@@ -12,4 +12,4 @@ include .make/log.make
 include .make/general.make
 include .make/git.make
 include .make/headers.make
-
+include .make/go/main.make
