@@ -73,17 +73,19 @@ COMMIT_MSG ?= _git.commit-msg-noop
 git.commit-msg: $(COMMIT_MSG)
 
 # prefixes for commit messages
-PREFIXES ?= gs ns as is webui util doc make vendor
+PREFIXES ?= gs ns as is webui util doc make vendor dev
 
 # the args of the commit hook
 ARGS ?= /dev/null
 
 # check the commit message to have a prefix
-git.commit-msg-prefix:
+git.commit-msg-log:
 	@$(log) "checking commit message"
+
+git.commit-msg-prefix:
 	@ok=0; \
 	for prefix in `echo $(PREFIXES)`; do \
-		cat $(ARGS) | grep -q '^\(.*,\)\?'$$prefix'\(,.*\)\?: ' && ok=1 || true; \
+		cat $(ARGS) | grep -q '^\(fixup! \)\?\(.*,\)\?'$$prefix'\(,.*\)\?: ' && ok=1 || true; \
 	done; \
 	if [[ $$ok -ne 1 ]]; then \
 		$(err) "commit messages should start with a topic from: $(PREFIXES)"; \
@@ -92,7 +94,7 @@ git.commit-msg-prefix:
 
 # check the commit message to be no longer thant 50 chars
 git.commit-msg-length:
-	@if [[ `head -n 1 $(ARGS) | wc -c` -gt 50 ]]; then \
+	@if [[ `head -n 1 $(ARGS) | sed 's/fixup! //' | wc -c` -gt 50 ]]; then \
 		$(err) "commit messages should be shorter than 50 characters"; \
 	fi
 
@@ -101,5 +103,13 @@ git.commit-msg-empty:
 	@if [[ `head -n 1 $(ARGS) | wc -c` -le 0 ]]; then \
 		$(err) "commit messages cannot be empty"; \
 	fi
+
+# check if the commit message ends with punctuation
+git.commit-msg-phrase:
+	@grep -q '[.,?]$$' $(ARGS) && $(warn) "commit messages should not end with punctuation" || true
+
+# check if the commit message begins with a capital letter
+git.commit-msg-casing:
+	@grep -q '.*: [A-Z]' $(ARGS) && $(warn) "commit messages should be lower case" || true
 
 # vim: ft=make
