@@ -8,8 +8,30 @@ The Things Network v3 API
 
 It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/_api.proto
+	github.com/TheThingsNetwork/ttn/api/end_device.proto
+	github.com/TheThingsNetwork/ttn/api/lorawan.proto
+	github.com/TheThingsNetwork/ttn/api/messages.proto
+	github.com/TheThingsNetwork/ttn/api/metadata.proto
 
 It has these top-level messages:
+	EndDeviceIdentifiers
+	Message
+	MHDR
+	MACPayload
+	FHDR
+	FCtrl
+	MACCommand
+	JoinRequestPayload
+	RejoinRequestPayload
+	JoinAcceptPayload
+	DLSettings
+	CFList
+	TxSettings
+	UplinkMessage
+	DownlinkMessage
+	RxMetadata
+	TxMetadata
+	Location
 */
 package ttnpb
 

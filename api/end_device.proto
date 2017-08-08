@@ -1,0 +1,24 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+package ttn.v3;
+
+option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+
+// End device identifiers are carried with uplink and downlink messages
+// Unknown fields are left empty
+message EndDeviceIdentifiers {
+  // TTN Device ID
+  string dev_id = 1 [(gogoproto.customname) = "DevID"];
+  // TTN Application ID
+  string app_id = 2 [(gogoproto.customname) = "AppID"];
+  // LoRaWAN DevEUI
+  bytes dev_eui = 3 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
+  // LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices)
+  bytes join_eui = 4 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+  // LoRaWAN DevAddr
+  bytes dev_addr = 5 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
+}

@@ -1,0 +1,164 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+package ttn.v3;
+
+option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+
+message Message {
+  MHDR  m_hdr = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  bytes mic   = 2 [(gogoproto.customname) = "MIC"];
+
+  oneof Payload {
+    MACPayload           mac_payload             = 3 [(gogoproto.customname) = "MACPayload"];
+    JoinRequestPayload   join_request_payload    = 4;
+    JoinAcceptPayload    join_accept_payload     = 5;
+    RejoinRequestPayload rejoin_request_payload  = 6;
+  }
+
+  reserved 7; // reserved for proprietary payload
+}
+
+enum MType {
+  JOIN_REQUEST      = 0;
+  JOIN_ACCEPT       = 1;
+  UNCONFIRMED_UP    = 2;
+  UNCONFIRMED_DOWN  = 3;
+  CONFIRMED_UP      = 4;
+  CONFIRMED_DOWN    = 5;
+  REJOIN_REQUEST    = 6;
+}
+
+enum Major {
+  LORAWAN_R1 = 0;
+}
+
+message MHDR {
+  MType m_type  = 1;
+  Major major   = 2;
+}
+
+message MACPayload {
+  FHDR  f_hdr       = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  int32 f_port      = 2;
+  bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
+}
+
+message FHDR {
+  bytes dev_addr  = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
+  FCtrl f_ctrl    = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  uint32 f_cnt    = 3;
+  repeated MACCommand f_opts = 4 [(gogoproto.nullable) = false];
+}
+
+message FCtrl {
+  bool    adr         = 1 [(gogoproto.customname) = "ADR"];
+  bool    adr_ack_req = 2 [(gogoproto.customname) = "ADRAckReq"]; // only on uplink
+  bool    ack         = 3;
+  bool    f_pending   = 4; // only on downlink
+  bool    class_b     = 5; // only on uplink
+}
+
+enum CID {
+  RESERVED_0         = 0;
+  RESET              = 1;
+  LINK_CHECK         = 2;
+  LINK_ADR           = 3;
+  DUTY_CYCLE         = 4;
+  RX_PARAM_SETUP     = 5;
+  DEV_STATUS         = 6;
+  NEW_CHANNEL        = 7;
+  RX_TIMING_SETUP    = 8;
+  TX_PARAM_SETUP     = 9;
+  DL_CHANNEL         = 10;
+  REKEY              = 11;
+  ADR_PARAM_SETUP    = 12;
+  DEVICE_TIME        = 13;
+  FORCE_REJOIN       = 14;
+  REJOIN_PARAM_SETUP = 15;
+}
+
+message MACCommand {
+  CID    cid     = 1 [(gogoproto.customname) = "CID"];
+  bytes  payload = 2;
+}
+
+message JoinRequestPayload {
+  bytes join_eui  = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "JoinEUI", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
+  bytes dev_eui   = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "DevEUI", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
+  bytes dev_nonce = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevNonce"];
+}
+
+enum RejoinType {
+  CONTEXT = 0; // Resets DevAddr, Session Keys, Frame Counters, Radio Parameters
+  SESSION = 1; // Equivalent to the initial JoinRequest
+  KEYS    = 2; // Resets DevAddr, Session Keys, Frame Counters, while keeping the Radio Parameters
+}
+
+message RejoinRequestPayload {
+  RejoinType  rejoin_type = 1;
+  bytes       net_id      = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.NetID"];
+  bytes       join_eui    = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "JoinEUI", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
+  bytes       dev_eui     = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "DevEUI", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
+  uint32      rejoin_cnt  = 5; // contains RJCount0 or RJCount1 depending on rejoin_type
+}
+
+message JoinAcceptPayload {
+  bytes       encrypted   = 1;
+  bytes       join_nonce  = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.JoinNonce"];
+  bytes       net_id      = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.NetID"];
+  bytes       dev_addr    = 4 [(gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
+  DLSettings  dl_settings = 5 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  uint32      rx_delay    = 6;
+  CFList      cf_list     = 7 [(gogoproto.customname) = "CFList"];
+}
+
+message DLSettings {
+  uint32 rx1_dr_offset = 1 [(gogoproto.customname) = "Rx1DROffset"];
+  uint32 rx2_dr        = 2 [(gogoproto.customname) = "Rx2DR"];
+}
+
+message CFList {
+  repeated uint32 freq = 1;
+}
+
+enum Modulation {
+  LORA = 0;
+  FSK  = 1;
+}
+
+// TxSettings contains the LoRaWAN settings for a transmission.
+// This message is used in both uplink and downlink
+message TxSettings {
+  Modulation modulation = 1;
+
+  // LoRaWAN data rate index
+  int32 data_rate_index = 2;
+
+  // Bandwidth in Hz (derived from data_rate_index)
+  uint32 bandwidth = 3;
+
+  // LoRa spreading factor (derived from data_rate_index)
+  uint32 spreading_factor = 4;
+
+  // FSK bit rate (derived from data_rate_index)
+  uint32 bit_rate = 5;
+
+  // LoRa coding rate
+  string coding_rate = 6;
+
+  // Frequency in Hz
+  uint64 frequency = 7;
+
+  // Transmit power in dBm
+  // - not set on uplink messages
+  int32 tx_power = 8;
+
+  // LoRa polarization inversion
+  // - gateway to end device: true
+  // - end device to gateway: false
+  bool polarization_inversion = 9;
+}

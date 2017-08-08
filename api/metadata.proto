@@ -1,0 +1,97 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+package ttn.v3;
+
+option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+
+// RxMetadata contains metadata for a received message. Each antenna that receives
+// a message corresponds to one RxMetadata.
+message RxMetadata {
+  // ID of the gateway that received the message
+  string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
+
+  // Index of the antenna that received the message
+  uint32 antenna_idx = 2;
+
+  // Index of the channel that received the message
+  uint32 channel_idx = 3;
+
+  // Gateway's internal timestamp when the Rx finished (nanoseconds)
+  // NOTE: most gateways use microsecond timestamps, so conversion may be needed
+  uint64 timestamp = 4;
+
+  // Real time
+  google.protobuf.Timestamp time = 5 [(gogoproto.stdtime) = true];
+
+  // Received signal strength in dBm
+  float rssi = 6 [(gogoproto.customname) = "RSSI"];
+
+  // Signal-to-noise-ratio in dB
+  float snr = 7 [(gogoproto.customname) = "SNR"];
+
+  // Location of the antenna
+  Location location = 8;
+
+  // Advanced metadata fields
+  // - can be used for advanced information or experimental features that are not yet formally defined in the API
+  // - field names are written in snake_case
+  google.protobuf.Struct advanced = 99;
+}
+
+// TxMetadata contains metadata for a to-be-transmitted message.
+// It contains gateway-specific fields that are not in the TxSettings message
+message TxMetadata {
+  // ID of the gateway that received the message
+  string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
+
+  // Gateway's internal timestamp when the Tx should start (nanoseconds)
+  // NOTE: most gateways use microsecond timestamps, so conversion may be needed
+  uint64 timestamp = 2;
+
+  // Real time
+  google.protobuf.Timestamp time = 3 [(gogoproto.stdtime) = true];
+
+  // Advanced metadata fields
+  // - can be used for advanced information or experimental features that are not yet formally defined in the API
+  // - field names are written in snake_case
+  google.protobuf.Struct advanced = 99;
+}
+
+// Location of an object
+message Location {
+  // The North–South position (degrees; -90 to +90), where 0 is the equator, North pole is positive, South pole is negative
+  float latitude = 1;
+
+  // The East-West position (degrees; -180 to +180), where 0 is the Prime Meridian (Greenwich), East is positive , West is negative
+  float longitude = 2;
+
+  // The altitude (meters), where 0 is the mean sea level
+  int32 altitude = 3;
+
+  // The accuracy of the location (meters)
+  int32 accuracy = 4;
+
+  // Source of the location information
+  LocationSource source = 5;
+}
+
+// LocationSource indicates the source of a Location
+enum LocationSource {
+  // The source of the location is not known or not set
+  UNKNOWN  = 0;
+  // The location is determined by GPS
+  GPS      = 1;
+  // The location is fixed by configuration
+  CONFIG   = 2;
+  // The location is set in and updated from a registry
+  REGISTRY = 3;
+  // The location is estimated with IP Geolocation
+  IP_GEOLOCATION = 4;
+  // More estimation methods can be added
+}

@@ -1,0 +1,125 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsNetwork/ttn/api/end_device.proto";
+import "github.com/TheThingsNetwork/ttn/api/lorawan.proto";
+import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
+
+package ttn.v3;
+
+option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+
+// Uplink message from the end device to the network
+message UplinkMessage {
+
+  // Mapping from UDP message (other fields can be set in "advanced"):
+  //
+  // - time: rx_metadata.time
+  // - tmst: rx_metadata.timestamp
+  // - freq: settings.frequency
+  // - modu: settings.modulation
+  // - datr: settings.data_rate_index (and derived fields)
+  // - codr: settings.coding_rate
+  // - size: len(raw_payload)
+  // - data: raw_payload (and derived payload)
+  // - rsig: rx_metadata
+  //  - ant: rx_metadata.antenna_idx
+  //  - chan: rx_metadata.channel_idx
+  //  - rssis: rx_metadata.rssi
+  //  - lsnr: rx_metadata.snr
+
+  // Mapping from BACKEND message:
+  //
+  // - PHYPayload: raw_payload
+  // - FRMPayload: payload.mac_payload.frm_payload
+  // - DevEUI: end_device.dev_eui
+  // - DevAddr: end_device.dev_addr
+  // - ULMetadata:
+  //  - DevEUI: end_device.dev_eui
+  //  - DevAddr: end_device.dev_addr
+  //  - FPort: payload.mac_payload.f_port
+  //  - FCntUp: payload.mac_payload.f_hdr.f_cnt
+  //  - Confirmed: payload.mhdr.m_type
+  //  - DataRate: settings.data_rate_index (and derived fields)
+  //  - ULFreq: settings.frequency
+  //  - RecvTime: included in each rx_metadata
+  //  - GWCnt: derived from rx_metadata contents
+  //  - GWInfo:
+  //   - ID: rx_metadata.gateway_id
+  //   - RSSI: rx_metadata.rssi
+  //   - SNR: rx_metadata.snr
+  //   - Lat: rx_metadata.location.latitude
+  //   - Lon: rx_metadata.location.longitude
+
+  // Raw uplink bytes (PHYPayload)
+  bytes raw_payload = 1;
+
+  // LoRaWAN Payload
+  Message payload = 2 [(gogoproto.nullable) = false];
+
+  // End device identifiers
+  EndDeviceIdentifiers end_device = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // LoRaWAN Tx settings used for this transmission
+  TxSettings settings = 4 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // Rx metadata from the gateway, one for each antenna that received the message
+  repeated RxMetadata rx_metadata = 5 [(gogoproto.nullable) = false];
+}
+
+// Downlink message from the network to the end device
+message DownlinkMessage {
+
+  // Mapping from UDP message:
+  //
+  // imme: -
+  // tmst: tx_metadata.timestamp
+  // time: tx_metadata.time
+  // freq: settings.frequency
+  // rfch: (0)
+  // powe: settings.tx_power
+  // modu: settings.modulation
+  // datr: settings.data_rate_index (derived)
+  // codr: settings.coding_rate
+  // fdev: (derived from bandwidth)
+  // ipol: settings.polarization_inversion
+  // prea: [settings.advanced]
+  // size: (derived from len(raw_payload))
+  // data: raw_payload
+  // ncrc: [settings.advanced]
+
+  // Mapping from BACKEND message:
+  //
+  // - PHYPayload: raw_payload
+  // - FRMPayload: payload.mac_payload.frm_payload
+  // - DevEUI: end_device.dev_eui
+  // - DevAddr: end_device.dev_addr
+  // - DLMetadata:
+  //  - DevEUI: end_device.dev_eui
+  //  - DevAddr: end_device.dev_addr
+  //  - FPort: payload.mac_payload.f_port
+  //  - FCntDown: payload.mac_payload.f_hdr.f_cnt
+  //  - Confirmed: payload.mhdr.m_type
+  //  - RXDelay1:                                                           | TODO: RX1/2 selection
+  //  - DataRate1/DataRate2: settings.data_rate_index (and derived fields)  |
+  //  - DLFreq1/DLFreq2: settings.frequency                                 |
+  //  - GWInfo:
+  //   - ID: tx_metadata.gateway_id
+
+  // Raw downlink bytes (PHYPayload)
+  bytes raw_payload = 1;
+
+  // LoRaWAN Payload
+  Message payload = 2 [(gogoproto.nullable) = false];
+
+  // End device identifiers
+  EndDeviceIdentifiers end_device = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // LoRaWAN Tx settings used for this transmission
+  TxSettings settings = 4 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // Tx metadata for the gateway
+  TxMetadata tx_metadata = 5 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+}
