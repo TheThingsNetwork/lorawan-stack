@@ -1,3 +1,6 @@
+# Copyright © 2017 The Things Network Foundation
+# Use of this code is governed by the MIT license which can be found in the LICENSE file.
+
 # This makefile has tools for logging
 
 LOG_NAME ?= $(shell basename $$(pwd))
