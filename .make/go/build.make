@@ -1,5 +1,4 @@
-# Copyright © 2017 The Things Network Foundation
-# Use of this code is governed by the MIT license which can be found in the LICENSE file.
+# Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 # Infer GOOS and GOARCH
 GOOS   ?= $(or $(word 1,$(subst -, ,${TARGET_PLATFORM})), $(shell echo "`go env GOOS`"))

@@ -1,5 +1,4 @@
-# Copyright © 2017 The Things Network Foundation
-# Use of this code is governed by the MIT license which can be found in the LICENSE file.
+# Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 # This makefile contains rules to check and fix headers in files. This can be
 # used to automatically check for copyright headers and fix them easily.

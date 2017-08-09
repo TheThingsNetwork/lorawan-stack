@@ -1,8 +1,7 @@
-# Copyright © 2017 The Things Network Foundation
-# Use of this code is governed by the MIT license which can be found in the LICENSE file.
+# Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 YEAR = 2017
-HEADER = $(COMMENT) Copyright © $(YEAR) The Things Network Foundation\n$(COMMENT) Use of this code is governed by the MIT license which can be found in the LICENSE file.
+HEADER = $(COMMENT) Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 HEADER_EXTRA_FILES = Makefile
 
 PRE_COMMIT = headers.check-staged
