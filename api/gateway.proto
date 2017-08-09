@@ -1,0 +1,58 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+package ttn.v3;
+
+option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+
+message GatewayStatus {
+  // Current time of the gateway
+  google.protobuf.Timestamp time = 1 [(gogoproto.stdtime) = true];
+
+  // Boot time of the gateway
+  // - can be left out to save bandwidth; old value will be kept
+  google.protobuf.Timestamp boot_time = 2 [(gogoproto.stdtime) = true];
+
+  // Gateway Platform
+  // - can be left out to save bandwidth; old value will be kept
+  // - for example: "Kerlink iBTS", "MultiTech Conduit AEP", "The Things Gateway", "..."
+  string platform = 3;
+
+  // Versions of gateway subsystems
+  // - each field can be left out to save bandwidth; old value will be kept
+  // - map keys are written in snake_case
+  // - for example:
+  //     firmware: "2.0.4"
+  //     forwarder: "v2-3.3.1"
+  //     fpga: "48"
+  //     dsp: "27"
+  //     hal: "v2-3.5.0"
+  map<string,string> versions = 4;
+
+  // Location of the gateway
+  // - if left out, server uses registry-set location as fallback
+  Location location = 5;
+
+  // IP addresses of this gateway
+  repeated string ip = 6 [(gogoproto.customname) = "IP"];
+
+  // Round-trip time to the server
+  google.protobuf.Duration rtt = 7 [(gogoproto.customname) = "RTT", (gogoproto.stdduration) = true];
+
+  // Metrics
+  // - can be used for forwarding gateway metrics such as temperatures or performance metrics
+  // - map keys are written in snake_case
+  map<string,float> metrics = 8;
+
+  // Advanced metadata fields
+  // - can be used for advanced information or experimental features that are not yet formally defined in the API
+  // - field names are written in snake_case
+  google.protobuf.Struct advanced = 99;
+}
