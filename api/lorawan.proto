@@ -114,11 +114,13 @@ message JoinAcceptPayload {
   DLSettings  dl_settings = 5 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   uint32      rx_delay    = 6;
   CFList      cf_list     = 7 [(gogoproto.customname) = "CFList"];
+  reserved 8; // Reserved for CFListType
 }
 
 message DLSettings {
   uint32 rx1_dr_offset = 1 [(gogoproto.customname) = "Rx1DROffset"];
   uint32 rx2_dr        = 2 [(gogoproto.customname) = "Rx2DR"];
+  reserved 3; // Reserved for OptNeg
 }
 
 message CFList {
