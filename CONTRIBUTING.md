@@ -42,6 +42,7 @@ The component or topic is typically a few characters long and should always be p
 - `ci`: CI instructions, e.g. Travis file
 - `doc`: documentation
 - `dev`: other non-functional development changes, e.g. Makefile, .gitignore, editor config
+- `all`: changes affecting all code, e.g. primitive types
 
 Changes that affect multiple components can be comma separated.
 
