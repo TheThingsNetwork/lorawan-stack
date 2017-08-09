@@ -38,7 +38,7 @@ git.hooks:
 	@for hook in $(_hooks); do \
 		touch ".git/hooks/$$hook"; \
 		chmod u+x ".git/hooks/$$hook"; \
-		grep "make" ".git/hooks/$$hook" >/dev/null || $(log) "installing git hook: $$hook" && echo 'ARGS="$$1" make git.'$$hook >> ".git/hooks/$$hook"; \
+		grep -q "make" ".git/hooks/$$hook" || { $(log) "installing git hook: $$hook" && echo 'ARGS="$$1" make git.'$$hook >> ".git/hooks/$$hook"; } \
 	done
 
 # remove git hooks
