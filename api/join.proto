@@ -1,0 +1,81 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsNetwork/ttn/api/end_device.proto";
+import "github.com/TheThingsNetwork/ttn/api/lorawan.proto";
+import "google/protobuf/duration.proto";
+
+package ttn.v3;
+
+option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+
+// Join Request
+message JoinReq {
+  // Raw uplink bytes (PHYPayload)
+  bytes raw_payload = 1;
+
+  // LoRaWAN Payload
+  Message payload = 2 [(gogoproto.nullable) = false];
+
+  // End device identifiers
+  // - this includes the DevAddr assigned by the Network Server
+  EndDeviceIdentifiers end_device = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // MAC version selected by the NS
+  string selected_mac_version = 4;
+
+  // NetID of the accepting network server
+  bytes net_id = 5 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.NetID"];
+
+  // Downlink Settings
+  DLSettings downlink_settings = 6 [(gogoproto.nullable) = false];
+
+  // RX Delay in seconds
+  uint32 rx_delay = 7;
+
+  // Optional CFList
+  CFList cf_list = 8 [(gogoproto.customname) = "CFList"];
+
+  reserved 9; // Reserved for CFListType
+}
+
+// Answer to the Join Request
+message JoinAns {
+  // Raw uplink bytes (PHYPayload)
+  bytes raw_payload = 1;
+
+  // The session keys
+  SessionKeys session_keys = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // Lifetime of the session
+  google.protobuf.Duration lifetime = 3;
+}
+
+// Session keys for a LoRaWAN session.
+// Only the components for which the keys were meant, will have the key-encryption-key (KEK) to decrypt the individual keys
+message SessionKeys {
+  // Join Server issued identifier for the session keys
+  string session_key_id = 1;
+
+  // The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode)
+  KeyEnvelope f_nwk_s_int_key = 2;
+
+  // The (encrypted) Serving Network Session Integrity Key
+  KeyEnvelope s_nwk_s_int_key = 4;
+
+  // The (encrypted) Network Session Encryption Key
+  KeyEnvelope nwk_s_enc_key = 6;
+
+  // The (encrypted) Application Session Key
+  KeyEnvelope app_s_key = 8;
+}
+
+message KeyEnvelope {
+  // The (encrypted) key
+  bytes key = 1 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.AES128Key"];
+
+  // The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key
+  string kek_label = 2;
+}
