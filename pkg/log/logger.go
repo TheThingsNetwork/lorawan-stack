@@ -8,8 +8,8 @@ import (
 
 // Logger implements Interface
 type Logger struct {
-	Level   Level
-	Handler Handler
+	Handler
+	Level Level
 }
 
 // Debug implements log.Interface
@@ -63,23 +63,23 @@ func (l *Logger) Fatalf(msg string, v ...interface{}) {
 }
 
 // WithField implements log.Interface
-func (l *Logger) WithField(string, interface{}) Interface {
-	return l.entry()
+func (l *Logger) WithField(name string, val interface{}) Interface {
+	return l.entry().WithField(name, val)
 }
 
 // WithFields implements log.Interface
-func (l *Logger) WithFields(Fielder) Interface {
-	return l
+func (l *Logger) WithFields(fields Fielder) Interface {
+	return l.entry().WithFields(fields)
 }
 
 // WithError implements log.Interface
-func (l *Logger) WithError(error) Interface {
-	return l
+func (l *Logger) WithError(err error) Interface {
+	return l.entry().WithError(err)
 }
 
 // entry creates a new log entry
-func (l *Logger) entry() *E {
-	return &E{
+func (l *Logger) entry() *entry {
+	return &entry{
 		logger: l,
 		fields: Fields(),
 	}
