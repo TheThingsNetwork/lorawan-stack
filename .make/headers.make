@@ -54,6 +54,19 @@ headers.fix:
 		fi; \
 	done
 
+# remove the headers in all the files
+headers.remove:
+	@$(log) "removing headers in `echo $$($(__HEADER_FILES)) | $(count)` files"
+	@for file in `$(__HEADER_FILES)`; do \
+		"$(MAKE_DIR)/headers.sh" remove "$(HEADER)" "$$file" "$(COMMENT)"; \
+		code=$$?; \
+		if [[ $$code -eq 2 ]]; then \
+			$(log) "removed header in \`$$file\`"; \
+		elif [[ $$code -ne 0 ]]; then \
+			$(err) "could not remove header in \`$$file\`"; exit 1; \
+		fi; \
+	done
+
 # check staged files
 headers.check-staged: __HEADER_FILES = $(_HEADER_FILES) | $(only_staged)
 headers.check-staged: headers.check

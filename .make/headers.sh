@@ -30,11 +30,20 @@ function fix () {
   exit 2
 }
 
+function remove () {
+  tmp=`mktemp`
+  N=`expr $LINES + 1`
+  tail -n +$N "$1" | sed '/./,$!d' > "$tmp"
+  mv "$tmp" "$1"
+  exit 2
+}
+
 ok=1
 for i in `seq 1 ${LINES}`; do
   hline=`echo -e ${HEADER} | sed $i'q;d'`
   sed $i'q;d' "$FILE" | grep -q ^$hline$ || ok=0
 done
+
 if [[ $ok -ne 1 ]]; then
   case "$CMD" in
     check)
@@ -42,6 +51,12 @@ if [[ $ok -ne 1 ]]; then
       ;;
     fix)
       fix "$FILE"
+      ;;
+  esac
+else
+  case "$CMD" in
+    remove)
+      remove "$FILE"
       ;;
   esac
 fi
