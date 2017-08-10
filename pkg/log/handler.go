@@ -6,3 +6,14 @@ package log
 type Handler interface {
 	HandleLog(Entry) error
 }
+
+// NoopHandler is a handler that does nothing
+var NoopHandler = &noopHandler{}
+
+// noopHandler is a handler that does nothing
+type noopHandler struct{}
+
+// HandleLog implements Handler
+func (h *noopHandler) HandleLog(Entry) error {
+	return nil
+}

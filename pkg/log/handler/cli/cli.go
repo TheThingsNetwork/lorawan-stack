@@ -11,7 +11,6 @@ import (
 	"sync"
 
 	"github.com/TheThingsNetwork/ttn/pkg/log"
-	"github.com/TheThingsNetwork/ttn/pkg/option"
 )
 
 const (
@@ -39,15 +38,14 @@ type Handler struct {
 	UseColor bool
 }
 
-// UseColor is a functional option with which you can force the usage of colors on or off
-func UseColor(arg bool) option.Option {
-	return option.Fn(func(to interface{}) error {
-		if h, ok := to.(*Handler); ok {
-			h.UseColor = arg
-		}
+// Option is the type of options for the Handler
+type Option func(*Handler)
 
-		return nil
-	})
+// UseColor is a functional option with which you can force the usage of colors on or off
+func UseColor(arg bool) Option {
+	return func(handler *Handler) {
+		handler.UseColor = arg
+	}
 }
 
 // colorTerms contains a list of substrings that indicate support for terminal colors
@@ -58,12 +56,7 @@ var colorTerms = []string{
 
 // ColorFromTerm determines from the TERM and COLORTERM environment variables wether or not
 // to use colors
-var ColorFromTerm = option.Fn(func(to interface{}) error {
-	h, ok := to.(*Handler)
-	if !ok {
-		return nil
-	}
-
+var ColorFromTerm = func(handler *Handler) {
 	COLORTERM := os.Getenv("COLORTERM")
 	TERM := os.Getenv("TERM")
 
@@ -78,26 +71,26 @@ var ColorFromTerm = option.Fn(func(to interface{}) error {
 	// COLORTERM=0 forces colors off
 	color = color && COLORTERM != "0"
 
-	h.UseColor = color
-	return nil
-})
+	handler.UseColor = color
+}
 
 // defaultOptions are the default options for the handler
-var defaultOptions = option.Options{
+var defaultOptions = []Option{
 	ColorFromTerm,
 }
 
 // New returns a new handler
-func New(w io.Writer, opts ...option.Option) *Handler {
-	h := &Handler{
+func New(w io.Writer, opts ...Option) *Handler {
+	handler := &Handler{
 		Writer:   w,
 		UseColor: false,
 	}
 
-	defaultOptions.Apply(h)
-	option.Options(opts).Apply(h)
+	for _, opt := range append(defaultOptions, opts...) {
+		opt(handler)
+	}
 
-	return h
+	return handler
 }
 
 // HandleLog implements log.Handler

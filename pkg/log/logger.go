@@ -6,6 +6,24 @@ import (
 	"fmt"
 )
 
+var defaultOptions = []Option{
+	WithLevel(Info),
+	WithHandler(NoopHandler),
+}
+
+// NewLogger creates a new logger with the default options
+func NewLogger(opts ...Option) (Interface, error) {
+	logger := &Logger{}
+
+	for _, opt := range append(defaultOptions, opts...) {
+		if err := opt(logger); err != nil {
+			return nil, err
+		}
+	}
+
+	return logger, nil
+}
+
 // Logger implements Interface
 type Logger struct {
 	Handler

@@ -52,7 +52,7 @@ func (e *entry) Message() string {
 // commit commits the log entry and passes it on to the handler
 func (e *entry) commit(level Level, msg string) {
 	// only log the entry if it has the correct level
-	if e.logger.Level <= level {
+	if e.logger.Handler != nil && e.logger.Level <= level {
 		e.logger.HandleLog(&entry{
 			message: msg,
 			level:   level,
