@@ -2,7 +2,7 @@
 
 # fmt all packages
 go.fmt:
-	@$(log) "formatting `$(GO_PACKAGES) | $(count)` go packages"
+	@$(log) "Formatting `$(GO_PACKAGES) | $(count)` go packages"
 	@[[ -z "`$(GO_PACKAGES) | xargs go fmt | tee -a /dev/stderr`" ]]
 
 # fmt stages packages
@@ -11,7 +11,7 @@ go.fmt-staged: go.fmt
 
 # vet all packages
 go.vet:
-	@$(log) "vetting `$(GO_PACKAGES) | $(count)` go packages"
+	@$(log) "Vetting `$(GO_PACKAGES) | $(count)` go packages"
 	@$(GO_PACKAGES) | xargs $(GO) vet
 
 # vet staged packages
@@ -20,7 +20,7 @@ go.vet-staged: go.vet
 
 # lint all packages, exiting when errors occur
 go.lint:
-	@$(log) "linting `$(GO_LINT_FILES) | $(count)` go files"
+	@$(log) "Linting `$(GO_LINT_FILES) | $(count)` go files"
 	@CODE=0; for pkg in `$(GO_LINT_FILES)`; do $(GOLINT) $(GOLINT_FLAGS) $$pkg 2>/dev/null || { CODE=1; }; done; exit $$CODE
 
 # lint all packages, ignoring errors
@@ -35,8 +35,8 @@ go.lint-staged: go.lint
 VENDOR_FILE = $(GO_VENDOR_FILE)
 go.check-vendors: DOUBLY_VENDORED=$(shell cat $(VENDOR_FILE) | grep -n '^[\t ]*name = .*/vendor/' | awk '{ print $$1 $$3 }' | sed 's/["]//g')
 go.check-vendors:
-	@test $(VENDOR_FILE) != "/dev/null" && $(log) "checking $(VENDOR_FILE) for bad packages" || true
-	@if test $$(echo $(DOUBLY_VENDORED) | wc -w) -gt 0; then $(log) "doubly vendored packages in $(VENDOR_FILE):" && echo $(DOUBLY_VENDORED) | xargs -n1 echo "       " | sed 's/:/  /' && exit 1; fi
+	@test $(VENDOR_FILE) != "/dev/null" && $(log) "Checking $(VENDOR_FILE) for bad packages" || true
+	@if test $$(echo $(DOUBLY_VENDORED) | wc -w) -gt 0; then $(err) "Doubly vendored packages in $(VENDOR_FILE):" && echo $(DOUBLY_VENDORED) | xargs -n1 echo "       " | sed 's/:/  /' && exit 1; fi
 
 # check if you have vendored packages in vendor (if it is staged)
 go.check-vendors-staged: VENDOR_FILE=$(shell $(STAGED_FILES) | grep -q $(GO_VENDOR_FILE) || echo /dev/null)

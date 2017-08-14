@@ -83,29 +83,29 @@ TEST_PACKAGES = $(GO_FILES) | $(no_vendor) | $(only_test) | $(to_packages)
 
 # get tools required for development
 go.dev-deps:
-	@$(log) "installing go dev dependencies"
-	@command -v dep  >/dev/null || { $(log) "installing dep" && $(GO) get -u github.com/golang/dep/cmd/dep; }
-	@command -v golint >/dev/null || { $(log) "installing golint" && $(GO) get -u github.com/golang/lint/golint; }
+	@$(log) "Installing go dev dependencies"
+	@command -v dep  >/dev/null || { $(log) "Installing dep" && $(GO) get -u github.com/golang/dep/cmd/dep; }
+	@command -v golint >/dev/null || { $(log) "Installing golint" && $(GO) get -u github.com/golang/lint/golint; }
 
 # install dependencies
 go.deps:
-	@$(log) "installing go dependencies"
+	@$(log) "Installing go dependencies"
 	@dep ensure -v
 
 # install packages for faster rebuilds
 go.install:
-	@$(log) "installing `$(EXTERNAL_PACKAGES) | $(count)` go packages"
+	@$(log) "Installing `$(EXTERNAL_PACKAGES) | $(count)` go packages"
 	@$(EXTERNAL_PACKAGES) | xargs $(GO) install -v
 
 # pre-build local files, ignoring failures (from unused packages or files for example)
 # use this to improve build speed
 go.pre:
-	@$(log) "installing go packages"
+	@$(log) "Installing go packages"
 	@$(GO_FILES) | $(to_packages) | xargs $(GO) install -v || true
 
 # clean build files
 go.clean:
-	@$(log) "cleaning release dir" [rm -rf $(RELEASE_DIR)]
+	@$(log) "Cleaning release dir" [rm -rf $(RELEASE_DIR)]
 	@rm -rf $(RELEASE_DIR)
 
 # list all go files
@@ -118,7 +118,7 @@ go.list-staged: go.list
 
 # init initializes go
 go.init:
-	@$(log) "initializing go"
+	@$(log) "Initializing go"
 	@make go.dev-deps
 	@dep init
 

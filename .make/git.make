@@ -38,18 +38,18 @@ git.hooks:
 	@for hook in $(_hooks); do \
 		touch ".git/hooks/$$hook"; \
 		chmod u+x ".git/hooks/$$hook"; \
-		grep -q "make" ".git/hooks/$$hook" || { $(log) "installing git hook: $$hook" && echo 'ARGS="$$1" make git.'$$hook >> ".git/hooks/$$hook"; } \
+		grep -q "make" ".git/hooks/$$hook" || { $(log) "Installing git hook: $$hook" && echo 'ARGS="$$1" make git.'$$hook >> ".git/hooks/$$hook"; } \
 	done
 
 # remove git hooks
 git.hooks.remove:
 	@for hook in $(_hooks); do \
-		rm ".git/hooks/$$hook" 2>/dev/null && $(log) "removed git hook: $$hook" || true; \
+		rm ".git/hooks/$$hook" 2>/dev/null && $(log) "Removed git hook: $$hook" || true; \
 	done
 
 # pre-commit
 _git.pre-commit-noop:
-	@$(warn) "warning: no pre-commit hooks set, add them by overriding PRE_COMMIT in your makefile"
+	@$(warn) "Warning: No pre-commit hooks set, add them by overriding PRE_COMMIT in your makefile"
 
 PRE_COMMIT ?= _git.pre-commit-noop
 
@@ -57,7 +57,7 @@ git.pre-commit: $(PRE_COMMIT)
 
 # pre-push
 _git.pre-push-noop:
-	@$(warn) "warning: no pre-push hooks set, add them by overriding PRE_PUSH in your makefile"
+	@$(warn) "Warning: No pre-push hooks set, add them by overriding PRE_PUSH in your makefile"
 
 PRE_PUSH ?= _git.pre-push-noop
 
@@ -65,7 +65,7 @@ git.pre-push: $(PRE_PUSH)
 
 # commit-msg
 _git.commit-msg-noop:
-	@$(warn) "warning: no commit-msg hooks set, add them by overriding COMMIT_MSG in your makefile"
+	@$(warn) "Warning: No commit-msg hooks set, add them by overriding COMMIT_MSG in your makefile"
 
 COMMIT_MSG ?= _git.commit-msg-noop
 
@@ -79,7 +79,7 @@ ARGS ?= /dev/null
 
 # check the commit message to have a prefix
 git.commit-msg-log:
-	@$(log) "checking commit message"
+	@$(log) "Checking commit message"
 
 git.commit-msg-prefix:
 	@ok=0; \
@@ -87,31 +87,31 @@ git.commit-msg-prefix:
 		cat $(ARGS) | grep -q '^\(fixup! \)\?\(.*,\)\?'$$prefix'\(,.*\)\?: ' && ok=1 || true; \
 	done; \
 	if [[ $$ok -ne 1 ]]; then \
-		$(err) "commit messages should start with a topic from: $(PREFIXES)"; \
+		$(err) "Commit messages should start with a topic from: $(PREFIXES)"; \
 		exit 1; \
 	fi
 
 # check the commit message to be no longer thant 50 chars
 git.commit-msg-length:
 	@if [[ `head -n 1 $(ARGS) | sed 's/fixup! //' | wc -c` -gt 72 ]]; then \
-		$(err) "commit messages should be shorter than 72 characters"; \
+		$(err) "Commit messages should be shorter than 72 characters"; \
 		exit 1; \
 	elif [[ `head -n 1 $(ARGS) | sed 's/fixup! //' | wc -c` -gt 50 ]]; then \
-		$(warn) "commit messages should be shorter than 50 characters"; \
+		$(warn) "Commit messages should be shorter than 50 characters"; \
 	fi
 
 # check the commit message to not be empty
 git.commit-msg-empty:
 	@if [[ `head -n 1 $(ARGS) | wc -c` -le 0 ]]; then \
-		$(err) "commit messages cannot be empty"; \
+		$(err) "Commit messages cannot be empty"; \
 	fi
 
 # check if the commit message ends with punctuation
 git.commit-msg-phrase:
-	@grep -q '[.,?]$$' $(ARGS) && $(warn) "commit messages should not end with punctuation" || true
+	@grep -q '[.,?]$$' $(ARGS) && $(warn) "Commit messages should not end with punctuation" || true
 
 # check if the commit message begins with a capital letter
 git.commit-msg-casing:
-	@grep -q '.*: [a-z]' $(ARGS) && $(warn) "commit messages should be full sentences that with a capital letter" || true
+	@grep -q '.*: [a-z]' $(ARGS) && $(warn) "Commit messages should be full sentences that with a capital letter" || true
 
 # vim: ft=make

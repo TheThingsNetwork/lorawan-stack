@@ -34,36 +34,36 @@ __HEADER_FILES = $(_HEADER_FILES)
 
 # check files to see if they have the required header
 headers.check:
-	@$(log) "checking headers in `echo $$($(__HEADER_FILES)) | $(count)` files"
+	@$(log) "Checking headers in `echo $$($(__HEADER_FILES)) | $(count)` files"
 	@CODE=0; \
 	for file in `$(__HEADER_FILES)`; do \
-		"$(MAKE_DIR)/headers.sh" check "$(HEADER)" "$$file" || { $(err) "incorrect or missing header in $$file"; CODE=1; }; \
+		"$(MAKE_DIR)/headers.sh" check "$(HEADER)" "$$file" || { $(err) "Incorrect or missing header in $$file"; CODE=1; }; \
 	done; \
 	exit $$CODE
 
 # fix the headers in all the files
 headers.fix:
-	@$(log) "fixing headers in `echo $$($(__HEADER_FILES)) | $(count)` files"
+	@$(log) "Fixing headers in `echo $$($(__HEADER_FILES)) | $(count)` files"
 	@for file in `$(__HEADER_FILES)`; do \
 		"$(MAKE_DIR)/headers.sh" fix "$(HEADER)" "$$file" "$(COMMENT)"; \
 		code=$$?; \
 		if [[ $$code -eq 2 ]]; then \
-			$(log) "fixed header in \`$$file\`"; \
+			$(log) "Fixed header in \`$$file\`"; \
 		elif [[ $$code -ne 0 ]]; then \
-			$(err) "could not fix header in \`$$file\`"; exit 1; \
+			$(err) "Could not fix header in \`$$file\`"; exit 1; \
 		fi; \
 	done
 
 # remove the headers in all the files
 headers.remove:
-	@$(log) "removing headers in `echo $$($(__HEADER_FILES)) | $(count)` files"
+	@$(log) "Removing headers in `echo $$($(__HEADER_FILES)) | $(count)` files"
 	@for file in `$(__HEADER_FILES)`; do \
 		"$(MAKE_DIR)/headers.sh" remove "$(HEADER)" "$$file" "$(COMMENT)"; \
 		code=$$?; \
 		if [[ $$code -eq 2 ]]; then \
-			$(log) "removed header in \`$$file\`"; \
+			$(log) "Removed header in \`$$file\`"; \
 		elif [[ $$code -ne 0 ]]; then \
-			$(err) "could not remove header in \`$$file\`"; exit 1; \
+			$(err) "Could not remove header in \`$$file\`"; exit 1; \
 		fi; \
 	done
 

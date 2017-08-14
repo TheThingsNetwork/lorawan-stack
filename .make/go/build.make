@@ -19,7 +19,7 @@ LAZY_GOARCH=`echo $@ | sed 's:$(RELEASE_DIR)/$(NAME)-::' | sed 's:.*-::'`
 
 # Build the executable
 $(RELEASE_DIR)/$(NAME)-%: $(shell $(GO_FILES)) $(VENDOR_DIR)/vendor.json
-	@$(log) "building" [$(GO_ENV) GOOS=$(GOOS) GOARCH=$(GOARCH) $(GO) build $(GO_FLAGS) ...]
+	@$(log) "Building" [$(GO_ENV) GOOS=$(GOOS) GOARCH=$(GOARCH) $(GO) build $(GO_FLAGS) ...]
 	$(GO_ENV) GOOS=$(LAZY_GOOS) GOARCH=$(LAZY_GOARCH) $(GO) build -o "$(RELEASE_DIR)/$(NAME)-$(LAZY_GOOS)-$(LAZY_GOARCH)" -v $(GO_FLAGS) $(LD_FLAGS) $(MAIN)
 
 # Build the executable in dev mode (much faster)
@@ -30,7 +30,7 @@ go.dev: $(RELEASE_DIR)/$(NAME)-$(GOOS)-$(GOARCH)
 
 ## link the executable to a simple name
 $(RELEASE_DIR)/$(NAME): $(RELEASE_DIR)/$(NAME)-$(GOOS)-$(GOARCH)
-	@$(log) "linking binary" [ln -sf $(RELEASE_DIR)/$(NAME)-$(GOOS)-$(GOARCH) $(RELEASE_DIR)/$(NAME)]
+	@$(log) "Linking binary" [ln -sf $(RELEASE_DIR)/$(NAME)-$(GOOS)-$(GOARCH) $(RELEASE_DIR)/$(NAME)]
 	@ln -sf $(NAME)-$(GOOS)-$(GOARCH) $(RELEASE_DIR)/$(NAME)
 
 go.link: $(RELEASE_DIR)/$(NAME)

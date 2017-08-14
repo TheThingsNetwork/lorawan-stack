@@ -2,13 +2,13 @@
 
 # run tests
 go.test:
-	@$(log) "testing `$(TEST_PACKAGES) | $(count)` go packages"
+	@$(log) "Testing `$(TEST_PACKAGES) | $(count)` go packages"
 	@$(GO) test $(GO_TEST_FLAGS) `$(TEST_PACKAGES)`
 
 # package coverage
 $(GO_COVER_DIR)/%.out: GO_TEST_FLAGS=-cover -coverprofile="$(GO_COVER_FILE)"
 $(GO_COVER_DIR)/%.out: %
-	@$(log) "testing $<"
+	@$(log) "Testing $<"
 	@mkdir -p `dirname "$(GO_COVER_DIR)/$<"`
 	@$(GO) test -cover -coverprofile="$@" "./$<"
 
