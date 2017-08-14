@@ -1,4 +1,4 @@
-// Code modified from github.com/grpc-ecosystem/grpc-gateway/runtime by copy.sh
+// Code generated from github.com/grpc-ecosystem/grpc-gateway/runtime by copy.sh
 
 package jsonpb
 

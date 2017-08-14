@@ -12,4 +12,4 @@ sed \
 
 goimports -w marshaling.go
 
-echo -e "// Code modified from github.com/grpc-ecosystem/grpc-gateway/runtime by copy.sh\n\n$(cat marshaling.go)" > marshaling.go
+echo -e "// Code generated from github.com/grpc-ecosystem/grpc-gateway/runtime by copy.sh\n\n$(cat marshaling.go)" > marshaling.go

@@ -1,4 +1,4 @@
-// Code copied from github.com/grpc-ecosystem/grpc-gateway/runtime
+// Code generated from github.com/grpc-ecosystem/grpc-gateway/runtime
 
 package jsonpb
 
