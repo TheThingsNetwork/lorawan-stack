@@ -10,31 +10,9 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/log"
+	"github.com/TheThingsNetwork/ttn/pkg/log/test"
 	"github.com/smartystreets/assertions"
 )
-
-type Entry struct {
-	message string
-	level   log.Level
-	time    time.Time
-	fields  log.Fielder
-}
-
-func (e *Entry) Message() string {
-	return e.message
-}
-
-func (e *Entry) Level() log.Level {
-	return e.level
-}
-
-func (e *Entry) Timestamp() time.Time {
-	return e.time
-}
-
-func (e *Entry) Fields() log.Fielder {
-	return e.fields
-}
 
 func TestHandlerNewColors(t *testing.T) {
 	a := assertions.New(t)
@@ -95,11 +73,11 @@ func TestHandlerHandleLog(t *testing.T) {
 
 	handler := New(w, UseColor(false))
 
-	err := handler.HandleLog(&Entry{
-		message: "Foo",
-		level:   log.Debug,
-		time:    time.Now(),
-		fields:  log.Fields("a", 10, "b", "bar", "c", false, "d", 33.4),
+	err := handler.HandleLog(&test.Entry{
+		M: "Foo",
+		L: log.Debug,
+		T: time.Now(),
+		F: log.Fields("a", 10, "b", "bar", "c", false, "d", 33.4),
 	})
 	a.So(err, assertions.ShouldBeNil)
 
