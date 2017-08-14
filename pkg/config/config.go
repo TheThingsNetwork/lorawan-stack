@@ -14,6 +14,9 @@ import (
 	"github.com/spf13/viper"
 )
 
+// TimeFormat is the format to parse times in
+const TimeFormat = time.RFC3339Nano
+
 // Manager is a manager for the configuration
 type Manager struct {
 	name     string
@@ -126,6 +129,10 @@ func (m *Manager) setDefaults(prefix string, config interface{}) {
 				m.viper.SetDefault(name, val)
 				m.flags.String(name, val, description)
 
+			case time.Time:
+				m.viper.SetDefault(name, val)
+				m.flags.String(name, val.Format(TimeFormat), description)
+
 			case []string:
 				m.viper.SetDefault(name, val)
 				m.flags.StringSlice(name, val, description)
@@ -200,21 +207,23 @@ func (m *Manager) Parse(flags ...string) {
 	m.flags.Parse(flags)
 }
 
-// r := reflect.Indirect(reflect.New(reflect.ValueOf(m.defaults).Type())).Interface()
-
+// Unmarshal unmarshals the available config keys to the interface that was passed
 func (m *Manager) Unmarshal(result interface{}) error {
 	d, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		TagName:          "name",
 		ZeroFields:       true,
 		WeaklyTypedInput: true,
 		Result:           result,
+		DecodeHook: mapstructure.ComposeDecodeHookFunc(
+			mapstructure.StringToTimeDurationHookFunc(),
+			stringToTimeHookFunc(TimeFormat),
+			stringSliceToStringMapHookFunc,
+		),
 	})
 
 	if err != nil {
 		return err
 	}
-
-	// TODO: parse map string string, time, ...
 
 	err = d.Decode(m.viper.AllSettings())
 	if err != nil {

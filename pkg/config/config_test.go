@@ -27,6 +27,8 @@ type example struct {
 
 	Bool      bool          `name:"bool" description:"A single bool"`
 	Duration  time.Duration `name:"duration" description:"A single duration"`
+	Time      time.Time     `name:"time" description:"A single time"`
+	TimePtr   *time.Time    `name:"timeptr" description:"A single time"`
 	Float     float64       `name:"float" description:"A single float"`
 	Int       int           `name:"int" description:"A single int"`
 	String    string        `name:"string" description:"A single string"`
@@ -43,6 +45,7 @@ var (
 	defaults = &example{
 		Bool:      true,
 		Duration:  2 * time.Second,
+		Time:      time.Date(1991, time.September, 12, 23, 24, 0, 0, time.UTC),
 		Float:     33.56,
 		Int:       42,
 		String:    "foo",
@@ -96,7 +99,9 @@ func TestConfigEnv(t *testing.T) {
 	settings := new(example)
 
 	os.Setenv("TEST_BOOL", "false")
+
 	os.Setenv("TEST_DURATION", "10m")
+	os.Setenv("TEST_TIME", "2017-08-12 01:02:03 +0000 UTC")
 	os.Setenv("TEST_FLOAT", "-112.45")
 	os.Setenv("TEST_INT", "345")
 	os.Setenv("TEST_STRING", "bababa")
@@ -116,6 +121,7 @@ func TestConfigEnv(t *testing.T) {
 	a.So(settings, should.Resemble, &example{
 		Bool:      false,
 		Duration:  10 * time.Minute,
+		Time:      time.Date(2017, time.August, 12, 01, 02, 03, 0, time.UTC),
 		Float:     -112.45,
 		Int:       345,
 		String:    "bababa",
@@ -140,6 +146,7 @@ func TestConfigFlags(t *testing.T) {
 
 	os.Setenv("TEST_BOOL", "")
 	os.Setenv("TEST_DURATION", "")
+	os.Setenv("TEST_TIME", "")
 	os.Setenv("TEST_FLOAT", "")
 	os.Setenv("TEST_INT", "")
 	os.Setenv("TEST_STRING", "")
@@ -151,6 +158,7 @@ func TestConfigFlags(t *testing.T) {
 	// parse no command line args
 	config.Parse(
 		"--duration", "10m",
+		"--time", "2017-08-12 01:02:03 +0000 UTC",
 		"--float", "12.45",
 		"--int", "345",
 		"--string", "bababa",
@@ -170,6 +178,7 @@ func TestConfigFlags(t *testing.T) {
 	a.So(settings, should.Resemble, &example{
 		Bool:      true,
 		Duration:  10 * time.Minute,
+		Time:      time.Date(2017, time.August, 12, 01, 02, 03, 0, time.UTC),
 		Float:     12.45,
 		Int:       345,
 		String:    "bababa",
