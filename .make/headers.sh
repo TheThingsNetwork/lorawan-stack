@@ -38,7 +38,14 @@ function remove () {
   exit 2
 }
 
+# Skip files that have generated in their header
+if head -n 3 "$FILE" | grep -q "generated"; then
+  exit 0
+fi
+
+
 ok=1
+
 for i in `seq 1 ${LINES}`; do
   hline=`echo -e ${HEADER} | sed $i'q;d'`
   sed $i'q;d' "$FILE" | grep -q ^$hline$ || ok=0
