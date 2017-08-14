@@ -13,7 +13,7 @@
 
 GIT_COMMIT = `git rev-parse HEAD 2>/dev/null`
 GIT_BRANCH = `git rev-parse --abbrev-ref HEAD 2>/dev/null`
-GIT_TAG = $(shell git describe --abbrev=0 --tags 2>/dev/null)
+GIT_TAG = `git describe --abbrev=0 --tags 2>/dev/null`
 BUILD_DATE = `date -u +%Y-%m-%dT%H:%M%SZ`
 
 GIT_RELATIVE_DIR=git rev-parse --show-prefix
