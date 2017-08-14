@@ -17,3 +17,5 @@ $(GO_COVER_FILE): go.cover.clean $(patsubst ./%,./$(GO_COVER_DIR)/%.out,$(shell 
 	@echo "mode: set" > $(GO_COVER_FILE)
 	@cat $(patsubst ./%,./$(GO_COVER_DIR)/%.out,$(shell $(TEST_PACKAGES))) | grep -vE "mode: set" | sort >> $(GO_COVER_FILE)
 
+
+# vim: ft=make

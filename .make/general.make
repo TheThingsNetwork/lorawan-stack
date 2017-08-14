@@ -17,3 +17,5 @@ INIT_RULES ?= git.hooks
 # init invokes the init rules
 init:
 	@make $(INIT_RULES)
+
+# vim: ft=make
