@@ -25,8 +25,8 @@ message UplinkMessage {
   // - size: len(raw_payload)
   // - data: raw_payload (and derived payload)
   // - rsig: rx_metadata
-  //  - ant: rx_metadata.antenna_idx
-  //  - chan: rx_metadata.channel_idx
+  //  - ant: rx_metadata.antenna_index
+  //  - chan: rx_metadata.channel_index
   //  - rssis: rx_metadata.rssi
   //  - lsnr: rx_metadata.snr
 

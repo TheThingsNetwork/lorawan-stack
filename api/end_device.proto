@@ -12,13 +12,16 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 // Unknown fields are left empty
 message EndDeviceIdentifiers {
   // TTN Device ID
-  string dev_id = 1 [(gogoproto.customname) = "DevID"];
+  string device_id = 1 [(gogoproto.customname) = "DeviceID"];
   // TTN Application ID
-  string app_id = 2 [(gogoproto.customname) = "AppID"];
+  string application_id = 2 [(gogoproto.customname) = "ApplicationID"];
+  // TTN Tenant ID (in case of multi-tenant network server)
+  string tenant_id = 3;
+
   // LoRaWAN DevEUI
-  bytes dev_eui = 3 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
+  bytes dev_eui = 4 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
   // LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices)
-  bytes join_eui = 4 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+  bytes join_eui = 5 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
   // LoRaWAN DevAddr
-  bytes dev_addr = 5 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
+  bytes dev_addr = 6 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
 }

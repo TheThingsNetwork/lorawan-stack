@@ -17,10 +17,10 @@ message RxMetadata {
   string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
 
   // Index of the antenna that received the message
-  uint32 antenna_idx = 2;
+  uint32 antenna_index = 2;
 
   // Index of the channel that received the message
-  uint32 channel_idx = 3;
+  uint32 channel_index = 3;
 
   // Gateway's internal timestamp when the Rx finished (nanoseconds)
   // NOTE: most gateways use microsecond timestamps, so conversion may be needed
