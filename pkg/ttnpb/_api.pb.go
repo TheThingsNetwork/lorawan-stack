@@ -20,8 +20,8 @@ It has these top-level messages:
 	KeyEnvelope
 	SessionKeys
 	GatewayStatus
-	JoinReq
-	JoinAns
+	JoinRequest
+	JoinResponse
 	Message
 	MHDR
 	MACPayload

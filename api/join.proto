@@ -12,7 +12,7 @@ package ttn.v3;
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // Join Request
-message JoinReq {
+message JoinRequest {
   // Raw uplink bytes (PHYPayload)
   bytes raw_payload = 1;
 
@@ -42,7 +42,7 @@ message JoinReq {
 }
 
 // Answer to the Join Request
-message JoinAns {
+message JoinResponse {
   // Raw uplink bytes (PHYPayload)
   bytes raw_payload = 1;
 
