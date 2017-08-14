@@ -1,0 +1,266 @@
+// Package config wraps Viper. It also allows to set a struct with defaults and generates pflags
+package config
+
+import (
+	"fmt"
+	"os"
+	"reflect"
+	"sort"
+	"strings"
+	"time"
+
+	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
+)
+
+// Manager is a manager for the configuration
+type Manager struct {
+	name     string
+	viper    *viper.Viper
+	flags    *pflag.FlagSet
+	replacer *strings.Replacer
+	defaults interface{}
+}
+
+// Flags to be used in the command
+func (m *Manager) Flags() *pflag.FlagSet {
+	return m.flags
+}
+
+// EnvKeyReplacer sets the strings.Replacer for mapping mapping an environmental variables to a key that does
+// not match them.
+func EnvKeyReplacer(r *strings.Replacer) Option {
+	return func(m *Manager) {
+		m.viper.SetEnvKeyReplacer(r)
+		m.replacer = r
+	}
+}
+
+// AllEnvironment returns all environment variables
+func (m *Manager) AllEnvironment() []string {
+	keys := m.viper.AllKeys()
+	env := make([]string, 0, len(keys))
+
+	for _, key := range keys {
+		env = append(env, strings.ToUpper(m.replacer.Replace(m.name+"."+key)))
+	}
+
+	return env
+}
+
+// AllKeys returns all keys holding a value, regardless of where they are set.
+// Nested keys are returned with a "." separator
+func (m *Manager) AllKeys() []string {
+	keys := m.viper.AllKeys()
+	sort.Strings(keys)
+
+	return keys
+}
+
+func (m *Manager) setDefaults(prefix string, config interface{}) {
+	configValue := reflect.ValueOf(config)
+	configKind := configValue.Type().Kind()
+
+	if configKind == reflect.Interface || configKind == reflect.Ptr {
+		configValue = configValue.Elem()
+		configKind = configValue.Type().Kind()
+	}
+
+	if configKind != reflect.Struct {
+		return
+	}
+
+	for i := 0; i < configValue.NumField(); i++ {
+		field := configValue.Type().Field(i)
+		name := field.Tag.Get("name")
+
+		if name == "-" {
+			continue
+		}
+
+		if name == "" {
+			name = strings.ToLower(field.Name)
+		}
+
+		if prefix != "" {
+			name = prefix + "." + name
+		}
+
+		description := field.Tag.Get("description")
+
+		if configValue.Field(i).CanInterface() {
+			fieldType := field.Type.Kind()
+
+			face := configValue.Field(i).Interface()
+			if fieldType == reflect.Interface || fieldType == reflect.Ptr {
+				if configValue.Field(i).IsNil() {
+					continue
+				}
+				elem := configValue.Field(i).Elem()
+				fieldType = elem.Type().Kind()
+				face = elem.Interface()
+			}
+
+			switch val := face.(type) {
+			case bool:
+				m.viper.SetDefault(name, val)
+				m.flags.Bool(name, val, description)
+
+			case int, int8, int16, int32, int64:
+				fieldValue := configValue.Field(i).Int()
+				m.viper.SetDefault(name, int(fieldValue))
+				m.flags.Int(name, int(fieldValue), description)
+
+			case uint, uint8, uint16, uint32, uint64:
+				fieldValue := configValue.Field(i).Uint()
+				m.viper.SetDefault(name, uint(fieldValue))
+				m.flags.Uint(name, uint(fieldValue), description)
+
+			case float32, float64:
+				fieldValue := configValue.Field(i).Float()
+				m.viper.SetDefault(name, float64(fieldValue))
+				m.flags.Float64(name, float64(fieldValue), description)
+
+			case string:
+				m.viper.SetDefault(name, val)
+				m.flags.String(name, val, description)
+
+			case []string:
+				m.viper.SetDefault(name, val)
+				m.flags.StringSlice(name, val, description)
+
+			case time.Duration:
+				m.viper.SetDefault(name, val)
+				m.flags.Duration(name, val, description)
+
+			case map[string]string:
+				m.viper.SetDefault(name, val)
+				defs := make([]string, 0, len(val))
+				for k, v := range val {
+					defs = append(defs, fmt.Sprintf("'%s'='%v'", k, v))
+				}
+
+				m.flags.StringSlice(name, defs, description)
+
+			default:
+				switch fieldType {
+				case reflect.Struct:
+					if field.Anonymous {
+						name = prefix
+					}
+					m.setDefaults(name, configValue.Field(i).Interface())
+				default:
+					panic(fmt.Errorf("config: cannot work with \"%v\" in configuration at name \"%s\"", field.Type, name))
+				}
+			}
+		}
+	}
+}
+
+// Option is the type of an option for the manager
+type Option func(m *Manager)
+
+// DefaultOptions are the default options
+var DefaultOptions = []Option{
+	EnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_")),
+}
+
+// Initialize config with the given name and defaults
+func Initialize(name string, defaults interface{}) *Manager {
+	m := &Manager{
+		name:     name,
+		viper:    viper.New(),
+		flags:    pflag.NewFlagSet(name, pflag.ExitOnError),
+		replacer: strings.NewReplacer(),
+		defaults: defaults,
+	}
+
+	m.viper.SetTypeByDefaultValue(true)
+	m.viper.SetConfigName(name)
+	m.viper.SetEnvPrefix(name)
+	m.viper.AutomaticEnv()
+	m.viper.AddConfigPath(".")
+
+	if defaults != nil {
+		m.setDefaults("", defaults)
+	}
+
+	for _, opt := range DefaultOptions {
+		opt(m)
+	}
+
+	m.viper.BindPFlags(m.flags)
+
+	return m
+}
+
+// Parse parses the command line arguments
+func (m *Manager) Parse(flags ...string) {
+	m.flags.Parse(flags)
+}
+
+// r := reflect.Indirect(reflect.New(reflect.ValueOf(m.defaults).Type())).Interface()
+
+func (m *Manager) Unmarshal(result interface{}) error {
+	d, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+		TagName:          "name",
+		ZeroFields:       true,
+		WeaklyTypedInput: true,
+		Result:           result,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	// TODO: parse map string string, time, ...
+
+	err = d.Decode(m.viper.AllSettings())
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ReadInConfig will load the configuration from disk. If a config file is set,
+// that file will be used, otherwise ReadInConfig will discover the file
+func (m *Manager) ReadInConfig() error {
+	configFile := m.viper.GetString("config")
+	if _, err := os.Stat(configFile); err == nil {
+		m.viper.SetConfigFile(configFile)
+	}
+	return m.viper.ReadInConfig()
+}
+
+// 	configPath := "$PWD"
+// 	dataPath := "$PWD"
+//
+// 	if home := os.Getenv("HOME"); home != "" {
+// 		c.AddConfigPath(home)
+// 		c.AddConfigPath(path.Join(home, "."+name))
+//
+// 		c.SetDefault("config", path.Join(home, "."+name+".yml"))
+// 		configPath = path.Join("$HOME", "."+name+".yml")
+//
+// 		c.SetDefault("data", path.Join(home, "."+name))
+// 		dataPath = path.Join("$HOME", "."+name)
+// 	}
+//
+// 	if xdg := os.Getenv("XDG_CONFIG_HOME"); xdg != "" {
+// 		c.AddConfigPath(xdg)
+// 		c.SetDefault("config", path.Join(xdg, name, name+".yml"))
+// 		configPath = path.Join("$XDG_CONFIG_HOME", name, name+".yml")
+// 	}
+//
+// 	if xdg := os.Getenv("XDG_DATA_HOME"); xdg != "" {
+// 		c.SetDefault("data", path.Join(xdg, name))
+// 		dataPath = path.Join("$XDG_DATA_HOME", name, name+".yml")
+// 	}
+//
+// 	c.flags.String("config", "", "Config file (default \""+configPath+"\")")
+// 	c.flags.String("data", "", "Data folder (default \""+dataPath+"\")")
+//
+// 	return c
+// }
