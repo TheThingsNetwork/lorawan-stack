@@ -93,8 +93,11 @@ git.commit-msg-prefix:
 
 # check the commit message to be no longer thant 50 chars
 git.commit-msg-length:
-	@if [[ `head -n 1 $(ARGS) | sed 's/fixup! //' | wc -c` -gt 50 ]]; then \
-		$(err) "commit messages should be shorter than 50 characters"; \
+	@if [[ `head -n 1 $(ARGS) | sed 's/fixup! //' | wc -c` -gt 72 ]]; then \
+		$(err) "commit messages should be shorter than 72 characters"; \
+		exit 1; \
+	elif [[ `head -n 1 $(ARGS) | sed 's/fixup! //' | wc -c` -gt 50 ]]; then \
+		$(warn) "commit messages should be shorter than 50 characters"; \
 	fi
 
 # check the commit message to not be empty
