@@ -20,10 +20,10 @@ message JoinRequest {
   Message payload = 2 [(gogoproto.nullable) = false];
 
   // End device identifiers
-  // - this includes the DevAddr assigned by the Network Server
+  // - this includes the DevAddr assigned by the network server
   EndDeviceIdentifiers end_device = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // MAC version selected by the NS
+  // MAC version selected by the network server
   string selected_mac_version = 4;
 
   // NetID of the accepting network server

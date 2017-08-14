@@ -28,9 +28,9 @@ type JoinRequest struct {
 	// LoRaWAN Payload
 	Payload Message `protobuf:"bytes,2,opt,name=payload" json:"payload"`
 	// End device identifiers
-	// - this includes the DevAddr assigned by the Network Server
+	// - this includes the DevAddr assigned by the network server
 	EndDeviceIdentifiers `protobuf:"bytes,3,opt,name=end_device,json=endDevice,embedded=end_device" json:"end_device"`
-	// MAC version selected by the NS
+	// MAC version selected by the network server
 	SelectedMacVersion string `protobuf:"bytes,4,opt,name=selected_mac_version,json=selectedMacVersion,proto3" json:"selected_mac_version,omitempty"`
 	// NetID of the accepting network server
 	NetID github_com_TheThingsNetwork_ttn_pkg_types.NetID `protobuf:"bytes,5,opt,name=net_id,json=netId,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.NetID" json:"net_id"`
