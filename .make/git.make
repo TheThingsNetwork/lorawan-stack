@@ -109,6 +109,6 @@ git.commit-msg-phrase:
 
 # check if the commit message begins with a capital letter
 git.commit-msg-casing:
-	@grep -q '.*: [A-Z]' $(ARGS) && $(warn) "commit messages should be lower case" || true
+	@grep -q '.*: [a-z]' $(ARGS) && $(warn) "commit messages should be full sentences that with a capital letter" || true
 
 # vim: ft=make
