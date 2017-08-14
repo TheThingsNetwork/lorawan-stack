@@ -22,7 +22,7 @@ only_existing = (xargs ls -d 2>/dev/null || true)
 dot_prefixed = sed 's:^:./:'
 
 # All files that are not ignored by git
-ALL_FILES ?= (git ls-files . && git ls-files . --exclude-standard --others) | $(only_existing) | $(dot_prefixed)
+ALL_FILES ?= git ls-files --cached --modified --others --killed --exclude-standard | $(only_existing) | $(dot_prefixed)
 
 # Get all files that are currently staged, except for deleted files
 STAGED_FILES = git diff --staged --name-only --diff-filter=d --relative=$$($(GIT_RELATIVE_DIR)) | $(only_existing) | $(dot_prefixed)
