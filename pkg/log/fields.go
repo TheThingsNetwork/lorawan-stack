@@ -7,19 +7,18 @@ import (
 	"fmt"
 )
 
-// Fielder interface check
+// Fielder interface check.
 var _ Fielder = &F{}
 
-// ErrInvalidPairs occures when not passing an even amount of arguments to a function that
-// expects a list of key-value pairs
+// ErrInvalidPairs occurs when not passing an even amount of arguments to a function that expects a list of key-value pairs.
 var ErrInvalidPairs = errors.New("Uneven number of key-value pairs passed")
 
-// Fielder is the log level for anything that can return fields
+// Fielder is the interface for anything that can have fields.
 type Fielder interface {
 	Fields() map[string]interface{}
 }
 
-// Fields returns a new immutable fields structure
+// Fields returns a new immutable fields structure.
 func Fields(pairs ...interface{}) *F {
 	nodes, err := pairsToMap(pairs...)
 	if err != nil {
@@ -31,7 +30,7 @@ func Fields(pairs ...interface{}) *F {
 	}
 }
 
-// F is a Fielder that uses structural sharing to avoid copying entries
+// F is a Fielder that uses structural sharing to avoid copying entries.
 // Setting a key is O(1), getting a key is O(n) (where n is the number of entries),
 // but we only use this to accumulate fields so that's ok.
 type F struct {

@@ -9,7 +9,7 @@ import (
 
 var ErrInvalidLevel = errors.New("Invalid log level")
 
-// Level is the level of logging
+// Level is the level of logging.
 type Level int8
 
 const (
@@ -19,19 +19,19 @@ const (
 	// Info is the log level for informational messages.
 	Info
 
-	// Warn is the log level for warnings. Warning are more important than info but
-	// do not need individual human review.
+	// Warn is the log level for warnings.
+	// Warnings are more important than info but do not need individual human review.
 	Warn
 
-	// Error is the log level for high priority error messages. When everything is running smoothly,
-	// an application should not be logging error level messages.
+	// Error is the log level for high priority error messages.
+	// When everything is running smoothly, an application should not be logging error level messages.
 	Error
 
 	// Fatal the log level for unrecoverable errors.
 	Fatal Level = iota
 )
 
-// String implements fmt.Stringer
+// String implements fmt.Stringer.
 func (l Level) String() string {
 	switch l {
 	case Debug:
@@ -49,7 +49,7 @@ func (l Level) String() string {
 	}
 }
 
-// ParseLevel parses a string into a log level
+// ParseLevel parses a string into a log level.
 func ParseLevel(str string) (Level, error) {
 	switch strings.ToLower(str) {
 	case "debug":
@@ -67,12 +67,12 @@ func ParseLevel(str string) (Level, error) {
 	}
 }
 
-// MarshalText implments encoding.TextMarshaller
+// MarshalText implments encoding.TextMarshaller.
 func (l Level) MarshalText() ([]byte, error) {
 	return []byte(l.String()), nil
 }
 
-// UnmarshalText implments encoding.TextMarshaller
+// UnmarshalText implments encoding.TextMarshaller.
 func (l *Level) UnmarshalText(text []byte) error {
 	level, err := ParseLevel(string(text))
 	if err != nil {

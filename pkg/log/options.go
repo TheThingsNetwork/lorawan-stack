@@ -4,7 +4,7 @@ package log
 
 type Option func(*Logger) error
 
-// WithHandler sets the handler on the logger
+// WithHandler sets the handler on the logger.
 func WithHandler(handler Handler) Option {
 	return func(logger *Logger) error {
 		logger.Handler = handler
@@ -12,7 +12,7 @@ func WithHandler(handler Handler) Option {
 	}
 }
 
-// WithLevel sets the level on the logger
+// WithLevel sets the level on the logger.
 func WithLevel(level Level) Option {
 	return func(logger *Logger) error {
 		logger.Level = level

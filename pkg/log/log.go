@@ -2,7 +2,7 @@
 
 package log
 
-// Interface is the interface for logging TTN
+// Interface is the interface for logging TTN.
 type Interface interface {
 	Debug(msg string)
 	Info(msg string)

@@ -22,7 +22,7 @@ const (
 	gray   = 90
 )
 
-// Colors mapping
+// Colors mapping.
 var Colors = [...]int{
 	log.Debug: gray,
 	log.Info:  blue,
@@ -38,24 +38,23 @@ type Handler struct {
 	UseColor bool
 }
 
-// Option is the type of options for the Handler
+// Option is the type of options for the Handler.
 type Option func(*Handler)
 
-// UseColor is a functional option with which you can force the usage of colors on or off
+// UseColor is a functional option with which you can force the usage of colors on or off.
 func UseColor(arg bool) Option {
 	return func(handler *Handler) {
 		handler.UseColor = arg
 	}
 }
 
-// colorTerms contains a list of substrings that indicate support for terminal colors
+// colorTerms contains a list of substrings that indicate support for terminal colors.
 var colorTerms = []string{
 	"color",
 	"xterm",
 }
 
-// ColorFromTerm determines from the TERM and COLORTERM environment variables wether or not
-// to use colors
+// ColorFromTerm determines from the TERM and COLORTERM environment variables wether or not to use colors.
 var ColorFromTerm = func(handler *Handler) {
 	COLORTERM := os.Getenv("COLORTERM")
 	TERM := os.Getenv("TERM")
@@ -74,12 +73,12 @@ var ColorFromTerm = func(handler *Handler) {
 	handler.UseColor = color
 }
 
-// defaultOptions are the default options for the handler
+// defaultOptions are the default options for the handler.
 var defaultOptions = []Option{
 	ColorFromTerm,
 }
 
-// New returns a new handler
+// New returns a new handler.
 func New(w io.Writer, opts ...Option) *Handler {
 	handler := &Handler{
 		Writer:   w,
@@ -93,7 +92,7 @@ func New(w io.Writer, opts ...Option) *Handler {
 	return handler
 }
 
-// HandleLog implements log.Handler
+// HandleLog implements log.Handler.
 func (h *Handler) HandleLog(e log.Entry) error {
 	color := Colors[e.Level()]
 	level := strings.ToUpper(e.Level().String())
@@ -136,20 +135,20 @@ func (h *Handler) HandleLog(e log.Entry) error {
 	return nil
 }
 
-// field used for sorting
+// field used for sorting.
 type field struct {
 	Name  string
 	Value interface{}
 }
 
-// byName sorts fields by name
+// byName sorts fields by name.
 type byName []field
 
-// Len implments sort.Sort
+// Len implments sort.Sort.
 func (a byName) Len() int { return len(a) }
 
-// Swap implments sort.Sort
+// Swap implments sort.Sort.
 func (a byName) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-// Less implments sort.Sort
+// Less implments sort.Sort.
 func (a byName) Less(i, j int) bool { return a[i].Name < a[j].Name }

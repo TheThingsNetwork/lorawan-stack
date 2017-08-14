@@ -41,8 +41,8 @@ func TestFields(t *testing.T) {
 	a := New(t)
 
 	f := Fields()
-	g := f.Set("a", 10)
-	h := f.Set("a", 20)
+	g := f.WithField("a", 10)
+	h := f.WithField("a", 20)
 
 	a.So(f, ShouldNotEqual, g)
 	a.So(f, ShouldNotEqual, h)
@@ -60,7 +60,7 @@ func TestFields(t *testing.T) {
 	a.So(ok, ShouldBeTrue)
 	a.So(got, ShouldEqual, 20)
 
-	i := g.Set("b", 20)
+	i := g.WithField("b", 20)
 
 	got, ok = g.Get("a")
 	a.So(ok, ShouldBeTrue)

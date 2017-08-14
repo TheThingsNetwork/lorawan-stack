@@ -6,19 +6,19 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 )
 
-// Handler implements log.Handler
+// Handler implements log.Handler.
 type Handler struct {
 	handlers []log.Handler
 }
 
-// New returns a new handler that combines the underlying handlers
+// New returns a new handler that combines the underlying handlers.
 func New(handlers ...log.Handler) *Handler {
 	return &Handler{
 		handlers: handlers,
 	}
 }
 
-// HandleLog implements log.Handler
+// HandleLog implements log.Handler.
 func (m *Handler) HandleLog(entry log.Entry) error {
 	var err error
 	for _, handler := range m.handlers {

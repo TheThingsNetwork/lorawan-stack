@@ -9,21 +9,21 @@ import (
 )
 
 // Filtered is a log.Handler that only logs fields that match the
-// specified filters
+// specified filters.
 type Filtered struct {
 	log.Handler
 	filter Filter
 }
 
-// Filter something that can filter a log entry
+// Filter something that can filter a log entry.
 type Filter interface {
 	Filter(log.Entry) bool
 }
 
-// FilterFunc is a wrapper type for simple functions that filter
+// FilterFunc is a wrapper type for simple functions that filter.
 type FilterFunc func(log.Entry) bool
 
-// Filter implements Filter
+// Filter implements Filter.
 func (fn FilterFunc) Filter(e log.Entry) bool {
 	return fn(e)
 }
@@ -36,12 +36,12 @@ func Wrap(handler log.Handler, filters ...Filter) *Filtered {
 	}
 }
 
-// SetFilters sets the filters
+// SetFilters sets the filters.
 func (f *Filtered) SetFilters(filters ...Filter) {
 	f.filter = And(filters...)
 }
 
-// HandleLog implements log.Handler
+// HandleLog implements log.Handler.
 func (f *Filtered) HandleLog(e log.Entry) error {
 	if f.filter.Filter(e) {
 		return f.Handler.HandleLog(e)
@@ -49,7 +49,7 @@ func (f *Filtered) HandleLog(e log.Entry) error {
 	return nil
 }
 
-// All is a filter allows all log entries to be passed..
+// All is a filter allows all log entries to be passed.
 var All = FilterFunc(func(e log.Entry) bool {
 	return true
 })
@@ -91,7 +91,7 @@ func Field(field string, matcher func(interface{}) bool) Filter {
 	})
 }
 
-// FieldString returns a filter that passes only if the string representation of the field value for the field equals the passed string
+// FieldString returns a filter that passes only if the string representation of the field value for the field equals the passed string.
 func FieldString(field string, value string) Filter {
 	return Field(field, func(val interface{}) bool {
 		if stringer, ok := val.(fmt.Stringer); ok {
