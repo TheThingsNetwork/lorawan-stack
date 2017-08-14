@@ -56,3 +56,59 @@ Make sure that commits are scoped to something meaningful and could, potentially
 ### Body
 
 The body may contain a more detailed description of the commit, explaining what it changes and why. The "how" is less relevant, as this should be obvious from the diff.
+
+## Code
+
+### Variable naming
+
+Variable names should be short and concise.
+
+We follow the [official go guidelines](https://github.com/golang/go/wiki/CodeReviewComments#variable-names) and try to be consistent with Go standard library as much as possible, everything not defined in the tables below should follow Go standard library naming scheme.
+
+#### Single-word entities
+
+| entity               | name    | example type                                                  |
+| :------------------: | :-----: | :-----------------------------------------------------------: |
+| context              | ctx     | context.Context                                               |
+| mutex                | mu      | sync.Mutex                                                    |
+| configuration        | conf    | github.com/TheThingsNetwork/ttn/pkg/config.Config             |
+| logger               | log     | github.com/TheThingsNetwork/ttn/pkg/ttnlog.Logger             |
+| message              | msg     | github.com/TheThingsNetwork/ttn/api/gateway.UplinkMessage     |
+| status               | st      | github.com/TheThingsNetwork/ttn/api/gateway.Status            |
+| server               | srv     | github.com/TheThingsNetwork/ttn/pkg/network-server.Server     |
+| EUI                  | eui     | github.com/TheThingsNetwork/ttn/pkg/types.DevEUI              |
+| ID                   | id      | string                                                        |
+| counter              | cnt     | int                                                           |
+| gateway              | gtw     |                                                               |
+| application          | app     |                                                               |
+| end device           | dev     |                                                               |
+| user                 | user    |                                                               |
+
+
+#### 2-word entities
+In case both of the words have an implementation-specific meaning, the variable name is the combination of first letter of each word.
+
+| entity                                                  | name    |
+| :-----------------------------------------------------: | :-----: |
+| wait group                                              | wg      |
+| gateway server                                          | gs      |
+| network server                                          | ns      |
+| join server                                             | js      |
+| application server                                      | as      |
+| identity server                                         | is      |
+
+In case one of the words specifies the meaning of the variable in a specific language construct context, the variable name is the combination of abbrevations of the words. 
+
+#### Well-known variable names
+
+These are the names of variables that occur often in the code. Be consistent in naming them, even when their
+meaning is obvious from the context.
+
+| entity                          | name    |
+| :-----------------------------: | :-----: |
+| gateway id                      | gtwID   |
+| gateway EUI                     | gtwEUI  |
+| application id                  | appID   |
+| application EUI                 | appEUI  |
+| device id                       | devID   |
+| user id                         | userID  |
