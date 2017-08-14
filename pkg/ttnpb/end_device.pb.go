@@ -62,8 +62,82 @@ func (m *EndDeviceIdentifiers) GetTenantId() string {
 	return ""
 }
 
+type KeyEnvelope struct {
+	// The (encrypted) key
+	Key *github_com_TheThingsNetwork_ttn_pkg_types.AES128Key `protobuf:"bytes,1,opt,name=key,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.AES128Key" json:"key,omitempty"`
+	// The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key
+	KekLabel string `protobuf:"bytes,2,opt,name=kek_label,json=kekLabel,proto3" json:"kek_label,omitempty"`
+}
+
+func (m *KeyEnvelope) Reset()                    { *m = KeyEnvelope{} }
+func (*KeyEnvelope) ProtoMessage()               {}
+func (*KeyEnvelope) Descriptor() ([]byte, []int) { return fileDescriptorEndDevice, []int{1} }
+
+func (m *KeyEnvelope) GetKekLabel() string {
+	if m != nil {
+		return m.KekLabel
+	}
+	return ""
+}
+
+// Session keys for a LoRaWAN session.
+// Only the components for which the keys were meant, will have the key-encryption-key (KEK) to decrypt the individual keys
+type SessionKeys struct {
+	// Join Server issued identifier for the session keys
+	SessionKeyId string `protobuf:"bytes,1,opt,name=session_key_id,json=sessionKeyId,proto3" json:"session_key_id,omitempty"`
+	// The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode)
+	FNwkSIntKey *KeyEnvelope `protobuf:"bytes,2,opt,name=f_nwk_s_int_key,json=fNwkSIntKey" json:"f_nwk_s_int_key,omitempty"`
+	// The (encrypted) Serving Network Session Integrity Key
+	SNwkSIntKey *KeyEnvelope `protobuf:"bytes,3,opt,name=s_nwk_s_int_key,json=sNwkSIntKey" json:"s_nwk_s_int_key,omitempty"`
+	// The (encrypted) Network Session Encryption Key
+	NwkSEncKey *KeyEnvelope `protobuf:"bytes,4,opt,name=nwk_s_enc_key,json=nwkSEncKey" json:"nwk_s_enc_key,omitempty"`
+	// The (encrypted) Application Session Key
+	AppSKey *KeyEnvelope `protobuf:"bytes,5,opt,name=app_s_key,json=appSKey" json:"app_s_key,omitempty"`
+}
+
+func (m *SessionKeys) Reset()                    { *m = SessionKeys{} }
+func (*SessionKeys) ProtoMessage()               {}
+func (*SessionKeys) Descriptor() ([]byte, []int) { return fileDescriptorEndDevice, []int{2} }
+
+func (m *SessionKeys) GetSessionKeyId() string {
+	if m != nil {
+		return m.SessionKeyId
+	}
+	return ""
+}
+
+func (m *SessionKeys) GetFNwkSIntKey() *KeyEnvelope {
+	if m != nil {
+		return m.FNwkSIntKey
+	}
+	return nil
+}
+
+func (m *SessionKeys) GetSNwkSIntKey() *KeyEnvelope {
+	if m != nil {
+		return m.SNwkSIntKey
+	}
+	return nil
+}
+
+func (m *SessionKeys) GetNwkSEncKey() *KeyEnvelope {
+	if m != nil {
+		return m.NwkSEncKey
+	}
+	return nil
+}
+
+func (m *SessionKeys) GetAppSKey() *KeyEnvelope {
+	if m != nil {
+		return m.AppSKey
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*EndDeviceIdentifiers)(nil), "ttn.v3.EndDeviceIdentifiers")
+	proto.RegisterType((*KeyEnvelope)(nil), "ttn.v3.KeyEnvelope")
+	proto.RegisterType((*SessionKeys)(nil), "ttn.v3.SessionKeys")
 }
 func (m *EndDeviceIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
@@ -131,6 +205,104 @@ func (m *EndDeviceIdentifiers) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *KeyEnvelope) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *KeyEnvelope) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Key != nil {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Key.Size()))
+		n4, err := m.Key.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n4
+	}
+	if len(m.KekLabel) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.KekLabel)))
+		i += copy(dAtA[i:], m.KekLabel)
+	}
+	return i, nil
+}
+
+func (m *SessionKeys) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SessionKeys) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.SessionKeyId) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.SessionKeyId)))
+		i += copy(dAtA[i:], m.SessionKeyId)
+	}
+	if m.FNwkSIntKey != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.FNwkSIntKey.Size()))
+		n5, err := m.FNwkSIntKey.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n5
+	}
+	if m.SNwkSIntKey != nil {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.SNwkSIntKey.Size()))
+		n6, err := m.SNwkSIntKey.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n6
+	}
+	if m.NwkSEncKey != nil {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.NwkSEncKey.Size()))
+		n7, err := m.NwkSEncKey.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n7
+	}
+	if m.AppSKey != nil {
+		dAtA[i] = 0x2a
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.AppSKey.Size()))
+		n8, err := m.AppSKey.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n8
+	}
+	return i, nil
+}
+
 func encodeFixed64EndDevice(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
@@ -188,6 +360,46 @@ func (m *EndDeviceIdentifiers) Size() (n int) {
 	return n
 }
 
+func (m *KeyEnvelope) Size() (n int) {
+	var l int
+	_ = l
+	if m.Key != nil {
+		l = m.Key.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	l = len(m.KekLabel)
+	if l > 0 {
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	return n
+}
+
+func (m *SessionKeys) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.SessionKeyId)
+	if l > 0 {
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.FNwkSIntKey != nil {
+		l = m.FNwkSIntKey.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.SNwkSIntKey != nil {
+		l = m.SNwkSIntKey.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.NwkSEncKey != nil {
+		l = m.NwkSEncKey.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.AppSKey != nil {
+		l = m.AppSKey.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	return n
+}
+
 func sovEndDevice(x uint64) (n int) {
 	for {
 		n++
@@ -212,6 +424,31 @@ func (this *EndDeviceIdentifiers) String() string {
 		`DevEUI:` + fmt.Sprintf("%v", this.DevEUI) + `,`,
 		`JoinEUI:` + fmt.Sprintf("%v", this.JoinEUI) + `,`,
 		`DevAddr:` + fmt.Sprintf("%v", this.DevAddr) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *KeyEnvelope) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&KeyEnvelope{`,
+		`Key:` + fmt.Sprintf("%v", this.Key) + `,`,
+		`KekLabel:` + fmt.Sprintf("%v", this.KekLabel) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *SessionKeys) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&SessionKeys{`,
+		`SessionKeyId:` + fmt.Sprintf("%v", this.SessionKeyId) + `,`,
+		`FNwkSIntKey:` + strings.Replace(fmt.Sprintf("%v", this.FNwkSIntKey), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
+		`SNwkSIntKey:` + strings.Replace(fmt.Sprintf("%v", this.SNwkSIntKey), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
+		`NwkSEncKey:` + strings.Replace(fmt.Sprintf("%v", this.NwkSEncKey), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
+		`AppSKey:` + strings.Replace(fmt.Sprintf("%v", this.AppSKey), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -457,6 +694,328 @@ func (m *EndDeviceIdentifiers) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *KeyEnvelope) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEndDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: KeyEnvelope: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: KeyEnvelope: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var v github_com_TheThingsNetwork_ttn_pkg_types.AES128Key
+			m.Key = &v
+			if err := m.Key.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field KekLabel", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.KekLabel = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEndDevice(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SessionKeys) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEndDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SessionKeys: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SessionKeys: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SessionKeyId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.SessionKeyId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FNwkSIntKey", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.FNwkSIntKey == nil {
+				m.FNwkSIntKey = &KeyEnvelope{}
+			}
+			if err := m.FNwkSIntKey.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SNwkSIntKey", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SNwkSIntKey == nil {
+				m.SNwkSIntKey = &KeyEnvelope{}
+			}
+			if err := m.SNwkSIntKey.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NwkSEncKey", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.NwkSEncKey == nil {
+				m.NwkSEncKey = &KeyEnvelope{}
+			}
+			if err := m.NwkSEncKey.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AppSKey", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AppSKey == nil {
+				m.AppSKey = &KeyEnvelope{}
+			}
+			if err := m.AppSKey.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEndDevice(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func skipEndDevice(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
@@ -567,29 +1126,40 @@ func init() {
 }
 
 var fileDescriptorEndDevice = []byte{
-	// 374 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x91, 0x41, 0x4b, 0xe3, 0x40,
-	0x14, 0xc7, 0x3b, 0xdb, 0xdd, 0x34, 0x1d, 0xda, 0x85, 0x0d, 0x7b, 0x28, 0xbb, 0x90, 0x94, 0x3d,
-	0xb5, 0x87, 0x4d, 0x90, 0x56, 0xf1, 0xa2, 0xd0, 0x92, 0x20, 0xf1, 0x20, 0x12, 0x5a, 0x41, 0x2f,
-	0x21, 0xe9, 0x4c, 0xd3, 0xb1, 0x3a, 0x13, 0xd2, 0x49, 0xc4, 0x9b, 0x5f, 0xc4, 0xef, 0xe3, 0xd1,
-	0xa3, 0xf4, 0x10, 0x74, 0x4e, 0x1e, 0xfd, 0x08, 0x32, 0xd3, 0x82, 0xbd, 0x59, 0xbc, 0xbd, 0x37,
-	0xef, 0xff, 0xfb, 0xc1, 0xbc, 0x07, 0xfb, 0x09, 0xe1, 0xb3, 0x3c, 0xb6, 0x27, 0xec, 0xda, 0x19,
-	0xcd, 0xf0, 0x68, 0x46, 0x68, 0xb2, 0x38, 0xc1, 0xfc, 0x86, 0x65, 0x73, 0x87, 0x73, 0xea, 0x44,
-	0x29, 0x71, 0x30, 0x45, 0x21, 0xc2, 0x05, 0x99, 0x60, 0x3b, 0xcd, 0x18, 0x67, 0x86, 0xc6, 0x39,
-	0xb5, 0x8b, 0xde, 0x9f, 0xff, 0x1b, 0x74, 0xc2, 0x12, 0xe6, 0xa8, 0x71, 0x9c, 0x4f, 0x55, 0xa7,
-	0x1a, 0x55, 0xad, 0xb0, 0x7f, 0xf7, 0x55, 0xf8, 0xdb, 0xa3, 0xc8, 0x55, 0x2a, 0x1f, 0x61, 0xca,
-	0xc9, 0x94, 0xe0, 0x6c, 0x61, 0x74, 0x61, 0x7d, 0xe5, 0x0f, 0x09, 0x6a, 0x81, 0x36, 0xe8, 0xd4,
-	0x87, 0x0d, 0x51, 0x5a, 0xfa, 0x3a, 0xe9, 0x06, 0x3a, 0x5a, 0x33, 0xc6, 0x3e, 0xfc, 0x19, 0xa5,
-	0xe9, 0x15, 0x99, 0x44, 0x9c, 0x30, 0x2a, 0xf3, 0xdf, 0x54, 0xfe, 0x97, 0x28, 0xad, 0xe6, 0xe0,
-	0x63, 0xe2, 0xbb, 0x41, 0x73, 0x23, 0xe8, 0x23, 0xe3, 0x2f, 0xac, 0x73, 0x4c, 0x23, 0xca, 0x25,
-	0x54, 0x95, 0x50, 0xa0, 0xaf, 0x1e, 0x7c, 0x64, 0x9c, 0xc1, 0x1a, 0xc2, 0x45, 0x88, 0x73, 0xd2,
-	0xfa, 0xde, 0x06, 0x9d, 0xc6, 0xf0, 0x60, 0x59, 0x5a, 0xce, 0x67, 0xcb, 0x49, 0xe7, 0x89, 0xc3,
-	0x6f, 0x53, 0xbc, 0xb0, 0xbd, 0xb1, 0xbf, 0xd7, 0x17, 0xa5, 0xa5, 0xb9, 0xb8, 0xf0, 0xc6, 0x7e,
-	0xa0, 0x21, 0x5c, 0x78, 0x39, 0x31, 0xce, 0xa1, 0x7e, 0xc9, 0x08, 0x55, 0xe2, 0x1f, 0x4a, 0x7c,
-	0xf8, 0x35, 0x71, 0xed, 0x98, 0x11, 0x2a, 0xcd, 0x35, 0xe9, 0x93, 0xea, 0x53, 0x28, 0xb7, 0x12,
-	0x46, 0x08, 0x65, 0x2d, 0x4d, 0xa9, 0x77, 0x97, 0xa5, 0xb5, 0xb3, 0xbd, 0xda, 0xc5, 0xc5, 0x00,
-	0xa1, 0x2c, 0x90, 0x3f, 0x97, 0xc5, 0xf0, 0xe8, 0xe9, 0xc5, 0xac, 0xdc, 0x09, 0x13, 0x3c, 0x08,
-	0x13, 0x3c, 0x0a, 0x13, 0x3c, 0x0b, 0x13, 0xbc, 0x0a, 0xb3, 0xf2, 0x26, 0x4c, 0x70, 0xd1, 0xdd,
-	0xca, 0xcc, 0x69, 0x1a, 0xc7, 0x9a, 0xba, 0x77, 0xef, 0x3d, 0x00, 0x00, 0xff, 0xff, 0x12, 0x42,
-	0xe6, 0xcd, 0x5e, 0x02, 0x00, 0x00,
+	// 545 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x93, 0xbf, 0x6f, 0xd3, 0x40,
+	0x14, 0xc7, 0xeb, 0xa6, 0xcd, 0x8f, 0x4b, 0x5a, 0x84, 0x61, 0xa8, 0x40, 0xb2, 0xab, 0x88, 0xa1,
+	0x1d, 0xb0, 0xd5, 0xa6, 0x94, 0x32, 0x80, 0x94, 0x28, 0x16, 0x32, 0x41, 0x15, 0x72, 0x5a, 0x24,
+	0x58, 0x2c, 0x27, 0xf7, 0x92, 0x1c, 0x0e, 0x77, 0xa7, 0xdc, 0xc5, 0x91, 0x37, 0xfe, 0x06, 0x76,
+	0xfe, 0x1f, 0x46, 0x46, 0x94, 0xc1, 0x02, 0x4f, 0x8c, 0xfc, 0x09, 0xe8, 0xce, 0x55, 0x89, 0x90,
+	0x0a, 0x11, 0xdb, 0x3d, 0xdf, 0xf7, 0xf3, 0x91, 0xee, 0xbd, 0x67, 0x74, 0x32, 0x26, 0x72, 0x32,
+	0x1f, 0x38, 0x43, 0xf6, 0xde, 0xbd, 0x98, 0xc0, 0xc5, 0x84, 0xd0, 0xb1, 0x38, 0x07, 0xb9, 0x60,
+	0xb3, 0xd8, 0x95, 0x92, 0xba, 0x11, 0x27, 0x2e, 0x50, 0x1c, 0x62, 0x48, 0xc8, 0x10, 0x1c, 0x3e,
+	0x63, 0x92, 0x99, 0x65, 0x29, 0xa9, 0x93, 0xb4, 0xee, 0x3d, 0x5c, 0xa1, 0xc7, 0x6c, 0xcc, 0x5c,
+	0x7d, 0x3d, 0x98, 0x8f, 0x74, 0xa5, 0x0b, 0x7d, 0x2a, 0xb0, 0xe6, 0xa7, 0x12, 0xba, 0xeb, 0x51,
+	0xdc, 0xd5, 0x2a, 0x1f, 0x03, 0x95, 0x64, 0x44, 0x60, 0x26, 0xcc, 0x43, 0x54, 0x2b, 0xfc, 0x21,
+	0xc1, 0x7b, 0xc6, 0xbe, 0x71, 0x50, 0xeb, 0x34, 0xf2, 0xcc, 0xae, 0x5e, 0x25, 0xbb, 0x41, 0x15,
+	0x5f, 0x31, 0xe6, 0x19, 0xda, 0x8d, 0x38, 0x9f, 0x92, 0x61, 0x24, 0x09, 0xa3, 0x2a, 0xbf, 0xa9,
+	0xf3, 0xb7, 0xf3, 0xcc, 0xde, 0x69, 0xff, 0xbe, 0xf1, 0xbb, 0xc1, 0xce, 0x4a, 0xd0, 0xc7, 0xe6,
+	0x7d, 0x54, 0x93, 0x40, 0x23, 0x2a, 0x15, 0x54, 0x52, 0x50, 0x50, 0x2d, 0x3e, 0xf8, 0xd8, 0x7c,
+	0x8d, 0x2a, 0x18, 0x92, 0x10, 0xe6, 0x64, 0x6f, 0x6b, 0xdf, 0x38, 0x68, 0x74, 0x9e, 0x2e, 0x33,
+	0xdb, 0xfd, 0x57, 0x73, 0x78, 0x3c, 0x76, 0x65, 0xca, 0x41, 0x38, 0xde, 0xa5, 0x7f, 0x7a, 0x92,
+	0x67, 0x76, 0xb9, 0x0b, 0x89, 0x77, 0xe9, 0x07, 0x65, 0x0c, 0x89, 0x37, 0x27, 0xe6, 0x1b, 0x54,
+	0x7d, 0xc7, 0x08, 0xd5, 0xe2, 0x6d, 0x2d, 0x7e, 0xf6, 0x7f, 0xe2, 0xca, 0x0b, 0x46, 0xa8, 0x32,
+	0x57, 0x94, 0x4f, 0xa9, 0x5f, 0x21, 0xd5, 0x95, 0x30, 0xc2, 0x78, 0xb6, 0x57, 0xd6, 0xea, 0x47,
+	0xcb, 0xcc, 0x3e, 0x5a, 0x5f, 0xdd, 0x85, 0xa4, 0x8d, 0xf1, 0x2c, 0x50, 0x2f, 0x57, 0x87, 0xe6,
+	0x1c, 0xd5, 0x7b, 0x90, 0x7a, 0x34, 0x81, 0x29, 0xe3, 0x60, 0xfa, 0xa8, 0x14, 0x43, 0xaa, 0xe7,
+	0xd1, 0xe8, 0x3c, 0x5e, 0x66, 0x76, 0x6b, 0x7d, 0x77, 0xdb, 0xeb, 0x1f, 0x1d, 0x9f, 0xf5, 0x20,
+	0x0d, 0x94, 0x43, 0xf5, 0x3e, 0x86, 0x38, 0x9c, 0x46, 0x03, 0x98, 0x16, 0x03, 0x0b, 0xaa, 0x31,
+	0xc4, 0x2f, 0x55, 0xdd, 0xfc, 0xb8, 0x89, 0xea, 0x7d, 0x10, 0x82, 0x30, 0xda, 0x83, 0x54, 0x98,
+	0x0f, 0xd0, 0xae, 0x28, 0xca, 0x30, 0x86, 0xf4, 0x7a, 0x25, 0x82, 0x86, 0xb8, 0x0e, 0xf9, 0xd8,
+	0x7c, 0x82, 0x6e, 0x8d, 0x42, 0xba, 0x88, 0x43, 0x11, 0x12, 0x2a, 0x55, 0x52, 0x8b, 0xeb, 0xc7,
+	0x77, 0x9c, 0x62, 0x3b, 0x9d, 0x95, 0xb7, 0x04, 0xf5, 0xd1, 0xf9, 0x22, 0xee, 0xfb, 0x54, 0xf6,
+	0x20, 0x55, 0xa8, 0xf8, 0x03, 0x2d, 0xfd, 0x05, 0x15, 0x2b, 0xe8, 0x29, 0xda, 0x29, 0x40, 0xa0,
+	0x43, 0x0d, 0x6e, 0xdd, 0x0c, 0x22, 0xba, 0x88, 0xfb, 0x1e, 0x1d, 0x2a, 0xce, 0x45, 0xb5, 0x88,
+	0xf3, 0x50, 0x68, 0x66, 0xfb, 0x66, 0xa6, 0x12, 0x71, 0xde, 0xef, 0x41, 0xda, 0x79, 0xfe, 0xf5,
+	0xbb, 0xb5, 0xf1, 0x21, 0xb7, 0x8c, 0xcf, 0xb9, 0x65, 0x7c, 0xc9, 0x2d, 0xe3, 0x5b, 0x6e, 0x19,
+	0x3f, 0x72, 0x6b, 0xe3, 0x67, 0x6e, 0x19, 0x6f, 0x0f, 0xd7, 0x9a, 0x84, 0xa4, 0x7c, 0x30, 0x28,
+	0xeb, 0x7f, 0xaf, 0xf5, 0x2b, 0x00, 0x00, 0xff, 0xff, 0x91, 0x7e, 0xfa, 0xa9, 0xea, 0x03, 0x00,
+	0x00,
 }

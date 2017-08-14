@@ -17,11 +17,11 @@ It is generated from these files:
 
 It has these top-level messages:
 	EndDeviceIdentifiers
+	KeyEnvelope
+	SessionKeys
 	GatewayStatus
 	JoinReq
 	JoinAns
-	SessionKeys
-	KeyEnvelope
 	Message
 	MHDR
 	MACPayload

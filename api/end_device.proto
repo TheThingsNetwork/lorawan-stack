@@ -25,3 +25,30 @@ message EndDeviceIdentifiers {
   // LoRaWAN DevAddr
   bytes dev_addr = 6 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
 }
+
+message KeyEnvelope {
+  // The (encrypted) key
+  bytes key = 1 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.AES128Key"];
+
+  // The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key
+  string kek_label = 2;
+}
+
+// Session keys for a LoRaWAN session.
+// Only the components for which the keys were meant, will have the key-encryption-key (KEK) to decrypt the individual keys
+message SessionKeys {
+  // Join Server issued identifier for the session keys
+  string session_key_id = 1;
+
+  // The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode)
+  KeyEnvelope f_nwk_s_int_key = 2;
+
+  // The (encrypted) Serving Network Session Integrity Key
+  KeyEnvelope s_nwk_s_int_key = 3;
+
+  // The (encrypted) Network Session Encryption Key
+  KeyEnvelope nwk_s_enc_key = 4;
+
+  // The (encrypted) Application Session Key
+  KeyEnvelope app_s_key = 5;
+}
