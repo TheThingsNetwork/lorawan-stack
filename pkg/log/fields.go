@@ -72,25 +72,6 @@ func pairsToMap(pairs ...interface{}) (map[string]interface{}, error) {
 	return nodes, nil
 }
 
-// Set returns a new F with the key set to val, O(n) where n is the number of
-// key-value pairs.
-func (f *F) Set(pairs ...interface{}) *F {
-	nodes, err := pairsToMap(pairs...)
-	if err != nil {
-		panic(err)
-	}
-
-	return f.SetFields(nodes)
-}
-
-// SetFields sets all fields in the map in O(1).
-func (f *F) SetFields(nodes map[string]interface{}) *F {
-	return &F{
-		parent: f,
-		nodes:  nodes,
-	}
-}
-
 // Fields implements Fielder. Returns all fields in O(n), where n is the number of entries in the map.
 func (f *F) Fields() map[string]interface{} {
 	var r map[string]interface{}
@@ -108,16 +89,29 @@ func (f *F) Fields() map[string]interface{} {
 	return r
 }
 
-// WithField returns a new fielder that has the key set to value
+// With returns a new F that has the fields in nodes.
+func (f *F) With(nodes map[string]interface{}) *F {
+	return &F{
+		parent: f,
+		nodes:  nodes,
+	}
+}
+
+// WithField returns a new fielder that has the key set to value.
 func (f *F) WithField(name string, val interface{}) *F {
-	return f.Set(name, val)
+	nodes := map[string]interface{}{
+		name: val,
+	}
+
+	return f.With(nodes)
 }
 
-// WithField returns a new fielder that has all the fields of the other fielder
+// WithField returns a new fielder that has all the fields of the other fielder.
 func (f *F) WithFields(fields Fielder) *F {
-	return f.SetFields(fields.Fields())
+	return f.With(fields.Fields())
 }
 
+// WithError returns new fields that contain the passed error and all its fields (if any).
 func (f *F) WithError(err error) *F {
 	var fields map[string]interface{}
 	if f, ok := err.(Fielder); ok {
@@ -126,7 +120,7 @@ func (f *F) WithError(err error) *F {
 		fields = make(map[string]interface{})
 	}
 
-	fields["Error"] = err
+	fields["error"] = err
 
-	return f.SetFields(fields)
+	return f.With(fields)
 }
