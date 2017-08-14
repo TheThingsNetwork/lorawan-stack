@@ -58,7 +58,7 @@ to_packages = sed 's:/[^/]*$$::' | sort | uniq
 to_local = sed 's:^:\./:' | sed 's:^\./.*\.go$$:.:'
 
 # the govendor file
-GO_VENDOR_FILE ?= vendor/vendor.json
+GO_VENDOR_FILE ?= Gopkg.toml
 
 # all go files
 GO_FILES = $(ALL_FILES) | $(only_go)
@@ -84,13 +84,13 @@ TEST_PACKAGES = $(GO_FILES) | $(no_vendor) | $(only_test) | $(to_packages)
 # get tools required for development
 go.dev-deps:
 	@$(log) "installing go dev dependencies"
-	@command -v govendor >/dev/null || { $(log) "installing govendor" && $(GO) get -u github.com/kardianos/govendor; }
+	@command -v dep  >/dev/null || { $(log) "installing dep" && $(GO) get -u github.com/golang/dep/cmd/dep; }
 	@command -v golint >/dev/null || { $(log) "installing golint" && $(GO) get -u github.com/golang/lint/golint; }
 
 # install dependencies
 go.deps:
 	@$(log) "installing go dependencies"
-	@govendor sync -v
+	@dep ensure -v
 
 # install packages for faster rebuilds
 go.install:
@@ -120,7 +120,7 @@ go.list-staged: go.list
 go.init:
 	@$(log) "initializing go"
 	@make go.dev-deps
-	@govendor init
+	@dep init
 
 INIT_RULES += go.init
 

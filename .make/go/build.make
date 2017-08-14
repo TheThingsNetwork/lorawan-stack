@@ -12,6 +12,7 @@ MAIN ?= ./main.go
 
 # default vendor folder
 VENDOR_DIR ?= ./vendor
+VENDOR_FILE ?= Gopkg.toml
 
 LAZY_GOOS=`echo $@ | sed 's:$(RELEASE_DIR)/$(NAME)-::' | sed 's:-.*::'`
 LAZY_GOARCH=`echo $@ | sed 's:$(RELEASE_DIR)/$(NAME)-::' | sed 's:.*-::'`
@@ -39,9 +40,9 @@ go.link-dev: GO_ENV =
 go.link-dev: BUILD_TYPE = dev
 go.link-dev: go.link
 
-## initialize govendor
-$(VENDOR_DIR)/vendor.json:
-	@$(log) initializing govendor
-	@mkdir -p $(VENDOR_DIR) && cd $(VENDOR_DIR)/.. && govendor init
+## initialize go dep
+$(VENDOR_FILE):
+	@$(log) "Initializing go deps"
+	@mkdir -p $(VENDOR_DIR) && cd $(VENDOR_DIR)/.. && dep init
 
 # vim: ft=make

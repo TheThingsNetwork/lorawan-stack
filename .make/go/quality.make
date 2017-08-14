@@ -33,7 +33,7 @@ go.lint-staged: go.lint
 
 # check if you have vendored packages in vendor
 VENDOR_FILE = $(GO_VENDOR_FILE)
-go.check-vendors: DOUBLY_VENDORED=$(shell cat $(VENDOR_FILE) | grep -n vendor | awk '{ print $$1 $$3 }' | sed 's/[",]//g')
+go.check-vendors: DOUBLY_VENDORED=$(shell cat $(VENDOR_FILE) | grep -n '^[\t ]*name = .*/vendor/' | awk '{ print $$1 $$3 }' | sed 's/["]//g')
 go.check-vendors:
 	@test $(VENDOR_FILE) != "/dev/null" && $(log) "checking $(VENDOR_FILE) for bad packages" || true
 	@if test $$(echo $(DOUBLY_VENDORED) | wc -w) -gt 0; then $(log) "doubly vendored packages in $(VENDOR_FILE):" && echo $(DOUBLY_VENDORED) | xargs -n1 echo "       " | sed 's/:/  /' && exit 1; fi
