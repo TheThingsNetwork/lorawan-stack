@@ -1,3 +1,5 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
 // Package config wraps Viper. It also allows to set a struct with defaults and generates pflags
 package config
 
