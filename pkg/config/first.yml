@@ -1,0 +1,4 @@
+foo: 10
+bar:
+  - x=baz
+  - y=quu

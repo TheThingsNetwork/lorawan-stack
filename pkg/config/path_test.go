@@ -9,8 +9,8 @@ import (
 )
 
 type configWithPath struct {
-	ConfigPath string `name:"config" shorthand:"c" description:"The location of the config path"`
-	DataDir    string `name:"data-dir" description:"The location of the data dir"`
+	ConfigPaths []string `name:"config" shorthand:"c" description:"The location of the config path"`
+	DataDir     string   `name:"data-dir" description:"The location of the data dir"`
 }
 
 type configWithoutPath struct{}
@@ -31,12 +31,12 @@ func TestConfigPathHome(t *testing.T) {
 
 	f := config.Flags().Lookup("config")
 	a.So(f, should.NotBeNil)
-	a.So(f.DefValue, should.Resemble, "$HOME/.test.yml")
+	a.So(f.DefValue, should.Resemble, "[$HOME/.test.yml]")
 
 	res := new(configWithPath)
 	config.Unmarshal(res)
 
-	a.So(res.ConfigPath, should.Resemble, "/home/johndoe/.test.yml")
+	a.So(res.ConfigPaths, should.Resemble, []string{"/home/johndoe/.test.yml"})
 }
 
 func TestConfigPathXDGHome(t *testing.T) {
@@ -55,12 +55,12 @@ func TestConfigPathXDGHome(t *testing.T) {
 
 	f := config.Flags().Lookup("config")
 	a.So(f, should.NotBeNil)
-	a.So(f.DefValue, should.Resemble, "$XDG_CONFIG_HOME/test/test.yml")
+	a.So(f.DefValue, should.Resemble, "[$XDG_CONFIG_HOME/test/test.yml]")
 
 	res := new(configWithPath)
 	config.Unmarshal(res)
 
-	a.So(res.ConfigPath, should.Resemble, "/home/johndoe/.config/test/test.yml")
+	a.So(res.ConfigPaths, should.Resemble, []string{"/home/johndoe/.config/test/test.yml"})
 }
 
 func TestConfigPathDefault(t *testing.T) {
@@ -71,7 +71,10 @@ func TestConfigPathDefault(t *testing.T) {
 	os.Setenv("TEST_CONFIG", "")
 
 	defaults := &configWithPath{
-		ConfigPath: "/env/test.yml",
+		ConfigPaths: []string{
+			"/env/test.yml",
+			"/quu/qux.yml",
+		},
 	}
 
 	config := Initialize("test", defaults)
@@ -81,12 +84,12 @@ func TestConfigPathDefault(t *testing.T) {
 
 	f := config.Flags().Lookup("config")
 	a.So(f, should.NotBeNil)
-	a.So(f.DefValue, should.Resemble, "/env/test.yml")
+	a.So(f.DefValue, should.Resemble, "[/env/test.yml,/quu/qux.yml]")
 
 	res := new(configWithPath)
 	config.Unmarshal(res)
 
-	a.So(res.ConfigPath, should.Resemble, "/env/test.yml")
+	a.So(res.ConfigPaths, should.Resemble, []string{"/env/test.yml", "/quu/qux.yml"})
 }
 
 func TestConfigPathEnv(t *testing.T) {
@@ -105,12 +108,12 @@ func TestConfigPathEnv(t *testing.T) {
 
 	f := config.Flags().Lookup("config")
 	a.So(f, should.NotBeNil)
-	a.So(f.DefValue, should.Resemble, "/foo/bar/baz.yml")
+	a.So(f.DefValue, should.Resemble, "[/foo/bar/baz.yml]")
 
 	res := new(configWithPath)
 	config.Unmarshal(res)
 
-	a.So(res.ConfigPath, should.Resemble, "/foo/bar/baz.yml")
+	a.So(res.ConfigPaths, should.Resemble, []string{"/foo/bar/baz.yml"})
 }
 
 func TestConfigPathCliFlag(t *testing.T) {
@@ -120,23 +123,21 @@ func TestConfigPathCliFlag(t *testing.T) {
 	os.Setenv("XDG_CONFIG_HOME", "/home/johndoe/.config")
 	os.Setenv("TEST_CONFIG", "")
 
-	defaults := &configWithPath{
-		ConfigPath: "",
-	}
+	defaults := &configWithPath{}
 
 	config := Initialize("test", defaults)
 	a.So(config, should.NotBeNil)
 
-	config.Parse("--config", "/foo/bar")
-
 	f := config.Flags().Lookup("config")
 	a.So(f, should.NotBeNil)
-	a.So(f.DefValue, should.Resemble, "$XDG_CONFIG_HOME/test/test.yml")
+	a.So(f.DefValue, should.Resemble, "[$XDG_CONFIG_HOME/test/test.yml]")
+
+	config.Parse("--config", "/foo/bar", "--config", "/quu/qux")
 
 	res := new(configWithPath)
 	config.Unmarshal(res)
 
-	a.So(res.ConfigPath, should.Resemble, "/foo/bar")
+	a.So(res.ConfigPaths, should.Resemble, []string{"/foo/bar", "/quu/qux"})
 }
 
 func TestConfigPathDefine(t *testing.T) {
@@ -155,7 +156,7 @@ func TestConfigPathDefine(t *testing.T) {
 
 	f := config.Flags().Lookup("config")
 	a.So(f, should.NotBeNil)
-	a.So(f.DefValue, should.Resemble, "$XDG_CONFIG_HOME/test/test.yml")
+	a.So(f.DefValue, should.Resemble, "[$XDG_CONFIG_HOME/test/test.yml]")
 }
 
 func TestDataDirHome(t *testing.T) {

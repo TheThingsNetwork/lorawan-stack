@@ -19,6 +19,12 @@ var (
 	mgr *config.Manager
 	cfg = &Config{}
 	cmd = &cobra.Command{
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			err := mgr.ReadInConfig()
+			if err != nil {
+				fmt.Println("Could not read config file:", err)
+			}
+		},
 		Run: func(cmd *cobra.Command, args []string) {
 			err := mgr.Unmarshal(cfg)
 			if err != nil {

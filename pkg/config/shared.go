@@ -4,8 +4,8 @@ package config
 
 // Base represents base component configuration
 type Base struct {
-	Debug  bool   `name:"debug" description:"Enable bug mode"`
-	Config string `name:"config" shorthand:"c" description:"Location of the config file"`
+	Debug  bool     `name:"debug" description:"Enable bug mode"`
+	Config []string `name:"config" shorthand:"c" description:"Location of the config files"`
 }
 
 // TLS represents TLS configuration

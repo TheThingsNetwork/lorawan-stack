@@ -3,7 +3,6 @@ package config
 
 import (
 	"fmt"
-	"os"
 	"reflect"
 	"sort"
 	"strings"
@@ -87,6 +86,8 @@ func Initialize(name string, defaults interface{}, opts ...Option) *Manager {
 	m.viper.AutomaticEnv()
 	m.viper.AddConfigPath(".")
 
+	m.flags.SetInterspersed(true)
+
 	if defaults != nil {
 		m.setDefaults("", defaults)
 	}
@@ -116,6 +117,7 @@ func (m *Manager) Unmarshal(result interface{}) error {
 			mapstructure.StringToTimeDurationHookFunc(),
 			stringToTimeHookFunc(TimeFormat),
 			stringSliceToStringMapHookFunc,
+			stringSliceToStringHookFunc,
 		),
 	})
 
@@ -134,12 +136,16 @@ func (m *Manager) Unmarshal(result interface{}) error {
 // ReadInConfig will load the configuration from disk. If a config file is set,
 // that file will be used, otherwise ReadInConfig will discover the file.
 func (m *Manager) ReadInConfig() error {
-	configFile := m.viper.GetString(m.configFlag)
-	if _, err := os.Stat(configFile); err == nil {
-		m.viper.SetConfigFile(configFile)
+	files := m.viper.GetStringSlice(m.configFlag)
+	for _, file := range files {
+		m.viper.SetConfigFile(file)
+		err := m.viper.MergeInConfig()
+		if err != nil {
+			return err
+		}
 	}
 
-	return m.viper.ReadInConfig()
+	return nil
 }
 
 func (m *Manager) setDefaults(prefix string, config interface{}) {
@@ -224,13 +230,13 @@ func (m *Manager) setDefaults(prefix string, config interface{}) {
 				m.flags.DurationP(name, shorthand, val, description)
 
 			case map[string]string:
-				m.viper.SetDefault(name, val)
 				defs := make([]string, 0, len(val))
 				for k, v := range val {
-					defs = append(defs, fmt.Sprintf("'%s'='%v'", k, v))
+					defs = append(defs, fmt.Sprintf("%s=%v", k, v))
 				}
 
 				m.flags.StringSliceP(name, shorthand, defs, description)
+				m.viper.SetDefault(name, defs)
 
 			default:
 				switch fieldType {

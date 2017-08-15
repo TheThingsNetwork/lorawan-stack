@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path"
+	"strings"
 )
 
 // DataDir is an option for the manager that automatically enables the config file flag
@@ -11,37 +12,41 @@ func ConfigPath(flag string) Option {
 	return func(m *Manager) {
 		m.configFlag = flag
 
-		configPath := "$PWD"
-		def := m.viper.GetString(flag)
+		configPaths := []string{path.Join("$PWD", "."+m.name+".yml")}
+		def := m.viper.GetStringSlice(flag)
 
 		// check HOME
 		if home := os.Getenv("HOME"); home != "" {
 			m.viper.AddConfigPath(home)
 			m.viper.AddConfigPath(path.Join(home, "."+m.name))
-			m.viper.SetDefault(flag, path.Join(home, "."+m.name+".yml"))
-			configPath = path.Join("$HOME", "."+m.name+".yml")
+			m.viper.SetDefault(flag, []string{path.Join(home, "."+m.name+".yml")})
+
+			configPaths = []string{path.Join("$HOME", "."+m.name+".yml")}
 		}
 
 		// check XDG_CONFIG_HOME
 		if xdg := os.Getenv("XDG_CONFIG_HOME"); xdg != "" {
 			m.viper.AddConfigPath(xdg)
-			m.viper.SetDefault(flag, path.Join(xdg, m.name, m.name+".yml"))
-			configPath = path.Join("$XDG_CONFIG_HOME", m.name, m.name+".yml")
+			m.viper.SetDefault(flag, []string{path.Join(xdg, m.name, m.name+".yml")})
+			configPaths = []string{path.Join("$XDG_CONFIG_HOME", m.name, m.name+".yml")}
 		}
 
 		// use the default
-		if def != "" {
-			configPath = def
-			m.viper.AddConfigPath(def)
+		if def != nil {
+			configPaths = def
+			for _, pth := range def {
+				m.viper.AddConfigPath(pth)
+			}
+
 			m.viper.SetDefault(flag, def)
 		}
 
 		// set the flag default
 		f := m.flags.Lookup(flag)
 		if f != nil {
-			f.DefValue = configPath
+			f.DefValue = "[" + strings.Join(configPaths, ",") + "]"
 		} else {
-			m.flags.String(flag, configPath, "Location of the configuration file")
+			m.flags.StringSlice(flag, configPaths, "Location of the configuration file")
 		}
 	}
 }
