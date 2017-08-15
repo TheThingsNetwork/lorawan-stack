@@ -36,6 +36,22 @@ enum Major {
   LORAWAN_R1 = 0;
 }
 
+enum MACVersion {
+  MAC_UNKNOWN = 0;
+  MAC_V1_0 = 1;
+  MAC_V1_0_1 = 2;
+  MAC_V1_0_2 = 3;
+  MAC_V1_1 = 4;
+}
+
+enum PHYVersion {
+  PHY_UNKNOWN = 0;
+  PHY_V1_0 = 1;
+  PHY_V1_0_1 = 2;
+  PHY_V1_0_2 = 3;
+  PHY_V1_1 = 4;
+}
+
 message MHDR {
   MType m_type  = 1;
   Major major   = 2;

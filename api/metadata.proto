@@ -84,14 +84,14 @@ message Location {
 // LocationSource indicates the source of a Location
 enum LocationSource {
   // The source of the location is not known or not set
-  UNKNOWN  = 0;
+  SOURCE_UNKNOWN  = 0;
   // The location is determined by GPS
-  GPS      = 1;
+  SOURCE_GPS      = 1;
   // The location is fixed by configuration
-  CONFIG   = 2;
+  SOURCE_CONFIG   = 2;
   // The location is set in and updated from a registry
-  REGISTRY = 3;
+  SOURCE_REGISTRY = 3;
   // The location is estimated with IP Geolocation
-  IP_GEOLOCATION = 4;
+  SOURCE_IP_GEOLOCATION = 4;
   // More estimation methods can be added
 }

@@ -116,10 +116,10 @@ message EndDevice {
   Session session_fallback = 12;
 
   // LoRaWAN MAC version
-  string lorawan_version = 13 [(gogoproto.customname) = "LoRaWANVersion"];
+  MACVersion lorawan_version = 13 [(gogoproto.customname) = "LoRaWANVersion"];
 
   // LoRaWAN PHY version
-  string lorawan_phy_version = 14 [(gogoproto.customname) = "LoRaWANPHYVersion"];
+  PHYVersion lorawan_phy_version = 14 [(gogoproto.customname) = "LoRaWANPHYVersion"];
 
   // Min frequency the device is capable of using
   uint64 min_frequency = 15;
