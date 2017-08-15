@@ -219,55 +219,57 @@ message MACInfo {
 }
 
 enum AggregatedDutyCycle {
+  option (gogoproto.goproto_enum_prefix) = false;
   // 100%
-  ONE_1TH     = 0;
+  DUTY_CYCLE_1     = 0;
   // 50%
-  ONE_2TH     = 1;
+  DUTY_CYCLE_2     = 1;
   // 25%
-  ONE_4TH     = 2;
+  DUTY_CYCLE_4     = 2;
   // 12.5%
-  ONE_8TH     = 3;
+  DUTY_CYCLE_8     = 3;
   // 6.25%
-  ONE_16TH    = 4;
+  DUTY_CYCLE_16    = 4;
   // 3.125%
-  ONE_32TH    = 5;
+  DUTY_CYCLE_32    = 5;
   // 1.5625%
-  ONE_64TH    = 6;
+  DUTY_CYCLE_64    = 6;
   // Roughly 0.781%
-  ONE_128TH   = 7;
+  DUTY_CYCLE_128   = 7;
   // Roughly 0.390%
-  ONE_256TH   = 8;
+  DUTY_CYCLE_256   = 8;
   // Roughly 0.195%
-  ONE_512TH   = 9;
+  DUTY_CYCLE_512   = 9;
   // Roughly 0.098%
-  ONE_1024TH  = 10;
+  DUTY_CYCLE_1024  = 10;
   // Roughly 0.049%
-  ONE_2048TH  = 11;
+  DUTY_CYCLE_2048  = 11;
   // Roughly 0.024%
-  ONE_4096TH  = 12;
+  DUTY_CYCLE_4096  = 12;
   // Roughly 0.012%
-  ONE_8192TH  = 13;
+  DUTY_CYCLE_8192  = 13;
   // Roughly 0.006%
-  ONE_16384TH = 14;
+  DUTY_CYCLE_16384 = 14;
   // Roughly 0.003%
-  ONE_32768TH = 15;
+  DUTY_CYCLE_32768 = 15;
 }
 
 enum PingSlotPeriod {
+  option (gogoproto.goproto_enum_prefix) = false;
   // Every second
-  EVERY_1S   = 0;
+  PING_EVERY_1S   = 0;
   // Every 2 seconds
-  EVERY_2S   = 1;
+  PING_EVERY_2S   = 1;
   // Every 4 seconds
-  EVERY_4S   = 2;
+  PING_EVERY_4S   = 2;
   // Every 8 seconds
-  EVERY_8S   = 3;
+  PING_EVERY_8S   = 3;
   // Every 16 seconds
-  EVERY_16S  = 4;
+  PING_EVERY_16S  = 4;
   // Every 32 seconds
-  EVERY_32S  = 5;
+  PING_EVERY_32S  = 5;
   // Every 64 seconds
-  EVERY_64S  = 6;
+  PING_EVERY_64S  = 6;
   // Every 128 seconds
-  EVERY_128S = 7;
+  PING_EVERY_128S = 7;
 }

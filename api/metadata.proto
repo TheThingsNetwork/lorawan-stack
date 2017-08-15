@@ -83,6 +83,7 @@ message Location {
 
 // LocationSource indicates the source of a Location
 enum LocationSource {
+  option (gogoproto.goproto_enum_prefix) = false;
   // The source of the location is not known or not set
   SOURCE_UNKNOWN  = 0;
   // The location is determined by GPS

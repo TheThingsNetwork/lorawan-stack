@@ -37,6 +37,7 @@ enum Major {
 }
 
 enum MACVersion {
+  option (gogoproto.goproto_enum_prefix) = false;
   MAC_UNKNOWN = 0;
   MAC_V1_0 = 1;
   MAC_V1_0_1 = 2;
@@ -45,6 +46,7 @@ enum MACVersion {
 }
 
 enum PHYVersion {
+  option (gogoproto.goproto_enum_prefix) = false;
   PHY_UNKNOWN = 0;
   PHY_V1_0 = 1;
   PHY_V1_0_1 = 2;
@@ -125,9 +127,10 @@ enum Modulation {
 }
 
 enum Class {
-  A = 0;
-  B = 1;
-  C = 2;
+  option (gogoproto.goproto_enum_prefix) = false;
+  CLASS_A = 0;
+  CLASS_B = 1;
+  CLASS_C = 2;
 }
 
 // TxSettings contains the LoRaWAN settings for a transmission.
