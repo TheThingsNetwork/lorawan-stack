@@ -103,51 +103,48 @@ message EndDevice {
   // Next Rejoin counter (type 1) to expect
   uint32 next_rj_count_1 = 8 [(gogoproto.customname) = "NextRJCount1"];
 
-  // Indicator that the device uses 32 bit frame counters
-  bool f_cnt_is_32_bit = 9;
-
   // Indicator that the device may reset the frame counters (not LoRaWAN compliant)
-  bool f_cnt_resets = 10;
+  bool f_cnt_resets = 9;
 
   // Current session
-  Session session = 11;
+  Session session = 10;
 
   // Fallback session (stored until RekeyInd received)
-  Session session_fallback = 12;
+  Session session_fallback = 11;
 
   // LoRaWAN MAC version
-  MACVersion lorawan_version = 13 [(gogoproto.customname) = "LoRaWANVersion"];
+  MACVersion lorawan_version = 12 [(gogoproto.customname) = "LoRaWANVersion"];
 
   // LoRaWAN PHY version
-  PHYVersion lorawan_phy_version = 14 [(gogoproto.customname) = "LoRaWANPHYVersion"];
+  PHYVersion lorawan_phy_version = 13 [(gogoproto.customname) = "LoRaWANPHYVersion"];
 
   // Min frequency the device is capable of using
-  uint64 min_frequency = 15;
+  uint64 min_frequency = 14;
 
   // Max frequency the device is capable of using
-  uint64 max_frequency = 16;
+  uint64 max_frequency = 15;
 
   // Max transmission power the device is capable of using
-  uint64 max_tx_power = 17 [(gogoproto.customname) = "MaxTXPower"];
+  uint64 max_tx_power = 16 [(gogoproto.customname) = "MaxTXPower"];
 
   // LoRaWAN MAC settings for the device
-  MACSettings mac_settings = 18 [(gogoproto.customname) = "MACSettings"];
+  MACSettings mac_settings = 17 [(gogoproto.customname) = "MACSettings"];
 
   // MAC info sent by the device
-  MACInfo mac_info = 19 [(gogoproto.customname) = "MACInfo"];
+  MACInfo mac_info = 18 [(gogoproto.customname) = "MACInfo"];
 
   // Current LoRaWAN MAC state
-  MACState mac_state = 20 [(gogoproto.customname) = "MACState"];
+  MACState mac_state = 19 [(gogoproto.customname) = "MACState"];
 
   // Desired LoRaWAN MAC state
-  MACState mac_state_desired = 21 [(gogoproto.customname) = "MACStateDesired"];
+  MACState mac_state_desired = 20 [(gogoproto.customname) = "MACStateDesired"];
 
   // Location of the device
-  Location location = 22;
+  Location location = 21;
 
   // Device Attributes
   // - field names are written in snake_case
-  google.protobuf.Struct attributes = 23;
+  google.protobuf.Struct attributes = 22;
 
   google.protobuf.Timestamp created_at = 97 [(gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 98 [(gogoproto.stdtime) = true];
