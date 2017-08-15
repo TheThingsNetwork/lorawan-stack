@@ -108,6 +108,12 @@ enum Modulation {
   FSK  = 1;
 }
 
+enum Class {
+  A = 0;
+  B = 1;
+  C = 2;
+}
+
 // TxSettings contains the LoRaWAN settings for a transmission.
 // This message is used in both uplink and downlink
 message TxSettings {

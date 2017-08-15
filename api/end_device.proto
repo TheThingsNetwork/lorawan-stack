@@ -3,6 +3,10 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsNetwork/ttn/api/lorawan.proto";
+import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
 
 package ttn.v3;
 
@@ -34,6 +38,18 @@ message KeyEnvelope {
   string kek_label = 2;
 }
 
+// Root keys for a LoRaWAN device.
+message RootKeys {
+  // Join Server issued identifier for the root keys
+  string root_key_id = 1;
+
+  // The (encrypted) Application Key
+  KeyEnvelope app_key = 2;
+
+  // The (encrypted) Network Key
+  KeyEnvelope nwk_key = 3;
+}
+
 // Session keys for a LoRaWAN session.
 // Only the components for which the keys were meant, will have the key-encryption-key (KEK) to decrypt the individual keys
 message SessionKeys {
@@ -51,4 +67,210 @@ message SessionKeys {
 
   // The (encrypted) Application Session Key
   KeyEnvelope app_s_key = 5;
+}
+
+message Session {
+  reserved 1; // RFU: Session ID
+  bytes dev_addr = 2 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
+  SessionKeys keys = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  uint32 next_f_cnt_up = 4;
+  uint32 next_n_f_cnt_down = 5;
+  uint32 next_a_f_cnt_down = 6;
+  google.protobuf.Timestamp started = 7 [(gogoproto.stdtime) = true];
+}
+
+message EndDevice {
+  EndDeviceIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // Root keys of the device
+  RootKeys root_keys = 2;
+
+  // Next DevNonce to be expected (in case of LoRaWAN 1.1)
+  uint32 next_dev_nonce = 3;
+
+  // Used DevNonces (in case of LoRaWAN 1.0)
+  repeated uint32 used_dev_nonces = 4;
+
+  // Next JoinNonce/AppNonce to be used (in case of LoRaWAN 1.1)
+  uint32 next_join_nonce = 5;
+
+  // Used JoinNonces/AppNonce (in case of LoRaWAN 1.0)
+  repeated uint32 used_join_nonces = 6;
+
+  // Next Rejoin counter (type 0/2) to expect
+  uint32 next_rj_count_0 = 7 [(gogoproto.customname) = "NextRJCount0"];
+
+  // Next Rejoin counter (type 1) to expect
+  uint32 next_rj_count_1 = 8 [(gogoproto.customname) = "NextRJCount1"];
+
+  // Indicator that the device uses 32 bit frame counters
+  bool f_cnt_is_32_bit = 9;
+
+  // Indicator that the device may reset the frame counters (not LoRaWAN compliant)
+  bool f_cnt_resets = 10;
+
+  // Current session
+  Session session = 11;
+
+  // Fallback session (stored until RekeyInd received)
+  Session session_fallback = 12;
+
+  // LoRaWAN MAC version
+  string lorawan_version = 13 [(gogoproto.customname) = "LoRaWANVersion"];
+
+  // LoRaWAN PHY version
+  string lorawan_phy_version = 14 [(gogoproto.customname) = "LoRaWANPHYVersion"];
+
+  // Min frequency the device is capable of using
+  uint64 min_frequency = 15;
+
+  // Max frequency the device is capable of using
+  uint64 max_frequency = 16;
+
+  // Max transmission power the device is capable of using
+  uint64 max_tx_power = 17 [(gogoproto.customname) = "MaxTXPower"];
+
+  // LoRaWAN MAC settings for the device
+  MACSettings mac_settings = 18 [(gogoproto.customname) = "MACSettings"];
+
+  // MAC info sent by the device
+  MACInfo mac_info = 19 [(gogoproto.customname) = "MACInfo"];
+
+  // Current LoRaWAN MAC state
+  MACState mac_state = 20 [(gogoproto.customname) = "MACState"];
+
+  // Desired LoRaWAN MAC state
+  MACState mac_state_desired = 21 [(gogoproto.customname) = "MACStateDesired"];
+
+  // Location of the device
+  Location location = 22;
+
+  // Device Attributes
+  // - field names are written in snake_case
+  google.protobuf.Struct attributes = 23;
+
+  google.protobuf.Timestamp created_at = 97 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 98 [(gogoproto.stdtime) = true];
+
+  reserved 99; // RFU: google.protobuf.Struct advanced = 99;
+}
+
+message MACSettings {
+  // Use ADR
+  bool adr = 1;
+  // The ADR margin
+  uint32 adr_margin = 2;
+}
+
+// MAC State of the device (active or desired)
+// This is used internally by the network server and is read only
+message MACState {
+  // Currently used maximum transmission power
+  uint32 max_tx_power = 2;
+  // Uplink dwell time is set (400ms)
+  bool uplink_dwell_time = 3;
+  // Downlink dwell time is set (400ms)
+  bool downlink_dwell_time = 4;
+  // ADR: data rate index to use
+  uint32 adr_data_rate_index = 5;
+  // ADR: transmission power index to use
+  uint32 adr_tx_power_index = 6;
+  // ADR: number of retransmissions
+  uint32 adr_nb_trans = 7;
+  // ADR: number of messages to wait before setting ADRAckReq
+  uint32 adr_ack_limit = 8;
+  // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate
+  uint32 adr_ack_delay = 9;
+  // Aggregated duty cycle of the device
+  AggregatedDutyCycle duty_cycle = 10;
+  // RX1 delay (RX2 delay is RX1 delay + 1 second)
+  uint32 rx_delay = 11;
+  // Data rate offset for RX1
+  int32 rx1_data_rate_offset = 12;
+  // Data rate index for RX2
+  uint32 rx2_data_rate_index = 13;
+  // Frequency for RX2
+  uint64 rx2_frequency = 14;
+  // Time after which a rejoin request will be sent
+  uint32 rejoin_timer = 18;
+  // Number of messages after which a rejoin request will be sent
+  uint32 rejoin_counter = 19;
+  // Frequency of the class B ping slot
+  uint64 ping_slot_frequency = 21;
+  // Data rate index of the class B ping slot
+  uint32 ping_slot_data_rate_index = 22;
+}
+
+// MAC information sent by the device
+// This message is read only
+message MACInfo {
+  // Currently active LoRaWAN device class
+  // - Device class is A by default
+  // - If device sets ClassB bit in uplink, this will be set to B
+  // - If device sent DeviceModeInd MAC message, this will be set to that value
+  Class device_class = 1;
+  // When the last device status MAC message was received
+  google.protobuf.Timestamp last_status = 2;
+  // Battery percentage received in last device status message
+  float battery_percentage = 3;
+  // Downlink margin received in last device status message
+  int32 downlink_margin = 4;
+  // Periodicity of the class B ping slot
+  PingSlotPeriod ping_slot_periodicity = 5;
+
+  // TODO: Add info about failed MAC requests
+}
+
+enum AggregatedDutyCycle {
+  // 100%
+  ONE_1TH     = 0;
+  // 50%
+  ONE_2TH     = 1;
+  // 25%
+  ONE_4TH     = 2;
+  // 12.5%
+  ONE_8TH     = 3;
+  // 6.25%
+  ONE_16TH    = 4;
+  // 3.125%
+  ONE_32TH    = 5;
+  // 1.5625%
+  ONE_64TH    = 6;
+  // Roughly 0.781%
+  ONE_128TH   = 7;
+  // Roughly 0.390%
+  ONE_256TH   = 8;
+  // Roughly 0.195%
+  ONE_512TH   = 9;
+  // Roughly 0.098%
+  ONE_1024TH  = 10;
+  // Roughly 0.049%
+  ONE_2048TH  = 11;
+  // Roughly 0.024%
+  ONE_4096TH  = 12;
+  // Roughly 0.012%
+  ONE_8192TH  = 13;
+  // Roughly 0.006%
+  ONE_16384TH = 14;
+  // Roughly 0.003%
+  ONE_32768TH = 15;
+}
+
+enum PingSlotPeriod {
+  // Every second
+  EVERY_1S   = 0;
+  // Every 2 seconds
+  EVERY_2S   = 1;
+  // Every 4 seconds
+  EVERY_4S   = 2;
+  // Every 8 seconds
+  EVERY_8S   = 3;
+  // Every 16 seconds
+  EVERY_16S  = 4;
+  // Every 32 seconds
+  EVERY_32S  = 5;
+  // Every 64 seconds
+  EVERY_64S  = 6;
+  // Every 128 seconds
+  EVERY_128S = 7;
 }

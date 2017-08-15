@@ -18,7 +18,13 @@ It is generated from these files:
 It has these top-level messages:
 	EndDeviceIdentifiers
 	KeyEnvelope
+	RootKeys
 	SessionKeys
+	Session
+	EndDevice
+	MACSettings
+	MACState
+	MACInfo
 	GatewayStatus
 	JoinRequest
 	JoinResponse

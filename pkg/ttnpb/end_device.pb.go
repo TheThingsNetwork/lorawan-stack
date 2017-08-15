@@ -7,8 +7,15 @@ import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
+import google_protobuf1 "github.com/gogo/protobuf/types"
+import google_protobuf2 "github.com/gogo/protobuf/types"
 
 import github_com_TheThingsNetwork_ttn_pkg_types "github.com/TheThingsNetwork/ttn/pkg/types"
+import time "time"
+
+import strconv "strconv"
+
+import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 
 import strings "strings"
 import reflect "reflect"
@@ -19,6 +26,127 @@ import io "io"
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+var _ = time.Kitchen
+
+type AggregatedDutyCycle int32
+
+const (
+	// 100%
+	AggregatedDutyCycle_ONE_1TH AggregatedDutyCycle = 0
+	// 50%
+	AggregatedDutyCycle_ONE_2TH AggregatedDutyCycle = 1
+	// 25%
+	AggregatedDutyCycle_ONE_4TH AggregatedDutyCycle = 2
+	// 12.5%
+	AggregatedDutyCycle_ONE_8TH AggregatedDutyCycle = 3
+	// 6.25%
+	AggregatedDutyCycle_ONE_16TH AggregatedDutyCycle = 4
+	// 3.125%
+	AggregatedDutyCycle_ONE_32TH AggregatedDutyCycle = 5
+	// 1.5625%
+	AggregatedDutyCycle_ONE_64TH AggregatedDutyCycle = 6
+	// Roughly 0.781%
+	AggregatedDutyCycle_ONE_128TH AggregatedDutyCycle = 7
+	// Roughly 0.390%
+	AggregatedDutyCycle_ONE_256TH AggregatedDutyCycle = 8
+	// Roughly 0.195%
+	AggregatedDutyCycle_ONE_512TH AggregatedDutyCycle = 9
+	// Roughly 0.098%
+	AggregatedDutyCycle_ONE_1024TH AggregatedDutyCycle = 10
+	// Roughly 0.049%
+	AggregatedDutyCycle_ONE_2048TH AggregatedDutyCycle = 11
+	// Roughly 0.024%
+	AggregatedDutyCycle_ONE_4096TH AggregatedDutyCycle = 12
+	// Roughly 0.012%
+	AggregatedDutyCycle_ONE_8192TH AggregatedDutyCycle = 13
+	// Roughly 0.006%
+	AggregatedDutyCycle_ONE_16384TH AggregatedDutyCycle = 14
+	// Roughly 0.003%
+	AggregatedDutyCycle_ONE_32768TH AggregatedDutyCycle = 15
+)
+
+var AggregatedDutyCycle_name = map[int32]string{
+	0:  "ONE_1TH",
+	1:  "ONE_2TH",
+	2:  "ONE_4TH",
+	3:  "ONE_8TH",
+	4:  "ONE_16TH",
+	5:  "ONE_32TH",
+	6:  "ONE_64TH",
+	7:  "ONE_128TH",
+	8:  "ONE_256TH",
+	9:  "ONE_512TH",
+	10: "ONE_1024TH",
+	11: "ONE_2048TH",
+	12: "ONE_4096TH",
+	13: "ONE_8192TH",
+	14: "ONE_16384TH",
+	15: "ONE_32768TH",
+}
+var AggregatedDutyCycle_value = map[string]int32{
+	"ONE_1TH":     0,
+	"ONE_2TH":     1,
+	"ONE_4TH":     2,
+	"ONE_8TH":     3,
+	"ONE_16TH":    4,
+	"ONE_32TH":    5,
+	"ONE_64TH":    6,
+	"ONE_128TH":   7,
+	"ONE_256TH":   8,
+	"ONE_512TH":   9,
+	"ONE_1024TH":  10,
+	"ONE_2048TH":  11,
+	"ONE_4096TH":  12,
+	"ONE_8192TH":  13,
+	"ONE_16384TH": 14,
+	"ONE_32768TH": 15,
+}
+
+func (AggregatedDutyCycle) EnumDescriptor() ([]byte, []int) { return fileDescriptorEndDevice, []int{0} }
+
+type PingSlotPeriod int32
+
+const (
+	// Every second
+	PingSlotPeriod_EVERY_1S PingSlotPeriod = 0
+	// Every 2 seconds
+	PingSlotPeriod_EVERY_2S PingSlotPeriod = 1
+	// Every 4 seconds
+	PingSlotPeriod_EVERY_4S PingSlotPeriod = 2
+	// Every 8 seconds
+	PingSlotPeriod_EVERY_8S PingSlotPeriod = 3
+	// Every 16 seconds
+	PingSlotPeriod_EVERY_16S PingSlotPeriod = 4
+	// Every 32 seconds
+	PingSlotPeriod_EVERY_32S PingSlotPeriod = 5
+	// Every 64 seconds
+	PingSlotPeriod_EVERY_64S PingSlotPeriod = 6
+	// Every 128 seconds
+	PingSlotPeriod_EVERY_128S PingSlotPeriod = 7
+)
+
+var PingSlotPeriod_name = map[int32]string{
+	0: "EVERY_1S",
+	1: "EVERY_2S",
+	2: "EVERY_4S",
+	3: "EVERY_8S",
+	4: "EVERY_16S",
+	5: "EVERY_32S",
+	6: "EVERY_64S",
+	7: "EVERY_128S",
+}
+var PingSlotPeriod_value = map[string]int32{
+	"EVERY_1S":   0,
+	"EVERY_2S":   1,
+	"EVERY_4S":   2,
+	"EVERY_8S":   3,
+	"EVERY_16S":  4,
+	"EVERY_32S":  5,
+	"EVERY_64S":  6,
+	"EVERY_128S": 7,
+}
+
+func (PingSlotPeriod) EnumDescriptor() ([]byte, []int) { return fileDescriptorEndDevice, []int{1} }
 
 // End device identifiers are carried with uplink and downlink messages
 // Unknown fields are left empty
@@ -80,6 +208,41 @@ func (m *KeyEnvelope) GetKekLabel() string {
 	return ""
 }
 
+// Root keys for a LoRaWAN device.
+type RootKeys struct {
+	// Join Server issued identifier for the root keys
+	RootKeyId string `protobuf:"bytes,1,opt,name=root_key_id,json=rootKeyId,proto3" json:"root_key_id,omitempty"`
+	// The (encrypted) Application Key
+	AppKey *KeyEnvelope `protobuf:"bytes,2,opt,name=app_key,json=appKey" json:"app_key,omitempty"`
+	// The (encrypted) Network Key
+	NwkKey *KeyEnvelope `protobuf:"bytes,3,opt,name=nwk_key,json=nwkKey" json:"nwk_key,omitempty"`
+}
+
+func (m *RootKeys) Reset()                    { *m = RootKeys{} }
+func (*RootKeys) ProtoMessage()               {}
+func (*RootKeys) Descriptor() ([]byte, []int) { return fileDescriptorEndDevice, []int{2} }
+
+func (m *RootKeys) GetRootKeyId() string {
+	if m != nil {
+		return m.RootKeyId
+	}
+	return ""
+}
+
+func (m *RootKeys) GetAppKey() *KeyEnvelope {
+	if m != nil {
+		return m.AppKey
+	}
+	return nil
+}
+
+func (m *RootKeys) GetNwkKey() *KeyEnvelope {
+	if m != nil {
+		return m.NwkKey
+	}
+	return nil
+}
+
 // Session keys for a LoRaWAN session.
 // Only the components for which the keys were meant, will have the key-encryption-key (KEK) to decrypt the individual keys
 type SessionKeys struct {
@@ -97,7 +260,7 @@ type SessionKeys struct {
 
 func (m *SessionKeys) Reset()                    { *m = SessionKeys{} }
 func (*SessionKeys) ProtoMessage()               {}
-func (*SessionKeys) Descriptor() ([]byte, []int) { return fileDescriptorEndDevice, []int{2} }
+func (*SessionKeys) Descriptor() ([]byte, []int) { return fileDescriptorEndDevice, []int{3} }
 
 func (m *SessionKeys) GetSessionKeyId() string {
 	if m != nil {
@@ -134,10 +297,540 @@ func (m *SessionKeys) GetAppSKey() *KeyEnvelope {
 	return nil
 }
 
+type Session struct {
+	DevAddr       *github_com_TheThingsNetwork_ttn_pkg_types.DevAddr `protobuf:"bytes,2,opt,name=dev_addr,json=devAddr,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.DevAddr" json:"dev_addr,omitempty"`
+	SessionKeys   `protobuf:"bytes,3,opt,name=keys,embedded=keys" json:"keys"`
+	NextFCntUp    uint32     `protobuf:"varint,4,opt,name=next_f_cnt_up,json=nextFCntUp,proto3" json:"next_f_cnt_up,omitempty"`
+	NextNFCntDown uint32     `protobuf:"varint,5,opt,name=next_n_f_cnt_down,json=nextNFCntDown,proto3" json:"next_n_f_cnt_down,omitempty"`
+	NextAFCntDown uint32     `protobuf:"varint,6,opt,name=next_a_f_cnt_down,json=nextAFCntDown,proto3" json:"next_a_f_cnt_down,omitempty"`
+	Started       *time.Time `protobuf:"bytes,7,opt,name=started,stdtime" json:"started,omitempty"`
+}
+
+func (m *Session) Reset()                    { *m = Session{} }
+func (*Session) ProtoMessage()               {}
+func (*Session) Descriptor() ([]byte, []int) { return fileDescriptorEndDevice, []int{4} }
+
+func (m *Session) GetNextFCntUp() uint32 {
+	if m != nil {
+		return m.NextFCntUp
+	}
+	return 0
+}
+
+func (m *Session) GetNextNFCntDown() uint32 {
+	if m != nil {
+		return m.NextNFCntDown
+	}
+	return 0
+}
+
+func (m *Session) GetNextAFCntDown() uint32 {
+	if m != nil {
+		return m.NextAFCntDown
+	}
+	return 0
+}
+
+func (m *Session) GetStarted() *time.Time {
+	if m != nil {
+		return m.Started
+	}
+	return nil
+}
+
+type EndDevice struct {
+	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,embedded=ids" json:"ids"`
+	// Root keys of the device
+	RootKeys *RootKeys `protobuf:"bytes,2,opt,name=root_keys,json=rootKeys" json:"root_keys,omitempty"`
+	// Next DevNonce to be expected (in case of LoRaWAN 1.1)
+	NextDevNonce uint32 `protobuf:"varint,3,opt,name=next_dev_nonce,json=nextDevNonce,proto3" json:"next_dev_nonce,omitempty"`
+	// Used DevNonces (in case of LoRaWAN 1.0)
+	UsedDevNonces []uint32 `protobuf:"varint,4,rep,packed,name=used_dev_nonces,json=usedDevNonces" json:"used_dev_nonces,omitempty"`
+	// Next JoinNonce/AppNonce to be used (in case of LoRaWAN 1.1)
+	NextJoinNonce uint32 `protobuf:"varint,5,opt,name=next_join_nonce,json=nextJoinNonce,proto3" json:"next_join_nonce,omitempty"`
+	// Used JoinNonces/AppNonce (in case of LoRaWAN 1.0)
+	UsedJoinNonces []uint32 `protobuf:"varint,6,rep,packed,name=used_join_nonces,json=usedJoinNonces" json:"used_join_nonces,omitempty"`
+	// Next Rejoin counter (type 0/2) to expect
+	NextRJCount0 uint32 `protobuf:"varint,7,opt,name=next_rj_count_0,json=nextRjCount0,proto3" json:"next_rj_count_0,omitempty"`
+	// Next Rejoin counter (type 1) to expect
+	NextRJCount1 uint32 `protobuf:"varint,8,opt,name=next_rj_count_1,json=nextRjCount1,proto3" json:"next_rj_count_1,omitempty"`
+	// Indicator that the device uses 32 bit frame counters
+	FCntIs_32Bit bool `protobuf:"varint,9,opt,name=f_cnt_is_32_bit,json=fCntIs32Bit,proto3" json:"f_cnt_is_32_bit,omitempty"`
+	// Indicator that the device may reset the frame counters (not LoRaWAN compliant)
+	FCntResets bool `protobuf:"varint,10,opt,name=f_cnt_resets,json=fCntResets,proto3" json:"f_cnt_resets,omitempty"`
+	// Current session
+	Session *Session `protobuf:"bytes,11,opt,name=session" json:"session,omitempty"`
+	// Fallback session (stored until RekeyInd received)
+	SessionFallback *Session `protobuf:"bytes,12,opt,name=session_fallback,json=sessionFallback" json:"session_fallback,omitempty"`
+	// LoRaWAN MAC version
+	LoRaWANVersion string `protobuf:"bytes,13,opt,name=lorawan_version,json=lorawanVersion,proto3" json:"lorawan_version,omitempty"`
+	// LoRaWAN PHY version
+	LoRaWANPHYVersion string `protobuf:"bytes,14,opt,name=lorawan_phy_version,json=lorawanPhyVersion,proto3" json:"lorawan_phy_version,omitempty"`
+	// Min frequency the device is capable of using
+	MinFrequency uint64 `protobuf:"varint,15,opt,name=min_frequency,json=minFrequency,proto3" json:"min_frequency,omitempty"`
+	// Max frequency the device is capable of using
+	MaxFrequency uint64 `protobuf:"varint,16,opt,name=max_frequency,json=maxFrequency,proto3" json:"max_frequency,omitempty"`
+	// Max transmission power the device is capable of using
+	MaxTXPower uint64 `protobuf:"varint,17,opt,name=max_tx_power,json=maxTxPower,proto3" json:"max_tx_power,omitempty"`
+	// LoRaWAN MAC settings for the device
+	MACSettings *MACSettings `protobuf:"bytes,18,opt,name=mac_settings,json=macSettings" json:"mac_settings,omitempty"`
+	// MAC info sent by the device
+	MACInfo *MACInfo `protobuf:"bytes,19,opt,name=mac_info,json=macInfo" json:"mac_info,omitempty"`
+	// Current LoRaWAN MAC state
+	MACState *MACState `protobuf:"bytes,20,opt,name=mac_state,json=macState" json:"mac_state,omitempty"`
+	// Desired LoRaWAN MAC state
+	MACStateDesired *MACState `protobuf:"bytes,21,opt,name=mac_state_desired,json=macStateDesired" json:"mac_state_desired,omitempty"`
+	// Location of the device
+	Location *Location `protobuf:"bytes,22,opt,name=location" json:"location,omitempty"`
+	// Device Attributes
+	// - field names are written in snake_case
+	Attributes *google_protobuf1.Struct `protobuf:"bytes,23,opt,name=attributes" json:"attributes,omitempty"`
+	CreatedAt  *time.Time               `protobuf:"bytes,97,opt,name=created_at,json=createdAt,stdtime" json:"created_at,omitempty"`
+	UpdatedAt  *time.Time               `protobuf:"bytes,98,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at,omitempty"`
+}
+
+func (m *EndDevice) Reset()                    { *m = EndDevice{} }
+func (*EndDevice) ProtoMessage()               {}
+func (*EndDevice) Descriptor() ([]byte, []int) { return fileDescriptorEndDevice, []int{5} }
+
+func (m *EndDevice) GetRootKeys() *RootKeys {
+	if m != nil {
+		return m.RootKeys
+	}
+	return nil
+}
+
+func (m *EndDevice) GetNextDevNonce() uint32 {
+	if m != nil {
+		return m.NextDevNonce
+	}
+	return 0
+}
+
+func (m *EndDevice) GetUsedDevNonces() []uint32 {
+	if m != nil {
+		return m.UsedDevNonces
+	}
+	return nil
+}
+
+func (m *EndDevice) GetNextJoinNonce() uint32 {
+	if m != nil {
+		return m.NextJoinNonce
+	}
+	return 0
+}
+
+func (m *EndDevice) GetUsedJoinNonces() []uint32 {
+	if m != nil {
+		return m.UsedJoinNonces
+	}
+	return nil
+}
+
+func (m *EndDevice) GetNextRJCount0() uint32 {
+	if m != nil {
+		return m.NextRJCount0
+	}
+	return 0
+}
+
+func (m *EndDevice) GetNextRJCount1() uint32 {
+	if m != nil {
+		return m.NextRJCount1
+	}
+	return 0
+}
+
+func (m *EndDevice) GetFCntIs_32Bit() bool {
+	if m != nil {
+		return m.FCntIs_32Bit
+	}
+	return false
+}
+
+func (m *EndDevice) GetFCntResets() bool {
+	if m != nil {
+		return m.FCntResets
+	}
+	return false
+}
+
+func (m *EndDevice) GetSession() *Session {
+	if m != nil {
+		return m.Session
+	}
+	return nil
+}
+
+func (m *EndDevice) GetSessionFallback() *Session {
+	if m != nil {
+		return m.SessionFallback
+	}
+	return nil
+}
+
+func (m *EndDevice) GetLoRaWANVersion() string {
+	if m != nil {
+		return m.LoRaWANVersion
+	}
+	return ""
+}
+
+func (m *EndDevice) GetLoRaWANPHYVersion() string {
+	if m != nil {
+		return m.LoRaWANPHYVersion
+	}
+	return ""
+}
+
+func (m *EndDevice) GetMinFrequency() uint64 {
+	if m != nil {
+		return m.MinFrequency
+	}
+	return 0
+}
+
+func (m *EndDevice) GetMaxFrequency() uint64 {
+	if m != nil {
+		return m.MaxFrequency
+	}
+	return 0
+}
+
+func (m *EndDevice) GetMaxTXPower() uint64 {
+	if m != nil {
+		return m.MaxTXPower
+	}
+	return 0
+}
+
+func (m *EndDevice) GetMACSettings() *MACSettings {
+	if m != nil {
+		return m.MACSettings
+	}
+	return nil
+}
+
+func (m *EndDevice) GetMACInfo() *MACInfo {
+	if m != nil {
+		return m.MACInfo
+	}
+	return nil
+}
+
+func (m *EndDevice) GetMACState() *MACState {
+	if m != nil {
+		return m.MACState
+	}
+	return nil
+}
+
+func (m *EndDevice) GetMACStateDesired() *MACState {
+	if m != nil {
+		return m.MACStateDesired
+	}
+	return nil
+}
+
+func (m *EndDevice) GetLocation() *Location {
+	if m != nil {
+		return m.Location
+	}
+	return nil
+}
+
+func (m *EndDevice) GetAttributes() *google_protobuf1.Struct {
+	if m != nil {
+		return m.Attributes
+	}
+	return nil
+}
+
+func (m *EndDevice) GetCreatedAt() *time.Time {
+	if m != nil {
+		return m.CreatedAt
+	}
+	return nil
+}
+
+func (m *EndDevice) GetUpdatedAt() *time.Time {
+	if m != nil {
+		return m.UpdatedAt
+	}
+	return nil
+}
+
+type MACSettings struct {
+	// Use ADR
+	Adr bool `protobuf:"varint,1,opt,name=adr,proto3" json:"adr,omitempty"`
+	// The ADR margin
+	AdrMargin uint32 `protobuf:"varint,2,opt,name=adr_margin,json=adrMargin,proto3" json:"adr_margin,omitempty"`
+}
+
+func (m *MACSettings) Reset()                    { *m = MACSettings{} }
+func (*MACSettings) ProtoMessage()               {}
+func (*MACSettings) Descriptor() ([]byte, []int) { return fileDescriptorEndDevice, []int{6} }
+
+func (m *MACSettings) GetAdr() bool {
+	if m != nil {
+		return m.Adr
+	}
+	return false
+}
+
+func (m *MACSettings) GetAdrMargin() uint32 {
+	if m != nil {
+		return m.AdrMargin
+	}
+	return 0
+}
+
+// MAC State of the device (active or desired)
+// This is used internally by the network server and is read only
+type MACState struct {
+	// Currently used maximum transmission power
+	MaxTxPower uint32 `protobuf:"varint,2,opt,name=max_tx_power,json=maxTxPower,proto3" json:"max_tx_power,omitempty"`
+	// Uplink dwell time is set (400ms)
+	UplinkDwellTime bool `protobuf:"varint,3,opt,name=uplink_dwell_time,json=uplinkDwellTime,proto3" json:"uplink_dwell_time,omitempty"`
+	// Downlink dwell time is set (400ms)
+	DownlinkDwellTime bool `protobuf:"varint,4,opt,name=downlink_dwell_time,json=downlinkDwellTime,proto3" json:"downlink_dwell_time,omitempty"`
+	// ADR: data rate index to use
+	AdrDataRateIndex uint32 `protobuf:"varint,5,opt,name=adr_data_rate_index,json=adrDataRateIndex,proto3" json:"adr_data_rate_index,omitempty"`
+	// ADR: transmission power index to use
+	AdrTxPowerIndex uint32 `protobuf:"varint,6,opt,name=adr_tx_power_index,json=adrTxPowerIndex,proto3" json:"adr_tx_power_index,omitempty"`
+	// ADR: number of retransmissions
+	AdrNbTrans uint32 `protobuf:"varint,7,opt,name=adr_nb_trans,json=adrNbTrans,proto3" json:"adr_nb_trans,omitempty"`
+	// ADR: number of messages to wait before setting ADRAckReq
+	AdrAckLimit uint32 `protobuf:"varint,8,opt,name=adr_ack_limit,json=adrAckLimit,proto3" json:"adr_ack_limit,omitempty"`
+	// ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate
+	AdrAckDelay uint32 `protobuf:"varint,9,opt,name=adr_ack_delay,json=adrAckDelay,proto3" json:"adr_ack_delay,omitempty"`
+	// Aggregated duty cycle of the device
+	DutyCycle AggregatedDutyCycle `protobuf:"varint,10,opt,name=duty_cycle,json=dutyCycle,proto3,enum=ttn.v3.AggregatedDutyCycle" json:"duty_cycle,omitempty"`
+	// RX1 delay (RX2 delay is RX1 delay + 1 second)
+	RxDelay uint32 `protobuf:"varint,11,opt,name=rx_delay,json=rxDelay,proto3" json:"rx_delay,omitempty"`
+	// Data rate offset for RX1
+	Rx1DataRateOffset int32 `protobuf:"varint,12,opt,name=rx1_data_rate_offset,json=rx1DataRateOffset,proto3" json:"rx1_data_rate_offset,omitempty"`
+	// Data rate index for RX2
+	Rx2DataRateIndex uint32 `protobuf:"varint,13,opt,name=rx2_data_rate_index,json=rx2DataRateIndex,proto3" json:"rx2_data_rate_index,omitempty"`
+	// Frequency for RX2
+	Rx2Frequency uint64 `protobuf:"varint,14,opt,name=rx2_frequency,json=rx2Frequency,proto3" json:"rx2_frequency,omitempty"`
+	// Time after which a rejoin request will be sent
+	RejoinTimer uint32 `protobuf:"varint,18,opt,name=rejoin_timer,json=rejoinTimer,proto3" json:"rejoin_timer,omitempty"`
+	// Number of messages after which a rejoin request will be sent
+	RejoinCounter uint32 `protobuf:"varint,19,opt,name=rejoin_counter,json=rejoinCounter,proto3" json:"rejoin_counter,omitempty"`
+	// Frequency of the class B ping slot
+	PingSlotFrequency uint64 `protobuf:"varint,21,opt,name=ping_slot_frequency,json=pingSlotFrequency,proto3" json:"ping_slot_frequency,omitempty"`
+	// Data rate index of the class B ping slot
+	PingSlotDataRateIndex uint32 `protobuf:"varint,22,opt,name=ping_slot_data_rate_index,json=pingSlotDataRateIndex,proto3" json:"ping_slot_data_rate_index,omitempty"`
+}
+
+func (m *MACState) Reset()                    { *m = MACState{} }
+func (*MACState) ProtoMessage()               {}
+func (*MACState) Descriptor() ([]byte, []int) { return fileDescriptorEndDevice, []int{7} }
+
+func (m *MACState) GetMaxTxPower() uint32 {
+	if m != nil {
+		return m.MaxTxPower
+	}
+	return 0
+}
+
+func (m *MACState) GetUplinkDwellTime() bool {
+	if m != nil {
+		return m.UplinkDwellTime
+	}
+	return false
+}
+
+func (m *MACState) GetDownlinkDwellTime() bool {
+	if m != nil {
+		return m.DownlinkDwellTime
+	}
+	return false
+}
+
+func (m *MACState) GetAdrDataRateIndex() uint32 {
+	if m != nil {
+		return m.AdrDataRateIndex
+	}
+	return 0
+}
+
+func (m *MACState) GetAdrTxPowerIndex() uint32 {
+	if m != nil {
+		return m.AdrTxPowerIndex
+	}
+	return 0
+}
+
+func (m *MACState) GetAdrNbTrans() uint32 {
+	if m != nil {
+		return m.AdrNbTrans
+	}
+	return 0
+}
+
+func (m *MACState) GetAdrAckLimit() uint32 {
+	if m != nil {
+		return m.AdrAckLimit
+	}
+	return 0
+}
+
+func (m *MACState) GetAdrAckDelay() uint32 {
+	if m != nil {
+		return m.AdrAckDelay
+	}
+	return 0
+}
+
+func (m *MACState) GetDutyCycle() AggregatedDutyCycle {
+	if m != nil {
+		return m.DutyCycle
+	}
+	return AggregatedDutyCycle_ONE_1TH
+}
+
+func (m *MACState) GetRxDelay() uint32 {
+	if m != nil {
+		return m.RxDelay
+	}
+	return 0
+}
+
+func (m *MACState) GetRx1DataRateOffset() int32 {
+	if m != nil {
+		return m.Rx1DataRateOffset
+	}
+	return 0
+}
+
+func (m *MACState) GetRx2DataRateIndex() uint32 {
+	if m != nil {
+		return m.Rx2DataRateIndex
+	}
+	return 0
+}
+
+func (m *MACState) GetRx2Frequency() uint64 {
+	if m != nil {
+		return m.Rx2Frequency
+	}
+	return 0
+}
+
+func (m *MACState) GetRejoinTimer() uint32 {
+	if m != nil {
+		return m.RejoinTimer
+	}
+	return 0
+}
+
+func (m *MACState) GetRejoinCounter() uint32 {
+	if m != nil {
+		return m.RejoinCounter
+	}
+	return 0
+}
+
+func (m *MACState) GetPingSlotFrequency() uint64 {
+	if m != nil {
+		return m.PingSlotFrequency
+	}
+	return 0
+}
+
+func (m *MACState) GetPingSlotDataRateIndex() uint32 {
+	if m != nil {
+		return m.PingSlotDataRateIndex
+	}
+	return 0
+}
+
+// MAC information sent by the device
+// This message is read only
+type MACInfo struct {
+	// Currently active LoRaWAN device class
+	// - Device class is A by default
+	// - If device sets ClassB bit in uplink, this will be set to B
+	// - If device sent DeviceModeInd MAC message, this will be set to that value
+	DeviceClass Class `protobuf:"varint,1,opt,name=device_class,json=deviceClass,proto3,enum=ttn.v3.Class" json:"device_class,omitempty"`
+	// When the last device status MAC message was received
+	LastStatus *google_protobuf2.Timestamp `protobuf:"bytes,2,opt,name=last_status,json=lastStatus" json:"last_status,omitempty"`
+	// Battery percentage received in last device status message
+	BatteryPercentage float32 `protobuf:"fixed32,3,opt,name=battery_percentage,json=batteryPercentage,proto3" json:"battery_percentage,omitempty"`
+	// Downlink margin received in last device status message
+	DownlinkMargin int32 `protobuf:"varint,4,opt,name=downlink_margin,json=downlinkMargin,proto3" json:"downlink_margin,omitempty"`
+	// Periodicity of the class B ping slot
+	PingSlotPeriodicity PingSlotPeriod `protobuf:"varint,5,opt,name=ping_slot_periodicity,json=pingSlotPeriodicity,proto3,enum=ttn.v3.PingSlotPeriod" json:"ping_slot_periodicity,omitempty"`
+}
+
+func (m *MACInfo) Reset()                    { *m = MACInfo{} }
+func (*MACInfo) ProtoMessage()               {}
+func (*MACInfo) Descriptor() ([]byte, []int) { return fileDescriptorEndDevice, []int{8} }
+
+func (m *MACInfo) GetDeviceClass() Class {
+	if m != nil {
+		return m.DeviceClass
+	}
+	return Class_A
+}
+
+func (m *MACInfo) GetLastStatus() *google_protobuf2.Timestamp {
+	if m != nil {
+		return m.LastStatus
+	}
+	return nil
+}
+
+func (m *MACInfo) GetBatteryPercentage() float32 {
+	if m != nil {
+		return m.BatteryPercentage
+	}
+	return 0
+}
+
+func (m *MACInfo) GetDownlinkMargin() int32 {
+	if m != nil {
+		return m.DownlinkMargin
+	}
+	return 0
+}
+
+func (m *MACInfo) GetPingSlotPeriodicity() PingSlotPeriod {
+	if m != nil {
+		return m.PingSlotPeriodicity
+	}
+	return PingSlotPeriod_EVERY_1S
+}
+
 func init() {
 	proto.RegisterType((*EndDeviceIdentifiers)(nil), "ttn.v3.EndDeviceIdentifiers")
 	proto.RegisterType((*KeyEnvelope)(nil), "ttn.v3.KeyEnvelope")
+	proto.RegisterType((*RootKeys)(nil), "ttn.v3.RootKeys")
 	proto.RegisterType((*SessionKeys)(nil), "ttn.v3.SessionKeys")
+	proto.RegisterType((*Session)(nil), "ttn.v3.Session")
+	proto.RegisterType((*EndDevice)(nil), "ttn.v3.EndDevice")
+	proto.RegisterType((*MACSettings)(nil), "ttn.v3.MACSettings")
+	proto.RegisterType((*MACState)(nil), "ttn.v3.MACState")
+	proto.RegisterType((*MACInfo)(nil), "ttn.v3.MACInfo")
+	proto.RegisterEnum("ttn.v3.AggregatedDutyCycle", AggregatedDutyCycle_name, AggregatedDutyCycle_value)
+	proto.RegisterEnum("ttn.v3.PingSlotPeriod", PingSlotPeriod_name, PingSlotPeriod_value)
+}
+func (x AggregatedDutyCycle) String() string {
+	s, ok := AggregatedDutyCycle_name[int32(x)]
+	if ok {
+		return s
+	}
+	return strconv.Itoa(int(x))
+}
+func (x PingSlotPeriod) String() string {
+	s, ok := PingSlotPeriod_name[int32(x)]
+	if ok {
+		return s
+	}
+	return strconv.Itoa(int(x))
 }
 func (m *EndDeviceIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
@@ -239,6 +932,50 @@ func (m *KeyEnvelope) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *RootKeys) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RootKeys) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.RootKeyId) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.RootKeyId)))
+		i += copy(dAtA[i:], m.RootKeyId)
+	}
+	if m.AppKey != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.AppKey.Size()))
+		n5, err := m.AppKey.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n5
+	}
+	if m.NwkKey != nil {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.NwkKey.Size()))
+		n6, err := m.NwkKey.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n6
+	}
+	return i, nil
+}
+
 func (m *SessionKeys) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -264,41 +1001,561 @@ func (m *SessionKeys) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.FNwkSIntKey.Size()))
-		n5, err := m.FNwkSIntKey.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n5
-	}
-	if m.SNwkSIntKey != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.SNwkSIntKey.Size()))
-		n6, err := m.SNwkSIntKey.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n6
-	}
-	if m.NwkSEncKey != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.NwkSEncKey.Size()))
-		n7, err := m.NwkSEncKey.MarshalTo(dAtA[i:])
+		n7, err := m.FNwkSIntKey.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
 		i += n7
 	}
-	if m.AppSKey != nil {
-		dAtA[i] = 0x2a
+	if m.SNwkSIntKey != nil {
+		dAtA[i] = 0x1a
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.AppSKey.Size()))
-		n8, err := m.AppSKey.MarshalTo(dAtA[i:])
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.SNwkSIntKey.Size()))
+		n8, err := m.SNwkSIntKey.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
 		i += n8
+	}
+	if m.NwkSEncKey != nil {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.NwkSEncKey.Size()))
+		n9, err := m.NwkSEncKey.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n9
+	}
+	if m.AppSKey != nil {
+		dAtA[i] = 0x2a
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.AppSKey.Size()))
+		n10, err := m.AppSKey.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n10
+	}
+	return i, nil
+}
+
+func (m *Session) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Session) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.DevAddr != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.DevAddr.Size()))
+		n11, err := m.DevAddr.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n11
+	}
+	dAtA[i] = 0x1a
+	i++
+	i = encodeVarintEndDevice(dAtA, i, uint64(m.SessionKeys.Size()))
+	n12, err := m.SessionKeys.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n12
+	if m.NextFCntUp != 0 {
+		dAtA[i] = 0x20
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.NextFCntUp))
+	}
+	if m.NextNFCntDown != 0 {
+		dAtA[i] = 0x28
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.NextNFCntDown))
+	}
+	if m.NextAFCntDown != 0 {
+		dAtA[i] = 0x30
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.NextAFCntDown))
+	}
+	if m.Started != nil {
+		dAtA[i] = 0x3a
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.Started)))
+		n13, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Started, dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n13
+	}
+	return i, nil
+}
+
+func (m *EndDevice) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintEndDevice(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
+	n14, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n14
+	if m.RootKeys != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.RootKeys.Size()))
+		n15, err := m.RootKeys.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n15
+	}
+	if m.NextDevNonce != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.NextDevNonce))
+	}
+	if len(m.UsedDevNonces) > 0 {
+		dAtA17 := make([]byte, len(m.UsedDevNonces)*10)
+		var j16 int
+		for _, num := range m.UsedDevNonces {
+			for num >= 1<<7 {
+				dAtA17[j16] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j16++
+			}
+			dAtA17[j16] = uint8(num)
+			j16++
+		}
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(j16))
+		i += copy(dAtA[i:], dAtA17[:j16])
+	}
+	if m.NextJoinNonce != 0 {
+		dAtA[i] = 0x28
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.NextJoinNonce))
+	}
+	if len(m.UsedJoinNonces) > 0 {
+		dAtA19 := make([]byte, len(m.UsedJoinNonces)*10)
+		var j18 int
+		for _, num := range m.UsedJoinNonces {
+			for num >= 1<<7 {
+				dAtA19[j18] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j18++
+			}
+			dAtA19[j18] = uint8(num)
+			j18++
+		}
+		dAtA[i] = 0x32
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(j18))
+		i += copy(dAtA[i:], dAtA19[:j18])
+	}
+	if m.NextRJCount0 != 0 {
+		dAtA[i] = 0x38
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.NextRJCount0))
+	}
+	if m.NextRJCount1 != 0 {
+		dAtA[i] = 0x40
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.NextRJCount1))
+	}
+	if m.FCntIs_32Bit {
+		dAtA[i] = 0x48
+		i++
+		if m.FCntIs_32Bit {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.FCntResets {
+		dAtA[i] = 0x50
+		i++
+		if m.FCntResets {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.Session != nil {
+		dAtA[i] = 0x5a
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Session.Size()))
+		n20, err := m.Session.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n20
+	}
+	if m.SessionFallback != nil {
+		dAtA[i] = 0x62
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.SessionFallback.Size()))
+		n21, err := m.SessionFallback.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n21
+	}
+	if len(m.LoRaWANVersion) > 0 {
+		dAtA[i] = 0x6a
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.LoRaWANVersion)))
+		i += copy(dAtA[i:], m.LoRaWANVersion)
+	}
+	if len(m.LoRaWANPHYVersion) > 0 {
+		dAtA[i] = 0x72
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.LoRaWANPHYVersion)))
+		i += copy(dAtA[i:], m.LoRaWANPHYVersion)
+	}
+	if m.MinFrequency != 0 {
+		dAtA[i] = 0x78
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MinFrequency))
+	}
+	if m.MaxFrequency != 0 {
+		dAtA[i] = 0x80
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxFrequency))
+	}
+	if m.MaxTXPower != 0 {
+		dAtA[i] = 0x88
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxTXPower))
+	}
+	if m.MACSettings != nil {
+		dAtA[i] = 0x92
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MACSettings.Size()))
+		n22, err := m.MACSettings.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n22
+	}
+	if m.MACInfo != nil {
+		dAtA[i] = 0x9a
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MACInfo.Size()))
+		n23, err := m.MACInfo.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n23
+	}
+	if m.MACState != nil {
+		dAtA[i] = 0xa2
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MACState.Size()))
+		n24, err := m.MACState.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n24
+	}
+	if m.MACStateDesired != nil {
+		dAtA[i] = 0xaa
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MACStateDesired.Size()))
+		n25, err := m.MACStateDesired.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n25
+	}
+	if m.Location != nil {
+		dAtA[i] = 0xb2
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Location.Size()))
+		n26, err := m.Location.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n26
+	}
+	if m.Attributes != nil {
+		dAtA[i] = 0xba
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Attributes.Size()))
+		n27, err := m.Attributes.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n27
+	}
+	if m.CreatedAt != nil {
+		dAtA[i] = 0x8a
+		i++
+		dAtA[i] = 0x6
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.CreatedAt)))
+		n28, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.CreatedAt, dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n28
+	}
+	if m.UpdatedAt != nil {
+		dAtA[i] = 0x92
+		i++
+		dAtA[i] = 0x6
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.UpdatedAt)))
+		n29, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.UpdatedAt, dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n29
+	}
+	return i, nil
+}
+
+func (m *MACSettings) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MACSettings) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Adr {
+		dAtA[i] = 0x8
+		i++
+		if m.Adr {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.AdrMargin != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.AdrMargin))
+	}
+	return i, nil
+}
+
+func (m *MACState) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MACState) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.MaxTxPower != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxTxPower))
+	}
+	if m.UplinkDwellTime {
+		dAtA[i] = 0x18
+		i++
+		if m.UplinkDwellTime {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.DownlinkDwellTime {
+		dAtA[i] = 0x20
+		i++
+		if m.DownlinkDwellTime {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.AdrDataRateIndex != 0 {
+		dAtA[i] = 0x28
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.AdrDataRateIndex))
+	}
+	if m.AdrTxPowerIndex != 0 {
+		dAtA[i] = 0x30
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.AdrTxPowerIndex))
+	}
+	if m.AdrNbTrans != 0 {
+		dAtA[i] = 0x38
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.AdrNbTrans))
+	}
+	if m.AdrAckLimit != 0 {
+		dAtA[i] = 0x40
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.AdrAckLimit))
+	}
+	if m.AdrAckDelay != 0 {
+		dAtA[i] = 0x48
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.AdrAckDelay))
+	}
+	if m.DutyCycle != 0 {
+		dAtA[i] = 0x50
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.DutyCycle))
+	}
+	if m.RxDelay != 0 {
+		dAtA[i] = 0x58
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.RxDelay))
+	}
+	if m.Rx1DataRateOffset != 0 {
+		dAtA[i] = 0x60
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx1DataRateOffset))
+	}
+	if m.Rx2DataRateIndex != 0 {
+		dAtA[i] = 0x68
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx2DataRateIndex))
+	}
+	if m.Rx2Frequency != 0 {
+		dAtA[i] = 0x70
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx2Frequency))
+	}
+	if m.RejoinTimer != 0 {
+		dAtA[i] = 0x90
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.RejoinTimer))
+	}
+	if m.RejoinCounter != 0 {
+		dAtA[i] = 0x98
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.RejoinCounter))
+	}
+	if m.PingSlotFrequency != 0 {
+		dAtA[i] = 0xa8
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotFrequency))
+	}
+	if m.PingSlotDataRateIndex != 0 {
+		dAtA[i] = 0xb0
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotDataRateIndex))
+	}
+	return i, nil
+}
+
+func (m *MACInfo) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MACInfo) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.DeviceClass != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.DeviceClass))
+	}
+	if m.LastStatus != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastStatus.Size()))
+		n30, err := m.LastStatus.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n30
+	}
+	if m.BatteryPercentage != 0 {
+		dAtA[i] = 0x1d
+		i++
+		i = encodeFixed32EndDevice(dAtA, i, uint32(math.Float32bits(float32(m.BatteryPercentage))))
+	}
+	if m.DownlinkMargin != 0 {
+		dAtA[i] = 0x20
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.DownlinkMargin))
+	}
+	if m.PingSlotPeriodicity != 0 {
+		dAtA[i] = 0x28
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotPeriodicity))
 	}
 	return i, nil
 }
@@ -374,6 +1631,24 @@ func (m *KeyEnvelope) Size() (n int) {
 	return n
 }
 
+func (m *RootKeys) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.RootKeyId)
+	if l > 0 {
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.AppKey != nil {
+		l = m.AppKey.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.NwkKey != nil {
+		l = m.NwkKey.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	return n
+}
+
 func (m *SessionKeys) Size() (n int) {
 	var l int
 	_ = l
@@ -396,6 +1671,223 @@ func (m *SessionKeys) Size() (n int) {
 	if m.AppSKey != nil {
 		l = m.AppSKey.Size()
 		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	return n
+}
+
+func (m *Session) Size() (n int) {
+	var l int
+	_ = l
+	if m.DevAddr != nil {
+		l = m.DevAddr.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	l = m.SessionKeys.Size()
+	n += 1 + l + sovEndDevice(uint64(l))
+	if m.NextFCntUp != 0 {
+		n += 1 + sovEndDevice(uint64(m.NextFCntUp))
+	}
+	if m.NextNFCntDown != 0 {
+		n += 1 + sovEndDevice(uint64(m.NextNFCntDown))
+	}
+	if m.NextAFCntDown != 0 {
+		n += 1 + sovEndDevice(uint64(m.NextAFCntDown))
+	}
+	if m.Started != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.Started)
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	return n
+}
+
+func (m *EndDevice) Size() (n int) {
+	var l int
+	_ = l
+	l = m.EndDeviceIdentifiers.Size()
+	n += 1 + l + sovEndDevice(uint64(l))
+	if m.RootKeys != nil {
+		l = m.RootKeys.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.NextDevNonce != 0 {
+		n += 1 + sovEndDevice(uint64(m.NextDevNonce))
+	}
+	if len(m.UsedDevNonces) > 0 {
+		l = 0
+		for _, e := range m.UsedDevNonces {
+			l += sovEndDevice(uint64(e))
+		}
+		n += 1 + sovEndDevice(uint64(l)) + l
+	}
+	if m.NextJoinNonce != 0 {
+		n += 1 + sovEndDevice(uint64(m.NextJoinNonce))
+	}
+	if len(m.UsedJoinNonces) > 0 {
+		l = 0
+		for _, e := range m.UsedJoinNonces {
+			l += sovEndDevice(uint64(e))
+		}
+		n += 1 + sovEndDevice(uint64(l)) + l
+	}
+	if m.NextRJCount0 != 0 {
+		n += 1 + sovEndDevice(uint64(m.NextRJCount0))
+	}
+	if m.NextRJCount1 != 0 {
+		n += 1 + sovEndDevice(uint64(m.NextRJCount1))
+	}
+	if m.FCntIs_32Bit {
+		n += 2
+	}
+	if m.FCntResets {
+		n += 2
+	}
+	if m.Session != nil {
+		l = m.Session.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.SessionFallback != nil {
+		l = m.SessionFallback.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	l = len(m.LoRaWANVersion)
+	if l > 0 {
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	l = len(m.LoRaWANPHYVersion)
+	if l > 0 {
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.MinFrequency != 0 {
+		n += 1 + sovEndDevice(uint64(m.MinFrequency))
+	}
+	if m.MaxFrequency != 0 {
+		n += 2 + sovEndDevice(uint64(m.MaxFrequency))
+	}
+	if m.MaxTXPower != 0 {
+		n += 2 + sovEndDevice(uint64(m.MaxTXPower))
+	}
+	if m.MACSettings != nil {
+		l = m.MACSettings.Size()
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	if m.MACInfo != nil {
+		l = m.MACInfo.Size()
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	if m.MACState != nil {
+		l = m.MACState.Size()
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	if m.MACStateDesired != nil {
+		l = m.MACStateDesired.Size()
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	if m.Location != nil {
+		l = m.Location.Size()
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	if m.Attributes != nil {
+		l = m.Attributes.Size()
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	if m.CreatedAt != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.CreatedAt)
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	if m.UpdatedAt != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.UpdatedAt)
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	return n
+}
+
+func (m *MACSettings) Size() (n int) {
+	var l int
+	_ = l
+	if m.Adr {
+		n += 2
+	}
+	if m.AdrMargin != 0 {
+		n += 1 + sovEndDevice(uint64(m.AdrMargin))
+	}
+	return n
+}
+
+func (m *MACState) Size() (n int) {
+	var l int
+	_ = l
+	if m.MaxTxPower != 0 {
+		n += 1 + sovEndDevice(uint64(m.MaxTxPower))
+	}
+	if m.UplinkDwellTime {
+		n += 2
+	}
+	if m.DownlinkDwellTime {
+		n += 2
+	}
+	if m.AdrDataRateIndex != 0 {
+		n += 1 + sovEndDevice(uint64(m.AdrDataRateIndex))
+	}
+	if m.AdrTxPowerIndex != 0 {
+		n += 1 + sovEndDevice(uint64(m.AdrTxPowerIndex))
+	}
+	if m.AdrNbTrans != 0 {
+		n += 1 + sovEndDevice(uint64(m.AdrNbTrans))
+	}
+	if m.AdrAckLimit != 0 {
+		n += 1 + sovEndDevice(uint64(m.AdrAckLimit))
+	}
+	if m.AdrAckDelay != 0 {
+		n += 1 + sovEndDevice(uint64(m.AdrAckDelay))
+	}
+	if m.DutyCycle != 0 {
+		n += 1 + sovEndDevice(uint64(m.DutyCycle))
+	}
+	if m.RxDelay != 0 {
+		n += 1 + sovEndDevice(uint64(m.RxDelay))
+	}
+	if m.Rx1DataRateOffset != 0 {
+		n += 1 + sovEndDevice(uint64(m.Rx1DataRateOffset))
+	}
+	if m.Rx2DataRateIndex != 0 {
+		n += 1 + sovEndDevice(uint64(m.Rx2DataRateIndex))
+	}
+	if m.Rx2Frequency != 0 {
+		n += 1 + sovEndDevice(uint64(m.Rx2Frequency))
+	}
+	if m.RejoinTimer != 0 {
+		n += 2 + sovEndDevice(uint64(m.RejoinTimer))
+	}
+	if m.RejoinCounter != 0 {
+		n += 2 + sovEndDevice(uint64(m.RejoinCounter))
+	}
+	if m.PingSlotFrequency != 0 {
+		n += 2 + sovEndDevice(uint64(m.PingSlotFrequency))
+	}
+	if m.PingSlotDataRateIndex != 0 {
+		n += 2 + sovEndDevice(uint64(m.PingSlotDataRateIndex))
+	}
+	return n
+}
+
+func (m *MACInfo) Size() (n int) {
+	var l int
+	_ = l
+	if m.DeviceClass != 0 {
+		n += 1 + sovEndDevice(uint64(m.DeviceClass))
+	}
+	if m.LastStatus != nil {
+		l = m.LastStatus.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.BatteryPercentage != 0 {
+		n += 5
+	}
+	if m.DownlinkMargin != 0 {
+		n += 1 + sovEndDevice(uint64(m.DownlinkMargin))
+	}
+	if m.PingSlotPeriodicity != 0 {
+		n += 1 + sovEndDevice(uint64(m.PingSlotPeriodicity))
 	}
 	return n
 }
@@ -439,6 +1931,18 @@ func (this *KeyEnvelope) String() string {
 	}, "")
 	return s
 }
+func (this *RootKeys) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RootKeys{`,
+		`RootKeyId:` + fmt.Sprintf("%v", this.RootKeyId) + `,`,
+		`AppKey:` + strings.Replace(fmt.Sprintf("%v", this.AppKey), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
+		`NwkKey:` + strings.Replace(fmt.Sprintf("%v", this.NwkKey), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
 func (this *SessionKeys) String() string {
 	if this == nil {
 		return "nil"
@@ -449,6 +1953,106 @@ func (this *SessionKeys) String() string {
 		`SNwkSIntKey:` + strings.Replace(fmt.Sprintf("%v", this.SNwkSIntKey), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
 		`NwkSEncKey:` + strings.Replace(fmt.Sprintf("%v", this.NwkSEncKey), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
 		`AppSKey:` + strings.Replace(fmt.Sprintf("%v", this.AppSKey), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *Session) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&Session{`,
+		`DevAddr:` + fmt.Sprintf("%v", this.DevAddr) + `,`,
+		`SessionKeys:` + strings.Replace(strings.Replace(this.SessionKeys.String(), "SessionKeys", "SessionKeys", 1), `&`, ``, 1) + `,`,
+		`NextFCntUp:` + fmt.Sprintf("%v", this.NextFCntUp) + `,`,
+		`NextNFCntDown:` + fmt.Sprintf("%v", this.NextNFCntDown) + `,`,
+		`NextAFCntDown:` + fmt.Sprintf("%v", this.NextAFCntDown) + `,`,
+		`Started:` + strings.Replace(fmt.Sprintf("%v", this.Started), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *EndDevice) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&EndDevice{`,
+		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceIdentifiers.String(), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
+		`RootKeys:` + strings.Replace(fmt.Sprintf("%v", this.RootKeys), "RootKeys", "RootKeys", 1) + `,`,
+		`NextDevNonce:` + fmt.Sprintf("%v", this.NextDevNonce) + `,`,
+		`UsedDevNonces:` + fmt.Sprintf("%v", this.UsedDevNonces) + `,`,
+		`NextJoinNonce:` + fmt.Sprintf("%v", this.NextJoinNonce) + `,`,
+		`UsedJoinNonces:` + fmt.Sprintf("%v", this.UsedJoinNonces) + `,`,
+		`NextRJCount0:` + fmt.Sprintf("%v", this.NextRJCount0) + `,`,
+		`NextRJCount1:` + fmt.Sprintf("%v", this.NextRJCount1) + `,`,
+		`FCntIs_32Bit:` + fmt.Sprintf("%v", this.FCntIs_32Bit) + `,`,
+		`FCntResets:` + fmt.Sprintf("%v", this.FCntResets) + `,`,
+		`Session:` + strings.Replace(fmt.Sprintf("%v", this.Session), "Session", "Session", 1) + `,`,
+		`SessionFallback:` + strings.Replace(fmt.Sprintf("%v", this.SessionFallback), "Session", "Session", 1) + `,`,
+		`LoRaWANVersion:` + fmt.Sprintf("%v", this.LoRaWANVersion) + `,`,
+		`LoRaWANPHYVersion:` + fmt.Sprintf("%v", this.LoRaWANPHYVersion) + `,`,
+		`MinFrequency:` + fmt.Sprintf("%v", this.MinFrequency) + `,`,
+		`MaxFrequency:` + fmt.Sprintf("%v", this.MaxFrequency) + `,`,
+		`MaxTXPower:` + fmt.Sprintf("%v", this.MaxTXPower) + `,`,
+		`MACSettings:` + strings.Replace(fmt.Sprintf("%v", this.MACSettings), "MACSettings", "MACSettings", 1) + `,`,
+		`MACInfo:` + strings.Replace(fmt.Sprintf("%v", this.MACInfo), "MACInfo", "MACInfo", 1) + `,`,
+		`MACState:` + strings.Replace(fmt.Sprintf("%v", this.MACState), "MACState", "MACState", 1) + `,`,
+		`MACStateDesired:` + strings.Replace(fmt.Sprintf("%v", this.MACStateDesired), "MACState", "MACState", 1) + `,`,
+		`Location:` + strings.Replace(fmt.Sprintf("%v", this.Location), "Location", "Location", 1) + `,`,
+		`Attributes:` + strings.Replace(fmt.Sprintf("%v", this.Attributes), "Struct", "google_protobuf1.Struct", 1) + `,`,
+		`CreatedAt:` + strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
+		`UpdatedAt:` + strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *MACSettings) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&MACSettings{`,
+		`Adr:` + fmt.Sprintf("%v", this.Adr) + `,`,
+		`AdrMargin:` + fmt.Sprintf("%v", this.AdrMargin) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *MACState) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&MACState{`,
+		`MaxTxPower:` + fmt.Sprintf("%v", this.MaxTxPower) + `,`,
+		`UplinkDwellTime:` + fmt.Sprintf("%v", this.UplinkDwellTime) + `,`,
+		`DownlinkDwellTime:` + fmt.Sprintf("%v", this.DownlinkDwellTime) + `,`,
+		`AdrDataRateIndex:` + fmt.Sprintf("%v", this.AdrDataRateIndex) + `,`,
+		`AdrTxPowerIndex:` + fmt.Sprintf("%v", this.AdrTxPowerIndex) + `,`,
+		`AdrNbTrans:` + fmt.Sprintf("%v", this.AdrNbTrans) + `,`,
+		`AdrAckLimit:` + fmt.Sprintf("%v", this.AdrAckLimit) + `,`,
+		`AdrAckDelay:` + fmt.Sprintf("%v", this.AdrAckDelay) + `,`,
+		`DutyCycle:` + fmt.Sprintf("%v", this.DutyCycle) + `,`,
+		`RxDelay:` + fmt.Sprintf("%v", this.RxDelay) + `,`,
+		`Rx1DataRateOffset:` + fmt.Sprintf("%v", this.Rx1DataRateOffset) + `,`,
+		`Rx2DataRateIndex:` + fmt.Sprintf("%v", this.Rx2DataRateIndex) + `,`,
+		`Rx2Frequency:` + fmt.Sprintf("%v", this.Rx2Frequency) + `,`,
+		`RejoinTimer:` + fmt.Sprintf("%v", this.RejoinTimer) + `,`,
+		`RejoinCounter:` + fmt.Sprintf("%v", this.RejoinCounter) + `,`,
+		`PingSlotFrequency:` + fmt.Sprintf("%v", this.PingSlotFrequency) + `,`,
+		`PingSlotDataRateIndex:` + fmt.Sprintf("%v", this.PingSlotDataRateIndex) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *MACInfo) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&MACInfo{`,
+		`DeviceClass:` + fmt.Sprintf("%v", this.DeviceClass) + `,`,
+		`LastStatus:` + strings.Replace(fmt.Sprintf("%v", this.LastStatus), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
+		`BatteryPercentage:` + fmt.Sprintf("%v", this.BatteryPercentage) + `,`,
+		`DownlinkMargin:` + fmt.Sprintf("%v", this.DownlinkMargin) + `,`,
+		`PingSlotPeriodicity:` + fmt.Sprintf("%v", this.PingSlotPeriodicity) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -805,6 +2409,151 @@ func (m *KeyEnvelope) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *RootKeys) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEndDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RootKeys: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RootKeys: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RootKeyId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RootKeyId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AppKey", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AppKey == nil {
+				m.AppKey = &KeyEnvelope{}
+			}
+			if err := m.AppKey.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NwkKey", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.NwkKey == nil {
+				m.NwkKey = &KeyEnvelope{}
+			}
+			if err := m.NwkKey.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEndDevice(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *SessionKeys) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1016,6 +2765,1624 @@ func (m *SessionKeys) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *Session) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEndDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Session: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Session: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DevAddr", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var v github_com_TheThingsNetwork_ttn_pkg_types.DevAddr
+			m.DevAddr = &v
+			if err := m.DevAddr.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SessionKeys", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.SessionKeys.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NextFCntUp", wireType)
+			}
+			m.NextFCntUp = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NextFCntUp |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NextNFCntDown", wireType)
+			}
+			m.NextNFCntDown = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NextNFCntDown |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NextAFCntDown", wireType)
+			}
+			m.NextAFCntDown = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NextAFCntDown |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Started", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Started == nil {
+				m.Started = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.Started, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEndDevice(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *EndDevice) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEndDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: EndDevice: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: EndDevice: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndDeviceIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.EndDeviceIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RootKeys", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.RootKeys == nil {
+				m.RootKeys = &RootKeys{}
+			}
+			if err := m.RootKeys.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NextDevNonce", wireType)
+			}
+			m.NextDevNonce = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NextDevNonce |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType == 0 {
+				var v uint32
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowEndDevice
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= (uint32(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.UsedDevNonces = append(m.UsedDevNonces, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowEndDevice
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= (int(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthEndDevice
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				for iNdEx < postIndex {
+					var v uint32
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowEndDevice
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= (uint32(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.UsedDevNonces = append(m.UsedDevNonces, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field UsedDevNonces", wireType)
+			}
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NextJoinNonce", wireType)
+			}
+			m.NextJoinNonce = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NextJoinNonce |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType == 0 {
+				var v uint32
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowEndDevice
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= (uint32(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.UsedJoinNonces = append(m.UsedJoinNonces, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowEndDevice
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= (int(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthEndDevice
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				for iNdEx < postIndex {
+					var v uint32
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowEndDevice
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= (uint32(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.UsedJoinNonces = append(m.UsedJoinNonces, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field UsedJoinNonces", wireType)
+			}
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NextRJCount0", wireType)
+			}
+			m.NextRJCount0 = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NextRJCount0 |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NextRJCount1", wireType)
+			}
+			m.NextRJCount1 = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NextRJCount1 |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FCntIs_32Bit", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.FCntIs_32Bit = bool(v != 0)
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FCntResets", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.FCntResets = bool(v != 0)
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Session", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Session == nil {
+				m.Session = &Session{}
+			}
+			if err := m.Session.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SessionFallback", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SessionFallback == nil {
+				m.SessionFallback = &Session{}
+			}
+			if err := m.SessionFallback.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 13:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LoRaWANVersion", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.LoRaWANVersion = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 14:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LoRaWANPHYVersion", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.LoRaWANPHYVersion = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 15:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinFrequency", wireType)
+			}
+			m.MinFrequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MinFrequency |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 16:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxFrequency", wireType)
+			}
+			m.MaxFrequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxFrequency |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 17:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxTXPower", wireType)
+			}
+			m.MaxTXPower = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxTXPower |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 18:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MACSettings", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.MACSettings == nil {
+				m.MACSettings = &MACSettings{}
+			}
+			if err := m.MACSettings.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 19:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MACInfo", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.MACInfo == nil {
+				m.MACInfo = &MACInfo{}
+			}
+			if err := m.MACInfo.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 20:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MACState", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.MACState == nil {
+				m.MACState = &MACState{}
+			}
+			if err := m.MACState.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 21:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MACStateDesired", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.MACStateDesired == nil {
+				m.MACStateDesired = &MACState{}
+			}
+			if err := m.MACStateDesired.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 22:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Location", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Location == nil {
+				m.Location = &Location{}
+			}
+			if err := m.Location.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 23:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Attributes", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Attributes == nil {
+				m.Attributes = &google_protobuf1.Struct{}
+			}
+			if err := m.Attributes.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 97:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.CreatedAt == nil {
+				m.CreatedAt = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 98:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAt", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.UpdatedAt == nil {
+				m.UpdatedAt = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEndDevice(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MACSettings) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEndDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MACSettings: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MACSettings: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Adr", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Adr = bool(v != 0)
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AdrMargin", wireType)
+			}
+			m.AdrMargin = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.AdrMargin |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEndDevice(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MACState) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEndDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MACState: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MACState: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxTxPower", wireType)
+			}
+			m.MaxTxPower = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxTxPower |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UplinkDwellTime", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.UplinkDwellTime = bool(v != 0)
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DownlinkDwellTime", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.DownlinkDwellTime = bool(v != 0)
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AdrDataRateIndex", wireType)
+			}
+			m.AdrDataRateIndex = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.AdrDataRateIndex |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AdrTxPowerIndex", wireType)
+			}
+			m.AdrTxPowerIndex = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.AdrTxPowerIndex |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AdrNbTrans", wireType)
+			}
+			m.AdrNbTrans = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.AdrNbTrans |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AdrAckLimit", wireType)
+			}
+			m.AdrAckLimit = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.AdrAckLimit |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AdrAckDelay", wireType)
+			}
+			m.AdrAckDelay = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.AdrAckDelay |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DutyCycle", wireType)
+			}
+			m.DutyCycle = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DutyCycle |= (AggregatedDutyCycle(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 11:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RxDelay", wireType)
+			}
+			m.RxDelay = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.RxDelay |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 12:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rx1DataRateOffset", wireType)
+			}
+			m.Rx1DataRateOffset = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Rx1DataRateOffset |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 13:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rx2DataRateIndex", wireType)
+			}
+			m.Rx2DataRateIndex = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Rx2DataRateIndex |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 14:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rx2Frequency", wireType)
+			}
+			m.Rx2Frequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Rx2Frequency |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 18:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RejoinTimer", wireType)
+			}
+			m.RejoinTimer = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.RejoinTimer |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 19:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RejoinCounter", wireType)
+			}
+			m.RejoinCounter = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.RejoinCounter |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 21:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PingSlotFrequency", wireType)
+			}
+			m.PingSlotFrequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.PingSlotFrequency |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 22:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PingSlotDataRateIndex", wireType)
+			}
+			m.PingSlotDataRateIndex = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.PingSlotDataRateIndex |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEndDevice(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MACInfo) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEndDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MACInfo: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MACInfo: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DeviceClass", wireType)
+			}
+			m.DeviceClass = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DeviceClass |= (Class(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LastStatus", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.LastStatus == nil {
+				m.LastStatus = &google_protobuf2.Timestamp{}
+			}
+			if err := m.LastStatus.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 5 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BatteryPercentage", wireType)
+			}
+			var v uint32
+			if (iNdEx + 4) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += 4
+			v = uint32(dAtA[iNdEx-4])
+			v |= uint32(dAtA[iNdEx-3]) << 8
+			v |= uint32(dAtA[iNdEx-2]) << 16
+			v |= uint32(dAtA[iNdEx-1]) << 24
+			m.BatteryPercentage = float32(math.Float32frombits(v))
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DownlinkMargin", wireType)
+			}
+			m.DownlinkMargin = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DownlinkMargin |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PingSlotPeriodicity", wireType)
+			}
+			m.PingSlotPeriodicity = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.PingSlotPeriodicity |= (PingSlotPeriod(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEndDevice(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func skipEndDevice(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1126,40 +4493,132 @@ func init() {
 }
 
 var fileDescriptorEndDevice = []byte{
-	// 545 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x93, 0xbf, 0x6f, 0xd3, 0x40,
-	0x14, 0xc7, 0xeb, 0xa6, 0xcd, 0x8f, 0x4b, 0x5a, 0x84, 0x61, 0xa8, 0x40, 0xb2, 0xab, 0x88, 0xa1,
-	0x1d, 0xb0, 0xd5, 0xa6, 0x94, 0x32, 0x80, 0x94, 0x28, 0x16, 0x32, 0x41, 0x15, 0x72, 0x5a, 0x24,
-	0x58, 0x2c, 0x27, 0xf7, 0x92, 0x1c, 0x0e, 0x77, 0xa7, 0xdc, 0xc5, 0x91, 0x37, 0xfe, 0x06, 0x76,
-	0xfe, 0x1f, 0x46, 0x46, 0x94, 0xc1, 0x02, 0x4f, 0x8c, 0xfc, 0x09, 0xe8, 0xce, 0x55, 0x89, 0x90,
-	0x0a, 0x11, 0xdb, 0x3d, 0xdf, 0xf7, 0xf3, 0x91, 0xee, 0xbd, 0x67, 0x74, 0x32, 0x26, 0x72, 0x32,
-	0x1f, 0x38, 0x43, 0xf6, 0xde, 0xbd, 0x98, 0xc0, 0xc5, 0x84, 0xd0, 0xb1, 0x38, 0x07, 0xb9, 0x60,
-	0xb3, 0xd8, 0x95, 0x92, 0xba, 0x11, 0x27, 0x2e, 0x50, 0x1c, 0x62, 0x48, 0xc8, 0x10, 0x1c, 0x3e,
-	0x63, 0x92, 0x99, 0x65, 0x29, 0xa9, 0x93, 0xb4, 0xee, 0x3d, 0x5c, 0xa1, 0xc7, 0x6c, 0xcc, 0x5c,
-	0x7d, 0x3d, 0x98, 0x8f, 0x74, 0xa5, 0x0b, 0x7d, 0x2a, 0xb0, 0xe6, 0xa7, 0x12, 0xba, 0xeb, 0x51,
-	0xdc, 0xd5, 0x2a, 0x1f, 0x03, 0x95, 0x64, 0x44, 0x60, 0x26, 0xcc, 0x43, 0x54, 0x2b, 0xfc, 0x21,
-	0xc1, 0x7b, 0xc6, 0xbe, 0x71, 0x50, 0xeb, 0x34, 0xf2, 0xcc, 0xae, 0x5e, 0x25, 0xbb, 0x41, 0x15,
-	0x5f, 0x31, 0xe6, 0x19, 0xda, 0x8d, 0x38, 0x9f, 0x92, 0x61, 0x24, 0x09, 0xa3, 0x2a, 0xbf, 0xa9,
-	0xf3, 0xb7, 0xf3, 0xcc, 0xde, 0x69, 0xff, 0xbe, 0xf1, 0xbb, 0xc1, 0xce, 0x4a, 0xd0, 0xc7, 0xe6,
-	0x7d, 0x54, 0x93, 0x40, 0x23, 0x2a, 0x15, 0x54, 0x52, 0x50, 0x50, 0x2d, 0x3e, 0xf8, 0xd8, 0x7c,
-	0x8d, 0x2a, 0x18, 0x92, 0x10, 0xe6, 0x64, 0x6f, 0x6b, 0xdf, 0x38, 0x68, 0x74, 0x9e, 0x2e, 0x33,
-	0xdb, 0xfd, 0x57, 0x73, 0x78, 0x3c, 0x76, 0x65, 0xca, 0x41, 0x38, 0xde, 0xa5, 0x7f, 0x7a, 0x92,
-	0x67, 0x76, 0xb9, 0x0b, 0x89, 0x77, 0xe9, 0x07, 0x65, 0x0c, 0x89, 0x37, 0x27, 0xe6, 0x1b, 0x54,
-	0x7d, 0xc7, 0x08, 0xd5, 0xe2, 0x6d, 0x2d, 0x7e, 0xf6, 0x7f, 0xe2, 0xca, 0x0b, 0x46, 0xa8, 0x32,
-	0x57, 0x94, 0x4f, 0xa9, 0x5f, 0x21, 0xd5, 0x95, 0x30, 0xc2, 0x78, 0xb6, 0x57, 0xd6, 0xea, 0x47,
-	0xcb, 0xcc, 0x3e, 0x5a, 0x5f, 0xdd, 0x85, 0xa4, 0x8d, 0xf1, 0x2c, 0x50, 0x2f, 0x57, 0x87, 0xe6,
-	0x1c, 0xd5, 0x7b, 0x90, 0x7a, 0x34, 0x81, 0x29, 0xe3, 0x60, 0xfa, 0xa8, 0x14, 0x43, 0xaa, 0xe7,
-	0xd1, 0xe8, 0x3c, 0x5e, 0x66, 0x76, 0x6b, 0x7d, 0x77, 0xdb, 0xeb, 0x1f, 0x1d, 0x9f, 0xf5, 0x20,
-	0x0d, 0x94, 0x43, 0xf5, 0x3e, 0x86, 0x38, 0x9c, 0x46, 0x03, 0x98, 0x16, 0x03, 0x0b, 0xaa, 0x31,
-	0xc4, 0x2f, 0x55, 0xdd, 0xfc, 0xb8, 0x89, 0xea, 0x7d, 0x10, 0x82, 0x30, 0xda, 0x83, 0x54, 0x98,
-	0x0f, 0xd0, 0xae, 0x28, 0xca, 0x30, 0x86, 0xf4, 0x7a, 0x25, 0x82, 0x86, 0xb8, 0x0e, 0xf9, 0xd8,
-	0x7c, 0x82, 0x6e, 0x8d, 0x42, 0xba, 0x88, 0x43, 0x11, 0x12, 0x2a, 0x55, 0x52, 0x8b, 0xeb, 0xc7,
-	0x77, 0x9c, 0x62, 0x3b, 0x9d, 0x95, 0xb7, 0x04, 0xf5, 0xd1, 0xf9, 0x22, 0xee, 0xfb, 0x54, 0xf6,
-	0x20, 0x55, 0xa8, 0xf8, 0x03, 0x2d, 0xfd, 0x05, 0x15, 0x2b, 0xe8, 0x29, 0xda, 0x29, 0x40, 0xa0,
-	0x43, 0x0d, 0x6e, 0xdd, 0x0c, 0x22, 0xba, 0x88, 0xfb, 0x1e, 0x1d, 0x2a, 0xce, 0x45, 0xb5, 0x88,
-	0xf3, 0x50, 0x68, 0x66, 0xfb, 0x66, 0xa6, 0x12, 0x71, 0xde, 0xef, 0x41, 0xda, 0x79, 0xfe, 0xf5,
-	0xbb, 0xb5, 0xf1, 0x21, 0xb7, 0x8c, 0xcf, 0xb9, 0x65, 0x7c, 0xc9, 0x2d, 0xe3, 0x5b, 0x6e, 0x19,
-	0x3f, 0x72, 0x6b, 0xe3, 0x67, 0x6e, 0x19, 0x6f, 0x0f, 0xd7, 0x9a, 0x84, 0xa4, 0x7c, 0x30, 0x28,
-	0xeb, 0x7f, 0xaf, 0xf5, 0x2b, 0x00, 0x00, 0xff, 0xff, 0x91, 0x7e, 0xfa, 0xa9, 0xea, 0x03, 0x00,
-	0x00,
+	// 2020 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x57, 0x4d, 0x73, 0xdb, 0xc8,
+	0xd1, 0x36, 0x25, 0x4a, 0x24, 0x9b, 0x5f, 0xe0, 0xc8, 0xf6, 0x72, 0xbd, 0xfb, 0x8a, 0x5a, 0xad,
+	0xdf, 0x44, 0x76, 0xd6, 0x92, 0x48, 0xc9, 0xb2, 0x6c, 0x57, 0x36, 0x45, 0x8a, 0xf4, 0x8a, 0xfe,
+	0xd0, 0x2a, 0x43, 0xda, 0x89, 0x73, 0x41, 0x0d, 0x81, 0x21, 0x05, 0x93, 0x1c, 0x20, 0xc0, 0x50,
+	0x22, 0x6f, 0xa9, 0x54, 0x25, 0xe7, 0x54, 0xce, 0xc9, 0xdf, 0xc8, 0x5f, 0xc8, 0x1e, 0xf7, 0x98,
+	0xf2, 0x81, 0x49, 0x78, 0xca, 0x31, 0x3f, 0x21, 0xd5, 0x03, 0x80, 0x1f, 0xf2, 0xc7, 0xaa, 0x52,
+	0xb9, 0xa1, 0xbb, 0x9f, 0xe7, 0x99, 0x9e, 0x9e, 0x99, 0x9e, 0x01, 0xec, 0x77, 0x2c, 0x79, 0x36,
+	0x68, 0x6d, 0x1b, 0x76, 0x7f, 0xa7, 0x79, 0xc6, 0x9b, 0x67, 0x96, 0xe8, 0x78, 0x27, 0x5c, 0x5e,
+	0xd8, 0x6e, 0x77, 0x47, 0x4a, 0xb1, 0xc3, 0x1c, 0x6b, 0x87, 0x0b, 0x53, 0x37, 0xf9, 0xb9, 0x65,
+	0xf0, 0x6d, 0xc7, 0xb5, 0xa5, 0x4d, 0x56, 0xa5, 0x14, 0xdb, 0xe7, 0x7b, 0xb7, 0xee, 0xcd, 0xb1,
+	0x3b, 0x76, 0xc7, 0xde, 0x51, 0xe1, 0xd6, 0xa0, 0xad, 0x2c, 0x65, 0xa8, 0x2f, 0x9f, 0x76, 0xab,
+	0x78, 0x95, 0xc1, 0x7a, 0xb6, 0xcb, 0x2e, 0x98, 0x08, 0x28, 0xa5, 0xab, 0x50, 0xfa, 0x5c, 0x32,
+	0x93, 0x49, 0x16, 0x70, 0x3e, 0xef, 0xd8, 0x76, 0xa7, 0xc7, 0x67, 0xc9, 0x78, 0xd2, 0x1d, 0x18,
+	0x32, 0x88, 0x16, 0x2e, 0x47, 0xa5, 0xd5, 0xe7, 0x9e, 0x64, 0x7d, 0xc7, 0x07, 0x6c, 0xfe, 0x79,
+	0x19, 0xae, 0xd7, 0x84, 0x59, 0x55, 0x13, 0xae, 0x9b, 0x5c, 0x48, 0xab, 0x6d, 0x71, 0xd7, 0x23,
+	0x77, 0x20, 0xe1, 0x57, 0x41, 0xb7, 0xcc, 0x7c, 0x64, 0x23, 0xb2, 0x95, 0xa8, 0xa4, 0x26, 0xe3,
+	0x42, 0x3c, 0x40, 0x56, 0x69, 0xdc, 0x0c, 0x38, 0xe4, 0x10, 0x32, 0xcc, 0x71, 0x7a, 0x96, 0xc1,
+	0xa4, 0x65, 0x0b, 0xc4, 0x2f, 0x29, 0x7c, 0x6e, 0x32, 0x2e, 0xa4, 0xcb, 0xb3, 0x48, 0xbd, 0x4a,
+	0xd3, 0x73, 0xc0, 0xba, 0x49, 0x3e, 0x83, 0x84, 0xe4, 0x82, 0x09, 0x89, 0xa4, 0x65, 0x24, 0xd1,
+	0xb8, 0xef, 0xa8, 0x9b, 0xe4, 0x15, 0xc4, 0x4c, 0x7e, 0xae, 0xf3, 0x81, 0x95, 0x8f, 0x6e, 0x44,
+	0xb6, 0x52, 0x95, 0x9f, 0xbe, 0x1d, 0x17, 0x76, 0x7e, 0xa8, 0x44, 0x4e, 0xb7, 0xb3, 0x23, 0x47,
+	0x0e, 0xf7, 0xb6, 0x6b, 0x2f, 0xeb, 0x07, 0xfb, 0x93, 0x71, 0x61, 0xb5, 0xca, 0xcf, 0x6b, 0x2f,
+	0xeb, 0x74, 0xd5, 0xe4, 0xe7, 0xb5, 0x81, 0x45, 0x5e, 0x43, 0xfc, 0x8d, 0x6d, 0x09, 0x25, 0xbc,
+	0xa2, 0x84, 0xbf, 0xfe, 0xef, 0x84, 0x63, 0x4f, 0x6d, 0x4b, 0xa0, 0x72, 0x0c, 0xf5, 0x50, 0xfa,
+	0x14, 0xb0, 0x2a, 0x3a, 0x33, 0x4d, 0x37, 0xbf, 0xaa, 0xa4, 0xef, 0xbf, 0x1d, 0x17, 0x8a, 0x57,
+	0x97, 0xae, 0xf2, 0xf3, 0xb2, 0x69, 0xba, 0x14, 0x67, 0x8e, 0x1f, 0x9b, 0x03, 0x48, 0x3e, 0xe3,
+	0xa3, 0x9a, 0x38, 0xe7, 0x3d, 0xdb, 0xe1, 0xa4, 0x0e, 0xcb, 0x5d, 0x3e, 0x52, 0xeb, 0x91, 0xaa,
+	0x3c, 0x78, 0x3b, 0x2e, 0xec, 0x5d, 0x5d, 0xbb, 0x5c, 0x6b, 0x14, 0x4b, 0x87, 0xcf, 0xf8, 0x88,
+	0xa2, 0x06, 0xd6, 0xbe, 0xcb, 0xbb, 0x7a, 0x8f, 0xb5, 0x78, 0xcf, 0x5f, 0x30, 0x1a, 0xef, 0xf2,
+	0xee, 0x73, 0xb4, 0x37, 0x7f, 0x1f, 0x81, 0x38, 0xb5, 0x6d, 0xf9, 0x8c, 0x8f, 0x3c, 0xb2, 0x0e,
+	0x49, 0xd7, 0xb6, 0xa5, 0xde, 0xe5, 0xa3, 0xe9, 0x66, 0xa0, 0x09, 0xd7, 0x0f, 0xd7, 0x4d, 0xf2,
+	0x15, 0xc4, 0x98, 0xe3, 0x60, 0x58, 0xe9, 0x24, 0x4b, 0x6b, 0xdb, 0xfe, 0x91, 0xd9, 0x9e, 0x4b,
+	0x9d, 0xae, 0x32, 0xc7, 0x79, 0xc6, 0x47, 0x88, 0x16, 0x17, 0x5d, 0x85, 0x5e, 0xfe, 0x08, 0x5a,
+	0x5c, 0x74, 0x9f, 0xf1, 0xd1, 0xe6, 0x1f, 0x97, 0x20, 0xd9, 0xe0, 0x9e, 0x67, 0xd9, 0x42, 0xe5,
+	0x72, 0x1b, 0x32, 0x9e, 0x6f, 0x2e, 0xa6, 0x93, 0xf2, 0xa6, 0xa0, 0xba, 0x49, 0x1e, 0x42, 0xb6,
+	0xad, 0xe3, 0x28, 0x9e, 0x6e, 0x09, 0xf9, 0x43, 0x99, 0x25, 0xdb, 0x27, 0x17, 0xdd, 0x46, 0x5d,
+	0xe0, 0x74, 0x90, 0xea, 0x5d, 0xa2, 0x7e, 0x24, 0xcd, 0xa4, 0x37, 0x47, 0x3d, 0x80, 0xb4, 0x4f,
+	0xe4, 0xc2, 0x50, 0xc4, 0xe8, 0x87, 0x89, 0x20, 0x2e, 0xba, 0x8d, 0x9a, 0x30, 0x90, 0xb7, 0x03,
+	0x09, 0xac, 0x9f, 0xa7, 0x38, 0x2b, 0x1f, 0xe6, 0x60, 0x95, 0x1b, 0x58, 0x94, 0xbf, 0x2e, 0x41,
+	0x2c, 0x28, 0xca, 0xc2, 0x96, 0x5b, 0xfa, 0x5f, 0x6c, 0x39, 0x52, 0x84, 0x68, 0x97, 0x8f, 0xbc,
+	0xcb, 0xd3, 0x9e, 0x5b, 0x85, 0x4a, 0xfc, 0xbb, 0x71, 0xe1, 0xda, 0xf7, 0xe3, 0x42, 0x84, 0x2a,
+	0x28, 0xf9, 0x02, 0xd2, 0x82, 0x0f, 0xa5, 0xde, 0xd6, 0x0d, 0x21, 0xf5, 0x81, 0xa3, 0x66, 0x9e,
+	0xa6, 0x80, 0xce, 0x27, 0x47, 0x42, 0xbe, 0x74, 0xc8, 0x16, 0xe4, 0x14, 0x44, 0x04, 0x20, 0xd3,
+	0xbe, 0x10, 0x6a, 0xb2, 0x69, 0xaa, 0xb8, 0x27, 0x88, 0xab, 0xda, 0x17, 0x62, 0x8a, 0x64, 0xf3,
+	0xc8, 0xd5, 0x19, 0xb2, 0x3c, 0x45, 0x3e, 0x82, 0x98, 0x27, 0x99, 0x2b, 0xb9, 0x99, 0x8f, 0xa9,
+	0x64, 0x6f, 0x6d, 0xfb, 0xfd, 0x6e, 0x3b, 0xec, 0x77, 0xdb, 0xcd, 0xb0, 0xdf, 0x55, 0xa2, 0x7f,
+	0xf8, 0x7b, 0x21, 0x42, 0x43, 0xc2, 0xd3, 0x68, 0x3c, 0xa2, 0x2d, 0x6d, 0xfe, 0x05, 0x20, 0x31,
+	0x6d, 0x7f, 0xe4, 0x10, 0x96, 0x2d, 0xd3, 0x53, 0x3b, 0x2a, 0x59, 0xfa, 0x3c, 0x9c, 0xf8, 0xfb,
+	0xda, 0xe3, 0x5c, 0x05, 0x90, 0x42, 0xee, 0x41, 0x22, 0x3c, 0x22, 0x5e, 0xb0, 0xd5, 0xb4, 0x90,
+	0x1f, 0x9e, 0x23, 0x1a, 0x77, 0xc3, 0x13, 0x75, 0x1b, 0x32, 0x6a, 0x8a, 0xb8, 0x72, 0xc2, 0x16,
+	0x06, 0x57, 0xc5, 0x4e, 0xd3, 0x14, 0x7a, 0xab, 0xfc, 0xfc, 0x04, 0x7d, 0xe4, 0x47, 0x90, 0x1d,
+	0x78, 0xdc, 0x9c, 0xa1, 0xbc, 0x7c, 0x74, 0x63, 0x19, 0xcb, 0x80, 0xee, 0x10, 0xe6, 0x21, 0x4e,
+	0xa9, 0xa9, 0xae, 0xe6, 0xcb, 0xcd, 0x15, 0x16, 0x9b, 0x94, 0xaf, 0xb7, 0x05, 0x9a, 0xd2, 0x9b,
+	0xe1, 0xbc, 0xfc, 0xaa, 0x12, 0xcc, 0xa0, 0x7f, 0x0a, 0xf4, 0xc8, 0x83, 0x40, 0xd1, 0x7d, 0xa3,
+	0x1b, 0xf6, 0x40, 0x48, 0x7d, 0x57, 0x15, 0x38, 0x5d, 0xd1, 0x26, 0xe3, 0x42, 0xea, 0x84, 0x0f,
+	0x25, 0x7d, 0x7a, 0x84, 0x81, 0x5d, 0x3f, 0x65, 0xfa, 0xc6, 0xb7, 0xde, 0x25, 0x16, 0xf3, 0xf1,
+	0xf7, 0x12, 0x8b, 0x0b, 0xc4, 0x22, 0xb9, 0x8d, 0x27, 0x16, 0x57, 0xdb, 0xf2, 0xf4, 0xbd, 0x92,
+	0xde, 0xb2, 0x64, 0x3e, 0xb1, 0x11, 0xd9, 0x8a, 0xd3, 0x64, 0xfb, 0x48, 0xc8, 0xba, 0xb7, 0x57,
+	0xaa, 0x58, 0x92, 0x6c, 0x40, 0xca, 0x47, 0xb9, 0xdc, 0xe3, 0xd2, 0xcb, 0x83, 0x82, 0x00, 0x42,
+	0xa8, 0xf2, 0x90, 0x3b, 0x10, 0x0b, 0x3a, 0x41, 0x3e, 0xa9, 0x96, 0x21, 0x7b, 0x69, 0xff, 0xd2,
+	0x30, 0x4e, 0x1e, 0x81, 0x16, 0xb6, 0x92, 0x36, 0xeb, 0xf5, 0x5a, 0xcc, 0xe8, 0xe6, 0x53, 0xef,
+	0xe7, 0x64, 0x03, 0xe0, 0x93, 0x00, 0x47, 0x1e, 0x43, 0x36, 0xb8, 0xba, 0xf5, 0x73, 0xee, 0xaa,
+	0xe1, 0xd2, 0xea, 0xce, 0x23, 0x93, 0x71, 0x21, 0xf3, 0xdc, 0xa6, 0xec, 0x17, 0xe5, 0x93, 0x57,
+	0x7e, 0x84, 0x66, 0x02, 0x68, 0x60, 0x93, 0x1a, 0xac, 0x85, 0x64, 0xe7, 0x6c, 0x34, 0x15, 0xc8,
+	0x28, 0x81, 0x1b, 0x93, 0x71, 0x21, 0x17, 0x08, 0x9c, 0x1e, 0xbf, 0x0e, 0x35, 0x72, 0x01, 0xe3,
+	0xf4, 0x6c, 0x14, 0xca, 0x7c, 0x09, 0xe9, 0xbe, 0x25, 0xf4, 0xb6, 0xcb, 0x7f, 0x3d, 0xe0, 0xc2,
+	0x18, 0xe5, 0xb3, 0x1b, 0x91, 0xad, 0x28, 0x4d, 0xf5, 0x2d, 0xf1, 0x24, 0xf4, 0x29, 0x10, 0x1b,
+	0xce, 0x81, 0xb4, 0x00, 0xc4, 0x86, 0x33, 0xd0, 0x2e, 0xa0, 0xad, 0xcb, 0xa1, 0xee, 0xd8, 0x17,
+	0xdc, 0xcd, 0xe7, 0x10, 0x53, 0xc9, 0x4c, 0xc6, 0x05, 0x78, 0xc1, 0x86, 0xcd, 0x5f, 0x9e, 0xa2,
+	0x97, 0x42, 0x9f, 0x0d, 0x9b, 0x43, 0xf5, 0x4d, 0xbe, 0x41, 0x86, 0xa1, 0x7b, 0x5c, 0x4a, 0xec,
+	0x2c, 0x79, 0xb2, 0xd8, 0x2b, 0x5e, 0x94, 0x8f, 0x1a, 0x41, 0xa8, 0x92, 0x9d, 0x8c, 0x0b, 0xc9,
+	0x39, 0x07, 0x4d, 0xf6, 0x99, 0x11, 0x1a, 0xe4, 0x01, 0xc4, 0x51, 0xc8, 0x12, 0x6d, 0x3b, 0xbf,
+	0xb6, 0x58, 0xfc, 0x17, 0xe5, 0xa3, 0xba, 0x68, 0xdb, 0x95, 0x24, 0x5e, 0xb5, 0x81, 0x41, 0x63,
+	0x7d, 0x66, 0xe0, 0x07, 0x79, 0x0c, 0x09, 0x95, 0x81, 0x64, 0x92, 0xe7, 0xaf, 0x2f, 0x9e, 0x38,
+	0x1c, 0x0d, 0xfd, 0xfe, 0x8b, 0x25, 0xb4, 0x28, 0x8e, 0xa4, 0xbe, 0xc8, 0xcf, 0x21, 0x37, 0x25,
+	0xeb, 0x26, 0xf7, 0x2c, 0x97, 0x9b, 0xf9, 0x1b, 0x1f, 0x10, 0x59, 0x9b, 0x8c, 0x0b, 0xd9, 0xd0,
+	0xaa, 0xfa, 0x60, 0x9a, 0x0d, 0xb5, 0x02, 0x07, 0xf9, 0x0a, 0xe2, 0x3d, 0xdb, 0x7f, 0xd8, 0xe4,
+	0x6f, 0x2e, 0x2a, 0x3d, 0x0f, 0xfc, 0x74, 0x8a, 0x20, 0x0f, 0x00, 0x98, 0x94, 0xae, 0xd5, 0x1a,
+	0x48, 0xee, 0xe5, 0x3f, 0x51, 0xf8, 0x4f, 0xde, 0x69, 0x5e, 0x0d, 0xf5, 0x94, 0xa3, 0x73, 0x50,
+	0xf2, 0x33, 0x00, 0xc3, 0xe5, 0x4c, 0x72, 0x53, 0x67, 0x32, 0xcf, 0xae, 0xd8, 0xf5, 0x12, 0x01,
+	0xa7, 0x2c, 0x51, 0x60, 0xe0, 0x98, 0xa1, 0x40, 0xeb, 0xaa, 0x02, 0x01, 0xa7, 0x2c, 0x9f, 0x46,
+	0xe3, 0x86, 0x66, 0x6e, 0x7e, 0x0d, 0xf3, 0x6b, 0x4a, 0x34, 0x58, 0x66, 0xa6, 0xab, 0x3a, 0x67,
+	0x9c, 0xe2, 0x27, 0xf9, 0x3f, 0x00, 0x66, 0xba, 0x7a, 0x9f, 0xb9, 0x1d, 0x4b, 0xa8, 0x96, 0x98,
+	0xa6, 0x09, 0x66, 0xba, 0x2f, 0x94, 0x63, 0x73, 0xbc, 0x02, 0xd3, 0x85, 0xc1, 0x63, 0xbd, 0xb0,
+	0xff, 0x7c, 0xf4, 0xfc, 0x7e, 0xbb, 0x0b, 0xb9, 0x81, 0xd3, 0xb3, 0x44, 0x57, 0x37, 0x2f, 0x78,
+	0xaf, 0xa7, 0xe3, 0x33, 0x56, 0xf5, 0xcc, 0x38, 0xcd, 0xfa, 0x81, 0x2a, 0xfa, 0x31, 0x6d, 0xb2,
+	0x0d, 0x6b, 0x78, 0x65, 0x5c, 0x46, 0x47, 0x15, 0x3a, 0x17, 0x86, 0x66, 0xf8, 0x7b, 0xb0, 0x86,
+	0x99, 0xe2, 0x9b, 0x5a, 0x77, 0x71, 0x43, 0x58, 0xc2, 0xe4, 0xc3, 0xa0, 0x85, 0x6a, 0xcc, 0x74,
+	0xab, 0x4c, 0x32, 0xca, 0x24, 0xaf, 0xa3, 0x9f, 0xfc, 0x04, 0x08, 0xc2, 0xc3, 0x64, 0x03, 0xb4,
+	0x7f, 0x3f, 0x65, 0x99, 0xe9, 0x06, 0x29, 0xfb, 0xe0, 0x0d, 0x48, 0x21, 0x58, 0xb4, 0x74, 0xe9,
+	0x32, 0xe1, 0xf9, 0x5d, 0x94, 0x62, 0x65, 0x4e, 0x5a, 0x4d, 0xf4, 0x90, 0x4d, 0x48, 0x23, 0x82,
+	0x19, 0x5d, 0xbd, 0x67, 0xf5, 0x2d, 0xe9, 0xf7, 0x4b, 0x9a, 0x64, 0xa6, 0x5b, 0x36, 0xba, 0xcf,
+	0xd1, 0x35, 0x8f, 0x31, 0x79, 0x8f, 0x8d, 0x54, 0x6b, 0x9c, 0x62, 0xaa, 0xe8, 0x22, 0x8f, 0x00,
+	0xcc, 0x81, 0x1c, 0xe9, 0xc6, 0xc8, 0xe8, 0x71, 0xd5, 0x18, 0x33, 0xa5, 0xcf, 0xc2, 0x1d, 0x58,
+	0xee, 0x74, 0x5c, 0xde, 0xc1, 0x05, 0xac, 0x0e, 0xe4, 0xe8, 0x08, 0x21, 0x34, 0x61, 0x86, 0x9f,
+	0xe4, 0x53, 0x88, 0xbb, 0xc3, 0x40, 0x3a, 0xa9, 0xa4, 0x63, 0xee, 0xd0, 0x97, 0xdd, 0x81, 0xeb,
+	0xee, 0xb0, 0x38, 0x57, 0x1c, 0xbb, 0xdd, 0xf6, 0xb8, 0x54, 0x8d, 0x72, 0x85, 0xe6, 0xdc, 0x61,
+	0x31, 0xac, 0xce, 0xb7, 0x2a, 0x80, 0xd5, 0x74, 0x87, 0xa5, 0x77, 0xaa, 0x99, 0xf6, 0xab, 0xe9,
+	0x0e, 0x4b, 0x8b, 0xd5, 0xfc, 0x12, 0xd2, 0x08, 0x9f, 0xf5, 0xa7, 0x8c, 0xdf, 0x9f, 0xdc, 0x61,
+	0x69, 0xd6, 0x9f, 0xbe, 0x80, 0x94, 0xcb, 0xd5, 0xad, 0x85, 0x2b, 0xe9, 0xaa, 0x6e, 0x93, 0xa6,
+	0x49, 0xdf, 0x87, 0x6b, 0xe8, 0x92, 0xff, 0x87, 0x4c, 0x00, 0x51, 0xf7, 0x0e, 0x77, 0x55, 0x37,
+	0x49, 0xd3, 0xb4, 0xef, 0x3d, 0xf2, 0x9d, 0xb8, 0x37, 0x1c, 0x4b, 0x74, 0x74, 0xaf, 0x67, 0xcb,
+	0xb9, 0x41, 0x6f, 0xa8, 0x41, 0x73, 0x18, 0x6a, 0xf4, 0x6c, 0x39, 0x1b, 0xf9, 0x10, 0x3e, 0x9d,
+	0xe1, 0x2f, 0xcf, 0xe9, 0xa6, 0x1a, 0xe1, 0x46, 0xc8, 0x5a, 0x98, 0xd8, 0xe6, 0x9f, 0x96, 0x20,
+	0x6c, 0x5a, 0xd8, 0x5f, 0x83, 0x7f, 0x29, 0xa3, 0xc7, 0x3c, 0xff, 0x81, 0x91, 0x29, 0xa5, 0xc3,
+	0xd5, 0x39, 0x42, 0x27, 0x4d, 0xfa, 0x10, 0x65, 0x90, 0xc7, 0x90, 0xec, 0x31, 0x4f, 0xaa, 0x0e,
+	0x35, 0x08, 0x5f, 0x14, 0x1f, 0x39, 0xa6, 0x14, 0x10, 0xde, 0x50, 0x68, 0x72, 0x0f, 0x48, 0x8b,
+	0x49, 0xc9, 0xdd, 0x91, 0xee, 0x70, 0xd7, 0xe0, 0x42, 0xb2, 0x8e, 0x7f, 0x5a, 0x96, 0x68, 0x2e,
+	0x88, 0x9c, 0x4e, 0x03, 0xe4, 0xc7, 0x90, 0x9d, 0x9e, 0x97, 0xe0, 0xb8, 0x46, 0xd5, 0xea, 0x66,
+	0x42, 0xb7, 0x7f, 0x66, 0xc9, 0x53, 0xb8, 0x31, 0x2b, 0x86, 0xc3, 0x5d, 0xcb, 0x36, 0x2d, 0xc3,
+	0x92, 0xfe, 0x9b, 0x35, 0x53, 0xba, 0x19, 0xce, 0xe7, 0x34, 0x28, 0xc8, 0xa9, 0x82, 0xd0, 0x35,
+	0x67, 0xc1, 0x56, 0x94, 0xbb, 0xbf, 0x5d, 0x82, 0xb5, 0xf7, 0xec, 0x4a, 0x92, 0x84, 0xd8, 0xb7,
+	0x27, 0x35, 0xbd, 0xd8, 0x3c, 0xd6, 0xae, 0x85, 0x46, 0xa9, 0x79, 0xac, 0x45, 0x42, 0x63, 0xbf,
+	0x79, 0xac, 0x2d, 0x85, 0xc6, 0x61, 0xf3, 0x58, 0x5b, 0x26, 0x29, 0x88, 0x2b, 0xce, 0x41, 0xf3,
+	0x58, 0x8b, 0x86, 0xd6, 0x1e, 0xb2, 0x56, 0x42, 0xeb, 0x00, 0x69, 0xab, 0x24, 0x0d, 0x09, 0x85,
+	0x2c, 0x21, 0x31, 0x16, 0x9a, 0xa5, 0xfb, 0xc8, 0x8c, 0x87, 0xe6, 0xfd, 0x22, 0x52, 0x13, 0x24,
+	0x03, 0xa0, 0xc0, 0xbb, 0x25, 0x24, 0x43, 0x68, 0x97, 0x76, 0xf7, 0x91, 0x9d, 0x0c, 0xed, 0xfd,
+	0xdd, 0x87, 0x48, 0x4f, 0x85, 0xf6, 0x61, 0xf1, 0x21, 0xf2, 0xd3, 0x24, 0x0b, 0x49, 0x3f, 0xad,
+	0xbd, 0x43, 0x14, 0xc8, 0x84, 0x8e, 0xbd, 0xd2, 0x83, 0x03, 0x54, 0xc8, 0xde, 0xfd, 0x5d, 0x04,
+	0x32, 0x8b, 0xc5, 0xc2, 0x7c, 0x6b, 0xaf, 0x6a, 0xf4, 0xb5, 0x5e, 0x6c, 0x68, 0xd7, 0x66, 0x56,
+	0xa9, 0xa1, 0x45, 0x66, 0xd6, 0x7e, 0x43, 0x5b, 0x9a, 0x59, 0x87, 0x0d, 0x6d, 0x19, 0x73, 0x0f,
+	0x78, 0x07, 0x0d, 0x2d, 0x3a, 0x33, 0xf7, 0x4a, 0x0d, 0x6d, 0x65, 0x66, 0x1e, 0xec, 0x37, 0xb4,
+	0x55, 0xcc, 0x34, 0x00, 0x97, 0x0e, 0x1b, 0x5a, 0xac, 0xf2, 0xcd, 0xdf, 0xfe, 0xb9, 0x7e, 0xed,
+	0x37, 0x93, 0xf5, 0xc8, 0x77, 0x93, 0xf5, 0xc8, 0xf7, 0x93, 0xf5, 0xc8, 0x3f, 0x26, 0xeb, 0x91,
+	0x7f, 0x4d, 0xd6, 0xaf, 0xfd, 0x7b, 0xb2, 0x1e, 0xf9, 0xd5, 0x9d, 0x2b, 0xfd, 0x4b, 0x48, 0xe1,
+	0xb4, 0x5a, 0xab, 0x6a, 0x67, 0xee, 0xfd, 0x27, 0x00, 0x00, 0xff, 0xff, 0x8e, 0xdc, 0x73, 0x28,
+	0x69, 0x11, 0x00, 0x00,
 }
