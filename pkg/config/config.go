@@ -92,6 +92,7 @@ func (m *Manager) setDefaults(prefix string, config interface{}) {
 		}
 
 		description := field.Tag.Get("description")
+		shorthand := field.Tag.Get("shorthand")
 
 		if configValue.Field(i).CanInterface() {
 			fieldType := field.Type.Kind()
@@ -109,38 +110,38 @@ func (m *Manager) setDefaults(prefix string, config interface{}) {
 			switch val := face.(type) {
 			case bool:
 				m.viper.SetDefault(name, val)
-				m.flags.Bool(name, val, description)
+				m.flags.BoolP(name, shorthand, val, description)
 
 			case int, int8, int16, int32, int64:
 				fieldValue := configValue.Field(i).Int()
 				m.viper.SetDefault(name, int(fieldValue))
-				m.flags.Int(name, int(fieldValue), description)
+				m.flags.IntP(name, shorthand, int(fieldValue), description)
 
 			case uint, uint8, uint16, uint32, uint64:
 				fieldValue := configValue.Field(i).Uint()
 				m.viper.SetDefault(name, uint(fieldValue))
-				m.flags.Uint(name, uint(fieldValue), description)
+				m.flags.UintP(name, shorthand, uint(fieldValue), description)
 
 			case float32, float64:
 				fieldValue := configValue.Field(i).Float()
 				m.viper.SetDefault(name, float64(fieldValue))
-				m.flags.Float64(name, float64(fieldValue), description)
+				m.flags.Float64P(name, shorthand, float64(fieldValue), description)
 
 			case string:
 				m.viper.SetDefault(name, val)
-				m.flags.String(name, val, description)
+				m.flags.StringP(name, shorthand, val, description)
 
 			case time.Time:
 				m.viper.SetDefault(name, val)
-				m.flags.String(name, val.Format(TimeFormat), description)
+				m.flags.StringP(name, shorthand, val.Format(TimeFormat), description)
 
 			case []string:
 				m.viper.SetDefault(name, val)
-				m.flags.StringSlice(name, val, description)
+				m.flags.StringSliceP(name, shorthand, val, description)
 
 			case time.Duration:
 				m.viper.SetDefault(name, val)
-				m.flags.Duration(name, val, description)
+				m.flags.DurationP(name, shorthand, val, description)
 
 			case map[string]string:
 				m.viper.SetDefault(name, val)
@@ -149,7 +150,7 @@ func (m *Manager) setDefaults(prefix string, config interface{}) {
 					defs = append(defs, fmt.Sprintf("'%s'='%v'", k, v))
 				}
 
-				m.flags.StringSlice(name, defs, description)
+				m.flags.StringSliceP(name, shorthand, defs, description)
 
 			default:
 				switch fieldType {

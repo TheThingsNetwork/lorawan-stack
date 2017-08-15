@@ -31,7 +31,7 @@ type example struct {
 	TimePtr   *time.Time    `name:"timeptr" description:"A single time"`
 	Float     float64       `name:"float" description:"A single float"`
 	Int       int           `name:"int" description:"A single int"`
-	String    string        `name:"string" description:"A single string"`
+	String    string        `name:"string" shorthand:"s" description:"A single string"`
 	Strings   []string      `name:"strings" description:"A couple of strings"`
 	StringPtr *string       `name:"stringptr" description:"A string ptr"`
 
@@ -191,4 +191,24 @@ func TestConfigFlags(t *testing.T) {
 			String: "mad",
 		},
 	})
+}
+
+func TestConfigShorthand(t *testing.T) {
+	a := assertions.New(t)
+
+	config := Initialize("test", defaults)
+	a.So(config, should.NotBeNil)
+
+	settings := new(example)
+
+	os.Setenv("TEST_STRING", "")
+
+	// parse command line args
+	config.Parse("-s", "bababa")
+
+	// unmarshal
+	err := config.Unmarshal(settings)
+	a.So(err, should.BeNil)
+
+	a.So(settings.String, should.Resemble, "bababa")
 }
