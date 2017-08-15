@@ -51,7 +51,7 @@ message FHDR {
   bytes dev_addr  = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
   FCtrl f_ctrl    = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   uint32 f_cnt    = 3;
-  repeated MACCommand f_opts = 4 [(gogoproto.nullable) = false];
+  bytes f_opts    = 4;
 }
 
 message FCtrl {
@@ -60,30 +60,6 @@ message FCtrl {
   bool    ack         = 3;
   bool    f_pending   = 4; // only on downlink
   bool    class_b     = 5; // only on uplink
-}
-
-enum CID {
-  RESERVED_0         = 0;
-  RESET              = 1;
-  LINK_CHECK         = 2;
-  LINK_ADR           = 3;
-  DUTY_CYCLE         = 4;
-  RX_PARAM_SETUP     = 5;
-  DEV_STATUS         = 6;
-  NEW_CHANNEL        = 7;
-  RX_TIMING_SETUP    = 8;
-  TX_PARAM_SETUP     = 9;
-  DL_CHANNEL         = 10;
-  REKEY              = 11;
-  ADR_PARAM_SETUP    = 12;
-  DEVICE_TIME        = 13;
-  FORCE_REJOIN       = 14;
-  REJOIN_PARAM_SETUP = 15;
-}
-
-message MACCommand {
-  CID    cid     = 1 [(gogoproto.customname) = "CID"];
-  bytes  payload = 2;
 }
 
 message JoinRequestPayload {

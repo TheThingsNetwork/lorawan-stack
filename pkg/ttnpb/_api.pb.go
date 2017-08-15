@@ -27,7 +27,6 @@ It has these top-level messages:
 	MACPayload
 	FHDR
 	FCtrl
-	MACCommand
 	JoinRequestPayload
 	RejoinRequestPayload
 	JoinAcceptPayload
