@@ -8,7 +8,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-// stringToTimeHookFunc is a hook for mapstructure that decodes strings to time.Time
+// stringToTimeHookFunc is a hook for mapstructure that decodes strings to time.Time.
 func stringToTimeHookFunc(layout string) mapstructure.DecodeHookFuncType {
 	return func(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
 		if f.Kind() != reflect.String {
@@ -21,7 +21,7 @@ func stringToTimeHookFunc(layout string) mapstructure.DecodeHookFuncType {
 	}
 }
 
-// stringSliceToStringMapHookFunc is a hook for mapstructure that decodes []string to map[string]string
+// stringSliceToStringMapHookFunc is a hook for mapstructure that decodes []string to map[string]string.
 func stringSliceToStringMapHookFunc(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
 	if f.Kind() != reflect.Slice || f.Elem().Kind() != reflect.String ||
 		t.Kind() != reflect.Map || t.Elem().Kind() != reflect.String {

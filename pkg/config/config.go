@@ -14,10 +14,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-// TimeFormat is the format to parse times in
+// TimeFormat is the format to parse times in.
 const TimeFormat = time.RFC3339Nano
 
-// Manager is a manager for the configuration
+// Manager is a manager for the configuration.
 type Manager struct {
 	name       string
 	viper      *viper.Viper
@@ -27,7 +27,7 @@ type Manager struct {
 	configFlag string
 }
 
-// Flags to be used in the command
+// Flags to be used in the command.
 func (m *Manager) Flags() *pflag.FlagSet {
 	return m.flags
 }
@@ -41,7 +41,7 @@ func EnvKeyReplacer(r *strings.Replacer) Option {
 	}
 }
 
-// AllEnvironment returns all environment variables
+// AllEnvironment returns all environment variables.
 func (m *Manager) AllEnvironment() []string {
 	keys := m.viper.AllKeys()
 	env := make([]string, 0, len(keys))
@@ -54,12 +54,92 @@ func (m *Manager) AllEnvironment() []string {
 }
 
 // AllKeys returns all keys holding a value, regardless of where they are set.
-// Nested keys are returned with a "." separator
+// Nested keys are returned with a "." separator.
 func (m *Manager) AllKeys() []string {
 	keys := m.viper.AllKeys()
 	sort.Strings(keys)
 
 	return keys
+}
+
+// Option is the type of an option for the manager.
+type Option func(m *Manager)
+
+// DefaultOptions are the default options.
+var DefaultOptions = []Option{
+	EnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_")),
+	ConfigPath("config"),
+}
+
+// Initialize config with the given name and defaults.
+func Initialize(name string, defaults interface{}, opts ...Option) *Manager {
+	m := &Manager{
+		name:     name,
+		viper:    viper.New(),
+		flags:    pflag.NewFlagSet(name, pflag.ExitOnError),
+		replacer: strings.NewReplacer(),
+		defaults: defaults,
+	}
+
+	m.viper.SetTypeByDefaultValue(true)
+	m.viper.SetConfigName(name)
+	m.viper.SetEnvPrefix(name)
+	m.viper.AutomaticEnv()
+	m.viper.AddConfigPath(".")
+
+	if defaults != nil {
+		m.setDefaults("", defaults)
+	}
+
+	for _, opt := range append(DefaultOptions, opts...) {
+		opt(m)
+	}
+
+	m.viper.BindPFlags(m.flags)
+
+	return m
+}
+
+// Parse parses the command line arguments.
+func (m *Manager) Parse(flags ...string) {
+	m.flags.Parse(flags)
+}
+
+// Unmarshal unmarshals the available config keys into the result. It matches the names of fields based on the name struct tag.
+func (m *Manager) Unmarshal(result interface{}) error {
+	d, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+		TagName:          "name",
+		ZeroFields:       true,
+		WeaklyTypedInput: true,
+		Result:           result,
+		DecodeHook: mapstructure.ComposeDecodeHookFunc(
+			mapstructure.StringToTimeDurationHookFunc(),
+			stringToTimeHookFunc(TimeFormat),
+			stringSliceToStringMapHookFunc,
+		),
+	})
+
+	if err != nil {
+		return err
+	}
+
+	err = d.Decode(m.viper.AllSettings())
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ReadInConfig will load the configuration from disk. If a config file is set,
+// that file will be used, otherwise ReadInConfig will discover the file.
+func (m *Manager) ReadInConfig() error {
+	configFile := m.viper.GetString(m.configFlag)
+	if _, err := os.Stat(configFile); err == nil {
+		m.viper.SetConfigFile(configFile)
+	}
+
+	return m.viper.ReadInConfig()
 }
 
 func (m *Manager) setDefaults(prefix string, config interface{}) {
@@ -165,84 +245,4 @@ func (m *Manager) setDefaults(prefix string, config interface{}) {
 			}
 		}
 	}
-}
-
-// Option is the type of an option for the manager
-type Option func(m *Manager)
-
-// DefaultOptions are the default options
-var DefaultOptions = []Option{
-	EnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_")),
-	ConfigPath("config"),
-}
-
-// Initialize config with the given name and defaults
-func Initialize(name string, defaults interface{}, opts ...Option) *Manager {
-	m := &Manager{
-		name:     name,
-		viper:    viper.New(),
-		flags:    pflag.NewFlagSet(name, pflag.ExitOnError),
-		replacer: strings.NewReplacer(),
-		defaults: defaults,
-	}
-
-	m.viper.SetTypeByDefaultValue(true)
-	m.viper.SetConfigName(name)
-	m.viper.SetEnvPrefix(name)
-	m.viper.AutomaticEnv()
-	m.viper.AddConfigPath(".")
-
-	if defaults != nil {
-		m.setDefaults("", defaults)
-	}
-
-	for _, opt := range append(DefaultOptions, opts...) {
-		opt(m)
-	}
-
-	m.viper.BindPFlags(m.flags)
-
-	return m
-}
-
-// Parse parses the command line arguments
-func (m *Manager) Parse(flags ...string) {
-	m.flags.Parse(flags)
-}
-
-// Unmarshal unmarshals the available config keys to the interface that was passed
-func (m *Manager) Unmarshal(result interface{}) error {
-	d, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		TagName:          "name",
-		ZeroFields:       true,
-		WeaklyTypedInput: true,
-		Result:           result,
-		DecodeHook: mapstructure.ComposeDecodeHookFunc(
-			mapstructure.StringToTimeDurationHookFunc(),
-			stringToTimeHookFunc(TimeFormat),
-			stringSliceToStringMapHookFunc,
-		),
-	})
-
-	if err != nil {
-		return err
-	}
-
-	err = d.Decode(m.viper.AllSettings())
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// ReadInConfig will load the configuration from disk. If a config file is set,
-// that file will be used, otherwise ReadInConfig will discover the file
-func (m *Manager) ReadInConfig() error {
-	configFile := m.viper.GetString(m.configFlag)
-	if _, err := os.Stat(configFile); err == nil {
-		m.viper.SetConfigFile(configFile)
-	}
-
-	return m.viper.ReadInConfig()
 }
