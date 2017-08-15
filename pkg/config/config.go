@@ -19,11 +19,12 @@ const TimeFormat = time.RFC3339Nano
 
 // Manager is a manager for the configuration
 type Manager struct {
-	name     string
-	viper    *viper.Viper
-	flags    *pflag.FlagSet
-	replacer *strings.Replacer
-	defaults interface{}
+	name       string
+	viper      *viper.Viper
+	flags      *pflag.FlagSet
+	replacer   *strings.Replacer
+	defaults   interface{}
+	configFlag string
 }
 
 // Flags to be used in the command
@@ -171,10 +172,11 @@ type Option func(m *Manager)
 // DefaultOptions are the default options
 var DefaultOptions = []Option{
 	EnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_")),
+	ConfigPath("config"),
 }
 
 // Initialize config with the given name and defaults
-func Initialize(name string, defaults interface{}) *Manager {
+func Initialize(name string, defaults interface{}, opts ...Option) *Manager {
 	m := &Manager{
 		name:     name,
 		viper:    viper.New(),
@@ -193,7 +195,7 @@ func Initialize(name string, defaults interface{}) *Manager {
 		m.setDefaults("", defaults)
 	}
 
-	for _, opt := range DefaultOptions {
+	for _, opt := range append(DefaultOptions, opts...) {
 		opt(m)
 	}
 
@@ -236,40 +238,10 @@ func (m *Manager) Unmarshal(result interface{}) error {
 // ReadInConfig will load the configuration from disk. If a config file is set,
 // that file will be used, otherwise ReadInConfig will discover the file
 func (m *Manager) ReadInConfig() error {
-	configFile := m.viper.GetString("config")
+	configFile := m.viper.GetString(m.configFlag)
 	if _, err := os.Stat(configFile); err == nil {
 		m.viper.SetConfigFile(configFile)
 	}
+
 	return m.viper.ReadInConfig()
 }
-
-// 	configPath := "$PWD"
-// 	dataPath := "$PWD"
-//
-// 	if home := os.Getenv("HOME"); home != "" {
-// 		c.AddConfigPath(home)
-// 		c.AddConfigPath(path.Join(home, "."+name))
-//
-// 		c.SetDefault("config", path.Join(home, "."+name+".yml"))
-// 		configPath = path.Join("$HOME", "."+name+".yml")
-//
-// 		c.SetDefault("data", path.Join(home, "."+name))
-// 		dataPath = path.Join("$HOME", "."+name)
-// 	}
-//
-// 	if xdg := os.Getenv("XDG_CONFIG_HOME"); xdg != "" {
-// 		c.AddConfigPath(xdg)
-// 		c.SetDefault("config", path.Join(xdg, name, name+".yml"))
-// 		configPath = path.Join("$XDG_CONFIG_HOME", name, name+".yml")
-// 	}
-//
-// 	if xdg := os.Getenv("XDG_DATA_HOME"); xdg != "" {
-// 		c.SetDefault("data", path.Join(xdg, name))
-// 		dataPath = path.Join("$XDG_DATA_HOME", name, name+".yml")
-// 	}
-//
-// 	c.flags.String("config", "", "Config file (default \""+configPath+"\")")
-// 	c.flags.String("data", "", "Data folder (default \""+dataPath+"\")")
-//
-// 	return c
-// }

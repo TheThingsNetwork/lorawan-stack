@@ -113,7 +113,7 @@ func TestConfigEnv(t *testing.T) {
 	// parse no command line args
 	config.Parse()
 
-	// unmarshal
+	// unmarshal into struct
 	err := config.Unmarshal(settings)
 	a.So(err, should.BeNil)
 
@@ -155,7 +155,7 @@ func TestConfigFlags(t *testing.T) {
 	os.Setenv("TEST_NESTED_STRING", "")
 	os.Setenv("TEST_NESTEDPTR_STRING", "")
 
-	// parse no command line args
+	// parse command line args
 	config.Parse(
 		"--duration", "10m",
 		"--time", "2017-08-12 01:02:03 +0000 UTC",
