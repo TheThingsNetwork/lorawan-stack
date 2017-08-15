@@ -101,8 +101,8 @@ func Initialize(name string, defaults interface{}, opts ...Option) *Manager {
 }
 
 // Parse parses the command line arguments.
-func (m *Manager) Parse(flags ...string) {
-	m.flags.Parse(flags)
+func (m *Manager) Parse(flags ...string) error {
+	return m.flags.Parse(flags)
 }
 
 // Unmarshal unmarshals the available config keys into the result. It matches the names of fields based on the name struct tag.
