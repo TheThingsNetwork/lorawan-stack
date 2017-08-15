@@ -45,6 +45,7 @@ func TestLevelOrder(t *testing.T) {
 		a.So(level <= Fatal, ShouldBeTrue)
 		a.So(level < Debug, ShouldBeFalse)
 		a.So(level > Fatal, ShouldBeFalse)
+		a.So(level != invalid, ShouldBeTrue)
 	}
 }
 

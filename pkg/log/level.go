@@ -13,8 +13,11 @@ var ErrInvalidLevel = errors.New("Invalid log level")
 type Level int8
 
 const (
+	// invalid is an invalid log level
+	invalid Level = iota
+
 	// Debug is the log level for debug messages, usually turned of in production.
-	Debug Level = iota
+	Debug
 
 	// Info is the log level for informational messages.
 	Info
@@ -28,7 +31,7 @@ const (
 	Error
 
 	// Fatal the log level for unrecoverable errors.
-	Fatal Level = iota
+	Fatal
 )
 
 // String implements fmt.Stringer.
@@ -49,7 +52,7 @@ func (l Level) String() string {
 	}
 }
 
-// ParseLevel parses a string into a log level.
+// ParseLevel parses a string into a log level or returns an error otherwise.
 func ParseLevel(str string) (Level, error) {
 	switch strings.ToLower(str) {
 	case "debug":
@@ -63,7 +66,7 @@ func ParseLevel(str string) (Level, error) {
 	case "fatal":
 		return Fatal, nil
 	default:
-		return Fatal, ErrInvalidLevel
+		return invalid, ErrInvalidLevel
 	}
 }
 
