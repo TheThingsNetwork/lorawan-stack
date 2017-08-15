@@ -37,6 +37,8 @@ type example struct {
 	Strings   []string      `name:"strings" description:"A couple of strings"`
 	StringPtr *string       `name:"stringptr" description:"A string ptr"`
 
+	StringMap map[string]string `name:"stringmap" description:"A map of strings"`
+
 	Nested    NestedConfig  `name:"nested" description:"A nested struct"`
 	NestedPtr *NestedConfig `name:"nestedptr" description:"A nested struct ptr"`
 	NotUsed   string        `name:"-"`
@@ -53,6 +55,9 @@ var (
 		String:    "foo",
 		Strings:   []string{"quu", "qux"},
 		StringPtr: &str,
+		StringMap: map[string]string{
+			"foo": "bar",
+		},
 		Nested: NestedConfig{
 			String: "nested-foo",
 		},
@@ -109,6 +114,7 @@ func TestConfigEnv(t *testing.T) {
 	os.Setenv("TEST_STRING", "bababa")
 	os.Setenv("TEST_STRINGS", "x y z")
 	os.Setenv("TEST_STRINGPTR", "yo")
+	os.Setenv("TEST_STRINGMAP", "q=r s=t")
 	os.Setenv("TEST_NESTED_STRING", "mud")
 	os.Setenv("TEST_NESTEDPTR_STRING", "mad")
 
@@ -129,6 +135,10 @@ func TestConfigEnv(t *testing.T) {
 		String:    "bababa",
 		Strings:   []string{"x", "y", "z"},
 		StringPtr: &str,
+		StringMap: map[string]string{
+			"q": "r",
+			"s": "t",
+		},
 		Nested: NestedConfig{
 			String: "mud",
 		},
@@ -154,6 +164,7 @@ func TestConfigFlags(t *testing.T) {
 	os.Setenv("TEST_STRING", "")
 	os.Setenv("TEST_STRINGS", "")
 	os.Setenv("TEST_STRINGPTR", "")
+	os.Setenv("TEST_STRINGMAP", "")
 	os.Setenv("TEST_NESTED_STRING", "")
 	os.Setenv("TEST_NESTEDPTR_STRING", "")
 
@@ -168,6 +179,8 @@ func TestConfigFlags(t *testing.T) {
 		"--strings", "y",
 		"--strings", "z",
 		"--stringptr", "yo",
+		"--stringmap", "q=r",
+		"--stringmap", "s=t",
 		"--nested.string", "mud",
 		"--nestedptr.string", "mad",
 	)
@@ -186,6 +199,10 @@ func TestConfigFlags(t *testing.T) {
 		String:    "bababa",
 		Strings:   []string{"x", "y", "z"},
 		StringPtr: &str,
+		StringMap: map[string]string{
+			"q": "r",
+			"s": "t",
+		},
 		Nested: NestedConfig{
 			String: "mud",
 		},

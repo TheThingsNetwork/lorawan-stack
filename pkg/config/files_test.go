@@ -42,8 +42,8 @@ func TestReadSingleConfig(t *testing.T) {
 
 	a.So(res.Foo, should.Resemble, "10")
 	a.So(res.Bar, should.Resemble, map[string]string{
-		"x": "baz",
-		"y": "quu",
+		"a": "baz",
+		"b": "quu",
 	})
 }
 
@@ -77,7 +77,8 @@ func TestReadMultiConfig(t *testing.T) {
 
 	a.So(res.Foo, should.Resemble, "20")
 	a.So(res.Bar, should.Resemble, map[string]string{
-		"y": "hey",
-		"z": "yo!",
+		"a": "baz",
+		"b": "hey",
+		"c": "yo!",
 	})
 }

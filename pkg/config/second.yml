@@ -1,4 +1,4 @@
 foo: 20
 bar:
-  - y=hey
-  - z=yo!
+  b: hey
+  c: yo!

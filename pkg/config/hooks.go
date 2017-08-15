@@ -53,3 +53,22 @@ func stringSliceToStringHookFunc(f reflect.Type, t reflect.Type, data interface{
 
 	return "", nil
 }
+
+// stringToStringMapHookFunc is a hook for mapstructure that decodes string to map[string]string.
+func stringToStringMapHookFunc(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	if f.Kind() != reflect.String || t.Kind() != reflect.Map || t.Elem().Kind() != reflect.String {
+		return data, nil
+	}
+
+	str := data.(string)
+	slice := strings.Split(str, " ")
+
+	m := make(map[string]string, len(slice))
+	for _, s := range slice {
+		if p := strings.SplitN(s, "=", 2); len(p) == 2 {
+			m[p[0]] = p[1]
+		}
+	}
+
+	return m, nil
+}

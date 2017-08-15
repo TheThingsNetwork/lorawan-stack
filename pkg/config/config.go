@@ -119,6 +119,7 @@ func (m *Manager) Unmarshal(result interface{}) error {
 			mapstructure.StringToTimeDurationHookFunc(),
 			stringToTimeHookFunc(TimeFormat),
 			stringSliceToStringMapHookFunc,
+			stringToStringMapHookFunc,
 			stringSliceToStringHookFunc,
 		),
 	})
@@ -238,7 +239,7 @@ func (m *Manager) setDefaults(prefix string, config interface{}) {
 				}
 
 				m.flags.StringSliceP(name, shorthand, defs, description)
-				m.viper.SetDefault(name, defs)
+				m.viper.SetDefault(name, val)
 
 			default:
 				switch fieldType {
