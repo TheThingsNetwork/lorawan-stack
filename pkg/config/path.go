@@ -8,9 +8,9 @@ import (
 	"strings"
 )
 
-// DataDir is an option for the manager that automatically enables the config file flag
+// WithConfigFileFlag is an option for the manager that automatically enables the config file flag
 // and tries to infer it from the $HOME and $XDG_CONFIG_HOME environment variables.
-func ConfigPath(flag string) Option {
+func WithConfigFileFlag(flag string) Option {
 	return func(m *Manager) {
 		m.configFlag = flag
 
@@ -53,9 +53,9 @@ func ConfigPath(flag string) Option {
 	}
 }
 
-// DataDir is an option for the manager that automatically enables the data directory config flag
+// WithDataDirFlag is an option for the manager that automatically enables the data directory config flag
 // and tries to infer it from the $HOME and $XDG_DATA_HOME environment variables.
-func DataDir(flag string) Option {
+func WithDataDirFlag(flag string) Option {
 	return func(m *Manager) {
 		dataDir := "$PWD"
 

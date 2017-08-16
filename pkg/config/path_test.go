@@ -170,7 +170,7 @@ func TestDataDirHome(t *testing.T) {
 
 	defaults := &configWithPath{}
 
-	config := Initialize("test", defaults, DataDir("data-dir"))
+	config := Initialize("test", defaults, WithDataDirFlag("data-dir"))
 	a.So(config, should.NotBeNil)
 
 	config.Parse()
@@ -190,7 +190,7 @@ func TestDataDirXDGHome(t *testing.T) {
 
 	defaults := &configWithPath{}
 
-	config := Initialize("test", defaults, DataDir("data-dir"))
+	config := Initialize("test", defaults, WithDataDirFlag("data-dir"))
 	a.So(config, should.NotBeNil)
 
 	config.Parse()
@@ -212,7 +212,7 @@ func TestDataDirDefault(t *testing.T) {
 		DataDir: "/var/run/test",
 	}
 
-	config := Initialize("test", defaults, DataDir("data-dir"))
+	config := Initialize("test", defaults, WithDataDirFlag("data-dir"))
 	a.So(config, should.NotBeNil)
 
 	config.Parse()
@@ -232,7 +232,7 @@ func TestDataDirEnv(t *testing.T) {
 
 	defaults := &configWithPath{}
 
-	config := Initialize("test", defaults, DataDir("data-dir"))
+	config := Initialize("test", defaults, WithDataDirFlag("data-dir"))
 	a.So(config, should.NotBeNil)
 
 	config.Parse()
@@ -252,7 +252,7 @@ func TestDataDirCliFlag(t *testing.T) {
 
 	defaults := &configWithPath{}
 
-	config := Initialize("test", defaults, DataDir("data-dir"))
+	config := Initialize("test", defaults, WithDataDirFlag("data-dir"))
 	a.So(config, should.NotBeNil)
 
 	config.Parse("--data-dir", "/mnt/data")
@@ -272,7 +272,7 @@ func TestDataDirDefine(t *testing.T) {
 
 	defaults := &configWithoutPath{}
 
-	config := Initialize("test", defaults, DataDir("data-dir"))
+	config := Initialize("test", defaults, WithDataDirFlag("data-dir"))
 	a.So(config, should.NotBeNil)
 
 	config.Parse()

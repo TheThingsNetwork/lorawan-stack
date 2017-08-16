@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Config is the type of configuration
 type Config struct {
 	config.ServiceBase `name:",squash"`
 	Int                int    `name:"int" description:"An example int"`

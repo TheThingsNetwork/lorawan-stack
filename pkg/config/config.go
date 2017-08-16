@@ -70,7 +70,7 @@ type Option func(m *Manager)
 // DefaultOptions are the default options.
 var DefaultOptions = []Option{
 	EnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_")),
-	ConfigPath("config"),
+	WithConfigFileFlag("config"),
 }
 
 // Initialize a new config manager with the given name and defaults.
