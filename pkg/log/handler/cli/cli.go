@@ -55,6 +55,9 @@ var colorTerms = []string{
 }
 
 // ColorFromTerm determines from the TERM and COLORTERM environment variables wether or not to use colors.
+// If set, colors will be enabled in these cases:
+// - COLORTERM is set and has a value different from 0
+// - TERM contains the substring "xterm" or "color" and COLORTERM is not 0
 var ColorFromTerm = func(handler *Handler) {
 	COLORTERM := os.Getenv("COLORTERM")
 	TERM := os.Getenv("TERM")
