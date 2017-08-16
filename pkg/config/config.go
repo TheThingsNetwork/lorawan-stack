@@ -118,13 +118,19 @@ func Initialize(name string, defaults interface{}, opts ...Option) *Manager {
 		m.setDefaults("", defaults)
 	}
 
-	for _, opt := range append(DefaultOptions, opts...) {
+	for _, opt := range opts {
 		opt(m)
 	}
 
 	m.viper.BindPFlags(m.flags)
 
 	return m
+}
+
+// InitializeWithDefaults is the same as Initialize but it sets some sane default options (see DefaultOptions)
+// alongside the passed in options.
+func InitializeWithDefaults(name string, defaults interface{}, opts ...Option) *Manager {
+	return Initialize(name, defaults, append(DefaultOptions, opts...)...)
 }
 
 // Parse parses the command line arguments.

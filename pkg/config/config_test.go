@@ -103,20 +103,20 @@ var (
 
 func TestNilConfig(t *testing.T) {
 	a := assertions.New(t)
-	config := Initialize("empty", nil)
+	config := InitializeWithDefaults("empty", nil)
 	a.So(config, should.NotBeNil)
 }
 
 func TestInvalidConfig(t *testing.T) {
 	a := assertions.New(t)
-	config := Initialize("invalid", "invalid")
+	config := InitializeWithDefaults("invalid", "invalid")
 	a.So(config, should.NotBeNil)
 }
 
 func TestConfigDefaults(t *testing.T) {
 	a := assertions.New(t)
 
-	config := Initialize("test", defaults)
+	config := InitializeWithDefaults("test", defaults)
 	a.So(config, should.NotBeNil)
 
 	settings := new(example)
@@ -134,7 +134,7 @@ func TestConfigDefaults(t *testing.T) {
 func TestConfigEnv(t *testing.T) {
 	a := assertions.New(t)
 
-	config := Initialize("test", defaults)
+	config := InitializeWithDefaults("test", defaults)
 	a.So(config, should.NotBeNil)
 
 	settings := new(example)
@@ -192,7 +192,7 @@ func TestConfigEnv(t *testing.T) {
 func TestConfigFlags(t *testing.T) {
 	a := assertions.New(t)
 
-	config := Initialize("test", defaults)
+	config := InitializeWithDefaults("test", defaults)
 	a.So(config, should.NotBeNil)
 
 	settings := new(example)
@@ -268,7 +268,7 @@ func TestConfigFlags(t *testing.T) {
 func TestConfigShorthand(t *testing.T) {
 	a := assertions.New(t)
 
-	config := Initialize("test", defaults)
+	config := InitializeWithDefaults("test", defaults)
 	a.So(config, should.NotBeNil)
 
 	settings := new(example)
