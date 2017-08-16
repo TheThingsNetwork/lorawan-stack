@@ -7,7 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 )
 
 var levels = []Level{Debug, Info, Warn, Error, Fatal}
@@ -17,54 +18,58 @@ type o struct {
 }
 
 func TestLevelParse(t *testing.T) {
-	a := New(t)
+	a := assertions.New(t)
+
 	for _, level := range levels {
 		str := level.String()
 
 		{
 			parsed, err := ParseLevel(str)
-			a.So(err, ShouldBeNil)
-			a.So(parsed, ShouldEqual, level)
+			a.So(err, should.BeNil)
+			a.So(parsed, should.Equal, level)
 		}
 
 		{
 			parsed, err := ParseLevel(strings.ToUpper(str))
-			a.So(err, ShouldBeNil)
-			a.So(parsed, ShouldEqual, level)
+			a.So(err, should.BeNil)
+			a.So(parsed, should.Equal, level)
 		}
 	}
 }
 
 func TestLevelOrder(t *testing.T) {
-	a := New(t)
-	a.So(Info > Debug, ShouldBeTrue)
-	a.So(Warn > Info, ShouldBeTrue)
+	a := assertions.New(t)
+
+	a.So(Info > Debug, should.BeTrue)
+	a.So(Warn > Info, should.BeTrue)
 
 	for _, level := range levels {
-		a.So(level >= Debug, ShouldBeTrue)
-		a.So(level <= Fatal, ShouldBeTrue)
-		a.So(level < Debug, ShouldBeFalse)
-		a.So(level > Fatal, ShouldBeFalse)
-		a.So(level != invalid, ShouldBeTrue)
+		a.So(level >= Debug, should.BeTrue)
+		a.So(level <= Fatal, should.BeTrue)
+		a.So(level < Debug, should.BeFalse)
+		a.So(level > Fatal, should.BeFalse)
+		a.So(level != invalid, should.BeTrue)
 	}
 }
 
 func TestLevelJSONUnmarshal(t *testing.T) {
+	a := assertions.New(t)
+
 	for _, level := range levels {
-		a := New(t)
 		raw := []byte(`{ "level": "` + level.String() + `" }`)
 
 		res := new(o)
 		err := json.Unmarshal(raw, res)
 
-		a.So(err, ShouldBeNil)
-		a.So(res.Level, ShouldEqual, level)
+		a.So(err, should.BeNil)
+		a.So(res.Level, should.Equal, level)
 	}
 }
 
 func TestLevelJSONMarshal(t *testing.T) {
+	a := assertions.New(t)
+
 	for _, level := range levels {
-		a := New(t)
 
 		raw := `{"level":"` + level.String() + `"}`
 
@@ -72,7 +77,7 @@ func TestLevelJSONMarshal(t *testing.T) {
 			Level: level,
 		})
 
-		a.So(err, ShouldBeNil)
-		a.So(string(res), ShouldEqual, raw)
+		a.So(err, should.BeNil)
+		a.So(string(res), should.Equal, raw)
 	}
 }

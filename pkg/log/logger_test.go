@@ -5,7 +5,8 @@ package log
 import (
 	"testing"
 
-	. "github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 )
 
 // recorder is log.Handler that records the entries
@@ -26,7 +27,7 @@ func newRecorder() *recorder {
 }
 
 func TestLogger(t *testing.T) {
-	a := New(t)
+	a := assertions.New(t)
 
 	rec := newRecorder()
 	logger := &Logger{
@@ -35,20 +36,20 @@ func TestLogger(t *testing.T) {
 	}
 
 	logger.Debug("Yo!")
-	a.So(rec.entries, ShouldHaveLength, 0)
+	a.So(rec.entries, should.HaveLength, 0)
 
 	logger.Warn("Hi!")
-	a.So(rec.entries, ShouldHaveLength, 1)
+	a.So(rec.entries, should.HaveLength, 1)
 	{
 		entry := rec.entries[0]
-		a.So(entry.Message(), ShouldEqual, "Hi!")
+		a.So(entry.Message(), should.Equal, "Hi!")
 	}
 
 	logger.Infof("Hey, %s!", "you")
-	a.So(rec.entries, ShouldHaveLength, 2)
+	a.So(rec.entries, should.HaveLength, 2)
 	{
 		entry := rec.entries[1]
-		a.So(entry.Message(), ShouldEqual, "Hey, you!")
+		a.So(entry.Message(), should.Equal, "Hey, you!")
 	}
 
 	other := logger.WithFields(Fields(
@@ -57,21 +58,21 @@ func TestLogger(t *testing.T) {
 	))
 
 	logger.Info("Ok!")
-	a.So(rec.entries, ShouldHaveLength, 3)
+	a.So(rec.entries, should.HaveLength, 3)
 	{
 		entry := rec.entries[2]
-		a.So(entry.Message(), ShouldEqual, "Ok!")
-		a.So(entry.Fields().Fields(), ShouldBeEmpty)
+		a.So(entry.Message(), should.Equal, "Ok!")
+		a.So(entry.Fields().Fields(), should.BeEmpty)
 	}
 
 	other.Info("Nice!")
-	a.So(rec.entries, ShouldHaveLength, 4)
+	a.So(rec.entries, should.HaveLength, 4)
 	{
 		entry := rec.entries[3]
-		a.So(entry.Message(), ShouldEqual, "Nice!")
-		a.So(entry.Fields().Fields(), ShouldHaveLength, 2)
+		a.So(entry.Message(), should.Equal, "Nice!")
+		a.So(entry.Fields().Fields(), should.HaveLength, 2)
 		fields := entry.Fields().Fields()
-		a.So(fields["foo"], ShouldEqual, 10)
-		a.So(fields["bar"], ShouldEqual, "baz")
+		a.So(fields["foo"], should.Equal, 10)
+		a.So(fields["bar"], should.Equal, "baz")
 	}
 }
