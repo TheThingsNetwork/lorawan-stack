@@ -72,7 +72,27 @@ var DefaultOptions = []Option{
 	ConfigPath("config"),
 }
 
-// Initialize config with the given name and defaults.
+// Initialize a new config manager with the given name and defaults.
+// defaults should be a struct wiath fields that define the possible config flags by setting the struct tags.
+// Possible struct tags are:
+// - `name:"<name>"`: Defines the name of the config flag, in the environment, on the command line and in the config files.
+// - `shorthand:"<n>"`: Defines a shorthand name for use on the command line.
+// - `description:"<description>"`: Add a description that will be printed in the command's help message.
+//
+// The type of the struct fields also defines their type when parsing the config file, command line arguments or environment
+// variables. Currently, the following types are supported:
+// - bool
+// - int, int8, int16, int32, int64
+// - uint, uint8, uint16, uint32, uint64
+// - float32, float64
+// - string
+// - []string
+// - map[string]string
+// - map[string][]string
+// - time.Time
+// - time.Duration, parsed as 1m
+// - structs that consist of fields with these types
+// - custom types that implement the Configurable interface
 func Initialize(name string, defaults interface{}, opts ...Option) *Manager {
 	m := &Manager{
 		name:     name,
