@@ -97,6 +97,9 @@ func New(w io.Writer, opts ...Option) *Handler {
 
 // HandleLog implements log.Handler.
 func (h *Handler) HandleLog(e log.Entry) error {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	color := Colors[e.Level()]
 	level := strings.ToUpper(e.Level().String())
 
@@ -107,9 +110,6 @@ func (h *Handler) HandleLog(e log.Entry) error {
 
 	// sort the fields by name
 	sort.Sort(byName(fields))
-
-	h.mu.Lock()
-	defer h.mu.Unlock()
 
 	if h.UseColor {
 		fmt.Fprintf(h.Writer, "\033[%dm%6s\033[0m %-40s", color, level, e.Message())
