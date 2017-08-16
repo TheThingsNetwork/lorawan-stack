@@ -119,6 +119,7 @@ func (m *Manager) Unmarshal(result interface{}) error {
 			mapstructure.StringToTimeDurationHookFunc(),
 			stringToTimeHookFunc(TimeFormat),
 			stringSliceToStringMapHookFunc,
+			stringSliceToStringMapStringSliceHookFunc,
 			stringToStringMapHookFunc,
 			stringSliceToStringHookFunc,
 			configurableInterfaceHook,
@@ -271,6 +272,17 @@ func (m *Manager) setDefaults(prefix string, config interface{}) {
 				defs := make([]string, 0, len(val))
 				for k, v := range val {
 					defs = append(defs, fmt.Sprintf("%s=%v", k, v))
+				}
+
+				m.flags.StringSliceP(name, shorthand, defs, description)
+				m.viper.SetDefault(name, val)
+
+			case map[string][]string:
+				defs := make([]string, 0, len(val))
+				for k, vs := range val {
+					for _, v := range vs {
+						defs = append(defs, fmt.Sprintf("%s=%v", k, v))
+					}
 				}
 
 				m.flags.StringSliceP(name, shorthand, defs, description)

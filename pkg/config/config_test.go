@@ -60,7 +60,8 @@ type example struct {
 	Strings   []string      `name:"strings" description:"A couple of strings"`
 	StringPtr *string       `name:"stringptr" description:"A string ptr"`
 
-	StringMap map[string]string `name:"stringmap" description:"A map of strings"`
+	StringMap      map[string]string   `name:"stringmap" description:"A map of strings"`
+	StringMapSlice map[string][]string `name:"stringmapslice" description:"A map of string slices"`
 
 	Nested    NestedConfig  `name:"nested" description:"A nested struct"`
 	NestedPtr *NestedConfig `name:"nestedptr" description:"A nested struct ptr"`
@@ -82,6 +83,10 @@ var (
 		StringPtr: &str,
 		StringMap: map[string]string{
 			"foo": "bar",
+		},
+		StringMapSlice: map[string][]string{
+			"foo": []string{"bar", "baz"},
+			"quu": []string{"qux"},
 		},
 		Nested: NestedConfig{
 			String: "nested-foo",
@@ -140,6 +145,7 @@ func TestConfigEnv(t *testing.T) {
 	os.Setenv("TEST_STRINGS", "x y z")
 	os.Setenv("TEST_STRINGPTR", "yo")
 	os.Setenv("TEST_STRINGMAP", "q=r s=t")
+	os.Setenv("TEST_STRINGMAPSLICE", "a=b a=c d=e")
 	os.Setenv("TEST_NESTED_STRING", "mud")
 	os.Setenv("TEST_NESTEDPTR_STRING", "mad")
 	os.Setenv("TEST_CUSTOM", "bar")
@@ -164,6 +170,10 @@ func TestConfigEnv(t *testing.T) {
 		StringMap: map[string]string{
 			"q": "r",
 			"s": "t",
+		},
+		StringMapSlice: map[string][]string{
+			"a": []string{"b", "c"},
+			"d": []string{"e"},
 		},
 		Nested: NestedConfig{
 			String: "mud",
@@ -192,6 +202,7 @@ func TestConfigFlags(t *testing.T) {
 	os.Setenv("TEST_STRINGS", "")
 	os.Setenv("TEST_STRINGPTR", "")
 	os.Setenv("TEST_STRINGMAP", "")
+	os.Setenv("TEST_STRINGMAPSLICE", "")
 	os.Setenv("TEST_NESTED_STRING", "")
 	os.Setenv("TEST_NESTEDPTR_STRING", "")
 	os.Setenv("TEST_CUSTOM", "")
@@ -212,6 +223,9 @@ func TestConfigFlags(t *testing.T) {
 		"--nested.string", "mud",
 		"--nestedptr.string", "mad",
 		"--custom", "bar",
+		"--stringmapslice", "a=b",
+		"--stringmapslice", "a=c",
+		"--stringmapslice", "d=e",
 	)
 
 	// unmarshal
@@ -231,6 +245,10 @@ func TestConfigFlags(t *testing.T) {
 		StringMap: map[string]string{
 			"q": "r",
 			"s": "t",
+		},
+		StringMapSlice: map[string][]string{
+			"a": []string{"b", "c"},
+			"d": []string{"e"},
 		},
 		Nested: NestedConfig{
 			String: "mud",

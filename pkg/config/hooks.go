@@ -39,6 +39,37 @@ func stringSliceToStringMapHookFunc(f reflect.Type, t reflect.Type, data interfa
 	return m, nil
 }
 
+// stringSliceToStringMapSliceHookFunc is a hook for mapstructure that decodes []string to map[string][]string.
+// For example: [a=b a=c d=e] -> map[string][]string{a:[b c], d:[e]}
+func stringSliceToStringMapStringSliceHookFunc(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	if (f.Kind() != reflect.String && (f.Kind() != reflect.Slice || f.Elem().Kind() != reflect.String)) || t.Kind() != reflect.Map || t.Elem().Kind() != reflect.Slice || t.Elem().Elem().Kind() != reflect.String {
+		return data, nil
+	}
+
+	var slice []string
+	switch v := data.(type) {
+	case []string:
+		slice = v
+	case string:
+		slice = strings.Split(v, " ")
+	}
+
+	m := make(map[string][]string, len(slice))
+
+	for _, s := range slice {
+		if p := strings.SplitN(s, "=", 2); len(p) == 2 {
+			v := m[p[0]]
+			if v == nil {
+				v = make([]string, 0, 1)
+			}
+
+			m[p[0]] = append(v, p[1])
+		}
+	}
+
+	return m, nil
+}
+
 // stringSliceToStringHookFunc is a hook function for mapstructure that converts []string to string by picking the first element.
 func stringSliceToStringHookFunc(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
 	if f.Kind() != reflect.Slice || f.Elem().Kind() != reflect.String || t.Kind() != reflect.String {
