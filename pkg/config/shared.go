@@ -2,10 +2,20 @@
 
 package config
 
+import (
+	"github.com/TheThingsNetwork/ttn/pkg/log"
+)
+
 // Base represents base component configuration
 type Base struct {
 	Debug  bool     `name:"debug" description:"Enable debug mode"`
 	Config []string `name:"config" shorthand:"c" description:"Location of the config files"`
+	Log    Log      `name:"log"`
+}
+
+// Log represents configuration for the logger
+type Log struct {
+	Level log.Level `name:"level" description:"The minimum level log messages must have to be shown"`
 }
 
 // TLS represents TLS configuration

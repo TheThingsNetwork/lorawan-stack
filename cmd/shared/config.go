@@ -2,10 +2,21 @@
 
 package shared
 
-import "github.com/TheThingsNetwork/ttn/pkg/config"
+import (
+	"github.com/TheThingsNetwork/ttn/pkg/config"
+	"github.com/TheThingsNetwork/ttn/pkg/log"
+)
 
 // DefaultBaseConfig is the default base component configuration.
-var DefaultBaseConfig = config.Base{}
+var DefaultBaseConfig = config.Base{
+	Debug: false,
+	Log:   DefaultLogConfig,
+}
+
+// DefaultLogConfig is the default log configuration
+var DefaultLogConfig = config.Log{
+	Level: log.Info,
+}
 
 // DefaultTLSConfig is the default TLS config.
 var DefaultTLSConfig = config.TLS{
