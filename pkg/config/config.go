@@ -197,10 +197,10 @@ type Configurable interface {
 	FromConfigString(string) (interface{}, error)
 }
 
-// ConfigStringer is the interface for config variables that have a custom string representation.
+// Stringer is the interface for config variables that have a custom string representation.
 // Implement next to Configurable if you want custom parsing and formatting for a type, and if the formatting
 // needs to be different from fmt.String for some reason.
-type ConfigStringer interface {
+type Stringer interface {
 	// ConfigString returns the config string representation of type
 	ConfigString() string
 }
@@ -256,7 +256,7 @@ func (m *Manager) setDefaults(prefix string, config interface{}) {
 					val = str.String()
 				}
 
-				if cstr, ok := face.(ConfigStringer); ok {
+				if cstr, ok := face.(Stringer); ok {
 					val = cstr.ConfigString()
 				}
 
