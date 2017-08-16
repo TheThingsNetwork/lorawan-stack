@@ -121,6 +121,7 @@ func (m *Manager) Unmarshal(result interface{}) error {
 			stringSliceToStringMapHookFunc,
 			stringToStringMapHookFunc,
 			stringSliceToStringHookFunc,
+			configurableInterfaceHook,
 		),
 	})
 
@@ -149,6 +150,23 @@ func (m *Manager) ReadInConfig() error {
 	}
 
 	return nil
+}
+
+// Configurable is the interface for things that can be configured.
+// Implement the interface to add custom parsing to config variables from strings.
+// For instance, to parse a log level from the strings "fatal", "error", etc into a custom
+// enum for log levels.
+type Configurable interface {
+	// FromConfigString parses a string into the config variable
+	FromConfigString(string) (interface{}, error)
+}
+
+// ConfigStringer is the interface for config variables that have a custom string representation.
+// Implement next to Configurable if you want custom parsing and formatting for a type, and if the formatting
+// needs to be different from fmt.String for some reason.
+type ConfigStringer interface {
+	// ConfigString returns the config string representation of type
+	ConfigString() string
 }
 
 func (m *Manager) setDefaults(prefix string, config interface{}) {
@@ -187,6 +205,23 @@ func (m *Manager) setDefaults(prefix string, config interface{}) {
 			fieldType := field.Type.Kind()
 
 			face := configValue.Field(i).Interface()
+
+			if c, ok := face.(Configurable); ok {
+				val := fmt.Sprintf("%v", c)
+
+				if str, ok := face.(fmt.Stringer); ok {
+					val = str.String()
+				}
+
+				if cstr, ok := face.(ConfigStringer); ok {
+					val = cstr.ConfigString()
+				}
+
+				m.viper.SetDefault(name, val)
+				m.flags.StringP(name, shorthand, val, description)
+				continue
+			}
+
 			if fieldType == reflect.Interface || fieldType == reflect.Ptr {
 				if configValue.Field(i).IsNil() {
 					continue

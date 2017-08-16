@@ -3,6 +3,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -23,9 +24,31 @@ type NestedConfig struct {
 	String string `name:"string" description:"a nested string"`
 }
 
+type Custom int
+
+func (c Custom) ConfigString() string {
+	switch int(c) {
+	case 42:
+		return "foo"
+	case 112:
+		return "bar"
+	default:
+		return ""
+	}
+}
+
+func (c Custom) FromConfigString(text string) (interface{}, error) {
+	switch text {
+	case "foo":
+		return Custom(42), nil
+	case "bar":
+		return Custom(112), nil
+	}
+	return nil, fmt.Errorf("Could not parse custom value %s", text)
+}
+
 type example struct {
 	EmbeddedConfig `name:",squash"`
-	// *EmbeddedConfigPtr `name:",squash"`
 
 	Bool      bool          `name:"bool" description:"A single bool"`
 	Duration  time.Duration `name:"duration" description:"A single duration"`
@@ -42,6 +65,8 @@ type example struct {
 	Nested    NestedConfig  `name:"nested" description:"A nested struct"`
 	NestedPtr *NestedConfig `name:"nestedptr" description:"A nested struct ptr"`
 	NotUsed   string        `name:"-"`
+
+	Custom Custom `name:"custom" description:"A custom type"`
 }
 
 var (
@@ -64,6 +89,7 @@ var (
 		NestedPtr: &NestedConfig{
 			String: "nested-bar",
 		},
+		Custom: Custom(42),
 	}
 )
 
@@ -106,7 +132,6 @@ func TestConfigEnv(t *testing.T) {
 	settings := new(example)
 
 	os.Setenv("TEST_BOOL", "false")
-
 	os.Setenv("TEST_DURATION", "10m")
 	os.Setenv("TEST_TIME", "2017-08-12 01:02:03 +0000 UTC")
 	os.Setenv("TEST_FLOAT", "-112.45")
@@ -117,6 +142,7 @@ func TestConfigEnv(t *testing.T) {
 	os.Setenv("TEST_STRINGMAP", "q=r s=t")
 	os.Setenv("TEST_NESTED_STRING", "mud")
 	os.Setenv("TEST_NESTEDPTR_STRING", "mad")
+	os.Setenv("TEST_CUSTOM", "bar")
 
 	// parse no command line args
 	config.Parse()
@@ -145,6 +171,7 @@ func TestConfigEnv(t *testing.T) {
 		NestedPtr: &NestedConfig{
 			String: "mad",
 		},
+		Custom: Custom(112),
 	})
 }
 
@@ -167,6 +194,7 @@ func TestConfigFlags(t *testing.T) {
 	os.Setenv("TEST_STRINGMAP", "")
 	os.Setenv("TEST_NESTED_STRING", "")
 	os.Setenv("TEST_NESTEDPTR_STRING", "")
+	os.Setenv("TEST_CUSTOM", "")
 
 	// parse command line args
 	config.Parse(
@@ -183,6 +211,7 @@ func TestConfigFlags(t *testing.T) {
 		"--stringmap", "s=t",
 		"--nested.string", "mud",
 		"--nestedptr.string", "mad",
+		"--custom", "bar",
 	)
 
 	// unmarshal
@@ -209,6 +238,7 @@ func TestConfigFlags(t *testing.T) {
 		NestedPtr: &NestedConfig{
 			String: "mad",
 		},
+		Custom: Custom(112),
 	})
 }
 

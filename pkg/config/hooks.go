@@ -72,3 +72,20 @@ func stringToStringMapHookFunc(f reflect.Type, t reflect.Type, data interface{})
 
 	return m, nil
 }
+
+var iConfigurable = reflect.TypeOf((*Configurable)(nil)).Elem()
+
+func configurableInterfaceHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	if f.Kind() != reflect.String || !t.Implements(iConfigurable) {
+		return data, nil
+	}
+
+	str := data.(string)
+
+	u, ok := reflect.New(t).Interface().(Configurable)
+	if !ok {
+		return data, nil
+	}
+
+	return u.FromConfigString(str)
+}
