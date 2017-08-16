@@ -51,7 +51,7 @@ func stringSliceToStringMapStringSliceHookFunc(f reflect.Type, t reflect.Type, d
 	case []string:
 		slice = v
 	case string:
-		slice = strings.Split(v, " ")
+		slice = strings.Fields(v)
 	}
 
 	m := make(map[string][]string, len(slice))
@@ -92,7 +92,7 @@ func stringToStringMapHookFunc(f reflect.Type, t reflect.Type, data interface{})
 	}
 
 	str := data.(string)
-	slice := strings.Split(str, " ")
+	slice := strings.Fields(str)
 
 	m := make(map[string]string, len(slice))
 	for _, s := range slice {
