@@ -21,12 +21,13 @@ const TimeFormat = time.RFC3339Nano
 
 // Manager is a manager for the configuration.
 type Manager struct {
-	name       string
-	viper      *viper.Viper
-	flags      *pflag.FlagSet
-	replacer   *strings.Replacer
-	defaults   interface{}
-	configFlag string
+	name        string
+	viper       *viper.Viper
+	flags       *pflag.FlagSet
+	replacer    *strings.Replacer
+	defaults    interface{}
+	configFlag  string
+	dataDirFlag string
 }
 
 // Flags to be used in the command.

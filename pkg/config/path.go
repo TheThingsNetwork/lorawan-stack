@@ -10,8 +10,13 @@ import (
 
 // WithConfigFileFlag is an option for the manager that automatically enables the config file flag
 // and tries to infer it from the $HOME and $XDG_CONFIG_HOME environment variables.
+// You can only use this option once, it will panic otherwise.
 func WithConfigFileFlag(flag string) Option {
 	return func(m *Manager) {
+		if m.configFlag != "" {
+			panic("The WithConfigFileFlag option should only be used once")
+		}
+
 		m.configFlag = flag
 
 		configPaths := []string{path.Join("$PWD", "."+m.name+".yml")}
@@ -55,8 +60,14 @@ func WithConfigFileFlag(flag string) Option {
 
 // WithDataDirFlag is an option for the manager that automatically enables the data directory config flag
 // and tries to infer it from the $HOME and $XDG_DATA_HOME environment variables.
+// You can only use this option once, it will panic otherwise.
 func WithDataDirFlag(flag string) Option {
 	return func(m *Manager) {
+		if m.dataDirFlag != "" {
+			panic("The WithDataDirFlag option should only be used once")
+		}
+
+		m.dataDirFlag = flag
 		dataDir := "$PWD"
 
 		// use the default from defaults
