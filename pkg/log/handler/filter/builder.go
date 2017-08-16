@@ -116,7 +116,7 @@ func match(in interface{}) (Filter, error) {
 		}
 
 	default:
-		return nil, fmt.Errorf("match should be a map with keys `field` and `value`, got %v", match)
+		return nil, fmt.Errorf("match should be a map with keys `field` and `value`, got %v", m)
 	}
 
 	return FieldString(field, value), nil
