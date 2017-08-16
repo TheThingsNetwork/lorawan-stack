@@ -2,9 +2,7 @@
 
 package shared
 
-import (
-	"github.com/TheThingsNetwork/ttn/pkg/config"
-)
+import "github.com/TheThingsNetwork/ttn/pkg/config"
 
 // DefaultBaseConfig is the default base component configuration.
 var DefaultBaseConfig = config.Base{}

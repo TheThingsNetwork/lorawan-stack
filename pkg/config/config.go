@@ -35,7 +35,7 @@ func (m *Manager) Flags() *pflag.FlagSet {
 	return m.flags
 }
 
-// EnvKeyReplacer sets the strings.Replacer for mapping mapping an environmental variables to a key that does
+// EnvKeyReplacer sets the strings.Replacer for mapping mapping an environment variables to a key that does
 // not match them.
 func EnvKeyReplacer(r *strings.Replacer) Option {
 	return func(m *Manager) {
@@ -46,7 +46,7 @@ func EnvKeyReplacer(r *strings.Replacer) Option {
 
 // AllEnvironment returns all environment variables.
 func (m *Manager) AllEnvironment() []string {
-	keys := m.viper.AllKeys()
+	keys := m.AllKeys()
 	env := make([]string, 0, len(keys))
 
 	for _, key := range keys {
@@ -89,12 +89,13 @@ var DefaultOptions = []Option{
 // - uint, uint8, uint16, uint32, uint64
 // - float32, float64
 // - string
-// - []string
-// - map[string]string
-// - map[string][]string
-// - time.Time
+// - []string, parsed by splitting on whitespace or by passing multiple flags. Eg. VAR="a b c" or --var a --var b --var c
+// - map[string]string, parsed by key=val pairs. Eg. VAR="k=v q=r" or --var k=v --var q=r
+// - map[string][]string, parsed by key=val pairs where keys are repeated. Eg. VAR="k=v1 k=v2 q=r" or --var k=v1 --var k=v2 --var q=r
+// - time.Time, parsed according to the TimeFormat
 // - time.Duration, parsed as 1m
-// - structs that consist of fields with these types
+// - structs that consist of fields with these types. The nested config names will be prefixed by the name of this struct, unless it is `name:",squash"` in which case
+//   the names be taken as is.
 // - custom types that implement the Configurable interface
 func Initialize(name string, defaults interface{}, opts ...Option) *Manager {
 	m := &Manager{
@@ -168,8 +169,8 @@ func (m *Manager) Unmarshal(result interface{}) error {
 	return nil
 }
 
-// ReadInConfig will load the configuration from disk. If a config file is set,
-// that file will be used, otherwise ReadInConfig will discover the file.
+// ReadInConfig will read in all defined config files (according to the config file flag set by WithConfigFileFlag).
+// The parsed config files will be merged into the config struct.
 func (m *Manager) ReadInConfig() error {
 	files := m.viper.GetStringSlice(m.configFlag)
 	for _, file := range files {
