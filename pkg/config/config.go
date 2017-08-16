@@ -5,6 +5,7 @@ package config
 
 import (
 	"fmt"
+	"io"
 	"reflect"
 	"sort"
 	"strings"
@@ -78,7 +79,8 @@ var DefaultOptions = []Option{
 // - `name:"<name>"`: Defines the name of the config flag, in the environment, on the command line and in the config files.
 // - `shorthand:"<n>"`: Defines a shorthand name for use on the command line.
 // - `description:"<description>"`: Add a description that will be printed in the command's help message.
-//
+// - `file-only:"<true|false>"`: Denotes wether or not to attempt to parse this variable from the command line and environment or only from the
+//    config file. This can be used to allow complicated types to exist in the config file but not on the command line.
 // The type of the struct fields also defines their type when parsing the config file, command line arguments or environment
 // variables. Currently, the following types are supported:
 // - bool
@@ -104,6 +106,7 @@ func Initialize(name string, defaults interface{}, opts ...Option) *Manager {
 
 	m.viper.SetTypeByDefaultValue(true)
 	m.viper.SetConfigName(name)
+	m.viper.SetConfigType("yml")
 	m.viper.SetEnvPrefix(name)
 	m.viper.AutomaticEnv()
 	m.viper.AddConfigPath(".")
@@ -173,6 +176,18 @@ func (m *Manager) ReadInConfig() error {
 	return nil
 }
 
+// mergeConfig merges the config from the reader as a yml config file.
+func (m *Manager) mergeConfig(in io.Reader) error {
+	return m.viper.MergeConfig(in)
+}
+
+// UnmarshalKey unmarshals a specific key into a destination, which must have a matching type.
+// This is useful for fields which have the `file-only:"true"` tag set and so are ignored when
+// Unmarshalling them to a struct.
+func (m *Manager) UnmarshalKey(key string, raw interface{}) error {
+	return m.viper.UnmarshalKey(key, raw)
+}
+
 // Configurable is the interface for things that can be configured.
 // Implement the interface to add custom parsing to config variables from strings.
 // For instance, to parse a log level from the strings "fatal", "error", etc into a custom
@@ -221,11 +236,18 @@ func (m *Manager) setDefaults(prefix string, config interface{}) {
 
 		description := field.Tag.Get("description")
 		shorthand := field.Tag.Get("shorthand")
+		fileOnly := field.Tag.Get("file-only")
 
 		if configValue.Field(i).CanInterface() {
 			fieldType := field.Type.Kind()
 
 			face := configValue.Field(i).Interface()
+
+			// if it's only for in the file, skip the rest
+			if fileOnly == "true" {
+				m.viper.SetDefault(name, face)
+				continue
+			}
 
 			if c, ok := face.(Configurable); ok {
 				val := fmt.Sprintf("%v", c)

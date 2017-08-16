@@ -68,6 +68,8 @@ type example struct {
 	NotUsed   string        `name:"-"`
 
 	Custom Custom `name:"custom" description:"A custom type"`
+
+	FileOnly interface{} `name:"file-only" file-only:"true"`
 }
 
 var (
@@ -94,7 +96,8 @@ var (
 		NestedPtr: &NestedConfig{
 			String: "nested-bar",
 		},
-		Custom: Custom(42),
+		Custom:   Custom(42),
+		FileOnly: 33,
 	}
 )
 
@@ -181,7 +184,8 @@ func TestConfigEnv(t *testing.T) {
 		NestedPtr: &NestedConfig{
 			String: "mad",
 		},
-		Custom: Custom(112),
+		Custom:   Custom(112),
+		FileOnly: defaults.FileOnly,
 	})
 }
 
@@ -256,7 +260,8 @@ func TestConfigFlags(t *testing.T) {
 		NestedPtr: &NestedConfig{
 			String: "mad",
 		},
-		Custom: Custom(112),
+		Custom:   Custom(112),
+		FileOnly: defaults.FileOnly,
 	})
 }
 

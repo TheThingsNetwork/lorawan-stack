@@ -2,3 +2,4 @@ foo: 10
 bar:
   a: baz
   b: quu
+file-only: 10
