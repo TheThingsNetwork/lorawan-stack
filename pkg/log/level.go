@@ -86,3 +86,8 @@ func (l *Level) UnmarshalText(text []byte) error {
 
 	return nil
 }
+
+// FromConfigString implements config.FromConfigString
+func (l Level) FromConfigString(str string) (interface{}, error) {
+	return ParseLevel(str)
+}
