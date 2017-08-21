@@ -20,7 +20,7 @@ message EndDeviceIdentifiers {
   // TTN Application ID
   string application_id = 2 [(gogoproto.customname) = "ApplicationID"];
   // TTN Tenant ID (in case of multi-tenant network server)
-  string tenant_id = 3;
+  string tenant_id = 3 [(gogoproto.customname) = "TenantID"];
 
   // LoRaWAN DevEUI
   bytes dev_eui = 4 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
