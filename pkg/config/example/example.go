@@ -3,24 +3,35 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"reflect"
 
+	yaml "gopkg.in/yaml.v1"
+
+	"github.com/TheThingsNetwork/ttn/cmd/shared"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/spf13/cobra"
 )
 
 // Config is the type of configuration
 type Config struct {
-	config.ServiceBase `name:",squash"`
-	Int                int    `name:"int" description:"An example int"`
-	String             string `name:"string" description:"An example string"`
+	config.Base `name:",squash"`
+	Int         int    `name:"int" description:"An example int"`
+	String      string `name:"string" description:"An example string"`
+}
+
+// SubConfig is the type of config for the sub command
+type SubConfig struct {
+	Config `name:",squash"`
+	Bar    string `name:"bar" description:"The bar config flag"`
 }
 
 var (
-	mgr *config.Manager
-	cfg = &Config{}
+	defaults = &Config{
+		Base:   shared.DefaultBaseConfig,
+		Int:    42,
+		String: "foo",
+	}
+	mgr = config.InitializeWithDefaults("example", defaults)
 	cmd = &cobra.Command{
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			err := mgr.ReadInConfig()
@@ -29,24 +40,36 @@ var (
 			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
+			cfg := new(Config)
 			err := mgr.Unmarshal(cfg)
 			if err != nil {
 				panic(err)
 			}
 
-			printConfig(cfg, "")
+			printYAML(cfg)
+		},
+	}
+	sub = &cobra.Command{
+		Use: "sub",
+		Run: func(cmd *cobra.Command, args []string) {
+			cfg := new(SubConfig)
+			err := mgr.Unmarshal(cfg)
+			if err != nil {
+				panic(err)
+			}
+
+			printYAML(cfg)
 		},
 	}
 )
 
 func init() {
-	defaults := &Config{
-		Int:    42,
-		String: "foo",
-	}
-
-	mgr = config.Initialize("example", defaults)
 	cmd.Flags().AddFlagSet(mgr.Flags())
+
+	sub.Flags().AddFlagSet(mgr.WithConfig(&SubConfig{
+		Bar: "baz",
+	}))
+	cmd.AddCommand(sub)
 }
 
 func main() {
@@ -56,38 +79,13 @@ func main() {
 	}
 }
 
-// printConfig prints the nested config struct.
-func printConfig(in interface{}, prefix string) {
-	v := reflect.ValueOf(in)
-
-	switch v.Kind() {
-	case reflect.Ptr:
-		if !v.IsNil() {
-			printConfig(reflect.Indirect(v).Interface(), prefix)
-		}
-	case reflect.Struct:
-		t := v.Type()
-		n := t.NumField()
-		for i := 0; i < n; i++ {
-			val := v.Field(i)
-
-			if v.Kind() == reflect.Ptr {
-				val = reflect.Indirect(val)
-			}
-
-			switch val.Kind() {
-			case reflect.Struct:
-				fmt.Printf("%s%s\n", prefix, t.Field(i).Name)
-				printConfig(v.Field(i).Interface(), prefix+"  ")
-			default:
-				m, err := json.Marshal(val.Interface())
-				if err != nil {
-					panic(err)
-				}
-				fmt.Printf("%s%s = %v\n", prefix, t.Field(i).Name, string(m))
-			}
-		}
-	default:
-		fmt.Printf("%s%v\n", prefix, in)
+// printYAML prints the nested config struct.
+func printYAML(in interface{}) error {
+	bs, err := yaml.Marshal(in)
+	if err != nil {
+		return err
 	}
+
+	fmt.Print(string(bs))
+	return nil
 }

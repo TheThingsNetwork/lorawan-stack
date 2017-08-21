@@ -116,7 +116,7 @@ func Initialize(name string, defaults interface{}, opts ...Option) *Manager {
 	m.flags.SetInterspersed(true)
 
 	if defaults != nil {
-		m.setDefaults("", defaults)
+		m.setDefaults("", m.flags, defaults)
 	}
 
 	for _, opt := range opts {
@@ -126,6 +126,22 @@ func Initialize(name string, defaults interface{}, opts ...Option) *Manager {
 	m.viper.BindPFlags(m.flags)
 
 	return m
+}
+
+// WithConfig returns a new flagset with has the flags of the Manager as well as the additional flags defined
+// from the defaults passed along.
+// Use this to build derived flagsets with a shared base config (for instance with cobra).
+func (m *Manager) WithConfig(defaults interface{}) *pflag.FlagSet {
+	flags := pflag.NewFlagSet(m.name, pflag.ExitOnError)
+	flags.AddFlagSet(m.flags)
+
+	if defaults != nil {
+		m.setDefaults("", flags, defaults)
+	}
+
+	m.viper.BindPFlags(flags)
+
+	return flags
 }
 
 // InitializeWithDefaults is the same as Initialize but it sets some sane default options (see DefaultOptions)
@@ -213,7 +229,7 @@ type Stringer interface {
 	ConfigString() string
 }
 
-func (m *Manager) setDefaults(prefix string, config interface{}) {
+func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interface{}) {
 	configValue := reflect.ValueOf(config)
 	configKind := configValue.Type().Kind()
 
@@ -240,6 +256,11 @@ func (m *Manager) setDefaults(prefix string, config interface{}) {
 
 		if prefix != "" {
 			name = prefix + "." + name
+		}
+
+		// skip previously defined flags
+		if f := flags.Lookup(name); f != nil {
+			continue
 		}
 
 		description := field.Tag.Get("description")
@@ -285,38 +306,38 @@ func (m *Manager) setDefaults(prefix string, config interface{}) {
 			switch val := face.(type) {
 			case bool:
 				m.viper.SetDefault(name, val)
-				m.flags.BoolP(name, shorthand, val, description)
+				flags.BoolP(name, shorthand, val, description)
 
 			case int, int8, int16, int32, int64:
 				fieldValue := configValue.Field(i).Int()
 				m.viper.SetDefault(name, int(fieldValue))
-				m.flags.IntP(name, shorthand, int(fieldValue), description)
+				flags.IntP(name, shorthand, int(fieldValue), description)
 
 			case uint, uint8, uint16, uint32, uint64:
 				fieldValue := configValue.Field(i).Uint()
 				m.viper.SetDefault(name, uint(fieldValue))
-				m.flags.UintP(name, shorthand, uint(fieldValue), description)
+				flags.UintP(name, shorthand, uint(fieldValue), description)
 
 			case float32, float64:
 				fieldValue := configValue.Field(i).Float()
 				m.viper.SetDefault(name, float64(fieldValue))
-				m.flags.Float64P(name, shorthand, float64(fieldValue), description)
+				flags.Float64P(name, shorthand, float64(fieldValue), description)
 
 			case string:
 				m.viper.SetDefault(name, val)
-				m.flags.StringP(name, shorthand, val, description)
+				flags.StringP(name, shorthand, val, description)
 
 			case time.Time:
 				m.viper.SetDefault(name, val)
-				m.flags.StringP(name, shorthand, val.Format(TimeFormat), description)
+				flags.StringP(name, shorthand, val.Format(TimeFormat), description)
 
 			case []string:
 				m.viper.SetDefault(name, val)
-				m.flags.StringSliceP(name, shorthand, val, description)
+				flags.StringSliceP(name, shorthand, val, description)
 
 			case time.Duration:
 				m.viper.SetDefault(name, val)
-				m.flags.DurationP(name, shorthand, val, description)
+				flags.DurationP(name, shorthand, val, description)
 
 			case map[string]string:
 				defs := make([]string, 0, len(val))
@@ -324,7 +345,7 @@ func (m *Manager) setDefaults(prefix string, config interface{}) {
 					defs = append(defs, fmt.Sprintf("%s=%v", k, v))
 				}
 
-				m.flags.StringSliceP(name, shorthand, defs, description)
+				flags.StringSliceP(name, shorthand, defs, description)
 				m.viper.SetDefault(name, val)
 
 			case map[string][]string:
@@ -335,7 +356,7 @@ func (m *Manager) setDefaults(prefix string, config interface{}) {
 					}
 				}
 
-				m.flags.StringSliceP(name, shorthand, defs, description)
+				flags.StringSliceP(name, shorthand, defs, description)
 				m.viper.SetDefault(name, val)
 
 			default:
@@ -344,7 +365,7 @@ func (m *Manager) setDefaults(prefix string, config interface{}) {
 					if field.Anonymous {
 						name = prefix
 					}
-					m.setDefaults(name, configValue.Field(i).Interface())
+					m.setDefaults(name, flags, configValue.Field(i).Interface())
 				default:
 					panic(fmt.Errorf("config: cannot work with \"%v\" in configuration at name \"%s\"", field.Type, name))
 				}
