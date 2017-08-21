@@ -20,8 +20,13 @@ var DefaultLogConfig = config.Log{
 
 // DefaultTLSConfig is the default TLS config.
 var DefaultTLSConfig = config.TLS{
-	Certificate: "cert.pem",
-	Key:         "key.pem",
+	Certificate: "",
+	Key:         "",
+}
+
+var DefaultHTTPConfig = config.HTTP{
+	HTTP:  ":80",
+	HTTPS: ":443",
 }
 
 // DefaultIdentityConfig is the default Identity config
@@ -45,6 +50,7 @@ var DefaultRedisConfig = config.Redis{
 var DefaultServiceBase = config.ServiceBase{
 	Base:     DefaultBaseConfig,
 	GRPC:     DefaultGRPCConfig,
+	HTTP:     DefaultHTTPConfig,
 	TLS:      DefaultTLSConfig,
 	Identity: DefaultIdentityConfig,
 }
