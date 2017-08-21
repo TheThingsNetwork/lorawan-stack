@@ -8,6 +8,7 @@ import (
 	"net"
 
 	"github.com/TheThingsNetwork/ttn/pkg/types"
+	"github.com/pkg/errors"
 )
 
 // ProtocolVersion of the forwarder
@@ -77,8 +78,8 @@ type Packet struct {
 	GatewayEUI      *types.EUI64
 	Data            *Data
 
-	gatewayAddr *net.UDPAddr
-	gatewayConn *Conn
+	GatewayAddr *net.UDPAddr
+	GatewayConn *Conn
 }
 
 // Ack sends the corresponding Ack back to the gateway
@@ -99,7 +100,7 @@ func (p Packet) Ack() error {
 	if err != nil {
 		return err
 	}
-	_, err = p.gatewayConn.WriteToUDP(bytes, p.gatewayAddr)
+	_, err = p.GatewayConn.WriteToUDP(bytes, p.GatewayAddr)
 	return err
 }
 
@@ -118,7 +119,7 @@ func (p *Packet) UnmarshalBinary(b []byte) (err error) {
 		p.GatewayEUI = new(types.EUI64)
 		err = p.GatewayEUI.UnmarshalBinary(b[i : i+8])
 		if err != nil {
-			return
+			return errors.Wrap(err, "failed to unmarshal gateway EUI")
 		}
 		i += 8
 	}
@@ -127,7 +128,7 @@ func (p *Packet) UnmarshalBinary(b []byte) (err error) {
 		p.Data = new(Data)
 		err = json.Unmarshal(b[i:], p.Data)
 		if err != nil {
-			return
+			return err
 		}
 	}
 

@@ -32,8 +32,8 @@ func (c *Conn) Read() (*Packet, error) {
 		return nil, err
 	}
 	packet := &Packet{
-		gatewayConn: c,
-		gatewayAddr: addr,
+		GatewayConn: c,
+		GatewayAddr: addr,
 	}
 	err = packet.UnmarshalBinary(c.buf[:n])
 	return packet, err
