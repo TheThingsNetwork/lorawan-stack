@@ -5,14 +5,14 @@ package filter
 import (
 	"testing"
 
-	s "github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 
 	yaml "gopkg.in/yaml.v1"
 )
 
 func TestBuild(t *testing.T) {
-	a := s.New(t)
+	a := assertions.New(t)
 
 	raw := []byte(`
 and:
