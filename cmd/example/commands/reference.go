@@ -19,8 +19,15 @@ var (
 				logger.WithError(err).Fatal("Could not parse config")
 			}
 
-			c := component.New(logger, cfg)
-			c.Start()
+			c, err := component.New(logger, cfg)
+			if err != nil {
+				logger.WithError(err).Fatal("Failed to initialize the reference component")
+			}
+
+			err = c.Start()
+			if err != nil {
+				logger.WithError(err).Fatal("Failed to start the reference component")
+			}
 		},
 	}
 )
