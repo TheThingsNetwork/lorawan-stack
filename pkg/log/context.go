@@ -2,10 +2,7 @@
 
 package log
 
-import (
-	"context"
-	"fmt"
-)
+import "context"
 
 // Key is the key where the logger will live in the context.
 var Key = &key{}
@@ -17,23 +14,13 @@ func WithLogger(ctx context.Context, logger Interface) context.Context {
 	return context.WithValue(ctx, Key, logger)
 }
 
-// FromContextMaybe returns the logger that is attached to the context or nil if does not exist.
-func FromContextMaybe(ctx context.Context) Interface {
+// FromContext returns the logger that is attached to the context or returns the Noop logger if it does not exist
+func FromContext(ctx context.Context) Interface {
 	if v := ctx.Value(Key); v != nil {
-		if i, ok := v.(Interface); ok {
-			return i
+		if logger, ok := v.(Interface); ok {
+			return logger
 		}
 	}
 
 	return nil
-}
-
-// FromContext returns the logger that is attached to the context or panics if it does not exist.
-func FromContext(ctx context.Context) Interface {
-	logger := FromContextMaybe(ctx)
-	if logger != nil {
-		return logger
-	}
-
-	panic(fmt.Sprintf("No logger in context at key %s", Key))
 }
