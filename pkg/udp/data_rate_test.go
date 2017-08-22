@@ -27,4 +27,8 @@ func TestDataRate(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(dec, should.Resemble, dr)
 	}
+
+	var dr DataRate
+	err := dr.UnmarshalJSON([]byte{})
+	a.So(err, should.NotBeNil)
 }

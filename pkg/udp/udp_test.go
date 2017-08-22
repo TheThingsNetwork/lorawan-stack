@@ -49,7 +49,7 @@ func Example() {
 			if err != nil {
 				panic(err)
 			}
-			err = packet.Ack()
+			err := packet.Ack()
 			if err != nil {
 				panic(err)
 			}
