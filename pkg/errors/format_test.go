@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 )
 
 func TestFormatTypes(t *testing.T) {
@@ -23,7 +24,7 @@ func TestFormatTypes(t *testing.T) {
 			"complex": 3 + 4i,
 			"ptr":     &val,
 		})
-		a.So(res, assertions.ShouldEqual, "10 - bar - <nil> - [1 2 3] - map[ok:1] - (3+4i) - 10")
+		a.So(res, should.Equal, "10 - bar - <nil> - [1 2 3] - map[ok:1] - (3+4i) - 10")
 	}
 }
 
@@ -35,12 +36,12 @@ func TestFormat(t *testing.T) {
 		res := Format(format, Attributes{
 			"foo": 1,
 		})
-		a.So(res, assertions.ShouldEqual, "Found 1 foo")
+		a.So(res, should.Equal, "Found 1 foo")
 	}
 	{
 		res := Format(format, Attributes{
 			"foo": 0,
 		})
-		a.So(res, assertions.ShouldEqual, "Found no foos")
+		a.So(res, should.Equal, "Found no foos")
 	}
 }

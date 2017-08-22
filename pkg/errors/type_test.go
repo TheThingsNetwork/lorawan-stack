@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 )
 
 var types = map[string]Type{
@@ -31,7 +32,7 @@ func TestTypeString(t *testing.T) {
 	a := assertions.New(t)
 
 	for str, typ := range types {
-		a.So(typ.String(), assertions.ShouldEqual, str)
+		a.So(typ.String(), should.Equal, str)
 	}
 }
 
@@ -40,8 +41,8 @@ func TestTypeMarshal(t *testing.T) {
 
 	for str, typ := range types {
 		text, err := typ.MarshalText()
-		a.So(err, assertions.ShouldBeNil)
-		a.So(text, assertions.ShouldResemble, []byte(str))
+		a.So(err, should.BeNil)
+		a.So(text, should.Resemble, []byte(str))
 	}
 }
 
@@ -51,12 +52,12 @@ func TestTypeUnmarshal(t *testing.T) {
 	for str, typ := range types {
 		var res Type
 		err := res.UnmarshalText([]byte(str))
-		a.So(err, assertions.ShouldBeNil)
-		a.So(res, assertions.ShouldEqual, typ)
+		a.So(err, should.BeNil)
+		a.So(res, should.Equal, typ)
 
 		err = res.UnmarshalText([]byte(strings.ToLower(str)))
-		a.So(err, assertions.ShouldBeNil)
-		a.So(res, assertions.ShouldEqual, typ)
+		a.So(err, should.BeNil)
+		a.So(res, should.Equal, typ)
 	}
 
 }

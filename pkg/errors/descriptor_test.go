@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 )
 
 // code creates Codes for testing
@@ -27,10 +28,10 @@ func TestDescriptor(t *testing.T) {
 	}
 	err := d.New(attributes)
 
-	a.So(err.Error(), assertions.ShouldEqual, "You do not have access to app with id foo")
-	a.So(err.Code(), assertions.ShouldEqual, d.Code)
-	a.So(err.Type(), assertions.ShouldEqual, d.Type)
-	a.So(err.Attributes(), assertions.ShouldResemble, attributes)
+	a.So(err.Error(), should.Equal, "You do not have access to app with id foo")
+	a.So(err.Code(), should.Equal, d.Code)
+	a.So(err.Type(), should.Equal, d.Type)
+	a.So(err.Attributes(), should.Resemble, attributes)
 }
 
 func TestDescriptorCause(t *testing.T) {
@@ -49,11 +50,11 @@ func TestDescriptorCause(t *testing.T) {
 	cause := fmt.Errorf("This is an error")
 	err := d.NewWithCause(attributes, cause)
 
-	a.So(err.Error(), assertions.ShouldEqual, "You do not have access to app with id foo")
-	a.So(err.Code(), assertions.ShouldEqual, d.Code)
-	a.So(err.Type(), assertions.ShouldEqual, d.Type)
-	a.So(err.Attributes()["app_id"], assertions.ShouldResemble, attributes["app_id"])
-	a.So(err.Attributes()[causeKey], assertions.ShouldResemble, cause)
+	a.So(err.Error(), should.Equal, "You do not have access to app with id foo")
+	a.So(err.Code(), should.Equal, d.Code)
+	a.So(err.Type(), should.Equal, d.Type)
+	a.So(err.Attributes()["app_id"], should.Resemble, attributes["app_id"])
+	a.So(err.Attributes()[causeKey], should.Resemble, cause)
 
-	a.So(Cause(err), assertions.ShouldEqual, cause)
+	a.So(Cause(err), should.Equal, cause)
 }

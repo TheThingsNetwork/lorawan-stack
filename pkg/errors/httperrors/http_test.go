@@ -9,6 +9,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 )
 
 // code creates Codes for testing
@@ -33,16 +34,16 @@ func TestHTTP(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	e := ToHTTP(err, w)
-	a.So(e, assertions.ShouldBeNil)
+	a.So(e, should.BeNil)
 
 	resp := w.Result()
 
 	got := FromHTTP(resp)
-	a.So(got.Code(), assertions.ShouldEqual, err.Code())
-	a.So(got.Type(), assertions.ShouldEqual, err.Type())
-	a.So(got.Error(), assertions.ShouldEqual, err.Error())
-	a.So(got.Attributes()["app_id"], assertions.ShouldResemble, attributes["app_id"])
-	a.So(got.Attributes()["count"], assertions.ShouldAlmostEqual, attributes["count"])
+	a.So(got.Code(), should.Equal, err.Code())
+	a.So(got.Type(), should.Equal, err.Type())
+	a.So(got.Error(), should.Equal, err.Error())
+	a.So(got.Attributes()["app_id"], should.Resemble, attributes["app_id"])
+	a.So(got.Attributes()["count"], should.AlmostEqual, attributes["count"])
 }
 
 func TestToUnspecifiedHTTP(t *testing.T) {
@@ -52,15 +53,15 @@ func TestToUnspecifiedHTTP(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	e := ToHTTP(err, w)
-	a.So(e, assertions.ShouldBeNil)
+	a.So(e, should.BeNil)
 
 	resp := w.Result()
 
 	got := FromHTTP(resp)
-	a.So(got.Code(), assertions.ShouldEqual, errors.NoCode)
-	a.So(got.Type(), assertions.ShouldEqual, errors.Unknown)
-	a.So(got.Error(), assertions.ShouldEqual, err.Error())
-	a.So(got.Attributes(), assertions.ShouldBeNil)
+	a.So(got.Code(), should.Equal, errors.NoCode)
+	a.So(got.Type(), should.Equal, errors.Unknown)
+	a.So(got.Error(), should.Equal, err.Error())
+	a.So(got.Attributes(), should.BeNil)
 }
 
 func TestHTTPResponse(t *testing.T) {
@@ -72,8 +73,8 @@ func TestHTTPResponse(t *testing.T) {
 	resp.Status = "404 Not found"
 
 	got := FromHTTP(resp)
-	a.So(got.Code(), assertions.ShouldEqual, errors.NoCode)
-	a.So(got.Type(), assertions.ShouldEqual, errors.NotFound)
-	a.So(got.Error(), assertions.ShouldEqual, "Not found")
-	a.So(got.Attributes(), assertions.ShouldBeNil)
+	a.So(got.Code(), should.Equal, errors.NoCode)
+	a.So(got.Type(), should.Equal, errors.NotFound)
+	a.So(got.Error(), should.Equal, "Not found")
+	a.So(got.Attributes(), should.BeNil)
 }
