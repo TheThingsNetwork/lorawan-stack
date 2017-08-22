@@ -3,14 +3,40 @@
 package udp_test
 
 import (
+	"fmt"
 	"net"
+	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/TheThingsNetwork/ttn/pkg/udp"
+	"github.com/TheThingsNetwork/ttn/pkg/udp/validation"
 )
 
-var downlink *udp.Packet
+var (
+	downlink ttnpb.DownlinkMessage
 
-func ExampleServer() {
+	converter = dummyConverter{}
+	store     = udp.GatewayStore{}
+	validator = validation.InMemoryValidator(validation.DefaultWaitDuration)
+)
+
+type dummyConverter struct{}
+
+func (d dummyConverter) RxPacket(p udp.RxPacket) (ttnpb.UplinkMessage, error) {
+	return ttnpb.UplinkMessage{}, nil
+}
+func (d dummyConverter) Status(p udp.Stat) (ttnpb.GatewayStatus, error) {
+	return ttnpb.GatewayStatus{}, nil
+}
+func (d dummyConverter) TxPacket(downlink ttnpb.DownlinkMessage) (udp.Packet, error) {
+	return udp.Packet{}, nil
+}
+func (d dummyConverter) TxPacketAck(p udp.TxPacketAck) (ttnpb.UplinkMessage, error) {
+	return ttnpb.UplinkMessage{}, nil
+}
+
+func Example() {
 	conn, err := udp.Listen(":1700")
 	if err != nil {
 		panic(err)
@@ -28,33 +54,44 @@ func ExampleServer() {
 				panic(err)
 			}
 
+			// Verify the packet against the IP-lock policy
+			if !validator.Valid(*packet) {
+				continue
+			}
+
 			switch packet.PacketType {
 			case udp.PushData:
-				// Verify the source address of the packet against the "IP-lock" policy
-				VerifySourceAddress(packet.GatewayEUI, conn.RemoteAddr())
 				if packet.Data == nil {
 					continue
 				}
 				// Handle the data
 				for _, packet := range packet.Data.RxPacket {
-					uplink := Convert(packet)
+					uplink, err := converter.RxPacket(*packet)
+					if err != nil {
+						continue
+					}
+
 					Forward(uplink)
 				}
 				if packet.Data.Stat != nil {
-					status := Convert(packet)
+					status, err := converter.Status(*packet.Data.Stat)
+					if err != nil {
+						continue
+					}
+
 					Forward(status)
 				}
 			case udp.PullData:
-				// Verify the source address of the packet against the "IP-lock" policy
-				VerifySourceAddress(packet.GatewayEUI, conn.RemoteAddr())
 				// Update the downlink address in the mapping
-				UpdateDownlinkAddress(packet.GatewayEUI, conn.RemoteAddr())
+				UpdateDownlinkAddress(*packet.GatewayEUI, conn)
 			case udp.TxAck:
-				// Verify the source address of the packet against the "IP-lock" policy
-				VerifySourceAddress(packet.GatewayEUI, conn.RemoteAddr())
 				// Handle the data
 				if packet.Data.TxPacketAck != nil {
-					txInfo := Convert(packet)
+					txInfo, err := converter.TxPacketAck(*packet.Data.TxPacketAck)
+					if err != nil {
+						continue
+					}
+
 					Forward(txInfo)
 				}
 			}
@@ -62,13 +99,36 @@ func ExampleServer() {
 	}()
 
 	go func() {
-		packet := Convert(downlink)
-		conn.WriteTo(packet, GetDownlinkAddress(downlink.GatewayEUI))
+		time.Sleep(10 * time.Second)
+		packet, err := converter.TxPacket(downlink)
+		if err != nil {
+			fmt.Println("Couldn't convert TX packet")
+			return
+		}
+
+		addr, isAddr := GetDownlinkAddress(&packet)
+		if !isAddr {
+			fmt.Println("No address found for this gateway")
+			return
+		}
+
+		if err := conn.WriteTo(&packet, addr); err != nil {
+			fmt.Println("Error when sending downlink: ", err)
+		}
 	}()
 }
 
-func VerifySourceAddress(interface{}, interface{})   {}
-func UpdateDownlinkAddress(interface{}, interface{}) {}
-func GetDownlinkAddress(interface{}) net.Addr        { return nil }
-func Convert(interface{}) *udp.Packet                { return nil }
-func Forward(interface{})                            {}
+func UpdateDownlinkAddress(eui types.EUI64, conn *udp.Conn) {
+	store.Lock()
+	store.Store[eui] = conn.UDPConn.LocalAddr()
+	store.Unlock()
+}
+
+func GetDownlinkAddress(packet *udp.Packet) (net.Addr, bool) {
+	store.Lock()
+	address, isAddress := store.Store[*packet.GatewayEUI]
+	store.Unlock()
+	return address, isAddress
+}
+
+func Forward(interface{}) {}
