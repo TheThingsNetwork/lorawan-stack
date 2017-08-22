@@ -2,6 +2,8 @@
 
 package errors
 
+import "encoding/json"
+
 type jsonError struct {
 	Message    string     `json:"error"`
 	Code       Code       `json:"error_code,omitempty"`
@@ -25,4 +27,13 @@ func fromJSON(err *jsonError) *Impl {
 		typ:        err.Type,
 		attributes: err.Attributes,
 	}
+}
+
+// UnmarshalJSON unmarshals the data into an error implementation
+func UnmarshalJSON(data []byte) (*Impl, error) {
+	aux := new(jsonError)
+	if err := json.Unmarshal(data, aux); err != nil {
+		return nil, err
+	}
+	return fromJSON(aux), nil
 }
