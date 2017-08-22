@@ -18,7 +18,7 @@ func TestStaticStore(t *testing.T) {
 	addr := &net.UDPAddr{
 		IP: net.IP("8.8.8.8"),
 	}
-	staticStore := StaticStore{addr}
+	staticStore := StaticStore(addr)
 	eui := types.EUI64([8]byte{1, 2, 3, 4, 5, 6, 7, 8})
 
 	staticStore.Set(eui, &net.UDPAddr{

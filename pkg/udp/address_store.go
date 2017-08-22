@@ -15,12 +15,15 @@ type AddressStore interface {
 }
 
 // StaticStore is a store that always returns the address in the struct
-type StaticStore struct {
+type staticStore struct {
 	net.Addr
 }
 
+// StaticStore returns an AddressStore that always returns the same net.Addr.
+func StaticStore(addr net.Addr) AddressStore { return staticStore{addr} }
+
 // Get implements AddressStore
-func (s StaticStore) Get(types.EUI64) (net.Addr, bool) { return net.Addr(s), true }
+func (s staticStore) Get(types.EUI64) (net.Addr, bool) { return net.Addr(s), true }
 
 // Set implements AddressStore
-func (s StaticStore) Set(types.EUI64, net.Addr) { return }
+func (s staticStore) Set(types.EUI64, net.Addr) { return }
