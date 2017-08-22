@@ -153,13 +153,13 @@ func (p Packet) MarshalBinary() ([]byte, error) {
 	return b, nil
 }
 
-// Converter is an interface representing objects capable of transforming packets between the
+// Extracter is an interface representing objects capable of transforming packets between the
 // Semtech structures format, and the TTN protobuf format.
 //
 // The TTN representation of those objects requires information from foreign actors, such as
-// the UplinkMessage.TxSettings.DataRateIndex value - implementation of this Converter should
+// the UplinkMessage.TxSettings.DataRateIndex value - implementation of this Extracter should
 // thus depend on the context of use.
-type Converter interface {
+type Extracter interface {
 	RxPacket(p RxPacket) (ttnpb.UplinkMessage, error)
 	Status(p Stat) (ttnpb.GatewayStatus, error)
 	TxPacket(downlink ttnpb.DownlinkMessage) (Packet, error)
