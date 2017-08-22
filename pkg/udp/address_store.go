@@ -10,8 +10,9 @@ import (
 
 // AddressStore exposes methods to set and get network addresses.
 type AddressStore interface {
-	Get(types.EUI64) (net.Addr, bool)
-	Set(types.EUI64, net.Addr)
+	GetDownlinkAddress(types.EUI64) (net.Addr, bool)
+	SetUplinkAddress(types.EUI64, net.Addr)
+	SetDownlinkAddress(types.EUI64, net.Addr)
 }
 
 // StaticStore is a store that always returns the address in the struct
@@ -22,8 +23,6 @@ type staticStore struct {
 // StaticStore returns an AddressStore that always returns the same net.Addr.
 func StaticStore(addr net.Addr) AddressStore { return staticStore{addr} }
 
-// Get implements AddressStore
-func (s staticStore) Get(types.EUI64) (net.Addr, bool) { return net.Addr(s), true }
-
-// Set implements AddressStore
-func (s staticStore) Set(types.EUI64, net.Addr) { return }
+func (s staticStore) GetDownlinkAddress(types.EUI64) (net.Addr, bool) { return net.Addr(s), true }
+func (s staticStore) SetDownlinkAddress(types.EUI64, net.Addr)        { return }
+func (s staticStore) SetUplinkAddress(types.EUI64, net.Addr)          { return }

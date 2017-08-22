@@ -13,5 +13,6 @@ func TestAlwaysValid(t *testing.T) {
 	validator := AlwaysValid()
 
 	a := assertions.New(t)
-	a.So(validator.Valid(Packet{}), should.BeTrue)
+	a.So(validator.ValidUplink(Packet{}), should.BeTrue)
+	a.So(validator.ValidDownlink(Packet{}), should.BeTrue)
 }

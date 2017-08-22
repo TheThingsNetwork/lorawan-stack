@@ -4,13 +4,16 @@ package udp
 
 // Validator is an object that can validate UDP packets.
 type Validator interface {
-	// Valid returns true if the sent packet is considered valid.
-	Valid(packet Packet) bool
+	// ValidUplink returns true if the sent uplink or status is considered valid.
+	ValidUplink(packet Packet) bool
+	// ValidDownlink returns true if the sent downlink is considered valid.
+	ValidDownlink(packet Packet) bool
 }
 
 type alwaysValid struct{}
 
-func (a alwaysValid) Valid(packet Packet) bool { return true }
+func (a alwaysValid) ValidUplink(packet Packet) bool   { return true }
+func (a alwaysValid) ValidDownlink(packet Packet) bool { return true }
 
 // AlwaysValid returns a Validator that considers all packets valid.
 func AlwaysValid() Validator { return alwaysValid{} }

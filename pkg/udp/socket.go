@@ -68,10 +68,18 @@ func (c *Conn) Read() (*Packet, error) {
 			continue
 		}
 
-		if !c.validator.Valid(*packet) {
-			continue
+		switch packet.PacketType {
+		case PullData, TxAck:
+			if !c.validator.ValidDownlink(*packet) {
+				continue
+			}
+			c.addrStore.SetDownlinkAddress(*packet.GatewayEUI, addr)
+		case PushData:
+			if !c.validator.ValidUplink(*packet) {
+				continue
+			}
+			c.addrStore.SetUplinkAddress(*packet.GatewayEUI, addr)
 		}
-		c.addrStore.Set(*packet.GatewayEUI, addr)
 
 		return packet, nil
 	}
@@ -86,8 +94,8 @@ func (c *Conn) Write(packet *Packet) error {
 		return err
 	}
 
-	addr, hasAddr := c.addrStore.Get(*packet.GatewayEUI)
-	if !hasAddr {
+	addr, hasAddr := c.addrStore.GetDownlinkAddress(*packet.GatewayEUI)
+	if !hasAddr || addr == nil {
 		return ErrGatewayNotConnected
 	}
 

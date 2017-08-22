@@ -47,13 +47,13 @@ func TestInvalidInMemory(t *testing.T) {
 		GatewayEUI:  &eui2,
 	}
 
-	v.Set(*eui, ip1)
+	v.SetUplinkAddress(*eui, ip1)
 
 	a := assertions.New(t)
-	a.So(v.Valid(udpPacket1), should.BeTrue)  // First packet should be valid
-	a.So(v.Valid(udpPacket2), should.BeFalse) // Second packet with the same EUI should be invalid, since it has a different IP but the same EUI
-	a.So(v.Valid(udpPacket3), should.BeTrue)  // Third packet should be valid, since it has the same IP as the first packet
-	a.So(v.Valid(udpPacket4), should.BeTrue)  // Fourth packet should be valid, since it has an unset EUI
+	a.So(v.ValidUplink(udpPacket1), should.BeTrue)  // First packet should be valid
+	a.So(v.ValidUplink(udpPacket2), should.BeFalse) // Second packet with the same EUI should be invalid, since it has a different IP but the same EUI
+	a.So(v.ValidUplink(udpPacket3), should.BeTrue)  // Third packet should be valid, since it has the same IP as the first packet
+	a.So(v.ValidUplink(udpPacket4), should.BeTrue)  // Fourth packet should be valid, since it has an unset EUI
 }
 
 func TestInvalidInMemoryIPv6(t *testing.T) {
@@ -77,12 +77,16 @@ func TestInvalidInMemoryIPv6(t *testing.T) {
 		GatewayEUI:  eui,
 	}
 
-	v.Set(*eui, ip1)
+	v.SetUplinkAddress(*eui, ip1)
+	v.SetDownlinkAddress(*eui, ip2)
 
 	a := assertions.New(t)
-	a.So(v.Valid(udpPacket1), should.BeTrue)  // First packet should be valid
-	a.So(v.Valid(udpPacket2), should.BeFalse) // Second packet with the same EUI should be invalid, since it has a different IP but the same EUI
-	a.So(v.Valid(udpPacket3), should.BeTrue)  // Third packet should be valid, since it has the same IP as the first packet
+	a.So(v.ValidUplink(udpPacket1), should.BeTrue)    // First packet should be valid
+	a.So(v.ValidUplink(udpPacket2), should.BeFalse)   // Second packet with the same EUI should be invalid, since it has a different IP but the same EUI
+	a.So(v.ValidUplink(udpPacket3), should.BeTrue)    // Third packet should be valid, since it has the same IP as the first packet
+	a.So(v.ValidDownlink(udpPacket1), should.BeFalse) // First packet should be invalid, since it has a different IP but the same EUI
+	a.So(v.ValidDownlink(udpPacket2), should.BeTrue)  // Second packet with the same EUI should be valid
+	a.So(v.ValidDownlink(udpPacket3), should.BeFalse) // Third packet should be invalid, since it has the same IP as the first packet
 }
 
 func TestDataCoherence(t *testing.T) {
@@ -90,9 +94,9 @@ func TestDataCoherence(t *testing.T) {
 	eui := types.EUI64([8]byte{1, 2, 3, 4, 0, 9, 8, 7})
 	eui2 := types.EUI64([8]byte{2, 4, 9, 3, 5, 9, 8, 9})
 	addr := newUDPAddress("8.8.8.8", 1700)
-	v.Set(eui, addr)
-	addr2, found := v.Get(eui)
-	_, found2 := v.Get(eui2)
+	v.SetDownlinkAddress(eui, addr)
+	addr2, found := v.GetDownlinkAddress(eui)
+	_, found2 := v.GetDownlinkAddress(eui2)
 
 	a := assertions.New(t)
 	a.So(found, should.BeTrue)      // Address associated to that EUI should be found
@@ -115,11 +119,11 @@ func TestValidInMemory(t *testing.T) {
 		GatewayEUI:  eui,
 	}
 
-	v.Set(*eui, ip1)
+	v.SetUplinkAddress(*eui, ip1)
 
 	a := assertions.New(t)
-	a.So(v.Valid(udpPacket1), should.BeTrue) // First packet should be valid
-	a.So(v.Valid(udpPacket2), should.BeTrue) // Second packet with the same EUI should be valid, since expiration is set to 0seconds
+	a.So(v.ValidUplink(udpPacket1), should.BeTrue) // First packet should be valid
+	a.So(v.ValidUplink(udpPacket2), should.BeTrue) // Second packet with the same EUI should be valid, since expiration is set to 0seconds
 }
 
 func TestInvalidPacket(t *testing.T) {
@@ -136,6 +140,7 @@ func TestInvalidPacket(t *testing.T) {
 	}
 
 	a := assertions.New(t)
-	a.So(v.Valid(udpPacket1), should.BeFalse) // Packets with no EUI should be invalid
-	a.So(v.Valid(udpPacket2), should.BeFalse) // Packets with no IP should be invalid
+	a.So(v.ValidUplink(udpPacket1), should.BeFalse)   // Packets with no EUI should be invalid
+	a.So(v.ValidUplink(udpPacket2), should.BeFalse)   // Packets with no IP should be invalid
+	a.So(v.ValidDownlink(udpPacket2), should.BeFalse) // Packets with no IP should be invalid
 }

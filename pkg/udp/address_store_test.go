@@ -21,12 +21,16 @@ func TestStaticStore(t *testing.T) {
 	staticStore := StaticStore(addr)
 	eui := types.EUI64([8]byte{1, 2, 3, 4, 5, 6, 7, 8})
 
-	staticStore.Set(eui, &net.UDPAddr{
+	staticStore.SetDownlinkAddress(eui, &net.UDPAddr{
 		IP:   net.IP("8.8.2.2"),
 		Port: 1701,
 	})
+	staticStore.SetUplinkAddress(eui, &net.UDPAddr{
+		IP:   net.IP("8.8.2.2"),
+		Port: 1702,
+	})
 
-	newAddr, found := staticStore.Get(eui)
+	newAddr, found := staticStore.GetDownlinkAddress(eui)
 	a.So(found, should.BeTrue)
 	a.So(newAddr.String(), should.Equal, addr.String())
 }

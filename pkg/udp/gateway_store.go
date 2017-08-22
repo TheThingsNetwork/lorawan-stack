@@ -11,11 +11,13 @@ import (
 )
 
 // DefaultWaitDuration is the recommended duration to block the IP of the gateway.
-const DefaultWaitDuration = time.Hour
+const DefaultWaitDuration = 5 * time.Minute
 
 type footprint struct {
-	Address net.Addr
-	Time    time.Time
+	DownlinkAddress  net.Addr
+	DownlinkLastSeen time.Time
+	UplinkAddress    net.Addr
+	UplinkLastSeen   time.Time
 }
 
 // GatewayStore is a multithread-safe structure that
@@ -40,18 +42,32 @@ type GatewayStore struct {
 	lastSeen map[types.EUI64]footprint
 }
 
-// Set implements AddressStore for GatewayStore.
-func (s *GatewayStore) Set(eui types.EUI64, addr net.Addr) {
+// SetUplinkAddress implements AddressStore for GatewayStore.
+func (s *GatewayStore) SetUplinkAddress(eui types.EUI64, addr net.Addr) {
 	s.mu.Lock()
-	s.lastSeen[eui] = footprint{
-		Address: addr,
-		Time:    time.Now(),
+	newFootprint := footprint{UplinkAddress: addr, UplinkLastSeen: time.Now()}
+	if gwFootprint, found := s.lastSeen[eui]; found {
+		newFootprint.DownlinkAddress = gwFootprint.DownlinkAddress
+		newFootprint.DownlinkLastSeen = gwFootprint.DownlinkLastSeen
 	}
+	s.lastSeen[eui] = newFootprint
 	s.mu.Unlock()
 }
 
-// Get implements AddressStore for GatewayStore.
-func (s *GatewayStore) Get(eui types.EUI64) (net.Addr, bool) {
+// SetDownlinkAddress implements AddressStore for GatewayStore.
+func (s *GatewayStore) SetDownlinkAddress(eui types.EUI64, addr net.Addr) {
+	s.mu.Lock()
+	newFootprint := footprint{DownlinkAddress: addr, DownlinkLastSeen: time.Now()}
+	if gwFootprint, found := s.lastSeen[eui]; found {
+		newFootprint.UplinkAddress = gwFootprint.UplinkAddress
+		newFootprint.UplinkLastSeen = gwFootprint.UplinkLastSeen
+	}
+	s.lastSeen[eui] = newFootprint
+	s.mu.Unlock()
+}
+
+// GetDownlinkAddress implements AddressStore for GatewayStore.
+func (s *GatewayStore) GetDownlinkAddress(eui types.EUI64) (net.Addr, bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	footprint, seen := s.lastSeen[eui]
@@ -59,18 +75,25 @@ func (s *GatewayStore) Get(eui types.EUI64) (net.Addr, bool) {
 		return nil, false
 	}
 
-	address := footprint.Address
+	address := footprint.DownlinkAddress
 	return address, true
 }
 
-// Valid implements Validator for GatewayStore.
-func (s *GatewayStore) Valid(packet Packet) (valid bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+func (s *GatewayStore) validPacket(packet Packet) bool {
 	if packet.GatewayEUI == nil {
 		return false
 	}
 	if packet.GatewayAddr == nil {
+		return false
+	}
+	return true
+}
+
+// ValidUplink implements Validator for GatewayStore.
+func (s *GatewayStore) ValidUplink(packet Packet) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if !s.validPacket(packet) {
 		return false
 	}
 
@@ -79,10 +102,32 @@ func (s *GatewayStore) Valid(packet Packet) (valid bool) {
 		return true
 	}
 
-	if packet.GatewayAddr.String() == footprint.Address.String() {
+	if packet.GatewayAddr.String() == footprint.UplinkAddress.String() {
 		return true
 	}
-	if footprint.Time.Add(s.duration).Before(time.Now()) {
+	if footprint.UplinkLastSeen.Add(s.duration).Before(time.Now()) {
+		return true
+	}
+	return false
+}
+
+// ValidDownlink implements Validator for GatewayStore.
+func (s *GatewayStore) ValidDownlink(packet Packet) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if !s.validPacket(packet) {
+		return false
+	}
+
+	footprint, seen := s.lastSeen[*packet.GatewayEUI]
+	if !seen {
+		return true
+	}
+
+	if packet.GatewayAddr.String() == footprint.DownlinkAddress.String() {
+		return true
+	}
+	if footprint.DownlinkLastSeen.Add(s.duration).Before(time.Now()) {
 		return true
 	}
 	return false
