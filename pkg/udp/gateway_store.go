@@ -33,7 +33,8 @@ type footprint struct {
 // The Valid function returns true if the gateway has a valid EUI, a valid
 // IP address, and that if there is a new IP, there has been no message
 // since <duration>.
-// - It is an AddressStore.
+//
+// - It is an AddressStore, storing the last IP seen in memory.
 type GatewayStore struct {
 	mu       sync.Mutex
 	duration time.Duration

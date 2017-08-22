@@ -1,5 +1,11 @@
 // Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
+/*
+Package udp contains a framework for interacting with UDP Semtech packet
+forwarders. It provides structs and methods to do so, as well as some other
+structs of convenience.
+*/
+
 package udp
 
 import (
@@ -9,9 +15,18 @@ import (
 	"github.com/pkg/errors"
 )
 
+// ErrGatewayNotConnected is returned when trying to send a packet to a
+// udp.Conn that has never interacted with the packet's gateway.
 var ErrGatewayNotConnected = errors.New("Not connected to the specified gateway")
 
-// Listen on a port
+// Listen on a port. Requires:
+//
+// - A Validator object, that represents application-level validation of an
+// incoming packet. When polling for packets, invalid packets won't be
+// transmitted.
+//
+// - An AddressStore object, used to store gateway IP addresses, and to
+// retrieve the addresses when sending downlinks.
 func Listen(addr string, validator Validator, addrStore AddressStore) (*Conn, error) {
 	udpAddr, err := net.ResolveUDPAddr("udp", addr)
 	if err != nil {
