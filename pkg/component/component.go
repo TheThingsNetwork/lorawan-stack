@@ -3,6 +3,7 @@
 package component
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
@@ -10,7 +11,6 @@ import (
 	"os/signal"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
@@ -23,39 +23,25 @@ type Config struct {
 
 // Component is a base component for The Things Network cluster
 type Component struct {
-	config *Config
-	log    log.Interface
-	http   *http.Server
-	https  *http.Server
-	grpc   *grpc.Server
-	grpcs  *grpc.Server
+	config  *Config
+	log     log.Interface
+	handler http.Handler
+	grpc    *grpc.Server
+
+	httpL  net.Listener
+	httpsL net.Listener
+	grpcL  net.Listener
+	grpcsL net.Listener
 }
 
 // New returns a new component
-func New(log log.Interface, config *Config) (*Component, error) {
-
-	cert := config.TLS.Certificate
-	key := config.TLS.Key
-
-	var grpcs *grpc.Server
-	if cert != "" && key != "" {
-		creds, err := credentials.NewServerTLSFromFile(cert, key)
-
-		if err != nil {
-			return nil, err
-		}
-
-		grpcs = grpc.NewServer(grpc.Creds(creds))
-	}
-
+func New(log log.Interface, config *Config) *Component {
 	return &Component{
-		config: config,
-		log:    log,
-		http:   &http.Server{Addr: config.ServiceBase.HTTP.HTTP},
-		https:  &http.Server{Addr: config.ServiceBase.HTTP.HTTPS},
-		grpc:   grpc.NewServer(),
-		grpcs:  grpcs,
-	}, nil
+		config:  config,
+		log:     log,
+		handler: nil,
+		grpc:    grpc.NewServer(),
+	}
 }
 
 // Start starts the component
@@ -69,10 +55,10 @@ func (c *Component) Start() error {
 
 	signal.Notify(signals, os.Interrupt)
 
-	go func() { errors <- c.startHTTP() }()
-	go func() { errors <- c.startHTTPS() }()
-	go func() { errors <- c.startGRPC() }()
-	go func() { errors <- c.startGRPCS() }()
+	go func() { errors <- c.listenHTTP() }()
+	go func() { errors <- c.listenHTTPS() }()
+	go func() { errors <- c.listenGRPC() }()
+	go func() { errors <- c.listenGRPCS() }()
 
 	for {
 		select {
@@ -90,14 +76,14 @@ func (c *Component) Start() error {
 
 // Close closes the server
 func (c *Component) Close() {
-	if c.http != nil {
-		_ = c.http.Close()
-		c.log.Debug("Stopped HTTP server")
+	if c.httpL != nil {
+		_ = c.httpL.Close()
+		c.log.Debug("Stopped listening on HTTP")
 	}
 
-	if c.https != nil {
-		_ = c.https.Close()
-		c.log.Debug("Stopped HTTPS server")
+	if c.httpsL != nil {
+		_ = c.httpsL.Close()
+		c.log.Debug("Stopped listening on HTTPS")
 	}
 
 	if c.grpc != nil {
@@ -105,23 +91,35 @@ func (c *Component) Close() {
 		c.log.Debug("Stopped gRPC server")
 	}
 
-	if c.grpcs != nil {
-		c.grpcs.Stop()
-		c.log.Debug("Stopped gRPCs server")
+	if c.grpcL != nil {
+		c.grpcL.Close()
+		c.log.Debug("Stopped listening on gRPC")
+	}
+
+	if c.grpcsL != nil {
+		c.grpcsL.Close()
+		c.log.Debug("Stopped listening on gRPCs")
 	}
 }
 
-func (c *Component) startHTTP() error {
+func (c *Component) listenHTTP() error {
 	addr := c.config.HTTP.HTTP
 	if addr == "" {
 		return nil
 	}
 
+	listener, err := net.Listen("tcp", addr)
+	if err != nil {
+		return err
+	}
+
+	c.httpL = listener
+
 	c.log.WithField("Address", addr).Debug("HTTP server listening")
-	return c.http.ListenAndServe()
+	return http.Serve(listener, c.handler)
 }
 
-func (c *Component) startHTTPS() error {
+func (c *Component) listenHTTPS() error {
 	addr := c.config.HTTP.HTTPS
 	cert := c.config.TLS.Certificate
 	key := c.config.TLS.Key
@@ -130,15 +128,30 @@ func (c *Component) startHTTPS() error {
 		return nil
 	}
 
-	c.log.WithField("Address", c.https.Addr).Debug("HTTPS server listening")
-	return c.https.ListenAndServeTLS(cert, key)
-}
-
-func (c *Component) startGRPC() error {
-	if c.grpc == nil {
-		return nil
+	listener, err := c.listenTLS(addr, cert, key)
+	if err != nil {
+		return err
 	}
 
+	c.httpsL = listener
+
+	c.log.WithField("Address", addr).Debug("HTTPS server listening")
+	return http.Serve(listener, c.handler)
+}
+
+func (c *Component) listenTLS(addr string, certFile string, keyFile string) (net.Listener, error) {
+	certificate, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		return nil, err
+	}
+
+	return tls.Listen("tcp", addr, &tls.Config{
+		Certificates:             []tls.Certificate{certificate},
+		PreferServerCipherSuites: true,
+	})
+}
+
+func (c *Component) listenGRPC() error {
 	addr := c.config.GRPC.TCP
 	if addr == "" {
 		return nil
@@ -149,25 +162,28 @@ func (c *Component) startGRPC() error {
 		return err
 	}
 
+	c.grpcL = listener
+
 	c.log.WithField("Address", addr).Debug("gRPC server listening")
 	return c.grpc.Serve(listener)
 }
 
-func (c *Component) startGRPCS() error {
-	if c.grpcs == nil {
-		return nil
-	}
-
+func (c *Component) listenGRPCS() error {
 	addr := c.config.GRPC.TLS
-	if addr == "" {
+	cert := c.config.TLS.Certificate
+	key := c.config.TLS.Key
+
+	if addr == "" || cert == "" || key == "" {
 		return nil
 	}
 
-	listener, err := net.Listen("tcp", addr)
+	listener, err := c.listenTLS(addr, cert, key)
 	if err != nil {
 		return err
 	}
 
+	c.grpcsL = listener
+
 	c.log.WithField("Address", addr).Debug("gRPCs server listening")
-	return c.grpcs.Serve(listener)
+	return c.grpc.Serve(listener)
 }
