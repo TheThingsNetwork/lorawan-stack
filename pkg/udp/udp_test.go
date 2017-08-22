@@ -4,21 +4,17 @@ package udp_test
 
 import (
 	"fmt"
-	"net"
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/TheThingsNetwork/ttn/pkg/udp"
-	"github.com/TheThingsNetwork/ttn/pkg/udp/validation"
 )
 
 var (
 	downlink ttnpb.DownlinkMessage
 
-	converter = dummyConverter{}
-	store     = udp.GatewayStore{}
-	validator = validation.InMemoryValidator(validation.DefaultWaitDuration)
+	converter    = dummyConverter{}
+	gatewayStore = udp.NewGatewayStore(udp.DefaultWaitDuration)
 )
 
 type dummyConverter struct{}
@@ -37,7 +33,7 @@ func (d dummyConverter) TxPacketAck(p udp.TxPacketAck) (ttnpb.UplinkMessage, err
 }
 
 func Example() {
-	conn, err := udp.Listen(":1700")
+	conn, err := udp.Listen(":1700", gatewayStore, gatewayStore)
 	if err != nil {
 		panic(err)
 	}
@@ -52,11 +48,6 @@ func Example() {
 			err := packet.Ack()
 			if err != nil {
 				panic(err)
-			}
-
-			// Verify the packet against the IP-lock policy
-			if !validator.Valid(*packet) {
-				continue
 			}
 
 			switch packet.PacketType {
@@ -81,9 +72,6 @@ func Example() {
 
 					Forward(status)
 				}
-			case udp.PullData:
-				// Update the downlink address in the mapping
-				UpdateDownlinkAddress(*packet.GatewayEUI, conn)
 			case udp.TxAck:
 				// Handle the data
 				if packet.Data.TxPacketAck != nil {
@@ -106,29 +94,10 @@ func Example() {
 			return
 		}
 
-		addr, isAddr := GetDownlinkAddress(&packet)
-		if !isAddr {
-			fmt.Println("No address found for this gateway")
-			return
-		}
-
-		if err := conn.WriteTo(&packet, addr); err != nil {
+		if err := conn.Send(&packet); err != nil {
 			fmt.Println("Error when sending downlink: ", err)
 		}
 	}()
-}
-
-func UpdateDownlinkAddress(eui types.EUI64, conn *udp.Conn) {
-	store.Lock()
-	store.Store[eui] = conn.UDPConn.LocalAddr()
-	store.Unlock()
-}
-
-func GetDownlinkAddress(packet *udp.Packet) (net.Addr, bool) {
-	store.Lock()
-	address, isAddress := store.Store[*packet.GatewayEUI]
-	store.Unlock()
-	return address, isAddress
 }
 
 func Forward(interface{}) {}

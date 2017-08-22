@@ -9,8 +9,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+var ErrGatewayNotConnected = errors.New("Not connected to the specified gateway")
+
 // Listen on a port
-func Listen(addr string, validator Validator) (*Conn, error) {
+func Listen(addr string, validator Validator, addrStore AddressStore) (*Conn, error) {
 	udpAddr, err := net.ResolveUDPAddr("udp", addr)
 	if err != nil {
 		return nil, err
@@ -20,6 +22,7 @@ func Listen(addr string, validator Validator) (*Conn, error) {
 		return nil, err
 	}
 	return &Conn{
+		addrStore:   addrStore,
 		gatewayAddr: make(map[types.EUI64]net.UDPAddr),
 		UDPConn:     conn,
 		validator:   validator,
@@ -31,6 +34,7 @@ type Conn struct {
 	buf [65507]byte
 	*net.UDPConn
 	gatewayAddr map[types.EUI64]net.UDPAddr
+	addrStore   AddressStore
 	validator   Validator
 }
 
@@ -58,17 +62,26 @@ func (c *Conn) Read() (*Packet, error) {
 		if !c.validator.Valid(*packet) {
 			continue
 		}
+		c.addrStore.Set(*packet.GatewayEUI, addr)
 
 		return packet, nil
 	}
 }
 
-// WriteTo writes a packet to the conn
-func (c *Conn) WriteTo(packet *Packet, addr net.Addr) error {
+// Send sends a packet. It returns ErrGatewayNotConnected if the gateway was
+// never connected, and otherwise, returns the result of the marshalling and
+// socket operation.
+func (c *Conn) Send(packet *Packet) error {
 	buf, err := packet.MarshalBinary()
 	if err != nil {
 		return err
 	}
+
+	addr, hasAddr := c.addrStore.Get(*packet.GatewayEUI)
+	if !hasAddr {
+		return ErrGatewayNotConnected
+	}
+
 	_, err = c.UDPConn.WriteTo(buf, addr)
 	return err
 }
