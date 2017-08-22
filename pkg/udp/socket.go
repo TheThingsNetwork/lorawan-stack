@@ -86,7 +86,8 @@ func (c *Conn) Send(packet *Packet) error {
 	return err
 }
 
-// Ack sends the corresponding Ack back to the gateway
+// Ack builds the corresponding Ack packet, using p.BuildAck(), and sends it to
+// the gateway.
 func (p *Packet) Ack() error {
 	if p.GatewayConn == nil || p.GatewayAddr == nil {
 		return errors.New("No gateway connection associated to this packet")
