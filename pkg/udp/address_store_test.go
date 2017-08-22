@@ -6,10 +6,9 @@ import (
 	"net"
 	"testing"
 
-	"github.com/smartystreets/assertions/should"
-
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 )
 
 func TestStaticStore(t *testing.T) {
