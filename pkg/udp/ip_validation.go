@@ -6,7 +6,7 @@ package udp
 type Validator interface {
 	// ValidUplink returns true if the sent uplink or status is considered valid.
 	ValidUplink(packet Packet) bool
-	// ValidDownlink returns true if the sent downlink is considered valid.
+	// ValidDownlink returns true if the downlink request is considered valid.
 	ValidDownlink(packet Packet) bool
 }
 
