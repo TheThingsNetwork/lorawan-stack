@@ -13,22 +13,22 @@ import (
 var (
 	downlink ttnpb.DownlinkMessage
 
-	converter    = dummyConverter{}
+	extracter    = dummyExtracter{}
 	gatewayStore = udp.NewGatewayStore(udp.DefaultWaitDuration)
 )
 
-type dummyConverter struct{}
+type dummyExtracter struct{}
 
-func (d dummyConverter) RxPacket(p udp.RxPacket) (ttnpb.UplinkMessage, error) {
+func (d dummyExtracter) RxPacket(p udp.RxPacket) (ttnpb.UplinkMessage, error) {
 	return ttnpb.UplinkMessage{}, nil
 }
-func (d dummyConverter) Status(p udp.Stat) (ttnpb.GatewayStatus, error) {
+func (d dummyExtracter) Status(p udp.Stat) (ttnpb.GatewayStatus, error) {
 	return ttnpb.GatewayStatus{}, nil
 }
-func (d dummyConverter) TxPacket(downlink ttnpb.DownlinkMessage) (udp.Packet, error) {
+func (d dummyExtracter) TxPacket(downlink ttnpb.DownlinkMessage) (udp.Packet, error) {
 	return udp.Packet{}, nil
 }
-func (d dummyConverter) TxPacketAck(p udp.TxPacketAck) (ttnpb.UplinkMessage, error) {
+func (d dummyExtracter) TxPacketAck(p udp.TxPacketAck) (ttnpb.UplinkMessage, error) {
 	return ttnpb.UplinkMessage{}, nil
 }
 
@@ -57,7 +57,7 @@ func Example() {
 				}
 				// Handle the data
 				for _, packet := range packet.Data.RxPacket {
-					uplink, err := converter.RxPacket(*packet)
+					uplink, err := extracter.RxPacket(*packet)
 					if err != nil {
 						continue
 					}
@@ -65,7 +65,7 @@ func Example() {
 					Forward(uplink)
 				}
 				if packet.Data.Stat != nil {
-					status, err := converter.Status(*packet.Data.Stat)
+					status, err := extracter.Status(*packet.Data.Stat)
 					if err != nil {
 						continue
 					}
@@ -75,7 +75,7 @@ func Example() {
 			case udp.TxAck:
 				// Handle the data
 				if packet.Data.TxPacketAck != nil {
-					txInfo, err := converter.TxPacketAck(*packet.Data.TxPacketAck)
+					txInfo, err := extracter.TxPacketAck(*packet.Data.TxPacketAck)
 					if err != nil {
 						continue
 					}
@@ -88,7 +88,7 @@ func Example() {
 
 	go func() {
 		time.Sleep(10 * time.Second)
-		packet, err := converter.TxPacket(downlink)
+		packet, err := extracter.TxPacket(downlink)
 		if err != nil {
 			fmt.Println("Couldn't convert TX packet")
 			return
