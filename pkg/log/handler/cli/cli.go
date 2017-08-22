@@ -24,11 +24,11 @@ const (
 
 // Colors mapping.
 var Colors = [...]int{
-	log.Debug: gray,
-	log.Info:  blue,
-	log.Warn:  yellow,
-	log.Error: red,
-	log.Fatal: red,
+	log.DebugLevel: gray,
+	log.InfoLevel:  blue,
+	log.WarnLevel:  yellow,
+	log.ErrorLevel: red,
+	log.FatalLevel: red,
 }
 
 // Handler implementation.

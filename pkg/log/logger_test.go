@@ -31,7 +31,7 @@ func TestLogger(t *testing.T) {
 
 	rec := newRecorder()
 	logger := &Logger{
-		Level:   Info,
+		Level:   InfoLevel,
 		Handler: rec,
 	}
 

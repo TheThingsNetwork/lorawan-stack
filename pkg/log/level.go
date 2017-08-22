@@ -16,36 +16,36 @@ const (
 	// invalid is an invalid log level
 	invalid Level = iota
 
-	// Debug is the log level for debug messages, usually turned of in production.
-	Debug
+	// DebugLevel is the log level for debug messages, usually turned of in production.
+	DebugLevel
 
-	// Info is the log level for informational messages.
-	Info
+	// InfoLevel is the log level for informational messages.
+	InfoLevel
 
 	// Warn is the log level for warnings.
 	// Warnings are more important than info but do not need individual human review.
-	Warn
+	WarnLevel
 
 	// Error is the log level for high priority error messages.
 	// When everything is running smoothly, an application should not be logging error level messages.
-	Error
+	ErrorLevel
 
 	// Fatal the log level for unrecoverable errors.
-	Fatal
+	FatalLevel
 )
 
 // String implements fmt.Stringer.
 func (l Level) String() string {
 	switch l {
-	case Debug:
+	case DebugLevel:
 		return "debug"
-	case Info:
+	case InfoLevel:
 		return "info"
-	case Warn:
+	case WarnLevel:
 		return "warn"
-	case Error:
+	case ErrorLevel:
 		return "error"
-	case Fatal:
+	case FatalLevel:
 		return "fatal"
 	default:
 		return "invalid"
@@ -56,15 +56,15 @@ func (l Level) String() string {
 func ParseLevel(str string) (Level, error) {
 	switch strings.ToLower(str) {
 	case "debug":
-		return Debug, nil
+		return DebugLevel, nil
 	case "info":
-		return Info, nil
+		return InfoLevel, nil
 	case "warn":
-		return Warn, nil
+		return WarnLevel, nil
 	case "error":
-		return Error, nil
+		return ErrorLevel, nil
 	case "fatal":
-		return Fatal, nil
+		return FatalLevel, nil
 	default:
 		return invalid, ErrInvalidLevel
 	}

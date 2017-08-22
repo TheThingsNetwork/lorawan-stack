@@ -7,7 +7,7 @@ import (
 )
 
 var defaultOptions = []Option{
-	WithLevel(Info),
+	WithLevel(InfoLevel),
 	WithHandler(NoopHandler),
 }
 
@@ -32,27 +32,27 @@ type Logger struct {
 
 // Debug implements log.Interface.
 func (l *Logger) Debug(msg string) {
-	l.entry().commit(Debug, msg)
+	l.entry().commit(DebugLevel, msg)
 }
 
 // Info implements log.Interface.
 func (l *Logger) Info(msg string) {
-	l.entry().commit(Info, msg)
+	l.entry().commit(InfoLevel, msg)
 }
 
 // Warn implements log.Interface.
 func (l *Logger) Warn(msg string) {
-	l.entry().commit(Warn, msg)
+	l.entry().commit(WarnLevel, msg)
 }
 
 // Error implements log.Interface.
 func (l *Logger) Error(msg string) {
-	l.entry().commit(Error, msg)
+	l.entry().commit(ErrorLevel, msg)
 }
 
 // Fatal implements log.Interface.
 func (l *Logger) Fatal(msg string) {
-	l.entry().commit(Fatal, msg)
+	l.entry().commit(FatalLevel, msg)
 }
 
 // Debugf implements log.Interface.

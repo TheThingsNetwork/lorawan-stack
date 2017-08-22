@@ -11,7 +11,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-var levels = []Level{Debug, Info, Warn, Error, Fatal}
+var levels = []Level{DebugLevel, InfoLevel, WarnLevel, ErrorLevel, FatalLevel}
 
 type o struct {
 	Level Level `json:"level"`
@@ -40,14 +40,14 @@ func TestLevelParse(t *testing.T) {
 func TestLevelOrder(t *testing.T) {
 	a := assertions.New(t)
 
-	a.So(Info > Debug, should.BeTrue)
-	a.So(Warn > Info, should.BeTrue)
+	a.So(InfoLevel > DebugLevel, should.BeTrue)
+	a.So(WarnLevel > InfoLevel, should.BeTrue)
 
 	for _, level := range levels {
-		a.So(level >= Debug, should.BeTrue)
-		a.So(level <= Fatal, should.BeTrue)
-		a.So(level < Debug, should.BeFalse)
-		a.So(level > Fatal, should.BeFalse)
+		a.So(level >= DebugLevel, should.BeTrue)
+		a.So(level <= FatalLevel, should.BeTrue)
+		a.So(level < DebugLevel, should.BeFalse)
+		a.So(level > FatalLevel, should.BeFalse)
 		a.So(level != invalid, should.BeTrue)
 	}
 }

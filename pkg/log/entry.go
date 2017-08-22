@@ -62,34 +62,34 @@ func (e *entry) commit(level Level, msg string) {
 	}
 
 	// exit with fatal log level
-	if level >= Fatal {
+	if level >= FatalLevel {
 		os.Exit(1)
 	}
 }
 
 // Debug implements log.Interface.
 func (e *entry) Debug(msg string) {
-	e.commit(Debug, msg)
+	e.commit(DebugLevel, msg)
 }
 
 // Info implements log.Interface.
 func (e *entry) Info(msg string) {
-	e.commit(Info, msg)
+	e.commit(InfoLevel, msg)
 }
 
 // Warn implements log.Interface.
 func (e *entry) Warn(msg string) {
-	e.commit(Warn, msg)
+	e.commit(WarnLevel, msg)
 }
 
 // Error implements log.Interface.
 func (e *entry) Error(msg string) {
-	e.commit(Error, msg)
+	e.commit(ErrorLevel, msg)
 }
 
 // Fatal implements log.Interface.
 func (e *entry) Fatal(msg string) {
-	e.commit(Fatal, msg)
+	e.commit(FatalLevel, msg)
 }
 
 // Debugf implements log.Interface.

@@ -75,7 +75,7 @@ func TestHandlerHandleLog(t *testing.T) {
 
 	err := handler.HandleLog(&test.Entry{
 		M: "Foo",
-		L: log.Debug,
+		L: log.DebugLevel,
 		T: time.Now(),
 		F: log.Fields("a", 10, "b", "bar", "c", false, "d", 33.4),
 	})

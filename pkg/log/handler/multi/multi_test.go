@@ -44,7 +44,7 @@ func Test(t *testing.T) {
 		message: "foo",
 		fields:  log.Fields(),
 		time:    time.Now(),
-		level:   log.Debug,
+		level:   log.DebugLevel,
 	})
 
 	a.So(err, assertions.ShouldBeNil)
