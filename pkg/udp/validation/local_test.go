@@ -1,3 +1,5 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
 package validation
 
 import (
@@ -25,11 +27,20 @@ func TestInvalidInMemory(t *testing.T) {
 		GatewayEUI:  eui,
 	}
 
+	ip3 := &net.UDPAddr{IP: net.IP("8.8.8.8")}
+	udpPacket3 := udp.Packet{
+		GatewayAddr: ip3,
+		GatewayEUI:  eui,
+	}
+
 	if v.Valid(udpPacket1) == false {
 		t.Error("First packet should be valid")
 	}
 	if v.Valid(udpPacket2) == true {
 		t.Error("Second packet with the same EUI should be invalid")
+	}
+	if v.Valid(udpPacket3) == false {
+		t.Error("Third packet should be valid, since it has the same IP as the first packet")
 	}
 }
 func TestValidInMemory(t *testing.T) {
