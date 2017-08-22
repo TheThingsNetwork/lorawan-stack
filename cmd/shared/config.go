@@ -15,7 +15,10 @@ var DefaultTLSConfig = config.TLS{
 
 // DefaultIdentityConfig is the default Identity config
 var DefaultIdentityConfig = config.Identity{
-	Servers: map[string]string{"ttn-account-v2": "https://account.thethingsnetwork.org"},
+	Servers: map[string]string{
+		"ttn-account-v2":  "https://account.thethingsnetwork.org",
+		"ttn-identity-v3": "https://identity.thethingsnetwork.org",
+	},
 }
 
 // DefaultGRPCConfig is the default config for GRPC.
