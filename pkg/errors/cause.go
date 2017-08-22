@@ -12,7 +12,12 @@ type Causer interface {
 }
 
 // Cause returns the cause of an error
-func Cause(err Error) error {
+func Cause(e error) error {
+	err, ok := e.(Error)
+	if !ok {
+		return e
+	}
+
 	attributes := err.Attributes()
 	if attributes == nil {
 		return nil

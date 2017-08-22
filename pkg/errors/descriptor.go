@@ -47,6 +47,18 @@ func (err *ErrDescriptor) New(attributes Attributes) Error {
 	}
 }
 
+// New creates a new error based on the error descriptor and adds a cause
+func (err *ErrDescriptor) NewWithCause(attributes Attributes, cause error) Error {
+	attr := make(map[string]interface{}, len(attributes)+1)
+	for k, v := range attributes {
+		attr[k] = v
+	}
+
+	attr[causeKey] = cause
+
+	return err.New(attr)
+}
+
 // Register registers the descriptor
 func (err *ErrDescriptor) Register() {
 	Register(err)

@@ -43,3 +43,15 @@ func New(text string) Error {
 		typ:     Unknown,
 	}
 }
+
+// New returns an "unknown" error with the given text and a given cause
+func NewWithCause(text string, cause error) Error {
+	return &Impl{
+		message: text,
+		code:    NoCode,
+		typ:     Unknown,
+		attributes: Attributes{
+			causeKey: cause,
+		},
+	}
+}
