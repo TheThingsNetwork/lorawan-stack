@@ -15,13 +15,15 @@ func TestStaticStore(t *testing.T) {
 	a := assertions.New(t)
 
 	addr := &net.UDPAddr{
-		IP: net.IP("8.8.8.8"),
+		IP:   net.IP("8.8.8.8"),
+		Port: 1700,
 	}
 	staticStore := StaticStore(addr)
 	eui := types.EUI64([8]byte{1, 2, 3, 4, 5, 6, 7, 8})
 
 	staticStore.Set(eui, &net.UDPAddr{
-		IP: net.IP("8.8.2.2"),
+		IP:   net.IP("8.8.2.2"),
+		Port: 1701,
 	})
 
 	newAddr, found := staticStore.Get(eui)

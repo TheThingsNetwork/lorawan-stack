@@ -10,8 +10,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 )
 
-// DefaultWaitDuration is the recommended duration to block the IP
-// of the gateway.
+// DefaultWaitDuration is the recommended duration to block the IP of the gateway.
 const DefaultWaitDuration = time.Hour
 
 type footprint struct {

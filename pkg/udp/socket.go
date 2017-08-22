@@ -77,10 +77,10 @@ func (c *Conn) Read() (*Packet, error) {
 	}
 }
 
-// Send sends a packet. It returns ErrGatewayNotConnected if the gateway was
+// Write sends a packet. It returns ErrGatewayNotConnected if the gateway was
 // never connected, and otherwise, returns the result of the marshalling and
 // socket operation.
-func (c *Conn) Send(packet *Packet) error {
+func (c *Conn) Write(packet *Packet) error {
 	buf, err := packet.MarshalBinary()
 	if err != nil {
 		return err

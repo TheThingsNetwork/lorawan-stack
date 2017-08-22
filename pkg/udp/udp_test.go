@@ -13,22 +13,22 @@ import (
 var (
 	downlink ttnpb.DownlinkMessage
 
-	extracter    = dummyExtracter{}
+	extracter    = dummyExtractor{}
 	gatewayStore = udp.NewGatewayStore(udp.DefaultWaitDuration)
 )
 
-type dummyExtracter struct{}
+type dummyExtractor struct{}
 
-func (d dummyExtracter) RxPacket(p udp.RxPacket) (ttnpb.UplinkMessage, error) {
+func (d dummyExtractor) RxPacket(p udp.RxPacket) (ttnpb.UplinkMessage, error) {
 	return ttnpb.UplinkMessage{}, nil
 }
-func (d dummyExtracter) Status(p udp.Stat) (ttnpb.GatewayStatus, error) {
+func (d dummyExtractor) Status(p udp.Stat) (ttnpb.GatewayStatus, error) {
 	return ttnpb.GatewayStatus{}, nil
 }
-func (d dummyExtracter) TxPacket(downlink ttnpb.DownlinkMessage) (udp.Packet, error) {
+func (d dummyExtractor) TxPacket(downlink ttnpb.DownlinkMessage) (udp.Packet, error) {
 	return udp.Packet{}, nil
 }
-func (d dummyExtracter) TxPacketAck(p udp.TxPacketAck) (ttnpb.UplinkMessage, error) {
+func (d dummyExtractor) TxPacketAck(p udp.TxPacketAck) (ttnpb.UplinkMessage, error) {
 	return ttnpb.UplinkMessage{}, nil
 }
 
@@ -94,7 +94,7 @@ func Example() {
 			return
 		}
 
-		if err := conn.Send(&packet); err != nil {
+		if err := conn.Write(&packet); err != nil {
 			fmt.Println("Error when sending downlink: ", err)
 		}
 	}()
