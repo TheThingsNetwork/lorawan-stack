@@ -102,7 +102,7 @@ func (s *GatewayStore) ValidUplink(packet Packet) bool {
 		return true
 	}
 
-	if packet.GatewayAddr.String() == footprint.UplinkAddress.String() {
+	if footprint.UplinkAddress == nil || packet.GatewayAddr.String() == footprint.UplinkAddress.String() {
 		return true
 	}
 	if footprint.UplinkLastSeen.Add(s.duration).Before(time.Now()) {
@@ -124,7 +124,7 @@ func (s *GatewayStore) ValidDownlink(packet Packet) bool {
 		return true
 	}
 
-	if packet.GatewayAddr.String() == footprint.DownlinkAddress.String() {
+	if footprint.DownlinkAddress == nil || packet.GatewayAddr.String() == footprint.DownlinkAddress.String() {
 		return true
 	}
 	if footprint.DownlinkLastSeen.Add(s.duration).Before(time.Now()) {
