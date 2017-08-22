@@ -4,11 +4,12 @@ package log
 
 import (
 	"fmt"
+	"os"
 )
 
 var defaultOptions = []Option{
 	WithLevel(InfoLevel),
-	WithHandler(NoopHandler),
+	WithHandler(NewCLI(os.Stdout)),
 }
 
 // NewLogger creates a new logger with the default options.

@@ -1,6 +1,6 @@
 // Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package cli
+package log
 
 import (
 	"fmt"
@@ -9,8 +9,6 @@ import (
 	"sort"
 	"strings"
 	"sync"
-
-	"github.com/TheThingsNetwork/ttn/pkg/log"
 )
 
 const (
@@ -24,26 +22,26 @@ const (
 
 // Colors mapping.
 var Colors = [...]int{
-	log.DebugLevel: gray,
-	log.InfoLevel:  blue,
-	log.WarnLevel:  yellow,
-	log.ErrorLevel: red,
-	log.FatalLevel: red,
+	DebugLevel: gray,
+	InfoLevel:  blue,
+	WarnLevel:  yellow,
+	ErrorLevel: red,
+	FatalLevel: red,
 }
 
-// Handler implementation.
-type Handler struct {
+// CLIHandler implements Handler.
+type CLIHandler struct {
 	mu       sync.Mutex
 	Writer   io.Writer
 	UseColor bool
 }
 
-// Option is the type of options for the Handler.
-type Option func(*Handler)
+// CLIHandlerOption is the type of options for the CLIHandler.
+type CLIHandlerOption func(*CLIHandler)
 
 // UseColor is a functional option with which you can force the usage of colors on or off.
-func UseColor(arg bool) Option {
-	return func(handler *Handler) {
+func UseColor(arg bool) CLIHandlerOption {
+	return func(handler *CLIHandler) {
 		handler.UseColor = arg
 	}
 }
@@ -58,7 +56,7 @@ var colorTerms = []string{
 // If set, colors will be enabled in these cases:
 // - COLORTERM is set and has a value different from 0
 // - TERM contains the substring "xterm" or "color" and COLORTERM is not 0
-var ColorFromTerm = func(handler *Handler) {
+var ColorFromTerm = func(handler *CLIHandler) {
 	COLORTERM := os.Getenv("COLORTERM")
 	TERM := os.Getenv("TERM")
 
@@ -76,27 +74,27 @@ var ColorFromTerm = func(handler *Handler) {
 	handler.UseColor = color
 }
 
-// defaultOptions are the default options for the handler.
-var defaultOptions = []Option{
+// defaultCLIOptions are the default options for the handler.
+var defaultCLIOptions = []CLIHandlerOption{
 	ColorFromTerm,
 }
 
-// New returns a new handler.
-func New(w io.Writer, opts ...Option) *Handler {
-	handler := &Handler{
+// NewCLI returns a new CLIHandler.
+func NewCLI(w io.Writer, opts ...CLIHandlerOption) *CLIHandler {
+	handler := &CLIHandler{
 		Writer:   w,
 		UseColor: false,
 	}
 
-	for _, opt := range append(defaultOptions, opts...) {
+	for _, opt := range append(defaultCLIOptions, opts...) {
 		opt(handler)
 	}
 
 	return handler
 }
 
-// HandleLog implements log.Handler.
-func (h *Handler) HandleLog(e log.Entry) error {
+// HandleLog implements Handler.
+func (h *CLIHandler) HandleLog(e Entry) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
