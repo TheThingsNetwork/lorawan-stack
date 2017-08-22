@@ -10,7 +10,7 @@ import (
 )
 
 // Listen on a port
-func Listen(addr string) (*Conn, error) {
+func Listen(addr string, validator Validator) (*Conn, error) {
 	udpAddr, err := net.ResolveUDPAddr("udp", addr)
 	if err != nil {
 		return nil, err
@@ -19,7 +19,11 @@ func Listen(addr string) (*Conn, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Conn{gatewayAddr: make(map[types.EUI64]net.UDPAddr), UDPConn: conn}, nil
+	return &Conn{
+		gatewayAddr: make(map[types.EUI64]net.UDPAddr),
+		UDPConn:     conn,
+		validator:   validator,
+	}, nil
 }
 
 // Conn wraps the net.UDPConn
@@ -27,20 +31,36 @@ type Conn struct {
 	buf [65507]byte
 	*net.UDPConn
 	gatewayAddr map[types.EUI64]net.UDPAddr
+	validator   Validator
 }
 
-// Read a packet from the conn
+// Read a packet from the conn. The poll system ignores UDP packets that are not
+// compliant to the Semtech network protocol, and only returns once a valid
+// Semtech-protocol packet has been received, or that there was an error when
+// interacting with the socket.
 func (c *Conn) Read() (*Packet, error) {
-	n, addr, err := c.UDPConn.ReadFromUDP(c.buf[:])
-	if err != nil {
-		return nil, err
+	for {
+		n, addr, err := c.UDPConn.ReadFromUDP(c.buf[:])
+		if err != nil {
+			return nil, err
+		}
+
+		packet := &Packet{
+			GatewayConn: c,
+			GatewayAddr: addr,
+		}
+
+		err = packet.UnmarshalBinary(c.buf[:n])
+		if err != nil {
+			continue
+		}
+
+		if !c.validator.Valid(*packet) {
+			continue
+		}
+
+		return packet, nil
 	}
-	packet := &Packet{
-		GatewayConn: c,
-		GatewayAddr: addr,
-	}
-	err = packet.UnmarshalBinary(c.buf[:n])
-	return packet, err
 }
 
 // WriteTo writes a packet to the conn
