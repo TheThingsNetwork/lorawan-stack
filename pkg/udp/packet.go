@@ -118,6 +118,10 @@ func (p *Packet) UnmarshalBinary(b []byte) (err error) {
 	i := 4 // keep track of our position in the slice
 
 	if p.PacketType.HasGatewayEUI() {
+		if len(b) < i+8 {
+			return errors.New("Packet is not long enough to contain the gateway EUI")
+		}
+
 		p.GatewayEUI = new(types.EUI64)
 		err = p.GatewayEUI.UnmarshalBinary(b[i : i+8])
 		if err != nil {
