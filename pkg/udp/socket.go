@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/TheThingsNetwork/ttn/pkg/types"
+	"github.com/pkg/errors"
 )
 
 // Listen on a port
@@ -49,5 +50,28 @@ func (c *Conn) WriteTo(packet *Packet, addr net.Addr) error {
 		return err
 	}
 	_, err = c.UDPConn.WriteTo(buf, addr)
+	return err
+}
+
+// Ack sends the corresponding Ack back to the gateway
+func (p *Packet) Ack() error {
+	if p.GatewayConn == nil || p.GatewayAddr == nil {
+		return errors.New("No gateway connection associated to this packet")
+	}
+
+	ackPacket, err := p.BuildAck()
+	if err != nil {
+		return errors.Wrap(err, "failed to build ack package")
+	}
+	if ackPacket == nil {
+		return nil
+	}
+
+	binaryAckPacket, err := ackPacket.MarshalBinary()
+	if err != nil {
+		return errors.Wrap(err, "failed to convert ack packet to binary format")
+	}
+
+	_, err = p.GatewayConn.WriteToUDP(binaryAckPacket, p.GatewayAddr)
 	return err
 }

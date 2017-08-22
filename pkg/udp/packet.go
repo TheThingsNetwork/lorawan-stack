@@ -8,7 +8,6 @@ import (
 	"net"
 
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/pkg/errors"
 )
@@ -84,8 +83,9 @@ type Packet struct {
 	GatewayConn *Conn
 }
 
-// Ack sends the corresponding Ack back to the gateway
-func (p Packet) Ack() error {
+// BuildAck builds the corresponding Ack back to the gateway. If the received packet
+// does not require an Ack, the function returns nil without an error.
+func (p Packet) BuildAck() (*Packet, error) {
 	ack := Packet{
 		ProtocolVersion: p.ProtocolVersion,
 		Token:           p.Token,
@@ -96,14 +96,10 @@ func (p Packet) Ack() error {
 	case PullData:
 		ack.PacketType = PullAck
 	default:
-		return nil
+		return nil, nil
 	}
-	bytes, err := ack.MarshalBinary()
-	if err != nil {
-		return err
-	}
-	_, err = p.GatewayConn.WriteToUDP(bytes, p.GatewayAddr)
-	return err
+
+	return &ack, nil
 }
 
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler
