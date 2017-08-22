@@ -47,11 +47,6 @@ func (err *ErrDescriptor) New(attributes Attributes) Error {
 	}
 }
 
-// New creates a new Error from a descriptor and some attributes
-func New(descriptor *ErrDescriptor, attributes Attributes) Error {
-	return descriptor.New(attributes)
-}
-
 // Register registers the descriptor
 func (err *ErrDescriptor) Register() {
 	Register(err)

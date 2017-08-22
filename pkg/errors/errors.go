@@ -34,3 +34,12 @@ type Error interface {
 
 // Attributes is a map of attributes
 type Attributes map[string]interface{}
+
+// New returns an "unknown" error with the given text
+func New(text string) Error {
+	return &Impl{
+		message: text,
+		code:    NoCode,
+		typ:     Unknown,
+	}
+}
