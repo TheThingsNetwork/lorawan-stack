@@ -4,6 +4,8 @@ package udp
 
 import (
 	"net"
+
+	"github.com/TheThingsNetwork/ttn/pkg/types"
 )
 
 // Listen on a port
@@ -16,13 +18,14 @@ func Listen(addr string) (*Conn, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Conn{UDPConn: conn}, nil
+	return &Conn{gatewayAddr: make(map[types.EUI64]net.UDPAddr), UDPConn: conn}, nil
 }
 
 // Conn wraps the net.UDPConn
 type Conn struct {
 	buf [65507]byte
 	*net.UDPConn
+	gatewayAddr map[types.EUI64]net.UDPAddr
 }
 
 // Read a packet from the conn
