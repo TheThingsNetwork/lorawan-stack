@@ -29,6 +29,9 @@ type config struct {
 
 	// HashKey is used to authenticate the cookie value using HMAC
 	HashKey []byte
+
+	// Renderer is the renderer that will be used
+	Renderer echo.Renderer
 }
 
 // Server is the server
@@ -67,6 +70,7 @@ func New(logger log.Interface, opts ...Option) *Server {
 
 	server.Logger = &noopLogger{}
 	server.HTTPErrorHandler = ErrorHandler
+	server.Renderer = cfg.Renderer
 
 	server.Use(
 		middleware.Log(logger),
@@ -131,6 +135,13 @@ func WithCookieSecrets(hash []byte, block []byte) Option {
 	return func(c *config) {
 		c.BlockKey = block
 		c.HashKey = hash
+	}
+}
+
+// WithRenderer sets the renderer.
+func WithRenderer(renderer echo.Renderer) Option {
+	return func(c *config) {
+		c.Renderer = renderer
 	}
 }
 

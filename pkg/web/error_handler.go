@@ -46,7 +46,9 @@ func ErrorHandler(err error, c echo.Context) {
 	case "application/json", "text/event-stream":
 		renderError = c.JSON(httpe.Code, body)
 	case "text/html":
-		renderError = c.Render(httpe.Code, "index", body)
+		renderError = c.Render(httpe.Code, "index.html", map[string]interface{}{
+			"error": body,
+		})
 	default:
 		renderError = c.String(httpe.Code, fmt.Sprintf("%v %s\n", body.Status, body.Description))
 	}
