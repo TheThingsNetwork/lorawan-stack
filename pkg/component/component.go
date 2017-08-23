@@ -124,8 +124,12 @@ func (c *Component) listenHTTPS() error {
 	cert := c.config.TLS.Certificate
 	key := c.config.TLS.Key
 
-	if addr == "" || cert == "" || key == "" {
+	if addr == "" {
 		return nil
+	}
+
+	if cert == "" || key == "" {
+		return fmt.Errorf("Cannot set up HTTPS server without certificate and key")
 	}
 
 	listener, err := c.listenTLS(addr, cert, key)
@@ -173,8 +177,12 @@ func (c *Component) listenGRPCS() error {
 	cert := c.config.TLS.Certificate
 	key := c.config.TLS.Key
 
-	if addr == "" || cert == "" || key == "" {
+	if addr == "" {
 		return nil
+	}
+
+	if cert == "" || key == "" {
+		return fmt.Errorf("Cannot set up HTTPS server without certificate and key")
 	}
 
 	listener, err := c.listenTLS(addr, cert, key)
