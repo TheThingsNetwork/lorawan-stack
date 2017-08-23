@@ -83,8 +83,7 @@ type Packet struct {
 	GatewayConn *Conn
 }
 
-// BuildAck builds the corresponding Ack back to the gateway. If the received packet
-// does not require an Ack, the function returns nil without an error.
+// BuildAck builds the corresponding Ack back to the gateway. If the received packet does not require an Ack, the function returns nil without an error.
 func (p Packet) BuildAck() (*Packet, error) {
 	ack := Packet{
 		ProtocolVersion: p.ProtocolVersion,
@@ -153,12 +152,9 @@ func (p Packet) MarshalBinary() ([]byte, error) {
 	return b, nil
 }
 
-// Extractor is an interface representing objects capable of transforming packets between the
-// Semtech structures format, and the TTN protobuf format.
+// Extractor is an interface representing objects capable of transforming packets between the Semtech structures format, and the TTN protobuf format.
 //
-// The TTN representation of those objects requires information from foreign actors, such as
-// the UplinkMessage.TxSettings.DataRateIndex value - implementation of this Extracter should
-// thus depend on the context of use.
+// The TTN representation of those objects requires information from foreign actors, such as the UplinkMessage.TxSettings.DataRateIndex value - implementation of this Extracter should thus depend on the context of use.
 type Extractor interface {
 	RxPacket(p RxPacket) (ttnpb.UplinkMessage, error)
 	Status(p Stat) (ttnpb.GatewayStatus, error)

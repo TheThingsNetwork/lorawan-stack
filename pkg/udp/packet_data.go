@@ -2,6 +2,7 @@
 
 package udp
 
+// Data contains a LoRaWAN packet
 type Data struct {
 	RxPacket    []*RxPacket  `json:"rxpk,omitempty"`
 	Stat        *Stat        `json:"stat,omitempty"`
@@ -9,6 +10,7 @@ type Data struct {
 	TxPacketAck *TxPacketAck `json:"txpk_ack,omitempty"`
 }
 
+// RxPacket contains a RX message
 type RxPacket struct {
 	Time CompactTime `json:"time"` // UTC time of pkt RX, us precision, ISO 8601 'compact' format
 	Tmms uint64      `json:"tmms"` // GPS time of pkt RX, number of milliseconds since 06.Jan.1980
@@ -41,6 +43,7 @@ type RSig struct {
 	FOff   int32   `json:"foff"`   // Frequency offset in Hz [-125kHz..+125Khz] (Optional)
 }
 
+// TxPacket contains a TX message
 type TxPacket struct {
 	Imme bool         `json:"imme"`           // Send packet immediately (will ignore tmst & time)
 	Tmst uint32       `json:"tmst,omitempty"` // Send packet on a certain timestamp value (will ignore time)
@@ -62,6 +65,7 @@ type TxPacket struct {
 	Data string       `json:"data"`           // Base64 encoded RF packet payload, padding optional
 }
 
+// Stat contains a status message
 type Stat struct {
 	Time ExpandedTime `json:"time"` // UTC 'system' time of the gateway, ISO 8601 'expanded' format (e.g 2014-01-12 08:59:28 GMT)
 	Boot ExpandedTime `json:"boot"` // UTC 'boot' time of the gateway, ISO 8601 'expanded' format (e.g 2014-01-12 08:59:28 GMT)
@@ -106,6 +110,7 @@ var (
 	TxErrGPSUnlocked TxError = "GPS_UNLOCKED"
 )
 
+// TxPacketAck contains a TX acknowledgment packet
 type TxPacketAck struct {
 	Error TxError `json:"error"`
 }

@@ -20,19 +20,10 @@ type footprint struct {
 	UplinkLastSeen   time.Time
 }
 
-// GatewayStore is a multithread-safe structure that
-// implements two interfaces:
+// GatewayStore is a goroutine-safe structure that implements two interfaces:
 //
-// - It is a Validator that keeps track in-memory of a
-// gateway's IP. It is fast and lightweight, but doesn't store
-// the data persistently. When a gateway sends a packet, this validator
-// blocks the gateway to this IP for <duration>. If a packet is sent
-// with the same gateway EUI but from another IP before this duration,
-// it is considered invalid.
-// The duration parameter to the constructor is the time.Duration to wait
-// before a gateway's location expires.
-// The Valid function returns true if the gateway has a valid EUI, a valid
-// IP address, and that if there is a new IP, there has been no message
+// - It is a Validator that keeps track in-memory of a gateway's IP. It is fast and lightweight, but doesn't store the data persistently. When a gateway sends a packet, this validator blocks the gateway to this IP for <duration>. If a packet is sent with the same gateway EUI but from another IP
+// before this duration, it is considered invalid. The duration parameter to the constructor is the time.Duration to wait before a gateway's location expires. The Valid function returns true if the gateway has a valid EUI, a valid IP address, and that if there is a new IP, there has been no message
 // since <duration>.
 //
 // - It is an AddressStore, storing the last IP seen in memory.
