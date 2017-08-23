@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	referenceCommand = &cobra.Command{
-		Use:   "reference",
+	startCommand = &cobra.Command{
+		Use:   "start",
 		Short: "Start the reference component",
 		Run: func(cmd *cobra.Command, args []string) {
 			cfg := new(component.Config)
@@ -30,8 +30,10 @@ var (
 )
 
 func init() {
-	Root.AddCommand(referenceCommand)
-	referenceCommand.PersistentFlags().AddFlagSet(config.WithConfig(&component.Config{
+	Root.AddCommand(startCommand)
+
+	// add config flags and defaults for the start sub command
+	startCommand.Flags().AddFlagSet(config.WithConfig(&component.Config{
 		ServiceBase: shared.DefaultServiceBase,
 	}))
 }
