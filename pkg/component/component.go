@@ -9,11 +9,11 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-
-	"google.golang.org/grpc"
+	"syscall"
 
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
+	"google.golang.org/grpc"
 )
 
 // Config is the type of configuration for Components
@@ -53,7 +53,7 @@ func (c *Component) Start() error {
 
 	defer c.Close()
 
-	signal.Notify(signals, os.Interrupt)
+	signal.Notify(signals, os.Interrupt, os.Kill, syscall.SIGTERM)
 
 	go func() { errors <- c.listenHTTP() }()
 	go func() { errors <- c.listenHTTPS() }()
