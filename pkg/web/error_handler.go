@@ -29,32 +29,34 @@ var (
 
 // ErrorHandler is an echo.HTTPErrorHandler and renders them based
 // on the accept header of the request.
-func ErrorHandler(err error, c echo.Context) {
-	httpe := HTTPFromError(err)
+func ErrorHandler(template string) echo.HTTPErrorHandler {
+	return func(err error, c echo.Context) {
+		httpe := HTTPFromError(err)
 
-	body := &HTTPErrorBody{
-		Status:      httpe.Code,
-		Description: fmt.Sprintf("%s", httpe.Message),
-	}
+		body := &HTTPErrorBody{
+			Status:      httpe.Code,
+			Description: fmt.Sprintf("%s", httpe.Message),
+		}
 
-	if c.Response().Committed {
-		return
-	}
+		if c.Response().Committed {
+			return
+		}
 
-	var renderError error
-	switch httputil.NegotiateContentType(c.Request(), offers, defaultType) {
-	case "application/json", "text/event-stream":
-		renderError = c.JSON(httpe.Code, body)
-	case "text/html":
-		renderError = c.Render(httpe.Code, "index.html", map[string]interface{}{
-			"error": body,
-		})
-	default:
-		renderError = c.String(httpe.Code, fmt.Sprintf("%v %s\n", body.Status, body.Description))
-	}
+		var renderError error
+		switch httputil.NegotiateContentType(c.Request(), offers, defaultType) {
+		case "application/json", "text/event-stream":
+			renderError = c.JSON(httpe.Code, body)
+		case "text/html":
+			renderError = c.Render(httpe.Code, template, map[string]interface{}{
+				"error": body,
+			})
+		default:
+			renderError = c.String(httpe.Code, fmt.Sprintf("%v %s\n", body.Status, body.Description))
+		}
 
-	if renderError != nil {
-		c.String(httpe.Code, fmt.Sprintf("%v %s\n", body.Status, body.Description))
+		if renderError != nil {
+			c.String(httpe.Code, fmt.Sprintf("%v %s\n", body.Status, body.Description))
+		}
 	}
 }
 

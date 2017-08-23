@@ -32,6 +32,9 @@ type config struct {
 
 	// Renderer is the renderer that will be used
 	Renderer echo.Renderer
+
+	// ErrorTemplate is the name of the template to use for html errors
+	ErrorTemplate string
 }
 
 // Server is the server
@@ -50,6 +53,7 @@ func New(logger log.Interface, opts ...Option) *Server {
 		Root:              "/",
 		Prefix:            "",
 		NormalizationMode: middleware.RedirectPermanent,
+		ErrorTemplate:     "index.html",
 	}
 
 	for _, opt := range opts {
@@ -69,7 +73,7 @@ func New(logger log.Interface, opts ...Option) *Server {
 	server := echo.New()
 
 	server.Logger = &noopLogger{}
-	server.HTTPErrorHandler = ErrorHandler
+	server.HTTPErrorHandler = ErrorHandler(cfg.ErrorTemplate)
 	server.Renderer = cfg.Renderer
 
 	server.Use(
@@ -161,4 +165,19 @@ func (s *Server) Static(prefix string, fs http.FileSystem) {
 // Routes returns the defined routes
 func (s *Server) Routes() []*echo.Route {
 	return s.server.Routes()
+}
+
+// Render returns an echo HandlerFunc that renders the specified template
+// without any data.
+func (s *Server) Render(name string) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		return c.Render(http.StatusOK, name, nil)
+	}
+}
+
+// WithErrorTemplate sets the name of the error template to use for rendering html errors.
+func WithErrorTemplate(name string) Option {
+	return func(c *config) {
+		c.ErrorTemplate = name
+	}
 }
