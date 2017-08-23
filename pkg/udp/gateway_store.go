@@ -36,25 +36,25 @@ type GatewayStore struct {
 // SetUplinkAddress implements AddressStore for GatewayStore.
 func (s *GatewayStore) SetUplinkAddress(eui types.EUI64, addr net.Addr) {
 	s.mu.Lock()
+	defer s.mu.Unlock()
 	newFootprint := footprint{UplinkAddress: addr, UplinkLastSeen: time.Now()}
 	if gwFootprint, found := s.lastSeen[eui]; found {
 		newFootprint.DownlinkAddress = gwFootprint.DownlinkAddress
 		newFootprint.DownlinkLastSeen = gwFootprint.DownlinkLastSeen
 	}
 	s.lastSeen[eui] = newFootprint
-	s.mu.Unlock()
 }
 
 // SetDownlinkAddress implements AddressStore for GatewayStore.
 func (s *GatewayStore) SetDownlinkAddress(eui types.EUI64, addr net.Addr) {
 	s.mu.Lock()
+	defer s.mu.Unlock()
 	newFootprint := footprint{DownlinkAddress: addr, DownlinkLastSeen: time.Now()}
 	if gwFootprint, found := s.lastSeen[eui]; found {
 		newFootprint.UplinkAddress = gwFootprint.UplinkAddress
 		newFootprint.UplinkLastSeen = gwFootprint.UplinkLastSeen
 	}
 	s.lastSeen[eui] = newFootprint
-	s.mu.Unlock()
 }
 
 // GetDownlinkAddress implements AddressStore for GatewayStore.

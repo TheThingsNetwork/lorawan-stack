@@ -19,7 +19,7 @@ func newUDPAddress(ip string, port int) *net.UDPAddr {
 	}
 }
 
-func TestInvalidInMemory(t *testing.T) {
+func TestInvalidUplinkGatewayStore(t *testing.T) {
 	v := NewGatewayStore(DefaultWaitDuration)
 	var eui = new(types.EUI64)
 
@@ -54,10 +54,10 @@ func TestInvalidInMemory(t *testing.T) {
 	a.So(v.ValidUplink(udpPacket1), should.BeTrue)  // First packet should be valid
 	a.So(v.ValidUplink(udpPacket2), should.BeFalse) // Second packet with the same EUI should be invalid, since it has a different IP but the same EUI
 	a.So(v.ValidUplink(udpPacket3), should.BeTrue)  // Third packet should be valid, since it has the same IP as the first packet
-	a.So(v.ValidUplink(udpPacket4), should.BeTrue)  // Fourth packet should be valid, since it has an unset EUI
+	a.So(v.ValidUplink(udpPacket4), should.BeTrue)  // Fourth packet should be valid, since it has an unseen EUI
 }
 
-func TestInvalidInMemoryIPv6(t *testing.T) {
+func TestInvalidIPv6UplinkGatewayStore(t *testing.T) {
 	v := NewGatewayStore(DefaultWaitDuration)
 	var eui = new(types.EUI64)
 	eui2 := types.EUI64([8]byte{1, 2, 3, 4, 5, 6, 7, 8})
@@ -85,21 +85,46 @@ func TestInvalidInMemoryIPv6(t *testing.T) {
 	}
 
 	v.SetUplinkAddress(*eui, ip1)
-	v.SetDownlinkAddress(*eui, ip2)
 
 	a := assertions.New(t)
-	a.So(v.ValidUplink(udpPacket1), should.BeTrue)    // First packet should be valid
-	a.So(v.ValidUplink(udpPacket2), should.BeFalse)   // Second packet with the same EUI should be invalid, since it has a different IP but the same EUI
-	a.So(v.ValidUplink(udpPacket3), should.BeTrue)    // Third packet should be valid, since it has the same IP as the first packet
-	a.So(v.ValidUplink(udpPacket4), should.BeTrue)    // Fourth packet should be valid since not registered
-	a.So(v.ValidDownlink(udpPacket1), should.BeFalse) // First packet should be invalid, since it has a different IP but the same EUI
-	a.So(v.ValidDownlink(udpPacket2), should.BeTrue)  // Second packet with the same EUI should be valid
-	a.So(v.ValidDownlink(udpPacket3), should.BeFalse) // Third packet should be invalid, since it has the same IP as the first packet
-	a.So(v.ValidDownlink(udpPacket4), should.BeTrue)  // Fourth packet should be valid since not registered
+	a.So(v.ValidUplink(udpPacket1), should.BeTrue)  // First packet should be valid
+	a.So(v.ValidUplink(udpPacket2), should.BeFalse) // Second packet with the same EUI should be invalid, since it has a different IP but the same EUI
+	a.So(v.ValidUplink(udpPacket3), should.BeTrue)  // Third packet should be valid, since it has the same IP as the first packet
+	a.So(v.ValidUplink(udpPacket4), should.BeTrue)  // Fourth packet should be valid since not registered
 
 	v.SetUplinkAddress(*eui, ip2)
 
 	a.So(v.ValidUplink(udpPacket2), should.BeTrue) // Second packet with the same EUI should be invalid, since it has a different IP but the same EUI
+}
+
+func TestInvalidIPv6DownlinkGatewayStore(t *testing.T) {
+	v := NewGatewayStore(DefaultWaitDuration)
+	var eui = new(types.EUI64)
+	eui2 := types.EUI64([8]byte{1, 2, 3, 4, 5, 6, 7, 8})
+
+	ip1 := newUDPAddress("2001:0db8:85a3:0000:0000:8a2e:0370:7334", 1700)
+	udpPacket1 := Packet{
+		GatewayAddr: ip1,
+		GatewayEUI:  eui,
+	}
+
+	ip2 := newUDPAddress("0db8:a32e:0890:3a1d:0000:8a2e:0370:7334", 1700)
+	udpPacket2 := Packet{
+		GatewayAddr: ip2,
+		GatewayEUI:  eui,
+	}
+
+	udpPacket3 := Packet{
+		GatewayAddr: ip1,
+		GatewayEUI:  &eui2,
+	}
+
+	v.SetDownlinkAddress(*eui, ip2)
+
+	a := assertions.New(t)
+	a.So(v.ValidDownlink(udpPacket1), should.BeFalse) // First packet should be invalid, since it has a different IP but the same EUI
+	a.So(v.ValidDownlink(udpPacket2), should.BeTrue)  // Second packet with the same EUI should be valid
+	a.So(v.ValidDownlink(udpPacket3), should.BeTrue)  // Third packet should be valid since the EUI is unseen
 }
 
 func TestDataCoherence(t *testing.T) {
@@ -141,7 +166,7 @@ func TestValidInMemory(t *testing.T) {
 	a.So(v.ValidDownlink(udpPacket2), should.BeTrue) // Second packet with the same EUI should be valid, since expiration is set to 0seconds
 }
 
-func TestInvalidPacket(t *testing.T) {
+func TestInvalidUDPPackets(t *testing.T) {
 	v := NewGatewayStore(time.Duration(0))
 	var eui = new(types.EUI64)
 
