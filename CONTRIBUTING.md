@@ -59,6 +59,34 @@ The body may contain a more detailed description of the commit, explaining what 
 
 ## Code
 
+### Formatting
+
+We want our code to be consistent across our projects, so we'll have to agree on a number of formatting rules. These rules should usually usually be applied by your editor. Make sure to install the [editorconfig](https://editorconfig.org) plugin for your editor.
+
+Go code can be automatically formatted using the [`gofmt`](https://golang.org/cmd/gofmt/) tool. There are many editor plugins that call `gofmt` when you save your files.
+
+#### General
+
+We use **utf-8**, **LF** line endings, a **final newline** and we **trim whitespace** from the end of the line (except in Markdown).
+
+#### Tabs vs Spaces
+
+Many developers have strong opinions about using tabs vs spaces. We apply the following rules:
+
+- All `.go` files are indented using **tabs**
+- The `Makefile` and all `.make` files are indented using **tabs**
+- All other files are indented using **two spaces**
+
+#### Line length
+
+- If a line is longer than 80 columns, try to find a "natural" break
+- If a line is longer than 120 columns, insert a line break
+- In very special cases, longer lines are tolerated
+
+### Linting
+
+We use [`golint`](github.com/golang/lint/golint) to lint `.go` files and [`eslint`](https://eslint.org) to lint `.js` and `.vue` files. These tools should automatically be installed when initializing your development environment.
+
 ### Variable naming
 
 Variable names should be short and concise.
