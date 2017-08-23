@@ -7,7 +7,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/spf13/cobra"
-	yaml "gopkg.in/yaml.v1"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type fooConfig struct {
