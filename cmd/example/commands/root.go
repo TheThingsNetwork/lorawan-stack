@@ -9,14 +9,13 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	conf "github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
-	"github.com/TheThingsNetwork/ttn/pkg/log/handler/cli"
 	"github.com/spf13/cobra"
 )
 
 var (
 	name      = "example"
 	config    = conf.InitializeWithDefaults(name, shared.DefaultBaseConfig)
-	logger, _ = log.NewLogger(log.WithLevel(shared.DefaultBaseConfig.Log.Level), log.WithHandler(cli.New(os.Stdout)))
+	logger, _ = log.NewLogger(log.WithLevel(shared.DefaultBaseConfig.Log.Level), log.WithHandler(log.NewCLI(os.Stdout)))
 	Root      = &cobra.Command{
 		Use:   name,
 		Short: "Example program",
