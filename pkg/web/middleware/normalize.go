@@ -42,6 +42,10 @@ func Normalize(mode NormalizationMode) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			u := c.Request().URL.String()
+			if u == "/" || u == "" {
+				return next(c)
+			}
+
 			r := purell.NormalizeURL(c.Request().URL, redirect)
 
 			// check if we need to redirect
