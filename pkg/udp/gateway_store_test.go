@@ -90,7 +90,7 @@ func TestInvalidIPv6UplinkGatewayStore(t *testing.T) {
 	a.So(v.ValidUplink(udpPacket1), should.BeTrue)  // First packet should be valid
 	a.So(v.ValidUplink(udpPacket2), should.BeFalse) // Second packet with the same EUI should be invalid, since it has a different IP but the same EUI
 	a.So(v.ValidUplink(udpPacket3), should.BeTrue)  // Third packet should be valid, since it has the same IP as the first packet
-	a.So(v.ValidUplink(udpPacket4), should.BeTrue)  // Fourth packet should be valid since not registered
+	a.So(v.ValidUplink(udpPacket4), should.BeTrue)  // Fourth packet should be valid since the EUI has not been seen before
 
 	v.SetUplinkAddress(*eui, ip2)
 
