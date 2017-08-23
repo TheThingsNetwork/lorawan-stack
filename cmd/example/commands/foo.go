@@ -40,12 +40,12 @@ func init() {
 	// add the command to the root command
 	Root.AddCommand(fooCommand)
 
-	// add foo-specific config
+	// add foo-specific config definitions and defaults
 	flags := config.WithConfig(&fooConfig{
 		Bar: "baz",
 	})
 
-	fooCommand.PersistentFlags().AddFlagSet(flags)
+	fooCommand.Flags().AddFlagSet(flags)
 }
 
 // printYAML prints the nested config struct.
