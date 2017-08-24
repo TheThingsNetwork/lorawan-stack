@@ -4,10 +4,13 @@
 package rpcserver
 
 import (
+	"context"
 	"math"
 	"time"
 
 	"github.com/TheThingsNetwork/go-utils/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/rpclog"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/sentry"
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
@@ -37,8 +40,12 @@ func init() {
 	rpcPanic.Register()
 }
 
-// New returns a new gRPC server
-func New(options ...grpc.ServerOption) *grpc.Server {
+// New returns a new gRPC server with a set of middlewares.
+// The given context is used in some of the middlewares, the given server options are passed to gRPC
+//
+// Currently the following middlewares are included: tag extraction, Prometheus metrics,
+// logging, sending errors to Sentry, validation, errors, panic recovery
+func New(ctx context.Context, options ...grpc.ServerOption) *grpc.Server {
 	ctxtagsOpts := []grpc_ctxtags.Option{
 		grpc_ctxtags.WithFieldExtractor(nil), // TODO: Extract useful fields from the context or payload
 	}
@@ -57,7 +64,7 @@ func New(options ...grpc.ServerOption) *grpc.Server {
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
 			grpc_ctxtags.StreamServerInterceptor(ctxtagsOpts...),
 			grpc_prometheus.StreamServerInterceptor,
-			// TODO: logger
+			rpclog.StreamServerInterceptor(ctx),
 			sentry.StreamServerInterceptor,
 			grpc_validator.StreamServerInterceptor(),
 
@@ -67,7 +74,7 @@ func New(options ...grpc.ServerOption) *grpc.Server {
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
 			grpc_ctxtags.UnaryServerInterceptor(ctxtagsOpts...),
 			grpc_prometheus.UnaryServerInterceptor,
-			// TODO: logger
+			rpclog.UnaryServerInterceptor(ctx),
 			sentry.UnaryServerInterceptor,
 			grpc_validator.UnaryServerInterceptor(),
 
