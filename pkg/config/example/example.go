@@ -5,11 +5,10 @@ package main
 import (
 	"fmt"
 
-	yaml "gopkg.in/yaml.v1"
-
 	"github.com/TheThingsNetwork/ttn/cmd/shared"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/spf13/cobra"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // Config is the type of configuration

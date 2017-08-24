@@ -120,7 +120,7 @@ go.list-staged: go.list
 go.init:
 	@$(log) "Initializing go"
 	@make go.dev-deps
-	@dep init
+	@make go.deps
 
 INIT_RULES += go.init
 
