@@ -21,7 +21,7 @@ func UnaryServerInterceptor(ctx context.Context, opts ...Option) grpc.UnaryServe
 		resp, err := handler(newCtx, req)
 		code := o.codeFunc(err)
 		level := o.levelFunc(code)
-		entry := log.FromContext(ctx).WithFields(log.Fields(
+		entry := log.FromContext(newCtx).WithFields(log.Fields(
 			"grpc_code", code.String(),
 			"duration", time.Since(startTime),
 		))
@@ -45,7 +45,7 @@ func StreamServerInterceptor(ctx context.Context, opts ...Option) grpc.StreamSer
 		err := handler(srv, wrapped)
 		code := o.codeFunc(err)
 		level := o.levelFunc(code)
-		entry := log.FromContext(ctx).WithFields(log.Fields(
+		entry := log.FromContext(newCtx).WithFields(log.Fields(
 			"grpc_code", code.String(),
 			"duration", time.Since(startTime),
 		))

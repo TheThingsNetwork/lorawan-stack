@@ -20,7 +20,7 @@ func UnaryClientInterceptor(ctx context.Context, opts ...Option) grpc.UnaryClien
 		err := invoker(newCtx, method, req, reply, cc, opts...)
 		code := o.codeFunc(err)
 		level := o.levelFunc(code)
-		entry := log.FromContext(ctx).WithFields(log.Fields(
+		entry := log.FromContext(newCtx).WithFields(log.Fields(
 			"grpc_code", code.String(),
 			"duration", time.Since(startTime),
 		))
@@ -43,7 +43,7 @@ func StreamClientInterceptor(ctx context.Context, opts ...Option) grpc.StreamCli
 		if err != nil {
 			code := o.codeFunc(err)
 			level := o.levelFunc(code)
-			entry := log.FromContext(ctx).WithError(err)
+			entry := log.FromContext(newCtx).WithError(err)
 			commit(entry, level, "Failed streaming call")
 		}
 		if err == nil {
