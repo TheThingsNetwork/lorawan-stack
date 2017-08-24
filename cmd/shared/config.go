@@ -9,8 +9,7 @@ import (
 
 // DefaultBaseConfig is the default base component configuration.
 var DefaultBaseConfig = config.Base{
-	Debug: false,
-	Log:   DefaultLogConfig,
+	Log: DefaultLogConfig,
 }
 
 // DefaultLogConfig is the default log configuration

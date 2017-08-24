@@ -8,7 +8,6 @@ import (
 
 // Base represents base component configuration
 type Base struct {
-	Debug  bool     `name:"debug" description:"Enable debug mode"`
 	Config []string `name:"config" shorthand:"c" description:"Location of the config files"`
 	Log    Log      `name:"log"`
 }
