@@ -79,8 +79,44 @@ make init
 
 #### Folder Structure
 
-_TODO_
+```
+.
+├── CONTRIBUTING.md     guidelines for contributing: branching, commits, code style, etc.
+├── DEVELOPMENT.md      guide for setting up your development environment
+├── Dockerfile          formula for building Docker images
+├── Gopkg.lock          dependency lock file managed by golang/dep
+├── Gopkg.toml          dependency file managed by golang/dep
+├── LICENSE             the license that explains what you're allowed to do with this code
+├── Makefile            dev/test/build tooling
+├── README.md           general information about this project
+│   ...
+├── api                 contains the protocol buffer definitions for our API
+├── cmd                 contains the different binaries that form the TTN stack
+│   ├── shared          contains configuration that is shared between the different binaries
+│   │   ...
+│   └── ttn-stack       bundles the binaries that form the TTN stack
+├── config
+├── doc
+├── pkg                 contains all libraries used in the TTN stack
+│   ├── component       contains the base component; all other components extend this component
+│   ├── config          package for configuration using config files, environment and CLI flags
+│   ├── errors          package for rich errors that include metadata and cross API boundaries
+│   ├── log             package for logging
+│   ├── messages        contains non-proto messages (such as the messages that are sent over MQTT)
+│   ├── metrics         package for metrics collection
+│   ├── ttnpb           contains generated code from our protocol buffer definitions and some helper functions
+│   ├── types           contains primitive types
+│   └── ...
+├── release             binaries will be compiled to this folder - not added to git
+└── vendor              dependencies managed by golang/dep - not added to git
+```
 
 #### Testing
 
+```sh
+make go.test
+```
+
 #### Building
+
+There are currently no binaries to build. If you're sure there are, this document needs to be updated.
