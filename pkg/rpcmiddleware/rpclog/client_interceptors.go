@@ -13,7 +13,7 @@ import (
 // UnaryClientInterceptor returns a new unary client interceptor that optionally logs the execution of external gRPC calls.
 func UnaryClientInterceptor(ctx context.Context, opts ...Option) grpc.UnaryClientInterceptor {
 	o := evaluateClientOpt(opts)
-	logger := log.Must(log.FromContext(ctx))
+	logger := log.Ensure(log.FromContext(ctx))
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		newCtx := newLoggerForCall(ctx, logger, method)
 		startTime := time.Now()
@@ -35,7 +35,7 @@ func UnaryClientInterceptor(ctx context.Context, opts ...Option) grpc.UnaryClien
 // StreamClientInterceptor returns a new streaming client interceptor that optionally logs the execution of external gRPC calls.
 func StreamClientInterceptor(ctx context.Context, opts ...Option) grpc.StreamClientInterceptor {
 	o := evaluateClientOpt(opts)
-	logger := log.Must(log.FromContext(ctx))
+	logger := log.Ensure(log.FromContext(ctx))
 	return func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 		newCtx := newLoggerForCall(ctx, logger, method)
 		startTime := time.Now()
