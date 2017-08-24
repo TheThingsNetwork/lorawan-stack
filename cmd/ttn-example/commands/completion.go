@@ -10,7 +10,7 @@ import (
 )
 
 var completionCommand = &cobra.Command{
-	Use:   "complete",
+	Use:   "completion",
 	Short: "Generate completions",
 }
 
