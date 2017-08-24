@@ -18,7 +18,7 @@ import (
 
 // Config is the type of configuration for Components
 type Config struct {
-	config.ServiceBase `name:",squash"`
+	config.ServiceBase `name:",squash" yaml:",inline"`
 }
 
 // Component is a base component for The Things Network cluster
