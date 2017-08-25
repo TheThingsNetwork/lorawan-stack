@@ -51,7 +51,4 @@ func TestMapStore(t *testing.T) {
 
 	obj, err = s.Find(id)
 	a.So(err, should.Equal, store.ErrNotFound)
-
-	err = s.Update(id, new, old)
-	a.So(err, should.Equal, store.ErrNotFound)
 }

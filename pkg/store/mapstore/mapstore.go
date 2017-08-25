@@ -33,10 +33,7 @@ func (s *mapStore) ulid() ulid.ULID {
 
 func (s *mapStore) Create(obj map[string]interface{}) (ulid.ULID, error) {
 	id := s.ulid()
-	s.mu.Lock()
-	s.data[id] = obj
-	s.mu.Unlock()
-	return id, nil
+	return id, s.Update(id, obj, nil)
 }
 
 func (s *mapStore) Find(id ulid.ULID) (map[string]interface{}, error) {
@@ -72,7 +69,8 @@ func (s *mapStore) Update(id ulid.ULID, new, old map[string]interface{}) error {
 	defer s.mu.Unlock()
 	obj, ok := s.data[id]
 	if !ok {
-		return store.ErrNotFound
+		s.data[id] = diff
+		return nil
 	}
 	for k, v := range diff {
 		if v == nil {
