@@ -27,8 +27,9 @@ func init() {
 }
 
 type options struct {
-	contextFiller fillcontext.Filler
-	serverOptions []grpc.ServerOption
+	contextFiller  fillcontext.Filler
+	fieldExtractor grpc_ctxtags.RequestFieldExtractorFunc
+	serverOptions  []grpc.ServerOption
 }
 
 // Option for the gRPC server
@@ -48,6 +49,13 @@ func WithContextFiller(contextFiller fillcontext.Filler) Option {
 	}
 }
 
+// WithFieldExtractor sets a field extractor
+func WithFieldExtractor(fieldExtractor grpc_ctxtags.RequestFieldExtractorFunc) Option {
+	return func(o *options) {
+		o.fieldExtractor = fieldExtractor
+	}
+}
+
 // New returns a new gRPC server with a set of middlewares.
 // The given context is used in some of the middlewares, the given server options are passed to gRPC
 //
@@ -60,7 +68,7 @@ func New(ctx context.Context, opts ...Option) *grpc.Server {
 	}
 
 	ctxtagsOpts := []grpc_ctxtags.Option{
-		grpc_ctxtags.WithFieldExtractor(nil), // TODO: Extract useful fields from the context or payload
+		grpc_ctxtags.WithFieldExtractor(options.fieldExtractor),
 	}
 	recoveryOpts := []grpc_recovery.Option{
 		grpc_recovery.WithRecoveryHandler(func(p interface{}) (err error) {
