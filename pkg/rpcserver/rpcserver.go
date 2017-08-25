@@ -5,10 +5,10 @@ package rpcserver
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"time"
 
-	"github.com/TheThingsNetwork/go-utils/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/rpclog"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/sentry"
@@ -25,21 +25,6 @@ func init() {
 	grpc.EnableTracing = false
 }
 
-// TODO: Move this to errors package
-var (
-	code     = errors.Range(0, 1000)
-	rpcPanic = errors.ErrDescriptor{
-		MessageFormat: "Internal Server Error",
-		Type:          errors.Internal,
-		Code:          code(500),
-	}
-)
-
-// TODO: Move this to errors package
-func init() {
-	rpcPanic.Register()
-}
-
 // New returns a new gRPC server with a set of middlewares.
 // The given context is used in some of the middlewares, the given server options are passed to gRPC
 //
@@ -51,7 +36,7 @@ func New(ctx context.Context, options ...grpc.ServerOption) *grpc.Server {
 	}
 	recoveryOpts := []grpc_recovery.Option{
 		grpc_recovery.WithRecoveryHandler(func(p interface{}) (err error) {
-			return rpcPanic.New(errors.Attributes{"panic": p}) // TODO: Use actual error
+			return errors.New(fmt.Sprint(p))
 		}),
 	}
 	grpc_prometheus.EnableHandlingTimeHistogram()
