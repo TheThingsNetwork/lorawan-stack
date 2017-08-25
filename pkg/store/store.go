@@ -4,8 +4,6 @@ package store
 
 import (
 	"errors"
-
-	"github.com/oklog/ulid"
 )
 
 var (
@@ -13,9 +11,9 @@ var (
 )
 
 type Store interface {
-	Create(obj map[string]interface{}) (ulid.ULID, error)
-	Find(id ulid.ULID) (map[string]interface{}, error)
-	FindBy(map[string]interface{}) (map[ulid.ULID]map[string]interface{}, error)
-	Update(id ulid.ULID, new, old map[string]interface{}) error
-	Delete(id ulid.ULID) error
+	Create(obj map[string]interface{}) (string, error)
+	Find(id string) (map[string]interface{}, error)
+	FindBy(map[string]interface{}) (map[string]map[string]interface{}, error)
+	Update(id string, new, old map[string]interface{}) error
+	Delete(id string) error
 }

@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	"github.com/TheThingsNetwork/ttn/pkg/store"
-	"github.com/oklog/ulid"
 )
 
 // NewIndexed returns a new MapStore that keeps indexes for the given fields
@@ -16,10 +15,10 @@ func NewIndexed(indexed ...string) store.Store {
 	internal := New().(*mapStore)
 	s := &indexedStore{
 		mapStore: internal,
-		indexes:  make(map[string]map[string]store.ULIDSet),
+		indexes:  make(map[string]map[string]store.StringSet),
 	}
 	for _, field := range indexed {
-		s.indexes[field] = make(map[string]store.ULIDSet)
+		s.indexes[field] = make(map[string]store.StringSet)
 	}
 	return s
 }
@@ -27,23 +26,23 @@ func NewIndexed(indexed ...string) store.Store {
 type indexedStore struct {
 	*mapStore
 	mu      sync.RWMutex
-	indexes map[string]map[string]store.ULIDSet
+	indexes map[string]map[string]store.StringSet
 }
 
 func (s *indexedStore) transform(i interface{}) string {
 	return fmt.Sprint(i)
 }
 
-func (s *indexedStore) index(field string, val interface{}, id ulid.ULID) {
+func (s *indexedStore) index(field string, val interface{}, id string) {
 	index := s.indexes[field]
 	ik := s.transform(val)
 	if _, ok := index[ik]; !ok {
-		index[ik] = store.NewULIDSet()
+		index[ik] = store.NewStringSet()
 	}
 	index[ik].Add(id)
 }
 
-func (s *indexedStore) deindex(field string, val interface{}, id ulid.ULID) {
+func (s *indexedStore) deindex(field string, val interface{}, id string) {
 	index := s.indexes[field]
 	ik := s.transform(val)
 	if idx, ok := index[ik]; ok {
@@ -54,8 +53,8 @@ func (s *indexedStore) deindex(field string, val interface{}, id ulid.ULID) {
 	}
 }
 
-func (s *indexedStore) filterIndex(filters map[string]interface{}) ([]store.ULIDSet, error) {
-	filtered := make([]store.ULIDSet, len(filters))
+func (s *indexedStore) filterIndex(filters map[string]interface{}) ([]store.StringSet, error) {
+	filtered := make([]store.StringSet, len(filters))
 	var i int
 	for filterK, filterV := range filters {
 		index, ok := s.indexes[filterK]
@@ -68,7 +67,7 @@ func (s *indexedStore) filterIndex(filters map[string]interface{}) ([]store.ULID
 	return filtered, nil
 }
 
-func (s *indexedStore) Create(obj map[string]interface{}) (ulid.ULID, error) {
+func (s *indexedStore) Create(obj map[string]interface{}) (string, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	id, err := s.mapStore.Create(obj)
@@ -83,7 +82,7 @@ func (s *indexedStore) Create(obj map[string]interface{}) (ulid.ULID, error) {
 	return id, nil
 }
 
-func (s *indexedStore) Update(id ulid.ULID, new, old map[string]interface{}) error {
+func (s *indexedStore) Update(id string, new, old map[string]interface{}) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	err := s.mapStore.Update(id, new, old)
@@ -106,8 +105,8 @@ func (s *indexedStore) Update(id ulid.ULID, new, old map[string]interface{}) err
 	return nil
 }
 
-func (s *indexedStore) FindBy(filters map[string]interface{}) (map[ulid.ULID]map[string]interface{}, error) {
-	matches := make(map[ulid.ULID]map[string]interface{})
+func (s *indexedStore) FindBy(filters map[string]interface{}) (map[string]map[string]interface{}, error) {
+	matches := make(map[string]map[string]interface{})
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	filtered, err := s.filterIndex(filters)
@@ -117,7 +116,7 @@ func (s *indexedStore) FindBy(filters map[string]interface{}) (map[ulid.ULID]map
 	sort.Slice(filtered, func(i, j int) bool { // Optimization: start with the smallest set
 		return filtered[i].Size() < filtered[j].Size()
 	})
-	var filterSet store.ULIDSet
+	var filterSet store.StringSet
 	for _, set := range filtered {
 		if filterSet == nil {
 			filterSet = set
@@ -133,7 +132,7 @@ func (s *indexedStore) FindBy(filters map[string]interface{}) (map[ulid.ULID]map
 	return matches, nil
 }
 
-func (s *indexedStore) Delete(id ulid.ULID) error {
+func (s *indexedStore) Delete(id string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	old, err := s.mapStore.Find(id)

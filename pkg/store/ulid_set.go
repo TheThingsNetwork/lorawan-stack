@@ -2,45 +2,43 @@
 
 package store
 
-import "github.com/oklog/ulid"
+// StringSet implements "set" data structure that contains strings
+type StringSet map[string]bool
 
-// ULIDSet implements "set" data structure that contains ULIDs
-type ULIDSet map[ulid.ULID]bool
-
-// NewULIDSet creates a new set that holds ULIDs
-func NewULIDSet() ULIDSet {
-	return make(ULIDSet)
+// NewStringSet creates a new set that holds ULIDs
+func NewStringSet() StringSet {
+	return make(StringSet)
 }
 
 // Size returns the size of the set
-func (s ULIDSet) Size() int {
+func (s StringSet) Size() int {
 	return len(s)
 }
 
-// IsEmtpy returns whether the set is empty
-func (s ULIDSet) IsEmpty() bool {
+// IsEmpty returns whether the set is empty
+func (s StringSet) IsEmpty() bool {
 	return len(s) == 0
 }
 
 // Add adds the ULID to the set
-func (s ULIDSet) Add(u ulid.ULID) {
+func (s StringSet) Add(u string) {
 	s[u] = true
 }
 
 // Remove removes the ULID from the set
-func (s ULIDSet) Remove(u ulid.ULID) {
+func (s StringSet) Remove(u string) {
 	delete(s, u)
 }
 
 // Contains returns whether the set contains the given ULID
-func (s ULIDSet) Contains(u ulid.ULID) bool {
+func (s StringSet) Contains(u string) bool {
 	_, exists := s[u]
 	return exists
 }
 
 // Slice returns the set as a slice
-func (s ULIDSet) Slice() []ulid.ULID {
-	result := make([]ulid.ULID, 0, len(s))
+func (s StringSet) Slice() []string {
+	result := make([]string, 0, len(s))
 	for u := range s {
 		result = append(result, u)
 	}
@@ -48,8 +46,8 @@ func (s ULIDSet) Slice() []ulid.ULID {
 }
 
 // Union returns the union of the two sets
-func (s ULIDSet) Union(other ULIDSet) ULIDSet {
-	result := make(ULIDSet)
+func (s StringSet) Union(other StringSet) StringSet {
+	result := make(StringSet)
 	for value := range s {
 		result[value] = true
 	}
@@ -60,8 +58,8 @@ func (s ULIDSet) Union(other ULIDSet) ULIDSet {
 }
 
 // Intersect returns the intersection of the two sets
-func (s ULIDSet) Intersect(other ULIDSet) ULIDSet {
-	result := make(ULIDSet)
+func (s StringSet) Intersect(other StringSet) StringSet {
+	result := make(StringSet)
 	for u := range s {
 		if other.Contains(u) {
 			result[u] = true
