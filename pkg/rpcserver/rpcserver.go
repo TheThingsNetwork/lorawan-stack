@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/fillcontext"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/rpclog"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/sentry"
 	"github.com/grpc-ecosystem/go-grpc-middleware"
@@ -25,12 +26,39 @@ func init() {
 	grpc.EnableTracing = false
 }
 
+type options struct {
+	contextFiller fillcontext.Filler
+	serverOptions []grpc.ServerOption
+}
+
+// Option for the gRPC server
+type Option func(*options)
+
+// WithServerOptions adds gRPC ServerOptions
+func WithServerOptions(serverOptions ...grpc.ServerOption) Option {
+	return func(o *options) {
+		o.serverOptions = append(o.serverOptions, serverOptions...)
+	}
+}
+
+// WithContextFiller sets a context filler
+func WithContextFiller(contextFiller fillcontext.Filler) Option {
+	return func(o *options) {
+		o.contextFiller = contextFiller
+	}
+}
+
 // New returns a new gRPC server with a set of middlewares.
 // The given context is used in some of the middlewares, the given server options are passed to gRPC
 //
 // Currently the following middlewares are included: tag extraction, Prometheus metrics,
 // logging, sending errors to Sentry, validation, errors, panic recovery
-func New(ctx context.Context, options ...grpc.ServerOption) *grpc.Server {
+func New(ctx context.Context, opts ...Option) *grpc.Server {
+	options := new(options)
+	for _, opt := range opts {
+		opt(options)
+	}
+
 	ctxtagsOpts := []grpc_ctxtags.Option{
 		grpc_ctxtags.WithFieldExtractor(nil), // TODO: Extract useful fields from the context or payload
 	}
@@ -48,6 +76,7 @@ func New(ctx context.Context, options ...grpc.ServerOption) *grpc.Server {
 		}),
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
 			grpc_ctxtags.StreamServerInterceptor(ctxtagsOpts...),
+			fillcontext.StreamServerInterceptor(options.contextFiller),
 			grpc_prometheus.StreamServerInterceptor,
 			rpclog.StreamServerInterceptor(ctx),
 			sentry.StreamServerInterceptor,
@@ -58,6 +87,7 @@ func New(ctx context.Context, options ...grpc.ServerOption) *grpc.Server {
 		)),
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
 			grpc_ctxtags.UnaryServerInterceptor(ctxtagsOpts...),
+			fillcontext.UnaryServerInterceptor(options.contextFiller),
 			grpc_prometheus.UnaryServerInterceptor,
 			rpclog.UnaryServerInterceptor(ctx),
 			sentry.UnaryServerInterceptor,
@@ -67,6 +97,6 @@ func New(ctx context.Context, options ...grpc.ServerOption) *grpc.Server {
 			grpc_recovery.UnaryServerInterceptor(recoveryOpts...),
 		)),
 	}
-	server := grpc.NewServer(append(baseOptions, options...)...)
+	server := grpc.NewServer(append(baseOptions, options.serverOptions...)...)
 	return server
 }
