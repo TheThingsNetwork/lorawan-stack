@@ -8,6 +8,27 @@ LoRaWAN is a MAC protocol for low-power wide area networks. It allows for large 
 
 ## Features
 
+- LoRaWAN 1.1 Network Server
+  - [x] Support for Class A devices
+  - [ ] Support for Class B devices
+  - [x] Support for Class C devices
+  - [x] Support for ABP devices
+  - [x] Support for MAC Commands
+  - [x] Support for Adaptive Data Rate
+- LoRaWAN 1.1 Application Server
+  - [x] Payload conversion of well-known payload formats
+  - [x] Payload conversion using custom JavaScript functions
+  - [x] MQTT Pub/Sub API
+- LoRaWAN 1.1 Join Server
+  - [x] Over The Air Activation
+- LoRaWAN 1.0 compatibility
+- OAuth 2.0 Identity Server
+  - [x] User Management
+  - [x] ACLs
+- GRPC APIs
+- HTTP APIs
+- Web Interface
+
 ## Installation
 
 ## Downloads
