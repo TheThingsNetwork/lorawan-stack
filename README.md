@@ -53,7 +53,9 @@ For the latest **master**, you can download pre-compiled binaries:
 - Setting up a development environment is documented in [DEVELOPMENT.md](DEVELOPMENT.md)
 - Our contributing guidelines are described in [CONTRIBUTING.md](CONTRIBUTING.md)
 - Documentation for our Go code can be found on [godoc.org](https://godoc.org/github.com/TheThingsNetwork/ttn)
-- Our [forums](https://www.thethingsnetwork.org/forum) contain a massive amount of information and has great search
-- You can chat on [Slack](http://thethingsnetwork.slack.com), an invite can be requested from your [account page](https://account.thethingsnetwork.org)
 
 ## Support
+
+- Our [forums](https://www.thethingsnetwork.org/forum) contain a massive amount of information and has great search
+- You can chat on [Slack](http://thethingsnetwork.slack.com), an invite can be requested from your [account page](https://account.thethingsnetwork.org)
+- Commercial support and consultancy is offered by [The Things Industries](https://www.thethingsindustries.com)
