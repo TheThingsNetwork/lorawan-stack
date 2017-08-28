@@ -13,6 +13,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/fillcontext"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/rpclog"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/sentry"
+	"github.com/getsentry/raven-go"
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
@@ -30,6 +31,7 @@ type options struct {
 	contextFiller  fillcontext.Filler
 	fieldExtractor grpc_ctxtags.RequestFieldExtractorFunc
 	serverOptions  []grpc.ServerOption
+	sentry         *raven.Client
 }
 
 // Option for the gRPC server
@@ -53,6 +55,13 @@ func WithContextFiller(contextFiller fillcontext.Filler) Option {
 func WithFieldExtractor(fieldExtractor grpc_ctxtags.RequestFieldExtractorFunc) Option {
 	return func(o *options) {
 		o.fieldExtractor = fieldExtractor
+	}
+}
+
+// WithSentry sets a sentry server
+func WithSentry(sentry *raven.Client) Option {
+	return func(o *options) {
+		o.sentry = sentry
 	}
 }
 
@@ -87,7 +96,7 @@ func New(ctx context.Context, opts ...Option) *grpc.Server {
 			fillcontext.StreamServerInterceptor(options.contextFiller),
 			grpc_prometheus.StreamServerInterceptor,
 			rpclog.StreamServerInterceptor(ctx),
-			sentry.StreamServerInterceptor,
+			sentry.StreamServerInterceptor(options.sentry),
 			grpc_validator.StreamServerInterceptor(),
 
 			// Recovery handler must be on bottom
@@ -98,7 +107,7 @@ func New(ctx context.Context, opts ...Option) *grpc.Server {
 			fillcontext.UnaryServerInterceptor(options.contextFiller),
 			grpc_prometheus.UnaryServerInterceptor,
 			rpclog.UnaryServerInterceptor(ctx),
-			sentry.UnaryServerInterceptor,
+			sentry.UnaryServerInterceptor(options.sentry),
 			grpc_validator.UnaryServerInterceptor(),
 
 			// Recovery handler must be on bottom
