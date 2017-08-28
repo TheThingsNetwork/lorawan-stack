@@ -1,0 +1,44 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsNetwork/ttn/api/gateway.proto";
+import "github.com/TheThingsNetwork/ttn/api/messages.proto";
+import "google/protobuf/empty.proto";
+
+package ttn.v3;
+
+option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+
+// GatewayUp may contain zero or more uplink messages and/or a status message for the gateway.
+message GatewayUp {
+  repeated UplinkMessage uplink_message = 1;
+  GatewayStatus gateway_status = 2;
+}
+
+// GatewayDown contains downlink messages for the gateway
+message GatewayDown {
+  DownlinkMessage downlink_message = 1;
+}
+
+// The GtwGs service connects a gateway to a gateway server.
+service GtwGs {
+  // Link the gateway to the gateway server. The authentication information will
+  // be used to determine the gateway ID. If no authentication information is present,
+  // this gateway may not be used for downlink.
+  rpc Link(stream GatewayUp) returns (stream GatewayDown);
+}
+
+// The NsGs service connects a network server to a gateway server.
+service NsGs {
+  // ScheduleDownlink instructs the gateway server to schedule a downlink message.
+  // The gateway server may refuse if there are any conflicts in the schedule or
+  // if a duty cycle prevents the gateway from transmitting.
+  rpc ScheduleDownlink(DownlinkMessage) returns (google.protobuf.Empty);
+}
+
+// Service Gs allows clients to retrieve the status of their gateways
+service Gs {
+  rpc GetGatewayObservations(GatewayIdentifiers) returns (GatewayObservations);
+}

@@ -10,6 +10,7 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/_api.proto
 	github.com/TheThingsNetwork/ttn/api/end_device.proto
 	github.com/TheThingsNetwork/ttn/api/gateway.proto
+	github.com/TheThingsNetwork/ttn/api/gatewayserver.proto
 	github.com/TheThingsNetwork/ttn/api/join.proto
 	github.com/TheThingsNetwork/ttn/api/lorawan.proto
 	github.com/TheThingsNetwork/ttn/api/messages.proto
@@ -25,7 +26,11 @@ It has these top-level messages:
 	MACSettings
 	MACState
 	MACInfo
+	GatewayIdentifiers
 	GatewayStatus
+	GatewayObservations
+	GatewayUp
+	GatewayDown
 	JoinRequest
 	JoinResponse
 	Message

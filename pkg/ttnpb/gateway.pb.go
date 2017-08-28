@@ -27,6 +27,31 @@ var _ = fmt.Errorf
 var _ = math.Inf
 var _ = time.Kitchen
 
+type GatewayIdentifiers struct {
+	// TTN Gateway ID
+	GatewayID string `protobuf:"bytes,1,opt,name=gateway_id,json=gatewayId,proto3" json:"gateway_id,omitempty"`
+	// TTN Tenant ID (in case of multi-tenant network stack)
+	TenantID string `protobuf:"bytes,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+}
+
+func (m *GatewayIdentifiers) Reset()                    { *m = GatewayIdentifiers{} }
+func (*GatewayIdentifiers) ProtoMessage()               {}
+func (*GatewayIdentifiers) Descriptor() ([]byte, []int) { return fileDescriptorGateway, []int{0} }
+
+func (m *GatewayIdentifiers) GetGatewayID() string {
+	if m != nil {
+		return m.GatewayID
+	}
+	return ""
+}
+
+func (m *GatewayIdentifiers) GetTenantID() string {
+	if m != nil {
+		return m.TenantID
+	}
+	return ""
+}
+
 type GatewayStatus struct {
 	// Current time of the gateway
 	Time *time.Time `protobuf:"bytes,1,opt,name=time,stdtime" json:"time,omitempty"`
@@ -66,7 +91,7 @@ type GatewayStatus struct {
 
 func (m *GatewayStatus) Reset()                    { *m = GatewayStatus{} }
 func (*GatewayStatus) ProtoMessage()               {}
-func (*GatewayStatus) Descriptor() ([]byte, []int) { return fileDescriptorGateway, []int{0} }
+func (*GatewayStatus) Descriptor() ([]byte, []int) { return fileDescriptorGateway, []int{1} }
 
 func (m *GatewayStatus) GetTime() *time.Time {
 	if m != nil {
@@ -131,9 +156,112 @@ func (m *GatewayStatus) GetAdvanced() *google_protobuf1.Struct {
 	return nil
 }
 
-func init() {
-	proto.RegisterType((*GatewayStatus)(nil), "ttn.v3.GatewayStatus")
+// GatewayObservations as observed by the gateway server
+type GatewayObservations struct {
+	// Time when the last uplink message was received
+	LastUplinkReceived *time.Time `protobuf:"bytes,1,opt,name=last_uplink_received,json=lastUplinkReceived,stdtime" json:"last_uplink_received,omitempty"`
+	// Uplink message counter. This counter may be reset to 0 when the gateway disconnects.
+	UplinkCount uint64 `protobuf:"varint,2,opt,name=uplink_count,json=uplinkCount,proto3" json:"uplink_count,omitempty"`
+	// Time when the last downlink message was received
+	LastDownlinkReceived *time.Time `protobuf:"bytes,3,opt,name=last_downlink_received,json=lastDownlinkReceived,stdtime" json:"last_downlink_received,omitempty"`
+	// Downlink message counter. This counter may be reset to 0 when the gateway disconnects.
+	DownlinkCount uint64 `protobuf:"varint,4,opt,name=downlink_count,json=downlinkCount,proto3" json:"downlink_count,omitempty"`
+	// Time when the last status message was received
+	LastStatusReceived *time.Time `protobuf:"bytes,5,opt,name=last_status_received,json=lastStatusReceived,stdtime" json:"last_status_received,omitempty"`
+	// Status message counter. This counter may be reset to 0 when the gateway disconnects.
+	StatusCount uint64 `protobuf:"varint,6,opt,name=status_count,json=statusCount,proto3" json:"status_count,omitempty"`
+	// Contents of the last status message
+	LastStatus *GatewayStatus `protobuf:"bytes,7,opt,name=last_status,json=lastStatus" json:"last_status,omitempty"`
 }
+
+func (m *GatewayObservations) Reset()                    { *m = GatewayObservations{} }
+func (*GatewayObservations) ProtoMessage()               {}
+func (*GatewayObservations) Descriptor() ([]byte, []int) { return fileDescriptorGateway, []int{2} }
+
+func (m *GatewayObservations) GetLastUplinkReceived() *time.Time {
+	if m != nil {
+		return m.LastUplinkReceived
+	}
+	return nil
+}
+
+func (m *GatewayObservations) GetUplinkCount() uint64 {
+	if m != nil {
+		return m.UplinkCount
+	}
+	return 0
+}
+
+func (m *GatewayObservations) GetLastDownlinkReceived() *time.Time {
+	if m != nil {
+		return m.LastDownlinkReceived
+	}
+	return nil
+}
+
+func (m *GatewayObservations) GetDownlinkCount() uint64 {
+	if m != nil {
+		return m.DownlinkCount
+	}
+	return 0
+}
+
+func (m *GatewayObservations) GetLastStatusReceived() *time.Time {
+	if m != nil {
+		return m.LastStatusReceived
+	}
+	return nil
+}
+
+func (m *GatewayObservations) GetStatusCount() uint64 {
+	if m != nil {
+		return m.StatusCount
+	}
+	return 0
+}
+
+func (m *GatewayObservations) GetLastStatus() *GatewayStatus {
+	if m != nil {
+		return m.LastStatus
+	}
+	return nil
+}
+
+func init() {
+	proto.RegisterType((*GatewayIdentifiers)(nil), "ttn.v3.GatewayIdentifiers")
+	proto.RegisterType((*GatewayStatus)(nil), "ttn.v3.GatewayStatus")
+	proto.RegisterType((*GatewayObservations)(nil), "ttn.v3.GatewayObservations")
+}
+func (m *GatewayIdentifiers) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GatewayIdentifiers) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.GatewayID) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.GatewayID)))
+		i += copy(dAtA[i:], m.GatewayID)
+	}
+	if len(m.TenantID) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.TenantID)))
+		i += copy(dAtA[i:], m.TenantID)
+	}
+	return i, nil
+}
+
 func (m *GatewayStatus) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -258,6 +386,79 @@ func (m *GatewayStatus) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *GatewayObservations) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GatewayObservations) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.LastUplinkReceived != nil {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastUplinkReceived)))
+		n6, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastUplinkReceived, dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n6
+	}
+	if m.UplinkCount != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintGateway(dAtA, i, uint64(m.UplinkCount))
+	}
+	if m.LastDownlinkReceived != nil {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastDownlinkReceived)))
+		n7, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastDownlinkReceived, dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n7
+	}
+	if m.DownlinkCount != 0 {
+		dAtA[i] = 0x20
+		i++
+		i = encodeVarintGateway(dAtA, i, uint64(m.DownlinkCount))
+	}
+	if m.LastStatusReceived != nil {
+		dAtA[i] = 0x2a
+		i++
+		i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastStatusReceived)))
+		n8, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastStatusReceived, dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n8
+	}
+	if m.StatusCount != 0 {
+		dAtA[i] = 0x30
+		i++
+		i = encodeVarintGateway(dAtA, i, uint64(m.StatusCount))
+	}
+	if m.LastStatus != nil {
+		dAtA[i] = 0x3a
+		i++
+		i = encodeVarintGateway(dAtA, i, uint64(m.LastStatus.Size()))
+		n9, err := m.LastStatus.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n9
+	}
+	return i, nil
+}
+
 func encodeFixed64Gateway(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
@@ -285,6 +486,20 @@ func encodeVarintGateway(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return offset + 1
 }
+func (m *GatewayIdentifiers) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.GatewayID)
+	if l > 0 {
+		n += 1 + l + sovGateway(uint64(l))
+	}
+	l = len(m.TenantID)
+	if l > 0 {
+		n += 1 + l + sovGateway(uint64(l))
+	}
+	return n
+}
+
 func (m *GatewayStatus) Size() (n int) {
 	var l int
 	_ = l
@@ -337,6 +552,37 @@ func (m *GatewayStatus) Size() (n int) {
 	return n
 }
 
+func (m *GatewayObservations) Size() (n int) {
+	var l int
+	_ = l
+	if m.LastUplinkReceived != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastUplinkReceived)
+		n += 1 + l + sovGateway(uint64(l))
+	}
+	if m.UplinkCount != 0 {
+		n += 1 + sovGateway(uint64(m.UplinkCount))
+	}
+	if m.LastDownlinkReceived != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastDownlinkReceived)
+		n += 1 + l + sovGateway(uint64(l))
+	}
+	if m.DownlinkCount != 0 {
+		n += 1 + sovGateway(uint64(m.DownlinkCount))
+	}
+	if m.LastStatusReceived != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastStatusReceived)
+		n += 1 + l + sovGateway(uint64(l))
+	}
+	if m.StatusCount != 0 {
+		n += 1 + sovGateway(uint64(m.StatusCount))
+	}
+	if m.LastStatus != nil {
+		l = m.LastStatus.Size()
+		n += 1 + l + sovGateway(uint64(l))
+	}
+	return n
+}
+
 func sovGateway(x uint64) (n int) {
 	for {
 		n++
@@ -349,6 +595,17 @@ func sovGateway(x uint64) (n int) {
 }
 func sozGateway(x uint64) (n int) {
 	return sovGateway(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (this *GatewayIdentifiers) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&GatewayIdentifiers{`,
+		`GatewayID:` + fmt.Sprintf("%v", this.GatewayID) + `,`,
+		`TenantID:` + fmt.Sprintf("%v", this.TenantID) + `,`,
+		`}`,
+	}, "")
+	return s
 }
 func (this *GatewayStatus) String() string {
 	if this == nil {
@@ -388,6 +645,22 @@ func (this *GatewayStatus) String() string {
 	}, "")
 	return s
 }
+func (this *GatewayObservations) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&GatewayObservations{`,
+		`LastUplinkReceived:` + strings.Replace(fmt.Sprintf("%v", this.LastUplinkReceived), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
+		`UplinkCount:` + fmt.Sprintf("%v", this.UplinkCount) + `,`,
+		`LastDownlinkReceived:` + strings.Replace(fmt.Sprintf("%v", this.LastDownlinkReceived), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
+		`DownlinkCount:` + fmt.Sprintf("%v", this.DownlinkCount) + `,`,
+		`LastStatusReceived:` + strings.Replace(fmt.Sprintf("%v", this.LastStatusReceived), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
+		`StatusCount:` + fmt.Sprintf("%v", this.StatusCount) + `,`,
+		`LastStatus:` + strings.Replace(fmt.Sprintf("%v", this.LastStatus), "GatewayStatus", "GatewayStatus", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
 func valueToStringGateway(v interface{}) string {
 	rv := reflect.ValueOf(v)
 	if rv.IsNil() {
@@ -395,6 +668,114 @@ func valueToStringGateway(v interface{}) string {
 	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
+}
+func (m *GatewayIdentifiers) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGateway
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GatewayIdentifiers: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GatewayIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGateway
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGateway
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.GatewayID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TenantID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGateway
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGateway
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TenantID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGateway(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGateway
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *GatewayStatus) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -886,6 +1267,245 @@ func (m *GatewayStatus) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *GatewayObservations) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGateway
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GatewayObservations: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GatewayObservations: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LastUplinkReceived", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGateway
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGateway
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.LastUplinkReceived == nil {
+				m.LastUplinkReceived = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.LastUplinkReceived, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UplinkCount", wireType)
+			}
+			m.UplinkCount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGateway
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.UplinkCount |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LastDownlinkReceived", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGateway
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGateway
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.LastDownlinkReceived == nil {
+				m.LastDownlinkReceived = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.LastDownlinkReceived, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DownlinkCount", wireType)
+			}
+			m.DownlinkCount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGateway
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DownlinkCount |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LastStatusReceived", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGateway
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGateway
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.LastStatusReceived == nil {
+				m.LastStatusReceived = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.LastStatusReceived, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StatusCount", wireType)
+			}
+			m.StatusCount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGateway
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.StatusCount |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LastStatus", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGateway
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGateway
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.LastStatus == nil {
+				m.LastStatus = &GatewayStatus{}
+			}
+			if err := m.LastStatus.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGateway(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGateway
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func skipGateway(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
@@ -996,37 +1616,49 @@ func init() {
 }
 
 var fileDescriptorGateway = []byte{
-	// 499 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x93, 0xcf, 0x8b, 0xd3, 0x40,
-	0x14, 0xc7, 0x77, 0x92, 0x6e, 0x37, 0x99, 0xba, 0xb0, 0x0c, 0xa2, 0x31, 0x48, 0x5a, 0xd6, 0x4b,
-	0x05, 0x4d, 0xb0, 0xf5, 0xb0, 0xac, 0x8a, 0x50, 0x94, 0x45, 0x50, 0x91, 0x6c, 0xf0, 0xe0, 0x45,
-	0x26, 0xe9, 0x6c, 0x1a, 0xda, 0x64, 0xc2, 0xe4, 0xa5, 0x4b, 0x6f, 0xfe, 0x09, 0x1e, 0xfd, 0x93,
-	0xbc, 0x08, 0x1e, 0x3d, 0xad, 0x9a, 0x93, 0x47, 0xff, 0x04, 0xc9, 0x4c, 0x5a, 0xbb, 0x3f, 0x60,
-	0x7b, 0xca, 0xbc, 0x79, 0xdf, 0xcf, 0x9b, 0xef, 0x7b, 0x8f, 0xe0, 0x47, 0x71, 0x02, 0x93, 0x32,
-	0x74, 0x23, 0x9e, 0x7a, 0xc1, 0x84, 0x05, 0x93, 0x24, 0x8b, 0x8b, 0xb7, 0x0c, 0x4e, 0xb9, 0x98,
-	0x7a, 0x00, 0x99, 0x47, 0xf3, 0xc4, 0x8b, 0x29, 0xb0, 0x53, 0xba, 0x70, 0x73, 0xc1, 0x81, 0x93,
-	0x36, 0x40, 0xe6, 0xce, 0x87, 0xf6, 0xc3, 0x35, 0x34, 0xe6, 0x31, 0xf7, 0x64, 0x3a, 0x2c, 0x4f,
-	0x64, 0x24, 0x03, 0x79, 0x52, 0x98, 0x3d, 0xd8, 0xe4, 0xa5, 0x94, 0x01, 0x1d, 0x53, 0xa0, 0x0d,
-	0xe3, 0xc4, 0x9c, 0xc7, 0x33, 0xf6, 0xbf, 0xf2, 0xb8, 0x14, 0x14, 0x12, 0x9e, 0x35, 0xf9, 0xbb,
-	0x17, 0xf3, 0x05, 0x88, 0x32, 0x82, 0x26, 0xdb, 0xbd, 0x98, 0x85, 0x24, 0x65, 0x05, 0xd0, 0x34,
-	0x57, 0x82, 0xfd, 0x6f, 0x2d, 0xbc, 0x7b, 0xa4, 0x7a, 0x3b, 0x06, 0x0a, 0x65, 0x41, 0x1e, 0xe3,
-	0x56, 0x2d, 0xb2, 0x50, 0x0f, 0xf5, 0x3b, 0x03, 0xdb, 0x55, 0x15, 0xdc, 0x65, 0x05, 0x37, 0x58,
-	0x56, 0x18, 0xb5, 0x3e, 0xff, 0xec, 0x22, 0x5f, 0xaa, 0xc9, 0x33, 0x6c, 0x86, 0x9c, 0xc3, 0x47,
-	0x89, 0x6a, 0x1b, 0xa2, 0x46, 0x8d, 0xd4, 0x97, 0xc4, 0xc6, 0x46, 0x3e, 0xa3, 0x70, 0xc2, 0x45,
-	0x6a, 0xe9, 0x3d, 0xd4, 0x37, 0xfd, 0x55, 0x4c, 0x9e, 0x63, 0x63, 0xce, 0x44, 0x91, 0xf0, 0xac,
-	0xb0, 0x5a, 0x3d, 0xbd, 0xdf, 0x19, 0xdc, 0x73, 0xd5, 0xfc, 0xdd, 0x73, 0xce, 0xdd, 0xf7, 0x8d,
-	0xea, 0x65, 0x06, 0x62, 0xe1, 0xaf, 0x20, 0xf2, 0x00, 0x1b, 0x33, 0x1e, 0xc9, 0xa1, 0x59, 0xdb,
-	0xd2, 0xda, 0xde, 0xb2, 0xc0, 0xeb, 0xe6, 0xde, 0x5f, 0x29, 0xc8, 0x2d, 0xac, 0x25, 0xb9, 0xd5,
-	0xee, 0xe9, 0x7d, 0x73, 0xd4, 0xae, 0xce, 0xba, 0xda, 0xab, 0x77, 0xbe, 0x96, 0xe4, 0xe4, 0x00,
-	0xeb, 0x02, 0xc0, 0xda, 0x91, 0x05, 0xee, 0x5c, 0xea, 0xed, 0x45, 0xb3, 0x96, 0x51, 0xa7, 0x3a,
-	0xeb, 0xea, 0x7e, 0x10, 0x7c, 0xa9, 0x3b, 0xac, 0x11, 0xf2, 0x14, 0xef, 0xa4, 0x0c, 0x44, 0x12,
-	0x15, 0x96, 0x21, 0xfd, 0xef, 0x5f, 0xed, 0xff, 0x8d, 0x12, 0x29, 0xfb, 0x4b, 0x84, 0x0c, 0xb1,
-	0x41, 0xc7, 0x73, 0x9a, 0x45, 0x6c, 0x6c, 0x45, 0xf2, 0xf1, 0xdb, 0x97, 0x1e, 0x3f, 0x96, 0x3b,
-	0xf7, 0x57, 0x42, 0xfb, 0x09, 0xde, 0x3d, 0x37, 0x0d, 0xb2, 0x87, 0xf5, 0x29, 0x5b, 0xc8, 0xa5,
-	0x9a, 0x7e, 0x7d, 0x24, 0x37, 0xf1, 0xf6, 0x9c, 0xce, 0x4a, 0xb5, 0x2d, 0xd3, 0x57, 0xc1, 0xa1,
-	0x76, 0x80, 0xec, 0x43, 0x7c, 0x63, 0xdd, 0xca, 0x75, 0xac, 0xb6, 0xc6, 0x8e, 0x8e, 0x7e, 0xfc,
-	0x76, 0xb6, 0x3e, 0x55, 0x0e, 0xfa, 0x5a, 0x39, 0xe8, 0x7b, 0xe5, 0xa0, 0x5f, 0x95, 0x83, 0xfe,
-	0x54, 0xce, 0xd6, 0xdf, 0xca, 0x41, 0x1f, 0xee, 0x5f, 0xf7, 0x03, 0xe4, 0xd3, 0xb8, 0xfe, 0xe6,
-	0x61, 0xd8, 0x96, 0xcd, 0x0d, 0xff, 0x05, 0x00, 0x00, 0xff, 0xff, 0xbf, 0x1f, 0x5f, 0xc8, 0x9e,
-	0x03, 0x00, 0x00,
+	// 694 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0xcd, 0x6e, 0xd3, 0x4c,
+	0x14, 0xad, 0xe3, 0x34, 0x75, 0x26, 0xcd, 0xa7, 0x6a, 0xbe, 0x52, 0x4c, 0x84, 0x9c, 0x12, 0x84,
+	0xd4, 0x4a, 0xc5, 0x11, 0x2d, 0x42, 0x55, 0x01, 0x21, 0x85, 0xa0, 0x2a, 0x12, 0x7f, 0x9a, 0x86,
+	0x2e, 0xd8, 0x44, 0x13, 0x7b, 0xea, 0x5a, 0x49, 0x3c, 0x96, 0x7d, 0x9d, 0xaa, 0x3b, 0x1e, 0x81,
+	0x25, 0xcf, 0xc2, 0x13, 0xb0, 0x41, 0x62, 0xc9, 0x2a, 0x80, 0x57, 0x2c, 0x79, 0x04, 0xe4, 0x99,
+	0x71, 0x9a, 0xfe, 0x48, 0x0d, 0xab, 0x78, 0xee, 0x3d, 0xe7, 0x9e, 0x73, 0x66, 0xae, 0x82, 0x1e,
+	0x78, 0x3e, 0x1c, 0x27, 0x7d, 0xdb, 0xe1, 0xa3, 0x66, 0xf7, 0x98, 0x75, 0x8f, 0xfd, 0xc0, 0x8b,
+	0x5f, 0x33, 0x38, 0xe1, 0xd1, 0xa0, 0x09, 0x10, 0x34, 0x69, 0xe8, 0x37, 0x3d, 0x0a, 0xec, 0x84,
+	0x9e, 0xda, 0x61, 0xc4, 0x81, 0xe3, 0x12, 0x40, 0x60, 0x8f, 0x77, 0x6a, 0xf7, 0x67, 0xa8, 0x1e,
+	0xf7, 0x78, 0x53, 0xb4, 0xfb, 0xc9, 0x91, 0x38, 0x89, 0x83, 0xf8, 0x92, 0xb4, 0xda, 0xf6, 0x3c,
+	0x4a, 0x23, 0x06, 0xd4, 0xa5, 0x40, 0x15, 0xc7, 0xf2, 0x38, 0xf7, 0x86, 0xec, 0x6c, 0xb2, 0x9b,
+	0x44, 0x14, 0x7c, 0x1e, 0xa8, 0xfe, 0xed, 0x8b, 0xfd, 0x18, 0xa2, 0xc4, 0x01, 0xd5, 0xad, 0x5f,
+	0xec, 0x82, 0x3f, 0x62, 0x31, 0xd0, 0x51, 0x28, 0x01, 0x8d, 0x11, 0xc2, 0xfb, 0x32, 0x5a, 0xc7,
+	0x65, 0x01, 0xf8, 0x47, 0x3e, 0x8b, 0x62, 0xbc, 0x85, 0x90, 0x0a, 0xdc, 0xf3, 0x5d, 0x53, 0x5b,
+	0xd7, 0x36, 0xca, 0xad, 0x6a, 0x3a, 0xa9, 0x97, 0x73, 0x6c, 0x9b, 0x94, 0xbd, 0x9c, 0x86, 0x37,
+	0x51, 0x19, 0x58, 0x40, 0x03, 0xc8, 0xc0, 0x05, 0x01, 0x5e, 0x4e, 0x27, 0x75, 0xa3, 0x2b, 0x8a,
+	0x9d, 0x36, 0x31, 0x64, 0xbb, 0xe3, 0x36, 0xbe, 0x16, 0x51, 0x55, 0xcd, 0x38, 0x00, 0x0a, 0x49,
+	0x8c, 0x1f, 0xa2, 0x62, 0xe6, 0x49, 0x88, 0x54, 0xb6, 0x6b, 0xb6, 0x34, 0x6c, 0xe7, 0x86, 0xed,
+	0x6e, 0x6e, 0xb8, 0x55, 0xfc, 0xf8, 0xa3, 0xae, 0x11, 0x81, 0xc6, 0x4f, 0x51, 0xb9, 0xcf, 0x39,
+	0xf4, 0x04, 0xb5, 0x30, 0x27, 0xd5, 0xc8, 0x28, 0x59, 0x11, 0xd7, 0x90, 0x11, 0x0e, 0x29, 0x1c,
+	0xf1, 0x68, 0x64, 0xea, 0x99, 0x61, 0x32, 0x3d, 0xe3, 0x67, 0xc8, 0x18, 0xb3, 0x28, 0xf6, 0x79,
+	0x10, 0x9b, 0xc5, 0x75, 0x7d, 0xa3, 0xb2, 0x7d, 0xd7, 0x96, 0xcf, 0x6d, 0x9f, 0x73, 0x6e, 0x1f,
+	0x2a, 0xd4, 0x8b, 0x00, 0xa2, 0x53, 0x32, 0x25, 0xe1, 0x2d, 0x64, 0x0c, 0xb9, 0x23, 0xde, 0xc8,
+	0x5c, 0x14, 0xd6, 0x56, 0xf2, 0x01, 0x2f, 0x55, 0x9d, 0x4c, 0x11, 0x78, 0x0d, 0x15, 0xfc, 0xd0,
+	0x2c, 0xad, 0xeb, 0x1b, 0xe5, 0x56, 0x29, 0x9d, 0xd4, 0x0b, 0x9d, 0xb7, 0xa4, 0xe0, 0x87, 0x78,
+	0x17, 0xe9, 0x11, 0x80, 0xb9, 0x24, 0x06, 0xdc, 0xba, 0x94, 0xad, 0xad, 0xb6, 0xa0, 0x55, 0x49,
+	0x27, 0x75, 0x9d, 0x74, 0xbb, 0x9f, 0xb2, 0x84, 0x19, 0x05, 0x3f, 0x41, 0x4b, 0x23, 0x06, 0x91,
+	0xef, 0xc4, 0xa6, 0x21, 0xfc, 0x37, 0xae, 0xf6, 0xff, 0x4a, 0x82, 0xa4, 0xfd, 0x9c, 0x82, 0x77,
+	0x90, 0x41, 0xdd, 0x31, 0x0d, 0x1c, 0xe6, 0x9a, 0x8e, 0x10, 0xbf, 0x79, 0x49, 0xfc, 0x40, 0xac,
+	0x18, 0x99, 0x02, 0x6b, 0x8f, 0x51, 0xf5, 0xdc, 0x6d, 0xe0, 0x15, 0xa4, 0x0f, 0xd8, 0xa9, 0xdc,
+	0x1c, 0x92, 0x7d, 0xe2, 0x55, 0xb4, 0x38, 0xa6, 0xc3, 0x44, 0xbe, 0x56, 0x99, 0xc8, 0xc3, 0x5e,
+	0x61, 0x57, 0xab, 0xed, 0xa1, 0xe5, 0x59, 0x2b, 0xd7, 0x71, 0x0b, 0x33, 0xdc, 0xc6, 0x67, 0x1d,
+	0xfd, 0xaf, 0x52, 0xbd, 0xe9, 0xc7, 0x2c, 0x1a, 0x8b, 0x4b, 0x89, 0x31, 0x41, 0xab, 0x43, 0x1a,
+	0x43, 0x2f, 0x09, 0x87, 0x7e, 0x30, 0xe8, 0x45, 0xcc, 0x61, 0xfe, 0x98, 0xb9, 0x73, 0x6f, 0x19,
+	0xce, 0xd8, 0xef, 0x04, 0x99, 0x28, 0x2e, 0xbe, 0x83, 0x96, 0xd5, 0x38, 0x87, 0x27, 0x01, 0x08,
+	0x33, 0x45, 0x52, 0x91, 0xb5, 0xe7, 0x59, 0x09, 0x1f, 0xa2, 0x35, 0x21, 0xeb, 0xf2, 0x93, 0xe0,
+	0xbc, 0xb0, 0x3e, 0xa7, 0xb0, 0xb0, 0xdd, 0x56, 0xf4, 0xa9, 0xf4, 0x3d, 0xf4, 0xdf, 0x74, 0xa4,
+	0x14, 0x2f, 0x0a, 0xf1, 0x6a, 0x5e, 0x95, 0xf2, 0x79, 0xea, 0x58, 0x3c, 0xf0, 0x99, 0xf8, 0xe2,
+	0xbf, 0xa4, 0x96, 0xdb, 0x31, 0x9b, 0x5a, 0x8d, 0x93, 0xc2, 0x25, 0x99, 0x5a, 0xd6, 0xa4, 0xec,
+	0x23, 0x54, 0x99, 0x91, 0x55, 0x2b, 0x7b, 0xe3, 0xca, 0xa5, 0x23, 0xe8, 0x4c, 0xa2, 0xb5, 0xff,
+	0xfd, 0x97, 0xb5, 0xf0, 0x21, 0xb5, 0xb4, 0x2f, 0xa9, 0xa5, 0x7d, 0x4b, 0x2d, 0xed, 0x67, 0x6a,
+	0x69, 0xbf, 0x53, 0x6b, 0xe1, 0x4f, 0x6a, 0x69, 0xef, 0x37, 0xaf, 0xfb, 0xb3, 0x0c, 0x07, 0x5e,
+	0xf6, 0x1b, 0xf6, 0xfb, 0x25, 0x91, 0x68, 0xe7, 0x6f, 0x00, 0x00, 0x00, 0xff, 0xff, 0xed, 0x08,
+	0x34, 0x09, 0xca, 0x05, 0x00, 0x00,
 }
