@@ -4,7 +4,7 @@
 
 The Things Network Stack is an open-source LoRaWAN network server suitable for large, global public networks as well as smaller private networks.
 
-LoRaWAN is a MAC protocol for low-power wide area networks. It allows for large scale Internet of Things deployments where low-powered devices efficiently communicate with Internet-connected applications over long range wireless connections. 
+LoRaWAN is a protocol for low-power wide area networks. It allows for large scale Internet of Things deployments where low-powered devices efficiently communicate with Internet-connected applications over long range wireless connections. 
 
 ## Features
 
@@ -28,8 +28,13 @@ LoRaWAN is a MAC protocol for low-power wide area networks. It allows for large 
 - GRPC APIs
 - HTTP APIs
 - Web Interface
+  - [x] Application management and traffic
+  - [x] End device management, status and traffic
+  - [x] Gateway management, status and traffic
 
 ## Installation
+
+Version 3 of The Things Network Stack is still under heavy development. We currently recommend to use version 2 instead.
 
 ## Downloads
 
@@ -45,8 +50,6 @@ For the latest **master**, you can download pre-compiled binaries:
 | [ttn-windows-amd64.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-windows-amd64.zip) | windows | amd64 |
 | [ttn-windows-386.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-windows-386.zip) | windows | 386 |
 
-## Getting Started
-
 ## Documentation
 
 - General documentation can be found on [thethingsnetwork.org/docs](https://www.thethingsnetwork.org/docs/)
@@ -58,4 +61,4 @@ For the latest **master**, you can download pre-compiled binaries:
 
 - Our [forums](https://www.thethingsnetwork.org/forum) contain a massive amount of information and has great search
 - You can chat on [Slack](http://thethingsnetwork.slack.com), an invite can be requested from your [account page](https://account.thethingsnetwork.org)
-- Commercial support and consultancy is offered by [The Things Industries](https://www.thethingsindustries.com)
+- Hosted solutions, as well as commercial support and consultancy are offered by [The Things Industries](https://www.thethingsindustries.com)
