@@ -7,18 +7,21 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"net/http"
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/fillcontext"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/rpclog"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/sentry"
+	"github.com/TheThingsNetwork/ttn/pkg/rpcserver/internal/jsonpb"
 	"github.com/getsentry/raven-go"
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	"github.com/grpc-ecosystem/go-grpc-middleware/validator"
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 )
@@ -65,17 +68,17 @@ func WithSentry(sentry *raven.Client) Option {
 	}
 }
 
-// New returns a new gRPC server with a set of middlewares.
+// New returns a new RPC server with a set of middlewares.
 // The given context is used in some of the middlewares, the given server options are passed to gRPC
 //
 // Currently the following middlewares are included: tag extraction, Prometheus metrics,
 // logging, sending errors to Sentry, validation, errors, panic recovery
-func New(ctx context.Context, opts ...Option) *grpc.Server {
+func New(ctx context.Context, opts ...Option) *Server {
 	options := new(options)
 	for _, opt := range opts {
 		opt(options)
 	}
-
+	server := &Server{ctx: ctx}
 	ctxtagsOpts := []grpc_ctxtags.Option{
 		grpc_ctxtags.WithFieldExtractor(options.fieldExtractor),
 	}
@@ -114,6 +117,21 @@ func New(ctx context.Context, opts ...Option) *grpc.Server {
 			grpc_recovery.UnaryServerInterceptor(recoveryOpts...),
 		)),
 	}
-	server := grpc.NewServer(append(baseOptions, options.serverOptions...)...)
+	server.Server = grpc.NewServer(append(baseOptions, options.serverOptions...)...)
+	server.ServeMux = runtime.NewServeMux(runtime.WithMarshalerOption("*", &jsonpb.GoGoJSONPb{
+		OrigName: true,
+	}))
 	return server
+}
+
+// Server wraps the gRPC server
+type Server struct {
+	ctx context.Context
+	*grpc.Server
+	*runtime.ServeMux
+}
+
+// ServeHTTP forwards requests to the gRPC gateway
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.ServeMux.ServeHTTP(w, r)
 }
