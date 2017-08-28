@@ -3,6 +3,7 @@
 package component
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net"
@@ -13,7 +14,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
-	"google.golang.org/grpc"
+	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
 )
 
 // Config is the type of configuration for Components
@@ -23,10 +24,14 @@ type Config struct {
 
 // Component is a base component for The Things Network cluster
 type Component struct {
-	config  *Config
-	log     log.Interface
+	ctx       context.Context
+	cancelCtx context.CancelFunc
+
+	config *Config
+	log    log.Interface
+
 	handler http.Handler
-	grpc    *grpc.Server
+	grpc    *rpcserver.Server
 
 	httpL  net.Listener
 	httpsL net.Listener
@@ -35,13 +40,26 @@ type Component struct {
 }
 
 // New returns a new component
-func New(log log.Interface, config *Config) *Component {
-	return &Component{
-		config:  config,
-		log:     log,
-		handler: nil,
-		grpc:    grpc.NewServer(),
+func New(logger log.Interface, config *Config) *Component {
+	ctx, cancel := context.WithCancel(context.Background())
+	ctx = log.WithLogger(ctx, logger)
+
+	c := &Component{
+		ctx:       ctx,
+		cancelCtx: cancel,
+
+		config: config,
+		log:    logger,
 	}
+
+	c.grpc = rpcserver.New(
+		c.ctx,
+		rpcserver.WithContextFiller(func(ctx context.Context) context.Context {
+			// TODO: Fill globals in call context (data stores, config, ...)
+			return ctx
+		}),
+	)
+	return c
 }
 
 // Start starts the component
@@ -52,6 +70,10 @@ func (c *Component) Start() error {
 	signals := make(chan os.Signal)
 
 	defer c.Close()
+
+	if c.handler == nil {
+		http.Handle(rpcserver.APIPrefix, http.StripPrefix(rpcserver.APIPrefix, c.grpc))
+	}
 
 	signal.Notify(signals, os.Interrupt, os.Kill, syscall.SIGTERM)
 
@@ -76,6 +98,8 @@ func (c *Component) Start() error {
 
 // Close closes the server
 func (c *Component) Close() {
+	c.cancelCtx()
+
 	if c.httpL != nil {
 		_ = c.httpL.Close()
 		c.log.Debug("Stopped listening on HTTP")
