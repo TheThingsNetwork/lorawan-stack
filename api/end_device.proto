@@ -5,6 +5,7 @@ syntax = "proto3";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsNetwork/ttn/api/lorawan.proto";
 import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
+import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -152,6 +153,10 @@ message EndDevice {
   reserved 99; // RFU: google.protobuf.Struct advanced = 99;
 }
 
+message EndDevices {
+  repeated EndDevice end_devices = 1;
+}
+
 message MACSettings {
   // Use ADR
   bool adr = 1;
@@ -272,4 +277,18 @@ enum PingSlotPeriod {
   PING_EVERY_64S  = 6;
   // Every 128 seconds
   PING_EVERY_128S = 7;
+}
+
+// The DeviceManagement service allows clients to manage their end devices
+service DeviceManagement {
+  // ListDevices returns the devices that match the given identifiers
+  rpc ListDevices(EndDeviceIdentifiers) returns (EndDevices);
+  // GetDevice returns the device that matches the given identifiers.
+  // If there are multiple matches, an error will be returned.
+  rpc GetDevice(EndDeviceIdentifiers) returns (EndDevice);
+  // SetDevice creates or updates the device
+  rpc SetDevice(EndDevice) returns (google.protobuf.Empty);
+  // DeleteDevice deletes the device that matches the given identifiers.
+  // If there are multiple matches, an error will be returned.
+  rpc DeleteDevice(EndDeviceIdentifiers) returns (google.protobuf.Empty);
 }

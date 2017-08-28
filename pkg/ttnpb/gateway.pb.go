@@ -638,7 +638,7 @@ func (this *GatewayStatus) String() string {
 		`Versions:` + mapStringForVersions + `,`,
 		`Location:` + strings.Replace(fmt.Sprintf("%v", this.Location), "Location", "Location", 1) + `,`,
 		`IP:` + fmt.Sprintf("%v", this.IP) + `,`,
-		`RTT:` + strings.Replace(fmt.Sprintf("%v", this.RTT), "Duration", "google_protobuf3.Duration", 1) + `,`,
+		`RTT:` + strings.Replace(fmt.Sprintf("%v", this.RTT), "Duration", "google_protobuf4.Duration", 1) + `,`,
 		`Metrics:` + mapStringForMetrics + `,`,
 		`Advanced:` + strings.Replace(fmt.Sprintf("%v", this.Advanced), "Struct", "google_protobuf1.Struct", 1) + `,`,
 		`}`,

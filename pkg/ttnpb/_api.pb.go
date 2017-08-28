@@ -8,6 +8,7 @@ The Things Network v3 API
 
 It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/_api.proto
+	github.com/TheThingsNetwork/ttn/api/application.proto
 	github.com/TheThingsNetwork/ttn/api/end_device.proto
 	github.com/TheThingsNetwork/ttn/api/gateway.proto
 	github.com/TheThingsNetwork/ttn/api/gatewayserver.proto
@@ -15,14 +16,20 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/lorawan.proto
 	github.com/TheThingsNetwork/ttn/api/messages.proto
 	github.com/TheThingsNetwork/ttn/api/metadata.proto
+	github.com/TheThingsNetwork/ttn/api/networkserver.proto
 
 It has these top-level messages:
+	ApplicationIdentifiers
+	ApplicationUplink
+	ApplicationDownlink
+	ApplicationDownlinks
 	EndDeviceIdentifiers
 	KeyEnvelope
 	RootKeys
 	SessionKeys
 	Session
 	EndDevice
+	EndDevices
 	MACSettings
 	MACState
 	MACInfo
@@ -49,6 +56,7 @@ It has these top-level messages:
 	RxMetadata
 	TxMetadata
 	Location
+	ApplicationUp
 */
 package ttnpb
 

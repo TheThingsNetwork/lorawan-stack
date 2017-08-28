@@ -7,7 +7,7 @@ import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
-import google_protobuf3 "github.com/gogo/protobuf/types"
+import google_protobuf4 "github.com/gogo/protobuf/types"
 
 import github_com_TheThingsNetwork_ttn_pkg_types "github.com/TheThingsNetwork/ttn/pkg/types"
 
@@ -95,7 +95,7 @@ type JoinResponse struct {
 	// The session keys
 	SessionKeys `protobuf:"bytes,2,opt,name=session_keys,json=sessionKeys,embedded=session_keys" json:"session_keys"`
 	// Lifetime of the session
-	Lifetime *google_protobuf3.Duration `protobuf:"bytes,3,opt,name=lifetime" json:"lifetime,omitempty"`
+	Lifetime *google_protobuf4.Duration `protobuf:"bytes,3,opt,name=lifetime" json:"lifetime,omitempty"`
 }
 
 func (m *JoinResponse) Reset()                    { *m = JoinResponse{} }
@@ -109,7 +109,7 @@ func (m *JoinResponse) GetRawPayload() []byte {
 	return nil
 }
 
-func (m *JoinResponse) GetLifetime() *google_protobuf3.Duration {
+func (m *JoinResponse) GetLifetime() *google_protobuf4.Duration {
 	if m != nil {
 		return m.Lifetime
 	}
@@ -348,7 +348,7 @@ func (this *JoinResponse) String() string {
 	s := strings.Join([]string{`&JoinResponse{`,
 		`RawPayload:` + fmt.Sprintf("%v", this.RawPayload) + `,`,
 		`SessionKeys:` + strings.Replace(strings.Replace(this.SessionKeys.String(), "SessionKeys", "SessionKeys", 1), `&`, ``, 1) + `,`,
-		`Lifetime:` + strings.Replace(fmt.Sprintf("%v", this.Lifetime), "Duration", "google_protobuf3.Duration", 1) + `,`,
+		`Lifetime:` + strings.Replace(fmt.Sprintf("%v", this.Lifetime), "Duration", "google_protobuf4.Duration", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -760,7 +760,7 @@ func (m *JoinResponse) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Lifetime == nil {
-				m.Lifetime = &google_protobuf3.Duration{}
+				m.Lifetime = &google_protobuf4.Duration{}
 			}
 			if err := m.Lifetime.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err

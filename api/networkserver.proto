@@ -1,0 +1,42 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsNetwork/ttn/api/application.proto";
+import "github.com/TheThingsNetwork/ttn/api/end_device.proto";
+import "github.com/TheThingsNetwork/ttn/api/gateway.proto";
+import "github.com/TheThingsNetwork/ttn/api/messages.proto";
+import "google/protobuf/empty.proto";
+
+package ttn.v3;
+
+option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+
+// ApplicationUp wraps multiple application-layer uplink types
+message ApplicationUp {
+  oneof up {
+    ApplicationUplink uplink_message = 1;
+    // Join accepted
+    // Downlink queued
+    // Downlink sent
+    // Downlink acked
+    // Downlink not acked
+    // Downlink queue invalidated (LoRaWAN 1.0)
+  }
+}
+
+// The GsNs service connects a gateway server to a network server.
+service GsNs {
+  rpc StartServingGateway(GatewayIdentifiers) returns (google.protobuf.Empty);
+  rpc StopServingGateway(GatewayIdentifiers) returns (google.protobuf.Empty);
+  rpc HandleUplink(UplinkMessage) returns (google.protobuf.Empty);
+}
+
+// The AsNs service connects an application server to a network server.
+service AsNs {
+  rpc LinkApplication(ApplicationIdentifiers) returns (stream ApplicationUp);
+  rpc DownlinkQueuePush(ApplicationDownlinks) returns (google.protobuf.Empty);
+  rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks);
+  rpc DownlinkQueueClear(EndDeviceIdentifiers) returns (google.protobuf.Empty);
+}

@@ -1,0 +1,34 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+package ttn.v3;
+
+option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+
+message ApplicationIdentifiers {
+  // TTN Application ID
+  string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
+  // TTN Tenant ID (in case of multi-tenant network stack)
+  string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
+}
+
+message ApplicationUplink {
+  int32 f_port = 1;
+  uint32 f_cnt = 2;
+  bytes frm_payload = 3;
+  // TODO: Add Metadata
+}
+
+message ApplicationDownlink {
+  int32 f_port = 1;
+  uint32 f_cnt = 2;
+  bytes frm_payload = 3;
+  // TODO: Add "hints" for NS
+}
+
+message ApplicationDownlinks {
+  repeated ApplicationDownlink downlinks = 1;
+}
