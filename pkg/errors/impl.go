@@ -13,14 +13,6 @@ type Impl struct {
 	namespace  string
 }
 
-type impl struct {
-	Message    string     `json:"error"`
-	Code       Code       `json:"error_code,omitempty"`
-	Typ        Type       `json:"error_type,omitempty"`
-	Attributes Attributes `json:"attributes,omitempty"`
-	Namespace  string     `json:"namespace,omitempty"`
-}
-
 // MarshalJSON implements json.Marshaler
 func (i *Impl) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toJSON(i))
