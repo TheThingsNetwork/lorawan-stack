@@ -32,7 +32,7 @@ func TestRegistry(t *testing.T) {
 		Code:          391,
 		Namespace:     "pkg/foo",
 	}
-	reg.Register(desc)
+	reg.Register(desc.Namespace, desc)
 
 	all := reg.GetAll()
 	a.So(all, should.HaveLength, 1)
@@ -40,37 +40,34 @@ func TestRegistry(t *testing.T) {
 
 	// duplicate ns-code combination, panic
 	a.So(func() {
-		reg.Register(&ErrDescriptor{
+		reg.Register(desc.Namespace, &ErrDescriptor{
 			MessageFormat: "You made a mistake cost us {price, plural, =0 {no money} =1 {one dollar} other {{price} dollars}}",
 			Type:          InvalidArgument,
 			Code:          391,
-			Namespace:     "pkg/foo",
 		})
 	}, should.Panic)
 
 	// missing code, panic
 	a.So(func() {
-		reg.Register(&ErrDescriptor{
+		reg.Register(desc.Namespace, &ErrDescriptor{
 			MessageFormat: "You made a mistake cost us {price, plural, =0 {no money} =1 {one dollar} other {{price} dollars}}",
 			Type:          InvalidArgument,
-			Namespace:     "pkg/foo",
 		})
 	}, should.Panic)
 
-	// missing namespace, panic
+	// wrong namespace, panic
 	a.So(func() {
-		reg.Register(&ErrDescriptor{
+		reg.Register(desc.Namespace, &ErrDescriptor{
 			MessageFormat: "You made a mistake cost us {price, plural, =0 {no money} =1 {one dollar} other {{price} dollars}}",
 			Type:          InvalidArgument,
-			Code:          392,
+			Namespace:     "foo/bar",
 		})
 	}, should.Panic)
 
-	reg.Register(&ErrDescriptor{
+	reg.Register(desc.Namespace, &ErrDescriptor{
 		MessageFormat: "You made a mistake cost us {price, plural, =0 {no money} =1 {one dollar} other {{price} dollars}}",
 		Type:          InvalidArgument,
 		Code:          392,
-		Namespace:     "pkg/foo",
 	})
 
 	a.So(reg.GetAll(), should.HaveLength, 2)

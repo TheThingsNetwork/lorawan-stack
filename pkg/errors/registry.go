@@ -14,7 +14,7 @@ type registry struct {
 }
 
 // Register registers a new error type
-func (r *registry) Register(err *ErrDescriptor) {
+func (r *registry) Register(namespace string, err *ErrDescriptor) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -23,7 +23,11 @@ func (r *registry) Register(err *ErrDescriptor) {
 	}
 
 	if err.Namespace == "" {
-		panic(fmt.Errorf("No namespace defined in error descriptor (message: `%s`)", err.MessageFormat))
+		err.Namespace = namespace
+	}
+
+	if err.Namespace != "" && err.Namespace != namespace {
+		panic(fmt.Errorf("Registering descriptor with namespace %s under namespace %s", err.Namespace, namespace))
 	}
 
 	// make sure the namespace exists
@@ -68,13 +72,7 @@ var reg = &registry{
 // Register registers the provided error descriptors under the provided namespace
 func Register(namespace string, descriptors ...*ErrDescriptor) {
 	for _, d := range descriptors {
-		if d.Namespace != "" && d.Namespace != namespace {
-			panic(fmt.Errorf("Registering descriptor with namespace %s under namespace %s", d.Namespace, namespace))
-		}
-
-		d.Namespace = namespace
-
-		reg.Register(d)
+		reg.Register(namespace, d)
 	}
 }
 
