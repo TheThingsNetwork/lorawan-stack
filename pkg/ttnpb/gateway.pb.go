@@ -8,7 +8,7 @@ import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/gogo/protobuf/types"
-import google_protobuf1 "github.com/gogo/protobuf/types"
+import google_protobuf2 "github.com/gogo/protobuf/types"
 import _ "github.com/gogo/protobuf/types"
 
 import time "time"
@@ -61,7 +61,7 @@ type GatewayStatus struct {
 	// Advanced metadata fields
 	// - can be used for advanced information or experimental features that are not yet formally defined in the API
 	// - field names are written in snake_case
-	Advanced *google_protobuf1.Struct `protobuf:"bytes,99,opt,name=advanced" json:"advanced,omitempty"`
+	Advanced *google_protobuf2.Struct `protobuf:"bytes,99,opt,name=advanced" json:"advanced,omitempty"`
 }
 
 func (m *GatewayStatus) Reset()                    { *m = GatewayStatus{} }
@@ -124,7 +124,7 @@ func (m *GatewayStatus) GetMetrics() map[string]float32 {
 	return nil
 }
 
-func (m *GatewayStatus) GetAdvanced() *google_protobuf1.Struct {
+func (m *GatewayStatus) GetAdvanced() *google_protobuf2.Struct {
 	if m != nil {
 		return m.Advanced
 	}
@@ -551,15 +551,15 @@ func (this *GatewayStatus) String() string {
 	}
 	mapStringForMetrics += "}"
 	s := strings.Join([]string{`&GatewayStatus{`,
-		`Time:` + strings.Replace(fmt.Sprintf("%v", this.Time), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
-		`BootTime:` + strings.Replace(fmt.Sprintf("%v", this.BootTime), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
+		`Time:` + strings.Replace(fmt.Sprintf("%v", this.Time), "Timestamp", "google_protobuf3.Timestamp", 1) + `,`,
+		`BootTime:` + strings.Replace(fmt.Sprintf("%v", this.BootTime), "Timestamp", "google_protobuf3.Timestamp", 1) + `,`,
 		`Platform:` + fmt.Sprintf("%v", this.Platform) + `,`,
 		`Versions:` + mapStringForVersions + `,`,
 		`Location:` + strings.Replace(fmt.Sprintf("%v", this.Location), "Location", "Location", 1) + `,`,
 		`IP:` + fmt.Sprintf("%v", this.IP) + `,`,
 		`RTT:` + strings.Replace(fmt.Sprintf("%v", this.RTT), "Duration", "google_protobuf4.Duration", 1) + `,`,
 		`Metrics:` + mapStringForMetrics + `,`,
-		`Advanced:` + strings.Replace(fmt.Sprintf("%v", this.Advanced), "Struct", "google_protobuf1.Struct", 1) + `,`,
+		`Advanced:` + strings.Replace(fmt.Sprintf("%v", this.Advanced), "Struct", "google_protobuf2.Struct", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -569,11 +569,11 @@ func (this *GatewayObservations) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GatewayObservations{`,
-		`LastUplinkReceived:` + strings.Replace(fmt.Sprintf("%v", this.LastUplinkReceived), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
+		`LastUplinkReceived:` + strings.Replace(fmt.Sprintf("%v", this.LastUplinkReceived), "Timestamp", "google_protobuf3.Timestamp", 1) + `,`,
 		`UplinkCount:` + fmt.Sprintf("%v", this.UplinkCount) + `,`,
-		`LastDownlinkReceived:` + strings.Replace(fmt.Sprintf("%v", this.LastDownlinkReceived), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
+		`LastDownlinkReceived:` + strings.Replace(fmt.Sprintf("%v", this.LastDownlinkReceived), "Timestamp", "google_protobuf3.Timestamp", 1) + `,`,
 		`DownlinkCount:` + fmt.Sprintf("%v", this.DownlinkCount) + `,`,
-		`LastStatusReceived:` + strings.Replace(fmt.Sprintf("%v", this.LastStatusReceived), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
+		`LastStatusReceived:` + strings.Replace(fmt.Sprintf("%v", this.LastStatusReceived), "Timestamp", "google_protobuf3.Timestamp", 1) + `,`,
 		`StatusCount:` + fmt.Sprintf("%v", this.StatusCount) + `,`,
 		`LastStatus:` + strings.Replace(fmt.Sprintf("%v", this.LastStatus), "GatewayStatus", "GatewayStatus", 1) + `,`,
 		`}`,
@@ -1051,7 +1051,7 @@ func (m *GatewayStatus) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Advanced == nil {
-				m.Advanced = &google_protobuf1.Struct{}
+				m.Advanced = &google_protobuf2.Struct{}
 			}
 			if err := m.Advanced.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err

@@ -263,6 +263,7 @@ enum PingSlotPeriod {
 }
 
 // The DeviceManagement service allows clients to manage their end devices
+// This service is implemented by the join server, network server and application server
 service DeviceManagement {
   // ListDevices returns the devices that match the given identifiers
   rpc ListDevices(EndDeviceIdentifiers) returns (EndDevices);

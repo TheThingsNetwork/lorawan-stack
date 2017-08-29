@@ -7,9 +7,9 @@ import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
-import google_protobuf3 "github.com/gogo/protobuf/types"
 import google_protobuf1 "github.com/gogo/protobuf/types"
 import google_protobuf2 "github.com/gogo/protobuf/types"
+import google_protobuf3 "github.com/gogo/protobuf/types"
 
 import github_com_TheThingsNetwork_ttn_pkg_types "github.com/TheThingsNetwork/ttn/pkg/types"
 import time "time"
@@ -346,7 +346,7 @@ type EndDevice struct {
 	Location *Location `protobuf:"bytes,21,opt,name=location" json:"location,omitempty"`
 	// Device Attributes
 	// - field names are written in snake_case
-	Attributes *google_protobuf1.Struct `protobuf:"bytes,22,opt,name=attributes" json:"attributes,omitempty"`
+	Attributes *google_protobuf2.Struct `protobuf:"bytes,22,opt,name=attributes" json:"attributes,omitempty"`
 	CreatedAt  *time.Time               `protobuf:"bytes,97,opt,name=created_at,json=createdAt,stdtime" json:"created_at,omitempty"`
 	UpdatedAt  *time.Time               `protobuf:"bytes,98,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at,omitempty"`
 }
@@ -495,7 +495,7 @@ func (m *EndDevice) GetLocation() *Location {
 	return nil
 }
 
-func (m *EndDevice) GetAttributes() *google_protobuf1.Struct {
+func (m *EndDevice) GetAttributes() *google_protobuf2.Struct {
 	if m != nil {
 		return m.Attributes
 	}
@@ -727,7 +727,7 @@ type MACInfo struct {
 	// - If device sent DeviceModeInd MAC message, this will be set to that value
 	DeviceClass Class `protobuf:"varint,1,opt,name=device_class,json=deviceClass,proto3,enum=ttn.v3.Class" json:"device_class,omitempty"`
 	// When the last device status MAC message was received
-	LastStatus *google_protobuf2.Timestamp `protobuf:"bytes,2,opt,name=last_status,json=lastStatus" json:"last_status,omitempty"`
+	LastStatus *google_protobuf3.Timestamp `protobuf:"bytes,2,opt,name=last_status,json=lastStatus" json:"last_status,omitempty"`
 	// Battery percentage received in last device status message
 	BatteryPercentage float32 `protobuf:"fixed32,3,opt,name=battery_percentage,json=batteryPercentage,proto3" json:"battery_percentage,omitempty"`
 	// Downlink margin received in last device status message
@@ -747,7 +747,7 @@ func (m *MACInfo) GetDeviceClass() Class {
 	return CLASS_A
 }
 
-func (m *MACInfo) GetLastStatus() *google_protobuf2.Timestamp {
+func (m *MACInfo) GetLastStatus() *google_protobuf3.Timestamp {
 	if m != nil {
 		return m.LastStatus
 	}
@@ -820,10 +820,10 @@ type DeviceManagementClient interface {
 	// If there are multiple matches, an error will be returned.
 	GetDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*EndDevice, error)
 	// SetDevice creates or updates the device
-	SetDevice(ctx context.Context, in *EndDevice, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
+	SetDevice(ctx context.Context, in *EndDevice, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
 	// DeleteDevice deletes the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
-	DeleteDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
+	DeleteDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
 }
 
 type deviceManagementClient struct {
@@ -852,8 +852,8 @@ func (c *deviceManagementClient) GetDevice(ctx context.Context, in *EndDeviceIde
 	return out, nil
 }
 
-func (c *deviceManagementClient) SetDevice(ctx context.Context, in *EndDevice, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
-	out := new(google_protobuf3.Empty)
+func (c *deviceManagementClient) SetDevice(ctx context.Context, in *EndDevice, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
+	out := new(google_protobuf1.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.DeviceManagement/SetDevice", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -861,8 +861,8 @@ func (c *deviceManagementClient) SetDevice(ctx context.Context, in *EndDevice, o
 	return out, nil
 }
 
-func (c *deviceManagementClient) DeleteDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
-	out := new(google_protobuf3.Empty)
+func (c *deviceManagementClient) DeleteDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
+	out := new(google_protobuf1.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.DeviceManagement/DeleteDevice", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -879,10 +879,10 @@ type DeviceManagementServer interface {
 	// If there are multiple matches, an error will be returned.
 	GetDevice(context.Context, *EndDeviceIdentifiers) (*EndDevice, error)
 	// SetDevice creates or updates the device
-	SetDevice(context.Context, *EndDevice) (*google_protobuf3.Empty, error)
+	SetDevice(context.Context, *EndDevice) (*google_protobuf1.Empty, error)
 	// DeleteDevice deletes the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
-	DeleteDevice(context.Context, *EndDeviceIdentifiers) (*google_protobuf3.Empty, error)
+	DeleteDevice(context.Context, *EndDeviceIdentifiers) (*google_protobuf1.Empty, error)
 }
 
 func RegisterDeviceManagementServer(s *grpc.Server, srv DeviceManagementServer) {
@@ -2033,7 +2033,7 @@ func (this *Session) String() string {
 		`NextFCntUp:` + fmt.Sprintf("%v", this.NextFCntUp) + `,`,
 		`NextNFCntDown:` + fmt.Sprintf("%v", this.NextNFCntDown) + `,`,
 		`NextAFCntDown:` + fmt.Sprintf("%v", this.NextAFCntDown) + `,`,
-		`Started:` + strings.Replace(fmt.Sprintf("%v", this.Started), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
+		`Started:` + strings.Replace(fmt.Sprintf("%v", this.Started), "Timestamp", "google_protobuf3.Timestamp", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2064,9 +2064,9 @@ func (this *EndDevice) String() string {
 		`MACState:` + strings.Replace(fmt.Sprintf("%v", this.MACState), "MACState", "MACState", 1) + `,`,
 		`MACStateDesired:` + strings.Replace(fmt.Sprintf("%v", this.MACStateDesired), "MACState", "MACState", 1) + `,`,
 		`Location:` + strings.Replace(fmt.Sprintf("%v", this.Location), "Location", "Location", 1) + `,`,
-		`Attributes:` + strings.Replace(fmt.Sprintf("%v", this.Attributes), "Struct", "google_protobuf1.Struct", 1) + `,`,
-		`CreatedAt:` + strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
-		`UpdatedAt:` + strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
+		`Attributes:` + strings.Replace(fmt.Sprintf("%v", this.Attributes), "Struct", "google_protobuf2.Struct", 1) + `,`,
+		`CreatedAt:` + strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "google_protobuf3.Timestamp", 1) + `,`,
+		`UpdatedAt:` + strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "google_protobuf3.Timestamp", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2124,7 +2124,7 @@ func (this *MACInfo) String() string {
 	}
 	s := strings.Join([]string{`&MACInfo{`,
 		`DeviceClass:` + fmt.Sprintf("%v", this.DeviceClass) + `,`,
-		`LastStatus:` + strings.Replace(fmt.Sprintf("%v", this.LastStatus), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
+		`LastStatus:` + strings.Replace(fmt.Sprintf("%v", this.LastStatus), "Timestamp", "google_protobuf3.Timestamp", 1) + `,`,
 		`BatteryPercentage:` + fmt.Sprintf("%v", this.BatteryPercentage) + `,`,
 		`DownlinkMargin:` + fmt.Sprintf("%v", this.DownlinkMargin) + `,`,
 		`PingSlotPeriodicity:` + fmt.Sprintf("%v", this.PingSlotPeriodicity) + `,`,
@@ -3474,7 +3474,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Attributes == nil {
-				m.Attributes = &google_protobuf1.Struct{}
+				m.Attributes = &google_protobuf2.Struct{}
 			}
 			if err := m.Attributes.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -4187,7 +4187,7 @@ func (m *MACInfo) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.LastStatus == nil {
-				m.LastStatus = &google_protobuf2.Timestamp{}
+				m.LastStatus = &google_protobuf3.Timestamp{}
 			}
 			if err := m.LastStatus.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err

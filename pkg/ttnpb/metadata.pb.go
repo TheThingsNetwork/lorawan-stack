@@ -7,7 +7,7 @@ import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
-import google_protobuf1 "github.com/gogo/protobuf/types"
+import google_protobuf2 "github.com/gogo/protobuf/types"
 import _ "github.com/gogo/protobuf/types"
 
 import time "time"
@@ -83,7 +83,7 @@ type RxMetadata struct {
 	// Advanced metadata fields
 	// - can be used for advanced information or experimental features that are not yet formally defined in the API
 	// - field names are written in snake_case
-	Advanced *google_protobuf1.Struct `protobuf:"bytes,99,opt,name=advanced" json:"advanced,omitempty"`
+	Advanced *google_protobuf2.Struct `protobuf:"bytes,99,opt,name=advanced" json:"advanced,omitempty"`
 }
 
 func (m *RxMetadata) Reset()                    { *m = RxMetadata{} }
@@ -139,7 +139,7 @@ func (m *RxMetadata) GetLocation() *Location {
 	return nil
 }
 
-func (m *RxMetadata) GetAdvanced() *google_protobuf1.Struct {
+func (m *RxMetadata) GetAdvanced() *google_protobuf2.Struct {
 	if m != nil {
 		return m.Advanced
 	}
@@ -159,7 +159,7 @@ type TxMetadata struct {
 	// Advanced metadata fields
 	// - can be used for advanced information or experimental features that are not yet formally defined in the API
 	// - field names are written in snake_case
-	Advanced *google_protobuf1.Struct `protobuf:"bytes,99,opt,name=advanced" json:"advanced,omitempty"`
+	Advanced *google_protobuf2.Struct `protobuf:"bytes,99,opt,name=advanced" json:"advanced,omitempty"`
 }
 
 func (m *TxMetadata) Reset()                    { *m = TxMetadata{} }
@@ -180,7 +180,7 @@ func (m *TxMetadata) GetTime() *time.Time {
 	return nil
 }
 
-func (m *TxMetadata) GetAdvanced() *google_protobuf1.Struct {
+func (m *TxMetadata) GetAdvanced() *google_protobuf2.Struct {
 	if m != nil {
 		return m.Advanced
 	}
@@ -556,11 +556,11 @@ func (this *RxMetadata) String() string {
 		`AntennaIndex:` + fmt.Sprintf("%v", this.AntennaIndex) + `,`,
 		`ChannelIndex:` + fmt.Sprintf("%v", this.ChannelIndex) + `,`,
 		`Timestamp:` + fmt.Sprintf("%v", this.Timestamp) + `,`,
-		`Time:` + strings.Replace(fmt.Sprintf("%v", this.Time), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
+		`Time:` + strings.Replace(fmt.Sprintf("%v", this.Time), "Timestamp", "google_protobuf3.Timestamp", 1) + `,`,
 		`RSSI:` + fmt.Sprintf("%v", this.RSSI) + `,`,
 		`SNR:` + fmt.Sprintf("%v", this.SNR) + `,`,
 		`Location:` + strings.Replace(fmt.Sprintf("%v", this.Location), "Location", "Location", 1) + `,`,
-		`Advanced:` + strings.Replace(fmt.Sprintf("%v", this.Advanced), "Struct", "google_protobuf1.Struct", 1) + `,`,
+		`Advanced:` + strings.Replace(fmt.Sprintf("%v", this.Advanced), "Struct", "google_protobuf2.Struct", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -572,8 +572,8 @@ func (this *TxMetadata) String() string {
 	s := strings.Join([]string{`&TxMetadata{`,
 		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Timestamp:` + fmt.Sprintf("%v", this.Timestamp) + `,`,
-		`Time:` + strings.Replace(fmt.Sprintf("%v", this.Time), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
-		`Advanced:` + strings.Replace(fmt.Sprintf("%v", this.Advanced), "Struct", "google_protobuf1.Struct", 1) + `,`,
+		`Time:` + strings.Replace(fmt.Sprintf("%v", this.Time), "Timestamp", "google_protobuf3.Timestamp", 1) + `,`,
+		`Advanced:` + strings.Replace(fmt.Sprintf("%v", this.Advanced), "Struct", "google_protobuf2.Struct", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -837,7 +837,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Advanced == nil {
-				m.Advanced = &google_protobuf1.Struct{}
+				m.Advanced = &google_protobuf2.Struct{}
 			}
 			if err := m.Advanced.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1002,7 +1002,7 @@ func (m *TxMetadata) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Advanced == nil {
-				m.Advanced = &google_protobuf1.Struct{}
+				m.Advanced = &google_protobuf2.Struct{}
 			}
 			if err := m.Advanced.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err

@@ -35,7 +35,4 @@ service GsNs {
 // The AsNs service connects an application server to a network server.
 service AsNs {
   rpc LinkApplication(ApplicationIdentifiers) returns (stream ApplicationUp);
-  rpc DownlinkQueuePush(ApplicationDownlinks) returns (google.protobuf.Empty);
-  rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks);
-  rpc DownlinkQueueClear(EndDeviceIdentifiers) returns (google.protobuf.Empty);
 }
