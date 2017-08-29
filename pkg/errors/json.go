@@ -9,6 +9,7 @@ type jsonError struct {
 	Code       Code       `json:"error_code,omitempty"`
 	Type       Type       `json:"error_type,omitempty"`
 	Attributes Attributes `json:"attributes,omitempty"`
+	Namespace  string     `json:"namespace,omitempty"`
 }
 
 func toJSON(err Error) *jsonError {
@@ -17,6 +18,7 @@ func toJSON(err Error) *jsonError {
 		Code:       err.Code(),
 		Type:       err.Type(),
 		Attributes: err.Attributes(),
+		Namespace:  err.Namespace(),
 	}
 }
 
@@ -26,6 +28,7 @@ func fromJSON(err *jsonError) *Impl {
 		code:       err.Code,
 		typ:        err.Type,
 		attributes: err.Attributes,
+		namespace:  err.Namespace,
 	}
 }
 

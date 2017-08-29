@@ -4,6 +4,7 @@ package errors
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -98,6 +99,7 @@ type impl struct {
 func (i impl) Error() string {
 	return HTTPStatusToType(i.StatusCode).String()
 }
+
 func (i impl) Code() errors.Code {
 	code, err := strconv.Atoi(i.Header.Get(CodeHeader))
 	if err != nil {
@@ -105,11 +107,17 @@ func (i impl) Code() errors.Code {
 	}
 	return errors.Code(code)
 }
+
 func (i impl) Type() errors.Type {
 	return HTTPStatusToType(i.StatusCode)
 }
+
 func (i impl) Attributes() errors.Attributes {
 	return nil
+}
+
+func (i impl) Namespace() string {
+	return ""
 }
 
 // FromHTTP parses the http.Response and returns the corresponding
@@ -120,6 +128,7 @@ func FromHTTP(resp *http.Response) (out errors.Error) {
 	}
 	defer resp.Body.Close()
 	bytes, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(bytes))
 	if len(bytes) > 0 {
 		var err error
 		out, err = errors.UnmarshalJSON(bytes)

@@ -30,6 +30,9 @@ type Error interface {
 
 	// Attributes returns the error attributes
 	Attributes() Attributes
+
+	// Namespace returns the namespace of the error, usually the package from which it originates
+	Namespace() string
 }
 
 // Attributes is a map of attributes

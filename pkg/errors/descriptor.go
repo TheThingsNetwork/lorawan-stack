@@ -28,6 +28,9 @@ type ErrDescriptor struct {
 	// Type is the type of errors created by this descriptor
 	Type Type
 
+	// Namespace is the namespace in which the errors live, usually the package name from which they originate.
+	Namespace string
+
 	// registered denotes wether or not the error has been registered
 	// (by a call to Register)
 	registered bool
@@ -44,6 +47,7 @@ func (err *ErrDescriptor) New(attributes Attributes) Error {
 		code:       err.Code,
 		typ:        err.Type,
 		attributes: attributes,
+		namespace:  err.Namespace,
 	}
 }
 

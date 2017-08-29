@@ -22,6 +22,7 @@ func TestHTTP(t *testing.T) {
 		MessageFormat: "You do not have access to app with id {app_id}",
 		Code:          code(77),
 		Type:          errors.PermissionDenied,
+		Namespace:     "pkg/foo",
 	}
 	d.Register()
 
@@ -44,6 +45,7 @@ func TestHTTP(t *testing.T) {
 	a.So(got.Error(), should.Equal, err.Error())
 	a.So(got.Attributes()["app_id"], should.Resemble, attributes["app_id"])
 	a.So(got.Attributes()["count"], should.AlmostEqual, attributes["count"])
+	a.So(got.Namespace(), should.Equal, d.Namespace)
 }
 
 func TestToUnspecifiedHTTP(t *testing.T) {
@@ -62,6 +64,7 @@ func TestToUnspecifiedHTTP(t *testing.T) {
 	a.So(got.Type(), should.Equal, errors.Unknown)
 	a.So(got.Error(), should.Equal, err.Error())
 	a.So(got.Attributes(), should.BeNil)
+	a.So(got.Namespace(), should.BeEmpty)
 }
 
 func TestHTTPResponse(t *testing.T) {
@@ -77,4 +80,5 @@ func TestHTTPResponse(t *testing.T) {
 	a.So(got.Type(), should.Equal, errors.NotFound)
 	a.So(got.Error(), should.Equal, "Not found")
 	a.So(got.Attributes(), should.BeNil)
+	a.So(got.Namespace(), should.BeEmpty)
 }

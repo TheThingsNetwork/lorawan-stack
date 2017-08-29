@@ -90,8 +90,9 @@ func GRPCCode(err error) codes.Code {
 
 type impl struct {
 	*status.Status
-	attrs errors.Attributes
-	code  errors.Code
+	attrs     errors.Attributes
+	code      errors.Code
+	namespace string
 }
 
 func (i impl) Error() string {
@@ -105,6 +106,9 @@ func (i impl) Type() errors.Type {
 }
 func (i impl) Attributes() errors.Attributes {
 	return i.attrs
+}
+func (i impl) Namespace() string {
+	return i.namespace
 }
 
 // FromGRPC parses a gRPC error and returns an Error
@@ -123,6 +127,10 @@ func FromGRPC(in error) errors.Error {
 					case "attributes":
 						if v, ok := v.(map[string]interface{}); ok {
 							out.attrs = v
+						}
+					case "ttn-error-namespace":
+						if v, ok := v.(string); ok {
+							out.namespace = v
 						}
 					}
 				}

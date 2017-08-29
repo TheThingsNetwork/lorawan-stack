@@ -10,6 +10,7 @@ type Impl struct {
 	code       Code
 	typ        Type
 	attributes Attributes
+	namespace  string
 }
 
 type impl struct {
@@ -17,6 +18,7 @@ type impl struct {
 	Code       Code       `json:"error_code,omitempty"`
 	Typ        Type       `json:"error_type,omitempty"`
 	Attributes Attributes `json:"attributes,omitempty"`
+	Namespace  string     `json:"namespace,omitempty"`
 }
 
 // MarshalJSON implements json.Marshaler
@@ -54,6 +56,11 @@ func (i *Impl) Attributes() Attributes {
 	return i.attributes
 }
 
+// Namespace returns the namespace of the error, which is usuallt the package it originates from.
+func (i *Impl) Namespace() string {
+	return i.namespace
+}
+
 // ToImpl creates an equivalent Impl for any Error
 func ToImpl(err Error) *Impl {
 	if i, ok := err.(*Impl); ok {
@@ -65,5 +72,6 @@ func ToImpl(err Error) *Impl {
 		code:       err.Code(),
 		typ:        err.Type(),
 		attributes: err.Attributes(),
+		namespace:  err.Namespace(),
 	}
 }
