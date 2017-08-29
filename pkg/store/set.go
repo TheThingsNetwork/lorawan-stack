@@ -2,43 +2,43 @@
 
 package store
 
-// StringSet implements "set" data structure that contains strings
-type StringSet map[string]bool
+// Set implements "set" data structure that contains strings
+type Set map[PrimaryKey]bool
 
-// NewStringSet creates a new set that holds ULIDs
-func NewStringSet() StringSet {
-	return make(StringSet)
+// NewSet creates a new set that holds primary keys
+func NewSet() Set {
+	return make(Set)
 }
 
 // Size returns the size of the set
-func (s StringSet) Size() int {
+func (s Set) Size() int {
 	return len(s)
 }
 
 // IsEmpty returns whether the set is empty
-func (s StringSet) IsEmpty() bool {
+func (s Set) IsEmpty() bool {
 	return len(s) == 0
 }
 
 // Add adds the ULID to the set
-func (s StringSet) Add(u string) {
+func (s Set) Add(u PrimaryKey) {
 	s[u] = true
 }
 
 // Remove removes the ULID from the set
-func (s StringSet) Remove(u string) {
+func (s Set) Remove(u PrimaryKey) {
 	delete(s, u)
 }
 
 // Contains returns whether the set contains the given ULID
-func (s StringSet) Contains(u string) bool {
+func (s Set) Contains(u PrimaryKey) bool {
 	_, exists := s[u]
 	return exists
 }
 
 // Slice returns the set as a slice
-func (s StringSet) Slice() []string {
-	result := make([]string, 0, len(s))
+func (s Set) Slice() []PrimaryKey {
+	result := make([]PrimaryKey, 0, len(s))
 	for u := range s {
 		result = append(result, u)
 	}
@@ -46,8 +46,8 @@ func (s StringSet) Slice() []string {
 }
 
 // Union returns the union of the two sets
-func (s StringSet) Union(other StringSet) StringSet {
-	result := make(StringSet)
+func (s Set) Union(other Set) Set {
+	result := make(Set)
 	for value := range s {
 		result[value] = true
 	}
@@ -58,8 +58,8 @@ func (s StringSet) Union(other StringSet) StringSet {
 }
 
 // Intersect returns the intersection of the two sets
-func (s StringSet) Intersect(other StringSet) StringSet {
-	result := make(StringSet)
+func (s Set) Intersect(other Set) Set {
+	result := make(Set)
 	for u := range s {
 		if other.Contains(u) {
 			result[u] = true

@@ -4,16 +4,21 @@ package store
 
 import (
 	"errors"
+	"fmt"
 )
 
 var (
 	ErrNotFound = errors.New("not found")
 )
 
+type PrimaryKey interface {
+	fmt.Stringer
+}
+
 type Store interface {
-	Create(obj map[string]interface{}) (string, error)
-	Find(id string) (map[string]interface{}, error)
-	FindBy(map[string]interface{}) (map[string]map[string]interface{}, error)
-	Update(id string, new, old map[string]interface{}) error
-	Delete(id string) error
+	Create(obj map[string]interface{}) (PrimaryKey, error)
+	Find(id PrimaryKey) (map[string]interface{}, error)
+	FindBy(map[string]interface{}) (map[PrimaryKey]map[string]interface{}, error)
+	Update(id PrimaryKey, new, old map[string]interface{}) error
+	Delete(id PrimaryKey) error
 }

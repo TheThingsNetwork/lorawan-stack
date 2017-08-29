@@ -29,9 +29,20 @@ func TestMapStore(t *testing.T) {
 	id, err := s.Create(old)
 	a.So(err, should.BeNil)
 
+	other := map[string]interface{}{
+		"hello": "world",
+	}
+	otherID, _ := s.Create(other)
+
+	a.So(otherID, should.NotEqual, id)
+
 	obj, err := s.Find(id)
 	a.So(err, should.BeNil)
 	a.So(obj, should.Resemble, old)
+
+	obj, err = s.Find(otherID)
+	a.So(err, should.BeNil)
+	a.So(obj, should.Resemble, other)
 
 	err = s.Update(id, new, old)
 	a.So(err, should.BeNil)

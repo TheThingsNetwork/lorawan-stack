@@ -17,26 +17,26 @@ import (
 func New() store.Store {
 	return &mapStore{
 		entropy: rand.New(rand.NewSource(time.Now().UnixNano())),
-		data:    make(map[string]map[string]interface{}),
+		data:    make(map[store.PrimaryKey]map[string]interface{}),
 	}
 }
 
 type mapStore struct {
 	entropy io.Reader
 	mu      sync.RWMutex
-	data    map[string]map[string]interface{}
+	data    map[store.PrimaryKey]map[string]interface{}
 }
 
-func (s *mapStore) ulid() string {
-	return ulid.MustNew(uint64(time.Now().UnixNano()/1000000), s.entropy).String()
+func (s *mapStore) ulid() store.PrimaryKey {
+	return ulid.MustNew(uint64(time.Now().UnixNano()/1000000), s.entropy)
 }
 
-func (s *mapStore) Create(obj map[string]interface{}) (string, error) {
+func (s *mapStore) Create(obj map[string]interface{}) (store.PrimaryKey, error) {
 	id := s.ulid()
 	return id, s.Update(id, obj, nil)
 }
 
-func (s *mapStore) Find(id string) (map[string]interface{}, error) {
+func (s *mapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	s.mu.RLock()
 	obj, ok := s.data[id]
 	s.mu.RUnlock()
@@ -46,8 +46,8 @@ func (s *mapStore) Find(id string) (map[string]interface{}, error) {
 	return nil, store.ErrNotFound
 }
 
-func (s *mapStore) FindBy(filters map[string]interface{}) (map[string]map[string]interface{}, error) {
-	matches := make(map[string]map[string]interface{})
+func (s *mapStore) FindBy(filters map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
+	matches := make(map[store.PrimaryKey]map[string]interface{})
 	s.mu.RLock()
 	for id, obj := range s.data {
 		for filterK, filterV := range filters {
@@ -63,7 +63,7 @@ func (s *mapStore) FindBy(filters map[string]interface{}) (map[string]map[string
 	return matches, nil
 }
 
-func (s *mapStore) Update(id string, new, old map[string]interface{}) error {
+func (s *mapStore) Update(id store.PrimaryKey, new, old map[string]interface{}) error {
 	diff := store.Diff(new, old)
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -83,7 +83,7 @@ func (s *mapStore) Update(id string, new, old map[string]interface{}) error {
 	return nil
 }
 
-func (s *mapStore) Delete(id string) error {
+func (s *mapStore) Delete(id store.PrimaryKey) error {
 	s.mu.Lock()
 	delete(s.data, id)
 	s.mu.Unlock()
