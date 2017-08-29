@@ -16,14 +16,14 @@ message ApplicationIdentifiers {
 }
 
 message ApplicationUplink {
-  int32 f_port = 1;
+  uint32 f_port = 1;
   uint32 f_cnt = 2;
   bytes frm_payload = 3;
   // TODO: Add Metadata
 }
 
 message ApplicationDownlink {
-  int32 f_port = 1;
+  uint32 f_port = 1;
   uint32 f_cnt = 2;
   bytes frm_payload = 3;
   // TODO: Add "hints" for NS
