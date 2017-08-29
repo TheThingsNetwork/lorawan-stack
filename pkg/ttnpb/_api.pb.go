@@ -12,6 +12,7 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/end_device.proto
 	github.com/TheThingsNetwork/ttn/api/gateway.proto
 	github.com/TheThingsNetwork/ttn/api/gatewayserver.proto
+	github.com/TheThingsNetwork/ttn/api/identifiers.proto
 	github.com/TheThingsNetwork/ttn/api/join.proto
 	github.com/TheThingsNetwork/ttn/api/lorawan.proto
 	github.com/TheThingsNetwork/ttn/api/messages.proto
@@ -19,11 +20,9 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/networkserver.proto
 
 It has these top-level messages:
-	ApplicationIdentifiers
 	ApplicationUplink
 	ApplicationDownlink
 	ApplicationDownlinks
-	EndDeviceIdentifiers
 	KeyEnvelope
 	RootKeys
 	SessionKeys
@@ -33,11 +32,13 @@ It has these top-level messages:
 	MACSettings
 	MACState
 	MACInfo
-	GatewayIdentifiers
 	GatewayStatus
 	GatewayObservations
 	GatewayUp
 	GatewayDown
+	GatewayIdentifiers
+	EndDeviceIdentifiers
+	ApplicationIdentifiers
 	JoinRequest
 	JoinResponse
 	Message

@@ -4,6 +4,7 @@ syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsNetwork/ttn/api/end_device.proto";
+import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/lorawan.proto";
 import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
 
@@ -63,7 +64,7 @@ message UplinkMessage {
   EndDeviceIdentifiers end_device = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // LoRaWAN Tx settings used for this transmission
-  TxSettings settings = 4 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  TxSettings settings = 4 [(gogoproto.nullable) = false];
 
   // Rx metadata from the gateway, one for each antenna that received the message
   repeated RxMetadata rx_metadata = 5 [(gogoproto.nullable) = false];
@@ -118,8 +119,8 @@ message DownlinkMessage {
   EndDeviceIdentifiers end_device = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // LoRaWAN Tx settings used for this transmission
-  TxSettings settings = 4 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  TxSettings settings = 4 [(gogoproto.nullable) = false];
 
   // Tx metadata for the gateway
-  TxMetadata tx_metadata = 5 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  TxMetadata tx_metadata = 5 [(gogoproto.nullable) = false];
 }

@@ -3,6 +3,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -14,7 +15,7 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 // a message corresponds to one RxMetadata.
 message RxMetadata {
   // ID of the gateway that received the message
-  string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
+  GatewayIdentifiers gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // Index of the antenna that received the message
   uint32 antenna_index = 2;
@@ -48,7 +49,7 @@ message RxMetadata {
 // It contains gateway-specific fields that are not in the TxSettings message
 message TxMetadata {
   // ID of the gateway that received the message
-  string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
+  GatewayIdentifiers gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // Gateway's internal timestamp when the Tx should start (nanoseconds)
   // NOTE: most gateways use microsecond timestamps, so conversion may be needed

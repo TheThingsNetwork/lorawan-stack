@@ -8,13 +8,6 @@ package ttn.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
-message ApplicationIdentifiers {
-  // TTN Application ID
-  string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
-  // TTN Tenant ID (in case of multi-tenant network stack)
-  string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
-}
-
 message ApplicationUplink {
   uint32 f_port = 1;
   uint32 f_cnt = 2;
