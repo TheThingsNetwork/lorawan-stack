@@ -14,7 +14,7 @@ type jsonError struct {
 
 func toJSON(err Error) *jsonError {
 	return &jsonError{
-		Message:    err.Error(),
+		Message:    err.Message(),
 		Code:       err.Code(),
 		Type:       err.Type(),
 		Attributes: err.Attributes(),

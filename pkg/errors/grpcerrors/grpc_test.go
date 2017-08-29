@@ -22,6 +22,7 @@ func TestGRPC(t *testing.T) {
 		MessageFormat: "You do not have access to app with id {app_id}",
 		Code:          code(77),
 		Type:          errors.PermissionDenied,
+		Namespace:     "pkg/foo",
 	}
 	d.Register()
 
@@ -45,7 +46,8 @@ func TestGRPC(t *testing.T) {
 	got := FromGRPC(grpcErr)
 	a.So(got.Code(), should.Equal, d.Code)
 	a.So(got.Type(), should.Equal, d.Type)
-	a.So(got.Error(), should.Equal, "You do not have access to app with id foo")
+	a.So(got.Message(), should.Equal, "You do not have access to app with id foo")
+	a.So(got.Error(), should.Equal, "pkg/foo: You do not have access to app with id foo")
 
 	a.So(got.Attributes(), should.NotBeEmpty)
 	a.So(got.Attributes()["app_id"], should.Resemble, attributes["app_id"])

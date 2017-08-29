@@ -63,7 +63,11 @@ func (err *ErrDescriptor) NewWithCause(attributes Attributes, cause error) Error
 	return err.New(attr)
 }
 
-// Register registers the descriptor
+// Register registers the error descriptor in the global error registry.
 func (err *ErrDescriptor) Register() {
-	Register(err)
+	if err.Namespace == "" {
+		err.Namespace = pkg()
+	}
+
+	Register(err.Namespace, err)
 }

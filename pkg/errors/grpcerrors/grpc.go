@@ -11,6 +11,12 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+const (
+	CodeKey      = "ttn-error-code"
+	AttributeKey = "attributes"
+	NamespaceKey = "namespace"
+)
+
 // TypeToGRPCCode returns the corresponding http status code from an error type
 func TypeToGRPCCode(t errors.Type) codes.Code {
 	switch t {
@@ -120,15 +126,15 @@ func FromGRPC(in error) errors.Error {
 			if details, ok := details.(*structpb.Struct); ok {
 				for k, v := range goproto.MapFromProto(details) {
 					switch k {
-					case "ttn-error-code":
+					case CodeKey:
 						if v, ok := v.(float64); ok {
 							out.code = errors.Code(v)
 						}
-					case "attributes":
+					case AttributeKey:
 						if v, ok := v.(map[string]interface{}); ok {
 							out.attrs = v
 						}
-					case "ttn-error-namespace":
+					case NamespaceKey:
 						if v, ok := v.(string); ok {
 							out.namespace = v
 						}
@@ -144,10 +150,11 @@ func FromGRPC(in error) errors.Error {
 // ToGRPC turns an error into a gRPC error
 func ToGRPC(in error) error {
 	if err, ok := in.(errors.Error); ok {
-		s, dErr := status.New(TypeToGRPCCode(err.Type()), err.Error()).
+		s, dErr := status.New(TypeToGRPCCode(err.Type()), err.Message()).
 			WithDetails(goproto.MapProto(map[string]interface{}{
-				"ttn-error-code": uint32(err.Code()),
-				"attributes":     err.Attributes(),
+				CodeKey:      uint32(err.Code()),
+				AttributeKey: err.Attributes(),
+				NamespaceKey: err.Namespace(),
 			}))
 		if dErr != nil {
 			panic(err) // probably means you're trying to send very very bad attributes

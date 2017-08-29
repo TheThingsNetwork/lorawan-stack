@@ -4,7 +4,6 @@ package errors
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -108,6 +107,10 @@ func (i impl) Code() errors.Code {
 	return errors.Code(code)
 }
 
+func (i impl) Message() string {
+	return ""
+}
+
 func (i impl) Type() errors.Type {
 	return HTTPStatusToType(i.StatusCode)
 }
@@ -128,7 +131,6 @@ func FromHTTP(resp *http.Response) (out errors.Error) {
 	}
 	defer resp.Body.Close()
 	bytes, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(bytes))
 	if len(bytes) > 0 {
 		var err error
 		out, err = errors.UnmarshalJSON(bytes)

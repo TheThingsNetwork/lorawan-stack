@@ -28,8 +28,17 @@ func (i *Impl) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// Error returns the formatted error message
+// Error returns the formatted error message, prefixed with the error namespace
 func (i *Impl) Error() string {
+	if i.namespace == "" {
+		return i.message
+	}
+
+	return i.namespace + ": " + i.message
+}
+
+// Message returns the formatted error message
+func (i *Impl) Message() string {
 	return i.message
 }
 

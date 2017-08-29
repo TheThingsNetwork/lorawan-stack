@@ -27,6 +27,9 @@ import (
 type Error interface {
 	error
 
+	// Message returns the errors message
+	Message() string
+
 	// Code returns the error code
 	Code() Code
 

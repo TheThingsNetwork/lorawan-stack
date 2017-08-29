@@ -54,10 +54,16 @@ var reg = &registry{
 	byCode: make(map[Code]*ErrDescriptor),
 }
 
-// Register registers a new error descriptor
-func Register(descriptors ...*ErrDescriptor) {
-	for _, descriptor := range descriptors {
-		reg.Register(descriptor)
+// Register registers the provided error descriptors under the provided namespace
+func Register(namespace string, descriptors ...*ErrDescriptor) {
+	for _, d := range descriptors {
+		if d.Namespace != "" && d.Namespace != namespace {
+			panic(fmt.Errorf("Registering descriptor with namespace %s under namespace %s", d.Namespace, namespace))
+		}
+
+		d.Namespace = namespace
+
+		reg.Register(d)
 	}
 }
 

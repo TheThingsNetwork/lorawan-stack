@@ -29,7 +29,6 @@ func Format(format string, values Attributes) string {
 	// todo format unsupported types
 	res, err := fm.FormatMap(fixed)
 	if err != nil {
-		fmt.Println("err", err)
 		return format
 	}
 
