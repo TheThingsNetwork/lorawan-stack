@@ -14,4 +14,4 @@ include .make/headers.make
 include .make/go/main.make
 
 messages:
-	@$(GO) run ./pkg/errors/main.go --filename config/messages.json
+	@$(GO) run ./pkg/errors/generate_messages.go --filename config/messages.json
