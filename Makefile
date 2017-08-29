@@ -12,3 +12,6 @@ include .make/general.make
 include .make/git.make
 include .make/headers.make
 include .make/go/main.make
+
+messages:
+	@$(GO) run ./pkg/errors/main.go --filename config/messages.json

@@ -20,16 +20,16 @@ type ErrDescriptor struct {
 	//   "This is an error about user john"
 	//
 	// The idea about this message format is that is is localizable
-	MessageFormat string
+	MessageFormat string `json:"format"`
 
 	// Code is the code of errors that are created by this descriptor
-	Code Code
+	Code Code `json:"code"`
 
 	// Type is the type of errors created by this descriptor
-	Type Type
+	Type Type `json:"type"`
 
 	// Namespace is the namespace in which the errors live, usually the package name from which they originate.
-	Namespace string
+	Namespace string `json:"namespace"`
 
 	// registered denotes wether or not the error has been registered
 	// (by a call to Register)
