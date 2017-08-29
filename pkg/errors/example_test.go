@@ -6,9 +6,6 @@ import "fmt"
 
 func Example() {
 
-	// define the range your error codes should be in
-	code := Range(10000, 120000)
-
 	// ErrSomeUserMistake is the description of the error some user made
 	// that costs the company some money
 	ErrSomeUserMistake := &ErrDescriptor{
@@ -22,10 +19,10 @@ func Example() {
 		Type: InvalidArgument,
 
 		// Code is the unique code of this error
-		Code: code(391),
+		Code: 391,
 	}
 
-	// register the error so others can find it based on Code
+	// register the error so others can find it based on the error Code
 	ErrSomeUserMistake.Register()
 
 	// Create a new error based on the descriptor

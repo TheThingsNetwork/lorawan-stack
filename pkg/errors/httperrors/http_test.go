@@ -12,15 +12,12 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-// code creates Codes for testing
-var code = errors.Range(10000, 11000)
-
 func TestHTTP(t *testing.T) {
 	a := assertions.New(t)
 
 	d := &errors.ErrDescriptor{
 		MessageFormat: "You do not have access to app with id {app_id}",
-		Code:          code(77),
+		Code:          77,
 		Type:          errors.PermissionDenied,
 		Namespace:     "pkg/foo",
 	}

@@ -16,29 +16,3 @@ const NoCode Code = 0
 func (c Code) String() string {
 	return fmt.Sprintf("%v", uint32(c))
 }
-
-// Range is a utility function that creates a code builder.
-//
-// Example:
-//	var code = Range(1000, 2000)
-//  var ErrSomethingWasWrong := &ErrDescriptor{
-//		// ...
-//		Code: code(77),
-//  }
-//
-// This can be used to create disjunct code ranges and be strict about it.
-// The codes created by the returned function will range from start (inclusive)
-// to end (exclusive) or the function will panic otherwise.
-func Range(start uint32, end uint32) func(uint32) Code {
-	if end <= start {
-		panic("Range end <= start")
-	}
-
-	return func(i uint32) Code {
-		if i >= (end - start) {
-			panic(fmt.Sprintf("Code %v does not fit in range [%v, %v[", i, start, end))
-		}
-
-		return Code(start + i)
-	}
-}

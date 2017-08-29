@@ -10,15 +10,12 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-// code creates Codes for testing
-var code = Range(10000, 11000)
-
 func TestDescriptor(t *testing.T) {
 	a := assertions.New(t)
 
 	d := &ErrDescriptor{
 		MessageFormat: "You do not have access to app with id {app_id}",
-		Code:          code(77),
+		Code:          77,
 		Type:          PermissionDenied,
 		registered:    true,
 	}
@@ -39,7 +36,7 @@ func TestDescriptorCause(t *testing.T) {
 
 	d := &ErrDescriptor{
 		MessageFormat: "You do not have access to app with id {app_id}",
-		Code:          code(77),
+		Code:          77,
 		Type:          PermissionDenied,
 		registered:    true,
 	}
