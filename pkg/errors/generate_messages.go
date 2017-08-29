@@ -169,13 +169,6 @@ func main() {
 		log.WithError(err).Fatal("Could not parse options")
 	}
 
-	ErrSomeUserMistake := &errors.ErrDescriptor{
-		MessageFormat: "You made a mistake cost us {price, plural, =0 {no money} =1 {one dollar} other {{price} dollars}}",
-		Type:          errors.InvalidArgument,
-		Code:          391,
-	}
-	ErrSomeUserMistake.Register()
-
 	log.WithField("Filename", cfg.Filename).Info("Updating messages")
 
 	err = updateMessages(cfg.Filename)
