@@ -18,6 +18,11 @@
 // to create a code range that is disjunct from other ranges.
 package errors
 
+import (
+	"runtime"
+	"strings"
+)
+
 // Error is the interface of portable errors
 type Error interface {
 	error
@@ -41,9 +46,10 @@ type Attributes map[string]interface{}
 // New returns an "unknown" error with the given text
 func New(text string) Error {
 	return &Impl{
-		message: text,
-		code:    NoCode,
-		typ:     Unknown,
+		message:   text,
+		code:      NoCode,
+		typ:       Unknown,
+		namespace: pkg(),
 	}
 }
 
@@ -56,5 +62,25 @@ func NewWithCause(text string, cause error) Error {
 		attributes: Attributes{
 			causeKey: cause,
 		},
+		namespace: pkg(),
 	}
+}
+
+// pkg returns the package the caller was called from
+func pkg() string {
+	fns := make([]uintptr, 1)
+
+	n := runtime.Callers(3, fns)
+	if n == 0 {
+		return ""
+	}
+
+	fun := runtime.FuncForPC(fns[0] - 1)
+	if fun == nil {
+		return ""
+	}
+
+	name := fun.Name()
+
+	return strings.Split(strings.TrimPrefix(name, "github.com/TheThingsNetwork/ttn/pkg/"), ".")[0]
 }
