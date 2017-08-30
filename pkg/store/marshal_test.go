@@ -5,8 +5,8 @@ package store_test
 import (
 	"testing"
 
-	"github.com/kr/pretty"
 	. "github.com/TheThingsNetwork/ttn/pkg/store"
+	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )

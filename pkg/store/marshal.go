@@ -2,7 +2,10 @@
 
 package store
 
-import "reflect"
+import (
+	"fmt"
+	"reflect"
+)
 
 // Code is in parts adapted from https://goo.gl/MB5Sao, which is MIT licensed
 
@@ -93,6 +96,10 @@ func marshal(s interface{}) map[string]interface{} {
 	v := reflect.Indirect(reflect.ValueOf(s))
 	t := v.Type()
 
+	if t.Kind() != reflect.Struct {
+		panic(fmt.Sprintf("github.com/TheThingsNetwork/ttn/pkg/store.marshal: expected argument to be a struct, got %s", t.Kind()))
+	}
+
 	out := make(map[string]interface{}, t.NumField())
 	for i := 0; i < t.NumField(); i++ {
 		ft := t.Field(i)
@@ -136,14 +143,22 @@ func marshal(s interface{}) map[string]interface{} {
 	return out
 }
 
+// MapMarshaler is the interface implemented by an object that can
+// marshal itself into a map[string]interface{}
+//
+// MarshalMap encodes the receiver into map[string]interface{} and returns the result.
 type MapMarshaler interface {
 	MarshalMap() map[string]interface{}
 }
 
+// Marshal returns the map encoding of v.
+//
+// Marshal traverses the value v recursively. If v implements the MapMarshaler interface, Marshal calls its MarshalMap method to produce map.
+// Otherwise, Marshal first encodes the value v as a map[string]interface{} and flattens it, by joining sub-map values with a dot. Structs are encoded as map[string]inteface{}
 func Marshal(v interface{}) map[string]interface{} {
 	switch t := v.(type) {
 	case MapMarshaler:
-		return flattened(t.MarshalMap())
+		return t.MarshalMap()
 	case map[string]interface{}:
 		return flattened(t)
 	default:
