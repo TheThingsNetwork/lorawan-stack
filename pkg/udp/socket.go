@@ -5,8 +5,8 @@ package udp
 import (
 	"net"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
-	"github.com/pkg/errors"
 )
 
 // ErrGatewayNotConnected is returned when trying to send a packet to a udp.Conn that has never interacted with the packet's gateway.
@@ -102,7 +102,7 @@ func (p *Packet) Ack() error {
 
 	ackPacket, err := p.BuildAck()
 	if err != nil {
-		return errors.Wrap(err, "failed to build ack package")
+		return errors.NewWithCause("failed to build ack package", err)
 	}
 	if ackPacket == nil {
 		return nil
@@ -110,7 +110,7 @@ func (p *Packet) Ack() error {
 
 	binaryAckPacket, err := ackPacket.MarshalBinary()
 	if err != nil {
-		return errors.Wrap(err, "failed to convert ack packet to binary format")
+		return errors.NewWithCause("failed to convert ack packet to binary format", err)
 	}
 
 	_, err = p.GatewayConn.WriteToUDP(binaryAckPacket, p.GatewayAddr)

@@ -7,9 +7,9 @@ import (
 	"io"
 	"net"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
-	"github.com/pkg/errors"
 )
 
 // ProtocolVersion of the forwarder
@@ -120,7 +120,7 @@ func (p *Packet) UnmarshalBinary(b []byte) (err error) {
 		p.GatewayEUI = new(types.EUI64)
 		err = p.GatewayEUI.UnmarshalBinary(b[i : i+8])
 		if err != nil {
-			return errors.Wrap(err, "failed to unmarshal gateway EUI")
+			return errors.NewWithCause("failed to unmarshal gateway EUI", err)
 		}
 		i += 8
 	}
