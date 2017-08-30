@@ -5,6 +5,8 @@ package store
 import (
 	"fmt"
 	"reflect"
+
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 )
 
 // Code is in parts adapted from https://github.com/fatih/structs/blob/master/structs.go, which is MIT licensed
@@ -93,7 +95,7 @@ func marshal(s interface{}) map[string]interface{} {
 	t := v.Type()
 
 	if t.Kind() != reflect.Struct {
-		panic(fmt.Sprintf("github.com/TheThingsNetwork/ttn/pkg/store.marshal: expected argument to be a struct, got %s", t.Kind()))
+		panic(errors.New(fmt.Sprintf("github.com/TheThingsNetwork/ttn/pkg/store.marshal: expected argument to be a struct, got %s", t.Kind())))
 	}
 
 	out := make(map[string]interface{}, t.NumField())
