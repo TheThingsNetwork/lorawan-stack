@@ -62,6 +62,16 @@ func New(logger log.Interface, config *Config) *Component {
 	return c
 }
 
+// Logger returns the logger of the component
+func (c *Component) Logger() log.Interface {
+	return c.log
+}
+
+// Context returns the context of the component
+func (c *Component) Context() context.Context {
+	return c.ctx
+}
+
 // Start starts the component
 func (c *Component) Start() error {
 	c.log.Debug("Starting component")
