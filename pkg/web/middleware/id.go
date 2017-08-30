@@ -3,25 +3,75 @@
 package middleware
 
 import (
+	"fmt"
+	"math/rand"
+	"net/http"
+	"sync"
+	"time"
+
 	"github.com/labstack/echo"
-	uuid "github.com/satori/go.uuid"
+	"github.com/oklog/ulid"
 )
 
 // ID adds a request id to the request.
 func ID(prefix string) echo.MiddlewareFunc {
+	id := newID(prefix)
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			c.Response().Header().Set("X-Request-ID", genID(prefix))
+			id, err := id.generate()
+			if err != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Failed to generate request ID: %s", err))
+			}
+
+			c.Response().Header().Set("X-Request-ID", id)
 			return next(c)
 		}
 	}
 }
 
-func genID(prefix string) string {
-	uid := uuid.NewV4().String()
-	if prefix == "" {
-		return uid
+// id a generator of new ids. It uses ULID and a pool of entropy sources under the hood.
+type id struct {
+	prefixer func(ulid.ULID) string
+	pool     sync.Pool
+}
+
+// newID creates a new id.
+func newID(prefix string) *id {
+	return &id{
+		prefixer: prefixer(prefix),
+		pool: sync.Pool{
+			New: func() interface{} {
+				return rand.New(rand.NewSource(time.Now().UnixNano()))
+			},
+		},
+	}
+}
+
+// generate generates a new ULID.
+func (i *id) generate() (string, error) {
+	entropy, ok := i.pool.Get().(*rand.Rand)
+	defer i.pool.Put(entropy)
+	if !ok {
+		return "", fmt.Errorf("Failed to get an entropy source")
 	}
 
-	return prefix + "." + uid
+	id, err := ulid.New(ulid.Now(), entropy)
+	if err != nil {
+		return "", fmt.Errorf("Failed to generate a new ULID")
+	}
+
+	return i.prefixer(id), nil
+}
+
+// prefixer returns a function that can smartly prefix the request id.
+func prefixer(prefix string) func(ulid.ULID) string {
+	if prefix == "" {
+		return func(id ulid.ULID) string {
+			return id.String()
+		}
+	}
+
+	return func(id ulid.ULID) string {
+		return prefix + "." + id.String()
+	}
 }
