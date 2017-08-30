@@ -60,6 +60,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/mitchellh/mapstructure"
+  source = "https://github.com/rvolosatovs/mapstructure.git"
 
 [[constraint]]
   branch = "master"
@@ -80,3 +81,11 @@
 [[constraint]]
   branch = "master"
   name = "github.com/prometheus/client_golang"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/mohae/deepcopy"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/kr/pretty"
