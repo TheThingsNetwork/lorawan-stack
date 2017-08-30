@@ -5,7 +5,9 @@ package middleware
 import (
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/labstack/echo"
 	"github.com/smartystreets/assertions"
@@ -58,4 +60,37 @@ func TestLogEmptyPrefix(t *testing.T) {
 
 	a.So(id, should.NotBeEmpty)
 	a.So(id, should.NotStartWith, ".")
+}
+
+func TestID(t *testing.T) {
+	a := assertions.New(t)
+	id := newID("")
+
+	// mock time to a fixed timestamp to emulate two simultaneous requests
+	n := time.Now()
+	now = func() time.Time { return n }
+
+	var id1 string
+	var id2 string
+	var err error
+
+	var wg sync.WaitGroup
+
+	wg.Add(2)
+
+	go func() {
+		id1, err = id.generate()
+		a.So(err, should.BeNil)
+		wg.Done()
+	}()
+
+	go func() {
+		id2, err = id.generate()
+		a.So(err, should.BeNil)
+		wg.Done()
+	}()
+
+	wg.Wait()
+
+	a.So(id1, should.NotEqual, id2)
 }

@@ -4,14 +4,19 @@ package middleware
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"net/http"
 	"sync"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/pseudorandom"
 	"github.com/labstack/echo"
 	"github.com/oklog/ulid"
 )
+
+// used to mock time
+var now = time.Now
 
 // ID adds a request id to the request.
 func ID(prefix string) echo.MiddlewareFunc {
@@ -41,7 +46,7 @@ func newID(prefix string) *id {
 		prefixer: prefixer(prefix),
 		pool: sync.Pool{
 			New: func() interface{} {
-				return rand.New(rand.NewSource(time.Now().UnixNano()))
+				return rand.New(rand.NewSource(int64(pseudorandom.Intn(int(math.MaxInt32)))))
 			},
 		},
 	}
@@ -55,7 +60,7 @@ func (i *id) generate() (string, error) {
 		return "", fmt.Errorf("Failed to get an entropy source")
 	}
 
-	id, err := ulid.New(ulid.Now(), entropy)
+	id, err := ulid.New(ulid.Timestamp(now()), entropy)
 	if err != nil {
 		return "", fmt.Errorf("Failed to generate a new ULID")
 	}
