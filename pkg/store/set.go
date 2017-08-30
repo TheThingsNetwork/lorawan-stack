@@ -20,17 +20,17 @@ func (s Set) IsEmpty() bool {
 	return len(s) == 0
 }
 
-// Add adds the ULID to the set
+// Add adds the PrimaryKey to the set
 func (s Set) Add(u PrimaryKey) {
 	s[u] = true
 }
 
-// Remove removes the ULID from the set
+// Remove removes the PrimaryKey from the set
 func (s Set) Remove(u PrimaryKey) {
 	delete(s, u)
 }
 
-// Contains returns whether the set contains the given ULID
+// Contains returns whether the set contains the given PrimaryKey
 func (s Set) Contains(u PrimaryKey) bool {
 	_, exists := s[u]
 	return exists
