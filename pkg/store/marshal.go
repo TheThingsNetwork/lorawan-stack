@@ -42,9 +42,8 @@ func marshalNested(val reflect.Value) interface{} {
 		// time.Time
 		if len(m) == 0 {
 			return val.Interface()
-		} else {
-			return m
 		}
+		return m
 	case reflect.Map:
 		// get the element type of the map
 		mapElem := val.Type()
