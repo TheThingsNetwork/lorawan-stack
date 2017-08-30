@@ -26,6 +26,7 @@ It has these top-level messages:
 	ApplicationUplink
 	ApplicationDownlink
 	ApplicationDownlinks
+	DownlinkQueueRequest
 	KeyEnvelope
 	RootKeys
 	SessionKeys
