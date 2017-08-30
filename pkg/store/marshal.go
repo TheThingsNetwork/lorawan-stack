@@ -37,7 +37,6 @@ func marshalNested(val reflect.Value) interface{} {
 	switch k {
 	case reflect.Struct:
 		m := marshal(val.Interface())
-
 		// do not add the converted value if there are no exported fields, ie:
 		// time.Time
 		if len(m) == 0 {
@@ -55,7 +54,6 @@ func marshalNested(val reflect.Value) interface{} {
 				mapElem = mapElem.Elem()
 			}
 		}
-
 		// only iterate over struct types, ie: map[string]StructType,
 		// map[string][]StructType,
 		if mapElem.Kind() == reflect.Struct ||
@@ -67,7 +65,6 @@ func marshalNested(val reflect.Value) interface{} {
 			}
 			return m
 		}
-
 		return val.Interface()
 	case reflect.Slice, reflect.Array:
 		if val.Type().Kind() == reflect.Interface {

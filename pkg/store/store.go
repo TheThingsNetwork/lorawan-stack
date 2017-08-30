@@ -19,7 +19,8 @@ type PrimaryKey fmt.Stringer
 //
 // Create creates a new PrimaryKey, stores fields under that key and returns it.
 // Find returns the fields stored under PrimaryKey specified.
-// FindBy returns mapping of PrimaryKey -> fields, which match field values specified in filter.
+// FindBy returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
+// meaning that only entries matching all the fields in filter should be returned.
 // Update overwrites field values stored under PrimaryKey specified with values in diff.
 // Delete deletes the fields stored under PrimaryKey specified.
 type Interface interface {
