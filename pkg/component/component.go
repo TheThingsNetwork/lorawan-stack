@@ -100,7 +100,7 @@ func (c *Component) Start() error {
 			}
 		case sig := <-signals:
 			fmt.Println()
-			c.logger.WithField("Signal", sig).Info("Received signal, exiting...")
+			c.logger.WithField("signal", sig).Info("Received signal, exiting...")
 			return nil
 		}
 	}
@@ -149,7 +149,7 @@ func (c *Component) listenHTTP() error {
 
 	c.httpL = listener
 
-	c.logger.WithField("Address", addr).Debug("HTTP server listening")
+	c.logger.WithField("address", addr).Debug("HTTP server listening")
 	return http.Serve(listener, c.handler)
 }
 
@@ -173,7 +173,7 @@ func (c *Component) listenHTTPS() error {
 
 	c.httpsL = listener
 
-	c.logger.WithField("Address", addr).Debug("HTTPS server listening")
+	c.logger.WithField("address", addr).Debug("HTTPS server listening")
 	return http.Serve(listener, c.handler)
 }
 
@@ -202,7 +202,7 @@ func (c *Component) listenGRPC() error {
 
 	c.grpcL = listener
 
-	c.logger.WithField("Address", addr).Debug("gRPC server listening")
+	c.logger.WithField("address", addr).Debug("gRPC server listening")
 	return c.grpc.Serve(listener)
 }
 
@@ -226,6 +226,6 @@ func (c *Component) listenGRPCS() error {
 
 	c.grpcsL = listener
 
-	c.logger.WithField("Address", addr).Debug("gRPCs server listening")
+	c.logger.WithField("address", addr).Debug("gRPCs server listening")
 	return c.grpc.Serve(listener)
 }

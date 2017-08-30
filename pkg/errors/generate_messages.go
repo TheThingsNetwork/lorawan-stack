@@ -169,7 +169,7 @@ func main() {
 		log.WithError(err).Fatal("Could not parse options")
 	}
 
-	log.WithField("Filename", cfg.Filename).Info("Updating messages")
+	log.WithField("filename", cfg.Filename).Info("Updating messages")
 
 	err = updateMessages(cfg.Filename)
 	if err != nil {
