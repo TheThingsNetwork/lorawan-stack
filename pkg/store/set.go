@@ -3,7 +3,7 @@
 package store
 
 // Set implements "set" data structure that contains strings
-type Set map[PrimaryKey]bool
+type Set map[PrimaryKey]struct{}
 
 // NewSet creates a new set that holds primary keys
 func NewSet() Set {
@@ -22,7 +22,7 @@ func (s Set) IsEmpty() bool {
 
 // Add adds the PrimaryKey to the set
 func (s Set) Add(u PrimaryKey) {
-	s[u] = true
+	s[u] = struct{}{}
 }
 
 // Remove removes the PrimaryKey from the set
@@ -47,22 +47,22 @@ func (s Set) Slice() []PrimaryKey {
 
 // Union returns the union of the two sets
 func (s Set) Union(other Set) Set {
-	result := make(Set)
+	result := make(Set, len(other))
 	for value := range s {
-		result[value] = true
+		result.Add(value)
 	}
 	for value := range other {
-		result[value] = true
+		result.Add(value)
 	}
 	return result
 }
 
 // Intersect returns the intersection of the two sets
 func (s Set) Intersect(other Set) Set {
-	result := make(Set)
+	result := make(Set, len(other))
 	for u := range s {
 		if other.Contains(u) {
-			result[u] = true
+			result.Add(u)
 		}
 	}
 	return result
