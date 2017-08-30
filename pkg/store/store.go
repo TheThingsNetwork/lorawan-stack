@@ -13,7 +13,9 @@ var (
 )
 
 // PrimaryKey represents the value used by store.Interface implementations to uniquely identify stored objects.
-type PrimaryKey fmt.Stringer
+type PrimaryKey interface {
+	fmt.Stringer
+}
 
 // Interface represents a store, modeled after CRUD.
 //
