@@ -10,13 +10,13 @@ import (
 	"github.com/labstack/echo"
 )
 
-// HTTPErrorBody is the type of an error body
+// HTTPErrorBody is the type of an error body.
 type HTTPErrorBody struct {
 	Status      int    `json:"status"`
 	Description string `json:"error_description"`
 }
 
-// Statusser is the interface of things that can have a specific http status
+// Statusser is the interface of things that can have a specific http status.
 type Statusser interface {
 	// Status returns the http status
 	Status() int
@@ -27,8 +27,7 @@ var (
 	defaultType = "text/html"
 )
 
-// ErrorHandler is an echo.HTTPErrorHandler and renders them based
-// on the accept header of the request.
+// ErrorHandler is an echo.HTTPErrorHandler and renders them based on the accept header of the request.
 func ErrorHandler(template string) echo.HTTPErrorHandler {
 	return func(err error, c echo.Context) {
 		httpe := HTTPFromError(err)
@@ -60,7 +59,7 @@ func ErrorHandler(template string) echo.HTTPErrorHandler {
 	}
 }
 
-// statusCodeFromError returns the statuscode that represent the error
+// statusCodeFromError returns the statuscode that represent the error.
 func StatusCodeFromError(err error) int {
 	switch v := err.(type) {
 	case *echo.HTTPError:
@@ -72,7 +71,7 @@ func StatusCodeFromError(err error) int {
 	}
 }
 
-// HTTPFromError creates an echo.HTTPError from an error
+// HTTPFromError creates an echo.HTTPError from an error.
 func HTTPFromError(err error) *echo.HTTPError {
 	switch e := err.(type) {
 	case *echo.HTTPError:

@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo"
 )
 
+// Log is middleware that logs the request.
 func Log(logger log.Interface) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {

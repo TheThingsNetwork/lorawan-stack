@@ -19,7 +19,7 @@ const (
 	tombstone  = "deleted"
 )
 
-// Cookie is the type of cookies with arbitrary values
+// Cookie is the type of cookies with arbitrary values.
 type Cookie struct {
 	Value    interface{}
 	Path     string
@@ -55,7 +55,7 @@ func getConfig(c echo.Context) (string, *securecookie.SecureCookie, error) {
 	return root, encoder, nil
 }
 
-// Get the cookie with the specified name
+// Get the cookie with the specified name.
 func Get(c echo.Context, name string) (*Cookie, error) {
 	root, s, err := getConfig(c)
 
@@ -79,7 +79,7 @@ func Get(c echo.Context, name string) (*Cookie, error) {
 	return res, nil
 }
 
-// Set the cookie with the specified name
+// Set the cookie with the specified name.
 func Set(c echo.Context, name string, cookie *Cookie) error {
 	root, s, err := getConfig(c)
 
@@ -100,7 +100,7 @@ func Set(c echo.Context, name string, cookie *Cookie) error {
 	return nil
 }
 
-// Remove the cookie with the specified name (if it exists)
+// Remove the cookie with the specified name (if it exists).
 func Remove(c echo.Context, name string) error {
 	root, _, err := getConfig(c)
 
