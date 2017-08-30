@@ -29,22 +29,22 @@ func Log(logger log.Interface) echo.MiddlewareFunc {
 
 			status := c.Response().Status
 			w := logger.WithFields(log.Fields(
-				"Duration", stop.Sub(start),
-				"Method", req.Method,
-				"URL", req.URL.String(),
-				"IP", req.RemoteAddr,
-				"ID", c.Response().Header().Get("X-Request-ID"),
-				"Size", c.Response().Size,
-				"Status", status,
-				"Version", version,
+				"duration", stop.Sub(start),
+				"method", req.Method,
+				"url", req.URL.String(),
+				"ip", req.RemoteAddr,
+				"id", c.Response().Header().Get("X-Request-ID"),
+				"size", c.Response().Size,
+				"status", status,
+				"version", version,
 			))
 
 			if loc := c.Response().Header().Get("Location"); status >= 300 && status < 400 && loc != "" {
-				w = w.WithField("Location", loc)
+				w = w.WithField("location", loc)
 			}
 
 			if fwd := req.Header.Get("X-Forwarded-For"); fwd != "" {
-				w = w.WithField("ForwardedFor", fwd)
+				w = w.WithField("forwarded_for", fwd)
 			}
 
 			if err != nil {
@@ -52,9 +52,9 @@ func Log(logger log.Interface) echo.MiddlewareFunc {
 			}
 
 			if status < 500 {
-				w.Info("Handled request")
+				w.Info("Request handled")
 			} else {
-				w.Error("Server error")
+				w.Error("Request error")
 			}
 
 			return err

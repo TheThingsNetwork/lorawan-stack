@@ -62,12 +62,12 @@ func New(logger log.Interface, opts ...Option) *Server {
 
 	if cfg.HashKey == nil {
 		cfg.HashKey = random.Bytes(32)
-		logger.WithField("HashKey", cfg.HashKey).Warn("Generated a random cookie hash key")
+		logger.WithField("hash_key", cfg.HashKey).Warn("Generated a random cookie hash key")
 	}
 
 	if cfg.BlockKey == nil {
 		cfg.BlockKey = random.Bytes(32)
-		logger.WithField("BlockKey", cfg.BlockKey).Warn("Generated a random cookie block key")
+		logger.WithField("block_key", cfg.BlockKey).Warn("Generated a random cookie block key")
 	}
 
 	server := echo.New()
