@@ -1,0 +1,103 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
+package deviceregistry
+
+import (
+	"github.com/TheThingsNetwork/ttn/pkg/store"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+)
+
+// Device represents the device stored in the registry.
+// It is not safe for concurrent use!
+type Device struct {
+	*ttnpb.EndDevice
+	stored map[string]interface{}
+
+	key   store.PrimaryKey
+	store store.Interface
+}
+
+// newDevice returns new initialized device.
+func newDevice(ed *ttnpb.EndDevice, s store.Interface, k store.PrimaryKey) *Device {
+	return &Device{
+		EndDevice: ed,
+		store:     s,
+		key:       k,
+		stored:    store.Marshal(ed),
+	}
+}
+
+// Registry is reponsible for mapping devices to their identities.
+type Registry struct {
+	store store.Interface
+}
+
+// New returns a new Registry with s as an internal Store.
+// If s is nil, a hashmap is used as an internal Store.
+func New(s store.Interface) *Registry {
+	return &Registry{
+		store: s,
+	}
+}
+
+// Register stores devices data in underlying store.Interface and returns a new *Device.
+func (r *Registry) Register(ed *ttnpb.EndDevice) (*Device, error) {
+	id, err := r.store.Create(store.Marshal(ed))
+	if err != nil {
+		return nil, err
+	}
+	return newDevice(ed, r.store, id), nil
+}
+
+// FindDeviceByIdentifiers searches for devices matching specified device identifiers in underlying store.Interface.
+func (r *Registry) FindDeviceByIdentifiers(ids ...*ttnpb.EndDeviceIdentifiers) ([]*Device, error) {
+	if len(ids) == 0 {
+		return make([]*Device, 0, 0), nil
+	}
+
+	intersection, err := r.store.FindBy(store.Marshal(&ttnpb.EndDevice{EndDeviceIdentifiers: *ids[0]}))
+	if err != nil {
+		return nil, err
+	}
+	for i := 1; i < len(ids); i++ {
+		m, err := r.store.FindBy(store.Marshal(ids[i]))
+		if err != nil {
+			return nil, err
+		}
+		for k := range m {
+			if _, ok := intersection[k]; !ok {
+				delete(intersection, k)
+			}
+		}
+	}
+
+	devices := make([]*Device, 0, len(intersection))
+	for id, fields := range intersection {
+		ed := &ttnpb.EndDevice{}
+		if err := store.Unmarshal(fields, ed); err != nil {
+			return nil, err
+		}
+		devices = append(devices, newDevice(ed, r.store, id))
+	}
+	return devices, nil
+}
+
+// Update updates devices data in the underlying store.Interface.
+func (d *Device) Update() error {
+	diff := store.Diff(store.Marshal(d.EndDevice), d.stored)
+	if len(diff) == 0 {
+		return nil
+	}
+	if err := d.store.Update(d.key, diff); err != nil {
+		return err
+	}
+	for k, v := range diff {
+		d.stored[k] = v
+	}
+	return nil
+}
+
+// Deregister removes device from the underlying store.Interface.
+func (d *Device) Deregister() error {
+	return d.store.Delete(d.key)
+}
