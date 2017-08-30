@@ -7,7 +7,7 @@ import (
 	"reflect"
 )
 
-// Code is in parts adapted from https://goo.gl/MB5Sao, which is MIT licensed
+// Code is in parts adapted from https://github.com/fatih/structs/blob/master/structs.go, which is MIT licensed
 
 // flattened returns a copy of m with keys 'flattened'.
 // If the map contains sub-maps, the values of these sub-maps are set under the root map, each level separated by a dot
