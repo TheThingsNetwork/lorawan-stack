@@ -2,6 +2,24 @@
 
 
 [[projects]]
+  name = "cloud.google.com/go"
+  packages = ["compute/metadata"]
+  revision = "0f0b8420cb699ac4ce059c63bac263f4301fe95b"
+  version = "v0.12.0"
+
+[[projects]]
+  name = "github.com/PuerkitoBio/purell"
+  packages = ["."]
+  revision = "0bcb03f4b4d0a9428594752bd2a3b9aa0a9d4bd4"
+  version = "v1.1.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/PuerkitoBio/urlesc"
+  packages = ["."]
+  revision = "de5bf2ad457846296e2031421a34e2568e304e35"
+
+[[projects]]
   branch = "master"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
@@ -12,6 +30,12 @@
   packages = ["."]
   revision = "3fd9e1adb12b72d2f3f82191d49be9b93c69f67c"
   version = "2017.07.27"
+
+[[projects]]
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  revision = "d2709f9f1f31ebcda9651b03077758c1f3a0018c"
+  version = "v3.0.0"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -33,9 +57,21 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/golang/gddo"
+  packages = ["httputil","httputil/header"]
+  revision = "2dccccb2f204bf42a2f46fc9ecd6340ec4984fd3"
+
+[[projects]]
+  branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["jsonpb","proto","ptypes","ptypes/any","ptypes/duration","ptypes/struct","ptypes/timestamp"]
   revision = "ab9f9a6dab164b7d1246e0e688b0ab7b94d8553e"
+
+[[projects]]
+  name = "github.com/gorilla/securecookie"
+  packages = ["."]
+  revision = "667fe4e3466a040b780561fe9b51a83a3753eefc"
+  version = "v1.1"
 
 [[projects]]
   branch = "master"
@@ -98,10 +134,34 @@
   revision = "7cafcd837844e784b526369c9bce262804aebc60"
 
 [[projects]]
+  name = "github.com/labstack/echo"
+  packages = ["."]
+  revision = "cec7629194fe4bf83b0c72d9a02d340c7a1468ac"
+  version = "3.2.3"
+
+[[projects]]
+  name = "github.com/labstack/gommon"
+  packages = ["color","log"]
+  revision = "779b8a8b9850a97acba6a3fe20feb628c39e17c1"
+  version = "0.2.2"
+
+[[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
   revision = "be5ece7dd465ab0765a9682137865547526d1dfb"
   version = "v1.7.3"
+
+[[projects]]
+  name = "github.com/mattn/go-colorable"
+  packages = ["."]
+  revision = "167de6bfdfba052fa6b2d3664c8f5272e23c9072"
+  version = "v0.0.9"
+
+[[projects]]
+  name = "github.com/mattn/go-isatty"
+  packages = ["."]
+  revision = "fc9e8d8ef48496124e79ae0df75490096eccf6fe"
+  version = "v0.0.2"
 
 [[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
@@ -208,8 +268,26 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/valyala/bytebufferpool"
+  packages = ["."]
+  revision = "e746df99fe4a3986f4d4f79e13c1e0117ce9c2f7"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/valyala/fasttemplate"
+  packages = ["."]
+  revision = "dcecefd839c4193db0d35b88ec65b4c12d360ab0"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["acme","acme/autocert"]
+  revision = "81e90905daefcd6fd217b62423c0908922eadb30"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/net"
-  packages = ["context","http2","http2/hpack","idna","internal/timeseries","lex/httplex","trace"]
+  packages = ["context","context/ctxhttp","http2","http2/hpack","idna","internal/timeseries","lex/httplex","trace"]
   revision = "1c05540f6879653db88113bc4a2b70aec4bd491f"
 
 [[projects]]
@@ -221,7 +299,7 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/text"
-  packages = ["internal/gen","internal/triegen","internal/ucd","secure/bidirule","transform","unicode/bidi","unicode/cldr","unicode/norm","unicode/rangetable"]
+  packages = ["internal/gen","internal/triegen","internal/ucd","secure/bidirule","transform","unicode/bidi","unicode/cldr","unicode/norm","unicode/rangetable","width"]
   revision = "f494f8223b00d59fdaf1f267755151a4e9070954"
 
 [[projects]]
@@ -245,6 +323,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "96968ed6c3324812544a8d712276612a83931f11055f640347fa3e3fb6ba9868"
+  inputs-digest = "21cdc8723131d7bd4402bd38cdaded508ea685bfaa960cc36785bc2250e7093e"
   solver-name = "gps-cdcl"
   solver-version = 1
