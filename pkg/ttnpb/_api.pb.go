@@ -9,6 +9,7 @@ The Things Network v3 API
 It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/_api.proto
 	github.com/TheThingsNetwork/ttn/api/application.proto
+	github.com/TheThingsNetwork/ttn/api/applicationserver.proto
 	github.com/TheThingsNetwork/ttn/api/end_device.proto
 	github.com/TheThingsNetwork/ttn/api/gateway.proto
 	github.com/TheThingsNetwork/ttn/api/gatewayserver.proto
@@ -21,6 +22,7 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/networkserver.proto
 
 It has these top-level messages:
+	ApplicationUp
 	ApplicationUplink
 	ApplicationDownlink
 	ApplicationDownlinks
@@ -58,7 +60,6 @@ It has these top-level messages:
 	RxMetadata
 	TxMetadata
 	Location
-	ApplicationUp
 */
 package ttnpb
 

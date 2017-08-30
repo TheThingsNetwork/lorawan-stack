@@ -12,19 +12,6 @@ package ttn.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
-// ApplicationUp wraps multiple application-layer uplink types
-message ApplicationUp {
-  oneof up {
-    ApplicationUplink uplink_message = 1;
-    // Join accepted
-    // Downlink queued
-    // Downlink sent
-    // Downlink acked
-    // Downlink not acked
-    // Downlink queue invalidated (LoRaWAN 1.0)
-  }
-}
-
 // The GsNs service connects a gateway server to a network server.
 service GsNs {
   rpc StartServingGateway(GatewayIdentifiers) returns (google.protobuf.Empty);
