@@ -42,7 +42,8 @@ type FrequencyPlan struct {
 // Channel describes one of the channels of the frequency plan
 type Channel struct {
 	Frequency uint32 `yaml:"frequency"`
-	DataRate  *uint8 `yaml:"datarate,omitempty"`
+	// DataRateIndex specifies a specific DataRate to for this channel
+	DataRateIndex *uint8 `yaml:"datarate,omitempty"`
 }
 
 // LBTConfig describes listen-before-talk configuration if applicable in the frequency plan

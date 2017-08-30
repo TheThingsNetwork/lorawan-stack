@@ -12,9 +12,9 @@ const (
 
 func init() {
 	defaultChannels := []Channel{
-		{Frequency: 922100000, DataRates: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 922300000, DataRates: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 922500000, DataRates: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 922100000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 922300000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 922500000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
 	}
 	kr_920_923 = Band{
 		ID: KR_920_923,

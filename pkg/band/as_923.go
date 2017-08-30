@@ -12,8 +12,8 @@ const (
 
 func init() {
 	defaultChannels := []Channel{
-		{Frequency: 923200000, DataRates: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 923400000, DataRates: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 923200000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 923400000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
 	}
 	as923 = Band{
 		ID: AS923,

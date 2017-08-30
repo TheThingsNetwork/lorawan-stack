@@ -42,6 +42,8 @@ radios:
 	a.So(err, should.BeNil)
 
 	a.So(len(fp.Channels), should.Equal, 10)
+	a.So(fp.Channels[4].DataRateIndex, should.NotBeNil)
+	a.So(*fp.Channels[4].DataRateIndex, should.Equal, 7)
 	a.So(len(fp.Radios), should.Equal, 2)
 	a.So(fp.Radios[0].TX.MinFrequency, should.Equal, 863000000)
 	a.So(fp.Radios[0].TX.MaxFrequency, should.Equal, 870000000)
@@ -52,7 +54,7 @@ radios:
 func TestUnmarshalKR(t *testing.T) {
 	a := assertions.New(t)
 
-	yamlDocument := `band: KR
+	yamlDocument := `band: KR_920_923
 channels:
 - frequency: 922100000
 - frequency: 922300000

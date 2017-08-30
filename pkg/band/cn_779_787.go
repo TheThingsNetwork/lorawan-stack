@@ -12,12 +12,12 @@ const (
 
 func init() {
 	defaultChannels := []Channel{
-		{Frequency: 779500000, DataRates: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 779500000, DataRates: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 779900000, DataRates: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 780500000, DataRates: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 780700000, DataRates: []int{0, 1, 2, 3, 4, 5}},
-		{Frequency: 780900000, DataRates: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 779500000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 779500000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 779900000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 780500000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 780700000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
+		{Frequency: 780900000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
 	}
 	cn_779_787 = Band{
 		ID: CN_779_787,

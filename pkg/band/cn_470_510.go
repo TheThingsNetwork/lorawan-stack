@@ -14,16 +14,16 @@ func init() {
 	uplinkChannels := make([]Channel, 0)
 	for i := 0; i < 96; i++ {
 		uplinkChannels = append(uplinkChannels, Channel{
-			Frequency: 470300000 + 200000*i,
-			DataRates: []int{0, 1, 2, 3, 4, 5},
+			Frequency:       470300000 + 200000*i,
+			DataRateIndexes: []int{0, 1, 2, 3, 4, 5},
 		})
 	}
 
 	downlinkChannels := make([]Channel, 0)
 	for i := 0; i < 48; i++ {
 		downlinkChannels = append(downlinkChannels, Channel{
-			Frequency: 500300000 + 200000*i,
-			DataRates: []int{0, 1, 2, 3, 4, 5},
+			Frequency:       500300000 + 200000*i,
+			DataRateIndexes: []int{0, 1, 2, 3, 4, 5},
 		})
 	}
 

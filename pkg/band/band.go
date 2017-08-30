@@ -4,9 +4,9 @@
 package band
 
 import (
-	"errors"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 )
 
@@ -45,8 +45,8 @@ type DataRate struct {
 }
 
 type Channel struct {
-	Frequency int
-	DataRates []int
+	Frequency       int
+	DataRateIndexes []int
 }
 
 // Rx1Emission takes the uplink's emission parameters, and returns downlink datarate index and channel
