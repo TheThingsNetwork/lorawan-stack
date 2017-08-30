@@ -14,6 +14,7 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/gatewayserver.proto
 	github.com/TheThingsNetwork/ttn/api/identifiers.proto
 	github.com/TheThingsNetwork/ttn/api/join.proto
+	github.com/TheThingsNetwork/ttn/api/joinserver.proto
 	github.com/TheThingsNetwork/ttn/api/lorawan.proto
 	github.com/TheThingsNetwork/ttn/api/messages.proto
 	github.com/TheThingsNetwork/ttn/api/metadata.proto
