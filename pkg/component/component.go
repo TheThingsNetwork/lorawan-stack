@@ -28,7 +28,7 @@ type Component struct {
 	cancelCtx context.CancelFunc
 
 	config *Config
-	log    log.Interface
+	logger log.Interface
 
 	handler http.Handler
 	grpc    *rpcserver.Server
@@ -49,7 +49,7 @@ func New(logger log.Interface, config *Config) *Component {
 		cancelCtx: cancel,
 
 		config: config,
-		log:    logger,
+		logger: logger,
 	}
 
 	c.grpc = rpcserver.New(
@@ -64,7 +64,7 @@ func New(logger log.Interface, config *Config) *Component {
 
 // Logger returns the logger of the component
 func (c *Component) Logger() log.Interface {
-	return c.log
+	return c.logger
 }
 
 // Context returns the context of the component
@@ -74,7 +74,7 @@ func (c *Component) Context() context.Context {
 
 // Start starts the component
 func (c *Component) Start() error {
-	c.log.Debug("Starting component")
+	c.logger.Debug("Starting component")
 
 	errors := make(chan error, 10)
 	signals := make(chan os.Signal)
@@ -100,7 +100,7 @@ func (c *Component) Start() error {
 			}
 		case sig := <-signals:
 			fmt.Println()
-			c.log.WithField("Signal", sig).Info("Received signal, exiting...")
+			c.logger.WithField("Signal", sig).Info("Received signal, exiting...")
 			return nil
 		}
 	}
@@ -112,27 +112,27 @@ func (c *Component) Close() {
 
 	if c.httpL != nil {
 		_ = c.httpL.Close()
-		c.log.Debug("Stopped listening on HTTP")
+		c.logger.Debug("Stopped listening on HTTP")
 	}
 
 	if c.httpsL != nil {
 		_ = c.httpsL.Close()
-		c.log.Debug("Stopped listening on HTTPS")
+		c.logger.Debug("Stopped listening on HTTPS")
 	}
 
 	if c.grpc != nil {
 		c.grpc.Stop()
-		c.log.Debug("Stopped gRPC server")
+		c.logger.Debug("Stopped gRPC server")
 	}
 
 	if c.grpcL != nil {
 		c.grpcL.Close()
-		c.log.Debug("Stopped listening on gRPC")
+		c.logger.Debug("Stopped listening on gRPC")
 	}
 
 	if c.grpcsL != nil {
 		c.grpcsL.Close()
-		c.log.Debug("Stopped listening on gRPCs")
+		c.logger.Debug("Stopped listening on gRPCs")
 	}
 }
 
@@ -149,7 +149,7 @@ func (c *Component) listenHTTP() error {
 
 	c.httpL = listener
 
-	c.log.WithField("Address", addr).Debug("HTTP server listening")
+	c.logger.WithField("Address", addr).Debug("HTTP server listening")
 	return http.Serve(listener, c.handler)
 }
 
@@ -173,7 +173,7 @@ func (c *Component) listenHTTPS() error {
 
 	c.httpsL = listener
 
-	c.log.WithField("Address", addr).Debug("HTTPS server listening")
+	c.logger.WithField("Address", addr).Debug("HTTPS server listening")
 	return http.Serve(listener, c.handler)
 }
 
@@ -202,7 +202,7 @@ func (c *Component) listenGRPC() error {
 
 	c.grpcL = listener
 
-	c.log.WithField("Address", addr).Debug("gRPC server listening")
+	c.logger.WithField("Address", addr).Debug("gRPC server listening")
 	return c.grpc.Serve(listener)
 }
 
@@ -226,6 +226,6 @@ func (c *Component) listenGRPCS() error {
 
 	c.grpcsL = listener
 
-	c.log.WithField("Address", addr).Debug("gRPCs server listening")
+	c.logger.WithField("Address", addr).Debug("gRPCs server listening")
 	return c.grpc.Serve(listener)
 }
