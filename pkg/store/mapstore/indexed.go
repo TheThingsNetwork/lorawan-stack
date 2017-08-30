@@ -11,7 +11,7 @@ import (
 )
 
 // NewIndexed returns a new MapStore that keeps indexes for the given fields
-func NewIndexed(indexed ...string) store.Store {
+func NewIndexed(indexed ...string) store.Interface {
 	internal := New().(*mapStore)
 	s := &indexedStore{
 		mapStore: internal,
@@ -82,25 +82,28 @@ func (s *indexedStore) Create(obj map[string]interface{}) (store.PrimaryKey, err
 	return id, nil
 }
 
-func (s *indexedStore) Update(id store.PrimaryKey, new, old map[string]interface{}) error {
+func (s *indexedStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	err := s.mapStore.Update(id, new, old)
+	old, err := s.mapStore.Find(id)
+	if err != nil {
+		return err
+	}
+
+	err = s.mapStore.Update(id, diff)
 	if err != nil {
 		return err
 	}
 	for field := range s.indexes {
-		oldVal, oldOK := old[field]
-		newVal, newOK := new[field]
-		if s.transform(oldVal) == s.transform(newVal) {
+		newVal, newOK := diff[field]
+		if !newOK {
 			continue
 		}
+		oldVal, oldOK := old[field]
 		if oldOK {
 			s.deindex(field, oldVal, id)
 		}
-		if newOK {
-			s.index(field, newVal, id)
-		}
+		s.index(field, newVal, id)
 	}
 	return nil
 }

@@ -15,10 +15,10 @@ type PrimaryKey interface {
 	fmt.Stringer
 }
 
-type Store interface {
+type Interface interface {
 	Create(obj map[string]interface{}) (PrimaryKey, error)
 	Find(id PrimaryKey) (map[string]interface{}, error)
 	FindBy(map[string]interface{}) (map[PrimaryKey]map[string]interface{}, error)
-	Update(id PrimaryKey, new, old map[string]interface{}) error
+	Update(id PrimaryKey, obj map[string]interface{}) error
 	Delete(id PrimaryKey) error
 }

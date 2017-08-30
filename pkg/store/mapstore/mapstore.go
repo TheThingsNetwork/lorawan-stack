@@ -14,7 +14,7 @@ import (
 )
 
 // New returns a new MapStore
-func New() store.Store {
+func New() store.Interface {
 	return &mapStore{
 		entropy: rand.New(rand.NewSource(time.Now().UnixNano())),
 		data:    make(map[store.PrimaryKey]map[string]interface{}),
@@ -33,7 +33,7 @@ func (s *mapStore) ulid() store.PrimaryKey {
 
 func (s *mapStore) Create(obj map[string]interface{}) (store.PrimaryKey, error) {
 	id := s.ulid()
-	return id, s.Update(id, obj, nil)
+	return id, s.Update(id, obj)
 }
 
 func (s *mapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
@@ -49,22 +49,21 @@ func (s *mapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 func (s *mapStore) FindBy(filters map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
 	matches := make(map[store.PrimaryKey]map[string]interface{})
 	s.mu.RLock()
+outer:
 	for id, obj := range s.data {
 		for filterK, filterV := range filters {
 			v, ok := obj[filterK]
 			if !ok || !reflect.DeepEqual(v, filterV) {
-				continue
+				continue outer
 			}
-			matches[id] = obj
-			break
 		}
+		matches[id] = obj
 	}
 	s.mu.RUnlock()
 	return matches, nil
 }
 
-func (s *mapStore) Update(id store.PrimaryKey, new, old map[string]interface{}) error {
-	diff := store.Diff(new, old)
+func (s *mapStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	obj, ok := s.data[id]

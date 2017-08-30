@@ -44,7 +44,7 @@ func TestMapStore(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(obj, should.Resemble, other)
 
-	err = s.Update(id, new, old)
+	err = s.Update(id, store.Diff(new, old))
 	a.So(err, should.BeNil)
 
 	obj, err = s.Find(id)
