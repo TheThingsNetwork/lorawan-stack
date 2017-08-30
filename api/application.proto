@@ -31,6 +31,7 @@ message ApplicationDownlinks {
 // The ApplicationDownlinkQueue service allows management of the application-layer downlink queue
 // This service is implemented the network server and the application server
 service ApplicationDownlinkQueue {
+  rpc DownlinkQueueReplace(ApplicationDownlinks) returns (google.protobuf.Empty);
   rpc DownlinkQueuePush(ApplicationDownlinks) returns (google.protobuf.Empty);
   rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks);
   rpc DownlinkQueueClear(EndDeviceIdentifiers) returns (google.protobuf.Empty);
