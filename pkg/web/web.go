@@ -7,8 +7,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/TheThingsNetwork/go-utils/random"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
+	"github.com/TheThingsNetwork/ttn/pkg/random"
 	"github.com/TheThingsNetwork/ttn/pkg/web/cookie"
 	"github.com/TheThingsNetwork/ttn/pkg/web/middleware"
 	"github.com/labstack/echo"
