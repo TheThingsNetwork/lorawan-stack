@@ -29,7 +29,7 @@
   branch = "master"
   name = "github.com/gogo/protobuf"
   packages = ["gogoproto","jsonpb","proto","protoc-gen-gogo/descriptor","sortkeys","types"]
-  revision = "9319258ff0eab7faf2eaca190ef9dff2b9603ead"
+  revision = "fcdc5011193ff531a548e9b0301828d5a5b97fd8"
 
 [[projects]]
   branch = "master"
@@ -71,7 +71,7 @@
   branch = "master"
   name = "github.com/hashicorp/hcl"
   packages = [".","hcl/ast","hcl/parser","hcl/scanner","hcl/strconv","hcl/token","json/parser","json/scanner","json/token"]
-  revision = "8f6b1344a92ff8877cf24a5de9177bf7d0a2a187"
+  revision = "392dba7d905ed5d04a5794ba89f558b27e2ba1ca"
 
 [[projects]]
   name = "github.com/inconshreveable/mousetrap"
@@ -165,16 +165,16 @@
   revision = "e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2"
 
 [[projects]]
+  branch = "master"
   name = "github.com/smartystreets/assertions"
   packages = [".","internal/go-render/render","internal/oglematchers","should"]
   revision = "9c0ea8acbc1d8ad689f9e6fe0c1fa5838e0cabc2"
-  version = "1.7.0"
 
 [[projects]]
   branch = "master"
   name = "github.com/spf13/afero"
   packages = [".","mem"]
-  revision = "36f8810e2e3d7eeac4ac05b57f65690fbfba62a2"
+  revision = "9be650865eab0c12963d8753212f4f9c66cdcf12"
 
 [[projects]]
   name = "github.com/spf13/cast"
@@ -210,19 +210,19 @@
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context","http2","http2/hpack","idna","internal/timeseries","lex/httplex","trace"]
-  revision = "66aacef3dd8a676686c7ae3716979581e8b03c47"
+  revision = "1c05540f6879653db88113bc4a2b70aec4bd491f"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "ab9e364efd8b52800ff7ee48a9ffba4e0ed78dfb"
+  revision = "07c182904dbd53199946ba614a412c61d3c548f5"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/text"
   packages = ["internal/gen","internal/triegen","internal/ucd","secure/bidirule","transform","unicode/bidi","unicode/cldr","unicode/norm","unicode/rangetable"]
-  revision = "18c65dde6afd36dbc39197ca72008895b8dfbfb6"
+  revision = "f494f8223b00d59fdaf1f267755151a4e9070954"
 
 [[projects]]
   branch = "master"
@@ -233,8 +233,8 @@
 [[projects]]
   branch = "master"
   name = "google.golang.org/grpc"
-  packages = [".","codes","connectivity","credentials","grpclb/grpc_lb_v1/messages","grpclog","internal","keepalive","metadata","naming","peer","stats","status","tap","transport"]
-  revision = "47d8591b1269253c642633a67ffeb276aab0b601"
+  packages = [".","codes","connectivity","credentials","grpclb/messages_only/grpc_lb_v1","grpclog","internal","keepalive","metadata","naming","peer","stats","status","tap","transport"]
+  revision = "9b6ac7ddb739a2bdfe5692fc29284db555756acd"
 
 [[projects]]
   branch = "v2"
