@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/store"
+	"github.com/mohae/deepcopy"
 	"github.com/oklog/ulid"
 )
 
@@ -41,7 +42,7 @@ func (s *mapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	obj, ok := s.data[id]
 	s.mu.RUnlock()
 	if ok {
-		return obj, nil
+		return deepcopy.Copy(obj).(map[string]interface{}), nil
 	}
 	return nil, store.ErrNotFound
 }

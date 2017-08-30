@@ -41,10 +41,18 @@ func TestIndexedMapStore(t *testing.T) {
 	a.So(obj, should.Resemble, new)
 
 	matches, err := s.FindBy(map[string]interface{}{
+		"foo": "baz",
 		"bar": "bar",
 	})
 	a.So(err, should.BeNil)
 	a.So(matches, should.HaveLength, 1)
+
+	matches, err = s.FindBy(map[string]interface{}{
+		"foo": "foo",
+		"bar": "bar",
+	})
+	a.So(err, should.BeNil)
+	a.So(matches, should.HaveLength, 0)
 
 	err = s.Delete(id)
 	a.So(err, should.BeNil)

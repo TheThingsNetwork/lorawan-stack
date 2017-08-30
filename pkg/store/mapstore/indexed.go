@@ -62,6 +62,13 @@ func (s *indexedStore) filterIndex(filters map[string]interface{}) ([]store.Set,
 			return nil, fmt.Errorf(`no index "%s"`, filterK)
 		}
 		filtered[i], _ = index[s.transform(filterV)]
+
+		s, ok := index[s.transform(filterV)]
+		if !ok {
+			filtered[i] = make(store.Set, 0)
+		} else {
+			filtered[i] = s
+		}
 		i++
 	}
 	return filtered, nil
