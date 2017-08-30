@@ -15,7 +15,13 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
+	"google.golang.org/grpc"
 )
+
+// Subsystem that can be registered to the component
+type Subsystem interface {
+	rpcserver.Registerer
+}
 
 // Config is the type of configuration for Components
 type Config struct {
@@ -33,10 +39,12 @@ type Component struct {
 	handler http.Handler
 	grpc    *rpcserver.Server
 
+	subsystems []Subsystem
+
+	loopback *grpc.ClientConn
+
 	httpL  net.Listener
 	httpsL net.Listener
-	grpcL  net.Listener
-	grpcsL net.Listener
 }
 
 // New returns a new component
@@ -72,21 +80,43 @@ func (c *Component) Context() context.Context {
 	return c.ctx
 }
 
+// Register a subsystem to the component
+func (c *Component) Register(s Subsystem) {
+	c.subsystems = append(c.subsystems, s)
+}
+
 // Start starts the component
-func (c *Component) Start() error {
-	c.logger.Debug("Starting component")
-
-	errors := make(chan error, 10)
-	signals := make(chan os.Signal)
-
+func (c *Component) Start() (err error) {
 	defer c.Close()
 
+	c.logger.Debug("Setting up gRPC server")
+
+	for _, sub := range c.subsystems {
+		sub.RegisterServices(c.grpc.Server)
+	}
+
+	c.logger.Debug("Starting loopback connection")
+
+	c.loopback, err = rpcserver.StartLoopback(c.grpc.Server)
+	if err != nil {
+		return
+	}
+
+	c.logger.Debug("Setting up gRPC gateway")
+
+	for _, sub := range c.subsystems {
+		sub.RegisterHandlers(c.grpc.ServeMux, c.loopback)
+	}
 	if c.handler == nil {
 		http.Handle(rpcserver.APIPrefix, http.StripPrefix(rpcserver.APIPrefix, c.grpc))
 	}
 
+	signals := make(chan os.Signal)
 	signal.Notify(signals, os.Interrupt, os.Kill, syscall.SIGTERM)
 
+	c.logger.Debug("Starting servers")
+
+	errors := make(chan error, 10)
 	go func() { errors <- c.listenHTTP() }()
 	go func() { errors <- c.listenHTTPS() }()
 	go func() { errors <- c.listenGRPC() }()
@@ -121,18 +151,8 @@ func (c *Component) Close() {
 	}
 
 	if c.grpc != nil {
-		c.grpc.Stop()
+		c.grpc.Stop() // This also closes all gRPC listeners
 		c.logger.Debug("Stopped gRPC server")
-	}
-
-	if c.grpcL != nil {
-		c.grpcL.Close()
-		c.logger.Debug("Stopped listening on gRPC")
-	}
-
-	if c.grpcsL != nil {
-		c.grpcsL.Close()
-		c.logger.Debug("Stopped listening on gRPCs")
 	}
 }
 
@@ -200,8 +220,6 @@ func (c *Component) listenGRPC() error {
 		return err
 	}
 
-	c.grpcL = listener
-
 	c.logger.WithField("address", addr).Debug("gRPC server listening")
 	return c.grpc.Serve(listener)
 }
@@ -223,8 +241,6 @@ func (c *Component) listenGRPCS() error {
 	if err != nil {
 		return err
 	}
-
-	c.grpcsL = listener
 
 	c.logger.WithField("address", addr).Debug("gRPCs server listening")
 	return c.grpc.Serve(listener)

@@ -127,6 +127,12 @@ func New(ctx context.Context, opts ...Option) *Server {
 	return server
 }
 
+// Registerer allows components to register their services to the gRPC server and the HTTP gateway
+type Registerer interface {
+	RegisterServices(s *grpc.Server)
+	RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn)
+}
+
 // Server wraps the gRPC server
 type Server struct {
 	ctx context.Context
