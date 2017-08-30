@@ -19,11 +19,6 @@ func Log(logger log.Interface) echo.MiddlewareFunc {
 
 			req := c.Request()
 
-			remote := req.Header.Get("X-Forwarded-For")
-			if remote == "" {
-				remote = req.RemoteAddr
-			}
-
 			version := req.Header.Get("X-Version")
 			if version == "" {
 				version = "unknown"
@@ -37,7 +32,7 @@ func Log(logger log.Interface) echo.MiddlewareFunc {
 				"Duration", stop.Sub(start),
 				"Method", req.Method,
 				"URL", req.URL.String(),
-				"IP", remote,
+				"IP", req.RemoteAddr,
 				"ID", c.Response().Header().Get("X-Request-ID"),
 				"Size", c.Response().Size,
 				"Status", status,
@@ -46,6 +41,10 @@ func Log(logger log.Interface) echo.MiddlewareFunc {
 
 			if loc := c.Response().Header().Get("Location"); status >= 300 && status < 400 && loc != "" {
 				w = w.WithField("Location", loc)
+			}
+
+			if fwd := req.Header.Get("X-Forwarded-For"); fwd != "" {
+				w = w.WithField("ForwardedFor", fwd)
 			}
 
 			if err != nil {
