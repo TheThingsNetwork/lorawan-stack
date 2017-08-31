@@ -32,6 +32,12 @@
   version = "2017.07.27"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/cockroachdb/cockroach-go"
+  packages = ["crdb"]
+  revision = "c806b484b8611fc587b6abc07f8bb0f7824a78d6"
+
+[[projects]]
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
   revision = "629574ca2a5df945712d3079857300b5e4da0236"
@@ -117,6 +123,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/jmoiron/sqlx"
+  packages = [".","reflectx"]
+  revision = "d9bd385d68c068f1fabb5057e3dedcbcbb039d0f"
+
+[[projects]]
+  branch = "master"
   name = "github.com/kr/pretty"
   packages = ["."]
   revision = "cfb55aafdaf3ec08f0db22699ab822c50091b1c4"
@@ -138,6 +150,13 @@
   packages = ["color","log"]
   revision = "779b8a8b9850a97acba6a3fe20feb628c39e17c1"
   version = "0.2.2"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/lib/pq"
+  packages = [".","oid"]
+  revision = "e42267488fe361b9dc034be7a6bffef5b195bceb"
+
 
 [[projects]]
   name = "github.com/magiconair/properties"
