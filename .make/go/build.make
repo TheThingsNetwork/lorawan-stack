@@ -8,7 +8,7 @@ GOARCH ?= $(or $(word 2,$(subst -, ,${TARGET_PLATFORM})), $(shell echo "`go env 
 MAIN ?= ./main.go
 
 # default vendor folder
-VENDOR_DIR ?= ./vendor
+VENDOR_DIR ?= $(PWD)/vendor
 VENDOR_FILE ?= Gopkg.toml
 
 LAZY_GOOS=`echo $@ | sed 's:-dev::' | sed 's:$(RELEASE_DIR)/.*-\(.*\)-\(.*\):\1:'`
