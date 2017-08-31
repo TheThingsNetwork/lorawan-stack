@@ -40,7 +40,7 @@ var DefaultGRPCConfig = config.GRPC{}
 
 // DefaultRedisConfig is the default config for Redis.
 var DefaultRedisConfig = config.Redis{
-	Address:  "localhost:3479",
+	Address:  "localhost:6379",
 	Database: 0,
 }
 
