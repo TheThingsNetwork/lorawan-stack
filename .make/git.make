@@ -72,7 +72,7 @@ COMMIT_MSG ?= _git.commit-msg-noop
 git.commit-msg: $(COMMIT_MSG)
 
 # prefixes for commit messages
-PREFIXES ?= api gs ns as is webui util ci doc make dev all
+PREFIXES ?= api gs ns as is js webui util ci doc make dev all
 
 # the args of the commit hook
 ARGS ?= /dev/null
