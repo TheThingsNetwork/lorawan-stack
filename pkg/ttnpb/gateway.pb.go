@@ -738,51 +738,14 @@ func (m *GatewayStatus) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			var keykey uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGateway
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				keykey |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			var stringLenmapkey uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGateway
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLenmapkey |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLenmapkey := int(stringLenmapkey)
-			if intStringLenmapkey < 0 {
-				return ErrInvalidLengthGateway
-			}
-			postStringIndexmapkey := iNdEx + intStringLenmapkey
-			if postStringIndexmapkey > l {
-				return io.ErrUnexpectedEOF
-			}
-			mapkey := string(dAtA[iNdEx:postStringIndexmapkey])
-			iNdEx = postStringIndexmapkey
 			if m.Versions == nil {
 				m.Versions = make(map[string]string)
 			}
-			if iNdEx < postIndex {
-				var valuekey uint64
+			var mapkey string
+			var mapvalue string
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowGateway
@@ -792,41 +755,80 @@ func (m *GatewayStatus) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					valuekey |= (uint64(b) & 0x7F) << shift
+					wire |= (uint64(b) & 0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				var stringLenmapvalue uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowGateway
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowGateway
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= (uint64(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
 					}
-					if iNdEx >= l {
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthGateway
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey > l {
 						return io.ErrUnexpectedEOF
 					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					stringLenmapvalue |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var stringLenmapvalue uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowGateway
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
 					}
+					intStringLenmapvalue := int(stringLenmapvalue)
+					if intStringLenmapvalue < 0 {
+						return ErrInvalidLengthGateway
+					}
+					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
+					iNdEx = postStringIndexmapvalue
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipGateway(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if skippy < 0 {
+						return ErrInvalidLengthGateway
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
 				}
-				intStringLenmapvalue := int(stringLenmapvalue)
-				if intStringLenmapvalue < 0 {
-					return ErrInvalidLengthGateway
-				}
-				postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-				if postStringIndexmapvalue > l {
-					return io.ErrUnexpectedEOF
-				}
-				mapvalue := string(dAtA[iNdEx:postStringIndexmapvalue])
-				iNdEx = postStringIndexmapvalue
-				m.Versions[mapkey] = mapvalue
-			} else {
-				var mapvalue string
-				m.Versions[mapkey] = mapvalue
 			}
+			m.Versions[mapkey] = mapvalue
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
@@ -949,51 +951,14 @@ func (m *GatewayStatus) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			var keykey uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGateway
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				keykey |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			var stringLenmapkey uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGateway
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLenmapkey |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLenmapkey := int(stringLenmapkey)
-			if intStringLenmapkey < 0 {
-				return ErrInvalidLengthGateway
-			}
-			postStringIndexmapkey := iNdEx + intStringLenmapkey
-			if postStringIndexmapkey > l {
-				return io.ErrUnexpectedEOF
-			}
-			mapkey := string(dAtA[iNdEx:postStringIndexmapkey])
-			iNdEx = postStringIndexmapkey
 			if m.Metrics == nil {
 				m.Metrics = make(map[string]float32)
 			}
-			if iNdEx < postIndex {
-				var valuekey uint64
+			var mapkey string
+			var mapvalue float32
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowGateway
@@ -1003,26 +968,65 @@ func (m *GatewayStatus) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					valuekey |= (uint64(b) & 0x7F) << shift
+					wire |= (uint64(b) & 0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				var mapvaluetemp uint32
-				if (iNdEx + 4) > l {
-					return io.ErrUnexpectedEOF
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowGateway
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= (uint64(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthGateway
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var mapvaluetemp uint32
+					if (iNdEx + 4) > l {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += 4
+					mapvaluetemp = uint32(dAtA[iNdEx-4])
+					mapvaluetemp |= uint32(dAtA[iNdEx-3]) << 8
+					mapvaluetemp |= uint32(dAtA[iNdEx-2]) << 16
+					mapvaluetemp |= uint32(dAtA[iNdEx-1]) << 24
+					mapvalue = math.Float32frombits(mapvaluetemp)
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipGateway(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if skippy < 0 {
+						return ErrInvalidLengthGateway
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
 				}
-				iNdEx += 4
-				mapvaluetemp = uint32(dAtA[iNdEx-4])
-				mapvaluetemp |= uint32(dAtA[iNdEx-3]) << 8
-				mapvaluetemp |= uint32(dAtA[iNdEx-2]) << 16
-				mapvaluetemp |= uint32(dAtA[iNdEx-1]) << 24
-				mapvalue := math.Float32frombits(mapvaluetemp)
-				m.Metrics[mapkey] = mapvalue
-			} else {
-				var mapvalue float32
-				m.Metrics[mapkey] = mapvalue
 			}
+			m.Metrics[mapkey] = mapvalue
 			iNdEx = postIndex
 		case 99:
 			if wireType != 2 {
