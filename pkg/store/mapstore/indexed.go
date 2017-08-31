@@ -54,35 +54,32 @@ func (s *indexedStore) deindex(field string, val interface{}, id store.PrimaryKe
 }
 
 func (s *indexedStore) filterIndex(filters map[string]interface{}) ([]store.Set, error) {
-	filtered := make([]store.Set, len(filters))
-	var i int
-	for filterK, filterV := range filters {
-		index, ok := s.indexes[filterK]
+	filtered := make([]store.Set, 0, len(filters))
+	for k, v := range filters {
+		index, ok := s.indexes[k]
 		if !ok {
-			return nil, fmt.Errorf(`no index "%s"`, filterK)
+			return nil, fmt.Errorf(`no index "%s"`, k)
 		}
-		filtered[i], _ = index[s.transform(filterV)]
 
-		s, ok := index[s.transform(filterV)]
+		idxs, ok := index[s.transform(v)]
 		if !ok {
-			filtered[i] = make(store.Set, 0)
+			filtered = append(filtered, make(store.Set, 0))
 		} else {
-			filtered[i] = s
+			filtered = append(filtered, idxs)
 		}
-		i++
 	}
 	return filtered, nil
 }
 
-func (s *indexedStore) Create(obj map[string]interface{}) (store.PrimaryKey, error) {
+func (s *indexedStore) Create(fields map[string]interface{}) (store.PrimaryKey, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	id, err := s.mapStore.Create(obj)
+	id, err := s.mapStore.Create(fields)
 	if err != nil {
 		return id, err
 	}
 	for field := range s.indexes {
-		if val, ok := obj[field]; ok {
+		if val, ok := fields[field]; ok {
 			s.index(field, val, id)
 		}
 	}
@@ -135,8 +132,8 @@ func (s *indexedStore) FindBy(filters map[string]interface{}) (map[store.Primary
 		filterSet.Intersect(set)
 	}
 	for id := range filterSet {
-		if obj, err := s.Find(id); err == nil {
-			matches[id] = obj
+		if fields, err := s.Find(id); err == nil {
+			matches[id] = fields
 		}
 	}
 	return matches, nil

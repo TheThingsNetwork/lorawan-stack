@@ -32,17 +32,17 @@ func (s *mapStore) ulid() store.PrimaryKey {
 	return ulid.MustNew(ulid.Now(), s.entropy)
 }
 
-func (s *mapStore) Create(obj map[string]interface{}) (store.PrimaryKey, error) {
+func (s *mapStore) Create(fields map[string]interface{}) (store.PrimaryKey, error) {
 	id := s.ulid()
-	return id, s.Update(id, obj)
+	return id, s.Update(id, fields)
 }
 
 func (s *mapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	s.mu.RLock()
-	obj, ok := s.data[id]
+	fields, ok := s.data[id]
 	s.mu.RUnlock()
 	if ok {
-		return deepcopy.Copy(obj).(map[string]interface{}), nil
+		return deepcopy.Copy(fields).(map[string]interface{}), nil
 	}
 	return nil, store.ErrNotFound
 }
@@ -51,14 +51,14 @@ func (s *mapStore) FindBy(filters map[string]interface{}) (map[store.PrimaryKey]
 	matches := make(map[store.PrimaryKey]map[string]interface{})
 	s.mu.RLock()
 outer:
-	for id, obj := range s.data {
-		for filterK, filterV := range filters {
-			v, ok := obj[filterK]
-			if !ok || !reflect.DeepEqual(v, filterV) {
+	for id, fields := range s.data {
+		for k, fv := range filters {
+			dv, ok := fields[k]
+			if !ok || !reflect.DeepEqual(dv, fv) {
 				continue outer
 			}
 		}
-		matches[id] = obj
+		matches[id] = fields
 	}
 	s.mu.RUnlock()
 	return matches, nil
@@ -67,19 +67,19 @@ outer:
 func (s *mapStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	obj, ok := s.data[id]
+	fields, ok := s.data[id]
 	if !ok {
 		s.data[id] = diff
 		return nil
 	}
 	for k, v := range diff {
 		if v == nil {
-			delete(obj, k)
+			delete(fields, k)
 			continue
 		}
-		obj[k] = v
+		fields[k] = v
 	}
-	s.data[id] = obj
+	s.data[id] = fields
 	return nil
 }
 

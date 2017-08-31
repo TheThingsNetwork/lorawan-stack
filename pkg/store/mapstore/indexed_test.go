@@ -29,16 +29,16 @@ func TestIndexedMapStore(t *testing.T) {
 	id, err := s.Create(old)
 	a.So(err, should.BeNil)
 
-	obj, err := s.Find(id)
+	fields, err := s.Find(id)
 	a.So(err, should.BeNil)
-	a.So(obj, should.Resemble, old)
+	a.So(fields, should.Resemble, old)
 
 	err = s.Update(id, store.Diff(new, old))
 	a.So(err, should.BeNil)
 
-	obj, err = s.Find(id)
+	fields, err = s.Find(id)
 	a.So(err, should.BeNil)
-	a.So(obj, should.Resemble, new)
+	a.So(fields, should.Resemble, new)
 
 	matches, err := s.FindBy(map[string]interface{}{
 		"foo": "baz",
@@ -57,6 +57,6 @@ func TestIndexedMapStore(t *testing.T) {
 	err = s.Delete(id)
 	a.So(err, should.BeNil)
 
-	obj, err = s.Find(id)
+	fields, err = s.Find(id)
 	a.So(err, should.Equal, store.ErrNotFound)
 }

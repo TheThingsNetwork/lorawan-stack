@@ -36,20 +36,20 @@ func TestMapStore(t *testing.T) {
 
 	a.So(otherID, should.NotEqual, id)
 
-	obj, err := s.Find(id)
+	fields, err := s.Find(id)
 	a.So(err, should.BeNil)
-	a.So(obj, should.Resemble, old)
+	a.So(fields, should.Resemble, old)
 
-	obj, err = s.Find(otherID)
+	fields, err = s.Find(otherID)
 	a.So(err, should.BeNil)
-	a.So(obj, should.Resemble, other)
+	a.So(fields, should.Resemble, other)
 
 	err = s.Update(id, store.Diff(new, old))
 	a.So(err, should.BeNil)
 
-	obj, err = s.Find(id)
+	fields, err = s.Find(id)
 	a.So(err, should.BeNil)
-	a.So(obj, should.Resemble, new)
+	a.So(fields, should.Resemble, new)
 
 	matches, err := s.FindBy(map[string]interface{}{
 		"foo": "baz",
@@ -68,6 +68,6 @@ func TestMapStore(t *testing.T) {
 	err = s.Delete(id)
 	a.So(err, should.BeNil)
 
-	obj, err = s.Find(id)
+	fields, err = s.Find(id)
 	a.So(err, should.Equal, store.ErrNotFound)
 }
