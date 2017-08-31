@@ -2,67 +2,67 @@
 
 package store
 
-// Set implements "set" data structure that contains strings
-type Set map[PrimaryKey]struct{}
+// KeySet implements "set" data structure that contains instances of PrimaryKey
+type KeySet map[PrimaryKey]struct{}
 
 // NewSet creates a new set that holds primary keys
-func NewSet() Set {
-	return make(Set)
+func NewSet() KeySet {
+	return make(KeySet)
 }
 
 // Size returns the size of the set
-func (s Set) Size() int {
+func (s KeySet) Size() int {
 	return len(s)
 }
 
 // IsEmpty returns whether the set is empty
-func (s Set) IsEmpty() bool {
+func (s KeySet) IsEmpty() bool {
 	return len(s) == 0
 }
 
 // Add adds the PrimaryKey to the set
-func (s Set) Add(u PrimaryKey) {
-	s[u] = struct{}{}
+func (s KeySet) Add(k PrimaryKey) {
+	s[k] = struct{}{}
 }
 
 // Remove removes the PrimaryKey from the set
-func (s Set) Remove(u PrimaryKey) {
-	delete(s, u)
+func (s KeySet) Remove(k PrimaryKey) {
+	delete(s, k)
 }
 
 // Contains returns whether the set contains the given PrimaryKey
-func (s Set) Contains(u PrimaryKey) bool {
-	_, exists := s[u]
-	return exists
+func (s KeySet) Contains(k PrimaryKey) bool {
+	_, ok := s[k]
+	return ok
 }
 
 // Slice returns the set as a slice
-func (s Set) Slice() []PrimaryKey {
+func (s KeySet) Slice() []PrimaryKey {
 	result := make([]PrimaryKey, 0, len(s))
-	for u := range s {
-		result = append(result, u)
+	for k := range s {
+		result = append(result, k)
 	}
 	return result
 }
 
 // Union returns the union of the two sets
-func (s Set) Union(other Set) Set {
-	result := make(Set, len(other))
-	for value := range s {
-		result.Add(value)
+func (s KeySet) Union(other KeySet) KeySet {
+	result := make(KeySet, len(other))
+	for k := range s {
+		result.Add(k)
 	}
-	for value := range other {
-		result.Add(value)
+	for k := range other {
+		result.Add(k)
 	}
 	return result
 }
 
 // Intersect returns the intersection of the two sets
-func (s Set) Intersect(other Set) Set {
-	result := make(Set, len(other))
-	for u := range s {
-		if other.Contains(u) {
-			result.Add(u)
+func (s KeySet) Intersect(other KeySet) KeySet {
+	result := make(KeySet, len(other))
+	for k := range s {
+		if other.Contains(k) {
+			result.Add(k)
 		}
 	}
 	return result

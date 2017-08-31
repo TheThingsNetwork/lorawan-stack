@@ -15,10 +15,10 @@ func NewIndexed(indexed ...string) store.Interface {
 	internal := New().(*mapStore)
 	s := &indexedStore{
 		mapStore: internal,
-		indexes:  make(map[string]map[string]store.Set),
+		indexes:  make(map[string]map[string]store.KeySet),
 	}
 	for _, field := range indexed {
-		s.indexes[field] = make(map[string]store.Set)
+		s.indexes[field] = make(map[string]store.KeySet)
 	}
 	return s
 }
@@ -26,7 +26,7 @@ func NewIndexed(indexed ...string) store.Interface {
 type indexedStore struct {
 	*mapStore
 	mu      sync.RWMutex
-	indexes map[string]map[string]store.Set
+	indexes map[string]map[string]store.KeySet
 }
 
 func (s *indexedStore) transform(i interface{}) string {
@@ -53,8 +53,8 @@ func (s *indexedStore) deindex(field string, val interface{}, id store.PrimaryKe
 	}
 }
 
-func (s *indexedStore) filterIndex(filters map[string]interface{}) ([]store.Set, error) {
-	filtered := make([]store.Set, 0, len(filters))
+func (s *indexedStore) filterIndex(filters map[string]interface{}) ([]store.KeySet, error) {
+	filtered := make([]store.KeySet, 0, len(filters))
 	for k, v := range filters {
 		index, ok := s.indexes[k]
 		if !ok {
@@ -63,7 +63,7 @@ func (s *indexedStore) filterIndex(filters map[string]interface{}) ([]store.Set,
 
 		idxs, ok := index[s.transform(v)]
 		if !ok {
-			filtered = append(filtered, make(store.Set, 0))
+			filtered = append(filtered, make(store.KeySet, 0))
 		} else {
 			filtered = append(filtered, idxs)
 		}
@@ -123,7 +123,7 @@ func (s *indexedStore) FindBy(filters map[string]interface{}) (map[store.Primary
 	sort.Slice(filtered, func(i, j int) bool { // Optimization: start with the smallest set
 		return filtered[i].Size() < filtered[j].Size()
 	})
-	var filterSet store.Set
+	var filterSet store.KeySet
 	for _, set := range filtered {
 		if filterSet == nil {
 			filterSet = set
