@@ -29,7 +29,7 @@ type mapStore struct {
 }
 
 func (s *mapStore) ulid() store.PrimaryKey {
-	return ulid.MustNew(uint64(time.Now().UnixNano()/1000000), s.entropy)
+	return ulid.MustNew(ulid.Now(), s.entropy)
 }
 
 func (s *mapStore) Create(obj map[string]interface{}) (store.PrimaryKey, error) {
