@@ -1,0 +1,19 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: golang
+    tag: '1.9'
+
+params:
+  TEST_GOARCH: amd64
+  GO_REPO: github.com/TheThingsNetwork/ttn
+
+inputs:
+- name: ttn-src
+  path: go/src/github.com/TheThingsNetwork/ttn
+- name: vendor
+
+run:
+  path: go/src/github.com/TheThingsNetwork/ttn/ci/go-test.sh

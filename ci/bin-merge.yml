@@ -1,0 +1,30 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: alpine
+    tag: '3.6'
+
+inputs:
+- name: ttn-linux-amd64
+- name: ttn-linux-386
+- name: ttn-linux-arm64
+- name: ttn-linux-arm
+- name: ttn-darwin-amd64
+- name: ttn-windows-amd64
+- name: ttn-windows-386
+
+outputs:
+- name: ttn-bin
+
+run:
+  path: sh
+  args:
+  - -exc
+  - |
+    mkdir release
+    mv ttn-*/* release
+    apk add --update tar
+    cd release
+    tar -cvzf ../ttn-bin/ttn-$(date '+%Y.%m.%d.%H.%M').tar.gz .

@@ -13,6 +13,12 @@ include .make/git.make
 include .make/headers.make
 include .make/go/main.make
 
+ci.encrypt-variables:
+	keybase encrypt -b -i ci/variables.yml -o ci/variables.yml.encrypted johanstokking htdvisser romeovs ericgo
+
+ci.decrypt-variables:
+	keybase decrypt -i ci/variables.yml.encrypted -o ci/variables.yml
+
 messages:
 	@$(GO) run ./pkg/errors/generate_messages.go --filename config/messages.json
 
@@ -38,3 +44,5 @@ ttn-example-dev: go.link
 
 ttn-example-docker: MAIN=./cmd/ttn-example/main.go
 ttn-example-docker: $(RELEASE_DIR)/ttn-example-linux-amd64
+
+build-all: ttn-example

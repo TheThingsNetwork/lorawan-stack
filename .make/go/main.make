@@ -14,7 +14,7 @@ GO = go
 GOLINT = golint
 
 # go flags
-GO_FLAGS = -a
+GO_FLAGS ?= -a
 GO_ENV = CGO_ENABLED=0
 LD_FLAGS = -ldflags "-w $(GO_TAGS)"
 GO_TAGS ?= -X main.commit=$(GIT_COMMIT) -X main.date=$(BUILD_DATE) -X main.tag=$(GIT_TAG) -X main.branch=$(GIT_BRANCH)

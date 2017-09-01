@@ -32,12 +32,6 @@
   version = "2017.07.27"
 
 [[projects]]
-  name = "github.com/dgrijalva/jwt-go"
-  packages = ["."]
-  revision = "d2709f9f1f31ebcda9651b03077758c1f3a0018c"
-  version = "v3.0.0"
-
-[[projects]]
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
   revision = "629574ca2a5df945712d3079857300b5e4da0236"
@@ -255,10 +249,10 @@
   revision = "0efa5202c04663c757d84f90f5219c1250baf94f"
 
 [[projects]]
+  branch = "master"
   name = "github.com/spf13/pflag"
   packages = ["."]
-  revision = "e57e3eeb33f795204c1ca35f56c44f83227c6e66"
-  version = "v1.0.0"
+  revision = "7aff26db30c1be810f9de5038ec5ef96ac41fd7c"
 
 [[projects]]
   name = "github.com/spf13/viper"
@@ -323,6 +317,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "21cdc8723131d7bd4402bd38cdaded508ea685bfaa960cc36785bc2250e7093e"
+  inputs-digest = "ca21382b9cbed3d4acf3cc8334ac27a1fdb1b2fd39cde995ec00af5d40d44ebe"
   solver-name = "gps-cdcl"
   solver-version = 1
