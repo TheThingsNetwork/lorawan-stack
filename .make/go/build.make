@@ -18,7 +18,7 @@ LAZY_GOOS=`echo $@ | sed 's:$(RELEASE_DIR)/$(NAME)-::' | sed 's:-.*::'`
 LAZY_GOARCH=`echo $@ | sed 's:$(RELEASE_DIR)/$(NAME)-::' | sed 's:.*-::'`
 
 # Build the executable
-$(RELEASE_DIR)/$(NAME)-%: $(shell $(GO_FILES)) $(GO_VENDOR_FILE)
+$(RELEASE_DIR)/%: $(shell $(GO_FILES)) $(GO_VENDOR_FILE)
 	@$(log) "Building" [$(GO_ENV) GOOS=$(GOOS) GOARCH=$(GOARCH) $(GO) build $(GO_FLAGS) ...]
 	$(GO_ENV) GOOS=$(LAZY_GOOS) GOARCH=$(LAZY_GOARCH) $(GO) build -o "$(RELEASE_DIR)/$(NAME)-$(LAZY_GOOS)-$(LAZY_GOARCH)" -v $(GO_FLAGS) $(LD_FLAGS) $(MAIN)
 
