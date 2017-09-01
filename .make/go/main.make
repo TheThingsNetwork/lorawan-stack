@@ -17,7 +17,7 @@ GOLINT = golint
 GO_FLAGS = -a
 GO_ENV = CGO_ENABLED=0
 LD_FLAGS = -ldflags "-w $(GO_TAGS)"
-GO_TAGS ?= "-X main.commit=$(GIT_COMMIT) -X main.date=$(BUILD_DATE) -X main.tag=$(GIT_TAG) -X main.branch=$(GIT_BRANCH)"
+GO_TAGS ?= -X main.commit=$(GIT_COMMIT) -X main.date=$(BUILD_DATE) -X main.tag=$(GIT_TAG) -X main.branch=$(GIT_BRANCH)
 
 # golint flags
 GOLINT_FLAGS = -set_exit_status
