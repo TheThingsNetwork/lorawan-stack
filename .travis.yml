@@ -1,0 +1,30 @@
+language: go
+
+go:
+- 1.9
+
+env:
+- GOARCH=amd64
+- GOARCH=386
+
+go_import_path: github.com/TheThingsNetwork/ttn
+
+sudo: required
+
+services:
+- docker
+
+cache:
+  directories:
+  - vendor
+
+install:
+- make dev-deps
+- make deps
+
+before_script:
+- docker run -d -p 127.0.0.1:6379:6379 redis
+
+script:
+- make test
+- make quality

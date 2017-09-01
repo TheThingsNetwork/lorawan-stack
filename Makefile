@@ -16,6 +16,14 @@ include .make/go/main.make
 messages:
 	@$(GO) run ./pkg/errors/generate_messages.go --filename config/messages.json
 
+dev-deps: go.dev-deps
+
+deps: go.deps
+
+test: go.test
+
+quality: go.quality
+
 # Cache build artifacts (speeds up dev builds)
 cache: go.install
 
