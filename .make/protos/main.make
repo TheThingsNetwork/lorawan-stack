@@ -17,17 +17,9 @@ SPACE := $(EMPTY) $(EMPTY)
 COMMA := ,
 SED = $(shell command -v gsed || command -v sed)
 
-ALL_FILES ?= (git ls-files . && git ls-files . --exclude-standard --others) | grep -v node_modules | sed 's:^:./:'
-PROTO_FILES ?= $(ALL_FILES) | grep "\.proto$$"
+PROTO_DIR=$(PWD)/api
+PROTO_OUT=$(PWD)/pkg/ttnpb
 
-# Go
-GO_PROTO_TYPES = any duration empty struct timestamp
-GO_PROTO_TYPE_CONVERSIONS = $(subst $(SPACE),$(COMMA),$(foreach type,$(GO_PROTO_TYPES),Mgoogle/protobuf/$(type).proto=$(GOGO_REPO)/types))
-GO_PROTOC_FLAGS ?= \
-	--gogottn_out=plugins=grpc,$(GO_PROTO_TYPE_CONVERSIONS):$(GO_PATH)/src \
-	--grpc-gateway_out=:$(GO_PATH)/src
-
-go.protos: $(wildcard $(PWD)/api/*.proto)
-	$(PROTOC) $(GO_PROTOC_FLAGS) $(PWD)/api/*.proto
+include .make/protos/go.make
 
 # vim: ft=make

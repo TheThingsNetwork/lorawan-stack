@@ -12,7 +12,7 @@ include .make/general.make
 include .make/git.make
 include .make/headers.make
 include .make/go/main.make
-include .make/protos.make
+include .make/protos/main.make
 
 ci.encrypt-variables:
 	keybase encrypt -b -i ci/variables.yml -o ci/variables.yml.encrypted johanstokking htdvisser romeovs ericgo
