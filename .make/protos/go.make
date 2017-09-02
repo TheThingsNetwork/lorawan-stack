@@ -10,6 +10,8 @@ GO_PROTOC_FLAGS ?= \
 go.protos: $(wildcard $(PWD)/api/*.proto)
 	$(PROTOC) $(GO_PROTOC_FLAGS) $(PROTO_DIR)/*.proto
 	$(MAKE_DIR)/protos/fix-grpc-gateway-names.sh $(PROTO_DIR)
-	mv $(PROTO_DIR)/*.gw.go $(PROTO_OUT)
+	@if [[ `ls $(PROTO_DIR)/*.gw.go 2> /dev/null` ]]; then \
+		mv $(PROTO_DIR)/*.gw.go $(PROTO_OUT); \
+	fi
 
 # vim: ft=make

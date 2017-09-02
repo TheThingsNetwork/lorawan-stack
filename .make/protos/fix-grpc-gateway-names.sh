@@ -29,5 +29,7 @@ for f in ${protos[@]}; do
 done
 IFS=${IFS_BAK}
 
-sed -i ${sedArgs[*]} ${genFiles[*]}
+if [[ ${#genFiles[@]} != 0 ]] && [[ ${#sedArgs[@]} != 0 ]]; then
+    sed -i ${sedArgs[*]} ${genFiles[*]}
+fi
 exit 0
