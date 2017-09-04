@@ -64,7 +64,6 @@ channels:
 - frequency: 923100000
 - frequency: 923300000
 lbt:
-  rssi_offset: -4
   rssi_target: -80
   scan_time: 128
 radios:
@@ -83,7 +82,6 @@ radios:
 	a.So(fp.Radios[0].TX.MinFrequency, should.Equal, 920900000)
 	a.So(fp.Radios[0].TX.MaxFrequency, should.Equal, 923300000)
 	a.So(fp.Radios[1].TX, should.BeNil)
-	a.So(fp.LBT.RSSIOffset, should.Equal, -4)
 	a.So(*fp.LBT.RSSITarget, should.Equal, -80)
 	a.So(*fp.LBT.ScanTime, should.Equal, 128)
 }

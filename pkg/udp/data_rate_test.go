@@ -1,10 +1,11 @@
 // Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package types
+package udp
 
 import (
 	"testing"
 
+	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -13,8 +14,8 @@ func TestDataRate(t *testing.T) {
 	a := assertions.New(t)
 
 	table := map[string]DataRate{
-		`"SF7BW125"`: DataRate{LoRa: "SF7BW125"},
-		`50000`:      DataRate{FSK: 50000},
+		`"SF7BW125"`: DataRate{types.DataRate{LoRa: "SF7BW125"}},
+		`50000`:      DataRate{types.DataRate{FSK: 50000}},
 	}
 
 	for s, dr := range table {

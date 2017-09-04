@@ -52,8 +52,11 @@ type Channel struct {
 // Rx1Emission takes the uplink's emission parameters, and returns downlink datarate index and channel
 type Rx1Emission func(dataRateIndex, frequency, RX1DROffset int, dwellTime bool) (int, int)
 
-// Rx2Emission takes the uplink's emission parameters, and returns downlink datarate index and channel
-type Rx2Emission func(dataRateIndex, frequency, RX2DataRate int) (int, int)
+// Rx2Parameters contains downlink datarate index and channel
+type Rx2Parameters struct {
+	DataRateIndex uint8
+	Frequency     uint32
+}
 
 type BandID string
 
@@ -71,12 +74,12 @@ type Band struct {
 
 	ImplementsCFList bool
 
-	// ReceiveDelay1 is the RX1 window timing in seconds
+	// ReceiveDelay1 is the default RX1 window timing in seconds
 	ReceiveDelay1 time.Duration
-	// ReceiveDelay2 is the RX2 window timing in seconds (ReceiveDelay1 + 1s)
+	// ReceiveDelay2 is the default RX2 window timing in seconds (ReceiveDelay1 + 1s)
 	ReceiveDelay2 time.Duration
 
-	// ReceiveDelay1 is the JoinAccept window timing in seconds
+	// ReceiveDelay1 is the default JoinAccept window timing in seconds
 	JoinAcceptDelay1 time.Duration
 	// ReceiveDelay2 is the JoinAccept window timing in seconds
 	JoinAcceptDelay2 time.Duration
@@ -95,8 +98,10 @@ type Band struct {
 	// DefaultMaxEIRP in dBm
 	DefaultMaxEIRP float32
 
-	RX1Parameters        Rx1Emission
-	DefaultRX2Parameters Rx2Emission
+	// RX1Parameters is the default function that determines the settings for a TX sent during RX1
+	RX1Parameters Rx1Emission
+	// RX1Parameters are the default parameters that determine the settings for a TX sent during RX2
+	DefaultRX2Parameters Rx2Parameters
 }
 
 // DutyCycle for the [MinFrequency;MaxFrequency[ sub-band

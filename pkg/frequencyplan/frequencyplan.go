@@ -48,7 +48,6 @@ type Channel struct {
 
 // LBTConfig describes listen-before-talk configuration if applicable in the frequency plan
 type LBTConfig struct {
-	RSSIOffset float32  `yaml:"rssi_offset,omitempty"`
 	RSSITarget *float32 `yaml:"rssi_target,omitempty"`
 	ScanTime   *int32   `yaml:"scan_time,omitempty"`
 }

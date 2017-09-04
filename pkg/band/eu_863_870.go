@@ -25,6 +25,11 @@ func init() {
 		BandDutyCycles: []DutyCycle{
 			{
 				MinFrequency: 863000000,
+				MaxFrequency: 865000000,
+				DutyCycle:    0.001,
+			},
+			{
+				MinFrequency: 865000000,
 				MaxFrequency: 868000000,
 				DutyCycle:    0.01,
 			},
@@ -84,9 +89,7 @@ func init() {
 			return outDataRateIndex, frequency
 		},
 
-		DefaultRX2Parameters: func(_, _, _ int) (int, int) {
-			return 0, 869525000
-		},
+		DefaultRX2Parameters: Rx2Parameters{0, 869525000},
 	}
 	All = append(All, eu_863_870)
 }

@@ -82,9 +82,7 @@ func init() {
 			return outDataRateIndex, downlinkChannels[frequencyIndex].Frequency
 		},
 
-		DefaultRX2Parameters: func(_, _, _ int) (int, int) {
-			return 0, 505300000
-		},
+		DefaultRX2Parameters: Rx2Parameters{0, 505300000},
 	}
 	All = append(All, cn_470_510)
 }

@@ -62,9 +62,7 @@ func init() {
 			return outDataRateIndex, frequency
 		},
 
-		DefaultRX2Parameters: func(_, _, _ int) (int, int) {
-			return 0, 921900000
-		},
+		DefaultRX2Parameters: Rx2Parameters{0, 921900000},
 	}
 	All = append(All, kr_920_923)
 }

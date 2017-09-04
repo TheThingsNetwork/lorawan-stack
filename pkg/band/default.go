@@ -6,10 +6,10 @@ import "time"
 
 const (
 	defaultReceiveDelay1 time.Duration = time.Second
-	defaultReceiveDelay2 time.Duration = 2 * time.Second
+	defaultReceiveDelay2 time.Duration = defaultReceiveDelay1 + time.Second
 
 	defaultJoinAcceptDelay1 time.Duration = 5 * time.Second
-	defaultJoinAcceptDelay2 time.Duration = 6 * time.Second
+	defaultJoinAcceptDelay2 time.Duration = defaultJoinAcceptDelay1 + time.Second
 
 	defaultMaxFCntGap uint = 16384
 
