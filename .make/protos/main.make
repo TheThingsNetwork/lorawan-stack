@@ -18,7 +18,6 @@ COMMA := ,
 SED = $(shell command -v gsed || command -v sed)
 
 PROTO_DIR=$(PWD)/api
-PROTO_OUT=$(PWD)/pkg/ttnpb
 
 include .make/protos/go.make
 

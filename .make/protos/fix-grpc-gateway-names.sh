@@ -8,18 +8,18 @@ function usage {
 [[ ${1} = "" ]] && usage
 protoDir=${1}
 
-# TODO figure out a way to traverse only files imported by protos using grpc-gateway(google.api.http option)
+# TODO figure out a way to traverse only files imported by protos using grpc-gateway (google.api.http option)
 protos=(${protoDir}/*.proto)
+sedArgs=()
+lines=()
 genFiles=()
 
 IFS_BAK=${IFS}
 IFS="
 "
-
-sedArgs=()
 for f in ${protos[@]}; do
   grep -q '(google.api.http)' ${f} && genFiles+=(${f%".proto"}".pb.gw.go")
-  grep -q '(gogoproto.customname)' ${f} && lines=(`cat ${f} | grep '(gogoproto.customname)'`) || continue
+  grep -q '(gogoproto.customname)' ${f} && lines+=(`cat ${f} | grep '(gogoproto.customname)'`) || continue
 
   for l in ${lines[@]}; do
     from=`echo $l | sed 's/[ ]*\(repeated[ ]\+\)\?[[:alnum:]_.]\+[ ]\+\([[:alnum:]_]\+\)[ ]*=[ ]*[0-9]\+.*/\2/' | sed 's/_\([a-z]\)/\u\1/g' | tr -d ' ' | sed 's/\(^[:a-z:]\)\(.*\)/\u\1\2/' | tr -d '_' `
