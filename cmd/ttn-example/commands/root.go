@@ -16,7 +16,9 @@ var (
 	name      = "ttn-example"
 	config    = conf.InitializeWithDefaults(name, shared.DefaultBaseConfig)
 	logger, _ = log.NewLogger(log.WithLevel(shared.DefaultBaseConfig.Log.Level), log.WithHandler(log.NewCLI(os.Stdout)))
-	Root      = &cobra.Command{
+
+	// Root command is the entrypoint of the program
+	Root = &cobra.Command{
 		Use:   name,
 		Short: "Example program",
 	}

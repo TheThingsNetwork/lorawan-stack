@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// Keys under which error metadata is stored
 const (
 	CodeKey      = "ttn-error-code"
 	AttributeKey = "attributes"

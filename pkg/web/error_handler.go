@@ -59,7 +59,7 @@ func ErrorHandler(template string) echo.HTTPErrorHandler {
 	}
 }
 
-// statusCodeFromError returns the statuscode that represent the error.
+// StatusCodeFromError returns the status code that represent the error.
 func StatusCodeFromError(err error) int {
 	switch v := err.(type) {
 	case *echo.HTTPError:

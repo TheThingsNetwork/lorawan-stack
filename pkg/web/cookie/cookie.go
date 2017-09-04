@@ -28,7 +28,7 @@ type Cookie struct {
 	HttpOnly bool
 }
 
-// Cookie is a middleware function that makes the handlers capable of handling cookies via
+// Cookies is a middleware function that makes the handlers capable of handling cookies via
 // methods of this package.
 func Cookies(root string, block, hash []byte) echo.MiddlewareFunc {
 	s := securecookie.New(hash, block)

@@ -114,7 +114,7 @@ var (
 	// OnNormalizeRedirectTemporary redirects clients temporarily if they use denormalized urls.
 	OnNormalizeRedirectTemporary = onNormalize(middleware.RedirectTemporary)
 
-	// OnNormalizeRedirectTemporary redirects clients permanently if they use denormalized urls.
+	// OnNormalizeRedirectPermanent redirects clients permanently if they use denormalized urls.
 	OnNormalizeRedirectPermanent = onNormalize(middleware.RedirectPermanent)
 )
 

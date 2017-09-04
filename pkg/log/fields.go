@@ -105,7 +105,7 @@ func (f *F) WithField(name string, val interface{}) *F {
 	return f.With(nodes)
 }
 
-// WithField returns a new fielder that has all the fields of the other fielder.
+// WithFields returns a new fielder that has all the fields of the other fielder.
 func (f *F) WithFields(fields Fielder) *F {
 	return f.With(fields.Fields())
 }

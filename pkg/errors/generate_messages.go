@@ -85,7 +85,7 @@ func merge(old map[string]*message, new []*errors.ErrDescriptor) ([]*message, ma
 		}
 
 		res = append(res, msg)
-		for lang, _ := range msg.Translations {
+		for lang := range msg.Translations {
 			stats[lang] = stats[lang] + 1
 		}
 	}

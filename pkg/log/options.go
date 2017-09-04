@@ -2,6 +2,7 @@
 
 package log
 
+// Option for the logger
 type Option func(*Logger) error
 
 // WithHandler sets the handler on the logger.

@@ -12,6 +12,7 @@ type testingT interface {
 	Error(args ...interface{})
 }
 
+// TestStore executes a black-box test for the given store
 func TestStore(t testingT, v store.Interface) {
 	a := assertions.New(t)
 

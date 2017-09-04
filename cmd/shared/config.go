@@ -12,7 +12,7 @@ var DefaultBaseConfig = config.Base{
 	Log: DefaultLogConfig,
 }
 
-// DefaultLogConfig is the default log configuration
+// DefaultLogConfig is the default log configuration.
 var DefaultLogConfig = config.Log{
 	Level: log.InfoLevel,
 }
@@ -23,11 +23,12 @@ var DefaultTLSConfig = config.TLS{
 	Key:         "",
 }
 
+// DefaultHTTPConfig is the default HTTP config.
 var DefaultHTTPConfig = config.HTTP{
 	HTTP: ":80",
 }
 
-// DefaultIdentityConfig is the default Identity config
+// DefaultIdentityConfig is the default Identity config.
 var DefaultIdentityConfig = config.Identity{
 	Servers: map[string]string{
 		"ttn-account-v2":  "https://account.thethingsnetwork.org",
