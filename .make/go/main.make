@@ -64,7 +64,7 @@ GO_VENDOR_FILE ?= Gopkg.toml
 GO_FILES = $(ALL_FILES) | $(only_go)
 
 # local go packages
-GO_PACKAGES = $(GO_FILES) | $(no_vendor) | $(to_packages)
+GO_PACKAGES = go list -v ./...
 
 # lintable go files
 GO_LINT_FILES = $(ALL_FILES) | $(only_go_lintable)
@@ -76,7 +76,7 @@ GO_LINT_STAGED_FILES = $(ALL_FILES) | $(only_go_lintable) | $(only_staged)
 EXTERNAL_PACKAGES = find ./vendor -name "*.go" | $(to_packages) | $(only_vendor)
 
 # staged local packages
-STAGED_PACKAGES = $(STAGED_FILES) | $(only_go) | $(no_vendor) | $(to_packages) | $(to_local)
+STAGED_PACKAGES = $(STAGED_FILES) | $(only_go) | $(no_vendor) | $(to_packages) | xargs $(GO) list -v 2>/dev/null
 
 # packages for testing
 TEST_PACKAGES = $(GO_FILES) | $(no_vendor) | $(only_test) | $(to_packages)
