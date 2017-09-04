@@ -16,6 +16,9 @@ include .make/go/main.make
 messages:
 	@$(GO) run ./pkg/errors/generate_messages.go --filename config/messages.json
 
+# Cache build artifacts (speeds up dev builds)
+cache: go.install
+
 # Example builds
 ttn-example: MAIN=./cmd/ttn-example/main.go
 ttn-example: $(RELEASE_DIR)/ttn-example-$(GOOS)-$(GOARCH)
