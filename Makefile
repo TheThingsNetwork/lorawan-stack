@@ -16,5 +16,14 @@ include .make/go/main.make
 messages:
 	@$(GO) run ./pkg/errors/generate_messages.go --filename config/messages.json
 
+# Example builds
 ttn-example: MAIN=./cmd/ttn-example/main.go
 ttn-example: $(RELEASE_DIR)/ttn-example-$(GOOS)-$(GOARCH)
+ttn-example: go.link
+
+ttn-example-dev: MAIN=./cmd/ttn-example/main.go
+ttn-example-dev: $(RELEASE_DIR)/ttn-example-$(GOOS)-$(GOARCH)-dev
+ttn-example-dev: go.link
+
+ttn-example-docker: MAIN=./cmd/ttn-example/main.go
+ttn-example-docker: $(RELEASE_DIR)/ttn-example-linux-amd64

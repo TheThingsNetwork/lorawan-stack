@@ -4,9 +4,6 @@
 GOOS   ?= $(or $(word 1,$(subst -, ,${TARGET_PLATFORM})), $(shell echo "`go env GOOS`"))
 GOARCH ?= $(or $(word 2,$(subst -, ,${TARGET_PLATFORM})), $(shell echo "`go env GOARCH`"))
 
-# build
-go.build: $(RELEASE_DIR)/$(NAME)-$(GOOS)-$(GOARCH)
-
 # default main file
 MAIN ?= ./main.go
 
@@ -14,31 +11,26 @@ MAIN ?= ./main.go
 VENDOR_DIR ?= ./vendor
 VENDOR_FILE ?= Gopkg.toml
 
-LAZY_GOOS=`echo $@ | sed 's:$(RELEASE_DIR)/.*-\(.*\)-\(.*\):\1:'`
-LAZY_GOARCH=`echo $@ | sed 's:$(RELEASE_DIR)/.*-\(.*\)-\(.*\):\2:'`
+LAZY_GOOS=`echo $@ | sed 's:-dev::' | sed 's:$(RELEASE_DIR)/.*-\(.*\)-\(.*\):\1:'`
+LAZY_GOARCH=`echo $@ | sed 's:-dev::' | sed 's:$(RELEASE_DIR)/.*-\(.*\)-\(.*\):\2:'`
+OUTPUT=`echo $@ | sed 's:-dev::'`
 
 # Build the executable
 $(RELEASE_DIR)/%: $(shell $(GO_FILES)) $(GO_VENDOR_FILE)
-	@$(log) "Building" [$(GO_ENV) GOOS=$(GOOS) GOARCH=$(GOARCH) $(GO) build $(GO_FLAGS) ...]
-	@$(GO_ENV) GOOS=$(LAZY_GOOS) GOARCH=$(LAZY_GOARCH) $(GO) build -o "$(RELEASE_DIR)/$(NAME)-$(LAZY_GOOS)-$(LAZY_GOARCH)" -v $(GO_FLAGS) $(LD_FLAGS) $(MAIN)
+	@$(log) "Building" [$(GO_ENV) GOOS=$(LAZY_GOOS) GOARCH=$(LAZY_GOARCH) $(GO) build $(GO_FLAGS) ...]
+	@$(GO_ENV) GOOS=$(LAZY_GOOS) GOARCH=$(LAZY_GOARCH) $(GO) build -o "$(OUTPUT)" -v $(GO_FLAGS) $(LD_FLAGS) $(MAIN)
 
 # Build the executable in dev mode (much faster)
-go.dev: GO_FLAGS =
-go.dev: GO_ENV =
-go.dev: BUILD_TYPE = dev
-go.dev: $(RELEASE_DIR)/$(NAME)-$(GOOS)-$(GOARCH)
+$(RELEASE_DIR)/%-dev: GO_ENV =
+$(RELEASE_DIR)/%-dev: GO_FLAGS =
+$(RELEASE_DIR)/%-dev: BUILD_TYPE = dev
+$(RELEASE_DIR)/%-dev: $(RELEASE_DIR)/%
 
-## link the executable to a simple name
-$(RELEASE_DIR)/$(NAME): $(RELEASE_DIR)/$(NAME)-$(GOOS)-$(GOARCH)
-	@$(log) "Linking binary" [ln -sf $(RELEASE_DIR)/$(NAME)-$(GOOS)-$(GOARCH) $(RELEASE_DIR)/$(NAME)]
-	@ln -sf $(NAME)-$(GOOS)-$(GOARCH) $(RELEASE_DIR)/$(NAME)
-
-go.link: $(RELEASE_DIR)/$(NAME)
-
-go.link-dev: GO_FLAGS =
-go.link-dev: GO_ENV =
-go.link-dev: BUILD_TYPE = dev
-go.link-dev: go.link
+# link executables to a simplified name that is the same on all architectures.
+go.link:
+		@for i in $(wildcard $(RELEASE_DIR)/*-$(GOOS)-$(GOARCH)); do \
+			ln -sfr $$i `echo $$i | sed 's:\(.*\)-.*-.*:\1:'` \
+		; done
 
 ## initialize go dep
 $(VENDOR_FILE):
