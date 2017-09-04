@@ -11,7 +11,12 @@ import (
 )
 
 var (
-	ErrBandNotFound *errors.ErrDescriptor
+	// ErrBandNotFound describes the errors returned when looking for an unknown band
+	ErrBandNotFound = &errors.ErrDescriptor{
+		MessageFormat: "Band {band} not found",
+		Type:          errors.NotFound,
+		Code:          1,
+	}
 )
 
 type PayloadSize interface {
@@ -129,10 +134,5 @@ func GetByID(id BandID) (Band, error) {
 }
 
 func init() {
-	ErrBandNotFound = &errors.ErrDescriptor{
-		MessageFormat: "Band {band} not found",
-		Type:          errors.NotFound,
-		Code:          1,
-	}
 	ErrBandNotFound.Register()
 }
