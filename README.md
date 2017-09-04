@@ -43,6 +43,7 @@ For **stable** versions, see the [Releases](https://github.com/TheThingsNetwork/
 For the latest **master**, you can download pre-compiled binaries:
 
 | **File Name** | **Operating System** | **Architecture** |
+| ------------- | -------------------- | ---------------- |
 | [ttn-darwin-amd64.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-darwin-amd64.zip) | macOS | amd64 |
 | [ttn-linux-amd64.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-linux-amd64.zip) | linux | amd64 |
 | [ttn-linux-386.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-linux-386.zip) | linux | 386 |
