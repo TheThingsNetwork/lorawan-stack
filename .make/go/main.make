@@ -95,7 +95,7 @@ go.deps:
 # install packages for faster rebuilds
 go.install:
 	@$(log) "Installing `$(EXTERNAL_PACKAGES) | $(count)` go packages"
-	@$(EXTERNAL_PACKAGES) | xargs $(GO) install -v
+	@$(GO) install -v ./...
 
 # pre-build local files, ignoring failures (from unused packages or files for example)
 # use this to improve build speed
