@@ -10,6 +10,10 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 )
 
+var (
+	ErrBandNotFound *errors.ErrDescriptor
+)
+
 type PayloadSize interface {
 	PayloadSize(emptyFOpt, dwellTime bool) uint16
 }
@@ -119,5 +123,16 @@ func GetByID(id BandID) (Band, error) {
 			return band, nil
 		}
 	}
-	return Band{}, errors.New("Band not found")
+	return Band{}, ErrBandNotFound.New(errors.Attributes{
+		"band": string(id),
+	})
+}
+
+func init() {
+	ErrBandNotFound = &errors.ErrDescriptor{
+		MessageFormat: "Band {band} not found",
+		Type:          errors.NotFound,
+		Code:          1,
+	}
+	ErrBandNotFound.Register()
 }
