@@ -1,32 +1,26 @@
 language: go
-
 go:
 - 1.9
-
 env:
 - GOARCH=amd64
 - GOARCH=386
-
 go_import_path: github.com/TheThingsNetwork/ttn
-
 sudo: required
-
 services:
 - docker
-
 cache:
   directories:
   - vendor
-
 install:
 - make dev-deps
 - make deps
-
+- go get -u github.com/dgrijalva/jwt-go
 before_script:
 - docker run -d -p 127.0.0.1:6379:6379 redis
-
 script:
 - make test
 - make go.vet
 - make go.fmt
-- make go.lint-travis
+- make go.lint-travis-comment --no-print-directory
+before_install:
+- openssl aes-256-cbc -K $encrypted_29695605fa9e_key -iv $encrypted_29695605fa9e_iv -in github.pem.enc -out .make/github.pem -d

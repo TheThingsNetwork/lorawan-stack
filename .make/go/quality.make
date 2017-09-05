@@ -24,9 +24,15 @@ go.lint:
 	@CODE=0; for pkg in `$(GO_LINT_FILES)`; do $(GOLINT) $(GOLINT_FLAGS) $$pkg 2>/dev/null || { CODE=1; }; done; exit $$CODE
 
 go.lint-travis: GO_LINT_FILES = git diff --name-only HEAD $(TRAVIS_BRANCH) | $(only_go_lintable)
-go.lint-travis: GOLINT_FLAGS =
 go.lint-travis: log = true
 go.lint-travis: go.lint
+
+go.lint-travis-comment:
+	@if [ "$$TRAVIS_PULL_REQUEST" != "false" ]; then \
+	 	REMARKS=`make go.lint-travis 2>/dev/null` || go run .make/comment.go '`golint` has some remarks:' '```' "$$REMARKS" '```'; \
+	else \
+		make go.lint || true; \
+	fi
 
 # lint all packages, ignoring errors
 go.lint-all: GOLINT_FLAGS =
