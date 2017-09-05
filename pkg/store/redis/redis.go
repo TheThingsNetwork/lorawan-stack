@@ -89,9 +89,9 @@ func (s *Store) Create(fields map[string]interface{}) (store.PrimaryKey, error) 
 		return nil, err
 	}
 	if ok {
-		return nil, errors.New(fmt.Sprintf("A key %s already exists", idStr))
+		errstr := fmt.Sprintf("A key %s already exists", idStr) // ensure `go lint` doesn't complain
+		return nil, errors.New(errstr)
 	}
-
 
 	_, err = s.Redis.Pipelined(func(p *redis.Pipeline) error {
 		sfields := make(map[string]string, len(fields))
