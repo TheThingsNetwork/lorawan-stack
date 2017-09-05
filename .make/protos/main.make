@@ -12,13 +12,9 @@ PROTOC += -I$(VENDOR_DIR) -I$(GOPATH)/src -I$(VENDOR_DIR)/$(GRPC_GATEWAY_REPO)/t
 protoc:
 	$(DOCKER) pull $(DOCKER_IMAGE)
 
-EMPTY :=
-SPACE := $(EMPTY) $(EMPTY)
-COMMA := ,
-SED = $(shell command -v gsed || command -v sed)
-
 PROTO_DIR=$(PWD)/api
 
+include .make/util.make
 include .make/protos/go.make
 
 # vim: ft=make
