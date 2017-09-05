@@ -27,7 +27,7 @@ type Store struct {
 	indexKeys map[string]struct{}
 }
 
-// Store represents Redis configuration.
+// Config represents Redis configuration.
 type Config struct {
 	config.Redis
 	Prefix    string
