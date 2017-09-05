@@ -27,4 +27,6 @@ before_script:
 
 script:
 - make test
-- make quality || true
+- make go.vet
+- make go.fmt
+- make go.lint-travis
