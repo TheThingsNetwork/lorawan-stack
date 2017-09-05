@@ -19,6 +19,7 @@ import (
 	redis "gopkg.in/redis.v5"
 )
 
+// Store represents a Redis store.Interface implemntation
 type Store struct {
 	Redis     *redis.Client
 	config    *Config
@@ -26,12 +27,14 @@ type Store struct {
 	indexKeys map[string]struct{}
 }
 
+// Store represents Redis configuration.
 type Config struct {
 	config.Redis
 	Prefix    string
 	IndexKeys []string
 }
 
+// New returns a new initialized Redis store.
 func New(conf *Config) *Store {
 	indexKeys := make(map[string]struct{}, len(conf.IndexKeys))
 	for _, k := range conf.IndexKeys {
@@ -76,6 +79,7 @@ func toString(v interface{}) (string, error) {
 	return fmt.Sprint(v), nil
 }
 
+// Create stores generates an ULID and stores fields under a key associated with it.
 func (s *Store) Create(fields map[string]interface{}) (store.PrimaryKey, error) {
 	id := ulid.MustNew(ulid.Now(), s.entropy)
 	idStr := id.String()
@@ -100,6 +104,8 @@ func (s *Store) Create(fields map[string]interface{}) (store.PrimaryKey, error) 
 	}
 	return id, nil
 }
+
+// Delete deletes the fields stored id specified.
 func (s *Store) Delete(id store.PrimaryKey) error {
 	indexKeys, err := s.Redis.HMGet(s.key(id.String()), s.config.IndexKeys...).Result()
 	if err != nil {
@@ -122,6 +128,7 @@ func (s *Store) Delete(id store.PrimaryKey) error {
 	return err
 }
 
+// Update overwrites field values stored under PrimaryKey specified with values in diff and rebinds indexed keys present in diff.
 func (s *Store) Update(id store.PrimaryKey, diff map[string]interface{}) error {
 	var (
 		idStr = id.String()
@@ -196,6 +203,7 @@ func newStringInterfaceMapCmd(c *redis.StringStringMapCmd) *stringInterfaceMapCm
 	return &stringInterfaceMapCmd{c}
 }
 
+// Find returns the fields stored under PrimaryKey specified.
 func (s *Store) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	m, err := newStringInterfaceMapCmd(s.Redis.HGetAll(s.key(id.String()))).Result()
 	if err != nil {
@@ -207,6 +215,8 @@ func (s *Store) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	return m, nil
 }
 
+// FindBy returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
+// meaning that only entries matching all the fields in filter should be returned.
 func (s *Store) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
 	keys := make([]string, 0, len(filter))
 	for k, v := range filter {
