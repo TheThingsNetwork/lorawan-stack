@@ -60,7 +60,7 @@ func (r *Registry) FindDeviceByIdentifiers(ids ...*ttnpb.EndDeviceIdentifiers) (
 		return nil, err
 	}
 	for i := 1; i < len(ids); i++ {
-		m, err := r.store.FindBy(store.Marshal(ids[i]))
+		m, err := r.store.FindBy(store.Marshal(&ttnpb.EndDevice{EndDeviceIdentifiers: *ids[i]}))
 		if err != nil {
 			return nil, err
 		}
