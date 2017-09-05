@@ -2,6 +2,11 @@
 
 # This makefile contains general variables that are used troughout the other makefiles
 
+EMPTY :=
+SPACE := $(EMPTY) $(EMPTY)
+COMMA := ,
+SED = $(shell command -v gsed || command -v sed)
+
 # set shell
 SHELL = bash
 

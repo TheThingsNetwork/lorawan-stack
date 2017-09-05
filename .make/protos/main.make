@@ -14,7 +14,6 @@ protoc:
 
 PROTO_DIR=$(PWD)/api
 
-include .make/util.make
 include .make/protos/go.make
 
 # vim: ft=make
