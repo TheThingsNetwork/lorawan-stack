@@ -17,7 +17,7 @@ import (
 func TestUnmarshalEU(t *testing.T) {
 	a := assertions.New(t)
 
-	yamlDocument := `band: EU_863_870
+	yamlDocument := `band-id: EU_863_870
 channels:
 - frequency: 867100000
 - frequency: 867300000
@@ -62,7 +62,7 @@ radios:
 func TestUnmarshalKR(t *testing.T) {
 	a := assertions.New(t)
 
-	yamlDocument := `band: KR_920_923
+	yamlDocument := `band-id: KR_920_923
 channels:
 - frequency: 922100000
 - frequency: 922300000
@@ -177,7 +177,7 @@ func TestMarshal(t *testing.T) {
 	a.So(match, should.BeTrue)
 	a.So(err, should.BeNil)
 
-	match, err = regexp.Match(fmt.Sprintf("band: %s", band.EU_863_870), res)
+	match, err = regexp.Match(fmt.Sprintf("band-id: %s", band.EU_863_870), res)
 	a.So(match, should.BeTrue)
 	a.So(err, should.BeNil)
 }

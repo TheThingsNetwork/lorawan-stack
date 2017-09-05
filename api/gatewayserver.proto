@@ -25,7 +25,7 @@ message GatewayDown {
 
 // FrequencyPlan contains the frequency plan for the gateway
 message FrequencyPlan {
-  string band_id = 1 [(gogoproto.customname) = "BandID",  (gogoproto.moretags) = "yaml:\"band\""];
+  string band_id = 1 [(gogoproto.customname) = "BandID",  (gogoproto.moretags) = "yaml:\"band-id\""];
 
   message Channel {
     uint32 frequency = 1 [(gogoproto.moretags) = "yaml:\"frequency\""];
