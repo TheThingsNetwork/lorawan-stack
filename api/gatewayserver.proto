@@ -29,7 +29,12 @@ message FrequencyPlan {
 
   message Channel {
     uint32 frequency = 1 [(gogoproto.moretags) = "yaml:\"frequency\""];
-    uint32 data_rate_index = 2 [(gogoproto.moretags) = "yaml:\"datarate-index,omitempty\""];
+
+    message ForceDataRate {
+      uint32 index = 1 [(gogoproto.moretags) = "yaml:\"index,omitempty\""];
+    }
+
+    ForceDataRate data_rate = 2 [(gogoproto.moretags) = "yaml:\"data-rate,omitempty\""];
   }
 
   repeated Channel channels = 2 [(gogoproto.moretags) = "yaml:\"channels\""];
@@ -37,11 +42,11 @@ message FrequencyPlan {
   message LBTConfig {
     float rssi_target = 1 [(gogoproto.customname) = "RSSITarget",  (gogoproto.moretags) = "yaml:\"rssi-target\""];
     // RSSIOffset describes the LBT config-specific RSSI offset
-    float rssi_offset = 2 [(gogoproto.customname) = "RSSIOffset",  (gogoproto.moretags) = "yaml:\"rssi-target\""];
-    int32 scan_time = 3 [(gogoproto.moretags) = "yaml:\"scan-time,omitempty\""];
+    float rssi_offset = 2 [(gogoproto.customname) = "RSSIOffset",  (gogoproto.moretags) = "yaml:\"rssi-offset\""];
+    int32 scan_time = 3 [(gogoproto.moretags) = "yaml:\"scan-time\""];
   }
 
-  LBTConfig lbt = 3 [(gogoproto.moretags) = "yaml:\"lbt,omitempty\""];
+  LBTConfig lbt = 3 [(gogoproto.customname) = "LBT",  (gogoproto.moretags) = "yaml:\"lbt,omitempty\""];
 
   message Radio {
     uint32 frequency = 1 [(gogoproto.moretags) = "yaml:\"frequency\""];
@@ -52,7 +57,7 @@ message FrequencyPlan {
       uint32 notch_frequency = 3 [(gogoproto.moretags) = "yaml:\"notch-frequency\""];
     }
 
-    TxConfiguration radio_tx_config = 2 [(gogoproto.customname) = "RadioTXConfig",  (gogoproto.moretags) = "yaml:\"tx\""];
+    TxConfiguration radio_tx_config = 2 [(gogoproto.customname) = "TXConfig",  (gogoproto.moretags) = "yaml:\"tx\""];
   }
 
   repeated Radio radios = 4 [(gogoproto.moretags) = "yaml:\"radios\""];
