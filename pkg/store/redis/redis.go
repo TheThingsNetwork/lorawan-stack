@@ -5,7 +5,6 @@ package redis
 import (
 	"encoding"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"math/rand"
@@ -13,6 +12,7 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/config"
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/randutil"
 	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/oklog/ulid"
@@ -229,7 +229,7 @@ func (s *Store) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[
 			for _, str := range ids {
 				id, err := ulid.Parse(str)
 				if err != nil {
-					return errors.New(fmt.Sprintf("pkg/store/redis: failed to parse %s as ULID, database inconsistent", str))
+					return errors.NewWithCause(fmt.Sprintf("pkg/store/redis: failed to parse %s as ULID, database inconsistent", str), err)
 				}
 				cmds[id] = newStringInterfaceMapCmd(p.HGetAll(s.key(str)))
 			}
