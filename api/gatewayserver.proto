@@ -23,12 +23,53 @@ message GatewayDown {
   DownlinkMessage downlink_message = 1;
 }
 
+// FrequencyPlan contains the frequency plan for the gateway
+message FrequencyPlan {
+  string band_id = 1 [(gogoproto.customname) = "BandID",  (gogoproto.moretags) = "yaml:\"band\""];
+
+  message Channel {
+    uint32 frequency = 1 [(gogoproto.moretags) = "yaml:\"frequency\""];
+    uint32 data_rate_index = 2 [(gogoproto.moretags) = "yaml:\"datarate-index,omitempty\""];
+  }
+
+  repeated Channel channels = 2 [(gogoproto.moretags) = "yaml:\"channels\""];
+
+  message LBTConfig {
+    float rssi_target = 1 [(gogoproto.customname) = "RSSITarget",  (gogoproto.moretags) = "yaml:\"rssi-target\""];
+    int32 scan_time = 2 [(gogoproto.moretags) = "yaml:\"scan-time,omitempty\""];
+  }
+
+  LBTConfig lbt = 3 [(gogoproto.moretags) = "yaml:\"lbt,omitempty\""];
+
+  message Radio {
+    uint32 frequency = 1 [(gogoproto.moretags) = "yaml:\"frequency\""];
+
+    message TxConfiguration {
+      uint32 min_frequency = 1 [(gogoproto.moretags) = "yaml:\"min-frequency\""];
+      uint32 max_frequency = 2 [(gogoproto.moretags) = "yaml:\"max-frequency\""];
+      uint32 notch_frequency = 3 [(gogoproto.moretags) = "yaml:\"notch-frequency\""];
+    }
+
+    TxConfiguration radio_tx_config = 2 [(gogoproto.customname) = "RadioTXConfig",  (gogoproto.moretags) = "yaml:\"tx\""];
+  }
+
+  repeated Radio radios = 4 [(gogoproto.moretags) = "yaml:\"radios\""];
+}
+
+message FrequencyPlanRequest {
+  string frequency_plan_id = 1 [(gogoproto.customname) = "FrequencyPlanID"];
+}
+
 // The GtwGs service connects a gateway to a gateway server.
 service GtwGs {
   // Link the gateway to the gateway server. The authentication information will
   // be used to determine the gateway ID. If no authentication information is present,
   // this gateway may not be used for downlink.
   rpc Link(stream GatewayUp) returns (stream GatewayDown);
+  // FetchFrequencyPlan associated to the gateway. The gateway is ID'd by its authentication
+  // token. The frequency plan is returned in a YAML format, just like it was retrieved from
+  // the storage repository in the first place.
+  rpc FetchFrequencyPlan(FrequencyPlanRequest) returns (FrequencyPlan);
 }
 
 // The NsGs service connects a network server to a gateway server.

@@ -64,9 +64,180 @@ func (m *GatewayDown) GetDownlinkMessage() *DownlinkMessage {
 	return nil
 }
 
+// FrequencyPlan contains the frequency plan for the gateway
+type FrequencyPlan struct {
+	BandID   string                   `protobuf:"bytes,1,opt,name=band_id,json=bandId,proto3" json:"band_id,omitempty" yaml:"band"`
+	Channels []*FrequencyPlan_Channel `protobuf:"bytes,2,rep,name=channels" json:"channels,omitempty" yaml:"channels"`
+	Lbt      *FrequencyPlan_LBTConfig `protobuf:"bytes,3,opt,name=lbt" json:"lbt,omitempty" yaml:"lbt,omitempty"`
+	Radios   []*FrequencyPlan_Radio   `protobuf:"bytes,4,rep,name=radios" json:"radios,omitempty" yaml:"radios"`
+}
+
+func (m *FrequencyPlan) Reset()                    { *m = FrequencyPlan{} }
+func (*FrequencyPlan) ProtoMessage()               {}
+func (*FrequencyPlan) Descriptor() ([]byte, []int) { return fileDescriptorGatewayserver, []int{2} }
+
+func (m *FrequencyPlan) GetBandID() string {
+	if m != nil {
+		return m.BandID
+	}
+	return ""
+}
+
+func (m *FrequencyPlan) GetChannels() []*FrequencyPlan_Channel {
+	if m != nil {
+		return m.Channels
+	}
+	return nil
+}
+
+func (m *FrequencyPlan) GetLbt() *FrequencyPlan_LBTConfig {
+	if m != nil {
+		return m.Lbt
+	}
+	return nil
+}
+
+func (m *FrequencyPlan) GetRadios() []*FrequencyPlan_Radio {
+	if m != nil {
+		return m.Radios
+	}
+	return nil
+}
+
+type FrequencyPlan_Channel struct {
+	Frequency     uint32 `protobuf:"varint,1,opt,name=frequency,proto3" json:"frequency,omitempty" yaml:"frequency"`
+	DataRateIndex uint32 `protobuf:"varint,2,opt,name=data_rate_index,json=dataRateIndex,proto3" json:"data_rate_index,omitempty" yaml:"datarate-index,omitempty"`
+}
+
+func (m *FrequencyPlan_Channel) Reset()      { *m = FrequencyPlan_Channel{} }
+func (*FrequencyPlan_Channel) ProtoMessage() {}
+func (*FrequencyPlan_Channel) Descriptor() ([]byte, []int) {
+	return fileDescriptorGatewayserver, []int{2, 0}
+}
+
+func (m *FrequencyPlan_Channel) GetFrequency() uint32 {
+	if m != nil {
+		return m.Frequency
+	}
+	return 0
+}
+
+func (m *FrequencyPlan_Channel) GetDataRateIndex() uint32 {
+	if m != nil {
+		return m.DataRateIndex
+	}
+	return 0
+}
+
+type FrequencyPlan_LBTConfig struct {
+	RSSITarget float32 `protobuf:"fixed32,1,opt,name=rssi_target,json=rssiTarget,proto3" json:"rssi_target,omitempty" yaml:"rssi-target"`
+	ScanTime   int32   `protobuf:"varint,2,opt,name=scan_time,json=scanTime,proto3" json:"scan_time,omitempty" yaml:"scan-time,omitempty"`
+}
+
+func (m *FrequencyPlan_LBTConfig) Reset()      { *m = FrequencyPlan_LBTConfig{} }
+func (*FrequencyPlan_LBTConfig) ProtoMessage() {}
+func (*FrequencyPlan_LBTConfig) Descriptor() ([]byte, []int) {
+	return fileDescriptorGatewayserver, []int{2, 1}
+}
+
+func (m *FrequencyPlan_LBTConfig) GetRSSITarget() float32 {
+	if m != nil {
+		return m.RSSITarget
+	}
+	return 0
+}
+
+func (m *FrequencyPlan_LBTConfig) GetScanTime() int32 {
+	if m != nil {
+		return m.ScanTime
+	}
+	return 0
+}
+
+type FrequencyPlan_Radio struct {
+	Frequency     uint32                               `protobuf:"varint,1,opt,name=frequency,proto3" json:"frequency,omitempty" yaml:"frequency"`
+	RadioTXConfig *FrequencyPlan_Radio_TxConfiguration `protobuf:"bytes,2,opt,name=radio_tx_config,json=radioTxConfig" json:"radio_tx_config,omitempty" yaml:"tx"`
+}
+
+func (m *FrequencyPlan_Radio) Reset()      { *m = FrequencyPlan_Radio{} }
+func (*FrequencyPlan_Radio) ProtoMessage() {}
+func (*FrequencyPlan_Radio) Descriptor() ([]byte, []int) {
+	return fileDescriptorGatewayserver, []int{2, 2}
+}
+
+func (m *FrequencyPlan_Radio) GetFrequency() uint32 {
+	if m != nil {
+		return m.Frequency
+	}
+	return 0
+}
+
+func (m *FrequencyPlan_Radio) GetRadioTXConfig() *FrequencyPlan_Radio_TxConfiguration {
+	if m != nil {
+		return m.RadioTXConfig
+	}
+	return nil
+}
+
+type FrequencyPlan_Radio_TxConfiguration struct {
+	MinFrequency   uint32 `protobuf:"varint,1,opt,name=min_frequency,json=minFrequency,proto3" json:"min_frequency,omitempty" yaml:"min-frequency"`
+	MaxFrequency   uint32 `protobuf:"varint,2,opt,name=max_frequency,json=maxFrequency,proto3" json:"max_frequency,omitempty" yaml:"max-frequency"`
+	NotchFrequency uint32 `protobuf:"varint,3,opt,name=notch_frequency,json=notchFrequency,proto3" json:"notch_frequency,omitempty" yaml:"notch-frequency"`
+}
+
+func (m *FrequencyPlan_Radio_TxConfiguration) Reset()      { *m = FrequencyPlan_Radio_TxConfiguration{} }
+func (*FrequencyPlan_Radio_TxConfiguration) ProtoMessage() {}
+func (*FrequencyPlan_Radio_TxConfiguration) Descriptor() ([]byte, []int) {
+	return fileDescriptorGatewayserver, []int{2, 2, 0}
+}
+
+func (m *FrequencyPlan_Radio_TxConfiguration) GetMinFrequency() uint32 {
+	if m != nil {
+		return m.MinFrequency
+	}
+	return 0
+}
+
+func (m *FrequencyPlan_Radio_TxConfiguration) GetMaxFrequency() uint32 {
+	if m != nil {
+		return m.MaxFrequency
+	}
+	return 0
+}
+
+func (m *FrequencyPlan_Radio_TxConfiguration) GetNotchFrequency() uint32 {
+	if m != nil {
+		return m.NotchFrequency
+	}
+	return 0
+}
+
+type FrequencyPlanRequest struct {
+	FrequencyPlanID string `protobuf:"bytes,1,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
+}
+
+func (m *FrequencyPlanRequest) Reset()      { *m = FrequencyPlanRequest{} }
+func (*FrequencyPlanRequest) ProtoMessage() {}
+func (*FrequencyPlanRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorGatewayserver, []int{3}
+}
+
+func (m *FrequencyPlanRequest) GetFrequencyPlanID() string {
+	if m != nil {
+		return m.FrequencyPlanID
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*GatewayUp)(nil), "ttn.v3.GatewayUp")
 	proto.RegisterType((*GatewayDown)(nil), "ttn.v3.GatewayDown")
+	proto.RegisterType((*FrequencyPlan)(nil), "ttn.v3.FrequencyPlan")
+	proto.RegisterType((*FrequencyPlan_Channel)(nil), "ttn.v3.FrequencyPlan.Channel")
+	proto.RegisterType((*FrequencyPlan_LBTConfig)(nil), "ttn.v3.FrequencyPlan.LBTConfig")
+	proto.RegisterType((*FrequencyPlan_Radio)(nil), "ttn.v3.FrequencyPlan.Radio")
+	proto.RegisterType((*FrequencyPlan_Radio_TxConfiguration)(nil), "ttn.v3.FrequencyPlan.Radio.TxConfiguration")
+	proto.RegisterType((*FrequencyPlanRequest)(nil), "ttn.v3.FrequencyPlanRequest")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -84,6 +255,10 @@ type GtwGsClient interface {
 	// be used to determine the gateway ID. If no authentication information is present,
 	// this gateway may not be used for downlink.
 	Link(ctx context.Context, opts ...grpc.CallOption) (GtwGs_LinkClient, error)
+	// FetchFrequencyPlan associated to the gateway. The gateway is ID'd by its authentication
+	// token. The frequency plan is returned in a YAML format, just like it was retrieved from
+	// the storage repository in the first place.
+	FetchFrequencyPlan(ctx context.Context, in *FrequencyPlanRequest, opts ...grpc.CallOption) (*FrequencyPlan, error)
 }
 
 type gtwGsClient struct {
@@ -125,6 +300,15 @@ func (x *gtwGsLinkClient) Recv() (*GatewayDown, error) {
 	return m, nil
 }
 
+func (c *gtwGsClient) FetchFrequencyPlan(ctx context.Context, in *FrequencyPlanRequest, opts ...grpc.CallOption) (*FrequencyPlan, error) {
+	out := new(FrequencyPlan)
+	err := grpc.Invoke(ctx, "/ttn.v3.GtwGs/FetchFrequencyPlan", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for GtwGs service
 
 type GtwGsServer interface {
@@ -132,6 +316,10 @@ type GtwGsServer interface {
 	// be used to determine the gateway ID. If no authentication information is present,
 	// this gateway may not be used for downlink.
 	Link(GtwGs_LinkServer) error
+	// FetchFrequencyPlan associated to the gateway. The gateway is ID'd by its authentication
+	// token. The frequency plan is returned in a YAML format, just like it was retrieved from
+	// the storage repository in the first place.
+	FetchFrequencyPlan(context.Context, *FrequencyPlanRequest) (*FrequencyPlan, error)
 }
 
 func RegisterGtwGsServer(s *grpc.Server, srv GtwGsServer) {
@@ -164,10 +352,33 @@ func (x *gtwGsLinkServer) Recv() (*GatewayUp, error) {
 	return m, nil
 }
 
+func _GtwGs_FetchFrequencyPlan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FrequencyPlanRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GtwGsServer).FetchFrequencyPlan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.GtwGs/FetchFrequencyPlan",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GtwGsServer).FetchFrequencyPlan(ctx, req.(*FrequencyPlanRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _GtwGs_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ttn.v3.GtwGs",
 	HandlerType: (*GtwGsServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "FetchFrequencyPlan",
+			Handler:    _GtwGs_FetchFrequencyPlan_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "Link",
@@ -381,6 +592,210 @@ func (m *GatewayDown) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *FrequencyPlan) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *FrequencyPlan) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.BandID) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintGatewayserver(dAtA, i, uint64(len(m.BandID)))
+		i += copy(dAtA[i:], m.BandID)
+	}
+	if len(m.Channels) > 0 {
+		for _, msg := range m.Channels {
+			dAtA[i] = 0x12
+			i++
+			i = encodeVarintGatewayserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if m.Lbt != nil {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintGatewayserver(dAtA, i, uint64(m.Lbt.Size()))
+		n3, err := m.Lbt.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n3
+	}
+	if len(m.Radios) > 0 {
+		for _, msg := range m.Radios {
+			dAtA[i] = 0x22
+			i++
+			i = encodeVarintGatewayserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *FrequencyPlan_Channel) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *FrequencyPlan_Channel) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Frequency != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintGatewayserver(dAtA, i, uint64(m.Frequency))
+	}
+	if m.DataRateIndex != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintGatewayserver(dAtA, i, uint64(m.DataRateIndex))
+	}
+	return i, nil
+}
+
+func (m *FrequencyPlan_LBTConfig) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *FrequencyPlan_LBTConfig) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.RSSITarget != 0 {
+		dAtA[i] = 0xd
+		i++
+		i = encodeFixed32Gatewayserver(dAtA, i, uint32(math.Float32bits(float32(m.RSSITarget))))
+	}
+	if m.ScanTime != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintGatewayserver(dAtA, i, uint64(m.ScanTime))
+	}
+	return i, nil
+}
+
+func (m *FrequencyPlan_Radio) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *FrequencyPlan_Radio) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Frequency != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintGatewayserver(dAtA, i, uint64(m.Frequency))
+	}
+	if m.RadioTXConfig != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintGatewayserver(dAtA, i, uint64(m.RadioTXConfig.Size()))
+		n4, err := m.RadioTXConfig.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n4
+	}
+	return i, nil
+}
+
+func (m *FrequencyPlan_Radio_TxConfiguration) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *FrequencyPlan_Radio_TxConfiguration) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.MinFrequency != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintGatewayserver(dAtA, i, uint64(m.MinFrequency))
+	}
+	if m.MaxFrequency != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintGatewayserver(dAtA, i, uint64(m.MaxFrequency))
+	}
+	if m.NotchFrequency != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintGatewayserver(dAtA, i, uint64(m.NotchFrequency))
+	}
+	return i, nil
+}
+
+func (m *FrequencyPlanRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *FrequencyPlanRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.FrequencyPlanID) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintGatewayserver(dAtA, i, uint64(len(m.FrequencyPlanID)))
+		i += copy(dAtA[i:], m.FrequencyPlanID)
+	}
+	return i, nil
+}
+
 func encodeFixed64Gatewayserver(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
@@ -434,6 +849,94 @@ func (m *GatewayDown) Size() (n int) {
 	return n
 }
 
+func (m *FrequencyPlan) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.BandID)
+	if l > 0 {
+		n += 1 + l + sovGatewayserver(uint64(l))
+	}
+	if len(m.Channels) > 0 {
+		for _, e := range m.Channels {
+			l = e.Size()
+			n += 1 + l + sovGatewayserver(uint64(l))
+		}
+	}
+	if m.Lbt != nil {
+		l = m.Lbt.Size()
+		n += 1 + l + sovGatewayserver(uint64(l))
+	}
+	if len(m.Radios) > 0 {
+		for _, e := range m.Radios {
+			l = e.Size()
+			n += 1 + l + sovGatewayserver(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *FrequencyPlan_Channel) Size() (n int) {
+	var l int
+	_ = l
+	if m.Frequency != 0 {
+		n += 1 + sovGatewayserver(uint64(m.Frequency))
+	}
+	if m.DataRateIndex != 0 {
+		n += 1 + sovGatewayserver(uint64(m.DataRateIndex))
+	}
+	return n
+}
+
+func (m *FrequencyPlan_LBTConfig) Size() (n int) {
+	var l int
+	_ = l
+	if m.RSSITarget != 0 {
+		n += 5
+	}
+	if m.ScanTime != 0 {
+		n += 1 + sovGatewayserver(uint64(m.ScanTime))
+	}
+	return n
+}
+
+func (m *FrequencyPlan_Radio) Size() (n int) {
+	var l int
+	_ = l
+	if m.Frequency != 0 {
+		n += 1 + sovGatewayserver(uint64(m.Frequency))
+	}
+	if m.RadioTXConfig != nil {
+		l = m.RadioTXConfig.Size()
+		n += 1 + l + sovGatewayserver(uint64(l))
+	}
+	return n
+}
+
+func (m *FrequencyPlan_Radio_TxConfiguration) Size() (n int) {
+	var l int
+	_ = l
+	if m.MinFrequency != 0 {
+		n += 1 + sovGatewayserver(uint64(m.MinFrequency))
+	}
+	if m.MaxFrequency != 0 {
+		n += 1 + sovGatewayserver(uint64(m.MaxFrequency))
+	}
+	if m.NotchFrequency != 0 {
+		n += 1 + sovGatewayserver(uint64(m.NotchFrequency))
+	}
+	return n
+}
+
+func (m *FrequencyPlanRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.FrequencyPlanID)
+	if l > 0 {
+		n += 1 + l + sovGatewayserver(uint64(l))
+	}
+	return n
+}
+
 func sovGatewayserver(x uint64) (n int) {
 	for {
 		n++
@@ -464,6 +967,74 @@ func (this *GatewayDown) String() string {
 	}
 	s := strings.Join([]string{`&GatewayDown{`,
 		`DownlinkMessage:` + strings.Replace(fmt.Sprintf("%v", this.DownlinkMessage), "DownlinkMessage", "DownlinkMessage", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *FrequencyPlan) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&FrequencyPlan{`,
+		`BandID:` + fmt.Sprintf("%v", this.BandID) + `,`,
+		`Channels:` + strings.Replace(fmt.Sprintf("%v", this.Channels), "FrequencyPlan_Channel", "FrequencyPlan_Channel", 1) + `,`,
+		`Lbt:` + strings.Replace(fmt.Sprintf("%v", this.Lbt), "FrequencyPlan_LBTConfig", "FrequencyPlan_LBTConfig", 1) + `,`,
+		`Radios:` + strings.Replace(fmt.Sprintf("%v", this.Radios), "FrequencyPlan_Radio", "FrequencyPlan_Radio", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *FrequencyPlan_Channel) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&FrequencyPlan_Channel{`,
+		`Frequency:` + fmt.Sprintf("%v", this.Frequency) + `,`,
+		`DataRateIndex:` + fmt.Sprintf("%v", this.DataRateIndex) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *FrequencyPlan_LBTConfig) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&FrequencyPlan_LBTConfig{`,
+		`RSSITarget:` + fmt.Sprintf("%v", this.RSSITarget) + `,`,
+		`ScanTime:` + fmt.Sprintf("%v", this.ScanTime) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *FrequencyPlan_Radio) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&FrequencyPlan_Radio{`,
+		`Frequency:` + fmt.Sprintf("%v", this.Frequency) + `,`,
+		`RadioTXConfig:` + strings.Replace(fmt.Sprintf("%v", this.RadioTXConfig), "FrequencyPlan_Radio_TxConfiguration", "FrequencyPlan_Radio_TxConfiguration", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *FrequencyPlan_Radio_TxConfiguration) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&FrequencyPlan_Radio_TxConfiguration{`,
+		`MinFrequency:` + fmt.Sprintf("%v", this.MinFrequency) + `,`,
+		`MaxFrequency:` + fmt.Sprintf("%v", this.MaxFrequency) + `,`,
+		`NotchFrequency:` + fmt.Sprintf("%v", this.NotchFrequency) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *FrequencyPlanRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&FrequencyPlanRequest{`,
+		`FrequencyPlanID:` + fmt.Sprintf("%v", this.FrequencyPlanID) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -673,6 +1244,639 @@ func (m *GatewayDown) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *FrequencyPlan) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGatewayserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: FrequencyPlan: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: FrequencyPlan: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BandID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGatewayserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGatewayserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.BandID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Channels", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGatewayserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGatewayserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Channels = append(m.Channels, &FrequencyPlan_Channel{})
+			if err := m.Channels[len(m.Channels)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Lbt", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGatewayserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGatewayserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Lbt == nil {
+				m.Lbt = &FrequencyPlan_LBTConfig{}
+			}
+			if err := m.Lbt.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Radios", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGatewayserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGatewayserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Radios = append(m.Radios, &FrequencyPlan_Radio{})
+			if err := m.Radios[len(m.Radios)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGatewayserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGatewayserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *FrequencyPlan_Channel) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGatewayserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Channel: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Channel: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Frequency", wireType)
+			}
+			m.Frequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGatewayserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Frequency |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DataRateIndex", wireType)
+			}
+			m.DataRateIndex = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGatewayserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DataRateIndex |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGatewayserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGatewayserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *FrequencyPlan_LBTConfig) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGatewayserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: LBTConfig: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: LBTConfig: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 5 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RSSITarget", wireType)
+			}
+			var v uint32
+			if (iNdEx + 4) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += 4
+			v = uint32(dAtA[iNdEx-4])
+			v |= uint32(dAtA[iNdEx-3]) << 8
+			v |= uint32(dAtA[iNdEx-2]) << 16
+			v |= uint32(dAtA[iNdEx-1]) << 24
+			m.RSSITarget = float32(math.Float32frombits(v))
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ScanTime", wireType)
+			}
+			m.ScanTime = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGatewayserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ScanTime |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGatewayserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGatewayserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *FrequencyPlan_Radio) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGatewayserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Radio: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Radio: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Frequency", wireType)
+			}
+			m.Frequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGatewayserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Frequency |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RadioTXConfig", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGatewayserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGatewayserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.RadioTXConfig == nil {
+				m.RadioTXConfig = &FrequencyPlan_Radio_TxConfiguration{}
+			}
+			if err := m.RadioTXConfig.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGatewayserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGatewayserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *FrequencyPlan_Radio_TxConfiguration) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGatewayserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: TxConfiguration: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: TxConfiguration: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinFrequency", wireType)
+			}
+			m.MinFrequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGatewayserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MinFrequency |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxFrequency", wireType)
+			}
+			m.MaxFrequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGatewayserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxFrequency |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NotchFrequency", wireType)
+			}
+			m.NotchFrequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGatewayserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NotchFrequency |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGatewayserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGatewayserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *FrequencyPlanRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGatewayserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: FrequencyPlanRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: FrequencyPlanRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyPlanID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGatewayserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGatewayserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.FrequencyPlanID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGatewayserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGatewayserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func skipGatewayserver(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
@@ -783,32 +1987,63 @@ func init() {
 }
 
 var fileDescriptorGatewayserver = []byte{
-	// 418 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x52, 0x4d, 0x8b, 0xd3, 0x40,
-	0x18, 0xde, 0x59, 0xd7, 0x05, 0x67, 0x59, 0x5d, 0x47, 0x5c, 0x97, 0x14, 0x42, 0xe9, 0xa9, 0x1e,
-	0x9c, 0x68, 0x8a, 0x78, 0xd0, 0x53, 0xad, 0x04, 0x51, 0x2b, 0xfd, 0x42, 0xf0, 0x52, 0x92, 0x66,
-	0x3a, 0x19, 0xd2, 0xce, 0x0c, 0x99, 0x49, 0x83, 0x37, 0x6f, 0xfe, 0x35, 0x8f, 0x1e, 0x3d, 0x6a,
-	0x4e, 0x1e, 0xfd, 0x09, 0x92, 0x64, 0x42, 0x63, 0x40, 0xec, 0x9e, 0x92, 0xf7, 0x7d, 0x78, 0x3e,
-	0xe6, 0xe1, 0x85, 0xcf, 0x28, 0xd3, 0x51, 0x1a, 0xe0, 0x95, 0xd8, 0x3a, 0xf3, 0x88, 0xcc, 0x23,
-	0xc6, 0xa9, 0x1a, 0x13, 0x9d, 0x89, 0x24, 0x76, 0xb4, 0xe6, 0x8e, 0x2f, 0x99, 0x43, 0x7d, 0x4d,
-	0x32, 0xff, 0x93, 0x22, 0xc9, 0x8e, 0x24, 0x58, 0x26, 0x42, 0x0b, 0x74, 0xaa, 0x35, 0xc7, 0xbb,
-	0x81, 0xf5, 0xa8, 0x21, 0x40, 0x05, 0x15, 0x4e, 0x09, 0x07, 0xe9, 0xba, 0x9c, 0xca, 0xa1, 0xfc,
-	0xab, 0x68, 0xd6, 0xd3, 0x43, 0xfc, 0x58, 0x48, 0xb8, 0x66, 0x6b, 0x46, 0x12, 0x65, 0x68, 0x4f,
-	0xae, 0x11, 0xd3, 0x50, 0xdc, 0x43, 0x28, 0x5b, 0xa2, 0x94, 0x4f, 0x49, 0x6d, 0xd3, 0xa1, 0x42,
-	0xd0, 0x0d, 0xd9, 0xbf, 0x81, 0x6c, 0xa5, 0x36, 0x82, 0xbd, 0x2f, 0x00, 0xde, 0xf2, 0x2a, 0x8b,
-	0x85, 0x44, 0x2f, 0xe0, 0xed, 0x54, 0x6e, 0x18, 0x8f, 0x97, 0x46, 0xe3, 0x0a, 0x74, 0x6f, 0xf4,
-	0xcf, 0xdc, 0xfb, 0xb8, 0x2a, 0x06, 0x2f, 0x4a, 0xf4, 0x5d, 0x05, 0x4e, 0xcf, 0xd3, 0xe6, 0x58,
-	0xb0, 0x4d, 0xda, 0xa5, 0xd2, 0xbe, 0x4e, 0xd5, 0xd5, 0x71, 0x17, 0x34, 0xd9, 0xc6, 0x68, 0x56,
-	0x82, 0xd3, 0x73, 0xda, 0x1c, 0x7b, 0x13, 0x78, 0x66, 0xf0, 0x91, 0xc8, 0x38, 0x1a, 0xc2, 0x8b,
-	0x50, 0x64, 0xbc, 0x15, 0xa6, 0x90, 0x7b, 0x50, 0xcb, 0x8d, 0x0c, 0x5e, 0xc7, 0xb9, 0x13, 0xfe,
-	0xbd, 0x70, 0x9f, 0xc3, 0x9b, 0x9e, 0xce, 0x3c, 0x85, 0x5c, 0x78, 0xf2, 0x96, 0xf1, 0x18, 0xdd,
-	0x6d, 0x25, 0x59, 0x48, 0xeb, 0x5e, 0x6b, 0x55, 0x88, 0xf6, 0xc1, 0x63, 0xe0, 0xbe, 0x81, 0x27,
-	0x63, 0xe5, 0x29, 0xf4, 0x12, 0x5e, 0xcc, 0x56, 0x11, 0x09, 0xd3, 0x0d, 0xa9, 0x0d, 0xd1, 0xbf,
-	0x22, 0x58, 0x97, 0xb8, 0x2a, 0x1b, 0xd7, 0x65, 0xe3, 0x57, 0x45, 0xd9, 0xee, 0x07, 0x78, 0xec,
-	0x29, 0x34, 0x81, 0x97, 0x1e, 0xd1, 0xc6, 0xe8, 0x7d, 0x50, 0x9c, 0x9e, 0xaf, 0x99, 0xe0, 0x0a,
-	0x59, 0xad, 0x14, 0xaf, 0xf7, 0xc7, 0x62, 0x75, 0x5a, 0x58, 0x93, 0x38, 0xf4, 0xbe, 0xff, 0xb4,
-	0x8f, 0x3e, 0xe7, 0x36, 0xf8, 0x9a, 0xdb, 0xe0, 0x5b, 0x6e, 0x83, 0x1f, 0xb9, 0x0d, 0x7e, 0xe5,
-	0xf6, 0xd1, 0xef, 0xdc, 0x06, 0x1f, 0x1f, 0xfe, 0xef, 0x5c, 0x64, 0x4c, 0x8b, 0xaf, 0x0c, 0x82,
-	0xd3, 0x32, 0xf1, 0xe0, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff, 0xa5, 0x95, 0x45, 0x03, 0x3c, 0x03,
-	0x00, 0x00,
+	// 917 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x55, 0xcf, 0x6f, 0xe3, 0x44,
+	0x14, 0x5e, 0x37, 0x6d, 0xba, 0x99, 0xe2, 0x4d, 0x3b, 0xed, 0x96, 0xe0, 0x42, 0xbc, 0x32, 0x1c,
+	0x16, 0x41, 0x1c, 0xc8, 0x0a, 0x21, 0xf1, 0x43, 0x48, 0x6e, 0xb7, 0x51, 0xd4, 0xa5, 0xb0, 0x6e,
+	0xaa, 0x45, 0x5c, 0xac, 0x49, 0x3c, 0x71, 0x46, 0x8d, 0xc7, 0xc1, 0x33, 0xd9, 0xa4, 0x37, 0x4e,
+	0xac, 0xc4, 0x85, 0x7f, 0x8b, 0x23, 0x48, 0x1c, 0x38, 0x59, 0xe0, 0x13, 0x47, 0xe4, 0xbf, 0x00,
+	0xcd, 0x8c, 0x93, 0x38, 0xa1, 0x40, 0xd9, 0x93, 0x3d, 0xf3, 0xbd, 0xef, 0x7b, 0xdf, 0x7b, 0x63,
+	0xbf, 0x01, 0x1f, 0x06, 0x84, 0x0f, 0x27, 0x3d, 0xbb, 0x1f, 0x85, 0xcd, 0xee, 0x10, 0x77, 0x87,
+	0x84, 0x06, 0xec, 0x1c, 0xf3, 0x69, 0x14, 0x5f, 0x35, 0x39, 0xa7, 0x4d, 0x34, 0x26, 0xcd, 0x00,
+	0x71, 0x3c, 0x45, 0xd7, 0x0c, 0xc7, 0xcf, 0x71, 0x6c, 0x8f, 0xe3, 0x88, 0x47, 0xb0, 0xcc, 0x39,
+	0xb5, 0x9f, 0x3f, 0x32, 0x1a, 0x05, 0x81, 0x20, 0x0a, 0xa2, 0xa6, 0x84, 0x7b, 0x93, 0x81, 0x5c,
+	0xc9, 0x85, 0x7c, 0x53, 0x34, 0xe3, 0x83, 0xdb, 0xe4, 0x23, 0x3e, 0xa6, 0x9c, 0x0c, 0x08, 0x8e,
+	0x59, 0x4e, 0x7b, 0xff, 0x7f, 0xd8, 0xcc, 0x29, 0xad, 0xdb, 0x50, 0x42, 0xcc, 0x18, 0x0a, 0xf0,
+	0x3c, 0xcd, 0x51, 0x10, 0x45, 0xc1, 0x08, 0x2f, 0x6b, 0xc0, 0xe1, 0x98, 0xe7, 0x82, 0xd6, 0x0b,
+	0x0d, 0x54, 0xda, 0x2a, 0xc5, 0xe5, 0x18, 0x7e, 0x02, 0xee, 0x4d, 0xc6, 0x23, 0x42, 0xaf, 0xbc,
+	0x5c, 0xa3, 0xa6, 0x3d, 0x28, 0x3d, 0xdc, 0x69, 0xdd, 0xb7, 0x55, 0x63, 0xec, 0x4b, 0x89, 0x7e,
+	0xae, 0x40, 0x57, 0x9f, 0x14, 0x97, 0x82, 0x9d, 0xbb, 0xf5, 0x18, 0x47, 0x7c, 0xc2, 0x6a, 0x1b,
+	0x0f, 0xb4, 0x22, 0x3b, 0x4f, 0x74, 0x21, 0x41, 0x57, 0x0f, 0x8a, 0x4b, 0xeb, 0x29, 0xd8, 0xc9,
+	0xf1, 0x93, 0x68, 0x4a, 0xa1, 0x03, 0x76, 0xfd, 0x68, 0x4a, 0xd7, 0xcc, 0x08, 0xb9, 0x57, 0xe7,
+	0x72, 0x27, 0x39, 0x3e, 0xb7, 0x53, 0xf5, 0x57, 0x37, 0xac, 0x9f, 0xb7, 0x81, 0x7e, 0x1a, 0xe3,
+	0x6f, 0x26, 0x98, 0xf6, 0xaf, 0xbf, 0x1c, 0x21, 0x0a, 0x5b, 0x60, 0xbb, 0x87, 0xa8, 0xef, 0x11,
+	0x5f, 0x8a, 0x55, 0x9c, 0xd7, 0xd2, 0xc4, 0x2c, 0x3b, 0x88, 0xfa, 0x9d, 0x93, 0x2c, 0x31, 0x77,
+	0xae, 0x51, 0x38, 0xfa, 0xc8, 0x12, 0x21, 0x96, 0x5b, 0x16, 0x8f, 0x8e, 0x0f, 0xcf, 0xc1, 0xdd,
+	0xfe, 0x10, 0x51, 0x8a, 0x47, 0xa2, 0x20, 0xd1, 0x8e, 0x37, 0xe6, 0x0e, 0x56, 0xc4, 0xed, 0x63,
+	0x15, 0xe5, 0xec, 0x67, 0x89, 0x59, 0x55, 0x4a, 0x73, 0xa2, 0xe5, 0x2e, 0x34, 0xe0, 0x19, 0x28,
+	0x8d, 0x7a, 0xbc, 0x56, 0x92, 0xc5, 0x98, 0x37, 0x4b, 0x3d, 0x71, 0xba, 0xc7, 0x11, 0x1d, 0x90,
+	0xc0, 0xa9, 0x65, 0x89, 0x79, 0xa0, 0xc4, 0x46, 0x3d, 0xfe, 0x6e, 0x14, 0x12, 0x2e, 0xcf, 0xcf,
+	0x72, 0x85, 0x0a, 0x3c, 0x05, 0xe5, 0x18, 0xf9, 0x24, 0x62, 0xb5, 0x4d, 0x69, 0xed, 0xe8, 0x66,
+	0x3d, 0x57, 0xc4, 0x38, 0x7b, 0x59, 0x62, 0xea, 0x4a, 0x4b, 0x91, 0x2c, 0x37, 0x67, 0x1b, 0xdf,
+	0x6b, 0x60, 0x3b, 0xf7, 0x0f, 0x5b, 0xa0, 0x32, 0x98, 0xb3, 0x65, 0x9b, 0x74, 0xe7, 0x20, 0x4b,
+	0xcc, 0x5d, 0xc5, 0x5c, 0x40, 0x96, 0xbb, 0x0c, 0x83, 0x67, 0xa0, 0xea, 0x23, 0x8e, 0xbc, 0x18,
+	0x71, 0xec, 0x11, 0xea, 0xe3, 0x99, 0x3c, 0x7c, 0xdd, 0x79, 0x33, 0x4b, 0x4c, 0x53, 0x31, 0x45,
+	0x80, 0xc0, 0x1b, 0x12, 0x2f, 0x96, 0xa2, 0x0b, 0xc8, 0x45, 0x1c, 0x77, 0x04, 0x62, 0xfc, 0xa0,
+	0x81, 0xca, 0xa2, 0x03, 0xf0, 0x31, 0xd8, 0x89, 0x19, 0x23, 0x1e, 0x47, 0x71, 0x80, 0xb9, 0x34,
+	0xb4, 0xe1, 0xbc, 0x95, 0x26, 0x26, 0x70, 0x2f, 0x2e, 0x3a, 0x5d, 0xb9, 0x9b, 0x25, 0x26, 0xcc,
+	0x0b, 0x63, 0x8c, 0x34, 0x54, 0xa8, 0xe5, 0x02, 0xb1, 0x52, 0x11, 0xf0, 0x63, 0x50, 0x61, 0x7d,
+	0x44, 0x3d, 0x4e, 0x42, 0x2c, 0xbd, 0x6d, 0x39, 0xf5, 0x2c, 0x31, 0x0d, 0x45, 0x13, 0x50, 0x43,
+	0x40, 0x45, 0x5b, 0x77, 0xc5, 0x6e, 0x97, 0x84, 0xd8, 0x78, 0x51, 0x02, 0x5b, 0xb2, 0x87, 0x2f,
+	0xd5, 0x1c, 0x06, 0xaa, 0xb2, 0xcd, 0x1e, 0x9f, 0x79, 0x7d, 0x59, 0x54, 0xfe, 0x67, 0xbc, 0xf3,
+	0x2f, 0xa7, 0x65, 0x77, 0x67, 0xaa, 0x01, 0x93, 0x18, 0x71, 0x12, 0x51, 0xa7, 0x9e, 0x26, 0xa6,
+	0x2e, 0xa1, 0xee, 0x57, 0x0a, 0xc9, 0x12, 0xb3, 0xa2, 0xf2, 0xf2, 0x99, 0xe5, 0xea, 0x32, 0xc7,
+	0x9c, 0x65, 0xfc, 0xa2, 0x81, 0xea, 0x9a, 0x04, 0xfc, 0x14, 0xe8, 0x21, 0xa1, 0xde, 0x7a, 0x01,
+	0x85, 0x6f, 0x2c, 0x24, 0xb4, 0x51, 0x28, 0xe2, 0x95, 0x90, 0xd0, 0x85, 0x37, 0x49, 0x47, 0xb3,
+	0x02, 0x7d, 0xe3, 0x6f, 0x74, 0x34, 0x5b, 0xa5, 0xa3, 0xd9, 0x92, 0x7e, 0x0c, 0xaa, 0x34, 0xe2,
+	0xfd, 0x61, 0x41, 0xa0, 0x24, 0x05, 0x8c, 0x2c, 0x31, 0x0f, 0x95, 0x80, 0x0c, 0x28, 0x4a, 0xdc,
+	0x93, 0x3b, 0x0b, 0x11, 0xeb, 0x19, 0x38, 0x58, 0x69, 0x96, 0x2b, 0xde, 0x19, 0x87, 0x9f, 0x81,
+	0xbd, 0x05, 0xcb, 0x1b, 0x8f, 0x10, 0x5d, 0xfe, 0xe3, 0xfb, 0x69, 0x62, 0x56, 0x57, 0x48, 0x9d,
+	0x13, 0xb7, 0x3a, 0x58, 0xd9, 0xf0, 0x5b, 0xdf, 0x69, 0x60, 0xab, 0xcd, 0xa7, 0x6d, 0x06, 0x5b,
+	0x60, 0xf3, 0x09, 0xa1, 0x57, 0x70, 0x6f, 0x6d, 0x6e, 0x5d, 0x8e, 0x8d, 0xfd, 0xb5, 0x2d, 0x31,
+	0x82, 0x1e, 0x6a, 0xef, 0x69, 0xb0, 0x03, 0xe0, 0x29, 0x2e, 0x1a, 0x95, 0xe3, 0xe6, 0xf5, 0x1b,
+	0xcf, 0x37, 0xb7, 0x6c, 0xdc, 0xbf, 0x11, 0x6d, 0x9d, 0x81, 0xcd, 0x73, 0xd6, 0x66, 0xf0, 0x18,
+	0xec, 0x5e, 0xf4, 0x87, 0xd8, 0x9f, 0x8c, 0xf0, 0x7c, 0xd2, 0xc1, 0x7f, 0x9a, 0x7d, 0xc6, 0xa1,
+	0xad, 0xa6, 0xbc, 0x3d, 0x9f, 0xf2, 0xf6, 0x63, 0xf1, 0x0d, 0xb7, 0x9e, 0x81, 0x8d, 0x36, 0x83,
+	0x4f, 0xc1, 0x61, 0x1b, 0xf3, 0xdc, 0xf3, 0x17, 0x3d, 0x71, 0xe7, 0xc9, 0x0f, 0x82, 0x41, 0x63,
+	0xad, 0xa0, 0xce, 0xf2, 0x96, 0x32, 0x8e, 0xd6, 0xb0, 0x22, 0xd1, 0x69, 0xff, 0xfa, 0x7b, 0xfd,
+	0xce, 0xb7, 0x69, 0x5d, 0xfb, 0x31, 0xad, 0x6b, 0x3f, 0xa5, 0x75, 0xed, 0xb7, 0xb4, 0xae, 0xfd,
+	0x91, 0xd6, 0xef, 0xfc, 0x99, 0xd6, 0xb5, 0xaf, 0xdf, 0xfe, 0xaf, 0x7b, 0x6a, 0x7c, 0x15, 0x88,
+	0xe7, 0xb8, 0xd7, 0x2b, 0x4b, 0xc7, 0x8f, 0xfe, 0x0a, 0x00, 0x00, 0xff, 0xff, 0xfd, 0x2f, 0x10,
+	0x10, 0xb5, 0x07, 0x00, 0x00,
 }

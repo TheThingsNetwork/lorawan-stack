@@ -40,6 +40,8 @@ It has these top-level messages:
 	GatewayObservations
 	GatewayUp
 	GatewayDown
+	FrequencyPlan
+	FrequencyPlanRequest
 	GatewayIdentifiers
 	EndDeviceIdentifiers
 	ApplicationIdentifiers
