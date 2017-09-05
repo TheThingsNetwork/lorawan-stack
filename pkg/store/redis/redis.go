@@ -83,8 +83,17 @@ func toString(v interface{}) (string, error) {
 func (s *Store) Create(fields map[string]interface{}) (store.PrimaryKey, error) {
 	id := ulid.MustNew(ulid.Now(), s.entropy)
 	idStr := id.String()
+	objKey := s.key(idStr)
+	ok, err := s.Redis.Exists(objKey).Result()
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		return nil, errors.New(fmt.Sprintf("A key %s already exists", idStr))
+	}
 
-	_, err := s.Redis.Pipelined(func(p *redis.Pipeline) error {
+
+	_, err = s.Redis.Pipelined(func(p *redis.Pipeline) error {
 		sfields := make(map[string]string, len(fields))
 		for k, v := range fields {
 			str, err := toString(v)
