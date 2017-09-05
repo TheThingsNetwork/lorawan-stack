@@ -8,7 +8,6 @@ import (
 )
 
 // Device represents the device stored in the registry.
-// It is not safe for concurrent use!
 type Device struct {
 	*ttnpb.EndDevice
 	stored map[string]interface{}
@@ -17,13 +16,15 @@ type Device struct {
 	store store.Interface
 }
 
-// newDevice returns new initialized device.
-func newDevice(ed *ttnpb.EndDevice, s store.Interface, k store.PrimaryKey) *Device {
+func newDevice(ed *ttnpb.EndDevice, s store.Interface, k store.PrimaryKey, stored map[string]interface{}) *Device {
+	if stored == nil {
+		stored = store.Marshal(ed)
+	}
 	return &Device{
 		EndDevice: ed,
 		store:     s,
 		key:       k,
-		stored:    store.Marshal(ed),
+		stored:    stored,
 	}
 }
 
@@ -33,20 +34,21 @@ type Registry struct {
 }
 
 // New returns a new Registry with s as an internal Store.
-// If s is nil, a hashmap is used as an internal Store.
 func New(s store.Interface) *Registry {
 	return &Registry{
 		store: s,
 	}
 }
 
-// Register stores devices data in underlying store.Interface and returns a new *Device.
-func (r *Registry) Register(ed *ttnpb.EndDevice) (*Device, error) {
-	id, err := r.store.Create(store.Marshal(ed))
+// Create stores devices data in underlying store.Interface and returns a new *Device.
+func (r *Registry) Create(ed *ttnpb.EndDevice) (*Device, error) {
+	m := store.Marshal(ed)
+
+	id, err := r.store.Create(m)
 	if err != nil {
 		return nil, err
 	}
-	return newDevice(ed, r.store, id), nil
+	return newDevice(ed, r.store, id, m), nil
 }
 
 // FindDeviceByIdentifiers searches for devices matching specified device identifiers in underlying store.Interface.
@@ -77,7 +79,7 @@ func (r *Registry) FindDeviceByIdentifiers(ids ...*ttnpb.EndDeviceIdentifiers) (
 		if err := store.Unmarshal(fields, ed); err != nil {
 			return nil, err
 		}
-		devices = append(devices, newDevice(ed, r.store, id))
+		devices = append(devices, newDevice(ed, r.store, id, fields))
 	}
 	return devices, nil
 }
@@ -97,7 +99,7 @@ func (d *Device) Update() error {
 	return nil
 }
 
-// Deregister removes device from the underlying store.Interface.
-func (d *Device) Deregister() error {
+// Delete removes device from the underlying store.Interface.
+func (d *Device) Delete() error {
 	return d.store.Delete(d.key)
 }

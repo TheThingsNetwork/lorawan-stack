@@ -36,7 +36,7 @@ func TestDeviceRegistry(t *testing.T) {
 
 	ed := newPopulatedEndDevice()
 
-	device, err := r.Register(ed)
+	device, err := r.Create(ed)
 	a.So(err, should.BeNil)
 	if a.So(device, should.NotBeNil) {
 		a.So(device.EndDevice, should.Resemble, ed)
@@ -88,7 +88,7 @@ func TestDeviceRegistry(t *testing.T) {
 		a.So(found[0].EndDevice, should.Resemble, updated)
 	}
 
-	a.So(device.Deregister(), should.BeNil)
+	a.So(device.Delete(), should.BeNil)
 
 	found, err = r.FindDeviceByIdentifiers(&ttnpb.EndDeviceIdentifiers{
 		DevEUI:        updated.DevEUI,
