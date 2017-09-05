@@ -36,7 +36,9 @@ message FrequencyPlan {
 
   message LBTConfig {
     float rssi_target = 1 [(gogoproto.customname) = "RSSITarget",  (gogoproto.moretags) = "yaml:\"rssi-target\""];
-    int32 scan_time = 2 [(gogoproto.moretags) = "yaml:\"scan-time,omitempty\""];
+    // RSSIOffset describes the LBT config-specific RSSI offset
+    float rssi_offset = 2 [(gogoproto.customname) = "RSSIOffset",  (gogoproto.moretags) = "yaml:\"rssi-target\""];
+    int32 scan_time = 3 [(gogoproto.moretags) = "yaml:\"scan-time,omitempty\""];
   }
 
   LBTConfig lbt = 3 [(gogoproto.moretags) = "yaml:\"lbt,omitempty\""];
@@ -67,8 +69,7 @@ service GtwGs {
   // this gateway may not be used for downlink.
   rpc Link(stream GatewayUp) returns (stream GatewayDown);
   // FetchFrequencyPlan associated to the gateway. The gateway is ID'd by its authentication
-  // token. The frequency plan is returned in a YAML format, just like it was retrieved from
-  // the storage repository in the first place.
+  // token.
   rpc FetchFrequencyPlan(FrequencyPlanRequest) returns (FrequencyPlan);
 }
 
