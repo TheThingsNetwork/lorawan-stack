@@ -54,7 +54,7 @@ func (r *Registry) Create(ed *ttnpb.EndDevice) (*Device, error) {
 // FindDeviceByIdentifiers searches for devices matching specified device identifiers in underlying store.Interface.
 func (r *Registry) FindDeviceByIdentifiers(ids ...*ttnpb.EndDeviceIdentifiers) ([]*Device, error) {
 	if len(ids) == 0 {
-		return make([]*Device, 0, 0), nil
+		return []*Device{}, nil
 	}
 
 	intersection, err := r.store.FindBy(store.Marshal(&ttnpb.EndDevice{EndDeviceIdentifiers: *ids[0]}))
