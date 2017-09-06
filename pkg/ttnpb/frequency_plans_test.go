@@ -97,30 +97,6 @@ radios:
 func TestFailUnmarshal(t *testing.T) {
 	a := assertions.New(t)
 
-	wrongYamlDocument := `band: UNKNOWN_BAND
-- frequency: 867100000
-- frequency: 867300000
-- frequency: 867500000
-- frequency: 867700000
-- frequency: 867800000
-datarate-index: 7
-- frequency: 867900000
-- frequency: 868100000
-- frequency: 868300000
-- frequency: 868300000
-datarate-index: 6
-- frequency: 868500000
-radios:
-- frequency: 867500000
-tx:
-min-frequency: 863000000
-max-frequency: 870000000
-- frequency: 868500000`
-
-	fp := ttnpb.FrequencyPlan{}
-	err := yaml.Unmarshal([]byte(wrongYamlDocument), &fp)
-	a.So(err, should.NotBeNil)
-
 	wrongYamlDocument2 := `band: UNKNOWN_BAND
 channels:
 - frequency: 867100000
@@ -143,7 +119,7 @@ max-frequency: 870000000
 - frequency: 868500000`
 
 	fp2 := ttnpb.FrequencyPlan{}
-	err = yaml.Unmarshal([]byte(wrongYamlDocument2), &fp2)
+	err := yaml.Unmarshal([]byte(wrongYamlDocument2), &fp2)
 	a.So(err, should.NotBeNil)
 }
 
