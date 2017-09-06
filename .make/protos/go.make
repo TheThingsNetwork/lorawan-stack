@@ -7,7 +7,7 @@ GO_PROTOC_FLAGS ?= \
 	--gogottn_out=plugins=grpc,$(GO_PROTO_TYPE_CONVERSIONS):$(GO_PATH)/src \
 	--grpc-gateway_out=:$(GO_PATH)/src
 
-go.protos: $(wildcard $(PWD)/api/*.proto)
+go.protos: $(wildcard $(PROTO_DIR)/*.proto)
 	$(PROTOC) $(GO_PROTOC_FLAGS) $(PROTO_DIR)/*.proto
 	$(MAKE_DIR)/protos/fix-grpc-gateway-names.sh $(PROTO_DIR)
 
