@@ -1,12 +1,13 @@
 # Contributing to The Things Network Stack
 
-Thank you for being willing to contribute to the Things Network Stack! Our core team appreciates and values external contributions, even for tiny fixes.
+Thank you for your interest in building this thing together with us. We're really happy with our active community and are glad that you're a part of it. There are many ways to contribute to our project, but given the fact that you're on Github looking at the code for The Things Network Stack, you're probably here for one of the following reasons:
 
-We usually welcome these kinds of contributions:
-* **Bug fixes and feature implementation**: If you notice that a component of the Things Network Stack is not behaving as it should, or if you'd like to see a feature implemented in the Stack, you're welcome to submit modifications. Our core team might already be working on it - make sure you communicate about it in a related [GitHub issue](https://github.com/TheThingsNetwork/ttn/issues).
-* **Documentation**: Writing documentation on internal packages and external APIs helps users and fellow contributors alike to understand better how to work with our stack, and is a great way to contribute without submitting code. You can either submit documentation in this repo, to document how the Stack is implemented, or in [our `docs` repo](https://github.com/TheThingsNetwork/docs), that is linked to our [official documentation](https://www.thethingsnetwork.org/docs).
+* **Requesting a new feature**: If you have a great idea or think some functionality is missing, we want to know! The only thing you have to do for that is to [create an issue](https://github.com/TheThingsNetwork/ttn/issues) if it doesn't exist yet. Please give a detailed description of the functionality you would want, and why it would be nice to have it. Also let us know if you can help us build it.
+* **Reporting an issue**: If you notice that a component of the Things Network Stack is not behaving as it should, there may be a bug in our systems. In this case you should [create an issue](https://github.com/TheThingsNetwork/ttn/issues) if it doesn't exist yet. For really sensitive issues, you can [contact us directly](#security-issues).
+* **Implementing a new feature or fixing a bug**: If you see an [open issue](https://github.com/TheThingsNetwork/ttn/issues) that you would like to work on, let us know by commenting in the issue. 
+* **Writing documentation**: If you see that our documentation is lacking or incorrect, it would be great if you could help us improve it. This will help users and fellow contributors understand better how to work with our stack, and will prevent making mistakes and introducing bugs. Our documentation is spread across a number of places. Code documentation obviously lives together with the code, and is therefore probably in this repository. More general documentation lives in [our `docs` repo](https://github.com/TheThingsNetwork/docs), that is published to our [official documentation pages](https://www.thethingsnetwork.org/docs).
 
-If you'd like to contribute by writing code, you'll find [here](DEVELOPMENT.md) how to set up your development environment. We also have code and Git workflow conventions that will help you make better contributions.
+If you'd like to contribute by writing code, you'll find [here](DEVELOPMENT.md) how to set up your development environment. We also have some guidelines that describe how to make contributions that are consistent our way of working.
 
 + [Git branching workflow](#branching)
 + [Commit conventions](#commit)
@@ -152,3 +153,14 @@ meaning is obvious from the context.
 | application EUI                 | appEUI  |
 | device id                       | devID   |
 | user id                         | userID  |
+
+## <a name="security-issues"></a>Security Issues
+
+We do our utmost best to build secure systems, but we're human too, so we sometimes make mistakes. If you find any vulnerability in our systems, please contact us directly. We can be reached on Slack, by email and a number of other communication platforms.
+
+- Johan Stokking - [keybase.io/johanstokking](https://keybase.io/johanstokking) `5D21A572255E61C6`
+- Hylke Visser - [keybase.io/htdvisser](https://keybase.io/htdvisser) `A115FF80DC8A2270`
+- Romeo Van Snick - [keybase.io/romeovs](https://keybase.io/romeovs) `FECE5D23EDDFFF1E`
+- Eric Gourlaouen - [keybase.io/ericgo](https://keybase.io/ericgo) `BB6517CB9AA889B4`
+
+Our email addresses follow the pattern `<firstname>@thethingsnetwork.org`.
