@@ -24,11 +24,11 @@ func (r *LockedSource) Int63() (n int64) {
 }
 
 // Uint64 returns a pseudo-random 64-bit value as a uint64.
-func (r *lockedSource) Uint64() (n uint64) {
+func (r *LockedSource) Uint64() (n uint64) {
 	if r.s64 != nil {
-		r.lk.Lock()
+		r.mu.Lock()
 		n = r.s64.Uint64()
-		r.lk.Unlock()
+		r.mu.Unlock()
 		return
 	}
 	return uint64(r.Int63())>>31 | uint64(r.Int63())<<32
