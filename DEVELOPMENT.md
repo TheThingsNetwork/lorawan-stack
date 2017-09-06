@@ -151,11 +151,16 @@ make ttn-example-dev
 # ...
 ```
 
-#### Protocol buffers
+#### API
 
-Files in our `api/` package, that describes interaction with components of the Stack, are written in [protocol buffers](https://developers.google.com/protocol-buffers/docs/proto3). To transpile them into Go code, we have a convenience `make` recipe, that relies on [Docker](https://www.docker.com/):
+> Note: If you don't work on changes in the API you can skip this section.
+
+Our APIs are defined in `.proto` files in the `api` folder. These files describe the messages and interfaces of the different components of the Stack. If this is the first time you hear the term "protocol buffers" you should probably read the [protocol buffers documentation](https://developers.google.com/protocol-buffers/docs/proto3) before you continue.
+
+From the `.proto` files, we generate code using the `protoc` compiler. As we plan to compile to a number of different languages, we decided to put the compiler and its dependencies in a Docker image, so make sure you have [Docker](https://www.docker.com/) installed before you try to compile them.
+
+The actual commands for compilation are handled by our Makefile, so the only thing you have to execute, is:
 
 ```sh
 make go.protos
 ```
-
