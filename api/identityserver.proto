@@ -1,0 +1,17 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
+import "github.com/TheThingsNetwork/ttn/api/gateway.proto";
+
+package ttn.v3;
+
+option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+
+// GtwGr implements a Gateway Registry service
+service GtwGr {
+  // PullConfiguration sends a new GatewayConfiguration, with all the latest values, at connection and when a gateway's configuration is updated
+  rpc PullConfiguration(GatewayIdentifiers) returns (stream GatewayConfiguration);
+}

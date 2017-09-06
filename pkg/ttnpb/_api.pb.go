@@ -14,6 +14,7 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/gateway.proto
 	github.com/TheThingsNetwork/ttn/api/gatewayserver.proto
 	github.com/TheThingsNetwork/ttn/api/identifiers.proto
+	github.com/TheThingsNetwork/ttn/api/identityserver.proto
 	github.com/TheThingsNetwork/ttn/api/join.proto
 	github.com/TheThingsNetwork/ttn/api/joinserver.proto
 	github.com/TheThingsNetwork/ttn/api/lorawan.proto
@@ -36,6 +37,7 @@ It has these top-level messages:
 	MACSettings
 	MACState
 	MACInfo
+	GatewayConfiguration
 	GatewayStatus
 	GatewayObservations
 	GatewayUp

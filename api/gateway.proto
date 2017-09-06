@@ -12,6 +12,34 @@ package ttn.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
+// GatewayConfiguration contains all the latest values relative to this gateway.
+message GatewayConfiguration {
+  // Token is a valid token that can identify the gateway with other components that have the IS's decryption keys
+  string token = 1;
+  // FrequencyPlanID indicates the ID of the frequency plan
+  string frequency_plan_id = 2 [(gogoproto.customname) = "FrequencyPlanID"];
+  // AntennaGain indicates the AntennaGain relative to this gateway, in dBi
+  float antenna_gain = 3;
+  // ClusterAddress indicates the URI of the gateway server cluster to connect to, in a "<ip>:<port>" format.
+  string cluster_address = 4;
+  // Location indicates the location of the gateway, if specified in the console
+  Location location = 5;
+
+  message Radio {
+    uint32 frequency = 1 [(gogoproto.moretags) = "yaml:\"frequency\""];
+
+    message TxConfiguration {
+      uint32 min_frequency = 1 [(gogoproto.moretags) = "yaml:\"min-frequency\""];
+      uint32 max_frequency = 2 [(gogoproto.moretags) = "yaml:\"max-frequency\""];
+      uint32 notch_frequency = 3 [(gogoproto.moretags) = "yaml:\"notch-frequency\""];
+    }
+
+    TxConfiguration radio_tx_config = 2 [(gogoproto.customname) = "TXConfig",  (gogoproto.moretags) = "yaml:\"tx\""];
+  }
+
+  repeated Radio radios = 6 [(gogoproto.moretags) = "yaml:\"radios\""];
+}
+
 message GatewayStatus {
   // Current time of the gateway
   google.protobuf.Timestamp time = 1 [(gogoproto.stdtime) = true];
