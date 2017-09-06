@@ -4,10 +4,10 @@ package band
 
 import "github.com/TheThingsNetwork/ttn/pkg/types"
 
-var us Band
+var us_902_928 Band
 
 const (
-	US BandID = "US"
+	US_902_928 BandID = "US_902_928"
 )
 
 func init() {
@@ -33,8 +33,8 @@ func init() {
 		})
 	}
 
-	us = Band{
-		ID: US,
+	us_902_928 = Band{
+		ID: US_902_928,
 
 		UplinkChannels:   uplinkChannels,
 		DownlinkChannels: downlinkChannels,
@@ -106,5 +106,5 @@ func init() {
 
 		DefaultRX2Parameters: Rx2Parameters{8, 923300000},
 	}
-	All = append(All, us)
+	All = append(All, us_902_928)
 }
