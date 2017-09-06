@@ -32,12 +32,6 @@ channels:
 - frequency: 868300000
   data-rate:
     index: 6
-- frequency: 868500000
-radios:
-- frequency: 867500000
-  tx:
-    min-frequency: 863000000
-    max-frequency: 870000000
 - frequency: 868500000`
 
 	fp := ttnpb.FrequencyPlan{}
@@ -52,10 +46,6 @@ radios:
 	a.So(len(fp.Channels), should.Equal, 10)
 	a.So(fp.Channels[4].GetDataRate(), should.NotBeNil)
 	a.So(fp.Channels[4].GetDataRate().Index, should.Equal, 7)
-	a.So(len(fp.Radios), should.Equal, 2)
-	a.So(fp.Radios[0].TXConfig.MinFrequency, should.Equal, 863000000)
-	a.So(fp.Radios[0].TXConfig.MaxFrequency, should.Equal, 870000000)
-	a.So(fp.Radios[1].TXConfig, should.BeNil)
 	a.So(fp.LBT, should.BeNil)
 }
 
@@ -73,23 +63,13 @@ channels:
 - frequency: 923300000
 lbt:
   rssi-target: -80
-  scan-time: 128
-radios:
-- frequency: 922700000
-  tx:
-    min-frequency: 920900000
-    max-frequency: 923300000
-- frequency: 922700000`
+  scan-time: 128`
 
 	fp := ttnpb.FrequencyPlan{}
 	err := yaml.Unmarshal([]byte(yamlDocument), &fp)
 	a.So(err, should.BeNil)
 
 	a.So(len(fp.Channels), should.Equal, 7)
-	a.So(len(fp.Radios), should.Equal, 2)
-	a.So(fp.Radios[0].TXConfig.MinFrequency, should.Equal, 920900000)
-	a.So(fp.Radios[0].TXConfig.MaxFrequency, should.Equal, 923300000)
-	a.So(fp.Radios[1].TXConfig, should.BeNil)
 	a.So(fp.LBT.RSSITarget, should.Equal, -80)
 	a.So(fp.LBT.ScanTime, should.Equal, 128)
 }
@@ -110,12 +90,6 @@ datarate-index: 7
 - frequency: 868300000
 - frequency: 868300000
 datarate-index: 6
-- frequency: 868500000
-radios:
-- frequency: 867500000
-tx:
-min-frequency: 863000000
-max-frequency: 870000000
 - frequency: 868500000`
 
 	fp2 := ttnpb.FrequencyPlan{}
@@ -129,11 +103,6 @@ func TestMarshal(t *testing.T) {
 	fp := ttnpb.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 		LBT:    nil,
-		Radios: []*ttnpb.FrequencyPlan_Radio{
-			&ttnpb.FrequencyPlan_Radio{
-				Frequency: 868300000,
-			},
-		},
 		Channels: []*ttnpb.FrequencyPlan_Channel{
 			&ttnpb.FrequencyPlan_Channel{
 				Frequency: 868500000,
@@ -143,12 +112,7 @@ func TestMarshal(t *testing.T) {
 	res, err := yaml.Marshal(fp)
 	a.So(err, should.BeNil)
 
-	match, err := regexp.Match(`radios:
-- frequency: 868300000`, res)
-	a.So(match, should.BeTrue)
-	a.So(err, should.BeNil)
-
-	match, err = regexp.Match(`channels:
+	match, err := regexp.Match(`channels:
 - frequency: 868500000`, res)
 	a.So(match, should.BeTrue)
 	a.So(err, should.BeNil)
