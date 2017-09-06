@@ -54,8 +54,8 @@ For the latest **master**, you can download pre-compiled binaries:
 ## Documentation
 
 - General documentation can be found on [thethingsnetwork.org/docs](https://www.thethingsnetwork.org/docs/)
+- Learn how to contribute in [CONTRIBUTING.md](CONTRIBUTING.md)
 - Setting up a development environment is documented in [DEVELOPMENT.md](DEVELOPMENT.md)
-- Our contributing guidelines are described in [CONTRIBUTING.md](CONTRIBUTING.md)
 - Documentation for our Go code can be found on [godoc.org](https://godoc.org/github.com/TheThingsNetwork/ttn)
 
 ## Support
