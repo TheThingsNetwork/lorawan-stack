@@ -153,6 +153,8 @@ make ttn-example-dev
 
 #### Protocol buffers
 
+Files in our `api/` package, that describes interaction with components of the Stack, are written in [protocol buffers](https://developers.google.com/protocol-buffers/docs/proto3). To transpile them into Go code, we have a convenience `make` recipe, that relies on [Docker](https://www.docker.com/):
+
 ```sh
 make go.protos
 ```
