@@ -59,6 +59,7 @@ type example struct {
 	String    string        `name:"string" shorthand:"s" description:"A single string"`
 	Strings   []string      `name:"strings" description:"A couple of strings"`
 	StringPtr *string       `name:"stringptr" description:"A string ptr"`
+	Bytes     []byte        `name:"bytes" description:"A slice of bytes"`
 
 	StringMap      map[string]string   `name:"stringmap" description:"A map of strings"`
 	StringMapSlice map[string][]string `name:"stringmapslice" description:"A map of string slices"`
@@ -83,6 +84,7 @@ var (
 		String:    "foo",
 		Strings:   []string{"quu", "qux"},
 		StringPtr: &str,
+		Bytes:     []byte{0x01, 0xFA},
 		StringMap: map[string]string{
 			"foo": "bar",
 		},
@@ -147,6 +149,7 @@ func TestConfigEnv(t *testing.T) {
 	os.Setenv("TEST_STRING", "bababa")
 	os.Setenv("TEST_STRINGS", "x y z")
 	os.Setenv("TEST_STRINGPTR", "yo")
+	os.Setenv("TEST_BYTES", "FA00BB")
 	os.Setenv("TEST_STRINGMAP", "q=r s=t")
 	os.Setenv("TEST_STRINGMAPSLICE", "a=b a=c d=e")
 	os.Setenv("TEST_NESTED_STRING", "mud")
@@ -170,6 +173,7 @@ func TestConfigEnv(t *testing.T) {
 		String:    "bababa",
 		Strings:   []string{"x", "y", "z"},
 		StringPtr: &str,
+		Bytes:     []byte{0xFA, 0x00, 0xBB},
 		StringMap: map[string]string{
 			"q": "r",
 			"s": "t",
@@ -205,6 +209,7 @@ func TestConfigFlags(t *testing.T) {
 	os.Setenv("TEST_STRING", "")
 	os.Setenv("TEST_STRINGS", "")
 	os.Setenv("TEST_STRINGPTR", "")
+	os.Setenv("TEST_BYTES", "")
 	os.Setenv("TEST_STRINGMAP", "")
 	os.Setenv("TEST_STRINGMAPSLICE", "")
 	os.Setenv("TEST_NESTED_STRING", "")
@@ -222,6 +227,7 @@ func TestConfigFlags(t *testing.T) {
 		"--strings", "y",
 		"--strings", "z",
 		"--stringptr", "yo",
+		"--bytes", "99FD",
 		"--stringmap", "q=r",
 		"--stringmap", "s=t",
 		"--nested.string", "mud",
@@ -246,6 +252,7 @@ func TestConfigFlags(t *testing.T) {
 		String:    "bababa",
 		Strings:   []string{"x", "y", "z"},
 		StringPtr: &str,
+		Bytes:     []byte{0x99, 0xFD},
 		StringMap: map[string]string{
 			"q": "r",
 			"s": "t",

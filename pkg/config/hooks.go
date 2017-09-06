@@ -3,6 +3,8 @@
 package config
 
 import (
+	"encoding/hex"
+	"fmt"
 	"reflect"
 	"strings"
 	"time"
@@ -119,4 +121,18 @@ func configurableInterfaceHook(f reflect.Type, t reflect.Type, data interface{})
 	}
 
 	return u.FromConfigString(str)
+}
+
+func stringToByteSliceHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	if f.Kind() != reflect.String || t.Kind() != reflect.Slice || t.Elem().Kind() != reflect.Uint8 {
+		return data, nil
+	}
+
+	str := strings.TrimPrefix(data.(string), "0x")
+	slice, err := hex.DecodeString(str)
+	if err != nil {
+		return nil, fmt.Errorf("Could not decode hex: %s", err)
+	}
+
+	return slice, nil
 }

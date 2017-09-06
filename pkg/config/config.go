@@ -4,6 +4,7 @@
 package config
 
 import (
+	"encoding/hex"
 	"fmt"
 	"io"
 	"reflect"
@@ -176,6 +177,7 @@ func (m *Manager) Unmarshal(result interface{}) error {
 			stringToStringMapHookFunc,
 			stringSliceToStringHookFunc,
 			configurableInterfaceHook,
+			stringToByteSliceHook,
 		),
 	})
 
@@ -364,6 +366,11 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 
 				flags.StringSliceP(name, shorthand, defs, description)
 				m.viper.SetDefault(name, val)
+
+			case []byte:
+				str := "0x" + strings.ToUpper(hex.EncodeToString(val[:]))
+				m.viper.SetDefault(name, str)
+				flags.StringP(name, shorthand, str, description)
 
 			default:
 				switch fieldType {
