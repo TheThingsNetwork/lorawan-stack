@@ -39,6 +39,9 @@ message FrequencyPlan {
 
   repeated Channel channels = 2 [(gogoproto.moretags) = "yaml:\"channels\""];
 
+  Channel lora_standard_channel = 3 [(gogoproto.moretags) = "yaml:\"lora-std-channel,omitempty\""];
+  Channel fsk_channel = 4 [(gogoproto.customname) = "FSKChannel", (gogoproto.moretags) = "yaml:\"fsk-channel,omitempty\""];
+
   message LBTConfiguration {
     float rssi_target = 1 [(gogoproto.customname) = "RSSITarget",  (gogoproto.moretags) = "yaml:\"rssi-target\""];
     // RSSIOffset describes the LBT config-specific RSSI offset
@@ -46,7 +49,7 @@ message FrequencyPlan {
     int32 scan_time = 3 [(gogoproto.moretags) = "yaml:\"scan-time\""];
   }
 
-  LBTConfiguration lbt = 3 [(gogoproto.customname) = "LBT",  (gogoproto.moretags) = "yaml:\"lbt,omitempty\""];
+  LBTConfiguration lbt = 5 [(gogoproto.customname) = "LBT",  (gogoproto.moretags) = "yaml:\"lbt,omitempty\""];
 }
 
 message FrequencyPlanRequest {

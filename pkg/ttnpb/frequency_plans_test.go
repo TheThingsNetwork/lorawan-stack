@@ -23,29 +23,35 @@ channels:
 - frequency: 867300000
 - frequency: 867500000
 - frequency: 867700000
-- frequency: 867800000
-  data-rate:
-    index: 7
 - frequency: 867900000
 - frequency: 868100000
 - frequency: 868300000
-- frequency: 868300000
+- frequency: 868500000
+lora-std-channel:
+  frequency: 863000000
   data-rate:
     index: 6
-- frequency: 868500000`
+fsk-channel:
+  frequency: 868800000
+  data-rate:
+    index: 7`
 
 	fp := ttnpb.FrequencyPlan{}
 
 	err := yaml.Unmarshal([]byte(yamlDocument), &fp)
 	a.So(err, should.BeNil)
 
-	for _, channelIndex := range []int{0, 1, 2, 3, 5, 6, 7, 9} {
-		a.So(fp.Channels[channelIndex].GetDataRate(), should.BeNil)
+	for _, channel := range fp.Channels {
+		a.So(channel.GetDataRate(), should.BeNil)
 	}
 
-	a.So(len(fp.Channels), should.Equal, 10)
-	a.So(fp.Channels[4].GetDataRate(), should.NotBeNil)
-	a.So(fp.Channels[4].GetDataRate().Index, should.Equal, 7)
+	a.So(len(fp.Channels), should.Equal, 8)
+	a.So(fp.LoraStandardChannel, should.NotBeNil)
+	a.So(fp.LoraStandardChannel.GetDataRate(), should.NotBeNil)
+	a.So(fp.LoraStandardChannel.GetDataRate().Index, should.Equal, 6)
+	a.So(fp.FSKChannel, should.NotBeNil)
+	a.So(fp.FSKChannel.GetDataRate(), should.NotBeNil)
+	a.So(fp.FSKChannel.GetDataRate().Index, should.Equal, 7)
 	a.So(fp.LBT, should.BeNil)
 }
 
