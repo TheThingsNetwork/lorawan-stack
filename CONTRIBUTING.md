@@ -1,6 +1,18 @@
 # Contributing to The Things Network Stack
 
-## Branching
+Thank you for being willing to contribute to the Things Network Stack! Our core team appreciates and values external contributions, even for tiny fixes.
+
+We usually welcome these kinds of contributions:
+* **Bug fixes and feature implementation**: If you notice that a component of the Things Network Stack is not behaving as it should, or if you'd like to see a feature implemented in the Stack, you're welcome to submit modifications. Our core team might already be working on it - make sure you communicate about it in a related [GitHub issue](https://github.com/TheThingsNetwork/ttn/issues).
+* **Documentation**: Writing documentation on internal packages and external APIs helps users and fellow contributors alike to understand better how to work with our stack, and is a great way to contribute without submitting code. You can either submit documentation in this repo, to document how the Stack is implemented, or in [our `docs` repo](https://github.com/TheThingsNetwork/docs), that is linked to our [official documentation](https://www.thethingsnetwork.org/docs).
+
+If you'd like to contribute by writing code, you'll find [here](DEVELOPMENT.md) how to set up your development environment. We also have code and Git workflow conventions that will help you make better contributions.
+
++ [Git branching workflow](#branching)
++ [Commit conventions](#commit)
++ [Coding conventions](#code)
+
+## <a name="branching"></a>Branching
 
 ### Naming
 
@@ -22,7 +34,7 @@ Before feature branches are merged, they shall rebased on top of their target br
 
 Interactive rebase (git rebase -i) may be used to rewrite commit messages that do not follow these contribution guidelines
 
-## Commit Messages
+## <a name="commit"></a>Commit Messages
 
 The first line of a commit message is the subject. The commit message may contain a body, separated from the subject by an empty line.
 
@@ -57,7 +69,7 @@ Make sure that commits are scoped to something meaningful and could, potentially
 
 The body may contain a more detailed description of the commit, explaining what it changes and why. The "how" is less relevant, as this should be obvious from the diff.
 
-## Code
+## <a name="code"></a>Code
 
 ### Formatting
 
