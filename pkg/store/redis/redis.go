@@ -51,8 +51,10 @@ func New(conf *Config) *Store {
 	}
 }
 
+const separator = ":"
+
 func (s *Store) key(str ...string) string {
-	return s.config.Prefix + ":" + strings.Join(str, ":")
+	return s.config.Prefix + separator + strings.Join(str, separator)
 }
 
 func toString(v interface{}) (string, error) {
@@ -114,7 +116,7 @@ func (s *Store) Create(fields map[string]interface{}) (store.PrimaryKey, error) 
 	return id, nil
 }
 
-// Delete deletes the fields stored id specified.
+// Delete deletes the fields stored under the key associated with id.
 func (s *Store) Delete(id store.PrimaryKey) error {
 	indexKeys, err := s.Redis.HMGet(s.key(id.String()), s.config.IndexKeys...).Result()
 	if err != nil {
@@ -249,23 +251,24 @@ func (s *Store) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[
 	if err != nil {
 		return nil, err
 	}
+	if len(ids) == 0 {
+		return map[store.PrimaryKey]map[string]interface{}{}, nil
+	}
 
 	cmds := make(map[ulid.ULID]*stringInterfaceMapCmd, len(ids))
-	if len(ids) > 0 {
-		// Executing a pipeline with no commands throws an error
-		_, err = s.Redis.Pipelined(func(p *redis.Pipeline) error {
-			for _, str := range ids {
-				id, err := ulid.Parse(str)
-				if err != nil {
-					return errors.NewWithCause(fmt.Sprintf("pkg/store/redis: failed to parse %s as ULID, database inconsistent", str), err)
-				}
-				cmds[id] = newStringInterfaceMapCmd(p.HGetAll(s.key(str)))
+	// Executing a pipeline with no commands throws an error
+	_, err = s.Redis.Pipelined(func(p *redis.Pipeline) error {
+		for _, str := range ids {
+			id, err := ulid.Parse(str)
+			if err != nil {
+				return errors.NewWithCause(fmt.Sprintf("pkg/store/redis: failed to parse %s as ULID, database inconsistent", str), err)
 			}
-			return nil
-		})
-		if err != nil {
-			return nil, err
+			cmds[id] = newStringInterfaceMapCmd(p.HGetAll(s.key(str)))
 		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	out := make(map[store.PrimaryKey]map[string]interface{}, len(cmds))
