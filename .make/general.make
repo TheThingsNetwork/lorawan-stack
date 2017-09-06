@@ -5,7 +5,6 @@
 EMPTY :=
 SPACE := $(EMPTY) $(EMPTY)
 COMMA := ,
-SED = $(shell command -v gsed || command -v sed)
 
 # set shell
 SHELL = bash

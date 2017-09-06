@@ -39,7 +39,9 @@ for f in ${protos[@]}; do
 done
 IFS=${IFS_BAK}
 
-if [[ ${#genPaths[@]} != 0 ]] && [[ ${#sedArgs[@]} != 0 ]]; then
-  sed -i ${sedArgs[*]} ${genPaths[*]}
+if [[ ${#sedArgs[@]} != 0 ]]; then
+  for f in ${genPaths[@]}; do
+    cat $f | sed ${sedArgs[*]} > $f
+  done
 fi
 exit 0
