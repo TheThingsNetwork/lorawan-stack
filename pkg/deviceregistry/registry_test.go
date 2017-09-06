@@ -3,6 +3,7 @@
 package deviceregistry_test
 
 import (
+	"fmt"
 	"math/rand"
 	"testing"
 
@@ -101,5 +102,57 @@ func TestDeviceRegistry(t *testing.T) {
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) {
 		a.So(found, should.HaveLength, 0)
+	}
+}
+
+func ExampleRegistry() {
+	r := New(mapstore.New())
+
+	devEUI := types.EUI64([8]byte{0, 1, 2, 3, 4, 5, 6, 7})
+	joinEUI := types.EUI64([8]byte{0, 1, 2, 3, 4, 5, 6, 7})
+	devAddr := types.DevAddr([4]byte{0, 1, 2, 3})
+	ed := &ttnpb.EndDevice{
+		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			ApplicationID: "test",
+			DeviceID:      "test",
+			TenantID:      "test",
+			DevEUI:        &devEUI,
+			JoinEUI:       &joinEUI,
+			DevAddr:       &devAddr,
+		},
+	}
+
+	dev, err := r.Create(ed)
+	if err != nil {
+		panic(fmt.Errorf("Failed to create device %s", err))
+	}
+
+	dev.NextDevNonce++
+	dev.NextJoinNonce++
+	dev.NextRJCount0++
+	dev.NextRJCount1++
+	dev.DeviceID = "differentID"
+	devAddr = types.DevAddr([4]byte{4, 3, 2, 1})
+	dev.DevAddr = &devAddr
+	err = dev.Update()
+	if err != nil {
+		panic(fmt.Errorf("Failed to update device %s", err))
+	}
+
+	devs, err := r.FindDeviceByIdentifiers(&ttnpb.EndDeviceIdentifiers{
+		ApplicationID: "test",
+		TenantID:      "test",
+	})
+	if err != nil {
+		panic(fmt.Errorf("Failed to find device by identifiers %s", err))
+	}
+	if len(devs) != 1 {
+		panic(fmt.Errorf("Expected to find 1 device, got %d", len(devs)))
+	}
+	dev = devs[0]
+
+	err = dev.Delete()
+	if err != nil {
+		panic(fmt.Errorf("Failed to delete device %s", err))
 	}
 }
