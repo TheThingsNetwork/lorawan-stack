@@ -224,9 +224,8 @@ func (s *Store) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	return m, nil
 }
 
-// FindBy returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
-// meaning that only entries matching all the fields in filter should be returned.
-func (s *Store) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
+// findKeysBy returns a slice of keys, which correspond to the filer specified.
+func (s *Store) findKeysBy(filter map[string]interface{}) ([]string, error) {
 	keys := make([]string, 0, len(filter))
 	for k, v := range filter {
 		str, err := toString(v)
@@ -234,6 +233,16 @@ func (s *Store) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[
 			return nil, err
 		}
 		keys = append(keys, s.key(k, str))
+	}
+	return keys, nil
+}
+
+// FindBy returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
+// meaning that only entries matching all the fields in filter should be returned.
+func (s *Store) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
+	keys, err := s.findKeysBy(filter)
+	if err != nil {
+		return nil, err
 	}
 
 	ids, err := s.Redis.SInter(keys...).Result()
