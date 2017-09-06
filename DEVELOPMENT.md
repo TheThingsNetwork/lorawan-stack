@@ -151,3 +151,9 @@ make ttn-example-dev
 # ...
 ```
 
+#### Protocol buffers
+
+```sh
+make go.protos
+```
+
