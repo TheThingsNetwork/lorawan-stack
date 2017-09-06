@@ -57,24 +57,27 @@ func (r *Registry) FindDeviceByIdentifiers(ids ...*ttnpb.EndDeviceIdentifiers) (
 		return []*Device{}, nil
 	}
 
-	intersection, err := r.store.FindBy(store.Marshal(&ttnpb.EndDevice{EndDeviceIdentifiers: *ids[0]}))
+	// Find devices matching the first filter
+	filtered, err := r.store.FindBy(store.Marshal(&ttnpb.EndDevice{EndDeviceIdentifiers: *ids[0]}))
 	if err != nil {
 		return nil, err
 	}
-	for i := 1; i < len(ids); i++ {
+	// Find devices matching other filters and intersect with devices already in filtered.
+	// Loop exits early, if no devices are left in filtered.
+	for i := 1; i < len(ids) && len(filtered) > 0; i++ {
 		m, err := r.store.FindBy(store.Marshal(&ttnpb.EndDevice{EndDeviceIdentifiers: *ids[i]}))
 		if err != nil {
 			return nil, err
 		}
 		for k := range m {
-			if _, ok := intersection[k]; !ok {
-				delete(intersection, k)
+			if _, ok := filtered[k]; !ok {
+				delete(filtered, k)
 			}
 		}
 	}
 
-	devices := make([]*Device, 0, len(intersection))
-	for id, fields := range intersection {
+	devices := make([]*Device, 0, len(filtered))
+	for id, fields := range filtered {
 		ed := &ttnpb.EndDevice{}
 		if err := store.Unmarshal(fields, ed); err != nil {
 			return nil, err
