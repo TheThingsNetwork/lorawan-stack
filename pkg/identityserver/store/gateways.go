@@ -27,6 +27,15 @@ type GatewayStore interface {
 	// Owners retrieves the owners for a gateway
 	Owners(gtwID string) ([]string, error)
 
+	// Antennas fetches all the registered antennas that belongs to a certain gateway
+	Antennas(gtwID string) ([]types.GatewayAntenna, error)
+
+	// UpsertAntenna inserts or modifies an antenna to a certain gateway
+	UpsertAntenna(gtwID string, antenna types.GatewayAntenna) error
+
+	// DeleteAntenna deletes an antenna from a gateway
+	DeleteAntenna(gtwID, antennaID string) error
+
 	// Collaborators retrieves the collaborators for a gateway
 	Collaborators(gtwID string) ([]types.Collaborator, error)
 

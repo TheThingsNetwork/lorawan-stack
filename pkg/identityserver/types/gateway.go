@@ -6,20 +6,22 @@ import (
 	"database/sql/driver"
 	"strings"
 	"time"
+
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 // RouterList is the type that represent a list of routers a gateway connect to
 type RouterList []string
 
-// Placement is the type of antenna placement
-type Placement string
+// GatewayAntennaPlacement denotes whether a gateway antenna is placed indoors or outdoors
+type GatewayAntennaPlacement string
 
 const (
-	// Indoor means that the antenna is placed indoors
-	Indoor Placement = "indoor"
+	// PlacementIndoor means that the antenna is placed indoors
+	PlacementIndoor GatewayAntennaPlacement = "indoors"
 
-	// Outdoor means that the antenna is placed outdoors
-	Outdoor Placement = "outdoor"
+	// PlacementOutdoor means that the antenna is placed outdoors
+	PlacementOutdoor GatewayAntennaPlacement = "outdoors"
 )
 
 // DefaultGateway represents an gateway on the network
@@ -39,16 +41,16 @@ type DefaultGateway struct {
 	// Activated denotes wether or not the gateway has been activated
 	Activated bool `db:"activated"`
 
-	// StatusPublic denotes wether or not the gateway's status is public or not
+	// StatusPublic denotes whether or not the gateway's status is public or not
 	StatusPublic bool `db:"status_public"`
 
-	// LocationPublic denotes wether or not the gateway's location is public
+	// LocationPublic denotes whether or not the gateway's location is public
 	LocationPublic bool `db:"location_public"`
 
-	// OwnerPublic denotes wether or not the gateway owner is public
+	// OwnerPublic denotes whether or not the gateway owner is public
 	OwnerPublic bool `db:"owner_public"`
 
-	// AutoUpdate indicates wether or not the gateway should be able to
+	// AutoUpdate indicates whether or not the gateway should be able to
 	// automatically fetch and execute firmware updates
 	AutoUpdate bool `db:"auto_update"`
 
@@ -58,20 +60,8 @@ type DefaultGateway struct {
 	// Model is the gateway model
 	Model *string `db:"model"`
 
-	// AntennaType denotes the antenna's type
-	AntennaType *string `db:"antenna_type"`
-
-	// AntennaModel denotes the antenna's model
-	AntennaModel *string `db:"antenna_model"`
-
-	// AntennaPlacement denotes wether if antenna is placed indoors or outdoors
-	AntennaPlacement *Placement `db:"antenna_placement"`
-
-	// AntennaAltitude denotes the estimated height the antenna is placed
-	AntennaAltitude *string `db:"antenna_altitude"`
-
-	// AntennaLocation denotes the
-	AntennaLocation *string `db:"antenna_location"`
+	// Antennas is all the antennas that the gateway has
+	Antennas []GatewayAntenna `json:"antennas"`
 
 	// Attributes is a free-form of attributes
 	Attributes map[string]string
@@ -87,6 +77,24 @@ type DefaultGateway struct {
 	Archived *time.Time `json:"deleted,omitempty" db:"archived"`
 }
 
+// GatewayAntenna is a gateway antenna
+type GatewayAntenna struct {
+	// ID is the unique and immutable antenna's identifier
+	ID string `db:"antenna_id"`
+
+	// Location is the antenna's location defined by: latitude, longitude and altitude
+	Location *ttnpb.Location
+
+	// Type denotes the antenna's type
+	Type *string `db:"type"`
+
+	// Model denotes the antenna's model
+	Model *string `db:"model"`
+
+	// Placement denotes whether if the antenna is placed indoors or outdoors
+	Placement *GatewayAntennaPlacement `db:"placement"`
+}
+
 // Gateway is the interface of all things that can be a gateway
 type Gateway interface {
 	// GetGateway returns de DefaultGateway that represents this gateway
@@ -94,6 +102,9 @@ type Gateway interface {
 
 	// SetAttributes sets the free-form attributes
 	SetAttributes(attributes map[string]string)
+
+	// SetAntennas sets the antennas
+	SetAntennas(antennas []GatewayAntenna)
 }
 
 // Value implements sql.Valuer interface
@@ -124,4 +135,9 @@ func (g *DefaultGateway) GetGateway() *DefaultGateway {
 // SetAttributes implements Gateway
 func (g *DefaultGateway) SetAttributes(attributes map[string]string) {
 	g.Attributes = attributes
+}
+
+// SetAntennas implements Gateway
+func (g *DefaultGateway) SetAntennas(antennas []GatewayAntenna) {
+	g.Antennas = antennas
 }

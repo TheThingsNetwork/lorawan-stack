@@ -8,6 +8,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/utils"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -24,6 +25,16 @@ func testGateways() map[string]*types.DefaultGateway {
 			Attributes: map[string]string{
 				"foo": "bar",
 			},
+			Antennas: []types.GatewayAntenna{
+				types.GatewayAntenna{
+					ID: "test antenna",
+					Location: &ttnpb.Location{
+						Latitude:  11.11,
+						Longitude: 22.22,
+						Altitude:  10,
+					},
+				},
+			},
 		},
 		"bob-gateway": &types.DefaultGateway{
 			ID:            "bob-gateway",
@@ -34,6 +45,11 @@ func testGateways() map[string]*types.DefaultGateway {
 			Attributes: map[string]string{
 				"Modulation": "12345",
 				"RFCH":       "111",
+			},
+			Antennas: []types.GatewayAntenna{
+				types.GatewayAntenna{
+					ID: "bobgw antenna",
+				},
 			},
 		},
 	}
@@ -59,6 +75,49 @@ func TestGatewayCreate(t *testing.T) {
 	}
 }
 
+func TestGatewayAntennas(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore()
+
+	gtw := testGateways()["bob-gateway"]
+
+	// fetch the gateway and check that the antenna has been registered with it
+	{
+		antennas, err := s.Gateways.Antennas(gtw.ID)
+		a.So(err, should.BeNil)
+		if a.So(antennas, should.HaveLength, 1) {
+			a.So(antennas[0], should.Resemble, gtw.Antennas[0])
+		}
+	}
+
+	ant := types.GatewayAntenna{
+		ID:       "bobgw antenna",
+		Location: &ttnpb.Location{Longitude: 12.12, Latitude: 10.02, Altitude: 2},
+	}
+
+	// modify antenna
+	{
+		err := s.Gateways.UpsertAntenna(gtw.ID, ant)
+		a.So(err, should.BeNil)
+
+		antennas, err := s.Gateways.Antennas(gtw.ID)
+		a.So(err, should.BeNil)
+		if a.So(antennas, should.HaveLength, 1) {
+			a.So(antennas[0], should.Resemble, ant)
+		}
+	}
+
+	// delete antenna
+	{
+		err := s.Gateways.DeleteAntenna(gtw.ID, ant.ID)
+		a.So(err, should.BeNil)
+
+		found, err := s.Gateways.FindByID(gtw.ID)
+		a.So(err, should.BeNil)
+		a.So(found.GetGateway().Antennas, should.HaveLength, 0)
+	}
+}
+
 func TestGatewayCollaborators(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore()
@@ -69,7 +128,7 @@ func TestGatewayCollaborators(t *testing.T) {
 
 	collaborator := utils.Collaborator(user.Username, rights)
 
-	// Add collaborator
+	// add collaborator
 	{
 		err := s.Gateways.AddCollaborator(gtw.ID, collaborator)
 		a.So(err, should.BeNil)

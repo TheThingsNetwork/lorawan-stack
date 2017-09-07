@@ -16,11 +16,6 @@ func init() {
 			auto_update         BOOL DEFAULT true,
 			brand               STRING,
 			model               STRING,
-			antenna_type        STRING,
-			antenna_model       STRING,
-			antenna_placement   STRING,
-			antenna_altitude    STRING,
-			antenna_location    STRING,
 			routers             TEXT NOT NULL,
 			created             TIMESTAMP DEFAULT current_timestamp(),
 			archived            TIMESTAMP DEFAULT null
@@ -30,6 +25,17 @@ func init() {
 			attribute    STRING NOT NULL,
 			value        STRING NOT NULL,
 			PRIMARY KEY(gateway_id, attribute)
+		);
+		CREATE TABLE IF NOT EXISTS gateways_antennas (
+			gateway_id   STRING(36) REFERENCES gateways(id),
+			antenna_id   STRING(36) NOT NULL,
+			type         STRING,
+			model        STRING,
+			placement    STRING,
+			longitude    FLOAT,
+			latitude     FLOAT,
+			altitude     INT,
+			PRIMARY KEY(gateway_id, antenna_id)
 		);
 		CREATE TABLE IF NOT EXISTS gateways_collaborators (
 			gateway_id   STRING(36) REFERENCES gateways(id),
@@ -41,6 +47,7 @@ func init() {
 
 	const backwards = `
 		DROP TABLE IF EXISTS gateways_attributes;
+		DROP TABLE IF EXISTS gateways_antennas;
 		DROP TABLE IF EXISTS gateways_collaborators;
 		DROP TABLE IF EXISTS gateways;
 	`

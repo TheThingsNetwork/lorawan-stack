@@ -12,6 +12,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/helpers"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/utils"
 )
 
 // GatewayStore implements store.GatewayStore
@@ -30,6 +31,10 @@ var ErrGatewayIDTaken = errors.New("gateway ID already taken")
 // ErrGatewayAttributeNotFound is returned when trying to delete an attribute
 // that does not exist
 var ErrGatewayAttributeNotFound = errors.New("gateway attribute not found")
+
+// ErrGatewayAntennaNotFound is returned when trying to delete an antenna that
+// does not exist
+var ErrGatewayAntennaNotFound = errors.New("gateway antenna not found")
 
 // ErrGatewayCollaboratorNotFound is returned when trying to remove a
 // collaborator that does not exist
@@ -126,7 +131,13 @@ func (s *GatewayStore) FindByID(gtwID string) (types.Gateway, error) {
 		}
 		result.SetAttributes(attributes)
 
-		return nil
+		antennas, err := s.antennas(tx, gtwID)
+		if err != nil {
+			return err
+		}
+		result.SetAntennas(antennas)
+
+		return s.loadAttributes(tx, gtwID, result)
 	})
 	return result, err
 }
@@ -150,8 +161,8 @@ func (s *GatewayStore) attributes(q db.QueryContext, gtwID string) (map[string]s
 		Value     string `db:"value"`
 	}
 	err := q.Select(
-		attrs,
-		`SELECT *
+		&attrs,
+		`SELECT attribute, value
 			FROM gateways_attributes
 			WHERE gateway_id = $1`,
 		gtwID)
@@ -204,6 +215,103 @@ func (s *GatewayStore) deleteAttribute(q db.QueryContext, gtwID string, attribut
 		attribute)
 	if db.IsNoRows(err) {
 		return ErrGatewayAttributeNotFound
+	}
+	return err
+}
+
+// Antennas fetches all the registered antennas that belongs to a certain gateway
+func (s *GatewayStore) Antennas(gtwID string) ([]types.GatewayAntenna, error) {
+	return s.antennas(s.db, gtwID)
+}
+
+func (s *GatewayStore) antennas(q db.QueryContext, gtwID string) ([]types.GatewayAntenna, error) {
+	var antnns []struct {
+		Longitude *float32 `db:"longitude"`
+		Latitude  *float32 `db:"latitude"`
+		Altitude  *int32   `db:"altitude"`
+		types.GatewayAntenna
+	}
+	err := q.Select(
+		&antnns,
+		`SELECT antenna_id, longitude, latitude, altitude, type, model, placement
+			FROM gateways_antennas
+			WHERE gateway_id = $1`,
+		gtwID)
+	if !db.IsNoRows(err) && err != nil {
+		return nil, err
+	}
+
+	result := make([]types.GatewayAntenna, 0, len(antnns))
+	for _, antenna := range antnns {
+		result = append(result, types.GatewayAntenna{
+			ID:        antenna.ID,
+			Location:  helpers.Location(antenna.Longitude, antenna.Latitude, antenna.Altitude),
+			Type:      antenna.Type,
+			Model:     antenna.Model,
+			Placement: antenna.Placement,
+		})
+	}
+
+	return result, nil
+}
+
+// UpsertAntenna inserts or modifies an antenna to a certain gateway
+func (s *GatewayStore) UpsertAntenna(gtwID string, antenna types.GatewayAntenna) error {
+	return s.upsertAntenna(s.db, gtwID, antenna)
+}
+
+func (s *GatewayStore) upsertAntenna(q db.QueryContext, gtwID string, antenna types.GatewayAntenna) error {
+	var ant struct {
+		types.GatewayAntenna
+		Longitude *float32
+		Latitude  *float32
+		Altitude  *int32
+	}
+	ant.GatewayAntenna = antenna
+
+	if ant.GatewayAntenna.Location != nil {
+		ant.Longitude = utils.Float32Address(ant.GatewayAntenna.Location.Longitude)
+		ant.Latitude = utils.Float32Address(ant.GatewayAntenna.Location.Latitude)
+		ant.Altitude = utils.Int32Address(ant.GatewayAntenna.Location.Altitude)
+	}
+
+	_, err := q.Exec(
+		`INSERT
+			INTO gateways_antennas (gateway_id, antenna_id, type, model,
+					placement, longitude, latitude, altitude)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+			ON CONFLICT (gateway_id, antenna_id)
+			DO UPDATE SET type = $3, model = $4, placement = $5, longitude = $6,
+					latitude = $7, altitude = $8
+			WHERE gateway_id = $1 AND antenna_id = $2`,
+		gtwID,
+		ant.ID,
+		ant.Type,
+		ant.Model,
+		ant.Placement,
+		ant.Longitude,
+		ant.Latitude,
+		ant.Altitude)
+	return err
+}
+
+// DeleteAntenna deletes an antenna from a gateway
+func (s *GatewayStore) DeleteAntenna(gtwID, antennaID string) error {
+	return s.deleteAntenna(s.db, gtwID, antennaID)
+}
+
+func (s *GatewayStore) deleteAntenna(q db.QueryContext, gtwID, antennaID string) error {
+	var i string
+	err := q.SelectOne(
+		&i,
+		`DELETE
+			FROM gateways_antennas
+			WHERE gateway_id = $1 AND antenna_id = $2
+			RETURNING antenna_id`,
+		gtwID,
+		antennaID)
+	if db.IsNoRows(err) {
+		return ErrGatewayAntennaNotFound
 	}
 	return err
 }
@@ -267,6 +375,15 @@ func (s *GatewayStore) Create(gateway types.Gateway) (types.Gateway, error) {
 		}
 		result.SetAttributes(gtw.Attributes)
 
+		// store antennas
+		for _, antenna := range gtw.Antennas {
+			err := s.upsertAntenna(tx, gtw.ID, antenna)
+			if err != nil {
+				return err
+			}
+		}
+		result.SetAntennas(gtw.Antennas)
+
 		return nil
 	})
 	return result, err
@@ -279,12 +396,10 @@ func (s *GatewayStore) create(q db.QueryContext, gateway types.Gateway, result t
 		`INSERT
 			INTO gateways (id, description, frequency_plan, key, activated,
 					status_public, location_public, owner_public, auto_update,
-					brand, model, antenna_type, antenna_model, antenna_placement,
-					antenna_altitude, antenna_location, routers)
+					brand, model, routers)
 			VALUES (:id, :description, :frequency_plan, :key, :activated,
 					:status_public, :location_public, :owner_public, :auto_update,
-					:brand, :model, :antenna_type, :antenna_model, :antenna_placement,
-					:antenna_altitude, :antenna_location, :routers)
+					:brand, :model, :routers)
 			RETURNING *`,
 		gtw)
 
@@ -308,13 +423,23 @@ func (s *GatewayStore) Update(gateway types.Gateway) (types.Gateway, error) {
 			return err
 		}
 
-		for attribute, value := range gateway.GetGateway().Attributes {
-			err := s.upsertAttribute(tx, gateway.GetGateway().ID, attribute, value)
+		gtw := gateway.GetGateway()
+
+		for attribute, value := range gtw.Attributes {
+			err := s.upsertAttribute(tx, gtw.ID, attribute, value)
 			if err != nil {
 				return err
 			}
 		}
-		result.SetAttributes(gateway.GetGateway().Attributes)
+		result.SetAttributes(gtw.Attributes)
+
+		for _, antenna := range gtw.Antennas {
+			err := s.upsertAntenna(tx, gtw.ID, antenna)
+			if err != nil {
+				return err
+			}
+		}
+		result.SetAntennas(gtw.Antennas)
 
 		return nil
 	})
@@ -326,11 +451,11 @@ func (s *GatewayStore) update(q db.QueryContext, gateway, result types.Gateway) 
 	err := q.SelectOne(
 		result,
 		`UPDATE gateways
-			SET description = :description, frequency_plan = :frequency_plan, key = :key,
-					activated = :activated, status_public = :status_public, location_public = :location_public,
-					owner_public = owner_public, auto_update = :auto_update, brand = :brand, model = :model,
-					antenna_type = :antenna_type, antenna_model = :antenna_model, antenna_placement = :antenna_placement,
-					antenna_altitude = :antenna_altitude, antenna_location = :antenna_location, routers = :routers
+			SET description = :description, frequency_plan = :frequency_plan,
+					key = :key, activated = :activated, status_public = :status_public,
+					location_public = :location_public, owner_public = owner_public,
+					auto_update = :auto_update, brand = :brand, model = :model,
+					routers = :routers
 			WHERE id = :id
 			RETURNING *`,
 		gtw)
