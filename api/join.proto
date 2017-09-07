@@ -27,7 +27,7 @@ message JoinRequest {
   EndDeviceIdentifiers end_device = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // MAC version selected by the network server
-  string selected_mac_version = 4;
+  MACVersion selected_mac_version = 4;
 
   // NetID of the accepting network server
   bytes net_id = 5 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.NetID"];

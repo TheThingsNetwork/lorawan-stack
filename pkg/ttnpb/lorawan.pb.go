@@ -805,7 +805,8 @@ func (m *JoinAcceptPayload) GetCFList() *CFList {
 type DLSettings struct {
 	Rx1DROffset uint32 `protobuf:"varint,1,opt,name=rx1_dr_offset,json=rx1DrOffset,proto3" json:"rx1_dr_offset,omitempty"`
 	Rx2DR       uint32 `protobuf:"varint,2,opt,name=rx2_dr,json=rx2Dr,proto3" json:"rx2_dr,omitempty"`
-	OptNeg      bool   `protobuf:"varint,3,opt,name=opt_neg,json=optNeg,proto3" json:"opt_neg,omitempty"`
+	// OptNeg is set if Network Server implements LoRaWAN 1.1 or greater
+	OptNeg bool `protobuf:"varint,3,opt,name=opt_neg,json=optNeg,proto3" json:"opt_neg,omitempty"`
 }
 
 func (m *DLSettings) Reset()                    { *m = DLSettings{} }
