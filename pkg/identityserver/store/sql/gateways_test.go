@@ -20,7 +20,7 @@ func testGateways() map[string]*types.DefaultGateway {
 			Description:   "My description",
 			FrequencyPlan: "868_3",
 			Key:           "1111",
-			Brand:         utils.String("Kerklink"),
+			Brand:         utils.StringAddress("Kerklink"),
 			Routers:       []string{"network.eu", "network.au"},
 			Attributes: map[string]string{
 				"foo": "bar",

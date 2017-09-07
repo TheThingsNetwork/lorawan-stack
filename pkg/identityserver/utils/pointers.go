@@ -11,3 +11,8 @@ func Float32Address(f float32) *float32 {
 func Int32Address(i int32) *int32 {
 	return &i
 }
+
+// StringAddress returns the address of a string literal
+func StringAddress(s string) *string {
+	return &s
+}
