@@ -113,7 +113,7 @@ We follow the [official go guidelines](https://github.com/golang/go/wiki/CodeRev
 | context              | ctx     | context.Context                                               |
 | mutex                | mu      | sync.Mutex                                                    |
 | configuration        | conf    | github.com/TheThingsNetwork/ttn/pkg/config.Config             |
-| logger               | log     | github.com/TheThingsNetwork/ttn/pkg/ttnlog.Logger             |
+| logger               | logger  | github.com/TheThingsNetwork/ttn/pkg/ttnlog.Logger             |
 | message              | msg     | github.com/TheThingsNetwork/ttn/api/gateway.UplinkMessage     |
 | status               | st      | github.com/TheThingsNetwork/ttn/api/gateway.Status            |
 | server               | srv     | github.com/TheThingsNetwork/ttn/pkg/network-server.Server     |
