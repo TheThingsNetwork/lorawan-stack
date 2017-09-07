@@ -157,7 +157,6 @@
   packages = [".","oid"]
   revision = "e42267488fe361b9dc034be7a6bffef5b195bceb"
 
-
 [[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
@@ -336,6 +335,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ca21382b9cbed3d4acf3cc8334ac27a1fdb1b2fd39cde995ec00af5d40d44ebe"
+  inputs-digest = "3783f921deda18e994a22d3ef7b6ab45ef5cb05fcad5b2fd17a098320ea265c9"
   solver-name = "gps-cdcl"
   solver-version = 1
