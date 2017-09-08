@@ -70,7 +70,7 @@ func NewWithCause(text string, cause error) Error {
 	}
 }
 
-// New returns an "unknown" error with the text fomatted accoding to format.
+// Errorf returns an "unknown" error with the text fomatted accoding to format.
 func Errorf(format string, a ...interface{}) error {
 	return New(fmt.Sprintf(format, a...))
 }
