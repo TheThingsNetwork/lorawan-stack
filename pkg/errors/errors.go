@@ -19,6 +19,7 @@
 package errors
 
 import (
+	"fmt"
 	"runtime"
 	"strings"
 )
@@ -67,6 +68,11 @@ func NewWithCause(text string, cause error) Error {
 		},
 		namespace: pkg(),
 	}
+}
+
+// New returns an "unknown" error with the text fomatted accoding to format.
+func Errorf(format string, a ...interface{}) error {
+	return New(fmt.Sprintf(format, a...))
 }
 
 // pkg returns the package the caller was called from
