@@ -83,57 +83,74 @@ func toString(v interface{}) (string, error) {
 
 // Create stores generates an ULID and stores fields under a key associated with it.
 func (s *Store) Create(fields map[string]interface{}) (store.PrimaryKey, error) {
-	id := ulid.MustNew(ulid.Now(), s.entropy)
-	idStr := id.String()
-	objKey := s.key(idStr)
-	ok, err := s.Redis.Exists(objKey).Result()
-	if err != nil {
-		return nil, err
-	}
-	if ok {
-		errstr := fmt.Sprintf("A key %s already exists", idStr) // ensure `go lint` doesn't complain
-		return nil, errors.New(errstr)
+	var (
+		id    = ulid.MustNew(ulid.Now(), s.entropy)
+		idStr = id.String()
+
+		key = s.key(idStr)
+
+		fieldsSet = make(map[string]string, len(fields))
+		idxAdd    = make([]string, 0, len(fields))
+	)
+	for k, v := range fields {
+		str, err := toString(v)
+		if err != nil {
+			return nil, err
+		}
+		fieldsSet[k] = str
+		if _, ok := s.indexKeys[k]; ok {
+			idxAdd = append(idxAdd, s.key(k, str))
+		}
 	}
 
-	_, err = s.Redis.Pipelined(func(p *redis.Pipeline) error {
-		sfields := make(map[string]string, len(fields))
-		for k, v := range fields {
-			str, err := toString(v)
+	var create func() error
+	create = func() error {
+		err := s.Redis.Watch(func(tx *redis.Tx) error {
+			ok, err := tx.Exists(key).Result()
 			if err != nil {
 				return err
 			}
-			sfields[k] = str
-			if _, ok := s.indexKeys[k]; ok {
-				p.SAdd(s.key(k, str), idStr)
+			if ok {
+				errstr := fmt.Sprintf("A key %s already exists", idStr) // ensure `go lint` doesn't complain
+				return errors.New(errstr)
 			}
+			_, err = tx.Pipelined(func(p *redis.Pipeline) error {
+				for _, k := range idxAdd {
+					p.SAdd(k, idStr)
+				}
+				p.HMSet(key, fieldsSet)
+				return nil
+			})
+			return err
+		}, key)
+		if err == redis.TxFailedErr {
+			return create()
 		}
-		p.HMSet(s.key(idStr), sfields)
-		return nil
-	})
-	if err != nil {
-		return nil, err
+		return err
 	}
-	return id, nil
+	return id, create()
 }
 
 // Delete deletes the fields stored under the key associated with id.
 func (s *Store) Delete(id store.PrimaryKey) error {
-	indexKeys, err := s.Redis.HMGet(s.key(id.String()), s.config.IndexKeys...).Result()
+	idStr := id.String()
+
+	indexKeys, err := s.Redis.HMGet(s.key(idStr), s.config.IndexKeys...).Result()
 	if err != nil {
 		return err
 	}
 
-	_, err = s.Redis.Pipelined(func(p *redis.Pipeline) error {
+	_, err = s.Redis.TxPipelined(func(p *redis.Pipeline) error {
 		for i, v := range indexKeys {
 			if v != nil {
 				str, err := toString(v)
 				if err != nil {
 					return err
 				}
-				p.SRem(s.key(s.config.IndexKeys[i], str), id.String())
+				p.SRem(s.key(s.config.IndexKeys[i], str), idStr)
 			}
 		}
-		p.Del(s.key(id.String()))
+		p.Del(s.key(idStr))
 		return nil
 	})
 	return err
@@ -147,7 +164,7 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string]interface{}) error {
 		key = s.key(idStr)
 
 		idxDel    = make([]string, 0, len(diff))
-		idxSet    = make(map[string]string, len(diff))
+		idxAdd    = make([]string, 0, len(diff))
 		fieldsDel = make([]string, 0, len(diff))
 		fieldsSet = make(map[string]string, len(diff))
 	)
@@ -168,29 +185,39 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string]interface{}) error {
 		}
 		fieldsSet[k] = str
 		if isIndex {
-			idxSet[k] = str
+			idxAdd = append(idxAdd, s.key(k, str))
 		}
 	}
 
-	idxCurrent, err := s.Redis.HMGet(s.key(id.String()), idxDel...).Result()
-	if err != nil {
+	var update func() error
+	update = func() error {
+		err := s.Redis.Watch(func(tx *redis.Tx) error {
+			idxCurrent, err := tx.HMGet(key, idxDel...).Result()
+			if err != nil {
+				return err
+			}
+			_, err = tx.Pipelined(func(p *redis.Pipeline) error {
+				p.HMSet(key, fieldsSet)
+				p.HDel(key, fieldsDel...)
+				for i, k := range idxDel {
+					if idxCurrent[i] == nil {
+						continue
+					}
+					p.SRem(s.key(k, idxCurrent[i].(string)), idStr)
+				}
+				for _, k := range idxAdd {
+					p.SAdd(k, idStr)
+				}
+				return nil
+			})
+			return err
+		}, key)
+		if err == redis.TxFailedErr {
+			return update()
+		}
 		return err
 	}
-	_, err = s.Redis.Pipelined(func(p *redis.Pipeline) error {
-		p.HMSet(key, fieldsSet)
-		p.HDel(key, fieldsDel...)
-		for i, k := range idxDel {
-			if idxCurrent[i] == nil {
-				continue
-			}
-			p.SRem(s.key(k, idxCurrent[i].(string)), idStr)
-		}
-		for k, v := range idxSet {
-			p.SAdd(s.key(k, v), idStr)
-		}
-		return nil
-	})
-	return err
+	return update()
 }
 
 type stringInterfaceMapCmd struct {
@@ -247,41 +274,53 @@ func (s *Store) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[
 		return nil, err
 	}
 
-	ids, err := s.Redis.SInter(keys...).Result()
-	if err != nil {
-		return nil, err
-	}
-	if len(ids) == 0 {
-		return map[store.PrimaryKey]map[string]interface{}{}, nil
-	}
-
-	cmds := make(map[ulid.ULID]*stringInterfaceMapCmd, len(ids))
-	// Executing a pipeline with no commands throws an error
-	_, err = s.Redis.Pipelined(func(p *redis.Pipeline) error {
-		for _, str := range ids {
-			id, err := ulid.Parse(str)
+	var (
+		out  map[store.PrimaryKey]map[string]interface{}
+		find func() error
+	)
+	find = func() error {
+		err := s.Redis.Watch(func(tx *redis.Tx) error {
+			ids, err := tx.SInter(keys...).Result()
 			if err != nil {
-				return errors.NewWithCause(fmt.Sprintf("pkg/store/redis: failed to parse %s as ULID, database inconsistent", str), err)
+				return err
 			}
-			cmds[id] = newStringInterfaceMapCmd(p.HGetAll(s.key(str)))
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
+			if len(ids) == 0 {
+				out = map[store.PrimaryKey]map[string]interface{}{}
+				return nil
+			}
 
-	out := make(map[store.PrimaryKey]map[string]interface{}, len(cmds))
-	for id, cmd := range cmds {
-		m, err := cmd.Result()
-		if err != nil {
-			return nil, err
-		}
-		if len(m) == 0 {
-			continue
-		}
-		out[id] = m
-	}
+			cmds := make(map[ulid.ULID]*stringInterfaceMapCmd, len(ids))
+			_, err = tx.Pipelined(func(p *redis.Pipeline) error {
+				for _, str := range ids {
+					id, err := ulid.Parse(str)
+					if err != nil {
+						return errors.NewWithCause(fmt.Sprintf("pkg/store/redis: failed to parse %s as ULID, database inconsistent", str), err)
+					}
+					cmds[id] = newStringInterfaceMapCmd(p.HGetAll(s.key(str)))
+				}
+				return nil
+			})
+			if err != nil {
+				return err
+			}
 
-	return out, nil
+			out = make(map[store.PrimaryKey]map[string]interface{}, len(cmds))
+			for id, cmd := range cmds {
+				m, err := cmd.Result()
+				if err != nil {
+					return err
+				}
+				if len(m) == 0 {
+					continue
+				}
+				out[id] = m
+			}
+			return nil
+		}, keys...)
+		if err == redis.TxFailedErr {
+			return find()
+		}
+		return err
+	}
+	return out, find()
 }
