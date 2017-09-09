@@ -57,7 +57,11 @@ func TestStore(t testingT, v store.Interface) {
 		"bar": "bar",
 	})
 	a.So(err, should.BeNil)
-	a.So(matches, should.HaveLength, 1)
+	if a.So(matches, should.HaveLength, 1) {
+		for _, m := range matches {
+			a.So(m, should.Resemble, new)
+		}
+	}
 
 	matches, err = v.FindBy(map[string]interface{}{
 		"foo": "foo",
