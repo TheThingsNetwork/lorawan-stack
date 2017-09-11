@@ -116,6 +116,9 @@ func (db *DB) NamedExec(query string, arg interface{}) (sql.Result, error) {
 		return nil, wrap(err)
 	}
 	res, err := nstmt.ExecContext(db.context, arg)
+	if err := nstmt.Close(); err != nil {
+		return *new(sql.Result), err
+	}
 	return res, wrap(err)
 }
 
@@ -125,7 +128,11 @@ func (db *DB) NamedSelectOne(dest interface{}, query string, arg interface{}) er
 	if err != nil {
 		return wrap(err)
 	}
-	return namedSelectOne(db.context, nstmt, dest, arg)
+	err = namedSelectOne(db.context, nstmt, dest, arg)
+	if err := nstmt.Close(); err != nil {
+		return err
+	}
+	return err
 }
 
 // NamedSelect implements QueryContext
@@ -134,7 +141,11 @@ func (db *DB) NamedSelect(dest interface{}, query string, arg interface{}) error
 	if err != nil {
 		return wrap(err)
 	}
-	return namedSelectAll(db.context, nstmt, dest, arg)
+	err = namedSelectAll(db.context, nstmt, dest, arg)
+	if err := nstmt.Close(); err != nil {
+		return err
+	}
+	return err
 }
 
 func namedSelectOne(context context.Context, nstmt *sqlx.NamedStmt, dest, arg interface{}) error {
@@ -147,7 +158,6 @@ func namedSelectOne(context context.Context, nstmt *sqlx.NamedStmt, dest, arg in
 	default:
 		err = nstmt.GetContext(context, dest, arg)
 	}
-
 	return wrap(err)
 }
 
@@ -228,7 +238,7 @@ type Tx struct {
 
 // NamedExec implements QueryContext
 func (tx *Tx) NamedExec(query string, arg interface{}) (sql.Result, error) {
-	res, err := tx.tx.NamedExec(query, arg)
+	res, err := tx.tx.NamedExecContext(tx.context, query, arg)
 	return res, wrap(err)
 }
 
@@ -238,7 +248,11 @@ func (tx *Tx) NamedSelectOne(dest interface{}, query string, arg interface{}) er
 	if err != nil {
 		return wrap(err)
 	}
-	return namedSelectOne(tx.context, nstmt, dest, arg)
+	err = namedSelectOne(tx.context, nstmt, dest, arg)
+	if err := nstmt.Close(); err != nil {
+		return err
+	}
+	return err
 }
 
 // NamedSelect implements QueryContext
@@ -247,7 +261,11 @@ func (tx *Tx) NamedSelect(dest interface{}, query string, arg interface{}) error
 	if err != nil {
 		return wrap(err)
 	}
-	return namedSelectAll(tx.context, nstmt, dest, arg)
+	err = namedSelectAll(tx.context, nstmt, dest, arg)
+	if err := nstmt.Close(); err != nil {
+		return err
+	}
+	return err
 }
 
 // Exec implements QueryContext
