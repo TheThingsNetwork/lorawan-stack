@@ -124,67 +124,12 @@ func (db *DB) NamedExec(query string, arg interface{}) (sql.Result, error) {
 
 // NamedSelectOne implements QueryContext
 func (db *DB) NamedSelectOne(dest interface{}, query string, arg interface{}) error {
-	nstmt, err := db.db.PrepareNamedContext(db.context, query)
-	if err != nil {
-		return wrap(err)
-	}
-	err = namedSelectOne(db.context, nstmt, dest, arg)
-	if err := nstmt.Close(); err != nil {
-		return err
-	}
-	return err
+	return namedSelectOne(db.context, db.db, dest, query, arg)
 }
 
 // NamedSelect implements QueryContext
 func (db *DB) NamedSelect(dest interface{}, query string, arg interface{}) error {
-	nstmt, err := db.db.PrepareNamedContext(db.context, query)
-	if err != nil {
-		return wrap(err)
-	}
-	err = namedSelectAll(db.context, nstmt, dest, arg)
-	if err := nstmt.Close(); err != nil {
-		return err
-	}
-	return err
-}
-
-func namedSelectOne(context context.Context, nstmt *sqlx.NamedStmt, dest, arg interface{}) error {
-	var err error
-	switch v := dest.(type) {
-	case *map[string]interface{}:
-		err = nstmt.QueryRowxContext(context, arg).MapScan(*v)
-	case map[string]interface{}:
-		err = nstmt.QueryRowxContext(context, arg).MapScan(v)
-	default:
-		err = nstmt.GetContext(context, dest, arg)
-	}
-	return wrap(err)
-}
-
-func namedSelectAll(context context.Context, nstmt *sqlx.NamedStmt, dest, arg interface{}) error {
-	var err error
-	switch v := dest.(type) {
-	case *[]map[string]interface{}:
-		rows, err := nstmt.QueryxContext(context, arg)
-		if err != nil {
-			return wrap(err)
-		}
-
-		aggr := make([]map[string]interface{}, 0)
-		for rows.Next() {
-			res := make(map[string]interface{})
-			err = rows.MapScan(res)
-			if err != nil {
-				break
-			}
-			aggr = append(aggr, res)
-		}
-		*v = aggr
-	default:
-		err = nstmt.SelectContext(context, dest, arg)
-	}
-
-	return wrap(err)
+	return namedSelectAll(db.context, db.db, dest, query, arg)
 }
 
 // Exec implements QueryContext
@@ -244,28 +189,12 @@ func (tx *Tx) NamedExec(query string, arg interface{}) (sql.Result, error) {
 
 // NamedSelectOne implements QueryContext
 func (tx *Tx) NamedSelectOne(dest interface{}, query string, arg interface{}) error {
-	nstmt, err := tx.tx.PrepareNamed(query)
-	if err != nil {
-		return wrap(err)
-	}
-	err = namedSelectOne(tx.context, nstmt, dest, arg)
-	if err := nstmt.Close(); err != nil {
-		return err
-	}
-	return err
+	return namedSelectOne(tx.context, tx.tx, dest, query, arg)
 }
 
 // NamedSelect implements QueryContext
 func (tx *Tx) NamedSelect(dest interface{}, query string, arg interface{}) error {
-	nstmt, err := tx.tx.PrepareNamed(query)
-	if err != nil {
-		return wrap(err)
-	}
-	err = namedSelectAll(tx.context, nstmt, dest, arg)
-	if err := nstmt.Close(); err != nil {
-		return err
-	}
-	return err
+	return namedSelectAll(tx.context, tx.tx, dest, query, arg)
 }
 
 // Exec implements QueryContext
@@ -282,6 +211,52 @@ func (tx *Tx) SelectOne(dest interface{}, query string, args ...interface{}) err
 // Select implements QueryContext
 func (tx *Tx) Select(dest interface{}, query string, args ...interface{}) error {
 	return selectAll(tx.context, tx.tx, dest, query, args...)
+}
+
+func namedSelectOne(context context.Context, e sqlx.ExtContext, dest interface{}, query string, arg interface{}) error {
+	var err error
+	rows, err := sqlx.NamedQueryContext(context, e, query, arg)
+	if err != nil {
+		return wrap(err)
+	}
+	defer rows.Close()
+	if rows.Next() {
+		switch v := dest.(type) {
+		case *map[string]interface{}:
+			err = rows.MapScan(*v)
+		case map[string]interface{}:
+			err = rows.MapScan(v)
+		default:
+			err = rows.StructScan(dest)
+		}
+	}
+	return wrap(err)
+}
+
+func namedSelectAll(context context.Context, e sqlx.ExtContext, dest interface{}, query string, arg interface{}) error {
+	var err error
+	rows, err := sqlx.NamedQueryContext(context, e, query, arg)
+	if err != nil {
+		return wrap(err)
+	}
+	defer rows.Close()
+	switch v := dest.(type) {
+	case *[]map[string]interface{}:
+		aggr := make([]map[string]interface{}, 0)
+		for rows.Next() {
+			res := make(map[string]interface{})
+			err = rows.MapScan(res)
+			if err != nil {
+				break
+			}
+			aggr = append(aggr, res)
+		}
+		*v = aggr
+	default:
+		err = rows.StructScan(dest)
+	}
+
+	return wrap(err)
 }
 
 // selectOne selects one item from the database and writes it to dest, which can
@@ -310,6 +285,7 @@ func selectAll(context context.Context, q sqlx.QueryerContext, dest interface{},
 		if err != nil {
 			return wrap(err)
 		}
+		defer rows.Close()
 
 		aggr := make([]map[string]interface{}, 0)
 		for rows.Next() {
