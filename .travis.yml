@@ -17,6 +17,7 @@ install:
 - go get -u github.com/dgrijalva/jwt-go
 before_script:
 - docker run -d -p 127.0.0.1:6379:6379 redis
+- docker run -d -p 127.0.0.1:26257:26257 cockroachdb/cockroach:v1.0.5 start --insecure
 script:
 - make test
 - make go.vet
