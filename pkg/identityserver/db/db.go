@@ -225,7 +225,7 @@ func (db *DB) Transact(fn func(*Tx) error, options ...TxOption) error {
 		context: db.context,
 	}
 
-	return wrap(crdb.ExecuteInTx(db.context, txx, func() error {
+	return wrap(crdb.ExecuteInTx(tx.context, txx, func() error {
 		return fn(tx)
 	}))
 }
