@@ -43,19 +43,20 @@ type QueryContext interface {
 	Select(dest interface{}, query string, args ...interface{}) error
 }
 
-// Migrator is the interface that provides methods to apply migrations
-// to a database
+// Migrator is the interface that provides methods to manage the database schema
+// through incremental but also reversible migrations.
 type Migrator interface {
-	// Migrate executes all the unapplied migrations both ways forwards or
-	// backwards until reach the target migration
+	// Migrate applies migrations  forwards or backwards until the target
+	// migration is reached.
 	Migrate(target int) error
 
-	// MigrateAll executes forwards all unapplied migrations
+	// MigrateAll applies all migrations forwards until the final migration is
+	// reached.
 	MigrateAll() error
 }
 
-// Database is the interface of an sql database, it can run global queries or start a
-// transaction.
+// Database is the interface of an sql database, it can run global queries or
+// start a transaction.
 type Database interface {
 	Migrator
 
