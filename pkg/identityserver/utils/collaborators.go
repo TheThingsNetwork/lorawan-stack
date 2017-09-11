@@ -6,9 +6,8 @@ import "github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 
 // Collaborator is a helper to construct a collaborator type
 func Collaborator(username string, rights []types.Right) types.Collaborator {
-	c := types.Collaborator{
+	return types.Collaborator{
 		Username: username,
 		Rights:   rights,
 	}
-	return c
 }
