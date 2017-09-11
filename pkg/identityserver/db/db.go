@@ -76,7 +76,7 @@ type DB struct {
 }
 
 // Open opens a new database connection to the specified address.
-func Open(context context.Context, address string) (*DB, error) {
+func Open(context context.Context, address string, migrations migrations.Registry) (*DB, error) {
 	db, err := sqlx.Open("postgres", address)
 	if err != nil {
 		return nil, err
@@ -88,8 +88,9 @@ func Open(context context.Context, address string) (*DB, error) {
 	}
 
 	return &DB{
-		db:      db,
-		context: context,
+		db:         db,
+		context:    context,
+		migrations: migrations,
 	}, nil
 }
 
@@ -106,12 +107,6 @@ func (db *DB) WithContext(context context.Context) *DB {
 		context:    context,
 		migrations: db.migrations,
 	}
-}
-
-// WithMigrationsRegistry attach to this database instance a given migrations
-// registry that will be used
-func (db *DB) WithMigrationsRegistry(registry migrations.Registry) {
-	db.migrations = registry
 }
 
 // NamedExec implements QueryContext

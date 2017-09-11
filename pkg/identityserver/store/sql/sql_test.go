@@ -30,13 +30,13 @@ func testStore() *Store {
 
 func cleanStore(database string) *Store {
 	// open database connection
-	db, err := db.Open(context.Background(), fmt.Sprintf(address, database))
+	db, err := db.Open(
+		context.Background(),
+		fmt.Sprintf(address, database),
+		migrations.Registry)
 	if err != nil {
 		panic(err)
 	}
-
-	// set the migrations registry from this store
-	db.WithMigrationsRegistry(migrations.Registry)
 
 	// drop database
 	_, err = db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s", database))

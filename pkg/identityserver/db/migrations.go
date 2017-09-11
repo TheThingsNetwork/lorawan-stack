@@ -3,13 +3,10 @@
 package db
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db/migrations"
 )
-
-var errMigrationsRegistryNotSet = errors.New("identityserver/server/db: no migrations registry has been attached to the database instance")
 
 func errMigrationDoesNotExist(order int) error {
 	return fmt.Errorf("identityserver/server/db: migration with order `%d` does not exist", order)
@@ -81,9 +78,6 @@ func (db *DB) logAppliedMigration(order int, name string, direction migrations.D
 
 // Migrate migrates the database to a target migration. Implements Migrator interface
 func (db *DB) Migrate(target int) error {
-	if db.migrations == nil {
-		return errMigrationsRegistryNotSet
-	}
 	current, err := db.currentState()
 	if err != nil {
 		return err

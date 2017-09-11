@@ -20,12 +20,10 @@ type Store struct {
 // Open opens and returns a reference to a new SQL datastore or an error if
 // opening the connection failed
 func Open(address string) (*Store, error) {
-	db, err := db.Open(context.Background(), address)
+	db, err := db.Open(context.Background(), address, migrations.Registry)
 	if err != nil {
 		return nil, err
 	}
-
-	db.WithMigrationsRegistry(migrations.Registry)
 
 	return FromDB(db)
 }
