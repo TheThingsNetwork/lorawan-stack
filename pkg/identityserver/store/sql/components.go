@@ -13,35 +13,35 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 )
 
-// ComponentStore implements store.ComponentStore
+// ComponentStore implements store.ComponentStore.
 type ComponentStore struct {
 	*Store
 	factory factory.ComponentFactory
 }
 
 // ErrComponentNotFound is returned when trying to fetch a component that
-// does not exist
+// does not exist.
 var ErrComponentNotFound = errors.New("component not found")
 
 // ErrComponentIDTaken is returned when trying to create a new component with
-// an ID that already exists
+// an ID that already exists.
 var ErrComponentIDTaken = errors.New("component ID already taken")
 
 // ErrComponentCollaboratorNotFound is returned when trying to remove a collaborator
-// that does not exist
+// that does not exist.
 var ErrComponentCollaboratorNotFound = errors.New("component collaborator not found")
 
 // ErrComponentCollaboratorRightNotFound is returned when trying to revoke a right
-// from a collaborator that is not granted
+// from a collaborator that is not granted.
 var ErrComponentCollaboratorRightNotFound = errors.New("component collaborator right not found")
 
-// SetFactory replaces the factory
+// SetFactory replaces the factory.
 func (s *ComponentStore) SetFactory(factory factory.ComponentFactory) {
 	s.factory = factory
 }
 
 // LoadAttributes loads the component attributes into result if it is an
-// ComponentAttributer
+// ComponentAttributer.
 func (s *ComponentStore) LoadAttributes(component types.Component) error {
 	return s.db.Transact(func(tx *db.Tx) error {
 		return s.loadAttributes(tx, component)
@@ -73,7 +73,7 @@ func (s *ComponentStore) loadAttributes(q db.QueryContext, component types.Compo
 	return nil
 }
 
-// WriteAttributes writes the component attributes into result if it is an ComponentAttributer
+// WriteAttributes writes the component attributes into result if it is an ComponentAttributer.
 func (s *ComponentStore) WriteAttributes(component, result types.Component) error {
 	return s.db.Transact(func(tx *db.Tx) error {
 		return s.writeAttributes(tx, component, result)
@@ -106,7 +106,7 @@ func (s *ComponentStore) writeAttributes(q db.QueryContext, component, result ty
 	return nil
 }
 
-// FindByID finds the component by its ID
+// FindByID finds the component by its ID.
 func (s *ComponentStore) FindByID(componentID string) (types.Component, error) {
 	result := s.factory.Component()
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -126,7 +126,7 @@ func (s *ComponentStore) component(q db.QueryContext, componentID string, result
 	return s.loadAttributes(q, result)
 }
 
-// FindByUser returns the components to which a user is a collaborator
+// FindByUser returns the components to which a user is a collaborator.
 func (s *ComponentStore) FindByUser(username string) ([]types.Component, error) {
 	var components []types.Component
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -157,7 +157,7 @@ func (s *ComponentStore) userComponents(q db.QueryContext, username string, resu
 	return nil
 }
 
-// Create creates a new component and returns the resulting component
+// Create creates a new component and returns the resulting component.
 func (s *ComponentStore) Create(component types.Component) (types.Component, error) {
 	result := s.factory.Component()
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -184,7 +184,7 @@ func (s *ComponentStore) create(q db.QueryContext, component, result types.Compo
 	return s.writeAttributes(q, component, nil)
 }
 
-// Update udpates a component and returns the resulting component
+// Update udpates a component and returns the resulting component.
 func (s *ComponentStore) Update(component types.Component) (types.Component, error) {
 	result := s.factory.Component()
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -207,7 +207,7 @@ func (s *ComponentStore) update(q db.QueryContext, component, result types.Compo
 	return s.writeAttributes(q, component, nil)
 }
 
-// Delete deletes a component
+// Delete deletes a component.
 func (s *ComponentStore) Delete(componentID string) error {
 	// Note: ON DELETE CASCADE is not supported yet but will be soon
 	// https://github.com/cockroachdb/cockroach/issues/14848
@@ -246,7 +246,7 @@ func (s *ComponentStore) delete(q db.QueryContext, componentID string) error {
 	return nil
 }
 
-// Collaborators returns the list of collaborators to a given component
+// Collaborators returns the list of collaborators to a given component.
 func (s *ComponentStore) Collaborators(componentID string) ([]types.Collaborator, error) {
 	return s.collaborators(s.db, componentID)
 }
@@ -287,7 +287,7 @@ func (s *ComponentStore) collaborators(q db.QueryContext, componentID string) ([
 	return result, nil
 }
 
-// AddCollaborator adds a new collaborator to a component
+// AddCollaborator adds a new collaborator to a component.
 func (s *ComponentStore) AddCollaborator(componentID string, collaborator types.Collaborator) error {
 	err := s.db.Transact(func(tx *db.Tx) error {
 		return s.addCollaborator(tx, componentID, collaborator)
@@ -305,7 +305,7 @@ func (s *ComponentStore) addCollaborator(q db.QueryContext, componentID string, 
 	return nil
 }
 
-// GrantRight grants a right to a specific user in a given component
+// GrantRight grants a right to a specific user in a given component.
 func (s *ComponentStore) GrantRight(componentID string, username string, right types.Right) error {
 	return s.grantRight(s.db, componentID, username, right)
 }
@@ -323,7 +323,7 @@ func (s *ComponentStore) grantRight(q db.QueryContext, componentID string, usern
 	return err
 }
 
-// RevokeRight revokes a specific right to a specific user in a given component
+// RevokeRight revokes a specific right to a specific user in a given component.
 func (s *ComponentStore) RevokeRight(componentID string, username string, right types.Right) error {
 	return s.revokeRight(s.db, componentID, username, right)
 }
@@ -345,7 +345,7 @@ func (s *ComponentStore) revokeRight(q db.QueryContext, componentID string, user
 	return err
 }
 
-// RemoveCollaborator removes a collaborator of a given component
+// RemoveCollaborator removes a collaborator of a given component.
 func (s *ComponentStore) RemoveCollaborator(componentID string, username string) error {
 	return s.removeCollaborator(s.db, componentID, username)
 }
@@ -366,7 +366,7 @@ func (s *ComponentStore) removeCollaborator(q db.QueryContext, componentID strin
 	return err
 }
 
-// UserRights returns the list of rights that an user has to a given component
+// UserRights returns the list of rights that an user has to a given component.
 func (s *ComponentStore) UserRights(componentID string, username string) ([]types.Right, error) {
 	return s.userRights(s.db, componentID, username)
 }

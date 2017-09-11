@@ -14,42 +14,41 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 )
 
-// ApplicationStore implements store.ApplicationStore
+// ApplicationStore implements store.ApplicationStore.
 type ApplicationStore struct {
 	*Store
 	factory factory.ApplicationFactory
 }
 
 // ErrApplicationNotFound is returned when trying to fetch an application that
-// does not exist
+// does not exist.
 var ErrApplicationNotFound = errors.New("application not found")
 
 // ErrApplicationIDTaken is returned when trying to create a new application
-// with an ID that already exists
+// with an ID that already exists.
 var ErrApplicationIDTaken = errors.New("application ID already taken")
 
-// ErrAppEUINotFound is returned when trying to remove an AppEUI that does not exist
+// ErrAppEUINotFound is returned when trying to remove an AppEUI that does not exist.
 var ErrAppEUINotFound = errors.New("application EUI not found")
 
 // ErrApplicationAPIKeyNotFound is returned when trying to access or delete
-// an application API key that does not exist
+// an application API key that does not exist.
 var ErrApplicationAPIKeyNotFound = errors.New("application API key not found")
 
 // ErrApplicationCollaboratorNotFound is returned when trying to remove a
-// collaborator that does not exist
+// collaborator that does not exist.
 var ErrApplicationCollaboratorNotFound = errors.New("application collaborator not found")
 
 // ErrApplicationCollaboratorRightNotFound is returned when trying to revoke a
-// right from a collaborator that is not granted
+// right from a collaborator that is not granted.
 var ErrApplicationCollaboratorRightNotFound = errors.New("application collaborator right not found")
 
-// SetFactory replaces the factory
+// SetFactory replaces the factory.
 func (s *ApplicationStore) SetFactory(factory factory.ApplicationFactory) {
 	s.factory = factory
 }
 
-// LoadAttributes loads the applications attributes into result if it is an
-// ApplicationAttributer
+// LoadAttributes loads the applications attributes into result if it is an Attributer.
 func (s *ApplicationStore) LoadAttributes(application types.Application) error {
 	return s.db.Transact(func(tx *db.Tx) error {
 		return s.loadAttributes(tx, application.GetApplication().ID, application)
@@ -82,7 +81,7 @@ func (s *ApplicationStore) loadAttributes(q db.QueryContext, appID string, appli
 	return nil
 }
 
-// WriteAttributes writes the applications attributes into result if it is an ApplicationAttributer
+// WriteAttributes writes the applications attributes into result if it is an Attributer.
 func (s *ApplicationStore) WriteAttributes(application types.Application, result types.Application) error {
 	return s.db.Transact(func(tx *db.Tx) error {
 		return s.writeAttributes(tx, application, result)
@@ -115,7 +114,7 @@ func (s *ApplicationStore) writeAttributes(q db.QueryContext, application, resul
 	return nil
 }
 
-// FindByID finds the application by ID
+// FindByID finds the application by ID.
 func (s *ApplicationStore) FindByID(appID string) (types.Application, error) {
 	result := s.factory.Application()
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -155,7 +154,7 @@ func (s *ApplicationStore) application(q db.QueryContext, appID string, result t
 }
 
 // AppEUIs fetches all application EUIs that belong to the app with the
-// specified appID
+// specified appID.
 func (s *ApplicationStore) AppEUIs(appID string) ([]types.AppEUI, error) {
 	return s.appEUIs(s.db, appID)
 }
@@ -175,7 +174,7 @@ func (s *ApplicationStore) appEUIs(q db.QueryContext, appID string) ([]types.App
 	return appEUIs, nil
 }
 
-// APIKeys gets all api keys that belong to the appID
+// APIKeys gets all api keys that belong to the appID.
 func (s *ApplicationStore) APIKeys(appID string) ([]types.ApplicationAPIKey, error) {
 	return s.apiKeys(s.db, appID)
 }
@@ -219,7 +218,7 @@ func (s *ApplicationStore) apiKeys(q db.QueryContext, appID string) ([]types.App
 	return apiKeys, nil
 }
 
-// FindByUser returns the applications to which an user is a collaborator
+// FindByUser returns the applications to which an user is a collaborator.
 func (s *ApplicationStore) FindByUser(username string) ([]types.Application, error) {
 	var applications []types.Application
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -258,7 +257,7 @@ func (s *ApplicationStore) FindByUser(username string) ([]types.Application, err
 	return applications, err
 }
 
-// userApplications fetches all applications that a given user is collaborator
+// userApplications fetches all applications that a given user is collaborator.
 func (s *ApplicationStore) userApplications(q db.QueryContext, username string) ([]string, error) {
 	var appIDs []string
 	err := q.Select(
@@ -274,7 +273,7 @@ func (s *ApplicationStore) userApplications(q db.QueryContext, username string) 
 	return appIDs, nil
 }
 
-// Create creates a new application and returns the resulting application
+// Create creates a new application and returns the resulting application.
 func (s *ApplicationStore) Create(application types.Application) (types.Application, error) {
 	result := s.factory.Application()
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -329,7 +328,7 @@ func (s *ApplicationStore) create(q db.QueryContext, application, result types.A
 	return s.writeAttributes(q, application, result)
 }
 
-// AddAppEUI adds an eui to the app
+// AddAppEUI adds an eui to the app.
 func (s *ApplicationStore) AddAppEUI(appID string, eui types.AppEUI) error {
 	return s.addAppEUI(s.db, appID, eui)
 }
@@ -346,7 +345,7 @@ func (s *ApplicationStore) addAppEUI(q db.QueryContext, appID string, eui types.
 	return err
 }
 
-// DeleteAppEUI delete an eui to the app
+// DeleteAppEUI delete an eui to the app.
 func (s *ApplicationStore) DeleteAppEUI(appID string, eui types.AppEUI) error {
 	return s.deleteAppEUI(s.db, appID, eui)
 }
@@ -367,7 +366,7 @@ func (s *ApplicationStore) deleteAppEUI(q db.QueryContext, appID string, eui typ
 	return err
 }
 
-// AddApplicationAPIKey adds an api key to the app
+// AddApplicationAPIKey adds an api key to the app.
 func (s *ApplicationStore) AddApplicationAPIKey(appID string, key types.ApplicationAPIKey) error {
 	err := s.db.Transact(func(tx *db.Tx) error {
 		return s.addApplicationAPIKey(tx, appID, key)
@@ -395,7 +394,7 @@ func (s *ApplicationStore) addApplicationAPIKey(q db.QueryContext, appID string,
 	return nil
 }
 
-// DeleteApplicationAPIKey deletes an api key to the app
+// DeleteApplicationAPIKey deletes an api key to the app.
 func (s *ApplicationStore) DeleteApplicationAPIKey(appID string, keyName string) error {
 	err := s.db.Transact(func(tx *db.Tx) error {
 		return s.deleteApplicationAPIKey(tx, appID, keyName)
@@ -419,7 +418,7 @@ func (s *ApplicationStore) deleteApplicationAPIKey(q db.QueryContext, appID stri
 	return err
 }
 
-// Update updates an application and returns the resulting application
+// Update updates an application and returns the resulting application.
 func (s *ApplicationStore) Update(application types.Application) (types.Application, error) {
 	result := s.factory.Application()
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -474,7 +473,7 @@ func (s *ApplicationStore) update(q db.QueryContext, application, result types.A
 	return s.writeAttributes(q, application, result)
 }
 
-// Archive archives an application
+// Archive archives an application.
 func (s *ApplicationStore) Archive(appID string) error {
 	return s.archive(s.db, appID)
 }
@@ -495,7 +494,7 @@ func (s *ApplicationStore) archive(q db.QueryContext, appID string) error {
 	return err
 }
 
-// Collaborators returns the list of collaborators to a given application
+// Collaborators returns the list of collaborators to a given application.
 func (s *ApplicationStore) Collaborators(appID string) ([]types.Collaborator, error) {
 	return s.collaborators(s.db, appID)
 }
@@ -536,7 +535,7 @@ func (s *ApplicationStore) collaborators(q db.QueryContext, appID string) ([]typ
 	return result, nil
 }
 
-// AddCollaborator adds a new collaborator to an application
+// AddCollaborator adds a new collaborator to an application.
 func (s *ApplicationStore) AddCollaborator(appID string, collaborator types.Collaborator) error {
 	err := s.db.Transact(func(tx *db.Tx) error {
 		return s.addCollaborator(tx, appID, collaborator)
@@ -554,7 +553,7 @@ func (s *ApplicationStore) addCollaborator(q db.QueryContext, appID string, coll
 	return nil
 }
 
-// GrantRight grants a right to a specific user in a given application
+// GrantRight grants a right to a specific user in a given application.
 func (s *ApplicationStore) GrantRight(appID string, username string, right types.Right) error {
 	return s.grantRight(s.db, appID, username, right)
 }
@@ -572,7 +571,7 @@ func (s *ApplicationStore) grantRight(q db.QueryContext, appID string, username 
 	return err
 }
 
-// RevokeRight revokes a specific right to a specific user in a given application
+// RevokeRight revokes a specific right to a specific user in a given application.
 func (s *ApplicationStore) RevokeRight(appID string, username string, right types.Right) error {
 	return s.revokeRight(s.db, appID, username, right)
 }
@@ -594,7 +593,7 @@ func (s *ApplicationStore) revokeRight(q db.QueryContext, appID string, username
 	return err
 }
 
-// RemoveCollaborator removes a collaborator of a given application
+// RemoveCollaborator removes a collaborator of a given application.
 func (s *ApplicationStore) RemoveCollaborator(appID string, username string) error {
 	return s.removeCollaborator(s.db, appID, username)
 }
@@ -615,7 +614,7 @@ func (s *ApplicationStore) removeCollaborator(q db.QueryContext, appID string, u
 	return err
 }
 
-// UserRights returns the list of rights that an user has to a given application
+// UserRights returns the list of rights that an user has to a given application.
 func (s *ApplicationStore) UserRights(appID string, username string) ([]types.Right, error) {
 	return s.userRights(s.db, appID, username)
 }

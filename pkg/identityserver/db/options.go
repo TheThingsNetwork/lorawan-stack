@@ -4,10 +4,10 @@ package db
 
 import "database/sql"
 
-// TxOption is a transaction option
+// TxOption is a transaction option.
 type TxOption func(*sql.TxOptions)
 
-// ReadOnly enables/disables read only mode on transactions
+// ReadOnly enables/disables read only mode on transactions.
 func ReadOnly(on bool) TxOption {
 	return func(opts *sql.TxOptions) {
 		// TODO: enable this when Cockroach supports it

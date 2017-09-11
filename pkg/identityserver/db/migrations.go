@@ -60,7 +60,7 @@ func (db *DB) currentState() (int, error) {
 	return last.Order, nil
 }
 
-// logAppliedMigration adds a record in the database about an applied migration
+// logAppliedMigration adds a record in the database about an applied migration.
 func (db *DB) logAppliedMigration(order int, name string, direction migrations.Direction) error {
 	err := db.ensureSchema()
 	if err != nil {
@@ -76,7 +76,7 @@ func (db *DB) logAppliedMigration(order int, name string, direction migrations.D
 	return err
 }
 
-// Migrate migrates the database to a target migration. Implements Migrator interface
+// Migrate migrates the database until reach the target migration.
 func (db *DB) Migrate(target int) error {
 	current, err := db.currentState()
 	if err != nil {
@@ -121,7 +121,7 @@ func (db *DB) Migrate(target int) error {
 	return nil
 }
 
-// MigrateAll applies forwards all unapplied migrations. Implements Migrator interface
+// MigrateAll applies forwards all unapplied migrations.
 func (db *DB) MigrateAll() error {
 	return db.Migrate(db.migrations.Count())
 }

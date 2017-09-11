@@ -10,7 +10,7 @@ import (
 )
 
 // WriteAttributes is a helper that constructs the sql query to write the Attributer
-// attributes of a certain namespace
+// attributes of a certain namespace.
 func WriteAttributes(attributer store.Attributer, namespace, baseTableName, primaryKeyName, id string) (string, []interface{}) {
 	m := attributer.Attributes(namespace)
 	values := make([]interface{}, 0, len(m)+1)

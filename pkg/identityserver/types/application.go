@@ -9,40 +9,40 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 )
 
-// DefaultApplication represents an application on the network
+// DefaultApplication represents an application on the network.
 type DefaultApplication struct {
-	// ID is the unique id of the application
+	// ID is the unique id of the application.
 	ID string `json:"id" db:"id"`
 
-	// Description is the description of the application
+	// Description is the description of the application.
 	Description string `json:"name" db:"description"`
 
-	// EUIs are the app euis this application uses
+	// EUIs are the app euis this application uses.
 	EUIs []AppEUI `json:"euis"`
 
-	// APIKeys are the API keys the application defined
+	// APIKeys are the API keys the application defined.
 	APIKeys []ApplicationAPIKey `json:"api_keys"`
 
-	// Created is the time when the user account was created
+	// Created is the time when the user account was created.
 	Created time.Time `json:"created" db:"created"`
 
-	// Deleted is the time when the user account was deleted
+	// Deleted is the time when the user account was deleted.
 	Archived *time.Time `json:"deleted,omitempty" db:"archived"`
 }
 
 // AppEUI is a type that overloads the base EUI64 type to implemen the sql.Scanner
-// and sql.Valuer interface
+// and sql.Valuer interface.
 type AppEUI types.EUI64
 
-// ApplicationAPIKey represents an API key of an application
+// ApplicationAPIKey represents an API key of an application.
 type ApplicationAPIKey struct {
-	// Name is the API key name
+	// Name is the API key name.
 	Name string `db:"name" json:"name"`
 
-	// Key is the actual API key (base64 encoded)
+	// Key is the actual API key (base64 encoded).
 	Key string `db:"key" json:"key"`
 
-	// Rights are the rights this API key bears
+	// Rights are the rights this API key bears.
 	Rights []Right `json:"rights"`
 }
 
@@ -51,27 +51,27 @@ type ApplicationAPIKey struct {
 // read and written to a database.
 type Application interface {
 	// GetApplication returns the DefaultApplication that represents this
-	// application
+	// application.
 	GetApplication() *DefaultApplication
 
-	// SetEUIs sets the apps EUIs
+	// SetEUIs sets the apps EUIs.
 	SetEUIs([]AppEUI)
 
-	// SetAPIKeys sets the apps APIKeys
+	// SetAPIKeys sets the apps APIKeys.
 	SetAPIKeys([]ApplicationAPIKey)
 }
 
-// GetApplication implements Application
+// GetApplication implements Application.
 func (d *DefaultApplication) GetApplication() *DefaultApplication {
 	return d
 }
 
-// SetEUIs implements Application
+// SetEUIs implements Application.
 func (d *DefaultApplication) SetEUIs(euis []AppEUI) {
 	d.EUIs = euis
 }
 
-// SetAPIKeys implements Application
+// SetAPIKeys implements Application.
 func (d *DefaultApplication) SetAPIKeys(apiKeys []ApplicationAPIKey) {
 	d.APIKeys = apiKeys
 }
@@ -82,7 +82,7 @@ func (e AppEUI) Value() (driver.Value, error) {
 	return eui.MarshalText()
 }
 
-// Scan implements sql.Scanner interface
+// Scan implements sql.Scanner interface.
 func (e *AppEUI) Scan(src interface{}) error {
 	eui := new(types.EUI64)
 	err := eui.UnmarshalText(src.([]byte))

@@ -52,19 +52,19 @@ func wrap(err error) error {
 }
 
 // ErrDuplicate denotes insertion/update of a duplicate value that should be
-// unique
+// unique.
 type ErrDuplicate struct {
 	Message    string
 	Duplicates map[string]string
 }
 
-// Error implments error
+// Error implments error.
 func (e *ErrDuplicate) Error() string {
 	return e.Message
 }
 
 // IsDuplicate returns the name and value of a duplicated field and a bool
-// denoting wether or not the error was caused by a duplicate value
+// denoting wether or not the error was caused by a duplicate value.
 func IsDuplicate(err error) (*ErrDuplicate, bool) {
 	if err == nil {
 		return nil, false
@@ -77,17 +77,17 @@ func IsDuplicate(err error) (*ErrDuplicate, bool) {
 	return nil, false
 }
 
-// IsNoRows returns wether or not the error is an sql.ErrNoRows
+// IsNoRows returns wether or not the error is an sql.ErrNoRows.
 func IsNoRows(err error) bool {
 	return err == sql.ErrNoRows
 }
 
-// ErrUnexpected is an unexpected error
+// ErrUnexpected is an unexpected error.
 type ErrUnexpected struct {
 	Cause error
 }
 
-// Error implmentents error
+// Error implmentents error.
 func (e *ErrUnexpected) Error() string {
 	return e.Cause.Error()
 }

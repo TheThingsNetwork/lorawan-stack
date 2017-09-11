@@ -15,42 +15,42 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/utils"
 )
 
-// GatewayStore implements store.GatewayStore
+// GatewayStore implements store.GatewayStore.
 type GatewayStore struct {
 	*Store
 	factory factory.GatewayFactory
 }
 
-// ErrGatewayNotFound is returned when trying to fetch a gateway that does not exist
+// ErrGatewayNotFound is returned when trying to fetch a gateway that does not exist.
 var ErrGatewayNotFound = errors.New("gateway not found")
 
 // ErrGatewayIDTaken is returned when trying to create a new gateway with an ID
-// that already exists
+// that already exists.
 var ErrGatewayIDTaken = errors.New("gateway ID already taken")
 
 // ErrGatewayAttributeNotFound is returned when trying to delete an attribute
-// that does not exist
+// that does not exist.
 var ErrGatewayAttributeNotFound = errors.New("gateway attribute not found")
 
 // ErrGatewayAntennaNotFound is returned when trying to delete an antenna that
-// does not exist
+// does not exist.
 var ErrGatewayAntennaNotFound = errors.New("gateway antenna not found")
 
 // ErrGatewayCollaboratorNotFound is returned when trying to remove a
-// collaborator that does not exist
+// collaborator that does not exist.
 var ErrGatewayCollaboratorNotFound = errors.New("gateway collaborator not found")
 
 // ErrGatewayCollaboratorRightNotFound is returned when trying to revoke a
-// right from a collaborator that is not granted
+// right from a collaborator that is not granted.
 var ErrGatewayCollaboratorRightNotFound = errors.New("gateway collaborator right not found")
 
-// SetFactory replaces the factory
+// SetFactory replaces the factory.
 func (s *GatewayStore) SetFactory(factory factory.GatewayFactory) {
 	s.factory = factory
 }
 
 // LoadAttributes loads the gateways attributes into result if it is an
-// Attributer
+// Attributer.
 func (s *GatewayStore) LoadAttributes(gateway types.Gateway) error {
 	return s.db.Transact(func(tx *db.Tx) error {
 		return s.loadAttributes(tx, gateway.GetGateway().ID, gateway)
@@ -83,7 +83,7 @@ func (s *GatewayStore) loadAttributes(q db.QueryContext, gtwID string, gateway t
 	return nil
 }
 
-// WriteAttributes writes the gateways attributes into result if it is an gatewayAttributer
+// WriteAttributes writes the gateways attributes into result if it is an gatewayAttributer.
 func (s *GatewayStore) WriteAttributes(gateway types.Gateway, result types.Gateway) error {
 	return s.db.Transact(func(tx *db.Tx) error {
 		return s.writeAttributes(tx, gateway.GetGateway().ID, gateway, result)
@@ -116,7 +116,7 @@ func (s *GatewayStore) writeAttributes(q db.QueryContext, gtwID string, gateway 
 	return nil
 }
 
-// FindByID finds the gateway by ID
+// FindByID finds the gateway by ID.
 func (s *GatewayStore) FindByID(gtwID string) (types.Gateway, error) {
 	result := s.factory.Gateway()
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -150,7 +150,7 @@ func (s *GatewayStore) gateway(q db.QueryContext, gtwID string, result types.Gat
 	return err
 }
 
-// Attributes returns the gateway attributes in a map
+// Attributes returns the gateway attributes in a map.
 func (s *GatewayStore) Attributes(q db.QueryContext, gtwID string) (map[string]string, error) {
 	return s.attributes(s.db, gtwID)
 }
@@ -179,7 +179,7 @@ func (s *GatewayStore) attributes(q db.QueryContext, gtwID string) (map[string]s
 	return result, nil
 }
 
-// UpsertAttribute inserts or modifies an existing attribute
+// UpsertAttribute inserts or modifies an existing attribute.
 func (s *GatewayStore) UpsertAttribute(gtwID string, attribute, value string) error {
 	return s.upsertAttribute(s.db, gtwID, attribute, value)
 }
@@ -198,7 +198,7 @@ func (s *GatewayStore) upsertAttribute(q db.QueryContext, gtwID string, attribut
 	return err
 }
 
-// DeleteAttribute deletes an attribute
+// DeleteAttribute deletes an attribute.
 func (s *GatewayStore) DeleteAttribute(gtwID string, attribute string) error {
 	return s.deleteAttribute(s.db, gtwID, attribute)
 }
@@ -219,7 +219,7 @@ func (s *GatewayStore) deleteAttribute(q db.QueryContext, gtwID string, attribut
 	return err
 }
 
-// Antennas fetches all the registered antennas that belongs to a certain gateway
+// Antennas fetches all the registered antennas that belongs to a certain gateway.
 func (s *GatewayStore) Antennas(gtwID string) ([]types.GatewayAntenna, error) {
 	return s.antennas(s.db, gtwID)
 }
@@ -255,7 +255,7 @@ func (s *GatewayStore) antennas(q db.QueryContext, gtwID string) ([]types.Gatewa
 	return result, nil
 }
 
-// UpsertAntenna inserts or modifies an antenna to a certain gateway
+// UpsertAntenna inserts or modifies an antenna to a certain gateway.
 func (s *GatewayStore) UpsertAntenna(gtwID string, antenna types.GatewayAntenna) error {
 	return s.upsertAntenna(s.db, gtwID, antenna)
 }
@@ -295,7 +295,7 @@ func (s *GatewayStore) upsertAntenna(q db.QueryContext, gtwID string, antenna ty
 	return err
 }
 
-// DeleteAntenna deletes an antenna from a gateway
+// DeleteAntenna deletes an antenna from a gateway.
 func (s *GatewayStore) DeleteAntenna(gtwID, antennaID string) error {
 	return s.deleteAntenna(s.db, gtwID, antennaID)
 }
@@ -316,7 +316,7 @@ func (s *GatewayStore) deleteAntenna(q db.QueryContext, gtwID, antennaID string)
 	return err
 }
 
-// FindByUser returns the gateways to which an user is a collaborator
+// FindByUser returns the gateways to which an user is a collaborator.
 func (s *GatewayStore) FindByUser(username string) ([]types.Gateway, error) {
 	var gateways []types.Gateway
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -356,7 +356,7 @@ func (s *GatewayStore) userGateways(q db.QueryContext, username string, result *
 	return nil
 }
 
-// Create creates a new gateway and returns the resulting gateway
+// Create creates a new gateway and returns the resulting gateway.
 func (s *GatewayStore) Create(gateway types.Gateway) (types.Gateway, error) {
 	result := s.factory.Gateway()
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -414,7 +414,7 @@ func (s *GatewayStore) create(q db.QueryContext, gateway types.Gateway, result t
 	return s.writeAttributes(q, gtw.ID, gateway, result)
 }
 
-// Update updates a gateway and returns the updated version
+// Update updates a gateway and returns the updated version.
 func (s *GatewayStore) Update(gateway types.Gateway) (types.Gateway, error) {
 	result := s.factory.Gateway()
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -471,7 +471,7 @@ func (s *GatewayStore) update(q db.QueryContext, gateway, result types.Gateway) 
 	return s.writeAttributes(q, gtw.ID, gateway, result)
 }
 
-// Archive archives a gateway
+// Archive archives a gateway.
 func (s *GatewayStore) Archive(gtwID string) error {
 	return s.archive(s.db, gtwID)
 }
@@ -492,7 +492,7 @@ func (s *GatewayStore) archive(q db.QueryContext, gtwID string) error {
 	return err
 }
 
-// Owners returns a list of users who have owners rights to a given gateway
+// Owners returns a list of users who have owners rights to a given gateway.
 func (s *GatewayStore) Owners(gtwID string) ([]string, error) {
 	return s.owners(s.db, gtwID)
 }
@@ -512,7 +512,7 @@ func (s *GatewayStore) owners(q db.QueryContext, gtwID string) ([]string, error)
 	return owners, nil
 }
 
-// Collaborators returns the list of collaborators to a given gateway
+// Collaborators returns the list of collaborators to a given gateway.
 func (s *GatewayStore) Collaborators(gtwID string) ([]types.Collaborator, error) {
 	return s.collaborators(s.db, gtwID)
 }
@@ -553,7 +553,7 @@ func (s *GatewayStore) collaborators(q db.QueryContext, gtwID string) ([]types.C
 	return result, nil
 }
 
-// AddCollaborator adds a new collaborator to a given gateway
+// AddCollaborator adds a new collaborator to a given gateway.
 func (s *GatewayStore) AddCollaborator(gtwID string, collaborator types.Collaborator) error {
 	err := s.db.Transact(func(tx *db.Tx) error {
 		return s.addCollaborator(tx, gtwID, collaborator)
@@ -571,7 +571,7 @@ func (s *GatewayStore) addCollaborator(q db.QueryContext, gtwID string, collabor
 	return nil
 }
 
-// GrantRight grants a right to a specific user in a given gateway
+// GrantRight grants a right to a specific user in a given gateway.
 func (s *GatewayStore) GrantRight(gtwID string, username string, right types.Right) error {
 	return s.grantRight(s.db, gtwID, username, right)
 }
@@ -589,7 +589,7 @@ func (s *GatewayStore) grantRight(q db.QueryContext, gtwID string, username stri
 	return err
 }
 
-// RevokeRight revokes a specific right to a specific user in a given gateway
+// RevokeRight revokes a specific right to a specific user in a given gateway.
 func (s *GatewayStore) RevokeRight(gtwID string, username string, right types.Right) error {
 	return s.revokeRight(s.db, gtwID, username, right)
 }
@@ -611,7 +611,7 @@ func (s *GatewayStore) revokeRight(q db.QueryContext, gtwID string, username str
 	return err
 }
 
-// RemoveCollaborator removes a collaborator of a given gateway
+// RemoveCollaborator removes a collaborator of a given gateway.
 func (s *GatewayStore) RemoveCollaborator(gtwID string, username string) error {
 	return s.removeCollaborator(s.db, gtwID, username)
 }
@@ -632,7 +632,7 @@ func (s *GatewayStore) removeCollaborator(q db.QueryContext, gtwID string, usern
 	return err
 }
 
-// UserRights returns the list of rights that an user has to a given gateway
+// UserRights returns the list of rights that an user has to a given gateway.
 func (s *GatewayStore) UserRights(gtwID string, username string) ([]types.Right, error) {
 	return s.userRights(s.db, gtwID, username)
 }

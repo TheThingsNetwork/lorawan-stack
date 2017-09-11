@@ -15,34 +15,34 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 )
 
-// UserStore implements store.UserStore
+// UserStore implements store.UserStore.
 type UserStore struct {
 	*Store
 	factory factory.UserFactory
 }
 
-// ErrUserNotFound is returned when trying to fetch an user that does not exist
+// ErrUserNotFound is returned when trying to fetch an user that does not exist.
 var ErrUserNotFound = errors.New("user not found")
 
 // ErrUserEmailNotFound is returned when trying to find an user with an email
-// that does not exist
+// that does not exist.
 var ErrUserEmailNotFound = errors.New("user email not found")
 
 // ErrUsernameTaken is returned when trying to create a new user with an
-// username that already exists
+// username that already exists.
 var ErrUsernameTaken = errors.New("username already taken")
 
 // ErrUserEmailTaken is returned when trying to create a new user with an
-// email that already exists
+// email that already exists.
 var ErrUserEmailTaken = errors.New("email already taken")
 
-// SetFactory replaces the factory
+// SetFactory replaces the factory.
 func (s *UserStore) SetFactory(factory factory.UserFactory) {
 	s.factory = factory
 }
 
 // LoadAttributes loads attributes for the user with the specified userID if
-// it is an Attributer
+// it is an Attributer.
 func (s *UserStore) LoadAttributes(username string, user types.User) error {
 	return s.db.Transact(func(tx *db.Tx) error {
 		return s.loadAttributes(tx, username, user)
@@ -50,7 +50,7 @@ func (s *UserStore) LoadAttributes(username string, user types.User) error {
 }
 
 // loadAttributes loads extra attributes into a user in a given db.QueryContext
-// context
+// context.
 func (s *UserStore) loadAttributes(q db.QueryContext, username string, user types.User) error {
 	attr, ok := user.(store.Attributer)
 	if !ok {
@@ -82,7 +82,7 @@ func (s *UserStore) loadAttributes(q db.QueryContext, username string, user type
 }
 
 // WriteAttributes writes all of the user attributes if the user is an
-// Attributer and returns the written user in result
+// Attributer and returns the written user in result.
 func (s *UserStore) WriteAttributes(user types.User, result types.User) error {
 	return s.db.Transact(func(tx *db.Tx) error {
 		return s.writeAttributes(tx, user.GetUser().Username, user, result)
@@ -90,7 +90,7 @@ func (s *UserStore) WriteAttributes(user types.User, result types.User) error {
 }
 
 // writeAttributes writes all of the users attributes to their respective
-// tables in a given db.QueryContext context
+// tables in a given db.QueryContext context.
 func (s *UserStore) writeAttributes(q db.QueryContext, username string, user types.User, res types.User) error {
 	attr, ok := user.(store.Attributer)
 	if !ok {
@@ -117,7 +117,7 @@ func (s *UserStore) writeAttributes(q db.QueryContext, username string, user typ
 	return nil
 }
 
-// FindByEmail finds an user by email address
+// FindByEmail finds an user by email address.
 func (s *UserStore) FindByEmail(email string) (types.User, error) {
 	result := s.factory.User()
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -141,7 +141,7 @@ func (s *UserStore) findByEmail(q db.QueryContext, email string, user types.User
 	return s.loadAttributes(q, user.GetUser().Username, user)
 }
 
-// FindByUsername finds an user by username
+// FindByUsername finds an user by username.
 func (s *UserStore) FindByUsername(username string) (types.User, error) {
 	result := s.factory.User()
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -166,7 +166,7 @@ func (s *UserStore) findByUsername(q db.QueryContext, username string, user type
 	return s.loadAttributes(q, user.GetUser().Username, user)
 }
 
-// Create creates a user and returns the new created user
+// Create creates a user and returns the new created user.
 func (s *UserStore) Create(user types.User) (types.User, error) {
 	result := s.factory.User()
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -201,7 +201,7 @@ func (s *UserStore) create(q db.QueryContext, user, result types.User) error {
 	return s.writeAttributes(q, result.GetUser().Username, user, result)
 }
 
-// Update updates an user and returns the updated user
+// Update updates an user and returns the updated user.
 func (s *UserStore) Update(user types.User) (types.User, error) {
 	result := s.factory.User()
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -235,7 +235,7 @@ func (s *UserStore) update(q db.QueryContext, user, result types.User) error {
 	return s.writeAttributes(q, u.Username, user, result)
 }
 
-// Archive archives an user
+// Archive archives an user.
 func (s *UserStore) Archive(username string) error {
 	return s.archive(s.db, username)
 }

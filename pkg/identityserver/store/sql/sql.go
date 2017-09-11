@@ -11,14 +11,14 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
 )
 
-// Store is an SQL data store
+// Store is an SQL data store.
 type Store struct {
 	db *db.DB
 	store.Store
 }
 
 // Open opens and returns a reference to a new SQL datastore or an error if
-// opening the connection failed
+// opening the connection failed.
 func Open(address string) (*Store, error) {
 	db, err := db.Open(context.Background(), address, migrations.Registry)
 	if err != nil {
@@ -28,7 +28,7 @@ func Open(address string) (*Store, error) {
 	return FromDB(db)
 }
 
-// FromDB creates a new Store from an already existing DB
+// FromDB creates a new Store from an already existing DB.
 func FromDB(db *db.DB) (*Store, error) {
 	store := &Store{
 		db: db,
@@ -53,12 +53,12 @@ func (s *Store) WithContext(context context.Context) *Store {
 	return store
 }
 
-// Close closes the connection to the database
+// Close closes the connection to the database.
 func (s *Store) Close() error {
 	return s.db.Close()
 }
 
-// initSubStores initializes all the substores in the provided Store instance
+// initSubStores initializes all the substores.
 func (s *Store) initSubStores() {
 	s.Users = &UserStore{Store: s, factory: factory.DefaultUser{}}
 	s.Applications = &ApplicationStore{Store: s, factory: factory.DefaultApplication{}}

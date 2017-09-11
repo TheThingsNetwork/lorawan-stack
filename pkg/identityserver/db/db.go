@@ -18,7 +18,7 @@ import (
 // Typically this means either the global database scope, or a transaction.
 type QueryContext interface {
 	// NamedExec executes the query in the specified context replacing the
-	// placeholder parameters with fields from arg
+	// placeholder parameters with fields from arg.
 	NamedExec(query string, arg interface{}) (sql.Result, error)
 
 	// NamedSelectOne selects the query replacing the placeholder paramenters
@@ -60,7 +60,7 @@ type Migrator interface {
 type Database interface {
 	Migrator
 
-	// A DB is a QueryContext that performs the queries at the top level
+	// A DB is a QueryContext that performs the queries at the top level.
 	QueryContext
 
 	// Transact begins a transaction and runs the function in it, it returns the
@@ -68,7 +68,7 @@ type Database interface {
 	Transact(func(*Tx) error) error
 }
 
-// DB implments Database
+// DB implements Database.
 type DB struct {
 	db         *sqlx.DB
 	context    context.Context
@@ -94,13 +94,13 @@ func Open(context context.Context, address string, migrations migrations.Registr
 	}, nil
 }
 
-// Close closes the connection to the database
+// Close closes the connection to the database.
 func (db *DB) Close() error {
 	return db.db.Close()
 }
 
 // WithContext returns a new DB with the same migratons registry and with the
-// provided context as base context for all queries and transactions
+// provided context as base context for all queries and transactions.
 func (db *DB) WithContext(context context.Context) *DB {
 	return &DB{
 		db:         db.db,
@@ -109,7 +109,7 @@ func (db *DB) WithContext(context context.Context) *DB {
 	}
 }
 
-// NamedExec implements QueryContext
+// NamedExec implements QueryContext.
 func (db *DB) NamedExec(query string, arg interface{}) (sql.Result, error) {
 	nstmt, err := db.db.PrepareNamedContext(db.context, query)
 	if err != nil {
@@ -122,33 +122,33 @@ func (db *DB) NamedExec(query string, arg interface{}) (sql.Result, error) {
 	return res, wrap(err)
 }
 
-// NamedSelectOne implements QueryContext
+// NamedSelectOne implements QueryContext.
 func (db *DB) NamedSelectOne(dest interface{}, query string, arg interface{}) error {
 	return namedSelectOne(db.context, db.db, dest, query, arg)
 }
 
-// NamedSelect implements QueryContext
+// NamedSelect implements QueryContext.
 func (db *DB) NamedSelect(dest interface{}, query string, arg interface{}) error {
 	return namedSelectAll(db.context, db.db, dest, query, arg)
 }
 
-// Exec implements QueryContext
+// Exec implements QueryContext.
 func (db *DB) Exec(query string, args ...interface{}) (sql.Result, error) {
 	res, err := db.db.ExecContext(db.context, query, args...)
 	return res, wrap(err)
 }
 
-// SelectOne implements QueryContext
+// SelectOne implements QueryContext.
 func (db *DB) SelectOne(dest interface{}, query string, args ...interface{}) error {
 	return selectOne(db.context, db.db, dest, query, args...)
 }
 
-// Select implements QueryContext
+// Select implements QueryContext.
 func (db *DB) Select(dest interface{}, query string, args ...interface{}) error {
 	return selectAll(db.context, db.db, dest, query, args...)
 }
 
-// Transact implements Database
+// Transact implements Database.
 func (db *DB) Transact(fn func(*Tx) error, options ...TxOption) error {
 	opts := &sql.TxOptions{
 		Isolation: sql.LevelSerializable,
@@ -175,40 +175,40 @@ func (db *DB) Transact(fn func(*Tx) error, options ...TxOption) error {
 	}))
 }
 
-// Tx is the type of a transaction
+// Tx is the type of a transaction.
 type Tx struct {
 	tx      *sqlx.Tx
 	context context.Context
 }
 
-// NamedExec implements QueryContext
+// NamedExec implements QueryContext.
 func (tx *Tx) NamedExec(query string, arg interface{}) (sql.Result, error) {
 	res, err := tx.tx.NamedExecContext(tx.context, query, arg)
 	return res, wrap(err)
 }
 
-// NamedSelectOne implements QueryContext
+// NamedSelectOne implements QueryContext.
 func (tx *Tx) NamedSelectOne(dest interface{}, query string, arg interface{}) error {
 	return namedSelectOne(tx.context, tx.tx, dest, query, arg)
 }
 
-// NamedSelect implements QueryContext
+// NamedSelect implements QueryContext.
 func (tx *Tx) NamedSelect(dest interface{}, query string, arg interface{}) error {
 	return namedSelectAll(tx.context, tx.tx, dest, query, arg)
 }
 
-// Exec implements QueryContext
+// Exec implements QueryContext.
 func (tx *Tx) Exec(query string, args ...interface{}) (sql.Result, error) {
 	res, err := tx.tx.Exec(query, args...)
 	return res, wrap(err)
 }
 
-// SelectOne implements QueryContext
+// SelectOne implements QueryContext.
 func (tx *Tx) SelectOne(dest interface{}, query string, args ...interface{}) error {
 	return selectOne(tx.context, tx.tx, dest, query, args...)
 }
 
-// Select implements QueryContext
+// Select implements QueryContext.
 func (tx *Tx) Select(dest interface{}, query string, args ...interface{}) error {
 	return selectAll(tx.context, tx.tx, dest, query, args...)
 }

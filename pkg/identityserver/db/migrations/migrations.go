@@ -4,18 +4,18 @@ package migrations
 
 import "fmt"
 
-// Direction represents whether a migration is forwards or backwards
+// Direction represents whether a migration is forwards or backwards.
 type Direction string
 
 const (
-	// DirectionForwards represents a forwards type migration
+	// DirectionForwards represents a forwards type migration.
 	DirectionForwards Direction = "forwards"
 
-	// DirectionBackwards represents a backwards type migration
+	// DirectionBackwards represents a backwards type migration.
 	DirectionBackwards Direction = "backwards"
 )
 
-// Migration represents a database migration
+// Migration represents a database migration.
 type Migration struct {
 	Order     int
 	Name      string
@@ -23,15 +23,15 @@ type Migration struct {
 	Backwards string
 }
 
-// Registry is the type that holds all migrations indexed by its order
+// Registry is the type that holds all migrations indexed by its order.
 type Registry map[int]*Migration
 
-// NewRegistry builds a new registry
+// NewRegistry builds a new registry.
 func NewRegistry() Registry {
 	return make(Registry)
 }
 
-// Register registers a new migration into the registry
+// Register registers a new migration into the registry.
 func (r Registry) Register(order int, name, forwards, backwards string) {
 	if order < 1 {
 		panic(fmt.Sprintf("identityserver/server/db/migrations: invalid migration order `%d` for migration `%s`. Must be > 0", order, name))
@@ -53,13 +53,13 @@ func (r Registry) Register(order int, name, forwards, backwards string) {
 	}
 }
 
-// Get returns by order a migration of the registry and a bool indicating if it is exists
+// Get returns by order a migration of the registry and a bool indicating if it is exists.
 func (r Registry) Get(order int) (*Migration, bool) {
 	m, exists := r[order]
 	return m, exists
 }
 
-// Count returns how many migrations are registered
+// Count returns how many migrations are registered.
 func (r Registry) Count() int {
 	return len(r)
 }
