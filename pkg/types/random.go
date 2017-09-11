@@ -20,52 +20,59 @@ func randy8(r randy) (b [8]byte) {
 }
 
 // NewPopulatedDevNonce returns a random DevNonce
-func NewPopulatedDevNonce(r randy) (dn DevNonce) {
+func NewPopulatedDevNonce(r randy) *DevNonce {
+	var dn DevNonce
 	r8 := randy8(r)
 	copy(dn[:], r8[:])
-	return
+	return &dn
 }
 
 // NewPopulatedJoinNonce returns a random JoinNonce
-func NewPopulatedJoinNonce(r randy) (jn JoinNonce) {
+func NewPopulatedJoinNonce(r randy) *JoinNonce {
+	var jn JoinNonce
 	r8 := randy8(r)
 	copy(jn[:], r8[:])
-	return
+	return &jn
 }
 
 // NewPopulatedNetID returns a random NetID
-func NewPopulatedNetID(r randy) (id NetID) {
+func NewPopulatedNetID(r randy) *NetID {
+	var id NetID
 	r8 := randy8(r)
 	copy(id[:], r8[:])
-	return
+	return &id
 }
 
 // NewPopulatedDevAddr returns a random DevAddr
-func NewPopulatedDevAddr(r randy) (addr DevAddr) {
+func NewPopulatedDevAddr(r randy) *DevAddr {
+	var addr DevAddr
 	r8 := randy8(r)
 	copy(addr[:], r8[:])
-	return
+	return &addr
 }
 
 // NewPopulatedDevAddrPrefix returns a random DevAddrPrefix
-func NewPopulatedDevAddrPrefix(r randy) (prefix DevAddrPrefix) {
-	prefix.DevAddr = NewPopulatedDevAddr(r)
+func NewPopulatedDevAddrPrefix(r randy) *DevAddrPrefix {
+	var prefix DevAddrPrefix
+	prefix.DevAddr = *NewPopulatedDevAddr(r)
 	prefix.Length = uint8(r.Int63())
-	return
+	return &prefix
 }
 
 // NewPopulatedEUI64 returns a random EUI64
-func NewPopulatedEUI64(r randy) (eui EUI64) {
+func NewPopulatedEUI64(r randy) *EUI64 {
+	var eui EUI64
 	r8 := randy8(r)
 	copy(eui[:], r8[:])
-	return
+	return &eui
 }
 
 // NewPopulatedAES128Key returns a random AES128Key
-func NewPopulatedAES128Key(r randy) (key AES128Key) {
+func NewPopulatedAES128Key(r randy) *AES128Key {
+	var key AES128Key
 	r8a := randy8(r)
 	r8b := randy8(r)
 	copy(key[:8], r8a[:])
 	copy(key[8:], r8b[:])
-	return
+	return &key
 }
