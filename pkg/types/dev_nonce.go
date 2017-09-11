@@ -22,6 +22,9 @@ func (dn DevNonce) GoString() string { return dn.String() }
 // Size implements the Sizer interface
 func (dn DevNonce) Size() int { return 2 }
 
+// Equal returns true iff nonces are equal
+func (dn DevNonce) Equal(other DevNonce) bool { return dn == other }
+
 // MarshalTo implements the proto.MarshalerTo interface
 func (dn DevNonce) MarshalTo(data []byte) (int, error) { return copy(data, dn[:]), nil }
 

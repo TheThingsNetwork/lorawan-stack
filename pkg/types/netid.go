@@ -22,6 +22,9 @@ func (id NetID) GoString() string { return id.String() }
 // Size implements the Sizer interface
 func (id NetID) Size() int { return 3 }
 
+// Equal returns true iff IDs are equal
+func (id NetID) Equal(other NetID) bool { return id == other }
+
 // MarshalTo implements the proto.MarshalerTo interface
 func (id NetID) MarshalTo(data []byte) (int, error) { return copy(data, id[:]), nil }
 

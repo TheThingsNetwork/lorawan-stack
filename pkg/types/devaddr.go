@@ -26,6 +26,9 @@ func (addr DevAddr) GoString() string { return addr.String() }
 // Size implements the Sizer interface
 func (addr DevAddr) Size() int { return 4 }
 
+// Equal returns true iff addresses are equal
+func (addr DevAddr) Equal(other DevAddr) bool { return addr == other }
+
 // MarshalTo implements the proto.MarshalerTo interface
 func (addr DevAddr) MarshalTo(data []byte) (int, error) { return copy(data, addr[:]), nil }
 

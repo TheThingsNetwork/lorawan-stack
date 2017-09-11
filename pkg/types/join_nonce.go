@@ -22,6 +22,9 @@ func (jn JoinNonce) GoString() string { return jn.String() }
 // Size implements the Sizer interface
 func (jn JoinNonce) Size() int { return 3 }
 
+// Equal returns true iff nonces are equal
+func (jn JoinNonce) Equal(other JoinNonce) bool { return jn == other }
+
 // MarshalTo implements the proto.MarshalerTo interface
 func (jn JoinNonce) MarshalTo(data []byte) (int, error) { return copy(data, jn[:]), nil }
 

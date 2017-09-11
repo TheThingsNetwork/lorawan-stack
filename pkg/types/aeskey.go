@@ -22,6 +22,9 @@ func (key AES128Key) GoString() string { return key.String() }
 // Size implements the Sizer interface
 func (key AES128Key) Size() int { return 16 }
 
+// Equal returns true iff keys are equal
+func (key AES128Key) Equal(other AES128Key) bool { return key == other }
+
 // MarshalTo implements the proto.MarshalerTo interface
 func (key AES128Key) MarshalTo(data []byte) (int, error) { return copy(data, key[:]), nil }
 

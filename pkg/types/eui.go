@@ -22,6 +22,9 @@ func (eui EUI64) GoString() string { return eui.String() }
 // Size implements the Sizer interface
 func (eui EUI64) Size() int { return 8 }
 
+// Equal returns true iff EUIs are equal
+func (eui EUI64) Equal(other EUI64) bool { return eui == other }
+
 // MarshalTo implements the proto.MarshalerTo interface
 func (eui EUI64) MarshalTo(data []byte) (int, error) { return copy(data, eui[:]), nil }
 
