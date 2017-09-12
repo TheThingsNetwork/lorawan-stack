@@ -25,35 +25,38 @@ func (key AES128Key) Size() int { return 16 }
 // Equal returns true iff keys are equal
 func (key AES128Key) Equal(other AES128Key) bool { return key == other }
 
-// MarshalTo implements the proto.MarshalerTo interface
-func (key AES128Key) MarshalTo(data []byte) (int, error) { return copy(data, key[:]), nil }
+// Marshal implements the proto.Marshaler interface
+func (key AES128Key) Marshal() ([]byte, error) { return key.MarshalBinary() }
+
+// MarshalTo implements the MarshalerTo function required by generated protobuf
+func (key AES128Key) MarshalTo(data []byte) (int, error) { return marshalBinaryBytesTo(data, key[:]) }
 
 // Unmarshal implements the proto.Unmarshaler interface
-func (key *AES128Key) Unmarshal(data []byte) error {
+func (key *AES128Key) Unmarshal(data []byte) error { return key.UnmarshalBinary(data) }
+
+// MarshalJSON implements the json.Marshaler interface
+func (key AES128Key) MarshalJSON() ([]byte, error) { return marshalJSONBytes(key[:]) }
+
+// UnmarshalJSON implements the json.Unmarshaler interface
+func (key *AES128Key) UnmarshalJSON(data []byte) error {
 	*key = [16]byte{}
-	if len(data) != 16 || copy(key[:], data) != 16 {
-		return ErrInvalidLength
-	}
-	return nil
+	return unmarshalJSONBytes(key[:], data)
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface
-func (key AES128Key) MarshalBinary() ([]byte, error) { return key[:], nil }
+func (key AES128Key) MarshalBinary() ([]byte, error) { return marshalBinaryBytes(key[:]) }
 
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface
-func (key *AES128Key) UnmarshalBinary(data []byte) error { return key.Unmarshal(data) }
+func (key *AES128Key) UnmarshalBinary(data []byte) error {
+	*key = [16]byte{}
+	return unmarshalBinaryBytes(key[:], data)
+}
 
 // MarshalText implements the encoding.TextMarshaler interface
-func (key AES128Key) MarshalText() ([]byte, error) { return []byte(key.String()), nil }
+func (key AES128Key) MarshalText() ([]byte, error) { return marshalTextBytes(key[:]) }
 
 // UnmarshalText implements the encoding.TextUnmarshaler interface
 func (key *AES128Key) UnmarshalText(data []byte) error {
-	if len(data) != 32 {
-		return ErrInvalidLength
-	}
-	_, err := hex.Decode(key[:], data)
-	if err != nil {
-		return err
-	}
-	return nil
+	*key = [16]byte{}
+	return unmarshalTextBytes(key[:], data)
 }

@@ -25,35 +25,38 @@ func (jn JoinNonce) Size() int { return 3 }
 // Equal returns true iff nonces are equal
 func (jn JoinNonce) Equal(other JoinNonce) bool { return jn == other }
 
-// MarshalTo implements the proto.MarshalerTo interface
-func (jn JoinNonce) MarshalTo(data []byte) (int, error) { return copy(data, jn[:]), nil }
+// Marshal implements the proto.Marshaler interface
+func (jn JoinNonce) Marshal() ([]byte, error) { return jn.MarshalBinary() }
+
+// MarshalTo implements the MarshalerTo function required by generated protobuf
+func (jn JoinNonce) MarshalTo(data []byte) (int, error) { return marshalBinaryBytesTo(data, jn[:]) }
 
 // Unmarshal implements the proto.Unmarshaler interface
-func (jn *JoinNonce) Unmarshal(data []byte) error {
+func (jn *JoinNonce) Unmarshal(data []byte) error { return jn.UnmarshalBinary(data) }
+
+// MarshalJSON implements the json.Marshaler interface
+func (jn JoinNonce) MarshalJSON() ([]byte, error) { return marshalJSONBytes(jn[:]) }
+
+// UnmarshalJSON implements the json.Unmarshaler interface
+func (jn *JoinNonce) UnmarshalJSON(data []byte) error {
 	*jn = [3]byte{}
-	if len(data) != 3 || copy(jn[:], data) != 3 {
-		return ErrInvalidLength
-	}
-	return nil
+	return unmarshalJSONBytes(jn[:], data)
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface
-func (jn JoinNonce) MarshalBinary() ([]byte, error) { return jn[:], nil }
+func (jn JoinNonce) MarshalBinary() ([]byte, error) { return marshalBinaryBytes(jn[:]) }
 
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface
-func (jn *JoinNonce) UnmarshalBinary(data []byte) error { return jn.Unmarshal(data) }
+func (jn *JoinNonce) UnmarshalBinary(data []byte) error {
+	*jn = [3]byte{}
+	return unmarshalBinaryBytes(jn[:], data)
+}
 
 // MarshalText implements the encoding.TextMarshaler interface
-func (jn JoinNonce) MarshalText() ([]byte, error) { return []byte(jn.String()), nil }
+func (jn JoinNonce) MarshalText() ([]byte, error) { return marshalTextBytes(jn[:]) }
 
 // UnmarshalText implements the encoding.TextUnmarshaler interface
 func (jn *JoinNonce) UnmarshalText(data []byte) error {
-	if len(data) != 6 {
-		return ErrInvalidLength
-	}
-	_, err := hex.Decode(jn[:], data)
-	if err != nil {
-		return err
-	}
-	return nil
+	*jn = [3]byte{}
+	return unmarshalTextBytes(jn[:], data)
 }

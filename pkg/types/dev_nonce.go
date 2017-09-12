@@ -25,35 +25,38 @@ func (dn DevNonce) Size() int { return 2 }
 // Equal returns true iff nonces are equal
 func (dn DevNonce) Equal(other DevNonce) bool { return dn == other }
 
-// MarshalTo implements the proto.MarshalerTo interface
-func (dn DevNonce) MarshalTo(data []byte) (int, error) { return copy(data, dn[:]), nil }
+// Marshal implements the proto.Marshaler interface
+func (dn DevNonce) Marshal() ([]byte, error) { return dn.MarshalBinary() }
+
+// MarshalTo implements the MarshalerTo function required by generated protobuf
+func (dn DevNonce) MarshalTo(data []byte) (int, error) { return marshalBinaryBytesTo(data, dn[:]) }
 
 // Unmarshal implements the proto.Unmarshaler interface
-func (dn *DevNonce) Unmarshal(data []byte) error {
+func (dn *DevNonce) Unmarshal(data []byte) error { return dn.UnmarshalBinary(data) }
+
+// MarshalJSON implements the json.Marshaler interface
+func (dn DevNonce) MarshalJSON() ([]byte, error) { return marshalJSONBytes(dn[:]) }
+
+// UnmarshalJSON implements the json.Unmarshaler interface
+func (dn *DevNonce) UnmarshalJSON(data []byte) error {
 	*dn = [2]byte{}
-	if len(data) != 2 || copy(dn[:], data) != 2 {
-		return ErrInvalidLength
-	}
-	return nil
+	return unmarshalJSONBytes(dn[:], data)
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface
-func (dn DevNonce) MarshalBinary() ([]byte, error) { return dn[:], nil }
+func (dn DevNonce) MarshalBinary() ([]byte, error) { return marshalBinaryBytes(dn[:]) }
 
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface
-func (dn *DevNonce) UnmarshalBinary(data []byte) error { return dn.Unmarshal(data) }
+func (dn *DevNonce) UnmarshalBinary(data []byte) error {
+	*dn = [2]byte{}
+	return unmarshalBinaryBytes(dn[:], data)
+}
 
 // MarshalText implements the encoding.TextMarshaler interface
-func (dn DevNonce) MarshalText() ([]byte, error) { return []byte(dn.String()), nil }
+func (dn DevNonce) MarshalText() ([]byte, error) { return marshalTextBytes(dn[:]) }
 
 // UnmarshalText implements the encoding.TextUnmarshaler interface
 func (dn *DevNonce) UnmarshalText(data []byte) error {
-	if len(data) != 4 {
-		return ErrInvalidLength
-	}
-	_, err := hex.Decode(dn[:], data)
-	if err != nil {
-		return err
-	}
-	return nil
+	*dn = [2]byte{}
+	return unmarshalTextBytes(dn[:], data)
 }

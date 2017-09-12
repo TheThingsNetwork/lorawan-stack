@@ -25,35 +25,38 @@ func (eui EUI64) Size() int { return 8 }
 // Equal returns true iff EUIs are equal
 func (eui EUI64) Equal(other EUI64) bool { return eui == other }
 
-// MarshalTo implements the proto.MarshalerTo interface
-func (eui EUI64) MarshalTo(data []byte) (int, error) { return copy(data, eui[:]), nil }
+// Marshal implements the proto.Marshaler interface
+func (eui EUI64) Marshal() ([]byte, error) { return eui.MarshalBinary() }
+
+// MarshalTo implements the MarshalerTo function required by generated protobuf
+func (eui EUI64) MarshalTo(data []byte) (int, error) { return marshalBinaryBytesTo(data, eui[:]) }
 
 // Unmarshal implements the proto.Unmarshaler interface
-func (eui *EUI64) Unmarshal(data []byte) error {
+func (eui *EUI64) Unmarshal(data []byte) error { return eui.UnmarshalBinary(data) }
+
+// MarshalJSON implements the json.Marshaler interface
+func (eui EUI64) MarshalJSON() ([]byte, error) { return marshalJSONBytes(eui[:]) }
+
+// UnmarshalJSON implements the json.Unmarshaler interface
+func (eui *EUI64) UnmarshalJSON(data []byte) error {
 	*eui = [8]byte{}
-	if len(data) != 8 || copy(eui[:], data) != 8 {
-		return ErrInvalidLength
-	}
-	return nil
+	return unmarshalJSONBytes(eui[:], data)
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface
-func (eui EUI64) MarshalBinary() ([]byte, error) { return eui[:], nil }
+func (eui EUI64) MarshalBinary() ([]byte, error) { return marshalBinaryBytes(eui[:]) }
 
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface
-func (eui *EUI64) UnmarshalBinary(data []byte) error { return eui.Unmarshal(data) }
+func (eui *EUI64) UnmarshalBinary(data []byte) error {
+	*eui = [8]byte{}
+	return unmarshalBinaryBytes(eui[:], data)
+}
 
 // MarshalText implements the encoding.TextMarshaler interface
-func (eui EUI64) MarshalText() ([]byte, error) { return []byte(eui.String()), nil }
+func (eui EUI64) MarshalText() ([]byte, error) { return marshalTextBytes(eui[:]) }
 
 // UnmarshalText implements the encoding.TextUnmarshaler interface
 func (eui *EUI64) UnmarshalText(data []byte) error {
-	if len(data) != 16 {
-		return ErrInvalidLength
-	}
-	_, err := hex.Decode(eui[:], data)
-	if err != nil {
-		return err
-	}
-	return nil
+	*eui = [8]byte{}
+	return unmarshalTextBytes(eui[:], data)
 }

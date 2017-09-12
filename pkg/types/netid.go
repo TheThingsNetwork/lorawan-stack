@@ -25,37 +25,40 @@ func (id NetID) Size() int { return 3 }
 // Equal returns true iff IDs are equal
 func (id NetID) Equal(other NetID) bool { return id == other }
 
-// MarshalTo implements the proto.MarshalerTo interface
-func (id NetID) MarshalTo(data []byte) (int, error) { return copy(data, id[:]), nil }
+// Marshal implements the proto.Marshaler interface
+func (id NetID) Marshal() ([]byte, error) { return id.MarshalBinary() }
+
+// MarshalTo implements the MarshalerTo function required by generated protobuf
+func (id NetID) MarshalTo(data []byte) (int, error) { return marshalBinaryBytesTo(data, id[:]) }
 
 // Unmarshal implements the proto.Unmarshaler interface
-func (id *NetID) Unmarshal(data []byte) error {
+func (id *NetID) Unmarshal(data []byte) error { return id.UnmarshalBinary(data) }
+
+// MarshalJSON implements the json.Marshaler interface
+func (id NetID) MarshalJSON() ([]byte, error) { return marshalJSONBytes(id[:]) }
+
+// UnmarshalJSON implements the json.Unmarshaler interface
+func (id *NetID) UnmarshalJSON(data []byte) error {
 	*id = [3]byte{}
-	if len(data) != 3 || copy(id[:], data) != 3 {
-		return ErrInvalidLength
-	}
-	return nil
+	return unmarshalJSONBytes(id[:], data)
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface
-func (id NetID) MarshalBinary() ([]byte, error) { return id[:], nil }
+func (id NetID) MarshalBinary() ([]byte, error) { return marshalBinaryBytes(id[:]) }
 
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface
-func (id *NetID) UnmarshalBinary(data []byte) error { return id.Unmarshal(data) }
+func (id *NetID) UnmarshalBinary(data []byte) error {
+	*id = [3]byte{}
+	return unmarshalBinaryBytes(id[:], data)
+}
 
 // MarshalText implements the encoding.TextMarshaler interface
-func (id NetID) MarshalText() ([]byte, error) { return []byte(id.String()), nil }
+func (id NetID) MarshalText() ([]byte, error) { return marshalTextBytes(id[:]) }
 
 // UnmarshalText implements the encoding.TextUnmarshaler interface
 func (id *NetID) UnmarshalText(data []byte) error {
-	if len(data) != 6 {
-		return ErrInvalidLength
-	}
-	_, err := hex.Decode(id[:], data)
-	if err != nil {
-		return err
-	}
-	return nil
+	*id = [3]byte{}
+	return unmarshalTextBytes(id[:], data)
 }
 
 // NwkID contained in the NetID
