@@ -58,8 +58,6 @@ type Migrator interface {
 // Database is the interface of an sql database, it can run global queries or
 // start a transaction.
 type Database interface {
-	Migrator
-
 	// A DB is a QueryContext that performs the queries at the top level.
 	QueryContext
 
