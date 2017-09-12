@@ -15,41 +15,42 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-func TestManagerRSA(t *testing.T) {
+func TestKeysRSA(t *testing.T) {
 	a := assertions.New(t)
 
-	m := &Manager{}
+	k := &Keys{}
 
 	key, err := rsa.GenerateKey(rand.Reader, 2014)
 	a.So(err, should.BeNil)
 
 	kid := "kid"
 
-	_, err = m.GetPrivateKey(kid)
+	_, err = k.GetPrivateKey(kid)
 	a.So(err, should.NotBeNil)
 
-	_, err = m.GetTokenKey(kid)
+	_, err = k.GetPublicKey(kid)
 	a.So(err, should.NotBeNil)
 
 	// rotate in new key
-	err = m.Rotate(kid, key)
+	err = k.Rotate(kid, key)
 	a.So(err, should.BeNil)
 
-	k, err := m.GetPrivateKey(kid)
+	got, err := k.GetPrivateKey(kid)
 	a.So(err, should.BeNil)
-	a.So(k, should.Equal, key)
+	a.So(got, should.Equal, key)
 
-	gkey, err := m.GetTokenKey(kid)
+	gkey, err := k.GetPublicKey(kid)
 	a.So(err, should.BeNil)
 	a.So(gkey, should.Resemble, gkey)
 
-	err = m.Rotate(kid, key)
+	err = k.Rotate(kid, key)
 	a.So(err, should.NotBeNil)
 }
 
 func TestManagerECDSA(t *testing.T) {
 	a := assertions.New(t)
-	m := &Manager{}
+
+	k := &Keys{}
 
 	key, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	a.So(err, should.BeNil)
@@ -57,25 +58,25 @@ func TestManagerECDSA(t *testing.T) {
 	kid := "kid"
 
 	// no key set, so return not found
-	_, err = m.GetPrivateKey(kid)
+	_, err = k.GetPrivateKey(kid)
 	a.So(err, should.NotBeNil)
 
-	_, err = m.GetTokenKey(kid)
+	_, err = k.GetPublicKey(kid)
 	a.So(err, should.NotBeNil)
 
-	err = m.Rotate(kid, key)
+	err = k.Rotate(kid, key)
 	a.So(err, should.BeNil)
 
-	k, err := m.GetPrivateKey(kid)
+	got, err := k.GetPrivateKey(kid)
 	a.So(err, should.BeNil)
-	a.So(k, should.Equal, key)
+	a.So(got, should.Equal, key)
 
-	gkey, err := m.GetTokenKey(kid)
+	gkey, err := k.GetPublicKey(kid)
 	a.So(err, should.BeNil)
 
 	a.So(gkey, should.Resemble, gkey)
 
-	err = m.Rotate(kid, key)
+	err = k.Rotate(kid, key)
 	a.So(err, should.NotBeNil)
 }
 
@@ -112,11 +113,11 @@ PdrF5e0X8uB76vq60osPk0R+41iZMu6gWcgL/rx5LqtCR9RJBS/vmlrQsKkDtwng
 pfeKo3HLUYMyS8l55ppjahjP4nG2cvuayO/VaHUIJW6VoVn5VDZ4ukM=
 -----END RSA PRIVATE KEY-----
 `)
-	m := &Manager{}
-	err := m.RotateFromPEM(kid, pems)
+	k := &Keys{}
+	err := k.RotateFromPEM(kid, pems)
 	a.So(err, should.BeNil)
 
-	_, err = m.GetTokenKey(kid)
+	_, err = k.GetPublicKey(kid)
 	a.So(err, should.BeNil)
 
 	claims := &Claims{
@@ -132,7 +133,7 @@ pfeKo3HLUYMyS8l55ppjahjP4nG2cvuayO/VaHUIJW6VoVn5VDZ4ukM=
 		},
 	}
 
-	str, err := m.Sign(claims)
+	str, err := k.Sign(claims)
 	a.So(err, should.BeNil)
 	a.So(str, should.NotBeEmpty)
 }

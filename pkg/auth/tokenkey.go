@@ -18,9 +18,9 @@ var (
 
 // TokenKeyProvider can get the public key of tokens, used for JWT validation.
 type TokenKeyProvider interface {
-	// Get returns the public key used by the given identity server. If kid is non-empty it will get the key
+	// Get returns the public key used by the given issuer. If kid is non-empty it will get the key
 	// with that key id.
-	Get(server string, kid string) (crypto.PublicKey, error)
+	Get(issuer string, kid string) (crypto.PublicKey, error)
 }
 
 // ConstProvider is a TokenKeyProvider that can return the token keys it was initialized with.

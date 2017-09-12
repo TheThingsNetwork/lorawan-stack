@@ -19,14 +19,14 @@ import (
 func TestGetTokenKeyRSA(t *testing.T) {
 	a := assertions.New(t)
 
+	keys := new(auth.Keys)
+	server := New(keys)
+
 	key, err := rsa.GenerateKey(rand.Reader, 2014)
 	a.So(err, should.BeNil)
 	kid := "kid"
 
-	manager := &auth.Manager{}
-	server := New(manager)
-
-	err = manager.Rotate(kid, key)
+	err = keys.Rotate(kid, key)
 	a.So(err, should.BeNil)
 
 	resp, err := server.GetTokenKey(context.Background(), &ttnpb.TokenKeyRequest{
@@ -44,14 +44,14 @@ func TestGetTokenKeyRSA(t *testing.T) {
 func TestGetTokenKeyECDSA(t *testing.T) {
 	a := assertions.New(t)
 
+	keys := new(auth.Keys)
+	server := New(keys)
+
 	key, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	a.So(err, should.BeNil)
 	kid := "kid"
 
-	manager := &auth.Manager{}
-	server := New(manager)
-
-	err = manager.Rotate(kid, key)
+	err = keys.Rotate(kid, key)
 	a.So(err, should.BeNil)
 
 	resp, err := server.GetTokenKey(context.Background(), &ttnpb.TokenKeyRequest{

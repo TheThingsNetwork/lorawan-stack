@@ -174,7 +174,7 @@ func (s *ClientStore) update(q db.QueryContext, client types.Client) error {
 	return s.writeAttributes(q, client, nil)
 }
 
-// Archive sets the ArchivedAt field of a client to the current timestamp.
+// Archive disables a Client.
 func (s *ClientStore) Archive(clientID string) error {
 	return s.archive(s.queryer(), clientID)
 }

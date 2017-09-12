@@ -17,20 +17,20 @@ import (
 
 // Server is a gRPC server that can serve public keys for JWT validation.
 type Server struct {
-	manager *auth.Manager
+	keys *auth.Keys
 }
 
 // New returns a new Server, ready for use.
-func New(manager *auth.Manager) *Server {
+func New(keys *auth.Keys) *Server {
 	return &Server{
-		manager: manager,
+		keys: keys,
 	}
 }
 
 // GetTokenKey gets the token public key for with the specified kid.
 func (s *Server) GetTokenKey(ctx context.Context, in *ttnpb.TokenKeyRequest, opts ...grpc.CallOption) (*ttnpb.TokenKeyResponse, error) {
 	kid := in.GetKID()
-	key, err := s.manager.GetTokenKey(kid)
+	key, err := s.keys.GetPublicKey(kid)
 	if err != nil {
 		return nil, err
 	}
