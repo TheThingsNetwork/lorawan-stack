@@ -35,78 +35,34 @@ var ErrComponentCollaboratorNotFound = errors.New("component collaborator not fo
 // from a collaborator that is not granted.
 var ErrComponentCollaboratorRightNotFound = errors.New("component collaborator right not found")
 
-// SetFactory replaces the factory.
-func (s *ComponentStore) SetFactory(factory factory.ComponentFactory) {
-	s.factory = factory
-}
-
-// LoadAttributes loads the component attributes into result if it is an
-// ComponentAttributer.
-func (s *ComponentStore) LoadAttributes(component types.Component) error {
-	return s.db.Transact(func(tx *db.Tx) error {
-		return s.loadAttributes(tx, component)
+// Register creates a new Component and returns the new created Component.
+func (s *ComponentStore) Register(component types.Component) (types.Component, error) {
+	result := s.factory.Component()
+	err := s.db.Transact(func(tx *db.Tx) error {
+		return s.register(tx, component, result)
 	})
+	return result, err
 }
 
-func (s *ComponentStore) loadAttributes(q db.QueryContext, component types.Component) error {
-	attr, ok := component.(store.Attributer)
-	if !ok {
-		return nil
+func (s *ComponentStore) register(q db.QueryContext, component, result types.Component) error {
+	comp := component.GetComponent()
+	err := q.NamedSelectOne(
+		result,
+		"INSERT INTO components (id, type) VALUES (:id, :type) RETURNING *",
+		comp)
+
+	if _, yes := db.IsDuplicate(err); yes {
+		return ErrComponentIDTaken
 	}
 
-	for _, namespace := range attr.Namespaces() {
-		m := make(map[string]interface{})
-		err := q.Select(
-			&m,
-			fmt.Sprintf("SELECT * FROM %s_components WHERE component_id = $1", namespace),
-			component.GetComponent().ID)
-		if err != nil {
-			return err
-		}
-
-		err = attr.Fill(namespace, m)
-		if err != nil {
-			return err
-		}
+	if err != nil {
+		return err
 	}
 
-	return nil
+	return s.writeAttributes(q, component, nil)
 }
 
-// WriteAttributes writes the component attributes into result if it is an ComponentAttributer.
-func (s *ComponentStore) WriteAttributes(component, result types.Component) error {
-	return s.db.Transact(func(tx *db.Tx) error {
-		return s.writeAttributes(tx, component, result)
-	})
-}
-
-func (s *ComponentStore) writeAttributes(q db.QueryContext, component, result types.Component) error {
-	attr, ok := component.(store.Attributer)
-	if !ok {
-		return nil
-	}
-
-	for _, namespace := range attr.Namespaces() {
-		query, values := helpers.WriteAttributes(attr, namespace, "components", "component_id", component.GetComponent().ID)
-
-		r := make(map[string]interface{})
-		err := q.SelectOne(r, query, values...)
-		if err != nil {
-			return err
-		}
-
-		if rattr, ok := result.(store.Attributer); ok {
-			err = rattr.Fill(namespace, r)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
-}
-
-// FindByID finds the component by its ID.
+// FindByID finds a Component ID and returns it.
 func (s *ComponentStore) FindByID(componentID string) (types.Component, error) {
 	result := s.factory.Component()
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -126,7 +82,7 @@ func (s *ComponentStore) component(q db.QueryContext, componentID string, result
 	return s.loadAttributes(q, result)
 }
 
-// FindByUser returns the components to which a user is a collaborator.
+// FindByUser retrieves all the networks Components that an User is collaborator to.
 func (s *ComponentStore) FindByUser(username string) ([]types.Component, error) {
 	var components []types.Component
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -157,43 +113,16 @@ func (s *ComponentStore) userComponents(q db.QueryContext, username string, resu
 	return nil
 }
 
-// Create creates a new component and returns the resulting component.
-func (s *ComponentStore) Create(component types.Component) (types.Component, error) {
+// Edit updates the Component and returns the updated Component.
+func (s *ComponentStore) Edit(component types.Component) (types.Component, error) {
 	result := s.factory.Component()
 	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.create(tx, component, result)
+		return s.edit(tx, component, result)
 	})
 	return result, err
 }
 
-func (s *ComponentStore) create(q db.QueryContext, component, result types.Component) error {
-	comp := component.GetComponent()
-	err := q.NamedSelectOne(
-		result,
-		"INSERT INTO components (id, type) VALUES (:id, :type) RETURNING *",
-		comp)
-
-	if _, yes := db.IsDuplicate(err); yes {
-		return ErrComponentIDTaken
-	}
-
-	if err != nil {
-		return err
-	}
-
-	return s.writeAttributes(q, component, nil)
-}
-
-// Update udpates a component and returns the resulting component.
-func (s *ComponentStore) Update(component types.Component) (types.Component, error) {
-	result := s.factory.Component()
-	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.update(tx, component, result)
-	})
-	return result, err
-}
-
-func (s *ComponentStore) update(q db.QueryContext, component, result types.Component) error {
+func (s *ComponentStore) edit(q db.QueryContext, component, result types.Component) error {
 	comp := component.GetComponent()
 	err := q.NamedSelectOne(
 		result,
@@ -207,12 +136,12 @@ func (s *ComponentStore) update(q db.QueryContext, component, result types.Compo
 	return s.writeAttributes(q, component, nil)
 }
 
-// Delete deletes a component.
+// Delete deletes a Component and all its collaborators.
 func (s *ComponentStore) Delete(componentID string) error {
 	// Note: ON DELETE CASCADE is not supported yet but will be soon
 	// https://github.com/cockroachdb/cockroach/issues/14848
 	err := s.db.Transact(func(tx *db.Tx) error {
-		collaborators, err := s.collaborators(tx, componentID)
+		collaborators, err := s.listCollaborators(tx, componentID)
 		if err != nil {
 			return err
 		}
@@ -246,12 +175,30 @@ func (s *ComponentStore) delete(q db.QueryContext, componentID string) error {
 	return nil
 }
 
-// Collaborators returns the list of collaborators to a given component.
-func (s *ComponentStore) Collaborators(componentID string) ([]types.Collaborator, error) {
-	return s.collaborators(s.db, componentID)
+// AddCollaborator adds a collaborator to a Component.
+func (s *ComponentStore) AddCollaborator(componentID string, collaborator types.Collaborator) error {
+	err := s.db.Transact(func(tx *db.Tx) error {
+		return s.addCollaborator(tx, componentID, collaborator)
+	})
+	return err
 }
 
-func (s *ComponentStore) collaborators(q db.QueryContext, componentID string) ([]types.Collaborator, error) {
+func (s *ComponentStore) addCollaborator(q db.QueryContext, componentID string, collaborator types.Collaborator) error {
+	for _, right := range collaborator.Rights {
+		err := s.addRight(q, componentID, collaborator.Username, right)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// ListCollaborators returns the collaborators of a given Component.
+func (s *ComponentStore) ListCollaborators(componentID string) ([]types.Collaborator, error) {
+	return s.listCollaborators(s.db, componentID)
+}
+
+func (s *ComponentStore) listCollaborators(q db.QueryContext, componentID string) ([]types.Collaborator, error) {
 	var collaborators []struct {
 		types.Collaborator
 		Right string `db:"right"`
@@ -287,65 +234,7 @@ func (s *ComponentStore) collaborators(q db.QueryContext, componentID string) ([
 	return result, nil
 }
 
-// AddCollaborator adds a new collaborator to a component.
-func (s *ComponentStore) AddCollaborator(componentID string, collaborator types.Collaborator) error {
-	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.addCollaborator(tx, componentID, collaborator)
-	})
-	return err
-}
-
-func (s *ComponentStore) addCollaborator(q db.QueryContext, componentID string, collaborator types.Collaborator) error {
-	for _, right := range collaborator.Rights {
-		err := s.grantRight(q, componentID, collaborator.Username, right)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// GrantRight grants a right to a specific user in a given component.
-func (s *ComponentStore) GrantRight(componentID string, username string, right types.Right) error {
-	return s.grantRight(s.db, componentID, username, right)
-}
-
-func (s *ComponentStore) grantRight(q db.QueryContext, componentID string, username string, right types.Right) error {
-	_, err := q.Exec(
-		`INSERT
-			INTO components_collaborators (component_id, username, "right")
-			VALUES ($1, $2, $3)
-			ON CONFLICT (component_id, username, "right")
-			DO NOTHING`,
-		componentID,
-		username,
-		right)
-	return err
-}
-
-// RevokeRight revokes a specific right to a specific user in a given component.
-func (s *ComponentStore) RevokeRight(componentID string, username string, right types.Right) error {
-	return s.revokeRight(s.db, componentID, username, right)
-}
-
-func (s *ComponentStore) revokeRight(q db.QueryContext, componentID string, username string, right types.Right) error {
-	var u string
-	err := q.SelectOne(
-		&u,
-		`DELETE
-			FROM components_collaborators
-			WHERE component_id = $1 AND username = $2 AND "right" = $3
-			RETURNING username`,
-		componentID,
-		username,
-		right)
-	if db.IsNoRows(err) {
-		return ErrComponentCollaboratorRightNotFound
-	}
-	return err
-}
-
-// RemoveCollaborator removes a collaborator of a given component.
+// RemoveCollaborator removes a collaborator from a Component.
 func (s *ComponentStore) RemoveCollaborator(componentID string, username string) error {
 	return s.removeCollaborator(s.db, componentID, username)
 }
@@ -366,12 +255,30 @@ func (s *ComponentStore) removeCollaborator(q db.QueryContext, componentID strin
 	return err
 }
 
-// UserRights returns the list of rights that an user has to a given component.
-func (s *ComponentStore) UserRights(componentID string, username string) ([]types.Right, error) {
-	return s.userRights(s.db, componentID, username)
+// AddRight grants a given right to a given User.
+func (s *ComponentStore) AddRight(componentID string, username string, right types.Right) error {
+	return s.addRight(s.db, componentID, username, right)
 }
 
-func (s *ComponentStore) userRights(q db.QueryContext, componentID string, username string) ([]types.Right, error) {
+func (s *ComponentStore) addRight(q db.QueryContext, componentID string, username string, right types.Right) error {
+	_, err := q.Exec(
+		`INSERT
+			INTO components_collaborators (component_id, username, "right")
+			VALUES ($1, $2, $3)
+			ON CONFLICT (component_id, username, "right")
+			DO NOTHING`,
+		componentID,
+		username,
+		right)
+	return err
+}
+
+// ListUserRights returns the rights the User has for a Component.
+func (s *ComponentStore) ListUserRights(componentID string, username string) ([]types.Right, error) {
+	return s.listUserRights(s.db, componentID, username)
+}
+
+func (s *ComponentStore) listUserRights(q db.QueryContext, componentID string, username string) ([]types.Right, error) {
 	var rights []types.Right
 	err := q.Select(
 		&rights,
@@ -381,4 +288,97 @@ func (s *ComponentStore) userRights(q db.QueryContext, componentID string, usern
 		componentID,
 		username)
 	return rights, err
+}
+
+// RemoveRight revokes a given right to a given collaborator.
+func (s *ComponentStore) RemoveRight(componentID string, username string, right types.Right) error {
+	return s.removeRight(s.db, componentID, username, right)
+}
+
+func (s *ComponentStore) removeRight(q db.QueryContext, componentID string, username string, right types.Right) error {
+	var u string
+	err := q.SelectOne(
+		&u,
+		`DELETE
+			FROM components_collaborators
+			WHERE component_id = $1 AND username = $2 AND "right" = $3
+			RETURNING username`,
+		componentID,
+		username,
+		right)
+	if db.IsNoRows(err) {
+		return ErrComponentCollaboratorRightNotFound
+	}
+	return err
+}
+
+// LoadAttributes loads extra attributes into the Component if it's an Attributer.
+func (s *ComponentStore) LoadAttributes(component types.Component) error {
+	return s.db.Transact(func(tx *db.Tx) error {
+		return s.loadAttributes(tx, component)
+	})
+}
+
+func (s *ComponentStore) loadAttributes(q db.QueryContext, component types.Component) error {
+	attr, ok := component.(store.Attributer)
+	if !ok {
+		return nil
+	}
+
+	for _, namespace := range attr.Namespaces() {
+		m := make(map[string]interface{})
+		err := q.Select(
+			&m,
+			fmt.Sprintf("SELECT * FROM %s_components WHERE component_id = $1", namespace),
+			component.GetComponent().ID)
+		if err != nil {
+			return err
+		}
+
+		err = attr.Fill(namespace, m)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// WriteAttributes writes the extra attributes on the Component if it's an
+// Attributer to the store.
+func (s *ComponentStore) WriteAttributes(component, result types.Component) error {
+	return s.db.Transact(func(tx *db.Tx) error {
+		return s.writeAttributes(tx, component, result)
+	})
+}
+
+func (s *ComponentStore) writeAttributes(q db.QueryContext, component, result types.Component) error {
+	attr, ok := component.(store.Attributer)
+	if !ok {
+		return nil
+	}
+
+	for _, namespace := range attr.Namespaces() {
+		query, values := helpers.WriteAttributes(attr, namespace, "components", "component_id", component.GetComponent().ID)
+
+		r := make(map[string]interface{})
+		err := q.SelectOne(r, query, values...)
+		if err != nil {
+			return err
+		}
+
+		if rattr, ok := result.(store.Attributer); ok {
+			err = rattr.Fill(namespace, r)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+// SetFactory allows to replace the DefaultComponent factory.
+func (s *ComponentStore) SetFactory(factory factory.ComponentFactory) {
+	s.factory = factory
 }

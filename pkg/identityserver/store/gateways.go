@@ -7,52 +7,61 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 )
 
-// GatewayStore is a store that holds gateways.
+// GatewayStore is a store that holds Gateways.
 type GatewayStore interface {
-	// FindByID retreives the Gateway by id.
+	// Register creates a new Gateway and returns the new created Gateway.
+	Register(gtw types.Gateway) (types.Gateway, error)
+
+	// FindByID finds a Gateway by ID and retrieves it.
 	FindByID(gtwID string) (types.Gateway, error)
 
-	// FindByUser returns the Gateways to which a user is a collaborator.
+	// FindByUser returns all the Gateways to which a given User is collaborator.
 	FindByUser(username string) ([]types.Gateway, error)
 
-	// CreateGateway creates a new Gateway.
-	Create(gtw types.Gateway) (types.Gateway, error)
+	// Edit updates the Gateway and returns the updated Gateway.
+	Edit(gtw types.Gateway) (types.Gateway, error)
 
-	// Updateupdates the Gateway.
-	Update(gtw types.Gateway) (types.Gateway, error)
-
-	// Archive disables the Gateway.
+	// Archive disables a Gateway.
 	Archive(gtwID string) error
 
-	// Owners retrieves the owners for a gateway.
-	Owners(gtwID string) ([]string, error)
+	// SetAttribute inserts or modifies an existing Gateway attribute.
+	SetAttribute(gtwID, attribute, value string) error
 
-	// Antennas fetches all the registered antennas that belongs to a certain gateway.
-	Antennas(gtwID string) ([]types.GatewayAntenna, error)
+	// ListAttributes returns all the Gateway attributes.
+	ListAttributes(gtwID string) (map[string]string, error)
 
-	// UpsertAntenna inserts or modifies an antenna to a certain gateway.
-	UpsertAntenna(gtwID string, antenna types.GatewayAntenna) error
+	// RemoveAttribute removes a specific Gateway attribute.
+	RemoveAttribute(gtwID, attribute string) error
 
-	// DeleteAntenna deletes an antenna from a gateway.
-	DeleteAntenna(gtwID, antennaID string) error
+	// SetAntenna inserts or modifies an existing Gateway antenna.
+	SetAntenna(gtwID string, antenna types.GatewayAntenna) error
 
-	// Collaborators retrieves the collaborators for a gateway.
-	Collaborators(gtwID string) ([]types.Collaborator, error)
+	// ListAntennas returns all the registered antennas that belong to a certain Gateway.
+	ListAntennas(gtwID string) ([]types.GatewayAntenna, error)
+
+	// RemoveAntenna deletes an antenna from a gateway.
+	RemoveAntenna(gtwID, antennaID string) error
 
 	// AddCollaborator adds a collaborator to a gateway.
 	AddCollaborator(gtwID string, collaborator types.Collaborator) error
 
-	// GrantRight grants a given right to a given collaborator.
-	GrantRight(gtwID string, username string, right types.Right) error
+	// ListCollaborators retrieves all the gateway collaborators.
+	ListCollaborators(gtwID string) ([]types.Collaborator, error)
 
-	// RevokeRight revokes a given right to a given collaborator.
-	RevokeRight(gtwID string, username string, right types.Right) error
+	// ListOwners retrieves all the owners of a gateway.
+	ListOwners(gtwID string) ([]string, error)
 
 	// RemoveCollaborator removes a collaborator from a gateway.
 	RemoveCollaborator(gtwID string, username string) error
 
-	// UserRights returns the rights the user has to the Gateway.
-	UserRights(gtwID string, username string) ([]types.Right, error)
+	// AddRight grants a given right to a given User.
+	AddRight(gtwID string, username string, right types.Right) error
+
+	// ListUserRights returns the rights the User has for a gateway.
+	ListUserRights(gtwID string, username string) ([]types.Right, error)
+
+	// RemoveRight revokes a given right from a given User.
+	RemoveRight(gtwID string, username string, right types.Right) error
 
 	// LoadAttributes loads extra attributes into the gateway if it's an Attributer.
 	LoadAttributes(gtw types.Gateway) error

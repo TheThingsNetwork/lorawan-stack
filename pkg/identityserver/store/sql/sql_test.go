@@ -15,9 +15,12 @@ const (
 	database = "is_tests"
 )
 
-// Single store instance shared across all tests
+// Single store instance shared across all tests.
 var testingStore *Store
 
+// testStore returns a single and shared store instance for all the times the
+// method is called in an execution. The first time that is called it creates
+// a new store instance in a newly created database.
 func testStore() *Store {
 	if testingStore != nil {
 		return testingStore
@@ -28,6 +31,8 @@ func testStore() *Store {
 	return testingStore
 }
 
+// cleanStore returns a new store instance attached to a newly created database
+// where all migrations has been applied and also has been feed with some users.
 func cleanStore(database string) *Store {
 	// open database connection
 	db, err := db.Open(
@@ -64,7 +69,7 @@ func cleanStore(database string) *Store {
 
 	// create some users
 	for _, user := range testUsers() {
-		_, err := s.Users.Create(user)
+		_, err := s.Users.Register(user)
 		if err != nil {
 			panic(err)
 		}

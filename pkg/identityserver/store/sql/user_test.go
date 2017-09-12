@@ -34,21 +34,21 @@ func TestUserCreate(t *testing.T) {
 	alice := testUsers()["alice"]
 	bob := testUsers()["bob"]
 
-	// inserting a user with a username that already exists should. result in an error
+	// Attempt to recreate them should throw an error
 	{
-		_, err := s.Users.Create(alice)
+		_, err := s.Users.Register(alice)
 		a.So(err, should.NotBeNil)
 		a.So(err.Error(), should.Equal, ErrUsernameTaken.Error())
 	}
 
-	// find by email
+	// Find by email
 	{
 		found, err := s.Users.FindByEmail(bob.Email)
 		a.So(err, should.BeNil)
 		a.So(found, test.ShouldBeUserIgnoringAutoFields, bob)
 	}
 
-	// find by username
+	// Find by username
 	{
 		found, err := s.Users.FindByUsername(bob.Username)
 		a.So(err, should.BeNil)
@@ -56,14 +56,14 @@ func TestUserCreate(t *testing.T) {
 	}
 }
 
-func TestUserUpdate(t *testing.T) {
+func TestUserEdit(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore()
 
 	alice := testUsers()["alice"]
 	alice.Password = "qwerty"
 
-	updated, err := s.Users.Update(alice)
+	updated, err := s.Users.Edit(alice)
 	a.So(err, should.BeNil)
 	a.So(updated, test.ShouldBeUserIgnoringAutoFields, alice)
 }
@@ -86,7 +86,7 @@ func BenchmarkUserCreate(b *testing.B) {
 	s := testStore()
 
 	for n := 0; n < b.N; n++ {
-		s.Users.Create(&types.DefaultUser{
+		s.Users.Register(&types.DefaultUser{
 			Username: string(n),
 			Email:    fmt.Sprintf("%v@gmail.com", n),
 			Password: "secret",

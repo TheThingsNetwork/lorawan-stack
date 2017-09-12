@@ -7,45 +7,45 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 )
 
-// ComponentStore is a store that holds network components.
+// ComponentStore is a store that holds network Components.
 type ComponentStore interface {
-	// FindByID finds a component by its ID.
+	// Register creates a new Component and returns the new created Component.
+	Register(component types.Component) (types.Component, error)
+
+	// FindByID finds a Component ID and returns it.
 	FindByID(componentID string) (types.Component, error)
 
-	// FindByUser retrieves all the networks components that an user is collaborator to.
+	// FindByUser retrieves all the networks Components that an User is collaborator to.
 	FindByUser(username string) ([]types.Component, error)
 
-	// Create creates a new component.
-	Create(component types.Component) (types.Component, error)
+	// Edit updates the Component and returns the updated Component.
+	Edit(component types.Component) (types.Component, error)
 
-	// Update updates a component.
-	Update(component types.Component) (types.Component, error)
-
-	// Delete deletes a component and all its collaborators.
+	// Delete deletes a Component and all its collaborators.
 	Delete(componentID string) error
 
-	// Collaborators returns the collaborators of a given component.
-	Collaborators(componentID string) ([]types.Collaborator, error)
-
-	// AddCollaborator adds a component collaborator.
+	// AddCollaborator adds a collaborator to a Component.
 	AddCollaborator(componentID string, collaborator types.Collaborator) error
 
-	// GrantRight grants a given right to a given collaborator.
-	GrantRight(componentID string, username string, right types.Right) error
+	// ListCollaborators returns the collaborators of a given Component.
+	ListCollaborators(componentID string) ([]types.Collaborator, error)
 
-	// RevokeRight revokes a given right to a given collaborator.
-	RevokeRight(componentID string, username string, right types.Right) error
-
-	// RemoveCollaborator removes a collaborator from a component.
+	// RemoveCollaborator removes a collaborator from a Component.
 	RemoveCollaborator(componentID string, username string) error
 
-	// UserRights returns the rights the user has to a component.
-	UserRights(componentID string, username string) ([]types.Right, error)
+	// AddRight grants a given right to a given User.
+	AddRight(componentID string, username string, right types.Right) error
 
-	// LoadAttributes loads extra attributes into the component if it's an Attributer.
+	// ListUserRights returns the rights the User has for a Component.
+	ListUserRights(componentID string, username string) ([]types.Right, error)
+
+	// RemoveRight revokes a given right to a given collaborator.
+	RemoveRight(componentID string, username string, right types.Right) error
+
+	// LoadAttributes loads extra attributes into the Component if it's an Attributer.
 	LoadAttributes(component types.Component) error
 
-	// WriteAttributes writes the extra attributes on the component if it's an
+	// WriteAttributes writes the extra attributes on the Component if it's an
 	// Attributer to the store.
 	WriteAttributes(component, result types.Component) error
 

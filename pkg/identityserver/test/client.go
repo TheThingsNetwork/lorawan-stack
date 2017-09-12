@@ -67,7 +67,7 @@ func ShouldBeClientIgnoringAutoFields(actual interface{}, expected ...interface{
 
 	return all(
 		assertions.ShouldEqual(a.ID, b.ID),
-		assertions.ShouldEqual(a.Description, b.Description),
+		assertions.ShouldResemble(a.Description, b.Description),
 		assertions.ShouldEqual(a.Secret, b.Secret),
 		assertions.ShouldEqual(a.URI, b.URI),
 		assertions.ShouldEqual(a.State, b.State),

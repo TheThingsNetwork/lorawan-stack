@@ -43,78 +43,62 @@ var ErrApplicationCollaboratorNotFound = errors.New("application collaborator no
 // right from a collaborator that is not granted.
 var ErrApplicationCollaboratorRightNotFound = errors.New("application collaborator right not found")
 
-// SetFactory replaces the factory.
-func (s *ApplicationStore) SetFactory(factory factory.ApplicationFactory) {
-	s.factory = factory
-}
-
-// LoadAttributes loads the applications attributes into result if it is an Attributer.
-func (s *ApplicationStore) LoadAttributes(application types.Application) error {
-	return s.db.Transact(func(tx *db.Tx) error {
-		return s.loadAttributes(tx, application.GetApplication().ID, application)
-	})
-}
-
-func (s *ApplicationStore) loadAttributes(q db.QueryContext, appID string, application types.Application) error {
-	attr, ok := application.(store.Attributer)
-	if !ok {
-		return nil
-	}
-
-	// fill the application from all specified namespaces
-	for _, namespace := range attr.Namespaces() {
-		m := make(map[string]interface{})
-		err := q.SelectOne(
-			&m,
-			fmt.Sprintf("SELECT * FROM %s_applications WHERE application_id = $1", namespace),
-			appID)
+// Register creates a new Application and returns the new created Application.
+func (s *ApplicationStore) Register(application types.Application) (types.Application, error) {
+	result := s.factory.Application()
+	err := s.db.Transact(func(tx *db.Tx) error {
+		err := s.register(tx, application, result)
 		if err != nil {
 			return err
 		}
 
-		err = attr.Fill(namespace, m)
-		if err != nil {
-			return err
-		}
-	}
+		app := application.GetApplication()
 
-	return nil
-}
-
-// WriteAttributes writes the applications attributes into result if it is an Attributer.
-func (s *ApplicationStore) WriteAttributes(application types.Application, result types.Application) error {
-	return s.db.Transact(func(tx *db.Tx) error {
-		return s.writeAttributes(tx, application, result)
-	})
-}
-
-func (s *ApplicationStore) writeAttributes(q db.QueryContext, application, result types.Application) error {
-	attr, ok := application.(store.Attributer)
-	if !ok {
-		return nil
-	}
-
-	for _, namespace := range attr.Namespaces() {
-		query, values := helpers.WriteAttributes(attr, namespace, "applications", "application_id", application.GetApplication().ID)
-
-		r := make(map[string]interface{})
-		err := q.SelectOne(r, query, values...)
-		if err != nil {
-			return err
-		}
-
-		if rattr, ok := result.(store.Attributer); ok {
-			err = rattr.Fill(namespace, r)
+		// add euis
+		for _, eui := range app.EUIs {
+			err := s.addAppEUI(tx, app.ID, eui)
 			if err != nil {
 				return err
 			}
 		}
-	}
+		result.SetEUIs(app.EUIs)
 
-	return nil
+		// add api keys
+		for _, apiKey := range app.APIKeys {
+			err := s.addAPIKey(tx, app.ID, apiKey)
+			if err != nil {
+				return err
+			}
+		}
+		result.SetAPIKeys(app.APIKeys)
+
+		return nil
+	})
+	return result, err
 }
 
-// FindByID finds the application by ID.
+func (s *ApplicationStore) register(q db.QueryContext, application, result types.Application) error {
+	app := application.GetApplication()
+	err := q.NamedSelectOne(
+		result,
+		`INSERT
+			INTO applications (id, description)
+			VALUES (:id, :description)
+			RETURNING *`,
+		app)
+
+	if _, yes := db.IsDuplicate(err); yes {
+		return ErrApplicationIDTaken
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return s.writeAttributes(q, application, result)
+}
+
+// FindByID finds the Application by ID and retrieves it.
 func (s *ApplicationStore) FindByID(appID string) (types.Application, error) {
 	result := s.factory.Application()
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -125,14 +109,14 @@ func (s *ApplicationStore) FindByID(appID string) (types.Application, error) {
 		}
 
 		// fetch euis
-		euis, err := s.appEUIs(tx, appID)
+		euis, err := s.listAppEUIs(tx, appID)
 		if err != nil {
 			return err
 		}
 		result.SetEUIs(euis)
 
 		// fetch api keys
-		apiKeys, err := s.apiKeys(tx, appID)
+		apiKeys, err := s.listAPIKeys(tx, appID)
 		if err != nil {
 			return err
 		}
@@ -153,13 +137,159 @@ func (s *ApplicationStore) application(q db.QueryContext, appID string, result t
 	return err
 }
 
-// AppEUIs fetches all application EUIs that belong to the app with the
-// specified appID.
-func (s *ApplicationStore) AppEUIs(appID string) ([]types.AppEUI, error) {
-	return s.appEUIs(s.db, appID)
+// FindByUser returns the Applications to which an User is a collaborator.
+func (s *ApplicationStore) FindByUser(username string) ([]types.Application, error) {
+	var applications []types.Application
+	err := s.db.Transact(func(tx *db.Tx) error {
+		// get applications ids
+		appIDs, err := s.userApplications(tx, username)
+		if err != nil {
+			return err
+		}
+
+		// fetch applications
+		for _, appID := range appIDs {
+			app := s.factory.Application()
+			err := s.application(tx, appID, app)
+			if err != nil {
+				return err
+			}
+
+			// fetch euis
+			euis, err := s.listAppEUIs(tx, appID)
+			if err != nil {
+				return err
+			}
+			app.SetEUIs(euis)
+
+			// fetch api keys
+			apiKeys, err := s.listAPIKeys(tx, appID)
+			if err != nil {
+				return err
+			}
+			app.SetAPIKeys(apiKeys)
+
+			applications = append(applications, app)
+		}
+		return nil
+	})
+	return applications, err
 }
 
-func (s *ApplicationStore) appEUIs(q db.QueryContext, appID string) ([]types.AppEUI, error) {
+func (s *ApplicationStore) userApplications(q db.QueryContext, username string) ([]string, error) {
+	var appIDs []string
+	err := q.Select(
+		&appIDs,
+		`SELECT DISTINCT app_id
+			FROM applications_collaborators
+			WHERE username = $1`,
+		username)
+	if !db.IsNoRows(err) && err != nil {
+		return nil, err
+	}
+
+	return appIDs, nil
+}
+
+// Edit updates the Application and returns the updated Application.
+func (s *ApplicationStore) Edit(application types.Application) (types.Application, error) {
+	result := s.factory.Application()
+	err := s.db.Transact(func(tx *db.Tx) error {
+		err := s.edit(tx, application, result)
+		if err != nil {
+			return err
+		}
+
+		app := application.GetApplication()
+
+		// update euis
+		for _, eui := range app.EUIs {
+			err := s.addAppEUI(tx, app.ID, eui)
+			if err != nil {
+				return err
+			}
+		}
+		result.SetEUIs(app.EUIs)
+
+		// update api keys
+		for _, key := range app.APIKeys {
+			err := s.addAPIKey(tx, app.ID, key)
+			if err != nil {
+				return err
+			}
+		}
+		result.SetAPIKeys(app.APIKeys)
+
+		return nil
+	})
+	return result, err
+}
+
+func (s *ApplicationStore) edit(q db.QueryContext, application, result types.Application) error {
+	app := application.GetApplication()
+	err := q.NamedSelectOne(
+		result,
+		`UPDATE applications
+			SET description = :description
+			WHERE id = :id
+			RETURNING *`,
+		app)
+
+	if db.IsNoRows(err) {
+		return ErrApplicationNotFound
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return s.writeAttributes(q, application, result)
+}
+
+// Archive disables the Application.
+func (s *ApplicationStore) Archive(appID string) error {
+	return s.archive(s.db, appID)
+}
+
+func (s *ApplicationStore) archive(q db.QueryContext, appID string) error {
+	var id string
+	err := q.SelectOne(
+		&id,
+		`UPDATE applications
+			SET archived = $1
+			WHERE id = $2
+			RETURNING id`,
+		time.Now(),
+		appID)
+	if db.IsNoRows(err) {
+		return ErrApplicationNotFound
+	}
+	return err
+}
+
+// AddAppEUI adds a new AppEUI to a given Application.
+func (s *ApplicationStore) AddAppEUI(appID string, eui types.AppEUI) error {
+	return s.addAppEUI(s.db, appID, eui)
+}
+
+func (s *ApplicationStore) addAppEUI(q db.QueryContext, appID string, eui types.AppEUI) error {
+	_, err := q.Exec(
+		`INSERT
+			INTO applications_euis (app_id, eui)
+			VALUES ($1, $2)
+			ON CONFLICT (app_id, eui)
+			DO NOTHING`,
+		appID,
+		eui)
+	return err
+}
+
+// ListAppEUIs returns all the AppEUIs that belong to a given Application.
+func (s *ApplicationStore) ListAppEUIs(appID string) ([]types.AppEUI, error) {
+	return s.listAppEUIs(s.db, appID)
+}
+
+func (s *ApplicationStore) listAppEUIs(q db.QueryContext, appID string) ([]types.AppEUI, error) {
 	var appEUIs []types.AppEUI
 	err := q.Select(
 		&appEUIs,
@@ -174,12 +304,62 @@ func (s *ApplicationStore) appEUIs(q db.QueryContext, appID string) ([]types.App
 	return appEUIs, nil
 }
 
-// APIKeys gets all api keys that belong to the appID.
-func (s *ApplicationStore) APIKeys(appID string) ([]types.ApplicationAPIKey, error) {
-	return s.apiKeys(s.db, appID)
+// RemoveAppEUI remove an AppEUI from a given Application.
+func (s *ApplicationStore) RemoveAppEUI(appID string, eui types.AppEUI) error {
+	return s.removeAppEUI(s.db, appID, eui)
 }
 
-func (s *ApplicationStore) apiKeys(q db.QueryContext, appID string) ([]types.ApplicationAPIKey, error) {
+func (s *ApplicationStore) removeAppEUI(q db.QueryContext, appID string, eui types.AppEUI) error {
+	var e string
+	err := q.SelectOne(
+		&e,
+		`DELETE
+			FROM applications_euis
+			WHERE app_id = $1 AND eui = $2
+			RETURNING eui`,
+		appID,
+		eui)
+	if db.IsNoRows(err) {
+		return ErrAppEUINotFound
+	}
+	return err
+}
+
+// AddAPIKey adds a new Application API key to a given Application.
+func (s *ApplicationStore) AddAPIKey(appID string, key types.ApplicationAPIKey) error {
+	err := s.db.Transact(func(tx *db.Tx) error {
+		return s.addAPIKey(tx, appID, key)
+	})
+	return err
+}
+
+func (s *ApplicationStore) addAPIKey(q db.QueryContext, appID string, key types.ApplicationAPIKey) error {
+	for _, right := range key.Rights {
+		_, err := q.Exec(
+			`INSERT
+				INTO applications_api_keys (app_id, name, key, "right")
+				VALUES ($1, $2, $3, $4)
+				ON CONFLICT(app_id, name, "right")
+				DO NOTHING`,
+			appID,
+			key.Name,
+			key.Key,
+			right,
+		)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// ListAPIKeys returns all the registered application API keys that belong to a
+// given Application.
+func (s *ApplicationStore) ListAPIKeys(appID string) ([]types.ApplicationAPIKey, error) {
+	return s.listAPIKeys(s.db, appID)
+}
+
+func (s *ApplicationStore) listAPIKeys(q db.QueryContext, appID string) ([]types.ApplicationAPIKey, error) {
 	var keys []struct {
 		types.ApplicationAPIKey
 		Right string `db:"right"`
@@ -218,191 +398,15 @@ func (s *ApplicationStore) apiKeys(q db.QueryContext, appID string) ([]types.App
 	return apiKeys, nil
 }
 
-// FindByUser returns the applications to which an user is a collaborator.
-func (s *ApplicationStore) FindByUser(username string) ([]types.Application, error) {
-	var applications []types.Application
+// RemoveAPIKey removes an Application API key from a given Application.
+func (s *ApplicationStore) RemoveAPIKey(appID string, keyName string) error {
 	err := s.db.Transact(func(tx *db.Tx) error {
-		// get applications ids
-		appIDs, err := s.userApplications(tx, username)
-		if err != nil {
-			return err
-		}
-
-		// fetch applications
-		for _, appID := range appIDs {
-			app := s.factory.Application()
-			err := s.application(tx, appID, app)
-			if err != nil {
-				return err
-			}
-
-			// fetch euis
-			euis, err := s.appEUIs(tx, appID)
-			if err != nil {
-				return err
-			}
-			app.SetEUIs(euis)
-
-			// fetch api keys
-			apiKeys, err := s.apiKeys(tx, appID)
-			if err != nil {
-				return err
-			}
-			app.SetAPIKeys(apiKeys)
-
-			applications = append(applications, app)
-		}
-		return nil
-	})
-	return applications, err
-}
-
-// userApplications fetches all applications that a given user is collaborator.
-func (s *ApplicationStore) userApplications(q db.QueryContext, username string) ([]string, error) {
-	var appIDs []string
-	err := q.Select(
-		&appIDs,
-		`SELECT DISTINCT app_id
-			FROM applications_collaborators
-			WHERE username = $1`,
-		username)
-	if !db.IsNoRows(err) && err != nil {
-		return nil, err
-	}
-
-	return appIDs, nil
-}
-
-// Create creates a new application and returns the resulting application.
-func (s *ApplicationStore) Create(application types.Application) (types.Application, error) {
-	result := s.factory.Application()
-	err := s.db.Transact(func(tx *db.Tx) error {
-		err := s.create(tx, application, result)
-		if err != nil {
-			return err
-		}
-
-		app := application.GetApplication()
-
-		// add euis
-		for _, eui := range app.EUIs {
-			err := s.addAppEUI(tx, app.ID, eui)
-			if err != nil {
-				return err
-			}
-		}
-		result.SetEUIs(app.EUIs)
-
-		// add api keys
-		for _, apiKey := range app.APIKeys {
-			err := s.addApplicationAPIKey(tx, app.ID, apiKey)
-			if err != nil {
-				return err
-			}
-		}
-		result.SetAPIKeys(app.APIKeys)
-
-		return nil
-	})
-	return result, err
-}
-
-func (s *ApplicationStore) create(q db.QueryContext, application, result types.Application) error {
-	app := application.GetApplication()
-	err := q.NamedSelectOne(
-		result,
-		`INSERT
-			INTO applications (id, description)
-			VALUES (:id, :description)
-			RETURNING *`,
-		app)
-
-	if _, yes := db.IsDuplicate(err); yes {
-		return ErrApplicationIDTaken
-	}
-
-	if err != nil {
-		return err
-	}
-
-	return s.writeAttributes(q, application, result)
-}
-
-// AddAppEUI adds an eui to the app.
-func (s *ApplicationStore) AddAppEUI(appID string, eui types.AppEUI) error {
-	return s.addAppEUI(s.db, appID, eui)
-}
-
-func (s *ApplicationStore) addAppEUI(q db.QueryContext, appID string, eui types.AppEUI) error {
-	_, err := q.Exec(
-		`INSERT
-			INTO applications_euis (app_id, eui)
-			VALUES ($1, $2)
-			ON CONFLICT (app_id, eui)
-			DO NOTHING`,
-		appID,
-		eui)
-	return err
-}
-
-// DeleteAppEUI delete an eui to the app.
-func (s *ApplicationStore) DeleteAppEUI(appID string, eui types.AppEUI) error {
-	return s.deleteAppEUI(s.db, appID, eui)
-}
-
-func (s *ApplicationStore) deleteAppEUI(q db.QueryContext, appID string, eui types.AppEUI) error {
-	var e string
-	err := q.SelectOne(
-		&e,
-		`DELETE
-			FROM applications_euis
-			WHERE app_id = $1 AND eui = $2
-			RETURNING eui`,
-		appID,
-		eui)
-	if db.IsNoRows(err) {
-		return ErrAppEUINotFound
-	}
-	return err
-}
-
-// AddApplicationAPIKey adds an api key to the app.
-func (s *ApplicationStore) AddApplicationAPIKey(appID string, key types.ApplicationAPIKey) error {
-	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.addApplicationAPIKey(tx, appID, key)
+		return s.removeAPIKey(tx, appID, keyName)
 	})
 	return err
 }
 
-func (s *ApplicationStore) addApplicationAPIKey(q db.QueryContext, appID string, key types.ApplicationAPIKey) error {
-	for _, right := range key.Rights {
-		_, err := q.Exec(
-			`INSERT
-				INTO applications_api_keys (app_id, name, key, "right")
-				VALUES ($1, $2, $3, $4)
-				ON CONFLICT(app_id, name, "right")
-				DO NOTHING`,
-			appID,
-			key.Name,
-			key.Key,
-			right,
-		)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// DeleteApplicationAPIKey deletes an api key to the app.
-func (s *ApplicationStore) DeleteApplicationAPIKey(appID string, keyName string) error {
-	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.deleteApplicationAPIKey(tx, appID, keyName)
-	})
-	return err
-}
-
-func (s *ApplicationStore) deleteApplicationAPIKey(q db.QueryContext, appID string, keyName string) error {
+func (s *ApplicationStore) removeAPIKey(q db.QueryContext, appID string, keyName string) error {
 	var i string
 	err := q.SelectOne(
 		&i,
@@ -418,88 +422,30 @@ func (s *ApplicationStore) deleteApplicationAPIKey(q db.QueryContext, appID stri
 	return err
 }
 
-// Update updates an application and returns the resulting application.
-func (s *ApplicationStore) Update(application types.Application) (types.Application, error) {
-	result := s.factory.Application()
+// AddCollaborator adds an Application collaborator.
+func (s *ApplicationStore) AddCollaborator(appID string, collaborator types.Collaborator) error {
 	err := s.db.Transact(func(tx *db.Tx) error {
-		err := s.update(tx, application, result)
-		if err != nil {
-			return err
-		}
-
-		app := application.GetApplication()
-
-		// update euis
-		for _, eui := range app.EUIs {
-			err := s.addAppEUI(tx, app.ID, eui)
-			if err != nil {
-				return err
-			}
-		}
-		result.SetEUIs(app.EUIs)
-
-		// update api keys
-		for _, key := range app.APIKeys {
-			err := s.addApplicationAPIKey(tx, app.ID, key)
-			if err != nil {
-				return err
-			}
-		}
-		result.SetAPIKeys(app.APIKeys)
-
-		return nil
+		return s.addCollaborator(tx, appID, collaborator)
 	})
-	return result, err
-}
-
-func (s *ApplicationStore) update(q db.QueryContext, application, result types.Application) error {
-	app := application.GetApplication()
-	err := q.NamedSelectOne(
-		result,
-		`UPDATE applications
-			SET description = :description
-			WHERE id = :id
-			RETURNING *`,
-		app)
-
-	if db.IsNoRows(err) {
-		return ErrApplicationNotFound
-	}
-
-	if err != nil {
-		return err
-	}
-
-	return s.writeAttributes(q, application, result)
-}
-
-// Archive archives an application.
-func (s *ApplicationStore) Archive(appID string) error {
-	return s.archive(s.db, appID)
-}
-
-func (s *ApplicationStore) archive(q db.QueryContext, appID string) error {
-	var id string
-	err := q.SelectOne(
-		&id,
-		`UPDATE applications
-			SET archived = $1
-			WHERE id = $2
-			RETURNING id`,
-		time.Now(),
-		appID)
-	if db.IsNoRows(err) {
-		return ErrApplicationNotFound
-	}
 	return err
 }
 
-// Collaborators returns the list of collaborators to a given application.
-func (s *ApplicationStore) Collaborators(appID string) ([]types.Collaborator, error) {
-	return s.collaborators(s.db, appID)
+func (s *ApplicationStore) addCollaborator(q db.QueryContext, appID string, collaborator types.Collaborator) error {
+	for _, right := range collaborator.Rights {
+		err := s.addRight(q, appID, collaborator.Username, right)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func (s *ApplicationStore) collaborators(q db.QueryContext, appID string) ([]types.Collaborator, error) {
+// ListCollaborators retrieves all the collaborators from an Application.
+func (s *ApplicationStore) ListCollaborators(appID string) ([]types.Collaborator, error) {
+	return s.listCollaborators(s.db, appID)
+}
+
+func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID string) ([]types.Collaborator, error) {
 	var collaborators []struct {
 		types.Collaborator
 		Right string `db:"right"`
@@ -535,65 +481,7 @@ func (s *ApplicationStore) collaborators(q db.QueryContext, appID string) ([]typ
 	return result, nil
 }
 
-// AddCollaborator adds a new collaborator to an application.
-func (s *ApplicationStore) AddCollaborator(appID string, collaborator types.Collaborator) error {
-	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.addCollaborator(tx, appID, collaborator)
-	})
-	return err
-}
-
-func (s *ApplicationStore) addCollaborator(q db.QueryContext, appID string, collaborator types.Collaborator) error {
-	for _, right := range collaborator.Rights {
-		err := s.grantRight(q, appID, collaborator.Username, right)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// GrantRight grants a right to a specific user in a given application.
-func (s *ApplicationStore) GrantRight(appID string, username string, right types.Right) error {
-	return s.grantRight(s.db, appID, username, right)
-}
-
-func (s *ApplicationStore) grantRight(q db.QueryContext, appID string, username string, right types.Right) error {
-	_, err := q.Exec(
-		`INSERT
-			INTO applications_collaborators (app_id, username, "right")
-			VALUES ($1, $2, $3)
-			ON CONFLICT (app_id, username, "right")
-			DO NOTHING`,
-		appID,
-		username,
-		right)
-	return err
-}
-
-// RevokeRight revokes a specific right to a specific user in a given application.
-func (s *ApplicationStore) RevokeRight(appID string, username string, right types.Right) error {
-	return s.revokeRight(s.db, appID, username, right)
-}
-
-func (s *ApplicationStore) revokeRight(q db.QueryContext, appID string, username string, right types.Right) error {
-	var u string
-	err := q.SelectOne(
-		&u,
-		`DELETE
-			FROM applications_collaborators
-			WHERE app_id = $1 AND username = $2 AND "right" = $3
-			RETURNING username`,
-		appID,
-		username,
-		right)
-	if db.IsNoRows(err) {
-		return ErrApplicationCollaboratorRightNotFound
-	}
-	return err
-}
-
-// RemoveCollaborator removes a collaborator of a given application.
+// RemoveCollaborator removes a collaborator from an Application.
 func (s *ApplicationStore) RemoveCollaborator(appID string, username string) error {
 	return s.removeCollaborator(s.db, appID, username)
 }
@@ -614,12 +502,30 @@ func (s *ApplicationStore) removeCollaborator(q db.QueryContext, appID string, u
 	return err
 }
 
-// UserRights returns the list of rights that an user has to a given application.
-func (s *ApplicationStore) UserRights(appID string, username string) ([]types.Right, error) {
-	return s.userRights(s.db, appID, username)
+// AddRight grants a given right to a given User.
+func (s *ApplicationStore) AddRight(appID string, username string, right types.Right) error {
+	return s.addRight(s.db, appID, username, right)
 }
 
-func (s *ApplicationStore) userRights(q db.QueryContext, appID string, username string) ([]types.Right, error) {
+func (s *ApplicationStore) addRight(q db.QueryContext, appID string, username string, right types.Right) error {
+	_, err := q.Exec(
+		`INSERT
+			INTO applications_collaborators (app_id, username, "right")
+			VALUES ($1, $2, $3)
+			ON CONFLICT (app_id, username, "right")
+			DO NOTHING`,
+		appID,
+		username,
+		right)
+	return err
+}
+
+// ListUserRights returns the rights a given User has for an Application.
+func (s *ApplicationStore) ListUserRights(appID string, username string) ([]types.Right, error) {
+	return s.listUserRights(s.db, appID, username)
+}
+
+func (s *ApplicationStore) listUserRights(q db.QueryContext, appID string, username string) ([]types.Right, error) {
 	var rights []types.Right
 	err := q.Select(
 		&rights,
@@ -629,4 +535,98 @@ func (s *ApplicationStore) userRights(q db.QueryContext, appID string, username 
 		appID,
 		username)
 	return rights, err
+}
+
+// RemoveRight revokes a given right to a given collaborator.
+func (s *ApplicationStore) RemoveRight(appID string, username string, right types.Right) error {
+	return s.removeRight(s.db, appID, username, right)
+}
+
+func (s *ApplicationStore) removeRight(q db.QueryContext, appID string, username string, right types.Right) error {
+	var u string
+	err := q.SelectOne(
+		&u,
+		`DELETE
+			FROM applications_collaborators
+			WHERE app_id = $1 AND username = $2 AND "right" = $3
+			RETURNING username`,
+		appID,
+		username,
+		right)
+	if db.IsNoRows(err) {
+		return ErrApplicationCollaboratorRightNotFound
+	}
+	return err
+}
+
+// LoadAttributes loads extra attributes into the Application.
+func (s *ApplicationStore) LoadAttributes(application types.Application) error {
+	return s.db.Transact(func(tx *db.Tx) error {
+		return s.loadAttributes(tx, application.GetApplication().ID, application)
+	})
+}
+
+func (s *ApplicationStore) loadAttributes(q db.QueryContext, appID string, application types.Application) error {
+	attr, ok := application.(store.Attributer)
+	if !ok {
+		return nil
+	}
+
+	// fill the application from all specified namespaces
+	for _, namespace := range attr.Namespaces() {
+		m := make(map[string]interface{})
+		err := q.SelectOne(
+			&m,
+			fmt.Sprintf("SELECT * FROM %s_applications WHERE application_id = $1", namespace),
+			appID)
+		if err != nil {
+			return err
+		}
+
+		err = attr.Fill(namespace, m)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// WriteAttributes writes the extra attributes on the Application if it is an
+// Attributer to the store.
+func (s *ApplicationStore) WriteAttributes(application types.Application, result types.Application) error {
+	return s.db.Transact(func(tx *db.Tx) error {
+		return s.writeAttributes(tx, application, result)
+	})
+}
+
+func (s *ApplicationStore) writeAttributes(q db.QueryContext, application, result types.Application) error {
+	attr, ok := application.(store.Attributer)
+	if !ok {
+		return nil
+	}
+
+	for _, namespace := range attr.Namespaces() {
+		query, values := helpers.WriteAttributes(attr, namespace, "applications", "application_id", application.GetApplication().ID)
+
+		r := make(map[string]interface{})
+		err := q.SelectOne(r, query, values...)
+		if err != nil {
+			return err
+		}
+
+		if rattr, ok := result.(store.Attributer); ok {
+			err = rattr.Fill(namespace, r)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+// SetFactory allows to replace the DefaultApplication factory.
+func (s *ApplicationStore) SetFactory(factory factory.ApplicationFactory) {
+	s.factory = factory
 }

@@ -44,79 +44,65 @@ var ErrGatewayCollaboratorNotFound = errors.New("gateway collaborator not found"
 // right from a collaborator that is not granted.
 var ErrGatewayCollaboratorRightNotFound = errors.New("gateway collaborator right not found")
 
-// SetFactory replaces the factory.
-func (s *GatewayStore) SetFactory(factory factory.GatewayFactory) {
-	s.factory = factory
-}
-
-// LoadAttributes loads the gateways attributes into result if it is an
-// Attributer.
-func (s *GatewayStore) LoadAttributes(gateway types.Gateway) error {
-	return s.db.Transact(func(tx *db.Tx) error {
-		return s.loadAttributes(tx, gateway.GetGateway().ID, gateway)
-	})
-}
-
-func (s *GatewayStore) loadAttributes(q db.QueryContext, gtwID string, gateway types.Gateway) error {
-	attr, ok := gateway.(store.Attributer)
-	if !ok {
-		return nil
-	}
-
-	// fill the gateway from all specified namespaces
-	for _, namespace := range attr.Namespaces() {
-		m := make(map[string]interface{})
-		err := q.SelectOne(
-			&m,
-			fmt.Sprintf("SELECT * FROM %s_gateways WHERE gateway_id = $1", namespace),
-			gtwID)
+// Register creates a new Gateway and returns the new created Gateway.
+func (s *GatewayStore) Register(gateway types.Gateway) (types.Gateway, error) {
+	result := s.factory.Gateway()
+	err := s.db.Transact(func(tx *db.Tx) error {
+		err := s.register(tx, gateway, result)
 		if err != nil {
 			return err
 		}
 
-		err = attr.Fill(namespace, m)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// WriteAttributes writes the gateways attributes into result if it is an gatewayAttributer.
-func (s *GatewayStore) WriteAttributes(gateway types.Gateway, result types.Gateway) error {
-	return s.db.Transact(func(tx *db.Tx) error {
-		return s.writeAttributes(tx, gateway.GetGateway().ID, gateway, result)
-	})
-}
-
-func (s *GatewayStore) writeAttributes(q db.QueryContext, gtwID string, gateway types.Gateway, result types.Gateway) error {
-	attr, ok := gateway.(store.Attributer)
-	if !ok {
-		return nil
-	}
-
-	for _, namespace := range attr.Namespaces() {
-		query, values := helpers.WriteAttributes(attr, namespace, "gateways", "gateway_id", gateway.GetGateway().ID)
-
-		r := make(map[string]interface{})
-		err := q.SelectOne(r, query, values...)
-		if err != nil {
-			return err
-		}
-
-		if rattr, ok := result.(store.Attributer); ok {
-			err = rattr.Fill(namespace, r)
+		// store attributes
+		gtw := gateway.GetGateway()
+		for attribute, value := range gtw.Attributes {
+			err := s.setAttribute(tx, gtw.ID, attribute, value)
 			if err != nil {
 				return err
 			}
 		}
-	}
+		result.SetAttributes(gtw.Attributes)
 
-	return nil
+		// store antennas
+		for _, antenna := range gtw.Antennas {
+			err := s.setAntenna(tx, gtw.ID, antenna)
+			if err != nil {
+				return err
+			}
+		}
+		result.SetAntennas(gtw.Antennas)
+
+		return nil
+	})
+	return result, err
 }
 
-// FindByID finds the gateway by ID.
+func (s *GatewayStore) register(q db.QueryContext, gateway types.Gateway, result types.Gateway) error {
+	gtw := gateway.GetGateway()
+	err := q.NamedSelectOne(
+		result,
+		`INSERT
+			INTO gateways (id, description, frequency_plan, key, activated,
+					status_public, location_public, owner_public, auto_update,
+					brand, model, routers)
+			VALUES (:id, :description, :frequency_plan, :key, :activated,
+					:status_public, :location_public, :owner_public, :auto_update,
+					:brand, :model, :routers)
+			RETURNING *`,
+		gtw)
+
+	if _, yes := db.IsDuplicate(err); yes {
+		return ErrGatewayIDTaken
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return s.writeAttributes(q, gtw.ID, gateway, result)
+}
+
+// FindByID finds a Gateway by ID and retrieves it.
 func (s *GatewayStore) FindByID(gtwID string) (types.Gateway, error) {
 	result := s.factory.Gateway()
 	err := s.db.Transact(func(tx *db.Tx) error {
@@ -125,13 +111,13 @@ func (s *GatewayStore) FindByID(gtwID string) (types.Gateway, error) {
 			return err
 		}
 
-		attributes, err := s.attributes(tx, gtwID)
+		attributes, err := s.listAttributes(tx, gtwID)
 		if err != nil {
 			return err
 		}
 		result.SetAttributes(attributes)
 
-		antennas, err := s.antennas(tx, gtwID)
+		antennas, err := s.listAntennas(tx, gtwID)
 		if err != nil {
 			return err
 		}
@@ -150,12 +136,149 @@ func (s *GatewayStore) gateway(q db.QueryContext, gtwID string, result types.Gat
 	return err
 }
 
-// Attributes returns the gateway attributes in a map.
-func (s *GatewayStore) Attributes(q db.QueryContext, gtwID string) (map[string]string, error) {
-	return s.attributes(s.db, gtwID)
+// FindByUser returns all the Gateways to which a given User is collaborator.
+func (s *GatewayStore) FindByUser(username string) ([]types.Gateway, error) {
+	var gateways []types.Gateway
+	err := s.db.Transact(func(tx *db.Tx) error {
+		return s.userGateways(tx, username, &gateways)
+	})
+	return gateways, err
 }
 
-func (s *GatewayStore) attributes(q db.QueryContext, gtwID string) (map[string]string, error) {
+func (s *GatewayStore) userGateways(q db.QueryContext, username string, result *[]types.Gateway) error {
+	var gtwIDs []string
+	err := q.Select(
+		&gtwIDs,
+		`SELECT DISTINCT gateway_id
+			FROM gateways_collaborators
+			WHERE username = $1`,
+		username)
+
+	if !db.IsNoRows(err) && err != nil {
+		return err
+	}
+
+	for _, gtwID := range gtwIDs {
+		gateway := s.factory.Gateway()
+		err := s.gateway(q, gtwID, gateway)
+		if err != nil {
+			return err
+		}
+
+		attributes, err := s.listAttributes(q, gtwID)
+		if err != nil {
+			return err
+		}
+		gateway.SetAttributes(attributes)
+
+		*result = append(*result, gateway)
+	}
+	return nil
+}
+
+// Edit updates the Gateway and returns the updated Gateway.
+func (s *GatewayStore) Edit(gateway types.Gateway) (types.Gateway, error) {
+	result := s.factory.Gateway()
+	err := s.db.Transact(func(tx *db.Tx) error {
+		err := s.edit(tx, gateway, result)
+		if err != nil {
+			return err
+		}
+
+		gtw := gateway.GetGateway()
+
+		for attribute, value := range gtw.Attributes {
+			err := s.setAttribute(tx, gtw.ID, attribute, value)
+			if err != nil {
+				return err
+			}
+		}
+		result.SetAttributes(gtw.Attributes)
+
+		for _, antenna := range gtw.Antennas {
+			err := s.setAntenna(tx, gtw.ID, antenna)
+			if err != nil {
+				return err
+			}
+		}
+		result.SetAntennas(gtw.Antennas)
+
+		return nil
+	})
+	return result, err
+}
+
+func (s *GatewayStore) edit(q db.QueryContext, gateway, result types.Gateway) error {
+	gtw := gateway.GetGateway()
+	err := q.NamedSelectOne(
+		result,
+		`UPDATE gateways
+			SET description = :description, frequency_plan = :frequency_plan,
+					key = :key, activated = :activated, status_public = :status_public,
+					location_public = :location_public, owner_public = owner_public,
+					auto_update = :auto_update, brand = :brand, model = :model,
+					routers = :routers
+			WHERE id = :id
+			RETURNING *`,
+		gtw)
+
+	if db.IsNoRows(err) {
+		return ErrGatewayNotFound
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return s.writeAttributes(q, gtw.ID, gateway, result)
+}
+
+// Archive disables a Gateway.
+func (s *GatewayStore) Archive(gtwID string) error {
+	return s.archive(s.db, gtwID)
+}
+
+func (s *GatewayStore) archive(q db.QueryContext, gtwID string) error {
+	var id string
+	err := q.SelectOne(
+		&id,
+		`UPDATE gateways
+			SET archived = $1
+			WHERE id = $2
+			RETURNING id`,
+		time.Now(),
+		gtwID)
+	if db.IsNoRows(err) {
+		return ErrGatewayNotFound
+	}
+	return err
+}
+
+// SetAttribute inserts or modifies an existing Gateway attribute.
+func (s *GatewayStore) SetAttribute(gtwID string, attribute, value string) error {
+	return s.setAttribute(s.db, gtwID, attribute, value)
+}
+
+func (s *GatewayStore) setAttribute(q db.QueryContext, gtwID string, attribute, value string) error {
+	_, err := q.Exec(
+		`INSERT
+			INTO gateways_attributes (gateway_id, attribute, value)
+			VALUES ($1, $2, $3)
+			ON CONFLICT (gateway_id, attribute)
+			DO UPDATE SET value = $3
+			WHERE gateway_id = $1 AND attribute = $2`,
+		gtwID,
+		attribute,
+		value)
+	return err
+}
+
+// ListAttributes returns all the Gateway attributes.
+func (s *GatewayStore) ListAttributes(gtwID string) (map[string]string, error) {
+	return s.listAttributes(s.db, gtwID)
+}
+
+func (s *GatewayStore) listAttributes(q db.QueryContext, gtwID string) (map[string]string, error) {
 	var attrs []struct {
 		Attribute string `db:"attribute"`
 		Value     string `db:"value"`
@@ -179,31 +302,12 @@ func (s *GatewayStore) attributes(q db.QueryContext, gtwID string) (map[string]s
 	return result, nil
 }
 
-// UpsertAttribute inserts or modifies an existing attribute.
-func (s *GatewayStore) UpsertAttribute(gtwID string, attribute, value string) error {
-	return s.upsertAttribute(s.db, gtwID, attribute, value)
+// RemoveAttribute removes a specific Gateway attribute.
+func (s *GatewayStore) RemoveAttribute(gtwID string, attribute string) error {
+	return s.removeAttribute(s.db, gtwID, attribute)
 }
 
-func (s *GatewayStore) upsertAttribute(q db.QueryContext, gtwID string, attribute, value string) error {
-	_, err := q.Exec(
-		`INSERT
-			INTO gateways_attributes (gateway_id, attribute, value)
-			VALUES ($1, $2, $3)
-			ON CONFLICT (gateway_id, attribute)
-			DO UPDATE SET value = $3
-			WHERE gateway_id = $1 AND attribute = $2`,
-		gtwID,
-		attribute,
-		value)
-	return err
-}
-
-// DeleteAttribute deletes an attribute.
-func (s *GatewayStore) DeleteAttribute(gtwID string, attribute string) error {
-	return s.deleteAttribute(s.db, gtwID, attribute)
-}
-
-func (s *GatewayStore) deleteAttribute(q db.QueryContext, gtwID string, attribute string) error {
+func (s *GatewayStore) removeAttribute(q db.QueryContext, gtwID string, attribute string) error {
 	var i string
 	err := q.SelectOne(
 		&i,
@@ -219,48 +323,12 @@ func (s *GatewayStore) deleteAttribute(q db.QueryContext, gtwID string, attribut
 	return err
 }
 
-// Antennas fetches all the registered antennas that belongs to a certain gateway.
-func (s *GatewayStore) Antennas(gtwID string) ([]types.GatewayAntenna, error) {
-	return s.antennas(s.db, gtwID)
+// SetAntenna inserts or modifies an existing Gateway antenna.
+func (s *GatewayStore) SetAntenna(gtwID string, antenna types.GatewayAntenna) error {
+	return s.setAntenna(s.db, gtwID, antenna)
 }
 
-func (s *GatewayStore) antennas(q db.QueryContext, gtwID string) ([]types.GatewayAntenna, error) {
-	var antnns []struct {
-		Longitude *float32 `db:"longitude"`
-		Latitude  *float32 `db:"latitude"`
-		Altitude  *int32   `db:"altitude"`
-		types.GatewayAntenna
-	}
-	err := q.Select(
-		&antnns,
-		`SELECT antenna_id, longitude, latitude, altitude, type, model, placement
-			FROM gateways_antennas
-			WHERE gateway_id = $1`,
-		gtwID)
-	if !db.IsNoRows(err) && err != nil {
-		return nil, err
-	}
-
-	result := make([]types.GatewayAntenna, 0, len(antnns))
-	for _, antenna := range antnns {
-		result = append(result, types.GatewayAntenna{
-			ID:        antenna.ID,
-			Location:  helpers.Location(antenna.Longitude, antenna.Latitude, antenna.Altitude),
-			Type:      antenna.Type,
-			Model:     antenna.Model,
-			Placement: antenna.Placement,
-		})
-	}
-
-	return result, nil
-}
-
-// UpsertAntenna inserts or modifies an antenna to a certain gateway.
-func (s *GatewayStore) UpsertAntenna(gtwID string, antenna types.GatewayAntenna) error {
-	return s.upsertAntenna(s.db, gtwID, antenna)
-}
-
-func (s *GatewayStore) upsertAntenna(q db.QueryContext, gtwID string, antenna types.GatewayAntenna) error {
+func (s *GatewayStore) setAntenna(q db.QueryContext, gtwID string, antenna types.GatewayAntenna) error {
 	var ant struct {
 		types.GatewayAntenna
 		Longitude *float32
@@ -295,12 +363,48 @@ func (s *GatewayStore) upsertAntenna(q db.QueryContext, gtwID string, antenna ty
 	return err
 }
 
-// DeleteAntenna deletes an antenna from a gateway.
-func (s *GatewayStore) DeleteAntenna(gtwID, antennaID string) error {
-	return s.deleteAntenna(s.db, gtwID, antennaID)
+// ListAntennas returns all the registered antennas that belong to a certain Gateway.
+func (s *GatewayStore) ListAntennas(gtwID string) ([]types.GatewayAntenna, error) {
+	return s.listAntennas(s.db, gtwID)
 }
 
-func (s *GatewayStore) deleteAntenna(q db.QueryContext, gtwID, antennaID string) error {
+func (s *GatewayStore) listAntennas(q db.QueryContext, gtwID string) ([]types.GatewayAntenna, error) {
+	var antnns []struct {
+		Longitude *float32 `db:"longitude"`
+		Latitude  *float32 `db:"latitude"`
+		Altitude  *int32   `db:"altitude"`
+		types.GatewayAntenna
+	}
+	err := q.Select(
+		&antnns,
+		`SELECT antenna_id, longitude, latitude, altitude, type, model, placement
+			FROM gateways_antennas
+			WHERE gateway_id = $1`,
+		gtwID)
+	if !db.IsNoRows(err) && err != nil {
+		return nil, err
+	}
+
+	result := make([]types.GatewayAntenna, 0, len(antnns))
+	for _, antenna := range antnns {
+		result = append(result, types.GatewayAntenna{
+			ID:        antenna.ID,
+			Location:  helpers.Location(antenna.Longitude, antenna.Latitude, antenna.Altitude),
+			Type:      antenna.Type,
+			Model:     antenna.Model,
+			Placement: antenna.Placement,
+		})
+	}
+
+	return result, nil
+}
+
+// RemoveAntenna deletes an antenna from a gateway.
+func (s *GatewayStore) RemoveAntenna(gtwID, antennaID string) error {
+	return s.removeAntenna(s.db, gtwID, antennaID)
+}
+
+func (s *GatewayStore) removeAntenna(q db.QueryContext, gtwID, antennaID string) error {
 	var i string
 	err := q.SelectOne(
 		&i,
@@ -316,208 +420,30 @@ func (s *GatewayStore) deleteAntenna(q db.QueryContext, gtwID, antennaID string)
 	return err
 }
 
-// FindByUser returns the gateways to which an user is a collaborator.
-func (s *GatewayStore) FindByUser(username string) ([]types.Gateway, error) {
-	var gateways []types.Gateway
+// AddCollaborator adds a collaborator to a gateway.
+func (s *GatewayStore) AddCollaborator(gtwID string, collaborator types.Collaborator) error {
 	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.userGateways(tx, username, &gateways)
+		return s.addCollaborator(tx, gtwID, collaborator)
 	})
-	return gateways, err
+	return err
 }
 
-func (s *GatewayStore) userGateways(q db.QueryContext, username string, result *[]types.Gateway) error {
-	var gtwIDs []string
-	err := q.Select(
-		&gtwIDs,
-		`SELECT DISTINCT gateway_id
-			FROM gateways_collaborators
-			WHERE username = $1`,
-		username)
-
-	if !db.IsNoRows(err) && err != nil {
-		return err
-	}
-
-	for _, gtwID := range gtwIDs {
-		gateway := s.factory.Gateway()
-		err := s.gateway(q, gtwID, gateway)
+func (s *GatewayStore) addCollaborator(q db.QueryContext, gtwID string, collaborator types.Collaborator) error {
+	for _, right := range collaborator.Rights {
+		err := s.addRight(q, gtwID, collaborator.Username, right)
 		if err != nil {
 			return err
 		}
-
-		attributes, err := s.attributes(q, gtwID)
-		if err != nil {
-			return err
-		}
-		gateway.SetAttributes(attributes)
-
-		*result = append(*result, gateway)
 	}
 	return nil
 }
 
-// Create creates a new gateway and returns the resulting gateway.
-func (s *GatewayStore) Create(gateway types.Gateway) (types.Gateway, error) {
-	result := s.factory.Gateway()
-	err := s.db.Transact(func(tx *db.Tx) error {
-		err := s.create(tx, gateway, result)
-		if err != nil {
-			return err
-		}
-
-		// store attributes
-		gtw := gateway.GetGateway()
-		for attribute, value := range gtw.Attributes {
-			err := s.upsertAttribute(tx, gtw.ID, attribute, value)
-			if err != nil {
-				return err
-			}
-		}
-		result.SetAttributes(gtw.Attributes)
-
-		// store antennas
-		for _, antenna := range gtw.Antennas {
-			err := s.upsertAntenna(tx, gtw.ID, antenna)
-			if err != nil {
-				return err
-			}
-		}
-		result.SetAntennas(gtw.Antennas)
-
-		return nil
-	})
-	return result, err
+// ListCollaborators retrieves all the gateway collaborators.
+func (s *GatewayStore) ListCollaborators(gtwID string) ([]types.Collaborator, error) {
+	return s.listCollaborators(s.db, gtwID)
 }
 
-func (s *GatewayStore) create(q db.QueryContext, gateway types.Gateway, result types.Gateway) error {
-	gtw := gateway.GetGateway()
-	err := q.NamedSelectOne(
-		result,
-		`INSERT
-			INTO gateways (id, description, frequency_plan, key, activated,
-					status_public, location_public, owner_public, auto_update,
-					brand, model, routers)
-			VALUES (:id, :description, :frequency_plan, :key, :activated,
-					:status_public, :location_public, :owner_public, :auto_update,
-					:brand, :model, :routers)
-			RETURNING *`,
-		gtw)
-
-	if _, yes := db.IsDuplicate(err); yes {
-		return ErrGatewayIDTaken
-	}
-
-	if err != nil {
-		return err
-	}
-
-	return s.writeAttributes(q, gtw.ID, gateway, result)
-}
-
-// Update updates a gateway and returns the updated version.
-func (s *GatewayStore) Update(gateway types.Gateway) (types.Gateway, error) {
-	result := s.factory.Gateway()
-	err := s.db.Transact(func(tx *db.Tx) error {
-		err := s.update(tx, gateway, result)
-		if err != nil {
-			return err
-		}
-
-		gtw := gateway.GetGateway()
-
-		for attribute, value := range gtw.Attributes {
-			err := s.upsertAttribute(tx, gtw.ID, attribute, value)
-			if err != nil {
-				return err
-			}
-		}
-		result.SetAttributes(gtw.Attributes)
-
-		for _, antenna := range gtw.Antennas {
-			err := s.upsertAntenna(tx, gtw.ID, antenna)
-			if err != nil {
-				return err
-			}
-		}
-		result.SetAntennas(gtw.Antennas)
-
-		return nil
-	})
-	return result, err
-}
-
-func (s *GatewayStore) update(q db.QueryContext, gateway, result types.Gateway) error {
-	gtw := gateway.GetGateway()
-	err := q.SelectOne(
-		result,
-		`UPDATE gateways
-			SET description = :description, frequency_plan = :frequency_plan,
-					key = :key, activated = :activated, status_public = :status_public,
-					location_public = :location_public, owner_public = owner_public,
-					auto_update = :auto_update, brand = :brand, model = :model,
-					routers = :routers
-			WHERE id = :id
-			RETURNING *`,
-		gtw)
-
-	if db.IsNoRows(err) {
-		return ErrGatewayNotFound
-	}
-
-	if err != nil {
-		return err
-	}
-
-	return s.writeAttributes(q, gtw.ID, gateway, result)
-}
-
-// Archive archives a gateway.
-func (s *GatewayStore) Archive(gtwID string) error {
-	return s.archive(s.db, gtwID)
-}
-
-func (s *GatewayStore) archive(q db.QueryContext, gtwID string) error {
-	var id string
-	err := q.SelectOne(
-		&id,
-		`UPDATE gateways
-			SET archived = $1
-			WHERE id = $2
-			RETURNING id`,
-		time.Now(),
-		gtwID)
-	if db.IsNoRows(err) {
-		return ErrGatewayNotFound
-	}
-	return err
-}
-
-// Owners returns a list of users who have owners rights to a given gateway.
-func (s *GatewayStore) Owners(gtwID string) ([]string, error) {
-	return s.owners(s.db, gtwID)
-}
-
-func (s *GatewayStore) owners(q db.QueryContext, gtwID string) ([]string, error) {
-	var owners []string
-	err := q.Select(
-		&owners,
-		`SELECT username
-			FROM gateways_collaborators
-			WHERE gateway_id = $1 AND "right" = $2`,
-		gtwID,
-		types.GatewayOwnerRight)
-	if !db.IsNoRows(err) && err != nil {
-		return nil, err
-	}
-	return owners, nil
-}
-
-// Collaborators returns the list of collaborators to a given gateway.
-func (s *GatewayStore) Collaborators(gtwID string) ([]types.Collaborator, error) {
-	return s.collaborators(s.db, gtwID)
-}
-
-func (s *GatewayStore) collaborators(q db.QueryContext, gtwID string) ([]types.Collaborator, error) {
+func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID string) ([]types.Collaborator, error) {
 	var collaborators []struct {
 		types.Collaborator
 		Right string `db:"right"`
@@ -553,65 +479,27 @@ func (s *GatewayStore) collaborators(q db.QueryContext, gtwID string) ([]types.C
 	return result, nil
 }
 
-// AddCollaborator adds a new collaborator to a given gateway.
-func (s *GatewayStore) AddCollaborator(gtwID string, collaborator types.Collaborator) error {
-	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.addCollaborator(tx, gtwID, collaborator)
-	})
-	return err
+// ListOwners retrieves all the owners of a gateway.
+func (s *GatewayStore) ListOwners(gtwID string) ([]string, error) {
+	return s.listOwners(s.db, gtwID)
 }
 
-func (s *GatewayStore) addCollaborator(q db.QueryContext, gtwID string, collaborator types.Collaborator) error {
-	for _, right := range collaborator.Rights {
-		err := s.grantRight(q, gtwID, collaborator.Username, right)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// GrantRight grants a right to a specific user in a given gateway.
-func (s *GatewayStore) GrantRight(gtwID string, username string, right types.Right) error {
-	return s.grantRight(s.db, gtwID, username, right)
-}
-
-func (s *GatewayStore) grantRight(q db.QueryContext, gtwID string, username string, right types.Right) error {
-	_, err := q.Exec(
-		`INSERT
-			INTO gateways_collaborators (gateway_id, username, "right")
-			VALUES ($1, $2, $3)
-			ON CONFLICT (gateway_id, username, "right")
-			DO NOTHING`,
-		gtwID,
-		username,
-		right)
-	return err
-}
-
-// RevokeRight revokes a specific right to a specific user in a given gateway.
-func (s *GatewayStore) RevokeRight(gtwID string, username string, right types.Right) error {
-	return s.revokeRight(s.db, gtwID, username, right)
-}
-
-func (s *GatewayStore) revokeRight(q db.QueryContext, gtwID string, username string, right types.Right) error {
-	var u string
-	err := q.SelectOne(
-		&u,
-		`DELETE
+func (s *GatewayStore) listOwners(q db.QueryContext, gtwID string) ([]string, error) {
+	var owners []string
+	err := q.Select(
+		&owners,
+		`SELECT username
 			FROM gateways_collaborators
-			WHERE gateway_id = $1 AND username = $2 AND "right" = $3
-			RETURNING username`,
+			WHERE gateway_id = $1 AND "right" = $2`,
 		gtwID,
-		username,
-		right)
-	if db.IsNoRows(err) {
-		return ErrGatewayCollaboratorRightNotFound
+		types.GatewayOwnerRight)
+	if !db.IsNoRows(err) && err != nil {
+		return nil, err
 	}
-	return err
+	return owners, nil
 }
 
-// RemoveCollaborator removes a collaborator of a given gateway.
+// RemoveCollaborator removes a collaborator from a gateway.
 func (s *GatewayStore) RemoveCollaborator(gtwID string, username string) error {
 	return s.removeCollaborator(s.db, gtwID, username)
 }
@@ -632,12 +520,30 @@ func (s *GatewayStore) removeCollaborator(q db.QueryContext, gtwID string, usern
 	return err
 }
 
-// UserRights returns the list of rights that an user has to a given gateway.
-func (s *GatewayStore) UserRights(gtwID string, username string) ([]types.Right, error) {
-	return s.userRights(s.db, gtwID, username)
+// AddRight grants a given right to a given User.
+func (s *GatewayStore) AddRight(gtwID string, username string, right types.Right) error {
+	return s.addRight(s.db, gtwID, username, right)
 }
 
-func (s *GatewayStore) userRights(q db.QueryContext, gtwID string, username string) ([]types.Right, error) {
+func (s *GatewayStore) addRight(q db.QueryContext, gtwID string, username string, right types.Right) error {
+	_, err := q.Exec(
+		`INSERT
+			INTO gateways_collaborators (gateway_id, username, "right")
+			VALUES ($1, $2, $3)
+			ON CONFLICT (gateway_id, username, "right")
+			DO NOTHING`,
+		gtwID,
+		username,
+		right)
+	return err
+}
+
+// ListUserRights returns the rights the User has for a gateway.
+func (s *GatewayStore) ListUserRights(gtwID string, username string) ([]types.Right, error) {
+	return s.listUserRights(s.db, gtwID, username)
+}
+
+func (s *GatewayStore) listUserRights(q db.QueryContext, gtwID string, username string) ([]types.Right, error) {
 	var rights []types.Right
 	err := q.Select(
 		&rights,
@@ -647,4 +553,97 @@ func (s *GatewayStore) userRights(q db.QueryContext, gtwID string, username stri
 		gtwID,
 		username)
 	return rights, err
+}
+
+// RemoveRight revokes a given right from a given User.
+func (s *GatewayStore) RemoveRight(gtwID string, username string, right types.Right) error {
+	return s.removeRight(s.db, gtwID, username, right)
+}
+
+func (s *GatewayStore) removeRight(q db.QueryContext, gtwID string, username string, right types.Right) error {
+	var u string
+	err := q.SelectOne(
+		&u,
+		`DELETE
+			FROM gateways_collaborators
+			WHERE gateway_id = $1 AND username = $2 AND "right" = $3
+			RETURNING username`,
+		gtwID,
+		username,
+		right)
+	if db.IsNoRows(err) {
+		return ErrGatewayCollaboratorRightNotFound
+	}
+	return err
+}
+
+// LoadAttributes loads the gateways attributes into result if it is an Attributer.
+func (s *GatewayStore) LoadAttributes(gateway types.Gateway) error {
+	return s.db.Transact(func(tx *db.Tx) error {
+		return s.loadAttributes(tx, gateway.GetGateway().ID, gateway)
+	})
+}
+
+func (s *GatewayStore) loadAttributes(q db.QueryContext, gtwID string, gateway types.Gateway) error {
+	attr, ok := gateway.(store.Attributer)
+	if !ok {
+		return nil
+	}
+
+	// fill the gateway from all specified namespaces
+	for _, namespace := range attr.Namespaces() {
+		m := make(map[string]interface{})
+		err := q.SelectOne(
+			&m,
+			fmt.Sprintf("SELECT * FROM %s_gateways WHERE gateway_id = $1", namespace),
+			gtwID)
+		if err != nil {
+			return err
+		}
+
+		err = attr.Fill(namespace, m)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// WriteAttributes writes the gateways attributes into result if it is an Attributer.
+func (s *GatewayStore) WriteAttributes(gateway types.Gateway, result types.Gateway) error {
+	return s.db.Transact(func(tx *db.Tx) error {
+		return s.writeAttributes(tx, gateway.GetGateway().ID, gateway, result)
+	})
+}
+
+func (s *GatewayStore) writeAttributes(q db.QueryContext, gtwID string, gateway types.Gateway, result types.Gateway) error {
+	attr, ok := gateway.(store.Attributer)
+	if !ok {
+		return nil
+	}
+
+	for _, namespace := range attr.Namespaces() {
+		query, values := helpers.WriteAttributes(attr, namespace, "gateways", "gateway_id", gateway.GetGateway().ID)
+
+		r := make(map[string]interface{})
+		err := q.SelectOne(r, query, values...)
+		if err != nil {
+			return err
+		}
+
+		if rattr, ok := result.(store.Attributer); ok {
+			err = rattr.Fill(namespace, r)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+// SetFactory allows to replace the DefaultGateway factory.
+func (s *GatewayStore) SetFactory(factory factory.GatewayFactory) {
+	s.factory = factory
 }

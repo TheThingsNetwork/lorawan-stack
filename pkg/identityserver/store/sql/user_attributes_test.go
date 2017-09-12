@@ -9,34 +9,38 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
-	. "github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 )
 
-// userWithFooFactory is the type to implement the custom factory for UserWithFoo
+// userWithFooFactory implements factory.UserFactory.
 type userWithFooFactory struct{}
 
-// User implements UserFactory
+// User returns an userWithFoo type.
 func (f userWithFooFactory) User() types.User {
-	return &UserWithFoo{}
+	return &userWithFoo{}
 }
 
-type UserWithFoo struct {
+// userWithFoo implements both types.User and store.Attributer interfaces.
+type userWithFoo struct {
 	*types.DefaultUser
 	Foo string
 }
 
-// GetUser implements User
-func (u *UserWithFoo) GetUser() *types.DefaultUser {
+// GetUser returns the DefaultUser.
+func (u *userWithFoo) GetUser() *types.DefaultUser {
 	return u.DefaultUser
 }
 
-func (u *UserWithFoo) Namespaces() []string {
+// Namespaces returns the namespaces userWithFoo have extra attributes in.
+func (u *userWithFoo) Namespaces() []string {
 	return []string{
 		"foo",
 	}
 }
 
-func (u *UserWithFoo) Attributes(namespace string) map[string]interface{} {
+// Attributes returns for a given namespace a map containing the type extra attributes.
+func (u *userWithFoo) Attributes(namespace string) map[string]interface{} {
 	if namespace != "foo" {
 		return nil
 	}
@@ -46,7 +50,8 @@ func (u *UserWithFoo) Attributes(namespace string) map[string]interface{} {
 	}
 }
 
-func (u *UserWithFoo) Fill(namespace string, attributes map[string]interface{}) error {
+// Fill fills an userWithFoo type with the extra attributes that were found in the store.
+func (u *userWithFoo) Fill(namespace string, attributes map[string]interface{}) error {
 	if namespace != "foo" {
 		return nil
 	}
@@ -66,10 +71,10 @@ func (u *UserWithFoo) Fill(namespace string, attributes map[string]interface{}) 
 }
 
 func TestUserAttributer(t *testing.T) {
-	a := New(t)
+	a := assertions.New(t)
 	s := testStore()
 
-	// Set the UserWithFoo factory in the User Store
+	// Set userWithFooFactory as the User Factory
 	s.Users.SetFactory(userWithFooFactory{})
 
 	_, err := s.db.Exec(`
@@ -78,7 +83,7 @@ func TestUserAttributer(t *testing.T) {
 			foo		  STRING
 		);
 	`)
-	a.So(err, ShouldBeNil)
+	a.So(err, should.BeNil)
 
 	user := &types.DefaultUser{
 		Username: "john-doe",
@@ -86,23 +91,23 @@ func TestUserAttributer(t *testing.T) {
 		Email:    "john@example.net",
 	}
 
-	withFoo := &UserWithFoo{
+	withFoo := &userWithFoo{
 		DefaultUser: user,
 		Foo:         "bar",
 	}
 
-	created, err := s.Users.Create(withFoo)
-	a.So(err, ShouldBeNil)
+	created, err := s.Users.Register(withFoo)
+	a.So(err, should.BeNil)
 
 	a.So(created, test.ShouldBeUserIgnoringAutoFields, withFoo)
-	a.So(created.GetUser().Username, ShouldEqual, withFoo.GetUser().Username)
-	a.So((created.(*UserWithFoo)).Foo, ShouldEqual, withFoo.Foo)
+	a.So(created.GetUser().Username, should.Equal, withFoo.GetUser().Username)
+	a.So((created.(*userWithFoo)).Foo, should.Equal, withFoo.Foo)
 
 	found, err := s.Users.FindByUsername(created.GetUser().Username)
-	a.So(err, ShouldBeNil)
+	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeUser, created)
 	a.So(found, test.ShouldBeUserIgnoringAutoFields, withFoo)
-	a.So((found.(*UserWithFoo)).Foo, ShouldEqual, (created.(*UserWithFoo)).Foo)
+	a.So((found.(*userWithFoo)).Foo, should.Equal, (created.(*userWithFoo)).Foo)
 
 	// Set back the DefaultUser factory
 	s.Users.SetFactory(factory.DefaultUser{})

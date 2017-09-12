@@ -7,57 +7,64 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 )
 
-// ApplicationStore is a store that holds applications.
+// ApplicationStore is a store that holds Applications.
 type ApplicationStore interface {
-	// FindByID finds the application by its id.
+	// Register creates a new Application and returns the new created Application.
+	Register(app types.Application) (types.Application, error)
+
+	// FindByID finds the Application by ID and retrieves it.
 	FindByID(appID string) (types.Application, error)
 
-	// FindByUser returns the applications to which an user is a collaborator.
+	// FindByUser returns the Applications to which an User is a collaborator.
 	FindByUser(username string) ([]types.Application, error)
 
-	// Create creates a new application and returns it.
-	Create(app types.Application) (types.Application, error)
+	// Edit updates the Application and returns the updated Application.
+	Edit(app types.Application) (types.Application, error)
 
-	// AddAppEUI adds a new application EUI to the given application.
-	AddAppEUI(appID string, eui types.AppEUI) error
-
-	// DeleteAppEUI deletes an application EUI from a given application.
-	DeleteAppEUI(appID string, eui types.AppEUI) error
-
-	// AddApplicationAPIKey adds a new application api key to the given application.
-	AddApplicationAPIKey(appID string, key types.ApplicationAPIKey) error
-
-	// DeleteApplicationAPIKey deletes an application api key.
-	DeleteApplicationAPIKey(appID string, keyName string) error
-
-	// Update updates the application and returns it updated.
-	Update(app types.Application) (types.Application, error)
-
-	// Archive disables the application.
+	// Archive disables the Application.
 	Archive(appID string) error
 
-	// Collaborators retrieves the collaborators for an app.
-	Collaborators(appID string) ([]types.Collaborator, error)
+	// AddAppEUI adds a new AppEUI to a given Application.
+	AddAppEUI(appID string, eui types.AppEUI) error
 
-	// AddCollaborator adds an application collaborator.
+	// ListAppEUIs returns all the AppEUIs that belong to a given Application.
+	ListAppEUIs(appID string) ([]types.AppEUI, error)
+
+	// RemoveAppEUI remove an AppEUI from a given Application.
+	RemoveAppEUI(appID string, eui types.AppEUI) error
+
+	// AddAPIKey adds a new Application API key to a given Application.
+	AddAPIKey(appID string, key types.ApplicationAPIKey) error
+
+	// ListAPIKeys returns all the registered application API keys that
+	// belong to a given Application.
+	ListAPIKeys(appID string) ([]types.ApplicationAPIKey, error)
+
+	// RemoveAPIKey removes an Application API key from a given Application.
+	RemoveAPIKey(appID string, keyName string) error
+
+	// AddCollaborator adds an Application collaborator.
 	AddCollaborator(appID string, collaborator types.Collaborator) error
 
-	// GrantRight grants a given right to a given collaborator.
-	GrantRight(appID string, username string, right types.Right) error
+	// ListCollaborators retrieves all the collaborators from an Application.
+	ListCollaborators(appID string) ([]types.Collaborator, error)
 
-	// RevokeRight revokes a given right to a given collaborator.
-	RevokeRight(appID string, username string, right types.Right) error
-
-	// RemoveCollaborator removes a collaborator from an app.
+	// RemoveCollaborator removes a collaborator from an Application.
 	RemoveCollaborator(appID string, username string) error
 
-	// UserRights returns the rights the user has to an application.
-	UserRights(appID string, username string) ([]types.Right, error)
+	// AddRight grants a given right to a given User.
+	AddRight(appID string, username string, right types.Right) error
 
-	// LoadAttributes loads extra attributes into the application.
+	// ListUserRights returns the rights a given User has for an Application.
+	ListUserRights(appID string, username string) ([]types.Right, error)
+
+	// RemoveRight revokes a given right to a given collaborator.
+	RemoveRight(appID string, username string, right types.Right) error
+
+	// LoadAttributes loads extra attributes into the Application.
 	LoadAttributes(app types.Application) error
 
-	// WriteAttributes writes the extra attributes on application if it is an
+	// WriteAttributes writes the extra attributes on the Application if it is an
 	// Attributer to the store.
 	WriteAttributes(app types.Application, result types.Application) error
 

@@ -62,16 +62,73 @@ func TestGatewayCreate(t *testing.T) {
 	gateways := testGateways()
 
 	for _, gtw := range gateways {
-		created, err := s.Gateways.Create(gtw)
+		created, err := s.Gateways.Register(gtw)
 		a.So(err, should.BeNil)
 		a.So(created, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 	}
 
-	// recreate them should throw an error
+	// Attempt to recreate them should throw an error
 	for _, gtw := range gateways {
-		_, err := s.Gateways.Create(gtw)
+		_, err := s.Gateways.Register(gtw)
 		a.So(err, should.NotBeNil)
 		a.So(err.Error(), should.Equal, ErrGatewayIDTaken.Error())
+	}
+}
+
+func TestGatewayAttributes(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore()
+
+	gtw := testGateways()["bob-gateway"]
+
+	// Fetch attributes
+	{
+		attributes, err := s.Gateways.ListAttributes(gtw.ID)
+		a.So(err, should.BeNil)
+		if a.So(attributes, should.HaveLength, 2) {
+			a.So(attributes, should.Resemble, gtw.Attributes)
+		}
+	}
+
+	attributeKey := "Foo"
+	attributeValue := "Bar"
+
+	// Add attribute
+	{
+		err := s.Gateways.SetAttribute(gtw.ID, attributeKey, attributeValue)
+		a.So(err, should.BeNil)
+
+		attributes, err := s.Gateways.ListAttributes(gtw.ID)
+		a.So(err, should.BeNil)
+		if a.So(attributes, should.HaveLength, 3) && a.So(attributes, should.ContainKey, attributeKey) {
+			a.So(attributes[attributeKey], should.Equal, attributeValue)
+		}
+	}
+
+	// Overwrite attribute
+	{
+		attributeValue = "BarBar"
+
+		err := s.Gateways.SetAttribute(gtw.ID, attributeKey, attributeValue)
+		a.So(err, should.BeNil)
+
+		attributes, err := s.Gateways.ListAttributes(gtw.ID)
+		a.So(err, should.BeNil)
+		if a.So(attributes, should.HaveLength, 3) && a.So(attributes, should.ContainKey, attributeKey) {
+			a.So(attributes[attributeKey], should.Equal, attributeValue)
+		}
+	}
+
+	// Delete attribute
+	{
+		err := s.Gateways.RemoveAttribute(gtw.ID, attributeKey)
+		a.So(err, should.BeNil)
+
+		attributes, err := s.Gateways.ListAttributes(gtw.ID)
+		a.So(err, should.BeNil)
+		if a.So(attributes, should.HaveLength, 2) {
+			a.So(attributes, should.Resemble, gtw.Attributes)
+		}
 	}
 }
 
@@ -81,35 +138,33 @@ func TestGatewayAntennas(t *testing.T) {
 
 	gtw := testGateways()["bob-gateway"]
 
-	// fetch the gateway and check that the antenna has been registered with it
+	// Fetch antennas
 	{
-		antennas, err := s.Gateways.Antennas(gtw.ID)
+		antennas, err := s.Gateways.ListAntennas(gtw.ID)
 		a.So(err, should.BeNil)
 		if a.So(antennas, should.HaveLength, 1) {
 			a.So(antennas[0], should.Resemble, gtw.Antennas[0])
 		}
 	}
 
-	ant := types.GatewayAntenna{
-		ID:       "bobgw antenna",
-		Location: &ttnpb.Location{Longitude: 12.12, Latitude: 10.02, Altitude: 2},
-	}
+	ant := gtw.Antennas[0]
+	ant.Location = &ttnpb.Location{Longitude: 12.12, Latitude: 10.02, Altitude: 2}
 
-	// modify antenna
+	// Modify the antenna
 	{
-		err := s.Gateways.UpsertAntenna(gtw.ID, ant)
+		err := s.Gateways.SetAntenna(gtw.ID, ant)
 		a.So(err, should.BeNil)
 
-		antennas, err := s.Gateways.Antennas(gtw.ID)
+		antennas, err := s.Gateways.ListAntennas(gtw.ID)
 		a.So(err, should.BeNil)
 		if a.So(antennas, should.HaveLength, 1) {
 			a.So(antennas[0], should.Resemble, ant)
 		}
 	}
 
-	// delete antenna
+	// Delete the antenna
 	{
-		err := s.Gateways.DeleteAntenna(gtw.ID, ant.ID)
+		err := s.Gateways.RemoveAntenna(gtw.ID, ant.ID)
 		a.So(err, should.BeNil)
 
 		found, err := s.Gateways.FindByID(gtw.ID)
@@ -128,7 +183,7 @@ func TestGatewayCollaborators(t *testing.T) {
 
 	collaborator := utils.Collaborator(user.Username, rights)
 
-	// add collaborator
+	// Add collaborator
 	{
 		err := s.Gateways.AddCollaborator(gtw.ID, collaborator)
 		a.So(err, should.BeNil)
@@ -136,7 +191,7 @@ func TestGatewayCollaborators(t *testing.T) {
 
 	// Find collaborators
 	{
-		collaborators, err := s.Gateways.Collaborators(gtw.ID)
+		collaborators, err := s.Gateways.ListCollaborators(gtw.ID)
 		a.So(err, should.BeNil)
 		a.So(collaborators, should.HaveLength, 1)
 		if len(collaborators) > 0 {
@@ -146,12 +201,12 @@ func TestGatewayCollaborators(t *testing.T) {
 
 	right := types.GatewaySettingsRight
 
-	// grant a right
+	// Grant a right
 	{
-		err := s.Gateways.GrantRight(gtw.ID, user.Username, right)
+		err := s.Gateways.AddRight(gtw.ID, user.Username, right)
 		a.So(err, should.BeNil)
 
-		rights, err := s.Gateways.UserRights(gtw.ID, user.Username)
+		rights, err := s.Gateways.ListUserRights(gtw.ID, user.Username)
 		a.So(err, should.BeNil)
 		a.So(rights, should.HaveLength, 2)
 		if len(rights) > 0 {
@@ -159,12 +214,12 @@ func TestGatewayCollaborators(t *testing.T) {
 		}
 	}
 
-	// revoke a right
+	// Revoke a right
 	{
-		err := s.Gateways.RevokeRight(gtw.ID, user.Username, right)
+		err := s.Gateways.RemoveRight(gtw.ID, user.Username, right)
 		a.So(err, should.BeNil)
 
-		rights, err := s.Gateways.UserRights(gtw.ID, user.Username)
+		rights, err := s.Gateways.ListUserRights(gtw.ID, user.Username)
 		a.So(err, should.BeNil)
 		a.So(rights, should.HaveLength, 1)
 		if len(rights) > 0 {
@@ -172,19 +227,19 @@ func TestGatewayCollaborators(t *testing.T) {
 		}
 	}
 
-	// fetch user rights
+	// Fetch user rights
 	{
-		rights, err := s.Gateways.UserRights(gtw.ID, user.Username)
+		rights, err := s.Gateways.ListUserRights(gtw.ID, user.Username)
 		a.So(err, should.BeNil)
 		a.So(collaborator.Rights, should.Resemble, rights)
 	}
 
-	// remove the collaborator
+	// Remove the collaborator
 	{
 		err := s.Gateways.RemoveCollaborator(gtw.ID, user.Username)
 		a.So(err, should.BeNil)
 
-		collaborators, err := s.Gateways.Collaborators(gtw.ID)
+		collaborators, err := s.Gateways.ListCollaborators(gtw.ID)
 		a.So(err, should.BeNil)
 		a.So(collaborators, should.HaveLength, 0)
 	}
@@ -201,25 +256,39 @@ func TestGatewayOwners(t *testing.T) {
 
 	rights := []types.Right{types.GatewayOwnerRight}
 
-	// add alice as owner
+	// Add Alice as Gateway owner
 	{
 		collaborator := utils.Collaborator(alice.Username, rights)
 		err := s.Gateways.AddCollaborator(gtw.ID, collaborator)
 		a.So(err, should.BeNil)
 	}
 
-	// add bob as owner
+	// Add Bob as owner also
 	{
 		collaborator := utils.Collaborator(bob.Username, rights)
 		err := s.Gateways.AddCollaborator(gtw.ID, collaborator)
 		a.So(err, should.BeNil)
 	}
 
-	// fetch owners
-	owners, err := s.Gateways.Owners(gtw.ID)
+	// Fetch owners
+	{
+		owners, err := s.Gateways.ListOwners(gtw.ID)
+		a.So(err, should.BeNil)
+		a.So(owners, should.HaveLength, 2)
+		a.So(owners, should.Resemble, []string{"alice", "bob"})
+	}
+}
+
+func TestGatewayEdit(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore()
+
+	gtw := testGateways()["bob-gateway"]
+	gtw.Description = "Fancy new description"
+
+	updated, err := s.Gateways.Edit(gtw)
 	a.So(err, should.BeNil)
-	a.So(owners, should.HaveLength, 2)
-	a.So(owners, should.Resemble, []string{"alice", "bob"})
+	a.So(updated, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 }
 
 func TestGatewayArchive(t *testing.T) {
@@ -230,4 +299,8 @@ func TestGatewayArchive(t *testing.T) {
 
 	err := s.Gateways.Archive(gtw.ID)
 	a.So(err, should.BeNil)
+
+	found, err := s.Gateways.FindByID(gtw.ID)
+	a.So(err, should.BeNil)
+	a.So(found.GetGateway().Archived, should.NotBeNil)
 }

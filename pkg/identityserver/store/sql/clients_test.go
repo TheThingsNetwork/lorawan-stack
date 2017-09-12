@@ -38,14 +38,14 @@ func TestClientCreate(t *testing.T) {
 	clients := testClients()
 
 	for _, client := range clients {
-		created, err := s.Clients.Create(client)
+		created, err := s.Clients.Register(client)
 		a.So(err, should.BeNil)
 		a.So(created, test.ShouldBeClientIgnoringAutoFields, client)
 	}
 
-	// recreating them should result in error
+	// Attempt to recreate them should throw an error
 	for _, client := range clients {
-		_, err := s.Clients.Create(client)
+		_, err := s.Clients.Register(client)
 		a.So(err, should.NotBeNil)
 		a.So(err.Error(), should.Equal, ErrClientIDTaken.Error())
 	}
@@ -61,15 +61,15 @@ func TestClientCollaborators(t *testing.T) {
 
 	collaborator := utils.Collaborator(user.Username, rights)
 
-	// add collaborator
+	// Add collaborator
 	{
 		err := s.Clients.AddCollaborator(client.ID, collaborator)
 		a.So(err, should.BeNil)
 	}
 
-	// fetch client collaborators
+	// Fetch client collaborators
 	{
-		collaborators, err := s.Clients.Collaborators(client.ID)
+		collaborators, err := s.Clients.ListCollaborators(client.ID)
 		a.So(err, should.BeNil)
 		a.So(collaborators, should.HaveLength, 1)
 		if len(collaborators) > 0 {
@@ -77,7 +77,7 @@ func TestClientCollaborators(t *testing.T) {
 		}
 	}
 
-	// find which components alice is collaborator
+	// Find which components alice is collaborator
 	{
 		clients, err := s.Clients.FindByUser(user.Username)
 		a.So(err, should.BeNil)
@@ -87,15 +87,15 @@ func TestClientCollaborators(t *testing.T) {
 		}
 	}
 
-	// right to be granted and revoked
+	// Right to be granted and revoked
 	right := types.ClientSettingsRight
 
-	// grant a right
+	// Grant a right
 	{
-		err := s.Clients.GrantRight(client.ID, user.Username, right)
+		err := s.Clients.AddRight(client.ID, user.Username, right)
 		a.So(err, should.BeNil)
 
-		rights, err := s.Clients.UserRights(client.ID, user.Username)
+		rights, err := s.Clients.ListUserRights(client.ID, user.Username)
 		a.So(err, should.BeNil)
 		a.So(rights, should.HaveLength, 2)
 		if len(rights) > 0 {
@@ -103,12 +103,12 @@ func TestClientCollaborators(t *testing.T) {
 		}
 	}
 
-	// revoke a right
+	// Revoke a right
 	{
-		err := s.Clients.RevokeRight(client.ID, user.Username, right)
+		err := s.Clients.RemoveRight(client.ID, user.Username, right)
 		a.So(err, should.BeNil)
 
-		rights, err := s.Clients.UserRights(client.ID, user.Username)
+		rights, err := s.Clients.ListUserRights(client.ID, user.Username)
 		a.So(err, should.BeNil)
 		a.So(rights, should.HaveLength, 1)
 		if len(rights) > 0 {
@@ -116,12 +116,12 @@ func TestClientCollaborators(t *testing.T) {
 		}
 	}
 
-	// delete collaborator
+	// Delete collaborator
 	{
 		err := s.Clients.RemoveCollaborator(client.ID, user.Username)
 		a.So(err, should.BeNil)
 
-		collaborators, err := s.Clients.Collaborators(client.ID)
+		collaborators, err := s.Clients.ListCollaborators(client.ID)
 		a.So(err, should.BeNil)
 		a.So(collaborators, should.HaveLength, 0)
 	}
@@ -133,12 +133,21 @@ func TestClientFind(t *testing.T) {
 
 	client := testClients()["test-client"]
 
-	// find by id
-	{
-		found, err := s.Clients.FindByID(client.ID)
-		a.So(err, should.BeNil)
-		a.So(client, test.ShouldBeClientIgnoringAutoFields, found)
-	}
+	found, err := s.Clients.FindByID(client.ID)
+	a.So(err, should.BeNil)
+	a.So(client, test.ShouldBeClientIgnoringAutoFields, found)
+}
+
+func TestClientEdit(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore()
+
+	client := testClients()["test-client"]
+	client.Description = utils.StringAddress("Fancy Description")
+
+	updated, err := s.Clients.Edit(client)
+	a.So(err, should.BeNil)
+	a.So(updated, test.ShouldBeClientIgnoringAutoFields, client)
 }
 
 func TestClientManagement(t *testing.T) {

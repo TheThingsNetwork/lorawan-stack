@@ -36,13 +36,146 @@ var ErrUsernameTaken = errors.New("username already taken")
 // email that already exists.
 var ErrUserEmailTaken = errors.New("email already taken")
 
-// SetFactory replaces the factory.
-func (s *UserStore) SetFactory(factory factory.UserFactory) {
-	s.factory = factory
+// Register creates an User and returns the new created User.
+func (s *UserStore) Register(user types.User) (types.User, error) {
+	result := s.factory.User()
+	err := s.db.Transact(func(tx *db.Tx) error {
+		return s.register(tx, user, result)
+	})
+	return result, err
 }
 
-// LoadAttributes loads attributes for the user with the specified userID if
-// it is an Attributer.
+func (s *UserStore) register(q db.QueryContext, user, result types.User) error {
+	u := user.GetUser()
+	err := q.NamedSelectOne(
+		result,
+		`INSERT
+			INTO users (username, email, password)
+			VALUES (:username, :email, :password)
+			RETURNING *`,
+		u)
+
+	if dup, yes := db.IsDuplicate(err); yes {
+		if _, duplicated := dup.Duplicates["email"]; duplicated {
+			return ErrUserEmailTaken
+		}
+		if _, duplicated := dup.Duplicates["username"]; duplicated {
+			return ErrUsernameTaken
+		}
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return s.writeAttributes(q, result.GetUser().Username, user, result)
+}
+
+// FindByUsername finds the User by username and returns it.
+func (s *UserStore) FindByUsername(username string) (types.User, error) {
+	result := s.factory.User()
+	err := s.db.Transact(func(tx *db.Tx) error {
+		return s.findByUsername(tx, username, result)
+	})
+	return result, err
+}
+
+func (s *UserStore) findByUsername(q db.QueryContext, username string, user types.User) error {
+	err := q.SelectOne(
+		user,
+		"SELECT * FROM users WHERE lower(username) = $1",
+		strings.ToLower(username))
+
+	if db.IsNoRows(err) {
+		return ErrUserNotFound
+	}
+	if err != nil {
+		return err
+	}
+
+	return s.loadAttributes(q, user.GetUser().Username, user)
+}
+
+// FindByEmail finds the User by email address and returns it.
+func (s *UserStore) FindByEmail(email string) (types.User, error) {
+	result := s.factory.User()
+	err := s.db.Transact(func(tx *db.Tx) error {
+		return s.findByEmail(tx, email, result)
+	})
+	return result, err
+}
+
+func (s *UserStore) findByEmail(q db.QueryContext, email string, user types.User) error {
+	err := q.SelectOne(
+		user,
+		"SELECT * FROM users WHERE email = $1",
+		strings.ToLower(email))
+	if db.IsNoRows(err) {
+		return ErrUserEmailNotFound
+	}
+	if err != nil {
+		return err
+	}
+
+	return s.loadAttributes(q, user.GetUser().Username, user)
+}
+
+// Edit updates an User and returns the updated User.
+func (s *UserStore) Edit(user types.User) (types.User, error) {
+	result := s.factory.User()
+	err := s.db.Transact(func(tx *db.Tx) error {
+		return s.edit(tx, user, result)
+	})
+	return result, err
+}
+
+func (s *UserStore) edit(q db.QueryContext, user, result types.User) error {
+	u := user.GetUser()
+	err := q.NamedSelectOne(
+		result,
+		`UPDATE users
+			SET email = :email,
+				validated = :validated,
+				password = :password,
+				admin = :admin,
+				god = :god
+			WHERE username = :username
+			RETURNING *`,
+		u)
+
+	if _, yes := db.IsDuplicate(err); yes {
+		return ErrUserEmailTaken
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return s.writeAttributes(q, u.Username, user, result)
+}
+
+// Archive archives an User.
+func (s *UserStore) Archive(username string) error {
+	return s.archive(s.db, username)
+}
+
+func (s *UserStore) archive(q db.QueryContext, username string) error {
+	var u string
+	err := q.SelectOne(
+		&u,
+		`UPDATE users
+			SET archived = $1
+			WHERE username = $2
+			RETURNING username`,
+		time.Now(),
+		username)
+	if db.IsNoRows(err) {
+		return ErrUserNotFound
+	}
+	return err
+}
+
+// LoadAttributes loads all user attributes if the User is an Attributer.
 func (s *UserStore) LoadAttributes(username string, user types.User) error {
 	return s.db.Transact(func(tx *db.Tx) error {
 		return s.loadAttributes(tx, username, user)
@@ -81,8 +214,8 @@ func (s *UserStore) loadAttributes(q db.QueryContext, username string, user type
 	return nil
 }
 
-// WriteAttributes writes all of the user attributes if the user is an
-// Attributer and returns the written user in result.
+// WriteAttributes writes all of the user attributes if the User is an Attributer
+// and returns the written User in result.
 func (s *UserStore) WriteAttributes(user types.User, result types.User) error {
 	return s.db.Transact(func(tx *db.Tx) error {
 		return s.writeAttributes(tx, user.GetUser().Username, user, result)
@@ -117,141 +250,7 @@ func (s *UserStore) writeAttributes(q db.QueryContext, username string, user typ
 	return nil
 }
 
-// FindByEmail finds an user by email address.
-func (s *UserStore) FindByEmail(email string) (types.User, error) {
-	result := s.factory.User()
-	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.findByEmail(tx, email, result)
-	})
-	return result, err
-}
-
-func (s *UserStore) findByEmail(q db.QueryContext, email string, user types.User) error {
-	err := q.SelectOne(
-		user,
-		"SELECT * FROM users WHERE email = $1",
-		strings.ToLower(email))
-	if db.IsNoRows(err) {
-		return ErrUserEmailNotFound
-	}
-	if err != nil {
-		return err
-	}
-
-	return s.loadAttributes(q, user.GetUser().Username, user)
-}
-
-// FindByUsername finds an user by username.
-func (s *UserStore) FindByUsername(username string) (types.User, error) {
-	result := s.factory.User()
-	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.findByUsername(tx, username, result)
-	})
-	return result, err
-}
-
-func (s *UserStore) findByUsername(q db.QueryContext, username string, user types.User) error {
-	err := q.SelectOne(
-		user,
-		"SELECT * FROM users WHERE lower(username) = $1",
-		strings.ToLower(username))
-
-	if db.IsNoRows(err) {
-		return ErrUserNotFound
-	}
-	if err != nil {
-		return err
-	}
-
-	return s.loadAttributes(q, user.GetUser().Username, user)
-}
-
-// Create creates a user and returns the new created user.
-func (s *UserStore) Create(user types.User) (types.User, error) {
-	result := s.factory.User()
-	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.create(tx, user, result)
-	})
-	return result, err
-}
-
-func (s *UserStore) create(q db.QueryContext, user, result types.User) error {
-	u := user.GetUser()
-	err := q.NamedSelectOne(
-		result,
-		`INSERT
-			INTO users (username, email, password)
-			VALUES (:username, :email, :password)
-			RETURNING *`,
-		u)
-
-	if dup, yes := db.IsDuplicate(err); yes {
-		if _, duplicated := dup.Duplicates["email"]; duplicated {
-			return ErrUserEmailTaken
-		}
-		if _, duplicated := dup.Duplicates["username"]; duplicated {
-			return ErrUsernameTaken
-		}
-	}
-
-	if err != nil {
-		return err
-	}
-
-	return s.writeAttributes(q, result.GetUser().Username, user, result)
-}
-
-// Update updates an user and returns the updated user.
-func (s *UserStore) Update(user types.User) (types.User, error) {
-	result := s.factory.User()
-	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.update(tx, user, result)
-	})
-	return result, err
-}
-
-func (s *UserStore) update(q db.QueryContext, user, result types.User) error {
-	u := user.GetUser()
-	err := q.NamedSelectOne(
-		result,
-		`UPDATE users
-			SET email = :email,
-				validated = :validated,
-				password = :password,
-				admin = :admin,
-				god = :god
-			WHERE username = :username
-			RETURNING *`,
-		u)
-
-	if _, yes := db.IsDuplicate(err); yes {
-		return ErrUserEmailTaken
-	}
-
-	if err != nil {
-		return err
-	}
-
-	return s.writeAttributes(q, u.Username, user, result)
-}
-
-// Archive archives an user.
-func (s *UserStore) Archive(username string) error {
-	return s.archive(s.db, username)
-}
-
-func (s *UserStore) archive(q db.QueryContext, username string) error {
-	var u string
-	err := q.SelectOne(
-		&u,
-		`UPDATE users
-			SET archived = $1
-			WHERE username = $2
-			RETURNING username`,
-		time.Now(),
-		username)
-	if db.IsNoRows(err) {
-		return ErrUserNotFound
-	}
-	return err
+// SetFactory allows to replace the DefaultUser factory.
+func (s *UserStore) SetFactory(factory factory.UserFactory) {
+	s.factory = factory
 }

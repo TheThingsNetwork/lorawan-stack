@@ -32,27 +32,27 @@ func TestComponentCreate(t *testing.T) {
 	components := testComponents()
 
 	for _, component := range components {
-		created, err := s.Components.Create(component)
+		created, err := s.Components.Register(component)
 		a.So(err, should.BeNil)
 		a.So(created, test.ShouldBeComponentIgnoringAutoFields, component)
 	}
 
-	// creating a component with duplicated id should. thrown an error
+	// Attempt to recreate them should throw an error
 	for _, component := range components {
-		_, err := s.Components.Create(component)
+		_, err := s.Components.Register(component)
 		a.So(err, should.NotBeNil)
 		a.So(err.Error(), should.Equal, ErrComponentIDTaken.Error())
 	}
 }
 
-func TestComponentUpdate(t *testing.T) {
+func TestComponentEdit(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore()
 
 	component := testComponents()["foo-handler"]
 	component.Type = types.Broker
 
-	updated, err := s.Components.Update(component)
+	updated, err := s.Components.Edit(component)
 	a.So(err, should.BeNil)
 	a.So(updated, test.ShouldBeComponentIgnoringAutoFields, component)
 }
@@ -86,7 +86,7 @@ func TestComponentCollaborators(t *testing.T) {
 
 	// fetch component collaborators
 	{
-		collaborators, err := s.Components.Collaborators(component.ID)
+		collaborators, err := s.Components.ListCollaborators(component.ID)
 		a.So(err, should.BeNil)
 		a.So(collaborators, should.HaveLength, 1)
 		if len(collaborators) > 0 {
@@ -109,10 +109,10 @@ func TestComponentCollaborators(t *testing.T) {
 
 	// grant a right
 	{
-		err := s.Components.GrantRight(component.ID, user.Username, right)
+		err := s.Components.AddRight(component.ID, user.Username, right)
 		a.So(err, should.BeNil)
 
-		rights, err := s.Components.UserRights(component.ID, user.Username)
+		rights, err := s.Components.ListUserRights(component.ID, user.Username)
 		a.So(err, should.BeNil)
 		a.So(rights, should.HaveLength, 2)
 		if len(rights) > 0 {
@@ -122,10 +122,10 @@ func TestComponentCollaborators(t *testing.T) {
 
 	// revoke a right
 	{
-		err := s.Components.RevokeRight(component.ID, user.Username, right)
+		err := s.Components.RemoveRight(component.ID, user.Username, right)
 		a.So(err, should.BeNil)
 
-		rights, err := s.Components.UserRights(component.ID, user.Username)
+		rights, err := s.Components.ListUserRights(component.ID, user.Username)
 		a.So(err, should.BeNil)
 		a.So(rights, should.HaveLength, 1)
 		if len(rights) > 0 {
@@ -135,7 +135,7 @@ func TestComponentCollaborators(t *testing.T) {
 
 	// fetch user rights
 	{
-		rights, err := s.Components.UserRights(component.ID, user.Username)
+		rights, err := s.Components.ListUserRights(component.ID, user.Username)
 		a.So(err, should.BeNil)
 		a.So(collaborator.Rights, should.Resemble, rights)
 	}
@@ -145,7 +145,7 @@ func TestComponentCollaborators(t *testing.T) {
 		err := s.Components.RemoveCollaborator(component.ID, user.Username)
 		a.So(err, should.BeNil)
 
-		collaborators, err := s.Components.Collaborators(component.ID)
+		collaborators, err := s.Components.ListCollaborators(component.ID)
 		a.So(err, should.BeNil)
 		a.So(collaborators, should.HaveLength, 0)
 	}
