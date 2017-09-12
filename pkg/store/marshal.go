@@ -3,7 +3,6 @@
 package store
 
 import (
-	"fmt"
 	"reflect"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
@@ -95,7 +94,7 @@ func marshal(s interface{}) map[string]interface{} {
 	t := v.Type()
 
 	if t.Kind() != reflect.Struct {
-		panic(errors.New(fmt.Sprintf("github.com/TheThingsNetwork/ttn/pkg/store.marshal: expected argument to be a struct, got %s", t.Kind())))
+		panic(errors.Errorf("github.com/TheThingsNetwork/ttn/pkg/store.marshal: expected argument to be a struct, got %s", t.Kind()))
 	}
 
 	out := make(map[string]interface{}, t.NumField())
