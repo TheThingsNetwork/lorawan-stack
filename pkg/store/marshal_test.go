@@ -4,6 +4,7 @@ package store_test
 
 import (
 	"testing"
+	"time"
 
 	. "github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/kr/pretty"
@@ -77,10 +78,27 @@ func TestMarshalMap(t *testing.T) {
 				"SubStruct.SubSubStruct.Int":    42,
 			},
 		},
+		{
+			struct {
+				a int
+				b int
+			}{},
+			map[string]interface{}{},
+		},
+		{
+			struct{ time.Time }{time.Unix(42, 42)},
+			map[string]interface{}{"Time": time.Unix(42, 42)},
+		},
+		{
+			struct{ T time.Time }{time.Unix(42, 42)},
+			map[string]interface{}{"T": time.Unix(42, 42)},
+		},
 	} {
-		ret := Marshal(tc.input)
-		if !a.So(ret, should.Resemble, tc.expected) {
-			t.Log(pretty.Sprintf("\n%# v\n does not resemble\n %# v\n", tc.expected, ret))
+		var ret map[string]interface{}
+		if a.So(func() { ret = Marshal(tc.input) }, should.NotPanic) {
+			if !a.So(ret, should.Resemble, tc.expected) {
+				t.Log(pretty.Sprintf("\n%# v\n does not resemble\n %# v\n", tc.expected, ret))
+			}
 		}
 	}
 }

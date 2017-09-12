@@ -130,13 +130,14 @@ func marshal(s interface{}) map[string]interface{} {
 		}
 
 		if fk == reflect.Struct || fk == reflect.Map {
-			valMap := val.(map[string]interface{})
-			for k := range valMap {
-				out[ft.Name+"."+k] = valMap[k]
+			if m, ok := val.(map[string]interface{}); ok {
+				for k, v := range m {
+					out[ft.Name+"."+k] = v
+				}
+				continue
 			}
-		} else {
-			out[ft.Name] = val
 		}
+		out[ft.Name] = val
 	}
 	return out
 }
