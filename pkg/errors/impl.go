@@ -2,7 +2,11 @@
 
 package errors
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+	"strings"
+)
 
 // Impl implements Error
 type Impl struct {
@@ -30,11 +34,20 @@ func (i *Impl) UnmarshalJSON(data []byte) error {
 
 // Error returns the formatted error message, prefixed with the error namespace
 func (i *Impl) Error() string {
-	if i.namespace == "" {
+	prefix := ""
+	if i.namespace != "" {
+		prefix = i.namespace
+	}
+
+	if i.code != NoCode {
+		prefix = prefix + fmt.Sprintf("[%v]", i.code)
+	}
+
+	if prefix == "" {
 		return i.message
 	}
 
-	return i.namespace + ": " + i.message
+	return strings.Trim(prefix, " ") + ": " + i.message
 }
 
 // Message returns the formatted error message

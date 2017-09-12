@@ -13,7 +13,7 @@ type registry struct {
 	byNamespaceAndCode map[string]map[Code]*ErrDescriptor
 }
 
-// Register registers a new error type
+// Register registers a new error descriptor.
 func (r *registry) Register(namespace string, err *ErrDescriptor) {
 	r.Lock()
 	defer r.Unlock()

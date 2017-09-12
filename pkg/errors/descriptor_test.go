@@ -25,7 +25,7 @@ func TestDescriptor(t *testing.T) {
 	}
 	err := d.New(attributes)
 
-	a.So(err.Error(), should.Equal, "You do not have access to app with id foo")
+	a.So(err.Error(), should.Equal, "[77]: You do not have access to app with id foo")
 	a.So(err.Code(), should.Equal, d.Code)
 	a.So(err.Type(), should.Equal, d.Type)
 	a.So(err.Attributes(), should.Resemble, attributes)
@@ -47,7 +47,7 @@ func TestDescriptorCause(t *testing.T) {
 	cause := fmt.Errorf("This is an error")
 	err := d.NewWithCause(attributes, cause)
 
-	a.So(err.Error(), should.Equal, "You do not have access to app with id foo")
+	a.So(err.Error(), should.Equal, "[77]: You do not have access to app with id foo")
 	a.So(err.Code(), should.Equal, d.Code)
 	a.So(err.Type(), should.Equal, d.Type)
 	a.So(err.Attributes()["app_id"], should.Resemble, attributes["app_id"])

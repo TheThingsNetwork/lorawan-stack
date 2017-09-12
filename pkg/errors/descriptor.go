@@ -8,7 +8,10 @@ import "fmt"
 // the authoritive information about error codes.
 //
 // The descriptor can be used to find out information about the error after it
-// has been handed over between components
+// has been handed over between components.
+//
+// The ErrDescriptor has to be registered before it can be used (trough the Register method), or
+// will panic otherwise.
 type ErrDescriptor struct {
 	// MessageFormat is the format of the error message. Attributes will be filled
 	// in when an error is created using New(). For example:
@@ -29,6 +32,7 @@ type ErrDescriptor struct {
 	Type Type `json:"type"`
 
 	// Namespace is the namespace in which the errors live, usually the package name from which they originate.
+	// If left blank, the namespace is filled in with the package name on registration.
 	Namespace string `json:"namespace"`
 
 	// registered denotes wether or not the error has been registered

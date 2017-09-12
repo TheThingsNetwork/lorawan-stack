@@ -6,8 +6,8 @@ import "fmt"
 
 func Example() {
 
-	// ErrSomeUserMistake is the description of the error some user made
-	// that costs the company some money
+	// ErrSomeUserMistake is the description of the error some user made that costs the company some money.
+	// The namespace is left blank and will be filled in automatically based on the package name.
 	ErrSomeUserMistake := &ErrDescriptor{
 		// MessageFormat is the format the error message will be using
 		// It is written in ICU message format
@@ -22,7 +22,8 @@ func Example() {
 		Code: 391,
 	}
 
-	// register the error so others can find it based on the error Code
+	// Register the error so others can find it based on the error Code and Namespace.
+	// do this in the init() function of your package.
 	ErrSomeUserMistake.Register()
 
 	// Create a new error based on the descriptor
@@ -30,10 +31,15 @@ func Example() {
 		"price": 7,
 	})
 
-	// this will print the formatted error message
-	fmt.Println(err)
-	// Output: You made a mistake cost us 7 dollars
-
-	// You can get the error descriptor back based on any error
+	// You can get the error descriptor back based on any error.
 	_ = Descriptor(err)
+
+	// This will print the formatted error message.
+	fmt.Println(err.Error())
+	fmt.Println("namespace:", err.Namespace())
+	fmt.Println("code:", err.Code())
+	// Output:
+	// errors[391]: You made a mistake cost us 7 dollars
+	// namespace: errors
+	// code: 391
 }

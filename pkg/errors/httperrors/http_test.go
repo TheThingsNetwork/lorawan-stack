@@ -40,7 +40,7 @@ func TestHTTP(t *testing.T) {
 	a.So(got.Code(), should.Equal, err.Code())
 	a.So(got.Type(), should.Equal, err.Type())
 	a.So(got.Message(), should.Equal, err.Message())
-	a.So(got.Error(), should.Equal, d.Namespace+": "+got.Message())
+	a.So(got.Error(), should.Equal, "pkg/foo[77]: You do not have access to app with id foo")
 	a.So(got.Attributes()["app_id"], should.Resemble, attributes["app_id"])
 	a.So(got.Attributes()["count"], should.AlmostEqual, attributes["count"])
 	a.So(got.Namespace(), should.Equal, d.Namespace)

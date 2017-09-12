@@ -44,7 +44,7 @@ func TestGRPC(t *testing.T) {
 	a.So(got.Code(), should.Equal, d.Code)
 	a.So(got.Type(), should.Equal, d.Type)
 	a.So(got.Message(), should.Equal, "You do not have access to app with id foo")
-	a.So(got.Error(), should.Equal, "pkg/foo: You do not have access to app with id foo")
+	a.So(got.Error(), should.Equal, "pkg/foo[77]: You do not have access to app with id foo")
 
 	a.So(got.Attributes(), should.NotBeEmpty)
 	a.So(got.Attributes()["app_id"], should.Resemble, attributes["app_id"])
