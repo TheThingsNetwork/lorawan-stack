@@ -11,6 +11,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/store/mapstore"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
+	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -53,7 +54,7 @@ func TestDeviceRegistry(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		a.So(found[0].EndDevice, should.Resemble, ed)
+		a.So(pretty.Diff(found[0].EndDevice, ed), should.BeEmpty)
 	}
 
 	updated := newPopulatedEndDevice()
@@ -86,7 +87,7 @@ func TestDeviceRegistry(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		a.So(found[0].EndDevice, should.Resemble, updated)
+		a.So(pretty.Diff(found[0].EndDevice, updated), should.BeEmpty)
 	}
 
 	a.So(device.Delete(), should.BeNil)
