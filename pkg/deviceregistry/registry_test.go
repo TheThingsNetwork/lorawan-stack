@@ -20,12 +20,9 @@ var randy = rand.New(rand.NewSource(42))
 
 func newPopulatedEndDevice() *ttnpb.EndDevice {
 	ed := &ttnpb.EndDevice{}
-	devEUI := types.NewPopulatedEUI64(randy)
-	ed.DevEUI = &devEUI
-	joinEUI := types.NewPopulatedEUI64(randy)
-	ed.JoinEUI = &joinEUI
-	devAddr := types.NewPopulatedDevAddr(randy)
-	ed.DevAddr = &devAddr
+	ed.DevEUI = types.NewPopulatedEUI64(randy)
+	ed.JoinEUI = types.NewPopulatedEUI64(randy)
+	ed.DevAddr = types.NewPopulatedDevAddr(randy)
 	ed.ApplicationID = "test"
 	ed.DeviceID = "test"
 	ed.TenantID = "test"
