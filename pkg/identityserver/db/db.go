@@ -109,14 +109,7 @@ func (db *DB) WithContext(context context.Context) *DB {
 
 // NamedExec implements QueryContext.
 func (db *DB) NamedExec(query string, arg interface{}) (sql.Result, error) {
-	nstmt, err := db.db.PrepareNamedContext(db.context, query)
-	if err != nil {
-		return nil, wrap(err)
-	}
-	res, err := nstmt.ExecContext(db.context, arg)
-	if err := nstmt.Close(); err != nil {
-		return *new(sql.Result), err
-	}
+	res, err := db.db.NamedExecContext(db.context, query, arg)
 	return res, wrap(err)
 }
 
