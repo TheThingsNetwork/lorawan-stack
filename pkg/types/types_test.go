@@ -3,6 +3,7 @@
 package types
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 
@@ -42,74 +43,98 @@ func TestTypes(t *testing.T) {
 	}
 
 	for _, sub := range subjects() {
-		// MarshalText, String, GoString
-		text, err := sub.MarshalText()
-		a.So(err, should.BeNil)
-		a.So(string(text), should.Equal, sub.String())
-		a.So(string(text), should.Equal, sub.GoString())
+		t.Run(reflect.TypeOf(sub).String(), func(t *testing.T) {
+			a = assertions.New(t)
 
-		// MarshalBinary, Size
-		bytes, err := sub.MarshalBinary()
-		a.So(err, should.BeNil)
-		a.So(bytes, should.HaveLength, sub.Size())
+			// MarshalText, String, GoString
+			text, err := sub.MarshalText()
+			a.So(err, should.BeNil)
+			a.So(string(text), should.Equal, sub.String())
+			a.So(string(text), should.Equal, sub.GoString())
 
-		// MarshalTo
-		marshaled := make([]byte, sub.Size())
-		i, err := sub.MarshalTo(marshaled)
-		a.So(err, should.BeNil)
-		a.So(i, should.Equal, sub.Size())
-		a.So(marshaled, should.Resemble, bytes)
+			// MarshalBinary, Size
+			bytes, err := sub.MarshalBinary()
+			a.So(err, should.BeNil)
+			a.So(bytes, should.HaveLength, sub.Size())
 
-		// UnmarshalBinary
-		err = sub.UnmarshalBinary(marshaled)
-		a.So(err, should.BeNil)
-		a.So(sub.String(), should.Equal, string(text))
+			// MarshalJSON
+			json, err := sub.MarshalJSON()
+			a.So(err, should.BeNil)
 
-		// UnmarshalText
-		err = sub.UnmarshalText(text)
-		a.So(err, should.BeNil)
-		a.So(sub.String(), should.Equal, string(text))
+			// Marshal, MarshalTo
+			marshaled := make([]byte, sub.Size())
+			i, err := sub.MarshalTo(marshaled)
+			a.So(err, should.BeNil)
+			a.So(i, should.Resemble, sub.Size())
+			a.So(marshaled, should.Resemble, bytes)
+			marshaled, err = sub.Marshal()
+			a.So(err, should.BeNil)
+			a.So(marshaled, should.Resemble, bytes)
+
+			// UnmarshalJSON
+			err = sub.UnmarshalJSON(json)
+			a.So(err, should.BeNil)
+			a.So(sub.String(), should.Equal, string(text))
+
+			// UnmarshalBinary
+			err = sub.UnmarshalBinary(marshaled)
+			a.So(err, should.BeNil)
+			a.So(sub.String(), should.Equal, string(text))
+
+			// UnmarshalText
+			err = sub.UnmarshalText(text)
+			a.So(err, should.BeNil)
+			a.So(sub.String(), should.Equal, string(text))
+		})
 	}
 
 	for _, sub := range zeroSubjects() {
-		// Too short
-		err := sub.UnmarshalBinary([]byte{})
-		a.So(err, should.NotBeNil)
-		err = sub.UnmarshalBinary([]byte{1})
-		a.So(err, should.NotBeNil)
+		t.Run(reflect.TypeOf(sub).String(), func(t *testing.T) {
+			a = assertions.New(t)
 
-		// Too long
-		err = sub.UnmarshalBinary([]byte(strings.Repeat("foo", 32)))
-		a.So(err, should.NotBeNil)
+			// Empty should not error
+			err := sub.UnmarshalBinary([]byte{})
+			a.So(err, should.BeNil)
 
-		// Too short
-		err = sub.UnmarshalText([]byte{})
-		a.So(err, should.NotBeNil)
-		err = sub.UnmarshalText([]byte{1, 2})
-		a.So(err, should.NotBeNil)
+			// Too short
+			err = sub.UnmarshalBinary([]byte{1})
+			a.So(err, should.NotBeNil)
 
-		// Too long
-		err = sub.UnmarshalText([]byte(strings.Repeat("foo", 32)))
-		a.So(err, should.NotBeNil)
+			// Too long
+			err = sub.UnmarshalBinary([]byte(strings.Repeat("foo", 32)))
+			a.So(err, should.NotBeNil)
 
-		// Invalid hesx
-		err = sub.UnmarshalText([]byte(strings.Repeat("zz", 2)))
-		a.So(err, should.NotBeNil)
-		err = sub.UnmarshalText([]byte(strings.Repeat("zz", 3)))
-		a.So(err, should.NotBeNil)
-		err = sub.UnmarshalText([]byte(strings.Repeat("zz", 4)))
-		a.So(err, should.NotBeNil)
-		err = sub.UnmarshalText([]byte(strings.Repeat("zz", 8)))
-		a.So(err, should.NotBeNil)
-		err = sub.UnmarshalText([]byte(strings.Repeat("zz", 16)))
-		a.So(err, should.NotBeNil)
+			// Empty should not error
+			err = sub.UnmarshalText([]byte{})
+			a.So(err, should.BeNil)
 
-		// Invalid prefixes
-		err = sub.UnmarshalText([]byte("f00f00f0/"))
-		a.So(err, should.NotBeNil)
-		err = sub.UnmarshalText([]byte("f00f00f0/fail"))
-		a.So(err, should.NotBeNil)
-		err = sub.UnmarshalText([]byte("f00f00f00/fail"))
-		a.So(err, should.NotBeNil)
+			// Too short
+			err = sub.UnmarshalText([]byte{1})
+			a.So(err, should.NotBeNil)
+
+			// Too long
+			err = sub.UnmarshalText([]byte(strings.Repeat("foo", 32)))
+			a.So(err, should.NotBeNil)
+
+			// Invalid hesx
+			err = sub.UnmarshalText([]byte(strings.Repeat("zz", 2)))
+			a.So(err, should.NotBeNil)
+			err = sub.UnmarshalText([]byte(strings.Repeat("zz", 3)))
+			a.So(err, should.NotBeNil)
+			err = sub.UnmarshalText([]byte(strings.Repeat("zz", 4)))
+			a.So(err, should.NotBeNil)
+			err = sub.UnmarshalText([]byte(strings.Repeat("zz", 8)))
+			a.So(err, should.NotBeNil)
+			err = sub.UnmarshalText([]byte(strings.Repeat("zz", 16)))
+			a.So(err, should.NotBeNil)
+
+			// Invalid prefixes
+			err = sub.UnmarshalText([]byte("f00f00f0/"))
+			a.So(err, should.NotBeNil)
+			err = sub.UnmarshalText([]byte("f00f00f0/fail"))
+			a.So(err, should.NotBeNil)
+			err = sub.UnmarshalText([]byte("f00f00f00/fail"))
+			a.So(err, should.NotBeNil)
+		})
 	}
 }
