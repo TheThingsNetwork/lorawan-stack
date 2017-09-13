@@ -13,11 +13,13 @@ import (
 
 // selectOne selects one item from the database and writes it to dest, which can
 // be a map[string]interface{}, a struct or a scannable value.
-func selectOne(context context.Context, q sqlx.QueryerContext, dest interface{}, query string, args ...interface{}) error {
+func selectOne(context context.Context, q sqlx.QueryerContext, dest interface{}, query string, args ...interface{}) (err error) {
+	defer func() { err = wrap(err) }()
+
 	// perform query
 	row := q.QueryRowxContext(context, query, args...)
 	if err := row.Err(); err != nil && !IsNoRows(err) {
-		return wrap(err)
+		return err
 	}
 
 	value := reflect.ValueOf(dest)
@@ -26,7 +28,7 @@ func selectOne(context context.Context, q sqlx.QueryerContext, dest interface{},
 	isPtr := value.Kind() == reflect.Ptr
 
 	if isPtr && value.IsNil() {
-		return wrap(errors.New("Nil pointer passed to selectOne"))
+		return errors.New("Nil pointer passed to selectOne")
 	}
 
 	if isPtr {
@@ -38,46 +40,48 @@ func selectOne(context context.Context, q sqlx.QueryerContext, dest interface{},
 	if typ.Kind() == reflect.Map {
 		m, ok := value.Interface().(map[string]interface{})
 		if !ok {
-			return wrap(fmt.Errorf("Expected map[string]interface{} but got %s", typ))
+			return fmt.Errorf("Expected map[string]interface{} but got %s", typ)
 		}
-		return wrap(row.MapScan(m))
+		return row.MapScan(m)
 	}
 
 	// try struct
 	if typ.Kind() == reflect.Struct {
-		return wrap(row.StructScan(dest))
+		return row.StructScan(dest)
 	}
 
 	// try scannable
-	return wrap(row.Scan(dest))
+	return row.Scan(dest)
 }
 
 // selectAll selects multiple items from the database and writes them to dest, which can
 // be a slice of map[string]interface or a slice of structs, or a slice of scannable values.
-func selectAll(context context.Context, q sqlx.QueryerContext, dest interface{}, query string, args ...interface{}) error {
+func selectAll(context context.Context, q sqlx.QueryerContext, dest interface{}, query string, args ...interface{}) (err error) {
+	defer func() { err = wrap(err) }()
+
 	rows, err := q.QueryxContext(context, query, args...)
 	if err != nil && !IsNoRows(err) {
-		return wrap(err)
+		return err
 	}
 
 	if err := rows.Err(); err != nil {
-		return wrap(err)
+		return err
 	}
 
 	defer rows.Close()
 
 	value := reflect.ValueOf(dest)
 	if value.Kind() != reflect.Ptr {
-		return wrap(fmt.Errorf("Expected pointer to slice but got %s", value.Type()))
+		return fmt.Errorf("Expected pointer to slice but got %s", value.Type())
 	}
 
 	if value.IsNil() {
-		return wrap(errors.New("Nil pointer passed to selectAll"))
+		return errors.New("Nil pointer passed to selectAll")
 	}
 
 	slice := reflect.Indirect(value)
 	if slice.Kind() != reflect.Slice {
-		return wrap(fmt.Errorf("Expected pointer to slice of map or struct, but got %s", value.Type()))
+		return fmt.Errorf("Expected pointer to slice of map or struct, but got %s", value.Type())
 	}
 
 	base := slice.Type().Elem()
@@ -90,7 +94,7 @@ func selectAll(context context.Context, q sqlx.QueryerContext, dest interface{},
 	if base.Kind() == reflect.Map {
 		_, ok := reflect.New(base).Elem().Interface().(map[string]interface{})
 		if !ok {
-			return wrap(fmt.Errorf("Expected []map[string]interface{} but got []%s", base))
+			return fmt.Errorf("Expected []map[string]interface{} but got []%s", base)
 		}
 
 		for rows.Next() {
@@ -117,7 +121,7 @@ func selectAll(context context.Context, q sqlx.QueryerContext, dest interface{},
 			res := vp.Interface()
 			err := rows.StructScan(res)
 			if err != nil {
-				return wrap(err)
+				return err
 			}
 
 			if isPtr {
@@ -135,7 +139,7 @@ func selectAll(context context.Context, q sqlx.QueryerContext, dest interface{},
 		res := vp.Interface()
 		err := rows.Scan(res)
 		if err != nil {
-			return wrap(err)
+			return err
 		}
 
 		if isPtr {
