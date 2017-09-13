@@ -78,15 +78,15 @@ func (s *UserStore) register(q db.QueryContext, user, result types.User) error {
 			RETURNING *`,
 		u)
 
-	if dup, yes := db.IsDuplicate(err); yes {
-		if _, duplicated := dup.Duplicates["email"]; duplicated {
+	if duplicates, yes := db.IsDuplicate(err); yes {
+		if email, duplicated := duplicates["email"]; duplicated {
 			return ErrUserEmailTaken.New(errors.Attributes{
-				"email": u.Email,
+				"email": email,
 			})
 		}
-		if _, duplicated := dup.Duplicates["username"]; duplicated {
+		if username, duplicated := duplicates["username"]; duplicated {
 			return ErrUsernameTaken.New(errors.Attributes{
-				"username": u.Username,
+				"username": username,
 			})
 		}
 	}

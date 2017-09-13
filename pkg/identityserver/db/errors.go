@@ -11,6 +11,19 @@ import (
 	"github.com/lib/pq"
 )
 
+func init() {
+	ErrDuplicate.Register()
+}
+
+var duplicatesKey = "duplicates"
+
+// ErrDuplicate is the descriptor for the error returned when there is an unique
+// constraint violation in the database.
+var ErrDuplicate = &errors.ErrDescriptor{
+	Code: 1,
+	Type: errors.Conflict,
+}
+
 func wrap(err error) error {
 	if err == nil {
 		return nil
@@ -35,10 +48,9 @@ func wrap(err error) error {
 					duplicates[name] = strings.Trim(values[i], "'")
 				}
 
-				return &ErrDuplicate{
-					Message:    err.Error(),
-					Duplicates: duplicates,
-				}
+				return ErrDuplicate.NewWithCause(errors.Attributes{
+					duplicatesKey: duplicates,
+				}, err)
 			}
 		}
 	}
@@ -50,27 +62,15 @@ func wrap(err error) error {
 	return errors.NewWithCause("Unexpected error", err)
 }
 
-// ErrDuplicate denotes insertion/update of a duplicate value that should be
-// unique.
-type ErrDuplicate struct {
-	Message    string
-	Duplicates map[string]string
-}
-
-// Error implments error.
-func (e *ErrDuplicate) Error() string {
-	return e.Message
-}
-
 // IsDuplicate returns the name and value of a duplicated field and a bool
 // denoting wether or not the error was caused by a duplicate value.
-func IsDuplicate(err error) (*ErrDuplicate, bool) {
+func IsDuplicate(err error) (map[string]string, bool) {
 	if err == nil {
 		return nil, false
 	}
 
-	if dup, ok := err.(*ErrDuplicate); ok {
-		return dup, true
+	if dup, ok := err.(errors.Error); ok && dup.Code() == ErrDuplicate.Code {
+		return dup.Attributes()[duplicatesKey].(map[string]string), true
 	}
 
 	return nil, false
