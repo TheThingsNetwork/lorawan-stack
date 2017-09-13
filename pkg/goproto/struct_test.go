@@ -3,6 +3,7 @@
 package goproto
 
 import (
+	"bytes"
 	"encoding/json"
 	"testing"
 
@@ -10,6 +11,19 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
+
+type jsonMarshaler struct {
+	Text string
+}
+
+func (m jsonMarshaler) MarshalJSON() ([]byte, error) {
+	return bytes.ToUpper([]byte(`"` + m.Text + `"`)), nil
+}
+
+func (m *jsonMarshaler) UnmarshalJSON(b []byte) error {
+	m.Text = string(bytes.ToLower(bytes.Trim(b, `"`)))
+	return nil
+}
 
 func TestStructProto(t *testing.T) {
 	a := assertions.New(t)
@@ -25,6 +39,7 @@ func TestStructProto(t *testing.T) {
 		"list":           []string{"a", "b", "c"},
 		"map":            map[string]string{"foo": "bar"},
 		"eui":            types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
+		"jsonMarshaler":  &jsonMarshaler{Text: "testtext"},
 	}
 	o := MapFromProto(MapProto(m))
 	mJSON, _ := json.Marshal(m)
