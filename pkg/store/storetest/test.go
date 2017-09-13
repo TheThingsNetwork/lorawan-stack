@@ -13,7 +13,7 @@ type testingT interface {
 }
 
 // TestStore executes a black-box test for the given store
-func TestStore(t testingT, v store.Interface) {
+func TestStore(t testingT, v store.TypedStore) {
 	a := assertions.New(t)
 
 	old := map[string]interface{}{

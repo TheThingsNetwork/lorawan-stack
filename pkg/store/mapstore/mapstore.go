@@ -15,7 +15,7 @@ import (
 )
 
 // New returns a new MapStore
-func New() store.Interface {
+func New() store.TypedStore {
 	return &mapStore{
 		entropy: rand.New(rand.NewSource(time.Now().UnixNano())),
 		data:    make(map[store.PrimaryKey]map[string]interface{}),
