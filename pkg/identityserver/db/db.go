@@ -5,10 +5,14 @@ package db
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
+	"reflect"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db/migrations"
 	"github.com/cockroachdb/cockroach-go/crdb"
 	"github.com/jmoiron/sqlx"
+	"github.com/jmoiron/sqlx/reflectx"
 
 	// include pq for the postgres driver
 	_ "github.com/lib/pq"
@@ -212,18 +216,20 @@ func namedSelectOne(context context.Context, e sqlx.ExtContext, dest interface{}
 	if err != nil {
 		return wrap(err)
 	}
+
 	defer rows.Close()
+
 	if rows.Next() {
 		switch v := dest.(type) {
 		case *map[string]interface{}:
-			err = rows.MapScan(*v)
+			return wrap(rows.MapScan(*v))
 		case map[string]interface{}:
-			err = rows.MapScan(v)
+			return wrap(rows.MapScan(v))
 		default:
-			err = rows.StructScan(dest)
+			return wrap(rows.StructScan(dest))
 		}
 	}
-	return wrap(err)
+	return nil
 }
 
 func namedSelectAll(context context.Context, e sqlx.ExtContext, dest interface{}, query string, arg interface{}) error {
@@ -246,10 +252,102 @@ func namedSelectAll(context context.Context, e sqlx.ExtContext, dest interface{}
 		}
 		*v = aggr
 	default:
-		err = rows.StructScan(dest)
+		err = scanAll(rows, dest)
 	}
 
 	return wrap(err)
+}
+
+var _scannerInterface = reflect.TypeOf((*sql.Scanner)(nil)).Elem()
+
+// scanAll scans all the rows into a slice of struct.
+// Copied and modified from https://github.com/jmoiron/sqlx
+func scanAll(rows *sqlx.Rows, dest interface{}) error {
+	value := reflect.ValueOf(dest)
+
+	if value.Kind() != reflect.Ptr {
+		return errors.New("Must pass a pointer, not a value to StructScan destination")
+	}
+
+	if value.IsNil() {
+		return errors.New("nil pointer passed to StructScan destination")
+	}
+
+	slice := reflect.Indirect(value)
+
+	if slice.Kind() != reflect.Slice {
+		return fmt.Errorf("Expected a slice, but got %s", slice.Kind())
+	}
+
+	isPtr := slice.Type().Elem().Kind() == reflect.Ptr
+	base := baseType(slice.Type().Elem())
+
+	if base.Kind() != reflect.Struct {
+		return fmt.Errorf("Expected a slice of struct, but got %s", slice.Kind())
+	}
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return err
+	}
+
+	fields := rows.Mapper.TraversalsByName(base, columns)
+	values := make([]interface{}, len(columns))
+
+	for rows.Next() {
+		vp := reflect.New(base)
+		v := reflect.Indirect(vp)
+
+		err = fieldsByTraversal(v, fields, values, true)
+		if err != nil {
+			return err
+		}
+
+		err = rows.Scan(values...)
+		if err != nil {
+			return err
+		}
+
+		if isPtr {
+			slice.Set(reflect.Append(slice, vp))
+		} else {
+			slice.Set(reflect.Append(slice, v))
+		}
+	}
+
+	return nil
+}
+
+// fieldsByName fills a values interface with fields from the passed value based
+// on the traversals in int.
+// Copied and modified from https://github.com/jmoiron/sqlx
+func fieldsByTraversal(v reflect.Value, traversals [][]int, values []interface{}, ptrs bool) error {
+	v = reflect.Indirect(v)
+	if v.Kind() != reflect.Struct {
+		return errors.New("argument not a struct")
+	}
+
+	for i, traversal := range traversals {
+		if len(traversal) == 0 {
+			values[i] = new(interface{})
+			continue
+		}
+		f := reflectx.FieldByIndexes(v, traversal)
+		if ptrs {
+			values[i] = f.Addr().Interface()
+		} else {
+			values[i] = f.Interface()
+		}
+	}
+	return nil
+}
+
+func baseType(t reflect.Type) reflect.Type {
+	if t.Kind() == reflect.Ptr {
+		return t.Elem()
+	}
+
+	return t
 }
 
 // selectOne selects one item from the database and writes it to dest, which can
