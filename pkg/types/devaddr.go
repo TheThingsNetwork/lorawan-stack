@@ -96,7 +96,7 @@ func (prefix DevAddrPrefix) MarshalTo(data []byte) (int, error) {
 	return marshalBinaryBytesTo(data, append(prefix.DevAddr[:], prefix.Length))
 }
 
-// Marshaler implements the proto.Marshaler interface
+// Marshal implements the proto.Marshaler interface
 func (prefix DevAddrPrefix) Marshal() ([]byte, error) { return prefix.MarshalBinary() }
 
 // Unmarshal implements the proto.Unmarshaler interface
