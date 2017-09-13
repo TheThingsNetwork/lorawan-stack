@@ -262,9 +262,9 @@ enum PingSlotPeriod {
   PING_EVERY_128S = 7;
 }
 
-// The DeviceManagement service allows clients to manage their end devices
+// The DeviceRegistry service allows clients to manage their end devices
 // This service is implemented by the join server, network server and application server
-service DeviceManagement {
+service DeviceRegistry {
   // ListDevices returns the devices that match the given identifiers
   rpc ListDevices(EndDeviceIdentifiers) returns (EndDevices);
   // GetDevice returns the device that matches the given identifiers.
