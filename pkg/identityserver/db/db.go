@@ -14,6 +14,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
+var ensureInterface Database = &DB{}
+
 // QueryContext is the interface of contexts where a query can be run.
 // Typically this means either the global database scope, or a transaction.
 type QueryContext interface {
@@ -63,7 +65,7 @@ type Database interface {
 
 	// Transact begins a transaction and runs the function in it, it returns the
 	// error the function returns (and retries or rolls back automatically).
-	Transact(func(*Tx) error) error
+	Transact(func(*Tx) error, ...TxOption) error
 }
 
 // DB implements Database.
