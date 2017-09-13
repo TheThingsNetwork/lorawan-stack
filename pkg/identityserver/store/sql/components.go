@@ -3,9 +3,9 @@
 package sql
 
 import (
-	"errors"
 	"fmt"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
@@ -19,21 +19,44 @@ type ComponentStore struct {
 	factory factory.ComponentFactory
 }
 
+func init() {
+	ErrComponentNotFound.Register()
+	ErrComponentIDTaken.Register()
+	ErrComponentCollaboratorNotFound.Register()
+	ErrComponentCollaboratorRightNotFound.Register()
+}
+
 // ErrComponentNotFound is returned when trying to fetch a component that
 // does not exist.
-var ErrComponentNotFound = errors.New("component not found")
+var ErrComponentNotFound = &errors.ErrDescriptor{
+	MessageFormat: "Component `{component_id}` does not exist",
+	Code:          200,
+	Type:          errors.NotFound,
+}
 
 // ErrComponentIDTaken is returned when trying to create a new component with
 // an ID that already exists.
-var ErrComponentIDTaken = errors.New("component ID already taken")
+var ErrComponentIDTaken = &errors.ErrDescriptor{
+	MessageFormat: "Component `{component_id}` is already taken",
+	Code:          201,
+	Type:          errors.AlreadyExists,
+}
 
 // ErrComponentCollaboratorNotFound is returned when trying to remove a collaborator
 // that does not exist.
-var ErrComponentCollaboratorNotFound = errors.New("component collaborator not found")
+var ErrComponentCollaboratorNotFound = &errors.ErrDescriptor{
+	MessageFormat: "User `{username}` is not a collaborator for component `{component_id}`",
+	Code:          202,
+	Type:          errors.NotFound,
+}
 
 // ErrComponentCollaboratorRightNotFound is returned when trying to revoke a right
 // from a collaborator that is not granted.
-var ErrComponentCollaboratorRightNotFound = errors.New("component collaborator right not found")
+var ErrComponentCollaboratorRightNotFound = &errors.ErrDescriptor{
+	MessageFormat: "User `{username}` does not have the right `{right}` for component `{component_id}`",
+	Code:          203,
+	Type:          errors.NotFound,
+}
 
 // Register creates a new Component and returns the new created Component.
 func (s *ComponentStore) Register(component types.Component) (types.Component, error) {
@@ -52,7 +75,9 @@ func (s *ComponentStore) register(q db.QueryContext, component, result types.Com
 		comp)
 
 	if _, yes := db.IsDuplicate(err); yes {
-		return ErrComponentIDTaken
+		return ErrComponentIDTaken.New(errors.Attributes{
+			"component_id": comp.ID,
+		})
 	}
 
 	if err != nil {
@@ -74,7 +99,9 @@ func (s *ComponentStore) FindByID(componentID string) (types.Component, error) {
 func (s *ComponentStore) component(q db.QueryContext, componentID string, result types.Component) error {
 	err := q.SelectOne(result, "SELECT * FROM components WHERE id = $1", componentID)
 	if db.IsNoRows(err) {
-		return ErrComponentNotFound
+		return ErrComponentNotFound.New(errors.Attributes{
+			"component_id": componentID,
+		})
 	}
 	if err != nil {
 		return err
@@ -170,7 +197,9 @@ func (s *ComponentStore) delete(q db.QueryContext, componentID string) error {
 		"DELETE FROM components WHERE id = $1 RETURNING id",
 		componentID)
 	if db.IsNoRows(err) {
-		return ErrComponentNotFound
+		return ErrComponentNotFound.New(errors.Attributes{
+			"component_id": componentID,
+		})
 	}
 	return nil
 }
@@ -250,7 +279,10 @@ func (s *ComponentStore) removeCollaborator(q db.QueryContext, componentID strin
 		componentID,
 		username)
 	if db.IsNoRows(err) {
-		return ErrComponentCollaboratorNotFound
+		return ErrComponentCollaboratorNotFound.New(errors.Attributes{
+			"component_id": componentID,
+			"username":     username,
+		})
 	}
 	return err
 }
@@ -307,7 +339,11 @@ func (s *ComponentStore) removeRight(q db.QueryContext, componentID string, user
 		username,
 		right)
 	if db.IsNoRows(err) {
-		return ErrComponentCollaboratorRightNotFound
+		return ErrComponentCollaboratorRightNotFound.New(errors.Attributes{
+			"component_id": componentID,
+			"username":     username,
+			"right":        right,
+		})
 	}
 	return err
 }

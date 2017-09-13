@@ -3,11 +3,11 @@
 package sql
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
@@ -21,20 +21,43 @@ type UserStore struct {
 	factory factory.UserFactory
 }
 
+func init() {
+	ErrUserNotFound.Register()
+	ErrUserEmailNotFound.Register()
+	ErrUsernameTaken.Register()
+	ErrUserEmailTaken.Register()
+}
+
 // ErrUserNotFound is returned when trying to fetch an user that does not exist.
-var ErrUserNotFound = errors.New("user not found")
+var ErrUserNotFound = &errors.ErrDescriptor{
+	MessageFormat: "User `{username}` does not exist",
+	Code:          400,
+	Type:          errors.NotFound,
+}
 
 // ErrUserEmailNotFound is returned when trying to find an user with an email
 // that does not exist.
-var ErrUserEmailNotFound = errors.New("user email not found")
+var ErrUserEmailNotFound = &errors.ErrDescriptor{
+	MessageFormat: "User with email address `{email}` does not exist",
+	Code:          401,
+	Type:          errors.NotFound,
+}
 
 // ErrUsernameTaken is returned when trying to create a new user with an
 // username that already exists.
-var ErrUsernameTaken = errors.New("username already taken")
+var ErrUsernameTaken = &errors.ErrDescriptor{
+	MessageFormat: "Username `{username}` is already taken",
+	Code:          402,
+	Type:          errors.AlreadyExists,
+}
 
 // ErrUserEmailTaken is returned when trying to create a new user with an
 // email that already exists.
-var ErrUserEmailTaken = errors.New("email already taken")
+var ErrUserEmailTaken = &errors.ErrDescriptor{
+	MessageFormat: "Email address `{email}` is already taken by another account",
+	Code:          403,
+	Type:          errors.AlreadyExists,
+}
 
 // Register creates an User and returns the new created User.
 func (s *UserStore) Register(user types.User) (types.User, error) {
@@ -57,10 +80,14 @@ func (s *UserStore) register(q db.QueryContext, user, result types.User) error {
 
 	if dup, yes := db.IsDuplicate(err); yes {
 		if _, duplicated := dup.Duplicates["email"]; duplicated {
-			return ErrUserEmailTaken
+			return ErrUserEmailTaken.New(errors.Attributes{
+				"email": u.Email,
+			})
 		}
 		if _, duplicated := dup.Duplicates["username"]; duplicated {
-			return ErrUsernameTaken
+			return ErrUsernameTaken.New(errors.Attributes{
+				"username": u.Username,
+			})
 		}
 	}
 
@@ -87,7 +114,9 @@ func (s *UserStore) findByUsername(q db.QueryContext, username string, user type
 		strings.ToLower(username))
 
 	if db.IsNoRows(err) {
-		return ErrUserNotFound
+		return ErrUserNotFound.New(errors.Attributes{
+			"username": username,
+		})
 	}
 	if err != nil {
 		return err
@@ -111,7 +140,9 @@ func (s *UserStore) findByEmail(q db.QueryContext, email string, user types.User
 		"SELECT * FROM users WHERE email = $1",
 		strings.ToLower(email))
 	if db.IsNoRows(err) {
-		return ErrUserEmailNotFound
+		return ErrUserEmailNotFound.New(errors.Attributes{
+			"email": email,
+		})
 	}
 	if err != nil {
 		return err
@@ -144,7 +175,9 @@ func (s *UserStore) edit(q db.QueryContext, user, result types.User) error {
 		u)
 
 	if _, yes := db.IsDuplicate(err); yes {
-		return ErrUserEmailTaken
+		return ErrUserEmailTaken.New(errors.Attributes{
+			"email": u.Email,
+		})
 	}
 
 	if err != nil {
@@ -170,7 +203,9 @@ func (s *UserStore) archive(q db.QueryContext, username string) error {
 		time.Now(),
 		username)
 	if db.IsNoRows(err) {
-		return ErrUserNotFound
+		return ErrUserNotFound.New(errors.Attributes{
+			username: username,
+		})
 	}
 	return err
 }

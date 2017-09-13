@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/smartystreets/assertions"
@@ -31,21 +32,26 @@ func TestUserCreate(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore()
 
+	for _, user := range testUsers() {
+		_, err := s.Users.Register(user)
+		a.So(err, should.NotBeNil)
+		a.So(err.(errors.Error).Code(), should.Equal, 402)
+		a.So(err.(errors.Error).Type(), should.Equal, errors.AlreadyExists)
+	}
+}
+
+func TestUserFind(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore()
+
 	alice := testUsers()["alice"]
 	bob := testUsers()["bob"]
 
-	// Attempt to recreate them should throw an error
-	{
-		_, err := s.Users.Register(alice)
-		a.So(err, should.NotBeNil)
-		a.So(err.Error(), should.Equal, ErrUsernameTaken.Error())
-	}
-
 	// Find by email
 	{
-		found, err := s.Users.FindByEmail(bob.Email)
+		found, err := s.Users.FindByEmail(alice.Email)
 		a.So(err, should.BeNil)
-		a.So(found, test.ShouldBeUserIgnoringAutoFields, bob)
+		a.So(found, test.ShouldBeUserIgnoringAutoFields, alice)
 	}
 
 	// Find by username
@@ -60,12 +66,25 @@ func TestUserEdit(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore()
 
+	bob := testUsers()["bob"]
 	alice := testUsers()["alice"]
 	alice.Password = "qwerty"
 
-	updated, err := s.Users.Edit(alice)
-	a.So(err, should.BeNil)
-	a.So(updated, test.ShouldBeUserIgnoringAutoFields, alice)
+	// Update user
+	{
+		updated, err := s.Users.Edit(alice)
+		a.So(err, should.BeNil)
+		a.So(updated, test.ShouldBeUserIgnoringAutoFields, alice)
+	}
+
+	alice.Email = bob.Email
+	// Try to update email to an existing one
+	{
+		_, err := s.Users.Edit(alice)
+		a.So(err, should.NotBeNil)
+		a.So(err.(errors.Error).Code(), should.Equal, 403)
+		a.So(err.(errors.Error).Type(), should.Equal, errors.AlreadyExists)
+	}
 }
 
 func TestUserArchive(t *testing.T) {

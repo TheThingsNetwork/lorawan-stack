@@ -5,6 +5,7 @@ package sql
 import (
 	"testing"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/utils"
@@ -71,7 +72,8 @@ func TestGatewayCreate(t *testing.T) {
 	for _, gtw := range gateways {
 		_, err := s.Gateways.Register(gtw)
 		a.So(err, should.NotBeNil)
-		a.So(err.Error(), should.Equal, ErrGatewayIDTaken.Error())
+		a.So(err.(errors.Error).Code(), should.Equal, 301)
+		a.So(err.(errors.Error).Type(), should.Equal, errors.AlreadyExists)
 	}
 }
 

@@ -2,7 +2,7 @@
 
 package migrations
 
-import "fmt"
+import "github.com/TheThingsNetwork/ttn/pkg/errors"
 
 // Direction represents whether a migration is forwards or backwards.
 type Direction string
@@ -34,15 +34,15 @@ func NewRegistry() Registry {
 // Register registers a new migration into the registry.
 func (r Registry) Register(order int, name, forwards, backwards string) {
 	if order < 1 {
-		panic(fmt.Sprintf("identityserver/server/db/migrations: invalid migration order `%d` for migration `%s`. Must be > 0", order, name))
+		panic(errors.Errorf("Invalid migration order `%d` for migration `%s`. Order must be > 0", order, name))
 	}
 
 	if _, exists := r.Get(order); exists {
-		panic(fmt.Sprintf("identityserver/server/db/migrations: a migration with order `%d` already exists", order))
+		panic(errors.Errorf("A migration with order `%d` already exists", order))
 	}
 
 	if _, exists := r.Get(order - 1); !exists && order != 1 {
-		panic(fmt.Sprintf("identityserver/server/db/migrations: trying to register a migration with order `%v` but migration with order `%v` does not exist", order, order-1))
+		panic(errors.Errorf("Trying to register a migration with order `%v` but migration with order `%v` does not exist", order, order-1))
 	}
 
 	r[order] = &Migration{

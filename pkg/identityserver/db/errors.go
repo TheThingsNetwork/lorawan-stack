@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/lib/pq"
 )
 
@@ -42,13 +43,11 @@ func wrap(err error) error {
 		}
 	}
 
-	if u, ok := err.(*ErrUnexpected); ok {
+	if u, ok := err.(errors.Error); ok {
 		return u
 	}
 
-	return &ErrUnexpected{
-		Cause: err,
-	}
+	return errors.NewWithCause("Unexpected error", err)
 }
 
 // ErrDuplicate denotes insertion/update of a duplicate value that should be
@@ -80,14 +79,4 @@ func IsDuplicate(err error) (*ErrDuplicate, bool) {
 // IsNoRows returns wether or not the error is an sql.ErrNoRows.
 func IsNoRows(err error) bool {
 	return err == sql.ErrNoRows
-}
-
-// ErrUnexpected is an unexpected error.
-type ErrUnexpected struct {
-	Cause error
-}
-
-// Error implmentents error.
-func (e *ErrUnexpected) Error() string {
-	return e.Cause.Error()
 }

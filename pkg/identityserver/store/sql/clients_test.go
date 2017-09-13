@@ -5,6 +5,7 @@ package sql
 import (
 	"testing"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/utils"
@@ -47,7 +48,8 @@ func TestClientCreate(t *testing.T) {
 	for _, client := range clients {
 		_, err := s.Clients.Register(client)
 		a.So(err, should.NotBeNil)
-		a.So(err.Error(), should.Equal, ErrClientIDTaken.Error())
+		a.So(err.(errors.Error).Code(), should.Equal, 101)
+		a.So(err.(errors.Error).Type(), should.Equal, errors.AlreadyExists)
 	}
 }
 
@@ -156,7 +158,7 @@ func TestClientManagement(t *testing.T) {
 
 	client := testClients()["foo-client"]
 
-	// archive
+	// Archive client
 	{
 		err := s.Clients.Archive(client.ID)
 		a.So(err, should.BeNil)
@@ -166,7 +168,7 @@ func TestClientManagement(t *testing.T) {
 		a.So(found.GetClient().Archived, should.NotBeNil)
 	}
 
-	// approve client
+	// Mark as approved
 	{
 		err := s.Clients.Approve(client.ID)
 		a.So(err, should.BeNil)
@@ -176,7 +178,7 @@ func TestClientManagement(t *testing.T) {
 		a.So(found.GetClient().State, should.Resemble, types.ApprovedClient)
 	}
 
-	// check that 3 previous operations were reflected in the database
+	// Mark as rejected
 	{
 		err := s.Clients.Reject(client.ID)
 		a.So(err, should.BeNil)
@@ -186,13 +188,15 @@ func TestClientManagement(t *testing.T) {
 		a.So(found.GetClient().State, should.Resemble, types.RejectedClient)
 	}
 
-	// delete
+	// Delete
 	{
 		err := s.Clients.Delete(client.ID)
 		a.So(err, should.BeNil)
 
 		_, err = s.Clients.FindByID(client.ID)
-		a.So(err, should.NotBeNil)
-		a.So(err.Error(), should.Equal, ErrClientNotFound.Error())
+		if a.So(err, should.NotBeNil) {
+			a.So(err.(errors.Error).Code(), should.Equal, 100)
+			a.So(err.(errors.Error).Type(), should.Equal, errors.NotFound)
+		}
 	}
 }

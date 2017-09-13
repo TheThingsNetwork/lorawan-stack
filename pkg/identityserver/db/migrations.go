@@ -5,16 +5,9 @@ package db
 import (
 	"fmt"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db/migrations"
 )
-
-func errMigrationDoesNotExist(order int) error {
-	return fmt.Errorf("identityserver/server/db: migration with order `%d` does not exist", order)
-}
-
-func errMigrationFailed(name string, dir migrations.Direction, err error) error {
-	return fmt.Errorf("identityserver/server/db: could not apply migration `%s` %s: %s", name, dir, err)
-}
 
 const migrationHistorySchema = `
 	CREATE TABLE IF NOT EXISTS migration_history (
@@ -97,7 +90,7 @@ func (db *DB) Migrate(target int) error {
 		}
 		migration, exists := db.migrations.Get(n)
 		if !exists {
-			return errMigrationDoesNotExist(n)
+			return errors.Errorf("Migration with order `%d` does not exist", n)
 		}
 		next := migration.Forwards
 		back := migration.Backwards
@@ -106,7 +99,7 @@ func (db *DB) Migrate(target int) error {
 			back = migration.Forwards
 		}
 		if _, err := db.Exec(next); err != nil {
-			return errMigrationFailed(migration.Name, direction, err)
+			return errors.NewWithCause(fmt.Sprintf("Failed to apply migration `%s` %s", migration.Name, direction), err)
 		}
 		defer func() {
 			if err != nil {

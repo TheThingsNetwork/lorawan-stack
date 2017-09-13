@@ -5,6 +5,7 @@ package sql
 import (
 	"testing"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/utils"
@@ -51,7 +52,9 @@ func TestApplicationCreate(t *testing.T) {
 	// Attempt to recreate them should throw an error
 	for _, application := range applications {
 		_, err := s.Applications.Register(application)
-		a.So(err.Error(), should.Equal, ErrApplicationIDTaken.Error())
+		a.So(err, should.NotBeNil)
+		a.So(err.(errors.Error).Code(), should.Equal, 2)
+		a.So(err.(errors.Error).Type(), should.Equal, errors.AlreadyExists)
 	}
 }
 

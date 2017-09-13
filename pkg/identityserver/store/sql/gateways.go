@@ -3,10 +3,10 @@
 package sql
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
@@ -21,28 +21,61 @@ type GatewayStore struct {
 	factory factory.GatewayFactory
 }
 
+func init() {
+	ErrGatewayNotFound.Register()
+	ErrGatewayIDTaken.Register()
+	ErrGatewayAttributeNotFound.Register()
+	ErrGatewayAntennaNotFound.Register()
+	ErrGatewayCollaboratorNotFound.Register()
+	ErrGatewayCollaboratorRightNotFound.Register()
+}
+
 // ErrGatewayNotFound is returned when trying to fetch a gateway that does not exist.
-var ErrGatewayNotFound = errors.New("gateway not found")
+var ErrGatewayNotFound = &errors.ErrDescriptor{
+	MessageFormat: "Gateway `{gateway_id}` does not exist",
+	Code:          300,
+	Type:          errors.NotFound,
+}
 
 // ErrGatewayIDTaken is returned when trying to create a new gateway with an ID
 // that already exists.
-var ErrGatewayIDTaken = errors.New("gateway ID already taken")
+var ErrGatewayIDTaken = &errors.ErrDescriptor{
+	MessageFormat: "Gateway id `{gateway_id}` is already taken",
+	Code:          301,
+	Type:          errors.AlreadyExists,
+}
 
 // ErrGatewayAttributeNotFound is returned when trying to delete an attribute
 // that does not exist.
-var ErrGatewayAttributeNotFound = errors.New("gateway attribute not found")
+var ErrGatewayAttributeNotFound = &errors.ErrDescriptor{
+	MessageFormat: "Attribute `{attribute}` does not exist for gateway `{gateway_id}`",
+	Code:          302,
+	Type:          errors.NotFound,
+}
 
 // ErrGatewayAntennaNotFound is returned when trying to delete an antenna that
 // does not exist.
-var ErrGatewayAntennaNotFound = errors.New("gateway antenna not found")
+var ErrGatewayAntennaNotFound = &errors.ErrDescriptor{
+	MessageFormat: "Antenna `{antenna}` does not exist for gateway `{gateway_id}`",
+	Code:          303,
+	Type:          errors.NotFound,
+}
 
 // ErrGatewayCollaboratorNotFound is returned when trying to remove a
 // collaborator that does not exist.
-var ErrGatewayCollaboratorNotFound = errors.New("gateway collaborator not found")
+var ErrGatewayCollaboratorNotFound = &errors.ErrDescriptor{
+	MessageFormat: "User `{username}` is not a collaborator for gateway `{gateway_id}`",
+	Code:          304,
+	Type:          errors.NotFound,
+}
 
 // ErrGatewayCollaboratorRightNotFound is returned when trying to revoke a
 // right from a collaborator that is not granted.
-var ErrGatewayCollaboratorRightNotFound = errors.New("gateway collaborator right not found")
+var ErrGatewayCollaboratorRightNotFound = &errors.ErrDescriptor{
+	MessageFormat: "User `{username}` does not have the right `{right}` for gateway `{gateway_id}`",
+	Code:          305,
+	Type:          errors.NotFound,
+}
 
 // Register creates a new Gateway and returns the new created Gateway.
 func (s *GatewayStore) Register(gateway types.Gateway) (types.Gateway, error) {
@@ -92,7 +125,9 @@ func (s *GatewayStore) register(q db.QueryContext, gateway types.Gateway, result
 		gtw)
 
 	if _, yes := db.IsDuplicate(err); yes {
-		return ErrGatewayIDTaken
+		return ErrGatewayIDTaken.New(errors.Attributes{
+			"gateway_id": gtw.ID,
+		})
 	}
 
 	if err != nil {
@@ -131,7 +166,9 @@ func (s *GatewayStore) FindByID(gtwID string) (types.Gateway, error) {
 func (s *GatewayStore) gateway(q db.QueryContext, gtwID string, result types.Gateway) error {
 	err := q.SelectOne(result, "SELECT * FROM gateways WHERE id = $1", gtwID)
 	if db.IsNoRows(err) {
-		return ErrGatewayNotFound
+		return ErrGatewayNotFound.New(errors.Attributes{
+			"gateway_id": gtwID,
+		})
 	}
 	return err
 }
@@ -223,7 +260,9 @@ func (s *GatewayStore) edit(q db.QueryContext, gateway, result types.Gateway) er
 		gtw)
 
 	if db.IsNoRows(err) {
-		return ErrGatewayNotFound
+		return ErrGatewayNotFound.New(errors.Attributes{
+			"gateway_id": gtw.ID,
+		})
 	}
 
 	if err != nil {
@@ -249,7 +288,9 @@ func (s *GatewayStore) archive(q db.QueryContext, gtwID string) error {
 		time.Now(),
 		gtwID)
 	if db.IsNoRows(err) {
-		return ErrGatewayNotFound
+		return ErrGatewayNotFound.New(errors.Attributes{
+			"gateway_id": gtwID,
+		})
 	}
 	return err
 }
@@ -318,7 +359,10 @@ func (s *GatewayStore) removeAttribute(q db.QueryContext, gtwID string, attribut
 		gtwID,
 		attribute)
 	if db.IsNoRows(err) {
-		return ErrGatewayAttributeNotFound
+		return ErrGatewayAttributeNotFound.New(errors.Attributes{
+			"gateway_id": gtwID,
+			"attribute":  attribute,
+		})
 	}
 	return err
 }
@@ -415,7 +459,10 @@ func (s *GatewayStore) removeAntenna(q db.QueryContext, gtwID, antennaID string)
 		gtwID,
 		antennaID)
 	if db.IsNoRows(err) {
-		return ErrGatewayAntennaNotFound
+		return ErrGatewayAntennaNotFound.New(errors.Attributes{
+			"gateway_id": gtwID,
+			"antenna":    antennaID,
+		})
 	}
 	return err
 }
@@ -515,7 +562,10 @@ func (s *GatewayStore) removeCollaborator(q db.QueryContext, gtwID string, usern
 		gtwID,
 		username)
 	if db.IsNoRows(err) {
-		return ErrGatewayCollaboratorNotFound
+		return ErrGatewayCollaboratorNotFound.New(errors.Attributes{
+			"gateway_id": gtwID,
+			"username":   username,
+		})
 	}
 	return err
 }
@@ -572,7 +622,11 @@ func (s *GatewayStore) removeRight(q db.QueryContext, gtwID string, username str
 		username,
 		right)
 	if db.IsNoRows(err) {
-		return ErrGatewayCollaboratorRightNotFound
+		return ErrGatewayCollaboratorRightNotFound.New(errors.Attributes{
+			"gateway_id": gtwID,
+			"username":   username,
+			"right":      right,
+		})
 	}
 	return err
 }

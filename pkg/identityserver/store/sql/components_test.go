@@ -5,6 +5,7 @@ package sql
 import (
 	"testing"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/utils"
@@ -41,7 +42,8 @@ func TestComponentCreate(t *testing.T) {
 	for _, component := range components {
 		_, err := s.Components.Register(component)
 		a.So(err, should.NotBeNil)
-		a.So(err.Error(), should.Equal, ErrComponentIDTaken.Error())
+		a.So(err.(errors.Error).Code(), should.Equal, 201)
+		a.So(err.(errors.Error).Type(), should.Equal, errors.AlreadyExists)
 	}
 }
 
@@ -161,5 +163,6 @@ func TestComponentDelete(t *testing.T) {
 
 	_, err = s.Components.FindByID(component.ID)
 	a.So(err, should.NotBeNil)
-	a.So(err.Error(), should.Equal, ErrComponentNotFound.Error())
+	a.So(err.(errors.Error).Code(), should.Equal, 200)
+	a.So(err.(errors.Error).Type(), should.Equal, errors.NotFound)
 }

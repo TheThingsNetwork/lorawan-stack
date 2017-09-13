@@ -3,10 +3,10 @@
 package sql
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
@@ -20,20 +20,43 @@ type ClientStore struct {
 	factory factory.ClientFactory
 }
 
+func init() {
+	ErrClientNotFound.Register()
+	ErrClientIDTaken.Register()
+	ErrClientCollaboratorNotFound.Register()
+	ErrClientCollaboratorRightNotFound.Register()
+}
+
 // ErrClientNotFound is returned when trying to fetch a client that does not exists.
-var ErrClientNotFound = errors.New("client not found")
+var ErrClientNotFound = &errors.ErrDescriptor{
+	MessageFormat: "Client `{client_id}` does not exist",
+	Code:          100,
+	Type:          errors.NotFound,
+}
 
 // ErrClientIDTaken is returned when trying to create a new client with an ID.
 // that already exists
-var ErrClientIDTaken = errors.New("client ID already taken")
+var ErrClientIDTaken = &errors.ErrDescriptor{
+	MessageFormat: "Client id `{client_id}` is already taken",
+	Code:          101,
+	Type:          errors.AlreadyExists,
+}
 
 // ErrClientCollaboratorNotFound is returned when trying to remove a collaborator.
 // that does not exist
-var ErrClientCollaboratorNotFound = errors.New("client collaborator not found")
+var ErrClientCollaboratorNotFound = &errors.ErrDescriptor{
+	MessageFormat: "User `{username}` is not a collaborator for client `{client_id}`",
+	Code:          102,
+	Type:          errors.NotFound,
+}
 
 // ErrClientCollaboratorRightNotFound is returned when trying to revoke a right.
 // from a collaborator that is not granted
-var ErrClientCollaboratorRightNotFound = errors.New("client collaborator right not found")
+var ErrClientCollaboratorRightNotFound = &errors.ErrDescriptor{
+	MessageFormat: "User `{username}` does not have the right `{right}` for client `{client_id}`",
+	Code:          103,
+	Type:          errors.NotFound,
+}
 
 // Register creates a new Client and returns the new created Client.
 func (s *ClientStore) Register(client types.Client) (types.Client, error) {
@@ -55,7 +78,9 @@ func (s *ClientStore) register(q db.QueryContext, client, result types.Client) e
 		cli)
 
 	if _, yes := db.IsDuplicate(err); yes {
-		return ErrClientIDTaken
+		return ErrClientIDTaken.New(errors.Attributes{
+			"client_id": cli.ID,
+		})
 	}
 
 	if err != nil {
@@ -77,7 +102,9 @@ func (s *ClientStore) FindByID(clientID string) (types.Client, error) {
 func (s *ClientStore) client(q db.QueryContext, clientID string, result types.Client) error {
 	err := q.SelectOne(result, "SELECT * FROM clients WHERE id = $1", clientID)
 	if db.IsNoRows(err) {
-		return ErrClientNotFound
+		return ErrClientNotFound.New(errors.Attributes{
+			"client_id": clientID,
+		})
 	}
 	if err != nil {
 		return err
@@ -139,7 +166,9 @@ func (s *ClientStore) edit(q db.QueryContext, client, result types.Client) error
 		cli)
 
 	if db.IsNoRows(err) {
-		return ErrClientNotFound
+		return ErrClientNotFound.New(errors.Attributes{
+			"client_id": cli.ID,
+		})
 	}
 
 	if err != nil {
@@ -180,7 +209,9 @@ func (s *ClientStore) delete(q db.QueryContext, clientID string) error {
 	var i string
 	err := q.SelectOne(&i, "DELETE FROM clients WHERE id = $1 RETURNING id", clientID)
 	if db.IsNoRows(err) {
-		return ErrClientNotFound
+		return ErrClientNotFound.New(errors.Attributes{
+			"client_id": clientID,
+		})
 	}
 	return err
 }
@@ -201,7 +232,9 @@ func (s *ClientStore) archive(q db.QueryContext, clientID string) error {
 		time.Now(),
 		clientID)
 	if db.IsNoRows(err) {
-		return ErrClientNotFound
+		return ErrClientNotFound.New(errors.Attributes{
+			"client_id": clientID,
+		})
 	}
 	return err
 }
@@ -222,7 +255,9 @@ func (s *ClientStore) approve(q db.QueryContext, clientID string) error {
 		clientID,
 		types.ApprovedClient)
 	if db.IsNoRows(err) {
-		return ErrClientNotFound
+		return ErrClientNotFound.New(errors.Attributes{
+			"client_id": clientID,
+		})
 	}
 	return err
 }
@@ -243,7 +278,9 @@ func (s *ClientStore) reject(q db.QueryContext, clientID string) error {
 		clientID,
 		types.RejectedClient)
 	if db.IsNoRows(err) {
-		return ErrClientNotFound
+		return ErrClientNotFound.New(errors.Attributes{
+			"client_id": clientID,
+		})
 	}
 	return err
 }
@@ -323,7 +360,10 @@ func (s *ClientStore) removeCollaborator(q db.QueryContext, clientID string, use
 		clientID,
 		username)
 	if db.IsNoRows(err) {
-		return ErrClientCollaboratorNotFound
+		return ErrClientCollaboratorNotFound.New(errors.Attributes{
+			"client_id": clientID,
+			"username":  username,
+		})
 	}
 	return err
 }
@@ -380,7 +420,11 @@ func (s *ClientStore) removeRight(q db.QueryContext, clientID string, username s
 		username,
 		right)
 	if db.IsNoRows(err) {
-		return ErrClientCollaboratorRightNotFound
+		return ErrClientCollaboratorRightNotFound.New(errors.Attributes{
+			"client_id": clientID,
+			"username":  username,
+			"right":     right,
+		})
 	}
 	return err
 }

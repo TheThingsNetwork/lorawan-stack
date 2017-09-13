@@ -3,8 +3,8 @@
 package sql
 
 import (
-	"errors"
 	"fmt"
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
@@ -20,28 +20,61 @@ type ApplicationStore struct {
 	factory factory.ApplicationFactory
 }
 
+func init() {
+	ErrApplicationNotFound.Register()
+	ErrApplicationIDTaken.Register()
+	ErrAppEUINotFound.Register()
+	ErrApplicationAPIKeyNotFound.Register()
+	ErrApplicationCollaboratorNotFound.Register()
+	ErrApplicationCollaboratorRightNotFound.Register()
+}
+
 // ErrApplicationNotFound is returned when trying to fetch an application that
 // does not exist.
-var ErrApplicationNotFound = errors.New("application not found")
+var ErrApplicationNotFound = &errors.ErrDescriptor{
+	MessageFormat: "Application `{application_id}` does not exist",
+	Code:          1,
+	Type:          errors.NotFound,
+}
 
 // ErrApplicationIDTaken is returned when trying to create a new application
 // with an ID that already exists.
-var ErrApplicationIDTaken = errors.New("application ID already taken")
+var ErrApplicationIDTaken = &errors.ErrDescriptor{
+	MessageFormat: "Application id `{application_id}` is already taken",
+	Code:          2,
+	Type:          errors.AlreadyExists,
+}
 
 // ErrAppEUINotFound is returned when trying to remove an AppEUI that does not exist.
-var ErrAppEUINotFound = errors.New("application EUI not found")
+var ErrAppEUINotFound = &errors.ErrDescriptor{
+	MessageFormat: "AppEUI `{eui}` does not exist for application `{application_id}`",
+	Code:          3,
+	Type:          errors.NotFound,
+}
 
 // ErrApplicationAPIKeyNotFound is returned when trying to access or delete
 // an application API key that does not exist.
-var ErrApplicationAPIKeyNotFound = errors.New("application API key not found")
+var ErrApplicationAPIKeyNotFound = &errors.ErrDescriptor{
+	MessageFormat: "API key `{key_name}` does not exist for application `{application_id}`",
+	Code:          4,
+	Type:          errors.NotFound,
+}
 
 // ErrApplicationCollaboratorNotFound is returned when trying to remove a
 // collaborator that does not exist.
-var ErrApplicationCollaboratorNotFound = errors.New("application collaborator not found")
+var ErrApplicationCollaboratorNotFound = &errors.ErrDescriptor{
+	MessageFormat: "User `{username}` is not a collaborator for application `{application_id}`",
+	Code:          5,
+	Type:          errors.NotFound,
+}
 
 // ErrApplicationCollaboratorRightNotFound is returned when trying to revoke a
 // right from a collaborator that is not granted.
-var ErrApplicationCollaboratorRightNotFound = errors.New("application collaborator right not found")
+var ErrApplicationCollaboratorRightNotFound = &errors.ErrDescriptor{
+	MessageFormat: "User `{username}` does not have the right `{right}` for application `{application_id}`",
+	Code:          6,
+	Type:          errors.NotFound,
+}
 
 // Register creates a new Application and returns the new created Application.
 func (s *ApplicationStore) Register(application types.Application) (types.Application, error) {
@@ -88,7 +121,9 @@ func (s *ApplicationStore) register(q db.QueryContext, application, result types
 		app)
 
 	if _, yes := db.IsDuplicate(err); yes {
-		return ErrApplicationIDTaken
+		return ErrApplicationIDTaken.New(errors.Attributes{
+			"application_id": app.ID,
+		})
 	}
 
 	if err != nil {
@@ -131,7 +166,9 @@ func (s *ApplicationStore) FindByID(appID string) (types.Application, error) {
 func (s *ApplicationStore) application(q db.QueryContext, appID string, result types.Application) error {
 	err := q.SelectOne(result, "SELECT * FROM applications WHERE id = $1", appID)
 	if db.IsNoRows(err) {
-		return ErrApplicationNotFound
+		return ErrApplicationNotFound.New(errors.Attributes{
+			"application_id": appID,
+		})
 	}
 
 	return err
@@ -236,7 +273,9 @@ func (s *ApplicationStore) edit(q db.QueryContext, application, result types.App
 		app)
 
 	if db.IsNoRows(err) {
-		return ErrApplicationNotFound
+		return ErrApplicationNotFound.New(errors.Attributes{
+			"application_id": app.ID,
+		})
 	}
 
 	if err != nil {
@@ -262,7 +301,9 @@ func (s *ApplicationStore) archive(q db.QueryContext, appID string) error {
 		time.Now(),
 		appID)
 	if db.IsNoRows(err) {
-		return ErrApplicationNotFound
+		return ErrApplicationNotFound.New(errors.Attributes{
+			"application_id": appID,
+		})
 	}
 	return err
 }
@@ -320,7 +361,10 @@ func (s *ApplicationStore) removeAppEUI(q db.QueryContext, appID string, eui typ
 		appID,
 		eui)
 	if db.IsNoRows(err) {
-		return ErrAppEUINotFound
+		return ErrAppEUINotFound.New(errors.Attributes{
+			"application_id": appID,
+			"eui":            eui,
+		})
 	}
 	return err
 }
@@ -417,7 +461,10 @@ func (s *ApplicationStore) removeAPIKey(q db.QueryContext, appID string, keyName
 		appID,
 		keyName)
 	if db.IsNoRows(err) {
-		return ErrApplicationAPIKeyNotFound
+		return ErrApplicationAPIKeyNotFound.New(errors.Attributes{
+			"application_id": appID,
+			"key_name":       keyName,
+		})
 	}
 	return err
 }
@@ -497,7 +544,10 @@ func (s *ApplicationStore) removeCollaborator(q db.QueryContext, appID string, u
 		appID,
 		username)
 	if db.IsNoRows(err) {
-		return ErrApplicationCollaboratorNotFound
+		return ErrApplicationCollaboratorNotFound.New(errors.Attributes{
+			"application_id": appID,
+			"username":       username,
+		})
 	}
 	return err
 }
@@ -554,7 +604,11 @@ func (s *ApplicationStore) removeRight(q db.QueryContext, appID string, username
 		username,
 		right)
 	if db.IsNoRows(err) {
-		return ErrApplicationCollaboratorRightNotFound
+		return ErrApplicationCollaboratorRightNotFound.New(errors.Attributes{
+			"application_id": appID,
+			"username":       username,
+			"right":          right,
+		})
 	}
 	return err
 }
