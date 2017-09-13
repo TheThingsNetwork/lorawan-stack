@@ -25,14 +25,14 @@ type TLS struct {
 
 // GRPC represents gRPC listener configuration
 type GRPC struct {
-	TCP string `name:"tcp" description:"Address for the TCP gRPC server to listen on"`
-	TLS string `name:"tls" description:"Address for the TLS gRPC server to listen on"`
+	Listen    string `name:"listen" description:"Address for the TCP gRPC server to listen on"`
+	ListenTLS string `name:"listen-tls" description:"Address for the TLS gRPC server to listen on"`
 }
 
 // HTTP represents the HTTP and HTTPS server configuration
 type HTTP struct {
-	HTTP  string `name:"http" description:"Address for the HTTP server to listen on"`
-	HTTPS string `name:"https" description:"Address for the HTTPS server to listen on"`
+	Listen    string `name:"listen" description:"Address for the HTTP server to listen on"`
+	ListenTLS string `name:"listen-tls" description:"Address for the HTTPS server to listen on"`
 }
 
 // Identity represents identity configuration

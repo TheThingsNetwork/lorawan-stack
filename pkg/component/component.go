@@ -157,7 +157,7 @@ func (c *Component) Close() {
 }
 
 func (c *Component) listenHTTP() error {
-	addr := c.config.HTTP.HTTP
+	addr := c.config.HTTP.Listen
 	if addr == "" {
 		return nil
 	}
@@ -174,7 +174,7 @@ func (c *Component) listenHTTP() error {
 }
 
 func (c *Component) listenHTTPS() error {
-	addr := c.config.HTTP.HTTPS
+	addr := c.config.HTTP.ListenTLS
 	cert := c.config.TLS.Certificate
 	key := c.config.TLS.Key
 
@@ -210,7 +210,7 @@ func (c *Component) listenTLS(addr string, certFile string, keyFile string) (net
 }
 
 func (c *Component) listenGRPC() error {
-	addr := c.config.GRPC.TCP
+	addr := c.config.GRPC.Listen
 	if addr == "" {
 		return nil
 	}
@@ -225,7 +225,7 @@ func (c *Component) listenGRPC() error {
 }
 
 func (c *Component) listenGRPCS() error {
-	addr := c.config.GRPC.TLS
+	addr := c.config.GRPC.ListenTLS
 	cert := c.config.TLS.Certificate
 	key := c.config.TLS.Key
 
