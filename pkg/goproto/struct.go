@@ -6,117 +6,131 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/golang/protobuf/ptypes/struct"
+	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/spf13/cast"
 )
 
-// MapFromProto returns the Struct proto as a map[string]interface{}
-func MapFromProto(p *structpb.Struct) (m map[string]interface{}) {
-	m = make(map[string]interface{})
+// Map returns the Struct proto as a map[string]interface{}
+func Map(p *pbtypes.Struct) map[string]interface{} {
+	m := make(map[string]interface{}, len(p.Fields))
 	for k, v := range p.Fields {
 		if v == nil {
 			continue
 		}
-		m[k] = ValueFromProto(v)
+		m[k] = Interface(v)
 	}
-	return
+	return m
 }
 
-// ValueFromProto returns the Value proto as an interface{}
-func ValueFromProto(v *structpb.Value) (i interface{}) {
-	switch v := v.GetKind().(type) {
-	case *structpb.Value_NullValue:
-		return nil
-	case *structpb.Value_NumberValue:
-		return v.NumberValue
-	case *structpb.Value_StringValue:
-		return v.StringValue
-	case *structpb.Value_BoolValue:
-		return v.BoolValue
-	case *structpb.Value_StructValue:
-		return MapFromProto(v.StructValue)
-	case *structpb.Value_ListValue:
-		return ListFromProto(v.ListValue)
-	}
-	return v.String()
-}
-
-// ListFromProto returns the ListValue proto as a []interface{}
-func ListFromProto(l *structpb.ListValue) (s []interface{}) {
-	s = make([]interface{}, len(l.Values))
+// Slice returns the ListValue proto as a []interface{}
+func Slice(l *pbtypes.ListValue) []interface{} {
+	s := make([]interface{}, len(l.Values))
 	for i, v := range l.Values {
-		s[i] = ValueFromProto(v)
+		s[i] = Interface(v)
 	}
-	return
+	return s
 }
 
-// MapProto returns the map as a Struct proto
-func MapProto(m map[string]interface{}) (p *structpb.Struct) {
-	p = &structpb.Struct{
-		Fields: make(map[string]*structpb.Value),
+// Interface returns the Value proto as an interface{}
+func Interface(v *pbtypes.Value) interface{} {
+	switch v := v.Kind.(type) {
+	case *pbtypes.Value_NullValue:
+		return nil
+	case *pbtypes.Value_NumberValue:
+		return v.NumberValue
+	case *pbtypes.Value_StringValue:
+		return v.StringValue
+	case *pbtypes.Value_BoolValue:
+		return v.BoolValue
+	case *pbtypes.Value_StructValue:
+		return Map(v.StructValue)
+	case *pbtypes.Value_ListValue:
+		return Slice(v.ListValue)
+	}
+	return nil
+}
+
+// Struct returns the map as a Struct proto
+func Struct(m map[string]interface{}) *pbtypes.Struct {
+	p := &pbtypes.Struct{
+		Fields: make(map[string]*pbtypes.Value),
 	}
 	for k, v := range m {
-		p.Fields[k] = ValueProto(v)
+		p.Fields[k] = Value(v)
 	}
-	return
+	return p
 }
 
-// ValueProto returns the value as a Value proto
-func ValueProto(i interface{}) (v *structpb.Value) {
-	v = &structpb.Value{}
-	if i == nil {
-		v.Kind = &structpb.Value_NullValue{}
-		return
-	}
-	rVal := reflect.ValueOf(i)
-	if rVal.Type().Kind() == reflect.Ptr {
-		rVal = rVal.Elem()
-		i = rVal.Interface()
-	}
-	switch val := i.(type) {
-	case bool:
-		v.Kind = &structpb.Value_BoolValue{BoolValue: val}
-		return
-	case int, int8, int16, int32, int64:
-		v.Kind = &structpb.Value_NumberValue{NumberValue: float64(rVal.Int())}
-		return
-	case uint, uint8, uint16, uint32, uint64:
-		v.Kind = &structpb.Value_NumberValue{NumberValue: float64(rVal.Uint())}
-		return
-	case float32, float64:
-		v.Kind = &structpb.Value_NumberValue{NumberValue: float64(rVal.Float())}
-		return
-	case string:
-		v.Kind = &structpb.Value_StringValue{StringValue: val}
-		return
-	default:
-		switch rVal.Type().Kind() {
-		case reflect.Slice:
-			s := make([]interface{}, rVal.Len())
-			for i := 0; i < rVal.Len(); i++ {
-				s[i] = rVal.Index(i).Interface()
-			}
-			v.Kind = &structpb.Value_ListValue{ListValue: ListProto(s)}
-			return
-		case reflect.Map:
-			m := make(map[string]interface{})
-			for _, key := range rVal.MapKeys() {
-				m[fmt.Sprint(key.Interface())] = rVal.MapIndex(key).Interface()
-			}
-			v.Kind = &structpb.Value_StructValue{StructValue: MapProto(m)}
-			return
-		}
-	}
-	v.Kind = &structpb.Value_StringValue{StringValue: fmt.Sprint(i)}
-	return
-}
-
-// ListProto returns the slice as a ListValue proto
-func ListProto(s []interface{}) (l *structpb.ListValue) {
-	l = &structpb.ListValue{
-		Values: make([]*structpb.Value, len(s)),
+// List returns the slice as a ListValue proto
+func List(s []interface{}) *pbtypes.ListValue {
+	l := &pbtypes.ListValue{
+		Values: make([]*pbtypes.Value, len(s)),
 	}
 	for i, v := range s {
-		l.Values[i] = ValueProto(v)
+		l.Values[i] = Value(v)
 	}
-	return
+	return l
+}
+
+func valueFromReflect(rv reflect.Value) *pbtypes.Value {
+	switch k := rv.Kind(); k {
+	case reflect.Ptr:
+		if rv.IsNil() {
+			return &pbtypes.Value{Kind: &pbtypes.Value_NullValue{}}
+		}
+		return valueFromReflect(rv.Elem())
+	case reflect.String:
+		return &pbtypes.Value{Kind: &pbtypes.Value_StringValue{rv.String()}}
+
+	case reflect.Bool:
+		return &pbtypes.Value{Kind: &pbtypes.Value_BoolValue{rv.Bool()}}
+
+	case reflect.Slice, reflect.Array:
+		if k == reflect.Slice && rv.IsNil() {
+			return &pbtypes.Value{Kind: &pbtypes.Value_NullValue{}}
+		}
+		s := make([]interface{}, rv.Len())
+		for i := 0; i < rv.Len(); i++ {
+			s[i] = rv.Index(i).Interface()
+		}
+		return &pbtypes.Value{Kind: &pbtypes.Value_ListValue{ListValue: List(s)}}
+
+	case reflect.Map:
+		if rv.IsNil() {
+			return &pbtypes.Value{Kind: &pbtypes.Value_NullValue{}}
+		}
+		m := make(map[string]interface{}, rv.Len())
+		for _, key := range rv.MapKeys() {
+			m[fmt.Sprint(key.Interface())] = rv.MapIndex(key).Interface()
+		}
+		return &pbtypes.Value{Kind: &pbtypes.Value_StructValue{Struct(m)}}
+
+	case reflect.Struct:
+		n := rv.NumField()
+		fields := make(map[string]*pbtypes.Value, n)
+		for i := 0; i < n; i++ {
+			f := rv.Field(i)
+			ft := f.Type()
+			if f.Type().PkgPath() != "" {
+				continue
+			}
+			fields[ft.Name()] = valueFromReflect(f)
+		}
+		return &pbtypes.Value{Kind: &pbtypes.Value_StructValue{&pbtypes.Struct{fields}}}
+
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+		reflect.Float32, reflect.Float64:
+
+		return &pbtypes.Value{Kind: &pbtypes.Value_NumberValue{cast.ToFloat64(rv.Interface())}}
+	}
+	return &pbtypes.Value{Kind: &pbtypes.Value_NullValue{}}
+}
+
+// Value returns the value as a Value proto
+func Value(v interface{}) *pbtypes.Value {
+	if v == nil {
+		return &pbtypes.Value{Kind: &pbtypes.Value_NullValue{}}
+	}
+	return valueFromReflect(reflect.Indirect(reflect.ValueOf(v)))
 }
