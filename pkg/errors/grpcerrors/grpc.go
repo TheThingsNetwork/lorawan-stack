@@ -5,7 +5,7 @@ package errors
 import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/goproto"
-	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/golang/protobuf/ptypes/struct"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -124,7 +124,7 @@ func FromGRPC(in error) errors.Error {
 	if ok {
 		out := &impl{Status: status, code: errors.NoCode}
 		for _, details := range status.Details() {
-			if details, ok := details.(*pbtypes.Struct); ok {
+			if details, ok := details.(*structpb.Struct); ok {
 				for k, v := range goproto.Map(details) {
 					switch k {
 					case CodeKey:

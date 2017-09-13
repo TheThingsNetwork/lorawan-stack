@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"reflect"
 
-	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/golang/protobuf/ptypes/struct"
 	"github.com/spf13/cast"
 )
 
 // Map returns the Struct proto as a map[string]interface{}
-func Map(p *pbtypes.Struct) map[string]interface{} {
+func Map(p *structpb.Struct) map[string]interface{} {
 	m := make(map[string]interface{}, len(p.Fields))
 	for k, v := range p.Fields {
 		if v == nil {
@@ -23,7 +23,7 @@ func Map(p *pbtypes.Struct) map[string]interface{} {
 }
 
 // Slice returns the ListValue proto as a []interface{}
-func Slice(l *pbtypes.ListValue) []interface{} {
+func Slice(l *structpb.ListValue) []interface{} {
 	s := make([]interface{}, len(l.Values))
 	for i, v := range l.Values {
 		s[i] = Interface(v)
@@ -32,28 +32,28 @@ func Slice(l *pbtypes.ListValue) []interface{} {
 }
 
 // Interface returns the Value proto as an interface{}
-func Interface(v *pbtypes.Value) interface{} {
+func Interface(v *structpb.Value) interface{} {
 	switch v := v.Kind.(type) {
-	case *pbtypes.Value_NullValue:
+	case *structpb.Value_NullValue:
 		return nil
-	case *pbtypes.Value_NumberValue:
+	case *structpb.Value_NumberValue:
 		return v.NumberValue
-	case *pbtypes.Value_StringValue:
+	case *structpb.Value_StringValue:
 		return v.StringValue
-	case *pbtypes.Value_BoolValue:
+	case *structpb.Value_BoolValue:
 		return v.BoolValue
-	case *pbtypes.Value_StructValue:
+	case *structpb.Value_StructValue:
 		return Map(v.StructValue)
-	case *pbtypes.Value_ListValue:
+	case *structpb.Value_ListValue:
 		return Slice(v.ListValue)
 	}
 	return nil
 }
 
 // Struct returns the map as a Struct proto
-func Struct(m map[string]interface{}) *pbtypes.Struct {
-	p := &pbtypes.Struct{
-		Fields: make(map[string]*pbtypes.Value),
+func Struct(m map[string]interface{}) *structpb.Struct {
+	p := &structpb.Struct{
+		Fields: make(map[string]*structpb.Value),
 	}
 	for k, v := range m {
 		p.Fields[k] = Value(v)
@@ -62,9 +62,9 @@ func Struct(m map[string]interface{}) *pbtypes.Struct {
 }
 
 // List returns the slice as a ListValue proto
-func List(s []interface{}) *pbtypes.ListValue {
-	l := &pbtypes.ListValue{
-		Values: make([]*pbtypes.Value, len(s)),
+func List(s []interface{}) *structpb.ListValue {
+	l := &structpb.ListValue{
+		Values: make([]*structpb.Value, len(s)),
 	}
 	for i, v := range s {
 		l.Values[i] = Value(v)
@@ -72,42 +72,42 @@ func List(s []interface{}) *pbtypes.ListValue {
 	return l
 }
 
-func valueFromReflect(rv reflect.Value) *pbtypes.Value {
+func valueFromReflect(rv reflect.Value) *structpb.Value {
 	switch k := rv.Kind(); k {
 	case reflect.Ptr:
 		if rv.IsNil() {
-			return &pbtypes.Value{Kind: &pbtypes.Value_NullValue{}}
+			return &structpb.Value{Kind: &structpb.Value_NullValue{}}
 		}
 		return valueFromReflect(rv.Elem())
 	case reflect.String:
-		return &pbtypes.Value{Kind: &pbtypes.Value_StringValue{rv.String()}}
+		return &structpb.Value{Kind: &structpb.Value_StringValue{rv.String()}}
 
 	case reflect.Bool:
-		return &pbtypes.Value{Kind: &pbtypes.Value_BoolValue{rv.Bool()}}
+		return &structpb.Value{Kind: &structpb.Value_BoolValue{rv.Bool()}}
 
 	case reflect.Slice, reflect.Array:
 		if k == reflect.Slice && rv.IsNil() {
-			return &pbtypes.Value{Kind: &pbtypes.Value_NullValue{}}
+			return &structpb.Value{Kind: &structpb.Value_NullValue{}}
 		}
 		s := make([]interface{}, rv.Len())
 		for i := 0; i < rv.Len(); i++ {
 			s[i] = rv.Index(i).Interface()
 		}
-		return &pbtypes.Value{Kind: &pbtypes.Value_ListValue{ListValue: List(s)}}
+		return &structpb.Value{Kind: &structpb.Value_ListValue{ListValue: List(s)}}
 
 	case reflect.Map:
 		if rv.IsNil() {
-			return &pbtypes.Value{Kind: &pbtypes.Value_NullValue{}}
+			return &structpb.Value{Kind: &structpb.Value_NullValue{}}
 		}
 		m := make(map[string]interface{}, rv.Len())
 		for _, key := range rv.MapKeys() {
 			m[fmt.Sprint(key.Interface())] = rv.MapIndex(key).Interface()
 		}
-		return &pbtypes.Value{Kind: &pbtypes.Value_StructValue{Struct(m)}}
+		return &structpb.Value{Kind: &structpb.Value_StructValue{Struct(m)}}
 
 	case reflect.Struct:
 		n := rv.NumField()
-		fields := make(map[string]*pbtypes.Value, n)
+		fields := make(map[string]*structpb.Value, n)
 		for i := 0; i < n; i++ {
 			f := rv.Field(i)
 			ft := f.Type()
@@ -116,21 +116,21 @@ func valueFromReflect(rv reflect.Value) *pbtypes.Value {
 			}
 			fields[ft.Name()] = valueFromReflect(f)
 		}
-		return &pbtypes.Value{Kind: &pbtypes.Value_StructValue{&pbtypes.Struct{fields}}}
+		return &structpb.Value{Kind: &structpb.Value_StructValue{&structpb.Struct{fields}}}
 
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
 		reflect.Float32, reflect.Float64:
 
-		return &pbtypes.Value{Kind: &pbtypes.Value_NumberValue{cast.ToFloat64(rv.Interface())}}
+		return &structpb.Value{Kind: &structpb.Value_NumberValue{cast.ToFloat64(rv.Interface())}}
 	}
-	return &pbtypes.Value{Kind: &pbtypes.Value_NullValue{}}
+	return &structpb.Value{Kind: &structpb.Value_NullValue{}}
 }
 
 // Value returns the value as a Value proto
-func Value(v interface{}) *pbtypes.Value {
+func Value(v interface{}) *structpb.Value {
 	if v == nil {
-		return &pbtypes.Value{Kind: &pbtypes.Value_NullValue{}}
+		return &structpb.Value{Kind: &structpb.Value_NullValue{}}
 	}
 	return valueFromReflect(reflect.Indirect(reflect.ValueOf(v)))
 }

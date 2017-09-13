@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/types"
-	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/golang/protobuf/ptypes/struct"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"github.com/spf13/cast"
@@ -49,7 +49,7 @@ func TestStructProto(t *testing.T) {
 		a.So(s.Fields, should.ContainKey, k)
 		a.So(sm, should.ContainKey, k)
 		if v == nil {
-			a.So(s.Fields[k].Kind, should.HaveSameTypeAs, &pbtypes.Value_NullValue{})
+			a.So(s.Fields[k].Kind, should.HaveSameTypeAs, &structpb.Value_NullValue{})
 			a.So(sm[k], should.BeNil)
 			continue
 		}
@@ -62,25 +62,25 @@ func TestStructProto(t *testing.T) {
 			reflect.Float32, reflect.Float64:
 
 			var vt float64
-			a.So(s.Fields[k].Kind, should.HaveSameTypeAs, &pbtypes.Value_NumberValue{})
+			a.So(s.Fields[k].Kind, should.HaveSameTypeAs, &structpb.Value_NumberValue{})
 			a.So(sm[k], should.HaveSameTypeAs, vt)
 			a.So(sm[k], should.Equal, cast.ToFloat64(rv.Interface()))
 
 		case reflect.Bool:
 			var vt bool
-			a.So(s.Fields[k].Kind, should.HaveSameTypeAs, &pbtypes.Value_BoolValue{})
+			a.So(s.Fields[k].Kind, should.HaveSameTypeAs, &structpb.Value_BoolValue{})
 			a.So(sm[k], should.HaveSameTypeAs, vt)
 			a.So(sm[k], should.Equal, rv.Bool())
 
 		case reflect.String:
 			var vt string
-			a.So(s.Fields[k].Kind, should.HaveSameTypeAs, &pbtypes.Value_StringValue{})
+			a.So(s.Fields[k].Kind, should.HaveSameTypeAs, &structpb.Value_StringValue{})
 			a.So(sm[k], should.HaveSameTypeAs, vt)
 			a.So(sm[k], should.Equal, rv.String())
 
 		case reflect.Slice, reflect.Array:
 			var vt []interface{}
-			a.So(s.Fields[k].Kind, should.HaveSameTypeAs, &pbtypes.Value_ListValue{})
+			a.So(s.Fields[k].Kind, should.HaveSameTypeAs, &structpb.Value_ListValue{})
 			a.So(sm[k], should.HaveSameTypeAs, vt)
 			if a.So(sm[k], should.HaveLength, rv.Len()) {
 				// TODO find a way to compare these values
@@ -92,7 +92,7 @@ func TestStructProto(t *testing.T) {
 
 		case reflect.Struct, reflect.Map:
 			var vt map[string]interface{}
-			a.So(s.Fields[k].Kind, should.HaveSameTypeAs, &pbtypes.Value_StructValue{})
+			a.So(s.Fields[k].Kind, should.HaveSameTypeAs, &structpb.Value_StructValue{})
 			a.So(sm[k], should.HaveSameTypeAs, vt)
 			if kind == reflect.Map {
 				a.So(sm[k], should.HaveLength, rv.Len())
