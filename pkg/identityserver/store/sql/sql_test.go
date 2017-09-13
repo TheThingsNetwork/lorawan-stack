@@ -22,11 +22,9 @@ var testingStore *Store
 // method is called in an execution. The first time that is called it creates
 // a new store instance in a newly created database.
 func testStore() *Store {
-	if testingStore != nil {
-		return testingStore
+	if testingStore == nil {
+		testingStore = cleanStore(database)
 	}
-
-	testingStore = cleanStore(database)
 
 	return testingStore
 }
