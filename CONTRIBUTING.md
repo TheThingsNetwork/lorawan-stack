@@ -100,6 +100,29 @@ Many developers have strong opinions about using tabs vs spaces. We apply the fo
 
 We use [`golint`](github.com/golang/lint/golint) to lint `.go` files and [`eslint`](https://eslint.org) to lint `.js` and `.vue` files. These tools should automatically be installed when initializing your development environment.
 
+### API methods naming
+
+All API method names should follow the naming convention of `VerbNoun` in upper camel case, where the verb uses the imperative mood and the noun is the resource type.
+
+The following snippet defines the basic CRUD definitions for a resource named `Type`.
+Note also that the order of the methods is defined by CRUD.
+
+```
+CreateType
+GetType
+ListTypes (returns slice)
+UpdateType
+DeleteType
+
+AddTypeAttribute
+SetTypeAttribute
+GetTypeAttribute
+ListTypeAttributes (returns slice)
+RemoveTypeAttribute
+
+StreamTypes (returns channel)
+```
+
 ### Variable naming
 
 Variable names should be short and concise.
