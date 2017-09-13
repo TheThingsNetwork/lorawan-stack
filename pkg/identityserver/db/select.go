@@ -4,69 +4,169 @@ package db
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"reflect"
 
 	"github.com/jmoiron/sqlx"
 )
 
 // selectOne selects one item from the database and writes it to dest, which can
-// be a map[string]interface{} or a struct.
+// be a map[string]interface{}, a struct or a scannable value.
 func selectOne(context context.Context, q sqlx.QueryerContext, dest interface{}, query string, args ...interface{}) error {
-	var err error
-	switch v := dest.(type) {
-	case *map[string]interface{}:
-		err = q.QueryRowxContext(context, query, args...).MapScan(*v)
-	case map[string]interface{}:
-		err = q.QueryRowxContext(context, query, args...).MapScan(v)
-	default:
-		err = sqlx.GetContext(context, q, dest, query, args...)
+	// perform query
+	row := q.QueryRowxContext(context, query, args...)
+	if err := row.Err(); err != nil && !IsNoRows(err) {
+		return wrap(err)
 	}
 
-	return wrap(err)
+	value := reflect.ValueOf(dest)
+	typ := value.Type()
+
+	isPtr := value.Kind() == reflect.Ptr
+
+	if isPtr && value.IsNil() {
+		return wrap(errors.New("Nil pointer passed to selectOne"))
+	}
+
+	if isPtr {
+		typ = value.Type().Elem()
+		value = reflect.Indirect(value)
+	}
+
+	// try map
+	if typ.Kind() == reflect.Map {
+		m, ok := value.Interface().(map[string]interface{})
+		if !ok {
+			return wrap(fmt.Errorf("Expected map[string]interface{} but got %s", typ))
+		}
+		return wrap(row.MapScan(m))
+	}
+
+	// try struct
+	if typ.Kind() == reflect.Struct {
+		return wrap(row.StructScan(dest))
+	}
+
+	// try scannable
+	return wrap(row.Scan(dest))
 }
 
 // selectAll selects multiple items from the database and writes them to dest, which can
-// be a slice of map[string]interface or a slice of structs.
+// be a slice of map[string]interface or a slice of structs, or a slice of scannable values.
 func selectAll(context context.Context, q sqlx.QueryerContext, dest interface{}, query string, args ...interface{}) error {
-	var err error
-	switch v := dest.(type) {
-	case *[]map[string]interface{}:
-		rows, err := q.QueryxContext(context, query, args...)
+	rows, err := q.QueryxContext(context, query, args...)
+	if err != nil && !IsNoRows(err) {
+		return wrap(err)
+	}
+
+	if err := rows.Err(); err != nil {
+		return wrap(err)
+	}
+
+	defer rows.Close()
+
+	value := reflect.ValueOf(dest)
+	if value.Kind() != reflect.Ptr {
+		return wrap(fmt.Errorf("Expected pointer to slice but got %s", value.Type()))
+	}
+
+	if value.IsNil() {
+		return wrap(errors.New("Nil pointer passed to selectAll"))
+	}
+
+	slice := reflect.Indirect(value)
+	if slice.Kind() != reflect.Slice {
+		return wrap(fmt.Errorf("Expected pointer to slice of map or struct, but got %s", value.Type()))
+	}
+
+	base := slice.Type().Elem()
+	isPtr := base.Kind() == reflect.Ptr
+	if isPtr {
+		base = base.Elem()
+	}
+
+	// try map
+	if base.Kind() == reflect.Map {
+		_, ok := reflect.New(base).Elem().Interface().(map[string]interface{})
+		if !ok {
+			return wrap(fmt.Errorf("Expected []map[string]interface{} but got []%s", base))
+		}
+
+		for rows.Next() {
+			res := make(map[string]interface{})
+			err := rows.MapScan(res)
+			if err != nil {
+				return err
+			}
+
+			if isPtr {
+				slice.Set(reflect.Append(slice, reflect.ValueOf(&res)))
+			} else {
+				slice.Set(reflect.Append(slice, reflect.ValueOf(res)))
+			}
+		}
+
+		return nil
+	}
+
+	// try struct
+	if base.Kind() == reflect.Struct {
+		for rows.Next() {
+			vp := reflect.New(base)
+			res := vp.Interface()
+			err := rows.StructScan(res)
+			if err != nil {
+				return wrap(err)
+			}
+
+			if isPtr {
+				slice.Set(reflect.Append(slice, vp))
+			} else {
+				slice.Set(reflect.Append(slice, reflect.Indirect(vp)))
+			}
+		}
+		return nil
+	}
+
+	// try scannable
+	for rows.Next() {
+		vp := reflect.New(base)
+		res := vp.Interface()
+		err := rows.Scan(res)
 		if err != nil {
 			return wrap(err)
 		}
-		defer rows.Close()
 
-		aggr := make([]map[string]interface{}, 0)
-		for rows.Next() {
-			res := make(map[string]interface{})
-			err = rows.MapScan(res)
-			if err != nil {
-				break
-			}
-			aggr = append(aggr, res)
+		if isPtr {
+			slice.Set(reflect.Append(slice, vp))
+		} else {
+			slice.Set(reflect.Append(slice, reflect.Indirect(vp)))
 		}
-		*v = aggr
-	default:
-		err = sqlx.SelectContext(context, q, dest, query, args...)
 	}
 
-	return wrap(err)
+	return nil
 }
 
-func namedSelectOne(context context.Context, e sqlx.ExtContext, dest interface{}, query string, arg interface{}) error {
-	q, args, err := sqlx.Named(query, arg)
+// namedSelectOne selects one row from the database and writes the result to the dest, which can be a map[string]interface{},
+// a struct, or a scannable value. It uses named items from args to fill the query.
+func namedSelectOne(context context.Context, q sqlx.QueryerContext, dest interface{}, query string, arg interface{}) error {
+	bound, args, err := sqlx.Named(query, arg)
 	if err != nil {
 		return wrap(err)
 	}
-	q = sqlx.Rebind(sqlx.DOLLAR, q)
-	return selectOne(context, e, dest, q, args...)
+	bound = sqlx.Rebind(sqlx.DOLLAR, bound)
+	return selectOne(context, q, dest, bound, args...)
 }
 
-func namedSelectAll(context context.Context, e sqlx.ExtContext, dest interface{}, query string, arg interface{}) error {
-	q, args, err := sqlx.Named(query, arg)
+// namedSelectAll selects multiple items from the database and writes them to dest, which can
+// be a slice of map[string]interface{} or a slice of structs, or a slice of scannable values.
+// It uses the items from arg to fill the query.
+func namedSelectAll(context context.Context, q sqlx.QueryerContext, dest interface{}, query string, arg interface{}) error {
+	bound, args, err := sqlx.Named(query, arg)
 	if err != nil {
 		return wrap(err)
 	}
-	q = sqlx.Rebind(sqlx.DOLLAR, q)
-	return selectAll(context, e, dest, q, args...)
+	bound = sqlx.Rebind(sqlx.DOLLAR, bound)
+	return selectAll(context, q, dest, bound, args...)
 }

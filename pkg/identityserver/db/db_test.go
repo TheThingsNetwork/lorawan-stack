@@ -9,8 +9,6 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db/migrations"
-	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 )
 
 const (
@@ -100,190 +98,17 @@ func clean() Database {
 }
 
 func TestSelect(t *testing.T) {
-	a := assertions.New(t)
-	db := getInstance()
-
-	{
-		res := make([]*foo, 0)
-		err := db.Select(&res, "SELECT * FROM foo")
-		a.So(err, should.BeNil)
-		a.So(res, should.HaveLength, len(data))
-	}
-
-	// into a slice of struct ptr
-	{
-		res := make([]*foo, 0)
-		err := db.Select(&res, `SELECT * FROM foo WHERE bar = $1`, "bar-2")
-		a.So(err, should.BeNil)
-		a.So(res, should.HaveLength, 1)
-	}
-
-	// into a slice of struct
-	{
-		res := make([]foo, 0)
-		err := db.Select(&res, `SELECT * FROM foo WHERE bar = $1`, "bar-2")
-		a.So(err, should.BeNil)
-		a.So(res, should.HaveLength, 1)
-	}
-
-	// into a slice of values
-	{
-		res := make([]string, 0)
-		err := db.Select(&res, `SELECT bar FROM foo WHERE bar = $1`, "bar-2")
-		a.So(err, should.BeNil)
-		a.So(res, should.HaveLength, 1)
-		a.So(res[0], should.Equal, data[1].Bar)
-	}
+	testSelect(t, getInstance())
 }
 
 func TestNamedSelect(t *testing.T) {
-	a := assertions.New(t)
-	db := getInstance()
-
-	{
-		res := make([]*foo, 0)
-		err := db.NamedSelect(&res, "SELECT * FROM foo", map[string]interface{}{})
-		a.So(err, should.BeNil)
-		a.So(res, should.HaveLength, len(data))
-	}
-
-	// into a slice of ptr to struct
-	{
-		res := make([]*foo, 0)
-		err := db.NamedSelect(&res, `SELECT * FROM foo WHERE bar = :bar`, foo{
-			Bar: "bar-2",
-		})
-		a.So(err, should.BeNil)
-		a.So(res, should.HaveLength, 1)
-		a.So(res[0].ID, should.NotBeNil)
-		a.So(res[0].Created, should.NotBeNil)
-		a.So(res[0].Bar, should.Equal, data[1].Bar)
-		a.So(res[0].Baz, should.Equal, data[1].Baz)
-		a.So(res[0].Quu, should.Equal, data[1].Quu)
-	}
-
-	// into a slice of struct
-	{
-		res := make([]foo, 0)
-		err := db.NamedSelect(&res, `SELECT * FROM foo WHERE bar = :bar`, foo{
-			Bar: "bar-2",
-		})
-		a.So(err, should.BeNil)
-		a.So(res, should.HaveLength, 1)
-		a.So(res[0].ID, should.NotBeNil)
-		a.So(res[0].Created, should.NotBeNil)
-		a.So(res[0].Bar, should.Equal, data[1].Bar)
-		a.So(res[0].Baz, should.Equal, data[1].Baz)
-		a.So(res[0].Quu, should.Equal, data[1].Quu)
-	}
-
-	// into a slice of maps
-	{
-		res := make([]map[string]interface{}, 0)
-		err := db.NamedSelect(&res, `SELECT * FROM foo WHERE bar = :bar`, foo{
-			Bar: "bar-2",
-		})
-		a.So(err, should.BeNil)
-		a.So(res, should.HaveLength, 1)
-		a.So(res[0]["id"], should.NotBeNil)
-		a.So(res[0]["created"], should.NotBeNil)
-		a.So(res[0]["bar"], should.Equal, data[1].Bar)
-		a.So(res[0]["baz"], should.Equal, data[1].Baz)
-		a.So(res[0]["quu"], should.Equal, data[1].Quu)
-	}
-
-	// into a slice of values
-	{
-		res := make([]string, 0)
-		err := db.NamedSelect(&res, `SELECT bar FROM foo WHERE bar = :bar`, foo{
-			Bar: "bar-2",
-		})
-		a.So(err, should.BeNil)
-		a.So(res, should.HaveLength, 1)
-		a.So(res[0], should.Equal, data[1].Bar)
-	}
+	testNamedSelect(t, getInstance())
 }
 
 func TestSelectOne(t *testing.T) {
-	a := assertions.New(t)
-	db := getInstance()
-
-	// into struct ptr
-	{
-		res := new(foo)
-		err := db.SelectOne(res, `SELECT * FROM foo WHERE bar = $1`, "bar-2")
-		a.So(err, should.BeNil)
-		a.So(res, should.NotBeNil)
-		a.So(res.ID, should.NotBeNil)
-		a.So(res.Created, should.NotBeNil)
-		a.So(res.Bar, should.Equal, data[1].Bar)
-		a.So(res.Baz, should.Equal, data[1].Baz)
-		a.So(res.Quu, should.Equal, data[1].Quu)
-	}
-
-	// into map
-	{
-		res := make(map[string]interface{})
-		err := db.SelectOne(res, `SELECT * FROM foo WHERE bar = $1`, "bar-2")
-		a.So(err, should.BeNil)
-		a.So(res, should.NotBeNil)
-		a.So(res["id"], should.NotBeNil)
-		a.So(res["created"], should.NotBeNil)
-		a.So(res["bar"], should.Equal, data[1].Bar)
-		a.So(res["baz"], should.Equal, data[1].Baz)
-		a.So(res["quu"], should.Equal, data[1].Quu)
-	}
-
-	// into value
-	{
-		res := ""
-		err := db.SelectOne(&res, `SELECT bar FROM foo WHERE bar = $1`, "bar-2")
-		a.So(err, should.BeNil)
-		a.So(res, should.Equal, data[1].Bar)
-	}
+	testSelectOne(t, getInstance())
 }
 
 func TestNamedSelectOne(t *testing.T) {
-	a := assertions.New(t)
-	db := getInstance()
-
-	// into struct ptr
-	{
-		res := new(foo)
-		err := db.NamedSelectOne(res, `SELECT * FROM foo WHERE bar = :bar`, map[string]interface{}{
-			"bar": "bar-2",
-		})
-		a.So(err, should.BeNil)
-		a.So(res, should.NotBeNil)
-		a.So(res.ID, should.NotBeNil)
-		a.So(res.Created, should.NotBeNil)
-		a.So(res.Bar, should.Equal, data[1].Bar)
-		a.So(res.Baz, should.Equal, data[1].Baz)
-		a.So(res.Quu, should.Equal, data[1].Quu)
-	}
-
-	// into map
-	{
-		res := make(map[string]interface{})
-		err := db.NamedSelectOne(res, `SELECT * FROM foo WHERE bar = :bar`, map[string]interface{}{
-			"bar": "bar-2",
-		})
-		a.So(err, should.BeNil)
-		a.So(res, should.NotBeNil)
-		a.So(res["id"], should.NotBeNil)
-		a.So(res["created"], should.NotBeNil)
-		a.So(res["bar"], should.Equal, data[1].Bar)
-		a.So(res["baz"], should.Equal, data[1].Baz)
-		a.So(res["quu"], should.Equal, data[1].Quu)
-	}
-
-	// into value
-	{
-		res := ""
-		err := db.NamedSelectOne(&res, `SELECT bar FROM foo WHERE bar = :bar`, map[string]interface{}{
-			"bar": "bar-2",
-		})
-		a.So(err, should.BeNil)
-		a.So(res, should.Equal, data[1].Bar)
-	}
+	testNamedSelectOne(t, getInstance())
 }
