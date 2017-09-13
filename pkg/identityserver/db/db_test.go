@@ -18,7 +18,7 @@ const (
 	database = "db_tests"
 	schema   = `
 	CREATE TABLE IF NOT EXISTS foo (
-		id       SERIAL,
+		id       SERIAL PRIMARY KEY,
 		created  TIMESTAMP DEFAULT current_timestamp(),
 		bar      TEXT,
 		baz      BOOL,
