@@ -28,14 +28,6 @@ func (f DefaultGateway) Gateway() types.Gateway {
 	return &types.DefaultGateway{}
 }
 
-// DefaultComponent implements ComponentFactory interface.
-type DefaultComponent struct{}
-
-// Component returns a DefaultComponent.
-func (f DefaultComponent) Component() types.Component {
-	return &types.DefaultComponent{}
-}
-
 // DefaultClient implement ClientFactory interface.
 type DefaultClient struct{}
 

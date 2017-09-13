@@ -22,12 +22,6 @@ type GatewayFactory interface {
 	Gateway() types.Gateway
 }
 
-// ComponentFactory is the interface that provides a method to construct the
-// result types in the Component store.
-type ComponentFactory interface {
-	Component() types.Component
-}
-
 // ClientFactory is the interface that provides a method to construct the
 // result types in the Client store.
 type ClientFactory interface {

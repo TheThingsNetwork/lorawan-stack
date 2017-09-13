@@ -63,6 +63,5 @@ func (s *Store) initSubStores() {
 	s.Users = &UserStore{Store: s, factory: factory.DefaultUser{}}
 	s.Applications = &ApplicationStore{Store: s, factory: factory.DefaultApplication{}}
 	s.Gateways = &GatewayStore{Store: s, factory: factory.DefaultGateway{}}
-	s.Components = &ComponentStore{Store: s, factory: factory.DefaultComponent{}}
 	s.Clients = &ClientStore{Store: s, factory: factory.DefaultClient{}}
 }

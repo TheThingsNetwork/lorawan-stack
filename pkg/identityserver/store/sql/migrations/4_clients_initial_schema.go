@@ -29,5 +29,5 @@ func init() {
 		DROP TABLE IF EXISTS clients;
 	`
 
-	Registry.Register(5, "5_clients_initial_schema", forwards, backwards)
+	Registry.Register(4, "4_clients_initial_schema", forwards, backwards)
 }

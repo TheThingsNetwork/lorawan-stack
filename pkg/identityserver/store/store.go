@@ -13,9 +13,6 @@ type Store struct {
 	// Gateways is the gateways store.
 	Gateways GatewayStore
 
-	// Components is the components store.
-	Components ComponentStore
-
 	// Clients is the clients store.
 	Clients ClientStore
 }
