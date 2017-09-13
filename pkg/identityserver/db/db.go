@@ -226,7 +226,12 @@ func namedSelectOne(context context.Context, e sqlx.ExtContext, dest interface{}
 		case map[string]interface{}:
 			return wrap(rows.MapScan(v))
 		default:
-			return wrap(rows.StructScan(dest))
+			vv := reflect.ValueOf(dest)
+			if vv.Kind() == reflect.Ptr && vv.Type().Elem().Kind() == reflect.Struct {
+				return wrap(rows.StructScan(dest))
+			}
+
+			return wrap(rows.Scan(dest))
 		}
 	}
 	return nil
@@ -253,6 +258,9 @@ func namedSelectAll(context context.Context, e sqlx.ExtContext, dest interface{}
 		*v = aggr
 	default:
 		err = scanAll(rows, dest)
+		if err != nil {
+			return err
+		}
 	}
 
 	return wrap(err)
@@ -260,7 +268,7 @@ func namedSelectAll(context context.Context, e sqlx.ExtContext, dest interface{}
 
 var _scannerInterface = reflect.TypeOf((*sql.Scanner)(nil)).Elem()
 
-// scanAll scans all the rows into a slice of struct.
+// scanAll scans all the rows into a slice of struct, slice of map[string]interface{} or slice of sql.Scanner.
 // Copied and modified from https://github.com/jmoiron/sqlx
 func scanAll(rows *sqlx.Rows, dest interface{}) error {
 	value := reflect.ValueOf(dest)
@@ -282,8 +290,26 @@ func scanAll(rows *sqlx.Rows, dest interface{}) error {
 	isPtr := slice.Type().Elem().Kind() == reflect.Ptr
 	base := baseType(slice.Type().Elem())
 
+	scannable := isScannable(base)
+	if scannable {
+		for rows.Next() {
+			vp := reflect.New(base)
+			err := rows.Scan(vp.Interface())
+			if err != nil {
+				return err
+			}
+
+			if isPtr {
+				slice.Set(reflect.Append(slice, vp))
+			} else {
+				slice.Set(reflect.Append(slice, reflect.Indirect(vp)))
+			}
+		}
+		return nil
+	}
+
 	if base.Kind() != reflect.Struct {
-		return fmt.Errorf("Expected a slice of struct, but got %s", slice.Kind())
+		return fmt.Errorf("Expected a slice of struct, but got %s", slice.Type())
 	}
 
 	columns, err := rows.Columns()
@@ -316,6 +342,20 @@ func scanAll(rows *sqlx.Rows, dest interface{}) error {
 	}
 
 	return nil
+}
+
+// isScannable takes the reflect.Type and the actual dest value and returns
+// whether or not it's Scannable.  Something is scannable if:
+// Copied and modified from https://github.com/jmoiron/sqlx
+func isScannable(t reflect.Type) bool {
+	if reflect.PtrTo(t).Implements(_scannerInterface) {
+		return true
+	}
+	if t.Kind() != reflect.Struct {
+		return true
+	}
+
+	return false
 }
 
 // fieldsByName fills a values interface with fields from the passed value based
