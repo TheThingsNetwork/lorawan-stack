@@ -67,9 +67,9 @@ func ShouldBeApplicationIgnoringAutoFields(actual interface{}, expected ...inter
 
 	return all(
 		assertions.ShouldEqual(a.ID, b.ID),
-		assertions.ShouldEqual(a.Description, b.Description),
+		assertions.ShouldResemble(a.Description, b.Description),
 		assertions.ShouldResemble(a.EUIs, b.EUIs),
 		assertions.ShouldResemble(a.APIKeys, b.APIKeys),
-		assertions.ShouldEqual(a.Archived, b.Archived),
+		assertions.ShouldResemble(a.Archived, b.Archived),
 	)
 }
