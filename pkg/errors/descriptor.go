@@ -75,3 +75,13 @@ func (err *ErrDescriptor) Register() {
 
 	Register(err.Namespace, err)
 }
+
+// Describes checks if the passed error is an error created by this descriptor.
+func (err *ErrDescriptor) Describes(e error) bool {
+	i, ok := e.(Error)
+	if !ok {
+		return false
+	}
+
+	return i.Namespace() == err.Namespace && i.Code() == err.Code
+}

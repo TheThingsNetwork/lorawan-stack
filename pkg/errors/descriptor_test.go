@@ -3,6 +3,7 @@
 package errors
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -29,6 +30,9 @@ func TestDescriptor(t *testing.T) {
 	a.So(err.Code(), should.Equal, d.Code)
 	a.So(err.Type(), should.Equal, d.Type)
 	a.So(err.Attributes(), should.Resemble, attributes)
+
+	a.So(d.Describes(err), should.BeTrue)
+	a.So(d.Describes(errors.New("Something else")), should.BeFalse)
 }
 
 func TestDescriptorCause(t *testing.T) {
@@ -52,6 +56,9 @@ func TestDescriptorCause(t *testing.T) {
 	a.So(err.Type(), should.Equal, d.Type)
 	a.So(err.Attributes()["app_id"], should.Resemble, attributes["app_id"])
 	a.So(err.Attributes()[causeKey], should.Resemble, cause)
+
+	a.So(d.Describes(err), should.BeTrue)
+	a.So(d.Describes(errors.New("Something else")), should.BeFalse)
 
 	a.So(Cause(err), should.Equal, cause)
 }
