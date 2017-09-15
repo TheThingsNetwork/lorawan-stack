@@ -15,5 +15,8 @@ inputs:
   path: go/src/github.com/TheThingsNetwork/ttn
 - name: vendor
 
+caches:
+- path: deps
+
 run:
   path: go/src/github.com/TheThingsNetwork/ttn/ci/go-test.sh
