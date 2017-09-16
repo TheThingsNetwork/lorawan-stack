@@ -4,18 +4,6 @@ package store
 
 type NewResultFunc func() interface{}
 
-var (
-	NewStringInterfaceMap NewResultFunc = func() interface{} {
-		return make(map[string]interface{})
-	}
-	NewStringStringMap NewResultFunc = func() interface{} {
-		return make(map[string]string)
-	}
-	NewStringBytesMap NewResultFunc = func() interface{} {
-		return make(map[string][]byte)
-	}
-)
-
 // Client represents a generic interface to interact with different store implementations
 type Client interface {
 	Create(v interface{}) (PrimaryKey, error)
