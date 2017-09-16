@@ -14,10 +14,10 @@ const (
 	Separator = "."
 
 	UnknownEncoding Encoding = iota
-	TextEncoding
 	BinaryEncoding
-	JSONEncoding
+	TextEncoding
 	ProtoEncoding
+	JSONEncoding
 )
 
 var (
