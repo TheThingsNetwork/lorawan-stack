@@ -7,12 +7,25 @@ import (
 	"fmt"
 )
 
+type Encoding byte
+
+const (
+	// Separator, used to separate the flattened struct fields
+	Separator = "."
+
+	UnknownEncoding Encoding = iota
+	TextEncoding
+	BinaryEncoding
+	JSONEncoding
+	ProtoEncoding
+)
+
 var (
 	// ErrNotFound represents an error returned, when entity is not found.
 	ErrNotFound = errors.New("not found")
 )
 
-// PrimaryKey represents the value used by store.Interface implementations to uniquely identify stored objects.
+// PrimaryKey represents the value used by Interface implementations to uniquely identify stored objects.
 type PrimaryKey interface {
 	fmt.Stringer
 }

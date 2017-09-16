@@ -51,7 +51,7 @@ func TestUnmarshal(t *testing.T) {
 	}
 
 	var v Struct
-	err := Unmarshal(input, &v)
+	err := UnmarshalMap(input, &v)
 	a.So(err, should.BeNil)
 	if !a.So(v, should.Resemble, expected) {
 		t.Log(pretty.Sprintf("\n%# v\n does not resemble\n %# v\n", v, expected))

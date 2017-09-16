@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	. "github.com/TheThingsNetwork/ttn/pkg/deviceregistry"
+	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/TheThingsNetwork/ttn/pkg/store/mapstore"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
@@ -31,12 +32,14 @@ func newPopulatedEndDevice() *ttnpb.EndDevice {
 
 func TestDeviceRegistry(t *testing.T) {
 	a := assertions.New(t)
-	r := New(mapstore.New())
+	r := New(store.NewTypedStoreClient(mapstore.New()))
 
 	ed := newPopulatedEndDevice()
 
 	device, err := r.Create(ed)
-	a.So(err, should.BeNil)
+	if !a.So(err, should.BeNil) {
+		return
+	}
 	if a.So(device, should.NotBeNil) {
 		a.So(device.EndDevice, should.Resemble, ed)
 	}
@@ -59,7 +62,9 @@ func TestDeviceRegistry(t *testing.T) {
 		updated = newPopulatedEndDevice()
 	}
 	device.EndDevice = updated
-	a.So(device.Update(), should.BeNil)
+	if !a.So(device.Update(), should.BeNil) {
+		return
+	}
 
 	found, err = r.FindDeviceByIdentifiers(&ttnpb.EndDeviceIdentifiers{
 		DevEUI:        ed.DevEUI,
@@ -104,7 +109,7 @@ func TestDeviceRegistry(t *testing.T) {
 }
 
 func ExampleRegistry() {
-	r := New(mapstore.New())
+	r := New(store.NewTypedStoreClient(mapstore.New()))
 
 	devEUI := types.EUI64([8]byte{0, 1, 2, 3, 4, 5, 6, 7})
 	joinEUI := types.EUI64([8]byte{0, 1, 2, 3, 4, 5, 6, 7})

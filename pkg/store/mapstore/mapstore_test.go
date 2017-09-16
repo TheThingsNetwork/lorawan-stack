@@ -10,5 +10,5 @@ import (
 
 func TestMapStore(t *testing.T) {
 	s := New()
-	storetest.TestStore(t, s)
+	storetest.TestTypedStore(t, s)
 }

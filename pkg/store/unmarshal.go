@@ -3,15 +3,22 @@
 package store
 
 import (
+	"encoding"
+	"encoding/json"
+	"fmt"
+	"reflect"
+	"strconv"
 	"strings"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/gogo/protobuf/proto"
 	"github.com/mitchellh/mapstructure"
 )
 
 func unflattened(m map[string]interface{}) map[string]interface{} {
 	out := make(map[string]interface{}, len(m))
 	for k, v := range m {
-		skeys := strings.Split(k, ".")
+		skeys := strings.Split(k, Separator)
 		parent := out
 		for _, sk := range skeys[:len(skeys)-1] {
 			sm, ok := parent[sk]
@@ -36,12 +43,12 @@ type MapUnmarshaler interface {
 	UnmarshalMap(map[string]interface{}) error
 }
 
-// Unmarshal parses the map-encoded data and stores the result
+// UnmarshalMap parses the map-encoded data and stores the result
 // in the value pointed to by v.
 //
-// Unmarshal uses the inverse of the encodings that
+// UnmarshalMap uses the inverse of the encodings that
 // Marshal uses.
-func Unmarshal(m map[string]interface{}, v interface{}) error {
+func UnmarshalMap(m map[string]interface{}, v interface{}) error {
 	switch t := v.(type) {
 	case MapUnmarshaler:
 		return t.UnmarshalMap(m)
@@ -53,4 +60,135 @@ func Unmarshal(m map[string]interface{}, v interface{}) error {
 	default:
 		return mapstructure.Decode(unflattened(m), v)
 	}
+}
+
+func fieldByFlatName(typ reflect.Type, name string) (f reflect.StructField, ok bool) {
+	if name == "" {
+		panic(errors.New(fmt.Sprintf("github.com/TheThingsNetwork/ttn/pkg/store.fieldByFlatName: empty name specified")))
+	}
+	for _, name := range strings.Split(name, Separator) {
+		f, ok = typ.FieldByName(name)
+		if !ok {
+			break
+		}
+		typ = f.Type
+	}
+	return f, ok
+}
+
+func bytesToType(b []byte, typ reflect.Type) (interface{}, error) {
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+	}
+
+	switch k := typ.Kind(); k {
+	case reflect.String:
+		return string(b), nil
+	case reflect.Bool:
+		return strconv.ParseBool(string(b))
+	case reflect.Int:
+		return strconv.ParseInt(string(b), 10, 64)
+	case reflect.Int8:
+		return strconv.ParseInt(string(b), 10, 8)
+	case reflect.Int16:
+		return strconv.ParseInt(string(b), 10, 16)
+	case reflect.Int32:
+		return strconv.ParseInt(string(b), 10, 32)
+	case reflect.Int64:
+		return strconv.ParseInt(string(b), 10, 64)
+	case reflect.Uint:
+		return strconv.ParseUint(string(b), 10, 64)
+	case reflect.Uint8:
+		return strconv.ParseUint(string(b), 10, 8)
+	case reflect.Uint16:
+		return strconv.ParseUint(string(b), 10, 16)
+	case reflect.Uint32:
+		return strconv.ParseUint(string(b), 10, 32)
+	case reflect.Uint64:
+		return strconv.ParseUint(string(b), 10, 64)
+	case reflect.Float32:
+		return strconv.ParseFloat(string(b), 32)
+	case reflect.Float64:
+		return strconv.ParseFloat(string(b), 64)
+	case reflect.Slice, reflect.Array:
+		elem := typ.Elem()
+		if elem.Kind() == reflect.Uint8 {
+			// Handle byte slices/arrays directly
+			if k == reflect.Slice {
+				return b, nil
+			}
+			rv := reflect.Indirect(reflect.New(typ))
+			for i := 0; i < rv.Len(); i++ {
+				rv.Index(i).SetUint(uint64(b[i]))
+			}
+			return rv.Interface(), nil
+		}
+	}
+
+	rv := reflect.New(typ)
+	switch Encoding(b[0]) {
+	case BinaryEncoding:
+		v, ok := rv.Interface().(encoding.BinaryUnmarshaler)
+		if !ok {
+			var expected encoding.BinaryUnmarshaler
+			return nil, errors.Errorf("expected %s to implement %T", typ, expected)
+		}
+		return v, v.UnmarshalBinary(b[1:])
+	case TextEncoding:
+		v, ok := rv.Interface().(encoding.TextUnmarshaler)
+		if !ok {
+			var expected encoding.TextUnmarshaler
+			return nil, errors.Errorf("expected %s to implement %T", typ, expected)
+		}
+		return v, v.UnmarshalText(b[1:])
+	case ProtoEncoding:
+		v, ok := rv.Interface().(proto.Unmarshaler)
+		if !ok {
+			var expected proto.Unmarshaler
+			return nil, errors.Errorf("expected %s to implement %T", typ, expected)
+		}
+		return v, v.Unmarshal(b[1:])
+	case JSONEncoding:
+		v, ok := rv.Interface().(json.Unmarshaler)
+		if !ok {
+			var expected json.Unmarshaler
+			return nil, errors.Errorf("expected %s to implement %T", typ, expected)
+		}
+		return v, v.UnmarshalJSON(b[1:])
+	case UnknownEncoding:
+		return nil, errors.New("value is encoded using unknown encoding")
+	default:
+		return nil, errors.New("wrong data format")
+	}
+}
+
+// UnmarshalByteMap parses the byte map-encoded data and stores the result
+// in the value pointed to by v.
+//
+// UnmarshalByteMap uses the inverse of the encodings that
+// MarshalByteMap uses.
+func UnmarshalByteMap(bm map[string][]byte, v interface{}) error {
+	typ := reflect.TypeOf(v)
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+	}
+
+	im := make(map[string]interface{}, len(bm))
+	switch typ.Kind() {
+	case reflect.Struct:
+		for k, bv := range bm {
+			f, ok := fieldByFlatName(typ, k)
+			if !ok {
+				return errors.Errorf("field %s does not exist on type specified", k)
+			}
+			iv, err := bytesToType(bv, f.Type)
+			if err != nil {
+				return err
+			}
+			im[k] = iv
+		}
+	default:
+		panic(errors.Errorf("UnmarshalByteMap: %s is not supported yet", typ))
+	}
+	return UnmarshalMap(im, v)
 }

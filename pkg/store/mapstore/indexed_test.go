@@ -10,5 +10,5 @@ import (
 
 func TestIndexedMapStore(t *testing.T) {
 	s := NewIndexed("foo", "bar")
-	storetest.TestStore(t, s)
+	storetest.TestTypedStore(t, s)
 }
