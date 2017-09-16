@@ -3,8 +3,7 @@
 package redis
 
 import (
-	"encoding"
-	"encoding/json"
+	"bytes"
 	"fmt"
 	"io"
 	"math/rand"
@@ -57,32 +56,13 @@ func (s *Store) key(str ...string) string {
 	return s.config.Prefix + separator + strings.Join(str, separator)
 }
 
-func toString(v interface{}) (string, error) {
-	switch t := v.(type) {
-	case encoding.TextMarshaler:
-		b, err := t.MarshalText()
-		if err != nil {
-			return "", err
-		}
-		return string(b), nil
-	case encoding.BinaryMarshaler:
-		b, err := t.MarshalBinary()
-		if err != nil {
-			return "", err
-		}
-		return string(b), nil
-	case json.Marshaler:
-		b, err := t.MarshalJSON()
-		if err != nil {
-			return "", err
-		}
-		return string(b), nil
-	}
-	return fmt.Sprint(v), nil
+func base(str string) string {
+	ss := strings.Split(str, separator)
+	return ss[len(ss)-1]
 }
 
 // Create stores generates an ULID and stores fields under a key associated with it.
-func (s *Store) Create(fields map[string]interface{}) (store.PrimaryKey, error) {
+func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 	var (
 		id    = ulid.MustNew(ulid.Now(), s.entropy)
 		idStr = id.String()
@@ -93,10 +73,7 @@ func (s *Store) Create(fields map[string]interface{}) (store.PrimaryKey, error) 
 		idxAdd    = make([]string, 0, len(fields))
 	)
 	for k, v := range fields {
-		str, err := toString(v)
-		if err != nil {
-			return nil, err
-		}
+		str := string(v)
 		fieldsSet[k] = str
 		if _, ok := s.indexKeys[k]; ok {
 			idxAdd = append(idxAdd, s.key(k, str))
@@ -111,8 +88,7 @@ func (s *Store) Create(fields map[string]interface{}) (store.PrimaryKey, error) 
 				return err
 			}
 			if ok {
-				errstr := fmt.Sprintf("A key %s already exists", idStr) // ensure `go lint` doesn't complain
-				return errors.New(errstr)
+				return errors.Errorf("A key %s already exists", idStr)
 			}
 			_, err = tx.Pipelined(func(p *redis.Pipeline) error {
 				for _, k := range idxAdd {
@@ -132,32 +108,43 @@ func (s *Store) Create(fields map[string]interface{}) (store.PrimaryKey, error) 
 }
 
 // Delete deletes the fields stored under the key associated with id.
-func (s *Store) Delete(id store.PrimaryKey) error {
-	idStr := id.String()
+func (s *Store) Delete(id store.PrimaryKey) (err error) {
+	var (
+		idStr = id.String()
+		key   = s.key(idStr)
 
-	indexKeys, err := s.Redis.HMGet(s.key(idStr), s.config.IndexKeys...).Result()
-	if err != nil {
-		return err
-	}
-
-	_, err = s.Redis.TxPipelined(func(p *redis.Pipeline) error {
-		for i, v := range indexKeys {
-			if v != nil {
-				str, err := toString(v)
+		del func() error
+	)
+	del = func() error {
+		err = s.Redis.Watch(func(tx *redis.Tx) error {
+			var idxCurrent []interface{}
+			if len(s.config.IndexKeys) > 0 {
+				idxCurrent, err = tx.HMGet(key, s.config.IndexKeys...).Result()
 				if err != nil {
 					return err
 				}
-				p.SRem(s.key(s.config.IndexKeys[i], str), idStr)
 			}
+			_, err = tx.Pipelined(func(p *redis.Pipeline) error {
+				for i, curr := range idxCurrent {
+					if curr != nil {
+						p.SRem(s.key(s.config.IndexKeys[i], curr.(string)), idStr)
+					}
+				}
+				p.Del(key)
+				return nil
+			})
+			return err
+		}, key)
+		if err == redis.TxFailedErr {
+			return del()
 		}
-		p.Del(s.key(idStr))
-		return nil
-	})
-	return err
+		return err
+	}
+	return del()
 }
 
 // Update overwrites field values stored under PrimaryKey specified with values in diff and rebinds indexed keys present in diff.
-func (s *Store) Update(id store.PrimaryKey, diff map[string]interface{}) error {
+func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) {
 	var (
 		idStr = id.String()
 
@@ -179,10 +166,7 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string]interface{}) error {
 			continue
 		}
 
-		str, err := toString(v)
-		if err != nil {
-			return err
-		}
+		str := string(v)
 		fieldsSet[k] = str
 		if isIndex {
 			idxAdd = append(idxAdd, s.key(k, str))
@@ -191,23 +175,27 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string]interface{}) error {
 
 	var update func() error
 	update = func() error {
-		err := s.Redis.Watch(func(tx *redis.Tx) error {
-			idxCurrent, err := tx.HMGet(key, idxDel...).Result()
-			if err != nil {
-				return err
+		err = s.Redis.Watch(func(tx *redis.Tx) error {
+			var idxCurrent []interface{}
+			if len(idxDel) != 0 {
+				idxCurrent, err = tx.HMGet(key, idxDel...).Result()
+				if err != nil {
+					return err
+				}
 			}
 			_, err = tx.Pipelined(func(p *redis.Pipeline) error {
-				p.HMSet(key, fieldsSet)
-				p.HDel(key, fieldsDel...)
 				for i, k := range idxDel {
-					if idxCurrent[i] == nil {
-						continue
+					if curr := idxCurrent[i]; curr != nil {
+						p.SRem(s.key(k, curr.(string)), idStr)
 					}
-					p.SRem(s.key(k, idxCurrent[i].(string)), idStr)
 				}
 				for _, k := range idxAdd {
 					p.SAdd(k, idStr)
 				}
+				if len(fieldsDel) > 0 {
+					p.HDel(key, fieldsDel...)
+				}
+				p.HMSet(key, fieldsSet)
 				return nil
 			})
 			return err
@@ -220,30 +208,30 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string]interface{}) error {
 	return update()
 }
 
-type stringInterfaceMapCmd struct {
+type stringBytesMapCmd struct {
 	*redis.StringStringMapCmd
 }
 
-func (c *stringInterfaceMapCmd) Result() (map[string]interface{}, error) {
+func (c *stringBytesMapCmd) Result() (map[string][]byte, error) {
 	fields, err := c.StringStringMapCmd.Result()
 	if err != nil {
 		return nil, err
 	}
 
-	out := make(map[string]interface{}, len(fields))
+	out := make(map[string][]byte, len(fields))
 	for k, v := range fields {
-		out[k] = v
+		out[k] = []byte(v)
 	}
 	return out, nil
 }
 
-func newStringInterfaceMapCmd(c *redis.StringStringMapCmd) *stringInterfaceMapCmd {
-	return &stringInterfaceMapCmd{c}
+func newStringBytesMapCmd(c *redis.StringStringMapCmd) *stringBytesMapCmd {
+	return &stringBytesMapCmd{c}
 }
 
 // Find returns the fields stored under PrimaryKey specified.
-func (s *Store) Find(id store.PrimaryKey) (map[string]interface{}, error) {
-	m, err := newStringInterfaceMapCmd(s.Redis.HGetAll(s.key(id.String()))).Result()
+func (s *Store) Find(id store.PrimaryKey) (map[string][]byte, error) {
+	m, err := newStringBytesMapCmd(s.Redis.HGetAll(s.key(id.String()))).Result()
 	if err != nil {
 		return nil, err
 	}
@@ -253,50 +241,49 @@ func (s *Store) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	return m, nil
 }
 
-// findKeysBy returns a slice of keys, which correspond to the filer specified.
-func (s *Store) findKeysBy(filter map[string]interface{}) ([]string, error) {
-	keys := make([]string, 0, len(filter))
-	for k, v := range filter {
-		str, err := toString(v)
-		if err != nil {
-			return nil, err
-		}
-		keys = append(keys, s.key(k, str))
-	}
-	return keys, nil
-}
-
 // FindBy returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
 // meaning that only entries matching all the fields in filter should be returned.
-func (s *Store) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
-	keys, err := s.findKeysBy(filter)
-	if err != nil {
-		return nil, err
+func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[string][]byte, err error) {
+	keyFilter := make([]string, 0, len(filter))
+	filterFields := make([]string, 0, len(filter))
+	for k, v := range filter {
+		str := string(v)
+		if _, ok := s.indexKeys[str]; ok {
+			keyFilter = append(keyFilter, s.key(k, str))
+		} else {
+			filterFields = append(filterFields, k)
+		}
 	}
 
-	var (
-		out  map[store.PrimaryKey]map[string]interface{}
-		find func() error
-	)
+	var find func() error
 	find = func() error {
 		err := s.Redis.Watch(func(tx *redis.Tx) error {
-			ids, err := tx.SInter(keys...).Result()
+			var ids []string
+			if len(keyFilter) != 0 {
+				ids, err = tx.SInter(keyFilter...).Result()
+			} else {
+				ids, err = tx.Keys(s.key("*")).Result()
+				for i, key := range ids {
+					ids[i] = base(key)
+				}
+
+			}
 			if err != nil {
 				return err
 			}
 			if len(ids) == 0 {
-				out = map[store.PrimaryKey]map[string]interface{}{}
+				out = map[store.PrimaryKey]map[string][]byte{}
 				return nil
 			}
 
-			cmds := make(map[ulid.ULID]*stringInterfaceMapCmd, len(ids))
+			cmds := make(map[ulid.ULID]*stringBytesMapCmd, len(ids))
 			_, err = tx.Pipelined(func(p *redis.Pipeline) error {
 				for _, str := range ids {
 					id, err := ulid.Parse(str)
 					if err != nil {
 						return errors.NewWithCause(fmt.Sprintf("pkg/store/redis: failed to parse %s as ULID, database inconsistent", str), err)
 					}
-					cmds[id] = newStringInterfaceMapCmd(p.HGetAll(s.key(str)))
+					cmds[id] = newStringBytesMapCmd(p.HGetAll(s.key(str)))
 				}
 				return nil
 			})
@@ -304,7 +291,9 @@ func (s *Store) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[
 				return err
 			}
 
-			out = make(map[store.PrimaryKey]map[string]interface{}, len(cmds))
+			out = make(map[store.PrimaryKey]map[string][]byte, len(cmds))
+
+		outer:
 			for id, cmd := range cmds {
 				m, err := cmd.Result()
 				if err != nil {
@@ -313,10 +302,15 @@ func (s *Store) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[
 				if len(m) == 0 {
 					continue
 				}
+				for _, k := range filterFields {
+					if !bytes.Equal(m[k], filter[k]) {
+						continue outer
+					}
+				}
 				out[id] = m
 			}
 			return nil
-		}, keys...)
+		}, keyFilter...)
 		if err == redis.TxFailedErr {
 			return find()
 		}

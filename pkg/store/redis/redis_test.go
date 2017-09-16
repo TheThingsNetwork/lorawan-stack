@@ -31,5 +31,5 @@ func TestStore(t *testing.T) {
 		}
 
 	}
-	storetest.TestStore(t, s)
+	storetest.TestByteStore(t, s)
 }
