@@ -3,6 +3,8 @@
 package errors
 
 import (
+	"fmt"
+
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/goproto"
 	"github.com/golang/protobuf/ptypes/struct"
@@ -125,7 +127,13 @@ func FromGRPC(in error) errors.Error {
 		out := &impl{Status: status, code: errors.NoCode}
 		for _, details := range status.Details() {
 			if details, ok := details.(*structpb.Struct); ok {
-				for k, v := range goproto.Map(details) {
+				m, err := goproto.Map(details)
+				if err != nil {
+					// TODO handle errors properly(write to log?)
+					fmt.Printf("Error decoding grpc error: %s", err)
+					continue
+				}
+				for k, v := range m {
 					switch k {
 					case CodeKey:
 						if v, ok := v.(float64); ok {
@@ -150,14 +158,17 @@ func FromGRPC(in error) errors.Error {
 
 // ToGRPC turns an error into a gRPC error
 func ToGRPC(in error) error {
-	if err, ok := in.(errors.Error); ok {
-		s, dErr := status.New(TypeToGRPCCode(err.Type()), err.Message()).
-			WithDetails(goproto.Struct(map[string]interface{}{
-				CodeKey:      uint32(err.Code()),
-				AttributeKey: err.Attributes(),
-				NamespaceKey: err.Namespace(),
-			}))
-		if dErr != nil {
+	if in, ok := in.(errors.Error); ok {
+		d, err := goproto.Struct(map[string]interface{}{
+			CodeKey:      uint32(in.Code()),
+			AttributeKey: in.Attributes(),
+			NamespaceKey: in.Namespace(),
+		})
+		if err != nil {
+			panic(err) // you're trying to encode something you should not be encoding
+		}
+		s, err := status.New(TypeToGRPCCode(in.Type()), in.Message()).WithDetails(d)
+		if err != nil {
 			panic(err) // probably means you're trying to send very very bad attributes
 		}
 		return s.Err()
