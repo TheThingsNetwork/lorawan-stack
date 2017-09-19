@@ -7,103 +7,128 @@ import (
 	"reflect"
 
 	"github.com/golang/protobuf/ptypes/struct"
-	"github.com/spf13/cast"
+	"github.com/pkg/errors"
 )
 
 // Map returns the Struct proto as a map[string]interface{}
-func Map(p *structpb.Struct) map[string]interface{} {
+func Map(p *structpb.Struct) (map[string]interface{}, error) {
 	m := make(map[string]interface{}, len(p.Fields))
 	for k, v := range p.Fields {
 		if v == nil {
 			continue
 		}
-		m[k] = Interface(v)
+		gv, err := Interface(v)
+		if err != nil {
+			return nil, err
+		}
+		m[k] = gv
 	}
-	return m
+	return m, nil
 }
 
 // Slice returns the ListValue proto as a []interface{}
-func Slice(l *structpb.ListValue) []interface{} {
+func Slice(l *structpb.ListValue) ([]interface{}, error) {
 	s := make([]interface{}, len(l.Values))
 	for i, v := range l.Values {
-		s[i] = Interface(v)
+		gv, err := Interface(v)
+		if err != nil {
+			return nil, err
+		}
+		s[i] = gv
 	}
-	return s
+	return s, nil
 }
 
 // Interface returns the Value proto as an interface{}
-func Interface(v *structpb.Value) interface{} {
-	switch v := v.Kind.(type) {
+func Interface(v *structpb.Value) (interface{}, error) {
+	switch v := v.GetKind().(type) {
 	case *structpb.Value_NullValue:
-		return nil
+		return nil, nil
 	case *structpb.Value_NumberValue:
-		return v.NumberValue
+		return v.NumberValue, nil
 	case *structpb.Value_StringValue:
-		return v.StringValue
+		return v.StringValue, nil
 	case *structpb.Value_BoolValue:
-		return v.BoolValue
+		return v.BoolValue, nil
 	case *structpb.Value_StructValue:
 		return Map(v.StructValue)
 	case *structpb.Value_ListValue:
 		return Slice(v.ListValue)
+	default:
+		return nil, errors.Errorf("unmatched structpb type: %T", v)
 	}
-	return nil
 }
 
 // Struct returns the map as a Struct proto
-func Struct(m map[string]interface{}) *structpb.Struct {
+func Struct(m map[string]interface{}) (*structpb.Struct, error) {
 	p := &structpb.Struct{
 		Fields: make(map[string]*structpb.Value),
 	}
 	for k, v := range m {
-		p.Fields[k] = Value(v)
+		pv, err := Value(v)
+		if err != nil {
+			return nil, err
+		}
+		p.Fields[k] = pv
 	}
-	return p
+	return p, nil
 }
 
 // List returns the slice as a ListValue proto
-func List(s []interface{}) *structpb.ListValue {
+func List(s []interface{}) (*structpb.ListValue, error) {
 	l := &structpb.ListValue{
 		Values: make([]*structpb.Value, len(s)),
 	}
 	for i, v := range s {
-		l.Values[i] = Value(v)
+		pv, err := Value(v)
+		if err != nil {
+			return nil, err
+		}
+		l.Values[i] = pv
 	}
-	return l
+	return l, nil
 }
 
-func valueFromReflect(rv reflect.Value) *structpb.Value {
+func valueFromReflect(rv reflect.Value) (*structpb.Value, error) {
 	switch k := rv.Kind(); k {
 	case reflect.Ptr:
 		if rv.IsNil() {
-			return &structpb.Value{Kind: &structpb.Value_NullValue{}}
+			return &structpb.Value{Kind: &structpb.Value_NullValue{}}, nil
 		}
 		return valueFromReflect(rv.Elem())
 	case reflect.String:
-		return &structpb.Value{Kind: &structpb.Value_StringValue{rv.String()}}
+		return &structpb.Value{Kind: &structpb.Value_StringValue{rv.String()}}, nil
 
 	case reflect.Bool:
-		return &structpb.Value{Kind: &structpb.Value_BoolValue{rv.Bool()}}
+		return &structpb.Value{Kind: &structpb.Value_BoolValue{rv.Bool()}}, nil
 
 	case reflect.Slice, reflect.Array:
 		if k == reflect.Slice && rv.IsNil() {
-			return &structpb.Value{Kind: &structpb.Value_NullValue{}}
+			return &structpb.Value{Kind: &structpb.Value_NullValue{}}, nil
 		}
 		s := make([]interface{}, rv.Len())
 		for i := 0; i < rv.Len(); i++ {
 			s[i] = rv.Index(i).Interface()
 		}
-		return &structpb.Value{Kind: &structpb.Value_ListValue{ListValue: List(s)}}
+		pv, err := List(s)
+		if err != nil {
+			return nil, err
+		}
+		return &structpb.Value{Kind: &structpb.Value_ListValue{pv}}, nil
 
 	case reflect.Map:
 		if rv.IsNil() {
-			return &structpb.Value{Kind: &structpb.Value_NullValue{}}
+			return &structpb.Value{Kind: &structpb.Value_NullValue{}}, nil
 		}
 		m := make(map[string]interface{}, rv.Len())
 		for _, key := range rv.MapKeys() {
 			m[fmt.Sprint(key.Interface())] = rv.MapIndex(key).Interface()
 		}
-		return &structpb.Value{Kind: &structpb.Value_StructValue{Struct(m)}}
+		pv, err := Struct(m)
+		if err != nil {
+			return nil, err
+		}
+		return &structpb.Value{Kind: &structpb.Value_StructValue{pv}}, nil
 
 	case reflect.Struct:
 		n := rv.NumField()
@@ -114,23 +139,40 @@ func valueFromReflect(rv reflect.Value) *structpb.Value {
 			if f.Type().PkgPath() != "" {
 				continue
 			}
-			fields[ft.Name()] = valueFromReflect(f)
+			pv, err := valueFromReflect(f)
+			if err != nil {
+				return nil, err
+			}
+			fields[ft.Name()] = pv
 		}
-		return &structpb.Value{Kind: &structpb.Value_StructValue{&structpb.Struct{fields}}}
+		return &structpb.Value{Kind: &structpb.Value_StructValue{&structpb.Struct{fields}}}, nil
 
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
-		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
-		reflect.Float32, reflect.Float64:
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return &structpb.Value{Kind: &structpb.Value_NumberValue{float64(rv.Int())}}, nil
 
-		return &structpb.Value{Kind: &structpb.Value_NumberValue{cast.ToFloat64(rv.Interface())}}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return &structpb.Value{Kind: &structpb.Value_NumberValue{float64(rv.Uint())}}, nil
+
+	case reflect.Float32, reflect.Float64:
+		return &structpb.Value{Kind: &structpb.Value_NumberValue{rv.Float()}}, nil
+
+	case reflect.Complex64, reflect.Complex128:
+		return &structpb.Value{Kind: &structpb.Value_StringValue{fmt.Sprint(rv.Complex())}}, nil
+
+	default:
+		// either Invalid, Chan. Func, Interface or UnsafePointer
+		return nil, errors.Errorf("Can not map a value of kind %s to a *structpb.Value", k)
 	}
-	return &structpb.Value{Kind: &structpb.Value_NullValue{}}
 }
 
 // Value returns the value as a Value proto
-func Value(v interface{}) *structpb.Value {
+func Value(v interface{}) (*structpb.Value, error) {
 	if v == nil {
-		return &structpb.Value{Kind: &structpb.Value_NullValue{}}
+		return &structpb.Value{Kind: &structpb.Value_NullValue{}}, nil
 	}
-	return valueFromReflect(reflect.Indirect(reflect.ValueOf(v)))
+	pv, err := valueFromReflect(reflect.Indirect(reflect.ValueOf(v)))
+	if err != nil {
+		return nil, err
+	}
+	return pv, nil
 }

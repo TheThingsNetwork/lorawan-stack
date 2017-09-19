@@ -43,8 +43,10 @@ func TestStructProto(t *testing.T) {
 		"eui":            types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
 		"jsonMarshaler":  &jsonMarshaler{Text: "testtext"},
 	}
-	s := Struct(m)
-	sm := Map(s)
+	s, err := Struct(m)
+	a.So(err, should.BeNil)
+	sm, err := Map(s)
+	a.So(err, should.BeNil)
 	for k, v := range m {
 		a.So(s.Fields, should.ContainKey, k)
 		a.So(sm, should.ContainKey, k)
@@ -101,7 +103,14 @@ func TestStructProto(t *testing.T) {
 		default:
 			panic("Unmatched kind: " + rv.Kind().String())
 		}
-		a.So(s.Fields[k], should.Resemble, Value(rv.Interface()))
-		a.So(sm[k], should.Resemble, Interface(Value(rv.Interface())))
+		pv, err := Value(rv.Interface())
+		if a.So(err, should.BeNil) {
+			a.So(s.Fields[k], should.Resemble, pv)
+
+			gv, err := Interface(pv)
+			if a.So(err, should.BeNil) {
+				a.So(sm[k], should.Resemble, gv)
+			}
+		}
 	}
 }
