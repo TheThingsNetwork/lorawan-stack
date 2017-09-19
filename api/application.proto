@@ -3,12 +3,46 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsNetwork/ttn/api/collaborator.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
+import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
 package ttn.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+
+// Application is the message that defines an application in the network.
+message Application {
+  // app_id is the unique id of the application.
+  string app_id = 1 [(gogoproto.customname) = "ID"];
+
+  // description is the description of the application.
+  string description = 2;
+
+  // app_euis are the app euis this application uses.
+  repeated bytes app_euis = 3 [(gogoproto.customname) = "AppEUIs", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
+
+  // api_keys are the API keys the application defined.
+  repeated ApplicationAPIKey api_keys = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
+
+  // created is the time when the application was created.
+  google.protobuf.Timestamp created = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
+  // archived is the time when the application was disabled.
+  google.protobuf.Timestamp archived = 7 [(gogoproto.stdtime) = true];
+}
+
+message ApplicationAPIKey {
+  // name is the API key name.
+  string name = 1;
+
+  // key is the actual API key (base64 encoded).
+  string key = 2;
+
+  // rights are the rights this API key bears.
+  repeated Right rights = 3;
+}
 
 // ApplicationUp wraps multiple application-layer uplink types
 message ApplicationUp {

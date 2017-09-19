@@ -1,0 +1,51 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+package ttn.v3;
+
+option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+
+// User is the message that defines an user on the network.
+message User {
+  // username is the unique and immutable username of the user.
+  string username = 1;
+
+  // email is the email address the user can be reached at.
+  string email = 2;
+
+  // password is the user's password in plain text.
+  string password = 3;
+
+  // name is the user's full name.
+  Name name = 4;
+
+  // validated denotes if the email address has been validated.
+  bool validated = 5;
+
+  // admin denotes whether or not the user has administrative rights.
+  bool admin = 6;
+
+  // god denotes whether or not the user can enter god mode.
+  bool god = 7;
+
+  // joined denotes when the user was created.
+  google.protobuf.Timestamp joined = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
+  // archived is the time when the user account was disabled.
+  google.protobuf.Timestamp archived = 9 [(gogoproto.stdtime) = true];
+}
+
+// Name is the message that defines the user's full name.
+message Name {
+  // first is the first name of the user.
+  string first = 1;
+
+  // last is the last name of the user.
+  string last = 2;
+}

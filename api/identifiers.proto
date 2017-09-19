@@ -39,3 +39,21 @@ message ApplicationIdentifiers {
   // TTN Tenant ID (in case of multi-tenant network stack)
   string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
 }
+
+message UserIdentifiers {
+  // username of the user
+  string username = 1;
+
+  // email address of the user
+  string email = 2;
+
+  // TTN Tenant ID (in case of multi-tenant network stack)
+  string tenant_id = 3 [(gogoproto.customname) = "TenantID"];
+}
+
+message ClientIdentifiers {
+  // TTN Client ID
+  string client_id = 1 [(gogoproto.customname) = "ClientID"];
+  // TTN Tenant ID (in case of multi-tenant network stack)
+  string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
+}

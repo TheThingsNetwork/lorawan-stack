@@ -12,32 +12,126 @@ package ttn.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
+// Gateway is the message that defines a gateway on the network.
+message Gateway {
+  // gateway_id is the unique identifier of the gateway.
+  string gateway_id = 1 [(gogoproto.customname) = "ID"];
+
+  // description is the description of the gateway.
+  string description = 2;
+
+  // token is a valid token that can identify the gateway with other components
+  // that have the IS's decryption keys.
+  string token = 3;
+
+  // frequency_plan_id indicates the ID of the frequency plan.
+  string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID", (gogoproto.moretags) = "db:\"frequency_plan\""];
+
+  // activated denotes wether or not the gateway has been activated.
+  bool activated = 5;
+
+  // status_public denotes whether Aor not the gateway's status is public or not.
+  bool status_public = 6 [(gogoproto.moretags) = "db:\"status_public\""];
+
+  // location_public denotes whether or not the gateway's location is public.
+  bool location_public = 7 [(gogoproto.moretags) = "db:\"location_public\""];
+
+  // owner_public denotes whether or not the gateway owner is public.
+  bool owner_public = 8 [(gogoproto.moretags) = "db:\"owner_public\""];
+
+  // auto_update indicates whether or not the gateway should be able to
+  // automatically fetch and execute firmware updates.
+  bool auto_update = 9 [(gogoproto.moretags) = "db:\"auto_update\""];
+
+  // brand is the gateway brand.
+  string brand = 10;
+
+  // model is the gateway model.
+  string model = 11;
+
+  // antennas is all the antennas that the gateway has.
+  repeated GatewayAntenna antennas = 12 [(gogoproto.nullable) = false];
+
+  // attributes is a map of free form attributes.
+  map<string, string> attributes = 13;
+
+  // cluster_address indicates the URI of the gateway server cluster to connect to,
+  // in a "<ip>:<port>" format.
+  string cluster_address = 14 [(gogoproto.moretags) = "db:\"cluster_address\""];
+
+  // created is the time when the gateway was created.
+  google.protobuf.Timestamp created = 15 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
+  // archived is the time when the gateway was disabled.
+  google.protobuf.Timestamp archived = 16 [(gogoproto.stdtime) = true];
+}
+
+// GatewayAntenna is the message that defines a gateway antenna.
+message GatewayAntenna {
+  // antenna_id is the unique and immutable antenna's identifier.
+  string antenna_id = 1 [(gogoproto.customname) = "ID", (gogoproto.moretags) = "db:\"antenna_id\""];
+
+  // antenna_gain is the antenna gain relative to this gateway, in dBi
+  float antenna_gain = 3;
+
+  // location is the antenna's location.
+  Location location = 4 [(gogoproto.nullable) = false];
+
+  // type denotes the antenna's type.
+  string type = 5;
+
+  // model denotes the antenna's model.
+  string model = 6;
+
+  // placement denotes whether if the antenna is placed indoors or outdoors.
+  GatewayAntennaPlacement placement = 7;
+}
+
+// GatewayAntennaPlacement enum defines whether if the gateway antenna is placed
+// indoors or outdoors.
+enum GatewayAntennaPlacement {
+  option (gogoproto.goproto_enum_prefix) = false;
+  // The antenna is placed indoors.
+  INDOOR  = 0 [(gogoproto.enumvalue_customname) = "GatewayAntennaPlacementIndoor"];
+
+  // The antenna is placed outdoors.
+  OUTDOOR = 1 [(gogoproto.enumvalue_customname) = "GatewayAntennaPlacementOutdoor"];
+}
+
 // GatewayConfiguration contains all the latest values relative to this gateway.
 message GatewayConfiguration {
-  // Token is a valid token that can identify the gateway with other components that have the IS's decryption keys
+  // token is a valid token that can identify the gateway with other components
+  // that have the IS's decryption keys.
   string token = 1;
-  // FrequencyPlanID indicates the ID of the frequency plan
+
+  // frequency_plan_id indicates the ID of the frequency plan.
   string frequency_plan_id = 2 [(gogoproto.customname) = "FrequencyPlanID"];
-  // AntennaGain indicates the AntennaGain relative to this gateway, in dBi
-  float antenna_gain = 3;
-  // ClusterAddress indicates the URI of the gateway server cluster to connect to, in a "<ip>:<port>" format.
-  string cluster_address = 4;
-  // Location indicates the location of the gateway, if specified in the console
-  Location location = 5;
+
+  // cluster_address indicates the URI of the gateway server cluster to connect to,
+  // in a "<ip>:<port>" format.
+  string cluster_address = 3;
+
+  message GatewayAntennaConfiguration {
+    // antenna_gain is the antenna gain relative to this gateway, in dBi
+    float antenna_gain = 1;
+
+    // location is the antenna's location
+    Location location = 2 [(gogoproto.nullable) = false];
+  }
+  repeated GatewayAntennaConfiguration antennas = 4 [(gogoproto.nullable) = false];
 
   message Radio {
-    uint32 frequency = 1 [(gogoproto.moretags) = "yaml:\"frequency\""];
+    uint32 frequency = 1;
 
     message TxConfiguration {
-      uint32 min_frequency = 1 [(gogoproto.moretags) = "yaml:\"min-frequency\""];
-      uint32 max_frequency = 2 [(gogoproto.moretags) = "yaml:\"max-frequency\""];
-      uint32 notch_frequency = 3 [(gogoproto.moretags) = "yaml:\"notch-frequency\""];
+      uint32 min_frequency = 1;
+      uint32 max_frequency = 2;
+      uint32 notch_frequency = 3;
     }
 
-    TxConfiguration radio_tx_config = 2 [(gogoproto.customname) = "TXConfig",  (gogoproto.moretags) = "yaml:\"tx\""];
+    TxConfiguration radio_tx_config = 2 [(gogoproto.customname) = "TXConfig"];
   }
-
-  repeated Radio radios = 6 [(gogoproto.moretags) = "yaml:\"radios\""];
+  repeated Radio radios = 6 [(gogoproto.nullable) = false];
 }
 
 message GatewayStatus {

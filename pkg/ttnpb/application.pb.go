@@ -7,12 +7,18 @@ import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
-import google_protobuf1 "github.com/gogo/protobuf/types"
+import _ "github.com/gogo/protobuf/types"
+import google_protobuf2 "github.com/gogo/protobuf/types"
+
+import github_com_TheThingsNetwork_ttn_pkg_types "github.com/TheThingsNetwork/ttn/pkg/types"
+import time "time"
 
 import (
 	context "golang.org/x/net/context"
 	grpc "google.golang.org/grpc"
 )
+
+import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 
 import strings "strings"
 import reflect "reflect"
@@ -23,6 +29,96 @@ import io "io"
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+var _ = time.Kitchen
+
+// Application is the message that defines an application in the network.
+type Application struct {
+	// app_id is the unique id of the application.
+	ID string `protobuf:"bytes,1,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
+	// description is the description of the application.
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// app_euis are the app euis this application uses.
+	AppEUIs []github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,3,rep,name=app_euis,json=appEuis,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"app_euis"`
+	// api_keys are the API keys the application defined.
+	APIKeys []ApplicationAPIKey `protobuf:"bytes,4,rep,name=api_keys,json=apiKeys" json:"api_keys"`
+	// created is the time when the application was created.
+	Created time.Time `protobuf:"bytes,6,opt,name=created,stdtime" json:"created"`
+	// archived is the time when the application was disabled.
+	Archived *time.Time `protobuf:"bytes,7,opt,name=archived,stdtime" json:"archived,omitempty"`
+}
+
+func (m *Application) Reset()                    { *m = Application{} }
+func (*Application) ProtoMessage()               {}
+func (*Application) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{0} }
+
+func (m *Application) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+func (m *Application) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *Application) GetAPIKeys() []ApplicationAPIKey {
+	if m != nil {
+		return m.APIKeys
+	}
+	return nil
+}
+
+func (m *Application) GetCreated() time.Time {
+	if m != nil {
+		return m.Created
+	}
+	return time.Time{}
+}
+
+func (m *Application) GetArchived() *time.Time {
+	if m != nil {
+		return m.Archived
+	}
+	return nil
+}
+
+type ApplicationAPIKey struct {
+	// name is the API key name.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// key is the actual API key (base64 encoded).
+	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+	// rights are the rights this API key bears.
+	Rights []Right `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
+}
+
+func (m *ApplicationAPIKey) Reset()                    { *m = ApplicationAPIKey{} }
+func (*ApplicationAPIKey) ProtoMessage()               {}
+func (*ApplicationAPIKey) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{1} }
+
+func (m *ApplicationAPIKey) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *ApplicationAPIKey) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+func (m *ApplicationAPIKey) GetRights() []Right {
+	if m != nil {
+		return m.Rights
+	}
+	return nil
+}
 
 // ApplicationUp wraps multiple application-layer uplink types
 type ApplicationUp struct {
@@ -33,7 +129,7 @@ type ApplicationUp struct {
 
 func (m *ApplicationUp) Reset()                    { *m = ApplicationUp{} }
 func (*ApplicationUp) ProtoMessage()               {}
-func (*ApplicationUp) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{0} }
+func (*ApplicationUp) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{2} }
 
 type isApplicationUp_Up interface {
 	isApplicationUp_Up()
@@ -124,7 +220,7 @@ type ApplicationUplink struct {
 
 func (m *ApplicationUplink) Reset()                    { *m = ApplicationUplink{} }
 func (*ApplicationUplink) ProtoMessage()               {}
-func (*ApplicationUplink) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{1} }
+func (*ApplicationUplink) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{3} }
 
 func (m *ApplicationUplink) GetFPort() uint32 {
 	if m != nil {
@@ -155,7 +251,7 @@ type ApplicationDownlink struct {
 
 func (m *ApplicationDownlink) Reset()                    { *m = ApplicationDownlink{} }
 func (*ApplicationDownlink) ProtoMessage()               {}
-func (*ApplicationDownlink) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{2} }
+func (*ApplicationDownlink) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{4} }
 
 func (m *ApplicationDownlink) GetFPort() uint32 {
 	if m != nil {
@@ -184,7 +280,7 @@ type ApplicationDownlinks struct {
 
 func (m *ApplicationDownlinks) Reset()                    { *m = ApplicationDownlinks{} }
 func (*ApplicationDownlinks) ProtoMessage()               {}
-func (*ApplicationDownlinks) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{3} }
+func (*ApplicationDownlinks) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{5} }
 
 func (m *ApplicationDownlinks) GetDownlinks() []*ApplicationDownlink {
 	if m != nil {
@@ -200,7 +296,7 @@ type DownlinkQueueRequest struct {
 
 func (m *DownlinkQueueRequest) Reset()                    { *m = DownlinkQueueRequest{} }
 func (*DownlinkQueueRequest) ProtoMessage()               {}
-func (*DownlinkQueueRequest) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{4} }
+func (*DownlinkQueueRequest) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{6} }
 
 func (m *DownlinkQueueRequest) GetDownlinks() []*ApplicationDownlink {
 	if m != nil {
@@ -210,6 +306,8 @@ func (m *DownlinkQueueRequest) GetDownlinks() []*ApplicationDownlink {
 }
 
 func init() {
+	proto.RegisterType((*Application)(nil), "ttn.v3.Application")
+	proto.RegisterType((*ApplicationAPIKey)(nil), "ttn.v3.ApplicationAPIKey")
 	proto.RegisterType((*ApplicationUp)(nil), "ttn.v3.ApplicationUp")
 	proto.RegisterType((*ApplicationUplink)(nil), "ttn.v3.ApplicationUplink")
 	proto.RegisterType((*ApplicationDownlink)(nil), "ttn.v3.ApplicationDownlink")
@@ -228,10 +326,10 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for ApplicationDownlinkQueue service
 
 type ApplicationDownlinkQueueClient interface {
-	DownlinkQueueReplace(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
-	DownlinkQueuePush(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	DownlinkQueueReplace(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	DownlinkQueuePush(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	DownlinkQueueList(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*ApplicationDownlinks, error)
-	DownlinkQueueClear(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	DownlinkQueueClear(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 }
 
 type applicationDownlinkQueueClient struct {
@@ -242,8 +340,8 @@ func NewApplicationDownlinkQueueClient(cc *grpc.ClientConn) ApplicationDownlinkQ
 	return &applicationDownlinkQueueClient{cc}
 }
 
-func (c *applicationDownlinkQueueClient) DownlinkQueueReplace(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *applicationDownlinkQueueClient) DownlinkQueueReplace(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.ApplicationDownlinkQueue/DownlinkQueueReplace", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -251,8 +349,8 @@ func (c *applicationDownlinkQueueClient) DownlinkQueueReplace(ctx context.Contex
 	return out, nil
 }
 
-func (c *applicationDownlinkQueueClient) DownlinkQueuePush(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *applicationDownlinkQueueClient) DownlinkQueuePush(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.ApplicationDownlinkQueue/DownlinkQueuePush", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -269,8 +367,8 @@ func (c *applicationDownlinkQueueClient) DownlinkQueueList(ctx context.Context, 
 	return out, nil
 }
 
-func (c *applicationDownlinkQueueClient) DownlinkQueueClear(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *applicationDownlinkQueueClient) DownlinkQueueClear(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.ApplicationDownlinkQueue/DownlinkQueueClear", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -281,10 +379,10 @@ func (c *applicationDownlinkQueueClient) DownlinkQueueClear(ctx context.Context,
 // Server API for ApplicationDownlinkQueue service
 
 type ApplicationDownlinkQueueServer interface {
-	DownlinkQueueReplace(context.Context, *DownlinkQueueRequest) (*google_protobuf1.Empty, error)
-	DownlinkQueuePush(context.Context, *DownlinkQueueRequest) (*google_protobuf1.Empty, error)
+	DownlinkQueueReplace(context.Context, *DownlinkQueueRequest) (*google_protobuf2.Empty, error)
+	DownlinkQueuePush(context.Context, *DownlinkQueueRequest) (*google_protobuf2.Empty, error)
 	DownlinkQueueList(context.Context, *EndDeviceIdentifiers) (*ApplicationDownlinks, error)
-	DownlinkQueueClear(context.Context, *EndDeviceIdentifiers) (*google_protobuf1.Empty, error)
+	DownlinkQueueClear(context.Context, *EndDeviceIdentifiers) (*google_protobuf2.Empty, error)
 }
 
 func RegisterApplicationDownlinkQueueServer(s *grpc.Server, srv ApplicationDownlinkQueueServer) {
@@ -388,6 +486,125 @@ var _ApplicationDownlinkQueue_serviceDesc = grpc.ServiceDesc{
 	Metadata: "github.com/TheThingsNetwork/ttn/api/application.proto",
 }
 
+func (m *Application) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Application) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.ID) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintApplication(dAtA, i, uint64(len(m.ID)))
+		i += copy(dAtA[i:], m.ID)
+	}
+	if len(m.Description) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintApplication(dAtA, i, uint64(len(m.Description)))
+		i += copy(dAtA[i:], m.Description)
+	}
+	if len(m.AppEUIs) > 0 {
+		for _, msg := range m.AppEUIs {
+			dAtA[i] = 0x1a
+			i++
+			i = encodeVarintApplication(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if len(m.APIKeys) > 0 {
+		for _, msg := range m.APIKeys {
+			dAtA[i] = 0x22
+			i++
+			i = encodeVarintApplication(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	dAtA[i] = 0x32
+	i++
+	i = encodeVarintApplication(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.Created)))
+	n1, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Created, dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n1
+	if m.Archived != nil {
+		dAtA[i] = 0x3a
+		i++
+		i = encodeVarintApplication(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.Archived)))
+		n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Archived, dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n2
+	}
+	return i, nil
+}
+
+func (m *ApplicationAPIKey) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ApplicationAPIKey) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintApplication(dAtA, i, uint64(len(m.Name)))
+		i += copy(dAtA[i:], m.Name)
+	}
+	if len(m.Key) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintApplication(dAtA, i, uint64(len(m.Key)))
+		i += copy(dAtA[i:], m.Key)
+	}
+	if len(m.Rights) > 0 {
+		dAtA4 := make([]byte, len(m.Rights)*10)
+		var j3 int
+		for _, num := range m.Rights {
+			for num >= 1<<7 {
+				dAtA4[j3] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j3++
+			}
+			dAtA4[j3] = uint8(num)
+			j3++
+		}
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintApplication(dAtA, i, uint64(j3))
+		i += copy(dAtA[i:], dAtA4[:j3])
+	}
+	return i, nil
+}
+
 func (m *ApplicationUp) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -404,11 +621,11 @@ func (m *ApplicationUp) MarshalTo(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	if m.Up != nil {
-		nn1, err := m.Up.MarshalTo(dAtA[i:])
+		nn5, err := m.Up.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += nn1
+		i += nn5
 	}
 	return i, nil
 }
@@ -419,11 +636,11 @@ func (m *ApplicationUp_UplinkMessage) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintApplication(dAtA, i, uint64(m.UplinkMessage.Size()))
-		n2, err := m.UplinkMessage.MarshalTo(dAtA[i:])
+		n6, err := m.UplinkMessage.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n2
+		i += n6
 	}
 	return i, nil
 }
@@ -555,11 +772,11 @@ func (m *DownlinkQueueRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintApplication(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
-	n3, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
+	n7, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n3
+	i += n7
 	return i, nil
 }
 
@@ -590,6 +807,59 @@ func encodeVarintApplication(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return offset + 1
 }
+func (m *Application) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.ID)
+	if l > 0 {
+		n += 1 + l + sovApplication(uint64(l))
+	}
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovApplication(uint64(l))
+	}
+	if len(m.AppEUIs) > 0 {
+		for _, e := range m.AppEUIs {
+			l = e.Size()
+			n += 1 + l + sovApplication(uint64(l))
+		}
+	}
+	if len(m.APIKeys) > 0 {
+		for _, e := range m.APIKeys {
+			l = e.Size()
+			n += 1 + l + sovApplication(uint64(l))
+		}
+	}
+	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.Created)
+	n += 1 + l + sovApplication(uint64(l))
+	if m.Archived != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.Archived)
+		n += 1 + l + sovApplication(uint64(l))
+	}
+	return n
+}
+
+func (m *ApplicationAPIKey) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovApplication(uint64(l))
+	}
+	l = len(m.Key)
+	if l > 0 {
+		n += 1 + l + sovApplication(uint64(l))
+	}
+	if len(m.Rights) > 0 {
+		l = 0
+		for _, e := range m.Rights {
+			l += sovApplication(uint64(e))
+		}
+		n += 1 + sovApplication(uint64(l)) + l
+	}
+	return n
+}
+
 func (m *ApplicationUp) Size() (n int) {
 	var l int
 	_ = l
@@ -679,6 +949,33 @@ func sovApplication(x uint64) (n int) {
 func sozApplication(x uint64) (n int) {
 	return sovApplication(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
+func (this *Application) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&Application{`,
+		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
+		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
+		`AppEUIs:` + fmt.Sprintf("%v", this.AppEUIs) + `,`,
+		`APIKeys:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.APIKeys), "ApplicationAPIKey", "ApplicationAPIKey", 1), `&`, ``, 1) + `,`,
+		`Created:` + strings.Replace(strings.Replace(this.Created.String(), "Timestamp", "google_protobuf1.Timestamp", 1), `&`, ``, 1) + `,`,
+		`Archived:` + strings.Replace(fmt.Sprintf("%v", this.Archived), "Timestamp", "google_protobuf1.Timestamp", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ApplicationAPIKey) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ApplicationAPIKey{`,
+		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`Key:` + fmt.Sprintf("%v", this.Key) + `,`,
+		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
+		`}`,
+	}, "")
+	return s
+}
 func (this *ApplicationUp) String() string {
 	if this == nil {
 		return "nil"
@@ -751,6 +1048,410 @@ func valueToStringApplication(v interface{}) string {
 	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
+}
+func (m *Application) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplication
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Application: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Application: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplication
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthApplication
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplication
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthApplication
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AppEUIs", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplication
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthApplication
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var v github_com_TheThingsNetwork_ttn_pkg_types.EUI64
+			m.AppEUIs = append(m.AppEUIs, v)
+			if err := m.AppEUIs[len(m.AppEUIs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field APIKeys", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplication
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplication
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.APIKeys = append(m.APIKeys, ApplicationAPIKey{})
+			if err := m.APIKeys[len(m.APIKeys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Created", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplication
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplication
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.Created, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Archived", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplication
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplication
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Archived == nil {
+				m.Archived = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.Archived, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplication(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplication
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ApplicationAPIKey) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplication
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ApplicationAPIKey: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ApplicationAPIKey: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplication
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthApplication
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplication
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthApplication
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Key = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType == 0 {
+				var v Right
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowApplication
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= (Right(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.Rights = append(m.Rights, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowApplication
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= (int(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthApplication
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				for iNdEx < postIndex {
+					var v Right
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowApplication
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= (Right(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.Rights = append(m.Rights, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplication(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplication
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *ApplicationUp) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -1374,36 +2075,52 @@ func init() {
 }
 
 var fileDescriptorApplication = []byte{
-	// 493 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x53, 0x3f, 0x6f, 0xd3, 0x40,
-	0x14, 0xcf, 0xa5, 0x6d, 0x44, 0x2f, 0x04, 0xa9, 0xd7, 0x82, 0x42, 0x5a, 0x39, 0x51, 0xa6, 0x30,
-	0x60, 0x4b, 0xa9, 0x18, 0x18, 0x49, 0x1b, 0x41, 0x51, 0x81, 0xd4, 0x2a, 0x03, 0x2c, 0xc6, 0x7f,
-	0x9e, 0x9d, 0x53, 0xec, 0xbb, 0xc3, 0x77, 0x6e, 0xd5, 0x8d, 0x8f, 0xc1, 0x47, 0xea, 0x98, 0x91,
-	0xa9, 0x02, 0x4f, 0x8c, 0x7c, 0x04, 0x94, 0x33, 0x26, 0x0d, 0x0d, 0x2d, 0x02, 0xa6, 0xe4, 0xbd,
-	0xf7, 0xfb, 0xf7, 0x4e, 0xcf, 0xf8, 0x51, 0x44, 0xd5, 0x38, 0xf3, 0x4c, 0x9f, 0x27, 0xd6, 0xf1,
-	0x18, 0x8e, 0xc7, 0x94, 0x45, 0xf2, 0x25, 0xa8, 0x53, 0x9e, 0x4e, 0x2c, 0xa5, 0x98, 0xe5, 0x0a,
-	0x6a, 0xb9, 0x42, 0xc4, 0xd4, 0x77, 0x15, 0xe5, 0xcc, 0x14, 0x29, 0x57, 0x9c, 0xd4, 0x94, 0x62,
-	0xe6, 0xc9, 0x6e, 0xeb, 0xe1, 0x25, 0x7a, 0xc4, 0x23, 0x6e, 0xe9, 0xb1, 0x97, 0x85, 0xba, 0xd2,
-	0x85, 0xfe, 0x57, 0xd0, 0x5a, 0x7f, 0xe4, 0x46, 0x03, 0x60, 0x8a, 0x86, 0x14, 0x52, 0xf9, 0x83,
-	0xb6, 0x1d, 0x71, 0x1e, 0xc5, 0x30, 0x17, 0x87, 0x44, 0xa8, 0xb3, 0x62, 0xd8, 0x7d, 0x83, 0x1b,
-	0x4f, 0xe6, 0xf9, 0x5e, 0x0b, 0x32, 0xc0, 0x77, 0x32, 0x11, 0x53, 0x36, 0x71, 0x12, 0x90, 0xd2,
-	0x8d, 0xa0, 0x89, 0x3a, 0xa8, 0x57, 0xef, 0xdf, 0x37, 0x8b, 0xd0, 0xe6, 0x02, 0x7c, 0x06, 0x7c,
-	0x56, 0xb1, 0x1b, 0x05, 0xe5, 0x45, 0xc1, 0x18, 0xac, 0xe2, 0x6a, 0x26, 0xba, 0xef, 0xf0, 0xc6,
-	0x15, 0x2c, 0xb9, 0x8b, 0x6b, 0xa1, 0x23, 0x78, 0xaa, 0xb4, 0x6c, 0xc3, 0x5e, 0x0b, 0x47, 0x3c,
-	0x55, 0x64, 0x13, 0xaf, 0x85, 0x8e, 0xcf, 0x54, 0xb3, 0xaa, 0xbb, 0xab, 0xe1, 0x1e, 0x53, 0xa4,
-	0x8d, 0xeb, 0x61, 0x9a, 0x38, 0xc2, 0x3d, 0x8b, 0xb9, 0x1b, 0x34, 0x57, 0x3a, 0xa8, 0x77, 0xdb,
-	0xc6, 0x61, 0x9a, 0x8c, 0x8a, 0x4e, 0xd7, 0xc3, 0x9b, 0x97, 0x1c, 0xf6, 0xf9, 0x29, 0xfb, 0xff,
-	0x1e, 0x47, 0x78, 0x6b, 0x89, 0x87, 0x24, 0x8f, 0xf1, 0x7a, 0x50, 0x16, 0x4d, 0xd4, 0x59, 0xe9,
-	0xd5, 0xfb, 0xdb, 0x4b, 0x9e, 0xa8, 0x24, 0xd8, 0x73, 0x74, 0xf7, 0x23, 0xc2, 0x5b, 0x65, 0xff,
-	0x28, 0x83, 0x0c, 0x6c, 0x78, 0x9f, 0x81, 0x54, 0xff, 0xa0, 0x49, 0x86, 0x18, 0x03, 0x0b, 0x9c,
-	0x00, 0x4e, 0xa8, 0x0f, 0x7a, 0xc3, 0x7a, 0x7f, 0xa7, 0xe4, 0x0e, 0x59, 0xb0, 0xaf, 0x07, 0x07,
-	0xf3, 0xe3, 0x18, 0xdc, 0x3a, 0xbf, 0x68, 0x57, 0xa6, 0x17, 0x6d, 0x64, 0xaf, 0x43, 0x39, 0xef,
-	0x4f, 0xab, 0xb8, 0xb9, 0xc4, 0x49, 0xa7, 0x24, 0x87, 0x57, 0x62, 0x8b, 0xd8, 0xf5, 0x81, 0xfc,
-	0xf4, 0x59, 0xb6, 0x54, 0xeb, 0x9e, 0x59, 0xdc, 0x9f, 0x59, 0xde, 0x9f, 0x39, 0x9c, 0xdd, 0x1f,
-	0x39, 0xc0, 0x1b, 0x0b, 0xf8, 0x51, 0x26, 0xc7, 0x7f, 0x29, 0xf5, 0xea, 0x17, 0xa9, 0x43, 0x2a,
-	0x15, 0xb9, 0x76, 0xfb, 0xd6, 0xce, 0x35, 0xef, 0x2a, 0xc9, 0x73, 0x4c, 0x16, 0x04, 0xf7, 0x62,
-	0x70, 0xd3, 0x1b, 0x14, 0x7f, 0x13, 0x6e, 0xf0, 0xf4, 0xd3, 0x17, 0xa3, 0xf2, 0x21, 0x37, 0xd0,
-	0x79, 0x6e, 0xa0, 0x69, 0x6e, 0xa0, 0xcf, 0xb9, 0x81, 0xbe, 0xe6, 0x46, 0xe5, 0x5b, 0x6e, 0xa0,
-	0xb7, 0x0f, 0x6e, 0xfa, 0xa6, 0xc5, 0x24, 0x9a, 0xfd, 0x0a, 0xcf, 0xab, 0x69, 0xe1, 0xdd, 0xef,
-	0x01, 0x00, 0x00, 0xff, 0xff, 0xa8, 0x22, 0xba, 0xb8, 0x75, 0x04, 0x00, 0x00,
+	// 745 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0x41, 0x6f, 0xe3, 0x44,
+	0x18, 0x8d, 0x93, 0x34, 0x69, 0x27, 0x4d, 0xa1, 0xd3, 0x82, 0x4c, 0x5a, 0xe2, 0x28, 0x12, 0x52,
+	0x38, 0xe0, 0x48, 0x29, 0x54, 0x42, 0x42, 0x48, 0x75, 0x1b, 0x41, 0xa0, 0x40, 0x6a, 0x35, 0x07,
+	0x90, 0x50, 0x98, 0xd8, 0x63, 0x67, 0x14, 0xdb, 0x33, 0x78, 0xc6, 0xad, 0x72, 0xe3, 0x27, 0x70,
+	0xe4, 0x27, 0xf5, 0xd8, 0x23, 0xe2, 0x10, 0x76, 0x7d, 0xda, 0xe3, 0x6a, 0x7f, 0xc1, 0xca, 0xe3,
+	0xb8, 0x49, 0xdb, 0x6c, 0x5b, 0xed, 0xee, 0x6d, 0xe6, 0xfb, 0xbe, 0xf7, 0xde, 0xf7, 0x9e, 0xad,
+	0x01, 0x5f, 0xb9, 0x44, 0x8c, 0xa3, 0x91, 0x6e, 0x51, 0xbf, 0x7d, 0x3e, 0xc6, 0xe7, 0x63, 0x12,
+	0xb8, 0xfc, 0x67, 0x2c, 0x2e, 0x69, 0x38, 0x69, 0x0b, 0x11, 0xb4, 0x11, 0x23, 0x6d, 0xc4, 0x98,
+	0x47, 0x2c, 0x24, 0x08, 0x0d, 0x74, 0x16, 0x52, 0x41, 0x61, 0x49, 0x88, 0x40, 0xbf, 0x38, 0xa8,
+	0x7d, 0xb1, 0x04, 0x77, 0xa9, 0x4b, 0xdb, 0xb2, 0x3d, 0x8a, 0x1c, 0x79, 0x93, 0x17, 0x79, 0x4a,
+	0x61, 0xb5, 0xc3, 0xa7, 0xa8, 0x59, 0xd4, 0xf3, 0xd0, 0x88, 0x86, 0x48, 0xd0, 0x70, 0x8e, 0x7b,
+	0xd2, 0x96, 0xc4, 0xc6, 0x81, 0x20, 0x0e, 0xc1, 0x21, 0x9f, 0xc3, 0x34, 0x97, 0x52, 0xd7, 0xc3,
+	0x8b, 0xa5, 0x04, 0xf1, 0x31, 0x17, 0xc8, 0x67, 0xf3, 0x81, 0xbd, 0xbb, 0x03, 0xd8, 0x67, 0x62,
+	0x9a, 0x36, 0x9b, 0xaf, 0xf2, 0xa0, 0x72, 0xb4, 0x70, 0x0e, 0x3f, 0x05, 0x25, 0xc4, 0xd8, 0x90,
+	0xd8, 0xaa, 0xd2, 0x50, 0x5a, 0x1b, 0x46, 0x29, 0x9e, 0x69, 0xf9, 0xde, 0x89, 0xb9, 0x86, 0x18,
+	0xeb, 0xd9, 0xb0, 0x01, 0x2a, 0x36, 0xe6, 0x56, 0x48, 0x58, 0x32, 0xad, 0xe6, 0x93, 0x19, 0x73,
+	0xb9, 0x04, 0x7f, 0x07, 0xeb, 0x09, 0x01, 0x8e, 0x08, 0x57, 0x0b, 0x8d, 0x42, 0x6b, 0xd3, 0x30,
+	0xae, 0x66, 0x5a, 0xee, 0xbf, 0x99, 0xd6, 0x7e, 0xcc, 0x1f, 0x9b, 0xb8, 0x6d, 0x31, 0x65, 0x98,
+	0xeb, 0xdd, 0x41, 0xef, 0xf0, 0xcb, 0x78, 0xa6, 0x95, 0x8f, 0x18, 0xeb, 0x0e, 0x7a, 0xdc, 0x2c,
+	0x23, 0xc6, 0xba, 0x11, 0xe1, 0xb0, 0x9b, 0xd0, 0x93, 0xe1, 0x04, 0x4f, 0xb9, 0x5a, 0x6c, 0x14,
+	0x5a, 0x95, 0xce, 0x27, 0x7a, 0xfa, 0x99, 0xf4, 0x25, 0x1b, 0x47, 0xfd, 0xde, 0x8f, 0x78, 0x6a,
+	0x7c, 0x90, 0x28, 0x4b, 0x1a, 0x79, 0x97, 0x34, 0x24, 0x39, 0xc0, 0x6f, 0x41, 0xd9, 0x0a, 0x31,
+	0x12, 0xd8, 0x56, 0x4b, 0x0d, 0xa5, 0x55, 0xe9, 0xd4, 0xf4, 0x34, 0x25, 0x3d, 0x4b, 0x49, 0x3f,
+	0xcf, 0x62, 0x34, 0xd6, 0x13, 0x9a, 0xbf, 0xff, 0xd7, 0x14, 0x33, 0x03, 0xc1, 0x6f, 0xc0, 0x3a,
+	0x0a, 0xad, 0x31, 0xb9, 0xc0, 0xb6, 0x5a, 0x7e, 0x94, 0xa0, 0x28, 0xc1, 0x37, 0x88, 0xe6, 0x1f,
+	0x60, 0xfb, 0xde, 0xb2, 0x10, 0x82, 0x62, 0x80, 0x7c, 0x9c, 0xe6, 0x6e, 0xca, 0x33, 0xfc, 0x10,
+	0x14, 0x26, 0x78, 0x3a, 0x8f, 0x39, 0x39, 0xc2, 0xcf, 0x40, 0x29, 0x24, 0xee, 0x58, 0xa4, 0xe1,
+	0x6e, 0x75, 0xaa, 0x99, 0x7b, 0x33, 0xa9, 0x9a, 0xf3, 0x66, 0xf3, 0x57, 0x50, 0x5d, 0x52, 0x18,
+	0x30, 0x68, 0x80, 0xad, 0x88, 0x79, 0x24, 0x98, 0x0c, 0x7d, 0xcc, 0x39, 0x72, 0x53, 0x9d, 0xd5,
+	0xe9, 0x0d, 0xe4, 0xe0, 0xf7, 0x39, 0xb3, 0x9a, 0x42, 0x7e, 0x4a, 0x11, 0x46, 0x11, 0xe4, 0x23,
+	0x76, 0x67, 0xf9, 0x74, 0x16, 0x7e, 0x04, 0x4a, 0xce, 0x90, 0xd1, 0x50, 0x48, 0xda, 0xaa, 0xb9,
+	0xe6, 0xf4, 0x69, 0x28, 0xe0, 0x0e, 0x58, 0x73, 0x86, 0x56, 0x20, 0xa4, 0x83, 0xaa, 0x59, 0x74,
+	0x8e, 0x03, 0x01, 0x35, 0x50, 0x71, 0x42, 0x7f, 0xc8, 0xd0, 0xd4, 0xa3, 0xc8, 0x56, 0x0b, 0x0d,
+	0xa5, 0xb5, 0x69, 0x02, 0x27, 0xf4, 0xfb, 0x69, 0xa5, 0x39, 0x02, 0x3b, 0x4b, 0x0a, 0x27, 0xf4,
+	0x32, 0x78, 0xff, 0x1a, 0x67, 0x60, 0x77, 0x85, 0x06, 0x87, 0x5f, 0x83, 0x0d, 0x3b, 0xbb, 0xa8,
+	0x8a, 0xfc, 0xc1, 0xf6, 0x56, 0x44, 0x94, 0x01, 0xcc, 0xc5, 0x74, 0xf3, 0x1f, 0x05, 0xec, 0x66,
+	0xf5, 0xb3, 0x08, 0x47, 0xd8, 0xc4, 0x7f, 0x46, 0x98, 0x8b, 0x77, 0xe0, 0x84, 0x5d, 0x00, 0x70,
+	0x60, 0x0f, 0x6d, 0x7c, 0x41, 0x2c, 0x2c, 0x1d, 0x56, 0x3a, 0xfb, 0x19, 0xb6, 0x1b, 0xd8, 0x27,
+	0xb2, 0xd1, 0x5b, 0x3c, 0x0a, 0xe9, 0xcf, 0x7a, 0x3d, 0xd3, 0x14, 0x73, 0x03, 0x67, 0xfd, 0xce,
+	0x75, 0x1e, 0xa8, 0x2b, 0x94, 0xe4, 0x96, 0xf0, 0xf4, 0xde, 0xda, 0xcc, 0x43, 0x16, 0x86, 0x37,
+	0x3a, 0xab, 0x4c, 0xd5, 0x3e, 0xbe, 0xf7, 0xbf, 0x77, 0x93, 0x67, 0x05, 0xf6, 0xc0, 0xf6, 0xad,
+	0xf9, 0x7e, 0xc4, 0xc7, 0x6f, 0x49, 0xf5, 0xcb, 0x1d, 0xaa, 0x53, 0xc2, 0x05, 0x7c, 0xd0, 0x7d,
+	0x6d, 0xff, 0x81, 0x5c, 0x39, 0xfc, 0x01, 0xc0, 0x5b, 0x84, 0xc7, 0x1e, 0x46, 0xe1, 0x23, 0x8c,
+	0x6f, 0x58, 0xce, 0xf8, 0xee, 0xdf, 0xe7, 0xf5, 0xdc, 0x5f, 0x71, 0x5d, 0xb9, 0x8a, 0xeb, 0xca,
+	0x75, 0x5c, 0x57, 0x9e, 0xc5, 0x75, 0xe5, 0x45, 0x5c, 0xcf, 0xbd, 0x8c, 0xeb, 0xca, 0x6f, 0x9f,
+	0x3f, 0xe9, 0xad, 0x13, 0x01, 0x1b, 0x8d, 0x4a, 0x92, 0xf8, 0xe0, 0x75, 0x00, 0x00, 0x00, 0xff,
+	0xff, 0x77, 0xa6, 0x9b, 0x9b, 0xa5, 0x06, 0x00, 0x00,
 }

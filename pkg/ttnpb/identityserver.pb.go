@@ -7,16 +7,1322 @@ import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
+import google_protobuf2 "github.com/gogo/protobuf/types"
+
+import github_com_TheThingsNetwork_ttn_pkg_types "github.com/TheThingsNetwork/ttn/pkg/types"
 
 import (
 	context "golang.org/x/net/context"
 	grpc "google.golang.org/grpc"
 )
 
+import strings "strings"
+import reflect "reflect"
+import github_com_gogo_protobuf_sortkeys "github.com/gogo/protobuf/sortkeys"
+
+import io "io"
+
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+
+type CreateUserRequest struct {
+	// username is the unique and immutable username of the user.
+	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	// password is the user's unencrypted password.
+	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	// email is the email address the user can be reached at.
+	Email string `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	// name is the user's full name.
+	Name *Name `protobuf:"bytes,4,opt,name=name" json:"name,omitempty"`
+}
+
+func (m *CreateUserRequest) Reset()                    { *m = CreateUserRequest{} }
+func (*CreateUserRequest) ProtoMessage()               {}
+func (*CreateUserRequest) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{0} }
+
+func (m *CreateUserRequest) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *CreateUserRequest) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
+}
+
+func (m *CreateUserRequest) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *CreateUserRequest) GetName() *Name {
+	if m != nil {
+		return m.Name
+	}
+	return nil
+}
+
+type CreateUserResponse struct {
+	// username is the unique and immutable username of the user.
+	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	// email is the email address the user can be reached at.
+	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	// name is the user's full name.
+	Name *Name `protobuf:"bytes,3,opt,name=name" json:"name,omitempty"`
+}
+
+func (m *CreateUserResponse) Reset()                    { *m = CreateUserResponse{} }
+func (*CreateUserResponse) ProtoMessage()               {}
+func (*CreateUserResponse) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{1} }
+
+func (m *CreateUserResponse) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *CreateUserResponse) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *CreateUserResponse) GetName() *Name {
+	if m != nil {
+		return m.Name
+	}
+	return nil
+}
+
+type GetUserResponse struct {
+	// username is the unique and immutable username of the user.
+	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	// name is the user's full name.
+	Name *Name `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
+}
+
+func (m *GetUserResponse) Reset()                    { *m = GetUserResponse{} }
+func (*GetUserResponse) ProtoMessage()               {}
+func (*GetUserResponse) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{2} }
+
+func (m *GetUserResponse) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *GetUserResponse) GetName() *Name {
+	if m != nil {
+		return m.Name
+	}
+	return nil
+}
+
+type GetAccountResponse struct {
+	// username is the unique and immutable username of the user.
+	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	// email is the email address the user can be reached at.
+	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	// name is the user's full name.
+	Name *Name `protobuf:"bytes,3,opt,name=name" json:"name,omitempty"`
+}
+
+func (m *GetAccountResponse) Reset()                    { *m = GetAccountResponse{} }
+func (*GetAccountResponse) ProtoMessage()               {}
+func (*GetAccountResponse) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{3} }
+
+func (m *GetAccountResponse) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *GetAccountResponse) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *GetAccountResponse) GetName() *Name {
+	if m != nil {
+		return m.Name
+	}
+	return nil
+}
+
+type UpdateUserRequest struct {
+	// name is new name of the user.
+	Name *Name `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+}
+
+func (m *UpdateUserRequest) Reset()                    { *m = UpdateUserRequest{} }
+func (*UpdateUserRequest) ProtoMessage()               {}
+func (*UpdateUserRequest) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{4} }
+
+func (m *UpdateUserRequest) GetName() *Name {
+	if m != nil {
+		return m.Name
+	}
+	return nil
+}
+
+type UpdateUserResponse struct {
+	// username is the unique and immutable username of the user.
+	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	// email is the email address the user can be reached at.
+	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	// name is the user's full name.
+	Name *Name `protobuf:"bytes,3,opt,name=name" json:"name,omitempty"`
+}
+
+func (m *UpdateUserResponse) Reset()                    { *m = UpdateUserResponse{} }
+func (*UpdateUserResponse) ProtoMessage()               {}
+func (*UpdateUserResponse) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{5} }
+
+func (m *UpdateUserResponse) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *UpdateUserResponse) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *UpdateUserResponse) GetName() *Name {
+	if m != nil {
+		return m.Name
+	}
+	return nil
+}
+
+type UpdateUserEmailRequest struct {
+	// email is the new email of the user.
+	Email string `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+}
+
+func (m *UpdateUserEmailRequest) Reset()      { *m = UpdateUserEmailRequest{} }
+func (*UpdateUserEmailRequest) ProtoMessage() {}
+func (*UpdateUserEmailRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{6}
+}
+
+func (m *UpdateUserEmailRequest) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+type UpdateUserPasswordRequest struct {
+	// old is the user's old password.
+	Old string `protobuf:"bytes,1,opt,name=old,proto3" json:"old,omitempty"`
+	// new is the user's new password.
+	New string `protobuf:"bytes,2,opt,name=new,proto3" json:"new,omitempty"`
+}
+
+func (m *UpdateUserPasswordRequest) Reset()      { *m = UpdateUserPasswordRequest{} }
+func (*UpdateUserPasswordRequest) ProtoMessage() {}
+func (*UpdateUserPasswordRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{7}
+}
+
+func (m *UpdateUserPasswordRequest) GetOld() string {
+	if m != nil {
+		return m.Old
+	}
+	return ""
+}
+
+func (m *UpdateUserPasswordRequest) GetNew() string {
+	if m != nil {
+		return m.New
+	}
+	return ""
+}
+
+type CreateApplicationRequest struct {
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
+	// description is the description of the application.
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// app_euis are the app euis this application uses.
+	AppEUIs []github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,3,rep,name=app_euis,json=appEuis,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"app_euis"`
+	// api_keys are the API keys the application defined.
+	APIKeys []ApplicationAPIKey `protobuf:"bytes,4,rep,name=api_keys,json=apiKeys" json:"api_keys"`
+}
+
+func (m *CreateApplicationRequest) Reset()      { *m = CreateApplicationRequest{} }
+func (*CreateApplicationRequest) ProtoMessage() {}
+func (*CreateApplicationRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{8}
+}
+
+func (m *CreateApplicationRequest) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *CreateApplicationRequest) GetAPIKeys() []ApplicationAPIKey {
+	if m != nil {
+		return m.APIKeys
+	}
+	return nil
+}
+
+type ListApplicationsResponse struct {
+	Applications []Application `protobuf:"bytes,1,rep,name=applications" json:"applications"`
+}
+
+func (m *ListApplicationsResponse) Reset()      { *m = ListApplicationsResponse{} }
+func (*ListApplicationsResponse) ProtoMessage() {}
+func (*ListApplicationsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{9}
+}
+
+func (m *ListApplicationsResponse) GetApplications() []Application {
+	if m != nil {
+		return m.Applications
+	}
+	return nil
+}
+
+type UpdateApplicationRequest struct {
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
+	// description is the description of the application.
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// app_euis are the app euis this application uses.
+	AppEUIs []github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,3,rep,name=app_euis,json=appEuis,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"app_euis"`
+	// api_keys are the API keys the application defined.
+	APIKeys []ApplicationAPIKey `protobuf:"bytes,4,rep,name=api_keys,json=apiKeys" json:"api_keys"`
+}
+
+func (m *UpdateApplicationRequest) Reset()      { *m = UpdateApplicationRequest{} }
+func (*UpdateApplicationRequest) ProtoMessage() {}
+func (*UpdateApplicationRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{10}
+}
+
+func (m *UpdateApplicationRequest) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *UpdateApplicationRequest) GetAPIKeys() []ApplicationAPIKey {
+	if m != nil {
+		return m.APIKeys
+	}
+	return nil
+}
+
+type AddApplicationAppEUIRequest struct {
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
+	// app_eui is the AppEUI to be added.
+	AppEUI github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,2,opt,name=app_eui,json=appEui,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"app_eui"`
+}
+
+func (m *AddApplicationAppEUIRequest) Reset()      { *m = AddApplicationAppEUIRequest{} }
+func (*AddApplicationAppEUIRequest) ProtoMessage() {}
+func (*AddApplicationAppEUIRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{11}
+}
+
+type AppEUIIdentifier struct {
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
+	AppEUI                 github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,2,opt,name=app_eui,json=appEui,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"app_eui"`
+}
+
+func (m *AppEUIIdentifier) Reset()                    { *m = AppEUIIdentifier{} }
+func (*AppEUIIdentifier) ProtoMessage()               {}
+func (*AppEUIIdentifier) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{12} }
+
+type GenerateAppEUIResponse struct {
+	AppEUI github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,1,opt,name=app_eui,json=appEui,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"app_eui"`
+}
+
+func (m *GenerateAppEUIResponse) Reset()      { *m = GenerateAppEUIResponse{} }
+func (*GenerateAppEUIResponse) ProtoMessage() {}
+func (*GenerateAppEUIResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{13}
+}
+
+type ListApplicationAppEUIsResponse struct {
+	AppEUIs []github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,1,rep,name=app_euis,json=appEuis,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"app_euis"`
+}
+
+func (m *ListApplicationAppEUIsResponse) Reset()      { *m = ListApplicationAppEUIsResponse{} }
+func (*ListApplicationAppEUIsResponse) ProtoMessage() {}
+func (*ListApplicationAppEUIsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{14}
+}
+
+type GenerateApplicationAPIKeyRequest struct {
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
+	// name is the name of the API key to be generated.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// rights the are rights the generated API key will bear.
+	Rights []Right `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
+}
+
+func (m *GenerateApplicationAPIKeyRequest) Reset()      { *m = GenerateApplicationAPIKeyRequest{} }
+func (*GenerateApplicationAPIKeyRequest) ProtoMessage() {}
+func (*GenerateApplicationAPIKeyRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{15}
+}
+
+func (m *GenerateApplicationAPIKeyRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *GenerateApplicationAPIKeyRequest) GetRights() []Right {
+	if m != nil {
+		return m.Rights
+	}
+	return nil
+}
+
+type ApplicationAPIKeyIdentifier struct {
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
+	// key_name is the API key name.
+	KeyName string `protobuf:"bytes,2,opt,name=key_name,json=keyName,proto3" json:"key_name,omitempty"`
+}
+
+func (m *ApplicationAPIKeyIdentifier) Reset()      { *m = ApplicationAPIKeyIdentifier{} }
+func (*ApplicationAPIKeyIdentifier) ProtoMessage() {}
+func (*ApplicationAPIKeyIdentifier) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{16}
+}
+
+func (m *ApplicationAPIKeyIdentifier) GetKeyName() string {
+	if m != nil {
+		return m.KeyName
+	}
+	return ""
+}
+
+type ListApplicationAPIKeysResponse struct {
+	APIKeys []ApplicationAPIKey `protobuf:"bytes,1,rep,name=api_keys,json=apiKeys" json:"api_keys"`
+}
+
+func (m *ListApplicationAPIKeysResponse) Reset()      { *m = ListApplicationAPIKeysResponse{} }
+func (*ListApplicationAPIKeysResponse) ProtoMessage() {}
+func (*ListApplicationAPIKeysResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{17}
+}
+
+func (m *ListApplicationAPIKeysResponse) GetAPIKeys() []ApplicationAPIKey {
+	if m != nil {
+		return m.APIKeys
+	}
+	return nil
+}
+
+type AddApplicationCollaboratorRequest struct {
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
+	Collaborator           `protobuf:"bytes,2,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
+}
+
+func (m *AddApplicationCollaboratorRequest) Reset()      { *m = AddApplicationCollaboratorRequest{} }
+func (*AddApplicationCollaboratorRequest) ProtoMessage() {}
+func (*AddApplicationCollaboratorRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{18}
+}
+
+type ListApplicationCollaboratorsResponse struct {
+	Collaborators []Collaborator `protobuf:"bytes,1,rep,name=collaborators" json:"collaborators"`
+}
+
+func (m *ListApplicationCollaboratorsResponse) Reset()      { *m = ListApplicationCollaboratorsResponse{} }
+func (*ListApplicationCollaboratorsResponse) ProtoMessage() {}
+func (*ListApplicationCollaboratorsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{19}
+}
+
+func (m *ListApplicationCollaboratorsResponse) GetCollaborators() []Collaborator {
+	if m != nil {
+		return m.Collaborators
+	}
+	return nil
+}
+
+type RemoveApplicationCollaboratorRequest struct {
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
+	// username is the user's username that identifies a collaborator in an application.
+	Username string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+}
+
+func (m *RemoveApplicationCollaboratorRequest) Reset()      { *m = RemoveApplicationCollaboratorRequest{} }
+func (*RemoveApplicationCollaboratorRequest) ProtoMessage() {}
+func (*RemoveApplicationCollaboratorRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{20}
+}
+
+func (m *RemoveApplicationCollaboratorRequest) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+type ApplicationRight struct {
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
+	// username is the user's username that holds the right for the application.
+	Username string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	// right is the right that the user holds for the application.
+	Right Right `protobuf:"varint,3,opt,name=right,proto3,enum=ttn.v3.Right" json:"right,omitempty"`
+}
+
+func (m *ApplicationRight) Reset()                    { *m = ApplicationRight{} }
+func (*ApplicationRight) ProtoMessage()               {}
+func (*ApplicationRight) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{21} }
+
+func (m *ApplicationRight) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *ApplicationRight) GetRight() Right {
+	if m != nil {
+		return m.Right
+	}
+	return RightApplicationDelete
+}
+
+type ListApplicationRightsResponse struct {
+	// rights is a list of rights that an user holds for an application.
+	Rights []Right `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
+}
+
+func (m *ListApplicationRightsResponse) Reset()      { *m = ListApplicationRightsResponse{} }
+func (*ListApplicationRightsResponse) ProtoMessage() {}
+func (*ListApplicationRightsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{22}
+}
+
+func (m *ListApplicationRightsResponse) GetRights() []Right {
+	if m != nil {
+		return m.Rights
+	}
+	return nil
+}
+
+type CreateGatewayRequest struct {
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
+	// description is the description of the gateway.
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// token is a valid token that can identify the gateway with other components
+	// that have the IS's decryption keys.
+	Token string `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"`
+	// frequency_plan_id indicates the ID of the frequency plan.
+	FrequencyPlanID string `protobuf:"bytes,4,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
+	// activated denotes wether or not the gateway has been activated.
+	Activated bool `protobuf:"varint,5,opt,name=activated,proto3" json:"activated,omitempty"`
+	// status_public denotes whether Aor not the gateway's status is public or not.
+	StatusPublic bool `protobuf:"varint,6,opt,name=status_public,json=statusPublic,proto3" json:"status_public,omitempty"`
+	// location_public denotes whether or not the gateway's location is public.
+	LocationPublic bool `protobuf:"varint,7,opt,name=location_public,json=locationPublic,proto3" json:"location_public,omitempty"`
+	// owner_public denotes whether or not the gateway owner is public.
+	OwnerPublic bool `protobuf:"varint,8,opt,name=owner_public,json=ownerPublic,proto3" json:"owner_public,omitempty"`
+	// auto_update indicates whether or not the gateway should be able to
+	// automatically fetch and execute firmware updates.
+	AutoUpdate bool `protobuf:"varint,9,opt,name=auto_update,json=autoUpdate,proto3" json:"auto_update,omitempty"`
+	// brand is the gateway brand.
+	Brand string `protobuf:"bytes,10,opt,name=brand,proto3" json:"brand,omitempty"`
+	// model is the gateway model.
+	Model string `protobuf:"bytes,11,opt,name=model,proto3" json:"model,omitempty"`
+	// antennas is all the antennas that the gateway has.
+	Antennas []GatewayAntenna `protobuf:"bytes,12,rep,name=antennas" json:"antennas"`
+	// attributes is a map of free form attributes.
+	Attributes map[string]string `protobuf:"bytes,13,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// cluster_address indicates the URI of the gateway server cluster to connect to,
+	// in a "<ip>:<port>" format.
+	ClusterAddress string `protobuf:"bytes,14,opt,name=cluster_address,json=clusterAddress,proto3" json:"cluster_address,omitempty"`
+}
+
+func (m *CreateGatewayRequest) Reset()      { *m = CreateGatewayRequest{} }
+func (*CreateGatewayRequest) ProtoMessage() {}
+func (*CreateGatewayRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{23}
+}
+
+func (m *CreateGatewayRequest) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *CreateGatewayRequest) GetToken() string {
+	if m != nil {
+		return m.Token
+	}
+	return ""
+}
+
+func (m *CreateGatewayRequest) GetFrequencyPlanID() string {
+	if m != nil {
+		return m.FrequencyPlanID
+	}
+	return ""
+}
+
+func (m *CreateGatewayRequest) GetActivated() bool {
+	if m != nil {
+		return m.Activated
+	}
+	return false
+}
+
+func (m *CreateGatewayRequest) GetStatusPublic() bool {
+	if m != nil {
+		return m.StatusPublic
+	}
+	return false
+}
+
+func (m *CreateGatewayRequest) GetLocationPublic() bool {
+	if m != nil {
+		return m.LocationPublic
+	}
+	return false
+}
+
+func (m *CreateGatewayRequest) GetOwnerPublic() bool {
+	if m != nil {
+		return m.OwnerPublic
+	}
+	return false
+}
+
+func (m *CreateGatewayRequest) GetAutoUpdate() bool {
+	if m != nil {
+		return m.AutoUpdate
+	}
+	return false
+}
+
+func (m *CreateGatewayRequest) GetBrand() string {
+	if m != nil {
+		return m.Brand
+	}
+	return ""
+}
+
+func (m *CreateGatewayRequest) GetModel() string {
+	if m != nil {
+		return m.Model
+	}
+	return ""
+}
+
+func (m *CreateGatewayRequest) GetAntennas() []GatewayAntenna {
+	if m != nil {
+		return m.Antennas
+	}
+	return nil
+}
+
+func (m *CreateGatewayRequest) GetAttributes() map[string]string {
+	if m != nil {
+		return m.Attributes
+	}
+	return nil
+}
+
+func (m *CreateGatewayRequest) GetClusterAddress() string {
+	if m != nil {
+		return m.ClusterAddress
+	}
+	return ""
+}
+
+type ListGatewaysResponse struct {
+	Gateways []Gateway `protobuf:"bytes,1,rep,name=gateways" json:"gateways"`
+}
+
+func (m *ListGatewaysResponse) Reset()      { *m = ListGatewaysResponse{} }
+func (*ListGatewaysResponse) ProtoMessage() {}
+func (*ListGatewaysResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{24}
+}
+
+func (m *ListGatewaysResponse) GetGateways() []Gateway {
+	if m != nil {
+		return m.Gateways
+	}
+	return nil
+}
+
+type UpdateGatewayRequest struct {
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
+	// description is the description of the gateway.
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// token is a valid token that can identify the gateway with other components
+	// that have the IS's decryption keys.
+	Token string `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"`
+	// frequency_plan_id indicates the ID of the frequency plan.
+	FrequencyPlanID string `protobuf:"bytes,4,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
+	// activated denotes wether or not the gateway has been activated.
+	Activated bool `protobuf:"varint,5,opt,name=activated,proto3" json:"activated,omitempty"`
+	// status_public denotes whether Aor not the gateway's status is public or not.
+	StatusPublic bool `protobuf:"varint,6,opt,name=status_public,json=statusPublic,proto3" json:"status_public,omitempty"`
+	// location_public denotes whether or not the gateway's location is public.
+	LocationPublic bool `protobuf:"varint,7,opt,name=location_public,json=locationPublic,proto3" json:"location_public,omitempty"`
+	// owner_public denotes whether or not the gateway owner is public.
+	OwnerPublic bool `protobuf:"varint,8,opt,name=owner_public,json=ownerPublic,proto3" json:"owner_public,omitempty"`
+	// auto_update indicates whether or not the gateway should be able to
+	// automatically fetch and execute firmware updates.
+	AutoUpdate bool `protobuf:"varint,9,opt,name=auto_update,json=autoUpdate,proto3" json:"auto_update,omitempty"`
+	// brand is the gateway brand.
+	Brand string `protobuf:"bytes,10,opt,name=brand,proto3" json:"brand,omitempty"`
+	// model is the gateway model.
+	Model string `protobuf:"bytes,11,opt,name=model,proto3" json:"model,omitempty"`
+	// antennas contains the gateway's antennas.
+	Antennas []GatewayAntenna `protobuf:"bytes,12,rep,name=antennas" json:"antennas"`
+	// attributes is a map of free form attributes.
+	Attributes map[string]string `protobuf:"bytes,13,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// cluster_address indicates the URI of the gateway server cluster to connect to,
+	// in a "<ip>:<port>" format.
+	ClusterAddress string `protobuf:"bytes,14,opt,name=cluster_address,json=clusterAddress,proto3" json:"cluster_address,omitempty"`
+}
+
+func (m *UpdateGatewayRequest) Reset()      { *m = UpdateGatewayRequest{} }
+func (*UpdateGatewayRequest) ProtoMessage() {}
+func (*UpdateGatewayRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{25}
+}
+
+func (m *UpdateGatewayRequest) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *UpdateGatewayRequest) GetToken() string {
+	if m != nil {
+		return m.Token
+	}
+	return ""
+}
+
+func (m *UpdateGatewayRequest) GetFrequencyPlanID() string {
+	if m != nil {
+		return m.FrequencyPlanID
+	}
+	return ""
+}
+
+func (m *UpdateGatewayRequest) GetActivated() bool {
+	if m != nil {
+		return m.Activated
+	}
+	return false
+}
+
+func (m *UpdateGatewayRequest) GetStatusPublic() bool {
+	if m != nil {
+		return m.StatusPublic
+	}
+	return false
+}
+
+func (m *UpdateGatewayRequest) GetLocationPublic() bool {
+	if m != nil {
+		return m.LocationPublic
+	}
+	return false
+}
+
+func (m *UpdateGatewayRequest) GetOwnerPublic() bool {
+	if m != nil {
+		return m.OwnerPublic
+	}
+	return false
+}
+
+func (m *UpdateGatewayRequest) GetAutoUpdate() bool {
+	if m != nil {
+		return m.AutoUpdate
+	}
+	return false
+}
+
+func (m *UpdateGatewayRequest) GetBrand() string {
+	if m != nil {
+		return m.Brand
+	}
+	return ""
+}
+
+func (m *UpdateGatewayRequest) GetModel() string {
+	if m != nil {
+		return m.Model
+	}
+	return ""
+}
+
+func (m *UpdateGatewayRequest) GetAntennas() []GatewayAntenna {
+	if m != nil {
+		return m.Antennas
+	}
+	return nil
+}
+
+func (m *UpdateGatewayRequest) GetAttributes() map[string]string {
+	if m != nil {
+		return m.Attributes
+	}
+	return nil
+}
+
+func (m *UpdateGatewayRequest) GetClusterAddress() string {
+	if m != nil {
+		return m.ClusterAddress
+	}
+	return ""
+}
+
+type AddGatewayAttributeRequest struct {
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
+	// attribute is the name of the attribute to be added.
+	Attribute string `protobuf:"bytes,2,opt,name=attribute,proto3" json:"attribute,omitempty"`
+	// value is the value of the attribute to be added.
+	Value string `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
+}
+
+func (m *AddGatewayAttributeRequest) Reset()      { *m = AddGatewayAttributeRequest{} }
+func (*AddGatewayAttributeRequest) ProtoMessage() {}
+func (*AddGatewayAttributeRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{26}
+}
+
+func (m *AddGatewayAttributeRequest) GetAttribute() string {
+	if m != nil {
+		return m.Attribute
+	}
+	return ""
+}
+
+func (m *AddGatewayAttributeRequest) GetValue() string {
+	if m != nil {
+		return m.Value
+	}
+	return ""
+}
+
+type ListGatewayAttributesResponse struct {
+	// attributes is a map that contain all the gateway attributes.
+	Attributes map[string]string `protobuf:"bytes,1,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+}
+
+func (m *ListGatewayAttributesResponse) Reset()      { *m = ListGatewayAttributesResponse{} }
+func (*ListGatewayAttributesResponse) ProtoMessage() {}
+func (*ListGatewayAttributesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{27}
+}
+
+func (m *ListGatewayAttributesResponse) GetAttributes() map[string]string {
+	if m != nil {
+		return m.Attributes
+	}
+	return nil
+}
+
+type RemoveGatewayAttributeRequest struct {
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
+	// attribute is the key of the attribute to be deleted.
+	Attribute string `protobuf:"bytes,2,opt,name=attribute,proto3" json:"attribute,omitempty"`
+}
+
+func (m *RemoveGatewayAttributeRequest) Reset()      { *m = RemoveGatewayAttributeRequest{} }
+func (*RemoveGatewayAttributeRequest) ProtoMessage() {}
+func (*RemoveGatewayAttributeRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{28}
+}
+
+func (m *RemoveGatewayAttributeRequest) GetAttribute() string {
+	if m != nil {
+		return m.Attribute
+	}
+	return ""
+}
+
+type AddGatewayAntennaRequest struct {
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
+	// antenna is the gateway antenna to be added.
+	Antenna GatewayAntenna `protobuf:"bytes,2,opt,name=antenna" json:"antenna"`
+}
+
+func (m *AddGatewayAntennaRequest) Reset()      { *m = AddGatewayAntennaRequest{} }
+func (*AddGatewayAntennaRequest) ProtoMessage() {}
+func (*AddGatewayAntennaRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{29}
+}
+
+func (m *AddGatewayAntennaRequest) GetAntenna() GatewayAntenna {
+	if m != nil {
+		return m.Antenna
+	}
+	return GatewayAntenna{}
+}
+
+type ListGatewayAntennasResponse struct {
+	Antennas []GatewayAntenna `protobuf:"bytes,1,rep,name=antennas" json:"antennas"`
+}
+
+func (m *ListGatewayAntennasResponse) Reset()      { *m = ListGatewayAntennasResponse{} }
+func (*ListGatewayAntennasResponse) ProtoMessage() {}
+func (*ListGatewayAntennasResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{30}
+}
+
+func (m *ListGatewayAntennasResponse) GetAntennas() []GatewayAntenna {
+	if m != nil {
+		return m.Antennas
+	}
+	return nil
+}
+
+type RemoveGatewayAntennaRequest struct {
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
+	// antenna_id is the ID of the antenna to be deleted.
+	AntennaID string `protobuf:"bytes,2,opt,name=antenna_id,json=antennaId,proto3" json:"antenna_id,omitempty"`
+}
+
+func (m *RemoveGatewayAntennaRequest) Reset()      { *m = RemoveGatewayAntennaRequest{} }
+func (*RemoveGatewayAntennaRequest) ProtoMessage() {}
+func (*RemoveGatewayAntennaRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{31}
+}
+
+func (m *RemoveGatewayAntennaRequest) GetAntennaID() string {
+	if m != nil {
+		return m.AntennaID
+	}
+	return ""
+}
+
+type AddGatewayCollaboratorRequest struct {
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
+	Collaborator       `protobuf:"bytes,2,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
+}
+
+func (m *AddGatewayCollaboratorRequest) Reset()      { *m = AddGatewayCollaboratorRequest{} }
+func (*AddGatewayCollaboratorRequest) ProtoMessage() {}
+func (*AddGatewayCollaboratorRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{32}
+}
+
+type ListGatewayCollaboratorsResponse struct {
+	Collaborators []Collaborator `protobuf:"bytes,1,rep,name=collaborators" json:"collaborators"`
+}
+
+func (m *ListGatewayCollaboratorsResponse) Reset()      { *m = ListGatewayCollaboratorsResponse{} }
+func (*ListGatewayCollaboratorsResponse) ProtoMessage() {}
+func (*ListGatewayCollaboratorsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{33}
+}
+
+func (m *ListGatewayCollaboratorsResponse) GetCollaborators() []Collaborator {
+	if m != nil {
+		return m.Collaborators
+	}
+	return nil
+}
+
+type ListGatewayOwnersResponse struct {
+	// usernames is the list of user's usernames that have owner rights for the gateway.
+	Usernames []string `protobuf:"bytes,1,rep,name=usernames" json:"usernames,omitempty"`
+}
+
+func (m *ListGatewayOwnersResponse) Reset()      { *m = ListGatewayOwnersResponse{} }
+func (*ListGatewayOwnersResponse) ProtoMessage() {}
+func (*ListGatewayOwnersResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{34}
+}
+
+func (m *ListGatewayOwnersResponse) GetUsernames() []string {
+	if m != nil {
+		return m.Usernames
+	}
+	return nil
+}
+
+type RemoveGatewayCollaboratorRequest struct {
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
+	// username is the identifier of the collaborator to be deleted.
+	Username string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+}
+
+func (m *RemoveGatewayCollaboratorRequest) Reset()      { *m = RemoveGatewayCollaboratorRequest{} }
+func (*RemoveGatewayCollaboratorRequest) ProtoMessage() {}
+func (*RemoveGatewayCollaboratorRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{35}
+}
+
+func (m *RemoveGatewayCollaboratorRequest) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+type GatewayRight struct {
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
+	// username is the user's username that holds a right over a gateway.
+	Username string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	// right is the right this user holds for the gateway.
+	Right Right `protobuf:"varint,3,opt,name=right,proto3,enum=ttn.v3.Right" json:"right,omitempty"`
+}
+
+func (m *GatewayRight) Reset()                    { *m = GatewayRight{} }
+func (*GatewayRight) ProtoMessage()               {}
+func (*GatewayRight) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{36} }
+
+func (m *GatewayRight) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *GatewayRight) GetRight() Right {
+	if m != nil {
+		return m.Right
+	}
+	return RightApplicationDelete
+}
+
+type ListGatewayRightsResponse struct {
+	// rights is a list of rights that an user has to the gateway.
+	Rights []Right `protobuf:"varint,1,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
+}
+
+func (m *ListGatewayRightsResponse) Reset()      { *m = ListGatewayRightsResponse{} }
+func (*ListGatewayRightsResponse) ProtoMessage() {}
+func (*ListGatewayRightsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{37}
+}
+
+func (m *ListGatewayRightsResponse) GetRights() []Right {
+	if m != nil {
+		return m.Rights
+	}
+	return nil
+}
+
+type CreateClientRequest struct {
+	ClientIdentifiers `protobuf:"bytes,1,opt,name=client,embedded=client" json:"client"`
+	// description is the description of the client.
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// secret is the secret used to prove the client identity.
+	Secret string `protobuf:"bytes,3,opt,name=secret,proto3" json:"secret,omitempty"`
+	// callback_uri is the callback URI of the client.
+	CallbackURI string `protobuf:"bytes,4,opt,name=callback_uri,json=callbackUri,proto3" json:"callback_uri,omitempty"`
+	// grants denotes which OAuth2 flows can the client use to get a token.
+	Grants ClientGrants `protobuf:"bytes,7,opt,name=grants" json:"grants"`
+	// scope denotes what scopes the client will have access to.
+	Scope ClientScope `protobuf:"bytes,8,opt,name=scope" json:"scope"`
+}
+
+func (m *CreateClientRequest) Reset()      { *m = CreateClientRequest{} }
+func (*CreateClientRequest) ProtoMessage() {}
+func (*CreateClientRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{38}
+}
+
+func (m *CreateClientRequest) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *CreateClientRequest) GetSecret() string {
+	if m != nil {
+		return m.Secret
+	}
+	return ""
+}
+
+func (m *CreateClientRequest) GetCallbackURI() string {
+	if m != nil {
+		return m.CallbackURI
+	}
+	return ""
+}
+
+func (m *CreateClientRequest) GetGrants() ClientGrants {
+	if m != nil {
+		return m.Grants
+	}
+	return ClientGrants{}
+}
+
+func (m *CreateClientRequest) GetScope() ClientScope {
+	if m != nil {
+		return m.Scope
+	}
+	return ClientScope{}
+}
+
+type ListClientsResponse struct {
+	// clients is a list of third-party clients.
+	Clients []Client `protobuf:"bytes,1,rep,name=clients" json:"clients"`
+}
+
+func (m *ListClientsResponse) Reset()      { *m = ListClientsResponse{} }
+func (*ListClientsResponse) ProtoMessage() {}
+func (*ListClientsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{39}
+}
+
+func (m *ListClientsResponse) GetClients() []Client {
+	if m != nil {
+		return m.Clients
+	}
+	return nil
+}
+
+type UpdateClientRequest struct {
+	ClientIdentifiers `protobuf:"bytes,1,opt,name=client,embedded=client" json:"client"`
+	// description is the description of the client.
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// secret is the secret used to prove the client identity.
+	Secret string `protobuf:"bytes,3,opt,name=secret,proto3" json:"secret,omitempty"`
+	// callback_uri is the callback URI of the client.
+	CallbackURI string `protobuf:"bytes,4,opt,name=callback_uri,json=callbackUri,proto3" json:"callback_uri,omitempty"`
+	// grants denotes which OAuth2 flows can the client use to get a token.
+	Grants ClientGrants `protobuf:"bytes,7,opt,name=grants" json:"grants"`
+	// scope denotes what scopes the client will have access to.
+	Scope ClientScope `protobuf:"bytes,8,opt,name=scope" json:"scope"`
+}
+
+func (m *UpdateClientRequest) Reset()      { *m = UpdateClientRequest{} }
+func (*UpdateClientRequest) ProtoMessage() {}
+func (*UpdateClientRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{40}
+}
+
+func (m *UpdateClientRequest) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *UpdateClientRequest) GetSecret() string {
+	if m != nil {
+		return m.Secret
+	}
+	return ""
+}
+
+func (m *UpdateClientRequest) GetCallbackURI() string {
+	if m != nil {
+		return m.CallbackURI
+	}
+	return ""
+}
+
+func (m *UpdateClientRequest) GetGrants() ClientGrants {
+	if m != nil {
+		return m.Grants
+	}
+	return ClientGrants{}
+}
+
+func (m *UpdateClientRequest) GetScope() ClientScope {
+	if m != nil {
+		return m.Scope
+	}
+	return ClientScope{}
+}
+
+type SetClientStateRequest struct {
+	ClientIdentifiers `protobuf:"bytes,1,opt,name=client,embedded=client" json:"client"`
+	State             ClientState `protobuf:"varint,2,opt,name=state,proto3,enum=ttn.v3.ClientState" json:"state,omitempty"`
+}
+
+func (m *SetClientStateRequest) Reset()      { *m = SetClientStateRequest{} }
+func (*SetClientStateRequest) ProtoMessage() {}
+func (*SetClientStateRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{41}
+}
+
+func (m *SetClientStateRequest) GetState() ClientState {
+	if m != nil {
+		return m.State
+	}
+	return StatePending
+}
+
+type AddClientCollaboratorRequest struct {
+	ClientIdentifiers `protobuf:"bytes,1,opt,name=client,embedded=client" json:"client"`
+	Collaborator      `protobuf:"bytes,2,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
+}
+
+func (m *AddClientCollaboratorRequest) Reset()      { *m = AddClientCollaboratorRequest{} }
+func (*AddClientCollaboratorRequest) ProtoMessage() {}
+func (*AddClientCollaboratorRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{42}
+}
+
+type ListClientCollaboratorsResponse struct {
+	Collaborators []Collaborator `protobuf:"bytes,1,rep,name=collaborators" json:"collaborators"`
+}
+
+func (m *ListClientCollaboratorsResponse) Reset()      { *m = ListClientCollaboratorsResponse{} }
+func (*ListClientCollaboratorsResponse) ProtoMessage() {}
+func (*ListClientCollaboratorsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{43}
+}
+
+func (m *ListClientCollaboratorsResponse) GetCollaborators() []Collaborator {
+	if m != nil {
+		return m.Collaborators
+	}
+	return nil
+}
+
+type RemoveClientCollaboratorRequest struct {
+	ClientIdentifiers `protobuf:"bytes,1,opt,name=client,embedded=client" json:"client"`
+	// Username is the username of the user.
+	Username string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+}
+
+func (m *RemoveClientCollaboratorRequest) Reset()      { *m = RemoveClientCollaboratorRequest{} }
+func (*RemoveClientCollaboratorRequest) ProtoMessage() {}
+func (*RemoveClientCollaboratorRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{44}
+}
+
+func (m *RemoveClientCollaboratorRequest) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+type ClientRight struct {
+	ClientIdentifiers `protobuf:"bytes,1,opt,name=client,embedded=client" json:"client"`
+	// username is the username of the user.
+	Username string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	// right is the right that the user holds for the client.
+	Right Right `protobuf:"varint,3,opt,name=right,proto3,enum=ttn.v3.Right" json:"right,omitempty"`
+}
+
+func (m *ClientRight) Reset()                    { *m = ClientRight{} }
+func (*ClientRight) ProtoMessage()               {}
+func (*ClientRight) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{45} }
+
+func (m *ClientRight) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *ClientRight) GetRight() Right {
+	if m != nil {
+		return m.Right
+	}
+	return RightApplicationDelete
+}
+
+type ListClientRightsResponse struct {
+	// rights is a list of rights that an user has to the client.
+	Rights []Right `protobuf:"varint,1,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
+}
+
+func (m *ListClientRightsResponse) Reset()      { *m = ListClientRightsResponse{} }
+func (*ListClientRightsResponse) ProtoMessage() {}
+func (*ListClientRightsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{46}
+}
+
+func (m *ListClientRightsResponse) GetRights() []Right {
+	if m != nil {
+		return m.Rights
+	}
+	return nil
+}
+
+func init() {
+	proto.RegisterType((*CreateUserRequest)(nil), "ttn.v3.CreateUserRequest")
+	proto.RegisterType((*CreateUserResponse)(nil), "ttn.v3.CreateUserResponse")
+	proto.RegisterType((*GetUserResponse)(nil), "ttn.v3.GetUserResponse")
+	proto.RegisterType((*GetAccountResponse)(nil), "ttn.v3.GetAccountResponse")
+	proto.RegisterType((*UpdateUserRequest)(nil), "ttn.v3.UpdateUserRequest")
+	proto.RegisterType((*UpdateUserResponse)(nil), "ttn.v3.UpdateUserResponse")
+	proto.RegisterType((*UpdateUserEmailRequest)(nil), "ttn.v3.UpdateUserEmailRequest")
+	proto.RegisterType((*UpdateUserPasswordRequest)(nil), "ttn.v3.UpdateUserPasswordRequest")
+	proto.RegisterType((*CreateApplicationRequest)(nil), "ttn.v3.CreateApplicationRequest")
+	proto.RegisterType((*ListApplicationsResponse)(nil), "ttn.v3.ListApplicationsResponse")
+	proto.RegisterType((*UpdateApplicationRequest)(nil), "ttn.v3.UpdateApplicationRequest")
+	proto.RegisterType((*AddApplicationAppEUIRequest)(nil), "ttn.v3.AddApplicationAppEUIRequest")
+	proto.RegisterType((*AppEUIIdentifier)(nil), "ttn.v3.AppEUIIdentifier")
+	proto.RegisterType((*GenerateAppEUIResponse)(nil), "ttn.v3.GenerateAppEUIResponse")
+	proto.RegisterType((*ListApplicationAppEUIsResponse)(nil), "ttn.v3.ListApplicationAppEUIsResponse")
+	proto.RegisterType((*GenerateApplicationAPIKeyRequest)(nil), "ttn.v3.GenerateApplicationAPIKeyRequest")
+	proto.RegisterType((*ApplicationAPIKeyIdentifier)(nil), "ttn.v3.ApplicationAPIKeyIdentifier")
+	proto.RegisterType((*ListApplicationAPIKeysResponse)(nil), "ttn.v3.ListApplicationAPIKeysResponse")
+	proto.RegisterType((*AddApplicationCollaboratorRequest)(nil), "ttn.v3.AddApplicationCollaboratorRequest")
+	proto.RegisterType((*ListApplicationCollaboratorsResponse)(nil), "ttn.v3.ListApplicationCollaboratorsResponse")
+	proto.RegisterType((*RemoveApplicationCollaboratorRequest)(nil), "ttn.v3.RemoveApplicationCollaboratorRequest")
+	proto.RegisterType((*ApplicationRight)(nil), "ttn.v3.ApplicationRight")
+	proto.RegisterType((*ListApplicationRightsResponse)(nil), "ttn.v3.ListApplicationRightsResponse")
+	proto.RegisterType((*CreateGatewayRequest)(nil), "ttn.v3.CreateGatewayRequest")
+	proto.RegisterType((*ListGatewaysResponse)(nil), "ttn.v3.ListGatewaysResponse")
+	proto.RegisterType((*UpdateGatewayRequest)(nil), "ttn.v3.UpdateGatewayRequest")
+	proto.RegisterType((*AddGatewayAttributeRequest)(nil), "ttn.v3.AddGatewayAttributeRequest")
+	proto.RegisterType((*ListGatewayAttributesResponse)(nil), "ttn.v3.ListGatewayAttributesResponse")
+	proto.RegisterType((*RemoveGatewayAttributeRequest)(nil), "ttn.v3.RemoveGatewayAttributeRequest")
+	proto.RegisterType((*AddGatewayAntennaRequest)(nil), "ttn.v3.AddGatewayAntennaRequest")
+	proto.RegisterType((*ListGatewayAntennasResponse)(nil), "ttn.v3.ListGatewayAntennasResponse")
+	proto.RegisterType((*RemoveGatewayAntennaRequest)(nil), "ttn.v3.RemoveGatewayAntennaRequest")
+	proto.RegisterType((*AddGatewayCollaboratorRequest)(nil), "ttn.v3.AddGatewayCollaboratorRequest")
+	proto.RegisterType((*ListGatewayCollaboratorsResponse)(nil), "ttn.v3.ListGatewayCollaboratorsResponse")
+	proto.RegisterType((*ListGatewayOwnersResponse)(nil), "ttn.v3.ListGatewayOwnersResponse")
+	proto.RegisterType((*RemoveGatewayCollaboratorRequest)(nil), "ttn.v3.RemoveGatewayCollaboratorRequest")
+	proto.RegisterType((*GatewayRight)(nil), "ttn.v3.GatewayRight")
+	proto.RegisterType((*ListGatewayRightsResponse)(nil), "ttn.v3.ListGatewayRightsResponse")
+	proto.RegisterType((*CreateClientRequest)(nil), "ttn.v3.CreateClientRequest")
+	proto.RegisterType((*ListClientsResponse)(nil), "ttn.v3.ListClientsResponse")
+	proto.RegisterType((*UpdateClientRequest)(nil), "ttn.v3.UpdateClientRequest")
+	proto.RegisterType((*SetClientStateRequest)(nil), "ttn.v3.SetClientStateRequest")
+	proto.RegisterType((*AddClientCollaboratorRequest)(nil), "ttn.v3.AddClientCollaboratorRequest")
+	proto.RegisterType((*ListClientCollaboratorsResponse)(nil), "ttn.v3.ListClientCollaboratorsResponse")
+	proto.RegisterType((*RemoveClientCollaboratorRequest)(nil), "ttn.v3.RemoveClientCollaboratorRequest")
+	proto.RegisterType((*ClientRight)(nil), "ttn.v3.ClientRight")
+	proto.RegisterType((*ListClientRightsResponse)(nil), "ttn.v3.ListClientRightsResponse")
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -29,7 +1335,8 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for GtwGr service
 
 type GtwGrClient interface {
-	// PullConfiguration sends a new GatewayConfiguration, with all the latest values, at connection and when a gateway's configuration is updated
+	// PullConfiguration sends a new GatewayConfiguration, with all the latest values,
+	// at connection and when a gateway's configuration is updated.
 	PullConfiguration(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (GtwGr_PullConfigurationClient, error)
 }
 
@@ -76,7 +1383,8 @@ func (x *gtwGrPullConfigurationClient) Recv() (*GatewayConfiguration, error) {
 // Server API for GtwGr service
 
 type GtwGrServer interface {
-	// PullConfiguration sends a new GatewayConfiguration, with all the latest values, at connection and when a gateway's configuration is updated
+	// PullConfiguration sends a new GatewayConfiguration, with all the latest values,
+	// at connection and when a gateway's configuration is updated.
 	PullConfiguration(*GatewayIdentifiers, GtwGr_PullConfigurationServer) error
 }
 
@@ -119,25 +1427,12246 @@ var _GtwGr_serviceDesc = grpc.ServiceDesc{
 	Metadata: "github.com/TheThingsNetwork/ttn/api/identityserver.proto",
 }
 
+// Client API for IsUser service
+
+type IsUserClient interface {
+	// CreateUser creates a new user on the network and returns the profile of
+	// the new user.
+	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	// GetUser returns the profile of an user.
+	GetUser(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*GetUserResponse, error)
+	// GetAccount returns the detailed user profile of the authenticated user,
+	GetAccount(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*GetAccountResponse, error)
+	// UpdateUser edits the profile of the authenticated user and returns
+	// the updated profile.
+	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
+	// UpdateUserEmail edits the email of the authenticated user and sets the
+	// new email as unvalidated.
+	UpdateUserEmail(ctx context.Context, in *UpdateUserEmailRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// UpdateUserPassword changes the password of the authenticated user.
+	UpdateUserPassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// DeleteUser permanently deletes a user.
+	DeleteUser(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// DisableUser disables the account of the authenticated user and therefore
+	// it cannot be used.
+	DisableUser(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+}
+
+type isUserClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewIsUserClient(cc *grpc.ClientConn) IsUserClient {
+	return &isUserClient{cc}
+}
+
+func (c *isUserClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
+	out := new(CreateUserResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsUser/CreateUser", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isUserClient) GetUser(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*GetUserResponse, error) {
+	out := new(GetUserResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsUser/GetUser", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isUserClient) GetAccount(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*GetAccountResponse, error) {
+	out := new(GetAccountResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsUser/GetAccount", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isUserClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error) {
+	out := new(UpdateUserResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsUser/UpdateUser", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isUserClient) UpdateUserEmail(ctx context.Context, in *UpdateUserEmailRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsUser/UpdateUserEmail", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isUserClient) UpdateUserPassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsUser/UpdateUserPassword", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isUserClient) DeleteUser(ctx context.Context, in *UserIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsUser/DeleteUser", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isUserClient) DisableUser(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsUser/DisableUser", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for IsUser service
+
+type IsUserServer interface {
+	// CreateUser creates a new user on the network and returns the profile of
+	// the new user.
+	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	// GetUser returns the profile of an user.
+	GetUser(context.Context, *UserIdentifiers) (*GetUserResponse, error)
+	// GetAccount returns the detailed user profile of the authenticated user,
+	GetAccount(context.Context, *google_protobuf2.Empty) (*GetAccountResponse, error)
+	// UpdateUser edits the profile of the authenticated user and returns
+	// the updated profile.
+	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
+	// UpdateUserEmail edits the email of the authenticated user and sets the
+	// new email as unvalidated.
+	UpdateUserEmail(context.Context, *UpdateUserEmailRequest) (*google_protobuf2.Empty, error)
+	// UpdateUserPassword changes the password of the authenticated user.
+	UpdateUserPassword(context.Context, *UpdateUserPasswordRequest) (*google_protobuf2.Empty, error)
+	// DeleteUser permanently deletes a user.
+	DeleteUser(context.Context, *UserIdentifiers) (*google_protobuf2.Empty, error)
+	// DisableUser disables the account of the authenticated user and therefore
+	// it cannot be used.
+	DisableUser(context.Context, *google_protobuf2.Empty) (*google_protobuf2.Empty, error)
+}
+
+func RegisterIsUserServer(s *grpc.Server, srv IsUserServer) {
+	s.RegisterService(&_IsUser_serviceDesc, srv)
+}
+
+func _IsUser_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsUserServer).CreateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsUser/CreateUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsUserServer).CreateUser(ctx, req.(*CreateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsUser_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsUserServer).GetUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsUser/GetUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsUserServer).GetUser(ctx, req.(*UserIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsUser_GetAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(google_protobuf2.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsUserServer).GetAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsUser/GetAccount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsUserServer).GetAccount(ctx, req.(*google_protobuf2.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsUser_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsUserServer).UpdateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsUser/UpdateUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsUserServer).UpdateUser(ctx, req.(*UpdateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsUser_UpdateUserEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsUserServer).UpdateUserEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsUser/UpdateUserEmail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsUserServer).UpdateUserEmail(ctx, req.(*UpdateUserEmailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsUser_UpdateUserPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsUserServer).UpdateUserPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsUser/UpdateUserPassword",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsUserServer).UpdateUserPassword(ctx, req.(*UpdateUserPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsUser_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsUserServer).DeleteUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsUser/DeleteUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsUserServer).DeleteUser(ctx, req.(*UserIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsUser_DisableUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(google_protobuf2.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsUserServer).DisableUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsUser/DisableUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsUserServer).DisableUser(ctx, req.(*google_protobuf2.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _IsUser_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.v3.IsUser",
+	HandlerType: (*IsUserServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateUser",
+			Handler:    _IsUser_CreateUser_Handler,
+		},
+		{
+			MethodName: "GetUser",
+			Handler:    _IsUser_GetUser_Handler,
+		},
+		{
+			MethodName: "GetAccount",
+			Handler:    _IsUser_GetAccount_Handler,
+		},
+		{
+			MethodName: "UpdateUser",
+			Handler:    _IsUser_UpdateUser_Handler,
+		},
+		{
+			MethodName: "UpdateUserEmail",
+			Handler:    _IsUser_UpdateUserEmail_Handler,
+		},
+		{
+			MethodName: "UpdateUserPassword",
+			Handler:    _IsUser_UpdateUserPassword_Handler,
+		},
+		{
+			MethodName: "DeleteUser",
+			Handler:    _IsUser_DeleteUser_Handler,
+		},
+		{
+			MethodName: "DisableUser",
+			Handler:    _IsUser_DisableUser_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "github.com/TheThingsNetwork/ttn/api/identityserver.proto",
+}
+
+// Client API for IsApplication service
+
+type IsApplicationClient interface {
+	// CreateApplication creates a new application on the network and returns it.
+	CreateApplication(ctx context.Context, in *CreateApplicationRequest, opts ...grpc.CallOption) (*Application, error)
+	// GetApplication finds an application by ID and retrieves it.
+	GetApplication(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*Application, error)
+	// ListApplications returns all the applications where the authenticated user
+	// is collaborator.
+	ListApplications(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*ListApplicationsResponse, error)
+	// UpdateApplication edits an application and returns the updated version.
+	UpdateApplication(ctx context.Context, in *UpdateApplicationRequest, opts ...grpc.CallOption) (*Application, error)
+	// DeleteApplication permanently deletes an application.
+	DeleteApplication(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// DisableApplication disables an application so it cannot be used anymore.
+	DisableApplication(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// RestoreApplication restores a disabled application so it can be used again.
+	RestoreApplication(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// AddApplicationAppEUI adds a given AppEUI to a given application.
+	AddApplicationAppEUI(ctx context.Context, in *AddApplicationAppEUIRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// GenerateAppEUI generates a new AppEUI for a given application and returns it.
+	GenerateAppEUI(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*GenerateAppEUIResponse, error)
+	// ListApplicationAppEUIs returns all the registered AppEUIs of an application.
+	ListApplicationAppEUIs(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*ListApplicationAppEUIsResponse, error)
+	// RemoveApplicationAppEUI deletes an AppEUI from an application.
+	RemoveApplicationAppEUI(ctx context.Context, in *AppEUIIdentifier, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// GenerateApplicationAPIKey generates a new API key for a given application
+	// and returns it.
+	GenerateApplicationAPIKey(ctx context.Context, in *GenerateApplicationAPIKeyRequest, opts ...grpc.CallOption) (*ApplicationAPIKey, error)
+	// GetApplicationAPIKey returns a given API key from an application.
+	GetApplicationAPIKey(ctx context.Context, in *ApplicationAPIKeyIdentifier, opts ...grpc.CallOption) (*ApplicationAPIKey, error)
+	// ListApplicationAPIKeys returns all the API keys that are registered
+	// for an application.
+	ListApplicationAPIKeys(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*ListApplicationAPIKeysResponse, error)
+	// RemoveApplicationAPIKey removes a given API key from an application.
+	RemoveApplicationAPIKey(ctx context.Context, in *ApplicationAPIKeyIdentifier, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// AddApplicationCollaborator adds an user as collaborator of an application.
+	AddApplicationCollaborator(ctx context.Context, in *AddApplicationCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// ListApplicationCollaborators returns all the collaborators of a given application.
+	ListApplicationCollaborators(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*ListApplicationCollaboratorsResponse, error)
+	// RemoveApplicationCollaborator removes a collaborator from an application.
+	RemoveApplicationCollaborator(ctx context.Context, in *RemoveApplicationCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// AddApplicationRight grants a given right to a given user for a given application.
+	AddApplicationRight(ctx context.Context, in *ApplicationRight, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// ListApplicationRights returns all the rights that the authenticated user has
+	// for a given application.
+	ListApplicationRights(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*ListApplicationRightsResponse, error)
+	// RemoveApplicationRight revokes a right to an application collaborator.
+	RemoveApplicationRight(ctx context.Context, in *ApplicationRight, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+}
+
+type isApplicationClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewIsApplicationClient(cc *grpc.ClientConn) IsApplicationClient {
+	return &isApplicationClient{cc}
+}
+
+func (c *isApplicationClient) CreateApplication(ctx context.Context, in *CreateApplicationRequest, opts ...grpc.CallOption) (*Application, error) {
+	out := new(Application)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/CreateApplication", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) GetApplication(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*Application, error) {
+	out := new(Application)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/GetApplication", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) ListApplications(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*ListApplicationsResponse, error) {
+	out := new(ListApplicationsResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/ListApplications", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) UpdateApplication(ctx context.Context, in *UpdateApplicationRequest, opts ...grpc.CallOption) (*Application, error) {
+	out := new(Application)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/UpdateApplication", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) DeleteApplication(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/DeleteApplication", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) DisableApplication(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/DisableApplication", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) RestoreApplication(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/RestoreApplication", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) AddApplicationAppEUI(ctx context.Context, in *AddApplicationAppEUIRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/AddApplicationAppEUI", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) GenerateAppEUI(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*GenerateAppEUIResponse, error) {
+	out := new(GenerateAppEUIResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/GenerateAppEUI", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) ListApplicationAppEUIs(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*ListApplicationAppEUIsResponse, error) {
+	out := new(ListApplicationAppEUIsResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/ListApplicationAppEUIs", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) RemoveApplicationAppEUI(ctx context.Context, in *AppEUIIdentifier, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/RemoveApplicationAppEUI", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) GenerateApplicationAPIKey(ctx context.Context, in *GenerateApplicationAPIKeyRequest, opts ...grpc.CallOption) (*ApplicationAPIKey, error) {
+	out := new(ApplicationAPIKey)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/GenerateApplicationAPIKey", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) GetApplicationAPIKey(ctx context.Context, in *ApplicationAPIKeyIdentifier, opts ...grpc.CallOption) (*ApplicationAPIKey, error) {
+	out := new(ApplicationAPIKey)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/GetApplicationAPIKey", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) ListApplicationAPIKeys(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*ListApplicationAPIKeysResponse, error) {
+	out := new(ListApplicationAPIKeysResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/ListApplicationAPIKeys", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) RemoveApplicationAPIKey(ctx context.Context, in *ApplicationAPIKeyIdentifier, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/RemoveApplicationAPIKey", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) AddApplicationCollaborator(ctx context.Context, in *AddApplicationCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/AddApplicationCollaborator", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) ListApplicationCollaborators(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*ListApplicationCollaboratorsResponse, error) {
+	out := new(ListApplicationCollaboratorsResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/ListApplicationCollaborators", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) RemoveApplicationCollaborator(ctx context.Context, in *RemoveApplicationCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/RemoveApplicationCollaborator", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) AddApplicationRight(ctx context.Context, in *ApplicationRight, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/AddApplicationRight", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) ListApplicationRights(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*ListApplicationRightsResponse, error) {
+	out := new(ListApplicationRightsResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/ListApplicationRights", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isApplicationClient) RemoveApplicationRight(ctx context.Context, in *ApplicationRight, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/RemoveApplicationRight", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for IsApplication service
+
+type IsApplicationServer interface {
+	// CreateApplication creates a new application on the network and returns it.
+	CreateApplication(context.Context, *CreateApplicationRequest) (*Application, error)
+	// GetApplication finds an application by ID and retrieves it.
+	GetApplication(context.Context, *ApplicationIdentifiers) (*Application, error)
+	// ListApplications returns all the applications where the authenticated user
+	// is collaborator.
+	ListApplications(context.Context, *google_protobuf2.Empty) (*ListApplicationsResponse, error)
+	// UpdateApplication edits an application and returns the updated version.
+	UpdateApplication(context.Context, *UpdateApplicationRequest) (*Application, error)
+	// DeleteApplication permanently deletes an application.
+	DeleteApplication(context.Context, *ApplicationIdentifiers) (*google_protobuf2.Empty, error)
+	// DisableApplication disables an application so it cannot be used anymore.
+	DisableApplication(context.Context, *ApplicationIdentifiers) (*google_protobuf2.Empty, error)
+	// RestoreApplication restores a disabled application so it can be used again.
+	RestoreApplication(context.Context, *ApplicationIdentifiers) (*google_protobuf2.Empty, error)
+	// AddApplicationAppEUI adds a given AppEUI to a given application.
+	AddApplicationAppEUI(context.Context, *AddApplicationAppEUIRequest) (*google_protobuf2.Empty, error)
+	// GenerateAppEUI generates a new AppEUI for a given application and returns it.
+	GenerateAppEUI(context.Context, *ApplicationIdentifiers) (*GenerateAppEUIResponse, error)
+	// ListApplicationAppEUIs returns all the registered AppEUIs of an application.
+	ListApplicationAppEUIs(context.Context, *ApplicationIdentifiers) (*ListApplicationAppEUIsResponse, error)
+	// RemoveApplicationAppEUI deletes an AppEUI from an application.
+	RemoveApplicationAppEUI(context.Context, *AppEUIIdentifier) (*google_protobuf2.Empty, error)
+	// GenerateApplicationAPIKey generates a new API key for a given application
+	// and returns it.
+	GenerateApplicationAPIKey(context.Context, *GenerateApplicationAPIKeyRequest) (*ApplicationAPIKey, error)
+	// GetApplicationAPIKey returns a given API key from an application.
+	GetApplicationAPIKey(context.Context, *ApplicationAPIKeyIdentifier) (*ApplicationAPIKey, error)
+	// ListApplicationAPIKeys returns all the API keys that are registered
+	// for an application.
+	ListApplicationAPIKeys(context.Context, *ApplicationIdentifiers) (*ListApplicationAPIKeysResponse, error)
+	// RemoveApplicationAPIKey removes a given API key from an application.
+	RemoveApplicationAPIKey(context.Context, *ApplicationAPIKeyIdentifier) (*google_protobuf2.Empty, error)
+	// AddApplicationCollaborator adds an user as collaborator of an application.
+	AddApplicationCollaborator(context.Context, *AddApplicationCollaboratorRequest) (*google_protobuf2.Empty, error)
+	// ListApplicationCollaborators returns all the collaborators of a given application.
+	ListApplicationCollaborators(context.Context, *ApplicationIdentifiers) (*ListApplicationCollaboratorsResponse, error)
+	// RemoveApplicationCollaborator removes a collaborator from an application.
+	RemoveApplicationCollaborator(context.Context, *RemoveApplicationCollaboratorRequest) (*google_protobuf2.Empty, error)
+	// AddApplicationRight grants a given right to a given user for a given application.
+	AddApplicationRight(context.Context, *ApplicationRight) (*google_protobuf2.Empty, error)
+	// ListApplicationRights returns all the rights that the authenticated user has
+	// for a given application.
+	ListApplicationRights(context.Context, *ApplicationIdentifiers) (*ListApplicationRightsResponse, error)
+	// RemoveApplicationRight revokes a right to an application collaborator.
+	RemoveApplicationRight(context.Context, *ApplicationRight) (*google_protobuf2.Empty, error)
+}
+
+func RegisterIsApplicationServer(s *grpc.Server, srv IsApplicationServer) {
+	s.RegisterService(&_IsApplication_serviceDesc, srv)
+}
+
+func _IsApplication_CreateApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateApplicationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).CreateApplication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/CreateApplication",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).CreateApplication(ctx, req.(*CreateApplicationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_GetApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplicationIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).GetApplication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/GetApplication",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).GetApplication(ctx, req.(*ApplicationIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_ListApplications_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(google_protobuf2.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).ListApplications(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/ListApplications",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).ListApplications(ctx, req.(*google_protobuf2.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_UpdateApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateApplicationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).UpdateApplication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/UpdateApplication",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).UpdateApplication(ctx, req.(*UpdateApplicationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_DeleteApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplicationIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).DeleteApplication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/DeleteApplication",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).DeleteApplication(ctx, req.(*ApplicationIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_DisableApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplicationIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).DisableApplication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/DisableApplication",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).DisableApplication(ctx, req.(*ApplicationIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_RestoreApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplicationIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).RestoreApplication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/RestoreApplication",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).RestoreApplication(ctx, req.(*ApplicationIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_AddApplicationAppEUI_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddApplicationAppEUIRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).AddApplicationAppEUI(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/AddApplicationAppEUI",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).AddApplicationAppEUI(ctx, req.(*AddApplicationAppEUIRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_GenerateAppEUI_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplicationIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).GenerateAppEUI(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/GenerateAppEUI",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).GenerateAppEUI(ctx, req.(*ApplicationIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_ListApplicationAppEUIs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplicationIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).ListApplicationAppEUIs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/ListApplicationAppEUIs",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).ListApplicationAppEUIs(ctx, req.(*ApplicationIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_RemoveApplicationAppEUI_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AppEUIIdentifier)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).RemoveApplicationAppEUI(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/RemoveApplicationAppEUI",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).RemoveApplicationAppEUI(ctx, req.(*AppEUIIdentifier))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_GenerateApplicationAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateApplicationAPIKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).GenerateApplicationAPIKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/GenerateApplicationAPIKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).GenerateApplicationAPIKey(ctx, req.(*GenerateApplicationAPIKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_GetApplicationAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplicationAPIKeyIdentifier)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).GetApplicationAPIKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/GetApplicationAPIKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).GetApplicationAPIKey(ctx, req.(*ApplicationAPIKeyIdentifier))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_ListApplicationAPIKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplicationIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).ListApplicationAPIKeys(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/ListApplicationAPIKeys",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).ListApplicationAPIKeys(ctx, req.(*ApplicationIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_RemoveApplicationAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplicationAPIKeyIdentifier)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).RemoveApplicationAPIKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/RemoveApplicationAPIKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).RemoveApplicationAPIKey(ctx, req.(*ApplicationAPIKeyIdentifier))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_AddApplicationCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddApplicationCollaboratorRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).AddApplicationCollaborator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/AddApplicationCollaborator",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).AddApplicationCollaborator(ctx, req.(*AddApplicationCollaboratorRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_ListApplicationCollaborators_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplicationIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).ListApplicationCollaborators(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/ListApplicationCollaborators",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).ListApplicationCollaborators(ctx, req.(*ApplicationIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_RemoveApplicationCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveApplicationCollaboratorRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).RemoveApplicationCollaborator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/RemoveApplicationCollaborator",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).RemoveApplicationCollaborator(ctx, req.(*RemoveApplicationCollaboratorRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_AddApplicationRight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplicationRight)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).AddApplicationRight(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/AddApplicationRight",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).AddApplicationRight(ctx, req.(*ApplicationRight))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_ListApplicationRights_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplicationIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).ListApplicationRights(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/ListApplicationRights",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).ListApplicationRights(ctx, req.(*ApplicationIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsApplication_RemoveApplicationRight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplicationRight)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).RemoveApplicationRight(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/RemoveApplicationRight",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).RemoveApplicationRight(ctx, req.(*ApplicationRight))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _IsApplication_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.v3.IsApplication",
+	HandlerType: (*IsApplicationServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateApplication",
+			Handler:    _IsApplication_CreateApplication_Handler,
+		},
+		{
+			MethodName: "GetApplication",
+			Handler:    _IsApplication_GetApplication_Handler,
+		},
+		{
+			MethodName: "ListApplications",
+			Handler:    _IsApplication_ListApplications_Handler,
+		},
+		{
+			MethodName: "UpdateApplication",
+			Handler:    _IsApplication_UpdateApplication_Handler,
+		},
+		{
+			MethodName: "DeleteApplication",
+			Handler:    _IsApplication_DeleteApplication_Handler,
+		},
+		{
+			MethodName: "DisableApplication",
+			Handler:    _IsApplication_DisableApplication_Handler,
+		},
+		{
+			MethodName: "RestoreApplication",
+			Handler:    _IsApplication_RestoreApplication_Handler,
+		},
+		{
+			MethodName: "AddApplicationAppEUI",
+			Handler:    _IsApplication_AddApplicationAppEUI_Handler,
+		},
+		{
+			MethodName: "GenerateAppEUI",
+			Handler:    _IsApplication_GenerateAppEUI_Handler,
+		},
+		{
+			MethodName: "ListApplicationAppEUIs",
+			Handler:    _IsApplication_ListApplicationAppEUIs_Handler,
+		},
+		{
+			MethodName: "RemoveApplicationAppEUI",
+			Handler:    _IsApplication_RemoveApplicationAppEUI_Handler,
+		},
+		{
+			MethodName: "GenerateApplicationAPIKey",
+			Handler:    _IsApplication_GenerateApplicationAPIKey_Handler,
+		},
+		{
+			MethodName: "GetApplicationAPIKey",
+			Handler:    _IsApplication_GetApplicationAPIKey_Handler,
+		},
+		{
+			MethodName: "ListApplicationAPIKeys",
+			Handler:    _IsApplication_ListApplicationAPIKeys_Handler,
+		},
+		{
+			MethodName: "RemoveApplicationAPIKey",
+			Handler:    _IsApplication_RemoveApplicationAPIKey_Handler,
+		},
+		{
+			MethodName: "AddApplicationCollaborator",
+			Handler:    _IsApplication_AddApplicationCollaborator_Handler,
+		},
+		{
+			MethodName: "ListApplicationCollaborators",
+			Handler:    _IsApplication_ListApplicationCollaborators_Handler,
+		},
+		{
+			MethodName: "RemoveApplicationCollaborator",
+			Handler:    _IsApplication_RemoveApplicationCollaborator_Handler,
+		},
+		{
+			MethodName: "AddApplicationRight",
+			Handler:    _IsApplication_AddApplicationRight_Handler,
+		},
+		{
+			MethodName: "ListApplicationRights",
+			Handler:    _IsApplication_ListApplicationRights_Handler,
+		},
+		{
+			MethodName: "RemoveApplicationRight",
+			Handler:    _IsApplication_RemoveApplicationRight_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "github.com/TheThingsNetwork/ttn/api/identityserver.proto",
+}
+
+// Client API for IsGateway service
+
+type IsGatewayClient interface {
+	// CreateGateway creates a new gateway on the network and returns it.
+	CreateGateway(ctx context.Context, in *CreateGatewayRequest, opts ...grpc.CallOption) (*Gateway, error)
+	// GetGateway finds a gateway by ID and retrieves it.
+	GetGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*Gateway, error)
+	// ListGateways returns all the gateways which the authenticated user is collaborator.
+	ListGateways(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*ListGatewaysResponse, error)
+	// UpdateGateway edits a gateway and retrieves the updated version.
+	UpdateGateway(ctx context.Context, in *UpdateGatewayRequest, opts ...grpc.CallOption) (*Gateway, error)
+	// DeleteGateway permanently deletes a gateway.
+	DeleteGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// DisableGateway disables a gateway and therefore it can not be used anymore.
+	DisableGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// AddGatewayAttribute sets an attribute with a key in the gateway.
+	AddGatewayAttribute(ctx context.Context, in *AddGatewayAttributeRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// ListGatewayAttributes returns all gateway attributes.
+	ListGatewayAttributes(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*ListGatewayAttributesResponse, error)
+	// RemoveGatewayAttribute removes an attribute matching the given key.
+	RemoveGatewayAttribute(ctx context.Context, in *RemoveGatewayAttributeRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// AddGatewayAntenna adds a new antenna to a gateway.
+	AddGatewayAntenna(ctx context.Context, in *AddGatewayAntennaRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// ListGatewayAntenas returns all the antennas that a gateway has registered.
+	ListGatewayAntennas(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*ListGatewayAntennasResponse, error)
+	// RemoveGatewayAntenna removes a given antenna from a gateway.
+	RemoveGatewayAntenna(ctx context.Context, in *RemoveGatewayAntennaRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// AddGatewayCollaborator makes an user collaborator a gateway.
+	AddGatewayCollaborator(ctx context.Context, in *AddGatewayCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// ListGatewayCollaborators returns all the collaborators for a given gateway.
+	ListGatewayCollaborators(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*ListGatewayCollaboratorsResponse, error)
+	// ListGatewayOwners returns all the collaborators that are owners of a gateway.
+	ListGatewayOwners(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*ListGatewayOwnersResponse, error)
+	// RemoveGatewayCollaborator revokes all the rights that a collaborator has to
+	// a given gateway.
+	RemoveGatewayCollaborator(ctx context.Context, in *RemoveGatewayCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// AddGatewayRight grants a right to a given user for a given gateway.
+	AddGatewayRight(ctx context.Context, in *GatewayRight, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// ListGatewayRights returns all the rights that the authenticated user has
+	// to a given gateway.
+	ListGatewayRights(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*ListGatewayRightsResponse, error)
+	// RemoveGatewayRight revokes a given right from a given gateway collaborator
+	RemoveGatewayRight(ctx context.Context, in *GatewayRight, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+}
+
+type isGatewayClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewIsGatewayClient(cc *grpc.ClientConn) IsGatewayClient {
+	return &isGatewayClient{cc}
+}
+
+func (c *isGatewayClient) CreateGateway(ctx context.Context, in *CreateGatewayRequest, opts ...grpc.CallOption) (*Gateway, error) {
+	out := new(Gateway)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/CreateGateway", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) GetGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*Gateway, error) {
+	out := new(Gateway)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/GetGateway", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) ListGateways(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*ListGatewaysResponse, error) {
+	out := new(ListGatewaysResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/ListGateways", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) UpdateGateway(ctx context.Context, in *UpdateGatewayRequest, opts ...grpc.CallOption) (*Gateway, error) {
+	out := new(Gateway)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/UpdateGateway", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) DeleteGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/DeleteGateway", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) DisableGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/DisableGateway", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) AddGatewayAttribute(ctx context.Context, in *AddGatewayAttributeRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/AddGatewayAttribute", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) ListGatewayAttributes(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*ListGatewayAttributesResponse, error) {
+	out := new(ListGatewayAttributesResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/ListGatewayAttributes", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) RemoveGatewayAttribute(ctx context.Context, in *RemoveGatewayAttributeRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/RemoveGatewayAttribute", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) AddGatewayAntenna(ctx context.Context, in *AddGatewayAntennaRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/AddGatewayAntenna", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) ListGatewayAntennas(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*ListGatewayAntennasResponse, error) {
+	out := new(ListGatewayAntennasResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/ListGatewayAntennas", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) RemoveGatewayAntenna(ctx context.Context, in *RemoveGatewayAntennaRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/RemoveGatewayAntenna", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) AddGatewayCollaborator(ctx context.Context, in *AddGatewayCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/AddGatewayCollaborator", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) ListGatewayCollaborators(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*ListGatewayCollaboratorsResponse, error) {
+	out := new(ListGatewayCollaboratorsResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/ListGatewayCollaborators", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) ListGatewayOwners(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*ListGatewayOwnersResponse, error) {
+	out := new(ListGatewayOwnersResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/ListGatewayOwners", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) RemoveGatewayCollaborator(ctx context.Context, in *RemoveGatewayCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/RemoveGatewayCollaborator", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) AddGatewayRight(ctx context.Context, in *GatewayRight, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/AddGatewayRight", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) ListGatewayRights(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*ListGatewayRightsResponse, error) {
+	out := new(ListGatewayRightsResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/ListGatewayRights", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) RemoveGatewayRight(ctx context.Context, in *GatewayRight, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/RemoveGatewayRight", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for IsGateway service
+
+type IsGatewayServer interface {
+	// CreateGateway creates a new gateway on the network and returns it.
+	CreateGateway(context.Context, *CreateGatewayRequest) (*Gateway, error)
+	// GetGateway finds a gateway by ID and retrieves it.
+	GetGateway(context.Context, *GatewayIdentifiers) (*Gateway, error)
+	// ListGateways returns all the gateways which the authenticated user is collaborator.
+	ListGateways(context.Context, *google_protobuf2.Empty) (*ListGatewaysResponse, error)
+	// UpdateGateway edits a gateway and retrieves the updated version.
+	UpdateGateway(context.Context, *UpdateGatewayRequest) (*Gateway, error)
+	// DeleteGateway permanently deletes a gateway.
+	DeleteGateway(context.Context, *GatewayIdentifiers) (*google_protobuf2.Empty, error)
+	// DisableGateway disables a gateway and therefore it can not be used anymore.
+	DisableGateway(context.Context, *GatewayIdentifiers) (*google_protobuf2.Empty, error)
+	// AddGatewayAttribute sets an attribute with a key in the gateway.
+	AddGatewayAttribute(context.Context, *AddGatewayAttributeRequest) (*google_protobuf2.Empty, error)
+	// ListGatewayAttributes returns all gateway attributes.
+	ListGatewayAttributes(context.Context, *GatewayIdentifiers) (*ListGatewayAttributesResponse, error)
+	// RemoveGatewayAttribute removes an attribute matching the given key.
+	RemoveGatewayAttribute(context.Context, *RemoveGatewayAttributeRequest) (*google_protobuf2.Empty, error)
+	// AddGatewayAntenna adds a new antenna to a gateway.
+	AddGatewayAntenna(context.Context, *AddGatewayAntennaRequest) (*google_protobuf2.Empty, error)
+	// ListGatewayAntenas returns all the antennas that a gateway has registered.
+	ListGatewayAntennas(context.Context, *GatewayIdentifiers) (*ListGatewayAntennasResponse, error)
+	// RemoveGatewayAntenna removes a given antenna from a gateway.
+	RemoveGatewayAntenna(context.Context, *RemoveGatewayAntennaRequest) (*google_protobuf2.Empty, error)
+	// AddGatewayCollaborator makes an user collaborator a gateway.
+	AddGatewayCollaborator(context.Context, *AddGatewayCollaboratorRequest) (*google_protobuf2.Empty, error)
+	// ListGatewayCollaborators returns all the collaborators for a given gateway.
+	ListGatewayCollaborators(context.Context, *GatewayIdentifiers) (*ListGatewayCollaboratorsResponse, error)
+	// ListGatewayOwners returns all the collaborators that are owners of a gateway.
+	ListGatewayOwners(context.Context, *GatewayIdentifiers) (*ListGatewayOwnersResponse, error)
+	// RemoveGatewayCollaborator revokes all the rights that a collaborator has to
+	// a given gateway.
+	RemoveGatewayCollaborator(context.Context, *RemoveGatewayCollaboratorRequest) (*google_protobuf2.Empty, error)
+	// AddGatewayRight grants a right to a given user for a given gateway.
+	AddGatewayRight(context.Context, *GatewayRight) (*google_protobuf2.Empty, error)
+	// ListGatewayRights returns all the rights that the authenticated user has
+	// to a given gateway.
+	ListGatewayRights(context.Context, *GatewayIdentifiers) (*ListGatewayRightsResponse, error)
+	// RemoveGatewayRight revokes a given right from a given gateway collaborator
+	RemoveGatewayRight(context.Context, *GatewayRight) (*google_protobuf2.Empty, error)
+}
+
+func RegisterIsGatewayServer(s *grpc.Server, srv IsGatewayServer) {
+	s.RegisterService(&_IsGateway_serviceDesc, srv)
+}
+
+func _IsGateway_CreateGateway_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateGatewayRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).CreateGateway(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/CreateGateway",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).CreateGateway(ctx, req.(*CreateGatewayRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_GetGateway_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatewayIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).GetGateway(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/GetGateway",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).GetGateway(ctx, req.(*GatewayIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_ListGateways_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(google_protobuf2.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).ListGateways(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/ListGateways",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).ListGateways(ctx, req.(*google_protobuf2.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_UpdateGateway_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateGatewayRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).UpdateGateway(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/UpdateGateway",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).UpdateGateway(ctx, req.(*UpdateGatewayRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_DeleteGateway_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatewayIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).DeleteGateway(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/DeleteGateway",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).DeleteGateway(ctx, req.(*GatewayIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_DisableGateway_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatewayIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).DisableGateway(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/DisableGateway",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).DisableGateway(ctx, req.(*GatewayIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_AddGatewayAttribute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddGatewayAttributeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).AddGatewayAttribute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/AddGatewayAttribute",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).AddGatewayAttribute(ctx, req.(*AddGatewayAttributeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_ListGatewayAttributes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatewayIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).ListGatewayAttributes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/ListGatewayAttributes",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).ListGatewayAttributes(ctx, req.(*GatewayIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_RemoveGatewayAttribute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveGatewayAttributeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).RemoveGatewayAttribute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/RemoveGatewayAttribute",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).RemoveGatewayAttribute(ctx, req.(*RemoveGatewayAttributeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_AddGatewayAntenna_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddGatewayAntennaRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).AddGatewayAntenna(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/AddGatewayAntenna",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).AddGatewayAntenna(ctx, req.(*AddGatewayAntennaRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_ListGatewayAntennas_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatewayIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).ListGatewayAntennas(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/ListGatewayAntennas",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).ListGatewayAntennas(ctx, req.(*GatewayIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_RemoveGatewayAntenna_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveGatewayAntennaRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).RemoveGatewayAntenna(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/RemoveGatewayAntenna",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).RemoveGatewayAntenna(ctx, req.(*RemoveGatewayAntennaRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_AddGatewayCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddGatewayCollaboratorRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).AddGatewayCollaborator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/AddGatewayCollaborator",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).AddGatewayCollaborator(ctx, req.(*AddGatewayCollaboratorRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_ListGatewayCollaborators_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatewayIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).ListGatewayCollaborators(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/ListGatewayCollaborators",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).ListGatewayCollaborators(ctx, req.(*GatewayIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_ListGatewayOwners_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatewayIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).ListGatewayOwners(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/ListGatewayOwners",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).ListGatewayOwners(ctx, req.(*GatewayIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_RemoveGatewayCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveGatewayCollaboratorRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).RemoveGatewayCollaborator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/RemoveGatewayCollaborator",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).RemoveGatewayCollaborator(ctx, req.(*RemoveGatewayCollaboratorRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_AddGatewayRight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatewayRight)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).AddGatewayRight(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/AddGatewayRight",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).AddGatewayRight(ctx, req.(*GatewayRight))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_ListGatewayRights_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatewayIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).ListGatewayRights(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/ListGatewayRights",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).ListGatewayRights(ctx, req.(*GatewayIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_RemoveGatewayRight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatewayRight)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).RemoveGatewayRight(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/RemoveGatewayRight",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).RemoveGatewayRight(ctx, req.(*GatewayRight))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _IsGateway_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.v3.IsGateway",
+	HandlerType: (*IsGatewayServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateGateway",
+			Handler:    _IsGateway_CreateGateway_Handler,
+		},
+		{
+			MethodName: "GetGateway",
+			Handler:    _IsGateway_GetGateway_Handler,
+		},
+		{
+			MethodName: "ListGateways",
+			Handler:    _IsGateway_ListGateways_Handler,
+		},
+		{
+			MethodName: "UpdateGateway",
+			Handler:    _IsGateway_UpdateGateway_Handler,
+		},
+		{
+			MethodName: "DeleteGateway",
+			Handler:    _IsGateway_DeleteGateway_Handler,
+		},
+		{
+			MethodName: "DisableGateway",
+			Handler:    _IsGateway_DisableGateway_Handler,
+		},
+		{
+			MethodName: "AddGatewayAttribute",
+			Handler:    _IsGateway_AddGatewayAttribute_Handler,
+		},
+		{
+			MethodName: "ListGatewayAttributes",
+			Handler:    _IsGateway_ListGatewayAttributes_Handler,
+		},
+		{
+			MethodName: "RemoveGatewayAttribute",
+			Handler:    _IsGateway_RemoveGatewayAttribute_Handler,
+		},
+		{
+			MethodName: "AddGatewayAntenna",
+			Handler:    _IsGateway_AddGatewayAntenna_Handler,
+		},
+		{
+			MethodName: "ListGatewayAntennas",
+			Handler:    _IsGateway_ListGatewayAntennas_Handler,
+		},
+		{
+			MethodName: "RemoveGatewayAntenna",
+			Handler:    _IsGateway_RemoveGatewayAntenna_Handler,
+		},
+		{
+			MethodName: "AddGatewayCollaborator",
+			Handler:    _IsGateway_AddGatewayCollaborator_Handler,
+		},
+		{
+			MethodName: "ListGatewayCollaborators",
+			Handler:    _IsGateway_ListGatewayCollaborators_Handler,
+		},
+		{
+			MethodName: "ListGatewayOwners",
+			Handler:    _IsGateway_ListGatewayOwners_Handler,
+		},
+		{
+			MethodName: "RemoveGatewayCollaborator",
+			Handler:    _IsGateway_RemoveGatewayCollaborator_Handler,
+		},
+		{
+			MethodName: "AddGatewayRight",
+			Handler:    _IsGateway_AddGatewayRight_Handler,
+		},
+		{
+			MethodName: "ListGatewayRights",
+			Handler:    _IsGateway_ListGatewayRights_Handler,
+		},
+		{
+			MethodName: "RemoveGatewayRight",
+			Handler:    _IsGateway_RemoveGatewayRight_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "github.com/TheThingsNetwork/ttn/api/identityserver.proto",
+}
+
+// Client API for IsClient service
+
+type IsClientClient interface {
+	// CreateClient creates a new client on the network.
+	CreateClient(ctx context.Context, in *CreateClientRequest, opts ...grpc.CallOption) (*Client, error)
+	// GetClient finds a client by ID and retrieves it.
+	GetClient(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*Client, error)
+	// ListClients returns all the clients which the authenticated user is collaborator.
+	ListClients(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*ListClientsResponse, error)
+	// UpdateClient edits a client and returns the updated version.
+	UpdateClient(ctx context.Context, in *UpdateClientRequest, opts ...grpc.CallOption) (*Client, error)
+	// DeleteClient permanently deletes a client.
+	DeleteClient(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// MarkClientAsOfficial marks a client as an official third-party client
+	// created by the staff.
+	MarkClientAsOfficial(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// UnmarkClientAsOfficial unmarks a client as an official third-party client
+	// created by the staff.
+	UnmarkClientAsOfficial(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// SetClientState allows to the staff to set the reviewing state of a
+	// third-party client request.
+	SetClientState(ctx context.Context, in *SetClientStateRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// DisableClient disables a client so it cannot be used anymore.
+	DisableClient(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// ApproveClient marks a client as approved by the staff so it can be used.
+	ApproveClient(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// RejectClient marks a client as rejected by the staff so it cannot be used.
+	RejectClient(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// AddClientCollaborator makes an user collaborator of a client.
+	AddClientCollaborator(ctx context.Context, in *AddClientCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// ListClientCollaborators returns all the collaborators for a given client.
+	ListClientCollaborators(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*ListClientCollaboratorsResponse, error)
+	// RemoveClientCollaborator revokes all the rights that a collaborator has to
+	// a given client.
+	RemoveClientCollaborator(ctx context.Context, in *RemoveClientCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// AddClientRight grants a right to a given user for a given client.
+	AddClientRight(ctx context.Context, in *ClientRight, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// ListClientRights returns all the rights that the authenticated user has
+	// to a given client.
+	ListClientRights(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*ListClientRightsResponse, error)
+	// RemoveClientRight revokes a given right from a given client collaborator.
+	RemoveClientRight(ctx context.Context, in *ClientRight, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+}
+
+type isClientClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewIsClientClient(cc *grpc.ClientConn) IsClientClient {
+	return &isClientClient{cc}
+}
+
+func (c *isClientClient) CreateClient(ctx context.Context, in *CreateClientRequest, opts ...grpc.CallOption) (*Client, error) {
+	out := new(Client)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/CreateClient", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isClientClient) GetClient(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*Client, error) {
+	out := new(Client)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/GetClient", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isClientClient) ListClients(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*ListClientsResponse, error) {
+	out := new(ListClientsResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/ListClients", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isClientClient) UpdateClient(ctx context.Context, in *UpdateClientRequest, opts ...grpc.CallOption) (*Client, error) {
+	out := new(Client)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/UpdateClient", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isClientClient) DeleteClient(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/DeleteClient", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isClientClient) MarkClientAsOfficial(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/MarkClientAsOfficial", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isClientClient) UnmarkClientAsOfficial(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/UnmarkClientAsOfficial", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isClientClient) SetClientState(ctx context.Context, in *SetClientStateRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/SetClientState", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isClientClient) DisableClient(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/DisableClient", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isClientClient) ApproveClient(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/ApproveClient", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isClientClient) RejectClient(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/RejectClient", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isClientClient) AddClientCollaborator(ctx context.Context, in *AddClientCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/AddClientCollaborator", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isClientClient) ListClientCollaborators(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*ListClientCollaboratorsResponse, error) {
+	out := new(ListClientCollaboratorsResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/ListClientCollaborators", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isClientClient) RemoveClientCollaborator(ctx context.Context, in *RemoveClientCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/RemoveClientCollaborator", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isClientClient) AddClientRight(ctx context.Context, in *ClientRight, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/AddClientRight", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isClientClient) ListClientRights(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*ListClientRightsResponse, error) {
+	out := new(ListClientRightsResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/ListClientRights", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isClientClient) RemoveClientRight(ctx context.Context, in *ClientRight, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/RemoveClientRight", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for IsClient service
+
+type IsClientServer interface {
+	// CreateClient creates a new client on the network.
+	CreateClient(context.Context, *CreateClientRequest) (*Client, error)
+	// GetClient finds a client by ID and retrieves it.
+	GetClient(context.Context, *ClientIdentifiers) (*Client, error)
+	// ListClients returns all the clients which the authenticated user is collaborator.
+	ListClients(context.Context, *google_protobuf2.Empty) (*ListClientsResponse, error)
+	// UpdateClient edits a client and returns the updated version.
+	UpdateClient(context.Context, *UpdateClientRequest) (*Client, error)
+	// DeleteClient permanently deletes a client.
+	DeleteClient(context.Context, *ClientIdentifiers) (*google_protobuf2.Empty, error)
+	// MarkClientAsOfficial marks a client as an official third-party client
+	// created by the staff.
+	MarkClientAsOfficial(context.Context, *ClientIdentifiers) (*google_protobuf2.Empty, error)
+	// UnmarkClientAsOfficial unmarks a client as an official third-party client
+	// created by the staff.
+	UnmarkClientAsOfficial(context.Context, *ClientIdentifiers) (*google_protobuf2.Empty, error)
+	// SetClientState allows to the staff to set the reviewing state of a
+	// third-party client request.
+	SetClientState(context.Context, *SetClientStateRequest) (*google_protobuf2.Empty, error)
+	// DisableClient disables a client so it cannot be used anymore.
+	DisableClient(context.Context, *ClientIdentifiers) (*google_protobuf2.Empty, error)
+	// ApproveClient marks a client as approved by the staff so it can be used.
+	ApproveClient(context.Context, *ClientIdentifiers) (*google_protobuf2.Empty, error)
+	// RejectClient marks a client as rejected by the staff so it cannot be used.
+	RejectClient(context.Context, *ClientIdentifiers) (*google_protobuf2.Empty, error)
+	// AddClientCollaborator makes an user collaborator of a client.
+	AddClientCollaborator(context.Context, *AddClientCollaboratorRequest) (*google_protobuf2.Empty, error)
+	// ListClientCollaborators returns all the collaborators for a given client.
+	ListClientCollaborators(context.Context, *ClientIdentifiers) (*ListClientCollaboratorsResponse, error)
+	// RemoveClientCollaborator revokes all the rights that a collaborator has to
+	// a given client.
+	RemoveClientCollaborator(context.Context, *RemoveClientCollaboratorRequest) (*google_protobuf2.Empty, error)
+	// AddClientRight grants a right to a given user for a given client.
+	AddClientRight(context.Context, *ClientRight) (*google_protobuf2.Empty, error)
+	// ListClientRights returns all the rights that the authenticated user has
+	// to a given client.
+	ListClientRights(context.Context, *ClientIdentifiers) (*ListClientRightsResponse, error)
+	// RemoveClientRight revokes a given right from a given client collaborator.
+	RemoveClientRight(context.Context, *ClientRight) (*google_protobuf2.Empty, error)
+}
+
+func RegisterIsClientServer(s *grpc.Server, srv IsClientServer) {
+	s.RegisterService(&_IsClient_serviceDesc, srv)
+}
+
+func _IsClient_CreateClient_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateClientRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).CreateClient(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/CreateClient",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).CreateClient(ctx, req.(*CreateClientRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsClient_GetClient_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClientIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).GetClient(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/GetClient",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).GetClient(ctx, req.(*ClientIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsClient_ListClients_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(google_protobuf2.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).ListClients(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/ListClients",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).ListClients(ctx, req.(*google_protobuf2.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsClient_UpdateClient_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateClientRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).UpdateClient(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/UpdateClient",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).UpdateClient(ctx, req.(*UpdateClientRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsClient_DeleteClient_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClientIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).DeleteClient(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/DeleteClient",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).DeleteClient(ctx, req.(*ClientIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsClient_MarkClientAsOfficial_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClientIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).MarkClientAsOfficial(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/MarkClientAsOfficial",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).MarkClientAsOfficial(ctx, req.(*ClientIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsClient_UnmarkClientAsOfficial_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClientIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).UnmarkClientAsOfficial(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/UnmarkClientAsOfficial",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).UnmarkClientAsOfficial(ctx, req.(*ClientIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsClient_SetClientState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetClientStateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).SetClientState(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/SetClientState",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).SetClientState(ctx, req.(*SetClientStateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsClient_DisableClient_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClientIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).DisableClient(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/DisableClient",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).DisableClient(ctx, req.(*ClientIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsClient_ApproveClient_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClientIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).ApproveClient(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/ApproveClient",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).ApproveClient(ctx, req.(*ClientIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsClient_RejectClient_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClientIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).RejectClient(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/RejectClient",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).RejectClient(ctx, req.(*ClientIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsClient_AddClientCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddClientCollaboratorRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).AddClientCollaborator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/AddClientCollaborator",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).AddClientCollaborator(ctx, req.(*AddClientCollaboratorRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsClient_ListClientCollaborators_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClientIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).ListClientCollaborators(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/ListClientCollaborators",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).ListClientCollaborators(ctx, req.(*ClientIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsClient_RemoveClientCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveClientCollaboratorRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).RemoveClientCollaborator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/RemoveClientCollaborator",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).RemoveClientCollaborator(ctx, req.(*RemoveClientCollaboratorRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsClient_AddClientRight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClientRight)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).AddClientRight(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/AddClientRight",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).AddClientRight(ctx, req.(*ClientRight))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsClient_ListClientRights_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClientIdentifiers)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).ListClientRights(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/ListClientRights",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).ListClientRights(ctx, req.(*ClientIdentifiers))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsClient_RemoveClientRight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClientRight)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsClientServer).RemoveClientRight(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsClient/RemoveClientRight",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsClientServer).RemoveClientRight(ctx, req.(*ClientRight))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _IsClient_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.v3.IsClient",
+	HandlerType: (*IsClientServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateClient",
+			Handler:    _IsClient_CreateClient_Handler,
+		},
+		{
+			MethodName: "GetClient",
+			Handler:    _IsClient_GetClient_Handler,
+		},
+		{
+			MethodName: "ListClients",
+			Handler:    _IsClient_ListClients_Handler,
+		},
+		{
+			MethodName: "UpdateClient",
+			Handler:    _IsClient_UpdateClient_Handler,
+		},
+		{
+			MethodName: "DeleteClient",
+			Handler:    _IsClient_DeleteClient_Handler,
+		},
+		{
+			MethodName: "MarkClientAsOfficial",
+			Handler:    _IsClient_MarkClientAsOfficial_Handler,
+		},
+		{
+			MethodName: "UnmarkClientAsOfficial",
+			Handler:    _IsClient_UnmarkClientAsOfficial_Handler,
+		},
+		{
+			MethodName: "SetClientState",
+			Handler:    _IsClient_SetClientState_Handler,
+		},
+		{
+			MethodName: "DisableClient",
+			Handler:    _IsClient_DisableClient_Handler,
+		},
+		{
+			MethodName: "ApproveClient",
+			Handler:    _IsClient_ApproveClient_Handler,
+		},
+		{
+			MethodName: "RejectClient",
+			Handler:    _IsClient_RejectClient_Handler,
+		},
+		{
+			MethodName: "AddClientCollaborator",
+			Handler:    _IsClient_AddClientCollaborator_Handler,
+		},
+		{
+			MethodName: "ListClientCollaborators",
+			Handler:    _IsClient_ListClientCollaborators_Handler,
+		},
+		{
+			MethodName: "RemoveClientCollaborator",
+			Handler:    _IsClient_RemoveClientCollaborator_Handler,
+		},
+		{
+			MethodName: "AddClientRight",
+			Handler:    _IsClient_AddClientRight_Handler,
+		},
+		{
+			MethodName: "ListClientRights",
+			Handler:    _IsClient_ListClientRights_Handler,
+		},
+		{
+			MethodName: "RemoveClientRight",
+			Handler:    _IsClient_RemoveClientRight_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "github.com/TheThingsNetwork/ttn/api/identityserver.proto",
+}
+
+func (m *CreateUserRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CreateUserRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Username) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Username)))
+		i += copy(dAtA[i:], m.Username)
+	}
+	if len(m.Password) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Password)))
+		i += copy(dAtA[i:], m.Password)
+	}
+	if len(m.Email) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Email)))
+		i += copy(dAtA[i:], m.Email)
+	}
+	if m.Name != nil {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(m.Name.Size()))
+		n1, err := m.Name.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n1
+	}
+	return i, nil
+}
+
+func (m *CreateUserResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CreateUserResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Username) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Username)))
+		i += copy(dAtA[i:], m.Username)
+	}
+	if len(m.Email) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Email)))
+		i += copy(dAtA[i:], m.Email)
+	}
+	if m.Name != nil {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(m.Name.Size()))
+		n2, err := m.Name.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n2
+	}
+	return i, nil
+}
+
+func (m *GetUserResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GetUserResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Username) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Username)))
+		i += copy(dAtA[i:], m.Username)
+	}
+	if m.Name != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(m.Name.Size()))
+		n3, err := m.Name.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n3
+	}
+	return i, nil
+}
+
+func (m *GetAccountResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GetAccountResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Username) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Username)))
+		i += copy(dAtA[i:], m.Username)
+	}
+	if len(m.Email) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Email)))
+		i += copy(dAtA[i:], m.Email)
+	}
+	if m.Name != nil {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(m.Name.Size()))
+		n4, err := m.Name.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n4
+	}
+	return i, nil
+}
+
+func (m *UpdateUserRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpdateUserRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Name != nil {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(m.Name.Size()))
+		n5, err := m.Name.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n5
+	}
+	return i, nil
+}
+
+func (m *UpdateUserResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpdateUserResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Username) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Username)))
+		i += copy(dAtA[i:], m.Username)
+	}
+	if len(m.Email) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Email)))
+		i += copy(dAtA[i:], m.Email)
+	}
+	if m.Name != nil {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(m.Name.Size()))
+		n6, err := m.Name.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n6
+	}
+	return i, nil
+}
+
+func (m *UpdateUserEmailRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpdateUserEmailRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Email) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Email)))
+		i += copy(dAtA[i:], m.Email)
+	}
+	return i, nil
+}
+
+func (m *UpdateUserPasswordRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpdateUserPasswordRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Old) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Old)))
+		i += copy(dAtA[i:], m.Old)
+	}
+	if len(m.New) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.New)))
+		i += copy(dAtA[i:], m.New)
+	}
+	return i, nil
+}
+
+func (m *CreateApplicationRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CreateApplicationRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
+	n7, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n7
+	if len(m.Description) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Description)))
+		i += copy(dAtA[i:], m.Description)
+	}
+	if len(m.AppEUIs) > 0 {
+		for _, msg := range m.AppEUIs {
+			dAtA[i] = 0x1a
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if len(m.APIKeys) > 0 {
+		for _, msg := range m.APIKeys {
+			dAtA[i] = 0x22
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *ListApplicationsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListApplicationsResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Applications) > 0 {
+		for _, msg := range m.Applications {
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *UpdateApplicationRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpdateApplicationRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
+	n8, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n8
+	if len(m.Description) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Description)))
+		i += copy(dAtA[i:], m.Description)
+	}
+	if len(m.AppEUIs) > 0 {
+		for _, msg := range m.AppEUIs {
+			dAtA[i] = 0x1a
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if len(m.APIKeys) > 0 {
+		for _, msg := range m.APIKeys {
+			dAtA[i] = 0x22
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *AddApplicationAppEUIRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AddApplicationAppEUIRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
+	n9, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n9
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.AppEUI.Size()))
+	n10, err := m.AppEUI.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n10
+	return i, nil
+}
+
+func (m *AppEUIIdentifier) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AppEUIIdentifier) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
+	n11, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n11
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.AppEUI.Size()))
+	n12, err := m.AppEUI.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n12
+	return i, nil
+}
+
+func (m *GenerateAppEUIResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GenerateAppEUIResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.AppEUI.Size()))
+	n13, err := m.AppEUI.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n13
+	return i, nil
+}
+
+func (m *ListApplicationAppEUIsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListApplicationAppEUIsResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.AppEUIs) > 0 {
+		for _, msg := range m.AppEUIs {
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *GenerateApplicationAPIKeyRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GenerateApplicationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
+	n14, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n14
+	if len(m.Name) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Name)))
+		i += copy(dAtA[i:], m.Name)
+	}
+	if len(m.Rights) > 0 {
+		dAtA16 := make([]byte, len(m.Rights)*10)
+		var j15 int
+		for _, num := range m.Rights {
+			for num >= 1<<7 {
+				dAtA16[j15] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j15++
+			}
+			dAtA16[j15] = uint8(num)
+			j15++
+		}
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(j15))
+		i += copy(dAtA[i:], dAtA16[:j15])
+	}
+	return i, nil
+}
+
+func (m *ApplicationAPIKeyIdentifier) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ApplicationAPIKeyIdentifier) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
+	n17, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n17
+	if len(m.KeyName) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.KeyName)))
+		i += copy(dAtA[i:], m.KeyName)
+	}
+	return i, nil
+}
+
+func (m *ListApplicationAPIKeysResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListApplicationAPIKeysResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.APIKeys) > 0 {
+		for _, msg := range m.APIKeys {
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *AddApplicationCollaboratorRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AddApplicationCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
+	n18, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n18
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Collaborator.Size()))
+	n19, err := m.Collaborator.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n19
+	return i, nil
+}
+
+func (m *ListApplicationCollaboratorsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListApplicationCollaboratorsResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Collaborators) > 0 {
+		for _, msg := range m.Collaborators {
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *RemoveApplicationCollaboratorRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RemoveApplicationCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
+	n20, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n20
+	if len(m.Username) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Username)))
+		i += copy(dAtA[i:], m.Username)
+	}
+	return i, nil
+}
+
+func (m *ApplicationRight) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ApplicationRight) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
+	n21, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n21
+	if len(m.Username) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Username)))
+		i += copy(dAtA[i:], m.Username)
+	}
+	if m.Right != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(m.Right))
+	}
+	return i, nil
+}
+
+func (m *ListApplicationRightsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListApplicationRightsResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Rights) > 0 {
+		dAtA23 := make([]byte, len(m.Rights)*10)
+		var j22 int
+		for _, num := range m.Rights {
+			for num >= 1<<7 {
+				dAtA23[j22] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j22++
+			}
+			dAtA23[j22] = uint8(num)
+			j22++
+		}
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(j22))
+		i += copy(dAtA[i:], dAtA23[:j22])
+	}
+	return i, nil
+}
+
+func (m *CreateGatewayRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CreateGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
+	n24, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n24
+	if len(m.Description) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Description)))
+		i += copy(dAtA[i:], m.Description)
+	}
+	if len(m.Token) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Token)))
+		i += copy(dAtA[i:], m.Token)
+	}
+	if len(m.FrequencyPlanID) > 0 {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.FrequencyPlanID)))
+		i += copy(dAtA[i:], m.FrequencyPlanID)
+	}
+	if m.Activated {
+		dAtA[i] = 0x28
+		i++
+		if m.Activated {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.StatusPublic {
+		dAtA[i] = 0x30
+		i++
+		if m.StatusPublic {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.LocationPublic {
+		dAtA[i] = 0x38
+		i++
+		if m.LocationPublic {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.OwnerPublic {
+		dAtA[i] = 0x40
+		i++
+		if m.OwnerPublic {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.AutoUpdate {
+		dAtA[i] = 0x48
+		i++
+		if m.AutoUpdate {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if len(m.Brand) > 0 {
+		dAtA[i] = 0x52
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Brand)))
+		i += copy(dAtA[i:], m.Brand)
+	}
+	if len(m.Model) > 0 {
+		dAtA[i] = 0x5a
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Model)))
+		i += copy(dAtA[i:], m.Model)
+	}
+	if len(m.Antennas) > 0 {
+		for _, msg := range m.Antennas {
+			dAtA[i] = 0x62
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if len(m.Attributes) > 0 {
+		for k, _ := range m.Attributes {
+			dAtA[i] = 0x6a
+			i++
+			v := m.Attributes[k]
+			mapSize := 1 + len(k) + sovIdentityserver(uint64(len(k))) + 1 + len(v) + sovIdentityserver(uint64(len(v)))
+			i = encodeVarintIdentityserver(dAtA, i, uint64(mapSize))
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(len(k)))
+			i += copy(dAtA[i:], k)
+			dAtA[i] = 0x12
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(len(v)))
+			i += copy(dAtA[i:], v)
+		}
+	}
+	if len(m.ClusterAddress) > 0 {
+		dAtA[i] = 0x72
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.ClusterAddress)))
+		i += copy(dAtA[i:], m.ClusterAddress)
+	}
+	return i, nil
+}
+
+func (m *ListGatewaysResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListGatewaysResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Gateways) > 0 {
+		for _, msg := range m.Gateways {
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *UpdateGatewayRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpdateGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
+	n25, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n25
+	if len(m.Description) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Description)))
+		i += copy(dAtA[i:], m.Description)
+	}
+	if len(m.Token) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Token)))
+		i += copy(dAtA[i:], m.Token)
+	}
+	if len(m.FrequencyPlanID) > 0 {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.FrequencyPlanID)))
+		i += copy(dAtA[i:], m.FrequencyPlanID)
+	}
+	if m.Activated {
+		dAtA[i] = 0x28
+		i++
+		if m.Activated {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.StatusPublic {
+		dAtA[i] = 0x30
+		i++
+		if m.StatusPublic {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.LocationPublic {
+		dAtA[i] = 0x38
+		i++
+		if m.LocationPublic {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.OwnerPublic {
+		dAtA[i] = 0x40
+		i++
+		if m.OwnerPublic {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.AutoUpdate {
+		dAtA[i] = 0x48
+		i++
+		if m.AutoUpdate {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if len(m.Brand) > 0 {
+		dAtA[i] = 0x52
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Brand)))
+		i += copy(dAtA[i:], m.Brand)
+	}
+	if len(m.Model) > 0 {
+		dAtA[i] = 0x5a
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Model)))
+		i += copy(dAtA[i:], m.Model)
+	}
+	if len(m.Antennas) > 0 {
+		for _, msg := range m.Antennas {
+			dAtA[i] = 0x62
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if len(m.Attributes) > 0 {
+		for k, _ := range m.Attributes {
+			dAtA[i] = 0x6a
+			i++
+			v := m.Attributes[k]
+			mapSize := 1 + len(k) + sovIdentityserver(uint64(len(k))) + 1 + len(v) + sovIdentityserver(uint64(len(v)))
+			i = encodeVarintIdentityserver(dAtA, i, uint64(mapSize))
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(len(k)))
+			i += copy(dAtA[i:], k)
+			dAtA[i] = 0x12
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(len(v)))
+			i += copy(dAtA[i:], v)
+		}
+	}
+	if len(m.ClusterAddress) > 0 {
+		dAtA[i] = 0x72
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.ClusterAddress)))
+		i += copy(dAtA[i:], m.ClusterAddress)
+	}
+	return i, nil
+}
+
+func (m *AddGatewayAttributeRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AddGatewayAttributeRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
+	n26, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n26
+	if len(m.Attribute) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Attribute)))
+		i += copy(dAtA[i:], m.Attribute)
+	}
+	if len(m.Value) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Value)))
+		i += copy(dAtA[i:], m.Value)
+	}
+	return i, nil
+}
+
+func (m *ListGatewayAttributesResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListGatewayAttributesResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Attributes) > 0 {
+		for k, _ := range m.Attributes {
+			dAtA[i] = 0xa
+			i++
+			v := m.Attributes[k]
+			mapSize := 1 + len(k) + sovIdentityserver(uint64(len(k))) + 1 + len(v) + sovIdentityserver(uint64(len(v)))
+			i = encodeVarintIdentityserver(dAtA, i, uint64(mapSize))
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(len(k)))
+			i += copy(dAtA[i:], k)
+			dAtA[i] = 0x12
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(len(v)))
+			i += copy(dAtA[i:], v)
+		}
+	}
+	return i, nil
+}
+
+func (m *RemoveGatewayAttributeRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RemoveGatewayAttributeRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
+	n27, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n27
+	if len(m.Attribute) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Attribute)))
+		i += copy(dAtA[i:], m.Attribute)
+	}
+	return i, nil
+}
+
+func (m *AddGatewayAntennaRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AddGatewayAntennaRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
+	n28, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n28
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Antenna.Size()))
+	n29, err := m.Antenna.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n29
+	return i, nil
+}
+
+func (m *ListGatewayAntennasResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListGatewayAntennasResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Antennas) > 0 {
+		for _, msg := range m.Antennas {
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *RemoveGatewayAntennaRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RemoveGatewayAntennaRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
+	n30, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n30
+	if len(m.AntennaID) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.AntennaID)))
+		i += copy(dAtA[i:], m.AntennaID)
+	}
+	return i, nil
+}
+
+func (m *AddGatewayCollaboratorRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AddGatewayCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
+	n31, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n31
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Collaborator.Size()))
+	n32, err := m.Collaborator.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n32
+	return i, nil
+}
+
+func (m *ListGatewayCollaboratorsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListGatewayCollaboratorsResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Collaborators) > 0 {
+		for _, msg := range m.Collaborators {
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *ListGatewayOwnersResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListGatewayOwnersResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Usernames) > 0 {
+		for _, s := range m.Usernames {
+			dAtA[i] = 0xa
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			dAtA[i] = uint8(l)
+			i++
+			i += copy(dAtA[i:], s)
+		}
+	}
+	return i, nil
+}
+
+func (m *RemoveGatewayCollaboratorRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RemoveGatewayCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
+	n33, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n33
+	if len(m.Username) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Username)))
+		i += copy(dAtA[i:], m.Username)
+	}
+	return i, nil
+}
+
+func (m *GatewayRight) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GatewayRight) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
+	n34, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n34
+	if len(m.Username) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Username)))
+		i += copy(dAtA[i:], m.Username)
+	}
+	if m.Right != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(m.Right))
+	}
+	return i, nil
+}
+
+func (m *ListGatewayRightsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListGatewayRightsResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Rights) > 0 {
+		dAtA36 := make([]byte, len(m.Rights)*10)
+		var j35 int
+		for _, num := range m.Rights {
+			for num >= 1<<7 {
+				dAtA36[j35] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j35++
+			}
+			dAtA36[j35] = uint8(num)
+			j35++
+		}
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(j35))
+		i += copy(dAtA[i:], dAtA36[:j35])
+	}
+	return i, nil
+}
+
+func (m *CreateClientRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CreateClientRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifiers.Size()))
+	n37, err := m.ClientIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n37
+	if len(m.Description) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Description)))
+		i += copy(dAtA[i:], m.Description)
+	}
+	if len(m.Secret) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Secret)))
+		i += copy(dAtA[i:], m.Secret)
+	}
+	if len(m.CallbackURI) > 0 {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.CallbackURI)))
+		i += copy(dAtA[i:], m.CallbackURI)
+	}
+	dAtA[i] = 0x3a
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Grants.Size()))
+	n38, err := m.Grants.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n38
+	dAtA[i] = 0x42
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Scope.Size()))
+	n39, err := m.Scope.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n39
+	return i, nil
+}
+
+func (m *ListClientsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListClientsResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Clients) > 0 {
+		for _, msg := range m.Clients {
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *UpdateClientRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpdateClientRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifiers.Size()))
+	n40, err := m.ClientIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n40
+	if len(m.Description) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Description)))
+		i += copy(dAtA[i:], m.Description)
+	}
+	if len(m.Secret) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Secret)))
+		i += copy(dAtA[i:], m.Secret)
+	}
+	if len(m.CallbackURI) > 0 {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.CallbackURI)))
+		i += copy(dAtA[i:], m.CallbackURI)
+	}
+	dAtA[i] = 0x3a
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Grants.Size()))
+	n41, err := m.Grants.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n41
+	dAtA[i] = 0x42
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Scope.Size()))
+	n42, err := m.Scope.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n42
+	return i, nil
+}
+
+func (m *SetClientStateRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SetClientStateRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifiers.Size()))
+	n43, err := m.ClientIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n43
+	if m.State != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(m.State))
+	}
+	return i, nil
+}
+
+func (m *AddClientCollaboratorRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AddClientCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifiers.Size()))
+	n44, err := m.ClientIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n44
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Collaborator.Size()))
+	n45, err := m.Collaborator.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n45
+	return i, nil
+}
+
+func (m *ListClientCollaboratorsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListClientCollaboratorsResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Collaborators) > 0 {
+		for _, msg := range m.Collaborators {
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *RemoveClientCollaboratorRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RemoveClientCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifiers.Size()))
+	n46, err := m.ClientIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n46
+	if len(m.Username) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Username)))
+		i += copy(dAtA[i:], m.Username)
+	}
+	return i, nil
+}
+
+func (m *ClientRight) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ClientRight) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifiers.Size()))
+	n47, err := m.ClientIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n47
+	if len(m.Username) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Username)))
+		i += copy(dAtA[i:], m.Username)
+	}
+	if m.Right != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(m.Right))
+	}
+	return i, nil
+}
+
+func (m *ListClientRightsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListClientRightsResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Rights) > 0 {
+		dAtA49 := make([]byte, len(m.Rights)*10)
+		var j48 int
+		for _, num := range m.Rights {
+			for num >= 1<<7 {
+				dAtA49[j48] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j48++
+			}
+			dAtA49[j48] = uint8(num)
+			j48++
+		}
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(j48))
+		i += copy(dAtA[i:], dAtA49[:j48])
+	}
+	return i, nil
+}
+
+func encodeFixed64Identityserver(dAtA []byte, offset int, v uint64) int {
+	dAtA[offset] = uint8(v)
+	dAtA[offset+1] = uint8(v >> 8)
+	dAtA[offset+2] = uint8(v >> 16)
+	dAtA[offset+3] = uint8(v >> 24)
+	dAtA[offset+4] = uint8(v >> 32)
+	dAtA[offset+5] = uint8(v >> 40)
+	dAtA[offset+6] = uint8(v >> 48)
+	dAtA[offset+7] = uint8(v >> 56)
+	return offset + 8
+}
+func encodeFixed32Identityserver(dAtA []byte, offset int, v uint32) int {
+	dAtA[offset] = uint8(v)
+	dAtA[offset+1] = uint8(v >> 8)
+	dAtA[offset+2] = uint8(v >> 16)
+	dAtA[offset+3] = uint8(v >> 24)
+	return offset + 4
+}
+func encodeVarintIdentityserver(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
+		dAtA[offset] = uint8(v&0x7f | 0x80)
+		v >>= 7
+		offset++
+	}
+	dAtA[offset] = uint8(v)
+	return offset + 1
+}
+func (m *CreateUserRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Username)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.Password)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.Email)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	if m.Name != nil {
+		l = m.Name.Size()
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *CreateUserResponse) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Username)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.Email)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	if m.Name != nil {
+		l = m.Name.Size()
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *GetUserResponse) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Username)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	if m.Name != nil {
+		l = m.Name.Size()
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *GetAccountResponse) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Username)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.Email)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	if m.Name != nil {
+		l = m.Name.Size()
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *UpdateUserRequest) Size() (n int) {
+	var l int
+	_ = l
+	if m.Name != nil {
+		l = m.Name.Size()
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *UpdateUserResponse) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Username)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.Email)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	if m.Name != nil {
+		l = m.Name.Size()
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *UpdateUserEmailRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Email)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *UpdateUserPasswordRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Old)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.New)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *CreateApplicationRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ApplicationIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	if len(m.AppEUIs) > 0 {
+		for _, e := range m.AppEUIs {
+			l = e.Size()
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	if len(m.APIKeys) > 0 {
+		for _, e := range m.APIKeys {
+			l = e.Size()
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *ListApplicationsResponse) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Applications) > 0 {
+		for _, e := range m.Applications {
+			l = e.Size()
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *UpdateApplicationRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ApplicationIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	if len(m.AppEUIs) > 0 {
+		for _, e := range m.AppEUIs {
+			l = e.Size()
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	if len(m.APIKeys) > 0 {
+		for _, e := range m.APIKeys {
+			l = e.Size()
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *AddApplicationAppEUIRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ApplicationIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = m.AppEUI.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	return n
+}
+
+func (m *AppEUIIdentifier) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ApplicationIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = m.AppEUI.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	return n
+}
+
+func (m *GenerateAppEUIResponse) Size() (n int) {
+	var l int
+	_ = l
+	l = m.AppEUI.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	return n
+}
+
+func (m *ListApplicationAppEUIsResponse) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.AppEUIs) > 0 {
+		for _, e := range m.AppEUIs {
+			l = e.Size()
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *GenerateApplicationAPIKeyRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ApplicationIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	if len(m.Rights) > 0 {
+		l = 0
+		for _, e := range m.Rights {
+			l += sovIdentityserver(uint64(e))
+		}
+		n += 1 + sovIdentityserver(uint64(l)) + l
+	}
+	return n
+}
+
+func (m *ApplicationAPIKeyIdentifier) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ApplicationIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.KeyName)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *ListApplicationAPIKeysResponse) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.APIKeys) > 0 {
+		for _, e := range m.APIKeys {
+			l = e.Size()
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *AddApplicationCollaboratorRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ApplicationIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = m.Collaborator.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	return n
+}
+
+func (m *ListApplicationCollaboratorsResponse) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Collaborators) > 0 {
+		for _, e := range m.Collaborators {
+			l = e.Size()
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *RemoveApplicationCollaboratorRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ApplicationIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.Username)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *ApplicationRight) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ApplicationIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.Username)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	if m.Right != 0 {
+		n += 1 + sovIdentityserver(uint64(m.Right))
+	}
+	return n
+}
+
+func (m *ListApplicationRightsResponse) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Rights) > 0 {
+		l = 0
+		for _, e := range m.Rights {
+			l += sovIdentityserver(uint64(e))
+		}
+		n += 1 + sovIdentityserver(uint64(l)) + l
+	}
+	return n
+}
+
+func (m *CreateGatewayRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.GatewayIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.Token)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.FrequencyPlanID)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	if m.Activated {
+		n += 2
+	}
+	if m.StatusPublic {
+		n += 2
+	}
+	if m.LocationPublic {
+		n += 2
+	}
+	if m.OwnerPublic {
+		n += 2
+	}
+	if m.AutoUpdate {
+		n += 2
+	}
+	l = len(m.Brand)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.Model)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	if len(m.Antennas) > 0 {
+		for _, e := range m.Antennas {
+			l = e.Size()
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	if len(m.Attributes) > 0 {
+		for k, v := range m.Attributes {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovIdentityserver(uint64(len(k))) + 1 + len(v) + sovIdentityserver(uint64(len(v)))
+			n += mapEntrySize + 1 + sovIdentityserver(uint64(mapEntrySize))
+		}
+	}
+	l = len(m.ClusterAddress)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *ListGatewaysResponse) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Gateways) > 0 {
+		for _, e := range m.Gateways {
+			l = e.Size()
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *UpdateGatewayRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.GatewayIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.Token)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.FrequencyPlanID)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	if m.Activated {
+		n += 2
+	}
+	if m.StatusPublic {
+		n += 2
+	}
+	if m.LocationPublic {
+		n += 2
+	}
+	if m.OwnerPublic {
+		n += 2
+	}
+	if m.AutoUpdate {
+		n += 2
+	}
+	l = len(m.Brand)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.Model)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	if len(m.Antennas) > 0 {
+		for _, e := range m.Antennas {
+			l = e.Size()
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	if len(m.Attributes) > 0 {
+		for k, v := range m.Attributes {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovIdentityserver(uint64(len(k))) + 1 + len(v) + sovIdentityserver(uint64(len(v)))
+			n += mapEntrySize + 1 + sovIdentityserver(uint64(mapEntrySize))
+		}
+	}
+	l = len(m.ClusterAddress)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *AddGatewayAttributeRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.GatewayIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.Attribute)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.Value)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *ListGatewayAttributesResponse) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Attributes) > 0 {
+		for k, v := range m.Attributes {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovIdentityserver(uint64(len(k))) + 1 + len(v) + sovIdentityserver(uint64(len(v)))
+			n += mapEntrySize + 1 + sovIdentityserver(uint64(mapEntrySize))
+		}
+	}
+	return n
+}
+
+func (m *RemoveGatewayAttributeRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.GatewayIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.Attribute)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *AddGatewayAntennaRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.GatewayIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = m.Antenna.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	return n
+}
+
+func (m *ListGatewayAntennasResponse) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Antennas) > 0 {
+		for _, e := range m.Antennas {
+			l = e.Size()
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *RemoveGatewayAntennaRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.GatewayIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.AntennaID)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *AddGatewayCollaboratorRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.GatewayIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = m.Collaborator.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	return n
+}
+
+func (m *ListGatewayCollaboratorsResponse) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Collaborators) > 0 {
+		for _, e := range m.Collaborators {
+			l = e.Size()
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *ListGatewayOwnersResponse) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Usernames) > 0 {
+		for _, s := range m.Usernames {
+			l = len(s)
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *RemoveGatewayCollaboratorRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.GatewayIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.Username)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *GatewayRight) Size() (n int) {
+	var l int
+	_ = l
+	l = m.GatewayIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.Username)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	if m.Right != 0 {
+		n += 1 + sovIdentityserver(uint64(m.Right))
+	}
+	return n
+}
+
+func (m *ListGatewayRightsResponse) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Rights) > 0 {
+		l = 0
+		for _, e := range m.Rights {
+			l += sovIdentityserver(uint64(e))
+		}
+		n += 1 + sovIdentityserver(uint64(l)) + l
+	}
+	return n
+}
+
+func (m *CreateClientRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ClientIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.Secret)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.CallbackURI)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = m.Grants.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = m.Scope.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	return n
+}
+
+func (m *ListClientsResponse) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Clients) > 0 {
+		for _, e := range m.Clients {
+			l = e.Size()
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *UpdateClientRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ClientIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.Secret)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = len(m.CallbackURI)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	l = m.Grants.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = m.Scope.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	return n
+}
+
+func (m *SetClientStateRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ClientIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	if m.State != 0 {
+		n += 1 + sovIdentityserver(uint64(m.State))
+	}
+	return n
+}
+
+func (m *AddClientCollaboratorRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ClientIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = m.Collaborator.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	return n
+}
+
+func (m *ListClientCollaboratorsResponse) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Collaborators) > 0 {
+		for _, e := range m.Collaborators {
+			l = e.Size()
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *RemoveClientCollaboratorRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ClientIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.Username)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *ClientRight) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ClientIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.Username)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	if m.Right != 0 {
+		n += 1 + sovIdentityserver(uint64(m.Right))
+	}
+	return n
+}
+
+func (m *ListClientRightsResponse) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Rights) > 0 {
+		l = 0
+		for _, e := range m.Rights {
+			l += sovIdentityserver(uint64(e))
+		}
+		n += 1 + sovIdentityserver(uint64(l)) + l
+	}
+	return n
+}
+
+func sovIdentityserver(x uint64) (n int) {
+	for {
+		n++
+		x >>= 7
+		if x == 0 {
+			break
+		}
+	}
+	return n
+}
+func sozIdentityserver(x uint64) (n int) {
+	return sovIdentityserver(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (this *CreateUserRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&CreateUserRequest{`,
+		`Username:` + fmt.Sprintf("%v", this.Username) + `,`,
+		`Password:` + fmt.Sprintf("%v", this.Password) + `,`,
+		`Email:` + fmt.Sprintf("%v", this.Email) + `,`,
+		`Name:` + strings.Replace(fmt.Sprintf("%v", this.Name), "Name", "Name", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *CreateUserResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&CreateUserResponse{`,
+		`Username:` + fmt.Sprintf("%v", this.Username) + `,`,
+		`Email:` + fmt.Sprintf("%v", this.Email) + `,`,
+		`Name:` + strings.Replace(fmt.Sprintf("%v", this.Name), "Name", "Name", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *GetUserResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&GetUserResponse{`,
+		`Username:` + fmt.Sprintf("%v", this.Username) + `,`,
+		`Name:` + strings.Replace(fmt.Sprintf("%v", this.Name), "Name", "Name", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *GetAccountResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&GetAccountResponse{`,
+		`Username:` + fmt.Sprintf("%v", this.Username) + `,`,
+		`Email:` + fmt.Sprintf("%v", this.Email) + `,`,
+		`Name:` + strings.Replace(fmt.Sprintf("%v", this.Name), "Name", "Name", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *UpdateUserRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&UpdateUserRequest{`,
+		`Name:` + strings.Replace(fmt.Sprintf("%v", this.Name), "Name", "Name", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *UpdateUserResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&UpdateUserResponse{`,
+		`Username:` + fmt.Sprintf("%v", this.Username) + `,`,
+		`Email:` + fmt.Sprintf("%v", this.Email) + `,`,
+		`Name:` + strings.Replace(fmt.Sprintf("%v", this.Name), "Name", "Name", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *UpdateUserEmailRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&UpdateUserEmailRequest{`,
+		`Email:` + fmt.Sprintf("%v", this.Email) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *UpdateUserPasswordRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&UpdateUserPasswordRequest{`,
+		`Old:` + fmt.Sprintf("%v", this.Old) + `,`,
+		`New:` + fmt.Sprintf("%v", this.New) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *CreateApplicationRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&CreateApplicationRequest{`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
+		`AppEUIs:` + fmt.Sprintf("%v", this.AppEUIs) + `,`,
+		`APIKeys:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.APIKeys), "ApplicationAPIKey", "ApplicationAPIKey", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListApplicationsResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListApplicationsResponse{`,
+		`Applications:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Applications), "Application", "Application", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *UpdateApplicationRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&UpdateApplicationRequest{`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
+		`AppEUIs:` + fmt.Sprintf("%v", this.AppEUIs) + `,`,
+		`APIKeys:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.APIKeys), "ApplicationAPIKey", "ApplicationAPIKey", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *AddApplicationAppEUIRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&AddApplicationAppEUIRequest{`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`AppEUI:` + fmt.Sprintf("%v", this.AppEUI) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *AppEUIIdentifier) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&AppEUIIdentifier{`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`AppEUI:` + fmt.Sprintf("%v", this.AppEUI) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *GenerateAppEUIResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&GenerateAppEUIResponse{`,
+		`AppEUI:` + fmt.Sprintf("%v", this.AppEUI) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListApplicationAppEUIsResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListApplicationAppEUIsResponse{`,
+		`AppEUIs:` + fmt.Sprintf("%v", this.AppEUIs) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *GenerateApplicationAPIKeyRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&GenerateApplicationAPIKeyRequest{`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ApplicationAPIKeyIdentifier) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ApplicationAPIKeyIdentifier{`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`KeyName:` + fmt.Sprintf("%v", this.KeyName) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListApplicationAPIKeysResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListApplicationAPIKeysResponse{`,
+		`APIKeys:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.APIKeys), "ApplicationAPIKey", "ApplicationAPIKey", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *AddApplicationCollaboratorRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&AddApplicationCollaboratorRequest{`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Collaborator:` + strings.Replace(strings.Replace(this.Collaborator.String(), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListApplicationCollaboratorsResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListApplicationCollaboratorsResponse{`,
+		`Collaborators:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborators), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *RemoveApplicationCollaboratorRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RemoveApplicationCollaboratorRequest{`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Username:` + fmt.Sprintf("%v", this.Username) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ApplicationRight) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ApplicationRight{`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Username:` + fmt.Sprintf("%v", this.Username) + `,`,
+		`Right:` + fmt.Sprintf("%v", this.Right) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListApplicationRightsResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListApplicationRightsResponse{`,
+		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *CreateGatewayRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	keysForAttributes := make([]string, 0, len(this.Attributes))
+	for k, _ := range this.Attributes {
+		keysForAttributes = append(keysForAttributes, k)
+	}
+	github_com_gogo_protobuf_sortkeys.Strings(keysForAttributes)
+	mapStringForAttributes := "map[string]string{"
+	for _, k := range keysForAttributes {
+		mapStringForAttributes += fmt.Sprintf("%v: %v,", k, this.Attributes[k])
+	}
+	mapStringForAttributes += "}"
+	s := strings.Join([]string{`&CreateGatewayRequest{`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
+		`Token:` + fmt.Sprintf("%v", this.Token) + `,`,
+		`FrequencyPlanID:` + fmt.Sprintf("%v", this.FrequencyPlanID) + `,`,
+		`Activated:` + fmt.Sprintf("%v", this.Activated) + `,`,
+		`StatusPublic:` + fmt.Sprintf("%v", this.StatusPublic) + `,`,
+		`LocationPublic:` + fmt.Sprintf("%v", this.LocationPublic) + `,`,
+		`OwnerPublic:` + fmt.Sprintf("%v", this.OwnerPublic) + `,`,
+		`AutoUpdate:` + fmt.Sprintf("%v", this.AutoUpdate) + `,`,
+		`Brand:` + fmt.Sprintf("%v", this.Brand) + `,`,
+		`Model:` + fmt.Sprintf("%v", this.Model) + `,`,
+		`Antennas:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Antennas), "GatewayAntenna", "GatewayAntenna", 1), `&`, ``, 1) + `,`,
+		`Attributes:` + mapStringForAttributes + `,`,
+		`ClusterAddress:` + fmt.Sprintf("%v", this.ClusterAddress) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListGatewaysResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListGatewaysResponse{`,
+		`Gateways:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Gateways), "Gateway", "Gateway", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *UpdateGatewayRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	keysForAttributes := make([]string, 0, len(this.Attributes))
+	for k, _ := range this.Attributes {
+		keysForAttributes = append(keysForAttributes, k)
+	}
+	github_com_gogo_protobuf_sortkeys.Strings(keysForAttributes)
+	mapStringForAttributes := "map[string]string{"
+	for _, k := range keysForAttributes {
+		mapStringForAttributes += fmt.Sprintf("%v: %v,", k, this.Attributes[k])
+	}
+	mapStringForAttributes += "}"
+	s := strings.Join([]string{`&UpdateGatewayRequest{`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
+		`Token:` + fmt.Sprintf("%v", this.Token) + `,`,
+		`FrequencyPlanID:` + fmt.Sprintf("%v", this.FrequencyPlanID) + `,`,
+		`Activated:` + fmt.Sprintf("%v", this.Activated) + `,`,
+		`StatusPublic:` + fmt.Sprintf("%v", this.StatusPublic) + `,`,
+		`LocationPublic:` + fmt.Sprintf("%v", this.LocationPublic) + `,`,
+		`OwnerPublic:` + fmt.Sprintf("%v", this.OwnerPublic) + `,`,
+		`AutoUpdate:` + fmt.Sprintf("%v", this.AutoUpdate) + `,`,
+		`Brand:` + fmt.Sprintf("%v", this.Brand) + `,`,
+		`Model:` + fmt.Sprintf("%v", this.Model) + `,`,
+		`Antennas:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Antennas), "GatewayAntenna", "GatewayAntenna", 1), `&`, ``, 1) + `,`,
+		`Attributes:` + mapStringForAttributes + `,`,
+		`ClusterAddress:` + fmt.Sprintf("%v", this.ClusterAddress) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *AddGatewayAttributeRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&AddGatewayAttributeRequest{`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Attribute:` + fmt.Sprintf("%v", this.Attribute) + `,`,
+		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListGatewayAttributesResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	keysForAttributes := make([]string, 0, len(this.Attributes))
+	for k, _ := range this.Attributes {
+		keysForAttributes = append(keysForAttributes, k)
+	}
+	github_com_gogo_protobuf_sortkeys.Strings(keysForAttributes)
+	mapStringForAttributes := "map[string]string{"
+	for _, k := range keysForAttributes {
+		mapStringForAttributes += fmt.Sprintf("%v: %v,", k, this.Attributes[k])
+	}
+	mapStringForAttributes += "}"
+	s := strings.Join([]string{`&ListGatewayAttributesResponse{`,
+		`Attributes:` + mapStringForAttributes + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *RemoveGatewayAttributeRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RemoveGatewayAttributeRequest{`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Attribute:` + fmt.Sprintf("%v", this.Attribute) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *AddGatewayAntennaRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&AddGatewayAntennaRequest{`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Antenna:` + strings.Replace(strings.Replace(this.Antenna.String(), "GatewayAntenna", "GatewayAntenna", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListGatewayAntennasResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListGatewayAntennasResponse{`,
+		`Antennas:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Antennas), "GatewayAntenna", "GatewayAntenna", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *RemoveGatewayAntennaRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RemoveGatewayAntennaRequest{`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`AntennaID:` + fmt.Sprintf("%v", this.AntennaID) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *AddGatewayCollaboratorRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&AddGatewayCollaboratorRequest{`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Collaborator:` + strings.Replace(strings.Replace(this.Collaborator.String(), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListGatewayCollaboratorsResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListGatewayCollaboratorsResponse{`,
+		`Collaborators:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborators), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListGatewayOwnersResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListGatewayOwnersResponse{`,
+		`Usernames:` + fmt.Sprintf("%v", this.Usernames) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *RemoveGatewayCollaboratorRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RemoveGatewayCollaboratorRequest{`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Username:` + fmt.Sprintf("%v", this.Username) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *GatewayRight) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&GatewayRight{`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Username:` + fmt.Sprintf("%v", this.Username) + `,`,
+		`Right:` + fmt.Sprintf("%v", this.Right) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListGatewayRightsResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListGatewayRightsResponse{`,
+		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *CreateClientRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&CreateClientRequest{`,
+		`ClientIdentifiers:` + strings.Replace(strings.Replace(this.ClientIdentifiers.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
+		`Secret:` + fmt.Sprintf("%v", this.Secret) + `,`,
+		`CallbackURI:` + fmt.Sprintf("%v", this.CallbackURI) + `,`,
+		`Grants:` + strings.Replace(strings.Replace(this.Grants.String(), "ClientGrants", "ClientGrants", 1), `&`, ``, 1) + `,`,
+		`Scope:` + strings.Replace(strings.Replace(this.Scope.String(), "ClientScope", "ClientScope", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListClientsResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListClientsResponse{`,
+		`Clients:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Clients), "Client", "Client", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *UpdateClientRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&UpdateClientRequest{`,
+		`ClientIdentifiers:` + strings.Replace(strings.Replace(this.ClientIdentifiers.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
+		`Secret:` + fmt.Sprintf("%v", this.Secret) + `,`,
+		`CallbackURI:` + fmt.Sprintf("%v", this.CallbackURI) + `,`,
+		`Grants:` + strings.Replace(strings.Replace(this.Grants.String(), "ClientGrants", "ClientGrants", 1), `&`, ``, 1) + `,`,
+		`Scope:` + strings.Replace(strings.Replace(this.Scope.String(), "ClientScope", "ClientScope", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *SetClientStateRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&SetClientStateRequest{`,
+		`ClientIdentifiers:` + strings.Replace(strings.Replace(this.ClientIdentifiers.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`State:` + fmt.Sprintf("%v", this.State) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *AddClientCollaboratorRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&AddClientCollaboratorRequest{`,
+		`ClientIdentifiers:` + strings.Replace(strings.Replace(this.ClientIdentifiers.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Collaborator:` + strings.Replace(strings.Replace(this.Collaborator.String(), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListClientCollaboratorsResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListClientCollaboratorsResponse{`,
+		`Collaborators:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborators), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *RemoveClientCollaboratorRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RemoveClientCollaboratorRequest{`,
+		`ClientIdentifiers:` + strings.Replace(strings.Replace(this.ClientIdentifiers.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Username:` + fmt.Sprintf("%v", this.Username) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ClientRight) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ClientRight{`,
+		`ClientIdentifiers:` + strings.Replace(strings.Replace(this.ClientIdentifiers.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Username:` + fmt.Sprintf("%v", this.Username) + `,`,
+		`Right:` + fmt.Sprintf("%v", this.Right) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListClientRightsResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListClientRightsResponse{`,
+		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func valueToStringIdentityserver(v interface{}) string {
+	rv := reflect.ValueOf(v)
+	if rv.IsNil() {
+		return "nil"
+	}
+	pv := reflect.Indirect(rv).Interface()
+	return fmt.Sprintf("*%v", pv)
+}
+func (m *CreateUserRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CreateUserRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CreateUserRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Username", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Username = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Password", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Password = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Email", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Email = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Name == nil {
+				m.Name = &Name{}
+			}
+			if err := m.Name.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CreateUserResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CreateUserResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CreateUserResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Username", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Username = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Email", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Email = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Name == nil {
+				m.Name = &Name{}
+			}
+			if err := m.Name.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GetUserResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GetUserResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GetUserResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Username", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Username = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Name == nil {
+				m.Name = &Name{}
+			}
+			if err := m.Name.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GetAccountResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GetAccountResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GetAccountResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Username", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Username = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Email", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Email = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Name == nil {
+				m.Name = &Name{}
+			}
+			if err := m.Name.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UpdateUserRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpdateUserRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpdateUserRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Name == nil {
+				m.Name = &Name{}
+			}
+			if err := m.Name.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UpdateUserResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpdateUserResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpdateUserResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Username", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Username = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Email", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Email = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Name == nil {
+				m.Name = &Name{}
+			}
+			if err := m.Name.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UpdateUserEmailRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpdateUserEmailRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpdateUserEmailRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Email", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Email = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UpdateUserPasswordRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpdateUserPasswordRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpdateUserPasswordRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Old", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Old = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field New", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.New = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CreateApplicationRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CreateApplicationRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CreateApplicationRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AppEUIs", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var v github_com_TheThingsNetwork_ttn_pkg_types.EUI64
+			m.AppEUIs = append(m.AppEUIs, v)
+			if err := m.AppEUIs[len(m.AppEUIs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field APIKeys", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.APIKeys = append(m.APIKeys, ApplicationAPIKey{})
+			if err := m.APIKeys[len(m.APIKeys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListApplicationsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListApplicationsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListApplicationsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Applications", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Applications = append(m.Applications, Application{})
+			if err := m.Applications[len(m.Applications)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UpdateApplicationRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpdateApplicationRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpdateApplicationRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AppEUIs", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var v github_com_TheThingsNetwork_ttn_pkg_types.EUI64
+			m.AppEUIs = append(m.AppEUIs, v)
+			if err := m.AppEUIs[len(m.AppEUIs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field APIKeys", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.APIKeys = append(m.APIKeys, ApplicationAPIKey{})
+			if err := m.APIKeys[len(m.APIKeys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AddApplicationAppEUIRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AddApplicationAppEUIRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AddApplicationAppEUIRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AppEUI", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.AppEUI.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AppEUIIdentifier) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AppEUIIdentifier: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AppEUIIdentifier: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AppEUI", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.AppEUI.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GenerateAppEUIResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GenerateAppEUIResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GenerateAppEUIResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AppEUI", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.AppEUI.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListApplicationAppEUIsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListApplicationAppEUIsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListApplicationAppEUIsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AppEUIs", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var v github_com_TheThingsNetwork_ttn_pkg_types.EUI64
+			m.AppEUIs = append(m.AppEUIs, v)
+			if err := m.AppEUIs[len(m.AppEUIs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GenerateApplicationAPIKeyRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GenerateApplicationAPIKeyRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GenerateApplicationAPIKeyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType == 0 {
+				var v Right
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowIdentityserver
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= (Right(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.Rights = append(m.Rights, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowIdentityserver
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= (int(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthIdentityserver
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				for iNdEx < postIndex {
+					var v Right
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowIdentityserver
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= (Right(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.Rights = append(m.Rights, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ApplicationAPIKeyIdentifier) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ApplicationAPIKeyIdentifier: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ApplicationAPIKeyIdentifier: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field KeyName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.KeyName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListApplicationAPIKeysResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListApplicationAPIKeysResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListApplicationAPIKeysResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field APIKeys", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.APIKeys = append(m.APIKeys, ApplicationAPIKey{})
+			if err := m.APIKeys[len(m.APIKeys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AddApplicationCollaboratorRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AddApplicationCollaboratorRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AddApplicationCollaboratorRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Collaborator", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Collaborator.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListApplicationCollaboratorsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListApplicationCollaboratorsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListApplicationCollaboratorsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Collaborators", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Collaborators = append(m.Collaborators, Collaborator{})
+			if err := m.Collaborators[len(m.Collaborators)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RemoveApplicationCollaboratorRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RemoveApplicationCollaboratorRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RemoveApplicationCollaboratorRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Username", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Username = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ApplicationRight) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ApplicationRight: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ApplicationRight: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Username", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Username = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Right", wireType)
+			}
+			m.Right = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Right |= (Right(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListApplicationRightsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListApplicationRightsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListApplicationRightsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 3:
+			if wireType == 0 {
+				var v Right
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowIdentityserver
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= (Right(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.Rights = append(m.Rights, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowIdentityserver
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= (int(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthIdentityserver
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				for iNdEx < postIndex {
+					var v Right
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowIdentityserver
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= (Right(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.Rights = append(m.Rights, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CreateGatewayRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CreateGatewayRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CreateGatewayRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.GatewayIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Token", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Token = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyPlanID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.FrequencyPlanID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Activated", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Activated = bool(v != 0)
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StatusPublic", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.StatusPublic = bool(v != 0)
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LocationPublic", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.LocationPublic = bool(v != 0)
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OwnerPublic", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.OwnerPublic = bool(v != 0)
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AutoUpdate", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.AutoUpdate = bool(v != 0)
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Brand", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Brand = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Model", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Model = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Antennas", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Antennas = append(m.Antennas, GatewayAntenna{})
+			if err := m.Antennas[len(m.Antennas)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 13:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Attributes", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Attributes == nil {
+				m.Attributes = make(map[string]string)
+			}
+			var mapkey string
+			var mapvalue string
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowIdentityserver
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= (uint64(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowIdentityserver
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= (uint64(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthIdentityserver
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var stringLenmapvalue uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowIdentityserver
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapvalue := int(stringLenmapvalue)
+					if intStringLenmapvalue < 0 {
+						return ErrInvalidLengthIdentityserver
+					}
+					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
+					iNdEx = postStringIndexmapvalue
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipIdentityserver(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if skippy < 0 {
+						return ErrInvalidLengthIdentityserver
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.Attributes[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 14:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClusterAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ClusterAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListGatewaysResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListGatewaysResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListGatewaysResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Gateways", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Gateways = append(m.Gateways, Gateway{})
+			if err := m.Gateways[len(m.Gateways)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UpdateGatewayRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpdateGatewayRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpdateGatewayRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.GatewayIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Token", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Token = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyPlanID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.FrequencyPlanID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Activated", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Activated = bool(v != 0)
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StatusPublic", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.StatusPublic = bool(v != 0)
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LocationPublic", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.LocationPublic = bool(v != 0)
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OwnerPublic", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.OwnerPublic = bool(v != 0)
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AutoUpdate", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.AutoUpdate = bool(v != 0)
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Brand", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Brand = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Model", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Model = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Antennas", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Antennas = append(m.Antennas, GatewayAntenna{})
+			if err := m.Antennas[len(m.Antennas)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 13:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Attributes", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Attributes == nil {
+				m.Attributes = make(map[string]string)
+			}
+			var mapkey string
+			var mapvalue string
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowIdentityserver
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= (uint64(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowIdentityserver
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= (uint64(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthIdentityserver
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var stringLenmapvalue uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowIdentityserver
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapvalue := int(stringLenmapvalue)
+					if intStringLenmapvalue < 0 {
+						return ErrInvalidLengthIdentityserver
+					}
+					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
+					iNdEx = postStringIndexmapvalue
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipIdentityserver(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if skippy < 0 {
+						return ErrInvalidLengthIdentityserver
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.Attributes[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 14:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClusterAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ClusterAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AddGatewayAttributeRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AddGatewayAttributeRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AddGatewayAttributeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.GatewayIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Attribute", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Attribute = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Value = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListGatewayAttributesResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListGatewayAttributesResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListGatewayAttributesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Attributes", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Attributes == nil {
+				m.Attributes = make(map[string]string)
+			}
+			var mapkey string
+			var mapvalue string
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowIdentityserver
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= (uint64(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowIdentityserver
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= (uint64(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthIdentityserver
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var stringLenmapvalue uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowIdentityserver
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapvalue := int(stringLenmapvalue)
+					if intStringLenmapvalue < 0 {
+						return ErrInvalidLengthIdentityserver
+					}
+					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
+					iNdEx = postStringIndexmapvalue
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipIdentityserver(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if skippy < 0 {
+						return ErrInvalidLengthIdentityserver
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.Attributes[mapkey] = mapvalue
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RemoveGatewayAttributeRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RemoveGatewayAttributeRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RemoveGatewayAttributeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.GatewayIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Attribute", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Attribute = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AddGatewayAntennaRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AddGatewayAntennaRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AddGatewayAntennaRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.GatewayIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Antenna", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Antenna.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListGatewayAntennasResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListGatewayAntennasResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListGatewayAntennasResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Antennas", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Antennas = append(m.Antennas, GatewayAntenna{})
+			if err := m.Antennas[len(m.Antennas)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RemoveGatewayAntennaRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RemoveGatewayAntennaRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RemoveGatewayAntennaRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.GatewayIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AntennaID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AntennaID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AddGatewayCollaboratorRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AddGatewayCollaboratorRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AddGatewayCollaboratorRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.GatewayIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Collaborator", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Collaborator.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListGatewayCollaboratorsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListGatewayCollaboratorsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListGatewayCollaboratorsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Collaborators", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Collaborators = append(m.Collaborators, Collaborator{})
+			if err := m.Collaborators[len(m.Collaborators)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListGatewayOwnersResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListGatewayOwnersResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListGatewayOwnersResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Usernames", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Usernames = append(m.Usernames, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RemoveGatewayCollaboratorRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RemoveGatewayCollaboratorRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RemoveGatewayCollaboratorRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.GatewayIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Username", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Username = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GatewayRight) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GatewayRight: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GatewayRight: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.GatewayIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Username", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Username = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Right", wireType)
+			}
+			m.Right = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Right |= (Right(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListGatewayRightsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListGatewayRightsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListGatewayRightsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType == 0 {
+				var v Right
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowIdentityserver
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= (Right(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.Rights = append(m.Rights, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowIdentityserver
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= (int(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthIdentityserver
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				for iNdEx < postIndex {
+					var v Right
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowIdentityserver
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= (Right(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.Rights = append(m.Rights, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CreateClientRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CreateClientRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CreateClientRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ClientIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Secret = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CallbackURI", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CallbackURI = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Grants", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Grants.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Scope", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Scope.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListClientsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListClientsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListClientsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Clients", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Clients = append(m.Clients, Client{})
+			if err := m.Clients[len(m.Clients)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UpdateClientRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpdateClientRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpdateClientRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ClientIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Secret = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CallbackURI", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CallbackURI = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Grants", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Grants.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Scope", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Scope.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SetClientStateRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SetClientStateRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SetClientStateRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ClientIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field State", wireType)
+			}
+			m.State = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.State |= (ClientState(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AddClientCollaboratorRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AddClientCollaboratorRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AddClientCollaboratorRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ClientIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Collaborator", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Collaborator.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListClientCollaboratorsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListClientCollaboratorsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListClientCollaboratorsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Collaborators", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Collaborators = append(m.Collaborators, Collaborator{})
+			if err := m.Collaborators[len(m.Collaborators)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RemoveClientCollaboratorRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RemoveClientCollaboratorRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RemoveClientCollaboratorRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ClientIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Username", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Username = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ClientRight) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ClientRight: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ClientRight: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ClientIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Username", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Username = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Right", wireType)
+			}
+			m.Right = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Right |= (Right(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListClientRightsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListClientRightsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListClientRightsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType == 0 {
+				var v Right
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowIdentityserver
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= (Right(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.Rights = append(m.Rights, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowIdentityserver
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= (int(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthIdentityserver
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				for iNdEx < postIndex {
+					var v Right
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowIdentityserver
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= (Right(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.Rights = append(m.Rights, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func skipIdentityserver(dAtA []byte) (n int, err error) {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return 0, ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return 0, io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		wireType := int(wire & 0x7)
+		switch wireType {
+		case 0:
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return 0, ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return 0, io.ErrUnexpectedEOF
+				}
+				iNdEx++
+				if dAtA[iNdEx-1] < 0x80 {
+					break
+				}
+			}
+			return iNdEx, nil
+		case 1:
+			iNdEx += 8
+			return iNdEx, nil
+		case 2:
+			var length int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return 0, ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return 0, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				length |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			iNdEx += length
+			if length < 0 {
+				return 0, ErrInvalidLengthIdentityserver
+			}
+			return iNdEx, nil
+		case 3:
+			for {
+				var innerWire uint64
+				var start int = iNdEx
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return 0, ErrIntOverflowIdentityserver
+					}
+					if iNdEx >= l {
+						return 0, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					innerWire |= (uint64(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				innerWireType := int(innerWire & 0x7)
+				if innerWireType == 4 {
+					break
+				}
+				next, err := skipIdentityserver(dAtA[start:])
+				if err != nil {
+					return 0, err
+				}
+				iNdEx = start + next
+			}
+			return iNdEx, nil
+		case 4:
+			return iNdEx, nil
+		case 5:
+			iNdEx += 4
+			return iNdEx, nil
+		default:
+			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
+		}
+	}
+	panic("unreachable")
+}
+
+var (
+	ErrInvalidLengthIdentityserver = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowIdentityserver   = fmt.Errorf("proto: integer overflow")
+)
+
 func init() {
 	proto.RegisterFile("github.com/TheThingsNetwork/ttn/api/identityserver.proto", fileDescriptorIdentityserver)
 }
 
 var fileDescriptorIdentityserver = []byte{
-	// 234 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xb2, 0x48, 0xcf, 0x2c, 0xc9,
-	0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x0f, 0xc9, 0x48, 0x0d, 0xc9, 0xc8, 0xcc, 0x4b, 0x2f,
-	0xf6, 0x4b, 0x2d, 0x29, 0xcf, 0x2f, 0xca, 0xd6, 0x2f, 0x29, 0xc9, 0xd3, 0x4f, 0x2c, 0xc8, 0xd4,
-	0xcf, 0x4c, 0x49, 0xcd, 0x2b, 0xc9, 0x2c, 0xa9, 0x2c, 0x4e, 0x2d, 0x2a, 0x4b, 0x2d, 0xd2, 0x2b,
-	0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x2b, 0x29, 0xc9, 0xd3, 0x2b, 0x33, 0x96, 0xd2, 0x45, 0x32,
-	0x21, 0x3d, 0x3f, 0x3d, 0x5f, 0x1f, 0x2c, 0x9d, 0x54, 0x9a, 0x06, 0xe6, 0x81, 0x39, 0x60, 0x16,
-	0x44, 0x9b, 0x94, 0x29, 0xf1, 0x16, 0xa6, 0x65, 0xa6, 0x16, 0x15, 0x43, 0xb5, 0x19, 0x12, 0xa3,
-	0x2d, 0x3d, 0xb1, 0x24, 0xb5, 0x3c, 0xb1, 0x12, 0xa2, 0xc5, 0x28, 0x82, 0x8b, 0xd5, 0xbd, 0xa4,
-	0xdc, 0xbd, 0x48, 0xc8, 0x9f, 0x4b, 0x30, 0xa0, 0x34, 0x27, 0xc7, 0x39, 0x3f, 0x2f, 0x2d, 0x33,
-	0xbd, 0xb4, 0x28, 0xb1, 0x24, 0x33, 0x3f, 0x4f, 0x48, 0x4a, 0x0f, 0xe2, 0x7e, 0x3d, 0x77, 0x88,
-	0x26, 0x4f, 0x84, 0x95, 0x52, 0x32, 0x68, 0x72, 0x28, 0x3a, 0x0d, 0x18, 0x9d, 0xdc, 0x6f, 0x3c,
-	0x94, 0x63, 0x68, 0x78, 0x24, 0xc7, 0x78, 0xe2, 0x91, 0x1c, 0xe3, 0x85, 0x47, 0x72, 0x8c, 0x0f,
-	0x1e, 0xc9, 0x31, 0xbe, 0x78, 0x24, 0xc7, 0xf0, 0xe1, 0x91, 0x1c, 0x63, 0x94, 0x26, 0x21, 0xa7,
-	0x16, 0x64, 0xa7, 0x83, 0xe8, 0x82, 0xa4, 0x24, 0x36, 0xb0, 0x4b, 0x8d, 0x01, 0x01, 0x00, 0x00,
-	0xff, 0xff, 0xce, 0x4b, 0x8c, 0x5e, 0x86, 0x01, 0x00, 0x00,
+	// 2615 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x5a, 0xcb, 0x6f, 0xdb, 0xd8,
+	0xd5, 0x1f, 0xda, 0xf1, 0x43, 0x47, 0xb2, 0x3d, 0xbe, 0x71, 0x1c, 0x59, 0x76, 0x64, 0x85, 0x49,
+	0xbe, 0x38, 0x40, 0x3e, 0x79, 0xc6, 0xd3, 0x04, 0x99, 0x06, 0x79, 0x48, 0xb6, 0x47, 0x50, 0x92,
+	0x19, 0xbb, 0xca, 0x38, 0x69, 0x53, 0xa4, 0x1e, 0x5a, 0xba, 0x96, 0x59, 0xd3, 0x24, 0x4b, 0x52,
+	0x31, 0x54, 0xa0, 0x9d, 0x02, 0xed, 0x6e, 0x80, 0xb6, 0xe8, 0xb2, 0x5d, 0x74, 0x51, 0x74, 0x51,
+	0x14, 0xe8, 0xa6, 0xe8, 0xa6, 0xfb, 0x02, 0xb3, 0x9c, 0x45, 0x17, 0x45, 0x17, 0x46, 0xab, 0x55,
+	0x97, 0xfd, 0x13, 0x0a, 0xde, 0x87, 0x78, 0x49, 0xf1, 0xd2, 0xb2, 0x63, 0x4d, 0x5b, 0x34, 0x3b,
+	0xf1, 0xde, 0x7b, 0x5e, 0xbf, 0x7b, 0xce, 0xe1, 0xe1, 0x39, 0x82, 0x3b, 0x4d, 0xdd, 0xdb, 0x6b,
+	0xed, 0x14, 0xeb, 0xd6, 0xc1, 0xf2, 0xc7, 0x7b, 0xf8, 0xe3, 0x3d, 0xdd, 0x6c, 0xba, 0x1f, 0x61,
+	0xef, 0xd0, 0x72, 0xf6, 0x97, 0x3d, 0xcf, 0x5c, 0xd6, 0x6c, 0x7d, 0x59, 0x6f, 0x60, 0xd3, 0xd3,
+	0xbd, 0xb6, 0x8b, 0x9d, 0x57, 0xd8, 0x29, 0xda, 0x8e, 0xe5, 0x59, 0x68, 0xd4, 0xf3, 0xcc, 0xe2,
+	0xab, 0xf7, 0x72, 0xff, 0x2f, 0x70, 0x68, 0x5a, 0x4d, 0x6b, 0x99, 0x6c, 0xef, 0xb4, 0x76, 0xc9,
+	0x13, 0x79, 0x20, 0xbf, 0x28, 0x59, 0xee, 0x56, 0x3f, 0x02, 0x35, 0xdb, 0x36, 0xf4, 0xba, 0xe6,
+	0xe9, 0x96, 0xc9, 0xc8, 0xde, 0xe9, 0x87, 0xac, 0x6e, 0xe8, 0xd8, 0xf4, 0x18, 0xc5, 0xed, 0xbe,
+	0x28, 0x2c, 0xc3, 0xd0, 0x76, 0x2c, 0x47, 0xf3, 0x2c, 0xe7, 0x24, 0x0a, 0x52, 0x44, 0x76, 0x75,
+	0xec, 0xb8, 0x8c, 0xec, 0xdd, 0x7e, 0xc8, 0x9a, 0x9a, 0x87, 0x0f, 0xb5, 0x36, 0x23, 0x29, 0xf6,
+	0x43, 0xd2, 0x72, 0x39, 0xe2, 0xb9, 0xf9, 0xa6, 0x65, 0x35, 0x0d, 0x1c, 0x00, 0x8c, 0x0f, 0x6c,
+	0x8f, 0x31, 0x53, 0x7f, 0xa8, 0xc0, 0xf4, 0xaa, 0x83, 0x35, 0x0f, 0x6f, 0xb9, 0xd8, 0xa9, 0xe1,
+	0xef, 0xb4, 0xb0, 0xeb, 0xa1, 0x1c, 0x8c, 0xfb, 0x0c, 0x4c, 0xed, 0x00, 0x67, 0x95, 0x82, 0xb2,
+	0x94, 0xaa, 0x75, 0x9f, 0xfd, 0x3d, 0x5b, 0x73, 0xdd, 0x43, 0xcb, 0x69, 0x64, 0x87, 0xe8, 0x1e,
+	0x7f, 0x46, 0x33, 0x30, 0x82, 0x0f, 0x34, 0xdd, 0xc8, 0x0e, 0x93, 0x0d, 0xfa, 0x80, 0x0a, 0x70,
+	0x8e, 0x70, 0x3a, 0x57, 0x50, 0x96, 0xd2, 0x2b, 0x99, 0x22, 0xf5, 0x80, 0xe2, 0x47, 0xda, 0x01,
+	0xae, 0x91, 0x1d, 0x75, 0x0f, 0x90, 0xa8, 0x84, 0x6b, 0x5b, 0xa6, 0x8b, 0x13, 0xb5, 0xe8, 0x4a,
+	0x1a, 0x8a, 0x93, 0x34, 0x2c, 0x95, 0xb4, 0x01, 0x53, 0x15, 0xec, 0xf5, 0x2d, 0x86, 0x33, 0x1c,
+	0x4a, 0x52, 0xbd, 0x82, 0xbd, 0x52, 0xbd, 0x6e, 0xb5, 0x4c, 0x6f, 0xa0, 0xaa, 0xdf, 0x82, 0xe9,
+	0x2d, 0xbb, 0x11, 0xb9, 0x29, 0x4e, 0xa6, 0x24, 0x29, 0x28, 0x92, 0x0d, 0x50, 0xc1, 0x22, 0xcc,
+	0x06, 0x92, 0xd6, 0x7d, 0x22, 0xae, 0x65, 0x97, 0xa3, 0x22, 0x70, 0x54, 0x1f, 0xc0, 0x5c, 0x70,
+	0x7e, 0x93, 0xf9, 0x10, 0x27, 0x79, 0x1b, 0x86, 0x2d, 0xa3, 0xc1, 0x08, 0xfc, 0x9f, 0xfe, 0x8a,
+	0x89, 0x0f, 0x99, 0x52, 0xfe, 0x4f, 0xf5, 0x77, 0x43, 0x90, 0xa5, 0x7e, 0x53, 0x0a, 0x22, 0x9f,
+	0x33, 0x78, 0x04, 0x69, 0x21, 0x1f, 0x30, 0x80, 0xf2, 0x5c, 0x6d, 0x81, 0xa0, 0x1a, 0x04, 0x65,
+	0x79, 0xfc, 0xf3, 0xa3, 0xc5, 0xb7, 0xbe, 0x38, 0x5a, 0x54, 0x6a, 0x22, 0x31, 0x2a, 0x40, 0xba,
+	0x81, 0xdd, 0xba, 0xa3, 0xdb, 0x84, 0x17, 0x55, 0x41, 0x5c, 0x42, 0x2f, 0x61, 0x5c, 0xb3, 0xed,
+	0x6d, 0xdc, 0xd2, 0xdd, 0xec, 0x70, 0x61, 0x78, 0x29, 0x53, 0x2e, 0xfb, 0xac, 0xfe, 0x7a, 0xb4,
+	0xb8, 0x7c, 0x5c, 0xb8, 0xda, 0xfb, 0xcd, 0x65, 0xaf, 0x6d, 0x63, 0xb7, 0xb8, 0xbe, 0x55, 0xbd,
+	0xfd, 0x95, 0xce, 0xd1, 0xe2, 0x58, 0xc9, 0xb6, 0xd7, 0xb7, 0xaa, 0x6e, 0x6d, 0x4c, 0xb3, 0xed,
+	0xf5, 0x96, 0xee, 0xa2, 0x75, 0x9f, 0xbd, 0xbe, 0xbd, 0x8f, 0xdb, 0x6e, 0xf6, 0x5c, 0x61, 0x78,
+	0x29, 0xbd, 0x32, 0x17, 0x63, 0x49, 0x69, 0xb3, 0xfa, 0x18, 0xb7, 0xcb, 0x53, 0xbe, 0x64, 0xc2,
+	0x86, 0x3c, 0x13, 0x36, 0xba, 0xff, 0x43, 0xfd, 0x06, 0x64, 0x9f, 0xe8, 0xae, 0x27, 0x90, 0xb8,
+	0x5d, 0x8f, 0xb8, 0x07, 0x19, 0xc1, 0x64, 0x37, 0xab, 0x10, 0x31, 0xe7, 0x63, 0xc4, 0x94, 0xcf,
+	0xf9, 0x02, 0x6a, 0xa1, 0xe3, 0xe4, 0x2e, 0xe8, 0x6d, 0xbe, 0xb9, 0x8b, 0xbe, 0xee, 0xe2, 0x4f,
+	0x0a, 0xcc, 0x97, 0x1a, 0x0d, 0x91, 0x84, 0x48, 0x1a, 0x04, 0x66, 0x2f, 0x60, 0x8c, 0x21, 0x42,
+	0xf0, 0xca, 0x94, 0x4b, 0xa7, 0x07, 0x64, 0x94, 0xa9, 0x39, 0x4a, 0xf1, 0x50, 0xff, 0xa8, 0xc0,
+	0xdb, 0x74, 0x29, 0x50, 0xe4, 0xbf, 0x46, 0x79, 0x0f, 0x66, 0x2b, 0xd8, 0xc4, 0x0e, 0x75, 0x5b,
+	0x82, 0x3e, 0x0b, 0x07, 0x41, 0xaa, 0x72, 0xd6, 0x52, 0x3f, 0x85, 0x7c, 0x24, 0x0c, 0xb9, 0x93,
+	0x71, 0xe9, 0xa2, 0x0b, 0x2b, 0x67, 0xee, 0xc2, 0xea, 0x6f, 0x14, 0x28, 0x08, 0x76, 0x87, 0x7d,
+	0x76, 0x10, 0x0e, 0x88, 0x84, 0xf7, 0x68, 0x8a, 0xbe, 0x2e, 0xd0, 0x35, 0x18, 0x75, 0xf4, 0xe6,
+	0x9e, 0x47, 0x83, 0x74, 0x72, 0x65, 0x82, 0xb3, 0xae, 0xf9, 0xab, 0x35, 0xb6, 0xa9, 0xfe, 0xc8,
+	0x8f, 0x93, 0xa8, 0x8e, 0x03, 0x72, 0xb5, 0x39, 0x18, 0xdf, 0xc7, 0xed, 0x6d, 0x41, 0xd5, 0xb1,
+	0x7d, 0xdc, 0xf6, 0x5f, 0x71, 0x6a, 0xb3, 0xf7, 0xce, 0x58, 0x44, 0xf3, 0x3b, 0x13, 0xf3, 0x82,
+	0x72, 0xfa, 0xbc, 0xf0, 0x7b, 0x05, 0x2e, 0x87, 0xf3, 0xc2, 0xaa, 0x50, 0x6d, 0x0e, 0xe2, 0x72,
+	0xca, 0x90, 0x11, 0x0b, 0x5a, 0x56, 0xec, 0xcc, 0x70, 0x66, 0xa2, 0x78, 0x81, 0x45, 0x88, 0x46,
+	0xdd, 0x83, 0xab, 0x11, 0x78, 0x44, 0xb2, 0x00, 0xa4, 0x87, 0x30, 0x21, 0xd2, 0x71, 0xa4, 0xe2,
+	0x85, 0xd1, 0xf7, 0x4c, 0x98, 0x40, 0xfd, 0xb1, 0x02, 0x57, 0x6b, 0xf8, 0xc0, 0x7a, 0x85, 0xbf,
+	0x44, 0x88, 0xc4, 0x72, 0x69, 0x28, 0x5c, 0x2e, 0xa9, 0xbf, 0xa4, 0x09, 0xb0, 0xfb, 0xce, 0xf3,
+	0xdd, 0xf6, 0xcb, 0x12, 0x8e, 0xae, 0xc0, 0x08, 0x89, 0x13, 0x52, 0x96, 0xf5, 0xc4, 0x10, 0xdd,
+	0x53, 0x3f, 0x80, 0x4b, 0x91, 0xcb, 0x21, 0xdb, 0xc1, 0xad, 0xf4, 0x19, 0x8a, 0xbf, 0x18, 0x81,
+	0x19, 0x5a, 0x6f, 0x55, 0xe8, 0x17, 0x09, 0x87, 0xfa, 0x3e, 0x8c, 0xb1, 0x6f, 0x14, 0x66, 0x69,
+	0x8e, 0x33, 0x60, 0x07, 0xe3, 0xad, 0xe4, 0x44, 0x7d, 0xbc, 0xd3, 0x67, 0x60, 0xc4, 0xb3, 0xf6,
+	0xb1, 0xc9, 0xbf, 0x2c, 0xc8, 0x03, 0x7a, 0x00, 0xd3, 0xbb, 0x8e, 0xaf, 0x83, 0x59, 0x6f, 0x6f,
+	0xdb, 0x86, 0x66, 0x6e, 0xeb, 0x0d, 0xf2, 0x99, 0x91, 0x2a, 0x9f, 0xef, 0x1c, 0x2d, 0x4e, 0x7d,
+	0xc0, 0x37, 0x37, 0x0d, 0xcd, 0xac, 0xae, 0xd5, 0xa6, 0x76, 0x43, 0x0b, 0x0d, 0xb4, 0x00, 0x29,
+	0xad, 0xee, 0xe9, 0xaf, 0x34, 0x0f, 0x37, 0xb2, 0x23, 0x05, 0x65, 0x69, 0xbc, 0x16, 0x2c, 0xa0,
+	0x2b, 0x30, 0xe1, 0x7a, 0x9a, 0xd7, 0x72, 0xb7, 0xed, 0xd6, 0x8e, 0xa1, 0xd7, 0xb3, 0xa3, 0xe4,
+	0x44, 0x86, 0x2e, 0x6e, 0x92, 0x35, 0x74, 0x1d, 0xa6, 0x0c, 0x8b, 0xa2, 0xca, 0x8f, 0x8d, 0x91,
+	0x63, 0x93, 0x7c, 0x99, 0x1d, 0xbc, 0x0c, 0x19, 0xeb, 0xd0, 0xc4, 0x0e, 0x3f, 0x35, 0x4e, 0x4e,
+	0xa5, 0xc9, 0x1a, 0x3b, 0xb2, 0x08, 0x69, 0xad, 0xe5, 0x59, 0xdb, 0x2d, 0x52, 0x48, 0x65, 0x53,
+	0xe4, 0x04, 0xf8, 0x4b, 0xb4, 0xb4, 0xf2, 0x61, 0xd8, 0x71, 0x34, 0xb3, 0x91, 0x05, 0x0a, 0x03,
+	0x79, 0xf0, 0x57, 0x0f, 0xac, 0x06, 0x36, 0xb2, 0x69, 0xba, 0x4a, 0x1e, 0xd0, 0x1d, 0x18, 0xd7,
+	0x4c, 0x0f, 0x9b, 0xa6, 0xe6, 0x66, 0x33, 0x24, 0xca, 0x66, 0x23, 0xb7, 0x52, 0xa2, 0xdb, 0x2c,
+	0xce, 0xba, 0xa7, 0xd1, 0x13, 0x00, 0xcd, 0xf3, 0x1c, 0x7d, 0xa7, 0xe5, 0x61, 0x37, 0x3b, 0x41,
+	0x68, 0x6f, 0x76, 0x23, 0x34, 0xc6, 0x01, 0x8a, 0xa5, 0xee, 0xf1, 0x75, 0xd3, 0x73, 0xda, 0x35,
+	0x81, 0xde, 0x07, 0xa8, 0x6e, 0xb4, 0x5c, 0x0f, 0x3b, 0xdb, 0x5a, 0xa3, 0xe1, 0x60, 0xd7, 0xcd,
+	0x4e, 0x12, 0x3d, 0x27, 0xd9, 0x72, 0x89, 0xae, 0xe6, 0xee, 0xc1, 0x54, 0x84, 0x8f, 0x5f, 0xf3,
+	0xef, 0xe3, 0x36, 0xff, 0x0a, 0xd8, 0xc7, 0x6d, 0xdf, 0xd6, 0x57, 0x9a, 0xd1, 0xe2, 0x91, 0x40,
+	0x1f, 0xbe, 0x3a, 0x74, 0x47, 0x51, 0xab, 0x30, 0xe3, 0x7b, 0x39, 0xd3, 0x2c, 0x70, 0xee, 0x77,
+	0x61, 0x9c, 0xf9, 0x19, 0xcf, 0x36, 0x53, 0x11, 0x1c, 0x38, 0x00, 0xfc, 0x18, 0x71, 0x74, 0x8a,
+	0xf8, 0x1b, 0x47, 0xff, 0x9f, 0x75, 0xf4, 0x38, 0x07, 0xf8, 0x8f, 0x70, 0xf4, 0x9f, 0x2a, 0x90,
+	0x2b, 0x35, 0x1a, 0xdc, 0x36, 0xce, 0xe9, 0xac, 0x7c, 0xd4, 0x77, 0x15, 0xce, 0x93, 0x09, 0x0f,
+	0x16, 0x02, 0xb5, 0x86, 0x05, 0xb5, 0xd4, 0x3f, 0x28, 0xf4, 0x15, 0x13, 0xd5, 0x29, 0x88, 0xc2,
+	0xad, 0x10, 0xd4, 0x34, 0x0e, 0x6f, 0x71, 0xc5, 0x12, 0x49, 0x93, 0x30, 0x7f, 0x5d, 0x28, 0xbf,
+	0x07, 0x97, 0x68, 0x2d, 0xf1, 0x6f, 0x01, 0x53, 0xfd, 0x99, 0x02, 0x59, 0xe1, 0x26, 0xa9, 0x5b,
+	0x9e, 0x95, 0xe8, 0xdb, 0x30, 0xc6, 0x1c, 0x9d, 0x55, 0x74, 0xc9, 0x51, 0xc1, 0x0f, 0xab, 0xcf,
+	0x61, 0x5e, 0xbc, 0x0f, 0x16, 0x2b, 0xdd, 0x8b, 0x14, 0xa3, 0x4d, 0x39, 0x49, 0xb4, 0xa9, 0x9f,
+	0x29, 0x30, 0x1f, 0x46, 0xfb, 0x6c, 0x0d, 0xbe, 0x09, 0xc0, 0x64, 0xf9, 0xd9, 0x91, 0x80, 0x5d,
+	0x9e, 0xe8, 0x1c, 0x2d, 0xa6, 0x98, 0x9c, 0xea, 0x5a, 0x2d, 0xc5, 0x0e, 0x54, 0x1b, 0xea, 0xaf,
+	0x14, 0xb8, 0x14, 0x60, 0x1f, 0x57, 0x40, 0xbe, 0xae, 0x3e, 0x67, 0x51, 0x57, 0x37, 0xa0, 0x20,
+	0x5c, 0xc6, 0xa0, 0x6a, 0xea, 0xf7, 0x61, 0x4e, 0x90, 0xb2, 0xe1, 0x27, 0xea, 0x80, 0xfd, 0x02,
+	0xa4, 0x78, 0xb9, 0x49, 0x59, 0xa7, 0x6a, 0xc1, 0x82, 0xfa, 0x7d, 0x28, 0x84, 0xee, 0x74, 0x10,
+	0x40, 0x26, 0x55, 0xdf, 0x3f, 0x51, 0x20, 0xc3, 0x73, 0x34, 0xa9, 0xbc, 0x07, 0x28, 0xac, 0xbf,
+	0x6a, 0xbb, 0x1c, 0x02, 0x53, 0x5a, 0x69, 0x2b, 0x49, 0x95, 0xf6, 0xaf, 0x87, 0xe0, 0x3c, 0x2d,
+	0xb4, 0x56, 0xc9, 0x70, 0x82, 0x23, 0x79, 0x17, 0x46, 0xe9, 0xb4, 0x82, 0xd9, 0xd6, 0xfd, 0xc2,
+	0xa4, 0xc7, 0xe2, 0x4d, 0x63, 0x24, 0x7d, 0x14, 0x1f, 0xb3, 0x30, 0xea, 0xe2, 0xba, 0x83, 0x3d,
+	0x96, 0xdd, 0xd9, 0x13, 0x5a, 0x81, 0x4c, 0x5d, 0x33, 0x8c, 0x1d, 0xad, 0xbe, 0xbf, 0xdd, 0x72,
+	0x74, 0x56, 0x79, 0x4c, 0x75, 0x8e, 0x16, 0xd3, 0xab, 0x6c, 0x7d, 0xab, 0x56, 0xad, 0xa5, 0xf9,
+	0xa1, 0x2d, 0x47, 0x47, 0x2b, 0x30, 0xda, 0x74, 0x34, 0xd3, 0x73, 0x49, 0x95, 0x20, 0xba, 0x23,
+	0xd1, 0xa6, 0x42, 0xf6, 0x98, 0x3b, 0xb2, 0x93, 0x68, 0x19, 0x46, 0xdc, 0xba, 0x65, 0x63, 0x52,
+	0x32, 0x08, 0xcd, 0x47, 0x4a, 0xf2, 0xd4, 0xdf, 0x62, 0x14, 0xf4, 0x9c, 0xba, 0x0e, 0xe7, 0x7d,
+	0xac, 0xe9, 0x7e, 0x80, 0x72, 0x11, 0xc6, 0xa8, 0xcd, 0x3c, 0x16, 0x26, 0xc3, 0x9c, 0x78, 0xca,
+	0x63, 0x87, 0x08, 0xdc, 0xf4, 0x75, 0xff, 0x06, 0xee, 0x24, 0xb8, 0x3f, 0x85, 0x0b, 0x4f, 0x31,
+	0x43, 0xfb, 0xa9, 0xa7, 0x05, 0xaf, 0xc9, 0xd7, 0x02, 0xea, 0x06, 0x8c, 0xf8, 0x85, 0x26, 0x0d,
+	0xb7, 0xc9, 0x1e, 0x35, 0x88, 0x1c, 0x7a, 0xc2, 0xff, 0xd6, 0x5e, 0x28, 0x35, 0x1a, 0x74, 0x27,
+	0x2e, 0xd5, 0xbc, 0x96, 0x22, 0x67, 0x91, 0xb0, 0xeb, 0xb0, 0x18, 0x78, 0xe4, 0xa0, 0xf2, 0xf5,
+	0x77, 0x61, 0x91, 0x26, 0xdd, 0x01, 0x01, 0x91, 0x94, 0x70, 0x3f, 0x53, 0x20, 0xcd, 0xa2, 0x84,
+	0xe4, 0xdb, 0x41, 0x09, 0xea, 0x2f, 0xd9, 0x96, 0xe8, 0x44, 0x43, 0x50, 0xe8, 0xa4, 0xb9, 0x76,
+	0xe5, 0xeb, 0x30, 0x52, 0xf1, 0x0e, 0x2b, 0x0e, 0xda, 0x80, 0xe9, 0xcd, 0x96, 0x61, 0xac, 0x5a,
+	0xe6, 0xae, 0xde, 0x6c, 0x39, 0xac, 0xf9, 0x22, 0x7f, 0x7b, 0xe4, 0x16, 0x22, 0x7b, 0x21, 0xca,
+	0x77, 0x94, 0x95, 0xdf, 0x9e, 0x83, 0xd1, 0xaa, 0xbb, 0xe5, 0x62, 0x07, 0xad, 0x02, 0x04, 0x13,
+	0x4e, 0x34, 0x17, 0xfe, 0x98, 0x16, 0x06, 0x7a, 0xb9, 0x5c, 0xdc, 0x16, 0x33, 0xe8, 0x2e, 0x8c,
+	0xb1, 0xe1, 0x25, 0xba, 0xd8, 0xfd, 0x4a, 0x71, 0xb1, 0x23, 0xea, 0xd4, 0xdd, 0x88, 0x8e, 0x39,
+	0x1f, 0x02, 0x04, 0x83, 0x4a, 0x34, 0x5b, 0xa4, 0x53, 0xe1, 0x22, 0x9f, 0x0a, 0x17, 0xd7, 0x0f,
+	0x6c, 0xaf, 0x1d, 0x88, 0x8f, 0x19, 0x6a, 0xae, 0x02, 0x04, 0xf3, 0xba, 0xc0, 0x86, 0x9e, 0xa1,
+	0x64, 0xc0, 0x24, 0x66, 0xf0, 0x58, 0x85, 0xa9, 0xc8, 0x90, 0x10, 0xe5, 0x7b, 0x8f, 0x8b, 0xd3,
+	0xc3, 0x9c, 0x44, 0x57, 0xb4, 0x21, 0x4e, 0x36, 0xf9, 0xfc, 0x10, 0x5d, 0xee, 0xe5, 0x16, 0x99,
+	0x2d, 0x4a, 0x19, 0xde, 0x03, 0x58, 0xc3, 0x06, 0x66, 0x06, 0x4a, 0x21, 0x96, 0x93, 0xa7, 0xd7,
+	0x74, 0x57, 0xdb, 0x31, 0x28, 0xbd, 0x0c, 0x62, 0xc9, 0xfa, 0xca, 0xcf, 0x27, 0x61, 0xa2, 0xea,
+	0x0a, 0x4d, 0x3a, 0xf4, 0x88, 0xcf, 0xe6, 0xc5, 0xc5, 0x42, 0xd8, 0x41, 0x7a, 0xa7, 0x6d, 0xb9,
+	0xb8, 0x99, 0x1d, 0x5a, 0x87, 0x49, 0xff, 0x4a, 0x85, 0x95, 0x63, 0xba, 0x91, 0xf1, 0x6c, 0x9e,
+	0xc0, 0xdb, 0xd1, 0x09, 0xa2, 0xd4, 0xd0, 0x82, 0xf8, 0x79, 0x17, 0x3b, 0x73, 0x7c, 0xc4, 0x47,
+	0xda, 0xb1, 0x06, 0xca, 0xc6, 0x89, 0xf1, 0x9a, 0x3d, 0x86, 0x69, 0x7a, 0x79, 0x27, 0xb1, 0x51,
+	0x76, 0x95, 0x4f, 0x00, 0xb1, 0xab, 0x3c, 0x23, 0x6e, 0x35, 0xec, 0x7a, 0x96, 0x73, 0x26, 0xdc,
+	0x9e, 0xc2, 0x4c, 0xdc, 0xdc, 0x10, 0x5d, 0xe9, 0xf2, 0x93, 0x4f, 0x15, 0xa5, 0x4c, 0x37, 0x7d,
+	0xf7, 0x10, 0x07, 0x61, 0xc7, 0xaa, 0x97, 0x0f, 0x32, 0x45, 0xec, 0x00, 0xed, 0x13, 0x98, 0x8d,
+	0x1f, 0x72, 0x1d, 0xcb, 0xf9, 0xff, 0x24, 0x7e, 0x13, 0x1d, 0x92, 0x3d, 0x86, 0x8b, 0x3d, 0x83,
+	0x00, 0xa6, 0x7c, 0x56, 0x10, 0x11, 0x9a, 0x4c, 0x4a, 0x01, 0xf8, 0x04, 0xe6, 0xa4, 0x13, 0x31,
+	0xb4, 0x14, 0x63, 0x6b, 0xec, 0xd0, 0x2c, 0x27, 0x1f, 0xf9, 0xa0, 0x67, 0x30, 0x13, 0x8e, 0x40,
+	0xb6, 0x7e, 0x45, 0x4a, 0x22, 0xa8, 0x9d, 0xc0, 0x37, 0x06, 0x68, 0x3a, 0x53, 0x3a, 0x3d, 0xd0,
+	0x91, 0xc9, 0xd6, 0xb3, 0x38, 0xa0, 0x4f, 0xa0, 0xbc, 0x0c, 0xf3, 0x6d, 0xd2, 0xc7, 0x92, 0x8c,
+	0x71, 0xd0, 0x8d, 0x78, 0x7f, 0x8e, 0x29, 0x76, 0xa4, 0x02, 0x0c, 0x58, 0x48, 0x9a, 0x4a, 0x1d,
+	0x0b, 0xd0, 0x4d, 0x09, 0x40, 0xf1, 0x75, 0x1d, 0xe6, 0xcd, 0x24, 0x99, 0x45, 0x5d, 0x76, 0xfd,
+	0xcc, 0xaf, 0xa4, 0x46, 0x55, 0xe0, 0x7c, 0x18, 0x11, 0x5a, 0x87, 0x65, 0x63, 0x6c, 0x21, 0x3b,
+	0x52, 0x46, 0xdf, 0x82, 0x0b, 0xb1, 0x63, 0xa1, 0x63, 0x61, 0xb9, 0x26, 0x81, 0x25, 0x52, 0x7f,
+	0x3d, 0x82, 0xd9, 0x1e, 0x43, 0x4f, 0xa9, 0xeb, 0x4a, 0x27, 0x0d, 0xa9, 0xaa, 0xcb, 0xea, 0x2c,
+	0x74, 0x1f, 0x26, 0x42, 0x63, 0x08, 0xb4, 0x90, 0x34, 0x9d, 0xc8, 0x45, 0xfb, 0xfd, 0xe8, 0x7d,
+	0x52, 0x0b, 0xf1, 0xa7, 0xa4, 0x12, 0xaf, 0x87, 0x74, 0x0d, 0x32, 0xe2, 0x94, 0x41, 0xfa, 0xf2,
+	0x5b, 0x88, 0xe9, 0x6d, 0x06, 0xd0, 0xdc, 0x87, 0x89, 0x50, 0x7b, 0x39, 0x30, 0x20, 0xae, 0xeb,
+	0xdc, 0xab, 0xc5, 0x2a, 0x4c, 0xd0, 0x97, 0x5d, 0x3f, 0x36, 0xc8, 0xee, 0x7f, 0x0d, 0x26, 0xd9,
+	0x4b, 0xee, 0x75, 0xb8, 0x7c, 0x8d, 0xb8, 0x63, 0xb4, 0x7f, 0x8a, 0x54, 0x21, 0x7a, 0x25, 0xcd,
+	0x55, 0x29, 0xcb, 0x17, 0xd4, 0x31, 0x7b, 0x3a, 0xc2, 0x89, 0xfa, 0x5d, 0xeb, 0xab, 0x99, 0x8c,
+	0x9e, 0x73, 0xa7, 0xec, 0xd1, 0xf8, 0x5a, 0x38, 0x3a, 0x4f, 0xaa, 0xf4, 0x87, 0x30, 0xdd, 0xd3,
+	0xca, 0x0d, 0x6a, 0x19, 0x59, 0x97, 0x57, 0xca, 0xee, 0x19, 0xed, 0x6c, 0x44, 0xba, 0xb0, 0x89,
+	0x08, 0x5c, 0x89, 0x43, 0x20, 0xda, 0xbe, 0x7d, 0x0a, 0x33, 0x71, 0x3d, 0xd8, 0x20, 0x91, 0x27,
+	0x74, 0x68, 0xa5, 0xca, 0x3e, 0x87, 0xd9, 0xf8, 0x56, 0x6a, 0x00, 0x6a, 0x62, 0xab, 0x35, 0xe1,
+	0xad, 0x9c, 0x95, 0xb5, 0x3f, 0x13, 0xa1, 0x58, 0x8a, 0x81, 0x22, 0x3e, 0x69, 0xd7, 0x60, 0xba,
+	0xa7, 0xf5, 0x99, 0xc8, 0xfa, 0x72, 0x0c, 0xeb, 0x48, 0xc7, 0xf4, 0x25, 0xcc, 0x49, 0x7b, 0xa2,
+	0x41, 0x2d, 0x71, 0x5c, 0xdb, 0x54, 0x0a, 0xca, 0x03, 0x98, 0x0a, 0xd0, 0xa4, 0x09, 0x75, 0x26,
+	0xa2, 0x70, 0x72, 0xe2, 0x0f, 0xdb, 0xcc, 0x92, 0xfe, 0x49, 0x6d, 0x8e, 0x24, 0xfb, 0xb2, 0x5f,
+	0xe3, 0x0a, 0x06, 0x9d, 0x42, 0xaf, 0x95, 0x3f, 0xa7, 0x60, 0xbc, 0xea, 0xd2, 0x6f, 0x79, 0x74,
+	0x17, 0x32, 0x62, 0x07, 0x14, 0xcd, 0x87, 0x53, 0x7c, 0xa8, 0x51, 0x97, 0x8b, 0xf4, 0xf7, 0xd0,
+	0x6d, 0x48, 0x55, 0x78, 0xa3, 0x0a, 0xc9, 0x3b, 0x12, 0x3d, 0x74, 0x65, 0x48, 0x0b, 0xfd, 0x44,
+	0x69, 0x72, 0x9f, 0x17, 0xf1, 0x88, 0x36, 0x1f, 0xef, 0x42, 0x46, 0xec, 0x25, 0x06, 0x8a, 0xc7,
+	0x74, 0x18, 0x7b, 0x14, 0x28, 0x41, 0x86, 0x26, 0xf6, 0xe3, 0x75, 0x97, 0xdd, 0x6e, 0x15, 0x66,
+	0x3e, 0xd4, 0x9c, 0x7d, 0x4a, 0x50, 0x72, 0x37, 0x76, 0x77, 0xf5, 0xba, 0xae, 0x19, 0xa7, 0x61,
+	0xf5, 0x18, 0x66, 0xb7, 0xcc, 0x83, 0x33, 0x62, 0x56, 0x81, 0xc9, 0x70, 0xf3, 0x10, 0x5d, 0xe2,
+	0x4c, 0x62, 0x9b, 0x8a, 0x52, 0x46, 0x65, 0x98, 0x60, 0xef, 0xad, 0xd3, 0x83, 0x54, 0x86, 0x89,
+	0x92, 0x6d, 0x3b, 0xdd, 0x16, 0xda, 0x69, 0x78, 0x94, 0x20, 0x53, 0xc3, 0xdf, 0xc6, 0x75, 0xef,
+	0xf4, 0x2c, 0xb6, 0xe0, 0x42, 0x6c, 0x3b, 0x13, 0x5d, 0x15, 0xf2, 0xa6, 0xb4, 0xc9, 0x27, 0x65,
+	0xfb, 0x12, 0x2e, 0x4a, 0x9a, 0x90, 0x49, 0x4a, 0x5e, 0xef, 0xf5, 0xea, 0xf8, 0x9c, 0xf9, 0x4d,
+	0xc8, 0xca, 0xda, 0x8f, 0xe8, 0x7a, 0x38, 0xbd, 0x9d, 0x5c, 0xf7, 0x7b, 0x30, 0xd9, 0xb5, 0x99,
+	0x26, 0x91, 0x48, 0x43, 0x38, 0x39, 0xb7, 0x6d, 0xd0, 0x06, 0x85, 0xd8, 0x10, 0x4c, 0xb2, 0xb9,
+	0xd0, 0x6b, 0x73, 0x24, 0xb1, 0x3d, 0x84, 0x69, 0xd1, 0x94, 0x93, 0xab, 0x54, 0xae, 0xfc, 0xe5,
+	0xef, 0xf9, 0xb7, 0x7e, 0xd0, 0xc9, 0x2b, 0x9f, 0x77, 0xf2, 0xca, 0x17, 0x9d, 0xbc, 0xf2, 0xb7,
+	0x4e, 0x5e, 0xf9, 0x47, 0x27, 0xff, 0xd6, 0x3f, 0x3b, 0x79, 0xe5, 0xc5, 0x8d, 0xbe, 0xfe, 0xd0,
+	0xe9, 0x99, 0xf6, 0xce, 0xce, 0x28, 0x61, 0xfc, 0xde, 0xbf, 0x02, 0x00, 0x00, 0xff, 0xff, 0xbd,
+	0x1a, 0x01, 0x8a, 0x7e, 0x33, 0x00, 0x00,
 }
