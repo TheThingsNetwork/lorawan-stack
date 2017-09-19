@@ -130,6 +130,7 @@ func FromGRPC(in error) errors.Error {
 				m, err := goproto.Map(details)
 				if err != nil {
 					// TODO handle errors properly(write to log?)
+					// https://github.com/TheThingsIndustries/ttn/issues/137
 					fmt.Printf("Error decoding grpc error: %s", err)
 					continue
 				}
