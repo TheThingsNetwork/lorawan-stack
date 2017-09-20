@@ -64,7 +64,7 @@ func UnmarshalMap(m map[string]interface{}, v interface{}) error {
 
 func fieldByFlatName(typ reflect.Type, name string) (f reflect.StructField, ok bool) {
 	if name == "" {
-		panic(errors.New(fmt.Sprintf("github.com/TheThingsNetwork/ttn/pkg/store.fieldByFlatName: empty name specified")))
+		panic(errors.New("github.com/TheThingsNetwork/ttn/pkg/store.fieldByFlatName: empty name specified"))
 	}
 	for _, name := range strings.Split(name, Separator) {
 		f, ok = typ.FieldByName(name)

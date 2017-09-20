@@ -2,6 +2,9 @@
 
 package store
 
+import "sync"
+
+// NewResultFunc represents a constructor of some arbitrary type.
 type NewResultFunc func() interface{}
 
 // Client represents a generic interface to interact with different store implementations
@@ -17,6 +20,7 @@ type typedStoreClient struct {
 	TypedStore
 }
 
+// NewTypedStoreClient returns a new instance of the Client, which uses TypedStore as the storing backend.
 func NewTypedStoreClient(s TypedStore) Client {
 	return &typedStoreClient{s}
 }
@@ -62,6 +66,7 @@ type byteStoreClient struct {
 	ByteStore
 }
 
+// NewByteStoreClient returns a new instance of the Client, which uses ByteStore as the storing backend.
 func NewByteStoreClient(s ByteStore) Client {
 	return &byteStoreClient{s}
 }

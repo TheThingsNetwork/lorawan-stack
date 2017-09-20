@@ -7,16 +7,23 @@ import (
 	"fmt"
 )
 
+// Encoding represents the encoding used to encode value into []byte representation.
+// This is used as the first byte in the encoded []byte representation and allows for consistent decoding.
 type Encoding byte
 
 const (
-	// Separator, used to separate the flattened struct fields
+	// Separator used to separate the flattened struct fields
 	Separator = "."
 
+	// UnknownEncoding represents case when unknown encoding(i.e. String() method) used.
 	UnknownEncoding Encoding = iota
+	// BinaryEncoding represents case when MarshalBinary() method was used to encode value.
 	BinaryEncoding
+	// TextEncoding represents case when MarshalText() method was used to encode value.
 	TextEncoding
+	// ProtoEncoding represents case when Proto() method was used to encode value.
 	ProtoEncoding
+	// JSONEncoding represents case when MarshalJSON() method was used to encode value.
 	JSONEncoding
 )
 

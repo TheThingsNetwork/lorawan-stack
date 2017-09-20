@@ -80,6 +80,7 @@ func TestTypedStore(t *testing.T, s store.TypedStore) {
 	a.So(fields, should.Equal, nil)
 }
 
+// TestByteStore executes a black-box test for the given byte store
 func TestByteStore(t testingT, s store.ByteStore) {
 	a := assertions.New(t)
 
