@@ -119,8 +119,6 @@ SetTypeAttribute
 GetTypeAttribute
 ListTypeAttributes (returns slice)
 RemoveTypeAttribute
-
-StreamTypes (returns channel)
 ```
 
 ### Variable naming
