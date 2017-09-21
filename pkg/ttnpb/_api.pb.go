@@ -70,7 +70,7 @@ It has these top-level messages:
 	ListApplicationsResponse
 	UpdateApplicationRequest
 	AddApplicationAppEUIRequest
-	GenerateAppEUIResponse
+	GenerateApplicationAppEUIResponse
 	ListApplicationAppEUIsResponse
 	GenerateApplicationAPIKeyRequest
 	ListApplicationAPIKeysResponse

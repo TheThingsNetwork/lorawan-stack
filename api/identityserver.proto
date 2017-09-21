@@ -108,7 +108,7 @@ message AddApplicationAppEUIRequest {
   bytes app_eui = 2 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 }
 
-message GenerateAppEUIResponse {
+message GenerateApplicationAppEUIResponse {
   // app_eui is the AppEUI that has been generated.
   bytes app_eui = 1 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 }
@@ -182,8 +182,8 @@ service IsApplication {
   // AddApplicationAppEUI adds a given AppEUI to a given application.
   rpc AddApplicationAppEUI(AddApplicationAppEUIRequest) returns (google.protobuf.Empty);
 
-  // GenerateAppEUI generates a new AppEUI for a given application and returns it.
-  rpc GenerateAppEUI(ApplicationIdentifiers) returns (GenerateAppEUIResponse);
+  // GenerateApplicationAppEUI generates a new AppEUI for a given application and returns it.
+  rpc GenerateApplicationAppEUI(ApplicationIdentifiers) returns (GenerateApplicationAppEUIResponse);
 
   // ListApplicationAppEUIs returns all the registered AppEUIs of an application.
   rpc ListApplicationAppEUIs(ApplicationIdentifiers) returns (ListApplicationAppEUIsResponse);
