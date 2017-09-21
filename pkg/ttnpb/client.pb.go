@@ -83,7 +83,7 @@ type ClientGrant int32
 const (
 	// Grant type used to exchange an authorization code for an access token.
 	GRANT_AUTHORIZATION_CODE ClientGrant = 0
-	// Grant type used to exchange an username and password for an access token.
+	// Grant type used to exchange an user ID and password for an access token.
 	GRANT_PASSWORD ClientGrant = 1
 	// Grant type used to exchange a refresh token for an access token.
 	GRANT_REFRESH_TOKEN ClientGrant = 2

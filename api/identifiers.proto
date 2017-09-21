@@ -27,8 +27,9 @@ message ApplicationCollaboratorIdentifiers {
   string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
   // TTN Tenant ID (in case of multi-tenant network stack)
   string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
-  // username of the user.
-  string username = 3;
+
+  // user_id is the id of the user
+  string user_id = 3 [(gogoproto.customname) = "UserID"];
   // email address of the user.
   string email = 4;
 }
@@ -54,8 +55,9 @@ message GatewayCollaboratorIdentifiers {
   string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
   // TTN Tenant ID (in case of multi-tenant network stack)
   string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
-  // username of the user.
-  string username = 3;
+
+  // user_id is the id of the user
+  string user_id = 3 [(gogoproto.customname) = "UserID"];
   // email address of the user.
   string email = 4;
 }
@@ -79,8 +81,8 @@ message EndDeviceIdentifiers {
 }
 
 message UserIdentifiers {
-  // username of the user
-  string username = 1;
+  // user_id is the id of the user
+  string user_id = 1 [(gogoproto.customname) = "UserID"];
   // email address of the user
   string email = 2;
   // TTN Tenant ID (in case of multi-tenant network stack)
@@ -99,8 +101,9 @@ message ClientCollaboratorIdentifiers {
   string client_id = 1 [(gogoproto.customname) = "ClientID"];
   // TTN Tenant ID (in case of multi-tenant network stack)
   string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
-  // username of the user.
-  string username = 3;
+
+  // user_id is the id of the user
+  string user_id = 3 [(gogoproto.customname) = "UserID"];
   // email address of the user.
   string email = 4;
 
