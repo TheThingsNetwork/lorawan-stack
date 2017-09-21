@@ -94,6 +94,7 @@ It has these top-level messages:
 	CreateClientRequest
 	ListClientsResponse
 	UpdateClientRequest
+	SetClientOfficialRequest
 	SetClientStateRequest
 	ClientCollaborator
 	ListClientCollaboratorsResponse

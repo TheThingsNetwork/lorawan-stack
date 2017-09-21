@@ -481,6 +481,14 @@ message UpdateClientRequest {
   repeated ClientScope scope = 6;
 }
 
+message SetClientOfficialRequest {
+  ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // official denotes whether if the client is labelled as an official third-party
+  // client by the tenant admin.
+  bool official = 2;
+}
+
 message SetClientStateRequest {
   ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
@@ -527,26 +535,16 @@ service IsClient {
   // DeleteClient permanently deletes a client.
   rpc DeleteClient(ClientIdentifiers) returns (google.protobuf.Empty);
 
-  // MarkClientAsOfficial marks a client as an official third-party client
-  // created by the network operator.
-  rpc MarkClientAsOfficial(ClientIdentifiers) returns (google.protobuf.Empty);
+  // SetClientOfficial allows to a tenant admin to add or remove the official
+  // distinguise "official" label of a third-party client.
+  rpc SetClientOfficial(SetClientOfficialRequest) returns (google.protobuf.Empty);
 
-  // UnmarkClientAsOfficial unmarks a client as an official third-party client
-  // created by the network operator.
-  rpc UnmarkClientAsOfficial(ClientIdentifiers) returns (google.protobuf.Empty);
-
-  // SetClientState allows to the network operator to set the reviewing state of
+  // SetClientState allows to the tenant admin to set the reviewing state of
   // a third-party client request.
   rpc SetClientState(SetClientStateRequest) returns (google.protobuf.Empty);
 
   // DisableClient disables a client so it cannot be used anymore.
   rpc DisableClient(ClientIdentifiers) returns (google.protobuf.Empty);
-
-  // ApproveClient marks a client as approved by the network operator so it can be used.
-  rpc ApproveClient(ClientIdentifiers) returns (google.protobuf.Empty);
-
-  // RejectClient marks a client as rejected by the network operator so it cannot be used.
-  rpc RejectClient(ClientIdentifiers) returns (google.protobuf.Empty);
 
   // AddClientCollaborator makes an user collaborator of a client.
   rpc AddClientCollaborator(ClientCollaborator) returns (google.protobuf.Empty);
