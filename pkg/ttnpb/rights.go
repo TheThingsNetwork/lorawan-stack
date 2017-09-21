@@ -37,9 +37,9 @@ func (r *Right) UnmarshalText(text []byte) error {
 }
 
 func normalizeRight(right string) string {
-	return strings.ToLower(strings.Replace(right, "_", ":", -1))
+	return strings.ToLower(strings.Replace(strings.TrimLeft(right, "RIGHT_"), "_", ":", -1))
 }
 
 func denormalizeRight(right string) string {
-	return strings.ToUpper(strings.Replace(right, ":", "_", -1))
+	return "RIGHT_" + strings.ToUpper(strings.Replace(right, ":", "_", -1))
 }

@@ -14,9 +14,9 @@ enum Right {
   option (gogoproto.goproto_enum_prefix) = false;
   option (gogoproto.enum_stringer) = false;
 
-  APPLICATION_DELETE = 0 [(gogoproto.enumvalue_customname) = "RightApplicationDelete"];
-  APPLICATION_SETTINGS = 1 [(gogoproto.enumvalue_customname) = "RightApplicationSettings"];
-  APPLICATION_COLLABORATORS = 2 [(gogoproto.enumvalue_customname) = "RightApplicationCollaborators"];
+  RIGHT_APPLICATION_DELETE = 0;
+  RIGHT_APPLICATION_SETTINGS = 1;
+  RIGHT_APPLICATION_COLLABORATORS = 2;
 
-  GATEWAY_OWNER = 10 [(gogoproto.enumvalue_customname) = "RightGatewayOwner"];
+  RIGHT_GATEWAY_OWNER = 10;
 }

@@ -49,15 +49,15 @@ enum ClientState {
 
   // State that denotes that the client request is pending to review by the
   // tenant admin.
-  PENDING = 0 [(gogoproto.enumvalue_customname) = "ClientStatePending"];
+  STATE_PENDING = 0;
 
   // Denotes that the client request has been approved by the tenant admin
   // and therefore the client can be used.
-  APPROVED = 1 [(gogoproto.enumvalue_customname) = "ClientStateApproved"];
+  STATE_APPROVED = 1;
 
   // Denotes that the client request has beenr rejected by the tenant admin
   // and therefore it cannot be used.
-  REJECTED = 2 [(gogoproto.enumvalue_customname) = "ClientStateRejected"];
+  STATE_REJECTED = 2;
 }
 
 // Scope enum defines the different scopes a third-party client can have access to.
@@ -65,10 +65,10 @@ enum ClientScope {
   option (gogoproto.goproto_enum_prefix) = false;
 
   // Denotes whether if the client has access to manage user's applications.
-  APPLICATION = 0 [(gogoproto.enumvalue_customname) = "ClientScopeApplication"];
+  SCOPE_APPLICATION = 0;
 
   // Denotes wheter if the client has r-w access to user's profile.
-  PROFILE = 1 [(gogoproto.enumvalue_customname) = "ClientScopeProfile"];
+  SCOPE_PROFILE = 1;
 }
 
 // Grant enum defines the OAuth2 flows a third-party client can use to get
@@ -77,11 +77,11 @@ enum ClientGrant {
   option (gogoproto.goproto_enum_prefix) = false;
 
   // Grant type used to exchange an authorization code for an access token.
-  AUTHORIZATION_CODE = 0 [(gogoproto.enumvalue_customname) = "ClientGrantAuthorizationCode"];
+  GRANT_AUTHORIZATION_CODE = 0;
 
   // Grant type used to exchange an username and password for an access token.
-  PASSWORD = 1 [(gogoproto.enumvalue_customname) = "ClientGrantPassword"];
+  GRANT_PASSWORD = 1;
 
   // Grant type used to exchange a refresh token for an access token.
-  REFRESH_TOKEN = 2 [(gogoproto.enumvalue_customname) = "ClientGrantRefreshToken"];
+  GRANT_REFRESH_TOKEN = 2;
 }

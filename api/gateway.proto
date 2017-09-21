@@ -88,10 +88,10 @@ message GatewayAntenna {
 enum GatewayAntennaPlacement {
   option (gogoproto.goproto_enum_prefix) = false;
   // The antenna is placed indoors.
-  INDOOR  = 0 [(gogoproto.enumvalue_customname) = "GatewayAntennaPlacementIndoor"];
+  PLACEMENT_INDOOR  = 0;
 
   // The antenna is placed outdoors.
-  OUTDOOR = 1 [(gogoproto.enumvalue_customname) = "GatewayAntennaPlacementOutdoor"];
+  PLACEMENT_OUTDOOR = 1;
 }
 
 // GatewayConfiguration contains all the latest values relative to this gateway.

@@ -12,27 +12,27 @@ import (
 
 func TestRightNormalization(t *testing.T) {
 	a := assertions.New(t)
-	a.So(normalizeRight("APPLICATION_DELETE"), should.Equal, "application:delete")
-	a.So(denormalizeRight("application:delete"), should.Equal, "APPLICATION_DELETE")
+	a.So(normalizeRight("RIGHT_APPLICATION_DELETE"), should.Equal, "application:delete")
+	a.So(denormalizeRight("application:delete"), should.Equal, "RIGHT_APPLICATION_DELETE")
 }
 
 func TestRightStringer(t *testing.T) {
 	a := assertions.New(t)
-	a.So(RightApplicationDelete.String(), should.Equal, "application:delete")
+	a.So(RIGHT_APPLICATION_DELETE.String(), should.Equal, "application:delete")
 	a.So(Right(1234).String(), should.Equal, "1234")
 }
 
 func TestRightText(t *testing.T) {
 	a := assertions.New(t)
 
-	text, err := RightApplicationDelete.MarshalText()
+	text, err := RIGHT_APPLICATION_DELETE.MarshalText()
 	a.So(err, should.BeNil)
 	a.So(string(text), should.Equal, "application:delete")
 
 	var right Right
 	err = (&right).UnmarshalText([]byte("application:delete"))
 	a.So(err, should.BeNil)
-	a.So(right, should.Equal, RightApplicationDelete)
+	a.So(right, should.Equal, RIGHT_APPLICATION_DELETE)
 
 	err = right.UnmarshalText([]byte("foo"))
 	a.So(err, should.NotBeNil)
@@ -41,14 +41,14 @@ func TestRightText(t *testing.T) {
 func TestRightJSON(t *testing.T) {
 	a := assertions.New(t)
 
-	b, err := json.Marshal(RightApplicationDelete)
+	b, err := json.Marshal(RIGHT_APPLICATION_DELETE)
 	a.So(err, should.BeNil)
 	a.So(b, should.Resemble, []byte(`"application:delete"`))
 
 	var right Right
 	err = json.Unmarshal([]byte(`"application:delete"`), &right)
 	a.So(err, should.BeNil)
-	a.So(right, should.Equal, RightApplicationDelete)
+	a.So(right, should.Equal, RIGHT_APPLICATION_DELETE)
 
 	err = json.Unmarshal([]byte(`"foo"`), right)
 	a.So(err, should.NotBeNil)

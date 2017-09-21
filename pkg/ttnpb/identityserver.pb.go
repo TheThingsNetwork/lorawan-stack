@@ -317,7 +317,7 @@ func (m *ApplicationRight) GetRight() Right {
 	if m != nil {
 		return m.Right
 	}
-	return RightApplicationDelete
+	return RIGHT_APPLICATION_DELETE
 }
 
 type ListApplicationRightsResponse struct {
@@ -765,7 +765,7 @@ func (m *GatewayRight) GetRight() Right {
 	if m != nil {
 		return m.Right
 	}
-	return RightApplicationDelete
+	return RIGHT_APPLICATION_DELETE
 }
 
 type ListGatewayRightsResponse struct {
@@ -929,7 +929,7 @@ func (m *SetClientStateRequest) GetState() ClientState {
 	if m != nil {
 		return m.State
 	}
-	return ClientStatePending
+	return STATE_PENDING
 }
 
 type ClientCollaborator struct {
@@ -981,7 +981,7 @@ func (m *ClientRight) GetRight() Right {
 	if m != nil {
 		return m.Right
 	}
-	return RightApplicationDelete
+	return RIGHT_APPLICATION_DELETE
 }
 
 type ListClientRightsResponse struct {
