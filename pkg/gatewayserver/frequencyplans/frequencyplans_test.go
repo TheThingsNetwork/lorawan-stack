@@ -85,9 +85,9 @@ func ExampleBaseURIOption() {
 	}
 }
 
-func ExampleFilesystemRootPathOption() {
+func ExampleFileSystemRootPathOption() {
 	// If all the frequency plans and the list of frequency plans are located in /workdir/frequencyplans:
-	store, err := frequencyplans.ReadFilesystemStore(frequencyplans.FilesystemRootPathOption("/workdir/frequencyplans"))
+	store, err := frequencyplans.ReadFileSystemStore(frequencyplans.FileSystemRootPathOption("/workdir/frequencyplans"))
 	if err != nil {
 		panic(err)
 	}

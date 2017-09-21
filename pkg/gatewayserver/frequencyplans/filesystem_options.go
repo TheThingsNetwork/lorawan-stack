@@ -25,11 +25,11 @@ func (c storeReadConfiguration) AbsolutePath(filename string) string {
 	return filename
 }
 
-// ReadFilesystemStoreOption is an option applied when creating the store from the filesystem.
-type ReadFilesystemStoreOption func(*storeReadConfiguration)
+// ReadFileSystemStoreOption is an option applied when creating the store from the filesystem.
+type ReadFileSystemStoreOption func(*storeReadConfiguration)
 
-// FilesystemRootPathOption can be used to specify the path to the directory where frequency plans will be read. The default path used is the directory of execution.
-func FilesystemRootPathOption(path string) ReadFilesystemStoreOption {
+// FileSystemRootPathOption can be used to specify the path to the directory where frequency plans will be read. The default path used is the directory of execution.
+func FileSystemRootPathOption(path string) ReadFileSystemStoreOption {
 	return func(config *storeReadConfiguration) {
 		config.Root = path
 	}

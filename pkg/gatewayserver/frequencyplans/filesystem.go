@@ -11,10 +11,10 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// ReadFilesystemStore returns a new Store of frequency plans, based on the options given, read from the local filesystem.
+// ReadFileSystemStore returns a new Store of frequency plans, based on the options given, read from the local filesystem.
 //
-// By default, ReadFilesystemStore reads the files in the current directory. It is possible to specify a root directory through options.
-func ReadFilesystemStore(options ...ReadFilesystemStoreOption) (Store, error) {
+// By default, ReadFileSystemStore reads the files in the current directory. It is possible to specify a root directory through options.
+func ReadFileSystemStore(options ...ReadFileSystemStoreOption) (Store, error) {
 	config := storeReadConfiguration{}
 
 	for _, option := range options {
@@ -23,7 +23,7 @@ func ReadFilesystemStore(options ...ReadFilesystemStoreOption) (Store, error) {
 
 	store, err := readFileSystemStore(config)
 	if err != nil {
-		return nil, errors.NewWithCause("Reading frequency plans from the filesystem failed", err)
+		return nil, errors.NewWithCause("Reading frequency plans from the file system failed", err)
 	}
 
 	return store, nil
