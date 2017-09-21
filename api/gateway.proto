@@ -43,7 +43,7 @@ message Gateway {
   // automatically fetch and execute firmware updates.
   bool auto_update = 9 [(gogoproto.moretags) = "db:\"auto_update\""];
 
-  // platform is the gatewqay platform, e.g. "The Things Gateway" or "Kerklink iBTS"
+  // platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS"
   string platform = 10;
 
   // antennas is all the antennas that the gateway has.

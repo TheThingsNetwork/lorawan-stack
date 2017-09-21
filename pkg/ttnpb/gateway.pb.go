@@ -74,7 +74,7 @@ type Gateway struct {
 	// auto_update indicates whether or not the gateway should be able to
 	// automatically fetch and execute firmware updates.
 	AutoUpdate bool `protobuf:"varint,9,opt,name=auto_update,json=autoUpdate,proto3" json:"auto_update,omitempty" db:"auto_update"`
-	// platform is the gatewqay platform, e.g. "The Things Gateway" or "Kerklink iBTS"
+	// platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS"
 	Platform string `protobuf:"bytes,10,opt,name=platform,proto3" json:"platform,omitempty"`
 	// antennas is all the antennas that the gateway has.
 	Antennas []GatewayAntenna `protobuf:"bytes,11,rep,name=antennas" json:"antennas"`
