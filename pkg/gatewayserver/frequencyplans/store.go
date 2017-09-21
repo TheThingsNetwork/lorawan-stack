@@ -39,7 +39,7 @@ func (s store) GetByID(id string) (ttnpb.FrequencyPlan, error) {
 }
 
 func (s store) GetAllIDs() []string {
-	ids := make([]string, 0)
+	ids := []string{}
 
 	for frequencyPlanID := range s {
 		ids = append(ids, frequencyPlanID)

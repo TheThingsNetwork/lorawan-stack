@@ -10,15 +10,14 @@ import (
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/band"
-
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/frequencyplans"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
-type frequencyPlansFilesystem string
+type frequencyPlansFileSystem string
 
-func createMockFilesystem() (frequencyPlansFilesystem, error) {
+func createMockFileSystem() (frequencyPlansFileSystem, error) {
 	dir, err := ioutil.TempDir("", "")
 	if err != nil {
 		return "", err
@@ -30,26 +29,26 @@ func createMockFilesystem() (frequencyPlansFilesystem, error) {
 	}
 	f.Close()
 
-	return frequencyPlansFilesystem(dir), nil
+	return frequencyPlansFileSystem(dir), nil
 }
 
-func (fs frequencyPlansFilesystem) Destroy() error {
+func (fs frequencyPlansFileSystem) Destroy() error {
 	return os.RemoveAll(string(fs))
 }
 
-func (fs frequencyPlansFilesystem) Dir() string {
+func (fs frequencyPlansFileSystem) Dir() string {
 	return string(fs)
 }
 
 func TestReadEmptyFrequencyPlans(t *testing.T) {
 	a := assertions.New(t)
 
-	fs, err := createMockFilesystem()
+	fs, err := createMockFileSystem()
 	a.So(err, should.BeNil)
 	defer fs.Destroy()
 
-	rootPathOption := frequencyplans.FilesystemRootPathOption(fs.Dir())
-	store, err := frequencyplans.ReadFilesystemStore(rootPathOption)
+	rootPathOption := frequencyplans.FileSystemRootPathOption(fs.Dir())
+	store, err := frequencyplans.ReadFileSystemStore(rootPathOption)
 	a.So(err, should.BeNil)
 
 	ids := store.GetAllIDs()
@@ -59,12 +58,12 @@ func TestReadEmptyFrequencyPlans(t *testing.T) {
 func TestAbsoluteListFilepath(t *testing.T) {
 	a := assertions.New(t)
 
-	fs, err := createMockFilesystem()
+	fs, err := createMockFileSystem()
 	a.So(err, should.BeNil)
 	defer fs.Destroy()
 
-	rootPathOption := frequencyplans.FilesystemRootPathOption(fs.Dir())
-	store, err := frequencyplans.ReadFilesystemStore(rootPathOption)
+	rootPathOption := frequencyplans.FileSystemRootPathOption(fs.Dir())
+	store, err := frequencyplans.ReadFileSystemStore(rootPathOption)
 	a.So(err, should.BeNil)
 
 	ids := store.GetAllIDs()
@@ -77,15 +76,15 @@ func TestReadInexistantStore(t *testing.T) {
 	tempDir, err := ioutil.TempDir("", "")
 	a.So(err, should.BeNil)
 
-	rootPathOption := frequencyplans.FilesystemRootPathOption(tempDir)
-	_, err = frequencyplans.ReadFilesystemStore(rootPathOption)
+	rootPathOption := frequencyplans.FileSystemRootPathOption(tempDir)
+	_, err = frequencyplans.ReadFileSystemStore(rootPathOption)
 	a.So(err, should.NotBeNil)
 }
 
 func TestReadInvalidStore(t *testing.T) {
 	a := assertions.New(t)
 
-	fs, err := createMockFilesystem()
+	fs, err := createMockFileSystem()
 	a.So(err, should.BeNil)
 	defer fs.Destroy()
 
@@ -93,15 +92,15 @@ func TestReadInvalidStore(t *testing.T) {
 	err = ioutil.WriteFile(listFile, []byte(`    invalid: yaml`), 0666)
 	a.So(err, should.BeNil)
 
-	rootPathOption := frequencyplans.FilesystemRootPathOption(fs.Dir())
-	_, err = frequencyplans.ReadFilesystemStore(rootPathOption)
+	rootPathOption := frequencyplans.FileSystemRootPathOption(fs.Dir())
+	_, err = frequencyplans.ReadFileSystemStore(rootPathOption)
 	a.So(err, should.NotBeNil)
 }
 
 func TestReadStoreWithInexistantFP(t *testing.T) {
 	a := assertions.New(t)
 
-	fs, err := createMockFilesystem()
+	fs, err := createMockFileSystem()
 	a.So(err, should.BeNil)
 	defer fs.Destroy()
 
@@ -109,15 +108,15 @@ func TestReadStoreWithInexistantFP(t *testing.T) {
 	err = ioutil.WriteFile(listFile, []byte(dummyFPList()), 0666)
 	a.So(err, should.BeNil)
 
-	rootPathOption := frequencyplans.FilesystemRootPathOption(fs.Dir())
-	_, err = frequencyplans.ReadFilesystemStore(rootPathOption)
+	rootPathOption := frequencyplans.FileSystemRootPathOption(fs.Dir())
+	_, err = frequencyplans.ReadFileSystemStore(rootPathOption)
 	a.So(err, should.NotBeNil)
 }
 
 func TestReadValidStore(t *testing.T) {
 	a := assertions.New(t)
 
-	fs, err := createMockFilesystem()
+	fs, err := createMockFileSystem()
 	a.So(err, should.BeNil)
 	defer fs.Destroy()
 
@@ -132,8 +131,8 @@ func TestReadValidStore(t *testing.T) {
 	err = ioutil.WriteFile(frequencyPlanFilename, []byte(frequencyPlan), 0666)
 	a.So(err, should.BeNil)
 
-	rootPathOption := frequencyplans.FilesystemRootPathOption(fs.Dir())
-	store, err := frequencyplans.ReadFilesystemStore(rootPathOption)
+	rootPathOption := frequencyplans.FileSystemRootPathOption(fs.Dir())
+	store, err := frequencyplans.ReadFileSystemStore(rootPathOption)
 	a.So(err, should.BeNil)
 
 	ids := store.GetAllIDs()
@@ -147,7 +146,7 @@ func TestReadValidStore(t *testing.T) {
 func TestReadStoreWithInvalidFP(t *testing.T) {
 	a := assertions.New(t)
 
-	fs, err := createMockFilesystem()
+	fs, err := createMockFileSystem()
 	a.So(err, should.BeNil)
 	defer fs.Destroy()
 
@@ -160,15 +159,15 @@ func TestReadStoreWithInvalidFP(t *testing.T) {
 yaml`), 0666)
 	a.So(err, should.BeNil)
 
-	rootPathOption := frequencyplans.FilesystemRootPathOption(fs.Dir())
-	_, err = frequencyplans.ReadFilesystemStore(rootPathOption)
+	rootPathOption := frequencyplans.FileSystemRootPathOption(fs.Dir())
+	_, err = frequencyplans.ReadFileSystemStore(rootPathOption)
 	a.So(err, should.NotBeNil)
 }
 
 func TestReadLocalStore(t *testing.T) {
 	a := assertions.New(t)
 
-	fs, err := createMockFilesystem()
+	fs, err := createMockFileSystem()
 	a.So(err, should.BeNil)
 	defer fs.Destroy()
 
@@ -191,7 +190,7 @@ func TestReadLocalStore(t *testing.T) {
 	err = ioutil.WriteFile(frequencyplans.DefaultListFilename, []byte(frequencyPlanList), 0666)
 	a.So(err, should.BeNil)
 
-	store, err := frequencyplans.ReadFilesystemStore()
+	store, err := frequencyplans.ReadFileSystemStore()
 	a.So(err, should.BeNil)
 	ids := store.GetAllIDs()
 	a.So(len(ids), should.Equal, 1)

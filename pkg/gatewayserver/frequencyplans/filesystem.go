@@ -37,7 +37,7 @@ func readList(config storeReadConfiguration) ([]frequencyPlanDescription, error)
 		return nil, errors.NewWithCause("Reading frequency plans list failed", err)
 	}
 
-	list := make([]frequencyPlanDescription, 0)
+	list := []frequencyPlanDescription{}
 	err = yaml.Unmarshal(content, &list)
 	if err != nil {
 		return nil, errors.NewWithCause("Failed to parse the file content as a list of frequency plans", err)
@@ -69,7 +69,7 @@ func readFileSystemStore(config storeReadConfiguration) (store, error) {
 		return nil, errors.NewWithCause("Fetching list of frequency plans failed", err)
 	}
 
-	frequencyPlansStorage := make(store, 0)
+	frequencyPlansStorage := make(store)
 	for _, frequencyPlanDescription := range frequencyPlansInfo {
 		frequencyPlanContent, err := readFrequencyPlan(config, frequencyPlanDescription.Filename)
 		if err != nil {

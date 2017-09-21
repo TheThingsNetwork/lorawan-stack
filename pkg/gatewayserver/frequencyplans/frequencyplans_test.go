@@ -49,7 +49,7 @@ func gitHubFileURL(filename string) string {
 }
 
 func Example() {
-	store, err := frequencyplans.RetrieveHTTPStore()
+	store, err := frequencyplans.RetrieveWebStore()
 	if err != nil {
 		panic(err)
 	}
@@ -68,7 +68,7 @@ func Example() {
 
 func ExampleBaseURIOption() {
 	// A local HTTP server exposes the frequency plans list on /frequency-plans.yml, and exposes every frequency plan yml file on /<filename>
-	store, err := frequencyplans.RetrieveHTTPStore(frequencyplans.BaseURIOption("http://localhost"))
+	store, err := frequencyplans.RetrieveWebStore(frequencyplans.BaseURIOption("http://localhost"))
 	if err != nil {
 		panic(err)
 	}
@@ -104,7 +104,7 @@ func ExampleFileSystemRootPathOption() {
 	}
 }
 
-func TestRetrieveHTTPStoreWithoutFrequencyPlans(t *testing.T) {
+func TestRetrieveWebStoreWithoutFrequencyPlans(t *testing.T) {
 	a := assertions.New(t)
 
 	httpmock.Activate()
@@ -113,7 +113,7 @@ func TestRetrieveHTTPStoreWithoutFrequencyPlans(t *testing.T) {
 	frequencyPlansListURL := listURL()
 	httpmock.RegisterResponder("GET", frequencyPlansListURL, httpmock.NewStringResponder(200, dummyFPList()))
 
-	_, err := frequencyplans.RetrieveHTTPStore()
+	_, err := frequencyplans.RetrieveWebStore()
 	a.So(err, should.NotBeNil)
 }
 
@@ -127,7 +127,7 @@ func testKnownFrequencyPlan(a *assertions.Assertion, store frequencyplans.Store)
 	a.So(err, should.BeNil)
 }
 
-func TestRetrieveHTTPStore(t *testing.T) {
+func TestRetrieveWebStore(t *testing.T) {
 	a := assertions.New(t)
 
 	httpmock.Activate()
@@ -142,7 +142,7 @@ func TestRetrieveHTTPStore(t *testing.T) {
 	httpmock.RegisterResponder("GET", frequencyPlansListURL, httpmock.NewStringResponder(200, dummyFPList()))
 	httpmock.RegisterResponder("GET", europeanFPURL, httpmock.NewStringResponder(200, dummyFP))
 
-	store, err := frequencyplans.RetrieveHTTPStore()
+	store, err := frequencyplans.RetrieveWebStore()
 
 	a.So(err, should.BeNil)
 
@@ -170,7 +170,7 @@ func TestRetrieveWithOptions(t *testing.T) {
 	httpmock.RegisterResponder("GET", frequencyPlansListURL, httpmock.NewStringResponder(200, dummyFPList()))
 	httpmock.RegisterResponder("GET", europeanFPURL, httpmock.NewStringResponder(200, dummyFP))
 
-	store, err := frequencyplans.RetrieveHTTPStore(frequencyplans.BaseURIOption(dummyURI))
+	store, err := frequencyplans.RetrieveWebStore(frequencyplans.BaseURIOption(dummyURI))
 	a.So(err, should.BeNil)
 
 	ids := store.GetAllIDs()
@@ -189,7 +189,7 @@ func TestInvalidFrequencyPlansList(t *testing.T) {
 	frequencyPlansListURL := listURL()
 	httpmock.RegisterResponder("GET", frequencyPlansListURL, httpmock.NewStringResponder(200, list))
 
-	_, err := frequencyplans.RetrieveHTTPStore()
+	_, err := frequencyplans.RetrieveWebStore()
 	a.So(err, should.NotBeNil)
 }
 
@@ -205,7 +205,7 @@ func TestInvalidFrequencyPlan(t *testing.T) {
 	httpmock.RegisterResponder("GET", frequencyPlansListURL, httpmock.NewStringResponder(200, dummyFPList()))
 	httpmock.RegisterResponder("GET", europeanFPURL, httpmock.NewStringResponder(200, `    dummy`))
 
-	_, err := frequencyplans.RetrieveHTTPStore()
+	_, err := frequencyplans.RetrieveWebStore()
 	a.So(err, should.NotBeNil)
 }
 
@@ -218,7 +218,7 @@ func TestInvalidServerResponse(t *testing.T) {
 	frequencyPlansListURL := listURL()
 	httpmock.RegisterResponder("GET", frequencyPlansListURL, httpmock.NewStringResponder(500, "Internal Server Error"))
 
-	_, err := frequencyplans.RetrieveHTTPStore()
+	_, err := frequencyplans.RetrieveWebStore()
 	a.So(err, should.NotBeNil)
 }
 
@@ -242,6 +242,6 @@ func TestInvalidReader(t *testing.T) {
 
 	httpmock.RegisterResponder("GET", frequencyPlansListURL, responder)
 
-	_, err := frequencyplans.RetrieveHTTPStore()
+	_, err := frequencyplans.RetrieveWebStore()
 	a.So(err, should.NotBeNil)
 }

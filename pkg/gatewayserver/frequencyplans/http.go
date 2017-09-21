@@ -12,6 +12,20 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+// RetrieveWebStore returns a new Store of frequency plans, based on the options given, fetched from a HTTP server.
+//
+// By default, RetrieveWebStore fetches its frequency plans on GitHub in the TheThingsNetwork/gateway-conf repository, in the yaml-master branch. It is possible to specify another HTTP root through options.
+func RetrieveWebStore(options ...RetrieveWebStoreOption) (Store, error) {
+	baseURI := DefaultBaseURL
+
+	for _, option := range options {
+		option(&baseURI)
+	}
+
+	store, err := fetchFrequencyPlans(baseURI)
+	return &store, err
+}
+
 func fetchHTTPContent(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -84,18 +98,4 @@ func fetchFrequencyPlans(config storeFetchingConfiguration) (store, error) {
 	}
 
 	return frequencyPlansStorage, nil
-}
-
-// RetrieveHTTPStore returns a new Store of frequency plans, based on the options given, fetched from a HTTP server.
-//
-// By default, RetrieveHTTPStore fetches its frequency plans on GitHub in the TheThingsNetwork/gateway-conf repository, in the yaml-master branch. It is possible to specify another HTTP root through options.
-func RetrieveHTTPStore(options ...RetrieveHTTPStoreOption) (Store, error) {
-	baseURI := DefaultBaseURL
-
-	for _, option := range options {
-		option(&baseURI)
-	}
-
-	store, err := fetchFrequencyPlans(baseURI)
-	return &store, err
 }
