@@ -8,7 +8,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 )
 
 // ReadFilesystemStore returns a new Store of frequency plans, based on the options given, read from the local filesystem.
@@ -70,13 +70,13 @@ func readFileSystemStore(config storeReadConfiguration) (store, error) {
 	}
 
 	frequencyPlansStorage := make(store, 0)
-	for _, frequencyPlanInfo := range frequencyPlansInfo {
-		frequencyPlanContent, err := readFrequencyPlan(config, frequencyPlanInfo.Filename)
+	for _, frequencyPlanDescription := range frequencyPlansInfo {
+		frequencyPlanContent, err := readFrequencyPlan(config, frequencyPlanDescription.Filename)
 		if err != nil {
-			return nil, errors.NewWithCause(fmt.Sprintf("Failed to retrieve %s frequency plan content", frequencyPlanInfo.ID), err)
+			return nil, errors.NewWithCause(fmt.Sprintf("Failed to retrieve %s frequency plan content", frequencyPlanDescription.ID), err)
 		}
 
-		frequencyPlansStorage[frequencyPlanInfo.ID] = frequencyPlanContent
+		frequencyPlansStorage[frequencyPlanDescription.ID] = frequencyPlanContent
 	}
 
 	return frequencyPlansStorage, nil

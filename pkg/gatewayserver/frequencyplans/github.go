@@ -31,8 +31,8 @@ func fetchHTTPContent(url string) ([]byte, error) {
 	return buffer, nil
 }
 
-func fetchList(baseURI storeFetchingConfiguration) ([]frequencyPlanInfo, error) {
-	list := make([]frequencyPlanInfo, 0)
+func fetchList(baseURI storeFetchingConfiguration) ([]frequencyPlanDescription, error) {
+	list := make([]frequencyPlanDescription, 0)
 
 	url := fmt.Sprintf("%s/%s", string(baseURI), "frequency-plans.yml")
 
@@ -74,31 +74,28 @@ func fetchFrequencyPlans(config storeFetchingConfiguration) (store, error) {
 	}
 
 	frequencyPlansStorage := make(store, 0)
-	for _, frequencyPlanInfo := range frequencyPlansInfo {
-		frequencyPlanContent, err := fetchFrequencyPlan(config, frequencyPlanInfo.Filename)
+	for _, description := range frequencyPlansInfo {
+		frequencyPlanContent, err := fetchFrequencyPlan(config, description.Filename)
 		if err != nil {
-			return nil, errors.NewWithCause(fmt.Sprintf("Failed to retrieve %s frequency plan content", frequencyPlanInfo.ID), err)
+			return nil, errors.NewWithCause(fmt.Sprintf("Failed to retrieve %s frequency plan content", description.ID), err)
 		}
 
-		frequencyPlansStorage[frequencyPlanInfo.ID] = frequencyPlanContent
+		frequencyPlansStorage[description.ID] = frequencyPlanContent
 	}
 
 	return frequencyPlansStorage, nil
 }
 
-// RetrieveGitHubStore returns a new Store of frequency plans, based on the options given, fetched on GitHub.
+// RetrieveHTTPStore returns a new Store of frequency plans, based on the options given, fetched from a HTTP server.
 //
-// By default, RetrieveGitHubStore fetches its frequency plans on GitHub in the TheThingsNetwork/gateway-conf repository, in the yaml-master branch. It is possible to specify a new repository and a new branch through options.
-func RetrieveGitHubStore(options ...RetrieveGitHubStoreOption) (Store, error) {
-	parameters := storeFetchingConfiguration{
-		GitBranch:     DefaultGitHubBranch,
-		GitRepository: DefaultGitHubRepository,
-	}
+// By default, RetrieveHTTPStore fetches its frequency plans on GitHub in the TheThingsNetwork/gateway-conf repository, in the yaml-master branch. It is possible to specify another HTTP root through options.
+func RetrieveHTTPStore(options ...RetrieveHTTPStoreOption) (Store, error) {
+	baseURI := DefaultBaseURL
 
 	for _, option := range options {
-		option(&parameters)
+		option(&baseURI)
 	}
 
-	store, err := fetchFrequencyPlans(parameters)
+	store, err := fetchFrequencyPlans(baseURI)
 	return &store, err
 }

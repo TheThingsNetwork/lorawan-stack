@@ -7,7 +7,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-type frequencyPlanInfo struct {
+type frequencyPlanDescription struct {
 	// ID to identify the frequency plan
 	ID string `yaml:"id"`
 	// Description in Mhz

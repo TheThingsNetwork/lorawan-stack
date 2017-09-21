@@ -2,21 +2,27 @@
 
 package frequencyplans
 
+import (
+	"path/filepath"
+)
+
+// DefaultListFilename is the default name that the frequency plans list has.
+const DefaultListFilename = "frequency-plans.yml"
+
 type storeReadConfiguration struct {
-	ListPath string
-	Root     string
+	Root string
 }
 
-// ReadFilesystemStoreOption is an option applied when creating the store from the filesystem.
-type ReadFilesystemStoreOption func(*storeReadConfiguration)
-
-// FilesystemListPathOption can be used to specify the path to the list of frequency plans. The default path used is `frequency-plans.yml`, which is the path within the repository.
-//
-// If the path is a relative path, the file is read from the current directory, or from the root directory if it is specified.
-func FilesystemListPathOption(path string) ReadFilesystemStoreOption {
-	return func(config *storeReadConfiguration) {
-		config.ListPath = path
+func (c storeReadConfiguration) AbsolutePath(filename string) string {
+	if filepath.IsAbs(filename) {
+		return filename
 	}
+
+	if c.Root != "" {
+		return filepath.Join(c.Root, filename)
+	}
+
+	return filename
 }
 
 // ReadFilesystemStoreOption is an option applied when creating the store from the filesystem.
