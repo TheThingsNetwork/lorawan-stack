@@ -26,7 +26,8 @@ message Client {
   // state denotes the reviewing state of the client by the tenant admin.
   ClientState state = 5;
 
-  // official denotes if the client is an official client created by the tenant admin.
+  // official denotes that a client has been labelled as an official third-party
+  // client by the tenant admins and therefore this fact will be shown to
   bool official = 6;
 
   // grants denotes which OAuth2 flows can the client use to get a token.

@@ -113,7 +113,8 @@ type Client struct {
 	CallbackURI string `protobuf:"bytes,4,opt,name=callback_uri,json=callbackUri,proto3" json:"callback_uri,omitempty" db:"callback_uri"`
 	// state denotes the reviewing state of the client by the tenant admin.
 	State ClientState `protobuf:"varint,5,opt,name=state,proto3,enum=ttn.v3.ClientState" json:"state,omitempty"`
-	// official denotes if the client is an official client created by the tenant admin.
+	// official denotes that a client has been labelled as an official third-party
+	// client by the tenant admins and therefore this fact will be shown to
 	Official bool `protobuf:"varint,6,opt,name=official,proto3" json:"official,omitempty"`
 	// grants denotes which OAuth2 flows can the client use to get a token.
 	Grants []ClientGrant `protobuf:"varint,7,rep,packed,name=grants,enum=ttn.v3.ClientGrant" json:"grants,omitempty"`

@@ -36,9 +36,9 @@ type Application struct {
 	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
 	// description is the description of the application.
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	// app_euis are the app euis this application uses.
+	// app_euis are the AppEUIs this application uses.
 	AppEUIs []github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,3,rep,name=app_euis,json=appEuis,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"app_euis"`
-	// api_keys are the API keys the application defined.
+	// api_keys are the API keys of the application.
 	APIKeys []ApplicationAPIKey `protobuf:"bytes,4,rep,name=api_keys,json=apiKeys" json:"api_keys"`
 	// created_at is the time when the application was created.
 	CreatedAt time.Time `protobuf:"bytes,6,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`

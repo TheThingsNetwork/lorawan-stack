@@ -20,82 +20,6 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-type UserIdentifiers struct {
-	// username of the user
-	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
-	// email address of the user
-	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	// TTN Tenant ID (in case of multi-tenant network stack)
-	TenantID string `protobuf:"bytes,3,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
-}
-
-func (m *UserIdentifiers) Reset()                    { *m = UserIdentifiers{} }
-func (*UserIdentifiers) ProtoMessage()               {}
-func (*UserIdentifiers) Descriptor() ([]byte, []int) { return fileDescriptorIdentifiers, []int{0} }
-
-func (m *UserIdentifiers) GetUsername() string {
-	if m != nil {
-		return m.Username
-	}
-	return ""
-}
-
-func (m *UserIdentifiers) GetEmail() string {
-	if m != nil {
-		return m.Email
-	}
-	return ""
-}
-
-func (m *UserIdentifiers) GetTenantID() string {
-	if m != nil {
-		return m.TenantID
-	}
-	return ""
-}
-
-// End device identifiers are carried with uplink and downlink messages
-// Unknown fields are left empty
-type EndDeviceIdentifiers struct {
-	// TTN Device ID
-	DeviceID string `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
-	// TTN Application ID
-	ApplicationID string `protobuf:"bytes,2,opt,name=application_id,json=applicationId,proto3" json:"application_id,omitempty"`
-	// TTN Tenant ID (in case of multi-tenant network server)
-	TenantID string `protobuf:"bytes,3,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
-	// LoRaWAN DevEUI
-	DevEUI *github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,4,opt,name=dev_eui,json=devEui,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"dev_eui,omitempty"`
-	// LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices)
-	JoinEUI *github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,5,opt,name=join_eui,json=joinEui,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"join_eui,omitempty"`
-	// LoRaWAN DevAddr
-	DevAddr *github_com_TheThingsNetwork_ttn_pkg_types.DevAddr `protobuf:"bytes,6,opt,name=dev_addr,json=devAddr,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.DevAddr" json:"dev_addr,omitempty"`
-}
-
-func (m *EndDeviceIdentifiers) Reset()                    { *m = EndDeviceIdentifiers{} }
-func (*EndDeviceIdentifiers) ProtoMessage()               {}
-func (*EndDeviceIdentifiers) Descriptor() ([]byte, []int) { return fileDescriptorIdentifiers, []int{1} }
-
-func (m *EndDeviceIdentifiers) GetDeviceID() string {
-	if m != nil {
-		return m.DeviceID
-	}
-	return ""
-}
-
-func (m *EndDeviceIdentifiers) GetApplicationID() string {
-	if m != nil {
-		return m.ApplicationID
-	}
-	return ""
-}
-
-func (m *EndDeviceIdentifiers) GetTenantID() string {
-	if m != nil {
-		return m.TenantID
-	}
-	return ""
-}
-
 type ApplicationIdentifiers struct {
 	// TTN Application ID
 	ApplicationID string `protobuf:"bytes,1,opt,name=application_id,json=applicationId,proto3" json:"application_id,omitempty"`
@@ -106,7 +30,7 @@ type ApplicationIdentifiers struct {
 func (m *ApplicationIdentifiers) Reset()      { *m = ApplicationIdentifiers{} }
 func (*ApplicationIdentifiers) ProtoMessage() {}
 func (*ApplicationIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentifiers, []int{2}
+	return fileDescriptorIdentifiers, []int{0}
 }
 
 func (m *ApplicationIdentifiers) GetApplicationID() string {
@@ -123,27 +47,16 @@ func (m *ApplicationIdentifiers) GetTenantID() string {
 	return ""
 }
 
-type ApplicationAppEUIIdentifiers struct {
-	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
-	AppEUI                 github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,2,opt,name=app_eui,json=appEui,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"app_eui"`
-}
-
-func (m *ApplicationAppEUIIdentifiers) Reset()      { *m = ApplicationAppEUIIdentifiers{} }
-func (*ApplicationAppEUIIdentifiers) ProtoMessage() {}
-func (*ApplicationAppEUIIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentifiers, []int{3}
-}
-
 type ApplicationAPIKeyIdentifiers struct {
 	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
-	// key_name is the API key name.
+	// key_name is the API key name to be removed.
 	KeyName string `protobuf:"bytes,2,opt,name=key_name,json=keyName,proto3" json:"key_name,omitempty"`
 }
 
 func (m *ApplicationAPIKeyIdentifiers) Reset()      { *m = ApplicationAPIKeyIdentifiers{} }
 func (*ApplicationAPIKeyIdentifiers) ProtoMessage() {}
 func (*ApplicationAPIKeyIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentifiers, []int{4}
+	return fileDescriptorIdentifiers, []int{1}
 }
 
 func (m *ApplicationAPIKeyIdentifiers) GetKeyName() string {
@@ -167,7 +80,7 @@ type ApplicationCollaboratorIdentifiers struct {
 func (m *ApplicationCollaboratorIdentifiers) Reset()      { *m = ApplicationCollaboratorIdentifiers{} }
 func (*ApplicationCollaboratorIdentifiers) ProtoMessage() {}
 func (*ApplicationCollaboratorIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentifiers, []int{5}
+	return fileDescriptorIdentifiers, []int{2}
 }
 
 func (m *ApplicationCollaboratorIdentifiers) GetApplicationID() string {
@@ -207,7 +120,7 @@ type GatewayIdentifiers struct {
 
 func (m *GatewayIdentifiers) Reset()                    { *m = GatewayIdentifiers{} }
 func (*GatewayIdentifiers) ProtoMessage()               {}
-func (*GatewayIdentifiers) Descriptor() ([]byte, []int) { return fileDescriptorIdentifiers, []int{6} }
+func (*GatewayIdentifiers) Descriptor() ([]byte, []int) { return fileDescriptorIdentifiers, []int{3} }
 
 func (m *GatewayIdentifiers) GetGatewayID() string {
 	if m != nil {
@@ -235,7 +148,7 @@ type GatewayAntennaIdentifiers struct {
 func (m *GatewayAntennaIdentifiers) Reset()      { *m = GatewayAntennaIdentifiers{} }
 func (*GatewayAntennaIdentifiers) ProtoMessage() {}
 func (*GatewayAntennaIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentifiers, []int{7}
+	return fileDescriptorIdentifiers, []int{4}
 }
 
 func (m *GatewayAntennaIdentifiers) GetGatewayID() string {
@@ -273,7 +186,7 @@ type GatewayCollaboratorIdentifiers struct {
 func (m *GatewayCollaboratorIdentifiers) Reset()      { *m = GatewayCollaboratorIdentifiers{} }
 func (*GatewayCollaboratorIdentifiers) ProtoMessage() {}
 func (*GatewayCollaboratorIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentifiers, []int{8}
+	return fileDescriptorIdentifiers, []int{5}
 }
 
 func (m *GatewayCollaboratorIdentifiers) GetGatewayID() string {
@@ -304,6 +217,82 @@ func (m *GatewayCollaboratorIdentifiers) GetEmail() string {
 	return ""
 }
 
+// End device identifiers are carried with uplink and downlink messages
+// Unknown fields are left empty
+type EndDeviceIdentifiers struct {
+	// TTN Device ID
+	DeviceID string `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
+	// TTN Application ID
+	ApplicationID string `protobuf:"bytes,2,opt,name=application_id,json=applicationId,proto3" json:"application_id,omitempty"`
+	// TTN Tenant ID (in case of multi-tenant network server)
+	TenantID string `protobuf:"bytes,3,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	// LoRaWAN DevEUI
+	DevEUI *github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,4,opt,name=dev_eui,json=devEui,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"dev_eui,omitempty"`
+	// LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices)
+	JoinEUI *github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,5,opt,name=join_eui,json=joinEui,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"join_eui,omitempty"`
+	// LoRaWAN DevAddr
+	DevAddr *github_com_TheThingsNetwork_ttn_pkg_types.DevAddr `protobuf:"bytes,6,opt,name=dev_addr,json=devAddr,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.DevAddr" json:"dev_addr,omitempty"`
+}
+
+func (m *EndDeviceIdentifiers) Reset()                    { *m = EndDeviceIdentifiers{} }
+func (*EndDeviceIdentifiers) ProtoMessage()               {}
+func (*EndDeviceIdentifiers) Descriptor() ([]byte, []int) { return fileDescriptorIdentifiers, []int{6} }
+
+func (m *EndDeviceIdentifiers) GetDeviceID() string {
+	if m != nil {
+		return m.DeviceID
+	}
+	return ""
+}
+
+func (m *EndDeviceIdentifiers) GetApplicationID() string {
+	if m != nil {
+		return m.ApplicationID
+	}
+	return ""
+}
+
+func (m *EndDeviceIdentifiers) GetTenantID() string {
+	if m != nil {
+		return m.TenantID
+	}
+	return ""
+}
+
+type UserIdentifiers struct {
+	// username of the user
+	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	// email address of the user
+	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	// TTN Tenant ID (in case of multi-tenant network stack)
+	TenantID string `protobuf:"bytes,3,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+}
+
+func (m *UserIdentifiers) Reset()                    { *m = UserIdentifiers{} }
+func (*UserIdentifiers) ProtoMessage()               {}
+func (*UserIdentifiers) Descriptor() ([]byte, []int) { return fileDescriptorIdentifiers, []int{7} }
+
+func (m *UserIdentifiers) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *UserIdentifiers) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *UserIdentifiers) GetTenantID() string {
+	if m != nil {
+		return m.TenantID
+	}
+	return ""
+}
+
 type ClientIdentifiers struct {
 	// TTN Client ID
 	ClientID string `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
@@ -313,7 +302,7 @@ type ClientIdentifiers struct {
 
 func (m *ClientIdentifiers) Reset()                    { *m = ClientIdentifiers{} }
 func (*ClientIdentifiers) ProtoMessage()               {}
-func (*ClientIdentifiers) Descriptor() ([]byte, []int) { return fileDescriptorIdentifiers, []int{9} }
+func (*ClientIdentifiers) Descriptor() ([]byte, []int) { return fileDescriptorIdentifiers, []int{8} }
 
 func (m *ClientIdentifiers) GetClientID() string {
 	if m != nil {
@@ -343,7 +332,7 @@ type ClientCollaboratorIdentifiers struct {
 func (m *ClientCollaboratorIdentifiers) Reset()      { *m = ClientCollaboratorIdentifiers{} }
 func (*ClientCollaboratorIdentifiers) ProtoMessage() {}
 func (*ClientCollaboratorIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentifiers, []int{10}
+	return fileDescriptorIdentifiers, []int{9}
 }
 
 func (m *ClientCollaboratorIdentifiers) GetClientID() string {
@@ -375,120 +364,17 @@ func (m *ClientCollaboratorIdentifiers) GetEmail() string {
 }
 
 func init() {
-	proto.RegisterType((*UserIdentifiers)(nil), "ttn.v3.UserIdentifiers")
-	proto.RegisterType((*EndDeviceIdentifiers)(nil), "ttn.v3.EndDeviceIdentifiers")
 	proto.RegisterType((*ApplicationIdentifiers)(nil), "ttn.v3.ApplicationIdentifiers")
-	proto.RegisterType((*ApplicationAppEUIIdentifiers)(nil), "ttn.v3.ApplicationAppEUIIdentifiers")
 	proto.RegisterType((*ApplicationAPIKeyIdentifiers)(nil), "ttn.v3.ApplicationAPIKeyIdentifiers")
 	proto.RegisterType((*ApplicationCollaboratorIdentifiers)(nil), "ttn.v3.ApplicationCollaboratorIdentifiers")
 	proto.RegisterType((*GatewayIdentifiers)(nil), "ttn.v3.GatewayIdentifiers")
 	proto.RegisterType((*GatewayAntennaIdentifiers)(nil), "ttn.v3.GatewayAntennaIdentifiers")
 	proto.RegisterType((*GatewayCollaboratorIdentifiers)(nil), "ttn.v3.GatewayCollaboratorIdentifiers")
+	proto.RegisterType((*EndDeviceIdentifiers)(nil), "ttn.v3.EndDeviceIdentifiers")
+	proto.RegisterType((*UserIdentifiers)(nil), "ttn.v3.UserIdentifiers")
 	proto.RegisterType((*ClientIdentifiers)(nil), "ttn.v3.ClientIdentifiers")
 	proto.RegisterType((*ClientCollaboratorIdentifiers)(nil), "ttn.v3.ClientCollaboratorIdentifiers")
 }
-func (m *UserIdentifiers) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *UserIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Username) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.Username)))
-		i += copy(dAtA[i:], m.Username)
-	}
-	if len(m.Email) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.Email)))
-		i += copy(dAtA[i:], m.Email)
-	}
-	if len(m.TenantID) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.TenantID)))
-		i += copy(dAtA[i:], m.TenantID)
-	}
-	return i, nil
-}
-
-func (m *EndDeviceIdentifiers) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *EndDeviceIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.DeviceID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.DeviceID)))
-		i += copy(dAtA[i:], m.DeviceID)
-	}
-	if len(m.ApplicationID) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.ApplicationID)))
-		i += copy(dAtA[i:], m.ApplicationID)
-	}
-	if len(m.TenantID) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.TenantID)))
-		i += copy(dAtA[i:], m.TenantID)
-	}
-	if m.DevEUI != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.DevEUI.Size()))
-		n1, err := m.DevEUI.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n1
-	}
-	if m.JoinEUI != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.JoinEUI.Size()))
-		n2, err := m.JoinEUI.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n2
-	}
-	if m.DevAddr != nil {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.DevAddr.Size()))
-		n3, err := m.DevAddr.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n3
-	}
-	return i, nil
-}
-
 func (m *ApplicationIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -519,40 +405,6 @@ func (m *ApplicationIdentifiers) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *ApplicationAppEUIIdentifiers) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ApplicationAppEUIIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintIdentifiers(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n4, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n4
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintIdentifiers(dAtA, i, uint64(m.AppEUI.Size()))
-	n5, err := m.AppEUI.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n5
-	return i, nil
-}
-
 func (m *ApplicationAPIKeyIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -571,11 +423,11 @@ func (m *ApplicationAPIKeyIdentifiers) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentifiers(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n6, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
+	n1, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n6
+	i += n1
 	if len(m.KeyName) > 0 {
 		dAtA[i] = 0x12
 		i++
@@ -735,6 +587,108 @@ func (m *GatewayCollaboratorIdentifiers) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *EndDeviceIdentifiers) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *EndDeviceIdentifiers) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.DeviceID) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.DeviceID)))
+		i += copy(dAtA[i:], m.DeviceID)
+	}
+	if len(m.ApplicationID) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.ApplicationID)))
+		i += copy(dAtA[i:], m.ApplicationID)
+	}
+	if len(m.TenantID) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.TenantID)))
+		i += copy(dAtA[i:], m.TenantID)
+	}
+	if m.DevEUI != nil {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(m.DevEUI.Size()))
+		n2, err := m.DevEUI.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n2
+	}
+	if m.JoinEUI != nil {
+		dAtA[i] = 0x2a
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(m.JoinEUI.Size()))
+		n3, err := m.JoinEUI.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n3
+	}
+	if m.DevAddr != nil {
+		dAtA[i] = 0x32
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(m.DevAddr.Size()))
+		n4, err := m.DevAddr.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n4
+	}
+	return i, nil
+}
+
+func (m *UserIdentifiers) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UserIdentifiers) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Username) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.Username)))
+		i += copy(dAtA[i:], m.Username)
+	}
+	if len(m.Email) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.Email)))
+		i += copy(dAtA[i:], m.Email)
+	}
+	if len(m.TenantID) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.TenantID)))
+		i += copy(dAtA[i:], m.TenantID)
+	}
+	return i, nil
+}
+
 func (m *ClientIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -834,54 +788,6 @@ func encodeVarintIdentifiers(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return offset + 1
 }
-func (m *UserIdentifiers) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.Username)
-	if l > 0 {
-		n += 1 + l + sovIdentifiers(uint64(l))
-	}
-	l = len(m.Email)
-	if l > 0 {
-		n += 1 + l + sovIdentifiers(uint64(l))
-	}
-	l = len(m.TenantID)
-	if l > 0 {
-		n += 1 + l + sovIdentifiers(uint64(l))
-	}
-	return n
-}
-
-func (m *EndDeviceIdentifiers) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.DeviceID)
-	if l > 0 {
-		n += 1 + l + sovIdentifiers(uint64(l))
-	}
-	l = len(m.ApplicationID)
-	if l > 0 {
-		n += 1 + l + sovIdentifiers(uint64(l))
-	}
-	l = len(m.TenantID)
-	if l > 0 {
-		n += 1 + l + sovIdentifiers(uint64(l))
-	}
-	if m.DevEUI != nil {
-		l = m.DevEUI.Size()
-		n += 1 + l + sovIdentifiers(uint64(l))
-	}
-	if m.JoinEUI != nil {
-		l = m.JoinEUI.Size()
-		n += 1 + l + sovIdentifiers(uint64(l))
-	}
-	if m.DevAddr != nil {
-		l = m.DevAddr.Size()
-		n += 1 + l + sovIdentifiers(uint64(l))
-	}
-	return n
-}
-
 func (m *ApplicationIdentifiers) Size() (n int) {
 	var l int
 	_ = l
@@ -893,16 +799,6 @@ func (m *ApplicationIdentifiers) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovIdentifiers(uint64(l))
 	}
-	return n
-}
-
-func (m *ApplicationAppEUIIdentifiers) Size() (n int) {
-	var l int
-	_ = l
-	l = m.ApplicationIdentifiers.Size()
-	n += 1 + l + sovIdentifiers(uint64(l))
-	l = m.AppEUI.Size()
-	n += 1 + l + sovIdentifiers(uint64(l))
 	return n
 }
 
@@ -994,6 +890,54 @@ func (m *GatewayCollaboratorIdentifiers) Size() (n int) {
 	return n
 }
 
+func (m *EndDeviceIdentifiers) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.DeviceID)
+	if l > 0 {
+		n += 1 + l + sovIdentifiers(uint64(l))
+	}
+	l = len(m.ApplicationID)
+	if l > 0 {
+		n += 1 + l + sovIdentifiers(uint64(l))
+	}
+	l = len(m.TenantID)
+	if l > 0 {
+		n += 1 + l + sovIdentifiers(uint64(l))
+	}
+	if m.DevEUI != nil {
+		l = m.DevEUI.Size()
+		n += 1 + l + sovIdentifiers(uint64(l))
+	}
+	if m.JoinEUI != nil {
+		l = m.JoinEUI.Size()
+		n += 1 + l + sovIdentifiers(uint64(l))
+	}
+	if m.DevAddr != nil {
+		l = m.DevAddr.Size()
+		n += 1 + l + sovIdentifiers(uint64(l))
+	}
+	return n
+}
+
+func (m *UserIdentifiers) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Username)
+	if l > 0 {
+		n += 1 + l + sovIdentifiers(uint64(l))
+	}
+	l = len(m.Email)
+	if l > 0 {
+		n += 1 + l + sovIdentifiers(uint64(l))
+	}
+	l = len(m.TenantID)
+	if l > 0 {
+		n += 1 + l + sovIdentifiers(uint64(l))
+	}
+	return n
+}
+
 func (m *ClientIdentifiers) Size() (n int) {
 	var l int
 	_ = l
@@ -1043,33 +987,6 @@ func sovIdentifiers(x uint64) (n int) {
 func sozIdentifiers(x uint64) (n int) {
 	return sovIdentifiers(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (this *UserIdentifiers) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&UserIdentifiers{`,
-		`Username:` + fmt.Sprintf("%v", this.Username) + `,`,
-		`Email:` + fmt.Sprintf("%v", this.Email) + `,`,
-		`TenantID:` + fmt.Sprintf("%v", this.TenantID) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *EndDeviceIdentifiers) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&EndDeviceIdentifiers{`,
-		`DeviceID:` + fmt.Sprintf("%v", this.DeviceID) + `,`,
-		`ApplicationID:` + fmt.Sprintf("%v", this.ApplicationID) + `,`,
-		`TenantID:` + fmt.Sprintf("%v", this.TenantID) + `,`,
-		`DevEUI:` + fmt.Sprintf("%v", this.DevEUI) + `,`,
-		`JoinEUI:` + fmt.Sprintf("%v", this.JoinEUI) + `,`,
-		`DevAddr:` + fmt.Sprintf("%v", this.DevAddr) + `,`,
-		`}`,
-	}, "")
-	return s
-}
 func (this *ApplicationIdentifiers) String() string {
 	if this == nil {
 		return "nil"
@@ -1077,17 +994,6 @@ func (this *ApplicationIdentifiers) String() string {
 	s := strings.Join([]string{`&ApplicationIdentifiers{`,
 		`ApplicationID:` + fmt.Sprintf("%v", this.ApplicationID) + `,`,
 		`TenantID:` + fmt.Sprintf("%v", this.TenantID) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *ApplicationAppEUIIdentifiers) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&ApplicationAppEUIIdentifiers{`,
-		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
-		`AppEUI:` + fmt.Sprintf("%v", this.AppEUI) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1152,6 +1058,33 @@ func (this *GatewayCollaboratorIdentifiers) String() string {
 	}, "")
 	return s
 }
+func (this *EndDeviceIdentifiers) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&EndDeviceIdentifiers{`,
+		`DeviceID:` + fmt.Sprintf("%v", this.DeviceID) + `,`,
+		`ApplicationID:` + fmt.Sprintf("%v", this.ApplicationID) + `,`,
+		`TenantID:` + fmt.Sprintf("%v", this.TenantID) + `,`,
+		`DevEUI:` + fmt.Sprintf("%v", this.DevEUI) + `,`,
+		`JoinEUI:` + fmt.Sprintf("%v", this.JoinEUI) + `,`,
+		`DevAddr:` + fmt.Sprintf("%v", this.DevAddr) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *UserIdentifiers) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&UserIdentifiers{`,
+		`Username:` + fmt.Sprintf("%v", this.Username) + `,`,
+		`Email:` + fmt.Sprintf("%v", this.Email) + `,`,
+		`TenantID:` + fmt.Sprintf("%v", this.TenantID) + `,`,
+		`}`,
+	}, "")
+	return s
+}
 func (this *ClientIdentifiers) String() string {
 	if this == nil {
 		return "nil"
@@ -1183,376 +1116,6 @@ func valueToStringIdentifiers(v interface{}) string {
 	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-}
-func (m *UserIdentifiers) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowIdentifiers
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: UserIdentifiers: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: UserIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Username", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentifiers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Username = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Email", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentifiers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Email = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TenantID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentifiers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TenantID = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipIdentifiers(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *EndDeviceIdentifiers) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowIdentifiers
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: EndDeviceIdentifiers: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: EndDeviceIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DeviceID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentifiers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.DeviceID = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentifiers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ApplicationID = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TenantID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentifiers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TenantID = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DevEUI", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentifiers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			var v github_com_TheThingsNetwork_ttn_pkg_types.EUI64
-			m.DevEUI = &v
-			if err := m.DevEUI.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field JoinEUI", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentifiers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			var v github_com_TheThingsNetwork_ttn_pkg_types.EUI64
-			m.JoinEUI = &v
-			if err := m.JoinEUI.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DevAddr", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentifiers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			var v github_com_TheThingsNetwork_ttn_pkg_types.DevAddr
-			m.DevAddr = &v
-			if err := m.DevAddr.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipIdentifiers(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
 }
 func (m *ApplicationIdentifiers) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -1640,116 +1203,6 @@ func (m *ApplicationIdentifiers) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.TenantID = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipIdentifiers(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ApplicationAppEUIIdentifiers) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowIdentifiers
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ApplicationAppEUIIdentifiers: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ApplicationAppEUIIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentifiers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AppEUI", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentifiers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthIdentifiers
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.AppEUI.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2458,6 +1911,376 @@ func (m *GatewayCollaboratorIdentifiers) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *EndDeviceIdentifiers) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentifiers
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: EndDeviceIdentifiers: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: EndDeviceIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DeviceID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentifiers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DeviceID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentifiers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ApplicationID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TenantID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentifiers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TenantID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DevEUI", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentifiers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var v github_com_TheThingsNetwork_ttn_pkg_types.EUI64
+			m.DevEUI = &v
+			if err := m.DevEUI.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field JoinEUI", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentifiers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var v github_com_TheThingsNetwork_ttn_pkg_types.EUI64
+			m.JoinEUI = &v
+			if err := m.JoinEUI.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DevAddr", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentifiers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var v github_com_TheThingsNetwork_ttn_pkg_types.DevAddr
+			m.DevAddr = &v
+			if err := m.DevAddr.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentifiers(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UserIdentifiers) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentifiers
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UserIdentifiers: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UserIdentifiers: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Username", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentifiers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Username = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Email", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentifiers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Email = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TenantID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentifiers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TenantID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentifiers(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *ClientIdentifiers) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -2842,48 +2665,46 @@ func init() {
 }
 
 var fileDescriptorIdentifiers = []byte{
-	// 683 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x55, 0x4d, 0x4f, 0x13, 0x41,
-	0x18, 0x66, 0xf8, 0x68, 0xb7, 0x03, 0xd5, 0xb0, 0x21, 0xa6, 0x10, 0xdd, 0x25, 0xeb, 0x05, 0x12,
-	0xed, 0x46, 0x11, 0xe3, 0x45, 0x93, 0x96, 0x6d, 0xc8, 0x62, 0x42, 0xc8, 0x86, 0x9a, 0xc8, 0xa5,
-	0x99, 0x76, 0x86, 0x65, 0x6c, 0x3b, 0x3b, 0xd9, 0x4e, 0x17, 0x7b, 0x30, 0xf1, 0xe2, 0x8f, 0xf0,
-	0x17, 0x78, 0xe0, 0x27, 0x78, 0x37, 0x1c, 0x39, 0x1a, 0x0e, 0x1b, 0xdd, 0x93, 0x47, 0x7f, 0x82,
-	0xd9, 0xd9, 0xc5, 0x2e, 0x28, 0x4a, 0x49, 0xca, 0x6d, 0xdf, 0xaf, 0xe7, 0x7d, 0xe6, 0x7d, 0x66,
-	0xde, 0x85, 0xeb, 0x2e, 0x15, 0x07, 0xfd, 0x66, 0xb9, 0xe5, 0x75, 0xcd, 0xdd, 0x03, 0xb2, 0x7b,
-	0x40, 0x99, 0xdb, 0xdb, 0x26, 0xe2, 0xd0, 0xf3, 0xdb, 0xa6, 0x10, 0xcc, 0x44, 0x9c, 0x9a, 0x14,
-	0x13, 0x26, 0xe8, 0x3e, 0x25, 0x7e, 0xaf, 0xcc, 0x7d, 0x4f, 0x78, 0x6a, 0x4e, 0x08, 0x56, 0x0e,
-	0xd6, 0x96, 0x1e, 0x66, 0xca, 0x5d, 0xcf, 0xf5, 0x4c, 0x19, 0x6e, 0xf6, 0xf7, 0xa5, 0x25, 0x0d,
-	0xf9, 0x95, 0x94, 0x19, 0x0c, 0xde, 0xae, 0xf7, 0x88, 0x6f, 0x0f, 0xf1, 0xd4, 0x25, 0xa8, 0xf4,
-	0x7b, 0xc4, 0x67, 0xa8, 0x4b, 0x4a, 0x60, 0x19, 0xac, 0x14, 0x9c, 0xdf, 0xb6, 0xba, 0x00, 0x67,
-	0x48, 0x17, 0xd1, 0x4e, 0x69, 0x52, 0x06, 0x12, 0x43, 0x5d, 0x85, 0x05, 0x41, 0x18, 0x62, 0xa2,
-	0x41, 0x71, 0x69, 0x2a, 0x8e, 0x54, 0xe7, 0xa2, 0x50, 0x57, 0x76, 0xa5, 0xd3, 0xb6, 0x1c, 0x25,
-	0x09, 0xdb, 0xd8, 0x38, 0x9a, 0x82, 0x0b, 0x35, 0x86, 0x2d, 0x12, 0xd0, 0x16, 0xc9, 0x76, 0x5d,
-	0x85, 0x05, 0x2c, 0x9d, 0x31, 0x06, 0x18, 0x62, 0xa4, 0x99, 0x96, 0xa3, 0xe0, 0xb4, 0x46, 0x7d,
-	0x06, 0x6f, 0x21, 0xce, 0x3b, 0xb4, 0x85, 0x04, 0xf5, 0x58, 0x9c, 0x2f, 0xd9, 0x54, 0xe7, 0xa3,
-	0x50, 0x2f, 0x56, 0x86, 0x11, 0xdb, 0x72, 0x8a, 0x99, 0x44, 0x1b, 0x8f, 0x40, 0x54, 0x7d, 0x05,
-	0xf3, 0x98, 0x04, 0x0d, 0xd2, 0xa7, 0xa5, 0xe9, 0x65, 0xb0, 0x32, 0x57, 0x7d, 0x7e, 0x1a, 0xea,
-	0xe6, 0xff, 0xb4, 0xe1, 0x6d, 0xd7, 0x14, 0x03, 0x4e, 0x7a, 0xe5, 0x5a, 0xdd, 0x7e, 0xfa, 0x24,
-	0x0a, 0xf5, 0x9c, 0x45, 0x82, 0x5a, 0xdd, 0x76, 0x72, 0x98, 0x04, 0xb5, 0x3e, 0x55, 0x5f, 0x43,
-	0xe5, 0x8d, 0x47, 0x99, 0x04, 0x9e, 0x91, 0xc0, 0x2f, 0xae, 0x07, 0x9c, 0xdf, 0xf2, 0x28, 0x8b,
-	0x91, 0xf3, 0x31, 0x5e, 0x0c, 0xbd, 0x03, 0xe3, 0x19, 0x35, 0x10, 0xc6, 0x7e, 0x29, 0x27, 0xa1,
-	0xd7, 0x4f, 0x43, 0xfd, 0xd1, 0xd5, 0xa1, 0x2d, 0x12, 0x54, 0x30, 0xf6, 0x9d, 0xf8, 0xe4, 0xf1,
-	0x87, 0xf1, 0x0e, 0xde, 0xc9, 0xce, 0x33, 0x23, 0xd7, 0x9f, 0x1a, 0x80, 0xeb, 0x68, 0x30, 0xf9,
-	0xcf, 0xcb, 0xf2, 0x05, 0xc0, 0xbb, 0x19, 0xac, 0x0a, 0xe7, 0xb5, 0xba, 0x9d, 0x65, 0xb1, 0x05,
-	0x67, 0x33, 0xe0, 0x92, 0xc2, 0xec, 0x63, 0xad, 0x9c, 0x3c, 0x85, 0xf2, 0xdf, 0xa9, 0x57, 0x95,
-	0xe3, 0x50, 0x9f, 0x38, 0x09, 0x75, 0xe0, 0x64, 0x8b, 0xd5, 0x3d, 0x98, 0x47, 0x9c, 0x4b, 0x5d,
-	0x26, 0xe5, 0xf0, 0x2a, 0x71, 0xde, 0x35, 0x45, 0x4f, 0xa8, 0x3a, 0x39, 0xc4, 0x79, 0xad, 0x4f,
-	0x8d, 0x0f, 0x17, 0x0e, 0xb2, 0x63, 0xbf, 0x24, 0x83, 0x71, 0x1d, 0x64, 0x11, 0x2a, 0x6d, 0x32,
-	0x68, 0xc8, 0xf7, 0x9b, 0x3c, 0xd3, 0x7c, 0x9b, 0x0c, 0xb6, 0x51, 0x97, 0x18, 0x9f, 0x01, 0x34,
-	0x32, 0x60, 0x1b, 0x5e, 0xa7, 0x83, 0x9a, 0x9e, 0x8f, 0x84, 0xe7, 0xdf, 0xb4, 0xb8, 0xe7, 0xd6,
-	0xcc, 0xd4, 0x65, 0x6b, 0x66, 0x3a, 0xb3, 0x66, 0x8c, 0x2e, 0x54, 0x37, 0x91, 0x20, 0x87, 0xe8,
-	0xdc, 0xe8, 0x1e, 0x40, 0xe8, 0x26, 0xde, 0x21, 0xd1, 0x62, 0x14, 0xea, 0x85, 0xb3, 0x5c, 0xcb,
-	0x29, 0xb8, 0x67, 0x65, 0xa3, 0xdc, 0xbe, 0x8f, 0x00, 0x2e, 0xa6, 0x18, 0x15, 0x26, 0x08, 0x63,
-	0xe8, 0x26, 0xda, 0xaa, 0xf7, 0x61, 0x11, 0x25, 0xed, 0x1a, 0x94, 0x61, 0xf2, 0x36, 0x1d, 0xce,
-	0x5c, 0xea, 0xb4, 0x63, 0x9f, 0x71, 0x04, 0xa0, 0x96, 0x36, 0xba, 0x4c, 0xc4, 0xb1, 0x11, 0x1c,
-	0x5d, 0x38, 0x0a, 0xe7, 0x37, 0x3a, 0x94, 0xc4, 0xd5, 0xe7, 0x16, 0x7e, 0x4b, 0x3a, 0x2f, 0x2c,
-	0xfc, 0x34, 0xd3, 0x72, 0x94, 0x56, 0x5a, 0x33, 0x8a, 0x68, 0x9f, 0x00, 0xbc, 0x97, 0x20, 0x5c,
-	0x36, 0x97, 0xb1, 0xf4, 0x1d, 0x7d, 0x28, 0xd5, 0xcd, 0xaf, 0xdf, 0xb5, 0x89, 0xf7, 0x91, 0x06,
-	0x8e, 0x23, 0x0d, 0x9c, 0x44, 0x1a, 0xf8, 0x16, 0x69, 0xe0, 0x47, 0xa4, 0x4d, 0xfc, 0x8c, 0x34,
-	0xb0, 0xb7, 0x7a, 0xa5, 0xa5, 0x23, 0x18, 0x6f, 0x36, 0x73, 0xf2, 0x4f, 0xbe, 0xf6, 0x2b, 0x00,
-	0x00, 0xff, 0xff, 0xf0, 0x62, 0x64, 0x7e, 0x39, 0x08, 0x00, 0x00,
+	// 641 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x55, 0x4f, 0x4f, 0x13, 0x41,
+	0x14, 0x67, 0x40, 0xda, 0xed, 0x40, 0x35, 0x6c, 0x88, 0x01, 0xa2, 0xbb, 0x66, 0xbd, 0x48, 0xa2,
+	0xdd, 0x28, 0x62, 0xbc, 0x68, 0xd2, 0xb2, 0x0d, 0x59, 0x4c, 0x08, 0xd9, 0x80, 0x89, 0x5e, 0x9a,
+	0x69, 0xe7, 0xb1, 0x8c, 0x6d, 0x67, 0x36, 0xdb, 0x69, 0xb1, 0x07, 0x13, 0x2f, 0x7e, 0x08, 0x3f,
+	0x81, 0x07, 0x3e, 0x82, 0x5f, 0x80, 0x23, 0x47, 0xc3, 0x61, 0xa3, 0x7b, 0xf2, 0xe8, 0x47, 0x30,
+	0x3b, 0xbb, 0xd8, 0xc5, 0x80, 0x52, 0x12, 0xb8, 0xcd, 0x7b, 0x6f, 0x7e, 0xbf, 0xf7, 0x7b, 0x7f,
+	0x66, 0x17, 0xaf, 0xfa, 0x4c, 0xee, 0xf5, 0x9b, 0x95, 0x96, 0xe8, 0xda, 0xdb, 0x7b, 0xb0, 0xbd,
+	0xc7, 0xb8, 0xdf, 0xdb, 0x04, 0xb9, 0x2f, 0xc2, 0xb6, 0x2d, 0x25, 0xb7, 0x49, 0xc0, 0x6c, 0x46,
+	0x81, 0x4b, 0xb6, 0xcb, 0x20, 0xec, 0x55, 0x82, 0x50, 0x48, 0xa1, 0x17, 0xa4, 0xe4, 0x95, 0xc1,
+	0xca, 0xd2, 0xa3, 0x1c, 0xdc, 0x17, 0xbe, 0xb0, 0x55, 0xb8, 0xd9, 0xdf, 0x55, 0x96, 0x32, 0xd4,
+	0x29, 0x85, 0x59, 0x1f, 0xf0, 0xed, 0x6a, 0x10, 0x74, 0x58, 0x8b, 0x48, 0x26, 0xb8, 0x3b, 0xa2,
+	0xd5, 0x9f, 0xe3, 0x9b, 0x64, 0x14, 0x69, 0x30, 0xba, 0x80, 0xee, 0xa1, 0x07, 0xa5, 0xda, 0x5c,
+	0x1c, 0x99, 0xe5, 0x3c, 0xc6, 0xf1, 0xca, 0x24, 0x4f, 0xa1, 0x2f, 0xe3, 0x92, 0x04, 0x4e, 0xb8,
+	0x4c, 0x40, 0x93, 0x0a, 0x34, 0x1b, 0x47, 0xa6, 0xb6, 0xad, 0x9c, 0xae, 0xe3, 0x69, 0x69, 0xd8,
+	0xa5, 0xd6, 0x27, 0x84, 0xef, 0xe4, 0xb8, 0xaa, 0x5b, 0xee, 0x2b, 0x18, 0xe6, 0x55, 0x6c, 0xe0,
+	0x99, 0x1c, 0xb9, 0x92, 0x30, 0xf3, 0xc4, 0xa8, 0xa4, 0xc5, 0x56, 0xce, 0x96, 0x5e, 0xd3, 0x0e,
+	0x23, 0x73, 0xe2, 0x28, 0x32, 0x91, 0x97, 0x07, 0xeb, 0x8b, 0x58, 0x6b, 0xc3, 0xb0, 0xc1, 0x49,
+	0x17, 0x52, 0x59, 0x5e, 0xb1, 0x0d, 0xc3, 0x4d, 0xd2, 0x05, 0xeb, 0x2b, 0xc2, 0x56, 0x8e, 0x6c,
+	0x4d, 0x74, 0x3a, 0xa4, 0x29, 0x42, 0x22, 0x45, 0x78, 0xdd, 0x3d, 0xd1, 0x97, 0xb0, 0xd6, 0xef,
+	0x41, 0xa8, 0x64, 0x4e, 0x29, 0x99, 0x7f, 0x6c, 0x7d, 0x1e, 0x4f, 0x43, 0x97, 0xb0, 0xce, 0xc2,
+	0x0d, 0x15, 0x48, 0x0d, 0xab, 0x8b, 0xf5, 0x75, 0x22, 0x61, 0x9f, 0x9c, 0x6a, 0xdd, 0x43, 0x8c,
+	0xfd, 0xd4, 0x3b, 0x12, 0x5a, 0x8e, 0x23, 0xb3, 0x74, 0x72, 0xd7, 0xf1, 0x4a, 0xfe, 0x09, 0x6c,
+	0x9c, 0xa1, 0x7d, 0x46, 0x78, 0x31, 0xe3, 0xa8, 0x72, 0x09, 0x9c, 0x93, 0xeb, 0x48, 0xab, 0xdf,
+	0xc7, 0x65, 0x92, 0xa6, 0x6b, 0x30, 0x4e, 0xe1, 0x7d, 0xd6, 0x9c, 0xd9, 0xcc, 0xe9, 0x26, 0x3e,
+	0xeb, 0x00, 0x61, 0x23, 0x4b, 0x74, 0xde, 0x10, 0xaf, 0x4c, 0xe0, 0xf8, 0x83, 0x3b, 0x98, 0xc2,
+	0xf3, 0x75, 0x4e, 0x1d, 0x18, 0xb0, 0x16, 0xe4, 0x35, 0x2e, 0xe3, 0x12, 0x55, 0xce, 0x91, 0x44,
+	0x95, 0x35, 0xbb, 0xe9, 0x78, 0x1a, 0xcd, 0x30, 0x67, 0xec, 0xe4, 0xe4, 0x65, 0x76, 0x72, 0xea,
+	0x9f, 0xa5, 0xbd, 0xc6, 0x45, 0x0a, 0x83, 0x06, 0xf4, 0x99, 0x2a, 0x60, 0xb6, 0xf6, 0xe2, 0x38,
+	0x32, 0xed, 0xff, 0x7d, 0xa9, 0x82, 0xb6, 0x6f, 0xcb, 0x61, 0x00, 0xbd, 0x4a, 0x7d, 0xc7, 0x7d,
+	0xf6, 0x34, 0x8e, 0xcc, 0x82, 0x03, 0x83, 0xfa, 0x8e, 0xeb, 0x15, 0x28, 0x0c, 0xea, 0x7d, 0xa6,
+	0xbf, 0xc1, 0xda, 0x3b, 0xc1, 0xb8, 0x22, 0x9e, 0x56, 0xc4, 0x2f, 0x2f, 0x47, 0x5c, 0xdc, 0x10,
+	0x8c, 0x27, 0xcc, 0xc5, 0x84, 0x2f, 0xa1, 0xde, 0xc2, 0x49, 0x8f, 0x1a, 0x84, 0xd2, 0x70, 0xa1,
+	0xa0, 0xa8, 0x57, 0x8f, 0x23, 0xf3, 0xf1, 0xc5, 0xa9, 0x1d, 0x18, 0x54, 0x29, 0x0d, 0xbd, 0xa4,
+	0xf2, 0xe4, 0x60, 0x71, 0x7c, 0x6b, 0xa7, 0x07, 0xa7, 0x76, 0x29, 0x3f, 0x72, 0x74, 0xde, 0xc8,
+	0x27, 0x73, 0x23, 0x1f, 0xa3, 0xe9, 0x16, 0xc3, 0x73, 0x6b, 0x1d, 0x06, 0xc9, 0xf9, 0xd4, 0x66,
+	0xb4, 0x94, 0xf3, 0xaf, 0xcd, 0xc8, 0x6e, 0x3a, 0x9e, 0xd6, 0xca, 0x30, 0xe3, 0x3c, 0xe9, 0x2f,
+	0x08, 0xdf, 0x4d, 0x19, 0xce, 0x7b, 0x35, 0x57, 0x92, 0x77, 0xfc, 0x27, 0x53, 0x5b, 0xff, 0xf6,
+	0xc3, 0x98, 0xf8, 0x18, 0x1b, 0xe8, 0x30, 0x36, 0xd0, 0x51, 0x6c, 0xa0, 0xef, 0xb1, 0x81, 0x7e,
+	0xc6, 0xc6, 0xc4, 0xaf, 0xd8, 0x40, 0x6f, 0x97, 0x2f, 0x34, 0x5e, 0xc9, 0x83, 0x66, 0xb3, 0xa0,
+	0x7e, 0x80, 0x2b, 0xbf, 0x03, 0x00, 0x00, 0xff, 0xff, 0x19, 0x41, 0xa6, 0xf7, 0x70, 0x07, 0x00,
+	0x00,
 }

@@ -8,33 +8,6 @@ package ttn.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
-message UserIdentifiers {
-  // username of the user
-  string username = 1;
-  // email address of the user
-  string email = 2;
-  // TTN Tenant ID (in case of multi-tenant network stack)
-  string tenant_id = 3 [(gogoproto.customname) = "TenantID"];
-}
-
-// End device identifiers are carried with uplink and downlink messages
-// Unknown fields are left empty
-message EndDeviceIdentifiers {
-  // TTN Device ID
-  string device_id = 1 [(gogoproto.customname) = "DeviceID"];
-  // TTN Application ID
-  string application_id = 2 [(gogoproto.customname) = "ApplicationID"];
-  // TTN Tenant ID (in case of multi-tenant network server)
-  string tenant_id = 3 [(gogoproto.customname) = "TenantID"];
-
-  // LoRaWAN DevEUI
-  bytes dev_eui = 4 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
-  // LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices)
-  bytes join_eui = 5 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
-  // LoRaWAN DevAddr
-  bytes dev_addr = 6 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
-}
-
 message ApplicationIdentifiers {
   // TTN Application ID
   string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
@@ -42,14 +15,10 @@ message ApplicationIdentifiers {
   string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
 }
 
-message ApplicationAppEUIIdentifiers {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  bytes app_eui = 2 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
-}
-
 message ApplicationAPIKeyIdentifiers {
   ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // key_name is the API key name.
+
+  // key_name is the API key name to be removed.
   string key_name = 2;
 }
 
@@ -89,6 +58,33 @@ message GatewayCollaboratorIdentifiers {
   string username = 3;
   // email address of the user.
   string email = 4;
+}
+
+// End device identifiers are carried with uplink and downlink messages
+// Unknown fields are left empty
+message EndDeviceIdentifiers {
+  // TTN Device ID
+  string device_id = 1 [(gogoproto.customname) = "DeviceID"];
+  // TTN Application ID
+  string application_id = 2 [(gogoproto.customname) = "ApplicationID"];
+  // TTN Tenant ID (in case of multi-tenant network server)
+  string tenant_id = 3 [(gogoproto.customname) = "TenantID"];
+
+  // LoRaWAN DevEUI
+  bytes dev_eui = 4 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
+  // LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices)
+  bytes join_eui = 5 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+  // LoRaWAN DevAddr
+  bytes dev_addr = 6 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
+}
+
+message UserIdentifiers {
+  // username of the user
+  string username = 1;
+  // email address of the user
+  string email = 2;
+  // TTN Tenant ID (in case of multi-tenant network stack)
+  string tenant_id = 3 [(gogoproto.customname) = "TenantID"];
 }
 
 message ClientIdentifiers {

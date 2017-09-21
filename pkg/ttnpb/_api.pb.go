@@ -52,15 +52,14 @@ It has these top-level messages:
 	GatewayDown
 	FrequencyPlan
 	FrequencyPlanRequest
-	UserIdentifiers
-	EndDeviceIdentifiers
 	ApplicationIdentifiers
-	ApplicationAppEUIIdentifiers
 	ApplicationAPIKeyIdentifiers
 	ApplicationCollaboratorIdentifiers
 	GatewayIdentifiers
 	GatewayAntennaIdentifiers
 	GatewayCollaboratorIdentifiers
+	EndDeviceIdentifiers
+	UserIdentifiers
 	ClientIdentifiers
 	ClientCollaboratorIdentifiers
 	CreateUserRequest
@@ -72,6 +71,7 @@ It has these top-level messages:
 	AddApplicationAppEUIRequest
 	GenerateApplicationAppEUIResponse
 	ListApplicationAppEUIsResponse
+	RemoveApplicationAppEUIRequest
 	GenerateApplicationAPIKeyRequest
 	ListApplicationAPIKeysResponse
 	ApplicationCollaborator

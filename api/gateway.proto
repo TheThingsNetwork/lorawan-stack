@@ -27,8 +27,8 @@ message Gateway {
   // frequency_plan_id indicates the ID of the frequency plan.
   string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID", (gogoproto.moretags) = "db:\"frequency_plan\""];
 
-  // activated denotes wether or not the gateway has been activated.
-  bool activated = 5;
+  // activated_at denotes when the gateway was activated.
+  google.protobuf.Timestamp activated_at = 5 [(gogoproto.stdtime) = true];
 
   // status_public denotes whether or not the gateway's status is public or not.
   bool status_public = 6 [(gogoproto.moretags) = "db:\"status_public\""];
@@ -49,7 +49,7 @@ message Gateway {
   // antennas is all the antennas that the gateway has.
   repeated GatewayAntenna antennas = 11 [(gogoproto.nullable) = false];
 
-  // attributes is a map of free form attributes.
+  // attributes is a free form map of attributes.
   map<string, string> attributes = 12;
 
   // cluster_address indicates the URI of the gateway server cluster to connect to,
@@ -65,22 +65,20 @@ message Gateway {
 
 // GatewayAntenna is the message that defines a gateway antenna.
 message GatewayAntenna {
-  GatewayAntennaIdentifiers id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
   // antenna_gain is the antenna gain relative to this gateway, in dBi
-  float antenna_gain = 2;
+  float antenna_gain = 1;
 
   // location is the antenna's location.
-  Location location = 3 [(gogoproto.nullable) = false];
+  Location location = 2 [(gogoproto.nullable) = false];
 
   // type denotes the antenna's type.
-  string type = 4;
+  string type = 3;
 
   // model denotes the antenna's model.
-  string model = 5;
+  string model = 4;
 
   // placement denotes whether if the antenna is placed indoors or outdoors.
-  GatewayAntennaPlacement placement = 6;
+  GatewayAntennaPlacement placement = 5;
 }
 
 // GatewayAntennaPlacement enum defines whether if the gateway antenna is placed

@@ -19,10 +19,10 @@ message Application {
   // description is the description of the application.
   string description = 2;
 
-  // app_euis are the app euis this application uses.
+  // app_euis are the AppEUIs this application uses.
   repeated bytes app_euis = 3 [(gogoproto.customname) = "AppEUIs", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 
-  // api_keys are the API keys the application defined.
+  // api_keys are the API keys of the application.
   repeated ApplicationAPIKey api_keys = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
 
   // created_at is the time when the application was created.

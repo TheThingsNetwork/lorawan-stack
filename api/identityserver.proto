@@ -117,6 +117,13 @@ message ListApplicationAppEUIsResponse {
   repeated bytes app_euis = 1 [(gogoproto.customname) = "AppEUIs", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 }
 
+message RemoveApplicationAppEUIRequest {
+  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // app_eui is the AppEUI to be removed.
+  bytes app_eui = 2 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
+}
+
 message GenerateApplicationAPIKeyRequest {
   ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
@@ -143,10 +150,10 @@ message ListApplicationCollaboratorsResponse {
 }
 
 message ApplicationRight {
-  ApplicationCollaboratorIdentifiers collaborator = 1;
+  ApplicationCollaboratorIdentifiers collaborator = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // right is the right that the user holds for the application.
-  Right right = 2;
+  Right right = 3;
 }
 
 message ListApplicationRightsResponse {
@@ -189,7 +196,7 @@ service IsApplication {
   rpc ListApplicationAppEUIs(ApplicationIdentifiers) returns (ListApplicationAppEUIsResponse);
 
   // RemoveApplicationAppEUI deletes an AppEUI from an application.
-  rpc RemoveApplicationAppEUI(ApplicationAppEUIIdentifiers) returns (google.protobuf.Empty);
+  rpc RemoveApplicationAppEUI(RemoveApplicationAppEUIRequest) returns (google.protobuf.Empty);
 
   // GenerateApplicationAPIKey generates a new API key for a given application
   // and returns it.
@@ -231,15 +238,8 @@ message CreateGatewayRequest {
   // description is the description of the gateway.
   string description = 2;
 
-  // token is a valid token that can identify the gateway with other components
-  // that have the IS's decryption keys.
-  string token = 3;
-
   // frequency_plan_id indicates the ID of the frequency plan.
   string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID"];
-
-  // activated denotes wether or not the gateway has been activated.
-  bool activated = 5;
 
   // status_public denotes whether Aor not the gateway's status is public or not.
   bool status_public = 6;
@@ -260,7 +260,7 @@ message CreateGatewayRequest {
   // antennas is all the antennas that the gateway has.
   repeated GatewayAntenna antennas = 11 [(gogoproto.nullable) = false];
 
-  // attributes is a map of free form attributes.
+  // attributes is a free form map of attributes.
   map<string, string> attributes = 12;
 
   // cluster_address indicates the URI of the gateway server cluster to connect to,
@@ -278,15 +278,8 @@ message UpdateGatewayRequest {
   // description is the description of the gateway.
   string description = 2;
 
-  // token is a valid token that can identify the gateway with other components
-  // that have the IS's decryption keys.
-  string token = 3;
-
   // frequency_plan_id indicates the ID of the frequency plan.
   string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID"];
-
-  // activated denotes wether or not the gateway has been activated.
-  bool activated = 5;
 
   // status_public denotes whether Aor not the gateway's status is public or not.
   bool status_public = 6;
@@ -307,7 +300,7 @@ message UpdateGatewayRequest {
   // antennas is all the antennas that the gateway has.
   repeated GatewayAntenna antennas = 11 [(gogoproto.nullable) = false];
 
-  // attributes is a map of free form attributes.
+  // attributes is a free form map of attributes.
   map<string, string> attributes = 12;
 
   // cluster_address indicates the URI of the gateway server cluster to connect to,
