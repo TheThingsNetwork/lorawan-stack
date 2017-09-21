@@ -85,7 +85,7 @@ type Gateway struct {
 	ClusterAddress string `protobuf:"bytes,13,opt,name=cluster_address,json=clusterAddress,proto3" json:"cluster_address,omitempty" db:"cluster_address"`
 	// created_at is the time when the gateway was created.
 	CreatedAt time.Time `protobuf:"bytes,14,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	// archived_at is the time when the gateway was disabled.
+	// archived_at is the time when the gateway was archived.
 	ArchivedAt *time.Time `protobuf:"bytes,15,opt,name=archived_at,json=archivedAt,stdtime" json:"archived_at,omitempty"`
 }
 

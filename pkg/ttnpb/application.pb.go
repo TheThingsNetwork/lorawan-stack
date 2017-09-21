@@ -42,7 +42,7 @@ type Application struct {
 	APIKeys []ApplicationAPIKey `protobuf:"bytes,4,rep,name=api_keys,json=apiKeys" json:"api_keys"`
 	// created_at is the time when the application was created.
 	CreatedAt time.Time `protobuf:"bytes,6,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	// archived_at is the time when the application was disabled.
+	// archived_at is the time when the application was archived.
 	ArchivedAt *time.Time `protobuf:"bytes,7,opt,name=archived_at,json=archivedAt,stdtime" json:"archived_at,omitempty"`
 }
 

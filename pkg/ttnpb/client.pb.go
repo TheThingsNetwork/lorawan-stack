@@ -122,7 +122,7 @@ type Client struct {
 	Scope []ClientScope `protobuf:"varint,8,rep,packed,name=scope,enum=ttn.v3.ClientScope" json:"scope,omitempty"`
 	// created_at denotes when the client was created.
 	CreatedAt time.Time `protobuf:"bytes,9,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	// archived_at denotes when the client was disabled.
+	// archived_at denotes when the client was archived.
 	ArchivedAt *time.Time `protobuf:"bytes,10,opt,name=archived_at,json=archivedAt,stdtime" json:"archived_at,omitempty"`
 }
 

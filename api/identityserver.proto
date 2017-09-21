@@ -66,9 +66,9 @@ service IsUser {
   // DeleteUser permanently deletes a user.
   rpc DeleteUser(UserIdentifiers) returns (google.protobuf.Empty);
 
-  // DisableUser disables the account of the authenticated user and therefore
+  // ArchiveUser archives the account of the authenticated user and therefore
   // it cannot be used.
-  rpc DisableUser(google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc ArchiveUser(google.protobuf.Empty) returns (google.protobuf.Empty);
 }
 
 message CreateApplicationRequest {
@@ -180,11 +180,8 @@ service IsApplication {
   // DeleteApplication permanently deletes an application.
   rpc DeleteApplication(ApplicationIdentifiers) returns (google.protobuf.Empty);
 
-  // DisableApplication disables an application so it cannot be used anymore.
-  rpc DisableApplication(ApplicationIdentifiers) returns (google.protobuf.Empty);
-
-  // RestoreApplication restores a disabled application so it can be used again.
-  rpc RestoreApplication(ApplicationIdentifiers) returns (google.protobuf.Empty);
+  // ArchiveApplication archives an application so it cannot be used anymore.
+  rpc ArchiveApplication(ApplicationIdentifiers) returns (google.protobuf.Empty);
 
   // AddApplicationAppEUI adds a given AppEUI to a given application.
   rpc AddApplicationAppEUI(AddApplicationAppEUIRequest) returns (google.protobuf.Empty);
@@ -386,8 +383,8 @@ service IsGateway {
   // DeleteGateway permanently deletes a gateway.
   rpc DeleteGateway(GatewayIdentifiers) returns (google.protobuf.Empty);
 
-  // DisableGateway disables a gateway and therefore it can not be used anymore.
-  rpc DisableGateway(GatewayIdentifiers) returns (google.protobuf.Empty);
+  // ArchiveGateway archives a gateway and therefore it cannot be used anymore.
+  rpc ArchiveGateway(GatewayIdentifiers) returns (google.protobuf.Empty);
 
   // AddGatewayAttribute sets an attribute with a key in the gateway.
   rpc AddGatewayAttribute(AddGatewayAttributeRequest) returns (google.protobuf.Empty);
@@ -536,8 +533,8 @@ service IsClient {
   // a third-party client request.
   rpc SetClientState(SetClientStateRequest) returns (google.protobuf.Empty);
 
-  // DisableClient disables a client so it cannot be used anymore.
-  rpc DisableClient(ClientIdentifiers) returns (google.protobuf.Empty);
+  // ArchiveClient archives a client so it cannot be used anymore.
+  rpc ArchiveClient(ClientIdentifiers) returns (google.protobuf.Empty);
 
   // AddClientCollaborator makes an user collaborator of a client.
   rpc AddClientCollaborator(ClientCollaborator) returns (google.protobuf.Empty);

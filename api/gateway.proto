@@ -59,7 +59,7 @@ message Gateway {
   // created_at is the time when the gateway was created.
   google.protobuf.Timestamp created_at = 14 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // archived_at is the time when the gateway was disabled.
+  // archived_at is the time when the gateway was archived.
   google.protobuf.Timestamp archived_at = 15 [(gogoproto.stdtime) = true];
 }
 

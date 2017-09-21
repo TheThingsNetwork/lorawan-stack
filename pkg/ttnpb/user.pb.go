@@ -38,7 +38,7 @@ type User struct {
 	Admin bool `protobuf:"varint,5,opt,name=admin,proto3" json:"admin,omitempty"`
 	// created_at denotes when the user was created.
 	CreatedAt time.Time `protobuf:"bytes,6,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
-	// archived_at is the time when the user account was disabled.
+	// archived_at is the time when the user account was archived.
 	ArchivedAt *time.Time `protobuf:"bytes,7,opt,name=archived_at,json=archivedAt,stdtime" json:"archived_at,omitempty"`
 }
 

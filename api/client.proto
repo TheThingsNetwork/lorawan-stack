@@ -39,7 +39,7 @@ message Client {
   // created_at denotes when the client was created.
   google.protobuf.Timestamp created_at = 9 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // archived_at denotes when the client was disabled.
+  // archived_at denotes when the client was archived.
   google.protobuf.Timestamp archived_at = 10 [(gogoproto.stdtime) = true];
 }
 
