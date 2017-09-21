@@ -81,7 +81,7 @@ func (m *Application) GetArchivedAt() *time.Time {
 type ApplicationAPIKey struct {
 	// name is the API key name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// key is the actual API key (base64 encoded).
+	// key is the actual API key.
 	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	// rights are the rights this API key bears.
 	Rights []Right `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`

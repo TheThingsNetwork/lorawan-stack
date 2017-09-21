@@ -36,7 +36,7 @@ message ApplicationAPIKey {
   // name is the API key name.
   string name = 1;
 
-  // key is the actual API key (base64 encoded).
+  // key is the actual API key.
   string key = 2;
 
   // rights are the rights this API key bears.

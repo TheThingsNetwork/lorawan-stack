@@ -111,7 +111,7 @@ type CreateApplicationRequest struct {
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	// app_euis are the app euis this application uses.
 	AppEUIs []github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,3,rep,name=app_euis,json=appEuis,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"app_euis,omitempty"`
-	// api_keys are the API keys the application defined.
+	// api_keys are the API keys of the application.
 	APIKeys []ApplicationAPIKey `protobuf:"bytes,4,rep,name=api_keys,json=apiKeys" json:"api_keys"`
 }
 
@@ -158,7 +158,7 @@ type UpdateApplicationRequest struct {
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	// app_euis are the app euis this application uses.
 	AppEUIs []github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,3,rep,name=app_euis,json=appEuis,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"app_euis,omitempty"`
-	// api_keys are the API keys the application defined.
+	// api_keys are the API keys of the application.
 	APIKeys []ApplicationAPIKey `protobuf:"bytes,4,rep,name=api_keys,json=apiKeys" json:"api_keys"`
 }
 

@@ -80,7 +80,7 @@ message CreateApplicationRequest {
   // app_euis are the app euis this application uses.
   repeated bytes app_euis = 3 [(gogoproto.customname) = "AppEUIs", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 
-  // api_keys are the API keys the application defined.
+  // api_keys are the API keys of the application.
   repeated ApplicationAPIKey api_keys = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
 }
 
@@ -97,7 +97,7 @@ message UpdateApplicationRequest {
   // app_euis are the app euis this application uses.
   repeated bytes app_euis = 3 [(gogoproto.customname) = "AppEUIs", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 
-  // api_keys are the API keys the application defined.
+  // api_keys are the API keys of the application.
   repeated ApplicationAPIKey api_keys = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
 }
 
