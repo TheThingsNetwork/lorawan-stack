@@ -8,11 +8,13 @@ package ttn.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
-message GatewayIdentifiers {
-  // TTN Gateway ID
-  string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
+message UserIdentifiers {
+  // username of the user
+  string username = 1;
+  // email address of the user
+  string email = 2;
   // TTN Tenant ID (in case of multi-tenant network stack)
-  string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
+  string tenant_id = 3 [(gogoproto.customname) = "TenantID"];
 }
 
 // End device identifiers are carried with uplink and downlink messages
@@ -40,15 +42,53 @@ message ApplicationIdentifiers {
   string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
 }
 
-message UserIdentifiers {
-  // username of the user
-  string username = 1;
+message ApplicationAppEUIIdentifiers {
+  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  bytes app_eui = 2 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
+}
 
-  // email address of the user
-  string email = 2;
+message ApplicationAPIKeyIdentifiers {
+  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // key_name is the API key name.
+  string key_name = 2;
+}
 
+message ApplicationCollaboratorIdentifiers {
+  // TTN Application ID
+  string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
   // TTN Tenant ID (in case of multi-tenant network stack)
-  string tenant_id = 3 [(gogoproto.customname) = "TenantID"];
+  string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
+  // username of the user.
+  string username = 3;
+  // email address of the user.
+  string email = 4;
+}
+
+message GatewayIdentifiers {
+  // TTN Gateway ID
+  string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
+  // TTN Tenant ID (in case of multi-tenant network stack)
+  string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
+}
+
+message GatewayAntennaIdentifiers {
+  // TTN Gateway ID
+  string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
+  // TTN Tenant ID (in case of multi-tenant network stack)
+  string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
+  // Indexed position of the antenna in the list
+  string antenna_index = 3;
+}
+
+message GatewayCollaboratorIdentifiers {
+  // TTN Gateway ID
+  string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
+  // TTN Tenant ID (in case of multi-tenant network stack)
+  string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
+  // username of the user.
+  string username = 3;
+  // email address of the user.
+  string email = 4;
 }
 
 message ClientIdentifiers {
@@ -56,4 +96,16 @@ message ClientIdentifiers {
   string client_id = 1 [(gogoproto.customname) = "ClientID"];
   // TTN Tenant ID (in case of multi-tenant network stack)
   string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
+}
+
+message ClientCollaboratorIdentifiers {
+  // TTN Client ID
+  string client_id = 1 [(gogoproto.customname) = "ClientID"];
+  // TTN Tenant ID (in case of multi-tenant network stack)
+  string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
+  // username of the user.
+  string username = 3;
+  // email address of the user.
+  string email = 4;
+
 }

@@ -1,11 +1,11 @@
-  // Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsNetwork/ttn/api/application.proto";
 import "github.com/TheThingsNetwork/ttn/api/client.proto";
-import "github.com/TheThingsNetwork/ttn/api/collaborator.proto";
+import "github.com/TheThingsNetwork/ttn/api/rights.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/gateway.proto";
 import "github.com/TheThingsNetwork/ttn/api/user.proto";
@@ -23,68 +23,21 @@ service GtwGr {
 }
 
 message CreateUserRequest {
-  // username is the unique and immutable username of the user.
-  string username = 1;
+  UserIdentifiers user = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // password is the user's unencrypted password.
   string password = 2;
 
-  // email is the email address the user can be reached at.
-  string email = 3;
-
   // name is the user's full name.
-  Name name = 4;
-}
-
-message CreateUserResponse {
-  // username is the unique and immutable username of the user.
-  string username = 1;
-
-  // email is the email address the user can be reached at.
-  string email = 2;
-
-  // name is the user's full name.
-  Name name = 3;
-}
-
-message GetUserResponse {
-  // username is the unique and immutable username of the user.
-  string username = 1;
-
-  // name is the user's full name.
-  Name name = 2;
-}
-
-message GetAccountResponse {
-  // username is the unique and immutable username of the user.
-  string username = 1;
-
-  // email is the email address the user can be reached at.
-  string email = 2;
-
-  // name is the user's full name.
-  Name name = 3;
+  Name name = 3 [(gogoproto.nullable) = false];
 }
 
 message UpdateUserRequest {
-  // name is new name of the user.
-  Name name = 1;
-}
-
-message UpdateUserResponse {
-  // username is the unique and immutable username of the user.
-  string username = 1;
-
-  // email is the email address the user can be reached at.
-  string email = 2;
-
-  // name is the user's full name.
-  Name name = 3;
-}
-
-message UpdateUserEmailRequest {
   // email is the new email of the user.
   string email = 1;
+
+  // name is the new name of the user.
+  Name name = 2 [(gogoproto.nullable) = false];
 }
 
 message UpdateUserPasswordRequest {
@@ -97,25 +50,17 @@ message UpdateUserPasswordRequest {
 
 // IsUser is the interface that provides methods to manage users in the Identity Server.
 service IsUser {
-  // CreateUser creates a new user on the network and returns the profile of
-  // the new user.
-  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  // CreateUser creates a new user on the network.
+  rpc CreateUser(CreateUserRequest) returns (google.protobuf.Empty);
 
-  // GetUser returns the profile of an user.
-  rpc GetUser(UserIdentifiers) returns (GetUserResponse);
+  // GetUser returns the profile of an user. If the user identifier is empty it
+  // returns the profile of the authenticated user.
+  rpc GetUser(UserIdentifiers) returns (User);
 
-  // GetAccount returns the detailed user profile of the authenticated user,
-  rpc GetAccount(google.protobuf.Empty) returns (GetAccountResponse);
+  // UpdateUser edits the profile of the authenticated user.
+  rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty);
 
-  // UpdateUser edits the profile of the authenticated user and returns
-  // the updated profile.
-  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
-
-  // UpdateUserEmail edits the email of the authenticated user and sets the
-  // new email as unvalidated.
-  rpc UpdateUserEmail(UpdateUserEmailRequest) returns (google.protobuf.Empty);
-
-  // UpdateUserPassword changes the password of the authenticated user.
+  // UpdateUserPassword sets a new password for the authenticated user account.
   rpc UpdateUserPassword(UpdateUserPasswordRequest) returns (google.protobuf.Empty);
 
   // DeleteUser permanently deletes a user.
@@ -133,7 +78,7 @@ message CreateApplicationRequest {
   string description = 2;
 
   // app_euis are the app euis this application uses.
-  repeated bytes app_euis = 3 [(gogoproto.customname) = "AppEUIs", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
+  repeated bytes app_euis = 3 [(gogoproto.customname) = "AppEUIs", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 
   // api_keys are the API keys the application defined.
   repeated ApplicationAPIKey api_keys = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
@@ -150,7 +95,7 @@ message UpdateApplicationRequest {
   string description = 2;
 
   // app_euis are the app euis this application uses.
-  repeated bytes app_euis = 3 [(gogoproto.customname) = "AppEUIs", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
+  repeated bytes app_euis = 3 [(gogoproto.customname) = "AppEUIs", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 
   // api_keys are the API keys the application defined.
   repeated ApplicationAPIKey api_keys = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
@@ -163,18 +108,13 @@ message AddApplicationAppEUIRequest {
   bytes app_eui = 2 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 }
 
-message AppEUIIdentifier {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  bytes app_eui = 2 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
-}
-
 message GenerateAppEUIResponse {
+  // app_eui is the AppEUI that has been generated.
   bytes app_eui = 1 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 }
 
 message ListApplicationAppEUIsResponse {
-  repeated bytes app_euis = 1 [(gogoproto.customname) = "AppEUIs", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
+  repeated bytes app_euis = 1 [(gogoproto.customname) = "AppEUIs", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 }
 
 message GenerateApplicationAPIKeyRequest {
@@ -187,42 +127,26 @@ message GenerateApplicationAPIKeyRequest {
   repeated Right rights = 3;
 }
 
-message ApplicationAPIKeyIdentifier {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // key_name is the API key name.
-  string key_name = 2;
-}
-
 message ListApplicationAPIKeysResponse {
   repeated ApplicationAPIKey api_keys = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
 }
 
-message AddApplicationCollaboratorRequest {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+message ApplicationCollaborator {
+  ApplicationCollaboratorIdentifiers collaborator = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  Collaborator collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // rights is a list of rights that an user holds for an application.
+  repeated Right rights = 2;
 }
 
 message ListApplicationCollaboratorsResponse {
-  repeated Collaborator collaborators = 1 [(gogoproto.nullable) = false];
-}
-
-message RemoveApplicationCollaboratorRequest {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // username is the user's username that identifies a collaborator in an application.
-  string username = 2;
+  repeated ApplicationCollaborator collaborators = 1 [(gogoproto.nullable) = false];
 }
 
 message ApplicationRight {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // username is the user's username that holds the right for the application.
-  string username = 2;
+  ApplicationCollaboratorIdentifiers collaborator = 1;
 
   // right is the right that the user holds for the application.
-  Right right = 3;
+  Right right = 2;
 }
 
 message ListApplicationRightsResponse {
@@ -233,8 +157,8 @@ message ListApplicationRightsResponse {
 // IsApplication is the interface that provides methods to manage applications
 // in the Identity Server.
 service IsApplication {
-  // CreateApplication creates a new application on the network and returns it.
-  rpc CreateApplication(CreateApplicationRequest) returns (Application);
+  // CreateApplication creates a new application on the network.
+  rpc CreateApplication(CreateApplicationRequest) returns (google.protobuf.Empty);
 
   // GetApplication finds an application by ID and retrieves it.
   rpc GetApplication(ApplicationIdentifiers) returns (Application);
@@ -243,8 +167,8 @@ service IsApplication {
   // is collaborator.
   rpc ListApplications(google.protobuf.Empty) returns (ListApplicationsResponse);
 
-  // UpdateApplication edits an application and returns the updated version.
-  rpc UpdateApplication(UpdateApplicationRequest) returns (Application);
+  // UpdateApplication edits an application.
+  rpc UpdateApplication(UpdateApplicationRequest) returns (google.protobuf.Empty);
 
   // DeleteApplication permanently deletes an application.
   rpc DeleteApplication(ApplicationIdentifiers) returns (google.protobuf.Empty);
@@ -265,30 +189,30 @@ service IsApplication {
   rpc ListApplicationAppEUIs(ApplicationIdentifiers) returns (ListApplicationAppEUIsResponse);
 
   // RemoveApplicationAppEUI deletes an AppEUI from an application.
-  rpc RemoveApplicationAppEUI(AppEUIIdentifier) returns (google.protobuf.Empty);
+  rpc RemoveApplicationAppEUI(ApplicationAppEUIIdentifiers) returns (google.protobuf.Empty);
 
   // GenerateApplicationAPIKey generates a new API key for a given application
   // and returns it.
   rpc GenerateApplicationAPIKey(GenerateApplicationAPIKeyRequest) returns (ApplicationAPIKey);
 
   // GetApplicationAPIKey returns a given API key from an application.
-  rpc GetApplicationAPIKey(ApplicationAPIKeyIdentifier) returns (ApplicationAPIKey);
+  rpc GetApplicationAPIKey(ApplicationAPIKeyIdentifiers) returns (ApplicationAPIKey);
 
   // ListApplicationAPIKeys returns all the API keys that are registered
   // for an application.
   rpc ListApplicationAPIKeys(ApplicationIdentifiers) returns (ListApplicationAPIKeysResponse);
 
   // RemoveApplicationAPIKey removes a given API key from an application.
-  rpc RemoveApplicationAPIKey(ApplicationAPIKeyIdentifier) returns (google.protobuf.Empty);
+  rpc RemoveApplicationAPIKey(ApplicationAPIKeyIdentifiers) returns (google.protobuf.Empty);
 
   // AddApplicationCollaborator adds an user as collaborator of an application.
-  rpc AddApplicationCollaborator(AddApplicationCollaboratorRequest) returns (google.protobuf.Empty);
+  rpc AddApplicationCollaborator(ApplicationCollaborator) returns (google.protobuf.Empty);
 
   // ListApplicationCollaborators returns all the collaborators of a given application.
   rpc ListApplicationCollaborators(ApplicationIdentifiers) returns (ListApplicationCollaboratorsResponse);
 
   // RemoveApplicationCollaborator removes a collaborator from an application.
-  rpc RemoveApplicationCollaborator(RemoveApplicationCollaboratorRequest) returns (google.protobuf.Empty);
+  rpc RemoveApplicationCollaborator(ApplicationCollaboratorIdentifiers) returns (google.protobuf.Empty);
 
   // AddApplicationRight grants a given right to a given user for a given application.
   rpc AddApplicationRight(ApplicationRight) returns (google.protobuf.Empty);
@@ -330,21 +254,18 @@ message CreateGatewayRequest {
   // automatically fetch and execute firmware updates.
   bool auto_update = 9;
 
-  // brand is the gateway brand.
-  string brand = 10;
-
-  // model is the gateway model.
-  string model = 11;
+  // platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS"
+  string platform = 10;
 
   // antennas is all the antennas that the gateway has.
-  repeated GatewayAntenna antennas = 12 [(gogoproto.nullable) = false];
+  repeated GatewayAntenna antennas = 11 [(gogoproto.nullable) = false];
 
   // attributes is a map of free form attributes.
-  map<string, string> attributes = 13;
+  map<string, string> attributes = 12;
 
   // cluster_address indicates the URI of the gateway server cluster to connect to,
   // in a "<ip>:<port>" format.
-  string cluster_address = 14;
+  string cluster_address = 13;
 }
 
 message ListGatewaysResponse {
@@ -380,21 +301,18 @@ message UpdateGatewayRequest {
   // automatically fetch and execute firmware updates.
   bool auto_update = 9;
 
-  // brand is the gateway brand.
-  string brand = 10;
+  // platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS"
+  string platform = 10;
 
-  // model is the gateway model.
-  string model = 11;
-
-  // antennas contains the gateway's antennas.
-  repeated GatewayAntenna antennas = 12 [(gogoproto.nullable) = false];
+  // antennas is all the antennas that the gateway has.
+  repeated GatewayAntenna antennas = 11 [(gogoproto.nullable) = false];
 
   // attributes is a map of free form attributes.
-  map<string, string> attributes = 13;
+  map<string, string> attributes = 12;
 
   // cluster_address indicates the URI of the gateway server cluster to connect to,
   // in a "<ip>:<port>" format.
-  string cluster_address = 14;
+  string cluster_address = 13;
 }
 
 message AddGatewayAttributeRequest {
@@ -419,8 +337,8 @@ message RemoveGatewayAttributeRequest {
   string attribute = 2;
 }
 
-message AddGatewayAntennaRequest {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+message SetGatewayAntennaRequest {
+  GatewayAntennaIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // antenna is the gateway antenna to be added.
   GatewayAntenna antenna = 2 [(gogoproto.nullable) = false];
@@ -430,43 +348,26 @@ message ListGatewayAntennasResponse {
   repeated GatewayAntenna antennas = 1 [(gogoproto.nullable) = false];
 }
 
-message RemoveGatewayAntennaRequest {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+message GatewayCollaborator {
+  GatewayCollaboratorIdentifiers collaborator = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // antenna_id is the ID of the antenna to be deleted.
-  string antenna_id = 2 [(gogoproto.customname) = "AntennaID"];
-}
-
-message AddGatewayCollaboratorRequest {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  Collaborator collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  repeated Right rights = 2;
 }
 
 message ListGatewayCollaboratorsResponse {
-  repeated Collaborator collaborators = 1 [(gogoproto.nullable) = false];
+  repeated GatewayCollaborator collaborators = 1 [(gogoproto.nullable) = false];
 }
 
 message ListGatewayOwnersResponse {
-  // usernames is the list of user's usernames that have owner rights for the gateway.
-  repeated string usernames = 1;
-}
-
-message RemoveGatewayCollaboratorRequest {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // username is the identifier of the collaborator to be deleted.
-  string username = 2;
+  // collaborators is the list of collaborators that have owner rights for the gateway.
+  repeated GatewayCollaboratorIdentifiers collaborators = 1;
 }
 
 message GatewayRight {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // username is the user's username that holds a right over a gateway.
-  string username = 2;
+  GatewayCollaboratorIdentifiers collaborator = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // right is the right this user holds for the gateway.
-  Right right = 3;
+  Right right = 2;
 }
 
 message ListGatewayRightsResponse {
@@ -504,17 +405,17 @@ service IsGateway {
   // RemoveGatewayAttribute removes an attribute matching the given key.
   rpc RemoveGatewayAttribute(RemoveGatewayAttributeRequest) returns (google.protobuf.Empty);
 
-  // AddGatewayAntenna adds a new antenna to a gateway.
-  rpc AddGatewayAntenna(AddGatewayAntennaRequest) returns (google.protobuf.Empty);
+  // SetGatewayAntenna sets an antenna to a gateway.
+  rpc SetGatewayAntenna(GatewayAntenna) returns (google.protobuf.Empty);
 
   // ListGatewayAntenas returns all the antennas that a gateway has registered.
   rpc ListGatewayAntennas(GatewayIdentifiers) returns (ListGatewayAntennasResponse);
 
   // RemoveGatewayAntenna removes a given antenna from a gateway.
-  rpc RemoveGatewayAntenna(RemoveGatewayAntennaRequest) returns (google.protobuf.Empty);
+  rpc RemoveGatewayAntenna(GatewayAntennaIdentifiers) returns (google.protobuf.Empty);
 
   // AddGatewayCollaborator makes an user collaborator a gateway.
-  rpc AddGatewayCollaborator(AddGatewayCollaboratorRequest) returns (google.protobuf.Empty);
+  rpc AddGatewayCollaborator(GatewayCollaborator) returns (google.protobuf.Empty);
 
   // ListGatewayCollaborators returns all the collaborators for a given gateway.
   rpc ListGatewayCollaborators(GatewayIdentifiers) returns (ListGatewayCollaboratorsResponse);
@@ -524,7 +425,7 @@ service IsGateway {
 
   // RemoveGatewayCollaborator revokes all the rights that a collaborator has to
   // a given gateway.
-  rpc RemoveGatewayCollaborator(RemoveGatewayCollaboratorRequest) returns (google.protobuf.Empty);
+  rpc RemoveGatewayCollaborator(GatewayCollaboratorIdentifiers) returns (google.protobuf.Empty);
 
   // AddGatewayRight grants a right to a given user for a given gateway.
   rpc AddGatewayRight(GatewayRight) returns (google.protobuf.Empty);
@@ -550,10 +451,10 @@ message CreateClientRequest {
   string callback_uri = 4 [(gogoproto.customname) = "CallbackURI"];
 
   // grants denotes which OAuth2 flows can the client use to get a token.
-  ClientGrants grants = 7 [(gogoproto.nullable) = false];
+  repeated ClientGrant grants = 5;
 
   // scope denotes what scopes the client will have access to.
-  ClientScope scope = 8 [(gogoproto.nullable) = false];
+  repeated ClientScope scope = 6;
 }
 
 message ListClientsResponse {
@@ -574,10 +475,10 @@ message UpdateClientRequest {
   string callback_uri = 4 [(gogoproto.customname) = "CallbackURI"];
 
   // grants denotes which OAuth2 flows can the client use to get a token.
-  ClientGrants grants = 7 [(gogoproto.nullable) = false];
+  repeated ClientGrant grants = 5;
 
   // scope denotes what scopes the client will have access to.
-  ClientScope scope = 8 [(gogoproto.nullable) = false];
+  repeated ClientScope scope = 6;
 }
 
 message SetClientStateRequest {
@@ -586,31 +487,21 @@ message SetClientStateRequest {
   ClientState state = 2;
 }
 
-message AddClientCollaboratorRequest {
-  ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+message ClientCollaborator {
+  ClientCollaboratorIdentifiers collaborator = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  Collaborator collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  repeated Right rights = 2;
 }
 
 message ListClientCollaboratorsResponse {
-  repeated Collaborator collaborators = 1 [(gogoproto.nullable) = false];
-}
-
-message RemoveClientCollaboratorRequest {
-  ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // Username is the username of the user.
-  string username = 2;
+  repeated ClientCollaborator collaborators = 1 [(gogoproto.nullable) = false];
 }
 
 message ClientRight {
-  ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // username is the username of the user.
-  string username = 2;
+  ClientCollaboratorIdentifiers collaborator = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // right is the right that the user holds for the client.
-  Right right = 3;
+  Right right = 2;
 }
 
 message ListClientRightsResponse {
@@ -622,7 +513,7 @@ message ListClientRightsResponse {
 // in the Identity Server.
 service IsClient {
   // CreateClient creates a new client on the network.
-  rpc CreateClient(CreateClientRequest) returns (Client);
+  rpc CreateClient(CreateClientRequest) returns (google.protobuf.Empty);
 
   // GetClient finds a client by ID and retrieves it.
   rpc GetClient(ClientIdentifiers) returns (Client);
@@ -630,42 +521,42 @@ service IsClient {
   // ListClients returns all the clients which the authenticated user is collaborator.
   rpc ListClients(google.protobuf.Empty) returns (ListClientsResponse);
 
-  // UpdateClient edits a client and returns the updated version.
-  rpc UpdateClient(UpdateClientRequest) returns (Client);
+  // UpdateClient edits a client.
+  rpc UpdateClient(UpdateClientRequest) returns (google.protobuf.Empty);
 
   // DeleteClient permanently deletes a client.
   rpc DeleteClient(ClientIdentifiers) returns (google.protobuf.Empty);
 
   // MarkClientAsOfficial marks a client as an official third-party client
-  // created by the staff.
+  // created by the network operator.
   rpc MarkClientAsOfficial(ClientIdentifiers) returns (google.protobuf.Empty);
 
   // UnmarkClientAsOfficial unmarks a client as an official third-party client
-  // created by the staff.
+  // created by the network operator.
   rpc UnmarkClientAsOfficial(ClientIdentifiers) returns (google.protobuf.Empty);
 
-  // SetClientState allows to the staff to set the reviewing state of a
-  // third-party client request.
+  // SetClientState allows to the network operator to set the reviewing state of
+  // a third-party client request.
   rpc SetClientState(SetClientStateRequest) returns (google.protobuf.Empty);
 
   // DisableClient disables a client so it cannot be used anymore.
   rpc DisableClient(ClientIdentifiers) returns (google.protobuf.Empty);
 
-  // ApproveClient marks a client as approved by the staff so it can be used.
+  // ApproveClient marks a client as approved by the network operator so it can be used.
   rpc ApproveClient(ClientIdentifiers) returns (google.protobuf.Empty);
 
-  // RejectClient marks a client as rejected by the staff so it cannot be used.
+  // RejectClient marks a client as rejected by the network operator so it cannot be used.
   rpc RejectClient(ClientIdentifiers) returns (google.protobuf.Empty);
 
   // AddClientCollaborator makes an user collaborator of a client.
-  rpc AddClientCollaborator(AddClientCollaboratorRequest) returns (google.protobuf.Empty);
+  rpc AddClientCollaborator(ClientCollaborator) returns (google.protobuf.Empty);
 
   // ListClientCollaborators returns all the collaborators for a given client.
   rpc ListClientCollaborators(ClientIdentifiers) returns (ListClientCollaboratorsResponse);
 
   // RemoveClientCollaborator revokes all the rights that a collaborator has to
   // a given client.
-  rpc RemoveClientCollaborator(RemoveClientCollaboratorRequest) returns (google.protobuf.Empty);
+  rpc RemoveClientCollaborator(ClientCollaboratorIdentifiers) returns (google.protobuf.Empty);
 
   // AddClientRight grants a right to a given user for a given client.
   rpc AddClientRight(ClientRight) returns (google.protobuf.Empty);

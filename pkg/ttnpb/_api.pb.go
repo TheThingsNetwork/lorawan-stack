@@ -11,7 +11,6 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/application.proto
 	github.com/TheThingsNetwork/ttn/api/applicationserver.proto
 	github.com/TheThingsNetwork/ttn/api/client.proto
-	github.com/TheThingsNetwork/ttn/api/collaborator.proto
 	github.com/TheThingsNetwork/ttn/api/end_device.proto
 	github.com/TheThingsNetwork/ttn/api/gateway.proto
 	github.com/TheThingsNetwork/ttn/api/gatewayserver.proto
@@ -23,6 +22,7 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/messages.proto
 	github.com/TheThingsNetwork/ttn/api/metadata.proto
 	github.com/TheThingsNetwork/ttn/api/networkserver.proto
+	github.com/TheThingsNetwork/ttn/api/rights.proto
 	github.com/TheThingsNetwork/ttn/api/user.proto
 
 It has these top-level messages:
@@ -34,9 +34,6 @@ It has these top-level messages:
 	ApplicationDownlinks
 	DownlinkQueueRequest
 	Client
-	ClientScope
-	ClientGrants
-	Collaborator
 	KeyEnvelope
 	RootKeys
 	SessionKeys
@@ -55,32 +52,30 @@ It has these top-level messages:
 	GatewayDown
 	FrequencyPlan
 	FrequencyPlanRequest
-	GatewayIdentifiers
+	UserIdentifiers
 	EndDeviceIdentifiers
 	ApplicationIdentifiers
-	UserIdentifiers
+	ApplicationAppEUIIdentifiers
+	ApplicationAPIKeyIdentifiers
+	ApplicationCollaboratorIdentifiers
+	GatewayIdentifiers
+	GatewayAntennaIdentifiers
+	GatewayCollaboratorIdentifiers
 	ClientIdentifiers
+	ClientCollaboratorIdentifiers
 	CreateUserRequest
-	CreateUserResponse
-	GetUserResponse
-	GetAccountResponse
 	UpdateUserRequest
-	UpdateUserResponse
-	UpdateUserEmailRequest
 	UpdateUserPasswordRequest
 	CreateApplicationRequest
 	ListApplicationsResponse
 	UpdateApplicationRequest
 	AddApplicationAppEUIRequest
-	AppEUIIdentifier
 	GenerateAppEUIResponse
 	ListApplicationAppEUIsResponse
 	GenerateApplicationAPIKeyRequest
-	ApplicationAPIKeyIdentifier
 	ListApplicationAPIKeysResponse
-	AddApplicationCollaboratorRequest
+	ApplicationCollaborator
 	ListApplicationCollaboratorsResponse
-	RemoveApplicationCollaboratorRequest
 	ApplicationRight
 	ListApplicationRightsResponse
 	CreateGatewayRequest
@@ -89,22 +84,19 @@ It has these top-level messages:
 	AddGatewayAttributeRequest
 	ListGatewayAttributesResponse
 	RemoveGatewayAttributeRequest
-	AddGatewayAntennaRequest
+	SetGatewayAntennaRequest
 	ListGatewayAntennasResponse
-	RemoveGatewayAntennaRequest
-	AddGatewayCollaboratorRequest
+	GatewayCollaborator
 	ListGatewayCollaboratorsResponse
 	ListGatewayOwnersResponse
-	RemoveGatewayCollaboratorRequest
 	GatewayRight
 	ListGatewayRightsResponse
 	CreateClientRequest
 	ListClientsResponse
 	UpdateClientRequest
 	SetClientStateRequest
-	AddClientCollaboratorRequest
+	ClientCollaborator
 	ListClientCollaboratorsResponse
-	RemoveClientCollaboratorRequest
 	ClientRight
 	ListClientRightsResponse
 	JoinRequest

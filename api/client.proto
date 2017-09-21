@@ -3,6 +3,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "google/protobuf/timestamp.proto";
 
 package ttn.v3;
@@ -11,8 +12,7 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // Client is the message that defines a third-party client on the network.
 message Client {
-  // client_id is the unique client identifier.
-  string client_id = 1 [(gogoproto.customname) = "ID"];
+  ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the client.
   string description = 2;
@@ -23,80 +23,65 @@ message Client {
   // callback_uri is the callback URI of the client.
   string callback_uri = 4 [(gogoproto.customname) = "CallbackURI", (gogoproto.moretags) = "db:\"callback_uri\""];
 
-  // state denotes the reviewing state of the client by the staff.
-  // It can be either: pending, accepted or rejected.
+  // state denotes the reviewing state of the client by the tenant admin.
   ClientState state = 5;
 
-  // official denotes if the client is an official client created by the staff.
+  // official denotes if the client is an official client created by the tenant admin.
   bool official = 6;
 
   // grants denotes which OAuth2 flows can the client use to get a token.
-  ClientGrants grants = 7 [(gogoproto.nullable) = false];
+  repeated ClientGrant grants = 7;
 
   // scope denotes what scopes the client will have access to.
-  ClientScope scope = 8 [(gogoproto.nullable) = false];
+  repeated ClientScope scope = 8;
 
-  // created denotes when the client was created.
-  google.protobuf.Timestamp created = 9 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // created_at denotes when the client was created.
+  google.protobuf.Timestamp created_at = 9 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // archived denotes when the client was disabled.
-  google.protobuf.Timestamp archived = 10 [(gogoproto.stdtime) = true];
+  // archived_at denotes when the client was disabled.
+  google.protobuf.Timestamp archived_at = 10 [(gogoproto.stdtime) = true];
 }
 
-// ClientState enum defines all the possible staff reviewing states that a
-// third-party client request can be at.
+// ClientState enum defines all the possible tenant admin reviewing states
+// that a third-party client request can be at.
 enum ClientState {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  // State that denotes that the client request is pending to review by the staff.
-  PENDING = 0 [(gogoproto.enumvalue_customname) = "StatePending"];
+  // State that denotes that the client request is pending to review by the
+  // tenant admin.
+  PENDING = 0 [(gogoproto.enumvalue_customname) = "ClientStatePending"];
 
-  // Denotes that the client request has been approved by the staff and therefore
-  // the client can be used.
-  APPROVED = 1 [(gogoproto.enumvalue_customname) = "StateApproved"];
+  // Denotes that the client request has been approved by the tenant admin
+  // and therefore the client can be used.
+  APPROVED = 1 [(gogoproto.enumvalue_customname) = "ClientStateApproved"];
 
-  // Denotes that the client request has beenr rejected by the staff and therefore
-  // it cannot be used.
-  REJECTED = 2 [(gogoproto.enumvalue_customname) = "StateRejected"];
-}
-
-// ClientScope is the message that defines the scope of a third-party client.
-message ClientScope {
-  // application denotes whether if the client has access to manage user's applications.
-  bool application = 1;
-
-  // profile denotes wheter if the client has r-w access to user's profile.
-  bool profile = 2;
+  // Denotes that the client request has beenr rejected by the tenant admin
+  // and therefore it cannot be used.
+  REJECTED = 2 [(gogoproto.enumvalue_customname) = "ClientStateRejected"];
 }
 
 // Scope enum defines the different scopes a third-party client can have access to.
-enum Scope {
+enum ClientScope {
   option (gogoproto.goproto_enum_prefix) = false;
-  APPLICATION = 0 [(gogoproto.enumvalue_customname) = "ScopeApplication"];
-  PROFILE = 1 [(gogoproto.enumvalue_customname) = "ScopeProfile"];
+
+  // Denotes whether if the client has access to manage user's applications.
+  APPLICATION = 0 [(gogoproto.enumvalue_customname) = "ClientScopeApplication"];
+
+  // Denotes wheter if the client has r-w access to user's profile.
+  PROFILE = 1 [(gogoproto.enumvalue_customname) = "ClientScopeProfile"];
 }
 
-// ClientGrants is the message that defines which grants a third-party client can
-// use to get access tokens.
-message ClientGrants {
-  // authorization_code is the grant type used to exchange an authorization
-  // code for an access token.
-  bool authorization_code = 1;
-
-  // password is the grant type used to exchange an username and password
-  // for an access token.
-  bool password = 2;
-
-  // refresh_token is the grant type used to exchange a refresh token for
-  // an access token.
-  bool refresh_token = 3;
-}
-
-// Grant enum defines the OAuth2 flows a third-party client can use to get access
-// to a token.
-enum Grant {
+// Grant enum defines the OAuth2 flows a third-party client can use to get
+// access to a token.
+enum ClientGrant {
   option (gogoproto.goproto_enum_prefix) = false;
-  AUTHORIZATION_CODE = 0 [(gogoproto.enumvalue_customname) = "GrantAuthorizationCode"];
-  PASSWORD = 1 [(gogoproto.enumvalue_customname) = "GrantPassword"];
-  REFRESH_TOKEN = 2 [(gogoproto.enumvalue_customname) = "GrantRefreshToken"];
+
+  // Grant type used to exchange an authorization code for an access token.
+  AUTHORIZATION_CODE = 0 [(gogoproto.enumvalue_customname) = "ClientGrantAuthorizationCode"];
+
+  // Grant type used to exchange an username and password for an access token.
+  PASSWORD = 1 [(gogoproto.enumvalue_customname) = "ClientGrantPassword"];
+
+  // Grant type used to exchange a refresh token for an access token.
+  REFRESH_TOKEN = 2 [(gogoproto.enumvalue_customname) = "ClientGrantRefreshToken"];
 }

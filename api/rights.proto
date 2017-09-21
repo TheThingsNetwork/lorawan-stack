@@ -8,16 +8,6 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
-// Collaborator is the message that defines the list of rights that an user holds
-// for a network entity.
-message Collaborator {
-  // username is the user's username that holds rights over a network entity.
-  string username = 1;
-
-  // rights are the rights this user holds for the network entity.
-  repeated Right rights = 3;
-}
-
 // Right is the enum that defines all the different rights to do something in
 // the network.
 enum Right {

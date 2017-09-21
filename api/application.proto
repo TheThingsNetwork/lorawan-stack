@@ -3,7 +3,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "github.com/TheThingsNetwork/ttn/api/collaborator.proto";
+import "github.com/TheThingsNetwork/ttn/api/rights.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
@@ -14,8 +14,7 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // Application is the message that defines an application in the network.
 message Application {
-  // app_id is the unique id of the application.
-  string app_id = 1 [(gogoproto.customname) = "ID"];
+  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the application.
   string description = 2;
@@ -26,11 +25,11 @@ message Application {
   // api_keys are the API keys the application defined.
   repeated ApplicationAPIKey api_keys = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
 
-  // created is the time when the application was created.
-  google.protobuf.Timestamp created = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // created_at is the time when the application was created.
+  google.protobuf.Timestamp created_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // archived is the time when the application was disabled.
-  google.protobuf.Timestamp archived = 7 [(gogoproto.stdtime) = true];
+  // archived_at is the time when the application was disabled.
+  google.protobuf.Timestamp archived_at = 7 [(gogoproto.stdtime) = true];
 }
 
 message ApplicationAPIKey {

@@ -3,6 +3,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
@@ -14,8 +15,7 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // Gateway is the message that defines a gateway on the network.
 message Gateway {
-  // gateway_id is the unique identifier of the gateway.
-  string gateway_id = 1 [(gogoproto.customname) = "ID"];
+  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the gateway.
   string description = 2;
@@ -30,7 +30,7 @@ message Gateway {
   // activated denotes wether or not the gateway has been activated.
   bool activated = 5;
 
-  // status_public denotes whether Aor not the gateway's status is public or not.
+  // status_public denotes whether or not the gateway's status is public or not.
   bool status_public = 6 [(gogoproto.moretags) = "db:\"status_public\""];
 
   // location_public denotes whether or not the gateway's location is public.
@@ -43,48 +43,44 @@ message Gateway {
   // automatically fetch and execute firmware updates.
   bool auto_update = 9 [(gogoproto.moretags) = "db:\"auto_update\""];
 
-  // brand is the gateway brand.
-  string brand = 10;
-
-  // model is the gateway model.
-  string model = 11;
+  // platform is the gatewqay platform, e.g. "The Things Gateway" or "Kerklink iBTS"
+  string platform = 10;
 
   // antennas is all the antennas that the gateway has.
-  repeated GatewayAntenna antennas = 12 [(gogoproto.nullable) = false];
+  repeated GatewayAntenna antennas = 11 [(gogoproto.nullable) = false];
 
   // attributes is a map of free form attributes.
-  map<string, string> attributes = 13;
+  map<string, string> attributes = 12;
 
   // cluster_address indicates the URI of the gateway server cluster to connect to,
   // in a "<ip>:<port>" format.
-  string cluster_address = 14 [(gogoproto.moretags) = "db:\"cluster_address\""];
+  string cluster_address = 13 [(gogoproto.moretags) = "db:\"cluster_address\""];
 
-  // created is the time when the gateway was created.
-  google.protobuf.Timestamp created = 15 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // created_at is the time when the gateway was created.
+  google.protobuf.Timestamp created_at = 14 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // archived is the time when the gateway was disabled.
-  google.protobuf.Timestamp archived = 16 [(gogoproto.stdtime) = true];
+  // archived_at is the time when the gateway was disabled.
+  google.protobuf.Timestamp archived_at = 15 [(gogoproto.stdtime) = true];
 }
 
 // GatewayAntenna is the message that defines a gateway antenna.
 message GatewayAntenna {
-  // antenna_id is the unique and immutable antenna's identifier.
-  string antenna_id = 1 [(gogoproto.customname) = "ID", (gogoproto.moretags) = "db:\"antenna_id\""];
+  GatewayAntennaIdentifiers id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // antenna_gain is the antenna gain relative to this gateway, in dBi
-  float antenna_gain = 3;
+  float antenna_gain = 2;
 
   // location is the antenna's location.
-  Location location = 4 [(gogoproto.nullable) = false];
+  Location location = 3 [(gogoproto.nullable) = false];
 
   // type denotes the antenna's type.
-  string type = 5;
+  string type = 4;
 
   // model denotes the antenna's model.
-  string model = 6;
+  string model = 5;
 
   // placement denotes whether if the antenna is placed indoors or outdoors.
-  GatewayAntennaPlacement placement = 7;
+  GatewayAntennaPlacement placement = 6;
 }
 
 // GatewayAntennaPlacement enum defines whether if the gateway antenna is placed
