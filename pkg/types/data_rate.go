@@ -19,7 +19,7 @@ type DataRate struct {
 func (dr DataRate) SpreadingFactor() (uint8, error) {
 	re := regexp.MustCompile("SF(7|8|9|10|11|12)")
 	matches := re.FindStringSubmatch(dr.LoRa)
-	if len(matches) != 3 {
+	if len(matches) != 2 {
 		return 0, errors.New("Spreading factor not found")
 	}
 
@@ -38,7 +38,7 @@ func (dr DataRate) Bandwidth() (uint32, error) {
 
 	re := regexp.MustCompile("BW(125|250|500)")
 	matches := re.FindStringSubmatch(dr.LoRa)
-	if len(matches) != 3 {
+	if len(matches) != 2 {
 		return 0, errors.New("Bandwidth not found")
 	}
 

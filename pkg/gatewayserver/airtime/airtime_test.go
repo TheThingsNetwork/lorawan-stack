@@ -1,9 +1,12 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
 package airtime
 
 import (
 	"testing"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/types"
 	. "github.com/smartystreets/assertions"
 )
 
@@ -13,20 +16,20 @@ func TestComputeLoRa(t *testing.T) {
 	var toa time.Duration
 	var err error
 
-	_, err = ComputeLoRa(10, "SFWUT", "4/5")
+	_, err = ComputeLoRa(10, types.DataRate{LoRa: "SFUT"}, "4/5")
 	a.So(err, ShouldNotBeNil)
 
-	_, err = ComputeLoRa(10, "SF10BW125", "1/9")
+	_, err = ComputeLoRa(10, types.DataRate{LoRa: "SF10BW125"}, "1/9")
 	a.So(err, ShouldNotBeNil)
 
 	// Test different SFs
-	sfTests := map[string]uint{
-		"SF7BW125":  41216,
-		"SF8BW125":  72192,
-		"SF9BW125":  144384,
-		"SF10BW125": 288768,
-		"SF11BW125": 577536,
-		"SF12BW125": 991232,
+	sfTests := map[types.DataRate]uint{
+		types.DataRate{LoRa: "SF7BW125"}:  41216,
+		types.DataRate{LoRa: "SF8BW125"}:  72192,
+		types.DataRate{LoRa: "SF9BW125"}:  144384,
+		types.DataRate{LoRa: "SF10BW125"}: 288768,
+		types.DataRate{LoRa: "SF11BW125"}: 577536,
+		types.DataRate{LoRa: "SF12BW125"}: 991232,
 	}
 	for dr, us := range sfTests {
 		toa, err = ComputeLoRa(10, dr, "4/5")
@@ -35,10 +38,10 @@ func TestComputeLoRa(t *testing.T) {
 	}
 
 	// Test different BWs
-	bwTests := map[string]uint{
-		"SF7BW125": 41216,
-		"SF7BW250": 20608,
-		"SF7BW500": 10304,
+	bwTests := map[types.DataRate]uint{
+		types.DataRate{LoRa: "SF7BW125"}: 41216,
+		types.DataRate{LoRa: "SF7BW250"}: 20608,
+		types.DataRate{LoRa: "SF7BW500"}: 10304,
 	}
 	for dr, us := range bwTests {
 		toa, err = ComputeLoRa(10, dr, "4/5")
@@ -54,7 +57,7 @@ func TestComputeLoRa(t *testing.T) {
 		"4/8": 53504,
 	}
 	for cr, us := range crTests {
-		toa, err = ComputeLoRa(10, "SF7BW125", cr)
+		toa, err = ComputeLoRa(10, types.DataRate{LoRa: "SF7BW125"}, cr)
 		a.So(err, ShouldBeNil)
 		a.So(toa, ShouldAlmostEqual, time.Duration(us)*time.Microsecond)
 	}
@@ -70,7 +73,7 @@ func TestComputeLoRa(t *testing.T) {
 		19: 51456,
 	}
 	for size, us := range plTests {
-		toa, err = ComputeLoRa(size, "SF7BW125", "4/5")
+		toa, err = ComputeLoRa(size, types.DataRate{LoRa: "SF7BW125"}, "4/5")
 		a.So(err, ShouldBeNil)
 		a.So(toa, ShouldAlmostEqual, time.Duration(us)*time.Microsecond)
 	}
