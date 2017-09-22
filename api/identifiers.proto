@@ -8,103 +8,86 @@ package ttn.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
+message UserIdentifiers {
+  // user_id is the ID of the user.
+  string user_id = 1 [(gogoproto.customname) = "UserID"];
+  // email address of the user.
+  string email = 2;
+  // TTN Tenant ID (in case of multi-tenant network stack).
+  string tenant_id = 3 [(gogoproto.customname) = "TenantID"];
+}
+
 message ApplicationIdentifiers {
-  // TTN Application ID
+  // TTN Application ID.
   string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
-  // TTN Tenant ID (in case of multi-tenant network stack)
+  // TTN Tenant ID (in case of multi-tenant network stack).
   string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
 }
 
 message ApplicationAPIKeyIdentifiers {
   ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // key_name is the API key name to be removed.
+  // key_name is the API key name.
   string key_name = 2;
 }
 
 message ApplicationCollaboratorIdentifiers {
-  // TTN Application ID
-  string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
-  // TTN Tenant ID (in case of multi-tenant network stack)
-  string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
-
-  // user_id is the id of the user
-  string user_id = 3 [(gogoproto.customname) = "UserID"];
+  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // user_id is the ID of the user.
+  string user_id = 2 [(gogoproto.customname) = "UserID"];
   // email address of the user.
-  string email = 4;
+  string email = 3;
 }
 
 message GatewayIdentifiers {
-  // TTN Gateway ID
+  // TTN Gateway ID.
   string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
-  // TTN Tenant ID (in case of multi-tenant network stack)
+  // TTN Tenant ID (in case of multi-tenant network stack).
   string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
 }
 
 message GatewayAntennaIdentifiers {
-  // TTN Gateway ID
-  string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
-  // TTN Tenant ID (in case of multi-tenant network stack)
-  string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
-  // Indexed position of the antenna in the list
-  string antenna_index = 3;
+  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // Indexed position of the antenna in the list.
+  string antenna_index = 2;
 }
 
 message GatewayCollaboratorIdentifiers {
-  // TTN Gateway ID
-  string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
-  // TTN Tenant ID (in case of multi-tenant network stack)
-  string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
-
-  // user_id is the id of the user
-  string user_id = 3 [(gogoproto.customname) = "UserID"];
+  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // user_id is the ID of the user.
+  string user_id = 2 [(gogoproto.customname) = "UserID"];
   // email address of the user.
-  string email = 4;
+  string email = 3;
 }
 
 // End device identifiers are carried with uplink and downlink messages
-// Unknown fields are left empty
+// Unknown fields are left empty.
 message EndDeviceIdentifiers {
-  // TTN Device ID
+  // TTN Device ID.
   string device_id = 1 [(gogoproto.customname) = "DeviceID"];
-  // TTN Application ID
+  // TTN Application ID.
   string application_id = 2 [(gogoproto.customname) = "ApplicationID"];
-  // TTN Tenant ID (in case of multi-tenant network server)
+  // TTN Tenant ID (in case of multi-tenant network server).
   string tenant_id = 3 [(gogoproto.customname) = "TenantID"];
 
-  // LoRaWAN DevEUI
+  // LoRaWAN DevEUI.
   bytes dev_eui = 4 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
-  // LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices)
+  // LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).
   bytes join_eui = 5 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
-  // LoRaWAN DevAddr
+  // LoRaWAN DevAddr.
   bytes dev_addr = 6 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
 }
 
-message UserIdentifiers {
-  // user_id is the id of the user
-  string user_id = 1 [(gogoproto.customname) = "UserID"];
-  // email address of the user
-  string email = 2;
-  // TTN Tenant ID (in case of multi-tenant network stack)
-  string tenant_id = 3 [(gogoproto.customname) = "TenantID"];
-}
-
 message ClientIdentifiers {
-  // TTN Client ID
+  // TTN Client ID.
   string client_id = 1 [(gogoproto.customname) = "ClientID"];
-  // TTN Tenant ID (in case of multi-tenant network stack)
+  // TTN Tenant ID (in case of multi-tenant network stack).
   string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
 }
 
 message ClientCollaboratorIdentifiers {
-  // TTN Client ID
-  string client_id = 1 [(gogoproto.customname) = "ClientID"];
-  // TTN Tenant ID (in case of multi-tenant network stack)
-  string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
-
-  // user_id is the id of the user
-  string user_id = 3 [(gogoproto.customname) = "UserID"];
+  ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // user_id is the ID of the user.
+  string user_id = 2 [(gogoproto.customname) = "UserID"];
   // email address of the user.
-  string email = 4;
-
+  string email = 3;
 }

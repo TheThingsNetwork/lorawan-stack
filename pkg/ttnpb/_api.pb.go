@@ -52,6 +52,7 @@ It has these top-level messages:
 	GatewayDown
 	FrequencyPlan
 	FrequencyPlanRequest
+	UserIdentifiers
 	ApplicationIdentifiers
 	ApplicationAPIKeyIdentifiers
 	ApplicationCollaboratorIdentifiers
@@ -59,7 +60,6 @@ It has these top-level messages:
 	GatewayAntennaIdentifiers
 	GatewayCollaboratorIdentifiers
 	EndDeviceIdentifiers
-	UserIdentifiers
 	ClientIdentifiers
 	ClientCollaboratorIdentifiers
 	CreateUserRequest
