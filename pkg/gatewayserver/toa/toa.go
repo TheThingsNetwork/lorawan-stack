@@ -1,6 +1,7 @@
 // Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package airtime
+// Package toa provides methods for computing a LoRaWAN packet's time-on-air
+package toa
 
 import (
 	"math"
