@@ -36,7 +36,6 @@ func TestValidBandwidth(t *testing.T) {
 		types.DataRate{LoRa: "SF7BW125"}: 125,
 		types.DataRate{LoRa: "SF8BW250"}: 250,
 		types.DataRate{LoRa: "SF9BW500"}: 500,
-		types.DataRate{FSK: 125}:         125,
 	}
 
 	for dr, bw := range dataRates {
