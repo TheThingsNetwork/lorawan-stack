@@ -236,33 +236,27 @@ message CreateGatewayRequest {
   string description = 2;
 
   // frequency_plan_id indicates the ID of the frequency plan.
-  string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID"];
+  string frequency_plan_id = 3 [(gogoproto.customname) = "FrequencyPlanID"];
 
-  // status_public denotes whether Aor not the gateway's status is public or not.
-  bool status_public = 6;
-
-  // location_public denotes whether or not the gateway's location is public.
-  bool location_public = 7;
-
-  // owner_public denotes whether or not the gateway owner is public.
-  bool owner_public = 8;
+  // privacy_settings defines the different privacy settings for this gateway.
+  GatewayPrivacySettings privacy_settings = 4 [(gogoproto.nullable) = false];
 
   // auto_update indicates whether or not the gateway should be able to
   // automatically fetch and execute firmware updates.
-  bool auto_update = 9;
+  bool auto_update = 5;
 
   // platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS"
-  string platform = 10;
+  string platform = 6;
 
   // antennas is all the antennas that the gateway has.
-  repeated GatewayAntenna antennas = 11 [(gogoproto.nullable) = false];
+  repeated GatewayAntenna antennas = 7 [(gogoproto.nullable) = false];
 
   // attributes is a free form map of attributes.
-  map<string, string> attributes = 12;
+  map<string, string> attributes = 8;
 
   // cluster_address indicates the URI of the gateway server cluster to connect to,
   // in a "<ip>:<port>" format.
-  string cluster_address = 13;
+  string cluster_address = 9;
 }
 
 message ListGatewaysResponse {
@@ -276,33 +270,27 @@ message UpdateGatewayRequest {
   string description = 2;
 
   // frequency_plan_id indicates the ID of the frequency plan.
-  string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID"];
+  string frequency_plan_id = 3 [(gogoproto.customname) = "FrequencyPlanID"];
 
-  // status_public denotes whether Aor not the gateway's status is public or not.
-  bool status_public = 6;
-
-  // location_public denotes whether or not the gateway's location is public.
-  bool location_public = 7;
-
-  // owner_public denotes whether or not the gateway owner is public.
-  bool owner_public = 8;
+  // privacy_settings defines the different privacy settings for this gateway.
+  GatewayPrivacySettings privacy_settings = 4 [(gogoproto.nullable) = false];
 
   // auto_update indicates whether or not the gateway should be able to
   // automatically fetch and execute firmware updates.
-  bool auto_update = 9;
+  bool auto_update = 5;
 
   // platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS"
-  string platform = 10;
+  string platform = 6;
 
   // antennas is all the antennas that the gateway has.
-  repeated GatewayAntenna antennas = 11 [(gogoproto.nullable) = false];
+  repeated GatewayAntenna antennas = 7 [(gogoproto.nullable) = false];
 
   // attributes is a free form map of attributes.
-  map<string, string> attributes = 12;
+  map<string, string> attributes = 8;
 
   // cluster_address indicates the URI of the gateway server cluster to connect to,
   // in a "<ip>:<port>" format.
-  string cluster_address = 13;
+  string cluster_address = 9;
 }
 
 message AddGatewayAttributeRequest {

@@ -44,6 +44,7 @@ It has these top-level messages:
 	MACState
 	MACInfo
 	Gateway
+	GatewayPrivacySettings
 	GatewayAntenna
 	GatewayConfiguration
 	GatewayStatus

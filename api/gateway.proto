@@ -30,37 +30,44 @@ message Gateway {
   // activated_at denotes when the gateway was activated.
   google.protobuf.Timestamp activated_at = 5 [(gogoproto.stdtime) = true];
 
-  // status_public denotes whether or not the gateway's status is public or not.
-  bool status_public = 6 [(gogoproto.moretags) = "db:\"status_public\""];
-
-  // location_public denotes whether or not the gateway's location is public.
-  bool location_public = 7 [(gogoproto.moretags) = "db:\"location_public\""];
-
-  // owner_public denotes whether or not the gateway owner is public.
-  bool owner_public = 8 [(gogoproto.moretags) = "db:\"owner_public\""];
+  // privacy_settings defines the different privacy settings for this gateway.
+  GatewayPrivacySettings privacy_settings = 6 [(gogoproto.nullable) = false];
 
   // auto_update indicates whether or not the gateway should be able to
   // automatically fetch and execute firmware updates.
-  bool auto_update = 9 [(gogoproto.moretags) = "db:\"auto_update\""];
+  bool auto_update = 7 [(gogoproto.moretags) = "db:\"auto_update\""];
 
   // platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS"
-  string platform = 10;
+  string platform = 8;
 
   // antennas is all the antennas that the gateway has.
-  repeated GatewayAntenna antennas = 11 [(gogoproto.nullable) = false];
+  repeated GatewayAntenna antennas = 9 [(gogoproto.nullable) = false];
 
   // attributes is a free form map of attributes.
-  map<string, string> attributes = 12;
+  map<string, string> attributes = 10;
 
   // cluster_address indicates the URI of the gateway server cluster to connect to,
   // in a "<ip>:<port>" format.
-  string cluster_address = 13 [(gogoproto.moretags) = "db:\"cluster_address\""];
+  string cluster_address = 11 [(gogoproto.moretags) = "db:\"cluster_address\""];
 
   // created_at is the time when the gateway was created.
-  google.protobuf.Timestamp created_at = 14 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 12 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // archived_at is the time when the gateway was archived.
-  google.protobuf.Timestamp archived_at = 15 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp archived_at = 13 [(gogoproto.stdtime) = true];
+}
+
+// GatewayPrivacySettings is the message that defines the different privacy settings
+// of the gateway such as if the owner information or location are public.
+message GatewayPrivacySettings {
+  // status_public denotes whether or not the gateway's status is public or not.
+  bool status_public = 1;
+
+  // location_public denotes whether or not the gateway's location is public.
+  bool location_public = 2;
+
+  // owner_public denotes whether or not the gateway owner is public.
+  bool owner_public = 3;
 }
 
 // GatewayAntenna is the message that defines a gateway antenna.
