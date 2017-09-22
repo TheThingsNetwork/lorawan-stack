@@ -30,12 +30,8 @@ func (dr DataRate) SpreadingFactor() (uint8, error) {
 	return uint8(sf), err
 }
 
-// Bandwidth returns the spreading factor of this data rate. It returns an error otherwise.
+// Bandwidth returns the spreading factor of this data rate, if it is a LoRa data rate. It returns an error otherwise.
 func (dr DataRate) Bandwidth() (uint32, error) {
-	if dr.FSK != 0 {
-		return dr.FSK, nil
-	}
-
 	re := regexp.MustCompile("BW(125|250|500)")
 	matches := re.FindStringSubmatch(dr.LoRa)
 	if len(matches) != 2 {
