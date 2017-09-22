@@ -161,24 +161,39 @@ func MarshalMap(v interface{}) map[string]interface{} {
 }
 
 func toBytes(v interface{}) (b []byte, err error) {
-	rv := reflect.Indirect(reflect.ValueOf(v))
+	var enc Encoding
+	defer func() {
+		if err != nil {
+			return
+		}
+		b = append([]byte{byte(enc)}, b...)
+	}()
 
+	rv := reflect.Indirect(reflect.ValueOf(v))
 	switch k := rv.Kind(); k {
 	case reflect.String:
+		enc = RawEncoding
 		return []byte(rv.String()), nil
 	case reflect.Bool:
+		enc = RawEncoding
 		return []byte(strconv.FormatBool(rv.Bool())), nil
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		enc = RawEncoding
 		return []byte(strconv.FormatInt(rv.Int(), 10)), nil
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		enc = RawEncoding
 		return []byte(strconv.FormatUint(rv.Uint(), 10)), nil
 	case reflect.Float32:
+		enc = RawEncoding
 		return []byte(strconv.FormatFloat(rv.Float(), 'f', -1, 32)), nil
 	case reflect.Float64:
+		enc = RawEncoding
 		return []byte(strconv.FormatFloat(rv.Float(), 'f', -1, 64)), nil
 	case reflect.Slice, reflect.Array:
 		elem := rv.Type().Elem()
 		if elem.Kind() == reflect.Uint8 {
+			enc = RawEncoding
+
 			// Handle byte slices/arrays directly
 			if k == reflect.Slice {
 				return rv.Bytes(), nil
@@ -192,28 +207,22 @@ func toBytes(v interface{}) (b []byte, err error) {
 		}
 	}
 
-	var token Encoding
 	switch v := v.(type) {
 	case encoding.BinaryMarshaler:
-		token = BinaryEncoding
-		b, err = v.MarshalBinary()
+		enc = BinaryEncoding
+		return v.MarshalBinary()
 	case encoding.TextMarshaler:
-		token = TextEncoding
-		b, err = v.MarshalText()
+		enc = TextEncoding
+		return v.MarshalText()
 	case proto.Marshaler:
-		token = ProtoEncoding
-		b, err = v.Marshal()
+		enc = ProtoEncoding
+		return v.Marshal()
 	case json.Marshaler:
-		token = JSONEncoding
-		b, err = v.MarshalJSON()
-	default:
-		token = UnknownEncoding
-		b = []byte(fmt.Sprint(v))
+		enc = JSONEncoding
+		return v.MarshalJSON()
 	}
-	if err != nil {
-		return nil, err
-	}
-	return append([]byte{byte(token)}, b...), nil
+	enc = UnknownEncoding
+	return []byte(fmt.Sprint(v)), nil
 }
 
 // ByteMapMarshaler is the interface implemented by an object that can

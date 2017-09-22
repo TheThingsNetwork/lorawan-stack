@@ -15,8 +15,8 @@ const (
 	// Separator used to separate the flattened struct fields
 	Separator = "."
 
-	// UnknownEncoding represents case when unknown encoding(i.e. String() method) used.
-	UnknownEncoding Encoding = iota
+	// RawEncoding represents case when value is encoded into "raw" byte value.
+	RawEncoding Encoding = iota
 	// BinaryEncoding represents case when MarshalBinary() method was used to encode value.
 	BinaryEncoding
 	// TextEncoding represents case when MarshalText() method was used to encode value.
@@ -25,6 +25,8 @@ const (
 	ProtoEncoding
 	// JSONEncoding represents case when MarshalJSON() method was used to encode value.
 	JSONEncoding
+	// UnknownEncoding represents case when unknown encoding was used to encode value(fmt.Sprint).
+	UnknownEncoding
 )
 
 var (
@@ -32,7 +34,7 @@ var (
 	ErrNotFound = errors.New("not found")
 )
 
-// PrimaryKey represents the value used by Interface implementations to uniquely identify stored objects.
+// PrimaryKey represents the value used by store implementations to uniquely identify stored objects.
 type PrimaryKey interface {
 	fmt.Stringer
 }

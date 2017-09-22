@@ -5,7 +5,6 @@ package store
 import (
 	"encoding"
 	"encoding/json"
-	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -81,84 +80,87 @@ func bytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 		typ = typ.Elem()
 	}
 
-	switch k := typ.Kind(); k {
-	case reflect.String:
-		return string(b), nil
-	case reflect.Bool:
-		return strconv.ParseBool(string(b))
-	case reflect.Int:
-		return strconv.ParseInt(string(b), 10, 64)
-	case reflect.Int8:
-		return strconv.ParseInt(string(b), 10, 8)
-	case reflect.Int16:
-		return strconv.ParseInt(string(b), 10, 16)
-	case reflect.Int32:
-		return strconv.ParseInt(string(b), 10, 32)
-	case reflect.Int64:
-		return strconv.ParseInt(string(b), 10, 64)
-	case reflect.Uint:
-		return strconv.ParseUint(string(b), 10, 64)
-	case reflect.Uint8:
-		return strconv.ParseUint(string(b), 10, 8)
-	case reflect.Uint16:
-		return strconv.ParseUint(string(b), 10, 16)
-	case reflect.Uint32:
-		return strconv.ParseUint(string(b), 10, 32)
-	case reflect.Uint64:
-		return strconv.ParseUint(string(b), 10, 64)
-	case reflect.Float32:
-		return strconv.ParseFloat(string(b), 32)
-	case reflect.Float64:
-		return strconv.ParseFloat(string(b), 64)
-	case reflect.Slice, reflect.Array:
-		elem := typ.Elem()
-		if elem.Kind() == reflect.Uint8 {
-			// Handle byte slices/arrays directly
-			if k == reflect.Slice {
-				return b, nil
-			}
-			rv := reflect.Indirect(reflect.New(typ))
-			for i := 0; i < rv.Len(); i++ {
-				rv.Index(i).SetUint(uint64(b[i]))
-			}
-			return rv.Interface(), nil
-		}
-	}
+	enc := Encoding(b[0])
+	b = b[1:]
 
-	rv := reflect.New(typ)
-	switch Encoding(b[0]) {
+	switch enc {
+	case RawEncoding:
+		switch k := typ.Kind(); k {
+		case reflect.String:
+			return string(b), nil
+		case reflect.Bool:
+			return strconv.ParseBool(string(b))
+		case reflect.Int:
+			return strconv.ParseInt(string(b), 10, 64)
+		case reflect.Int8:
+			return strconv.ParseInt(string(b), 10, 8)
+		case reflect.Int16:
+			return strconv.ParseInt(string(b), 10, 16)
+		case reflect.Int32:
+			return strconv.ParseInt(string(b), 10, 32)
+		case reflect.Int64:
+			return strconv.ParseInt(string(b), 10, 64)
+		case reflect.Uint:
+			return strconv.ParseUint(string(b), 10, 64)
+		case reflect.Uint8:
+			return strconv.ParseUint(string(b), 10, 8)
+		case reflect.Uint16:
+			return strconv.ParseUint(string(b), 10, 16)
+		case reflect.Uint32:
+			return strconv.ParseUint(string(b), 10, 32)
+		case reflect.Uint64:
+			return strconv.ParseUint(string(b), 10, 64)
+		case reflect.Float32:
+			return strconv.ParseFloat(string(b), 32)
+		case reflect.Float64:
+			return strconv.ParseFloat(string(b), 64)
+		case reflect.Slice, reflect.Array:
+			elem := typ.Elem()
+			if elem.Kind() == reflect.Uint8 {
+				// Handle byte slices/arrays directly
+				if k == reflect.Slice {
+					return b, nil
+				}
+				rv := reflect.Indirect(reflect.New(typ))
+				for i := 0; i < rv.Len(); i++ {
+					rv.Index(i).SetUint(uint64(b[i]))
+				}
+				return rv.Interface(), nil
+			}
+		}
+		return nil, errors.Errorf("can not decode raw bytes to value of type %s", typ)
 	case BinaryEncoding:
-		v, ok := rv.Interface().(encoding.BinaryUnmarshaler)
+		v, ok := reflect.New(typ).Interface().(encoding.BinaryUnmarshaler)
 		if !ok {
 			var expected encoding.BinaryUnmarshaler
 			return nil, errors.Errorf("expected %s to implement %T", typ, expected)
 		}
-		return v, v.UnmarshalBinary(b[1:])
+		return v, v.UnmarshalBinary(b)
 	case TextEncoding:
-		v, ok := rv.Interface().(encoding.TextUnmarshaler)
+		v, ok := reflect.New(typ).Interface().(encoding.TextUnmarshaler)
 		if !ok {
 			var expected encoding.TextUnmarshaler
 			return nil, errors.Errorf("expected %s to implement %T", typ, expected)
 		}
-		return v, v.UnmarshalText(b[1:])
+		return v, v.UnmarshalText(b)
 	case ProtoEncoding:
-		v, ok := rv.Interface().(proto.Unmarshaler)
+		v, ok := reflect.New(typ).Interface().(proto.Unmarshaler)
 		if !ok {
 			var expected proto.Unmarshaler
 			return nil, errors.Errorf("expected %s to implement %T", typ, expected)
 		}
-		return v, v.Unmarshal(b[1:])
+		return v, v.Unmarshal(b)
 	case JSONEncoding:
-		v, ok := rv.Interface().(json.Unmarshaler)
+		v, ok := reflect.New(typ).Interface().(json.Unmarshaler)
 		if !ok {
 			var expected json.Unmarshaler
 			return nil, errors.Errorf("expected %s to implement %T", typ, expected)
 		}
-		return v, v.UnmarshalJSON(b[1:])
+		return v, v.UnmarshalJSON(b)
 	case UnknownEncoding:
 		return nil, errors.New("value is encoded using unknown encoding")
 	default:
-		return nil, errors.New("wrong data format")
+		return nil, errors.New("invalid data")
 	}
 }
 

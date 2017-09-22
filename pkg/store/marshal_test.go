@@ -3,14 +3,11 @@
 package store_test
 
 import (
-	"encoding"
-	"encoding/json"
 	"reflect"
 	"testing"
 	"time"
 
 	. "github.com/TheThingsNetwork/ttn/pkg/store"
-	"github.com/gogo/protobuf/proto"
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -44,38 +41,38 @@ type byteArray [2]byte
 
 var (
 	interfaceMapInput = map[string]interface{}{
-		"string":    "string",
+		"string":    "42",
 		"int":       42,
-		"bytes":     []byte("bytes"),
+		"bytes":     []byte("42"),
 		"byteArray": byteArray([2]byte{'4', '2'}),
 		"sub": map[string]interface{}{
-			"string":    "string",
+			"string":    "42",
 			"int":       42,
-			"bytes":     []byte("bytes"),
+			"bytes":     []byte("42"),
 			"byteArray": byteArray([2]byte{'4', '2'}),
 			"sub": map[string]interface{}{
-				"string":    "string",
+				"string":    "42",
 				"int":       42,
-				"bytes":     []byte("bytes"),
+				"bytes":     []byte("42"),
 				"byteArray": byteArray([2]byte{'4', '2'}),
 			},
 		},
 	}
 
 	structInput = Struct{
-		String:    "string",
+		String:    "42",
 		Int:       42,
-		Bytes:     []byte("bytes"),
+		Bytes:     []byte("42"),
 		ByteArray: byteArray([2]byte{'4', '2'}),
 		SubStruct: SubStruct{
-			String:    "string",
+			String:    "42",
 			Int:       42,
-			Bytes:     []byte("bytes"),
+			Bytes:     []byte("42"),
 			ByteArray: byteArray([2]byte{'4', '2'}),
 			SubSubStruct: SubSubStruct{
-				String:    "string",
+				String:    "42",
 				Int:       42,
-				Bytes:     []byte("bytes"),
+				Bytes:     []byte("42"),
 				ByteArray: byteArray([2]byte{'4', '2'}),
 			},
 		},
@@ -91,36 +88,36 @@ func TestMarshalMap(t *testing.T) {
 		{
 			interfaceMapInput,
 			map[string]interface{}{
-				"string":            "string",
-				"int":               42,
-				"bytes":             []byte("bytes"),
-				"byteArray":         byteArray([2]byte{'4', '2'}),
-				"sub.string":        "string",
-				"sub.int":           42,
-				"sub.bytes":         []byte("bytes"),
-				"sub.byteArray":     byteArray([2]byte{'4', '2'}),
-				"sub.sub.string":    "string",
-				"sub.sub.int":       42,
-				"sub.sub.bytes":     []byte("bytes"),
-				"sub.sub.byteArray": byteArray([2]byte{'4', '2'}),
+				"string":            interfaceMapInput["string"],
+				"int":               interfaceMapInput["int"],
+				"bytes":             interfaceMapInput["bytes"],
+				"byteArray":         interfaceMapInput["byteArray"],
+				"sub.string":        interfaceMapInput["sub"].(map[string]interface{})["string"],
+				"sub.int":           interfaceMapInput["sub"].(map[string]interface{})["int"],
+				"sub.bytes":         interfaceMapInput["sub"].(map[string]interface{})["bytes"],
+				"sub.byteArray":     interfaceMapInput["sub"].(map[string]interface{})["byteArray"],
+				"sub.sub.string":    interfaceMapInput["sub"].(map[string]interface{})["sub"].(map[string]interface{})["string"],
+				"sub.sub.int":       interfaceMapInput["sub"].(map[string]interface{})["sub"].(map[string]interface{})["int"],
+				"sub.sub.bytes":     interfaceMapInput["sub"].(map[string]interface{})["sub"].(map[string]interface{})["bytes"],
+				"sub.sub.byteArray": interfaceMapInput["sub"].(map[string]interface{})["sub"].(map[string]interface{})["byteArray"],
 			},
 		},
 
 		{
 			structInput,
 			map[string]interface{}{
-				"String":                           "string",
-				"Int":                              42,
-				"Bytes":                            []byte("bytes"),
-				"ByteArray":                        byteArray([2]byte{'4', '2'}),
-				"SubStruct.String":                 "string",
-				"SubStruct.Int":                    42,
-				"SubStruct.Bytes":                  []byte("bytes"),
-				"SubStruct.ByteArray":              byteArray([2]byte{'4', '2'}),
-				"SubStruct.SubSubStruct.String":    "string",
-				"SubStruct.SubSubStruct.Int":       42,
-				"SubStruct.SubSubStruct.Bytes":     []byte("bytes"),
-				"SubStruct.SubSubStruct.ByteArray": byteArray([2]byte{'4', '2'}),
+				"String":                           structInput.String,
+				"Int":                              structInput.Int,
+				"Bytes":                            structInput.Bytes,
+				"ByteArray":                        structInput.ByteArray,
+				"SubStruct.String":                 structInput.SubStruct.String,
+				"SubStruct.Int":                    structInput.SubStruct.Int,
+				"SubStruct.Bytes":                  structInput.SubStruct.Bytes,
+				"SubStruct.ByteArray":              structInput.SubStruct.ByteArray,
+				"SubStruct.SubSubStruct.String":    structInput.SubStruct.SubSubStruct.String,
+				"SubStruct.SubSubStruct.Int":       structInput.SubStruct.SubSubStruct.Int,
+				"SubStruct.SubSubStruct.Bytes":     structInput.SubStruct.SubSubStruct.Bytes,
+				"SubStruct.SubSubStruct.ByteArray": structInput.SubStruct.SubSubStruct.ByteArray,
 			},
 		},
 
@@ -151,29 +148,12 @@ func TestMarshalMap(t *testing.T) {
 	}
 }
 
-func marshalToBytes(v interface{}) (b []byte) {
-	var (
-		token Encoding
-		err   error
-	)
-	switch v := v.(type) {
-	case encoding.BinaryMarshaler:
-		token = BinaryEncoding
-		b, err = v.MarshalBinary()
-	case encoding.TextMarshaler:
-		token = TextEncoding
-		b, err = v.MarshalText()
-	case proto.Marshaler:
-		token = ProtoEncoding
-		b, err = v.Marshal()
-	case json.Marshaler:
-		token = JSONEncoding
-		b, err = v.MarshalJSON()
-	}
+func mustToBytes(v interface{}) []byte {
+	b, err := ToBytes(v)
 	if err != nil {
 		panic(err)
 	}
-	return append([]byte{byte(token)}, b...)
+	return b
 }
 
 func TestMarshalByteMap(t *testing.T) {
@@ -185,36 +165,36 @@ func TestMarshalByteMap(t *testing.T) {
 		{
 			interfaceMapInput,
 			map[string][]byte{
-				"string":            []byte("string"),
-				"int":               []byte("42"),
-				"bytes":             []byte("bytes"),
-				"byteArray":         []byte{'4', '2'},
-				"sub.string":        []byte("string"),
-				"sub.int":           []byte("42"),
-				"sub.bytes":         []byte("bytes"),
-				"sub.byteArray":     []byte{'4', '2'},
-				"sub.sub.string":    []byte("string"),
-				"sub.sub.int":       []byte("42"),
-				"sub.sub.bytes":     []byte("bytes"),
-				"sub.sub.byteArray": []byte{'4', '2'},
+				"string":            mustToBytes("42"),
+				"int":               mustToBytes(42),
+				"bytes":             mustToBytes("42"),
+				"byteArray":         mustToBytes("42"),
+				"sub.string":        mustToBytes("42"),
+				"sub.int":           mustToBytes(42),
+				"sub.bytes":         mustToBytes("42"),
+				"sub.byteArray":     mustToBytes("42"),
+				"sub.sub.string":    mustToBytes("42"),
+				"sub.sub.int":       mustToBytes(42),
+				"sub.sub.bytes":     mustToBytes("42"),
+				"sub.sub.byteArray": mustToBytes("42"),
 			},
 		},
 
 		{
 			structInput,
 			map[string][]byte{
-				"String":                           []byte("string"),
-				"Int":                              []byte("42"),
-				"Bytes":                            []byte("bytes"),
-				"ByteArray":                        []byte{'4', '2'},
-				"SubStruct.String":                 []byte("string"),
-				"SubStruct.Int":                    []byte("42"),
-				"SubStruct.Bytes":                  []byte("bytes"),
-				"SubStruct.ByteArray":              []byte{'4', '2'},
-				"SubStruct.SubSubStruct.String":    []byte("string"),
-				"SubStruct.SubSubStruct.Int":       []byte("42"),
-				"SubStruct.SubSubStruct.Bytes":     []byte("bytes"),
-				"SubStruct.SubSubStruct.ByteArray": []byte{'4', '2'},
+				"String":                           mustToBytes("42"),
+				"Int":                              mustToBytes(42),
+				"Bytes":                            mustToBytes("42"),
+				"ByteArray":                        mustToBytes("42"),
+				"SubStruct.String":                 mustToBytes("42"),
+				"SubStruct.Int":                    mustToBytes(42),
+				"SubStruct.Bytes":                  mustToBytes("42"),
+				"SubStruct.ByteArray":              mustToBytes("42"),
+				"SubStruct.SubSubStruct.String":    mustToBytes("42"),
+				"SubStruct.SubSubStruct.Int":       mustToBytes(42),
+				"SubStruct.SubSubStruct.Bytes":     mustToBytes("42"),
+				"SubStruct.SubSubStruct.ByteArray": mustToBytes("42"),
 			},
 		},
 		{
@@ -226,11 +206,11 @@ func TestMarshalByteMap(t *testing.T) {
 		},
 		{
 			struct{ time.Time }{time.Unix(42, 42)},
-			map[string][]byte{"Time": marshalToBytes(time.Unix(42, 42))},
+			map[string][]byte{"Time": mustToBytes(time.Unix(42, 42))},
 		},
 		{
 			struct{ T time.Time }{time.Unix(42, 42)},
-			map[string][]byte{"T": marshalToBytes(time.Unix(42, 42))},
+			map[string][]byte{"T": mustToBytes(time.Unix(42, 42))},
 		},
 	} {
 		m, err := MarshalByteMap(tc.input)

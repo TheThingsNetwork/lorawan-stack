@@ -2,16 +2,22 @@
 
 package store
 
-import "sync"
-
 // NewResultFunc represents a constructor of some arbitrary type.
 type NewResultFunc func() interface{}
 
-// Client represents a generic interface to interact with different store implementations
+// Client represents a generic interface to interact with different store implementations in CRUD manner.
+//
+// Create creates a new PrimaryKey, stores v under that key and returns it.
+// Find searches for the value associated with PrimaryKey specified and stores it in v. v must be a pointer type.
+// FindBy returns mapping of PrimaryKey -> value, which match field values specified in filter. Filter represents an AND relation,
+// meaning that only entries matching all the fields in filter should be returned.
+// newResultFunc is the constructor of a single value expected to be returned.
+// Update calculates the diff between old and new values and overwrites stored fields under PrimaryKey with that.
+// Delete deletes the value stored under PrimaryKey specified.
 type Client interface {
 	Create(v interface{}) (PrimaryKey, error)
 	Find(id PrimaryKey, v interface{}) error
-	FindBy(filter interface{}, newResult func() interface{}) (map[PrimaryKey]interface{}, error)
+	FindBy(filter interface{}, newResult NewResultFunc) (map[PrimaryKey]interface{}, error)
 	Update(id PrimaryKey, new, old interface{}) error
 	Delete(id PrimaryKey) error
 }
@@ -37,7 +43,7 @@ func (cl *typedStoreClient) Find(id PrimaryKey, v interface{}) error {
 	return UnmarshalMap(m, v)
 }
 
-func (cl *typedStoreClient) FindBy(filter interface{}, newResult func() interface{}) (map[PrimaryKey]interface{}, error) {
+func (cl *typedStoreClient) FindBy(filter interface{}, newResult NewResultFunc) (map[PrimaryKey]interface{}, error) {
 	m, err := cl.TypedStore.FindBy(MarshalMap(filter))
 	if err != nil {
 		return nil, err
@@ -87,7 +93,7 @@ func (cl *byteStoreClient) Find(id PrimaryKey, v interface{}) error {
 	return UnmarshalByteMap(m, v)
 }
 
-func (cl *byteStoreClient) FindBy(filter interface{}, newResult func() interface{}) (map[PrimaryKey]interface{}, error) {
+func (cl *byteStoreClient) FindBy(filter interface{}, newResult NewResultFunc) (map[PrimaryKey]interface{}, error) {
 	fm, err := MarshalByteMap(filter)
 	if err != nil {
 		return nil, err
