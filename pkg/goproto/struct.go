@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/golang/protobuf/ptypes/struct"
-	"github.com/pkg/errors"
 )
 
 // Map returns the Struct proto as a map[string]interface{}
