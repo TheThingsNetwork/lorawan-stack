@@ -3,8 +3,9 @@
 package log
 
 import (
-	"errors"
 	"fmt"
+
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 )
 
 // Fielder interface check.
@@ -112,14 +113,11 @@ func (f *F) WithFields(fields Fielder) *F {
 
 // WithError returns new fields that contain the passed error and all its fields (if any).
 func (f *F) WithError(err error) *F {
-	var fields map[string]interface{}
-	if f, ok := err.(Fielder); ok {
-		fields = f.Fields()
-	} else {
-		fields = make(map[string]interface{})
+	res := f.WithField("error", err)
+
+	if fld, ok := err.(Fielder); ok {
+		return res.With(fld.Fields())
 	}
 
-	fields["error"] = err
-
-	return f.With(fields)
+	return res
 }
