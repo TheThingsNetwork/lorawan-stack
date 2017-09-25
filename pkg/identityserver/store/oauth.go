@@ -11,7 +11,7 @@ import (
 // AuthorizationData is the data stored for an authorization code.
 type AuthorizationData struct {
 	// Code is the actual opaque authorization code.
-	Code string `db:"code"`
+	Code string `db:"authorization_code"`
 
 	// ClientID is the id of the client this authorization code is for.
 	ClientID string `db:"client_id"`
@@ -23,7 +23,7 @@ type AuthorizationData struct {
 	ExpiresIn time.Duration `db:"expires_in"`
 
 	// Scope is the scope of the authorization code.
-	Scope []types.Scope `db:"scope"`
+	Scope string `db:"scope"`
 
 	// RedirectURI is the redirect URI from the request.
 	RedirectURI string `db:"redirect_uri"`
@@ -44,7 +44,7 @@ type RefreshData struct {
 	CreatedAt time.Time `db:"created_at"`
 
 	// Scope is the scope of the authorization code.
-	Scope []types.Scope `db:"scope"`
+	Scope string `db:"scope"`
 
 	// RedirectURI is the redirect URI from the request.
 	RedirectURI string `db:"redirect_uri"`
@@ -55,19 +55,19 @@ type OAuthStore interface {
 	ClientStore
 
 	// SaveAuthorizationCode saves the authorization code.
-	SaveAuthorizationCode(authorization AuthorizationData) error
+	SaveAuthorizationCode(authorization *AuthorizationData) error
 
 	// FindAuthorizationCode finds the authorization code.
-	FindAuthorizationCode(authorizationCode string) (*AuthorizationData, error)
+	FindAuthorizationCode(authorizationCode string) (*AuthorizationData, types.Client, error)
 
 	// DeleteAuthorizationCode deletes the authorization code.
 	DeleteAuthorizationCode(authorizationCode string) error
 
 	// SaveRefreshToken saves the refresh token.
-	SaveRefreshToken(refresh RefreshData) error
+	SaveRefreshToken(refresh *RefreshData) error
 
 	// FindRefreshToken finds the refresh token.
-	FindRefreshToken(refreshToken string) (*RefreshData, error)
+	FindRefreshToken(refreshToken string) (*RefreshData, types.Client, error)
 
 	// FindRefreshToken deletes the refresh token from the database.
 	DeleteRefreshToken(refreshToken string) error

@@ -15,6 +15,9 @@ type Store struct {
 
 	// Clients is the clients store.
 	Clients ClientStore
+
+	// OAuth is the OAuth store.
+	OAuth OAuthStore
 }
 
 // Attributer is the interface providing methods to extend basic IS data types.

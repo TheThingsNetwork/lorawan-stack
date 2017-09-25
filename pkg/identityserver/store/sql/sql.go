@@ -126,6 +126,7 @@ func initSubStores(s storer, previous *Store) {
 		store.Applications = NewApplicationStore(s, factory.DefaultApplication{})
 		store.Gateways = NewGatewayStore(s, factory.DefaultGateway{})
 		store.Clients = NewClientStore(s, factory.DefaultClient{})
+		store.OAuth = NewOAuthStore(s, store.Clients.(*ClientStore))
 		return
 	}
 
@@ -133,4 +134,9 @@ func initSubStores(s storer, previous *Store) {
 	store.Applications = NewApplicationStore(s, previous.Applications.(*ApplicationStore).factory)
 	store.Gateways = NewGatewayStore(s, previous.Gateways.(*GatewayStore).factory)
 	store.Clients = NewClientStore(s, previous.Clients.(*ClientStore).factory)
+	store.OAuth = NewOAuthStore(s, store.Clients.(*ClientStore))
+}
+
+func (s *Store) MigrateAll() error {
+	return s.db.MigrateAll()
 }
