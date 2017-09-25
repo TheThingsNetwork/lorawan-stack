@@ -58,7 +58,7 @@ func testGateways() map[string]*types.DefaultGateway {
 
 func TestGatewayCreate(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	gateways := testGateways()
 
@@ -79,7 +79,7 @@ func TestGatewayCreate(t *testing.T) {
 
 func TestGatewayAttributes(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	gtw := testGateways()["bob-gateway"]
 
@@ -136,7 +136,7 @@ func TestGatewayAttributes(t *testing.T) {
 
 func TestGatewayAntennas(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	gtw := testGateways()["bob-gateway"]
 
@@ -177,7 +177,7 @@ func TestGatewayAntennas(t *testing.T) {
 
 func TestGatewayCollaborators(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	gtw := testGateways()["bob-gateway"]
 	user := testUsers()["alice"]
@@ -249,7 +249,7 @@ func TestGatewayCollaborators(t *testing.T) {
 
 func TestGatewayOwners(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	gtw := testGateways()["test-gateway"]
 
@@ -283,7 +283,7 @@ func TestGatewayOwners(t *testing.T) {
 
 func TestGatewayEdit(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	gtw := testGateways()["bob-gateway"]
 	gtw.Description = "Fancy new description"
@@ -295,7 +295,7 @@ func TestGatewayEdit(t *testing.T) {
 
 func TestGatewayArchive(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	gtw := testGateways()["bob-gateway"]
 

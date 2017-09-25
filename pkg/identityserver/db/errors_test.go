@@ -12,7 +12,7 @@ import (
 
 func TestErrorDuplicate(t *testing.T) {
 	a := assertions.New(t)
-	db := getInstance()
+	db := getInstance(t)
 
 	var id int64
 	err := db.SelectOne(&id, `INSERT INTO foo (bar) VALUES ($1) RETURNING id`, "bar")

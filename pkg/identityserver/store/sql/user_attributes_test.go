@@ -72,7 +72,7 @@ func (u *userWithFoo) Fill(namespace string, attributes map[string]interface{}) 
 
 func TestUserAttributer(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	// Set userWithFooFactory as the User Factory
 	s.Users.SetFactory(userWithFooFactory{})

@@ -30,7 +30,7 @@ func testUsers() map[string]*types.DefaultUser {
 
 func TestUserCreate(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	for _, user := range testUsers() {
 		_, err := s.Users.Register(user)
@@ -42,7 +42,7 @@ func TestUserCreate(t *testing.T) {
 
 func TestUserFind(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	alice := testUsers()["alice"]
 	bob := testUsers()["bob"]
@@ -64,7 +64,7 @@ func TestUserFind(t *testing.T) {
 
 func TestUserEdit(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	bob := testUsers()["bob"]
 	alice := testUsers()["alice"]
@@ -89,7 +89,7 @@ func TestUserEdit(t *testing.T) {
 
 func TestUserArchive(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	bob := testUsers()["bob"]
 
@@ -102,7 +102,7 @@ func TestUserArchive(t *testing.T) {
 }
 
 func BenchmarkUserCreate(b *testing.B) {
-	s := testStore()
+	s := testStore(b)
 
 	for n := 0; n < b.N; n++ {
 		s.Users.Register(&types.DefaultUser{

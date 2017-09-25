@@ -39,7 +39,7 @@ func testApplications() map[string]*types.DefaultApplication {
 
 func TestApplicationCreate(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	applications := testApplications()
 
@@ -60,7 +60,7 @@ func TestApplicationCreate(t *testing.T) {
 
 func TestApplicationAppEUIManagement(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	app := testApplications()["demo-app"]
 	eui := types.AppEUI(ttn_types.EUI64([8]byte{2, 2, 2, 2, 2, 2, 2, 2}))
@@ -101,7 +101,7 @@ func TestApplicationAppEUIManagement(t *testing.T) {
 
 func TestApplicationAPIKeyManagement(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	app := testApplications()["demo-app"]
 	key := types.ApplicationAPIKey{
@@ -150,7 +150,7 @@ func TestApplicationAPIKeyManagement(t *testing.T) {
 
 func TestApplicationRetrieve(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	app := testApplications()["demo-app"]
 
@@ -161,7 +161,7 @@ func TestApplicationRetrieve(t *testing.T) {
 
 func TestApplicationCollaborators(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	user := testUsers()["alice"]
 	app := testApplications()["demo-app"]
@@ -220,7 +220,7 @@ func TestApplicationCollaborators(t *testing.T) {
 
 func TestApplicationEdit(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	app := testApplications()["demo-app"]
 	app.Description = "New description"
@@ -232,7 +232,7 @@ func TestApplicationEdit(t *testing.T) {
 
 func TestApplicationArchive(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	app := testApplications()["demo-app"]
 	app.ID = "archived-app"

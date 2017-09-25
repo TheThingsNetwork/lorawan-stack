@@ -25,18 +25,18 @@ func Open(address string) (*Store, error) {
 		return nil, err
 	}
 
-	return FromDB(db)
+	return FromDB(db), nil
 }
 
 // FromDB creates a new Store from an already existing DB.
-func FromDB(db *db.DB) (*Store, error) {
+func FromDB(db *db.DB) *Store {
 	store := &Store{
 		db: db,
 	}
 
 	store.initSubStores()
 
-	return store, nil
+	return store
 }
 
 // WithContext creates a reference to a new Store that will use the

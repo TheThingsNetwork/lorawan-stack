@@ -9,6 +9,22 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
+func TestSelect(t *testing.T) {
+	testSelect(t, getInstance(t))
+}
+
+func TestNamedSelect(t *testing.T) {
+	testNamedSelect(t, getInstance(t))
+}
+
+func TestSelectOne(t *testing.T) {
+	testSelectOne(t, getInstance(t))
+}
+
+func TestNamedSelectOne(t *testing.T) {
+	testNamedSelectOne(t, getInstance(t))
+}
+
 func testSelect(t *testing.T, q QueryContext) {
 	a := assertions.New(t)
 

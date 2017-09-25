@@ -5,9 +5,11 @@ package sql
 import (
 	"context"
 	"fmt"
+	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
+	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 )
 
 const (
@@ -18,12 +20,12 @@ const (
 // Single store instance shared across all tests.
 var testingStore *Store
 
-// testStore returns a single and shared store instance for all the times the
-// method is called in an execution. The first time that is called it creates
-// a new store instance in a newly created database.
-func testStore() *Store {
+// testStore returns a single and shared store instance everytime the method is
+// called. The first time that is called it creates  a new store instance in a
+// newly created database.
+func testStore(t testing.TB) *Store {
 	if testingStore == nil {
-		testingStore = cleanStore(database)
+		testingStore = cleanStore(t, database)
 	}
 
 	return testingStore
@@ -31,45 +33,46 @@ func testStore() *Store {
 
 // cleanStore returns a new store instance attached to a newly created database
 // where all migrations has been applied and also has been feed with some users.
-func cleanStore(database string) *Store {
+func cleanStore(t testing.TB, database string) *Store {
+	logger := test.GetLogger(t, "Identity Server")
+
 	// open database connection
-	db, err := db.Open(
-		context.Background(),
-		fmt.Sprintf(address, database),
-		migrations.Registry)
+	db, err := db.Open(context.Background(), fmt.Sprintf(address, database), migrations.Registry)
 	if err != nil {
-		panic(err)
+		logger.WithError(err).Fatal("Failed to establish a connection with the CockroachDB instance")
+		return nil
 	}
 
 	// drop database
 	_, err = db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s", database))
 	if err != nil {
-		panic(err)
+		logger.WithError(err).Fatalf("Failed to delete database `%s`", database)
+		return nil
 	}
 
 	// create it again
 	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s", database))
 	if err != nil {
-		panic(err)
+		logger.WithError(err).Fatalf("Failed to create database `%s`", database)
+		return nil
 	}
 
 	// apply all migrations
 	err = db.MigrateAll()
 	if err != nil {
-		panic(err)
+		logger.WithError(err).Fatal("Failed to apply the migrations from the registry")
+		return nil
 	}
 
 	// instantiate store
-	s, err := FromDB(db)
-	if err != nil {
-		panic(err)
-	}
+	s := FromDB(db)
 
 	// create some users
 	for _, user := range testUsers() {
 		_, err := s.Users.Register(user)
 		if err != nil {
-			panic(err)
+			logger.WithError(err).Fatalf("Failed to feed test database `%s` with some users", database)
+			return nil
 		}
 	}
 

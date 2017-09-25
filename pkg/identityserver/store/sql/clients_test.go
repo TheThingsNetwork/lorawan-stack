@@ -34,7 +34,7 @@ func testClients() map[string]*types.DefaultClient {
 
 func TestClientCreate(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	clients := testClients()
 
@@ -55,7 +55,7 @@ func TestClientCreate(t *testing.T) {
 
 func TestClientCollaborators(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	user := testUsers()["alice"]
 	client := testClients()["test-client"]
@@ -131,7 +131,7 @@ func TestClientCollaborators(t *testing.T) {
 
 func TestClientFind(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	client := testClients()["test-client"]
 
@@ -142,7 +142,7 @@ func TestClientFind(t *testing.T) {
 
 func TestClientEdit(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	client := testClients()["test-client"]
 	client.Description = utils.StringAddress("Fancy Description")
@@ -154,7 +154,7 @@ func TestClientEdit(t *testing.T) {
 
 func TestClientManagement(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore()
+	s := testStore(t)
 
 	client := testClients()["foo-client"]
 

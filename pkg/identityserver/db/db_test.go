@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db/migrations"
+	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 )
 
 const (
@@ -48,67 +49,55 @@ type foo struct {
 
 var db Database
 
-func getInstance() Database {
+func getInstance(t testing.TB) Database {
 	if db == nil {
-		db = clean()
+		db = clean(t)
 	}
 
 	return db
 }
 
-func clean() Database {
+func clean(t testing.TB) Database {
+	logger := test.GetLogger(t, "Identity Server")
+
 	registry := migrations.NewRegistry()
 	registry.Register(1, "1_foo_schema", schema, "DROP TABLE IF EXISTS foo")
 
 	// open database connection
-	db, err := Open(
-		context.Background(),
-		fmt.Sprintf(address, database),
-		registry,
-	)
+	db, err := Open(context.Background(), fmt.Sprintf(address, database), registry)
 	if err != nil {
-		panic(err)
+		logger.WithError(err).Fatal("Failed to establish a connection with the CockroachDB instance")
+		return nil
 	}
 
 	// drop database
 	_, err = db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s", database))
 	if err != nil {
-		panic(err)
+		logger.WithError(err).Fatalf("Failed to delete database `%s`", database)
+		return nil
 	}
 
 	// create it again
 	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s", database))
 	if err != nil {
-		panic(err)
+		logger.WithError(err).Fatalf("Failed to create database `%s`", database)
+		return nil
 	}
 
+	// apply all migrations
 	err = db.MigrateAll()
 	if err != nil {
-		panic(err)
+		logger.WithError(err).Fatal("Failed to apply migrations from the registry")
+		return nil
 	}
 
 	for _, f := range data {
 		_, err = db.Exec(`INSERT INTO foo (bar, baz, quu) VALUES ($1, $2, $3) RETURNING *`, f.Bar, f.Baz, f.Quu)
 		if err != nil {
-			panic(err)
+			logger.WithError(err).Fatalf("Failed to feed the test database `%s` with some data", database)
+			return nil
 		}
 	}
 
 	return db
-}
-
-func TestSelect(t *testing.T) {
-	testSelect(t, getInstance())
-}
-
-func TestNamedSelect(t *testing.T) {
-	testNamedSelect(t, getInstance())
-}
-
-func TestSelectOne(t *testing.T) {
-	testSelectOne(t, getInstance())
-}
-
-func TestNamedSelectOne(t *testing.T) {
-	testNamedSelectOne(t, getInstance())
 }
