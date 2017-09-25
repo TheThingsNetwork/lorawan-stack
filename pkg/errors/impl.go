@@ -89,3 +89,19 @@ func ToImpl(err Error) *Impl {
 		namespace:  err.Namespace(),
 	}
 }
+
+// Fields implements fielder.
+func (i *Impl) Fields() map[string]interface{} {
+	fields := make(map[string]interface{})
+
+	for k, v := range i.Attributes() {
+		fields[k] = v
+	}
+
+	fields["error"] = i.Message()
+	fields["code"] = i.Code()
+	fields["namespace"] = i.Namespace()
+	fields["type"] = i.Type()
+
+	return fields
+}
