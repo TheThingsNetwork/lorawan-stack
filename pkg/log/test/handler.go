@@ -11,17 +11,17 @@ import (
 
 // TestingHandler implements Handler.
 type TestingHandler struct {
-	t          *testing.T
+	tb         testing.TB
 	cliHandler *log.CLIHandler
 	buffer     *bytes.Buffer
 }
 
 // NewTestingHandler returns a new TestingHandler.
-func NewTestingHandler(t *testing.T) *TestingHandler {
+func NewTestingHandler(tb testing.TB) *TestingHandler {
 	buffer := bytes.NewBuffer([]byte{})
 
 	return &TestingHandler{
-		t:          t,
+		tb:         tb,
 		cliHandler: log.NewCLI(buffer),
 		buffer:     buffer,
 	}
@@ -34,7 +34,11 @@ func (h *TestingHandler) HandleLog(e log.Entry) error {
 		return err
 	}
 
-	h.t.Log(h.buffer.String())
+	if e.Level() == log.FatalLevel {
+		h.tb.Fatal(h.buffer.String())
+	} else {
+		h.tb.Log(h.buffer.String())
+	}
 
 	return nil
 }
