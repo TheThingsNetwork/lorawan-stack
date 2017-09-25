@@ -120,7 +120,6 @@ It has these top-level messages:
 	TxMetadata
 	Location
 	User
-	Name
 */
 package ttnpb
 

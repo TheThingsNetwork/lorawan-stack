@@ -19,7 +19,7 @@ message User {
   string password = 2;
 
   // name is the user's full name.
-  Name name = 3;
+  string name = 3;
 
   // validated denotes if the email address has been validated.
   bool validated = 4;
@@ -32,13 +32,4 @@ message User {
 
   // archived_at is the time when the user account was archived.
   google.protobuf.Timestamp archived_at = 7 [(gogoproto.stdtime) = true];
-}
-
-// Name is the message that defines the user's full name.
-message Name {
-  // first is the first name of the user.
-  string first = 1;
-
-  // last is the last name of the user.
-  string last = 2;
 }

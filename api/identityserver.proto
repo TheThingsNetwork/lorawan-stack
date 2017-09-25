@@ -29,7 +29,7 @@ message CreateUserRequest {
   string password = 2;
 
   // name is the user's full name.
-  Name name = 3 [(gogoproto.nullable) = false];
+  string name = 3;
 }
 
 message UpdateUserRequest {
@@ -37,7 +37,7 @@ message UpdateUserRequest {
   string email = 1;
 
   // name is the new name of the user.
-  Name name = 2 [(gogoproto.nullable) = false];
+  string name = 2;
 }
 
 message UpdateUserPasswordRequest {
