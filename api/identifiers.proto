@@ -49,14 +49,11 @@ message ApplicationAPIKeyIdentifiers {
 }
 
 // ApplicationCollaboratorIdentifiers is the message that is used to identify
-// a collaborator within an application. user_id will have priority over email
-// in case both of them are set.
+// a collaborator within an application.
 message ApplicationCollaboratorIdentifiers {
   ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // user_id is the ID of the user.
   string user_id = 2 [(gogoproto.customname) = "UserID"];
-  // email address of the user.
-  string email = 3;
 }
 
 // GatewayIdentifiers is the message that is used to identify a gateway.
@@ -68,14 +65,11 @@ message GatewayIdentifiers {
 }
 
 // GatewayCollaboratorIdentifiers is the message that is used to identify a
-// collaborator within a gateway. user_id will have priority over email
-// in case both of them are set.
+// collaborator within a gateway.
 message GatewayCollaboratorIdentifiers {
   GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // user_id is the ID of the user.
   string user_id = 2 [(gogoproto.customname) = "UserID"];
-  // email address of the user.
-  string email = 3;
 }
 
 // EndDeviceIdentifiers message is carried with uplink and downlink messages.
@@ -105,12 +99,9 @@ message ClientIdentifiers {
 }
 
 // ClientCollaboratorIdentifiers is the message used to identify a collaborator
-// within a client. user_id will have priority over email in case both of them
-// are set.
+// within a client.
 message ClientCollaboratorIdentifiers {
   ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // user_id is the ID of the user.
   string user_id = 2 [(gogoproto.customname) = "UserID"];
-  // email address of the user.
-  string email = 3;
 }
