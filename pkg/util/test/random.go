@@ -1,0 +1,11 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
+package test
+
+import (
+	"math/rand"
+
+	"github.com/TheThingsNetwork/ttn/pkg/util/randutil"
+)
+
+var Randy = rand.New(randutil.NewLockedSource(rand.NewSource(42)))
