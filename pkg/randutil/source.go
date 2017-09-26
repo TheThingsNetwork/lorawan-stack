@@ -1,5 +1,6 @@
 // Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
+// Package randutil provides pseudo-random number generator utilities.
 package randutil
 
 import (
@@ -44,7 +45,9 @@ func (r *LockedSource) Seed(seed int64) {
 
 // NewLockedSource returns a rand.Source, which is safe for concurrent use.
 func NewLockedSource(src rand.Source) *LockedSource {
+	s64, _ := src.(rand.Source64)
 	return &LockedSource{
 		src: src,
+		s64: s64,
 	}
 }
