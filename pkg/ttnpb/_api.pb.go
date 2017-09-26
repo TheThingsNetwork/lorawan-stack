@@ -53,14 +53,15 @@ It has these top-level messages:
 	FrequencyPlan
 	FrequencyPlanRequest
 	UserIdentifiers
-	ApplicationIdentifier
-	ApplicationAPIKeyIdentifier
+	UserIDIdentifiers
+	UserEmailIdentifiers
+	ApplicationIdentifiers
+	ApplicationAPIKeyIdentifiers
 	ApplicationCollaboratorIdentifiers
-	GatewayIdentifier
-	GatewayAntennaIdentifier
+	GatewayIdentifiers
 	GatewayCollaboratorIdentifiers
 	EndDeviceIdentifiers
-	ClientIdentifier
+	ClientIdentifiers
 	ClientCollaboratorIdentifiers
 	CreateUserRequest
 	UpdateUserRequest
@@ -86,6 +87,7 @@ It has these top-level messages:
 	RemoveGatewayAttributeRequest
 	SetGatewayAntennaRequest
 	ListGatewayAntennasResponse
+	RemoveGatewayAntennaRequest
 	GatewayCollaborator
 	ListGatewayCollaboratorsResponse
 	ListGatewayOwnersResponse

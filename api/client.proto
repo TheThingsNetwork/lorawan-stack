@@ -3,7 +3,6 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "google/protobuf/timestamp.proto";
 
 package ttn.v3;
@@ -12,7 +11,8 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // Client is the message that defines a third-party client on the network.
 message Client {
-  ClientIdentifier client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // id is the client's ID.
+  string id = 1 [(gogoproto.customname) = "ID"];
 
   // description is the description of the client.
   string description = 2;

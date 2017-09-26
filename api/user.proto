@@ -13,23 +13,27 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // User is the message that defines an user on the network.
 message User {
-  UserIdentifiers user = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // id is the user's ID.
+  string id = 1 [(gogoproto.customname) = "ID"];
+
+  // email is the user's email address.
+  string email = 2;
 
   // password is the user's password.
-  string password = 2;
+  string password = 3;
 
   // name is the user's full name.
-  string name = 3;
+  string name = 4;
 
   // validated denotes if the email address has been validated.
-  bool validated = 4;
+  bool validated = 5;
 
   // admin denotes whether or not the user has administrative rights within the tenant.
-  bool admin = 5;
+  bool admin = 6;
 
   // created_at denotes when the user was created.
-  google.protobuf.Timestamp created_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // deleted_at is the time when the user account was deleted.
-  google.protobuf.Timestamp deleted_at = 7 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp deleted_at = 8 [(gogoproto.stdtime) = true];
 }
