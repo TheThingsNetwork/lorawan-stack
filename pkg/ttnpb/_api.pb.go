@@ -27,7 +27,6 @@ It is generated from these files:
 
 It has these top-level messages:
 	Application
-	ApplicationAPIKey
 	ApplicationUp
 	ApplicationUplink
 	ApplicationDownlink
@@ -119,6 +118,7 @@ It has these top-level messages:
 	RxMetadata
 	TxMetadata
 	Location
+	APIKey
 	User
 */
 package ttnpb

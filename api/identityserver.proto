@@ -77,7 +77,7 @@ message CreateApplicationRequest {
   repeated bytes app_euis = 3 [(gogoproto.customname) = "AppEUIs", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 
   // api_keys are the API keys of the application.
-  repeated ApplicationAPIKey api_keys = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
+  repeated APIKey api_keys = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
 }
 
 message ListApplicationsResponse {
@@ -94,7 +94,7 @@ message UpdateApplicationRequest {
   repeated bytes app_euis = 3 [(gogoproto.customname) = "AppEUIs", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 
   // api_keys are the API keys of the application.
-  repeated ApplicationAPIKey api_keys = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
+  repeated APIKey api_keys = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
 }
 
 message AddApplicationAppEUIRequest {
@@ -131,7 +131,7 @@ message GenerateApplicationAPIKeyRequest {
 }
 
 message ListApplicationAPIKeysResponse {
-  repeated ApplicationAPIKey api_keys = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
+  repeated APIKey api_keys = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
 }
 
 message ApplicationCollaborator {
@@ -190,10 +190,10 @@ service IsApplication {
 
   // GenerateApplicationAPIKey generates a new API key for a given application
   // and returns it.
-  rpc GenerateApplicationAPIKey(GenerateApplicationAPIKeyRequest) returns (ApplicationAPIKey);
+  rpc GenerateApplicationAPIKey(GenerateApplicationAPIKeyRequest) returns (APIKey);
 
   // GetApplicationAPIKey returns a given API key from an application.
-  rpc GetApplicationAPIKey(ApplicationAPIKeyIdentifier) returns (ApplicationAPIKey);
+  rpc GetApplicationAPIKey(ApplicationAPIKeyIdentifier) returns (APIKey);
 
   // ListApplicationAPIKeys returns all the API keys that are registered
   // for an application.

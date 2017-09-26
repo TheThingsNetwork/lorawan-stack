@@ -23,24 +23,13 @@ message Application {
   repeated bytes app_euis = 3 [(gogoproto.customname) = "AppEUIs", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 
   // api_keys are the API keys of the application.
-  repeated ApplicationAPIKey api_keys = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
+  repeated APIKey api_keys = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
 
   // created_at is the time when the application was created.
   google.protobuf.Timestamp created_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // deleted_at is the time when the application was deleted.
   google.protobuf.Timestamp deleted_at = 7 [(gogoproto.stdtime) = true];
-}
-
-message ApplicationAPIKey {
-  // name is the API key name.
-  string name = 1;
-
-  // key is the actual API key.
-  string key = 2;
-
-  // rights are the rights this API key bears.
-  repeated Right rights = 3;
 }
 
 // ApplicationUp wraps multiple application-layer uplink types

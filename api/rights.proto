@@ -8,6 +8,17 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
+message APIKey {
+  // name is the API key name.
+  string name = 1;
+
+  // key is the actual API key.
+  string key = 2;
+
+  // rights are the rights this API key bears.
+  repeated Right rights = 3;
+}
+
 // Right is the enum that defines all the different rights to do something in
 // the network.
 enum Right {
