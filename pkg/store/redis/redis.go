@@ -12,7 +12,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/randutil"
+	"github.com/TheThingsNetwork/ttn/pkg/util/randutil"
 	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/oklog/ulid"
 	redis "gopkg.in/redis.v5"
