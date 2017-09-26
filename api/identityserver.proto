@@ -63,10 +63,8 @@ service IsUser {
   // UpdateUserPassword sets a new password for the authenticated user account.
   rpc UpdateUserPassword(UpdateUserPasswordRequest) returns (google.protobuf.Empty);
 
-  // ArchiveUser archives the account of the authenticated user and therefore
-  // it cannot be used anymore. Once the account is archived it will be set
-  // to deletion.
-  rpc ArchiveUser(google.protobuf.Empty) returns (google.protobuf.Empty);
+  // DeleteUser permantly deletes the user account of the authenticated user.
+  rpc DeleteUser(google.protobuf.Empty) returns (google.protobuf.Empty);
 }
 
 message CreateApplicationRequest {
@@ -175,9 +173,8 @@ service IsApplication {
   // UpdateApplication edits an application.
   rpc UpdateApplication(UpdateApplicationRequest) returns (google.protobuf.Empty);
 
-  // ArchiveApplication archives an application so it cannot be used anymore.
-  // Once the application is archived it will be set to deletion.
-  rpc ArchiveApplication(ApplicationIdentifier) returns (google.protobuf.Empty);
+  // DeleteApplication permantly deletes an application.
+  rpc DeleteApplication(ApplicationIdentifier) returns (google.protobuf.Empty);
 
   // AddApplicationAppEUI adds a given AppEUI to a given application.
   rpc AddApplicationAppEUI(AddApplicationAppEUIRequest) returns (google.protobuf.Empty);
@@ -364,9 +361,8 @@ service IsGateway {
   // UpdateGateway edits a gateway and retrieves the updated version.
   rpc UpdateGateway(UpdateGatewayRequest) returns (Gateway);
 
-  // ArchiveGateway archives a gateway and therefore it cannot be used anymore.
-  // Once the gateway is archived it will be set to deletion.
-  rpc ArchiveGateway(GatewayIdentifier) returns (google.protobuf.Empty);
+  // DeleteGateway permantly deletes a gateway.
+  rpc DeleteGateway(GatewayIdentifier) returns (google.protobuf.Empty);
 
   // AddGatewayAttribute sets an attribute with a key in the gateway.
   rpc AddGatewayAttribute(AddGatewayAttributeRequest) returns (google.protobuf.Empty);
@@ -504,9 +500,8 @@ service IsClient {
   // UpdateClient edits a client.
   rpc UpdateClient(UpdateClientRequest) returns (google.protobuf.Empty);
 
-  // ArchiveClient archives a client so it cannot be used anymore. Once the client
-  // is archived it will be set to deletion.
-  rpc ArchiveClient(ClientIdentifier) returns (google.protobuf.Empty);
+  // DeleteClient permantly deletes a client.
+  rpc DeleteClient(ClientIdentifier) returns (google.protobuf.Empty);
 
   // SetClientOfficial allows to a tenant admin to add or remove the official
   // distinguise "official" label of a third-party client.

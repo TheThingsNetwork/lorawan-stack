@@ -30,6 +30,6 @@ message User {
   // created_at denotes when the user was created.
   google.protobuf.Timestamp created_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // archived_at is the time when the user account was archived.
-  google.protobuf.Timestamp archived_at = 7 [(gogoproto.stdtime) = true];
+  // deleted_at is the time when the user account was deleted.
+  google.protobuf.Timestamp deleted_at = 7 [(gogoproto.stdtime) = true];
 }
