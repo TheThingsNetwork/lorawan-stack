@@ -315,27 +315,19 @@ func (m *ListApplicationAPIKeysResponse) GetAPIKeys() []APIKey {
 	return nil
 }
 
-type ApplicationCollaborator struct {
-	ApplicationCollaboratorIdentifiers `protobuf:"bytes,1,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
-	// rights is a list of rights that an user holds for an application.
-	Rights []Right `protobuf:"varint,2,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
+type AddApplicationCollaboratorRequest struct {
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
+	Collaborator           `protobuf:"bytes,2,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
 }
 
-func (m *ApplicationCollaborator) Reset()      { *m = ApplicationCollaborator{} }
-func (*ApplicationCollaborator) ProtoMessage() {}
-func (*ApplicationCollaborator) Descriptor() ([]byte, []int) {
+func (m *AddApplicationCollaboratorRequest) Reset()      { *m = AddApplicationCollaboratorRequest{} }
+func (*AddApplicationCollaboratorRequest) ProtoMessage() {}
+func (*AddApplicationCollaboratorRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptorIdentityserver, []int{12}
 }
 
-func (m *ApplicationCollaborator) GetRights() []Right {
-	if m != nil {
-		return m.Rights
-	}
-	return nil
-}
-
 type ListApplicationCollaboratorsResponse struct {
-	Collaborators []ApplicationCollaborator `protobuf:"bytes,1,rep,name=collaborators" json:"collaborators"`
+	Collaborators []Collaborator `protobuf:"bytes,1,rep,name=collaborators" json:"collaborators"`
 }
 
 func (m *ListApplicationCollaboratorsResponse) Reset()      { *m = ListApplicationCollaboratorsResponse{} }
@@ -344,22 +336,50 @@ func (*ListApplicationCollaboratorsResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptorIdentityserver, []int{13}
 }
 
-func (m *ListApplicationCollaboratorsResponse) GetCollaborators() []ApplicationCollaborator {
+func (m *ListApplicationCollaboratorsResponse) GetCollaborators() []Collaborator {
 	if m != nil {
 		return m.Collaborators
 	}
 	return nil
 }
 
+type RemoveApplicationCollaboratorRequest struct {
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
+	// user_id is the user's ID to be removed as collaborator.
+	UserID string `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+}
+
+func (m *RemoveApplicationCollaboratorRequest) Reset()      { *m = RemoveApplicationCollaboratorRequest{} }
+func (*RemoveApplicationCollaboratorRequest) ProtoMessage() {}
+func (*RemoveApplicationCollaboratorRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{14}
+}
+
+func (m *RemoveApplicationCollaboratorRequest) GetUserID() string {
+	if m != nil {
+		return m.UserID
+	}
+	return ""
+}
+
 type ApplicationRight struct {
-	ApplicationCollaboratorIdentifiers `protobuf:"bytes,1,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
+	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application,embedded=application" json:"application"`
+	// user_id is the user's ID.
+	UserID string `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	// right is the right that the user holds for the application.
 	Right Right `protobuf:"varint,3,opt,name=right,proto3,enum=ttn.v3.Right" json:"right,omitempty"`
 }
 
 func (m *ApplicationRight) Reset()                    { *m = ApplicationRight{} }
 func (*ApplicationRight) ProtoMessage()               {}
-func (*ApplicationRight) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{14} }
+func (*ApplicationRight) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{15} }
+
+func (m *ApplicationRight) GetUserID() string {
+	if m != nil {
+		return m.UserID
+	}
+	return ""
+}
 
 func (m *ApplicationRight) GetRight() Right {
 	if m != nil {
@@ -376,7 +396,7 @@ type ListApplicationRightsResponse struct {
 func (m *ListApplicationRightsResponse) Reset()      { *m = ListApplicationRightsResponse{} }
 func (*ListApplicationRightsResponse) ProtoMessage() {}
 func (*ListApplicationRightsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{15}
+	return fileDescriptorIdentityserver, []int{16}
 }
 
 func (m *ListApplicationRightsResponse) GetRights() []Right {
@@ -414,7 +434,7 @@ type CreateGatewayRequest struct {
 func (m *CreateGatewayRequest) Reset()      { *m = CreateGatewayRequest{} }
 func (*CreateGatewayRequest) ProtoMessage() {}
 func (*CreateGatewayRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{16}
+	return fileDescriptorIdentityserver, []int{17}
 }
 
 func (m *CreateGatewayRequest) GetTenantID() string {
@@ -494,7 +514,7 @@ type ListGatewaysResponse struct {
 func (m *ListGatewaysResponse) Reset()      { *m = ListGatewaysResponse{} }
 func (*ListGatewaysResponse) ProtoMessage() {}
 func (*ListGatewaysResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{17}
+	return fileDescriptorIdentityserver, []int{18}
 }
 
 func (m *ListGatewaysResponse) GetGateways() []Gateway {
@@ -529,7 +549,7 @@ type UpdateGatewayRequest struct {
 func (m *UpdateGatewayRequest) Reset()      { *m = UpdateGatewayRequest{} }
 func (*UpdateGatewayRequest) ProtoMessage() {}
 func (*UpdateGatewayRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{18}
+	return fileDescriptorIdentityserver, []int{19}
 }
 
 func (m *UpdateGatewayRequest) GetDescription() string {
@@ -599,7 +619,7 @@ type AddGatewayAttributeRequest struct {
 func (m *AddGatewayAttributeRequest) Reset()      { *m = AddGatewayAttributeRequest{} }
 func (*AddGatewayAttributeRequest) ProtoMessage() {}
 func (*AddGatewayAttributeRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{19}
+	return fileDescriptorIdentityserver, []int{20}
 }
 
 func (m *AddGatewayAttributeRequest) GetAttribute() string {
@@ -624,7 +644,7 @@ type ListGatewayAttributesResponse struct {
 func (m *ListGatewayAttributesResponse) Reset()      { *m = ListGatewayAttributesResponse{} }
 func (*ListGatewayAttributesResponse) ProtoMessage() {}
 func (*ListGatewayAttributesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{20}
+	return fileDescriptorIdentityserver, []int{21}
 }
 
 func (m *ListGatewayAttributesResponse) GetAttributes() map[string]string {
@@ -643,7 +663,7 @@ type RemoveGatewayAttributeRequest struct {
 func (m *RemoveGatewayAttributeRequest) Reset()      { *m = RemoveGatewayAttributeRequest{} }
 func (*RemoveGatewayAttributeRequest) ProtoMessage() {}
 func (*RemoveGatewayAttributeRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{21}
+	return fileDescriptorIdentityserver, []int{22}
 }
 
 func (m *RemoveGatewayAttributeRequest) GetAttribute() string {
@@ -662,7 +682,7 @@ type SetGatewayAntennaRequest struct {
 func (m *SetGatewayAntennaRequest) Reset()      { *m = SetGatewayAntennaRequest{} }
 func (*SetGatewayAntennaRequest) ProtoMessage() {}
 func (*SetGatewayAntennaRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{22}
+	return fileDescriptorIdentityserver, []int{23}
 }
 
 func (m *SetGatewayAntennaRequest) GetAntenna() GatewayAntenna {
@@ -679,7 +699,7 @@ type ListGatewayAntennasResponse struct {
 func (m *ListGatewayAntennasResponse) Reset()      { *m = ListGatewayAntennasResponse{} }
 func (*ListGatewayAntennasResponse) ProtoMessage() {}
 func (*ListGatewayAntennasResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{23}
+	return fileDescriptorIdentityserver, []int{24}
 }
 
 func (m *ListGatewayAntennasResponse) GetAntennas() []GatewayAntenna {
@@ -698,7 +718,7 @@ type RemoveGatewayAntennaRequest struct {
 func (m *RemoveGatewayAntennaRequest) Reset()      { *m = RemoveGatewayAntennaRequest{} }
 func (*RemoveGatewayAntennaRequest) ProtoMessage() {}
 func (*RemoveGatewayAntennaRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{24}
+	return fileDescriptorIdentityserver, []int{25}
 }
 
 func (m *RemoveGatewayAntennaRequest) GetAntennaID() string {
@@ -708,35 +728,28 @@ func (m *RemoveGatewayAntennaRequest) GetAntennaID() string {
 	return ""
 }
 
-type GatewayCollaborator struct {
-	GatewayCollaboratorIdentifiers `protobuf:"bytes,1,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
-	Rights                         []Right `protobuf:"varint,2,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
+type AddGatewayCollaboratorRequest struct {
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
+	Collaborator       `protobuf:"bytes,2,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
 }
 
-func (m *GatewayCollaborator) Reset()      { *m = GatewayCollaborator{} }
-func (*GatewayCollaborator) ProtoMessage() {}
-func (*GatewayCollaborator) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{25}
-}
-
-func (m *GatewayCollaborator) GetRights() []Right {
-	if m != nil {
-		return m.Rights
-	}
-	return nil
+func (m *AddGatewayCollaboratorRequest) Reset()      { *m = AddGatewayCollaboratorRequest{} }
+func (*AddGatewayCollaboratorRequest) ProtoMessage() {}
+func (*AddGatewayCollaboratorRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{26}
 }
 
 type ListGatewayCollaboratorsResponse struct {
-	Collaborators []GatewayCollaborator `protobuf:"bytes,1,rep,name=collaborators" json:"collaborators"`
+	Collaborators []Collaborator `protobuf:"bytes,1,rep,name=collaborators" json:"collaborators"`
 }
 
 func (m *ListGatewayCollaboratorsResponse) Reset()      { *m = ListGatewayCollaboratorsResponse{} }
 func (*ListGatewayCollaboratorsResponse) ProtoMessage() {}
 func (*ListGatewayCollaboratorsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{26}
+	return fileDescriptorIdentityserver, []int{27}
 }
 
-func (m *ListGatewayCollaboratorsResponse) GetCollaborators() []GatewayCollaborator {
+func (m *ListGatewayCollaboratorsResponse) GetCollaborators() []Collaborator {
 	if m != nil {
 		return m.Collaborators
 	}
@@ -745,31 +758,59 @@ func (m *ListGatewayCollaboratorsResponse) GetCollaborators() []GatewayCollabora
 
 type ListGatewayOwnersResponse struct {
 	// collaborators is the list of collaborators that have owner rights for the gateway.
-	Collaborators []*GatewayCollaboratorIdentifiers `protobuf:"bytes,1,rep,name=collaborators" json:"collaborators,omitempty"`
+	Collaborators []Collaborator `protobuf:"bytes,1,rep,name=collaborators" json:"collaborators"`
 }
 
 func (m *ListGatewayOwnersResponse) Reset()      { *m = ListGatewayOwnersResponse{} }
 func (*ListGatewayOwnersResponse) ProtoMessage() {}
 func (*ListGatewayOwnersResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{27}
+	return fileDescriptorIdentityserver, []int{28}
 }
 
-func (m *ListGatewayOwnersResponse) GetCollaborators() []*GatewayCollaboratorIdentifiers {
+func (m *ListGatewayOwnersResponse) GetCollaborators() []Collaborator {
 	if m != nil {
 		return m.Collaborators
 	}
 	return nil
 }
 
+type RemoveGatewayCollaboratorRequest struct {
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
+	// user_id is the user's ID to be removed as collaborator.
+	UserID string `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+}
+
+func (m *RemoveGatewayCollaboratorRequest) Reset()      { *m = RemoveGatewayCollaboratorRequest{} }
+func (*RemoveGatewayCollaboratorRequest) ProtoMessage() {}
+func (*RemoveGatewayCollaboratorRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{29}
+}
+
+func (m *RemoveGatewayCollaboratorRequest) GetUserID() string {
+	if m != nil {
+		return m.UserID
+	}
+	return ""
+}
+
 type GatewayRight struct {
-	GatewayCollaboratorIdentifiers `protobuf:"bytes,1,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
+	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
+	// user_id is the user's ID to be removed as collaborator.
+	UserID string `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	// right is the right this user holds for the gateway.
-	Right Right `protobuf:"varint,2,opt,name=right,proto3,enum=ttn.v3.Right" json:"right,omitempty"`
+	Right Right `protobuf:"varint,3,opt,name=right,proto3,enum=ttn.v3.Right" json:"right,omitempty"`
 }
 
 func (m *GatewayRight) Reset()                    { *m = GatewayRight{} }
 func (*GatewayRight) ProtoMessage()               {}
-func (*GatewayRight) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{28} }
+func (*GatewayRight) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{30} }
+
+func (m *GatewayRight) GetUserID() string {
+	if m != nil {
+		return m.UserID
+	}
+	return ""
+}
 
 func (m *GatewayRight) GetRight() Right {
 	if m != nil {
@@ -786,7 +827,7 @@ type ListGatewayRightsResponse struct {
 func (m *ListGatewayRightsResponse) Reset()      { *m = ListGatewayRightsResponse{} }
 func (*ListGatewayRightsResponse) ProtoMessage() {}
 func (*ListGatewayRightsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{29}
+	return fileDescriptorIdentityserver, []int{31}
 }
 
 func (m *ListGatewayRightsResponse) GetRights() []Right {
@@ -816,7 +857,7 @@ type CreateClientRequest struct {
 func (m *CreateClientRequest) Reset()      { *m = CreateClientRequest{} }
 func (*CreateClientRequest) ProtoMessage() {}
 func (*CreateClientRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{30}
+	return fileDescriptorIdentityserver, []int{32}
 }
 
 func (m *CreateClientRequest) GetTenantID() string {
@@ -876,7 +917,7 @@ type ListClientsResponse struct {
 func (m *ListClientsResponse) Reset()      { *m = ListClientsResponse{} }
 func (*ListClientsResponse) ProtoMessage() {}
 func (*ListClientsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{31}
+	return fileDescriptorIdentityserver, []int{33}
 }
 
 func (m *ListClientsResponse) GetClients() []Client {
@@ -903,7 +944,7 @@ type UpdateClientRequest struct {
 func (m *UpdateClientRequest) Reset()      { *m = UpdateClientRequest{} }
 func (*UpdateClientRequest) ProtoMessage() {}
 func (*UpdateClientRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{32}
+	return fileDescriptorIdentityserver, []int{34}
 }
 
 func (m *UpdateClientRequest) GetDescription() string {
@@ -951,7 +992,7 @@ type SetClientOfficialRequest struct {
 func (m *SetClientOfficialRequest) Reset()      { *m = SetClientOfficialRequest{} }
 func (*SetClientOfficialRequest) ProtoMessage() {}
 func (*SetClientOfficialRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{33}
+	return fileDescriptorIdentityserver, []int{35}
 }
 
 func (m *SetClientOfficialRequest) GetOfficial() bool {
@@ -969,7 +1010,7 @@ type SetClientStateRequest struct {
 func (m *SetClientStateRequest) Reset()      { *m = SetClientStateRequest{} }
 func (*SetClientStateRequest) ProtoMessage() {}
 func (*SetClientStateRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{34}
+	return fileDescriptorIdentityserver, []int{36}
 }
 
 func (m *SetClientStateRequest) GetState() ClientState {
@@ -979,50 +1020,71 @@ func (m *SetClientStateRequest) GetState() ClientState {
 	return STATE_PENDING
 }
 
-type ClientCollaborator struct {
-	ClientCollaboratorIdentifiers `protobuf:"bytes,1,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
-	Rights                        []Right `protobuf:"varint,2,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
+type AddClientCollaboratorRequest struct {
+	ClientIdentifiers `protobuf:"bytes,1,opt,name=client,embedded=client" json:"client"`
+	Collaborator      `protobuf:"bytes,2,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
 }
 
-func (m *ClientCollaborator) Reset()      { *m = ClientCollaborator{} }
-func (*ClientCollaborator) ProtoMessage() {}
-func (*ClientCollaborator) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{35}
-}
-
-func (m *ClientCollaborator) GetRights() []Right {
-	if m != nil {
-		return m.Rights
-	}
-	return nil
+func (m *AddClientCollaboratorRequest) Reset()      { *m = AddClientCollaboratorRequest{} }
+func (*AddClientCollaboratorRequest) ProtoMessage() {}
+func (*AddClientCollaboratorRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{37}
 }
 
 type ListClientCollaboratorsResponse struct {
-	Collaborators []ClientCollaborator `protobuf:"bytes,1,rep,name=collaborators" json:"collaborators"`
+	Collaborators []Collaborator `protobuf:"bytes,1,rep,name=collaborators" json:"collaborators"`
 }
 
 func (m *ListClientCollaboratorsResponse) Reset()      { *m = ListClientCollaboratorsResponse{} }
 func (*ListClientCollaboratorsResponse) ProtoMessage() {}
 func (*ListClientCollaboratorsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{36}
+	return fileDescriptorIdentityserver, []int{38}
 }
 
-func (m *ListClientCollaboratorsResponse) GetCollaborators() []ClientCollaborator {
+func (m *ListClientCollaboratorsResponse) GetCollaborators() []Collaborator {
 	if m != nil {
 		return m.Collaborators
 	}
 	return nil
 }
 
+type RemoveClientCollaboratorRequest struct {
+	ClientIdentifiers `protobuf:"bytes,1,opt,name=client,embedded=client" json:"client"`
+	// user_id is the user's ID to be removed as collaborator.
+	UserID string `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+}
+
+func (m *RemoveClientCollaboratorRequest) Reset()      { *m = RemoveClientCollaboratorRequest{} }
+func (*RemoveClientCollaboratorRequest) ProtoMessage() {}
+func (*RemoveClientCollaboratorRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{39}
+}
+
+func (m *RemoveClientCollaboratorRequest) GetUserID() string {
+	if m != nil {
+		return m.UserID
+	}
+	return ""
+}
+
 type ClientRight struct {
-	ClientCollaboratorIdentifiers `protobuf:"bytes,1,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
+	ClientIdentifiers `protobuf:"bytes,1,opt,name=client,embedded=client" json:"client"`
+	// user_id is the user's ID to be removed as collaborator.
+	UserID string `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	// right is the right that the user holds for the client.
-	Right Right `protobuf:"varint,2,opt,name=right,proto3,enum=ttn.v3.Right" json:"right,omitempty"`
+	Right Right `protobuf:"varint,3,opt,name=right,proto3,enum=ttn.v3.Right" json:"right,omitempty"`
 }
 
 func (m *ClientRight) Reset()                    { *m = ClientRight{} }
 func (*ClientRight) ProtoMessage()               {}
-func (*ClientRight) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{37} }
+func (*ClientRight) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{40} }
+
+func (m *ClientRight) GetUserID() string {
+	if m != nil {
+		return m.UserID
+	}
+	return ""
+}
 
 func (m *ClientRight) GetRight() Right {
 	if m != nil {
@@ -1039,7 +1101,7 @@ type ListClientRightsResponse struct {
 func (m *ListClientRightsResponse) Reset()      { *m = ListClientRightsResponse{} }
 func (*ListClientRightsResponse) ProtoMessage() {}
 func (*ListClientRightsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{38}
+	return fileDescriptorIdentityserver, []int{41}
 }
 
 func (m *ListClientRightsResponse) GetRights() []Right {
@@ -1062,8 +1124,9 @@ func init() {
 	proto.RegisterType((*RemoveApplicationAppEUIRequest)(nil), "ttn.v3.RemoveApplicationAppEUIRequest")
 	proto.RegisterType((*GenerateApplicationAPIKeyRequest)(nil), "ttn.v3.GenerateApplicationAPIKeyRequest")
 	proto.RegisterType((*ListApplicationAPIKeysResponse)(nil), "ttn.v3.ListApplicationAPIKeysResponse")
-	proto.RegisterType((*ApplicationCollaborator)(nil), "ttn.v3.ApplicationCollaborator")
+	proto.RegisterType((*AddApplicationCollaboratorRequest)(nil), "ttn.v3.AddApplicationCollaboratorRequest")
 	proto.RegisterType((*ListApplicationCollaboratorsResponse)(nil), "ttn.v3.ListApplicationCollaboratorsResponse")
+	proto.RegisterType((*RemoveApplicationCollaboratorRequest)(nil), "ttn.v3.RemoveApplicationCollaboratorRequest")
 	proto.RegisterType((*ApplicationRight)(nil), "ttn.v3.ApplicationRight")
 	proto.RegisterType((*ListApplicationRightsResponse)(nil), "ttn.v3.ListApplicationRightsResponse")
 	proto.RegisterType((*CreateGatewayRequest)(nil), "ttn.v3.CreateGatewayRequest")
@@ -1075,9 +1138,10 @@ func init() {
 	proto.RegisterType((*SetGatewayAntennaRequest)(nil), "ttn.v3.SetGatewayAntennaRequest")
 	proto.RegisterType((*ListGatewayAntennasResponse)(nil), "ttn.v3.ListGatewayAntennasResponse")
 	proto.RegisterType((*RemoveGatewayAntennaRequest)(nil), "ttn.v3.RemoveGatewayAntennaRequest")
-	proto.RegisterType((*GatewayCollaborator)(nil), "ttn.v3.GatewayCollaborator")
+	proto.RegisterType((*AddGatewayCollaboratorRequest)(nil), "ttn.v3.AddGatewayCollaboratorRequest")
 	proto.RegisterType((*ListGatewayCollaboratorsResponse)(nil), "ttn.v3.ListGatewayCollaboratorsResponse")
 	proto.RegisterType((*ListGatewayOwnersResponse)(nil), "ttn.v3.ListGatewayOwnersResponse")
+	proto.RegisterType((*RemoveGatewayCollaboratorRequest)(nil), "ttn.v3.RemoveGatewayCollaboratorRequest")
 	proto.RegisterType((*GatewayRight)(nil), "ttn.v3.GatewayRight")
 	proto.RegisterType((*ListGatewayRightsResponse)(nil), "ttn.v3.ListGatewayRightsResponse")
 	proto.RegisterType((*CreateClientRequest)(nil), "ttn.v3.CreateClientRequest")
@@ -1085,8 +1149,9 @@ func init() {
 	proto.RegisterType((*UpdateClientRequest)(nil), "ttn.v3.UpdateClientRequest")
 	proto.RegisterType((*SetClientOfficialRequest)(nil), "ttn.v3.SetClientOfficialRequest")
 	proto.RegisterType((*SetClientStateRequest)(nil), "ttn.v3.SetClientStateRequest")
-	proto.RegisterType((*ClientCollaborator)(nil), "ttn.v3.ClientCollaborator")
+	proto.RegisterType((*AddClientCollaboratorRequest)(nil), "ttn.v3.AddClientCollaboratorRequest")
 	proto.RegisterType((*ListClientCollaboratorsResponse)(nil), "ttn.v3.ListClientCollaboratorsResponse")
+	proto.RegisterType((*RemoveClientCollaboratorRequest)(nil), "ttn.v3.RemoveClientCollaboratorRequest")
 	proto.RegisterType((*ClientRight)(nil), "ttn.v3.ClientRight")
 	proto.RegisterType((*ListClientRightsResponse)(nil), "ttn.v3.ListClientRightsResponse")
 }
@@ -1435,11 +1500,11 @@ type IsApplicationClient interface {
 	// RemoveApplicationAPIKey removes a given API key from an application.
 	RemoveApplicationAPIKey(ctx context.Context, in *ApplicationAPIKeyIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// AddApplicationCollaborator adds an user as collaborator of an application.
-	AddApplicationCollaborator(ctx context.Context, in *ApplicationCollaborator, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	AddApplicationCollaborator(ctx context.Context, in *AddApplicationCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// ListApplicationCollaborators returns all the collaborators of a given application.
 	ListApplicationCollaborators(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*ListApplicationCollaboratorsResponse, error)
 	// RemoveApplicationCollaborator removes a collaborator from an application.
-	RemoveApplicationCollaborator(ctx context.Context, in *ApplicationCollaboratorIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	RemoveApplicationCollaborator(ctx context.Context, in *RemoveApplicationCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// AddApplicationRight grants a given right to a given user for a given application.
 	AddApplicationRight(ctx context.Context, in *ApplicationRight, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// ListApplicationRights returns all the rights that the authenticated user has
@@ -1574,7 +1639,7 @@ func (c *isApplicationClient) RemoveApplicationAPIKey(ctx context.Context, in *A
 	return out, nil
 }
 
-func (c *isApplicationClient) AddApplicationCollaborator(ctx context.Context, in *ApplicationCollaborator, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+func (c *isApplicationClient) AddApplicationCollaborator(ctx context.Context, in *AddApplicationCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
 	out := new(google_protobuf2.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/AddApplicationCollaborator", in, out, c.cc, opts...)
 	if err != nil {
@@ -1592,7 +1657,7 @@ func (c *isApplicationClient) ListApplicationCollaborators(ctx context.Context, 
 	return out, nil
 }
 
-func (c *isApplicationClient) RemoveApplicationCollaborator(ctx context.Context, in *ApplicationCollaboratorIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+func (c *isApplicationClient) RemoveApplicationCollaborator(ctx context.Context, in *RemoveApplicationCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
 	out := new(google_protobuf2.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/RemoveApplicationCollaborator", in, out, c.cc, opts...)
 	if err != nil {
@@ -1661,11 +1726,11 @@ type IsApplicationServer interface {
 	// RemoveApplicationAPIKey removes a given API key from an application.
 	RemoveApplicationAPIKey(context.Context, *ApplicationAPIKeyIdentifiers) (*google_protobuf2.Empty, error)
 	// AddApplicationCollaborator adds an user as collaborator of an application.
-	AddApplicationCollaborator(context.Context, *ApplicationCollaborator) (*google_protobuf2.Empty, error)
+	AddApplicationCollaborator(context.Context, *AddApplicationCollaboratorRequest) (*google_protobuf2.Empty, error)
 	// ListApplicationCollaborators returns all the collaborators of a given application.
 	ListApplicationCollaborators(context.Context, *ApplicationIdentifiers) (*ListApplicationCollaboratorsResponse, error)
 	// RemoveApplicationCollaborator removes a collaborator from an application.
-	RemoveApplicationCollaborator(context.Context, *ApplicationCollaboratorIdentifiers) (*google_protobuf2.Empty, error)
+	RemoveApplicationCollaborator(context.Context, *RemoveApplicationCollaboratorRequest) (*google_protobuf2.Empty, error)
 	// AddApplicationRight grants a given right to a given user for a given application.
 	AddApplicationRight(context.Context, *ApplicationRight) (*google_protobuf2.Empty, error)
 	// ListApplicationRights returns all the rights that the authenticated user has
@@ -1914,7 +1979,7 @@ func _IsApplication_RemoveApplicationAPIKey_Handler(srv interface{}, ctx context
 }
 
 func _IsApplication_AddApplicationCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ApplicationCollaborator)
+	in := new(AddApplicationCollaboratorRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1926,7 +1991,7 @@ func _IsApplication_AddApplicationCollaborator_Handler(srv interface{}, ctx cont
 		FullMethod: "/ttn.v3.IsApplication/AddApplicationCollaborator",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsApplicationServer).AddApplicationCollaborator(ctx, req.(*ApplicationCollaborator))
+		return srv.(IsApplicationServer).AddApplicationCollaborator(ctx, req.(*AddApplicationCollaboratorRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1950,7 +2015,7 @@ func _IsApplication_ListApplicationCollaborators_Handler(srv interface{}, ctx co
 }
 
 func _IsApplication_RemoveApplicationCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ApplicationCollaboratorIdentifiers)
+	in := new(RemoveApplicationCollaboratorRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1962,7 +2027,7 @@ func _IsApplication_RemoveApplicationCollaborator_Handler(srv interface{}, ctx c
 		FullMethod: "/ttn.v3.IsApplication/RemoveApplicationCollaborator",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsApplicationServer).RemoveApplicationCollaborator(ctx, req.(*ApplicationCollaboratorIdentifiers))
+		return srv.(IsApplicationServer).RemoveApplicationCollaborator(ctx, req.(*RemoveApplicationCollaboratorRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2132,14 +2197,14 @@ type IsGatewayClient interface {
 	// RemoveGatewayAntenna removes a given antenna from a gateway.
 	RemoveGatewayAntenna(ctx context.Context, in *RemoveGatewayAntennaRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// AddGatewayCollaborator makes an user collaborator a gateway.
-	AddGatewayCollaborator(ctx context.Context, in *GatewayCollaborator, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	AddGatewayCollaborator(ctx context.Context, in *AddGatewayCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// ListGatewayCollaborators returns all the collaborators for a given gateway.
 	ListGatewayCollaborators(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*ListGatewayCollaboratorsResponse, error)
 	// ListGatewayOwners returns all the collaborators that are owners of a gateway.
 	ListGatewayOwners(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*ListGatewayOwnersResponse, error)
 	// RemoveGatewayCollaborator revokes all the rights that a collaborator has to
 	// a given gateway.
-	RemoveGatewayCollaborator(ctx context.Context, in *GatewayCollaboratorIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	RemoveGatewayCollaborator(ctx context.Context, in *RemoveGatewayCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// AddGatewayRight grants a right to a given user for a given gateway.
 	AddGatewayRight(ctx context.Context, in *GatewayRight, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// ListGatewayRights returns all the rights that the authenticated user has
@@ -2256,7 +2321,7 @@ func (c *isGatewayClient) RemoveGatewayAntenna(ctx context.Context, in *RemoveGa
 	return out, nil
 }
 
-func (c *isGatewayClient) AddGatewayCollaborator(ctx context.Context, in *GatewayCollaborator, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+func (c *isGatewayClient) AddGatewayCollaborator(ctx context.Context, in *AddGatewayCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
 	out := new(google_protobuf2.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/AddGatewayCollaborator", in, out, c.cc, opts...)
 	if err != nil {
@@ -2283,7 +2348,7 @@ func (c *isGatewayClient) ListGatewayOwners(ctx context.Context, in *GatewayIden
 	return out, nil
 }
 
-func (c *isGatewayClient) RemoveGatewayCollaborator(ctx context.Context, in *GatewayCollaboratorIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+func (c *isGatewayClient) RemoveGatewayCollaborator(ctx context.Context, in *RemoveGatewayCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
 	out := new(google_protobuf2.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/RemoveGatewayCollaborator", in, out, c.cc, opts...)
 	if err != nil {
@@ -2345,14 +2410,14 @@ type IsGatewayServer interface {
 	// RemoveGatewayAntenna removes a given antenna from a gateway.
 	RemoveGatewayAntenna(context.Context, *RemoveGatewayAntennaRequest) (*google_protobuf2.Empty, error)
 	// AddGatewayCollaborator makes an user collaborator a gateway.
-	AddGatewayCollaborator(context.Context, *GatewayCollaborator) (*google_protobuf2.Empty, error)
+	AddGatewayCollaborator(context.Context, *AddGatewayCollaboratorRequest) (*google_protobuf2.Empty, error)
 	// ListGatewayCollaborators returns all the collaborators for a given gateway.
 	ListGatewayCollaborators(context.Context, *GatewayIdentifiers) (*ListGatewayCollaboratorsResponse, error)
 	// ListGatewayOwners returns all the collaborators that are owners of a gateway.
 	ListGatewayOwners(context.Context, *GatewayIdentifiers) (*ListGatewayOwnersResponse, error)
 	// RemoveGatewayCollaborator revokes all the rights that a collaborator has to
 	// a given gateway.
-	RemoveGatewayCollaborator(context.Context, *GatewayCollaboratorIdentifiers) (*google_protobuf2.Empty, error)
+	RemoveGatewayCollaborator(context.Context, *RemoveGatewayCollaboratorRequest) (*google_protobuf2.Empty, error)
 	// AddGatewayRight grants a right to a given user for a given gateway.
 	AddGatewayRight(context.Context, *GatewayRight) (*google_protobuf2.Empty, error)
 	// ListGatewayRights returns all the rights that the authenticated user has
@@ -2565,7 +2630,7 @@ func _IsGateway_RemoveGatewayAntenna_Handler(srv interface{}, ctx context.Contex
 }
 
 func _IsGateway_AddGatewayCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GatewayCollaborator)
+	in := new(AddGatewayCollaboratorRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -2577,7 +2642,7 @@ func _IsGateway_AddGatewayCollaborator_Handler(srv interface{}, ctx context.Cont
 		FullMethod: "/ttn.v3.IsGateway/AddGatewayCollaborator",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsGatewayServer).AddGatewayCollaborator(ctx, req.(*GatewayCollaborator))
+		return srv.(IsGatewayServer).AddGatewayCollaborator(ctx, req.(*AddGatewayCollaboratorRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2619,7 +2684,7 @@ func _IsGateway_ListGatewayOwners_Handler(srv interface{}, ctx context.Context, 
 }
 
 func _IsGateway_RemoveGatewayCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GatewayCollaboratorIdentifiers)
+	in := new(RemoveGatewayCollaboratorRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -2631,7 +2696,7 @@ func _IsGateway_RemoveGatewayCollaborator_Handler(srv interface{}, ctx context.C
 		FullMethod: "/ttn.v3.IsGateway/RemoveGatewayCollaborator",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsGatewayServer).RemoveGatewayCollaborator(ctx, req.(*GatewayCollaboratorIdentifiers))
+		return srv.(IsGatewayServer).RemoveGatewayCollaborator(ctx, req.(*RemoveGatewayCollaboratorRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2791,12 +2856,12 @@ type IsClientClient interface {
 	// a third-party client request.
 	SetClientState(ctx context.Context, in *SetClientStateRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// AddClientCollaborator makes an user collaborator of a client.
-	AddClientCollaborator(ctx context.Context, in *ClientCollaborator, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	AddClientCollaborator(ctx context.Context, in *AddClientCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// ListClientCollaborators returns all the collaborators for a given client.
 	ListClientCollaborators(ctx context.Context, in *ClientIdentifiers, opts ...grpc.CallOption) (*ListClientCollaboratorsResponse, error)
 	// RemoveClientCollaborator revokes all the rights that a collaborator has to
 	// a given client.
-	RemoveClientCollaborator(ctx context.Context, in *ClientCollaboratorIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	RemoveClientCollaborator(ctx context.Context, in *RemoveClientCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// AddClientRight grants a right to a given user for a given client.
 	AddClientRight(ctx context.Context, in *ClientRight, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// ListClientRights returns all the rights that the authenticated user has
@@ -2877,7 +2942,7 @@ func (c *isClientClient) SetClientState(ctx context.Context, in *SetClientStateR
 	return out, nil
 }
 
-func (c *isClientClient) AddClientCollaborator(ctx context.Context, in *ClientCollaborator, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+func (c *isClientClient) AddClientCollaborator(ctx context.Context, in *AddClientCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
 	out := new(google_protobuf2.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/AddClientCollaborator", in, out, c.cc, opts...)
 	if err != nil {
@@ -2895,7 +2960,7 @@ func (c *isClientClient) ListClientCollaborators(ctx context.Context, in *Client
 	return out, nil
 }
 
-func (c *isClientClient) RemoveClientCollaborator(ctx context.Context, in *ClientCollaboratorIdentifiers, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+func (c *isClientClient) RemoveClientCollaborator(ctx context.Context, in *RemoveClientCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
 	out := new(google_protobuf2.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/RemoveClientCollaborator", in, out, c.cc, opts...)
 	if err != nil {
@@ -2951,12 +3016,12 @@ type IsClientServer interface {
 	// a third-party client request.
 	SetClientState(context.Context, *SetClientStateRequest) (*google_protobuf2.Empty, error)
 	// AddClientCollaborator makes an user collaborator of a client.
-	AddClientCollaborator(context.Context, *ClientCollaborator) (*google_protobuf2.Empty, error)
+	AddClientCollaborator(context.Context, *AddClientCollaboratorRequest) (*google_protobuf2.Empty, error)
 	// ListClientCollaborators returns all the collaborators for a given client.
 	ListClientCollaborators(context.Context, *ClientIdentifiers) (*ListClientCollaboratorsResponse, error)
 	// RemoveClientCollaborator revokes all the rights that a collaborator has to
 	// a given client.
-	RemoveClientCollaborator(context.Context, *ClientCollaboratorIdentifiers) (*google_protobuf2.Empty, error)
+	RemoveClientCollaborator(context.Context, *RemoveClientCollaboratorRequest) (*google_protobuf2.Empty, error)
 	// AddClientRight grants a right to a given user for a given client.
 	AddClientRight(context.Context, *ClientRight) (*google_protobuf2.Empty, error)
 	// ListClientRights returns all the rights that the authenticated user has
@@ -3097,7 +3162,7 @@ func _IsClient_SetClientState_Handler(srv interface{}, ctx context.Context, dec 
 }
 
 func _IsClient_AddClientCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ClientCollaborator)
+	in := new(AddClientCollaboratorRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -3109,7 +3174,7 @@ func _IsClient_AddClientCollaborator_Handler(srv interface{}, ctx context.Contex
 		FullMethod: "/ttn.v3.IsClient/AddClientCollaborator",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsClientServer).AddClientCollaborator(ctx, req.(*ClientCollaborator))
+		return srv.(IsClientServer).AddClientCollaborator(ctx, req.(*AddClientCollaboratorRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -3133,7 +3198,7 @@ func _IsClient_ListClientCollaborators_Handler(srv interface{}, ctx context.Cont
 }
 
 func _IsClient_RemoveClientCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ClientCollaboratorIdentifiers)
+	in := new(RemoveClientCollaboratorRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -3145,7 +3210,7 @@ func _IsClient_RemoveClientCollaborator_Handler(srv interface{}, ctx context.Con
 		FullMethod: "/ttn.v3.IsClient/RemoveClientCollaborator",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsClientServer).RemoveClientCollaborator(ctx, req.(*ClientCollaboratorIdentifiers))
+		return srv.(IsClientServer).RemoveClientCollaborator(ctx, req.(*RemoveClientCollaboratorRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -3722,7 +3787,7 @@ func (m *ListApplicationAPIKeysResponse) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *ApplicationCollaborator) Marshal() (dAtA []byte, err error) {
+func (m *AddApplicationCollaboratorRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -3732,36 +3797,27 @@ func (m *ApplicationCollaborator) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ApplicationCollaborator) MarshalTo(dAtA []byte) (int, error) {
+func (m *AddApplicationCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationCollaboratorIdentifiers.Size()))
-	n10, err := m.ApplicationCollaboratorIdentifiers.MarshalTo(dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
+	n10, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n10
-	if len(m.Rights) > 0 {
-		dAtA12 := make([]byte, len(m.Rights)*10)
-		var j11 int
-		for _, num := range m.Rights {
-			for num >= 1<<7 {
-				dAtA12[j11] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j11++
-			}
-			dAtA12[j11] = uint8(num)
-			j11++
-		}
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j11))
-		i += copy(dAtA[i:], dAtA12[:j11])
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Collaborator.Size()))
+	n11, err := m.Collaborator.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
 	}
+	i += n11
 	return i, nil
 }
 
@@ -3795,6 +3851,38 @@ func (m *ListApplicationCollaboratorsResponse) MarshalTo(dAtA []byte) (int, erro
 	return i, nil
 }
 
+func (m *RemoveApplicationCollaboratorRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RemoveApplicationCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
+	n12, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n12
+	if len(m.UserID) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.UserID)))
+		i += copy(dAtA[i:], m.UserID)
+	}
+	return i, nil
+}
+
 func (m *ApplicationRight) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -3812,12 +3900,18 @@ func (m *ApplicationRight) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationCollaboratorIdentifiers.Size()))
-	n13, err := m.ApplicationCollaboratorIdentifiers.MarshalTo(dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
+	n13, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n13
+	if len(m.UserID) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.UserID)))
+		i += copy(dAtA[i:], m.UserID)
+	}
 	if m.Right != 0 {
 		dAtA[i] = 0x18
 		i++
@@ -4290,7 +4384,7 @@ func (m *RemoveGatewayAntennaRequest) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *GatewayCollaborator) Marshal() (dAtA []byte, err error) {
+func (m *AddGatewayCollaboratorRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -4300,36 +4394,27 @@ func (m *GatewayCollaborator) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *GatewayCollaborator) MarshalTo(dAtA []byte) (int, error) {
+func (m *AddGatewayCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayCollaboratorIdentifiers.Size()))
-	n24, err := m.GatewayCollaboratorIdentifiers.MarshalTo(dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
+	n24, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n24
-	if len(m.Rights) > 0 {
-		dAtA26 := make([]byte, len(m.Rights)*10)
-		var j25 int
-		for _, num := range m.Rights {
-			for num >= 1<<7 {
-				dAtA26[j25] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j25++
-			}
-			dAtA26[j25] = uint8(num)
-			j25++
-		}
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j25))
-		i += copy(dAtA[i:], dAtA26[:j25])
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Collaborator.Size()))
+	n25, err := m.Collaborator.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
 	}
+	i += n25
 	return i, nil
 }
 
@@ -4393,6 +4478,38 @@ func (m *ListGatewayOwnersResponse) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *RemoveGatewayCollaboratorRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RemoveGatewayCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
+	n26, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n26
+	if len(m.UserID) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.UserID)))
+		i += copy(dAtA[i:], m.UserID)
+	}
+	return i, nil
+}
+
 func (m *GatewayRight) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -4410,14 +4527,20 @@ func (m *GatewayRight) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayCollaboratorIdentifiers.Size()))
-	n27, err := m.GatewayCollaboratorIdentifiers.MarshalTo(dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
+	n27, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n27
+	if len(m.UserID) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.UserID)))
+		i += copy(dAtA[i:], m.UserID)
+	}
 	if m.Right != 0 {
-		dAtA[i] = 0x10
+		dAtA[i] = 0x18
 		i++
 		i = encodeVarintIdentityserver(dAtA, i, uint64(m.Right))
 	}
@@ -4716,7 +4839,7 @@ func (m *SetClientStateRequest) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *ClientCollaborator) Marshal() (dAtA []byte, err error) {
+func (m *AddClientCollaboratorRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -4726,36 +4849,27 @@ func (m *ClientCollaborator) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ClientCollaborator) MarshalTo(dAtA []byte) (int, error) {
+func (m *AddClientCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientCollaboratorIdentifiers.Size()))
-	n41, err := m.ClientCollaboratorIdentifiers.MarshalTo(dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifiers.Size()))
+	n41, err := m.ClientIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n41
-	if len(m.Rights) > 0 {
-		dAtA43 := make([]byte, len(m.Rights)*10)
-		var j42 int
-		for _, num := range m.Rights {
-			for num >= 1<<7 {
-				dAtA43[j42] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j42++
-			}
-			dAtA43[j42] = uint8(num)
-			j42++
-		}
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j42))
-		i += copy(dAtA[i:], dAtA43[:j42])
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Collaborator.Size()))
+	n42, err := m.Collaborator.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
 	}
+	i += n42
 	return i, nil
 }
 
@@ -4789,6 +4903,38 @@ func (m *ListClientCollaboratorsResponse) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *RemoveClientCollaboratorRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RemoveClientCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifiers.Size()))
+	n43, err := m.ClientIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n43
+	if len(m.UserID) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.UserID)))
+		i += copy(dAtA[i:], m.UserID)
+	}
+	return i, nil
+}
+
 func (m *ClientRight) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -4806,14 +4952,20 @@ func (m *ClientRight) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientCollaboratorIdentifiers.Size()))
-	n44, err := m.ClientCollaboratorIdentifiers.MarshalTo(dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifiers.Size()))
+	n44, err := m.ClientIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n44
+	if len(m.UserID) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.UserID)))
+		i += copy(dAtA[i:], m.UserID)
+	}
 	if m.Right != 0 {
-		dAtA[i] = 0x10
+		dAtA[i] = 0x18
 		i++
 		i = encodeVarintIdentityserver(dAtA, i, uint64(m.Right))
 	}
@@ -5073,18 +5225,13 @@ func (m *ListApplicationAPIKeysResponse) Size() (n int) {
 	return n
 }
 
-func (m *ApplicationCollaborator) Size() (n int) {
+func (m *AddApplicationCollaboratorRequest) Size() (n int) {
 	var l int
 	_ = l
-	l = m.ApplicationCollaboratorIdentifiers.Size()
+	l = m.ApplicationIdentifiers.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
-	if len(m.Rights) > 0 {
-		l = 0
-		for _, e := range m.Rights {
-			l += sovIdentityserver(uint64(e))
-		}
-		n += 1 + sovIdentityserver(uint64(l)) + l
-	}
+	l = m.Collaborator.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
 	return n
 }
 
@@ -5100,11 +5247,27 @@ func (m *ListApplicationCollaboratorsResponse) Size() (n int) {
 	return n
 }
 
+func (m *RemoveApplicationCollaboratorRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ApplicationIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.UserID)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
 func (m *ApplicationRight) Size() (n int) {
 	var l int
 	_ = l
-	l = m.ApplicationCollaboratorIdentifiers.Size()
+	l = m.ApplicationIdentifiers.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.UserID)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
 	if m.Right != 0 {
 		n += 1 + sovIdentityserver(uint64(m.Right))
 	}
@@ -5304,18 +5467,13 @@ func (m *RemoveGatewayAntennaRequest) Size() (n int) {
 	return n
 }
 
-func (m *GatewayCollaborator) Size() (n int) {
+func (m *AddGatewayCollaboratorRequest) Size() (n int) {
 	var l int
 	_ = l
-	l = m.GatewayCollaboratorIdentifiers.Size()
+	l = m.GatewayIdentifiers.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
-	if len(m.Rights) > 0 {
-		l = 0
-		for _, e := range m.Rights {
-			l += sovIdentityserver(uint64(e))
-		}
-		n += 1 + sovIdentityserver(uint64(l)) + l
-	}
+	l = m.Collaborator.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
 	return n
 }
 
@@ -5343,11 +5501,27 @@ func (m *ListGatewayOwnersResponse) Size() (n int) {
 	return n
 }
 
+func (m *RemoveGatewayCollaboratorRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.GatewayIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.UserID)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
 func (m *GatewayRight) Size() (n int) {
 	var l int
 	_ = l
-	l = m.GatewayCollaboratorIdentifiers.Size()
+	l = m.GatewayIdentifiers.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.UserID)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
 	if m.Right != 0 {
 		n += 1 + sovIdentityserver(uint64(m.Right))
 	}
@@ -5475,18 +5649,13 @@ func (m *SetClientStateRequest) Size() (n int) {
 	return n
 }
 
-func (m *ClientCollaborator) Size() (n int) {
+func (m *AddClientCollaboratorRequest) Size() (n int) {
 	var l int
 	_ = l
-	l = m.ClientCollaboratorIdentifiers.Size()
+	l = m.ClientIdentifiers.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
-	if len(m.Rights) > 0 {
-		l = 0
-		for _, e := range m.Rights {
-			l += sovIdentityserver(uint64(e))
-		}
-		n += 1 + sovIdentityserver(uint64(l)) + l
-	}
+	l = m.Collaborator.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
 	return n
 }
 
@@ -5502,11 +5671,27 @@ func (m *ListClientCollaboratorsResponse) Size() (n int) {
 	return n
 }
 
+func (m *RemoveClientCollaboratorRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ClientIdentifiers.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.UserID)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
 func (m *ClientRight) Size() (n int) {
 	var l int
 	_ = l
-	l = m.ClientCollaboratorIdentifiers.Size()
+	l = m.ClientIdentifiers.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.UserID)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
 	if m.Right != 0 {
 		n += 1 + sovIdentityserver(uint64(m.Right))
 	}
@@ -5676,13 +5861,13 @@ func (this *ListApplicationAPIKeysResponse) String() string {
 	}, "")
 	return s
 }
-func (this *ApplicationCollaborator) String() string {
+func (this *AddApplicationCollaboratorRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&ApplicationCollaborator{`,
-		`ApplicationCollaboratorIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationCollaboratorIdentifiers.String(), "ApplicationCollaboratorIdentifiers", "ApplicationCollaboratorIdentifiers", 1), `&`, ``, 1) + `,`,
-		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
+	s := strings.Join([]string{`&AddApplicationCollaboratorRequest{`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Collaborator:` + strings.Replace(strings.Replace(this.Collaborator.String(), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5692,7 +5877,18 @@ func (this *ListApplicationCollaboratorsResponse) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListApplicationCollaboratorsResponse{`,
-		`Collaborators:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborators), "ApplicationCollaborator", "ApplicationCollaborator", 1), `&`, ``, 1) + `,`,
+		`Collaborators:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborators), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *RemoveApplicationCollaboratorRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RemoveApplicationCollaboratorRequest{`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserID:` + fmt.Sprintf("%v", this.UserID) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5702,7 +5898,8 @@ func (this *ApplicationRight) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ApplicationRight{`,
-		`ApplicationCollaboratorIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationCollaboratorIdentifiers.String(), "ApplicationCollaboratorIdentifiers", "ApplicationCollaboratorIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserID:` + fmt.Sprintf("%v", this.UserID) + `,`,
 		`Right:` + fmt.Sprintf("%v", this.Right) + `,`,
 		`}`,
 	}, "")
@@ -5860,13 +6057,13 @@ func (this *RemoveGatewayAntennaRequest) String() string {
 	}, "")
 	return s
 }
-func (this *GatewayCollaborator) String() string {
+func (this *AddGatewayCollaboratorRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&GatewayCollaborator{`,
-		`GatewayCollaboratorIdentifiers:` + strings.Replace(strings.Replace(this.GatewayCollaboratorIdentifiers.String(), "GatewayCollaboratorIdentifiers", "GatewayCollaboratorIdentifiers", 1), `&`, ``, 1) + `,`,
-		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
+	s := strings.Join([]string{`&AddGatewayCollaboratorRequest{`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Collaborator:` + strings.Replace(strings.Replace(this.Collaborator.String(), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5876,7 +6073,7 @@ func (this *ListGatewayCollaboratorsResponse) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListGatewayCollaboratorsResponse{`,
-		`Collaborators:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborators), "GatewayCollaborator", "GatewayCollaborator", 1), `&`, ``, 1) + `,`,
+		`Collaborators:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborators), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5886,7 +6083,18 @@ func (this *ListGatewayOwnersResponse) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListGatewayOwnersResponse{`,
-		`Collaborators:` + strings.Replace(fmt.Sprintf("%v", this.Collaborators), "GatewayCollaboratorIdentifiers", "GatewayCollaboratorIdentifiers", 1) + `,`,
+		`Collaborators:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborators), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *RemoveGatewayCollaboratorRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RemoveGatewayCollaboratorRequest{`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserID:` + fmt.Sprintf("%v", this.UserID) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5896,7 +6104,8 @@ func (this *GatewayRight) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GatewayRight{`,
-		`GatewayCollaboratorIdentifiers:` + strings.Replace(strings.Replace(this.GatewayCollaboratorIdentifiers.String(), "GatewayCollaboratorIdentifiers", "GatewayCollaboratorIdentifiers", 1), `&`, ``, 1) + `,`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserID:` + fmt.Sprintf("%v", this.UserID) + `,`,
 		`Right:` + fmt.Sprintf("%v", this.Right) + `,`,
 		`}`,
 	}, "")
@@ -5975,13 +6184,13 @@ func (this *SetClientStateRequest) String() string {
 	}, "")
 	return s
 }
-func (this *ClientCollaborator) String() string {
+func (this *AddClientCollaboratorRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&ClientCollaborator{`,
-		`ClientCollaboratorIdentifiers:` + strings.Replace(strings.Replace(this.ClientCollaboratorIdentifiers.String(), "ClientCollaboratorIdentifiers", "ClientCollaboratorIdentifiers", 1), `&`, ``, 1) + `,`,
-		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
+	s := strings.Join([]string{`&AddClientCollaboratorRequest{`,
+		`ClientIdentifiers:` + strings.Replace(strings.Replace(this.ClientIdentifiers.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Collaborator:` + strings.Replace(strings.Replace(this.Collaborator.String(), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5991,7 +6200,18 @@ func (this *ListClientCollaboratorsResponse) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListClientCollaboratorsResponse{`,
-		`Collaborators:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborators), "ClientCollaborator", "ClientCollaborator", 1), `&`, ``, 1) + `,`,
+		`Collaborators:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborators), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *RemoveClientCollaboratorRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RemoveClientCollaboratorRequest{`,
+		`ClientIdentifiers:` + strings.Replace(strings.Replace(this.ClientIdentifiers.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserID:` + fmt.Sprintf("%v", this.UserID) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -6001,7 +6221,8 @@ func (this *ClientRight) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ClientRight{`,
-		`ClientCollaboratorIdentifiers:` + strings.Replace(strings.Replace(this.ClientCollaboratorIdentifiers.String(), "ClientCollaboratorIdentifiers", "ClientCollaboratorIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ClientIdentifiers:` + strings.Replace(strings.Replace(this.ClientIdentifiers.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserID:` + fmt.Sprintf("%v", this.UserID) + `,`,
 		`Right:` + fmt.Sprintf("%v", this.Right) + `,`,
 		`}`,
 	}, "")
@@ -7523,7 +7744,7 @@ func (m *ListApplicationAPIKeysResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ApplicationCollaborator) Unmarshal(dAtA []byte) error {
+func (m *AddApplicationCollaboratorRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -7546,15 +7767,15 @@ func (m *ApplicationCollaborator) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ApplicationCollaborator: wiretype end group for non-group")
+			return fmt.Errorf("proto: AddApplicationCollaboratorRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ApplicationCollaborator: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: AddApplicationCollaboratorRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationCollaboratorIdentifiers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -7578,72 +7799,40 @@ func (m *ApplicationCollaborator) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.ApplicationCollaboratorIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
-			if wireType == 0 {
-				var v Right
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= (Right(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Collaborator", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
 				}
-				m.Rights = append(m.Rights, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= (int(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthIdentityserver
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex > l {
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
 				}
-				for iNdEx < postIndex {
-					var v Right
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowIdentityserver
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= (Right(b) & 0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Rights = append(m.Rights, v)
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
 				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
 			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Collaborator.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipIdentityserver(dAtA[iNdEx:])
@@ -7720,10 +7909,119 @@ func (m *ListApplicationCollaboratorsResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Collaborators = append(m.Collaborators, ApplicationCollaborator{})
+			m.Collaborators = append(m.Collaborators, Collaborator{})
 			if err := m.Collaborators[len(m.Collaborators)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RemoveApplicationCollaboratorRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RemoveApplicationCollaboratorRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RemoveApplicationCollaboratorRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UserID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -7777,7 +8075,7 @@ func (m *ApplicationRight) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationCollaboratorIdentifiers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifiers", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -7801,9 +8099,38 @@ func (m *ApplicationRight) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.ApplicationCollaboratorIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.ApplicationIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UserID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 0 {
@@ -9571,7 +9898,7 @@ func (m *RemoveGatewayAntennaRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *GatewayCollaborator) Unmarshal(dAtA []byte) error {
+func (m *AddGatewayCollaboratorRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -9594,15 +9921,15 @@ func (m *GatewayCollaborator) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: GatewayCollaborator: wiretype end group for non-group")
+			return fmt.Errorf("proto: AddGatewayCollaboratorRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GatewayCollaborator: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: AddGatewayCollaboratorRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field GatewayCollaboratorIdentifiers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifiers", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -9626,72 +9953,40 @@ func (m *GatewayCollaborator) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.GatewayCollaboratorIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.GatewayIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
-			if wireType == 0 {
-				var v Right
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= (Right(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Collaborator", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
 				}
-				m.Rights = append(m.Rights, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= (int(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthIdentityserver
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex > l {
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
 				}
-				for iNdEx < postIndex {
-					var v Right
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowIdentityserver
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= (Right(b) & 0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Rights = append(m.Rights, v)
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
 				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
 			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Collaborator.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipIdentityserver(dAtA[iNdEx:])
@@ -9768,7 +10063,7 @@ func (m *ListGatewayCollaboratorsResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Collaborators = append(m.Collaborators, GatewayCollaborator{})
+			m.Collaborators = append(m.Collaborators, Collaborator{})
 			if err := m.Collaborators[len(m.Collaborators)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -9849,10 +10144,119 @@ func (m *ListGatewayOwnersResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Collaborators = append(m.Collaborators, &GatewayCollaboratorIdentifiers{})
+			m.Collaborators = append(m.Collaborators, Collaborator{})
 			if err := m.Collaborators[len(m.Collaborators)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RemoveGatewayCollaboratorRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RemoveGatewayCollaboratorRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RemoveGatewayCollaboratorRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.GatewayIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UserID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -9906,7 +10310,7 @@ func (m *GatewayRight) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field GatewayCollaboratorIdentifiers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifiers", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -9930,11 +10334,40 @@ func (m *GatewayRight) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.GatewayCollaboratorIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.GatewayIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UserID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Right", wireType)
 			}
@@ -10976,7 +11409,7 @@ func (m *SetClientStateRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ClientCollaborator) Unmarshal(dAtA []byte) error {
+func (m *AddClientCollaboratorRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -10999,15 +11432,15 @@ func (m *ClientCollaborator) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ClientCollaborator: wiretype end group for non-group")
+			return fmt.Errorf("proto: AddClientCollaboratorRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ClientCollaborator: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: AddClientCollaboratorRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientCollaboratorIdentifiers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientIdentifiers", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -11031,72 +11464,40 @@ func (m *ClientCollaborator) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.ClientCollaboratorIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.ClientIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
-			if wireType == 0 {
-				var v Right
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= (Right(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Collaborator", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
 				}
-				m.Rights = append(m.Rights, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= (int(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthIdentityserver
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex > l {
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
 				}
-				for iNdEx < postIndex {
-					var v Right
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowIdentityserver
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= (Right(b) & 0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Rights = append(m.Rights, v)
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
 				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
 			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Collaborator.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipIdentityserver(dAtA[iNdEx:])
@@ -11173,10 +11574,119 @@ func (m *ListClientCollaboratorsResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Collaborators = append(m.Collaborators, ClientCollaborator{})
+			m.Collaborators = append(m.Collaborators, Collaborator{})
 			if err := m.Collaborators[len(m.Collaborators)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RemoveClientCollaboratorRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RemoveClientCollaboratorRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RemoveClientCollaboratorRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ClientIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UserID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -11230,7 +11740,7 @@ func (m *ClientRight) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientCollaboratorIdentifiers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientIdentifiers", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -11254,11 +11764,40 @@ func (m *ClientRight) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.ClientCollaboratorIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.ClientIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UserID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Right", wireType)
 			}
@@ -11520,161 +12059,163 @@ func init() {
 }
 
 var fileDescriptorIdentityserver = []byte{
-	// 2488 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x5a, 0xcd, 0x73, 0x1b, 0x49,
-	0x15, 0xdf, 0xf1, 0x87, 0x24, 0x3f, 0xcb, 0x76, 0xdc, 0x76, 0x1c, 0x59, 0x4e, 0x2c, 0x47, 0xd9,
-	0xec, 0x3a, 0x10, 0xe4, 0xac, 0x97, 0x4d, 0x85, 0x85, 0x24, 0x48, 0xb6, 0xa3, 0xd2, 0x26, 0xc1,
-	0x61, 0x1c, 0x93, 0x4d, 0xf8, 0xf0, 0x8e, 0xa5, 0xb6, 0x32, 0x65, 0x79, 0x66, 0x98, 0x19, 0xc5,
-	0xa5, 0xa2, 0xa8, 0xe5, 0xc4, 0x47, 0x71, 0x01, 0x4e, 0x14, 0x17, 0xce, 0x7b, 0xe4, 0x40, 0xc1,
-	0x1f, 0x00, 0x55, 0xa9, 0xe2, 0x92, 0x23, 0xc5, 0xc1, 0x05, 0x3a, 0x71, 0xe4, 0x4f, 0xa0, 0xa6,
-	0xbb, 0x47, 0xd3, 0x33, 0xd3, 0x3d, 0x92, 0x1c, 0xbb, 0x28, 0x6e, 0x56, 0xf7, 0x7b, 0xaf, 0xdf,
-	0xfb, 0xf5, 0xeb, 0xd7, 0x6f, 0x7e, 0x6d, 0xb8, 0xd3, 0xd4, 0xdd, 0x97, 0xed, 0xfd, 0x52, 0xdd,
-	0x3c, 0x5a, 0x7b, 0xfa, 0x12, 0x3f, 0x7d, 0xa9, 0x1b, 0x4d, 0xe7, 0x5b, 0xd8, 0x3d, 0x36, 0xed,
-	0xc3, 0x35, 0xd7, 0x35, 0xd6, 0x34, 0x4b, 0x5f, 0xd3, 0x1b, 0xd8, 0x70, 0x75, 0xb7, 0xe3, 0x60,
-	0xfb, 0x15, 0xb6, 0x4b, 0x96, 0x6d, 0xba, 0x26, 0x4a, 0xb9, 0xae, 0x51, 0x7a, 0xf5, 0x61, 0xfe,
-	0x2b, 0x9c, 0x85, 0xa6, 0xd9, 0x34, 0xd7, 0xc8, 0xf4, 0x7e, 0xfb, 0x80, 0xfc, 0x22, 0x3f, 0xc8,
-	0x5f, 0x54, 0x2d, 0xff, 0xd1, 0x20, 0x0b, 0x6a, 0x96, 0xd5, 0xd2, 0xeb, 0x9a, 0xab, 0x9b, 0x06,
-	0x53, 0xbb, 0x35, 0x88, 0x5a, 0xbd, 0xa5, 0x63, 0xc3, 0x1d, 0x46, 0xc3, 0xd6, 0x9b, 0x2f, 0x5d,
-	0x67, 0x18, 0xd7, 0x28, 0x16, 0x07, 0x3a, 0xb6, 0x7d, 0xb5, 0x0f, 0x06, 0x51, 0x6b, 0x6a, 0x2e,
-	0x3e, 0xd6, 0x3a, 0x4c, 0xa5, 0x34, 0x88, 0x4a, 0xdb, 0xf1, 0xb1, 0xce, 0x2f, 0x35, 0x4d, 0xb3,
-	0xd9, 0xc2, 0x01, 0xb4, 0xf8, 0xc8, 0x72, 0x99, 0xb1, 0xe2, 0x17, 0x0a, 0xcc, 0x6e, 0xd8, 0x58,
-	0x73, 0xf1, 0xae, 0x83, 0x6d, 0x15, 0xff, 0xb0, 0x8d, 0x1d, 0x17, 0xdd, 0x80, 0x09, 0x17, 0x1b,
-	0x9a, 0xe1, 0xee, 0xe9, 0x8d, 0x9c, 0xb2, 0xa2, 0xac, 0x4e, 0x54, 0xb2, 0xdd, 0x93, 0x42, 0xe6,
-	0x29, 0x19, 0xac, 0x6d, 0xaa, 0x19, 0x3a, 0x5d, 0x6b, 0xa0, 0x6b, 0x90, 0xf6, 0xd6, 0xf2, 0x04,
-	0x47, 0x88, 0x20, 0x74, 0x4f, 0x0a, 0x29, 0xcf, 0x58, 0x6d, 0x53, 0x4d, 0x79, 0x53, 0xb5, 0x06,
-	0x9a, 0x87, 0x71, 0x7c, 0xa4, 0xe9, 0xad, 0xdc, 0xa8, 0x27, 0xa2, 0xd2, 0x1f, 0x28, 0x0f, 0x19,
-	0x4b, 0x73, 0x9c, 0x63, 0xd3, 0x6e, 0xe4, 0xc6, 0xc8, 0x44, 0xef, 0x37, 0x42, 0x30, 0x66, 0x68,
-	0x47, 0x38, 0x37, 0x4e, 0xc6, 0xc9, 0xdf, 0xc5, 0xbb, 0x30, 0xbb, 0x6b, 0x35, 0x22, 0xae, 0xf6,
-	0x4c, 0x2b, 0xbc, 0x69, 0x5f, 0x7d, 0x84, 0x53, 0xbf, 0x0f, 0x8b, 0x81, 0xfa, 0x13, 0xb6, 0x90,
-	0x6f, 0xe6, 0x02, 0x8c, 0x9a, 0x2d, 0x16, 0xab, 0xea, 0xfd, 0xe9, 0x8d, 0x18, 0xf8, 0x98, 0x59,
-	0xf0, 0xfe, 0x2c, 0xfe, 0x79, 0x04, 0x72, 0x14, 0xab, 0x72, 0x90, 0x62, 0xa7, 0x80, 0xec, 0x0e,
-	0x4c, 0x73, 0x39, 0x1a, 0x20, 0x37, 0xdb, 0x3d, 0x29, 0x4c, 0x71, 0xa6, 0x6b, 0x9b, 0xea, 0x14,
-	0x27, 0x58, 0x6b, 0xa0, 0x15, 0x98, 0x6c, 0x60, 0xa7, 0x6e, 0xeb, 0x96, 0x37, 0xc0, 0xd0, 0xe4,
-	0x87, 0xd0, 0x73, 0xc8, 0x68, 0x96, 0xb5, 0x87, 0xdb, 0xba, 0x93, 0x1b, 0x5b, 0x19, 0x5d, 0xcd,
-	0x56, 0xee, 0xfd, 0xe3, 0xa4, 0xb0, 0xd6, 0x2f, 0x65, 0xac, 0xc3, 0xe6, 0x9a, 0xdb, 0xb1, 0xb0,
-	0x53, 0xda, 0xda, 0xad, 0xdd, 0xfe, 0x6a, 0xf7, 0xa4, 0x90, 0x2e, 0x5b, 0xd6, 0xd6, 0x6e, 0xcd,
-	0x51, 0xd3, 0x9a, 0x65, 0x6d, 0xb5, 0x75, 0x07, 0x7d, 0xec, 0x99, 0xd6, 0xf7, 0x0e, 0x71, 0xc7,
-	0xc9, 0x8d, 0xaf, 0x8c, 0xae, 0x4e, 0xae, 0x4f, 0x97, 0xe8, 0x31, 0x2e, 0x95, 0x9f, 0xd4, 0x1e,
-	0xe2, 0x4e, 0x65, 0xe6, 0xf5, 0x49, 0xe1, 0x1d, 0xa2, 0x4b, 0x7e, 0x13, 0x5d, 0xdd, 0xfb, 0xa3,
-	0xf8, 0x1c, 0x72, 0x8f, 0x74, 0xc7, 0xe5, 0x82, 0x73, 0x54, 0xec, 0x58, 0xa6, 0xe1, 0x60, 0x74,
-	0x17, 0xb2, 0x5c, 0x94, 0x4e, 0x4e, 0x21, 0xb6, 0xe7, 0x7a, 0xb6, 0x83, 0xb9, 0xca, 0x98, 0xb7,
-	0x80, 0x1a, 0x12, 0x2f, 0xfe, 0x7e, 0x04, 0x72, 0x74, 0x5f, 0x05, 0xbb, 0xf2, 0x09, 0x4c, 0x72,
-	0xc2, 0x64, 0x5f, 0x26, 0xd7, 0x97, 0x05, 0xa6, 0x6b, 0xc1, 0xc9, 0xac, 0x64, 0xbc, 0x55, 0xde,
-	0x9c, 0x14, 0x14, 0x95, 0x57, 0x8e, 0x82, 0x3f, 0x92, 0x0c, 0xfe, 0xe8, 0xf9, 0x81, 0x3f, 0x36,
-	0x24, 0xf8, 0x7f, 0x55, 0x60, 0xa9, 0xdc, 0x68, 0x70, 0xd1, 0x52, 0xf3, 0xe7, 0x01, 0xd2, 0x0b,
-	0x48, 0x33, 0x08, 0x08, 0x40, 0xd9, 0x4a, 0xd9, 0x93, 0x3b, 0x1d, 0x0a, 0x29, 0xe6, 0x66, 0x8a,
-	0x82, 0x50, 0xfc, 0x1c, 0xae, 0x56, 0xb1, 0x81, 0xed, 0xf0, 0x56, 0xfb, 0xb1, 0xb0, 0x6c, 0xe2,
-	0x1c, 0x50, 0xce, 0xda, 0x81, 0x1f, 0xc1, 0x72, 0x24, 0x8b, 0xfd, 0x7d, 0xf2, 0x57, 0xe7, 0x33,
-	0x40, 0x39, 0xd3, 0x0c, 0x28, 0xbe, 0x56, 0x60, 0x59, 0xc5, 0x47, 0xe6, 0x2b, 0xfc, 0x7f, 0xbf,
-	0x91, 0x5f, 0x28, 0xb0, 0x22, 0xda, 0x49, 0x92, 0xb8, 0xe7, 0x11, 0x8c, 0xe0, 0x3a, 0x40, 0xd7,
-	0x21, 0x45, 0x2f, 0x70, 0x72, 0x54, 0xa7, 0xd7, 0xa7, 0x7c, 0xd3, 0xaa, 0x37, 0xaa, 0xb2, 0xc9,
-	0xe2, 0xf7, 0xe2, 0x7b, 0xce, 0xce, 0x97, 0xbf, 0xe7, 0xfc, 0xd1, 0x54, 0x86, 0x3c, 0x9a, 0xbf,
-	0x53, 0xe0, 0x12, 0x67, 0x7a, 0xc3, 0x6c, 0xb5, 0xb4, 0x7d, 0xd3, 0xd6, 0x5c, 0xd3, 0x46, 0x9f,
-	0x42, 0xb6, 0xce, 0xfd, 0x66, 0x08, 0x7c, 0x49, 0x80, 0x00, 0xaf, 0x26, 0x46, 0x23, 0x64, 0x89,
-	0x0b, 0x7d, 0x24, 0x29, 0x74, 0x07, 0xde, 0x8d, 0x84, 0xce, 0x2f, 0x14, 0x00, 0xf0, 0x10, 0xa6,
-	0x78, 0xf3, 0x3e, 0x0a, 0x85, 0x3e, 0x9e, 0xb2, 0x6a, 0x1e, 0xd6, 0x2d, 0xfe, 0x5a, 0x81, 0x0b,
-	0x7c, 0x21, 0xf7, 0x5c, 0x39, 0x47, 0x28, 0xae, 0xc1, 0x38, 0x89, 0x96, 0xdc, 0xa5, 0x31, 0x24,
-	0xe8, 0x5c, 0xf1, 0x01, 0x5c, 0x89, 0x00, 0x41, 0xa6, 0x03, 0x04, 0x06, 0xcc, 0xa5, 0x37, 0x63,
-	0x30, 0x4f, 0x1b, 0x88, 0x2a, 0xed, 0xe8, 0x4e, 0xd1, 0x3c, 0xdc, 0x04, 0x60, 0xed, 0x60, 0xd0,
-	0x38, 0x4c, 0x75, 0x4f, 0x0a, 0x13, 0xcc, 0x64, 0x6d, 0x53, 0x9d, 0x60, 0x02, 0x03, 0x35, 0x0c,
-	0xf7, 0x61, 0xf6, 0xc0, 0xf6, 0xdc, 0x30, 0xea, 0x9d, 0x3d, 0xab, 0xa5, 0x91, 0x7e, 0x84, 0x74,
-	0x63, 0x95, 0xb9, 0xee, 0x49, 0x61, 0xe6, 0x81, 0x3f, 0xf9, 0xa4, 0xa5, 0x79, 0x1d, 0xc9, 0xcc,
-	0x41, 0x68, 0xa0, 0x81, 0xb6, 0xe1, 0x82, 0x65, 0xeb, 0xaf, 0xb4, 0x7a, 0x67, 0xcf, 0xc1, 0xae,
-	0xeb, 0x55, 0x03, 0xd2, 0xb5, 0x71, 0x87, 0x95, 0xb9, 0xf6, 0x84, 0x8a, 0xed, 0x30, 0x29, 0xb6,
-	0xff, 0x33, 0x56, 0x78, 0x18, 0x15, 0x60, 0x52, 0x6b, 0xbb, 0xe6, 0x5e, 0x9b, 0x5c, 0xea, 0xb9,
-	0xd4, 0x8a, 0xb2, 0x9a, 0x51, 0xc1, 0x1b, 0xa2, 0xd7, 0x3c, 0xe9, 0x1b, 0x5b, 0x9a, 0x7b, 0x60,
-	0xda, 0x47, 0xb9, 0x34, 0xeb, 0x1b, 0xd9, 0x6f, 0x74, 0x07, 0x32, 0x9a, 0xe1, 0x62, 0xc3, 0xd0,
-	0x9c, 0x5c, 0x86, 0xa4, 0xe1, 0x42, 0xc4, 0x8b, 0x32, 0x9d, 0x66, 0xab, 0xf7, 0xa4, 0xd1, 0x23,
-	0x00, 0xcd, 0x75, 0x6d, 0x7d, 0xbf, 0xed, 0x62, 0x27, 0x37, 0x41, 0x74, 0x6f, 0xfa, 0xba, 0xa2,
-	0x5d, 0x2b, 0x95, 0x7b, 0xe2, 0x5b, 0x86, 0x6b, 0x77, 0x54, 0x4e, 0x1f, 0xbd, 0x0f, 0x33, 0xf5,
-	0x56, 0xdb, 0x71, 0xb1, 0xbd, 0xa7, 0x35, 0x1a, 0x36, 0x76, 0x9c, 0x1c, 0x10, 0x57, 0xa7, 0xd9,
-	0x70, 0x99, 0x8e, 0xe6, 0xef, 0xc2, 0x4c, 0xc4, 0x8e, 0xd7, 0x79, 0x1e, 0xe2, 0x8e, 0xdf, 0x8b,
-	0x1e, 0xe2, 0x8e, 0xd7, 0xe4, 0xbe, 0xd2, 0x5a, 0x6d, 0xbf, 0x80, 0xd1, 0x1f, 0x1f, 0x8f, 0xdc,
-	0x51, 0x8a, 0x35, 0x98, 0xf7, 0x52, 0x93, 0x79, 0x16, 0x64, 0xe4, 0x07, 0x90, 0x61, 0x59, 0xe0,
-	0x1f, 0xc7, 0x99, 0x08, 0x0e, 0x3e, 0x00, 0xbe, 0x58, 0xf1, 0x4f, 0x63, 0x30, 0x4f, 0x11, 0x8e,
-	0x64, 0xe7, 0x3d, 0x48, 0x33, 0x21, 0x76, 0xf0, 0xf2, 0x11, 0x53, 0xe2, 0x83, 0xe6, 0x2b, 0x0d,
-	0xd0, 0x38, 0x09, 0x93, 0x70, 0xf4, 0x2d, 0x93, 0x70, 0xec, 0x0c, 0x93, 0x70, 0x3c, 0x31, 0x09,
-	0x53, 0x09, 0x49, 0x98, 0x7e, 0x8b, 0x24, 0xcc, 0x84, 0x93, 0x50, 0xb4, 0x39, 0xc3, 0x26, 0xe1,
-	0xc4, 0x79, 0x24, 0xe1, 0xaf, 0x14, 0xc8, 0x97, 0x1b, 0x0d, 0x3f, 0x36, 0xdf, 0xd2, 0x59, 0xe5,
-	0xcf, 0x65, 0x98, 0xe8, 0x05, 0xc5, 0x16, 0x0f, 0x06, 0x02, 0xb7, 0x46, 0x39, 0xb7, 0x8a, 0x7f,
-	0x54, 0x68, 0xcd, 0x8e, 0xfa, 0x14, 0x9c, 0x90, 0xdd, 0x10, 0xd4, 0xf4, 0x8c, 0x7c, 0xe4, 0x3b,
-	0x96, 0xa8, 0x9a, 0x84, 0xf9, 0xdb, 0x42, 0xf9, 0x63, 0xb8, 0x42, 0x9b, 0xbc, 0xff, 0x09, 0x98,
-	0xc5, 0xdf, 0x28, 0x90, 0xdb, 0xc1, 0x6e, 0x38, 0x4b, 0xcf, 0x6a, 0xe9, 0xdb, 0x90, 0x66, 0x89,
-	0x4e, 0x16, 0xee, 0x77, 0x2a, 0x7c, 0xe1, 0xe2, 0x33, 0x58, 0xe2, 0xf7, 0x83, 0x9d, 0x95, 0xde,
-	0x46, 0xf2, 0xa7, 0x4d, 0x19, 0xe6, 0xb4, 0x15, 0x7f, 0xa9, 0xc0, 0x52, 0x18, 0xed, 0xb3, 0x0d,
-	0xf8, 0x26, 0x00, 0x5b, 0x2b, 0x72, 0x57, 0xb3, 0x75, 0xbc, 0xbb, 0x9a, 0x09, 0xd4, 0x1a, 0x1e,
-	0xf6, 0x73, 0xcc, 0x6e, 0xa8, 0x0f, 0x7c, 0x2a, 0x6c, 0x7e, 0xde, 0x8b, 0xb8, 0x72, 0x4e, 0x3d,
-	0xe0, 0x21, 0xac, 0x70, 0xd8, 0x8b, 0xfb, 0xbf, 0xaa, 0xb8, 0xff, 0x5b, 0x4a, 0xf0, 0x50, 0xdc,
-	0xfb, 0xe9, 0xb0, 0xc8, 0x2d, 0xb6, 0x7d, 0x6c, 0x60, 0x6e, 0x95, 0x47, 0xe2, 0x55, 0x06, 0xc4,
-	0x21, 0xba, 0xd4, 0x2f, 0x14, 0xc8, 0xfa, 0x95, 0x94, 0xb4, 0x98, 0xe7, 0x83, 0x72, 0xaf, 0xbd,
-	0x1c, 0x49, 0x68, 0x2f, 0x2b, 0xa1, 0xb0, 0xa5, 0xad, 0xa5, 0x92, 0xb4, 0x4f, 0x7f, 0x18, 0x81,
-	0x39, 0xda, 0xa4, 0x6c, 0x10, 0x1e, 0xf3, 0x14, 0x9d, 0xe5, 0x0d, 0x98, 0xa0, 0x1c, 0x68, 0x90,
-	0xac, 0x44, 0x94, 0x1a, 0xf4, 0x44, 0xe9, 0xf4, 0x40, 0x6d, 0xe5, 0x02, 0xa4, 0x1c, 0x5c, 0xb7,
-	0xb1, 0xcb, 0x98, 0x3d, 0xf6, 0x0b, 0xad, 0x43, 0xb6, 0xae, 0xb5, 0x5a, 0xfb, 0x5a, 0xfd, 0x70,
-	0xaf, 0x6d, 0xeb, 0x94, 0xdf, 0xab, 0xcc, 0x74, 0x4f, 0x0a, 0x93, 0x1b, 0x6c, 0x7c, 0x57, 0xad,
-	0xa9, 0x93, 0xbe, 0xd0, 0xae, 0xad, 0xa3, 0x2f, 0x43, 0xaa, 0x69, 0x6b, 0x86, 0xeb, 0xe4, 0x52,
-	0x04, 0x82, 0x1e, 0x35, 0x44, 0x3d, 0xab, 0x7a, 0x73, 0x2a, 0x13, 0x41, 0x37, 0x60, 0xdc, 0xa9,
-	0x9b, 0x16, 0x26, 0x17, 0x6f, 0x4c, 0x76, 0xc7, 0x9b, 0x52, 0xa9, 0x44, 0x71, 0x0b, 0xe6, 0x3c,
-	0xdc, 0xe9, 0x4c, 0x80, 0x78, 0x09, 0xd2, 0x34, 0xd0, 0xd8, 0xe7, 0x1c, 0x95, 0xf4, 0xcb, 0x13,
-	0x13, 0x2a, 0xfe, 0x76, 0x04, 0xe6, 0xe8, 0xd5, 0x1c, 0x86, 0xfe, 0xeb, 0x90, 0xa2, 0x22, 0x2c,
-	0x97, 0x16, 0xc3, 0x66, 0xc4, 0xe9, 0xc3, 0x54, 0x06, 0xe8, 0x99, 0x02, 0x84, 0x47, 0x13, 0x11,
-	0x1e, 0x1b, 0x0a, 0xe1, 0xf1, 0x21, 0x10, 0x4e, 0xf5, 0x45, 0xd8, 0x21, 0xb7, 0x09, 0x9d, 0xd8,
-	0x3e, 0x38, 0xd0, 0xeb, 0xba, 0xd6, 0x3a, 0x13, 0x78, 0xf2, 0x90, 0x31, 0x99, 0x3d, 0x82, 0x4d,
-	0x46, 0xed, 0xfd, 0x2e, 0x7e, 0x0e, 0x17, 0x7b, 0x8b, 0xee, 0xb8, 0x5a, 0x70, 0x75, 0xbe, 0xd5,
-	0x8a, 0x5e, 0xd4, 0x9e, 0x31, 0x76, 0x92, 0xa3, 0x51, 0x93, 0x75, 0xa8, 0x84, 0xd7, 0x0e, 0x21,
-	0x3a, 0x1c, 0xaa, 0xe3, 0x3b, 0xc2, 0x0a, 0x73, 0x3d, 0x6c, 0xe8, 0x9c, 0xca, 0xb8, 0x0e, 0x85,
-	0x20, 0xd5, 0xc5, 0x55, 0xfc, 0x81, 0xb8, 0xbe, 0xe6, 0xe5, 0xfe, 0x89, 0x8b, 0xf8, 0xcf, 0x14,
-	0x98, 0x64, 0x07, 0x81, 0x14, 0xd6, 0x73, 0x09, 0x7b, 0xa0, 0xba, 0x5a, 0xa6, 0xa4, 0x33, 0xe7,
-	0xcc, 0xb0, 0x65, 0x75, 0xfd, 0x53, 0x18, 0xaf, 0xba, 0xc7, 0x55, 0x1b, 0x6d, 0xc3, 0xec, 0x93,
-	0x76, 0xab, 0xb5, 0x61, 0x1a, 0x07, 0x7a, 0xb3, 0x6d, 0x53, 0x5a, 0x29, 0xa1, 0x1d, 0xc8, 0x5f,
-	0x8e, 0xdd, 0x1c, 0x9c, 0xe6, 0x2d, 0x65, 0xfd, 0x6f, 0x23, 0x90, 0xaa, 0x39, 0xbb, 0x0e, 0xb6,
-	0xd1, 0x7d, 0x80, 0xe0, 0x09, 0x06, 0x2d, 0x86, 0xbf, 0x39, 0xb9, 0xb7, 0x8e, 0xfc, 0x42, 0x89,
-	0x3e, 0xe5, 0x94, 0xfc, 0xa7, 0x9c, 0xd2, 0xd6, 0x91, 0xe5, 0x76, 0xd0, 0x2d, 0x48, 0x57, 0xb1,
-	0x4b, 0xb4, 0x2f, 0xf5, 0x3e, 0x16, 0xc8, 0xcb, 0x4b, 0xe0, 0x4f, 0x96, 0x9f, 0xf0, 0x96, 0x0c,
-	0xde, 0x42, 0x82, 0x25, 0x63, 0xcf, 0x2b, 0xd2, 0x25, 0xb7, 0x01, 0xc5, 0x1f, 0x53, 0xd0, 0xd5,
-	0xb8, 0xa1, 0xc8, 0x43, 0x8b, 0xd4, 0xe0, 0x37, 0x00, 0x36, 0x71, 0x0b, 0x33, 0x8f, 0x24, 0x52,
-	0x32, 0xed, 0xf5, 0x9f, 0x4f, 0xc1, 0x54, 0xcd, 0xe1, 0x08, 0x1a, 0xf4, 0xd8, 0x7f, 0xd7, 0xe2,
-	0x07, 0x57, 0xc2, 0xd8, 0xc6, 0x1f, 0x0c, 0xa4, 0xee, 0x6d, 0xc1, 0x74, 0x15, 0xf3, 0x0c, 0x10,
-	0xea, 0x43, 0x45, 0xe6, 0x45, 0x0f, 0x18, 0xe8, 0x11, 0x5c, 0x88, 0xbe, 0x83, 0x48, 0x63, 0x5d,
-	0xe1, 0x3f, 0x46, 0x84, 0x2f, 0x27, 0x8f, 0xfd, 0x07, 0x31, 0x61, 0x8c, 0xb2, 0x47, 0x11, 0x69,
-	0x8c, 0x0f, 0x61, 0x96, 0x6e, 0xc1, 0x30, 0x61, 0xca, 0x8c, 0xed, 0xc0, 0xbc, 0xe8, 0xcd, 0x01,
-	0x5d, 0xeb, 0xd9, 0x93, 0xbf, 0x48, 0x48, 0x8d, 0x1e, 0xc0, 0xa2, 0xf4, 0x05, 0xa0, 0xaf, 0xa7,
-	0x37, 0x7a, 0x27, 0xb2, 0xef, 0x23, 0xc2, 0x67, 0xb0, 0x20, 0x26, 0xfa, 0xfb, 0x2e, 0xf2, 0x9e,
-	0x64, 0xd3, 0xe2, 0x0f, 0x05, 0x97, 0x24, 0x64, 0x3e, 0xea, 0x99, 0x48, 0x66, 0xfb, 0xa5, 0x20,
-	0xed, 0x8a, 0x41, 0x22, 0xd4, 0x33, 0x5a, 0x4d, 0x02, 0x81, 0xe7, 0xdf, 0xf3, 0x11, 0x12, 0x1b,
-	0x3d, 0x82, 0xf9, 0xf0, 0x09, 0x60, 0xe3, 0xef, 0x0a, 0x10, 0xa1, 0x53, 0x3c, 0x2e, 0x51, 0x6b,
-	0x02, 0x84, 0x29, 0x37, 0x7e, 0x7a, 0x84, 0x23, 0xb4, 0xfc, 0x33, 0x11, 0xc2, 0xc3, 0xb8, 0x2c,
-	0xc7, 0x37, 0x1f, 0xce, 0xdd, 0xd0, 0x2d, 0xdf, 0x8f, 0xf5, 0x96, 0x9a, 0x6d, 0xc1, 0xe5, 0x24,
-	0xb6, 0xbd, 0x2f, 0x2e, 0x37, 0x25, 0xb8, 0x88, 0x6f, 0xfb, 0xba, 0xcf, 0x33, 0xc8, 0xe2, 0x18,
-	0x82, 0x5c, 0x97, 0x86, 0x54, 0x85, 0xb9, 0x30, 0x52, 0xb4, 0x23, 0xc8, 0x09, 0x4c, 0x93, 0x19,
-	0xa9, 0xa1, 0x1f, 0xc0, 0x45, 0x21, 0x01, 0xdf, 0x17, 0x94, 0xeb, 0x12, 0x50, 0x22, 0xdd, 0xc0,
-	0x27, 0xb0, 0x10, 0x43, 0xe3, 0x94, 0xbe, 0xae, 0xff, 0x74, 0x12, 0x26, 0x6a, 0x0e, 0xbb, 0xf5,
-	0xd1, 0x3d, 0x98, 0x0a, 0x71, 0xc7, 0xe8, 0x72, 0x12, 0xa5, 0x9c, 0x8f, 0x92, 0xb4, 0xe8, 0x6b,
-	0x00, 0xd5, 0x1e, 0x1f, 0x93, 0xd8, 0x70, 0xc4, 0x54, 0x37, 0x21, 0xcb, 0x53, 0xc3, 0xd2, 0x7b,
-	0xe6, 0xb2, 0x80, 0xf4, 0x0a, 0xa0, 0xb9, 0x07, 0x53, 0x21, 0xde, 0x31, 0x08, 0x40, 0x44, 0x47,
-	0xc6, 0xbd, 0xd8, 0x80, 0x29, 0x7a, 0xa9, 0x0c, 0x12, 0x83, 0x6c, 0xff, 0xbf, 0x4d, 0x12, 0x29,
-	0x4a, 0x89, 0xa1, 0x22, 0x77, 0x97, 0x48, 0xf8, 0x32, 0xa9, 0xc9, 0x17, 0x34, 0xa5, 0x62, 0x24,
-	0x5f, 0xa2, 0x7f, 0xd7, 0x07, 0xe2, 0x07, 0xd1, 0x33, 0x3f, 0x9d, 0x62, 0x1e, 0x5f, 0x0f, 0xd7,
-	0xf6, 0x61, 0x9d, 0xde, 0x80, 0xd9, 0x18, 0x3b, 0x87, 0x24, 0x6c, 0x97, 0xd4, 0xc8, 0x77, 0xe8,
-	0x67, 0x6f, 0x84, 0x4e, 0x4b, 0x8c, 0xfb, 0x9a, 0x28, 0xee, 0x28, 0x0f, 0xb7, 0x03, 0xf3, 0x22,
-	0x32, 0x2d, 0xb8, 0xf1, 0x13, 0xa8, 0x36, 0xa9, 0xb3, 0x8f, 0x61, 0x21, 0xd8, 0xdc, 0x50, 0x81,
-	0x4a, 0xa2, 0x97, 0xa4, 0xe6, 0x3e, 0xa3, 0x9f, 0x04, 0x22, 0x3a, 0x2b, 0x11, 0x80, 0x55, 0x01,
-	0x00, 0xe2, 0xc2, 0xaa, 0xc2, 0x6c, 0x8c, 0xc3, 0x4a, 0x34, 0x7d, 0x55, 0x60, 0x3a, 0x42, 0x7d,
-	0x7d, 0x17, 0x16, 0x43, 0xd8, 0x85, 0x70, 0x18, 0x90, 0xa2, 0x92, 0x42, 0x72, 0x1f, 0x66, 0x02,
-	0x84, 0x69, 0xd1, 0x9b, 0x8f, 0x98, 0x4c, 0x2e, 0xce, 0xe1, 0x88, 0x59, 0x61, 0x1e, 0x36, 0xe2,
-	0x48, 0x41, 0xae, 0x00, 0x0a, 0x45, 0x7c, 0x0a, 0xbf, 0xd6, 0xff, 0x92, 0x86, 0x4c, 0xcd, 0xa1,
-	0x5f, 0x7f, 0x68, 0x03, 0xb2, 0x3c, 0x3d, 0x16, 0x64, 0x8f, 0x80, 0x34, 0x93, 0x46, 0x7a, 0x1b,
-	0x26, 0xaa, 0x3e, 0xb3, 0x80, 0xe4, 0xec, 0x41, 0x3e, 0x42, 0x18, 0xa1, 0x0a, 0x4c, 0x72, 0x44,
-	0x93, 0xb4, 0x10, 0x2f, 0xf1, 0xb8, 0x44, 0x59, 0xa9, 0x0d, 0xc8, 0xf2, 0x24, 0x53, 0x10, 0x80,
-	0x80, 0x7a, 0x92, 0x06, 0x50, 0x86, 0x2c, 0x2d, 0xc6, 0xfd, 0x63, 0x90, 0x1f, 0xc8, 0xd9, 0x18,
-	0xa5, 0x13, 0x7c, 0x73, 0xc8, 0xd8, 0x9e, 0x84, 0x16, 0x61, 0x3a, 0x4c, 0xd6, 0xa0, 0x2b, 0x31,
-	0x5b, 0x3c, 0x89, 0x93, 0xf0, 0xf1, 0x72, 0xb1, 0xdc, 0x68, 0x08, 0x68, 0x97, 0x04, 0x02, 0x43,
-	0x6a, 0xec, 0xfb, 0x70, 0x49, 0x42, 0x97, 0x24, 0x41, 0xf6, 0x7e, 0x7c, 0xff, 0xc4, 0x35, 0xe2,
-	0x39, 0xe4, 0x68, 0x76, 0x0b, 0xdc, 0x1d, 0x8c, 0x18, 0x91, 0x7a, 0x7e, 0x17, 0xa6, 0x7b, 0x30,
-	0xd0, 0x43, 0x13, 0x61, 0xaa, 0x92, 0xcf, 0xf2, 0x36, 0xfd, 0x3e, 0xe5, 0x29, 0x93, 0xa4, 0x88,
-	0x57, 0xe2, 0x11, 0x47, 0x0e, 0xf2, 0x37, 0x61, 0x96, 0x0f, 0x75, 0x78, 0x97, 0x2a, 0xd5, 0xbf,
-	0xff, 0x6b, 0xf9, 0x9d, 0x9f, 0x74, 0x97, 0x95, 0xd7, 0xdd, 0x65, 0xe5, 0x4d, 0x77, 0x59, 0xf9,
-	0x67, 0x77, 0x59, 0xf9, 0x77, 0x77, 0xf9, 0x9d, 0xff, 0x74, 0x97, 0x95, 0x17, 0x37, 0x06, 0xfa,
-	0x6f, 0x24, 0xd7, 0xb0, 0xf6, 0xf7, 0x53, 0xc4, 0xf0, 0x87, 0xff, 0x0d, 0x00, 0x00, 0xff, 0xff,
-	0xcb, 0x40, 0x08, 0xb6, 0xb6, 0x2c, 0x00, 0x00,
+	// 2516 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x5a, 0xcf, 0x6f, 0x1b, 0xc7,
+	0xf5, 0xcf, 0xea, 0x07, 0x49, 0x3d, 0x52, 0x92, 0x35, 0x92, 0x65, 0x8a, 0x92, 0x45, 0x7a, 0x6d,
+	0x7f, 0x2d, 0xe1, 0xeb, 0x52, 0x8e, 0xd2, 0x18, 0x6e, 0x5a, 0xdb, 0x21, 0x25, 0x85, 0x60, 0x62,
+	0x57, 0xee, 0xca, 0xaa, 0x1b, 0xb7, 0xae, 0xb2, 0x22, 0x47, 0xf4, 0x42, 0x14, 0x77, 0xbb, 0xbb,
+	0xb4, 0x40, 0x14, 0x45, 0x0a, 0xf4, 0xd0, 0x43, 0x2f, 0x45, 0x10, 0xa0, 0xb9, 0xe5, 0xd0, 0x4b,
+	0x73, 0x2c, 0x8a, 0xa2, 0xfd, 0x07, 0x0a, 0x18, 0xe8, 0xc5, 0xc7, 0xa2, 0x07, 0xa1, 0xe5, 0xa9,
+	0xc7, 0xfe, 0x09, 0xc5, 0xce, 0xcc, 0x72, 0x67, 0x7f, 0xcc, 0x8a, 0x94, 0xc4, 0x14, 0xbd, 0x89,
+	0x33, 0xf3, 0xde, 0xbc, 0xf7, 0x99, 0xf7, 0x66, 0xde, 0x7e, 0x9e, 0xe0, 0x5e, 0x43, 0xb3, 0x5f,
+	0xb6, 0xf7, 0x8b, 0x35, 0xfd, 0x68, 0xed, 0xe9, 0x4b, 0xfc, 0xf4, 0xa5, 0xd6, 0x6a, 0x58, 0xdf,
+	0xc5, 0xf6, 0xb1, 0x6e, 0x1e, 0xae, 0xd9, 0x76, 0x6b, 0x4d, 0x35, 0xb4, 0x35, 0xad, 0x8e, 0x5b,
+	0xb6, 0x66, 0x77, 0x2c, 0x6c, 0xbe, 0xc2, 0x66, 0xd1, 0x30, 0x75, 0x5b, 0x47, 0x09, 0xdb, 0x6e,
+	0x15, 0x5f, 0xbd, 0x93, 0xfb, 0x06, 0xa7, 0xa1, 0xa1, 0x37, 0xf4, 0x35, 0x32, 0xbd, 0xdf, 0x3e,
+	0x20, 0xbf, 0xc8, 0x0f, 0xf2, 0x17, 0x15, 0xcb, 0xbd, 0xdb, 0xcf, 0x86, 0xaa, 0x61, 0x34, 0xb5,
+	0x9a, 0x6a, 0x6b, 0x7a, 0x8b, 0x89, 0xdd, 0xe9, 0x47, 0xac, 0xd6, 0xd4, 0x70, 0xcb, 0x66, 0x12,
+	0x77, 0xfb, 0x92, 0xd0, 0x9b, 0x4d, 0x75, 0x5f, 0x37, 0x55, 0x5b, 0x37, 0x07, 0xd9, 0xc9, 0xd4,
+	0x1a, 0x2f, 0x6d, 0x6b, 0x10, 0x97, 0x28, 0x86, 0x07, 0x1a, 0x36, 0x5d, 0xb1, 0xb7, 0xfb, 0x11,
+	0x6b, 0xa8, 0x36, 0x3e, 0x56, 0x3b, 0x4c, 0xa4, 0xd8, 0x8f, 0x48, 0xdb, 0x72, 0xcf, 0x28, 0xb7,
+	0xd8, 0xd0, 0xf5, 0x46, 0x13, 0x7b, 0x47, 0x82, 0x8f, 0x0c, 0x9b, 0x29, 0x93, 0xbf, 0x92, 0x60,
+	0x66, 0xc3, 0xc4, 0xaa, 0x8d, 0x77, 0x2d, 0x6c, 0x2a, 0xf8, 0x27, 0x6d, 0x6c, 0xd9, 0x68, 0x15,
+	0x26, 0x6c, 0xdc, 0x52, 0x5b, 0xf6, 0x9e, 0x56, 0xcf, 0x4a, 0x05, 0x69, 0x65, 0xa2, 0x9c, 0xe9,
+	0x9e, 0xe4, 0x53, 0x4f, 0xc9, 0x60, 0x75, 0x53, 0x49, 0xd1, 0xe9, 0x6a, 0x1d, 0x5d, 0x87, 0xa4,
+	0xb3, 0x97, 0xb3, 0x70, 0x84, 0x2c, 0x84, 0xee, 0x49, 0x3e, 0xe1, 0x28, 0xab, 0x6e, 0x2a, 0x09,
+	0x67, 0xaa, 0x5a, 0x47, 0x73, 0x30, 0x8e, 0x8f, 0x54, 0xad, 0x99, 0x1d, 0x75, 0x96, 0x28, 0xf4,
+	0x07, 0xca, 0x41, 0xca, 0x50, 0x2d, 0xeb, 0x58, 0x37, 0xeb, 0xd9, 0x31, 0x32, 0xd1, 0xfb, 0x8d,
+	0x10, 0x8c, 0xb5, 0xd4, 0x23, 0x9c, 0x1d, 0x27, 0xe3, 0xe4, 0x6f, 0xf9, 0x3e, 0xcc, 0xec, 0x1a,
+	0xf5, 0x80, 0xa9, 0x3d, 0xd5, 0x12, 0xaf, 0xda, 0x15, 0x1f, 0xe1, 0xc4, 0x1f, 0xc2, 0x82, 0x27,
+	0xfe, 0x84, 0x6d, 0xe4, 0xaa, 0xb9, 0x04, 0xa3, 0x7a, 0x93, 0xf9, 0xaa, 0x38, 0x7f, 0x3a, 0x23,
+	0x2d, 0x7c, 0xcc, 0x34, 0x38, 0x7f, 0xca, 0x7f, 0x1e, 0x81, 0x2c, 0xc5, 0xaa, 0xe4, 0x85, 0xe6,
+	0x19, 0x20, 0xbb, 0x07, 0x53, 0x5c, 0x6c, 0x7b, 0xc8, 0xcd, 0x74, 0x4f, 0xf2, 0x93, 0x9c, 0xea,
+	0xea, 0xa6, 0x32, 0xc9, 0x2d, 0xac, 0xd6, 0x51, 0x01, 0xd2, 0x75, 0x6c, 0xd5, 0x4c, 0xcd, 0x70,
+	0x06, 0x18, 0x9a, 0xfc, 0x10, 0xfa, 0x18, 0x52, 0xaa, 0x61, 0xec, 0xe1, 0xb6, 0x66, 0x65, 0xc7,
+	0x0a, 0xa3, 0x2b, 0x99, 0xf2, 0x83, 0xbf, 0x9f, 0xe4, 0xd7, 0x4e, 0x0b, 0x19, 0xe3, 0xb0, 0xb1,
+	0x66, 0x77, 0x0c, 0x6c, 0x15, 0xb7, 0x76, 0xab, 0x77, 0xbf, 0xd9, 0x3d, 0xc9, 0x27, 0x4b, 0x86,
+	0xb1, 0xb5, 0x5b, 0xb5, 0x94, 0xa4, 0x6a, 0x18, 0x5b, 0x6d, 0xcd, 0x42, 0xef, 0x39, 0xaa, 0xb5,
+	0xbd, 0x43, 0xdc, 0xb1, 0xb2, 0xe3, 0x85, 0xd1, 0x95, 0xf4, 0xfa, 0x54, 0x91, 0xa6, 0x7f, 0xb1,
+	0xf4, 0xa4, 0xfa, 0x11, 0xee, 0x94, 0xa7, 0x5f, 0x9f, 0xe4, 0xdf, 0x22, 0xb2, 0xe4, 0x37, 0x91,
+	0xd5, 0x9c, 0x3f, 0xe4, 0x8f, 0x21, 0xfb, 0x48, 0xb3, 0x6c, 0xce, 0x39, 0x4b, 0xc1, 0x96, 0xa1,
+	0xb7, 0x2c, 0x8c, 0xee, 0x43, 0x86, 0xf3, 0xd2, 0xca, 0x4a, 0x44, 0xf7, 0x6c, 0x4f, 0xb7, 0x37,
+	0x57, 0x1e, 0x73, 0x36, 0x50, 0x7c, 0xcb, 0xe5, 0x2f, 0x47, 0x20, 0x4b, 0xcf, 0x35, 0xe2, 0x54,
+	0x3e, 0x84, 0x34, 0xb7, 0x98, 0x9c, 0x4b, 0x7a, 0x7d, 0x39, 0x42, 0x75, 0xd5, 0xcb, 0xcc, 0x72,
+	0xca, 0xd9, 0xe5, 0xcd, 0x49, 0x5e, 0x52, 0x78, 0xe1, 0x20, 0xf8, 0x23, 0xf1, 0xe0, 0x8f, 0x0e,
+	0x0f, 0xfc, 0xb1, 0x01, 0xc1, 0xff, 0x8b, 0x04, 0x8b, 0xa5, 0x7a, 0x9d, 0xf3, 0x96, 0xaa, 0x1f,
+	0x06, 0x48, 0xcf, 0x21, 0xc9, 0x20, 0x20, 0x00, 0x65, 0xca, 0x25, 0x67, 0xdd, 0xd9, 0x50, 0x48,
+	0x30, 0x33, 0x13, 0x14, 0x04, 0xf9, 0x53, 0xb8, 0x56, 0xc1, 0x2d, 0x6c, 0xfa, 0x8f, 0xda, 0xf5,
+	0x85, 0x45, 0x13, 0x67, 0x80, 0x74, 0xd1, 0x06, 0xfc, 0x14, 0x96, 0x03, 0x51, 0xec, 0x9e, 0x93,
+	0xbb, 0x3b, 0x1f, 0x01, 0xd2, 0x85, 0x46, 0x80, 0xfc, 0x5a, 0x82, 0x65, 0x05, 0x1f, 0xe9, 0xaf,
+	0xf0, 0xff, 0xfc, 0x41, 0x7e, 0x25, 0x41, 0x21, 0xea, 0x24, 0x49, 0xe0, 0x0e, 0xc3, 0x99, 0x88,
+	0xe7, 0x00, 0xdd, 0x84, 0x04, 0x7d, 0xc0, 0x49, 0xaa, 0x4e, 0xad, 0x4f, 0xba, 0xaa, 0x15, 0x67,
+	0x54, 0x61, 0x93, 0xf2, 0x8f, 0xc2, 0x67, 0xce, 0xf2, 0xcb, 0x3d, 0x73, 0x3e, 0x35, 0xa5, 0x01,
+	0x53, 0xf3, 0x0f, 0x12, 0x5c, 0xf3, 0xa7, 0xe6, 0x06, 0x57, 0x8c, 0x0c, 0x03, 0x8a, 0x32, 0x64,
+	0xf8, 0x7a, 0x87, 0x40, 0x92, 0x5e, 0x9f, 0x73, 0x95, 0xf1, 0xdb, 0x73, 0x2a, 0x7c, 0x32, 0xf2,
+	0x4b, 0xb8, 0x11, 0xc0, 0x84, 0x17, 0xf3, 0x90, 0x79, 0x1f, 0x26, 0x79, 0x39, 0x17, 0x9e, 0xe8,
+	0xcd, 0xe8, 0xdd, 0xee, 0x17, 0x90, 0x7f, 0x23, 0xc1, 0x8d, 0x50, 0xd0, 0x0f, 0x1b, 0xa2, 0x7e,
+	0x4a, 0x1a, 0xf9, 0x77, 0x12, 0x5c, 0xe2, 0x1f, 0x1c, 0x27, 0x5a, 0xbe, 0x76, 0x2b, 0xd0, 0x75,
+	0x18, 0x27, 0x71, 0x4a, 0x4a, 0x81, 0x50, 0x0c, 0xd3, 0x39, 0xf9, 0x03, 0xb8, 0x1a, 0x38, 0x2e,
+	0x32, 0xed, 0x9d, 0x53, 0x9f, 0xa9, 0xf0, 0x66, 0x0c, 0xe6, 0x68, 0xfd, 0x53, 0xa1, 0x05, 0xe9,
+	0x19, 0x6a, 0x9f, 0xdb, 0x00, 0xac, 0x9a, 0xf5, 0x1c, 0x9b, 0xec, 0x9e, 0xe4, 0x27, 0x98, 0xca,
+	0xea, 0xa6, 0x32, 0xc1, 0x16, 0xf4, 0x55, 0xef, 0x3c, 0x84, 0x99, 0x03, 0xd3, 0x31, 0xa3, 0x55,
+	0xeb, 0xec, 0x19, 0x4d, 0x95, 0x94, 0x53, 0xa4, 0x98, 0x2c, 0xcf, 0x76, 0x4f, 0xf2, 0xd3, 0x1f,
+	0xb8, 0x93, 0x4f, 0x9a, 0xaa, 0x53, 0x50, 0x4d, 0x1f, 0xf8, 0x06, 0xea, 0x68, 0x1b, 0x2e, 0x19,
+	0xa6, 0xf6, 0x4a, 0xad, 0x75, 0xf6, 0x2c, 0x6c, 0xdb, 0xce, 0x65, 0x46, 0x8a, 0x4e, 0xee, 0xdc,
+	0x98, 0x69, 0x4f, 0xe8, 0xb2, 0x1d, 0xb6, 0x8a, 0x05, 0xec, 0xb4, 0xe1, 0x1f, 0x46, 0x79, 0x48,
+	0xab, 0x6d, 0x5b, 0xdf, 0x6b, 0x93, 0x9a, 0x24, 0x9b, 0x28, 0x48, 0x2b, 0x29, 0x05, 0x9c, 0x21,
+	0x5a, 0xa5, 0x90, 0xb2, 0xb7, 0xa9, 0xda, 0x07, 0xba, 0x79, 0x94, 0x4d, 0xb2, 0xb2, 0x97, 0xfd,
+	0x46, 0xf7, 0x20, 0xa5, 0xb6, 0x6c, 0xdc, 0x6a, 0xa9, 0x56, 0x36, 0x45, 0x92, 0x65, 0x3e, 0x60,
+	0x45, 0x89, 0x4e, 0xb3, 0xdd, 0x7b, 0xab, 0xd1, 0x23, 0x00, 0xd5, 0xb6, 0x4d, 0x6d, 0xbf, 0x6d,
+	0x63, 0x2b, 0x3b, 0x41, 0x64, 0x6f, 0xf7, 0x12, 0x2d, 0xe2, 0xd4, 0x8a, 0xa5, 0xde, 0xf2, 0xad,
+	0x96, 0x6d, 0x76, 0x14, 0x4e, 0x1e, 0xdd, 0x82, 0xe9, 0x5a, 0xb3, 0x6d, 0xd9, 0xd8, 0xdc, 0x53,
+	0xeb, 0x75, 0x13, 0x5b, 0x56, 0x16, 0x88, 0xa9, 0x53, 0x6c, 0xb8, 0x44, 0x47, 0x73, 0xf7, 0x61,
+	0x3a, 0xa0, 0xc7, 0x29, 0x9c, 0x0f, 0x71, 0xc7, 0x2d, 0xa5, 0x0f, 0x71, 0xc7, 0xa9, 0xd1, 0x5f,
+	0xa9, 0xcd, 0xb6, 0x7b, 0xff, 0xd2, 0x1f, 0xef, 0x8d, 0xdc, 0x93, 0xe4, 0x2a, 0xcc, 0x39, 0xa1,
+	0xc9, 0x2c, 0xf3, 0x22, 0xf2, 0x6d, 0x48, 0xb1, 0x28, 0x70, 0x2f, 0x8d, 0xe9, 0x00, 0x0e, 0x2e,
+	0x00, 0xee, 0x32, 0xf9, 0x4f, 0x63, 0x30, 0x47, 0x11, 0x0e, 0x44, 0xe7, 0x03, 0x48, 0xb2, 0x45,
+	0x2c, 0x21, 0x73, 0x01, 0x55, 0xd1, 0xc9, 0xe8, 0x0a, 0xf5, 0x51, 0xf7, 0x45, 0x06, 0xe1, 0xe8,
+	0x39, 0x83, 0x70, 0xec, 0x02, 0x83, 0x70, 0x3c, 0x36, 0x08, 0x13, 0x31, 0x41, 0x98, 0x3c, 0x47,
+	0x10, 0xa6, 0xfc, 0x41, 0x18, 0x75, 0x38, 0x83, 0x06, 0xe1, 0xc4, 0x30, 0x82, 0xf0, 0xd7, 0x12,
+	0xe4, 0x4a, 0xf5, 0xba, 0xeb, 0x9b, 0xab, 0xe9, 0xa2, 0xe2, 0x67, 0x09, 0x26, 0x7a, 0x4e, 0xb1,
+	0xcd, 0xbd, 0x01, 0xcf, 0xac, 0x51, 0xce, 0x2c, 0xf9, 0x8f, 0x12, 0xbd, 0xb3, 0x83, 0x36, 0x79,
+	0x19, 0xb2, 0xeb, 0x83, 0x9a, 0xe6, 0xc8, 0xbb, 0xae, 0x61, 0xb1, 0xa2, 0x71, 0x98, 0x9f, 0x17,
+	0xca, 0x9f, 0xc1, 0x55, 0xfa, 0x5c, 0xff, 0x57, 0xc0, 0x94, 0x3f, 0x93, 0x20, 0xbb, 0x83, 0x6d,
+	0x7f, 0x94, 0x5e, 0xd4, 0xd6, 0x77, 0x21, 0xc9, 0x02, 0x9d, 0x15, 0x4d, 0xf1, 0x59, 0xe1, 0x2e,
+	0x96, 0x9f, 0xc1, 0x22, 0x7f, 0x1e, 0x2c, 0x57, 0x7a, 0x07, 0xc9, 0x67, 0x9b, 0x34, 0x48, 0xb6,
+	0xc9, 0xbf, 0x92, 0x60, 0xd1, 0x8f, 0xf6, 0xc5, 0x3a, 0x7c, 0x1b, 0x80, 0xed, 0x15, 0x78, 0xab,
+	0xd9, 0x3e, 0xce, 0x5b, 0xcd, 0x16, 0x54, 0xeb, 0xf2, 0x6f, 0x25, 0xb8, 0xea, 0x65, 0x51, 0x54,
+	0x8d, 0x76, 0x5e, 0x7b, 0x2e, 0xa2, 0x74, 0xad, 0x43, 0x81, 0x3b, 0x8c, 0x61, 0x95, 0xad, 0x2f,
+	0x60, 0x81, 0xdb, 0x65, 0xfb, 0xb8, 0x85, 0x2f, 0x54, 0xfd, 0x2f, 0x25, 0x28, 0xf8, 0x0e, 0x7e,
+	0x18, 0x68, 0xf7, 0x55, 0x05, 0x7f, 0x21, 0x41, 0xc6, 0xbd, 0xd1, 0x49, 0x05, 0xfc, 0x75, 0xec,
+	0xda, 0x5f, 0xd5, 0x5b, 0xf6, 0x9d, 0x81, 0xb0, 0xe2, 0x95, 0xe2, 0x2a, 0xde, 0xdf, 0x8f, 0xc0,
+	0x2c, 0xad, 0x9d, 0x36, 0x08, 0xab, 0x7c, 0x86, 0x82, 0x77, 0x15, 0x26, 0x28, 0x23, 0xed, 0xb9,
+	0x44, 0x96, 0x52, 0x85, 0xce, 0x52, 0x3a, 0xdd, 0x57, 0xb5, 0x3b, 0x0f, 0x09, 0x0b, 0xd7, 0x4c,
+	0x6c, 0x33, 0xbe, 0x94, 0xfd, 0x42, 0xeb, 0x90, 0xa9, 0xa9, 0xcd, 0xe6, 0xbe, 0x5a, 0x3b, 0xdc,
+	0x6b, 0x9b, 0x1a, 0x65, 0x4d, 0xcb, 0xd3, 0xdd, 0x93, 0x7c, 0x7a, 0x83, 0x8d, 0xef, 0x2a, 0x55,
+	0x25, 0xed, 0x2e, 0xda, 0x35, 0x35, 0xf4, 0xff, 0x90, 0x68, 0x98, 0x6a, 0xcb, 0xb6, 0xb2, 0x09,
+	0x02, 0x41, 0x8f, 0x70, 0xa3, 0x96, 0x55, 0x9c, 0x39, 0x85, 0x2d, 0x41, 0xab, 0x30, 0x6e, 0xd5,
+	0x74, 0x03, 0x93, 0x7a, 0x20, 0xb4, 0x76, 0xc7, 0x99, 0x52, 0xe8, 0x0a, 0x79, 0x0b, 0x66, 0x1d,
+	0xdc, 0xe9, 0x8c, 0x87, 0x78, 0x11, 0x92, 0xd4, 0xd1, 0xd0, 0x47, 0x32, 0x5d, 0xe9, 0xde, 0x9a,
+	0x6c, 0x91, 0xfc, 0xc5, 0x08, 0xcc, 0xd2, 0x8a, 0xc1, 0x0f, 0xfd, 0xb7, 0x21, 0x41, 0x97, 0xb0,
+	0xf8, 0x5a, 0xf0, 0xab, 0x89, 0x0e, 0x2f, 0x26, 0xd2, 0x47, 0x29, 0xe7, 0x21, 0x3c, 0x1a, 0x8b,
+	0xf0, 0xd8, 0x40, 0x08, 0x8f, 0x0f, 0x80, 0x70, 0xe2, 0x54, 0x84, 0x2d, 0xf2, 0xc8, 0xd1, 0x89,
+	0xed, 0x83, 0x03, 0xad, 0xa6, 0xa9, 0xcd, 0x0b, 0x81, 0x27, 0x07, 0x29, 0x9d, 0xe9, 0x23, 0xd8,
+	0xa4, 0x94, 0xde, 0x6f, 0xf9, 0x53, 0xb8, 0xdc, 0xdb, 0x74, 0xc7, 0x56, 0xbd, 0x17, 0xfd, 0x5c,
+	0x3b, 0x3a, 0x5e, 0x3b, 0xca, 0xc8, 0x76, 0x61, 0xaf, 0xc9, 0x3e, 0x74, 0x85, 0xfc, 0xa5, 0x04,
+	0x4b, 0xa5, 0x7a, 0x9d, 0xce, 0x44, 0x5d, 0x78, 0xe7, 0x32, 0xe4, 0x22, 0xde, 0x96, 0x1a, 0xe4,
+	0xbd, 0xc8, 0x1f, 0xd6, 0xd3, 0xf2, 0x0b, 0x09, 0xf2, 0xf4, 0xee, 0x1f, 0x12, 0x12, 0x7d, 0xdd,
+	0xfb, 0x9f, 0x4b, 0x90, 0x66, 0x79, 0x49, 0xae, 0xfd, 0xa1, 0xef, 0xd8, 0xdf, 0x9d, 0x5f, 0xa2,
+	0x6d, 0x06, 0xce, 0xb2, 0x41, 0xaf, 0xfc, 0xf5, 0x1f, 0xc0, 0x78, 0xc5, 0x3e, 0xae, 0x98, 0x68,
+	0x1b, 0x66, 0x9e, 0xb4, 0x9b, 0xcd, 0x0d, 0xbd, 0x75, 0xa0, 0x35, 0xda, 0x26, 0x25, 0x65, 0x62,
+	0x5e, 0xb3, 0xdc, 0x52, 0x60, 0xce, 0x27, 0x79, 0x47, 0x5a, 0xff, 0xeb, 0x08, 0x24, 0xaa, 0x96,
+	0xe3, 0x16, 0x7a, 0x08, 0xe0, 0x35, 0xdd, 0xd0, 0x82, 0xff, 0x33, 0x9d, 0xeb, 0x6e, 0xe5, 0xe6,
+	0x8b, 0xb4, 0x79, 0x57, 0x74, 0x9b, 0x77, 0xc5, 0xad, 0x23, 0xc3, 0xee, 0xa0, 0x3b, 0x90, 0xac,
+	0x60, 0x9b, 0x48, 0x5f, 0xe9, 0x7d, 0x5f, 0x11, 0xa0, 0x3c, 0x7b, 0x32, 0xfc, 0x84, 0xb3, 0xa5,
+	0xd7, 0xfd, 0xf2, 0xb6, 0x0c, 0x35, 0xd4, 0x84, 0x5b, 0x6e, 0x03, 0x0a, 0xb7, 0xcf, 0xd0, 0xb5,
+	0xb0, 0xa2, 0x40, 0x6b, 0x4d, 0xa8, 0xf0, 0x3b, 0x00, 0x9b, 0xb8, 0x89, 0x99, 0x45, 0x82, 0x55,
+	0x22, 0xe9, 0xf5, 0xcf, 0x27, 0x61, 0xb2, 0x6a, 0x71, 0x9c, 0x16, 0x7a, 0xec, 0x76, 0x32, 0xf9,
+	0xc1, 0x82, 0x1f, 0xdb, 0x70, 0x8b, 0x48, 0x68, 0xde, 0x16, 0x4c, 0x55, 0x30, 0x4f, 0x9a, 0xa1,
+	0x53, 0x88, 0xbc, 0x5c, 0x54, 0xcb, 0x0a, 0x3d, 0x82, 0x4b, 0xc1, 0xce, 0x97, 0xd0, 0xd7, 0x02,
+	0xff, 0xfd, 0x16, 0xd9, 0x2b, 0x7b, 0xec, 0xb6, 0x40, 0x23, 0x7d, 0x14, 0xb5, 0xc1, 0x84, 0x3e,
+	0x7e, 0x04, 0x33, 0xf4, 0x08, 0x06, 0x71, 0x53, 0xa4, 0x6c, 0x07, 0xe6, 0xa2, 0xba, 0x4c, 0xe8,
+	0x7a, 0x4f, 0x9f, 0xb8, 0x07, 0x25, 0x54, 0x7a, 0x00, 0x0b, 0xc2, 0x9e, 0xcf, 0xa9, 0x96, 0xae,
+	0xf6, 0x32, 0xf2, 0xd4, 0xb6, 0xd1, 0x27, 0x30, 0x1f, 0xdd, 0xda, 0x39, 0x75, 0x93, 0xff, 0x13,
+	0x1c, 0x5a, 0xb8, 0x35, 0x74, 0x45, 0xd0, 0xbe, 0x41, 0x3d, 0x15, 0xf1, 0xfd, 0x1d, 0x21, 0x48,
+	0xbb, 0xd1, 0x20, 0x91, 0x66, 0x03, 0x5a, 0x89, 0x03, 0x81, 0xef, 0xb8, 0xe4, 0x02, 0x6d, 0x0b,
+	0xf4, 0x08, 0xe6, 0xfc, 0x19, 0xc0, 0xc6, 0x6f, 0x44, 0x20, 0x42, 0xa7, 0x78, 0x5c, 0x82, 0xda,
+	0x22, 0x10, 0xa6, 0xdd, 0x90, 0xb3, 0x23, 0x1c, 0x68, 0xc4, 0x3c, 0x8b, 0x42, 0x78, 0x10, 0x93,
+	0x45, 0xf8, 0xee, 0x11, 0x7e, 0x48, 0xd0, 0x81, 0x40, 0xab, 0xd1, 0xf1, 0x1d, 0xf1, 0x30, 0x0b,
+	0x37, 0x68, 0xc2, 0x52, 0x5c, 0x43, 0xe5, 0x54, 0x84, 0x6e, 0x0b, 0x10, 0x8a, 0x2e, 0x42, 0xb0,
+	0x4b, 0xd2, 0x88, 0x3c, 0xba, 0x2d, 0x8c, 0xc7, 0x41, 0x9c, 0xaa, 0xc0, 0xac, 0x1f, 0x11, 0x5a,
+	0x2a, 0x64, 0x23, 0x7c, 0x21, 0x33, 0x42, 0x45, 0x3f, 0x86, 0xcb, 0x91, 0xfd, 0x8b, 0x53, 0x61,
+	0xb9, 0x29, 0x80, 0x25, 0x50, 0x19, 0x7c, 0x08, 0xf3, 0x21, 0x47, 0xcf, 0x68, 0xeb, 0xfa, 0x67,
+	0x69, 0x98, 0xa8, 0x5a, 0xac, 0x02, 0x40, 0x0f, 0x60, 0xd2, 0x47, 0xbd, 0xa3, 0xa5, 0x38, 0x46,
+	0x3e, 0x17, 0xe4, 0xb8, 0xd1, 0xb7, 0x00, 0x2a, 0x3d, 0x3a, 0x2b, 0xb6, 0xf8, 0x08, 0x89, 0x6e,
+	0x42, 0x86, 0x67, 0xd6, 0x85, 0x6f, 0xce, 0x52, 0x04, 0x67, 0xe8, 0x41, 0xf3, 0x00, 0x26, 0x7d,
+	0xb4, 0xad, 0xe7, 0x40, 0x14, 0x9b, 0x1b, 0xb6, 0x62, 0x03, 0x26, 0xe9, 0x03, 0xd3, 0x8f, 0x0f,
+	0xa2, 0xf3, 0xff, 0x1e, 0x09, 0xa4, 0x20, 0xa3, 0x88, 0x64, 0x2e, 0xef, 0x04, 0x74, 0xa3, 0x50,
+	0xe5, 0x73, 0x1a, 0x52, 0x21, 0x8e, 0x34, 0xd6, 0xbe, 0x9b, 0x7d, 0xd1, 0xab, 0xe8, 0x99, 0x1b,
+	0x4e, 0x21, 0x8b, 0x6f, 0xfa, 0xf3, 0x6a, 0x50, 0xa3, 0x37, 0x60, 0x26, 0x44, 0x6e, 0x22, 0x01,
+	0x59, 0x28, 0x54, 0xf2, 0x7d, 0xfa, 0x79, 0x1e, 0x60, 0x23, 0x63, 0xfd, 0xbe, 0x1e, 0xe5, 0x77,
+	0x90, 0xc6, 0xdc, 0x81, 0xb9, 0x28, 0x2e, 0xd2, 0x7b, 0xfd, 0x63, 0x98, 0x4a, 0xa1, 0xb1, 0xcf,
+	0x60, 0x3e, 0x9a, 0x52, 0xf4, 0xa0, 0x8c, 0xa5, 0x1c, 0x85, 0x8a, 0x3f, 0xa1, 0x1f, 0x0a, 0x51,
+	0x34, 0x60, 0x2c, 0x14, 0x2b, 0x11, 0x50, 0x44, 0x5f, 0xb2, 0x0a, 0xcc, 0x84, 0x28, 0xc0, 0x58,
+	0xd5, 0xd7, 0x22, 0x54, 0x07, 0x98, 0xc3, 0x17, 0xb0, 0x20, 0xa4, 0xfd, 0xbc, 0x77, 0xfe, 0x34,
+	0x66, 0x50, 0x08, 0xca, 0x43, 0x98, 0xf6, 0xd0, 0xa4, 0x17, 0xe0, 0x5c, 0xc0, 0xe0, 0xf8, 0x8b,
+	0xda, 0xef, 0x33, 0xbb, 0xa4, 0x07, 0xf5, 0x39, 0x70, 0x39, 0x97, 0x01, 0xf9, 0x1c, 0x3a, 0x83,
+	0x5d, 0xeb, 0x6f, 0x92, 0x90, 0xaa, 0x5a, 0xf4, 0xab, 0x10, 0x6d, 0x40, 0x86, 0xa7, 0xf4, 0xd0,
+	0xa2, 0xff, 0x4a, 0xf6, 0xb1, 0x4d, 0x42, 0x4f, 0xef, 0xc2, 0x44, 0xc5, 0x65, 0x43, 0x90, 0xf8,
+	0x63, 0x37, 0x17, 0x20, 0xb9, 0x50, 0x19, 0xd2, 0x1c, 0x39, 0x26, 0xbc, 0x94, 0x17, 0x79, 0x5c,
+	0x82, 0x4c, 0xda, 0x06, 0x64, 0x78, 0x62, 0xcc, 0x73, 0x20, 0x82, 0x2e, 0x13, 0x3a, 0x50, 0x82,
+	0x0c, 0xbd, 0x98, 0x4f, 0xf7, 0x41, 0xa4, 0xe2, 0x31, 0xb9, 0x8e, 0xfc, 0x34, 0x94, 0xf7, 0x2d,
+	0x22, 0x62, 0xa8, 0x62, 0xca, 0x85, 0x29, 0x3f, 0xc1, 0x84, 0xae, 0x86, 0x74, 0xf1, 0xc4, 0x53,
+	0x4c, 0x35, 0x7c, 0x39, 0x92, 0x27, 0xe2, 0x8a, 0xc0, 0x18, 0x1a, 0x49, 0xa8, 0xf6, 0x05, 0x5c,
+	0x11, 0xb0, 0x3b, 0x71, 0xe0, 0xdd, 0x0a, 0x9f, 0x64, 0xf4, 0x7d, 0xf1, 0x43, 0xc8, 0x8a, 0x68,
+	0x1d, 0x74, 0xcb, 0x9f, 0xda, 0x83, 0xdb, 0x7e, 0x1f, 0xa6, 0x7a, 0x3e, 0xd3, 0x04, 0x0a, 0x30,
+	0x6d, 0xf1, 0x79, 0xbd, 0x4d, 0xbf, 0x61, 0x79, 0x5a, 0x25, 0xce, 0xe7, 0x42, 0xd8, 0xe7, 0x40,
+	0x52, 0xbf, 0x0f, 0x33, 0xbc, 0x2b, 0x83, 0x9b, 0x54, 0xae, 0xfc, 0xed, 0x9f, 0xcb, 0x6f, 0xfd,
+	0xbc, 0xbb, 0x2c, 0xbd, 0xee, 0x2e, 0x4b, 0x6f, 0xba, 0xcb, 0xd2, 0x3f, 0xba, 0xcb, 0xd2, 0xbf,
+	0xba, 0xcb, 0x6f, 0xfd, 0xbb, 0xbb, 0x2c, 0x3d, 0x5f, 0xed, 0xeb, 0x7f, 0xd4, 0xec, 0x96, 0xb1,
+	0xbf, 0x9f, 0x20, 0x8a, 0xdf, 0xf9, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x15, 0xd6, 0x82, 0x48,
+	0x04, 0x2f, 0x00, 0x00,
 }

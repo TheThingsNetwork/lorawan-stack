@@ -48,28 +48,12 @@ message ApplicationAPIKeyIdentifiers {
   string key_name = 2;
 }
 
-// ApplicationCollaboratorIdentifiers is the message that is used to identify
-// a collaborator within an application.
-message ApplicationCollaboratorIdentifiers {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // user_id is the ID of the user.
-  string user_id = 2 [(gogoproto.customname) = "UserID"];
-}
-
 // GatewayIdentifiers is the message that is used to identify a gateway.
 message GatewayIdentifiers {
   // TTN Gateway ID.
   string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
   // TTN Tenant ID (in case of multi-tenant network stack).
   string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
-}
-
-// GatewayCollaboratorIdentifiers is the message that is used to identify a
-// collaborator within a gateway.
-message GatewayCollaboratorIdentifiers {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // user_id is the ID of the user.
-  string user_id = 2 [(gogoproto.customname) = "UserID"];
 }
 
 // EndDeviceIdentifiers message is carried with uplink and downlink messages.
@@ -96,12 +80,4 @@ message ClientIdentifiers {
   string client_id = 1 [(gogoproto.customname) = "ClientID"];
   // TTN Tenant ID (in case of multi-tenant network stack).
   string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
-}
-
-// ClientCollaboratorIdentifiers is the message used to identify a collaborator
-// within a client.
-message ClientCollaboratorIdentifiers {
-  ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // user_id is the ID of the user.
-  string user_id = 2 [(gogoproto.customname) = "UserID"];
 }

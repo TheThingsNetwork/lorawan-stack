@@ -11,6 +11,7 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/application.proto
 	github.com/TheThingsNetwork/ttn/api/applicationserver.proto
 	github.com/TheThingsNetwork/ttn/api/client.proto
+	github.com/TheThingsNetwork/ttn/api/collaborator.proto
 	github.com/TheThingsNetwork/ttn/api/end_device.proto
 	github.com/TheThingsNetwork/ttn/api/gateway.proto
 	github.com/TheThingsNetwork/ttn/api/gatewayserver.proto
@@ -33,6 +34,7 @@ It has these top-level messages:
 	ApplicationDownlinks
 	DownlinkQueueRequest
 	Client
+	Collaborator
 	KeyEnvelope
 	RootKeys
 	SessionKeys
@@ -57,12 +59,9 @@ It has these top-level messages:
 	UserEmailIdentifiers
 	ApplicationIdentifiers
 	ApplicationAPIKeyIdentifiers
-	ApplicationCollaboratorIdentifiers
 	GatewayIdentifiers
-	GatewayCollaboratorIdentifiers
 	EndDeviceIdentifiers
 	ClientIdentifiers
-	ClientCollaboratorIdentifiers
 	CreateUserRequest
 	UpdateUserRequest
 	UpdateUserPasswordRequest
@@ -75,8 +74,9 @@ It has these top-level messages:
 	RemoveApplicationAppEUIRequest
 	GenerateApplicationAPIKeyRequest
 	ListApplicationAPIKeysResponse
-	ApplicationCollaborator
+	AddApplicationCollaboratorRequest
 	ListApplicationCollaboratorsResponse
+	RemoveApplicationCollaboratorRequest
 	ApplicationRight
 	ListApplicationRightsResponse
 	CreateGatewayRequest
@@ -88,9 +88,10 @@ It has these top-level messages:
 	SetGatewayAntennaRequest
 	ListGatewayAntennasResponse
 	RemoveGatewayAntennaRequest
-	GatewayCollaborator
+	AddGatewayCollaboratorRequest
 	ListGatewayCollaboratorsResponse
 	ListGatewayOwnersResponse
+	RemoveGatewayCollaboratorRequest
 	GatewayRight
 	ListGatewayRightsResponse
 	CreateClientRequest
@@ -98,8 +99,9 @@ It has these top-level messages:
 	UpdateClientRequest
 	SetClientOfficialRequest
 	SetClientStateRequest
-	ClientCollaborator
+	AddClientCollaboratorRequest
 	ListClientCollaboratorsResponse
+	RemoveClientCollaboratorRequest
 	ClientRight
 	ListClientRightsResponse
 	JoinRequest
