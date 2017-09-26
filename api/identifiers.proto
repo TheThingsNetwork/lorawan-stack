@@ -8,6 +8,8 @@ package ttn.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
+// UserIdentifiers is the message that is used to identify an user both by ID or
+// by email. user_id will have priority over email in case both of them are set.
 message UserIdentifiers {
   // user_id is the ID of the user.
   string user_id = 1 [(gogoproto.customname) = "UserID"];
@@ -17,42 +19,54 @@ message UserIdentifiers {
   string tenant_id = 3 [(gogoproto.customname) = "TenantID"];
 }
 
-message ApplicationIdentifiers {
+// ApplicationIdentifier is the message that is used to identify an application.
+message ApplicationIdentifier {
   // TTN Application ID.
   string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
   // TTN Tenant ID (in case of multi-tenant network stack).
   string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
 }
 
-message ApplicationAPIKeyIdentifiers {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // key_name is the API key name.
+// ApplicationAPIKeyIdentifier is the message that is used to identity an
+// application API key.
+message ApplicationAPIKeyIdentifier {
+  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // key_name is the application API key name.
   string key_name = 2;
 }
 
+// ApplicationCollaboratorIdentifiers is the message that is used to identify
+// a collaborator within an application. user_id will have priority over email
+// in case both of them are set.
 message ApplicationCollaboratorIdentifiers {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // user_id is the ID of the user.
   string user_id = 2 [(gogoproto.customname) = "UserID"];
   // email address of the user.
   string email = 3;
 }
 
-message GatewayIdentifiers {
+// GatewayIdentifier is the message that is used to identify a gateway.
+message GatewayIdentifier {
   // TTN Gateway ID.
   string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
   // TTN Tenant ID (in case of multi-tenant network stack).
   string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
 }
 
-message GatewayAntennaIdentifiers {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // Indexed position of the antenna in the list.
-  string antenna_index = 2;
+// GatewayAntennaIdentifier is the message that is used to identify a antenna
+// within a gateway.
+message GatewayAntennaIdentifier {
+  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // antenna_id is an auto-generated, unique and immutable id for the antenna.
+  string antenna_id = 2;
 }
 
+// GatewayCollaboratorIdentifiers is the message that is used to identify a
+// collaborator within a gateway. user_id will have priority over email
+// in case both of them are set.
 message GatewayCollaboratorIdentifiers {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // user_id is the ID of the user.
   string user_id = 2 [(gogoproto.customname) = "UserID"];
   // email address of the user.
@@ -77,15 +91,19 @@ message EndDeviceIdentifiers {
   bytes dev_addr = 6 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
 }
 
-message ClientIdentifiers {
+// ClientIdentifier is the message that is used to identify a client.
+message ClientIdentifier {
   // TTN Client ID.
   string client_id = 1 [(gogoproto.customname) = "ClientID"];
   // TTN Tenant ID (in case of multi-tenant network stack).
   string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
 }
 
+// ClientCollaboratorIdentifiers is the message used to identify a collaborator
+// within a client. user_id will have priority over email in case both of them
+// are set.
 message ClientCollaboratorIdentifiers {
-  ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ClientIdentifier client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // user_id is the ID of the user.
   string user_id = 2 [(gogoproto.customname) = "UserID"];
   // email address of the user.

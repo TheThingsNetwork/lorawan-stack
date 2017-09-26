@@ -15,7 +15,7 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // Gateway is the message that defines a gateway on the network.
 message Gateway {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the gateway.
   string description = 2;
@@ -58,7 +58,7 @@ message Gateway {
 }
 
 // GatewayPrivacySettings is the message that defines the different privacy settings
-// of the gateway such as if the owner information or location are public.
+// of the gateway such as if the owner information or gateway location are public.
 message GatewayPrivacySettings {
   // status_public denotes whether or not the gateway's status is public or not.
   bool status_public = 1;
@@ -72,20 +72,22 @@ message GatewayPrivacySettings {
 
 // GatewayAntenna is the message that defines a gateway antenna.
 message GatewayAntenna {
-  // antenna_gain is the antenna gain relative to this gateway, in dBi
-  float antenna_gain = 1;
+  GatewayAntennaIdentifier antenna = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // gain is the antenna gain relative to this gateway, in dBi.
+  float gain = 2;
 
   // location is the antenna's location.
-  Location location = 2 [(gogoproto.nullable) = false];
+  Location location = 3 [(gogoproto.nullable) = false];
 
   // type denotes the antenna's type.
-  string type = 3;
+  string type = 4;
 
   // model denotes the antenna's model.
-  string model = 4;
+  string model = 5;
 
   // placement denotes whether if the antenna is placed indoors or outdoors.
-  GatewayAntennaPlacement placement = 5;
+  GatewayAntennaPlacement placement = 6;
 }
 
 // GatewayAntennaPlacement enum defines whether if the gateway antenna is placed

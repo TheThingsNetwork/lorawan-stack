@@ -54,14 +54,14 @@ It has these top-level messages:
 	FrequencyPlan
 	FrequencyPlanRequest
 	UserIdentifiers
-	ApplicationIdentifiers
-	ApplicationAPIKeyIdentifiers
+	ApplicationIdentifier
+	ApplicationAPIKeyIdentifier
 	ApplicationCollaboratorIdentifiers
-	GatewayIdentifiers
-	GatewayAntennaIdentifiers
+	GatewayIdentifier
+	GatewayAntennaIdentifier
 	GatewayCollaboratorIdentifiers
 	EndDeviceIdentifiers
-	ClientIdentifiers
+	ClientIdentifier
 	ClientCollaboratorIdentifiers
 	CreateUserRequest
 	UpdateUserRequest
