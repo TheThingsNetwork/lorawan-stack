@@ -9,13 +9,13 @@ const (
 
 type storeFetchingConfiguration string
 
-// RetrieveWebStoreOption is an option applied when creating the store.
-type RetrieveWebStoreOption func(*storeFetchingConfiguration)
+// RetrieveHTTPStoreOption is an option applied when creating the store.
+type RetrieveHTTPStoreOption func(*storeFetchingConfiguration)
 
 // BaseURIOption returns an option allowing to change the base URI to retrieve the frequency plans from. When this option is not used, the URI `https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/yaml-master` is used.
 //
 // Frequency plans are then retrieved from the `<base>/frequency-plans.yml` file, then from the `<base>/<file path>` files.
-func BaseURIOption(baseURI string) RetrieveWebStoreOption {
+func BaseURIOption(baseURI string) RetrieveHTTPStoreOption {
 	return func(config *storeFetchingConfiguration) {
 		*config = storeFetchingConfiguration(baseURI)
 	}
