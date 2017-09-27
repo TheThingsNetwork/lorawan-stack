@@ -18,6 +18,8 @@ import (
 	redis "gopkg.in/redis.v5"
 )
 
+const recursionLimit = 10
+
 // Store represents a Redis store.Interface implemntation
 type Store struct {
 	Redis     *redis.Client
@@ -63,15 +65,8 @@ func base(str string) string {
 
 // Create stores generates an ULID and stores fields under a key associated with it.
 func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
-	var (
-		id    = ulid.MustNew(ulid.Now(), s.entropy)
-		idStr = id.String()
-
-		key = s.key(idStr)
-
-		fieldsSet = make(map[string]string, len(fields))
-		idxAdd    = make([]string, 0, len(fields))
-	)
+	fieldsSet := make(map[string]string, len(fields))
+	idxAdd := make([]string, 0, len(fields))
 	for k, v := range fields {
 		str := string(v)
 		fieldsSet[k] = str
@@ -80,6 +75,12 @@ func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 		}
 	}
 
+	id := ulid.MustNew(ulid.Now(), s.entropy)
+	idStr := id.String()
+	key := s.key(idStr)
+
+	// recursion levels
+	var n int
 	var create func() error
 	create = func() error {
 		err := s.Redis.Watch(func(tx *redis.Tx) error {
@@ -99,7 +100,7 @@ func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 			})
 			return err
 		}, key)
-		if err == redis.TxFailedErr {
+		if n != recursionLimit && err == redis.TxFailedErr {
 			return create()
 		}
 		return err
@@ -109,12 +110,12 @@ func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 
 // Delete deletes the fields stored under the key associated with id.
 func (s *Store) Delete(id store.PrimaryKey) (err error) {
-	var (
-		idStr = id.String()
-		key   = s.key(idStr)
+	idStr := id.String()
+	key := s.key(idStr)
 
-		del func() error
-	)
+	// recursion levels
+	var n int
+	var del func() error
 	del = func() error {
 		err = s.Redis.Watch(func(tx *redis.Tx) error {
 			var idxCurrent []interface{}
@@ -135,7 +136,7 @@ func (s *Store) Delete(id store.PrimaryKey) (err error) {
 			})
 			return err
 		}, key)
-		if err == redis.TxFailedErr {
+		if n != recursionLimit && err == redis.TxFailedErr {
 			return del()
 		}
 		return err
@@ -145,16 +146,11 @@ func (s *Store) Delete(id store.PrimaryKey) (err error) {
 
 // Update overwrites field values stored under PrimaryKey specified with values in diff and rebinds indexed keys present in diff.
 func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) {
-	var (
-		idStr = id.String()
+	idxDel := make([]string, 0, len(diff))
+	idxAdd := make([]string, 0, len(diff))
+	fieldsDel := make([]string, 0, len(diff))
+	fieldsSet := make(map[string]string, len(diff))
 
-		key = s.key(idStr)
-
-		idxDel    = make([]string, 0, len(diff))
-		idxAdd    = make([]string, 0, len(diff))
-		fieldsDel = make([]string, 0, len(diff))
-		fieldsSet = make(map[string]string, len(diff))
-	)
 	for k, v := range diff {
 		_, isIndex := s.indexKeys[k]
 		if isIndex {
@@ -173,6 +169,11 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) 
 		}
 	}
 
+	idStr := id.String()
+	key := s.key(idStr)
+
+	// recursion levels
+	var n int
 	var update func() error
 	update = func() error {
 		err = s.Redis.Watch(func(tx *redis.Tx) error {
@@ -200,7 +201,7 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) 
 			})
 			return err
 		}, key)
-		if err == redis.TxFailedErr {
+		if n != recursionLimit && err == redis.TxFailedErr {
 			return update()
 		}
 		return err
@@ -255,6 +256,8 @@ func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[s
 		}
 	}
 
+	// recursion levels
+	var n int
 	var find func() error
 	find = func() error {
 		err := s.Redis.Watch(func(tx *redis.Tx) error {
@@ -311,7 +314,7 @@ func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[s
 			}
 			return nil
 		}, keyFilter...)
-		if err == redis.TxFailedErr {
+		if n != recursionLimit && err == redis.TxFailedErr {
 			return find()
 		}
 		return err
