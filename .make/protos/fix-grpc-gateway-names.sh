@@ -41,7 +41,9 @@ IFS=${IFS_BAK}
 
 if [[ ${#sedArgs[@]} != 0 ]]; then
   for f in ${genPaths[@]}; do
-    cat $f | sed ${sedArgs[*]} > $f
+    tmp=`mktemp`
+    sed ${sedArgs[*]} ${f} > ${tmp}
+    mv ${tmp} ${f}
   done
 fi
 exit 0
