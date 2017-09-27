@@ -10,6 +10,7 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/_api.proto
 	github.com/TheThingsNetwork/ttn/api/application.proto
 	github.com/TheThingsNetwork/ttn/api/applicationserver.proto
+	github.com/TheThingsNetwork/ttn/api/auth.proto
 	github.com/TheThingsNetwork/ttn/api/client.proto
 	github.com/TheThingsNetwork/ttn/api/collaborator.proto
 	github.com/TheThingsNetwork/ttn/api/end_device.proto
@@ -34,6 +35,7 @@ It has these top-level messages:
 	ApplicationDownlink
 	ApplicationDownlinks
 	DownlinkQueueRequest
+	Scope
 	Client
 	Collaborator
 	KeyEnvelope
