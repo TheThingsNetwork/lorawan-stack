@@ -133,3 +133,7 @@ func (k *Keys) RotateFromFile(kid string, filename string) error {
 
 	return k.RotateFromPEM(kid, content)
 }
+
+func (k *Keys) Get(_ string, kid string) (crypto.PublicKey, error) {
+	return k.GetPublicKey(kid)
+}

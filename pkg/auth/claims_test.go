@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -23,20 +24,22 @@ func TestClaims(t *testing.T) {
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Unix() + 1800,
 			IssuedAt:  time.Now().Unix() - 1800,
+			Subject:   "john-doe",
 			Issuer:    "account.thethingsnetwork.org",
 		},
-		Subject: ApplicationSubject("foo"),
-		Scope: []Scope{
-			ApplicationInfo,
-			ApplicationTrafficRead,
-		},
+		Scope: ttnpb.ApplicationScope(
+			"foo",
+			ttnpb.RIGHT_APPLICATION_INFO,
+			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		),
 	}
 
 	a.So(claims.Valid(), should.BeNil)
-	a.So(claims.HasScope(ApplicationInfo), should.BeTrue)
-	a.So(claims.HasScope(ApplicationSettingsBasic), should.BeFalse)
-	a.So(claims.HasScope(ApplicationInfo, ApplicationTrafficRead), should.BeTrue)
-	a.So(claims.HasScope(ApplicationInfo, ApplicationDelete), should.BeFalse)
+	a.So(claims.ApplicationID(), should.Equal, "foo")
+	a.So(claims.HasRights(ttnpb.RIGHT_APPLICATION_INFO), should.BeTrue)
+	a.So(claims.HasRights(ttnpb.RIGHT_APPLICATION_DEVICES_WRITE), should.BeFalse)
+	a.So(claims.HasRights(ttnpb.RIGHT_APPLICATION_INFO, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ), should.BeTrue)
+	a.So(claims.HasRights(ttnpb.RIGHT_APPLICATION_INFO, ttnpb.RIGHT_APPLICATION_DELETE), should.BeFalse)
 }
 
 func TestSign(t *testing.T) {
@@ -46,13 +49,14 @@ func TestSign(t *testing.T) {
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Unix() + 1800,
 			IssuedAt:  time.Now().Unix() - 1800,
+			Subject:   "john-doe",
 			Issuer:    "account.thethingsnetwork.org",
 		},
-		Subject: ApplicationSubject("foo"),
-		Scope: []Scope{
-			ApplicationInfo,
-			ApplicationTrafficRead,
-		},
+		Scope: ttnpb.ApplicationScope(
+			"foo",
+			ttnpb.RIGHT_APPLICATION_INFO,
+			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		),
 	}
 
 	// ECDSA512

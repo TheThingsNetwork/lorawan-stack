@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
@@ -22,52 +23,32 @@ var (
 type Claims struct {
 	jwt.StandardClaims
 
-	// Subject denotes the entity this token is for. This can be an application, a gateway or a user,
-	// which are prefixed by the application:, gateway: or user: respectively.
-	Subject Subject `json:"sub"`
+	// Client is the client this token was created for.
+	Client string `json:"cid,omitempty"`
 
 	// Scope is the list of actions this token has access to.
-	Scope []Scope `json:"scope"`
-
-	// Username is the username of the user that created this token.
-	Username string `json:"username,omitempty"`
+	Scope ttnpb.Scope `json:"scope"`
 }
 
-// Application returns the application ID  of the application this token is for, or the empty string if it is not for an application.
-func (c *Claims) Application() string {
-	return c.Subject.Application()
+// Username returns the username of the user this token is for, or the empty string if it is not for a user.
+func (c *Claims) Username() string {
+	return c.Scope.Username()
 }
 
-// Gateway returns the gateway ID  of the gateway this token is for, or the empty string if it is not for a gateway.
-func (c *Claims) Gateway() string {
-	return c.Subject.Gateway()
+// ApplicationID returns the application ID  of the application this token is for, or the empty string if it is not for an application.
+func (c *Claims) ApplicationID() string {
+	return c.Scope.ApplicationID()
 }
 
-// User returns the username of the user this token is for, or the empty string if it is not for a user.
-func (c *Claims) User() string {
-	return c.Subject.User()
+// GatewayID returns the gateway ID  of the gateway this token is for, or the empty string if it is not for a gateway.
+func (c *Claims) GatewayID() string {
+	return c.Scope.GatewayID()
 }
 
-// hasScope checks wether or not the scope is included in this token.
-func (c *Claims) hasScope(scope Scope) bool {
-	for _, s := range c.Scope {
-		if s == scope {
-			return true
-		}
-	}
-
-	return false
-}
-
-// HasScope checks wether or not the provided scope is included in this token. It will only return true if all the provided scopes are
-// included in the token.
-func (c *Claims) HasScope(scopes ...Scope) bool {
-	ok := true
-	for _, scope := range scopes {
-		ok = ok && c.hasScope(scope)
-	}
-
-	return ok
+// HasRights checks wether or not the provided right is included in the tokens scope. It will only return true if all the provided rights are
+// included in the token..
+func (c *Claims) HasRights(rights ...ttnpb.Right) bool {
+	return c.Scope.HasRights(rights...)
 }
 
 // Sign signs the claims using the provided signing method and returns the corresponding JWT.
@@ -90,6 +71,7 @@ func (c *Claims) Sign(privateKey crypto.PrivateKey) (string, error) {
 	case *ecdsa.PrivateKey:
 		method = jwt.SigningMethodES512
 	default:
+		fmt.Printf("K %T\n", key)
 		return "", ErrUnsupportedSigningMethod
 	}
 

@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -124,13 +125,14 @@ pfeKo3HLUYMyS8l55ppjahjP4nG2cvuayO/VaHUIJW6VoVn5VDZ4ukM=
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Unix() + 1800,
 			IssuedAt:  time.Now().Unix() - 1800,
+			Subject:   "john-doe",
 			Issuer:    "account.thethingsnetwork.org",
 		},
-		Subject: ApplicationSubject("foo"),
-		Scope: []Scope{
-			ApplicationInfo,
-			ApplicationTrafficRead,
-		},
+		Scope: ttnpb.ApplicationScope(
+			"foo",
+			ttnpb.RIGHT_APPLICATION_INFO,
+			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		),
 	}
 
 	str, err := k.Sign(claims)
