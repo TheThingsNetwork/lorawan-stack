@@ -14,6 +14,10 @@ type PrivateKeyWithKID struct {
 
 // WithKID returns a crypto.PrivateKeyWithKID that explicitly has the KID set.
 func WithKID(key crypto.PrivateKey, kid string) *PrivateKeyWithKID {
+	if k, ok := key.(*PrivateKeyWithKID); ok {
+		return WithKID(k.PrivateKey, kid)
+	}
+
 	return &PrivateKeyWithKID{
 		PrivateKey: key,
 		KID:        kid,
