@@ -795,7 +795,7 @@ func (m *RemoveGatewayCollaboratorRequest) GetUserID() string {
 
 type GatewayRight struct {
 	GatewayIdentifiers `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
-	// user_id is the user's ID to be removed as collaborator.
+	// user_id is the user's ID.
 	UserID string `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	// right is the right this user holds for the gateway.
 	Right Right `protobuf:"varint,3,opt,name=right,proto3,enum=ttn.v3.Right" json:"right,omitempty"`
@@ -1069,7 +1069,7 @@ func (m *RemoveClientCollaboratorRequest) GetUserID() string {
 
 type ClientRight struct {
 	ClientIdentifiers `protobuf:"bytes,1,opt,name=client,embedded=client" json:"client"`
-	// user_id is the user's ID to be removed as collaborator.
+	// user_id is the user's ID.
 	UserID string `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	// right is the right that the user holds for the client.
 	Right Right `protobuf:"varint,3,opt,name=right,proto3,enum=ttn.v3.Right" json:"right,omitempty"`

@@ -27,7 +27,7 @@ var _ = time.Kitchen
 
 // User is the message that defines an user on the network.
 type User struct {
-	// id is the user's ID.
+	// id is the user's unique and immutable ID.
 	ID string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// email is the user's email address.
 	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
@@ -37,7 +37,7 @@ type User struct {
 	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	// validated denotes if the email address has been validated.
 	Validated bool `protobuf:"varint,5,opt,name=validated,proto3" json:"validated,omitempty"`
-	// admin denotes whether or not the user has administrative rights within the tenant.
+	// admin denotes whether or not the user has administrative rights within the tenancy.
 	Admin bool `protobuf:"varint,6,opt,name=admin,proto3" json:"admin,omitempty"`
 	// created_at denotes when the user was created.
 	CreatedAt time.Time `protobuf:"bytes,7,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`

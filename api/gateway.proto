@@ -37,7 +37,7 @@ message Gateway {
   // automatically fetch and execute firmware updates.
   bool auto_update = 7 [(gogoproto.moretags) = "db:\"auto_update\""];
 
-  // platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS"
+  // platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS".
   string platform = 8;
 
   // antennas is all the antennas that the gateway has.
@@ -116,10 +116,10 @@ message GatewayConfiguration {
   string cluster_address = 3;
 
   message GatewayAntennaConfiguration {
-    // antenna_gain is the antenna gain relative to this gateway, in dBi
+    // antenna_gain is the antenna gain relative to this gateway, in dBi.
     float antenna_gain = 1;
 
-    // location is the antenna's location
+    // location is the antenna's location.
     Location location = 2 [(gogoproto.nullable) = false];
   }
   repeated GatewayAntennaConfiguration antennas = 4 [(gogoproto.nullable) = false];

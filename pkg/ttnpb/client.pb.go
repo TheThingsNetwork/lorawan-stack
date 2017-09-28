@@ -55,13 +55,13 @@ var ClientState_value = map[string]int32{
 
 func (ClientState) EnumDescriptor() ([]byte, []int) { return fileDescriptorClient, []int{0} }
 
-// Scope enum defines the different scopes a third-party client can have access to.
+// ClientScope enum defines the different scopes a third-party client can have access to.
 type ClientScope int32
 
 const (
 	// Denotes whether if the client has access to manage user's applications.
 	SCOPE_APPLICATION ClientScope = 0
-	// Denotes wheter if the client has r-w access to user's profile.
+	// Denotes whether if the client has r-w access to user's profile.
 	SCOPE_PROFILE ClientScope = 1
 )
 
@@ -76,7 +76,7 @@ var ClientScope_value = map[string]int32{
 
 func (ClientScope) EnumDescriptor() ([]byte, []int) { return fileDescriptorClient, []int{1} }
 
-// Grant enum defines the OAuth2 flows a third-party client can use to get
+// ClientGrant enum defines the OAuth2 flows a third-party client can use to get
 // access to a token.
 type ClientGrant int32
 
@@ -114,8 +114,8 @@ type Client struct {
 	CallbackURI string `protobuf:"bytes,4,opt,name=callback_uri,json=callbackUri,proto3" json:"callback_uri,omitempty" db:"callback_uri"`
 	// state denotes the reviewing state of the client by the tenant admin.
 	State ClientState `protobuf:"varint,5,opt,name=state,proto3,enum=ttn.v3.ClientState" json:"state,omitempty"`
-	// official denotes that a client has been labelled as an official third-party
-	// client by the tenant admins and therefore this fact will be shown to
+	// official denotes if a client has been labelled as an official third-party
+	// client by the tenant admin.
 	Official bool `protobuf:"varint,6,opt,name=official,proto3" json:"official,omitempty"`
 	// grants denotes which OAuth2 flows can the client use to get a token.
 	Grants []ClientGrant `protobuf:"varint,7,rep,packed,name=grants,enum=ttn.v3.ClientGrant" json:"grants,omitempty"`

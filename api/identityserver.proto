@@ -370,7 +370,7 @@ message RemoveGatewayCollaboratorRequest {
 
 message GatewayRight {
   GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // user_id is the user's ID to be removed as collaborator.
+  // user_id is the user's ID.
   string user_id = 2 [(gogoproto.customname) = "UserID"];
   // right is the right this user holds for the gateway.
   Right right = 3;
@@ -520,7 +520,7 @@ message RemoveClientCollaboratorRequest {
 
 message ClientRight {
   ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // user_id is the user's ID to be removed as collaborator.
+  // user_id is the user's ID.
   string user_id = 2 [(gogoproto.customname) = "UserID"];
   // right is the right that the user holds for the client.
   Right right = 3;

@@ -26,8 +26,8 @@ message Client {
   // state denotes the reviewing state of the client by the tenant admin.
   ClientState state = 5;
 
-  // official denotes that a client has been labelled as an official third-party
-  // client by the tenant admins and therefore this fact will be shown to
+  // official denotes if a client has been labelled as an official third-party
+  // client by the tenant admin.
   bool official = 6;
 
   // grants denotes which OAuth2 flows can the client use to get a token.
@@ -61,18 +61,18 @@ enum ClientState {
   STATE_REJECTED = 2;
 }
 
-// Scope enum defines the different scopes a third-party client can have access to.
+// ClientScope enum defines the different scopes a third-party client can have access to.
 enum ClientScope {
   option (gogoproto.goproto_enum_prefix) = false;
 
   // Denotes whether if the client has access to manage user's applications.
   SCOPE_APPLICATION = 0;
 
-  // Denotes wheter if the client has r-w access to user's profile.
+  // Denotes whether if the client has r-w access to user's profile.
   SCOPE_PROFILE = 1;
 }
 
-// Grant enum defines the OAuth2 flows a third-party client can use to get
+// ClientGrant enum defines the OAuth2 flows a third-party client can use to get
 // access to a token.
 enum ClientGrant {
   option (gogoproto.goproto_enum_prefix) = false;

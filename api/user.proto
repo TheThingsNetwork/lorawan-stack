@@ -13,7 +13,7 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // User is the message that defines an user on the network.
 message User {
-  // id is the user's ID.
+  // id is the user's unique and immutable ID.
   string id = 1 [(gogoproto.customname) = "ID"];
 
   // email is the user's email address.
@@ -28,7 +28,7 @@ message User {
   // validated denotes if the email address has been validated.
   bool validated = 5;
 
-  // admin denotes whether or not the user has administrative rights within the tenant.
+  // admin denotes whether or not the user has administrative rights within the tenancy.
   bool admin = 6;
 
   // created_at denotes when the user was created.

@@ -18,6 +18,7 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
+// Collaborator is the message to define a collaborator of an entity on the network.
 type Collaborator struct {
 	// user_id is the ID of the user.
 	UserID string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`

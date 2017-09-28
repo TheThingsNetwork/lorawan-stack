@@ -9,6 +9,7 @@ import "github.com/TheThingsNetwork/ttn/api/rights.proto";
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
+// Collaborator is the message to define a collaborator of an entity on the network.
 message Collaborator {
   // user_id is the ID of the user.
   string user_id = 1 [(gogoproto.customname) = "UserID"];
