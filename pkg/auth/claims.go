@@ -52,7 +52,8 @@ func (c *Claims) HasRights(rights ...ttnpb.Right) bool {
 }
 
 // Sign signs the claims using the provided signing method and returns the corresponding JWT.
-// The signing method is determined from the type of the private key provided. Currently ECDSA and RSA are supported.
+// The signing method is determined from the type of the private key provided.
+// Currently ECDSA and RSA are supported.
 func (c *Claims) Sign(privateKey crypto.PrivateKey) (string, error) {
 	var method jwt.SigningMethod
 
@@ -71,14 +72,11 @@ func (c *Claims) Sign(privateKey crypto.PrivateKey) (string, error) {
 	case *ecdsa.PrivateKey:
 		method = jwt.SigningMethodES512
 	default:
-		fmt.Printf("K %T\n", key)
 		return "", ErrUnsupportedSigningMethod
 	}
 
 	builder := jwt.NewWithClaims(method, c)
-	if kid != "" {
-		builder.Header["kid"] = kid
-	}
+	builder.Header["kid"] = kid
 
 	token, err := builder.SignedString(key)
 	if err != nil {
