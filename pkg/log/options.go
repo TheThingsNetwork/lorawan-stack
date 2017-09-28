@@ -8,6 +8,9 @@ type Option func(*Logger) error
 // WithHandler sets the handler on the logger.
 func WithHandler(handler Handler) Option {
 	return func(logger *Logger) error {
+		logger.mutex.Lock()
+		defer logger.mutex.Unlock()
+
 		if handler != nil {
 			logger.Handler = handler
 		}

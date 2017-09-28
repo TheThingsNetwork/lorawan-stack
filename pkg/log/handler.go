@@ -17,3 +17,11 @@ type noopHandler struct{}
 func (h *noopHandler) HandleLog(Entry) error {
 	return nil
 }
+
+// HandlerFunc is a function that implements Handler.
+type HandlerFunc func(Entry) error
+
+// HandleLog implements Handler.
+func (fn HandlerFunc) HandleLog(e Entry) error {
+	return fn(e)
+}

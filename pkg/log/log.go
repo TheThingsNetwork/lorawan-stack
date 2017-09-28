@@ -18,3 +18,12 @@ type Interface interface {
 	WithFields(Fielder) Interface
 	WithError(error) Interface
 }
+
+// Stack is the interface of loggers that have a handler stack with middleware.
+type Stack interface {
+	// Log is an Interface.
+	Interface
+
+	// Use installs the specified middleware in the middleware stack.
+	Use(Middleware)
+}

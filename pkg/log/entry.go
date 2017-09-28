@@ -4,7 +4,6 @@ package log
 
 import (
 	"fmt"
-	"os"
 	"time"
 )
 
@@ -51,20 +50,12 @@ func (e *entry) Message() string {
 
 // commit commits the log entry and passes it on to the handler.
 func (e *entry) commit(level Level, msg string) {
-	// only log the entry if it has the correct level
-	if e.logger.Handler != nil && e.logger.Level <= level {
-		e.logger.HandleLog(&entry{
-			message: msg,
-			level:   level,
-			time:    time.Now(),
-			fields:  e.fields,
-		})
-	}
-
-	// exit with fatal log level
-	if level >= FatalLevel {
-		os.Exit(1)
-	}
+	e.logger.commit(&entry{
+		message: msg,
+		level:   level,
+		time:    time.Now(),
+		fields:  e.fields,
+	})
 }
 
 // Debug implements log.Interface.

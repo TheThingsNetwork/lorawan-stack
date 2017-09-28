@@ -76,3 +76,54 @@ func TestLogger(t *testing.T) {
 		a.So(fields["bar"], should.Equal, "baz")
 	}
 }
+
+func TestMiddleware(t *testing.T) {
+	a := assertions.New(t)
+
+	rec := newRecorder()
+	logger := &Logger{
+		Level:   InfoLevel,
+		Handler: rec,
+	}
+
+	before := []int{}
+	after := []int{}
+
+	logger.Use(MiddlewareFunc(func(next Handler) Handler {
+		return HandlerFunc(func(entry Entry) error {
+			before = append(before, 1)
+			err := next.HandleLog(entry)
+			after = append(after, 1)
+
+			return err
+		})
+	}))
+
+	logger.Info("Hey!")
+
+	a.So(before, should.Resemble, []int{1})
+	a.So(after, should.Resemble, []int{1})
+
+	a.So(rec.entries, should.HaveLength, 1)
+
+	// reset
+	before = []int{}
+	after = []int{}
+
+	logger.Use(MiddlewareFunc(func(next Handler) Handler {
+		return HandlerFunc(func(entry Entry) error {
+			before = append(before, 2)
+			err := next.HandleLog(entry)
+			after = append(after, 2)
+
+			return err
+		})
+	}))
+
+	logger.Info("Hey!")
+
+	a.So(before, should.Resemble, []int{1, 2})
+	a.So(after, should.Resemble, []int{2, 1})
+
+	a.So(rec.entries, should.HaveLength, 2)
+}

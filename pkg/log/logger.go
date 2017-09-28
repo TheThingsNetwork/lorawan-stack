@@ -5,6 +5,7 @@ package log
 import (
 	"fmt"
 	"os"
+	"sync"
 )
 
 var defaultOptions = []Option{
@@ -13,7 +14,7 @@ var defaultOptions = []Option{
 }
 
 // NewLogger creates a new logger with the default options.
-func NewLogger(opts ...Option) (Interface, error) {
+func NewLogger(opts ...Option) (*Logger, error) {
 	logger := &Logger{}
 
 	for _, opt := range append(defaultOptions, opts...) {
@@ -27,8 +28,38 @@ func NewLogger(opts ...Option) (Interface, error) {
 
 // Logger implements Interface.
 type Logger struct {
-	Handler
-	Level Level
+	mutex      sync.Mutex
+	Level      Level
+	Handler    Handler
+	middleware []Middleware
+	stack      Handler
+}
+
+// Use installs the handler middleware.
+func (l *Logger) Use(middleware Middleware) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
+	l.middleware = append(l.middleware, middleware)
+
+	handler := l.Handler
+	for i := len(l.middleware) - 1; i >= 0; i-- {
+		handler = l.middleware[i].Wrap(handler)
+	}
+
+	l.stack = handler
+}
+
+// commit comits the entry to the handler.
+func (l *Logger) commit(e *entry) {
+	handler := l.stack
+	if handler == nil {
+		handler = l.Handler
+	}
+
+	if handler != nil && l.Level <= e.level {
+		handler.HandleLog(e)
+	}
 }
 
 // Debug implements log.Interface.
