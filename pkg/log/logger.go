@@ -28,7 +28,7 @@ func NewLogger(opts ...Option) (*Logger, error) {
 
 // Logger implements Interface.
 type Logger struct {
-	mutex      sync.Mutex
+	mutex      sync.RWMutex
 	Level      Level
 	Handler    Handler
 	middleware []Middleware
@@ -42,7 +42,14 @@ func (l *Logger) Use(middleware Middleware) {
 
 	l.middleware = append(l.middleware, middleware)
 
-	handler := l.Handler
+	// the first handler uses the base handler from the logger
+	// we need to wrap this is a function so the base handler can be
+	// changed afterwards.
+	var handler Handler
+	handler = HandlerFunc(func(entry Entry) error {
+		return l.Handler.HandleLog(entry)
+	})
+
 	for i := len(l.middleware) - 1; i >= 0; i-- {
 		handler = l.middleware[i].Wrap(handler)
 	}
@@ -58,6 +65,8 @@ func (l *Logger) commit(e *entry) {
 	}
 
 	if handler != nil && l.Level <= e.level {
+		l.mutex.RLock()
+		defer l.mutex.RUnlock()
 		handler.HandleLog(e)
 	}
 }
