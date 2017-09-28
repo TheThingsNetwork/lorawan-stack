@@ -35,5 +35,5 @@ message User {
   google.protobuf.Timestamp created_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // deleted_at is the time when the user account was deleted.
-  google.protobuf.Timestamp deleted_at = 8 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp deleted_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }

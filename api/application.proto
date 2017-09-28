@@ -30,7 +30,7 @@ message Application {
   google.protobuf.Timestamp created_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // deleted_at is the time when the application was deleted.
-  google.protobuf.Timestamp deleted_at = 7 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp deleted_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 // ApplicationUp wraps multiple application-layer uplink types

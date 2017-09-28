@@ -54,7 +54,7 @@ message Gateway {
   google.protobuf.Timestamp created_at = 12 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // deleted_at is the time when the gateway was deleted.
-  google.protobuf.Timestamp deleted_at = 13 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp deleted_at = 13 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 // GatewayPrivacySettings is the message that defines the different privacy settings
