@@ -16,6 +16,7 @@ import (
 // Keys the key pairs used to sign and validate JWT tokens.
 // It holds the current key pair as well as previous ones (to allow clients to validate older tokens).
 type Keys struct {
+	issuer  string
 	keys    sync.Map
 	current string
 }
@@ -37,28 +38,24 @@ func (k *Keys) GetPublicKey(kid string) (crypto.PublicKey, error) {
 		return nil, fmt.Errorf("Could not find token key with kid `%s`", kid)
 	}
 
-	key, ok := v.(crypto.PrivateKey)
-	if !ok {
-		panic(fmt.Errorf("Expected type crypto.PrivateKey when loading the public key, but got %T", v))
+	if err := checkPrivateKey(v); err != nil {
+		panic(err)
 	}
 
-	return getPublic(key), nil
+	switch key := v.(type) {
+	case *rsa.PrivateKey:
+		return &key.PublicKey, nil
+	case *ecdsa.PrivateKey:
+		return &key.PublicKey, nil
+	}
+
+	return nil, nil
 }
 
 // GetCurrentPublicKey returns the kid and public key of the currently active keypair.
 func (k *Keys) GetCurrentPublicKey() (string, crypto.PublicKey, error) {
 	key, err := k.GetPublicKey(k.current)
 	return k.current, key, err
-}
-
-func getPublic(key crypto.PrivateKey) crypto.PublicKey {
-	switch v := key.(type) {
-	case *rsa.PrivateKey:
-		return &v.PublicKey
-	case *ecdsa.PrivateKey:
-		return &v.PublicKey
-	}
-	return nil
 }
 
 // GetPrivateKey gets the privatekey for the specified kid.
@@ -68,12 +65,11 @@ func (k *Keys) GetPrivateKey(kid string) (crypto.PrivateKey, error) {
 		return nil, fmt.Errorf("Could not find token key with kid `%s`", kid)
 	}
 
-	key, ok := v.(crypto.PrivateKey)
-	if !ok {
-		panic(fmt.Errorf("Expected type crypto.PrivateKey when loading the private key, but got %T", v))
+	if err := checkPrivateKey(v); err != nil {
+		panic(err)
 	}
 
-	return key, nil
+	return v, nil
 }
 
 // GetCurrentPrivateKey returns the kid and private key that is currently active.
@@ -134,6 +130,29 @@ func (k *Keys) RotateFromFile(kid string, filename string) error {
 	return k.RotateFromPEM(kid, content)
 }
 
-func (k *Keys) Get(_ string, kid string) (crypto.PublicKey, error) {
+// Get implements TokenKeyProvider.
+func (k *Keys) Get(iss string, kid string) (crypto.PublicKey, error) {
+	if iss != k.issuer {
+		return nil, fmt.Errorf("Could not get public key for issuer %s", iss)
+	}
+
 	return k.GetPublicKey(kid)
+}
+
+// checkPrivateKey makes sure the argument is a private key and that it is supported by this package.
+func checkPrivateKey(key crypto.PrivateKey) error {
+	switch key.(type) {
+	case *rsa.PrivateKey, *ecdsa.PrivateKey, *PrivateKeyWithKID:
+		return nil
+	}
+	return fmt.Errorf("Expected type crypto.PrivateKey when loading the private key, but got %T", key)
+}
+
+// checkPublicKey  makes sure the argument is a public key and that it is supported by the keys.
+func checkPublicKey(key crypto.PublicKey) error {
+	switch key.(type) {
+	case *rsa.PublicKey, *ecdsa.PublicKey:
+		return nil
+	}
+	return fmt.Errorf("Expected type crypto.PublicKey when loading the public key, but got %T", key)
 }

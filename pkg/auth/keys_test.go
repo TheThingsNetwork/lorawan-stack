@@ -19,7 +19,7 @@ import (
 func TestKeysRSA(t *testing.T) {
 	a := assertions.New(t)
 
-	k := &Keys{}
+	k := NewKeys("http://foo")
 
 	key, err := rsa.GenerateKey(rand.Reader, 2014)
 	a.So(err, should.BeNil)
@@ -138,4 +138,38 @@ pfeKo3HLUYMyS8l55ppjahjP4nG2cvuayO/VaHUIJW6VoVn5VDZ4ukM=
 	str, err := k.Sign(claims)
 	a.So(err, should.BeNil)
 	a.So(str, should.NotBeEmpty)
+}
+
+func TestCheck(t *testing.T) {
+	a := assertions.New(t)
+
+	// ecdsa
+	{
+		key, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
+		a.So(err, should.BeNil)
+
+		a.So(checkPrivateKey(key), should.BeNil)
+		a.So(checkPublicKey(&key.PublicKey), should.BeNil)
+
+		a.So(checkPublicKey(key), should.NotBeNil)
+		a.So(checkPrivateKey(key.PublicKey), should.NotBeNil)
+	}
+
+	// rsa
+	{
+		key, err := rsa.GenerateKey(rand.Reader, 2014)
+		a.So(err, should.BeNil)
+
+		a.So(checkPrivateKey(key), should.BeNil)
+		a.So(checkPublicKey(&key.PublicKey), should.BeNil)
+
+		a.So(checkPublicKey(key), should.NotBeNil)
+		a.So(checkPrivateKey(key.PublicKey), should.NotBeNil)
+	}
+
+	// other stuff
+	{
+		a.So(checkPublicKey("foo"), should.NotBeNil)
+		a.So(checkPrivateKey("bar"), should.NotBeNil)
+	}
 }
