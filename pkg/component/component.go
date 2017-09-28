@@ -34,7 +34,7 @@ type Component struct {
 	cancelCtx context.CancelFunc
 
 	config *Config
-	logger log.Interface
+	logger log.Stack
 
 	handler http.Handler
 	grpc    *rpcserver.Server
@@ -48,7 +48,7 @@ type Component struct {
 }
 
 // New returns a new component
-func New(logger log.Interface, config *Config) *Component {
+func New(logger log.Stack, config *Config) *Component {
 	ctx, cancel := context.WithCancel(context.Background())
 	ctx = log.WithLogger(ctx, logger)
 
@@ -71,7 +71,7 @@ func New(logger log.Interface, config *Config) *Component {
 }
 
 // Logger returns the logger of the component
-func (c *Component) Logger() log.Interface {
+func (c *Component) Logger() log.Stack {
 	return c.logger
 }
 
