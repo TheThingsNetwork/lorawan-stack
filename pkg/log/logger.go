@@ -26,7 +26,7 @@ func NewLogger(opts ...Option) (*Logger, error) {
 	return logger, nil
 }
 
-// Logger implements Interface.
+// Logger implements Stack.
 type Logger struct {
 	mutex      sync.RWMutex
 	Level      Level
