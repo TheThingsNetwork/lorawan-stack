@@ -46,15 +46,16 @@ message Gateway {
   // attributes is a free form map of attributes.
   map<string, string> attributes = 10;
 
-  // cluster_address indicates the URI of the gateway server cluster to connect to,
-  // in a "<ip>:<port>" format.
+  // cluster_address indicates the URI of the gateway server cluster to connect
+  // to, in a "<ip>:<port>" format.
   string cluster_address = 11 [(gogoproto.moretags) = "db:\"cluster_address\""];
 
   // created_at is the time when the gateway was created.
   google.protobuf.Timestamp created_at = 12 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // deleted_at is the time when the gateway was deleted.
-  google.protobuf.Timestamp deleted_at = 13 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // archived_at is the time when the gateway was archived and therefore
+  // permantly disabled.
+  google.protobuf.Timestamp archived_at = 13 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 // GatewayPrivacySettings is the message that defines the different privacy settings

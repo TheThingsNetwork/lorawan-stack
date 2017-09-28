@@ -39,8 +39,9 @@ message Client {
   // created_at denotes when the client was created.
   google.protobuf.Timestamp created_at = 9 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // deleted_at denotes when the client was deleted.
-  google.protobuf.Timestamp deleted_at = 10 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // archived_at is the time when the client was archived and therefore
+  // permantly disabled.
+  google.protobuf.Timestamp archived_at = 10 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 // ClientState enum defines all the possible tenant admin reviewing states
