@@ -25,6 +25,9 @@ messages:
 
 dev-deps: go.dev-deps
 
+dev-cert:
+	go run $$(go env GOROOT)/src/crypto/tls/generate_cert.go -ca -host localhost
+
 deps: go.deps
 
 test: go.test
