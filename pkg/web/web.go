@@ -14,6 +14,11 @@ import (
 	"github.com/labstack/echo"
 )
 
+// Registerer allows components to register their services to the web server
+type Registerer interface {
+	RegisterRoutes(s *Server)
+}
+
 type config struct {
 	// Root is the root where the router will live.
 	Root string

@@ -243,6 +243,12 @@
   revision = "9c0ea8acbc1d8ad689f9e6fe0c1fa5838e0cabc2"
 
 [[projects]]
+  name = "github.com/soheilhy/cmux"
+  packages = ["."]
+  revision = "bb79a83465015a27a175925ebd155e660f55e9f1"
+  version = "v0.1.3"
+
+[[projects]]
   branch = "master"
   name = "github.com/spf13/afero"
   packages = [".","mem"]
@@ -341,6 +347,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "da12ffa80405525c39ad7700a54a8b1d74be77316dfcd619fec6cedd6cf125fd"
+  inputs-digest = "5de54a9ebc33e9770235250595389c0668697fdc70dfbfc3f4c03c94225fbd7b"
   solver-name = "gps-cdcl"
   solver-version = 1
