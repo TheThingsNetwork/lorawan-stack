@@ -11,7 +11,6 @@ import (
 // Filtered is a log.Handler that only logs fields that match the
 // specified filters.
 type Filtered struct {
-	log.Handler
 	filter Filter
 }
 
@@ -28,25 +27,20 @@ func (fn FilterFunc) Filter(e log.Entry) bool {
 	return fn(e)
 }
 
-// Wrap returns a new filtered logger that allows all log entries to be passed.
-func Wrap(handler log.Handler, filters ...Filter) *Filtered {
-	return &Filtered{
-		Handler: handler,
-		filter:  And(filters...),
-	}
-}
-
 // SetFilters sets the filters.
 func (f *Filtered) SetFilters(filters ...Filter) {
 	f.filter = And(filters...)
 }
 
-// HandleLog implements log.Handler.
-func (f *Filtered) HandleLog(e log.Entry) error {
-	if f.filter.Filter(e) {
-		return f.Handler.HandleLog(e)
-	}
-	return nil
+// HandleLog implements log.Middleware.
+func (f *Filtered) Wrap(next log.Handler) log.Handler {
+	return log.HandlerFunc(func(entry log.Entry) error {
+		if f.filter.Filter(entry) {
+			return next.HandleLog(entry)
+		}
+
+		return nil
+	})
 }
 
 // All is a filter allows all log entries to be passed.
