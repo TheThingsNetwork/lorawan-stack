@@ -43,11 +43,19 @@ func (i *Impl) Error() string {
 		prefix = prefix + fmt.Sprintf("[%v]", i.code)
 	}
 
-	if prefix == "" {
-		return i.message
+	message := i.message
+
+	if prefix != "" {
+		message = strings.Trim(prefix, " ") + ": " + i.message
 	}
 
-	return strings.Trim(prefix, " ") + ": " + i.message
+	if i.code == NoCode && i.attributes != nil && i.attributes[causeKey] != nil {
+		if cause, ok := i.attributes[causeKey].(error); ok {
+			message += fmt.Sprintf(" (%s)", cause.Error())
+		}
+	}
+
+	return message
 }
 
 // Message returns the formatted error message
