@@ -39,7 +39,7 @@ func init() {
 		}
 
 		// set log level to correct level
-		log.WithLevel(cfg.Log.Level)(logger.(*log.Logger))
+		log.WithLevel(cfg.Log.Level)(logger)
 	})
 
 	Root.PersistentFlags().AddFlagSet(config.Flags())
