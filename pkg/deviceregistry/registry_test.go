@@ -26,7 +26,6 @@ func newPopulatedEndDevice() *ttnpb.EndDevice {
 	ed.DevAddr = types.NewPopulatedDevAddr(randy)
 	ed.ApplicationID = "test"
 	ed.DeviceID = "test"
-	ed.TenantID = "test"
 	return ed
 }
 
@@ -50,7 +49,6 @@ func TestDeviceRegistry(t *testing.T) {
 		DevAddr:       ed.DevAddr,
 		DeviceID:      ed.DeviceID,
 		ApplicationID: ed.ApplicationID,
-		TenantID:      ed.TenantID,
 	})
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
@@ -72,7 +70,6 @@ func TestDeviceRegistry(t *testing.T) {
 		DevAddr:       ed.DevAddr,
 		DeviceID:      ed.DeviceID,
 		ApplicationID: ed.ApplicationID,
-		TenantID:      ed.TenantID,
 	})
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) {
@@ -85,7 +82,6 @@ func TestDeviceRegistry(t *testing.T) {
 		DevAddr:       updated.DevAddr,
 		DeviceID:      updated.DeviceID,
 		ApplicationID: updated.ApplicationID,
-		TenantID:      updated.TenantID,
 	})
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
@@ -100,7 +96,6 @@ func TestDeviceRegistry(t *testing.T) {
 		DevAddr:       updated.DevAddr,
 		DeviceID:      updated.DeviceID,
 		ApplicationID: updated.ApplicationID,
-		TenantID:      updated.TenantID,
 	})
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) {
@@ -118,7 +113,6 @@ func ExampleRegistry() {
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			ApplicationID: "test",
 			DeviceID:      "test",
-			TenantID:      "test",
 			DevEUI:        &devEUI,
 			JoinEUI:       &joinEUI,
 			DevAddr:       &devAddr,
@@ -144,7 +138,6 @@ func ExampleRegistry() {
 
 	devs, err := r.FindDeviceByIdentifiers(&ttnpb.EndDeviceIdentifiers{
 		ApplicationID: "test",
-		TenantID:      "test",
 	})
 	if err != nil {
 		panic(fmt.Errorf("Failed to find device by identifiers %s", err))
