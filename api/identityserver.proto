@@ -20,24 +20,21 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 service GtwGr {
   // PullConfiguration sends a new GatewayConfiguration, with all the latest values,
   // at connection and when a gateway's configuration is updated.
-  rpc PullConfiguration(GatewayIdentifiers) returns (stream GatewayConfiguration);
+  rpc PullConfiguration(GatewayIdentifier) returns (stream GatewayConfiguration);
 }
 
 message CreateUserRequest {
-  // tenant_id is the TTN Tenant ID (in case of multi-tenant network stack).
-  string tenant_id = 1 [(gogoproto.customname) = "TenantID"];
-
   // user_id is the ID of the user.
-  string user_id = 2 [(gogoproto.customname) = "UserID"];
+  string user_id = 1 [(gogoproto.customname) = "UserID"];
 
   // email address of the user.
-  string email = 3;
+  string email = 2;
 
   // password is the user's unencrypted password.
-  string password = 4;
+  string password = 3;
 
   // name is the user's full name.
-  string name = 5;
+  string name = 4;
 }
 
 message UpdateUserRequest {
@@ -63,7 +60,7 @@ service IsUser {
 
   // GetUser returns the profile of an user. If the user identifier is empty it
   // returns the profile of the authenticated user.
-  rpc GetUser(UserIdentifiers) returns (User);
+  rpc GetUser(UserIdentifier) returns (User);
 
   // UpdateUser edits the profile of the authenticated user.
   rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty);
@@ -76,20 +73,17 @@ service IsUser {
 }
 
 message CreateApplicationRequest {
-  // tenant_id is the TTN Tenant ID (in case of multi-tenant network server).
-  string tenant_id = 1 [(gogoproto.customname) = "TenantID"];
-
   // application_id is the ID of the application to be created.
-  string application_id = 2 [(gogoproto.customname) = "ApplicationID"];
+  string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
 
   // description is the description of the application.
-  string description = 3;
+  string description = 2;
 
   // app_euis are the app euis this application uses.
-  repeated bytes app_euis = 4 [(gogoproto.customname) = "AppEUIs", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
+  repeated bytes app_euis = 3 [(gogoproto.customname) = "AppEUIs", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 
   // api_keys are the API keys of the application.
-  repeated APIKey api_keys = 5 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
+  repeated APIKey api_keys = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
 }
 
 message ListApplicationsResponse {
@@ -97,7 +91,7 @@ message ListApplicationsResponse {
 }
 
 message UpdateApplicationRequest {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the application.
   string description = 2;
@@ -110,7 +104,7 @@ message UpdateApplicationRequest {
 }
 
 message AddApplicationAppEUIRequest {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // app_eui is the AppEUI to be added.
   bytes app_eui = 2 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
@@ -126,14 +120,14 @@ message ListApplicationAppEUIsResponse {
 }
 
 message RemoveApplicationAppEUIRequest {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // app_eui is the AppEUI to be removed.
   bytes app_eui = 2 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 }
 
 message GenerateApplicationAPIKeyRequest {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // name is the name of the API key to be generated.
   string name = 2;
@@ -147,7 +141,7 @@ message ListApplicationAPIKeysResponse {
 }
 
 message AddApplicationCollaboratorRequest {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   Collaborator collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
@@ -157,15 +151,13 @@ message ListApplicationCollaboratorsResponse {
 }
 
 message RemoveApplicationCollaboratorRequest {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // user_id is the user's ID to be removed as collaborator.
-  string user_id = 2 [(gogoproto.customname) = "UserID"];
+  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIDIdentifier user = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message ApplicationRight {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // user_id is the user's ID.
-  string user_id = 2 [(gogoproto.customname) = "UserID"];
+  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIDIdentifier user = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // right is the right that the user holds for the application.
   Right right = 3;
 }
@@ -182,7 +174,7 @@ service IsApplication {
   rpc CreateApplication(CreateApplicationRequest) returns (google.protobuf.Empty);
 
   // GetApplication finds an application by ID and retrieves it.
-  rpc GetApplication(ApplicationIdentifiers) returns (Application);
+  rpc GetApplication(ApplicationIdentifier) returns (Application);
 
   // ListApplications returns all the applications where the authenticated user
   // is collaborator.
@@ -192,16 +184,16 @@ service IsApplication {
   rpc UpdateApplication(UpdateApplicationRequest) returns (google.protobuf.Empty);
 
   // DeleteApplication permantly deletes an application.
-  rpc DeleteApplication(ApplicationIdentifiers) returns (google.protobuf.Empty);
+  rpc DeleteApplication(ApplicationIdentifier) returns (google.protobuf.Empty);
 
   // AddApplicationAppEUI adds a given AppEUI to a given application.
   rpc AddApplicationAppEUI(AddApplicationAppEUIRequest) returns (google.protobuf.Empty);
 
   // GenerateApplicationAppEUI generates a new AppEUI for a given application and returns it.
-  rpc GenerateApplicationAppEUI(ApplicationIdentifiers) returns (GenerateApplicationAppEUIResponse);
+  rpc GenerateApplicationAppEUI(ApplicationIdentifier) returns (GenerateApplicationAppEUIResponse);
 
   // ListApplicationAppEUIs returns all the registered AppEUIs of an application.
-  rpc ListApplicationAppEUIs(ApplicationIdentifiers) returns (ListApplicationAppEUIsResponse);
+  rpc ListApplicationAppEUIs(ApplicationIdentifier) returns (ListApplicationAppEUIsResponse);
 
   // RemoveApplicationAppEUI deletes an AppEUI from an application.
   rpc RemoveApplicationAppEUI(RemoveApplicationAppEUIRequest) returns (google.protobuf.Empty);
@@ -211,20 +203,20 @@ service IsApplication {
   rpc GenerateApplicationAPIKey(GenerateApplicationAPIKeyRequest) returns (APIKey);
 
   // GetApplicationAPIKey returns a given API key from an application.
-  rpc GetApplicationAPIKey(ApplicationAPIKeyIdentifiers) returns (APIKey);
+  rpc GetApplicationAPIKey(ApplicationAPIKeyIdentifier) returns (APIKey);
 
   // ListApplicationAPIKeys returns all the API keys that are registered
   // for an application.
-  rpc ListApplicationAPIKeys(ApplicationIdentifiers) returns (ListApplicationAPIKeysResponse);
+  rpc ListApplicationAPIKeys(ApplicationIdentifier) returns (ListApplicationAPIKeysResponse);
 
   // RemoveApplicationAPIKey removes a given API key from an application.
-  rpc RemoveApplicationAPIKey(ApplicationAPIKeyIdentifiers) returns (google.protobuf.Empty);
+  rpc RemoveApplicationAPIKey(ApplicationAPIKeyIdentifier) returns (google.protobuf.Empty);
 
   // AddApplicationCollaborator adds an user as collaborator of an application.
   rpc AddApplicationCollaborator(AddApplicationCollaboratorRequest) returns (google.protobuf.Empty);
 
   // ListApplicationCollaborators returns all the collaborators of a given application.
-  rpc ListApplicationCollaborators(ApplicationIdentifiers) returns (ListApplicationCollaboratorsResponse);
+  rpc ListApplicationCollaborators(ApplicationIdentifier) returns (ListApplicationCollaboratorsResponse);
 
   // RemoveApplicationCollaborator removes a collaborator from an application.
   rpc RemoveApplicationCollaborator(RemoveApplicationCollaboratorRequest) returns (google.protobuf.Empty);
@@ -234,44 +226,41 @@ service IsApplication {
 
   // ListApplicationRights returns all the rights that the authenticated user has
   // for a given application.
-  rpc ListApplicationRights(ApplicationIdentifiers) returns (ListApplicationRightsResponse);
+  rpc ListApplicationRights(ApplicationIdentifier) returns (ListApplicationRightsResponse);
 
   // RemoveApplicationRight revokes a right to an application collaborator.
   rpc RemoveApplicationRight(ApplicationRight) returns (google.protobuf.Empty);
 }
 
 message CreateGatewayRequest {
-  // tenant_id is the TTN Tenant ID (in case of multi-tenant network stack).
-  string tenant_id = 1 [(gogoproto.customname) = "TenantID"];
-
   // gateway_id is the Gateway's ID to be created.
-  string gateway_id = 2 [(gogoproto.customname) = "GatewayID"];
+  string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
 
   // description is the description of the gateway.
-  string description = 3;
+  string description = 2;
 
   // frequency_plan_id indicates the ID of the frequency plan.
-  string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID"];
+  string frequency_plan_id = 3 [(gogoproto.customname) = "FrequencyPlanID"];
 
   // privacy_settings defines the different privacy settings for this gateway.
-  GatewayPrivacySettings privacy_settings = 5 [(gogoproto.nullable) = false];
+  GatewayPrivacySettings privacy_settings = 4 [(gogoproto.nullable) = false];
 
   // auto_update indicates whether or not the gateway should be able to
   // automatically fetch and execute firmware updates.
-  bool auto_update = 6;
+  bool auto_update = 5;
 
   // platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS"
-  string platform = 7;
+  string platform = 6;
 
   // antennas is all the antennas that the gateway has.
-  repeated GatewayAntenna antennas = 8 [(gogoproto.nullable) = false];
+  repeated GatewayAntenna antennas = 7 [(gogoproto.nullable) = false];
 
   // attributes is a free form map of attributes.
-  map<string, string> attributes = 9;
+  map<string, string> attributes = 8;
 
   // cluster_address indicates the URI of the gateway server cluster to connect to,
   // in a "<ip>:<port>" format.
-  string cluster_address = 10;
+  string cluster_address = 9;
 }
 
 message ListGatewaysResponse {
@@ -279,7 +268,7 @@ message ListGatewaysResponse {
 }
 
 message UpdateGatewayRequest {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the gateway.
   string description = 2;
@@ -309,7 +298,7 @@ message UpdateGatewayRequest {
 }
 
 message AddGatewayAttributeRequest {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // attribute is the name of the attribute to be added.
   string attribute = 2;
@@ -324,14 +313,14 @@ message ListGatewayAttributesResponse {
 }
 
 message RemoveGatewayAttributeRequest {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // attribute is the key of the attribute to be deleted.
   string attribute = 2;
 }
 
 message SetGatewayAntennaRequest {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // antenna is the gateway antenna to be set.
   GatewayAntenna antenna = 2 [(gogoproto.nullable) = false];
@@ -342,13 +331,13 @@ message ListGatewayAntennasResponse {
 }
 
 message RemoveGatewayAntennaRequest {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // antenna_id is the gateway antenna's ID to be removed.
   string antenna_id = 2 [(gogoproto.customname) = "AntennaID"];
 }
 
 message AddGatewayCollaboratorRequest {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   Collaborator collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
@@ -363,15 +352,16 @@ message ListGatewayOwnersResponse {
 }
 
 message RemoveGatewayCollaboratorRequest {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // user_id is the user's ID to be removed as collaborator.
-  string user_id = 2 [(gogoproto.customname) = "UserID"];
+  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  UserIDIdentifier user = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message GatewayRight {
-  GatewayIdentifiers gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // user_id is the user's ID.
-  string user_id = 2 [(gogoproto.customname) = "UserID"];
+  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  UserIDIdentifier user = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
   // right is the right this user holds for the gateway.
   Right right = 3;
 }
@@ -388,7 +378,7 @@ service IsGateway {
   rpc CreateGateway(CreateGatewayRequest) returns (Gateway);
 
   // GetGateway finds a gateway by ID and retrieves it.
-  rpc GetGateway(GatewayIdentifiers) returns (Gateway);
+  rpc GetGateway(GatewayIdentifier) returns (Gateway);
 
   // ListGateways returns all the gateways which the authenticated user is collaborator.
   rpc ListGateways(google.protobuf.Empty) returns (ListGatewaysResponse);
@@ -397,13 +387,13 @@ service IsGateway {
   rpc UpdateGateway(UpdateGatewayRequest) returns (Gateway);
 
   // DeleteGateway permantly deletes a gateway.
-  rpc DeleteGateway(GatewayIdentifiers) returns (google.protobuf.Empty);
+  rpc DeleteGateway(GatewayIdentifier) returns (google.protobuf.Empty);
 
   // AddGatewayAttribute sets an attribute with a key in the gateway.
   rpc AddGatewayAttribute(AddGatewayAttributeRequest) returns (google.protobuf.Empty);
 
   // ListGatewayAttributes returns all gateway attributes.
-  rpc ListGatewayAttributes(GatewayIdentifiers) returns (ListGatewayAttributesResponse);
+  rpc ListGatewayAttributes(GatewayIdentifier) returns (ListGatewayAttributesResponse);
 
   // RemoveGatewayAttribute removes an attribute matching the given key.
   rpc RemoveGatewayAttribute(RemoveGatewayAttributeRequest) returns (google.protobuf.Empty);
@@ -412,7 +402,7 @@ service IsGateway {
   rpc SetGatewayAntenna(GatewayAntenna) returns (google.protobuf.Empty);
 
   // ListGatewayAntenas returns all the antennas that a gateway has registered.
-  rpc ListGatewayAntennas(GatewayIdentifiers) returns (ListGatewayAntennasResponse);
+  rpc ListGatewayAntennas(GatewayIdentifier) returns (ListGatewayAntennasResponse);
 
   // RemoveGatewayAntenna removes a given antenna from a gateway.
   rpc RemoveGatewayAntenna(RemoveGatewayAntennaRequest) returns (google.protobuf.Empty);
@@ -421,10 +411,10 @@ service IsGateway {
   rpc AddGatewayCollaborator(AddGatewayCollaboratorRequest) returns (google.protobuf.Empty);
 
   // ListGatewayCollaborators returns all the collaborators for a given gateway.
-  rpc ListGatewayCollaborators(GatewayIdentifiers) returns (ListGatewayCollaboratorsResponse);
+  rpc ListGatewayCollaborators(GatewayIdentifier) returns (ListGatewayCollaboratorsResponse);
 
   // ListGatewayOwners returns all the collaborators that are owners of a gateway.
-  rpc ListGatewayOwners(GatewayIdentifiers) returns (ListGatewayOwnersResponse);
+  rpc ListGatewayOwners(GatewayIdentifier) returns (ListGatewayOwnersResponse);
 
   // RemoveGatewayCollaborator revokes all the rights that a collaborator has to
   // a given gateway.
@@ -435,33 +425,30 @@ service IsGateway {
 
   // ListGatewayRights returns all the rights that the authenticated user has
   // to a given gateway.
-  rpc ListGatewayRights(GatewayIdentifiers) returns (ListGatewayRightsResponse);
+  rpc ListGatewayRights(GatewayIdentifier) returns (ListGatewayRightsResponse);
 
   // RemoveGatewayRight revokes a given right from a given gateway collaborator
   rpc RemoveGatewayRight(GatewayRight) returns (google.protobuf.Empty);
 }
 
 message CreateClientRequest {
-  // tenant_id is the TTN Tenant ID (in case of multi-tenant network stack).
-  string tenant_id = 1 [(gogoproto.customname) = "TenantID"];
-
   // client_id is the client's ID to be created.
-  string client_id = 2 [(gogoproto.customname) = "ClientID"];
+  string client_id = 1 [(gogoproto.customname) = "ClientID"];
 
   // description is the description of the client.
-  string description = 3;
+  string description = 2;
 
   // secret is the secret used to prove the client identity.
-  string secret = 4;
+  string secret = 3;
 
   // callback_uri is the callback URI of the client.
-  string callback_uri = 5 [(gogoproto.customname) = "CallbackURI"];
+  string callback_uri = 4 [(gogoproto.customname) = "CallbackURI"];
 
   // grants denotes which OAuth2 flows can the client use to get a token.
-  repeated ClientGrant grants = 6;
+  repeated ClientGrant grants = 5;
 
   // scope denotes what scopes the client will have access to.
-  repeated ClientScope scope = 7;
+  repeated ClientScope scope = 6;
 }
 
 message ListClientsResponse {
@@ -470,7 +457,7 @@ message ListClientsResponse {
 }
 
 message UpdateClientRequest {
-  ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ClientIdentifier client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the client.
   string description = 2;
@@ -489,7 +476,7 @@ message UpdateClientRequest {
 }
 
 message SetClientOfficialRequest {
-  ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ClientIdentifier client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // official denotes whether if the client is labelled as an official third-party
   // client by the tenant admin.
@@ -497,13 +484,13 @@ message SetClientOfficialRequest {
 }
 
 message SetClientStateRequest {
-  ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ClientIdentifier client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   ClientState state = 2;
 }
 
 message AddClientCollaboratorRequest {
-  ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ClientIdentifier client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   Collaborator collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
@@ -513,15 +500,16 @@ message ListClientCollaboratorsResponse {
 }
 
 message RemoveClientCollaboratorRequest {
-  ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // user_id is the user's ID to be removed as collaborator.
-  string user_id = 2 [(gogoproto.customname) = "UserID"];
+  ClientIdentifier client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  UserIDIdentifier user = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message ClientRight {
-  ClientIdentifiers client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // user_id is the user's ID.
-  string user_id = 2 [(gogoproto.customname) = "UserID"];
+  ClientIdentifier client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  UserIDIdentifier user = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
   // right is the right that the user holds for the client.
   Right right = 3;
 }
@@ -538,7 +526,7 @@ service IsClient {
   rpc CreateClient(CreateClientRequest) returns (google.protobuf.Empty);
 
   // GetClient finds a client by ID and retrieves it.
-  rpc GetClient(ClientIdentifiers) returns (Client);
+  rpc GetClient(ClientIdentifier) returns (Client);
 
   // ListClients returns all the clients which the authenticated user is collaborator.
   rpc ListClients(google.protobuf.Empty) returns (ListClientsResponse);
@@ -547,7 +535,7 @@ service IsClient {
   rpc UpdateClient(UpdateClientRequest) returns (google.protobuf.Empty);
 
   // DeleteClient permantly deletes a client.
-  rpc DeleteClient(ClientIdentifiers) returns (google.protobuf.Empty);
+  rpc DeleteClient(ClientIdentifier) returns (google.protobuf.Empty);
 
   // SetClientOfficial allows to a tenant admin to add or remove the official
   // distinguise "official" label of a third-party client.
@@ -561,7 +549,7 @@ service IsClient {
   rpc AddClientCollaborator(AddClientCollaboratorRequest) returns (google.protobuf.Empty);
 
   // ListClientCollaborators returns all the collaborators for a given client.
-  rpc ListClientCollaborators(ClientIdentifiers) returns (ListClientCollaboratorsResponse);
+  rpc ListClientCollaborators(ClientIdentifier) returns (ListClientCollaboratorsResponse);
 
   // RemoveClientCollaborator revokes all the rights that a collaborator has to
   // a given client.
@@ -572,7 +560,7 @@ service IsClient {
 
   // ListClientRights returns all the rights that the authenticated user has
   // to a given client.
-  rpc ListClientRights(ClientIdentifiers) returns (ListClientRightsResponse);
+  rpc ListClientRights(ClientIdentifier) returns (ListClientRightsResponse);
 
   // RemoveClientRight revokes a given right from a given client collaborator.
   rpc RemoveClientRight(ClientRight) returns (google.protobuf.Empty);

@@ -8,52 +8,44 @@ package ttn.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
-// UserIdentifiers is the message that is used to identify an user by ID or by email.
-message UserIdentifiers {
+// UserIdentifier is the message that is used to identify an user by ID or by email.
+message UserIdentifier {
   oneof Identifiers {
-    UserIDIdentifiers id = 1 [(gogoproto.customname) = "ID"];
-    UserEmailIdentifiers email = 2;
+    UserIDIdentifier id = 1 [(gogoproto.customname) = "ID"];
+    UserEmailIdentifier email = 2;
   }
 }
 
-// UserIDIdentifiers is the message that is used to identify an user by ID.
-message UserIDIdentifiers {
-  // TTN Tenant ID (in case of multi-tenant network stack).
-  string tenant_id = 1 [(gogoproto.customname) = "TenantID"];
+// UserIDIdentifier is the message that is used to identify an user by ID.
+message UserIDIdentifier {
   // user_id is the ID of the user.
-  string user_id = 2 [(gogoproto.customname) = "UserID"];
+  string user_id = 1 [(gogoproto.customname) = "UserID"];
 }
 
-// UserEmailIdentifiers is the message used to identify an user by email.
-message UserEmailIdentifiers {
-  // TTN Tenant ID (in case of multi-tenant network stack).
-  string tenant_id = 1 [(gogoproto.customname) = "TenantID"];
+// UserEmailIdentifier is the message used to identify an user by email.
+message UserEmailIdentifier {
   // email address of the user.
-  string email = 2;
+  string email = 1;
 }
 
-// ApplicationIdentifiers is the message that is used to identify an application.
-message ApplicationIdentifiers {
-  // TTN Tenant ID (in case of multi-tenant network stack).
-  string tenant_id = 1 [(gogoproto.customname) = "TenantID"];
+// ApplicationIdentifier is the message that is used to identify an application.
+message ApplicationIdentifier {
   // TTN Application ID.
-  string application_id = 2 [(gogoproto.customname) = "ApplicationID"];
+  string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
 }
 
-// ApplicationAPIKeyIdentifiers is the message that is used to identity an
+// ApplicationAPIKeyIdentifier is the message that is used to identity an
 // application API key.
-message ApplicationAPIKeyIdentifiers {
-  ApplicationIdentifiers application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+message ApplicationAPIKeyIdentifier {
+  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // key_name is the application API key name.
   string key_name = 2;
 }
 
-// GatewayIdentifiers is the message that is used to identify a gateway.
-message GatewayIdentifiers {
+// GatewayIdentifier is the message that is used to identify a gateway.
+message GatewayIdentifier {
   // TTN Gateway ID.
   string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
-  // TTN Tenant ID (in case of multi-tenant network stack).
-  string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
 }
 
 // EndDeviceIdentifiers message is carried with uplink and downlink messages.
@@ -63,8 +55,6 @@ message EndDeviceIdentifiers {
   string device_id = 1 [(gogoproto.customname) = "DeviceID"];
   // TTN Application ID.
   string application_id = 2 [(gogoproto.customname) = "ApplicationID"];
-  // TTN Tenant ID (in case of multi-tenant network server).
-  string tenant_id = 3 [(gogoproto.customname) = "TenantID"];
 
   // LoRaWAN DevEUI.
   bytes dev_eui = 4 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
@@ -74,10 +64,8 @@ message EndDeviceIdentifiers {
   bytes dev_addr = 6 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
 }
 
-// ClientIdentifiers is the message that is used to identify a client.
-message ClientIdentifiers {
+// ClientIdentifier is the message that is used to identify a client.
+message ClientIdentifier {
   // TTN Client ID.
   string client_id = 1 [(gogoproto.customname) = "ClientID"];
-  // TTN Tenant ID (in case of multi-tenant network stack).
-  string tenant_id = 2 [(gogoproto.customname) = "TenantID"];
 }
