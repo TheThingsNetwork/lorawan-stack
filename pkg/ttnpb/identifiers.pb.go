@@ -232,7 +232,7 @@ func (m *GatewayIdentifier) GetGatewayID() string {
 	return ""
 }
 
-// EndDeviceIdentifiers message is carried with uplink and downlink messages.
+// End device identifiers are carried with uplink and downlink messages.
 // Unknown fields are left empty.
 type EndDeviceIdentifiers struct {
 	// TTN Device ID.

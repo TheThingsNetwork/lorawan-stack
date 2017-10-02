@@ -14,7 +14,7 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 // RxMetadata contains metadata for a received message. Each antenna that receives
 // a message corresponds to one RxMetadata.
 message RxMetadata {
-  // ID of the gateway that received the message
+  // gateway includes the ID of the gateway that received the message
   GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // Index of the antenna that received the message
@@ -48,7 +48,7 @@ message RxMetadata {
 // TxMetadata contains metadata for a to-be-transmitted message.
 // It contains gateway-specific fields that are not in the TxSettings message
 message TxMetadata {
-  // ID of the gateway that received the message
+  // gateway includes the ID of the gateway that received the message
   GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // Gateway's internal timestamp when the Tx should start (nanoseconds)

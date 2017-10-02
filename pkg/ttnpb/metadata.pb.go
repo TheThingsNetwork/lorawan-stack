@@ -63,7 +63,7 @@ func (LocationSource) EnumDescriptor() ([]byte, []int) { return fileDescriptorMe
 // RxMetadata contains metadata for a received message. Each antenna that receives
 // a message corresponds to one RxMetadata.
 type RxMetadata struct {
-	// ID of the gateway that received the message
+	// gateway includes the ID of the gateway that received the message
 	GatewayIdentifier `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
 	// Index of the antenna that received the message
 	AntennaIndex uint32 `protobuf:"varint,2,opt,name=antenna_index,json=antennaIndex,proto3" json:"antenna_index,omitempty"`
@@ -149,7 +149,7 @@ func (m *RxMetadata) GetAdvanced() *google_protobuf3.Struct {
 // TxMetadata contains metadata for a to-be-transmitted message.
 // It contains gateway-specific fields that are not in the TxSettings message
 type TxMetadata struct {
-	// ID of the gateway that received the message
+	// gateway includes the ID of the gateway that received the message
 	GatewayIdentifier `protobuf:"bytes,1,opt,name=gateway,embedded=gateway" json:"gateway"`
 	// Gateway's internal timestamp when the Tx should start (nanoseconds)
 	// NOTE: most gateways use microsecond timestamps, so conversion may be needed
