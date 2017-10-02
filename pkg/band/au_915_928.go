@@ -7,7 +7,8 @@ import "github.com/TheThingsNetwork/ttn/pkg/types"
 var au_915_928 Band
 
 const (
-	AU_915_928 BandID = "AU_915_928"
+	// AU_915_928 is the ID of the Australian band
+	AU_915_928 ID = "AU_915_928"
 )
 
 func init() {

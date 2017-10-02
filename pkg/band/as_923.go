@@ -4,10 +4,11 @@ package band
 
 import "github.com/TheThingsNetwork/ttn/pkg/types"
 
-var as923 Band
+var as_923 Band
 
 const (
-	AS923 BandID = "AS923"
+	// AS_923 is the ID of the Asian 923Mhz band
+	AS_923 ID = "AS_923"
 )
 
 func init() {
@@ -15,8 +16,8 @@ func init() {
 		{Frequency: 923200000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
 		{Frequency: 923400000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
 	}
-	as923 = Band{
-		ID: AS923,
+	as_923 = Band{
+		ID: AS_923,
 
 		UplinkChannels:   defaultChannels,
 		DownlinkChannels: defaultChannels,
@@ -79,5 +80,5 @@ func init() {
 
 		DefaultRX2Parameters: Rx2Parameters{2, 923200000},
 	}
-	All = append(All, as923)
+	All = append(All, as_923)
 }

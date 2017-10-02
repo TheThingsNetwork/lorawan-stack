@@ -7,7 +7,8 @@ import "github.com/TheThingsNetwork/ttn/pkg/types"
 var us_902_928 Band
 
 const (
-	US_902_928 BandID = "US_902_928"
+	// US_902_928 is the ID of the US frequency plan
+	US_902_928 ID = "US_902_928"
 )
 
 func init() {

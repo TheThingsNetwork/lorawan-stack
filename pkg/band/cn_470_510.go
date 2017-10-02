@@ -7,7 +7,8 @@ import "github.com/TheThingsNetwork/ttn/pkg/types"
 var cn_470_510 Band
 
 const (
-	CN_470_510 BandID = "CN_470_510"
+	// CN_470_510 is the ID of the Chinese 470-510Mhz band
+	CN_470_510 ID = "CN_470_510"
 )
 
 func init() {

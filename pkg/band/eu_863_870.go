@@ -7,7 +7,8 @@ import "github.com/TheThingsNetwork/ttn/pkg/types"
 var eu_863_870 Band
 
 const (
-	EU_863_870 BandID = "EU_863_870"
+	// EU_863_870 is the ID of the European 863-870Mhz band
+	EU_863_870 ID = "EU_863_870"
 )
 
 func init() {

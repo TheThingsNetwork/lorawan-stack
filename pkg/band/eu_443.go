@@ -7,7 +7,8 @@ import "github.com/TheThingsNetwork/ttn/pkg/types"
 var eu_443 Band
 
 const (
-	EU_443 BandID = "EU_443"
+	// EU_443 is the ID of the European 443Mhz band
+	EU_443 ID = "EU_443"
 )
 
 func init() {

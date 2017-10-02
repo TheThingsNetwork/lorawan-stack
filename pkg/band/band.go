@@ -19,6 +19,7 @@ var (
 	}
 )
 
+// PayloadSize abstracts the acceptable payload size depending on contextual parameters
 type PayloadSize interface {
 	PayloadSize(emptyFOpt, dwellTime bool) uint16
 }
@@ -47,14 +48,18 @@ func (p dwellTimePayloadSize) PayloadSize(_, dwellTime bool) uint16 {
 	return p.NoDwellTime
 }
 
+// DataRate indicates the properties of a band's data rate
 type DataRate struct {
 	Rate              types.DataRate
 	DefaultMaxSize    PayloadSize
 	NoRepeaterMaxSize PayloadSize
 }
 
+// Channel abstracts a band's channel properties
 type Channel struct {
-	Frequency       int
+	// Frequency indicates the frequency of the channel
+	Frequency int
+	// DataRateIndexes indicates the data rates accepted on this channel
 	DataRateIndexes []int
 }
 
@@ -67,10 +72,12 @@ type Rx2Parameters struct {
 	Frequency     uint32
 }
 
-type BandID string
+// ID is the ID of band
+type ID = string
 
+// Band contains a band's properties
 type Band struct {
-	ID BandID
+	ID ID
 
 	// UplinkChannels by default
 	UplinkChannels []Channel
@@ -120,9 +127,11 @@ type DutyCycle struct {
 	DutyCycle    float32
 }
 
+// All contains all the bands available
 var All = make([]Band, 0)
 
-func GetByID(id BandID) (Band, error) {
+// GetByID returns the band if it was found, and returns an error otherwise
+func GetByID(id ID) (Band, error) {
 	for _, band := range All {
 		if band.ID == id {
 			return band, nil

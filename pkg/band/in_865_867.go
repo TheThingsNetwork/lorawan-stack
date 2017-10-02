@@ -7,7 +7,8 @@ import "github.com/TheThingsNetwork/ttn/pkg/types"
 var in_865_867 Band
 
 const (
-	IN_865_867 BandID = "IN_865_867"
+	// IN_865_867 is the ID of the Indian frequency plan
+	IN_865_867 ID = "IN_865_867"
 )
 
 func init() {

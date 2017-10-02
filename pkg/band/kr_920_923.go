@@ -7,7 +7,8 @@ import "github.com/TheThingsNetwork/ttn/pkg/types"
 var kr_920_923 Band
 
 const (
-	KR_920_923 BandID = "KR_920_923"
+	// KR_920_923 is the ID of the Korean frequency plan
+	KR_920_923 ID = "KR_920_923"
 )
 
 func init() {
