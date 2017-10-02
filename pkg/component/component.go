@@ -11,8 +11,10 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
+	"github.com/TheThingsNetwork/ttn/pkg/log/middleware/sentry"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
 	"github.com/TheThingsNetwork/ttn/pkg/web"
+	raven "github.com/getsentry/raven-go"
 	"google.golang.org/grpc"
 )
 
@@ -28,6 +30,7 @@ type Component struct {
 
 	config *Config
 	logger log.Stack
+	sentry *raven.Client
 
 	grpc           *rpcserver.Server
 	grpcSubsystems []rpcserver.Registerer
@@ -53,6 +56,11 @@ func New(logger log.Stack, config *Config) *Component {
 		logger: logger,
 
 		listeners: make(map[string]*listener),
+	}
+
+	if config.Sentry.DSN != "" {
+		c.sentry, _ = raven.New(config.Sentry.DSN)
+		c.logger.Use(sentry.New(c.sentry))
 	}
 
 	c.web = web.New(c.logger)

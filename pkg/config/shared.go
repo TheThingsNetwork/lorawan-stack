@@ -17,6 +17,11 @@ type Log struct {
 	Level log.Level `name:"level" description:"The minimum level log messages must have to be shown"`
 }
 
+// Sentry represents configuration for error tracking using Sentry
+type Sentry struct {
+	DSN string `name:"dsn" description:"Sentry Data Source Name"`
+}
+
 // TLS represents TLS configuration
 type TLS struct {
 	Certificate string `name:"certificate" description:"Location of TLS certificate"`
@@ -64,6 +69,7 @@ type ServiceBase struct {
 	TLS          TLS                   `name:"tls"`
 	Identity     Identity              `name:"identity"`
 	RemoteConfig *RemoteProviderConfig `name:"remote-config"`
+	Sentry       Sentry                `name:"sentry"`
 }
 
 // IsValid returns wether or not the remote config is valid or not

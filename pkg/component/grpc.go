@@ -19,6 +19,7 @@ func (c *Component) initGRPC() {
 			// TODO: Fill globals in call context (data stores, config, ...)
 			return ctx
 		}),
+		rpcserver.WithSentry(c.sentry),
 	)
 }
 
