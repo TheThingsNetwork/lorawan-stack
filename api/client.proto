@@ -21,7 +21,7 @@ message Client {
   string secret = 3;
 
   // callback_uri is the callback URI of the client.
-  string callback_uri = 4 [(gogoproto.customname) = "CallbackURI", (gogoproto.moretags) = "db:\"callback_uri\""];
+  string callback_uri = 4 [(gogoproto.customname) = "CallbackURI"];
 
   // state denotes the reviewing state of the client by the tenant admin.
   ClientState state = 5;

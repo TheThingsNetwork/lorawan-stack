@@ -25,7 +25,7 @@ message Gateway {
   string token = 3;
 
   // frequency_plan_id indicates the ID of the frequency plan.
-  string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID", (gogoproto.moretags) = "db:\"frequency_plan\""];
+  string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID"];
 
   // activated_at denotes when the gateway was activated.
   google.protobuf.Timestamp activated_at = 5 [(gogoproto.stdtime) = true];
@@ -35,7 +35,7 @@ message Gateway {
 
   // auto_update indicates whether or not the gateway should be able to
   // automatically fetch and execute firmware updates.
-  bool auto_update = 7 [(gogoproto.moretags) = "db:\"auto_update\""];
+  bool auto_update = 7;
 
   // platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS".
   string platform = 8;
@@ -48,7 +48,7 @@ message Gateway {
 
   // cluster_address indicates the URI of the gateway server cluster to connect
   // to, in a "<ip>:<port>" format.
-  string cluster_address = 11 [(gogoproto.moretags) = "db:\"cluster_address\""];
+  string cluster_address = 11;
 
   // created_at is the time when the gateway was created.
   google.protobuf.Timestamp created_at = 12 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
