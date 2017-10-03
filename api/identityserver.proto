@@ -428,7 +428,7 @@ service IsGateway {
   rpc RemoveGatewayAttribute(RemoveGatewayAttributeRequest) returns (google.protobuf.Empty);
 
   // AddGatewayAntenna adds a new antenna to a gateway.
-  rpc AddGatewayAntenna(AddGatewayAntennaRequest) returns (GatewayAntenna);
+  rpc AddGatewayAntenna(AddGatewayAntennaRequest) returns (google.protobuf.Empty);
 
   // ListGatewayAntenas returns all the antennas that a gateway has registered.
   rpc ListGatewayAntennas(GatewayIdentifier) returns (ListGatewayAntennasResponse);
