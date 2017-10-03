@@ -35,7 +35,10 @@ message User {
   // created_at denotes when the user was created.
   google.protobuf.Timestamp created_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
+  // updated_at is the last time the user was updated.
+  google.protobuf.Timestamp updated_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
   // archived_at is the time when the user was archived and therefore
   // permantly disabled.
-  google.protobuf.Timestamp archived_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp archived_at = 9 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }

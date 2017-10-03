@@ -53,9 +53,12 @@ message Gateway {
   // created_at is the time when the gateway was created.
   google.protobuf.Timestamp created_at = 12 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
+  // updated_at is the last time the gateway was updated.
+  google.protobuf.Timestamp updated_at = 13 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
   // archived_at is the time when the gateway was archived and therefore
   // permantly disabled.
-  google.protobuf.Timestamp archived_at = 13 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp archived_at = 14 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 // GatewayPrivacySettings is the message that defines the different privacy settings

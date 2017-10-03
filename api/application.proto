@@ -29,9 +29,12 @@ message Application {
   // created_at is the time when the application was created.
   google.protobuf.Timestamp created_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
+  // updated_at is the last time the application was updated.
+  google.protobuf.Timestamp updated_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
   // archived_at is the time when the application was archived and therefore
   // permantly disabled.
-  google.protobuf.Timestamp archived_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp archived_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 // ApplicationUp wraps multiple application-layer uplink types
