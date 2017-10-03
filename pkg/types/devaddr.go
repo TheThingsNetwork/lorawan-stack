@@ -167,7 +167,7 @@ func (prefix *DevAddrPrefix) UnmarshalText(data []byte) error {
 		*prefix = DevAddrPrefix{}
 		return nil
 	}
-	if len(data) != 10 {
+	if len(data) != 10 && len(data) != 11 {
 		return ErrInvalidLength
 	}
 	if data[8] != '/' {
