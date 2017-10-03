@@ -91,7 +91,7 @@ message ListApplicationsResponse {
 }
 
 message UpdateApplicationRequest {
-  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the application.
   string description = 2;
@@ -104,7 +104,7 @@ message UpdateApplicationRequest {
 }
 
 message AddApplicationAppEUIRequest {
-  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // app_eui is the AppEUI to be added.
   bytes app_eui = 2 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
@@ -120,14 +120,14 @@ message ListApplicationAppEUIsResponse {
 }
 
 message RemoveApplicationAppEUIRequest {
-  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // app_eui is the AppEUI to be removed.
   bytes app_eui = 2 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 }
 
 message GenerateApplicationAPIKeyRequest {
-  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // name is the name of the API key to be generated.
   string name = 2;
@@ -141,7 +141,7 @@ message ListApplicationAPIKeysResponse {
 }
 
 message AddApplicationCollaboratorRequest {
-  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   Collaborator collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
@@ -151,13 +151,16 @@ message ListApplicationCollaboratorsResponse {
 }
 
 message RemoveApplicationCollaboratorRequest {
-  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  UserIDIdentifier user = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  UserIDIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message ApplicationRight {
-  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  UserIDIdentifier user = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  UserIDIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
   // right is the right that the user holds for the application.
   Right right = 3;
 }
@@ -268,7 +271,7 @@ message ListGatewaysResponse {
 }
 
 message UpdateGatewayRequest {
-  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the gateway.
   string description = 2;
@@ -298,7 +301,7 @@ message UpdateGatewayRequest {
 }
 
 message AddGatewayAttributeRequest {
-  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // attribute is the name of the attribute to be added.
   string attribute = 2;
@@ -313,14 +316,14 @@ message ListGatewayAttributesResponse {
 }
 
 message RemoveGatewayAttributeRequest {
-  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // attribute is the key of the attribute to be deleted.
   string attribute = 2;
 }
 
 message SetGatewayAntennaRequest {
-  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // antenna is the gateway antenna to be set.
   GatewayAntenna antenna = 2 [(gogoproto.nullable) = false];
@@ -331,13 +334,14 @@ message ListGatewayAntennasResponse {
 }
 
 message RemoveGatewayAntennaRequest {
-  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
   // antenna_id is the gateway antenna's ID to be removed.
   string antenna_id = 2 [(gogoproto.customname) = "AntennaID"];
 }
 
 message AddGatewayCollaboratorRequest {
-  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   Collaborator collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
@@ -352,17 +356,17 @@ message ListGatewayOwnersResponse {
 }
 
 message RemoveGatewayCollaboratorRequest {
-  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  UserIDIdentifier user = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIDIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message GatewayRight {
-  GatewayIdentifier gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  UserIDIdentifier user = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIDIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // right is the right this user holds for the gateway.
+  // right is the right this user holds for the gatewa true, (gogoproto.nullable) = false];
   Right right = 3;
 }
 
@@ -457,7 +461,7 @@ message ListClientsResponse {
 }
 
 message UpdateClientRequest {
-  ClientIdentifier client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the client.
   string description = 2;
@@ -476,7 +480,7 @@ message UpdateClientRequest {
 }
 
 message SetClientOfficialRequest {
-  ClientIdentifier client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // official denotes whether if the client is labelled as an official third-party
   // client by the tenant admin.
@@ -484,13 +488,13 @@ message SetClientOfficialRequest {
 }
 
 message SetClientStateRequest {
-  ClientIdentifier client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   ClientState state = 2;
 }
 
 message AddClientCollaboratorRequest {
-  ClientIdentifier client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   Collaborator collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
@@ -500,15 +504,15 @@ message ListClientCollaboratorsResponse {
 }
 
 message RemoveClientCollaboratorRequest {
-  ClientIdentifier client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  UserIDIdentifier user = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIDIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message ClientRight {
-  ClientIdentifier client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  UserIDIdentifier user = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIDIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // right is the right that the user holds for the client.
   Right right = 3;
