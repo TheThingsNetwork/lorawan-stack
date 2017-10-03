@@ -12,7 +12,7 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // Collaborator is the message to define a collaborator of an entity on the network.
 message Collaborator {
-  UserIDIdentifier user = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIdentifier user = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // rights is the list of rights the user bears.
   repeated Right rights = 2;

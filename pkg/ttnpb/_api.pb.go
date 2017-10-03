@@ -55,8 +55,6 @@ It has these top-level messages:
 	FrequencyPlan
 	FrequencyPlanRequest
 	UserIdentifier
-	UserIDIdentifier
-	UserEmailIdentifier
 	ApplicationIdentifier
 	ApplicationAPIKeyIdentifier
 	GatewayIdentifier
@@ -64,6 +62,7 @@ It has these top-level messages:
 	EndDeviceIdentifiers
 	ClientIdentifier
 	CreateUserRequest
+	GetUserByEmailRequest
 	UpdateUserRequest
 	UpdateUserPasswordRequest
 	CreateApplicationRequest

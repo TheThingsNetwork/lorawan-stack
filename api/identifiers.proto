@@ -8,24 +8,10 @@ package ttn.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
-// UserIdentifier is the message that is used to identify an user by ID or by email.
+// UserIdentifier is the message that is used to identify an user by ID.
 message UserIdentifier {
-  oneof Identifier {
-    UserIDIdentifier id = 1 [(gogoproto.customname) = "ID"];
-    UserEmailIdentifier email = 2;
-  }
-}
-
-// UserIDIdentifier is the message that is used to identify an user by ID.
-message UserIDIdentifier {
   // user_id is the ID of the user.
   string user_id = 1 [(gogoproto.customname) = "UserID"];
-}
-
-// UserEmailIdentifier is the message used to identify an user by email.
-message UserEmailIdentifier {
-  // email address of the user.
-  string email = 1;
 }
 
 // ApplicationIdentifier is the message that is used to identify an application.

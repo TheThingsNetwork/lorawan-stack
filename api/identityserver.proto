@@ -38,6 +38,11 @@ message CreateUserRequest {
   string name = 4;
 }
 
+message GetUserByEmailRequest {
+  // email address of the user to be looked for.
+  string email = 1;
+}
+
 message UpdateUserRequest {
   // email is the new email of the user.
   string email = 1;
@@ -59,9 +64,12 @@ service IsUser {
   // CreateUser creates a new user on the network.
   rpc CreateUser(CreateUserRequest) returns (google.protobuf.Empty);
 
-  // GetUser returns the profile of an user. If the user identifier is empty it
+  // GetUser returns the profile of an user by ID. If the user identifier is empty it
   // returns the profile of the authenticated user.
   rpc GetUser(UserIdentifier) returns (User);
+
+  // GetUserByEmail finds an user by email address and returns it.
+  rpc GetUserByEmail(GetUserByEmailRequest) returns (User);
 
   // UpdateUser edits the profile of the authenticated user.
   rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty);
@@ -154,13 +162,13 @@ message ListApplicationCollaboratorsResponse {
 message RemoveApplicationCollaboratorRequest {
   ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  UserIDIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message ApplicationRight {
   ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  UserIDIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // right is the right that the user holds for the application.
   Right right = 3;
@@ -383,13 +391,13 @@ message ListGatewayOwnersResponse {
 message RemoveGatewayCollaboratorRequest {
   GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  UserIDIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message GatewayRight {
   GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  UserIDIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // right is the right this user holds for the gatewa true, (gogoproto.nullable) = false];
   Right right = 3;
@@ -534,13 +542,13 @@ message ListClientCollaboratorsResponse {
 message RemoveClientCollaboratorRequest {
   ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  UserIDIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message ClientRight {
   ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  UserIDIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // right is the right that the user holds for the client.
   Right right = 3;
