@@ -45,7 +45,11 @@ func buildLoRaDownlinkFromParameters(payloadSize int, dataRate types.DataRate, c
 func TestInvalidModulation(t *testing.T) {
 	a := assertions.New(t)
 
-	_, err := Compute(ttnpb.DownlinkMessage{})
+	_, err := Compute(ttnpb.DownlinkMessage{
+		Settings: ttnpb.TxSettings{
+			Modulation: ttnpb.Modulation_FSK + ttnpb.Modulation_LORA + 1,
+		},
+	})
 	a.So(err, should.NotBeNil)
 }
 
