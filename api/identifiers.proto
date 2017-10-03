@@ -48,6 +48,12 @@ message GatewayIdentifier {
   string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
 }
 
+message GatewayAntennaIdentifier {
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // antenna_is the gateway antenna's ID.
+  string antenna_id = 2 [(gogoproto.customname) = "AntennaID"];
+}
+
 // End device identifiers are carried with uplink and downlink messages.
 // Unknown fields are left empty.
 message EndDeviceIdentifiers {
