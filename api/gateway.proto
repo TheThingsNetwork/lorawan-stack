@@ -4,6 +4,7 @@ syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
+import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
@@ -15,7 +16,7 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 // Gateway is the message that defines a gateway on the network.
 message Gateway {
   // id is the Gateway's ID.
-  string id = 1 [(gogoproto.customname) = "ID"];
+  GatewayIdentifier id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the gateway.
   string description = 2;

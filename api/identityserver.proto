@@ -26,7 +26,7 @@ service GtwGr {
 
 message CreateUserRequest {
   // user_id is the ID of the user.
-  string user_id = 1 [(gogoproto.customname) = "UserID"];
+  UserIdentifier user_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // email address of the user.
   string email = 2;
@@ -83,7 +83,7 @@ service IsUser {
 
 message CreateApplicationRequest {
   // application_id is the ID of the application to be created.
-  string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
+  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the application.
   string description = 2;
@@ -246,7 +246,7 @@ service IsApplication {
 
 message CreateGatewayRequest {
   // gateway_id is the Gateway's ID to be created.
-  string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the gateway.
   string description = 2;
@@ -473,7 +473,7 @@ service IsGateway {
 
 message CreateClientRequest {
   // client_id is the client's ID to be created.
-  string client_id = 1 [(gogoproto.customname) = "ClientID"];
+  ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the client.
   string description = 2;
