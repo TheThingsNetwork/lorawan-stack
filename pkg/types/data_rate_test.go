@@ -33,9 +33,9 @@ func TestValidBandwidth(t *testing.T) {
 	a := assertions.New(t)
 
 	dataRates := map[types.DataRate]uint32{
-		types.DataRate{LoRa: "SF7BW125"}: 125,
-		types.DataRate{LoRa: "SF8BW250"}: 250,
-		types.DataRate{LoRa: "SF9BW500"}: 500,
+		types.DataRate{LoRa: "SF7BW125"}: 125000,
+		types.DataRate{LoRa: "SF8BW250"}: 250000,
+		types.DataRate{LoRa: "SF9BW500"}: 500000,
 	}
 
 	for dr, bw := range dataRates {

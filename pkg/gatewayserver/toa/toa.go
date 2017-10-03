@@ -7,19 +7,29 @@ import (
 	"math"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/types"
 )
 
-// ComputeLoRa computes the time-on-air given a PHY payload size in bytes, a datr
-// identifier and LoRa coding rate identifier. Note that this function operates
-// on the PHY payload size and does not add the LoRaWAN header.
+// Compute the time-on-air from the payload and RF parameters.
 //
 // See http://www.semtech.com/images/datasheet/LoraDesignGuide_STD.pdf, page 7
-func ComputeLoRa(payloadSize uint, datr types.DataRate, codr string) (time.Duration, error) {
-	// Determine CR
+func Compute(downlink ttnpb.DownlinkMessage) (time.Duration, error) {
+	switch downlink.Settings.Modulation {
+	case ttnpb.Modulation_LORA:
+		d, err := computeLoRa(downlink)
+		return d, err
+	case ttnpb.Modulation_FSK:
+		return computeFSK(downlink), nil
+	default:
+		return 0, errors.New("Unknown modulation")
+	}
+}
+
+func computeLoRa(downlink ttnpb.DownlinkMessage) (time.Duration, error) {
 	var cr float64
-	switch codr {
+	switch downlink.Settings.CodingRate {
 	case "4/5":
 		cr = 1
 	case "4/6":
@@ -29,29 +39,20 @@ func ComputeLoRa(payloadSize uint, datr types.DataRate, codr string) (time.Durat
 	case "4/8":
 		cr = 4
 	default:
-		return 0, errors.New("Invalid Codr")
+		return 0, errors.New("Invalid downlink coding rate")
 	}
 
-	// Determine DR
-	bw, err := datr.Bandwidth()
-	if err != nil {
-		return 0, errors.NewWithCause("Failed to retrieve data rate bandwidth", err)
-	}
+	bandwidth := downlink.Settings.Bandwidth / 1000 // Bandwidth in KHz
+	spreadingFactor := downlink.Settings.SpreadingFactor
 
-	// Determine SF
-	sf, err := datr.SpreadingFactor()
-	if err != nil {
-		return 0, errors.NewWithCause("Failed to retrieve spreading factor", err)
-	}
-
-	// Determine DE
 	var de float64
-	if bw == 125 && (sf == 11 || sf == 12) {
+	if bandwidth == 125 && (spreadingFactor == 11 || spreadingFactor == 12) {
 		de = 1.0
 	}
-	pl := float64(payloadSize)
-	floatSF := float64(sf)
-	floatBW := float64(bw)
+
+	pl := float64(len(downlink.RawPayload))
+	floatBW := float64(bandwidth)
+	floatSF := float64(spreadingFactor)
 	h := 0.0 // 0 means header is enabled
 
 	tSym := math.Pow(2, floatSF) / floatBW
@@ -62,10 +63,11 @@ func ComputeLoRa(payloadSize uint, datr types.DataRate, codr string) (time.Durat
 	return time.Duration(timeOnAir), nil
 }
 
-// ComputeFSK computes the time-on-air given a PHY payload size in bytes and a
-// bitrate, Note that this function operates on the PHY payload size and does
-// not add the LoRaWAN header.
-func ComputeFSK(payloadSize uint, bitrate int) (time.Duration, error) {
-	tPkt := int64(time.Second) * (int64(payloadSize) + 5 + 3 + 1 + 2) * 8 / int64(bitrate)
-	return time.Duration(tPkt), nil
+func computeFSK(downlink ttnpb.DownlinkMessage) time.Duration {
+	payloadSize := len(downlink.RawPayload)
+	bitRate := downlink.Settings.BitRate
+
+	tPkt := int64(time.Second) * (int64(payloadSize) + 5 + 3 + 1 + 2) * 8 / int64(bitRate)
+
+	return time.Duration(tPkt)
 }
