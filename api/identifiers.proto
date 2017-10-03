@@ -10,7 +10,7 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // UserIdentifier is the message that is used to identify an user by ID or by email.
 message UserIdentifier {
-  oneof Identifiers {
+  oneof Identifier {
     UserIDIdentifier id = 1 [(gogoproto.customname) = "ID"];
     UserEmailIdentifier email = 2;
   }
@@ -48,6 +48,7 @@ message GatewayIdentifier {
   string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
 }
 
+// GatewayAntennaIdentifier is the message that is used to identify a gateway's antenna.
 message GatewayAntennaIdentifier {
   GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   // antenna_is the gateway antenna's ID.
