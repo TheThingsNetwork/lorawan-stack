@@ -5,7 +5,7 @@ GRPC_GATEWAY_REPO=github.com/grpc-ecosystem/grpc-gateway
 
 DOCKER ?= docker
 DOCKER_ARGS = run --user `id -u` --rm -v$(GO_PATH):$(GO_PATH) -w`pwd`
-DOCKER_IMAGE ?= thethingsindustries/protoc
+DOCKER_IMAGE ?= thethingsindustries/protoc:3
 PROTOC ?= $(DOCKER) $(DOCKER_ARGS) $(DOCKER_IMAGE) -I/usr/include
 PROTOC += -I$(VENDOR_DIR) -I$(GOPATH)/src -I$(VENDOR_DIR)/$(GRPC_GATEWAY_REPO)/third_party/googleapis
 
