@@ -12,7 +12,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 )
 
-// Compute the time-on-air from the payload and RF parameters.
+// Compute the time-on-air from the payload and RF parameters. This function only takes into account the PHY payload.
 //
 // See http://www.semtech.com/images/datasheet/LoraDesignGuide_STD.pdf, page 7
 func Compute(downlink ttnpb.DownlinkMessage) (time.Duration, error) {
