@@ -122,8 +122,6 @@ type CreateApplicationRequest struct {
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	// app_euis are the app euis this application uses.
 	AppEUIs []github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,3,rep,name=app_euis,json=appEuis,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"app_euis,omitempty"`
-	// api_keys are the API keys of the application.
-	APIKeys []APIKey `protobuf:"bytes,4,rep,name=api_keys,json=apiKeys" json:"api_keys"`
 }
 
 func (m *CreateApplicationRequest) Reset()      { *m = CreateApplicationRequest{} }
@@ -137,13 +135,6 @@ func (m *CreateApplicationRequest) GetDescription() string {
 		return m.Description
 	}
 	return ""
-}
-
-func (m *CreateApplicationRequest) GetAPIKeys() []APIKey {
-	if m != nil {
-		return m.APIKeys
-	}
-	return nil
 }
 
 type ListApplicationsResponse struct {
@@ -169,8 +160,6 @@ type UpdateApplicationRequest struct {
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	// app_euis are the app euis this application uses.
 	AppEUIs []github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,3,rep,name=app_euis,json=appEuis,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"app_euis,omitempty"`
-	// api_keys are the API keys of the application.
-	APIKeys []APIKey `protobuf:"bytes,4,rep,name=api_keys,json=apiKeys" json:"api_keys"`
 }
 
 func (m *UpdateApplicationRequest) Reset()      { *m = UpdateApplicationRequest{} }
@@ -186,25 +175,6 @@ func (m *UpdateApplicationRequest) GetDescription() string {
 	return ""
 }
 
-func (m *UpdateApplicationRequest) GetAPIKeys() []APIKey {
-	if m != nil {
-		return m.APIKeys
-	}
-	return nil
-}
-
-type AddApplicationAppEUIRequest struct {
-	ApplicationIdentifier `protobuf:"bytes,1,opt,name=application_id,json=applicationId,embedded=application_id" json:"application_id"`
-	// app_eui is the AppEUI to be added.
-	AppEUI github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,2,opt,name=app_eui,json=appEui,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"app_eui"`
-}
-
-func (m *AddApplicationAppEUIRequest) Reset()      { *m = AddApplicationAppEUIRequest{} }
-func (*AddApplicationAppEUIRequest) ProtoMessage() {}
-func (*AddApplicationAppEUIRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{6}
-}
-
 type GenerateApplicationAppEUIResponse struct {
 	// app_eui is the AppEUI that has been generated.
 	AppEUI github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,1,opt,name=app_eui,json=appEui,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"app_eui"`
@@ -213,25 +183,13 @@ type GenerateApplicationAppEUIResponse struct {
 func (m *GenerateApplicationAppEUIResponse) Reset()      { *m = GenerateApplicationAppEUIResponse{} }
 func (*GenerateApplicationAppEUIResponse) ProtoMessage() {}
 func (*GenerateApplicationAppEUIResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{7}
-}
-
-type RemoveApplicationAppEUIRequest struct {
-	ApplicationIdentifier `protobuf:"bytes,1,opt,name=application_id,json=applicationId,embedded=application_id" json:"application_id"`
-	// app_eui is the AppEUI to be removed.
-	AppEUI github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,2,opt,name=app_eui,json=appEui,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"app_eui"`
-}
-
-func (m *RemoveApplicationAppEUIRequest) Reset()      { *m = RemoveApplicationAppEUIRequest{} }
-func (*RemoveApplicationAppEUIRequest) ProtoMessage() {}
-func (*RemoveApplicationAppEUIRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{8}
+	return fileDescriptorIdentityserver, []int{6}
 }
 
 type GenerateApplicationAPIKeyRequest struct {
 	ApplicationIdentifier `protobuf:"bytes,1,opt,name=application_id,json=applicationId,embedded=application_id" json:"application_id"`
-	// name is the name of the API key to be generated.
-	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// key_name is the name of the API key to be generated.
+	KeyName string `protobuf:"bytes,2,opt,name=key_name,json=keyName,proto3" json:"key_name,omitempty"`
 	// rights the are rights the generated API key will bear.
 	Rights []Right `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
 }
@@ -239,12 +197,12 @@ type GenerateApplicationAPIKeyRequest struct {
 func (m *GenerateApplicationAPIKeyRequest) Reset()      { *m = GenerateApplicationAPIKeyRequest{} }
 func (*GenerateApplicationAPIKeyRequest) ProtoMessage() {}
 func (*GenerateApplicationAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{9}
+	return fileDescriptorIdentityserver, []int{7}
 }
 
-func (m *GenerateApplicationAPIKeyRequest) GetName() string {
+func (m *GenerateApplicationAPIKeyRequest) GetKeyName() string {
 	if m != nil {
-		return m.Name
+		return m.KeyName
 	}
 	return ""
 }
@@ -256,6 +214,25 @@ func (m *GenerateApplicationAPIKeyRequest) GetRights() []Right {
 	return nil
 }
 
+type RemoveApplicationAPIKeyRequest struct {
+	ApplicationIdentifier `protobuf:"bytes,1,opt,name=application_id,json=applicationId,embedded=application_id" json:"application_id"`
+	// key_name is the name of the API key to be removed.
+	KeyName string `protobuf:"bytes,2,opt,name=key_name,json=keyName,proto3" json:"key_name,omitempty"`
+}
+
+func (m *RemoveApplicationAPIKeyRequest) Reset()      { *m = RemoveApplicationAPIKeyRequest{} }
+func (*RemoveApplicationAPIKeyRequest) ProtoMessage() {}
+func (*RemoveApplicationAPIKeyRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{8}
+}
+
+func (m *RemoveApplicationAPIKeyRequest) GetKeyName() string {
+	if m != nil {
+		return m.KeyName
+	}
+	return ""
+}
+
 type AddApplicationCollaboratorRequest struct {
 	ApplicationIdentifier `protobuf:"bytes,1,opt,name=application_id,json=applicationId,embedded=application_id" json:"application_id"`
 	Collaborator          `protobuf:"bytes,2,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
@@ -264,7 +241,7 @@ type AddApplicationCollaboratorRequest struct {
 func (m *AddApplicationCollaboratorRequest) Reset()      { *m = AddApplicationCollaboratorRequest{} }
 func (*AddApplicationCollaboratorRequest) ProtoMessage() {}
 func (*AddApplicationCollaboratorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{10}
+	return fileDescriptorIdentityserver, []int{9}
 }
 
 type ListApplicationCollaboratorsResponse struct {
@@ -274,7 +251,7 @@ type ListApplicationCollaboratorsResponse struct {
 func (m *ListApplicationCollaboratorsResponse) Reset()      { *m = ListApplicationCollaboratorsResponse{} }
 func (*ListApplicationCollaboratorsResponse) ProtoMessage() {}
 func (*ListApplicationCollaboratorsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{11}
+	return fileDescriptorIdentityserver, []int{10}
 }
 
 func (m *ListApplicationCollaboratorsResponse) GetCollaborators() []Collaborator {
@@ -292,7 +269,7 @@ type RemoveApplicationCollaboratorRequest struct {
 func (m *RemoveApplicationCollaboratorRequest) Reset()      { *m = RemoveApplicationCollaboratorRequest{} }
 func (*RemoveApplicationCollaboratorRequest) ProtoMessage() {}
 func (*RemoveApplicationCollaboratorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{12}
+	return fileDescriptorIdentityserver, []int{11}
 }
 
 type ApplicationRight struct {
@@ -304,7 +281,7 @@ type ApplicationRight struct {
 
 func (m *ApplicationRight) Reset()                    { *m = ApplicationRight{} }
 func (*ApplicationRight) ProtoMessage()               {}
-func (*ApplicationRight) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{13} }
+func (*ApplicationRight) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{12} }
 
 func (m *ApplicationRight) GetRight() Right {
 	if m != nil {
@@ -321,7 +298,7 @@ type ListApplicationRightsResponse struct {
 func (m *ListApplicationRightsResponse) Reset()      { *m = ListApplicationRightsResponse{} }
 func (*ListApplicationRightsResponse) ProtoMessage() {}
 func (*ListApplicationRightsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{14}
+	return fileDescriptorIdentityserver, []int{13}
 }
 
 func (m *ListApplicationRightsResponse) GetRights() []Right {
@@ -357,7 +334,7 @@ type CreateGatewayRequest struct {
 func (m *CreateGatewayRequest) Reset()      { *m = CreateGatewayRequest{} }
 func (*CreateGatewayRequest) ProtoMessage() {}
 func (*CreateGatewayRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{15}
+	return fileDescriptorIdentityserver, []int{14}
 }
 
 func (m *CreateGatewayRequest) GetDescription() string {
@@ -423,7 +400,7 @@ type ListGatewaysResponse struct {
 func (m *ListGatewaysResponse) Reset()      { *m = ListGatewaysResponse{} }
 func (*ListGatewaysResponse) ProtoMessage() {}
 func (*ListGatewaysResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{16}
+	return fileDescriptorIdentityserver, []int{15}
 }
 
 func (m *ListGatewaysResponse) GetGateways() []Gateway {
@@ -458,7 +435,7 @@ type UpdateGatewayRequest struct {
 func (m *UpdateGatewayRequest) Reset()      { *m = UpdateGatewayRequest{} }
 func (*UpdateGatewayRequest) ProtoMessage() {}
 func (*UpdateGatewayRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{17}
+	return fileDescriptorIdentityserver, []int{16}
 }
 
 func (m *UpdateGatewayRequest) GetDescription() string {
@@ -528,7 +505,7 @@ type SetGatewayAttributeRequest struct {
 func (m *SetGatewayAttributeRequest) Reset()      { *m = SetGatewayAttributeRequest{} }
 func (*SetGatewayAttributeRequest) ProtoMessage() {}
 func (*SetGatewayAttributeRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{18}
+	return fileDescriptorIdentityserver, []int{17}
 }
 
 func (m *SetGatewayAttributeRequest) GetAttribute() string {
@@ -554,7 +531,7 @@ type RemoveGatewayAttributeRequest struct {
 func (m *RemoveGatewayAttributeRequest) Reset()      { *m = RemoveGatewayAttributeRequest{} }
 func (*RemoveGatewayAttributeRequest) ProtoMessage() {}
 func (*RemoveGatewayAttributeRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{19}
+	return fileDescriptorIdentityserver, []int{18}
 }
 
 func (m *RemoveGatewayAttributeRequest) GetAttribute() string {
@@ -581,7 +558,7 @@ type AddGatewayAntennaRequest struct {
 func (m *AddGatewayAntennaRequest) Reset()      { *m = AddGatewayAntennaRequest{} }
 func (*AddGatewayAntennaRequest) ProtoMessage() {}
 func (*AddGatewayAntennaRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{20}
+	return fileDescriptorIdentityserver, []int{19}
 }
 
 func (m *AddGatewayAntennaRequest) GetGain() float32 {
@@ -636,7 +613,7 @@ type EditGatewayAntennaRequest struct {
 func (m *EditGatewayAntennaRequest) Reset()      { *m = EditGatewayAntennaRequest{} }
 func (*EditGatewayAntennaRequest) ProtoMessage() {}
 func (*EditGatewayAntennaRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{21}
+	return fileDescriptorIdentityserver, []int{20}
 }
 
 func (m *EditGatewayAntennaRequest) GetGain() float32 {
@@ -682,7 +659,7 @@ type AddGatewayCollaboratorRequest struct {
 func (m *AddGatewayCollaboratorRequest) Reset()      { *m = AddGatewayCollaboratorRequest{} }
 func (*AddGatewayCollaboratorRequest) ProtoMessage() {}
 func (*AddGatewayCollaboratorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{22}
+	return fileDescriptorIdentityserver, []int{21}
 }
 
 type ListGatewayCollaboratorsResponse struct {
@@ -692,7 +669,7 @@ type ListGatewayCollaboratorsResponse struct {
 func (m *ListGatewayCollaboratorsResponse) Reset()      { *m = ListGatewayCollaboratorsResponse{} }
 func (*ListGatewayCollaboratorsResponse) ProtoMessage() {}
 func (*ListGatewayCollaboratorsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{23}
+	return fileDescriptorIdentityserver, []int{22}
 }
 
 func (m *ListGatewayCollaboratorsResponse) GetCollaborators() []Collaborator {
@@ -710,7 +687,7 @@ type ListGatewayOwnersResponse struct {
 func (m *ListGatewayOwnersResponse) Reset()      { *m = ListGatewayOwnersResponse{} }
 func (*ListGatewayOwnersResponse) ProtoMessage() {}
 func (*ListGatewayOwnersResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{24}
+	return fileDescriptorIdentityserver, []int{23}
 }
 
 func (m *ListGatewayOwnersResponse) GetCollaborators() []Collaborator {
@@ -728,7 +705,7 @@ type RemoveGatewayCollaboratorRequest struct {
 func (m *RemoveGatewayCollaboratorRequest) Reset()      { *m = RemoveGatewayCollaboratorRequest{} }
 func (*RemoveGatewayCollaboratorRequest) ProtoMessage() {}
 func (*RemoveGatewayCollaboratorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{25}
+	return fileDescriptorIdentityserver, []int{24}
 }
 
 type GatewayRight struct {
@@ -740,7 +717,7 @@ type GatewayRight struct {
 
 func (m *GatewayRight) Reset()                    { *m = GatewayRight{} }
 func (*GatewayRight) ProtoMessage()               {}
-func (*GatewayRight) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{26} }
+func (*GatewayRight) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{25} }
 
 func (m *GatewayRight) GetRight() Right {
 	if m != nil {
@@ -757,7 +734,7 @@ type ListGatewayRightsResponse struct {
 func (m *ListGatewayRightsResponse) Reset()      { *m = ListGatewayRightsResponse{} }
 func (*ListGatewayRightsResponse) ProtoMessage() {}
 func (*ListGatewayRightsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{27}
+	return fileDescriptorIdentityserver, []int{26}
 }
 
 func (m *ListGatewayRightsResponse) GetRights() []Right {
@@ -785,7 +762,7 @@ type CreateClientRequest struct {
 func (m *CreateClientRequest) Reset()      { *m = CreateClientRequest{} }
 func (*CreateClientRequest) ProtoMessage() {}
 func (*CreateClientRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{28}
+	return fileDescriptorIdentityserver, []int{27}
 }
 
 func (m *CreateClientRequest) GetDescription() string {
@@ -831,7 +808,7 @@ type ListClientsResponse struct {
 func (m *ListClientsResponse) Reset()      { *m = ListClientsResponse{} }
 func (*ListClientsResponse) ProtoMessage() {}
 func (*ListClientsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{29}
+	return fileDescriptorIdentityserver, []int{28}
 }
 
 func (m *ListClientsResponse) GetClients() []Client {
@@ -858,7 +835,7 @@ type UpdateClientRequest struct {
 func (m *UpdateClientRequest) Reset()      { *m = UpdateClientRequest{} }
 func (*UpdateClientRequest) ProtoMessage() {}
 func (*UpdateClientRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{30}
+	return fileDescriptorIdentityserver, []int{29}
 }
 
 func (m *UpdateClientRequest) GetDescription() string {
@@ -906,7 +883,7 @@ type SetClientOfficialRequest struct {
 func (m *SetClientOfficialRequest) Reset()      { *m = SetClientOfficialRequest{} }
 func (*SetClientOfficialRequest) ProtoMessage() {}
 func (*SetClientOfficialRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{31}
+	return fileDescriptorIdentityserver, []int{30}
 }
 
 func (m *SetClientOfficialRequest) GetOfficial() bool {
@@ -924,7 +901,7 @@ type SetClientStateRequest struct {
 func (m *SetClientStateRequest) Reset()      { *m = SetClientStateRequest{} }
 func (*SetClientStateRequest) ProtoMessage() {}
 func (*SetClientStateRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{32}
+	return fileDescriptorIdentityserver, []int{31}
 }
 
 func (m *SetClientStateRequest) GetState() ClientState {
@@ -942,7 +919,7 @@ type AddClientCollaboratorRequest struct {
 func (m *AddClientCollaboratorRequest) Reset()      { *m = AddClientCollaboratorRequest{} }
 func (*AddClientCollaboratorRequest) ProtoMessage() {}
 func (*AddClientCollaboratorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{33}
+	return fileDescriptorIdentityserver, []int{32}
 }
 
 type ListClientCollaboratorsResponse struct {
@@ -952,7 +929,7 @@ type ListClientCollaboratorsResponse struct {
 func (m *ListClientCollaboratorsResponse) Reset()      { *m = ListClientCollaboratorsResponse{} }
 func (*ListClientCollaboratorsResponse) ProtoMessage() {}
 func (*ListClientCollaboratorsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{34}
+	return fileDescriptorIdentityserver, []int{33}
 }
 
 func (m *ListClientCollaboratorsResponse) GetCollaborators() []Collaborator {
@@ -970,7 +947,7 @@ type RemoveClientCollaboratorRequest struct {
 func (m *RemoveClientCollaboratorRequest) Reset()      { *m = RemoveClientCollaboratorRequest{} }
 func (*RemoveClientCollaboratorRequest) ProtoMessage() {}
 func (*RemoveClientCollaboratorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{35}
+	return fileDescriptorIdentityserver, []int{34}
 }
 
 type ClientRight struct {
@@ -982,7 +959,7 @@ type ClientRight struct {
 
 func (m *ClientRight) Reset()                    { *m = ClientRight{} }
 func (*ClientRight) ProtoMessage()               {}
-func (*ClientRight) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{36} }
+func (*ClientRight) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{35} }
 
 func (m *ClientRight) GetRight() Right {
 	if m != nil {
@@ -999,7 +976,7 @@ type ListClientRightsResponse struct {
 func (m *ListClientRightsResponse) Reset()      { *m = ListClientRightsResponse{} }
 func (*ListClientRightsResponse) ProtoMessage() {}
 func (*ListClientRightsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{37}
+	return fileDescriptorIdentityserver, []int{36}
 }
 
 func (m *ListClientRightsResponse) GetRights() []Right {
@@ -1016,10 +993,9 @@ func init() {
 	proto.RegisterType((*CreateApplicationRequest)(nil), "ttn.v3.CreateApplicationRequest")
 	proto.RegisterType((*ListApplicationsResponse)(nil), "ttn.v3.ListApplicationsResponse")
 	proto.RegisterType((*UpdateApplicationRequest)(nil), "ttn.v3.UpdateApplicationRequest")
-	proto.RegisterType((*AddApplicationAppEUIRequest)(nil), "ttn.v3.AddApplicationAppEUIRequest")
 	proto.RegisterType((*GenerateApplicationAppEUIResponse)(nil), "ttn.v3.GenerateApplicationAppEUIResponse")
-	proto.RegisterType((*RemoveApplicationAppEUIRequest)(nil), "ttn.v3.RemoveApplicationAppEUIRequest")
 	proto.RegisterType((*GenerateApplicationAPIKeyRequest)(nil), "ttn.v3.GenerateApplicationAPIKeyRequest")
+	proto.RegisterType((*RemoveApplicationAPIKeyRequest)(nil), "ttn.v3.RemoveApplicationAPIKeyRequest")
 	proto.RegisterType((*AddApplicationCollaboratorRequest)(nil), "ttn.v3.AddApplicationCollaboratorRequest")
 	proto.RegisterType((*ListApplicationCollaboratorsResponse)(nil), "ttn.v3.ListApplicationCollaboratorsResponse")
 	proto.RegisterType((*RemoveApplicationCollaboratorRequest)(nil), "ttn.v3.RemoveApplicationCollaboratorRequest")
@@ -1375,19 +1351,13 @@ type IsApplicationClient interface {
 	UpdateApplication(ctx context.Context, in *UpdateApplicationRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// DeleteApplication permantly deletes an application.
 	DeleteApplication(ctx context.Context, in *ApplicationIdentifier, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
-	// AddApplicationAppEUI adds a given AppEUI to a given application.
-	AddApplicationAppEUI(ctx context.Context, in *AddApplicationAppEUIRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// GenerateApplicationAppEUI generates a new AppEUI for a given application and returns it.
 	GenerateApplicationAppEUI(ctx context.Context, in *ApplicationIdentifier, opts ...grpc.CallOption) (*GenerateApplicationAppEUIResponse, error)
-	// RemoveApplicationAppEUI deletes an AppEUI from an application.
-	RemoveApplicationAppEUI(ctx context.Context, in *RemoveApplicationAppEUIRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// GenerateApplicationAPIKey generates a new API key for a given application
 	// and returns it.
 	GenerateApplicationAPIKey(ctx context.Context, in *GenerateApplicationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
-	// GetApplicationAPIKey returns a given API key from an application.
-	GetApplicationAPIKey(ctx context.Context, in *ApplicationAPIKeyIdentifier, opts ...grpc.CallOption) (*APIKey, error)
 	// RemoveApplicationAPIKey removes a given API key from an application.
-	RemoveApplicationAPIKey(ctx context.Context, in *ApplicationAPIKeyIdentifier, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	RemoveApplicationAPIKey(ctx context.Context, in *RemoveApplicationAPIKeyRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// AddApplicationCollaborator adds an user as collaborator of an application.
 	AddApplicationCollaborator(ctx context.Context, in *AddApplicationCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// ListApplicationCollaborators returns all the collaborators of a given application.
@@ -1456,27 +1426,9 @@ func (c *isApplicationClient) DeleteApplication(ctx context.Context, in *Applica
 	return out, nil
 }
 
-func (c *isApplicationClient) AddApplicationAppEUI(ctx context.Context, in *AddApplicationAppEUIRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
-	out := new(google_protobuf2.Empty)
-	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/AddApplicationAppEUI", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *isApplicationClient) GenerateApplicationAppEUI(ctx context.Context, in *ApplicationIdentifier, opts ...grpc.CallOption) (*GenerateApplicationAppEUIResponse, error) {
 	out := new(GenerateApplicationAppEUIResponse)
 	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/GenerateApplicationAppEUI", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *isApplicationClient) RemoveApplicationAppEUI(ctx context.Context, in *RemoveApplicationAppEUIRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
-	out := new(google_protobuf2.Empty)
-	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/RemoveApplicationAppEUI", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1492,16 +1444,7 @@ func (c *isApplicationClient) GenerateApplicationAPIKey(ctx context.Context, in 
 	return out, nil
 }
 
-func (c *isApplicationClient) GetApplicationAPIKey(ctx context.Context, in *ApplicationAPIKeyIdentifier, opts ...grpc.CallOption) (*APIKey, error) {
-	out := new(APIKey)
-	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/GetApplicationAPIKey", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *isApplicationClient) RemoveApplicationAPIKey(ctx context.Context, in *ApplicationAPIKeyIdentifier, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+func (c *isApplicationClient) RemoveApplicationAPIKey(ctx context.Context, in *RemoveApplicationAPIKeyRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
 	out := new(google_protobuf2.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/RemoveApplicationAPIKey", in, out, c.cc, opts...)
 	if err != nil {
@@ -1578,19 +1521,13 @@ type IsApplicationServer interface {
 	UpdateApplication(context.Context, *UpdateApplicationRequest) (*google_protobuf2.Empty, error)
 	// DeleteApplication permantly deletes an application.
 	DeleteApplication(context.Context, *ApplicationIdentifier) (*google_protobuf2.Empty, error)
-	// AddApplicationAppEUI adds a given AppEUI to a given application.
-	AddApplicationAppEUI(context.Context, *AddApplicationAppEUIRequest) (*google_protobuf2.Empty, error)
 	// GenerateApplicationAppEUI generates a new AppEUI for a given application and returns it.
 	GenerateApplicationAppEUI(context.Context, *ApplicationIdentifier) (*GenerateApplicationAppEUIResponse, error)
-	// RemoveApplicationAppEUI deletes an AppEUI from an application.
-	RemoveApplicationAppEUI(context.Context, *RemoveApplicationAppEUIRequest) (*google_protobuf2.Empty, error)
 	// GenerateApplicationAPIKey generates a new API key for a given application
 	// and returns it.
 	GenerateApplicationAPIKey(context.Context, *GenerateApplicationAPIKeyRequest) (*APIKey, error)
-	// GetApplicationAPIKey returns a given API key from an application.
-	GetApplicationAPIKey(context.Context, *ApplicationAPIKeyIdentifier) (*APIKey, error)
 	// RemoveApplicationAPIKey removes a given API key from an application.
-	RemoveApplicationAPIKey(context.Context, *ApplicationAPIKeyIdentifier) (*google_protobuf2.Empty, error)
+	RemoveApplicationAPIKey(context.Context, *RemoveApplicationAPIKeyRequest) (*google_protobuf2.Empty, error)
 	// AddApplicationCollaborator adds an user as collaborator of an application.
 	AddApplicationCollaborator(context.Context, *AddApplicationCollaboratorRequest) (*google_protobuf2.Empty, error)
 	// ListApplicationCollaborators returns all the collaborators of a given application.
@@ -1700,24 +1637,6 @@ func _IsApplication_DeleteApplication_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IsApplication_AddApplicationAppEUI_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddApplicationAppEUIRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IsApplicationServer).AddApplicationAppEUI(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ttn.v3.IsApplication/AddApplicationAppEUI",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsApplicationServer).AddApplicationAppEUI(ctx, req.(*AddApplicationAppEUIRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _IsApplication_GenerateApplicationAppEUI_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ApplicationIdentifier)
 	if err := dec(in); err != nil {
@@ -1732,24 +1651,6 @@ func _IsApplication_GenerateApplicationAppEUI_Handler(srv interface{}, ctx conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IsApplicationServer).GenerateApplicationAppEUI(ctx, req.(*ApplicationIdentifier))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _IsApplication_RemoveApplicationAppEUI_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RemoveApplicationAppEUIRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IsApplicationServer).RemoveApplicationAppEUI(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ttn.v3.IsApplication/RemoveApplicationAppEUI",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsApplicationServer).RemoveApplicationAppEUI(ctx, req.(*RemoveApplicationAppEUIRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1772,26 +1673,8 @@ func _IsApplication_GenerateApplicationAPIKey_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IsApplication_GetApplicationAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ApplicationAPIKeyIdentifier)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IsApplicationServer).GetApplicationAPIKey(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ttn.v3.IsApplication/GetApplicationAPIKey",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsApplicationServer).GetApplicationAPIKey(ctx, req.(*ApplicationAPIKeyIdentifier))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _IsApplication_RemoveApplicationAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ApplicationAPIKeyIdentifier)
+	in := new(RemoveApplicationAPIKeyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1803,7 +1686,7 @@ func _IsApplication_RemoveApplicationAPIKey_Handler(srv interface{}, ctx context
 		FullMethod: "/ttn.v3.IsApplication/RemoveApplicationAPIKey",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsApplicationServer).RemoveApplicationAPIKey(ctx, req.(*ApplicationAPIKeyIdentifier))
+		return srv.(IsApplicationServer).RemoveApplicationAPIKey(ctx, req.(*RemoveApplicationAPIKeyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1941,24 +1824,12 @@ var _IsApplication_serviceDesc = grpc.ServiceDesc{
 			Handler:    _IsApplication_DeleteApplication_Handler,
 		},
 		{
-			MethodName: "AddApplicationAppEUI",
-			Handler:    _IsApplication_AddApplicationAppEUI_Handler,
-		},
-		{
 			MethodName: "GenerateApplicationAppEUI",
 			Handler:    _IsApplication_GenerateApplicationAppEUI_Handler,
 		},
 		{
-			MethodName: "RemoveApplicationAppEUI",
-			Handler:    _IsApplication_RemoveApplicationAppEUI_Handler,
-		},
-		{
 			MethodName: "GenerateApplicationAPIKey",
 			Handler:    _IsApplication_GenerateApplicationAPIKey_Handler,
-		},
-		{
-			MethodName: "GetApplicationAPIKey",
-			Handler:    _IsApplication_GetApplicationAPIKey_Handler,
 		},
 		{
 			MethodName: "RemoveApplicationAPIKey",
@@ -3262,18 +3133,6 @@ func (m *CreateApplicationRequest) MarshalTo(dAtA []byte) (int, error) {
 			i += n
 		}
 	}
-	if len(m.APIKeys) > 0 {
-		for _, msg := range m.APIKeys {
-			dAtA[i] = 0x22
-			i++
-			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
 	return i, nil
 }
 
@@ -3348,52 +3207,6 @@ func (m *UpdateApplicationRequest) MarshalTo(dAtA []byte) (int, error) {
 			i += n
 		}
 	}
-	if len(m.APIKeys) > 0 {
-		for _, msg := range m.APIKeys {
-			dAtA[i] = 0x22
-			i++
-			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	return i, nil
-}
-
-func (m *AddApplicationAppEUIRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *AddApplicationAppEUIRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
-	n4, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n4
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.AppEUI.Size()))
-	n5, err := m.AppEUI.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n5
 	return i, nil
 }
 
@@ -3415,45 +3228,11 @@ func (m *GenerateApplicationAppEUIResponse) MarshalTo(dAtA []byte) (int, error) 
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.AppEUI.Size()))
-	n6, err := m.AppEUI.MarshalTo(dAtA[i:])
+	n4, err := m.AppEUI.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n6
-	return i, nil
-}
-
-func (m *RemoveApplicationAppEUIRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *RemoveApplicationAppEUIRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
-	n7, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n7
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.AppEUI.Size()))
-	n8, err := m.AppEUI.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n8
+	i += n4
 	return i, nil
 }
 
@@ -3475,33 +3254,65 @@ func (m *GenerateApplicationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
-	n9, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
+	n5, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n9
-	if len(m.Name) > 0 {
+	i += n5
+	if len(m.KeyName) > 0 {
 		dAtA[i] = 0x12
 		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.KeyName)))
+		i += copy(dAtA[i:], m.KeyName)
 	}
 	if len(m.Rights) > 0 {
-		dAtA11 := make([]byte, len(m.Rights)*10)
-		var j10 int
+		dAtA7 := make([]byte, len(m.Rights)*10)
+		var j6 int
 		for _, num := range m.Rights {
 			for num >= 1<<7 {
-				dAtA11[j10] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA7[j6] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j10++
+				j6++
 			}
-			dAtA11[j10] = uint8(num)
-			j10++
+			dAtA7[j6] = uint8(num)
+			j6++
 		}
 		dAtA[i] = 0x1a
 		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j10))
-		i += copy(dAtA[i:], dAtA11[:j10])
+		i = encodeVarintIdentityserver(dAtA, i, uint64(j6))
+		i += copy(dAtA[i:], dAtA7[:j6])
+	}
+	return i, nil
+}
+
+func (m *RemoveApplicationAPIKeyRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RemoveApplicationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
+	n8, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n8
+	if len(m.KeyName) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.KeyName)))
+		i += copy(dAtA[i:], m.KeyName)
 	}
 	return i, nil
 }
@@ -3524,19 +3335,19 @@ func (m *AddApplicationCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) 
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
-	n12, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
+	n9, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n12
+	i += n9
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Collaborator.Size()))
-	n13, err := m.Collaborator.MarshalTo(dAtA[i:])
+	n10, err := m.Collaborator.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n13
+	i += n10
 	return i, nil
 }
 
@@ -3588,19 +3399,19 @@ func (m *RemoveApplicationCollaboratorRequest) MarshalTo(dAtA []byte) (int, erro
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
-	n14, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
+	n11, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n14
+	i += n11
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UserIdentifier.Size()))
-	n15, err := m.UserIdentifier.MarshalTo(dAtA[i:])
+	n12, err := m.UserIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n15
+	i += n12
 	return i, nil
 }
 
@@ -3622,19 +3433,19 @@ func (m *ApplicationRight) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
-	n16, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
+	n13, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n16
+	i += n13
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UserIdentifier.Size()))
-	n17, err := m.UserIdentifier.MarshalTo(dAtA[i:])
+	n14, err := m.UserIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n17
+	i += n14
 	if m.Right != 0 {
 		dAtA[i] = 0x18
 		i++
@@ -3659,21 +3470,21 @@ func (m *ListApplicationRightsResponse) MarshalTo(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	if len(m.Rights) > 0 {
-		dAtA19 := make([]byte, len(m.Rights)*10)
-		var j18 int
+		dAtA16 := make([]byte, len(m.Rights)*10)
+		var j15 int
 		for _, num := range m.Rights {
 			for num >= 1<<7 {
-				dAtA19[j18] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA16[j15] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j18++
+				j15++
 			}
-			dAtA19[j18] = uint8(num)
-			j18++
+			dAtA16[j15] = uint8(num)
+			j15++
 		}
 		dAtA[i] = 0x1a
 		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j18))
-		i += copy(dAtA[i:], dAtA19[:j18])
+		i = encodeVarintIdentityserver(dAtA, i, uint64(j15))
+		i += copy(dAtA[i:], dAtA16[:j15])
 	}
 	return i, nil
 }
@@ -3696,11 +3507,11 @@ func (m *CreateGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
-	n20, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	n17, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n20
+	i += n17
 	if len(m.Description) > 0 {
 		dAtA[i] = 0x12
 		i++
@@ -3716,11 +3527,11 @@ func (m *CreateGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0x22
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.PrivacySettings.Size()))
-	n21, err := m.PrivacySettings.MarshalTo(dAtA[i:])
+	n18, err := m.PrivacySettings.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n21
+	i += n18
 	if m.AutoUpdate {
 		dAtA[i] = 0x28
 		i++
@@ -3823,11 +3634,11 @@ func (m *UpdateGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
-	n22, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	n19, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n22
+	i += n19
 	if len(m.Description) > 0 {
 		dAtA[i] = 0x12
 		i++
@@ -3843,11 +3654,11 @@ func (m *UpdateGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0x22
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.PrivacySettings.Size()))
-	n23, err := m.PrivacySettings.MarshalTo(dAtA[i:])
+	n20, err := m.PrivacySettings.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n23
+	i += n20
 	if m.AutoUpdate {
 		dAtA[i] = 0x28
 		i++
@@ -3920,11 +3731,11 @@ func (m *SetGatewayAttributeRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
-	n24, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	n21, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n24
+	i += n21
 	if len(m.Attribute) > 0 {
 		dAtA[i] = 0x12
 		i++
@@ -3958,11 +3769,11 @@ func (m *RemoveGatewayAttributeRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
-	n25, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	n22, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n25
+	i += n22
 	if len(m.Attribute) > 0 {
 		dAtA[i] = 0x12
 		i++
@@ -3990,11 +3801,11 @@ func (m *AddGatewayAntennaRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
-	n26, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	n23, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n26
+	i += n23
 	if m.Gain != 0 {
 		dAtA[i] = 0x15
 		i++
@@ -4003,11 +3814,11 @@ func (m *AddGatewayAntennaRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Location.Size()))
-	n27, err := m.Location.MarshalTo(dAtA[i:])
+	n24, err := m.Location.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n27
+	i += n24
 	if len(m.Type) > 0 {
 		dAtA[i] = 0x22
 		i++
@@ -4046,11 +3857,11 @@ func (m *EditGatewayAntennaRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayAntennaIdentifier.Size()))
-	n28, err := m.GatewayAntennaIdentifier.MarshalTo(dAtA[i:])
+	n25, err := m.GatewayAntennaIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n28
+	i += n25
 	if m.Gain != 0 {
 		dAtA[i] = 0x15
 		i++
@@ -4059,11 +3870,11 @@ func (m *EditGatewayAntennaRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Location.Size()))
-	n29, err := m.Location.MarshalTo(dAtA[i:])
+	n26, err := m.Location.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n29
+	i += n26
 	if len(m.Type) > 0 {
 		dAtA[i] = 0x22
 		i++
@@ -4102,19 +3913,19 @@ func (m *AddGatewayCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
-	n30, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	n27, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n30
+	i += n27
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Collaborator.Size()))
-	n31, err := m.Collaborator.MarshalTo(dAtA[i:])
+	n28, err := m.Collaborator.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n31
+	i += n28
 	return i, nil
 }
 
@@ -4196,19 +4007,19 @@ func (m *RemoveGatewayCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
-	n32, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	n29, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n32
+	i += n29
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UserIdentifier.Size()))
-	n33, err := m.UserIdentifier.MarshalTo(dAtA[i:])
+	n30, err := m.UserIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n33
+	i += n30
 	return i, nil
 }
 
@@ -4230,19 +4041,19 @@ func (m *GatewayRight) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
-	n34, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	n31, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n34
+	i += n31
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UserIdentifier.Size()))
-	n35, err := m.UserIdentifier.MarshalTo(dAtA[i:])
+	n32, err := m.UserIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n35
+	i += n32
 	if m.Right != 0 {
 		dAtA[i] = 0x18
 		i++
@@ -4267,21 +4078,21 @@ func (m *ListGatewayRightsResponse) MarshalTo(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	if len(m.Rights) > 0 {
-		dAtA37 := make([]byte, len(m.Rights)*10)
-		var j36 int
+		dAtA34 := make([]byte, len(m.Rights)*10)
+		var j33 int
 		for _, num := range m.Rights {
 			for num >= 1<<7 {
-				dAtA37[j36] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA34[j33] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j36++
+				j33++
 			}
-			dAtA37[j36] = uint8(num)
-			j36++
+			dAtA34[j33] = uint8(num)
+			j33++
 		}
 		dAtA[i] = 0xa
 		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j36))
-		i += copy(dAtA[i:], dAtA37[:j36])
+		i = encodeVarintIdentityserver(dAtA, i, uint64(j33))
+		i += copy(dAtA[i:], dAtA34[:j33])
 	}
 	return i, nil
 }
@@ -4304,11 +4115,11 @@ func (m *CreateClientRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifier.Size()))
-	n38, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
+	n35, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n38
+	i += n35
 	if len(m.Description) > 0 {
 		dAtA[i] = 0x12
 		i++
@@ -4328,38 +4139,38 @@ func (m *CreateClientRequest) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], m.CallbackURI)
 	}
 	if len(m.Grants) > 0 {
-		dAtA40 := make([]byte, len(m.Grants)*10)
-		var j39 int
+		dAtA37 := make([]byte, len(m.Grants)*10)
+		var j36 int
 		for _, num := range m.Grants {
 			for num >= 1<<7 {
-				dAtA40[j39] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA37[j36] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j39++
+				j36++
 			}
-			dAtA40[j39] = uint8(num)
-			j39++
+			dAtA37[j36] = uint8(num)
+			j36++
 		}
 		dAtA[i] = 0x2a
 		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j39))
-		i += copy(dAtA[i:], dAtA40[:j39])
+		i = encodeVarintIdentityserver(dAtA, i, uint64(j36))
+		i += copy(dAtA[i:], dAtA37[:j36])
 	}
 	if len(m.Scope) > 0 {
-		dAtA42 := make([]byte, len(m.Scope)*10)
-		var j41 int
+		dAtA39 := make([]byte, len(m.Scope)*10)
+		var j38 int
 		for _, num := range m.Scope {
 			for num >= 1<<7 {
-				dAtA42[j41] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA39[j38] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j41++
+				j38++
 			}
-			dAtA42[j41] = uint8(num)
-			j41++
+			dAtA39[j38] = uint8(num)
+			j38++
 		}
 		dAtA[i] = 0x32
 		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j41))
-		i += copy(dAtA[i:], dAtA42[:j41])
+		i = encodeVarintIdentityserver(dAtA, i, uint64(j38))
+		i += copy(dAtA[i:], dAtA39[:j38])
 	}
 	return i, nil
 }
@@ -4412,11 +4223,11 @@ func (m *UpdateClientRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifier.Size()))
-	n43, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
+	n40, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n43
+	i += n40
 	if len(m.Description) > 0 {
 		dAtA[i] = 0x12
 		i++
@@ -4436,38 +4247,38 @@ func (m *UpdateClientRequest) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], m.CallbackURI)
 	}
 	if len(m.Grants) > 0 {
-		dAtA45 := make([]byte, len(m.Grants)*10)
-		var j44 int
+		dAtA42 := make([]byte, len(m.Grants)*10)
+		var j41 int
 		for _, num := range m.Grants {
 			for num >= 1<<7 {
-				dAtA45[j44] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA42[j41] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j44++
+				j41++
 			}
-			dAtA45[j44] = uint8(num)
-			j44++
+			dAtA42[j41] = uint8(num)
+			j41++
 		}
 		dAtA[i] = 0x2a
 		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j44))
-		i += copy(dAtA[i:], dAtA45[:j44])
+		i = encodeVarintIdentityserver(dAtA, i, uint64(j41))
+		i += copy(dAtA[i:], dAtA42[:j41])
 	}
 	if len(m.Scope) > 0 {
-		dAtA47 := make([]byte, len(m.Scope)*10)
-		var j46 int
+		dAtA44 := make([]byte, len(m.Scope)*10)
+		var j43 int
 		for _, num := range m.Scope {
 			for num >= 1<<7 {
-				dAtA47[j46] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA44[j43] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j46++
+				j43++
 			}
-			dAtA47[j46] = uint8(num)
-			j46++
+			dAtA44[j43] = uint8(num)
+			j43++
 		}
 		dAtA[i] = 0x32
 		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j46))
-		i += copy(dAtA[i:], dAtA47[:j46])
+		i = encodeVarintIdentityserver(dAtA, i, uint64(j43))
+		i += copy(dAtA[i:], dAtA44[:j43])
 	}
 	return i, nil
 }
@@ -4490,11 +4301,11 @@ func (m *SetClientOfficialRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifier.Size()))
-	n48, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
+	n45, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n48
+	i += n45
 	if m.Official {
 		dAtA[i] = 0x10
 		i++
@@ -4526,11 +4337,11 @@ func (m *SetClientStateRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifier.Size()))
-	n49, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
+	n46, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n49
+	i += n46
 	if m.State != 0 {
 		dAtA[i] = 0x10
 		i++
@@ -4557,19 +4368,19 @@ func (m *AddClientCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifier.Size()))
-	n50, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
+	n47, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n50
+	i += n47
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Collaborator.Size()))
-	n51, err := m.Collaborator.MarshalTo(dAtA[i:])
+	n48, err := m.Collaborator.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n51
+	i += n48
 	return i, nil
 }
 
@@ -4621,19 +4432,19 @@ func (m *RemoveClientCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifier.Size()))
-	n52, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
+	n49, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n52
+	i += n49
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UserIdentifier.Size()))
-	n53, err := m.UserIdentifier.MarshalTo(dAtA[i:])
+	n50, err := m.UserIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n53
+	i += n50
 	return i, nil
 }
 
@@ -4655,19 +4466,19 @@ func (m *ClientRight) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifier.Size()))
-	n54, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
+	n51, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n54
+	i += n51
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UserIdentifier.Size()))
-	n55, err := m.UserIdentifier.MarshalTo(dAtA[i:])
+	n52, err := m.UserIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n55
+	i += n52
 	if m.Right != 0 {
 		dAtA[i] = 0x18
 		i++
@@ -4692,21 +4503,21 @@ func (m *ListClientRightsResponse) MarshalTo(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	if len(m.Rights) > 0 {
-		dAtA57 := make([]byte, len(m.Rights)*10)
-		var j56 int
+		dAtA54 := make([]byte, len(m.Rights)*10)
+		var j53 int
 		for _, num := range m.Rights {
 			for num >= 1<<7 {
-				dAtA57[j56] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA54[j53] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j56++
+				j53++
 			}
-			dAtA57[j56] = uint8(num)
-			j56++
+			dAtA54[j53] = uint8(num)
+			j53++
 		}
 		dAtA[i] = 0xa
 		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j56))
-		i += copy(dAtA[i:], dAtA57[:j56])
+		i = encodeVarintIdentityserver(dAtA, i, uint64(j53))
+		i += copy(dAtA[i:], dAtA54[:j53])
 	}
 	return i, nil
 }
@@ -4801,12 +4612,6 @@ func (m *CreateApplicationRequest) Size() (n int) {
 			n += 1 + l + sovIdentityserver(uint64(l))
 		}
 	}
-	if len(m.APIKeys) > 0 {
-		for _, e := range m.APIKeys {
-			l = e.Size()
-			n += 1 + l + sovIdentityserver(uint64(l))
-		}
-	}
 	return n
 }
 
@@ -4837,22 +4642,6 @@ func (m *UpdateApplicationRequest) Size() (n int) {
 			n += 1 + l + sovIdentityserver(uint64(l))
 		}
 	}
-	if len(m.APIKeys) > 0 {
-		for _, e := range m.APIKeys {
-			l = e.Size()
-			n += 1 + l + sovIdentityserver(uint64(l))
-		}
-	}
-	return n
-}
-
-func (m *AddApplicationAppEUIRequest) Size() (n int) {
-	var l int
-	_ = l
-	l = m.ApplicationIdentifier.Size()
-	n += 1 + l + sovIdentityserver(uint64(l))
-	l = m.AppEUI.Size()
-	n += 1 + l + sovIdentityserver(uint64(l))
 	return n
 }
 
@@ -4864,22 +4653,12 @@ func (m *GenerateApplicationAppEUIResponse) Size() (n int) {
 	return n
 }
 
-func (m *RemoveApplicationAppEUIRequest) Size() (n int) {
-	var l int
-	_ = l
-	l = m.ApplicationIdentifier.Size()
-	n += 1 + l + sovIdentityserver(uint64(l))
-	l = m.AppEUI.Size()
-	n += 1 + l + sovIdentityserver(uint64(l))
-	return n
-}
-
 func (m *GenerateApplicationAPIKeyRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = m.ApplicationIdentifier.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
-	l = len(m.Name)
+	l = len(m.KeyName)
 	if l > 0 {
 		n += 1 + l + sovIdentityserver(uint64(l))
 	}
@@ -4889,6 +4668,18 @@ func (m *GenerateApplicationAPIKeyRequest) Size() (n int) {
 			l += sovIdentityserver(uint64(e))
 		}
 		n += 1 + sovIdentityserver(uint64(l)) + l
+	}
+	return n
+}
+
+func (m *RemoveApplicationAPIKeyRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ApplicationIdentifier.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.KeyName)
+	if l > 0 {
+		n += 1 + l + sovIdentityserver(uint64(l))
 	}
 	return n
 }
@@ -5411,7 +5202,6 @@ func (this *CreateApplicationRequest) String() string {
 		`ApplicationIdentifier:` + strings.Replace(strings.Replace(this.ApplicationIdentifier.String(), "ApplicationIdentifier", "ApplicationIdentifier", 1), `&`, ``, 1) + `,`,
 		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
 		`AppEUIs:` + fmt.Sprintf("%v", this.AppEUIs) + `,`,
-		`APIKeys:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.APIKeys), "APIKey", "APIKey", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5434,18 +5224,6 @@ func (this *UpdateApplicationRequest) String() string {
 		`ApplicationIdentifier:` + strings.Replace(strings.Replace(this.ApplicationIdentifier.String(), "ApplicationIdentifier", "ApplicationIdentifier", 1), `&`, ``, 1) + `,`,
 		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
 		`AppEUIs:` + fmt.Sprintf("%v", this.AppEUIs) + `,`,
-		`APIKeys:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.APIKeys), "APIKey", "APIKey", 1), `&`, ``, 1) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *AddApplicationAppEUIRequest) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&AddApplicationAppEUIRequest{`,
-		`ApplicationIdentifier:` + strings.Replace(strings.Replace(this.ApplicationIdentifier.String(), "ApplicationIdentifier", "ApplicationIdentifier", 1), `&`, ``, 1) + `,`,
-		`AppEUI:` + fmt.Sprintf("%v", this.AppEUI) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5460,25 +5238,25 @@ func (this *GenerateApplicationAppEUIResponse) String() string {
 	}, "")
 	return s
 }
-func (this *RemoveApplicationAppEUIRequest) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&RemoveApplicationAppEUIRequest{`,
-		`ApplicationIdentifier:` + strings.Replace(strings.Replace(this.ApplicationIdentifier.String(), "ApplicationIdentifier", "ApplicationIdentifier", 1), `&`, ``, 1) + `,`,
-		`AppEUI:` + fmt.Sprintf("%v", this.AppEUI) + `,`,
-		`}`,
-	}, "")
-	return s
-}
 func (this *GenerateApplicationAPIKeyRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GenerateApplicationAPIKeyRequest{`,
 		`ApplicationIdentifier:` + strings.Replace(strings.Replace(this.ApplicationIdentifier.String(), "ApplicationIdentifier", "ApplicationIdentifier", 1), `&`, ``, 1) + `,`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`KeyName:` + fmt.Sprintf("%v", this.KeyName) + `,`,
 		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *RemoveApplicationAPIKeyRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RemoveApplicationAPIKeyRequest{`,
+		`ApplicationIdentifier:` + strings.Replace(strings.Replace(this.ApplicationIdentifier.String(), "ApplicationIdentifier", "ApplicationIdentifier", 1), `&`, ``, 1) + `,`,
+		`KeyName:` + fmt.Sprintf("%v", this.KeyName) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -6347,37 +6125,6 @@ func (m *CreateApplicationRequest) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field APIKeys", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.APIKeys = append(m.APIKeys, APIKey{})
-			if err := m.APIKeys[len(m.APIKeys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipIdentityserver(dAtA[iNdEx:])
@@ -6600,147 +6347,6 @@ func (m *UpdateApplicationRequest) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field APIKeys", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.APIKeys = append(m.APIKeys, APIKey{})
-			if err := m.APIKeys[len(m.APIKeys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipIdentityserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *AddApplicationAppEUIRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowIdentityserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AddApplicationAppEUIRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AddApplicationAppEUIRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifier", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.ApplicationIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AppEUI", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.AppEUI.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipIdentityserver(dAtA[iNdEx:])
@@ -6792,116 +6398,6 @@ func (m *GenerateApplicationAppEUIResponse) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AppEUI", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.AppEUI.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipIdentityserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *RemoveApplicationAppEUIRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowIdentityserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: RemoveApplicationAppEUIRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: RemoveApplicationAppEUIRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifier", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.ApplicationIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AppEUI", wireType)
 			}
@@ -7013,7 +6509,7 @@ func (m *GenerateApplicationAPIKeyRequest) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field KeyName", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -7038,7 +6534,7 @@ func (m *GenerateApplicationAPIKeyRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Name = string(dAtA[iNdEx:postIndex])
+			m.KeyName = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType == 0 {
@@ -7102,6 +6598,115 @@ func (m *GenerateApplicationAPIKeyRequest) Unmarshal(dAtA []byte) error {
 			} else {
 				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
 			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RemoveApplicationAPIKeyRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RemoveApplicationAPIKeyRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RemoveApplicationAPIKeyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifier", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field KeyName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.KeyName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipIdentityserver(dAtA[iNdEx:])
@@ -11322,151 +10927,147 @@ func init() {
 }
 
 var fileDescriptorIdentityserver = []byte{
-	// 2333 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x5a, 0xcd, 0x73, 0xdb, 0xc6,
-	0x15, 0x37, 0x28, 0x89, 0xa2, 0x1e, 0x29, 0xc9, 0x5a, 0xc9, 0x0e, 0x44, 0xcb, 0x22, 0x4d, 0xdb,
-	0xb5, 0x3c, 0x75, 0xa9, 0x84, 0x69, 0x32, 0x6e, 0xa6, 0xfe, 0x20, 0x65, 0x85, 0xc3, 0xc4, 0x1f,
-	0x0a, 0x14, 0x35, 0xe3, 0xb4, 0x1e, 0x0d, 0x44, 0xae, 0x28, 0x8c, 0x40, 0x00, 0x05, 0x96, 0xd2,
-	0xf0, 0xd4, 0x76, 0xfa, 0x07, 0xf4, 0x92, 0x99, 0x5e, 0xda, 0x43, 0x27, 0x87, 0x9e, 0xda, 0x99,
-	0xf4, 0xd2, 0x43, 0x6f, 0x3d, 0x25, 0x9d, 0x1c, 0x72, 0xec, 0xf4, 0xa0, 0x69, 0x75, 0xea, 0xb1,
-	0x7f, 0x42, 0x07, 0xbb, 0x00, 0xb1, 0x00, 0xb1, 0x10, 0x69, 0x4b, 0xb5, 0x9b, 0xf1, 0x0d, 0xfb,
-	0xf1, 0xde, 0xbe, 0xf7, 0xdb, 0xb7, 0xef, 0x3d, 0xbe, 0x47, 0xb8, 0xdd, 0xd6, 0xc8, 0x5e, 0x77,
-	0xa7, 0xdc, 0x34, 0x3b, 0xab, 0x1f, 0xef, 0xe1, 0x8f, 0xf7, 0x34, 0xa3, 0xed, 0x3c, 0xc6, 0xe4,
-	0xd0, 0xb4, 0xf7, 0x57, 0x09, 0x31, 0x56, 0x55, 0x4b, 0x5b, 0xd5, 0x5a, 0xd8, 0x20, 0x1a, 0xe9,
-	0x39, 0xd8, 0x3e, 0xc0, 0x76, 0xd9, 0xb2, 0x4d, 0x62, 0xa2, 0x34, 0x21, 0x46, 0xf9, 0xe0, 0xed,
-	0xfc, 0xf7, 0x38, 0x0e, 0x6d, 0xb3, 0x6d, 0xae, 0xd2, 0xe5, 0x9d, 0xee, 0x2e, 0x1d, 0xd1, 0x01,
-	0xfd, 0x62, 0x64, 0xf9, 0x77, 0x86, 0x39, 0x50, 0xb5, 0x2c, 0x5d, 0x6b, 0xaa, 0x44, 0x33, 0x0d,
-	0x8f, 0xec, 0xcd, 0x61, 0xc8, 0x9a, 0xba, 0x86, 0x0d, 0xe2, 0x51, 0xbc, 0x3b, 0x14, 0x85, 0xa9,
-	0xeb, 0xea, 0x8e, 0x69, 0xab, 0xc4, 0xb4, 0x47, 0x39, 0xc9, 0xd6, 0xda, 0x7b, 0xc4, 0x19, 0x45,
-	0x25, 0x86, 0xe1, 0xae, 0x86, 0x6d, 0x9f, 0xac, 0x32, 0x0c, 0x59, 0x07, 0x13, 0xb5, 0xa5, 0x12,
-	0xd5, 0xa3, 0x79, 0x6b, 0x18, 0x9a, 0xb6, 0x4a, 0xf0, 0xa1, 0xda, 0xf3, 0x48, 0xca, 0xc3, 0x90,
-	0x74, 0x1d, 0xff, 0x5e, 0xf3, 0x97, 0xda, 0xa6, 0xd9, 0xd6, 0x71, 0x70, 0x8d, 0xb8, 0x63, 0x11,
-	0x8f, 0x59, 0xe9, 0x33, 0x09, 0xe6, 0xd6, 0x6c, 0xac, 0x12, 0xbc, 0xe5, 0x60, 0x5b, 0xc1, 0x3f,
-	0xed, 0x62, 0x87, 0xa0, 0x1f, 0xc0, 0xa4, 0xcb, 0x60, 0x5b, 0x6b, 0xc9, 0x52, 0x51, 0x5a, 0xc9,
-	0x56, 0x2e, 0x96, 0x99, 0x71, 0x94, 0xdd, 0x5d, 0x8d, 0xbe, 0xe6, 0xb5, 0xcc, 0x97, 0x47, 0x85,
-	0x73, 0xdf, 0x1c, 0x15, 0x24, 0x25, 0xdd, 0xa5, 0x2b, 0x68, 0x01, 0x26, 0x70, 0x47, 0xd5, 0x74,
-	0x39, 0x55, 0x94, 0x56, 0xa6, 0x14, 0x36, 0x40, 0x79, 0xc8, 0x58, 0xaa, 0xe3, 0x1c, 0x9a, 0x76,
-	0x4b, 0x1e, 0xa3, 0x0b, 0xfd, 0x31, 0x42, 0x30, 0x6e, 0xa8, 0x1d, 0x2c, 0x8f, 0xd3, 0x79, 0xfa,
-	0x5d, 0xba, 0x03, 0x73, 0x5b, 0x56, 0x2b, 0x22, 0x55, 0x9f, 0xb5, 0xc4, 0xb3, 0xf6, 0xc9, 0x53,
-	0x1c, 0xf9, 0x3d, 0x58, 0x0c, 0xc8, 0x37, 0xbc, 0x83, 0x7c, 0x36, 0xe7, 0x61, 0xcc, 0xd4, 0x5b,
-	0x1e, 0x13, 0xf7, 0xd3, 0x9d, 0x31, 0xf0, 0xa1, 0xc7, 0xc1, 0xfd, 0x2c, 0x7d, 0x9e, 0x02, 0x99,
-	0xc1, 0x52, 0x0d, 0x2c, 0xd7, 0x67, 0xf0, 0x18, 0x66, 0x38, 0x7b, 0x0e, 0x40, 0xba, 0xec, 0x83,
-	0xc4, 0xd1, 0xc4, 0x62, 0x35, 0xad, 0xf2, 0x1b, 0x50, 0x11, 0xb2, 0x2d, 0xec, 0x34, 0x6d, 0xcd,
-	0x72, 0x27, 0x3c, 0x31, 0xf8, 0x29, 0xf4, 0x14, 0x32, 0xaa, 0x65, 0x6d, 0xe3, 0xae, 0xe6, 0xc8,
-	0x63, 0xc5, 0xb1, 0x95, 0x5c, 0xed, 0xee, 0x3f, 0x8e, 0x0a, 0xab, 0x27, 0x19, 0x82, 0xb5, 0xdf,
-	0x5e, 0x25, 0x3d, 0x0b, 0x3b, 0xe5, 0xf5, 0xad, 0xc6, 0xbb, 0xdf, 0x3f, 0x3e, 0x2a, 0x4c, 0x56,
-	0x2d, 0x6b, 0x7d, 0xab, 0xe1, 0x28, 0x93, 0xaa, 0x65, 0xad, 0x77, 0x35, 0x07, 0xbd, 0xe7, 0xb2,
-	0xd6, 0xb6, 0xf7, 0x71, 0xcf, 0x91, 0xc7, 0x8b, 0x63, 0x2b, 0xd9, 0xca, 0x4c, 0x5f, 0x8d, 0x8d,
-	0xc6, 0x87, 0xb8, 0x57, 0x9b, 0x75, 0xe5, 0xa6, 0xb4, 0x74, 0x4c, 0x69, 0x35, 0xf7, 0xa3, 0xf4,
-	0x14, 0xe4, 0x87, 0x9a, 0x43, 0x38, 0x75, 0x1d, 0x05, 0x3b, 0x96, 0x69, 0x38, 0x18, 0xdd, 0x81,
-	0x1c, 0xa7, 0xa5, 0x23, 0x4b, 0x94, 0xf7, 0x7c, 0x0c, 0x44, 0xb5, 0x71, 0xf7, 0x00, 0x25, 0xb4,
-	0x9d, 0x5e, 0x00, 0xbb, 0xc2, 0xd7, 0x17, 0x20, 0xbe, 0x80, 0xaf, 0x24, 0xb8, 0x54, 0x6d, 0xb5,
-	0x38, 0x75, 0x19, 0xfb, 0xb3, 0x02, 0xea, 0x53, 0x98, 0xf4, 0x60, 0xa0, 0x20, 0xe5, 0x6a, 0x55,
-	0x77, 0xe7, 0xf3, 0x21, 0x91, 0xf6, 0x44, 0x4d, 0x33, 0x20, 0x4a, 0x3f, 0x83, 0x2b, 0x75, 0x6c,
-	0x60, 0x3b, 0x7c, 0xe5, 0xbe, 0x3e, 0x9e, 0x55, 0x71, 0x02, 0x48, 0xa7, 0x2d, 0xc0, 0xd7, 0x12,
-	0x2c, 0x2b, 0xb8, 0x63, 0x1e, 0xe0, 0x6f, 0x05, 0x9e, 0x7f, 0x90, 0xa0, 0x18, 0x07, 0x28, 0xb5,
-	0xa1, 0xb3, 0x52, 0x28, 0xc6, 0x19, 0xa3, 0xeb, 0x90, 0x66, 0xd1, 0x95, 0xbe, 0x9c, 0x99, 0xca,
-	0xb4, 0xcf, 0x5b, 0x71, 0x67, 0x15, 0x6f, 0xb1, 0xf4, 0x67, 0x09, 0xae, 0x84, 0x6d, 0x79, 0x8d,
-	0x8b, 0xe5, 0x67, 0x25, 0x70, 0x0d, 0x72, 0x7c, 0xca, 0x40, 0x05, 0xcf, 0x56, 0x16, 0x7c, 0x6e,
-	0xbc, 0x08, 0x1c, 0x93, 0x10, 0x4d, 0x69, 0x0f, 0xae, 0x45, 0xdc, 0x20, 0x4f, 0x16, 0xb8, 0xc4,
-	0xfb, 0x30, 0xcd, 0xd3, 0xf9, 0x3e, 0x31, 0xfe, 0x30, 0xe6, 0x14, 0xc3, 0x04, 0xa5, 0x2f, 0x24,
-	0xb8, 0x36, 0x60, 0xa2, 0xff, 0x0b, 0x98, 0xb8, 0x84, 0x20, 0x35, 0x5a, 0x42, 0x50, 0xfa, 0xab,
-	0x04, 0xe7, 0x79, 0x1f, 0xee, 0xde, 0xf6, 0x2b, 0x24, 0x1f, 0xba, 0x0a, 0x13, 0xd4, 0x02, 0x69,
-	0x5e, 0x32, 0x60, 0x9d, 0x6c, 0xad, 0xf4, 0x3e, 0x5c, 0x8e, 0x5c, 0x31, 0x5d, 0x0e, 0xee, 0x76,
-	0x48, 0x23, 0xff, 0xcb, 0x38, 0x2c, 0xb0, 0xbc, 0xa2, 0xce, 0x72, 0x3a, 0xff, 0xc2, 0x6a, 0x00,
-	0x5e, 0x96, 0x17, 0x80, 0xb1, 0xe8, 0xf3, 0xf0, 0xf6, 0xc6, 0xaa, 0x31, 0xd5, 0xf6, 0x17, 0x87,
-	0x08, 0x63, 0xf7, 0x60, 0x6e, 0xd7, 0x76, 0x4f, 0x34, 0x9a, 0xbd, 0x6d, 0x4b, 0x57, 0x29, 0xf2,
-	0x34, 0x1f, 0xab, 0xcd, 0x1f, 0x1f, 0x15, 0x66, 0xdf, 0xf7, 0x17, 0x37, 0x74, 0xd5, 0x68, 0x3c,
-	0x50, 0x66, 0x77, 0x43, 0x13, 0x2d, 0xf4, 0x04, 0xce, 0x5b, 0xb6, 0x76, 0xa0, 0x36, 0x7b, 0xdb,
-	0x0e, 0x26, 0xc4, 0xf5, 0x4a, 0x34, 0x6f, 0xcb, 0x56, 0x96, 0x23, 0xc2, 0x6e, 0xb0, 0x6d, 0x9b,
-	0xde, 0x2e, 0xcf, 0x9e, 0x67, 0xad, 0xf0, 0x34, 0x2a, 0x40, 0x56, 0xed, 0x12, 0x73, 0xbb, 0x4b,
-	0x63, 0xbd, 0x3c, 0x51, 0x94, 0x56, 0x32, 0x0a, 0xb8, 0x53, 0x2c, 0xfa, 0xd3, 0xcc, 0x51, 0x57,
-	0xc9, 0xae, 0x69, 0x77, 0xe4, 0xb4, 0x97, 0x39, 0x7a, 0x63, 0x74, 0x1b, 0x32, 0xaa, 0x41, 0xb0,
-	0x61, 0xa8, 0x8e, 0x3c, 0x49, 0xdf, 0xd2, 0xc5, 0x88, 0x14, 0x55, 0xb6, 0xec, 0x9d, 0xde, 0xdf,
-	0x8d, 0x1e, 0x02, 0xa8, 0x84, 0xd8, 0xda, 0x4e, 0x97, 0x60, 0x47, 0xce, 0x50, 0xda, 0x5b, 0xfd,
-	0x77, 0x18, 0x73, 0x41, 0xe5, 0x6a, 0x7f, 0xfb, 0xba, 0x41, 0xec, 0x9e, 0xc2, 0xd1, 0xa3, 0x1b,
-	0x30, 0xdb, 0xd4, 0xbb, 0x0e, 0xc1, 0xf6, 0xb6, 0xda, 0x6a, 0xd9, 0xd8, 0x71, 0xe4, 0x29, 0x2a,
-	0xea, 0x8c, 0x37, 0x5d, 0x65, 0xb3, 0xf9, 0x3b, 0x30, 0x1b, 0xe1, 0xe3, 0xe6, 0x9e, 0xfb, 0xb8,
-	0xe7, 0x67, 0xa3, 0xfb, 0xb8, 0xe7, 0xa6, 0xb9, 0x07, 0xaa, 0xde, 0xf5, 0x9d, 0x28, 0x1b, 0xbc,
-	0x97, 0xba, 0x2d, 0x95, 0x1a, 0xb0, 0xe0, 0x5a, 0xa1, 0x27, 0x59, 0x60, 0x7c, 0x6f, 0x41, 0xc6,
-	0xb3, 0x02, 0xdf, 0xa7, 0xcc, 0x46, 0x70, 0xf0, 0x01, 0xf0, 0xb7, 0x51, 0x43, 0x64, 0x08, 0xbf,
-	0x36, 0xc4, 0x57, 0xd6, 0x10, 0xe3, 0x2e, 0xe8, 0x95, 0x30, 0xc4, 0xcf, 0x24, 0xc8, 0x6f, 0x62,
-	0xdf, 0x10, 0xfb, 0x9c, 0x4e, 0xd3, 0x86, 0x96, 0x60, 0xaa, 0xaf, 0x98, 0x27, 0x40, 0x30, 0x11,
-	0x88, 0x36, 0xc6, 0x89, 0x56, 0xfa, 0x85, 0x04, 0x97, 0x59, 0x78, 0x7c, 0x69, 0x92, 0x95, 0x7e,
-	0x95, 0x02, 0xb9, 0xda, 0x6a, 0x85, 0xaf, 0xfd, 0x34, 0x8f, 0x47, 0x30, 0xde, 0x56, 0x35, 0xf6,
-	0xaa, 0x52, 0x0a, 0xfd, 0x46, 0x15, 0xc8, 0xe8, 0x26, 0x8b, 0x4b, 0x14, 0x91, 0x6c, 0xe5, 0xbc,
-	0xcf, 0xf5, 0xa1, 0x19, 0xfa, 0x95, 0xd5, 0xdf, 0xe7, 0xf2, 0x71, 0x13, 0x48, 0xff, 0x67, 0xb7,
-	0xfb, 0xed, 0xc2, 0xda, 0x31, 0x5b, 0x58, 0xa7, 0xe6, 0x3f, 0xa5, 0xb0, 0x01, 0xba, 0x03, 0x53,
-	0x96, 0xae, 0x36, 0x71, 0x07, 0x1b, 0x84, 0x9a, 0xfe, 0x4c, 0xa5, 0x10, 0x6f, 0xde, 0x1b, 0xfe,
-	0x36, 0x25, 0xa0, 0x28, 0xfd, 0x3a, 0x05, 0x8b, 0xeb, 0x2d, 0x8d, 0xc4, 0x43, 0xd2, 0x00, 0xf0,
-	0x1e, 0x43, 0x00, 0x49, 0x31, 0x9e, 0x7b, 0x3c, 0x32, 0xaa, 0xbf, 0xf8, 0xff, 0x87, 0xcc, 0xef,
-	0x25, 0xb8, 0x1c, 0xd8, 0x4a, 0x5c, 0x1e, 0x77, 0x1a, 0x06, 0x73, 0x1a, 0x29, 0x6e, 0x0b, 0x8a,
-	0x5c, 0xe4, 0x39, 0xab, 0xf4, 0xf6, 0x19, 0x2c, 0x72, 0xa7, 0x3c, 0x39, 0x34, 0xf0, 0xa9, 0xb2,
-	0xff, 0x9d, 0x04, 0xc5, 0x90, 0x7b, 0x38, 0x2b, 0xc4, 0x5f, 0x20, 0x5b, 0xfe, 0x93, 0x04, 0x39,
-	0xdf, 0xe1, 0xd3, 0x4c, 0xf9, 0xe5, 0xca, 0x33, 0x5c, 0x76, 0x5c, 0x0b, 0xdd, 0x9b, 0x30, 0x33,
-	0x96, 0x92, 0x32, 0xe3, 0xdf, 0xa4, 0x60, 0x9e, 0x25, 0x5e, 0x6b, 0xb4, 0xe8, 0xeb, 0xdf, 0xc7,
-	0x3d, 0x98, 0x62, 0x55, 0xe0, 0x40, 0x7d, 0xb9, 0x7f, 0xe5, 0x74, 0x21, 0x56, 0xfe, 0x4c, 0xd3,
-	0x5b, 0x1b, 0x22, 0x19, 0xb9, 0x08, 0x69, 0x07, 0x37, 0x6d, 0x4c, 0xbc, 0x68, 0xe2, 0x8d, 0x50,
-	0x05, 0x72, 0x4d, 0x55, 0xd7, 0x77, 0xd4, 0xe6, 0xfe, 0x76, 0xd7, 0xd6, 0x98, 0x3f, 0xa8, 0xcd,
-	0x1e, 0x1f, 0x15, 0xb2, 0x6b, 0xde, 0xfc, 0x96, 0xd2, 0x50, 0xb2, 0xfe, 0xa6, 0x2d, 0x5b, 0x43,
-	0xdf, 0x85, 0x74, 0xdb, 0x56, 0x0d, 0xe2, 0xc8, 0x13, 0x54, 0xdb, 0xf9, 0xb0, 0xac, 0x75, 0x77,
-	0x4d, 0xf1, 0xb6, 0xa0, 0x9b, 0x30, 0xe1, 0x34, 0x4d, 0x0b, 0xcb, 0xe9, 0xb8, 0xbd, 0x9b, 0xee,
-	0x92, 0xc2, 0x76, 0x94, 0xd6, 0x61, 0xde, 0x85, 0x98, 0xad, 0x04, 0xe0, 0x96, 0x61, 0x92, 0x29,
-	0xea, 0x3f, 0x87, 0x99, 0x30, 0x0f, 0xef, 0x21, 0xf8, 0x9b, 0x28, 0xca, 0x2c, 0xab, 0x78, 0x8d,
-	0x72, 0x0c, 0xca, 0x87, 0x20, 0x6f, 0x62, 0x0f, 0xe4, 0x27, 0xbb, 0xbb, 0x5a, 0x53, 0x53, 0xf5,
-	0x53, 0x83, 0x28, 0x0f, 0x19, 0xd3, 0xe3, 0x49, 0xf1, 0xc9, 0x28, 0xfd, 0x71, 0xe9, 0x97, 0x12,
-	0x5c, 0xe8, 0x9f, 0xbc, 0x49, 0xd4, 0x20, 0x63, 0x79, 0xe1, 0x63, 0x5d, 0xf5, 0x5d, 0x86, 0xf4,
-	0xcc, 0x41, 0xf5, 0xe9, 0x59, 0x6c, 0x47, 0xe9, 0x73, 0x09, 0x96, 0xaa, 0xad, 0x16, 0x5b, 0x89,
-	0x73, 0x8e, 0x2f, 0x2c, 0xcc, 0x69, 0xc4, 0xa2, 0x26, 0x14, 0x82, 0xa7, 0x70, 0x56, 0xa1, 0xe8,
-	0xb7, 0x12, 0x14, 0x58, 0xac, 0x38, 0x43, 0x34, 0x5e, 0x20, 0x4e, 0xfc, 0x51, 0x82, 0xac, 0xf7,
-	0x84, 0x69, 0x98, 0x78, 0x89, 0xb2, 0x0c, 0x17, 0x23, 0xaa, 0xac, 0x57, 0xc0, 0xc9, 0x3c, 0x6a,
-	0x88, 0xa8, 0x7c, 0x02, 0x13, 0x75, 0x72, 0x58, 0xb7, 0xd1, 0x63, 0x98, 0xdb, 0xe8, 0xea, 0xfa,
-	0x9a, 0x69, 0xec, 0x6a, 0xed, 0xae, 0xcd, 0xb2, 0x36, 0x71, 0x50, 0xcc, 0x2f, 0x45, 0x96, 0x42,
-	0x84, 0x6f, 0x4a, 0x95, 0xbf, 0xa5, 0x20, 0xdd, 0x70, 0x5c, 0x3d, 0xd1, 0x3d, 0x80, 0xa0, 0x1d,
-	0x16, 0xf0, 0x1c, 0x68, 0x91, 0xe5, 0x2f, 0x96, 0x59, 0x5b, 0xad, 0xec, 0xb7, 0xd5, 0xca, 0xeb,
-	0x1d, 0x8b, 0xf4, 0xd0, 0x2a, 0x4c, 0xd6, 0x31, 0xa1, 0xd4, 0x02, 0x04, 0xf3, 0x39, 0x7e, 0xde,
-	0x3d, 0x31, 0xe8, 0x55, 0x05, 0x27, 0x0e, 0xb4, 0xbf, 0x84, 0x27, 0x3e, 0x01, 0x34, 0xd8, 0xec,
-	0x42, 0x57, 0x06, 0x19, 0x45, 0x1a, 0x61, 0x42, 0x86, 0x3f, 0x04, 0x78, 0x80, 0x75, 0xec, 0x49,
-	0x24, 0xd8, 0x25, 0xa2, 0xae, 0x7c, 0x95, 0x85, 0xe9, 0x86, 0xc3, 0x55, 0xca, 0xd0, 0x23, 0xbf,
-	0xc5, 0xc8, 0x4f, 0x16, 0xc3, 0xd0, 0x0e, 0x76, 0x79, 0x84, 0xe2, 0x3d, 0x80, 0x99, 0x3a, 0xe6,
-	0x4b, 0x71, 0x28, 0xb9, 0x6a, 0x98, 0x8f, 0x6b, 0x3a, 0xa1, 0x87, 0x70, 0x3e, 0xda, 0xbb, 0x12,
-	0xaa, 0xda, 0x97, 0x55, 0xd8, 0xed, 0x7a, 0xe4, 0xf7, 0x2b, 0x63, 0x55, 0x14, 0x35, 0xb2, 0x84,
-	0x2a, 0x7e, 0x00, 0x73, 0xec, 0x06, 0x46, 0xd0, 0x52, 0xc4, 0x6b, 0x13, 0x16, 0xe2, 0x5a, 0x44,
-	0xe8, 0x6a, 0x9f, 0x9d, 0xb8, 0x81, 0x24, 0x64, 0x8a, 0x61, 0x51, 0xd8, 0xac, 0x39, 0x49, 0xd0,
-	0x9b, 0xfd, 0xd7, 0x78, 0x62, 0xbb, 0xe7, 0x29, 0xbc, 0x21, 0xe8, 0xc8, 0xa0, 0xef, 0xf4, 0x7d,
-	0x44, 0x62, 0xcb, 0x46, 0xa8, 0xc1, 0x56, 0xbc, 0x06, 0xb4, 0x3b, 0x82, 0x56, 0x92, 0x44, 0xe4,
-	0x1b, 0x28, 0xf9, 0x48, 0xaf, 0x0e, 0x7d, 0x08, 0x0b, 0x61, 0xe3, 0xf4, 0xe6, 0xaf, 0xc6, 0x60,
-	0xc2, 0x96, 0x38, 0x64, 0xa2, 0xcc, 0x7e, 0x14, 0xa7, 0xfe, 0x08, 0xfc, 0x44, 0xba, 0x6f, 0x43,
-	0x5e, 0xdc, 0x69, 0x41, 0x37, 0xe3, 0x0d, 0x23, 0x26, 0x02, 0x0a, 0x0f, 0xd8, 0x87, 0xa5, 0xa4,
-	0x8e, 0xc8, 0x49, 0x16, 0x72, 0x4b, 0xf0, 0xde, 0xe2, 0x83, 0x3d, 0xf6, 0x8b, 0x3e, 0x22, 0x85,
-	0x6e, 0x09, 0x4d, 0x65, 0x14, 0x9d, 0xea, 0x30, 0x1f, 0x06, 0x84, 0x05, 0x5e, 0x39, 0x46, 0x15,
-	0xba, 0x22, 0x64, 0xf4, 0x0c, 0x2e, 0xc4, 0xf6, 0x12, 0x4e, 0x42, 0xe5, 0xba, 0x00, 0x95, 0x48,
-	0x30, 0xfd, 0x00, 0x2e, 0x0e, 0xe8, 0xf9, 0x9c, 0xa2, 0x56, 0xbe, 0x00, 0x98, 0x6a, 0x38, 0x5e,
-	0xd4, 0x44, 0x77, 0x61, 0x3a, 0x54, 0x1a, 0x47, 0x4b, 0x49, 0x15, 0xf3, 0x7c, 0xb4, 0x06, 0x8d,
-	0x6e, 0x03, 0xd4, 0xfb, 0x45, 0xc3, 0xa4, 0x78, 0x3d, 0x40, 0xf9, 0x00, 0x72, 0x7c, 0xe1, 0x5b,
-	0xe8, 0xa8, 0x97, 0x78, 0x88, 0x06, 0xca, 0xe4, 0x77, 0x61, 0x3a, 0x54, 0x51, 0x0d, 0xe4, 0x8f,
-	0x2b, 0xb4, 0x0e, 0x4a, 0x51, 0x83, 0x69, 0xe6, 0x95, 0x87, 0x50, 0x41, 0x74, 0xf9, 0x1f, 0xc1,
-	0x7c, 0x4c, 0xe1, 0x14, 0x95, 0x7c, 0x4e, 0xe2, 0xaa, 0xaa, 0x90, 0xe5, 0x27, 0xfe, 0x85, 0x0f,
-	0x70, 0xbd, 0x1e, 0x36, 0xfc, 0x51, 0x19, 0x3f, 0x82, 0xb9, 0x81, 0x4a, 0x66, 0x10, 0xd4, 0x44,
-	0x45, 0xce, 0xa4, 0x3c, 0x65, 0xb0, 0x0c, 0x18, 0xe4, 0x29, 0xc2, 0x12, 0xa1, 0x90, 0xe1, 0x06,
-	0x2c, 0x84, 0x15, 0x8b, 0x8a, 0x28, 0x2a, 0x1f, 0x26, 0x41, 0x19, 0x5f, 0x8f, 0x0b, 0xa0, 0x4c,
-	0xac, 0xd7, 0x25, 0x78, 0x5c, 0x59, 0x54, 0x3f, 0x4b, 0xb2, 0xa2, 0x95, 0x18, 0x7b, 0x8e, 0x77,
-	0x82, 0x1f, 0xc1, 0xdc, 0x40, 0xe9, 0x2c, 0x89, 0xf3, 0x95, 0x18, 0xce, 0x91, 0x82, 0xdb, 0x33,
-	0x58, 0x14, 0x56, 0xcb, 0x82, 0x08, 0x79, 0x52, 0x41, 0x4d, 0x08, 0xc9, 0x3d, 0x98, 0x0d, 0xb0,
-	0x64, 0x0e, 0x6a, 0x21, 0x22, 0x6f, 0xb2, 0x1f, 0x0d, 0xab, 0xec, 0xf9, 0xd0, 0x11, 0x55, 0x8e,
-	0xf8, 0xce, 0x1a, 0xa0, 0x90, 0x3e, 0xcf, 0x21, 0x56, 0xe5, 0xeb, 0x49, 0xc8, 0x34, 0x1c, 0xf6,
-	0x3b, 0x07, 0xad, 0x41, 0x8e, 0x2f, 0x6a, 0xa1, 0x4b, 0x61, 0x8f, 0x19, 0x2a, 0xc2, 0x08, 0x15,
-	0x7d, 0x07, 0xa6, 0xea, 0x7e, 0x6d, 0x00, 0x09, 0x7f, 0xd5, 0xe5, 0x23, 0xa5, 0x1f, 0x54, 0x83,
-	0x2c, 0x57, 0x32, 0x12, 0xfa, 0xcc, 0x4b, 0x3c, 0x2c, 0xd1, 0xfa, 0xd2, 0x1a, 0xe4, 0xf8, 0x72,
-	0x51, 0x20, 0x7f, 0x4c, 0x11, 0x49, 0x28, 0xff, 0x7d, 0xc8, 0x31, 0xbf, 0x79, 0xa2, 0x0a, 0x09,
-	0x9e, 0x68, 0xa0, 0x2e, 0x13, 0x3c, 0x73, 0x51, 0xc9, 0x26, 0x21, 0x94, 0xcf, 0x84, 0x8b, 0x2d,
-	0x41, 0xe8, 0x8d, 0x2d, 0xc2, 0x24, 0x24, 0x91, 0x17, 0x62, 0xeb, 0x25, 0xe8, 0x1a, 0xe7, 0x2e,
-	0x84, 0x05, 0x04, 0x21, 0xdb, 0x9f, 0xc0, 0x1b, 0x82, 0x0a, 0x47, 0x02, 0x76, 0x37, 0x06, 0xef,
-	0x31, 0xde, 0x55, 0xfc, 0x18, 0x64, 0x51, 0x65, 0x03, 0xdd, 0x08, 0x3f, 0xeb, 0xd1, 0x45, 0xbf,
-	0x03, 0x33, 0x7d, 0x95, 0xd9, 0xeb, 0x89, 0x14, 0x9c, 0x92, 0xdf, 0xf4, 0x63, 0xf6, 0xab, 0x8c,
-	0xaf, 0x12, 0x24, 0xa8, 0x5c, 0x1c, 0x54, 0x39, 0xf2, 0xa0, 0xef, 0xc3, 0x1c, 0xaf, 0xc9, 0xe8,
-	0x12, 0xd5, 0xea, 0x7f, 0xff, 0xd7, 0xf2, 0xb9, 0x9f, 0x1f, 0x2f, 0x4b, 0x5f, 0x1e, 0x2f, 0x4b,
-	0xdf, 0x1c, 0x2f, 0x4b, 0xff, 0x3c, 0x5e, 0x96, 0xfe, 0x7d, 0xbc, 0x7c, 0xee, 0x3f, 0xc7, 0xcb,
-	0xd2, 0xa7, 0x37, 0x87, 0xfa, 0x9f, 0x16, 0x31, 0xac, 0x9d, 0x9d, 0x34, 0x65, 0xfc, 0xf6, 0x7f,
-	0x03, 0x00, 0x00, 0xff, 0xff, 0x38, 0x6b, 0x88, 0x71, 0xa1, 0x2d, 0x00, 0x00,
+	// 2261 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x5a, 0x4f, 0x6f, 0x23, 0x49,
+	0x15, 0xdf, 0x4e, 0x26, 0x8e, 0xfd, 0xec, 0x24, 0x93, 0x4a, 0x26, 0xdb, 0xf1, 0x64, 0x62, 0x8f,
+	0x99, 0x61, 0x32, 0x62, 0x70, 0x76, 0xbd, 0xec, 0x6a, 0x40, 0x64, 0x32, 0x76, 0x26, 0x6b, 0x79,
+	0x99, 0xc9, 0x64, 0x3b, 0x1b, 0xad, 0x66, 0x61, 0x14, 0x75, 0xec, 0x8a, 0xd3, 0x4a, 0xbb, 0xbb,
+	0xe9, 0x2e, 0x27, 0xf2, 0x09, 0x10, 0x47, 0x0e, 0x5c, 0x56, 0xe2, 0x02, 0x07, 0xc4, 0x81, 0x1b,
+	0xd2, 0x22, 0x24, 0x0e, 0xdc, 0x38, 0xad, 0x10, 0x12, 0x7b, 0x44, 0x1c, 0x22, 0xc8, 0x05, 0x8e,
+	0x7c, 0x04, 0xd4, 0x55, 0xfd, 0xa7, 0xba, 0xdd, 0xe5, 0xd8, 0x33, 0x09, 0x33, 0xa0, 0xbd, 0xb9,
+	0xab, 0xea, 0xbd, 0x7a, 0xef, 0x57, 0xaf, 0xde, 0x7b, 0xf5, 0x9e, 0xe1, 0x7e, 0x5b, 0x23, 0x87,
+	0xdd, 0xfd, 0x72, 0xd3, 0xec, 0xac, 0x7e, 0x74, 0x88, 0x3f, 0x3a, 0xd4, 0x8c, 0xb6, 0xb3, 0x85,
+	0xc9, 0x89, 0x69, 0x1f, 0xad, 0x12, 0x62, 0xac, 0xaa, 0x96, 0xb6, 0xaa, 0xb5, 0xb0, 0x41, 0x34,
+	0xd2, 0x73, 0xb0, 0x7d, 0x8c, 0xed, 0xb2, 0x65, 0x9b, 0xc4, 0x44, 0x29, 0x42, 0x8c, 0xf2, 0xf1,
+	0x3b, 0xf9, 0xaf, 0x73, 0x1c, 0xda, 0x66, 0xdb, 0x5c, 0xa5, 0xd3, 0xfb, 0xdd, 0x03, 0xfa, 0x45,
+	0x3f, 0xe8, 0x2f, 0x46, 0x96, 0x7f, 0x77, 0x98, 0x0d, 0x55, 0xcb, 0xd2, 0xb5, 0xa6, 0x4a, 0x34,
+	0xd3, 0xf0, 0xc8, 0xde, 0x1a, 0x86, 0xac, 0xa9, 0x6b, 0xd8, 0x20, 0x1e, 0xc5, 0x7b, 0x43, 0x51,
+	0x98, 0xba, 0xae, 0xee, 0x9b, 0xb6, 0x4a, 0x4c, 0x7b, 0x94, 0x9d, 0x6c, 0xad, 0x7d, 0x48, 0x9c,
+	0x51, 0x54, 0x62, 0x18, 0x1e, 0x68, 0xd8, 0xf6, 0xc9, 0x2a, 0xc3, 0x90, 0x75, 0x30, 0x51, 0x5b,
+	0x2a, 0x51, 0x3d, 0x9a, 0xb7, 0x87, 0xa1, 0x69, 0xab, 0x04, 0x9f, 0xa8, 0x3d, 0x8f, 0xa4, 0x3c,
+	0x0c, 0x49, 0xd7, 0xf1, 0xcf, 0x35, 0x7f, 0xbd, 0x6d, 0x9a, 0x6d, 0x1d, 0x87, 0xc7, 0x88, 0x3b,
+	0x16, 0xf1, 0x98, 0x95, 0x3e, 0x95, 0x60, 0x76, 0xc3, 0xc6, 0x2a, 0xc1, 0xbb, 0x0e, 0xb6, 0x15,
+	0xfc, 0xfd, 0x2e, 0x76, 0x08, 0xfa, 0x26, 0x4c, 0xba, 0x0c, 0xf6, 0xb4, 0x96, 0x2c, 0x15, 0xa5,
+	0x95, 0x6c, 0x65, 0xa1, 0xcc, 0x8c, 0xa3, 0xec, 0xae, 0x6a, 0x04, 0x9a, 0xd7, 0xd2, 0x9f, 0x9f,
+	0x16, 0xde, 0xf8, 0xe2, 0xb4, 0x20, 0x29, 0xa9, 0x2e, 0x9d, 0x41, 0xf3, 0x30, 0x81, 0x3b, 0xaa,
+	0xa6, 0xcb, 0x63, 0x45, 0x69, 0x25, 0xa3, 0xb0, 0x0f, 0x94, 0x87, 0xb4, 0xa5, 0x3a, 0xce, 0x89,
+	0x69, 0xb7, 0xe4, 0x71, 0x3a, 0x11, 0x7c, 0x23, 0x04, 0x57, 0x0c, 0xb5, 0x83, 0xe5, 0x2b, 0x74,
+	0x9c, 0xfe, 0x2e, 0xad, 0xc1, 0xec, 0xae, 0xd5, 0x8a, 0x49, 0x15, 0xb0, 0x96, 0x78, 0xd6, 0x3e,
+	0xf9, 0x18, 0x47, 0xbe, 0x0e, 0x8b, 0x21, 0xf9, 0xb6, 0xb7, 0x91, 0xcf, 0xe6, 0x2a, 0x8c, 0x9b,
+	0x7a, 0xcb, 0x63, 0xe2, 0xfe, 0x74, 0x47, 0x0c, 0x7c, 0xe2, 0x71, 0x70, 0x7f, 0x96, 0xfe, 0x29,
+	0x81, 0xcc, 0x60, 0xa9, 0x86, 0x96, 0xeb, 0x33, 0xd8, 0x82, 0x69, 0xce, 0x9e, 0x43, 0x90, 0x6e,
+	0xf8, 0x20, 0x71, 0x34, 0x89, 0x58, 0x4d, 0xa9, 0xfc, 0x02, 0x54, 0x84, 0x6c, 0x0b, 0x3b, 0x4d,
+	0x5b, 0xb3, 0xdc, 0x01, 0x4f, 0x0c, 0x7e, 0x08, 0x3d, 0x83, 0xb4, 0x6a, 0x59, 0x7b, 0xb8, 0xab,
+	0x39, 0xf2, 0x78, 0x71, 0x7c, 0x25, 0x57, 0x7b, 0xf0, 0xb7, 0xd3, 0xc2, 0xea, 0x79, 0x86, 0x60,
+	0x1d, 0xb5, 0x57, 0x49, 0xcf, 0xc2, 0x4e, 0x79, 0x73, 0xb7, 0xf1, 0xde, 0x37, 0xce, 0x4e, 0x0b,
+	0x93, 0x55, 0xcb, 0xda, 0xdc, 0x6d, 0x38, 0xca, 0xa4, 0x6a, 0x59, 0x9b, 0x5d, 0xcd, 0x29, 0x3d,
+	0x03, 0xf9, 0xb1, 0xe6, 0x10, 0x4e, 0x64, 0x47, 0xc1, 0x8e, 0x65, 0x1a, 0x0e, 0x46, 0x6b, 0x90,
+	0xe3, 0x24, 0x75, 0x64, 0xa9, 0x38, 0xbe, 0x92, 0xad, 0xcc, 0x25, 0xa8, 0x59, 0xbb, 0xe2, 0x2a,
+	0xa7, 0x44, 0x96, 0x53, 0x10, 0xd9, 0x31, 0xfc, 0xbf, 0x83, 0xf8, 0x03, 0xb8, 0x59, 0xc7, 0x06,
+	0xb6, 0xa3, 0xaa, 0xb2, 0x65, 0x01, 0x9a, 0x9f, 0xc0, 0xa4, 0xb7, 0x3f, 0x55, 0x35, 0x57, 0xab,
+	0xba, 0xba, 0xbc, 0x98, 0x08, 0x29, 0x8f, 0x77, 0x8a, 0x49, 0x50, 0xfa, 0x9d, 0x04, 0xc5, 0x24,
+	0x09, 0xb6, 0x1b, 0xdf, 0xc1, 0xbd, 0xcb, 0x82, 0x7c, 0x11, 0xd2, 0x47, 0xb8, 0xb7, 0xc7, 0xdd,
+	0xbe, 0xc9, 0x23, 0xdc, 0xdb, 0x52, 0x3b, 0x18, 0xdd, 0x86, 0x14, 0xf3, 0xa8, 0x14, 0xe9, 0xe9,
+	0xca, 0x94, 0xbf, 0x85, 0xe2, 0x8e, 0x2a, 0xde, 0x64, 0xe9, 0x27, 0x12, 0x2c, 0x2b, 0xb8, 0x63,
+	0x1e, 0xbf, 0x0e, 0x42, 0x97, 0x7e, 0x2f, 0xc1, 0xcd, 0x6a, 0xab, 0xc5, 0x31, 0xdc, 0xe0, 0xa2,
+	0xc9, 0x65, 0x09, 0x54, 0x83, 0x1c, 0x1f, 0xb4, 0xa8, 0x50, 0xd9, 0xca, 0xbc, 0xcf, 0x8d, 0x17,
+	0x81, 0x63, 0x12, 0xa1, 0x29, 0x1d, 0xc2, 0xad, 0xd8, 0x25, 0xe6, 0xc9, 0xc2, 0x0b, 0xfd, 0x10,
+	0xa6, 0x78, 0x3a, 0xff, 0x46, 0x27, 0x6f, 0xc6, 0xae, 0x74, 0x94, 0xa0, 0xf4, 0x99, 0x04, 0xb7,
+	0xfa, 0x4e, 0xec, 0xbf, 0x01, 0x13, 0x17, 0x92, 0xc6, 0x46, 0x0b, 0x49, 0xa5, 0x3f, 0x4a, 0x70,
+	0x95, 0xf7, 0x40, 0xae, 0xed, 0xbd, 0x46, 0xf2, 0xa1, 0xaf, 0xc0, 0x04, 0xbd, 0x0f, 0x34, 0x32,
+	0xf6, 0xdd, 0x15, 0x36, 0x57, 0x7a, 0x1f, 0x6e, 0xc4, 0x8e, 0x98, 0x4e, 0x87, 0x67, 0x3b, 0xe4,
+	0x95, 0xfb, 0xc3, 0x15, 0x98, 0x67, 0x91, 0xad, 0xce, 0xb2, 0x0a, 0xff, 0xc0, 0x6a, 0x00, 0x5e,
+	0x9e, 0x11, 0x82, 0xb1, 0xe8, 0xf3, 0xf0, 0xd6, 0x26, 0xaa, 0x91, 0x69, 0xfb, 0x93, 0x43, 0x38,
+	0xe1, 0x75, 0x98, 0x3d, 0xb0, 0xdd, 0x1d, 0x8d, 0x66, 0x6f, 0xcf, 0xd2, 0x55, 0x8a, 0x3c, 0xcd,
+	0x08, 0x6a, 0x73, 0x67, 0xa7, 0x85, 0x99, 0xf7, 0xfd, 0xc9, 0x6d, 0x5d, 0x35, 0x1a, 0x8f, 0x94,
+	0x99, 0x83, 0xc8, 0x40, 0x0b, 0x3d, 0x85, 0xab, 0x96, 0xad, 0x1d, 0xab, 0xcd, 0xde, 0x9e, 0x83,
+	0x09, 0x71, 0x5d, 0x25, 0xcd, 0x1c, 0xb2, 0x95, 0xe5, 0x98, 0xb0, 0xdb, 0x6c, 0xd9, 0x8e, 0xb7,
+	0xca, 0xb3, 0xe7, 0x19, 0x2b, 0x3a, 0x8c, 0x0a, 0x90, 0x55, 0xbb, 0xc4, 0xdc, 0xeb, 0xd2, 0x48,
+	0x25, 0x4f, 0x14, 0xa5, 0x95, 0xb4, 0x02, 0xee, 0x10, 0x8b, 0x5d, 0x34, 0x77, 0xd1, 0x55, 0x72,
+	0x60, 0xda, 0x1d, 0x39, 0xe5, 0xe5, 0x2e, 0xde, 0x37, 0xba, 0x0f, 0x69, 0xd5, 0x20, 0xd8, 0x30,
+	0x54, 0x47, 0x9e, 0xa4, 0x77, 0x69, 0x21, 0x26, 0x45, 0x95, 0x4d, 0x7b, 0xbb, 0x07, 0xab, 0xd1,
+	0x63, 0x00, 0x95, 0x10, 0x5b, 0xdb, 0xef, 0x12, 0xec, 0xc8, 0x69, 0x4a, 0x7b, 0x2f, 0xb8, 0x87,
+	0x09, 0x07, 0x54, 0xae, 0x06, 0xcb, 0x37, 0x0d, 0x62, 0xf7, 0x14, 0x8e, 0x1e, 0xdd, 0x81, 0x99,
+	0xa6, 0xde, 0x75, 0x08, 0xb6, 0xf7, 0xd4, 0x56, 0xcb, 0xc6, 0x8e, 0x23, 0x67, 0xa8, 0xa8, 0xd3,
+	0xde, 0x70, 0x95, 0x8d, 0xe6, 0xd7, 0x60, 0x26, 0xc6, 0xc7, 0xcd, 0x7e, 0x8e, 0x70, 0xcf, 0xcf,
+	0x87, 0x8e, 0x70, 0xcf, 0x4d, 0xb4, 0x8e, 0x55, 0xbd, 0xeb, 0x3b, 0x48, 0xf6, 0xf1, 0xad, 0xb1,
+	0xfb, 0x52, 0xa9, 0x01, 0xf3, 0xae, 0x15, 0x7a, 0x92, 0x85, 0xc6, 0xf7, 0x36, 0xa4, 0x3d, 0x2b,
+	0xf0, 0x7d, 0xca, 0x4c, 0x0c, 0x07, 0x1f, 0x00, 0x7f, 0x19, 0x35, 0x44, 0x86, 0xf0, 0x97, 0x86,
+	0xf8, 0xda, 0x1a, 0x62, 0xd2, 0x01, 0xbd, 0x16, 0x86, 0xf8, 0xa9, 0x04, 0xf9, 0x1d, 0xec, 0x1b,
+	0x62, 0xc0, 0xe9, 0x22, 0x6d, 0x68, 0x09, 0x32, 0x81, 0x62, 0x9e, 0x00, 0xe1, 0x40, 0x28, 0xda,
+	0x38, 0x27, 0x5a, 0xe9, 0x47, 0x12, 0xdc, 0x60, 0xe1, 0xf1, 0x95, 0x49, 0x56, 0xfa, 0xe9, 0x18,
+	0xc8, 0xd5, 0x56, 0x2b, 0x7a, 0xec, 0x17, 0xb9, 0x3d, 0x82, 0x2b, 0x6d, 0x55, 0x63, 0xb7, 0x6a,
+	0x4c, 0xa1, 0xbf, 0x51, 0x05, 0xd2, 0xba, 0xc9, 0xe2, 0x12, 0x45, 0x24, 0x5b, 0xb9, 0xea, 0x73,
+	0x7d, 0x6c, 0x46, 0xde, 0x08, 0xc1, 0x3a, 0x97, 0x8f, 0x9b, 0xd5, 0xfa, 0x0f, 0x3f, 0xf7, 0xb7,
+	0x0b, 0x6b, 0xc7, 0x6c, 0x61, 0x9d, 0x9a, 0x7f, 0x46, 0x61, 0x1f, 0x68, 0x0d, 0x32, 0x96, 0xae,
+	0x36, 0x71, 0x07, 0x1b, 0x84, 0x9a, 0xfe, 0x74, 0xa5, 0x90, 0x6c, 0xde, 0xdb, 0xfe, 0x32, 0x25,
+	0xa4, 0x28, 0xfd, 0x6c, 0x0c, 0x16, 0x37, 0x5b, 0x1a, 0x49, 0x86, 0xa4, 0x01, 0xe0, 0x5d, 0x86,
+	0x10, 0x92, 0x62, 0x32, 0xf7, 0x64, 0x64, 0x54, 0x7f, 0xf2, 0x7f, 0x0f, 0x99, 0x5f, 0x4b, 0x70,
+	0x23, 0xb4, 0x95, 0xa4, 0x3c, 0xee, 0x22, 0x0c, 0xe6, 0x22, 0x52, 0xdc, 0x16, 0x14, 0xb9, 0xc8,
+	0x73, 0x59, 0xe9, 0xed, 0x73, 0x58, 0xe4, 0x76, 0x79, 0x7a, 0x62, 0xe0, 0x0b, 0x65, 0xff, 0x4b,
+	0x09, 0x8a, 0x11, 0xf7, 0x70, 0x59, 0x88, 0xbf, 0x44, 0xb6, 0xfc, 0x5b, 0x09, 0x72, 0xbe, 0xc3,
+	0xa7, 0x99, 0xf2, 0xab, 0x95, 0x67, 0xb8, 0xec, 0xb8, 0x16, 0x39, 0x37, 0x61, 0x66, 0x2c, 0x0d,
+	0xca, 0x8c, 0x7f, 0x3e, 0x06, 0x73, 0x2c, 0xf1, 0xda, 0xa0, 0x65, 0x47, 0xff, 0x3c, 0xd6, 0x21,
+	0xc3, 0xea, 0x90, 0xa1, 0xfa, 0x72, 0x70, 0xe4, 0x74, 0x22, 0x51, 0xfe, 0x74, 0xd3, 0x9b, 0x1b,
+	0x22, 0x19, 0x59, 0x80, 0x94, 0x83, 0x9b, 0x36, 0x26, 0x5e, 0x34, 0xf1, 0xbe, 0x50, 0x05, 0x72,
+	0x4d, 0x55, 0xd7, 0xf7, 0xd5, 0xe6, 0xd1, 0x5e, 0xd7, 0xd6, 0x98, 0x3f, 0xa8, 0xcd, 0x9c, 0x9d,
+	0x16, 0xb2, 0x1b, 0xde, 0xf8, 0xae, 0xd2, 0x50, 0xb2, 0xfe, 0xa2, 0x5d, 0x5b, 0x43, 0x5f, 0x83,
+	0x54, 0xdb, 0x56, 0x0d, 0xe2, 0xc8, 0x13, 0x54, 0xdb, 0xb9, 0xa8, 0xac, 0x75, 0x77, 0x4e, 0xf1,
+	0x96, 0xa0, 0xbb, 0x30, 0xe1, 0x34, 0x4d, 0x0b, 0xcb, 0xa9, 0xa4, 0xb5, 0x3b, 0xee, 0x94, 0xc2,
+	0x56, 0x94, 0x36, 0x61, 0xce, 0x85, 0x98, 0xcd, 0x84, 0xe0, 0x96, 0x61, 0x92, 0x29, 0xea, 0x5f,
+	0x87, 0xe9, 0x28, 0x0f, 0xef, 0x22, 0xf8, 0x8b, 0x28, 0xca, 0x2c, 0xab, 0xf8, 0x12, 0xe5, 0x04,
+	0x94, 0x4f, 0x40, 0xde, 0xc1, 0x1e, 0xc8, 0x4f, 0x0f, 0x0e, 0xb4, 0xa6, 0xa6, 0xea, 0x17, 0x06,
+	0x51, 0x1e, 0xd2, 0xa6, 0xc7, 0x93, 0xe2, 0x93, 0x56, 0x82, 0xef, 0xd2, 0x8f, 0x25, 0xb8, 0x16,
+	0xec, 0xbc, 0x43, 0xd4, 0x30, 0x63, 0x79, 0xe9, 0x6d, 0x5d, 0xf5, 0x5d, 0x86, 0x74, 0xcf, 0x7e,
+	0xf5, 0xe9, 0x5e, 0x6c, 0x45, 0xe9, 0x57, 0x12, 0x2c, 0x55, 0x5b, 0x2d, 0x36, 0x93, 0xe4, 0x1c,
+	0x5f, 0x5a, 0x98, 0x8b, 0x88, 0x45, 0x4d, 0x28, 0x84, 0x57, 0xe1, 0xb2, 0x42, 0xd1, 0x2f, 0x24,
+	0x28, 0xb0, 0x58, 0x71, 0x89, 0x68, 0xbc, 0x44, 0x9c, 0xf8, 0x8d, 0x04, 0x59, 0xef, 0x0a, 0xd3,
+	0x30, 0xf1, 0x0a, 0x65, 0x19, 0x2e, 0x46, 0x54, 0x59, 0xa5, 0x9b, 0x93, 0x79, 0xd4, 0x10, 0x51,
+	0xf9, 0x18, 0x26, 0xea, 0xe4, 0xa4, 0x6e, 0xa3, 0x2d, 0x98, 0xdd, 0xee, 0xea, 0xfa, 0x86, 0x69,
+	0x1c, 0x68, 0xed, 0xae, 0xcd, 0xb2, 0x36, 0x71, 0x50, 0xcc, 0x2f, 0xc5, 0xa6, 0x22, 0x84, 0x6f,
+	0x49, 0x95, 0x3f, 0x8d, 0x41, 0xaa, 0xe1, 0xb8, 0x7a, 0xa2, 0x75, 0x80, 0xb0, 0x21, 0x13, 0xf2,
+	0xec, 0x6b, 0xd2, 0xe4, 0x17, 0xca, 0xac, 0xb1, 0x53, 0xf6, 0x1b, 0x3b, 0xe5, 0xcd, 0x8e, 0x45,
+	0x7a, 0x68, 0x15, 0x26, 0xeb, 0x98, 0x50, 0x6a, 0x01, 0x82, 0xf9, 0x1c, 0x3f, 0xee, 0xee, 0x18,
+	0x76, 0x4b, 0xc2, 0x1d, 0xfb, 0x1a, 0x30, 0xc2, 0x1d, 0x9f, 0x02, 0xea, 0x6f, 0xb7, 0xa0, 0x9b,
+	0xfd, 0x8c, 0x62, 0xad, 0x18, 0x21, 0xc3, 0x6f, 0x03, 0x3c, 0xc2, 0x3a, 0xf6, 0x24, 0x12, 0xac,
+	0x12, 0x51, 0x57, 0xfe, 0x92, 0x81, 0xa9, 0x86, 0xc3, 0x55, 0xca, 0xd0, 0x13, 0xbf, 0xc9, 0xc5,
+	0x0f, 0x16, 0xa3, 0xd0, 0xf6, 0xf7, 0x28, 0x84, 0xe2, 0x3d, 0x82, 0xe9, 0x3a, 0xe6, 0x4b, 0x71,
+	0x68, 0x70, 0xd5, 0x30, 0x9f, 0xd4, 0x32, 0x41, 0x8f, 0xe1, 0x6a, 0xbc, 0xf3, 0x22, 0x54, 0x35,
+	0x90, 0x55, 0xd8, 0xab, 0x79, 0xe2, 0x77, 0xcc, 0x12, 0x55, 0x14, 0xb5, 0x61, 0x84, 0x2a, 0x7e,
+	0x00, 0xb3, 0xec, 0x04, 0x46, 0xd0, 0x52, 0xc4, 0x0b, 0xc3, 0xa2, 0xb0, 0x3b, 0x72, 0x1e, 0xcf,
+	0xbb, 0xc1, 0xc5, 0x39, 0xb7, 0xbf, 0xb2, 0x9b, 0xbc, 0x0d, 0xed, 0x26, 0xa0, 0x95, 0x41, 0x7c,
+	0xf8, 0x86, 0x43, 0x3e, 0xc8, 0x5f, 0x3c, 0xca, 0x67, 0xf0, 0xa6, 0xa0, 0x45, 0x81, 0xbe, 0x1a,
+	0x78, 0x89, 0x81, 0x3d, 0x0c, 0x21, 0x30, 0x7b, 0x90, 0x17, 0xf7, 0x1b, 0x50, 0xa0, 0xfa, 0xb9,
+	0x3d, 0x09, 0xe1, 0x06, 0x47, 0xb0, 0x34, 0xa8, 0x2f, 0x70, 0x1e, 0xf8, 0xf7, 0x04, 0x56, 0x97,
+	0x1c, 0xf2, 0xb0, 0x5f, 0xfa, 0x10, 0x29, 0x74, 0x4f, 0x08, 0xd7, 0x28, 0x3a, 0xd5, 0x61, 0x2e,
+	0x0a, 0x08, 0x0b, 0x3f, 0x72, 0x82, 0x2a, 0x74, 0x46, 0xc8, 0xe8, 0x39, 0x5c, 0x4b, 0xac, 0xa8,
+	0x9f, 0x87, 0xca, 0x6d, 0x01, 0x2a, 0xb1, 0x90, 0xf2, 0x01, 0x2c, 0xf4, 0xe9, 0xf9, 0x82, 0xa2,
+	0x56, 0x3e, 0x03, 0xc8, 0x34, 0x1c, 0x2f, 0x76, 0xa0, 0x07, 0x30, 0x15, 0x29, 0x10, 0xa3, 0xa5,
+	0x41, 0x75, 0xe3, 0x7c, 0xbc, 0x12, 0x8b, 0xee, 0x03, 0xd4, 0x83, 0xd2, 0xd9, 0xa0, 0xa8, 0xd5,
+	0x47, 0xf9, 0x08, 0x72, 0x7c, 0xf9, 0x57, 0xe8, 0xae, 0x96, 0x78, 0x88, 0xfa, 0x8a, 0xc5, 0x0f,
+	0x60, 0x2a, 0x52, 0x57, 0x0c, 0xe5, 0x4f, 0x2a, 0x37, 0xf6, 0x4b, 0x51, 0x83, 0x29, 0xe6, 0x9b,
+	0x86, 0x50, 0x41, 0x74, 0xf8, 0x1f, 0xc2, 0x5c, 0x42, 0xf9, 0x10, 0x95, 0x7c, 0x4e, 0xe2, 0xda,
+	0xa2, 0x90, 0xe5, 0xc7, 0xfe, 0x81, 0xf7, 0x71, 0xbd, 0x1d, 0x35, 0xfc, 0x51, 0x19, 0x3f, 0x81,
+	0xd9, 0xbe, 0x7a, 0x5e, 0xe8, 0xda, 0x45, 0xa5, 0xbe, 0x41, 0xd1, 0xba, 0xbf, 0x18, 0x16, 0x46,
+	0x6b, 0x61, 0xa1, 0x4c, 0xc8, 0x70, 0x1b, 0xe6, 0xa3, 0x8a, 0xc5, 0x45, 0x14, 0x15, 0xd1, 0x06,
+	0x41, 0x99, 0x5c, 0x95, 0x0a, 0xa1, 0x1c, 0x58, 0xb5, 0x1a, 0xe0, 0x71, 0x65, 0x51, 0x15, 0x69,
+	0x90, 0x15, 0xad, 0x24, 0xd8, 0x73, 0xb2, 0x13, 0xfc, 0x10, 0x66, 0xfb, 0x0a, 0x48, 0x83, 0x38,
+	0xdf, 0x4c, 0xe0, 0x1c, 0x2b, 0x3b, 0x3d, 0x87, 0x45, 0x61, 0xcd, 0x28, 0x8c, 0x6b, 0xe7, 0x95,
+	0x95, 0x84, 0x90, 0xac, 0xc3, 0x4c, 0x88, 0x25, 0x73, 0x50, 0xf3, 0x31, 0x79, 0x07, 0xfb, 0xd1,
+	0xa8, 0xca, 0x9e, 0x0f, 0x1d, 0x51, 0xe5, 0x98, 0xef, 0xac, 0x01, 0x8a, 0xe8, 0xf3, 0x02, 0x62,
+	0x55, 0xfe, 0x3c, 0x09, 0xe9, 0x86, 0xc3, 0xb2, 0x7d, 0xb4, 0x01, 0x39, 0xbe, 0xb4, 0x83, 0xae,
+	0x47, 0x3d, 0x66, 0xa4, 0x14, 0x21, 0x54, 0xf4, 0x5d, 0xc8, 0xd4, 0xfd, 0x17, 0x32, 0x12, 0xbe,
+	0x6d, 0xf2, 0xb1, 0x02, 0x08, 0xaa, 0x41, 0x96, 0x2b, 0x9c, 0x08, 0x7d, 0xe6, 0x75, 0x1e, 0x96,
+	0x78, 0x95, 0x65, 0x03, 0x72, 0x7c, 0xd1, 0x24, 0x94, 0x3f, 0xa1, 0x94, 0x22, 0x94, 0xff, 0x21,
+	0xe4, 0x98, 0xdf, 0x3c, 0x57, 0x85, 0x01, 0x9e, 0xa8, 0xaf, 0x3a, 0x11, 0x5e, 0x73, 0x51, 0xe1,
+	0x62, 0x40, 0x28, 0x9f, 0x8e, 0x96, 0x1c, 0xc2, 0xd0, 0x9b, 0x58, 0x8a, 0x10, 0x32, 0xda, 0x85,
+	0x6b, 0x89, 0x55, 0x03, 0x74, 0x8b, 0x73, 0x17, 0xc2, 0x67, 0xb4, 0x90, 0xed, 0xf7, 0xe0, 0x4d,
+	0xc1, 0x3b, 0x7f, 0x00, 0x76, 0x77, 0xfa, 0xcf, 0x31, 0xd9, 0x55, 0x7c, 0x17, 0x64, 0xd1, 0xfb,
+	0x1e, 0xdd, 0x89, 0x5e, 0xeb, 0xd1, 0x45, 0x5f, 0x83, 0xe9, 0x40, 0x65, 0x76, 0x7b, 0x62, 0x65,
+	0x97, 0xc1, 0x77, 0x7a, 0x8b, 0xbd, 0x4d, 0xf8, 0xb7, 0xf2, 0x00, 0x95, 0x8b, 0xfd, 0x2a, 0xc7,
+	0x2e, 0xf4, 0x43, 0x98, 0xe5, 0x35, 0x19, 0x5d, 0xa2, 0x5a, 0xfd, 0xaf, 0xff, 0x58, 0x7e, 0xe3,
+	0x87, 0x67, 0xcb, 0xd2, 0xe7, 0x67, 0xcb, 0xd2, 0x17, 0x67, 0xcb, 0xd2, 0xdf, 0xcf, 0x96, 0xa5,
+	0x7f, 0x9d, 0x2d, 0xbf, 0xf1, 0xef, 0xb3, 0x65, 0xe9, 0x93, 0xbb, 0x43, 0xfd, 0x85, 0x8a, 0x18,
+	0xd6, 0xfe, 0x7e, 0x8a, 0x32, 0x7e, 0xe7, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x70, 0xe3, 0x1e,
+	0xef, 0x29, 0x2b, 0x00, 0x00,
 }

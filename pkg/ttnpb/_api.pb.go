@@ -56,7 +56,6 @@ It has these top-level messages:
 	FrequencyPlanRequest
 	UserIdentifier
 	ApplicationIdentifier
-	ApplicationAPIKeyIdentifier
 	GatewayIdentifier
 	GatewayAntennaIdentifier
 	EndDeviceIdentifiers
@@ -67,10 +66,9 @@ It has these top-level messages:
 	CreateApplicationRequest
 	ListApplicationsResponse
 	UpdateApplicationRequest
-	AddApplicationAppEUIRequest
 	GenerateApplicationAppEUIResponse
-	RemoveApplicationAppEUIRequest
 	GenerateApplicationAPIKeyRequest
+	RemoveApplicationAPIKeyRequest
 	AddApplicationCollaboratorRequest
 	ListApplicationCollaboratorsResponse
 	RemoveApplicationCollaboratorRequest

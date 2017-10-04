@@ -20,14 +20,6 @@ message ApplicationIdentifier {
   string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
 }
 
-// ApplicationAPIKeyIdentifier is the message that is used to identity an
-// application API key.
-message ApplicationAPIKeyIdentifier {
-  ApplicationIdentifier application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // key_name is the application API key name.
-  string key_name = 2;
-}
-
 // GatewayIdentifier is the message that is used to identify a gateway.
 message GatewayIdentifier {
   // TTN Gateway ID.

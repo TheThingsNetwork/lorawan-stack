@@ -82,9 +82,6 @@ message CreateApplicationRequest {
 
   // app_euis are the app euis this application uses.
   repeated bytes app_euis = 3 [(gogoproto.customname) = "AppEUIs", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
-
-  // api_keys are the API keys of the application.
-  repeated APIKey api_keys = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
 }
 
 message ListApplicationsResponse {
@@ -99,16 +96,6 @@ message UpdateApplicationRequest {
 
   // app_euis are the app euis this application uses.
   repeated bytes app_euis = 3 [(gogoproto.customname) = "AppEUIs", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
-
-  // api_keys are the API keys of the application.
-  repeated APIKey api_keys = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
-}
-
-message AddApplicationAppEUIRequest {
-  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // app_eui is the AppEUI to be added.
-  bytes app_eui = 2 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 }
 
 message GenerateApplicationAppEUIResponse {
@@ -116,21 +103,21 @@ message GenerateApplicationAppEUIResponse {
   bytes app_eui = 1 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 }
 
-message RemoveApplicationAppEUIRequest {
-  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // app_eui is the AppEUI to be removed.
-  bytes app_eui = 2 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
-}
-
 message GenerateApplicationAPIKeyRequest {
   ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // name is the name of the API key to be generated.
-  string name = 2;
+  // key_name is the name of the API key to be generated.
+  string key_name = 2;
 
   // rights the are rights the generated API key will bear.
   repeated Right rights = 3;
+}
+
+message RemoveApplicationAPIKeyRequest {
+  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // key_name is the name of the API key to be removed.
+  string key_name = 2;
 }
 
 message AddApplicationCollaboratorRequest {
@@ -182,24 +169,15 @@ service IsApplication {
   // DeleteApplication permantly deletes an application.
   rpc DeleteApplication(ApplicationIdentifier) returns (google.protobuf.Empty);
 
-  // AddApplicationAppEUI adds a given AppEUI to a given application.
-  rpc AddApplicationAppEUI(AddApplicationAppEUIRequest) returns (google.protobuf.Empty);
-
   // GenerateApplicationAppEUI generates a new AppEUI for a given application and returns it.
   rpc GenerateApplicationAppEUI(ApplicationIdentifier) returns (GenerateApplicationAppEUIResponse);
-
-  // RemoveApplicationAppEUI deletes an AppEUI from an application.
-  rpc RemoveApplicationAppEUI(RemoveApplicationAppEUIRequest) returns (google.protobuf.Empty);
 
   // GenerateApplicationAPIKey generates a new API key for a given application
   // and returns it.
   rpc GenerateApplicationAPIKey(GenerateApplicationAPIKeyRequest) returns (APIKey);
 
-  // GetApplicationAPIKey returns a given API key from an application.
-  rpc GetApplicationAPIKey(ApplicationAPIKeyIdentifier) returns (APIKey);
-
   // RemoveApplicationAPIKey removes a given API key from an application.
-  rpc RemoveApplicationAPIKey(ApplicationAPIKeyIdentifier) returns (google.protobuf.Empty);
+  rpc RemoveApplicationAPIKey(RemoveApplicationAPIKeyRequest) returns (google.protobuf.Empty);
 
   // AddApplicationCollaborator adds an user as collaborator of an application.
   rpc AddApplicationCollaborator(AddApplicationCollaboratorRequest) returns (google.protobuf.Empty);
