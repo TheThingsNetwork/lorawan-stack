@@ -4,7 +4,6 @@ package deviceregistry_test
 
 import (
 	"fmt"
-	"math/rand"
 	"testing"
 
 	. "github.com/TheThingsNetwork/ttn/pkg/deviceregistry"
@@ -12,28 +11,17 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/store/mapstore"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
+	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
-var randy = rand.New(rand.NewSource(42))
-
-func newPopulatedEndDevice() *ttnpb.EndDevice {
-	ed := &ttnpb.EndDevice{}
-	ed.DevEUI = types.NewPopulatedEUI64(randy)
-	ed.JoinEUI = types.NewPopulatedEUI64(randy)
-	ed.DevAddr = types.NewPopulatedDevAddr(randy)
-	ed.ApplicationID = "test"
-	ed.DeviceID = "test"
-	return ed
-}
-
 func TestDeviceRegistry(t *testing.T) {
 	a := assertions.New(t)
 	r := New(store.NewTypedStoreClient(mapstore.New()))
 
-	ed := newPopulatedEndDevice()
+	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
 	device, err := r.Create(ed)
 	if !a.So(err, should.BeNil) {
@@ -55,9 +43,9 @@ func TestDeviceRegistry(t *testing.T) {
 		a.So(pretty.Diff(found[0].EndDevice, ed), should.BeEmpty)
 	}
 
-	updated := newPopulatedEndDevice()
+	updated := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	for device.EndDeviceIdentifiers == updated.EndDeviceIdentifiers {
-		updated = newPopulatedEndDevice()
+		updated = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	}
 	device.EndDevice = updated
 	if !a.So(device.Update(), should.BeNil) {
