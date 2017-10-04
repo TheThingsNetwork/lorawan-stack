@@ -62,7 +62,6 @@ It has these top-level messages:
 	EndDeviceIdentifiers
 	ClientIdentifier
 	CreateUserRequest
-	GetUserByEmailRequest
 	UpdateUserRequest
 	UpdateUserPasswordRequest
 	CreateApplicationRequest

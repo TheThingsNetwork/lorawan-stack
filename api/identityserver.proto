@@ -38,11 +38,6 @@ message CreateUserRequest {
   string name = 4;
 }
 
-message GetUserByEmailRequest {
-  // email address of the user to be looked for.
-  string email = 1;
-}
-
 message UpdateUserRequest {
   // email is the new email of the user.
   string email = 1;
@@ -67,9 +62,6 @@ service IsUser {
   // GetUser returns the profile of an user by ID. If the user identifier is empty it
   // returns the profile of the authenticated user.
   rpc GetUser(UserIdentifier) returns (User);
-
-  // GetUserByEmail finds an user by email address and returns it.
-  rpc GetUserByEmail(GetUserByEmailRequest) returns (User);
 
   // UpdateUser edits the profile of the authenticated user.
   rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty);
