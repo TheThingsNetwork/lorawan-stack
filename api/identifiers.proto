@@ -26,13 +26,6 @@ message GatewayIdentifier {
   string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
 }
 
-// GatewayAntennaIdentifier is the message that is used to identify a gateway's antenna.
-message GatewayAntennaIdentifier {
-  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  // antenna_index is the index of the antenna in the gateway's antenna list.
-  uint32 antenna_index = 2;
-}
-
 // End device identifiers are carried with uplink and downlink messages.
 // Unknown fields are left empty.
 message EndDeviceIdentifiers {

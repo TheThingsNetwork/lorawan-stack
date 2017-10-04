@@ -57,7 +57,6 @@ It has these top-level messages:
 	UserIdentifier
 	ApplicationIdentifier
 	GatewayIdentifier
-	GatewayAntennaIdentifier
 	EndDeviceIdentifiers
 	ClientIdentifier
 	CreateUserRequest
@@ -77,10 +76,6 @@ It has these top-level messages:
 	CreateGatewayRequest
 	ListGatewaysResponse
 	UpdateGatewayRequest
-	SetGatewayAttributeRequest
-	RemoveGatewayAttributeRequest
-	AddGatewayAntennaRequest
-	EditGatewayAntennaRequest
 	AddGatewayCollaboratorRequest
 	ListGatewayCollaboratorsResponse
 	ListGatewayOwnersResponse

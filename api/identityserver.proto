@@ -8,7 +8,6 @@ import "github.com/TheThingsNetwork/ttn/api/client.proto";
 import "github.com/TheThingsNetwork/ttn/api/collaborator.proto";
 import "github.com/TheThingsNetwork/ttn/api/rights.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
-import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
 import "github.com/TheThingsNetwork/ttn/api/gateway.proto";
 import "github.com/TheThingsNetwork/ttn/api/user.proto";
 import "google/protobuf/empty.proto";
@@ -264,61 +263,6 @@ message UpdateGatewayRequest {
   string cluster_address = 9;
 }
 
-message SetGatewayAttributeRequest {
-  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // attribute is the name of the attribute to be added.
-  string attribute = 2;
-
-  // value is the value of the attribute to be added.
-  string value = 3;
-}
-
-message RemoveGatewayAttributeRequest {
-  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // attribute is the key of the attribute to be deleted.
-  string attribute = 2;
-}
-
-message AddGatewayAntennaRequest {
-  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // gain is the antenna gain relative to this gateway, in dBi.
-  float gain = 2;
-
-  // location is the antenna's location.
-  Location location = 3 [(gogoproto.nullable) = false];
-
-  // type denotes the antenna's type.
-  string type = 4;
-
-  // model denotes the antenna's model.
-  string model = 5;
-
-  // placement denotes whether if the antenna is placed indoors or outdoors.
-  GatewayAntennaPlacement placement = 6;
-}
-
-message EditGatewayAntennaRequest {
-  GatewayAntennaIdentifier antenna_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // gain is the antenna gain relative to this gateway, in dBi.
-  float gain = 2;
-
-  // location is the antenna's location.
-  Location location = 3 [(gogoproto.nullable) = false];
-
-  // type denotes the antenna's type.
-  string type = 4;
-
-  // model denotes the antenna's model.
-  string model = 5;
-
-  // placement denotes whether if the antenna is placed indoors or outdoors.
-  GatewayAntennaPlacement placement = 6;
-}
-
 message AddGatewayCollaboratorRequest {
   GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
@@ -371,21 +315,6 @@ service IsGateway {
 
   // DeleteGateway permantly deletes a gateway.
   rpc DeleteGateway(GatewayIdentifier) returns (google.protobuf.Empty);
-
-  // SetGatewayAttribute sets an attribute with a key in the gateway.
-  rpc SetGatewayAttribute(SetGatewayAttributeRequest) returns (google.protobuf.Empty);
-
-  // RemoveGatewayAttribute removes an attribute matching the given key.
-  rpc RemoveGatewayAttribute(RemoveGatewayAttributeRequest) returns (google.protobuf.Empty);
-
-  // AddGatewayAntenna adds a new antenna to a gateway.
-  rpc AddGatewayAntenna(AddGatewayAntennaRequest) returns (google.protobuf.Empty);
-
-  // EditGatewayAntenna edits a gateway antenna.
-  rpc EditGatewayAntenna(EditGatewayAntennaRequest) returns (google.protobuf.Empty);
-
-  // RemoveGatewayAntenna removes a given antenna from a gateway.
-  rpc RemoveGatewayAntenna(GatewayAntennaIdentifier) returns (google.protobuf.Empty);
 
   // AddGatewayCollaborator makes an user collaborator a gateway.
   rpc AddGatewayCollaborator(AddGatewayCollaboratorRequest) returns (google.protobuf.Empty);
