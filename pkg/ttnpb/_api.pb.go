@@ -79,7 +79,7 @@ It has these top-level messages:
 	CreateGatewayRequest
 	ListGatewaysResponse
 	UpdateGatewayRequest
-	AddGatewayAttributeRequest
+	SetGatewayAttributeRequest
 	RemoveGatewayAttributeRequest
 	AddGatewayAntennaRequest
 	EditGatewayAntennaRequest

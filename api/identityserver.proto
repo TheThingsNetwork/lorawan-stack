@@ -286,7 +286,7 @@ message UpdateGatewayRequest {
   string cluster_address = 9;
 }
 
-message AddGatewayAttributeRequest {
+message SetGatewayAttributeRequest {
   GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // attribute is the name of the attribute to be added.
@@ -394,8 +394,8 @@ service IsGateway {
   // DeleteGateway permantly deletes a gateway.
   rpc DeleteGateway(GatewayIdentifier) returns (google.protobuf.Empty);
 
-  // AddGatewayAttribute sets an attribute with a key in the gateway.
-  rpc AddGatewayAttribute(AddGatewayAttributeRequest) returns (google.protobuf.Empty);
+  // SetGatewayAttribute sets an attribute with a key in the gateway.
+  rpc SetGatewayAttribute(SetGatewayAttributeRequest) returns (google.protobuf.Empty);
 
   // RemoveGatewayAttribute removes an attribute matching the given key.
   rpc RemoveGatewayAttribute(RemoveGatewayAttributeRequest) returns (google.protobuf.Empty);
