@@ -14,6 +14,8 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // Join Request
 message JoinRequest {
+  option (gogoproto.populate) = false;
+
   // Raw uplink bytes (PHYPayload)
   bytes raw_payload = 1;
 

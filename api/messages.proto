@@ -14,6 +14,7 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // Uplink message from the end device to the network
 message UplinkMessage {
+  option (gogoproto.populate) = false;
 
   // Mapping from UDP message (other fields can be set in "advanced"):
   //
@@ -72,6 +73,7 @@ message UplinkMessage {
 
 // Downlink message from the network to the end device
 message DownlinkMessage {
+  option (gogoproto.populate) = false;
 
   // Mapping from UDP message:
   //
