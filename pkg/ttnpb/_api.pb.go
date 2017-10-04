@@ -69,10 +69,8 @@ It has these top-level messages:
 	UpdateApplicationRequest
 	AddApplicationAppEUIRequest
 	GenerateApplicationAppEUIResponse
-	ListApplicationAppEUIsResponse
 	RemoveApplicationAppEUIRequest
 	GenerateApplicationAPIKeyRequest
-	ListApplicationAPIKeysResponse
 	AddApplicationCollaboratorRequest
 	ListApplicationCollaboratorsResponse
 	RemoveApplicationCollaboratorRequest
@@ -82,11 +80,9 @@ It has these top-level messages:
 	ListGatewaysResponse
 	UpdateGatewayRequest
 	AddGatewayAttributeRequest
-	ListGatewayAttributesResponse
 	RemoveGatewayAttributeRequest
 	AddGatewayAntennaRequest
 	EditGatewayAntennaRequest
-	ListGatewayAntennasResponse
 	AddGatewayCollaboratorRequest
 	ListGatewayCollaboratorsResponse
 	ListGatewayOwnersResponse

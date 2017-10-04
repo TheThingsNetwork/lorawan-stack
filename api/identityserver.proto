@@ -116,10 +116,6 @@ message GenerateApplicationAppEUIResponse {
   bytes app_eui = 1 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 }
 
-message ListApplicationAppEUIsResponse {
-  repeated bytes app_euis = 1 [(gogoproto.customname) = "AppEUIs", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
-}
-
 message RemoveApplicationAppEUIRequest {
   ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
@@ -135,10 +131,6 @@ message GenerateApplicationAPIKeyRequest {
 
   // rights the are rights the generated API key will bear.
   repeated Right rights = 3;
-}
-
-message ListApplicationAPIKeysResponse {
-  repeated APIKey api_keys = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
 }
 
 message AddApplicationCollaboratorRequest {
@@ -196,9 +188,6 @@ service IsApplication {
   // GenerateApplicationAppEUI generates a new AppEUI for a given application and returns it.
   rpc GenerateApplicationAppEUI(ApplicationIdentifier) returns (GenerateApplicationAppEUIResponse);
 
-  // ListApplicationAppEUIs returns all the registered AppEUIs of an application.
-  rpc ListApplicationAppEUIs(ApplicationIdentifier) returns (ListApplicationAppEUIsResponse);
-
   // RemoveApplicationAppEUI deletes an AppEUI from an application.
   rpc RemoveApplicationAppEUI(RemoveApplicationAppEUIRequest) returns (google.protobuf.Empty);
 
@@ -208,10 +197,6 @@ service IsApplication {
 
   // GetApplicationAPIKey returns a given API key from an application.
   rpc GetApplicationAPIKey(ApplicationAPIKeyIdentifier) returns (APIKey);
-
-  // ListApplicationAPIKeys returns all the API keys that are registered
-  // for an application.
-  rpc ListApplicationAPIKeys(ApplicationIdentifier) returns (ListApplicationAPIKeysResponse);
 
   // RemoveApplicationAPIKey removes a given API key from an application.
   rpc RemoveApplicationAPIKey(ApplicationAPIKeyIdentifier) returns (google.protobuf.Empty);
@@ -311,11 +296,6 @@ message AddGatewayAttributeRequest {
   string value = 3;
 }
 
-message ListGatewayAttributesResponse {
-  // attributes is a map that contain all the gateway attributes.
-  map<string, string> attributes = 1;
-}
-
 message RemoveGatewayAttributeRequest {
   GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
@@ -359,10 +339,6 @@ message EditGatewayAntennaRequest {
 
   // placement denotes whether if the antenna is placed indoors or outdoors.
   GatewayAntennaPlacement placement = 6;
-}
-
-message ListGatewayAntennasResponse {
-  repeated GatewayAntenna antennas = 1 [(gogoproto.nullable) = false];
 }
 
 message AddGatewayCollaboratorRequest {
@@ -421,17 +397,11 @@ service IsGateway {
   // AddGatewayAttribute sets an attribute with a key in the gateway.
   rpc AddGatewayAttribute(AddGatewayAttributeRequest) returns (google.protobuf.Empty);
 
-  // ListGatewayAttributes returns all gateway attributes.
-  rpc ListGatewayAttributes(GatewayIdentifier) returns (ListGatewayAttributesResponse);
-
   // RemoveGatewayAttribute removes an attribute matching the given key.
   rpc RemoveGatewayAttribute(RemoveGatewayAttributeRequest) returns (google.protobuf.Empty);
 
   // AddGatewayAntenna adds a new antenna to a gateway.
   rpc AddGatewayAntenna(AddGatewayAntennaRequest) returns (google.protobuf.Empty);
-
-  // ListGatewayAntenas returns all the antennas that a gateway has registered.
-  rpc ListGatewayAntennas(GatewayIdentifier) returns (ListGatewayAntennasResponse);
 
   // EditGatewayAntenna edits a gateway antenna.
   rpc EditGatewayAntenna(EditGatewayAntennaRequest) returns (google.protobuf.Empty);
