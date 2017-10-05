@@ -3,6 +3,7 @@
 package toa
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -44,11 +45,13 @@ func buildLoRaDownlinkFromParameters(payloadSize int, dataRate types.DataRate, c
 func TestInvalidModulation(t *testing.T) {
 	a := assertions.New(t)
 
-	_, err := Compute(ttnpb.DownlinkMessage{
+	dl := ttnpb.DownlinkMessage{
 		Settings: ttnpb.TxSettings{
 			Modulation: ttnpb.Modulation_FSK + ttnpb.Modulation_LORA + 1,
 		},
-	})
+	}
+
+	_, err := Compute(dl.RawPayload, dl.Settings)
 	a.So(err, should.NotBeNil)
 }
 
@@ -60,7 +63,7 @@ func TestInvalidLoRa(t *testing.T) {
 
 	downlink, err := buildLoRaDownlinkFromParameters(10, types.DataRate{LoRa: "SF10BW125"}, "1/9")
 	a.So(err, should.BeNil)
-	_, err = Compute(downlink)
+	_, err = Compute(downlink.RawPayload, downlink.Settings)
 	a.So(err, should.NotBeNil)
 }
 
@@ -79,7 +82,7 @@ func TestDifferentLoRaSFs(t *testing.T) {
 	for dr, us := range sfTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, dr, "4/5")
 		a.So(err, should.BeNil)
-		toa, err := Compute(dl)
+		toa, err := Compute(dl.RawPayload, dl.Settings)
 		a.So(err, should.BeNil)
 		a.So(toa, should.AlmostEqual, time.Duration(us)*time.Microsecond)
 	}
@@ -97,7 +100,7 @@ func TestDifferentLoRaBWs(t *testing.T) {
 	for dr, us := range bwTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, dr, "4/5")
 		a.So(err, should.BeNil)
-		toa, err := Compute(dl)
+		toa, err := Compute(dl.RawPayload, dl.Settings)
 		a.So(err, should.BeNil)
 		a.So(toa, should.AlmostEqual, time.Duration(us)*time.Microsecond)
 	}
@@ -116,7 +119,7 @@ func TestDifferentLoRaCRs(t *testing.T) {
 	for cr, us := range crTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, types.DataRate{LoRa: "SF7BW125"}, cr)
 		a.So(err, should.BeNil)
-		toa, err := Compute(dl)
+		toa, err := Compute(dl.RawPayload, dl.Settings)
 		a.So(err, should.BeNil)
 		a.So(toa, should.AlmostEqual, time.Duration(us)*time.Microsecond)
 	}
@@ -138,7 +141,7 @@ func TestDifferentLoRaPayloadSizes(t *testing.T) {
 	for size, us := range plTests {
 		dl, err := buildLoRaDownlinkFromParameters(size, types.DataRate{LoRa: "SF7BW125"}, "4/5")
 		a.So(err, should.BeNil)
-		toa, err := Compute(dl)
+		toa, err := Compute(dl.RawPayload, dl.Settings)
 		a.So(err, should.BeNil)
 		a.So(toa, should.AlmostEqual, time.Duration(us)*time.Microsecond)
 	}
@@ -162,7 +165,21 @@ func TestFSK(t *testing.T) {
 		},
 	}
 
-	toa, err := Compute(d)
+	toa, err := Compute(d.RawPayload, d.Settings)
 	a.So(err, should.BeNil)
 	a.So(toa, should.AlmostEqual, 33760*time.Microsecond)
+}
+
+func getDownlink() ttnpb.DownlinkMessage { return ttnpb.DownlinkMessage{} }
+
+func ExampleCompute() {
+	var downlink ttnpb.DownlinkMessage
+	downlink = getDownlink()
+
+	toa, err := Compute(downlink.RawPayload, downlink.Settings)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Time on air:", toa)
 }
