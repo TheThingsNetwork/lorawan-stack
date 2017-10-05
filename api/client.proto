@@ -27,9 +27,9 @@ message Client {
   // state denotes the reviewing state of the client by the tenant admin.
   ClientState state = 5;
 
-  // official denotes if a client has been labelled as an official third-party
-  // client by the tenant admin.
-  bool official = 6;
+  // official_labeled denotes if a client has been labeled as an official
+  // third-party client by the tenant admin.
+  bool official_labeled = 6;
 
   // grants denotes which OAuth2 flows can the client use to get a token.
   repeated ClientGrant grants = 7;
@@ -61,7 +61,7 @@ enum ClientState {
   // and therefore the client can be used.
   STATE_APPROVED = 1;
 
-  // Denotes that the client request has beenr rejected by the tenant admin
+  // Denotes that the client request has been rejected by the tenant admin
   // and therefore it cannot be used.
   STATE_REJECTED = 2;
 }

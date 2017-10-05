@@ -159,7 +159,7 @@ service IsApplication {
   rpc GetApplication(ApplicationIdentifier) returns (Application);
 
   // ListApplications returns all the applications where the authenticated user
-  // is collaborator.
+  // has access to.
   rpc ListApplications(google.protobuf.Empty) returns (ListApplicationsResponse);
 
   // UpdateApplication edits an application.
@@ -307,7 +307,8 @@ service IsGateway {
   // GetGateway finds a gateway by ID and retrieves it.
   rpc GetGateway(GatewayIdentifier) returns (Gateway);
 
-  // ListGateways returns all the gateways which the authenticated user is collaborator.
+  // ListGateways returns all the gateways which the authenticated user
+  // has access to.
   rpc ListGateways(google.protobuf.Empty) returns (ListGatewaysResponse);
 
   // UpdateGateway edits a gateway and retrieves the updated version.
@@ -387,9 +388,9 @@ message UpdateClientRequest {
 message SetClientOfficialRequest {
   ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // official denotes whether if the client is labelled as an official third-party
+  // official denotes whether if the client is labeled as an official third-party
   // client by the tenant admin.
-  bool official = 2;
+  bool official_labeled = 2;
 }
 
 message SetClientStateRequest {
@@ -437,7 +438,7 @@ service IsClient {
   // GetClient finds a client by ID and retrieves it.
   rpc GetClient(ClientIdentifier) returns (Client);
 
-  // ListClients returns all the clients which the authenticated user is collaborator.
+  // ListClients returns all the clients which the authenticated has access to.
   rpc ListClients(google.protobuf.Empty) returns (ListClientsResponse);
 
   // UpdateClient edits a client.

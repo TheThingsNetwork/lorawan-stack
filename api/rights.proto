@@ -22,6 +22,7 @@ message APIKey {
 // Right is the enum that defines all the different rights to do something in
 // the network.
 enum Right {
+  // TODO(romeovs): to be extended.
   option (gogoproto.goproto_enum_prefix) = false;
   option (gogoproto.enum_stringer) = false;
 
