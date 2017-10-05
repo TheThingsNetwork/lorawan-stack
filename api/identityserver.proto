@@ -190,6 +190,12 @@ message CreateGatewayRequest {
   // cluster_address indicates the URI of the gateway server cluster to connect to,
   // in a "<ip>:<port>" format.
   string cluster_address = 9;
+
+  // contact_account is the user ID that will be displayed (given the set privacy
+  // settings) as contact person for this gateway.
+  // TODO(gomezjdaniel): allow to use an organization ID as contact account when
+  // they are added.
+  UserIdentifier contact_account = 10 [(gogoproto.nullable) = false];
 }
 
 message ListGatewaysResponse {
@@ -224,6 +230,12 @@ message UpdateGatewayRequest {
   // cluster_address indicates the URI of the gateway server cluster to connect to,
   // in a "<ip>:<port>" format.
   string cluster_address = 9;
+
+  // contact_account is the user ID that will be displayed (given the set privacy
+  // settings) as contact person for this gateway.
+  // TODO(gomezjdaniel): allow to use an organization ID as contact account when
+  // they are added.
+  UserIdentifier contact_account = 10 [(gogoproto.nullable) = false];
 }
 
 message SetGatewayCollaboratorRequest {
@@ -271,9 +283,6 @@ service IsGateway {
 
   // ListGatewayCollaborators returns all the collaborators for a given gateway.
   rpc ListGatewayCollaborators(GatewayIdentifier) returns (ListGatewayCollaboratorsResponse);
-
-  // ListGatewayOwners returns all the collaborators that are owners of a gateway.
-  rpc ListGatewayOwners(GatewayIdentifier) returns (ListGatewayOwnersResponse);
 
   // ListGatewayRights returns all the rights that the authenticated user has
   // to a given gateway.

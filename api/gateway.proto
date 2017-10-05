@@ -51,15 +51,21 @@ message Gateway {
   // to, in a "<ip>:<port>" format.
   string cluster_address = 11;
 
+  // contact_account is the user ID that will be displayed (given the set privacy
+  // settings) as contact person for this gateway.
+  // TODO(gomezjdaniel): allow to use an organization ID as contact account when
+  // they are added.
+  UserIdentifier contact_account = 12 [(gogoproto.nullable) = false];
+
   // created_at is the time when the gateway was created.
-  google.protobuf.Timestamp created_at = 12 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 13 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // updated_at is the last time the gateway was updated.
-  google.protobuf.Timestamp updated_at = 13 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 14 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // archived_at is the time when the gateway was archived and therefore
   // permantly disabled.
-  google.protobuf.Timestamp archived_at = 14 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp archived_at = 15 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 // GatewayPrivacySettings is the message that defines the different privacy settings
@@ -71,8 +77,9 @@ message GatewayPrivacySettings {
   // location_public denotes whether or not the gateway's location is public.
   bool location_public = 2;
 
-  // owner_public denotes whether or not the gateway owner is public.
-  bool owner_public = 3;
+  // contactable denotes whether the user ID thas has been set as contact person
+  // is private or public.
+  bool contactable = 3;
 }
 
 // GatewayAntenna is the message that defines a gateway antenna.
