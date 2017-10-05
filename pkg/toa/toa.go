@@ -14,21 +14,21 @@ import (
 // Compute the time-on-air from the payload and RF parameters. This function only takes into account the PHY payload.
 //
 // See http://www.semtech.com/images/datasheet/LoraDesignGuide_STD.pdf, page 7
-func Compute(downlink ttnpb.DownlinkMessage) (time.Duration, error) {
-	switch downlink.Settings.Modulation {
+func Compute(rawPayload []byte, settings ttnpb.TxSettings) (time.Duration, error) {
+	switch settings.Modulation {
 	case ttnpb.Modulation_LORA:
-		d, err := computeLoRa(downlink)
+		d, err := computeLoRa(rawPayload, settings)
 		return d, err
 	case ttnpb.Modulation_FSK:
-		return computeFSK(downlink), nil
+		return computeFSK(rawPayload, settings), nil
 	default:
 		return 0, errors.New("Unknown modulation")
 	}
 }
 
-func computeLoRa(downlink ttnpb.DownlinkMessage) (time.Duration, error) {
+func computeLoRa(rawPayload []byte, settings ttnpb.TxSettings) (time.Duration, error) {
 	var cr float64
-	switch downlink.Settings.CodingRate {
+	switch settings.CodingRate {
 	case "4/5":
 		cr = 1
 	case "4/6":
@@ -41,15 +41,15 @@ func computeLoRa(downlink ttnpb.DownlinkMessage) (time.Duration, error) {
 		return 0, errors.New("Invalid downlink coding rate")
 	}
 
-	bandwidth := downlink.Settings.Bandwidth / 1000 // Bandwidth in KHz
-	spreadingFactor := downlink.Settings.SpreadingFactor
+	bandwidth := settings.Bandwidth / 1000 // Bandwidth in KHz
+	spreadingFactor := settings.SpreadingFactor
 
 	var de float64
 	if bandwidth == 125 && (spreadingFactor == 11 || spreadingFactor == 12) {
 		de = 1.0
 	}
 
-	pl := float64(len(downlink.RawPayload))
+	pl := float64(len(rawPayload))
 	floatBW := float64(bandwidth)
 	floatSF := float64(spreadingFactor)
 	h := 0.0 // 0 means header is enabled
@@ -62,9 +62,9 @@ func computeLoRa(downlink ttnpb.DownlinkMessage) (time.Duration, error) {
 	return time.Duration(timeOnAir), nil
 }
 
-func computeFSK(downlink ttnpb.DownlinkMessage) time.Duration {
-	payloadSize := len(downlink.RawPayload)
-	bitRate := downlink.Settings.BitRate
+func computeFSK(rawPayload []byte, settings ttnpb.TxSettings) time.Duration {
+	payloadSize := len(rawPayload)
+	bitRate := settings.BitRate
 
 	tPkt := int64(time.Second) * (int64(payloadSize) + 5 + 3 + 1 + 2) * 8 / int64(bitRate)
 
