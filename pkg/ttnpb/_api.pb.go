@@ -67,29 +67,23 @@ It has these top-level messages:
 	UpdateApplicationRequest
 	GenerateApplicationAPIKeyRequest
 	RemoveApplicationAPIKeyRequest
-	AddApplicationCollaboratorRequest
+	SetApplicationCollaboratorRequest
 	ListApplicationCollaboratorsResponse
-	RemoveApplicationCollaboratorRequest
-	ApplicationRight
 	ListApplicationRightsResponse
 	CreateGatewayRequest
 	ListGatewaysResponse
 	UpdateGatewayRequest
-	AddGatewayCollaboratorRequest
+	SetGatewayCollaboratorRequest
 	ListGatewayCollaboratorsResponse
 	ListGatewayOwnersResponse
-	RemoveGatewayCollaboratorRequest
-	GatewayRight
 	ListGatewayRightsResponse
 	CreateClientRequest
 	ListClientsResponse
 	UpdateClientRequest
 	SetClientOfficialRequest
 	SetClientStateRequest
-	AddClientCollaboratorRequest
+	SetClientCollaboratorRequest
 	ListClientCollaboratorsResponse
-	RemoveClientCollaboratorRequest
-	ClientRight
 	ListClientRightsResponse
 	JoinRequest
 	JoinResponse

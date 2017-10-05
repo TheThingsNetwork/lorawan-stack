@@ -108,7 +108,7 @@ message RemoveApplicationAPIKeyRequest {
   string key_name = 2;
 }
 
-message AddApplicationCollaboratorRequest {
+message SetApplicationCollaboratorRequest {
   ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   Collaborator collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
@@ -116,21 +116,6 @@ message AddApplicationCollaboratorRequest {
 
 message ListApplicationCollaboratorsResponse {
   repeated Collaborator collaborators = 1 [(gogoproto.nullable) = false];
-}
-
-message RemoveApplicationCollaboratorRequest {
-  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  UserIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-}
-
-message ApplicationRight {
-  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  UserIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // right is the right that the user holds for the application.
-  Right right = 3;
 }
 
 message ListApplicationRightsResponse {
@@ -164,24 +149,16 @@ service IsApplication {
   // RemoveApplicationAPIKey removes a given API key from an application.
   rpc RemoveApplicationAPIKey(RemoveApplicationAPIKeyRequest) returns (google.protobuf.Empty);
 
-  // AddApplicationCollaborator adds an user as collaborator of an application.
-  rpc AddApplicationCollaborator(AddApplicationCollaboratorRequest) returns (google.protobuf.Empty);
+  // SetApplicationCollaborator sets a collaborator for a given application. If
+  // the list of rights is empty the collaborator will be removed.
+  rpc SetApplicationCollaborator(SetApplicationCollaboratorRequest) returns (google.protobuf.Empty);
 
-  // ListApplicationCollaborators returns all the collaborators of a given application.
+  // ListApplicationCollaborators returns all the collaborators for a given application.
   rpc ListApplicationCollaborators(ApplicationIdentifier) returns (ListApplicationCollaboratorsResponse);
-
-  // RemoveApplicationCollaborator removes a collaborator from an application.
-  rpc RemoveApplicationCollaborator(RemoveApplicationCollaboratorRequest) returns (google.protobuf.Empty);
-
-  // AddApplicationRight grants a given right to a given user for a given application.
-  rpc AddApplicationRight(ApplicationRight) returns (google.protobuf.Empty);
 
   // ListApplicationRights returns all the rights that the authenticated user has
   // for a given application.
   rpc ListApplicationRights(ApplicationIdentifier) returns (ListApplicationRightsResponse);
-
-  // RemoveApplicationRight revokes a right to an application collaborator.
-  rpc RemoveApplicationRight(ApplicationRight) returns (google.protobuf.Empty);
 }
 
 message CreateGatewayRequest {
@@ -249,7 +226,7 @@ message UpdateGatewayRequest {
   string cluster_address = 9;
 }
 
-message AddGatewayCollaboratorRequest {
+message SetGatewayCollaboratorRequest {
   GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   Collaborator collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
@@ -262,21 +239,6 @@ message ListGatewayCollaboratorsResponse {
 message ListGatewayOwnersResponse {
   // collaborators is the list of collaborators that have owner rights for the gateway.
   repeated Collaborator collaborators = 1 [(gogoproto.nullable) = false];
-}
-
-message RemoveGatewayCollaboratorRequest {
-  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  UserIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-}
-
-message GatewayRight {
-  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  UserIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // right is the right this user holds for the gatewa true, (gogoproto.nullable) = false];
-  Right right = 3;
 }
 
 message ListGatewayRightsResponse {
@@ -303,8 +265,9 @@ service IsGateway {
   // DeleteGateway permantly deletes a gateway.
   rpc DeleteGateway(GatewayIdentifier) returns (google.protobuf.Empty);
 
-  // AddGatewayCollaborator makes an user collaborator a gateway.
-  rpc AddGatewayCollaborator(AddGatewayCollaboratorRequest) returns (google.protobuf.Empty);
+  // SetGatewayCollaborator sets a collaborator for a given gateway. If the list
+  // of rights is empty the collaborator will be removed.
+  rpc SetGatewayCollaborator(SetGatewayCollaboratorRequest) returns (google.protobuf.Empty);
 
   // ListGatewayCollaborators returns all the collaborators for a given gateway.
   rpc ListGatewayCollaborators(GatewayIdentifier) returns (ListGatewayCollaboratorsResponse);
@@ -312,19 +275,9 @@ service IsGateway {
   // ListGatewayOwners returns all the collaborators that are owners of a gateway.
   rpc ListGatewayOwners(GatewayIdentifier) returns (ListGatewayOwnersResponse);
 
-  // RemoveGatewayCollaborator revokes all the rights that a collaborator has to
-  // a given gateway.
-  rpc RemoveGatewayCollaborator(RemoveGatewayCollaboratorRequest) returns (google.protobuf.Empty);
-
-  // AddGatewayRight grants a right to a given user for a given gateway.
-  rpc AddGatewayRight(GatewayRight) returns (google.protobuf.Empty);
-
   // ListGatewayRights returns all the rights that the authenticated user has
   // to a given gateway.
   rpc ListGatewayRights(GatewayIdentifier) returns (ListGatewayRightsResponse);
-
-  // RemoveGatewayRight revokes a given right from a given gateway collaborator
-  rpc RemoveGatewayRight(GatewayRight) returns (google.protobuf.Empty);
 }
 
 message CreateClientRequest {
@@ -385,7 +338,7 @@ message SetClientStateRequest {
   ClientState state = 2;
 }
 
-message AddClientCollaboratorRequest {
+message SetClientCollaboratorRequest {
   ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   Collaborator collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
@@ -393,21 +346,6 @@ message AddClientCollaboratorRequest {
 
 message ListClientCollaboratorsResponse {
   repeated Collaborator collaborators = 1 [(gogoproto.nullable) = false];
-}
-
-message RemoveClientCollaboratorRequest {
-  ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  UserIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-}
-
-message ClientRight {
-  ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  UserIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // right is the right that the user holds for the client.
-  Right right = 3;
 }
 
 message ListClientRightsResponse {
@@ -434,30 +372,21 @@ service IsClient {
   rpc DeleteClient(ClientIdentifier) returns (google.protobuf.Empty);
 
   // SetClientOfficial allows to a tenant admin to add or remove the official
-  // distinguise "official" label of a third-party client.
+  // label of a third-party client.
   rpc SetClientOfficial(SetClientOfficialRequest) returns (google.protobuf.Empty);
 
   // SetClientState allows to the tenant admin to set the reviewing state of
   // a third-party client request.
   rpc SetClientState(SetClientStateRequest) returns (google.protobuf.Empty);
 
-  // AddClientCollaborator makes an user collaborator of a client.
-  rpc AddClientCollaborator(AddClientCollaboratorRequest) returns (google.protobuf.Empty);
+  // SetClientCollaborator sets a collaborator for a given third-party client.
+  // If the list of rights is empty the collaborator will be removed.
+  rpc SetClientCollaborator(SetClientCollaboratorRequest) returns (google.protobuf.Empty);
 
-  // ListClientCollaborators returns all the collaborators for a given client.
+  // ListClientCollaborators returns all the collaborators for a given third-party client.
   rpc ListClientCollaborators(ClientIdentifier) returns (ListClientCollaboratorsResponse);
 
-  // RemoveClientCollaborator revokes all the rights that a collaborator has to
-  // a given client.
-  rpc RemoveClientCollaborator(RemoveClientCollaboratorRequest) returns (google.protobuf.Empty);
-
-  // AddClientRight grants a right to a given user for a given client.
-  rpc AddClientRight(ClientRight) returns (google.protobuf.Empty);
-
   // ListClientRights returns all the rights that the authenticated user has
-  // to a given client.
+  // to a given third-party client.
   rpc ListClientRights(ClientIdentifier) returns (ListClientRightsResponse);
-
-  // RemoveClientRight revokes a given right from a given client collaborator.
-  rpc RemoveClientRight(ClientRight) returns (google.protobuf.Empty);
 }
