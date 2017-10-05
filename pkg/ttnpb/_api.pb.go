@@ -65,7 +65,6 @@ It has these top-level messages:
 	CreateApplicationRequest
 	ListApplicationsResponse
 	UpdateApplicationRequest
-	GenerateApplicationAppEUIResponse
 	GenerateApplicationAPIKeyRequest
 	RemoveApplicationAPIKeyRequest
 	AddApplicationCollaboratorRequest

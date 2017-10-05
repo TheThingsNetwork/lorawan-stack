@@ -78,9 +78,6 @@ message CreateApplicationRequest {
 
   // description is the description of the application.
   string description = 2;
-
-  // app_euis are the app euis this application uses.
-  repeated bytes app_euis = 3 [(gogoproto.customname) = "AppEUIs", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 }
 
 message ListApplicationsResponse {
@@ -92,14 +89,6 @@ message UpdateApplicationRequest {
 
   // description is the description of the application.
   string description = 2;
-
-  // app_euis are the app euis this application uses.
-  repeated bytes app_euis = 3 [(gogoproto.customname) = "AppEUIs", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
-}
-
-message GenerateApplicationAppEUIResponse {
-  // app_eui is the AppEUI that has been generated.
-  bytes app_eui = 1 [(gogoproto.customname) = "AppEUI", (gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
 }
 
 message GenerateApplicationAPIKeyRequest {
@@ -167,9 +156,6 @@ service IsApplication {
 
   // DeleteApplication permantly deletes an application.
   rpc DeleteApplication(ApplicationIdentifier) returns (google.protobuf.Empty);
-
-  // GenerateApplicationAppEUI generates a new AppEUI for a given application and returns it.
-  rpc GenerateApplicationAppEUI(ApplicationIdentifier) returns (GenerateApplicationAppEUIResponse);
 
   // GenerateApplicationAPIKey generates a new API key for a given application
   // and returns it.
