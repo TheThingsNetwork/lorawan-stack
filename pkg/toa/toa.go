@@ -7,9 +7,8 @@ import (
 	"math"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 // Compute the time-on-air from the payload and RF parameters. This function only takes into account the PHY payload.

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 	assertions "github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
