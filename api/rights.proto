@@ -24,7 +24,6 @@ message APIKey {
 enum Right {
   // TODO(romeovs): to be extended.
   option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_stringer) = false;
 
   RIGHT_APPLICATION_DELETE = 0;
   RIGHT_APPLICATION_SETTINGS = 1;

@@ -42,6 +42,9 @@ var Right_value = map[string]int32{
 	"RIGHT_GATEWAY_OWNER":             10,
 }
 
+func (x Right) String() string {
+	return proto.EnumName(Right_name, int32(x))
+}
 func (Right) EnumDescriptor() ([]byte, []int) { return fileDescriptorRights, []int{0} }
 
 type APIKey struct {

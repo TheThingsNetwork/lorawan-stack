@@ -10,15 +10,11 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-func TestRightNormalization(t *testing.T) {
-	a := assertions.New(t)
-	a.So(normalizeRight("RIGHT_APPLICATION_DELETE"), should.Equal, "application:delete")
-	a.So(denormalizeRight("application:delete"), should.Equal, "RIGHT_APPLICATION_DELETE")
-}
-
 func TestRightStringer(t *testing.T) {
 	a := assertions.New(t)
-	a.So(RIGHT_APPLICATION_DELETE.String(), should.Equal, "application:delete")
+	a.So(RIGHT_APPLICATION_DELETE.TextString(), should.Equal, "application:delete")
+	a.So(Right(1234).TextString(), should.Equal, "1234")
+	a.So(RIGHT_APPLICATION_DELETE.String(), should.Equal, Right_name[int32(RIGHT_APPLICATION_DELETE)])
 	a.So(Right(1234).String(), should.Equal, "1234")
 }
 
