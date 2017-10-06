@@ -11,4 +11,7 @@ go.protos: $(wildcard $(PROTO_DIR)/*.proto)
 	$(PROTOC) $(GO_PROTOC_FLAGS) $(PROTO_DIR)/*.proto
 	$(MAKE_DIR)/protos/fix-grpc-gateway-names.sh $(PROTO_DIR)
 
+go.protos.clean:
+	find ./pkg/ttnpb -name '*.pb.go' -delete -or -name '*.pb.gw.go' -delete -or -name '*pb_test.go' -delete
+
 # vim: ft=make
