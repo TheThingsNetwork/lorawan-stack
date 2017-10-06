@@ -4,7 +4,7 @@ package ttnpb
 
 import (
 	"strconv"
-	strings "strings"
+	"strings"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/gogo/protobuf/jsonpb"
