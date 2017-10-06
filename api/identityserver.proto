@@ -10,6 +10,7 @@ import "github.com/TheThingsNetwork/ttn/api/rights.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/gateway.proto";
 import "github.com/TheThingsNetwork/ttn/api/user.proto";
+import "github.com/TheThingsNetwork/ttn/api/auth.proto";
 import "google/protobuf/empty.proto";
 
 package ttn.v3;
@@ -342,10 +343,10 @@ message CreateClientRequest {
   reserved 5,6;
 
   // grants denotes which OAuth2 flows can the client use to get a token.
-  repeated ClientGrant grants = 7;
+  repeated GrantType grants = 7;
 
-  // scope denotes what scopes the client will have access to.
-  repeated ClientScope scope = 8;
+  // rights denotes what rights the client will have access to.
+  repeated Right rights = 8;
 
   // reserved fields in order to make the message binary compatible with Client.
   reserved 9,10,11;
@@ -372,10 +373,10 @@ message UpdateClientRequest {
   reserved 5,6;
 
   // grants denotes which OAuth2 flows can the client use to get a token.
-  repeated ClientGrant grants = 7;
+  repeated GrantType grants = 7;
 
-  // scope denotes what scopes the client will have access to.
-  repeated ClientScope scope = 8;
+  // rights denotes what scopes the client will have access to.
+  repeated Right rights = 8;
 
   // reserved fields in order to make the message binary compatible with Client.
   reserved 9,10,11;

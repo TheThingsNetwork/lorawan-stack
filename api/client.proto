@@ -4,6 +4,8 @@ syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
+import "github.com/TheThingsNetwork/ttn/api/auth.proto";
+import "github.com/TheThingsNetwork/ttn/api/rights.proto";
 import "google/protobuf/timestamp.proto";
 
 package ttn.v3;
@@ -32,10 +34,10 @@ message Client {
   bool official_labeled = 6;
 
   // grants denotes which OAuth2 flows can the client use to get a token.
-  repeated ClientGrant grants = 7;
+  repeated GrantType grants = 7;
 
-  // scope denotes what scopes the client will have access to.
-  repeated ClientScope scope = 8;
+  // Rights denotes what rights the client will have access to.
+  repeated Right rights = 8;
 
   // created_at denotes when the client was created.
   google.protobuf.Timestamp created_at = 9 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
@@ -64,30 +66,4 @@ enum ClientState {
   // Denotes that the client request has been rejected by the tenant admin
   // and therefore it cannot be used.
   STATE_REJECTED = 2;
-}
-
-// ClientScope enum defines the different scopes a third-party client can have access to.
-enum ClientScope {
-  option (gogoproto.goproto_enum_prefix) = false;
-
-  // Denotes whether if the client has access to manage user's applications.
-  SCOPE_APPLICATION = 0;
-
-  // Denotes whether if the client has r-w access to user's profile.
-  SCOPE_PROFILE = 1;
-}
-
-// ClientGrant enum defines the OAuth2 flows a third-party client can use to get
-// access to a token.
-enum ClientGrant {
-  option (gogoproto.goproto_enum_prefix) = false;
-
-  // Grant type used to exchange an authorization code for an access token.
-  GRANT_AUTHORIZATION_CODE = 0;
-
-  // Grant type used to exchange an user ID and password for an access token.
-  GRANT_PASSWORD = 1;
-
-  // Grant type used to exchange a refresh token for an access token.
-  GRANT_REFRESH_TOKEN = 2;
 }

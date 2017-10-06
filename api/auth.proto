@@ -9,29 +9,49 @@ import "github.com/TheThingsNetwork/ttn/api/rights.proto";
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
-enum ScopeType {
-  option (gogoproto.goproto_enum_prefix) = false;
-
-  // TYPE_INVALID is an invalid scope type.
-  TYPE_INVALID = 0;
-
-  // TYPE_USER is the type of scopes that are valid for a user.
-  TYPE_USER = 1;
-
-  // TYPE_APPLICATION is the type of scopes that are valid for a specific application.
-  TYPE_APPLICATION = 2;
-
-  // TYPE_GATEWAY is the type of scopes that are valid for a specific gateway.
-  TYPE_GATEWAY = 3;
-}
-
+// Scope is the scope of an enitity
 message Scope {
   // type is the type of entities this scope is for.
-  ScopeType type = 1;
+  ScopeType type = 1 [(gogoproto.moretags) = "type"];
 
   // id is the identifier of the entity this scope is for.
-  string id = 2 [(gogoproto.customname) = "ID"];
+  string id = 2 [(gogoproto.customname) = "ID", (gogoproto.moretags) = "id"];
 
   // rights are the rights this scope has to the specified entity.
   repeated Right rights = 3;
+}
+
+// GrantType enum defines the OAuth2 flows a third-party client can use to get
+// access to a token.
+enum GrantType {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  // Grant type used to exchange an authorization code for an access token.
+  GRANT_AUTHORIZATION_CODE = 0;
+
+  // Grant type used to exchange an user ID and password for an access token.
+  GRANT_PASSWORD = 1;
+
+  // Grant type used to exchange a refresh token for an access token.
+  GRANT_REFRESH_TOKEN = 2;
+}
+
+// ScopeType is the type of a scope.
+enum ScopeType {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  // SCOPE_INVALIDD is an invalid scope type.
+  SCOPE_INVALID = 0;
+
+  // SCOPE_USER is the type of scopes that are valid for a user.
+  SCOPE_USER = 1;
+
+  // SCOPE_APPLICATION is the type of scopes that are valid for a specific application.
+  SCOPE_APPLICATION = 2;
+
+  // SCOPE_GATEWAY is the type of scopes that are valid for a specific gateway.
+  SCOPE_GATEWAY = 3;
+
+  // SCOPE_CLIENT is the type of scopes that are valid for a specific client.
+  SCOPE_CLIENT = 4;
 }

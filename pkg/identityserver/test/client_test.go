@@ -15,8 +15,8 @@ func client() *ttnpb.Client {
 	return &ttnpb.Client{
 		ClientIdentifier: ttnpb.ClientIdentifier{"test-client"},
 		Secret:           "123456",
-		CallbackURI:      "/oauth/callback",
-		Grants:           []ttnpb.ClientGrant{ttnpb.GRANT_AUTHORIZATION_CODE},
+		RedirectURI:      "/oauth/callback",
+		Grants:           []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE},
 	}
 }
 
@@ -38,7 +38,7 @@ func TestShouldBeClientIgnoringAutoFields(t *testing.T) {
 
 	modified := client()
 	modified.Secret = "foo"
-	modified.Grants = []ttnpb.ClientGrant{}
+	modified.Grants = []ttnpb.GrantType{}
 
 	a.So(ShouldBeClientIgnoringAutoFields(modified, client()), should.NotEqual, success)
 }

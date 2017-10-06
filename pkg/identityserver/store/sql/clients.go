@@ -62,10 +62,10 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 	cli := client.GetClient()
 	_, err := q.NamedExec(
 		`INSERT
-			INTO clients (client_id, description, secret, callback_uri, grants,
-					scope, updated_at, archived_at)
-			VALUES (:client_id, :description, :secret, :callback_uri, :grants,
-					:scope, :updated_at, :archived_at)`,
+			INTO clients (client_id, description, secret, redirect_uri, grants,
+					rights, updated_at, archived_at)
+			VALUES (:client_id, :description, :secret, :redirect_uri, :grants,
+					:rights, :updated_at, :archived_at)`,
 		cli)
 
 	if _, yes := db.IsDuplicate(err); yes {
@@ -157,7 +157,7 @@ func (s *ClientStore) update(q db.QueryContext, client types.Client) error {
 	_, err := q.NamedExec(
 		`UPDATE clients
 			SET description = :description, secret = :secret, callback_uri = :callback_uri,
-			grants = :grants, scope = :scope, updated_at = :updated_at
+			grants = :grants, rights = :rights, updated_at = :updated_at
 			WHERE client_id = :client_id`,
 		cli)
 

@@ -3,12 +3,13 @@
 package sql
 
 import (
+	"testing"
+
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
-	"testing"
 )
 
 func testClients() map[string]*ttnpb.Client {
@@ -16,15 +17,15 @@ func testClients() map[string]*ttnpb.Client {
 		"test-client": &ttnpb.Client{
 			ClientIdentifier: ttnpb.ClientIdentifier{"test-client"},
 			Secret:           "123456",
-			CallbackURI:      "/oauth/callback",
-			Grants:           []ttnpb.ClientGrant{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_PASSWORD},
-			Scope:            []ttnpb.ClientScope{ttnpb.SCOPE_PROFILE},
+			RedirectURI:      "/oauth/callback",
+			Grants:           []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_PASSWORD},
+			Rights:           []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
 		},
 		"foo-client": &ttnpb.Client{
 			ClientIdentifier: ttnpb.ClientIdentifier{"foo-client"},
 			Secret:           "foofoofoo",
-			CallbackURI:      "https://foo.bar/oauth/callback",
-			Grants:           []ttnpb.ClientGrant{ttnpb.GRANT_AUTHORIZATION_CODE},
+			RedirectURI:      "https://foo.bar/oauth/callback",
+			Grants:           []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE},
 		},
 	}
 }

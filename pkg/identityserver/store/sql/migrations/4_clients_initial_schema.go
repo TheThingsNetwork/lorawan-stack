@@ -12,7 +12,7 @@ func init() {
 			state	           INT NOT NULL DEFAULT 0,
 			official_labeled   BOOL DEFAULT false,
 			grants             TEXT,
-			scope              TEXT,
+			rights             TEXT,
 			created_at         TIMESTAMP DEFAULT current_timestamp(),
 			updated_at         TIMESTAMP,
 			archived_at        TIMESTAMP

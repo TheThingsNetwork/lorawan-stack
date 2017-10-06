@@ -2,50 +2,9 @@
 
 package ttnpb
 
-import (
-	"strings"
-
-	"github.com/pkg/errors"
-)
-
-// String implements fmt.Stringer interface.
-func (t ScopeType) String() string {
-	typ, exists := ScopeType_name[int32(t)]
-	if exists {
-		return normalizeScopeType(typ)
-	}
-
-	return TYPE_INVALID.String()
-}
-
-// MarshalText implements encoding.TextMarshaler interface.
-func (t ScopeType) MarshalText() ([]byte, error) {
-	return []byte(t.String()), nil
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler interface.
-func (t *ScopeType) UnmarshalText(text []byte) error {
-	val, exists := ScopeType_value[denormalizeScopeType(string(text))]
-	if !exists {
-		return errors.Errorf("Could not parse right `%s`", string(text))
-	}
-
-	*t = ScopeType(val)
-
-	return nil
-}
-
-func normalizeScopeType(str string) string {
-	return strings.ToLower(strings.TrimPrefix(str, "TYPE_"))
-}
-
-func denormalizeScopeType(str string) string {
-	return "TYPE_" + strings.ToUpper(str)
-}
-
 // Username returns the username of the user this scope is for, or the empty string if it is not for a user.
 func (s Scope) Username() string {
-	if s.Type == TYPE_USER {
+	if s.Type == SCOPE_USER {
 		return s.ID
 	}
 	return ""
@@ -53,7 +12,7 @@ func (s Scope) Username() string {
 
 // ApplicationID returns the application ID of the application this scope is for, or the empty string if it is not for an application.
 func (s Scope) ApplicationID() string {
-	if s.Type == TYPE_APPLICATION {
+	if s.Type == SCOPE_APPLICATION {
 		return s.ID
 	}
 	return ""
@@ -61,7 +20,7 @@ func (s Scope) ApplicationID() string {
 
 // GatewayID returns the gateway ID of the gateway this scope is for, or the empty string if it is not for a gateway.
 func (s Scope) GatewayID() string {
-	if s.Type == TYPE_GATEWAY {
+	if s.Type == SCOPE_GATEWAY {
 		return s.ID
 	}
 	return ""
@@ -88,25 +47,37 @@ func (s Scope) HasRights(rights ...Right) bool {
 	return ok
 }
 
+// UserScope returns a scope with the specified rights that is valid for the specified user.
 func UserScope(username string, rights ...Right) Scope {
 	return Scope{
-		Type:   TYPE_USER,
+		Type:   SCOPE_USER,
 		ID:     username,
 		Rights: rights,
 	}
 }
 
+// ApplicationScope returns a scope with the specified rights that is valid for the specified application.
 func ApplicationScope(applicationID string, rights ...Right) Scope {
 	return Scope{
-		Type:   TYPE_APPLICATION,
+		Type:   SCOPE_APPLICATION,
 		ID:     applicationID,
 		Rights: rights,
 	}
 }
 
+// GatewayScopereturns a scope with the specified rights that is valid for the specified gateway.
 func GatewayScope(gatewayID string, rights ...Right) Scope {
 	return Scope{
-		Type:   TYPE_GATEWAY,
+		Type:   SCOPE_GATEWAY,
+		ID:     gatewayID,
+		Rights: rights,
+	}
+}
+
+// ClientScope a scope with the specified rights that is valid for the specified client.
+func ClientScope(gatewayID string, rights ...Right) Scope {
+	return Scope{
+		Type:   SCOPE_GATEWAY,
 		ID:     gatewayID,
 		Rights: rights,
 	}
