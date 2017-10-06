@@ -23,5 +23,8 @@ script:
 - make go.vet
 - make go.fmt
 - make go.lint-travis-comment --no-print-directory
+- make go.protos.clean
+- make go.protos
+- git diff --exit-code
 before_install:
 - openssl aes-256-cbc -K $encrypted_29695605fa9e_key -iv $encrypted_29695605fa9e_iv -in github.pem.enc -out .make/github.pem -d
