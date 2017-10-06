@@ -279,10 +279,10 @@
   revision = "7aff26db30c1be810f9de5038ec5ef96ac41fd7c"
 
 [[projects]]
+  branch = "master"
   name = "github.com/spf13/viper"
   packages = ["."]
-  revision = "25b30aa063fc18e48662b86996252eabdcf2f0c7"
-  version = "v1.0.0"
+  revision = "d9cca5ef33035202efb1586825bdbb15ff9ec3ba"
 
 [[projects]]
   branch = "master"
@@ -339,6 +339,12 @@
   revision = "cf52904a3cf0f78f199ecade6a6df8e245d5b25a"
 
 [[projects]]
+  name = "gopkg.in/redis.v5"
+  packages = [".","internal","internal/consistenthash","internal/hashtag","internal/pool","internal/proto"]
+  revision = "a16aeec10ff407b1e7be6dd35797ccf5426ef0f0"
+  version = "v5.2.9"
+
+[[projects]]
   branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
@@ -347,6 +353,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "5de54a9ebc33e9770235250595389c0668697fdc70dfbfc3f4c03c94225fbd7b"
+  inputs-digest = "f405b6185183a1bdd9593ff656b6c745de3fdf85f3216fce47a26886653003db"
   solver-name = "gps-cdcl"
   solver-version = 1
