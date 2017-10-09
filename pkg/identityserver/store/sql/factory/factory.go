@@ -7,23 +7,23 @@ import "github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 // UserFactory is the interface that provides a method to construct the result
 // types in the User store.
 type UserFactory interface {
-	User() types.User
+	BuildUser() types.User
 }
 
 // ApplicationFactory is the interface that provides a method to construct the
 // result types in the Application store.
 type ApplicationFactory interface {
-	Application() types.Application
+	BuildApplication() types.Application
 }
 
 // GatewayFactory is the interface that provides a method to construct the
 // result types in the Gateway store.
 type GatewayFactory interface {
-	Gateway() types.Gateway
+	BuildGateway() types.Gateway
 }
 
 // ClientFactory is the interface that provides a method to construct the
 // result types in the Client store.
 type ClientFactory interface {
-	Client() types.Client
+	BuildClient() types.Client
 }

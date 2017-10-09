@@ -2,36 +2,39 @@
 
 package factory
 
-import "github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+import (
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+)
 
 // DefaultUser implements UserFactory interface.
 type DefaultUser struct{}
 
-// User returns a DefaultUser.
-func (f DefaultUser) User() types.User {
-	return &types.DefaultUser{}
+// BuildUser returns a ttnpb.User.
+func (f DefaultUser) BuildUser() types.User {
+	return &ttnpb.User{}
 }
 
 // DefaultApplication implements ApplicationFactory interface.
 type DefaultApplication struct{}
 
-// Application returns a DefaultApplication.
-func (f DefaultApplication) Application() types.Application {
-	return &types.DefaultApplication{}
+// BuildApplication returns a ttnpb.Application.
+func (f DefaultApplication) BuildApplication() types.Application {
+	return &ttnpb.Application{}
 }
 
 // DefaultGateway implements GatewayFactory interface.
 type DefaultGateway struct{}
 
-// Gateway returns a DefaultGateway.
-func (f DefaultGateway) Gateway() types.Gateway {
-	return &types.DefaultGateway{}
+// BuildGateway returns a ttnpb.Gateway.
+func (f DefaultGateway) BuildGateway() types.Gateway {
+	return &ttnpb.Gateway{}
 }
 
 // DefaultClient implement ClientFactory interface.
 type DefaultClient struct{}
 
-// Client returns a DefaultClient.
-func (f DefaultClient) Client() types.Client {
-	return &types.DefaultClient{}
+// BuildClient returns a ttnpb.Client.
+func (f DefaultClient) BuildClient() types.Client {
+	return &ttnpb.Client{}
 }
