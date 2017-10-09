@@ -5,43 +5,42 @@ package migrations
 func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS gateways (
-			id                  STRING(36) PRIMARY KEY,
-			description         TEXT,
-			frequency_plan      STRING(36) NOT NULL,
-			key                 STRING(36),
-			activated           BOOL DEFAULT false,
-			status_public       BOOL DEFAULT false,
-			location_public     BOOL DEFAULT false,
-			owner_public        BOOL DEFAULT false,
+			gateway_id          STRING(36) PRIMARY KEY,
+			description         STRING,
+			frequency_plan_id   STRING(36) NOT NULL,
+			token               STRING(36),
+			activated_at        TIMESTAMP DEFAULT null,
+			privacy_settings    STRING,
 			auto_update         BOOL DEFAULT true,
-			brand               STRING,
-			model               STRING,
-			routers             TEXT NOT NULL,
-			created             TIMESTAMP DEFAULT current_timestamp(),
-			archived            TIMESTAMP DEFAULT null
+			platform            STRING,
+			cluster_address     STRING NOT NULL,
+			created_at          TIMESTAMP DEFAULT current_timestamp(),
+			updated_at          TIMESTAMP,
+			archived_at         TIMESTAMP
 		);
 		CREATE TABLE IF NOT EXISTS gateways_attributes (
-			gateway_id   STRING(36) REFERENCES gateways(id),
+			gateway_id   STRING(36) REFERENCES gateways(gateway_id),
 			attribute    STRING NOT NULL,
 			value        STRING NOT NULL,
 			PRIMARY KEY(gateway_id, attribute)
 		);
 		CREATE TABLE IF NOT EXISTS gateways_antennas (
-			gateway_id   STRING(36) REFERENCES gateways(id),
-			antenna_id   STRING(36) NOT NULL,
+			antenna_id   STRING DEFAULT to_hex(unique_rowid()) PRIMARY KEY,
+			gateway_id   STRING(36) REFERENCES gateways(gateway_id) NOT NULL,
+			gain         FLOAT,
 			type         STRING,
 			model        STRING,
 			placement    STRING,
 			longitude    FLOAT,
 			latitude     FLOAT,
 			altitude     INT,
-			PRIMARY KEY(gateway_id, antenna_id)
+			created_at   TIMESTAMP DEFAULT current_timestamp()
 		);
 		CREATE TABLE IF NOT EXISTS gateways_collaborators (
-			gateway_id   STRING(36) REFERENCES gateways(id),
-			username     STRING(36) REFERENCES users(username),
+			gateway_id   STRING(36) REFERENCES gateways(gateway_id),
+			user_id      STRING(36) REFERENCES users(user_id),
 			"right"      STRING NOT NULL,
-			PRIMARY KEY(gateway_id, username, "right")
+			PRIMARY KEY(gateway_id, user_id, "right")
 		);
 	`
 

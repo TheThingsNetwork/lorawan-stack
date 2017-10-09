@@ -5,22 +5,23 @@ package migrations
 func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS clients (
-			id            STRING(36) PRIMARY KEY,
-			description   TEXT,
-			secret        STRING NOT NULL,
-			uri           STRING NOT NULL,
-			state	      INT NOT NULL DEFAULT 0,
-			official      BOOL DEFAULT false,
-			grants        TEXT NOT NULL,
-			scope         TEXT NOT NULL,
-			created       TIMESTAMP DEFAULT current_timestamp(),
-			archived      TIMESTAMP DEFAULT null
+			client_id          STRING(36) PRIMARY KEY,
+			description        TEXT,
+			secret             STRING NOT NULL,
+			callback_uri       STRING NOT NULL,
+			state	           INT NOT NULL DEFAULT 0,
+			official_labeled   BOOL DEFAULT false,
+			grants             TEXT,
+			scope              TEXT,
+			created_at         TIMESTAMP DEFAULT current_timestamp(),
+			updated_at         TIMESTAMP,
+			archived_at        TIMESTAMP
 		);
 		CREATE TABLE IF NOT EXISTS clients_collaborators (
-			client_id   STRING(36) REFERENCES clients(id),
-			username    STRING(36) REFERENCES users(username),
+			client_id   STRING(36) REFERENCES clients(client_id),
+			user_id     STRING(36) REFERENCES users(user_id),
 			"right"     STRING NOT NULL,
-			PRIMARY KEY(client_id, username, "right")
+			PRIMARY KEY(client_id, user_id, "right")
 		);
 	`
 
