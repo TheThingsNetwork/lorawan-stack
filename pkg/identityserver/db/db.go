@@ -11,7 +11,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db/migrations"
 	"github.com/cockroachdb/cockroach-go/crdb"
-	"github.com/jmoiron/sqlx"
+	"github.com/gomezjdaniel/sqlx"
 
 	// include pq for the postgres driver
 	_ "github.com/lib/pq"
@@ -23,30 +23,30 @@ var _ Database = &DB{}
 // QueryContext is the interface of contexts where a query can be run.
 // Typically this means either the global database scope, or a transaction.
 type QueryContext interface {
+	// Exec executes the query in the specified context and returns no result.
+	Exec(query string, args ...interface{}) (sql.Result, error)
+
 	// NamedExec executes the query in the specified context replacing the
 	// placeholder parameters with fields from arg.
 	NamedExec(query string, arg interface{}) (sql.Result, error)
+
+	// SelectOne selects the query and expects one result. It writes the result
+	// into dest, which can be a map[string]interface, a struct, or a scannable.
+	SelectOne(dest interface{}, query string, args ...interface{}) error
 
 	// NamedSelectOne selects the query replacing the placeholder paramenters
 	// with fields from arg and expects one result. It writes the result
 	// into dest, which can be a map[string]interface, a struct, or a scannable.
 	NamedSelectOne(dest interface{}, query string, arg interface{}) error
 
+	// Select selects the query and expects one result. It writes the results
+	// into dest, which can be a []map[string]interface, or a slice of struct.
+	Select(dest interface{}, query string, args ...interface{}) error
+
 	// Select selects the query replacing the placeholder paramenters
 	// with fields from arg and expects one result. It writes the results
 	// into dest, which can be a []map[string]interface, or a slice of struct.
 	NamedSelect(dest interface{}, query string, arg interface{}) error
-
-	// Exec executes the query in the specified context and returns no result.
-	Exec(query string, args ...interface{}) (sql.Result, error)
-
-	// SelectOne selects the query and expects one result. It writes the result
-	// into dest, which can be a map[string]interface, a struct, or a scannable.
-	SelectOne(dest interface{}, query string, args ...interface{}) error
-
-	// Select selects the query and expects one result. It writes the results
-	// into dest, which can be a []map[string]interface, or a slice of struct.
-	Select(dest interface{}, query string, args ...interface{}) error
 }
 
 // Migrator is the interface that provides methods to manage the database schema
@@ -70,6 +70,9 @@ type Database interface {
 	// Transact begins a transaction and runs the function in it, it returns the
 	// error the function returns (and retries or rolls back automatically).
 	Transact(func(*Tx) error, ...TxOption) error
+
+	// Close closes the database connection, releasing any open resources.
+	Close() error
 }
 
 // DB implements Database.
@@ -113,26 +116,15 @@ func (db *DB) WithContext(context context.Context) *DB {
 	}
 }
 
-// NamedExec implements QueryContext.
-func (db *DB) NamedExec(query string, arg interface{}) (sql.Result, error) {
-	res, err := db.db.NamedExecContext(db.context, query, arg)
-	return res, wrap(err)
-}
-
-// NamedSelectOne implements QueryContext.
-func (db *DB) NamedSelectOne(dest interface{}, query string, arg interface{}) error {
-	return namedSelectOne(db.context, db.db, dest, query, arg)
-}
-
-// NamedSelect implements QueryContext.
-func (db *DB) NamedSelect(dest interface{}, query string, arg interface{}) error {
-	return namedSelectAll(db.context, db.db, dest, query, arg)
-}
-
 // Exec implements QueryContext.
 func (db *DB) Exec(query string, args ...interface{}) (sql.Result, error) {
 	res, err := db.db.ExecContext(db.context, query, args...)
 	return res, wrap(err)
+}
+
+// NamedExec implements QueryContext.
+func (db *DB) NamedExec(query string, arg interface{}) (sql.Result, error) {
+	return namedExec(db.context, db.db, query, arg)
 }
 
 // SelectOne implements QueryContext.
@@ -140,9 +132,19 @@ func (db *DB) SelectOne(dest interface{}, query string, args ...interface{}) err
 	return selectOne(db.context, db.db, dest, query, args...)
 }
 
+// NamedSelectOne implements QueryContext.
+func (db *DB) NamedSelectOne(dest interface{}, query string, arg interface{}) error {
+	return namedSelectOne(db.context, db.db, dest, query, arg)
+}
+
 // Select implements QueryContext.
 func (db *DB) Select(dest interface{}, query string, args ...interface{}) error {
 	return selectAll(db.context, db.db, dest, query, args...)
+}
+
+// NamedSelect implements QueryContext.
+func (db *DB) NamedSelect(dest interface{}, query string, arg interface{}) error {
+	return namedSelectAll(db.context, db.db, dest, query, arg)
 }
 
 // Transact implements Database.

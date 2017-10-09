@@ -10,6 +10,8 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db/migrations"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
+	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 )
 
 const (
@@ -40,11 +42,11 @@ var data = []foo{
 }
 
 type foo struct {
-	ID      int64     `db:"id"`
-	Created time.Time `db:"created"`
-	Bar     string    `db:"bar"`
-	Baz     bool      `db:"baz"`
-	Quu     int       `db:"quu"`
+	ID      int64
+	Created time.Time
+	Bar     string
+	Baz     bool
+	Quu     int
 }
 
 var db Database
@@ -100,4 +102,40 @@ func clean(t testing.TB) Database {
 	}
 
 	return db
+}
+
+func testExec(t *testing.T, q QueryContext) {
+	a := assertions.New(t)
+
+	id := int64(1234)
+
+	_, err := q.Exec(`INSERT INTO foo (id, bar) VALUES ($1, $2)`, id, "bar")
+	a.So(err, should.BeNil)
+
+	_, err = q.Exec(`DELETE FROM foo WHERE id = $1`, id)
+	a.So(err, should.BeNil)
+}
+
+func TestExec(t *testing.T) {
+	testExec(t, getInstance(t))
+}
+
+func TestNamedExec(t *testing.T) {
+	testNamedExec(t, getInstance(t))
+}
+
+func TestSelectOne(t *testing.T) {
+	testSelectOne(t, getInstance(t))
+}
+
+func TestNamedSelectOne(t *testing.T) {
+	testNamedSelectOne(t, getInstance(t))
+}
+
+func TestSelect(t *testing.T) {
+	testSelect(t, getInstance(t))
+}
+
+func TestNamedSelect(t *testing.T) {
+	testNamedSelect(t, getInstance(t))
 }

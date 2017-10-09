@@ -4,6 +4,20 @@ package db
 
 import "testing"
 
+func TestExecTx(t *testing.T) {
+	getInstance(t).Transact(func(tx *Tx) error {
+		testExec(t, tx)
+		return nil
+	})
+}
+
+func TestNamedExecTx(t *testing.T) {
+	getInstance(t).Transact(func(tx *Tx) error {
+		testNamedExec(t, tx)
+		return nil
+	})
+}
+
 func TestSelectTx(t *testing.T) {
 	getInstance(t).Transact(func(tx *Tx) error {
 		testSelect(t, tx)
