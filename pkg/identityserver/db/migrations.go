@@ -30,8 +30,8 @@ func (db *DB) currentState() (int, error) {
 		return 0, err
 	}
 	var last struct {
-		Order     int                  `db:"order"`
-		Direction migrations.Direction `db:"direction"`
+		Order     int
+		Direction migrations.Direction
 	}
 	err = db.SelectOne(
 		&last,
