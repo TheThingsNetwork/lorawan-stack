@@ -7,23 +7,24 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 )
 
-func defaultClient(in interface{}) (*types.DefaultClient, error) {
-	if u, ok := in.(types.Client); ok {
-		return u.GetClient(), nil
+func defaultClient(in interface{}) (*ttnpb.Client, error) {
+	if cli, ok := in.(types.Client); ok {
+		return cli.GetClient(), nil
 	}
 
-	if d, ok := in.(types.DefaultClient); ok {
-		return &d, nil
+	if cli, ok := in.(ttnpb.Client); ok {
+		return &cli, nil
 	}
 
-	if ptr, ok := in.(*types.DefaultClient); ok {
+	if ptr, ok := in.(*ttnpb.Client); ok {
 		return ptr, nil
 	}
 
-	return nil, fmt.Errorf("Expected: '%v' to be of type types.DefaultClient but it was not", in)
+	return nil, fmt.Errorf("Expected: '%v' to be of type ttnpb.Client but it was not", in)
 }
 
 // ShouldBeClient checks if two clients resemble each other.
@@ -44,7 +45,7 @@ func ShouldBeClient(actual interface{}, expected ...interface{}) string {
 
 	return all(
 		ShouldBeClientIgnoringAutoFields(a, b),
-		assertions.ShouldHappenWithin(a.Created, time.Millisecond, b.Created),
+		assertions.ShouldHappenWithin(a.CreatedAt, time.Millisecond, b.CreatedAt),
 	)
 }
 
@@ -66,14 +67,14 @@ func ShouldBeClientIgnoringAutoFields(actual interface{}, expected ...interface{
 	}
 
 	return all(
-		assertions.ShouldEqual(a.ID, b.ID),
+		assertions.ShouldEqual(a.ClientID, b.ClientID),
 		assertions.ShouldResemble(a.Description, b.Description),
 		assertions.ShouldEqual(a.Secret, b.Secret),
-		assertions.ShouldEqual(a.URI, b.URI),
+		assertions.ShouldEqual(a.CallbackURI, b.CallbackURI),
 		assertions.ShouldEqual(a.State, b.State),
-		assertions.ShouldEqual(a.Official, b.Official),
+		assertions.ShouldEqual(a.OfficialLabeled, b.OfficialLabeled),
 		assertions.ShouldResemble(a.Grants, b.Grants),
 		assertions.ShouldResemble(a.Scope, b.Scope),
-		assertions.ShouldEqual(a.Archived, b.Archived),
+		assertions.ShouldBeTrue(a.ArchivedAt.Equal(b.ArchivedAt)),
 	)
 }

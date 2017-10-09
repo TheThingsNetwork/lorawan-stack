@@ -6,16 +6,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
-func user() *types.DefaultUser {
-	return &types.DefaultUser{
-		Username: "alice",
-		Password: "123456",
-		Email:    "alice@alice.com",
+func user() *ttnpb.User {
+	return &ttnpb.User{
+		UserIdentifier: ttnpb.UserIdentifier{"alice"},
+		Name:           "Ali Ce",
+		Password:       "123456",
+		Email:          "alice@alice.com",
 	}
 }
 
@@ -25,7 +26,7 @@ func TestShouldBeUser(t *testing.T) {
 	a.So(ShouldBeUser(user(), user()), should.Equal, success)
 
 	modified := user()
-	modified.Joined = time.Now()
+	modified.CreatedAt = time.Now()
 
 	a.So(ShouldBeUser(modified, user()), should.NotEqual, success)
 }

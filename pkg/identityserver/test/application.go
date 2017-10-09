@@ -7,23 +7,24 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 )
 
-func defaultApplication(in interface{}) (*types.DefaultApplication, error) {
-	if u, ok := in.(types.Application); ok {
-		return u.GetApplication(), nil
+func defaultApplication(in interface{}) (*ttnpb.Application, error) {
+	if app, ok := in.(types.Application); ok {
+		return app.GetApplication(), nil
 	}
 
-	if d, ok := in.(types.DefaultApplication); ok {
-		return &d, nil
+	if app, ok := in.(ttnpb.Application); ok {
+		return &app, nil
 	}
 
-	if ptr, ok := in.(*types.DefaultApplication); ok {
+	if ptr, ok := in.(*ttnpb.Application); ok {
 		return ptr, nil
 	}
 
-	return nil, fmt.Errorf("Expected: '%v' to be of type types.DefaultApplication but it was not", in)
+	return nil, fmt.Errorf("Expected: '%v' to be of type ttnpb.Application but it was not", in)
 }
 
 // ShouldBeApplication checks if two Applications resemble each other.
@@ -44,7 +45,7 @@ func ShouldBeApplication(actual interface{}, expected ...interface{}) string {
 
 	return all(
 		ShouldBeApplicationIgnoringAutoFields(a, b),
-		assertions.ShouldHappenWithin(a.Created, time.Millisecond, b.Created),
+		assertions.ShouldHappenWithin(a.CreatedAt, time.Millisecond, b.CreatedAt),
 	)
 }
 
@@ -66,10 +67,9 @@ func ShouldBeApplicationIgnoringAutoFields(actual interface{}, expected ...inter
 	}
 
 	return all(
-		assertions.ShouldEqual(a.ID, b.ID),
+		assertions.ShouldEqual(a.ApplicationID, b.ApplicationID),
 		assertions.ShouldResemble(a.Description, b.Description),
-		assertions.ShouldResemble(a.EUIs, b.EUIs),
 		assertions.ShouldResemble(a.APIKeys, b.APIKeys),
-		assertions.ShouldResemble(a.Archived, b.Archived),
+		assertions.ShouldBeTrue(a.ArchivedAt.Equal(b.ArchivedAt)),
 	)
 }

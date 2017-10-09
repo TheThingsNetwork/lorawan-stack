@@ -6,18 +6,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
-func client() *types.DefaultClient {
-	return &types.DefaultClient{
-		ID:     "test-client",
-		Secret: "123456",
-		URI:    "/oauth/callback",
-		Grants: types.Grants{Password: true, RefreshToken: true},
-		Scope:  types.Scopes{Application: true},
+func client() *ttnpb.Client {
+	return &ttnpb.Client{
+		ClientIdentifier: ttnpb.ClientIdentifier{"test-client"},
+		Secret:           "123456",
+		CallbackURI:      "/oauth/callback",
+		Grants:           []ttnpb.ClientGrant{ttnpb.GRANT_AUTHORIZATION_CODE},
 	}
 }
 
@@ -27,7 +26,7 @@ func TestShouldBeClient(t *testing.T) {
 	a.So(ShouldBeClient(client(), client()), should.Equal, success)
 
 	modified := client()
-	modified.Created = time.Now()
+	modified.CreatedAt = time.Now()
 
 	a.So(ShouldBeClient(modified, client()), should.NotEqual, success)
 }
@@ -39,7 +38,7 @@ func TestShouldBeClientIgnoringAutoFields(t *testing.T) {
 
 	modified := client()
 	modified.Secret = "foo"
-	modified.Grants = types.Grants{}
+	modified.Grants = []ttnpb.ClientGrant{}
 
 	a.So(ShouldBeClientIgnoringAutoFields(modified, client()), should.NotEqual, success)
 }

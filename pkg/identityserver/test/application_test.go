@@ -6,27 +6,22 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
-	ttn_types "github.com/TheThingsNetwork/ttn/pkg/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
-func app() *types.DefaultApplication {
-	return &types.DefaultApplication{
-		ID:          "demo-app",
-		Description: "Demo application",
-		EUIs: []types.AppEUI{
-			types.AppEUI(ttn_types.EUI64([8]byte{1, 1, 1, 1, 1, 1, 1, 1})),
-			types.AppEUI(ttn_types.EUI64([8]byte{1, 2, 3, 4, 5, 6, 7, 8})),
-		},
-		APIKeys: []types.ApplicationAPIKey{
-			types.ApplicationAPIKey{
+func app() *ttnpb.Application {
+	return &ttnpb.Application{
+		ApplicationIdentifier: ttnpb.ApplicationIdentifier{"demo-app"},
+		Description:           "Demo application",
+		APIKeys: []ttnpb.APIKey{
+			ttnpb.APIKey{
 				Name: "test-key",
 				Key:  "123",
-				Rights: []types.Right{
-					types.Right("bar"),
-					types.Right("foo"),
+				Rights: []ttnpb.Right{
+					ttnpb.Right(1),
+					ttnpb.Right(2),
 				},
 			},
 		},
@@ -39,7 +34,7 @@ func TestShouldBeApplication(t *testing.T) {
 	a.So(ShouldBeApplication(app(), app()), should.Equal, success)
 
 	modified := app()
-	modified.Created = time.Now()
+	modified.CreatedAt = time.Now()
 
 	a.So(ShouldBeApplication(modified, app()), should.NotEqual, success)
 }
@@ -50,7 +45,7 @@ func TestShouldBeApplicationIgnoringAutoFields(t *testing.T) {
 	a.So(ShouldBeApplicationIgnoringAutoFields(app(), app()), should.Equal, success)
 
 	modified := app()
-	modified.EUIs = append(modified.EUIs, app().EUIs[0])
+	modified.Description = "foo"
 
 	a.So(ShouldBeApplicationIgnoringAutoFields(modified, app()), should.NotEqual, success)
 }
