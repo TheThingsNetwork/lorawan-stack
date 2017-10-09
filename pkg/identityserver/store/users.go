@@ -9,28 +9,28 @@ import (
 
 // UserStore is a store that holds Users.
 type UserStore interface {
-	// Register creates an User and returns the new created User.
-	Register(user types.User) (types.User, error)
+	// Create creates an user.
+	Create(user types.User) error
 
-	// FindByUsername finds the User by username and returns it.
-	FindByUsername(username string) (types.User, error)
+	// GetByID finds the user by ID and retrieves it.
+	GetByID(userID string) (types.User, error)
 
-	// FindByEmail finds the User by email address and returns it.
-	FindByEmail(email string) (types.User, error)
+	// GetByEmail finds the user by email address and retrieves it.
+	GetByEmail(email string) (types.User, error)
 
-	// Edit updates an User and returns the updated User.
-	Edit(user types.User) (types.User, error)
+	// Update updates an user.
+	Update(user types.User) error
 
-	// Archive disables an User.
-	Archive(username string) error
+	// Archive sets the ArchivedAt field of an user to the current timestamp.
+	Archive(userID string) error
 
 	// LoadAttributes loads all user attributes if the User is an Attributer.
-	LoadAttributes(username string, user types.User) error
+	LoadAttributes(userID string, user types.User) error
 
 	// WriteAttributes writes all of the user attributes if the User is an
 	// Attributer and returns the written User in result.
 	WriteAttributes(user, result types.User) error
 
-	// SetFactory allows to replace the DefaultUser factory.
+	// SetFactory allows to replace the default ttnpb.User factory.
 	SetFactory(factory factory.UserFactory)
 }

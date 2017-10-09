@@ -5,61 +5,41 @@ package store
 import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 // ApplicationStore is a store that holds Applications.
 type ApplicationStore interface {
-	// Register creates a new Application and returns the new created Application.
-	Register(app types.Application) (types.Application, error)
+	// Create creates a new application.
+	Create(app types.Application) error
 
-	// FindByID finds the Application by ID and retrieves it.
-	FindByID(appID string) (types.Application, error)
+	// GetByID finds the application by ID and retrieves it.
+	GetByID(appID string) (types.Application, error)
 
-	// FindByUser returns the Applications to which an User is a collaborator.
-	FindByUser(username string) ([]types.Application, error)
+	// ListByUser returns the applications to which an user is a collaborator.
+	ListByUser(userID string) ([]types.Application, error)
 
-	// Edit updates the Application and returns the updated Application.
-	Edit(app types.Application) (types.Application, error)
+	// Update updates the application.
+	Update(app types.Application) error
 
-	// Archive disables the Application.
+	// Archive sets the ArchivedAt field of the application to the current timestamp.
 	Archive(appID string) error
 
-	// AddAppEUI adds a new AppEUI to a given Application.
-	AddAppEUI(appID string, eui types.AppEUI) error
+	// AddAPIKey adds a new application API key to a given application.
+	AddAPIKey(appID string, key ttnpb.APIKey) error
 
-	// ListAppEUIs returns all the AppEUIs that belong to a given Application.
-	ListAppEUIs(appID string) ([]types.AppEUI, error)
-
-	// RemoveAppEUI remove an AppEUI from a given Application.
-	RemoveAppEUI(appID string, eui types.AppEUI) error
-
-	// AddAPIKey adds a new Application API key to a given Application.
-	AddAPIKey(appID string, key types.ApplicationAPIKey) error
-
-	// ListAPIKeys returns all the registered application API keys that
-	// belong to a given Application.
-	ListAPIKeys(appID string) ([]types.ApplicationAPIKey, error)
-
-	// RemoveAPIKey removes an Application API key from a given Application.
+	// RemoveAPIKey removes an application API key from a given application.
 	RemoveAPIKey(appID string, keyName string) error
 
-	// AddCollaborator adds an Application collaborator.
-	AddCollaborator(appID string, collaborator types.Collaborator) error
+	// SetCollaborator inserts or updates a collaborator within an application.
+	// If the list of rights is empty the collaborator will be unset.
+	SetCollaborator(appID string, collaborator ttnpb.Collaborator) error
 
-	// ListCollaborators retrieves all the collaborators from an Application.
-	ListCollaborators(appID string) ([]types.Collaborator, error)
-
-	// RemoveCollaborator removes a collaborator from an Application.
-	RemoveCollaborator(appID string, username string) error
-
-	// AddRight grants a given right to a given User.
-	AddRight(appID string, username string, right types.Right) error
+	// ListCollaborators retrieves all the collaborators from an application.
+	ListCollaborators(appID string) ([]ttnpb.Collaborator, error)
 
 	// ListUserRights returns the rights a given User has for an Application.
-	ListUserRights(appID string, username string) ([]types.Right, error)
-
-	// RemoveRight revokes a given right to a given collaborator.
-	RemoveRight(appID string, username string, right types.Right) error
+	ListUserRights(appID string, userID string) ([]ttnpb.Right, error)
 
 	// LoadAttributes loads extra attributes into the Application.
 	LoadAttributes(app types.Application) error
@@ -68,6 +48,6 @@ type ApplicationStore interface {
 	// Attributer to the store.
 	WriteAttributes(app types.Application, result types.Application) error
 
-	// SetFactory allows to replace the DefaultApplication factory.
+	// SetFactory allows to replace the default ttnpb.Application factory.
 	SetFactory(factory factory.ApplicationFactory)
 }

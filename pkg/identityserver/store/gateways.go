@@ -5,63 +5,35 @@ package store
 import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 // GatewayStore is a store that holds Gateways.
 type GatewayStore interface {
-	// Register creates a new Gateway and returns the new created Gateway.
-	Register(gtw types.Gateway) (types.Gateway, error)
+	// Create creates a new gateway.
+	Create(gtw types.Gateway) error
 
-	// FindByID finds a Gateway by ID and retrieves it.
-	FindByID(gtwID string) (types.Gateway, error)
+	// GetByID finds a gateway by ID and retrieves it.
+	GetByID(gtwID string) (types.Gateway, error)
 
-	// FindByUser returns all the Gateways to which a given User is collaborator.
-	FindByUser(username string) ([]types.Gateway, error)
+	// ListByUser returns all the gateways to which an user is collaborator.
+	ListByUser(userID string) ([]types.Gateway, error)
 
-	// Edit updates the Gateway and returns the updated Gateway.
-	Edit(gtw types.Gateway) (types.Gateway, error)
+	// Update updates the gateway.
+	Update(gtw types.Gateway) error
 
-	// Archive disables a Gateway.
+	// Archive sets the ArchivedAt field of the gateway to the current timestamp.
 	Archive(gtwID string) error
 
-	// SetAttribute inserts or modifies an existing Gateway attribute.
-	SetAttribute(gtwID, attribute, value string) error
-
-	// ListAttributes returns all the Gateway attributes.
-	ListAttributes(gtwID string) (map[string]string, error)
-
-	// RemoveAttribute removes a specific Gateway attribute.
-	RemoveAttribute(gtwID, attribute string) error
-
-	// SetAntenna inserts or modifies an existing Gateway antenna.
-	SetAntenna(gtwID string, antenna types.GatewayAntenna) error
-
-	// ListAntennas returns all the registered antennas that belong to a certain Gateway.
-	ListAntennas(gtwID string) ([]types.GatewayAntenna, error)
-
-	// RemoveAntenna deletes an antenna from a gateway.
-	RemoveAntenna(gtwID, antennaID string) error
-
-	// AddCollaborator adds a collaborator to a gateway.
-	AddCollaborator(gtwID string, collaborator types.Collaborator) error
+	// SetCollaborator inserts or updates a collaborator within a gateway.
+	// If the list of rights is empty the collaborator will be unset.
+	SetCollaborator(gtwID string, collaborator ttnpb.Collaborator) error
 
 	// ListCollaborators retrieves all the gateway collaborators.
-	ListCollaborators(gtwID string) ([]types.Collaborator, error)
+	ListCollaborators(gtwID string) ([]ttnpb.Collaborator, error)
 
-	// ListOwners retrieves all the owners of a gateway.
-	ListOwners(gtwID string) ([]string, error)
-
-	// RemoveCollaborator removes a collaborator from a gateway.
-	RemoveCollaborator(gtwID string, username string) error
-
-	// AddRight grants a given right to a given User.
-	AddRight(gtwID string, username string, right types.Right) error
-
-	// ListUserRights returns the rights the User has for a gateway.
-	ListUserRights(gtwID string, username string) ([]types.Right, error)
-
-	// RemoveRight revokes a given right from a given User.
-	RemoveRight(gtwID string, username string, right types.Right) error
+	// ListUserRights returns the rights the user has for a gateway.
+	ListUserRights(gtwID string, username string) ([]ttnpb.Right, error)
 
 	// LoadAttributes loads extra attributes into the gateway if it's an Attributer.
 	LoadAttributes(gtw types.Gateway) error
@@ -70,6 +42,6 @@ type GatewayStore interface {
 	// Attributer to the store.
 	WriteAttributes(gtw, res types.Gateway) error
 
-	// SetFactory allows to replace the DefaultGateway factory.
+	// SetFactory allows to replace the default ttnpb.Gateway factory.
 	SetFactory(factory factory.GatewayFactory)
 }

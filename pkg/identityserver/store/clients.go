@@ -5,51 +5,41 @@ package store
 import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 // ClientStore is a store that holds authorized third party Clients.
 type ClientStore interface {
-	// Register creates a new Client and returns the new created Client.
-	Register(client types.Client) (types.Client, error)
+	// Create creates a new Client.
+	Create(client types.Client) error
 
-	// FindByID finds a Client by ID and retrieves it.
-	FindByID(clientID string) (types.Client, error)
+	// GetByID finds a client by ID and retrieves it.
+	GetByID(clientID string) (types.Client, error)
 
-	// FindByUser finds all the Clients an user is collaborator to.
-	FindByUser(username string) ([]types.Client, error)
+	// ListByUser finds all the clients to which an user is collaborator to.
+	ListByUser(username string) ([]types.Client, error)
 
-	// Edit updates the Client and returns the updated Client.
-	Edit(client types.Client) (types.Client, error)
+	// Update updates the client.
+	Update(client types.Client) error
 
-	// Delete deletes a Client.
-	Delete(clientID string) error
-
-	// Archive disables a Client.
+	// Archive sets the ArchivedAt field of the client to the current timestamp.
 	Archive(clientID string) error
 
-	// Approve marks a Client approved by the tenant admins, so it can be used.
-	Approve(clientID string) error
+	// SetClientState allows to modify the reviewing state field of a client.
+	SetClientState(clientID string, state ttnpb.ClientState) error
 
-	// Reject marks a Client as rejected by the tenant admins, so it cannot be used anymore.
-	Reject(clientID string) error
+	// SetClientOfficial allows to set an unset a client as official labeled.
+	SetClientOfficial(clientID string, official bool) error
 
-	// AddCollaborator adds a collaborator to a given Client.
-	AddCollaborator(clientID string, collaborator types.Collaborator) error
+	// SetCollaborator inserts or updates a collaborator within a client.
+	// If the list of rights is empty the collaborator will be unset.
+	SetCollaborator(clientID string, collaborator ttnpb.Collaborator) error
 
-	// ListCollaborators retrieves the collaborators for a given Client.
-	ListCollaborators(clientID string) ([]types.Collaborator, error)
+	// ListCollaborators retrieves the collaborators for a given client.
+	ListCollaborators(clientID string) ([]ttnpb.Collaborator, error)
 
-	// RemoveCollaborator removes a collaborator from a given Client.
-	RemoveCollaborator(clientID string, username string) error
-
-	// AddRight grants a given right to a given User for a Client.
-	AddRight(clientID string, username string, right types.Right) error
-
-	// ListUserRights returns the rights the user has for a Client.
-	ListUserRights(clientID string, username string) ([]types.Right, error)
-
-	// RemoveRight revokes a given right from a given Client collaborator.
-	RemoveRight(clientID string, username string, right types.Right) error
+	// ListUserRights returns the rights the user has for a client.
+	ListUserRights(clientID string, username string) ([]ttnpb.Right, error)
 
 	// LoadAttributes loads extra attributes into the Client if it's an Attributer.
 	LoadAttributes(client types.Client) error
@@ -58,6 +48,6 @@ type ClientStore interface {
 	// Attributer to the store.
 	WriteAttributes(client, result types.Client) error
 
-	// SetFactory allows to replace the DefaultClient factory.
+	// SetFactory allows to replace the default ttnpb.Client factory.
 	SetFactory(factory factory.ClientFactory)
 }
