@@ -130,19 +130,4 @@ func testSelectOne(t *testing.T, q QueryContext) {
 		err := q.SelectOne(res, `SELECT bar FROM foo WHERE bar = $1`, "bar-2")
 		a.So(err, should.NotBeNil)
 	}
-
-	// into ptr to value
-	{
-		res := new(string)
-		err := q.SelectOne(&res, `SELECT bar FROM foo WHERE bar = $1`, "bar-22")
-		a.So(IsNoRows(err), should.BeTrue)
-		a.So(*res, should.BeEmpty)
-	}
-
-	/*// lookup for row that doesn't exist
-	{
-		res := new(string)
-		err := q.SelectOne(&res, `SELECT bar FROM foo WHERE bar = $1`, "bar-22")
-		a.So(IsNoRows(err), should.BeTrue)
-	}*/
 }
