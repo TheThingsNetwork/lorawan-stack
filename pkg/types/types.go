@@ -5,6 +5,7 @@ package types
 
 import (
 	"bytes"
+	"database/sql/driver"
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
@@ -25,10 +26,15 @@ type Interface interface {
 	UnmarshalBinary(data []byte) error
 	MarshalText() ([]byte, error)
 	UnmarshalText(data []byte) error
+	Value() (driver.Value, error)
+	Scan(src interface{}) error
 }
 
 // ErrInvalidLength can be returned when unmarshaling a slice of invalid length
 var ErrInvalidLength = errors.New("invalid length")
+
+// ErrTypeAssertion can be returned when trying to assert one variable
+var ErrTypeAssertion = errors.New("invalid type assertion")
 
 var base64Encoding = base64.StdEncoding
 

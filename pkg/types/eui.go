@@ -3,6 +3,7 @@
 package types
 
 import (
+	"database/sql/driver"
 	"encoding/hex"
 	"strings"
 )
@@ -59,4 +60,18 @@ func (eui EUI64) MarshalText() ([]byte, error) { return marshalTextBytes(eui[:])
 func (eui *EUI64) UnmarshalText(data []byte) error {
 	*eui = [8]byte{}
 	return unmarshalTextBytes(eui[:], data)
+}
+
+// Value implements driver.Valuer interface.
+func (eui EUI64) Value() (driver.Value, error) {
+	return eui.MarshalText()
+}
+
+// Scan implements sql.Scanner interface.
+func (eui *EUI64) Scan(src interface{}) error {
+	data, ok := src.([]byte)
+	if !ok {
+		return ErrTypeAssertion
+	}
+	return eui.UnmarshalText(data)
 }

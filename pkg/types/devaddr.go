@@ -3,6 +3,7 @@
 package types
 
 import (
+	"database/sql/driver"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -61,6 +62,20 @@ func (addr DevAddr) MarshalText() ([]byte, error) { return marshalTextBytes(addr
 func (addr *DevAddr) UnmarshalText(data []byte) error {
 	*addr = [4]byte{}
 	return unmarshalTextBytes(addr[:], data)
+}
+
+// Value implements sql.Valuer interface.
+func (addr DevAddr) Value() (driver.Value, error) {
+	return addr.MarshalText()
+}
+
+// Scan implements sql.Scanner interface.
+func (addr *DevAddr) Scan(src interface{}) error {
+	data, ok := src.([]byte)
+	if !ok {
+		return ErrTypeAssertion
+	}
+	return addr.UnmarshalText(data)
 }
 
 // ErrInvalidPrefix can be returned when unmarshaling an invalid slice into a prefix
@@ -167,7 +182,7 @@ func (prefix *DevAddrPrefix) UnmarshalText(data []byte) error {
 		*prefix = DevAddrPrefix{}
 		return nil
 	}
-	if len(data) != 10 && len(data) != 11 {
+	if len(data) != 10 {
 		return ErrInvalidLength
 	}
 	if data[8] != '/' {
@@ -179,6 +194,20 @@ func (prefix *DevAddrPrefix) UnmarshalText(data []byte) error {
 	// transform length from number character range
 	prefix.Length = data[9] - '0'
 	return nil
+}
+
+// Value implements driver.Valuer interface.
+func (prefix DevAddrPrefix) Value() (driver.Value, error) {
+	return prefix.MarshalText()
+}
+
+// Scan implements sql.Scanner interface.
+func (prefix *DevAddrPrefix) Scan(src interface{}) error {
+	data, ok := src.([]byte)
+	if !ok {
+		return ErrTypeAssertion
+	}
+	return prefix.UnmarshalText(data)
 }
 
 // NwkID of the DevAddr.

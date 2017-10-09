@@ -3,6 +3,7 @@
 package types
 
 import (
+	"database/sql/driver"
 	"encoding/hex"
 	"strings"
 )
@@ -59,4 +60,18 @@ func (key AES128Key) MarshalText() ([]byte, error) { return marshalTextBytes(key
 func (key *AES128Key) UnmarshalText(data []byte) error {
 	*key = [16]byte{}
 	return unmarshalTextBytes(key[:], data)
+}
+
+// Value implements driver.Valuer interface.
+func (key AES128Key) Value() (driver.Value, error) {
+	return key.MarshalText()
+}
+
+// Scan implements sql.Scanner interface.
+func (key *AES128Key) Scan(src interface{}) error {
+	data, ok := src.([]byte)
+	if !ok {
+		return ErrTypeAssertion
+	}
+	return key.UnmarshalText(data)
 }

@@ -3,6 +3,7 @@
 package types
 
 import (
+	"database/sql/driver"
 	"encoding/hex"
 	"strings"
 )
@@ -64,4 +65,18 @@ func (id *NetID) UnmarshalText(data []byte) error {
 // NwkID contained in the NetID
 func (id NetID) NwkID() byte {
 	return id[2] & 127
+}
+
+// Value implements driver.Valuer interface.
+func (id NetID) Value() (driver.Value, error) {
+	return id.MarshalText()
+}
+
+// Scan implements sql.Scanner interface.
+func (id *NetID) Scan(src interface{}) error {
+	data, ok := src.([]byte)
+	if !ok {
+		return ErrTypeAssertion
+	}
+	return id.UnmarshalText(data)
 }

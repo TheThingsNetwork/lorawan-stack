@@ -3,6 +3,7 @@
 package types
 
 import (
+	"database/sql/driver"
 	"encoding/hex"
 	"strings"
 )
@@ -59,4 +60,18 @@ func (jn JoinNonce) MarshalText() ([]byte, error) { return marshalTextBytes(jn[:
 func (jn *JoinNonce) UnmarshalText(data []byte) error {
 	*jn = [3]byte{}
 	return unmarshalTextBytes(jn[:], data)
+}
+
+// Value implements driver.Valuer interface.
+func (jn JoinNonce) Value() (driver.Value, error) {
+	return jn.MarshalText()
+}
+
+// Scan implements sql.Scanner interface.
+func (jn *JoinNonce) Scan(src interface{}) error {
+	data, ok := src.([]byte)
+	if !ok {
+		return ErrTypeAssertion
+	}
+	return jn.UnmarshalText(data)
 }
