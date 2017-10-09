@@ -69,7 +69,7 @@ func cleanStore(t testing.TB, database string) *Store {
 
 	// create some users
 	for _, user := range testUsers() {
-		_, err := s.Users.Register(user)
+		err := s.Users.Create(user)
 		if err != nil {
 			logger.WithError(err).Fatalf("Failed to feed test database `%s` with some users", database)
 			return nil

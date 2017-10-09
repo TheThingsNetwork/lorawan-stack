@@ -8,22 +8,22 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
-func testUsers() map[string]*types.DefaultUser {
-	return map[string]*types.DefaultUser{
-		"alice": &types.DefaultUser{
-			Username: "alice",
-			Password: "123456",
-			Email:    "alice@alice.com",
+func testUsers() map[string]*ttnpb.User {
+	return map[string]*ttnpb.User{
+		"alice": &ttnpb.User{
+			UserIdentifier: ttnpb.UserIdentifier{"alice"},
+			Password:       "123456",
+			Email:          "alice@alice.com",
 		},
-		"bob": &types.DefaultUser{
-			Username: "bob",
-			Password: "1234567",
-			Email:    "bob@bob.com",
+		"bob": &ttnpb.User{
+			UserIdentifier: ttnpb.UserIdentifier{"bob"},
+			Password:       "1234567",
+			Email:          "bob@bob.com",
 		},
 	}
 }
@@ -33,14 +33,14 @@ func TestUserCreate(t *testing.T) {
 	s := testStore(t)
 
 	for _, user := range testUsers() {
-		_, err := s.Users.Register(user)
+		err := s.Users.Create(user)
 		a.So(err, should.NotBeNil)
 		a.So(err.(errors.Error).Code(), should.Equal, 402)
 		a.So(err.(errors.Error).Type(), should.Equal, errors.AlreadyExists)
 	}
 }
 
-func TestUserFind(t *testing.T) {
+func TestUserGet(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore(t)
 
@@ -49,38 +49,42 @@ func TestUserFind(t *testing.T) {
 
 	// Find by email
 	{
-		found, err := s.Users.FindByEmail(alice.Email)
+		found, err := s.Users.GetByEmail(alice.Email)
 		a.So(err, should.BeNil)
 		a.So(found, test.ShouldBeUserIgnoringAutoFields, alice)
 	}
 
-	// Find by username
+	// Find by user ID
 	{
-		found, err := s.Users.FindByUsername(bob.Username)
+		found, err := s.Users.GetByID(bob.UserID)
 		a.So(err, should.BeNil)
 		a.So(found, test.ShouldBeUserIgnoringAutoFields, bob)
 	}
 }
 
-func TestUserEdit(t *testing.T) {
+func TestUserUpdate(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore(t)
 
 	bob := testUsers()["bob"]
 	alice := testUsers()["alice"]
-	alice.Password = "qwerty"
 
 	// Update user
 	{
-		updated, err := s.Users.Edit(alice)
+		alice.Password = "qwerty"
+		err := s.Users.Update(alice)
+		a.So(err, should.BeNil)
+
+		updated, err := s.Users.GetByID(alice.UserID)
 		a.So(err, should.BeNil)
 		a.So(updated, test.ShouldBeUserIgnoringAutoFields, alice)
 	}
 
-	alice.Email = bob.Email
-	// Try to update email to an existing one
+	// Try to update email to a taken one should throw an error
 	{
-		_, err := s.Users.Edit(alice)
+		alice.Email = bob.Email
+
+		err := s.Users.Update(alice)
 		a.So(err, should.NotBeNil)
 		a.So(err.(errors.Error).Code(), should.Equal, 403)
 		a.So(err.(errors.Error).Type(), should.Equal, errors.AlreadyExists)
@@ -93,22 +97,22 @@ func TestUserArchive(t *testing.T) {
 
 	bob := testUsers()["bob"]
 
-	err := s.Users.Archive(bob.Username)
+	err := s.Users.Archive(bob.UserID)
 	a.So(err, should.BeNil)
 
-	found, err := s.Users.FindByUsername(bob.Username)
+	found, err := s.Users.GetByID(bob.UserID)
 	a.So(err, should.BeNil)
-	a.So(found.GetUser().Archived, should.NotBeNil)
+	a.So(found.GetUser().ArchivedAt.IsZero(), should.BeFalse)
 }
 
 func BenchmarkUserCreate(b *testing.B) {
 	s := testStore(b)
 
 	for n := 0; n < b.N; n++ {
-		s.Users.Register(&types.DefaultUser{
-			Username: string(n),
-			Email:    fmt.Sprintf("%v@gmail.com", n),
-			Password: "secret",
+		s.Users.Create(&ttnpb.User{
+			UserIdentifier: ttnpb.UserIdentifier{string(n)},
+			Email:          fmt.Sprintf("%v@gmail.com", n),
+			Password:       "secret",
 		})
 	}
 }

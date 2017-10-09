@@ -4,7 +4,6 @@ package sql
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
@@ -24,13 +23,13 @@ type UserStore struct {
 func init() {
 	ErrUserNotFound.Register()
 	ErrUserEmailNotFound.Register()
-	ErrUsernameTaken.Register()
+	ErrUserIDTaken.Register()
 	ErrUserEmailTaken.Register()
 }
 
 // ErrUserNotFound is returned when trying to fetch an user that does not exist.
 var ErrUserNotFound = &errors.ErrDescriptor{
-	MessageFormat: "User `{username}` does not exist",
+	MessageFormat: "User `{user_id}` does not exist",
 	Code:          400,
 	Type:          errors.NotFound,
 }
@@ -43,39 +42,43 @@ var ErrUserEmailNotFound = &errors.ErrDescriptor{
 	Type:          errors.NotFound,
 }
 
-// ErrUsernameTaken is returned when trying to create a new user with an
-// username that already exists.
-var ErrUsernameTaken = &errors.ErrDescriptor{
-	MessageFormat: "Username `{username}` is already taken",
+// ErrUserIDTaken is returned when trying to create a new user with an ID that
+// is already taken.
+var ErrUserIDTaken = &errors.ErrDescriptor{
+	MessageFormat: "User ID `{user_id}` is already taken",
 	Code:          402,
 	Type:          errors.AlreadyExists,
 }
 
 // ErrUserEmailTaken is returned when trying to create a new user with an
-// email that already exists.
+// email that is already taken.
 var ErrUserEmailTaken = &errors.ErrDescriptor{
 	MessageFormat: "Email address `{email}` is already taken by another account",
 	Code:          403,
 	Type:          errors.AlreadyExists,
 }
 
-// Register creates an User and returns the new created User.
-func (s *UserStore) Register(user types.User) (types.User, error) {
-	result := s.factory.User()
-	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.register(tx, user, result)
-	})
-	return result, err
+func NewUserStore(store *Store, factory factory.UserFactory) *UserStore {
+	return &UserStore{
+		Store:   store,
+		factory: factory,
+	}
 }
 
-func (s *UserStore) register(q db.QueryContext, user, result types.User) error {
+// Create creates an user.
+func (s *UserStore) Create(user types.User) error {
+	err := s.db.Transact(func(tx *db.Tx) error {
+		return s.create(tx, user)
+	})
+	return err
+}
+
+func (s *UserStore) create(q db.QueryContext, user types.User) error {
 	u := user.GetUser()
-	err := q.NamedSelectOne(
-		result,
+	_, err := q.NamedExec(
 		`INSERT
-			INTO users (username, email, password)
-			VALUES (:username, :email, :password)
-			RETURNING *`,
+			INTO users (user_id, name, email, password, updated_at, archived_at)
+			VALUES (lower(:user_id), :name, lower(:email), :password, :updated_at, :archived_at)`,
 		u)
 
 	if duplicates, yes := db.IsDuplicate(err); yes {
@@ -84,9 +87,9 @@ func (s *UserStore) register(q db.QueryContext, user, result types.User) error {
 				"email": email,
 			})
 		}
-		if username, duplicated := duplicates["username"]; duplicated {
-			return ErrUsernameTaken.New(errors.Attributes{
-				"username": username,
+		if userID, duplicated := duplicates["user_id"]; duplicated {
+			return ErrUserIDTaken.New(errors.Attributes{
+				"user_id": userID,
 			})
 		}
 	}
@@ -95,50 +98,43 @@ func (s *UserStore) register(q db.QueryContext, user, result types.User) error {
 		return err
 	}
 
-	return s.writeAttributes(q, result.GetUser().Username, user, result)
+	return s.writeAttributes(q, user.GetUser().UserID, user, nil)
 }
 
-// FindByUsername finds the User by username and returns it.
-func (s *UserStore) FindByUsername(username string) (types.User, error) {
-	result := s.factory.User()
+// GetByID finds the user by ID and returns it.
+func (s *UserStore) GetByID(userID string) (types.User, error) {
+	result := s.factory.BuildUser()
 	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.findByUsername(tx, username, result)
+		return s.getByID(tx, userID, result)
 	})
 	return result, err
 }
 
-func (s *UserStore) findByUsername(q db.QueryContext, username string, user types.User) error {
-	err := q.SelectOne(
-		user,
-		"SELECT * FROM users WHERE lower(username) = $1",
-		strings.ToLower(username))
-
+func (s *UserStore) getByID(q db.QueryContext, userID string, result types.User) error {
+	err := q.SelectOne(result, "SELECT * FROM users WHERE user_id = lower($1)", userID)
 	if db.IsNoRows(err) {
 		return ErrUserNotFound.New(errors.Attributes{
-			"username": username,
+			"user_id": userID,
 		})
 	}
 	if err != nil {
 		return err
 	}
 
-	return s.loadAttributes(q, user.GetUser().Username, user)
+	return s.loadAttributes(q, userID, result)
 }
 
-// FindByEmail finds the User by email address and returns it.
-func (s *UserStore) FindByEmail(email string) (types.User, error) {
-	result := s.factory.User()
+// GetByEmail finds the user by email address and returns it.
+func (s *UserStore) GetByEmail(email string) (types.User, error) {
+	result := s.factory.BuildUser()
 	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.findByEmail(tx, email, result)
+		return s.getByEmail(tx, email, result)
 	})
 	return result, err
 }
 
-func (s *UserStore) findByEmail(q db.QueryContext, email string, user types.User) error {
-	err := q.SelectOne(
-		user,
-		"SELECT * FROM users WHERE email = $1",
-		strings.ToLower(email))
+func (s *UserStore) getByEmail(q db.QueryContext, email string, result types.User) error {
+	err := q.SelectOne(result, "SELECT * FROM users WHERE email = lower($1)", email)
 	if db.IsNoRows(err) {
 		return ErrUserEmailNotFound.New(errors.Attributes{
 			"email": email,
@@ -148,30 +144,30 @@ func (s *UserStore) findByEmail(q db.QueryContext, email string, user types.User
 		return err
 	}
 
-	return s.loadAttributes(q, user.GetUser().Username, user)
+	return s.loadAttributes(q, result.GetUser().UserID, result)
 }
 
-// Edit updates an User and returns the updated User.
-func (s *UserStore) Edit(user types.User) (types.User, error) {
-	result := s.factory.User()
+// Update updates an user.
+func (s *UserStore) Update(user types.User) error {
 	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.edit(tx, user, result)
+		return s.update(tx, user)
 	})
-	return result, err
+	return err
 }
 
-func (s *UserStore) edit(q db.QueryContext, user, result types.User) error {
+func (s *UserStore) update(q db.QueryContext, user types.User) error {
 	u := user.GetUser()
-	err := q.NamedSelectOne(
-		result,
+	u.UpdatedAt = time.Now()
+
+	_, err := q.NamedExec(
 		`UPDATE users
-			SET email = :email,
+			SET name = :name,
+				email = lower(:email),
 				validated = :validated,
 				password = :password,
 				admin = :admin,
-				god = :god
-			WHERE username = :username
-			RETURNING *`,
+				updated_at = :updated_at
+			WHERE user_id = :user_id`,
 		u)
 
 	if _, yes := db.IsDuplicate(err); yes {
@@ -184,42 +180,42 @@ func (s *UserStore) edit(q db.QueryContext, user, result types.User) error {
 		return err
 	}
 
-	return s.writeAttributes(q, u.Username, user, result)
+	return s.writeAttributes(q, u.UserID, user, nil)
 }
 
-// Archive archives an User.
-func (s *UserStore) Archive(username string) error {
-	return s.archive(s.db, username)
+// Archive sets the ArchivedAt field of an user to the current timestamp.
+func (s *UserStore) Archive(userID string) error {
+	return s.archive(s.db, userID)
 }
 
-func (s *UserStore) archive(q db.QueryContext, username string) error {
-	var u string
+func (s *UserStore) archive(q db.QueryContext, userID string) error {
+	var i string
 	err := q.SelectOne(
-		&u,
+		&i,
 		`UPDATE users
-			SET archived = $1
-			WHERE username = $2
-			RETURNING username`,
+			SET archived_at = $1
+			WHERE user_id = $2
+			RETURNING user_id`,
 		time.Now(),
-		username)
+		userID)
 	if db.IsNoRows(err) {
 		return ErrUserNotFound.New(errors.Attributes{
-			username: username,
+			"user_id": userID,
 		})
 	}
 	return err
 }
 
 // LoadAttributes loads all user attributes if the User is an Attributer.
-func (s *UserStore) LoadAttributes(username string, user types.User) error {
+func (s *UserStore) LoadAttributes(id string, user types.User) error {
 	return s.db.Transact(func(tx *db.Tx) error {
-		return s.loadAttributes(tx, username, user)
+		return s.loadAttributes(tx, id, user)
 	})
 }
 
 // loadAttributes loads extra attributes into a user in a given db.QueryContext
 // context.
-func (s *UserStore) loadAttributes(q db.QueryContext, username string, user types.User) error {
+func (s *UserStore) loadAttributes(q db.QueryContext, id string, user types.User) error {
 	attr, ok := user.(store.Attributer)
 	if !ok {
 		return nil
@@ -233,9 +229,9 @@ func (s *UserStore) loadAttributes(q db.QueryContext, username string, user type
 			fmt.Sprintf(
 				`SELECT *
 					FROM %s_users
-				 	WHERE username = $1`,
+				 	WHERE user_id = $1`,
 				namespace),
-			username)
+			id)
 		if err != nil {
 			return err
 		}
@@ -253,20 +249,20 @@ func (s *UserStore) loadAttributes(q db.QueryContext, username string, user type
 // and returns the written User in result.
 func (s *UserStore) WriteAttributes(user types.User, result types.User) error {
 	return s.db.Transact(func(tx *db.Tx) error {
-		return s.writeAttributes(tx, user.GetUser().Username, user, result)
+		return s.writeAttributes(tx, user.GetUser().UserID, user, result)
 	})
 }
 
 // writeAttributes writes all of the users attributes to their respective
 // tables in a given db.QueryContext context.
-func (s *UserStore) writeAttributes(q db.QueryContext, username string, user types.User, res types.User) error {
+func (s *UserStore) writeAttributes(q db.QueryContext, id string, user types.User, res types.User) error {
 	attr, ok := user.(store.Attributer)
 	if !ok {
 		return nil
 	}
 
 	for _, namespace := range attr.Namespaces() {
-		query, values := helpers.WriteAttributes(attr, namespace, "users", "username", user.GetUser().Username)
+		query, values := helpers.WriteAttributes(attr, namespace, "users", "user_id", user.GetUser().UserID)
 
 		r := make(map[string]interface{})
 		err := q.SelectOne(r, query, values...)
@@ -285,7 +281,7 @@ func (s *UserStore) writeAttributes(q db.QueryContext, username string, user typ
 	return nil
 }
 
-// SetFactory allows to replace the DefaultUser factory.
+// SetFactory allows to replace the default ttnpb.User factory.
 func (s *UserStore) SetFactory(factory factory.UserFactory) {
 	s.factory = factory
 }

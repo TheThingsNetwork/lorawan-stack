@@ -60,8 +60,8 @@ func (s *Store) Close() error {
 
 // initSubStores initializes all the substores.
 func (s *Store) initSubStores() {
-	s.Users = &UserStore{Store: s, factory: factory.DefaultUser{}}
-	s.Applications = &ApplicationStore{Store: s, factory: factory.DefaultApplication{}}
-	s.Gateways = &GatewayStore{Store: s, factory: factory.DefaultGateway{}}
-	s.Clients = &ClientStore{Store: s, factory: factory.DefaultClient{}}
+	s.Users = NewUserStore(s, factory.DefaultUser{})
+	s.Applications = NewApplicationStore(s, factory.DefaultApplication{})
+	s.Gateways = NewGatewayStore(s, factory.DefaultGateway{})
+	s.Clients = NewClientStore(s, factory.DefaultClient{})
 }

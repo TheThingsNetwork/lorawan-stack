@@ -7,29 +7,25 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/utils"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
-func testGateways() map[string]*types.DefaultGateway {
-	return map[string]*types.DefaultGateway{
-		"test-gateway": &types.DefaultGateway{
-			ID:            "test-gateway",
-			Description:   "My description",
-			FrequencyPlan: "868_3",
-			Key:           "1111",
-			Brand:         utils.StringAddress("Kerklink"),
-			Routers:       []string{"network.eu", "network.au"},
+func testGateways() map[string]*ttnpb.Gateway {
+	return map[string]*ttnpb.Gateway{
+		"test-gateway": &ttnpb.Gateway{
+			GatewayIdentifier: ttnpb.GatewayIdentifier{"test-gateway"},
+			Description:       "My description",
+			FrequencyPlanID:   "868_3",
+			Token:             "1111",
+			Platform:          "Kerklink",
 			Attributes: map[string]string{
 				"foo": "bar",
 			},
-			Antennas: []types.GatewayAntenna{
-				types.GatewayAntenna{
-					ID: "test antenna",
-					Location: &ttnpb.Location{
+			Antennas: []ttnpb.GatewayAntenna{
+				ttnpb.GatewayAntenna{
+					Location: ttnpb.Location{
 						Latitude:  11.11,
 						Longitude: 22.22,
 						Altitude:  10,
@@ -37,20 +33,19 @@ func testGateways() map[string]*types.DefaultGateway {
 				},
 			},
 		},
-		"bob-gateway": &types.DefaultGateway{
-			ID:            "bob-gateway",
-			Description:   "My description",
-			FrequencyPlan: "868_3",
-			Key:           "1111",
-			Routers:       []string{"network.eu", "network.au"},
+		"bob-gateway": &ttnpb.Gateway{
+			GatewayIdentifier: ttnpb.GatewayIdentifier{"bob-gateway"},
+			Description:       "My description",
+			FrequencyPlanID:   "868_3",
+			Token:             "1111",
+			ClusterAddress:    "network.eu",
 			Attributes: map[string]string{
 				"Modulation": "12345",
 				"RFCH":       "111",
 			},
-			Antennas: []types.GatewayAntenna{
-				types.GatewayAntenna{
-					ID: "bobgw antenna",
-				},
+			Antennas: []ttnpb.GatewayAntenna{
+				ttnpb.GatewayAntenna{
+					Gain: 12.22},
 			},
 		},
 	}
@@ -63,14 +58,13 @@ func TestGatewayCreate(t *testing.T) {
 	gateways := testGateways()
 
 	for _, gtw := range gateways {
-		created, err := s.Gateways.Register(gtw)
+		err := s.Gateways.Create(gtw)
 		a.So(err, should.BeNil)
-		a.So(created, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 	}
 
 	// Attempt to recreate them should throw an error
 	for _, gtw := range gateways {
-		_, err := s.Gateways.Register(gtw)
+		err := s.Gateways.Create(gtw)
 		a.So(err, should.NotBeNil)
 		a.So(err.(errors.Error).Code(), should.Equal, 301)
 		a.So(err.(errors.Error).Type(), should.Equal, errors.AlreadyExists)
@@ -83,54 +77,34 @@ func TestGatewayAttributes(t *testing.T) {
 
 	gtw := testGateways()["bob-gateway"]
 
-	// Fetch attributes
+	// fetch gateway and check that the attributes has been registered
 	{
-		attributes, err := s.Gateways.ListAttributes(gtw.ID)
+		found, err := s.Gateways.GetByID(gtw.GatewayID)
 		a.So(err, should.BeNil)
-		if a.So(attributes, should.HaveLength, 2) {
-			a.So(attributes, should.Resemble, gtw.Attributes)
-		}
+		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 	}
 
 	attributeKey := "Foo"
-	attributeValue := "Bar"
 
-	// Add attribute
+	// add attribute
 	{
-		err := s.Gateways.SetAttribute(gtw.ID, attributeKey, attributeValue)
+		gtw.Attributes[attributeKey] = "bar"
+		err := s.Gateways.Update(gtw)
 		a.So(err, should.BeNil)
-
-		attributes, err := s.Gateways.ListAttributes(gtw.ID)
+		found, err := s.Gateways.GetByID(gtw.GatewayID)
 		a.So(err, should.BeNil)
-		if a.So(attributes, should.HaveLength, 3) && a.So(attributes, should.ContainKey, attributeKey) {
-			a.So(attributes[attributeKey], should.Equal, attributeValue)
-		}
+		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 	}
 
-	// Overwrite attribute
+	// delete attribute
 	{
-		attributeValue = "BarBar"
-
-		err := s.Gateways.SetAttribute(gtw.ID, attributeKey, attributeValue)
+		delete(gtw.Attributes, attributeKey)
+		err := s.Gateways.Update(gtw)
 		a.So(err, should.BeNil)
-
-		attributes, err := s.Gateways.ListAttributes(gtw.ID)
+		found, err := s.Gateways.GetByID(gtw.GatewayID)
 		a.So(err, should.BeNil)
-		if a.So(attributes, should.HaveLength, 3) && a.So(attributes, should.ContainKey, attributeKey) {
-			a.So(attributes[attributeKey], should.Equal, attributeValue)
-		}
-	}
+		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 
-	// Delete attribute
-	{
-		err := s.Gateways.RemoveAttribute(gtw.ID, attributeKey)
-		a.So(err, should.BeNil)
-
-		attributes, err := s.Gateways.ListAttributes(gtw.ID)
-		a.So(err, should.BeNil)
-		if a.So(attributes, should.HaveLength, 2) {
-			a.So(attributes, should.Resemble, gtw.Attributes)
-		}
 	}
 }
 
@@ -140,38 +114,37 @@ func TestGatewayAntennas(t *testing.T) {
 
 	gtw := testGateways()["bob-gateway"]
 
-	// Fetch antennas
+	// check that all antennas were registered
 	{
-		antennas, err := s.Gateways.ListAntennas(gtw.ID)
+		found, err := s.Gateways.GetByID(gtw.GatewayID)
 		a.So(err, should.BeNil)
-		if a.So(antennas, should.HaveLength, 1) {
-			a.So(antennas[0], should.Resemble, gtw.Antennas[0])
+		if a.So(found.GetGateway().Antennas, should.HaveLength, 1) {
+			a.So(found.GetGateway().Antennas[0], should.Resemble, gtw.Antennas[0])
+			gtw = found.GetGateway()
 		}
 	}
 
-	ant := gtw.Antennas[0]
-	ant.Location = &ttnpb.Location{Longitude: 12.12, Latitude: 10.02, Altitude: 2}
-
-	// Modify the antenna
+	// add a new antenna
 	{
-		err := s.Gateways.SetAntenna(gtw.ID, ant)
+		gtw.Antennas = append(gtw.Antennas, ttnpb.GatewayAntenna{Gain: 12.12})
+		err := s.Gateways.Update(gtw)
 		a.So(err, should.BeNil)
 
-		antennas, err := s.Gateways.ListAntennas(gtw.ID)
+		found, err := s.Gateways.GetByID(gtw.GatewayID)
 		a.So(err, should.BeNil)
-		if a.So(antennas, should.HaveLength, 1) {
-			a.So(antennas[0], should.Resemble, ant)
-		}
+		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 	}
 
-	// Delete the antenna
+	// delete previously added antenna
 	{
-		err := s.Gateways.RemoveAntenna(gtw.ID, ant.ID)
+		gtw.Antennas = gtw.Antennas[:1]
+
+		err := s.Gateways.Update(gtw)
 		a.So(err, should.BeNil)
 
-		found, err := s.Gateways.FindByID(gtw.ID)
+		found, err := s.Gateways.GetByID(gtw.GatewayID)
 		a.So(err, should.BeNil)
-		a.So(found.GetGateway().Antennas, should.HaveLength, 0)
+		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 	}
 }
 
@@ -179,118 +152,92 @@ func TestGatewayCollaborators(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore(t)
 
+	user := testUsers()["bob"]
 	gtw := testGateways()["bob-gateway"]
-	user := testUsers()["alice"]
-	rights := []types.Right{types.GatewayDeleteRight}
 
-	collaborator := utils.Collaborator(user.Username, rights)
-
-	// Add collaborator
+	// check indeed that the gateway has no collaborator
 	{
-		err := s.Gateways.AddCollaborator(gtw.ID, collaborator)
+		collaborators, err := s.Gateways.ListCollaborators(gtw.GatewayID)
 		a.So(err, should.BeNil)
+		a.So(collaborators, should.HaveLength, 0)
 	}
 
-	// Find collaborators
+	collaborator := ttnpb.Collaborator{
+		UserIdentifier: ttnpb.UserIdentifier{user.UserID},
+		Rights: []ttnpb.Right{
+			ttnpb.Right(1),
+			ttnpb.Right(2),
+		},
+	}
+
+	// set the collaborator
 	{
-		collaborators, err := s.Gateways.ListCollaborators(gtw.ID)
+		err := s.Gateways.SetCollaborator(gtw.GatewayID, collaborator)
+		a.So(err, should.BeNil)
+
+		collaborators, err := s.Gateways.ListCollaborators(gtw.GatewayID)
 		a.So(err, should.BeNil)
 		a.So(collaborators, should.HaveLength, 1)
-		if len(collaborators) > 0 {
-			a.So(collaborators[0], should.Resemble, collaborator)
+		a.So(collaborators, should.Contain, collaborator)
+
+	}
+
+	// fetch gateways where Bob is collaborator
+	{
+		gtws, err := s.Gateways.ListByUser(user.UserID)
+		a.So(err, should.BeNil)
+		if a.So(gtws, should.HaveLength, 1) {
+			a.So(gtws[0], test.ShouldBeGatewayIgnoringAutoFields, gtw)
 		}
 	}
 
-	right := types.GatewaySettingsRight
-
-	// Grant a right
+	// modify rights
 	{
-		err := s.Gateways.AddRight(gtw.ID, user.Username, right)
+		collaborator.Rights = append(collaborator.Rights, ttnpb.Right(3))
+		err := s.Gateways.SetCollaborator(gtw.GatewayID, collaborator)
 		a.So(err, should.BeNil)
 
-		rights, err := s.Gateways.ListUserRights(gtw.ID, user.Username)
+		collaborators, err := s.Gateways.ListCollaborators(gtw.GatewayID)
 		a.So(err, should.BeNil)
-		a.So(rights, should.HaveLength, 2)
-		if len(rights) > 0 {
-			a.So(rights, should.Contain, right)
+		if a.So(collaborators, should.HaveLength, 1) {
+			a.So(collaborators[0].Rights, should.Resemble, collaborator.Rights)
 		}
 	}
 
-	// Revoke a right
+	// fetch user rights
 	{
-		err := s.Gateways.RemoveRight(gtw.ID, user.Username, right)
+		rights, err := s.Gateways.ListUserRights(gtw.GatewayID, user.UserID)
 		a.So(err, should.BeNil)
-
-		rights, err := s.Gateways.ListUserRights(gtw.ID, user.Username)
-		a.So(err, should.BeNil)
-		a.So(rights, should.HaveLength, 1)
-		if len(rights) > 0 {
-			a.So(rights, should.NotContain, right)
+		if a.So(rights, should.HaveLength, 3) {
+			a.So(rights, should.Resemble, collaborator.Rights)
 		}
 	}
 
-	// Fetch user rights
+	// remove collaborator
 	{
-		rights, err := s.Gateways.ListUserRights(gtw.ID, user.Username)
-		a.So(err, should.BeNil)
-		a.So(collaborator.Rights, should.Resemble, rights)
-	}
-
-	// Remove the collaborator
-	{
-		err := s.Gateways.RemoveCollaborator(gtw.ID, user.Username)
+		collaborator.Rights = []ttnpb.Right{}
+		err := s.Gateways.SetCollaborator(gtw.GatewayID, collaborator)
 		a.So(err, should.BeNil)
 
-		collaborators, err := s.Gateways.ListCollaborators(gtw.ID)
+		collaborators, err := s.Gateways.ListCollaborators(gtw.GatewayID)
 		a.So(err, should.BeNil)
 		a.So(collaborators, should.HaveLength, 0)
 	}
 }
 
-func TestGatewayOwners(t *testing.T) {
-	a := assertions.New(t)
-	s := testStore(t)
-
-	gtw := testGateways()["test-gateway"]
-
-	alice := testUsers()["alice"]
-	bob := testUsers()["bob"]
-
-	rights := []types.Right{types.GatewayOwnerRight}
-
-	// Add Alice as Gateway owner
-	{
-		collaborator := utils.Collaborator(alice.Username, rights)
-		err := s.Gateways.AddCollaborator(gtw.ID, collaborator)
-		a.So(err, should.BeNil)
-	}
-
-	// Add Bob as owner also
-	{
-		collaborator := utils.Collaborator(bob.Username, rights)
-		err := s.Gateways.AddCollaborator(gtw.ID, collaborator)
-		a.So(err, should.BeNil)
-	}
-
-	// Fetch owners
-	{
-		owners, err := s.Gateways.ListOwners(gtw.ID)
-		a.So(err, should.BeNil)
-		a.So(owners, should.HaveLength, 2)
-		a.So(owners, should.Resemble, []string{"alice", "bob"})
-	}
-}
-
-func TestGatewayEdit(t *testing.T) {
+func TestGatewayUpdate(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore(t)
 
 	gtw := testGateways()["bob-gateway"]
-	gtw.Description = "Fancy new description"
 
-	updated, err := s.Gateways.Edit(gtw)
+	gtw.Description = "Fancy new description"
+	err := s.Gateways.Update(gtw)
 	a.So(err, should.BeNil)
-	a.So(updated, test.ShouldBeGatewayIgnoringAutoFields, gtw)
+
+	found, err := s.Gateways.GetByID(gtw.GatewayID)
+	a.So(err, should.BeNil)
+	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 }
 
 func TestGatewayArchive(t *testing.T) {
@@ -299,10 +246,11 @@ func TestGatewayArchive(t *testing.T) {
 
 	gtw := testGateways()["bob-gateway"]
 
-	err := s.Gateways.Archive(gtw.ID)
+	err := s.Gateways.Archive(gtw.GatewayID)
 	a.So(err, should.BeNil)
 
-	found, err := s.Gateways.FindByID(gtw.ID)
+	found, err := s.Gateways.GetByID(gtw.GatewayID)
 	a.So(err, should.BeNil)
-	a.So(found.GetGateway().Archived, should.NotBeNil)
+
+	a.So(found.GetGateway().ArchivedAt.IsZero(), should.BeFalse)
 }

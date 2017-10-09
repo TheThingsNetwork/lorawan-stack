@@ -12,25 +12,28 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/helpers"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
+
+const clientsCollaboratorsTable = "clients_collaborators"
+const clientsCollaboratorsForeignKey = "client_id"
 
 // ClientStore implements store.ClientStore.
 type ClientStore struct {
 	*Store
+	*collaboratorStore
 	factory factory.ClientFactory
 }
 
 func init() {
 	ErrClientNotFound.Register()
 	ErrClientIDTaken.Register()
-	ErrClientCollaboratorNotFound.Register()
-	ErrClientCollaboratorRightNotFound.Register()
 }
 
 // ErrClientNotFound is returned when trying to fetch a client that does not exists.
 var ErrClientNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Client `{client_id}` does not exist",
-	Code:          100,
+	Code:          20,
 	Type:          errors.NotFound,
 }
 
@@ -38,48 +41,39 @@ var ErrClientNotFound = &errors.ErrDescriptor{
 // that already exists
 var ErrClientIDTaken = &errors.ErrDescriptor{
 	MessageFormat: "Client id `{client_id}` is already taken",
-	Code:          101,
+	Code:          21,
 	Type:          errors.AlreadyExists,
 }
 
-// ErrClientCollaboratorNotFound is returned when trying to remove a collaborator.
-// that does not exist
-var ErrClientCollaboratorNotFound = &errors.ErrDescriptor{
-	MessageFormat: "User `{username}` is not a collaborator for client `{client_id}`",
-	Code:          102,
-	Type:          errors.NotFound,
+func NewClientStore(store *Store, factory factory.ClientFactory) *ClientStore {
+	return &ClientStore{
+		Store:             store,
+		factory:           factory,
+		collaboratorStore: newCollaboratorStore(store, clientsCollaboratorsTable, clientsCollaboratorsForeignKey),
+	}
 }
 
-// ErrClientCollaboratorRightNotFound is returned when trying to revoke a right.
-// from a collaborator that is not granted
-var ErrClientCollaboratorRightNotFound = &errors.ErrDescriptor{
-	MessageFormat: "User `{username}` does not have the right `{right}` for client `{client_id}`",
-	Code:          103,
-	Type:          errors.NotFound,
-}
-
-// Register creates a new Client and returns the new created Client.
-func (s *ClientStore) Register(client types.Client) (types.Client, error) {
-	result := s.factory.Client()
+// Create creates a client.
+func (s *ClientStore) Create(client types.Client) error {
 	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.register(tx, client, result)
+		return s.create(tx, client)
 	})
-	return result, err
+	return err
 }
 
-func (s *ClientStore) register(q db.QueryContext, client, result types.Client) error {
+func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 	cli := client.GetClient()
-	err := q.NamedSelectOne(
-		result,
+	_, err := q.NamedExec(
 		`INSERT
-			INTO clients (id, description, secret, uri, grants, scope)
-			VALUES (:id, :description, :secret, :uri, :grants, :scope)
-			RETURNING *`,
+			INTO clients (client_id, description, secret, callback_uri, grants,
+					scope, updated_at, archived_at)
+			VALUES (:client_id, :description, :secret, :callback_uri, :grants,
+					:scope, :updated_at, :archived_at)`,
 		cli)
 
 	if _, yes := db.IsDuplicate(err); yes {
 		return ErrClientIDTaken.New(errors.Attributes{
-			"client_id": cli.ID,
+			"client_id": cli.ClientID,
 		})
 	}
 
@@ -87,12 +81,12 @@ func (s *ClientStore) register(q db.QueryContext, client, result types.Client) e
 		return err
 	}
 
-	return s.writeAttributes(q, client, result)
+	return s.writeAttributes(q, client, nil)
 }
 
-// FindByID finds a Client by ID and retrieves it.
-func (s *ClientStore) FindByID(clientID string) (types.Client, error) {
-	result := s.factory.Client()
+// GetByID finds a client by ID and retrieves it.
+func (s *ClientStore) GetByID(clientID string) (types.Client, error) {
+	result := s.factory.BuildClient()
 	err := s.db.Transact(func(tx *db.Tx) error {
 		return s.client(tx, clientID, result)
 	})
@@ -100,7 +94,7 @@ func (s *ClientStore) FindByID(clientID string) (types.Client, error) {
 }
 
 func (s *ClientStore) client(q db.QueryContext, clientID string, result types.Client) error {
-	err := q.SelectOne(result, "SELECT * FROM clients WHERE id = $1", clientID)
+	err := q.SelectOne(result, "SELECT * FROM clients WHERE client_id = $1", clientID)
 	if db.IsNoRows(err) {
 		return ErrClientNotFound.New(errors.Attributes{
 			"client_id": clientID,
@@ -112,62 +106,67 @@ func (s *ClientStore) client(q db.QueryContext, clientID string, result types.Cl
 	return s.loadAttributes(q, result)
 }
 
-// FindByUser finds all the Clients an user is collaborator to.
-func (s *ClientStore) FindByUser(username string) ([]types.Client, error) {
+// ListByUser finds all the clients an user is collaborator to.
+func (s *ClientStore) ListByUser(userID string) ([]types.Client, error) {
 	var result []types.Client
 	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.userClients(tx, username, &result)
+		clientIDs, err := s.userClients(tx, userID)
+		if err != nil {
+			return err
+		}
+
+		for _, clientID := range clientIDs {
+			client := s.factory.BuildClient()
+
+			err := s.client(tx, clientID, client)
+			if err != nil {
+				return err
+			}
+
+			result = append(result, client)
+		}
+
+		return nil
 	})
 	return result, err
 }
 
-func (s *ClientStore) userClients(q db.QueryContext, username string, result *[]types.Client) error {
+func (s *ClientStore) userClients(q db.QueryContext, userID string) ([]string, error) {
 	var clientIDs []string
 	err := q.Select(
 		&clientIDs,
 		`SELECT DISTINCT client_id
 			FROM clients_collaborators
-			WHERE username = $1`,
-		username)
+			WHERE user_id = $1`,
+		userID)
 	if !db.IsNoRows(err) && err != nil {
-		return err
+		return nil, err
 	}
-
-	for _, clientID := range clientIDs {
-		client := s.factory.Client()
-		err := s.client(q, clientID, client)
-		if err != nil {
-			return err
-		}
-		*result = append(*result, client)
-	}
-
-	return nil
+	return clientIDs, nil
 }
 
-// Edit updates the Client and returns the updated Client.
-func (s *ClientStore) Edit(client types.Client) (types.Client, error) {
-	result := s.factory.Client()
+// Update updates the client.
+func (s *ClientStore) Update(client types.Client) error {
 	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.edit(tx, client, result)
+		return s.update(tx, client)
 	})
-	return result, err
+	return err
 }
 
-func (s *ClientStore) edit(q db.QueryContext, client, result types.Client) error {
+func (s *ClientStore) update(q db.QueryContext, client types.Client) error {
 	cli := client.GetClient()
-	err := q.NamedSelectOne(
-		result,
+	cli.UpdatedAt = time.Now()
+
+	_, err := q.NamedExec(
 		`UPDATE clients
-			SET description = :description, secret = :secret, uri = :uri,
-			grants = :grants, scope = :scope
-			WHERE id = :id
-			RETURNING *`,
+			SET description = :description, secret = :secret, callback_uri = :callback_uri,
+			grants = :grants, scope = :scope, updated_at = :updated_at
+			WHERE client_id = :client_id`,
 		cli)
 
 	if db.IsNoRows(err) {
 		return ErrClientNotFound.New(errors.Attributes{
-			"client_id": cli.ID,
+			"client_id": cli.ClientID,
 		})
 	}
 
@@ -175,48 +174,10 @@ func (s *ClientStore) edit(q db.QueryContext, client, result types.Client) error
 		return err
 	}
 
-	return s.writeAttributes(q, client, result)
+	return s.writeAttributes(q, client, nil)
 }
 
-// Delete deletes a Client.
-func (s *ClientStore) Delete(clientID string) error {
-	// Note: ON DELETE CASCADE is not supported yet but will be soon
-	// https://github.com/cockroachdb/cockroach/issues/14848
-	err := s.db.Transact(func(tx *db.Tx) error {
-		collaborators, err := s.listCollaborators(tx, clientID)
-		if err != nil {
-			return err
-		}
-
-		for _, collaborator := range collaborators {
-			err := s.removeCollaborator(tx, clientID, collaborator.Username)
-			if err != nil {
-				return err
-			}
-		}
-
-		err = s.delete(tx, clientID)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
-	return err
-}
-
-func (s *ClientStore) delete(q db.QueryContext, clientID string) error {
-	var i string
-	err := q.SelectOne(&i, "DELETE FROM clients WHERE id = $1 RETURNING id", clientID)
-	if db.IsNoRows(err) {
-		return ErrClientNotFound.New(errors.Attributes{
-			"client_id": clientID,
-		})
-	}
-	return err
-}
-
-// Archive disables a Client.
+// Archive sets the ArchivedAt field of a client to the current timestamp.
 func (s *ClientStore) Archive(clientID string) error {
 	return s.archive(s.db, clientID)
 }
@@ -226,9 +187,9 @@ func (s *ClientStore) archive(q db.QueryContext, clientID string) error {
 	err := q.SelectOne(
 		&i,
 		`UPDATE clients
-			SET archived = $1
-			WHERE id = $2
-			RETURNING id`,
+			SET archived_at = $1
+			WHERE client_id = $2
+			RETURNING client_id`,
 		time.Now(),
 		clientID)
 	if db.IsNoRows(err) {
@@ -239,21 +200,21 @@ func (s *ClientStore) archive(q db.QueryContext, clientID string) error {
 	return err
 }
 
-// Approve marks a Client approved by the tenant admins, so it can be used.
-func (s *ClientStore) Approve(clientID string) error {
-	return s.approve(s.db, clientID)
+func (s *ClientStore) SetClientOfficial(clientID string, official bool) error {
+	return s.setClientOfficial(s.db, clientID, official)
 }
 
-func (s *ClientStore) approve(q db.QueryContext, clientID string) error {
-	var i string
+func (s *ClientStore) setClientOfficial(q db.QueryContext, clientID string, official bool) error {
+	var id string
 	err := q.SelectOne(
-		&i,
+		&id,
 		`UPDATE clients
-			SET state = $2
-			WHERE id = $1
-			RETURNING id`,
-		clientID,
-		types.ApprovedClient)
+			SET official_labeled = $1, updated_at = $2
+			WHERE client_id = $3
+			RETURNING client_id`,
+		official,
+		time.Now(),
+		clientID)
 	if db.IsNoRows(err) {
 		return ErrClientNotFound.New(errors.Attributes{
 			"client_id": clientID,
@@ -263,167 +224,24 @@ func (s *ClientStore) approve(q db.QueryContext, clientID string) error {
 }
 
 // Reject marks a Client as rejected by the tenant admins, so it cannot be used anymore.
-func (s *ClientStore) Reject(clientID string) error {
-	return s.reject(s.db, clientID)
+func (s *ClientStore) SetClientState(clientID string, state ttnpb.ClientState) error {
+	return s.setClientState(s.db, clientID, state)
 }
 
-func (s *ClientStore) reject(q db.QueryContext, clientID string) error {
-	var i string
+func (s *ClientStore) setClientState(q db.QueryContext, clientID string, state ttnpb.ClientState) error {
+	var id string
 	err := q.SelectOne(
-		&i,
+		&id,
 		`UPDATE clients
-			SET state = $2
-			WHERE id = $1
-			RETURNING id`,
-		clientID,
-		types.RejectedClient)
+			SET state = $1, updated_at = $2
+			WHERE client_id = $3
+			RETURNING client_id`,
+		state,
+		time.Now(),
+		clientID)
 	if db.IsNoRows(err) {
 		return ErrClientNotFound.New(errors.Attributes{
 			"client_id": clientID,
-		})
-	}
-	return err
-}
-
-// AddCollaborator adds a collaborator to a given Client.
-func (s *ClientStore) AddCollaborator(clientID string, collaborator types.Collaborator) error {
-	err := s.db.Transact(func(tx *db.Tx) error {
-		return s.addCollaborator(tx, clientID, collaborator)
-	})
-	return err
-}
-
-func (s *ClientStore) addCollaborator(q db.QueryContext, clientID string, collaborator types.Collaborator) error {
-	for _, right := range collaborator.Rights {
-		err := s.addRight(q, clientID, collaborator.Username, right)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// ListCollaborators retrieves the collaborators for a given Client.
-func (s *ClientStore) ListCollaborators(clientID string) ([]types.Collaborator, error) {
-	return s.listCollaborators(s.db, clientID)
-}
-
-func (s *ClientStore) listCollaborators(q db.QueryContext, clientID string) ([]types.Collaborator, error) {
-	var collaborators []struct {
-		types.Collaborator
-		Right string `db:"right"`
-	}
-	err := q.Select(
-		&collaborators,
-		`SELECT username, "right"
-			FROM clients_collaborators
-			WHERE client_id = $1`,
-		clientID)
-	if !db.IsNoRows(err) && err != nil {
-		return nil, err
-	}
-
-	byUser := make(map[string]*types.Collaborator)
-	for _, collaborator := range collaborators {
-		if _, exists := byUser[collaborator.Username]; !exists {
-			byUser[collaborator.Username] = &types.Collaborator{
-				Username: collaborator.Username,
-				Rights:   []types.Right{types.Right(collaborator.Right)},
-			}
-			continue
-		}
-
-		byUser[collaborator.Username].Rights = append(byUser[collaborator.Username].Rights, types.Right(collaborator.Right))
-	}
-
-	result := make([]types.Collaborator, 0, len(byUser))
-	for _, collaborator := range byUser {
-		result = append(result, *collaborator)
-	}
-
-	return result, nil
-}
-
-// RemoveCollaborator removes a collaborator from a given Client.
-func (s *ClientStore) RemoveCollaborator(clientID string, username string) error {
-	return s.removeCollaborator(s.db, clientID, username)
-}
-
-func (s *ClientStore) removeCollaborator(q db.QueryContext, clientID string, username string) error {
-	var u string
-	err := q.SelectOne(
-		&u,
-		`DELETE
-			FROM clients_collaborators
-			WHERE client_id = $1 AND username = $2
-			RETURNING username`,
-		clientID,
-		username)
-	if db.IsNoRows(err) {
-		return ErrClientCollaboratorNotFound.New(errors.Attributes{
-			"client_id": clientID,
-			"username":  username,
-		})
-	}
-	return err
-}
-
-// AddRight grants a given right to a given User for a Client.
-func (s *ClientStore) AddRight(clientID string, username string, right types.Right) error {
-	return s.addRight(s.db, clientID, username, right)
-}
-
-func (s *ClientStore) addRight(q db.QueryContext, clientID string, username string, right types.Right) error {
-	_, err := q.Exec(
-		`INSERT
-			INTO clients_collaborators (client_id, username, "right")
-			VALUES ($1, $2, $3)
-			ON CONFLICT (client_id, username, "right")
-			DO NOTHING`,
-		clientID,
-		username,
-		right)
-	return err
-}
-
-// ListUserRights returns the rights the user has for a Client.
-func (s *ClientStore) ListUserRights(clientID string, username string) ([]types.Right, error) {
-	return s.listUserRights(s.db, clientID, username)
-}
-
-func (s *ClientStore) listUserRights(q db.QueryContext, clientID string, username string) ([]types.Right, error) {
-	var rights []types.Right
-	err := q.Select(
-		&rights,
-		`SELECT "right"
-			FROM clients_collaborators
-			WHERE client_id = $1 AND username = $2`,
-		clientID,
-		username)
-	return rights, err
-}
-
-// RemoveRight revokes a given right from a given Client collaborator.
-func (s *ClientStore) RemoveRight(clientID string, username string, right types.Right) error {
-	return s.removeRight(s.db, clientID, username, right)
-}
-
-func (s *ClientStore) removeRight(q db.QueryContext, clientID string, username string, right types.Right) error {
-	var u string
-	err := q.SelectOne(
-		&u,
-		`DELETE
-			FROM clients_collaborators
-			WHERE client_id = $1 AND username = $2 AND "right" = $3
-			RETURNING username`,
-		clientID,
-		username,
-		right)
-	if db.IsNoRows(err) {
-		return ErrClientCollaboratorRightNotFound.New(errors.Attributes{
-			"client_id": clientID,
-			"username":  username,
-			"right":     right,
 		})
 	}
 	return err
@@ -447,7 +265,7 @@ func (s *ClientStore) loadAttributes(q db.QueryContext, client types.Client) err
 		err := q.Select(
 			&m,
 			fmt.Sprintf("SELECT * FROM %s_clients WHERE client_id = $1", namespace),
-			client.GetClient().ID)
+			client.GetClient().ClientID)
 		if err != nil {
 			return err
 		}
@@ -475,7 +293,7 @@ func (s *ClientStore) writeAttributes(q db.QueryContext, client, result types.Cl
 	}
 
 	for _, namespace := range attr.Namespaces() {
-		query, values := helpers.WriteAttributes(attr, namespace, "clients", "client_id", client.GetClient().ID)
+		query, values := helpers.WriteAttributes(attr, namespace, "clients", "client_id", client.GetClient().ClientID)
 
 		r := make(map[string]interface{})
 		err := q.SelectOne(r, query, values...)
@@ -494,7 +312,7 @@ func (s *ClientStore) writeAttributes(q db.QueryContext, client, result types.Cl
 	return nil
 }
 
-// SetFactory allows to replace the DefaultClient factory.
+// SetFactory allows to replace the default ttnpb.Client factory.
 func (s *ClientStore) SetFactory(factory factory.ClientFactory) {
 	s.factory = factory
 }

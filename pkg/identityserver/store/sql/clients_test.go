@@ -3,31 +3,28 @@
 package sql
 
 import (
-	"testing"
-
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/utils"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"testing"
 )
 
-func testClients() map[string]*types.DefaultClient {
-	return map[string]*types.DefaultClient{
-		"test-client": &types.DefaultClient{
-			ID:     "test-client",
-			Secret: "123456",
-			URI:    "/oauth/callback",
-			Grants: types.Grants{Password: true, RefreshToken: true},
-			Scope:  types.Scopes{Application: true},
+func testClients() map[string]*ttnpb.Client {
+	return map[string]*ttnpb.Client{
+		"test-client": &ttnpb.Client{
+			ClientIdentifier: ttnpb.ClientIdentifier{"test-client"},
+			Secret:           "123456",
+			CallbackURI:      "/oauth/callback",
+			Grants:           []ttnpb.ClientGrant{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_PASSWORD},
+			Scope:            []ttnpb.ClientScope{ttnpb.SCOPE_PROFILE},
 		},
-		"foo-client": &types.DefaultClient{
-			ID:     "foo-client",
-			Secret: "foofoofoo",
-			URI:    "https://foo.bar/oauth/callback",
-			Grants: types.Grants{Password: true, RefreshToken: true},
-			Scope:  types.Scopes{Application: true, Profile: true},
+		"foo-client": &ttnpb.Client{
+			ClientIdentifier: ttnpb.ClientIdentifier{"foo-client"},
+			Secret:           "foofoofoo",
+			CallbackURI:      "https://foo.bar/oauth/callback",
+			Grants:           []ttnpb.ClientGrant{ttnpb.GRANT_AUTHORIZATION_CODE},
 		},
 	}
 }
@@ -39,16 +36,15 @@ func TestClientCreate(t *testing.T) {
 	clients := testClients()
 
 	for _, client := range clients {
-		created, err := s.Clients.Register(client)
+		err := s.Clients.Create(client)
 		a.So(err, should.BeNil)
-		a.So(created, test.ShouldBeClientIgnoringAutoFields, client)
 	}
 
 	// Attempt to recreate them should throw an error
 	for _, client := range clients {
-		_, err := s.Clients.Register(client)
+		err := s.Clients.Create(client)
 		a.So(err, should.NotBeNil)
-		a.So(err.(errors.Error).Code(), should.Equal, 101)
+		a.So(err.(errors.Error).Code(), should.Equal, 21)
 		a.So(err.(errors.Error).Type(), should.Equal, errors.AlreadyExists)
 	}
 }
@@ -58,98 +54,93 @@ func TestClientCollaborators(t *testing.T) {
 	s := testStore(t)
 
 	user := testUsers()["alice"]
-	client := testClients()["test-client"]
-	rights := []types.Right{types.ClientDeleteRight}
+	client := testClients()["foo-client"]
 
-	collaborator := utils.Collaborator(user.Username, rights)
-
-	// Add collaborator
+	// check indeed that application has no collaborator
 	{
-		err := s.Clients.AddCollaborator(client.ID, collaborator)
+		collaborators, err := s.Clients.ListCollaborators(client.ClientID)
+		a.So(err, should.BeNil)
+		a.So(collaborators, should.HaveLength, 0)
+	}
+
+	collaborator := ttnpb.Collaborator{
+		UserIdentifier: ttnpb.UserIdentifier{user.UserID},
+		Rights: []ttnpb.Right{
+			ttnpb.Right(1),
+			ttnpb.Right(2),
+		},
+	}
+
+	// add one
+	{
+		err := s.Clients.SetCollaborator(client.ClientID, collaborator)
 		a.So(err, should.BeNil)
 	}
 
-	// Fetch client collaborators
+	// check that was added
 	{
-		collaborators, err := s.Clients.ListCollaborators(client.ID)
+		collaborators, err := s.Clients.ListCollaborators(client.ClientID)
 		a.So(err, should.BeNil)
 		a.So(collaborators, should.HaveLength, 1)
-		if len(collaborators) > 0 {
-			a.So(collaborators[0], should.Resemble, collaborator)
+		a.So(collaborators, should.Contain, collaborator)
+	}
+
+	// fetch applications where Alice is collaborator
+	{
+		clients, err := s.Clients.ListByUser(user.UserID)
+		a.So(err, should.BeNil)
+		if a.So(clients, should.HaveLength, 1) {
+			a.So(clients[0].GetClient().ClientID, should.Equal, client.ClientID)
 		}
 	}
 
-	// Find which components alice is collaborator
+	// modify rights
 	{
-		clients, err := s.Clients.FindByUser(user.Username)
+		collaborator.Rights = append(collaborator.Rights, ttnpb.Right(3))
+		err := s.Clients.SetCollaborator(client.ClientID, collaborator)
 		a.So(err, should.BeNil)
-		a.So(clients, should.HaveLength, 1)
-		if len(clients) > 0 {
-			a.So(clients[0], test.ShouldBeClientIgnoringAutoFields, client)
+
+		collaborators, err := s.Clients.ListCollaborators(client.ClientID)
+		a.So(err, should.BeNil)
+		if a.So(collaborators, should.HaveLength, 1) {
+			a.So(collaborators[0].Rights, should.Resemble, collaborator.Rights)
 		}
 	}
 
-	// Right to be granted and revoked
-	right := types.ClientSettingsRight
-
-	// Grant a right
+	// fetch user rights
 	{
-		err := s.Clients.AddRight(client.ID, user.Username, right)
+		rights, err := s.Clients.ListUserRights(client.ClientID, user.UserID)
 		a.So(err, should.BeNil)
-
-		rights, err := s.Clients.ListUserRights(client.ID, user.Username)
-		a.So(err, should.BeNil)
-		a.So(rights, should.HaveLength, 2)
-		if len(rights) > 0 {
-			a.So(rights, should.Contain, right)
+		if a.So(rights, should.HaveLength, 3) {
+			a.So(rights, should.Resemble, collaborator.Rights)
 		}
 	}
 
-	// Revoke a right
+	// remove collaborator
 	{
-		err := s.Clients.RemoveRight(client.ID, user.Username, right)
+		collaborator.Rights = []ttnpb.Right{}
+		err := s.Clients.SetCollaborator(client.ClientID, collaborator)
 		a.So(err, should.BeNil)
 
-		rights, err := s.Clients.ListUserRights(client.ID, user.Username)
-		a.So(err, should.BeNil)
-		a.So(rights, should.HaveLength, 1)
-		if len(rights) > 0 {
-			a.So(rights, should.NotContain, right)
-		}
-	}
-
-	// Delete collaborator
-	{
-		err := s.Clients.RemoveCollaborator(client.ID, user.Username)
-		a.So(err, should.BeNil)
-
-		collaborators, err := s.Clients.ListCollaborators(client.ID)
+		collaborators, err := s.Clients.ListCollaborators(client.ClientID)
 		a.So(err, should.BeNil)
 		a.So(collaborators, should.HaveLength, 0)
 	}
 }
 
-func TestClientFind(t *testing.T) {
+func TestClientUpdate(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore(t)
 
 	client := testClients()["test-client"]
+	client.Description = "Fancy Description"
 
-	found, err := s.Clients.FindByID(client.ID)
+	err := s.Clients.Update(client)
+	a.So(err, should.BeNil)
+
+	found, err := s.Clients.GetByID(client.ClientID)
 	a.So(err, should.BeNil)
 	a.So(client, test.ShouldBeClientIgnoringAutoFields, found)
-}
-
-func TestClientEdit(t *testing.T) {
-	a := assertions.New(t)
-	s := testStore(t)
-
-	client := testClients()["test-client"]
-	client.Description = utils.StringAddress("Fancy Description")
-
-	updated, err := s.Clients.Edit(client)
-	a.So(err, should.BeNil)
-	a.So(updated, test.ShouldBeClientIgnoringAutoFields, client)
 }
 
 func TestClientManagement(t *testing.T) {
@@ -158,45 +149,38 @@ func TestClientManagement(t *testing.T) {
 
 	client := testClients()["foo-client"]
 
-	// Archive client
+	// label as official
 	{
-		err := s.Clients.Archive(client.ID)
+		err := s.Clients.SetClientOfficial(client.ClientID, true)
 		a.So(err, should.BeNil)
 
-		found, err := s.Clients.FindByID(client.ID)
+		found, err := s.Clients.GetByID(client.ClientID)
 		a.So(err, should.BeNil)
-		a.So(found.GetClient().Archived, should.NotBeNil)
+		a.So(found.GetClient().OfficialLabeled, should.BeTrue)
 	}
 
-	// Mark as approved
+	// mark as approved
 	{
-		err := s.Clients.Approve(client.ID)
+		err := s.Clients.SetClientState(client.ClientID, ttnpb.STATE_APPROVED)
 		a.So(err, should.BeNil)
 
-		found, err := s.Clients.FindByID(client.ID)
+		found, err := s.Clients.GetByID(client.ClientID)
 		a.So(err, should.BeNil)
-		a.So(found.GetClient().State, should.Resemble, types.ApprovedClient)
+		a.So(found.GetClient().State, should.Resemble, ttnpb.STATE_APPROVED)
 	}
+}
 
-	// Mark as rejected
-	{
-		err := s.Clients.Reject(client.ID)
-		a.So(err, should.BeNil)
+func TestClientArchive(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore(t)
 
-		found, err := s.Clients.FindByID(client.ID)
-		a.So(err, should.BeNil)
-		a.So(found.GetClient().State, should.Resemble, types.RejectedClient)
-	}
+	client := testClients()["test-client"]
 
-	// Delete
-	{
-		err := s.Clients.Delete(client.ID)
-		a.So(err, should.BeNil)
+	err := s.Clients.Archive(client.ClientID)
+	a.So(err, should.BeNil)
 
-		_, err = s.Clients.FindByID(client.ID)
-		if a.So(err, should.NotBeNil) {
-			a.So(err.(errors.Error).Code(), should.Equal, 100)
-			a.So(err.(errors.Error).Type(), should.Equal, errors.NotFound)
-		}
-	}
+	found, err := s.Clients.GetByID(client.ClientID)
+	a.So(err, should.BeNil)
+
+	a.So(found.GetClient().ArchivedAt.IsZero(), should.BeFalse)
 }
