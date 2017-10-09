@@ -11,6 +11,8 @@ import (
 	"github.com/gomezjdaniel/sqlx"
 )
 
+// namedExec executes the named query using the provided argument and returns
+// a sql.Result.
 func namedExec(context context.Context, q sqlx.ExecerContext, query string, arg interface{}) (res sql.Result, err error) {
 	defer func() { err = wrap(err) }()
 	bound, args, err := compileNamedQuery(query, arg)
@@ -22,7 +24,7 @@ func namedExec(context context.Context, q sqlx.ExecerContext, query string, arg 
 
 // namedSelectOne selects one row from the database and writes the result to the
 // dest, which can be a map[string]interface{}, a struct, or a scannable value.
-// It uses named items from args to fill the query.
+// It construct the query using the named parameters and the argument.
 func namedSelectOne(context context.Context, q sqlx.QueryerContext, dest interface{}, query string, arg interface{}) error {
 	bound, args, err := compileNamedQuery(query, arg)
 	if err != nil {
@@ -33,7 +35,7 @@ func namedSelectOne(context context.Context, q sqlx.QueryerContext, dest interfa
 
 // namedSelectAll selects multiple items from the database and writes them to dest,
 // which can be a slice of map[string]interface{} or a slice of structs, or a slice
-// of scannable values. It uses the items from arg to fill the query.
+// of scannable values. It construct the query using the named parameters and the argument.
 func namedSelectAll(context context.Context, q sqlx.QueryerContext, dest interface{}, query string, arg interface{}) error {
 	bound, args, err := compileNamedQuery(query, arg)
 	if err != nil {
