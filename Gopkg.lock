@@ -68,6 +68,12 @@
   revision = "ab9f9a6dab164b7d1246e0e688b0ab7b94d8553e"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/gomezjdaniel/sqlx"
+  packages = [".","reflectx"]
+  revision = "c663a68255b43e4e89a5b634e0bbfd2e291c7452"
+
+[[projects]]
   name = "github.com/gorilla/securecookie"
   packages = ["."]
   revision = "667fe4e3466a040b780561fe9b51a83a3753eefc"
@@ -124,7 +130,7 @@
 [[projects]]
   branch = "master"
   name = "github.com/jmoiron/sqlx"
-  packages = [".","reflectx"]
+  packages = ["reflectx"]
   revision = "d9bd385d68c068f1fabb5057e3dedcbcbb039d0f"
 
 [[projects]]
@@ -353,6 +359,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f405b6185183a1bdd9593ff656b6c745de3fdf85f3216fce47a26886653003db"
+  inputs-digest = "d791d6031d2af85519df56836313f319f5e44676e37cad1f65c897a49c41b853"
   solver-name = "gps-cdcl"
   solver-version = 1
