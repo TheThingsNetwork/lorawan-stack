@@ -35,14 +35,26 @@ message CreateUserRequest {
 
   // name is the user's full name.
   string name = 4;
+
+  // reserved fields in order to make the message binary compatible with User.
+  reserved 5,6,7,8,9;
 }
 
 message UpdateUserRequest {
+  // reserved field in order to make the message binary compatible with User.
+  reserved 1;
+
   // email is the new email of the user.
-  string email = 1;
+  string email = 2;
+
+  // reserved field in order to make the message binary compatible with User.
+  reserved 3;
 
   // name is the new name of the user.
-  string name = 2;
+  string name = 4;
+
+  // reserved fields in order to make the message binary compatible with User.
+  reserved 5,6,7,8,9;
 }
 
 message UpdateUserPasswordRequest {
@@ -78,6 +90,9 @@ message CreateApplicationRequest {
 
   // description is the description of the application.
   string description = 2;
+
+  // reserved fields in order to make the message binary compatible with Application.
+  reserved 3,4,5,6;
 }
 
 message ListApplicationsResponse {
@@ -89,6 +104,9 @@ message UpdateApplicationRequest {
 
   // description is the description of the application.
   string description = 2;
+
+  // reserved fields in order to make the message binary compatible with Application.
+  reserved 3,4,5,6;
 }
 
 message GenerateApplicationAPIKeyRequest {
@@ -168,34 +186,43 @@ message CreateGatewayRequest {
   // description is the description of the gateway.
   string description = 2;
 
+  // reserved field in order to make the message binary compatible with Gateway.
+  reserved 3;
+
   // frequency_plan_id indicates the ID of the frequency plan.
-  string frequency_plan_id = 3 [(gogoproto.customname) = "FrequencyPlanID"];
+  string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID"];
+
+  // reserved field in order to make the message binary compatible with Gateway.
+  reserved 5;
 
   // privacy_settings defines the different privacy settings for this gateway.
-  GatewayPrivacySettings privacy_settings = 4 [(gogoproto.nullable) = false];
+  GatewayPrivacySettings privacy_settings = 6 [(gogoproto.nullable) = false];
 
   // auto_update indicates whether or not the gateway should be able to
   // automatically fetch and execute firmware updates.
-  bool auto_update = 5;
+  bool auto_update = 7;
 
   // platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS"
-  string platform = 6;
+  string platform = 8;
 
   // antennas is all the antennas that the gateway has.
-  repeated GatewayAntenna antennas = 7 [(gogoproto.nullable) = false];
+  repeated GatewayAntenna antennas = 9 [(gogoproto.nullable) = false];
 
   // attributes is a free form map of attributes.
-  map<string, string> attributes = 8;
+  map<string, string> attributes = 10;
 
   // cluster_address indicates the URI of the gateway server cluster to connect to,
   // in a "<ip>:<port>" format.
-  string cluster_address = 9;
+  string cluster_address = 11;
 
   // contact_account is the user ID that will be displayed (given the set privacy
   // settings) as contact person for this gateway.
   // TODO(gomezjdaniel): allow to use an organization ID as contact account when
   // they are added.
-  UserIdentifier contact_account = 10 [(gogoproto.nullable) = false];
+  UserIdentifier contact_account = 12 [(gogoproto.nullable) = false];
+
+  // reserved fields in order to make the message binary compatible with Gateway.
+  reserved 13,14,15;
 }
 
 message ListGatewaysResponse {
@@ -208,34 +235,43 @@ message UpdateGatewayRequest {
   // description is the description of the gateway.
   string description = 2;
 
+  // reserved field in order to make the message binary compatible with Gateway.
+  reserved 3;
+
   // frequency_plan_id indicates the ID of the frequency plan.
-  string frequency_plan_id = 3 [(gogoproto.customname) = "FrequencyPlanID"];
+  string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID"];
+
+  // reserved field in order to make the message binary compatible with Gateway.
+  reserved 5;
 
   // privacy_settings defines the different privacy settings for this gateway.
-  GatewayPrivacySettings privacy_settings = 4 [(gogoproto.nullable) = false];
+  GatewayPrivacySettings privacy_settings = 6 [(gogoproto.nullable) = false];
 
   // auto_update indicates whether or not the gateway should be able to
   // automatically fetch and execute firmware updates.
-  bool auto_update = 5;
+  bool auto_update = 7;
 
   // platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS"
-  string platform = 6;
+  string platform = 8;
 
   // antennas is all the antennas that the gateway has.
-  repeated GatewayAntenna antennas = 7 [(gogoproto.nullable) = false];
+  repeated GatewayAntenna antennas = 9 [(gogoproto.nullable) = false];
 
   // attributes is a free form map of attributes.
-  map<string, string> attributes = 8;
+  map<string, string> attributes = 10;
 
   // cluster_address indicates the URI of the gateway server cluster to connect to,
   // in a "<ip>:<port>" format.
-  string cluster_address = 9;
+  string cluster_address = 11;
 
   // contact_account is the user ID that will be displayed (given the set privacy
   // settings) as contact person for this gateway.
   // TODO(gomezjdaniel): allow to use an organization ID as contact account when
   // they are added.
-  UserIdentifier contact_account = 10 [(gogoproto.nullable) = false];
+  UserIdentifier contact_account = 12 [(gogoproto.nullable) = false];
+
+  // reserved fields in order to make the message binary compatible with Gateway.
+  reserved 13,14,15;
 }
 
 message SetGatewayCollaboratorRequest {
@@ -302,11 +338,17 @@ message CreateClientRequest {
   // callback_uri is the callback URI of the client.
   string callback_uri = 4 [(gogoproto.customname) = "CallbackURI"];
 
+  // reserved fields in order to make the message binary compatible with Client.
+  reserved 5,6;
+
   // grants denotes which OAuth2 flows can the client use to get a token.
-  repeated ClientGrant grants = 5;
+  repeated ClientGrant grants = 7;
 
   // scope denotes what scopes the client will have access to.
-  repeated ClientScope scope = 6;
+  repeated ClientScope scope = 8;
+
+  // reserved fields in order to make the message binary compatible with Client.
+  reserved 9,10,11;
 }
 
 message ListClientsResponse {
@@ -326,11 +368,17 @@ message UpdateClientRequest {
   // callback_uri is the callback URI of the client.
   string callback_uri = 4 [(gogoproto.customname) = "CallbackURI"];
 
+  // reserved fields in order to make the message binary compatible with Client.
+  reserved 5,6;
+
   // grants denotes which OAuth2 flows can the client use to get a token.
-  repeated ClientGrant grants = 5;
+  repeated ClientGrant grants = 7;
 
   // scope denotes what scopes the client will have access to.
-  repeated ClientScope scope = 6;
+  repeated ClientScope scope = 8;
+
+  // reserved fields in order to make the message binary compatible with Client.
+  reserved 9,10,11;
 }
 
 message SetClientOfficialRequest {
