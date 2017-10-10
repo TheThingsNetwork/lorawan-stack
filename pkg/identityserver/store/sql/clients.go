@@ -15,9 +15,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-const clientsCollaboratorsTable = "clients_collaborators"
-const clientsCollaboratorsForeignKey = "client_id"
-
 // ClientStore implements store.ClientStore.
 type ClientStore struct {
 	*Store
@@ -49,7 +46,7 @@ func NewClientStore(store *Store, factory factory.ClientFactory) *ClientStore {
 	return &ClientStore{
 		Store:             store,
 		factory:           factory,
-		collaboratorStore: newCollaboratorStore(store, clientsCollaboratorsTable, clientsCollaboratorsForeignKey),
+		collaboratorStore: newCollaboratorStore(store, "client"),
 	}
 }
 

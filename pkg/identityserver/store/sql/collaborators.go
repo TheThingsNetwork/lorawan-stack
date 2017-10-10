@@ -10,20 +10,20 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-// collaboratorStore is a store that can be reused amongs other stores and holds
-// the logic to manage collaborators of an entity.
+// collaboratorStore is a store that holds the logic to manage collaborators of
+// an entity. This store is inteded to be reusable among other stores.
 type collaboratorStore struct {
 	*Store
 	table      string
 	foreignKey string
 }
 
-// newCollaboratorStore creates a newCollaboratorStore.
-func newCollaboratorStore(store *Store, table, foreignKey string) *collaboratorStore {
+// newCollaboratorStore creates a collaboratorStore.
+func newCollaboratorStore(store *Store, entity string) *collaboratorStore {
 	return &collaboratorStore{
 		Store:      store,
-		table:      table,
-		foreignKey: foreignKey,
+		table:      fmt.Sprintf("%ss_collaborators", entity),
+		foreignKey: fmt.Sprintf("%s_id", entity),
 	}
 }
 
@@ -41,8 +41,8 @@ func (s *collaboratorStore) SetCollaborator(entityID string, collaborator ttnpb.
 }
 
 func (s *collaboratorStore) unsetCollaborator(q db.QueryContext, entityID, userID string) error {
-	query := fmt.Sprintf(`
-		DELETE
+	query := fmt.Sprintf(
+		`DELETE
 			FROM %s
 			WHERE %s = $1 AND user_id = $2`,
 		s.table,
@@ -100,12 +100,12 @@ func (s *collaboratorStore) addRightsQuery(entityID, userID string, rights []ttn
 		boundValues[i] = fmt.Sprintf("($1, $2, $%d)", i+3)
 	}
 
-	query := fmt.Sprintf(`
-			INSERT
-				INTO %s (%s, user_id, "right")
-				VALUES %s
-				ON CONFLICT (%s, user_id, "right")
-				DO NOTHING`,
+	query := fmt.Sprintf(
+		`INSERT
+			INTO %s (%s, user_id, "right")
+			VALUES %s
+			ON CONFLICT (%s, user_id, "right")
+			DO NOTHING`,
 		s.table,
 		s.foreignKey,
 		strings.Join(boundValues, " ,"),
@@ -120,8 +120,8 @@ func (s *collaboratorStore) ListCollaborators(entityID string) ([]ttnpb.Collabor
 }
 
 func (s *collaboratorStore) listCollaborators(q db.QueryContext, entityID string) ([]ttnpb.Collaborator, error) {
-	query := fmt.Sprintf(`
-		SELECT user_id, "right"
+	query := fmt.Sprintf(
+		`SELECT user_id, "right"
 			FROM %s
 			WHERE %s = $1`,
 		s.table,
@@ -163,8 +163,8 @@ func (s *collaboratorStore) ListUserRights(entityID string, userID string) ([]tt
 }
 
 func (s *collaboratorStore) listUserRights(q db.QueryContext, entityID string, userID string) ([]ttnpb.Right, error) {
-	query := fmt.Sprintf(`
-		SELECT "right"
+	query := fmt.Sprintf(
+		`SELECT "right"
 			FROM %s
 			WHERE %s = $1 AND user_id = $2`,
 		s.table,

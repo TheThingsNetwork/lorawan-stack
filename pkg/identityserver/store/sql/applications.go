@@ -16,9 +16,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-const applicationsCollaboratorsTable = "applications_collaborators"
-const applicationsCollaboratorsForeignKey = "application_id"
-
 // ApplicationStore implements store.ApplicationStore.
 type ApplicationStore struct {
 	*Store
@@ -60,7 +57,7 @@ func NewApplicationStore(store *Store, factory factory.ApplicationFactory) *Appl
 	return &ApplicationStore{
 		Store:             store,
 		factory:           factory,
-		collaboratorStore: newCollaboratorStore(store, applicationsCollaboratorsTable, applicationsCollaboratorsForeignKey),
+		collaboratorStore: newCollaboratorStore(store, "application"),
 	}
 }
 

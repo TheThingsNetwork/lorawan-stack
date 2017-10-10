@@ -16,9 +16,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-const gatewaysCollaboratorsTable = "gateways_collaborators"
-const gatewaysCollaboratorsForeignKey = "gateway_id"
-
 // GatewayStore implements store.GatewayStore.
 type GatewayStore struct {
 	*Store
@@ -50,7 +47,7 @@ func NewGatewayStore(store *Store, factory factory.GatewayFactory) *GatewayStore
 	return &GatewayStore{
 		Store:             store,
 		factory:           factory,
-		collaboratorStore: newCollaboratorStore(store, gatewaysCollaboratorsTable, gatewaysCollaboratorsForeignKey),
+		collaboratorStore: newCollaboratorStore(store, "gateway"),
 	}
 }
 

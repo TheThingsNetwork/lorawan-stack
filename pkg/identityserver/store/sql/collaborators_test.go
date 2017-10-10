@@ -21,11 +21,7 @@ func TestCollaboratorStore(t *testing.T) {
 	err := s.Applications.Create(app)
 	a.So(err, should.BeNil)
 
-	c := newCollaboratorStore(
-		s,
-		applicationsCollaboratorsTable,
-		applicationsCollaboratorsForeignKey,
-	)
+	c := newCollaboratorStore(s, "application")
 
 	// check there is no collaborators
 	{
