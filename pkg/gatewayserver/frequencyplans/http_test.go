@@ -20,11 +20,25 @@ import (
 var (
 	euFPID       = "EU_FREQUENCY_PLAN"
 	euFPFilename = "eu_frequency_plan.yml"
+
+	euWithLBTID       = "EU_FREQUENCY_PLAN_WITH_LBT"
+	euWithLBTFilename = "eu_frequency_plan_lbt.yml"
 )
 
 func dummyFPList() string {
 	return fmt.Sprintf(`- id: %s
   file: %s`, euFPID, euFPFilename)
+}
+
+func dummyFPListWithOnlyLBTExtension() string {
+	return fmt.Sprintf(`- id: %s
+  file: %s
+  base: %s`, euWithLBTID, euWithLBTFilename, euFPID)
+}
+
+func dummyFPListWithLBTExtension() string {
+	return dummyFPList() + `
+` + dummyFPListWithOnlyLBTExtension()
 }
 
 func dummyEUFP() (string, error) {
@@ -37,6 +51,16 @@ func dummyEUFP() (string, error) {
 		},
 	}
 	out, err := yaml.Marshal(fp)
+	return string(out), err
+}
+
+func dummyLBTExtension() (string, error) {
+	ext := ttnpb.FrequencyPlan{
+		LBT: &ttnpb.FrequencyPlan_LBTConfiguration{
+			RSSITarget: 80,
+		},
+	}
+	out, err := yaml.Marshal(ext)
 	return string(out), err
 }
 
@@ -138,8 +162,13 @@ func TestRetrieveHTTPStore(t *testing.T) {
 
 	frequencyPlansListURL := listURL()
 	europeanFPURL := gitHubFileURL(euFPFilename)
+	europeanLBTExtensionURL := gitHubFileURL(euWithLBTFilename)
 
-	httpmock.RegisterResponder("GET", frequencyPlansListURL, httpmock.NewStringResponder(200, dummyFPList()))
+	lbtExtension, err := dummyLBTExtension()
+	a.So(err, should.BeNil)
+
+	httpmock.RegisterResponder("GET", frequencyPlansListURL, httpmock.NewStringResponder(200, dummyFPListWithLBTExtension()))
+	httpmock.RegisterResponder("GET", europeanLBTExtensionURL, httpmock.NewStringResponder(200, lbtExtension))
 	httpmock.RegisterResponder("GET", europeanFPURL, httpmock.NewStringResponder(200, dummyFP))
 
 	store, err := frequencyplans.RetrieveHTTPStore()
@@ -150,8 +179,55 @@ func TestRetrieveHTTPStore(t *testing.T) {
 	testKnownFrequencyPlan(a, store)
 
 	ids := store.GetAllIDs()
-	a.So(len(ids), should.Equal, 1)
-	a.So(ids[0], should.Equal, euFPID)
+	a.So(len(ids), should.Equal, 2)
+
+	fp, err := store.GetByID(euFPID)
+	a.So(err, should.BeNil)
+	a.So(fp.LBT, should.BeNil)
+
+	extended, err := store.GetByID(euWithLBTID)
+	a.So(err, should.BeNil)
+	a.So(extended.LBT, should.NotBeNil)
+}
+
+func TestHTTPStoreExtensionContentNotFound(t *testing.T) {
+	a := assertions.New(t)
+
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	dummyFP, err := dummyEUFP()
+	a.So(err, should.BeNil)
+
+	frequencyPlansListURL := listURL()
+	europeanFPURL := gitHubFileURL(euFPFilename)
+
+	httpmock.RegisterResponder("GET", frequencyPlansListURL, httpmock.NewStringResponder(200, dummyFPListWithLBTExtension()))
+	httpmock.RegisterResponder("GET", europeanFPURL, httpmock.NewStringResponder(200, dummyFP))
+
+	_, err = frequencyplans.RetrieveHTTPStore()
+
+	a.So(err, should.NotBeNil)
+}
+
+func TestHTTPStoreExtensionBaseNotFound(t *testing.T) {
+	a := assertions.New(t)
+
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	frequencyPlansListURL := listURL()
+	europeanLBTExtensionURL := gitHubFileURL(euWithLBTFilename)
+
+	lbtExtension, err := dummyLBTExtension()
+	a.So(err, should.BeNil)
+
+	httpmock.RegisterResponder("GET", frequencyPlansListURL, httpmock.NewStringResponder(200, dummyFPListWithOnlyLBTExtension()))
+	httpmock.RegisterResponder("GET", europeanLBTExtensionURL, httpmock.NewStringResponder(200, lbtExtension))
+
+	_, err = frequencyplans.RetrieveHTTPStore()
+
+	a.So(err, should.NotBeNil)
 }
 
 func TestRetrieveWithOptions(t *testing.T) {

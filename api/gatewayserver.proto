@@ -6,6 +6,7 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/gateway.proto";
 import "github.com/TheThingsNetwork/ttn/api/messages.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 
 package ttn.v3;
@@ -50,6 +51,18 @@ message FrequencyPlan {
   }
 
   LBTConfiguration lbt = 5 [(gogoproto.customname) = "LBT",  (gogoproto.moretags) = "yaml:\"lbt,omitempty\""];
+
+  // DwellTime indicates the maximum duration of a transmission.
+  google.protobuf.Duration dwell_time = 6 [(gogoproto.moretags) = "yaml:\"dwell-time,omitempty\"", (gogoproto.stdduration) = true];
+
+  message TimeOffAir {
+    // Fraction of the time on air of a TX emission to account as cooloff after emission
+    float fraction = 1 [(gogoproto.moretags) = "yaml:\"fraction,omitempty\""];
+    // Cooloff after a TX emission
+    google.protobuf.Duration duration = 2 [(gogoproto.moretags) = "yaml:\"duration,omitempty\"", (gogoproto.stdduration) = true];
+  }
+
+  TimeOffAir time_off_air = 7 [(gogoproto.moretags) = "yaml:\"tx-timeoff-air,omitempty\""];
 }
 
 message FrequencyPlanRequest {

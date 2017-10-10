@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+	time "time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/band"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -53,6 +54,99 @@ fsk-channel:
 	a.So(fp.FSKChannel.GetDataRate(), should.NotBeNil)
 	a.So(fp.FSKChannel.GetDataRate().Index, should.Equal, 7)
 	a.So(fp.LBT, should.BeNil)
+}
+
+func TestUnmarshalUS(t *testing.T) {
+	a := assertions.New(t)
+
+	yamlDocument := `band-id: US_902_928
+channels:
+  - frequency: 903900000
+  - frequency: 904100000
+  - frequency: 904300000
+  - frequency: 904500000
+  - frequency: 904700000
+  - frequency: 904900000
+  - frequency: 905100000
+  - frequency: 905300000
+lora-std-channel:
+  frequency: 904600000
+  data-rate:
+    index: 4
+dwell-time: 400ms`
+
+	fp := ttnpb.FrequencyPlan{}
+
+	err := yaml.Unmarshal([]byte(yamlDocument), &fp)
+	a.So(err, should.BeNil)
+
+	for _, channel := range fp.Channels {
+		a.So(channel.GetDataRate(), should.BeNil)
+	}
+
+	a.So(len(fp.Channels), should.Equal, 8)
+	a.So(fp.LoraStandardChannel, should.NotBeNil)
+	a.So(fp.LoraStandardChannel.GetDataRate(), should.NotBeNil)
+	a.So(fp.LoraStandardChannel.GetDataRate().Index, should.Equal, 4)
+	a.So(fp.FSKChannel, should.BeNil)
+	a.So(fp.LBT, should.BeNil)
+	a.So(fp.DwellTime, should.NotBeNil)
+	a.So(*fp.DwellTime, should.Equal, time.Millisecond*400)
+}
+
+func TestUnmarshalJP(t *testing.T) {
+	a := assertions.New(t)
+
+	yamlDocument := `band-id: AS923
+channels:
+  - frequency: 922000000
+  - frequency: 922200000
+  - frequency: 922400000
+  - frequency: 922600000
+  - frequency: 922800000
+  - frequency: 923000000
+  - frequency: 923200000
+  - frequency: 923400000
+lora-std-channel:
+  frequency: 922100000
+  data-rate:
+    index: 6
+fsk-channel:
+  frequency: 921800000
+  data-rate:
+    index: 7
+lbt:
+  rssi-target: -80
+  rssi-offset: -4
+  scan-time: 128
+dwell-time: 4s
+tx-timeoff-air:
+  duration: 90ms`
+
+	fp := ttnpb.FrequencyPlan{}
+
+	err := yaml.Unmarshal([]byte(yamlDocument), &fp)
+	a.So(err, should.BeNil)
+
+	for _, channel := range fp.Channels {
+		a.So(channel.GetDataRate(), should.BeNil)
+	}
+
+	a.So(len(fp.Channels), should.Equal, 8)
+	a.So(fp.LoraStandardChannel, should.NotBeNil)
+	a.So(fp.LoraStandardChannel.GetDataRate(), should.NotBeNil)
+	a.So(fp.LoraStandardChannel.GetDataRate().Index, should.Equal, 6)
+	a.So(fp.FSKChannel, should.NotBeNil)
+	a.So(fp.FSKChannel.GetDataRate(), should.NotBeNil)
+	a.So(fp.FSKChannel.GetDataRate().Index, should.Equal, 7)
+	a.So(fp.LBT, should.NotBeNil)
+
+	a.So(fp.TimeOffAir, should.NotBeNil)
+	a.So(fp.TimeOffAir.Duration, should.NotBeNil)
+	a.So(*fp.TimeOffAir.Duration, should.Equal, time.Millisecond*90)
+
+	a.So(fp.DwellTime, should.NotBeNil)
+	a.So(*fp.DwellTime, should.Equal, time.Second*4)
 }
 
 func TestUnmarshalKR(t *testing.T) {

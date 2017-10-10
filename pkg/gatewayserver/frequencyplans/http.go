@@ -22,7 +22,7 @@ func RetrieveHTTPStore(options ...RetrieveHTTPStoreOption) (Store, error) {
 		option(&baseURI)
 	}
 
-	store, err := fetchFrequencyPlans(baseURI)
+	store, err := retrieveFrequencyPlans(baseURI)
 	return &store, err
 }
 
@@ -45,7 +45,7 @@ func fetchHTTPContent(url string) ([]byte, error) {
 	return buffer, nil
 }
 
-func fetchList(baseURI storeFetchingConfiguration) ([]frequencyPlanDescription, error) {
+func (baseURI storeFetchingConfiguration) GetList() ([]frequencyPlanDescription, error) {
 	list := make([]frequencyPlanDescription, 0)
 
 	url := fmt.Sprintf("%s/%s", string(baseURI), "frequency-plans.yml")
@@ -63,7 +63,7 @@ func fetchList(baseURI storeFetchingConfiguration) ([]frequencyPlanDescription, 
 	return list, nil
 }
 
-func fetchFrequencyPlan(baseURI storeFetchingConfiguration, filename string) (ttnpb.FrequencyPlan, error) {
+func (baseURI storeFetchingConfiguration) GetFrequencyPlan(filename string) (ttnpb.FrequencyPlan, error) {
 	frequencyPlan := ttnpb.FrequencyPlan{}
 
 	url := fmt.Sprintf("%s/%s", string(baseURI), filename)
@@ -79,23 +79,4 @@ func fetchFrequencyPlan(baseURI storeFetchingConfiguration, filename string) (tt
 	}
 
 	return frequencyPlan, nil
-}
-
-func fetchFrequencyPlans(config storeFetchingConfiguration) (store, error) {
-	frequencyPlansInfo, err := fetchList(config)
-	if err != nil {
-		return nil, errors.NewWithCause("Fetching list of frequency plans failed", err)
-	}
-
-	frequencyPlansStorage := make(store, 0)
-	for _, description := range frequencyPlansInfo {
-		frequencyPlanContent, err := fetchFrequencyPlan(config, description.Filename)
-		if err != nil {
-			return nil, errors.NewWithCause(fmt.Sprintf("Failed to retrieve %s frequency plan content", description.ID), err)
-		}
-
-		frequencyPlansStorage[description.ID] = frequencyPlanContent
-	}
-
-	return frequencyPlansStorage, nil
 }

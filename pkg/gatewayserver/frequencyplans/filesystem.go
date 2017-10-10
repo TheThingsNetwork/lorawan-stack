@@ -3,7 +3,6 @@
 package frequencyplans
 
 import (
-	"fmt"
 	"io/ioutil"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
@@ -21,7 +20,7 @@ func ReadFileSystemStore(options ...ReadFileSystemStoreOption) (Store, error) {
 		option(&config)
 	}
 
-	store, err := readFileSystemStore(config)
+	store, err := retrieveFrequencyPlans(config)
 	if err != nil {
 		return nil, errors.NewWithCause("Reading frequency plans from the file system failed", err)
 	}
@@ -29,7 +28,7 @@ func ReadFileSystemStore(options ...ReadFileSystemStoreOption) (Store, error) {
 	return store, nil
 }
 
-func readList(config storeReadConfiguration) ([]frequencyPlanDescription, error) {
+func (config storeReadConfiguration) GetList() ([]frequencyPlanDescription, error) {
 	frequencyPlanListPath := config.AbsolutePath(DefaultListFilename)
 
 	content, err := ioutil.ReadFile(frequencyPlanListPath)
@@ -46,7 +45,7 @@ func readList(config storeReadConfiguration) ([]frequencyPlanDescription, error)
 	return list, nil
 }
 
-func readFrequencyPlan(config storeReadConfiguration, filename string) (ttnpb.FrequencyPlan, error) {
+func (config storeReadConfiguration) GetFrequencyPlan(filename string) (ttnpb.FrequencyPlan, error) {
 	frequencyPlanPath := config.AbsolutePath(filename)
 	frequencyPlan := ttnpb.FrequencyPlan{}
 
@@ -61,23 +60,4 @@ func readFrequencyPlan(config storeReadConfiguration, filename string) (ttnpb.Fr
 	}
 
 	return frequencyPlan, nil
-}
-
-func readFileSystemStore(config storeReadConfiguration) (store, error) {
-	frequencyPlansInfo, err := readList(config)
-	if err != nil {
-		return nil, errors.NewWithCause("Fetching list of frequency plans failed", err)
-	}
-
-	frequencyPlansStorage := make(store)
-	for _, frequencyPlanDescription := range frequencyPlansInfo {
-		frequencyPlanContent, err := readFrequencyPlan(config, frequencyPlanDescription.Filename)
-		if err != nil {
-			return nil, errors.NewWithCause(fmt.Sprintf("Failed to retrieve %s frequency plan content", frequencyPlanDescription.ID), err)
-		}
-
-		frequencyPlansStorage[frequencyPlanDescription.ID] = frequencyPlanContent
-	}
-
-	return frequencyPlansStorage, nil
 }
