@@ -35,7 +35,6 @@ It has these top-level messages:
 	ApplicationDownlink
 	ApplicationDownlinks
 	DownlinkQueueRequest
-	Scope
 	Client
 	Collaborator
 	KeyEnvelope
