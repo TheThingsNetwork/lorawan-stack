@@ -11,7 +11,8 @@ import (
 // during the authorization flow.
 type Authorizer interface {
 	// CheckLogin checks if the user is logged in and redirects to the login page if not.
-	CheckLogin(c echo.Context) error
+	// Returns the username of the user if logged in.
+	CheckLogin(c echo.Context) (string, error)
 
 	// Authorize does a couple of things:
 	// - renders the authorization form if it is not a form accept

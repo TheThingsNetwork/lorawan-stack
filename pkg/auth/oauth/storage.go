@@ -4,14 +4,12 @@ package oauth
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/RangelReale/osin"
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 type storage struct {
@@ -20,8 +18,7 @@ type storage struct {
 }
 
 type UserData struct {
-	Username         string
-	AuthorizedClient bool
+	Username string
 }
 
 // Clone the store if needed.
@@ -48,6 +45,12 @@ func (s *storage) GetClient(clientID string) (osin.Client, error) {
 
 // SaveAuthorize saves authorization data.
 func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
+	username := ""
+	udata, ok := data.UserData.(*UserData)
+	if ok && udata != nil {
+		username = udata.Username
+	}
+
 	return s.store.SaveAuthorizationCode(&store.AuthorizationData{
 		Code:        data.Code,
 		ClientID:    data.Client.GetId(),
@@ -56,6 +59,7 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 		Scope:       data.Scope,
 		RedirectUri: data.RedirectUri,
 		State:       data.State,
+		Username:    username,
 	})
 }
 
@@ -79,23 +83,10 @@ func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 		RedirectUri: data.RedirectUri,
 		State:       data.State,
 		CreatedAt:   data.CreatedAt,
+		UserData: &UserData{
+			Username: data.Username,
+		},
 	}, nil
-}
-
-func ParseScope(scope string) ([]ttnpb.Right, error) {
-	split := strings.Fields(scope)
-	res := make([]ttnpb.Right, 0, len(split))
-	for _, str := range split {
-		var right ttnpb.Right
-		err := right.UnmarshalText([]byte(str))
-		if err != nil {
-			return nil, fmt.Errorf("Invalid right: %s", str)
-		}
-
-		res = append(res, right)
-	}
-
-	return res, nil
 }
 
 // RemoveAuthorize deletes the authorization code.
@@ -135,9 +126,11 @@ func (s *storage) LoadAccess(accessToken string) (*osin.AccessData, error) {
 	return &osin.AccessData{
 		Client:    client,
 		ExpiresIn: int32(time.Unix(claims.ExpiresAt, 0).Sub(time.Now()).Seconds()),
-		Scope:     claims.Scope(),
+		Scope:     Scope(claims.Rights),
 		CreatedAt: time.Unix(claims.IssuedAt, 0),
-		UserData:  UserData{},
+		UserData: &UserData{
+			Username: claims.User,
+		},
 	}, nil
 }
 
