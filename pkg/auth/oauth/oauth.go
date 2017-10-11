@@ -60,15 +60,35 @@ func New(iss string, keys *auth.Keys, store store.OAuthStore, authorizer Authori
 
 // Register registers the server to the web server.
 func (s *Server) Register(server *web.Server) {
-	group := server.Group.Group("/oauth", middleware.JSONForm)
+	group := server.Group.Group("/oauth")
 	group.Any("/token", s.tokenHandler)
 	group.Any("/authorize", s.authorizationHandler)
+}
+
+type tokenRequest struct {
+	GrantType   string `json:"grant_type" form:"grant_type"`
+	Code        string `json:"code" form:"code"`
+	RedirectUri string `json:"redirect_uri" form:"redirect_uri"`
 }
 
 func (s *Server) tokenHandler(c echo.Context) error {
 	req := c.Request()
 	resp := s.oauth.NewResponse()
 	defer resp.Close()
+
+	tr := &tokenRequest{}
+	err := c.Bind(tr)
+	if err != nil {
+		return err
+	}
+
+	if req.Form == nil {
+		req.Form = make(url.Values)
+	}
+
+	req.Form.Set("grant_type", tr.GrantType)
+	req.Form.Set("code", tr.Code)
+	req.Form.Set("redirect_uri", tr.RedirectUri)
 
 	ar := s.oauth.HandleAccessRequest(resp, req)
 	if ar == nil {
