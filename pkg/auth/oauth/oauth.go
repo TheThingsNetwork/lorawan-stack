@@ -112,7 +112,7 @@ func (s *Server) authorizationHandler(c echo.Context) error {
 		return output(c, resp)
 	}
 
-	// TODO: match the scope of the client to the scope of the request
+	// TODO: match the rights of the client to the scope of the request
 
 	// make sure the user is logged in or redirect
 	err := s.authorizer.CheckLogin(c)

@@ -25,14 +25,14 @@ func TestClaims(t *testing.T) {
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Unix() + 1800,
 			IssuedAt:  time.Now().Unix() - 1800,
-			Subject:   "john-doe",
+			Subject:   ApplicationSubject("foo"),
 			Issuer:    "account.thethingsnetwork.org",
 		},
-		Scope: ttnpb.ApplicationScope(
-			"foo",
+		User: "john-doe",
+		Rights: []ttnpb.Right{
 			ttnpb.RIGHT_APPLICATION_INFO,
 			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
-		),
+		},
 	}
 
 	a.So(claims.Valid(), should.BeNil)
@@ -50,14 +50,14 @@ func TestSign(t *testing.T) {
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Unix() + 1800,
 			IssuedAt:  time.Now().Unix() - 1800,
-			Subject:   "john-doe",
+			Subject:   ApplicationSubject("foo-app"),
 			Issuer:    "account.thethingsnetwork.org",
 		},
-		Scope: ttnpb.ApplicationScope(
-			"foo",
+		User: "john-doe",
+		Rights: []ttnpb.Right{
 			ttnpb.RIGHT_APPLICATION_INFO,
 			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
-		),
+		},
 	}
 
 	// ECDSA512
@@ -147,4 +147,24 @@ func TestSign(t *testing.T) {
 		_, err = FromToken(provider, token)
 		a.So(err, should.NotBeNil)
 	}
+}
+
+func TestScope(t *testing.T) {
+	a := assertions.New(t)
+
+	claims := &Claims{
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Unix() + 1800,
+			IssuedAt:  time.Now().Unix() - 1800,
+			Subject:   ApplicationSubject("foo-app"),
+			Issuer:    "account.thethingsnetwork.org",
+		},
+		User: "john-doe",
+		Rights: []ttnpb.Right{
+			ttnpb.RIGHT_APPLICATION_INFO,
+			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+		},
+	}
+
+	a.So(claims.Scope(), should.Equal, "RIGHT_APPLICATION_INFO RIGHT_APPLICATION_TRAFFIC_READ")
 }

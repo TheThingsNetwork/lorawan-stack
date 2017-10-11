@@ -116,12 +116,11 @@ func (s *storage) LoadAccess(accessToken string) (*osin.AccessData, error) {
 	}
 
 	return &osin.AccessData{
-		Client:      client,
-		ExpiresIn:   int32(time.Unix(claims.ExpiresAt, 0).Sub(time.Now()).Seconds()),
-		Scope:       claims.Scope.String(),
-		RedirectUri: "", // TODO: check if this is necessary here
-		CreatedAt:   time.Unix(claims.IssuedAt, 0),
-		UserData:    UserData{},
+		Client:    client,
+		ExpiresIn: int32(time.Unix(claims.ExpiresAt, 0).Sub(time.Now()).Seconds()),
+		Scope:     claims.Scope(),
+		CreatedAt: time.Unix(claims.IssuedAt, 0),
+		UserData:  UserData{},
 	}, nil
 }
 

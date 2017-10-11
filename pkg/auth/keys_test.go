@@ -125,14 +125,14 @@ pfeKo3HLUYMyS8l55ppjahjP4nG2cvuayO/VaHUIJW6VoVn5VDZ4ukM=
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Unix() + 1800,
 			IssuedAt:  time.Now().Unix() - 1800,
-			Subject:   "john-doe",
+			Subject:   ApplicationSubject("foo-app"),
 			Issuer:    "account.thethingsnetwork.org",
 		},
-		Scope: ttnpb.ApplicationScope(
-			"foo",
+		User: "john-doe",
+		Rights: []ttnpb.Right{
 			ttnpb.RIGHT_APPLICATION_INFO,
 			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
-		),
+		},
 	}
 
 	str, err := k.Sign(claims)

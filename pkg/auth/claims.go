@@ -22,34 +22,69 @@ var (
 // Claims is the type of claims used for the things network authentication.
 // It consists of the standard JWT claims and a couple of additional fields.
 type Claims struct {
+	// StandardClaims are the standard claims for the token.
+	// Sub is interpreted as the id of the entity this token is for.
 	jwt.StandardClaims
+
+	// User is the username of the user that created this token.
+	User string `json:"user"`
 
 	// Client is the client this token was created for.
 	Client string `json:"cid,omitempty"`
 
-	// Scope is the list of actions this token has access to.
-	Scope ttnpb.Scope `json:"scope"`
+	// Rights is the list of actions this token has access to.
+	Rights []ttnpb.Right `json:"rights"`
 }
 
 // Username returns the username of the user this token is for, or the empty string if it is not for a user.
 func (c *Claims) Username() string {
-	return c.Scope.Username()
+	return splitprefix(UserPrefix, c.Subject)
 }
 
 // ApplicationID returns the application ID  of the application this token is for, or the empty string if it is not for an application.
 func (c *Claims) ApplicationID() string {
-	return c.Scope.ApplicationID()
+	return splitprefix(ApplicationPrefix, c.Subject)
 }
 
-// GatewayID returns the gateway ID  of the gateway this token is for, or the empty string if it is not for a gateway.
+// GatewayID returns the gateway ID of the gateway this token is for, or the empty string if it is not for a gateway.
 func (c *Claims) GatewayID() string {
-	return c.Scope.GatewayID()
+	return splitprefix(GatewayPrefix, c.Subject)
 }
 
-// HasRights checks wether or not the provided right is included in the tokens scope. It will only return true if all the provided rights are
+// ClientID returns the client ID of the client this token is for, or the empty string if it is not for an OAuth client..
+func (c *Claims) ClientID() string {
+	return splitprefix(ClientPrefix, c.Subject)
+}
+
+// Scope returns a string representation of the claims scope.
+func (c *Claims) Scope() string {
+	res := ""
+	for _, right := range c.Rights {
+		res = res + right.String() + " "
+	}
+
+	return res[:len(res)-1]
+}
+
+// HasRights checks wether or not the provided right is included in the claims. It will only return true if all the provided rights are
 // included in the token..
 func (c *Claims) HasRights(rights ...ttnpb.Right) bool {
-	return c.Scope.HasRights(rights...)
+	ok := true
+	for _, right := range rights {
+		ok = ok && c.hasRight(right)
+	}
+
+	return ok
+}
+
+// hasRight checks wether or not the right is included in this claims.
+func (c *Claims) hasRight(right ttnpb.Right) bool {
+	for _, r := range c.Rights {
+		if r == right {
+			return true
+		}
+	}
+	return false
 }
 
 // Sign signs the claims using the provided signing method and returns the corresponding JWT.
