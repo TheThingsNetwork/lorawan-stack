@@ -20,9 +20,7 @@ func TestArray(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(value.(string), should.Equal, "{}")
 		a.So(array.Scan("{1,2,3}"), should.BeNil)
-		if a.So(s, should.HaveLength, 3) {
-			a.So(s, should.Resemble, []int32{1, 2, 3})
-		}
+		a.So(s, should.Resemble, []int32{1, 2, 3})
 	}
 
 	// int32 filled
@@ -33,9 +31,7 @@ func TestArray(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(value.(string), should.Equal, "{3,3,3}")
 		a.So(array.Scan("{}"), should.BeNil)
-		if a.So(s, should.HaveLength, 0) {
-			a.So(s, should.Resemble, []int32{})
-		}
+		a.So(s, should.Resemble, []int32{})
 	}
 
 	type Foo int32
@@ -48,9 +44,7 @@ func TestArray(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(value.(string), should.Equal, "{}")
 		a.So(array.Scan("{1,2,3}"), should.BeNil)
-		if a.So(s, should.HaveLength, 3) {
-			a.So(s, should.Resemble, []Foo{1, 2, 3})
-		}
+		a.So(s, should.Resemble, []Foo{1, 2, 3})
 	}
 
 	// Foo slice filled
@@ -61,8 +55,6 @@ func TestArray(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(value.(string), should.Equal, "{3,3,3}")
 		a.So(array.Scan("{}"), should.BeNil)
-		if a.So(s, should.HaveLength, 0) {
-			a.So(s, should.Resemble, []Foo{})
-		}
+		a.So(s, should.Resemble, []Foo{})
 	}
 }

@@ -117,7 +117,7 @@ func TestApplicationCollaborators(t *testing.T) {
 		a.So(err, should.BeNil)
 	}
 
-	// check that was added
+	// check that it was added
 	{
 		collaborators, err := s.Applications.ListCollaborators(app.ApplicationID)
 		a.So(err, should.BeNil)

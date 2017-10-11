@@ -13,8 +13,8 @@ import (
 	"github.com/lib/pq"
 )
 
-// Array wraps an int32 (or int32 like) slice into a new type that implements
-// both driver.Valuer and sql.Scanner interfaces.
+// Array wraps an int32 slice (or a type whose underlying type is an int32 slice)
+// into a new type that implements both driver.Valuer and sql.Scanner interfaces.
 //
 // Array is a wrapper for the pq (postgres golang driver) library Array method
 // so if the passed argument it is not a pointer to int32 (or int32 like) slice
@@ -40,8 +40,9 @@ func Array(a interface{}) interface {
 	return pq.Array(a)
 }
 
-// IntLikeArray is the type used to wrap an []int32 like into a type that
-// implements both driver.Valuer and sql.Scanner interfaces.
+// IntLikeArray is the type used to wrap an []int32 like (i.e. a type whose
+// underlying type is an int32 slice) into a type that implements both
+// driver.Valuer and sql.Scanner interfaces.
 type IntLikeArray struct {
 	val interface{}
 }
@@ -101,7 +102,8 @@ func (a IntLikeArray) Value() (driver.Value, error) {
 	return Int32Array(ints).Value()
 }
 
-// int32Slice converts and int32 like slice into an int32 slice.
+// int32Slice converts and int32 like slice (i.e. a type whose underlying type
+// is an int32 slice) into an int32 slice.
 func int32Slice(in interface{}) ([]int32, error) {
 	int32SliceType := reflect.ValueOf([]int32{}).Type()
 	int32Type := int32SliceType.Elem()
@@ -189,7 +191,8 @@ func (a Int32Array) Value() (driver.Value, error) {
 	return "{}", nil
 }
 
-// isInt32Slice checks if typ is an int32 (or int32 like) slice.
+// isInt32Slice checks if typ is an int32 slice (or a type whose underlying type
+// is an int32 slice).
 func isInt32Slice(typ reflect.Type) bool {
 	return typ.Kind() == reflect.Slice && typ.Elem().Kind() == reflect.Int32
 }

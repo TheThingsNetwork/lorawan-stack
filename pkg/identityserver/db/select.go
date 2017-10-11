@@ -168,7 +168,6 @@ func selectAll(context context.Context, q sqlx.QueryerContext, dest interface{},
 
 	// try struct
 	if base.Kind() == reflect.Struct {
-		// wrap rows into wrows
 		wrows := &wrows{Rows: rows}
 		for rows.Next() {
 			vp := reflect.New(base)
