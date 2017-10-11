@@ -134,7 +134,7 @@ binary for your architecture and operating system. This way builds on different 
 #### Development builds
 
 When developing, it is not necessary to re-build all packages every time you compile. You should instead be using dev builds. The dev build rule for `ttn-example` is 
-called `ttn-example-dev`. This builds the `ttn-example` binary, but makes some assumptions which can be made only in development mode, to speed up builds.
+called `ttn-example.dev`. This builds the `ttn-example` binary, but makes some assumptions which can be made only in development mode, to speed up builds.
 
 Use this together with artifact caching to speed up builds dramatically. The `cache` rule pre-builds all relevant build artifacts and caches them so they can be used for
 dev builds.
@@ -143,11 +143,11 @@ When developing you should therefore run:
 
 ```
 make cache
-make ttn-example-dev
+make ttn-example.dev
 # make edits...
-make ttn-example-dev
+make ttn-example.dev
 # make some more edits...
-make ttn-example-dev
+make ttn-example.dev
 # ...
 ```
 
