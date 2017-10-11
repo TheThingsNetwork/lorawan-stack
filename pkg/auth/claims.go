@@ -56,16 +56,6 @@ func (c *Claims) ClientID() string {
 	return splitprefix(ClientPrefix, c.Subject)
 }
 
-// Scope returns a string representation of the claims scope.
-func (c *Claims) Scope() string {
-	res := ""
-	for _, right := range c.Rights {
-		res = res + right.String() + " "
-	}
-
-	return res[:len(res)-1]
-}
-
 // HasRights checks wether or not the provided right is included in the claims. It will only return true if all the provided rights are
 // included in the token..
 func (c *Claims) HasRights(rights ...ttnpb.Right) bool {
