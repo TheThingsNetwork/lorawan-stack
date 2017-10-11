@@ -17,13 +17,26 @@ func (s *Server) GenerateAccessToken(data *osin.AccessData, generateRefresh bool
 		return "", "", err
 	}
 
+	rights, err := ParseScope(data.Scope)
+	if err != nil {
+		return "", "", err
+	}
+
+	username := ""
+	udata, ok := data.UserData.(*UserData)
+	if ok && udata != nil {
+		username = udata.Username
+	}
+
 	claims := &auth.Claims{
 		StandardClaims: jwt.StandardClaims{
 			Issuer:    s.iss,
 			ExpiresAt: data.ExpireAt().Unix(),
-			Subject:   "",
+			Subject:   auth.UserSubject(username),
 			IssuedAt:  time.Now().Add(-5 * time.Second).Unix(),
 		},
+		User:   username,
+		Rights: rights,
 		Client: data.Client.GetId(),
 	}
 

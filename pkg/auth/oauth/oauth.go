@@ -4,16 +4,17 @@ package oauth
 
 import (
 	"net/http"
+	"net/url"
 
 	"github.com/RangelReale/osin"
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/web"
-	"github.com/TheThingsNetwork/ttn/pkg/web/middleware"
 	"github.com/labstack/echo"
 )
 
+// Server represents an OAuth 2.0 Server.
 type Server struct {
 	keys       *auth.Keys
 	iss        string
@@ -21,6 +22,7 @@ type Server struct {
 	authorizer Authorizer
 }
 
+// New returns a new *Server that is ready to use.
 func New(iss string, keys *auth.Keys, store store.OAuthStore, authorizer Authorizer) *Server {
 	config := &osin.ServerConfig{
 		AuthorizationExpiration:     60 * 5,  // 5 minutes
@@ -132,10 +134,22 @@ func (s *Server) authorizationHandler(c echo.Context) error {
 		return output(c, resp)
 	}
 
-	// TODO: match the rights of the client to the scope of the request
+	scope, err := ParseScope(ar.Scope)
+	if err != nil {
+		return err
+	}
+
+	_ = scope
+
+	// TODO: check if scope contains rights client does not have
+	// left := Subtract(scope, client.GetClient().Rights)
+	// if len(left) > 0 {
+	// 	return fmt.Errorf("Client does not have access to rights: %s", strings.Join(left, ", "))
+	// }
+	// TODO: set the scope to the client scope
 
 	// make sure the user is logged in or redirect
-	err := s.authorizer.CheckLogin(c)
+	username, err := s.authorizer.CheckLogin(c)
 	if err != nil || c.Response().Committed {
 		return err
 	}
@@ -144,6 +158,10 @@ func (s *Server) authorizationHandler(c echo.Context) error {
 	authorized, err := s.authorizer.Authorize(c, client)
 	if err != nil || c.Response().Committed {
 		return err
+	}
+
+	ar.UserData = &UserData{
+		Username: username,
 	}
 
 	ar.Authorized = authorized
@@ -155,6 +173,7 @@ func (s *Server) authorizationHandler(c echo.Context) error {
 func output(c echo.Context, resp *osin.Response) error {
 	if resp.IsError && resp.InternalError != nil {
 		// TODO: log internal error
+		return echo.NewHTTPError(400, "Something went wrong")
 	}
 
 	headers := c.Response().Header()
