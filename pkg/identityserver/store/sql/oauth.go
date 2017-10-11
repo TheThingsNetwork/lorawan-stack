@@ -39,7 +39,8 @@ func saveAuthorizationCode(q db.QueryContext, data *store.AuthorizationData) err
 				expires_in,
 				scope,
 				redirect_uri,
-				state
+				state,
+				username
 			)
 			VALUES (
 				:authorization_code,
@@ -48,7 +49,8 @@ func saveAuthorizationCode(q db.QueryContext, data *store.AuthorizationData) err
 				:expires_in,
 				:scope,
 				:redirect_uri,
-				:state
+				:state,
+				:username
 			)
 			RETURNING authorization_code`,
 		data,

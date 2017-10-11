@@ -11,7 +11,8 @@ func init() {
 			expires_in         INTEGER,
 			scope              STRING,
 			redirect_uri       STRING,
-			state              STRING
+			state              STRING,
+			username           STRING
 		);
 
 		CREATE TABLE IF NOT EXISTS refresh_tokens (

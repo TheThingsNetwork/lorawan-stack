@@ -30,6 +30,9 @@ type AuthorizationData struct {
 
 	// State is the state the client passed when authorizing.
 	State string `db:"state"`
+
+	// Username is the username the authorization is for.
+	Username string `db:"username"`
 }
 
 // RefreshData is the data stored for refresh tokens.
