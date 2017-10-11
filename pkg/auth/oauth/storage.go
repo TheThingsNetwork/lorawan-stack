@@ -4,12 +4,14 @@ package oauth
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/RangelReale/osin"
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 type storage struct {
@@ -78,7 +80,22 @@ func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 		State:       data.State,
 		CreatedAt:   data.CreatedAt,
 	}, nil
+}
 
+func ParseScope(scope string) ([]ttnpb.Right, error) {
+	split := strings.Fields(scope)
+	res := make([]ttnpb.Right, 0, len(split))
+	for _, str := range split {
+		var right ttnpb.Right
+		err := right.UnmarshalText([]byte(str))
+		if err != nil {
+			return nil, fmt.Errorf("Invalid right: %s", str)
+		}
+
+		res = append(res, right)
+	}
+
+	return res, nil
 }
 
 // RemoveAuthorize deletes the authorization code.
