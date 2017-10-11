@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/tokenkey"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/smartystreets/assertions"
@@ -68,7 +69,7 @@ func TestSign(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(token, should.NotBeEmpty)
 
-		provider := &ConstProvider{
+		provider := &tokenkey.ConstProvider{
 			Tokens: map[string]map[string]crypto.PublicKey{
 				claims.Issuer: map[string]crypto.PublicKey{
 					"": &key.PublicKey,
@@ -90,7 +91,7 @@ func TestSign(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(token, should.NotBeEmpty)
 
-		provider := &ConstProvider{
+		provider := &tokenkey.ConstProvider{
 			Tokens: map[string]map[string]crypto.PublicKey{
 				claims.Issuer: map[string]crypto.PublicKey{
 					"": &key.PublicKey,
@@ -109,11 +110,11 @@ func TestSign(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		kid := "kid-123"
-		token, err := claims.Sign(WithKID(key, kid))
+		token, err := claims.Sign(tokenkey.WithKID(key, kid))
 		a.So(err, should.BeNil)
 		a.So(token, should.NotBeEmpty)
 
-		provider := &ConstProvider{
+		provider := &tokenkey.ConstProvider{
 			Tokens: map[string]map[string]crypto.PublicKey{
 				claims.Issuer: map[string]crypto.PublicKey{
 					kid: &key.PublicKey,
@@ -131,11 +132,11 @@ func TestSign(t *testing.T) {
 		key, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 		a.So(err, should.BeNil)
 
-		token, err := claims.Sign(WithKID(key, "kid"))
+		token, err := claims.Sign(tokenkey.WithKID(key, "kid"))
 		a.So(err, should.BeNil)
 		a.So(token, should.NotBeEmpty)
 
-		provider := &ConstProvider{
+		provider := &tokenkey.ConstProvider{
 			Tokens: map[string]map[string]crypto.PublicKey{
 				claims.Issuer: map[string]crypto.PublicKey{
 					"otherkid": &key.PublicKey,

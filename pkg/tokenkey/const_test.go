@@ -1,6 +1,6 @@
 // Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package auth
+package tokenkey
 
 import (
 	"crypto"
@@ -12,6 +12,8 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
+
+var _ Provider = new(ConstProvider)
 
 func TestConstProvider(t *testing.T) {
 	a := assertions.New(t)
@@ -30,13 +32,13 @@ func TestConstProvider(t *testing.T) {
 		},
 	}
 
-	k, err := provider.Get(iss, kid)
+	k, err := provider.TokenKey(iss, kid)
 	a.So(err, should.BeNil)
 	a.So(k, should.Resemble, &key.PublicKey)
 
-	_, err = provider.Get("wrong", kid)
+	_, err = provider.TokenKey("wrong", kid)
 	a.So(err, should.Equal, ErrUnknownIdentityServer)
 
-	_, err = provider.Get(iss, "wrong")
+	_, err = provider.TokenKey(iss, "wrong")
 	a.So(err, should.Equal, ErrUnknownKID)
 }

@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/TheThingsNetwork/ttn/pkg/tokenkey"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	jwt "github.com/dgrijalva/jwt-go"
 )
@@ -61,7 +62,7 @@ func (c *Claims) Sign(privateKey crypto.PrivateKey) (string, error) {
 	kid := ""
 
 	// set the kid if it is there
-	if w, ok := privateKey.(*PrivateKeyWithKID); ok {
+	if w, ok := privateKey.(*tokenkey.PrivateKeyWithKID); ok {
 		kid = w.KID
 		key = w.PrivateKey
 	}
@@ -88,7 +89,7 @@ func (c *Claims) Sign(privateKey crypto.PrivateKey) (string, error) {
 
 // FromToken parses the token into their matching claims or returns an error if the
 // the signature is invalid.
-func FromToken(provider TokenKeyProvider, token string) (*Claims, error) {
+func FromToken(provider tokenkey.Provider, token string) (*Claims, error) {
 	if provider == nil {
 		return nil, fmt.Errorf("No token key provider configured")
 	}
@@ -113,7 +114,7 @@ func FromToken(provider TokenKeyProvider, token string) (*Claims, error) {
 			}
 		}
 
-		key, err := provider.Get(claims.Issuer, kid)
+		key, err := provider.TokenKey(claims.Issuer, kid)
 		if err != nil {
 			return nil, err
 		}

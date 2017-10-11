@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"sync"
+
+	"github.com/TheThingsNetwork/ttn/pkg/tokenkey"
 )
 
 // Keys the key pairs used to sign and validate JWT tokens.
@@ -19,6 +21,13 @@ type Keys struct {
 	issuer  string
 	keys    sync.Map
 	current string
+}
+
+// NewKeys creates a new keys instance for the specified issuer.
+func NewKeys(iss string) *Keys {
+	return &Keys{
+		issuer: iss,
+	}
 }
 
 // Sign signs the claims with the current private key.
@@ -130,8 +139,8 @@ func (k *Keys) RotateFromFile(kid string, filename string) error {
 	return k.RotateFromPEM(kid, content)
 }
 
-// Get implements TokenKeyProvider.
-func (k *Keys) Get(iss string, kid string) (crypto.PublicKey, error) {
+// TokenKey implements tokenkey.Provider.
+func (k *Keys) TokenKey(iss string, kid string) (crypto.PublicKey, error) {
 	if iss != k.issuer {
 		return nil, fmt.Errorf("Could not get public key for issuer %s", iss)
 	}
@@ -142,7 +151,7 @@ func (k *Keys) Get(iss string, kid string) (crypto.PublicKey, error) {
 // checkPrivateKey makes sure the argument is a private key and that it is supported by this package.
 func checkPrivateKey(key crypto.PrivateKey) error {
 	switch key.(type) {
-	case *rsa.PrivateKey, *ecdsa.PrivateKey, *PrivateKeyWithKID:
+	case *rsa.PrivateKey, *ecdsa.PrivateKey, *tokenkey.PrivateKeyWithKID:
 		return nil
 	}
 	return fmt.Errorf("Expected type crypto.PrivateKey when loading the private key, but got %T", key)
