@@ -6,11 +6,14 @@ package sentry
 import (
 	"fmt"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	grpcerrors "github.com/TheThingsNetwork/ttn/pkg/errors/grpcerrors" // Note: actual package name there is "errors"
 	raven "github.com/getsentry/raven-go"
 	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type forwarder struct {
@@ -18,10 +21,27 @@ type forwarder struct {
 }
 
 func (f *forwarder) forward(ctx context.Context, method string, err error) {
-	code := grpc.Code(err)
-	if code == codes.OK {
-		return
+	code := codes.Unknown
+	if status, ok := status.FromError(err); ok {
+		code = status.Code()
 	}
+
+	ttnErr := grpcerrors.FromGRPC(err)
+	ttnErrType := ttnErr.Type()
+
+	switch ttnErrType {
+	case errors.InvalidArgument,
+		errors.OutOfRange,
+		errors.NotFound,
+		errors.Conflict,
+		errors.AlreadyExists,
+		errors.Unauthorized,
+		errors.PermissionDenied,
+		errors.Timeout,
+		errors.Canceled:
+		return // ignore
+	}
+
 	var details = make(map[string]string)
 	details["grpc.code"] = code.String()
 	details["grpc.method"] = method
@@ -30,6 +50,13 @@ func (f *forwarder) forward(ctx context.Context, method string, err error) {
 			details[k] = fmt.Sprint(v)
 		}
 	}
+	details["ttn.error.code"] = ttnErr.Code().String()
+	details["ttn.error.type"] = ttnErrType.String()
+	details["ttn.error.namespace"] = ttnErr.Namespace()
+	for k, v := range ttnErr.Attributes() {
+		details["ttn.error."+k] = fmt.Sprint(v)
+	}
+
 	f.client.CaptureError(err, details, nil)
 }
 
