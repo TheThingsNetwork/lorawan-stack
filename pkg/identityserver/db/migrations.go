@@ -3,8 +3,6 @@
 package db
 
 import (
-	"fmt"
-
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db/migrations"
 )
@@ -25,15 +23,11 @@ func (db *DB) ensureSchema() error {
 }
 
 func (db *DB) currentState() (int, error) {
-	err := db.ensureSchema()
-	if err != nil {
-		return 0, err
-	}
 	var last struct {
 		Order     int
 		Direction migrations.Direction
 	}
-	err = db.SelectOne(
+	err := db.SelectOne(
 		&last,
 		`SELECT "order", direction
 			FROM migration_history
@@ -54,12 +48,8 @@ func (db *DB) currentState() (int, error) {
 }
 
 // logAppliedMigration adds a record in the database about an applied migration.
-func (db *DB) logAppliedMigration(order int, name string, direction migrations.Direction) error {
-	err := db.ensureSchema()
-	if err != nil {
-		return err
-	}
-	_, err = db.Exec(
+func (db *DB) logAppliedMigration(q QueryContext, order int, name string, direction migrations.Direction) error {
+	_, err := q.Exec(
 		`INSERT
 			INTO migration_history ("order", name, direction)
 			VALUES ($1, $2, $3)`,
@@ -71,6 +61,10 @@ func (db *DB) logAppliedMigration(order int, name string, direction migrations.D
 
 // Migrate migrates the database until reach the target migration.
 func (db *DB) Migrate(target int) error {
+	err := db.ensureSchema()
+	if err != nil {
+		return err
+	}
 	current, err := db.currentState()
 	if err != nil {
 		return err
@@ -93,20 +87,15 @@ func (db *DB) Migrate(target int) error {
 			return errors.Errorf("Migration with order `%d` does not exist", n)
 		}
 		next := migration.Forwards
-		back := migration.Backwards
 		if incr == -1 {
 			next = migration.Backwards
-			back = migration.Forwards
 		}
-		if _, err := db.Exec(next); err != nil {
-			return errors.NewWithCause(fmt.Sprintf("Failed to apply migration `%s` %s", migration.Name, direction), err)
-		}
-		defer func() {
-			if err != nil {
-				db.Exec(back)
+		err := db.Transact(func(tx *Tx) error {
+			if _, err := tx.Exec(next); err != nil {
+				return err
 			}
-		}()
-		err := db.logAppliedMigration(migration.Order, migration.Name, direction)
+			return db.logAppliedMigration(tx, migration.Order, migration.Name, direction)
+		})
 		if err != nil {
 			return err
 		}
