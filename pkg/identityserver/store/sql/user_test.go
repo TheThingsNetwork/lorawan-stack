@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
@@ -26,6 +27,34 @@ func testUsers() map[string]*ttnpb.User {
 			Email:          "bob@bob.com",
 		},
 	}
+}
+
+func TestUserTx(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore(t)
+
+	john := testUsers()["alice"]
+	john.UserID = "john"
+	john.Email = "john@john.com"
+
+	err := s.Transact(func(s store.Store) error {
+		if err := s.Users.Create(john); err != nil {
+			return err
+		}
+
+		john.Name = "PEPE"
+		if err := s.Users.Update(john); err != nil {
+			return err
+		}
+
+		return s.Users.Archive(john.UserID)
+	})
+	a.So(err, should.BeNil)
+
+	found, err := s.Users.GetByID(john.UserID)
+	a.So(err, should.BeNil)
+	john.ArchivedAt = found.GetUser().ArchivedAt
+	a.So(found, test.ShouldBeUserIgnoringAutoFields, john)
 }
 
 func TestUserCreate(t *testing.T) {

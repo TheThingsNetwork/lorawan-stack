@@ -18,7 +18,7 @@ import (
 
 // GatewayStore implements store.GatewayStore.
 type GatewayStore struct {
-	*Store
+	storer
 	*collaboratorStore
 	factory factory.GatewayFactory
 }
@@ -43,9 +43,9 @@ var ErrGatewayIDTaken = &errors.ErrDescriptor{
 	Type:          errors.AlreadyExists,
 }
 
-func NewGatewayStore(store *Store, factory factory.GatewayFactory) *GatewayStore {
+func NewGatewayStore(store storer, factory factory.GatewayFactory) *GatewayStore {
 	return &GatewayStore{
-		Store:             store,
+		storer:            store,
 		factory:           factory,
 		collaboratorStore: newCollaboratorStore(store, "gateway"),
 	}
@@ -53,7 +53,7 @@ func NewGatewayStore(store *Store, factory factory.GatewayFactory) *GatewayStore
 
 // Create creates a new gateway.
 func (s *GatewayStore) Create(gateway types.Gateway) error {
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		err := s.create(tx, gateway)
 		if err != nil {
 			return err
@@ -147,7 +147,7 @@ func (s *GatewayStore) addAntennasQuery(gtwID string, antennas []ttnpb.GatewayAn
 // GetByID finds a gateway by ID and retrieves it.
 func (s *GatewayStore) GetByID(gtwID string) (types.Gateway, error) {
 	result := s.factory.BuildGateway()
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		return s.getByID(tx, gtwID, result)
 	})
 	return result, err
@@ -190,7 +190,7 @@ func (s *GatewayStore) gateway(q db.QueryContext, gtwID string, result types.Gat
 // ListByUser returns all the gateways to which a given user is collaborator.
 func (s *GatewayStore) ListByUser(userID string) ([]types.Gateway, error) {
 	var gateways []types.Gateway
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		gtwIDs, err := s.userGateways(tx, userID)
 		if err != nil {
 			return err
@@ -230,7 +230,7 @@ func (s *GatewayStore) userGateways(q db.QueryContext, userID string) ([]string,
 
 // Update updates the gateway.
 func (s *GatewayStore) Update(gateway types.Gateway) error {
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		err := s.update(tx, gateway)
 		if err != nil {
 			return err
@@ -289,7 +289,7 @@ func (s *GatewayStore) updateAntennas(q db.QueryContext, gtwID string, antennas 
 
 // Archive disables a Gateway.
 func (s *GatewayStore) Archive(gtwID string) error {
-	return s.archive(s.db, gtwID)
+	return s.archive(s.queryer(), gtwID)
 }
 
 func (s *GatewayStore) archive(q db.QueryContext, gtwID string) error {
@@ -444,7 +444,7 @@ func (s *GatewayStore) listAntennas(q db.QueryContext, gtwID string) ([]ttnpb.Ga
 
 // LoadAttributes loads the gateways attributes into result if it is an Attributer.
 func (s *GatewayStore) LoadAttributes(gateway types.Gateway) error {
-	return s.db.Transact(func(tx *db.Tx) error {
+	return s.transact(func(tx *db.Tx) error {
 		return s.loadAttributes(tx, gateway.GetGateway().GatewayID, gateway)
 	})
 }
@@ -477,7 +477,7 @@ func (s *GatewayStore) loadAttributes(q db.QueryContext, gtwID string, gateway t
 
 // WriteAttributes writes the gateways attributes into result if it is an Attributer.
 func (s *GatewayStore) WriteAttributes(gateway types.Gateway, result types.Gateway) error {
-	return s.db.Transact(func(tx *db.Tx) error {
+	return s.transact(func(tx *db.Tx) error {
 		return s.writeAttributes(tx, gateway.GetGateway().GatewayID, gateway, result)
 	})
 }

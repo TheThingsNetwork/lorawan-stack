@@ -18,7 +18,7 @@ import (
 
 // ApplicationStore implements store.ApplicationStore.
 type ApplicationStore struct {
-	*Store
+	storer
 	*collaboratorStore
 	factory factory.ApplicationFactory
 }
@@ -53,9 +53,9 @@ var ErrApplicationAPIKeyNotFound = &errors.ErrDescriptor{
 	Type:          errors.NotFound,
 }
 
-func NewApplicationStore(store *Store, factory factory.ApplicationFactory) *ApplicationStore {
+func NewApplicationStore(store storer, factory factory.ApplicationFactory) *ApplicationStore {
 	return &ApplicationStore{
-		Store:             store,
+		storer:            store,
 		factory:           factory,
 		collaboratorStore: newCollaboratorStore(store, "application"),
 	}
@@ -63,7 +63,7 @@ func NewApplicationStore(store *Store, factory factory.ApplicationFactory) *Appl
 
 // Create creates a new application.
 func (s *ApplicationStore) Create(application types.Application) error {
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		return s.create(tx, application)
 	})
 	return err
@@ -93,7 +93,7 @@ func (s *ApplicationStore) create(q db.QueryContext, application types.Applicati
 // GetByID finds the application by ID and retrieves it.
 func (s *ApplicationStore) GetByID(appID string) (types.Application, error) {
 	result := s.factory.BuildApplication()
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		return s.getByID(tx, appID, result)
 	}, db.ReadOnly(true))
 	return result, err
@@ -132,7 +132,7 @@ func (s *ApplicationStore) application(q db.QueryContext, appID string, result t
 // FindByUser returns the Applications to which an User is a collaborator.
 func (s *ApplicationStore) ListByUser(userID string) ([]types.Application, error) {
 	var result []types.Application
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		appIDs, err := s.userApplications(tx, userID)
 		if err != nil {
 			return err
@@ -172,7 +172,7 @@ func (s *ApplicationStore) userApplications(q db.QueryContext, userID string) ([
 
 // Edit updates the Application and returns the updated Application.
 func (s *ApplicationStore) Update(application types.Application) error {
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		return s.update(tx, application)
 	})
 	return err
@@ -225,7 +225,7 @@ func (s *ApplicationStore) syncUpdatedAt(q db.QueryContext, appID string) error 
 
 // Archive disables the Application.
 func (s *ApplicationStore) Archive(appID string) error {
-	return s.archive(s.db, appID)
+	return s.archive(s.queryer(), appID)
 }
 
 func (s *ApplicationStore) archive(q db.QueryContext, appID string) error {
@@ -248,7 +248,7 @@ func (s *ApplicationStore) archive(q db.QueryContext, appID string) error {
 
 // AddAPIKey adds a new Application API key to a given Application.
 func (s *ApplicationStore) AddAPIKey(appID string, key ttnpb.APIKey) error {
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		err := s.addAPIKey(tx, appID, key)
 		if err != nil {
 			return err
@@ -333,7 +333,7 @@ func (s *ApplicationStore) listAPIKeys(q db.QueryContext, appID string) ([]ttnpb
 
 // RemoveAPIKey removes an Application API key from a given Application.
 func (s *ApplicationStore) RemoveAPIKey(appID string, keyName string) error {
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		err := s.removeAPIKey(tx, appID, keyName)
 		if err != nil {
 			return err
@@ -365,7 +365,7 @@ func (s *ApplicationStore) removeAPIKey(q db.QueryContext, appID string, keyName
 
 // LoadAttributes loads extra attributes into the Application.
 func (s *ApplicationStore) LoadAttributes(application types.Application) error {
-	return s.db.Transact(func(tx *db.Tx) error {
+	return s.transact(func(tx *db.Tx) error {
 		return s.loadAttributes(tx, application.GetApplication().ApplicationID, application)
 	})
 }
@@ -399,7 +399,7 @@ func (s *ApplicationStore) loadAttributes(q db.QueryContext, appID string, appli
 // WriteAttributes writes the extra attributes on the Application if it is an
 // Attributer to the store.
 func (s *ApplicationStore) WriteAttributes(application types.Application, result types.Application) error {
-	return s.db.Transact(func(tx *db.Tx) error {
+	return s.transact(func(tx *db.Tx) error {
 		return s.writeAttributes(tx, application, result)
 	})
 }

@@ -17,7 +17,7 @@ import (
 
 // ClientStore implements store.ClientStore.
 type ClientStore struct {
-	*Store
+	storer
 	*collaboratorStore
 	factory factory.ClientFactory
 }
@@ -42,9 +42,9 @@ var ErrClientIDTaken = &errors.ErrDescriptor{
 	Type:          errors.AlreadyExists,
 }
 
-func NewClientStore(store *Store, factory factory.ClientFactory) *ClientStore {
+func NewClientStore(store storer, factory factory.ClientFactory) *ClientStore {
 	return &ClientStore{
-		Store:             store,
+		storer:            store,
 		factory:           factory,
 		collaboratorStore: newCollaboratorStore(store, "client"),
 	}
@@ -52,7 +52,7 @@ func NewClientStore(store *Store, factory factory.ClientFactory) *ClientStore {
 
 // Create creates a client.
 func (s *ClientStore) Create(client types.Client) error {
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		return s.create(tx, client)
 	})
 	return err
@@ -84,7 +84,7 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 // GetByID finds a client by ID and retrieves it.
 func (s *ClientStore) GetByID(clientID string) (types.Client, error) {
 	result := s.factory.BuildClient()
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		return s.client(tx, clientID, result)
 	})
 	return result, err
@@ -106,7 +106,7 @@ func (s *ClientStore) client(q db.QueryContext, clientID string, result types.Cl
 // ListByUser finds all the clients an user is collaborator to.
 func (s *ClientStore) ListByUser(userID string) ([]types.Client, error) {
 	var result []types.Client
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		clientIDs, err := s.userClients(tx, userID)
 		if err != nil {
 			return err
@@ -144,7 +144,7 @@ func (s *ClientStore) userClients(q db.QueryContext, userID string) ([]string, e
 
 // Update updates the client.
 func (s *ClientStore) Update(client types.Client) error {
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		return s.update(tx, client)
 	})
 	return err
@@ -176,7 +176,7 @@ func (s *ClientStore) update(q db.QueryContext, client types.Client) error {
 
 // Archive sets the ArchivedAt field of a client to the current timestamp.
 func (s *ClientStore) Archive(clientID string) error {
-	return s.archive(s.db, clientID)
+	return s.archive(s.queryer(), clientID)
 }
 
 func (s *ClientStore) archive(q db.QueryContext, clientID string) error {
@@ -198,7 +198,7 @@ func (s *ClientStore) archive(q db.QueryContext, clientID string) error {
 }
 
 func (s *ClientStore) SetClientOfficial(clientID string, official bool) error {
-	return s.setClientOfficial(s.db, clientID, official)
+	return s.setClientOfficial(s.queryer(), clientID, official)
 }
 
 func (s *ClientStore) setClientOfficial(q db.QueryContext, clientID string, official bool) error {
@@ -222,7 +222,7 @@ func (s *ClientStore) setClientOfficial(q db.QueryContext, clientID string, offi
 
 // Reject marks a Client as rejected by the tenant admins, so it cannot be used anymore.
 func (s *ClientStore) SetClientState(clientID string, state ttnpb.ClientState) error {
-	return s.setClientState(s.db, clientID, state)
+	return s.setClientState(s.queryer(), clientID, state)
 }
 
 func (s *ClientStore) setClientState(q db.QueryContext, clientID string, state ttnpb.ClientState) error {
@@ -246,7 +246,7 @@ func (s *ClientStore) setClientState(q db.QueryContext, clientID string, state t
 
 // LoadAttributes loads the client attributes into result if it is an Attributer.
 func (s *ClientStore) LoadAttributes(client types.Client) error {
-	return s.db.Transact(func(tx *db.Tx) error {
+	return s.transact(func(tx *db.Tx) error {
 		return s.loadAttributes(tx, client)
 	})
 }
@@ -278,7 +278,7 @@ func (s *ClientStore) loadAttributes(q db.QueryContext, client types.Client) err
 
 // WriteAttributes writes the client attributes into result if it is an Attributer.
 func (s *ClientStore) WriteAttributes(client, result types.Client) error {
-	return s.db.Transact(func(tx *db.Tx) error {
+	return s.transact(func(tx *db.Tx) error {
 		return s.writeAttributes(tx, client, result)
 	})
 }

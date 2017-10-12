@@ -16,7 +16,7 @@ import (
 
 // UserStore implements store.UserStore.
 type UserStore struct {
-	*Store
+	storer
 	factory factory.UserFactory
 }
 
@@ -58,16 +58,16 @@ var ErrUserEmailTaken = &errors.ErrDescriptor{
 	Type:          errors.AlreadyExists,
 }
 
-func NewUserStore(store *Store, factory factory.UserFactory) *UserStore {
+func NewUserStore(store storer, factory factory.UserFactory) *UserStore {
 	return &UserStore{
-		Store:   store,
+		storer:  store,
 		factory: factory,
 	}
 }
 
 // Create creates an user.
 func (s *UserStore) Create(user types.User) error {
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		return s.create(tx, user)
 	})
 	return err
@@ -104,7 +104,7 @@ func (s *UserStore) create(q db.QueryContext, user types.User) error {
 // GetByID finds the user by ID and returns it.
 func (s *UserStore) GetByID(userID string) (types.User, error) {
 	result := s.factory.BuildUser()
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		return s.getByID(tx, userID, result)
 	})
 	return result, err
@@ -127,7 +127,7 @@ func (s *UserStore) getByID(q db.QueryContext, userID string, result types.User)
 // GetByEmail finds the user by email address and returns it.
 func (s *UserStore) GetByEmail(email string) (types.User, error) {
 	result := s.factory.BuildUser()
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		return s.getByEmail(tx, email, result)
 	})
 	return result, err
@@ -149,7 +149,7 @@ func (s *UserStore) getByEmail(q db.QueryContext, email string, result types.Use
 
 // Update updates an user.
 func (s *UserStore) Update(user types.User) error {
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		return s.update(tx, user)
 	})
 	return err
@@ -185,7 +185,7 @@ func (s *UserStore) update(q db.QueryContext, user types.User) error {
 
 // Archive sets the ArchivedAt field of an user to the current timestamp.
 func (s *UserStore) Archive(userID string) error {
-	return s.archive(s.db, userID)
+	return s.archive(s.queryer(), userID)
 }
 
 func (s *UserStore) archive(q db.QueryContext, userID string) error {
@@ -208,7 +208,7 @@ func (s *UserStore) archive(q db.QueryContext, userID string) error {
 
 // LoadAttributes loads all user attributes if the User is an Attributer.
 func (s *UserStore) LoadAttributes(id string, user types.User) error {
-	return s.db.Transact(func(tx *db.Tx) error {
+	return s.transact(func(tx *db.Tx) error {
 		return s.loadAttributes(tx, id, user)
 	})
 }
@@ -248,7 +248,7 @@ func (s *UserStore) loadAttributes(q db.QueryContext, id string, user types.User
 // WriteAttributes writes all of the user attributes if the User is an Attributer
 // and returns the written User in result.
 func (s *UserStore) WriteAttributes(user types.User, result types.User) error {
-	return s.db.Transact(func(tx *db.Tx) error {
+	return s.transact(func(tx *db.Tx) error {
 		return s.writeAttributes(tx, user.GetUser().UserID, user, result)
 	})
 }

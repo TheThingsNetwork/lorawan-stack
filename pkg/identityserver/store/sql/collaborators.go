@@ -13,15 +13,15 @@ import (
 // collaboratorStore is a store that holds the logic to manage collaborators of
 // an entity. This store is inteded to be reusable among other stores.
 type collaboratorStore struct {
-	*Store
+	storer
 	table      string
 	foreignKey string
 }
 
 // newCollaboratorStore creates a collaboratorStore.
-func newCollaboratorStore(store *Store, entity string) *collaboratorStore {
+func newCollaboratorStore(store storer, entity string) *collaboratorStore {
 	return &collaboratorStore{
-		Store:      store,
+		storer:     store,
 		table:      fmt.Sprintf("%ss_collaborators", entity),
 		foreignKey: fmt.Sprintf("%s_id", entity),
 	}
@@ -31,10 +31,10 @@ func newCollaboratorStore(store *Store, entity string) *collaboratorStore {
 // If the provided list of rights is empty the collaborator will be unset.
 func (s *collaboratorStore) SetCollaborator(entityID string, collaborator ttnpb.Collaborator) error {
 	if len(collaborator.Rights) == 0 {
-		return s.unsetCollaborator(s.db, entityID, collaborator.UserID)
+		return s.unsetCollaborator(s.queryer(), entityID, collaborator.UserID)
 	}
 
-	err := s.db.Transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		return s.setCollaborator(tx, entityID, collaborator)
 	})
 	return err
@@ -116,7 +116,7 @@ func (s *collaboratorStore) addRightsQuery(entityID, userID string, rights []ttn
 
 // ListCollaborators retrieves all the collaborators from an entity.
 func (s *collaboratorStore) ListCollaborators(entityID string) ([]ttnpb.Collaborator, error) {
-	return s.listCollaborators(s.db, entityID)
+	return s.listCollaborators(s.queryer(), entityID)
 }
 
 func (s *collaboratorStore) listCollaborators(q db.QueryContext, entityID string) ([]ttnpb.Collaborator, error) {
@@ -159,7 +159,7 @@ func (s *collaboratorStore) listCollaborators(q db.QueryContext, entityID string
 
 // ListUserRights returns the rights a given user has for an entity.
 func (s *collaboratorStore) ListUserRights(entityID string, userID string) ([]ttnpb.Right, error) {
-	return s.listUserRights(s.db, entityID, userID)
+	return s.listUserRights(s.queryer(), entityID, userID)
 }
 
 func (s *collaboratorStore) listUserRights(q db.QueryContext, entityID string, userID string) ([]ttnpb.Right, error) {
