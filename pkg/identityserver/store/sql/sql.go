@@ -5,16 +5,22 @@ package sql
 import (
 	"context"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
 )
 
+// storer is the interface all stores have to adhere to.
 type storer interface {
+	// queryer returns the storers query context.
 	queryer() db.QueryContext
+
+	// transact starts a new transaction in the storer.
 	transact(fn func(*db.Tx) error, opts ...db.TxOption) error
+
+	// store returns the underlying store.
+	store() *store.Store
 }
 
 // Store is a SQL data store.
@@ -23,7 +29,7 @@ type Store struct {
 	store.Store
 }
 
-// Open openes a new database connection and attachs it to a new store.
+// Open opens a new database connection and attachs it to a new store.
 func Open(dsn string) (*Store, error) {
 	db, err := db.Open(context.Background(), dsn, migrations.Registry)
 	if err != nil {
@@ -38,7 +44,8 @@ func FromDB(db *db.DB) *Store {
 	s := &Store{
 		db: db,
 	}
-	s.initSubStores()
+
+	initSubStores(s, nil)
 	return s
 }
 
@@ -51,7 +58,7 @@ func (s *Store) WithContext(context context.Context) *Store {
 		db: s.db.WithContext(context),
 	}
 
-	s.initSubStores()
+	initSubStores(store, s)
 
 	return store
 }
@@ -63,7 +70,8 @@ func (s *Store) Transact(fn func(store.Store) error) error {
 		store := &txStore{
 			tx: tx,
 		}
-		store.initSubStores()
+
+		initSubStores(store, s)
 
 		return fn(store.Store)
 	})
@@ -74,43 +82,55 @@ func (s *Store) Close() error {
 	return s.db.Close()
 }
 
+// queryer returns the global database context.
 func (s *Store) queryer() db.QueryContext {
 	return s.db
 }
 
+// transact starts a new transaction.
 func (s *Store) transact(fn func(*db.Tx) error, opts ...db.TxOption) error {
 	return s.db.Transact(fn, opts...)
 }
 
-func (s *Store) initSubStores() {
-	s.Users = NewUserStore(s, factory.DefaultUser{})
-	s.Applications = NewApplicationStore(s, factory.DefaultApplication{})
-	s.Gateways = NewGatewayStore(s, factory.DefaultGateway{})
-	s.Clients = NewClientStore(s, factory.DefaultClient{})
+// store returns the store.Store.
+func (s *Store) store() *store.Store {
+	return &s.Store
 }
 
-// txStore is a store that holds a transaction that is being executed.
+// txStore is a store that keeps a transaction that is being executed.
 type txStore struct {
 	tx *db.Tx
 	store.Store
 }
 
-// Transact returns error as a transaction is being executed already.
-func (s *txStore) Transact(fn func(store.Store) error) error {
-	return errors.New("Failed to execute transaction. There is already a transaction in progress.")
-}
-
+// queryer returns the transaction that is already happening.
 func (s *txStore) queryer() db.QueryContext {
 	return s.tx
 }
 
+// transact works in the same transaction that is already happening.
 func (s *txStore) transact(fn func(*db.Tx) error, opts ...db.TxOption) error {
 	return fn(s.tx)
 }
 
-func (s *txStore) initSubStores() {
-	s.Users = NewUserStore(s, factory.DefaultUser{})
-	s.Applications = NewApplicationStore(s, factory.DefaultApplication{})
-	s.Gateways = NewGatewayStore(s, factory.DefaultGateway{})
-	s.Clients = NewClientStore(s, factory.DefaultClient{})
+// store returns the store.Store.
+func (s *txStore) store() *store.Store {
+	return &s.Store
+}
+
+// initSubStores initializes the sub stores of the store.
+func initSubStores(s storer, previous *Store) {
+	store := s.store()
+	if previous == nil {
+		store.Users = NewUserStore(s, factory.DefaultUser{})
+		store.Applications = NewApplicationStore(s, factory.DefaultApplication{})
+		store.Gateways = NewGatewayStore(s, factory.DefaultGateway{})
+		store.Clients = NewClientStore(s, factory.DefaultClient{})
+		return
+	}
+
+	store.Users = NewUserStore(s, previous.Users.(*UserStore).factory)
+	store.Applications = NewApplicationStore(s, previous.Applications.(*ApplicationStore).factory)
+	store.Gateways = NewGatewayStore(s, previous.Gateways.(*GatewayStore).factory)
+	store.Clients = NewClientStore(s, previous.Clients.(*ClientStore).factory)
 }
