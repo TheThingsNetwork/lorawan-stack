@@ -20,7 +20,7 @@ func init() {
 // underscore before non preceding uppercase characters.
 //
 // Examples:
-//    CallbackURI -> callback_uri
+//    RedirectURI -> redirect_uri
 //    ArchivedAt  -> archived_at
 //    UserID      -> user_id
 func nameMapper(fieldName string) string {

@@ -14,7 +14,7 @@ func (c *Client) GetId() string {
 
 // GetRedirectUri implements osin.Client.
 func (c *Client) GetRedirectUri() string {
-	return c.CallbackURI
+	return c.RedirectURI
 }
 
 // GetUserData implements osin.Client.

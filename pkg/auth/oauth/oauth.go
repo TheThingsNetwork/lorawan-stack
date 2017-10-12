@@ -3,8 +3,10 @@
 package oauth
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/RangelReale/osin"
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
@@ -142,11 +144,10 @@ func (s *Server) authorizationHandler(c echo.Context) error {
 	_ = scope
 
 	// TODO: check if scope contains rights client does not have
-	// left := Subtract(scope, client.GetClient().Rights)
-	// if len(left) > 0 {
-	// 	return fmt.Errorf("Client does not have access to rights: %s", strings.Join(left, ", "))
-	// }
-	// TODO: set the scope to the client scope
+	left := Subtract(scope, client.GetClient().Rights)
+	if len(left) > 0 {
+		return fmt.Errorf("Client does not have access to rights: %s", strings.Join(left, ", "))
+	}
 
 	// make sure the user is logged in or redirect
 	username, err := s.authorizer.CheckLogin(c)

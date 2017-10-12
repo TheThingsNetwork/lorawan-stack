@@ -336,8 +336,8 @@ message CreateClientRequest {
   // secret is the secret used to prove the client identity.
   string secret = 3;
 
-  // callback_uri is the callback URI of the client.
-  string callback_uri = 4 [(gogoproto.customname) = "CallbackURI"];
+  // redirect_uri is the OAuth 2 redirect URI of the client.
+  string redirect_uri = 4 [(gogoproto.customname) = "RedirectURI"];
 
   // reserved fields in order to make the message binary compatible with Client.
   reserved 5,6;
@@ -366,8 +366,8 @@ message UpdateClientRequest {
   // secret is the secret used to prove the client identity.
   string secret = 3;
 
-  // callback_uri is the callback URI of the client.
-  string callback_uri = 4 [(gogoproto.customname) = "CallbackURI"];
+  // redirect_uri is the callback URI of the client.
+  string redirect_uri = 4 [(gogoproto.customname) = "RedirectURI"];
 
   // reserved fields in order to make the message binary compatible with Client.
   reserved 5,6;

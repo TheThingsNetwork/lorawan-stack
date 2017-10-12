@@ -156,7 +156,7 @@ func (s *ClientStore) update(q db.QueryContext, client types.Client) error {
 
 	_, err := q.NamedExec(
 		`UPDATE clients
-			SET description = :description, secret = :secret, callback_uri = :callback_uri,
+			SET description = :description, secret = :secret, redirect_uri = :redirect_uri,
 			grants = :grants, rights = :rights, updated_at = :updated_at
 			WHERE client_id = :client_id`,
 		cli)

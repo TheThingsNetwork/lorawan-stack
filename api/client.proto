@@ -23,8 +23,8 @@ message Client {
   // secret is the secret used to prove the client identity.
   string secret = 3;
 
-  // callback_uri is the callback URI of the client.
-  string callback_uri = 4 [(gogoproto.customname) = "CallbackURI"];
+  // redirect_uri is the OAuth redirect URI of the client.
+  string redirect_uri = 4 [(gogoproto.customname) = "RedirectURI"];
 
   // state denotes the reviewing state of the client by the tenant admin.
   ClientState state = 5;

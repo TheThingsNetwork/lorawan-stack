@@ -8,7 +8,7 @@ func init() {
 			client_id          STRING(36) PRIMARY KEY,
 			description        TEXT,
 			secret             STRING NOT NULL,
-			callback_uri       STRING NOT NULL,
+			redirect_uri       STRING NOT NULL,
 			state	           INT NOT NULL DEFAULT 0,
 			official_labeled   BOOL DEFAULT false,
 			grants             TEXT,
