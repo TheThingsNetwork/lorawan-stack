@@ -87,10 +87,12 @@ go.dev-deps:
 	@command -v dep  >/dev/null || { $(log) "Installing dep" && $(GO) get -u github.com/golang/dep/cmd/dep; }
 	@command -v golint >/dev/null || { $(log) "Installing golint" && $(GO) get -u github.com/golang/lint/golint; }
 
+DEP_FLAGS ?= $(if $(CI),-vendor-only,)
+
 # install dependencies
 go.deps:
 	@$(log) "Installing go dependencies"
-	@dep ensure -v
+	@dep ensure -v $(DEP_FLAGS)
 
 # install packages for faster rebuilds
 go.install:
