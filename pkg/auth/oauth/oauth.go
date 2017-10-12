@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/RangelReale/osin"
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/web"
 	"github.com/labstack/echo"
 )
@@ -103,11 +103,11 @@ func (s *Server) tokenHandler(c echo.Context) error {
 
 	switch ar.Type {
 	case osin.AUTHORIZATION_CODE:
-		ar.Authorized = client != nil && client.Grants.AuthorizationCode
+		ar.Authorized = client != nil && client.HasGrant(ttnpb.GRANT_AUTHORIZATION_CODE)
 	case osin.REFRESH_TOKEN:
-		ar.Authorized = client != nil && client.Grants.RefreshToken
+		ar.Authorized = client != nil && client.HasGrant(ttnpb.GRANT_REFRESH_TOKEN)
 	case osin.PASSWORD:
-		ar.Authorized = client != nil && client.Grants.Password
+		ar.Authorized = client != nil && client.HasGrant(ttnpb.GRANT_PASSWORD)
 	case osin.CLIENT_CREDENTIALS, osin.ASSERTION, osin.IMPLICIT:
 		// not supported
 		ar.Authorized = false
@@ -130,7 +130,7 @@ func (s *Server) authorizationHandler(c echo.Context) error {
 	client := ar.Client.(types.Client)
 
 	// make sure client supports authorization code
-	if !client.GetClient().Grants.AuthorizationCode {
+	if !client.GetClient().HasGrant(ttnpb.GRANT_AUTHORIZATION_CODE) {
 		resp.SetError(osin.E_INVALID_CLIENT, "")
 		s.oauth.FinishAuthorizeRequest(resp, req, ar)
 		return output(c, resp)
@@ -141,12 +141,10 @@ func (s *Server) authorizationHandler(c echo.Context) error {
 		return err
 	}
 
-	_ = scope
-
-	// TODO: check if scope contains rights client does not have
-	left := Subtract(scope, client.GetClient().Rights)
-	if len(left) > 0 {
-		return fmt.Errorf("Client does not have access to rights: %s", strings.Join(left, ", "))
+	// check if scope contains rights client does not have
+	leftover := Subtract(scope, client.GetClient().Rights)
+	if len(leftover) > 0 {
+		return fmt.Errorf("Client does not have access to rights: %s", leftover)
 	}
 
 	// make sure the user is logged in or redirect

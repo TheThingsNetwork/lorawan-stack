@@ -9,7 +9,7 @@ import (
 	"github.com/RangelReale/osin"
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 type storage struct {
@@ -31,12 +31,12 @@ func (s *storage) Close() {}
 
 // GetClient loads the OAuth Client by client_id.
 func (s *storage) GetClient(clientID string) (osin.Client, error) {
-	client, err := s.store.FindByID(clientID)
+	client, err := s.store.GetByID(clientID)
 	if err != nil {
 		return nil, err
 	}
 
-	if client.GetClient().State != types.ApprovedClient {
+	if client.GetClient().State != ttnpb.STATE_APPROVED {
 		return nil, nil
 	}
 
@@ -118,7 +118,7 @@ func (s *storage) LoadAccess(accessToken string) (*osin.AccessData, error) {
 		return nil, err
 	}
 
-	client, err := s.store.FindByID(claims.Client)
+	client, err := s.store.GetByID(claims.Client)
 	if err != nil {
 		return nil, err
 	}

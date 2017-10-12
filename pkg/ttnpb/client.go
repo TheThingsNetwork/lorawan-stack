@@ -21,3 +21,13 @@ func (c *Client) GetRedirectUri() string {
 func (c *Client) GetUserData() interface{} {
 	return nil
 }
+
+func (c *Client) HasGrant(grant GrantType) bool {
+	for _, g := range c.Grants {
+		if g == grant {
+			return true
+		}
+	}
+
+	return false
+}

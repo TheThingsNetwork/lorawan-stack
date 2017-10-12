@@ -34,13 +34,17 @@ var (
 	address  = "postgres://root@localhost:26257/%s?sslmode=disable"
 	database = "is_tests"
 	issuer   = "issuer.test.local"
-	client   = &types.DefaultClient{
-		ID:     "foo",
-		URI:    "http://example.com/oauth/callback",
-		Secret: "secret",
-		Grants: types.Grants{
-			AuthorizationCode: true,
-			RefreshToken:      true,
+	username = "john-doe"
+	client   = &ttnpb.Client{
+		ClientIdentifier: ttnpb.ClientIdentifier{ClientID: "foo"},
+		RedirectURI:      "http://example.com/oauth/callback",
+		Secret:           "secret",
+		Grants: []ttnpb.GrantType{
+			ttnpb.GRANT_AUTHORIZATION_CODE,
+			ttnpb.GRANT_REFRESH_TOKEN,
+		},
+		Rights: []ttnpb.Right{
+			ttnpb.RIGHT_USER_PROFILE_READ,
 		},
 	}
 	authorizer = &TestAuthorizer{
@@ -99,10 +103,10 @@ func testServer(t *testing.T) (*web.Server, *auth.Keys) {
 
 	store := cleanStore(t, database)
 
-	_, err = store.Clients.Register(client)
+	err = store.Clients.Create(client)
 	a.So(err, should.BeNil)
 
-	err = store.Clients.Approve(client.ID)
+	err = store.Clients.SetClientState(client.ClientID, ttnpb.STATE_APPROVED)
 	a.So(err, should.BeNil)
 
 	server := New(issuer, keys, store.OAuth, authorizer)
@@ -113,15 +117,16 @@ func testServer(t *testing.T) (*web.Server, *auth.Keys) {
 	return mux, keys
 }
 
-func TestAuthorizationFlow(t *testing.T) {
+func TestAuthorizationFlowJSON(t *testing.T) {
 	a := assertions.New(t)
 	server, keys := testServer(t)
 
 	state := "state"
-
-	uri := fmt.Sprintf("https://%s/oauth/authorize?client_id=%s&redirect_uri=%s&response_type=code&state=%s&scope=%s", issuer, client.ID, client.URI, state, Scope([]ttnpb.Right{
+	rights := []ttnpb.Right{
 		ttnpb.RIGHT_USER_PROFILE_READ,
-	}))
+	}
+
+	uri := fmt.Sprintf("https://%s/oauth/authorize?client_id=%s&redirect_uri=%s&response_type=code&state=%s&scope=%s", issuer, client.ClientID, client.RedirectURI, state, Scope(rights))
 
 	var code string
 
@@ -156,11 +161,79 @@ func TestAuthorizationFlow(t *testing.T) {
 
 		u, err := url.Parse(loc)
 		a.So(err, should.BeNil)
-		a.So(u.Query().Get("code"), should.NotBeEmpty)
+		code = u.Query().Get("code")
+		a.So(code, should.NotBeEmpty)
 		a.So(u.Query().Get("state"), should.Equal, state)
+
 	}
 
-	// authorize client (html form)
+	// exchange code
+	{
+		uri = "https://" + issuer + "/oauth/token"
+		req := httptest.NewRequest("POST", uri, strings.NewReader(fmt.Sprintf(`{"code":"%s", "grant_type": "authorization_code", "redirect_uri": "%s"}`, code, client.RedirectURI)))
+		req.Header.Set("Content-Type", "application/json")
+
+		req.SetBasicAuth(client.ClientID, client.Secret)
+
+		_ = code
+		w := httptest.NewRecorder()
+
+		server.ServeHTTP(w, req)
+		resp := w.Result()
+
+		a.So(resp.StatusCode, should.Equal, http.StatusOK)
+
+		body, err := ioutil.ReadAll(resp.Body)
+		a.So(err, should.BeNil)
+
+		tok := &oauth2.Token{}
+		err = json.Unmarshal(body, tok)
+		a.So(err, should.BeNil)
+
+		a.So(tok.AccessToken, should.NotBeEmpty)
+		a.So(tok.TokenType, should.Equal, "bearer")
+
+		claims, err := auth.FromToken(keys, tok.AccessToken)
+		a.So(err, should.BeNil)
+
+		a.So(claims.Rights, should.Resemble, rights)
+		a.So(claims.Client, should.Resemble, client.ClientID)
+		a.So(claims.Issuer, should.Resemble, issuer)
+		a.So(claims.Subject, should.Resemble, "user:"+username)
+		a.So(claims.Username(), should.Resemble, username)
+	}
+}
+
+func TestAuthorizationFlowForm(t *testing.T) {
+	a := assertions.New(t)
+	server, keys := testServer(t)
+
+	state := "state"
+	rights := []ttnpb.Right{
+		ttnpb.RIGHT_USER_PROFILE_READ,
+	}
+
+	uri := fmt.Sprintf("https://%s/oauth/authorize?client_id=%s&redirect_uri=%s&response_type=code&state=%s&scope=%s", issuer, client.ClientID, client.RedirectURI, state, Scope(rights))
+
+	var code string
+
+	// get authorization page
+	{
+		req := httptest.NewRequest("GET", uri, nil)
+		w := httptest.NewRecorder()
+
+		server.ServeHTTP(w, req)
+		resp := w.Result()
+
+		body, err := ioutil.ReadAll(resp.Body)
+		a.So(err, should.BeNil)
+
+		a.So(resp.StatusCode, should.Equal, http.StatusOK)
+		a.So(string(body), should.Resemble, authorizer.Body)
+		a.So(resp.Header.Get("Location"), should.BeEmpty)
+	}
+
+	// authorize client
 	{
 		req := httptest.NewRequest("POST", uri, strings.NewReader(`authorize=true`))
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -184,13 +257,10 @@ func TestAuthorizationFlow(t *testing.T) {
 	// exchange code
 	{
 		uri = "https://" + issuer + "/oauth/token"
-		// req := httptest.NewRequest("POST", uri, strings.NewReader(fmt.Sprintf("code=%s&grant_type=authorization_code&redirect_uri=%s", code, client.URI)))
-		// req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		req := httptest.NewRequest("POST", uri, strings.NewReader(fmt.Sprintf("code=%s&grant_type=authorization_code&redirect_uri=%s", code, client.RedirectURI)))
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-		req := httptest.NewRequest("POST", uri, strings.NewReader(fmt.Sprintf(`{"code":"%s", "grant_type": "authorization_code", "redirect_uri": "%s"}`, code, client.URI)))
-		req.Header.Set("Content-Type", "application/json")
-
-		req.SetBasicAuth(client.ID, client.Secret)
+		req.SetBasicAuth(client.ClientID, client.Secret)
 
 		_ = code
 		w := httptest.NewRecorder()
@@ -213,7 +283,11 @@ func TestAuthorizationFlow(t *testing.T) {
 		claims, err := auth.FromToken(keys, tok.AccessToken)
 		a.So(err, should.BeNil)
 
-		fmt.Println(claims)
+		a.So(claims.Rights, should.Resemble, rights)
+		a.So(claims.Client, should.Resemble, client.ClientID)
+		a.So(claims.Issuer, should.Resemble, issuer)
+		a.So(claims.Subject, should.Resemble, "user:"+username)
+		a.So(claims.Username(), should.Resemble, username)
 	}
 }
 
@@ -222,7 +296,7 @@ type TestAuthorizer struct {
 }
 
 func (a *TestAuthorizer) CheckLogin(c echo.Context) (string, error) {
-	return "john-doe", nil
+	return username, nil
 }
 
 type authBody struct {
