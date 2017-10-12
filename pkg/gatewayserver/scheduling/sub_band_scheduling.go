@@ -67,8 +67,8 @@ func (s *subBandScheduling) addScheduling(w packetWindow) {
 // Schedule adds the requested time window to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns ErrScheduleFull. If another error prevents scheduling, it is returned.
 func (s *subBandScheduling) Schedule(w Window, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) error {
 	s.mu.Lock()
+	defer s.mu.Unlock()
 	err := s.schedule(w, timeOffAir)
-	s.mu.Unlock()
 	return err
 }
 
