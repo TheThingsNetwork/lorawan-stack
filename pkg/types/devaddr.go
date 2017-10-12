@@ -4,14 +4,22 @@ package types
 
 import (
 	"database/sql/driver"
+	"encoding/binary"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"math"
 	"strings"
 )
 
 // DevAddr is a 32-bit LoRaWAN device address
 type DevAddr [4]byte
+
+// MinDevAddr is the lowest value possible for a DevAddr
+var MinDevAddr = DevAddr{0x00, 0x00, 0x00, 0x00}
+
+// MaxDevAddr is the highest value possible for a DevAddr
+var MaxDevAddr = DevAddr{0xFF, 0xFF, 0xFF, 0xFF}
 
 // IsZero returns true iff the type is zero
 func (addr DevAddr) IsZero() bool { return addr == [4]byte{} }
@@ -78,6 +86,43 @@ func (addr *DevAddr) Scan(src interface{}) error {
 	return addr.UnmarshalText(data)
 }
 
+// MarshalNumber returns the DevAddr in a decimal form
+func (addr DevAddr) MarshalNumber() uint32 {
+	return binary.BigEndian.Uint32(addr[:])
+}
+
+// UnmarshalNumber retrieves a DevAddr from a decimal form
+func (addr *DevAddr) UnmarshalNumber(n uint32) {
+	*addr = [4]byte{}
+	binary.BigEndian.PutUint32(addr[:], n)
+}
+
+// Before returns true if the DevAddr is strictly inferior to the DevAddr passed as an argument
+func (addr DevAddr) Before(a DevAddr) bool {
+	if addr.MarshalNumber() < a.MarshalNumber() {
+		return true
+	}
+	return false
+}
+
+// After returns true if the DevAddr is strictly superior to the DevAddr passed as an argument
+func (addr DevAddr) After(a DevAddr) bool {
+	if addr.MarshalNumber() > a.MarshalNumber() {
+		return true
+	}
+	return false
+}
+
+// BeforeOrEqual returns true if the DevAddr is inferior or equal to the DevAddr passed as an argument
+func (addr DevAddr) BeforeOrEqual(a DevAddr) bool {
+	return addr.Before(a) || addr == a
+}
+
+// AfterOrEqual returns true if the DevAddr is superior or equal to the DevAddr passed as an argument
+func (addr DevAddr) AfterOrEqual(a DevAddr) bool {
+	return addr.After(a) || addr == a
+}
+
 // ErrInvalidPrefix can be returned when unmarshaling an invalid slice into a prefix
 var ErrInvalidPrefix = errors.New("invalid device address prefix")
 
@@ -85,6 +130,35 @@ var ErrInvalidPrefix = errors.New("invalid device address prefix")
 type DevAddrPrefix struct {
 	DevAddr DevAddr
 	Length  uint8
+}
+
+// NbItems returns the number of items that this prefix encapsulates
+func (prefix DevAddrPrefix) NbItems() uint64 {
+	return uint64(math.Pow(2, float64(32-prefix.Length)))
+}
+
+// FirstDevAddrCovered returns the first DevAddr covered, in the numeric order
+func (prefix DevAddrPrefix) FirstDevAddrCovered() DevAddr {
+	return prefix.DevAddr.Mask(prefix.Length)
+}
+
+func (prefix DevAddrPrefix) firstNumericDevAddrCovered() uint32 {
+	return prefix.FirstDevAddrCovered().MarshalNumber()
+}
+
+func (prefix DevAddrPrefix) lastNumericDevAddrCovered() uint32 {
+	return prefix.firstNumericDevAddrCovered() + uint32(prefix.NbItems()-1)
+}
+
+// LastDevAddrCovered returns the last DevAddr covered, in the numeric order
+func (prefix DevAddrPrefix) LastDevAddrCovered() DevAddr {
+	result := DevAddr{}
+
+	lastDevAddrNumeric := prefix.lastNumericDevAddrCovered()
+	hex := fmt.Sprintf("%08X", lastDevAddrNumeric)
+	result.UnmarshalText([]byte(hex))
+
+	return result
 }
 
 // IsZero returns true iff the type is zero
@@ -182,7 +256,7 @@ func (prefix *DevAddrPrefix) UnmarshalText(data []byte) error {
 		*prefix = DevAddrPrefix{}
 		return nil
 	}
-	if len(data) != 10 {
+	if len(data) != 10 && len(data) != 11 {
 		return ErrInvalidLength
 	}
 	if data[8] != '/' {
@@ -192,7 +266,11 @@ func (prefix *DevAddrPrefix) UnmarshalText(data []byte) error {
 		return err
 	}
 	// transform length from number character range
-	prefix.Length = data[9] - '0'
+	if len(data) == 10 {
+		prefix.Length = data[9] - '0'
+	} else {
+		prefix.Length = (data[9]-'0')*10 + (data[10] - '0')
+	}
 	return nil
 }
 
