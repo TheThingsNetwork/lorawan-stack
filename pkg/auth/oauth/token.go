@@ -11,6 +11,7 @@ import (
 	"github.com/labstack/gommon/random"
 )
 
+// GenerateAccessToken generates the JWT access token based on the access token request.
 func (s *Server) GenerateAccessToken(data *osin.AccessData, generateRefresh bool) (string, string, error) {
 	_, key, err := s.keys.GetCurrentPrivateKey()
 	if err != nil {

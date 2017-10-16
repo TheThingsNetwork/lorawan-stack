@@ -17,6 +17,7 @@ type storage struct {
 	store store.OAuthStore
 }
 
+// UserData is the userdata that gets carried around with authorization requests.
 type UserData struct {
 	Username string
 }

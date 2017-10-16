@@ -5,11 +5,20 @@ package auth
 import "strings"
 
 const (
-	UserPrefix        = "user"
+	// UserPrefix is the prefix used in subjects for a user.
+	UserPrefix = "user"
+
+	// ApplicationPrefix is the prefix used in subjects for an application.
 	ApplicationPrefix = "application"
-	GatewayPrefix     = "gateway"
-	ClientPrefix      = "client"
-	sep               = ":"
+
+	// GatewayPrefix is the prefix used in subjects for a gateway.
+	GatewayPrefix = "gateway"
+
+	// ClientPrefix is the prefix used in subjects for a client.
+	ClientPrefix = "client"
+
+	// sep is the separator between the prefix and the id of the subject.
+	sep = ":"
 )
 
 func splitprefix(prefix, sub string) string {
@@ -21,18 +30,22 @@ func splitprefix(prefix, sub string) string {
 	return ""
 }
 
+// UserSubject returns a JWT subject for the user with the specified username.
 func UserSubject(username string) string {
 	return UserPrefix + sep + username
 }
 
+// ApplicationSubject returns a JWT subject for the application with the specified application ID.
 func ApplicationSubject(appID string) string {
 	return ApplicationPrefix + sep + appID
 }
 
+// GatewaySubject returns a JWT subject for the gateway with the specified gateway ID.
 func GatewaySubject(gwID string) string {
 	return ApplicationPrefix + sep + gwID
 }
 
+// ClientSubject returns a JWT subject for the OAuth client with the specified client ID.
 func ClientSubject(clientID string) string {
 	return ApplicationPrefix + sep + clientID
 }

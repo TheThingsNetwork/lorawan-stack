@@ -26,6 +26,8 @@ func ParseScope(scope string) ([]ttnpb.Right, error) {
 	return res, nil
 }
 
+// Scope takes a list of rights and returns a string representing the
+// scope that contains those rights.
 func Scope(rights []ttnpb.Right) string {
 	res := ""
 	for _, right := range rights {

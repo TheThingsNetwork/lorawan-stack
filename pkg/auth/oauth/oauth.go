@@ -72,7 +72,7 @@ func (s *Server) Register(server *web.Server) {
 type tokenRequest struct {
 	GrantType   string `json:"grant_type" form:"grant_type"`
 	Code        string `json:"code" form:"code"`
-	RedirectUri string `json:"redirect_uri" form:"redirect_uri"`
+	RedirectURI string `json:"redirect_uri" form:"redirect_uri"`
 }
 
 func (s *Server) tokenHandler(c echo.Context) error {
@@ -92,7 +92,7 @@ func (s *Server) tokenHandler(c echo.Context) error {
 
 	req.Form.Set("grant_type", tr.GrantType)
 	req.Form.Set("code", tr.Code)
-	req.Form.Set("redirect_uri", tr.RedirectUri)
+	req.Form.Set("redirect_uri", tr.RedirectURI)
 
 	ar := s.oauth.HandleAccessRequest(resp, req)
 	if ar == nil {
