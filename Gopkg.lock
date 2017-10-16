@@ -21,6 +21,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/RangelReale/osin"
+  packages = ["."]
+  revision = "829186e6c125f77df6d6ae0162a9ba59fad91e2d"
+
+[[projects]]
+  branch = "master"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
   revision = "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9"
@@ -36,6 +42,12 @@
   name = "github.com/cockroachdb/cockroach-go"
   packages = ["crdb"]
   revision = "c806b484b8611fc587b6abc07f8bb0f7824a78d6"
+
+[[projects]]
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  revision = "d2709f9f1f31ebcda9651b03077758c1f3a0018c"
+  version = "v3.0.0"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -153,7 +165,7 @@
 
 [[projects]]
   name = "github.com/labstack/gommon"
-  packages = ["color","log"]
+  packages = ["color","log","random"]
   revision = "779b8a8b9850a97acba6a3fe20feb628c39e17c1"
   version = "0.2.2"
 
@@ -205,6 +217,12 @@
   packages = ["."]
   revision = "d311cb43c92434ec4072dfbbda3400741d0a6337"
   version = "v0.3.0"
+
+[[projects]]
+  name = "github.com/pborman/uuid"
+  packages = ["."]
+  revision = "e790cca94e6cc75c7064b1332e63811d4aae1a53"
+  version = "v1.1"
 
 [[projects]]
   name = "github.com/pelletier/go-buffruneio"
@@ -305,7 +323,7 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["acme","acme/autocert"]
+  packages = ["acme","acme/autocert","pbkdf2"]
   revision = "81e90905daefcd6fd217b62423c0908922eadb30"
 
 [[projects]]
@@ -313,6 +331,12 @@
   name = "golang.org/x/net"
   packages = ["context","context/ctxhttp","http2","http2/hpack","idna","internal/timeseries","lex/httplex","trace"]
   revision = "1c05540f6879653db88113bc4a2b70aec4bd491f"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/oauth2"
+  packages = [".","internal"]
+  revision = "bb50c06baba3d0c76f9d125c0719093e315b5b44"
 
 [[projects]]
   branch = "master"
@@ -325,6 +349,12 @@
   name = "golang.org/x/text"
   packages = ["internal/gen","internal/triegen","internal/ucd","secure/bidirule","transform","unicode/bidi","unicode/cldr","unicode/norm","unicode/rangetable","width"]
   revision = "f494f8223b00d59fdaf1f267755151a4e9070954"
+
+[[projects]]
+  name = "google.golang.org/appengine"
+  packages = ["internal","internal/base","internal/datastore","internal/log","internal/remote_api","internal/urlfetch","urlfetch"]
+  revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -359,6 +389,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d791d6031d2af85519df56836313f319f5e44676e37cad1f65c897a49c41b853"
+  inputs-digest = "d226dcefcc5bada3f0498bba0daf2dfcb22615fab7aba8c168ec33a240c7dd1f"
   solver-name = "gps-cdcl"
   solver-version = 1
