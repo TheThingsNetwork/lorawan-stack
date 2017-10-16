@@ -15,6 +15,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
@@ -288,6 +289,10 @@ func TestAuthorizationFlowForm(t *testing.T) {
 		a.So(claims.Issuer, should.Resemble, issuer)
 		a.So(claims.Subject, should.Resemble, "user:"+username)
 		a.So(claims.Username(), should.Resemble, username)
+		a.So(claims.Valid(), should.BeNil)
+		a.So([]time.Time{time.Now().Add(-6 * time.Second), time.Unix(claims.IssuedAt, 0)}, should.BeChronological)
+		a.So([]time.Time{time.Unix(claims.IssuedAt, 0), time.Now().Add(1 * time.Second)}, should.BeChronological)
+		a.So([]time.Time{time.Now().Add(time.Hour - 5*time.Second), time.Unix(claims.ExpiresAt, 0), time.Now().Add(time.Hour + 5*time.Second)}, should.BeChronological)
 	}
 }
 
