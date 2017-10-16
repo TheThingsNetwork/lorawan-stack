@@ -59,7 +59,7 @@ func (r *Right) UnmarshalText(b []byte) (err error) {
 	return
 }
 
-// MarshalJSON implements json.Unmarshaler interface.
+// UnmarshalJSON implements json.Unmarshaler interface.
 func (r *Right) UnmarshalJSON(b []byte) error {
 	return r.UnmarshalText(b[1 : len(b)-1])
 }
