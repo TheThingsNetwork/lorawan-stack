@@ -1,8 +1,8 @@
 # Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 # Infer GOOS and GOARCH
-GOOS   ?= $(or $(word 1,$(subst -, ,${TARGET_PLATFORM})), $(shell echo "`go env GOOS`"))
-GOARCH ?= $(or $(word 2,$(subst -, ,${TARGET_PLATFORM})), $(shell echo "`go env GOARCH`"))
+GOOS ?= `go env GOOS`
+GOARCH ?= `go env GOARCH`
 
 # default main file
 MAIN ?= ./main.go
@@ -30,7 +30,7 @@ go.dev:
 
 # link executables to a simplified name that is the same on all architectures.
 go.link:
-	@for i in $(wildcard $(RELEASE_DIR)/*-$(GOOS)-$(GOARCH)); do \
+	@for i in $(wildcard $(RELEASE_DIR)/*-$(shell echo $(GOOS))-$(shell echo $(GOARCH))); do \
 		ln -sfr $$i `echo $$i | sed 's:\(.*\)-.*-.*:\1:'`; \
 	done
 
