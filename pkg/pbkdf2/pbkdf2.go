@@ -73,7 +73,7 @@ func (*PBKDF2) Validate(hashed, plain string) (bool, error) {
 
 	iter, err := strconv.ParseInt(parts[2], 10, 32)
 	if err != nil {
-		return false, fmt.Errorf("Invalid number of iterations: %s", iter)
+		return false, fmt.Errorf("Invalid number of iterations: %s", parts[2])
 	}
 	salt := parts[3]
 	key := parts[4]
