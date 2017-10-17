@@ -51,11 +51,16 @@ var (
 	authorizer = &TestAuthorizer{
 		Body: "<html />",
 	}
+	s *sql.Store
 )
 
 // cleanStore returns a new store instance attached to a newly created database
 // where all migrations has been applied and also has been feed with some users.
 func cleanStore(t testing.TB, database string) *sql.Store {
+	if s != nil {
+		return s
+	}
+
 	logger := test.GetLogger(t, "OAuth")
 
 	// open database connection
@@ -86,7 +91,9 @@ func cleanStore(t testing.TB, database string) *sql.Store {
 		return nil
 	}
 
-	return sql.FromDB(db)
+	s = sql.FromDB(db)
+
+	return s
 }
 
 func testServer(t *testing.T) (*web.Server, *auth.Keys) {
@@ -104,8 +111,7 @@ func testServer(t *testing.T) (*web.Server, *auth.Keys) {
 
 	store := cleanStore(t, database)
 
-	err = store.Clients.Create(client)
-	a.So(err, should.BeNil)
+	_ = store.Clients.Create(client)
 
 	err = store.Clients.SetClientState(client.ClientID, ttnpb.STATE_APPROVED)
 	a.So(err, should.BeNil)
