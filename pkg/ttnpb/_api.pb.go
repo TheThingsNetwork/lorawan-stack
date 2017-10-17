@@ -100,6 +100,7 @@ It has these top-level messages:
 	DLSettings
 	CFList
 	TxSettings
+	MACCommand
 	UplinkMessage
 	DownlinkMessage
 	RxMetadata

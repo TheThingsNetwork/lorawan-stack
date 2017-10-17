@@ -206,62 +206,6 @@ message MACInfo {
   // TODO: Add info about failed MAC requests
 }
 
-enum AggregatedDutyCycle {
-  option (gogoproto.goproto_enum_prefix) = false;
-  // 100%
-  DUTY_CYCLE_1     = 0;
-  // 50%
-  DUTY_CYCLE_2     = 1;
-  // 25%
-  DUTY_CYCLE_4     = 2;
-  // 12.5%
-  DUTY_CYCLE_8     = 3;
-  // 6.25%
-  DUTY_CYCLE_16    = 4;
-  // 3.125%
-  DUTY_CYCLE_32    = 5;
-  // 1.5625%
-  DUTY_CYCLE_64    = 6;
-  // Roughly 0.781%
-  DUTY_CYCLE_128   = 7;
-  // Roughly 0.390%
-  DUTY_CYCLE_256   = 8;
-  // Roughly 0.195%
-  DUTY_CYCLE_512   = 9;
-  // Roughly 0.098%
-  DUTY_CYCLE_1024  = 10;
-  // Roughly 0.049%
-  DUTY_CYCLE_2048  = 11;
-  // Roughly 0.024%
-  DUTY_CYCLE_4096  = 12;
-  // Roughly 0.012%
-  DUTY_CYCLE_8192  = 13;
-  // Roughly 0.006%
-  DUTY_CYCLE_16384 = 14;
-  // Roughly 0.003%
-  DUTY_CYCLE_32768 = 15;
-}
-
-enum PingSlotPeriod {
-  option (gogoproto.goproto_enum_prefix) = false;
-  // Every second
-  PING_EVERY_1S   = 0;
-  // Every 2 seconds
-  PING_EVERY_2S   = 1;
-  // Every 4 seconds
-  PING_EVERY_4S   = 2;
-  // Every 8 seconds
-  PING_EVERY_8S   = 3;
-  // Every 16 seconds
-  PING_EVERY_16S  = 4;
-  // Every 32 seconds
-  PING_EVERY_32S  = 5;
-  // Every 64 seconds
-  PING_EVERY_64S  = 6;
-  // Every 128 seconds
-  PING_EVERY_128S = 7;
-}
-
 // The DeviceRegistry service allows clients to manage their end devices
 // This service is implemented by the join server, network server and application server
 service DeviceRegistry {

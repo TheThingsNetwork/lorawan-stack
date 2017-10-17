@@ -3,6 +3,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
 
 package ttn.v3;
 
@@ -191,4 +192,258 @@ message TxSettings {
   // - gateway to end device: true
   // - end device to gateway: false
   bool polarization_inversion = 9;
+}
+
+enum MACCommandIdentifier {
+  option (gogoproto.goproto_enum_prefix) = false;
+  cid_rfu_0 = 0;
+  CID_RESET = 1;
+  CID_LINK_CHECK = 2;
+  CID_LINK_ADR = 3;
+  CID_DUTY_CYCLE = 4;
+  CID_RX_PARAM_SETUP = 5;
+  CID_DEV_STATUS = 6;
+  CID_NEW_CHANNEL = 7;
+  CID_RX_TIMING_SETUP = 8;
+  CID_TX_PARAM_SETUP = 9;
+  CID_DL_CHANNEL = 10;
+  CID_REKEY = 11;
+  CID_ADR_PARAM_SETUP = 12;
+  CID_DEVICE_TIME = 13;
+  CID_FORCE_REJOIN = 14;
+  CID_REJOIN_PARAM_SETUP = 15;
+  CID_PING_SLOT_INFO = 16;
+  CID_PING_SLOT_CHANNEL = 17;
+  CID_BEACON_TIMING = 18; // Deprecated
+  CID_BEACON_FREQ = 19;
+  CID_DEVICE_MODE = 32;
+}
+
+message MACCommand {
+  oneof payload {
+    Proprietary         proprietary             = 1;
+    ResetInd            reset_ind               = 2;
+    ResetConf           reset_conf              = 3;
+    LinkCheckAns        link_check_ans          = 4;
+    LinkADRReq          link_adr_req            = 5;
+    LinkADRAns          link_adr_ans            = 6;
+    DutyCycleReq        duty_cycle_req          = 7;
+    RxParamSetupReq     rx_param_setup_req      = 8;
+    RxParamSetupAns     rx_param_setup_ans      = 9;
+    DevStatusAns        dev_status_ans          = 10;
+    NewChannelReq       new_channel_req         = 11;
+    NewChannelAns       new_channel_ans         = 12;
+    DLChannelReq        dl_channel_req          = 13;
+    DLChannelAns        dl_channel_ans          = 14;
+    RxTimingSetupReq    rx_timing_setup_req     = 15;
+    TxParamSetupReq     tx_param_setup_req      = 16;
+    RekeyInd            rekey_ind               = 17;
+    RekeyConf           rekey_conf              = 18;
+    ADRParamSetupReq    adr_param_setup_req     = 29;
+    DeviceTimeAns       device_time_ans         = 20;
+    ForceRejoinReq      force_rejoin_req        = 21;
+    RejoinParamSetupReq rejoin_param_setup_req  = 22;
+    RejoinParamSetupAns rejoin_param_setup_ans  = 23;
+    PingSlotInfoReq     ping_slot_info_req      = 24;
+    PingSlotChannelReq  ping_slot_channel_req   = 25;
+    PingSlotChannelAns  ping_slot_channel_ans   = 26;
+    BeaconTimingAns     beacon_timing_ans       = 27;
+    BeaconFreqReq       beacon_freq_req         = 28;
+    BeaconFreqAns       beacon_freq_ans         = 39;
+    DeviceModeInd       device_mode_ind         = 30;
+    DeviceModeConf      device_mode_conf        = 31;
+  }
+
+  message Proprietary {
+    MACCommandIdentifier cid = 1 [(gogoproto.customname) = "CID"];
+    bytes raw_payload = 2;
+  }
+  message ResetInd {
+    uint32 minor_version = 1;
+  }
+  message ResetConf {
+    uint32 minor_version = 1;
+  }
+  message LinkCheckAns {
+    // Margin indicates the link margin in dB of the received LinkCheckReq, relative to the demodulation floor.
+    uint32 margin = 1;
+    uint32 gateway_count = 2;
+  }
+  message LinkADRReq {
+    uint32 data_rate_index = 1;
+    uint32 tx_power_index = 2;
+    repeated bool channel_mask = 3;
+    reserved 4; // for RFU 7th bit of Redundancy
+    uint32 channel_mask_control = 5;
+    uint32 nb_trans = 6;
+  }
+  message LinkADRAns {
+    bool channel_mask_ack = 1;
+    bool data_rate_index_ack = 2;
+    bool tx_power_index_ack = 3;
+  }
+  message DutyCycleReq {
+    AggregatedDutyCycle max_duty_cycle = 1;
+  }
+  message RxParamSetupReq {
+    uint32 rx2_data_rate_index = 1;
+    uint32 rx1_data_rate_offset = 2;
+    uint64 rx2_frequency = 3;
+  }
+  message RxParamSetupAns {
+    bool rx2_data_rate_index_ack = 1;
+    bool rx1_data_rate_offset_ack = 2;
+    bool rx2_frequency_ack = 3;
+  }
+  message DevStatusAns {
+    // Battery indicates the device battery status.
+    // 0 indicates that the device is connected to an external power source.
+    // 1..254 indicates a battery level.
+    // 255 indicates that the device was not able to measure the battery level.
+    uint32 battery = 1;
+    // Margin indicates the demodulation SNR in dB in the range [-32, +31].
+    int32 margin = 2;
+  }
+  message NewChannelReq {
+    uint32 channel_index = 1;
+    uint64 frequency = 2;
+    uint32 min_data_rate_index = 3;
+    uint32 max_data_rate_index = 4;
+  }
+  message NewChannelAns {
+    bool frequency_ack = 1;
+    bool data_rate_ack = 2;
+  }
+  message DLChannelReq {
+    uint32 channel_index = 1;
+    uint64 frequency = 2;
+  }
+  message DLChannelAns {
+    bool channel_index_ack = 1;
+    bool frequency_ack = 2;
+  }
+  message RxTimingSetupReq {
+    uint32 delay = 1;
+  }
+  message TxParamSetupReq {
+    // MaxEIRPIndex indicates the maximum EIRP value in dBm, indexed by the following table:
+    // [ 8 10 12 13 14 16 18 20 21 24 26 27 29 30 33 36 ]
+    uint32 max_eirp_index = 1 [(gogoproto.customname) = "MaxEIRPIndex"];
+    bool uplink_dwell_time = 2;
+    bool downlink_dwell_time = 3;
+  }
+  message RekeyInd {
+    uint32 minor_version = 1;
+  }
+  message RekeyConf {
+    uint32 minor_version = 1;
+  }
+  message ADRParamSetupReq {
+    // ADRAckLimitExponent is the exponent e that configures the ADR_ACK_LIMIT = 2^e messages
+    uint32 adr_ack_limit_exponent = 1 [(gogoproto.customname) = "ADRAckLimitExponent"];
+    // ADRAckDelayExponent is the exponent e that configures the ADR_ACK_DELAY = 2^e messages
+    uint32 adr_ack_delay_exponent = 2 [(gogoproto.customname) = "ADRAckDelayExponent"];
+  }
+  message DeviceTimeAns {
+    google.protobuf.Timestamp time = 7 [(gogoproto.stdtime) = true];
+  }
+  message ForceRejoinReq {
+    uint32 rejoin_type = 1;
+    uint32 data_rate_index = 2;
+    uint32 max_retries = 3;
+    // PeriodExponent is the exponent e that configures the rejoin period = 32 * 2^e + rand(0,32) seconds
+    uint32 period_exponent = 4;
+  }
+  message RejoinParamSetupReq {
+    // MaxCountExponent is the exponent e that configures the rejoin counter = 2^(e+4) messages
+    uint32 max_count_exponent = 1;
+    // MaxTimeExponent is the exponent e that configures the rejoin timer = 2^(e+10) seconds
+    uint32 max_time_exponent = 2;
+  }
+  message RejoinParamSetupAns {
+    bool max_time_exponent_ack = 1;
+  }
+  message PingSlotInfoReq {
+    PingSlotPeriod period = 1;
+  }
+  message PingSlotChannelReq {
+    uint64 frequency = 1;
+    uint32 data_rate_index = 2;
+  }
+  message PingSlotChannelAns {
+    bool frequency_ack = 1;
+    bool data_rate_index_ack = 2;
+  }
+  message BeaconTimingAns {
+    uint32 delay = 1;
+    uint32 channel_index = 2;
+  }
+  message BeaconFreqReq {
+    uint64 frequency = 1;
+  }
+  message BeaconFreqAns {
+    bool frequency_ack = 1;
+  }
+  message DeviceModeInd {
+    Class class = 1;
+  }
+  message DeviceModeConf {
+    Class class = 1;
+  }
+}
+
+enum AggregatedDutyCycle {
+  option (gogoproto.goproto_enum_prefix) = false;
+  // 100%
+  DUTY_CYCLE_1     = 0;
+  // 50%
+  DUTY_CYCLE_2     = 1;
+  // 25%
+  DUTY_CYCLE_4     = 2;
+  // 12.5%
+  DUTY_CYCLE_8     = 3;
+  // 6.25%
+  DUTY_CYCLE_16    = 4;
+  // 3.125%
+  DUTY_CYCLE_32    = 5;
+  // 1.5625%
+  DUTY_CYCLE_64    = 6;
+  // Roughly 0.781%
+  DUTY_CYCLE_128   = 7;
+  // Roughly 0.390%
+  DUTY_CYCLE_256   = 8;
+  // Roughly 0.195%
+  DUTY_CYCLE_512   = 9;
+  // Roughly 0.098%
+  DUTY_CYCLE_1024  = 10;
+  // Roughly 0.049%
+  DUTY_CYCLE_2048  = 11;
+  // Roughly 0.024%
+  DUTY_CYCLE_4096  = 12;
+  // Roughly 0.012%
+  DUTY_CYCLE_8192  = 13;
+  // Roughly 0.006%
+  DUTY_CYCLE_16384 = 14;
+  // Roughly 0.003%
+  DUTY_CYCLE_32768 = 15;
+}
+
+enum PingSlotPeriod {
+  option (gogoproto.goproto_enum_prefix) = false;
+  // Every second
+  PING_EVERY_1S   = 0;
+  // Every 2 seconds
+  PING_EVERY_2S   = 1;
+  // Every 4 seconds
+  PING_EVERY_4S   = 2;
+  // Every 8 seconds
+  PING_EVERY_8S   = 3;
+  // Every 16 seconds
+  PING_EVERY_16S  = 4;
+  // Every 32 seconds
+  PING_EVERY_32S  = 5;
+  // Every 64 seconds
+  PING_EVERY_64S  = 6;
+  // Every 128 seconds
+  PING_EVERY_128S = 7;
 }
