@@ -29,6 +29,7 @@ message GatewayIdentifier {
 // End device identifiers are carried with uplink and downlink messages.
 // Unknown fields are left empty.
 message EndDeviceIdentifiers {
+  option (gogoproto.populate) = false;
   // TTN Device ID.
   string device_id = 1 [(gogoproto.customname) = "DeviceID"];
   // TTN Application ID.
