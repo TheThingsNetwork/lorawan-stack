@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -21,7 +21,7 @@ func TestAuthorizationCode(t *testing.T) {
 	err := s.Clients.Create(client)
 	a.So(err, should.BeNil)
 
-	data := &store.AuthorizationData{
+	data := &types.AuthorizationData{
 		Code:        "123456",
 		ClientID:    client.ClientIdentifier.ClientID,
 		CreatedAt:   time.Now(),
@@ -62,7 +62,7 @@ func TestRefreshToken(t *testing.T) {
 	err := s.Clients.Create(client)
 	a.So(err, should.BeNil)
 
-	data := &store.RefreshData{
+	data := &types.RefreshData{
 		RefreshToken: "123456",
 		ClientID:     client.ClientIdentifier.ClientID,
 		CreatedAt:    time.Now(),

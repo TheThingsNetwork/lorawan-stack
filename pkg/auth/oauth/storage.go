@@ -9,6 +9,7 @@ import (
 	"github.com/RangelReale/osin"
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
@@ -52,13 +53,13 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 		username = udata.Username
 	}
 
-	return s.store.SaveAuthorizationCode(&store.AuthorizationData{
+	return s.store.SaveAuthorizationCode(&types.AuthorizationData{
 		Code:        data.Code,
 		ClientID:    data.Client.GetId(),
 		CreatedAt:   data.CreatedAt,
 		ExpiresIn:   time.Duration(data.ExpiresIn) * time.Second,
 		Scope:       data.Scope,
-		RedirectUri: data.RedirectUri,
+		RedirectURI: data.RedirectUri,
 		State:       data.State,
 		Username:    username,
 	})
@@ -81,7 +82,7 @@ func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 		Client:      client,
 		ExpiresIn:   int32(data.ExpiresIn.Seconds()),
 		Scope:       data.Scope,
-		RedirectUri: data.RedirectUri,
+		RedirectUri: data.RedirectURI,
 		State:       data.State,
 		CreatedAt:   data.CreatedAt,
 		UserData: &UserData{
@@ -98,12 +99,12 @@ func (s *storage) RemoveAuthorize(code string) error {
 // SaveAccess saves the access data for later use.
 func (s *storage) SaveAccess(data *osin.AccessData) error {
 	if data.RefreshToken != "" {
-		err := s.store.SaveRefreshToken(&store.RefreshData{
+		err := s.store.SaveRefreshToken(&types.RefreshData{
 			RefreshToken: data.RefreshToken,
 			ClientID:     data.Client.GetId(),
 			Scope:        data.Scope,
 			CreatedAt:    data.CreatedAt,
-			RedirectUri:  data.RedirectUri,
+			RedirectURI:  data.RedirectUri,
 		})
 
 		return err
@@ -153,7 +154,7 @@ func (s *storage) LoadRefresh(refreshToken string) (*osin.AccessData, error) {
 		Client:       client,
 		Scope:        data.Scope,
 		CreatedAt:    data.CreatedAt,
-		RedirectUri:  data.RedirectUri,
+		RedirectUri:  data.RedirectURI,
 	}, nil
 }
 
