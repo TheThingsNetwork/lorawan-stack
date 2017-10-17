@@ -54,14 +54,14 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 	}
 
 	return s.store.SaveAuthorizationCode(&types.AuthorizationData{
-		Code:        data.Code,
-		ClientID:    data.Client.GetId(),
-		CreatedAt:   data.CreatedAt,
-		ExpiresIn:   time.Duration(data.ExpiresIn) * time.Second,
-		Scope:       data.Scope,
-		RedirectURI: data.RedirectUri,
-		State:       data.State,
-		Username:    username,
+		AuthorizationCode: data.Code,
+		ClientID:          data.Client.GetId(),
+		CreatedAt:         data.CreatedAt,
+		ExpiresIn:         time.Duration(data.ExpiresIn) * time.Second,
+		Scope:             data.Scope,
+		RedirectURI:       data.RedirectUri,
+		State:             data.State,
+		Username:          username,
 	})
 }
 
@@ -78,7 +78,7 @@ func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 	}
 
 	return &osin.AuthorizeData{
-		Code:        data.Code,
+		Code:        data.AuthorizationCode,
 		Client:      client,
 		ExpiresIn:   int32(data.ExpiresIn.Seconds()),
 		Scope:       data.Scope,

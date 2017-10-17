@@ -6,45 +6,45 @@ import "time"
 
 // AuthorizationData is the data stored for an authorization code.
 type AuthorizationData struct {
-	// Code is the actual opaque authorization code.
-	Code string `db:"authorization_code"`
+	// AuthorizationCode is the actual opaque authorization code.
+	AuthorizationCode string
 
 	// ClientID is the id of the client this authorization code is for.
-	ClientID string `db:"client_id"`
+	ClientID string
 
 	// CreatedAt is the time when the authorization code was created.
-	CreatedAt time.Time `db:"created_at"`
+	CreatedAt time.Time
 
 	// ExpiresIn is the time the authorization code should be valid for.
-	ExpiresIn time.Duration `db:"expires_in"`
+	ExpiresIn time.Duration
 
 	// Scope is the scope of the authorization code.
-	Scope string `db:"scope"`
+	Scope string
 
 	// RedirectURI is the redirect URI from the request.
-	RedirectURI string `db:"redirect_uri"`
+	RedirectURI string
 
 	// State is the state the client passed when authorizing.
-	State string `db:"state"`
+	State string
 
 	// Username is the username the authorization is for.
-	Username string `db:"username"`
+	Username string
 }
 
 // RefreshData is the data stored for refresh tokens.
 type RefreshData struct {
 	// RefreshToken is the actaul opaque refresh token
-	RefreshToken string `db:"refresh_token"`
+	RefreshToken string
 
 	// ClientID is the id of the client this refresh token is for.
-	ClientID string `db:"client_id"`
+	ClientID string
 
 	// CreatedAt is the time when the refresh token was created.
-	CreatedAt time.Time `db:"created_at"`
+	CreatedAt time.Time
 
 	// Scope is the scope of the authorization code.
-	Scope string `db:"scope"`
+	Scope string
 
 	// RedirectURI is the redirect URI from the request.
-	RedirectURI string `db:"redirect_uri"`
+	RedirectURI string
 }

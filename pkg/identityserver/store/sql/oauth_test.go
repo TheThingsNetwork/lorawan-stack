@@ -22,22 +22,22 @@ func TestAuthorizationCode(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	data := &types.AuthorizationData{
-		Code:        "123456",
-		ClientID:    client.ClientIdentifier.ClientID,
-		CreatedAt:   time.Now(),
-		ExpiresIn:   5 * time.Second,
-		Scope:       "scope",
-		RedirectURI: "https://example.com/oauth/callback",
-		State:       "state",
+		AuthorizationCode: "123456",
+		ClientID:          client.ClientIdentifier.ClientID,
+		CreatedAt:         time.Now(),
+		ExpiresIn:         5 * time.Second,
+		Scope:             "scope",
+		RedirectURI:       "https://example.com/oauth/callback",
+		State:             "state",
 	}
 
 	err = s.OAuth.SaveAuthorizationCode(data)
 	a.So(err, should.BeNil)
 
-	found, c, err := s.OAuth.FindAuthorizationCode(data.Code)
+	found, c, err := s.OAuth.FindAuthorizationCode(data.AuthorizationCode)
 	a.So(err, should.BeNil)
 
-	a.So(found.Code, should.Equal, data.Code)
+	a.So(found.AuthorizationCode, should.Equal, data.AuthorizationCode)
 	a.So(found.ClientID, should.Equal, data.ClientID)
 	a.So(found.ExpiresIn, should.Equal, data.ExpiresIn)
 	a.So(found.Scope, should.Equal, data.Scope)
@@ -46,10 +46,10 @@ func TestAuthorizationCode(t *testing.T) {
 
 	a.So(c, test.ShouldBeClientIgnoringAutoFields, client)
 
-	err = s.OAuth.DeleteAuthorizationCode(data.Code)
+	err = s.OAuth.DeleteAuthorizationCode(data.AuthorizationCode)
 	a.So(err, should.BeNil)
 
-	_, _, err = s.OAuth.FindAuthorizationCode(data.Code)
+	_, _, err = s.OAuth.FindAuthorizationCode(data.AuthorizationCode)
 	a.So(err, should.NotBeNil)
 }
 
