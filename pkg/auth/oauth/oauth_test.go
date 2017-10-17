@@ -116,6 +116,12 @@ func testServer(t *testing.T) (*web.Server, *auth.Keys) {
 	err = store.Clients.SetClientState(client.ClientID, ttnpb.STATE_APPROVED)
 	a.So(err, should.BeNil)
 
+	_ = store.Users.Create(&ttnpb.User{
+		UserIdentifier: ttnpb.UserIdentifier{
+			UserID: userID,
+		},
+	})
+
 	server := New(issuer, keys, store.OAuth, authorizer)
 
 	mux := web.New(logger)

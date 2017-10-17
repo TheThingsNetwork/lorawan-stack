@@ -8,6 +8,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -16,9 +17,17 @@ func TestAuthorizationCode(t *testing.T) {
 	a := assertions.New(t)
 
 	s := cleanStore(t, database)
+	userID := "john-doe"
+
+	err := s.Users.Create(&ttnpb.User{
+		UserIdentifier: ttnpb.UserIdentifier{
+			UserID: userID,
+		},
+	})
+	a.So(err, should.BeNil)
 
 	client := testClients()["test-client"]
-	err := s.Clients.Create(client)
+	err = s.Clients.Create(client)
 	a.So(err, should.BeNil)
 
 	data := &types.AuthorizationData{
@@ -29,6 +38,7 @@ func TestAuthorizationCode(t *testing.T) {
 		Scope:             "scope",
 		RedirectURI:       "https://example.com/oauth/callback",
 		State:             "state",
+		UserID:            userID,
 	}
 
 	err = s.OAuth.SaveAuthorizationCode(data)
