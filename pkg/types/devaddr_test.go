@@ -133,7 +133,7 @@ func TestDevAddrPrefix_NbItems(t *testing.T) {
 
 	err = prefix.UnmarshalText([]byte("27000000/0"))
 	a.So(err, should.BeNil)
-	a.So(prefix.NbItems(), should.Equal, 4294967296)
+	a.So(prefix.NbItems(), should.Equal, uint64(4294967296))
 
 	err = prefix.UnmarshalText([]byte("27000000/32"))
 	a.So(err, should.BeNil)
@@ -196,8 +196,8 @@ func TestDevAddrPrefix_numbers(t *testing.T) {
 	a.So(prefix4.firstNumericDevAddrCovered(), should.Equal, 0)
 	a.So(prefix4.FirstDevAddrCovered(), should.Equal, DevAddr{0x00, 0x00, 0x00, 0x00})
 	a.So(prefix4.LastDevAddrCovered(), should.Equal, DevAddr{0xff, 0xff, 0xff, 0xff})
-	a.So(prefix4.lastNumericDevAddrCovered(), should.Equal, 4294967295)
-	a.So(prefix4.NbItems(), should.Equal, 4294967296)
+	a.So(prefix4.lastNumericDevAddrCovered(), should.Equal, uint64(4294967295))
+	a.So(prefix4.NbItems(), should.Equal, uint64(4294967296))
 
 	var prefix5 DevAddrPrefix
 	err = prefix5.UnmarshalText([]byte("01000000/7"))
