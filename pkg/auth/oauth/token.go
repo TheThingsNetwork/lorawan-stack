@@ -23,20 +23,20 @@ func (s *Server) GenerateAccessToken(data *osin.AccessData, generateRefresh bool
 		return "", "", err
 	}
 
-	username := ""
+	userID := ""
 	udata, ok := data.UserData.(*UserData)
 	if ok && udata != nil {
-		username = udata.Username
+		userID = udata.UserID
 	}
 
 	claims := &auth.Claims{
 		StandardClaims: jwt.StandardClaims{
 			Issuer:    s.iss,
 			ExpiresAt: data.ExpireAt().Unix(),
-			Subject:   auth.UserSubject(username),
+			Subject:   auth.UserSubject(userID),
 			IssuedAt:  time.Now().Add(-5 * time.Second).Unix(),
 		},
-		User:   username,
+		User:   userID,
 		Rights: rights,
 		Client: data.Client.GetId(),
 	}

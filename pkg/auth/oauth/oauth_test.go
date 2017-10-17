@@ -35,7 +35,7 @@ var (
 	address  = "postgres://root@localhost:26257/%s?sslmode=disable"
 	database = "is_tests"
 	issuer   = "issuer.test.local"
-	username = "john-doe"
+	userID   = "john-doe"
 	client   = &ttnpb.Client{
 		ClientIdentifier: ttnpb.ClientIdentifier{ClientID: "foo"},
 		RedirectURI:      "http://example.com/oauth/callback",
@@ -206,8 +206,8 @@ func TestAuthorizationFlowJSON(t *testing.T) {
 		a.So(claims.Rights, should.Resemble, rights)
 		a.So(claims.Client, should.Resemble, client.ClientID)
 		a.So(claims.Issuer, should.Resemble, issuer)
-		a.So(claims.Subject, should.Resemble, "user:"+username)
-		a.So(claims.Username(), should.Resemble, username)
+		a.So(claims.Subject, should.Resemble, "user:"+userID)
+		a.So(claims.UserID(), should.Resemble, userID)
 	}
 }
 
@@ -293,8 +293,8 @@ func TestAuthorizationFlowForm(t *testing.T) {
 		a.So(claims.Rights, should.Resemble, rights)
 		a.So(claims.Client, should.Resemble, client.ClientID)
 		a.So(claims.Issuer, should.Resemble, issuer)
-		a.So(claims.Subject, should.Resemble, "user:"+username)
-		a.So(claims.Username(), should.Resemble, username)
+		a.So(claims.Subject, should.Resemble, "user:"+userID)
+		a.So(claims.UserID(), should.Resemble, userID)
 		a.So(claims.Valid(), should.BeNil)
 		a.So([]time.Time{time.Now().Add(-6 * time.Second), time.Unix(claims.IssuedAt, 0)}, should.BeChronological)
 		a.So([]time.Time{time.Unix(claims.IssuedAt, 0), time.Now().Add(1 * time.Second)}, should.BeChronological)
@@ -307,7 +307,7 @@ type TestAuthorizer struct {
 }
 
 func (a *TestAuthorizer) CheckLogin(c echo.Context) (string, error) {
-	return username, nil
+	return userID, nil
 }
 
 type authBody struct {

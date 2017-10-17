@@ -12,7 +12,7 @@ func init() {
 			scope              STRING,
 			redirect_uri       STRING,
 			state              STRING,
-			username           STRING
+			user_id            STRING
 		);
 
 		CREATE TABLE IF NOT EXISTS refresh_tokens (

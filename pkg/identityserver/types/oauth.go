@@ -27,8 +27,8 @@ type AuthorizationData struct {
 	// State is the state the client passed when authorizing.
 	State string
 
-	// Username is the username the authorization is for.
-	Username string
+	// UserID is the username the authorization is for.
+	UserID string
 }
 
 // RefreshData is the data stored for refresh tokens.

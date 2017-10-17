@@ -148,7 +148,7 @@ func (s *Server) authorizationHandler(c echo.Context) error {
 	}
 
 	// make sure the user is logged in or redirect
-	username, err := s.authorizer.CheckLogin(c)
+	userID, err := s.authorizer.CheckLogin(c)
 	if err != nil || c.Response().Committed {
 		return err
 	}
@@ -160,7 +160,7 @@ func (s *Server) authorizationHandler(c echo.Context) error {
 	}
 
 	ar.UserData = &UserData{
-		Username: username,
+		UserID: userID,
 	}
 
 	ar.Authorized = authorized

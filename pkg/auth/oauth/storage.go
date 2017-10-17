@@ -20,7 +20,7 @@ type storage struct {
 
 // UserData is the userdata that gets carried around with authorization requests.
 type UserData struct {
-	Username string
+	UserID string
 }
 
 // Clone the store if needed.
@@ -47,10 +47,10 @@ func (s *storage) GetClient(clientID string) (osin.Client, error) {
 
 // SaveAuthorize saves authorization data.
 func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
-	username := ""
+	userID := ""
 	udata, ok := data.UserData.(*UserData)
 	if ok && udata != nil {
-		username = udata.Username
+		userID = udata.UserID
 	}
 
 	return s.store.SaveAuthorizationCode(&types.AuthorizationData{
@@ -61,7 +61,7 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 		Scope:             data.Scope,
 		RedirectURI:       data.RedirectUri,
 		State:             data.State,
-		Username:          username,
+		UserID:            userID,
 	})
 }
 
@@ -86,7 +86,7 @@ func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 		State:       data.State,
 		CreatedAt:   data.CreatedAt,
 		UserData: &UserData{
-			Username: data.Username,
+			UserID: data.UserID,
 		},
 	}, nil
 }
@@ -131,7 +131,7 @@ func (s *storage) LoadAccess(accessToken string) (*osin.AccessData, error) {
 		Scope:     Scope(claims.Rights),
 		CreatedAt: time.Unix(claims.IssuedAt, 0),
 		UserData: &UserData{
-			Username: claims.User,
+			UserID: claims.User,
 		},
 	}, nil
 }

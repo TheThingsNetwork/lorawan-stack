@@ -26,8 +26,8 @@ type Claims struct {
 	// Sub is interpreted as the id of the entity this token is for.
 	jwt.StandardClaims
 
-	// User is the username of the user that created this token.
-	User string `json:"user"`
+	// User is the user ID of the user that created this token.
+	User string `json:"user_id"`
 
 	// Client is the client this token was created for.
 	Client string `json:"cid,omitempty"`
@@ -36,8 +36,8 @@ type Claims struct {
 	Rights []ttnpb.Right `json:"rights"`
 }
 
-// Username returns the username of the user this token is for, or the empty string if it is not for a user.
-func (c *Claims) Username() string {
+// UserID returns the user ID of the user profile this token is for, or the empty string if it is not for a user.
+func (c *Claims) UserID() string {
 	return splitprefix(UserPrefix, c.Subject)
 }
 

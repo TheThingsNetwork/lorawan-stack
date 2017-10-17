@@ -39,7 +39,7 @@ func saveAuthorizationCode(q db.QueryContext, data *types.AuthorizationData) err
 				scope,
 				redirect_uri,
 				state,
-				username
+				user_id
 			)
 			VALUES (
 				:authorization_code,
@@ -49,7 +49,7 @@ func saveAuthorizationCode(q db.QueryContext, data *types.AuthorizationData) err
 				:scope,
 				:redirect_uri,
 				:state,
-				:username
+				:user_id
 			)
 			RETURNING authorization_code`,
 		data,
