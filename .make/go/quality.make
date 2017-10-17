@@ -9,6 +9,14 @@ go.fmt:
 go.fmt-staged: GO_PACKAGES = $(STAGED_PACKAGES)
 go.fmt-staged: go.fmt
 
+# unconvert all packages
+go.unconvert:
+	@$(log) "Unconverting `$(GO_PACKAGES) | $(count)` go packages"
+	@[[ -z "`$(GO_PACKAGES) | xargs $(UNCONVERT) $(UNCONVERT_FLAGS) | tee -a /dev/stderr`" ]]
+
+go.unconvert-staged: GO_PACKAGES = $(STAGED_PACKAGES)
+go.unconvert-staged: go.unconvert
+
 # vet all packages
 go.vet:
 	@$(log) "Vetting `$(GO_PACKAGES) | $(count)` go packages"
@@ -54,9 +62,9 @@ go.check-vendors-staged: VENDOR_FILE=$(shell $(STAGED_FILES) | grep -q $(GO_VEND
 go.check-vendors-staged: go.check-vendors
 
 # run all quality on all files
-go.quality: go.fmt go.vet go.lint go.check-vendors
+go.quality: go.fmt go.unconvert go.vet go.lint go.check-vendors
 
 # run all quality on staged files
-go.quality-staged: go.fmt-staged go.vet-staged go.lint-staged go.check-vendors-staged
+go.quality-staged: go.fmt-staged go.unconvert-staged go.vet-staged go.lint-staged go.check-vendors-staged
 
 # vim: ft=make

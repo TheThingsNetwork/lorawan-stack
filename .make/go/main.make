@@ -12,6 +12,7 @@ GO_PKG ?= $(shell echo $(PWD) | sed s:$(GO_PATH)/src/::)
 # programs
 GO = go
 GOLINT = golint
+UNCONVERT = unconvert
 
 # go flags
 GO_FLAGS ?= -a
@@ -29,6 +30,9 @@ GO_TEST_FLAGS = -cover
 GO_COVER_FILE = coverage.out
 GO_COVER_DIR  = .coverage
 
+# unconvert flags
+UNCONVERT_FLAGS = -v -apply
+
 # select only go files
 only_go = grep '\.go$$'
 
@@ -41,8 +45,8 @@ no_mock = grep -v '_mock\.go'
 only_mock = grep '_mock\.go'
 
 # select/remove protobuf generated files
-no_pb = grep -Ev '\.pb\.go$$|\.pb\.gw\.go$$'
-only_pb = grep -E '\.pb\.go$$|\.pb\.gw\.go$$'
+no_pb = grep -Ev '\.pb\.go$$|\.pb\.gw\.go$$|pb_test.go$$'
+only_pb = grep -E '\.pb\.go$$|\.pb\.gw\.go$$|pb_test.go$$'
 
 # select/remove test files
 no_test = grep -v '_test\.go$$'
