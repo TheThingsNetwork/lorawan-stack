@@ -4,24 +4,29 @@ package test
 
 import (
 	"bytes"
-	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 )
 
+// Logger represents the logging interface implemented by i.e. testing.T
+type Logger interface {
+	Fatal(args ...interface{})
+	Log(args ...interface{})
+}
+
 // TestingHandler implements Handler.
 type TestingHandler struct {
-	tb         testing.TB
+	logger     Logger
 	cliHandler *log.CLIHandler
 	buffer     *bytes.Buffer
 }
 
 // NewTestingHandler returns a new TestingHandler.
-func NewTestingHandler(tb testing.TB) *TestingHandler {
+func NewTestingHandler(l Logger) *TestingHandler {
 	buffer := bytes.NewBuffer([]byte{})
 
 	return &TestingHandler{
-		tb:         tb,
+		logger:     l,
 		cliHandler: log.NewCLI(buffer),
 		buffer:     buffer,
 	}
@@ -35,9 +40,9 @@ func (h *TestingHandler) HandleLog(e log.Entry) error {
 	}
 
 	if e.Level() == log.FatalLevel {
-		h.tb.Fatal(h.buffer.String())
+		h.logger.Fatal(h.buffer.String())
 	} else {
-		h.tb.Log(h.buffer.String())
+		h.logger.Log(h.buffer.String())
 	}
 
 	return nil

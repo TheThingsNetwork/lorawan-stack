@@ -5,7 +5,7 @@ package test
 import "testing"
 
 func TestGetLogger(t *testing.T) {
-	logger := GetLogger(t, "fooz")
+	logger := GetLogger(t)
 	logger.Debug("abcabcabc - Hi!")
 	logger.Info("Fooz")
 	logger.Errorf("Nope %d", 1234)
