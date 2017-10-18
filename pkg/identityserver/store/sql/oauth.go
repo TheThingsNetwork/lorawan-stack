@@ -9,6 +9,8 @@ import (
 )
 
 func init() {
+	ErrAuthorizationCodeNotFound.Register()
+	ErrAuthorizationCodeConflict.Register()
 	ErrRefreshTokenNotFound.Register()
 	ErrRefreshTokenConflict.Register()
 }
@@ -21,7 +23,7 @@ var ErrAuthorizationCodeNotFound = &errors.ErrDescriptor{
 	Type:          errors.NotFound,
 }
 
-// ErrDuplicateAuthorizationCode is returned when trying to create an authorization code that already exists.
+// ErrAuthorizationCodeConflict is returned when trying to create an authorization code that already exists.
 var ErrAuthorizationCodeConflict = &errors.ErrDescriptor{
 	MessageFormat: "Authorization code already exists",
 	Code:          502,
@@ -36,7 +38,7 @@ var ErrRefreshTokenNotFound = &errors.ErrDescriptor{
 	Type:          errors.NotFound,
 }
 
-// ErrDuplicateRefreshToken is returned when trying to create a refresh token that already exists.
+// ErrRefreshTokenConflict is returned when trying to create a refresh token that already exists.
 var ErrRefreshTokenConflict = &errors.ErrDescriptor{
 	MessageFormat: "Refresh token already exists",
 	Code:          504,
