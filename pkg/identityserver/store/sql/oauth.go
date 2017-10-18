@@ -59,10 +59,10 @@ func NewOAuthStore(store storer, clients *ClientStore) *OAuthStore {
 
 // SaveAuthorizationCode saves the authorization code.
 func (s *OAuthStore) SaveAuthorizationCode(authorization *types.AuthorizationData) error {
-	return saveAuthorizationCode(s.queryer(), authorization)
+	return s.saveAuthorizationCode(s.queryer(), authorization)
 }
 
-func saveAuthorizationCode(q db.QueryContext, data *types.AuthorizationData) error {
+func (s *OAuthStore) saveAuthorizationCode(q db.QueryContext, data *types.AuthorizationData) error {
 	_, err := q.NamedExec(
 		`INSERT
 			INTO authorization_codes (
@@ -113,8 +113,7 @@ func (s *OAuthStore) getAuthorizationCode(q db.QueryContext, authorizationCode s
 	result := new(types.AuthorizationData)
 	err := q.SelectOne(
 		result,
-		`SELECT * FROM authorization_codes
-			WHERE authorization_code = $1`,
+		`SELECT * FROM authorization_codes WHERE authorization_code = $1`,
 		authorizationCode,
 	)
 
@@ -137,10 +136,10 @@ func (s *OAuthStore) getAuthorizationCode(q db.QueryContext, authorizationCode s
 
 // DeleteAuthorizationCode deletes the authorization code.
 func (s *OAuthStore) DeleteAuthorizationCode(authorizationCode string) error {
-	return deleteAuthorizationCode(s.queryer(), authorizationCode)
+	return s.deleteAuthorizationCode(s.queryer(), authorizationCode)
 }
 
-func deleteAuthorizationCode(q db.QueryContext, authorizationCode string) error {
+func (s *OAuthStore) deleteAuthorizationCode(q db.QueryContext, authorizationCode string) error {
 	code := new(string)
 	err := q.SelectOne(
 		code,
@@ -160,10 +159,10 @@ func deleteAuthorizationCode(q db.QueryContext, authorizationCode string) error 
 
 // SaveRefreshToken saves the refresh token.
 func (s *OAuthStore) SaveRefreshToken(access *types.RefreshData) error {
-	return saveRefreshToken(s.queryer(), access)
+	return s.saveRefreshToken(s.queryer(), access)
 }
 
-func saveRefreshToken(q db.QueryContext, refresh *types.RefreshData) error {
+func (s *OAuthStore) saveRefreshToken(q db.QueryContext, refresh *types.RefreshData) error {
 	result := new(string)
 	err := q.NamedSelectOne(
 		result,
@@ -234,10 +233,10 @@ func (s *OAuthStore) getRefreshToken(q db.QueryContext, refreshToken string) (*t
 
 // DeleteRefreshToken deletes the refresh token from the database.
 func (s *OAuthStore) DeleteRefreshToken(refreshToken string) error {
-	return deleteRefreshToken(s.queryer(), refreshToken)
+	return s.deleteRefreshToken(s.queryer(), refreshToken)
 }
 
-func deleteRefreshToken(q db.QueryContext, refreshToken string) error {
+func (s *OAuthStore) deleteRefreshToken(q db.QueryContext, refreshToken string) error {
 	token := new(string)
 	err := q.SelectOne(
 		token,
