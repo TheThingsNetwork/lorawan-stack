@@ -22,7 +22,6 @@ func init() {
 			scope		 STRING,
 			redirect_uri STRING
 		);
-
 	`
 
 	const backwards = `

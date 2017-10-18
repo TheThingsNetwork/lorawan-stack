@@ -7,7 +7,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 )
 
-// OAuthStore implements store.ApplicationStore.
+// OAuthStore implements store.OAuthStore.
 type OAuthStore struct {
 	storer
 	*ClientStore
@@ -22,8 +22,8 @@ func NewOAuthStore(store storer, clients *ClientStore) *OAuthStore {
 }
 
 // SaveAuthorizationCode saves the authorization code.
-func (o *OAuthStore) SaveAuthorizationCode(authorization *types.AuthorizationData) error {
-	return saveAuthorizationCode(o.queryer(), authorization)
+func (s *OAuthStore) SaveAuthorizationCode(authorization *types.AuthorizationData) error {
+	return saveAuthorizationCode(s.queryer(), authorization)
 }
 
 func saveAuthorizationCode(q db.QueryContext, data *types.AuthorizationData) error {
@@ -57,19 +57,19 @@ func saveAuthorizationCode(q db.QueryContext, data *types.AuthorizationData) err
 }
 
 // FindAuthorizationCode finds the authorization code.
-func (o *OAuthStore) FindAuthorizationCode(authorizationCode string) (*types.AuthorizationData, types.Client, error) {
+func (s *OAuthStore) FindAuthorizationCode(authorizationCode string) (*types.AuthorizationData, types.Client, error) {
 	var data *types.AuthorizationData
 	var client types.Client
-	err := o.transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		var err error
-		data, client, err = o.findAuthorizationCode(tx, authorizationCode)
+		data, client, err = s.findAuthorizationCode(tx, authorizationCode)
 		return err
 	})
 
 	return data, client, err
 }
 
-func (o *OAuthStore) findAuthorizationCode(q db.QueryContext, authorizationCode string) (*types.AuthorizationData, types.Client, error) {
+func (s *OAuthStore) findAuthorizationCode(q db.QueryContext, authorizationCode string) (*types.AuthorizationData, types.Client, error) {
 	result := new(types.AuthorizationData)
 	err := q.SelectOne(
 		result,
@@ -82,8 +82,8 @@ func (o *OAuthStore) findAuthorizationCode(q db.QueryContext, authorizationCode 
 		return nil, nil, err
 	}
 
-	client := o.ClientStore.factory.BuildClient()
-	err = o.ClientStore.client(q, result.ClientID, client)
+	client := s.ClientStore.factory.BuildClient()
+	err = s.ClientStore.client(q, result.ClientID, client)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -92,8 +92,8 @@ func (o *OAuthStore) findAuthorizationCode(q db.QueryContext, authorizationCode 
 }
 
 // DeleteAuthorizationCode deletes the authorization code.
-func (o *OAuthStore) DeleteAuthorizationCode(authorizationCode string) error {
-	return deleteAuthorizationCode(o.queryer(), authorizationCode)
+func (s *OAuthStore) DeleteAuthorizationCode(authorizationCode string) error {
+	return deleteAuthorizationCode(s.queryer(), authorizationCode)
 }
 
 func deleteAuthorizationCode(q db.QueryContext, authorizationCode string) error {
@@ -109,8 +109,8 @@ func deleteAuthorizationCode(q db.QueryContext, authorizationCode string) error 
 }
 
 // SaveRefreshToken saves the refresh token.
-func (o *OAuthStore) SaveRefreshToken(access *types.RefreshData) error {
-	return saveRefreshToken(o.queryer(), access)
+func (s *OAuthStore) SaveRefreshToken(access *types.RefreshData) error {
+	return saveRefreshToken(s.queryer(), access)
 }
 
 func saveRefreshToken(q db.QueryContext, refresh *types.RefreshData) error {
@@ -138,19 +138,19 @@ func saveRefreshToken(q db.QueryContext, refresh *types.RefreshData) error {
 }
 
 // FindRefreshToken finds the refresh token.
-func (o *OAuthStore) FindRefreshToken(refreshToken string) (*types.RefreshData, types.Client, error) {
+func (s *OAuthStore) FindRefreshToken(refreshToken string) (*types.RefreshData, types.Client, error) {
 	var data *types.RefreshData
 	var client types.Client
-	err := o.transact(func(tx *db.Tx) error {
+	err := s.transact(func(tx *db.Tx) error {
 		var err error
-		data, client, err = o.findRefreshToken(tx, refreshToken)
+		data, client, err = s.findRefreshToken(tx, refreshToken)
 		return err
 	})
 
 	return data, client, err
 }
 
-func (o *OAuthStore) findRefreshToken(q db.QueryContext, refreshToken string) (*types.RefreshData, types.Client, error) {
+func (s *OAuthStore) findRefreshToken(q db.QueryContext, refreshToken string) (*types.RefreshData, types.Client, error) {
 	result := new(types.RefreshData)
 	err := q.SelectOne(
 		result,
@@ -162,8 +162,8 @@ func (o *OAuthStore) findRefreshToken(q db.QueryContext, refreshToken string) (*
 		return nil, nil, err
 	}
 
-	client := o.ClientStore.factory.BuildClient()
-	err = o.ClientStore.client(q, result.ClientID, client)
+	client := s.ClientStore.factory.BuildClient()
+	err = s.ClientStore.client(q, result.ClientID, client)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -172,8 +172,8 @@ func (o *OAuthStore) findRefreshToken(q db.QueryContext, refreshToken string) (*
 }
 
 // DeleteRefreshToken deletes the refresh token from the database.
-func (o *OAuthStore) DeleteRefreshToken(refreshToken string) error {
-	return deleteRefreshToken(o.queryer(), refreshToken)
+func (s *OAuthStore) DeleteRefreshToken(refreshToken string) error {
+	return deleteRefreshToken(s.queryer(), refreshToken)
 }
 
 func deleteRefreshToken(q db.QueryContext, refreshToken string) error {
