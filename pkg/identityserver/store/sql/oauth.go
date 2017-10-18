@@ -3,9 +3,45 @@
 package sql
 
 import (
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 )
+
+func init() {
+	ErrRefreshTokenNotFound.Register()
+	ErrRefreshTokenConflict.Register()
+}
+
+// ErrAuthorizationCodeNotFound is returned when trying to fetch or delete an authorization code that
+// does not exist.
+var ErrAuthorizationCodeNotFound = &errors.ErrDescriptor{
+	MessageFormat: "authorization Code token does not exist",
+	Code:          501,
+	Type:          errors.NotFound,
+}
+
+// ErrDuplicateAuthorizationCode is returned when trying to create an authorization code that already exists.
+var ErrAuthorizationCodeConflict = &errors.ErrDescriptor{
+	MessageFormat: "Authorization code already exists",
+	Code:          502,
+	Type:          errors.Conflict,
+}
+
+// ErrRefreshTokenNotFound is returned when trying to fetch or delete a refresh token that
+// does not exist.
+var ErrRefreshTokenNotFound = &errors.ErrDescriptor{
+	MessageFormat: "Refresh token does not exist",
+	Code:          503,
+	Type:          errors.NotFound,
+}
+
+// ErrDuplicateRefreshToken is returned when trying to create a refresh token that already exists.
+var ErrRefreshTokenConflict = &errors.ErrDescriptor{
+	MessageFormat: "Refresh token already exists",
+	Code:          504,
+	Type:          errors.Conflict,
+}
 
 // OAuthStore implements store.OAuthStore.
 type OAuthStore struct {
@@ -53,6 +89,10 @@ func saveAuthorizationCode(q db.QueryContext, data *types.AuthorizationData) err
 		data,
 	)
 
+	if _, dup := db.IsDuplicate(err); dup {
+		return ErrAuthorizationCodeConflict.New(nil)
+	}
+
 	return err
 }
 
@@ -78,6 +118,10 @@ func (s *OAuthStore) getAuthorizationCode(q db.QueryContext, authorizationCode s
 		authorizationCode,
 	)
 
+	if db.IsNoRows(err) {
+		return nil, nil, ErrAuthorizationCodeNotFound.New(nil)
+	}
+
 	if err != nil {
 		return nil, nil, err
 	}
@@ -98,7 +142,7 @@ func (s *OAuthStore) DeleteAuthorizationCode(authorizationCode string) error {
 
 func deleteAuthorizationCode(q db.QueryContext, authorizationCode string) error {
 	code := new(string)
-	return q.SelectOne(
+	err := q.SelectOne(
 		code,
 		`DELETE
 			FROM authorization_codes
@@ -106,6 +150,12 @@ func deleteAuthorizationCode(q db.QueryContext, authorizationCode string) error 
 			RETURNING authorization_code`,
 		authorizationCode,
 	)
+
+	if db.IsNoRows(err) {
+		return ErrAuthorizationCodeNotFound.New(nil)
+	}
+
+	return err
 }
 
 // SaveRefreshToken saves the refresh token.
@@ -115,7 +165,7 @@ func (s *OAuthStore) SaveRefreshToken(access *types.RefreshData) error {
 
 func saveRefreshToken(q db.QueryContext, refresh *types.RefreshData) error {
 	result := new(string)
-	return q.NamedSelectOne(
+	err := q.NamedSelectOne(
 		result,
 		`INSERT
 			INTO refresh_tokens (
@@ -135,6 +185,12 @@ func saveRefreshToken(q db.QueryContext, refresh *types.RefreshData) error {
 			RETURNING refresh_token`,
 		refresh,
 	)
+
+	if _, dup := db.IsDuplicate(err); dup {
+		return ErrRefreshTokenConflict.New(nil)
+	}
+
+	return err
 }
 
 // GetRefreshToken finds the refresh token.
@@ -158,6 +214,11 @@ func (s *OAuthStore) getRefreshToken(q db.QueryContext, refreshToken string) (*t
 			WHERE refresh_token = $1`,
 		refreshToken,
 	)
+
+	if db.IsNoRows(err) {
+		return nil, nil, ErrRefreshTokenNotFound.New(nil)
+	}
+
 	if err != nil {
 		return nil, nil, err
 	}
@@ -178,7 +239,7 @@ func (s *OAuthStore) DeleteRefreshToken(refreshToken string) error {
 
 func deleteRefreshToken(q db.QueryContext, refreshToken string) error {
 	token := new(string)
-	return q.SelectOne(
+	err := q.SelectOne(
 		token,
 		`DELETE
 			FROM refresh_tokens
@@ -186,4 +247,10 @@ func deleteRefreshToken(q db.QueryContext, refreshToken string) error {
 			RETURNING refresh_token`,
 		refreshToken,
 	)
+
+	if db.IsNoRows(err) {
+		return ErrRefreshTokenNotFound.New(nil)
+	}
+
+	return err
 }
