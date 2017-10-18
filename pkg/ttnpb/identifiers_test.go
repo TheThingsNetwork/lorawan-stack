@@ -4,7 +4,7 @@ package ttnpb_test
 
 import (
 	"regexp"
-	testing "testing"
+	"testing"
 
 	. "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
