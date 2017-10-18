@@ -27,9 +27,7 @@ func (s *OAuthStore) SaveAuthorizationCode(authorization *types.AuthorizationDat
 }
 
 func saveAuthorizationCode(q db.QueryContext, data *types.AuthorizationData) error {
-	result := new(string)
-	return q.NamedSelectOne(
-		result,
+	_, err := q.NamedExec(
 		`INSERT
 			INTO authorization_codes (
 				authorization_code,
@@ -51,9 +49,11 @@ func saveAuthorizationCode(q db.QueryContext, data *types.AuthorizationData) err
 				:state,
 				:user_id
 			)
-			RETURNING authorization_code`,
+		`,
 		data,
 	)
+
+	return err
 }
 
 // FindAuthorizationCode finds the authorization code.
