@@ -44,7 +44,7 @@ func TestAuthorizationCode(t *testing.T) {
 	err = s.OAuth.SaveAuthorizationCode(data)
 	a.So(err, should.BeNil)
 
-	found, c, err := s.OAuth.FindAuthorizationCode(data.AuthorizationCode)
+	found, c, err := s.OAuth.GetAuthorizationCode(data.AuthorizationCode)
 	a.So(err, should.BeNil)
 
 	a.So(found.AuthorizationCode, should.Equal, data.AuthorizationCode)
@@ -59,7 +59,7 @@ func TestAuthorizationCode(t *testing.T) {
 	err = s.OAuth.DeleteAuthorizationCode(data.AuthorizationCode)
 	a.So(err, should.BeNil)
 
-	_, _, err = s.OAuth.FindAuthorizationCode(data.AuthorizationCode)
+	_, _, err = s.OAuth.GetAuthorizationCode(data.AuthorizationCode)
 	a.So(err, should.NotBeNil)
 }
 
@@ -83,7 +83,7 @@ func TestRefreshToken(t *testing.T) {
 	err = s.OAuth.SaveRefreshToken(data)
 	a.So(err, should.BeNil)
 
-	found, c, err := s.OAuth.FindRefreshToken(data.RefreshToken)
+	found, c, err := s.OAuth.GetRefreshToken(data.RefreshToken)
 	a.So(err, should.BeNil)
 
 	a.So(found.RefreshToken, should.Equal, data.RefreshToken)
@@ -96,7 +96,7 @@ func TestRefreshToken(t *testing.T) {
 	err = s.OAuth.DeleteRefreshToken(data.RefreshToken)
 	a.So(err, should.BeNil)
 
-	_, _, err = s.OAuth.FindRefreshToken(data.RefreshToken)
+	_, _, err = s.OAuth.GetRefreshToken(data.RefreshToken)
 	a.So(err, should.NotBeNil)
 	_ = c
 }

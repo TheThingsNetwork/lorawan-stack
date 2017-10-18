@@ -56,20 +56,20 @@ func saveAuthorizationCode(q db.QueryContext, data *types.AuthorizationData) err
 	return err
 }
 
-// FindAuthorizationCode finds the authorization code.
-func (s *OAuthStore) FindAuthorizationCode(authorizationCode string) (*types.AuthorizationData, types.Client, error) {
+// GetAuthorizationCode finds the authorization code.
+func (s *OAuthStore) GetAuthorizationCode(authorizationCode string) (*types.AuthorizationData, types.Client, error) {
 	var data *types.AuthorizationData
 	var client types.Client
 	err := s.transact(func(tx *db.Tx) error {
 		var err error
-		data, client, err = s.findAuthorizationCode(tx, authorizationCode)
+		data, client, err = s.getAuthorizationCode(tx, authorizationCode)
 		return err
 	})
 
 	return data, client, err
 }
 
-func (s *OAuthStore) findAuthorizationCode(q db.QueryContext, authorizationCode string) (*types.AuthorizationData, types.Client, error) {
+func (s *OAuthStore) getAuthorizationCode(q db.QueryContext, authorizationCode string) (*types.AuthorizationData, types.Client, error) {
 	result := new(types.AuthorizationData)
 	err := q.SelectOne(
 		result,
@@ -137,20 +137,20 @@ func saveRefreshToken(q db.QueryContext, refresh *types.RefreshData) error {
 	)
 }
 
-// FindRefreshToken finds the refresh token.
-func (s *OAuthStore) FindRefreshToken(refreshToken string) (*types.RefreshData, types.Client, error) {
+// GetRefreshToken finds the refresh token.
+func (s *OAuthStore) GetRefreshToken(refreshToken string) (*types.RefreshData, types.Client, error) {
 	var data *types.RefreshData
 	var client types.Client
 	err := s.transact(func(tx *db.Tx) error {
 		var err error
-		data, client, err = s.findRefreshToken(tx, refreshToken)
+		data, client, err = s.getRefreshToken(tx, refreshToken)
 		return err
 	})
 
 	return data, client, err
 }
 
-func (s *OAuthStore) findRefreshToken(q db.QueryContext, refreshToken string) (*types.RefreshData, types.Client, error) {
+func (s *OAuthStore) getRefreshToken(q db.QueryContext, refreshToken string) (*types.RefreshData, types.Client, error) {
 	result := new(types.RefreshData)
 	err := q.SelectOne(
 		result,

@@ -67,7 +67,7 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 
 // LoadAuthorize loads the client and authorization data for the authorization code.
 func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
-	data, client, err := s.store.FindAuthorizationCode(code)
+	data, client, err := s.store.GetAuthorizationCode(code)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func (s *storage) RemoveAccess(accessToken string) error {
 
 // LoadRefresh loads the access data based on the refresh token.
 func (s *storage) LoadRefresh(refreshToken string) (*osin.AccessData, error) {
-	data, client, err := s.store.FindRefreshToken(refreshToken)
+	data, client, err := s.store.GetRefreshToken(refreshToken)
 	if err != nil {
 		return nil, nil
 	}

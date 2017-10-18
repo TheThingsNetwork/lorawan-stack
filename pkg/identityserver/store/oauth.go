@@ -13,8 +13,8 @@ type OAuthStore interface {
 	// SaveAuthorizationCode saves the authorization code.
 	SaveAuthorizationCode(authorization *types.AuthorizationData) error
 
-	// FindAuthorizationCode finds the authorization code.
-	FindAuthorizationCode(authorizationCode string) (*types.AuthorizationData, types.Client, error)
+	// GetAuthorizationCode finds the authorization code.
+	GetAuthorizationCode(authorizationCode string) (*types.AuthorizationData, types.Client, error)
 
 	// DeleteAuthorizationCode deletes the authorization code.
 	DeleteAuthorizationCode(authorizationCode string) error
@@ -22,9 +22,9 @@ type OAuthStore interface {
 	// SaveRefreshToken saves the refresh token.
 	SaveRefreshToken(refresh *types.RefreshData) error
 
-	// FindRefreshToken finds the refresh token.
-	FindRefreshToken(refreshToken string) (*types.RefreshData, types.Client, error)
+	// GetRefreshToken finds the refresh token.
+	GetRefreshToken(refreshToken string) (*types.RefreshData, types.Client, error)
 
-	// FindRefreshToken deletes the refresh token from the database.
+	// DeleteRefreshToken deletes the refresh token from the database.
 	DeleteRefreshToken(refreshToken string) error
 }
