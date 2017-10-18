@@ -9,12 +9,14 @@ import (
 // pad pads a byte slice with random bytes until it has the desired length.
 // The slice is prefixed with the length of the original byte slice to allow for unpadding so the length
 // of the resulting slice will be to + 1.
-// If the length of the byte slice is bigger than the desired length, it is truncated.
+// If the length of the byte slice is bigger than the desired length, it is returned unaltered.
 func pad(a []byte, to int) []byte {
-	length := min(len(a), to)
+	if len(a) > to {
+		return append([]byte{byte(len(a))}, a...)
+	}
 
 	res := make([]byte, to+1)
-	res[0] = byte(length)
+	res[0] = byte(len(a))
 
 	for i := range a {
 		if to > i {
@@ -45,13 +47,4 @@ func unpad(a []byte) []byte {
 	}
 
 	return res
-}
-
-// min returns the minimum of two integers.
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-
-	return b
 }

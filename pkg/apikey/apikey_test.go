@@ -3,6 +3,7 @@
 package apikey
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -10,12 +11,10 @@ import (
 )
 
 var (
-	tenant = "id.tenant.example.net"
-	apps   = []string{
-		"aa",
-		"ab",
-		"app-foo",
-		"app-with-a-very-long-id-but-still-ok",
+	tenants = []string{
+		"foo.bar.baz",
+		"id.thethings.network",
+		"a.very.long.tenant.id.that.is.really.long",
 	}
 )
 
@@ -23,28 +22,12 @@ func TestGenerateKey(t *testing.T) {
 	a := assertions.New(t)
 
 	// test good apps
-	for _, app := range apps {
-		key := GenerateApplicationAPIKey(tenant, app)
-		info, err := DecodeKey(key)
+	for _, tenant := range tenants {
+		key := GenerateAPIKey(tenant)
+		ten, err := KeyTenant(key)
 		a.So(err, should.BeNil)
 
-		a.So(info.ID, should.Equal, app)
-		a.So(info.Tenant, should.Equal, tenant)
-		a.So(info.Type, should.Equal, Application)
+		fmt.Println(key)
+		a.So(ten, should.Equal, tenant)
 	}
-
-}
-
-func TestGenerateKeyInvalidKey(t *testing.T) {
-	a := assertions.New(t)
-
-	key := GenerateApplicationAPIKey(tenant, "app-with-a-very-long-id-that-is-definately-too-long-for-us")
-	a.So(key, should.BeEmpty)
-}
-
-func TestGenerateKeyInvalidKeyType(t *testing.T) {
-	a := assertions.New(t)
-
-	key := generateKey(Invalid, tenant, "app-with-a-very-long-id-that-is-definately-too-long-for-us")
-	a.So(key, should.BeEmpty)
 }

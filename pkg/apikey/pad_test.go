@@ -31,10 +31,10 @@ func TestPad(t *testing.T) {
 		padded := pad(original, length)
 
 		// first byte is the length
-		a.So(int(padded[0]), should.Resemble, min(len(original), length))
+		a.So(int(padded[0]), should.Resemble, len(original))
 
 		// total length should be what we asked for
-		a.So(len(padded), should.Equal, length+1)
+		a.So(len(padded), should.Equal, max(length, len(original))+1)
 
 		// the original byte should be present
 		m := min(length, len(original))
@@ -48,6 +48,24 @@ func TestPad(t *testing.T) {
 
 		// the unpadded slice should equal the (truncated) original slice
 		unpadded := unpad(padded)
-		a.So(unpadded, should.Resemble, original[:m])
+		a.So(unpadded, should.Resemble, original)
 	}
+}
+
+// min returns the minimum of two integers.
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+
+	return b
+}
+
+// max returns the maximum of two integers.
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+
+	return b
 }
