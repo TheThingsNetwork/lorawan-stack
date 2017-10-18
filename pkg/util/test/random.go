@@ -8,4 +8,5 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/util/randutil"
 )
 
+// Randy is global rand safe for concurrent use
 var Randy = rand.New(randutil.NewLockedSource(rand.NewSource(42)))
