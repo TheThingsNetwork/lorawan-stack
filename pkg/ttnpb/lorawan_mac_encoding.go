@@ -308,6 +308,11 @@ func (m *MACCommands) MarshalLoRaWAN() ([]byte, error) {
 	return m.AppendLoRaWAN(make([]byte, 0, 15)) // most messages have MAC commands in the header, then 15 is enough
 }
 
+// MACCommand returns the Proprietary MAC command as a *MACCommand
+func (m *MACCommand_Proprietary) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_Proprietary_{Proprietary: m}}
+}
+
 // AppendLoRaWAN appends the marshaled Proprietary CID and payload to the slice.
 func (m *MACCommand_Proprietary) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(m.CID))
@@ -358,6 +363,11 @@ func getBit(b byte, i uint8) bool {
 	return (b>>i)&1 == 1
 }
 
+// MACCommand returns the ResetInd MAC command as a *MACCommand
+func (m *MACCommand_ResetInd) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_ResetInd_{ResetInd: m}}
+}
+
 // AppendLoRaWAN appends the marshaled ResetInd CID and payload to the slice.
 func (m *MACCommand_ResetInd) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if m.MinorVersion > 15 {
@@ -382,6 +392,11 @@ func (m *MACCommand_ResetInd) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
+// MACCommand returns the ResetConf MAC command as a *MACCommand
+func (m *MACCommand_ResetConf) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_ResetConf_{ResetConf: m}}
+}
+
 // AppendLoRaWAN appends the marshaled ResetConf CID and payload to the slice.
 func (m *MACCommand_ResetConf) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if m.MinorVersion > 15 {
@@ -404,6 +419,11 @@ func (m *MACCommand_ResetConf) UnmarshalLoRaWAN(b []byte) error {
 	}
 	m.MinorVersion = uint32(b[1] & 0xf)
 	return nil
+}
+
+// MACCommand returns the LinkCheckAns MAC command as a *MACCommand
+func (m *MACCommand_LinkCheckAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_LinkCheckAns_{LinkCheckAns: m}}
 }
 
 // AppendLoRaWAN appends the marshaled LinkCheckAns CID and payload to the slice.
@@ -432,6 +452,11 @@ func (m *MACCommand_LinkCheckAns) UnmarshalLoRaWAN(b []byte) error {
 	m.Margin = uint32(b[1])
 	m.GatewayCount = uint32(b[2])
 	return nil
+}
+
+// MACCommand returns the LinkADRReq MAC command as a *MACCommand
+func (m *MACCommand_LinkADRReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_LinkAdrReq{LinkAdrReq: m}}
 }
 
 // AppendLoRaWAN appends the marshaled LinkADRReq CID and payload to the slice.
@@ -486,6 +511,11 @@ func (m *MACCommand_LinkADRReq) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
+// MACCommand returns the LinkADRAns MAC command as a *MACCommand
+func (m *MACCommand_LinkADRAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_LinkAdrAns{LinkAdrAns: m}}
+}
+
 // AppendLoRaWAN appends the marshaled LinkADRAns CID and payload to the slice.
 func (m *MACCommand_LinkADRAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(CID_LINK_ADR))
@@ -519,6 +549,11 @@ func (m *MACCommand_LinkADRAns) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
+// MACCommand returns the DutyCycleReq MAC command as a *MACCommand
+func (m *MACCommand_DutyCycleReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_DutyCycleReq_{DutyCycleReq: m}}
+}
+
 // AppendLoRaWAN appends the marshaled DutyCycleReq CID and payload to the slice.
 func (m *MACCommand_DutyCycleReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(CID_DUTY_CYCLE))
@@ -534,6 +569,11 @@ func (m *MACCommand_DutyCycleReq) MarshalLoRaWAN() ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the DutyCycleReq CID and payload.
 func (m *MACCommand_DutyCycleReq) UnmarshalLoRaWAN(b []byte) error {
 	return nil // TODO
+}
+
+// MACCommand returns the RxParamSetupReq MAC command as a *MACCommand
+func (m *MACCommand_RxParamSetupReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_RxParamSetupReq_{RxParamSetupReq: m}}
 }
 
 // AppendLoRaWAN appends the marshaled RxParamSetupReq CID and payload to the slice.
@@ -553,6 +593,11 @@ func (m *MACCommand_RxParamSetupReq) UnmarshalLoRaWAN(b []byte) error {
 	return nil // TODO
 }
 
+// MACCommand returns the RxParamSetupAns MAC command as a *MACCommand
+func (m *MACCommand_RxParamSetupAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_RxParamSetupAns_{RxParamSetupAns: m}}
+}
+
 // AppendLoRaWAN appends the marshaled RxParamSetupAns CID and payload to the slice.
 func (m *MACCommand_RxParamSetupAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(CID_RX_PARAM_SETUP))
@@ -568,6 +613,11 @@ func (m *MACCommand_RxParamSetupAns) MarshalLoRaWAN() ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the RxParamSetupAns CID and payload.
 func (m *MACCommand_RxParamSetupAns) UnmarshalLoRaWAN(b []byte) error {
 	return nil // TODO
+}
+
+// MACCommand returns the DevStatusAns MAC command as a *MACCommand
+func (m *MACCommand_DevStatusAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_DevStatusAns_{DevStatusAns: m}}
 }
 
 // AppendLoRaWAN appends the marshaled DevStatusAns CID and payload to the slice.
@@ -587,6 +637,11 @@ func (m *MACCommand_DevStatusAns) UnmarshalLoRaWAN(b []byte) error {
 	return nil // TODO
 }
 
+// MACCommand returns the NewChannelReq MAC command as a *MACCommand
+func (m *MACCommand_NewChannelReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_NewChannelReq_{NewChannelReq: m}}
+}
+
 // AppendLoRaWAN appends the marshaled NewChannelReq CID and payload to the slice.
 func (m *MACCommand_NewChannelReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(CID_NEW_CHANNEL))
@@ -602,6 +657,11 @@ func (m *MACCommand_NewChannelReq) MarshalLoRaWAN() ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the NewChannelReq CID and payload.
 func (m *MACCommand_NewChannelReq) UnmarshalLoRaWAN(b []byte) error {
 	return nil // TODO
+}
+
+// MACCommand returns the NewChannelAns MAC command as a *MACCommand
+func (m *MACCommand_NewChannelAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_NewChannelAns_{NewChannelAns: m}}
 }
 
 // AppendLoRaWAN appends the marshaled NewChannelAns CID and payload to the slice.
@@ -621,6 +681,11 @@ func (m *MACCommand_NewChannelAns) UnmarshalLoRaWAN(b []byte) error {
 	return nil // TODO
 }
 
+// MACCommand returns the DLChannelReq MAC command as a *MACCommand
+func (m *MACCommand_DLChannelReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_DlChannelReq{DlChannelReq: m}}
+}
+
 // AppendLoRaWAN appends the marshaled DLChannelReq CID and payload to the slice.
 func (m *MACCommand_DLChannelReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(CID_DL_CHANNEL))
@@ -636,6 +701,11 @@ func (m *MACCommand_DLChannelReq) MarshalLoRaWAN() ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the DLChannelReq CID and payload.
 func (m *MACCommand_DLChannelReq) UnmarshalLoRaWAN(b []byte) error {
 	return nil // TODO
+}
+
+// MACCommand returns the DLChannelAns MAC command as a *MACCommand
+func (m *MACCommand_DLChannelAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_DlChannelAns{DlChannelAns: m}}
 }
 
 // AppendLoRaWAN appends the marshaled DLChannelAns CID and payload to the slice.
@@ -655,6 +725,11 @@ func (m *MACCommand_DLChannelAns) UnmarshalLoRaWAN(b []byte) error {
 	return nil // TODO
 }
 
+// MACCommand returns the RxTimingSetupReq MAC command as a *MACCommand
+func (m *MACCommand_RxTimingSetupReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_RxTimingSetupReq_{RxTimingSetupReq: m}}
+}
+
 // AppendLoRaWAN appends the marshaled RxTimingSetupReq CID and payload to the slice.
 func (m *MACCommand_RxTimingSetupReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(CID_RX_TIMING_SETUP))
@@ -672,6 +747,11 @@ func (m *MACCommand_RxTimingSetupReq) UnmarshalLoRaWAN(b []byte) error {
 	return nil // TODO
 }
 
+// MACCommand returns the TxParamSetupReq MAC command as a *MACCommand
+func (m *MACCommand_TxParamSetupReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_TxParamSetupReq_{TxParamSetupReq: m}}
+}
+
 // AppendLoRaWAN appends the marshaled TxParamSetupReq CID and payload to the slice.
 func (m *MACCommand_TxParamSetupReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(CID_TX_PARAM_SETUP))
@@ -687,6 +767,11 @@ func (m *MACCommand_TxParamSetupReq) MarshalLoRaWAN() ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the TxParamSetupReq CID and payload.
 func (m *MACCommand_TxParamSetupReq) UnmarshalLoRaWAN(b []byte) error {
 	return nil // TODO
+}
+
+// MACCommand returns the RekeyInd MAC command as a *MACCommand
+func (m *MACCommand_RekeyInd) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_RekeyInd_{RekeyInd: m}}
 }
 
 // AppendLoRaWAN appends the marshaled RekeyInd CID and payload to the slice.
@@ -713,6 +798,11 @@ func (m *MACCommand_RekeyInd) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
+// MACCommand returns the RekeyConf MAC command as a *MACCommand
+func (m *MACCommand_RekeyConf) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_RekeyConf_{RekeyConf: m}}
+}
+
 // AppendLoRaWAN appends the marshaled RekeyConf CID and payload to the slice.
 func (m *MACCommand_RekeyConf) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if m.MinorVersion > 15 {
@@ -737,6 +827,11 @@ func (m *MACCommand_RekeyConf) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
+// MACCommand returns the ADRParamSetupReq MAC command as a *MACCommand
+func (m *MACCommand_ADRParamSetupReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_AdrParamSetupReq{AdrParamSetupReq: m}}
+}
+
 // AppendLoRaWAN appends the marshaled ADRParamSetupReq CID and payload to the slice.
 func (m *MACCommand_ADRParamSetupReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(CID_ADR_PARAM_SETUP))
@@ -752,6 +847,11 @@ func (m *MACCommand_ADRParamSetupReq) MarshalLoRaWAN() ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the ADRParamSetupReq CID and payload.
 func (m *MACCommand_ADRParamSetupReq) UnmarshalLoRaWAN(b []byte) error {
 	return nil
+}
+
+// MACCommand returns the DeviceTimeAns MAC command as a *MACCommand
+func (m *MACCommand_DeviceTimeAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_DeviceTimeAns_{DeviceTimeAns: m}}
 }
 
 // AppendLoRaWAN appends the marshaled DeviceTimeAns CID and payload to the slice.
@@ -771,6 +871,11 @@ func (m *MACCommand_DeviceTimeAns) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
+// MACCommand returns the ForceRejoinReq MAC command as a *MACCommand
+func (m *MACCommand_ForceRejoinReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_ForceRejoinReq_{ForceRejoinReq: m}}
+}
+
 // AppendLoRaWAN appends the marshaled ForceRejoinReq CID and payload to the slice.
 func (m *MACCommand_ForceRejoinReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(CID_FORCE_REJOIN))
@@ -786,6 +891,11 @@ func (m *MACCommand_ForceRejoinReq) MarshalLoRaWAN() ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the ForceRejoinReq CID and payload.
 func (m *MACCommand_ForceRejoinReq) UnmarshalLoRaWAN(b []byte) error {
 	return nil
+}
+
+// MACCommand returns the RejoinParamSetupReq MAC command as a *MACCommand
+func (m *MACCommand_RejoinParamSetupReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_RejoinParamSetupReq_{RejoinParamSetupReq: m}}
 }
 
 // AppendLoRaWAN appends the marshaled RejoinParamSetupReq CID and payload to the slice.
@@ -805,6 +915,11 @@ func (m *MACCommand_RejoinParamSetupReq) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
+// MACCommand returns the RejoinParamSetupAns MAC command as a *MACCommand
+func (m *MACCommand_RejoinParamSetupAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_RejoinParamSetupAns_{RejoinParamSetupAns: m}}
+}
+
 // AppendLoRaWAN appends the marshaled RejoinParamSetupAns CID and payload to the slice.
 func (m *MACCommand_RejoinParamSetupAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(CID_REJOIN_PARAM_SETUP))
@@ -820,6 +935,11 @@ func (m *MACCommand_RejoinParamSetupAns) MarshalLoRaWAN() ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the RejoinParamSetupAns CID and payload.
 func (m *MACCommand_RejoinParamSetupAns) UnmarshalLoRaWAN(b []byte) error {
 	return nil
+}
+
+// MACCommand returns the PingSlotInfoReq MAC command as a *MACCommand
+func (m *MACCommand_PingSlotInfoReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_PingSlotInfoReq_{PingSlotInfoReq: m}}
 }
 
 // AppendLoRaWAN appends the marshaled PingSlotInfoReq CID and payload to the slice.
@@ -839,6 +959,11 @@ func (m *MACCommand_PingSlotInfoReq) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
+// MACCommand returns the PingSlotChannelReq MAC command as a *MACCommand
+func (m *MACCommand_PingSlotChannelReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_PingSlotChannelReq_{PingSlotChannelReq: m}}
+}
+
 // AppendLoRaWAN appends the marshaled PingSlotChannelReq CID and payload to the slice.
 func (m *MACCommand_PingSlotChannelReq) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(CID_PING_SLOT_CHANNEL))
@@ -854,6 +979,11 @@ func (m *MACCommand_PingSlotChannelReq) MarshalLoRaWAN() ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the PingSlotChannelReq CID and payload.
 func (m *MACCommand_PingSlotChannelReq) UnmarshalLoRaWAN(b []byte) error {
 	return nil
+}
+
+// MACCommand returns the PingSlotChannelAns MAC command as a *MACCommand
+func (m *MACCommand_PingSlotChannelAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_PingSlotChannelAns_{PingSlotChannelAns: m}}
 }
 
 // AppendLoRaWAN appends the marshaled PingSlotChannelAns CID and payload to the slice.
@@ -873,6 +1003,11 @@ func (m *MACCommand_PingSlotChannelAns) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
+// MACCommand returns the BeaconTimingAns MAC command as a *MACCommand
+func (m *MACCommand_BeaconTimingAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_BeaconTimingAns_{BeaconTimingAns: m}}
+}
+
 // AppendLoRaWAN appends the marshaled BeaconTimingAns CID and payload to the slice.
 func (m *MACCommand_BeaconTimingAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(CID_BEACON_TIMING))
@@ -888,6 +1023,11 @@ func (m *MACCommand_BeaconTimingAns) MarshalLoRaWAN() ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the BeaconTimingAns CID and payload.
 func (m *MACCommand_BeaconTimingAns) UnmarshalLoRaWAN(b []byte) error {
 	return nil
+}
+
+// MACCommand returns the BeaconFreqReq MAC command as a *MACCommand
+func (m *MACCommand_BeaconFreqReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_BeaconFreqReq_{BeaconFreqReq: m}}
 }
 
 // AppendLoRaWAN appends the marshaled BeaconFreqReq CID and payload to the slice.
@@ -907,6 +1047,11 @@ func (m *MACCommand_BeaconFreqReq) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
+// MACCommand returns the BeaconFreqAns MAC command as a *MACCommand
+func (m *MACCommand_BeaconFreqAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_BeaconFreqAns_{BeaconFreqAns: m}}
+}
+
 // AppendLoRaWAN appends the marshaled BeaconFreqAns CID and payload to the slice.
 func (m *MACCommand_BeaconFreqAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(CID_BEACON_FREQ))
@@ -924,6 +1069,11 @@ func (m *MACCommand_BeaconFreqAns) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
+// MACCommand returns the DeviceModeInd MAC command as a *MACCommand
+func (m *MACCommand_DeviceModeInd) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_DeviceModeInd_{DeviceModeInd: m}}
+}
+
 // AppendLoRaWAN appends the marshaled DeviceModeInd CID and payload to the slice.
 func (m *MACCommand_DeviceModeInd) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(CID_DEVICE_MODE))
@@ -939,6 +1089,11 @@ func (m *MACCommand_DeviceModeInd) MarshalLoRaWAN() ([]byte, error) {
 // UnmarshalLoRaWAN unmarshals the DeviceModeInd CID and payload.
 func (m *MACCommand_DeviceModeInd) UnmarshalLoRaWAN(b []byte) error {
 	return nil
+}
+
+// MACCommand returns the DeviceModeConf MAC command as a *MACCommand
+func (m *MACCommand_DeviceModeConf) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_DeviceModeConf_{DeviceModeConf: m}}
 }
 
 // AppendLoRaWAN appends the marshaled DeviceModeConf CID and payload to the slice.

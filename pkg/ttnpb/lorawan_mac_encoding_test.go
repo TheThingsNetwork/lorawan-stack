@@ -17,31 +17,37 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		Command interface {
 			AppendLoRaWAN(dst []byte) ([]byte, error)
 			MarshalLoRaWAN() ([]byte, error)
+			MACCommand() *MACCommand
 		}
 		Empty interface {
 			UnmarshalLoRaWAN(b []byte) error
 		}
-		Bytes []byte
+		Bytes    []byte
+		IsUplink bool
 	}{
 		{
 			&MACCommand_Proprietary{CID: 0x80, RawPayload: []byte{1, 2, 3, 4}},
 			&MACCommand_Proprietary{},
 			[]byte{0x80, 1, 2, 3, 4},
+			true,
 		},
 		{
 			&MACCommand_ResetInd{MinorVersion: 1},
 			&MACCommand_ResetInd{},
 			[]byte{0x01, 1},
+			true,
 		},
 		{
 			&MACCommand_ResetConf{MinorVersion: 1},
 			&MACCommand_ResetConf{},
 			[]byte{0x01, 1},
+			false,
 		},
 		{
 			&MACCommand_LinkCheckAns{Margin: 20, GatewayCount: 3},
 			&MACCommand_LinkCheckAns{},
 			[]byte{0x02, 20, 3},
+			false,
 		},
 		{
 			&MACCommand_LinkADRReq{
@@ -56,6 +62,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 			},
 			&MACCommand_LinkADRReq{},
 			[]byte{0x03, 0x52, 0x04, 0x02, 0x11},
+			false,
 		},
 		{
 			&MACCommand_LinkADRAns{
@@ -65,6 +72,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 			},
 			&MACCommand_LinkADRAns{},
 			[]byte{0x03, 0x7},
+			true,
 		},
 		// {
 		// 	&MACCommand_DutyCycleReq{},
@@ -120,11 +128,13 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 			&MACCommand_RekeyInd{MinorVersion: 1},
 			&MACCommand_RekeyInd{},
 			[]byte{0x0B, 1},
+			true,
 		},
 		{
 			&MACCommand_RekeyConf{MinorVersion: 1},
 			&MACCommand_RekeyConf{},
 			[]byte{0x0B, 1},
+			false,
 		},
 		// {
 		// 	&MACCommand_ADRParamSetupReq{},
@@ -207,6 +217,16 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 			ret, err := tc.Command.AppendLoRaWAN(make([]byte, 0))
 			a.So(err, should.BeNil)
 			a.So(ret, should.Resemble, tc.Bytes)
+
+			cmds := MACCommands{tc.Command.MACCommand()}
+			cmdsb, err := cmds.MarshalLoRaWAN()
+			a.So(err, should.BeNil)
+			a.So(cmdsb, should.Resemble, tc.Bytes)
+
+			var cmds2 MACCommands
+			err = cmds2.UnmarshalLoRaWAN(cmdsb, tc.IsUplink)
+			a.So(err, should.BeNil)
+			a.So(cmds2, should.Resemble, cmds)
 		})
 	}
 }
