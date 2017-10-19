@@ -24,6 +24,30 @@ func (g *Gateway) SetAntennas(antennas []GatewayAntenna) {
 	g.Antennas = antennas
 }
 
+const (
+	PathGatewayDescription = "description"
+
+	PathGatewayFrequencyPlanID = "frequency_plan_id"
+
+	PathGatewayPrivacySettingStatusPublic = "privacy_settings.status_public"
+
+	PathGatewayPrivacySettingLocationPublic = "privacy_settings.location_public"
+
+	PathGatewayPrivacySettingsContactable = "privacy_settings.contactable"
+
+	PathGatewayAutoUpdate = "auto_update"
+
+	PathGatewayPlatform = "platform"
+
+	PathGatewayAntennas = "antennas"
+
+	PathGatewayAttributes = "attributes"
+
+	PathGatewayClusterAddress = "cluster_address"
+
+	PathGatewayContactAccount = "contact_account.user_id"
+)
+
 // GatewayPrivacySetting is an enum that defines the different gateway privacy settings.
 type GatewayPrivacySetting int32
 

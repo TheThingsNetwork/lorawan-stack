@@ -31,3 +31,13 @@ func (c *Client) HasGrant(grant GrantType) bool {
 
 	return false
 }
+
+const (
+	PathClientDescription = "description"
+
+	PathClientCallbackURI = "callback_uri"
+
+	PathClientGrants = "grants"
+
+	PathClientScope = "scope"
+)

@@ -11,3 +11,10 @@ func (d *Application) GetApplication() *Application {
 func (d *Application) SetAPIKeys(keys []APIKey) {
 	d.APIKeys = keys
 }
+
+const (
+	// Valid FieldMask path values for the `update_mask` in UpdateApplication method.
+
+	// PathApplicationDescription is the path value for the `description` field.
+	PathApplicationDescription = "description"
+)
