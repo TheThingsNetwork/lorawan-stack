@@ -10,12 +10,3 @@ func Must(logger Interface) Interface {
 
 	panic("No logger attached to the context")
 }
-
-// Ensure returns the logger that was passed or Noop if it is nil
-func Ensure(logger Interface) Interface {
-	if logger != nil {
-		return logger
-	}
-
-	return Noop
-}
