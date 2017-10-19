@@ -22,5 +22,5 @@ func FromContext(ctx context.Context) Interface {
 		}
 	}
 
-	return nil
+	return Noop
 }

@@ -17,13 +17,12 @@ func TestContext(t *testing.T) {
 	logger, err := NewLogger()
 	a.So(err, should.BeNil)
 
-	a.So(FromContext(ctx), should.BeNil)
-	a.So(Ensure(FromContext(ctx)), should.Equal, Noop)
-	a.So(func() { Must(FromContext(ctx)) }, should.Panic)
+	a.So(FromContext(ctx), should.NotBeNil)
+	a.So(FromContext(ctx), should.Equal, Noop)
+	a.So(func() { Must(FromContext(ctx)) }, should.NotPanic)
 
 	ctx = WithLogger(ctx, logger)
 
 	a.So(FromContext(ctx), should.Equal, logger)
-	a.So(Ensure(FromContext(ctx)), should.Equal, logger)
 	a.So(func() { Must(FromContext(ctx)) }, should.NotPanic)
 }
