@@ -73,7 +73,7 @@ func clean(t testing.TB) Database {
 	}
 
 	// drop database
-	_, err = db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s", database))
+	_, err = db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE", database))
 	if err != nil {
 		logger.WithError(err).Fatalf("Failed to delete database `%s`", database)
 		return nil
