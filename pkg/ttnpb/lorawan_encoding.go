@@ -3,44 +3,125 @@
 package ttnpb
 
 import (
-	"encoding/binary"
-	math "math"
+	"math"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 )
 
 const maxUint24 = 1<<24 - 1
 
+func parseUint16(b []byte) uint16 {
+	switch len(b) {
+	case 0:
+		return 0
+	case 1:
+		_ = b[0]
+		return uint16(b[0])
+	default:
+		_ = b[1]
+		return uint16(b[0]) | uint16(b[1])<<8
+	}
+}
+func parseUint32(b []byte) uint32 {
+	switch len(b) {
+	case 0:
+		return 0
+	case 1:
+		_ = b[0]
+		return uint32(b[0])
+	case 2:
+		_ = b[1]
+		return uint32(b[0]) | uint32(b[1])<<8
+	case 3:
+		_ = b[2]
+		return uint32(b[0]) | uint32(b[1])<<8 | uint32(b[2])<<16
+	default:
+		_ = b[3]
+		return uint32(b[0]) | uint32(b[1])<<8 | uint32(b[2])<<16 | uint32(b[3])<<24
+	}
+}
+func parseUint64(b []byte) uint64 {
+	switch len(b) {
+	case 0:
+		return 0
+	case 1:
+		_ = b[0]
+		return uint64(b[0])
+	case 2:
+		_ = b[1]
+		return uint64(b[0]) | uint64(b[1])<<8
+	case 3:
+		_ = b[2]
+		return uint64(b[0]) | uint64(b[1])<<8 | uint64(b[2])<<16
+	case 4:
+		_ = b[3]
+		return uint64(b[0]) | uint64(b[1])<<8 | uint64(b[2])<<16 | uint64(b[3])<<24
+	case 5:
+		_ = b[4]
+		return uint64(b[0]) | uint64(b[1])<<8 | uint64(b[2])<<16 | uint64(b[3])<<24 | uint64(b[4])<<32
+	case 6:
+		_ = b[5]
+		return uint64(b[0]) | uint64(b[1])<<8 | uint64(b[2])<<16 | uint64(b[3])<<24 | uint64(b[4])<<32 | uint64(b[5])<<40
+	case 7:
+		_ = b[6]
+		return uint64(b[0]) | uint64(b[1])<<8 | uint64(b[2])<<16 | uint64(b[3])<<24 | uint64(b[4])<<32 | uint64(b[5])<<40 | uint64(b[6])<<48
+	default:
+		_ = b[7]
+		return uint64(b[0]) | uint64(b[1])<<8 | uint64(b[2])<<16 | uint64(b[3])<<24 | uint64(b[4])<<32 | uint64(b[5])<<40 | uint64(b[6])<<48 | uint64(b[7])<<56
+	}
+}
+
+func appendUint16(dst []byte, v uint16, byteCount uint8) []byte {
+	switch byteCount {
+	case 0:
+		return dst
+	case 1:
+		return append(dst, byte(v))
+	default:
+		dst = append(dst, byte(v), byte(v>>8))
+		for i := uint8(2); i < byteCount; i++ {
+			dst = append(dst, 0)
+		}
+		return dst
+	}
+}
+
 func appendUint32(dst []byte, v uint32, byteCount uint8) []byte {
 	switch byteCount {
-	case 1:
-		dst = append(dst, byte(v))
-	case 2:
-		dst = append(dst, byte(v), byte(v>>8))
+	case 0, 1, 2:
+		return appendUint16(dst, uint16(v), byteCount)
 	case 3:
-		dst = append(dst, byte(v), byte(v>>8), byte(v>>16))
-	case 4:
+		return append(dst, byte(v), byte(v>>8), byte(v>>16))
+	default:
 		dst = append(dst, byte(v), byte(v>>8), byte(v>>16), byte(v>>24))
+		for i := uint8(4); i < byteCount; i++ {
+			dst = append(dst, 0)
+		}
+		return dst
 	}
-	return dst
 }
 
 func appendUint64(dst []byte, v uint64, byteCount uint8) []byte {
 	switch byteCount {
-	case 1, 2, 3, 4:
+	case 0, 1, 2, 3, 4:
 		return appendUint32(dst, uint32(v), byteCount)
 	case 5:
-		dst = append(dst, byte(v), byte(v>>8), byte(v>>16), byte(v>>24), byte(v>>32))
+		return append(dst, byte(v), byte(v>>8), byte(v>>16), byte(v>>24), byte(v>>32))
 	case 6:
-		dst = append(dst, byte(v), byte(v>>8), byte(v>>16), byte(v>>24), byte(v>>32), byte(v>>40))
+		return append(dst, byte(v), byte(v>>8), byte(v>>16), byte(v>>24), byte(v>>32), byte(v>>40))
 	case 7:
-		dst = append(dst, byte(v), byte(v>>8), byte(v>>16), byte(v>>24), byte(v>>32), byte(v>>40), byte(v>>48))
-	case 8:
+		return append(dst, byte(v), byte(v>>8), byte(v>>16), byte(v>>24), byte(v>>32), byte(v>>40), byte(v>>48))
+	default:
 		dst = append(dst, byte(v), byte(v>>8), byte(v>>16), byte(v>>24), byte(v>>32), byte(v>>40), byte(v>>48), byte(v>>56))
+		for i := uint8(8); i < byteCount; i++ {
+			dst = append(dst, 0)
+		}
+		return dst
 	}
-	return dst
 }
 
+// AppendLoRaWAN appends the LoRaWAN representation of msg
+// to dst and returns the extended buffer.
 func (msg MHDR) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if msg.MType > 7 {
 		return nil, errors.Errorf("expected MType to be less or equal to 7, got %d", msg.MType)
@@ -48,7 +129,7 @@ func (msg MHDR) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if msg.Major > 4 {
 		return nil, errors.Errorf("expected Major to be less or equal to 4, got %d", msg.Major)
 	}
-	return append(dst, byte(msg.MType)<<5^byte(msg.Major)), nil
+	return append(dst, byte(msg.MType)<<5|byte(msg.Major)), nil
 }
 func (msg *MHDR) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
@@ -60,27 +141,29 @@ func (msg *MHDR) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
+// AppendLoRaWAN appends the LoRaWAN representation of msg
+// to dst and returns the extended buffer.
 func (msg FCtrl) AppendLoRaWAN(dst []byte, isUplink bool, fOptsLen uint8) ([]byte, error) {
 	if fOptsLen > 15 {
 		return nil, errors.Errorf("expected fOptsLen be less or equal to 15, got %d", fOptsLen)
 	}
 	b := fOptsLen
 	if msg.ADR {
-		b ^= 1 << 7
+		b |= 1 << 7
 	}
 	if msg.Ack {
-		b ^= 1 << 5
+		b |= 1 << 5
 	}
 	if isUplink {
 		if msg.ADRAckReq {
-			b ^= 1 << 6
+			b |= 1 << 6
 		}
 		if msg.ClassB {
-			b ^= 1 << 4
+			b |= 1 << 4
 		}
 	} else {
 		if msg.FPending {
-			b ^= 1 << 4
+			b |= 1 << 4
 		}
 	}
 	return append(dst, b), nil
@@ -101,6 +184,8 @@ func (msg *FCtrl) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	return nil
 }
 
+// AppendLoRaWAN appends the LoRaWAN representation of msg
+// to dst and returns the extended buffer.
 func (msg FHDR) AppendLoRaWAN(dst []byte, isUplink bool) ([]byte, error) {
 	dst = append(dst, msg.DevAddr[:]...)
 	fOptsLen := uint8(len(msg.FOpts))
@@ -127,12 +212,14 @@ func (msg *FHDR) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	if err := msg.FCtrl.UnmarshalLoRaWAN(b[4:5], isUplink); err != nil {
 		return errors.NewWithCause("failed to decode FCtrl", err)
 	}
-	msg.FCnt = uint32(binary.LittleEndian.Uint16(b[5:7]))
+	msg.FCnt = parseUint32(b[5:7])
 	msg.FOpts = make([]byte, 0, n-7)
 	msg.FOpts = append(msg.FOpts, b[7:n]...)
 	return nil
 }
 
+// AppendLoRaWAN appends the LoRaWAN representation of msg
+// to dst and returns the extended buffer.
 func (msg MACPayload) AppendLoRaWAN(dst []byte, isUplink bool) ([]byte, error) {
 	dst, err := msg.FHDR.AppendLoRaWAN(dst, isUplink)
 	if err != nil {
@@ -147,6 +234,8 @@ func (msg MACPayload) AppendLoRaWAN(dst []byte, isUplink bool) ([]byte, error) {
 	dst = append(dst, msg.FRMPayload...)
 	return dst, nil
 }
+
+// MarshalLoRaWAN returns the LoRaWAN representation of msg.
 func (msg MACPayload) MarshalLoRaWAN(isUplink bool) ([]byte, error) {
 	return msg.AppendLoRaWAN(make([]byte, 0, 1), isUplink)
 }
@@ -177,6 +266,8 @@ func (msg *MACPayload) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	return nil
 }
 
+// AppendLoRaWAN appends the LoRaWAN representation of msg
+// to dst and returns the extended buffer.
 func (msg DLSettings) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if msg.Rx1DROffset > 7 {
 		return nil, errors.Errorf("expected Rx1DROffset to be less or equal to 7, got %d", msg.Rx1DROffset)
@@ -184,8 +275,12 @@ func (msg DLSettings) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if msg.Rx2DR > 15 {
 		return nil, errors.Errorf("expected Rx2DR to be less or equal to 15, got %d", msg.Rx2DR)
 	}
-	return append(dst, byte((msg.Rx1DROffset<<4)^msg.Rx2DR)), nil
+	b := msg.Rx2DR
+	b |= (msg.Rx1DROffset << 4)
+	return append(dst, byte(b)), nil
 }
+
+// MarshalLoRaWAN returns the LoRaWAN representation of msg.
 func (msg DLSettings) MarshalLoRaWAN() ([]byte, error) {
 	return msg.AppendLoRaWAN(make([]byte, 0, 1))
 }
@@ -194,7 +289,7 @@ func (msg *DLSettings) UnmarshalLoRaWAN(b []byte) error {
 		return errors.Errorf("expected length of encoded DLSettings to be equal to 1, got %d", len(b))
 	}
 	v := uint32(b[0])
-	msg.Rx1DROffset = v >> 4
+	msg.Rx1DROffset = (v >> 4) & 0x7
 	msg.Rx2DR = v & 0xf
 	return nil
 }
@@ -272,6 +367,8 @@ func (msg *CFList) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
+// AppendLoRaWAN appends the LoRaWAN representation of msg
+// to dst and returns the extended buffer.
 func (msg JoinAcceptPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, msg.JoinNonce[:]...)
 	dst = append(dst, msg.NetID[:]...)
@@ -368,6 +465,7 @@ func (msg RejoinRequestPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	return dst, nil
 }
 
+// MarshalLoRaWAN returns the LoRaWAN representation of msg.
 func (msg RejoinRequestPayload) MarshalLoRaWAN() ([]byte, error) {
 	if msg.RejoinType == 1 {
 		return msg.AppendLoRaWAN(make([]byte, 0, 19))
@@ -384,14 +482,14 @@ func (msg *RejoinRequestPayload) UnmarshalLoRaWAN(b []byte) error {
 		}
 		copy(msg.NetID[:], b[1:4])
 		copy(msg.DevEUI[:], b[4:12])
-		msg.RejoinCnt = uint32(binary.LittleEndian.Uint16(b[12:14]))
+		msg.RejoinCnt = parseUint32(b[12:14])
 	case 1:
 		if len(b) != 19 {
 			return errors.Errorf("expected payload length of 19 bytes, got %d", len(b))
 		}
 		copy(msg.JoinEUI[:], b[1:9])
 		copy(msg.DevEUI[:], b[9:17])
-		msg.RejoinCnt = uint32(binary.LittleEndian.Uint16(b[17:19]))
+		msg.RejoinCnt = parseUint32(b[17:19])
 	default:
 		return errors.Errorf("unknown RejoinType value: %s", msg.RejoinType)
 	}
