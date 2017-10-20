@@ -120,8 +120,7 @@ func appendUint64(dst []byte, v uint64, byteCount uint8) []byte {
 	}
 }
 
-// AppendLoRaWAN appends the LoRaWAN representation of msg
-// to dst and returns the extended buffer.
+// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
 func (msg MHDR) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if msg.MType > 7 {
 		return nil, errors.Errorf("expected MType to be less or equal to 7, got %d", msg.MType)
@@ -131,6 +130,8 @@ func (msg MHDR) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	}
 	return append(dst, byte(msg.MType)<<5|byte(msg.Major)), nil
 }
+
+// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
 func (msg *MHDR) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
 		return errors.Errorf("expected length of encoded MHDR to be equal to 1, got %d", len(b))
@@ -141,8 +142,7 @@ func (msg *MHDR) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
-// AppendLoRaWAN appends the LoRaWAN representation of msg
-// to dst and returns the extended buffer.
+// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
 func (msg FCtrl) AppendLoRaWAN(dst []byte, isUplink bool, fOptsLen uint8) ([]byte, error) {
 	if fOptsLen > 15 {
 		return nil, errors.Errorf("expected fOptsLen be less or equal to 15, got %d", fOptsLen)
@@ -168,6 +168,8 @@ func (msg FCtrl) AppendLoRaWAN(dst []byte, isUplink bool, fOptsLen uint8) ([]byt
 	}
 	return append(dst, b), nil
 }
+
+// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
 func (msg *FCtrl) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	if len(b) != 1 {
 		return errors.Errorf("expected length of encoded FCtrl to be equal to 1, got %d", len(b))
@@ -184,8 +186,7 @@ func (msg *FCtrl) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	return nil
 }
 
-// AppendLoRaWAN appends the LoRaWAN representation of msg
-// to dst and returns the extended buffer.
+// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
 func (msg FHDR) AppendLoRaWAN(dst []byte, isUplink bool) ([]byte, error) {
 	dst = append(dst, msg.DevAddr[:]...)
 	fOptsLen := uint8(len(msg.FOpts))
@@ -203,6 +204,8 @@ func (msg FHDR) AppendLoRaWAN(dst []byte, isUplink bool) ([]byte, error) {
 	dst = append(dst, msg.FOpts...)
 	return dst, nil
 }
+
+// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
 func (msg *FHDR) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	n := len(b)
 	if n < 7 || n > 23 {
@@ -218,8 +221,7 @@ func (msg *FHDR) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	return nil
 }
 
-// AppendLoRaWAN appends the LoRaWAN representation of msg
-// to dst and returns the extended buffer.
+// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
 func (msg MACPayload) AppendLoRaWAN(dst []byte, isUplink bool) ([]byte, error) {
 	dst, err := msg.FHDR.AppendLoRaWAN(dst, isUplink)
 	if err != nil {
@@ -235,10 +237,12 @@ func (msg MACPayload) AppendLoRaWAN(dst []byte, isUplink bool) ([]byte, error) {
 	return dst, nil
 }
 
-// MarshalLoRaWAN returns the LoRaWAN representation of msg.
+// MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
 func (msg MACPayload) MarshalLoRaWAN(isUplink bool) ([]byte, error) {
 	return msg.AppendLoRaWAN(make([]byte, 0, 1), isUplink)
 }
+
+// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
 func (msg *MACPayload) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	n := uint8(len(b))
 	if n < 7 {
@@ -266,8 +270,7 @@ func (msg *MACPayload) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	return nil
 }
 
-// AppendLoRaWAN appends the LoRaWAN representation of msg
-// to dst and returns the extended buffer.
+// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
 func (msg DLSettings) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	if msg.Rx1DROffset > 7 {
 		return nil, errors.Errorf("expected Rx1DROffset to be less or equal to 7, got %d", msg.Rx1DROffset)
@@ -283,10 +286,12 @@ func (msg DLSettings) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	return append(dst, byte(b)), nil
 }
 
-// MarshalLoRaWAN returns the LoRaWAN representation of msg.
+// MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
 func (msg DLSettings) MarshalLoRaWAN() ([]byte, error) {
 	return msg.AppendLoRaWAN(make([]byte, 0, 1))
 }
+
+// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
 func (msg *DLSettings) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
 		return errors.Errorf("expected length of encoded DLSettings to be equal to 1, got %d", len(b))
@@ -298,8 +303,7 @@ func (msg *DLSettings) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
-// AppendLoRaWAN appends the LoRaWAN representation of msg
-// to dst and returns the extended buffer.
+// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
 func (msg CFList) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	switch msg.Type {
 	case 0:
@@ -335,10 +339,12 @@ func (msg CFList) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	return dst, nil
 }
 
-// MarshalLoRaWAN returns the LoRaWAN representation of msg.
+// MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
 func (msg CFList) MarshalLoRaWAN() ([]byte, error) {
 	return msg.AppendLoRaWAN(make([]byte, 0, 16))
 }
+
+// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
 func (msg *CFList) UnmarshalLoRaWAN(b []byte) error {
 	n := len(b)
 	if n != 16 {
@@ -371,8 +377,7 @@ func (msg *CFList) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
-// AppendLoRaWAN appends the LoRaWAN representation of msg
-// to dst and returns the extended buffer.
+// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
 func (msg JoinAcceptPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, msg.JoinNonce[:]...)
 	dst = append(dst, msg.NetID[:]...)
@@ -394,13 +399,15 @@ func (msg JoinAcceptPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	return dst, nil
 }
 
-// MarshalLoRaWAN returns the LoRaWAN representation of msg.
+// MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
 func (msg JoinAcceptPayload) MarshalLoRaWAN() ([]byte, error) {
 	if msg.GetCFList() != nil {
 		return msg.AppendLoRaWAN(make([]byte, 0, 28))
 	}
 	return msg.AppendLoRaWAN(make([]byte, 0, 12))
 }
+
+// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
 func (msg *JoinAcceptPayload) UnmarshalLoRaWAN(b []byte) error {
 	n := len(b)
 	if n != 12 && n != 28 {
@@ -424,8 +431,7 @@ func (msg *JoinAcceptPayload) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
-// AppendLoRaWAN appends the LoRaWAN representation of msg
-// to dst and returns the extended buffer.
+// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
 func (msg JoinRequestPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, msg.JoinEUI[:]...)
 	dst = append(dst, msg.DevEUI[:]...)
@@ -433,11 +439,12 @@ func (msg JoinRequestPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	return dst, nil
 }
 
-// MarshalLoRaWAN returns the LoRaWAN representation of msg.
+// MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
 func (msg JoinRequestPayload) MarshalLoRaWAN() ([]byte, error) {
 	return msg.AppendLoRaWAN(make([]byte, 0, 18))
 }
 
+// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
 func (msg *JoinRequestPayload) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 18 {
 		return errors.Errorf("expected length of encoded Join-Request payload to be 18, got %d", len(b))
@@ -448,8 +455,7 @@ func (msg *JoinRequestPayload) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
-// AppendLoRaWAN appends the LoRaWAN representation of msg
-// to dst and returns the extended buffer.
+// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
 func (msg RejoinRequestPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(msg.RejoinType))
 	switch msg.RejoinType {
@@ -469,7 +475,7 @@ func (msg RejoinRequestPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	return dst, nil
 }
 
-// MarshalLoRaWAN returns the LoRaWAN representation of msg.
+// MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
 func (msg RejoinRequestPayload) MarshalLoRaWAN() ([]byte, error) {
 	if msg.RejoinType == 1 {
 		return msg.AppendLoRaWAN(make([]byte, 0, 19))
@@ -477,6 +483,9 @@ func (msg RejoinRequestPayload) MarshalLoRaWAN() ([]byte, error) {
 	return msg.AppendLoRaWAN(make([]byte, 0, 14))
 }
 
+// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
+// If message type is a Join-Accept, only the Encrypted field is populated in
+// the payload. You should decrypt that value and supply it to UnmarshalLoRaWAN of the payload struct to populate it. MIC should be set manually(i.e. msg.MIC = decrypted[len(decrypted)-4:]) after decryption.
 func (msg *RejoinRequestPayload) UnmarshalLoRaWAN(b []byte) error {
 	msg.RejoinType = RejoinType(b[0])
 	switch msg.RejoinType {
@@ -500,8 +509,7 @@ func (msg *RejoinRequestPayload) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
-// AppendLoRaWAN appends the LoRaWAN representation of msg
-// to dst and returns the extended buffer.
+// AppendLoRaWAN implements the encoding.LoRaWANAppender interface.
 func (msg Message) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst, err := msg.MHDR.AppendLoRaWAN(dst)
 	if err != nil {
@@ -561,7 +569,7 @@ func (msg Message) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	return dst, nil
 }
 
-// MarshalLoRaWAN returns the LoRaWAN representation of msg.
+// MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
 func (msg Message) MarshalLoRaWAN() ([]byte, error) {
 	switch msg.MType {
 	case MType_CONFIRMED_DOWN, MType_UNCONFIRMED_DOWN, MType_CONFIRMED_UP, MType_UNCONFIRMED_UP:
@@ -581,7 +589,7 @@ func (msg Message) MarshalLoRaWAN() ([]byte, error) {
 	}
 }
 
-// UnmarshalLoRaWAN unmarshals the (encrypted) LoRaWAN payload in b.
+// UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
 // If message type is a Join-Accept, only the Encrypted field is populated in
 // the payload. You should decrypt that value and supply it to UnmarshalLoRaWAN of the payload struct to populate it. MIC should be set manually(i.e. msg.MIC = decrypted[len(decrypted)-4:]) after decryption.
 func (msg *Message) UnmarshalLoRaWAN(b []byte) error {
