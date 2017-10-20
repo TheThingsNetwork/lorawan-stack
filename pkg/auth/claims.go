@@ -56,7 +56,7 @@ func (c *Claims) ClientID() string {
 	return splitprefix(ClientPrefix, c.Subject)
 }
 
-// HasRights checks wether or not the provided right is included in the claims. It will only return true if all the provided rights are
+// HasRights checks whether or not the provided right is included in the claims. It will only return true if all the provided rights are
 // included in the token..
 func (c *Claims) HasRights(rights ...ttnpb.Right) bool {
 	ok := true
@@ -67,7 +67,7 @@ func (c *Claims) HasRights(rights ...ttnpb.Right) bool {
 	return ok
 }
 
-// hasRight checks wether or not the right is included in this claims.
+// hasRight checks whether or not the right is included in this claims.
 func (c *Claims) hasRight(right ttnpb.Right) bool {
 	for _, r := range c.Rights {
 		if r == right {
