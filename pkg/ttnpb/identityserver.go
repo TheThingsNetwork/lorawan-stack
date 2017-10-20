@@ -15,7 +15,7 @@ func init() {
 // ErrInvalidPathUpdateMask is returned when including in the `update_mask` a
 // path that does not exist or is not allowed.
 var ErrInvalidPathUpdateMask = &errors.ErrDescriptor{
-	MessageFormat: "Invalid update_mask. `{path}` is not a valid path",
+	MessageFormat: "Invalid update_mask: `{path}` is not a valid path",
 	Code:          1,
 	Type:          errors.InvalidArgument,
 }
@@ -181,7 +181,7 @@ func (req *SetGatewayCollaboratorRequest) Validate() error {
 func (req *CreateClientRequest) Validate() error {
 	return validate.All(
 		validate.Field(req.ClientID, validate.ID).DescribeFieldName("Client ID"),
-		validate.Field(req.CallbackURI, validate.URL).DescribeFieldName("Callback URI"),
+		validate.Field(req.CallbackURI, validate.Required).DescribeFieldName("Callback URI"),
 		validate.Field(req.Grants, validate.MinLength(1)).DescribeFieldName("Grants"),
 		validate.Field(req.Scope, validate.MinLength(1)).DescribeFieldName("Scope"),
 	)
@@ -204,7 +204,7 @@ func (req *UpdateClientRequest) Validate() error {
 		switch path {
 		case PathClientDescription:
 		case PathClientCallbackURI:
-			err = validate.Field(req.CallbackURI, validate.URL).DescribeFieldName("Callback URI")
+			err = validate.Field(req.CallbackURI, validate.Required).DescribeFieldName("Callback URI")
 		case PathClientGrants:
 			err = validate.Field(req.Grants, validate.MinLength(1)).DescribeFieldName("Grants")
 		case PathClientScope:
