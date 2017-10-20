@@ -132,7 +132,7 @@ message DLSettings {
 
   uint32 rx1_dr_offset = 1 [(gogoproto.customname) = "Rx1DROffset"];
   uint32 rx2_dr        = 2 [(gogoproto.customname) = "Rx2DR"];
-  reserved 3; // Reserved for OptNeg
+  bool opt_neg         = 3 [(gogoproto.customname) = "OptNeg"];
 }
 
 enum CFListType {

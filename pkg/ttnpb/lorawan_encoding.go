@@ -277,6 +277,9 @@ func (msg DLSettings) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	}
 	b := msg.Rx2DR
 	b |= (msg.Rx1DROffset << 4)
+	if msg.OptNeg {
+		b |= (1 << 7)
+	}
 	return append(dst, byte(b)), nil
 }
 
@@ -289,6 +292,7 @@ func (msg *DLSettings) UnmarshalLoRaWAN(b []byte) error {
 		return errors.Errorf("expected length of encoded DLSettings to be equal to 1, got %d", len(b))
 	}
 	v := uint32(b[0])
+	msg.OptNeg = (v >> 7) != 0
 	msg.Rx1DROffset = (v >> 4) & 0x7
 	msg.Rx2DR = v & 0xf
 	return nil
