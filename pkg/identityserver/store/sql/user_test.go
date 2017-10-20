@@ -26,6 +26,11 @@ func testUsers() map[string]*ttnpb.User {
 			Password:       "1234567",
 			Email:          "bob@bob.com",
 		},
+		"john-doe": &ttnpb.User{
+			UserIdentifier: ttnpb.UserIdentifier{"john-doe"},
+			Password:       "123456",
+			Email:          "john@doe.com",
+		},
 	}
 }
 

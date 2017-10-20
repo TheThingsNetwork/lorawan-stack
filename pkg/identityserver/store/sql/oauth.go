@@ -48,14 +48,12 @@ var ErrRefreshTokenConflict = &errors.ErrDescriptor{
 // OAuthStore implements store.OAuthStore.
 type OAuthStore struct {
 	storer
-	*ClientStore
 }
 
 // NewOAuthStore creates a new OAuth store.
-func NewOAuthStore(store storer, clients *ClientStore) *OAuthStore {
+func NewOAuthStore(store storer) *OAuthStore {
 	return &OAuthStore{
-		storer:      store,
-		ClientStore: clients,
+		storer: store,
 	}
 }
 
@@ -99,19 +97,11 @@ func (s *OAuthStore) saveAuthorizationCode(q db.QueryContext, data *types.Author
 }
 
 // GetAuthorizationCode finds the authorization code.
-func (s *OAuthStore) GetAuthorizationCode(authorizationCode string) (*types.AuthorizationData, types.Client, error) {
-	var data *types.AuthorizationData
-	var client types.Client
-	err := s.transact(func(tx *db.Tx) error {
-		var err error
-		data, client, err = s.getAuthorizationCode(tx, authorizationCode)
-		return err
-	})
-
-	return data, client, err
+func (s *OAuthStore) GetAuthorizationCode(authorizationCode string) (*types.AuthorizationData, error) {
+	return s.getAuthorizationCode(s.queryer(), authorizationCode)
 }
 
-func (s *OAuthStore) getAuthorizationCode(q db.QueryContext, authorizationCode string) (*types.AuthorizationData, types.Client, error) {
+func (s *OAuthStore) getAuthorizationCode(q db.QueryContext, authorizationCode string) (*types.AuthorizationData, error) {
 	result := new(types.AuthorizationData)
 	err := q.SelectOne(
 		result,
@@ -120,20 +110,14 @@ func (s *OAuthStore) getAuthorizationCode(q db.QueryContext, authorizationCode s
 	)
 
 	if db.IsNoRows(err) {
-		return nil, nil, ErrAuthorizationCodeNotFound.New(nil)
+		return nil, ErrAuthorizationCodeNotFound.New(nil)
 	}
 
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	client := s.ClientStore.factory.BuildClient()
-	err = s.ClientStore.client(q, result.ClientID, client)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return result, client, nil
+	return result, nil
 }
 
 // DeleteAuthorizationCode deletes the authorization code.
@@ -195,19 +179,11 @@ func (s *OAuthStore) saveRefreshToken(q db.QueryContext, refresh *types.RefreshD
 }
 
 // GetRefreshToken finds the refresh token.
-func (s *OAuthStore) GetRefreshToken(refreshToken string) (*types.RefreshData, types.Client, error) {
-	var data *types.RefreshData
-	var client types.Client
-	err := s.transact(func(tx *db.Tx) error {
-		var err error
-		data, client, err = s.getRefreshToken(tx, refreshToken)
-		return err
-	})
-
-	return data, client, err
+func (s *OAuthStore) GetRefreshToken(refreshToken string) (*types.RefreshData, error) {
+	return s.getRefreshToken(s.queryer(), refreshToken)
 }
 
-func (s *OAuthStore) getRefreshToken(q db.QueryContext, refreshToken string) (*types.RefreshData, types.Client, error) {
+func (s *OAuthStore) getRefreshToken(q db.QueryContext, refreshToken string) (*types.RefreshData, error) {
 	result := new(types.RefreshData)
 	err := q.SelectOne(
 		result,
@@ -217,20 +193,14 @@ func (s *OAuthStore) getRefreshToken(q db.QueryContext, refreshToken string) (*t
 	)
 
 	if db.IsNoRows(err) {
-		return nil, nil, ErrRefreshTokenNotFound.New(nil)
+		return nil, ErrRefreshTokenNotFound.New(nil)
 	}
 
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	client := s.ClientStore.factory.BuildClient()
-	err = s.ClientStore.client(q, result.ClientID, client)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return result, client, nil
+	return result, nil
 }
 
 // DeleteRefreshToken deletes the refresh token from the database.

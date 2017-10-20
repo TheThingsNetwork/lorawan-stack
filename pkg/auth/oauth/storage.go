@@ -15,7 +15,7 @@ import (
 
 type storage struct {
 	keys  *auth.Keys
-	store store.OAuthStore
+	store store.Store
 }
 
 // UserData is the userdata that gets carried around with authorization requests.
@@ -33,7 +33,7 @@ func (s *storage) Close() {}
 
 // GetClient loads the OAuth Client by client_id.
 func (s *storage) GetClient(clientID string) (osin.Client, error) {
-	client, err := s.store.GetByID(clientID)
+	client, err := s.store.Clients.GetByID(clientID)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 		userID = udata.UserID
 	}
 
-	return s.store.SaveAuthorizationCode(&types.AuthorizationData{
+	return s.store.OAuth.SaveAuthorizationCode(&types.AuthorizationData{
 		AuthorizationCode: data.Code,
 		ClientID:          data.Client.GetId(),
 		CreatedAt:         data.CreatedAt,
@@ -67,7 +67,12 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 
 // LoadAuthorize loads the client and authorization data for the authorization code.
 func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
-	data, client, err := s.store.GetAuthorizationCode(code)
+	data, err := s.store.OAuth.GetAuthorizationCode(code)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := s.store.Clients.GetByID(data.ClientID)
 	if err != nil {
 		return nil, err
 	}
@@ -93,13 +98,13 @@ func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 
 // RemoveAuthorize deletes the authorization code.
 func (s *storage) RemoveAuthorize(code string) error {
-	return s.store.DeleteAuthorizationCode(code)
+	return s.store.OAuth.DeleteAuthorizationCode(code)
 }
 
 // SaveAccess saves the access data for later use.
 func (s *storage) SaveAccess(data *osin.AccessData) error {
 	if data.RefreshToken != "" {
-		err := s.store.SaveRefreshToken(&types.RefreshData{
+		err := s.store.OAuth.SaveRefreshToken(&types.RefreshData{
 			RefreshToken: data.RefreshToken,
 			ClientID:     data.Client.GetId(),
 			Scope:        data.Scope,
@@ -120,7 +125,7 @@ func (s *storage) LoadAccess(accessToken string) (*osin.AccessData, error) {
 		return nil, err
 	}
 
-	client, err := s.store.GetByID(claims.Client)
+	client, err := s.store.Clients.GetByID(claims.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -144,9 +149,14 @@ func (s *storage) RemoveAccess(accessToken string) error {
 
 // LoadRefresh loads the access data based on the refresh token.
 func (s *storage) LoadRefresh(refreshToken string) (*osin.AccessData, error) {
-	data, client, err := s.store.GetRefreshToken(refreshToken)
+	data, err := s.store.OAuth.GetRefreshToken(refreshToken)
 	if err != nil {
-		return nil, nil
+		return nil, err
+	}
+
+	client, err := s.store.Clients.GetByID(data.ClientID)
+	if err != nil {
+		return nil, err
 	}
 
 	return &osin.AccessData{
@@ -160,5 +170,5 @@ func (s *storage) LoadRefresh(refreshToken string) (*osin.AccessData, error) {
 
 // RemoveRefresh deletes the refresh token.
 func (s *storage) RemoveRefresh(refreshToken string) error {
-	return s.store.DeleteRefreshToken(refreshToken)
+	return s.store.OAuth.DeleteRefreshToken(refreshToken)
 }

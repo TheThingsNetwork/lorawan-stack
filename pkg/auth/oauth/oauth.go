@@ -25,7 +25,7 @@ type Server struct {
 }
 
 // New returns a new *Server that is ready to use.
-func New(iss string, keys *auth.Keys, store store.OAuthStore, authorizer Authorizer) *Server {
+func New(iss string, keys *auth.Keys, store store.Store, authorizer Authorizer) *Server {
 	config := &osin.ServerConfig{
 		AuthorizationExpiration:     60 * 5,  // 5 minutes
 		AccessExpiration:            60 * 60, // 1 hour

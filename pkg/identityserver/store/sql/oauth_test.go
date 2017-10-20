@@ -8,26 +8,18 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
 func TestAuthorizationCode(t *testing.T) {
 	a := assertions.New(t)
-
 	s := cleanStore(t, database)
-	userID := "john-doe"
 
-	err := s.Users.Create(&ttnpb.User{
-		UserIdentifier: ttnpb.UserIdentifier{
-			UserID: userID,
-		},
-	})
-	a.So(err, should.BeNil)
+	userID := testUsers()["john-doe"].UserID
 
 	client := testClients()["test-client"]
-	err = s.Clients.Create(client)
+	err := s.Clients.Create(client)
 	a.So(err, should.BeNil)
 
 	data := &types.AuthorizationData{
@@ -44,7 +36,7 @@ func TestAuthorizationCode(t *testing.T) {
 	err = s.OAuth.SaveAuthorizationCode(data)
 	a.So(err, should.BeNil)
 
-	found, c, err := s.OAuth.GetAuthorizationCode(data.AuthorizationCode)
+	found, err := s.OAuth.GetAuthorizationCode(data.AuthorizationCode)
 	a.So(err, should.BeNil)
 
 	a.So(found.AuthorizationCode, should.Equal, data.AuthorizationCode)
@@ -54,12 +46,14 @@ func TestAuthorizationCode(t *testing.T) {
 	a.So(found.RedirectURI, should.Equal, data.RedirectURI)
 	a.So(found.State, should.Equal, data.State)
 
+	c, err := s.Clients.GetByID(found.ClientID)
+	a.So(err, should.BeNil)
 	a.So(c, test.ShouldBeClientIgnoringAutoFields, client)
 
 	err = s.OAuth.DeleteAuthorizationCode(data.AuthorizationCode)
 	a.So(err, should.BeNil)
 
-	_, _, err = s.OAuth.GetAuthorizationCode(data.AuthorizationCode)
+	_, err = s.OAuth.GetAuthorizationCode(data.AuthorizationCode)
 	a.So(err, should.NotBeNil)
 }
 
@@ -83,7 +77,7 @@ func TestRefreshToken(t *testing.T) {
 	err = s.OAuth.SaveRefreshToken(data)
 	a.So(err, should.BeNil)
 
-	found, c, err := s.OAuth.GetRefreshToken(data.RefreshToken)
+	found, err := s.OAuth.GetRefreshToken(data.RefreshToken)
 	a.So(err, should.BeNil)
 
 	a.So(found.RefreshToken, should.Equal, data.RefreshToken)
@@ -91,12 +85,13 @@ func TestRefreshToken(t *testing.T) {
 	a.So(found.Scope, should.Equal, data.Scope)
 	a.So(found.RedirectURI, should.Equal, data.RedirectURI)
 
+	c, err := s.Clients.GetByID(found.ClientID)
+	a.So(err, should.BeNil)
 	a.So(c, test.ShouldBeClientIgnoringAutoFields, client)
 
 	err = s.OAuth.DeleteRefreshToken(data.RefreshToken)
 	a.So(err, should.BeNil)
 
-	_, _, err = s.OAuth.GetRefreshToken(data.RefreshToken)
+	_, err = s.OAuth.GetRefreshToken(data.RefreshToken)
 	a.So(err, should.NotBeNil)
-	_ = c
 }

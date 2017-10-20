@@ -8,13 +8,11 @@ import (
 
 // OAuthStore is a store that manages OAuth refresh tokens and authorization codes.
 type OAuthStore interface {
-	ClientStore
-
 	// SaveAuthorizationCode saves the authorization code.
 	SaveAuthorizationCode(authorization *types.AuthorizationData) error
 
 	// GetAuthorizationCode finds the authorization code.
-	GetAuthorizationCode(authorizationCode string) (*types.AuthorizationData, types.Client, error)
+	GetAuthorizationCode(authorizationCode string) (*types.AuthorizationData, error)
 
 	// DeleteAuthorizationCode deletes the authorization code.
 	DeleteAuthorizationCode(authorizationCode string) error
@@ -23,7 +21,7 @@ type OAuthStore interface {
 	SaveRefreshToken(refresh *types.RefreshData) error
 
 	// GetRefreshToken finds the refresh token.
-	GetRefreshToken(refreshToken string) (*types.RefreshData, types.Client, error)
+	GetRefreshToken(refreshToken string) (*types.RefreshData, error)
 
 	// DeleteRefreshToken deletes the refresh token from the database.
 	DeleteRefreshToken(refreshToken string) error
