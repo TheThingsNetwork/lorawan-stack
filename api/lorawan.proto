@@ -17,7 +17,7 @@ message Message {
   // Payload represents either MACPayload, RejoinRequestPayload, JoinRequestPayload or JoinAcceptPayload
   // - MACPayload length is in range [7:M] bytes, where M is region specific(see LoRaWAN spec).
   // - JoinRequestPayload length is 18 bytes.
-  // - JoinAcceptPayload length is in range [12:28] bytes.
+  // - JoinAcceptPayload length is either 12 or 28 bytes.
   // - RejoinRequestPayload length is 14 for Type 0 and 2, 19 for Type 1.
   oneof Payload {
     MACPayload           mac_payload             = 3 [(gogoproto.customname) = "MACPayload"];
@@ -70,7 +70,7 @@ message MACPayload {
   option (gogoproto.populate) = false;
 
   FHDR  f_hdr       = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  uint32 f_port      = 2;
+  uint32 f_port     = 2;
   bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
 }
 
