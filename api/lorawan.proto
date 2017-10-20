@@ -125,7 +125,6 @@ message JoinAcceptPayload {
   DLSettings  dl_settings = 5 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   uint32      rx_delay    = 6;
   CFList      cf_list     = 7 [(gogoproto.customname) = "CFList"];
-  //CFListType  cf_list_type = 8 [(gogoproto.customname) = "CFListType"];
 }
 
 message DLSettings {
@@ -136,10 +135,17 @@ message DLSettings {
   reserved 3; // Reserved for OptNeg
 }
 
+enum CFListType {
+  FREQUENCIES = 0;
+  CHANNEL_MASKS = 1;
+}
+
 message CFList {
   option (gogoproto.populate) = false;
 
-  repeated uint32 freq = 1;
+  CFListType        type = 1;
+  repeated uint32   freq = 2;
+  repeated bool ch_masks = 3;
 }
 
 enum Modulation {

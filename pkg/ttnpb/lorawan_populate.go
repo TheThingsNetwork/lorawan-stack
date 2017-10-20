@@ -61,19 +61,26 @@ func NewPopulatedDLSettings(r randyLorawan, easy bool) *DLSettings {
 
 func NewPopulatedCFList(r randyLorawan, easy bool) *CFList {
 	out := &CFList{}
-	out.Freq = make([]uint32, r.Intn(16))
-	for i := 0; i < len(out.Freq); i++ {
-		out.Freq[i] = uint32(uint8(r.Intn(256)))
+	out.Type = CFListType(r.Intn(2))
+	switch out.Type {
+	case 0:
+		out.Freq = make([]uint32, 5)
+		for i := 0; i < len(out.Freq); i++ {
+			out.Freq[i] = uint32(r.Intn(0xfff))
+		}
+	case 1:
+		out.ChMasks = make([]bool, 96)
+		for i := 0; i < len(out.ChMasks); i++ {
+			out.ChMasks[i] = (r.Intn(2) == 0)
+		}
+	default:
+		panic("unreachable")
 	}
 	return out
 }
 
 func NewPopulatedJoinAcceptPayload(r randyLorawan, easy bool) *JoinAcceptPayload {
 	out := &JoinAcceptPayload{}
-	out.Encrypted = make([]byte, r.Intn(100))
-	for i := 0; i < len(out.Encrypted); i++ {
-		out.Encrypted[i] = byte(r.Intn(256))
-	}
 	out.JoinNonce = *types.NewPopulatedJoinNonce(r)
 	out.NetID = *types.NewPopulatedNetID(r)
 	out.DevAddr = *types.NewPopulatedDevAddr(r)

@@ -199,23 +199,76 @@ func (msg *DLSettings) UnmarshalLoRaWAN(b []byte) error {
 	return nil
 }
 
-func (msg JoinRequestPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
-	dst = append(dst, msg.JoinEUI[:]...)
-	dst = append(dst, msg.DevEUI[:]...)
-	dst = append(dst, msg.DevNonce[:]...)
+// AppendLoRaWAN appends the LoRaWAN representation of msg
+// to dst and returns the extended buffer.
+func (msg CFList) AppendLoRaWAN(dst []byte) ([]byte, error) {
+	switch msg.Type {
+	case 0:
+		if len(msg.Freq) > 15 {
+			return nil, errors.Errorf("expected length of frequencies to be less or equal to 15, got %d", len(msg.Freq))
+		}
+		for i, freq := range msg.Freq {
+			if freq > maxUint24 {
+				return nil, errors.Errorf("expected frequency nr. %d to be less or equal to %d, got %d", i, math.MaxUint8, freq)
+			}
+			dst = appendUint32(dst, freq, 3)
+		}
+	case 1:
+		n := len(msg.ChMasks)
+		if n > 96 {
+			return nil, errors.Errorf("expected length of channel masks to be less or equal to 96, got %d", n)
+		}
+		for i := uint(0); i < uint(n); i += 8 {
+			var b byte
+			for j := uint(0); j < 8; j++ {
+				if msg.ChMasks[i+j] {
+					b |= (1 << j)
+				}
+			}
+			dst = append(dst, b)
+		}
+		// fill remaining space with 0's
+		for i := 0; i < 15-(n+7)/8; i++ {
+			dst = append(dst, 0)
+		}
+	}
+	dst = append(dst, byte(msg.Type))
 	return dst, nil
 }
-func (msg JoinRequestPayload) MarshalLoRaWAN() ([]byte, error) {
-	return msg.AppendLoRaWAN(make([]byte, 0, 18))
-}
 
-func (msg *JoinRequestPayload) UnmarshalLoRaWAN(b []byte) error {
-	if len(b) != 18 {
-		return errors.Errorf("expected length of encoded Join-Request payload to be 18, got %d", len(b))
+// MarshalLoRaWAN returns the LoRaWAN representation of msg.
+func (msg CFList) MarshalLoRaWAN() ([]byte, error) {
+	return msg.AppendLoRaWAN(make([]byte, 0, 16))
+}
+func (msg *CFList) UnmarshalLoRaWAN(b []byte) error {
+	n := len(b)
+	if n != 16 {
+		return errors.Errorf("expected length of encoded CFList to be equal to 16, got %d", n)
 	}
-	copy(msg.JoinEUI[:], b[0:8])
-	copy(msg.DevEUI[:], b[8:16])
-	copy(msg.DevNonce[:], b[16:18])
+	msg.Type = CFListType(b[15])
+	switch msg.Type {
+	case 0:
+		msg.Freq = make([]uint32, 0, 5)
+		for i := 0; i < 15; i += 3 {
+			msg.Freq = append(msg.Freq, parseUint32(b[i:i+3]))
+		}
+	case 1:
+		msg.ChMasks = make([]bool, 0, 96)
+		for _, m := range b[:12] {
+			msg.ChMasks = append(msg.ChMasks,
+				m&1 > 0,
+				m&(1<<1) > 0,
+				m&(1<<2) > 0,
+				m&(1<<3) > 0,
+				m&(1<<4) > 0,
+				m&(1<<5) > 0,
+				m&(1<<6) > 0,
+				m&(1<<7) > 0,
+			)
+		}
+	default:
+		return errors.Errorf("unknown CFListType %s", msg.Type)
+	}
 	return nil
 }
 
@@ -231,33 +284,26 @@ func (msg JoinAcceptPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
 		return nil, errors.Errorf("expected RxDelay to be less or equal to %d, got %d", math.MaxUint8, msg.RxDelay)
 	}
 	dst = append(dst, byte(msg.RxDelay))
-
 	if msg.GetCFList() != nil {
-		if len(msg.CFList.Freq) > 15 {
-			return nil, errors.Errorf("expected length of CFList to be less than 16, got %d", len(msg.CFList.Freq))
-		}
-		for i, freq := range msg.CFList.Freq {
-			if freq > math.MaxUint8 {
-				return nil, errors.Errorf("expected CFList frequency nr. %d to be less or equal to %d, got %d", i, math.MaxUint8, freq)
-			}
-			dst = append(dst, byte(freq))
+		dst, err = msg.CFList.AppendLoRaWAN(dst)
+		if err != nil {
+			return nil, errors.NewWithCause("failed to encode CFList", err)
 		}
 	}
 	return dst, nil
 }
+
+// MarshalLoRaWAN returns the LoRaWAN representation of msg.
 func (msg JoinAcceptPayload) MarshalLoRaWAN() ([]byte, error) {
-	if msg.CFList != nil {
+	if msg.GetCFList() != nil {
 		return msg.AppendLoRaWAN(make([]byte, 0, 28))
 	}
 	return msg.AppendLoRaWAN(make([]byte, 0, 12))
 }
 func (msg *JoinAcceptPayload) UnmarshalLoRaWAN(b []byte) error {
 	n := len(b)
-	if n < 12 || n > 28 {
-		return errors.Errorf("expected length of encoded JoinAcceptPayload to be between 12 and 28, got %d", n)
-	}
-	if n == 13 {
-		return errors.New("CFlist and CFlistType must either be both present or both absent, impossible with supplied payload length (13)")
+	if n != 12 && n != 28 {
+		return errors.Errorf("expected length of encoded JoinAcceptPayload to be either 12 or 28, got %d", n)
 	}
 	copy(msg.JoinNonce[:], b[0:3])
 	copy(msg.NetID[:], b[3:6])
@@ -266,16 +312,38 @@ func (msg *JoinAcceptPayload) UnmarshalLoRaWAN(b []byte) error {
 		return errors.NewWithCause("failed to decode DLSettings", err)
 	}
 	msg.RxDelay = uint32(b[11])
-	if n != 12 {
-		msg.CFList = &CFList{}
-		msg.CFList.Freq = make([]uint32, 0, n-13)
-		for _, freq := range b[13 : n-1] {
-			msg.CFList.Freq = append(msg.CFList.Freq, uint32(freq))
-		}
-		// TODO decode CFListType once the specification is known
-		// ISSUE-LINK
-		//msg.CFList.Type = b[n-1]
+
+	if n == 12 {
+		return nil
 	}
+	msg.CFList = &CFList{}
+	if err := msg.CFList.UnmarshalLoRaWAN(b[12:]); err != nil {
+		return errors.NewWithCause("failed to decode CFList", err)
+	}
+	return nil
+}
+
+// AppendLoRaWAN appends the LoRaWAN representation of msg
+// to dst and returns the extended buffer.
+func (msg JoinRequestPayload) AppendLoRaWAN(dst []byte) ([]byte, error) {
+	dst = append(dst, msg.JoinEUI[:]...)
+	dst = append(dst, msg.DevEUI[:]...)
+	dst = append(dst, msg.DevNonce[:]...)
+	return dst, nil
+}
+
+// MarshalLoRaWAN returns the LoRaWAN representation of msg.
+func (msg JoinRequestPayload) MarshalLoRaWAN() ([]byte, error) {
+	return msg.AppendLoRaWAN(make([]byte, 0, 18))
+}
+
+func (msg *JoinRequestPayload) UnmarshalLoRaWAN(b []byte) error {
+	if len(b) != 18 {
+		return errors.Errorf("expected length of encoded Join-Request payload to be 18, got %d", len(b))
+	}
+	copy(msg.JoinEUI[:], b[0:8])
+	copy(msg.DevEUI[:], b[8:16])
+	copy(msg.DevNonce[:], b[16:18])
 	return nil
 }
 
