@@ -62,10 +62,24 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 	cli := client.GetClient()
 	_, err := q.NamedExec(
 		`INSERT
-			INTO clients (client_id, description, secret, redirect_uri, grants,
-					rights, updated_at, archived_at)
-			VALUES (:client_id, :description, :secret, :redirect_uri, :grants,
-					:rights, :updated_at, :archived_at)`,
+			INTO clients (
+				client_id,
+				description,
+				secret,
+				redirect_uri,
+				grants,
+				rights,
+				updated_at,
+				archived_at)
+			VALUES (
+				:client_id,
+				:description,
+				:secret,
+				:redirect_uri,
+				:grants,
+				:rights,
+				current_timestamp(),
+				:archived_at)`,
 		cli)
 
 	if _, yes := db.IsDuplicate(err); yes {
@@ -91,7 +105,11 @@ func (s *ClientStore) GetByID(clientID string) (types.Client, error) {
 }
 
 func (s *ClientStore) client(q db.QueryContext, clientID string, result types.Client) error {
-	err := q.SelectOne(result, "SELECT * FROM clients WHERE client_id = $1", clientID)
+	err := q.SelectOne(result,
+		`SELECT *
+			FROM clients
+			WHERE client_id = $1`,
+		clientID)
 	if db.IsNoRows(err) {
 		return ErrClientNotFound.New(errors.Attributes{
 			"client_id": clientID,

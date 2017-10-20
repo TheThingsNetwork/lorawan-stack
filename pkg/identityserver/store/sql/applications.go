@@ -73,8 +73,16 @@ func (s *ApplicationStore) create(q db.QueryContext, application types.Applicati
 	app := application.GetApplication()
 	_, err := q.NamedExec(
 		`INSERT
-			INTO applications (application_id, description, updated_at, archived_at)
-			VALUES (:application_id, :description, :updated_at, :archived_at)`,
+			INTO applications (
+				application_id,
+				description,
+				updated_at,
+				archived_at)
+			VALUES (
+				:application_id,
+				:description,
+				current_timestamp(),
+				:archived_at)`,
 		app)
 
 	if _, yes := db.IsDuplicate(err); yes {
@@ -115,7 +123,12 @@ func (s *ApplicationStore) getByID(q db.QueryContext, appID string, result types
 }
 
 func (s *ApplicationStore) application(q db.QueryContext, appID string, result types.Application) error {
-	err := q.SelectOne(result, "SELECT * FROM applications WHERE application_id = $1", appID)
+	err := q.SelectOne(
+		result,
+		`SELECT *
+			FROM applications
+			WHERE application_id = $1`,
+		appID)
 	if db.IsNoRows(err) {
 		return ErrApplicationNotFound.New(errors.Attributes{
 			"application_id": appID,

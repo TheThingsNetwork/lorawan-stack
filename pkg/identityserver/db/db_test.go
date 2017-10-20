@@ -16,7 +16,7 @@ import (
 
 const (
 	address  = "postgres://root@localhost:26257/%s?sslmode=disable"
-	database = "db_tests"
+	database = "is_db_tests"
 	schema   = `
 	CREATE TABLE IF NOT EXISTS foo (
 		id       SERIAL PRIMARY KEY,

@@ -5,7 +5,6 @@ package sql
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
@@ -82,12 +81,30 @@ func (s *GatewayStore) create(q db.QueryContext, gateway types.Gateway) error {
 	gtw := gateway.GetGateway()
 	_, err := q.NamedExec(
 		`INSERT
-			INTO gateways (gateway_id, description, frequency_plan_id, token, activated_at,
-					privacy_settings, auto_update, platform, cluster_address,
-					updated_at, archived_at)
-			VALUES (:gateway_id, :description, :frequency_plan_id, :token, :activated_at,
-					:privacy_settings, :auto_update, :platform, :cluster_address,
-					:updated_at, :archived_at)`,
+			INTO gateways (
+					gateway_id,
+					description,
+					frequency_plan_id,
+					token,
+					activated_at,
+					privacy_settings,
+					auto_update,
+					platform,
+					cluster_address,
+					updated_at,
+					archived_at)
+			VALUES (
+					:gateway_id,
+					:description,
+					:frequency_plan_id,
+					:token,
+					:activated_at,
+					:privacy_settings,
+					:auto_update,
+					:platform,
+					:cluster_address,
+					current_timestamp(),
+					:archived_at)`,
 		gtw)
 
 	if _, yes := db.IsDuplicate(err); yes {
@@ -136,8 +153,15 @@ func (s *GatewayStore) addAntennasQuery(gtwID string, antennas []ttnpb.GatewayAn
 
 	query := fmt.Sprintf(
 		`INSERT
-			INTO gateways_antennas (gateway_id, gain, type, model, placement,
-					longitude, latitude, altitude)
+			INTO gateways_antennas (
+					gateway_id,
+					gain,
+					type,
+					model,
+					placement,
+					longitude,
+					latitude,
+					altitude)
 			VALUES %s`,
 		strings.Join(boundValues, ", "))
 
@@ -178,7 +202,12 @@ func (s *GatewayStore) getByID(q db.QueryContext, gtwID string, result types.Gat
 // gateway fetchs a gateway from the database without antennas and attributes and
 // saves it into result.
 func (s *GatewayStore) gateway(q db.QueryContext, gtwID string, result types.Gateway) error {
-	err := q.SelectOne(result, "SELECT * FROM gateways WHERE gateway_id = $1", gtwID)
+	err := q.SelectOne(
+		result,
+		`SELECT *
+				FROM gateways
+				WHERE gateway_id = $1`,
+		gtwID)
 	if db.IsNoRows(err) {
 		return ErrGatewayNotFound.New(errors.Attributes{
 			"gateway_id": gtwID,
@@ -250,17 +279,20 @@ func (s *GatewayStore) Update(gateway types.Gateway) error {
 
 func (s *GatewayStore) update(q db.QueryContext, gateway types.Gateway) error {
 	gtw := gateway.GetGateway()
-	gtw.UpdatedAt = time.Now()
 
 	var id string
 	err := q.NamedSelectOne(
 		&id,
 		`UPDATE gateways
-			SET description = :description, frequency_plan_id = :frequency_plan_id,
-					token = :token, activated_at = :activated_at,
-					privacy_settings = :privacy_settings, auto_update = :auto_update,
-					platform = :platform, cluster_address = :cluster_address,
-					updated_at = :updated_at
+			SET description = :description,
+				frequency_plan_id = :frequency_plan_id,
+				token = :token,
+				activated_at = :activated_at,
+				privacy_settings = :privacy_settings,
+				auto_update = :auto_update,
+				platform = :platform,
+				cluster_address = :cluster_address,
+				updated_at = current_timestamp()
 			WHERE gateway_id = :gateway_id
 			RETURNING gateway_id`,
 		gtw)
@@ -297,10 +329,9 @@ func (s *GatewayStore) archive(q db.QueryContext, gtwID string) error {
 	err := q.SelectOne(
 		&id,
 		`UPDATE gateways
-			SET archived_at = $1
-			WHERE gateway_id = $2
+			SET archived_at = current_timestamp()
+			WHERE gateway_id = $1
 			returning gateway_id`,
-		time.Now(),
 		gtwID)
 	if db.IsNoRows(err) {
 		return ErrGatewayNotFound.New(errors.Attributes{

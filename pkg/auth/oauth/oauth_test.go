@@ -33,7 +33,7 @@ import (
 
 var (
 	address  = "postgres://root@localhost:26257/%s?sslmode=disable"
-	database = "is_tests"
+	database = "is_oauth_tests"
 	issuer   = "issuer.test.local"
 	userID   = "john-doe"
 	client   = &ttnpb.Client{

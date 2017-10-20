@@ -4,7 +4,6 @@ package sql
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
@@ -77,8 +76,20 @@ func (s *UserStore) create(q db.QueryContext, user types.User) error {
 	u := user.GetUser()
 	_, err := q.NamedExec(
 		`INSERT
-			INTO users (user_id, name, email, password, updated_at, archived_at)
-			VALUES (lower(:user_id), :name, lower(:email), :password, :updated_at, :archived_at)`,
+			INTO users (
+				user_id,
+				name,
+				email,
+				password,
+				updated_at,
+				archived_at)
+			VALUES (
+				lower(:user_id),
+				:name,
+				lower(:email),
+				:password,
+				current_timestamp(),
+				:archived_at)`,
 		u)
 
 	if duplicates, yes := db.IsDuplicate(err); yes {
@@ -111,7 +122,12 @@ func (s *UserStore) GetByID(userID string) (types.User, error) {
 }
 
 func (s *UserStore) getByID(q db.QueryContext, userID string, result types.User) error {
-	err := q.SelectOne(result, "SELECT * FROM users WHERE user_id = lower($1)", userID)
+	err := q.SelectOne(
+		result,
+		`SELECT *
+			FROM users
+			WHERE user_id = lower($1)`,
+		userID)
 	if db.IsNoRows(err) {
 		return ErrUserNotFound.New(errors.Attributes{
 			"user_id": userID,
@@ -134,7 +150,12 @@ func (s *UserStore) GetByEmail(email string) (types.User, error) {
 }
 
 func (s *UserStore) getByEmail(q db.QueryContext, email string, result types.User) error {
-	err := q.SelectOne(result, "SELECT * FROM users WHERE email = lower($1)", email)
+	err := q.SelectOne(
+		result,
+		`SELECT *
+			FROM users
+			WHERE email = lower($1)`,
+		email)
 	if db.IsNoRows(err) {
 		return ErrUserEmailNotFound.New(errors.Attributes{
 			"email": email,
@@ -157,7 +178,6 @@ func (s *UserStore) Update(user types.User) error {
 
 func (s *UserStore) update(q db.QueryContext, user types.User) error {
 	u := user.GetUser()
-	u.UpdatedAt = time.Now()
 
 	_, err := q.NamedExec(
 		`UPDATE users
@@ -166,7 +186,7 @@ func (s *UserStore) update(q db.QueryContext, user types.User) error {
 				validated = :validated,
 				password = :password,
 				admin = :admin,
-				updated_at = :updated_at
+				updated_at = current_timestamp()
 			WHERE user_id = :user_id`,
 		u)
 
@@ -193,10 +213,9 @@ func (s *UserStore) archive(q db.QueryContext, userID string) error {
 	err := q.SelectOne(
 		&i,
 		`UPDATE users
-			SET archived_at = $1
-			WHERE user_id = $2
+			SET archived_at = current_timestamp()
+			WHERE user_id = $1
 			RETURNING user_id`,
-		time.Now(),
 		userID)
 	if db.IsNoRows(err) {
 		return ErrUserNotFound.New(errors.Attributes{

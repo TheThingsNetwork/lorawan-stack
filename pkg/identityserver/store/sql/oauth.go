@@ -105,7 +105,9 @@ func (s *OAuthStore) getAuthorizationCode(q db.QueryContext, authorizationCode s
 	result := new(types.AuthorizationData)
 	err := q.SelectOne(
 		result,
-		`SELECT * FROM authorization_codes WHERE authorization_code = $1`,
+		`SELECT *
+			FROM authorization_codes
+			WHERE authorization_code = $1`,
 		authorizationCode,
 	)
 
@@ -187,7 +189,8 @@ func (s *OAuthStore) getRefreshToken(q db.QueryContext, refreshToken string) (*t
 	result := new(types.RefreshData)
 	err := q.SelectOne(
 		result,
-		`SELECT * FROM refresh_tokens
+		`SELECT *
+			FROM refresh_tokens
 			WHERE refresh_token = $1`,
 		refreshToken,
 	)

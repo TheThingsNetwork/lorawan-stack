@@ -14,7 +14,7 @@ import (
 
 const (
 	address  = "postgres://root@localhost:26257/%s?sslmode=disable"
-	database = "is_tests"
+	database = "is_store_tests"
 )
 
 // Single store instance shared across all tests.
