@@ -144,8 +144,8 @@ func (req *UpdateGatewayRequest) Validate() error {
 	for _, path := range req.GetUpdateMask().Paths {
 		switch path {
 		case PathGatewayDescription,
-			PathGatewayPrivacySettingStatusPublic,
-			PathGatewayPrivacySettingLocationPublic,
+			PathGatewayPrivacySettingsStatusPublic,
+			PathGatewayPrivacySettingsLocationPublic,
 			PathGatewayPrivacySettingsContactable,
 			PathGatewayAutoUpdate,
 			PathGatewayPlatform,

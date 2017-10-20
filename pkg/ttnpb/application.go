@@ -13,7 +13,7 @@ func (d *Application) SetAPIKeys(keys []APIKey) {
 }
 
 const (
-	// Valid FieldMask path values for the `update_mask` in UpdateApplication method.
+	// Valid FieldMask path values for the `update_mask` in UpdateApplicationRequest message.
 
 	// PathApplicationDescription is the path value for the `description` field.
 	PathApplicationDescription = "description"

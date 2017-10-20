@@ -33,11 +33,17 @@ func (c *Client) HasGrant(grant GrantType) bool {
 }
 
 const (
+	// Valid FieldMask path values for the `update_mask` in UpdateClientRequest message.
+
+	// PathClientDescription is the path value for the description.
 	PathClientDescription = "description"
 
+	// PathClientCallbackURI is the path value for the Callback URI.
 	PathClientCallbackURI = "callback_uri"
 
+	// PathClientGrants is the path value for the grants field.
 	PathClientGrants = "grants"
 
+	// PathClientScope is the path value for the scope field.
 	PathClientScope = "scope"
 )

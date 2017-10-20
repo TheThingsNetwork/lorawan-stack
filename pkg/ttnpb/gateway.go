@@ -25,26 +25,43 @@ func (g *Gateway) SetAntennas(antennas []GatewayAntenna) {
 }
 
 const (
+	// Valid FieldMask path values for the `update_mask` in UpdateGatewayRequest message.
+
+	// PathGatewayDescription is the path value for the description field.
 	PathGatewayDescription = "description"
 
+	// PathGatewayFrequencyPlanID is the path value for the frequency plan ID field.
 	PathGatewayFrequencyPlanID = "frequency_plan_id"
 
-	PathGatewayPrivacySettingStatusPublic = "privacy_settings.status_public"
+	// PathGatewayPrivacySettingsStatusPublic is the path value for the privacy setting
+	// that denotes if the status is public or not.
+	PathGatewayPrivacySettingsStatusPublic = "privacy_settings.status_public"
 
-	PathGatewayPrivacySettingLocationPublic = "privacy_settings.location_public"
+	// PathGatewayPrivacySettingsLocationPublic is the path value for the privacy setting
+	// that denotes if the gateway location is public or not.
+	PathGatewayPrivacySettingsLocationPublic = "privacy_settings.location_public"
 
+	// PathGatewayPrivacySettingsContactable is the path value for the privacy setting
+	// that denotes if the contact account information is public or not.
 	PathGatewayPrivacySettingsContactable = "privacy_settings.contactable"
 
+	// PathGatewayAutoUpdate is the path value for the auto update field.
 	PathGatewayAutoUpdate = "auto_update"
 
+	// PathGatewayPlatform is the path value for the gateway platform.
 	PathGatewayPlatform = "platform"
 
+	// PathGatewayAntennas is the path value for the gateway antennas.
 	PathGatewayAntennas = "antennas"
 
+	// PathGatewayAttributes is the path value for the attributes map.
 	PathGatewayAttributes = "attributes"
 
+	// PathGatewayClusterAddress is the path value for the cluster address field.
 	PathGatewayClusterAddress = "cluster_address"
 
+	// PathGatewayContactAccount is the path value for the User ID that reflects
+	// the contact account of the gateway.
 	PathGatewayContactAccount = "contact_account.user_id"
 )
 
