@@ -3,9 +3,11 @@
 package ttnpb_test
 
 import (
-	fmt "fmt"
+	"fmt"
+	"reflect"
 	"testing"
 
+	"github.com/TheThingsNetwork/ttn/pkg/encoding"
 	. "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
@@ -13,29 +15,42 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-func lorawanEncodingTestName(msg *Message) string {
-	switch msg.MType {
-	case MType_UNCONFIRMED_UP:
-		return "Uplink(Unconfirmed)"
-	case MType_UNCONFIRMED_DOWN:
-		return "Downlink(Unconfirmed)"
-	case MType_CONFIRMED_UP:
-		return "Uplink(Confirmed)"
-	case MType_CONFIRMED_DOWN:
-		return "Downlink(Confirmed)"
-	case MType_JOIN_REQUEST:
-		return "JoinRequest"
-	case MType_JOIN_ACCEPT:
-		return "JoinAccept(Encrypted)"
-	case MType_REJOIN_REQUEST:
-		return fmt.Sprintf("RejoinRequest%d", msg.GetRejoinRequestPayload().RejoinType)
+func lorawanEncodingTestName(v interface{}) string {
+	switch v := v.(type) {
+	case *Message:
+		switch v.MType {
+		case MType_UNCONFIRMED_UP:
+			return "Uplink(Unconfirmed)"
+		case MType_UNCONFIRMED_DOWN:
+			return "Downlink(Unconfirmed)"
+		case MType_CONFIRMED_UP:
+			return "Uplink(Confirmed)"
+		case MType_CONFIRMED_DOWN:
+			return "Downlink(Confirmed)"
+		case MType_JOIN_REQUEST:
+			return "JoinRequest"
+		case MType_JOIN_ACCEPT:
+			return "JoinAccept(Encrypted)"
+		case MType_REJOIN_REQUEST:
+			return fmt.Sprintf("RejoinRequest%d", v.GetRejoinRequestPayload().RejoinType)
+		}
+	case *JoinAcceptPayload:
+		if v.CFList == nil {
+			return "JoinAcceptPayload(no CFList)"
+		}
+		return fmt.Sprintf("JoinAcceptPayload(CFListType %d)", v.CFList.Type)
 	}
-	panic("unreachable")
+	panic("Unmatched type")
+}
+
+type message interface {
+	encoding.LoRaWANMarshaler
+	encoding.LoRaWANAppender
 }
 
 func TestLoRaWANEncodingRandomized(t *testing.T) {
 	r := test.Randy
-	for _, expected := range []*Message{
+	for _, expected := range []message{
 		NewPopulatedMessageUplink(r, *types.NewPopulatedAES128Key(r), *types.NewPopulatedAES128Key(r), uint8(r.Intn(256)), uint8(r.Intn(256)), false),
 		NewPopulatedMessageUplink(r, *types.NewPopulatedAES128Key(r), *types.NewPopulatedAES128Key(r), uint8(r.Intn(256)), uint8(r.Intn(256)), true),
 		NewPopulatedMessageDownlink(r, *types.NewPopulatedAES128Key(r), false),
@@ -45,6 +60,8 @@ func TestLoRaWANEncodingRandomized(t *testing.T) {
 		NewPopulatedMessageRejoinRequest(test.Randy, 0),
 		NewPopulatedMessageRejoinRequest(test.Randy, 1),
 		NewPopulatedMessageRejoinRequest(test.Randy, 2),
+
+		NewPopulatedJoinAcceptPayload(test.Randy, false),
 	} {
 		t.Run(lorawanEncodingTestName(expected), func(t *testing.T) {
 			a := assertions.New(t)
@@ -53,20 +70,20 @@ func TestLoRaWANEncodingRandomized(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(b, should.NotBeNil)
 
-			pld := &Message{}
-			a.So(pld.UnmarshalLoRaWAN(b), should.BeNil)
-			a.So(pld, should.Resemble, expected)
-
-			ret, err := pld.AppendLoRaWAN(make([]byte, 0))
+			ret, err := expected.AppendLoRaWAN(make([]byte, 0))
 			a.So(err, should.BeNil)
 			a.So(ret, should.Resemble, b)
+
+			msg := reflect.New(reflect.Indirect(reflect.ValueOf(expected)).Type()).Interface().(encoding.LoRaWANUnmarshaler)
+			a.So(msg.UnmarshalLoRaWAN(b), should.BeNil)
+			a.So(msg, should.Resemble, expected)
 		})
 	}
 }
 
 func TestLoRaWANEncodingRaw(t *testing.T) {
 	for _, tc := range []struct {
-		Message *Message
+		Message message
 		Bytes   []byte
 	}{
 		{
@@ -384,6 +401,110 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 				0x42, 0xff, 0xff, 0xff,
 			},
 		},
+		{
+			&JoinAcceptPayload{
+				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
+				NetID:     types.NetID{0x42, 0xff, 0xff},
+				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DLSettings: DLSettings{
+					OptNeg:      true,
+					Rx1DROffset: 0x6,
+					Rx2DR:       0xf,
+				},
+				RxDelay: 0x42,
+			},
+			[]byte{
+				/* JoinNonce */
+				0x42, 0xff, 0xff,
+				/* NetID */
+				0x42, 0xff, 0xff,
+				/* DevAddr */
+				0x42, 0xff, 0xff, 0xff,
+				/* DLSettings */
+				0xef,
+				/* RxDelay */
+				0x42,
+			},
+		},
+		{
+			&JoinAcceptPayload{
+				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
+				NetID:     types.NetID{0x42, 0xff, 0xff},
+				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DLSettings: DLSettings{
+					OptNeg:      true,
+					Rx1DROffset: 0x6,
+					Rx2DR:       0xf,
+				},
+				RxDelay: 0x42,
+				CFList: &CFList{
+					Type: CFListType_FREQUENCIES,
+					Freq: []uint32{0xffff42, 0xffffff, 0xffffff, 0xffffff, 0xffffff},
+				},
+			},
+			[]byte{
+				/* JoinNonce */
+				0x42, 0xff, 0xff,
+				/* NetID */
+				0x42, 0xff, 0xff,
+				/* DevAddr */
+				0x42, 0xff, 0xff, 0xff,
+				/* DLSettings */
+				0xef,
+				/* RxDelay */
+				0x42,
+				/* CFList */
+				0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+				/* CFListType */
+				0x0,
+			},
+		},
+		{
+			&JoinAcceptPayload{
+				JoinNonce: types.JoinNonce{0x42, 0xff, 0xff},
+				NetID:     types.NetID{0x42, 0xff, 0xff},
+				DevAddr:   types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DLSettings: DLSettings{
+					OptNeg:      true,
+					Rx1DROffset: 0x6,
+					Rx2DR:       0xf,
+				},
+				RxDelay: 0x42,
+				CFList: &CFList{
+					Type: CFListType_CHANNEL_MASKS,
+					ChMasks: []bool{
+						false, true, false, false, false, false, true, false,
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+			},
+			[]byte{
+				/* JoinNonce */
+				0x42, 0xff, 0xff,
+				/* NetID */
+				0x42, 0xff, 0xff,
+				/* DevAddr */
+				0x42, 0xff, 0xff, 0xff,
+				/* DLSettings */
+				0xef,
+				/* RxDelay */
+				0x42,
+				/* CFList */
+				0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0,
+				/* CFListType */
+				0x1,
+			},
+		},
 	} {
 		t.Run(lorawanEncodingTestName(tc.Message), func(t *testing.T) {
 			a := assertions.New(t)
@@ -393,13 +514,13 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			a.So(b, should.NotBeNil)
 			a.So(b, should.Resemble, tc.Bytes)
 
-			msg := &Message{}
+			b, err = tc.Message.AppendLoRaWAN(make([]byte, 0))
+			a.So(err, should.BeNil)
+			a.So(b, should.Resemble, tc.Bytes)
+
+			msg := reflect.New(reflect.Indirect(reflect.ValueOf(tc.Message)).Type()).Interface().(encoding.LoRaWANUnmarshaler)
 			a.So(msg.UnmarshalLoRaWAN(b), should.BeNil)
 			a.So(msg, should.Resemble, tc.Message)
-
-			ret, err := tc.Message.AppendLoRaWAN(make([]byte, 0))
-			a.So(err, should.BeNil)
-			a.So(ret, should.Resemble, tc.Bytes)
 		})
 	}
 }
