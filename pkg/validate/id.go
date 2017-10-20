@@ -41,7 +41,7 @@ const idRegex = "^[a-z0-9](?:[_-]?[a-z0-9]){1,35}$"
 func ID(v interface{}) error {
 	id, ok := v.(string)
 	if !ok {
-		return fmt.Errorf("Invalid input type, got %T instead of string", v)
+		return fmt.Errorf("ID validator: got %T instead of string", v)
 	}
 
 	re := regexp.MustCompile(idRegex)

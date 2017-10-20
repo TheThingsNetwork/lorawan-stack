@@ -4,8 +4,11 @@ package validate
 
 import "fmt"
 
+// Errors is a slice of errors. It it is used to concatenate the different
+// validation errors than can happen in a single field.
 type Errors []error
 
+// Error implements error.
 func (e Errors) Error() string {
 	switch len(e) {
 	case 0:
@@ -31,6 +34,7 @@ func (e Errors) Error() string {
 	}
 }
 
+// DescribeFieldName allows to prefix the errors with the name of the field.
 func (e Errors) DescribeFieldName(fieldName string) Errors {
 	if len(e) == 0 {
 		return nil
@@ -39,8 +43,4 @@ func (e Errors) DescribeFieldName(fieldName string) Errors {
 		e[i] = fmt.Errorf("%s: %s", fieldName, e[i].Error())
 	}
 	return e
-}
-
-func IsNil(e Errors) bool {
-	return e == nil || len(e) == 0
 }

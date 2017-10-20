@@ -24,7 +24,7 @@ var errInvalidPassword = errors.New("Password must be at least 8 characters long
 func Password(v interface{}) error {
 	password, ok := v.(string)
 	if !ok {
-		return fmt.Errorf("Invalid input type, got %T instead of string", v)
+		return fmt.Errorf("Password validator: got %T instead of string", v)
 	}
 
 	if len(password) < 8 {

@@ -24,7 +24,7 @@ func MinLength(length int) validateFn {
 			return minLengthSlice(reflect.ValueOf(v), length)
 		}
 
-		return fmt.Errorf("Unsupported input type: `%T`", v)
+		return fmt.Errorf("MinLength validator: got %T instead of string or slice", v)
 	}
 }
 

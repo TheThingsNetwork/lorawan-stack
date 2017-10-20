@@ -13,7 +13,7 @@ const emailRegex = "^(?:(?:(?:(?:[a-zA-Z]|\\d|[!#\\$%&'\\*\\+\\-\\/=\\?\\^_`{\\|
 func Email(v interface{}) error {
 	str, ok := v.(string)
 	if !ok {
-		return fmt.Errorf("Invalid input type, got %T instead of string", v)
+		return fmt.Errorf("Email validator: got %T instead of string", v)
 	}
 
 	re := regexp.MustCompile(emailRegex)

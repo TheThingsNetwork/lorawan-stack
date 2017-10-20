@@ -40,5 +40,14 @@ func TestIsZero(t *testing.T) {
 	a.So(isZero(str), should.BeTrue)
 	str = "a"
 	a.So(isZero(str), should.BeFalse)
+}
 
+func TestRequired(t *testing.T) {
+	a := assertions.New(t)
+
+	a.So(Field("", Required), should.NotBeNil)
+	a.So(Field("f", Required), should.BeNil)
+
+	a.So(Field("", NotRequired), should.BeNil)
+	a.So(Field("f", NotRequired), should.BeNil)
 }
