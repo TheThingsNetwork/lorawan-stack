@@ -48,7 +48,7 @@ func (k *Keys) GetPublicKey(kid string) (crypto.PublicKey, error) {
 	}
 
 	if err := checkPrivateKey(v); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	switch key := v.(type) {
