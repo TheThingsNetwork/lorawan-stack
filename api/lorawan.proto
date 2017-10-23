@@ -221,37 +221,38 @@ enum MACCommandIdentifier {
 
 message MACCommand {
   oneof payload {
-    Proprietary         proprietary             = 1;
-    ResetInd            reset_ind               = 2;
-    ResetConf           reset_conf              = 3;
-    LinkCheckAns        link_check_ans          = 4;
-    LinkADRReq          link_adr_req            = 5;
-    LinkADRAns          link_adr_ans            = 6;
-    DutyCycleReq        duty_cycle_req          = 7;
-    RxParamSetupReq     rx_param_setup_req      = 8;
-    RxParamSetupAns     rx_param_setup_ans      = 9;
-    DevStatusAns        dev_status_ans          = 10;
-    NewChannelReq       new_channel_req         = 11;
-    NewChannelAns       new_channel_ans         = 12;
-    DLChannelReq        dl_channel_req          = 13;
-    DLChannelAns        dl_channel_ans          = 14;
-    RxTimingSetupReq    rx_timing_setup_req     = 15;
-    TxParamSetupReq     tx_param_setup_req      = 16;
-    RekeyInd            rekey_ind               = 17;
-    RekeyConf           rekey_conf              = 18;
-    ADRParamSetupReq    adr_param_setup_req     = 29;
-    DeviceTimeAns       device_time_ans         = 20;
-    ForceRejoinReq      force_rejoin_req        = 21;
-    RejoinParamSetupReq rejoin_param_setup_req  = 22;
-    RejoinParamSetupAns rejoin_param_setup_ans  = 23;
-    PingSlotInfoReq     ping_slot_info_req      = 24;
-    PingSlotChannelReq  ping_slot_channel_req   = 25;
-    PingSlotChannelAns  ping_slot_channel_ans   = 26;
-    BeaconTimingAns     beacon_timing_ans       = 27;
-    BeaconFreqReq       beacon_freq_req         = 28;
-    BeaconFreqAns       beacon_freq_ans         = 39;
-    DeviceModeInd       device_mode_ind         = 30;
-    DeviceModeConf      device_mode_conf        = 31;
+    MACCommandIdentifier  cid                     = 1 [(gogoproto.customname) = "CID"];
+    Proprietary           proprietary             = 2;
+    ResetInd              reset_ind               = 3;
+    ResetConf             reset_conf              = 4;
+    LinkCheckAns          link_check_ans          = 5;
+    LinkADRReq            link_adr_req            = 6;
+    LinkADRAns            link_adr_ans            = 7;
+    DutyCycleReq          duty_cycle_req          = 8;
+    RxParamSetupReq       rx_param_setup_req      = 9;
+    RxParamSetupAns       rx_param_setup_ans      = 10;
+    DevStatusAns          dev_status_ans          = 11;
+    NewChannelReq         new_channel_req         = 12;
+    NewChannelAns         new_channel_ans         = 13;
+    DLChannelReq          dl_channel_req          = 14;
+    DLChannelAns          dl_channel_ans          = 15;
+    RxTimingSetupReq      rx_timing_setup_req     = 16;
+    TxParamSetupReq       tx_param_setup_req      = 17;
+    RekeyInd              rekey_ind               = 18;
+    RekeyConf             rekey_conf              = 19;
+    ADRParamSetupReq      adr_param_setup_req     = 20;
+    DeviceTimeAns         device_time_ans         = 21;
+    ForceRejoinReq        force_rejoin_req        = 22;
+    RejoinParamSetupReq   rejoin_param_setup_req  = 23;
+    RejoinParamSetupAns   rejoin_param_setup_ans  = 24;
+    PingSlotInfoReq       ping_slot_info_req      = 25;
+    PingSlotChannelReq    ping_slot_channel_req   = 26;
+    PingSlotChannelAns    ping_slot_channel_ans   = 27;
+    BeaconTimingAns       beacon_timing_ans       = 28;
+    BeaconFreqReq         beacon_freq_req         = 29;
+    BeaconFreqAns         beacon_freq_ans         = 30;
+    DeviceModeInd         device_mode_ind         = 31;
+    DeviceModeConf        device_mode_conf        = 32;
   }
 
   message Proprietary {
