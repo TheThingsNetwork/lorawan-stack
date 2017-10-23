@@ -83,6 +83,11 @@ func (m *MACCommands) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 			}
 			rawPayload = b[:payloadLen+1]
 			b = b[payloadLen+1:]
+			if payloadLen == 0 {
+				cmd.Payload = &MACCommand_CID{CID: cid}
+				*m = append(*m, cmd)
+				continue
+			}
 			switch cid {
 			case CID_RESET:
 				pld := &MACCommand_ResetInd{}
@@ -139,6 +144,11 @@ func (m *MACCommands) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 			}
 			rawPayload = b[:payloadLen+1]
 			b = b[payloadLen+1:]
+			if payloadLen == 0 {
+				cmd.Payload = &MACCommand_CID{CID: cid}
+				*m = append(*m, cmd)
+				continue
+			}
 			switch cid {
 			case CID_RESET:
 				pld := &MACCommand_ResetConf{}

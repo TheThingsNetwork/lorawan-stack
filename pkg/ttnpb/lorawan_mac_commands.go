@@ -16,6 +16,8 @@ type MACCommandPayload interface {
 // CID returns the CID of the embedded MAC command
 func (m *MACCommand) CID() MACCommandIdentifier {
 	switch x := m.Payload.(type) {
+	case *MACCommand_CID:
+		return x.CID
 	case *MACCommand_Proprietary_:
 		return x.Proprietary.CID
 	case *MACCommand_ResetInd_:
@@ -85,6 +87,8 @@ func (m *MACCommand) CID() MACCommandIdentifier {
 // GetActualPayload returns the actual payload of the embedded MAC command
 func (m *MACCommand) GetActualPayload() MACCommandPayload {
 	switch x := m.Payload.(type) {
+	case *MACCommand_CID:
+		return nil
 	case *MACCommand_Proprietary_:
 		return x.Proprietary
 	case *MACCommand_ResetInd_:
@@ -149,6 +153,11 @@ func (m *MACCommand) GetActualPayload() MACCommandPayload {
 		return x.DeviceModeConf
 	}
 	return nil
+}
+
+// MACCommand returns a payload-less MAC command with this CID
+func (m MACCommandIdentifier) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_CID{CID: m}}
 }
 
 // MACCommand returns the Proprietary MAC command as a *MACCommand
