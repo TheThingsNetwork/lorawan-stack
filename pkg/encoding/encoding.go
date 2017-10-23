@@ -1,15 +1,26 @@
 // Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-// Package encoding defines interfaces shared by other packages that
-// convert data to and from byte-level and textual representations.
-// Packages that check for these interfaces include encoding/gob,
-// encoding/json, and encoding/xml. As a result, implementing an
-// interface once can make a type useful in multiple encodings.
-// Standard types that implement these interfaces include time.Time and net.IP.
-// The interfaces come in pairs that produce and consume encoded data.
-// This package is an extension of standard library 'encoding'
-// package with LoRaWAN encoding interfaces added.
+// Package encoding is an extension of standard library 'encoding'
+// package with additional encoding interfaces added.
 package encoding
+
+import "encoding"
+
+// BinaryMarshaler is an encoding.BinaryMarshaler.
+// Refer to standard library `encoding` package for documentation.
+type BinaryMarshaler encoding.BinaryMarshaler
+
+// BinaryUnmarshaler is an encoding.BinaryUnmarshaler.
+// Refer to standard library `encoding` package for documentation.
+type BinaryUnmarshaler encoding.BinaryUnmarshaler
+
+// TextMarshaler is an encoding.TextMarshaler.
+// Refer to standard library `encoding` package for documentation.
+type TextMarshaler encoding.TextMarshaler
+
+// TextUnmarshaler is an encoding.TextUnmarshaler.
+// Refer to standard library `encoding` package for documentation.
+type TextUnmarshaler encoding.TextUnmarshaler
 
 // LoRaWANMarshaler is the interface implemented by an object that can
 // marshal itself into LoRaWAN form.
