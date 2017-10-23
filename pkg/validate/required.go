@@ -9,7 +9,8 @@ import (
 
 var errZeroValue = errors.New("variable is empty")
 
-// NotRequired checks whether the inpur value is an empty value upon its type.
+// NotRequired checks whether the input value is an empty value upon its type.
+// It does not support functions as input value.
 func NotRequired(v interface{}) error {
 	if isZero(v) {
 		return errZeroValue
@@ -17,7 +18,8 @@ func NotRequired(v interface{}) error {
 	return nil
 }
 
-// Required return error if the input value is empty.
+// Required return error if the input value is empty. It does not support functions
+// as input value.
 func Required(v interface{}) error {
 	if isZero(v) {
 		return errors.New("Field cannot be empty")
