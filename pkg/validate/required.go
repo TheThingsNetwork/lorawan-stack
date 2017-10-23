@@ -29,7 +29,7 @@ func isZero(v interface{}) bool {
 	value := reflect.ValueOf(v)
 
 	switch value.Kind() {
-	case reflect.Func, reflect.Map, reflect.Slice:
+	case reflect.Map, reflect.Slice, reflect.Ptr:
 		return value.IsNil()
 	case reflect.Array:
 		for i := 0; i < value.Len(); i++ {

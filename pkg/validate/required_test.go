@@ -17,12 +17,6 @@ func TestIsZero(t *testing.T) {
 	slice = append(slice, 1)
 	a.So(isZero(slice), should.BeFalse)
 
-	type fn func() error
-	var dummyFn fn
-	a.So(isZero(dummyFn), should.BeTrue)
-	dummyFn = func() error { return nil }
-	a.So(isZero(dummyFn), should.BeFalse)
-
 	var mp map[string]string
 	a.So(isZero(mp), should.BeTrue)
 	mp = make(map[string]string)
@@ -40,6 +34,11 @@ func TestIsZero(t *testing.T) {
 	a.So(isZero(str), should.BeTrue)
 	str = "a"
 	a.So(isZero(str), should.BeFalse)
+
+	var b *Bar
+	a.So(isZero(b), should.BeTrue)
+	b = new(Bar)
+	a.So(isZero(b), should.BeFalse)
 }
 
 func TestRequired(t *testing.T) {
