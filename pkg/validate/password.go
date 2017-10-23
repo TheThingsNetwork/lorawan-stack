@@ -5,45 +5,20 @@ package validate
 import (
 	"errors"
 	"fmt"
-	"unicode"
+	"regexp"
 )
 
-var mustHave = []func(rune) bool{
-	unicode.IsUpper,
-	unicode.IsLower,
-	unicode.IsDigit,
-}
+var passwordRegex = regexp.MustCompile("^.{8,}$")
 
-var errInvalidPassword = errors.New("Password must be at least 8 characters long and have contain at least one lowercase letter, one uppercase letter and one digit")
-
-// Password checks wether the input value is a string and a valid password according:
-//		-  Length must be 8 at least
-//		- It must contain at least a lower case letter
-//		- It must contain at least an upper case letter
-//		- It must contain at least one digit
+// Password checks whether the input value is a string and is at least 8 characters long.
 func Password(v interface{}) error {
 	password, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("Password validator: got %T instead of string", v)
 	}
 
-	if len(password) < 8 {
-		return errInvalidPassword
-	}
-
-	for _, fn := range mustHave {
-		found := false
-
-		for _, c := range password {
-			if fn(c) {
-				found = true
-				break
-			}
-		}
-
-		if !found {
-			return errInvalidPassword
-		}
+	if !passwordRegex.MatchString(password) {
+		return errors.New("Password must be at least 8 characters long")
 	}
 
 	return nil
