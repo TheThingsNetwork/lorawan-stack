@@ -16,16 +16,6 @@ func (e Errors) Error() string {
 	case 1:
 		return e[0].Error()
 	default:
-		/*msg := "multiple errors:"
-		for _, err := range e {
-			msg += "\n"
-			if _, ok := err.(Errors); ok {
-				msg += "\n\t" + err.Error()
-			} else {
-				msg += "\t" + err.Error()
-			}
-		}
-		return msg*/
 		msg := e[0].Error()
 		for i := 1; i < len(e); i++ {
 			msg += "\n" + e[i].Error()
