@@ -13,6 +13,10 @@ import (
 //     - For other types returns error
 func MinLength(length int) validateFn {
 	return func(v interface{}) error {
+		if v == nil {
+			return fmt.Errorf("MinLength validator: got %T instead of string or slice", v)
+		}
+
 		typ := reflect.TypeOf(v)
 
 		if typ.Kind() == reflect.String {

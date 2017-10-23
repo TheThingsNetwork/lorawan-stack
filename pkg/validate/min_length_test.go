@@ -25,6 +25,6 @@ func TestMinLength(t *testing.T) {
 	slice = append(slice, 2)
 	a.So(minLength2(slice), should.BeNil)
 
-	//a.So(minLength2(nil), should.NotBeNil)
+	a.So(minLength2(nil), should.NotBeNil)
 	a.So(minLength2(1), should.NotBeNil)
 }
