@@ -216,6 +216,58 @@ func TestClientValidations(t *testing.T) {
 	a := assertions.New(t)
 
 	{
+		req := &CreateClientRequest{}
+		a.So(req.Validate(), should.NotBeNil)
+
+		req = &CreateClientRequest{
+			ClientIdentifier: ClientIdentifier{"foo-client"},
+			CallbackURI:      "localhost",
+			Grants:           []ClientGrant{GRANT_PASSWORD},
+			Scope:            []ClientScope{SCOPE_PROFILE},
+		}
+		a.So(req.Validate(), should.BeNil)
+	}
+
+	{
+		req := &UpdateClientRequest{}
+		a.So(req.Validate(), should.NotBeNil)
+
+		req = &UpdateClientRequest{
+			ClientIdentifier: ClientIdentifier{"foo-client"},
+			Description:      "",
+		}
+		err := req.Validate()
+		a.So(err, should.NotBeNil)
+		a.So(ErrUpdateMaskNotFound.Describes(err), should.BeTrue)
+
+		req = &UpdateClientRequest{
+			ClientIdentifier: ClientIdentifier{"foo-client"},
+			CallbackURI:      "localhost",
+			Grants:           []ClientGrant{GRANT_PASSWORD},
+			Scope:            []ClientScope{SCOPE_PROFILE},
+			UpdateMask: &ptypes.FieldMask{
+				Paths: []string{"frequency_plan_id", "cluster_address"},
+			},
+		}
+		err = req.Validate()
+		a.So(err, should.NotBeNil)
+		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+
+		req = &UpdateClientRequest{
+			ClientIdentifier: ClientIdentifier{"foo-client"},
+			Description:      "",
+			CallbackURI:      "ttn.com",
+			Grants:           []ClientGrant{GRANT_PASSWORD},
+			Scope:            []ClientScope{SCOPE_PROFILE},
+			UpdateMask: &ptypes.FieldMask{
+				Paths: []string{"callback_uri", "grants", "scope", "description"},
+			},
+		}
+		err = req.Validate()
+		a.So(err, should.BeNil)
+	}
+
+	{
 		req := &SetClientStateRequest{}
 		a.So(req.Validate(), should.NotBeNil)
 
