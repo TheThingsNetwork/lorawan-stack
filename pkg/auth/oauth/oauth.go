@@ -64,7 +64,7 @@ func New(iss string, keys *auth.Keys, store store.Store, authorizer Authorizer) 
 
 // Register registers the server to the web server.
 func (s *Server) Register(server *web.Server) {
-	group := server.Group("/oauth")
+	group := server.Group.Group("/oauth")
 	group.Any("/token", s.tokenHandler)
 	group.Any("/authorize", s.authorizationHandler)
 }
