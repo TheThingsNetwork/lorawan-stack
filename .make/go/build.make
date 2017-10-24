@@ -1,8 +1,8 @@
 # Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 # Infer GOOS and GOARCH
-GOOS ?= `go env GOOS`
-GOARCH ?= `go env GOARCH`
+GOOS ?= $(shell go env GOOS)
+GOARCH ?= $(shell go env GOARCH)
 
 # default main file
 MAIN ?= ./main.go
@@ -13,8 +13,8 @@ BUILD_TYPE = production
 VENDOR_DIR ?= $(PWD)/vendor
 VENDOR_FILE ?= Gopkg.toml
 
-LAZY_GOOS=`echo $@ | sed 's:$(RELEASE_DIR)/.*-\(.*\)-\(.*\):\1:'`
-LAZY_GOARCH=`echo $@ | sed 's:$(RELEASE_DIR)/.*-\(.*\)-\(.*\):\2:'`
+LAZY_GOOS = `echo $@ | sed 's:$(RELEASE_DIR)/.*-\(.*\)-\(.*\):\1:'`
+LAZY_GOARCH = `echo $@ | sed 's:$(RELEASE_DIR)/.*-\(.*\)-\(.*\):\2:'`
 
 # Build the executable
 $(RELEASE_DIR)/%: $(shell $(GO_FILES)) $(GO_VENDOR_FILE)
@@ -30,7 +30,7 @@ go.dev:
 
 # link executables to a simplified name that is the same on all architectures.
 go.link:
-	@for i in $(wildcard $(RELEASE_DIR)/*-$(shell echo $(GOOS))-$(shell echo $(GOARCH))); do \
+	@for i in $(wildcard $(RELEASE_DIR)/*-$(GOOS)-$(GOARCH)); do \
 		ln -sfr $$i `echo $$i | sed 's:\(.*\)-.*-.*:\1:'`; \
 	done
 
