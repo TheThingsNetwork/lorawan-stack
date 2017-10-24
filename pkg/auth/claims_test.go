@@ -28,7 +28,7 @@ func TestClaims(t *testing.T) {
 			Subject:   ApplicationSubject("foo"),
 			Issuer:    "account.thethingsnetwork.org",
 		},
-		User: "john-doe",
+		Creator: "john-doe",
 		Rights: []ttnpb.Right{
 			ttnpb.RIGHT_APPLICATION_INFO,
 			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
@@ -53,7 +53,7 @@ func TestSign(t *testing.T) {
 			Subject:   ApplicationSubject("foo-app"),
 			Issuer:    "account.thethingsnetwork.org",
 		},
-		User: "john-doe",
+		Creator: "john-doe",
 		Rights: []ttnpb.Right{
 			ttnpb.RIGHT_APPLICATION_INFO,
 			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,

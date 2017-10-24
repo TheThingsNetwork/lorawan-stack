@@ -128,7 +128,7 @@ pfeKo3HLUYMyS8l55ppjahjP4nG2cvuayO/VaHUIJW6VoVn5VDZ4ukM=
 			Subject:   ApplicationSubject("foo-app"),
 			Issuer:    "account.thethingsnetwork.org",
 		},
-		User: "john-doe",
+		Creator: "john-doe",
 		Rights: []ttnpb.Right{
 			ttnpb.RIGHT_APPLICATION_INFO,
 			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,

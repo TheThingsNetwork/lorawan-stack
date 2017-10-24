@@ -36,9 +36,9 @@ func (s *Server) GenerateAccessToken(data *osin.AccessData, generateRefresh bool
 			Subject:   auth.UserSubject(userID),
 			IssuedAt:  time.Now().Add(-5 * time.Second).Unix(),
 		},
-		User:   userID,
-		Rights: rights,
-		Client: data.Client.GetId(),
+		Creator: userID,
+		Rights:  rights,
+		Client:  data.Client.GetId(),
 	}
 
 	accessToken, err := claims.Sign(key)

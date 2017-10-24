@@ -136,7 +136,7 @@ func (s *storage) LoadAccess(accessToken string) (*osin.AccessData, error) {
 		Scope:     Scope(claims.Rights),
 		CreatedAt: time.Unix(claims.IssuedAt, 0),
 		UserData: &UserData{
-			UserID: claims.User,
+			UserID: claims.Creator,
 		},
 	}, nil
 }

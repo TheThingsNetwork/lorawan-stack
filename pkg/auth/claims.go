@@ -26,8 +26,8 @@ type Claims struct {
 	// Sub is interpreted as the id of the entity this token is for.
 	jwt.StandardClaims
 
-	// User is the user ID of the user that created this token.
-	User string `json:"user_id"`
+	// Creator is the user ID of the user that created this token.
+	Creator string `json:"creator"`
 
 	// Client is the client this token was created for.
 	Client string `json:"cid,omitempty"`
