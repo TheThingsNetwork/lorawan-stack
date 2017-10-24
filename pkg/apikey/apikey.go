@@ -4,7 +4,9 @@ package apikey
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/TheThingsNetwork/ttn/pkg/random"
 )
@@ -13,49 +15,105 @@ var (
 	// enc is the encoder we use
 	enc = base64.RawURLEncoding
 
-	// entropy is the amount of entropy we use
+	// typ is the JOSE type for the API Key
+	typ = "key"
+
+	// alg is the JOSE algorithm for the API Key
+	alg = "secret"
+
+	// entropy is the amount of entropy we use (in bytes)
 	entropy = 32
 
-	// tenantLen is the minimum length to pad tenants to.
-	// Longer tenant id's will not be padded.
-	tenantLen = 32
-
-	// minLen is the minimum lenght of a decoded key, consisting of:
-	// entropy
-	minLen = entropy
+	// header64 is the base64 encoded header
+	header64 string
 )
 
-// GenerateAPIKey generates an API key for the specified tenant.
-// The key has the following byte layout, base64 encoded:
-//
-//     | entropy  |  tenant             |
-//     +----------+---------------------+
-//     | 32 bytes |  ? (variable) bytes |
-//
-// The id is padded with random bytes to make sure all api keys have the same length,
-// it is prefixed with the length of the id so we can decode the id from the API key.
-// The entropy of an API key varies between 20 and 35 - len(tenant).
-func GenerateAPIKey(tenant string) string {
-	raw := append(random.Bytes(entropy), pad([]byte(tenant), tenantLen)...)
-
-	return enc.EncodeToString(raw)
+type header struct {
+	Alg  string `json:"alg"`
+	Type string `json:"typ"`
 }
 
-// KeyTenant gets the tenant from the base64 encoded key.
-func KeyTenant(key string) (string, error) {
-	dec, err := enc.DecodeString(key)
+type payload struct {
+	Issuer string `json:"iss"`
+}
+
+// GenerateAPIKey generates an API key with the JOSE header:
+// {"typ":"key", "iss": "<tenant>"} and a JWS body that consists of random bytes.
+func GenerateAPIKey(tenant string) (string, error) {
+	payload, err := marshal(payload{
+		Issuer: tenant,
+	})
 	if err != nil {
 		return "", err
 	}
 
-	if len(dec) < minLen {
+	return header64 + "." + payload + "." + enc.EncodeToString(random.Bytes(entropy)), nil
+}
+
+// KeyTenant gets the tenant from the base64 encoded key.
+func KeyTenant(key string) (string, error) {
+	parts := strings.Split(key, ".")
+	if len(parts) != 3 {
 		return "", fmt.Errorf("Invalid number of segments in key")
 	}
 
-	tenant := unpad(dec[entropy:])
-	if tenant == nil {
-		return "", fmt.Errorf("Invalid format of key")
+	if len(parts[2]) <= 4 {
+		return "", fmt.Errorf("The API Key does not contain a valid secret")
 	}
 
-	return string(tenant), nil
+	head := new(header)
+	err := unmarshal([]byte(parts[0]), head)
+	if err != nil {
+		return "", err
+	}
+
+	if head.Type != typ {
+		return "", fmt.Errorf("The received key is not an API Key")
+	}
+
+	if head.Alg != alg {
+		return "", fmt.Errorf("Unkown alg for API Key: %s", head.Alg)
+	}
+
+	payload := new(payload)
+	err = unmarshal([]byte(parts[1]), payload)
+	if err != nil {
+		return "", err
+	}
+
+	if payload.Issuer == "" {
+		return "", fmt.Errorf("The API Key does not contain an issuer")
+	}
+
+	return payload.Issuer, nil
+}
+
+func marshal(v interface{}) (string, error) {
+	data, err := json.Marshal(v)
+	if err != nil {
+		return "", err
+	}
+
+	return enc.EncodeToString(data), nil
+}
+
+func unmarshal(data []byte, v interface{}) error {
+	js, err := enc.DecodeString(string(data))
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(js, v)
+}
+
+func init() {
+	header, err := marshal(header{
+		Type: typ,
+		Alg:  alg,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	header64 = header
 }
