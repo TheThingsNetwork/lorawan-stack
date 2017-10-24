@@ -221,9 +221,9 @@ func TestClientValidations(t *testing.T) {
 
 		req = &CreateClientRequest{
 			ClientIdentifier: ClientIdentifier{"foo-client"},
-			CallbackURI:      "localhost",
-			Grants:           []ClientGrant{GRANT_PASSWORD},
-			Scope:            []ClientScope{SCOPE_PROFILE},
+			RedirectURI:      "localhost",
+			Grants:           []GrantType{GRANT_AUTHORIZATION_CODE},
+			Rights:           []Right{RIGHT_APPLICATION_INFO},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -242,9 +242,9 @@ func TestClientValidations(t *testing.T) {
 
 		req = &UpdateClientRequest{
 			ClientIdentifier: ClientIdentifier{"foo-client"},
-			CallbackURI:      "localhost",
-			Grants:           []ClientGrant{GRANT_PASSWORD},
-			Scope:            []ClientScope{SCOPE_PROFILE},
+			RedirectURI:      "localhost",
+			Grants:           []GrantType{GRANT_AUTHORIZATION_CODE},
+			Rights:           []Right{RIGHT_APPLICATION_INFO},
 			UpdateMask: &ptypes.FieldMask{
 				Paths: []string{"frequency_plan_id", "cluster_address"},
 			},
@@ -256,9 +256,9 @@ func TestClientValidations(t *testing.T) {
 		req = &UpdateClientRequest{
 			ClientIdentifier: ClientIdentifier{"foo-client"},
 			Description:      "",
-			CallbackURI:      "ttn.com",
-			Grants:           []ClientGrant{GRANT_PASSWORD},
-			Scope:            []ClientScope{SCOPE_PROFILE},
+			RedirectURI:      "ttn.com",
+			Grants:           []GrantType{GRANT_AUTHORIZATION_CODE},
+			Rights:           []Right{RIGHT_APPLICATION_INFO},
 			UpdateMask: &ptypes.FieldMask{
 				Paths: []string{"callback_uri", "grants", "scope", "description"},
 			},

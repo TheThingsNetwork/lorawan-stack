@@ -160,9 +160,9 @@ func (req *SetGatewayCollaboratorRequest) Validate() error {
 func (req *CreateClientRequest) Validate() error {
 	return validate.All(
 		validate.Field(req.ClientID, validate.ID).DescribeFieldName("Client ID"),
-		validate.Field(req.CallbackURI, validate.Required).DescribeFieldName("Callback URI"),
+		validate.Field(req.RedirectURI, validate.Required).DescribeFieldName("Callback URI"),
 		validate.Field(req.Grants, validate.MinLength(1)).DescribeFieldName("Grants"),
-		validate.Field(req.Scope, validate.MinLength(1)).DescribeFieldName("Scope"),
+		validate.Field(req.Rights, validate.MinLength(1)).DescribeFieldName("Scope"),
 	)
 }
 
@@ -183,11 +183,11 @@ func (req *UpdateClientRequest) Validate() error {
 		switch path {
 		case PathClientDescription:
 		case PathClientCallbackURI:
-			err = validate.Field(req.CallbackURI, validate.Required).DescribeFieldName("Callback URI")
+			err = validate.Field(req.RedirectURI, validate.Required).DescribeFieldName("Callback URI")
 		case PathClientGrants:
 			err = validate.Field(req.Grants, validate.MinLength(1)).DescribeFieldName("Grants")
 		case PathClientScope:
-			err = validate.Field(req.Scope, validate.MinLength(1)).DescribeFieldName("Scope")
+			err = validate.Field(req.Rights, validate.MinLength(1)).DescribeFieldName("Scope")
 		default:
 			return ErrInvalidPathUpdateMask.New(errors.Attributes{
 				"path": path,
