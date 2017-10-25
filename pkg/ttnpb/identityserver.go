@@ -27,8 +27,8 @@ func (req *UpdateUserRequest) Validate() error {
 	var err validate.Errors
 	for _, path := range req.GetUpdateMask().Paths {
 		switch path {
-		case PathUserName:
-		case PathUserEmail:
+		case FieldPathUserName:
+		case FieldPathUserEmail:
 			err = validate.Field(req.Email, validate.Email).DescribeFieldName("Email")
 		default:
 			return ErrInvalidPathUpdateMask.New(errors.Attributes{
@@ -66,7 +66,7 @@ func (req *UpdateApplicationRequest) Validate() error {
 
 	for _, path := range req.GetUpdateMask().Paths {
 		switch path {
-		case PathApplicationDescription:
+		case FieldPathApplicationDescription:
 		default:
 			return ErrInvalidPathUpdateMask.New(errors.Attributes{
 				"path": path,
@@ -122,18 +122,18 @@ func (req *UpdateGatewayRequest) Validate() error {
 	var err validate.Errors
 	for _, path := range req.GetUpdateMask().Paths {
 		switch path {
-		case PathGatewayDescription,
-			PathGatewayPrivacySettingsStatusPublic,
-			PathGatewayPrivacySettingsLocationPublic,
-			PathGatewayPrivacySettingsContactable,
-			PathGatewayAutoUpdate,
-			PathGatewayPlatform,
-			PathGatewayAntennas,
-			PathGatewayAttributes,
-			PathGatewayContactAccount:
-		case PathGatewayFrequencyPlanID:
+		case FieldPathGatewayDescription,
+			FieldPathGatewayPrivacySettingsStatusPublic,
+			FieldPathGatewayPrivacySettingsLocationPublic,
+			FieldPathGatewayPrivacySettingsContactable,
+			FieldPathGatewayAutoUpdate,
+			FieldPathGatewayPlatform,
+			FieldPathGatewayAntennas,
+			FieldPathGatewayAttributes,
+			FieldPathGatewayContactAccount:
+		case FieldPathGatewayFrequencyPlanID:
 			err = validate.Field(req.FrequencyPlanID, validate.Required).DescribeFieldName("Frequency plan ID")
-		case PathGatewayClusterAddress:
+		case FieldPathGatewayClusterAddress:
 			err = validate.Field(req.ClusterAddress, validate.Required).DescribeFieldName("Cluster address")
 		default:
 			return ErrInvalidPathUpdateMask.New(errors.Attributes{
@@ -160,9 +160,9 @@ func (req *SetGatewayCollaboratorRequest) Validate() error {
 func (req *CreateClientRequest) Validate() error {
 	return validate.All(
 		validate.Field(req.ClientID, validate.ID).DescribeFieldName("Client ID"),
-		validate.Field(req.RedirectURI, validate.Required).DescribeFieldName("Callback URI"),
+		validate.Field(req.RedirectURI, validate.Required).DescribeFieldName("Redirect URI"),
 		validate.Field(req.Grants, validate.MinLength(1)).DescribeFieldName("Grants"),
-		validate.Field(req.Rights, validate.MinLength(1)).DescribeFieldName("Scope"),
+		validate.Field(req.Rights, validate.MinLength(1)).DescribeFieldName("Rights"),
 	)
 }
 
@@ -181,13 +181,13 @@ func (req *UpdateClientRequest) Validate() error {
 	var err validate.Errors
 	for _, path := range req.GetUpdateMask().Paths {
 		switch path {
-		case PathClientDescription:
-		case PathClientCallbackURI:
-			err = validate.Field(req.RedirectURI, validate.Required).DescribeFieldName("Callback URI")
-		case PathClientGrants:
+		case FieldPathClientDescription:
+		case FieldPathClientRedirectURI:
+			err = validate.Field(req.RedirectURI, validate.Required).DescribeFieldName("Redirect URI")
+		case FieldPathClientGrants:
 			err = validate.Field(req.Grants, validate.MinLength(1)).DescribeFieldName("Grants")
-		case PathClientScope:
-			err = validate.Field(req.Rights, validate.MinLength(1)).DescribeFieldName("Scope")
+		case FieldPathClientRights:
+			err = validate.Field(req.Rights, validate.MinLength(1)).DescribeFieldName("Rights")
 		default:
 			return ErrInvalidPathUpdateMask.New(errors.Attributes{
 				"path": path,

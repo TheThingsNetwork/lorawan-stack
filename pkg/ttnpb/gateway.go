@@ -25,44 +25,46 @@ func (g *Gateway) SetAntennas(antennas []GatewayAntenna) {
 }
 
 const (
-	// Valid FieldMask path values for the `update_mask` in UpdateGatewayRequest message.
+	// These are the valid FieldMask path values for the `update_mask` in
+	// the UpdateGatewayRequest message.
 
-	// PathGatewayDescription is the path value for the description field.
-	PathGatewayDescription = "description"
+	// FieldPathGatewayDescription is the path value for the `description` field.
+	FieldPathGatewayDescription = "description"
 
-	// PathGatewayFrequencyPlanID is the path value for the frequency plan ID field.
-	PathGatewayFrequencyPlanID = "frequency_plan_id"
+	// FieldPathGatewayFrequencyPlanID is the path value for the `frequency_plan_id` field.
+	FieldPathGatewayFrequencyPlanID = "frequency_plan_id"
 
-	// PathGatewayPrivacySettingsStatusPublic is the path value for the privacy setting
-	// that denotes if the status is public or not.
-	PathGatewayPrivacySettingsStatusPublic = "privacy_settings.status_public"
+	// FieldPathGatewayPrivacySettingsStatusPublic is the path value for the
+	// `status_public` field in the privacy settings.
+	FieldPathGatewayPrivacySettingsStatusPublic = "privacy_settings.status_public"
 
-	// PathGatewayPrivacySettingsLocationPublic is the path value for the privacy setting
-	// that denotes if the gateway location is public or not.
-	PathGatewayPrivacySettingsLocationPublic = "privacy_settings.location_public"
+	// FieldPathGatewayPrivacySettingsLocationPublic is the path value for the
+	// `location_public` field in the privacy settings.
+	FieldPathGatewayPrivacySettingsLocationPublic = "privacy_settings.location_public"
 
-	// PathGatewayPrivacySettingsContactable is the path value for the privacy setting
-	// that denotes if the contact account information is public or not.
-	PathGatewayPrivacySettingsContactable = "privacy_settings.contactable"
+	// FieldPathGatewayPrivacySettingsContactable is the path value for the
+	// `contactable` field in the privacy settings.
+	FieldPathGatewayPrivacySettingsContactable = "privacy_settings.contactable"
 
-	// PathGatewayAutoUpdate is the path value for the auto update field.
-	PathGatewayAutoUpdate = "auto_update"
+	// FieldPathGatewayAutoUpdate is the path value for the `auto_update` field.
+	FieldPathGatewayAutoUpdate = "auto_update"
 
-	// PathGatewayPlatform is the path value for the gateway platform.
-	PathGatewayPlatform = "platform"
+	// FieldPathGatewayPlatform is the path value for the `platform` field.
+	FieldPathGatewayPlatform = "platform"
 
-	// PathGatewayAntennas is the path value for the gateway antennas.
-	PathGatewayAntennas = "antennas"
+	// FieldPathGatewayAntennas is the path value for the `antennas` field.
+	// This field path affect to all the antennas inside the slice.
+	FieldPathGatewayAntennas = "antennas"
 
-	// PathGatewayAttributes is the path value for the attributes map.
-	PathGatewayAttributes = "attributes"
+	// FieldPathGatewayAttributes is the path value for the `attributes` field.
+	FieldPathGatewayAttributes = "attributes"
 
-	// PathGatewayClusterAddress is the path value for the cluster address field.
-	PathGatewayClusterAddress = "cluster_address"
+	// FieldPathGatewayClusterAddress is the path value for the `cluster_address` field.
+	FieldPathGatewayClusterAddress = "cluster_address"
 
-	// PathGatewayContactAccount is the path value for the User ID that reflects
-	// the contact account of the gateway.
-	PathGatewayContactAccount = "contact_account.user_id"
+	// FieldPathGatewayContactAccount is the path value for the `user_id` field
+	// that denotes the contact account of the gateway.
+	FieldPathGatewayContactAccount = "contact_account.user_id"
 )
 
 // GatewayPrivacySetting is an enum that defines the different gateway privacy settings.

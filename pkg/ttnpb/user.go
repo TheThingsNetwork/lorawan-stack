@@ -8,11 +8,12 @@ func (u *User) GetUser() *User {
 }
 
 const (
-	// Valid FieldMask path values for the `update_mask` in UpdateUserRequest message.
+	// These are the valid FieldMask path values for the `update_mask` in
+	// the UpdateUserRequest message.
 
-	// PathUserName is the path value for the `name` field.
-	PathUserName = "name"
+	// FieldPathUserName is the path value for the `name` field.
+	FieldPathUserName = "name"
 
-	// PathUserEmail is the path value for the 'email' field.
-	PathUserEmail = "email"
+	// FieldPathUserEmail is the path value for the `email field.
+	FieldPathUserEmail = "email"
 )

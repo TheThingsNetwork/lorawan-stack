@@ -260,7 +260,7 @@ func TestClientValidations(t *testing.T) {
 			Grants:           []GrantType{GRANT_AUTHORIZATION_CODE},
 			Rights:           []Right{RIGHT_APPLICATION_INFO},
 			UpdateMask: &ptypes.FieldMask{
-				Paths: []string{"callback_uri", "grants", "scope", "description"},
+				Paths: []string{"redirect_uri", "grants", "rights", "description"},
 			},
 		}
 		err = req.Validate()

@@ -13,8 +13,9 @@ func (d *Application) SetAPIKeys(keys []APIKey) {
 }
 
 const (
-	// Valid FieldMask path values for the `update_mask` in UpdateApplicationRequest message.
+	// These are the valid FieldMask path values for the `update_mask` in
+	// the UpdateApplicationRequest message.
 
-	// PathApplicationDescription is the path value for the `description` field.
-	PathApplicationDescription = "description"
+	// FieldPathApplicationDescription is the path value for the `description` field.
+	FieldPathApplicationDescription = "description"
 )
