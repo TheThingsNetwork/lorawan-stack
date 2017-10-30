@@ -88,14 +88,10 @@ func (r *Registry) FindDeviceByIdentifiers(ids ...*ttnpb.EndDeviceIdentifiers) (
 
 // Update updates devices data in the underlying store.Interface.
 func (d *Device) Update() error {
-	copy := make(chan *ttnpb.EndDevice, 1)
-	go func() {
-		copy <- deepcopy.Copy(d.EndDevice).(*ttnpb.EndDevice)
-	}()
 	if err := d.store.Update(d.key, d.EndDevice, d.stored); err != nil {
 		return err
 	}
-	d.stored = <-copy
+	d.stored = deepcopy.Copy(d.EndDevice).(*ttnpb.EndDevice)
 	return nil
 }
 
