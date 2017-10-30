@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/encoding"
+	"github.com/TheThingsNetwork/ttn/pkg/encoding/lorawan"
 	. "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
@@ -44,8 +44,9 @@ func lorawanEncodingTestName(v interface{}) string {
 }
 
 type message interface {
-	encoding.LoRaWANMarshaler
-	encoding.LoRaWANAppender
+	lorawan.Marshaler
+	lorawan.Appender
+	lorawan.Unmarshaler
 }
 
 func TestLoRaWANEncodingRandomized(t *testing.T) {
@@ -74,7 +75,7 @@ func TestLoRaWANEncodingRandomized(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(ret, should.Resemble, b)
 
-			msg := reflect.New(reflect.Indirect(reflect.ValueOf(expected)).Type()).Interface().(encoding.LoRaWANUnmarshaler)
+			msg := reflect.New(reflect.Indirect(reflect.ValueOf(expected)).Type()).Interface().(lorawan.Unmarshaler)
 			a.So(msg.UnmarshalLoRaWAN(b), should.BeNil)
 			a.So(msg, should.Resemble, expected)
 		})
@@ -518,7 +519,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(b, should.Resemble, tc.Bytes)
 
-			msg := reflect.New(reflect.Indirect(reflect.ValueOf(tc.Message)).Type()).Interface().(encoding.LoRaWANUnmarshaler)
+			msg := reflect.New(reflect.Indirect(reflect.ValueOf(tc.Message)).Type()).Interface().(lorawan.Unmarshaler)
 			a.So(msg.UnmarshalLoRaWAN(b), should.BeNil)
 			a.So(msg, should.Resemble, tc.Message)
 		})
