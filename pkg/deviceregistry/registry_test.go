@@ -19,7 +19,7 @@ import (
 
 func TestDeviceRegistry(t *testing.T) {
 	a := assertions.New(t)
-	r := New(store.NewTypedStoreClient(mapstore.New()))
+	r := NewRegistry(store.NewTypedStoreClient(mapstore.New()))
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
@@ -92,7 +92,7 @@ func TestDeviceRegistry(t *testing.T) {
 }
 
 func ExampleRegistry() {
-	r := New(store.NewTypedStoreClient(mapstore.New()))
+	r := NewRegistry(store.NewTypedStoreClient(mapstore.New()))
 
 	devEUI := types.EUI64([8]byte{0, 1, 2, 3, 4, 5, 6, 7})
 	joinEUI := types.EUI64([8]byte{0, 1, 2, 3, 4, 5, 6, 7})

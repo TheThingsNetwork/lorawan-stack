@@ -8,6 +8,12 @@ import (
 	"github.com/mohae/deepcopy"
 )
 
+// Interface represents the interface exposed by the *Registry.
+type Interface interface {
+	Create(ed *ttnpb.EndDevice) (*Device, error)
+	FindDeviceByIdentifiers(ids ...*ttnpb.EndDeviceIdentifiers) ([]*Device, error)
+}
+
 // Device represents the device stored in the registry.
 type Device struct {
 	*ttnpb.EndDevice
@@ -34,8 +40,8 @@ type Registry struct {
 	store store.Client
 }
 
-// New returns a new Registry with s as an internal Store.
-func New(s store.Client) *Registry {
+// NewRegistry returns a new Registry with s as an internal Store.
+func NewRegistry(s store.Client) *Registry {
 	return &Registry{
 		store: s,
 	}
