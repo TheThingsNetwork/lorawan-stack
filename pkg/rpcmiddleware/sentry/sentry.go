@@ -6,11 +6,11 @@ package sentry
 import (
 	"fmt"
 
+	"context"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	grpcerrors "github.com/TheThingsNetwork/ttn/pkg/errors/grpcerrors" // Note: actual package name there is "errors"
 	raven "github.com/getsentry/raven-go"
 	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

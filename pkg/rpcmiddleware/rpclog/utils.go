@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"path"
 
+	"context"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
-	"golang.org/x/net/context"
 )
 
 type fielder struct {

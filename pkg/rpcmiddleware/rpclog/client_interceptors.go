@@ -5,8 +5,8 @@ package rpclog
 import (
 	"time"
 
+	"context"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
 
