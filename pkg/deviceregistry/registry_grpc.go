@@ -47,28 +47,28 @@ type RegistryRPC struct {
 // Option represents RegistryRPC option
 type Option func(*RegistryRPC)
 
-// WithListDevicesCheck adds a check to ListDevices method of RegistryRPC instance.
+// WithListDevicesCheck sets a check to ListDevices method of RegistryRPC instance.
 // ListDevices first executes fn and if error is returned by it,
 // returns error, otherwise execution advances as usual.
 func WithListDevicesCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) Option {
 	return func(r *RegistryRPC) { r.checks.ListDevices = fn }
 }
 
-// WithGetDeviceCheck adds a check to GetDevice method of RegistryRPC instance.
+// WithGetDeviceCheck sets a check to GetDevice method of RegistryRPC instance.
 // GetDevice first executes fn and if error is returned by it,
 // returns error, otherwise execution advances as usual.
 func WithGetDeviceCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) Option {
 	return func(r *RegistryRPC) { r.checks.GetDevice = fn }
 }
 
-// WithSetDeviceCheck adds a check to SetDevice method of RegistryRPC instance.
+// WithSetDeviceCheck sets a check to SetDevice method of RegistryRPC instance.
 // SetDevice first executes fn and if error is returned by it,
 // returns error, otherwise execution advances as usual.
 func WithSetDeviceCheck(fn func(context.Context, *ttnpb.EndDevice) error) Option {
 	return func(r *RegistryRPC) { r.checks.SetDevice = fn }
 }
 
-// WithDeleteDeviceCheck adds a check to DeleteDevice method of RegistryRPC instance.
+// WithDeleteDeviceCheck sets a check to DeleteDevice method of RegistryRPC instance.
 // DeleteDevice first executes fn and if error is returned by it,
 // returns error, otherwise execution advances as usual.
 func WithDeleteDeviceCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) Option {
