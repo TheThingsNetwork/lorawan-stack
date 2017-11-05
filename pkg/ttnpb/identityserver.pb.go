@@ -12,7 +12,7 @@ import google_protobuf2 "github.com/gogo/protobuf/types"
 import google_protobuf5 "github.com/gogo/protobuf/types"
 
 import (
-	context "golang.org/x/net/context"
+	context "context"
 	grpc "google.golang.org/grpc"
 )
 
