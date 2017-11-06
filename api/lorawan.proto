@@ -346,7 +346,7 @@ message MACCommand {
     uint32 adr_ack_delay_exponent = 2 [(gogoproto.customname) = "ADRAckDelayExponent"];
   }
   message DeviceTimeAns {
-    google.protobuf.Timestamp time = 7 [(gogoproto.stdtime) = true];
+    google.protobuf.Timestamp time = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   }
   message ForceRejoinReq {
     uint32 rejoin_type = 1;
