@@ -18,7 +18,7 @@ var MACCommandIdentifier_uplinkLength = map[MACCommandIdentifier]uint{
 	CID_NEW_CHANNEL:        1,
 	CID_RX_TIMING_SETUP:    0,
 	CID_TX_PARAM_SETUP:     0,
-	CID_DL_CHANNEL:         0,
+	CID_DL_CHANNEL:         1,
 	CID_REKEY:              1,
 	CID_ADR_PARAM_SETUP:    0,
 	CID_DEVICE_TIME:        0,
@@ -42,7 +42,7 @@ var MACCommandIdentifier_downlinkLength = map[MACCommandIdentifier]uint{
 	CID_NEW_CHANNEL:        5,
 	CID_RX_TIMING_SETUP:    1,
 	CID_TX_PARAM_SETUP:     1,
-	CID_DL_CHANNEL:         0,
+	CID_DL_CHANNEL:         4,
 	CID_REKEY:              1,
 	CID_ADR_PARAM_SETUP:    1,
 	CID_DEVICE_TIME:        5,
@@ -109,6 +109,10 @@ func (m *MACCommands) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 				pld := &MACCommand_NewChannelAns{}
 				macPayload = pld
 				cmd.Payload = &MACCommand_NewChannelAns_{NewChannelAns: pld}
+			case CID_DL_CHANNEL:
+				pld := &MACCommand_DLChannelAns{}
+				macPayload = pld
+				cmd.Payload = &MACCommand_DlChannelAns{DlChannelAns: pld}
 			case CID_REKEY:
 				pld := &MACCommand_RekeyInd{}
 				macPayload = pld
@@ -182,6 +186,10 @@ func (m *MACCommands) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 				pld := &MACCommand_TxParamSetupReq{}
 				macPayload = pld
 				cmd.Payload = &MACCommand_TxParamSetupReq_{TxParamSetupReq: pld}
+			case CID_DL_CHANNEL:
+				pld := &MACCommand_DLChannelReq{}
+				macPayload = pld
+				cmd.Payload = &MACCommand_DlChannelReq{DlChannelReq: pld}
 			case CID_REKEY:
 				pld := &MACCommand_RekeyConf{}
 				macPayload = pld
