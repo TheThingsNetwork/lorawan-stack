@@ -120,7 +120,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 
 // LoadAccess loads the access data based on the access token.
 func (s *storage) LoadAccess(accessToken string) (*osin.AccessData, error) {
-	claims, err := auth.FromToken(s.keys, accessToken)
+	claims, err := auth.ClaimsFromToken(s.keys, accessToken)
 	if err != nil {
 		return nil, err
 	}

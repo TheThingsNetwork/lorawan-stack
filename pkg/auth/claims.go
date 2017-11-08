@@ -6,9 +6,10 @@ import (
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/rsa"
-	"errors"
 	"fmt"
 
+	"github.com/TheThingsNetwork/ttn/pkg/apikey"
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/tokenkey"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	jwt "github.com/dgrijalva/jwt-go"
@@ -112,9 +113,9 @@ func (c *Claims) Sign(privateKey crypto.PrivateKey) (string, error) {
 	return token, nil
 }
 
-// FromToken parses the token into their matching claims or returns an error if the
-// the signature is invalid.
-func FromToken(provider tokenkey.Provider, token string) (*Claims, error) {
+// ClaimsFromToken parses the token into their matching claims or returns an
+// error if the signature is invalid.
+func ClaimsFromToken(provider tokenkey.Provider, token string) (*Claims, error) {
 	if provider == nil {
 		return nil, fmt.Errorf("No token key provider configured")
 	}
@@ -169,4 +170,59 @@ func FromToken(provider tokenkey.Provider, token string) (*Claims, error) {
 	}
 
 	return claims, nil
+}
+
+// ClaimsFromKey returns the claims associated to an API key. It will return
+// error if the key is invalid or doesn't exist.
+func ClaimsFromKey(provider apikey.Provider, key string) (*Claims, error) {
+	payload, err := apikey.KeyPayload(key)
+	if err != nil {
+		return nil, err
+	}
+
+	id, k, err := provider.GetAPIKey(key)
+	if err != nil {
+		return nil, err
+	}
+
+	var subject string
+	switch payload.Type {
+	case apikey.TypeApplication:
+		subject = ApplicationSubject(id)
+	case apikey.TypeGateway:
+		subject = GatewaySubject(id)
+	}
+
+	return &Claims{
+		StandardClaims: jwt.StandardClaims{
+			Subject: subject,
+			Issuer:  payload.Issuer,
+		},
+		Rights: k.Rights,
+	}, nil
+}
+
+// ClaimsFromTokenOrKey builds the claims based on the provided value and the
+// apikey and tokenkey providers.
+func ClaimsFromTokenOrKey(tokenkey tokenkey.Provider, keyprovider apikey.Provider, v string) (*Claims, error) {
+	header, err := JOSEHeader(v)
+	if err != nil {
+		return nil, err
+	}
+
+	var res *Claims
+	switch header.Type {
+	case apikey.Type:
+		res, err = ClaimsFromKey(keyprovider, v)
+	case "JWT":
+		res, err = ClaimsFromToken(tokenkey, v)
+	default:
+		return nil, errors.Errorf("Expected typ to be `JWT` or `%s` but got `%s`", apikey.Type, header.Type)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }

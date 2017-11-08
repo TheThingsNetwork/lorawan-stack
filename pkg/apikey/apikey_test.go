@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	tenants = []string{
+	ids = []string{
 		"foo.bar.baz",
 		"id.thethings.network",
 		"a.very.long.tenant.id.that.is.really.long",
@@ -20,117 +20,140 @@ var (
 func TestGenerateKey(t *testing.T) {
 	a := assertions.New(t)
 
-	// test good apps
-	for _, tenant := range tenants {
-		key, err := GenerateAPIKey(tenant)
+	for _, id := range ids {
+		key, err := GenerateApplicationAPIKey(id)
 		a.So(err, should.BeNil)
-
-		ten, err := KeyTenant(key)
+		payload, err := KeyPayload(key)
 		a.So(err, should.BeNil)
+		a.So(payload, should.Resemble, &Payload{
+			Issuer: id,
+			Type:   TypeApplication,
+		})
 
-		a.So(ten, should.Equal, tenant)
+		key, err = GenerateGatewayAPIKey(id)
+		a.So(err, should.BeNil)
+		payload, err = KeyPayload(key)
+		a.So(err, should.BeNil)
+		a.So(payload, should.Resemble, &Payload{
+			Issuer: id,
+			Type:   TypeGateway,
+		})
 	}
 }
 
 func TestParseKey(t *testing.T) {
 	a := assertions.New(t)
 
-	p, err := marshal(payload{
+	p, err := marshal(Payload{
 		Issuer: "id.thethings.network",
+		Type:   TypeApplication,
 	})
 	a.So(err, should.BeNil)
 
 	// bad payload
 	{
-		_, err := KeyTenant(header64 + ".invalid.secret")
+		_, err := KeyPayload(header64 + ".invalid.secret")
 		a.So(err, should.NotBeNil)
 	}
 
 	// bad secret (empty)
 	{
-		_, err = KeyTenant(header64 + "." + p + ".")
+		_, err = KeyPayload(header64 + "." + p + ".")
 		a.So(err, should.NotBeNil)
 	}
 
 	// bad secret (none)
 	{
-		_, err = KeyTenant(header64 + "." + p)
+		_, err = KeyPayload(header64 + "." + p)
 		a.So(err, should.NotBeNil)
 	}
 
 	// bad issuer (none)
 	{
-		p, err := marshal(payload{})
+		p, err := marshal(Payload{
+			Type: TypeApplication,
+		})
 		a.So(err, should.BeNil)
 
-		_, err = KeyTenant(header64 + "." + p + ".secret")
+		_, err = KeyPayload(header64 + "." + p + ".secret")
+		a.So(err, should.NotBeNil)
+	}
+
+	// bad type (none)
+	{
+		p, err := marshal(Payload{
+			Issuer: "foo",
+		})
+		a.So(err, should.BeNil)
+
+		_, err = KeyPayload(header64 + "." + p + ".secret")
 		a.So(err, should.NotBeNil)
 	}
 
 	// bad header (enc)
 	{
-		_, err = KeyTenant("invalid" + "." + p + ".secret")
+		_, err = KeyPayload("invalid" + "." + p + ".secret")
 		a.So(err, should.NotBeNil)
 	}
 
 	// bad header (empty)
 	{
-		_, err = KeyTenant("." + p + ".secret")
+		_, err = KeyPayload("." + p + ".secret")
 		a.So(err, should.NotBeNil)
 	}
 
 	// bad header (no values)
 	{
-		head, err := marshal(header{})
+		head, err := marshal(Header{})
 		a.So(err, should.BeNil)
 
-		_, err = KeyTenant(head + "." + p + ".secret")
+		_, err = KeyPayload(head + "." + p + ".secret")
 		a.So(err, should.NotBeNil)
 	}
 
 	// bad header (no typ)
 	{
-		head, err := marshal(header{
+		head, err := marshal(Header{
 			Alg: alg,
 		})
 		a.So(err, should.BeNil)
 
-		_, err = KeyTenant(head + "." + p + ".secret")
+		_, err = KeyPayload(head + "." + p + ".secret")
 		a.So(err, should.NotBeNil)
 	}
 
 	// bad header (bad typ)
 	{
-		head, err := marshal(header{
+		head, err := marshal(Header{
 			Type: "bad",
 			Alg:  alg,
 		})
 		a.So(err, should.BeNil)
 
-		_, err = KeyTenant(head + "." + p + ".secret")
+		_, err = KeyPayload(head + "." + p + ".secret")
 		a.So(err, should.NotBeNil)
 	}
 
 	// bad header (no alg)
 	{
-		head, err := marshal(header{
-			Type: typ,
+		head, err := marshal(Header{
+			Type: Type,
 		})
 		a.So(err, should.BeNil)
 
-		_, err = KeyTenant(head + "." + p + ".secret")
+		_, err = KeyPayload(head + "." + p + ".secret")
 		a.So(err, should.NotBeNil)
 	}
 
 	// bad header (bad alg)
 	{
-		head, err := marshal(header{
-			Type: typ,
+		head, err := marshal(Header{
+			Type: Type,
 			Alg:  "bad",
 		})
 		a.So(err, should.BeNil)
 
-		_, err = KeyTenant(head + "." + p + ".secret")
+		_, err = KeyPayload(head + "." + p + ".secret")
 		a.So(err, should.NotBeNil)
 	}
 }

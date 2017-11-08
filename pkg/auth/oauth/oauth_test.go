@@ -206,7 +206,7 @@ func TestAuthorizationFlowJSON(t *testing.T) {
 		a.So(tok.AccessToken, should.NotBeEmpty)
 		a.So(tok.TokenType, should.Equal, "bearer")
 
-		claims, err := auth.FromToken(keys, tok.AccessToken)
+		claims, err := auth.ClaimsFromToken(keys, tok.AccessToken)
 		a.So(err, should.BeNil)
 
 		a.So(claims.Rights, should.Resemble, rights)
@@ -293,7 +293,7 @@ func TestAuthorizationFlowForm(t *testing.T) {
 		a.So(tok.AccessToken, should.NotBeEmpty)
 		a.So(tok.TokenType, should.Equal, "bearer")
 
-		claims, err := auth.FromToken(keys, tok.AccessToken)
+		claims, err := auth.ClaimsFromToken(keys, tok.AccessToken)
 		a.So(err, should.BeNil)
 
 		a.So(claims.Rights, should.Resemble, rights)

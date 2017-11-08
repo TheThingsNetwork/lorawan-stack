@@ -77,9 +77,16 @@ func TestSign(t *testing.T) {
 			},
 		}
 
-		parsed, err := FromToken(provider, token)
+		parsed, err := ClaimsFromToken(provider, token)
 		a.So(err, should.BeNil)
 		a.So(parsed, should.Resemble, claims)
+
+		header, err := JOSEHeader(token)
+		a.So(err, should.BeNil)
+		a.So(header, should.Resemble, &Header{
+			Type:      "JWT",
+			Algorithm: "ES512",
+		})
 	}
 
 	// RSA512
@@ -99,9 +106,16 @@ func TestSign(t *testing.T) {
 			},
 		}
 
-		parsed, err := FromToken(provider, token)
+		parsed, err := ClaimsFromToken(provider, token)
 		a.So(err, should.BeNil)
 		a.So(parsed, should.Resemble, claims)
+
+		header, err := JOSEHeader(token)
+		a.So(err, should.BeNil)
+		a.So(header, should.Resemble, &Header{
+			Type:      "JWT",
+			Algorithm: "RS512",
+		})
 	}
 
 	// ECDSA512 with kid
@@ -122,9 +136,16 @@ func TestSign(t *testing.T) {
 			},
 		}
 
-		parsed, err := FromToken(provider, token)
+		parsed, err := ClaimsFromToken(provider, token)
 		a.So(err, should.BeNil)
 		a.So(parsed, should.Resemble, claims)
+
+		header, err := JOSEHeader(token)
+		a.So(err, should.BeNil)
+		a.So(header, should.Resemble, &Header{
+			Type:      "JWT",
+			Algorithm: "ES512",
+		})
 	}
 
 	// ECDSA512 with wrong kid
@@ -144,7 +165,14 @@ func TestSign(t *testing.T) {
 			},
 		}
 
-		_, err = FromToken(provider, token)
+		_, err = ClaimsFromToken(provider, token)
 		a.So(err, should.NotBeNil)
+
+		header, err := JOSEHeader(token)
+		a.So(err, should.BeNil)
+		a.So(header, should.Resemble, &Header{
+			Type:      "JWT",
+			Algorithm: "ES512",
+		})
 	}
 }
