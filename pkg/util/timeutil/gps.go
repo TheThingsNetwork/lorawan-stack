@@ -33,9 +33,7 @@ var leaps = [...]int64{
 	1341118800,
 }
 
-// IsLeap reports whether the given GPS time,
-// sec seconds since January 6, 1980 UTC,
-// is a leap second in UTC.
+// IsLeap reports whether the given GPS time, sec seconds since January 6, 1980 UTC, is a leap second in UTC.
 func IsLeap(sec int64) bool {
 	i := int64(len(leaps)) - 1
 	for ; i >= 0; i-- {
@@ -49,8 +47,7 @@ func IsLeap(sec int64) bool {
 	return false
 }
 
-// GPS returns the local Time corresponding to the given GPS time,
-// sec seconds since January 6, 1980 UTC.
+// GPS returns the local Time corresponding to the given GPS time, sec seconds since January 6, 1980 UTC.
 func GPS(sec int64) time.Time {
 	i := int64(len(leaps))
 	for ; i > 0; i-- {
@@ -61,8 +58,7 @@ func GPS(sec int64) time.Time {
 	return time.Unix(sec+gpsEpochSec-i, 0)
 }
 
-// TimeToGPS returns t as a GPS time, the number of seconds elapsed
-// since January 6, 1980 UTC.
+// TimeToGPS returns t as a GPS time, the number of seconds elapsed since January 6, 1980 UTC.
 func TimeToGPS(t time.Time) int64 {
 	sec := t.Unix() - gpsEpochSec
 
