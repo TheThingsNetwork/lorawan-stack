@@ -7,7 +7,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
-	"golang.org/x/net/context"
+	"context"
 )
 
 // ErrDeviceNotFound represents the ErrDescriptor of the error returned
