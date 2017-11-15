@@ -33,8 +33,8 @@ var leaps = [...]int64{
 	1341118800,
 }
 
-// IsLeap reports whether the given GPS time, sec seconds since January 6, 1980 UTC, is a leap second in UTC.
-func IsLeap(sec int64) bool {
+// IsGPSLeap reports whether the given GPS time, sec seconds since January 6, 1980 UTC, is a leap second in UTC.
+func IsGPSLeap(sec int64) bool {
 	i := int64(len(leaps)) - 1
 	for ; i >= 0; i-- {
 		if sec > leaps[i] {

@@ -92,7 +92,7 @@ func TestGPSConversion(t *testing.T) {
 	} {
 		a := assertions.New(t)
 		a.So(GPS(tc.GPS).UnixNano(), should.Resemble, tc.Time.UnixNano())
-		if IsLeap(tc.GPS) {
+		if IsGPSLeap(tc.GPS) {
 			a.So(TimeToGPS(tc.Time), should.Equal, tc.GPS+1)
 		} else {
 			a.So(TimeToGPS(tc.Time), should.Equal, tc.GPS)
