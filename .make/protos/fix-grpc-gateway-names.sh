@@ -21,7 +21,7 @@ for f in ${protos[@]}; do
   if grep -q '(google.api.http)' ${f}; then
     path=${f%".proto"}".pb.gw.go"
     if grep -q 'option go_package' ${f}; then
-      goPackage=`grep 'option go_package' ${f} | sed 's/[[:space:]]*option[[:space:]]\+go_package[[:space:]]\+=[[:space:]]*"\([[:alnum:]./]\+\)".*/\1/'`
+      goPackage=`grep 'option go_package' ${f} | perl -pe 's/[[:space:]]*option[[:space:]]\+go_package[[:space:]]\+=[[:space:]]*"\([[:alnum:]./]\+\)".*/\1/'`
       newPath=${GOPATH:-"${HOME}/go"}"/src/"${goPackage}/`basename ${path}`
       mv ${path} ${newPath}
       path=${newPath}
@@ -31,8 +31,8 @@ for f in ${protos[@]}; do
 
   if grep -q '(gogoproto.customname)' ${f}; then
     for l in `grep '(gogoproto.customname)' ${f}`; do
-      from=`echo $l | sed 's/[[:space:]]*\(repeated[[:space:]]\+\)\?[[:alnum:]_.]\+[[:space:]]\+\([[:alnum:]_]\+\)[[:space:]]*=[[:space:]]*[0-9]\+.*/\2/' | sed 's/_\([a-z]\)/\u\1/g' | tr -d ' ' | sed 's/\(^[:a-z:]\)\(.*\)/\u\1\2/' | tr -d '_' `
-      to=`echo $l | sed 's/.*(gogoproto.customname)[[:space:]]*=[[:space:]]*"\([[:alnum:]]\+\)".*/\1/' | tr -d ' '`
+      from=`echo $l | perl -pe 's/[[:space:]]*\(repeated[[:space:]]\+\)\?[[:alnum:]_.]\+[[:space:]]\+\([[:alnum:]_]\+\)[[:space:]]*=[[:space:]]*[0-9]\+.*/\2/' | perl -pe 's/_\([a-z]\)/\u\1/g' | tr -d ' ' | perl -pe 's/\(^[:a-z:]\)\(.*\)/\u\1\2/' | tr -d '_' `
+      to=`echo $l | perl -pe 's/.*(gogoproto.customname)[[:space:]]*=[[:space:]]*"\([[:alnum:]]\+\)".*/\1/' | tr -d ' '`
       sedArgs+=("-e s/\([^[:alnum:]]\)${from}\([^[:alnum:]]\)/\1${to}\2/")
     done
   fi
@@ -42,7 +42,7 @@ IFS=${IFS_BAK}
 if [[ ${#sedArgs[@]} != 0 ]]; then
   for f in ${genPaths[@]}; do
     tmp=`mktemp`
-    sed ${sedArgs[*]} ${f} > ${tmp}
+    perl -pe ${sedArgs[*]} ${f} > ${tmp}
     mv ${tmp} ${f}
   done
 fi
