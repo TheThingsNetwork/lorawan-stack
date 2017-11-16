@@ -189,7 +189,7 @@ func (prefix DevAddrPrefix) MarshalTo(data []byte) (int, error) {
 func (prefix DevAddrPrefix) Marshal() ([]byte, error) { return prefix.MarshalBinary() }
 
 // Unmarshal implements the proto.Unmarshaler interface
-func (prefix *DevAddrPrefix) Unmarshal(data []byte) error { return prefix.Unmarshal(data) }
+func (prefix *DevAddrPrefix) Unmarshal(data []byte) error { return prefix.UnmarshalBinary(data) }
 
 // MarshalJSON implements the json.Marshaler interface
 func (prefix DevAddrPrefix) MarshalJSON() ([]byte, error) {
