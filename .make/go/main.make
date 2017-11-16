@@ -14,10 +14,10 @@ GO = go
 GO_FMT= gofmt
 GO_MISSPELL= misspell
 GO_UNCONVERT= unconvert
-GO_METALINTER = gometalinter.v1
+GO_METALINTER = gometalinter
 GO_METALINTER_EXCLUDE_REGEX='.*easy is unused.*|.*\.pb\.go:.*|.*\.pb\.gw\.go:.*|.*pb_test\.go:.*|.*github.com/TheThingsNetwork/ttn/pkg/band/.*\.go:.*'
 GO_METALINTER_FLAGS = --enable-gc -e $(GO_METALINTER_EXCLUDE_REGEX) --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E misspell -E gofmt
-GO_METALINTER_FLAGS_FULL= --enable-gc -e $(GO_METALINTER_EXCLUDE_REGEX) --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E misspell -E gofmt -E interfacer -E safesql -E unparam -E structcheck -E varcheck -E unconvert -E gosimple -E unused -E staticcheck --deadline 60s
+GO_METALINTER_FLAGS_FULL= --enable-gc -e $(GO_METALINTER_EXCLUDE_REGEX) --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E misspell -E gofmt -E interfacer -E safesql -E unparam -E structcheck -E varcheck -E unconvert -E nakedret -E megacheck --deadline 60s
 
 # go flags
 GO_FLAGS ?= -a
@@ -81,7 +81,6 @@ STAGED_PACKAGES = $(STAGED_FILES) | $(only_go) | $(no_vendor) | $(to_packages) |
 # staged local packages as absolute paths
 STAGED_PACKAGES_ABSOLUTE = $(STAGED_FILES) | $(only_go) | $(no_vendor) | $(to_packages) | xargs $(GO) list -v -f '{{.Dir}}' 2>/dev/null
 
-
 # packages for testing
 TEST_PACKAGES = $(GO_FILES) | $(no_vendor) | $(only_test) | $(to_packages)
 
@@ -89,8 +88,8 @@ TEST_PACKAGES = $(GO_FILES) | $(no_vendor) | $(only_test) | $(to_packages)
 go.dev-deps:
 	@$(log) "Installing go dev dependencies"
 	@command -v dep  >/dev/null || { $(log) "Installing dep" && $(GO) get -u github.com/golang/dep/cmd/dep; }
-	@command -v gometalinter >/dev/null || { $(log) "Installing gometalinter" && $(GO) get -u gopkg.in/alecthomas/gometalinter.v1; }
-	@gometalinter -i -u
+	@command -v $(GO_METALINTER) >/dev/null || { $(log) "Installing gometalinter" && $(GO) get -u github.com/alecthomas/gometalinter; }
+	@$(GO_METALINTER) -i -u
 
 DEP_FLAGS ?= $(if $(CI),-vendor-only,)
 
