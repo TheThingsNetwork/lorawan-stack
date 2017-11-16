@@ -10,7 +10,7 @@ protoDir=${1}
 
 # TODO figure out a way to traverse only files imported by protos using grpc-gateway (google.api.http option)
 protos=(${protoDir}/*.proto)
-sedArgs=()
+perlArgs=()
 lines=()
 genPaths=()
 
@@ -33,17 +33,15 @@ for f in ${protos[@]}; do
     for l in `grep '(gogoproto.customname)' ${f}`; do
       from=`echo $l | perl -pe 's/[[:space:]]*\(repeated[[:space:]]\+\)\?[[:alnum:]_.]\+[[:space:]]\+\([[:alnum:]_]\+\)[[:space:]]*=[[:space:]]*[0-9]\+.*/\2/' | perl -pe 's/_\([a-z]\)/\u\1/g' | tr -d ' ' | perl -pe 's/\(^[:a-z:]\)\(.*\)/\u\1\2/' | tr -d '_' `
       to=`echo $l | perl -pe 's/.*(gogoproto.customname)[[:space:]]*=[[:space:]]*"\([[:alnum:]]\+\)".*/\1/' | tr -d ' '`
-      sedArgs+=("-e s/\([^[:alnum:]]\)${from}\([^[:alnum:]]\)/\1${to}\2/")
+      perlArgs+=("-e s/\([^[:alnum:]]\)${from}\([^[:alnum:]]\)/\1${to}\2/")
     done
   fi
 done
 IFS=${IFS_BAK}
 
-if [[ ${#sedArgs[@]} != 0 ]]; then
+if [[ ${#perlArgs[@]} != 0 ]]; then
   for f in ${genPaths[@]}; do
-    tmp=`mktemp`
-    perl -pe ${sedArgs[*]} ${f} > ${tmp}
-    mv ${tmp} ${f}
+    perl -i -p ${perlArgs[*]} ${f}
   done
 fi
 exit 0
