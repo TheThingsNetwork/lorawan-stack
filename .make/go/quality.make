@@ -2,12 +2,8 @@
 
 # fmt all packages
 go.fmt:
-	@$(log) "Formatting `$(GO_PACKAGES) | $(count)` go packages"
-	@[[ -z "`go list -f '{{.Dir}}' ./... | xargs gofmt -w -s | tee -a /dev/stderr`" ]]
-
-# fmt stages packages
-go.fmt-staged: GO_PACKAGES = $(STAGED_PACKAGES)
-go.fmt-staged: go.fmt
+	@$(log) "Formatting `$(GO_PACKAGES_ABSOLUTE) | $(count)` go packages"
+	@[[ -z "`$(GO_PACKAGES_ABSOLUTE) | xargs echo $(GO_FMT) -w -s | tee -a /dev/stderr`" ]]
 
 # lint all packages, exiting when errors occur
 go.lint:
@@ -17,6 +13,20 @@ go.lint:
 go.lint-full: GO_METALINTER_FLAGS=$(GO_METALINTER_FLAGS_FULL)
 go.lint-full: go.lint
 
+# fix misspellings in all packages
+go.misspell:
+	@$(log) "Fixing misspellings in `$(GO_PACKAGES) | $(count)` go packages"
+	@[[ -z "`$(GO_PACKAGES_ABSOLUTE) | xargs $(GO_MISSPELL) -w | tee -a /dev/stderr`" ]]
+
+# unconvert all packages
+go.unconvert:
+	@$(log) "Unconverting `$(GO_PACKAGES) | $(count)` go packages"
+	@[[ -z "`$(GO_PACKAGES) | xargs $(GO_UNCONVERT) -safe -apply | tee -a /dev/stderr`" ]]
+
+# fmt staged packages
+go.fmt-staged: GO_PACKAGES_ABSOLUTE = $(STAGED_PACKAGES_ABSOLUTE)
+go.fmt-staged: go.fmt
+
 # lint staged packages
 go.lint-staged: GO_PACKAGES = $(STAGED_PACKAGES)
 go.lint-staged: go.lint
@@ -24,6 +34,14 @@ go.lint-staged: go.lint
 # lint staged packages with all linters
 go.lint-staged-full: GOMETALINTER_FLAGS=$(GO_METALINTER_FLAGS_FULL)
 go.lint-staged-full: go.lint-staged
+
+# fix misspellings in all staged packages
+go.misspell-staged: GO_PACKAGES_ABSOLUTE = $(STAGED_PACKAGES_ABSOLUTE)
+go.misspell-staged: go.misspell
+
+# unconvert all staged packages
+go.unconvert-staged: GO_PACKAGES = $(STAGED_PACKAGES)
+go.unconvert-staged: go.unconvert
 
 go.lint-travis: GO_PACKAGES = git diff --name-only HEAD $(TRAVIS_BRANCH) |  $(to_packages)
 go.lint-travis: log = true

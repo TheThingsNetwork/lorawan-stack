@@ -11,9 +11,12 @@ GO_PKG ?= $(shell echo $(PWD) | sed s:$(GO_PATH)/src/::)
 
 # programs
 GO = go
+GO_FMT= gofmt
+GO_MISSPELL= misspell
+GO_UNCONVERT= unconvert
 GO_METALINTER = gometalinter.v1
-GO_METALINTER_FLAGS = --enable-gc -e '.*easy is unused.*|.*\.pb\.go:.*|.*\.pb\.gw\.go:.*|.*pb_test\.go:.*' --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E misspell -E gofmt --deadline 10s
-GO_METALINTER_FLAGS_FULL= --enable-gc -e '.*easy is unused.*|.*\.pb\.go:.*|.*\.pb\.gw\.go:.*|.*pb_test\.go:.*' --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E misspell -E gofmt -E safesql -E unparam -E structcheck -E varcheck -E maligned -E megacheck -E interfacer -E unconvert -E unused --deadline 60s
+GO_METALINTER_FLAGS = --enable-gc -e '.*easy is unused.*|.*\.pb\.go:.*|.*\.pb\.gw\.go:.*|.*pb_test\.go:.*' --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E misspell -E gofmt -E interfacer --deadline 10s
+GO_METALINTER_FLAGS_FULL= --enable-gc -e '.*easy is unused.*|.*\.pb\.go:.*|.*\.pb\.gw\.go:.*|.*pb_test\.go:.*' --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E misspell -E gofmt -E interfacer -E safesql -E unparam -E structcheck -E varcheck -E maligned -E megacheck -E unconvert -E unused --deadline 60s
 
 # go flags
 GO_FLAGS ?= -a
@@ -63,13 +66,20 @@ GO_VENDOR_FILE ?= Gopkg.toml
 GO_FILES = $(ALL_FILES) | $(only_go)
 
 # local go packages
-GO_PACKAGES = go list -v ./...
+GO_PACKAGES = $(GO) list -v ./...
+
+# local go packages as absolute paths
+GO_PACKAGES_ABSOLUTE = $(GO) list -v -f '{{.Dir}}' ./...
 
 # external go packages (in vendor)
 EXTERNAL_PACKAGES = find ./vendor -name "*.go" | $(to_packages) | $(only_vendor)
 
 # staged local packages
 STAGED_PACKAGES = $(STAGED_FILES) | $(only_go) | $(no_vendor) | $(to_packages) | xargs $(GO) list -v 2>/dev/null
+
+# staged local packages as absolute paths
+STAGED_PACKAGES_ABSOLUTE = $(STAGED_FILES) | $(only_go) | $(no_vendor) | $(to_packages) | xargs $(GO) list -v -f '{{.Dir}}' 2>/dev/null
+
 
 # packages for testing
 TEST_PACKAGES = $(GO_FILES) | $(no_vendor) | $(only_test) | $(to_packages)
