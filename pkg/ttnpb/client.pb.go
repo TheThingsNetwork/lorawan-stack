@@ -440,11 +440,11 @@ func NewPopulatedClient(r randyClient, easy bool) *Client {
 	this := &Client{}
 	v1 := NewPopulatedClientIdentifier(r, easy)
 	this.ClientIdentifier = *v1
-	this.Description = randStringClient(r)
-	this.Secret = randStringClient(r)
-	this.RedirectURI = randStringClient(r)
+	this.Description = string(randStringClient(r))
+	this.Secret = string(randStringClient(r))
+	this.RedirectURI = string(randStringClient(r))
 	this.State = ClientState([]int32{0, 1, 2}[r.Intn(3)])
-	this.OfficialLabeled = bool(r.Intn(2) == 0)
+	this.OfficialLabeled = bool(bool(r.Intn(2) == 0))
 	v2 := r.Intn(10)
 	this.Grants = make([]GrantType, v2)
 	for i := 0; i < v2; i++ {
@@ -532,7 +532,7 @@ func randFieldClient(dAtA []byte, r randyClient, fieldNumber int, wire int) []by
 }
 func encodeVarintPopulateClient(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -595,7 +595,7 @@ func sovClient(x uint64) (n int) {
 	return n
 }
 func sozClient(x uint64) (n int) {
-	return sovClient((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovClient(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (m *Client) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

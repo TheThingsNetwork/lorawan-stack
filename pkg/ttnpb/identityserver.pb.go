@@ -4777,7 +4777,7 @@ func (m *CreateGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
 		}
 	}
 	if len(m.Attributes) > 0 {
-		for k := range m.Attributes {
+		for k, _ := range m.Attributes {
 			dAtA[i] = 0x52
 			i++
 			v := m.Attributes[k]
@@ -4912,7 +4912,7 @@ func (m *UpdateGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
 		}
 	}
 	if len(m.Attributes) > 0 {
-		for k := range m.Attributes {
+		for k, _ := range m.Attributes {
 			dAtA[i] = 0x52
 			i++
 			v := m.Attributes[k]
@@ -5461,9 +5461,9 @@ func NewPopulatedCreateUserRequest(r randyIdentityserver, easy bool) *CreateUser
 	this := &CreateUserRequest{}
 	v1 := NewPopulatedUserIdentifier(r, easy)
 	this.UserIdentifier = *v1
-	this.Email = randStringIdentityserver(r)
-	this.Password = randStringIdentityserver(r)
-	this.Name = randStringIdentityserver(r)
+	this.Email = string(randStringIdentityserver(r))
+	this.Password = string(randStringIdentityserver(r))
+	this.Name = string(randStringIdentityserver(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5471,8 +5471,8 @@ func NewPopulatedCreateUserRequest(r randyIdentityserver, easy bool) *CreateUser
 
 func NewPopulatedUpdateUserRequest(r randyIdentityserver, easy bool) *UpdateUserRequest {
 	this := &UpdateUserRequest{}
-	this.Email = randStringIdentityserver(r)
-	this.Name = randStringIdentityserver(r)
+	this.Email = string(randStringIdentityserver(r))
+	this.Name = string(randStringIdentityserver(r))
 	if r.Intn(10) != 0 {
 		this.UpdateMask = google_protobuf5.NewPopulatedFieldMask(r, easy)
 	}
@@ -5483,8 +5483,8 @@ func NewPopulatedUpdateUserRequest(r randyIdentityserver, easy bool) *UpdateUser
 
 func NewPopulatedUpdateUserPasswordRequest(r randyIdentityserver, easy bool) *UpdateUserPasswordRequest {
 	this := &UpdateUserPasswordRequest{}
-	this.Old = randStringIdentityserver(r)
-	this.New = randStringIdentityserver(r)
+	this.Old = string(randStringIdentityserver(r))
+	this.New = string(randStringIdentityserver(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5494,7 +5494,7 @@ func NewPopulatedCreateApplicationRequest(r randyIdentityserver, easy bool) *Cre
 	this := &CreateApplicationRequest{}
 	v2 := NewPopulatedApplicationIdentifier(r, easy)
 	this.ApplicationIdentifier = *v2
-	this.Description = randStringIdentityserver(r)
+	this.Description = string(randStringIdentityserver(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5519,7 +5519,7 @@ func NewPopulatedUpdateApplicationRequest(r randyIdentityserver, easy bool) *Upd
 	this := &UpdateApplicationRequest{}
 	v5 := NewPopulatedApplicationIdentifier(r, easy)
 	this.ApplicationIdentifier = *v5
-	this.Description = randStringIdentityserver(r)
+	this.Description = string(randStringIdentityserver(r))
 	if r.Intn(10) != 0 {
 		this.UpdateMask = google_protobuf5.NewPopulatedFieldMask(r, easy)
 	}
@@ -5532,7 +5532,7 @@ func NewPopulatedGenerateApplicationAPIKeyRequest(r randyIdentityserver, easy bo
 	this := &GenerateApplicationAPIKeyRequest{}
 	v6 := NewPopulatedApplicationIdentifier(r, easy)
 	this.ApplicationIdentifier = *v6
-	this.KeyName = randStringIdentityserver(r)
+	this.KeyName = string(randStringIdentityserver(r))
 	v7 := r.Intn(10)
 	this.Rights = make([]Right, v7)
 	for i := 0; i < v7; i++ {
@@ -5547,7 +5547,7 @@ func NewPopulatedRemoveApplicationAPIKeyRequest(r randyIdentityserver, easy bool
 	this := &RemoveApplicationAPIKeyRequest{}
 	v8 := NewPopulatedApplicationIdentifier(r, easy)
 	this.ApplicationIdentifier = *v8
-	this.KeyName = randStringIdentityserver(r)
+	this.KeyName = string(randStringIdentityserver(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5595,12 +5595,12 @@ func NewPopulatedCreateGatewayRequest(r randyIdentityserver, easy bool) *CreateG
 	this := &CreateGatewayRequest{}
 	v14 := NewPopulatedGatewayIdentifier(r, easy)
 	this.GatewayIdentifier = *v14
-	this.Description = randStringIdentityserver(r)
-	this.FrequencyPlanID = randStringIdentityserver(r)
+	this.Description = string(randStringIdentityserver(r))
+	this.FrequencyPlanID = string(randStringIdentityserver(r))
 	v15 := NewPopulatedGatewayPrivacySettings(r, easy)
 	this.PrivacySettings = *v15
-	this.AutoUpdate = bool(r.Intn(2) == 0)
-	this.Platform = randStringIdentityserver(r)
+	this.AutoUpdate = bool(bool(r.Intn(2) == 0))
+	this.Platform = string(randStringIdentityserver(r))
 	if r.Intn(10) != 0 {
 		v16 := r.Intn(5)
 		this.Antennas = make([]GatewayAntenna, v16)
@@ -5616,7 +5616,7 @@ func NewPopulatedCreateGatewayRequest(r randyIdentityserver, easy bool) *CreateG
 			this.Attributes[randStringIdentityserver(r)] = randStringIdentityserver(r)
 		}
 	}
-	this.ClusterAddress = randStringIdentityserver(r)
+	this.ClusterAddress = string(randStringIdentityserver(r))
 	v19 := NewPopulatedUserIdentifier(r, easy)
 	this.ContactAccount = *v19
 	if !easy && r.Intn(10) != 0 {
@@ -5643,12 +5643,12 @@ func NewPopulatedUpdateGatewayRequest(r randyIdentityserver, easy bool) *UpdateG
 	this := &UpdateGatewayRequest{}
 	v22 := NewPopulatedGatewayIdentifier(r, easy)
 	this.GatewayIdentifier = *v22
-	this.Description = randStringIdentityserver(r)
-	this.FrequencyPlanID = randStringIdentityserver(r)
+	this.Description = string(randStringIdentityserver(r))
+	this.FrequencyPlanID = string(randStringIdentityserver(r))
 	v23 := NewPopulatedGatewayPrivacySettings(r, easy)
 	this.PrivacySettings = *v23
-	this.AutoUpdate = bool(r.Intn(2) == 0)
-	this.Platform = randStringIdentityserver(r)
+	this.AutoUpdate = bool(bool(r.Intn(2) == 0))
+	this.Platform = string(randStringIdentityserver(r))
 	if r.Intn(10) != 0 {
 		v24 := r.Intn(5)
 		this.Antennas = make([]GatewayAntenna, v24)
@@ -5664,7 +5664,7 @@ func NewPopulatedUpdateGatewayRequest(r randyIdentityserver, easy bool) *UpdateG
 			this.Attributes[randStringIdentityserver(r)] = randStringIdentityserver(r)
 		}
 	}
-	this.ClusterAddress = randStringIdentityserver(r)
+	this.ClusterAddress = string(randStringIdentityserver(r))
 	v27 := NewPopulatedUserIdentifier(r, easy)
 	this.ContactAccount = *v27
 	if r.Intn(10) != 0 {
@@ -5732,9 +5732,9 @@ func NewPopulatedCreateClientRequest(r randyIdentityserver, easy bool) *CreateCl
 	this := &CreateClientRequest{}
 	v35 := NewPopulatedClientIdentifier(r, easy)
 	this.ClientIdentifier = *v35
-	this.Description = randStringIdentityserver(r)
-	this.Secret = randStringIdentityserver(r)
-	this.RedirectURI = randStringIdentityserver(r)
+	this.Description = string(randStringIdentityserver(r))
+	this.Secret = string(randStringIdentityserver(r))
+	this.RedirectURI = string(randStringIdentityserver(r))
 	v36 := r.Intn(10)
 	this.Grants = make([]GrantType, v36)
 	for i := 0; i < v36; i++ {
@@ -5769,9 +5769,9 @@ func NewPopulatedUpdateClientRequest(r randyIdentityserver, easy bool) *UpdateCl
 	this := &UpdateClientRequest{}
 	v40 := NewPopulatedClientIdentifier(r, easy)
 	this.ClientIdentifier = *v40
-	this.Description = randStringIdentityserver(r)
-	this.Secret = randStringIdentityserver(r)
-	this.RedirectURI = randStringIdentityserver(r)
+	this.Description = string(randStringIdentityserver(r))
+	this.Secret = string(randStringIdentityserver(r))
+	this.RedirectURI = string(randStringIdentityserver(r))
 	v41 := r.Intn(10)
 	this.Grants = make([]GrantType, v41)
 	for i := 0; i < v41; i++ {
@@ -5794,7 +5794,7 @@ func NewPopulatedSetClientOfficialRequest(r randyIdentityserver, easy bool) *Set
 	this := &SetClientOfficialRequest{}
 	v43 := NewPopulatedClientIdentifier(r, easy)
 	this.ClientIdentifier = *v43
-	this.OfficialLabeled = bool(r.Intn(2) == 0)
+	this.OfficialLabeled = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5914,7 +5914,7 @@ func randFieldIdentityserver(dAtA []byte, r randyIdentityserver, fieldNumber int
 }
 func encodeVarintPopulateIdentityserver(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -6383,7 +6383,7 @@ func sovIdentityserver(x uint64) (n int) {
 	return n
 }
 func sozIdentityserver(x uint64) (n int) {
-	return sovIdentityserver((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovIdentityserver(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (m *CreateUserRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

@@ -322,11 +322,11 @@ func NewPopulatedUser(r randyUser, easy bool) *User {
 	this := &User{}
 	v1 := NewPopulatedUserIdentifier(r, easy)
 	this.UserIdentifier = *v1
-	this.Email = randStringUser(r)
-	this.Password = randStringUser(r)
-	this.Name = randStringUser(r)
-	this.Validated = bool(r.Intn(2) == 0)
-	this.Admin = bool(r.Intn(2) == 0)
+	this.Email = string(randStringUser(r))
+	this.Password = string(randStringUser(r))
+	this.Name = string(randStringUser(r))
+	this.Validated = bool(bool(r.Intn(2) == 0))
+	this.Admin = bool(bool(r.Intn(2) == 0))
 	v2 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.CreatedAt = *v2
 	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
@@ -404,7 +404,7 @@ func randFieldUser(dAtA []byte, r randyUser, fieldNumber int, wire int) []byte {
 }
 func encodeVarintPopulateUser(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -453,7 +453,7 @@ func sovUser(x uint64) (n int) {
 	return n
 }
 func sozUser(x uint64) (n int) {
-	return sovUser((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovUser(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (m *User) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
