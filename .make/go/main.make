@@ -11,8 +11,9 @@ GO_PKG ?= $(shell echo $(PWD) | sed s:$(GO_PATH)/src/::)
 
 # programs
 GO = go
-GOLINT = golint
-UNCONVERT = unconvert
+GO_METALINTER = gometalinter
+GO_METALINTER_FLAGS = --enable-gc -e '.*easy is unused.*|.*\.pb\.go:.*|.*\.pb\.gw\.go:.*|.*pb_test\.go:.*' --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E nakedret -E misspell -E gofmt --deadline 10s
+GO_METALINTER_FLAGS_FULL= --enable-gc -e '.*easy is unused.*|.*\.pb\.go:.*|.*\.pb\.gw\.go:.*|.*pb_test\.go:.*' --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E nakedret -E misspell -E gofmt -E safesql -E unparam -E structcheck -E varcheck -E maligned -E megacheck -E interfacer -E unconvert -E unused --deadline 60s
 
 # go flags
 GO_FLAGS ?= -a
@@ -20,18 +21,12 @@ GO_ENV = CGO_ENABLED=0
 LD_FLAGS = -ldflags "-w $(GO_TAGS)"
 GO_TAGS ?= -X main.commit=$(GIT_COMMIT) -X main.date=$(BUILD_DATE) -X main.tag=$(GIT_TAG) -X main.branch=$(GIT_BRANCH)
 
-# golint flags
-GOLINT_FLAGS = -set_exit_status
-
 # go test flags
 GO_TEST_FLAGS = -cover
 
 # coverage
 GO_COVER_FILE = coverage.out
 GO_COVER_DIR  = .coverage
-
-# unconvert flags
-UNCONVERT_FLAGS = -v -apply
 
 # select only go files
 only_go = grep '\.go$$'
@@ -70,12 +65,6 @@ GO_FILES = $(ALL_FILES) | $(only_go)
 # local go packages
 GO_PACKAGES = go list -v ./...
 
-# lintable go files
-GO_LINT_FILES = $(ALL_FILES) | $(only_go_lintable)
-
-# staged lintable go files
-GO_LINT_STAGED_FILES = $(ALL_FILES) | $(only_go_lintable) | $(only_staged)
-
 # external go packages (in vendor)
 EXTERNAL_PACKAGES = find ./vendor -name "*.go" | $(to_packages) | $(only_vendor)
 
@@ -89,7 +78,8 @@ TEST_PACKAGES = $(GO_FILES) | $(no_vendor) | $(only_test) | $(to_packages)
 go.dev-deps:
 	@$(log) "Installing go dev dependencies"
 	@command -v dep  >/dev/null || { $(log) "Installing dep" && $(GO) get -u github.com/golang/dep/cmd/dep; }
-	@command -v golint >/dev/null || { $(log) "Installing golint" && $(GO) get -u github.com/golang/lint/golint; }
+	@command -v gometalinter >/dev/null || { $(log) "Installing gometalinter" && $(GO) get -u gopkg.in/alecthomas/gometalinter.v1; }
+	@$(GOMETALINTER) $(GOMETALINTER_FLAGS) -i -u
 
 DEP_FLAGS ?= $(if $(CI),-vendor-only,)
 
