@@ -1380,13 +1380,13 @@ func (m *FrequencyPlan_LBTConfiguration) MarshalTo(dAtA []byte) (int, error) {
 	if m.RSSITarget != 0 {
 		dAtA[i] = 0xd
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.RSSITarget))))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSITarget))
 		i += 4
 	}
 	if m.RSSIOffset != 0 {
 		dAtA[i] = 0x15
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.RSSIOffset))))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSIOffset))
 		i += 4
 	}
 	if m.ScanTime != 0 {
@@ -1415,7 +1415,7 @@ func (m *FrequencyPlan_TimeOffAir) MarshalTo(dAtA []byte) (int, error) {
 	if m.Fraction != 0 {
 		dAtA[i] = 0xd
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.Fraction))))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Fraction))
 		i += 4
 	}
 	if m.Duration != nil {
@@ -1493,7 +1493,7 @@ func NewPopulatedGatewayDown(r randyGatewayserver, easy bool) *GatewayDown {
 
 func NewPopulatedFrequencyPlan(r randyGatewayserver, easy bool) *FrequencyPlan {
 	this := &FrequencyPlan{}
-	this.BandID = string(randStringGatewayserver(r))
+	this.BandID = randStringGatewayserver(r)
 	if r.Intn(10) != 0 {
 		v2 := r.Intn(5)
 		this.Channels = make([]*FrequencyPlan_Channel, v2)
@@ -1523,7 +1523,7 @@ func NewPopulatedFrequencyPlan(r randyGatewayserver, easy bool) *FrequencyPlan {
 
 func NewPopulatedFrequencyPlan_Channel(r randyGatewayserver, easy bool) *FrequencyPlan_Channel {
 	this := &FrequencyPlan_Channel{}
-	this.Frequency = uint32(r.Uint32())
+	this.Frequency = r.Uint32()
 	if r.Intn(10) != 0 {
 		this.DataRate = NewPopulatedFrequencyPlan_Channel_ForceDataRate(r, easy)
 	}
@@ -1534,7 +1534,7 @@ func NewPopulatedFrequencyPlan_Channel(r randyGatewayserver, easy bool) *Frequen
 
 func NewPopulatedFrequencyPlan_Channel_ForceDataRate(r randyGatewayserver, easy bool) *FrequencyPlan_Channel_ForceDataRate {
 	this := &FrequencyPlan_Channel_ForceDataRate{}
-	this.Index = uint32(r.Uint32())
+	this.Index = r.Uint32()
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1542,15 +1542,15 @@ func NewPopulatedFrequencyPlan_Channel_ForceDataRate(r randyGatewayserver, easy 
 
 func NewPopulatedFrequencyPlan_LBTConfiguration(r randyGatewayserver, easy bool) *FrequencyPlan_LBTConfiguration {
 	this := &FrequencyPlan_LBTConfiguration{}
-	this.RSSITarget = float32(r.Float32())
+	this.RSSITarget = r.Float32()
 	if r.Intn(2) == 0 {
 		this.RSSITarget *= -1
 	}
-	this.RSSIOffset = float32(r.Float32())
+	this.RSSIOffset = r.Float32()
 	if r.Intn(2) == 0 {
 		this.RSSIOffset *= -1
 	}
-	this.ScanTime = int32(r.Int31())
+	this.ScanTime = r.Int31()
 	if r.Intn(2) == 0 {
 		this.ScanTime *= -1
 	}
@@ -1561,7 +1561,7 @@ func NewPopulatedFrequencyPlan_LBTConfiguration(r randyGatewayserver, easy bool)
 
 func NewPopulatedFrequencyPlan_TimeOffAir(r randyGatewayserver, easy bool) *FrequencyPlan_TimeOffAir {
 	this := &FrequencyPlan_TimeOffAir{}
-	this.Fraction = float32(r.Float32())
+	this.Fraction = r.Float32()
 	if r.Intn(2) == 0 {
 		this.Fraction *= -1
 	}
@@ -1575,7 +1575,7 @@ func NewPopulatedFrequencyPlan_TimeOffAir(r randyGatewayserver, easy bool) *Freq
 
 func NewPopulatedFrequencyPlanRequest(r randyGatewayserver, easy bool) *FrequencyPlanRequest {
 	this := &FrequencyPlanRequest{}
-	this.FrequencyPlanID = string(randStringGatewayserver(r))
+	this.FrequencyPlanID = randStringGatewayserver(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1647,7 +1647,7 @@ func randFieldGatewayserver(dAtA []byte, r randyGatewayserver, fieldNumber int, 
 }
 func encodeVarintPopulateGatewayserver(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -1786,7 +1786,7 @@ func sovGatewayserver(x uint64) (n int) {
 	return n
 }
 func sozGatewayserver(x uint64) (n int) {
-	return sovGatewayserver(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovGatewayserver((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (m *GatewayUp) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -2468,9 +2468,9 @@ func (m *FrequencyPlan_LBTConfiguration) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
+			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
-			m.RSSITarget = float32(math.Float32frombits(v))
+			m.RSSITarget = math.Float32frombits(v)
 		case 2:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RSSIOffset", wireType)
@@ -2479,9 +2479,9 @@ func (m *FrequencyPlan_LBTConfiguration) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
+			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
-			m.RSSIOffset = float32(math.Float32frombits(v))
+			m.RSSIOffset = math.Float32frombits(v)
 		case 3:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ScanTime", wireType)
@@ -2559,9 +2559,9 @@ func (m *FrequencyPlan_TimeOffAir) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
+			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
-			m.Fraction = float32(math.Float32frombits(v))
+			m.Fraction = math.Float32frombits(v)
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Duration", wireType)

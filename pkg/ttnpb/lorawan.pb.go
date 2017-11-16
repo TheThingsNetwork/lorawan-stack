@@ -8749,7 +8749,7 @@ func (m *TxSettings) MarshalTo(dAtA []byte) (int, error) {
 	if m.Frequency != 0 {
 		dAtA[i] = 0x38
 		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Frequency))
+		i = encodeVarintLorawan(dAtA, i, m.Frequency)
 	}
 	if m.TxPower != 0 {
 		dAtA[i] = 0x40
@@ -10239,11 +10239,11 @@ func NewPopulatedMHDR(r randyLorawan, easy bool) *MHDR {
 
 func NewPopulatedFCtrl(r randyLorawan, easy bool) *FCtrl {
 	this := &FCtrl{}
-	this.ADR = bool(bool(r.Intn(2) == 0))
-	this.ADRAckReq = bool(bool(r.Intn(2) == 0))
-	this.Ack = bool(bool(r.Intn(2) == 0))
-	this.FPending = bool(bool(r.Intn(2) == 0))
-	this.ClassB = bool(bool(r.Intn(2) == 0))
+	this.ADR = bool(r.Intn(2) == 0)
+	this.ADRAckReq = bool(r.Intn(2) == 0)
+	this.Ack = bool(r.Intn(2) == 0)
+	this.FPending = bool(r.Intn(2) == 0)
+	this.ClassB = bool(r.Intn(2) == 0)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -10252,20 +10252,20 @@ func NewPopulatedFCtrl(r randyLorawan, easy bool) *FCtrl {
 func NewPopulatedTxSettings(r randyLorawan, easy bool) *TxSettings {
 	this := &TxSettings{}
 	this.Modulation = Modulation([]int32{0, 1}[r.Intn(2)])
-	this.DataRateIndex = int32(r.Int31())
+	this.DataRateIndex = r.Int31()
 	if r.Intn(2) == 0 {
 		this.DataRateIndex *= -1
 	}
-	this.Bandwidth = uint32(r.Uint32())
-	this.SpreadingFactor = uint32(r.Uint32())
-	this.BitRate = uint32(r.Uint32())
-	this.CodingRate = string(randStringLorawan(r))
-	this.Frequency = uint64(uint64(r.Uint32()))
-	this.TxPower = int32(r.Int31())
+	this.Bandwidth = r.Uint32()
+	this.SpreadingFactor = r.Uint32()
+	this.BitRate = r.Uint32()
+	this.CodingRate = randStringLorawan(r)
+	this.Frequency = uint64(r.Uint32())
+	this.TxPower = r.Int31()
 	if r.Intn(2) == 0 {
 		this.TxPower *= -1
 	}
-	this.PolarizationInversion = bool(bool(r.Intn(2) == 0))
+	this.PolarizationInversion = bool(r.Intn(2) == 0)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -10860,7 +10860,7 @@ func randFieldLorawan(dAtA []byte, r randyLorawan, fieldNumber int, wire int) []
 }
 func encodeVarintPopulateLorawan(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -11094,7 +11094,7 @@ func (m *TxSettings) Size() (n int) {
 		n += 1 + l + sovLorawan(uint64(l))
 	}
 	if m.Frequency != 0 {
-		n += 1 + sovLorawan(uint64(m.Frequency))
+		n += 1 + sovLorawan(m.Frequency)
 	}
 	if m.TxPower != 0 {
 		n += 1 + sovLorawan(uint64(m.TxPower))
@@ -11776,7 +11776,7 @@ func sovLorawan(x uint64) (n int) {
 	return n
 }
 func sozLorawan(x uint64) (n int) {
-	return sovLorawan(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovLorawan((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (m *Message) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
