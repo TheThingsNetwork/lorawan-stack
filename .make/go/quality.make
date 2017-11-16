@@ -3,7 +3,7 @@
 # fmt all packages
 go.fmt:
 	@$(log) "Formatting `$(GO_PACKAGES) | $(count)` go packages"
-	@[[ -z "`$(GO_PACKAGES) | xargs go fmt | tee -a /dev/stderr`" ]]
+	@[[ -z "`go list -f '{{.Dir}}' ./... | xargs gofmt -w -s | tee -a /dev/stderr`" ]]
 
 # fmt stages packages
 go.fmt-staged: GO_PACKAGES = $(STAGED_PACKAGES)
