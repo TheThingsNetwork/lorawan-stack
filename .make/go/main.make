@@ -90,7 +90,7 @@ go.dev-deps:
 	@$(log) "Installing go dev dependencies"
 	@command -v dep  >/dev/null || { $(log) "Installing dep" && $(GO) get -u github.com/golang/dep/cmd/dep; }
 	@command -v gometalinter >/dev/null || { $(log) "Installing gometalinter" && $(GO) get -u gopkg.in/alecthomas/gometalinter.v1; }
-	@$(GOMETALINTER) $(GOMETALINTER_FLAGS) -i -u
+	@gometalinter -i -u
 
 DEP_FLAGS ?= $(if $(CI),-vendor-only,)
 
