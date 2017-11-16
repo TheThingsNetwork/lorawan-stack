@@ -15,8 +15,8 @@ GO_FMT= gofmt
 GO_MISSPELL= misspell
 GO_UNCONVERT= unconvert
 GO_METALINTER = gometalinter.v1
-GO_METALINTER_FLAGS = --enable-gc -e '.*easy is unused.*|.*\.pb\.go:.*|.*\.pb\.gw\.go:.*|.*pb_test\.go:.*' --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E misspell -E gofmt -E interfacer --deadline 10s
-GO_METALINTER_FLAGS_FULL= --enable-gc -e '.*easy is unused.*|.*\.pb\.go:.*|.*\.pb\.gw\.go:.*|.*pb_test\.go:.*' --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E misspell -E gofmt -E interfacer -E safesql -E unparam -E structcheck -E varcheck -E maligned -E megacheck -E unconvert -E unused --deadline 60s
+GO_METALINTER_FLAGS = --enable-gc -e '.*easy is unused.*|.*\.pb\.go:.*|.*\.pb\.gw\.go:.*|.*pb_test\.go:.*' --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E misspell -E gofmt
+GO_METALINTER_FLAGS_FULL= --enable-gc -e '.*easy is unused.*|.*\.pb\.go:.*|.*\.pb\.gw\.go:.*|.*pb_test\.go:.*' --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E misspell -E gofmt -E interfacer -E safesql -E unparam -E structcheck -E varcheck -E unconvert -E gosimple -E unused -E staticcheck --deadline 60s
 
 # go flags
 GO_FLAGS ?= -a

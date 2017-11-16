@@ -8,7 +8,8 @@ go.fmt:
 # lint all packages, exiting when errors occur
 go.lint:
 	@$(log) "Linting `$(GO_PACKAGES) | $(count)` go packages"
-	@CODE=0; for pkg in `$(GO_PACKAGES)`; do $(GO_METALINTER) $(GO_METALINTER_FLAGS) $(GOPATH)/src/$$pkg 2> /dev/null || { CODE=1; }; done; exit $$CODE
+#@CODE=0; $(GO_METALINTER) $(GO_METALINTER_FLAGS) `$(GO_PACKAGES_ABSOLUTE)` 2> /dev/null || { CODE=1; }; exit $$CODE
+	@CODE=0; $(GO_METALINTER) $(GO_METALINTER_FLAGS) `$(GO_PACKAGES_ABSOLUTE)`  || { CODE=1; }; exit $$CODE
 
 go.lint-full: GO_METALINTER_FLAGS=$(GO_METALINTER_FLAGS_FULL)
 go.lint-full: go.lint
