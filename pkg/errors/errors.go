@@ -87,5 +87,8 @@ func pkg() string {
 
 	name := fun.Name()
 
-	return strings.Split(strings.TrimPrefix(name, "github.com/TheThingsNetwork/ttn/pkg/"), ".")[0]
+	split := strings.Split(name, "github.com/TheThingsNetwork/ttn/pkg/")
+	pkg := split[len(split)-1]
+
+	return strings.Split(pkg, ".")[0]
 }
