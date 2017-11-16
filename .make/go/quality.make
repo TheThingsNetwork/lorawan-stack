@@ -3,13 +3,12 @@
 # fmt all packages
 go.fmt:
 	@$(log) "Formatting `$(GO_PACKAGES_ABSOLUTE) | $(count)` go packages"
-	@[[ -z "`$(GO_PACKAGES_ABSOLUTE) | xargs echo $(GO_FMT) -w -s | tee -a /dev/stderr`" ]]
+	@[[ -z "`$(GO_PACKAGES_ABSOLUTE) | xargs $(GO_FMT) -w -s | tee -a /dev/stderr`" ]]
 
 # lint all packages, exiting when errors occur
 go.lint:
 	@$(log) "Linting `$(GO_PACKAGES) | $(count)` go packages"
-#@CODE=0; $(GO_METALINTER) $(GO_METALINTER_FLAGS) `$(GO_PACKAGES_ABSOLUTE)` 2> /dev/null || { CODE=1; }; exit $$CODE
-	@CODE=0; $(GO_METALINTER) $(GO_METALINTER_FLAGS) `$(GO_PACKAGES_ABSOLUTE)`  || { CODE=1; }; exit $$CODE
+	@CODE=0; $(GO_METALINTER) $(GO_METALINTER_FLAGS) `$(GO_PACKAGES_ABSOLUTE)` 2> /dev/null || { CODE=1; }; exit $$CODE
 
 go.lint-full: GO_METALINTER_FLAGS=$(GO_METALINTER_FLAGS_FULL)
 go.lint-full: go.lint
@@ -67,9 +66,9 @@ go.check-vendors-staged: VENDOR_FILE=$(shell $(STAGED_FILES) | grep -q $(GO_VEND
 go.check-vendors-staged: go.check-vendors
 
 # run all quality on all files
-go.quality: go.fmt go.lint go.check-vendors
+go.quality: go.fmt go.misspell go.unconvert go.lint go.check-vendors
 
 # run all quality on staged files
-go.quality-staged: go.fmt-staged go.lint-staged go.check-vendors-staged
+go.quality-staged: go.fmt-staged go.misspell-staged go.unconvert-staged go.lint-staged go.check-vendors-staged
 
 # vim: ft=make
