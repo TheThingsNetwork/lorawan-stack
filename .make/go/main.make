@@ -11,9 +11,9 @@ GO_PKG ?= $(shell echo $(PWD) | sed s:$(GO_PATH)/src/::)
 
 # programs
 GO = go
-GO_METALINTER = gometalinter
-GO_METALINTER_FLAGS = --enable-gc -e '.*easy is unused.*|.*\.pb\.go:.*|.*\.pb\.gw\.go:.*|.*pb_test\.go:.*' --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E nakedret -E misspell -E gofmt --deadline 10s
-GO_METALINTER_FLAGS_FULL= --enable-gc -e '.*easy is unused.*|.*\.pb\.go:.*|.*\.pb\.gw\.go:.*|.*pb_test\.go:.*' --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E nakedret -E misspell -E gofmt -E safesql -E unparam -E structcheck -E varcheck -E maligned -E megacheck -E interfacer -E unconvert -E unused --deadline 60s
+GO_METALINTER = gometalinter.v1
+GO_METALINTER_FLAGS = --enable-gc -e '.*easy is unused.*|.*\.pb\.go:.*|.*\.pb\.gw\.go:.*|.*pb_test\.go:.*' --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E misspell -E gofmt --deadline 10s
+GO_METALINTER_FLAGS_FULL= --enable-gc -e '.*easy is unused.*|.*\.pb\.go:.*|.*\.pb\.gw\.go:.*|.*pb_test\.go:.*' --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E misspell -E gofmt -E safesql -E unparam -E structcheck -E varcheck -E maligned -E megacheck -E interfacer -E unconvert -E unused --deadline 60s
 
 # go flags
 GO_FLAGS ?= -a
