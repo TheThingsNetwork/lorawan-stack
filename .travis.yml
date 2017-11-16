@@ -20,8 +20,9 @@ before_script:
 - docker run -d -p 127.0.0.1:26257:26257 cockroachdb/cockroach:v1.1.1 start --insecure
 script:
 - make test
-- make go.vet
 - make go.fmt
+- make go.unconvert
+- make go.misspell
 - make go.lint-travis-comment --no-print-directory
 - make go.protos.clean
 - make go.protos
