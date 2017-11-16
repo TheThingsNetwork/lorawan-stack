@@ -49,7 +49,7 @@ func (p *PBKDF2) Hash(plain string) (string, error) {
 
 	salt := random.String(p.SaltLength)
 	hash := hash64([]byte(plain), []byte(salt), p.Iterations, p.KeyLength, p.Algorithm)
-	pass := fmt.Sprintf("PBKDF2$%s$%v$%s$%s", p.Algorithm, p.Iterations, string(salt), string(hash))
+	pass := fmt.Sprintf("PBKDF2$%s$%v$%s$%s", p.Algorithm, p.Iterations, salt, string(hash))
 
 	return pass, nil
 }
@@ -93,7 +93,7 @@ func (*PBKDF2) Validate(hashed, plain string) (bool, error) {
 
 // hash64 hashes a plain password and encodes it to base64
 func hash64(plain, salt []byte, iterations int, keyLength int, algorithm Algorithm) []byte {
-	key := pbkdf2.Key([]byte(plain), salt, iterations, keyLength, algorithm.Hash)
+	key := pbkdf2.Key(plain, salt, iterations, keyLength, algorithm.Hash)
 	res := make([]byte, base64.RawURLEncoding.EncodedLen(len(key)))
 	base64.RawURLEncoding.Encode(res, key)
 	return res

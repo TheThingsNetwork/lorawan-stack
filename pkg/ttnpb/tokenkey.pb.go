@@ -359,7 +359,7 @@ func encodeVarintTokenkey(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedTokenKeyRequest(r randyTokenkey, easy bool) *TokenKeyRequest {
 	this := &TokenKeyRequest{}
-	this.KID = string(randStringTokenkey(r))
+	this.KID = randStringTokenkey(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -367,9 +367,9 @@ func NewPopulatedTokenKeyRequest(r randyTokenkey, easy bool) *TokenKeyRequest {
 
 func NewPopulatedTokenKeyResponse(r randyTokenkey, easy bool) *TokenKeyResponse {
 	this := &TokenKeyResponse{}
-	this.PublicKey = string(randStringTokenkey(r))
-	this.KID = string(randStringTokenkey(r))
-	this.Algorithm = string(randStringTokenkey(r))
+	this.PublicKey = randStringTokenkey(r)
+	this.KID = randStringTokenkey(r)
+	this.Algorithm = randStringTokenkey(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -441,7 +441,7 @@ func randFieldTokenkey(dAtA []byte, r randyTokenkey, fieldNumber int, wire int) 
 }
 func encodeVarintPopulateTokenkey(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -486,7 +486,7 @@ func sovTokenkey(x uint64) (n int) {
 	return n
 }
 func sozTokenkey(x uint64) (n int) {
-	return sovTokenkey(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovTokenkey((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (m *TokenKeyRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

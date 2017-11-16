@@ -193,7 +193,7 @@ func (prefix *DevAddrPrefix) Unmarshal(data []byte) error { return prefix.Unmars
 
 // MarshalJSON implements the json.Marshaler interface
 func (prefix DevAddrPrefix) MarshalJSON() ([]byte, error) {
-	return append([]byte(`"`+base64Encoding.EncodeToString(prefix.DevAddr[:])), '/', byte(prefix.Length), '"'), nil
+	return append([]byte(`"`+base64Encoding.EncodeToString(prefix.DevAddr[:])), '/', prefix.Length, '"'), nil
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface
@@ -215,7 +215,7 @@ func (prefix *DevAddrPrefix) UnmarshalJSON(data []byte) error {
 	if n != 4 || copy(prefix.DevAddr[:], b) != 4 {
 		return ErrInvalidPrefix
 	}
-	prefix.Length = uint8(data[10])
+	prefix.Length = data[10]
 	return nil
 }
 
@@ -236,7 +236,7 @@ func (prefix *DevAddrPrefix) UnmarshalBinary(data []byte) error {
 	if err := prefix.DevAddr.Unmarshal(data[:4]); err != nil {
 		return err
 	}
-	prefix.Length = uint8(data[4])
+	prefix.Length = data[4]
 	return nil
 }
 

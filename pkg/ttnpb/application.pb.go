@@ -1244,7 +1244,7 @@ func NewPopulatedApplication(r randyApplication, easy bool) *Application {
 	this := &Application{}
 	v1 := NewPopulatedApplicationIdentifier(r, easy)
 	this.ApplicationIdentifier = *v1
-	this.Description = string(randStringApplication(r))
+	this.Description = randStringApplication(r)
 	if r.Intn(10) != 0 {
 		v2 := r.Intn(5)
 		this.APIKeys = make([]APIKey, v2)
@@ -1283,8 +1283,8 @@ func NewPopulatedApplicationUp_UplinkMessage(r randyApplication, easy bool) *App
 }
 func NewPopulatedApplicationUplink(r randyApplication, easy bool) *ApplicationUplink {
 	this := &ApplicationUplink{}
-	this.FPort = uint32(r.Uint32())
-	this.FCnt = uint32(r.Uint32())
+	this.FPort = r.Uint32()
+	this.FCnt = r.Uint32()
 	v7 := r.Intn(100)
 	this.FrmPayload = make([]byte, v7)
 	for i := 0; i < v7; i++ {
@@ -1297,8 +1297,8 @@ func NewPopulatedApplicationUplink(r randyApplication, easy bool) *ApplicationUp
 
 func NewPopulatedApplicationDownlink(r randyApplication, easy bool) *ApplicationDownlink {
 	this := &ApplicationDownlink{}
-	this.FPort = uint32(r.Uint32())
-	this.FCnt = uint32(r.Uint32())
+	this.FPort = r.Uint32()
+	this.FCnt = r.Uint32()
 	v8 := r.Intn(100)
 	this.FrmPayload = make([]byte, v8)
 	for i := 0; i < v8; i++ {
@@ -1405,7 +1405,7 @@ func randFieldApplication(dAtA []byte, r randyApplication, fieldNumber int, wire
 }
 func encodeVarintPopulateApplication(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -1522,7 +1522,7 @@ func sovApplication(x uint64) (n int) {
 	return n
 }
 func sozApplication(x uint64) (n int) {
-	return sovApplication(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovApplication((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (m *Application) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

@@ -328,8 +328,8 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 
 			case float32, float64:
 				fieldValue := configValue.Field(i).Float()
-				m.viper.SetDefault(name, float64(fieldValue))
-				flags.Float64P(name, shorthand, float64(fieldValue), description)
+				m.viper.SetDefault(name, fieldValue)
+				flags.Float64P(name, shorthand, fieldValue, description)
 
 			case string:
 				m.viper.SetDefault(name, val)

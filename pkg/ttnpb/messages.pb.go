@@ -473,7 +473,7 @@ func sovMessages(x uint64) (n int) {
 	return n
 }
 func sozMessages(x uint64) (n int) {
-	return sovMessages(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovMessages((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (m *UplinkMessage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

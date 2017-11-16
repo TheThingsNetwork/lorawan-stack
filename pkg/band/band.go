@@ -138,7 +138,7 @@ func GetByID(id ID) (Band, error) {
 		}
 	}
 	return Band{}, ErrBandNotFound.New(errors.Attributes{
-		"band": string(id),
+		"band": id,
 	})
 }
 

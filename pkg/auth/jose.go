@@ -22,7 +22,7 @@ func JOSEHeader(key string) (*Header, error) {
 		return nil, fmt.Errorf("Invalid number of segments")
 	}
 
-	data, err := base64.RawURLEncoding.DecodeString(string(parts[0]))
+	data, err := base64.RawURLEncoding.DecodeString(parts[0])
 	if err != nil {
 		return nil, err
 	}

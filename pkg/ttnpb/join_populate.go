@@ -19,7 +19,7 @@ func NewPopulatedJoinRequest(r randyJoin, easy bool) *JoinRequest {
 	out.SelectedMacVersion = MACVersion(r.Intn(5)).String()
 	out.NetID = *types.NewPopulatedNetID(r)
 	out.DownlinkSettings = *NewPopulatedDLSettings(r, easy)
-	out.RxDelay = uint32(r.Uint32())
+	out.RxDelay = r.Uint32()
 	if r.Intn(10) != 0 {
 		out.CFList = NewPopulatedCFList(r, false)
 	}

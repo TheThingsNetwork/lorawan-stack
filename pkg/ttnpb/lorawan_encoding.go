@@ -136,7 +136,7 @@ func (msg *MACPayload) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 	if n < 7 {
 		return errors.Errorf("expected length of at least 7 to decode FHDR, got %d", n)
 	}
-	fOptsLen := uint8(b[4] & 0xf)
+	fOptsLen := b[4] & 0xf
 	fhdrLen := fOptsLen + 7
 	if n < fhdrLen {
 		return errors.Errorf("expected length of at least %d bytes to decode FHDR(FOptsLen is %d), got %d.", fhdrLen, fOptsLen, n)
