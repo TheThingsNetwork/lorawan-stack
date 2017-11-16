@@ -134,7 +134,7 @@ func KeyPayload(key string) (*Payload, error) {
 	}
 
 	if head.Alg != alg {
-		return nil, fmt.Errorf("Unkown alg for API Key: %s", head.Alg)
+		return nil, fmt.Errorf("Unknown alg for API Key: %s", head.Alg)
 	}
 
 	payload := new(Payload)

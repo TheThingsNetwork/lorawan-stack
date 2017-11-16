@@ -36,7 +36,7 @@ func Build(in interface{}) (Filter, error) {
 			return Or(c...), nil
 		}
 
-		return nil, fmt.Errorf("Unkown clause, expected `match`, `or` or `and` (got %v)", v)
+		return nil, fmt.Errorf("Unknown clause, expected `match`, `or` or `and` (got %v)", v)
 
 	case []map[string]interface{}:
 		// list of clauses is AND

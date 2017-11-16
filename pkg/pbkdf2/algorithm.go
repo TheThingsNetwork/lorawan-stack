@@ -30,14 +30,14 @@ func (a Algorithm) MarshalText() ([]byte, error) {
 	return []byte(a.String()), nil
 }
 
-// parseAlgorithm parses a string into an Algortihm and checks if it is supported.
+// parseAlgorithm parses a string into an Algorithm and checks if it is supported.
 func parseAlgorithm(str string) (Algorithm, error) {
 	alg := Algorithm(str)
 	switch alg {
 	case Sha256, Sha512:
 		return alg, nil
 	default:
-		return alg, fmt.Errorf("Unsupported algoritm: %s", str)
+		return alg, fmt.Errorf("Unsupported algorithm: %s", str)
 	}
 }
 

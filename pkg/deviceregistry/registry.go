@@ -29,7 +29,7 @@ func newDevice(ed *ttnpb.EndDevice, s store.Client, k store.PrimaryKey, stored *
 	}
 }
 
-// Registry is reponsible for mapping devices to their identities.
+// Registry is responsible for mapping devices to their identities.
 type Registry struct {
 	store store.Client
 }

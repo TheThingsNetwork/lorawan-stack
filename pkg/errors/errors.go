@@ -6,7 +6,7 @@
 // It relies on the concept of describing your errors statically and then
 // building actual instances of the errors from these descriptors when they occur.
 //
-// The resulting errors are uniquely identifiable so their orginal descriptions
+// The resulting errors are uniquely identifiable so their original descriptions
 // can be retreived. This makes it easier to localize the error messages since
 // we can enumerate all possible errors.
 //

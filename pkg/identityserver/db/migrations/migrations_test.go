@@ -42,7 +42,7 @@ func TestMigrationsRegistry(t *testing.T) {
 	}, should.Panic)
 
 	// register a migration with an order that will result in a gap in the order
-	// of the registy should panic
+	// of the registry should panic
 	a.So(func() {
 		registry.Register(3, "foo", "", "")
 	}, should.Panic)

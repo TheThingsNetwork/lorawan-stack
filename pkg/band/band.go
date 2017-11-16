@@ -108,7 +108,7 @@ type Band struct {
 	MinAckTimeout time.Duration
 	MaxAckTimeout time.Duration
 
-	// TXOffset in dB: A TX's power is computed by taking the MaxEIRP (default: +16dBm) and substracting the offset
+	// TXOffset in dB: A TX's power is computed by taking the MaxEIRP (default: +16dBm) and subtracting the offset
 	TXOffset []float32
 
 	// DefaultMaxEIRP in dBm
