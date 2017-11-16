@@ -89,8 +89,8 @@ var (
 			"foo": "bar",
 		},
 		StringMapSlice: map[string][]string{
-			"foo": []string{"bar", "baz"},
-			"quu": []string{"qux"},
+			"foo": {"bar", "baz"},
+			"quu": {"qux"},
 		},
 		Nested: NestedConfig{
 			String: "nested-foo",
@@ -179,8 +179,8 @@ func TestConfigEnv(t *testing.T) {
 			"s": "t",
 		},
 		StringMapSlice: map[string][]string{
-			"a": []string{"b", "c"},
-			"d": []string{"e"},
+			"a": {"b", "c"},
+			"d": {"e"},
 		},
 		Nested: NestedConfig{
 			String: "mud",
@@ -258,8 +258,8 @@ func TestConfigFlags(t *testing.T) {
 			"s": "t",
 		},
 		StringMapSlice: map[string][]string{
-			"a": []string{"b", "c"},
-			"d": []string{"e"},
+			"a": {"b", "c"},
+			"d": {"e"},
 		},
 		Nested: NestedConfig{
 			String: "mud",

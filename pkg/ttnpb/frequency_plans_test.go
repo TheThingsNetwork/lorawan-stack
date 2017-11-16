@@ -204,7 +204,7 @@ func TestMarshal(t *testing.T) {
 		BandID: string(band.EU_863_870),
 		LBT:    nil,
 		Channels: []*ttnpb.FrequencyPlan_Channel{
-			&ttnpb.FrequencyPlan_Channel{
+			{
 				Frequency: 868500000,
 			},
 		},

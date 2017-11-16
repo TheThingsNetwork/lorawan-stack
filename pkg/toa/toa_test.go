@@ -71,12 +71,12 @@ func TestDifferentLoRaSFs(t *testing.T) {
 	a := assertions.New(t)
 
 	sfTests := map[types.DataRate]uint{
-		types.DataRate{LoRa: "SF7BW125"}:  41216,
-		types.DataRate{LoRa: "SF8BW125"}:  72192,
-		types.DataRate{LoRa: "SF9BW125"}:  144384,
-		types.DataRate{LoRa: "SF10BW125"}: 288768,
-		types.DataRate{LoRa: "SF11BW125"}: 577536,
-		types.DataRate{LoRa: "SF12BW125"}: 991232,
+		{LoRa: "SF7BW125"}:  41216,
+		{LoRa: "SF8BW125"}:  72192,
+		{LoRa: "SF9BW125"}:  144384,
+		{LoRa: "SF10BW125"}: 288768,
+		{LoRa: "SF11BW125"}: 577536,
+		{LoRa: "SF12BW125"}: 991232,
 	}
 
 	for dr, us := range sfTests {
@@ -92,9 +92,9 @@ func TestDifferentLoRaBWs(t *testing.T) {
 	a := assertions.New(t)
 
 	bwTests := map[types.DataRate]uint{
-		types.DataRate{LoRa: "SF7BW125"}: 41216,
-		types.DataRate{LoRa: "SF7BW250"}: 20608,
-		types.DataRate{LoRa: "SF7BW500"}: 10304,
+		{LoRa: "SF7BW125"}: 41216,
+		{LoRa: "SF7BW250"}: 20608,
+		{LoRa: "SF7BW500"}: 10304,
 	}
 
 	for dr, us := range bwTests {

@@ -16,17 +16,17 @@ import (
 
 func testUsers() map[string]*ttnpb.User {
 	return map[string]*ttnpb.User{
-		"alice": &ttnpb.User{
+		"alice": {
 			UserIdentifier: ttnpb.UserIdentifier{"alice"},
 			Password:       "123456",
 			Email:          "alice@alice.com",
 		},
-		"bob": &ttnpb.User{
+		"bob": {
 			UserIdentifier: ttnpb.UserIdentifier{"bob"},
 			Password:       "1234567",
 			Email:          "bob@bob.com",
 		},
-		"john-doe": &ttnpb.User{
+		"john-doe": {
 			UserIdentifier: ttnpb.UserIdentifier{"john-doe"},
 			Password:       "123456",
 			Email:          "john@doe.com",

@@ -14,7 +14,7 @@ import (
 
 func testApplications() map[string]*ttnpb.Application {
 	return map[string]*ttnpb.Application{
-		"demo-app": &ttnpb.Application{
+		"demo-app": {
 			ApplicationIdentifier: ttnpb.ApplicationIdentifier{"demo-app"},
 			Description:           "Demo application",
 		},

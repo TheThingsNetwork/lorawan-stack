@@ -29,12 +29,12 @@ const (
 )
 
 var data = []foo{
-	foo{
+	{
 		Bar: "bar-1",
 		Baz: true,
 		Quu: 42,
 	},
-	foo{
+	{
 		Bar: "bar-2",
 		Baz: false,
 		Quu: 392,

@@ -45,7 +45,7 @@ func dummyEUFP() (string, error) {
 	fp := ttnpb.FrequencyPlan{
 		BandID: string(band.EU_863_870),
 		Channels: []*ttnpb.FrequencyPlan_Channel{
-			&ttnpb.FrequencyPlan_Channel{
+			{
 				Frequency: 868000000,
 			},
 		},

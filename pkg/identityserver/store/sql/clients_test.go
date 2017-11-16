@@ -14,14 +14,14 @@ import (
 
 func testClients() map[string]*ttnpb.Client {
 	return map[string]*ttnpb.Client{
-		"test-client": &ttnpb.Client{
+		"test-client": {
 			ClientIdentifier: ttnpb.ClientIdentifier{"test-client"},
 			Secret:           "123456",
 			RedirectURI:      "/oauth/callback",
 			Grants:           []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_PASSWORD},
 			Rights:           []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
 		},
-		"foo-client": &ttnpb.Client{
+		"foo-client": {
 			ClientIdentifier: ttnpb.ClientIdentifier{"foo-client"},
 			Secret:           "foofoofoo",
 			RedirectURI:      "https://foo.bar/oauth/callback",

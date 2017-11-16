@@ -1664,7 +1664,7 @@ func (m *Gateway) MarshalTo(dAtA []byte) (int, error) {
 		}
 	}
 	if len(m.Attributes) > 0 {
-		for k, _ := range m.Attributes {
+		for k := range m.Attributes {
 			dAtA[i] = 0x52
 			i++
 			v := m.Attributes[k]
@@ -2018,7 +2018,7 @@ func (m *GatewayStatus) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], m.Platform)
 	}
 	if len(m.Versions) > 0 {
-		for k, _ := range m.Versions {
+		for k := range m.Versions {
 			dAtA[i] = 0x22
 			i++
 			v := m.Versions[k]
@@ -2072,7 +2072,7 @@ func (m *GatewayStatus) MarshalTo(dAtA []byte) (int, error) {
 		i += n13
 	}
 	if len(m.Metrics) > 0 {
-		for k, _ := range m.Metrics {
+		for k := range m.Metrics {
 			dAtA[i] = 0x42
 			i++
 			v := m.Metrics[k]

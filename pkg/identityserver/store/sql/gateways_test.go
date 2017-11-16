@@ -14,7 +14,7 @@ import (
 
 func testGateways() map[string]*ttnpb.Gateway {
 	return map[string]*ttnpb.Gateway{
-		"test-gateway": &ttnpb.Gateway{
+		"test-gateway": {
 			GatewayIdentifier: ttnpb.GatewayIdentifier{"test-gateway"},
 			Description:       "My description",
 			FrequencyPlanID:   "868_3",
@@ -24,7 +24,7 @@ func testGateways() map[string]*ttnpb.Gateway {
 				"foo": "bar",
 			},
 			Antennas: []ttnpb.GatewayAntenna{
-				ttnpb.GatewayAntenna{
+				{
 					Location: ttnpb.Location{
 						Latitude:  11.11,
 						Longitude: 22.22,
@@ -33,7 +33,7 @@ func testGateways() map[string]*ttnpb.Gateway {
 				},
 			},
 		},
-		"bob-gateway": &ttnpb.Gateway{
+		"bob-gateway": {
 			GatewayIdentifier: ttnpb.GatewayIdentifier{"bob-gateway"},
 			Description:       "My description",
 			FrequencyPlanID:   "868_3",
@@ -44,7 +44,7 @@ func testGateways() map[string]*ttnpb.Gateway {
 				"RFCH":       "111",
 			},
 			Antennas: []ttnpb.GatewayAntenna{
-				ttnpb.GatewayAntenna{
+				{
 					Gain: 12.22},
 			},
 		},

@@ -363,7 +363,7 @@ func (s *GatewayStore) removeAttributeDiffQuery(gtwID string, attributes map[str
 	boundVariables := make([]string, len(attributes))
 
 	i := 0
-	for k, _ := range attributes {
+	for k := range attributes {
 		args[i+1] = k
 		boundVariables[i] = fmt.Sprintf("$%d", i+2)
 		i++

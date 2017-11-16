@@ -14,12 +14,12 @@ func TestValidSpreadingFactors(t *testing.T) {
 	a := assertions.New(t)
 
 	dataRates := map[types.DataRate]uint8{
-		types.DataRate{LoRa: "SF7BW125"}:  7,
-		types.DataRate{LoRa: "SF8BW125"}:  8,
-		types.DataRate{LoRa: "SF9BW125"}:  9,
-		types.DataRate{LoRa: "SF10BW125"}: 10,
-		types.DataRate{LoRa: "SF11BW125"}: 11,
-		types.DataRate{LoRa: "SF12BW125"}: 12,
+		{LoRa: "SF7BW125"}:  7,
+		{LoRa: "SF8BW125"}:  8,
+		{LoRa: "SF9BW125"}:  9,
+		{LoRa: "SF10BW125"}: 10,
+		{LoRa: "SF11BW125"}: 11,
+		{LoRa: "SF12BW125"}: 12,
 	}
 
 	for dr, sf := range dataRates {
@@ -33,9 +33,9 @@ func TestValidBandwidth(t *testing.T) {
 	a := assertions.New(t)
 
 	dataRates := map[types.DataRate]uint32{
-		types.DataRate{LoRa: "SF7BW125"}: 125000,
-		types.DataRate{LoRa: "SF8BW250"}: 250000,
-		types.DataRate{LoRa: "SF9BW500"}: 500000,
+		{LoRa: "SF7BW125"}: 125000,
+		{LoRa: "SF8BW250"}: 250000,
+		{LoRa: "SF9BW500"}: 500000,
 	}
 
 	for dr, bw := range dataRates {

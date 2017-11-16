@@ -26,7 +26,7 @@ func TestConstProvider(t *testing.T) {
 
 	provider := &ConstProvider{
 		Tokens: map[string]map[string]crypto.PublicKey{
-			iss: map[string]crypto.PublicKey{
+			iss: {
 				kid: &key.PublicKey,
 			},
 		},

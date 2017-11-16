@@ -14,8 +14,8 @@ func TestDataRate(t *testing.T) {
 	a := assertions.New(t)
 
 	table := map[string]DataRate{
-		`"SF7BW125"`: DataRate{types.DataRate{LoRa: "SF7BW125"}},
-		`50000`:      DataRate{types.DataRate{FSK: 50000}},
+		`"SF7BW125"`: {types.DataRate{LoRa: "SF7BW125"}},
+		`50000`:      {types.DataRate{FSK: 50000}},
 	}
 
 	for s, dr := range table {

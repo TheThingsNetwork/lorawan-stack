@@ -26,7 +26,7 @@ func gateway() *ttnpb.Gateway {
 			LocationPublic: true,
 		},
 		Antennas: []ttnpb.GatewayAntenna{
-			ttnpb.GatewayAntenna{
+			{
 				Location: ttnpb.Location{
 					Latitude:  11.11,
 					Longitude: 22.22,

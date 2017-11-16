@@ -71,7 +71,7 @@ func TestSign(t *testing.T) {
 
 		provider := &tokenkey.ConstProvider{
 			Tokens: map[string]map[string]crypto.PublicKey{
-				claims.Issuer: map[string]crypto.PublicKey{
+				claims.Issuer: {
 					"": &key.PublicKey,
 				},
 			},
@@ -100,7 +100,7 @@ func TestSign(t *testing.T) {
 
 		provider := &tokenkey.ConstProvider{
 			Tokens: map[string]map[string]crypto.PublicKey{
-				claims.Issuer: map[string]crypto.PublicKey{
+				claims.Issuer: {
 					"": &key.PublicKey,
 				},
 			},
@@ -130,7 +130,7 @@ func TestSign(t *testing.T) {
 
 		provider := &tokenkey.ConstProvider{
 			Tokens: map[string]map[string]crypto.PublicKey{
-				claims.Issuer: map[string]crypto.PublicKey{
+				claims.Issuer: {
 					kid: &key.PublicKey,
 				},
 			},
@@ -159,7 +159,7 @@ func TestSign(t *testing.T) {
 
 		provider := &tokenkey.ConstProvider{
 			Tokens: map[string]map[string]crypto.PublicKey{
-				claims.Issuer: map[string]crypto.PublicKey{
+				claims.Issuer: {
 					"otherkid": &key.PublicKey,
 				},
 			},

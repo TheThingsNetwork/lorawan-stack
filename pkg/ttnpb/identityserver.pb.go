@@ -4777,7 +4777,7 @@ func (m *CreateGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
 		}
 	}
 	if len(m.Attributes) > 0 {
-		for k, _ := range m.Attributes {
+		for k := range m.Attributes {
 			dAtA[i] = 0x52
 			i++
 			v := m.Attributes[k]
@@ -4912,7 +4912,7 @@ func (m *UpdateGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
 		}
 	}
 	if len(m.Attributes) > 0 {
-		for k, _ := range m.Attributes {
+		for k := range m.Attributes {
 			dAtA[i] = 0x52
 			i++
 			v := m.Attributes[k]
