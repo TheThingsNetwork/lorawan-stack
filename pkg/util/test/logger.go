@@ -10,11 +10,9 @@ import (
 )
 
 // GetLogger returns a logger for tests.
-func GetLogger(t testing.TB, tag string) log.Interface {
-	logger := &log.Logger{
+func GetLogger(t testing.TB) log.Stack {
+	return &log.Logger{
 		Level:   log.DebugLevel,
 		Handler: test.NewTestingHandler(t),
 	}
-
-	return logger.WithField("tag", tag)
 }

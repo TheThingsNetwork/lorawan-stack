@@ -61,7 +61,7 @@ func cleanStore(t testing.TB, database string) *sql.Store {
 		return s
 	}
 
-	logger := test.GetLogger(t, "OAuth")
+	logger := test.GetLogger(t).WithField("tag", "OAuth")
 
 	// open database connection
 	db, err := db.Open(context.Background(), fmt.Sprintf(address, database), migrations.Registry)
@@ -97,7 +97,7 @@ func cleanStore(t testing.TB, database string) *sql.Store {
 }
 
 func testServer(t *testing.T) (*web.Server, *auth.Keys) {
-	logger := test.GetLogger(t, "OAuth")
+	logger := test.GetLogger(t).WithField("tag", "OAuth")
 
 	a := assertions.New(t)
 

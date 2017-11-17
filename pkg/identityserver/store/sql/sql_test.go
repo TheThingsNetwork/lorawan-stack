@@ -34,7 +34,7 @@ func testStore(t testing.TB) *Store {
 // cleanStore returns a new store instance attached to a newly created database
 // where all migrations has been applied and also has been feed with some users.
 func cleanStore(t testing.TB, database string) *Store {
-	logger := test.GetLogger(t, "Identity Server")
+	logger := test.GetLogger(t).WithField("tag", "Identity Server")
 
 	// open database connection
 	db, err := db.Open(context.Background(), fmt.Sprintf(address, database), migrations.Registry)

@@ -60,7 +60,7 @@ func getInstance(t testing.TB) Database {
 }
 
 func clean(t testing.TB) Database {
-	logger := test.GetLogger(t, "Identity Server")
+	logger := test.GetLogger(t).WithField("tag", "Identity Server")
 
 	registry := migrations.NewRegistry()
 	registry.Register(1, "1_foo_schema", schema, "DROP TABLE IF EXISTS foo")
