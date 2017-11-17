@@ -9,7 +9,7 @@ import (
 )
 
 func GetUplink() ttnpb.UplinkMessage                   { return ttnpb.UplinkMessage{} }
-func SendDownlink(ttnpb.DownlinkMessage)               { return }
+func SendDownlink(ttnpb.DownlinkMessage)               {}
 func ParseSpreadingFactor(types.DataRate) uint32       { return 7 }
 func ParseBandwidth(types.DataRate) uint32             { return 125000 }
 func ParseBitRate(types.DataRate) uint32               { return 0 }
