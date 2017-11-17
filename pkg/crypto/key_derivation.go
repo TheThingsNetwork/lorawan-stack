@@ -9,7 +9,19 @@ import (
 )
 
 // deriveSKey derives a session key
-func deriveSKey(key types.AES128Key, t byte, jn types.JoinNonce, nid types.NetID, dn types.DevNonce) (derived types.AES128Key) {
+func deriveSKey(key types.AES128Key, t byte, jn types.JoinNonce, joinEUI types.EUI64, dn types.DevNonce) (derived types.AES128Key) {
+	buf := make([]byte, 16)
+	buf[0] = t
+	copy(buf[1:4], reverse(jn[:]))
+	copy(buf[4:12], reverse(joinEUI[:]))
+	copy(buf[12:14], reverse(dn[:]))
+	block, _ := aes.NewCipher(key[:])
+	block.Encrypt(derived[:], buf)
+	return
+}
+
+// deriveLegacySKey derives a session key
+func deriveLegacySKey(key types.AES128Key, t byte, jn types.JoinNonce, nid types.NetID, dn types.DevNonce) (derived types.AES128Key) {
 	buf := make([]byte, 16)
 	buf[0] = t
 	copy(buf[1:4], reverse(jn[:]))
@@ -21,32 +33,37 @@ func deriveSKey(key types.AES128Key, t byte, jn types.JoinNonce, nid types.NetID
 }
 
 // DeriveFNwkSIntKey derives the LoRaWAN 1.1 Forwarding Network Session Integrity Key
-func DeriveFNwkSIntKey(nwkKey types.AES128Key, jn types.JoinNonce, nid types.NetID, dn types.DevNonce) types.AES128Key {
-	return deriveSKey(nwkKey, 0x01, jn, nid, dn)
+func DeriveFNwkSIntKey(nwkKey types.AES128Key, jn types.JoinNonce, joinEUI types.EUI64, dn types.DevNonce) types.AES128Key {
+	return deriveSKey(nwkKey, 0x01, jn, joinEUI, dn)
 }
 
 // DeriveSNwkSIntKey derives the LoRaWAN 1.1 Forwarding Network Session Integrity Key
-func DeriveSNwkSIntKey(nwkKey types.AES128Key, jn types.JoinNonce, nid types.NetID, dn types.DevNonce) types.AES128Key {
-	return deriveSKey(nwkKey, 0x03, jn, nid, dn)
+func DeriveSNwkSIntKey(nwkKey types.AES128Key, jn types.JoinNonce, joinEUI types.EUI64, dn types.DevNonce) types.AES128Key {
+	return deriveSKey(nwkKey, 0x03, jn, joinEUI, dn)
 }
 
 // DeriveNwkSEncKey derives the LoRaWAN 1.1 Forwarding Network Session Integrity Key
-func DeriveNwkSEncKey(nwkKey types.AES128Key, jn types.JoinNonce, nid types.NetID, dn types.DevNonce) types.AES128Key {
-	return deriveSKey(nwkKey, 0x04, jn, nid, dn)
+func DeriveNwkSEncKey(nwkKey types.AES128Key, jn types.JoinNonce, joinEUI types.EUI64, dn types.DevNonce) types.AES128Key {
+	return deriveSKey(nwkKey, 0x04, jn, joinEUI, dn)
 }
 
 // DeriveAppSKey derives the LoRaWAN Application Session Key
-// - If a LoRaWAN 1.0 device joins a LoRaWAN 1.0/1.1 network, the AppKey is used as "key"
 // - If a LoRaWAN 1.1 device joins a LoRaWAN 1.1 network, the AppKey is used as "key"
+func DeriveAppSKey(key types.AES128Key, jn types.JoinNonce, joinEUI types.EUI64, dn types.DevNonce) types.AES128Key {
+	return deriveSKey(key, 0x02, jn, joinEUI, dn)
+}
+
+// DeriveLegacyAppSKey derives the LoRaWAN Application Session Key
+// - If a LoRaWAN 1.0 device joins a LoRaWAN 1.0/1.1 network, the AppKey is used as "key"
 // - If a LoRaWAN 1.1 device joins a LoRaWAN 1.0 network, the NwkKey is used as "key"
-func DeriveAppSKey(key types.AES128Key, jn types.JoinNonce, nid types.NetID, dn types.DevNonce) types.AES128Key {
-	return deriveSKey(key, 0x02, jn, nid, dn)
+func DeriveLegacyAppSKey(key types.AES128Key, jn types.JoinNonce, nid types.NetID, dn types.DevNonce) types.AES128Key {
+	return deriveLegacySKey(key, 0x02, jn, nid, dn)
 }
 
 // DeriveNwkSKey derives the LoRaWAN 1.0 Network Session Key
 // - Here the AppNonce is entered as JoinNonce
 func DeriveNwkSKey(appKey types.AES128Key, jn types.JoinNonce, nid types.NetID, dn types.DevNonce) types.AES128Key {
-	return deriveSKey(appKey, 0x01, jn, nid, dn)
+	return deriveLegacySKey(appKey, 0x01, jn, nid, dn)
 }
 
 // deriveKey derives a device key
