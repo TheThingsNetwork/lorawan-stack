@@ -60,9 +60,9 @@ func DeriveLegacyAppSKey(key types.AES128Key, jn types.JoinNonce, nid types.NetI
 	return deriveLegacySKey(key, 0x02, jn, nid, dn)
 }
 
-// DeriveNwkSKey derives the LoRaWAN 1.0 Network Session Key
+// DeriveLegacyNwkSKey derives the LoRaWAN 1.0 Network Session Key
 // - Here the AppNonce is entered as JoinNonce
-func DeriveNwkSKey(appKey types.AES128Key, jn types.JoinNonce, nid types.NetID, dn types.DevNonce) types.AES128Key {
+func DeriveLegacyNwkSKey(appKey types.AES128Key, jn types.JoinNonce, nid types.NetID, dn types.DevNonce) types.AES128Key {
 	return deriveLegacySKey(appKey, 0x01, jn, nid, dn)
 }
 
