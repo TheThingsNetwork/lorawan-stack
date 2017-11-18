@@ -5,6 +5,7 @@ package gwpool_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/gwpool"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
@@ -55,13 +56,14 @@ func TestDoneContextUplinks(t *testing.T) {
 	emptyUplink := &ttnpb.GatewayUp{}
 	upstream := p.Subscribe(ttnpb.GatewayIdentifier{GatewayID: gatewayID}, link)
 	go func() { link.NextUplink <- emptyUplink }()
+	time.Sleep(time.Millisecond)
 	select {
 	case _, ok := <-upstream:
 		if ok {
-			t.Fail()
+			t.Error("Stream not closed, message received")
 		}
 	default:
-		t.Fail()
+		t.Error("Stream not closed, no message")
 	}
 }
 
