@@ -12,15 +12,13 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-type outgoing = chan *ttnpb.GatewayDown
-
 type gatewayStore struct {
-	store map[ttnpb.GatewayIdentifier]outgoing
+	store map[ttnpb.GatewayIdentifier]chan *ttnpb.GatewayDown
 
 	mu sync.Mutex
 }
 
-func (s *gatewayStore) Store(gatewayID ttnpb.GatewayIdentifier, outgoingChannel outgoing) {
+func (s *gatewayStore) Store(gatewayID ttnpb.GatewayIdentifier, outgoingChannel chan *ttnpb.GatewayDown) {
 	s.mu.Lock()
 
 	res, err := s.fetch(gatewayID)
@@ -32,7 +30,7 @@ func (s *gatewayStore) Store(gatewayID ttnpb.GatewayIdentifier, outgoingChannel 
 	s.mu.Unlock()
 }
 
-func (s *gatewayStore) fetch(gatewayID ttnpb.GatewayIdentifier) (outgoing, error) {
+func (s *gatewayStore) fetch(gatewayID ttnpb.GatewayIdentifier) (chan *ttnpb.GatewayDown, error) {
 	outgoingChannel, ok := s.store[gatewayID]
 	if !ok {
 		return nil, errors.New("Gateway not found")
@@ -41,7 +39,7 @@ func (s *gatewayStore) fetch(gatewayID ttnpb.GatewayIdentifier) (outgoing, error
 	return outgoingChannel, nil
 }
 
-func (s *gatewayStore) Fetch(gatewayID ttnpb.GatewayIdentifier) (outgoing, error) {
+func (s *gatewayStore) Fetch(gatewayID ttnpb.GatewayIdentifier) (chan *ttnpb.GatewayDown, error) {
 	s.mu.Lock()
 	res, err := s.fetch(gatewayID)
 	s.mu.Unlock()
@@ -90,7 +88,7 @@ type pool struct {
 func NewPool(logger log.Interface) Pool {
 	return &pool{
 		store: &gatewayStore{
-			store: map[ttnpb.GatewayIdentifier]outgoing{},
+			store: map[ttnpb.GatewayIdentifier]chan *ttnpb.GatewayDown{},
 			mu:    sync.Mutex{},
 		},
 
