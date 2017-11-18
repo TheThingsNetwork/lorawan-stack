@@ -12,20 +12,13 @@ import (
 )
 
 func (p *pool) Subscribe(gatewayInfo ttnpb.GatewayIdentifier, link PoolSubscription) chan *ttnpb.GatewayUp {
-	upstreamChannel := make(chan *ttnpb.GatewayUp)
-	downstreamChannel := make(outgoing)
-
-	p.store.Store(gatewayInfo, downstreamChannel)
-
-	var streamErr atomic.Value
-
 	c := connection{
 		Logger: p.logger.WithField("gateway_id", gatewayInfo.GatewayID),
 
 		GatewayInfo: gatewayInfo,
 
 		Link:      link,
-		StreamErr: &streamErr,
+		StreamErr: &atomicError{},
 	}
 
 	upstreamChannel := make(chan *ttnpb.GatewayUp)
@@ -52,20 +45,37 @@ type connection struct {
 	GatewayInfo ttnpb.GatewayIdentifier
 
 	Link      PoolSubscription
-	StreamErr *atomic.Value
+	StreamErr *atomicError
 }
 
-func (p *pool) sendingRoutine(c connection, downstreamChannel outgoing, readySignal chan bool) {
-	var signaledReady bool
-	defer func() {
-		if !signaledReady {
-			readySignal <- true
+type atomicError struct {
+	value atomic.Value
+}
+
+func (aerr *atomicError) Store(err error) {
+	aerr.value.Store(err)
+}
+
+func (aerr *atomicError) Load() error {
+	if v := aerr.value.Load(); v != nil {
+		err, ok := v.(error)
+		if !ok {
+			panic("atomicError value is not error type")
 		}
-	}()
+		return err
+	}
+	return nil
+}
+
 func (p *pool) sendingRoutine(c connection, downstreamChannel chan *ttnpb.GatewayDown, wg *sync.WaitGroup) {
 	wg.Done()
 
 	for {
+		if err := c.StreamErr.Load(); err != nil {
+			p.logger.WithError(err).Warn("Error encountered on stream, closing sending routine")
+			return
+		}
+
 		select {
 		case <-c.Link.Context().Done():
 			c.StreamErr.Store(c.Link.Context().Err())
@@ -91,9 +101,10 @@ func (p *pool) receivingRoutine(c connection, upstreamChannel chan *ttnpb.Gatewa
 	defer close(upstreamChannel)
 	wg.Done()
 
+	ctx := c.Link.Context()
 	for {
-		streamErr := c.StreamErr.Load()
-		if streamErr != nil {
+		if err := c.StreamErr.Load(); err != nil {
+			p.logger.WithError(err).Warn("Error encountered on stream, closing receiving routine")
 			return
 		}
 
