@@ -54,12 +54,14 @@ func TestDoneContextUplinks(t *testing.T) {
 	cancel()
 	emptyUplink := &ttnpb.GatewayUp{}
 	upstream := p.Subscribe(ttnpb.GatewayIdentifier{GatewayID: gatewayID}, link)
-
 	go func() { link.NextUplink <- emptyUplink }()
 	select {
-	case <-upstream:
-		t.Fail()
+	case _, ok := <-upstream:
+		if ok {
+			t.Fail()
+		}
 	default:
+		t.Fail()
 	}
 }
 
