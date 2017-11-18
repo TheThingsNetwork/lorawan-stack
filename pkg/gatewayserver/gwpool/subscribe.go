@@ -70,6 +70,7 @@ func (aerr *atomicError) Load() error {
 func (p *pool) sendingRoutine(c connection, downstreamChannel chan *ttnpb.GatewayDown, wg *sync.WaitGroup) {
 	wg.Done()
 
+	ctx := c.Link.Context()
 	for {
 		if err := c.StreamErr.Load(); err != nil {
 			p.logger.WithError(err).Warn("Error encountered on stream, closing sending routine")
@@ -77,8 +78,10 @@ func (p *pool) sendingRoutine(c connection, downstreamChannel chan *ttnpb.Gatewa
 		}
 
 		select {
-		case <-c.Link.Context().Done():
-			c.StreamErr.Store(c.Link.Context().Err())
+		case <-ctx.Done():
+			err := ctx.Err()
+			c.Logger.WithError(err).Warn("Link context done, closing sending routine")
+			c.StreamErr.Store(err)
 			p.store.Remove(c.GatewayInfo)
 			return
 		case outgoingMessage, ok := <-downstreamChannel:
@@ -115,6 +118,12 @@ func (p *pool) receivingRoutine(c connection, upstreamChannel chan *ttnpb.Gatewa
 		c.Logger.Debug("Received incoming message")
 
 		select {
+		case <-ctx.Done():
+			err := ctx.Err()
+			c.Logger.WithError(err).Warn("Link context done, closing receiving routine")
+			c.StreamErr.Store(err)
+			p.store.Remove(c.GatewayInfo)
+			return
 		case upstreamChannel <- upstreamMessage:
 		default:
 			c.Logger.Debug("No handler for upstream message, dropping message")
