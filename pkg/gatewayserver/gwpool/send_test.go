@@ -4,6 +4,7 @@ package gwpool_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/gwpool"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -15,7 +16,7 @@ import (
 func TestPoolDownlinks(t *testing.T) {
 	a := assertions.New(t)
 
-	p := gwpool.NewPool(test.GetLogger(t, "TestPoolDownlinks"))
+	p := gwpool.NewPool(test.GetLogger(t, "TestPoolDownlinks"), time.Millisecond)
 
 	gatewayID := "gateway"
 	link := &dummyLink{

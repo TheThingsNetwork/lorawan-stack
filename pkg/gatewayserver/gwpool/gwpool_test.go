@@ -54,7 +54,7 @@ func downlink() *ttnpb.DownlinkMessage {
 }
 
 func ExamplePool() {
-	p := gwpool.NewPool(log.Noop)
+	p := gwpool.NewPool(log.Noop, time.Millisecond)
 
 	gatewayInfo := ttnpb.GatewayIdentifier{GatewayID: "my-kerlink"}
 	upMessages := p.Subscribe(gatewayInfo, newPoolConnection())

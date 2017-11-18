@@ -3,6 +3,8 @@
 package gwpool
 
 import (
+	"time"
+
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
@@ -16,7 +18,7 @@ func (p *pool) Send(gatewayInfo ttnpb.GatewayIdentifier, downstream *ttnpb.Gatew
 	select {
 	case gateway <- downstream:
 		return nil
-	default:
-		return errors.New("Downlink could not be picked up by this gateway's sending routine")
+	case <-time.After(p.sendTimeout):
+		return errors.Errorf("Downlink could not be picked up by this gateway's sending routine in given time interval(%s)", p.sendTimeout)
 	}
 }

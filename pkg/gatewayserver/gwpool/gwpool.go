@@ -6,6 +6,7 @@ package gwpool
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
@@ -81,16 +82,18 @@ type Pool interface {
 type pool struct {
 	store *gatewayStore
 
-	logger log.Interface
+	sendTimeout time.Duration
+	logger      log.Interface
 }
 
 // NewPool returns a new empty gateway pool.
-func NewPool(logger log.Interface) Pool {
+func NewPool(logger log.Interface, sendTimeout time.Duration) Pool {
 	return &pool{
 		store: &gatewayStore{
 			store: map[ttnpb.GatewayIdentifier]chan *ttnpb.GatewayDown{},
 			mu:    sync.Mutex{},
 		},
+		sendTimeout: sendTimeout,
 
 		logger: logger,
 	}

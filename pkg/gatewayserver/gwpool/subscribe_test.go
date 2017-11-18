@@ -17,7 +17,7 @@ import (
 func TestPoolUplinks(t *testing.T) {
 	a := assertions.New(t)
 
-	p := gwpool.NewPool(test.GetLogger(t, "TestPoolUplinks"))
+	p := gwpool.NewPool(test.GetLogger(t, "TestPoolUplinks"), time.Millisecond)
 
 	gatewayID := "gateway"
 	link := &dummyLink{
@@ -39,7 +39,7 @@ func TestPoolUplinks(t *testing.T) {
 }
 
 func TestDoneContextUplinks(t *testing.T) {
-	p := gwpool.NewPool(test.GetLogger(t, "TestDoneContextUplinks"))
+	p := gwpool.NewPool(test.GetLogger(t, "TestDoneContextUplinks"), time.Millisecond)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -68,7 +68,7 @@ func TestDoneContextUplinks(t *testing.T) {
 }
 
 func TestSubscribeTwice(t *testing.T) {
-	p := gwpool.NewPool(test.GetLogger(t, "TestSubscribeTwice"))
+	p := gwpool.NewPool(test.GetLogger(t, "TestSubscribeTwice"), time.Millisecond)
 
 	gateway := ttnpb.GatewayIdentifier{GatewayID: "gateway"}
 
