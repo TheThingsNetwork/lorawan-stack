@@ -4,6 +4,7 @@ package gwpool
 
 import (
 	"io"
+	"sync"
 	"sync/atomic"
 
 	"github.com/TheThingsNetwork/ttn/pkg/log"
@@ -27,14 +28,21 @@ func (p *pool) Subscribe(gatewayInfo ttnpb.GatewayIdentifier, link PoolSubscript
 		StreamErr: &streamErr,
 	}
 
+	upstreamChannel := make(chan *ttnpb.GatewayUp)
+	downstreamChannel := make(chan *ttnpb.GatewayDown)
+
+	p.store.Store(gatewayInfo, downstreamChannel)
+
+	wg := &sync.WaitGroup{}
 	// Receiving on the stream
-	go p.receivingRoutine(c, upstreamChannel)
+	wg.Add(1)
+	go p.receivingRoutine(c, upstreamChannel, wg)
 
 	// Sending on the stream
-	sendingReady := make(chan bool, 1)
-	go p.sendingRoutine(c, downstreamChannel, sendingReady)
-	<-sendingReady
+	wg.Add(1)
+	go p.sendingRoutine(c, downstreamChannel, wg)
 
+	wg.Wait()
 	return upstreamChannel
 }
 
@@ -54,6 +62,8 @@ func (p *pool) sendingRoutine(c connection, downstreamChannel outgoing, readySig
 			readySignal <- true
 		}
 	}()
+func (p *pool) sendingRoutine(c connection, downstreamChannel chan *ttnpb.GatewayDown, wg *sync.WaitGroup) {
+	wg.Done()
 
 	for {
 		select {
@@ -73,14 +83,13 @@ func (p *pool) sendingRoutine(c connection, downstreamChannel outgoing, readySig
 				return
 			}
 			c.Logger.Debug("Sent outgoing message to the gateway")
-		case readySignal <- true:
-			signaledReady = true
 		}
 	}
 }
 
-func (p *pool) receivingRoutine(c connection, upstreamChannel chan *ttnpb.GatewayUp) {
+func (p *pool) receivingRoutine(c connection, upstreamChannel chan *ttnpb.GatewayUp, wg *sync.WaitGroup) {
 	defer close(upstreamChannel)
+	wg.Done()
 
 	for {
 		streamErr := c.StreamErr.Load()
