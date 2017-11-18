@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/gwpool"
-	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -17,7 +17,7 @@ import (
 func TestPoolUplinks(t *testing.T) {
 	a := assertions.New(t)
 
-	p := gwpool.NewPool(log.Noop)
+	p := gwpool.NewPool(test.GetLogger(t, "TestPoolUplinks"))
 
 	gatewayID := "gateway"
 	link := &dummyLink{
@@ -39,7 +39,7 @@ func TestPoolUplinks(t *testing.T) {
 }
 
 func TestDoneContextUplinks(t *testing.T) {
-	p := gwpool.NewPool(log.Noop)
+	p := gwpool.NewPool(test.GetLogger(t, "TestDoneContextUplinks"))
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -68,7 +68,7 @@ func TestDoneContextUplinks(t *testing.T) {
 }
 
 func TestSubscribeTwice(t *testing.T) {
-	p := gwpool.NewPool(log.Noop)
+	p := gwpool.NewPool(test.GetLogger(t, "TestSubscribeTwice"))
 
 	gateway := ttnpb.GatewayIdentifier{GatewayID: "gateway"}
 

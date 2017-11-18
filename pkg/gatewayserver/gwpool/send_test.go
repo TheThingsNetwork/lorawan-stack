@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/gwpool"
-	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -15,7 +15,7 @@ import (
 func TestPoolDownlinks(t *testing.T) {
 	a := assertions.New(t)
 
-	p := gwpool.NewPool(log.Noop)
+	p := gwpool.NewPool(test.GetLogger(t, "TestPoolDownlinks"))
 
 	gatewayID := "gateway"
 	link := &dummyLink{
