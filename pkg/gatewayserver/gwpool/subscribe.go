@@ -31,7 +31,7 @@ func (p *pool) Subscribe(gatewayInfo ttnpb.GatewayIdentifier, link PoolSubscript
 	go p.receivingRoutine(c, upstreamChannel)
 
 	// Sending on the stream
-	sendingReady := make(chan bool)
+	sendingReady := make(chan bool, 1)
 	go p.sendingRoutine(c, downstreamChannel, sendingReady)
 	<-sendingReady
 
