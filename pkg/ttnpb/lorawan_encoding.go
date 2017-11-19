@@ -19,6 +19,11 @@ func (msg MHDR) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	return append(dst, byte(msg.MType)<<5|byte(msg.Major)), nil
 }
 
+// MarshalLoRaWAN implements the encoding.LoRaWANMarshaler interface.
+func (msg MHDR) MarshalLoRaWAN() ([]byte, error) {
+	return msg.AppendLoRaWAN(make([]byte, 0, 1))
+}
+
 // UnmarshalLoRaWAN implements the encoding.LoRaWANUnmarshaler interface.
 func (msg *MHDR) UnmarshalLoRaWAN(b []byte) error {
 	if len(b) != 1 {
