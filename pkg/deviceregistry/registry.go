@@ -3,6 +3,7 @@
 package deviceregistry
 
 import (
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/mohae/deepcopy"
@@ -64,6 +65,11 @@ var newEndDevice store.NewResultFunc = func() interface{} {
 func (r *Registry) FindDeviceByIdentifiers(ids ...*ttnpb.EndDeviceIdentifiers) ([]*Device, error) {
 	if len(ids) == 0 {
 		return []*Device{}, nil
+	}
+	for i, id := range ids {
+		if id == nil {
+			return nil, errors.Errorf("Identifier %d is nil", i)
+		}
 	}
 
 	// Find devices matching the first filter
