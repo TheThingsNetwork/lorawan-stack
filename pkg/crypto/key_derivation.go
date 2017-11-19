@@ -55,12 +55,14 @@ func DeriveAppSKey(key types.AES128Key, jn types.JoinNonce, joinEUI types.EUI64,
 
 // DeriveLegacyAppSKey derives the LoRaWAN Application Session Key
 // - If a LoRaWAN 1.0 device joins a LoRaWAN 1.0/1.1 network, the AppKey is used as "key"
+// - If a LoRaWAN 1.1 device joins a LoRaWAN 1.0 network, the NwkKey is used as "key"
 func DeriveLegacyAppSKey(key types.AES128Key, jn types.JoinNonce, nid types.NetID, dn types.DevNonce) types.AES128Key {
 	return deriveLegacySKey(key, 0x02, jn, nid, dn)
 }
 
-// DeriveLegacyNwkSKey derives the LoRaWAN 1.0 Network Session Key
-// - Here the AppNonce is entered as JoinNonce
+// DeriveLegacyNwkSKey derives the LoRaWAN 1.0 Network Session Key. AppNonce is entered as JoinNonce.
+// - If a LoRaWAN 1.0 device joins a LoRaWAN 1.0/1.1 network, the AppKey is used as "key"
+// - If a LoRaWAN 1.1 device joins a LoRaWAN 1.0 network, the NwkKey is used as "key"
 func DeriveLegacyNwkSKey(appKey types.AES128Key, jn types.JoinNonce, nid types.NetID, dn types.DevNonce) types.AES128Key {
 	return deriveLegacySKey(appKey, 0x01, jn, nid, dn)
 }
