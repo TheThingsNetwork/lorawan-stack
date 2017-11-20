@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/errors/grpcerrors"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/fillcontext"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/rpclog"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/sentry"
@@ -98,6 +99,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 			MaxConnectionAge:  24 * time.Hour,
 		}),
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
+			grpcerrors.StreamServerInterceptor(),
 			grpc_ctxtags.StreamServerInterceptor(ctxtagsOpts...),
 			fillcontext.StreamServerInterceptor(options.contextFiller),
 			grpc_prometheus.StreamServerInterceptor,
@@ -109,6 +111,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 			grpc_recovery.StreamServerInterceptor(recoveryOpts...),
 		)),
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
+			grpcerrors.UnaryServerInterceptor(),
 			grpc_ctxtags.UnaryServerInterceptor(ctxtagsOpts...),
 			fillcontext.UnaryServerInterceptor(options.contextFiller),
 			grpc_prometheus.UnaryServerInterceptor,
