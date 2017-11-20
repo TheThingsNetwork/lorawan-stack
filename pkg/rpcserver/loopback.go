@@ -9,11 +9,11 @@ import (
 )
 
 // StartLoopback starts the server on a local address and returns a connection to that address
-func StartLoopback(s *grpc.Server) (*grpc.ClientConn, error) {
+func StartLoopback(s *grpc.Server, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
 	lis, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		return nil, err
 	}
 	go s.Serve(lis)
-	return grpc.Dial(lis.Addr().String(), grpc.WithInsecure())
+	return grpc.Dial(lis.Addr().String(), append(opts, grpc.WithInsecure())...)
 }
