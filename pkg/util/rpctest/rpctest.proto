@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package rpctest;
+
+option go_package = "github.com/TheThingsNetwork/ttn/pkg/util/rpctest";
+
+service FooBar {
+  rpc Unary (Foo) returns (Bar) {}
+  rpc ClientStream (stream Foo) returns (Bar) {}
+  rpc ServerStream (Foo) returns (stream Bar) {}
+  rpc BidiStream (stream Foo) returns (stream Bar) {}
+}
+
+message Foo {
+  string message = 1;
+}
+
+message Bar {
+  string message = 1;
+}
