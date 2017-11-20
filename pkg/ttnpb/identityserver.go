@@ -187,8 +187,8 @@ func (req *RemoveApplicationAPIKeyRequest) Validate() error {
 func (req *SetApplicationCollaboratorRequest) Validate() error {
 	return validate.All(
 		validate.Field(req.ApplicationID, validate.ID).DescribeFieldName("Application ID"),
-		validate.Field(req.UserID, validate.ID).DescribeFieldName("User ID"),
-		validate.Field(req.Rights, validate.NotRequired, validate.In(AllApplicationRights)).DescribeFieldName("Rights"),
+		validate.Field(req.Collaborator.UserID, validate.ID).DescribeFieldName("User ID"),
+		validate.Field(req.Collaborator.Rights, validate.NotRequired, validate.In(AllApplicationRights)).DescribeFieldName("Rights"),
 	)
 }
 
@@ -308,8 +308,8 @@ func (req *RemoveGatewayAPIKeyRequest) Validate() error {
 func (req *SetGatewayCollaboratorRequest) Validate() error {
 	return validate.All(
 		validate.Field(req.GatewayID, validate.ID).DescribeFieldName("Gateway ID"),
-		validate.Field(req.UserID, validate.ID).DescribeFieldName("User ID"),
-		validate.Field(req.Rights, validate.NotRequired, validate.In(AllGatewayRights)).DescribeFieldName("Rights"),
+		validate.Field(req.Collaborator.UserID, validate.ID).DescribeFieldName("User ID"),
+		validate.Field(req.Collaborator.Rights, validate.NotRequired, validate.In(AllGatewayRights)).DescribeFieldName("Rights"),
 	)
 }
 
