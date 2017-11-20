@@ -19,7 +19,7 @@ import fmt "fmt"
 import math "math"
 
 import (
-	context "golang.org/x/net/context"
+	context "context"
 	grpc "google.golang.org/grpc"
 )
 
@@ -520,7 +520,7 @@ func encodeVarintRpctest(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedFoo(r randyRpctest, easy bool) *Foo {
 	this := &Foo{}
-	this.Message = string(randStringRpctest(r))
+	this.Message = randStringRpctest(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -528,7 +528,7 @@ func NewPopulatedFoo(r randyRpctest, easy bool) *Foo {
 
 func NewPopulatedBar(r randyRpctest, easy bool) *Bar {
 	this := &Bar{}
-	this.Message = string(randStringRpctest(r))
+	this.Message = randStringRpctest(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -600,7 +600,7 @@ func randFieldRpctest(dAtA []byte, r randyRpctest, fieldNumber int, wire int) []
 }
 func encodeVarintPopulateRpctest(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -637,7 +637,7 @@ func sovRpctest(x uint64) (n int) {
 	return n
 }
 func sozRpctest(x uint64) (n int) {
-	return sovRpctest(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovRpctest((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (m *Foo) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

@@ -11,7 +11,7 @@ go.protos: $(wildcard $(PROTO_DIR)/*.proto)
 	$(PROTOC) $(GO_PROTOC_FLAGS) $(PROTO_DIR)/*.proto
 	$(MAKE_DIR)/protos/fix-grpc-gateway-names.sh $(PROTO_DIR)
 	perl -i -pe 's:golang.org/x/net/context:context:' `find ./pkg -name '*pb.go' | grep -v 'vendor'`
-	unconvert -apply ./pkg/ttnpb/...
+	unconvert -apply ./pkg/ttnpb/... ./pkg/util/rpctest/...
 	gofmt -w -s $(PWD)/pkg/ttnpb
 
 go.protos.clean:
