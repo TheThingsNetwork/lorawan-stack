@@ -3,35 +3,61 @@
 package ttnpb
 
 import (
-	"reflect"
+	"regexp"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/validate"
 )
 
-// FullMask sets all the fields of the mask to true.
-func (m *IdentityServerSettingsMask) FullMask() {
-	value := reflect.ValueOf(m).Elem()
+var (
+	// FieldPathSettingsBlacklistedIDs is the field path for the blacklisted IDs field.
+	FieldPathSettingsBlacklistedIDs = regexp.MustCompile(`^blacklisted_ids$`)
 
-	for i := 0; i < value.NumField(); i++ {
-		value.Field(i).SetBool(true)
-	}
-}
+	// FieldPathSettingsAutomaticApproval is the field path for the automatic approval field.
+	FieldPathSettingsAutomaticApproval = regexp.MustCompile(`^automatic_approval$`)
+
+	// FieldPathSettingsClosedRegistration is the field path for the closed registration field.
+	FieldPathSettingsClosedRegistration = regexp.MustCompile(`^closed_registration$`)
+
+	// FieldPathSettingsValidationTokenTTL is the field path for the validation token TTL field.
+	FieldPathSettingsValidationTokenTTL = regexp.MustCompile(`^validation_token_ttl$`)
+
+	// FieldPathSettingsAllowedEmails is the field path for the allowed emails field.
+	FieldPathSettingsAllowedEmails = regexp.MustCompile(`^allowed_emails$`)
+)
 
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *UpdateSettingsRequest) Validate() error {
 	mask := req.GetUpdateMask()
-	if reflect.DeepEqual(mask, IdentityServerSettingsMask{}) {
+	paths := mask.GetPaths()
+
+	if paths == nil || len(paths) == 0 {
 		return ErrEmptyUpdateMask.New(nil)
 	}
 
 	validations := make([]validate.Errors, 0)
-	if mask.BlacklistedIDs {
-		for _, id := range req.Settings.BlacklistedIDs {
-			err := validate.Field(id, validate.ID).DescribeFieldName("Blacklisted ID")
-			if err != nil {
-				validations = append(validations, err)
+
+	var err validate.Errors
+	for _, path := range paths {
+		switch true {
+		case FieldPathSettingsBlacklistedIDs.MatchString(path):
+			for _, id := range req.Settings.BlacklistedIDs {
+				err := validate.Field(id, validate.ID).DescribeFieldName("Blacklisted ID")
+				if err != nil {
+					validations = append(validations, err)
+				}
 			}
+		case FieldPathSettingsAutomaticApproval.MatchString(path),
+			FieldPathSettingsClosedRegistration.MatchString(path),
+			FieldPathSettingsValidationTokenTTL.MatchString(path),
+			FieldPathSettingsAllowedEmails.MatchString(path):
+		default:
+			return ErrInvalidPathUpdateMask.New(errors.Attributes{
+				"path": path,
+			})
 		}
+
+		validations = append(validations, err)
 	}
 
 	return validate.All(validations...)
@@ -49,17 +75,31 @@ func (req *CreateUserRequest) Validate() error {
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *UpdateUserRequest) Validate() error {
 	mask := req.GetUpdateMask()
-	if reflect.DeepEqual(mask, UserMask{}) {
+	paths := mask.GetPaths()
+
+	if paths == nil || len(paths) == 0 {
 		return ErrEmptyUpdateMask.New(nil)
 	}
 
 	validations := make([]validate.Errors, 0)
 
-	if mask.Email {
-		err := validate.Field(req.User.Email, validate.Email).DescribeFieldName("Email")
-		if err != nil {
-			validations = append(validations, err)
+	if err := validate.Field(req.User.UserID, validate.ID).DescribeFieldName("User ID"); err != nil {
+		validations = append(validations, err)
+	}
+
+	var err validate.Errors
+	for _, path := range paths {
+		switch true {
+		case FieldPathUserName.MatchString(path):
+		case FieldPathUserEmail.MatchString(path):
+			err = validate.Field(req.User.Email, validate.Email).DescribeFieldName("Email")
+		default:
+			return ErrInvalidPathUpdateMask.New(errors.Attributes{
+				"path": path,
+			})
 		}
+
+		validations = append(validations, err)
 	}
 
 	return validate.All(validations...)
@@ -86,11 +126,29 @@ func (req *CreateApplicationRequest) Validate() error {
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *UpdateApplicationRequest) Validate() error {
 	mask := req.GetUpdateMask()
-	if reflect.DeepEqual(mask, ApplicationMask{}) {
+	paths := mask.GetPaths()
+
+	if paths == nil || len(paths) == 0 {
 		return ErrEmptyUpdateMask.New(nil)
 	}
 
-	return nil
+	validations := make([]validate.Errors, 0)
+
+	if err := validate.Field(req.Application.ApplicationID, validate.ID).DescribeFieldName("Application ID"); err != nil {
+		validations = append(validations, err)
+	}
+
+	for _, path := range paths {
+		switch true {
+		case FieldPathApplicationDescription.MatchString(path):
+		default:
+			return ErrInvalidPathUpdateMask.New(errors.Attributes{
+				"path": path,
+			})
+		}
+	}
+
+	return validate.All(validations...)
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.
@@ -105,29 +163,32 @@ func (req *GenerateApplicationAPIKeyRequest) Validate() error {
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *UpdateApplicationAPIKeyRequest) Validate() error {
 	mask := req.GetUpdateMask()
-	if reflect.DeepEqual(mask, APIKeyMask{}) {
+	paths := mask.GetPaths()
+
+	if paths == nil || len(paths) == 0 {
 		return ErrEmptyUpdateMask.New(nil)
 	}
 
 	validations := make([]validate.Errors, 0)
 
-	err := validate.Field(req.ApplicationID, validate.ID).DescribeFieldName("Application ID")
-	if err != nil {
+	if err := validate.Field(req.ApplicationID, validate.ID).DescribeFieldName("Application ID"); err != nil {
 		validations = append(validations, err)
 	}
 
-	if mask.Name {
-		err := validate.Field(req.Key.Name, validate.Required).DescribeFieldName("Key name")
-		if err != nil {
-			validations = append(validations, err)
+	var err validate.Errors
+	for _, path := range paths {
+		switch true {
+		case FieldPathAPIKeyName.MatchString(path):
+			err = validate.Field(req.Key.Name, validate.Required).DescribeFieldName("Key name")
+		case FieldPathAPIKeyRights.MatchString(path):
+			err = validate.Field(req.Key.Rights, validate.MinLength(1), validate.In(AllApplicationRights)).DescribeFieldName("Rights")
+		default:
+			return ErrInvalidPathUpdateMask.New(errors.Attributes{
+				"path": path,
+			})
 		}
-	}
 
-	if mask.Rights {
-		err := validate.Field(req.Key.Rights, validate.MinLength(1), validate.In(AllApplicationRights)).DescribeFieldName("Key rights")
-		if err != nil {
-			validations = append(validations, err)
-		}
+		validations = append(validations, err)
 	}
 
 	return validate.All(validations...)
@@ -162,29 +223,50 @@ func (req *CreateGatewayRequest) Validate() error {
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *UpdateGatewayRequest) Validate() error {
 	mask := req.GetUpdateMask()
-	if reflect.DeepEqual(mask, GatewayMask{}) {
+	paths := mask.GetPaths()
+
+	if paths == nil || len(paths) == 0 {
 		return ErrEmptyUpdateMask.New(nil)
 	}
 
 	validations := make([]validate.Errors, 0)
 
-	err := validate.Field(req.Gateway.GatewayID, validate.ID).DescribeFieldName("Gateway ID")
-	if err != nil {
+	if err := validate.Field(req.Gateway.GatewayID, validate.ID).DescribeFieldName("Gateway ID"); err != nil {
 		validations = append(validations, err)
 	}
 
-	if mask.FrequencyPlanID {
-		err := validate.Field(req.Gateway.FrequencyPlanID, validate.Required).DescribeFieldName("Frequency plan ID")
-		if err != nil {
-			validations = append(validations, err)
+	var err validate.Errors
+	for _, path := range paths {
+		switch true {
+		case FieldPathGatewayDescription.MatchString(path):
+		case FieldPathGatewayFrequencyPlanID.MatchString(path):
+			err = validate.Field(req.Gateway.FrequencyPlanID, validate.Required).DescribeFieldName("Frequency plan ID")
+		case FieldPathGatewayPrivacySettingsStatusPublic.MatchString(path),
+			FieldPathGatewayPrivacySettingsLocationPublic.MatchString(path),
+			FieldPathGatewayPrivacySettingsContactable.MatchString(path),
+			FieldPathGatewayAutoUpdate.MatchString(path),
+			FieldPathGatewayPlatform.MatchString(path),
+			FieldPathGatewayAntennaGain.MatchString(path),
+			FieldPathGatewayAntennaLocationLatitude.MatchString(path),
+			FieldPathGatewayAntennaLocationLongitude.MatchString(path),
+			FieldPathGatewayAntennaLocationAltitude.MatchString(path),
+			FieldPathGatewayAntennaLocationAccuracy.MatchString(path),
+			FieldPathGatewayAntennaLocationSource.MatchString(path),
+			FieldPathGatewayAntennaType.MatchString(path),
+			FieldPathGatewayAntennaModel.MatchString(path),
+			FieldPathGatewayAntennaPlacement.MatchString(path),
+			FieldPathGatewayAttributes.MatchString(path):
+		case FieldPathGatewayClusterAddress.MatchString(path):
+			err = validate.Field(req.Gateway.ClusterAddress, validate.Required).DescribeFieldName("Cluster adddress")
+		case FieldPathGatewayContactAccountUserID.MatchString(path):
+			err = validate.Field(req.Gateway.ContactAccount.UserID, validate.NotRequired, validate.ID).DescribeFieldName("Contact account: user ID")
+		default:
+			return ErrInvalidPathUpdateMask.New(errors.Attributes{
+				"path": path,
+			})
 		}
-	}
 
-	if mask.ClusterAddress {
-		err := validate.Field(req.Gateway.ClusterAddress, validate.Required).DescribeFieldName("Cluster address")
-		if err != nil {
-			validations = append(validations, err)
-		}
+		validations = append(validations, err)
 	}
 
 	return validate.All(validations...)
@@ -202,29 +284,32 @@ func (req *GenerateGatewayAPIKeyRequest) Validate() error {
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *UpdateGatewayAPIKeyRequest) Validate() error {
 	mask := req.GetUpdateMask()
-	if reflect.DeepEqual(mask, APIKeyMask{}) {
+	paths := mask.GetPaths()
+
+	if paths == nil || len(paths) == 0 {
 		return ErrEmptyUpdateMask.New(nil)
 	}
 
 	validations := make([]validate.Errors, 0)
 
-	err := validate.Field(req.GatewayID, validate.ID).DescribeFieldName("Gateway ID")
-	if err != nil {
+	if err := validate.Field(req.GatewayID, validate.ID).DescribeFieldName("Gateway ID"); err != nil {
 		validations = append(validations, err)
 	}
 
-	if mask.Name {
-		err := validate.Field(req.Key.Name, validate.Required).DescribeFieldName("Key name")
-		if err != nil {
-			validations = append(validations, err)
+	var err validate.Errors
+	for _, path := range paths {
+		switch true {
+		case FieldPathAPIKeyName.MatchString(path):
+			err = validate.Field(req.Key.Name, validate.Required).DescribeFieldName("Key name")
+		case FieldPathAPIKeyRights.MatchString(path):
+			err = validate.Field(req.Key.Rights, validate.MinLength(1), validate.In(AllGatewayRights)).DescribeFieldName("Rights")
+		default:
+			return ErrInvalidPathUpdateMask.New(errors.Attributes{
+				"path": path,
+			})
 		}
-	}
 
-	if mask.Rights {
-		err := validate.Field(req.Key.Rights, validate.MinLength(1), validate.In(AllGatewayRights)).DescribeFieldName("Key rights")
-		if err != nil {
-			validations = append(validations, err)
-		}
+		validations = append(validations, err)
 	}
 
 	return validate.All(validations...)
@@ -287,36 +372,34 @@ func (req *CreateClientRequest) Validate() error {
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *UpdateClientRequest) Validate() error {
 	mask := req.GetUpdateMask()
-	if reflect.DeepEqual(mask, ClientMask{}) {
+	paths := mask.GetPaths()
+
+	if paths == nil || len(paths) == 0 {
 		return ErrEmptyUpdateMask.New(nil)
 	}
 
 	validations := make([]validate.Errors, 0)
 
-	err := validate.Field(req.Client.ClientID, validate.ID).DescribeFieldName("Client ID")
-	if err != nil {
+	if err := validate.Field(req.Client.ClientID, validate.ID).DescribeFieldName("Client ID"); err != nil {
 		validations = append(validations, err)
 	}
 
-	if mask.Description {
-		err := validate.Field(req.Client.Description, validate.Required).DescribeFieldName("Description")
-		if err != nil {
-			validations = append(validations, err)
+	var err validate.Errors
+	for _, path := range paths {
+		switch true {
+		case FieldPathClientDescription.MatchString(path):
+			err = validate.Field(req.Client.Description, validate.Required).DescribeFieldName("Description")
+		case FieldPathClientRedirectURI.MatchString(path):
+			err = validate.Field(req.Client.RedirectURI, validate.Required).DescribeFieldName("Redirect URI")
+		case FieldPathClientRights.MatchString(path):
+			err = validate.Field(req.Client.Rights, validate.MinLength(1), validate.In(validClientRights)).DescribeFieldName("Rights")
+		default:
+			return ErrInvalidPathUpdateMask.New(errors.Attributes{
+				"path": path,
+			})
 		}
-	}
 
-	if mask.RedirectURI {
-		err := validate.Field(req.Client.RedirectURI, validate.Required).DescribeFieldName("Redirect URI")
-		if err != nil {
-			validations = append(validations, err)
-		}
-	}
-
-	if mask.Rights {
-		err := validate.Field(req.Client.Rights, validate.MinLength(1), validate.In(validClientRights)).DescribeFieldName("Rights")
-		if err != nil {
-			validations = append(validations, err)
-		}
+		validations = append(validations, err)
 	}
 
 	return validate.All(validations...)

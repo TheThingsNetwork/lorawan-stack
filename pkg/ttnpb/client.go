@@ -2,6 +2,8 @@
 
 package ttnpb
 
+import "regexp"
+
 // GetClient returns the base Client itself.
 func (c *Client) GetClient() *Client {
 	return c
@@ -31,3 +33,14 @@ func (c *Client) HasGrant(grant GrantType) bool {
 
 	return false
 }
+
+var (
+	// FieldPathClientDescription is the field path for the client description field.
+	FieldPathClientDescription = regexp.MustCompile(`^description$`)
+
+	// FieldPathClientRedirectURI is the field path for the client redirect URI field.
+	FieldPathClientRedirectURI = regexp.MustCompile(`^redirect_uri$`)
+
+	// FieldPathClientRights is the field path for the client rights field.
+	FieldPathClientRights = regexp.MustCompile(`^rights$`)
+)

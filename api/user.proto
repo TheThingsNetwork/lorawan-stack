@@ -47,9 +47,3 @@ message User {
   // This is a read-only field.
   google.protobuf.Timestamp archived_at = 9 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
-
-message UserMask {
-  bool email = 1;
-  bool name = 2;
-  reserved 3,4; // RFU: validated_at, admin
-}

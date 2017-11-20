@@ -21,11 +21,6 @@ message APIKey {
   repeated Right rights = 3;
 }
 
-message APIKeyMask {
-  bool name = 1;
-  bool rights = 2;
-}
-
 // Right is the enum that defines all the different rights to do something in
 // the network.
 enum Right {

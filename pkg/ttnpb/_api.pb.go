@@ -30,7 +30,6 @@ It is generated from these files:
 
 It has these top-level messages:
 	Application
-	ApplicationMask
 	ApplicationUp
 	ApplicationUplink
 	ApplicationDownlink
@@ -49,7 +48,6 @@ It has these top-level messages:
 	MACState
 	MACInfo
 	Gateway
-	GatewayMask
 	GatewayPrivacySettings
 	GatewayAntenna
 	GatewayConfiguration
@@ -65,7 +63,6 @@ It has these top-level messages:
 	EndDeviceIdentifiers
 	ClientIdentifier
 	IdentityServerSettings
-	IdentityServerSettingsMask
 	GetSettingsRequest
 	UpdateSettingsRequest
 	CreateUserRequest
@@ -112,11 +109,9 @@ It has these top-level messages:
 	TxMetadata
 	Location
 	APIKey
-	APIKeyMask
 	TokenKeyRequest
 	TokenKeyResponse
 	User
-	UserMask
 */
 package ttnpb
 

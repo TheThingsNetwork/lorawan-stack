@@ -74,25 +74,6 @@ message Gateway {
   google.protobuf.Timestamp archived_at = 15 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
-message GatewayMask {
-  bool description = 1;
-  bool frequency_plan_id = 2 [(gogoproto.customname) = "FrequencyPlanID"];
-
-  message PrivacySettingsMask {
-    bool status_public = 1;
-    bool location_public = 2;
-    bool contactable = 3;
-  }
-  PrivacySettingsMask privacy_settings = 3 [(gogoproto.nullable) = false];
-
-  bool auto_update = 4;
-  bool platform = 5;
-  bool antennas = 6;
-  bool attributes = 7;
-  bool cluster_address = 8;
-  bool contact_account = 9;
-}
-
 // GatewayPrivacySettings is the message that defines the different privacy settings
 // of the gateway such as if the owner information or gateway location are public.
 message GatewayPrivacySettings {

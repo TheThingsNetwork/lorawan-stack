@@ -12,6 +12,7 @@ import "github.com/TheThingsNetwork/ttn/api/gateway.proto";
 import "github.com/TheThingsNetwork/ttn/api/user.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/duration.proto";
+import "google/protobuf/field_mask.proto";
 
 package ttn.v3;
 
@@ -44,20 +45,10 @@ message IdentityServerSettings {
   repeated string allowed_emails = 5;
 }
 
-// IdentityServerSettingsMask is the message that defines the FieldMask that
-// can be used for the Get and Update operations of the Identity Server settings.
-message IdentityServerSettingsMask {
-  bool blacklisted_ids = 1 [(gogoproto.customname) = "BlacklistedIDs"];
-  bool automatic_approval = 2;
-  bool closed_registration = 3;
-  bool validation_token_ttl = 4 [(gogoproto.customname) = "ValidationTokenTTL"];
-  bool allowed_emails = 5;
-}
-
 message GetSettingsRequest {
-  // projection_mask is the symbolic set of fields that will be returned in the
-  // operation. If the list is empty all settings will be returned.
-  IdentityServerSettingsMask projection_mask = 1;
+  // projection_mask is the set of field paths that represents the settings that
+  // will be returned in the operation. If the list is empty all settings will be returned.
+  google.protobuf.FieldMask projection_mask = 1;
 }
 
 message UpdateSettingsRequest {
@@ -67,7 +58,7 @@ message UpdateSettingsRequest {
   // update_mask is the symbolic set of fields that will be affected in the update
   // operation. Fields not included in the update_mask are not changed and ignored
   // in the request. Must be non-empty.
-  IdentityServerSettingsMask update_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask update_mask = 2 [(gogoproto.nullable) = false];
 }
 
 // IsSettings is the service that provided methods to manage the settings of an
@@ -98,7 +89,7 @@ message UpdateUserRequest {
   // update_mask is the symbolic set of fields that will be affected in the update
   // operation. Fields not included in the update_mask are not changed and ignored
   // in the request. Must be non-empty.
-  UserMask update_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask update_mask = 2 [(gogoproto.nullable) = false];
 }
 
 message UpdateUserPasswordRequest {
@@ -169,10 +160,10 @@ message UpdateApplicationRequest {
   // application is the application to be updated.
   Application application = 1 [(gogoproto.nullable) = false];
 
-  // update_mask is the symbolic set of fields that will be affected in the update
+  // update_mask is the set of field paths that will be affected in the update
   // operation. Fields not included in the update_mask are not changed and ignored
   // in the request. Must be non-empty.
-  ApplicationMask update_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask update_mask = 2 [(gogoproto.nullable) = false];
 }
 
 message GenerateApplicationAPIKeyRequest {
@@ -196,7 +187,7 @@ message UpdateApplicationAPIKeyRequest {
   // update_mask is the symbolic set of fields that will be affected in the update
   // operation. Fields not included in the update_mask are not changed and ignored
   // in the request. Must be non-empty.
-  APIKeyMask update_mask = 3 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask update_mask = 3 [(gogoproto.nullable) = false];
 }
 
 message RemoveApplicationAPIKeyRequest {
@@ -272,10 +263,10 @@ message UpdateGatewayRequest {
   // gateway is the gateway to be updated.
   Gateway gateway = 1 [(gogoproto.nullable) = false];
 
-  // update_mask is the symbolic set of fields that will be affected in the update
+  // update_mask is the set of field paths that will be affected in the update
   // operation. Fields not included in the update_mask are not changed and ignored
   // in the request. Must be non-empty.
-  GatewayMask update_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask update_mask = 2 [(gogoproto.nullable) = false];
 }
 
 message GenerateGatewayAPIKeyRequest {
@@ -299,7 +290,7 @@ message UpdateGatewayAPIKeyRequest {
   // update_mask is the symbolic set of fields that will be affected in the update
   // operation. Fields not included in the update_mask are not changed and ignored
   // in the request. Must be non-empty.
-  APIKeyMask update_mask = 3 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask update_mask = 3 [(gogoproto.nullable) = false];
 }
 
 message RemoveGatewayAPIKeyRequest {
@@ -375,10 +366,10 @@ message UpdateClientRequest {
   // client is the client to be updated.
   Client client = 1 [(gogoproto.nullable) = false];
 
-  // update_mask is the symbolic set of fields that will be affected in the update
+  // update_mask is the set of field paths that will be affected in the update
   // operation. Fields not included in the update_mask are not changed and ignored
   // in the request. Must be non-empty.
-  ClientMask update_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask update_mask = 2 [(gogoproto.nullable) = false];
 }
 
 // IsClient is the interface that provides methods to manage third-party clients

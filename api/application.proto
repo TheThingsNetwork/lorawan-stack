@@ -39,10 +39,6 @@ message Application {
   google.protobuf.Timestamp archived_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
-message ApplicationMask {
-  bool description = 1;
-}
-
 // ApplicationUp wraps multiple application-layer uplink types
 message ApplicationUp {
   oneof up {

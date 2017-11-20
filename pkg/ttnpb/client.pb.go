@@ -622,11 +622,11 @@ func NewPopulatedClient(r randyClient, easy bool) *Client {
 	this := &Client{}
 	v1 := NewPopulatedClientIdentifier(r, easy)
 	this.ClientIdentifier = *v1
-	this.Description = randStringClient(r)
-	this.Secret = randStringClient(r)
-	this.RedirectURI = randStringClient(r)
+	this.Description = string(randStringClient(r))
+	this.Secret = string(randStringClient(r))
+	this.RedirectURI = string(randStringClient(r))
 	this.State = ClientState([]int32{0, 1, 2}[r.Intn(3)])
-	this.OfficialLabeled = bool(r.Intn(2) == 0)
+	this.OfficialLabeled = bool(bool(r.Intn(2) == 0))
 	v2 := r.Intn(10)
 	this.Grants = make([]GrantType, v2)
 	for i := 0; i < v2; i++ {
@@ -637,7 +637,7 @@ func NewPopulatedClient(r randyClient, easy bool) *Client {
 	for i := 0; i < v3; i++ {
 		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
 	}
-	this.Creator = randStringClient(r)
+	this.Creator = string(randStringClient(r))
 	v4 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.CreatedAt = *v4
 	v5 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
@@ -651,9 +651,9 @@ func NewPopulatedClient(r randyClient, easy bool) *Client {
 
 func NewPopulatedClientMask(r randyClient, easy bool) *ClientMask {
 	this := &ClientMask{}
-	this.Description = bool(r.Intn(2) == 0)
-	this.RedirectURI = bool(r.Intn(2) == 0)
-	this.Rights = bool(r.Intn(2) == 0)
+	this.Description = bool(bool(r.Intn(2) == 0))
+	this.RedirectURI = bool(bool(r.Intn(2) == 0))
+	this.Rights = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -725,7 +725,7 @@ func randFieldClient(dAtA []byte, r randyClient, fieldNumber int, wire int) []by
 }
 func encodeVarintPopulateClient(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -807,7 +807,7 @@ func sovClient(x uint64) (n int) {
 	return n
 }
 func sozClient(x uint64) (n int) {
-	return sovClient((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovClient(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (m *Client) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

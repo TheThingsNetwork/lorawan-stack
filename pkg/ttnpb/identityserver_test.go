@@ -5,59 +5,42 @@ package ttnpb
 import (
 	"testing"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
-func TestSettingsMask(t *testing.T) {
-	a := assertions.New(t)
-
-	mask := new(IdentityServerSettingsMask)
-	mask.FullMask()
-	a.So(mask, should.Resemble, &IdentityServerSettingsMask{
-		BlacklistedIDs:     true,
-		AutomaticApproval:  true,
-		ClosedRegistration: true,
-		ValidationTokenTTL: true,
-		AllowedEmails:      true,
-	})
-}
-
 func TestSettingsValidations(t *testing.T) {
 	a := assertions.New(t)
 
-	// empty update mask (bad)
-	req := &UpdateSettingsRequest{}
-	a.So(ErrEmptyUpdateMask.Describes(req.Validate()), should.BeTrue)
+	{
+		// empty request without update mask (bad)
+		req := &UpdateSettingsRequest{}
+		err := req.Validate()
+		a.So(err, should.NotBeNil)
+		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
 
-	// empty update mask (bad)
-	req = &UpdateSettingsRequest{
-		UpdateMask: IdentityServerSettingsMask{},
+		// request with an invalid path in the update mask (bad)
+		req = &UpdateSettingsRequest{
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"name", "foo"},
+			},
+		}
+		err = req.Validate()
+		a.So(err, should.NotBeNil)
+		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+
+		// good request
+		req = &UpdateSettingsRequest{
+			Settings: IdentityServerSettings{
+				AutomaticApproval: true,
+			},
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"automatic_approval"},
+			},
+		}
+		a.So(req.Validate(), should.BeNil)
 	}
-	a.So(ErrEmptyUpdateMask.Describes(req.Validate()), should.BeTrue)
-
-	// request with not valid ids (bad)
-	req = &UpdateSettingsRequest{
-		Settings: IdentityServerSettings{
-			BlacklistedIDs: []string{"s", "webui"},
-		},
-		UpdateMask: IdentityServerSettingsMask{
-			BlacklistedIDs: true,
-		},
-	}
-	a.So(req.Validate(), should.NotBeNil)
-
-	// good request
-	req = &UpdateSettingsRequest{
-		Settings: IdentityServerSettings{
-			BlacklistedIDs: []string{"webui", "self"},
-		},
-		UpdateMask: IdentityServerSettingsMask{
-			BlacklistedIDs: true,
-		},
-	}
-	a.So(req.Validate(), should.BeNil)
-
 }
 
 func TestUserValidations(t *testing.T) {
@@ -92,20 +75,30 @@ func TestUserValidations(t *testing.T) {
 	}
 
 	{
-		// empty request with empty update mask (bad)
+		// empty request without update mask (bad)
 		req := &UpdateUserRequest{}
 		err := req.Validate()
 		a.So(err, should.NotBeNil)
 		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
 
+		// request with an invalid path in the update mask (bad)
+		req = &UpdateUserRequest{
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"name", "foo"},
+			},
+		}
+		err = req.Validate()
+		a.So(err, should.NotBeNil)
+		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+
 		// good request
 		req = &UpdateUserRequest{
 			User: User{
-				Email: "alice@ttn.com",
+				UserIdentifier: UserIdentifier{"alice"},
+				Email:          "alice@ttn.com",
 			},
-			UpdateMask: UserMask{
-				Name:  true,
-				Email: true,
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"name", "email"},
 			},
 		}
 		a.So(req.Validate(), should.BeNil)
@@ -161,7 +154,7 @@ func TestApplicationValidations(t *testing.T) {
 	}
 
 	{
-		// request with empty update mask (bad)
+		// request without update mask (bad)
 		req := &UpdateApplicationRequest{
 			Application: Application{
 				ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
@@ -171,13 +164,26 @@ func TestApplicationValidations(t *testing.T) {
 		a.So(err, should.NotBeNil)
 		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
 
+		// request with an invalid update mask (bad)
+		req = &UpdateApplicationRequest{
+			Application: Application{
+				ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			},
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"descriptio"},
+			},
+		}
+		err = req.Validate()
+		a.So(err, should.NotBeNil)
+		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+
 		// good request
 		req = &UpdateApplicationRequest{
 			Application: Application{
 				ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
 			},
-			UpdateMask: ApplicationMask{
-				Description: true,
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"description"},
 			},
 		}
 		err = req.Validate()
@@ -225,14 +231,13 @@ func TestApplicationValidations(t *testing.T) {
 			Key: APIKey{
 				Name: "Foo-key",
 			},
-			UpdateMask: APIKeyMask{
-				Name:   true,
-				Rights: true,
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"name", "rights"},
 			},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
-		// request with empty update mask (bad)
+		// request without update mask (bad)
 		req = &UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
 			Key: APIKey{
@@ -250,9 +255,8 @@ func TestApplicationValidations(t *testing.T) {
 				Name:   "Foo-key",
 				Rights: []Right{RIGHT_GATEWAY_DELETE},
 			},
-			UpdateMask: APIKeyMask{
-				Name:   true,
-				Rights: true,
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"name", "rights"},
 			},
 		}
 		a.So(req.Validate(), should.NotBeNil)
@@ -263,8 +267,8 @@ func TestApplicationValidations(t *testing.T) {
 			Key: APIKey{
 				Name: "Foo-key",
 			},
-			UpdateMask: APIKeyMask{
-				Name: true,
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"name"},
 			},
 		}
 		a.So(req.Validate(), should.BeNil)
@@ -335,35 +339,36 @@ func TestGatewayValidations(t *testing.T) {
 	}
 
 	{
-		// empty request without update_mask
-		req := &UpdateGatewayRequest{}
+		// request without update mask (bad)
+		req := &UpdateApplicationRequest{
+			Application: Application{
+				ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			},
+		}
 		err := req.Validate()
 		a.So(err, should.NotBeNil)
 		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
 
-		// request with empty frequency plan ID and no gateway ID (bad)
-		req = &UpdateGatewayRequest{
-			Gateway: Gateway{
-				FrequencyPlanID: "",
-				ClusterAddress:  "foo",
+		// request with an invalid update mask (bad)
+		req = &UpdateApplicationRequest{
+			Application: Application{
+				ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
 			},
-			UpdateMask: GatewayMask{
-				ClusterAddress:  true,
-				FrequencyPlanID: true,
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"descriptio"},
 			},
 		}
-		a.So(req.Validate(), should.NotBeNil)
+		err = req.Validate()
+		a.So(err, should.NotBeNil)
+		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
 
 		// good request
-		req = &UpdateGatewayRequest{
-			Gateway: Gateway{
-				GatewayIdentifier: GatewayIdentifier{"foo-gtw"},
-				FrequencyPlanID:   "foo",
-				ClusterAddress:    "foo",
+		req = &UpdateApplicationRequest{
+			Application: Application{
+				ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
 			},
-			UpdateMask: GatewayMask{
-				ClusterAddress:  true,
-				FrequencyPlanID: true,
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"description"},
 			},
 		}
 		err = req.Validate()
@@ -411,13 +416,13 @@ func TestGatewayValidations(t *testing.T) {
 			Key: APIKey{
 				Name: "Foo-key",
 			},
-			UpdateMask: APIKeyMask{
-				Name:   true,
-				Rights: true,
-			}}
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"name", "rights"},
+			},
+		}
 		a.So(req.Validate(), should.NotBeNil)
 
-		// request with empty update mask (bad)
+		// request without update mask (bad)
 		req = &UpdateGatewayAPIKeyRequest{
 			GatewayIdentifier: GatewayIdentifier{"foo-app"},
 			Key: APIKey{
@@ -435,9 +440,8 @@ func TestGatewayValidations(t *testing.T) {
 				Name:   "Foo-key",
 				Rights: []Right{RIGHT_APPLICATION_DELETE},
 			},
-			UpdateMask: APIKeyMask{
-				Name:   true,
-				Rights: true,
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"name", "rights"},
 			},
 		}
 		a.So(req.Validate(), should.NotBeNil)
@@ -448,8 +452,8 @@ func TestGatewayValidations(t *testing.T) {
 			Key: APIKey{
 				Name: "Foo-key",
 			},
-			UpdateMask: APIKeyMask{
-				Name: true,
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"name"},
 			},
 		}
 		a.So(req.Validate(), should.BeNil)
@@ -519,7 +523,7 @@ func TestClientValidations(t *testing.T) {
 		req := &UpdateClientRequest{}
 		a.So(req.Validate(), should.NotBeNil)
 
-		// request with empty update_mask (bad)
+		// request without update_mask (bad)
 		req = &UpdateClientRequest{
 			Client: Client{
 				ClientIdentifier: ClientIdentifier{"foo-client"},
@@ -530,18 +534,32 @@ func TestClientValidations(t *testing.T) {
 		a.So(err, should.NotBeNil)
 		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
 
+		// request with invalid path fields on the update_mask (bad)
+		req = &UpdateClientRequest{
+			Client: Client{
+				ClientIdentifier: ClientIdentifier{"foo-client"},
+				Description:      "foo description",
+				RedirectURI:      "localhost",
+				Rights:           []Right{RIGHT_APPLICATION_INFO},
+			},
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"frequency_plan_id", "cluster_address"},
+			},
+		}
+		err = req.Validate()
+		a.So(err, should.NotBeNil)
+		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+
 		// good request
 		req = &UpdateClientRequest{
 			Client: Client{
 				ClientIdentifier: ClientIdentifier{"foo-client"},
-				Description:      "ho",
+				Description:      "foo description",
 				RedirectURI:      "ttn.com",
 				Rights:           []Right{RIGHT_APPLICATION_INFO},
 			},
-			UpdateMask: ClientMask{
-				RedirectURI: true,
-				Description: true,
-				Rights:      true,
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"redirect_uri", "rights", "description"},
 			},
 		}
 		err = req.Validate()
