@@ -1,0 +1,30 @@
+// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
+
+package ttn.v3;
+
+option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+
+message IdentityServerSettings {
+  // blacklisted_ids is the list of IDs that are not allowed to use in the network.
+  repeated string blacklisted_ids = 1 [(gogoproto.customname) = "BlacklistedIDs"];
+
+  // automatic_approval denotes if the users are approved automatically after
+  // registration or they need to validate their account through email.
+  bool automatic_approval = 2;
+
+  // closed_registration denotes whether people can freely register user accounts
+  // or they need to be granted an invitation to do so.
+  bool closed_registration = 3;
+
+  // validation_token_ttl denotes the time an account validation token is valid
+  // after being issued.
+  google.protobuf.Duration validation_token_ttl = 4 [(gogoproto.customname) = "ValidationTokenTTL", (gogoproto.nullable) = false, (gogoproto.stdduration) = true];
+
+  // allowed_emails is a list of globs to restrict emails to. If empty all emails are valid.
+  repeated string allowed_emails = 5;
+}

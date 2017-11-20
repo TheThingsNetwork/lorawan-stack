@@ -10,8 +10,8 @@ import "github.com/TheThingsNetwork/ttn/api/rights.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/gateway.proto";
 import "github.com/TheThingsNetwork/ttn/api/user.proto";
+import "github.com/TheThingsNetwork/ttn/api/settings.proto";
 import "google/protobuf/empty.proto";
-import "google/protobuf/duration.proto";
 import "google/protobuf/field_mask.proto";
 
 package ttn.v3;
@@ -23,26 +23,6 @@ service GtwGr {
   // PullConfiguration sends a new GatewayConfiguration, with all the latest values,
   // at connection and when a gateway's configuration is updated.
   rpc PullConfiguration(GatewayIdentifier) returns (stream GatewayConfiguration);
-}
-
-message IdentityServerSettings {
-  // blacklisted_ids is the list of IDs that are not allowed to use in the network.
-  repeated string blacklisted_ids = 1 [(gogoproto.customname) = "BlacklistedIDs"];
-
-  // automatic_approval denotes if the users are approved automatically after
-  // registration or they need to validate their account through email.
-  bool automatic_approval = 2;
-
-  // closed_registration denotes whether people can freely register user accounts
-  // or they need to be granted an invitation to do so.
-  bool closed_registration = 3;
-
-  // validation_token_ttl denotes the time an account validation token is valid
-  // after being issued.
-  google.protobuf.Duration validation_token_ttl = 4 [(gogoproto.customname) = "ValidationTokenTTL", (gogoproto.nullable) = false, (gogoproto.stdduration) = true];
-
-  // allowed_emails is a list of globs to restrict emails to. If empty all emails are valid.
-  repeated string allowed_emails = 5;
 }
 
 message GetSettingsRequest {

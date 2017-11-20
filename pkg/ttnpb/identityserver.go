@@ -3,27 +3,8 @@
 package ttnpb
 
 import (
-	"regexp"
-
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/validate"
-)
-
-var (
-	// FieldPathSettingsBlacklistedIDs is the field path for the blacklisted IDs field.
-	FieldPathSettingsBlacklistedIDs = regexp.MustCompile(`^blacklisted_ids$`)
-
-	// FieldPathSettingsAutomaticApproval is the field path for the automatic approval field.
-	FieldPathSettingsAutomaticApproval = regexp.MustCompile(`^automatic_approval$`)
-
-	// FieldPathSettingsClosedRegistration is the field path for the closed registration field.
-	FieldPathSettingsClosedRegistration = regexp.MustCompile(`^closed_registration$`)
-
-	// FieldPathSettingsValidationTokenTTL is the field path for the validation token TTL field.
-	FieldPathSettingsValidationTokenTTL = regexp.MustCompile(`^validation_token_ttl$`)
-
-	// FieldPathSettingsAllowedEmails is the field path for the allowed emails field.
-	FieldPathSettingsAllowedEmails = regexp.MustCompile(`^allowed_emails$`)
 )
 
 // Validate is used as validator function by the GRPC validator interceptor.
