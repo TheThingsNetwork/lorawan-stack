@@ -8,6 +8,35 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/validate"
 )
 
+// FullMask sets all the fields of the mask to true.
+func (m *IdentityServerSettingsMask) FullMask() {
+	value := reflect.ValueOf(m).Elem()
+
+	for i := 0; i < value.NumField(); i++ {
+		value.Field(i).SetBool(true)
+	}
+}
+
+// Validate is used as validator function by the GRPC validator interceptor.
+func (req *UpdateSettingsRequest) Validate() error {
+	mask := req.GetUpdateMask()
+	if reflect.DeepEqual(mask, IdentityServerSettingsMask{}) {
+		return ErrEmptyUpdateMask.New(nil)
+	}
+
+	validations := make([]validate.Errors, 0)
+	if mask.BlacklistedIDs {
+		for _, id := range req.Settings.BlacklistedIDs {
+			err := validate.Field(id, validate.ID).DescribeFieldName("Blacklisted ID")
+			if err != nil {
+				validations = append(validations, err)
+			}
+		}
+	}
+
+	return validate.All(validations...)
+}
+
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *CreateUserRequest) Validate() error {
 	return validate.All(

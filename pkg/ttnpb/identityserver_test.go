@@ -9,6 +9,57 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
+func TestSettingsMask(t *testing.T) {
+	a := assertions.New(t)
+
+	mask := new(IdentityServerSettingsMask)
+	mask.FullMask()
+	a.So(mask, should.Resemble, &IdentityServerSettingsMask{
+		BlacklistedIDs:     true,
+		AutomaticApproval:  true,
+		ClosedRegistration: true,
+		ValidationTokenTTL: true,
+		AllowedEmails:      true,
+	})
+}
+
+func TestSettingsValidations(t *testing.T) {
+	a := assertions.New(t)
+
+	// empty update mask (bad)
+	req := &UpdateSettingsRequest{}
+	a.So(ErrEmptyUpdateMask.Describes(req.Validate()), should.BeTrue)
+
+	// empty update mask (bad)
+	req = &UpdateSettingsRequest{
+		UpdateMask: IdentityServerSettingsMask{},
+	}
+	a.So(ErrEmptyUpdateMask.Describes(req.Validate()), should.BeTrue)
+
+	// request with not valid ids (bad)
+	req = &UpdateSettingsRequest{
+		Settings: IdentityServerSettings{
+			BlacklistedIDs: []string{"s", "webui"},
+		},
+		UpdateMask: IdentityServerSettingsMask{
+			BlacklistedIDs: true,
+		},
+	}
+	a.So(req.Validate(), should.NotBeNil)
+
+	// good request
+	req = &UpdateSettingsRequest{
+		Settings: IdentityServerSettings{
+			BlacklistedIDs: []string{"webui", "self"},
+		},
+		UpdateMask: IdentityServerSettingsMask{
+			BlacklistedIDs: true,
+		},
+	}
+	a.So(req.Validate(), should.BeNil)
+
+}
+
 func TestUserValidations(t *testing.T) {
 	a := assertions.New(t)
 

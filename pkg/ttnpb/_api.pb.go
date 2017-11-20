@@ -64,6 +64,10 @@ It has these top-level messages:
 	GatewayIdentifier
 	EndDeviceIdentifiers
 	ClientIdentifier
+	IdentityServerSettings
+	IdentityServerSettingsMask
+	GetSettingsRequest
+	UpdateSettingsRequest
 	CreateUserRequest
 	UpdateUserRequest
 	UpdateUserPasswordRequest

@@ -11,6 +11,7 @@ import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/gateway.proto";
 import "github.com/TheThingsNetwork/ttn/api/user.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/duration.proto";
 
 package ttn.v3;
 
@@ -21,6 +22,62 @@ service GtwGr {
   // PullConfiguration sends a new GatewayConfiguration, with all the latest values,
   // at connection and when a gateway's configuration is updated.
   rpc PullConfiguration(GatewayIdentifier) returns (stream GatewayConfiguration);
+}
+
+message IdentityServerSettings {
+  // blacklisted_ids is the list of IDs that are not allowed to use in the network.
+  repeated string blacklisted_ids = 1 [(gogoproto.customname) = "BlacklistedIDs"];
+
+  // automatic_approval denotes if the users are approved automatically after
+  // registration or they need to validate their account through email.
+  bool automatic_approval = 2;
+
+  // closed_registration denotes whether people can freely register user accounts
+  // or they need to be granted an invitation to do so.
+  bool closed_registration = 3;
+
+  // validation_token_ttl denotes the time an account validation token is valid
+  // after being issued.
+  google.protobuf.Duration validation_token_ttl = 4 [(gogoproto.customname) = "ValidationTokenTTL", (gogoproto.nullable) = false, (gogoproto.stdduration) = true];
+
+  // allowed_emails is a list of globs to restrict emails to. If empty all emails are valid.
+  repeated string allowed_emails = 5;
+}
+
+// IdentityServerSettingsMask is the message that defines the FieldMask that
+// can be used for the Get and Update operations of the Identity Server settings.
+message IdentityServerSettingsMask {
+  bool blacklisted_ids = 1 [(gogoproto.customname) = "BlacklistedIDs"];
+  bool automatic_approval = 2;
+  bool closed_registration = 3;
+  bool validation_token_ttl = 4 [(gogoproto.customname) = "ValidationTokenTTL"];
+  bool allowed_emails = 5;
+}
+
+message GetSettingsRequest {
+  // projection_mask is the symbolic set of fields that will be returned in the
+  // operation. If the list is empty all settings will be returned.
+  IdentityServerSettingsMask projection_mask = 1;
+}
+
+message UpdateSettingsRequest {
+  // settings are the settings to be updated.
+  IdentityServerSettings settings = 1 [(gogoproto.nullable) = false];
+
+  // update_mask is the symbolic set of fields that will be affected in the update
+  // operation. Fields not included in the update_mask are not changed and ignored
+  // in the request. Must be non-empty.
+  IdentityServerSettingsMask update_mask = 2 [(gogoproto.nullable) = false];
+}
+
+// IsSettings is the service that provided methods to manage the settings of an
+// Identity Server within a tenant.
+service IsSettings {
+  // GetSettings returns the value of the specified settings.
+  rpc GetSettings(GetSettingsRequest) returns (IdentityServerSettings);
+
+  // UpdateSettings updates the settings.
+  rpc UpdateSettings(UpdateSettingsRequest) returns (google.protobuf.Empty);
 }
 
 message CreateUserRequest {

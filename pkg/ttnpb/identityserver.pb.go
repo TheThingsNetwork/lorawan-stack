@@ -9,11 +9,16 @@ import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import google_protobuf2 "github.com/gogo/protobuf/types"
+import _ "github.com/gogo/protobuf/types"
+
+import time "time"
 
 import (
 	context "context"
 	grpc "google.golang.org/grpc"
 )
+
+import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 
 import io "io"
 
@@ -22,6 +27,165 @@ var _ = proto.Marshal
 var _ = golang_proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+var _ = time.Kitchen
+
+type IdentityServerSettings struct {
+	// blacklisted_ids is the list of IDs that are not allowed to use in the network.
+	BlacklistedIDs []string `protobuf:"bytes,1,rep,name=blacklisted_ids,json=blacklistedIds" json:"blacklisted_ids,omitempty"`
+	// automatic_approval denotes if the users are approved automatically after
+	// registration or they need to validate their account through email.
+	AutomaticApproval bool `protobuf:"varint,2,opt,name=automatic_approval,json=automaticApproval,proto3" json:"automatic_approval,omitempty"`
+	// closed_registration denotes whether people can freely register user accounts
+	// or they need to be granted an invitation to do so.
+	ClosedRegistration bool `protobuf:"varint,3,opt,name=closed_registration,json=closedRegistration,proto3" json:"closed_registration,omitempty"`
+	// validation_token_ttl denotes the time an account validation token is valid
+	// after being issued.
+	ValidationTokenTTL time.Duration `protobuf:"bytes,4,opt,name=validation_token_ttl,json=validationTokenTtl,stdduration" json:"validation_token_ttl"`
+	// allowed_emails is a list of globs to restrict emails to. If empty all emails are valid.
+	AllowedEmails []string `protobuf:"bytes,5,rep,name=allowed_emails,json=allowedEmails" json:"allowed_emails,omitempty"`
+}
+
+func (m *IdentityServerSettings) Reset()         { *m = IdentityServerSettings{} }
+func (m *IdentityServerSettings) String() string { return proto.CompactTextString(m) }
+func (*IdentityServerSettings) ProtoMessage()    {}
+func (*IdentityServerSettings) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{0}
+}
+
+func (m *IdentityServerSettings) GetBlacklistedIDs() []string {
+	if m != nil {
+		return m.BlacklistedIDs
+	}
+	return nil
+}
+
+func (m *IdentityServerSettings) GetAutomaticApproval() bool {
+	if m != nil {
+		return m.AutomaticApproval
+	}
+	return false
+}
+
+func (m *IdentityServerSettings) GetClosedRegistration() bool {
+	if m != nil {
+		return m.ClosedRegistration
+	}
+	return false
+}
+
+func (m *IdentityServerSettings) GetValidationTokenTTL() time.Duration {
+	if m != nil {
+		return m.ValidationTokenTTL
+	}
+	return 0
+}
+
+func (m *IdentityServerSettings) GetAllowedEmails() []string {
+	if m != nil {
+		return m.AllowedEmails
+	}
+	return nil
+}
+
+// IdentityServerSettingsMask is the message that defines the FieldMask that
+// can be used for the Get and Update operations of the Identity Server settings.
+type IdentityServerSettingsMask struct {
+	BlacklistedIDs     bool `protobuf:"varint,1,opt,name=blacklisted_ids,json=blacklistedIds,proto3" json:"blacklisted_ids,omitempty"`
+	AutomaticApproval  bool `protobuf:"varint,2,opt,name=automatic_approval,json=automaticApproval,proto3" json:"automatic_approval,omitempty"`
+	ClosedRegistration bool `protobuf:"varint,3,opt,name=closed_registration,json=closedRegistration,proto3" json:"closed_registration,omitempty"`
+	ValidationTokenTTL bool `protobuf:"varint,4,opt,name=validation_token_ttl,json=validationTokenTtl,proto3" json:"validation_token_ttl,omitempty"`
+	AllowedEmails      bool `protobuf:"varint,5,opt,name=allowed_emails,json=allowedEmails,proto3" json:"allowed_emails,omitempty"`
+}
+
+func (m *IdentityServerSettingsMask) Reset()         { *m = IdentityServerSettingsMask{} }
+func (m *IdentityServerSettingsMask) String() string { return proto.CompactTextString(m) }
+func (*IdentityServerSettingsMask) ProtoMessage()    {}
+func (*IdentityServerSettingsMask) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{1}
+}
+
+func (m *IdentityServerSettingsMask) GetBlacklistedIDs() bool {
+	if m != nil {
+		return m.BlacklistedIDs
+	}
+	return false
+}
+
+func (m *IdentityServerSettingsMask) GetAutomaticApproval() bool {
+	if m != nil {
+		return m.AutomaticApproval
+	}
+	return false
+}
+
+func (m *IdentityServerSettingsMask) GetClosedRegistration() bool {
+	if m != nil {
+		return m.ClosedRegistration
+	}
+	return false
+}
+
+func (m *IdentityServerSettingsMask) GetValidationTokenTTL() bool {
+	if m != nil {
+		return m.ValidationTokenTTL
+	}
+	return false
+}
+
+func (m *IdentityServerSettingsMask) GetAllowedEmails() bool {
+	if m != nil {
+		return m.AllowedEmails
+	}
+	return false
+}
+
+type GetSettingsRequest struct {
+	// projection_mask is the symbolic set of fields that will be returned in the
+	// operation. If the list is empty all settings will be returned.
+	ProjectionMask *IdentityServerSettingsMask `protobuf:"bytes,1,opt,name=projection_mask,json=projectionMask" json:"projection_mask,omitempty"`
+}
+
+func (m *GetSettingsRequest) Reset()                    { *m = GetSettingsRequest{} }
+func (m *GetSettingsRequest) String() string            { return proto.CompactTextString(m) }
+func (*GetSettingsRequest) ProtoMessage()               {}
+func (*GetSettingsRequest) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{2} }
+
+func (m *GetSettingsRequest) GetProjectionMask() *IdentityServerSettingsMask {
+	if m != nil {
+		return m.ProjectionMask
+	}
+	return nil
+}
+
+type UpdateSettingsRequest struct {
+	// settings are the settings to be updated.
+	Settings IdentityServerSettings `protobuf:"bytes,1,opt,name=settings" json:"settings"`
+	// update_mask is the symbolic set of fields that will be affected in the update
+	// operation. Fields not included in the update_mask are not changed and ignored
+	// in the request. Must be non-empty.
+	UpdateMask IdentityServerSettingsMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
+}
+
+func (m *UpdateSettingsRequest) Reset()         { *m = UpdateSettingsRequest{} }
+func (m *UpdateSettingsRequest) String() string { return proto.CompactTextString(m) }
+func (*UpdateSettingsRequest) ProtoMessage()    {}
+func (*UpdateSettingsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{3}
+}
+
+func (m *UpdateSettingsRequest) GetSettings() IdentityServerSettings {
+	if m != nil {
+		return m.Settings
+	}
+	return IdentityServerSettings{}
+}
+
+func (m *UpdateSettingsRequest) GetUpdateMask() IdentityServerSettingsMask {
+	if m != nil {
+		return m.UpdateMask
+	}
+	return IdentityServerSettingsMask{}
+}
 
 type CreateUserRequest struct {
 	// user is the user to be created.
@@ -36,7 +200,7 @@ type CreateUserRequest struct {
 func (m *CreateUserRequest) Reset()                    { *m = CreateUserRequest{} }
 func (m *CreateUserRequest) String() string            { return proto.CompactTextString(m) }
 func (*CreateUserRequest) ProtoMessage()               {}
-func (*CreateUserRequest) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{0} }
+func (*CreateUserRequest) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{4} }
 
 func (m *CreateUserRequest) GetUser() User {
 	if m != nil {
@@ -64,7 +228,7 @@ type UpdateUserRequest struct {
 func (m *UpdateUserRequest) Reset()                    { *m = UpdateUserRequest{} }
 func (m *UpdateUserRequest) String() string            { return proto.CompactTextString(m) }
 func (*UpdateUserRequest) ProtoMessage()               {}
-func (*UpdateUserRequest) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{1} }
+func (*UpdateUserRequest) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{5} }
 
 func (m *UpdateUserRequest) GetUser() User {
 	if m != nil {
@@ -91,7 +255,7 @@ func (m *UpdateUserPasswordRequest) Reset()         { *m = UpdateUserPasswordReq
 func (m *UpdateUserPasswordRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateUserPasswordRequest) ProtoMessage()    {}
 func (*UpdateUserPasswordRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{2}
+	return fileDescriptorIdentityserver, []int{6}
 }
 
 func (m *UpdateUserPasswordRequest) GetOld() string {
@@ -117,7 +281,7 @@ func (m *ValidateUserEmailRequest) Reset()         { *m = ValidateUserEmailReque
 func (m *ValidateUserEmailRequest) String() string { return proto.CompactTextString(m) }
 func (*ValidateUserEmailRequest) ProtoMessage()    {}
 func (*ValidateUserEmailRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{3}
+	return fileDescriptorIdentityserver, []int{7}
 }
 
 func (m *ValidateUserEmailRequest) GetToken() string {
@@ -136,7 +300,7 @@ func (m *ListAuthorizedClientsResponse) Reset()         { *m = ListAuthorizedCli
 func (m *ListAuthorizedClientsResponse) String() string { return proto.CompactTextString(m) }
 func (*ListAuthorizedClientsResponse) ProtoMessage()    {}
 func (*ListAuthorizedClientsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{4}
+	return fileDescriptorIdentityserver, []int{8}
 }
 
 func (m *ListAuthorizedClientsResponse) GetClients() []Client {
@@ -155,7 +319,7 @@ func (m *CreateApplicationRequest) Reset()         { *m = CreateApplicationReque
 func (m *CreateApplicationRequest) String() string { return proto.CompactTextString(m) }
 func (*CreateApplicationRequest) ProtoMessage()    {}
 func (*CreateApplicationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{5}
+	return fileDescriptorIdentityserver, []int{9}
 }
 
 func (m *CreateApplicationRequest) GetApplication() Application {
@@ -174,7 +338,7 @@ func (m *ListApplicationsResponse) Reset()         { *m = ListApplicationsRespon
 func (m *ListApplicationsResponse) String() string { return proto.CompactTextString(m) }
 func (*ListApplicationsResponse) ProtoMessage()    {}
 func (*ListApplicationsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{6}
+	return fileDescriptorIdentityserver, []int{10}
 }
 
 func (m *ListApplicationsResponse) GetApplications() []Application {
@@ -197,7 +361,7 @@ func (m *UpdateApplicationRequest) Reset()         { *m = UpdateApplicationReque
 func (m *UpdateApplicationRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateApplicationRequest) ProtoMessage()    {}
 func (*UpdateApplicationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{7}
+	return fileDescriptorIdentityserver, []int{11}
 }
 
 func (m *UpdateApplicationRequest) GetApplication() Application {
@@ -227,7 +391,7 @@ func (m *GenerateApplicationAPIKeyRequest) Reset()         { *m = GenerateApplic
 func (m *GenerateApplicationAPIKeyRequest) String() string { return proto.CompactTextString(m) }
 func (*GenerateApplicationAPIKeyRequest) ProtoMessage()    {}
 func (*GenerateApplicationAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{8}
+	return fileDescriptorIdentityserver, []int{12}
 }
 
 func (m *GenerateApplicationAPIKeyRequest) GetName() string {
@@ -259,7 +423,7 @@ func (m *UpdateApplicationAPIKeyRequest) Reset()         { *m = UpdateApplicatio
 func (m *UpdateApplicationAPIKeyRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateApplicationAPIKeyRequest) ProtoMessage()    {}
 func (*UpdateApplicationAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{9}
+	return fileDescriptorIdentityserver, []int{13}
 }
 
 func (m *UpdateApplicationAPIKeyRequest) GetKey() APIKey {
@@ -287,7 +451,7 @@ func (m *RemoveApplicationAPIKeyRequest) Reset()         { *m = RemoveApplicatio
 func (m *RemoveApplicationAPIKeyRequest) String() string { return proto.CompactTextString(m) }
 func (*RemoveApplicationAPIKeyRequest) ProtoMessage()    {}
 func (*RemoveApplicationAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{10}
+	return fileDescriptorIdentityserver, []int{14}
 }
 
 func (m *RemoveApplicationAPIKeyRequest) GetKey() string {
@@ -309,7 +473,7 @@ func (m *SetApplicationCollaboratorRequest) Reset()         { *m = SetApplicatio
 func (m *SetApplicationCollaboratorRequest) String() string { return proto.CompactTextString(m) }
 func (*SetApplicationCollaboratorRequest) ProtoMessage()    {}
 func (*SetApplicationCollaboratorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{11}
+	return fileDescriptorIdentityserver, []int{15}
 }
 
 type ListApplicationCollaboratorsResponse struct {
@@ -321,7 +485,7 @@ func (m *ListApplicationCollaboratorsResponse) Reset()         { *m = ListApplic
 func (m *ListApplicationCollaboratorsResponse) String() string { return proto.CompactTextString(m) }
 func (*ListApplicationCollaboratorsResponse) ProtoMessage()    {}
 func (*ListApplicationCollaboratorsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{12}
+	return fileDescriptorIdentityserver, []int{16}
 }
 
 func (m *ListApplicationCollaboratorsResponse) GetCollaborators() []Collaborator {
@@ -340,7 +504,7 @@ func (m *CreateGatewayRequest) Reset()         { *m = CreateGatewayRequest{} }
 func (m *CreateGatewayRequest) String() string { return proto.CompactTextString(m) }
 func (*CreateGatewayRequest) ProtoMessage()    {}
 func (*CreateGatewayRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{13}
+	return fileDescriptorIdentityserver, []int{17}
 }
 
 func (m *CreateGatewayRequest) GetGateway() Gateway {
@@ -359,7 +523,7 @@ func (m *ListGatewaysResponse) Reset()         { *m = ListGatewaysResponse{} }
 func (m *ListGatewaysResponse) String() string { return proto.CompactTextString(m) }
 func (*ListGatewaysResponse) ProtoMessage()    {}
 func (*ListGatewaysResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{14}
+	return fileDescriptorIdentityserver, []int{18}
 }
 
 func (m *ListGatewaysResponse) GetGateways() []Gateway {
@@ -382,7 +546,7 @@ func (m *UpdateGatewayRequest) Reset()         { *m = UpdateGatewayRequest{} }
 func (m *UpdateGatewayRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateGatewayRequest) ProtoMessage()    {}
 func (*UpdateGatewayRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{15}
+	return fileDescriptorIdentityserver, []int{19}
 }
 
 func (m *UpdateGatewayRequest) GetGateway() Gateway {
@@ -412,7 +576,7 @@ func (m *GenerateGatewayAPIKeyRequest) Reset()         { *m = GenerateGatewayAPI
 func (m *GenerateGatewayAPIKeyRequest) String() string { return proto.CompactTextString(m) }
 func (*GenerateGatewayAPIKeyRequest) ProtoMessage()    {}
 func (*GenerateGatewayAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{16}
+	return fileDescriptorIdentityserver, []int{20}
 }
 
 func (m *GenerateGatewayAPIKeyRequest) GetName() string {
@@ -444,7 +608,7 @@ func (m *UpdateGatewayAPIKeyRequest) Reset()         { *m = UpdateGatewayAPIKeyR
 func (m *UpdateGatewayAPIKeyRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateGatewayAPIKeyRequest) ProtoMessage()    {}
 func (*UpdateGatewayAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{17}
+	return fileDescriptorIdentityserver, []int{21}
 }
 
 func (m *UpdateGatewayAPIKeyRequest) GetKey() APIKey {
@@ -472,7 +636,7 @@ func (m *RemoveGatewayAPIKeyRequest) Reset()         { *m = RemoveGatewayAPIKeyR
 func (m *RemoveGatewayAPIKeyRequest) String() string { return proto.CompactTextString(m) }
 func (*RemoveGatewayAPIKeyRequest) ProtoMessage()    {}
 func (*RemoveGatewayAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{18}
+	return fileDescriptorIdentityserver, []int{22}
 }
 
 func (m *RemoveGatewayAPIKeyRequest) GetKey() string {
@@ -494,7 +658,7 @@ func (m *SetGatewayCollaboratorRequest) Reset()         { *m = SetGatewayCollabo
 func (m *SetGatewayCollaboratorRequest) String() string { return proto.CompactTextString(m) }
 func (*SetGatewayCollaboratorRequest) ProtoMessage()    {}
 func (*SetGatewayCollaboratorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{19}
+	return fileDescriptorIdentityserver, []int{23}
 }
 
 type ListGatewayCollaboratorsResponse struct {
@@ -506,7 +670,7 @@ func (m *ListGatewayCollaboratorsResponse) Reset()         { *m = ListGatewayCol
 func (m *ListGatewayCollaboratorsResponse) String() string { return proto.CompactTextString(m) }
 func (*ListGatewayCollaboratorsResponse) ProtoMessage()    {}
 func (*ListGatewayCollaboratorsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{20}
+	return fileDescriptorIdentityserver, []int{24}
 }
 
 func (m *ListGatewayCollaboratorsResponse) GetCollaborators() []Collaborator {
@@ -525,7 +689,7 @@ func (m *CreateClientRequest) Reset()         { *m = CreateClientRequest{} }
 func (m *CreateClientRequest) String() string { return proto.CompactTextString(m) }
 func (*CreateClientRequest) ProtoMessage()    {}
 func (*CreateClientRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{21}
+	return fileDescriptorIdentityserver, []int{25}
 }
 
 func (m *CreateClientRequest) GetClient() Client {
@@ -544,7 +708,7 @@ func (m *ListClientsResponse) Reset()         { *m = ListClientsResponse{} }
 func (m *ListClientsResponse) String() string { return proto.CompactTextString(m) }
 func (*ListClientsResponse) ProtoMessage()    {}
 func (*ListClientsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{22}
+	return fileDescriptorIdentityserver, []int{26}
 }
 
 func (m *ListClientsResponse) GetClients() []Client {
@@ -567,7 +731,7 @@ func (m *UpdateClientRequest) Reset()         { *m = UpdateClientRequest{} }
 func (m *UpdateClientRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateClientRequest) ProtoMessage()    {}
 func (*UpdateClientRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{23}
+	return fileDescriptorIdentityserver, []int{27}
 }
 
 func (m *UpdateClientRequest) GetClient() Client {
@@ -585,6 +749,14 @@ func (m *UpdateClientRequest) GetUpdateMask() ClientMask {
 }
 
 func init() {
+	proto.RegisterType((*IdentityServerSettings)(nil), "ttn.v3.IdentityServerSettings")
+	golang_proto.RegisterType((*IdentityServerSettings)(nil), "ttn.v3.IdentityServerSettings")
+	proto.RegisterType((*IdentityServerSettingsMask)(nil), "ttn.v3.IdentityServerSettingsMask")
+	golang_proto.RegisterType((*IdentityServerSettingsMask)(nil), "ttn.v3.IdentityServerSettingsMask")
+	proto.RegisterType((*GetSettingsRequest)(nil), "ttn.v3.GetSettingsRequest")
+	golang_proto.RegisterType((*GetSettingsRequest)(nil), "ttn.v3.GetSettingsRequest")
+	proto.RegisterType((*UpdateSettingsRequest)(nil), "ttn.v3.UpdateSettingsRequest")
+	golang_proto.RegisterType((*UpdateSettingsRequest)(nil), "ttn.v3.UpdateSettingsRequest")
 	proto.RegisterType((*CreateUserRequest)(nil), "ttn.v3.CreateUserRequest")
 	golang_proto.RegisterType((*CreateUserRequest)(nil), "ttn.v3.CreateUserRequest")
 	proto.RegisterType((*UpdateUserRequest)(nil), "ttn.v3.UpdateUserRequest")
@@ -633,6 +805,320 @@ func init() {
 	golang_proto.RegisterType((*ListClientsResponse)(nil), "ttn.v3.ListClientsResponse")
 	proto.RegisterType((*UpdateClientRequest)(nil), "ttn.v3.UpdateClientRequest")
 	golang_proto.RegisterType((*UpdateClientRequest)(nil), "ttn.v3.UpdateClientRequest")
+}
+func (this *IdentityServerSettings) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*IdentityServerSettings)
+	if !ok {
+		that2, ok := that.(IdentityServerSettings)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *IdentityServerSettings")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *IdentityServerSettings but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *IdentityServerSettings but is not nil && this == nil")
+	}
+	if len(this.BlacklistedIDs) != len(that1.BlacklistedIDs) {
+		return fmt.Errorf("BlacklistedIDs this(%v) Not Equal that(%v)", len(this.BlacklistedIDs), len(that1.BlacklistedIDs))
+	}
+	for i := range this.BlacklistedIDs {
+		if this.BlacklistedIDs[i] != that1.BlacklistedIDs[i] {
+			return fmt.Errorf("BlacklistedIDs this[%v](%v) Not Equal that[%v](%v)", i, this.BlacklistedIDs[i], i, that1.BlacklistedIDs[i])
+		}
+	}
+	if this.AutomaticApproval != that1.AutomaticApproval {
+		return fmt.Errorf("AutomaticApproval this(%v) Not Equal that(%v)", this.AutomaticApproval, that1.AutomaticApproval)
+	}
+	if this.ClosedRegistration != that1.ClosedRegistration {
+		return fmt.Errorf("ClosedRegistration this(%v) Not Equal that(%v)", this.ClosedRegistration, that1.ClosedRegistration)
+	}
+	if this.ValidationTokenTTL != that1.ValidationTokenTTL {
+		return fmt.Errorf("ValidationTokenTTL this(%v) Not Equal that(%v)", this.ValidationTokenTTL, that1.ValidationTokenTTL)
+	}
+	if len(this.AllowedEmails) != len(that1.AllowedEmails) {
+		return fmt.Errorf("AllowedEmails this(%v) Not Equal that(%v)", len(this.AllowedEmails), len(that1.AllowedEmails))
+	}
+	for i := range this.AllowedEmails {
+		if this.AllowedEmails[i] != that1.AllowedEmails[i] {
+			return fmt.Errorf("AllowedEmails this[%v](%v) Not Equal that[%v](%v)", i, this.AllowedEmails[i], i, that1.AllowedEmails[i])
+		}
+	}
+	return nil
+}
+func (this *IdentityServerSettings) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*IdentityServerSettings)
+	if !ok {
+		that2, ok := that.(IdentityServerSettings)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if len(this.BlacklistedIDs) != len(that1.BlacklistedIDs) {
+		return false
+	}
+	for i := range this.BlacklistedIDs {
+		if this.BlacklistedIDs[i] != that1.BlacklistedIDs[i] {
+			return false
+		}
+	}
+	if this.AutomaticApproval != that1.AutomaticApproval {
+		return false
+	}
+	if this.ClosedRegistration != that1.ClosedRegistration {
+		return false
+	}
+	if this.ValidationTokenTTL != that1.ValidationTokenTTL {
+		return false
+	}
+	if len(this.AllowedEmails) != len(that1.AllowedEmails) {
+		return false
+	}
+	for i := range this.AllowedEmails {
+		if this.AllowedEmails[i] != that1.AllowedEmails[i] {
+			return false
+		}
+	}
+	return true
+}
+func (this *IdentityServerSettingsMask) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*IdentityServerSettingsMask)
+	if !ok {
+		that2, ok := that.(IdentityServerSettingsMask)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *IdentityServerSettingsMask")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *IdentityServerSettingsMask but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *IdentityServerSettingsMask but is not nil && this == nil")
+	}
+	if this.BlacklistedIDs != that1.BlacklistedIDs {
+		return fmt.Errorf("BlacklistedIDs this(%v) Not Equal that(%v)", this.BlacklistedIDs, that1.BlacklistedIDs)
+	}
+	if this.AutomaticApproval != that1.AutomaticApproval {
+		return fmt.Errorf("AutomaticApproval this(%v) Not Equal that(%v)", this.AutomaticApproval, that1.AutomaticApproval)
+	}
+	if this.ClosedRegistration != that1.ClosedRegistration {
+		return fmt.Errorf("ClosedRegistration this(%v) Not Equal that(%v)", this.ClosedRegistration, that1.ClosedRegistration)
+	}
+	if this.ValidationTokenTTL != that1.ValidationTokenTTL {
+		return fmt.Errorf("ValidationTokenTTL this(%v) Not Equal that(%v)", this.ValidationTokenTTL, that1.ValidationTokenTTL)
+	}
+	if this.AllowedEmails != that1.AllowedEmails {
+		return fmt.Errorf("AllowedEmails this(%v) Not Equal that(%v)", this.AllowedEmails, that1.AllowedEmails)
+	}
+	return nil
+}
+func (this *IdentityServerSettingsMask) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*IdentityServerSettingsMask)
+	if !ok {
+		that2, ok := that.(IdentityServerSettingsMask)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.BlacklistedIDs != that1.BlacklistedIDs {
+		return false
+	}
+	if this.AutomaticApproval != that1.AutomaticApproval {
+		return false
+	}
+	if this.ClosedRegistration != that1.ClosedRegistration {
+		return false
+	}
+	if this.ValidationTokenTTL != that1.ValidationTokenTTL {
+		return false
+	}
+	if this.AllowedEmails != that1.AllowedEmails {
+		return false
+	}
+	return true
+}
+func (this *GetSettingsRequest) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*GetSettingsRequest)
+	if !ok {
+		that2, ok := that.(GetSettingsRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *GetSettingsRequest")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *GetSettingsRequest but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *GetSettingsRequest but is not nil && this == nil")
+	}
+	if !this.ProjectionMask.Equal(that1.ProjectionMask) {
+		return fmt.Errorf("ProjectionMask this(%v) Not Equal that(%v)", this.ProjectionMask, that1.ProjectionMask)
+	}
+	return nil
+}
+func (this *GetSettingsRequest) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*GetSettingsRequest)
+	if !ok {
+		that2, ok := that.(GetSettingsRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if !this.ProjectionMask.Equal(that1.ProjectionMask) {
+		return false
+	}
+	return true
+}
+func (this *UpdateSettingsRequest) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*UpdateSettingsRequest)
+	if !ok {
+		that2, ok := that.(UpdateSettingsRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *UpdateSettingsRequest")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *UpdateSettingsRequest but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *UpdateSettingsRequest but is not nil && this == nil")
+	}
+	if !this.Settings.Equal(&that1.Settings) {
+		return fmt.Errorf("Settings this(%v) Not Equal that(%v)", this.Settings, that1.Settings)
+	}
+	if !this.UpdateMask.Equal(&that1.UpdateMask) {
+		return fmt.Errorf("UpdateMask this(%v) Not Equal that(%v)", this.UpdateMask, that1.UpdateMask)
+	}
+	return nil
+}
+func (this *UpdateSettingsRequest) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*UpdateSettingsRequest)
+	if !ok {
+		that2, ok := that.(UpdateSettingsRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if !this.Settings.Equal(&that1.Settings) {
+		return false
+	}
+	if !this.UpdateMask.Equal(&that1.UpdateMask) {
+		return false
+	}
+	return true
 }
 func (this *CreateUserRequest) VerboseEqual(that interface{}) error {
 	if that == nil {
@@ -2366,6 +2852,107 @@ var _GtwGr_serviceDesc = grpc.ServiceDesc{
 	Metadata: "github.com/TheThingsNetwork/ttn/api/identityserver.proto",
 }
 
+// Client API for IsSettings service
+
+type IsSettingsClient interface {
+	// GetSettings returns the value of the specified settings.
+	GetSettings(ctx context.Context, in *GetSettingsRequest, opts ...grpc.CallOption) (*IdentityServerSettings, error)
+	// UpdateSettings updates the settings.
+	UpdateSettings(ctx context.Context, in *UpdateSettingsRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+}
+
+type isSettingsClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewIsSettingsClient(cc *grpc.ClientConn) IsSettingsClient {
+	return &isSettingsClient{cc}
+}
+
+func (c *isSettingsClient) GetSettings(ctx context.Context, in *GetSettingsRequest, opts ...grpc.CallOption) (*IdentityServerSettings, error) {
+	out := new(IdentityServerSettings)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsSettings/GetSettings", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isSettingsClient) UpdateSettings(ctx context.Context, in *UpdateSettingsRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsSettings/UpdateSettings", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for IsSettings service
+
+type IsSettingsServer interface {
+	// GetSettings returns the value of the specified settings.
+	GetSettings(context.Context, *GetSettingsRequest) (*IdentityServerSettings, error)
+	// UpdateSettings updates the settings.
+	UpdateSettings(context.Context, *UpdateSettingsRequest) (*google_protobuf2.Empty, error)
+}
+
+func RegisterIsSettingsServer(s *grpc.Server, srv IsSettingsServer) {
+	s.RegisterService(&_IsSettings_serviceDesc, srv)
+}
+
+func _IsSettings_GetSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsSettingsServer).GetSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsSettings/GetSettings",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsSettingsServer).GetSettings(ctx, req.(*GetSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsSettings_UpdateSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsSettingsServer).UpdateSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsSettings/UpdateSettings",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsSettingsServer).UpdateSettings(ctx, req.(*UpdateSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _IsSettings_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "ttn.v3.IsSettings",
+	HandlerType: (*IsSettingsServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetSettings",
+			Handler:    _IsSettings_GetSettings_Handler,
+		},
+		{
+			MethodName: "UpdateSettings",
+			Handler:    _IsSettings_UpdateSettings_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "github.com/TheThingsNetwork/ttn/api/identityserver.proto",
+}
+
 // Client API for IsUser service
 
 type IsUserClient interface {
@@ -3706,6 +4293,212 @@ var _IsClient_serviceDesc = grpc.ServiceDesc{
 	Metadata: "github.com/TheThingsNetwork/ttn/api/identityserver.proto",
 }
 
+func (m *IdentityServerSettings) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *IdentityServerSettings) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.BlacklistedIDs) > 0 {
+		for _, s := range m.BlacklistedIDs {
+			dAtA[i] = 0xa
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			dAtA[i] = uint8(l)
+			i++
+			i += copy(dAtA[i:], s)
+		}
+	}
+	if m.AutomaticApproval {
+		dAtA[i] = 0x10
+		i++
+		if m.AutomaticApproval {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.ClosedRegistration {
+		dAtA[i] = 0x18
+		i++
+		if m.ClosedRegistration {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	dAtA[i] = 0x22
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.ValidationTokenTTL)))
+	n1, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.ValidationTokenTTL, dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n1
+	if len(m.AllowedEmails) > 0 {
+		for _, s := range m.AllowedEmails {
+			dAtA[i] = 0x2a
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			dAtA[i] = uint8(l)
+			i++
+			i += copy(dAtA[i:], s)
+		}
+	}
+	return i, nil
+}
+
+func (m *IdentityServerSettingsMask) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *IdentityServerSettingsMask) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.BlacklistedIDs {
+		dAtA[i] = 0x8
+		i++
+		if m.BlacklistedIDs {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.AutomaticApproval {
+		dAtA[i] = 0x10
+		i++
+		if m.AutomaticApproval {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.ClosedRegistration {
+		dAtA[i] = 0x18
+		i++
+		if m.ClosedRegistration {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.ValidationTokenTTL {
+		dAtA[i] = 0x20
+		i++
+		if m.ValidationTokenTTL {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.AllowedEmails {
+		dAtA[i] = 0x28
+		i++
+		if m.AllowedEmails {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	return i, nil
+}
+
+func (m *GetSettingsRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GetSettingsRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.ProjectionMask != nil {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(m.ProjectionMask.Size()))
+		n2, err := m.ProjectionMask.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n2
+	}
+	return i, nil
+}
+
+func (m *UpdateSettingsRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpdateSettingsRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Settings.Size()))
+	n3, err := m.Settings.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n3
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
+	n4, err := m.UpdateMask.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n4
+	return i, nil
+}
+
 func (m *CreateUserRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -3724,11 +4517,11 @@ func (m *CreateUserRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.User.Size()))
-	n1, err := m.User.MarshalTo(dAtA[i:])
+	n5, err := m.User.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n1
+	i += n5
 	if len(m.InvitationToken) > 0 {
 		dAtA[i] = 0x12
 		i++
@@ -3756,19 +4549,19 @@ func (m *UpdateUserRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.User.Size()))
-	n2, err := m.User.MarshalTo(dAtA[i:])
+	n6, err := m.User.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n2
+	i += n6
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
-	n3, err := m.UpdateMask.MarshalTo(dAtA[i:])
+	n7, err := m.UpdateMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n3
+	i += n7
 	return i, nil
 }
 
@@ -3874,11 +4667,11 @@ func (m *CreateApplicationRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Application.Size()))
-	n4, err := m.Application.MarshalTo(dAtA[i:])
+	n8, err := m.Application.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n4
+	i += n8
 	return i, nil
 }
 
@@ -3930,19 +4723,19 @@ func (m *UpdateApplicationRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Application.Size()))
-	n5, err := m.Application.MarshalTo(dAtA[i:])
+	n9, err := m.Application.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n5
+	i += n9
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
-	n6, err := m.UpdateMask.MarshalTo(dAtA[i:])
+	n10, err := m.UpdateMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n6
+	i += n10
 	return i, nil
 }
 
@@ -3964,11 +4757,11 @@ func (m *GenerateApplicationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
-	n7, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
+	n11, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n7
+	i += n11
 	if len(m.Name) > 0 {
 		dAtA[i] = 0x12
 		i++
@@ -3976,21 +4769,21 @@ func (m *GenerateApplicationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], m.Name)
 	}
 	if len(m.Rights) > 0 {
-		dAtA9 := make([]byte, len(m.Rights)*10)
-		var j8 int
+		dAtA13 := make([]byte, len(m.Rights)*10)
+		var j12 int
 		for _, num := range m.Rights {
 			for num >= 1<<7 {
-				dAtA9[j8] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA13[j12] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j8++
+				j12++
 			}
-			dAtA9[j8] = uint8(num)
-			j8++
+			dAtA13[j12] = uint8(num)
+			j12++
 		}
 		dAtA[i] = 0x1a
 		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j8))
-		i += copy(dAtA[i:], dAtA9[:j8])
+		i = encodeVarintIdentityserver(dAtA, i, uint64(j12))
+		i += copy(dAtA[i:], dAtA13[:j12])
 	}
 	return i, nil
 }
@@ -4013,27 +4806,27 @@ func (m *UpdateApplicationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
-	n10, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
+	n14, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n10
+	i += n14
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Key.Size()))
-	n11, err := m.Key.MarshalTo(dAtA[i:])
+	n15, err := m.Key.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n11
+	i += n15
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
-	n12, err := m.UpdateMask.MarshalTo(dAtA[i:])
+	n16, err := m.UpdateMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n12
+	i += n16
 	return i, nil
 }
 
@@ -4055,11 +4848,11 @@ func (m *RemoveApplicationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
-	n13, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
+	n17, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n13
+	i += n17
 	if len(m.Key) > 0 {
 		dAtA[i] = 0x12
 		i++
@@ -4087,19 +4880,19 @@ func (m *SetApplicationCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) 
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
-	n14, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
+	n18, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n14
+	i += n18
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Collaborator.Size()))
-	n15, err := m.Collaborator.MarshalTo(dAtA[i:])
+	n19, err := m.Collaborator.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n15
+	i += n19
 	return i, nil
 }
 
@@ -4151,11 +4944,11 @@ func (m *CreateGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Gateway.Size()))
-	n16, err := m.Gateway.MarshalTo(dAtA[i:])
+	n20, err := m.Gateway.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n16
+	i += n20
 	return i, nil
 }
 
@@ -4207,19 +5000,19 @@ func (m *UpdateGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Gateway.Size()))
-	n17, err := m.Gateway.MarshalTo(dAtA[i:])
+	n21, err := m.Gateway.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n17
+	i += n21
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
-	n18, err := m.UpdateMask.MarshalTo(dAtA[i:])
+	n22, err := m.UpdateMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n18
+	i += n22
 	return i, nil
 }
 
@@ -4241,11 +5034,11 @@ func (m *GenerateGatewayAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
-	n19, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	n23, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n19
+	i += n23
 	if len(m.Name) > 0 {
 		dAtA[i] = 0x12
 		i++
@@ -4253,21 +5046,21 @@ func (m *GenerateGatewayAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], m.Name)
 	}
 	if len(m.Rights) > 0 {
-		dAtA21 := make([]byte, len(m.Rights)*10)
-		var j20 int
+		dAtA25 := make([]byte, len(m.Rights)*10)
+		var j24 int
 		for _, num := range m.Rights {
 			for num >= 1<<7 {
-				dAtA21[j20] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA25[j24] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j20++
+				j24++
 			}
-			dAtA21[j20] = uint8(num)
-			j20++
+			dAtA25[j24] = uint8(num)
+			j24++
 		}
 		dAtA[i] = 0x1a
 		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j20))
-		i += copy(dAtA[i:], dAtA21[:j20])
+		i = encodeVarintIdentityserver(dAtA, i, uint64(j24))
+		i += copy(dAtA[i:], dAtA25[:j24])
 	}
 	return i, nil
 }
@@ -4290,27 +5083,27 @@ func (m *UpdateGatewayAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
-	n22, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	n26, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n22
+	i += n26
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Key.Size()))
-	n23, err := m.Key.MarshalTo(dAtA[i:])
+	n27, err := m.Key.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n23
+	i += n27
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
-	n24, err := m.UpdateMask.MarshalTo(dAtA[i:])
+	n28, err := m.UpdateMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n24
+	i += n28
 	return i, nil
 }
 
@@ -4332,11 +5125,11 @@ func (m *RemoveGatewayAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
-	n25, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	n29, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n25
+	i += n29
 	if len(m.Key) > 0 {
 		dAtA[i] = 0x12
 		i++
@@ -4364,19 +5157,19 @@ func (m *SetGatewayCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
-	n26, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	n30, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n26
+	i += n30
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Collaborator.Size()))
-	n27, err := m.Collaborator.MarshalTo(dAtA[i:])
+	n31, err := m.Collaborator.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n27
+	i += n31
 	return i, nil
 }
 
@@ -4428,11 +5221,11 @@ func (m *CreateClientRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Client.Size()))
-	n28, err := m.Client.MarshalTo(dAtA[i:])
+	n32, err := m.Client.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n28
+	i += n32
 	return i, nil
 }
 
@@ -4484,19 +5277,19 @@ func (m *UpdateClientRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Client.Size()))
-	n29, err := m.Client.MarshalTo(dAtA[i:])
+	n33, err := m.Client.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n29
+	i += n33
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
-	n30, err := m.UpdateMask.MarshalTo(dAtA[i:])
+	n34, err := m.UpdateMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n30
+	i += n34
 	return i, nil
 }
 
@@ -4509,10 +5302,64 @@ func encodeVarintIdentityserver(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return offset + 1
 }
+func NewPopulatedIdentityServerSettings(r randyIdentityserver, easy bool) *IdentityServerSettings {
+	this := &IdentityServerSettings{}
+	v1 := r.Intn(10)
+	this.BlacklistedIDs = make([]string, v1)
+	for i := 0; i < v1; i++ {
+		this.BlacklistedIDs[i] = randStringIdentityserver(r)
+	}
+	this.AutomaticApproval = bool(r.Intn(2) == 0)
+	this.ClosedRegistration = bool(r.Intn(2) == 0)
+	v2 := github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
+	this.ValidationTokenTTL = *v2
+	v3 := r.Intn(10)
+	this.AllowedEmails = make([]string, v3)
+	for i := 0; i < v3; i++ {
+		this.AllowedEmails[i] = randStringIdentityserver(r)
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedIdentityServerSettingsMask(r randyIdentityserver, easy bool) *IdentityServerSettingsMask {
+	this := &IdentityServerSettingsMask{}
+	this.BlacklistedIDs = bool(r.Intn(2) == 0)
+	this.AutomaticApproval = bool(r.Intn(2) == 0)
+	this.ClosedRegistration = bool(r.Intn(2) == 0)
+	this.ValidationTokenTTL = bool(r.Intn(2) == 0)
+	this.AllowedEmails = bool(r.Intn(2) == 0)
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedGetSettingsRequest(r randyIdentityserver, easy bool) *GetSettingsRequest {
+	this := &GetSettingsRequest{}
+	if r.Intn(10) != 0 {
+		this.ProjectionMask = NewPopulatedIdentityServerSettingsMask(r, easy)
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedUpdateSettingsRequest(r randyIdentityserver, easy bool) *UpdateSettingsRequest {
+	this := &UpdateSettingsRequest{}
+	v4 := NewPopulatedIdentityServerSettings(r, easy)
+	this.Settings = *v4
+	v5 := NewPopulatedIdentityServerSettingsMask(r, easy)
+	this.UpdateMask = *v5
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
 func NewPopulatedCreateUserRequest(r randyIdentityserver, easy bool) *CreateUserRequest {
 	this := &CreateUserRequest{}
-	v1 := NewPopulatedUser(r, easy)
-	this.User = *v1
+	v6 := NewPopulatedUser(r, easy)
+	this.User = *v6
 	this.InvitationToken = randStringIdentityserver(r)
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -4521,10 +5368,10 @@ func NewPopulatedCreateUserRequest(r randyIdentityserver, easy bool) *CreateUser
 
 func NewPopulatedUpdateUserRequest(r randyIdentityserver, easy bool) *UpdateUserRequest {
 	this := &UpdateUserRequest{}
-	v2 := NewPopulatedUser(r, easy)
-	this.User = *v2
-	v3 := NewPopulatedUserMask(r, easy)
-	this.UpdateMask = *v3
+	v7 := NewPopulatedUser(r, easy)
+	this.User = *v7
+	v8 := NewPopulatedUserMask(r, easy)
+	this.UpdateMask = *v8
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4550,11 +5397,11 @@ func NewPopulatedValidateUserEmailRequest(r randyIdentityserver, easy bool) *Val
 func NewPopulatedListAuthorizedClientsResponse(r randyIdentityserver, easy bool) *ListAuthorizedClientsResponse {
 	this := &ListAuthorizedClientsResponse{}
 	if r.Intn(10) != 0 {
-		v4 := r.Intn(5)
-		this.Clients = make([]Client, v4)
-		for i := 0; i < v4; i++ {
-			v5 := NewPopulatedClient(r, easy)
-			this.Clients[i] = *v5
+		v9 := r.Intn(5)
+		this.Clients = make([]Client, v9)
+		for i := 0; i < v9; i++ {
+			v10 := NewPopulatedClient(r, easy)
+			this.Clients[i] = *v10
 		}
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -4564,8 +5411,8 @@ func NewPopulatedListAuthorizedClientsResponse(r randyIdentityserver, easy bool)
 
 func NewPopulatedCreateApplicationRequest(r randyIdentityserver, easy bool) *CreateApplicationRequest {
 	this := &CreateApplicationRequest{}
-	v6 := NewPopulatedApplication(r, easy)
-	this.Application = *v6
+	v11 := NewPopulatedApplication(r, easy)
+	this.Application = *v11
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4574,11 +5421,11 @@ func NewPopulatedCreateApplicationRequest(r randyIdentityserver, easy bool) *Cre
 func NewPopulatedListApplicationsResponse(r randyIdentityserver, easy bool) *ListApplicationsResponse {
 	this := &ListApplicationsResponse{}
 	if r.Intn(10) != 0 {
-		v7 := r.Intn(5)
-		this.Applications = make([]Application, v7)
-		for i := 0; i < v7; i++ {
-			v8 := NewPopulatedApplication(r, easy)
-			this.Applications[i] = *v8
+		v12 := r.Intn(5)
+		this.Applications = make([]Application, v12)
+		for i := 0; i < v12; i++ {
+			v13 := NewPopulatedApplication(r, easy)
+			this.Applications[i] = *v13
 		}
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -4588,10 +5435,10 @@ func NewPopulatedListApplicationsResponse(r randyIdentityserver, easy bool) *Lis
 
 func NewPopulatedUpdateApplicationRequest(r randyIdentityserver, easy bool) *UpdateApplicationRequest {
 	this := &UpdateApplicationRequest{}
-	v9 := NewPopulatedApplication(r, easy)
-	this.Application = *v9
-	v10 := NewPopulatedApplicationMask(r, easy)
-	this.UpdateMask = *v10
+	v14 := NewPopulatedApplication(r, easy)
+	this.Application = *v14
+	v15 := NewPopulatedApplicationMask(r, easy)
+	this.UpdateMask = *v15
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4599,12 +5446,12 @@ func NewPopulatedUpdateApplicationRequest(r randyIdentityserver, easy bool) *Upd
 
 func NewPopulatedGenerateApplicationAPIKeyRequest(r randyIdentityserver, easy bool) *GenerateApplicationAPIKeyRequest {
 	this := &GenerateApplicationAPIKeyRequest{}
-	v11 := NewPopulatedApplicationIdentifier(r, easy)
-	this.ApplicationIdentifier = *v11
+	v16 := NewPopulatedApplicationIdentifier(r, easy)
+	this.ApplicationIdentifier = *v16
 	this.Name = randStringIdentityserver(r)
-	v12 := r.Intn(10)
-	this.Rights = make([]Right, v12)
-	for i := 0; i < v12; i++ {
+	v17 := r.Intn(10)
+	this.Rights = make([]Right, v17)
+	for i := 0; i < v17; i++ {
 		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -4614,12 +5461,12 @@ func NewPopulatedGenerateApplicationAPIKeyRequest(r randyIdentityserver, easy bo
 
 func NewPopulatedUpdateApplicationAPIKeyRequest(r randyIdentityserver, easy bool) *UpdateApplicationAPIKeyRequest {
 	this := &UpdateApplicationAPIKeyRequest{}
-	v13 := NewPopulatedApplicationIdentifier(r, easy)
-	this.ApplicationIdentifier = *v13
-	v14 := NewPopulatedAPIKey(r, easy)
-	this.Key = *v14
-	v15 := NewPopulatedAPIKeyMask(r, easy)
-	this.UpdateMask = *v15
+	v18 := NewPopulatedApplicationIdentifier(r, easy)
+	this.ApplicationIdentifier = *v18
+	v19 := NewPopulatedAPIKey(r, easy)
+	this.Key = *v19
+	v20 := NewPopulatedAPIKeyMask(r, easy)
+	this.UpdateMask = *v20
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4627,8 +5474,8 @@ func NewPopulatedUpdateApplicationAPIKeyRequest(r randyIdentityserver, easy bool
 
 func NewPopulatedRemoveApplicationAPIKeyRequest(r randyIdentityserver, easy bool) *RemoveApplicationAPIKeyRequest {
 	this := &RemoveApplicationAPIKeyRequest{}
-	v16 := NewPopulatedApplicationIdentifier(r, easy)
-	this.ApplicationIdentifier = *v16
+	v21 := NewPopulatedApplicationIdentifier(r, easy)
+	this.ApplicationIdentifier = *v21
 	this.Key = randStringIdentityserver(r)
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -4637,10 +5484,10 @@ func NewPopulatedRemoveApplicationAPIKeyRequest(r randyIdentityserver, easy bool
 
 func NewPopulatedSetApplicationCollaboratorRequest(r randyIdentityserver, easy bool) *SetApplicationCollaboratorRequest {
 	this := &SetApplicationCollaboratorRequest{}
-	v17 := NewPopulatedApplicationIdentifier(r, easy)
-	this.ApplicationIdentifier = *v17
-	v18 := NewPopulatedCollaborator(r, easy)
-	this.Collaborator = *v18
+	v22 := NewPopulatedApplicationIdentifier(r, easy)
+	this.ApplicationIdentifier = *v22
+	v23 := NewPopulatedCollaborator(r, easy)
+	this.Collaborator = *v23
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4649,11 +5496,11 @@ func NewPopulatedSetApplicationCollaboratorRequest(r randyIdentityserver, easy b
 func NewPopulatedListApplicationCollaboratorsResponse(r randyIdentityserver, easy bool) *ListApplicationCollaboratorsResponse {
 	this := &ListApplicationCollaboratorsResponse{}
 	if r.Intn(10) != 0 {
-		v19 := r.Intn(5)
-		this.Collaborators = make([]Collaborator, v19)
-		for i := 0; i < v19; i++ {
-			v20 := NewPopulatedCollaborator(r, easy)
-			this.Collaborators[i] = *v20
+		v24 := r.Intn(5)
+		this.Collaborators = make([]Collaborator, v24)
+		for i := 0; i < v24; i++ {
+			v25 := NewPopulatedCollaborator(r, easy)
+			this.Collaborators[i] = *v25
 		}
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -4663,8 +5510,8 @@ func NewPopulatedListApplicationCollaboratorsResponse(r randyIdentityserver, eas
 
 func NewPopulatedCreateGatewayRequest(r randyIdentityserver, easy bool) *CreateGatewayRequest {
 	this := &CreateGatewayRequest{}
-	v21 := NewPopulatedGateway(r, easy)
-	this.Gateway = *v21
+	v26 := NewPopulatedGateway(r, easy)
+	this.Gateway = *v26
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4673,11 +5520,11 @@ func NewPopulatedCreateGatewayRequest(r randyIdentityserver, easy bool) *CreateG
 func NewPopulatedListGatewaysResponse(r randyIdentityserver, easy bool) *ListGatewaysResponse {
 	this := &ListGatewaysResponse{}
 	if r.Intn(10) != 0 {
-		v22 := r.Intn(5)
-		this.Gateways = make([]Gateway, v22)
-		for i := 0; i < v22; i++ {
-			v23 := NewPopulatedGateway(r, easy)
-			this.Gateways[i] = *v23
+		v27 := r.Intn(5)
+		this.Gateways = make([]Gateway, v27)
+		for i := 0; i < v27; i++ {
+			v28 := NewPopulatedGateway(r, easy)
+			this.Gateways[i] = *v28
 		}
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -4687,10 +5534,10 @@ func NewPopulatedListGatewaysResponse(r randyIdentityserver, easy bool) *ListGat
 
 func NewPopulatedUpdateGatewayRequest(r randyIdentityserver, easy bool) *UpdateGatewayRequest {
 	this := &UpdateGatewayRequest{}
-	v24 := NewPopulatedGateway(r, easy)
-	this.Gateway = *v24
-	v25 := NewPopulatedGatewayMask(r, easy)
-	this.UpdateMask = *v25
+	v29 := NewPopulatedGateway(r, easy)
+	this.Gateway = *v29
+	v30 := NewPopulatedGatewayMask(r, easy)
+	this.UpdateMask = *v30
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4698,12 +5545,12 @@ func NewPopulatedUpdateGatewayRequest(r randyIdentityserver, easy bool) *UpdateG
 
 func NewPopulatedGenerateGatewayAPIKeyRequest(r randyIdentityserver, easy bool) *GenerateGatewayAPIKeyRequest {
 	this := &GenerateGatewayAPIKeyRequest{}
-	v26 := NewPopulatedGatewayIdentifier(r, easy)
-	this.GatewayIdentifier = *v26
+	v31 := NewPopulatedGatewayIdentifier(r, easy)
+	this.GatewayIdentifier = *v31
 	this.Name = randStringIdentityserver(r)
-	v27 := r.Intn(10)
-	this.Rights = make([]Right, v27)
-	for i := 0; i < v27; i++ {
+	v32 := r.Intn(10)
+	this.Rights = make([]Right, v32)
+	for i := 0; i < v32; i++ {
 		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -4713,12 +5560,12 @@ func NewPopulatedGenerateGatewayAPIKeyRequest(r randyIdentityserver, easy bool) 
 
 func NewPopulatedUpdateGatewayAPIKeyRequest(r randyIdentityserver, easy bool) *UpdateGatewayAPIKeyRequest {
 	this := &UpdateGatewayAPIKeyRequest{}
-	v28 := NewPopulatedGatewayIdentifier(r, easy)
-	this.GatewayIdentifier = *v28
-	v29 := NewPopulatedAPIKey(r, easy)
-	this.Key = *v29
-	v30 := NewPopulatedAPIKeyMask(r, easy)
-	this.UpdateMask = *v30
+	v33 := NewPopulatedGatewayIdentifier(r, easy)
+	this.GatewayIdentifier = *v33
+	v34 := NewPopulatedAPIKey(r, easy)
+	this.Key = *v34
+	v35 := NewPopulatedAPIKeyMask(r, easy)
+	this.UpdateMask = *v35
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4726,8 +5573,8 @@ func NewPopulatedUpdateGatewayAPIKeyRequest(r randyIdentityserver, easy bool) *U
 
 func NewPopulatedRemoveGatewayAPIKeyRequest(r randyIdentityserver, easy bool) *RemoveGatewayAPIKeyRequest {
 	this := &RemoveGatewayAPIKeyRequest{}
-	v31 := NewPopulatedGatewayIdentifier(r, easy)
-	this.GatewayIdentifier = *v31
+	v36 := NewPopulatedGatewayIdentifier(r, easy)
+	this.GatewayIdentifier = *v36
 	this.Key = randStringIdentityserver(r)
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -4736,10 +5583,10 @@ func NewPopulatedRemoveGatewayAPIKeyRequest(r randyIdentityserver, easy bool) *R
 
 func NewPopulatedSetGatewayCollaboratorRequest(r randyIdentityserver, easy bool) *SetGatewayCollaboratorRequest {
 	this := &SetGatewayCollaboratorRequest{}
-	v32 := NewPopulatedGatewayIdentifier(r, easy)
-	this.GatewayIdentifier = *v32
-	v33 := NewPopulatedCollaborator(r, easy)
-	this.Collaborator = *v33
+	v37 := NewPopulatedGatewayIdentifier(r, easy)
+	this.GatewayIdentifier = *v37
+	v38 := NewPopulatedCollaborator(r, easy)
+	this.Collaborator = *v38
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4748,11 +5595,11 @@ func NewPopulatedSetGatewayCollaboratorRequest(r randyIdentityserver, easy bool)
 func NewPopulatedListGatewayCollaboratorsResponse(r randyIdentityserver, easy bool) *ListGatewayCollaboratorsResponse {
 	this := &ListGatewayCollaboratorsResponse{}
 	if r.Intn(10) != 0 {
-		v34 := r.Intn(5)
-		this.Collaborators = make([]Collaborator, v34)
-		for i := 0; i < v34; i++ {
-			v35 := NewPopulatedCollaborator(r, easy)
-			this.Collaborators[i] = *v35
+		v39 := r.Intn(5)
+		this.Collaborators = make([]Collaborator, v39)
+		for i := 0; i < v39; i++ {
+			v40 := NewPopulatedCollaborator(r, easy)
+			this.Collaborators[i] = *v40
 		}
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -4762,8 +5609,8 @@ func NewPopulatedListGatewayCollaboratorsResponse(r randyIdentityserver, easy bo
 
 func NewPopulatedCreateClientRequest(r randyIdentityserver, easy bool) *CreateClientRequest {
 	this := &CreateClientRequest{}
-	v36 := NewPopulatedClient(r, easy)
-	this.Client = *v36
+	v41 := NewPopulatedClient(r, easy)
+	this.Client = *v41
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4772,11 +5619,11 @@ func NewPopulatedCreateClientRequest(r randyIdentityserver, easy bool) *CreateCl
 func NewPopulatedListClientsResponse(r randyIdentityserver, easy bool) *ListClientsResponse {
 	this := &ListClientsResponse{}
 	if r.Intn(10) != 0 {
-		v37 := r.Intn(5)
-		this.Clients = make([]Client, v37)
-		for i := 0; i < v37; i++ {
-			v38 := NewPopulatedClient(r, easy)
-			this.Clients[i] = *v38
+		v42 := r.Intn(5)
+		this.Clients = make([]Client, v42)
+		for i := 0; i < v42; i++ {
+			v43 := NewPopulatedClient(r, easy)
+			this.Clients[i] = *v43
 		}
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -4786,10 +5633,10 @@ func NewPopulatedListClientsResponse(r randyIdentityserver, easy bool) *ListClie
 
 func NewPopulatedUpdateClientRequest(r randyIdentityserver, easy bool) *UpdateClientRequest {
 	this := &UpdateClientRequest{}
-	v39 := NewPopulatedClient(r, easy)
-	this.Client = *v39
-	v40 := NewPopulatedClientMask(r, easy)
-	this.UpdateMask = *v40
+	v44 := NewPopulatedClient(r, easy)
+	this.Client = *v44
+	v45 := NewPopulatedClientMask(r, easy)
+	this.UpdateMask = *v45
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4814,9 +5661,9 @@ func randUTF8RuneIdentityserver(r randyIdentityserver) rune {
 	return rune(ru + 61)
 }
 func randStringIdentityserver(r randyIdentityserver) string {
-	v41 := r.Intn(100)
-	tmps := make([]rune, v41)
-	for i := 0; i < v41; i++ {
+	v46 := r.Intn(100)
+	tmps := make([]rune, v46)
+	for i := 0; i < v46; i++ {
 		tmps[i] = randUTF8RuneIdentityserver(r)
 	}
 	return string(tmps)
@@ -4838,11 +5685,11 @@ func randFieldIdentityserver(dAtA []byte, r randyIdentityserver, fieldNumber int
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateIdentityserver(dAtA, uint64(key))
-		v42 := r.Int63()
+		v47 := r.Int63()
 		if r.Intn(2) == 0 {
-			v42 *= -1
+			v47 *= -1
 		}
-		dAtA = encodeVarintPopulateIdentityserver(dAtA, uint64(v42))
+		dAtA = encodeVarintPopulateIdentityserver(dAtA, uint64(v47))
 	case 1:
 		dAtA = encodeVarintPopulateIdentityserver(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -4867,6 +5714,73 @@ func encodeVarintPopulateIdentityserver(dAtA []byte, v uint64) []byte {
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
 }
+func (m *IdentityServerSettings) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.BlacklistedIDs) > 0 {
+		for _, s := range m.BlacklistedIDs {
+			l = len(s)
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	if m.AutomaticApproval {
+		n += 2
+	}
+	if m.ClosedRegistration {
+		n += 2
+	}
+	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.ValidationTokenTTL)
+	n += 1 + l + sovIdentityserver(uint64(l))
+	if len(m.AllowedEmails) > 0 {
+		for _, s := range m.AllowedEmails {
+			l = len(s)
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *IdentityServerSettingsMask) Size() (n int) {
+	var l int
+	_ = l
+	if m.BlacklistedIDs {
+		n += 2
+	}
+	if m.AutomaticApproval {
+		n += 2
+	}
+	if m.ClosedRegistration {
+		n += 2
+	}
+	if m.ValidationTokenTTL {
+		n += 2
+	}
+	if m.AllowedEmails {
+		n += 2
+	}
+	return n
+}
+
+func (m *GetSettingsRequest) Size() (n int) {
+	var l int
+	_ = l
+	if m.ProjectionMask != nil {
+		l = m.ProjectionMask.Size()
+		n += 1 + l + sovIdentityserver(uint64(l))
+	}
+	return n
+}
+
+func (m *UpdateSettingsRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.Settings.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = m.UpdateMask.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	return n
+}
+
 func (m *CreateUserRequest) Size() (n int) {
 	var l int
 	_ = l
@@ -5157,6 +6071,527 @@ func sovIdentityserver(x uint64) (n int) {
 }
 func sozIdentityserver(x uint64) (n int) {
 	return sovIdentityserver((x << 1) ^ uint64((int64(x) >> 63)))
+}
+func (m *IdentityServerSettings) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: IdentityServerSettings: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: IdentityServerSettings: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BlacklistedIDs", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.BlacklistedIDs = append(m.BlacklistedIDs, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AutomaticApproval", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.AutomaticApproval = bool(v != 0)
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClosedRegistration", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.ClosedRegistration = bool(v != 0)
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ValidationTokenTTL", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.ValidationTokenTTL, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AllowedEmails", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AllowedEmails = append(m.AllowedEmails, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *IdentityServerSettingsMask) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: IdentityServerSettingsMask: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: IdentityServerSettingsMask: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BlacklistedIDs", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.BlacklistedIDs = bool(v != 0)
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AutomaticApproval", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.AutomaticApproval = bool(v != 0)
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClosedRegistration", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.ClosedRegistration = bool(v != 0)
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ValidationTokenTTL", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.ValidationTokenTTL = bool(v != 0)
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AllowedEmails", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.AllowedEmails = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GetSettingsRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GetSettingsRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GetSettingsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProjectionMask", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ProjectionMask == nil {
+				m.ProjectionMask = &IdentityServerSettingsMask{}
+			}
+			if err := m.ProjectionMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UpdateSettingsRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpdateSettingsRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpdateSettingsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Settings", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Settings.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateMask", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.UpdateMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *CreateUserRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -7793,101 +9228,121 @@ func init() {
 }
 
 var fileDescriptorIdentityserver = []byte{
-	// 1534 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x58, 0x4d, 0x6c, 0x13, 0xc7,
-	0x17, 0xf7, 0x10, 0x30, 0xe4, 0xc5, 0x0e, 0xc9, 0x24, 0x04, 0x63, 0xc2, 0x60, 0x56, 0x80, 0x82,
-	0xc4, 0xdf, 0x01, 0x23, 0xfe, 0xa5, 0x9f, 0x80, 0x4d, 0x64, 0x99, 0xf2, 0x69, 0xbe, 0x44, 0x2f,
-	0xd1, 0x06, 0x4f, 0x9c, 0x95, 0x1d, 0xaf, 0xbb, 0xbb, 0x4e, 0x94, 0x1e, 0x2a, 0xd4, 0x5e, 0x90,
-	0xda, 0x43, 0x6f, 0xed, 0xa5, 0x6a, 0x6f, 0xe5, 0x52, 0x89, 0x5b, 0x39, 0x22, 0xf5, 0xc2, 0x91,
-	0xaa, 0x17, 0x4e, 0x08, 0xdb, 0x17, 0x8e, 0x1c, 0x39, 0x56, 0xbb, 0x33, 0xe3, 0x9d, 0xb5, 0x77,
-	0x1c, 0x87, 0x24, 0x9c, 0xb2, 0xde, 0x7d, 0x1f, 0xbf, 0xf7, 0xe6, 0xbd, 0x37, 0xbf, 0x17, 0x38,
-	0x57, 0x36, 0x9c, 0xa5, 0xc6, 0x42, 0xfa, 0x81, 0xb9, 0x3c, 0x7b, 0x7b, 0x89, 0xde, 0x5e, 0x32,
-	0x6a, 0x65, 0xfb, 0x1a, 0x75, 0x56, 0x4d, 0xab, 0x32, 0xeb, 0x38, 0xb5, 0x59, 0xbd, 0x6e, 0xcc,
-	0x1a, 0x25, 0x5a, 0x73, 0x0c, 0x67, 0xcd, 0xa6, 0xd6, 0x0a, 0xb5, 0xd2, 0x75, 0xcb, 0x74, 0x4c,
-	0x1c, 0x75, 0x9c, 0x5a, 0x7a, 0xe5, 0x4c, 0xf2, 0x7f, 0x92, 0x85, 0xb2, 0x59, 0x36, 0x67, 0xbd,
-	0xcf, 0x0b, 0x8d, 0x45, 0xef, 0x97, 0xf7, 0xc3, 0x7b, 0x62, 0x6a, 0xc9, 0xb3, 0x83, 0x38, 0xd4,
-	0xeb, 0xf5, 0xaa, 0xf1, 0x40, 0x77, 0x0c, 0xb3, 0xc6, 0xd5, 0x4e, 0x0d, 0xa2, 0xf6, 0xa0, 0x6a,
-	0xd0, 0x9a, 0xc3, 0x35, 0xfe, 0x3f, 0x90, 0x86, 0x59, 0xad, 0xea, 0x0b, 0xa6, 0xa5, 0x3b, 0xa6,
-	0xb5, 0x11, 0x4f, 0x96, 0x51, 0x5e, 0x72, 0xec, 0x8d, 0x84, 0xc4, 0x72, 0xb8, 0x68, 0x50, 0x4b,
-	0xa8, 0x9d, 0x1e, 0x44, 0xad, 0xac, 0x3b, 0x74, 0x55, 0x5f, 0xe3, 0x2a, 0xe9, 0x41, 0x54, 0x1a,
-	0xb6, 0x38, 0xa3, 0xe4, 0xc1, 0xb2, 0x69, 0x96, 0xab, 0xd4, 0x3f, 0x12, 0xba, 0x5c, 0x77, 0xb8,
-	0x31, 0x6d, 0x11, 0xc6, 0x73, 0x16, 0xd5, 0x1d, 0x7a, 0xc7, 0xa6, 0x56, 0x91, 0x7e, 0xdd, 0xa0,
-	0xb6, 0x83, 0x8f, 0xc3, 0x4e, 0x57, 0x3f, 0x81, 0x52, 0x68, 0x66, 0x24, 0x13, 0x4b, 0xb3, 0x43,
-	0x4e, 0xbb, 0x22, 0xd9, 0x9d, 0xcf, 0x5f, 0x1d, 0x8e, 0x14, 0xbd, 0xef, 0xf8, 0x04, 0x8c, 0x19,
-	0xb5, 0x15, 0xc3, 0xf1, 0xce, 0x68, 0xde, 0x31, 0x2b, 0xb4, 0x96, 0xd8, 0x91, 0x42, 0x33, 0xc3,
-	0xc5, 0xbd, 0xfe, 0xfb, 0xdb, 0xee, 0x6b, 0xcd, 0x81, 0xf1, 0x3b, 0xf5, 0xd2, 0x7b, 0xfa, 0xf9,
-	0x08, 0x46, 0x1a, 0x9e, 0xf2, 0xfc, 0xb2, 0x6e, 0x57, 0x3c, 0x17, 0x23, 0x99, 0x31, 0x59, 0xfc,
-	0xaa, 0x6e, 0x57, 0xb8, 0x0a, 0x30, 0x51, 0xf7, 0x8d, 0x76, 0x1e, 0x0e, 0xf8, 0x5e, 0x6f, 0xe8,
-	0xb6, 0xbd, 0x6a, 0x5a, 0x25, 0xe1, 0x7d, 0x0c, 0x86, 0xcc, 0x6a, 0xc9, 0x73, 0x3e, 0x5c, 0x74,
-	0x1f, 0xdd, 0x37, 0x35, 0xba, 0xca, 0x43, 0x70, 0x1f, 0xb5, 0x53, 0x90, 0xb8, 0xab, 0x57, 0x0d,
-	0x61, 0x62, 0x6e, 0x59, 0x37, 0xaa, 0x42, 0x7f, 0x12, 0x76, 0xb1, 0x90, 0x99, 0x05, 0xf6, 0x43,
-	0xbb, 0x0e, 0x87, 0xae, 0x18, 0xb6, 0x73, 0xb1, 0xe1, 0x2c, 0x99, 0x96, 0xf1, 0x0d, 0x2d, 0xe5,
-	0xbc, 0x7a, 0xb4, 0x8b, 0xd4, 0xae, 0x9b, 0x35, 0x9b, 0xe2, 0x34, 0xec, 0x66, 0x25, 0x6a, 0x27,
-	0x50, 0x6a, 0x68, 0x66, 0x24, 0x33, 0x2a, 0x02, 0x61, 0x92, 0x3c, 0x0c, 0x21, 0xa4, 0xdd, 0x83,
-	0x04, 0x3b, 0xa1, 0x8b, 0x7e, 0x3f, 0x08, 0x08, 0x9f, 0xc2, 0x88, 0xd4, 0x25, 0x3c, 0x8f, 0x13,
-	0xc2, 0x9e, 0xa4, 0xc0, 0x8d, 0xca, 0xd2, 0xda, 0x7d, 0x48, 0x78, 0x48, 0xfd, 0x57, 0x3e, 0xc8,
-	0xcf, 0x21, 0x26, 0x89, 0x0a, 0xa4, 0x7d, 0x2c, 0x07, 0xc4, 0xb5, 0x9f, 0x11, 0x24, 0x58, 0xe2,
-	0xb7, 0x18, 0x34, 0xfe, 0x22, 0xac, 0x14, 0xf6, 0x87, 0x28, 0x2b, 0x2a, 0xe2, 0x4f, 0x04, 0xa9,
-	0x3c, 0xad, 0x51, 0x2b, 0x88, 0xed, 0xe2, 0x8d, 0xc2, 0x97, 0x74, 0x4d, 0x20, 0xbc, 0x06, 0xa3,
-	0x92, 0xcf, 0x79, 0xa3, 0xc4, 0x41, 0x1e, 0x0a, 0xf1, 0x53, 0xe8, 0xb4, 0x74, 0x76, 0x8f, 0xeb,
-	0xed, 0xc5, 0xab, 0xc3, 0xa8, 0x18, 0xd7, 0x65, 0x01, 0x8c, 0x61, 0x67, 0x4d, 0x5f, 0xa6, 0xbc,
-	0xb0, 0xbc, 0x67, 0x7c, 0x0c, 0xa2, 0x6c, 0x7e, 0x24, 0x86, 0x52, 0x43, 0x33, 0xa3, 0x99, 0xb8,
-	0xb0, 0x5d, 0x74, 0xdf, 0x16, 0xf9, 0x47, 0xed, 0x5f, 0x04, 0xa4, 0x27, 0x93, 0xdb, 0x8b, 0xf6,
-	0x38, 0x0c, 0x55, 0xe8, 0x1a, 0x4f, 0x6d, 0xa7, 0x38, 0x99, 0x4f, 0x9e, 0x51, 0x57, 0x00, 0x7f,
-	0x1c, 0x3c, 0x8a, 0x21, 0x4f, 0x1e, 0x07, 0xe5, 0x15, 0xa7, 0xf0, 0x1d, 0x02, 0x52, 0xa4, 0xcb,
-	0xe6, 0xca, 0x87, 0x8b, 0x6a, 0xcc, 0x8f, 0x6a, 0xd8, 0xc3, 0xaf, 0xfd, 0x85, 0xe0, 0xc8, 0x2d,
-	0x2a, 0xd7, 0x7f, 0x4e, 0xba, 0x08, 0xb6, 0x0b, 0x47, 0x16, 0x62, 0xf2, 0x7d, 0xc3, 0xd3, 0x3c,
-	0xd9, 0x99, 0x01, 0xd2, 0x37, 0xc9, 0x48, 0x40, 0x47, 0x5b, 0x82, 0xa3, 0x5d, 0x9d, 0x2b, 0xab,
-	0xf9, 0x5d, 0x7c, 0x01, 0xe2, 0xb2, 0x9e, 0x68, 0xe3, 0x70, 0x67, 0xec, 0x94, 0x82, 0x0a, 0x5a,
-	0x1e, 0x26, 0xd9, 0xf0, 0xc9, 0xb3, 0x2b, 0x48, 0x64, 0x65, 0x16, 0x76, 0xf3, 0x4b, 0x89, 0xa7,
-	0x63, 0xaf, 0xb0, 0xc9, 0x05, 0xc5, 0x14, 0xe3, 0x52, 0x5a, 0x01, 0x26, 0x5d, 0xc8, 0xfc, 0xab,
-	0x0f, 0xf1, 0x34, 0xec, 0xe1, 0x22, 0x02, 0x9d, 0xc2, 0x52, 0x47, 0x4c, 0xfb, 0x1e, 0xc1, 0x24,
-	0x6b, 0x89, 0x4d, 0x82, 0xc2, 0x9f, 0x84, 0x0d, 0x93, 0x89, 0x2e, 0x25, 0x45, 0x09, 0xff, 0x8a,
-	0x60, 0x5a, 0x0c, 0x12, 0x2e, 0x19, 0x2c, 0xe0, 0x2c, 0x00, 0xf7, 0xe3, 0x17, 0xcd, 0x81, 0x2e,
-	0xdb, 0xa1, 0x05, 0x33, 0x5c, 0x16, 0x1f, 0x37, 0x33, 0x38, 0xfe, 0x46, 0x90, 0x0c, 0x64, 0x69,
-	0xeb, 0xd1, 0x7d, 0x80, 0x41, 0x61, 0x41, 0x92, 0xcd, 0x89, 0x6d, 0x0b, 0xa2, 0x77, 0x2e, 0xfc,
-	0x81, 0xe0, 0xd0, 0x2d, 0x2a, 0x4a, 0x35, 0x6c, 0x26, 0x6c, 0x85, 0xdf, 0xad, 0x98, 0x03, 0x25,
-	0x48, 0x49, 0x4d, 0xb5, 0x5d, 0x33, 0x20, 0x07, 0x13, 0x6c, 0x06, 0x30, 0x7e, 0x22, 0x92, 0x70,
-	0x12, 0xa2, 0x8c, 0xa2, 0xf0, 0x04, 0x84, 0xd3, 0x18, 0x2e, 0xa3, 0xcd, 0xc1, 0x84, 0x0b, 0x75,
-	0xb3, 0x64, 0xe8, 0x5b, 0x98, 0x60, 0x45, 0xbd, 0x09, 0x2c, 0xdd, 0xf5, 0xb8, 0x23, 0x58, 0x8f,
-	0x4c, 0x25, 0xbc, 0x1e, 0x33, 0xf7, 0x60, 0x57, 0xde, 0x59, 0xcd, 0x5b, 0xf8, 0x1a, 0x8c, 0xdf,
-	0x68, 0x54, 0xab, 0x39, 0xb3, 0xb6, 0x68, 0x94, 0x1b, 0x16, 0x23, 0x27, 0xea, 0x1a, 0x48, 0x4e,
-	0x77, 0x7d, 0x0a, 0x28, 0x9e, 0x42, 0x99, 0x1f, 0x76, 0x41, 0xb4, 0x60, 0xbb, 0x1c, 0x13, 0x9f,
-	0x07, 0xf0, 0x29, 0xb9, 0x6f, 0xb3, 0x87, 0xa6, 0x27, 0xa7, 0xd2, 0x8c, 0xd9, 0xa7, 0x05, 0xb3,
-	0x4f, 0xcf, 0xb9, 0xcc, 0xde, 0x9d, 0x83, 0x79, 0xea, 0x78, 0xda, 0x53, 0x32, 0x49, 0x96, 0xe0,
-	0x04, 0xb8, 0xb6, 0xeb, 0xd1, 0xa7, 0xc9, 0xbe, 0xc7, 0x1e, 0xc2, 0xae, 0xf4, 0x78, 0x1d, 0x70,
-	0x2f, 0xcf, 0xc6, 0x47, 0x7a, 0x0d, 0x75, 0x71, 0x70, 0xa5, 0xc1, 0xcf, 0x00, 0x2e, 0xd1, 0x2a,
-	0xe5, 0x88, 0x14, 0x52, 0x4a, 0xed, 0xab, 0x30, 0xde, 0xc3, 0xda, 0x71, 0x4a, 0xa0, 0x51, 0x11,
-	0x7a, 0xa5, 0xb9, 0x2b, 0xee, 0x10, 0xf2, 0x44, 0x3a, 0x2a, 0xdc, 0x86, 0x7b, 0xe8, 0x1b, 0x05,
-	0x77, 0x17, 0xf6, 0x85, 0x2e, 0x08, 0x4a, 0x43, 0xc7, 0x04, 0xf0, 0xfe, 0x7b, 0xc5, 0x65, 0x98,
-	0x2a, 0xd2, 0x15, 0xb3, 0x42, 0xbb, 0x45, 0x70, 0x22, 0x58, 0xda, 0x52, 0x19, 0x28, 0x5c, 0x66,
-	0xde, 0x44, 0x21, 0x5e, 0xb0, 0x25, 0x7e, 0xe1, 0xa6, 0xb4, 0x67, 0x0b, 0xf1, 0x53, 0xaa, 0x5a,
-	0x50, 0x94, 0x49, 0xb8, 0x04, 0xa3, 0xf9, 0x00, 0xf5, 0xc2, 0xfd, 0xf9, 0x54, 0x32, 0x6c, 0x3f,
-	0xc0, 0x57, 0x60, 0xac, 0x7b, 0x83, 0x51, 0x66, 0x31, 0x15, 0xc8, 0x62, 0xd8, 0xce, 0x73, 0x55,
-	0xac, 0xa8, 0xa1, 0x21, 0xaa, 0xd6, 0x19, 0x65, 0x88, 0x97, 0x61, 0x9c, 0x95, 0xf0, 0x06, 0xa2,
-	0x54, 0xd9, 0xba, 0x03, 0x07, 0x94, 0x4b, 0x0b, 0x9e, 0xe9, 0x8c, 0x96, 0x75, 0xf6, 0x9a, 0x64,
-	0xd7, 0x1d, 0x8d, 0xef, 0xc3, 0x7e, 0xc5, 0x6e, 0x81, 0x8f, 0x2b, 0xe3, 0x0e, 0x9a, 0x54, 0x21,
-	0xbe, 0x0f, 0xfb, 0x15, 0x04, 0xdf, 0x37, 0xdd, 0x7f, 0x03, 0x50, 0x9a, 0x9e, 0x87, 0xa4, 0x9a,
-	0xb6, 0xe3, 0x13, 0xc2, 0xfa, 0xba, 0xd4, 0x5e, 0xe9, 0xa0, 0x02, 0xd3, 0xfd, 0xe8, 0xf5, 0x7a,
-	0x87, 0x78, 0x52, 0x51, 0x69, 0xa1, 0xf7, 0x73, 0xe6, 0xc7, 0x28, 0x0c, 0x17, 0x6c, 0x7e, 0x2b,
-	0xe0, 0x39, 0x88, 0x07, 0xf8, 0x36, 0x9e, 0x0e, 0xb6, 0x58, 0x90, 0xf1, 0x2a, 0x23, 0x38, 0x07,
-	0x90, 0xef, 0x30, 0x98, 0x7e, 0xd7, 0x52, 0x37, 0x43, 0xc6, 0x97, 0x20, 0x26, 0xf3, 0x74, 0x65,
-	0x3b, 0x4d, 0xcb, 0x41, 0xf6, 0xb0, 0xfa, 0x39, 0x88, 0x07, 0xb8, 0xa7, 0x1f, 0x46, 0x18, 0x71,
-	0x57, 0x86, 0x91, 0x85, 0x38, 0x6b, 0xa1, 0x01, 0x22, 0x51, 0xdf, 0x05, 0xfb, 0x42, 0x69, 0x3a,
-	0x3e, 0xda, 0xdd, 0x36, 0x61, 0x14, 0xb3, 0xa7, 0x65, 0x6e, 0x0a, 0x02, 0x12, 0x34, 0xa6, 0x85,
-	0xc6, 0x37, 0x58, 0x3d, 0xdf, 0x84, 0x89, 0x10, 0x8e, 0xeb, 0x9b, 0x54, 0x13, 0x60, 0xa5, 0xc9,
-	0x7b, 0x30, 0x15, 0xce, 0x60, 0xf1, 0x31, 0xa9, 0x3d, 0xd4, 0x0c, 0xb7, 0x4f, 0xef, 0x25, 0x54,
-	0x8c, 0xb3, 0xdf, 0xe1, 0xcc, 0x84, 0x54, 0x4b, 0x78, 0x3b, 0xfc, 0xb3, 0x03, 0xf6, 0x14, 0x6c,
-	0x7e, 0x71, 0xe5, 0x20, 0x26, 0x33, 0x4f, 0x7c, 0x30, 0xd8, 0x0c, 0x01, 0x0e, 0xa8, 0x84, 0x7c,
-	0x16, 0x86, 0xf3, 0xd4, 0x59, 0xf7, 0x2a, 0xec, 0xa2, 0x8c, 0x38, 0x0b, 0x23, 0x12, 0x61, 0x55,
-	0xf6, 0xc1, 0x41, 0x39, 0xb2, 0xee, 0x2b, 0x39, 0x07, 0x31, 0x99, 0xad, 0xfa, 0xf8, 0x43, 0x38,
-	0xac, 0x12, 0xff, 0x05, 0x88, 0xb1, 0x26, 0x78, 0xdf, 0xdb, 0x3c, 0xfb, 0x1b, 0x7a, 0xde, 0x24,
-	0xe8, 0x45, 0x93, 0xa0, 0x97, 0x4d, 0x82, 0x5e, 0x37, 0x09, 0x7a, 0xd3, 0x24, 0x91, 0xb7, 0x4d,
-	0x12, 0x79, 0xd7, 0x24, 0xe8, 0x61, 0x8b, 0x44, 0x1e, 0xb5, 0x48, 0xe4, 0x71, 0x8b, 0xa0, 0x27,
-	0x2d, 0x12, 0x79, 0xda, 0x22, 0xe8, 0x59, 0x8b, 0xa0, 0xe7, 0x2d, 0x82, 0x5e, 0xb4, 0x08, 0x7a,
-	0xd9, 0x22, 0x91, 0xd7, 0x2d, 0x82, 0xde, 0xb4, 0x48, 0xe4, 0x6d, 0x8b, 0xa0, 0x77, 0x2d, 0x12,
-	0x79, 0xd8, 0x26, 0x91, 0x47, 0x6d, 0x82, 0x7e, 0x6a, 0x93, 0xc8, 0x2f, 0x6d, 0x82, 0x7e, 0x6f,
-	0x93, 0xc8, 0xe3, 0x36, 0x89, 0x3c, 0x69, 0x13, 0xf4, 0xb4, 0x4d, 0xd0, 0xb3, 0x36, 0x41, 0x5f,
-	0x9d, 0x58, 0xef, 0xff, 0xd4, 0xf5, 0x4a, 0xd9, 0xfd, 0x5b, 0x5f, 0x58, 0x88, 0x7a, 0x88, 0xcf,
-	0xfc, 0x17, 0x00, 0x00, 0xff, 0xff, 0x31, 0x0e, 0x25, 0x7d, 0x89, 0x18, 0x00, 0x00,
+	// 1851 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x59, 0x4d, 0x6c, 0x1b, 0xc7,
+	0x15, 0xe6, 0x48, 0xb6, 0x22, 0x3d, 0x89, 0xb4, 0x34, 0x92, 0x65, 0x9a, 0x96, 0x47, 0xcc, 0x22,
+	0x36, 0x64, 0x20, 0xa1, 0x1c, 0x06, 0x69, 0xd3, 0xa6, 0x6d, 0x6c, 0x4a, 0x02, 0xcb, 0xc4, 0x76,
+	0x9c, 0x95, 0x1c, 0xc3, 0xbd, 0x10, 0x2b, 0x71, 0x4c, 0x6d, 0xb9, 0xe2, 0xb2, 0xbb, 0x43, 0x0a,
+	0xee, 0xa1, 0x08, 0xda, 0x4b, 0x80, 0xf6, 0xd0, 0x5b, 0x73, 0x29, 0x9a, 0x43, 0x81, 0x06, 0x05,
+	0x0a, 0xe4, 0xd6, 0x1c, 0x03, 0xf4, 0xe2, 0xde, 0x5c, 0xf4, 0x92, 0x93, 0x1a, 0x91, 0x17, 0x1f,
+	0x73, 0xcc, 0xb1, 0xd8, 0x9d, 0x59, 0xee, 0xec, 0x72, 0x87, 0xa2, 0x22, 0xc9, 0xc8, 0x49, 0xdc,
+	0x99, 0xf7, 0xf3, 0xbd, 0x37, 0x6f, 0xde, 0xbc, 0x0f, 0x82, 0xb7, 0xea, 0x26, 0xdb, 0x6d, 0x6f,
+	0x17, 0x76, 0xec, 0xbd, 0xd5, 0xad, 0x5d, 0xba, 0xb5, 0x6b, 0x36, 0xeb, 0xee, 0x3d, 0xca, 0xf6,
+	0x6d, 0xa7, 0xb1, 0xca, 0x58, 0x73, 0xd5, 0x68, 0x99, 0xab, 0x66, 0x8d, 0x36, 0x99, 0xc9, 0x9e,
+	0xb8, 0xd4, 0xe9, 0x50, 0xa7, 0xd0, 0x72, 0x6c, 0x66, 0xe3, 0x09, 0xc6, 0x9a, 0x85, 0xce, 0x1b,
+	0xb9, 0xd7, 0x24, 0x0b, 0x75, 0xbb, 0x6e, 0xaf, 0xfa, 0xdb, 0xdb, 0xed, 0xc7, 0xfe, 0x97, 0xff,
+	0xe1, 0xff, 0xe2, 0x6a, 0xb9, 0x37, 0x47, 0x71, 0x68, 0xb4, 0x5a, 0x96, 0xb9, 0x63, 0x30, 0xd3,
+	0x6e, 0x0a, 0xb5, 0x9b, 0xa3, 0xa8, 0xed, 0x58, 0x26, 0x6d, 0x32, 0xa1, 0xf1, 0x83, 0x91, 0x34,
+	0x6c, 0xcb, 0x32, 0xb6, 0x6d, 0xc7, 0x60, 0xb6, 0x73, 0x1c, 0x4f, 0x8e, 0x59, 0xdf, 0x65, 0xee,
+	0x71, 0x42, 0xe2, 0x39, 0x7c, 0x6c, 0x52, 0x27, 0x50, 0x7b, 0x7d, 0x14, 0xb5, 0xba, 0xc1, 0xe8,
+	0xbe, 0xf1, 0x44, 0xa8, 0x14, 0x46, 0x51, 0x69, 0xbb, 0xc1, 0x19, 0xe5, 0xae, 0xd4, 0x6d, 0xbb,
+	0x6e, 0xd1, 0xf0, 0x48, 0xe8, 0x5e, 0x8b, 0x05, 0xc6, 0x48, 0x7c, 0xb3, 0xd6, 0x76, 0xa4, 0x94,
+	0x6b, 0xff, 0x1e, 0x83, 0xc5, 0x8a, 0x38, 0xf9, 0x4d, 0xff, 0xe4, 0x37, 0x29, 0x63, 0x9e, 0x47,
+	0xfc, 0x36, 0x5c, 0xd8, 0xb6, 0x8c, 0x9d, 0x86, 0x65, 0xba, 0x8c, 0xd6, 0xaa, 0x66, 0xcd, 0xcd,
+	0xa2, 0xfc, 0xf8, 0xca, 0x54, 0x09, 0x77, 0x0f, 0x96, 0x33, 0xa5, 0x70, 0xab, 0xb2, 0xee, 0xea,
+	0x19, 0x49, 0xb4, 0x52, 0x73, 0xf1, 0x6b, 0x80, 0x8d, 0x36, 0xb3, 0xf7, 0x0c, 0x66, 0xee, 0x54,
+	0x8d, 0x56, 0xcb, 0xb1, 0x3b, 0x86, 0x95, 0x1d, 0xcb, 0xa3, 0x95, 0x49, 0x7d, 0xae, 0xbf, 0x73,
+	0x5b, 0x6c, 0xe0, 0x55, 0x98, 0xdf, 0xb1, 0x6c, 0x97, 0xd6, 0xaa, 0x0e, 0xad, 0x9b, 0x2e, 0xe3,
+	0x18, 0xb3, 0xe3, 0xbe, 0x3c, 0xe6, 0x5b, 0xba, 0xb4, 0x83, 0x1b, 0xb0, 0xd0, 0x31, 0x2c, 0xb3,
+	0xe6, 0x7f, 0x55, 0x99, 0xdd, 0xa0, 0xcd, 0x2a, 0x63, 0x56, 0xf6, 0x5c, 0x1e, 0xad, 0x4c, 0x17,
+	0x2f, 0x17, 0x78, 0xd8, 0x85, 0x20, 0xec, 0xc2, 0xba, 0x08, 0xbb, 0x44, 0x9e, 0x1e, 0x2c, 0xa7,
+	0xba, 0x07, 0xcb, 0xf8, 0xc3, 0xbe, 0xfa, 0x96, 0xa7, 0xbd, 0xb5, 0x75, 0xe7, 0x93, 0xff, 0x2d,
+	0x23, 0x1d, 0x77, 0x62, 0xeb, 0xcc, 0xc2, 0xd7, 0x20, 0x63, 0x58, 0x96, 0xbd, 0x4f, 0x6b, 0x55,
+	0xba, 0x67, 0x98, 0x96, 0x9b, 0x3d, 0xef, 0x25, 0x42, 0x4f, 0x8b, 0xd5, 0x0d, 0x7f, 0x51, 0xfb,
+	0xfb, 0x18, 0xe4, 0x92, 0x73, 0x79, 0xd7, 0x70, 0x1b, 0xc9, 0xf9, 0x44, 0x2b, 0x93, 0xdf, 0x8b,
+	0x7c, 0xfe, 0x7c, 0x48, 0x3e, 0x27, 0x4b, 0x8b, 0xc9, 0x09, 0x1b, 0x39, 0x59, 0x9e, 0xd7, 0x58,
+	0xb2, 0x0c, 0xc0, 0x65, 0xca, 0x82, 0x04, 0xe9, 0xf4, 0x57, 0x6d, 0xea, 0x32, 0xfc, 0x1e, 0x5c,
+	0x68, 0x39, 0xf6, 0x2f, 0xe9, 0x8e, 0x0f, 0x63, 0xcf, 0x70, 0x1b, 0x7e, 0x8e, 0xa6, 0x8b, 0x5a,
+	0x81, 0x77, 0xa2, 0x82, 0x3a, 0xc1, 0x7a, 0x26, 0x54, 0xf5, 0xbe, 0xb5, 0xbf, 0x22, 0xb8, 0xf8,
+	0xa0, 0x55, 0x33, 0x18, 0x8d, 0xbb, 0xb9, 0x05, 0x93, 0xae, 0x58, 0x12, 0xf6, 0xc9, 0x70, 0xfb,
+	0xa5, 0x73, 0x5e, 0xd9, 0xe8, 0x7d, 0x2d, 0x5c, 0x81, 0xe9, 0xb6, 0x6f, 0x9a, 0x83, 0x1c, 0x1b,
+	0x15, 0xa4, 0x30, 0x04, 0x5c, 0xd9, 0x87, 0xf9, 0x18, 0xe6, 0xd6, 0x1c, 0x6a, 0x30, 0xfa, 0xc0,
+	0xa5, 0x4e, 0x80, 0xf0, 0x3a, 0x9c, 0xf3, 0xae, 0xb8, 0x40, 0x37, 0x13, 0x18, 0xf6, 0x44, 0x84,
+	0x09, 0x7f, 0x1f, 0xdf, 0x80, 0x59, 0xb3, 0xd9, 0x31, 0x99, 0x74, 0x6e, 0x3e, 0x98, 0x29, 0xfd,
+	0x42, 0xb8, 0xee, 0x9f, 0x8d, 0xc6, 0x60, 0x8e, 0x67, 0xe3, 0xbb, 0xf8, 0xf9, 0x61, 0x52, 0xbc,
+	0xb3, 0xb2, 0xb8, 0x22, 0xba, 0x77, 0xe0, 0x72, 0xe8, 0xf5, 0xbe, 0xe1, 0xba, 0xfb, 0xb6, 0x53,
+	0x0b, 0xbc, 0xcf, 0xc2, 0xb8, 0x6d, 0xd5, 0x7c, 0xe7, 0x53, 0xba, 0xf7, 0xd3, 0x5b, 0x69, 0xd2,
+	0x7d, 0x11, 0x82, 0xf7, 0x53, 0xbb, 0x09, 0x59, 0x51, 0x79, 0xbe, 0x09, 0xbf, 0x7c, 0x02, 0xfd,
+	0x05, 0x38, 0xcf, 0x43, 0xe6, 0x16, 0xf8, 0x87, 0xf6, 0x3e, 0x5c, 0xbd, 0x63, 0xba, 0xec, 0x76,
+	0x9b, 0xed, 0xda, 0x8e, 0xf9, 0x6b, 0x5a, 0x5b, 0xf3, 0x9f, 0x0c, 0x57, 0xa7, 0x6e, 0xcb, 0x6e,
+	0xba, 0x14, 0x17, 0xe0, 0x25, 0xfe, 0x8a, 0xf0, 0x8e, 0x36, 0x5d, 0xcc, 0x04, 0x81, 0x70, 0x49,
+	0x11, 0x46, 0x20, 0xa4, 0x3d, 0x84, 0x2c, 0x3f, 0xa1, 0xdb, 0xe1, 0x93, 0x15, 0x40, 0x78, 0x1b,
+	0xa6, 0xa5, 0x87, 0x4c, 0xe4, 0x71, 0x3e, 0xb0, 0x27, 0x29, 0x08, 0xa3, 0xb2, 0xb4, 0xf6, 0x08,
+	0xb2, 0x3e, 0xd2, 0x70, 0x29, 0x04, 0xf9, 0x53, 0x98, 0x91, 0x44, 0x03, 0xa4, 0x43, 0x2c, 0x47,
+	0xc4, 0xb5, 0x3f, 0x21, 0xc8, 0xf2, 0xc4, 0x9f, 0x32, 0x68, 0xfc, 0xb3, 0xa4, 0x52, 0xb8, 0x94,
+	0xa0, 0xac, 0xa8, 0x88, 0x7f, 0x20, 0xc8, 0x97, 0x69, 0x93, 0x3a, 0x51, 0x6c, 0xb7, 0xef, 0x57,
+	0xde, 0xa3, 0x4f, 0x02, 0x84, 0xf7, 0x20, 0x23, 0xf9, 0xac, 0x9a, 0x35, 0x01, 0xf2, 0x6a, 0x82,
+	0x9f, 0x4a, 0xff, 0xd5, 0x2d, 0x4d, 0x7a, 0xde, 0x9e, 0x1d, 0x2c, 0x23, 0x3d, 0x6d, 0xc8, 0x02,
+	0x18, 0xc3, 0xb9, 0xa6, 0xb1, 0x47, 0x45, 0x61, 0xf9, 0xbf, 0xf1, 0x35, 0x98, 0xe0, 0x4f, 0x7c,
+	0x76, 0x3c, 0x3f, 0xbe, 0x92, 0x29, 0xa6, 0x03, 0xdb, 0xba, 0xb7, 0xaa, 0x8b, 0x4d, 0xed, 0xbf,
+	0x08, 0xc8, 0x40, 0x26, 0xcf, 0x16, 0xed, 0x75, 0x18, 0x6f, 0xd0, 0x27, 0x22, 0xb5, 0xfd, 0xe2,
+	0xe4, 0x3e, 0x45, 0x46, 0x3d, 0x01, 0xfc, 0xa3, 0xe8, 0x51, 0x8c, 0xfb, 0xf2, 0x38, 0x2a, 0xaf,
+	0x38, 0x85, 0xdf, 0x22, 0x20, 0x3a, 0xdd, 0xb3, 0x3b, 0x2f, 0x2e, 0xaa, 0xd9, 0x30, 0xaa, 0x29,
+	0x1f, 0xbf, 0xf6, 0x4f, 0x04, 0x2f, 0x6f, 0x52, 0xb9, 0xfe, 0xd7, 0xa4, 0x59, 0xed, 0xac, 0x70,
+	0x94, 0x60, 0x46, 0x1e, 0x09, 0x45, 0x9a, 0x17, 0xfa, 0x3d, 0x40, 0xda, 0x93, 0x8c, 0x44, 0x74,
+	0xb4, 0x5d, 0x78, 0x25, 0x76, 0x73, 0x65, 0xb5, 0xf0, 0x16, 0xdf, 0x82, 0xb4, 0xac, 0x17, 0x5c,
+	0xe3, 0x64, 0x67, 0xfc, 0x94, 0xa2, 0x0a, 0x5a, 0x19, 0x16, 0x78, 0xf3, 0x29, 0xf3, 0x29, 0x31,
+	0xc8, 0xca, 0x2a, 0xbc, 0x24, 0xe6, 0x46, 0x91, 0x8e, 0x0b, 0x81, 0x4d, 0x21, 0x18, 0x74, 0x31,
+	0x21, 0xa5, 0x55, 0x60, 0xc1, 0x83, 0x2c, 0x76, 0x43, 0x88, 0xaf, 0xc3, 0xa4, 0x10, 0x09, 0xd0,
+	0x29, 0x2c, 0xf5, 0xc5, 0xb4, 0xdf, 0x21, 0x58, 0xe0, 0x57, 0xe2, 0x84, 0xa0, 0xf0, 0x8f, 0x93,
+	0x9a, 0xc9, 0x7c, 0x4c, 0x49, 0x51, 0xc2, 0x7f, 0x46, 0xb0, 0x14, 0x34, 0x12, 0x21, 0x19, 0x2d,
+	0xe0, 0x12, 0x80, 0xf0, 0x13, 0x16, 0xcd, 0xe5, 0x98, 0xed, 0xc4, 0x82, 0x99, 0xaa, 0x07, 0x9b,
+	0x27, 0x69, 0x1c, 0xff, 0x42, 0x90, 0x8b, 0x64, 0xe9, 0xf4, 0xd1, 0xbd, 0x80, 0x46, 0xe1, 0x40,
+	0x8e, 0xf7, 0x89, 0x33, 0x0b, 0x62, 0xb0, 0x2f, 0xfc, 0x0d, 0xc1, 0xd5, 0x4d, 0x1a, 0x94, 0x6a,
+	0x52, 0x4f, 0x38, 0x0d, 0xbf, 0xa7, 0xd1, 0x07, 0x6a, 0x90, 0x97, 0x2e, 0xd5, 0x59, 0xf5, 0x80,
+	0x35, 0x98, 0xe7, 0x3d, 0x80, 0xcf, 0x27, 0x41, 0x12, 0x5e, 0x85, 0x09, 0x3e, 0xa2, 0x88, 0x04,
+	0x24, 0x8f, 0x31, 0x42, 0x46, 0xdb, 0x80, 0x79, 0x0f, 0xea, 0x49, 0x87, 0xa1, 0xdf, 0xc0, 0x3c,
+	0x2f, 0xea, 0x13, 0x60, 0x89, 0xd7, 0xe3, 0x58, 0xb4, 0x1e, 0xb9, 0x4a, 0x72, 0x3d, 0x16, 0x1f,
+	0xc2, 0xf9, 0x32, 0xdb, 0x2f, 0x3b, 0xf8, 0x1e, 0xcc, 0xdd, 0x6f, 0x5b, 0xd6, 0x9a, 0xdd, 0x7c,
+	0x6c, 0xd6, 0x05, 0xbd, 0xc3, 0xea, 0x1a, 0xc8, 0x2d, 0xc5, 0xb6, 0x22, 0x8a, 0x37, 0x51, 0xf1,
+	0x53, 0x04, 0x50, 0x71, 0x37, 0xa5, 0x09, 0x5f, 0x22, 0x28, 0x38, 0xd7, 0xd7, 0x1e, 0x60, 0x2d,
+	0xb9, 0x23, 0xc8, 0x03, 0x2e, 0x43, 0x26, 0xca, 0x43, 0x70, 0xff, 0xe9, 0x4a, 0xe4, 0x27, 0xb9,
+	0xc5, 0x01, 0xfe, 0xba, 0xe1, 0x71, 0xfa, 0xe2, 0xef, 0xcf, 0xc3, 0x44, 0xc5, 0xf5, 0xc6, 0x60,
+	0xfc, 0x0e, 0x40, 0xc8, 0x1a, 0xc2, 0xb0, 0x07, 0x98, 0x84, 0xca, 0x96, 0xd7, 0xaa, 0xcb, 0x94,
+	0xf9, 0xda, 0x8b, 0xf2, 0x1c, 0x2f, 0x65, 0x2c, 0x42, 0x07, 0x3c, 0x8f, 0xe1, 0x24, 0x1f, 0x7a,
+	0x1c, 0xe0, 0x14, 0x4a, 0x8f, 0xef, 0x03, 0x1e, 0xa4, 0x02, 0xf8, 0xe5, 0x41, 0x43, 0x31, 0x9a,
+	0xa0, 0x34, 0xf8, 0x13, 0x80, 0x75, 0x6a, 0x51, 0x81, 0x48, 0x21, 0xa5, 0xd4, 0xbe, 0x0b, 0x73,
+	0x03, 0xc4, 0x02, 0xe7, 0x03, 0x34, 0x2a, 0xce, 0xa1, 0x34, 0x77, 0xc7, 0xeb, 0x93, 0xbe, 0x48,
+	0x5f, 0x25, 0x64, 0xcc, 0xc7, 0x06, 0xf7, 0x21, 0x5c, 0x4c, 0xe4, 0x30, 0x4a, 0x43, 0xd7, 0x02,
+	0xe0, 0xc3, 0xa9, 0xcf, 0xbb, 0xb0, 0xa8, 0xd3, 0x8e, 0xdd, 0xa0, 0x71, 0x11, 0x9c, 0x8d, 0xde,
+	0x3e, 0xa9, 0x0c, 0x54, 0xd5, 0xf8, 0x7c, 0x02, 0xd2, 0x15, 0x57, 0x1a, 0x81, 0xbc, 0x94, 0x0e,
+	0x10, 0xa5, 0x30, 0xa5, 0x2a, 0x0e, 0xa5, 0x4c, 0xc2, 0x3a, 0x64, 0xca, 0x91, 0xe9, 0x10, 0x0f,
+	0x1f, 0xf9, 0x72, 0x49, 0x14, 0x06, 0xdf, 0x81, 0xd9, 0x38, 0xc9, 0x52, 0x66, 0x31, 0x1f, 0xc9,
+	0x62, 0x12, 0x2d, 0xbb, 0x1b, 0xb0, 0xe8, 0xc4, 0x10, 0x55, 0x8c, 0x4b, 0x19, 0xe2, 0xbb, 0x30,
+	0xc7, 0x4b, 0xf8, 0x18, 0x51, 0xaa, 0x6c, 0x3d, 0x80, 0xcb, 0x4a, 0x5e, 0x85, 0x57, 0xc2, 0xfe,
+	0x35, 0x9c, 0x7a, 0xe5, 0x62, 0x63, 0x04, 0x7e, 0x04, 0x97, 0x14, 0xf4, 0x07, 0x5f, 0x57, 0xc6,
+	0x1d, 0x35, 0xa9, 0x42, 0xfc, 0x08, 0x2e, 0x29, 0x38, 0x48, 0x68, 0x7a, 0x38, 0x49, 0x51, 0x9a,
+	0xae, 0x42, 0x4e, 0xcd, 0x2c, 0xf0, 0x8d, 0xc0, 0xfa, 0x91, 0xec, 0x43, 0xe9, 0xa0, 0x01, 0x4b,
+	0xc3, 0x18, 0xc0, 0x51, 0x87, 0xf8, 0xaa, 0xa2, 0xd2, 0x12, 0x47, 0x88, 0xe2, 0x1f, 0x26, 0x60,
+	0xaa, 0xe2, 0x8a, 0x87, 0x0b, 0x6f, 0x40, 0x3a, 0x42, 0x09, 0xf0, 0x52, 0xf4, 0x8a, 0x45, 0x87,
+	0x72, 0x65, 0x04, 0x6f, 0x01, 0x94, 0xfb, 0x43, 0xd6, 0xb0, 0x97, 0x33, 0x3e, 0xc4, 0xe3, 0x75,
+	0x98, 0x91, 0xa9, 0x84, 0xf2, 0x3a, 0x2d, 0xc9, 0x41, 0x0e, 0x10, 0x8f, 0x0d, 0x48, 0x47, 0xc6,
+	0xe3, 0x30, 0x8c, 0x24, 0x6e, 0xa1, 0x0c, 0xa3, 0x04, 0x69, 0x7e, 0x85, 0x46, 0x88, 0x44, 0xfd,
+	0x16, 0x5c, 0x4c, 0x64, 0x12, 0xf8, 0x95, 0xf8, 0xb5, 0x49, 0x9a, 0x82, 0x07, 0xae, 0xcc, 0x07,
+	0xc1, 0x8c, 0x14, 0x35, 0xa6, 0x25, 0xc6, 0x37, 0x5a, 0x3d, 0x7f, 0x00, 0xf3, 0x09, 0x63, 0x78,
+	0x68, 0x52, 0x3d, 0xa3, 0x2b, 0x4d, 0x3e, 0x84, 0xc5, 0xe4, 0x21, 0x1b, 0x5f, 0x93, 0xae, 0x87,
+	0x7a, 0x08, 0x1f, 0x72, 0xf7, 0xb2, 0xaa, 0xa1, 0x78, 0xd8, 0xe1, 0xac, 0x24, 0x54, 0x4b, 0xf2,
+	0x75, 0xf8, 0xcf, 0x18, 0x4c, 0x56, 0x5c, 0xf1, 0x70, 0xad, 0xc1, 0x8c, 0x3c, 0x1c, 0xe3, 0x2b,
+	0xd1, 0xcb, 0x10, 0x19, 0x53, 0x95, 0x90, 0xdf, 0x84, 0xa9, 0x32, 0x65, 0x47, 0x3e, 0x85, 0xb1,
+	0xa9, 0x16, 0x97, 0x60, 0x5a, 0x9a, 0xa9, 0x95, 0xf7, 0xe0, 0x8a, 0x1c, 0x59, 0xfc, 0x49, 0x5e,
+	0x83, 0x19, 0x79, 0xa0, 0x0e, 0xf1, 0x27, 0x8c, 0xd9, 0x4a, 0xfc, 0xb7, 0x60, 0x86, 0x5f, 0x82,
+	0xef, 0xfa, 0x9a, 0x97, 0xfe, 0x82, 0x9e, 0x1e, 0x12, 0xf4, 0xec, 0x90, 0xa0, 0xaf, 0x0e, 0x09,
+	0xfa, 0xfa, 0x90, 0xa0, 0xe7, 0x87, 0x24, 0xf5, 0xcd, 0x21, 0x49, 0x7d, 0x7b, 0x48, 0xd0, 0x47,
+	0x5d, 0x92, 0xfa, 0xb8, 0x4b, 0x52, 0x9f, 0x75, 0x09, 0xfa, 0xbc, 0x4b, 0x52, 0x5f, 0x74, 0x09,
+	0xfa, 0xb2, 0x4b, 0xd0, 0xd3, 0x2e, 0x41, 0xcf, 0xba, 0x04, 0x7d, 0xd5, 0x25, 0xa9, 0xaf, 0xbb,
+	0x04, 0x3d, 0xef, 0x92, 0xd4, 0x37, 0x5d, 0x82, 0xbe, 0xed, 0x92, 0xd4, 0x47, 0x3d, 0x92, 0xfa,
+	0xb8, 0x47, 0xd0, 0x1f, 0x7b, 0x24, 0xf5, 0x49, 0x8f, 0xa0, 0x4f, 0x7b, 0x24, 0xf5, 0x59, 0x8f,
+	0xa4, 0x3e, 0xef, 0x11, 0xf4, 0x45, 0x8f, 0xa0, 0x2f, 0x7b, 0x04, 0xfd, 0xe2, 0xc6, 0x51, 0xff,
+	0xed, 0x6a, 0x35, 0xea, 0xde, 0xdf, 0xd6, 0xf6, 0xf6, 0x84, 0x8f, 0xf8, 0x8d, 0xff, 0x07, 0x00,
+	0x00, 0xff, 0xff, 0x0d, 0xa4, 0xdc, 0x8a, 0xcf, 0x1c, 0x00, 0x00,
 }
