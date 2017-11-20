@@ -6,14 +6,3 @@ package ttnpb
 func (u *User) GetUser() *User {
 	return u
 }
-
-const (
-	// These are the valid FieldMask path values for the `update_mask` in
-	// the UpdateUserRequest message.
-
-	// FieldPathUserName is the path value for the `name` field.
-	FieldPathUserName = "name"
-
-	// FieldPathUserEmail is the path value for the `email field.
-	FieldPathUserEmail = "email"
-)

@@ -25,20 +25,31 @@ message User {
   // name is the user's full name.
   string name = 4;
 
-  // validated denotes if the email address has been validated.
-  bool validated = 5;
+  // validated_at denotes the time the email was validated at.
+  // This is a read-only field.
+  google.protobuf.Timestamp validated_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // admin denotes whether or not the user has administrative rights within the
   // tenancy.
+  // This is a read-only field and can be modified only by an admin.
   bool admin = 6;
 
   // created_at denotes when the user was created.
+  // This is a read-only field.
   google.protobuf.Timestamp created_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // updated_at is the last time the user was updated.
+  // This is a read-only field.
   google.protobuf.Timestamp updated_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // archived_at is the time when the user was archived and therefore
   // permantly disabled.
+  // This is a read-only field.
   google.protobuf.Timestamp archived_at = 9 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+}
+
+message UserMask {
+  bool email = 1;
+  bool name = 2;
+  reserved 3,4; // RFU: validated_at, admin
 }

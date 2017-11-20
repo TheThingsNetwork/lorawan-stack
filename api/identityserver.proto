@@ -10,9 +10,7 @@ import "github.com/TheThingsNetwork/ttn/api/rights.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/gateway.proto";
 import "github.com/TheThingsNetwork/ttn/api/user.proto";
-import "github.com/TheThingsNetwork/ttn/api/auth.proto";
 import "google/protobuf/empty.proto";
-import "google/protobuf/field_mask.proto";
 
 package ttn.v3;
 
@@ -26,41 +24,24 @@ service GtwGr {
 }
 
 message CreateUserRequest {
-  // user_id is the ID of the user.
-  UserIdentifier user_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // user is the user to be created.
+  User user = 1 [(gogoproto.nullable) = false];
 
-  // email address of the user.
-  string email = 2;
-
-  // password is the user's unencrypted password.
-  string password = 3;
-
-  // name is the user's full name.
-  string name = 4;
-
-  // reserved fields in order to make the message binary compatible with User.
-  reserved 5,6,7,8,9;
+  // invitation_token is the token provided within the registration process to
+  // be able to create an user account.
+  // This token is only required when the Identity Server registration mode is
+  // set to "invitation only", otherwise it will be ignored.
+  string invitation_token = 2;
 }
 
 message UpdateUserRequest {
-  // reserved field in order to make the message binary compatible with User.
-  reserved 1;
+  // User is the user to be updated.
+  User user = 1 [(gogoproto.nullable) = false];
 
-  // email is the new email of the user.
-  string email = 2;
-
-  // reserved field in order to make the message binary compatible with User.
-  reserved 3;
-
-  // name is the new name of the user.
-  string name = 4;
-
-  // reserved fields in order to make the message binary compatible with User.
-  reserved 5,6,7,8,9;
-
-  // Fields modified by the update request.
-  // Must be specified and non-empty.
-  google.protobuf.FieldMask update_mask = 10;
+  // update_mask is the symbolic set of fields that will be affected in the update
+  // operation. Fields not included in the update_mask are not changed and ignored
+  // in the request. Must be non-empty.
+  UserMask update_mask = 2 [(gogoproto.nullable) = false];
 }
 
 message UpdateUserPasswordRequest {
@@ -69,6 +50,16 @@ message UpdateUserPasswordRequest {
 
   // new is the user's new password.
   string new = 2;
+}
+
+message ValidateUserEmailRequest {
+  // token is the token sent to the user's email address in order to validate it.
+  string token = 1;
+}
+
+message ListAuthorizedClientsResponse {
+  // clients is the list of clients an user has currently authorized.
+  repeated Client clients = 1 [(gogoproto.nullable) = false];
 }
 
 // IsUser is the interface that provides methods to manage users in the Identity Server.
@@ -88,67 +79,89 @@ service IsUser {
 
   // DeleteUser permantly deletes the user account of the authenticated user.
   rpc DeleteUser(google.protobuf.Empty) returns (google.protobuf.Empty);
+
+  // ValidateUserEmail validates the user's email address of the authenticated
+  // user by using the token sent to the user's email address.
+  rpc ValidateUserEmail(ValidateUserEmailRequest) returns (google.protobuf.Empty);
+
+  // RequestUserEmailValidation re-issues a new email validation token and sends
+  // it to the user's email address so he can validate it. Any previous validation
+  // token that has not been used will be revoked.
+  rpc RequestUserEmailValidation(google.protobuf.Empty) returns (google.protobuf.Empty);
+
+  // ListAuthorizedClients returns the list of clients that the authenticated user
+  // has currently authorized to access its account.
+  rpc ListAuthorizedClients(google.protobuf.Empty) returns (ListAuthorizedClientsResponse);
+
+  // RevokeClient revokes the access of an authorized client to the authenticated
+  // user's account.
+  rpc RevokeAuthorizedClient(ClientIdentifier) returns (google.protobuf.Empty);
 }
 
 message CreateApplicationRequest {
-  // application_id is the ID of the application to be created.
-  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // description is the description of the application.
-  string description = 2;
-
-  // reserved fields in order to make the message binary compatible with Application.
-  reserved 3,4,5,6;
+  // application is the application to be created.
+  Application application = 1 [(gogoproto.nullable) = false];
 }
 
 message ListApplicationsResponse {
+  // applications is the list of applications the authenticated user has access to.
   repeated Application applications = 1 [(gogoproto.nullable) = false];
 }
 
 message UpdateApplicationRequest {
-  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // application is the application to be updated.
+  Application application = 1 [(gogoproto.nullable) = false];
 
-  // description is the description of the application.
-  string description = 2;
-
-  // reserved fields in order to make the message binary compatible with Application.
-  reserved 3,4,5,6;
-
-  // Fields modified by the update request.
-  // Must be specified and non-empty.
-  google.protobuf.FieldMask update_mask = 7;
+  // update_mask is the symbolic set of fields that will be affected in the update
+  // operation. Fields not included in the update_mask are not changed and ignored
+  // in the request. Must be non-empty.
+  ApplicationMask update_mask = 2 [(gogoproto.nullable) = false];
 }
 
 message GenerateApplicationAPIKeyRequest {
+  // application_id is the application's ID which API key will be added to.
   ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // key_name is the name of the API key to be generated.
-  string key_name = 2;
+  // name is the name of the API key to be generated.
+  string name = 2;
 
   // rights the are rights the generated API key will bear.
   repeated Right rights = 3;
 }
 
-message RemoveApplicationAPIKeyRequest {
+message UpdateApplicationAPIKeyRequest {
+  // application_id is the application's ID which an API key will be modified.
   ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // key_name is the name of the API key to be removed.
-  string key_name = 2;
+  // key is the API key to be updated.
+  APIKey key = 2 [(gogoproto.nullable) = false];
+
+  // update_mask is the symbolic set of fields that will be affected in the update
+  // operation. Fields not included in the update_mask are not changed and ignored
+  // in the request. Must be non-empty.
+  APIKeyMask update_mask = 3 [(gogoproto.nullable) = false];
+}
+
+message RemoveApplicationAPIKeyRequest {
+  // application_id is the application's ID which the API key will be removed from.
+  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // key is the application API key to be removed.
+  string key = 2;
 }
 
 message SetApplicationCollaboratorRequest {
+  // application_id is the application ID where the collaborator will be (un)set.
   ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
+  // collaborator is the collaborator to be set. If the list if rights is empty
+  // it will result as unset.
   Collaborator collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message ListApplicationCollaboratorsResponse {
+  // collaborators is the list of collaborators the application has.
   repeated Collaborator collaborators = 1 [(gogoproto.nullable) = false];
-}
-
-message ListApplicationRightsResponse {
-  // rights is a list of rights that an user holds for an application.
-  repeated Right rights = 3;
 }
 
 // IsApplication is the interface that provides methods to manage applications
@@ -174,6 +187,9 @@ service IsApplication {
   // and returns it.
   rpc GenerateApplicationAPIKey(GenerateApplicationAPIKeyRequest) returns (APIKey);
 
+  // UpdateApplicationAPIKey updates an application API key name or rights.
+  rpc UpdateApplicationAPIKey(UpdateApplicationAPIKeyRequest) returns (google.protobuf.Empty);
+
   // RemoveApplicationAPIKey removes a given API key from an application.
   rpc RemoveApplicationAPIKey(RemoveApplicationAPIKeyRequest) returns (google.protobuf.Empty);
 
@@ -183,136 +199,79 @@ service IsApplication {
 
   // ListApplicationCollaborators returns all the collaborators for a given application.
   rpc ListApplicationCollaborators(ApplicationIdentifier) returns (ListApplicationCollaboratorsResponse);
-
-  // ListApplicationRights returns all the rights that the authenticated user has
-  // for a given application.
-  rpc ListApplicationRights(ApplicationIdentifier) returns (ListApplicationRightsResponse);
 }
 
 message CreateGatewayRequest {
-  // gateway_id is the Gateway's ID to be created.
-  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // description is the description of the gateway.
-  string description = 2;
-
-  // reserved field in order to make the message binary compatible with Gateway.
-  reserved 3;
-
-  // frequency_plan_id indicates the ID of the frequency plan.
-  string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID"];
-
-  // reserved field in order to make the message binary compatible with Gateway.
-  reserved 5;
-
-  // privacy_settings defines the different privacy settings for this gateway.
-  GatewayPrivacySettings privacy_settings = 6 [(gogoproto.nullable) = false];
-
-  // auto_update indicates whether or not the gateway should be able to
-  // automatically fetch and execute firmware updates.
-  bool auto_update = 7;
-
-  // platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS"
-  string platform = 8;
-
-  // antennas is all the antennas that the gateway has.
-  repeated GatewayAntenna antennas = 9 [(gogoproto.nullable) = false];
-
-  // attributes is a free form map of attributes.
-  map<string, string> attributes = 10;
-
-  // cluster_address indicates the URI of the gateway server cluster to connect to,
-  // in a "<ip>:<port>" format.
-  string cluster_address = 11;
-
-  // contact_account is the user ID that will be displayed (given the set privacy
-  // settings) as contact person for this gateway.
-  // TODO(gomezjdaniel): allow to use an organization ID as contact account when
-  // they are added.
-  UserIdentifier contact_account = 12 [(gogoproto.nullable) = false];
-
-  // reserved fields in order to make the message binary compatible with Gateway.
-  reserved 13,14,15;
+  // gateway is the gateway to be created.
+  Gateway gateway = 1 [(gogoproto.nullable) = false];
 }
 
 message ListGatewaysResponse {
+  // gateways it the list of gateways the authenticated user has access to.
   repeated Gateway gateways = 1 [(gogoproto.nullable) = false];
 }
 
 message UpdateGatewayRequest {
+  // gateway is the gateway to be updated.
+  Gateway gateway = 1 [(gogoproto.nullable) = false];
+
+  // update_mask is the symbolic set of fields that will be affected in the update
+  // operation. Fields not included in the update_mask are not changed and ignored
+  // in the request. Must be non-empty.
+  GatewayMask update_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message GenerateGatewayAPIKeyRequest {
+  // gateway_id is the gateway's ID which API key will be added to.
   GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // description is the description of the gateway.
-  string description = 2;
+  // name is the name of the API key to be generated.
+  string name = 2;
 
-  // reserved field in order to make the message binary compatible with Gateway.
-  reserved 3;
+  // rights the are rights the generated API key will bear.
+  repeated Right rights = 3;
+}
 
-  // frequency_plan_id indicates the ID of the frequency plan.
-  string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID"];
+message UpdateGatewayAPIKeyRequest {
+  // gateway_id is the gateway's ID which an API key will be modified.
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // reserved field in order to make the message binary compatible with Gateway.
-  reserved 5;
+  // key is the API key to be updated.
+  APIKey key = 2 [(gogoproto.nullable) = false];
 
-  // privacy_settings defines the different privacy settings for this gateway.
-  GatewayPrivacySettings privacy_settings = 6 [(gogoproto.nullable) = false];
+  // update_mask is the symbolic set of fields that will be affected in the update
+  // operation. Fields not included in the update_mask are not changed and ignored
+  // in the request. Must be non-empty.
+  APIKeyMask update_mask = 3 [(gogoproto.nullable) = false];
+}
 
-  // auto_update indicates whether or not the gateway should be able to
-  // automatically fetch and execute firmware updates.
-  bool auto_update = 7;
+message RemoveGatewayAPIKeyRequest {
+  // gateway_id is the gateway's ID which API key will be removed from.
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS"
-  string platform = 8;
-
-  // antennas is all the antennas that the gateway has.
-  repeated GatewayAntenna antennas = 9 [(gogoproto.nullable) = false];
-
-  // attributes is a free form map of attributes.
-  map<string, string> attributes = 10;
-
-  // cluster_address indicates the URI of the gateway server cluster to connect to,
-  // in a "<ip>:<port>" format.
-  string cluster_address = 11;
-
-  // contact_account is the user ID that will be displayed (given the set privacy
-  // settings) as contact person for this gateway.
-  // TODO(gomezjdaniel): allow to use an organization ID as contact account when
-  // they are added.
-  UserIdentifier contact_account = 12 [(gogoproto.nullable) = false];
-
-  // reserved fields in order to make the message binary compatible with Gateway.
-  reserved 13,14,15;
-
-  // Fields modified by the update request.
-  // Must be specified and non-empty.
-  google.protobuf.FieldMask update_mask = 16;
+  // key is the gateway API key to be removed.
+  string key = 2;
 }
 
 message SetGatewayCollaboratorRequest {
+  // gateway_id is the ID of the gateway where the collaborator will be (un)set.
   GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
+  // collaborator is the collaborator to be set. If the list if rights is empty
+  // it will result as unset.
   Collaborator collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message ListGatewayCollaboratorsResponse {
+  // collaborators is the list of collaborators a gateway has.
   repeated Collaborator collaborators = 1 [(gogoproto.nullable) = false];
-}
-
-message ListGatewayOwnersResponse {
-  // collaborators is the list of collaborators that have owner rights for the gateway.
-  repeated Collaborator collaborators = 1 [(gogoproto.nullable) = false];
-}
-
-message ListGatewayRightsResponse {
-  // rights is a list of rights that an user has to the gateway.
-  repeated Right rights = 1;
 }
 
 // IsGateway is the interface that provides methods to manage gateways in the
 // Identity Server.
 service IsGateway {
   // CreateGateway creates a new gateway on the network and returns it.
-  rpc CreateGateway(CreateGatewayRequest) returns (Gateway);
+  rpc CreateGateway(CreateGatewayRequest) returns (google.protobuf.Empty);
 
   // GetGateway finds a gateway by ID and retrieves it.
   rpc GetGateway(GatewayIdentifier) returns (Gateway);
@@ -322,10 +281,20 @@ service IsGateway {
   rpc ListGateways(google.protobuf.Empty) returns (ListGatewaysResponse);
 
   // UpdateGateway edits a gateway and retrieves the updated version.
-  rpc UpdateGateway(UpdateGatewayRequest) returns (Gateway);
+  rpc UpdateGateway(UpdateGatewayRequest) returns (google.protobuf.Empty);
 
   // DeleteGateway permantly deletes a gateway.
   rpc DeleteGateway(GatewayIdentifier) returns (google.protobuf.Empty);
+
+  // GenerateGatewayAPIKey generates a new API key for a given gateway and
+  // returns it.
+  rpc GenerateGatewayAPIKey(GenerateGatewayAPIKeyRequest) returns (APIKey);
+
+  // UpdateGatewayAPIKey updates an gateway API key name or rights.
+  rpc UpdateGatewayAPIKey(UpdateGatewayAPIKeyRequest) returns (google.protobuf.Empty);
+
+  // RemoveGatewayAPIKey removes a given API key from a gateway.
+  rpc RemoveGatewayAPIKey(RemoveGatewayAPIKeyRequest) returns (google.protobuf.Empty);
 
   // SetGatewayCollaborator sets a collaborator for a given gateway. If the list
   // of rights is empty the collaborator will be removed.
@@ -333,36 +302,11 @@ service IsGateway {
 
   // ListGatewayCollaborators returns all the collaborators for a given gateway.
   rpc ListGatewayCollaborators(GatewayIdentifier) returns (ListGatewayCollaboratorsResponse);
-
-  // ListGatewayRights returns all the rights that the authenticated user has
-  // to a given gateway.
-  rpc ListGatewayRights(GatewayIdentifier) returns (ListGatewayRightsResponse);
 }
 
 message CreateClientRequest {
-  // client_id is the client's ID to be created.
-  ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // description is the description of the client.
-  string description = 2;
-
-  // secret is the secret used to prove the client identity.
-  string secret = 3;
-
-  // redirect_uri is the OAuth 2 redirect URI of the client.
-  string redirect_uri = 4 [(gogoproto.customname) = "RedirectURI"];
-
-  // reserved fields in order to make the message binary compatible with Client.
-  reserved 5,6;
-
-  // grants denotes which OAuth2 flows can the client use to get a token.
-  repeated GrantType grants = 7;
-
-  // rights denotes what rights the client will have access to.
-  repeated Right rights = 8;
-
-  // reserved fields in order to make the message binary compatible with Client.
-  reserved 9,10,11;
+  // client is the client to be created.
+  Client client = 1 [(gogoproto.nullable) = false];
 }
 
 message ListClientsResponse {
@@ -371,97 +315,31 @@ message ListClientsResponse {
 }
 
 message UpdateClientRequest {
-  ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // client is the client to be updated.
+  Client client = 1 [(gogoproto.nullable) = false];
 
-  // description is the description of the client.
-  string description = 2;
-
-  // secret is the secret used to prove the client identity.
-  string secret = 3;
-
-  // redirect_uri is the callback URI of the client.
-  string redirect_uri = 4 [(gogoproto.customname) = "RedirectURI"];
-
-  // reserved fields in order to make the message binary compatible with Client.
-  reserved 5,6;
-
-  // grants denotes which OAuth2 flows can the client use to get a token.
-  repeated GrantType grants = 7;
-
-  // rights denotes what scopes the client will have access to.
-  repeated Right rights = 8;
-
-  // reserved fields in order to make the message binary compatible with Client.
-  reserved 9,10,11;
-
-  // Fields modified by the update request.
-  // Must be specified and non-empty.
-  google.protobuf.FieldMask update_mask = 12;
-}
-
-message SetClientOfficialRequest {
-  ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // official denotes whether if the client is labeled as an official third-party
-  // client by the tenant admin.
-  bool official_labeled = 2;
-}
-
-message SetClientStateRequest {
-  ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  ClientState state = 2;
-}
-
-message SetClientCollaboratorRequest {
-  ClientIdentifier client_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  Collaborator collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-}
-
-message ListClientCollaboratorsResponse {
-  repeated Collaborator collaborators = 1 [(gogoproto.nullable) = false];
-}
-
-message ListClientRightsResponse {
-  // rights is a list of rights that an user has to the client.
-  repeated Right rights = 1;
+  // update_mask is the symbolic set of fields that will be affected in the update
+  // operation. Fields not included in the update_mask are not changed and ignored
+  // in the request. Must be non-empty.
+  ClientMask update_mask = 2 [(gogoproto.nullable) = false];
 }
 
 // IsClient is the interface that provides methods to manage third-party clients
 // in the Identity Server.
 service IsClient {
-  // CreateClient creates a new client on the network.
+  // CreateClient sends a request to create a third-party client. The request
+  // has to be approved by the admins.
   rpc CreateClient(CreateClientRequest) returns (google.protobuf.Empty);
 
   // GetClient finds a client by ID and retrieves it.
   rpc GetClient(ClientIdentifier) returns (Client);
 
-  // ListClients returns all the clients which the authenticated has access to.
+  // ListClients returns all the clients the authenticated user has created.
   rpc ListClients(google.protobuf.Empty) returns (ListClientsResponse);
 
-  // UpdateClient edits a client.
+  // UpdateClient sends a request to update a client.
   rpc UpdateClient(UpdateClientRequest) returns (google.protobuf.Empty);
 
   // DeleteClient permantly deletes a client.
   rpc DeleteClient(ClientIdentifier) returns (google.protobuf.Empty);
-
-  // SetClientOfficial allows to a tenant admin to add or remove the official
-  // label of a third-party client.
-  rpc SetClientOfficial(SetClientOfficialRequest) returns (google.protobuf.Empty);
-
-  // SetClientState allows to the tenant admin to set the reviewing state of
-  // a third-party client request.
-  rpc SetClientState(SetClientStateRequest) returns (google.protobuf.Empty);
-
-  // SetClientCollaborator sets a collaborator for a given third-party client.
-  // If the list of rights is empty the collaborator will be removed.
-  rpc SetClientCollaborator(SetClientCollaboratorRequest) returns (google.protobuf.Empty);
-
-  // ListClientCollaborators returns all the collaborators for a given third-party client.
-  rpc ListClientCollaborators(ClientIdentifier) returns (ListClientCollaboratorsResponse);
-
-  // ListClientRights returns all the rights that the authenticated user has
-  // to a given third-party client.
-  rpc ListClientRights(ClientIdentifier) returns (ListClientRightsResponse);
 }

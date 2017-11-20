@@ -14,40 +14,57 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // Client is the message that defines a third-party client on the network.
 message Client {
-  // id is the client's ID.
+  // id is the client's unique and immutable ID.
   ClientIdentifier id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the client.
   string description = 2;
 
   // secret is the secret used to prove the client identity.
+  // This is a read-only field.
   string secret = 3;
 
   // redirect_uri is the OAuth redirect URI of the client.
   string redirect_uri = 4 [(gogoproto.customname) = "RedirectURI"];
 
-  // state denotes the reviewing state of the client by the tenant admin.
+  // state denotes the reviewing state of the client by admin.
+  // This is a read-only field and can be only modified by an admin.
   ClientState state = 5;
 
   // official_labeled denotes if a client has been labeled as an official
   // third-party client by the tenant admin.
+  // This is a read-only field and can be only modified by an admin.
   bool official_labeled = 6;
 
   // grants denotes which OAuth2 flows can the client use to get a token.
+  // This is a read-only field and can be only modified by an admin.
   repeated GrantType grants = 7;
 
   // Rights denotes what rights the client will have access to.
   repeated Right rights = 8;
 
+  // creator contains the user ID of the user who created the client.
+  string creator = 9;
+
   // created_at denotes when the client was created.
-  google.protobuf.Timestamp created_at = 9 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // This a read-only field.
+  google.protobuf.Timestamp created_at = 10 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // updated_at is the last time the client was updated.
-  google.protobuf.Timestamp updated_at = 10 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // This is a read-only field.
+  google.protobuf.Timestamp updated_at = 11 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // archived_at is the time when the client was archived and therefore
   // permantly disabled.
-  google.protobuf.Timestamp archived_at = 11 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // This a read-only field.
+  google.protobuf.Timestamp archived_at = 12 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+}
+
+message ClientMask {
+  bool description = 1;
+  bool redirect_uri = 2 [(gogoproto.customname) = "RedirectURI"];
+  reserved 3,4,5; // RFU: state, official_labeled, grants
+  bool rights = 6;
 }
 
 // ClientState enum defines all the possible tenant admin reviewing states

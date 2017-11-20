@@ -17,4 +17,6 @@ func TestIn(t *testing.T) {
 	a.So(in(3), should.NotBeNil)
 	a.So(in(""), should.NotBeNil)
 	a.So(in(0), should.BeNil)
+	a.So(in([]int{0, 1}), should.BeNil)
+	a.So(in([]int{2, 3, 4, 5}), should.NotBeNil)
 }

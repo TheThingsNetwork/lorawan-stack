@@ -7,24 +7,44 @@ import (
 	"reflect"
 )
 
-// In checks whether an element is contained in an array or slice.
+// In checks whether:
+//     - an element is contained in an array or slice
+//     - an slice is a subset of other slice
 func In(slice interface{}) validateFn {
 	return func(v interface{}) error {
-		value := reflect.ValueOf(slice)
+		sliceVal := reflect.ValueOf(slice)
 
-		if value.Kind() != reflect.Slice && value.Kind() != reflect.Array {
+		if sliceVal.Kind() != reflect.Slice && sliceVal.Kind() != reflect.Array {
 			return fmt.Errorf("In validator: got %T instead of an slice or array", v)
 		}
 
-		var found bool
-		for i := 0; i < value.Len() && !found; i++ {
-			if reflect.DeepEqual(v, value.Index(i).Interface()) {
-				found = true
+		fn := func(v interface{}, slice reflect.Value) error {
+			var found bool
+			for i := 0; i < slice.Len() && !found; i++ {
+				found = reflect.DeepEqual(v, slice.Index(i).Interface())
 			}
+
+			if !found {
+				return fmt.Errorf("Expected `%v` to be in `%v` but not", v, slice)
+			}
+
+			return nil
 		}
 
-		if !found {
-			return fmt.Errorf("Expected `%v` to be in `%v` but not", v, slice)
+		val := reflect.ValueOf(v)
+		if val.Kind() == reflect.Slice || val.Kind() == reflect.Array {
+			if val.Len() > sliceVal.Len() {
+				return fmt.Errorf("Expected `%v` (length %d) to be a subset of `%v` (length %d) but not", v, val.Len(), slice, sliceVal.Len())
+			}
+
+			for i := 0; i < val.Len(); i++ {
+				err := fn(val.Index(i).Interface(), sliceVal)
+				if err != nil {
+					return err
+				}
+			}
+		} else {
+			return fn(v, sliceVal)
 		}
 
 		return nil

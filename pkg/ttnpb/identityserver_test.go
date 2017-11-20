@@ -5,7 +5,6 @@ package ttnpb
 import (
 	"testing"
 
-	ptypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -14,53 +13,81 @@ func TestUserValidations(t *testing.T) {
 	a := assertions.New(t)
 
 	{
+		// empty request (bad)
 		req := &CreateUserRequest{}
 		a.So(req.Validate(), should.NotBeNil)
 
+		// request with an invalid email (bad)
 		req = &CreateUserRequest{
-			UserIdentifier: UserIdentifier{"alice"},
-			Name:           "Ali Ce",
-			Password:       "12345678abC",
-			Email:          "alice@alice.",
+			User: User{
+				UserIdentifier: UserIdentifier{"alice"},
+				Name:           "Ali Ce",
+				Password:       "12345678abC",
+				Email:          "alice@alice.",
+			},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
-		req.Email = "alice@alice.com"
+		// good request
+		req = &CreateUserRequest{
+			User: User{
+				UserIdentifier: UserIdentifier{"alice"},
+				Name:           "Ali Ce",
+				Password:       "12345678abC",
+				Email:          "alice@alice.com",
+			},
+		}
 		a.So(req.Validate(), should.BeNil)
 	}
 
 	{
+		// empty request with empty update mask (bad)
 		req := &UpdateUserRequest{}
 		err := req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrUpdateMaskNotFound.Describes(err), should.BeTrue)
+		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
 
+		// good request
 		req = &UpdateUserRequest{
-			UpdateMask: &ptypes.FieldMask{
-				Paths: []string{"name", "foo"},
+			User: User{
+				Email: "alice@ttn.com",
 			},
-		}
-		err = req.Validate()
-		a.So(err, should.NotBeNil)
-		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
-
-		req = &UpdateUserRequest{
-			UpdateMask: &ptypes.FieldMask{
-				Paths: []string{"name", "email"},
+			UpdateMask: UserMask{
+				Name:  true,
+				Email: true,
 			},
-			Email: "alice@ttn.com",
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
 
 	{
+		// empty request (bad)
 		req := &UpdateUserPasswordRequest{}
 		a.So(req.Validate(), should.NotBeNil)
 
-		req.New = "1234"
+		// password that dont have the minimum required length (bad)
+		req = &UpdateUserPasswordRequest{
+			Old: "lol",
+			New: "1234",
+		}
 		a.So(req.Validate(), should.NotBeNil)
 
-		req.New = "abcABC123494949"
+		// good password
+		req = &UpdateUserPasswordRequest{
+			Old: "lol",
+			New: "fofofoof1234",
+		}
+		a.So(req.Validate(), should.BeNil)
+	}
+
+	{
+		// empty request (bad)
+		req := &ValidateUserEmailRequest{}
+		a.So(req.Validate(), should.NotBeNil)
+
+		req = &ValidateUserEmailRequest{
+			Token: "foo",
+		}
 		a.So(req.Validate(), should.BeNil)
 	}
 }
@@ -69,34 +96,37 @@ func TestApplicationValidations(t *testing.T) {
 	a := assertions.New(t)
 
 	{
+		// empty request (bad)
 		req := &CreateApplicationRequest{}
 		a.So(req.Validate(), should.NotBeNil)
 
+		// good request
 		req = &CreateApplicationRequest{
-			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			Application: Application{
+				ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
 
 	{
-		req := &UpdateApplicationRequest{}
-		err := req.Validate()
-		a.So(err, should.NotBeNil)
-		a.So(ErrUpdateMaskNotFound.Describes(err), should.BeTrue)
-
-		req = &UpdateApplicationRequest{
-			UpdateMask: &ptypes.FieldMask{
-				Paths: []string{"descriptio"},
+		// request with empty update mask (bad)
+		req := &UpdateApplicationRequest{
+			Application: Application{
+				ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
 			},
 		}
-		err = req.Validate()
+		err := req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
 
+		// good request
 		req = &UpdateApplicationRequest{
-			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
-			UpdateMask: &ptypes.FieldMask{
-				Paths: []string{"description"},
+			Application: Application{
+				ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			},
+			UpdateMask: ApplicationMask{
+				Description: true,
 			},
 		}
 		err = req.Validate()
@@ -104,43 +134,127 @@ func TestApplicationValidations(t *testing.T) {
 	}
 
 	{
+		// empty request (bad)
 		req := &GenerateApplicationAPIKeyRequest{}
 		a.So(req.Validate(), should.NotBeNil)
 
+		// empty list of rights (bad)
 		req = &GenerateApplicationAPIKeyRequest{
-			KeyName: "foo",
-			Rights:  []Right{},
+			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			Name:   "foo",
+			Rights: []Right{},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
+		// request with gateway rights (bad)
 		req = &GenerateApplicationAPIKeyRequest{
-			KeyName: "foo",
-			Rights:  []Right{Right(1)},
+			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			Name:   "foo",
+			Rights: []Right{RIGHT_GATEWAY_DELETE},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// good request
+		req = &GenerateApplicationAPIKeyRequest{
+			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			Name:   "foo",
+			Rights: []Right{RIGHT_APPLICATION_INFO},
 		}
 		a.So(req.Validate(), should.BeNil)
-
 	}
 
 	{
+		// empty request (bad)
+		req := &UpdateApplicationAPIKeyRequest{}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// request which tries to clear the rights (bad)
+		req = &UpdateApplicationAPIKeyRequest{
+			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			Key: APIKey{
+				Name: "Foo-key",
+			},
+			UpdateMask: APIKeyMask{
+				Name:   true,
+				Rights: true,
+			},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// request with empty update mask (bad)
+		req = &UpdateApplicationAPIKeyRequest{
+			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			Key: APIKey{
+				Name: "Foo-key",
+			},
+		}
+		err := req.Validate()
+		a.So(err, should.NotBeNil)
+		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
+
+		// request with gateway rights (bad)
+		req = &UpdateApplicationAPIKeyRequest{
+			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			Key: APIKey{
+				Name:   "Foo-key",
+				Rights: []Right{RIGHT_GATEWAY_DELETE},
+			},
+			UpdateMask: APIKeyMask{
+				Name:   true,
+				Rights: true,
+			},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// good request
+		req = &UpdateApplicationAPIKeyRequest{
+			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			Key: APIKey{
+				Name: "Foo-key",
+			},
+			UpdateMask: APIKeyMask{
+				Name: true,
+			},
+		}
+		a.So(req.Validate(), should.BeNil)
+	}
+
+	{
+		// empty request (bad)
 		req := &RemoveApplicationAPIKeyRequest{}
 		a.So(req.Validate(), should.NotBeNil)
 
+		// good request
 		req = &RemoveApplicationAPIKeyRequest{
-			KeyName: "foo",
+			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			Key: "foo",
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
 
 	{
+		// empty request (bad)
 		req := &SetApplicationCollaboratorRequest{}
 		a.So(req.Validate(), should.NotBeNil)
 
+		// request with gateway rights (bad)
+		req = &SetApplicationCollaboratorRequest{
+			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			Collaborator: Collaborator{
+				UserIdentifier: UserIdentifier{"alice"},
+				Rights:         []Right{RIGHT_GATEWAY_DELETE},
+			},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// good request
 		req = &SetApplicationCollaboratorRequest{
 			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
 			Collaborator: Collaborator{
 				UserIdentifier: UserIdentifier{"alice"},
 			},
 		}
+		a.So(req.Validate(), should.BeNil)
 	}
 }
 
@@ -148,51 +262,57 @@ func TestGatewayValidations(t *testing.T) {
 	a := assertions.New(t)
 
 	{
+		// request with invalid gateway ID
 		req := &CreateGatewayRequest{
-			GatewayIdentifier: GatewayIdentifier{"__foo-gtw"},
-			FrequencyPlanID:   "foo",
-			ClusterAddress:    "foo",
+			Gateway: Gateway{
+				GatewayIdentifier: GatewayIdentifier{"__foo-gtw"},
+				FrequencyPlanID:   "foo",
+				ClusterAddress:    "foo",
+			},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
+		// good request
 		req = &CreateGatewayRequest{
-			GatewayIdentifier: GatewayIdentifier{"foo-gtw"},
-			FrequencyPlanID:   "foo",
-			ClusterAddress:    "foo",
+			Gateway: Gateway{
+				GatewayIdentifier: GatewayIdentifier{"foo-gtw"},
+				FrequencyPlanID:   "foo",
+				ClusterAddress:    "foo",
+			},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
 
 	{
+		// empty request without update_mask
 		req := &UpdateGatewayRequest{}
-		a.So(req.Validate(), should.NotBeNil)
-
-		req = &UpdateGatewayRequest{
-			FrequencyPlanID: "",
-			ClusterAddress:  "localhost:1234",
-			UpdateMask: &ptypes.FieldMask{
-				Paths: []string{"frequency_plan_id", "cluster_address"},
-			},
-		}
-		a.So(req.Validate(), should.NotBeNil)
-
-		req = &UpdateGatewayRequest{
-			FrequencyPlanID: "fooPlan",
-			ClusterAddress:  "localhost:1234",
-			UpdateMask: &ptypes.FieldMask{
-				Paths: []string{"frequency_plan_id", "cluster_addressss"},
-			},
-		}
 		err := req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
 
+		// request with empty frequency plan ID and no gateway ID (bad)
 		req = &UpdateGatewayRequest{
-			GatewayIdentifier: GatewayIdentifier{"foo-gtw"},
-			FrequencyPlanID:   "fooPlan",
-			ClusterAddress:    "localhost:1234",
-			UpdateMask: &ptypes.FieldMask{
-				Paths: []string{"frequency_plan_id", "cluster_address"},
+			Gateway: Gateway{
+				FrequencyPlanID: "",
+				ClusterAddress:  "foo",
+			},
+			UpdateMask: GatewayMask{
+				ClusterAddress:  true,
+				FrequencyPlanID: true,
+			},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// good request
+		req = &UpdateGatewayRequest{
+			Gateway: Gateway{
+				GatewayIdentifier: GatewayIdentifier{"foo-gtw"},
+				FrequencyPlanID:   "foo",
+				ClusterAddress:    "foo",
+			},
+			UpdateMask: GatewayMask{
+				ClusterAddress:  true,
+				FrequencyPlanID: true,
 			},
 		}
 		err = req.Validate()
@@ -200,15 +320,126 @@ func TestGatewayValidations(t *testing.T) {
 	}
 
 	{
+		// empty request (bad)
+		req := &GenerateGatewayAPIKeyRequest{}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// empty list of rights (bad)
+		req = &GenerateGatewayAPIKeyRequest{
+			GatewayIdentifier: GatewayIdentifier{"foo-app"},
+			Name:              "foo",
+			Rights:            []Right{},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// rights for application (bad)
+		req = &GenerateGatewayAPIKeyRequest{
+			GatewayIdentifier: GatewayIdentifier{"foo-app"},
+			Name:              "foo",
+			Rights:            []Right{RIGHT_APPLICATION_INFO},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// good request
+		req = &GenerateGatewayAPIKeyRequest{
+			GatewayIdentifier: GatewayIdentifier{"foo-app"},
+			Name:              "foo",
+			Rights:            []Right{RIGHT_GATEWAY_DELETE},
+		}
+		a.So(req.Validate(), should.BeNil)
+	}
+
+	{
+		// empty request (bad)
+		req := &UpdateGatewayAPIKeyRequest{}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// request which tries to clear the rights (bad)
+		req = &UpdateGatewayAPIKeyRequest{
+			GatewayIdentifier: GatewayIdentifier{"foo-app"},
+			Key: APIKey{
+				Name: "Foo-key",
+			},
+			UpdateMask: APIKeyMask{
+				Name:   true,
+				Rights: true,
+			}}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// request with empty update mask (bad)
+		req = &UpdateGatewayAPIKeyRequest{
+			GatewayIdentifier: GatewayIdentifier{"foo-app"},
+			Key: APIKey{
+				Name: "Foo-key",
+			},
+		}
+		err := req.Validate()
+		a.So(err, should.NotBeNil)
+		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
+
+		// request with application rights (bad)
+		req = &UpdateGatewayAPIKeyRequest{
+			GatewayIdentifier: GatewayIdentifier{"foo-app"},
+			Key: APIKey{
+				Name:   "Foo-key",
+				Rights: []Right{RIGHT_APPLICATION_DELETE},
+			},
+			UpdateMask: APIKeyMask{
+				Name:   true,
+				Rights: true,
+			},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// good request
+		req = &UpdateGatewayAPIKeyRequest{
+			GatewayIdentifier: GatewayIdentifier{"foo-app"},
+			Key: APIKey{
+				Name: "Foo-key",
+			},
+			UpdateMask: APIKeyMask{
+				Name: true,
+			},
+		}
+		a.So(req.Validate(), should.BeNil)
+	}
+
+	{
+		// empty request (bad)
+		req := &RemoveGatewayAPIKeyRequest{}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// good request
+		req = &RemoveGatewayAPIKeyRequest{
+			GatewayIdentifier: GatewayIdentifier{"foo-app"},
+			Key:               "foo",
+		}
+		a.So(req.Validate(), should.BeNil)
+	}
+
+	{
+		// empty request (bad)
 		req := &SetGatewayCollaboratorRequest{}
 		a.So(req.Validate(), should.NotBeNil)
 
+		// request with application rights (bad)
+		req = &SetGatewayCollaboratorRequest{
+			GatewayIdentifier: GatewayIdentifier{"foo-gtw"},
+			Collaborator: Collaborator{
+				UserIdentifier: UserIdentifier{"alice"},
+				Rights:         []Right{RIGHT_APPLICATION_DELETE},
+			},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// good request
 		req = &SetGatewayCollaboratorRequest{
 			GatewayIdentifier: GatewayIdentifier{"foo-gtw"},
 			Collaborator: Collaborator{
 				UserIdentifier: UserIdentifier{"alice"},
 			},
 		}
+		a.So(req.Validate(), should.BeNil)
 	}
 }
 
@@ -216,84 +447,53 @@ func TestClientValidations(t *testing.T) {
 	a := assertions.New(t)
 
 	{
+		// empty request (bad)
 		req := &CreateClientRequest{}
 		a.So(req.Validate(), should.NotBeNil)
 
+		// good request
 		req = &CreateClientRequest{
-			ClientIdentifier: ClientIdentifier{"foo-client"},
-			RedirectURI:      "localhost",
-			Grants:           []GrantType{GRANT_AUTHORIZATION_CODE},
-			Rights:           []Right{RIGHT_APPLICATION_INFO},
+			Client: Client{
+				Description:      "hi",
+				ClientIdentifier: ClientIdentifier{"foo-client"},
+				RedirectURI:      "localhost",
+				Rights:           []Right{RIGHT_APPLICATION_INFO},
+			},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
 
 	{
+		// empty request (bad)
 		req := &UpdateClientRequest{}
 		a.So(req.Validate(), should.NotBeNil)
 
+		// request with empty update_mask (bad)
 		req = &UpdateClientRequest{
-			ClientIdentifier: ClientIdentifier{"foo-client"},
-			Description:      "",
+			Client: Client{
+				ClientIdentifier: ClientIdentifier{"foo-client"},
+				Description:      "",
+			},
 		}
 		err := req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrUpdateMaskNotFound.Describes(err), should.BeTrue)
+		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
 
+		// good request
 		req = &UpdateClientRequest{
-			ClientIdentifier: ClientIdentifier{"foo-client"},
-			RedirectURI:      "localhost",
-			Grants:           []GrantType{GRANT_AUTHORIZATION_CODE},
-			Rights:           []Right{RIGHT_APPLICATION_INFO},
-			UpdateMask: &ptypes.FieldMask{
-				Paths: []string{"frequency_plan_id", "cluster_address"},
+			Client: Client{
+				ClientIdentifier: ClientIdentifier{"foo-client"},
+				Description:      "ho",
+				RedirectURI:      "ttn.com",
+				Rights:           []Right{RIGHT_APPLICATION_INFO},
 			},
-		}
-		err = req.Validate()
-		a.So(err, should.NotBeNil)
-		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
-
-		req = &UpdateClientRequest{
-			ClientIdentifier: ClientIdentifier{"foo-client"},
-			Description:      "",
-			RedirectURI:      "ttn.com",
-			Grants:           []GrantType{GRANT_AUTHORIZATION_CODE},
-			Rights:           []Right{RIGHT_APPLICATION_INFO},
-			UpdateMask: &ptypes.FieldMask{
-				Paths: []string{"redirect_uri", "grants", "rights", "description"},
+			UpdateMask: ClientMask{
+				RedirectURI: true,
+				Description: true,
+				Rights:      true,
 			},
 		}
 		err = req.Validate()
 		a.So(err, should.BeNil)
 	}
-
-	{
-		req := &SetClientStateRequest{}
-		a.So(req.Validate(), should.NotBeNil)
-
-		req = &SetClientStateRequest{
-			ClientIdentifier: ClientIdentifier{"foo-client"},
-			State:            ClientState(5),
-		}
-		a.So(req.Validate(), should.NotBeNil)
-
-		req = &SetClientStateRequest{
-			ClientIdentifier: ClientIdentifier{"foo-client"},
-			State:            ClientState(0),
-		}
-		a.So(req.Validate(), should.BeNil)
-	}
-
-	{
-		req := &SetClientCollaboratorRequest{}
-		a.So(req.Validate(), should.NotBeNil)
-
-		req = &SetClientCollaboratorRequest{
-			ClientIdentifier: ClientIdentifier{"foo-client"},
-			Collaborator: Collaborator{
-				UserIdentifier: UserIdentifier{"alice"},
-			},
-		}
-	}
-
 }

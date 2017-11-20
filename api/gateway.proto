@@ -5,6 +5,7 @@ syntax = "proto3";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
+import "github.com/TheThingsNetwork/ttn/api/rights.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
@@ -15,21 +16,23 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // Gateway is the message that defines a gateway on the network.
 message Gateway {
-  // id is the Gateway's ID.
+  // id is the Gateway's unique and immutable ID.
   GatewayIdentifier id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the gateway.
   string description = 2;
 
-  // token is a valid token that can identify the gateway with other components
-  // that have the IS's decryption keys.
-  string token = 3;
+  // api_keys are the API keys of the gateway.
+  // This is an only read field. API keys can be added, modified and removed
+  // through the specific application API key methods of the IsGateway service.
+  repeated APIKey api_keys = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
 
   // frequency_plan_id indicates the ID of the frequency plan.
   string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID"];
 
   // activated_at denotes when the gateway was activated.
-  google.protobuf.Timestamp activated_at = 5 [(gogoproto.stdtime) = true];
+  // This a read-only field.
+  google.protobuf.Timestamp activated_at = 5 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
 
   // privacy_settings defines the different privacy settings for this gateway.
   GatewayPrivacySettings privacy_settings = 6 [(gogoproto.nullable) = false];
@@ -58,14 +61,36 @@ message Gateway {
   UserIdentifier contact_account = 12 [(gogoproto.nullable) = false];
 
   // created_at is the time when the gateway was created.
+  // This a read-only field.
   google.protobuf.Timestamp created_at = 13 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // updated_at is the last time the gateway was updated.
+  // This a read-only field.
   google.protobuf.Timestamp updated_at = 14 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // archived_at is the time when the gateway was archived and therefore
   // permantly disabled.
+  // This a read-only field.
   google.protobuf.Timestamp archived_at = 15 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+}
+
+message GatewayMask {
+  bool description = 1;
+  bool frequency_plan_id = 2 [(gogoproto.customname) = "FrequencyPlanID"];
+
+  message PrivacySettingsMask {
+    bool status_public = 1;
+    bool location_public = 2;
+    bool contactable = 3;
+  }
+  PrivacySettingsMask privacy_settings = 3 [(gogoproto.nullable) = false];
+
+  bool auto_update = 4;
+  bool platform = 5;
+  bool antennas = 6;
+  bool attributes = 7;
+  bool cluster_address = 8;
+  bool contact_account = 9;
 }
 
 // GatewayPrivacySettings is the message that defines the different privacy settings
@@ -113,9 +138,9 @@ enum GatewayAntennaPlacement {
 
 // GatewayConfiguration contains all the latest values relative to this gateway.
 message GatewayConfiguration {
-  // token is a valid token that can identify the gateway with other components
-  // that have the IS's decryption keys.
-  string token = 1;
+  // api_key is the API key that is used to identify the gateway against other
+  // components in the network.
+  string api_key = 1 [(gogoproto.customname) = "APIKey"];
 
   // frequency_plan_id indicates the ID of the frequency plan.
   string frequency_plan_id = 2 [(gogoproto.customname) = "FrequencyPlanID"];

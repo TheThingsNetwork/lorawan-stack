@@ -14,24 +14,33 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // Application is the message that defines an application in the network.
 message Application {
-  // id is the application's ID.
+  // id is the application's unique and immutable ID.
   ApplicationIdentifier id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the application.
   string description = 2;
 
   // api_keys are the API keys of the application.
+  // This is an only read field. API keys can be added, modified and removed
+  // through the specific application API key methods of the IsApplication service.
   repeated APIKey api_keys = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
 
   // created_at is the time when the application was created.
+  // This is a read-only field.
   google.protobuf.Timestamp created_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // updated_at is the last time the application was updated.
+  // This is a read-only field.
   google.protobuf.Timestamp updated_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // archived_at is the time when the application was archived and therefore
   // permantly disabled.
+  // This a read-only field.
   google.protobuf.Timestamp archived_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+}
+
+message ApplicationMask {
+  bool description = 1;
 }
 
 // ApplicationUp wraps multiple application-layer uplink types

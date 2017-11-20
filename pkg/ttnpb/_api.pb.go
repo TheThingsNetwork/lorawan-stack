@@ -30,12 +30,14 @@ It is generated from these files:
 
 It has these top-level messages:
 	Application
+	ApplicationMask
 	ApplicationUp
 	ApplicationUplink
 	ApplicationDownlink
 	ApplicationDownlinks
 	DownlinkQueueRequest
 	Client
+	ClientMask
 	Collaborator
 	KeyEnvelope
 	RootKeys
@@ -47,6 +49,7 @@ It has these top-level messages:
 	MACState
 	MACInfo
 	Gateway
+	GatewayMask
 	GatewayPrivacySettings
 	GatewayAntenna
 	GatewayConfiguration
@@ -64,29 +67,27 @@ It has these top-level messages:
 	CreateUserRequest
 	UpdateUserRequest
 	UpdateUserPasswordRequest
+	ValidateUserEmailRequest
+	ListAuthorizedClientsResponse
 	CreateApplicationRequest
 	ListApplicationsResponse
 	UpdateApplicationRequest
 	GenerateApplicationAPIKeyRequest
+	UpdateApplicationAPIKeyRequest
 	RemoveApplicationAPIKeyRequest
 	SetApplicationCollaboratorRequest
 	ListApplicationCollaboratorsResponse
-	ListApplicationRightsResponse
 	CreateGatewayRequest
 	ListGatewaysResponse
 	UpdateGatewayRequest
+	GenerateGatewayAPIKeyRequest
+	UpdateGatewayAPIKeyRequest
+	RemoveGatewayAPIKeyRequest
 	SetGatewayCollaboratorRequest
 	ListGatewayCollaboratorsResponse
-	ListGatewayOwnersResponse
-	ListGatewayRightsResponse
 	CreateClientRequest
 	ListClientsResponse
 	UpdateClientRequest
-	SetClientOfficialRequest
-	SetClientStateRequest
-	SetClientCollaboratorRequest
-	ListClientCollaboratorsResponse
-	ListClientRightsResponse
 	JoinRequest
 	JoinResponse
 	Message
@@ -107,9 +108,11 @@ It has these top-level messages:
 	TxMetadata
 	Location
 	APIKey
+	APIKeyMask
 	TokenKeyRequest
 	TokenKeyResponse
 	User
+	UserMask
 */
 package ttnpb
 

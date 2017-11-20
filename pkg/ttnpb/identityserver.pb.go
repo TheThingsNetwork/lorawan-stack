@@ -9,7 +9,6 @@ import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import google_protobuf2 "github.com/gogo/protobuf/types"
-import google_protobuf5 "github.com/gogo/protobuf/types"
 
 import (
 	context "context"
@@ -25,14 +24,13 @@ var _ = fmt.Errorf
 var _ = math.Inf
 
 type CreateUserRequest struct {
-	// user_id is the ID of the user.
-	UserIdentifier `protobuf:"bytes,1,opt,name=user_id,json=userId,embedded=user_id" json:"user_id"`
-	// email address of the user.
-	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	// password is the user's unencrypted password.
-	Password string `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
-	// name is the user's full name.
-	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	// user is the user to be created.
+	User User `protobuf:"bytes,1,opt,name=user" json:"user"`
+	// invitation_token is the token provided within the registration process to
+	// be able to create an user account.
+	// This token is only required when the Identity Server registration mode is
+	// set to "invitation only", otherwise it will be ignored.
+	InvitationToken string `protobuf:"bytes,2,opt,name=invitation_token,json=invitationToken,proto3" json:"invitation_token,omitempty"`
 }
 
 func (m *CreateUserRequest) Reset()                    { *m = CreateUserRequest{} }
@@ -40,35 +38,27 @@ func (m *CreateUserRequest) String() string            { return proto.CompactTex
 func (*CreateUserRequest) ProtoMessage()               {}
 func (*CreateUserRequest) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{0} }
 
-func (m *CreateUserRequest) GetEmail() string {
+func (m *CreateUserRequest) GetUser() User {
 	if m != nil {
-		return m.Email
+		return m.User
 	}
-	return ""
+	return User{}
 }
 
-func (m *CreateUserRequest) GetPassword() string {
+func (m *CreateUserRequest) GetInvitationToken() string {
 	if m != nil {
-		return m.Password
-	}
-	return ""
-}
-
-func (m *CreateUserRequest) GetName() string {
-	if m != nil {
-		return m.Name
+		return m.InvitationToken
 	}
 	return ""
 }
 
 type UpdateUserRequest struct {
-	// email is the new email of the user.
-	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	// name is the new name of the user.
-	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	// Fields modified by the update request.
-	// Must be specified and non-empty.
-	UpdateMask *google_protobuf5.FieldMask `protobuf:"bytes,10,opt,name=update_mask,json=updateMask" json:"update_mask,omitempty"`
+	// User is the user to be updated.
+	User User `protobuf:"bytes,1,opt,name=user" json:"user"`
+	// update_mask is the symbolic set of fields that will be affected in the update
+	// operation. Fields not included in the update_mask are not changed and ignored
+	// in the request. Must be non-empty.
+	UpdateMask UserMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
 }
 
 func (m *UpdateUserRequest) Reset()                    { *m = UpdateUserRequest{} }
@@ -76,25 +66,18 @@ func (m *UpdateUserRequest) String() string            { return proto.CompactTex
 func (*UpdateUserRequest) ProtoMessage()               {}
 func (*UpdateUserRequest) Descriptor() ([]byte, []int) { return fileDescriptorIdentityserver, []int{1} }
 
-func (m *UpdateUserRequest) GetEmail() string {
+func (m *UpdateUserRequest) GetUser() User {
 	if m != nil {
-		return m.Email
+		return m.User
 	}
-	return ""
+	return User{}
 }
 
-func (m *UpdateUserRequest) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *UpdateUserRequest) GetUpdateMask() *google_protobuf5.FieldMask {
+func (m *UpdateUserRequest) GetUpdateMask() UserMask {
 	if m != nil {
 		return m.UpdateMask
 	}
-	return nil
+	return UserMask{}
 }
 
 type UpdateUserPasswordRequest struct {
@@ -125,28 +108,65 @@ func (m *UpdateUserPasswordRequest) GetNew() string {
 	return ""
 }
 
+type ValidateUserEmailRequest struct {
+	// token is the token sent to the user's email address in order to validate it.
+	Token string `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+}
+
+func (m *ValidateUserEmailRequest) Reset()         { *m = ValidateUserEmailRequest{} }
+func (m *ValidateUserEmailRequest) String() string { return proto.CompactTextString(m) }
+func (*ValidateUserEmailRequest) ProtoMessage()    {}
+func (*ValidateUserEmailRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{3}
+}
+
+func (m *ValidateUserEmailRequest) GetToken() string {
+	if m != nil {
+		return m.Token
+	}
+	return ""
+}
+
+type ListAuthorizedClientsResponse struct {
+	// clients is the list of clients an user has currently authorized.
+	Clients []Client `protobuf:"bytes,1,rep,name=clients" json:"clients"`
+}
+
+func (m *ListAuthorizedClientsResponse) Reset()         { *m = ListAuthorizedClientsResponse{} }
+func (m *ListAuthorizedClientsResponse) String() string { return proto.CompactTextString(m) }
+func (*ListAuthorizedClientsResponse) ProtoMessage()    {}
+func (*ListAuthorizedClientsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{4}
+}
+
+func (m *ListAuthorizedClientsResponse) GetClients() []Client {
+	if m != nil {
+		return m.Clients
+	}
+	return nil
+}
+
 type CreateApplicationRequest struct {
-	// application_id is the ID of the application to be created.
-	ApplicationIdentifier `protobuf:"bytes,1,opt,name=application_id,json=applicationId,embedded=application_id" json:"application_id"`
-	// description is the description of the application.
-	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// application is the application to be created.
+	Application Application `protobuf:"bytes,1,opt,name=application" json:"application"`
 }
 
 func (m *CreateApplicationRequest) Reset()         { *m = CreateApplicationRequest{} }
 func (m *CreateApplicationRequest) String() string { return proto.CompactTextString(m) }
 func (*CreateApplicationRequest) ProtoMessage()    {}
 func (*CreateApplicationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{3}
+	return fileDescriptorIdentityserver, []int{5}
 }
 
-func (m *CreateApplicationRequest) GetDescription() string {
+func (m *CreateApplicationRequest) GetApplication() Application {
 	if m != nil {
-		return m.Description
+		return m.Application
 	}
-	return ""
+	return Application{}
 }
 
 type ListApplicationsResponse struct {
+	// applications is the list of applications the authenticated user has access to.
 	Applications []Application `protobuf:"bytes,1,rep,name=applications" json:"applications"`
 }
 
@@ -154,7 +174,7 @@ func (m *ListApplicationsResponse) Reset()         { *m = ListApplicationsRespon
 func (m *ListApplicationsResponse) String() string { return proto.CompactTextString(m) }
 func (*ListApplicationsResponse) ProtoMessage()    {}
 func (*ListApplicationsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{4}
+	return fileDescriptorIdentityserver, []int{6}
 }
 
 func (m *ListApplicationsResponse) GetApplications() []Application {
@@ -165,39 +185,40 @@ func (m *ListApplicationsResponse) GetApplications() []Application {
 }
 
 type UpdateApplicationRequest struct {
-	ApplicationIdentifier `protobuf:"bytes,1,opt,name=application_id,json=applicationId,embedded=application_id" json:"application_id"`
-	// description is the description of the application.
-	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	// Fields modified by the update request.
-	// Must be specified and non-empty.
-	UpdateMask *google_protobuf5.FieldMask `protobuf:"bytes,7,opt,name=update_mask,json=updateMask" json:"update_mask,omitempty"`
+	// application is the application to be updated.
+	Application Application `protobuf:"bytes,1,opt,name=application" json:"application"`
+	// update_mask is the symbolic set of fields that will be affected in the update
+	// operation. Fields not included in the update_mask are not changed and ignored
+	// in the request. Must be non-empty.
+	UpdateMask ApplicationMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
 }
 
 func (m *UpdateApplicationRequest) Reset()         { *m = UpdateApplicationRequest{} }
 func (m *UpdateApplicationRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateApplicationRequest) ProtoMessage()    {}
 func (*UpdateApplicationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{5}
+	return fileDescriptorIdentityserver, []int{7}
 }
 
-func (m *UpdateApplicationRequest) GetDescription() string {
+func (m *UpdateApplicationRequest) GetApplication() Application {
 	if m != nil {
-		return m.Description
+		return m.Application
 	}
-	return ""
+	return Application{}
 }
 
-func (m *UpdateApplicationRequest) GetUpdateMask() *google_protobuf5.FieldMask {
+func (m *UpdateApplicationRequest) GetUpdateMask() ApplicationMask {
 	if m != nil {
 		return m.UpdateMask
 	}
-	return nil
+	return ApplicationMask{}
 }
 
 type GenerateApplicationAPIKeyRequest struct {
+	// application_id is the application's ID which API key will be added to.
 	ApplicationIdentifier `protobuf:"bytes,1,opt,name=application_id,json=applicationId,embedded=application_id" json:"application_id"`
-	// key_name is the name of the API key to be generated.
-	KeyName string `protobuf:"bytes,2,opt,name=key_name,json=keyName,proto3" json:"key_name,omitempty"`
+	// name is the name of the API key to be generated.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// rights the are rights the generated API key will bear.
 	Rights []Right `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
 }
@@ -206,12 +227,12 @@ func (m *GenerateApplicationAPIKeyRequest) Reset()         { *m = GenerateApplic
 func (m *GenerateApplicationAPIKeyRequest) String() string { return proto.CompactTextString(m) }
 func (*GenerateApplicationAPIKeyRequest) ProtoMessage()    {}
 func (*GenerateApplicationAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{6}
+	return fileDescriptorIdentityserver, []int{8}
 }
 
-func (m *GenerateApplicationAPIKeyRequest) GetKeyName() string {
+func (m *GenerateApplicationAPIKeyRequest) GetName() string {
 	if m != nil {
-		return m.KeyName
+		return m.Name
 	}
 	return ""
 }
@@ -223,39 +244,76 @@ func (m *GenerateApplicationAPIKeyRequest) GetRights() []Right {
 	return nil
 }
 
-type RemoveApplicationAPIKeyRequest struct {
+type UpdateApplicationAPIKeyRequest struct {
+	// application_id is the application's ID which an API key will be modified.
 	ApplicationIdentifier `protobuf:"bytes,1,opt,name=application_id,json=applicationId,embedded=application_id" json:"application_id"`
-	// key_name is the name of the API key to be removed.
-	KeyName string `protobuf:"bytes,2,opt,name=key_name,json=keyName,proto3" json:"key_name,omitempty"`
+	// key is the API key to be updated.
+	Key APIKey `protobuf:"bytes,2,opt,name=key" json:"key"`
+	// update_mask is the symbolic set of fields that will be affected in the update
+	// operation. Fields not included in the update_mask are not changed and ignored
+	// in the request. Must be non-empty.
+	UpdateMask APIKeyMask `protobuf:"bytes,3,opt,name=update_mask,json=updateMask" json:"update_mask"`
+}
+
+func (m *UpdateApplicationAPIKeyRequest) Reset()         { *m = UpdateApplicationAPIKeyRequest{} }
+func (m *UpdateApplicationAPIKeyRequest) String() string { return proto.CompactTextString(m) }
+func (*UpdateApplicationAPIKeyRequest) ProtoMessage()    {}
+func (*UpdateApplicationAPIKeyRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{9}
+}
+
+func (m *UpdateApplicationAPIKeyRequest) GetKey() APIKey {
+	if m != nil {
+		return m.Key
+	}
+	return APIKey{}
+}
+
+func (m *UpdateApplicationAPIKeyRequest) GetUpdateMask() APIKeyMask {
+	if m != nil {
+		return m.UpdateMask
+	}
+	return APIKeyMask{}
+}
+
+type RemoveApplicationAPIKeyRequest struct {
+	// application_id is the application's ID which the API key will be removed from.
+	ApplicationIdentifier `protobuf:"bytes,1,opt,name=application_id,json=applicationId,embedded=application_id" json:"application_id"`
+	// key is the application API key to be removed.
+	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 }
 
 func (m *RemoveApplicationAPIKeyRequest) Reset()         { *m = RemoveApplicationAPIKeyRequest{} }
 func (m *RemoveApplicationAPIKeyRequest) String() string { return proto.CompactTextString(m) }
 func (*RemoveApplicationAPIKeyRequest) ProtoMessage()    {}
 func (*RemoveApplicationAPIKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{7}
+	return fileDescriptorIdentityserver, []int{10}
 }
 
-func (m *RemoveApplicationAPIKeyRequest) GetKeyName() string {
+func (m *RemoveApplicationAPIKeyRequest) GetKey() string {
 	if m != nil {
-		return m.KeyName
+		return m.Key
 	}
 	return ""
 }
 
 type SetApplicationCollaboratorRequest struct {
+	// application_id is the application ID where the collaborator will be (un)set.
 	ApplicationIdentifier `protobuf:"bytes,1,opt,name=application_id,json=applicationId,embedded=application_id" json:"application_id"`
-	Collaborator          `protobuf:"bytes,2,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
+	// collaborator is the collaborator to be set. If the list if rights is empty
+	// it will result as unset.
+	Collaborator `protobuf:"bytes,2,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
 }
 
 func (m *SetApplicationCollaboratorRequest) Reset()         { *m = SetApplicationCollaboratorRequest{} }
 func (m *SetApplicationCollaboratorRequest) String() string { return proto.CompactTextString(m) }
 func (*SetApplicationCollaboratorRequest) ProtoMessage()    {}
 func (*SetApplicationCollaboratorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{8}
+	return fileDescriptorIdentityserver, []int{11}
 }
 
 type ListApplicationCollaboratorsResponse struct {
+	// collaborators is the list of collaborators the application has.
 	Collaborators []Collaborator `protobuf:"bytes,1,rep,name=collaborators" json:"collaborators"`
 }
 
@@ -263,7 +321,7 @@ func (m *ListApplicationCollaboratorsResponse) Reset()         { *m = ListApplic
 func (m *ListApplicationCollaboratorsResponse) String() string { return proto.CompactTextString(m) }
 func (*ListApplicationCollaboratorsResponse) ProtoMessage()    {}
 func (*ListApplicationCollaboratorsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{9}
+	return fileDescriptorIdentityserver, []int{12}
 }
 
 func (m *ListApplicationCollaboratorsResponse) GetCollaborators() []Collaborator {
@@ -273,124 +331,27 @@ func (m *ListApplicationCollaboratorsResponse) GetCollaborators() []Collaborator
 	return nil
 }
 
-type ListApplicationRightsResponse struct {
-	// rights is a list of rights that an user holds for an application.
-	Rights []Right `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
-}
-
-func (m *ListApplicationRightsResponse) Reset()         { *m = ListApplicationRightsResponse{} }
-func (m *ListApplicationRightsResponse) String() string { return proto.CompactTextString(m) }
-func (*ListApplicationRightsResponse) ProtoMessage()    {}
-func (*ListApplicationRightsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{10}
-}
-
-func (m *ListApplicationRightsResponse) GetRights() []Right {
-	if m != nil {
-		return m.Rights
-	}
-	return nil
-}
-
 type CreateGatewayRequest struct {
-	// gateway_id is the Gateway's ID to be created.
-	GatewayIdentifier `protobuf:"bytes,1,opt,name=gateway_id,json=gatewayId,embedded=gateway_id" json:"gateway_id"`
-	// description is the description of the gateway.
-	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	// frequency_plan_id indicates the ID of the frequency plan.
-	FrequencyPlanID string `protobuf:"bytes,4,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
-	// privacy_settings defines the different privacy settings for this gateway.
-	PrivacySettings GatewayPrivacySettings `protobuf:"bytes,6,opt,name=privacy_settings,json=privacySettings" json:"privacy_settings"`
-	// auto_update indicates whether or not the gateway should be able to
-	// automatically fetch and execute firmware updates.
-	AutoUpdate bool `protobuf:"varint,7,opt,name=auto_update,json=autoUpdate,proto3" json:"auto_update,omitempty"`
-	// platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS"
-	Platform string `protobuf:"bytes,8,opt,name=platform,proto3" json:"platform,omitempty"`
-	// antennas is all the antennas that the gateway has.
-	Antennas []GatewayAntenna `protobuf:"bytes,9,rep,name=antennas" json:"antennas"`
-	// attributes is a free form map of attributes.
-	Attributes map[string]string `protobuf:"bytes,10,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	// cluster_address indicates the URI of the gateway server cluster to connect to,
-	// in a "<ip>:<port>" format.
-	ClusterAddress string `protobuf:"bytes,11,opt,name=cluster_address,json=clusterAddress,proto3" json:"cluster_address,omitempty"`
-	// contact_account is the user ID that will be displayed (given the set privacy
-	// settings) as contact person for this gateway.
-	// TODO(gomezjdaniel): allow to use an organization ID as contact account when
-	// they are added.
-	ContactAccount UserIdentifier `protobuf:"bytes,12,opt,name=contact_account,json=contactAccount" json:"contact_account"`
+	// gateway is the gateway to be created.
+	Gateway Gateway `protobuf:"bytes,1,opt,name=gateway" json:"gateway"`
 }
 
 func (m *CreateGatewayRequest) Reset()         { *m = CreateGatewayRequest{} }
 func (m *CreateGatewayRequest) String() string { return proto.CompactTextString(m) }
 func (*CreateGatewayRequest) ProtoMessage()    {}
 func (*CreateGatewayRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{11}
+	return fileDescriptorIdentityserver, []int{13}
 }
 
-func (m *CreateGatewayRequest) GetDescription() string {
+func (m *CreateGatewayRequest) GetGateway() Gateway {
 	if m != nil {
-		return m.Description
+		return m.Gateway
 	}
-	return ""
-}
-
-func (m *CreateGatewayRequest) GetFrequencyPlanID() string {
-	if m != nil {
-		return m.FrequencyPlanID
-	}
-	return ""
-}
-
-func (m *CreateGatewayRequest) GetPrivacySettings() GatewayPrivacySettings {
-	if m != nil {
-		return m.PrivacySettings
-	}
-	return GatewayPrivacySettings{}
-}
-
-func (m *CreateGatewayRequest) GetAutoUpdate() bool {
-	if m != nil {
-		return m.AutoUpdate
-	}
-	return false
-}
-
-func (m *CreateGatewayRequest) GetPlatform() string {
-	if m != nil {
-		return m.Platform
-	}
-	return ""
-}
-
-func (m *CreateGatewayRequest) GetAntennas() []GatewayAntenna {
-	if m != nil {
-		return m.Antennas
-	}
-	return nil
-}
-
-func (m *CreateGatewayRequest) GetAttributes() map[string]string {
-	if m != nil {
-		return m.Attributes
-	}
-	return nil
-}
-
-func (m *CreateGatewayRequest) GetClusterAddress() string {
-	if m != nil {
-		return m.ClusterAddress
-	}
-	return ""
-}
-
-func (m *CreateGatewayRequest) GetContactAccount() UserIdentifier {
-	if m != nil {
-		return m.ContactAccount
-	}
-	return UserIdentifier{}
+	return Gateway{}
 }
 
 type ListGatewaysResponse struct {
+	// gateways it the list of gateways the authenticated user has access to.
 	Gateways []Gateway `protobuf:"bytes,1,rep,name=gateways" json:"gateways"`
 }
 
@@ -398,7 +359,7 @@ func (m *ListGatewaysResponse) Reset()         { *m = ListGatewaysResponse{} }
 func (m *ListGatewaysResponse) String() string { return proto.CompactTextString(m) }
 func (*ListGatewaysResponse) ProtoMessage()    {}
 func (*ListGatewaysResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{12}
+	return fileDescriptorIdentityserver, []int{14}
 }
 
 func (m *ListGatewaysResponse) GetGateways() []Gateway {
@@ -409,125 +370,135 @@ func (m *ListGatewaysResponse) GetGateways() []Gateway {
 }
 
 type UpdateGatewayRequest struct {
-	GatewayIdentifier `protobuf:"bytes,1,opt,name=gateway_id,json=gatewayId,embedded=gateway_id" json:"gateway_id"`
-	// description is the description of the gateway.
-	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	// frequency_plan_id indicates the ID of the frequency plan.
-	FrequencyPlanID string `protobuf:"bytes,4,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
-	// privacy_settings defines the different privacy settings for this gateway.
-	PrivacySettings GatewayPrivacySettings `protobuf:"bytes,6,opt,name=privacy_settings,json=privacySettings" json:"privacy_settings"`
-	// auto_update indicates whether or not the gateway should be able to
-	// automatically fetch and execute firmware updates.
-	AutoUpdate bool `protobuf:"varint,7,opt,name=auto_update,json=autoUpdate,proto3" json:"auto_update,omitempty"`
-	// platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS"
-	Platform string `protobuf:"bytes,8,opt,name=platform,proto3" json:"platform,omitempty"`
-	// antennas is all the antennas that the gateway has.
-	Antennas []GatewayAntenna `protobuf:"bytes,9,rep,name=antennas" json:"antennas"`
-	// attributes is a free form map of attributes.
-	Attributes map[string]string `protobuf:"bytes,10,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	// cluster_address indicates the URI of the gateway server cluster to connect to,
-	// in a "<ip>:<port>" format.
-	ClusterAddress string `protobuf:"bytes,11,opt,name=cluster_address,json=clusterAddress,proto3" json:"cluster_address,omitempty"`
-	// contact_account is the user ID that will be displayed (given the set privacy
-	// settings) as contact person for this gateway.
-	// TODO(gomezjdaniel): allow to use an organization ID as contact account when
-	// they are added.
-	ContactAccount UserIdentifier `protobuf:"bytes,12,opt,name=contact_account,json=contactAccount" json:"contact_account"`
-	// Fields modified by the update request.
-	// Must be specified and non-empty.
-	UpdateMask *google_protobuf5.FieldMask `protobuf:"bytes,16,opt,name=update_mask,json=updateMask" json:"update_mask,omitempty"`
+	// gateway is the gateway to be updated.
+	Gateway Gateway `protobuf:"bytes,1,opt,name=gateway" json:"gateway"`
+	// update_mask is the symbolic set of fields that will be affected in the update
+	// operation. Fields not included in the update_mask are not changed and ignored
+	// in the request. Must be non-empty.
+	UpdateMask GatewayMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
 }
 
 func (m *UpdateGatewayRequest) Reset()         { *m = UpdateGatewayRequest{} }
 func (m *UpdateGatewayRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateGatewayRequest) ProtoMessage()    {}
 func (*UpdateGatewayRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{13}
+	return fileDescriptorIdentityserver, []int{15}
 }
 
-func (m *UpdateGatewayRequest) GetDescription() string {
+func (m *UpdateGatewayRequest) GetGateway() Gateway {
 	if m != nil {
-		return m.Description
+		return m.Gateway
 	}
-	return ""
+	return Gateway{}
 }
 
-func (m *UpdateGatewayRequest) GetFrequencyPlanID() string {
-	if m != nil {
-		return m.FrequencyPlanID
-	}
-	return ""
-}
-
-func (m *UpdateGatewayRequest) GetPrivacySettings() GatewayPrivacySettings {
-	if m != nil {
-		return m.PrivacySettings
-	}
-	return GatewayPrivacySettings{}
-}
-
-func (m *UpdateGatewayRequest) GetAutoUpdate() bool {
-	if m != nil {
-		return m.AutoUpdate
-	}
-	return false
-}
-
-func (m *UpdateGatewayRequest) GetPlatform() string {
-	if m != nil {
-		return m.Platform
-	}
-	return ""
-}
-
-func (m *UpdateGatewayRequest) GetAntennas() []GatewayAntenna {
-	if m != nil {
-		return m.Antennas
-	}
-	return nil
-}
-
-func (m *UpdateGatewayRequest) GetAttributes() map[string]string {
-	if m != nil {
-		return m.Attributes
-	}
-	return nil
-}
-
-func (m *UpdateGatewayRequest) GetClusterAddress() string {
-	if m != nil {
-		return m.ClusterAddress
-	}
-	return ""
-}
-
-func (m *UpdateGatewayRequest) GetContactAccount() UserIdentifier {
-	if m != nil {
-		return m.ContactAccount
-	}
-	return UserIdentifier{}
-}
-
-func (m *UpdateGatewayRequest) GetUpdateMask() *google_protobuf5.FieldMask {
+func (m *UpdateGatewayRequest) GetUpdateMask() GatewayMask {
 	if m != nil {
 		return m.UpdateMask
 	}
+	return GatewayMask{}
+}
+
+type GenerateGatewayAPIKeyRequest struct {
+	// gateway_id is the gateway's ID which API key will be added to.
+	GatewayIdentifier `protobuf:"bytes,1,opt,name=gateway_id,json=gatewayId,embedded=gateway_id" json:"gateway_id"`
+	// name is the name of the API key to be generated.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// rights the are rights the generated API key will bear.
+	Rights []Right `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
+}
+
+func (m *GenerateGatewayAPIKeyRequest) Reset()         { *m = GenerateGatewayAPIKeyRequest{} }
+func (m *GenerateGatewayAPIKeyRequest) String() string { return proto.CompactTextString(m) }
+func (*GenerateGatewayAPIKeyRequest) ProtoMessage()    {}
+func (*GenerateGatewayAPIKeyRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{16}
+}
+
+func (m *GenerateGatewayAPIKeyRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *GenerateGatewayAPIKeyRequest) GetRights() []Right {
+	if m != nil {
+		return m.Rights
+	}
 	return nil
 }
 
-type SetGatewayCollaboratorRequest struct {
+type UpdateGatewayAPIKeyRequest struct {
+	// gateway_id is the gateway's ID which an API key will be modified.
 	GatewayIdentifier `protobuf:"bytes,1,opt,name=gateway_id,json=gatewayId,embedded=gateway_id" json:"gateway_id"`
-	Collaborator      `protobuf:"bytes,2,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
+	// key is the API key to be updated.
+	Key APIKey `protobuf:"bytes,2,opt,name=key" json:"key"`
+	// update_mask is the symbolic set of fields that will be affected in the update
+	// operation. Fields not included in the update_mask are not changed and ignored
+	// in the request. Must be non-empty.
+	UpdateMask APIKeyMask `protobuf:"bytes,3,opt,name=update_mask,json=updateMask" json:"update_mask"`
+}
+
+func (m *UpdateGatewayAPIKeyRequest) Reset()         { *m = UpdateGatewayAPIKeyRequest{} }
+func (m *UpdateGatewayAPIKeyRequest) String() string { return proto.CompactTextString(m) }
+func (*UpdateGatewayAPIKeyRequest) ProtoMessage()    {}
+func (*UpdateGatewayAPIKeyRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{17}
+}
+
+func (m *UpdateGatewayAPIKeyRequest) GetKey() APIKey {
+	if m != nil {
+		return m.Key
+	}
+	return APIKey{}
+}
+
+func (m *UpdateGatewayAPIKeyRequest) GetUpdateMask() APIKeyMask {
+	if m != nil {
+		return m.UpdateMask
+	}
+	return APIKeyMask{}
+}
+
+type RemoveGatewayAPIKeyRequest struct {
+	// gateway_id is the gateway's ID which API key will be removed from.
+	GatewayIdentifier `protobuf:"bytes,1,opt,name=gateway_id,json=gatewayId,embedded=gateway_id" json:"gateway_id"`
+	// key is the gateway API key to be removed.
+	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+}
+
+func (m *RemoveGatewayAPIKeyRequest) Reset()         { *m = RemoveGatewayAPIKeyRequest{} }
+func (m *RemoveGatewayAPIKeyRequest) String() string { return proto.CompactTextString(m) }
+func (*RemoveGatewayAPIKeyRequest) ProtoMessage()    {}
+func (*RemoveGatewayAPIKeyRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentityserver, []int{18}
+}
+
+func (m *RemoveGatewayAPIKeyRequest) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+type SetGatewayCollaboratorRequest struct {
+	// gateway_id is the ID of the gateway where the collaborator will be (un)set.
+	GatewayIdentifier `protobuf:"bytes,1,opt,name=gateway_id,json=gatewayId,embedded=gateway_id" json:"gateway_id"`
+	// collaborator is the collaborator to be set. If the list if rights is empty
+	// it will result as unset.
+	Collaborator `protobuf:"bytes,2,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
 }
 
 func (m *SetGatewayCollaboratorRequest) Reset()         { *m = SetGatewayCollaboratorRequest{} }
 func (m *SetGatewayCollaboratorRequest) String() string { return proto.CompactTextString(m) }
 func (*SetGatewayCollaboratorRequest) ProtoMessage()    {}
 func (*SetGatewayCollaboratorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{14}
+	return fileDescriptorIdentityserver, []int{19}
 }
 
 type ListGatewayCollaboratorsResponse struct {
+	// collaborators is the list of collaborators a gateway has.
 	Collaborators []Collaborator `protobuf:"bytes,1,rep,name=collaborators" json:"collaborators"`
 }
 
@@ -535,7 +506,7 @@ func (m *ListGatewayCollaboratorsResponse) Reset()         { *m = ListGatewayCol
 func (m *ListGatewayCollaboratorsResponse) String() string { return proto.CompactTextString(m) }
 func (*ListGatewayCollaboratorsResponse) ProtoMessage()    {}
 func (*ListGatewayCollaboratorsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{15}
+	return fileDescriptorIdentityserver, []int{20}
 }
 
 func (m *ListGatewayCollaboratorsResponse) GetCollaborators() []Collaborator {
@@ -545,99 +516,23 @@ func (m *ListGatewayCollaboratorsResponse) GetCollaborators() []Collaborator {
 	return nil
 }
 
-type ListGatewayOwnersResponse struct {
-	// collaborators is the list of collaborators that have owner rights for the gateway.
-	Collaborators []Collaborator `protobuf:"bytes,1,rep,name=collaborators" json:"collaborators"`
-}
-
-func (m *ListGatewayOwnersResponse) Reset()         { *m = ListGatewayOwnersResponse{} }
-func (m *ListGatewayOwnersResponse) String() string { return proto.CompactTextString(m) }
-func (*ListGatewayOwnersResponse) ProtoMessage()    {}
-func (*ListGatewayOwnersResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{16}
-}
-
-func (m *ListGatewayOwnersResponse) GetCollaborators() []Collaborator {
-	if m != nil {
-		return m.Collaborators
-	}
-	return nil
-}
-
-type ListGatewayRightsResponse struct {
-	// rights is a list of rights that an user has to the gateway.
-	Rights []Right `protobuf:"varint,1,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
-}
-
-func (m *ListGatewayRightsResponse) Reset()         { *m = ListGatewayRightsResponse{} }
-func (m *ListGatewayRightsResponse) String() string { return proto.CompactTextString(m) }
-func (*ListGatewayRightsResponse) ProtoMessage()    {}
-func (*ListGatewayRightsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{17}
-}
-
-func (m *ListGatewayRightsResponse) GetRights() []Right {
-	if m != nil {
-		return m.Rights
-	}
-	return nil
-}
-
 type CreateClientRequest struct {
-	// client_id is the client's ID to be created.
-	ClientIdentifier `protobuf:"bytes,1,opt,name=client_id,json=clientId,embedded=client_id" json:"client_id"`
-	// description is the description of the client.
-	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	// secret is the secret used to prove the client identity.
-	Secret string `protobuf:"bytes,3,opt,name=secret,proto3" json:"secret,omitempty"`
-	// redirect_uri is the OAuth 2 redirect URI of the client.
-	RedirectURI string `protobuf:"bytes,4,opt,name=redirect_uri,json=redirectUri,proto3" json:"redirect_uri,omitempty"`
-	// grants denotes which OAuth2 flows can the client use to get a token.
-	Grants []GrantType `protobuf:"varint,7,rep,packed,name=grants,enum=ttn.v3.GrantType" json:"grants,omitempty"`
-	// rights denotes what rights the client will have access to.
-	Rights []Right `protobuf:"varint,8,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
+	// client is the client to be created.
+	Client Client `protobuf:"bytes,1,opt,name=client" json:"client"`
 }
 
 func (m *CreateClientRequest) Reset()         { *m = CreateClientRequest{} }
 func (m *CreateClientRequest) String() string { return proto.CompactTextString(m) }
 func (*CreateClientRequest) ProtoMessage()    {}
 func (*CreateClientRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{18}
+	return fileDescriptorIdentityserver, []int{21}
 }
 
-func (m *CreateClientRequest) GetDescription() string {
+func (m *CreateClientRequest) GetClient() Client {
 	if m != nil {
-		return m.Description
+		return m.Client
 	}
-	return ""
-}
-
-func (m *CreateClientRequest) GetSecret() string {
-	if m != nil {
-		return m.Secret
-	}
-	return ""
-}
-
-func (m *CreateClientRequest) GetRedirectURI() string {
-	if m != nil {
-		return m.RedirectURI
-	}
-	return ""
-}
-
-func (m *CreateClientRequest) GetGrants() []GrantType {
-	if m != nil {
-		return m.Grants
-	}
-	return nil
-}
-
-func (m *CreateClientRequest) GetRights() []Right {
-	if m != nil {
-		return m.Rights
-	}
-	return nil
+	return Client{}
 }
 
 type ListClientsResponse struct {
@@ -649,7 +544,7 @@ func (m *ListClientsResponse) Reset()         { *m = ListClientsResponse{} }
 func (m *ListClientsResponse) String() string { return proto.CompactTextString(m) }
 func (*ListClientsResponse) ProtoMessage()    {}
 func (*ListClientsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{19}
+	return fileDescriptorIdentityserver, []int{22}
 }
 
 func (m *ListClientsResponse) GetClients() []Client {
@@ -660,158 +555,33 @@ func (m *ListClientsResponse) GetClients() []Client {
 }
 
 type UpdateClientRequest struct {
-	ClientIdentifier `protobuf:"bytes,1,opt,name=client_id,json=clientId,embedded=client_id" json:"client_id"`
-	// description is the description of the client.
-	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	// secret is the secret used to prove the client identity.
-	Secret string `protobuf:"bytes,3,opt,name=secret,proto3" json:"secret,omitempty"`
-	// redirect_uri is the callback URI of the client.
-	RedirectURI string `protobuf:"bytes,4,opt,name=redirect_uri,json=redirectUri,proto3" json:"redirect_uri,omitempty"`
-	// grants denotes which OAuth2 flows can the client use to get a token.
-	Grants []GrantType `protobuf:"varint,7,rep,packed,name=grants,enum=ttn.v3.GrantType" json:"grants,omitempty"`
-	// rights denotes what scopes the client will have access to.
-	Rights []Right `protobuf:"varint,8,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
-	// Fields modified by the update request.
-	// Must be specified and non-empty.
-	UpdateMask *google_protobuf5.FieldMask `protobuf:"bytes,12,opt,name=update_mask,json=updateMask" json:"update_mask,omitempty"`
+	// client is the client to be updated.
+	Client Client `protobuf:"bytes,1,opt,name=client" json:"client"`
+	// update_mask is the symbolic set of fields that will be affected in the update
+	// operation. Fields not included in the update_mask are not changed and ignored
+	// in the request. Must be non-empty.
+	UpdateMask ClientMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
 }
 
 func (m *UpdateClientRequest) Reset()         { *m = UpdateClientRequest{} }
 func (m *UpdateClientRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateClientRequest) ProtoMessage()    {}
 func (*UpdateClientRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{20}
-}
-
-func (m *UpdateClientRequest) GetDescription() string {
-	if m != nil {
-		return m.Description
-	}
-	return ""
-}
-
-func (m *UpdateClientRequest) GetSecret() string {
-	if m != nil {
-		return m.Secret
-	}
-	return ""
-}
-
-func (m *UpdateClientRequest) GetRedirectURI() string {
-	if m != nil {
-		return m.RedirectURI
-	}
-	return ""
-}
-
-func (m *UpdateClientRequest) GetGrants() []GrantType {
-	if m != nil {
-		return m.Grants
-	}
-	return nil
-}
-
-func (m *UpdateClientRequest) GetRights() []Right {
-	if m != nil {
-		return m.Rights
-	}
-	return nil
-}
-
-func (m *UpdateClientRequest) GetUpdateMask() *google_protobuf5.FieldMask {
-	if m != nil {
-		return m.UpdateMask
-	}
-	return nil
-}
-
-type SetClientOfficialRequest struct {
-	ClientIdentifier `protobuf:"bytes,1,opt,name=client_id,json=clientId,embedded=client_id" json:"client_id"`
-	// official denotes whether if the client is labeled as an official third-party
-	// client by the tenant admin.
-	OfficialLabeled bool `protobuf:"varint,2,opt,name=official_labeled,json=officialLabeled,proto3" json:"official_labeled,omitempty"`
-}
-
-func (m *SetClientOfficialRequest) Reset()         { *m = SetClientOfficialRequest{} }
-func (m *SetClientOfficialRequest) String() string { return proto.CompactTextString(m) }
-func (*SetClientOfficialRequest) ProtoMessage()    {}
-func (*SetClientOfficialRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{21}
-}
-
-func (m *SetClientOfficialRequest) GetOfficialLabeled() bool {
-	if m != nil {
-		return m.OfficialLabeled
-	}
-	return false
-}
-
-type SetClientStateRequest struct {
-	ClientIdentifier `protobuf:"bytes,1,opt,name=client_id,json=clientId,embedded=client_id" json:"client_id"`
-	State            ClientState `protobuf:"varint,2,opt,name=state,proto3,enum=ttn.v3.ClientState" json:"state,omitempty"`
-}
-
-func (m *SetClientStateRequest) Reset()         { *m = SetClientStateRequest{} }
-func (m *SetClientStateRequest) String() string { return proto.CompactTextString(m) }
-func (*SetClientStateRequest) ProtoMessage()    {}
-func (*SetClientStateRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{22}
-}
-
-func (m *SetClientStateRequest) GetState() ClientState {
-	if m != nil {
-		return m.State
-	}
-	return STATE_PENDING
-}
-
-type SetClientCollaboratorRequest struct {
-	ClientIdentifier `protobuf:"bytes,1,opt,name=client_id,json=clientId,embedded=client_id" json:"client_id"`
-	Collaborator     `protobuf:"bytes,2,opt,name=collaborator,embedded=collaborator" json:"collaborator"`
-}
-
-func (m *SetClientCollaboratorRequest) Reset()         { *m = SetClientCollaboratorRequest{} }
-func (m *SetClientCollaboratorRequest) String() string { return proto.CompactTextString(m) }
-func (*SetClientCollaboratorRequest) ProtoMessage()    {}
-func (*SetClientCollaboratorRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptorIdentityserver, []int{23}
 }
 
-type ListClientCollaboratorsResponse struct {
-	Collaborators []Collaborator `protobuf:"bytes,1,rep,name=collaborators" json:"collaborators"`
-}
-
-func (m *ListClientCollaboratorsResponse) Reset()         { *m = ListClientCollaboratorsResponse{} }
-func (m *ListClientCollaboratorsResponse) String() string { return proto.CompactTextString(m) }
-func (*ListClientCollaboratorsResponse) ProtoMessage()    {}
-func (*ListClientCollaboratorsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{24}
-}
-
-func (m *ListClientCollaboratorsResponse) GetCollaborators() []Collaborator {
+func (m *UpdateClientRequest) GetClient() Client {
 	if m != nil {
-		return m.Collaborators
+		return m.Client
 	}
-	return nil
+	return Client{}
 }
 
-type ListClientRightsResponse struct {
-	// rights is a list of rights that an user has to the client.
-	Rights []Right `protobuf:"varint,1,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
-}
-
-func (m *ListClientRightsResponse) Reset()         { *m = ListClientRightsResponse{} }
-func (m *ListClientRightsResponse) String() string { return proto.CompactTextString(m) }
-func (*ListClientRightsResponse) ProtoMessage()    {}
-func (*ListClientRightsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorIdentityserver, []int{25}
-}
-
-func (m *ListClientRightsResponse) GetRights() []Right {
+func (m *UpdateClientRequest) GetUpdateMask() ClientMask {
 	if m != nil {
-		return m.Rights
+		return m.UpdateMask
 	}
-	return nil
+	return ClientMask{}
 }
 
 func init() {
@@ -821,6 +591,10 @@ func init() {
 	golang_proto.RegisterType((*UpdateUserRequest)(nil), "ttn.v3.UpdateUserRequest")
 	proto.RegisterType((*UpdateUserPasswordRequest)(nil), "ttn.v3.UpdateUserPasswordRequest")
 	golang_proto.RegisterType((*UpdateUserPasswordRequest)(nil), "ttn.v3.UpdateUserPasswordRequest")
+	proto.RegisterType((*ValidateUserEmailRequest)(nil), "ttn.v3.ValidateUserEmailRequest")
+	golang_proto.RegisterType((*ValidateUserEmailRequest)(nil), "ttn.v3.ValidateUserEmailRequest")
+	proto.RegisterType((*ListAuthorizedClientsResponse)(nil), "ttn.v3.ListAuthorizedClientsResponse")
+	golang_proto.RegisterType((*ListAuthorizedClientsResponse)(nil), "ttn.v3.ListAuthorizedClientsResponse")
 	proto.RegisterType((*CreateApplicationRequest)(nil), "ttn.v3.CreateApplicationRequest")
 	golang_proto.RegisterType((*CreateApplicationRequest)(nil), "ttn.v3.CreateApplicationRequest")
 	proto.RegisterType((*ListApplicationsResponse)(nil), "ttn.v3.ListApplicationsResponse")
@@ -829,44 +603,36 @@ func init() {
 	golang_proto.RegisterType((*UpdateApplicationRequest)(nil), "ttn.v3.UpdateApplicationRequest")
 	proto.RegisterType((*GenerateApplicationAPIKeyRequest)(nil), "ttn.v3.GenerateApplicationAPIKeyRequest")
 	golang_proto.RegisterType((*GenerateApplicationAPIKeyRequest)(nil), "ttn.v3.GenerateApplicationAPIKeyRequest")
+	proto.RegisterType((*UpdateApplicationAPIKeyRequest)(nil), "ttn.v3.UpdateApplicationAPIKeyRequest")
+	golang_proto.RegisterType((*UpdateApplicationAPIKeyRequest)(nil), "ttn.v3.UpdateApplicationAPIKeyRequest")
 	proto.RegisterType((*RemoveApplicationAPIKeyRequest)(nil), "ttn.v3.RemoveApplicationAPIKeyRequest")
 	golang_proto.RegisterType((*RemoveApplicationAPIKeyRequest)(nil), "ttn.v3.RemoveApplicationAPIKeyRequest")
 	proto.RegisterType((*SetApplicationCollaboratorRequest)(nil), "ttn.v3.SetApplicationCollaboratorRequest")
 	golang_proto.RegisterType((*SetApplicationCollaboratorRequest)(nil), "ttn.v3.SetApplicationCollaboratorRequest")
 	proto.RegisterType((*ListApplicationCollaboratorsResponse)(nil), "ttn.v3.ListApplicationCollaboratorsResponse")
 	golang_proto.RegisterType((*ListApplicationCollaboratorsResponse)(nil), "ttn.v3.ListApplicationCollaboratorsResponse")
-	proto.RegisterType((*ListApplicationRightsResponse)(nil), "ttn.v3.ListApplicationRightsResponse")
-	golang_proto.RegisterType((*ListApplicationRightsResponse)(nil), "ttn.v3.ListApplicationRightsResponse")
 	proto.RegisterType((*CreateGatewayRequest)(nil), "ttn.v3.CreateGatewayRequest")
 	golang_proto.RegisterType((*CreateGatewayRequest)(nil), "ttn.v3.CreateGatewayRequest")
 	proto.RegisterType((*ListGatewaysResponse)(nil), "ttn.v3.ListGatewaysResponse")
 	golang_proto.RegisterType((*ListGatewaysResponse)(nil), "ttn.v3.ListGatewaysResponse")
 	proto.RegisterType((*UpdateGatewayRequest)(nil), "ttn.v3.UpdateGatewayRequest")
 	golang_proto.RegisterType((*UpdateGatewayRequest)(nil), "ttn.v3.UpdateGatewayRequest")
+	proto.RegisterType((*GenerateGatewayAPIKeyRequest)(nil), "ttn.v3.GenerateGatewayAPIKeyRequest")
+	golang_proto.RegisterType((*GenerateGatewayAPIKeyRequest)(nil), "ttn.v3.GenerateGatewayAPIKeyRequest")
+	proto.RegisterType((*UpdateGatewayAPIKeyRequest)(nil), "ttn.v3.UpdateGatewayAPIKeyRequest")
+	golang_proto.RegisterType((*UpdateGatewayAPIKeyRequest)(nil), "ttn.v3.UpdateGatewayAPIKeyRequest")
+	proto.RegisterType((*RemoveGatewayAPIKeyRequest)(nil), "ttn.v3.RemoveGatewayAPIKeyRequest")
+	golang_proto.RegisterType((*RemoveGatewayAPIKeyRequest)(nil), "ttn.v3.RemoveGatewayAPIKeyRequest")
 	proto.RegisterType((*SetGatewayCollaboratorRequest)(nil), "ttn.v3.SetGatewayCollaboratorRequest")
 	golang_proto.RegisterType((*SetGatewayCollaboratorRequest)(nil), "ttn.v3.SetGatewayCollaboratorRequest")
 	proto.RegisterType((*ListGatewayCollaboratorsResponse)(nil), "ttn.v3.ListGatewayCollaboratorsResponse")
 	golang_proto.RegisterType((*ListGatewayCollaboratorsResponse)(nil), "ttn.v3.ListGatewayCollaboratorsResponse")
-	proto.RegisterType((*ListGatewayOwnersResponse)(nil), "ttn.v3.ListGatewayOwnersResponse")
-	golang_proto.RegisterType((*ListGatewayOwnersResponse)(nil), "ttn.v3.ListGatewayOwnersResponse")
-	proto.RegisterType((*ListGatewayRightsResponse)(nil), "ttn.v3.ListGatewayRightsResponse")
-	golang_proto.RegisterType((*ListGatewayRightsResponse)(nil), "ttn.v3.ListGatewayRightsResponse")
 	proto.RegisterType((*CreateClientRequest)(nil), "ttn.v3.CreateClientRequest")
 	golang_proto.RegisterType((*CreateClientRequest)(nil), "ttn.v3.CreateClientRequest")
 	proto.RegisterType((*ListClientsResponse)(nil), "ttn.v3.ListClientsResponse")
 	golang_proto.RegisterType((*ListClientsResponse)(nil), "ttn.v3.ListClientsResponse")
 	proto.RegisterType((*UpdateClientRequest)(nil), "ttn.v3.UpdateClientRequest")
 	golang_proto.RegisterType((*UpdateClientRequest)(nil), "ttn.v3.UpdateClientRequest")
-	proto.RegisterType((*SetClientOfficialRequest)(nil), "ttn.v3.SetClientOfficialRequest")
-	golang_proto.RegisterType((*SetClientOfficialRequest)(nil), "ttn.v3.SetClientOfficialRequest")
-	proto.RegisterType((*SetClientStateRequest)(nil), "ttn.v3.SetClientStateRequest")
-	golang_proto.RegisterType((*SetClientStateRequest)(nil), "ttn.v3.SetClientStateRequest")
-	proto.RegisterType((*SetClientCollaboratorRequest)(nil), "ttn.v3.SetClientCollaboratorRequest")
-	golang_proto.RegisterType((*SetClientCollaboratorRequest)(nil), "ttn.v3.SetClientCollaboratorRequest")
-	proto.RegisterType((*ListClientCollaboratorsResponse)(nil), "ttn.v3.ListClientCollaboratorsResponse")
-	golang_proto.RegisterType((*ListClientCollaboratorsResponse)(nil), "ttn.v3.ListClientCollaboratorsResponse")
-	proto.RegisterType((*ListClientRightsResponse)(nil), "ttn.v3.ListClientRightsResponse")
-	golang_proto.RegisterType((*ListClientRightsResponse)(nil), "ttn.v3.ListClientRightsResponse")
 }
 func (this *CreateUserRequest) VerboseEqual(that interface{}) error {
 	if that == nil {
@@ -893,17 +659,11 @@ func (this *CreateUserRequest) VerboseEqual(that interface{}) error {
 	} else if this == nil {
 		return fmt.Errorf("that is type *CreateUserRequest but is not nil && this == nil")
 	}
-	if !this.UserIdentifier.Equal(&that1.UserIdentifier) {
-		return fmt.Errorf("UserIdentifier this(%v) Not Equal that(%v)", this.UserIdentifier, that1.UserIdentifier)
+	if !this.User.Equal(&that1.User) {
+		return fmt.Errorf("User this(%v) Not Equal that(%v)", this.User, that1.User)
 	}
-	if this.Email != that1.Email {
-		return fmt.Errorf("Email this(%v) Not Equal that(%v)", this.Email, that1.Email)
-	}
-	if this.Password != that1.Password {
-		return fmt.Errorf("Password this(%v) Not Equal that(%v)", this.Password, that1.Password)
-	}
-	if this.Name != that1.Name {
-		return fmt.Errorf("Name this(%v) Not Equal that(%v)", this.Name, that1.Name)
+	if this.InvitationToken != that1.InvitationToken {
+		return fmt.Errorf("InvitationToken this(%v) Not Equal that(%v)", this.InvitationToken, that1.InvitationToken)
 	}
 	return nil
 }
@@ -932,16 +692,10 @@ func (this *CreateUserRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.UserIdentifier.Equal(&that1.UserIdentifier) {
+	if !this.User.Equal(&that1.User) {
 		return false
 	}
-	if this.Email != that1.Email {
-		return false
-	}
-	if this.Password != that1.Password {
-		return false
-	}
-	if this.Name != that1.Name {
+	if this.InvitationToken != that1.InvitationToken {
 		return false
 	}
 	return true
@@ -971,13 +725,10 @@ func (this *UpdateUserRequest) VerboseEqual(that interface{}) error {
 	} else if this == nil {
 		return fmt.Errorf("that is type *UpdateUserRequest but is not nil && this == nil")
 	}
-	if this.Email != that1.Email {
-		return fmt.Errorf("Email this(%v) Not Equal that(%v)", this.Email, that1.Email)
+	if !this.User.Equal(&that1.User) {
+		return fmt.Errorf("User this(%v) Not Equal that(%v)", this.User, that1.User)
 	}
-	if this.Name != that1.Name {
-		return fmt.Errorf("Name this(%v) Not Equal that(%v)", this.Name, that1.Name)
-	}
-	if !this.UpdateMask.Equal(that1.UpdateMask) {
+	if !this.UpdateMask.Equal(&that1.UpdateMask) {
 		return fmt.Errorf("UpdateMask this(%v) Not Equal that(%v)", this.UpdateMask, that1.UpdateMask)
 	}
 	return nil
@@ -1007,13 +758,10 @@ func (this *UpdateUserRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if this.Email != that1.Email {
+	if !this.User.Equal(&that1.User) {
 		return false
 	}
-	if this.Name != that1.Name {
-		return false
-	}
-	if !this.UpdateMask.Equal(that1.UpdateMask) {
+	if !this.UpdateMask.Equal(&that1.UpdateMask) {
 		return false
 	}
 	return true
@@ -1084,6 +832,136 @@ func (this *UpdateUserPasswordRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *ValidateUserEmailRequest) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*ValidateUserEmailRequest)
+	if !ok {
+		that2, ok := that.(ValidateUserEmailRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *ValidateUserEmailRequest")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *ValidateUserEmailRequest but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *ValidateUserEmailRequest but is not nil && this == nil")
+	}
+	if this.Token != that1.Token {
+		return fmt.Errorf("Token this(%v) Not Equal that(%v)", this.Token, that1.Token)
+	}
+	return nil
+}
+func (this *ValidateUserEmailRequest) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*ValidateUserEmailRequest)
+	if !ok {
+		that2, ok := that.(ValidateUserEmailRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.Token != that1.Token {
+		return false
+	}
+	return true
+}
+func (this *ListAuthorizedClientsResponse) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*ListAuthorizedClientsResponse)
+	if !ok {
+		that2, ok := that.(ListAuthorizedClientsResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *ListAuthorizedClientsResponse")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *ListAuthorizedClientsResponse but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *ListAuthorizedClientsResponse but is not nil && this == nil")
+	}
+	if len(this.Clients) != len(that1.Clients) {
+		return fmt.Errorf("Clients this(%v) Not Equal that(%v)", len(this.Clients), len(that1.Clients))
+	}
+	for i := range this.Clients {
+		if !this.Clients[i].Equal(&that1.Clients[i]) {
+			return fmt.Errorf("Clients this[%v](%v) Not Equal that[%v](%v)", i, this.Clients[i], i, that1.Clients[i])
+		}
+	}
+	return nil
+}
+func (this *ListAuthorizedClientsResponse) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*ListAuthorizedClientsResponse)
+	if !ok {
+		that2, ok := that.(ListAuthorizedClientsResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if len(this.Clients) != len(that1.Clients) {
+		return false
+	}
+	for i := range this.Clients {
+		if !this.Clients[i].Equal(&that1.Clients[i]) {
+			return false
+		}
+	}
+	return true
+}
 func (this *CreateApplicationRequest) VerboseEqual(that interface{}) error {
 	if that == nil {
 		if this == nil {
@@ -1109,11 +987,8 @@ func (this *CreateApplicationRequest) VerboseEqual(that interface{}) error {
 	} else if this == nil {
 		return fmt.Errorf("that is type *CreateApplicationRequest but is not nil && this == nil")
 	}
-	if !this.ApplicationIdentifier.Equal(&that1.ApplicationIdentifier) {
-		return fmt.Errorf("ApplicationIdentifier this(%v) Not Equal that(%v)", this.ApplicationIdentifier, that1.ApplicationIdentifier)
-	}
-	if this.Description != that1.Description {
-		return fmt.Errorf("Description this(%v) Not Equal that(%v)", this.Description, that1.Description)
+	if !this.Application.Equal(&that1.Application) {
+		return fmt.Errorf("Application this(%v) Not Equal that(%v)", this.Application, that1.Application)
 	}
 	return nil
 }
@@ -1142,10 +1017,7 @@ func (this *CreateApplicationRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.ApplicationIdentifier.Equal(&that1.ApplicationIdentifier) {
-		return false
-	}
-	if this.Description != that1.Description {
+	if !this.Application.Equal(&that1.Application) {
 		return false
 	}
 	return true
@@ -1245,13 +1117,10 @@ func (this *UpdateApplicationRequest) VerboseEqual(that interface{}) error {
 	} else if this == nil {
 		return fmt.Errorf("that is type *UpdateApplicationRequest but is not nil && this == nil")
 	}
-	if !this.ApplicationIdentifier.Equal(&that1.ApplicationIdentifier) {
-		return fmt.Errorf("ApplicationIdentifier this(%v) Not Equal that(%v)", this.ApplicationIdentifier, that1.ApplicationIdentifier)
+	if !this.Application.Equal(&that1.Application) {
+		return fmt.Errorf("Application this(%v) Not Equal that(%v)", this.Application, that1.Application)
 	}
-	if this.Description != that1.Description {
-		return fmt.Errorf("Description this(%v) Not Equal that(%v)", this.Description, that1.Description)
-	}
-	if !this.UpdateMask.Equal(that1.UpdateMask) {
+	if !this.UpdateMask.Equal(&that1.UpdateMask) {
 		return fmt.Errorf("UpdateMask this(%v) Not Equal that(%v)", this.UpdateMask, that1.UpdateMask)
 	}
 	return nil
@@ -1281,13 +1150,10 @@ func (this *UpdateApplicationRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.ApplicationIdentifier.Equal(&that1.ApplicationIdentifier) {
+	if !this.Application.Equal(&that1.Application) {
 		return false
 	}
-	if this.Description != that1.Description {
-		return false
-	}
-	if !this.UpdateMask.Equal(that1.UpdateMask) {
+	if !this.UpdateMask.Equal(&that1.UpdateMask) {
 		return false
 	}
 	return true
@@ -1320,8 +1186,8 @@ func (this *GenerateApplicationAPIKeyRequest) VerboseEqual(that interface{}) err
 	if !this.ApplicationIdentifier.Equal(&that1.ApplicationIdentifier) {
 		return fmt.Errorf("ApplicationIdentifier this(%v) Not Equal that(%v)", this.ApplicationIdentifier, that1.ApplicationIdentifier)
 	}
-	if this.KeyName != that1.KeyName {
-		return fmt.Errorf("KeyName this(%v) Not Equal that(%v)", this.KeyName, that1.KeyName)
+	if this.Name != that1.Name {
+		return fmt.Errorf("Name this(%v) Not Equal that(%v)", this.Name, that1.Name)
 	}
 	if len(this.Rights) != len(that1.Rights) {
 		return fmt.Errorf("Rights this(%v) Not Equal that(%v)", len(this.Rights), len(that1.Rights))
@@ -1361,7 +1227,7 @@ func (this *GenerateApplicationAPIKeyRequest) Equal(that interface{}) bool {
 	if !this.ApplicationIdentifier.Equal(&that1.ApplicationIdentifier) {
 		return false
 	}
-	if this.KeyName != that1.KeyName {
+	if this.Name != that1.Name {
 		return false
 	}
 	if len(this.Rights) != len(that1.Rights) {
@@ -1371,6 +1237,78 @@ func (this *GenerateApplicationAPIKeyRequest) Equal(that interface{}) bool {
 		if this.Rights[i] != that1.Rights[i] {
 			return false
 		}
+	}
+	return true
+}
+func (this *UpdateApplicationAPIKeyRequest) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*UpdateApplicationAPIKeyRequest)
+	if !ok {
+		that2, ok := that.(UpdateApplicationAPIKeyRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *UpdateApplicationAPIKeyRequest")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *UpdateApplicationAPIKeyRequest but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *UpdateApplicationAPIKeyRequest but is not nil && this == nil")
+	}
+	if !this.ApplicationIdentifier.Equal(&that1.ApplicationIdentifier) {
+		return fmt.Errorf("ApplicationIdentifier this(%v) Not Equal that(%v)", this.ApplicationIdentifier, that1.ApplicationIdentifier)
+	}
+	if !this.Key.Equal(&that1.Key) {
+		return fmt.Errorf("Key this(%v) Not Equal that(%v)", this.Key, that1.Key)
+	}
+	if !this.UpdateMask.Equal(&that1.UpdateMask) {
+		return fmt.Errorf("UpdateMask this(%v) Not Equal that(%v)", this.UpdateMask, that1.UpdateMask)
+	}
+	return nil
+}
+func (this *UpdateApplicationAPIKeyRequest) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*UpdateApplicationAPIKeyRequest)
+	if !ok {
+		that2, ok := that.(UpdateApplicationAPIKeyRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if !this.ApplicationIdentifier.Equal(&that1.ApplicationIdentifier) {
+		return false
+	}
+	if !this.Key.Equal(&that1.Key) {
+		return false
+	}
+	if !this.UpdateMask.Equal(&that1.UpdateMask) {
+		return false
 	}
 	return true
 }
@@ -1402,8 +1340,8 @@ func (this *RemoveApplicationAPIKeyRequest) VerboseEqual(that interface{}) error
 	if !this.ApplicationIdentifier.Equal(&that1.ApplicationIdentifier) {
 		return fmt.Errorf("ApplicationIdentifier this(%v) Not Equal that(%v)", this.ApplicationIdentifier, that1.ApplicationIdentifier)
 	}
-	if this.KeyName != that1.KeyName {
-		return fmt.Errorf("KeyName this(%v) Not Equal that(%v)", this.KeyName, that1.KeyName)
+	if this.Key != that1.Key {
+		return fmt.Errorf("Key this(%v) Not Equal that(%v)", this.Key, that1.Key)
 	}
 	return nil
 }
@@ -1435,7 +1373,7 @@ func (this *RemoveApplicationAPIKeyRequest) Equal(that interface{}) bool {
 	if !this.ApplicationIdentifier.Equal(&that1.ApplicationIdentifier) {
 		return false
 	}
-	if this.KeyName != that1.KeyName {
+	if this.Key != that1.Key {
 		return false
 	}
 	return true
@@ -1576,76 +1514,6 @@ func (this *ListApplicationCollaboratorsResponse) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *ListApplicationRightsResponse) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*ListApplicationRightsResponse)
-	if !ok {
-		that2, ok := that.(ListApplicationRightsResponse)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *ListApplicationRightsResponse")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *ListApplicationRightsResponse but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *ListApplicationRightsResponse but is not nil && this == nil")
-	}
-	if len(this.Rights) != len(that1.Rights) {
-		return fmt.Errorf("Rights this(%v) Not Equal that(%v)", len(this.Rights), len(that1.Rights))
-	}
-	for i := range this.Rights {
-		if this.Rights[i] != that1.Rights[i] {
-			return fmt.Errorf("Rights this[%v](%v) Not Equal that[%v](%v)", i, this.Rights[i], i, that1.Rights[i])
-		}
-	}
-	return nil
-}
-func (this *ListApplicationRightsResponse) Equal(that interface{}) bool {
-	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	}
-
-	that1, ok := that.(*ListApplicationRightsResponse)
-	if !ok {
-		that2, ok := that.(ListApplicationRightsResponse)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	} else if this == nil {
-		return false
-	}
-	if len(this.Rights) != len(that1.Rights) {
-		return false
-	}
-	for i := range this.Rights {
-		if this.Rights[i] != that1.Rights[i] {
-			return false
-		}
-	}
-	return true
-}
 func (this *CreateGatewayRequest) VerboseEqual(that interface{}) error {
 	if that == nil {
 		if this == nil {
@@ -1671,45 +1539,8 @@ func (this *CreateGatewayRequest) VerboseEqual(that interface{}) error {
 	} else if this == nil {
 		return fmt.Errorf("that is type *CreateGatewayRequest but is not nil && this == nil")
 	}
-	if !this.GatewayIdentifier.Equal(&that1.GatewayIdentifier) {
-		return fmt.Errorf("GatewayIdentifier this(%v) Not Equal that(%v)", this.GatewayIdentifier, that1.GatewayIdentifier)
-	}
-	if this.Description != that1.Description {
-		return fmt.Errorf("Description this(%v) Not Equal that(%v)", this.Description, that1.Description)
-	}
-	if this.FrequencyPlanID != that1.FrequencyPlanID {
-		return fmt.Errorf("FrequencyPlanID this(%v) Not Equal that(%v)", this.FrequencyPlanID, that1.FrequencyPlanID)
-	}
-	if !this.PrivacySettings.Equal(&that1.PrivacySettings) {
-		return fmt.Errorf("PrivacySettings this(%v) Not Equal that(%v)", this.PrivacySettings, that1.PrivacySettings)
-	}
-	if this.AutoUpdate != that1.AutoUpdate {
-		return fmt.Errorf("AutoUpdate this(%v) Not Equal that(%v)", this.AutoUpdate, that1.AutoUpdate)
-	}
-	if this.Platform != that1.Platform {
-		return fmt.Errorf("Platform this(%v) Not Equal that(%v)", this.Platform, that1.Platform)
-	}
-	if len(this.Antennas) != len(that1.Antennas) {
-		return fmt.Errorf("Antennas this(%v) Not Equal that(%v)", len(this.Antennas), len(that1.Antennas))
-	}
-	for i := range this.Antennas {
-		if !this.Antennas[i].Equal(&that1.Antennas[i]) {
-			return fmt.Errorf("Antennas this[%v](%v) Not Equal that[%v](%v)", i, this.Antennas[i], i, that1.Antennas[i])
-		}
-	}
-	if len(this.Attributes) != len(that1.Attributes) {
-		return fmt.Errorf("Attributes this(%v) Not Equal that(%v)", len(this.Attributes), len(that1.Attributes))
-	}
-	for i := range this.Attributes {
-		if this.Attributes[i] != that1.Attributes[i] {
-			return fmt.Errorf("Attributes this[%v](%v) Not Equal that[%v](%v)", i, this.Attributes[i], i, that1.Attributes[i])
-		}
-	}
-	if this.ClusterAddress != that1.ClusterAddress {
-		return fmt.Errorf("ClusterAddress this(%v) Not Equal that(%v)", this.ClusterAddress, that1.ClusterAddress)
-	}
-	if !this.ContactAccount.Equal(&that1.ContactAccount) {
-		return fmt.Errorf("ContactAccount this(%v) Not Equal that(%v)", this.ContactAccount, that1.ContactAccount)
+	if !this.Gateway.Equal(&that1.Gateway) {
+		return fmt.Errorf("Gateway this(%v) Not Equal that(%v)", this.Gateway, that1.Gateway)
 	}
 	return nil
 }
@@ -1738,44 +1569,7 @@ func (this *CreateGatewayRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.GatewayIdentifier.Equal(&that1.GatewayIdentifier) {
-		return false
-	}
-	if this.Description != that1.Description {
-		return false
-	}
-	if this.FrequencyPlanID != that1.FrequencyPlanID {
-		return false
-	}
-	if !this.PrivacySettings.Equal(&that1.PrivacySettings) {
-		return false
-	}
-	if this.AutoUpdate != that1.AutoUpdate {
-		return false
-	}
-	if this.Platform != that1.Platform {
-		return false
-	}
-	if len(this.Antennas) != len(that1.Antennas) {
-		return false
-	}
-	for i := range this.Antennas {
-		if !this.Antennas[i].Equal(&that1.Antennas[i]) {
-			return false
-		}
-	}
-	if len(this.Attributes) != len(that1.Attributes) {
-		return false
-	}
-	for i := range this.Attributes {
-		if this.Attributes[i] != that1.Attributes[i] {
-			return false
-		}
-	}
-	if this.ClusterAddress != that1.ClusterAddress {
-		return false
-	}
-	if !this.ContactAccount.Equal(&that1.ContactAccount) {
+	if !this.Gateway.Equal(&that1.Gateway) {
 		return false
 	}
 	return true
@@ -1875,47 +1669,10 @@ func (this *UpdateGatewayRequest) VerboseEqual(that interface{}) error {
 	} else if this == nil {
 		return fmt.Errorf("that is type *UpdateGatewayRequest but is not nil && this == nil")
 	}
-	if !this.GatewayIdentifier.Equal(&that1.GatewayIdentifier) {
-		return fmt.Errorf("GatewayIdentifier this(%v) Not Equal that(%v)", this.GatewayIdentifier, that1.GatewayIdentifier)
+	if !this.Gateway.Equal(&that1.Gateway) {
+		return fmt.Errorf("Gateway this(%v) Not Equal that(%v)", this.Gateway, that1.Gateway)
 	}
-	if this.Description != that1.Description {
-		return fmt.Errorf("Description this(%v) Not Equal that(%v)", this.Description, that1.Description)
-	}
-	if this.FrequencyPlanID != that1.FrequencyPlanID {
-		return fmt.Errorf("FrequencyPlanID this(%v) Not Equal that(%v)", this.FrequencyPlanID, that1.FrequencyPlanID)
-	}
-	if !this.PrivacySettings.Equal(&that1.PrivacySettings) {
-		return fmt.Errorf("PrivacySettings this(%v) Not Equal that(%v)", this.PrivacySettings, that1.PrivacySettings)
-	}
-	if this.AutoUpdate != that1.AutoUpdate {
-		return fmt.Errorf("AutoUpdate this(%v) Not Equal that(%v)", this.AutoUpdate, that1.AutoUpdate)
-	}
-	if this.Platform != that1.Platform {
-		return fmt.Errorf("Platform this(%v) Not Equal that(%v)", this.Platform, that1.Platform)
-	}
-	if len(this.Antennas) != len(that1.Antennas) {
-		return fmt.Errorf("Antennas this(%v) Not Equal that(%v)", len(this.Antennas), len(that1.Antennas))
-	}
-	for i := range this.Antennas {
-		if !this.Antennas[i].Equal(&that1.Antennas[i]) {
-			return fmt.Errorf("Antennas this[%v](%v) Not Equal that[%v](%v)", i, this.Antennas[i], i, that1.Antennas[i])
-		}
-	}
-	if len(this.Attributes) != len(that1.Attributes) {
-		return fmt.Errorf("Attributes this(%v) Not Equal that(%v)", len(this.Attributes), len(that1.Attributes))
-	}
-	for i := range this.Attributes {
-		if this.Attributes[i] != that1.Attributes[i] {
-			return fmt.Errorf("Attributes this[%v](%v) Not Equal that[%v](%v)", i, this.Attributes[i], i, that1.Attributes[i])
-		}
-	}
-	if this.ClusterAddress != that1.ClusterAddress {
-		return fmt.Errorf("ClusterAddress this(%v) Not Equal that(%v)", this.ClusterAddress, that1.ClusterAddress)
-	}
-	if !this.ContactAccount.Equal(&that1.ContactAccount) {
-		return fmt.Errorf("ContactAccount this(%v) Not Equal that(%v)", this.ContactAccount, that1.ContactAccount)
-	}
-	if !this.UpdateMask.Equal(that1.UpdateMask) {
+	if !this.UpdateMask.Equal(&that1.UpdateMask) {
 		return fmt.Errorf("UpdateMask this(%v) Not Equal that(%v)", this.UpdateMask, that1.UpdateMask)
 	}
 	return nil
@@ -1945,47 +1702,230 @@ func (this *UpdateGatewayRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
+	if !this.Gateway.Equal(&that1.Gateway) {
+		return false
+	}
+	if !this.UpdateMask.Equal(&that1.UpdateMask) {
+		return false
+	}
+	return true
+}
+func (this *GenerateGatewayAPIKeyRequest) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*GenerateGatewayAPIKeyRequest)
+	if !ok {
+		that2, ok := that.(GenerateGatewayAPIKeyRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *GenerateGatewayAPIKeyRequest")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *GenerateGatewayAPIKeyRequest but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *GenerateGatewayAPIKeyRequest but is not nil && this == nil")
+	}
+	if !this.GatewayIdentifier.Equal(&that1.GatewayIdentifier) {
+		return fmt.Errorf("GatewayIdentifier this(%v) Not Equal that(%v)", this.GatewayIdentifier, that1.GatewayIdentifier)
+	}
+	if this.Name != that1.Name {
+		return fmt.Errorf("Name this(%v) Not Equal that(%v)", this.Name, that1.Name)
+	}
+	if len(this.Rights) != len(that1.Rights) {
+		return fmt.Errorf("Rights this(%v) Not Equal that(%v)", len(this.Rights), len(that1.Rights))
+	}
+	for i := range this.Rights {
+		if this.Rights[i] != that1.Rights[i] {
+			return fmt.Errorf("Rights this[%v](%v) Not Equal that[%v](%v)", i, this.Rights[i], i, that1.Rights[i])
+		}
+	}
+	return nil
+}
+func (this *GenerateGatewayAPIKeyRequest) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*GenerateGatewayAPIKeyRequest)
+	if !ok {
+		that2, ok := that.(GenerateGatewayAPIKeyRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
 	if !this.GatewayIdentifier.Equal(&that1.GatewayIdentifier) {
 		return false
 	}
-	if this.Description != that1.Description {
+	if this.Name != that1.Name {
 		return false
 	}
-	if this.FrequencyPlanID != that1.FrequencyPlanID {
+	if len(this.Rights) != len(that1.Rights) {
 		return false
 	}
-	if !this.PrivacySettings.Equal(&that1.PrivacySettings) {
-		return false
-	}
-	if this.AutoUpdate != that1.AutoUpdate {
-		return false
-	}
-	if this.Platform != that1.Platform {
-		return false
-	}
-	if len(this.Antennas) != len(that1.Antennas) {
-		return false
-	}
-	for i := range this.Antennas {
-		if !this.Antennas[i].Equal(&that1.Antennas[i]) {
+	for i := range this.Rights {
+		if this.Rights[i] != that1.Rights[i] {
 			return false
 		}
 	}
-	if len(this.Attributes) != len(that1.Attributes) {
+	return true
+}
+func (this *UpdateGatewayAPIKeyRequest) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*UpdateGatewayAPIKeyRequest)
+	if !ok {
+		that2, ok := that.(UpdateGatewayAPIKeyRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *UpdateGatewayAPIKeyRequest")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *UpdateGatewayAPIKeyRequest but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *UpdateGatewayAPIKeyRequest but is not nil && this == nil")
+	}
+	if !this.GatewayIdentifier.Equal(&that1.GatewayIdentifier) {
+		return fmt.Errorf("GatewayIdentifier this(%v) Not Equal that(%v)", this.GatewayIdentifier, that1.GatewayIdentifier)
+	}
+	if !this.Key.Equal(&that1.Key) {
+		return fmt.Errorf("Key this(%v) Not Equal that(%v)", this.Key, that1.Key)
+	}
+	if !this.UpdateMask.Equal(&that1.UpdateMask) {
+		return fmt.Errorf("UpdateMask this(%v) Not Equal that(%v)", this.UpdateMask, that1.UpdateMask)
+	}
+	return nil
+}
+func (this *UpdateGatewayAPIKeyRequest) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
 		return false
 	}
-	for i := range this.Attributes {
-		if this.Attributes[i] != that1.Attributes[i] {
+
+	that1, ok := that.(*UpdateGatewayAPIKeyRequest)
+	if !ok {
+		that2, ok := that.(UpdateGatewayAPIKeyRequest)
+		if ok {
+			that1 = &that2
+		} else {
 			return false
 		}
 	}
-	if this.ClusterAddress != that1.ClusterAddress {
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
 		return false
 	}
-	if !this.ContactAccount.Equal(&that1.ContactAccount) {
+	if !this.GatewayIdentifier.Equal(&that1.GatewayIdentifier) {
 		return false
 	}
-	if !this.UpdateMask.Equal(that1.UpdateMask) {
+	if !this.Key.Equal(&that1.Key) {
+		return false
+	}
+	if !this.UpdateMask.Equal(&that1.UpdateMask) {
+		return false
+	}
+	return true
+}
+func (this *RemoveGatewayAPIKeyRequest) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*RemoveGatewayAPIKeyRequest)
+	if !ok {
+		that2, ok := that.(RemoveGatewayAPIKeyRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *RemoveGatewayAPIKeyRequest")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *RemoveGatewayAPIKeyRequest but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *RemoveGatewayAPIKeyRequest but is not nil && this == nil")
+	}
+	if !this.GatewayIdentifier.Equal(&that1.GatewayIdentifier) {
+		return fmt.Errorf("GatewayIdentifier this(%v) Not Equal that(%v)", this.GatewayIdentifier, that1.GatewayIdentifier)
+	}
+	if this.Key != that1.Key {
+		return fmt.Errorf("Key this(%v) Not Equal that(%v)", this.Key, that1.Key)
+	}
+	return nil
+}
+func (this *RemoveGatewayAPIKeyRequest) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*RemoveGatewayAPIKeyRequest)
+	if !ok {
+		that2, ok := that.(RemoveGatewayAPIKeyRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if !this.GatewayIdentifier.Equal(&that1.GatewayIdentifier) {
+		return false
+	}
+	if this.Key != that1.Key {
 		return false
 	}
 	return true
@@ -2126,146 +2066,6 @@ func (this *ListGatewayCollaboratorsResponse) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *ListGatewayOwnersResponse) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*ListGatewayOwnersResponse)
-	if !ok {
-		that2, ok := that.(ListGatewayOwnersResponse)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *ListGatewayOwnersResponse")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *ListGatewayOwnersResponse but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *ListGatewayOwnersResponse but is not nil && this == nil")
-	}
-	if len(this.Collaborators) != len(that1.Collaborators) {
-		return fmt.Errorf("Collaborators this(%v) Not Equal that(%v)", len(this.Collaborators), len(that1.Collaborators))
-	}
-	for i := range this.Collaborators {
-		if !this.Collaborators[i].Equal(&that1.Collaborators[i]) {
-			return fmt.Errorf("Collaborators this[%v](%v) Not Equal that[%v](%v)", i, this.Collaborators[i], i, that1.Collaborators[i])
-		}
-	}
-	return nil
-}
-func (this *ListGatewayOwnersResponse) Equal(that interface{}) bool {
-	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	}
-
-	that1, ok := that.(*ListGatewayOwnersResponse)
-	if !ok {
-		that2, ok := that.(ListGatewayOwnersResponse)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	} else if this == nil {
-		return false
-	}
-	if len(this.Collaborators) != len(that1.Collaborators) {
-		return false
-	}
-	for i := range this.Collaborators {
-		if !this.Collaborators[i].Equal(&that1.Collaborators[i]) {
-			return false
-		}
-	}
-	return true
-}
-func (this *ListGatewayRightsResponse) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*ListGatewayRightsResponse)
-	if !ok {
-		that2, ok := that.(ListGatewayRightsResponse)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *ListGatewayRightsResponse")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *ListGatewayRightsResponse but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *ListGatewayRightsResponse but is not nil && this == nil")
-	}
-	if len(this.Rights) != len(that1.Rights) {
-		return fmt.Errorf("Rights this(%v) Not Equal that(%v)", len(this.Rights), len(that1.Rights))
-	}
-	for i := range this.Rights {
-		if this.Rights[i] != that1.Rights[i] {
-			return fmt.Errorf("Rights this[%v](%v) Not Equal that[%v](%v)", i, this.Rights[i], i, that1.Rights[i])
-		}
-	}
-	return nil
-}
-func (this *ListGatewayRightsResponse) Equal(that interface{}) bool {
-	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	}
-
-	that1, ok := that.(*ListGatewayRightsResponse)
-	if !ok {
-		that2, ok := that.(ListGatewayRightsResponse)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	} else if this == nil {
-		return false
-	}
-	if len(this.Rights) != len(that1.Rights) {
-		return false
-	}
-	for i := range this.Rights {
-		if this.Rights[i] != that1.Rights[i] {
-			return false
-		}
-	}
-	return true
-}
 func (this *CreateClientRequest) VerboseEqual(that interface{}) error {
 	if that == nil {
 		if this == nil {
@@ -2291,33 +2091,8 @@ func (this *CreateClientRequest) VerboseEqual(that interface{}) error {
 	} else if this == nil {
 		return fmt.Errorf("that is type *CreateClientRequest but is not nil && this == nil")
 	}
-	if !this.ClientIdentifier.Equal(&that1.ClientIdentifier) {
-		return fmt.Errorf("ClientIdentifier this(%v) Not Equal that(%v)", this.ClientIdentifier, that1.ClientIdentifier)
-	}
-	if this.Description != that1.Description {
-		return fmt.Errorf("Description this(%v) Not Equal that(%v)", this.Description, that1.Description)
-	}
-	if this.Secret != that1.Secret {
-		return fmt.Errorf("Secret this(%v) Not Equal that(%v)", this.Secret, that1.Secret)
-	}
-	if this.RedirectURI != that1.RedirectURI {
-		return fmt.Errorf("RedirectURI this(%v) Not Equal that(%v)", this.RedirectURI, that1.RedirectURI)
-	}
-	if len(this.Grants) != len(that1.Grants) {
-		return fmt.Errorf("Grants this(%v) Not Equal that(%v)", len(this.Grants), len(that1.Grants))
-	}
-	for i := range this.Grants {
-		if this.Grants[i] != that1.Grants[i] {
-			return fmt.Errorf("Grants this[%v](%v) Not Equal that[%v](%v)", i, this.Grants[i], i, that1.Grants[i])
-		}
-	}
-	if len(this.Rights) != len(that1.Rights) {
-		return fmt.Errorf("Rights this(%v) Not Equal that(%v)", len(this.Rights), len(that1.Rights))
-	}
-	for i := range this.Rights {
-		if this.Rights[i] != that1.Rights[i] {
-			return fmt.Errorf("Rights this[%v](%v) Not Equal that[%v](%v)", i, this.Rights[i], i, that1.Rights[i])
-		}
+	if !this.Client.Equal(&that1.Client) {
+		return fmt.Errorf("Client this(%v) Not Equal that(%v)", this.Client, that1.Client)
 	}
 	return nil
 }
@@ -2346,33 +2121,8 @@ func (this *CreateClientRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.ClientIdentifier.Equal(&that1.ClientIdentifier) {
+	if !this.Client.Equal(&that1.Client) {
 		return false
-	}
-	if this.Description != that1.Description {
-		return false
-	}
-	if this.Secret != that1.Secret {
-		return false
-	}
-	if this.RedirectURI != that1.RedirectURI {
-		return false
-	}
-	if len(this.Grants) != len(that1.Grants) {
-		return false
-	}
-	for i := range this.Grants {
-		if this.Grants[i] != that1.Grants[i] {
-			return false
-		}
-	}
-	if len(this.Rights) != len(that1.Rights) {
-		return false
-	}
-	for i := range this.Rights {
-		if this.Rights[i] != that1.Rights[i] {
-			return false
-		}
 	}
 	return true
 }
@@ -2471,35 +2221,10 @@ func (this *UpdateClientRequest) VerboseEqual(that interface{}) error {
 	} else if this == nil {
 		return fmt.Errorf("that is type *UpdateClientRequest but is not nil && this == nil")
 	}
-	if !this.ClientIdentifier.Equal(&that1.ClientIdentifier) {
-		return fmt.Errorf("ClientIdentifier this(%v) Not Equal that(%v)", this.ClientIdentifier, that1.ClientIdentifier)
+	if !this.Client.Equal(&that1.Client) {
+		return fmt.Errorf("Client this(%v) Not Equal that(%v)", this.Client, that1.Client)
 	}
-	if this.Description != that1.Description {
-		return fmt.Errorf("Description this(%v) Not Equal that(%v)", this.Description, that1.Description)
-	}
-	if this.Secret != that1.Secret {
-		return fmt.Errorf("Secret this(%v) Not Equal that(%v)", this.Secret, that1.Secret)
-	}
-	if this.RedirectURI != that1.RedirectURI {
-		return fmt.Errorf("RedirectURI this(%v) Not Equal that(%v)", this.RedirectURI, that1.RedirectURI)
-	}
-	if len(this.Grants) != len(that1.Grants) {
-		return fmt.Errorf("Grants this(%v) Not Equal that(%v)", len(this.Grants), len(that1.Grants))
-	}
-	for i := range this.Grants {
-		if this.Grants[i] != that1.Grants[i] {
-			return fmt.Errorf("Grants this[%v](%v) Not Equal that[%v](%v)", i, this.Grants[i], i, that1.Grants[i])
-		}
-	}
-	if len(this.Rights) != len(that1.Rights) {
-		return fmt.Errorf("Rights this(%v) Not Equal that(%v)", len(this.Rights), len(that1.Rights))
-	}
-	for i := range this.Rights {
-		if this.Rights[i] != that1.Rights[i] {
-			return fmt.Errorf("Rights this[%v](%v) Not Equal that[%v](%v)", i, this.Rights[i], i, that1.Rights[i])
-		}
-	}
-	if !this.UpdateMask.Equal(that1.UpdateMask) {
+	if !this.UpdateMask.Equal(&that1.UpdateMask) {
 		return fmt.Errorf("UpdateMask this(%v) Not Equal that(%v)", this.UpdateMask, that1.UpdateMask)
 	}
 	return nil
@@ -2529,374 +2254,11 @@ func (this *UpdateClientRequest) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.ClientIdentifier.Equal(&that1.ClientIdentifier) {
+	if !this.Client.Equal(&that1.Client) {
 		return false
 	}
-	if this.Description != that1.Description {
+	if !this.UpdateMask.Equal(&that1.UpdateMask) {
 		return false
-	}
-	if this.Secret != that1.Secret {
-		return false
-	}
-	if this.RedirectURI != that1.RedirectURI {
-		return false
-	}
-	if len(this.Grants) != len(that1.Grants) {
-		return false
-	}
-	for i := range this.Grants {
-		if this.Grants[i] != that1.Grants[i] {
-			return false
-		}
-	}
-	if len(this.Rights) != len(that1.Rights) {
-		return false
-	}
-	for i := range this.Rights {
-		if this.Rights[i] != that1.Rights[i] {
-			return false
-		}
-	}
-	if !this.UpdateMask.Equal(that1.UpdateMask) {
-		return false
-	}
-	return true
-}
-func (this *SetClientOfficialRequest) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*SetClientOfficialRequest)
-	if !ok {
-		that2, ok := that.(SetClientOfficialRequest)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *SetClientOfficialRequest")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *SetClientOfficialRequest but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *SetClientOfficialRequest but is not nil && this == nil")
-	}
-	if !this.ClientIdentifier.Equal(&that1.ClientIdentifier) {
-		return fmt.Errorf("ClientIdentifier this(%v) Not Equal that(%v)", this.ClientIdentifier, that1.ClientIdentifier)
-	}
-	if this.OfficialLabeled != that1.OfficialLabeled {
-		return fmt.Errorf("OfficialLabeled this(%v) Not Equal that(%v)", this.OfficialLabeled, that1.OfficialLabeled)
-	}
-	return nil
-}
-func (this *SetClientOfficialRequest) Equal(that interface{}) bool {
-	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	}
-
-	that1, ok := that.(*SetClientOfficialRequest)
-	if !ok {
-		that2, ok := that.(SetClientOfficialRequest)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	} else if this == nil {
-		return false
-	}
-	if !this.ClientIdentifier.Equal(&that1.ClientIdentifier) {
-		return false
-	}
-	if this.OfficialLabeled != that1.OfficialLabeled {
-		return false
-	}
-	return true
-}
-func (this *SetClientStateRequest) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*SetClientStateRequest)
-	if !ok {
-		that2, ok := that.(SetClientStateRequest)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *SetClientStateRequest")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *SetClientStateRequest but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *SetClientStateRequest but is not nil && this == nil")
-	}
-	if !this.ClientIdentifier.Equal(&that1.ClientIdentifier) {
-		return fmt.Errorf("ClientIdentifier this(%v) Not Equal that(%v)", this.ClientIdentifier, that1.ClientIdentifier)
-	}
-	if this.State != that1.State {
-		return fmt.Errorf("State this(%v) Not Equal that(%v)", this.State, that1.State)
-	}
-	return nil
-}
-func (this *SetClientStateRequest) Equal(that interface{}) bool {
-	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	}
-
-	that1, ok := that.(*SetClientStateRequest)
-	if !ok {
-		that2, ok := that.(SetClientStateRequest)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	} else if this == nil {
-		return false
-	}
-	if !this.ClientIdentifier.Equal(&that1.ClientIdentifier) {
-		return false
-	}
-	if this.State != that1.State {
-		return false
-	}
-	return true
-}
-func (this *SetClientCollaboratorRequest) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*SetClientCollaboratorRequest)
-	if !ok {
-		that2, ok := that.(SetClientCollaboratorRequest)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *SetClientCollaboratorRequest")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *SetClientCollaboratorRequest but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *SetClientCollaboratorRequest but is not nil && this == nil")
-	}
-	if !this.ClientIdentifier.Equal(&that1.ClientIdentifier) {
-		return fmt.Errorf("ClientIdentifier this(%v) Not Equal that(%v)", this.ClientIdentifier, that1.ClientIdentifier)
-	}
-	if !this.Collaborator.Equal(&that1.Collaborator) {
-		return fmt.Errorf("Collaborator this(%v) Not Equal that(%v)", this.Collaborator, that1.Collaborator)
-	}
-	return nil
-}
-func (this *SetClientCollaboratorRequest) Equal(that interface{}) bool {
-	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	}
-
-	that1, ok := that.(*SetClientCollaboratorRequest)
-	if !ok {
-		that2, ok := that.(SetClientCollaboratorRequest)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	} else if this == nil {
-		return false
-	}
-	if !this.ClientIdentifier.Equal(&that1.ClientIdentifier) {
-		return false
-	}
-	if !this.Collaborator.Equal(&that1.Collaborator) {
-		return false
-	}
-	return true
-}
-func (this *ListClientCollaboratorsResponse) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*ListClientCollaboratorsResponse)
-	if !ok {
-		that2, ok := that.(ListClientCollaboratorsResponse)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *ListClientCollaboratorsResponse")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *ListClientCollaboratorsResponse but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *ListClientCollaboratorsResponse but is not nil && this == nil")
-	}
-	if len(this.Collaborators) != len(that1.Collaborators) {
-		return fmt.Errorf("Collaborators this(%v) Not Equal that(%v)", len(this.Collaborators), len(that1.Collaborators))
-	}
-	for i := range this.Collaborators {
-		if !this.Collaborators[i].Equal(&that1.Collaborators[i]) {
-			return fmt.Errorf("Collaborators this[%v](%v) Not Equal that[%v](%v)", i, this.Collaborators[i], i, that1.Collaborators[i])
-		}
-	}
-	return nil
-}
-func (this *ListClientCollaboratorsResponse) Equal(that interface{}) bool {
-	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	}
-
-	that1, ok := that.(*ListClientCollaboratorsResponse)
-	if !ok {
-		that2, ok := that.(ListClientCollaboratorsResponse)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	} else if this == nil {
-		return false
-	}
-	if len(this.Collaborators) != len(that1.Collaborators) {
-		return false
-	}
-	for i := range this.Collaborators {
-		if !this.Collaborators[i].Equal(&that1.Collaborators[i]) {
-			return false
-		}
-	}
-	return true
-}
-func (this *ListClientRightsResponse) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*ListClientRightsResponse)
-	if !ok {
-		that2, ok := that.(ListClientRightsResponse)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *ListClientRightsResponse")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *ListClientRightsResponse but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *ListClientRightsResponse but is not nil && this == nil")
-	}
-	if len(this.Rights) != len(that1.Rights) {
-		return fmt.Errorf("Rights this(%v) Not Equal that(%v)", len(this.Rights), len(that1.Rights))
-	}
-	for i := range this.Rights {
-		if this.Rights[i] != that1.Rights[i] {
-			return fmt.Errorf("Rights this[%v](%v) Not Equal that[%v](%v)", i, this.Rights[i], i, that1.Rights[i])
-		}
-	}
-	return nil
-}
-func (this *ListClientRightsResponse) Equal(that interface{}) bool {
-	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	}
-
-	that1, ok := that.(*ListClientRightsResponse)
-	if !ok {
-		that2, ok := that.(ListClientRightsResponse)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	} else if this == nil {
-		return false
-	}
-	if len(this.Rights) != len(that1.Rights) {
-		return false
-	}
-	for i := range this.Rights {
-		if this.Rights[i] != that1.Rights[i] {
-			return false
-		}
 	}
 	return true
 }
@@ -3018,6 +2380,19 @@ type IsUserClient interface {
 	UpdateUserPassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// DeleteUser permantly deletes the user account of the authenticated user.
 	DeleteUser(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// ValidateUserEmail validates the user's email address of the authenticated
+	// user by using the token sent to the user's email address.
+	ValidateUserEmail(ctx context.Context, in *ValidateUserEmailRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// RequestUserEmailValidation re-issues a new email validation token and sends
+	// it to the user's email address so he can validate it. Any previous validation
+	// token that has not been used will be revoked.
+	RequestUserEmailValidation(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// ListAuthorizedClients returns the list of clients that the authenticated user
+	// has currently authorized to access its account.
+	ListAuthorizedClients(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*ListAuthorizedClientsResponse, error)
+	// RevokeClient revokes the access of an authorized client to the authenticated
+	// user's account.
+	RevokeAuthorizedClient(ctx context.Context, in *ClientIdentifier, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 }
 
 type isUserClient struct {
@@ -3073,6 +2448,42 @@ func (c *isUserClient) DeleteUser(ctx context.Context, in *google_protobuf2.Empt
 	return out, nil
 }
 
+func (c *isUserClient) ValidateUserEmail(ctx context.Context, in *ValidateUserEmailRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsUser/ValidateUserEmail", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isUserClient) RequestUserEmailValidation(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsUser/RequestUserEmailValidation", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isUserClient) ListAuthorizedClients(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*ListAuthorizedClientsResponse, error) {
+	out := new(ListAuthorizedClientsResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsUser/ListAuthorizedClients", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isUserClient) RevokeAuthorizedClient(ctx context.Context, in *ClientIdentifier, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsUser/RevokeAuthorizedClient", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for IsUser service
 
 type IsUserServer interface {
@@ -3087,6 +2498,19 @@ type IsUserServer interface {
 	UpdateUserPassword(context.Context, *UpdateUserPasswordRequest) (*google_protobuf2.Empty, error)
 	// DeleteUser permantly deletes the user account of the authenticated user.
 	DeleteUser(context.Context, *google_protobuf2.Empty) (*google_protobuf2.Empty, error)
+	// ValidateUserEmail validates the user's email address of the authenticated
+	// user by using the token sent to the user's email address.
+	ValidateUserEmail(context.Context, *ValidateUserEmailRequest) (*google_protobuf2.Empty, error)
+	// RequestUserEmailValidation re-issues a new email validation token and sends
+	// it to the user's email address so he can validate it. Any previous validation
+	// token that has not been used will be revoked.
+	RequestUserEmailValidation(context.Context, *google_protobuf2.Empty) (*google_protobuf2.Empty, error)
+	// ListAuthorizedClients returns the list of clients that the authenticated user
+	// has currently authorized to access its account.
+	ListAuthorizedClients(context.Context, *google_protobuf2.Empty) (*ListAuthorizedClientsResponse, error)
+	// RevokeClient revokes the access of an authorized client to the authenticated
+	// user's account.
+	RevokeAuthorizedClient(context.Context, *ClientIdentifier) (*google_protobuf2.Empty, error)
 }
 
 func RegisterIsUserServer(s *grpc.Server, srv IsUserServer) {
@@ -3183,6 +2607,78 @@ func _IsUser_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IsUser_ValidateUserEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ValidateUserEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsUserServer).ValidateUserEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsUser/ValidateUserEmail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsUserServer).ValidateUserEmail(ctx, req.(*ValidateUserEmailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsUser_RequestUserEmailValidation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(google_protobuf2.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsUserServer).RequestUserEmailValidation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsUser/RequestUserEmailValidation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsUserServer).RequestUserEmailValidation(ctx, req.(*google_protobuf2.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsUser_ListAuthorizedClients_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(google_protobuf2.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsUserServer).ListAuthorizedClients(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsUser/ListAuthorizedClients",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsUserServer).ListAuthorizedClients(ctx, req.(*google_protobuf2.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsUser_RevokeAuthorizedClient_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClientIdentifier)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsUserServer).RevokeAuthorizedClient(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsUser/RevokeAuthorizedClient",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsUserServer).RevokeAuthorizedClient(ctx, req.(*ClientIdentifier))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _IsUser_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ttn.v3.IsUser",
 	HandlerType: (*IsUserServer)(nil),
@@ -3207,6 +2703,22 @@ var _IsUser_serviceDesc = grpc.ServiceDesc{
 			MethodName: "DeleteUser",
 			Handler:    _IsUser_DeleteUser_Handler,
 		},
+		{
+			MethodName: "ValidateUserEmail",
+			Handler:    _IsUser_ValidateUserEmail_Handler,
+		},
+		{
+			MethodName: "RequestUserEmailValidation",
+			Handler:    _IsUser_RequestUserEmailValidation_Handler,
+		},
+		{
+			MethodName: "ListAuthorizedClients",
+			Handler:    _IsUser_ListAuthorizedClients_Handler,
+		},
+		{
+			MethodName: "RevokeAuthorizedClient",
+			Handler:    _IsUser_RevokeAuthorizedClient_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "github.com/TheThingsNetwork/ttn/api/identityserver.proto",
@@ -3229,6 +2741,8 @@ type IsApplicationClient interface {
 	// GenerateApplicationAPIKey generates a new API key for a given application
 	// and returns it.
 	GenerateApplicationAPIKey(ctx context.Context, in *GenerateApplicationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
+	// UpdateApplicationAPIKey updates an application API key name or rights.
+	UpdateApplicationAPIKey(ctx context.Context, in *UpdateApplicationAPIKeyRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// RemoveApplicationAPIKey removes a given API key from an application.
 	RemoveApplicationAPIKey(ctx context.Context, in *RemoveApplicationAPIKeyRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// SetApplicationCollaborator sets a collaborator for a given application. If
@@ -3236,9 +2750,6 @@ type IsApplicationClient interface {
 	SetApplicationCollaborator(ctx context.Context, in *SetApplicationCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// ListApplicationCollaborators returns all the collaborators for a given application.
 	ListApplicationCollaborators(ctx context.Context, in *ApplicationIdentifier, opts ...grpc.CallOption) (*ListApplicationCollaboratorsResponse, error)
-	// ListApplicationRights returns all the rights that the authenticated user has
-	// for a given application.
-	ListApplicationRights(ctx context.Context, in *ApplicationIdentifier, opts ...grpc.CallOption) (*ListApplicationRightsResponse, error)
 }
 
 type isApplicationClient struct {
@@ -3303,6 +2814,15 @@ func (c *isApplicationClient) GenerateApplicationAPIKey(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *isApplicationClient) UpdateApplicationAPIKey(ctx context.Context, in *UpdateApplicationAPIKeyRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/UpdateApplicationAPIKey", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *isApplicationClient) RemoveApplicationAPIKey(ctx context.Context, in *RemoveApplicationAPIKeyRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
 	out := new(google_protobuf2.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/RemoveApplicationAPIKey", in, out, c.cc, opts...)
@@ -3330,15 +2850,6 @@ func (c *isApplicationClient) ListApplicationCollaborators(ctx context.Context, 
 	return out, nil
 }
 
-func (c *isApplicationClient) ListApplicationRights(ctx context.Context, in *ApplicationIdentifier, opts ...grpc.CallOption) (*ListApplicationRightsResponse, error) {
-	out := new(ListApplicationRightsResponse)
-	err := grpc.Invoke(ctx, "/ttn.v3.IsApplication/ListApplicationRights", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // Server API for IsApplication service
 
 type IsApplicationServer interface {
@@ -3356,6 +2867,8 @@ type IsApplicationServer interface {
 	// GenerateApplicationAPIKey generates a new API key for a given application
 	// and returns it.
 	GenerateApplicationAPIKey(context.Context, *GenerateApplicationAPIKeyRequest) (*APIKey, error)
+	// UpdateApplicationAPIKey updates an application API key name or rights.
+	UpdateApplicationAPIKey(context.Context, *UpdateApplicationAPIKeyRequest) (*google_protobuf2.Empty, error)
 	// RemoveApplicationAPIKey removes a given API key from an application.
 	RemoveApplicationAPIKey(context.Context, *RemoveApplicationAPIKeyRequest) (*google_protobuf2.Empty, error)
 	// SetApplicationCollaborator sets a collaborator for a given application. If
@@ -3363,9 +2876,6 @@ type IsApplicationServer interface {
 	SetApplicationCollaborator(context.Context, *SetApplicationCollaboratorRequest) (*google_protobuf2.Empty, error)
 	// ListApplicationCollaborators returns all the collaborators for a given application.
 	ListApplicationCollaborators(context.Context, *ApplicationIdentifier) (*ListApplicationCollaboratorsResponse, error)
-	// ListApplicationRights returns all the rights that the authenticated user has
-	// for a given application.
-	ListApplicationRights(context.Context, *ApplicationIdentifier) (*ListApplicationRightsResponse, error)
 }
 
 func RegisterIsApplicationServer(s *grpc.Server, srv IsApplicationServer) {
@@ -3480,6 +2990,24 @@ func _IsApplication_GenerateApplicationAPIKey_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IsApplication_UpdateApplicationAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateApplicationAPIKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsApplicationServer).UpdateApplicationAPIKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsApplication/UpdateApplicationAPIKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsApplicationServer).UpdateApplicationAPIKey(ctx, req.(*UpdateApplicationAPIKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _IsApplication_RemoveApplicationAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RemoveApplicationAPIKeyRequest)
 	if err := dec(in); err != nil {
@@ -3534,24 +3062,6 @@ func _IsApplication_ListApplicationCollaborators_Handler(srv interface{}, ctx co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IsApplication_ListApplicationRights_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ApplicationIdentifier)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IsApplicationServer).ListApplicationRights(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ttn.v3.IsApplication/ListApplicationRights",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsApplicationServer).ListApplicationRights(ctx, req.(*ApplicationIdentifier))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _IsApplication_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ttn.v3.IsApplication",
 	HandlerType: (*IsApplicationServer)(nil),
@@ -3581,6 +3091,10 @@ var _IsApplication_serviceDesc = grpc.ServiceDesc{
 			Handler:    _IsApplication_GenerateApplicationAPIKey_Handler,
 		},
 		{
+			MethodName: "UpdateApplicationAPIKey",
+			Handler:    _IsApplication_UpdateApplicationAPIKey_Handler,
+		},
+		{
 			MethodName: "RemoveApplicationAPIKey",
 			Handler:    _IsApplication_RemoveApplicationAPIKey_Handler,
 		},
@@ -3592,10 +3106,6 @@ var _IsApplication_serviceDesc = grpc.ServiceDesc{
 			MethodName: "ListApplicationCollaborators",
 			Handler:    _IsApplication_ListApplicationCollaborators_Handler,
 		},
-		{
-			MethodName: "ListApplicationRights",
-			Handler:    _IsApplication_ListApplicationRights_Handler,
-		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "github.com/TheThingsNetwork/ttn/api/identityserver.proto",
@@ -3605,24 +3115,28 @@ var _IsApplication_serviceDesc = grpc.ServiceDesc{
 
 type IsGatewayClient interface {
 	// CreateGateway creates a new gateway on the network and returns it.
-	CreateGateway(ctx context.Context, in *CreateGatewayRequest, opts ...grpc.CallOption) (*Gateway, error)
+	CreateGateway(ctx context.Context, in *CreateGatewayRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// GetGateway finds a gateway by ID and retrieves it.
 	GetGateway(ctx context.Context, in *GatewayIdentifier, opts ...grpc.CallOption) (*Gateway, error)
 	// ListGateways returns all the gateways which the authenticated user
 	// has access to.
 	ListGateways(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*ListGatewaysResponse, error)
 	// UpdateGateway edits a gateway and retrieves the updated version.
-	UpdateGateway(ctx context.Context, in *UpdateGatewayRequest, opts ...grpc.CallOption) (*Gateway, error)
+	UpdateGateway(ctx context.Context, in *UpdateGatewayRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// DeleteGateway permantly deletes a gateway.
 	DeleteGateway(ctx context.Context, in *GatewayIdentifier, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// GenerateGatewayAPIKey generates a new API key for a given gateway and
+	// returns it.
+	GenerateGatewayAPIKey(ctx context.Context, in *GenerateGatewayAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
+	// UpdateGatewayAPIKey updates an gateway API key name or rights.
+	UpdateGatewayAPIKey(ctx context.Context, in *UpdateGatewayAPIKeyRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
+	// RemoveGatewayAPIKey removes a given API key from a gateway.
+	RemoveGatewayAPIKey(ctx context.Context, in *RemoveGatewayAPIKeyRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// SetGatewayCollaborator sets a collaborator for a given gateway. If the list
 	// of rights is empty the collaborator will be removed.
 	SetGatewayCollaborator(ctx context.Context, in *SetGatewayCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// ListGatewayCollaborators returns all the collaborators for a given gateway.
 	ListGatewayCollaborators(ctx context.Context, in *GatewayIdentifier, opts ...grpc.CallOption) (*ListGatewayCollaboratorsResponse, error)
-	// ListGatewayRights returns all the rights that the authenticated user has
-	// to a given gateway.
-	ListGatewayRights(ctx context.Context, in *GatewayIdentifier, opts ...grpc.CallOption) (*ListGatewayRightsResponse, error)
 }
 
 type isGatewayClient struct {
@@ -3633,8 +3147,8 @@ func NewIsGatewayClient(cc *grpc.ClientConn) IsGatewayClient {
 	return &isGatewayClient{cc}
 }
 
-func (c *isGatewayClient) CreateGateway(ctx context.Context, in *CreateGatewayRequest, opts ...grpc.CallOption) (*Gateway, error) {
-	out := new(Gateway)
+func (c *isGatewayClient) CreateGateway(ctx context.Context, in *CreateGatewayRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/CreateGateway", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -3660,8 +3174,8 @@ func (c *isGatewayClient) ListGateways(ctx context.Context, in *google_protobuf2
 	return out, nil
 }
 
-func (c *isGatewayClient) UpdateGateway(ctx context.Context, in *UpdateGatewayRequest, opts ...grpc.CallOption) (*Gateway, error) {
-	out := new(Gateway)
+func (c *isGatewayClient) UpdateGateway(ctx context.Context, in *UpdateGatewayRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/UpdateGateway", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -3672,6 +3186,33 @@ func (c *isGatewayClient) UpdateGateway(ctx context.Context, in *UpdateGatewayRe
 func (c *isGatewayClient) DeleteGateway(ctx context.Context, in *GatewayIdentifier, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
 	out := new(google_protobuf2.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/DeleteGateway", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) GenerateGatewayAPIKey(ctx context.Context, in *GenerateGatewayAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error) {
+	out := new(APIKey)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/GenerateGatewayAPIKey", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) UpdateGatewayAPIKey(ctx context.Context, in *UpdateGatewayAPIKeyRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/UpdateGatewayAPIKey", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *isGatewayClient) RemoveGatewayAPIKey(ctx context.Context, in *RemoveGatewayAPIKeyRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
+	out := new(google_protobuf2.Empty)
+	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/RemoveGatewayAPIKey", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -3696,37 +3237,32 @@ func (c *isGatewayClient) ListGatewayCollaborators(ctx context.Context, in *Gate
 	return out, nil
 }
 
-func (c *isGatewayClient) ListGatewayRights(ctx context.Context, in *GatewayIdentifier, opts ...grpc.CallOption) (*ListGatewayRightsResponse, error) {
-	out := new(ListGatewayRightsResponse)
-	err := grpc.Invoke(ctx, "/ttn.v3.IsGateway/ListGatewayRights", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // Server API for IsGateway service
 
 type IsGatewayServer interface {
 	// CreateGateway creates a new gateway on the network and returns it.
-	CreateGateway(context.Context, *CreateGatewayRequest) (*Gateway, error)
+	CreateGateway(context.Context, *CreateGatewayRequest) (*google_protobuf2.Empty, error)
 	// GetGateway finds a gateway by ID and retrieves it.
 	GetGateway(context.Context, *GatewayIdentifier) (*Gateway, error)
 	// ListGateways returns all the gateways which the authenticated user
 	// has access to.
 	ListGateways(context.Context, *google_protobuf2.Empty) (*ListGatewaysResponse, error)
 	// UpdateGateway edits a gateway and retrieves the updated version.
-	UpdateGateway(context.Context, *UpdateGatewayRequest) (*Gateway, error)
+	UpdateGateway(context.Context, *UpdateGatewayRequest) (*google_protobuf2.Empty, error)
 	// DeleteGateway permantly deletes a gateway.
 	DeleteGateway(context.Context, *GatewayIdentifier) (*google_protobuf2.Empty, error)
+	// GenerateGatewayAPIKey generates a new API key for a given gateway and
+	// returns it.
+	GenerateGatewayAPIKey(context.Context, *GenerateGatewayAPIKeyRequest) (*APIKey, error)
+	// UpdateGatewayAPIKey updates an gateway API key name or rights.
+	UpdateGatewayAPIKey(context.Context, *UpdateGatewayAPIKeyRequest) (*google_protobuf2.Empty, error)
+	// RemoveGatewayAPIKey removes a given API key from a gateway.
+	RemoveGatewayAPIKey(context.Context, *RemoveGatewayAPIKeyRequest) (*google_protobuf2.Empty, error)
 	// SetGatewayCollaborator sets a collaborator for a given gateway. If the list
 	// of rights is empty the collaborator will be removed.
 	SetGatewayCollaborator(context.Context, *SetGatewayCollaboratorRequest) (*google_protobuf2.Empty, error)
 	// ListGatewayCollaborators returns all the collaborators for a given gateway.
 	ListGatewayCollaborators(context.Context, *GatewayIdentifier) (*ListGatewayCollaboratorsResponse, error)
-	// ListGatewayRights returns all the rights that the authenticated user has
-	// to a given gateway.
-	ListGatewayRights(context.Context, *GatewayIdentifier) (*ListGatewayRightsResponse, error)
 }
 
 func RegisterIsGatewayServer(s *grpc.Server, srv IsGatewayServer) {
@@ -3823,6 +3359,60 @@ func _IsGateway_DeleteGateway_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IsGateway_GenerateGatewayAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateGatewayAPIKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).GenerateGatewayAPIKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/GenerateGatewayAPIKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).GenerateGatewayAPIKey(ctx, req.(*GenerateGatewayAPIKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_UpdateGatewayAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateGatewayAPIKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).UpdateGatewayAPIKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/UpdateGatewayAPIKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).UpdateGatewayAPIKey(ctx, req.(*UpdateGatewayAPIKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IsGateway_RemoveGatewayAPIKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveGatewayAPIKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IsGatewayServer).RemoveGatewayAPIKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.IsGateway/RemoveGatewayAPIKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IsGatewayServer).RemoveGatewayAPIKey(ctx, req.(*RemoveGatewayAPIKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _IsGateway_SetGatewayCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SetGatewayCollaboratorRequest)
 	if err := dec(in); err != nil {
@@ -3859,24 +3449,6 @@ func _IsGateway_ListGatewayCollaborators_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IsGateway_ListGatewayRights_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GatewayIdentifier)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IsGatewayServer).ListGatewayRights(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ttn.v3.IsGateway/ListGatewayRights",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsGatewayServer).ListGatewayRights(ctx, req.(*GatewayIdentifier))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _IsGateway_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ttn.v3.IsGateway",
 	HandlerType: (*IsGatewayServer)(nil),
@@ -3902,16 +3474,24 @@ var _IsGateway_serviceDesc = grpc.ServiceDesc{
 			Handler:    _IsGateway_DeleteGateway_Handler,
 		},
 		{
+			MethodName: "GenerateGatewayAPIKey",
+			Handler:    _IsGateway_GenerateGatewayAPIKey_Handler,
+		},
+		{
+			MethodName: "UpdateGatewayAPIKey",
+			Handler:    _IsGateway_UpdateGatewayAPIKey_Handler,
+		},
+		{
+			MethodName: "RemoveGatewayAPIKey",
+			Handler:    _IsGateway_RemoveGatewayAPIKey_Handler,
+		},
+		{
 			MethodName: "SetGatewayCollaborator",
 			Handler:    _IsGateway_SetGatewayCollaborator_Handler,
 		},
 		{
 			MethodName: "ListGatewayCollaborators",
 			Handler:    _IsGateway_ListGatewayCollaborators_Handler,
-		},
-		{
-			MethodName: "ListGatewayRights",
-			Handler:    _IsGateway_ListGatewayRights_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -3921,30 +3501,17 @@ var _IsGateway_serviceDesc = grpc.ServiceDesc{
 // Client API for IsClient service
 
 type IsClientClient interface {
-	// CreateClient creates a new client on the network.
+	// CreateClient sends a request to create a third-party client. The request
+	// has to be approved by the admins.
 	CreateClient(ctx context.Context, in *CreateClientRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// GetClient finds a client by ID and retrieves it.
 	GetClient(ctx context.Context, in *ClientIdentifier, opts ...grpc.CallOption) (*Client, error)
-	// ListClients returns all the clients which the authenticated has access to.
+	// ListClients returns all the clients the authenticated user has created.
 	ListClients(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*ListClientsResponse, error)
-	// UpdateClient edits a client.
+	// UpdateClient sends a request to update a client.
 	UpdateClient(ctx context.Context, in *UpdateClientRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// DeleteClient permantly deletes a client.
 	DeleteClient(ctx context.Context, in *ClientIdentifier, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
-	// SetClientOfficial allows to a tenant admin to add or remove the official
-	// label of a third-party client.
-	SetClientOfficial(ctx context.Context, in *SetClientOfficialRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
-	// SetClientState allows to the tenant admin to set the reviewing state of
-	// a third-party client request.
-	SetClientState(ctx context.Context, in *SetClientStateRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
-	// SetClientCollaborator sets a collaborator for a given third-party client.
-	// If the list of rights is empty the collaborator will be removed.
-	SetClientCollaborator(ctx context.Context, in *SetClientCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
-	// ListClientCollaborators returns all the collaborators for a given third-party client.
-	ListClientCollaborators(ctx context.Context, in *ClientIdentifier, opts ...grpc.CallOption) (*ListClientCollaboratorsResponse, error)
-	// ListClientRights returns all the rights that the authenticated user has
-	// to a given third-party client.
-	ListClientRights(ctx context.Context, in *ClientIdentifier, opts ...grpc.CallOption) (*ListClientRightsResponse, error)
 }
 
 type isClientClient struct {
@@ -4000,78 +3567,20 @@ func (c *isClientClient) DeleteClient(ctx context.Context, in *ClientIdentifier,
 	return out, nil
 }
 
-func (c *isClientClient) SetClientOfficial(ctx context.Context, in *SetClientOfficialRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
-	out := new(google_protobuf2.Empty)
-	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/SetClientOfficial", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *isClientClient) SetClientState(ctx context.Context, in *SetClientStateRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
-	out := new(google_protobuf2.Empty)
-	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/SetClientState", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *isClientClient) SetClientCollaborator(ctx context.Context, in *SetClientCollaboratorRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
-	out := new(google_protobuf2.Empty)
-	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/SetClientCollaborator", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *isClientClient) ListClientCollaborators(ctx context.Context, in *ClientIdentifier, opts ...grpc.CallOption) (*ListClientCollaboratorsResponse, error) {
-	out := new(ListClientCollaboratorsResponse)
-	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/ListClientCollaborators", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *isClientClient) ListClientRights(ctx context.Context, in *ClientIdentifier, opts ...grpc.CallOption) (*ListClientRightsResponse, error) {
-	out := new(ListClientRightsResponse)
-	err := grpc.Invoke(ctx, "/ttn.v3.IsClient/ListClientRights", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // Server API for IsClient service
 
 type IsClientServer interface {
-	// CreateClient creates a new client on the network.
+	// CreateClient sends a request to create a third-party client. The request
+	// has to be approved by the admins.
 	CreateClient(context.Context, *CreateClientRequest) (*google_protobuf2.Empty, error)
 	// GetClient finds a client by ID and retrieves it.
 	GetClient(context.Context, *ClientIdentifier) (*Client, error)
-	// ListClients returns all the clients which the authenticated has access to.
+	// ListClients returns all the clients the authenticated user has created.
 	ListClients(context.Context, *google_protobuf2.Empty) (*ListClientsResponse, error)
-	// UpdateClient edits a client.
+	// UpdateClient sends a request to update a client.
 	UpdateClient(context.Context, *UpdateClientRequest) (*google_protobuf2.Empty, error)
 	// DeleteClient permantly deletes a client.
 	DeleteClient(context.Context, *ClientIdentifier) (*google_protobuf2.Empty, error)
-	// SetClientOfficial allows to a tenant admin to add or remove the official
-	// label of a third-party client.
-	SetClientOfficial(context.Context, *SetClientOfficialRequest) (*google_protobuf2.Empty, error)
-	// SetClientState allows to the tenant admin to set the reviewing state of
-	// a third-party client request.
-	SetClientState(context.Context, *SetClientStateRequest) (*google_protobuf2.Empty, error)
-	// SetClientCollaborator sets a collaborator for a given third-party client.
-	// If the list of rights is empty the collaborator will be removed.
-	SetClientCollaborator(context.Context, *SetClientCollaboratorRequest) (*google_protobuf2.Empty, error)
-	// ListClientCollaborators returns all the collaborators for a given third-party client.
-	ListClientCollaborators(context.Context, *ClientIdentifier) (*ListClientCollaboratorsResponse, error)
-	// ListClientRights returns all the rights that the authenticated user has
-	// to a given third-party client.
-	ListClientRights(context.Context, *ClientIdentifier) (*ListClientRightsResponse, error)
 }
 
 func RegisterIsClientServer(s *grpc.Server, srv IsClientServer) {
@@ -4168,96 +3677,6 @@ func _IsClient_DeleteClient_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IsClient_SetClientOfficial_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SetClientOfficialRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IsClientServer).SetClientOfficial(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ttn.v3.IsClient/SetClientOfficial",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsClientServer).SetClientOfficial(ctx, req.(*SetClientOfficialRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _IsClient_SetClientState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SetClientStateRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IsClientServer).SetClientState(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ttn.v3.IsClient/SetClientState",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsClientServer).SetClientState(ctx, req.(*SetClientStateRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _IsClient_SetClientCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SetClientCollaboratorRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IsClientServer).SetClientCollaborator(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ttn.v3.IsClient/SetClientCollaborator",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsClientServer).SetClientCollaborator(ctx, req.(*SetClientCollaboratorRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _IsClient_ListClientCollaborators_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ClientIdentifier)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IsClientServer).ListClientCollaborators(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ttn.v3.IsClient/ListClientCollaborators",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsClientServer).ListClientCollaborators(ctx, req.(*ClientIdentifier))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _IsClient_ListClientRights_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ClientIdentifier)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IsClientServer).ListClientRights(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ttn.v3.IsClient/ListClientRights",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IsClientServer).ListClientRights(ctx, req.(*ClientIdentifier))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _IsClient_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ttn.v3.IsClient",
 	HandlerType: (*IsClientServer)(nil),
@@ -4282,26 +3701,6 @@ var _IsClient_serviceDesc = grpc.ServiceDesc{
 			MethodName: "DeleteClient",
 			Handler:    _IsClient_DeleteClient_Handler,
 		},
-		{
-			MethodName: "SetClientOfficial",
-			Handler:    _IsClient_SetClientOfficial_Handler,
-		},
-		{
-			MethodName: "SetClientState",
-			Handler:    _IsClient_SetClientState_Handler,
-		},
-		{
-			MethodName: "SetClientCollaborator",
-			Handler:    _IsClient_SetClientCollaborator_Handler,
-		},
-		{
-			MethodName: "ListClientCollaborators",
-			Handler:    _IsClient_ListClientCollaborators_Handler,
-		},
-		{
-			MethodName: "ListClientRights",
-			Handler:    _IsClient_ListClientRights_Handler,
-		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "github.com/TheThingsNetwork/ttn/api/identityserver.proto",
@@ -4324,29 +3723,17 @@ func (m *CreateUserRequest) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UserIdentifier.Size()))
-	n1, err := m.UserIdentifier.MarshalTo(dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.User.Size()))
+	n1, err := m.User.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n1
-	if len(m.Email) > 0 {
+	if len(m.InvitationToken) > 0 {
 		dAtA[i] = 0x12
 		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Email)))
-		i += copy(dAtA[i:], m.Email)
-	}
-	if len(m.Password) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Password)))
-		i += copy(dAtA[i:], m.Password)
-	}
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.InvitationToken)))
+		i += copy(dAtA[i:], m.InvitationToken)
 	}
 	return i, nil
 }
@@ -4366,28 +3753,22 @@ func (m *UpdateUserRequest) MarshalTo(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Email) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Email)))
-		i += copy(dAtA[i:], m.Email)
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.User.Size()))
+	n2, err := m.User.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
 	}
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
+	i += n2
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
+	n3, err := m.UpdateMask.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
 	}
-	if m.UpdateMask != nil {
-		dAtA[i] = 0x52
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
-		n2, err := m.UpdateMask.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n2
-	}
+	i += n3
 	return i, nil
 }
 
@@ -4421,6 +3802,60 @@ func (m *UpdateUserPasswordRequest) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *ValidateUserEmailRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ValidateUserEmailRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Token) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Token)))
+		i += copy(dAtA[i:], m.Token)
+	}
+	return i, nil
+}
+
+func (m *ListAuthorizedClientsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListAuthorizedClientsResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Clients) > 0 {
+		for _, msg := range m.Clients {
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
 func (m *CreateApplicationRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -4438,18 +3873,12 @@ func (m *CreateApplicationRequest) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
-	n3, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Application.Size()))
+	n4, err := m.Application.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n3
-	if len(m.Description) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Description)))
-		i += copy(dAtA[i:], m.Description)
-	}
+	i += n4
 	return i, nil
 }
 
@@ -4500,28 +3929,20 @@ func (m *UpdateApplicationRequest) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
-	n4, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Application.Size()))
+	n5, err := m.Application.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n4
-	if len(m.Description) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Description)))
-		i += copy(dAtA[i:], m.Description)
+	i += n5
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
+	n6, err := m.UpdateMask.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
 	}
-	if m.UpdateMask != nil {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
-		n5, err := m.UpdateMask.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n5
-	}
+	i += n6
 	return i, nil
 }
 
@@ -4543,34 +3964,76 @@ func (m *GenerateApplicationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
-	n6, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
+	n7, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n6
-	if len(m.KeyName) > 0 {
+	i += n7
+	if len(m.Name) > 0 {
 		dAtA[i] = 0x12
 		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.KeyName)))
-		i += copy(dAtA[i:], m.KeyName)
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Name)))
+		i += copy(dAtA[i:], m.Name)
 	}
 	if len(m.Rights) > 0 {
-		dAtA8 := make([]byte, len(m.Rights)*10)
-		var j7 int
+		dAtA9 := make([]byte, len(m.Rights)*10)
+		var j8 int
 		for _, num := range m.Rights {
 			for num >= 1<<7 {
-				dAtA8[j7] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA9[j8] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j7++
+				j8++
 			}
-			dAtA8[j7] = uint8(num)
-			j7++
+			dAtA9[j8] = uint8(num)
+			j8++
 		}
 		dAtA[i] = 0x1a
 		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j7))
-		i += copy(dAtA[i:], dAtA8[:j7])
+		i = encodeVarintIdentityserver(dAtA, i, uint64(j8))
+		i += copy(dAtA[i:], dAtA9[:j8])
 	}
+	return i, nil
+}
+
+func (m *UpdateApplicationAPIKeyRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpdateApplicationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
+	n10, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n10
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Key.Size()))
+	n11, err := m.Key.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n11
+	dAtA[i] = 0x1a
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
+	n12, err := m.UpdateMask.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n12
 	return i, nil
 }
 
@@ -4592,16 +4055,16 @@ func (m *RemoveApplicationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
-	n9, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
+	n13, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n9
-	if len(m.KeyName) > 0 {
+	i += n13
+	if len(m.Key) > 0 {
 		dAtA[i] = 0x12
 		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.KeyName)))
-		i += copy(dAtA[i:], m.KeyName)
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Key)))
+		i += copy(dAtA[i:], m.Key)
 	}
 	return i, nil
 }
@@ -4624,19 +4087,19 @@ func (m *SetApplicationCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) 
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
-	n10, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
+	n14, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n10
+	i += n14
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Collaborator.Size()))
-	n11, err := m.Collaborator.MarshalTo(dAtA[i:])
+	n15, err := m.Collaborator.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n11
+	i += n15
 	return i, nil
 }
 
@@ -4670,41 +4133,6 @@ func (m *ListApplicationCollaboratorsResponse) MarshalTo(dAtA []byte) (int, erro
 	return i, nil
 }
 
-func (m *ListApplicationRightsResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ListApplicationRightsResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Rights) > 0 {
-		dAtA13 := make([]byte, len(m.Rights)*10)
-		var j12 int
-		for _, num := range m.Rights {
-			for num >= 1<<7 {
-				dAtA13[j12] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j12++
-			}
-			dAtA13[j12] = uint8(num)
-			j12++
-		}
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j12))
-		i += copy(dAtA[i:], dAtA13[:j12])
-	}
-	return i, nil
-}
-
 func (m *CreateGatewayRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -4722,87 +4150,8 @@ func (m *CreateGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
-	n14, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n14
-	if len(m.Description) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Description)))
-		i += copy(dAtA[i:], m.Description)
-	}
-	if len(m.FrequencyPlanID) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.FrequencyPlanID)))
-		i += copy(dAtA[i:], m.FrequencyPlanID)
-	}
-	dAtA[i] = 0x32
-	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.PrivacySettings.Size()))
-	n15, err := m.PrivacySettings.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n15
-	if m.AutoUpdate {
-		dAtA[i] = 0x38
-		i++
-		if m.AutoUpdate {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if len(m.Platform) > 0 {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Platform)))
-		i += copy(dAtA[i:], m.Platform)
-	}
-	if len(m.Antennas) > 0 {
-		for _, msg := range m.Antennas {
-			dAtA[i] = 0x4a
-			i++
-			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if len(m.Attributes) > 0 {
-		for k := range m.Attributes {
-			dAtA[i] = 0x52
-			i++
-			v := m.Attributes[k]
-			mapSize := 1 + len(k) + sovIdentityserver(uint64(len(k))) + 1 + len(v) + sovIdentityserver(uint64(len(v)))
-			i = encodeVarintIdentityserver(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintIdentityserver(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintIdentityserver(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
-		}
-	}
-	if len(m.ClusterAddress) > 0 {
-		dAtA[i] = 0x5a
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.ClusterAddress)))
-		i += copy(dAtA[i:], m.ClusterAddress)
-	}
-	dAtA[i] = 0x62
-	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ContactAccount.Size()))
-	n16, err := m.ContactAccount.MarshalTo(dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Gateway.Size()))
+	n16, err := m.Gateway.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -4857,102 +4206,142 @@ func (m *UpdateGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
-	n17, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Gateway.Size()))
+	n17, err := m.Gateway.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n17
-	if len(m.Description) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Description)))
-		i += copy(dAtA[i:], m.Description)
-	}
-	if len(m.FrequencyPlanID) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.FrequencyPlanID)))
-		i += copy(dAtA[i:], m.FrequencyPlanID)
-	}
-	dAtA[i] = 0x32
+	dAtA[i] = 0x12
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.PrivacySettings.Size()))
-	n18, err := m.PrivacySettings.MarshalTo(dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
+	n18, err := m.UpdateMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n18
-	if m.AutoUpdate {
-		dAtA[i] = 0x38
-		i++
-		if m.AutoUpdate {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
+	return i, nil
+}
+
+func (m *GenerateGatewayAPIKeyRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
 	}
-	if len(m.Platform) > 0 {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Platform)))
-		i += copy(dAtA[i:], m.Platform)
-	}
-	if len(m.Antennas) > 0 {
-		for _, msg := range m.Antennas {
-			dAtA[i] = 0x4a
-			i++
-			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if len(m.Attributes) > 0 {
-		for k := range m.Attributes {
-			dAtA[i] = 0x52
-			i++
-			v := m.Attributes[k]
-			mapSize := 1 + len(k) + sovIdentityserver(uint64(len(k))) + 1 + len(v) + sovIdentityserver(uint64(len(v)))
-			i = encodeVarintIdentityserver(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintIdentityserver(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintIdentityserver(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
-		}
-	}
-	if len(m.ClusterAddress) > 0 {
-		dAtA[i] = 0x5a
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.ClusterAddress)))
-		i += copy(dAtA[i:], m.ClusterAddress)
-	}
-	dAtA[i] = 0x62
+	return dAtA[:n], nil
+}
+
+func (m *GenerateGatewayAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ContactAccount.Size()))
-	n19, err := m.ContactAccount.MarshalTo(dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
+	n19, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n19
-	if m.UpdateMask != nil {
-		dAtA[i] = 0x82
+	if len(m.Name) > 0 {
+		dAtA[i] = 0x12
 		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
-		n20, err := m.UpdateMask.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Name)))
+		i += copy(dAtA[i:], m.Name)
+	}
+	if len(m.Rights) > 0 {
+		dAtA21 := make([]byte, len(m.Rights)*10)
+		var j20 int
+		for _, num := range m.Rights {
+			for num >= 1<<7 {
+				dAtA21[j20] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j20++
+			}
+			dAtA21[j20] = uint8(num)
+			j20++
 		}
-		i += n20
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(j20))
+		i += copy(dAtA[i:], dAtA21[:j20])
+	}
+	return i, nil
+}
+
+func (m *UpdateGatewayAPIKeyRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpdateGatewayAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
+	n22, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n22
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Key.Size()))
+	n23, err := m.Key.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n23
+	dAtA[i] = 0x1a
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
+	n24, err := m.UpdateMask.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n24
+	return i, nil
+}
+
+func (m *RemoveGatewayAPIKeyRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RemoveGatewayAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
+	n25, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n25
+	if len(m.Key) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Key)))
+		i += copy(dAtA[i:], m.Key)
 	}
 	return i, nil
 }
@@ -4975,19 +4364,19 @@ func (m *SetGatewayCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.GatewayIdentifier.Size()))
-	n21, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	n26, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n21
+	i += n26
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Collaborator.Size()))
-	n22, err := m.Collaborator.MarshalTo(dAtA[i:])
+	n27, err := m.Collaborator.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n22
+	i += n27
 	return i, nil
 }
 
@@ -5021,71 +4410,6 @@ func (m *ListGatewayCollaboratorsResponse) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *ListGatewayOwnersResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ListGatewayOwnersResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Collaborators) > 0 {
-		for _, msg := range m.Collaborators {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	return i, nil
-}
-
-func (m *ListGatewayRightsResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ListGatewayRightsResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Rights) > 0 {
-		dAtA24 := make([]byte, len(m.Rights)*10)
-		var j23 int
-		for _, num := range m.Rights {
-			for num >= 1<<7 {
-				dAtA24[j23] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j23++
-			}
-			dAtA24[j23] = uint8(num)
-			j23++
-		}
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j23))
-		i += copy(dAtA[i:], dAtA24[:j23])
-	}
-	return i, nil
-}
-
 func (m *CreateClientRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -5103,64 +4427,12 @@ func (m *CreateClientRequest) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifier.Size()))
-	n25, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Client.Size()))
+	n28, err := m.Client.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n25
-	if len(m.Description) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Description)))
-		i += copy(dAtA[i:], m.Description)
-	}
-	if len(m.Secret) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Secret)))
-		i += copy(dAtA[i:], m.Secret)
-	}
-	if len(m.RedirectURI) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.RedirectURI)))
-		i += copy(dAtA[i:], m.RedirectURI)
-	}
-	if len(m.Grants) > 0 {
-		dAtA27 := make([]byte, len(m.Grants)*10)
-		var j26 int
-		for _, num := range m.Grants {
-			for num >= 1<<7 {
-				dAtA27[j26] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j26++
-			}
-			dAtA27[j26] = uint8(num)
-			j26++
-		}
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j26))
-		i += copy(dAtA[i:], dAtA27[:j26])
-	}
-	if len(m.Rights) > 0 {
-		dAtA29 := make([]byte, len(m.Rights)*10)
-		var j28 int
-		for _, num := range m.Rights {
-			for num >= 1<<7 {
-				dAtA29[j28] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j28++
-			}
-			dAtA29[j28] = uint8(num)
-			j28++
-		}
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j28))
-		i += copy(dAtA[i:], dAtA29[:j28])
-	}
+	i += n28
 	return i, nil
 }
 
@@ -5211,240 +4483,20 @@ func (m *UpdateClientRequest) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifier.Size()))
-	n30, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Client.Size()))
+	n29, err := m.Client.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n29
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
+	n30, err := m.UpdateMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n30
-	if len(m.Description) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Description)))
-		i += copy(dAtA[i:], m.Description)
-	}
-	if len(m.Secret) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.Secret)))
-		i += copy(dAtA[i:], m.Secret)
-	}
-	if len(m.RedirectURI) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(len(m.RedirectURI)))
-		i += copy(dAtA[i:], m.RedirectURI)
-	}
-	if len(m.Grants) > 0 {
-		dAtA32 := make([]byte, len(m.Grants)*10)
-		var j31 int
-		for _, num := range m.Grants {
-			for num >= 1<<7 {
-				dAtA32[j31] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j31++
-			}
-			dAtA32[j31] = uint8(num)
-			j31++
-		}
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j31))
-		i += copy(dAtA[i:], dAtA32[:j31])
-	}
-	if len(m.Rights) > 0 {
-		dAtA34 := make([]byte, len(m.Rights)*10)
-		var j33 int
-		for _, num := range m.Rights {
-			for num >= 1<<7 {
-				dAtA34[j33] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j33++
-			}
-			dAtA34[j33] = uint8(num)
-			j33++
-		}
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j33))
-		i += copy(dAtA[i:], dAtA34[:j33])
-	}
-	if m.UpdateMask != nil {
-		dAtA[i] = 0x62
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(m.UpdateMask.Size()))
-		n35, err := m.UpdateMask.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n35
-	}
-	return i, nil
-}
-
-func (m *SetClientOfficialRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SetClientOfficialRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifier.Size()))
-	n36, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n36
-	if m.OfficialLabeled {
-		dAtA[i] = 0x10
-		i++
-		if m.OfficialLabeled {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	return i, nil
-}
-
-func (m *SetClientStateRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SetClientStateRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifier.Size()))
-	n37, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n37
-	if m.State != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(m.State))
-	}
-	return i, nil
-}
-
-func (m *SetClientCollaboratorRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SetClientCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.ClientIdentifier.Size()))
-	n38, err := m.ClientIdentifier.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n38
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.Collaborator.Size()))
-	n39, err := m.Collaborator.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n39
-	return i, nil
-}
-
-func (m *ListClientCollaboratorsResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ListClientCollaboratorsResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Collaborators) > 0 {
-		for _, msg := range m.Collaborators {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintIdentityserver(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	return i, nil
-}
-
-func (m *ListClientRightsResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ListClientRightsResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Rights) > 0 {
-		dAtA41 := make([]byte, len(m.Rights)*10)
-		var j40 int
-		for _, num := range m.Rights {
-			for num >= 1<<7 {
-				dAtA41[j40] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j40++
-			}
-			dAtA41[j40] = uint8(num)
-			j40++
-		}
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(j40))
-		i += copy(dAtA[i:], dAtA41[:j40])
-	}
 	return i, nil
 }
 
@@ -5459,11 +4511,9 @@ func encodeVarintIdentityserver(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedCreateUserRequest(r randyIdentityserver, easy bool) *CreateUserRequest {
 	this := &CreateUserRequest{}
-	v1 := NewPopulatedUserIdentifier(r, easy)
-	this.UserIdentifier = *v1
-	this.Email = randStringIdentityserver(r)
-	this.Password = randStringIdentityserver(r)
-	this.Name = randStringIdentityserver(r)
+	v1 := NewPopulatedUser(r, easy)
+	this.User = *v1
+	this.InvitationToken = randStringIdentityserver(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5471,11 +4521,10 @@ func NewPopulatedCreateUserRequest(r randyIdentityserver, easy bool) *CreateUser
 
 func NewPopulatedUpdateUserRequest(r randyIdentityserver, easy bool) *UpdateUserRequest {
 	this := &UpdateUserRequest{}
-	this.Email = randStringIdentityserver(r)
-	this.Name = randStringIdentityserver(r)
-	if r.Intn(10) != 0 {
-		this.UpdateMask = google_protobuf5.NewPopulatedFieldMask(r, easy)
-	}
+	v2 := NewPopulatedUser(r, easy)
+	this.User = *v2
+	v3 := NewPopulatedUserMask(r, easy)
+	this.UpdateMask = *v3
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5490,11 +4539,33 @@ func NewPopulatedUpdateUserPasswordRequest(r randyIdentityserver, easy bool) *Up
 	return this
 }
 
+func NewPopulatedValidateUserEmailRequest(r randyIdentityserver, easy bool) *ValidateUserEmailRequest {
+	this := &ValidateUserEmailRequest{}
+	this.Token = randStringIdentityserver(r)
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedListAuthorizedClientsResponse(r randyIdentityserver, easy bool) *ListAuthorizedClientsResponse {
+	this := &ListAuthorizedClientsResponse{}
+	if r.Intn(10) != 0 {
+		v4 := r.Intn(5)
+		this.Clients = make([]Client, v4)
+		for i := 0; i < v4; i++ {
+			v5 := NewPopulatedClient(r, easy)
+			this.Clients[i] = *v5
+		}
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
 func NewPopulatedCreateApplicationRequest(r randyIdentityserver, easy bool) *CreateApplicationRequest {
 	this := &CreateApplicationRequest{}
-	v2 := NewPopulatedApplicationIdentifier(r, easy)
-	this.ApplicationIdentifier = *v2
-	this.Description = randStringIdentityserver(r)
+	v6 := NewPopulatedApplication(r, easy)
+	this.Application = *v6
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5503,11 +4574,11 @@ func NewPopulatedCreateApplicationRequest(r randyIdentityserver, easy bool) *Cre
 func NewPopulatedListApplicationsResponse(r randyIdentityserver, easy bool) *ListApplicationsResponse {
 	this := &ListApplicationsResponse{}
 	if r.Intn(10) != 0 {
-		v3 := r.Intn(5)
-		this.Applications = make([]Application, v3)
-		for i := 0; i < v3; i++ {
-			v4 := NewPopulatedApplication(r, easy)
-			this.Applications[i] = *v4
+		v7 := r.Intn(5)
+		this.Applications = make([]Application, v7)
+		for i := 0; i < v7; i++ {
+			v8 := NewPopulatedApplication(r, easy)
+			this.Applications[i] = *v8
 		}
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -5517,12 +4588,10 @@ func NewPopulatedListApplicationsResponse(r randyIdentityserver, easy bool) *Lis
 
 func NewPopulatedUpdateApplicationRequest(r randyIdentityserver, easy bool) *UpdateApplicationRequest {
 	this := &UpdateApplicationRequest{}
-	v5 := NewPopulatedApplicationIdentifier(r, easy)
-	this.ApplicationIdentifier = *v5
-	this.Description = randStringIdentityserver(r)
-	if r.Intn(10) != 0 {
-		this.UpdateMask = google_protobuf5.NewPopulatedFieldMask(r, easy)
-	}
+	v9 := NewPopulatedApplication(r, easy)
+	this.Application = *v9
+	v10 := NewPopulatedApplicationMask(r, easy)
+	this.UpdateMask = *v10
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5530,14 +4599,27 @@ func NewPopulatedUpdateApplicationRequest(r randyIdentityserver, easy bool) *Upd
 
 func NewPopulatedGenerateApplicationAPIKeyRequest(r randyIdentityserver, easy bool) *GenerateApplicationAPIKeyRequest {
 	this := &GenerateApplicationAPIKeyRequest{}
-	v6 := NewPopulatedApplicationIdentifier(r, easy)
-	this.ApplicationIdentifier = *v6
-	this.KeyName = randStringIdentityserver(r)
-	v7 := r.Intn(10)
-	this.Rights = make([]Right, v7)
-	for i := 0; i < v7; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 31, 32, 33, 34, 35, 38, 39, 36, 37, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(30)])
+	v11 := NewPopulatedApplicationIdentifier(r, easy)
+	this.ApplicationIdentifier = *v11
+	this.Name = randStringIdentityserver(r)
+	v12 := r.Intn(10)
+	this.Rights = make([]Right, v12)
+	for i := 0; i < v12; i++ {
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
 	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedUpdateApplicationAPIKeyRequest(r randyIdentityserver, easy bool) *UpdateApplicationAPIKeyRequest {
+	this := &UpdateApplicationAPIKeyRequest{}
+	v13 := NewPopulatedApplicationIdentifier(r, easy)
+	this.ApplicationIdentifier = *v13
+	v14 := NewPopulatedAPIKey(r, easy)
+	this.Key = *v14
+	v15 := NewPopulatedAPIKeyMask(r, easy)
+	this.UpdateMask = *v15
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5545,9 +4627,9 @@ func NewPopulatedGenerateApplicationAPIKeyRequest(r randyIdentityserver, easy bo
 
 func NewPopulatedRemoveApplicationAPIKeyRequest(r randyIdentityserver, easy bool) *RemoveApplicationAPIKeyRequest {
 	this := &RemoveApplicationAPIKeyRequest{}
-	v8 := NewPopulatedApplicationIdentifier(r, easy)
-	this.ApplicationIdentifier = *v8
-	this.KeyName = randStringIdentityserver(r)
+	v16 := NewPopulatedApplicationIdentifier(r, easy)
+	this.ApplicationIdentifier = *v16
+	this.Key = randStringIdentityserver(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5555,10 +4637,10 @@ func NewPopulatedRemoveApplicationAPIKeyRequest(r randyIdentityserver, easy bool
 
 func NewPopulatedSetApplicationCollaboratorRequest(r randyIdentityserver, easy bool) *SetApplicationCollaboratorRequest {
 	this := &SetApplicationCollaboratorRequest{}
-	v9 := NewPopulatedApplicationIdentifier(r, easy)
-	this.ApplicationIdentifier = *v9
-	v10 := NewPopulatedCollaborator(r, easy)
-	this.Collaborator = *v10
+	v17 := NewPopulatedApplicationIdentifier(r, easy)
+	this.ApplicationIdentifier = *v17
+	v18 := NewPopulatedCollaborator(r, easy)
+	this.Collaborator = *v18
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5567,24 +4649,12 @@ func NewPopulatedSetApplicationCollaboratorRequest(r randyIdentityserver, easy b
 func NewPopulatedListApplicationCollaboratorsResponse(r randyIdentityserver, easy bool) *ListApplicationCollaboratorsResponse {
 	this := &ListApplicationCollaboratorsResponse{}
 	if r.Intn(10) != 0 {
-		v11 := r.Intn(5)
-		this.Collaborators = make([]Collaborator, v11)
-		for i := 0; i < v11; i++ {
-			v12 := NewPopulatedCollaborator(r, easy)
-			this.Collaborators[i] = *v12
+		v19 := r.Intn(5)
+		this.Collaborators = make([]Collaborator, v19)
+		for i := 0; i < v19; i++ {
+			v20 := NewPopulatedCollaborator(r, easy)
+			this.Collaborators[i] = *v20
 		}
-	}
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedListApplicationRightsResponse(r randyIdentityserver, easy bool) *ListApplicationRightsResponse {
-	this := &ListApplicationRightsResponse{}
-	v13 := r.Intn(10)
-	this.Rights = make([]Right, v13)
-	for i := 0; i < v13; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 31, 32, 33, 34, 35, 38, 39, 36, 37, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(30)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -5593,32 +4663,8 @@ func NewPopulatedListApplicationRightsResponse(r randyIdentityserver, easy bool)
 
 func NewPopulatedCreateGatewayRequest(r randyIdentityserver, easy bool) *CreateGatewayRequest {
 	this := &CreateGatewayRequest{}
-	v14 := NewPopulatedGatewayIdentifier(r, easy)
-	this.GatewayIdentifier = *v14
-	this.Description = randStringIdentityserver(r)
-	this.FrequencyPlanID = randStringIdentityserver(r)
-	v15 := NewPopulatedGatewayPrivacySettings(r, easy)
-	this.PrivacySettings = *v15
-	this.AutoUpdate = bool(r.Intn(2) == 0)
-	this.Platform = randStringIdentityserver(r)
-	if r.Intn(10) != 0 {
-		v16 := r.Intn(5)
-		this.Antennas = make([]GatewayAntenna, v16)
-		for i := 0; i < v16; i++ {
-			v17 := NewPopulatedGatewayAntenna(r, easy)
-			this.Antennas[i] = *v17
-		}
-	}
-	if r.Intn(10) != 0 {
-		v18 := r.Intn(10)
-		this.Attributes = make(map[string]string)
-		for i := 0; i < v18; i++ {
-			this.Attributes[randStringIdentityserver(r)] = randStringIdentityserver(r)
-		}
-	}
-	this.ClusterAddress = randStringIdentityserver(r)
-	v19 := NewPopulatedUserIdentifier(r, easy)
-	this.ContactAccount = *v19
+	v21 := NewPopulatedGateway(r, easy)
+	this.Gateway = *v21
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5627,11 +4673,11 @@ func NewPopulatedCreateGatewayRequest(r randyIdentityserver, easy bool) *CreateG
 func NewPopulatedListGatewaysResponse(r randyIdentityserver, easy bool) *ListGatewaysResponse {
 	this := &ListGatewaysResponse{}
 	if r.Intn(10) != 0 {
-		v20 := r.Intn(5)
-		this.Gateways = make([]Gateway, v20)
-		for i := 0; i < v20; i++ {
-			v21 := NewPopulatedGateway(r, easy)
-			this.Gateways[i] = *v21
+		v22 := r.Intn(5)
+		this.Gateways = make([]Gateway, v22)
+		for i := 0; i < v22; i++ {
+			v23 := NewPopulatedGateway(r, easy)
+			this.Gateways[i] = *v23
 		}
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -5641,35 +4687,48 @@ func NewPopulatedListGatewaysResponse(r randyIdentityserver, easy bool) *ListGat
 
 func NewPopulatedUpdateGatewayRequest(r randyIdentityserver, easy bool) *UpdateGatewayRequest {
 	this := &UpdateGatewayRequest{}
-	v22 := NewPopulatedGatewayIdentifier(r, easy)
-	this.GatewayIdentifier = *v22
-	this.Description = randStringIdentityserver(r)
-	this.FrequencyPlanID = randStringIdentityserver(r)
-	v23 := NewPopulatedGatewayPrivacySettings(r, easy)
-	this.PrivacySettings = *v23
-	this.AutoUpdate = bool(r.Intn(2) == 0)
-	this.Platform = randStringIdentityserver(r)
-	if r.Intn(10) != 0 {
-		v24 := r.Intn(5)
-		this.Antennas = make([]GatewayAntenna, v24)
-		for i := 0; i < v24; i++ {
-			v25 := NewPopulatedGatewayAntenna(r, easy)
-			this.Antennas[i] = *v25
-		}
+	v24 := NewPopulatedGateway(r, easy)
+	this.Gateway = *v24
+	v25 := NewPopulatedGatewayMask(r, easy)
+	this.UpdateMask = *v25
+	if !easy && r.Intn(10) != 0 {
 	}
-	if r.Intn(10) != 0 {
-		v26 := r.Intn(10)
-		this.Attributes = make(map[string]string)
-		for i := 0; i < v26; i++ {
-			this.Attributes[randStringIdentityserver(r)] = randStringIdentityserver(r)
-		}
+	return this
+}
+
+func NewPopulatedGenerateGatewayAPIKeyRequest(r randyIdentityserver, easy bool) *GenerateGatewayAPIKeyRequest {
+	this := &GenerateGatewayAPIKeyRequest{}
+	v26 := NewPopulatedGatewayIdentifier(r, easy)
+	this.GatewayIdentifier = *v26
+	this.Name = randStringIdentityserver(r)
+	v27 := r.Intn(10)
+	this.Rights = make([]Right, v27)
+	for i := 0; i < v27; i++ {
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
 	}
-	this.ClusterAddress = randStringIdentityserver(r)
-	v27 := NewPopulatedUserIdentifier(r, easy)
-	this.ContactAccount = *v27
-	if r.Intn(10) != 0 {
-		this.UpdateMask = google_protobuf5.NewPopulatedFieldMask(r, easy)
+	if !easy && r.Intn(10) != 0 {
 	}
+	return this
+}
+
+func NewPopulatedUpdateGatewayAPIKeyRequest(r randyIdentityserver, easy bool) *UpdateGatewayAPIKeyRequest {
+	this := &UpdateGatewayAPIKeyRequest{}
+	v28 := NewPopulatedGatewayIdentifier(r, easy)
+	this.GatewayIdentifier = *v28
+	v29 := NewPopulatedAPIKey(r, easy)
+	this.Key = *v29
+	v30 := NewPopulatedAPIKeyMask(r, easy)
+	this.UpdateMask = *v30
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedRemoveGatewayAPIKeyRequest(r randyIdentityserver, easy bool) *RemoveGatewayAPIKeyRequest {
+	this := &RemoveGatewayAPIKeyRequest{}
+	v31 := NewPopulatedGatewayIdentifier(r, easy)
+	this.GatewayIdentifier = *v31
+	this.Key = randStringIdentityserver(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5677,10 +4736,10 @@ func NewPopulatedUpdateGatewayRequest(r randyIdentityserver, easy bool) *UpdateG
 
 func NewPopulatedSetGatewayCollaboratorRequest(r randyIdentityserver, easy bool) *SetGatewayCollaboratorRequest {
 	this := &SetGatewayCollaboratorRequest{}
-	v28 := NewPopulatedGatewayIdentifier(r, easy)
-	this.GatewayIdentifier = *v28
-	v29 := NewPopulatedCollaborator(r, easy)
-	this.Collaborator = *v29
+	v32 := NewPopulatedGatewayIdentifier(r, easy)
+	this.GatewayIdentifier = *v32
+	v33 := NewPopulatedCollaborator(r, easy)
+	this.Collaborator = *v33
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5689,39 +4748,12 @@ func NewPopulatedSetGatewayCollaboratorRequest(r randyIdentityserver, easy bool)
 func NewPopulatedListGatewayCollaboratorsResponse(r randyIdentityserver, easy bool) *ListGatewayCollaboratorsResponse {
 	this := &ListGatewayCollaboratorsResponse{}
 	if r.Intn(10) != 0 {
-		v30 := r.Intn(5)
-		this.Collaborators = make([]Collaborator, v30)
-		for i := 0; i < v30; i++ {
-			v31 := NewPopulatedCollaborator(r, easy)
-			this.Collaborators[i] = *v31
+		v34 := r.Intn(5)
+		this.Collaborators = make([]Collaborator, v34)
+		for i := 0; i < v34; i++ {
+			v35 := NewPopulatedCollaborator(r, easy)
+			this.Collaborators[i] = *v35
 		}
-	}
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedListGatewayOwnersResponse(r randyIdentityserver, easy bool) *ListGatewayOwnersResponse {
-	this := &ListGatewayOwnersResponse{}
-	if r.Intn(10) != 0 {
-		v32 := r.Intn(5)
-		this.Collaborators = make([]Collaborator, v32)
-		for i := 0; i < v32; i++ {
-			v33 := NewPopulatedCollaborator(r, easy)
-			this.Collaborators[i] = *v33
-		}
-	}
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedListGatewayRightsResponse(r randyIdentityserver, easy bool) *ListGatewayRightsResponse {
-	this := &ListGatewayRightsResponse{}
-	v34 := r.Intn(10)
-	this.Rights = make([]Right, v34)
-	for i := 0; i < v34; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 31, 32, 33, 34, 35, 38, 39, 36, 37, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(30)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -5730,21 +4762,8 @@ func NewPopulatedListGatewayRightsResponse(r randyIdentityserver, easy bool) *Li
 
 func NewPopulatedCreateClientRequest(r randyIdentityserver, easy bool) *CreateClientRequest {
 	this := &CreateClientRequest{}
-	v35 := NewPopulatedClientIdentifier(r, easy)
-	this.ClientIdentifier = *v35
-	this.Description = randStringIdentityserver(r)
-	this.Secret = randStringIdentityserver(r)
-	this.RedirectURI = randStringIdentityserver(r)
-	v36 := r.Intn(10)
-	this.Grants = make([]GrantType, v36)
-	for i := 0; i < v36; i++ {
-		this.Grants[i] = GrantType([]int32{0, 1, 2}[r.Intn(3)])
-	}
-	v37 := r.Intn(10)
-	this.Rights = make([]Right, v37)
-	for i := 0; i < v37; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 31, 32, 33, 34, 35, 38, 39, 36, 37, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(30)])
-	}
+	v36 := NewPopulatedClient(r, easy)
+	this.Client = *v36
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5753,11 +4772,11 @@ func NewPopulatedCreateClientRequest(r randyIdentityserver, easy bool) *CreateCl
 func NewPopulatedListClientsResponse(r randyIdentityserver, easy bool) *ListClientsResponse {
 	this := &ListClientsResponse{}
 	if r.Intn(10) != 0 {
-		v38 := r.Intn(5)
-		this.Clients = make([]Client, v38)
-		for i := 0; i < v38; i++ {
-			v39 := NewPopulatedClient(r, easy)
-			this.Clients[i] = *v39
+		v37 := r.Intn(5)
+		this.Clients = make([]Client, v37)
+		for i := 0; i < v37; i++ {
+			v38 := NewPopulatedClient(r, easy)
+			this.Clients[i] = *v38
 		}
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -5767,82 +4786,10 @@ func NewPopulatedListClientsResponse(r randyIdentityserver, easy bool) *ListClie
 
 func NewPopulatedUpdateClientRequest(r randyIdentityserver, easy bool) *UpdateClientRequest {
 	this := &UpdateClientRequest{}
-	v40 := NewPopulatedClientIdentifier(r, easy)
-	this.ClientIdentifier = *v40
-	this.Description = randStringIdentityserver(r)
-	this.Secret = randStringIdentityserver(r)
-	this.RedirectURI = randStringIdentityserver(r)
-	v41 := r.Intn(10)
-	this.Grants = make([]GrantType, v41)
-	for i := 0; i < v41; i++ {
-		this.Grants[i] = GrantType([]int32{0, 1, 2}[r.Intn(3)])
-	}
-	v42 := r.Intn(10)
-	this.Rights = make([]Right, v42)
-	for i := 0; i < v42; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 31, 32, 33, 34, 35, 38, 39, 36, 37, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(30)])
-	}
-	if r.Intn(10) != 0 {
-		this.UpdateMask = google_protobuf5.NewPopulatedFieldMask(r, easy)
-	}
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedSetClientOfficialRequest(r randyIdentityserver, easy bool) *SetClientOfficialRequest {
-	this := &SetClientOfficialRequest{}
-	v43 := NewPopulatedClientIdentifier(r, easy)
-	this.ClientIdentifier = *v43
-	this.OfficialLabeled = bool(r.Intn(2) == 0)
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedSetClientStateRequest(r randyIdentityserver, easy bool) *SetClientStateRequest {
-	this := &SetClientStateRequest{}
-	v44 := NewPopulatedClientIdentifier(r, easy)
-	this.ClientIdentifier = *v44
-	this.State = ClientState([]int32{0, 1, 2}[r.Intn(3)])
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedSetClientCollaboratorRequest(r randyIdentityserver, easy bool) *SetClientCollaboratorRequest {
-	this := &SetClientCollaboratorRequest{}
-	v45 := NewPopulatedClientIdentifier(r, easy)
-	this.ClientIdentifier = *v45
-	v46 := NewPopulatedCollaborator(r, easy)
-	this.Collaborator = *v46
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedListClientCollaboratorsResponse(r randyIdentityserver, easy bool) *ListClientCollaboratorsResponse {
-	this := &ListClientCollaboratorsResponse{}
-	if r.Intn(10) != 0 {
-		v47 := r.Intn(5)
-		this.Collaborators = make([]Collaborator, v47)
-		for i := 0; i < v47; i++ {
-			v48 := NewPopulatedCollaborator(r, easy)
-			this.Collaborators[i] = *v48
-		}
-	}
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedListClientRightsResponse(r randyIdentityserver, easy bool) *ListClientRightsResponse {
-	this := &ListClientRightsResponse{}
-	v49 := r.Intn(10)
-	this.Rights = make([]Right, v49)
-	for i := 0; i < v49; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 31, 32, 33, 34, 35, 38, 39, 36, 37, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(30)])
-	}
+	v39 := NewPopulatedClient(r, easy)
+	this.Client = *v39
+	v40 := NewPopulatedClientMask(r, easy)
+	this.UpdateMask = *v40
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -5867,9 +4814,9 @@ func randUTF8RuneIdentityserver(r randyIdentityserver) rune {
 	return rune(ru + 61)
 }
 func randStringIdentityserver(r randyIdentityserver) string {
-	v50 := r.Intn(100)
-	tmps := make([]rune, v50)
-	for i := 0; i < v50; i++ {
+	v41 := r.Intn(100)
+	tmps := make([]rune, v41)
+	for i := 0; i < v41; i++ {
 		tmps[i] = randUTF8RuneIdentityserver(r)
 	}
 	return string(tmps)
@@ -5891,11 +4838,11 @@ func randFieldIdentityserver(dAtA []byte, r randyIdentityserver, fieldNumber int
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateIdentityserver(dAtA, uint64(key))
-		v51 := r.Int63()
+		v42 := r.Int63()
 		if r.Intn(2) == 0 {
-			v51 *= -1
+			v42 *= -1
 		}
-		dAtA = encodeVarintPopulateIdentityserver(dAtA, uint64(v51))
+		dAtA = encodeVarintPopulateIdentityserver(dAtA, uint64(v42))
 	case 1:
 		dAtA = encodeVarintPopulateIdentityserver(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -5923,17 +4870,9 @@ func encodeVarintPopulateIdentityserver(dAtA []byte, v uint64) []byte {
 func (m *CreateUserRequest) Size() (n int) {
 	var l int
 	_ = l
-	l = m.UserIdentifier.Size()
+	l = m.User.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
-	l = len(m.Email)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	l = len(m.Password)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	l = len(m.Name)
+	l = len(m.InvitationToken)
 	if l > 0 {
 		n += 1 + l + sovIdentityserver(uint64(l))
 	}
@@ -5943,18 +4882,10 @@ func (m *CreateUserRequest) Size() (n int) {
 func (m *UpdateUserRequest) Size() (n int) {
 	var l int
 	_ = l
-	l = len(m.Email)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	l = len(m.Name)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	if m.UpdateMask != nil {
-		l = m.UpdateMask.Size()
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
+	l = m.User.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = m.UpdateMask.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
 	return n
 }
 
@@ -5972,15 +4903,33 @@ func (m *UpdateUserPasswordRequest) Size() (n int) {
 	return n
 }
 
-func (m *CreateApplicationRequest) Size() (n int) {
+func (m *ValidateUserEmailRequest) Size() (n int) {
 	var l int
 	_ = l
-	l = m.ApplicationIdentifier.Size()
-	n += 1 + l + sovIdentityserver(uint64(l))
-	l = len(m.Description)
+	l = len(m.Token)
 	if l > 0 {
 		n += 1 + l + sovIdentityserver(uint64(l))
 	}
+	return n
+}
+
+func (m *ListAuthorizedClientsResponse) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Clients) > 0 {
+		for _, e := range m.Clients {
+			l = e.Size()
+			n += 1 + l + sovIdentityserver(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *CreateApplicationRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.Application.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
 	return n
 }
 
@@ -5999,16 +4948,10 @@ func (m *ListApplicationsResponse) Size() (n int) {
 func (m *UpdateApplicationRequest) Size() (n int) {
 	var l int
 	_ = l
-	l = m.ApplicationIdentifier.Size()
+	l = m.Application.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
-	l = len(m.Description)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	if m.UpdateMask != nil {
-		l = m.UpdateMask.Size()
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
+	l = m.UpdateMask.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
 	return n
 }
 
@@ -6017,7 +4960,7 @@ func (m *GenerateApplicationAPIKeyRequest) Size() (n int) {
 	_ = l
 	l = m.ApplicationIdentifier.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
-	l = len(m.KeyName)
+	l = len(m.Name)
 	if l > 0 {
 		n += 1 + l + sovIdentityserver(uint64(l))
 	}
@@ -6031,12 +4974,24 @@ func (m *GenerateApplicationAPIKeyRequest) Size() (n int) {
 	return n
 }
 
+func (m *UpdateApplicationAPIKeyRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.ApplicationIdentifier.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = m.Key.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = m.UpdateMask.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	return n
+}
+
 func (m *RemoveApplicationAPIKeyRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = m.ApplicationIdentifier.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
-	l = len(m.KeyName)
+	l = len(m.Key)
 	if l > 0 {
 		n += 1 + l + sovIdentityserver(uint64(l))
 	}
@@ -6065,60 +5020,10 @@ func (m *ListApplicationCollaboratorsResponse) Size() (n int) {
 	return n
 }
 
-func (m *ListApplicationRightsResponse) Size() (n int) {
-	var l int
-	_ = l
-	if len(m.Rights) > 0 {
-		l = 0
-		for _, e := range m.Rights {
-			l += sovIdentityserver(uint64(e))
-		}
-		n += 1 + sovIdentityserver(uint64(l)) + l
-	}
-	return n
-}
-
 func (m *CreateGatewayRequest) Size() (n int) {
 	var l int
 	_ = l
-	l = m.GatewayIdentifier.Size()
-	n += 1 + l + sovIdentityserver(uint64(l))
-	l = len(m.Description)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	l = len(m.FrequencyPlanID)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	l = m.PrivacySettings.Size()
-	n += 1 + l + sovIdentityserver(uint64(l))
-	if m.AutoUpdate {
-		n += 2
-	}
-	l = len(m.Platform)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	if len(m.Antennas) > 0 {
-		for _, e := range m.Antennas {
-			l = e.Size()
-			n += 1 + l + sovIdentityserver(uint64(l))
-		}
-	}
-	if len(m.Attributes) > 0 {
-		for k, v := range m.Attributes {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + len(k) + sovIdentityserver(uint64(len(k))) + 1 + len(v) + sovIdentityserver(uint64(len(v)))
-			n += mapEntrySize + 1 + sovIdentityserver(uint64(mapEntrySize))
-		}
-	}
-	l = len(m.ClusterAddress)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	l = m.ContactAccount.Size()
+	l = m.Gateway.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
 	return n
 }
@@ -6138,48 +5043,52 @@ func (m *ListGatewaysResponse) Size() (n int) {
 func (m *UpdateGatewayRequest) Size() (n int) {
 	var l int
 	_ = l
+	l = m.Gateway.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = m.UpdateMask.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	return n
+}
+
+func (m *GenerateGatewayAPIKeyRequest) Size() (n int) {
+	var l int
+	_ = l
 	l = m.GatewayIdentifier.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
-	l = len(m.Description)
+	l = len(m.Name)
 	if l > 0 {
 		n += 1 + l + sovIdentityserver(uint64(l))
 	}
-	l = len(m.FrequencyPlanID)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	l = m.PrivacySettings.Size()
-	n += 1 + l + sovIdentityserver(uint64(l))
-	if m.AutoUpdate {
-		n += 2
-	}
-	l = len(m.Platform)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	if len(m.Antennas) > 0 {
-		for _, e := range m.Antennas {
-			l = e.Size()
-			n += 1 + l + sovIdentityserver(uint64(l))
+	if len(m.Rights) > 0 {
+		l = 0
+		for _, e := range m.Rights {
+			l += sovIdentityserver(uint64(e))
 		}
+		n += 1 + sovIdentityserver(uint64(l)) + l
 	}
-	if len(m.Attributes) > 0 {
-		for k, v := range m.Attributes {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + len(k) + sovIdentityserver(uint64(len(k))) + 1 + len(v) + sovIdentityserver(uint64(len(v)))
-			n += mapEntrySize + 1 + sovIdentityserver(uint64(mapEntrySize))
-		}
-	}
-	l = len(m.ClusterAddress)
+	return n
+}
+
+func (m *UpdateGatewayAPIKeyRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.GatewayIdentifier.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = m.Key.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = m.UpdateMask.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	return n
+}
+
+func (m *RemoveGatewayAPIKeyRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = m.GatewayIdentifier.Size()
+	n += 1 + l + sovIdentityserver(uint64(l))
+	l = len(m.Key)
 	if l > 0 {
 		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	l = m.ContactAccount.Size()
-	n += 1 + l + sovIdentityserver(uint64(l))
-	if m.UpdateMask != nil {
-		l = m.UpdateMask.Size()
-		n += 2 + l + sovIdentityserver(uint64(l))
 	}
 	return n
 }
@@ -6206,62 +5115,11 @@ func (m *ListGatewayCollaboratorsResponse) Size() (n int) {
 	return n
 }
 
-func (m *ListGatewayOwnersResponse) Size() (n int) {
-	var l int
-	_ = l
-	if len(m.Collaborators) > 0 {
-		for _, e := range m.Collaborators {
-			l = e.Size()
-			n += 1 + l + sovIdentityserver(uint64(l))
-		}
-	}
-	return n
-}
-
-func (m *ListGatewayRightsResponse) Size() (n int) {
-	var l int
-	_ = l
-	if len(m.Rights) > 0 {
-		l = 0
-		for _, e := range m.Rights {
-			l += sovIdentityserver(uint64(e))
-		}
-		n += 1 + sovIdentityserver(uint64(l)) + l
-	}
-	return n
-}
-
 func (m *CreateClientRequest) Size() (n int) {
 	var l int
 	_ = l
-	l = m.ClientIdentifier.Size()
+	l = m.Client.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
-	l = len(m.Description)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	l = len(m.Secret)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	l = len(m.RedirectURI)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	if len(m.Grants) > 0 {
-		l = 0
-		for _, e := range m.Grants {
-			l += sovIdentityserver(uint64(e))
-		}
-		n += 1 + sovIdentityserver(uint64(l)) + l
-	}
-	if len(m.Rights) > 0 {
-		l = 0
-		for _, e := range m.Rights {
-			l += sovIdentityserver(uint64(e))
-		}
-		n += 1 + sovIdentityserver(uint64(l)) + l
-	}
 	return n
 }
 
@@ -6280,95 +5138,10 @@ func (m *ListClientsResponse) Size() (n int) {
 func (m *UpdateClientRequest) Size() (n int) {
 	var l int
 	_ = l
-	l = m.ClientIdentifier.Size()
+	l = m.Client.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
-	l = len(m.Description)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	l = len(m.Secret)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	l = len(m.RedirectURI)
-	if l > 0 {
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	if len(m.Grants) > 0 {
-		l = 0
-		for _, e := range m.Grants {
-			l += sovIdentityserver(uint64(e))
-		}
-		n += 1 + sovIdentityserver(uint64(l)) + l
-	}
-	if len(m.Rights) > 0 {
-		l = 0
-		for _, e := range m.Rights {
-			l += sovIdentityserver(uint64(e))
-		}
-		n += 1 + sovIdentityserver(uint64(l)) + l
-	}
-	if m.UpdateMask != nil {
-		l = m.UpdateMask.Size()
-		n += 1 + l + sovIdentityserver(uint64(l))
-	}
-	return n
-}
-
-func (m *SetClientOfficialRequest) Size() (n int) {
-	var l int
-	_ = l
-	l = m.ClientIdentifier.Size()
+	l = m.UpdateMask.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
-	if m.OfficialLabeled {
-		n += 2
-	}
-	return n
-}
-
-func (m *SetClientStateRequest) Size() (n int) {
-	var l int
-	_ = l
-	l = m.ClientIdentifier.Size()
-	n += 1 + l + sovIdentityserver(uint64(l))
-	if m.State != 0 {
-		n += 1 + sovIdentityserver(uint64(m.State))
-	}
-	return n
-}
-
-func (m *SetClientCollaboratorRequest) Size() (n int) {
-	var l int
-	_ = l
-	l = m.ClientIdentifier.Size()
-	n += 1 + l + sovIdentityserver(uint64(l))
-	l = m.Collaborator.Size()
-	n += 1 + l + sovIdentityserver(uint64(l))
-	return n
-}
-
-func (m *ListClientCollaboratorsResponse) Size() (n int) {
-	var l int
-	_ = l
-	if len(m.Collaborators) > 0 {
-		for _, e := range m.Collaborators {
-			l = e.Size()
-			n += 1 + l + sovIdentityserver(uint64(l))
-		}
-	}
-	return n
-}
-
-func (m *ListClientRightsResponse) Size() (n int) {
-	var l int
-	_ = l
-	if len(m.Rights) > 0 {
-		l = 0
-		for _, e := range m.Rights {
-			l += sovIdentityserver(uint64(e))
-		}
-		n += 1 + sovIdentityserver(uint64(l)) + l
-	}
 	return n
 }
 
@@ -6416,7 +5189,7 @@ func (m *CreateUserRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UserIdentifier", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field User", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6440,13 +5213,13 @@ func (m *CreateUserRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.UserIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.User.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Email", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field InvitationToken", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -6471,65 +5244,7 @@ func (m *CreateUserRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Email = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Password", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Password = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Name = string(dAtA[iNdEx:postIndex])
+			m.InvitationToken = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -6581,65 +5296,37 @@ func (m *UpdateUserRequest) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: UpdateUserRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field User", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.User.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Email", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Email = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Name = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 10:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdateMask", wireType)
 			}
@@ -6664,9 +5351,6 @@ func (m *UpdateUserRequest) Unmarshal(dAtA []byte) error {
 			postIndex := iNdEx + msglen
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			}
-			if m.UpdateMask == nil {
-				m.UpdateMask = &google_protobuf5.FieldMask{}
 			}
 			if err := m.UpdateMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -6801,6 +5485,166 @@ func (m *UpdateUserPasswordRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *ValidateUserEmailRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ValidateUserEmailRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ValidateUserEmailRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Token", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Token = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListAuthorizedClientsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListAuthorizedClientsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListAuthorizedClientsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Clients", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Clients = append(m.Clients, Client{})
+			if err := m.Clients[len(m.Clients)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *CreateApplicationRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -6832,7 +5676,7 @@ func (m *CreateApplicationRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifier", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Application", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6856,38 +5700,9 @@ func (m *CreateApplicationRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.ApplicationIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Application.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Description = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -7022,7 +5837,7 @@ func (m *UpdateApplicationRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifier", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Application", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -7046,40 +5861,11 @@ func (m *UpdateApplicationRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.ApplicationIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Application.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Description = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdateMask", wireType)
 			}
@@ -7104,9 +5890,6 @@ func (m *UpdateApplicationRequest) Unmarshal(dAtA []byte) error {
 			postIndex := iNdEx + msglen
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			}
-			if m.UpdateMask == nil {
-				m.UpdateMask = &google_protobuf5.FieldMask{}
 			}
 			if err := m.UpdateMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -7194,7 +5977,7 @@ func (m *GenerateApplicationAPIKeyRequest) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field KeyName", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -7219,7 +6002,7 @@ func (m *GenerateApplicationAPIKeyRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.KeyName = string(dAtA[iNdEx:postIndex])
+			m.Name = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType == 0 {
@@ -7304,6 +6087,146 @@ func (m *GenerateApplicationAPIKeyRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *UpdateApplicationAPIKeyRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpdateApplicationAPIKeyRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpdateApplicationAPIKeyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifier", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Key.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateMask", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.UpdateMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *RemoveApplicationAPIKeyRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -7365,7 +6288,7 @@ func (m *RemoveApplicationAPIKeyRequest) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field KeyName", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -7390,7 +6313,7 @@ func (m *RemoveApplicationAPIKeyRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.KeyName = string(dAtA[iNdEx:postIndex])
+			m.Key = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -7604,118 +6527,6 @@ func (m *ListApplicationCollaboratorsResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ListApplicationRightsResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowIdentityserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ListApplicationRightsResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListApplicationRightsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 3:
-			if wireType == 0 {
-				var v Right
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= (Right(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.Rights = append(m.Rights, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= (int(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthIdentityserver
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				for iNdEx < postIndex {
-					var v Right
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowIdentityserver
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= (Right(b) & 0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Rights = append(m.Rights, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipIdentityserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *CreateGatewayRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -7747,7 +6558,7 @@ func (m *CreateGatewayRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifier", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Gateway", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -7771,352 +6582,7 @@ func (m *CreateGatewayRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.GatewayIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Description = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyPlanID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.FrequencyPlanID = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PrivacySettings", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.PrivacySettings.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 7:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AutoUpdate", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.AutoUpdate = bool(v != 0)
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Platform", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Platform = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Antennas", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Antennas = append(m.Antennas, GatewayAntenna{})
-			if err := m.Antennas[len(m.Antennas)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Attributes", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Attributes == nil {
-				m.Attributes = make(map[string]string)
-			}
-			var mapkey string
-			var mapvalue string
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowIdentityserver
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= (uint64(b) & 0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthIdentityserver
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowIdentityserver
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 {
-						return ErrInvalidLengthIdentityserver
-					}
-					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
-					iNdEx = postStringIndexmapvalue
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipIdentityserver(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if skippy < 0 {
-						return ErrInvalidLengthIdentityserver
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
-				}
-			}
-			m.Attributes[mapkey] = mapvalue
-			iNdEx = postIndex
-		case 11:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClusterAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ClusterAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 12:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ContactAccount", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.ContactAccount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Gateway.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -8253,6 +6719,116 @@ func (m *UpdateGatewayRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Gateway", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Gateway.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateMask", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.UpdateMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GenerateGatewayAPIKeyRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GenerateGatewayAPIKeyRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GenerateGatewayAPIKeyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifier", wireType)
 			}
 			var msglen int
@@ -8283,7 +6859,7 @@ func (m *UpdateGatewayRequest) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -8308,181 +6884,11 @@ func (m *UpdateGatewayRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Description = string(dAtA[iNdEx:postIndex])
+			m.Name = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyPlanID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.FrequencyPlanID = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PrivacySettings", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.PrivacySettings.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 7:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AutoUpdate", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.AutoUpdate = bool(v != 0)
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Platform", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Platform = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Antennas", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Antennas = append(m.Antennas, GatewayAntenna{})
-			if err := m.Antennas[len(m.Antennas)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Attributes", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Attributes == nil {
-				m.Attributes = make(map[string]string)
-			}
-			var mapkey string
-			var mapvalue string
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
+		case 3:
+			if wireType == 0 {
+				var v Right
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowIdentityserver
@@ -8492,113 +6898,109 @@ func (m *UpdateGatewayRequest) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					wire |= (uint64(b) & 0x7F) << shift
+					v |= (Right(b) & 0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowIdentityserver
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= (uint64(b) & 0x7F) << shift
-						if b < 0x80 {
-							break
-						}
+				m.Rights = append(m.Rights, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowIdentityserver
 					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthIdentityserver
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey > l {
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
 					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowIdentityserver
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
-						if b < 0x80 {
-							break
-						}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= (int(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
 					}
-					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 {
-						return ErrInvalidLengthIdentityserver
-					}
-					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
-					iNdEx = postStringIndexmapvalue
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipIdentityserver(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if skippy < 0 {
-						return ErrInvalidLengthIdentityserver
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
 				}
-			}
-			m.Attributes[mapkey] = mapvalue
-			iNdEx = postIndex
-		case 11:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClusterAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
+				if packedLen < 0 {
+					return ErrInvalidLengthIdentityserver
 				}
-				if iNdEx >= l {
+				postIndex := iNdEx + packedLen
+				if postIndex > l {
 					return io.ErrUnexpectedEOF
 				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
+				for iNdEx < postIndex {
+					var v Right
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowIdentityserver
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= (Right(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.Rights = append(m.Rights, v)
 				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthIdentityserver
 			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ClusterAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 12:
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UpdateGatewayAPIKeyRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpdateGatewayAPIKeyRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpdateGatewayAPIKeyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ContactAccount", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifier", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -8622,11 +7024,41 @@ func (m *UpdateGatewayRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.ContactAccount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.GatewayIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 16:
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Key.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdateMask", wireType)
 			}
@@ -8652,12 +7084,118 @@ func (m *UpdateGatewayRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.UpdateMask == nil {
-				m.UpdateMask = &google_protobuf5.FieldMask{}
-			}
 			if err := m.UpdateMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentityserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RemoveGatewayAPIKeyRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentityserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RemoveGatewayAPIKeyRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RemoveGatewayAPIKeyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifier", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.GatewayIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentityserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentityserver
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Key = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -8871,199 +7409,6 @@ func (m *ListGatewayCollaboratorsResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ListGatewayOwnersResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowIdentityserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ListGatewayOwnersResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListGatewayOwnersResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Collaborators", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Collaborators = append(m.Collaborators, Collaborator{})
-			if err := m.Collaborators[len(m.Collaborators)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipIdentityserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ListGatewayRightsResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowIdentityserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ListGatewayRightsResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListGatewayRightsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType == 0 {
-				var v Right
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= (Right(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.Rights = append(m.Rights, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= (int(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthIdentityserver
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				for iNdEx < postIndex {
-					var v Right
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowIdentityserver
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= (Right(b) & 0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Rights = append(m.Rights, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipIdentityserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *CreateClientRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -9095,7 +7440,7 @@ func (m *CreateClientRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientIdentifier", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Client", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -9119,221 +7464,10 @@ func (m *CreateClientRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.ClientIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Client.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Description = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Secret = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RedirectURI", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.RedirectURI = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 7:
-			if wireType == 0 {
-				var v GrantType
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= (GrantType(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.Grants = append(m.Grants, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= (int(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthIdentityserver
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				for iNdEx < postIndex {
-					var v GrantType
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowIdentityserver
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= (GrantType(b) & 0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Grants = append(m.Grants, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Grants", wireType)
-			}
-		case 8:
-			if wireType == 0 {
-				var v Right
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= (Right(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.Rights = append(m.Rights, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= (int(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthIdentityserver
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				for iNdEx < postIndex {
-					var v Right
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowIdentityserver
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= (Right(b) & 0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Rights = append(m.Rights, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
-			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipIdentityserver(dAtA[iNdEx:])
@@ -9467,7 +7601,7 @@ func (m *UpdateClientRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientIdentifier", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Client", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -9491,222 +7625,11 @@ func (m *UpdateClientRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.ClientIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Client.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Description = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Secret = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RedirectURI", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.RedirectURI = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 7:
-			if wireType == 0 {
-				var v GrantType
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= (GrantType(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.Grants = append(m.Grants, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= (int(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthIdentityserver
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				for iNdEx < postIndex {
-					var v GrantType
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowIdentityserver
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= (GrantType(b) & 0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Grants = append(m.Grants, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Grants", wireType)
-			}
-		case 8:
-			if wireType == 0 {
-				var v Right
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= (Right(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.Rights = append(m.Rights, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= (int(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthIdentityserver
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				for iNdEx < postIndex {
-					var v Right
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowIdentityserver
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= (Right(b) & 0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Rights = append(m.Rights, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
-			}
-		case 12:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdateMask", wireType)
 			}
@@ -9732,515 +7655,10 @@ func (m *UpdateClientRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.UpdateMask == nil {
-				m.UpdateMask = &google_protobuf5.FieldMask{}
-			}
 			if err := m.UpdateMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipIdentityserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SetClientOfficialRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowIdentityserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SetClientOfficialRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SetClientOfficialRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientIdentifier", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.ClientIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OfficialLabeled", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.OfficialLabeled = bool(v != 0)
-		default:
-			iNdEx = preIndex
-			skippy, err := skipIdentityserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SetClientStateRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowIdentityserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SetClientStateRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SetClientStateRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientIdentifier", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.ClientIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field State", wireType)
-			}
-			m.State = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.State |= (ClientState(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipIdentityserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SetClientCollaboratorRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowIdentityserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SetClientCollaboratorRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SetClientCollaboratorRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientIdentifier", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.ClientIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Collaborator", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.Collaborator.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipIdentityserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ListClientCollaboratorsResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowIdentityserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ListClientCollaboratorsResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListClientCollaboratorsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Collaborators", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowIdentityserver
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Collaborators = append(m.Collaborators, Collaborator{})
-			if err := m.Collaborators[len(m.Collaborators)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipIdentityserver(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthIdentityserver
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ListClientRightsResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowIdentityserver
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ListClientRightsResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListClientRightsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType == 0 {
-				var v Right
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= (Right(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.Rights = append(m.Rights, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= (int(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthIdentityserver
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				for iNdEx < postIndex {
-					var v Right
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowIdentityserver
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= (Right(b) & 0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Rights = append(m.Rights, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
-			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipIdentityserver(dAtA[iNdEx:])
@@ -10375,131 +7793,101 @@ func init() {
 }
 
 var fileDescriptorIdentityserver = []byte{
-	// 2001 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x19, 0x4d, 0x6c, 0xdb, 0xd6,
-	0x59, 0xcf, 0x96, 0x65, 0xea, 0x93, 0x2c, 0xd1, 0x2f, 0x8e, 0x4b, 0x2b, 0x0e, 0xad, 0x08, 0xcd,
-	0xea, 0x00, 0x9d, 0xdc, 0xba, 0xe8, 0x90, 0xfd, 0xb4, 0xa9, 0xed, 0x24, 0x82, 0xb4, 0xc4, 0xf1,
-	0xe8, 0x18, 0x45, 0x87, 0x15, 0x02, 0x2d, 0x3d, 0xc9, 0x84, 0x68, 0x52, 0x23, 0x9f, 0x6c, 0xe8,
-	0x56, 0x60, 0xc0, 0x50, 0x60, 0x97, 0x1d, 0x77, 0x5b, 0x81, 0x0d, 0x58, 0x8f, 0xc5, 0x50, 0x60,
-	0x3d, 0xf6, 0x18, 0xec, 0x94, 0x63, 0x0f, 0x5b, 0x50, 0x4b, 0x97, 0x1e, 0x86, 0xa1, 0xbb, 0xf5,
-	0x38, 0x90, 0x8f, 0x14, 0x7f, 0x44, 0xca, 0xf2, 0x66, 0x03, 0x39, 0xf4, 0x64, 0xf1, 0xbd, 0xef,
-	0xff, 0xf7, 0x7d, 0x9f, 0xe1, 0x6e, 0x5b, 0xa1, 0x47, 0xbd, 0xc3, 0x72, 0x43, 0x3f, 0xde, 0x78,
-	0x7a, 0x44, 0x9e, 0x1e, 0x29, 0x5a, 0xdb, 0xdc, 0x25, 0xf4, 0x54, 0x37, 0x3a, 0x1b, 0x94, 0x6a,
-	0x1b, 0x72, 0x57, 0xd9, 0x50, 0x9a, 0x44, 0xa3, 0x0a, 0xed, 0x9b, 0xc4, 0x38, 0x21, 0x46, 0xb9,
-	0x6b, 0xe8, 0x54, 0xc7, 0x29, 0x4a, 0xb5, 0xf2, 0xc9, 0x5b, 0x85, 0x1f, 0xfa, 0x28, 0xb4, 0xf5,
-	0xb6, 0xbe, 0x61, 0x5f, 0x1f, 0xf6, 0x5a, 0xf6, 0x97, 0xfd, 0x61, 0xff, 0x62, 0x68, 0x85, 0xb7,
-	0xa7, 0x61, 0x28, 0x77, 0xbb, 0xaa, 0xd2, 0x90, 0xa9, 0xa2, 0x6b, 0x0e, 0xda, 0x1b, 0xd3, 0xa0,
-	0x35, 0x54, 0x85, 0x68, 0xd4, 0xc1, 0xf8, 0xd1, 0x54, 0x18, 0xba, 0xaa, 0xca, 0x87, 0xba, 0x21,
-	0x53, 0xdd, 0xb8, 0x08, 0x27, 0x43, 0x69, 0x1f, 0x51, 0xf3, 0x22, 0x2a, 0x31, 0x1b, 0xb6, 0x14,
-	0x62, 0xb8, 0x68, 0x6f, 0x4e, 0x83, 0xd6, 0x96, 0x29, 0x39, 0x95, 0xfb, 0x0e, 0x4a, 0x79, 0x1a,
-	0x94, 0x9e, 0xe9, 0xfa, 0x68, 0x3a, 0x78, 0xb9, 0x47, 0x8f, 0x1c, 0xf8, 0x1b, 0x6d, 0x5d, 0x6f,
-	0xab, 0xc4, 0x73, 0x21, 0x39, 0xee, 0x52, 0x97, 0x79, 0x31, 0x7c, 0xd9, 0x52, 0x88, 0xda, 0xac,
-	0x1f, 0xcb, 0x66, 0x87, 0x41, 0x94, 0xfe, 0x8a, 0x60, 0x71, 0xc7, 0x20, 0x32, 0x25, 0x07, 0x26,
-	0x31, 0x24, 0xf2, 0xeb, 0x1e, 0x31, 0x29, 0xfe, 0x31, 0xcc, 0x5b, 0x22, 0xd5, 0x95, 0xa6, 0x80,
-	0x8a, 0x68, 0x3d, 0xb3, 0xb9, 0x5c, 0x66, 0xa1, 0x53, 0xb6, 0xa0, 0xaa, 0x23, 0xbb, 0x6c, 0x73,
-	0xcf, 0x5e, 0xac, 0x25, 0x9e, 0xbf, 0x58, 0x43, 0x52, 0xaa, 0x67, 0xdf, 0xe0, 0x25, 0x98, 0x23,
-	0xc7, 0xb2, 0xa2, 0x0a, 0x33, 0x45, 0xb4, 0x9e, 0x96, 0xd8, 0x07, 0x2e, 0x00, 0xd7, 0x95, 0x4d,
-	0xf3, 0x54, 0x37, 0x9a, 0xc2, 0xac, 0x7d, 0x31, 0xfa, 0xc6, 0x18, 0x92, 0x9a, 0x7c, 0x4c, 0x84,
-	0xa4, 0x7d, 0x6e, 0xff, 0xae, 0x25, 0xb9, 0x39, 0x3e, 0x55, 0x4b, 0x72, 0x29, 0x7e, 0xbe, 0x96,
-	0xe4, 0xe6, 0x79, 0xae, 0x96, 0xe4, 0x38, 0x3e, 0x5d, 0x4b, 0x72, 0x69, 0x1e, 0x4a, 0x7f, 0x46,
-	0xb0, 0x78, 0xd0, 0x6d, 0x86, 0x84, 0x8e, 0xe6, 0x1c, 0x41, 0x1d, 0xff, 0x14, 0x32, 0x3d, 0x1b,
-	0xdd, 0xb6, 0x84, 0x00, 0xb6, 0x8a, 0x85, 0x32, 0x33, 0x56, 0xd9, 0x35, 0x56, 0xf9, 0xa1, 0x65,
-	0xac, 0xc7, 0xb2, 0xd9, 0x91, 0x80, 0x81, 0x5b, 0xbf, 0x6b, 0x49, 0x0e, 0xf1, 0x33, 0xb5, 0x24,
-	0x37, 0xcb, 0x27, 0xcf, 0x11, 0xf3, 0x1e, 0xac, 0x78, 0x52, 0xee, 0x39, 0xea, 0xba, 0xd2, 0xf2,
-	0x30, 0xab, 0xab, 0xcc, 0xbc, 0x69, 0xc9, 0xfa, 0x69, 0x9d, 0x68, 0xe4, 0xd4, 0x91, 0xde, 0xfa,
-	0x69, 0xe9, 0x29, 0x30, 0xe7, 0x6c, 0x79, 0xd9, 0xe5, 0x12, 0xd8, 0x85, 0x9c, 0x2f, 0xe7, 0x3c,
-	0x57, 0xdd, 0x74, 0x5d, 0xe5, 0xc3, 0x89, 0xf4, 0xd8, 0x82, 0xec, 0x07, 0xc0, 0x45, 0xc8, 0x34,
-	0x89, 0xd9, 0x30, 0x94, 0xae, 0x75, 0xe0, 0x88, 0xe1, 0x3f, 0x1a, 0xe9, 0x9c, 0xe4, 0xe7, 0xfc,
-	0x9a, 0x97, 0x3e, 0x00, 0xe1, 0x91, 0x62, 0x52, 0x1f, 0x3f, 0x53, 0x22, 0x66, 0x57, 0xd7, 0x4c,
-	0x82, 0xdf, 0x81, 0xac, 0x8f, 0x8d, 0x29, 0xa0, 0xe2, 0xec, 0x7a, 0x66, 0xf3, 0x5a, 0x84, 0x8c,
-	0xdb, 0x49, 0x4b, 0x32, 0x29, 0x00, 0x5e, 0x3a, 0x43, 0x20, 0x30, 0x1b, 0xbe, 0x0c, 0x16, 0x08,
-	0x07, 0xce, 0xfc, 0x05, 0x03, 0x27, 0xda, 0x7c, 0x9f, 0x23, 0x28, 0x56, 0x88, 0x46, 0x8c, 0xa0,
-	0x96, 0x5b, 0x7b, 0xd5, 0x9f, 0x93, 0xfe, 0x55, 0xe9, 0xba, 0x02, 0x5c, 0x87, 0xf4, 0xeb, 0x76,
-	0x6a, 0x30, 0x45, 0xe7, 0x3b, 0xa4, 0xbf, 0x6b, 0x65, 0xc7, 0x6d, 0x48, 0xb1, 0x5a, 0x29, 0xcc,
-	0x16, 0x67, 0xd7, 0x73, 0x9b, 0x0b, 0x2e, 0x0b, 0xc9, 0x3a, 0x95, 0x9c, 0xcb, 0xd2, 0xef, 0x10,
-	0x88, 0x12, 0x39, 0xd6, 0x4f, 0x5e, 0x06, 0xa1, 0x4b, 0x7f, 0x43, 0x70, 0x6b, 0x9f, 0xf8, 0x63,
-	0x70, 0xc7, 0xd7, 0x27, 0xae, 0x4a, 0xa0, 0x6d, 0xc8, 0xfa, 0xdb, 0x91, 0x2d, 0x54, 0x66, 0x73,
-	0xc9, 0xa5, 0xe6, 0x17, 0xc1, 0x47, 0x24, 0x80, 0x53, 0x3a, 0x82, 0x57, 0x43, 0xd9, 0xe3, 0x47,
-	0xf3, 0x32, 0xe9, 0x3d, 0x58, 0xf0, 0xe3, 0xb9, 0xa9, 0x14, 0xcd, 0x8c, 0xe5, 0x52, 0x10, 0xa1,
-	0xf4, 0x10, 0x6e, 0x86, 0x38, 0xd9, 0x1e, 0xf5, 0x58, 0x4c, 0xe9, 0xf9, 0x4f, 0xe6, 0x60, 0x89,
-	0x95, 0xa5, 0x0a, 0x6b, 0x75, 0xae, 0x79, 0xb7, 0x01, 0x9c, 0xe6, 0xe7, 0x99, 0x76, 0xc5, 0xa5,
-	0xe1, 0xc0, 0x46, 0x9a, 0x35, 0xdd, 0x76, 0x2f, 0xa7, 0x48, 0xc2, 0x7b, 0xb0, 0xd8, 0x32, 0x2c,
-	0x8e, 0x5a, 0xa3, 0x5f, 0xef, 0xaa, 0xb2, 0xed, 0x47, 0xbb, 0xbc, 0x6f, 0x5f, 0x1b, 0xbc, 0x58,
-	0xcb, 0x3f, 0x74, 0x2f, 0xf7, 0x54, 0x59, 0xab, 0xde, 0x97, 0xf2, 0xad, 0xc0, 0x41, 0x13, 0x3f,
-	0x01, 0xbe, 0x6b, 0x28, 0x27, 0x72, 0xa3, 0x5f, 0x37, 0x09, 0xa5, 0x56, 0x83, 0x15, 0x52, 0xb6,
-	0xb0, 0x62, 0x48, 0xd8, 0x3d, 0x06, 0xb6, 0xef, 0x40, 0x39, 0x66, 0xcd, 0x77, 0x83, 0xc7, 0x78,
-	0x0d, 0x32, 0x72, 0x8f, 0xea, 0x75, 0x96, 0xec, 0x76, 0x59, 0xe0, 0x24, 0xb0, 0x8e, 0x58, 0xed,
-	0xb2, 0xdb, 0x9f, 0x2a, 0xd3, 0x96, 0x6e, 0x1c, 0x0b, 0x9c, 0xd3, 0xfe, 0x9c, 0x6f, 0x7c, 0x17,
-	0x38, 0x59, 0xa3, 0x44, 0xd3, 0x64, 0x53, 0x48, 0xdb, 0x2e, 0x5d, 0x0e, 0x49, 0xb1, 0xc5, 0xae,
-	0x1d, 0xee, 0x23, 0x68, 0xfc, 0x08, 0x40, 0xa6, 0xd4, 0x50, 0x0e, 0x7b, 0x94, 0x98, 0x02, 0xd8,
-	0xb8, 0xaf, 0x8f, 0xc2, 0x21, 0xc2, 0x41, 0xe5, 0xad, 0x11, 0xf8, 0x03, 0x8d, 0x1a, 0x7d, 0xc9,
-	0x87, 0x8f, 0x5f, 0x83, 0x7c, 0x43, 0xed, 0x99, 0x94, 0x18, 0x75, 0xb9, 0xd9, 0x34, 0x88, 0x69,
-	0x0a, 0x19, 0x5b, 0xd4, 0x9c, 0x73, 0xbc, 0xc5, 0x4e, 0xf1, 0x03, 0xc8, 0x37, 0x74, 0x8d, 0xca,
-	0x0d, 0x5a, 0x97, 0x1b, 0x0d, 0xbd, 0xa7, 0x51, 0x21, 0x3b, 0xf1, 0x91, 0xc0, 0xe4, 0xce, 0x39,
-	0x48, 0x5b, 0x0c, 0xa7, 0xf0, 0x0e, 0xe4, 0x43, 0xe2, 0x58, 0x1d, 0xb0, 0x43, 0xfa, 0x6e, 0x4f,
-	0xec, 0x90, 0xbe, 0xd5, 0xd3, 0x4f, 0x64, 0xb5, 0xe7, 0xa6, 0x3b, 0xfb, 0xf8, 0xc9, 0xcc, 0x5d,
-	0x14, 0x6a, 0xc0, 0x0b, 0x7c, 0xae, 0x96, 0xe4, 0x72, 0x7c, 0xbe, 0x96, 0xe4, 0xf2, 0x3c, 0x5f,
-	0xaa, 0xc2, 0x92, 0x15, 0xea, 0x8e, 0xfa, 0x5e, 0x84, 0xbf, 0x09, 0x9c, 0x13, 0x6a, 0x6e, 0xfe,
-	0xe4, 0x43, 0xc6, 0x76, 0xad, 0xec, 0x82, 0x95, 0xfe, 0x39, 0x07, 0x4b, 0xcc, 0x8d, 0xdf, 0x47,
-	0xfb, 0x4b, 0x1b, 0xed, 0x51, 0x0e, 0x7a, 0x99, 0xa2, 0x3d, 0xfc, 0x72, 0xe0, 0x2f, 0xf2, 0x72,
-	0xb8, 0xda, 0x54, 0xf9, 0x0b, 0x82, 0x9b, 0xfb, 0xc4, 0x4d, 0x95, 0xa8, 0xae, 0x79, 0x19, 0x81,
-	0x7e, 0x19, 0x9d, 0xb2, 0x09, 0x45, 0x5f, 0x52, 0x5f, 0x55, 0x97, 0xfc, 0x10, 0x56, 0x7c, 0x5c,
-	0x9e, 0x9c, 0x6a, 0xe4, 0x52, 0xc9, 0x6f, 0x07, 0xc8, 0xc7, 0x36, 0x60, 0x34, 0xa9, 0x01, 0x7f,
-	0x3e, 0x03, 0xd7, 0x58, 0x7d, 0xdf, 0xb1, 0xc7, 0x67, 0xd7, 0x51, 0xf7, 0x20, 0xcd, 0xe6, 0x69,
-	0xcf, 0x4f, 0xc2, 0x48, 0x32, 0xfb, 0x22, 0xd2, 0x4d, 0x5c, 0xc3, 0xb9, 0x9b, 0xa2, 0x1c, 0x2d,
-	0x43, 0xca, 0x24, 0x0d, 0x83, 0x50, 0x67, 0x8c, 0x73, 0xbe, 0xf0, 0x26, 0x64, 0x0d, 0xd2, 0x54,
-	0x0c, 0xd2, 0xa0, 0xf5, 0x9e, 0xa1, 0x38, 0x15, 0x2a, 0x3f, 0x78, 0xb1, 0x96, 0x91, 0x9c, 0xf3,
-	0x03, 0xa9, 0x2a, 0x65, 0x5c, 0xa0, 0x03, 0x43, 0xc1, 0x77, 0x20, 0xd5, 0x36, 0x64, 0x8d, 0x9a,
-	0xc2, 0xbc, 0xad, 0xed, 0xe2, 0x28, 0xa6, 0xac, 0xd3, 0xa7, 0xfd, 0x2e, 0x91, 0x1c, 0x00, 0x9f,
-	0x61, 0xb8, 0x09, 0x86, 0x09, 0xcd, 0x63, 0x69, 0x1e, 0x6a, 0x49, 0x0e, 0xf8, 0x4c, 0x2d, 0xc9,
-	0x65, 0xf8, 0x6c, 0xe9, 0x01, 0x5c, 0xb3, 0x4c, 0xcf, 0x2c, 0xe1, 0x19, 0xbd, 0x0c, 0xf3, 0xcc,
-	0x00, 0xae, 0x37, 0x73, 0x41, 0x9b, 0x39, 0x7e, 0x74, 0x81, 0x4a, 0xff, 0x99, 0x81, 0x6b, 0xac,
-	0xde, 0x7c, 0x6f, 0x7d, 0xbf, 0xf5, 0xc3, 0x35, 0x2e, 0x7b, 0xc1, 0xe9, 0x68, 0x92, 0xeb, 0x7e,
-	0x8b, 0x40, 0xd8, 0x27, 0x8e, 0xeb, 0x9e, 0xb4, 0x5a, 0x4a, 0x43, 0x91, 0xd5, 0x4b, 0x33, 0xfc,
-	0x1d, 0xe0, 0x75, 0x87, 0x66, 0x5d, 0x95, 0x0f, 0x89, 0x4a, 0x9a, 0xb6, 0xf5, 0x39, 0x29, 0xef,
-	0x9e, 0x3f, 0x62, 0xc7, 0xa5, 0xdf, 0x20, 0xb8, 0x3e, 0x12, 0x64, 0x9f, 0xca, 0x94, 0x5c, 0xa2,
-	0x14, 0x73, 0xa6, 0x45, 0xd0, 0x66, 0x9d, 0xf3, 0x66, 0x64, 0x3f, 0x2f, 0x06, 0x51, 0xfa, 0x13,
-	0x82, 0xd5, 0x91, 0x14, 0x51, 0x25, 0xfb, 0xff, 0x16, 0xe6, 0x32, 0xea, 0x75, 0x03, 0xd6, 0xbc,
-	0x7c, 0xbb, 0xaa, 0x72, 0xbd, 0xc5, 0x96, 0x0f, 0x4e, 0x2a, 0xfe, 0x2f, 0xe5, 0x74, 0xf3, 0x7d,
-	0x98, 0xab, 0xd0, 0xd3, 0x8a, 0x81, 0x77, 0x61, 0x71, 0xaf, 0xa7, 0xaa, 0x3b, 0xba, 0xd6, 0x52,
-	0xda, 0x3d, 0xc3, 0x1e, 0x91, 0x70, 0x7c, 0xa7, 0x2b, 0xac, 0x86, 0xae, 0x02, 0x88, 0x6f, 0xa0,
-	0xcd, 0xbf, 0xcf, 0x40, 0xaa, 0x6a, 0x5a, 0xef, 0x03, 0x7c, 0x0f, 0xc0, 0x5b, 0xb3, 0x79, 0x34,
-	0xc7, 0x56, 0x6f, 0x85, 0xe5, 0xb1, 0x7c, 0x79, 0x70, 0xdc, 0xa5, 0x7d, 0xbc, 0x01, 0xf3, 0x15,
-	0x42, 0x6d, 0xec, 0x98, 0x97, 0x47, 0x21, 0xeb, 0x3f, 0xb7, 0x38, 0x7a, 0xdb, 0x27, 0x8f, 0xe3,
-	0xd8, 0xde, 0x2c, 0x96, 0xe3, 0x13, 0xc0, 0xe3, 0xeb, 0x2b, 0x7c, 0x6b, 0x9c, 0x50, 0x68, 0xb5,
-	0x15, 0x4b, 0xf0, 0x67, 0x00, 0xf7, 0x89, 0x4a, 0x1c, 0x89, 0x62, 0xa0, 0xe2, 0xb0, 0x37, 0xff,
-	0x95, 0x82, 0x85, 0xaa, 0xe9, 0x1b, 0x5e, 0xf1, 0x63, 0x77, 0x75, 0xe9, 0x3f, 0x2c, 0x06, 0x4d,
-	0x3b, 0xbe, 0x36, 0x8a, 0x15, 0xef, 0x3e, 0xe4, 0x2a, 0x81, 0x0d, 0x02, 0x9e, 0xbc, 0x16, 0x28,
-	0x44, 0x6d, 0xb1, 0xf0, 0x23, 0xe0, 0xc3, 0xcb, 0xb0, 0x58, 0x55, 0x47, 0xb2, 0xc6, 0xae, 0xcf,
-	0x1e, 0xbb, 0x8b, 0xce, 0x48, 0x15, 0xe3, 0x36, 0x63, 0xb1, 0x2a, 0xd6, 0x60, 0x91, 0x79, 0xe0,
-	0x02, 0x5a, 0xc6, 0xd1, 0x3a, 0x80, 0x95, 0xd8, 0xad, 0x15, 0x5e, 0x1f, 0x65, 0xc6, 0x39, 0x8b,
-	0xad, 0xc2, 0xa8, 0xd9, 0x3a, 0x98, 0x1f, 0xc0, 0x2b, 0x31, 0x5b, 0x25, 0xfc, 0x83, 0x51, 0xfa,
-	0x4e, 0x5c, 0x3b, 0xc5, 0x4a, 0x5c, 0x87, 0x42, 0xfc, 0x8a, 0x08, 0xdf, 0x71, 0xa9, 0x9f, 0xbb,
-	0x46, 0x8a, 0x65, 0xd0, 0x81, 0xd5, 0x49, 0xab, 0x9c, 0xf3, 0x2c, 0xfd, 0x7a, 0x4c, 0x38, 0x44,
-	0x97, 0xce, 0x0f, 0xe1, 0x7a, 0xe4, 0x36, 0xe7, 0x3c, 0x2e, 0xb7, 0x63, 0xb8, 0x04, 0x6b, 0xe7,
-	0xe6, 0x3f, 0x92, 0x90, 0xae, 0x9a, 0x4e, 0x61, 0xc3, 0xef, 0xc2, 0x42, 0x60, 0xa1, 0x80, 0x57,
-	0x27, 0xed, 0x19, 0x0a, 0xe1, 0xa1, 0x1a, 0xdf, 0x05, 0xa8, 0x8c, 0x66, 0x8c, 0x49, 0x25, 0x75,
-	0x0c, 0xf3, 0x3e, 0x64, 0xfd, 0x93, 0x7c, 0x6c, 0x2e, 0xad, 0xfa, 0xd5, 0x1a, 0x9b, 0xfb, 0xdf,
-	0x85, 0x85, 0xc0, 0x88, 0xe8, 0xc9, 0x1f, 0x35, 0x39, 0x8e, 0x4b, 0xb1, 0x0d, 0x0b, 0x2c, 0x71,
-	0xa6, 0x50, 0x21, 0x2e, 0x3a, 0xde, 0x87, 0xe5, 0xe8, 0x39, 0x0b, 0xdf, 0xf6, 0x85, 0x5e, 0xfc,
-	0x1c, 0x36, 0x21, 0xae, 0x85, 0xb8, 0xb9, 0x68, 0x92, 0x9c, 0xeb, 0x11, 0x16, 0x8b, 0x0e, 0xb5,
-	0x5f, 0xc0, 0xe2, 0xd8, 0xcc, 0x32, 0x89, 0xf2, 0xad, 0x08, 0xca, 0xa1, 0xf0, 0xfa, 0xf7, 0x1c,
-	0x70, 0x55, 0x93, 0x75, 0x6d, 0xbc, 0x03, 0x59, 0xff, 0x38, 0x83, 0x6f, 0x04, 0x83, 0x2b, 0xf0,
-	0xcc, 0x8e, 0xb5, 0xc2, 0xdb, 0x90, 0xae, 0xb8, 0x4f, 0x22, 0x1c, 0xfb, 0xd8, 0x29, 0x84, 0x1e,
-	0xf7, 0x78, 0x1b, 0x32, 0xbe, 0xa1, 0x20, 0x36, 0xbc, 0x6e, 0xf8, 0x55, 0x0a, 0x4f, 0x10, 0x3b,
-	0x90, 0xf5, 0x0f, 0x04, 0x9e, 0xfc, 0x11, 0x63, 0x42, 0xac, 0xfc, 0xef, 0x41, 0x96, 0x85, 0xd8,
-	0xb9, 0x2a, 0xc4, 0x51, 0x78, 0x0c, 0x8b, 0x63, 0x6f, 0x64, 0xaf, 0x59, 0xc4, 0x3d, 0x9f, 0x63,
-	0xc9, 0x55, 0x20, 0x17, 0x7c, 0xe9, 0x7a, 0x95, 0x25, 0xf2, 0x05, 0x3c, 0xa1, 0x53, 0x5c, 0x8f,
-	0x7c, 0xac, 0xe2, 0x57, 0xc7, 0xe8, 0x5d, 0x24, 0xec, 0x7f, 0x05, 0xaf, 0xc4, 0x3c, 0x2f, 0x27,
-	0xd8, 0xee, 0xb5, 0x71, 0x3f, 0x46, 0xc7, 0xfc, 0x2e, 0xeb, 0xe3, 0xfe, 0x77, 0xe5, 0x04, 0xb2,
-	0xc5, 0x71, 0xb2, 0xc1, 0x80, 0xdf, 0xfe, 0x23, 0x7a, 0x76, 0x26, 0xa2, 0xe7, 0x67, 0x22, 0xfa,
-	0xea, 0x4c, 0x44, 0x5f, 0x9f, 0x89, 0xe8, 0x9b, 0x33, 0x31, 0xf1, 0xed, 0x99, 0x98, 0xf8, 0xee,
-	0x4c, 0x44, 0x1f, 0x0d, 0xc4, 0xc4, 0xc7, 0x03, 0x31, 0xf1, 0xe9, 0x40, 0x44, 0x9f, 0x0d, 0xc4,
-	0xc4, 0x17, 0x03, 0x11, 0x7d, 0x39, 0x10, 0xd1, 0xb3, 0x81, 0x88, 0x9e, 0x0f, 0x44, 0xf4, 0xd5,
-	0x40, 0x4c, 0x7c, 0x3d, 0x10, 0xd1, 0x37, 0x03, 0x31, 0xf1, 0xed, 0x40, 0x44, 0xdf, 0x0d, 0xc4,
-	0xc4, 0x47, 0x43, 0x31, 0xf1, 0xf1, 0x50, 0x44, 0xbf, 0x1f, 0x8a, 0x89, 0x3f, 0x0c, 0x45, 0xf4,
-	0xc9, 0x50, 0x4c, 0x7c, 0x3a, 0x14, 0x13, 0x9f, 0x0d, 0x45, 0xf4, 0xc5, 0x50, 0x44, 0x5f, 0x0e,
-	0x45, 0xf4, 0xcb, 0x3b, 0xe7, 0xfd, 0x3b, 0xb9, 0xdb, 0x69, 0x5b, 0x7f, 0xbb, 0x87, 0x87, 0x29,
-	0xdb, 0xbe, 0x6f, 0xfd, 0x37, 0x00, 0x00, 0xff, 0xff, 0x3b, 0x7e, 0xc0, 0x8a, 0x60, 0x20, 0x00,
-	0x00,
+	// 1534 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x58, 0x4d, 0x6c, 0x13, 0xc7,
+	0x17, 0xf7, 0x10, 0x30, 0xe4, 0xc5, 0x0e, 0xc9, 0x24, 0x04, 0x63, 0xc2, 0x60, 0x56, 0x80, 0x82,
+	0xc4, 0xdf, 0x01, 0x23, 0xfe, 0xa5, 0x9f, 0x80, 0x4d, 0x64, 0x99, 0xf2, 0x69, 0xbe, 0x44, 0x2f,
+	0xd1, 0x06, 0x4f, 0x9c, 0x95, 0x1d, 0xaf, 0xbb, 0xbb, 0x4e, 0x94, 0x1e, 0x2a, 0xd4, 0x5e, 0x90,
+	0xda, 0x43, 0x6f, 0xed, 0xa5, 0x6a, 0x6f, 0xe5, 0x52, 0x89, 0x5b, 0x39, 0x22, 0xf5, 0xc2, 0x91,
+	0xaa, 0x17, 0x4e, 0x08, 0xdb, 0x17, 0x8e, 0x1c, 0x39, 0x56, 0xbb, 0x33, 0xe3, 0x9d, 0xb5, 0x77,
+	0x1c, 0x87, 0x24, 0x9c, 0xb2, 0xde, 0x7d, 0x1f, 0xbf, 0xf7, 0xe6, 0xbd, 0x37, 0xbf, 0x17, 0x38,
+	0x57, 0x36, 0x9c, 0xa5, 0xc6, 0x42, 0xfa, 0x81, 0xb9, 0x3c, 0x7b, 0x7b, 0x89, 0xde, 0x5e, 0x32,
+	0x6a, 0x65, 0xfb, 0x1a, 0x75, 0x56, 0x4d, 0xab, 0x32, 0xeb, 0x38, 0xb5, 0x59, 0xbd, 0x6e, 0xcc,
+	0x1a, 0x25, 0x5a, 0x73, 0x0c, 0x67, 0xcd, 0xa6, 0xd6, 0x0a, 0xb5, 0xd2, 0x75, 0xcb, 0x74, 0x4c,
+	0x1c, 0x75, 0x9c, 0x5a, 0x7a, 0xe5, 0x4c, 0xf2, 0x7f, 0x92, 0x85, 0xb2, 0x59, 0x36, 0x67, 0xbd,
+	0xcf, 0x0b, 0x8d, 0x45, 0xef, 0x97, 0xf7, 0xc3, 0x7b, 0x62, 0x6a, 0xc9, 0xb3, 0x83, 0x38, 0xd4,
+	0xeb, 0xf5, 0xaa, 0xf1, 0x40, 0x77, 0x0c, 0xb3, 0xc6, 0xd5, 0x4e, 0x0d, 0xa2, 0xf6, 0xa0, 0x6a,
+	0xd0, 0x9a, 0xc3, 0x35, 0xfe, 0x3f, 0x90, 0x86, 0x59, 0xad, 0xea, 0x0b, 0xa6, 0xa5, 0x3b, 0xa6,
+	0xb5, 0x11, 0x4f, 0x96, 0x51, 0x5e, 0x72, 0xec, 0x8d, 0x84, 0xc4, 0x72, 0xb8, 0x68, 0x50, 0x4b,
+	0xa8, 0x9d, 0x1e, 0x44, 0xad, 0xac, 0x3b, 0x74, 0x55, 0x5f, 0xe3, 0x2a, 0xe9, 0x41, 0x54, 0x1a,
+	0xb6, 0x38, 0xa3, 0xe4, 0xc1, 0xb2, 0x69, 0x96, 0xab, 0xd4, 0x3f, 0x12, 0xba, 0x5c, 0x77, 0xb8,
+	0x31, 0x6d, 0x11, 0xc6, 0x73, 0x16, 0xd5, 0x1d, 0x7a, 0xc7, 0xa6, 0x56, 0x91, 0x7e, 0xdd, 0xa0,
+	0xb6, 0x83, 0x8f, 0xc3, 0x4e, 0x57, 0x3f, 0x81, 0x52, 0x68, 0x66, 0x24, 0x13, 0x4b, 0xb3, 0x43,
+	0x4e, 0xbb, 0x22, 0xd9, 0x9d, 0xcf, 0x5f, 0x1d, 0x8e, 0x14, 0xbd, 0xef, 0xf8, 0x04, 0x8c, 0x19,
+	0xb5, 0x15, 0xc3, 0xf1, 0xce, 0x68, 0xde, 0x31, 0x2b, 0xb4, 0x96, 0xd8, 0x91, 0x42, 0x33, 0xc3,
+	0xc5, 0xbd, 0xfe, 0xfb, 0xdb, 0xee, 0x6b, 0xcd, 0x81, 0xf1, 0x3b, 0xf5, 0xd2, 0x7b, 0xfa, 0xf9,
+	0x08, 0x46, 0x1a, 0x9e, 0xf2, 0xfc, 0xb2, 0x6e, 0x57, 0x3c, 0x17, 0x23, 0x99, 0x31, 0x59, 0xfc,
+	0xaa, 0x6e, 0x57, 0xb8, 0x0a, 0x30, 0x51, 0xf7, 0x8d, 0x76, 0x1e, 0x0e, 0xf8, 0x5e, 0x6f, 0xe8,
+	0xb6, 0xbd, 0x6a, 0x5a, 0x25, 0xe1, 0x7d, 0x0c, 0x86, 0xcc, 0x6a, 0xc9, 0x73, 0x3e, 0x5c, 0x74,
+	0x1f, 0xdd, 0x37, 0x35, 0xba, 0xca, 0x43, 0x70, 0x1f, 0xb5, 0x53, 0x90, 0xb8, 0xab, 0x57, 0x0d,
+	0x61, 0x62, 0x6e, 0x59, 0x37, 0xaa, 0x42, 0x7f, 0x12, 0x76, 0xb1, 0x90, 0x99, 0x05, 0xf6, 0x43,
+	0xbb, 0x0e, 0x87, 0xae, 0x18, 0xb6, 0x73, 0xb1, 0xe1, 0x2c, 0x99, 0x96, 0xf1, 0x0d, 0x2d, 0xe5,
+	0xbc, 0x7a, 0xb4, 0x8b, 0xd4, 0xae, 0x9b, 0x35, 0x9b, 0xe2, 0x34, 0xec, 0x66, 0x25, 0x6a, 0x27,
+	0x50, 0x6a, 0x68, 0x66, 0x24, 0x33, 0x2a, 0x02, 0x61, 0x92, 0x3c, 0x0c, 0x21, 0xa4, 0xdd, 0x83,
+	0x04, 0x3b, 0xa1, 0x8b, 0x7e, 0x3f, 0x08, 0x08, 0x9f, 0xc2, 0x88, 0xd4, 0x25, 0x3c, 0x8f, 0x13,
+	0xc2, 0x9e, 0xa4, 0xc0, 0x8d, 0xca, 0xd2, 0xda, 0x7d, 0x48, 0x78, 0x48, 0xfd, 0x57, 0x3e, 0xc8,
+	0xcf, 0x21, 0x26, 0x89, 0x0a, 0xa4, 0x7d, 0x2c, 0x07, 0xc4, 0xb5, 0x9f, 0x11, 0x24, 0x58, 0xe2,
+	0xb7, 0x18, 0x34, 0xfe, 0x22, 0xac, 0x14, 0xf6, 0x87, 0x28, 0x2b, 0x2a, 0xe2, 0x4f, 0x04, 0xa9,
+	0x3c, 0xad, 0x51, 0x2b, 0x88, 0xed, 0xe2, 0x8d, 0xc2, 0x97, 0x74, 0x4d, 0x20, 0xbc, 0x06, 0xa3,
+	0x92, 0xcf, 0x79, 0xa3, 0xc4, 0x41, 0x1e, 0x0a, 0xf1, 0x53, 0xe8, 0xb4, 0x74, 0x76, 0x8f, 0xeb,
+	0xed, 0xc5, 0xab, 0xc3, 0xa8, 0x18, 0xd7, 0x65, 0x01, 0x8c, 0x61, 0x67, 0x4d, 0x5f, 0xa6, 0xbc,
+	0xb0, 0xbc, 0x67, 0x7c, 0x0c, 0xa2, 0x6c, 0x7e, 0x24, 0x86, 0x52, 0x43, 0x33, 0xa3, 0x99, 0xb8,
+	0xb0, 0x5d, 0x74, 0xdf, 0x16, 0xf9, 0x47, 0xed, 0x5f, 0x04, 0xa4, 0x27, 0x93, 0xdb, 0x8b, 0xf6,
+	0x38, 0x0c, 0x55, 0xe8, 0x1a, 0x4f, 0x6d, 0xa7, 0x38, 0x99, 0x4f, 0x9e, 0x51, 0x57, 0x00, 0x7f,
+	0x1c, 0x3c, 0x8a, 0x21, 0x4f, 0x1e, 0x07, 0xe5, 0x15, 0xa7, 0xf0, 0x1d, 0x02, 0x52, 0xa4, 0xcb,
+	0xe6, 0xca, 0x87, 0x8b, 0x6a, 0xcc, 0x8f, 0x6a, 0xd8, 0xc3, 0xaf, 0xfd, 0x85, 0xe0, 0xc8, 0x2d,
+	0x2a, 0xd7, 0x7f, 0x4e, 0xba, 0x08, 0xb6, 0x0b, 0x47, 0x16, 0x62, 0xf2, 0x7d, 0xc3, 0xd3, 0x3c,
+	0xd9, 0x99, 0x01, 0xd2, 0x37, 0xc9, 0x48, 0x40, 0x47, 0x5b, 0x82, 0xa3, 0x5d, 0x9d, 0x2b, 0xab,
+	0xf9, 0x5d, 0x7c, 0x01, 0xe2, 0xb2, 0x9e, 0x68, 0xe3, 0x70, 0x67, 0xec, 0x94, 0x82, 0x0a, 0x5a,
+	0x1e, 0x26, 0xd9, 0xf0, 0xc9, 0xb3, 0x2b, 0x48, 0x64, 0x65, 0x16, 0x76, 0xf3, 0x4b, 0x89, 0xa7,
+	0x63, 0xaf, 0xb0, 0xc9, 0x05, 0xc5, 0x14, 0xe3, 0x52, 0x5a, 0x01, 0x26, 0x5d, 0xc8, 0xfc, 0xab,
+	0x0f, 0xf1, 0x34, 0xec, 0xe1, 0x22, 0x02, 0x9d, 0xc2, 0x52, 0x47, 0x4c, 0xfb, 0x1e, 0xc1, 0x24,
+	0x6b, 0x89, 0x4d, 0x82, 0xc2, 0x9f, 0x84, 0x0d, 0x93, 0x89, 0x2e, 0x25, 0x45, 0x09, 0xff, 0x8a,
+	0x60, 0x5a, 0x0c, 0x12, 0x2e, 0x19, 0x2c, 0xe0, 0x2c, 0x00, 0xf7, 0xe3, 0x17, 0xcd, 0x81, 0x2e,
+	0xdb, 0xa1, 0x05, 0x33, 0x5c, 0x16, 0x1f, 0x37, 0x33, 0x38, 0xfe, 0x46, 0x90, 0x0c, 0x64, 0x69,
+	0xeb, 0xd1, 0x7d, 0x80, 0x41, 0x61, 0x41, 0x92, 0xcd, 0x89, 0x6d, 0x0b, 0xa2, 0x77, 0x2e, 0xfc,
+	0x81, 0xe0, 0xd0, 0x2d, 0x2a, 0x4a, 0x35, 0x6c, 0x26, 0x6c, 0x85, 0xdf, 0xad, 0x98, 0x03, 0x25,
+	0x48, 0x49, 0x4d, 0xb5, 0x5d, 0x33, 0x20, 0x07, 0x13, 0x6c, 0x06, 0x30, 0x7e, 0x22, 0x92, 0x70,
+	0x12, 0xa2, 0x8c, 0xa2, 0xf0, 0x04, 0x84, 0xd3, 0x18, 0x2e, 0xa3, 0xcd, 0xc1, 0x84, 0x0b, 0x75,
+	0xb3, 0x64, 0xe8, 0x5b, 0x98, 0x60, 0x45, 0xbd, 0x09, 0x2c, 0xdd, 0xf5, 0xb8, 0x23, 0x58, 0x8f,
+	0x4c, 0x25, 0xbc, 0x1e, 0x33, 0xf7, 0x60, 0x57, 0xde, 0x59, 0xcd, 0x5b, 0xf8, 0x1a, 0x8c, 0xdf,
+	0x68, 0x54, 0xab, 0x39, 0xb3, 0xb6, 0x68, 0x94, 0x1b, 0x16, 0x23, 0x27, 0xea, 0x1a, 0x48, 0x4e,
+	0x77, 0x7d, 0x0a, 0x28, 0x9e, 0x42, 0x99, 0x1f, 0x76, 0x41, 0xb4, 0x60, 0xbb, 0x1c, 0x13, 0x9f,
+	0x07, 0xf0, 0x29, 0xb9, 0x6f, 0xb3, 0x87, 0xa6, 0x27, 0xa7, 0xd2, 0x8c, 0xd9, 0xa7, 0x05, 0xb3,
+	0x4f, 0xcf, 0xb9, 0xcc, 0xde, 0x9d, 0x83, 0x79, 0xea, 0x78, 0xda, 0x53, 0x32, 0x49, 0x96, 0xe0,
+	0x04, 0xb8, 0xb6, 0xeb, 0xd1, 0xa7, 0xc9, 0xbe, 0xc7, 0x1e, 0xc2, 0xae, 0xf4, 0x78, 0x1d, 0x70,
+	0x2f, 0xcf, 0xc6, 0x47, 0x7a, 0x0d, 0x75, 0x71, 0x70, 0xa5, 0xc1, 0xcf, 0x00, 0x2e, 0xd1, 0x2a,
+	0xe5, 0x88, 0x14, 0x52, 0x4a, 0xed, 0xab, 0x30, 0xde, 0xc3, 0xda, 0x71, 0x4a, 0xa0, 0x51, 0x11,
+	0x7a, 0xa5, 0xb9, 0x2b, 0xee, 0x10, 0xf2, 0x44, 0x3a, 0x2a, 0xdc, 0x86, 0x7b, 0xe8, 0x1b, 0x05,
+	0x77, 0x17, 0xf6, 0x85, 0x2e, 0x08, 0x4a, 0x43, 0xc7, 0x04, 0xf0, 0xfe, 0x7b, 0xc5, 0x65, 0x98,
+	0x2a, 0xd2, 0x15, 0xb3, 0x42, 0xbb, 0x45, 0x70, 0x22, 0x58, 0xda, 0x52, 0x19, 0x28, 0x5c, 0x66,
+	0xde, 0x44, 0x21, 0x5e, 0xb0, 0x25, 0x7e, 0xe1, 0xa6, 0xb4, 0x67, 0x0b, 0xf1, 0x53, 0xaa, 0x5a,
+	0x50, 0x94, 0x49, 0xb8, 0x04, 0xa3, 0xf9, 0x00, 0xf5, 0xc2, 0xfd, 0xf9, 0x54, 0x32, 0x6c, 0x3f,
+	0xc0, 0x57, 0x60, 0xac, 0x7b, 0x83, 0x51, 0x66, 0x31, 0x15, 0xc8, 0x62, 0xd8, 0xce, 0x73, 0x55,
+	0xac, 0xa8, 0xa1, 0x21, 0xaa, 0xd6, 0x19, 0x65, 0x88, 0x97, 0x61, 0x9c, 0x95, 0xf0, 0x06, 0xa2,
+	0x54, 0xd9, 0xba, 0x03, 0x07, 0x94, 0x4b, 0x0b, 0x9e, 0xe9, 0x8c, 0x96, 0x75, 0xf6, 0x9a, 0x64,
+	0xd7, 0x1d, 0x8d, 0xef, 0xc3, 0x7e, 0xc5, 0x6e, 0x81, 0x8f, 0x2b, 0xe3, 0x0e, 0x9a, 0x54, 0x21,
+	0xbe, 0x0f, 0xfb, 0x15, 0x04, 0xdf, 0x37, 0xdd, 0x7f, 0x03, 0x50, 0x9a, 0x9e, 0x87, 0xa4, 0x9a,
+	0xb6, 0xe3, 0x13, 0xc2, 0xfa, 0xba, 0xd4, 0x5e, 0xe9, 0xa0, 0x02, 0xd3, 0xfd, 0xe8, 0xf5, 0x7a,
+	0x87, 0x78, 0x52, 0x51, 0x69, 0xa1, 0xf7, 0x73, 0xe6, 0xc7, 0x28, 0x0c, 0x17, 0x6c, 0x7e, 0x2b,
+	0xe0, 0x39, 0x88, 0x07, 0xf8, 0x36, 0x9e, 0x0e, 0xb6, 0x58, 0x90, 0xf1, 0x2a, 0x23, 0x38, 0x07,
+	0x90, 0xef, 0x30, 0x98, 0x7e, 0xd7, 0x52, 0x37, 0x43, 0xc6, 0x97, 0x20, 0x26, 0xf3, 0x74, 0x65,
+	0x3b, 0x4d, 0xcb, 0x41, 0xf6, 0xb0, 0xfa, 0x39, 0x88, 0x07, 0xb8, 0xa7, 0x1f, 0x46, 0x18, 0x71,
+	0x57, 0x86, 0x91, 0x85, 0x38, 0x6b, 0xa1, 0x01, 0x22, 0x51, 0xdf, 0x05, 0xfb, 0x42, 0x69, 0x3a,
+	0x3e, 0xda, 0xdd, 0x36, 0x61, 0x14, 0xb3, 0xa7, 0x65, 0x6e, 0x0a, 0x02, 0x12, 0x34, 0xa6, 0x85,
+	0xc6, 0x37, 0x58, 0x3d, 0xdf, 0x84, 0x89, 0x10, 0x8e, 0xeb, 0x9b, 0x54, 0x13, 0x60, 0xa5, 0xc9,
+	0x7b, 0x30, 0x15, 0xce, 0x60, 0xf1, 0x31, 0xa9, 0x3d, 0xd4, 0x0c, 0xb7, 0x4f, 0xef, 0x25, 0x54,
+	0x8c, 0xb3, 0xdf, 0xe1, 0xcc, 0x84, 0x54, 0x4b, 0x78, 0x3b, 0xfc, 0xb3, 0x03, 0xf6, 0x14, 0x6c,
+	0x7e, 0x71, 0xe5, 0x20, 0x26, 0x33, 0x4f, 0x7c, 0x30, 0xd8, 0x0c, 0x01, 0x0e, 0xa8, 0x84, 0x7c,
+	0x16, 0x86, 0xf3, 0xd4, 0x59, 0xf7, 0x2a, 0xec, 0xa2, 0x8c, 0x38, 0x0b, 0x23, 0x12, 0x61, 0x55,
+	0xf6, 0xc1, 0x41, 0x39, 0xb2, 0xee, 0x2b, 0x39, 0x07, 0x31, 0x99, 0xad, 0xfa, 0xf8, 0x43, 0x38,
+	0xac, 0x12, 0xff, 0x05, 0x88, 0xb1, 0x26, 0x78, 0xdf, 0xdb, 0x3c, 0xfb, 0x1b, 0x7a, 0xde, 0x24,
+	0xe8, 0x45, 0x93, 0xa0, 0x97, 0x4d, 0x82, 0x5e, 0x37, 0x09, 0x7a, 0xd3, 0x24, 0x91, 0xb7, 0x4d,
+	0x12, 0x79, 0xd7, 0x24, 0xe8, 0x61, 0x8b, 0x44, 0x1e, 0xb5, 0x48, 0xe4, 0x71, 0x8b, 0xa0, 0x27,
+	0x2d, 0x12, 0x79, 0xda, 0x22, 0xe8, 0x59, 0x8b, 0xa0, 0xe7, 0x2d, 0x82, 0x5e, 0xb4, 0x08, 0x7a,
+	0xd9, 0x22, 0x91, 0xd7, 0x2d, 0x82, 0xde, 0xb4, 0x48, 0xe4, 0x6d, 0x8b, 0xa0, 0x77, 0x2d, 0x12,
+	0x79, 0xd8, 0x26, 0x91, 0x47, 0x6d, 0x82, 0x7e, 0x6a, 0x93, 0xc8, 0x2f, 0x6d, 0x82, 0x7e, 0x6f,
+	0x93, 0xc8, 0xe3, 0x36, 0x89, 0x3c, 0x69, 0x13, 0xf4, 0xb4, 0x4d, 0xd0, 0xb3, 0x36, 0x41, 0x5f,
+	0x9d, 0x58, 0xef, 0xff, 0xd4, 0xf5, 0x4a, 0xd9, 0xfd, 0x5b, 0x5f, 0x58, 0x88, 0x7a, 0x88, 0xcf,
+	0xfc, 0x17, 0x00, 0x00, 0xff, 0xff, 0x31, 0x0e, 0x25, 0x7d, 0x89, 0x18, 0x00, 0x00,
 }

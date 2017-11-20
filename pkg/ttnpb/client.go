@@ -31,20 +31,3 @@ func (c *Client) HasGrant(grant GrantType) bool {
 
 	return false
 }
-
-const (
-	// These are the valid FieldMask path values for the `update_mask` in
-	// the UpdateClientRequest message.
-
-	// FieldPathClientDescription is the path value for the `description` field.
-	FieldPathClientDescription = "description"
-
-	// FieldPathClientRedirectURI is the path value for the `redirect_uri` field.
-	FieldPathClientRedirectURI = "redirect_uri"
-
-	// FieldPathClientGrants is the path value for the `grants` field.
-	FieldPathClientGrants = "grants"
-
-	// FieldPathClientRights is the path value for the `rights` field.
-	FieldPathClientRights = "rights"
-)
