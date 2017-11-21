@@ -18,12 +18,12 @@ func (r *registry) Register(namespace string, err *ErrDescriptor) {
 	r.Lock()
 	defer r.Unlock()
 
-	if err.Code == NoCode {
-		panic(fmt.Errorf("No code defined in error descriptor (message: `%s`)", err.MessageFormat))
-	}
-
 	if err.Namespace == "" {
 		err.Namespace = namespace
+	}
+
+	if e := err.validate(); e != nil {
+		panic(e)
 	}
 
 	if err.Namespace != "" && err.Namespace != namespace {
@@ -37,10 +37,6 @@ func (r *registry) Register(namespace string, err *ErrDescriptor) {
 
 	if r.byNamespaceAndCode[err.Namespace][err.Code] != nil {
 		panic(fmt.Errorf("errors: Duplicate error code %v registered for namespace %s", err.Code, err.Namespace))
-	}
-
-	if err.MessageFormat == "" {
-		panic(fmt.Errorf("errors: An error cannot have an empty message"))
 	}
 
 	err.registered = true

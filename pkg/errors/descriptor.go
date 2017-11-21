@@ -85,3 +85,16 @@ func (err *ErrDescriptor) Describes(e error) bool {
 
 	return i.Namespace() == err.Namespace && i.Code() == err.Code
 }
+
+// validate validates the error descriptor and returns an error if it is not valid.
+func (err *ErrDescriptor) validate() error {
+	if err.Code == NoCode {
+		return fmt.Errorf("No code defined in error descriptor (message: `%s`)", err.MessageFormat)
+	}
+
+	if err.MessageFormat == "" {
+		return fmt.Errorf("errors: An error cannot have an empty message")
+	}
+
+	return nil
+}
