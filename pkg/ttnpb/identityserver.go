@@ -8,6 +8,33 @@ import (
 )
 
 // Validate is used as validator function by the GRPC validator interceptor.
+func (req *GetSettingsRequest) Validate() error {
+	mask := req.GetProjectionMask()
+	paths := mask.GetPaths()
+
+	if mask == nil || paths == nil || len(paths) == 0 {
+		return nil
+	}
+
+	for _, path := range paths {
+		switch true {
+		case FieldPathSettingsBlacklistedIDs.MatchString(path),
+			FieldPathSettingsAutomaticApproval.MatchString(path),
+			FieldPathSettingsClosedRegistration.MatchString(path),
+			FieldPathSettingsValidationTokenTTL.MatchString(path),
+			FieldPathSettingsAllowedEmails.MatchString(path):
+		default:
+			return ErrInvalidPathFieldMask.New(errors.Attributes{
+				"fieldmask_name": "projection_mask",
+				"path":           path,
+			})
+		}
+	}
+
+	return nil
+}
+
+// Validate is used as validator function by the GRPC validator interceptor.
 func (req *UpdateSettingsRequest) Validate() error {
 	mask := req.GetUpdateMask()
 	paths := mask.GetPaths()
