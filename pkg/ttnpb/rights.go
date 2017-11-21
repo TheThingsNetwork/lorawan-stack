@@ -12,8 +12,8 @@ import (
 
 // AllUserRights is the set thart contains all the rights that are to users.
 var AllUserRights = []Right{
-	RIGHT_USER_PROFILE_READ,
-	RIGHT_USER_PROFILE_WRITE,
+	RIGHT_USER_ACCOUNT_READ,
+	RIGHT_USER_ACCOUNT_WRITE,
 	RIGHT_USER_DELETE,
 	RIGHT_USER_AUTHORIZEDCLIENTS,
 	RIGHT_USER_APPLICATIONS_LIST,
