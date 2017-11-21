@@ -69,6 +69,10 @@ func (l *Logger) commit(e *entry) {
 		defer l.mutex.RUnlock()
 		handler.HandleLog(e)
 	}
+
+	if l.Level == FatalLevel {
+		os.Exit(1)
+	}
 }
 
 // Debug implements log.Interface.
