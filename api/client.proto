@@ -43,7 +43,7 @@ message Client {
   repeated Right rights = 8;
 
   // creator contains the user ID of the user who created the client.
-  string creator = 9;
+  UserIdentifier creator = 9 [(gogoproto.nullable) = false];
 
   // created_at denotes when the client was created.
   // This a read-only field.
