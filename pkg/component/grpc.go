@@ -28,7 +28,7 @@ func (c *Component) setupGRPC() (err error) {
 		sub.RegisterServices(c.grpc.Server)
 	}
 	c.logger.Debug("Starting loopback connection")
-	c.loopback, err = rpcserver.StartLoopback(c.grpc.Server)
+	c.loopback, err = rpcserver.StartLoopback(c.ctx, c.grpc.Server)
 	if err != nil {
 		return errors.NewWithCause("Could not start loopback connection", err)
 	}
