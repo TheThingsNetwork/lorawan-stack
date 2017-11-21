@@ -6,7 +6,7 @@ pkg/version/ttn.go: .FORCE
 	@echo "package version" >> pkg/version/ttn.go
 	@echo "" >> pkg/version/ttn.go
 	@echo "// TTN Version" >> pkg/version/ttn.go
-	@echo "const TTN = \"$(VERSION)-dev\"" >> pkg/version/ttn.go
+	@echo "const TTN = \"v$(VERSION)-dev\"" >> pkg/version/ttn.go
 
 version.bump.major: BUMP=major
 version.bump.major: version.bump
@@ -22,5 +22,11 @@ version.bump.rc: version.bump
 
 version.bump: VERSION=$(shell $(GO) run .make/bump.go "$(GIT_TAG)" "$(BUMP)")
 version.bump: pkg/version/ttn.go
-	git tag -s -f -m "$(VERSION)" "$(VERSION)"
-	@$(log) "Bumped to $(VERSION)"
+	@if [[ ! -z "`git status -s | grep -v 'pkg/version/ttn.go'`" ]]; then \
+		$(err) "Working tree not clean"; \
+		exit 1; \
+	fi
+	git add pkg/version/ttn.go
+	git commit -m "all: Bump version to $(VERSION)"
+	git tag -a -s -f -m "Version $(VERSION)" "v$(VERSION)"
+	@$(log) "Bumped to v$(VERSION)"
