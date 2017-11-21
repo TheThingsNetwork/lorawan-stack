@@ -38,6 +38,9 @@ type ErrDescriptor struct {
 	// registered denotes wether or not the error has been registered
 	// (by a call to Register)
 	registered bool
+
+	// SafeAttributes is a list of attributes that can safely be sent to clients.
+	SafeAttributes []string `json:"safe_attributes"`
 }
 
 // New creates a new error based on the error descriptor
