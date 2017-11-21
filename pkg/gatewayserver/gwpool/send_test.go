@@ -16,7 +16,7 @@ import (
 func TestPoolDownlinks(t *testing.T) {
 	a := assertions.New(t)
 
-	p := gwpool.NewPool(test.GetLogger(t, "TestPoolDownlinks"), time.Millisecond)
+	p := gwpool.NewPool(test.GetLogger(t), time.Millisecond)
 
 	gatewayID := "gateway"
 	link := &dummyLink{
