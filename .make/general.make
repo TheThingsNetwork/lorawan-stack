@@ -18,6 +18,9 @@ MAKE_DIR = $(shell dirname $(GENERAL_FILE))
 # init rules are the rules to invoke to initialize the repo
 INIT_RULES ?= git.hooks
 
+.PHONY: .FORCE
+.FORCE:
+
 # init invokes the init rules
 init:
 	@make $(INIT_RULES)

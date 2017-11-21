@@ -10,6 +10,7 @@ COMMIT_MSG = git.commit-msg-log git.commit-msg-length git.commit-msg-empty git.c
 include .make/log.make
 include .make/general.make
 include .make/git.make
+include .make/versions.make
 include .make/headers.make
 include .make/go/main.make
 include .make/protos/main.make
