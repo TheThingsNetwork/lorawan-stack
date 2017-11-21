@@ -16,6 +16,9 @@ var (
 		MessageFormat: "Band {band} not found",
 		Type:          errors.NotFound,
 		Code:          1,
+		SafeAttributes: []string{
+			"band",
+		},
 	}
 )
 

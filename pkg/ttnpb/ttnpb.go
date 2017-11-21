@@ -15,6 +15,9 @@ var ErrInvalidPathUpdateMask = &errors.ErrDescriptor{
 	MessageFormat: "Invalid update_mask: `{path}` is not a valid path",
 	Code:          1,
 	Type:          errors.InvalidArgument,
+	SafeAttributes: []string{
+		"path",
+	},
 }
 
 // ErrUpdateMaskNotFound is returned on update operations where `update_mask`

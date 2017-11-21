@@ -35,6 +35,9 @@ var ErrApplicationNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Application `{application_id}` does not exist",
 	Code:          1,
 	Type:          errors.NotFound,
+	SafeAttributes: []string{
+		"application_id",
+	},
 }
 
 // ErrApplicationIDTaken is returned when trying to create a new application
@@ -43,6 +46,9 @@ var ErrApplicationIDTaken = &errors.ErrDescriptor{
 	MessageFormat: "Application id `{application_id}` is already taken",
 	Code:          2,
 	Type:          errors.AlreadyExists,
+	SafeAttributes: []string{
+		"application_id",
+	},
 }
 
 // ErrApplicationAPIKeyNotFound is returned when trying to access or delete
@@ -51,6 +57,9 @@ var ErrApplicationAPIKeyNotFound = &errors.ErrDescriptor{
 	MessageFormat: "API key `{key_name}` does not exist for application `{application_id}`",
 	Code:          3,
 	Type:          errors.NotFound,
+	SafeAttributes: []string{
+		"application_id",
+	},
 }
 
 func NewApplicationStore(store storer, factory factory.ApplicationFactory) *ApplicationStore {

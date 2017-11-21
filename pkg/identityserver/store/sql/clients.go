@@ -32,6 +32,9 @@ var ErrClientNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Client `{client_id}` does not exist",
 	Code:          20,
 	Type:          errors.NotFound,
+	SafeAttributes: []string{
+		"client_id",
+	},
 }
 
 // ErrClientIDTaken is returned when trying to create a new client with an ID.
@@ -40,6 +43,9 @@ var ErrClientIDTaken = &errors.ErrDescriptor{
 	MessageFormat: "Client id `{client_id}` is already taken",
 	Code:          21,
 	Type:          errors.AlreadyExists,
+	SafeAttributes: []string{
+		"client_id",
+	},
 }
 
 func NewClientStore(store storer, factory factory.ClientFactory) *ClientStore {

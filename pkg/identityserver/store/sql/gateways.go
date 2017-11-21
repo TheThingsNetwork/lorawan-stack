@@ -32,6 +32,9 @@ var ErrGatewayNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Gateway `{gateway_id}` does not exist",
 	Code:          300,
 	Type:          errors.NotFound,
+	SafeAttributes: []string{
+		"gateway_id",
+	},
 }
 
 // ErrGatewayIDTaken is returned when trying to create a new gateway with an ID
@@ -40,6 +43,9 @@ var ErrGatewayIDTaken = &errors.ErrDescriptor{
 	MessageFormat: "Gateway id `{gateway_id}` is already taken",
 	Code:          301,
 	Type:          errors.AlreadyExists,
+	SafeAttributes: []string{
+		"gateway_id",
+	},
 }
 
 func NewGatewayStore(store storer, factory factory.GatewayFactory) *GatewayStore {

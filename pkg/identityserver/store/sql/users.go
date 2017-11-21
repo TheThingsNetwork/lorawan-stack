@@ -31,6 +31,9 @@ var ErrUserNotFound = &errors.ErrDescriptor{
 	MessageFormat: "User `{user_id}` does not exist",
 	Code:          400,
 	Type:          errors.NotFound,
+	SafeAttributes: []string{
+		"user_id",
+	},
 }
 
 // ErrUserEmailNotFound is returned when trying to find an user with an email
@@ -39,6 +42,9 @@ var ErrUserEmailNotFound = &errors.ErrDescriptor{
 	MessageFormat: "User with email address `{email}` does not exist",
 	Code:          401,
 	Type:          errors.NotFound,
+	SafeAttributes: []string{
+		"email",
+	},
 }
 
 // ErrUserIDTaken is returned when trying to create a new user with an ID that
@@ -47,6 +53,9 @@ var ErrUserIDTaken = &errors.ErrDescriptor{
 	MessageFormat: "User ID `{user_id}` is already taken",
 	Code:          402,
 	Type:          errors.AlreadyExists,
+	SafeAttributes: []string{
+		"user_id",
+	},
 }
 
 // ErrUserEmailTaken is returned when trying to create a new user with an
@@ -55,6 +64,9 @@ var ErrUserEmailTaken = &errors.ErrDescriptor{
 	MessageFormat: "Email address `{email}` is already taken by another account",
 	Code:          403,
 	Type:          errors.AlreadyExists,
+	SafeAttributes: []string{
+		"email",
+	},
 }
 
 func NewUserStore(store storer, factory factory.UserFactory) *UserStore {
