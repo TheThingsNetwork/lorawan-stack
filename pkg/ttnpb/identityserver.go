@@ -95,6 +95,53 @@ func (req *UpdateUserPasswordRequest) Validate() error {
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.
+func (req *GenerateUserAPIKeyRequest) Validate() error {
+	return validate.All(
+		validate.Field(req.Name, validate.Required).DescribeFieldName("Key name"),
+		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllUserRights)).DescribeFieldName("Rights"),
+	)
+}
+
+// Validate is used as validator function by the GRPC validator interceptor.
+func (req *UpdateUserAPIKeyRequest) Validate() error {
+	mask := req.GetUpdateMask()
+	paths := mask.GetPaths()
+
+	if paths == nil || len(paths) == 0 {
+		return ErrEmptyUpdateMask.New(nil)
+	}
+
+	validations := make([]validate.Errors, 0)
+
+	if err := validate.Field(req.Key.Key, validate.Required).DescribeFieldName("API key"); err != nil {
+		validations = append(validations, err)
+	}
+
+	var err validate.Errors
+	for _, path := range paths {
+		switch true {
+		case FieldPathAPIKeyName.MatchString(path):
+			err = validate.Field(req.Key.Name, validate.Required).DescribeFieldName("Key name")
+		case FieldPathAPIKeyRights.MatchString(path):
+			err = validate.Field(req.Key.Rights, validate.MinLength(1), validate.In(AllUserRights)).DescribeFieldName("Rights")
+		default:
+			return ErrInvalidPathUpdateMask.New(errors.Attributes{
+				"path": path,
+			})
+		}
+
+		validations = append(validations, err)
+	}
+
+	return validate.All(validations...)
+}
+
+// Validate is used as validator function by the GRPC validator interceptor.
+func (req *RemoveUserAPIKeyRequest) Validate() error {
+	return validate.Field(req.Key, validate.Required).DescribeFieldName("API key")
+}
+
+// Validate is used as validator function by the GRPC validator interceptor.
 func (req *ValidateUserEmailRequest) Validate() error {
 	return validate.Field(req.Token, validate.Required).DescribeFieldName("Token")
 }

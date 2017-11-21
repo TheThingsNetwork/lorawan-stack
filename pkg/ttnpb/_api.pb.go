@@ -37,7 +37,6 @@ It has these top-level messages:
 	ApplicationDownlinks
 	DownlinkQueueRequest
 	Client
-	ClientMask
 	Collaborator
 	KeyEnvelope
 	RootKeys
@@ -68,6 +67,9 @@ It has these top-level messages:
 	CreateUserRequest
 	UpdateUserRequest
 	UpdateUserPasswordRequest
+	GenerateUserAPIKeyRequest
+	UpdateUserAPIKeyRequest
+	RemoveUserAPIKeyRequest
 	ValidateUserEmailRequest
 	ListAuthorizedClientsResponse
 	CreateApplicationRequest

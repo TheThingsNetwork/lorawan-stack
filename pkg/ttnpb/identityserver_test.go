@@ -126,6 +126,99 @@ func TestUserValidations(t *testing.T) {
 
 	{
 		// empty request (bad)
+		req := &GenerateUserAPIKeyRequest{}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// empty list of rights (bad)
+		req = &GenerateUserAPIKeyRequest{
+			Name:   "foo",
+			Rights: []Right{},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// request with gateway rights (bad)
+		req = &GenerateUserAPIKeyRequest{
+			Name:   "foo",
+			Rights: []Right{RIGHT_GATEWAY_DELETE},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// good request
+		req = &GenerateUserAPIKeyRequest{
+			Name:   "foo",
+			Rights: []Right{RIGHT_USER_APPLICATIONS_LIST},
+		}
+		a.So(req.Validate(), should.BeNil)
+	}
+
+	{
+		// empty request (bad)
+		req := &UpdateUserAPIKeyRequest{}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// request which tries to clear the rights (bad)
+		req = &UpdateUserAPIKeyRequest{
+			Key: APIKey{
+				Key:  "key",
+				Name: "Foo-key",
+			},
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"name", "rights"},
+			},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// request without update mask (bad)
+		req = &UpdateUserAPIKeyRequest{
+			Key: APIKey{
+				Key:  "key",
+				Name: "Foo-key",
+			},
+		}
+		err := req.Validate()
+		a.So(err, should.NotBeNil)
+		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
+
+		// request with gateway rights (bad)
+		req = &UpdateUserAPIKeyRequest{
+			Key: APIKey{
+				Key:    "key",
+				Name:   "Foo-key",
+				Rights: []Right{RIGHT_GATEWAY_DELETE},
+			},
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"name", "rights"},
+			},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// good request
+		req = &UpdateUserAPIKeyRequest{
+			Key: APIKey{
+				Key:  "key",
+				Name: "Foo-key",
+			},
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"name"},
+			},
+		}
+		a.So(req.Validate(), should.BeNil)
+	}
+
+	{
+		// empty request (bad)
+		req := &RemoveUserAPIKeyRequest{}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// good request
+		req = &RemoveUserAPIKeyRequest{
+			Key: "foo",
+		}
+		a.So(req.Validate(), should.BeNil)
+	}
+
+	{
+		// empty request (bad)
 		req := &ValidateUserEmailRequest{}
 		a.So(req.Validate(), should.NotBeNil)
 

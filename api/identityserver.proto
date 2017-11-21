@@ -80,6 +80,29 @@ message UpdateUserPasswordRequest {
   string new = 2;
 }
 
+message GenerateUserAPIKeyRequest {
+  // name is the name of the API key to be generated.
+  string name = 1;
+
+  // rights the are rights the generated API key will bear.
+  repeated Right rights = 2;
+}
+
+message UpdateUserAPIKeyRequest {
+  // key is the API key to be updated.
+  APIKey key = 1 [(gogoproto.nullable) = false];
+
+  // update_mask is the symbolic set of fields that will be affected in the update
+  // operation. Fields not included in the update_mask are not changed and ignored
+  // in the request. Must be non-empty.
+  google.protobuf.FieldMask update_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message RemoveUserAPIKeyRequest {
+  // key is the user API key to be removed.
+  string key = 1;
+}
+
 message ValidateUserEmailRequest {
   // token is the token sent to the user's email address in order to validate it.
   string token = 1;
@@ -107,6 +130,15 @@ service IsUser {
 
   // DeleteUser permantly deletes the user account of the authenticated user.
   rpc DeleteUser(google.protobuf.Empty) returns (google.protobuf.Empty);
+
+  // GenerateUserAPIKey generates a new API key for the authenticated user and returns it.
+  rpc GenerateUserAPIKey(GenerateUserAPIKeyRequest) returns (APIKey);
+
+  // UpdateUserAPIKey updates an authenticated user API key name or rights.
+  rpc UpdateUserAPIKey(UpdateUserAPIKeyRequest) returns (google.protobuf.Empty);
+
+  // RemoveUserAPIKey removes an API key from the authenticated user.
+  rpc RemoveUserAPIKey(RemoveUserAPIKeyRequest) returns (google.protobuf.Empty);
 
   // ValidateUserEmail validates the user's email address of the authenticated
   // user by using the token sent to the user's email address.
