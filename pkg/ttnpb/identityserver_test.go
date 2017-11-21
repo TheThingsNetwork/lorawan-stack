@@ -158,49 +158,21 @@ func TestUserValidations(t *testing.T) {
 
 		// request which tries to clear the rights (bad)
 		req = &UpdateUserAPIKeyRequest{
-			Key: APIKey{
-				Key:  "key",
-				Name: "Foo-key",
-			},
-			UpdateMask: pbtypes.FieldMask{
-				Paths: []string{"name", "rights"},
-			},
+			Name: "Foo-key",
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
-		// request without update mask (bad)
-		req = &UpdateUserAPIKeyRequest{
-			Key: APIKey{
-				Key:  "key",
-				Name: "Foo-key",
-			},
-		}
-		err := req.Validate()
-		a.So(err, should.NotBeNil)
-		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
-
 		// request with gateway rights (bad)
 		req = &UpdateUserAPIKeyRequest{
-			Key: APIKey{
-				Key:    "key",
-				Name:   "Foo-key",
-				Rights: []Right{RIGHT_GATEWAY_DELETE},
-			},
-			UpdateMask: pbtypes.FieldMask{
-				Paths: []string{"name", "rights"},
-			},
+			Name:   "Foo-key",
+			Rights: []Right{RIGHT_GATEWAY_DELETE},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// good request
 		req = &UpdateUserAPIKeyRequest{
-			Key: APIKey{
-				Key:  "key",
-				Name: "Foo-key",
-			},
-			UpdateMask: pbtypes.FieldMask{
-				Paths: []string{"name"},
-			},
+			Name:   "Foo-key",
+			Rights: []Right{RIGHT_USER_AUTHORIZEDCLIENTS},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -212,7 +184,7 @@ func TestUserValidations(t *testing.T) {
 
 		// good request
 		req = &RemoveUserAPIKeyRequest{
-			Key: "foo",
+			Name: "foo",
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -321,52 +293,23 @@ func TestApplicationValidations(t *testing.T) {
 		// request which tries to clear the rights (bad)
 		req = &UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
-			Key: APIKey{
-				Key:  "key",
-				Name: "Foo-key",
-			},
-			UpdateMask: pbtypes.FieldMask{
-				Paths: []string{"name", "rights"},
-			},
+			Name: "Foo-key",
 		}
 		a.So(req.Validate(), should.NotBeNil)
-
-		// request without update mask (bad)
-		req = &UpdateApplicationAPIKeyRequest{
-			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
-			Key: APIKey{
-				Key:  "key",
-				Name: "Foo-key",
-			},
-		}
-		err := req.Validate()
-		a.So(err, should.NotBeNil)
-		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
 
 		// request with gateway rights (bad)
 		req = &UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
-			Key: APIKey{
-				Key:    "key",
-				Name:   "Foo-key",
-				Rights: []Right{RIGHT_GATEWAY_DELETE},
-			},
-			UpdateMask: pbtypes.FieldMask{
-				Paths: []string{"name", "rights"},
-			},
+			Name:   "foo",
+			Rights: []Right{RIGHT_GATEWAY_DELETE},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// good request
 		req = &UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
-			Key: APIKey{
-				Key:  "key",
-				Name: "Foo-key",
-			},
-			UpdateMask: pbtypes.FieldMask{
-				Paths: []string{"name"},
-			},
+			Name:   "foo",
+			Rights: []Right{RIGHT_APPLICATION_DELETE},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -379,7 +322,7 @@ func TestApplicationValidations(t *testing.T) {
 		// good request
 		req = &RemoveApplicationAPIKeyRequest{
 			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
-			Key: "foo",
+			Name: "foo",
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -510,52 +453,23 @@ func TestGatewayValidations(t *testing.T) {
 		// request which tries to clear the rights (bad)
 		req = &UpdateGatewayAPIKeyRequest{
 			GatewayIdentifier: GatewayIdentifier{"foo-app"},
-			Key: APIKey{
-				Key:  "key",
-				Name: "Foo-key",
-			},
-			UpdateMask: pbtypes.FieldMask{
-				Paths: []string{"name", "rights"},
-			},
+			Name:              "Foo-key",
 		}
 		a.So(req.Validate(), should.NotBeNil)
-
-		// request without update mask (bad)
-		req = &UpdateGatewayAPIKeyRequest{
-			GatewayIdentifier: GatewayIdentifier{"foo-app"},
-			Key: APIKey{
-				Key:  "key",
-				Name: "Foo-key",
-			},
-		}
-		err := req.Validate()
-		a.So(err, should.NotBeNil)
-		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
 
 		// request with application rights (bad)
 		req = &UpdateGatewayAPIKeyRequest{
 			GatewayIdentifier: GatewayIdentifier{"foo-app"},
-			Key: APIKey{
-				Key:    "key",
-				Name:   "Foo-key",
-				Rights: []Right{RIGHT_APPLICATION_DELETE},
-			},
-			UpdateMask: pbtypes.FieldMask{
-				Paths: []string{"name", "rights"},
-			},
+			Name:              "foo",
+			Rights:            []Right{RIGHT_APPLICATION_DELETE},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// good request
 		req = &UpdateGatewayAPIKeyRequest{
 			GatewayIdentifier: GatewayIdentifier{"foo-app"},
-			Key: APIKey{
-				Key:  "key",
-				Name: "Foo-key",
-			},
-			UpdateMask: pbtypes.FieldMask{
-				Paths: []string{"name"},
-			},
+			Name:              "foo",
+			Rights:            []Right{RIGHT_GATEWAY_DELETE},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -568,7 +482,7 @@ func TestGatewayValidations(t *testing.T) {
 		// good request
 		req = &RemoveGatewayAPIKeyRequest{
 			GatewayIdentifier: GatewayIdentifier{"foo-app"},
-			Key:               "foo",
+			Name:              "foo",
 		}
 		a.So(req.Validate(), should.BeNil)
 	}

@@ -9,11 +9,6 @@ func (d *Application) GetApplication() *Application {
 	return d
 }
 
-// SetAPIKeys sets a list of APIKeys into the Application.
-func (d *Application) SetAPIKeys(keys []APIKey) {
-	d.APIKeys = keys
-}
-
 var (
 	// FieldPathApplicationDescription is the field path for the application description field.
 	FieldPathApplicationDescription = regexp.MustCompile(`^description$`)

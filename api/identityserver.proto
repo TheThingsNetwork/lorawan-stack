@@ -6,6 +6,7 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsNetwork/ttn/api/application.proto";
 import "github.com/TheThingsNetwork/ttn/api/client.proto";
 import "github.com/TheThingsNetwork/ttn/api/collaborator.proto";
+import "github.com/TheThingsNetwork/ttn/api/auth.proto";
 import "github.com/TheThingsNetwork/ttn/api/rights.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/gateway.proto";
@@ -88,19 +89,22 @@ message GenerateUserAPIKeyRequest {
   repeated Right rights = 2;
 }
 
-message UpdateUserAPIKeyRequest {
-  // key is the API key to be updated.
-  APIKey key = 1 [(gogoproto.nullable) = false];
+message ListUserAPIKeysResponse {
+  // api_keys are the API keys that the user has currently registered.
+  repeated APIKey api_keys = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
+}
 
-  // update_mask is the symbolic set of fields that will be affected in the update
-  // operation. Fields not included in the update_mask are not changed and ignored
-  // in the request. Must be non-empty.
-  google.protobuf.FieldMask update_mask = 2 [(gogoproto.nullable) = false];
+message UpdateUserAPIKeyRequest {
+  // name is the name of the user API key to be updated.
+  string name = 1;
+
+  // rights are the list of rights that will be set.
+  repeated Right rights = 2;
 }
 
 message RemoveUserAPIKeyRequest {
-  // key is the user API key to be removed.
-  string key = 1;
+  // name is the name of the user API key to be removed.
+  string name = 1;
 }
 
 message ValidateUserEmailRequest {
@@ -134,7 +138,10 @@ service IsUser {
   // GenerateUserAPIKey generates a new API key for the authenticated user and returns it.
   rpc GenerateUserAPIKey(GenerateUserAPIKeyRequest) returns (APIKey);
 
-  // UpdateUserAPIKey updates an authenticated user API key name or rights.
+  // ListUserAPIKeys returns all the user API keys that the authenticated user has.
+  rpc ListUserAPIKeys(google.protobuf.Empty) returns (ListUserAPIKeysResponse);
+
+  // UpdateUserAPIKey updates the rights of an API key of the authenticated user.
   rpc UpdateUserAPIKey(UpdateUserAPIKeyRequest) returns (google.protobuf.Empty);
 
   // RemoveUserAPIKey removes an API key from the authenticated user.
@@ -189,25 +196,28 @@ message GenerateApplicationAPIKeyRequest {
   repeated Right rights = 3;
 }
 
+message ListApplicationAPIKeysResponse {
+  // api_keys are the API keys that the application has currently registered.
+  repeated APIKey api_keys = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
+}
+
 message UpdateApplicationAPIKeyRequest {
   // application_id is the application's ID which an API key will be modified.
   ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // key is the API key to be updated.
-  APIKey key = 2 [(gogoproto.nullable) = false];
+  // name is the name of the application API key to be updated.
+  string name = 2;
 
-  // update_mask is the symbolic set of fields that will be affected in the update
-  // operation. Fields not included in the update_mask are not changed and ignored
-  // in the request. Must be non-empty.
-  google.protobuf.FieldMask update_mask = 3 [(gogoproto.nullable) = false];
+  // rights are the list of rights that will be set.
+  repeated Right rights = 3;
 }
 
 message RemoveApplicationAPIKeyRequest {
   // application_id is the application's ID which the API key will be removed from.
   ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // key is the application API key to be removed.
-  string key = 2;
+  // name is the name of the application API key to be removed.
+  string name = 2;
 }
 
 message SetApplicationCollaboratorRequest {
@@ -247,7 +257,11 @@ service IsApplication {
   // and returns it.
   rpc GenerateApplicationAPIKey(GenerateApplicationAPIKeyRequest) returns (APIKey);
 
-  // UpdateApplicationAPIKey updates an application API key name or rights.
+  // ListApplicationAPIKeys returns all the application API keys that a given
+  // application has.
+  rpc ListApplicationAPIKeys(ApplicationIdentifier) returns (ListApplicationAPIKeysResponse);
+
+  // UpdateApplicationAPIKey updates the rights of a given application API key.
   rpc UpdateApplicationAPIKey(UpdateApplicationAPIKeyRequest) returns (google.protobuf.Empty);
 
   // RemoveApplicationAPIKey removes a given API key from an application.
@@ -292,25 +306,28 @@ message GenerateGatewayAPIKeyRequest {
   repeated Right rights = 3;
 }
 
+message ListGatewayAPIKeysResponse {
+  // api_keys are the API keys that the gateways has currently registered.
+  repeated APIKey api_keys = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
+}
+
 message UpdateGatewayAPIKeyRequest {
   // gateway_id is the gateway's ID which an API key will be modified.
   GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // key is the API key to be updated.
-  APIKey key = 2 [(gogoproto.nullable) = false];
+  // name is the name of the gateway API key to be updated.
+  string name = 2;
 
-  // update_mask is the symbolic set of fields that will be affected in the update
-  // operation. Fields not included in the update_mask are not changed and ignored
-  // in the request. Must be non-empty.
-  google.protobuf.FieldMask update_mask = 3 [(gogoproto.nullable) = false];
+  // rights are the list of rights that will be set.
+  repeated Right rights = 3;
 }
 
 message RemoveGatewayAPIKeyRequest {
   // gateway_id is the gateway's ID which API key will be removed from.
   GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // key is the gateway API key to be removed.
-  string key = 2;
+  // name is the name of the gateway API key to be removed.
+  string name = 2;
 }
 
 message SetGatewayCollaboratorRequest {
@@ -350,7 +367,10 @@ service IsGateway {
   // returns it.
   rpc GenerateGatewayAPIKey(GenerateGatewayAPIKeyRequest) returns (APIKey);
 
-  // UpdateGatewayAPIKey updates an gateway API key name or rights.
+  // ListGatewayAPIKeys returns all the gateway API keys that a given gateway has.
+  rpc ListGatewayAPIKeys(GatewayIdentifier) returns (ListGatewayAPIKeysResponse);
+
+  // UpdateGatewayAPIKey updates the rights of a gateway API key.
   rpc UpdateGatewayAPIKey(UpdateGatewayAPIKeyRequest) returns (google.protobuf.Empty);
 
   // RemoveGatewayAPIKey removes a given API key from a gateway.

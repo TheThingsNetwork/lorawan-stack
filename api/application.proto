@@ -3,7 +3,6 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "github.com/TheThingsNetwork/ttn/api/rights.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
@@ -20,23 +19,18 @@ message Application {
   // description is the description of the application.
   string description = 2;
 
-  // api_keys are the API keys of the application.
-  // This is an only read field. API keys can be added, modified and removed
-  // through the specific application API key methods of the IsApplication service.
-  repeated APIKey api_keys = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
-
   // created_at is the time when the application was created.
   // This is a read-only field.
-  google.protobuf.Timestamp created_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // updated_at is the last time the application was updated.
   // This is a read-only field.
-  google.protobuf.Timestamp updated_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // archived_at is the time when the application was archived and therefore
   // permantly disabled.
   // This a read-only field.
-  google.protobuf.Timestamp archived_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp archived_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 // ApplicationUp wraps multiple application-layer uplink types

@@ -3,20 +3,11 @@
 package ttnpb
 
 import (
-	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/gogo/protobuf/jsonpb"
-)
-
-var (
-	// FieldPathAPIKeyName is the field path for the API key name field.
-	FieldPathAPIKeyName = regexp.MustCompile(`^name$`)
-
-	// FieldPathAPIKeyRights is the field path for the API key rights field.
-	FieldPathAPIKeyRights = regexp.MustCompile(`^rights$`)
 )
 
 // AllUserRights is the set thart contains all the rights that are to users.

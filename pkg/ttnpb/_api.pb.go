@@ -36,6 +36,7 @@ It has these top-level messages:
 	ApplicationDownlink
 	ApplicationDownlinks
 	DownlinkQueueRequest
+	APIKey
 	Client
 	Collaborator
 	KeyEnvelope
@@ -68,6 +69,7 @@ It has these top-level messages:
 	UpdateUserRequest
 	UpdateUserPasswordRequest
 	GenerateUserAPIKeyRequest
+	ListUserAPIKeysResponse
 	UpdateUserAPIKeyRequest
 	RemoveUserAPIKeyRequest
 	ValidateUserEmailRequest
@@ -76,6 +78,7 @@ It has these top-level messages:
 	ListApplicationsResponse
 	UpdateApplicationRequest
 	GenerateApplicationAPIKeyRequest
+	ListApplicationAPIKeysResponse
 	UpdateApplicationAPIKeyRequest
 	RemoveApplicationAPIKeyRequest
 	SetApplicationCollaboratorRequest
@@ -84,6 +87,7 @@ It has these top-level messages:
 	ListGatewaysResponse
 	UpdateGatewayRequest
 	GenerateGatewayAPIKeyRequest
+	ListGatewayAPIKeysResponse
 	UpdateGatewayAPIKeyRequest
 	RemoveGatewayAPIKeyRequest
 	SetGatewayCollaboratorRequest
@@ -110,7 +114,6 @@ It has these top-level messages:
 	RxMetadata
 	TxMetadata
 	Location
-	APIKey
 	IdentityServerSettings
 	TokenKeyRequest
 	TokenKeyResponse
