@@ -60,13 +60,6 @@ message Client {
   google.protobuf.Timestamp archived_at = 12 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
-message ClientMask {
-  bool description = 1;
-  bool redirect_uri = 2 [(gogoproto.customname) = "RedirectURI"];
-  reserved 3,4,5; // RFU: state, official_labeled, grants
-  bool rights = 6;
-}
-
 // ClientState enum defines all the possible tenant admin reviewing states
 // that a third-party client request can be at.
 enum ClientState {
