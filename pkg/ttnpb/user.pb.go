@@ -37,9 +37,8 @@ type User struct {
 	// validated_at denotes the time the email was validated at.
 	// This is a read-only field.
 	ValidatedAt time.Time `protobuf:"bytes,5,opt,name=validated_at,json=validatedAt,stdtime" json:"validated_at"`
-	// admin denotes whether or not the user has administrative rights within the
-	// tenancy.
-	// This is a read-only field and can be modified only by an admin.
+	// admin denotes whether or not the user has administrative rights within the tenancy.
+	// This field can only be modified by admins.
 	Admin bool `protobuf:"varint,6,opt,name=admin,proto3" json:"admin,omitempty"`
 	// created_at denotes when the user was created.
 	// This is a read-only field.

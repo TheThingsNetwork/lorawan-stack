@@ -30,9 +30,8 @@ message User {
   // This is a read-only field.
   google.protobuf.Timestamp validated_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // admin denotes whether or not the user has administrative rights within the
-  // tenancy.
-  // This is a read-only field and can be modified only by an admin.
+  // admin denotes whether or not the user has administrative rights within the tenancy.
+  // This field can only be modified by admins.
   bool admin = 6;
 
   // created_at denotes when the user was created.

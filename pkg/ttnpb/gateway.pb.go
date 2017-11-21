@@ -282,10 +282,11 @@ func (m *GatewayAntenna) GetPlacement() GatewayAntennaPlacement {
 	return PLACEMENT_INDOOR
 }
 
-// GatewayConfiguration contains all the latest values relative to this gateway.
+// GatewayConfiguration contains SX1301-related information used to configure
+// the gateway's concentrator.
 type GatewayConfiguration struct {
-	// api_key is the API key that is used to identify the gateway against other
-	// components in the network.
+	// api_key is the API key that is used to authenticate the gateway to other
+	// components of the network.
 	APIKey string `protobuf:"bytes,1,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
 	// frequency_plan_id indicates the ID of the frequency plan.
 	FrequencyPlanID string `protobuf:"bytes,2,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`

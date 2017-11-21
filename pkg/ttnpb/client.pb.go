@@ -92,14 +92,14 @@ type Client struct {
 	// redirect_uri is the OAuth redirect URI of the client.
 	RedirectURI string `protobuf:"bytes,4,opt,name=redirect_uri,json=redirectUri,proto3" json:"redirect_uri,omitempty"`
 	// state denotes the reviewing state of the client by admin.
-	// This is a read-only field and can be only modified by an admin.
+	// This field can only be modified by admins.
 	State ClientState `protobuf:"varint,5,opt,name=state,proto3,enum=ttn.v3.ClientState" json:"state,omitempty"`
 	// official_labeled denotes if a client has been labeled as an official
 	// third-party client by the tenant admin.
-	// This is a read-only field and can be only modified by an admin.
+	// This field can only be modified by admins.
 	OfficialLabeled bool `protobuf:"varint,6,opt,name=official_labeled,json=officialLabeled,proto3" json:"official_labeled,omitempty"`
 	// grants denotes which OAuth2 flows can the client use to get a token.
-	// This is a read-only field and can be only modified by an admin.
+	// This field can only be modified by admins.
 	Grants []GrantType `protobuf:"varint,7,rep,packed,name=grants,enum=ttn.v3.GrantType" json:"grants,omitempty"`
 	// Rights denotes what rights the client will have access to.
 	Rights []Right `protobuf:"varint,8,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`

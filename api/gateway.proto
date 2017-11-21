@@ -111,10 +111,11 @@ enum GatewayAntennaPlacement {
   PLACEMENT_OUTDOOR = 1;
 }
 
-// GatewayConfiguration contains all the latest values relative to this gateway.
+// GatewayConfiguration contains SX1301-related information used to configure
+// the gateway's concentrator.
 message GatewayConfiguration {
-  // api_key is the API key that is used to identify the gateway against other
-  // components in the network.
+  // api_key is the API key that is used to authenticate the gateway to other
+  // components of the network.
   string api_key = 1 [(gogoproto.customname) = "APIKey"];
 
   // frequency_plan_id indicates the ID of the frequency plan.
