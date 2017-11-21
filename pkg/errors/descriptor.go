@@ -50,6 +50,7 @@ func (err *ErrDescriptor) New(attributes Attributes) Error {
 	}
 
 	return &Impl{
+		descriptor: err,
 		message:    Format(err.MessageFormat, attributes),
 		code:       err.Code,
 		typ:        err.Type,

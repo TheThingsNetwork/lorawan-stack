@@ -10,6 +10,7 @@ import (
 
 // Impl implements Error
 type Impl struct {
+	descriptor *ErrDescriptor
 	message    string
 	code       Code
 	typ        Type
@@ -112,4 +113,18 @@ func (i *Impl) Fields() map[string]interface{} {
 	fields["type"] = i.Type()
 
 	return fields
+}
+
+// SafeImpl is the same as Impl, but only returns the safe attributes.
+type SafeImpl struct {
+	*Impl
+}
+
+// Attributes returns the safe attributes.
+func (i *SafeImpl) Attributes() Attributes {
+	if i.descriptor == nil {
+		return i.Impl.Attributes()
+	}
+
+	return Safe(i.Impl, i.descriptor.SafeAttributes).Attributes()
 }
