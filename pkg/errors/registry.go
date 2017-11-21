@@ -39,6 +39,10 @@ func (r *registry) Register(namespace string, err *ErrDescriptor) {
 		panic(fmt.Errorf("errors: Duplicate error code %v registered for namespace %s", err.Code, err.Namespace))
 	}
 
+	if err.MessageFormat == "" {
+		panic(fmt.Errorf("errors: An error cannot have an empty message"))
+	}
+
 	err.registered = true
 	r.byNamespaceAndCode[err.Namespace][err.Code] = err
 }
