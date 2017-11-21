@@ -322,6 +322,7 @@ func TestApplicationValidations(t *testing.T) {
 		req = &UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
 			Key: APIKey{
+				Key:  "key",
 				Name: "Foo-key",
 			},
 			UpdateMask: pbtypes.FieldMask{
@@ -334,6 +335,7 @@ func TestApplicationValidations(t *testing.T) {
 		req = &UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
 			Key: APIKey{
+				Key:  "key",
 				Name: "Foo-key",
 			},
 		}
@@ -345,6 +347,7 @@ func TestApplicationValidations(t *testing.T) {
 		req = &UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
 			Key: APIKey{
+				Key:    "key",
 				Name:   "Foo-key",
 				Rights: []Right{RIGHT_GATEWAY_DELETE},
 			},
@@ -358,6 +361,7 @@ func TestApplicationValidations(t *testing.T) {
 		req = &UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
 			Key: APIKey{
+				Key:  "key",
 				Name: "Foo-key",
 			},
 			UpdateMask: pbtypes.FieldMask{
@@ -507,6 +511,7 @@ func TestGatewayValidations(t *testing.T) {
 		req = &UpdateGatewayAPIKeyRequest{
 			GatewayIdentifier: GatewayIdentifier{"foo-app"},
 			Key: APIKey{
+				Key:  "key",
 				Name: "Foo-key",
 			},
 			UpdateMask: pbtypes.FieldMask{
@@ -519,6 +524,7 @@ func TestGatewayValidations(t *testing.T) {
 		req = &UpdateGatewayAPIKeyRequest{
 			GatewayIdentifier: GatewayIdentifier{"foo-app"},
 			Key: APIKey{
+				Key:  "key",
 				Name: "Foo-key",
 			},
 		}
@@ -530,6 +536,7 @@ func TestGatewayValidations(t *testing.T) {
 		req = &UpdateGatewayAPIKeyRequest{
 			GatewayIdentifier: GatewayIdentifier{"foo-app"},
 			Key: APIKey{
+				Key:    "key",
 				Name:   "Foo-key",
 				Rights: []Right{RIGHT_APPLICATION_DELETE},
 			},
@@ -543,6 +550,7 @@ func TestGatewayValidations(t *testing.T) {
 		req = &UpdateGatewayAPIKeyRequest{
 			GatewayIdentifier: GatewayIdentifier{"foo-app"},
 			Key: APIKey{
+				Key:  "key",
 				Name: "Foo-key",
 			},
 			UpdateMask: pbtypes.FieldMask{

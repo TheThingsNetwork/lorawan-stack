@@ -203,6 +203,10 @@ func (req *UpdateApplicationAPIKeyRequest) Validate() error {
 		validations = append(validations, err)
 	}
 
+	if err := validate.Field(req.Key.Key, validate.Required).DescribeFieldName("API key"); err != nil {
+		validations = append(validations, err)
+	}
+
 	var err validate.Errors
 	for _, path := range paths {
 		switch true {
@@ -321,6 +325,10 @@ func (req *UpdateGatewayAPIKeyRequest) Validate() error {
 	validations := make([]validate.Errors, 0)
 
 	if err := validate.Field(req.GatewayID, validate.ID).DescribeFieldName("Gateway ID"); err != nil {
+		validations = append(validations, err)
+	}
+
+	if err := validate.Field(req.Key.Key, validate.Required).DescribeFieldName("API key"); err != nil {
 		validations = append(validations, err)
 	}
 
