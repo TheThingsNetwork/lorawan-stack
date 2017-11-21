@@ -9,7 +9,7 @@ import (
 
 // In checks whether:
 //     - an element is contained in an array or slice
-//     - an slice is a subset of other slice
+//     - a slice is a subset of other slice
 func In(slice interface{}) validateFn {
 	return func(v interface{}) error {
 		sliceVal := reflect.ValueOf(slice)
