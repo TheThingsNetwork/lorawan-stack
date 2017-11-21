@@ -16,7 +16,6 @@ func gateway() *ttnpb.Gateway {
 		GatewayIdentifier: ttnpb.GatewayIdentifier{"test-gateway"},
 		Description:       "My description",
 		FrequencyPlanID:   "868_3",
-		Token:             "1111",
 		Platform:          "Kerklink",
 		ClusterAddress:    "localhost",
 		Attributes: map[string]string{
@@ -54,7 +53,7 @@ func TestShouldBeGatewayIgnoringAutoFields(t *testing.T) {
 	a.So(ShouldBeGatewayIgnoringAutoFields(gateway(), gateway()), should.Equal, success)
 
 	modified := gateway()
-	modified.Token = "foo"
+	modified.Platform = "foo"
 	modified.Attributes["foz"] = "baz"
 
 	a.So(ShouldBeGatewayIgnoringAutoFields(modified, gateway()), should.NotEqual, success)

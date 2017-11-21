@@ -15,16 +15,6 @@ func app() *ttnpb.Application {
 	return &ttnpb.Application{
 		ApplicationIdentifier: ttnpb.ApplicationIdentifier{"demo-app"},
 		Description:           "Demo application",
-		APIKeys: []ttnpb.APIKey{
-			{
-				Name: "test-key",
-				Key:  "123",
-				Rights: []ttnpb.Right{
-					ttnpb.Right(1),
-					ttnpb.Right(2),
-				},
-			},
-		},
 	}
 }
 

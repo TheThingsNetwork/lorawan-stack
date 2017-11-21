@@ -37,8 +37,7 @@ func TestShouldBeClientIgnoringAutoFields(t *testing.T) {
 	a.So(ShouldBeClientIgnoringAutoFields(client(), client()), should.Equal, success)
 
 	modified := client()
-	modified.Secret = "foo"
-	modified.Grants = []ttnpb.GrantType{}
+	modified.Description = "lol"
 
 	a.So(ShouldBeClientIgnoringAutoFields(modified, client()), should.NotEqual, success)
 }

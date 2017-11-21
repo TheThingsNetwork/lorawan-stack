@@ -46,6 +46,8 @@ func ShouldBeClient(actual interface{}, expected ...interface{}) string {
 	return all(
 		ShouldBeClientIgnoringAutoFields(a, b),
 		assertions.ShouldHappenWithin(a.CreatedAt, time.Millisecond, b.CreatedAt),
+		assertions.ShouldEqual(a.Secret, b.Secret),
+		assertions.ShouldResemble(a.Grants, b.Grants),
 	)
 }
 
@@ -69,11 +71,9 @@ func ShouldBeClientIgnoringAutoFields(actual interface{}, expected ...interface{
 	return all(
 		assertions.ShouldEqual(a.ClientID, b.ClientID),
 		assertions.ShouldResemble(a.Description, b.Description),
-		assertions.ShouldEqual(a.Secret, b.Secret),
 		assertions.ShouldEqual(a.RedirectURI, b.RedirectURI),
 		assertions.ShouldEqual(a.State, b.State),
 		assertions.ShouldEqual(a.OfficialLabeled, b.OfficialLabeled),
-		assertions.ShouldResemble(a.Grants, b.Grants),
 		assertions.ShouldResemble(a.Rights, b.Rights),
 		assertions.ShouldBeTrue(a.ArchivedAt.Equal(b.ArchivedAt)),
 	)

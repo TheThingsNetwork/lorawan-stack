@@ -45,6 +45,7 @@ func ShouldBeGateway(actual interface{}, expected ...interface{}) string {
 
 	return all(
 		ShouldBeGatewayIgnoringAutoFields(a, b),
+		assertions.ShouldHappenWithin(a.UpdatedAt, time.Millisecond, b.UpdatedAt),
 		assertions.ShouldHappenWithin(a.CreatedAt, time.Millisecond, b.CreatedAt),
 	)
 }
@@ -70,8 +71,7 @@ func ShouldBeGatewayIgnoringAutoFields(actual interface{}, expected ...interface
 		assertions.ShouldEqual(a.GatewayID, b.GatewayID),
 		assertions.ShouldEqual(a.Description, b.Description),
 		assertions.ShouldEqual(a.FrequencyPlanID, b.FrequencyPlanID),
-		assertions.ShouldEqual(a.Token, b.Token),
-		assertions.ShouldResemble(a.ActivatedAt, b.ActivatedAt),
+		assertions.ShouldBeTrue(a.ActivatedAt.Equal(b.ActivatedAt)),
 		assertions.ShouldResemble(a.PrivacySettings, b.PrivacySettings),
 		assertions.ShouldEqual(a.AutoUpdate, b.AutoUpdate),
 		assertions.ShouldResemble(a.Platform, b.Platform),
