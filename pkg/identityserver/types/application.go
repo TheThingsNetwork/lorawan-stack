@@ -11,7 +11,4 @@ type Application interface {
 	// GetApplication returns the ttnpb.Application that represents this
 	// application.
 	GetApplication() *ttnpb.Application
-
-	// SetAPIKeys sets the application API Keys.
-	SetAPIKeys([]ttnpb.APIKey)
 }
