@@ -8,11 +8,17 @@ var (
 	// FieldPathSettingsBlacklistedIDs is the field path for the blacklisted IDs field.
 	FieldPathSettingsBlacklistedIDs = regexp.MustCompile(`^blacklisted_ids$`)
 
-	// FieldPathSettingsAutomaticApproval is the field path for the automatic approval field.
-	FieldPathSettingsAutomaticApproval = regexp.MustCompile(`^automatic_approval$`)
+	// FieldPathSettingsUserRegistrationSkipValidation is the field path for the
+	// user registration flow skip validation field.
+	FieldPathSettingsUserRegistrationSkipValidation = regexp.MustCompile(`^user_registration.skip_validation$`)
 
-	// FieldPathSettingsClosedRegistration is the field path for the closed registration field.
-	FieldPathSettingsClosedRegistration = regexp.MustCompile(`^closed_registration$`)
+	// FieldPathSettingsUserRegistrationSelfRegistration is the field path for the
+	// user registration flow self registration field.
+	FieldPathSettingsUserRegistrationSelfRegistration = regexp.MustCompile(`^user_registration.self_registration$`)
+
+	// FieldPathSettingsUserRegistrationAdminApproval is the field path for the
+	// user registration flow admin approval field.
+	FieldPathSettingsUserRegistrationAdminApproval = regexp.MustCompile(`^user_registration.admin_approval$`)
 
 	// FieldPathSettingsValidationTokenTTL is the field path for the validation token TTL field.
 	FieldPathSettingsValidationTokenTTL = regexp.MustCompile(`^validation_token_ttl$`)

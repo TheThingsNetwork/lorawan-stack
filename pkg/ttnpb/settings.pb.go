@@ -26,17 +26,13 @@ var _ = time.Kitchen
 type IdentityServerSettings struct {
 	// blacklisted_ids is the list of IDs that are not allowed to use in the network.
 	BlacklistedIDs []string `protobuf:"bytes,1,rep,name=blacklisted_ids,json=blacklistedIds" json:"blacklisted_ids,omitempty"`
-	// automatic_approval denotes if the users are approved automatically after
-	// registration or they need to validate their account through email.
-	AutomaticApproval bool `protobuf:"varint,2,opt,name=automatic_approval,json=automaticApproval,proto3" json:"automatic_approval,omitempty"`
-	// closed_registration denotes whether people can freely register user accounts
-	// or they need to be granted an invitation to do so.
-	ClosedRegistration bool `protobuf:"varint,3,opt,name=closed_registration,json=closedRegistration,proto3" json:"closed_registration,omitempty"`
+	// user_registration are the settings used to configure the user registration flow.
+	UserRegistration IdentityServerSettings_UserRegistrationFlow `protobuf:"bytes,2,opt,name=user_registration,json=userRegistration" json:"user_registration"`
 	// validation_token_ttl denotes the time an account validation token is valid
 	// after being issued.
-	ValidationTokenTTL time.Duration `protobuf:"bytes,4,opt,name=validation_token_ttl,json=validationTokenTtl,stdduration" json:"validation_token_ttl"`
+	ValidationTokenTTL time.Duration `protobuf:"bytes,3,opt,name=validation_token_ttl,json=validationTokenTtl,stdduration" json:"validation_token_ttl"`
 	// allowed_emails is a list of globs to restrict emails to. If empty all emails are valid.
-	AllowedEmails []string `protobuf:"bytes,5,rep,name=allowed_emails,json=allowedEmails" json:"allowed_emails,omitempty"`
+	AllowedEmails []string `protobuf:"bytes,4,rep,name=allowed_emails,json=allowedEmails" json:"allowed_emails,omitempty"`
 }
 
 func (m *IdentityServerSettings) Reset()                    { *m = IdentityServerSettings{} }
@@ -51,18 +47,11 @@ func (m *IdentityServerSettings) GetBlacklistedIDs() []string {
 	return nil
 }
 
-func (m *IdentityServerSettings) GetAutomaticApproval() bool {
+func (m *IdentityServerSettings) GetUserRegistration() IdentityServerSettings_UserRegistrationFlow {
 	if m != nil {
-		return m.AutomaticApproval
+		return m.UserRegistration
 	}
-	return false
-}
-
-func (m *IdentityServerSettings) GetClosedRegistration() bool {
-	if m != nil {
-		return m.ClosedRegistration
-	}
-	return false
+	return IdentityServerSettings_UserRegistrationFlow{}
 }
 
 func (m *IdentityServerSettings) GetValidationTokenTTL() time.Duration {
@@ -79,9 +68,55 @@ func (m *IdentityServerSettings) GetAllowedEmails() []string {
 	return nil
 }
 
+type IdentityServerSettings_UserRegistrationFlow struct {
+	// skip_validation denotes whether if users need to validate their email
+	// account after registration or this step is skipped.
+	SkipValidation bool `protobuf:"varint,1,opt,name=skip_validation,json=skipValidation,proto3" json:"skip_validation,omitempty"`
+	// self_registration denotes whether people can register themselves an user
+	// account or they need to be granted an invitation to do so.
+	SelfRegistration bool `protobuf:"varint,2,opt,name=self_registration,json=selfRegistration,proto3" json:"self_registration,omitempty"`
+	// admin_approval denotes whether or not admins need to validate user accounts
+	// after they are registered.
+	AdminApproval bool `protobuf:"varint,3,opt,name=admin_approval,json=adminApproval,proto3" json:"admin_approval,omitempty"`
+}
+
+func (m *IdentityServerSettings_UserRegistrationFlow) Reset() {
+	*m = IdentityServerSettings_UserRegistrationFlow{}
+}
+func (m *IdentityServerSettings_UserRegistrationFlow) String() string {
+	return proto.CompactTextString(m)
+}
+func (*IdentityServerSettings_UserRegistrationFlow) ProtoMessage() {}
+func (*IdentityServerSettings_UserRegistrationFlow) Descriptor() ([]byte, []int) {
+	return fileDescriptorSettings, []int{0, 0}
+}
+
+func (m *IdentityServerSettings_UserRegistrationFlow) GetSkipValidation() bool {
+	if m != nil {
+		return m.SkipValidation
+	}
+	return false
+}
+
+func (m *IdentityServerSettings_UserRegistrationFlow) GetSelfRegistration() bool {
+	if m != nil {
+		return m.SelfRegistration
+	}
+	return false
+}
+
+func (m *IdentityServerSettings_UserRegistrationFlow) GetAdminApproval() bool {
+	if m != nil {
+		return m.AdminApproval
+	}
+	return false
+}
+
 func init() {
 	proto.RegisterType((*IdentityServerSettings)(nil), "ttn.v3.IdentityServerSettings")
 	golang_proto.RegisterType((*IdentityServerSettings)(nil), "ttn.v3.IdentityServerSettings")
+	proto.RegisterType((*IdentityServerSettings_UserRegistrationFlow)(nil), "ttn.v3.IdentityServerSettings.UserRegistrationFlow")
+	golang_proto.RegisterType((*IdentityServerSettings_UserRegistrationFlow)(nil), "ttn.v3.IdentityServerSettings.UserRegistrationFlow")
 }
 func (this *IdentityServerSettings) VerboseEqual(that interface{}) error {
 	if that == nil {
@@ -116,11 +151,8 @@ func (this *IdentityServerSettings) VerboseEqual(that interface{}) error {
 			return fmt.Errorf("BlacklistedIDs this[%v](%v) Not Equal that[%v](%v)", i, this.BlacklistedIDs[i], i, that1.BlacklistedIDs[i])
 		}
 	}
-	if this.AutomaticApproval != that1.AutomaticApproval {
-		return fmt.Errorf("AutomaticApproval this(%v) Not Equal that(%v)", this.AutomaticApproval, that1.AutomaticApproval)
-	}
-	if this.ClosedRegistration != that1.ClosedRegistration {
-		return fmt.Errorf("ClosedRegistration this(%v) Not Equal that(%v)", this.ClosedRegistration, that1.ClosedRegistration)
+	if !this.UserRegistration.Equal(&that1.UserRegistration) {
+		return fmt.Errorf("UserRegistration this(%v) Not Equal that(%v)", this.UserRegistration, that1.UserRegistration)
 	}
 	if this.ValidationTokenTTL != that1.ValidationTokenTTL {
 		return fmt.Errorf("ValidationTokenTTL this(%v) Not Equal that(%v)", this.ValidationTokenTTL, that1.ValidationTokenTTL)
@@ -168,10 +200,7 @@ func (this *IdentityServerSettings) Equal(that interface{}) bool {
 			return false
 		}
 	}
-	if this.AutomaticApproval != that1.AutomaticApproval {
-		return false
-	}
-	if this.ClosedRegistration != that1.ClosedRegistration {
+	if !this.UserRegistration.Equal(&that1.UserRegistration) {
 		return false
 	}
 	if this.ValidationTokenTTL != that1.ValidationTokenTTL {
@@ -184,6 +213,78 @@ func (this *IdentityServerSettings) Equal(that interface{}) bool {
 		if this.AllowedEmails[i] != that1.AllowedEmails[i] {
 			return false
 		}
+	}
+	return true
+}
+func (this *IdentityServerSettings_UserRegistrationFlow) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*IdentityServerSettings_UserRegistrationFlow)
+	if !ok {
+		that2, ok := that.(IdentityServerSettings_UserRegistrationFlow)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *IdentityServerSettings_UserRegistrationFlow")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *IdentityServerSettings_UserRegistrationFlow but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *IdentityServerSettings_UserRegistrationFlow but is not nil && this == nil")
+	}
+	if this.SkipValidation != that1.SkipValidation {
+		return fmt.Errorf("SkipValidation this(%v) Not Equal that(%v)", this.SkipValidation, that1.SkipValidation)
+	}
+	if this.SelfRegistration != that1.SelfRegistration {
+		return fmt.Errorf("SelfRegistration this(%v) Not Equal that(%v)", this.SelfRegistration, that1.SelfRegistration)
+	}
+	if this.AdminApproval != that1.AdminApproval {
+		return fmt.Errorf("AdminApproval this(%v) Not Equal that(%v)", this.AdminApproval, that1.AdminApproval)
+	}
+	return nil
+}
+func (this *IdentityServerSettings_UserRegistrationFlow) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*IdentityServerSettings_UserRegistrationFlow)
+	if !ok {
+		that2, ok := that.(IdentityServerSettings_UserRegistrationFlow)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.SkipValidation != that1.SkipValidation {
+		return false
+	}
+	if this.SelfRegistration != that1.SelfRegistration {
+		return false
+	}
+	if this.AdminApproval != that1.AdminApproval {
+		return false
 	}
 	return true
 }
@@ -217,37 +318,25 @@ func (m *IdentityServerSettings) MarshalTo(dAtA []byte) (int, error) {
 			i += copy(dAtA[i:], s)
 		}
 	}
-	if m.AutomaticApproval {
-		dAtA[i] = 0x10
-		i++
-		if m.AutomaticApproval {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.ClosedRegistration {
-		dAtA[i] = 0x18
-		i++
-		if m.ClosedRegistration {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	dAtA[i] = 0x22
+	dAtA[i] = 0x12
 	i++
-	i = encodeVarintSettings(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.ValidationTokenTTL)))
-	n1, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.ValidationTokenTTL, dAtA[i:])
+	i = encodeVarintSettings(dAtA, i, uint64(m.UserRegistration.Size()))
+	n1, err := m.UserRegistration.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n1
+	dAtA[i] = 0x1a
+	i++
+	i = encodeVarintSettings(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.ValidationTokenTTL)))
+	n2, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.ValidationTokenTTL, dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n2
 	if len(m.AllowedEmails) > 0 {
 		for _, s := range m.AllowedEmails {
-			dAtA[i] = 0x2a
+			dAtA[i] = 0x22
 			i++
 			l = len(s)
 			for l >= 1<<7 {
@@ -259,6 +348,54 @@ func (m *IdentityServerSettings) MarshalTo(dAtA []byte) (int, error) {
 			i++
 			i += copy(dAtA[i:], s)
 		}
+	}
+	return i, nil
+}
+
+func (m *IdentityServerSettings_UserRegistrationFlow) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *IdentityServerSettings_UserRegistrationFlow) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.SkipValidation {
+		dAtA[i] = 0x8
+		i++
+		if m.SkipValidation {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.SelfRegistration {
+		dAtA[i] = 0x10
+		i++
+		if m.SelfRegistration {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.AdminApproval {
+		dAtA[i] = 0x18
+		i++
+		if m.AdminApproval {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
 	}
 	return i, nil
 }
@@ -279,15 +416,25 @@ func NewPopulatedIdentityServerSettings(r randySettings, easy bool) *IdentitySer
 	for i := 0; i < v1; i++ {
 		this.BlacklistedIDs[i] = string(randStringSettings(r))
 	}
-	this.AutomaticApproval = bool(bool(r.Intn(2) == 0))
-	this.ClosedRegistration = bool(bool(r.Intn(2) == 0))
-	v2 := github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
-	this.ValidationTokenTTL = *v2
-	v3 := r.Intn(10)
-	this.AllowedEmails = make([]string, v3)
-	for i := 0; i < v3; i++ {
+	v2 := NewPopulatedIdentityServerSettings_UserRegistrationFlow(r, easy)
+	this.UserRegistration = *v2
+	v3 := github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
+	this.ValidationTokenTTL = *v3
+	v4 := r.Intn(10)
+	this.AllowedEmails = make([]string, v4)
+	for i := 0; i < v4; i++ {
 		this.AllowedEmails[i] = string(randStringSettings(r))
 	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedIdentityServerSettings_UserRegistrationFlow(r randySettings, easy bool) *IdentityServerSettings_UserRegistrationFlow {
+	this := &IdentityServerSettings_UserRegistrationFlow{}
+	this.SkipValidation = bool(bool(r.Intn(2) == 0))
+	this.SelfRegistration = bool(bool(r.Intn(2) == 0))
+	this.AdminApproval = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -312,9 +459,9 @@ func randUTF8RuneSettings(r randySettings) rune {
 	return rune(ru + 61)
 }
 func randStringSettings(r randySettings) string {
-	v4 := r.Intn(100)
-	tmps := make([]rune, v4)
-	for i := 0; i < v4; i++ {
+	v5 := r.Intn(100)
+	tmps := make([]rune, v5)
+	for i := 0; i < v5; i++ {
 		tmps[i] = randUTF8RuneSettings(r)
 	}
 	return string(tmps)
@@ -336,11 +483,11 @@ func randFieldSettings(dAtA []byte, r randySettings, fieldNumber int, wire int) 
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateSettings(dAtA, uint64(key))
-		v5 := r.Int63()
+		v6 := r.Int63()
 		if r.Intn(2) == 0 {
-			v5 *= -1
+			v6 *= -1
 		}
-		dAtA = encodeVarintPopulateSettings(dAtA, uint64(v5))
+		dAtA = encodeVarintPopulateSettings(dAtA, uint64(v6))
 	case 1:
 		dAtA = encodeVarintPopulateSettings(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -374,12 +521,8 @@ func (m *IdentityServerSettings) Size() (n int) {
 			n += 1 + l + sovSettings(uint64(l))
 		}
 	}
-	if m.AutomaticApproval {
-		n += 2
-	}
-	if m.ClosedRegistration {
-		n += 2
-	}
+	l = m.UserRegistration.Size()
+	n += 1 + l + sovSettings(uint64(l))
 	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.ValidationTokenTTL)
 	n += 1 + l + sovSettings(uint64(l))
 	if len(m.AllowedEmails) > 0 {
@@ -387,6 +530,21 @@ func (m *IdentityServerSettings) Size() (n int) {
 			l = len(s)
 			n += 1 + l + sovSettings(uint64(l))
 		}
+	}
+	return n
+}
+
+func (m *IdentityServerSettings_UserRegistrationFlow) Size() (n int) {
+	var l int
+	_ = l
+	if m.SkipValidation {
+		n += 2
+	}
+	if m.SelfRegistration {
+		n += 2
+	}
+	if m.AdminApproval {
+		n += 2
 	}
 	return n
 }
@@ -463,10 +621,10 @@ func (m *IdentityServerSettings) Unmarshal(dAtA []byte) error {
 			m.BlacklistedIDs = append(m.BlacklistedIDs, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AutomaticApproval", wireType)
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserRegistration", wireType)
 			}
-			var v int
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowSettings
@@ -476,33 +634,23 @@ func (m *IdentityServerSettings) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= (int(b) & 0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			m.AutomaticApproval = bool(v != 0)
+			if msglen < 0 {
+				return ErrInvalidLengthSettings
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.UserRegistration.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClosedRegistration", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowSettings
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.ClosedRegistration = bool(v != 0)
-		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ValidationTokenTTL", wireType)
 			}
@@ -532,7 +680,7 @@ func (m *IdentityServerSettings) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 5:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AllowedEmails", wireType)
 			}
@@ -561,6 +709,116 @@ func (m *IdentityServerSettings) Unmarshal(dAtA []byte) error {
 			}
 			m.AllowedEmails = append(m.AllowedEmails, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipSettings(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthSettings
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *IdentityServerSettings_UserRegistrationFlow) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowSettings
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UserRegistrationFlow: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UserRegistrationFlow: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SkipValidation", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSettings
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.SkipValidation = bool(v != 0)
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SelfRegistration", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSettings
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.SelfRegistration = bool(v != 0)
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AdminApproval", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSettings
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.AdminApproval = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipSettings(dAtA[iNdEx:])
@@ -695,34 +953,38 @@ func init() {
 }
 
 var fileDescriptorSettings = []byte{
-	// 461 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x92, 0x31, 0x6c, 0xd3, 0x40,
-	0x14, 0x86, 0xef, 0xb5, 0x50, 0x81, 0x11, 0x41, 0x1c, 0x08, 0x85, 0x0e, 0x2f, 0x11, 0x12, 0x52,
-	0x18, 0x6a, 0x4b, 0xed, 0xc8, 0x44, 0x54, 0x86, 0x48, 0x88, 0x21, 0x8d, 0x18, 0x58, 0xac, 0x4b,
-	0x7c, 0x38, 0x27, 0x5f, 0x7c, 0x96, 0xfd, 0xe2, 0x8a, 0xad, 0x63, 0x47, 0xc6, 0x6e, 0x30, 0x76,
-	0xec, 0xd8, 0xb1, 0x63, 0xd8, 0x3a, 0x76, 0x0a, 0xf5, 0x79, 0xe9, 0xd8, 0xb1, 0x23, 0x8a, 0x1d,
-	0xda, 0x88, 0xa5, 0x93, 0xfd, 0xfe, 0xef, 0xff, 0x75, 0xf7, 0x3f, 0x9d, 0xb3, 0x1d, 0x2a, 0x1a,
-	0x4f, 0x87, 0xee, 0xc8, 0x4c, 0xbc, 0xc1, 0x58, 0x0e, 0xc6, 0x2a, 0x0e, 0xb3, 0xcf, 0x92, 0xf6,
-	0x4d, 0x1a, 0x79, 0x44, 0xb1, 0x27, 0x12, 0xe5, 0x65, 0x92, 0x68, 0xa1, 0xbb, 0x49, 0x6a, 0xc8,
-	0xf0, 0x0d, 0xa2, 0xd8, 0xcd, 0x77, 0x36, 0xb7, 0x56, 0xb2, 0xa1, 0x09, 0x8d, 0x57, 0xe1, 0xe1,
-	0xf4, 0x5b, 0x35, 0x55, 0x43, 0xf5, 0x57, 0xc7, 0x36, 0x31, 0x34, 0x26, 0xd4, 0xf2, 0xce, 0x15,
-	0x4c, 0x53, 0x41, 0xca, 0xc4, 0x35, 0x7f, 0xf3, 0x7b, 0xcd, 0x79, 0xd5, 0x0b, 0x64, 0x4c, 0x8a,
-	0xbe, 0xef, 0xc9, 0x34, 0x97, 0xe9, 0xde, 0xf2, 0x5c, 0xfe, 0xde, 0x79, 0x36, 0xd4, 0x62, 0x14,
-	0x69, 0x95, 0x91, 0x0c, 0x7c, 0x15, 0x64, 0x4d, 0x68, 0xaf, 0x77, 0x1e, 0x77, 0xb9, 0x9d, 0xb7,
-	0x1a, 0xdd, 0x3b, 0xd4, 0xdb, 0xcd, 0xfa, 0x8d, 0x15, 0x6b, 0x2f, 0xc8, 0xf8, 0x96, 0xc3, 0xc5,
-	0x94, 0xcc, 0x44, 0x90, 0x1a, 0xf9, 0x22, 0x49, 0x52, 0x93, 0x0b, 0xdd, 0x5c, 0x6b, 0x43, 0xe7,
-	0x51, 0xff, 0xf9, 0x2d, 0xf9, 0xb0, 0x04, 0xdc, 0x73, 0x5e, 0x8c, 0xb4, 0xc9, 0x64, 0xe0, 0xa7,
-	0x32, 0x54, 0x19, 0xd5, 0x77, 0x6c, 0xae, 0x57, 0x7e, 0x5e, 0xa3, 0xfe, 0x0a, 0xe1, 0x91, 0xf3,
-	0x32, 0x17, 0x5a, 0x05, 0xd5, 0xe4, 0x93, 0x89, 0x64, 0xec, 0x13, 0xe9, 0xe6, 0x83, 0x36, 0x74,
-	0x9e, 0x6c, 0xbf, 0x76, 0xeb, 0xda, 0xee, 0xbf, 0xda, 0xee, 0xee, 0xb2, 0x76, 0x17, 0x67, 0xf3,
-	0x16, 0xb3, 0xf3, 0x16, 0xff, 0x72, 0x1b, 0x1f, 0x2c, 0xd2, 0x83, 0xc1, 0xa7, 0xa3, 0x3f, 0x2d,
-	0xe8, 0xf3, 0xfc, 0x3f, 0x9d, 0x34, 0x7f, 0xeb, 0x34, 0x84, 0xd6, 0x66, 0x5f, 0x06, 0xbe, 0x9c,
-	0x08, 0xa5, 0xb3, 0xe6, 0xc3, 0xc5, 0x22, 0xfa, 0x4f, 0x97, 0xea, 0xc7, 0x4a, 0xec, 0xfe, 0x84,
-	0x59, 0x81, 0x70, 0x5e, 0x20, 0x5c, 0x14, 0x08, 0x97, 0x05, 0xc2, 0x55, 0x81, 0xec, 0xba, 0x40,
-	0x76, 0x53, 0x20, 0x1c, 0x58, 0x64, 0x87, 0x16, 0xd9, 0xb1, 0x45, 0x38, 0xb1, 0xc8, 0x4e, 0x2d,
-	0xc2, 0x99, 0x45, 0x98, 0x59, 0x84, 0x73, 0x8b, 0x70, 0x61, 0x91, 0x5d, 0x5a, 0x84, 0x2b, 0x8b,
-	0xec, 0xda, 0x22, 0xdc, 0x58, 0x64, 0x07, 0x25, 0xb2, 0xc3, 0x12, 0xe1, 0x47, 0x89, 0xec, 0xa8,
-	0x44, 0xf8, 0x55, 0x22, 0x3b, 0x2e, 0x91, 0x9d, 0x94, 0x08, 0xa7, 0x25, 0xc2, 0x59, 0x89, 0xf0,
-	0xf5, 0xdd, 0x7d, 0xaf, 0x29, 0x89, 0xc2, 0xc5, 0x37, 0x19, 0x0e, 0x37, 0xaa, 0x7d, 0xec, 0xfc,
-	0x0d, 0x00, 0x00, 0xff, 0xff, 0x2f, 0x17, 0x47, 0x45, 0x81, 0x02, 0x00, 0x00,
+	// 519 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x52, 0x31, 0x6c, 0xd3, 0x4c,
+	0x14, 0xbe, 0xf7, 0xa7, 0xaa, 0xf2, 0x1b, 0x35, 0x6d, 0xad, 0x0a, 0x85, 0x0c, 0x2f, 0x11, 0x12,
+	0x22, 0x08, 0xe1, 0x48, 0xcd, 0xc8, 0x44, 0x54, 0x90, 0x22, 0x21, 0x06, 0x37, 0x30, 0xb0, 0x58,
+	0x4e, 0x7d, 0x71, 0x4e, 0xbe, 0xf8, 0x2c, 0xdf, 0x25, 0x11, 0x5b, 0xc7, 0x8e, 0x48, 0x2c, 0xdd,
+	0x60, 0xec, 0xd8, 0xb1, 0x63, 0xc7, 0x8c, 0x1d, 0x3b, 0x85, 0xfa, 0x3c, 0xd0, 0xb1, 0x63, 0x47,
+	0x64, 0x3b, 0x90, 0x50, 0x2a, 0x31, 0xd9, 0xef, 0xfb, 0xde, 0xf7, 0xbe, 0xf7, 0x3d, 0xdb, 0xd8,
+	0xf5, 0x99, 0x1a, 0x8e, 0xfb, 0xd6, 0x81, 0x18, 0xb5, 0x7a, 0x43, 0xda, 0x1b, 0xb2, 0xd0, 0x97,
+	0xef, 0xa8, 0x9a, 0x8a, 0x38, 0x68, 0x29, 0x15, 0xb6, 0xdc, 0x88, 0xb5, 0x24, 0x55, 0x2a, 0xc3,
+	0xad, 0x28, 0x16, 0x4a, 0x98, 0xeb, 0x4a, 0x85, 0xd6, 0xa4, 0x5d, 0x7b, 0xb1, 0xa2, 0xf5, 0x85,
+	0x2f, 0x5a, 0x39, 0xdd, 0x1f, 0x0f, 0xf2, 0x2a, 0x2f, 0xf2, 0xb7, 0x42, 0x56, 0x43, 0x5f, 0x08,
+	0x9f, 0xd3, 0x65, 0x97, 0x37, 0x8e, 0x5d, 0xc5, 0x44, 0x58, 0xf0, 0x8f, 0x7f, 0x94, 0x8c, 0x87,
+	0x5d, 0x8f, 0x86, 0x8a, 0xa9, 0x4f, 0xfb, 0x34, 0x9e, 0xd0, 0x78, 0x7f, 0xe1, 0x6b, 0xbe, 0x34,
+	0x36, 0xfb, 0xdc, 0x3d, 0x08, 0x38, 0x93, 0x8a, 0x7a, 0x0e, 0xf3, 0x64, 0x15, 0x1a, 0xa5, 0xe6,
+	0xff, 0x1d, 0x53, 0xcf, 0xeb, 0x95, 0xce, 0x92, 0xea, 0xee, 0x49, 0xbb, 0xb2, 0xd2, 0xda, 0xf5,
+	0xa4, 0x39, 0x30, 0xb6, 0xc7, 0x92, 0xc6, 0x4e, 0x4c, 0x7d, 0x26, 0x55, 0x61, 0x59, 0xfd, 0xaf,
+	0x01, 0xcd, 0x07, 0xbb, 0x6d, 0xab, 0x88, 0x62, 0xdd, 0xef, 0x6b, 0xbd, 0x97, 0x34, 0xb6, 0x57,
+	0x64, 0x6f, 0xb8, 0x98, 0x76, 0xd6, 0x66, 0xf3, 0x3a, 0xb1, 0xb7, 0xc6, 0x77, 0x38, 0x33, 0x30,
+	0x76, 0x26, 0x2e, 0x67, 0x5e, 0x5e, 0x39, 0x4a, 0x04, 0x34, 0x74, 0x94, 0xe2, 0xd5, 0x52, 0x6e,
+	0xf5, 0xc8, 0x2a, 0xe2, 0x5b, 0xbf, 0xe2, 0x5b, 0x7b, 0x8b, 0xf8, 0x1d, 0xcc, 0x06, 0xea, 0x79,
+	0xdd, 0xfc, 0xf0, 0x5b, 0xde, 0xcb, 0xd4, 0xbd, 0xde, 0xdb, 0xe3, 0xef, 0x75, 0xb0, 0xcd, 0xc9,
+	0x1d, 0x5c, 0x71, 0xf3, 0x89, 0x51, 0x71, 0x39, 0x17, 0x53, 0xea, 0x39, 0x74, 0xe4, 0x32, 0x2e,
+	0xab, 0x6b, 0xd9, 0x41, 0xec, 0x8d, 0x05, 0xfa, 0x3a, 0x07, 0x6b, 0x5f, 0xc0, 0xd8, 0xb9, 0x2f,
+	0x84, 0xf9, 0xd4, 0xd8, 0x94, 0x01, 0x8b, 0x9c, 0xe5, 0xe8, 0x2a, 0x34, 0xa0, 0x59, 0xb6, 0x2b,
+	0x19, 0xbc, 0x5c, 0xc4, 0x7c, 0x6e, 0x6c, 0x4b, 0xca, 0x07, 0x7f, 0x5f, 0xaf, 0x6c, 0x6f, 0x65,
+	0xc4, 0x1f, 0x27, 0xc8, 0xb6, 0xf2, 0x46, 0x2c, 0x74, 0xdc, 0x28, 0x8a, 0xc5, 0xc4, 0x2d, 0xc2,
+	0x97, 0xed, 0x8d, 0x1c, 0x7d, 0xb5, 0x00, 0x3b, 0x5f, 0x61, 0x96, 0x20, 0x5c, 0x24, 0x08, 0x97,
+	0x09, 0xc2, 0x55, 0x82, 0x70, 0x9d, 0x20, 0xb9, 0x49, 0x90, 0xdc, 0x26, 0x08, 0x87, 0x1a, 0xc9,
+	0x91, 0x46, 0x72, 0xa2, 0x11, 0x4e, 0x35, 0x92, 0x33, 0x8d, 0x70, 0xae, 0x11, 0x66, 0x1a, 0xe1,
+	0x42, 0x23, 0x5c, 0x6a, 0x24, 0x57, 0x1a, 0xe1, 0x5a, 0x23, 0xb9, 0xd1, 0x08, 0xb7, 0x1a, 0xc9,
+	0x61, 0x8a, 0xe4, 0x28, 0x45, 0xf8, 0x9c, 0x22, 0x39, 0x4e, 0x11, 0xbe, 0xa5, 0x48, 0x4e, 0x52,
+	0x24, 0xa7, 0x29, 0xc2, 0x59, 0x8a, 0x70, 0x9e, 0x22, 0x7c, 0x7c, 0xf6, 0xaf, 0x7f, 0x3d, 0x0a,
+	0xfc, 0xec, 0x19, 0xf5, 0xfb, 0xeb, 0xf9, 0x57, 0x6a, 0xff, 0x0c, 0x00, 0x00, 0xff, 0xff, 0x84,
+	0x83, 0x8f, 0xfd, 0x1f, 0x03, 0x00, 0x00,
 }

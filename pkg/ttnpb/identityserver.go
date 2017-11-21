@@ -19,8 +19,9 @@ func (req *GetSettingsRequest) Validate() error {
 	for _, path := range paths {
 		switch true {
 		case FieldPathSettingsBlacklistedIDs.MatchString(path),
-			FieldPathSettingsAutomaticApproval.MatchString(path),
-			FieldPathSettingsClosedRegistration.MatchString(path),
+			FieldPathSettingsUserRegistrationSkipValidation.MatchString(path),
+			FieldPathSettingsUserRegistrationSelfRegistration.MatchString(path),
+			FieldPathSettingsUserRegistrationAdminApproval.MatchString(path),
 			FieldPathSettingsValidationTokenTTL.MatchString(path),
 			FieldPathSettingsAllowedEmails.MatchString(path):
 		default:
@@ -55,8 +56,9 @@ func (req *UpdateSettingsRequest) Validate() error {
 					validations = append(validations, err)
 				}
 			}
-		case FieldPathSettingsAutomaticApproval.MatchString(path),
-			FieldPathSettingsClosedRegistration.MatchString(path),
+		case FieldPathSettingsUserRegistrationSkipValidation.MatchString(path),
+			FieldPathSettingsUserRegistrationSelfRegistration.MatchString(path),
+			FieldPathSettingsUserRegistrationAdminApproval.MatchString(path),
 			FieldPathSettingsValidationTokenTTL.MatchString(path),
 			FieldPathSettingsAllowedEmails.MatchString(path):
 		default:

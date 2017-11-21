@@ -69,10 +69,12 @@ func TestSettingsValidations(t *testing.T) {
 		// good request
 		req = &UpdateSettingsRequest{
 			Settings: IdentityServerSettings{
-				AutomaticApproval: true,
+				UserRegistration: IdentityServerSettings_UserRegistrationFlow{
+					SkipValidation: true,
+				},
 			},
 			UpdateMask: pbtypes.FieldMask{
-				Paths: []string{"automatic_approval"},
+				Paths: []string{"user_registration.skip_validation"},
 			},
 		}
 		a.So(req.Validate(), should.BeNil)
