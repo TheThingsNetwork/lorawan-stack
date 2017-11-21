@@ -4,7 +4,6 @@ syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
-import "github.com/TheThingsNetwork/ttn/api/auth.proto";
 import "github.com/TheThingsNetwork/ttn/api/rights.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -76,4 +75,19 @@ enum ClientState {
   // Denotes that the client request has been rejected by the tenant admin
   // and therefore it cannot be used.
   STATE_REJECTED = 2;
+}
+
+// GrantType enum defines the OAuth2 flows a third-party client can use to get
+// access to a token.
+enum GrantType {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  // Grant type used to exchange an authorization code for an access token.
+  GRANT_AUTHORIZATION_CODE = 0;
+
+  // Grant type used to exchange an user ID and password for an access token.
+  GRANT_PASSWORD = 1;
+
+  // Grant type used to exchange a refresh token for an access token.
+  GRANT_REFRESH_TOKEN = 2;
 }
