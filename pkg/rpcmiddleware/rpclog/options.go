@@ -68,7 +68,7 @@ func DefaultCodeToLevel(code codes.Code) log.Level {
 	case codes.Canceled:
 		return log.InfoLevel
 	case codes.Unknown:
-		return log.ErrorLevel
+		return log.WarnLevel
 	case codes.InvalidArgument:
 		return log.InfoLevel
 	case codes.DeadlineExceeded:
@@ -80,7 +80,7 @@ func DefaultCodeToLevel(code codes.Code) log.Level {
 	case codes.PermissionDenied:
 		return log.WarnLevel
 	case codes.Unauthenticated:
-		return log.InfoLevel // unauthenticated requests can happen
+		return log.InfoLevel
 	case codes.ResourceExhausted:
 		return log.WarnLevel
 	case codes.FailedPrecondition:
@@ -88,7 +88,7 @@ func DefaultCodeToLevel(code codes.Code) log.Level {
 	case codes.Aborted:
 		return log.WarnLevel
 	case codes.OutOfRange:
-		return log.WarnLevel
+		return log.InfoLevel
 	case codes.Unimplemented:
 		return log.ErrorLevel
 	case codes.Internal:
@@ -110,29 +110,29 @@ func DefaultClientCodeToLevel(code codes.Code) log.Level {
 	case codes.Canceled:
 		return log.DebugLevel
 	case codes.Unknown:
-		return log.InfoLevel
+		return log.DebugLevel
 	case codes.InvalidArgument:
 		return log.DebugLevel
 	case codes.DeadlineExceeded:
-		return log.InfoLevel
+		return log.DebugLevel
 	case codes.NotFound:
 		return log.DebugLevel
 	case codes.AlreadyExists:
 		return log.DebugLevel
 	case codes.PermissionDenied:
-		return log.InfoLevel
-	case codes.Unauthenticated:
-		return log.InfoLevel // unauthenticated requests can happen
-	case codes.ResourceExhausted:
-		return log.DebugLevel
-	case codes.FailedPrecondition:
-		return log.DebugLevel
-	case codes.Aborted:
-		return log.DebugLevel
-	case codes.OutOfRange:
-		return log.DebugLevel
-	case codes.Unimplemented:
 		return log.WarnLevel
+	case codes.Unauthenticated:
+		return log.WarnLevel
+	case codes.ResourceExhausted:
+		return log.WarnLevel
+	case codes.FailedPrecondition:
+		return log.WarnLevel
+	case codes.Aborted:
+		return log.WarnLevel
+	case codes.OutOfRange:
+		return log.WarnLevel
+	case codes.Unimplemented:
+		return log.ErrorLevel // Probably client/server version mismatch
 	case codes.Internal:
 		return log.WarnLevel
 	case codes.Unavailable:
@@ -140,6 +140,6 @@ func DefaultClientCodeToLevel(code codes.Code) log.Level {
 	case codes.DataLoss:
 		return log.WarnLevel
 	default:
-		return log.InfoLevel
+		return log.WarnLevel
 	}
 }
