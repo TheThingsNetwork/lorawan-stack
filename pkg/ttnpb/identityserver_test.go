@@ -28,7 +28,7 @@ func TestSettingsValidations(t *testing.T) {
 		}
 		err = req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+		a.So(ErrInvalidPathFieldMask.Describes(err), should.BeTrue)
 
 		// good request
 		req = &UpdateSettingsRequest{
@@ -89,7 +89,7 @@ func TestUserValidations(t *testing.T) {
 		}
 		err = req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+		a.So(ErrInvalidPathFieldMask.Describes(err), should.BeTrue)
 
 		// good request
 		req = &UpdateUserRequest{
@@ -240,7 +240,7 @@ func TestApplicationValidations(t *testing.T) {
 		}
 		err = req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+		a.So(ErrInvalidPathFieldMask.Describes(err), should.BeTrue)
 
 		// good request
 		req = &UpdateApplicationRequest{
@@ -400,7 +400,7 @@ func TestGatewayValidations(t *testing.T) {
 		}
 		err = req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+		a.So(ErrInvalidPathFieldMask.Describes(err), should.BeTrue)
 
 		// good request
 		req = &UpdateApplicationRequest{
@@ -563,7 +563,7 @@ func TestClientValidations(t *testing.T) {
 		}
 		err = req.Validate()
 		a.So(err, should.NotBeNil)
-		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+		a.So(ErrInvalidPathFieldMask.Describes(err), should.BeTrue)
 
 		// good request
 		req = &UpdateClientRequest{
