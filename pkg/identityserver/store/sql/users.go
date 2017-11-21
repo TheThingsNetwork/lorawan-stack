@@ -93,6 +93,7 @@ func (s *UserStore) create(q db.QueryContext, user types.User) error {
 				name,
 				email,
 				password,
+				validated_at,
 				updated_at,
 				archived_at)
 			VALUES (
@@ -100,6 +101,7 @@ func (s *UserStore) create(q db.QueryContext, user types.User) error {
 				:name,
 				lower(:email),
 				:password,
+				:validated_at,
 				current_timestamp(),
 				:archived_at)`,
 		u)
@@ -195,7 +197,7 @@ func (s *UserStore) update(q db.QueryContext, user types.User) error {
 		`UPDATE users
 			SET name = :name,
 				email = lower(:email),
-				validated = :validated,
+				validated_at = :validated_at,
 				password = :password,
 				admin = :admin,
 				updated_at = current_timestamp()

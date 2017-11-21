@@ -8,7 +8,6 @@ func init() {
 			gateway_id          STRING(36) PRIMARY KEY,
 			description         STRING,
 			frequency_plan_id   STRING(36) NOT NULL,
-			token               STRING(36),
 			activated_at        TIMESTAMP DEFAULT null,
 			privacy_settings    STRING,
 			auto_update         BOOL DEFAULT true,

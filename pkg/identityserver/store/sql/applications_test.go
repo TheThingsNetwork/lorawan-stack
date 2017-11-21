@@ -59,22 +59,12 @@ func TestApplicationAPIKeyManagement(t *testing.T) {
 	{
 		err := s.Applications.AddAPIKey(app.ApplicationID, key)
 		a.So(err, should.BeNil)
-
-		found, err := s.Applications.GetByID(app.ApplicationID)
-		a.So(err, should.BeNil)
-		if a.So(found.GetApplication().APIKeys, should.HaveLength, 1) {
-			a.So(found.GetApplication().APIKeys, should.Contain, key)
-		}
 	}
 
 	// delete API key
 	{
 		err := s.Applications.RemoveAPIKey(app.ApplicationID, key.Name)
 		a.So(err, should.BeNil)
-
-		found, err := s.Applications.GetByID(app.ApplicationID)
-		a.So(err, should.BeNil)
-		a.So(found.GetApplication().APIKeys, should.HaveLength, 0)
 	}
 }
 

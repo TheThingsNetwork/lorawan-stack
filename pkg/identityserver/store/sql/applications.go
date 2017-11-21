@@ -122,12 +122,6 @@ func (s *ApplicationStore) getByID(q db.QueryContext, appID string, result types
 		return err
 	}
 
-	apiKeys, err := s.listAPIKeys(q, appID)
-	if err != nil {
-		return err
-	}
-	result.SetAPIKeys(apiKeys)
-
 	return s.loadAttributes(q, appID, result)
 }
 

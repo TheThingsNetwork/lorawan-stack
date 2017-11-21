@@ -18,7 +18,6 @@ func testGateways() map[string]*ttnpb.Gateway {
 			GatewayIdentifier: ttnpb.GatewayIdentifier{"test-gateway"},
 			Description:       "My description",
 			FrequencyPlanID:   "868_3",
-			Token:             "1111",
 			Platform:          "Kerklink",
 			Attributes: map[string]string{
 				"foo": "bar",
@@ -37,7 +36,6 @@ func testGateways() map[string]*ttnpb.Gateway {
 			GatewayIdentifier: ttnpb.GatewayIdentifier{"bob-gateway"},
 			Description:       "My description",
 			FrequencyPlanID:   "868_3",
-			Token:             "1111",
 			ClusterAddress:    "network.eu",
 			Attributes: map[string]string{
 				"Modulation": "12345",

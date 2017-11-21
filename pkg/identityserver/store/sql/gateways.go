@@ -91,7 +91,6 @@ func (s *GatewayStore) create(q db.QueryContext, gateway types.Gateway) error {
 					gateway_id,
 					description,
 					frequency_plan_id,
-					token,
 					activated_at,
 					privacy_settings,
 					auto_update,
@@ -103,7 +102,6 @@ func (s *GatewayStore) create(q db.QueryContext, gateway types.Gateway) error {
 					:gateway_id,
 					:description,
 					:frequency_plan_id,
-					:token,
 					:activated_at,
 					:privacy_settings,
 					:auto_update,
@@ -292,7 +290,6 @@ func (s *GatewayStore) update(q db.QueryContext, gateway types.Gateway) error {
 		`UPDATE gateways
 			SET description = :description,
 				frequency_plan_id = :frequency_plan_id,
-				token = :token,
 				activated_at = :activated_at,
 				privacy_settings = :privacy_settings,
 				auto_update = :auto_update,
