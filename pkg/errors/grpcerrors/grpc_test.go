@@ -50,6 +50,7 @@ func TestGRPC(t *testing.T) {
 	a.So(got.Type(), should.Equal, d.Type)
 	a.So(got.Message(), should.Equal, "You do not have access to app with id foo")
 	a.So(got.Error(), should.Equal, "pkg/foo[77]: You do not have access to app with id foo")
+	a.So(got.ID(), should.Equal, err.ID())
 
 	a.So(got.Attributes(), should.NotBeEmpty)
 	a.So(got.Attributes()["app_id"], should.Resemble, attributes["app_id"])
@@ -67,4 +68,5 @@ func TestFromUnspecifiedGRPC(t *testing.T) {
 	a.So(got.Type(), should.Equal, errors.Timeout)
 	a.So(got.Error(), should.Equal, "This is an error")
 	a.So(got.Attributes(), should.BeNil)
+	a.So(got.ID(), should.BeEmpty)
 }

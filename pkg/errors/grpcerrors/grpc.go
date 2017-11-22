@@ -18,6 +18,7 @@ const (
 	CodeKey      = "ttn-error-code"
 	AttributeKey = "attributes"
 	NamespaceKey = "namespace"
+	IDKey        = "ttn-error-id"
 )
 
 // TypeToGRPCCode returns the corresponding http status code from an error type
@@ -102,6 +103,7 @@ type impl struct {
 	attrs     errors.Attributes
 	code      errors.Code
 	namespace string
+	id        string
 }
 
 func (i impl) Error() string {
@@ -118,6 +120,9 @@ func (i impl) Attributes() errors.Attributes {
 }
 func (i impl) Namespace() string {
 	return i.namespace
+}
+func (i impl) ID() string {
+	return i.id
 }
 
 // FromGRPC parses a gRPC error and returns an Error
@@ -148,6 +153,10 @@ func FromGRPC(in error) errors.Error {
 						if v, ok := v.(string); ok {
 							out.namespace = v
 						}
+					case IDKey:
+						if v, ok := v.(string); ok {
+							out.id = v
+						}
 					}
 				}
 			}
@@ -164,6 +173,7 @@ func ToGRPC(in error) error {
 			CodeKey:      uint32(in.Code()),
 			AttributeKey: errors.Safe(in).Attributes(),
 			NamespaceKey: in.Namespace(),
+			IDKey:        in.ID(),
 		})
 		if err != nil {
 			panic(err) // you're trying to encode something you should not be encoding
