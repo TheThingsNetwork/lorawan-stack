@@ -5,9 +5,9 @@ package rpcserver
 
 import (
 	"context"
-	"fmt"
 	"math"
 	"net/http"
+	"runtime/debug"
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
@@ -72,6 +72,18 @@ func WithSentry(sentry *raven.Client) Option {
 	}
 }
 
+func init() {
+	ErrRPCRecovered.Register()
+}
+
+// ErrRPCRecovered is returned when we recovered from a panic
+var ErrRPCRecovered = &errors.ErrDescriptor{
+	MessageFormat:  "Internal Server Error",
+	Code:           500,
+	Type:           errors.Internal,
+	SafeAttributes: nil, // We don't want to give any information to the clients
+}
+
 // New returns a new RPC server with a set of middlewares.
 // The given context is used in some of the middlewares, the given server options are passed to gRPC
 //
@@ -88,7 +100,10 @@ func New(ctx context.Context, opts ...Option) *Server {
 	}
 	recoveryOpts := []grpc_recovery.Option{
 		grpc_recovery.WithRecoveryHandler(func(p interface{}) (err error) {
-			return errors.New(fmt.Sprint(p))
+			return ErrRPCRecovered.New(errors.Attributes{
+				"panic": p,
+				"stack": string(debug.Stack()),
+			})
 		}),
 	}
 	grpc_prometheus.EnableHandlingTimeHistogram()
