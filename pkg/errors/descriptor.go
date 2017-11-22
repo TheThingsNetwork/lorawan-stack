@@ -3,12 +3,16 @@
 package errors
 
 import (
-	"crypto/rand"
 	"fmt"
-	"time"
+	"math"
+	"math/rand"
 
+	"github.com/TheThingsNetwork/ttn/pkg/random"
 	"github.com/oklog/ulid"
 )
+
+// source is the random source for errors
+var source = rand.New(rand.NewSource(int64(random.Intn(math.MaxInt64))))
 
 // ErrDescriptor is a helper struct to easily build new Errors from and to be
 // the authoritive information about error codes.
@@ -55,11 +59,6 @@ func (err *ErrDescriptor) New(attributes Attributes) Error {
 		panic(fmt.Errorf("Error descriptor with code %v was not registered", err.Code))
 	}
 
-	id := "???"
-	if ulid, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader); err == nil {
-		id = ulid.String()
-	}
-
 	return &Impl{
 		descriptor: err,
 		message:    Format(err.MessageFormat, attributes),
@@ -67,7 +66,7 @@ func (err *ErrDescriptor) New(attributes Attributes) Error {
 		typ:        err.Type,
 		attributes: attributes,
 		namespace:  err.Namespace,
-		id:         id,
+		id:         ulid.MustNew(ulid.Now(), source).String(),
 	}
 }
 
