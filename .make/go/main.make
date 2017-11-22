@@ -87,9 +87,9 @@ TEST_PACKAGES = $(GO_FILES) | $(no_vendor) | $(only_test) | $(to_packages)
 # get tools required for development
 go.dev-deps:
 	@$(log) "Installing go dev dependencies"
-	@command -v dep  >/dev/null || { $(log) "Installing dep" && $(GO) get -u github.com/golang/dep/cmd/dep; }
-	@command -v $(GO_METALINTER) >/dev/null || { $(log) "Installing gometalinter" && $(GO) get -u github.com/alecthomas/gometalinter; }
-	@$(GO_METALINTER) -i -u
+	@$(log) "Getting dep" && $(GO) get -u github.com/golang/dep/cmd/dep
+	@$(log) "Getting gometalinter" && $(GO) get -u github.com/alecthomas/gometalinter
+	@$(log) "Getting gometalinter linters" && $(GO_METALINTER) -i -u
 
 DEP_FLAGS ?= $(if $(CI),-vendor-only,)
 
