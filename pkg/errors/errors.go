@@ -20,16 +20,9 @@ import (
 	"strings"
 )
 
-type Attributer interface {
-	// Attributes returns the error attributes.
-	Attributes() Attributes
-}
-
 // Error is the interface of portable errors.
 type Error interface {
 	error
-
-	Attributer
 
 	// Message returns the errors message.
 	Message() string
