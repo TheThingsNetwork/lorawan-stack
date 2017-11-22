@@ -35,10 +35,12 @@ func init() {
 }
 
 type options struct {
-	contextFillers []fillcontext.Filler
-	fieldExtractor grpc_ctxtags.RequestFieldExtractorFunc
-	serverOptions  []grpc.ServerOption
-	sentry         *raven.Client
+	contextFillers     []fillcontext.Filler
+	fieldExtractor     grpc_ctxtags.RequestFieldExtractorFunc
+	streamInterceptors []grpc.StreamServerInterceptor
+	unaryInterceptors  []grpc.UnaryServerInterceptor
+	serverOptions      []grpc.ServerOption
+	sentry             *raven.Client
 }
 
 // Option for the gRPC server
@@ -62,6 +64,20 @@ func WithContextFiller(contextFillers ...fillcontext.Filler) Option {
 func WithFieldExtractor(fieldExtractor grpc_ctxtags.RequestFieldExtractorFunc) Option {
 	return func(o *options) {
 		o.fieldExtractor = fieldExtractor
+	}
+}
+
+// WithStreamInterceptors adds gRPC stream interceptors
+func WithStreamInterceptors(interceptors ...grpc.StreamServerInterceptor) Option {
+	return func(o *options) {
+		o.streamInterceptors = append(o.streamInterceptors, interceptors...)
+	}
+}
+
+// WithUnaryInterceptors adds gRPC unary interceptors
+func WithUnaryInterceptors(interceptors ...grpc.UnaryServerInterceptor) Option {
+	return func(o *options) {
+		o.unaryInterceptors = append(o.unaryInterceptors, interceptors...)
 	}
 }
 
@@ -107,6 +123,27 @@ func New(ctx context.Context, opts ...Option) *Server {
 		}),
 	}
 	grpc_prometheus.EnableHandlingTimeHistogram()
+
+	streamInterceptors := []grpc.StreamServerInterceptor{
+		grpcerrors.StreamServerInterceptor(),
+		grpc_ctxtags.StreamServerInterceptor(ctxtagsOpts...),
+		fillcontext.StreamServerInterceptor(options.contextFillers...),
+		grpc_prometheus.StreamServerInterceptor,
+		rpclog.StreamServerInterceptor(ctx), // Gets logger from global context
+		sentry.StreamServerInterceptor(options.sentry),
+		grpc_validator.StreamServerInterceptor(),
+	}
+
+	unaryInterceptors := []grpc.UnaryServerInterceptor{
+		grpcerrors.UnaryServerInterceptor(),
+		grpc_ctxtags.UnaryServerInterceptor(ctxtagsOpts...),
+		fillcontext.UnaryServerInterceptor(options.contextFillers...),
+		grpc_prometheus.UnaryServerInterceptor,
+		rpclog.UnaryServerInterceptor(ctx), // Gets logger from global context
+		sentry.UnaryServerInterceptor(options.sentry),
+		grpc_validator.UnaryServerInterceptor(),
+	}
+
 	baseOptions := []grpc.ServerOption{
 		grpc.MaxConcurrentStreams(math.MaxUint16),
 		grpc.KeepaliveParams(keepalive.ServerParameters{
@@ -114,28 +151,16 @@ func New(ctx context.Context, opts ...Option) *Server {
 			MaxConnectionAge:  24 * time.Hour,
 		}),
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
-			grpcerrors.StreamServerInterceptor(),
-			grpc_ctxtags.StreamServerInterceptor(ctxtagsOpts...),
-			fillcontext.StreamServerInterceptor(options.contextFillers...),
-			grpc_prometheus.StreamServerInterceptor,
-			rpclog.StreamServerInterceptor(ctx),
-			sentry.StreamServerInterceptor(options.sentry),
-			grpc_validator.StreamServerInterceptor(),
-
-			// Recovery handler must be on bottom
-			grpc_recovery.StreamServerInterceptor(recoveryOpts...),
+			append(
+				append(streamInterceptors, options.streamInterceptors...),
+				grpc_recovery.StreamServerInterceptor(recoveryOpts...),
+			)...,
 		)),
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			grpcerrors.UnaryServerInterceptor(),
-			grpc_ctxtags.UnaryServerInterceptor(ctxtagsOpts...),
-			fillcontext.UnaryServerInterceptor(options.contextFillers...),
-			grpc_prometheus.UnaryServerInterceptor,
-			rpclog.UnaryServerInterceptor(ctx),
-			sentry.UnaryServerInterceptor(options.sentry),
-			grpc_validator.UnaryServerInterceptor(),
-
-			// Recovery handler must be on bottom
-			grpc_recovery.UnaryServerInterceptor(recoveryOpts...),
+			append(
+				append(unaryInterceptors, options.unaryInterceptors...),
+				grpc_recovery.UnaryServerInterceptor(recoveryOpts...),
+			)...,
 		)),
 	}
 	server.Server = grpc.NewServer(append(baseOptions, options.serverOptions...)...)
