@@ -125,7 +125,7 @@ func normalize(i *Impl) *Impl {
 	return i
 }
 
-// Fields implements fielder.
+// Fields implements log.Fielder.
 func (i *Impl) Fields() map[string]interface{} {
 	fields := make(map[string]interface{})
 
@@ -133,6 +133,7 @@ func (i *Impl) Fields() map[string]interface{} {
 		fields[k] = v
 	}
 
+	fields["error_id"] = i.ID()
 	fields["error"] = i.Message()
 	fields["code"] = i.Code()
 	fields["namespace"] = i.Namespace()
