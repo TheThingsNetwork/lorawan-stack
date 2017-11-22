@@ -162,7 +162,7 @@ func ToGRPC(in error) error {
 	if in, ok := in.(errors.Error); ok {
 		d, err := goproto.Struct(map[string]interface{}{
 			CodeKey:      uint32(in.Code()),
-			AttributeKey: in.Attributes(),
+			AttributeKey: errors.Safe(in).Attributes(),
 			NamespaceKey: in.Namespace(),
 		})
 		if err != nil {

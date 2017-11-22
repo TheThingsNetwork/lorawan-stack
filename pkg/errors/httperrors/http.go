@@ -108,7 +108,7 @@ func (i impl) Code() errors.Code {
 }
 
 func (i impl) Message() string {
-	return ""
+	return i.Response.Status
 }
 
 func (i impl) Type() errors.Type {
@@ -147,7 +147,7 @@ func ToHTTP(in error, w http.ResponseWriter) error {
 	if err, ok := in.(errors.Error); ok {
 		w.Header().Set(CodeHeader, err.Code().String())
 		w.WriteHeader(TypeToHTTPStatusCode(err.Type()))
-		return json.NewEncoder(w).Encode(errors.ToImpl(err))
+		return json.NewEncoder(w).Encode(errors.ToImpl(errors.Safe(err)))
 	}
 	w.WriteHeader(http.StatusInternalServerError)
 	return json.NewEncoder(w).Encode(&struct {

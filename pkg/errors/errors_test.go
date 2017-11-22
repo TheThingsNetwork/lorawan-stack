@@ -3,6 +3,7 @@
 package errors
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -71,4 +72,28 @@ func TestRegistry(t *testing.T) {
 	})
 
 	a.So(reg.GetAll(), should.HaveLength, 2)
+}
+
+func ExampleSafe() {
+	desc := &ErrDescriptor{
+		MessageFormat: "You made a mistake cost us {price, plural, =0 {no money} =1 {one dollar} other {{price} dollars}}",
+		Type:          InvalidArgument,
+		Code:          391,
+		Namespace:     "pkg/foo",
+		SafeAttributes: []string{
+			"price",
+		},
+	}
+
+	desc.Register()
+
+	err := desc.New(Attributes{
+		"price": 12,
+		"user":  "john-doe",
+	})
+
+	safe := Safe(err)
+
+	fmt.Println(err.Attributes())
+	fmt.Println(safe.Attributes())
 }

@@ -20,12 +20,17 @@ func TestHTTP(t *testing.T) {
 		Code:          77,
 		Type:          errors.PermissionDenied,
 		Namespace:     "pkg/foo",
+		SafeAttributes: []string{
+			"app_id",
+			"count",
+		},
 	}
 	d.Register()
 
 	attributes := errors.Attributes{
 		"app_id": "foo",
 		"count":  42,
+		"unsafe": "secret",
 	}
 
 	err := d.New(attributes)
@@ -43,6 +48,7 @@ func TestHTTP(t *testing.T) {
 	a.So(got.Error(), should.Equal, "pkg/foo[77]: You do not have access to app with id foo")
 	a.So(got.Attributes()["app_id"], should.Resemble, attributes["app_id"])
 	a.So(got.Attributes()["count"], should.AlmostEqual, attributes["count"])
+	a.So(got.Attributes(), should.NotContainKey, "unsafe")
 	a.So(got.Namespace(), should.Equal, d.Namespace)
 }
 
@@ -71,7 +77,7 @@ func TestHTTPResponse(t *testing.T) {
 	w := httptest.NewRecorder()
 	resp := w.Result()
 	resp.StatusCode = 404
-	resp.Status = "404 Not found"
+	resp.Status = "Not found"
 
 	got := FromHTTP(resp)
 	a.So(got.Code(), should.Equal, errors.NoCode)

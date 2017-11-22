@@ -91,7 +91,7 @@ func ToImpl(err Error) *Impl {
 	}
 
 	return &Impl{
-		message:    err.Error(),
+		message:    err.Message(),
 		code:       err.Code(),
 		typ:        err.Type(),
 		attributes: err.Attributes(),
@@ -126,5 +126,24 @@ func (i *SafeImpl) Attributes() Attributes {
 		return i.Impl.Attributes()
 	}
 
-	return Safe(i.Impl, i.descriptor.SafeAttributes).Attributes()
+	attrs := i.Impl.Attributes()
+
+	res := make(Attributes, len(i.descriptor.SafeAttributes))
+
+	for _, key := range i.descriptor.SafeAttributes {
+		if value, ok := attrs[key]; ok {
+			res[key] = value
+		}
+	}
+
+	return res
+}
+
+// Safe returns an error that only returns its safe attributes.
+func Safe(err Error) Error {
+	if i, ok := err.(*Impl); ok {
+		return &SafeImpl{i}
+	}
+
+	return err
 }

@@ -20,12 +20,17 @@ func TestGRPC(t *testing.T) {
 		Code:          77,
 		Type:          errors.PermissionDenied,
 		Namespace:     "pkg/foo",
+		SafeAttributes: []string{
+			"app_id",
+			"count",
+		},
 	}
 	d.Register()
 
 	attributes := errors.Attributes{
 		"app_id": "foo",
 		"count":  42,
+		"unsafe": "secret",
 	}
 
 	err := d.New(attributes)
@@ -49,6 +54,7 @@ func TestGRPC(t *testing.T) {
 	a.So(got.Attributes(), should.NotBeEmpty)
 	a.So(got.Attributes()["app_id"], should.Resemble, attributes["app_id"])
 	a.So(got.Attributes()["count"], should.AlmostEqual, attributes["count"])
+	a.So(got.Attributes(), should.NotContainKey, "unsafe")
 }
 
 func TestFromUnspecifiedGRPC(t *testing.T) {
