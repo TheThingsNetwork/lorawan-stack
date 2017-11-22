@@ -35,7 +35,7 @@ func init() {
 }
 
 type options struct {
-	contextFiller  fillcontext.Filler
+	contextFillers []fillcontext.Filler
 	fieldExtractor grpc_ctxtags.RequestFieldExtractorFunc
 	serverOptions  []grpc.ServerOption
 	sentry         *raven.Client
@@ -52,9 +52,9 @@ func WithServerOptions(serverOptions ...grpc.ServerOption) Option {
 }
 
 // WithContextFiller sets a context filler
-func WithContextFiller(contextFiller fillcontext.Filler) Option {
+func WithContextFiller(contextFillers ...fillcontext.Filler) Option {
 	return func(o *options) {
-		o.contextFiller = contextFiller
+		o.contextFillers = append(o.contextFillers, contextFillers...)
 	}
 }
 
@@ -101,7 +101,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
 			grpcerrors.StreamServerInterceptor(),
 			grpc_ctxtags.StreamServerInterceptor(ctxtagsOpts...),
-			fillcontext.StreamServerInterceptor(options.contextFiller),
+			fillcontext.StreamServerInterceptor(options.contextFillers...),
 			grpc_prometheus.StreamServerInterceptor,
 			rpclog.StreamServerInterceptor(ctx),
 			sentry.StreamServerInterceptor(options.sentry),
@@ -113,7 +113,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
 			grpcerrors.UnaryServerInterceptor(),
 			grpc_ctxtags.UnaryServerInterceptor(ctxtagsOpts...),
-			fillcontext.UnaryServerInterceptor(options.contextFiller),
+			fillcontext.UnaryServerInterceptor(options.contextFillers...),
 			grpc_prometheus.UnaryServerInterceptor,
 			rpclog.UnaryServerInterceptor(ctx),
 			sentry.UnaryServerInterceptor(options.sentry),
