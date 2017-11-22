@@ -44,4 +44,5 @@ func TestSafeImpl(t *testing.T) {
 	a.So(safe.Code(), should.Resemble, desc.Code)
 	a.So(safe.Type(), should.Resemble, desc.Type)
 	a.So(safe.Namespace(), should.Resemble, desc.Namespace)
+	a.So(safe.ID(), should.Resemble, i.ID())
 }

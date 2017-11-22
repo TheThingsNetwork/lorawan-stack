@@ -38,6 +38,9 @@ type Error interface {
 
 	// Attributes returns the error attributes.
 	Attributes() Attributes
+
+	// ID is the unique identifier of the error.
+	ID() string
 }
 
 // Attributes is a map of attributes

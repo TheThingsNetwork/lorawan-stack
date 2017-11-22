@@ -2,7 +2,9 @@
 
 package errors
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type jsonError struct {
 	Message    string     `json:"error"`
@@ -10,6 +12,7 @@ type jsonError struct {
 	Type       Type       `json:"error_type,omitempty"`
 	Attributes Attributes `json:"attributes,omitempty"`
 	Namespace  string     `json:"namespace,omitempty"`
+	ID         string     `json:"id,omitempty"`
 }
 
 func toJSON(err Error) *jsonError {
@@ -19,6 +22,7 @@ func toJSON(err Error) *jsonError {
 		Type:       err.Type(),
 		Attributes: err.Attributes(),
 		Namespace:  err.Namespace(),
+		ID:         err.ID(),
 	}
 }
 
@@ -29,6 +33,7 @@ func fromJSON(err *jsonError) *Impl {
 		typ:        err.Type,
 		attributes: err.Attributes,
 		namespace:  err.Namespace,
+		id:         err.ID,
 	}
 }
 

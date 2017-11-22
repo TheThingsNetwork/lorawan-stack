@@ -16,6 +16,7 @@ type Impl struct {
 	typ        Type
 	attributes Attributes
 	namespace  string
+	id         string
 }
 
 // MarshalJSON implements json.Marshaler
@@ -96,7 +97,13 @@ func ToImpl(err Error) *Impl {
 		typ:        err.Type(),
 		attributes: err.Attributes(),
 		namespace:  err.Namespace(),
+		id:         err.ID(),
 	}
+}
+
+// ID returns the unique identifier of this error.
+func (i *Impl) ID() string {
+	return i.id
 }
 
 // Fields implements fielder.

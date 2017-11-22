@@ -2,7 +2,13 @@
 
 package errors
 
-import "fmt"
+import (
+	"crypto/rand"
+	"fmt"
+	"time"
+
+	"github.com/oklog/ulid"
+)
 
 // ErrDescriptor is a helper struct to easily build new Errors from and to be
 // the authoritive information about error codes.
@@ -49,6 +55,11 @@ func (err *ErrDescriptor) New(attributes Attributes) Error {
 		panic(fmt.Errorf("Error descriptor with code %v was not registered", err.Code))
 	}
 
+	id := "???"
+	if ulid, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader); err == nil {
+		id = ulid.String()
+	}
+
 	return &Impl{
 		descriptor: err,
 		message:    Format(err.MessageFormat, attributes),
@@ -56,6 +67,7 @@ func (err *ErrDescriptor) New(attributes Attributes) Error {
 		typ:        err.Type,
 		attributes: attributes,
 		namespace:  err.Namespace,
+		id:         id,
 	}
 }
 
