@@ -51,6 +51,7 @@ enum MType {
   CONFIRMED_UP      = 4;
   CONFIRMED_DOWN    = 5;
   REJOIN_REQUEST    = 6;
+  PROPRIETARY       = 7;
 }
 
 enum Major {
