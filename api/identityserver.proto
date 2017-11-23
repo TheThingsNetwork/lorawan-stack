@@ -234,6 +234,11 @@ message ListApplicationCollaboratorsResponse {
   repeated Collaborator collaborators = 1 [(gogoproto.nullable) = false];
 }
 
+message ListApplicationRightsResponse {
+  // rights are the rights that a caller has to an application.
+  repeated Right rights = 1;
+}
+
 // IsApplication is the interface that provides methods to manage applications
 // in the Identity Server.
 service IsApplication {
@@ -273,6 +278,9 @@ service IsApplication {
 
   // ListApplicationCollaborators returns all the collaborators for a given application.
   rpc ListApplicationCollaborators(ApplicationIdentifier) returns (ListApplicationCollaboratorsResponse);
+
+  // ListApplicationRights returns all the rights that the caller has to the specified application.
+  rpc ListApplicationRights(ApplicationIdentifier) returns (ListApplicationRightsResponse);
 }
 
 message CreateGatewayRequest {
@@ -344,6 +352,11 @@ message ListGatewayCollaboratorsResponse {
   repeated Collaborator collaborators = 1 [(gogoproto.nullable) = false];
 }
 
+message ListGatewayRightsResponse {
+  // rights are the rights that a caller has to a gateway.
+  repeated Right rights = 1;
+}
+
 // IsGateway is the interface that provides methods to manage gateways in the
 // Identity Server.
 service IsGateway {
@@ -382,6 +395,9 @@ service IsGateway {
 
   // ListGatewayCollaborators returns all the collaborators for a given gateway.
   rpc ListGatewayCollaborators(GatewayIdentifier) returns (ListGatewayCollaboratorsResponse);
+
+  // ListGatewayRights returns all the rights that the caller has to the specified gateway.
+  rpc ListGatewayRights(GatewayIdentifier) returns (ListGatewayRightsResponse);
 }
 
 message CreateClientRequest {

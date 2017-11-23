@@ -83,6 +83,7 @@ It has these top-level messages:
 	RemoveApplicationAPIKeyRequest
 	SetApplicationCollaboratorRequest
 	ListApplicationCollaboratorsResponse
+	ListApplicationRightsResponse
 	CreateGatewayRequest
 	ListGatewaysResponse
 	UpdateGatewayRequest
@@ -92,6 +93,7 @@ It has these top-level messages:
 	RemoveGatewayAPIKeyRequest
 	SetGatewayCollaboratorRequest
 	ListGatewayCollaboratorsResponse
+	ListGatewayRightsResponse
 	CreateClientRequest
 	ListClientsResponse
 	UpdateClientRequest
