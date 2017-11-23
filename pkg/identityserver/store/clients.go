@@ -26,7 +26,7 @@ type ClientStore interface {
 	Archive(clientID string) error
 
 	// SetClientState allows to modify the reviewing state field of a client.
-	SetClientState(clientID string, state ttnpb.ClientState) error
+	SetClientState(clientID string, state ttnpb.ReviewingState) error
 
 	// SetClientOfficial allows to set an unset a client as official labeled.
 	SetClientOfficial(clientID string, official bool) error

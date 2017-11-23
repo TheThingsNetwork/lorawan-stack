@@ -5,6 +5,7 @@ syntax = "proto3";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/rights.proto";
+import "github.com/TheThingsNetwork/ttn/api/client.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
@@ -34,16 +35,20 @@ message User {
   // This field can only be modified by admins.
   bool admin = 6;
 
+  // state denotes the reviewing state of the user by admin.
+  // This field can only be modified by admins.
+  ReviewingState state = 7;
+
   // created_at denotes when the user was created.
   // This is a read-only field.
-  google.protobuf.Timestamp created_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // updated_at is the last time the user was updated.
   // This is a read-only field.
-  google.protobuf.Timestamp updated_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 9 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // archived_at is the time when the user was archived and therefore
   // permantly disabled.
   // This is a read-only field.
-  google.protobuf.Timestamp archived_at = 9 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp archived_at = 10 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }

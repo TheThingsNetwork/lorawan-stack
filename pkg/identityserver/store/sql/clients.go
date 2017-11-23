@@ -245,11 +245,11 @@ func (s *ClientStore) setClientOfficial(q db.QueryContext, clientID string, offi
 }
 
 // Reject marks a Client as rejected by the tenant admins, so it cannot be used anymore.
-func (s *ClientStore) SetClientState(clientID string, state ttnpb.ClientState) error {
+func (s *ClientStore) SetClientState(clientID string, state ttnpb.ReviewingState) error {
 	return s.setClientState(s.queryer(), clientID, state)
 }
 
-func (s *ClientStore) setClientState(q db.QueryContext, clientID string, state ttnpb.ClientState) error {
+func (s *ClientStore) setClientState(q db.QueryContext, clientID string, state ttnpb.ReviewingState) error {
 	var id string
 	err := q.SelectOne(
 		&id,
