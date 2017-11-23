@@ -940,12 +940,15 @@ func (m *MACCommand_ADRParamSetupReq) UnmarshalLoRaWAN(b []byte) error {
 // 0.5^8 * 1000000000 ns
 const fractStep = 3906250 * time.Nanosecond
 
+// max GPS time allowed in the DeviceTime MAC command
+const maxGPSTime int64 = 1<<32 - 1
+
 // AppendLoRaWAN appends the marshaled DeviceTimeAns CID and payload to the slice.
 func (m *MACCommand_DeviceTimeAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(CID_DEVICE_TIME))
 	sec := timeutil.TimeToGPS(m.Time)
-	if sec > math.MaxUint32 {
-		return nil, errors.Errorf("expected GPS time to be less or equal to %d, got %d", math.MaxUint32, sec)
+	if sec > maxGPSTime {
+		return nil, errors.Errorf("expected GPS time to be less or equal to %d, got %d", maxGPSTime, sec)
 	}
 	dst = appendUint32(dst, uint32(sec), 4)
 	dst = append(dst, byte(time.Duration(m.Time.Nanosecond())/fractStep))

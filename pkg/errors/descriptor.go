@@ -4,15 +4,14 @@ package errors
 
 import (
 	"fmt"
-	"math"
 	"math/rand"
+	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/random"
 	"github.com/oklog/ulid"
 )
 
 // source is the random source for errors
-var source = rand.New(rand.NewSource(int64(random.Intn(math.MaxInt64))))
+var source = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 // ErrDescriptor is a helper struct to easily build new Errors from and to be
 // the authoritive information about error codes.
