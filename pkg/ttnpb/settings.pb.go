@@ -414,7 +414,7 @@ func NewPopulatedIdentityServerSettings(r randySettings, easy bool) *IdentitySer
 	v1 := r.Intn(10)
 	this.BlacklistedIDs = make([]string, v1)
 	for i := 0; i < v1; i++ {
-		this.BlacklistedIDs[i] = string(randStringSettings(r))
+		this.BlacklistedIDs[i] = randStringSettings(r)
 	}
 	v2 := NewPopulatedIdentityServerSettings_UserRegistrationFlow(r, easy)
 	this.UserRegistration = *v2
@@ -423,7 +423,7 @@ func NewPopulatedIdentityServerSettings(r randySettings, easy bool) *IdentitySer
 	v4 := r.Intn(10)
 	this.AllowedEmails = make([]string, v4)
 	for i := 0; i < v4; i++ {
-		this.AllowedEmails[i] = string(randStringSettings(r))
+		this.AllowedEmails[i] = randStringSettings(r)
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -432,9 +432,9 @@ func NewPopulatedIdentityServerSettings(r randySettings, easy bool) *IdentitySer
 
 func NewPopulatedIdentityServerSettings_UserRegistrationFlow(r randySettings, easy bool) *IdentityServerSettings_UserRegistrationFlow {
 	this := &IdentityServerSettings_UserRegistrationFlow{}
-	this.SkipValidation = bool(bool(r.Intn(2) == 0))
-	this.SelfRegistration = bool(bool(r.Intn(2) == 0))
-	this.AdminApproval = bool(bool(r.Intn(2) == 0))
+	this.SkipValidation = bool(r.Intn(2) == 0)
+	this.SelfRegistration = bool(r.Intn(2) == 0)
+	this.AdminApproval = bool(r.Intn(2) == 0)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -506,7 +506,7 @@ func randFieldSettings(dAtA []byte, r randySettings, fieldNumber int, wire int) 
 }
 func encodeVarintPopulateSettings(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -560,7 +560,7 @@ func sovSettings(x uint64) (n int) {
 	return n
 }
 func sozSettings(x uint64) (n int) {
-	return sovSettings(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovSettings((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (m *IdentityServerSettings) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

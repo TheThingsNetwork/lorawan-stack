@@ -6216,7 +6216,7 @@ func NewPopulatedCreateUserRequest(r randyIdentityserver, easy bool) *CreateUser
 	this := &CreateUserRequest{}
 	v3 := NewPopulatedUser(r, easy)
 	this.User = *v3
-	this.InvitationToken = string(randStringIdentityserver(r))
+	this.InvitationToken = randStringIdentityserver(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -6235,8 +6235,8 @@ func NewPopulatedUpdateUserRequest(r randyIdentityserver, easy bool) *UpdateUser
 
 func NewPopulatedUpdateUserPasswordRequest(r randyIdentityserver, easy bool) *UpdateUserPasswordRequest {
 	this := &UpdateUserPasswordRequest{}
-	this.Old = string(randStringIdentityserver(r))
-	this.New = string(randStringIdentityserver(r))
+	this.Old = randStringIdentityserver(r)
+	this.New = randStringIdentityserver(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -6244,7 +6244,7 @@ func NewPopulatedUpdateUserPasswordRequest(r randyIdentityserver, easy bool) *Up
 
 func NewPopulatedGenerateUserAPIKeyRequest(r randyIdentityserver, easy bool) *GenerateUserAPIKeyRequest {
 	this := &GenerateUserAPIKeyRequest{}
-	this.Name = string(randStringIdentityserver(r))
+	this.Name = randStringIdentityserver(r)
 	v6 := r.Intn(10)
 	this.Rights = make([]Right, v6)
 	for i := 0; i < v6; i++ {
@@ -6272,7 +6272,7 @@ func NewPopulatedListUserAPIKeysResponse(r randyIdentityserver, easy bool) *List
 
 func NewPopulatedUpdateUserAPIKeyRequest(r randyIdentityserver, easy bool) *UpdateUserAPIKeyRequest {
 	this := &UpdateUserAPIKeyRequest{}
-	this.Name = string(randStringIdentityserver(r))
+	this.Name = randStringIdentityserver(r)
 	v9 := r.Intn(10)
 	this.Rights = make([]Right, v9)
 	for i := 0; i < v9; i++ {
@@ -6285,7 +6285,7 @@ func NewPopulatedUpdateUserAPIKeyRequest(r randyIdentityserver, easy bool) *Upda
 
 func NewPopulatedRemoveUserAPIKeyRequest(r randyIdentityserver, easy bool) *RemoveUserAPIKeyRequest {
 	this := &RemoveUserAPIKeyRequest{}
-	this.Name = string(randStringIdentityserver(r))
+	this.Name = randStringIdentityserver(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -6293,7 +6293,7 @@ func NewPopulatedRemoveUserAPIKeyRequest(r randyIdentityserver, easy bool) *Remo
 
 func NewPopulatedValidateUserEmailRequest(r randyIdentityserver, easy bool) *ValidateUserEmailRequest {
 	this := &ValidateUserEmailRequest{}
-	this.Token = string(randStringIdentityserver(r))
+	this.Token = randStringIdentityserver(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -6353,7 +6353,7 @@ func NewPopulatedGenerateApplicationAPIKeyRequest(r randyIdentityserver, easy bo
 	this := &GenerateApplicationAPIKeyRequest{}
 	v17 := NewPopulatedApplicationIdentifier(r, easy)
 	this.ApplicationIdentifier = *v17
-	this.Name = string(randStringIdentityserver(r))
+	this.Name = randStringIdentityserver(r)
 	v18 := r.Intn(10)
 	this.Rights = make([]Right, v18)
 	for i := 0; i < v18; i++ {
@@ -6383,7 +6383,7 @@ func NewPopulatedUpdateApplicationAPIKeyRequest(r randyIdentityserver, easy bool
 	this := &UpdateApplicationAPIKeyRequest{}
 	v21 := NewPopulatedApplicationIdentifier(r, easy)
 	this.ApplicationIdentifier = *v21
-	this.Name = string(randStringIdentityserver(r))
+	this.Name = randStringIdentityserver(r)
 	v22 := r.Intn(10)
 	this.Rights = make([]Right, v22)
 	for i := 0; i < v22; i++ {
@@ -6398,7 +6398,7 @@ func NewPopulatedRemoveApplicationAPIKeyRequest(r randyIdentityserver, easy bool
 	this := &RemoveApplicationAPIKeyRequest{}
 	v23 := NewPopulatedApplicationIdentifier(r, easy)
 	this.ApplicationIdentifier = *v23
-	this.Name = string(randStringIdentityserver(r))
+	this.Name = randStringIdentityserver(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -6481,7 +6481,7 @@ func NewPopulatedGenerateGatewayAPIKeyRequest(r randyIdentityserver, easy bool) 
 	this := &GenerateGatewayAPIKeyRequest{}
 	v34 := NewPopulatedGatewayIdentifier(r, easy)
 	this.GatewayIdentifier = *v34
-	this.Name = string(randStringIdentityserver(r))
+	this.Name = randStringIdentityserver(r)
 	v35 := r.Intn(10)
 	this.Rights = make([]Right, v35)
 	for i := 0; i < v35; i++ {
@@ -6511,7 +6511,7 @@ func NewPopulatedUpdateGatewayAPIKeyRequest(r randyIdentityserver, easy bool) *U
 	this := &UpdateGatewayAPIKeyRequest{}
 	v38 := NewPopulatedGatewayIdentifier(r, easy)
 	this.GatewayIdentifier = *v38
-	this.Name = string(randStringIdentityserver(r))
+	this.Name = randStringIdentityserver(r)
 	v39 := r.Intn(10)
 	this.Rights = make([]Right, v39)
 	for i := 0; i < v39; i++ {
@@ -6526,7 +6526,7 @@ func NewPopulatedRemoveGatewayAPIKeyRequest(r randyIdentityserver, easy bool) *R
 	this := &RemoveGatewayAPIKeyRequest{}
 	v40 := NewPopulatedGatewayIdentifier(r, easy)
 	this.GatewayIdentifier = *v40
-	this.Name = string(randStringIdentityserver(r))
+	this.Name = randStringIdentityserver(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -6671,7 +6671,7 @@ func randFieldIdentityserver(dAtA []byte, r randyIdentityserver, fieldNumber int
 }
 func encodeVarintPopulateIdentityserver(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -7106,7 +7106,7 @@ func sovIdentityserver(x uint64) (n int) {
 	return n
 }
 func sozIdentityserver(x uint64) (n int) {
-	return sovIdentityserver(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovIdentityserver((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (m *GetSettingsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

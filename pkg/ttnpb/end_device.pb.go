@@ -2145,19 +2145,19 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 	if m.MinFrequency != 0 {
 		dAtA[i] = 0x70
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.MinFrequency))
+		i = encodeVarintEndDevice(dAtA, i, m.MinFrequency)
 	}
 	if m.MaxFrequency != 0 {
 		dAtA[i] = 0x78
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxFrequency))
+		i = encodeVarintEndDevice(dAtA, i, m.MaxFrequency)
 	}
 	if m.MaxTXPower != 0 {
 		dAtA[i] = 0x80
 		i++
 		dAtA[i] = 0x1
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxTXPower))
+		i = encodeVarintEndDevice(dAtA, i, m.MaxTXPower)
 	}
 	if m.MACSettings != nil {
 		dAtA[i] = 0x8a
@@ -2409,7 +2409,7 @@ func (m *MACState) MarshalTo(dAtA []byte) (int, error) {
 	if m.Rx2Frequency != 0 {
 		dAtA[i] = 0x70
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx2Frequency))
+		i = encodeVarintEndDevice(dAtA, i, m.Rx2Frequency)
 	}
 	if m.RejoinTimer != 0 {
 		dAtA[i] = 0x90
@@ -2430,7 +2430,7 @@ func (m *MACState) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		dAtA[i] = 0x1
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotFrequency))
+		i = encodeVarintEndDevice(dAtA, i, m.PingSlotFrequency)
 	}
 	if m.PingSlotDataRateIndex != 0 {
 		dAtA[i] = 0xb0
@@ -2475,7 +2475,7 @@ func (m *MACInfo) MarshalTo(dAtA []byte) (int, error) {
 	if m.BatteryPercentage != 0 {
 		dAtA[i] = 0x1d
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.BatteryPercentage))))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.BatteryPercentage))
 		i += 4
 	}
 	if m.DownlinkMargin != 0 {
@@ -2503,7 +2503,7 @@ func encodeVarintEndDevice(dAtA []byte, offset int, v uint64) int {
 func NewPopulatedKeyEnvelope(r randyEndDevice, easy bool) *KeyEnvelope {
 	this := &KeyEnvelope{}
 	this.Key = github_com_TheThingsNetwork_ttn_pkg_types.NewPopulatedAES128Key(r)
-	this.KekLabel = string(randStringEndDevice(r))
+	this.KekLabel = randStringEndDevice(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2511,7 +2511,7 @@ func NewPopulatedKeyEnvelope(r randyEndDevice, easy bool) *KeyEnvelope {
 
 func NewPopulatedRootKeys(r randyEndDevice, easy bool) *RootKeys {
 	this := &RootKeys{}
-	this.RootKeyId = string(randStringEndDevice(r))
+	this.RootKeyId = randStringEndDevice(r)
 	if r.Intn(10) != 0 {
 		this.AppKey = NewPopulatedKeyEnvelope(r, easy)
 	}
@@ -2525,7 +2525,7 @@ func NewPopulatedRootKeys(r randyEndDevice, easy bool) *RootKeys {
 
 func NewPopulatedSessionKeys(r randyEndDevice, easy bool) *SessionKeys {
 	this := &SessionKeys{}
-	this.SessionKeyId = string(randStringEndDevice(r))
+	this.SessionKeyId = randStringEndDevice(r)
 	if r.Intn(10) != 0 {
 		this.FNwkSIntKey = NewPopulatedKeyEnvelope(r, easy)
 	}
@@ -2548,9 +2548,9 @@ func NewPopulatedSession(r randyEndDevice, easy bool) *Session {
 	this.DevAddr = github_com_TheThingsNetwork_ttn_pkg_types.NewPopulatedDevAddr(r)
 	v1 := NewPopulatedSessionKeys(r, easy)
 	this.SessionKeys = *v1
-	this.NextFCntUp = uint32(r.Uint32())
-	this.NextNFCntDown = uint32(r.Uint32())
-	this.NextAFCntDown = uint32(r.Uint32())
+	this.NextFCntUp = r.Uint32()
+	this.NextNFCntDown = r.Uint32()
+	this.NextAFCntDown = r.Uint32()
 	if r.Intn(10) != 0 {
 		this.Started = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
@@ -2566,21 +2566,21 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	if r.Intn(10) != 0 {
 		this.RootKeys = NewPopulatedRootKeys(r, easy)
 	}
-	this.NextDevNonce = uint32(r.Uint32())
+	this.NextDevNonce = r.Uint32()
 	v3 := r.Intn(10)
 	this.UsedDevNonces = make([]uint32, v3)
 	for i := 0; i < v3; i++ {
-		this.UsedDevNonces[i] = uint32(r.Uint32())
+		this.UsedDevNonces[i] = r.Uint32()
 	}
-	this.NextJoinNonce = uint32(r.Uint32())
+	this.NextJoinNonce = r.Uint32()
 	v4 := r.Intn(10)
 	this.UsedJoinNonces = make([]uint32, v4)
 	for i := 0; i < v4; i++ {
-		this.UsedJoinNonces[i] = uint32(r.Uint32())
+		this.UsedJoinNonces[i] = r.Uint32()
 	}
-	this.NextRJCount0 = uint32(r.Uint32())
-	this.NextRJCount1 = uint32(r.Uint32())
-	this.FCntResets = bool(bool(r.Intn(2) == 0))
+	this.NextRJCount0 = r.Uint32()
+	this.NextRJCount1 = r.Uint32()
+	this.FCntResets = bool(r.Intn(2) == 0)
 	if r.Intn(10) != 0 {
 		this.Session = NewPopulatedSession(r, easy)
 	}
@@ -2589,9 +2589,9 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	}
 	this.LoRaWANVersion = MACVersion([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
 	this.LoRaWANPHYVersion = PHYVersion([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.MinFrequency = uint64(uint64(r.Uint32()))
-	this.MaxFrequency = uint64(uint64(r.Uint32()))
-	this.MaxTXPower = uint64(uint64(r.Uint32()))
+	this.MinFrequency = uint64(r.Uint32())
+	this.MaxFrequency = uint64(r.Uint32())
+	this.MaxTXPower = uint64(r.Uint32())
 	if r.Intn(10) != 0 {
 		this.MACSettings = NewPopulatedMACSettings(r, easy)
 	}
@@ -2637,8 +2637,8 @@ func NewPopulatedEndDevices(r randyEndDevice, easy bool) *EndDevices {
 
 func NewPopulatedMACSettings(r randyEndDevice, easy bool) *MACSettings {
 	this := &MACSettings{}
-	this.Adr = bool(bool(r.Intn(2) == 0))
-	this.AdrMargin = uint32(r.Uint32())
+	this.Adr = bool(r.Intn(2) == 0)
+	this.AdrMargin = r.Uint32()
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2646,26 +2646,26 @@ func NewPopulatedMACSettings(r randyEndDevice, easy bool) *MACSettings {
 
 func NewPopulatedMACState(r randyEndDevice, easy bool) *MACState {
 	this := &MACState{}
-	this.MaxTxPower = uint32(r.Uint32())
-	this.UplinkDwellTime = bool(bool(r.Intn(2) == 0))
-	this.DownlinkDwellTime = bool(bool(r.Intn(2) == 0))
-	this.AdrDataRateIndex = uint32(r.Uint32())
-	this.AdrTxPowerIndex = uint32(r.Uint32())
-	this.AdrNbTrans = uint32(r.Uint32())
-	this.AdrAckLimit = uint32(r.Uint32())
-	this.AdrAckDelay = uint32(r.Uint32())
+	this.MaxTxPower = r.Uint32()
+	this.UplinkDwellTime = bool(r.Intn(2) == 0)
+	this.DownlinkDwellTime = bool(r.Intn(2) == 0)
+	this.AdrDataRateIndex = r.Uint32()
+	this.AdrTxPowerIndex = r.Uint32()
+	this.AdrNbTrans = r.Uint32()
+	this.AdrAckLimit = r.Uint32()
+	this.AdrAckDelay = r.Uint32()
 	this.DutyCycle = AggregatedDutyCycle([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}[r.Intn(16)])
-	this.RxDelay = uint32(r.Uint32())
-	this.Rx1DataRateOffset = int32(r.Int31())
+	this.RxDelay = r.Uint32()
+	this.Rx1DataRateOffset = r.Int31()
 	if r.Intn(2) == 0 {
 		this.Rx1DataRateOffset *= -1
 	}
-	this.Rx2DataRateIndex = uint32(r.Uint32())
-	this.Rx2Frequency = uint64(uint64(r.Uint32()))
-	this.RejoinTimer = uint32(r.Uint32())
-	this.RejoinCounter = uint32(r.Uint32())
-	this.PingSlotFrequency = uint64(uint64(r.Uint32()))
-	this.PingSlotDataRateIndex = uint32(r.Uint32())
+	this.Rx2DataRateIndex = r.Uint32()
+	this.Rx2Frequency = uint64(r.Uint32())
+	this.RejoinTimer = r.Uint32()
+	this.RejoinCounter = r.Uint32()
+	this.PingSlotFrequency = uint64(r.Uint32())
+	this.PingSlotDataRateIndex = r.Uint32()
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2677,11 +2677,11 @@ func NewPopulatedMACInfo(r randyEndDevice, easy bool) *MACInfo {
 	if r.Intn(10) != 0 {
 		this.LastStatus = google_protobuf1.NewPopulatedTimestamp(r, easy)
 	}
-	this.BatteryPercentage = float32(r.Float32())
+	this.BatteryPercentage = r.Float32()
 	if r.Intn(2) == 0 {
 		this.BatteryPercentage *= -1
 	}
-	this.DownlinkMargin = int32(r.Int31())
+	this.DownlinkMargin = r.Int31()
 	if r.Intn(2) == 0 {
 		this.DownlinkMargin *= -1
 	}
@@ -2757,7 +2757,7 @@ func randFieldEndDevice(dAtA []byte, r randyEndDevice, fieldNumber int, wire int
 }
 func encodeVarintPopulateEndDevice(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -2899,13 +2899,13 @@ func (m *EndDevice) Size() (n int) {
 		n += 1 + sovEndDevice(uint64(m.LoRaWANPHYVersion))
 	}
 	if m.MinFrequency != 0 {
-		n += 1 + sovEndDevice(uint64(m.MinFrequency))
+		n += 1 + sovEndDevice(m.MinFrequency)
 	}
 	if m.MaxFrequency != 0 {
-		n += 1 + sovEndDevice(uint64(m.MaxFrequency))
+		n += 1 + sovEndDevice(m.MaxFrequency)
 	}
 	if m.MaxTXPower != 0 {
-		n += 2 + sovEndDevice(uint64(m.MaxTXPower))
+		n += 2 + sovEndDevice(m.MaxTXPower)
 	}
 	if m.MACSettings != nil {
 		l = m.MACSettings.Size()
@@ -3006,7 +3006,7 @@ func (m *MACState) Size() (n int) {
 		n += 1 + sovEndDevice(uint64(m.Rx2DataRateIndex))
 	}
 	if m.Rx2Frequency != 0 {
-		n += 1 + sovEndDevice(uint64(m.Rx2Frequency))
+		n += 1 + sovEndDevice(m.Rx2Frequency)
 	}
 	if m.RejoinTimer != 0 {
 		n += 2 + sovEndDevice(uint64(m.RejoinTimer))
@@ -3015,7 +3015,7 @@ func (m *MACState) Size() (n int) {
 		n += 2 + sovEndDevice(uint64(m.RejoinCounter))
 	}
 	if m.PingSlotFrequency != 0 {
-		n += 2 + sovEndDevice(uint64(m.PingSlotFrequency))
+		n += 2 + sovEndDevice(m.PingSlotFrequency)
 	}
 	if m.PingSlotDataRateIndex != 0 {
 		n += 2 + sovEndDevice(uint64(m.PingSlotDataRateIndex))
@@ -3056,7 +3056,7 @@ func sovEndDevice(x uint64) (n int) {
 	return n
 }
 func sozEndDevice(x uint64) (n int) {
-	return sovEndDevice(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovEndDevice((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (m *KeyEnvelope) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -5119,9 +5119,9 @@ func (m *MACInfo) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
+			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
-			m.BatteryPercentage = float32(math.Float32frombits(v))
+			m.BatteryPercentage = math.Float32frombits(v)
 		case 4:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DownlinkMargin", wireType)

@@ -248,7 +248,7 @@ func randFieldCollaborator(dAtA []byte, r randyCollaborator, fieldNumber int, wi
 }
 func encodeVarintPopulateCollaborator(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -280,7 +280,7 @@ func sovCollaborator(x uint64) (n int) {
 	return n
 }
 func sozCollaborator(x uint64) (n int) {
-	return sovCollaborator(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovCollaborator((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (m *Collaborator) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

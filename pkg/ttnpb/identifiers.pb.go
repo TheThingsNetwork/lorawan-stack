@@ -652,7 +652,7 @@ func encodeVarintIdentifiers(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedUserIdentifier(r randyIdentifiers, easy bool) *UserIdentifier {
 	this := &UserIdentifier{}
-	this.UserID = string(randStringIdentifiers(r))
+	this.UserID = randStringIdentifiers(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -660,7 +660,7 @@ func NewPopulatedUserIdentifier(r randyIdentifiers, easy bool) *UserIdentifier {
 
 func NewPopulatedApplicationIdentifier(r randyIdentifiers, easy bool) *ApplicationIdentifier {
 	this := &ApplicationIdentifier{}
-	this.ApplicationID = string(randStringIdentifiers(r))
+	this.ApplicationID = randStringIdentifiers(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -668,7 +668,7 @@ func NewPopulatedApplicationIdentifier(r randyIdentifiers, easy bool) *Applicati
 
 func NewPopulatedGatewayIdentifier(r randyIdentifiers, easy bool) *GatewayIdentifier {
 	this := &GatewayIdentifier{}
-	this.GatewayID = string(randStringIdentifiers(r))
+	this.GatewayID = randStringIdentifiers(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -676,7 +676,7 @@ func NewPopulatedGatewayIdentifier(r randyIdentifiers, easy bool) *GatewayIdenti
 
 func NewPopulatedClientIdentifier(r randyIdentifiers, easy bool) *ClientIdentifier {
 	this := &ClientIdentifier{}
-	this.ClientID = string(randStringIdentifiers(r))
+	this.ClientID = randStringIdentifiers(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -748,7 +748,7 @@ func randFieldIdentifiers(dAtA []byte, r randyIdentifiers, fieldNumber int, wire
 }
 func encodeVarintPopulateIdentifiers(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -831,7 +831,7 @@ func sovIdentifiers(x uint64) (n int) {
 	return n
 }
 func sozIdentifiers(x uint64) (n int) {
-	return sovIdentifiers(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovIdentifiers((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (m *UserIdentifier) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
