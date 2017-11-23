@@ -81,15 +81,6 @@ func Get(namespace string, code Code) *ErrDescriptor {
 	return reg.Get(namespace, code)
 }
 
-// From lifts an error to be and Error
-func From(in error) Error {
-	if err, ok := in.(Error); ok {
-		return err
-	}
-
-	return nil // FromGRPC(in)
-}
-
 // Descriptor returns the error descriptor from any error
 func Descriptor(in error) (desc *ErrDescriptor) {
 	err := From(in)
