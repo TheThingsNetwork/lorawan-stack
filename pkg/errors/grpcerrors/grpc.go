@@ -127,8 +127,7 @@ func (i impl) ID() string {
 
 // FromGRPC parses a gRPC error and returns an Error
 func FromGRPC(in error) errors.Error {
-	status, ok := status.FromError(in)
-	if ok {
+	if status, ok := status.FromError(in); ok {
 		out := &impl{Status: status, code: errors.NoCode}
 		for _, details := range status.Details() {
 			if details, ok := details.(*structpb.Struct); ok {
@@ -161,28 +160,32 @@ func FromGRPC(in error) errors.Error {
 				}
 			}
 		}
+
 		return errors.ToImpl(out)
 	}
-	return errors.ToImpl(errors.New(in.Error()))
+
+	return errors.From(in)
 }
 
 // ToGRPC turns an error into a gRPC error
 func ToGRPC(in error) error {
-	if in, ok := in.(errors.Error); ok {
-		d, err := goproto.Struct(map[string]interface{}{
-			CodeKey:      uint32(in.Code()),
-			AttributeKey: errors.Safe(in).Attributes(),
-			NamespaceKey: in.Namespace(),
-			IDKey:        in.ID(),
-		})
-		if err != nil {
-			panic(err) // you're trying to encode something you should not be encoding
-		}
-		s, err := status.New(TypeToGRPCCode(in.Type()), in.Message()).WithDetails(d)
-		if err != nil {
-			panic(err) // probably means you're trying to send very very bad attributes
-		}
-		return s.Err()
+	e := errors.Safe(errors.From(in))
+
+	details, err := goproto.Struct(map[string]interface{}{
+		CodeKey:      uint32(e.Code()),
+		AttributeKey: e.Attributes(),
+		NamespaceKey: e.Namespace(),
+		IDKey:        e.ID(),
+	})
+
+	if err != nil {
+		panic(err) // you're trying to encode something you should not be encoding
 	}
-	return status.Errorf(codes.Unknown, in.Error())
+
+	status, err := status.New(TypeToGRPCCode(e.Type()), e.Message()).WithDetails(details)
+	if err != nil {
+		panic(err) // probably means you're trying to send very very bad attributes
+	}
+
+	return status.Err()
 }

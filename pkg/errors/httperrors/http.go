@@ -148,17 +148,12 @@ func FromHTTP(resp *http.Response) (out errors.Error) {
 
 // ToHTTP writes the error to the http response
 func ToHTTP(in error, w http.ResponseWriter) error {
+	err := errors.From(in)
+
 	w.Header().Set("Content-Type", "application/json")
-	if err, ok := in.(errors.Error); ok {
-		w.Header().Set(CodeHeader, err.Code().String())
-		w.Header().Set(IDHeader, err.ID())
-		w.WriteHeader(TypeToHTTPStatusCode(err.Type()))
-		return json.NewEncoder(w).Encode(errors.ToImpl(errors.Safe(err)))
-	}
-	w.WriteHeader(http.StatusInternalServerError)
-	return json.NewEncoder(w).Encode(&struct {
-		Message string `json:"error"`
-	}{
-		Message: in.Error(),
-	})
+	w.Header().Set(CodeHeader, err.Code().String())
+	w.Header().Set(IDHeader, err.ID())
+	w.WriteHeader(TypeToHTTPStatusCode(err.Type()))
+
+	return json.NewEncoder(w).Encode(errors.ToImpl(errors.Safe(err)))
 }
