@@ -27,7 +27,8 @@ func init() {
 	ErrEncodePayloadFailed.Register()
 	ErrComputeJoinAcceptMIC.Register()
 	ErrEncryptPayloadFailed.Register()
-	ErrDevNonceMismatch.Register()
+	ErrDevNonceTooSmall.Register()
+	ErrDevNonceReused.Register()
 }
 
 var ErrDeviceNotFound = &errors.ErrDescriptor{
@@ -162,8 +163,14 @@ var ErrEncryptPayloadFailed = &errors.ErrDescriptor{
 	Code:          22,
 }
 
-var ErrDevNonceMismatch = &errors.ErrDescriptor{
-	MessageFormat: "DevNonce mismatch",
+var ErrDevNonceTooSmall = &errors.ErrDescriptor{
+	MessageFormat: "DevNonce is too small",
 	Type:          errors.InvalidArgument,
 	Code:          23,
+}
+
+var ErrDevNonceReused = &errors.ErrDescriptor{
+	MessageFormat: "DevNonce already used",
+	Type:          errors.InvalidArgument,
+	Code:          24,
 }

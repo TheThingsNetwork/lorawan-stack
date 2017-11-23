@@ -3,10 +3,11 @@
 package joinserver
 
 import (
+	"encoding/binary"
+
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/crypto"
 	"github.com/TheThingsNetwork/ttn/pkg/deviceregistry"
-	"github.com/TheThingsNetwork/ttn/pkg/encoding/lorawan"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
@@ -148,7 +149,9 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 	}
 
 	var jn types.JoinNonce
-	lorawan.AppendUint32(jn[:0], dev.NextJoinNonce, 3)
+	bb := make([]byte, 4)
+	binary.LittleEndian.PutUint32(bb, dev.NextJoinNonce)
+	copy(jn[:], bb)
 
 	b, err = (&ttnpb.JoinAcceptPayload{
 		NetID:      req.NetID,
@@ -162,11 +165,17 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 		return nil, ErrEncodePayloadFailed.NewWithCause(nil, err)
 	}
 
-	dn := lorawan.ParseUint16(pld.DevNonce[:])
+	dn := binary.LittleEndian.Uint16(pld.DevNonce[:])
 	var resp *ttnpb.JoinResponse
 
 	switch req.SelectedMacVersion {
 	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
+		for _, used := range dev.UsedDevNonces {
+			if dn == uint16(used) {
+				return nil, ErrDevNonceReused.New(nil)
+			}
+		}
+
 		if err := checkMIC(appKey, rawPayload); err != nil {
 			return nil, ErrMICCheckFailed.NewWithCause(nil, err)
 		}
@@ -196,7 +205,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 		}
 	case ttnpb.MAC_V1_1:
 		if uint32(dn) < dev.NextDevNonce {
-			return nil, ErrDevNonceMismatch.New(nil)
+			return nil, ErrDevNonceTooSmall.New(nil)
 		}
 		dev.NextDevNonce = uint32(dn + 1)
 
@@ -250,6 +259,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 		})
 	}
 
+	dev.UsedDevNonces = append(dev.UsedDevNonces, uint32(dn))
 	dev.NextJoinNonce++
 	go func() {
 		if err := dev.Update(); err != nil {
