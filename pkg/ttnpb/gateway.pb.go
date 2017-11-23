@@ -79,7 +79,7 @@ type Gateway struct {
 	ClusterAddress string `protobuf:"bytes,10,opt,name=cluster_address,json=clusterAddress,proto3" json:"cluster_address,omitempty"`
 	// contact_account is the user ID that will be displayed (given the set privacy
 	// settings) as contact person for this gateway.
-	// TODO(gomezjdaniel): allow to use an organization ID as contact account when
+	// TODO(gomezjdaniel#222): allow to use an organization ID as contact account when
 	// they are added.
 	ContactAccount UserIdentifier `protobuf:"bytes,11,opt,name=contact_account,json=contactAccount" json:"contact_account"`
 	// created_at is the time when the gateway was created.

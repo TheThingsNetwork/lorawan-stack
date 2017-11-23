@@ -50,7 +50,7 @@ message Gateway {
 
   // contact_account is the user ID that will be displayed (given the set privacy
   // settings) as contact person for this gateway.
-  // TODO(gomezjdaniel): allow to use an organization ID as contact account when
+  // TODO(gomezjdaniel#222): allow to use an organization ID as contact account when
   // they are added.
   UserIdentifier contact_account = 11 [(gogoproto.nullable) = false];
 
