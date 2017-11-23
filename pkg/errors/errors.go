@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
+
+	"github.com/oklog/ulid"
 )
 
 // Error is the interface of portable errors.
@@ -53,6 +55,7 @@ func New(text string) Error {
 		code:      NoCode,
 		typ:       Unknown,
 		namespace: pkg(),
+		id:        ulid.MustNew(ulid.Now(), source).String(),
 	}
 }
 
@@ -66,6 +69,7 @@ func NewWithCause(text string, cause error) Error {
 			causeKey: cause,
 		},
 		namespace: pkg(),
+		id:        ulid.MustNew(ulid.Now(), source).String(),
 	}
 }
 
