@@ -41,8 +41,8 @@ type Registry struct {
 	store store.Client
 }
 
-// NewRegistry returns a new Registry with s as an internal Store.
-func NewRegistry(s store.Client) *Registry {
+// New returns a new Registry with s as an internal Store.
+func New(s store.Client) *Registry {
 	return &Registry{
 		store: s,
 	}
