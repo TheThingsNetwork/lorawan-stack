@@ -115,7 +115,6 @@ func FindOneDeviceByIdentifiers(r Interface, ids ...*ttnpb.EndDeviceIdentifiers)
 			"identifiers": ids,
 		})
 	}
-
 }
 
 // Update updates devices data in the underlying store.Interface.
