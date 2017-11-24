@@ -1,9 +1,6 @@
 language: go
 go:
 - 1.9
-env:
-- GOARCH=amd64
-- GOARCH=386
 go_import_path: github.com/TheThingsNetwork/ttn
 sudo: required
 services:
@@ -26,6 +23,7 @@ script:
 - make go.fmt
 - make go.lint-travis-comment --no-print-directory
 - git diff --exit-code
-- make test
+- GOARCH=amd64 make test
+- GOARCH=386 make test
 before_install:
 - openssl aes-256-cbc -K $encrypted_29695605fa9e_key -iv $encrypted_29695605fa9e_iv -in github.pem.enc -out .make/github.pem -d
