@@ -52,6 +52,7 @@ func TestDescriptorCause(t *testing.T) {
 	cause := fmt.Errorf("This is an error")
 	err := d.NewWithCause(attributes, cause)
 
+	a.So(d.Is(err), should.BeTrue)
 	a.So(err.Error(), should.Equal, "[77]: You do not have access to app with id foo")
 	a.So(err.Code(), should.Equal, d.Code)
 	a.So(err.Type(), should.Equal, d.Type)

@@ -85,7 +85,7 @@ func TestHTTPResponse(t *testing.T) {
 	a.So(got.Code(), should.Equal, errors.NoCode)
 	a.So(got.Type(), should.Equal, errors.NotFound)
 	a.So(got.Error(), should.Equal, "Not found")
-	a.So(got.ID(), should.BeEmpty)
+	a.So(got.ID(), should.NotBeEmpty)
 	a.So(got.Attributes(), should.BeNil)
 	a.So(got.Namespace(), should.BeEmpty)
 }

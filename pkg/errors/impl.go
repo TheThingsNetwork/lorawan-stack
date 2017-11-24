@@ -6,53 +6,57 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+
+	"github.com/oklog/ulid"
 )
+
+type info struct {
+	ID         string     `json:"id,omitempty"`
+	Message    string     `json:"error"`
+	Code       Code       `json:"error_code,omitempty"`
+	Type       Type       `json:"error_type,omitempty"`
+	Attributes Attributes `json:"attributes,omitempty"`
+	Namespace  string     `json:"namespace,omitempty"`
+}
 
 // Impl implements Error
 type Impl struct {
 	descriptor *ErrDescriptor
-	message    string
-	code       Code
-	typ        Type
-	attributes Attributes
-	namespace  string
-	id         string
+
+	// info contains all the public information about the error, nested to
+	// avoid name clashes.
+	info info
 }
 
 // MarshalJSON implements json.Marshaler
 func (i *Impl) MarshalJSON() ([]byte, error) {
-	return json.Marshal(toJSON(i))
+	return json.Marshal(i.info)
 }
 
 // UnmarshalJSON implements json.Unmarshaler
 func (i *Impl) UnmarshalJSON(data []byte) error {
-	aux := new(jsonError)
-	if err := json.Unmarshal(data, aux); err != nil {
-		return err
-	}
-	*i = *fromJSON(aux)
-	return nil
+	return json.Unmarshal(data, &i.info)
 }
 
 // Error returns the formatted error message, prefixed with the error namespace
 func (i *Impl) Error() string {
 	prefix := ""
-	if i.namespace != "" {
-		prefix = i.namespace
+	if i.info.Namespace != "" {
+		prefix = i.info.Namespace
 	}
 
-	if i.code != NoCode {
-		prefix = prefix + fmt.Sprintf("[%v]", i.code)
+	if i.info.Code != NoCode {
+		prefix = prefix + fmt.Sprintf("[%v]", i.info.Code)
 	}
 
-	message := i.message
+	message := i.info.Message
 
 	if prefix != "" {
-		message = strings.Trim(prefix, " ") + ": " + i.message
+		message = strings.Trim(prefix, " ") + ": " + i.info.Message
 	}
 
-	if i.code == NoCode && i.attributes != nil && i.attributes[causeKey] != nil {
-		if cause, ok := i.attributes[causeKey].(error); ok {
+	if i.info.Code == NoCode && i.info.Attributes != nil && i.info.Attributes[causeKey] != nil {
+		if cause, ok := i.info.Attributes[causeKey].(error); ok {
 			message += fmt.Sprintf(" (%s)", cause.Error())
 		}
 	}
@@ -62,27 +66,32 @@ func (i *Impl) Error() string {
 
 // Message returns the formatted error message
 func (i *Impl) Message() string {
-	return i.message
+	return i.info.Message
 }
 
 // Code returns the error code
 func (i *Impl) Code() Code {
-	return i.code
+	return i.info.Code
 }
 
 // Type returns the error type
 func (i *Impl) Type() Type {
-	return i.typ
+	return i.info.Type
 }
 
 // Attributes returns the error attributes
 func (i *Impl) Attributes() Attributes {
-	return i.attributes
+	return i.info.Attributes
 }
 
 // Namespace returns the namespace of the error, which is usuallt the package it originates from.
 func (i *Impl) Namespace() string {
-	return i.namespace
+	return i.info.Namespace
+}
+
+// ID returns the unique identifier of this error.
+func (i *Impl) ID() string {
+	return i.info.ID
 }
 
 // ToImpl creates an equivalent Impl for any Error
@@ -91,19 +100,29 @@ func ToImpl(err Error) *Impl {
 		return i
 	}
 
-	return &Impl{
-		message:    err.Message(),
-		code:       err.Code(),
-		typ:        err.Type(),
-		attributes: err.Attributes(),
-		namespace:  err.Namespace(),
-		id:         err.ID(),
-	}
+	return normalize(&Impl{
+		info: info{
+			ID:         err.ID(),
+			Message:    err.Message(),
+			Code:       err.Code(),
+			Type:       err.Type(),
+			Attributes: err.Attributes(),
+			Namespace:  err.Namespace(),
+		},
+	})
 }
 
-// ID returns the unique identifier of this error.
-func (i *Impl) ID() string {
-	return i.id
+// normalize normalizes the error
+func normalize(i *Impl) *Impl {
+	if i.info.ID == "" {
+		i.info.ID = ulid.MustNew(ulid.Now(), source).String()
+	}
+
+	if i.descriptor == nil {
+		i.descriptor = Get(i.info.Namespace, i.info.Code)
+	}
+
+	return i
 }
 
 // Fields implements fielder.

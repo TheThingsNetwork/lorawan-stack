@@ -130,19 +130,20 @@ func (i impl) ID() string {
 
 // FromHTTP parses the http.Response and returns the corresponding
 // If the response is not an error (eg. 200 OK), it returns nil
-func FromHTTP(resp *http.Response) (out errors.Error) {
+func FromHTTP(resp *http.Response) errors.Error {
 	if resp.StatusCode < 399 {
 		return nil
 	}
 	defer resp.Body.Close()
 	bytes, _ := ioutil.ReadAll(resp.Body)
 	if len(bytes) > 0 {
-		var err error
-		out, err = errors.UnmarshalJSON(bytes)
+		out := new(errors.Impl)
+		err := out.UnmarshalJSON(bytes)
 		if err == nil {
 			return out
 		}
 	}
+
 	return errors.ToImpl(&impl{resp})
 }
 

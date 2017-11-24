@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
-
-	"github.com/oklog/ulid"
 )
 
 // source is the random source for errors
@@ -58,15 +56,16 @@ func (err *ErrDescriptor) New(attributes Attributes) Error {
 		panic(fmt.Errorf("Error descriptor with code %v was not registered", err.Code))
 	}
 
-	return &Impl{
+	return normalize(&Impl{
 		descriptor: err,
-		message:    Format(err.MessageFormat, attributes),
-		code:       err.Code,
-		typ:        err.Type,
-		attributes: attributes,
-		namespace:  err.Namespace,
-		id:         ulid.MustNew(ulid.Now(), source).String(),
-	}
+		info: info{
+			Message:    Format(err.MessageFormat, attributes),
+			Code:       err.Code,
+			Type:       err.Type,
+			Attributes: attributes,
+			Namespace:  err.Namespace,
+		},
+	})
 }
 
 // NewWithCause creates a new error based on the error descriptor and adds a cause

@@ -68,5 +68,5 @@ func TestFromUnspecifiedGRPC(t *testing.T) {
 	a.So(got.Type(), should.Equal, errors.Timeout)
 	a.So(got.Error(), should.Equal, "This is an error")
 	a.So(got.Attributes(), should.BeNil)
-	a.So(got.ID(), should.BeEmpty)
+	a.So(got.ID(), should.NotBeEmpty)
 }

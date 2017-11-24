@@ -18,8 +18,6 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
-
-	"github.com/oklog/ulid"
 )
 
 // Error is the interface of portable errors.
@@ -50,27 +48,29 @@ type Attributes map[string]interface{}
 
 // New returns an "unknown" error with the given text
 func New(text string) Error {
-	return &Impl{
-		message:   text,
-		code:      NoCode,
-		typ:       Unknown,
-		namespace: pkg(),
-		id:        ulid.MustNew(ulid.Now(), source).String(),
-	}
+	return normalize(&Impl{
+		info: info{
+			Message:   text,
+			Code:      NoCode,
+			Type:      Unknown,
+			Namespace: pkg(),
+		},
+	})
 }
 
 // NewWithCause returns an "unknown" error with the given text and a given cause
 func NewWithCause(text string, cause error) Error {
-	return &Impl{
-		message: text,
-		code:    NoCode,
-		typ:     Unknown,
-		attributes: Attributes{
-			causeKey: cause,
+	return normalize(&Impl{
+		info: info{
+			Message:   text,
+			Code:      NoCode,
+			Type:      Unknown,
+			Namespace: pkg(),
+			Attributes: Attributes{
+				causeKey: cause,
+			},
 		},
-		namespace: pkg(),
-		id:        ulid.MustNew(ulid.Now(), source).String(),
-	}
+	})
 }
 
 // Errorf returns an "unknown" error with the text fomatted accoding to format.

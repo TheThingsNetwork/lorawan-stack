@@ -5,8 +5,6 @@ package errors
 import (
 	"context"
 	"io"
-
-	"github.com/oklog/ulid"
 )
 
 // ErrEOF is the descriptor for the io.EOF error.
@@ -54,10 +52,11 @@ func From(in error) Error {
 		return ErrContextDeadlineExceeded.New(nil)
 	}
 
-	return &Impl{
-		message: in.Error(),
-		code:    Code(0),
-		typ:     Unknown,
-		id:      ulid.MustNew(ulid.Now(), source).String(),
-	}
+	return normalize(&Impl{
+		info: info{
+			Message: in.Error(),
+			Code:    Code(0),
+			Type:    Unknown,
+		},
+	})
 }
