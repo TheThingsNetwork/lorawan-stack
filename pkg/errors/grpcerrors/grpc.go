@@ -3,10 +3,12 @@
 package grpcerrors
 
 import (
-	"fmt"
+	"context"
+	"io"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/goproto"
+	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/golang/protobuf/ptypes/struct"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -126,16 +128,37 @@ func (i impl) ID() string {
 }
 
 // FromGRPC parses a gRPC error and returns an Error
-func FromGRPC(in error) errors.Error {
+func FromGRPC(in error) (err errors.Error) {
+	switch in {
+	case io.EOF:
+		return errors.ErrEOF.New(nil)
+	case context.Canceled:
+		return errors.ErrContextCanceled.New(nil)
+	case context.DeadlineExceeded:
+		return errors.ErrContextDeadlineExceeded.New(nil)
+	case grpc.ErrClientConnClosing:
+		return ErrClientConnClosing.New(nil)
+	case grpc.ErrClientConnTimeout:
+		return ErrClientConnTimeout.New(nil)
+	case grpc.ErrServerStopped:
+		return ErrServerStopped.New(nil)
+	}
+	if err, ok := in.(errors.Error); ok {
+		return err
+	}
 	if status, ok := status.FromError(in); ok {
 		out := &impl{Status: status, code: errors.NoCode}
+		switch {
+		case status.Code() == codes.Unavailable && status.Message() == ErrConnClosing.MessageFormat:
+			return ErrConnClosing.New(nil)
+		case status.Code() == codes.Canceled && status.Message() == errors.ErrContextCanceled.MessageFormat:
+			return errors.ErrContextCanceled.New(nil)
+		}
 		for _, details := range status.Details() {
 			if details, ok := details.(*structpb.Struct); ok {
 				m, err := goproto.Map(details)
 				if err != nil {
-					// TODO handle errors properly(write to log?)
-					// https://github.com/TheThingsIndustries/ttn/issues/137
-					fmt.Printf("Error decoding grpc error: %s", err)
+					log.WithError(err).WithField("in_error", err).Errorf("Could not decode gRPC error")
 					continue
 				}
 				for k, v := range m {
@@ -168,8 +191,29 @@ func FromGRPC(in error) errors.Error {
 }
 
 // ToGRPC turns an error into a gRPC error
-func ToGRPC(in error) error {
-	e := errors.Safe(errors.From(in))
+func ToGRPC(in error) (err error) {
+	switch in {
+	case io.EOF:
+		in = errors.ErrEOF.New(nil)
+	case context.Canceled:
+		in = errors.ErrContextCanceled.New(nil)
+	case context.DeadlineExceeded:
+		in = errors.ErrContextDeadlineExceeded.New(nil)
+	case grpc.ErrClientConnClosing:
+		in = ErrClientConnClosing.New(nil)
+	case grpc.ErrClientConnTimeout:
+		in = ErrClientConnTimeout.New(nil)
+	case grpc.ErrServerStopped:
+		in = ErrServerStopped.New(nil)
+	}
+
+	e, ok := in.(errors.Error)
+	if ok {
+		e = errors.Safe(e)
+	} else {
+		e = errors.Safe(errors.From(in))
+		log.WithField("in_error", in).Error("Sending unknown error over gRPC")
+	}
 
 	details, err := goproto.Struct(map[string]interface{}{
 		CodeKey:      uint32(e.Code()),

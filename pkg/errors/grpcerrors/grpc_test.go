@@ -3,7 +3,9 @@
 package grpcerrors
 
 import (
+	"context"
 	"fmt"
+	"io"
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
@@ -69,4 +71,22 @@ func TestFromUnspecifiedGRPC(t *testing.T) {
 	a.So(got.Error(), should.Equal, "This is an error")
 	a.So(got.Attributes(), should.BeNil)
 	a.So(got.ID(), should.NotBeEmpty)
+}
+
+func TestWellKnown(t *testing.T) {
+	a := assertions.New(t)
+
+	a.So(errors.ErrEOF.Is(FromGRPC(ToGRPC(io.EOF))), should.BeTrue)
+	a.So(errors.ErrContextCanceled.Is(FromGRPC(ToGRPC(context.Canceled))), should.BeTrue)
+	a.So(errors.ErrContextDeadlineExceeded.Is(FromGRPC(ToGRPC(context.DeadlineExceeded))), should.BeTrue)
+	a.So(ErrClientConnClosing.Is(FromGRPC(ToGRPC(grpc.ErrClientConnClosing))), should.BeTrue)
+	a.So(ErrClientConnTimeout.Is(FromGRPC(ToGRPC(grpc.ErrClientConnTimeout))), should.BeTrue)
+	a.So(ErrServerStopped.Is(FromGRPC(ToGRPC(grpc.ErrServerStopped))), should.BeTrue)
+
+	a.So(errors.ErrEOF.Is(FromGRPC(io.EOF)), should.BeTrue)
+	a.So(errors.ErrContextCanceled.Is(FromGRPC(context.Canceled)), should.BeTrue)
+	a.So(errors.ErrContextDeadlineExceeded.Is(FromGRPC(context.DeadlineExceeded)), should.BeTrue)
+	a.So(ErrClientConnClosing.Is(FromGRPC(grpc.ErrClientConnClosing)), should.BeTrue)
+	a.So(ErrClientConnTimeout.Is(FromGRPC(grpc.ErrClientConnTimeout)), should.BeTrue)
+	a.So(ErrServerStopped.Is(FromGRPC(grpc.ErrServerStopped)), should.BeTrue)
 }
