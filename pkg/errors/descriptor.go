@@ -112,3 +112,9 @@ func (err *ErrDescriptor) validate() error {
 
 	return nil
 }
+
+// Is returns true if the passed in error is an instance of the error descriptor.
+func (err *ErrDescriptor) Is(in error) bool {
+	e := From(in)
+	return e.Namespace() == err.Namespace && e.Code() == err.Code
+}

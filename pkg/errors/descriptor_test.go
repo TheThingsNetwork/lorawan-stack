@@ -26,6 +26,7 @@ func TestDescriptor(t *testing.T) {
 	}
 	err := d.New(attributes)
 
+	a.So(d.Is(err), should.BeTrue)
 	a.So(err.Error(), should.Equal, "[77]: You do not have access to app with id foo")
 	a.So(err.Code(), should.Equal, d.Code)
 	a.So(err.Type(), should.Equal, d.Type)
