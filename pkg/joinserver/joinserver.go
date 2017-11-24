@@ -108,7 +108,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 	}
 
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
-		DevEUI: &pld.DevEUI,
+		DevEUI:  &pld.DevEUI,
+		JoinEUI: &pld.JoinEUI,
 	})
 	if err != nil {
 		return nil, err
