@@ -101,6 +101,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 	}
 	if pld.JoinEUI != js.joinEUI {
 		// TODO determine the cluster containing the device
+		// https://github.com/TheThingsIndustries/ttn/issues/244
 		return nil, ErrForwardJoinRequest.New(nil)
 	}
 
