@@ -96,35 +96,37 @@ type impl struct {
 	*http.Response
 }
 
-func (i impl) Error() string {
-	return HTTPStatusToType(i.StatusCode).String()
+type respError http.Response
+
+func (r *respError) Error() string {
+	return HTTPStatusToType(r.StatusCode).String()
 }
 
-func (i impl) Code() errors.Code {
-	code, err := strconv.Atoi(i.Header.Get(CodeHeader))
+func (r *respError) Code() errors.Code {
+	code, err := strconv.Atoi(r.Header.Get(CodeHeader))
 	if err != nil {
 		return errors.Code(0)
 	}
 	return errors.Code(code)
 }
 
-func (i impl) Message() string {
-	return i.Response.Status
+func (r *respError) Message() string {
+	return r.Status
 }
 
-func (i impl) Type() errors.Type {
-	return HTTPStatusToType(i.StatusCode)
+func (r *respError) Type() errors.Type {
+	return HTTPStatusToType(r.StatusCode)
 }
 
-func (i impl) Attributes() errors.Attributes {
+func (r *respError) Attributes() errors.Attributes {
 	return nil
 }
 
-func (i impl) Namespace() string {
+func (r *respError) Namespace() string {
 	return ""
 }
 
-func (i impl) ID() string {
+func (r *respError) ID() string {
 	return ""
 }
 
@@ -144,7 +146,7 @@ func FromHTTP(resp *http.Response) errors.Error {
 		}
 	}
 
-	return errors.ToImpl(&impl{resp})
+	return errors.ToImpl((*respError)(resp))
 }
 
 // ToHTTP writes the error to the http response
