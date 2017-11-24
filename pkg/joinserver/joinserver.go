@@ -262,11 +262,9 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 
 	dev.UsedDevNonces = append(dev.UsedDevNonces, uint32(dn))
 	dev.NextJoinNonce++
-	go func() {
-		if err := dev.Update(); err != nil {
-			js.Component.Logger().WithField("device", dev).Error("Failed to update device")
-		}
-	}()
+	if err := dev.Update(); err != nil {
+		js.Component.Logger().WithField("device", dev).WithError(err).Error("Failed to update device")
+	}
 	return resp, nil
 }
 
