@@ -107,24 +107,11 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 		return nil, ErrForwardJoinRequest.New(nil)
 	}
 
-	devs, err := js.registry.FindDeviceByIdentifiers(&ttnpb.EndDeviceIdentifiers{
+	dev, err := deviceregistry.FindOneDeviceByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
 		DevEUI: &pld.DevEUI,
 	})
 	if err != nil {
 		return nil, err
-	}
-	var dev *deviceregistry.Device
-	switch len(devs) {
-	case 0:
-		return nil, deviceregistry.ErrDeviceNotFound.New(errors.Attributes{
-			"identifiers": pld.DevEUI,
-		})
-	case 1:
-		dev = devs[0]
-	default:
-		return nil, deviceregistry.ErrTooManyDevices.New(errors.Attributes{
-			"identifiers": pld.DevEUI,
-		})
 	}
 
 	ke := dev.GetRootKeys().GetAppKey()

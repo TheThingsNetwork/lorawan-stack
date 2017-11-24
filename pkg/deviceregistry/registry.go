@@ -98,6 +98,26 @@ func (r *Registry) FindDeviceByIdentifiers(ids ...*ttnpb.EndDeviceIdentifiers) (
 	return devices, nil
 }
 
+func FindOneDeviceByIdentifiers(r Interface, ids ...*ttnpb.EndDeviceIdentifiers) (*Device, error) {
+	devs, err := r.FindDeviceByIdentifiers(ids...)
+	if err != nil {
+		return nil, err
+	}
+	switch len(devs) {
+	case 0:
+		return nil, ErrDeviceNotFound.New(errors.Attributes{
+			"identifiers": ids,
+		})
+	case 1:
+		return devs[0], nil
+	default:
+		return nil, ErrTooManyDevices.New(errors.Attributes{
+			"identifiers": ids,
+		})
+	}
+
+}
+
 // Update updates devices data in the underlying store.Interface.
 func (d *Device) Update() error {
 	if err := d.store.Update(d.key, d.EndDevice, d.stored); err != nil {

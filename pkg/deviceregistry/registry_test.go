@@ -91,6 +91,60 @@ func TestDeviceRegistry(t *testing.T) {
 	}
 }
 
+func TestFindOneDeviceByIdentifiers(t *testing.T) {
+	a := assertions.New(t)
+	r := New(store.NewTypedStoreClient(mapstore.New()))
+
+	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+
+	found, err := FindOneDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
+		DevEUI:        ed.DevEUI,
+		JoinEUI:       ed.JoinEUI,
+		DevAddr:       ed.DevAddr,
+		DeviceID:      ed.DeviceID,
+		ApplicationID: ed.ApplicationID,
+	})
+	a.So(err, should.NotBeNil)
+	a.So(found, should.BeNil)
+
+	device, err := r.Create(ed)
+	if !a.So(err, should.BeNil) {
+		return
+	}
+	if a.So(device, should.NotBeNil) {
+		a.So(device.EndDevice, should.Resemble, ed)
+	}
+
+	found, err = FindOneDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
+		DevEUI:        ed.DevEUI,
+		JoinEUI:       ed.JoinEUI,
+		DevAddr:       ed.DevAddr,
+		DeviceID:      ed.DeviceID,
+		ApplicationID: ed.ApplicationID,
+	})
+	a.So(err, should.BeNil)
+	if a.So(found, should.NotBeNil) && !a.So(found.EndDevice, should.Resemble, device.EndDevice) {
+		pretty.Ldiff(t, found.EndDevice, device.EndDevice)
+	}
+	device, err = r.Create(ed)
+	if !a.So(err, should.BeNil) {
+		return
+	}
+	if a.So(device, should.NotBeNil) {
+		a.So(device.EndDevice, should.Resemble, ed)
+	}
+
+	found, err = FindOneDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
+		DevEUI:        ed.DevEUI,
+		JoinEUI:       ed.JoinEUI,
+		DevAddr:       ed.DevAddr,
+		DeviceID:      ed.DeviceID,
+		ApplicationID: ed.ApplicationID,
+	})
+	a.So(err, should.NotBeNil)
+	a.So(found, should.BeNil)
+}
+
 func ExampleRegistry() {
 	r := New(store.NewTypedStoreClient(mapstore.New()))
 
