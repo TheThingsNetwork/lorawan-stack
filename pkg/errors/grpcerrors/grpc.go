@@ -149,6 +149,8 @@ func FromGRPC(in error) (err errors.Error) {
 	if status, ok := status.FromError(in); ok {
 		out := &impl{Status: status, code: errors.NoCode}
 		switch {
+		case status.Code() == codes.FailedPrecondition && status.Message() == ErrClientConnClosing.MessageFormat:
+			return ErrClientConnClosing.New(nil)
 		case status.Code() == codes.Unavailable && status.Message() == ErrConnClosing.MessageFormat:
 			return ErrConnClosing.New(nil)
 		case status.Code() == codes.Canceled && status.Message() == errors.ErrContextCanceled.MessageFormat:
