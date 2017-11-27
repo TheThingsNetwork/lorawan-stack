@@ -38,7 +38,8 @@ It has these top-level messages:
 	DownlinkQueueRequest
 	APIKey
 	Client
-	Collaborator
+	ApplicationCollaborator
+	GatewayCollaborator
 	KeyEnvelope
 	RootKeys
 	SessionKeys
@@ -81,7 +82,6 @@ It has these top-level messages:
 	ListApplicationAPIKeysResponse
 	UpdateApplicationAPIKeyRequest
 	RemoveApplicationAPIKeyRequest
-	SetApplicationCollaboratorRequest
 	ListApplicationCollaboratorsResponse
 	ListApplicationRightsResponse
 	CreateGatewayRequest
@@ -91,7 +91,6 @@ It has these top-level messages:
 	ListGatewayAPIKeysResponse
 	UpdateGatewayAPIKeyRequest
 	RemoveGatewayAPIKeyRequest
-	SetGatewayCollaboratorRequest
 	ListGatewayCollaboratorsResponse
 	ListGatewayRightsResponse
 	CreateClientRequest

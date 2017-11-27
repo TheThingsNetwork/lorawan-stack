@@ -10,10 +10,24 @@ import "github.com/TheThingsNetwork/ttn/api/rights.proto";
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
-// Collaborator is the message to define a collaborator of an entity on the network.
-message Collaborator {
-  UserIdentifier user = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+message ApplicationCollaborator {
+  // application_id is the application's ID.
+  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // rights is the list of rights the user bears.
-  repeated Right rights = 2;
+  // user_id is the user's id.
+  UserIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // rights is the list of rights the user bears to the application.
+  repeated Right rights = 3;
+}
+
+message GatewayCollaborator {
+  // gateway_id is the gateway's ID.
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // user_id is the user's id.
+  UserIdentifier user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // rights is the list of rights the user bears to the application.
+  repeated Right rights = 3;
 }

@@ -17,19 +17,44 @@ var _ = golang_proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// Collaborator is the message to define a collaborator of an entity on the network.
-type Collaborator struct {
-	UserIdentifier `protobuf:"bytes,1,opt,name=user,embedded=user" json:"user"`
-	// rights is the list of rights the user bears.
-	Rights []Right `protobuf:"varint,2,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
+type ApplicationCollaborator struct {
+	// application_id is the application's ID.
+	ApplicationIdentifier `protobuf:"bytes,1,opt,name=application_id,json=applicationId,embedded=application_id" json:"application_id"`
+	// user_id is the user's id.
+	UserIdentifier `protobuf:"bytes,2,opt,name=user_id,json=userId,embedded=user_id" json:"user_id"`
+	// rights is the list of rights the user bears to the application.
+	Rights []Right `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
 }
 
-func (m *Collaborator) Reset()                    { *m = Collaborator{} }
-func (m *Collaborator) String() string            { return proto.CompactTextString(m) }
-func (*Collaborator) ProtoMessage()               {}
-func (*Collaborator) Descriptor() ([]byte, []int) { return fileDescriptorCollaborator, []int{0} }
+func (m *ApplicationCollaborator) Reset()         { *m = ApplicationCollaborator{} }
+func (m *ApplicationCollaborator) String() string { return proto.CompactTextString(m) }
+func (*ApplicationCollaborator) ProtoMessage()    {}
+func (*ApplicationCollaborator) Descriptor() ([]byte, []int) {
+	return fileDescriptorCollaborator, []int{0}
+}
 
-func (m *Collaborator) GetRights() []Right {
+func (m *ApplicationCollaborator) GetRights() []Right {
+	if m != nil {
+		return m.Rights
+	}
+	return nil
+}
+
+type GatewayCollaborator struct {
+	// gateway_id is the gateway's ID.
+	GatewayIdentifier `protobuf:"bytes,1,opt,name=gateway_id,json=gatewayId,embedded=gateway_id" json:"gateway_id"`
+	// user_id is the user's id.
+	UserIdentifier `protobuf:"bytes,2,opt,name=user_id,json=userId,embedded=user_id" json:"user_id"`
+	// rights is the list of rights the user bears to the application.
+	Rights []Right `protobuf:"varint,3,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
+}
+
+func (m *GatewayCollaborator) Reset()                    { *m = GatewayCollaborator{} }
+func (m *GatewayCollaborator) String() string            { return proto.CompactTextString(m) }
+func (*GatewayCollaborator) ProtoMessage()               {}
+func (*GatewayCollaborator) Descriptor() ([]byte, []int) { return fileDescriptorCollaborator, []int{1} }
+
+func (m *GatewayCollaborator) GetRights() []Right {
 	if m != nil {
 		return m.Rights
 	}
@@ -37,10 +62,12 @@ func (m *Collaborator) GetRights() []Right {
 }
 
 func init() {
-	proto.RegisterType((*Collaborator)(nil), "ttn.v3.Collaborator")
-	golang_proto.RegisterType((*Collaborator)(nil), "ttn.v3.Collaborator")
+	proto.RegisterType((*ApplicationCollaborator)(nil), "ttn.v3.ApplicationCollaborator")
+	golang_proto.RegisterType((*ApplicationCollaborator)(nil), "ttn.v3.ApplicationCollaborator")
+	proto.RegisterType((*GatewayCollaborator)(nil), "ttn.v3.GatewayCollaborator")
+	golang_proto.RegisterType((*GatewayCollaborator)(nil), "ttn.v3.GatewayCollaborator")
 }
-func (this *Collaborator) VerboseEqual(that interface{}) error {
+func (this *ApplicationCollaborator) VerboseEqual(that interface{}) error {
 	if that == nil {
 		if this == nil {
 			return nil
@@ -48,22 +75,25 @@ func (this *Collaborator) VerboseEqual(that interface{}) error {
 		return fmt.Errorf("that == nil && this != nil")
 	}
 
-	that1, ok := that.(*Collaborator)
+	that1, ok := that.(*ApplicationCollaborator)
 	if !ok {
-		that2, ok := that.(Collaborator)
+		that2, ok := that.(ApplicationCollaborator)
 		if ok {
 			that1 = &that2
 		} else {
-			return fmt.Errorf("that is not of type *Collaborator")
+			return fmt.Errorf("that is not of type *ApplicationCollaborator")
 		}
 	}
 	if that1 == nil {
 		if this == nil {
 			return nil
 		}
-		return fmt.Errorf("that is type *Collaborator but is nil && this != nil")
+		return fmt.Errorf("that is type *ApplicationCollaborator but is nil && this != nil")
 	} else if this == nil {
-		return fmt.Errorf("that is type *Collaborator but is not nil && this == nil")
+		return fmt.Errorf("that is type *ApplicationCollaborator but is not nil && this == nil")
+	}
+	if !this.ApplicationIdentifier.Equal(&that1.ApplicationIdentifier) {
+		return fmt.Errorf("ApplicationIdentifier this(%v) Not Equal that(%v)", this.ApplicationIdentifier, that1.ApplicationIdentifier)
 	}
 	if !this.UserIdentifier.Equal(&that1.UserIdentifier) {
 		return fmt.Errorf("UserIdentifier this(%v) Not Equal that(%v)", this.UserIdentifier, that1.UserIdentifier)
@@ -78,7 +108,7 @@ func (this *Collaborator) VerboseEqual(that interface{}) error {
 	}
 	return nil
 }
-func (this *Collaborator) Equal(that interface{}) bool {
+func (this *ApplicationCollaborator) Equal(that interface{}) bool {
 	if that == nil {
 		if this == nil {
 			return true
@@ -86,9 +116,9 @@ func (this *Collaborator) Equal(that interface{}) bool {
 		return false
 	}
 
-	that1, ok := that.(*Collaborator)
+	that1, ok := that.(*ApplicationCollaborator)
 	if !ok {
-		that2, ok := that.(Collaborator)
+		that2, ok := that.(ApplicationCollaborator)
 		if ok {
 			that1 = &that2
 		} else {
@@ -101,6 +131,9 @@ func (this *Collaborator) Equal(that interface{}) bool {
 		}
 		return false
 	} else if this == nil {
+		return false
+	}
+	if !this.ApplicationIdentifier.Equal(&that1.ApplicationIdentifier) {
 		return false
 	}
 	if !this.UserIdentifier.Equal(&that1.UserIdentifier) {
@@ -116,7 +149,89 @@ func (this *Collaborator) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (m *Collaborator) Marshal() (dAtA []byte, err error) {
+func (this *GatewayCollaborator) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*GatewayCollaborator)
+	if !ok {
+		that2, ok := that.(GatewayCollaborator)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *GatewayCollaborator")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *GatewayCollaborator but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *GatewayCollaborator but is not nil && this == nil")
+	}
+	if !this.GatewayIdentifier.Equal(&that1.GatewayIdentifier) {
+		return fmt.Errorf("GatewayIdentifier this(%v) Not Equal that(%v)", this.GatewayIdentifier, that1.GatewayIdentifier)
+	}
+	if !this.UserIdentifier.Equal(&that1.UserIdentifier) {
+		return fmt.Errorf("UserIdentifier this(%v) Not Equal that(%v)", this.UserIdentifier, that1.UserIdentifier)
+	}
+	if len(this.Rights) != len(that1.Rights) {
+		return fmt.Errorf("Rights this(%v) Not Equal that(%v)", len(this.Rights), len(that1.Rights))
+	}
+	for i := range this.Rights {
+		if this.Rights[i] != that1.Rights[i] {
+			return fmt.Errorf("Rights this[%v](%v) Not Equal that[%v](%v)", i, this.Rights[i], i, that1.Rights[i])
+		}
+	}
+	return nil
+}
+func (this *GatewayCollaborator) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*GatewayCollaborator)
+	if !ok {
+		that2, ok := that.(GatewayCollaborator)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if !this.GatewayIdentifier.Equal(&that1.GatewayIdentifier) {
+		return false
+	}
+	if !this.UserIdentifier.Equal(&that1.UserIdentifier) {
+		return false
+	}
+	if len(this.Rights) != len(that1.Rights) {
+		return false
+	}
+	for i := range this.Rights {
+		if this.Rights[i] != that1.Rights[i] {
+			return false
+		}
+	}
+	return true
+}
+func (m *ApplicationCollaborator) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -126,35 +241,94 @@ func (m *Collaborator) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *Collaborator) MarshalTo(dAtA []byte) (int, error) {
+func (m *ApplicationCollaborator) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintCollaborator(dAtA, i, uint64(m.UserIdentifier.Size()))
-	n1, err := m.UserIdentifier.MarshalTo(dAtA[i:])
+	i = encodeVarintCollaborator(dAtA, i, uint64(m.ApplicationIdentifier.Size()))
+	n1, err := m.ApplicationIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n1
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintCollaborator(dAtA, i, uint64(m.UserIdentifier.Size()))
+	n2, err := m.UserIdentifier.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n2
 	if len(m.Rights) > 0 {
-		dAtA3 := make([]byte, len(m.Rights)*10)
-		var j2 int
+		dAtA4 := make([]byte, len(m.Rights)*10)
+		var j3 int
 		for _, num := range m.Rights {
 			for num >= 1<<7 {
-				dAtA3[j2] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA4[j3] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j2++
+				j3++
 			}
-			dAtA3[j2] = uint8(num)
-			j2++
+			dAtA4[j3] = uint8(num)
+			j3++
 		}
-		dAtA[i] = 0x12
+		dAtA[i] = 0x1a
 		i++
-		i = encodeVarintCollaborator(dAtA, i, uint64(j2))
-		i += copy(dAtA[i:], dAtA3[:j2])
+		i = encodeVarintCollaborator(dAtA, i, uint64(j3))
+		i += copy(dAtA[i:], dAtA4[:j3])
+	}
+	return i, nil
+}
+
+func (m *GatewayCollaborator) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GatewayCollaborator) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintCollaborator(dAtA, i, uint64(m.GatewayIdentifier.Size()))
+	n5, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n5
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintCollaborator(dAtA, i, uint64(m.UserIdentifier.Size()))
+	n6, err := m.UserIdentifier.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n6
+	if len(m.Rights) > 0 {
+		dAtA8 := make([]byte, len(m.Rights)*10)
+		var j7 int
+		for _, num := range m.Rights {
+			for num >= 1<<7 {
+				dAtA8[j7] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j7++
+			}
+			dAtA8[j7] = uint8(num)
+			j7++
+		}
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintCollaborator(dAtA, i, uint64(j7))
+		i += copy(dAtA[i:], dAtA8[:j7])
 	}
 	return i, nil
 }
@@ -168,13 +342,31 @@ func encodeVarintCollaborator(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return offset + 1
 }
-func NewPopulatedCollaborator(r randyCollaborator, easy bool) *Collaborator {
-	this := &Collaborator{}
-	v1 := NewPopulatedUserIdentifier(r, easy)
-	this.UserIdentifier = *v1
-	v2 := r.Intn(10)
-	this.Rights = make([]Right, v2)
-	for i := 0; i < v2; i++ {
+func NewPopulatedApplicationCollaborator(r randyCollaborator, easy bool) *ApplicationCollaborator {
+	this := &ApplicationCollaborator{}
+	v1 := NewPopulatedApplicationIdentifier(r, easy)
+	this.ApplicationIdentifier = *v1
+	v2 := NewPopulatedUserIdentifier(r, easy)
+	this.UserIdentifier = *v2
+	v3 := r.Intn(10)
+	this.Rights = make([]Right, v3)
+	for i := 0; i < v3; i++ {
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedGatewayCollaborator(r randyCollaborator, easy bool) *GatewayCollaborator {
+	this := &GatewayCollaborator{}
+	v4 := NewPopulatedGatewayIdentifier(r, easy)
+	this.GatewayIdentifier = *v4
+	v5 := NewPopulatedUserIdentifier(r, easy)
+	this.UserIdentifier = *v5
+	v6 := r.Intn(10)
+	this.Rights = make([]Right, v6)
+	for i := 0; i < v6; i++ {
 		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -201,9 +393,9 @@ func randUTF8RuneCollaborator(r randyCollaborator) rune {
 	return rune(ru + 61)
 }
 func randStringCollaborator(r randyCollaborator) string {
-	v3 := r.Intn(100)
-	tmps := make([]rune, v3)
-	for i := 0; i < v3; i++ {
+	v7 := r.Intn(100)
+	tmps := make([]rune, v7)
+	for i := 0; i < v7; i++ {
 		tmps[i] = randUTF8RuneCollaborator(r)
 	}
 	return string(tmps)
@@ -225,11 +417,11 @@ func randFieldCollaborator(dAtA []byte, r randyCollaborator, fieldNumber int, wi
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateCollaborator(dAtA, uint64(key))
-		v4 := r.Int63()
+		v8 := r.Int63()
 		if r.Intn(2) == 0 {
-			v4 *= -1
+			v8 *= -1
 		}
-		dAtA = encodeVarintPopulateCollaborator(dAtA, uint64(v4))
+		dAtA = encodeVarintPopulateCollaborator(dAtA, uint64(v8))
 	case 1:
 		dAtA = encodeVarintPopulateCollaborator(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -254,9 +446,28 @@ func encodeVarintPopulateCollaborator(dAtA []byte, v uint64) []byte {
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
 }
-func (m *Collaborator) Size() (n int) {
+func (m *ApplicationCollaborator) Size() (n int) {
 	var l int
 	_ = l
+	l = m.ApplicationIdentifier.Size()
+	n += 1 + l + sovCollaborator(uint64(l))
+	l = m.UserIdentifier.Size()
+	n += 1 + l + sovCollaborator(uint64(l))
+	if len(m.Rights) > 0 {
+		l = 0
+		for _, e := range m.Rights {
+			l += sovCollaborator(uint64(e))
+		}
+		n += 1 + sovCollaborator(uint64(l)) + l
+	}
+	return n
+}
+
+func (m *GatewayCollaborator) Size() (n int) {
+	var l int
+	_ = l
+	l = m.GatewayIdentifier.Size()
+	n += 1 + l + sovCollaborator(uint64(l))
 	l = m.UserIdentifier.Size()
 	n += 1 + l + sovCollaborator(uint64(l))
 	if len(m.Rights) > 0 {
@@ -282,7 +493,7 @@ func sovCollaborator(x uint64) (n int) {
 func sozCollaborator(x uint64) (n int) {
 	return sovCollaborator((x << 1) ^ uint64((int64(x) >> 63)))
 }
-func (m *Collaborator) Unmarshal(dAtA []byte) error {
+func (m *ApplicationCollaborator) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -305,13 +516,43 @@ func (m *Collaborator) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: Collaborator: wiretype end group for non-group")
+			return fmt.Errorf("proto: ApplicationCollaborator: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Collaborator: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ApplicationCollaborator: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationIdentifier", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCollaborator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthCollaborator
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UserIdentifier", wireType)
 			}
@@ -341,7 +582,179 @@ func (m *Collaborator) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 3:
+			if wireType == 0 {
+				var v Right
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowCollaborator
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= (Right(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.Rights = append(m.Rights, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowCollaborator
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= (int(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthCollaborator
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				for iNdEx < postIndex {
+					var v Right
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowCollaborator
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= (Right(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.Rights = append(m.Rights, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rights", wireType)
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipCollaborator(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthCollaborator
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GatewayCollaborator) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowCollaborator
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GatewayCollaborator: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GatewayCollaborator: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIdentifier", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCollaborator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthCollaborator
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.GatewayIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserIdentifier", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCollaborator
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthCollaborator
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.UserIdentifier.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
 			if wireType == 0 {
 				var v Right
 				for shift := uint(0); ; shift += 7 {
@@ -537,26 +950,32 @@ func init() {
 }
 
 var fileDescriptorCollaborator = []byte{
-	// 333 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x90, 0xbf, 0x4f, 0xc2, 0x40,
-	0x1c, 0xc5, 0xef, 0xab, 0x86, 0x98, 0xfa, 0x63, 0x60, 0x30, 0x84, 0xe1, 0x41, 0x4c, 0x4c, 0x70,
-	0xb0, 0x35, 0xa0, 0xfe, 0x01, 0x38, 0xb9, 0x38, 0x10, 0x5c, 0xdc, 0x28, 0x96, 0xb6, 0x01, 0x7b,
-	0xcd, 0xf5, 0xd0, 0x95, 0x91, 0xd1, 0xd1, 0x4d, 0x47, 0x46, 0x46, 0x46, 0x46, 0x46, 0x46, 0x26,
-	0x42, 0xef, 0x16, 0x46, 0x46, 0x46, 0x43, 0x41, 0xc3, 0x26, 0xd3, 0xdd, 0xf7, 0xde, 0x7d, 0xbe,
-	0xef, 0xe5, 0x19, 0x77, 0xae, 0x2f, 0xbd, 0xb6, 0x6d, 0xd6, 0xf9, 0xab, 0x55, 0xf5, 0x9c, 0xaa,
-	0xe7, 0x07, 0x6e, 0xf4, 0xe8, 0xc8, 0x77, 0x2e, 0x9a, 0x96, 0x94, 0x81, 0x55, 0x0b, 0x7d, 0xab,
-	0xce, 0x5b, 0xad, 0x9a, 0xcd, 0x45, 0x4d, 0x72, 0x61, 0x86, 0x82, 0x4b, 0x9e, 0x4e, 0x49, 0x19,
-	0x98, 0x6f, 0xa5, 0xec, 0xd5, 0x16, 0xef, 0x72, 0x97, 0x5b, 0x89, 0x6c, 0xb7, 0x1b, 0xc9, 0x94,
-	0x0c, 0xc9, 0x6d, 0x8d, 0x65, 0x6f, 0x77, 0xb1, 0xf3, 0x5f, 0x9c, 0x40, 0xfa, 0x0d, 0xdf, 0x11,
-	0xd1, 0x06, 0xbb, 0xde, 0x05, 0x13, 0xbe, 0xeb, 0xc9, 0x0d, 0x71, 0xde, 0x34, 0x8e, 0xef, 0xb7,
-	0x52, 0xa7, 0x6f, 0x8c, 0x83, 0x76, 0xe4, 0x88, 0x0c, 0xe5, 0xa9, 0x70, 0x54, 0x3c, 0x33, 0xd7,
-	0xf1, 0xcd, 0xa7, 0xc8, 0x11, 0x0f, 0x7f, 0x76, 0xe5, 0xc3, 0xd1, 0x34, 0xc7, 0xc6, 0xd3, 0x1c,
-	0x55, 0x92, 0xdf, 0xe9, 0x0b, 0x23, 0xb5, 0xde, 0x9a, 0xd9, 0xcb, 0xef, 0x17, 0x4e, 0x8b, 0x27,
-	0xbf, 0x5c, 0x65, 0xf5, 0x5a, 0xd9, 0x88, 0xe5, 0x2f, 0x1a, 0xc5, 0xa0, 0x71, 0x0c, 0x9a, 0xc4,
-	0xa0, 0x59, 0x0c, 0x9a, 0xc7, 0x60, 0x8b, 0x18, 0x6c, 0x19, 0x83, 0x3a, 0x0a, 0xac, 0xab, 0xc0,
-	0x7a, 0x0a, 0xd4, 0x57, 0x60, 0x03, 0x05, 0x1a, 0x2a, 0xd0, 0x48, 0x81, 0xc6, 0x0a, 0x34, 0x51,
-	0x60, 0x33, 0x05, 0x9a, 0x2b, 0xb0, 0x85, 0x02, 0x2d, 0x15, 0x58, 0x47, 0x83, 0x75, 0x35, 0xe8,
-	0x43, 0x83, 0x7d, 0x6a, 0xd0, 0xb7, 0x06, 0xeb, 0x69, 0xb0, 0xbe, 0x06, 0x0d, 0x34, 0x68, 0xa8,
-	0x41, 0xcf, 0x97, 0xff, 0xb5, 0x12, 0x36, 0xdd, 0xd5, 0x19, 0xda, 0x76, 0x2a, 0x69, 0xa5, 0xf4,
-	0x13, 0x00, 0x00, 0xff, 0xff, 0xa0, 0x6a, 0x45, 0x6d, 0xef, 0x01, 0x00, 0x00,
+	// 418 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x92, 0x3f, 0x68, 0x14, 0x41,
+	0x14, 0xc6, 0xe7, 0x19, 0x58, 0x75, 0x24, 0x29, 0x56, 0xd0, 0x18, 0xf0, 0x25, 0x04, 0x84, 0x58,
+	0xb8, 0x2b, 0x09, 0x0a, 0x96, 0x9e, 0x85, 0xd8, 0xa4, 0x38, 0x62, 0x63, 0x23, 0xb3, 0x97, 0xcd,
+	0xec, 0x90, 0x73, 0x67, 0x99, 0x9d, 0x35, 0xd8, 0xa5, 0x4c, 0x69, 0x69, 0xa7, 0x65, 0xca, 0x94,
+	0x07, 0x36, 0x57, 0x1e, 0xd8, 0x5c, 0x79, 0xd5, 0x71, 0x3b, 0xd3, 0x5c, 0x79, 0xe5, 0x95, 0x72,
+	0xfb, 0xc7, 0x5b, 0xe1, 0xc0, 0x6b, 0xac, 0x76, 0xdf, 0xfb, 0xe6, 0xf7, 0xbd, 0xf7, 0xc1, 0xa3,
+	0x2f, 0xb9, 0xd0, 0x51, 0x16, 0x78, 0x1d, 0xf9, 0xc9, 0x3f, 0x89, 0xc2, 0x93, 0x48, 0xc4, 0x3c,
+	0x3d, 0x0e, 0xf5, 0x85, 0x54, 0xe7, 0xbe, 0xd6, 0xb1, 0xcf, 0x12, 0xe1, 0x77, 0x64, 0xb7, 0xcb,
+	0x02, 0xa9, 0x98, 0x96, 0xca, 0x4b, 0x94, 0xd4, 0xd2, 0x75, 0xb4, 0x8e, 0xbd, 0xcf, 0x47, 0x3b,
+	0xcf, 0x1a, 0x3c, 0x97, 0x5c, 0xfa, 0x85, 0x1c, 0x64, 0x67, 0x45, 0x55, 0x14, 0xc5, 0x5f, 0x89,
+	0xed, 0xbc, 0x58, 0x67, 0x9c, 0x38, 0x0d, 0x63, 0x2d, 0xce, 0x44, 0xa8, 0xd2, 0x0a, 0x7b, 0xbe,
+	0x0e, 0xa6, 0x04, 0x8f, 0x74, 0x45, 0xec, 0xff, 0x02, 0xfa, 0xf0, 0x75, 0x92, 0x74, 0x45, 0x87,
+	0x69, 0x21, 0xe3, 0x37, 0x8d, 0x04, 0xee, 0x31, 0xdd, 0x62, 0x4b, 0xe9, 0xa3, 0x38, 0xdd, 0x86,
+	0x3d, 0x38, 0xb8, 0x77, 0xf8, 0xd8, 0x2b, 0x43, 0x79, 0x0d, 0xf0, 0xdd, 0x9f, 0x5d, 0x5a, 0x77,
+	0x06, 0xe3, 0x5d, 0x32, 0x1c, 0xef, 0x42, 0x7b, 0x93, 0x35, 0x1f, 0xb8, 0xaf, 0xe8, 0xed, 0x2c,
+	0x0d, 0xd5, 0xc2, 0xe8, 0x56, 0x61, 0xf4, 0xa0, 0x36, 0x7a, 0x9f, 0x86, 0x6a, 0xa5, 0x83, 0x93,
+	0x15, 0x8a, 0xfb, 0x84, 0x3a, 0xe5, 0xda, 0xdb, 0x1b, 0x7b, 0x1b, 0x07, 0x5b, 0x87, 0x9b, 0x35,
+	0xd9, 0x5e, 0x74, 0xdb, 0x95, 0xb8, 0xff, 0x13, 0xe8, 0xfd, 0xb7, 0x4c, 0x87, 0x17, 0xec, 0xcb,
+	0x5f, 0x49, 0x5a, 0x94, 0xf2, 0xb2, 0xbd, 0x4c, 0xf1, 0xa8, 0xb6, 0xa8, 0x80, 0x95, 0xf3, 0xef,
+	0xf2, 0x5a, 0xfc, 0xff, 0xdb, 0xb7, 0xbe, 0xc3, 0x20, 0x47, 0x18, 0xe6, 0x08, 0xa3, 0x1c, 0x61,
+	0x92, 0x23, 0x4c, 0x73, 0x24, 0xb3, 0x1c, 0xc9, 0x3c, 0x47, 0xb8, 0x34, 0x48, 0xae, 0x0c, 0x92,
+	0x6b, 0x83, 0x70, 0x63, 0x90, 0xf4, 0x0c, 0x42, 0xdf, 0x20, 0x0c, 0x0c, 0xc2, 0xd0, 0x20, 0x8c,
+	0x0c, 0x92, 0x89, 0x41, 0x98, 0x1a, 0x24, 0x33, 0x83, 0x30, 0x37, 0x48, 0x2e, 0x2d, 0x92, 0x2b,
+	0x8b, 0xf0, 0xd5, 0x22, 0xf9, 0x66, 0x11, 0x7e, 0x58, 0x24, 0xd7, 0x16, 0xc9, 0x8d, 0x45, 0xe8,
+	0x59, 0x84, 0xbe, 0x45, 0xf8, 0xf0, 0xf4, 0x5f, 0x47, 0x93, 0x9c, 0xf3, 0xc5, 0x37, 0x09, 0x02,
+	0xa7, 0x38, 0x9a, 0xa3, 0xdf, 0x01, 0x00, 0x00, 0xff, 0xff, 0xbf, 0x13, 0x9d, 0x26, 0x0e, 0x03,
+	0x00, 0x00,
 }

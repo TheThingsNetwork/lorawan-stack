@@ -220,18 +220,9 @@ message RemoveApplicationAPIKeyRequest {
   string name = 2;
 }
 
-message SetApplicationCollaboratorRequest {
-  // application_id is the application ID where the collaborator will be (un)set.
-  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // collaborator is the collaborator to be set. If the list if rights is empty
-  // it will result as unset.
-  Collaborator collaborator = 2 [(gogoproto.nullable) = false];
-}
-
 message ListApplicationCollaboratorsResponse {
   // collaborators is the list of collaborators the application has.
-  repeated Collaborator collaborators = 1 [(gogoproto.nullable) = false];
+  repeated ApplicationCollaborator collaborators = 1 [(gogoproto.nullable) = false];
 }
 
 message ListApplicationRightsResponse {
@@ -274,7 +265,7 @@ service IsApplication {
 
   // SetApplicationCollaborator sets a collaborator for a given application. If
   // the list of rights is empty the collaborator will be removed.
-  rpc SetApplicationCollaborator(SetApplicationCollaboratorRequest) returns (google.protobuf.Empty);
+  rpc SetApplicationCollaborator(ApplicationCollaborator) returns (google.protobuf.Empty);
 
   // ListApplicationCollaborators returns all the collaborators for a given application.
   rpc ListApplicationCollaborators(ApplicationIdentifier) returns (ListApplicationCollaboratorsResponse);
@@ -338,18 +329,9 @@ message RemoveGatewayAPIKeyRequest {
   string name = 2;
 }
 
-message SetGatewayCollaboratorRequest {
-  // gateway_id is the ID of the gateway where the collaborator will be (un)set.
-  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // collaborator is the collaborator to be set. If the list if rights is empty
-  // it will result as unset.
-  Collaborator collaborator = 2 [(gogoproto.nullable) = false];
-}
-
 message ListGatewayCollaboratorsResponse {
   // collaborators is the list of collaborators a gateway has.
-  repeated Collaborator collaborators = 1 [(gogoproto.nullable) = false];
+  repeated GatewayCollaborator collaborators = 1 [(gogoproto.nullable) = false];
 }
 
 message ListGatewayRightsResponse {
@@ -391,7 +373,7 @@ service IsGateway {
 
   // SetGatewayCollaborator sets a collaborator for a given gateway. If the list
   // of rights is empty the collaborator will be removed.
-  rpc SetGatewayCollaborator(SetGatewayCollaboratorRequest) returns (google.protobuf.Empty);
+  rpc SetGatewayCollaborator(GatewayCollaborator) returns (google.protobuf.Empty);
 
   // ListGatewayCollaborators returns all the collaborators for a given gateway.
   rpc ListGatewayCollaborators(GatewayIdentifier) returns (ListGatewayCollaboratorsResponse);

@@ -367,25 +367,21 @@ func TestApplicationValidations(t *testing.T) {
 
 	{
 		// empty request (bad)
-		req := &SetApplicationCollaboratorRequest{}
+		req := &ApplicationCollaborator{}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// request with gateway rights (bad)
-		req = &SetApplicationCollaboratorRequest{
+		req = &ApplicationCollaborator{
 			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
-			Collaborator: Collaborator{
-				UserIdentifier: UserIdentifier{"alice"},
-				Rights:         []Right{RIGHT_GATEWAY_DELETE},
-			},
+			UserIdentifier:        UserIdentifier{"alice"},
+			Rights:                []Right{RIGHT_GATEWAY_DELETE},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// good request
-		req = &SetApplicationCollaboratorRequest{
+		req = &ApplicationCollaborator{
 			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
-			Collaborator: Collaborator{
-				UserIdentifier: UserIdentifier{"alice"},
-			},
+			UserIdentifier:        UserIdentifier{"alice"},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -527,25 +523,21 @@ func TestGatewayValidations(t *testing.T) {
 
 	{
 		// empty request (bad)
-		req := &SetGatewayCollaboratorRequest{}
+		req := &GatewayCollaborator{}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// request with application rights (bad)
-		req = &SetGatewayCollaboratorRequest{
+		req = &GatewayCollaborator{
 			GatewayIdentifier: GatewayIdentifier{"foo-gtw"},
-			Collaborator: Collaborator{
-				UserIdentifier: UserIdentifier{"alice"},
-				Rights:         []Right{RIGHT_APPLICATION_DELETE},
-			},
+			UserIdentifier:    UserIdentifier{"alice"},
+			Rights:            []Right{RIGHT_APPLICATION_DELETE},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// good request
-		req = &SetGatewayCollaboratorRequest{
+		req = &GatewayCollaborator{
 			GatewayIdentifier: GatewayIdentifier{"foo-gtw"},
-			Collaborator: Collaborator{
-				UserIdentifier: UserIdentifier{"alice"},
-			},
+			UserIdentifier:    UserIdentifier{"alice"},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
