@@ -102,33 +102,36 @@ message EndDevice {
   // LoRaWAN PHY version
   PHYVersion lorawan_phy_version = 13 [(gogoproto.customname) = "LoRaWANPHYVersion"];
 
+  // frequency_plan_id indicates the ID of the frequency plan.
+  string frequency_plan_id = 14 [(gogoproto.customname) = "FrequencyPlanID"];
+
   // Min frequency the device is capable of using
-  uint64 min_frequency = 14;
+  uint64 min_frequency = 15;
 
   // Max frequency the device is capable of using
-  uint64 max_frequency = 15;
+  uint64 max_frequency = 16;
 
   // Max transmission power the device is capable of using
-  uint64 max_tx_power = 16;
+  uint64 max_tx_power = 17;
 
   // LoRaWAN MAC settings for the device
-  MACSettings mac_settings = 17 [(gogoproto.customname) = "MACSettings"];
+  MACSettings mac_settings = 18 [(gogoproto.customname) = "MACSettings"];
 
   // MAC info sent by the device
-  MACInfo mac_info = 18 [(gogoproto.customname) = "MACInfo"];
+  MACInfo mac_info = 19 [(gogoproto.customname) = "MACInfo"];
 
   // Current LoRaWAN MAC state
-  MACState mac_state = 19 [(gogoproto.customname) = "MACState"];
+  MACState mac_state = 20 [(gogoproto.customname) = "MACState"];
 
   // Desired LoRaWAN MAC state
-  MACState mac_state_desired = 20 [(gogoproto.customname) = "MACStateDesired"];
+  MACState mac_state_desired = 21 [(gogoproto.customname) = "MACStateDesired"];
 
   // Location of the device
-  Location location = 21;
+  Location location = 22;
 
   // Device Attributes
   // - field names are written in snake_case
-  google.protobuf.Struct attributes = 22;
+  google.protobuf.Struct attributes = 23;
 
   google.protobuf.Timestamp created_at = 97 [(gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 98 [(gogoproto.stdtime) = true];
