@@ -167,7 +167,7 @@ message TxSettings {
   Modulation modulation = 1;
 
   // LoRaWAN data rate index
-  int32 data_rate_index = 2;
+  uint32 data_rate_index = 2;
 
   // Bandwidth in Hz (derived from data_rate_index)
   uint32 bandwidth = 3;

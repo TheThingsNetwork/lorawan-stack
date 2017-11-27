@@ -29,7 +29,7 @@ func Example() {
 
 	downlink := ttnpb.DownlinkMessage{
 		Settings: ttnpb.TxSettings{
-			DataRateIndex:   int32(downlinkDatarateIndex),
+			DataRateIndex:   uint32(downlinkDatarateIndex),
 			Frequency:       uint64(downlinkFrequency),
 			Modulation:      ParseModulation(downlinkDatarate.Rate),
 			SpreadingFactor: ParseSpreadingFactor(downlinkDatarate.Rate),
