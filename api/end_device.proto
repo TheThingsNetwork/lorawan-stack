@@ -25,7 +25,7 @@ message KeyEnvelope {
 // Root keys for a LoRaWAN device.
 message RootKeys {
   // Join Server issued identifier for the root keys
-  string root_key_id = 1;
+  string root_key_id = 1 [(gogoproto.customname) = "RootKeyID"];
 
   // The (encrypted) Application Key
   KeyEnvelope app_key = 2;
@@ -38,7 +38,7 @@ message RootKeys {
 // Only the components for which the keys were meant, will have the key-encryption-key (KEK) to decrypt the individual keys
 message SessionKeys {
   // Join Server issued identifier for the session keys
-  string session_key_id = 1;
+  string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
 
   // The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode)
   KeyEnvelope f_nwk_s_int_key = 2;
