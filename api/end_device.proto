@@ -109,7 +109,7 @@ message EndDevice {
   uint64 max_frequency = 15;
 
   // Max transmission power the device is capable of using
-  uint64 max_tx_power = 16 [(gogoproto.customname) = "MaxTXPower"];
+  uint64 max_tx_power = 16;
 
   // LoRaWAN MAC settings for the device
   MACSettings mac_settings = 17 [(gogoproto.customname) = "MACSettings"];
