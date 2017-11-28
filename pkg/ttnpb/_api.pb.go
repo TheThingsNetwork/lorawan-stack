@@ -25,7 +25,6 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/metadata.proto
 	github.com/TheThingsNetwork/ttn/api/networkserver.proto
 	github.com/TheThingsNetwork/ttn/api/rights.proto
-	github.com/TheThingsNetwork/ttn/api/settings.proto
 	github.com/TheThingsNetwork/ttn/api/tokenkey.proto
 	github.com/TheThingsNetwork/ttn/api/user.proto
 
@@ -64,6 +63,7 @@ It has these top-level messages:
 	GatewayIdentifier
 	EndDeviceIdentifiers
 	ClientIdentifier
+	IdentityServerSettings
 	GetSettingsRequest
 	UpdateSettingsRequest
 	CreateUserRequest
@@ -115,7 +115,6 @@ It has these top-level messages:
 	RxMetadata
 	TxMetadata
 	Location
-	IdentityServerSettings
 	TokenKeyRequest
 	TokenKeyResponse
 	User
