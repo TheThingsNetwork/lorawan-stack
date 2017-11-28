@@ -100,7 +100,8 @@ type Client struct {
 	Grants []GrantType `protobuf:"varint,7,rep,packed,name=grants,enum=ttn.v3.GrantType" json:"grants,omitempty"`
 	// Rights denotes what rights the client will have access to.
 	Rights []Right `protobuf:"varint,8,rep,packed,name=rights,enum=ttn.v3.Right" json:"rights,omitempty"`
-	// creator contains the user ID of the user who created the client.
+	// creator is the user ID of the user who created the client.
+	// This is an immutable and read-only field.
 	Creator UserIdentifier `protobuf:"bytes,9,opt,name=creator" json:"creator"`
 	// created_at denotes when the client was created.
 	// This a read-only field.
