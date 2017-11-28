@@ -93,8 +93,9 @@ func TestApplicationCollaborators(t *testing.T) {
 		a.So(collaborators, should.HaveLength, 0)
 	}
 
-	collaborator := ttnpb.Collaborator{
-		UserIdentifier: ttnpb.UserIdentifier{user.UserID},
+	collaborator := ttnpb.ApplicationCollaborator{
+		ApplicationIdentifier: ttnpb.ApplicationIdentifier{app.ApplicationID},
+		UserIdentifier:        ttnpb.UserIdentifier{user.UserID},
 		Rights: []ttnpb.Right{
 			ttnpb.Right(1),
 			ttnpb.Right(2),
@@ -103,7 +104,7 @@ func TestApplicationCollaborators(t *testing.T) {
 
 	// add one
 	{
-		err := s.Applications.SetCollaborator(app.ApplicationID, collaborator)
+		err := s.Applications.SetCollaborator(collaborator)
 		a.So(err, should.BeNil)
 	}
 
@@ -127,7 +128,7 @@ func TestApplicationCollaborators(t *testing.T) {
 	// modify rights
 	{
 		collaborator.Rights = append(collaborator.Rights, ttnpb.Right(3))
-		err := s.Applications.SetCollaborator(app.ApplicationID, collaborator)
+		err := s.Applications.SetCollaborator(collaborator)
 		a.So(err, should.BeNil)
 
 		collaborators, err := s.Applications.ListCollaborators(app.ApplicationID)
@@ -149,7 +150,7 @@ func TestApplicationCollaborators(t *testing.T) {
 	// remove collaborator
 	{
 		collaborator.Rights = []ttnpb.Right{}
-		err := s.Applications.SetCollaborator(app.ApplicationID, collaborator)
+		err := s.Applications.SetCollaborator(collaborator)
 		a.So(err, should.BeNil)
 
 		collaborators, err := s.Applications.ListCollaborators(app.ApplicationID)

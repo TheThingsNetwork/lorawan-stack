@@ -18,7 +18,6 @@ import (
 // GatewayStore implements store.GatewayStore.
 type GatewayStore struct {
 	storer
-	*collaboratorStore
 	factory factory.GatewayFactory
 }
 
@@ -50,9 +49,8 @@ var ErrGatewayIDTaken = &errors.ErrDescriptor{
 
 func NewGatewayStore(store storer, factory factory.GatewayFactory) *GatewayStore {
 	return &GatewayStore{
-		storer:            store,
-		factory:           factory,
-		collaboratorStore: newCollaboratorStore(store, "gateway"),
+		storer:  store,
+		factory: factory,
 	}
 }
 
@@ -474,6 +472,144 @@ func (s *GatewayStore) listAntennas(q db.QueryContext, gtwID string) ([]ttnpb.Ga
 	}
 
 	return result, nil
+}
+
+// SetCollaborator inserts or modifies a collaborator within an entity.
+// If the provided list of rights is empty the collaborator will be unset.
+func (s *GatewayStore) SetCollaborator(collaborator ttnpb.GatewayCollaborator) error {
+	if len(collaborator.Rights) == 0 {
+		return s.unsetCollaborator(s.queryer(), collaborator.GatewayID, collaborator.UserID)
+	}
+
+	err := s.transact(func(tx *db.Tx) error {
+		return s.setCollaborator(tx, collaborator)
+	})
+	return err
+}
+
+func (s *GatewayStore) unsetCollaborator(q db.QueryContext, gtwID, userID string) error {
+	_, err := q.Exec(
+		`DELETE
+			FROM gateways_collaborators
+			WHERE gateway_id = $1 AND user_id = $2`, gtwID, userID)
+	return err
+}
+
+func (s *GatewayStore) setCollaborator(q db.QueryContext, collaborator ttnpb.GatewayCollaborator) error {
+	query, args := s.removeRightsDiffQuery(collaborator)
+	_, err := q.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+
+	query, args = s.addRightsQuery(collaborator.GatewayID, collaborator.UserID, collaborator.Rights)
+	_, err = q.Exec(query, args...)
+
+	return err
+}
+
+func (s *GatewayStore) removeRightsDiffQuery(collaborator ttnpb.GatewayCollaborator) (string, []interface{}) {
+	args := make([]interface{}, 2+len(collaborator.Rights))
+	args[0] = collaborator.GatewayID
+	args[1] = collaborator.UserID
+
+	boundVariables := make([]string, len(collaborator.Rights))
+
+	for i, right := range collaborator.Rights {
+		args[i+2] = right
+		boundVariables[i] = fmt.Sprintf("$%d", i+3)
+	}
+
+	query := fmt.Sprintf(
+		`DELETE
+			FROM gateways_collaborators
+			WHERE gateway_id = $1 AND user_id = $2 AND "right" NOT IN (%s)`,
+		strings.Join(boundVariables, ", "))
+
+	return query, args
+}
+
+func (s *GatewayStore) addRightsQuery(gtwID, userID string, rights []ttnpb.Right) (string, []interface{}) {
+	args := make([]interface{}, 2+len(rights))
+	args[0] = gtwID
+	args[1] = userID
+
+	boundValues := make([]string, len(rights))
+
+	for i, right := range rights {
+		args[i+2] = right
+		boundValues[i] = fmt.Sprintf("($1, $2, $%d)", i+3)
+	}
+
+	query := fmt.Sprintf(
+		`INSERT
+			INTO gateways_collaborators (gateway_id, user_id, "right")
+			VALUES %s
+			ON CONFLICT (gateway_id, user_id, "right")
+			DO NOTHING`,
+		strings.Join(boundValues, " ,"))
+
+	return query, args
+}
+
+// ListCollaborators retrieves all the collaborators from an entity.
+func (s *GatewayStore) ListCollaborators(gtwID string) ([]ttnpb.GatewayCollaborator, error) {
+	return s.listCollaborators(s.queryer(), gtwID)
+}
+
+func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID string) ([]ttnpb.GatewayCollaborator, error) {
+	var collaborators []struct {
+		ttnpb.GatewayCollaborator
+		Right ttnpb.Right
+	}
+	err := q.Select(
+		&collaborators,
+		`SELECT user_id, "right"
+			FROM gateways_collaborators
+			WHERE gateway_id = $1`,
+		gtwID)
+	if !db.IsNoRows(err) && err != nil {
+		return nil, err
+	}
+
+	byUser := make(map[string]*ttnpb.GatewayCollaborator)
+	for _, collaborator := range collaborators {
+		if _, exists := byUser[collaborator.UserID]; !exists {
+			byUser[collaborator.UserID] = &ttnpb.GatewayCollaborator{
+				GatewayIdentifier: ttnpb.GatewayIdentifier{gtwID},
+				UserIdentifier:    ttnpb.UserIdentifier{collaborator.UserID},
+				Rights:            []ttnpb.Right{collaborator.Right},
+			}
+			continue
+		}
+
+		byUser[collaborator.UserID].Rights = append(byUser[collaborator.UserID].Rights, collaborator.Right)
+	}
+
+	result := make([]ttnpb.GatewayCollaborator, 0, len(byUser))
+	for _, collaborator := range byUser {
+		result = append(result, *collaborator)
+	}
+
+	return result, nil
+}
+
+// ListUserRights returns the rights a given user has for an entity.
+func (s *GatewayStore) ListUserRights(gtwID string, userID string) ([]ttnpb.Right, error) {
+	return s.listUserRights(s.queryer(), gtwID, userID)
+}
+
+func (s *GatewayStore) listUserRights(q db.QueryContext, gtwID string, userID string) ([]ttnpb.Right, error) {
+	var rights []ttnpb.Right
+	err := q.Select(
+		&rights,
+		`SELECT "right"
+			FROM gateways_collaborators
+			WHERE gateway_id = $1 AND user_id = $2`,
+		gtwID,
+		userID)
+
+	return rights, err
 }
 
 // LoadAttributes loads the gateways attributes into result if it is an Attributer.

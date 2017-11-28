@@ -160,8 +160,9 @@ func TestGatewayCollaborators(t *testing.T) {
 		a.So(collaborators, should.HaveLength, 0)
 	}
 
-	collaborator := ttnpb.Collaborator{
-		UserIdentifier: ttnpb.UserIdentifier{user.UserID},
+	collaborator := ttnpb.GatewayCollaborator{
+		GatewayIdentifier: ttnpb.GatewayIdentifier{gtw.GatewayID},
+		UserIdentifier:    ttnpb.UserIdentifier{user.UserID},
 		Rights: []ttnpb.Right{
 			ttnpb.Right(1),
 			ttnpb.Right(2),
@@ -170,7 +171,7 @@ func TestGatewayCollaborators(t *testing.T) {
 
 	// set the collaborator
 	{
-		err := s.Gateways.SetCollaborator(gtw.GatewayID, collaborator)
+		err := s.Gateways.SetCollaborator(collaborator)
 		a.So(err, should.BeNil)
 
 		collaborators, err := s.Gateways.ListCollaborators(gtw.GatewayID)
@@ -192,7 +193,7 @@ func TestGatewayCollaborators(t *testing.T) {
 	// modify rights
 	{
 		collaborator.Rights = append(collaborator.Rights, ttnpb.Right(3))
-		err := s.Gateways.SetCollaborator(gtw.GatewayID, collaborator)
+		err := s.Gateways.SetCollaborator(collaborator)
 		a.So(err, should.BeNil)
 
 		collaborators, err := s.Gateways.ListCollaborators(gtw.GatewayID)
@@ -214,7 +215,7 @@ func TestGatewayCollaborators(t *testing.T) {
 	// remove collaborator
 	{
 		collaborator.Rights = []ttnpb.Right{}
-		err := s.Gateways.SetCollaborator(gtw.GatewayID, collaborator)
+		err := s.Gateways.SetCollaborator(collaborator)
 		a.So(err, should.BeNil)
 
 		collaborators, err := s.Gateways.ListCollaborators(gtw.GatewayID)

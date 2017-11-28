@@ -10,23 +10,16 @@ func init() {
 			secret             STRING NOT NULL,
 			redirect_uri       STRING NOT NULL,
 			state	           INT NOT NULL DEFAULT 0,
-			official_labeled   BOOL DEFAULT false,
+				official_labeled   BOOL DEFAULT false,
 			grants             TEXT,
 			rights             TEXT,
 			created_at         TIMESTAMP DEFAULT current_timestamp(),
 			updated_at         TIMESTAMP,
 			archived_at        TIMESTAMP
 		);
-		CREATE TABLE IF NOT EXISTS clients_collaborators (
-			client_id   STRING(36) REFERENCES clients(client_id),
-			user_id     STRING(36) REFERENCES users(user_id),
-			"right"     STRING NOT NULL,
-			PRIMARY KEY(client_id, user_id, "right")
-		);
 	`
 
 	const backwards = `
-		DROP TABLE IF EXISTS clients_collaborators;
 		DROP TABLE IF EXISTS clients;
 	`
 

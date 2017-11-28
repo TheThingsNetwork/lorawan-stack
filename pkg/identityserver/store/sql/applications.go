@@ -19,7 +19,6 @@ import (
 // ApplicationStore implements store.ApplicationStore.
 type ApplicationStore struct {
 	storer
-	*collaboratorStore
 	factory factory.ApplicationFactory
 }
 
@@ -64,9 +63,8 @@ var ErrApplicationAPIKeyNotFound = &errors.ErrDescriptor{
 
 func NewApplicationStore(store storer, factory factory.ApplicationFactory) *ApplicationStore {
 	return &ApplicationStore{
-		storer:            store,
-		factory:           factory,
-		collaboratorStore: newCollaboratorStore(store, "application"),
+		storer:  store,
+		factory: factory,
 	}
 }
 
@@ -377,6 +375,144 @@ func (s *ApplicationStore) removeAPIKey(q db.QueryContext, appID string, keyName
 		})
 	}
 	return err
+}
+
+// SetCollaborator inserts or modifies a collaborator within an entity.
+// If the provided list of rights is empty the collaborator will be unset.
+func (s *ApplicationStore) SetCollaborator(collaborator ttnpb.ApplicationCollaborator) error {
+	if len(collaborator.Rights) == 0 {
+		return s.unsetCollaborator(s.queryer(), collaborator.ApplicationID, collaborator.UserID)
+	}
+
+	err := s.transact(func(tx *db.Tx) error {
+		return s.setCollaborator(tx, collaborator)
+	})
+	return err
+}
+
+func (s *ApplicationStore) unsetCollaborator(q db.QueryContext, appID, userID string) error {
+	_, err := q.Exec(
+		`DELETE
+			FROM applications_collaborators
+			WHERE application_id = $1 AND user_id = $2`, appID, userID)
+	return err
+}
+
+func (s *ApplicationStore) setCollaborator(q db.QueryContext, collaborator ttnpb.ApplicationCollaborator) error {
+	query, args := s.removeRightsDiffQuery(collaborator)
+	_, err := q.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+
+	query, args = s.addRightsQuery(collaborator.ApplicationID, collaborator.UserID, collaborator.Rights)
+	_, err = q.Exec(query, args...)
+
+	return err
+}
+
+func (s *ApplicationStore) removeRightsDiffQuery(collaborator ttnpb.ApplicationCollaborator) (string, []interface{}) {
+	args := make([]interface{}, 2+len(collaborator.Rights))
+	args[0] = collaborator.ApplicationID
+	args[1] = collaborator.UserID
+
+	boundVariables := make([]string, len(collaborator.Rights))
+
+	for i, right := range collaborator.Rights {
+		args[i+2] = right
+		boundVariables[i] = fmt.Sprintf("$%d", i+3)
+	}
+
+	query := fmt.Sprintf(
+		`DELETE
+			FROM applications_collaborators
+			WHERE application_id = $1 AND user_id = $2 AND "right" NOT IN (%s)`,
+		strings.Join(boundVariables, ", "))
+
+	return query, args
+}
+
+func (s *ApplicationStore) addRightsQuery(appID, userID string, rights []ttnpb.Right) (string, []interface{}) {
+	args := make([]interface{}, 2+len(rights))
+	args[0] = appID
+	args[1] = userID
+
+	boundValues := make([]string, len(rights))
+
+	for i, right := range rights {
+		args[i+2] = right
+		boundValues[i] = fmt.Sprintf("($1, $2, $%d)", i+3)
+	}
+
+	query := fmt.Sprintf(
+		`INSERT
+			INTO applications_collaborators (application_id, user_id, "right")
+			VALUES %s
+			ON CONFLICT (application_id, user_id, "right")
+			DO NOTHING`,
+		strings.Join(boundValues, " ,"))
+
+	return query, args
+}
+
+// ListCollaborators retrieves all the collaborators from an entity.
+func (s *ApplicationStore) ListCollaborators(appID string) ([]ttnpb.ApplicationCollaborator, error) {
+	return s.listCollaborators(s.queryer(), appID)
+}
+
+func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID string) ([]ttnpb.ApplicationCollaborator, error) {
+	var collaborators []struct {
+		ttnpb.ApplicationCollaborator
+		Right ttnpb.Right
+	}
+	err := q.Select(
+		&collaborators,
+		`SELECT user_id, "right"
+			FROM applications_collaborators
+			WHERE application_id = $1`,
+		appID)
+	if !db.IsNoRows(err) && err != nil {
+		return nil, err
+	}
+
+	byUser := make(map[string]*ttnpb.ApplicationCollaborator)
+	for _, collaborator := range collaborators {
+		if _, exists := byUser[collaborator.UserID]; !exists {
+			byUser[collaborator.UserID] = &ttnpb.ApplicationCollaborator{
+				ApplicationIdentifier: ttnpb.ApplicationIdentifier{appID},
+				UserIdentifier:        ttnpb.UserIdentifier{collaborator.UserID},
+				Rights:                []ttnpb.Right{collaborator.Right},
+			}
+			continue
+		}
+
+		byUser[collaborator.UserID].Rights = append(byUser[collaborator.UserID].Rights, collaborator.Right)
+	}
+
+	result := make([]ttnpb.ApplicationCollaborator, 0, len(byUser))
+	for _, collaborator := range byUser {
+		result = append(result, *collaborator)
+	}
+
+	return result, nil
+}
+
+// ListUserRights returns the rights a given user has for an entity.
+func (s *ApplicationStore) ListUserRights(appID string, userID string) ([]ttnpb.Right, error) {
+	return s.listUserRights(s.queryer(), appID, userID)
+}
+
+func (s *ApplicationStore) listUserRights(q db.QueryContext, appID string, userID string) ([]ttnpb.Right, error) {
+	var rights []ttnpb.Right
+	err := q.Select(
+		&rights,
+		`SELECT "right"
+			FROM applications_collaborators
+			WHERE application_id = $1 AND user_id = $2`,
+		appID,
+		userID)
+
+	return rights, err
 }
 
 // LoadAttributes loads extra attributes into the Application.

@@ -18,7 +18,6 @@ import (
 // ClientStore implements store.ClientStore.
 type ClientStore struct {
 	storer
-	*collaboratorStore
 	factory factory.ClientFactory
 }
 
@@ -50,9 +49,8 @@ var ErrClientIDTaken = &errors.ErrDescriptor{
 
 func NewClientStore(store storer, factory factory.ClientFactory) *ClientStore {
 	return &ClientStore{
-		storer:            store,
-		factory:           factory,
-		collaboratorStore: newCollaboratorStore(store, "client"),
+		storer:  store,
+		factory: factory,
 	}
 }
 
@@ -125,45 +123,6 @@ func (s *ClientStore) client(q db.QueryContext, clientID string, result types.Cl
 		return err
 	}
 	return s.loadAttributes(q, result)
-}
-
-// ListByUser finds all the clients an user is collaborator to.
-func (s *ClientStore) ListByUser(userID string) ([]types.Client, error) {
-	var result []types.Client
-	err := s.transact(func(tx *db.Tx) error {
-		clientIDs, err := s.userClients(tx, userID)
-		if err != nil {
-			return err
-		}
-
-		for _, clientID := range clientIDs {
-			client := s.factory.BuildClient()
-
-			err := s.client(tx, clientID, client)
-			if err != nil {
-				return err
-			}
-
-			result = append(result, client)
-		}
-
-		return nil
-	})
-	return result, err
-}
-
-func (s *ClientStore) userClients(q db.QueryContext, userID string) ([]string, error) {
-	var clientIDs []string
-	err := q.Select(
-		&clientIDs,
-		`SELECT DISTINCT client_id
-			FROM clients_collaborators
-			WHERE user_id = $1`,
-		userID)
-	if !db.IsNoRows(err) && err != nil {
-		return nil, err
-	}
-	return clientIDs, nil
 }
 
 // Update updates the client.

@@ -27,13 +27,13 @@ type GatewayStore interface {
 
 	// SetCollaborator inserts or updates a collaborator within a gateway.
 	// If the list of rights is empty the collaborator will be unset.
-	SetCollaborator(gtwID string, collaborator ttnpb.Collaborator) error
+	SetCollaborator(collaborator ttnpb.GatewayCollaborator) error
 
 	// ListCollaborators retrieves all the gateway collaborators.
-	ListCollaborators(gtwID string) ([]ttnpb.Collaborator, error)
+	ListCollaborators(gtwID string) ([]ttnpb.GatewayCollaborator, error)
 
 	// ListUserRights returns the rights the user has for a gateway.
-	ListUserRights(gtwID string, username string) ([]ttnpb.Right, error)
+	ListUserRights(gtwID string, userID string) ([]ttnpb.Right, error)
 
 	// LoadAttributes loads extra attributes into the gateway if it's an Attributer.
 	LoadAttributes(gtw types.Gateway) error

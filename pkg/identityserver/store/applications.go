@@ -33,10 +33,10 @@ type ApplicationStore interface {
 
 	// SetCollaborator inserts or updates a collaborator within an application.
 	// If the list of rights is empty the collaborator will be unset.
-	SetCollaborator(appID string, collaborator ttnpb.Collaborator) error
+	SetCollaborator(collaborator ttnpb.ApplicationCollaborator) error
 
 	// ListCollaborators retrieves all the collaborators from an application.
-	ListCollaborators(appID string) ([]ttnpb.Collaborator, error)
+	ListCollaborators(appID string) ([]ttnpb.ApplicationCollaborator, error)
 
 	// ListUserRights returns the rights a given User has for an Application.
 	ListUserRights(appID string, userID string) ([]ttnpb.Right, error)
