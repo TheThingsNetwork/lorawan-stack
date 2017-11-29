@@ -319,8 +319,8 @@ func (req *GatewayCollaborator) Validate() error {
 
 // validClientRights is the list of valid rights for a third-party client scope.
 var validClientRights = []Right{
-	RIGHT_USER_ACCOUNT_READ,
-	RIGHT_USER_ACCOUNT_WRITE,
+	RIGHT_USER_PROFILE_READ,
+	RIGHT_USER_PROFILE_WRITE,
 	RIGHT_USER_APPLICATIONS_LIST,
 	RIGHT_USER_APPLICATIONS_CREATE,
 	RIGHT_USER_APPLICATIONS,

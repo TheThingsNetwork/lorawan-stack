@@ -45,7 +45,7 @@ var (
 			ttnpb.GRANT_REFRESH_TOKEN,
 		},
 		Rights: []ttnpb.Right{
-			ttnpb.RIGHT_USER_ACCOUNT_READ,
+			ttnpb.RIGHT_USER_PROFILE_READ,
 		},
 	}
 	authorizer = &TestAuthorizer{
@@ -136,7 +136,7 @@ func TestAuthorizationFlowJSON(t *testing.T) {
 
 	state := "state"
 	rights := []ttnpb.Right{
-		ttnpb.RIGHT_USER_ACCOUNT_READ,
+		ttnpb.RIGHT_USER_PROFILE_READ,
 	}
 
 	uri := fmt.Sprintf("https://%s/oauth/authorize?client_id=%s&redirect_uri=%s&response_type=code&state=%s&scope=%s", issuer, client.ClientID, client.RedirectURI, state, Scope(rights))
@@ -223,7 +223,7 @@ func TestAuthorizationFlowForm(t *testing.T) {
 
 	state := "state"
 	rights := []ttnpb.Right{
-		ttnpb.RIGHT_USER_ACCOUNT_READ,
+		ttnpb.RIGHT_USER_PROFILE_READ,
 	}
 
 	uri := fmt.Sprintf("https://%s/oauth/authorize?client_id=%s&redirect_uri=%s&response_type=code&state=%s&scope=%s", issuer, client.ClientID, client.RedirectURI, state, Scope(rights))

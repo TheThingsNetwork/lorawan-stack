@@ -17,11 +17,11 @@ enum Right {
   // It can denote a parsing error.
   RIGHT_INVALID = 0;
 
-  // RIGHT_USER_ACCOUNT_READ is the right to read the user's account.
-  RIGHT_USER_ACCOUNT_READ = 1;
+  // RIGHT_USER_PROFILE_READ is the right to read the user's profile.
+  RIGHT_USER_PROFILE_READ = 1;
 
-  // RIGHT_USER_ACCOUNT_WRITE is the right to edit the user's account.
-  RIGHT_USER_ACCOUNT_WRITE = 2;
+  // RIGHT_USER_PROFILE_WRITE is the right to edit the user's profile.
+  RIGHT_USER_PROFILE_WRITE = 2;
 
   // RIGHT_USER_DELETE is the right to delete the user's account.
   RIGHT_USER_DELETE = 3;
