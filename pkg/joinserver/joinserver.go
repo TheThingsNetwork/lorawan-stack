@@ -89,6 +89,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 			"got_value":      req.Payload.MType,
 		})
 	}
+	if msg.GetMajor() != ttnpb.Major_LORAWAN_R1 {
+		return nil, ErrUnsupportedLoRaWANMajorVersion.New(errors.Attributes{
+			"major": msg.GetMajor(),
+ }
 
 	pld := msg.GetJoinRequestPayload()
 	if pld == nil {
