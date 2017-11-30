@@ -37,6 +37,7 @@ func TestTypes(t *testing.T) {
 			&NetID{12, 34, 56},
 			&DevAddr{12, 34, 56, 78},
 			&DevAddrPrefix{DevAddr{12, 34, 56, 78}, 8},
+			&DevAddrPrefix{DevAddr{12, 34, 56, 78}, 12},
 			&EUI64{12, 34, 56, 78, 12, 34, 56, 78},
 			&AES128Key{12, 34, 56, 78, 12, 34, 56, 78, 12, 34, 56, 78, 12, 34, 56, 78},
 		)

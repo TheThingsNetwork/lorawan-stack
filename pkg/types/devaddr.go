@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"strconv"
 	"strings"
 )
 
@@ -199,6 +200,7 @@ func (prefix DevAddrPrefix) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements the json.Unmarshaler interface
 func (prefix *DevAddrPrefix) UnmarshalJSON(data []byte) error {
 	if string(data) == `""` {
+		*prefix = DevAddrPrefix{}
 		return nil
 	}
 	if len(data) != 12 {
@@ -246,8 +248,7 @@ func (prefix DevAddrPrefix) MarshalText() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	// transform length into digit character range
-	return append(b, '/', prefix.Length+'0'), nil
+	return append(append(b, '/'), []byte(strconv.Itoa(int(prefix.Length)))...), nil
 }
 
 // UnmarshalText implements the encoding.TextUnmarshaler interface
