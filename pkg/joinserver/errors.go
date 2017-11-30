@@ -27,7 +27,7 @@ func init() {
 	ErrDevNonceReused.Register()
 }
 
-// ErrMICComputeFailed represents error occuring when MIC computation fails
+// ErrMICComputeFailed represents error occurring when MIC computation fails
 var ErrMICComputeFailed = &errors.ErrDescriptor{
 	MessageFormat: "Failed to compute MIC",
 	Type:          errors.InvalidArgument,

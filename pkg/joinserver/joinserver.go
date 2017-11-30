@@ -50,11 +50,11 @@ func checkMIC(key types.AES128Key, rawPayload []byte) error {
 	}
 	computed, err := crypto.ComputeJoinRequestMIC(key, rawPayload[:19])
 	if err != nil {
-		return errors.NewWithCause("failed to compute MIC from payload", err)
+		return ErrMICComputeFailed.New(nil)
 	}
 	for i := 0; i < 4; i++ {
 		if computed[i] != rawPayload[19+i] {
-			return ErrInvalidMIC.New(nil)
+			return ErrMICInvalid.New(nil)
 		}
 	}
 	return nil
@@ -85,14 +85,14 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 	msg := req.GetPayload()
 	if msg.GetMType() != ttnpb.MType_JOIN_REQUEST {
 		return nil, ErrWrongPayloadType.New(errors.Attributes{
-			"expected_value": ttnpb.MType_JOIN_REQUEST,
-			"got_value":      req.Payload.MType,
+			"type": req.Payload.MType,
 		})
 	}
 	if msg.GetMajor() != ttnpb.Major_LORAWAN_R1 {
 		return nil, ErrUnsupportedLoRaWANMajorVersion.New(errors.Attributes{
 			"major": msg.GetMajor(),
- }
+		})
+	}
 
 	pld := msg.GetJoinRequestPayload()
 	if pld == nil {
@@ -140,7 +140,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 		Major: msg.GetMajor(),
 	}).AppendLoRaWAN(b)
 	if err != nil {
-		return nil, ErrEncodeMHDRFailed.NewWithCause(nil, err)
+		panic(errors.NewWithCause("Failed to encode join accept MHDR", err))
 	}
 
 	var jn types.JoinNonce
@@ -157,7 +157,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 		RxDelay:    req.RxDelay,
 	}).AppendLoRaWAN(b)
 	if err != nil {
-		return nil, ErrEncodePayloadFailed.NewWithCause(nil, err)
+		panic(errors.NewWithCause("Failed to encode join accept MAC payload", err))
 	}
 
 	dn := binary.LittleEndian.Uint16(pld.DevNonce[:])
@@ -249,8 +249,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 			Lifetime: nil,
 		}
 	default:
-		return nil, ErrUnsupportedLoRaWANVersion.New(errors.Attributes{
-			"lorawan_version": req.SelectedMacVersion,
+		return nil, ErrUnsupportedLoRaWANMACVersion.New(errors.Attributes{
+			"version": req.SelectedMacVersion,
 		})
 	}
 
