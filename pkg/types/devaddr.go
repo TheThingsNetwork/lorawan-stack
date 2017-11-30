@@ -124,8 +124,8 @@ func (addr DevAddr) AfterOrEqual(a DevAddr) bool {
 	return addr.After(a) || addr == a
 }
 
-// ErrInvalidPrefix can be returned when unmarshaling an invalid slice into a prefix
-var ErrInvalidPrefix = errors.New("invalid device address prefix")
+// ErrInvalidDevAddrPrefix can be returned when unmarshaling an invalid slice into a prefix
+var ErrInvalidDevAddrPrefix = errors.New("invalid device address prefix")
 
 // DevAddrPrefix is a DevAddr with a prefix length
 type DevAddrPrefix struct {
@@ -207,7 +207,7 @@ func (prefix *DevAddrPrefix) UnmarshalJSON(data []byte) error {
 		return ErrInvalidLength
 	}
 	if data[9] != '/' {
-		return ErrInvalidPrefix
+		return ErrInvalidDevAddrPrefix
 	}
 	b := make([]byte, base64Encoding.DecodedLen(8))
 	n, err := base64Encoding.Decode(b, data[1:9])
@@ -215,7 +215,7 @@ func (prefix *DevAddrPrefix) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	if n != 4 || copy(prefix.DevAddr[:], b) != 4 {
-		return ErrInvalidPrefix
+		return ErrInvalidDevAddrPrefix
 	}
 	prefix.Length = data[10]
 	return nil
@@ -261,7 +261,7 @@ func (prefix *DevAddrPrefix) UnmarshalText(data []byte) error {
 		return ErrInvalidLength
 	}
 	if data[8] != '/' {
-		return ErrInvalidPrefix
+		return ErrInvalidDevAddrPrefix
 	}
 	if err := prefix.DevAddr.UnmarshalText(data[:8]); err != nil {
 		return err

@@ -22,6 +22,7 @@ func TestTypes(t *testing.T) {
 			&DevAddr{},
 			&DevAddrPrefix{},
 			&EUI64{},
+			&EUI64Prefix{},
 			&AES128Key{},
 		}
 	}
@@ -39,6 +40,8 @@ func TestTypes(t *testing.T) {
 			&DevAddrPrefix{DevAddr{12, 34, 56, 78}, 8},
 			&DevAddrPrefix{DevAddr{12, 34, 56, 78}, 12},
 			&EUI64{12, 34, 56, 78, 12, 34, 56, 78},
+			&EUI64Prefix{EUI64{12, 34, 56, 78, 12, 34, 56, 78}, 2},
+			&EUI64Prefix{EUI64{12, 34, 56, 78, 12, 34, 56, 78}, 16},
 			&AES128Key{12, 34, 56, 78, 12, 34, 56, 78, 12, 34, 56, 78, 12, 34, 56, 78},
 		)
 	}
