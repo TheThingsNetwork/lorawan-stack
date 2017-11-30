@@ -5,51 +5,48 @@ package joinserver
 import "github.com/TheThingsNetwork/ttn/pkg/errors"
 
 func init() {
-	ErrDeviceNotFound.Register()
-	ErrTooManyDevices.Register()
+	ErrMICComputeFailed.Register()
+	ErrUnsupportedLoRaWANMajorVersion.Register()
 	ErrWrongPayloadType.Register()
 	ErrMissingPayload.Register()
-	ErrWrongMICLength.Register()
-	ErrInvalidMIC.Register()
+	ErrMICInvalid.Register()
 	ErrAppKeyNotFound.Register()
 	ErrNwkKeyNotFound.Register()
 	ErrAppKeyEnvelopeNotFound.Register()
 	ErrNwkKeyEnvelopeNotFound.Register()
 	ErrMICCheckFailed.Register()
-	ErrUnsupportedLoRaWANVersion.Register()
+	ErrUnsupportedLoRaWANMACVersion.Register()
 	ErrMissingDevAddr.Register()
 	ErrMissingJoinEUI.Register()
 	ErrMissingDevEUI.Register()
 	ErrMissingJoinRequest.Register()
 	ErrUnmarshalFailed.Register()
 	ErrForwardJoinRequest.Register()
-	ErrEncodeMHDRFailed.Register()
-	ErrEncodePayloadFailed.Register()
-	ErrComputeJoinAcceptMIC.Register()
 	ErrEncryptPayloadFailed.Register()
 	ErrDevNonceTooSmall.Register()
 	ErrDevNonceReused.Register()
 }
 
-// ErrDeviceNotFound represents error ocurring when a device is not found.
-var ErrDeviceNotFound = &errors.ErrDescriptor{
-	MessageFormat: "Device not found",
-	Type:          errors.NotFound,
+// ErrMICComputeFailed represents error occuring when MIC computation fails
+var ErrMICComputeFailed = &errors.ErrDescriptor{
+	MessageFormat: "Failed to compute MIC",
+	Type:          errors.InvalidArgument,
 	Code:          1,
 }
 
-// ErrTooManyDevices represents error ocurring when too many devices are associated with identifiers specified.
-var ErrTooManyDevices = &errors.ErrDescriptor{
-	MessageFormat: "Too many devices are associated with identifiers specified",
-	Type:          errors.Conflict,
+// ErrUnsupportedLoRaWANMajorVersion represents error ocurring when unsupported LoRaWAN MAC version is specified.
+var ErrUnsupportedLoRaWANMajorVersion = &errors.ErrDescriptor{
+	MessageFormat: "Unsupported LoRaWAN major version: {major}",
+	Type:          errors.NotImplemented,
 	Code:          2,
 }
 
 // ErrWrongPayloadType represents error ocurring when wrong payload type is received.
 var ErrWrongPayloadType = &errors.ErrDescriptor{
-	MessageFormat: "Wrong payload type: expected {expected_value}, got {got_value}",
-	Type:          errors.InvalidArgument,
-	Code:          3,
+	MessageFormat:  "Wrong payload type: {type}",
+	Type:           errors.InvalidArgument,
+	SafeAttributes: []string{"type"},
+	Code:           3,
 }
 
 // ErrMissingPayload represents error ocurring when join request payload is missing.
@@ -59,15 +56,8 @@ var ErrMissingPayload = &errors.ErrDescriptor{
 	Code:          4,
 }
 
-// ErrWrongMICLength represents error ocurring when wrong MIC has wrong length.
-var ErrWrongMICLength = &errors.ErrDescriptor{
-	MessageFormat: "Wrong MIC length: expected 4, got {got_value}",
-	Type:          errors.InvalidArgument,
-	Code:          5,
-}
-
-// ErrInvalidMIC represents error ocurring when MIC mismatch.
-var ErrInvalidMIC = &errors.ErrDescriptor{
+// ErrMICInvalid represents error ocurring when MIC mismatch.
+var ErrMICInvalid = &errors.ErrDescriptor{
 	MessageFormat: "MIC mismatch",
 	Type:          errors.InvalidArgument,
 	Code:          6,
@@ -108,9 +98,9 @@ var ErrMICCheckFailed = &errors.ErrDescriptor{
 	Code:          11,
 }
 
-// ErrUnsupportedLoRaWANVersion represents error ocurring when unsupported LoRaWAN MAC version is specified.
-var ErrUnsupportedLoRaWANVersion = &errors.ErrDescriptor{
-	MessageFormat: "Unsupported LoRaWAN MAC version: {lorawan_version}",
+// ErrUnsupportedLoRaWANMACVersion represents error ocurring when unsupported LoRaWAN MAC version is specified.
+var ErrUnsupportedLoRaWANMACVersion = &errors.ErrDescriptor{
+	MessageFormat: "Unsupported LoRaWAN MAC version: {version}",
 	Type:          errors.NotImplemented,
 	Code:          12,
 }
@@ -155,20 +145,6 @@ var ErrForwardJoinRequest = &errors.ErrDescriptor{
 	MessageFormat: "Forwarding requests to other join servers is not implemented yet",
 	Type:          errors.NotImplemented,
 	Code:          18,
-}
-
-// ErrEncodeMHDRFailed represents error ocurring when encoding of join accept MHDR fails.
-var ErrEncodeMHDRFailed = &errors.ErrDescriptor{
-	MessageFormat: "Failed to encode join accept MHDR",
-	Type:          errors.Unknown,
-	Code:          19,
-}
-
-// ErrEncodePayloadFailed represents error ocurring when encodin of join accept payload fails.
-var ErrEncodePayloadFailed = &errors.ErrDescriptor{
-	MessageFormat: "Failed to encode join accept payload",
-	Type:          errors.Unknown,
-	Code:          20,
 }
 
 // ErrComputeJoinAcceptMIC represents error ocurring when computation of join accept MIC fails.
