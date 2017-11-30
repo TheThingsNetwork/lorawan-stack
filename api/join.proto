@@ -35,7 +35,7 @@ message JoinRequest {
   // Downlink Settings
   DLSettings downlink_settings = 6 [(gogoproto.nullable) = false];
 
-  // RX Delay in seconds
+  // Rx Delay in seconds
   uint32 rx_delay = 7;
 
   // Optional CFList

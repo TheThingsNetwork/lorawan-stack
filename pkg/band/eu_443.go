@@ -55,17 +55,17 @@ func init() {
 		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
 
 		DefaultMaxEIRP: 12.15,
-		TXOffset:       []float32{0, -2, -4, -6, -8, -10},
+		TxOffset:       []float32{0, -2, -4, -6, -8, -10},
 
-		RX1Parameters: func(dataRateIndex, frequency, RX1DROffset int, _ bool) (int, int) {
-			outDataRateIndex := dataRateIndex - RX1DROffset
+		Rx1Parameters: func(dataRateIndex, frequency, rx1DROffset int, _ bool) (int, int) {
+			outDataRateIndex := dataRateIndex - rx1DROffset
 			if outDataRateIndex < 0 {
 				outDataRateIndex = 0
 			}
 			return outDataRateIndex, frequency
 		},
 
-		DefaultRX2Parameters: Rx2Parameters{0, 434665000},
+		DefaultRx2Parameters: Rx2Parameters{0, 434665000},
 	}
 	All = append(All, eu_443)
 }

@@ -37,7 +37,7 @@ type JoinRequest struct {
 	NetID github_com_TheThingsNetwork_ttn_pkg_types.NetID `protobuf:"bytes,5,opt,name=net_id,json=netId,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.NetID" json:"net_id"`
 	// Downlink Settings
 	DownlinkSettings DLSettings `protobuf:"bytes,6,opt,name=downlink_settings,json=downlinkSettings" json:"downlink_settings"`
-	// RX Delay in seconds
+	// Rx Delay in seconds
 	RxDelay uint32 `protobuf:"varint,7,opt,name=rx_delay,json=rxDelay,proto3" json:"rx_delay,omitempty"`
 	// Optional CFList
 	CFList *CFList `protobuf:"bytes,8,opt,name=cf_list,json=cfList" json:"cf_list,omitempty"`

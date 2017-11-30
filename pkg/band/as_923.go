@@ -54,20 +54,20 @@ func init() {
 		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
 
 		DefaultMaxEIRP: 16,
-		TXOffset:       []float32{0, -2, -4, -6, -8, -10, -12, -14},
+		TxOffset:       []float32{0, -2, -4, -6, -8, -10, -12, -14},
 
-		RX1Parameters: func(dataRateIndex, frequency, RX1DROffset int, dwellTime bool) (int, int) {
+		Rx1Parameters: func(dataRateIndex, frequency, rx1DROffset int, dwellTime bool) (int, int) {
 			minDR := 0
-			effectiveRX1DROffset := RX1DROffset
-			if effectiveRX1DROffset > 5 {
-				effectiveRX1DROffset = 5 - RX1DROffset
+			effectiveRx1DROffset := rx1DROffset
+			if effectiveRx1DROffset > 5 {
+				effectiveRx1DROffset = 5 - rx1DROffset
 			}
 			if dwellTime {
 				minDR = 2
 			}
 
-			// Downstream data rate in RX1 slot = MIN (5, MAX (MinDR, Upstream data rate – Effective_RX1DROffset))
-			outDataRateIndex := dataRateIndex - effectiveRX1DROffset
+			// Downstream data rate in Rx1 slot = MIN (5, MAX (MinDR, Upstream data rate – Effective_Rx1DROffset))
+			outDataRateIndex := dataRateIndex - effectiveRx1DROffset
 			if outDataRateIndex > minDR {
 				outDataRateIndex = minDR
 			}
@@ -78,7 +78,7 @@ func init() {
 			return outDataRateIndex, frequency
 		},
 
-		DefaultRX2Parameters: Rx2Parameters{2, 923200000},
+		DefaultRx2Parameters: Rx2Parameters{2, 923200000},
 	}
 	All = append(All, as_923)
 }

@@ -19,7 +19,7 @@ func TestJoinAcceptEncryption(t *testing.T) {
 		0x03, 0x02, 0x01, // NetID
 		0x04, 0x03, 0x02, 0x01, // DevAddr
 		0x00,                   // DLSettings
-		0x01,                   // RXDelay
+		0x01,                   // RxDelay
 		0x32, 0xF5, 0x4A, 0xB3, // MIC
 	}
 
@@ -76,7 +76,7 @@ func TestJoinAcceptMIC(t *testing.T) {
 		0x03, 0x02, 0x01, // NetID
 		0x04, 0x03, 0x02, 0x01, // DevAddr
 		0x00, // DLSettings
-		0x01, // RXDelay
+		0x01, // RxDelay
 	}
 
 	var mic [4]byte

@@ -90,7 +90,7 @@ func Example() {
 		time.Sleep(10 * time.Second)
 		packet, err := extracter.TxPacket(downlink)
 		if err != nil {
-			fmt.Println("Couldn't convert TX packet")
+			fmt.Println("Couldn't convert Tx packet")
 			return
 		}
 

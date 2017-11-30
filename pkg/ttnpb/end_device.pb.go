@@ -471,13 +471,13 @@ type MACState struct {
 	AdrAckDelay uint32 `protobuf:"varint,9,opt,name=adr_ack_delay,json=adrAckDelay,proto3" json:"adr_ack_delay,omitempty"`
 	// Aggregated duty cycle of the device
 	DutyCycle AggregatedDutyCycle `protobuf:"varint,10,opt,name=duty_cycle,json=dutyCycle,proto3,enum=ttn.v3.AggregatedDutyCycle" json:"duty_cycle,omitempty"`
-	// RX1 delay (RX2 delay is RX1 delay + 1 second)
+	// Rx1 delay (Rx2 delay is Rx1 delay + 1 second)
 	RxDelay uint32 `protobuf:"varint,11,opt,name=rx_delay,json=rxDelay,proto3" json:"rx_delay,omitempty"`
-	// Data rate offset for RX1
+	// Data rate offset for Rx1
 	Rx1DataRateOffset int32 `protobuf:"varint,12,opt,name=rx1_data_rate_offset,json=rx1DataRateOffset,proto3" json:"rx1_data_rate_offset,omitempty"`
-	// Data rate index for RX2
+	// Data rate index for Rx2
 	Rx2DataRateIndex uint32 `protobuf:"varint,13,opt,name=rx2_data_rate_index,json=rx2DataRateIndex,proto3" json:"rx2_data_rate_index,omitempty"`
-	// Frequency for RX2
+	// Frequency for Rx2
 	Rx2Frequency uint64 `protobuf:"varint,14,opt,name=rx2_frequency,json=rx2Frequency,proto3" json:"rx2_frequency,omitempty"`
 	// Time after which a rejoin request will be sent
 	RejoinTimer uint32 `protobuf:"varint,18,opt,name=rejoin_timer,json=rejoinTimer,proto3" json:"rejoin_timer,omitempty"`

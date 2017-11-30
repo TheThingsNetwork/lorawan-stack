@@ -171,13 +171,13 @@ message MACState {
   uint32 adr_ack_delay = 9;
   // Aggregated duty cycle of the device
   AggregatedDutyCycle duty_cycle = 10;
-  // RX1 delay (RX2 delay is RX1 delay + 1 second)
+  // Rx1 delay (Rx2 delay is Rx1 delay + 1 second)
   uint32 rx_delay = 11;
-  // Data rate offset for RX1
+  // Data rate offset for Rx1
   int32 rx1_data_rate_offset = 12;
-  // Data rate index for RX2
+  // Data rate index for Rx2
   uint32 rx2_data_rate_index = 13;
-  // Frequency for RX2
+  // Frequency for Rx2
   uint64 rx2_frequency = 14;
   // Time after which a rejoin request will be sent
   uint32 rejoin_timer = 18;

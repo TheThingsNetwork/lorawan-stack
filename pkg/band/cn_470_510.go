@@ -64,10 +64,10 @@ func init() {
 		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
 
 		DefaultMaxEIRP: 19.15,
-		TXOffset:       []float32{0, -2, -4, -6, -8, -10, -12, -14},
+		TxOffset:       []float32{0, -2, -4, -6, -8, -10, -12, -14},
 
-		RX1Parameters: func(dataRateIndex, frequency, RX1DROffset int, _ bool) (int, int) {
-			outDataRateIndex := dataRateIndex - RX1DROffset
+		Rx1Parameters: func(dataRateIndex, frequency, rx1DROffset int, _ bool) (int, int) {
+			outDataRateIndex := dataRateIndex - rx1DROffset
 			if outDataRateIndex < 0 {
 				outDataRateIndex = 0
 			}
@@ -83,7 +83,7 @@ func init() {
 			return outDataRateIndex, downlinkChannels[frequencyIndex].Frequency
 		},
 
-		DefaultRX2Parameters: Rx2Parameters{0, 505300000},
+		DefaultRx2Parameters: Rx2Parameters{0, 505300000},
 	}
 	All = append(All, cn_470_510)
 }

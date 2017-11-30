@@ -105,7 +105,7 @@ message DownlinkMessage {
   //  - FPort: payload.mac_payload.f_port
   //  - FCntDown: payload.mac_payload.f_hdr.f_cnt
   //  - Confirmed: payload.mhdr.m_type
-  //  - RXDelay1:                                                           | TODO: RX1/2 selection
+  //  - RxDelay1:                                                           | TODO: Rx1/2 selection
   //  - DataRate1/DataRate2: settings.data_rate_index (and derived fields)  |
   //  - DLFreq1/DLFreq2: settings.frequency                                 |
   //  - GWInfo:

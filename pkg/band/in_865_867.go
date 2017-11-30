@@ -55,7 +55,7 @@ func init() {
 		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
 
 		DefaultMaxEIRP: 30,
-		TXOffset: func() []float32 {
+		TxOffset: func() []float32 {
 			offset := []float32{}
 			for i := 0; i < 11; i++ {
 				offset = append(offset, float32(0-2*i))
@@ -63,20 +63,20 @@ func init() {
 			return offset
 		}(),
 
-		RX1Parameters: func(dataRateIndex, frequency, RX1DROffset int, _ bool) (int, int) {
-			effectiveRX1DROffset := RX1DROffset
-			if effectiveRX1DROffset > 5 {
-				effectiveRX1DROffset = 5 - RX1DROffset
+		Rx1Parameters: func(dataRateIndex, frequency, rx1DROffset int, _ bool) (int, int) {
+			effectiveRx1DROffset := rx1DROffset
+			if effectiveRx1DROffset > 5 {
+				effectiveRx1DROffset = 5 - rx1DROffset
 			}
 
-			outDataRateIndex := dataRateIndex - effectiveRX1DROffset
+			outDataRateIndex := dataRateIndex - effectiveRx1DROffset
 			if outDataRateIndex < 5 {
 				outDataRateIndex = 5
 			}
 			return outDataRateIndex, frequency
 		},
 
-		DefaultRX2Parameters: Rx2Parameters{2, 866550000},
+		DefaultRx2Parameters: Rx2Parameters{2, 866550000},
 	}
 	All = append(All, in_865_867)
 }

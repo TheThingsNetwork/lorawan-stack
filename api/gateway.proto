@@ -143,7 +143,7 @@ message GatewayConfiguration {
       uint32 notch_frequency = 3;
     }
 
-    TxConfiguration radio_tx_config = 2 [(gogoproto.customname) = "TXConfig"];
+    TxConfiguration tx_configuration = 2;
   }
   repeated Radio radios = 6 [(gogoproto.nullable) = false];
 }

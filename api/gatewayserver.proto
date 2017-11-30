@@ -56,9 +56,9 @@ message FrequencyPlan {
   google.protobuf.Duration dwell_time = 6 [(gogoproto.moretags) = "yaml:\"dwell-time,omitempty\"", (gogoproto.stdduration) = true];
 
   message TimeOffAir {
-    // Fraction of the time on air of a TX emission to account as cooloff after emission
+    // Fraction of the time on air of a Tx emission to account as cooloff after emission
     float fraction = 1 [(gogoproto.moretags) = "yaml:\"fraction,omitempty\""];
-    // Cooloff after a TX emission
+    // Cooloff after a Tx emission
     google.protobuf.Duration duration = 2 [(gogoproto.moretags) = "yaml:\"duration,omitempty\"", (gogoproto.stdduration) = true];
   }
 

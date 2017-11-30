@@ -218,9 +218,9 @@ func (m *FrequencyPlan_LBTConfiguration) GetScanTime() int32 {
 }
 
 type FrequencyPlan_TimeOffAir struct {
-	// Fraction of the time on air of a TX emission to account as cooloff after emission
+	// Fraction of the time on air of a Tx emission to account as cooloff after emission
 	Fraction float32 `protobuf:"fixed32,1,opt,name=fraction,proto3" json:"fraction,omitempty" yaml:"fraction,omitempty"`
-	// Cooloff after a TX emission
+	// Cooloff after a Tx emission
 	Duration *time.Duration `protobuf:"bytes,2,opt,name=duration,stdduration" json:"duration,omitempty" yaml:"duration,omitempty"`
 }
 

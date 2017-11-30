@@ -24,7 +24,7 @@ func Example() {
 
 	uplink := GetUplink()
 	uplinkTxSettings := uplink.Settings
-	downlinkDatarateIndex, downlinkFrequency := euBand.RX1Parameters(int(uplinkTxSettings.DataRateIndex), int(uplinkTxSettings.Frequency), 0, false)
+	downlinkDatarateIndex, downlinkFrequency := euBand.Rx1Parameters(int(uplinkTxSettings.DataRateIndex), int(uplinkTxSettings.Frequency), 0, false)
 	downlinkDatarate := euBand.DataRates[downlinkDatarateIndex]
 
 	downlink := ttnpb.DownlinkMessage{

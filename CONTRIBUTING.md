@@ -145,9 +145,11 @@ We follow the [official go guidelines](https://github.com/golang/go/wiki/CodeRev
 | application          | app     |                                                               |
 | end device           | dev     |                                                               |
 | user                 | user    |                                                               |
-
+| transmit             | tx / Tx |                                                               |
+| receive              | rx / Rx |                                                               |
 
 #### 2-word entities
+
 In case both of the words have an implementation-specific meaning, the variable name is the combination of first letter of each word.
 
 | entity                                                  | name    |
