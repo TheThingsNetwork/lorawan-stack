@@ -312,13 +312,13 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["acme","acme/autocert","pbkdf2"]
-  revision = "365904b0f3154c6e11a9cf541c9803d1dca0445a"
+  revision = "94eea52f7b742c7cbe0b03b22f0c4c8631ece122"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context","context/ctxhttp","http2","http2/hpack","idna","internal/timeseries","lex/httplex","trace"]
-  revision = "fc492d2e106922eb3aa4bca863d55e882c087ae3"
+  revision = "a8b9294777976932365dabb6640cf1468d95c70f"
 
 [[projects]]
   branch = "master"
@@ -330,13 +330,13 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "a204229cd828a74741ee7b5da9bf4794497f85ed"
+  revision = "13fcbd661c8ececa8807a29b48407d674b1d8ed8"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/text"
   packages = ["collate","collate/build","internal/colltab","internal/gen","internal/tag","internal/triegen","internal/ucd","language","secure/bidirule","transform","unicode/bidi","unicode/cldr","unicode/norm","unicode/rangetable","width"]
-  revision = "572a2b141f625f4360cf42a41a43622067e0510b"
+  revision = "75cc3cad82b5f47d3fb229ddda8c5167da14f294"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -377,6 +377,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "77665a942ab799f9f57ca5fd848e26486efe1f7fc9281c3d8deb372912a99ef1"
+  inputs-digest = "52f178ad04c5ac49e888cdddc64c398c88a94538012a7541b2c4038b6ec2e47e"
   solver-name = "gps-cdcl"
   solver-version = 1
