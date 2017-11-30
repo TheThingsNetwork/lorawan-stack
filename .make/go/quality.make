@@ -65,10 +65,13 @@ go.check-vendors:
 go.check-vendors-staged: VENDOR_FILE=$(shell $(STAGED_FILES) | grep -q $(GO_VENDOR_FILE) || echo /dev/null)
 go.check-vendors-staged: go.check-vendors
 
+go.depfmt:
+	@go run $(MAKE_DIR)/go/depfmt.go
+
 # run all quality on all files
-go.quality: go.fmt go.misspell go.unconvert go.lint go.check-vendors
+go.quality: go.fmt go.misspell go.unconvert go.lint go.check-vendors go.depfmt
 
 # run all quality on staged files
-go.quality-staged: go.fmt-staged go.misspell-staged go.unconvert-staged go.lint-staged go.check-vendors-staged
+go.quality-staged: go.fmt-staged go.misspell-staged go.unconvert-staged go.lint-staged go.check-vendors-staged go.depfmt
 
 # vim: ft=make
