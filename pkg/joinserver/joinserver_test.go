@@ -26,9 +26,13 @@ import (
 const appID = "test"
 
 var (
-	joinEUI = types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	nwkKey  = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	appKey  = types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	joinEUIPrefixes = []types.EUI64Prefix{
+		{types.EUI64{0xff, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}, 42},
+		{types.EUI64{0x10, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}, 12},
+		{types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00}, 56},
+	}
+	nwkKey = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	appKey = types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 )
 
 func mustEncryptJoinAccept(key types.AES128Key, pld []byte) []byte {
@@ -44,9 +48,9 @@ func TestHandleJoin(t *testing.T) {
 
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 	js := New(&Config{
-		Component: component.New(test.GetLogger(t), &component.Config{shared.DefaultServiceBase}),
-		Registry:  reg,
-		JoinEUI:   joinEUI,
+		Component:       component.New(test.GetLogger(t), &component.Config{shared.DefaultServiceBase}),
+		Registry:        reg,
+		JoinEUIPrefixes: joinEUIPrefixes,
 	})
 
 	resp, err := js.HandleJoin(context.Background(), nil)
@@ -67,6 +71,12 @@ func TestHandleJoin(t *testing.T) {
 
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.Payload = nil
+	resp, err = js.HandleJoin(context.Background(), req)
+	a.So(err, should.NotBeNil)
+	a.So(resp, should.BeNil)
+
+	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
+	req.Payload.GetJoinRequestPayload().JoinEUI = types.EUI64{0x11, 0x12, 0x13, 0x14, 0x42, 0x42, 0x42, 0x42}
 	resp, err = js.HandleJoin(context.Background(), req)
 	a.So(err, should.NotBeNil)
 	a.So(resp, should.BeNil)
@@ -802,9 +812,9 @@ func TestHandleJoin(t *testing.T) {
 
 			reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 			js := New(&Config{
-				Component: component.New(test.GetLogger(t), &component.Config{shared.DefaultServiceBase}),
-				Registry:  reg,
-				JoinEUI:   joinEUI,
+				Component:       component.New(test.GetLogger(t), &component.Config{shared.DefaultServiceBase}),
+				Registry:        reg,
+				JoinEUIPrefixes: joinEUIPrefixes,
 			})
 
 			_, err := reg.Create(tc.Device)

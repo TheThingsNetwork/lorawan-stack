@@ -23,15 +23,15 @@ type JoinServer struct {
 	*component.Component
 	*deviceregistry.RegistryRPC
 
-	registry deviceregistry.Interface
-	joinEUI  types.EUI64
+	registry    deviceregistry.Interface
+	euiPrefixes []types.EUI64Prefix
 }
 
 // Config represents the JoinServer configuration.
 type Config struct {
-	Component *component.Component
-	Registry  deviceregistry.Interface
-	JoinEUI   types.EUI64
+	Component       *component.Component
+	Registry        deviceregistry.Interface
+	JoinEUIPrefixes []types.EUI64Prefix
 }
 
 // New returns new *JoinServer.
@@ -40,7 +40,7 @@ func New(conf *Config) *JoinServer {
 		Component:   conf.Component,
 		RegistryRPC: deviceregistry.NewRPC(conf.Component, conf.Registry),
 		registry:    conf.Registry,
-		joinEUI:     conf.JoinEUI,
+		euiPrefixes: conf.JoinEUIPrefixes,
 	}
 }
 
@@ -105,7 +105,14 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 	if pld.JoinEUI.IsZero() {
 		return nil, ErrMissingJoinEUI.New(nil)
 	}
-	if pld.JoinEUI != js.joinEUI {
+
+	match := false
+	for _, px := range js.euiPrefixes {
+		if px.Matches(pld.JoinEUI) {
+			match = true
+		}
+	}
+	if !match {
 		// TODO determine the cluster containing the device
 		// https://github.com/TheThingsIndustries/ttn/issues/244
 		return nil, ErrForwardJoinRequest.New(nil)
