@@ -181,15 +181,21 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 
 	dn := binary.LittleEndian.Uint16(pld.DevNonce[:])
-
-	switch req.SelectedMacVersion {
-	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
+	if req.SelectedMacVersion == ttnpb.MAC_V1_1 && !dev.GetDisableNonceCheck() {
+		if uint32(dn) < dev.NextDevNonce {
+			return nil, ErrDevNonceTooSmall.New(nil)
+		}
+		dev.NextDevNonce = uint32(dn + 1)
+	} else {
 		for _, used := range dev.UsedDevNonces {
 			if dn == uint16(used) {
 				return nil, ErrDevNonceReused.New(nil)
 			}
 		}
+	}
 
+	switch req.SelectedMacVersion {
+	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
 		if err := checkMIC(appKey, rawPayload); err != nil {
 			return nil, ErrMICCheckFailed.NewWithCause(nil, err)
 		}
@@ -218,11 +224,6 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			Lifetime: nil,
 		}
 	case ttnpb.MAC_V1_1:
-		if uint32(dn) < dev.NextDevNonce {
-			return nil, ErrDevNonceTooSmall.New(nil)
-		}
-		dev.NextDevNonce = uint32(dn + 1)
-
 		ke := dev.GetRootKeys().GetNwkKey()
 		if ke == nil {
 			return nil, ErrNwkKeyEnvelopeNotFound.New(nil)
