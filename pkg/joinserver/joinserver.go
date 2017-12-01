@@ -65,9 +65,12 @@ func keyPointer(key types.AES128Key) *types.AES128Key {
 }
 
 // HandleJoin is called by the network server to join a device
-func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (resp *ttnpb.JoinResponse, err error) {
+	if ctx == nil {
+		panic("joinserver: HandleJoin received nil ctx")
+	}
 	if req == nil {
-		return nil, ErrMissingJoinRequest.New(nil)
+		panic("joinserver: HandleJoin received nil req")
 	}
 
 	if req.EndDeviceIdentifiers.DevAddr == nil {
@@ -75,8 +78,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 	}
 	devAddr := *req.EndDeviceIdentifiers.DevAddr
 
+	rawPayload := req.GetRawPayload()
 	if req.Payload.Payload == nil {
-		rawPayload := req.GetRawPayload()
 		if rawPayload == nil {
 			return nil, ErrMissingPayload.New(nil)
 		}
@@ -99,7 +102,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 
 	pld := msg.GetJoinRequestPayload()
 	if pld == nil {
-		return nil, ErrMissingPayload.New(nil)
+		return nil, ErrMissingJoinRequest.New(nil)
 	}
 
 	if pld.DevEUI.IsZero() {
@@ -107,6 +110,13 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 	}
 	if pld.JoinEUI.IsZero() {
 		return nil, ErrMissingJoinEUI.New(nil)
+	}
+
+	if rawPayload == nil {
+		rawPayload, err = req.Payload.MarshalLoRaWAN()
+		if err != nil {
+			panic(errors.NewWithCause("Failed to marshal join request payload", err))
+		}
 	}
 
 	match := false
@@ -171,7 +181,6 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 	}
 
 	dn := binary.LittleEndian.Uint16(pld.DevNonce[:])
-	var resp *ttnpb.JoinResponse
 
 	switch req.SelectedMacVersion {
 	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
