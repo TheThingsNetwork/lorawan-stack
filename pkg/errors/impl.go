@@ -11,12 +11,12 @@ import (
 )
 
 type info struct {
-	ID         string     `json:"id,omitempty"`
-	Message    string     `json:"error"`
+	Message    string     `json:"error_message"`
+	ID         string     `json:"error_id,omitempty"`
 	Code       Code       `json:"error_code,omitempty"`
 	Type       Type       `json:"error_type,omitempty"`
-	Attributes Attributes `json:"attributes,omitempty"`
-	Namespace  string     `json:"namespace,omitempty"`
+	Namespace  string     `json:"error_namespace,omitempty"`
+	Attributes Attributes `json:"error_attributes,omitempty"`
 }
 
 // Impl implements Error
