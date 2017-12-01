@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/TheThingsNetwork/ttn/cmd/shared"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
@@ -36,6 +37,7 @@ var (
 			err := mgr.ReadInConfig()
 			if err != nil {
 				fmt.Println("Could not read config file:", err)
+				os.Exit(1)
 			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
