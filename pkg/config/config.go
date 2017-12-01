@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"os"
 	"reflect"
 	"sort"
 	"strings"
@@ -22,13 +23,14 @@ const TimeFormat = time.RFC3339Nano
 
 // Manager is a manager for the configuration.
 type Manager struct {
-	name        string
-	viper       *viper.Viper
-	flags       *pflag.FlagSet
-	replacer    *strings.Replacer
-	defaults    interface{}
-	configFlag  string
-	dataDirFlag string
+	name         string
+	viper        *viper.Viper
+	flags        *pflag.FlagSet
+	replacer     *strings.Replacer
+	defaults     interface{}
+	defaultPaths []string
+	configFlag   string
+	dataDirFlag  string
 }
 
 // Flags to be used in the command.
@@ -193,11 +195,43 @@ func (m *Manager) Unmarshal(result interface{}) error {
 	return nil
 }
 
+// the path must be in default paths
+func (m *Manager) isDefault(path string) bool {
+	for _, def := range m.defaultPaths {
+		if def == path {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (m *Manager) inCLIFlags(path string) bool {
+	flags, err := m.flags.GetStringSlice(m.configFlag)
+	if err != nil {
+		return false
+	}
+
+	for _, flag := range flags {
+		if path == flag {
+			return true
+		}
+	}
+	return false
+}
+
 // ReadInConfig will read in all defined config files (according to the config file flag set by WithConfigFileFlag).
 // The parsed config files will be merged into the config struct.
 func (m *Manager) ReadInConfig() error {
 	files := m.viper.GetStringSlice(m.configFlag)
 	for _, file := range files {
+		// ignore default config files that do not exist
+		if m.isDefault(file) && !m.inCLIFlags(file) {
+			if _, err := os.Stat(file); os.IsNotExist(err) {
+				continue
+			}
+		}
+
 		m.viper.SetConfigFile(file)
 		err := m.viper.MergeInConfig()
 		if err != nil {

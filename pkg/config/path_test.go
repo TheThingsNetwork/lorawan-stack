@@ -110,7 +110,7 @@ func TestConfigPathEnv(t *testing.T) {
 
 	f := config.Flags().Lookup("config")
 	a.So(f, should.NotBeNil)
-	a.So(f.DefValue, should.Resemble, "[/foo/bar/baz.yml]")
+	a.So(f.DefValue, should.Resemble, "[]")
 
 	res := new(configWithPath)
 	config.Unmarshal(res)

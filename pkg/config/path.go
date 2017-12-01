@@ -19,41 +19,44 @@ func WithConfigFileFlag(flag string) Option {
 
 		m.configFlag = flag
 
-		configPaths := []string{path.Join("$PWD", "."+m.name+".yml")}
-		def := m.viper.GetStringSlice(flag)
+		// use the default from the config if set
+		if def := m.viper.GetStringSlice(flag); def != nil {
+			m.viper.SetDefault(flag, def)
+			return
+		}
+
+		file := m.name + ".yml"
+		dotfile := "." + file
+
+		var envPaths []string
+		var paths []string
+
+		if pwd := os.Getenv("PWD"); pwd != "" {
+			envPaths = []string{path.Join("$PWD", dotfile)}
+			paths = []string{path.Join(pwd, dotfile)}
+		}
 
 		// check HOME
 		if home := os.Getenv("HOME"); home != "" {
-			m.viper.AddConfigPath(home)
-			m.viper.AddConfigPath(path.Join(home, "."+m.name))
-			m.viper.SetDefault(flag, []string{path.Join(home, "."+m.name+".yml")})
-
-			configPaths = []string{path.Join("$HOME", "."+m.name+".yml")}
+			envPaths = []string{path.Join("$HOME", dotfile)}
+			paths = []string{path.Join(home, dotfile)}
 		}
 
 		// check XDG_CONFIG_HOME
 		if xdg := os.Getenv("XDG_CONFIG_HOME"); xdg != "" {
-			m.viper.AddConfigPath(xdg)
-			m.viper.SetDefault(flag, []string{path.Join(xdg, m.name, m.name+".yml")})
-			configPaths = []string{path.Join("$XDG_CONFIG_HOME", m.name, m.name+".yml")}
+			envPaths = []string{path.Join("$XDG_CONFIG_HOME", m.name, file)}
+			paths = []string{path.Join(xdg, m.name, file)}
 		}
 
-		// use the default
-		if def != nil {
-			configPaths = def
-			for _, pth := range def {
-				m.viper.AddConfigPath(pth)
-			}
-
-			m.viper.SetDefault(flag, def)
-		}
+		m.defaultPaths = paths
+		m.viper.SetDefault(flag, paths)
 
 		// set the flag default
 		f := m.flags.Lookup(flag)
 		if f != nil {
-			f.DefValue = "[" + strings.Join(configPaths, ",") + "]"
+			f.DefValue = "[" + strings.Join(envPaths, ",") + "]"
 		} else {
-			m.flags.StringSlice(flag, configPaths, "Location of the configuration file")
+			m.flags.StringSlice(flag, envPaths, "Location of the configuration file")
 		}
 	}
 }
