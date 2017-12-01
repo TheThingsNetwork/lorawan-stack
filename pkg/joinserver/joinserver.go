@@ -16,6 +16,13 @@ import (
 	"google.golang.org/grpc"
 )
 
+var supportedMACVersions = [...]ttnpb.MACVersion{
+	ttnpb.MAC_V1_0,
+	ttnpb.MAC_V1_0_1,
+	ttnpb.MAC_V1_0_2,
+	ttnpb.MAC_V1_1,
+}
+
 // JoinServer implements the join server component.
 //
 // The join server exposes the NsJs and DeviceRegistry services.
@@ -71,6 +78,19 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 	if req == nil {
 		panic("joinserver: HandleJoin received nil req")
+	}
+
+	supported := false
+	for _, v := range supportedMACVersions {
+		supported = v == req.SelectedMacVersion
+		if supported {
+			break
+		}
+	}
+	if !supported {
+		return nil, ErrUnsupportedLoRaWANMACVersion.New(errors.Attributes{
+			"version": req.SelectedMacVersion,
+		})
 	}
 
 	if req.EndDeviceIdentifiers.DevAddr == nil {
@@ -187,6 +207,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		}
 		dev.NextDevNonce = uint32(dn + 1)
 	} else {
+		// Fallback to LoRaWAN 1.0 DevNonce check by default
 		for _, used := range dev.UsedDevNonces {
 			if dn == uint16(used) {
 				return nil, ErrDevNonceReused.New(nil)
@@ -195,34 +216,6 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 
 	switch req.SelectedMacVersion {
-	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-		if err := checkMIC(appKey, rawPayload); err != nil {
-			return nil, ErrMICCheckFailed.NewWithCause(nil, err)
-		}
-
-		mic, err := crypto.ComputeLegacyJoinAcceptMIC(appKey, b)
-		if err != nil {
-			return nil, ErrComputeJoinAcceptMIC.NewWithCause(nil, err)
-		}
-
-		enc, err := crypto.EncryptJoinAccept(appKey, append(b[1:], mic[:]...))
-		if err != nil {
-			return nil, ErrEncryptPayloadFailed.NewWithCause(nil, err)
-		}
-		resp = &ttnpb.JoinResponse{
-			RawPayload: append(b[:1], enc...),
-			SessionKeys: ttnpb.SessionKeys{
-				FNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key:      keyPointer(crypto.DeriveLegacyNwkSKey(appKey, jn, req.NetID, pld.DevNonce)),
-					KekLabel: "",
-				},
-				AppSKey: &ttnpb.KeyEnvelope{
-					Key:      keyPointer(crypto.DeriveLegacyAppSKey(appKey, jn, req.NetID, pld.DevNonce)),
-					KekLabel: "",
-				},
-			},
-			Lifetime: nil,
-		}
 	case ttnpb.MAC_V1_1:
 		ke := dev.GetRootKeys().GetNwkKey()
 		if ke == nil {
@@ -269,9 +262,33 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			Lifetime: nil,
 		}
 	default:
-		return nil, ErrUnsupportedLoRaWANMACVersion.New(errors.Attributes{
-			"version": req.SelectedMacVersion,
-		})
+		if err := checkMIC(appKey, rawPayload); err != nil {
+			return nil, ErrMICCheckFailed.NewWithCause(nil, err)
+		}
+
+		mic, err := crypto.ComputeLegacyJoinAcceptMIC(appKey, b)
+		if err != nil {
+			return nil, ErrComputeJoinAcceptMIC.NewWithCause(nil, err)
+		}
+
+		enc, err := crypto.EncryptJoinAccept(appKey, append(b[1:], mic[:]...))
+		if err != nil {
+			return nil, ErrEncryptPayloadFailed.NewWithCause(nil, err)
+		}
+		resp = &ttnpb.JoinResponse{
+			RawPayload: append(b[:1], enc...),
+			SessionKeys: ttnpb.SessionKeys{
+				FNwkSIntKey: &ttnpb.KeyEnvelope{
+					Key:      keyPointer(crypto.DeriveLegacyNwkSKey(appKey, jn, req.NetID, pld.DevNonce)),
+					KekLabel: "",
+				},
+				AppSKey: &ttnpb.KeyEnvelope{
+					Key:      keyPointer(crypto.DeriveLegacyAppSKey(appKey, jn, req.NetID, pld.DevNonce)),
+					KekLabel: "",
+				},
+			},
+			Lifetime: nil,
+		}
 	}
 
 	dev.UsedDevNonces = append(dev.UsedDevNonces, uint32(dn))
