@@ -75,8 +75,11 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 	}
 	devAddr := *req.EndDeviceIdentifiers.DevAddr
 
-	rawPayload := req.GetRawPayload()
-	if rawPayload != nil {
+	if req.Payload.Payload == nil {
+		rawPayload := req.GetRawPayload()
+		if rawPayload == nil {
+			return nil, ErrMissingPayload.New(nil)
+		}
 		if err := req.Payload.UnmarshalLoRaWAN(rawPayload); err != nil {
 			return nil, ErrUnmarshalFailed.NewWithCause(nil, err)
 		}
