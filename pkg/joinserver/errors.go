@@ -25,6 +25,8 @@ func init() {
 	ErrEncryptPayloadFailed.Register()
 	ErrDevNonceTooSmall.Register()
 	ErrDevNonceReused.Register()
+	ErrCorruptRegistry.Register()
+	ErrMACVersionMismatch.Register()
 }
 
 // ErrMICComputeFailed represents error occurring when MIC computation fails
@@ -173,4 +175,18 @@ var ErrDevNonceReused = &errors.ErrDescriptor{
 	MessageFormat: "DevNonce has already been used",
 	Type:          errors.InvalidArgument,
 	Code:          24,
+}
+
+// ErrCorruptRegistry represents error ocurring when join server registry is corrupted.
+var ErrCorruptRegistry = &errors.ErrDescriptor{
+	MessageFormat: "Registry is corrupt",
+	Type:          errors.Internal,
+	Code:          25,
+}
+
+// ErrMACVersionMismatch represents error ocurring when selected MAC version does not match version stored in join server registry.
+var ErrMACVersionMismatch = &errors.ErrDescriptor{
+	MessageFormat: "Device MAC version mismatch, in registry: {registered}, selected: {selected}",
+	Type:          errors.Internal,
+	Code:          26,
 }

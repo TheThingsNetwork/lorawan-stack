@@ -159,12 +159,20 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		return nil, err
 	}
 
+	// Registered version is lower than selected.
+	if dev.LoRaWANVersion.Compare(req.SelectedMacVersion) == -1 {
+		return nil, ErrMACVersionMismatch.New(errors.Attributes{
+			"registered": dev.LoRaWANVersion,
+			"selected":   req.SelectedMacVersion,
+		})
+	}
+
 	ke := dev.GetRootKeys().GetAppKey()
 	if ke == nil {
-		return nil, ErrAppKeyEnvelopeNotFound.New(nil)
+		return nil, ErrCorruptRegistry.NewWithCause(nil, ErrAppKeyEnvelopeNotFound.New(nil))
 	}
 	if ke.Key == nil || ke.Key.IsZero() {
-		return nil, ErrAppKeyNotFound.New(nil)
+		return nil, ErrCorruptRegistry.NewWithCause(nil, ErrAppKeyNotFound.New(nil))
 	}
 	appKey := *ke.Key
 
@@ -221,10 +229,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	case ttnpb.MAC_V1_1:
 		ke := dev.GetRootKeys().GetNwkKey()
 		if ke == nil {
-			return nil, ErrNwkKeyEnvelopeNotFound.New(nil)
+			return nil, ErrCorruptRegistry.NewWithCause(nil, ErrNwkKeyEnvelopeNotFound.New(nil))
 		}
 		if ke.Key == nil || ke.Key.IsZero() {
-			return nil, ErrNwkKeyNotFound.New(nil)
+			return nil, ErrCorruptRegistry.NewWithCause(nil, ErrNwkKeyNotFound.New(nil))
 		}
 		nwkKey := *ke.Key
 
