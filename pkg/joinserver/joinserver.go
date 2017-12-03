@@ -201,16 +201,18 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 
 	dn := binary.LittleEndian.Uint16(pld.DevNonce[:])
-	if req.SelectedMacVersion == ttnpb.MAC_V1_1 && !dev.GetDisableNonceCheck() {
-		if uint32(dn) < dev.NextDevNonce {
-			return nil, ErrDevNonceTooSmall.New(nil)
-		}
-		dev.NextDevNonce = uint32(dn + 1)
-	} else {
-		// Fallback to LoRaWAN 1.0 DevNonce check by default
-		for _, used := range dev.UsedDevNonces {
-			if dn == uint16(used) {
-				return nil, ErrDevNonceReused.New(nil)
+	if !dev.GetDisableNonceCheck() {
+		switch req.SelectedMacVersion {
+		case ttnpb.MAC_V1_1:
+			if uint32(dn) < dev.NextDevNonce {
+				return nil, ErrDevNonceTooSmall.New(nil)
+			}
+			dev.NextDevNonce = uint32(dn + 1)
+		default:
+			for _, used := range dev.UsedDevNonces {
+				if dn == uint16(used) {
+					return nil, ErrDevNonceReused.New(nil)
+				}
 			}
 		}
 	}
