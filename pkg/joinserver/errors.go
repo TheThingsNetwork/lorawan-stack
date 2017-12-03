@@ -9,7 +9,7 @@ func init() {
 	ErrUnsupportedLoRaWANMajorVersion.Register()
 	ErrWrongPayloadType.Register()
 	ErrMissingPayload.Register()
-	ErrMICInvalid.Register()
+	ErrMICMismatch.Register()
 	ErrAppKeyNotFound.Register()
 	ErrNwkKeyNotFound.Register()
 	ErrAppKeyEnvelopeNotFound.Register()
@@ -56,8 +56,8 @@ var ErrMissingPayload = &errors.ErrDescriptor{
 	Code:          4,
 }
 
-// ErrMICInvalid represents error ocurring when MIC mismatch.
-var ErrMICInvalid = &errors.ErrDescriptor{
+// ErrMICMismatch represents error ocurring when MIC mismatch.
+var ErrMICMismatch = &errors.ErrDescriptor{
 	MessageFormat: "MIC mismatch",
 	Type:          errors.InvalidArgument,
 	Code:          6,

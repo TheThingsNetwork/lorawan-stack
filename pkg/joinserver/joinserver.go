@@ -61,7 +61,7 @@ func checkMIC(key types.AES128Key, rawPayload []byte) error {
 	}
 	for i := 0; i < 4; i++ {
 		if computed[i] != rawPayload[19+i] {
-			return ErrMICInvalid.New(nil)
+			return ErrMICMismatch.New(nil)
 		}
 	}
 	return nil
