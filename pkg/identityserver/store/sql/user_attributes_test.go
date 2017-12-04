@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -14,11 +13,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-// userWithFooFactory implements factory.UserFactory.
-type userWithFooFactory struct{}
-
-// BuildUser returns an userWithFoo type.
-func (f userWithFooFactory) BuildUser() types.User {
+var userWithFooFactory = func() types.User {
 	return &userWithFoo{}
 }
 
@@ -75,9 +70,6 @@ func TestUserAttributer(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore(t)
 
-	// Set userWithFooFactory as the User Factory
-	s.Users.SetFactory(userWithFooFactory{})
-
 	_, err := s.db.Exec(`
 		CREATE TABLE IF NOT EXISTS foo_users (
 			user_id  STRING(36) REFERENCES users(user_id) NOT NULL,
@@ -100,12 +92,9 @@ func TestUserAttributer(t *testing.T) {
 	err = s.Users.Create(withFoo)
 	a.So(err, should.BeNil)
 
-	found, err := s.Users.GetByID(withFoo.GetUser().UserID)
+	found, err := s.Users.GetByID(withFoo.GetUser().UserID, userWithFooFactory)
 	a.So(err, should.BeNil)
 	//a.So(found, test.ShouldBeUser, created)
 	a.So(found, test.ShouldBeUserIgnoringAutoFields, withFoo)
 	//a.So((found.(*userWithFoo)).Foo, should.Equal, (cre.Foo)
-
-	// Set back the DefaultUser factory
-	s.Users.SetFactory(factory.DefaultUser{})
 }

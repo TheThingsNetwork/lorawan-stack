@@ -2,9 +2,7 @@
 
 package store
 
-import (
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
-)
+import "github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 
 // OAuthStore is a store that manages OAuth refresh tokens and authorization codes.
 type OAuthStore interface {

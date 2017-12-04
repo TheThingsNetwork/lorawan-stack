@@ -7,7 +7,6 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
 )
 
@@ -121,20 +120,13 @@ func (s *txStore) store() *store.Store {
 // initSubStores initializes the sub stores of the store.
 func initSubStores(s storer, previous *Store) {
 	store := s.store()
-	if previous == nil {
-		store.Users = NewUserStore(s, factory.DefaultUser{})
-		store.Applications = NewApplicationStore(s, factory.DefaultApplication{})
-		store.Gateways = NewGatewayStore(s, factory.DefaultGateway{})
-		store.Clients = NewClientStore(s, factory.DefaultClient{})
-		store.OAuth = NewOAuthStore(s)
-		return
-	}
-
-	store.Users = NewUserStore(s, previous.Users.(*UserStore).factory)
-	store.Applications = NewApplicationStore(s, previous.Applications.(*ApplicationStore).factory)
-	store.Gateways = NewGatewayStore(s, previous.Gateways.(*GatewayStore).factory)
-	store.Clients = NewClientStore(s, previous.Clients.(*ClientStore).factory)
+	store.Users = NewUserStore(s)
+	store.Applications = NewApplicationStore(s)
+	store.Gateways = NewGatewayStore(s)
+	store.Clients = NewClientStore(s)
 	store.OAuth = NewOAuthStore(s)
+	return
+
 }
 
 func (s *Store) MigrateAll() error {

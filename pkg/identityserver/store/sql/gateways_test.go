@@ -7,10 +7,15 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
+
+var gatewayFactory = func() types.Gateway {
+	return &ttnpb.Gateway{}
+}
 
 func testGateways() map[string]*ttnpb.Gateway {
 	return map[string]*ttnpb.Gateway{
@@ -77,7 +82,7 @@ func TestGatewayAttributes(t *testing.T) {
 
 	// fetch gateway and check that the attributes has been registered
 	{
-		found, err := s.Gateways.GetByID(gtw.GatewayID)
+		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewayFactory)
 		a.So(err, should.BeNil)
 		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 	}
@@ -89,7 +94,7 @@ func TestGatewayAttributes(t *testing.T) {
 		gtw.Attributes[attributeKey] = "bar"
 		err := s.Gateways.Update(gtw)
 		a.So(err, should.BeNil)
-		found, err := s.Gateways.GetByID(gtw.GatewayID)
+		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewayFactory)
 		a.So(err, should.BeNil)
 		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 	}
@@ -99,7 +104,7 @@ func TestGatewayAttributes(t *testing.T) {
 		delete(gtw.Attributes, attributeKey)
 		err := s.Gateways.Update(gtw)
 		a.So(err, should.BeNil)
-		found, err := s.Gateways.GetByID(gtw.GatewayID)
+		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewayFactory)
 		a.So(err, should.BeNil)
 		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 
@@ -114,7 +119,7 @@ func TestGatewayAntennas(t *testing.T) {
 
 	// check that all antennas were registered
 	{
-		found, err := s.Gateways.GetByID(gtw.GatewayID)
+		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewayFactory)
 		a.So(err, should.BeNil)
 		if a.So(found.GetGateway().Antennas, should.HaveLength, 1) {
 			a.So(found.GetGateway().Antennas[0], should.Resemble, gtw.Antennas[0])
@@ -128,7 +133,7 @@ func TestGatewayAntennas(t *testing.T) {
 		err := s.Gateways.Update(gtw)
 		a.So(err, should.BeNil)
 
-		found, err := s.Gateways.GetByID(gtw.GatewayID)
+		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewayFactory)
 		a.So(err, should.BeNil)
 		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 	}
@@ -140,7 +145,7 @@ func TestGatewayAntennas(t *testing.T) {
 		err := s.Gateways.Update(gtw)
 		a.So(err, should.BeNil)
 
-		found, err := s.Gateways.GetByID(gtw.GatewayID)
+		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewayFactory)
 		a.So(err, should.BeNil)
 		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 	}
@@ -183,7 +188,7 @@ func TestGatewayCollaborators(t *testing.T) {
 
 	// fetch gateways where Bob is collaborator
 	{
-		gtws, err := s.Gateways.ListByUser(user.UserID)
+		gtws, err := s.Gateways.ListByUser(user.UserID, gatewayFactory)
 		a.So(err, should.BeNil)
 		if a.So(gtws, should.HaveLength, 1) {
 			a.So(gtws[0], test.ShouldBeGatewayIgnoringAutoFields, gtw)
@@ -234,7 +239,7 @@ func TestGatewayUpdate(t *testing.T) {
 	err := s.Gateways.Update(gtw)
 	a.So(err, should.BeNil)
 
-	found, err := s.Gateways.GetByID(gtw.GatewayID)
+	found, err := s.Gateways.GetByID(gtw.GatewayID, gatewayFactory)
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 }
@@ -248,7 +253,7 @@ func TestGatewayArchive(t *testing.T) {
 	err := s.Gateways.Archive(gtw.GatewayID)
 	a.So(err, should.BeNil)
 
-	found, err := s.Gateways.GetByID(gtw.GatewayID)
+	found, err := s.Gateways.GetByID(gtw.GatewayID, gatewayFactory)
 	a.So(err, should.BeNil)
 
 	a.So(found.GetGateway().ArchivedAt.IsZero(), should.BeFalse)

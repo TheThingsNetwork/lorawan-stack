@@ -3,10 +3,13 @@
 package store
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
+
+// ApplicationFactory is a function that returns a types.Application used to
+// construct the results in read operations.
+type ApplicationFactory func() types.Application
 
 // ApplicationStore is a store that holds Applications.
 type ApplicationStore interface {
@@ -14,10 +17,10 @@ type ApplicationStore interface {
 	Create(app types.Application) error
 
 	// GetByID finds the application by ID and retrieves it.
-	GetByID(appID string) (types.Application, error)
+	GetByID(appID string, factory ApplicationFactory) (types.Application, error)
 
 	// ListByUser returns the applications to which an user is a collaborator.
-	ListByUser(userID string) ([]types.Application, error)
+	ListByUser(userID string, factory ApplicationFactory) ([]types.Application, error)
 
 	// Update updates the application.
 	Update(app types.Application) error
@@ -47,7 +50,4 @@ type ApplicationStore interface {
 	// WriteAttributes writes the extra attributes on the Application if it is an
 	// Attributer to the store.
 	WriteAttributes(app types.Application, result types.Application) error
-
-	// SetFactory allows to replace the default ttnpb.Application factory.
-	SetFactory(factory factory.ApplicationFactory)
 }

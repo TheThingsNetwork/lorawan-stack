@@ -7,10 +7,16 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
+
+var clientFactory = func() types.Client {
+	return &ttnpb.Client{}
+
+}
 
 func testClients() map[string]*ttnpb.Client {
 	return map[string]*ttnpb.Client{
@@ -60,7 +66,7 @@ func TestClientUpdate(t *testing.T) {
 	err := s.Clients.Update(client)
 	a.So(err, should.BeNil)
 
-	found, err := s.Clients.GetByID(client.ClientID)
+	found, err := s.Clients.GetByID(client.ClientID, clientFactory)
 	a.So(err, should.BeNil)
 	a.So(client, test.ShouldBeClientIgnoringAutoFields, found)
 }
@@ -76,7 +82,7 @@ func TestClientManagement(t *testing.T) {
 		err := s.Clients.SetClientOfficial(client.ClientID, true)
 		a.So(err, should.BeNil)
 
-		found, err := s.Clients.GetByID(client.ClientID)
+		found, err := s.Clients.GetByID(client.ClientID, clientFactory)
 		a.So(err, should.BeNil)
 		a.So(found.GetClient().OfficialLabeled, should.BeTrue)
 	}
@@ -86,7 +92,7 @@ func TestClientManagement(t *testing.T) {
 		err := s.Clients.SetClientState(client.ClientID, ttnpb.STATE_APPROVED)
 		a.So(err, should.BeNil)
 
-		found, err := s.Clients.GetByID(client.ClientID)
+		found, err := s.Clients.GetByID(client.ClientID, clientFactory)
 		a.So(err, should.BeNil)
 		a.So(found.GetClient().State, should.Resemble, ttnpb.STATE_APPROVED)
 	}
@@ -101,7 +107,7 @@ func TestClientArchive(t *testing.T) {
 	err := s.Clients.Archive(client.ClientID)
 	a.So(err, should.BeNil)
 
-	found, err := s.Clients.GetByID(client.ClientID)
+	found, err := s.Clients.GetByID(client.ClientID, clientFactory)
 	a.So(err, should.BeNil)
 
 	a.So(found.GetClient().ArchivedAt.IsZero(), should.BeFalse)

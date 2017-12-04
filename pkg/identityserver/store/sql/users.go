@@ -8,7 +8,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/helpers"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 )
@@ -16,7 +15,6 @@ import (
 // UserStore implements store.UserStore.
 type UserStore struct {
 	storer
-	factory factory.UserFactory
 }
 
 func init() {
@@ -69,10 +67,9 @@ var ErrUserEmailTaken = &errors.ErrDescriptor{
 	},
 }
 
-func NewUserStore(store storer, factory factory.UserFactory) *UserStore {
+func NewUserStore(store storer) *UserStore {
 	return &UserStore{
-		storer:  store,
-		factory: factory,
+		storer: store,
 	}
 }
 
@@ -127,8 +124,8 @@ func (s *UserStore) create(q db.QueryContext, user types.User) error {
 }
 
 // GetByID finds the user by ID and returns it.
-func (s *UserStore) GetByID(userID string) (types.User, error) {
-	result := s.factory.BuildUser()
+func (s *UserStore) GetByID(userID string, resultFunc store.UserFactory) (types.User, error) {
+	result := resultFunc()
 	err := s.transact(func(tx *db.Tx) error {
 		return s.getByID(tx, userID, result)
 	})
@@ -155,8 +152,8 @@ func (s *UserStore) getByID(q db.QueryContext, userID string, result types.User)
 }
 
 // GetByEmail finds the user by email address and returns it.
-func (s *UserStore) GetByEmail(email string) (types.User, error) {
-	result := s.factory.BuildUser()
+func (s *UserStore) GetByEmail(email string, resultFunc store.UserFactory) (types.User, error) {
+	result := resultFunc()
 	err := s.transact(func(tx *db.Tx) error {
 		return s.getByEmail(tx, email, result)
 	})
@@ -312,9 +309,4 @@ func (s *UserStore) writeAttributes(q db.QueryContext, id string, user types.Use
 	}
 
 	return nil
-}
-
-// SetFactory allows to replace the default ttnpb.User factory.
-func (s *UserStore) SetFactory(factory factory.UserFactory) {
-	s.factory = factory
 }

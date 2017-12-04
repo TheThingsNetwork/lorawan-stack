@@ -46,7 +46,7 @@ func TestAuthorizationCode(t *testing.T) {
 	a.So(found.RedirectURI, should.Equal, data.RedirectURI)
 	a.So(found.State, should.Equal, data.State)
 
-	c, err := s.Clients.GetByID(found.ClientID)
+	c, err := s.Clients.GetByID(found.ClientID, clientFactory)
 	a.So(err, should.BeNil)
 	a.So(c, test.ShouldBeClientIgnoringAutoFields, client)
 
@@ -85,7 +85,7 @@ func TestRefreshToken(t *testing.T) {
 	a.So(found.Scope, should.Equal, data.Scope)
 	a.So(found.RedirectURI, should.Equal, data.RedirectURI)
 
-	c, err := s.Clients.GetByID(found.ClientID)
+	c, err := s.Clients.GetByID(found.ClientID, clientFactory)
 	a.So(err, should.BeNil)
 	a.So(c, test.ShouldBeClientIgnoringAutoFields, client)
 

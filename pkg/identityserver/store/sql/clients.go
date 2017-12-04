@@ -9,7 +9,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/helpers"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -18,7 +17,6 @@ import (
 // ClientStore implements store.ClientStore.
 type ClientStore struct {
 	storer
-	factory factory.ClientFactory
 }
 
 func init() {
@@ -47,10 +45,9 @@ var ErrClientIDTaken = &errors.ErrDescriptor{
 	},
 }
 
-func NewClientStore(store storer, factory factory.ClientFactory) *ClientStore {
+func NewClientStore(store storer) *ClientStore {
 	return &ClientStore{
-		storer:  store,
-		factory: factory,
+		storer: store,
 	}
 }
 
@@ -100,8 +97,8 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 }
 
 // GetByID finds a client by ID and retrieves it.
-func (s *ClientStore) GetByID(clientID string) (types.Client, error) {
-	result := s.factory.BuildClient()
+func (s *ClientStore) GetByID(clientID string, resultFunc store.ClientFactory) (types.Client, error) {
+	result := resultFunc()
 	err := s.transact(func(tx *db.Tx) error {
 		return s.client(tx, clientID, result)
 	})
@@ -290,9 +287,4 @@ func (s *ClientStore) writeAttributes(q db.QueryContext, client, result types.Cl
 	}
 
 	return nil
-}
-
-// SetFactory allows to replace the default ttnpb.Client factory.
-func (s *ClientStore) SetFactory(factory factory.ClientFactory) {
-	s.factory = factory
 }

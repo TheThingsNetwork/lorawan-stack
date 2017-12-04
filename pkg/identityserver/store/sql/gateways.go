@@ -9,7 +9,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/helpers"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -18,7 +17,6 @@ import (
 // GatewayStore implements store.GatewayStore.
 type GatewayStore struct {
 	storer
-	factory factory.GatewayFactory
 }
 
 func init() {
@@ -47,10 +45,9 @@ var ErrGatewayIDTaken = &errors.ErrDescriptor{
 	},
 }
 
-func NewGatewayStore(store storer, factory factory.GatewayFactory) *GatewayStore {
+func NewGatewayStore(store storer) *GatewayStore {
 	return &GatewayStore{
-		storer:  store,
-		factory: factory,
+		storer: store,
 	}
 }
 
@@ -171,8 +168,8 @@ func (s *GatewayStore) addAntennasQuery(gtwID string, antennas []ttnpb.GatewayAn
 }
 
 // GetByID finds a gateway by ID and retrieves it.
-func (s *GatewayStore) GetByID(gtwID string) (types.Gateway, error) {
-	result := s.factory.BuildGateway()
+func (s *GatewayStore) GetByID(gtwID string, resultFunc store.GatewayFactory) (types.Gateway, error) {
+	result := resultFunc()
 	err := s.transact(func(tx *db.Tx) error {
 		return s.getByID(tx, gtwID, result)
 	})
@@ -219,7 +216,7 @@ func (s *GatewayStore) gateway(q db.QueryContext, gtwID string, result types.Gat
 }
 
 // ListByUser returns all the gateways to which a given user is collaborator.
-func (s *GatewayStore) ListByUser(userID string) ([]types.Gateway, error) {
+func (s *GatewayStore) ListByUser(userID string, resultFunc store.GatewayFactory) ([]types.Gateway, error) {
 	var gateways []types.Gateway
 	err := s.transact(func(tx *db.Tx) error {
 		gtwIDs, err := s.userGateways(tx, userID)
@@ -228,7 +225,7 @@ func (s *GatewayStore) ListByUser(userID string) ([]types.Gateway, error) {
 		}
 
 		for _, gtwID := range gtwIDs {
-			result := s.factory.BuildGateway()
+			result := resultFunc()
 
 			err := s.getByID(tx, gtwID, result)
 			if err != nil {
@@ -676,9 +673,4 @@ func (s *GatewayStore) writeAttributes(q db.QueryContext, gtwID string, gateway 
 	}
 
 	return nil
-}
-
-// SetFactory allows to replace the default ttnpb.Gateway factory.
-func (s *GatewayStore) SetFactory(factory factory.GatewayFactory) {
-	s.factory = factory
 }

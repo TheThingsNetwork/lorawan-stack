@@ -3,10 +3,13 @@
 package store
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
+
+// ClientFactory is a function that returns a types.Client used to
+// construct the results in read operations.
+type ClientFactory func() types.Client
 
 // ClientStore is a store that holds authorized third party Clients.
 type ClientStore interface {
@@ -14,7 +17,7 @@ type ClientStore interface {
 	Create(client types.Client) error
 
 	// GetByID finds a client by ID and retrieves it.
-	GetByID(clientID string) (types.Client, error)
+	GetByID(clientID string, factory ClientFactory) (types.Client, error)
 
 	// Update updates the client.
 	Update(client types.Client) error
@@ -34,7 +37,4 @@ type ClientStore interface {
 	// WriteAttributes writes the extra attributes on the Client if it's an
 	// Attributer to the store.
 	WriteAttributes(client, result types.Client) error
-
-	// SetFactory allows to replace the default ttnpb.Client factory.
-	SetFactory(factory factory.ClientFactory)
 }

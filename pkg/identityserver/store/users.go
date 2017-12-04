@@ -2,10 +2,11 @@
 
 package store
 
-import (
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
-)
+import "github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+
+// UserFactory is a function that returns a types.User used to
+// construct the results in read operations.
+type UserFactory func() types.User
 
 // UserStore is a store that holds Users.
 type UserStore interface {
@@ -13,10 +14,10 @@ type UserStore interface {
 	Create(user types.User) error
 
 	// GetByID finds the user by ID and retrieves it.
-	GetByID(userID string) (types.User, error)
+	GetByID(userID string, factory UserFactory) (types.User, error)
 
 	// GetByEmail finds the user by email address and retrieves it.
-	GetByEmail(email string) (types.User, error)
+	GetByEmail(email string, factory UserFactory) (types.User, error)
 
 	// Update updates an user.
 	Update(user types.User) error
@@ -30,7 +31,4 @@ type UserStore interface {
 	// WriteAttributes writes all of the user attributes if the User is an
 	// Attributer and returns the written User in result.
 	WriteAttributes(user, result types.User) error
-
-	// SetFactory allows to replace the default ttnpb.User factory.
-	SetFactory(factory factory.UserFactory)
 }

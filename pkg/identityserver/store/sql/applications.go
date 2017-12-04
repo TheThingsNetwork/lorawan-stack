@@ -10,7 +10,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/helpers"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -19,7 +18,6 @@ import (
 // ApplicationStore implements store.ApplicationStore.
 type ApplicationStore struct {
 	storer
-	factory factory.ApplicationFactory
 }
 
 func init() {
@@ -61,10 +59,9 @@ var ErrApplicationAPIKeyNotFound = &errors.ErrDescriptor{
 	},
 }
 
-func NewApplicationStore(store storer, factory factory.ApplicationFactory) *ApplicationStore {
+func NewApplicationStore(store storer) *ApplicationStore {
 	return &ApplicationStore{
-		storer:  store,
-		factory: factory,
+		storer: store,
 	}
 }
 
@@ -106,8 +103,8 @@ func (s *ApplicationStore) create(q db.QueryContext, application types.Applicati
 }
 
 // GetByID finds the application by ID and retrieves it.
-func (s *ApplicationStore) GetByID(appID string) (types.Application, error) {
-	result := s.factory.BuildApplication()
+func (s *ApplicationStore) GetByID(appID string, resultFunc store.ApplicationFactory) (types.Application, error) {
+	result := resultFunc()
 	err := s.transact(func(tx *db.Tx) error {
 		return s.getByID(tx, appID, result)
 	}, db.ReadOnly(true))
@@ -144,7 +141,7 @@ func (s *ApplicationStore) application(q db.QueryContext, appID string, result t
 }
 
 // FindByUser returns the Applications to which an User is a collaborator.
-func (s *ApplicationStore) ListByUser(userID string) ([]types.Application, error) {
+func (s *ApplicationStore) ListByUser(userID string, resultFunc store.ApplicationFactory) ([]types.Application, error) {
 	var result []types.Application
 	err := s.transact(func(tx *db.Tx) error {
 		appIDs, err := s.userApplications(tx, userID)
@@ -153,7 +150,7 @@ func (s *ApplicationStore) ListByUser(userID string) ([]types.Application, error
 		}
 
 		for _, appID := range appIDs {
-			app := s.factory.BuildApplication()
+			app := resultFunc()
 
 			err := s.getByID(tx, appID, app)
 			if err != nil {
@@ -580,9 +577,4 @@ func (s *ApplicationStore) writeAttributes(q db.QueryContext, application, resul
 	}
 
 	return nil
-}
-
-// SetFactory allows to replace the default ttnpb.Application factory.
-func (s *ApplicationStore) SetFactory(factory factory.ApplicationFactory) {
-	s.factory = factory
 }

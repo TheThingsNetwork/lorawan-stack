@@ -3,10 +3,13 @@
 package store
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/factory"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
+
+// GatewayFactory is a function that returns a types.Gateway used to
+// construct the results in read operations.
+type GatewayFactory func() types.Gateway
 
 // GatewayStore is a store that holds Gateways.
 type GatewayStore interface {
@@ -14,10 +17,10 @@ type GatewayStore interface {
 	Create(gtw types.Gateway) error
 
 	// GetByID finds a gateway by ID and retrieves it.
-	GetByID(gtwID string) (types.Gateway, error)
+	GetByID(gtwID string, factory GatewayFactory) (types.Gateway, error)
 
 	// ListByUser returns all the gateways to which an user is collaborator.
-	ListByUser(userID string) ([]types.Gateway, error)
+	ListByUser(userID string, factory GatewayFactory) ([]types.Gateway, error)
 
 	// Update updates the gateway.
 	Update(gtw types.Gateway) error
@@ -41,7 +44,4 @@ type GatewayStore interface {
 	// WriteAttributes writes the extra attributes on the gatewat if it's an
 	// Attributer to the store.
 	WriteAttributes(gtw, res types.Gateway) error
-
-	// SetFactory allows to replace the default ttnpb.Gateway factory.
-	SetFactory(factory factory.GatewayFactory)
 }

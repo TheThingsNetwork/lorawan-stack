@@ -9,10 +9,15 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
+
+var userFactory = func() types.User {
+	return &ttnpb.User{}
+}
 
 func testUsers() map[string]*ttnpb.User {
 	return map[string]*ttnpb.User{
@@ -56,7 +61,7 @@ func TestUserTx(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	found, err := s.Users.GetByID(john.UserID)
+	found, err := s.Users.GetByID(john.UserID, userFactory)
 	a.So(err, should.BeNil)
 	john.ArchivedAt = found.GetUser().ArchivedAt
 	a.So(found, test.ShouldBeUserIgnoringAutoFields, john)
@@ -83,14 +88,14 @@ func TestUserGet(t *testing.T) {
 
 	// Find by email
 	{
-		found, err := s.Users.GetByEmail(alice.Email)
+		found, err := s.Users.GetByEmail(alice.Email, userFactory)
 		a.So(err, should.BeNil)
 		a.So(found, test.ShouldBeUserIgnoringAutoFields, alice)
 	}
 
 	// Find by user ID
 	{
-		found, err := s.Users.GetByID(bob.UserID)
+		found, err := s.Users.GetByID(bob.UserID, userFactory)
 		a.So(err, should.BeNil)
 		a.So(found, test.ShouldBeUserIgnoringAutoFields, bob)
 	}
@@ -109,7 +114,7 @@ func TestUserUpdate(t *testing.T) {
 		err := s.Users.Update(alice)
 		a.So(err, should.BeNil)
 
-		updated, err := s.Users.GetByID(alice.UserID)
+		updated, err := s.Users.GetByID(alice.UserID, userFactory)
 		a.So(err, should.BeNil)
 		a.So(updated, test.ShouldBeUserIgnoringAutoFields, alice)
 	}
@@ -134,7 +139,7 @@ func TestUserArchive(t *testing.T) {
 	err := s.Users.Archive(bob.UserID)
 	a.So(err, should.BeNil)
 
-	found, err := s.Users.GetByID(bob.UserID)
+	found, err := s.Users.GetByID(bob.UserID, userFactory)
 	a.So(err, should.BeNil)
 	a.So(found.GetUser().ArchivedAt.IsZero(), should.BeFalse)
 }

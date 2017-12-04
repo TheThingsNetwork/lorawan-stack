@@ -7,10 +7,16 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
+
+var applicationFactory = func() types.Application {
+	return &ttnpb.Application{}
+
+}
 
 func testApplications() map[string]*ttnpb.Application {
 	return map[string]*ttnpb.Application{
@@ -74,7 +80,7 @@ func TestApplicationRetrieve(t *testing.T) {
 
 	app := testApplications()["demo-app"]
 
-	found, err := s.Applications.GetByID(app.ApplicationID)
+	found, err := s.Applications.GetByID(app.ApplicationID, applicationFactory)
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeApplicationIgnoringAutoFields, app)
 }
@@ -118,7 +124,7 @@ func TestApplicationCollaborators(t *testing.T) {
 
 	// fetch applications where Alice is collaborator
 	{
-		apps, err := s.Applications.ListByUser(user.UserID)
+		apps, err := s.Applications.ListByUser(user.UserID, applicationFactory)
 		a.So(err, should.BeNil)
 		if a.So(apps, should.HaveLength, 1) {
 			a.So(apps[0].GetApplication().ApplicationID, should.Equal, app.ApplicationID)
@@ -168,7 +174,7 @@ func TestApplicationArchive(t *testing.T) {
 	err := s.Applications.Archive(app.ApplicationID)
 	a.So(err, should.BeNil)
 
-	found, err := s.Applications.GetByID(app.ApplicationID)
+	found, err := s.Applications.GetByID(app.ApplicationID, applicationFactory)
 	a.So(err, should.BeNil)
 	a.So(found.GetApplication().ArchivedAt.IsZero(), should.BeFalse)
 }
@@ -183,7 +189,7 @@ func TestApplicationUpdate(t *testing.T) {
 	err := s.Applications.Update(app)
 	a.So(err, should.BeNil)
 
-	found, err := s.Applications.GetByID(app.ApplicationID)
+	found, err := s.Applications.GetByID(app.ApplicationID, applicationFactory)
 	a.So(err, should.BeNil)
 	a.So(found.GetApplication().Description, should.Equal, app.Description)
 }
