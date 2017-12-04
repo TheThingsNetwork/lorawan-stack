@@ -12,71 +12,79 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-// Config is the type of configuration
+// Config contains the base configuration with shared flags.
 type Config struct {
 	config.Base `name:",squash"`
 	Int         int    `name:"int" description:"An example int"`
 	String      string `name:"string" description:"An example string"`
 }
 
-// SubConfig is the type of config for the sub command
+// SubConfig contains the flags for the sub command.
 type SubConfig struct {
 	Config `name:",squash"`
 	Bar    string `name:"bar" description:"The bar config flag"`
 }
 
 var (
-	defaults = &Config{
+	// mgr is a configuration manager for the example program, initialized
+	// with default config values.
+	mgr = config.InitializeWithDefaults("example", &Config{
 		Base:   shared.DefaultBaseConfig,
 		Int:    42,
 		String: "foo",
-	}
-	mgr = config.InitializeWithDefaults("example", defaults)
-	cmd = &cobra.Command{
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+	})
+
+	// cfg will be the config shared by all commands.
+	cfg = new(Config)
+
+	// root is the root command.
+	root = &cobra.Command{
+		// PersistentPreRunE runs always, so we can use it to read in config files
+		// and parse the shared config.
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			err := mgr.ReadInConfig()
 			if err != nil {
-				fmt.Println("Could not read config file:", err)
-				os.Exit(1)
-			}
-		},
-		Run: func(cmd *cobra.Command, args []string) {
-			cfg := new(Config)
-			err := mgr.Unmarshal(cfg)
-			if err != nil {
-				panic(err)
+				return err
 			}
 
-			printYAML(cfg)
+			return mgr.Unmarshal(cfg)
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return printYAML(cfg)
 		},
 	}
+
+	// sub is a sub command.
 	sub = &cobra.Command{
 		Use: "sub",
-		Run: func(cmd *cobra.Command, args []string) {
+
+		// RunE parses the sub config that is only relevant for this command.
+		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg := new(SubConfig)
 			err := mgr.Unmarshal(cfg)
 			if err != nil {
-				panic(err)
+				return err
 			}
 
-			printYAML(cfg)
+			return printYAML(cfg)
 		},
 	}
 )
 
 func init() {
-	cmd.Flags().AddFlagSet(mgr.Flags())
-
+	root.AddCommand(sub)
+	root.Flags().AddFlagSet(mgr.Flags())
 	sub.Flags().AddFlagSet(mgr.WithConfig(&SubConfig{
 		Bar: "baz",
 	}))
-	cmd.AddCommand(sub)
 }
 
 func main() {
-	err := cmd.Execute()
+	// execute the commands and print resulting errors.
+	err := root.Execute()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }
 
