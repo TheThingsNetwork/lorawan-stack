@@ -19,19 +19,16 @@ var (
 	fooCommand = &cobra.Command{
 		Use:   "foo",
 		Short: "The foo subcommand",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			logger.Info("Running foo")
 
 			cfg := new(fooConfig)
-			err := config.Unmarshal(cfg)
+			err := mgr.Unmarshal(cfg)
 			if err != nil {
-				logger.WithError(err).Fatal("Could not parse config")
+				return err
 			}
 
-			err = printYAML(cfg)
-			if err != nil {
-				logger.WithError(err).Fatal("Could not print config")
-			}
+			return printYAML(cfg)
 		},
 	}
 )
@@ -41,11 +38,9 @@ func init() {
 	Root.AddCommand(fooCommand)
 
 	// add foo-specific config definitions and defaults
-	flags := config.WithConfig(&fooConfig{
+	fooCommand.Flags().AddFlagSet(mgr.WithConfig(&fooConfig{
 		Bar: "baz",
-	})
-
-	fooCommand.Flags().AddFlagSet(flags)
+	}))
 }
 
 // printYAML prints the nested config struct.

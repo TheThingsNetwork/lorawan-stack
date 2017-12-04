@@ -12,28 +12,16 @@ var (
 	startCommand = &cobra.Command{
 		Use:   "start",
 		Short: "Start the reference component",
-		Run: func(cmd *cobra.Command, args []string) {
-			cfg := new(component.Config)
-			err := config.Unmarshal(cfg)
-			if err != nil {
-				logger.WithError(err).Fatal("Could not parse config")
-			}
-
-			c := component.New(logger, cfg)
-
-			err = c.Start()
-			if err != nil {
-				logger.WithError(err).Fatal("Failed to start the reference component")
-			}
+		RunE: func(cmd *cobra.Command, args []string) error {
+			c := component.New(logger, config)
+			return c.Start()
 		},
 	}
 )
 
 func init() {
 	Root.AddCommand(startCommand)
-
-	// add config flags and defaults for the start sub command
-	startCommand.Flags().AddFlagSet(config.WithConfig(&component.Config{
+	startCommand.Flags().AddFlagSet(mgr.WithConfig(&component.Config{
 		ServiceBase: shared.DefaultServiceBase,
 	}))
 }

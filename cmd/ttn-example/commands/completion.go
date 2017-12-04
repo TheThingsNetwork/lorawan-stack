@@ -3,7 +3,6 @@
 package commands
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -17,22 +16,16 @@ var completionCommand = &cobra.Command{
 var completionBashCommand = &cobra.Command{
 	Use:   "bash",
 	Short: "Generate completion functions for bash",
-	Run: func(*cobra.Command, []string) {
-		err := Root.GenBashCompletion(os.Stdout)
-		if err != nil {
-			fmt.Println(err)
-		}
+	RunE: func(*cobra.Command, []string) error {
+		return Root.GenBashCompletion(os.Stdout)
 	},
 }
 
 var completionZshCommand = &cobra.Command{
 	Use:   "zsh",
 	Short: "Generate completion functions for zsh",
-	Run: func(*cobra.Command, []string) {
-		err := Root.GenZshCompletion(os.Stdout)
-		if err != nil {
-			fmt.Println(err)
-		}
+	RunE: func(*cobra.Command, []string) error {
+		return Root.GenZshCompletion(os.Stdout)
 	},
 }
 

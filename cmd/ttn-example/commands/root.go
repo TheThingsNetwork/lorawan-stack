@@ -13,34 +13,39 @@ import (
 )
 
 var (
-	name      = "ttn-example"
-	config    = conf.InitializeWithDefaults(name, shared.DefaultBaseConfig)
-	logger, _ = log.NewLogger(log.WithLevel(shared.DefaultBaseConfig.Log.Level), log.WithHandler(log.NewCLI(os.Stdout)))
+	logger *log.Logger
+	name   = "ttn-example"
+	mgr    = conf.InitializeWithDefaults(name, shared.DefaultBaseConfig)
+	config = new(component.Config)
 
 	// Root command is the entrypoint of the program
 	Root = &cobra.Command{
-		Use:   name,
-		Short: "Example program",
+		Use:           name,
+		SilenceErrors: true,
+		SilenceUsage:  true,
+		Short:         "Example program",
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			// read in config from file
+			err := mgr.ReadInConfig()
+			if err != nil {
+				return err
+			}
+
+			// unmarshal config
+			if err = mgr.Unmarshal(config); err != nil {
+				return err
+			}
+
+			// create logger
+			logger, err = log.NewLogger(
+				log.WithLevel(config.Log.Level),
+				log.WithHandler(log.NewCLI(os.Stdout)),
+			)
+			return err
+		},
 	}
 )
 
 func init() {
-	cobra.OnInitialize(func() {
-		// read in config from file
-		err := config.ReadInConfig()
-		if err != nil {
-			logger.WithError(err).Warn("Could not read config file")
-		}
-
-		// unmarshal config
-		cfg := new(component.Config)
-		if err := config.Unmarshal(cfg); err != nil {
-			logger.WithError(err).Fatal("Could not parse config")
-		}
-
-		// set log level to correct level
-		log.WithLevel(cfg.Log.Level)(logger)
-	})
-
-	Root.PersistentFlags().AddFlagSet(config.Flags())
+	Root.PersistentFlags().AddFlagSet(mgr.Flags())
 }
