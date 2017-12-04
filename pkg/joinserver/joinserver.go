@@ -209,12 +209,14 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				return nil, ErrDevNonceTooSmall.New(nil)
 			}
 			dev.NextDevNonce = uint32(dn + 1)
-		default:
+		case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
 			for _, used := range dev.UsedDevNonces {
 				if dn == uint16(used) {
 					return nil, ErrDevNonceReused.New(nil)
 				}
 			}
+		default:
+			panic("unreachable")
 		}
 	}
 
@@ -264,7 +266,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			},
 			Lifetime: nil,
 		}
-	default:
+	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
 		if err := checkMIC(appKey, rawPayload); err != nil {
 			return nil, ErrMICCheckFailed.NewWithCause(nil, err)
 		}
@@ -292,6 +294,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			},
 			Lifetime: nil,
 		}
+	default:
+		panic("unreachable")
 	}
 
 	dev.UsedDevNonces = append(dev.UsedDevNonces, uint32(dn))
