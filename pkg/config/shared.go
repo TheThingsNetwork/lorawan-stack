@@ -10,6 +10,7 @@ import (
 type Base struct {
 	Config []string `name:"config" shorthand:"c" description:"Location of the config files"`
 	Log    Log      `name:"log"`
+	Silent bool     `name:"silent" shorthand:"s" description:"Suppress all log messages"`
 }
 
 // Log represents configuration for the logger
