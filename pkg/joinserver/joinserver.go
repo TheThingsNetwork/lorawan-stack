@@ -73,13 +73,6 @@ func keyPointer(key types.AES128Key) *types.AES128Key {
 
 // HandleJoin is called by the network server to join a device
 func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (resp *ttnpb.JoinResponse, err error) {
-	if ctx == nil {
-		panic("joinserver: HandleJoin received nil ctx")
-	}
-	if req == nil {
-		panic("joinserver: HandleJoin received nil req")
-	}
-
 	supported := false
 	for _, v := range supportedMACVersions {
 		supported = v == req.SelectedMacVersion

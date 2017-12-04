@@ -53,16 +53,6 @@ func TestHandleJoin(t *testing.T) {
 		JoinEUIPrefixes: joinEUIPrefixes,
 	})
 
-	a.So(func() {
-		js.HandleJoin(context.Background(), nil)
-	}, should.Panic)
-	a.So(func() {
-		js.HandleJoin(nil, nil)
-	}, should.Panic)
-	a.So(func() {
-		js.HandleJoin(nil, ttnpb.NewPopulatedJoinRequest(test.Randy, false))
-	}, should.Panic)
-
 	req := ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload = *ttnpb.NewPopulatedMessageDownlink(test.Randy, *types.NewPopulatedAES128Key(test.Randy), false)
 	resp, err := js.HandleJoin(context.Background(), req)
