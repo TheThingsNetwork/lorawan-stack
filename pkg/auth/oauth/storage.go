@@ -13,6 +13,10 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
+var clientFactory = func() types.Client {
+	return &ttnpb.Client{}
+}
+
 type storage struct {
 	keys  *auth.Keys
 	store store.Store
@@ -33,7 +37,7 @@ func (s *storage) Close() {}
 
 // GetClient loads the OAuth Client by client_id.
 func (s *storage) GetClient(clientID string) (osin.Client, error) {
-	client, err := s.store.Clients.GetByID(clientID)
+	client, err := s.store.Clients.GetByID(clientID, clientFactory)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +76,7 @@ func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 		return nil, err
 	}
 
-	client, err := s.store.Clients.GetByID(data.ClientID)
+	client, err := s.store.Clients.GetByID(data.ClientID, clientFactory)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +129,7 @@ func (s *storage) LoadAccess(accessToken string) (*osin.AccessData, error) {
 		return nil, err
 	}
 
-	client, err := s.store.Clients.GetByID(claims.Client)
+	client, err := s.store.Clients.GetByID(claims.Client, clientFactory)
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +158,7 @@ func (s *storage) LoadRefresh(refreshToken string) (*osin.AccessData, error) {
 		return nil, err
 	}
 
-	client, err := s.store.Clients.GetByID(data.ClientID)
+	client, err := s.store.Clients.GetByID(data.ClientID, clientFactory)
 	if err != nil {
 		return nil, err
 	}
