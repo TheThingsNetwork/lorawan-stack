@@ -105,7 +105,12 @@ func (s *ClientStore) getByID(q db.QueryContext, clientID string, result types.C
 // Update updates the client.
 func (s *ClientStore) Update(client types.Client) error {
 	err := s.transact(func(tx *db.Tx) error {
-		return s.update(tx, client)
+		err := s.update(tx, client)
+		if err != nil {
+			return err
+		}
+
+		return s.writeAttributes(tx, client.GetClient().ClientID, client, nil)
 	})
 	return err
 }
@@ -126,11 +131,7 @@ func (s *ClientStore) update(q db.QueryContext, client types.Client) error {
 		})
 	}
 
-	if err != nil {
-		return err
-	}
-
-	return s.writeAttributes(q, cli.ClientID, client, nil)
+	return err
 }
 
 // Archive disables a Client.

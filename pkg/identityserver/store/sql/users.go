@@ -74,10 +74,21 @@ func (s *UserStore) create(q db.QueryContext, user types.User) error {
 // GetByID finds the user by ID and returns it.
 func (s *UserStore) GetByID(userID string, factory store.UserFactory) (types.User, error) {
 	result := factory()
+
 	err := s.transact(func(tx *db.Tx) error {
-		return s.getByID(tx, userID, result)
+		err := s.getByID(tx, userID, result)
+		if err != nil {
+			return err
+		}
+
+		return s.loadAttributes(tx, result.GetUser().UserID, result)
 	})
-	return result, err
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func (s *UserStore) getByID(q db.QueryContext, userID string, result types.User) error {
@@ -92,20 +103,32 @@ func (s *UserStore) getByID(q db.QueryContext, userID string, result types.User)
 			"user_id": userID,
 		})
 	}
-	if err != nil {
-		return err
-	}
-
-	return s.loadAttributes(q, userID, result)
+	return err
 }
 
 // GetByEmail finds the user by email address and returns it.
+<<<<<<< HEAD
 func (s *UserStore) GetByEmail(email string, factory store.UserFactory) (types.User, error) {
 	result := factory()
+=======
+func (s *UserStore) GetByEmail(email string, resultFunc store.UserFactory) (types.User, error) {
+	result := resultFunc()
+
+>>>>>>> is: Review transactions
 	err := s.transact(func(tx *db.Tx) error {
-		return s.getByEmail(tx, email, result)
+		err := s.getByEmail(tx, email, result)
+		if err != nil {
+			return err
+		}
+
+		return s.loadAttributes(tx, result.GetUser().UserID, result)
 	})
-	return result, err
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func (s *UserStore) getByEmail(q db.QueryContext, email string, result types.User) error {
@@ -120,11 +143,7 @@ func (s *UserStore) getByEmail(q db.QueryContext, email string, result types.Use
 			"email": email,
 		})
 	}
-	if err != nil {
-		return err
-	}
-
-	return s.loadAttributes(q, result.GetUser().UserID, result)
+	return err
 }
 
 // Update updates an user.
