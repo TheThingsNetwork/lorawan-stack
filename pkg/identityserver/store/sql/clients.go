@@ -47,6 +47,7 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 				grants,
 				state,
 				rights,
+				official_labeled,
 				archived_at)
 			VALUES (
 				:client_id,
@@ -56,6 +57,7 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 				:grants,
 				:state,
 				:rights,
+				:official_labeled,
 				:archived_at)`,
 		cli)
 
@@ -120,8 +122,15 @@ func (s *ClientStore) update(q db.QueryContext, client types.Client) error {
 
 	_, err := q.NamedExec(
 		`UPDATE clients
-			SET description = :description, secret = :secret, redirect_uri = :redirect_uri,
-			grants = :grants, rights = :rights, updated_at = current_timestamp()
+			SET
+				description = :description,
+				secret = :secret,
+				redirect_uri = :redirect_uri,
+			  grants = :grants,
+			  state = :state,
+			  official_labeled = :official_labeled,
+			  rights = :rights,
+			  updated_at = current_timestamp()
 			WHERE client_id = :client_id`,
 		cli)
 
