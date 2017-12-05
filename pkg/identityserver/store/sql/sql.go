@@ -44,7 +44,7 @@ func FromDB(db *db.DB) *Store {
 		db: db,
 	}
 
-	initSubStores(s, nil)
+	initSubStores(s)
 	return s
 }
 
@@ -57,22 +57,22 @@ func (s *Store) WithContext(context context.Context) *Store {
 		db: s.db.WithContext(context),
 	}
 
-	initSubStores(store, s)
+	initSubStores(store)
 
 	return store
 }
 
 // Transact executes fn inside a transaction and retries it or rollbacks it as
 // needed. It returns the error fn returns.
-func (s *Store) Transact(fn func(store.Store) error) error {
+func (s *Store) Transact(fn func(*store.Store) error) error {
 	return s.transact(func(tx *db.Tx) error {
 		store := &txStore{
 			tx: tx,
 		}
 
-		initSubStores(store, s)
+		initSubStores(store)
 
-		return fn(store.Store)
+		return fn(store.store())
 	})
 }
 
@@ -118,15 +118,13 @@ func (s *txStore) store() *store.Store {
 }
 
 // initSubStores initializes the sub stores of the store.
-func initSubStores(s storer, previous *Store) {
+func initSubStores(s storer) {
 	store := s.store()
 	store.Users = NewUserStore(s)
 	store.Applications = NewApplicationStore(s)
 	store.Gateways = NewGatewayStore(s)
 	store.Clients = NewClientStore(s)
 	store.OAuth = NewOAuthStore(s)
-	return
-
 }
 
 func (s *Store) MigrateAll() error {

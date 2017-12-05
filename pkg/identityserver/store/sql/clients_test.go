@@ -5,7 +5,6 @@ package sql
 import (
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -51,8 +50,7 @@ func TestClientCreate(t *testing.T) {
 	for _, client := range clients {
 		err := s.Clients.Create(client)
 		a.So(err, should.NotBeNil)
-		a.So(err.(errors.Error).Code(), should.Equal, 21)
-		a.So(err.(errors.Error).Type(), should.Equal, errors.AlreadyExists)
+		a.So(ErrClientIDTaken.Describes(err), should.BeTrue)
 	}
 }
 
@@ -69,33 +67,6 @@ func TestClientUpdate(t *testing.T) {
 	found, err := s.Clients.GetByID(client.ClientID, clientFactory)
 	a.So(err, should.BeNil)
 	a.So(client, test.ShouldBeClientIgnoringAutoFields, found)
-}
-
-func TestClientManagement(t *testing.T) {
-	a := assertions.New(t)
-	s := testStore(t)
-
-	client := testClients()["foo-client"]
-
-	// label as official
-	{
-		err := s.Clients.SetClientOfficial(client.ClientID, true)
-		a.So(err, should.BeNil)
-
-		found, err := s.Clients.GetByID(client.ClientID, clientFactory)
-		a.So(err, should.BeNil)
-		a.So(found.GetClient().OfficialLabeled, should.BeTrue)
-	}
-
-	// mark as approved
-	{
-		err := s.Clients.SetClientState(client.ClientID, ttnpb.STATE_APPROVED)
-		a.So(err, should.BeNil)
-
-		found, err := s.Clients.GetByID(client.ClientID, clientFactory)
-		a.So(err, should.BeNil)
-		a.So(found.GetClient().State, should.Resemble, ttnpb.STATE_APPROVED)
-	}
 }
 
 func TestClientArchive(t *testing.T) {

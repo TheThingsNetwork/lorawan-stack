@@ -5,7 +5,6 @@ package sql
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
@@ -68,7 +67,12 @@ func NewApplicationStore(store storer) *ApplicationStore {
 // Create creates a new application.
 func (s *ApplicationStore) Create(application types.Application) error {
 	err := s.transact(func(tx *db.Tx) error {
-		return s.create(tx, application)
+		err := s.create(tx, application)
+		if err != nil {
+			return err
+		}
+
+		return s.writeAttributes(tx, application, nil)
 	})
 	return err
 }
@@ -80,12 +84,10 @@ func (s *ApplicationStore) create(q db.QueryContext, application types.Applicati
 			INTO applications (
 				application_id,
 				description,
-				updated_at,
 				archived_at)
 			VALUES (
 				:application_id,
 				:description,
-				current_timestamp(),
 				:archived_at)`,
 		app)
 
@@ -95,32 +97,30 @@ func (s *ApplicationStore) create(q db.QueryContext, application types.Applicati
 		})
 	}
 
-	if err != nil {
-		return err
-	}
-
-	return s.writeAttributes(q, application, nil)
+	return err
 }
 
 // GetByID finds the application by ID and retrieves it.
 func (s *ApplicationStore) GetByID(appID string, factory store.ApplicationFactory) (types.Application, error) {
 	result := factory()
+
 	err := s.transact(func(tx *db.Tx) error {
-		return s.getByID(tx, appID, result)
+		err := s.getByID(tx, appID, result)
+		if err != nil {
+			return err
+		}
+
+		return s.loadAttributes(tx, appID, result)
 	}, db.ReadOnly(true))
-	return result, err
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func (s *ApplicationStore) getByID(q db.QueryContext, appID string, result types.Application) error {
-	err := s.application(q, appID, result)
-	if err != nil {
-		return err
-	}
-
-	return s.loadAttributes(q, appID, result)
-}
-
-func (s *ApplicationStore) application(q db.QueryContext, appID string, result types.Application) error {
 	err := q.SelectOne(
 		result,
 		`SELECT *
@@ -133,26 +133,24 @@ func (s *ApplicationStore) application(q db.QueryContext, appID string, result t
 		})
 	}
 
-	if err != nil {
-		return err
-	}
-
-	return s.loadAttributes(q, appID, result)
+	return err
 }
 
 // FindByUser returns the Applications to which an User is a collaborator.
 func (s *ApplicationStore) ListByUser(userID string, factory store.ApplicationFactory) ([]types.Application, error) {
 	var result []types.Application
+
 	err := s.transact(func(tx *db.Tx) error {
-		appIDs, err := s.userApplications(tx, userID)
+		applications, err := s.userApplications(tx, userID)
 		if err != nil {
 			return err
 		}
 
-		for _, appID := range appIDs {
+		for _, application := range applications {
 			app := factory()
+			*(app.GetApplication()) = application
 
-			err := s.getByID(tx, appID, app)
+			err := s.loadAttributes(tx, app.GetApplication().ApplicationID, app)
 			if err != nil {
 				return err
 			}
@@ -162,42 +160,61 @@ func (s *ApplicationStore) ListByUser(userID string, factory store.ApplicationFa
 
 		return nil
 	})
-	return result, err
-}
 
-func (s *ApplicationStore) userApplications(q db.QueryContext, userID string) ([]string, error) {
-	var appIDs []string
-	err := q.Select(
-		&appIDs,
-		`SELECT DISTINCT application_id
-			FROM applications_collaborators
-			WHERE user_id = $1`,
-		userID)
-
-	if !db.IsNoRows(err) && err != nil {
+	if err != nil {
 		return nil, err
 	}
 
-	return appIDs, nil
+	return result, nil
+}
+
+func (s *ApplicationStore) userApplications(q db.QueryContext, userID string) ([]ttnpb.Application, error) {
+	var applications []ttnpb.Application
+	err := q.Select(
+		&applications,
+		`SELECT *
+			FROM applications
+			WHERE application_id
+			IN (
+				SELECT
+					DISTINCT application_id
+					FROM applications_collaborators
+					WHERE user_id = $1
+			)`,
+		userID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(applications) == 0 {
+		return make([]ttnpb.Application, 0), nil
+	}
+
+	return applications, nil
 }
 
 // Edit updates the Application and returns the updated Application.
 func (s *ApplicationStore) Update(application types.Application) error {
 	err := s.transact(func(tx *db.Tx) error {
-		return s.update(tx, application)
+		err := s.update(tx, application)
+		if err != nil {
+			return err
+		}
+
+		return s.writeAttributes(tx, application, nil)
 	})
 	return err
 }
 
 func (s *ApplicationStore) update(q db.QueryContext, application types.Application) error {
 	app := application.GetApplication()
-	app.UpdatedAt = time.Now()
 
 	var id string
 	err := q.NamedSelectOne(
 		&id,
 		`UPDATE applications
-			SET description = :description, updated_at = :updated_at
+			SET description = :description, updated_at = current_timestamp()
 			WHERE application_id = :application_id
 			RETURNING application_id`,
 		app)
@@ -208,11 +225,7 @@ func (s *ApplicationStore) update(q db.QueryContext, application types.Applicati
 		})
 	}
 
-	if err != nil {
-		return err
-	}
-
-	return s.writeAttributes(q, application, nil)
+	return err
 }
 
 // syncUpdatedAt modifies the application UpdatedAt field to the current timestamp.
@@ -221,10 +234,9 @@ func (s *ApplicationStore) syncUpdatedAt(q db.QueryContext, appID string) error 
 	err := q.SelectOne(
 		&id,
 		`UPDATE applications
-			SET updated_at = $1
-			WHERE application_id = $2
+			SET updated_at = current_timestamp()
+			WHERE application_id = $1
 			RETURNING application_id`,
-		time.Now(),
 		appID)
 	if db.IsNoRows(err) {
 		return ErrApplicationNotFound.New(errors.Attributes{
@@ -244,10 +256,9 @@ func (s *ApplicationStore) archive(q db.QueryContext, appID string) error {
 	err := q.SelectOne(
 		&id,
 		`UPDATE applications
-			SET archived_at = $1
-			WHERE application_id = $2
+			SET archived_at = current_timestamp()
+			WHERE application_id = $1
 			RETURNING application_id`,
-		time.Now(),
 		appID)
 	if db.IsNoRows(err) {
 		return ErrApplicationNotFound.New(errors.Attributes{

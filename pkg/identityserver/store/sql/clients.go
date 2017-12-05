@@ -4,14 +4,12 @@ package sql
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/helpers"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 // ClientStore implements store.ClientStore.
@@ -54,7 +52,12 @@ func NewClientStore(store storer) *ClientStore {
 // Create creates a client.
 func (s *ClientStore) Create(client types.Client) error {
 	err := s.transact(func(tx *db.Tx) error {
-		return s.create(tx, client)
+		err := s.create(tx, client)
+		if err != nil {
+			return err
+		}
+
+		return s.writeAttributes(tx, client, nil)
 	})
 	return err
 }
@@ -69,8 +72,8 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 				secret,
 				redirect_uri,
 				grants,
+				state,
 				rights,
-				updated_at,
 				archived_at)
 			VALUES (
 				:client_id,
@@ -78,8 +81,8 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 				:secret,
 				:redirect_uri,
 				:grants,
+				:state,
 				:rights,
-				current_timestamp(),
 				:archived_at)`,
 		cli)
 
@@ -89,23 +92,30 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 		})
 	}
 
-	if err != nil {
-		return err
-	}
-
-	return s.writeAttributes(q, client, nil)
+	return err
 }
 
 // GetByID finds a client by ID and retrieves it.
 func (s *ClientStore) GetByID(clientID string, factory store.ClientFactory) (types.Client, error) {
 	result := factory()
+
 	err := s.transact(func(tx *db.Tx) error {
-		return s.client(tx, clientID, result)
+		err := s.getByID(tx, clientID, result)
+		if err != nil {
+			return err
+		}
+
+		return s.loadAttributes(tx, result)
 	})
-	return result, err
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
-func (s *ClientStore) client(q db.QueryContext, clientID string, result types.Client) error {
+func (s *ClientStore) getByID(q db.QueryContext, clientID string, result types.Client) error {
 	err := q.SelectOne(result,
 		`SELECT *
 			FROM clients
@@ -116,10 +126,7 @@ func (s *ClientStore) client(q db.QueryContext, clientID string, result types.Cl
 			"client_id": clientID,
 		})
 	}
-	if err != nil {
-		return err
-	}
-	return s.loadAttributes(q, result)
+	return err
 }
 
 // Update updates the client.
@@ -132,12 +139,11 @@ func (s *ClientStore) Update(client types.Client) error {
 
 func (s *ClientStore) update(q db.QueryContext, client types.Client) error {
 	cli := client.GetClient()
-	cli.UpdatedAt = time.Now()
 
 	_, err := q.NamedExec(
 		`UPDATE clients
 			SET description = :description, secret = :secret, redirect_uri = :redirect_uri,
-			grants = :grants, rights = :rights, updated_at = :updated_at
+			grants = :grants, rights = :rights, updated_at = current_timestamp()
 			WHERE client_id = :client_id`,
 		cli)
 
@@ -164,57 +170,9 @@ func (s *ClientStore) archive(q db.QueryContext, clientID string) error {
 	err := q.SelectOne(
 		&i,
 		`UPDATE clients
-			SET archived_at = $1
-			WHERE client_id = $2
+			SET archived_at = current_timestamp()
+			WHERE client_id = $1
 			RETURNING client_id`,
-		time.Now(),
-		clientID)
-	if db.IsNoRows(err) {
-		return ErrClientNotFound.New(errors.Attributes{
-			"client_id": clientID,
-		})
-	}
-	return err
-}
-
-func (s *ClientStore) SetClientOfficial(clientID string, official bool) error {
-	return s.setClientOfficial(s.queryer(), clientID, official)
-}
-
-func (s *ClientStore) setClientOfficial(q db.QueryContext, clientID string, official bool) error {
-	var id string
-	err := q.SelectOne(
-		&id,
-		`UPDATE clients
-			SET official_labeled = $1, updated_at = $2
-			WHERE client_id = $3
-			RETURNING client_id`,
-		official,
-		time.Now(),
-		clientID)
-	if db.IsNoRows(err) {
-		return ErrClientNotFound.New(errors.Attributes{
-			"client_id": clientID,
-		})
-	}
-	return err
-}
-
-// Reject marks a Client as rejected by the tenant admins, so it cannot be used anymore.
-func (s *ClientStore) SetClientState(clientID string, state ttnpb.ReviewingState) error {
-	return s.setClientState(s.queryer(), clientID, state)
-}
-
-func (s *ClientStore) setClientState(q db.QueryContext, clientID string, state ttnpb.ReviewingState) error {
-	var id string
-	err := q.SelectOne(
-		&id,
-		`UPDATE clients
-			SET state = $1, updated_at = $2
-			WHERE client_id = $3
-			RETURNING client_id`,
-		state,
-		time.Now(),
 		clientID)
 	if db.IsNoRows(err) {
 		return ErrClientNotFound.New(errors.Attributes{

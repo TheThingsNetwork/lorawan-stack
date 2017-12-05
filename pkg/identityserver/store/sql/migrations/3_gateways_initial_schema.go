@@ -14,7 +14,7 @@ func init() {
 			platform            STRING,
 			cluster_address     STRING NOT NULL,
 			created_at          TIMESTAMP DEFAULT current_timestamp(),
-			updated_at          TIMESTAMP,
+			updated_at          TIMESTAMP DEFAULT current_timestamp(),
 			archived_at         TIMESTAMP
 		);
 		CREATE TABLE IF NOT EXISTS gateways_attributes (

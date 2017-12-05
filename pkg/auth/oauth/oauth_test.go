@@ -44,6 +44,7 @@ var (
 			ttnpb.GRANT_AUTHORIZATION_CODE,
 			ttnpb.GRANT_REFRESH_TOKEN,
 		},
+		State: ttnpb.STATE_APPROVED,
 		Rights: []ttnpb.Right{
 			ttnpb.RIGHT_USER_PROFILE_READ,
 		},
@@ -112,9 +113,6 @@ func testServer(t *testing.T) (*web.Server, *auth.Keys) {
 	store := cleanStore(t, database)
 
 	_ = store.Clients.Create(client)
-
-	err = store.Clients.SetClientState(client.ClientID, ttnpb.STATE_APPROVED)
-	a.So(err, should.BeNil)
 
 	_ = store.Users.Create(&ttnpb.User{
 		UserIdentifier: ttnpb.UserIdentifier{

@@ -9,12 +9,12 @@ func init() {
 			description        TEXT,
 			secret             STRING NOT NULL,
 			redirect_uri       STRING NOT NULL,
-			state	           INT NOT NULL DEFAULT 0,
-				official_labeled   BOOL DEFAULT false,
+			state	            INT NOT NULL DEFAULT 0,
+			official_labeled   BOOL DEFAULT false,
 			grants             TEXT,
 			rights             TEXT,
 			created_at         TIMESTAMP DEFAULT current_timestamp(),
-			updated_at         TIMESTAMP,
+			updated_at         TIMESTAMP DEFAULT current_timestamp(),
 			archived_at        TIMESTAMP
 		);
 	`

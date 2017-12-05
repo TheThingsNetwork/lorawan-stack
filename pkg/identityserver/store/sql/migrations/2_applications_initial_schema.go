@@ -8,7 +8,7 @@ func init() {
 			application_id   STRING(36) PRIMARY KEY,
 			description      TEXT,
 			created_at       TIMESTAMP DEFAULT current_timestamp(),
-			updated_at       TIMESTAMP,
+			updated_at       TIMESTAMP DEFAULT current_timestamp(),
 			archived_at      TIMESTAMP
 		);
 		CREATE TABLE IF NOT EXISTS applications_api_keys (

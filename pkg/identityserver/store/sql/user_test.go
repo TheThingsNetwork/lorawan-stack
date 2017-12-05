@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
@@ -47,7 +46,7 @@ func TestUserTx(t *testing.T) {
 	john.UserID = "john"
 	john.Email = "john@john.com"
 
-	err := s.Transact(func(s store.Store) error {
+	err := s.Transact(func(s *store.Store) error {
 		if err := s.Users.Create(john); err != nil {
 			return err
 		}
@@ -74,8 +73,7 @@ func TestUserCreate(t *testing.T) {
 	for _, user := range testUsers() {
 		err := s.Users.Create(user)
 		a.So(err, should.NotBeNil)
-		a.So(err.(errors.Error).Code(), should.Equal, 402)
-		a.So(err.(errors.Error).Type(), should.Equal, errors.AlreadyExists)
+		a.So(ErrUserIDTaken.Describes(err), should.BeTrue)
 	}
 }
 
@@ -125,8 +123,7 @@ func TestUserUpdate(t *testing.T) {
 
 		err := s.Users.Update(alice)
 		a.So(err, should.NotBeNil)
-		a.So(err.(errors.Error).Code(), should.Equal, 403)
-		a.So(err.(errors.Error).Type(), should.Equal, errors.AlreadyExists)
+		a.So(ErrUserEmailTaken.Describes(err), should.BeTrue)
 	}
 }
 

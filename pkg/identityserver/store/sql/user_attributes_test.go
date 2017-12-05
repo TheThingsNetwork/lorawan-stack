@@ -73,7 +73,7 @@ func TestUserAttributer(t *testing.T) {
 	_, err := s.db.Exec(`
 		CREATE TABLE IF NOT EXISTS foo_users (
 			user_id  STRING(36) REFERENCES users(user_id) NOT NULL,
-			foo		 STRING
+			foo		   STRING
 		);
 	`)
 	a.So(err, should.BeNil)
@@ -94,7 +94,5 @@ func TestUserAttributer(t *testing.T) {
 
 	found, err := s.Users.GetByID(withFoo.GetUser().UserID, userWithFooFactory)
 	a.So(err, should.BeNil)
-	//a.So(found, test.ShouldBeUser, created)
 	a.So(found, test.ShouldBeUserIgnoringAutoFields, withFoo)
-	//a.So((found.(*userWithFoo)).Foo, should.Equal, (cre.Foo)
 }

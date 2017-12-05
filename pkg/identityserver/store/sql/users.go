@@ -76,7 +76,12 @@ func NewUserStore(store storer) *UserStore {
 // Create creates an user.
 func (s *UserStore) Create(user types.User) error {
 	err := s.transact(func(tx *db.Tx) error {
-		return s.create(tx, user)
+		err := s.create(tx, user)
+		if err != nil {
+			return err
+		}
+
+		return s.writeAttributes(tx, user.GetUser().UserID, user, nil)
 	})
 	return err
 }
@@ -91,7 +96,6 @@ func (s *UserStore) create(q db.QueryContext, user types.User) error {
 				email,
 				password,
 				validated_at,
-				updated_at,
 				archived_at)
 			VALUES (
 				lower(:user_id),
@@ -99,7 +103,6 @@ func (s *UserStore) create(q db.QueryContext, user types.User) error {
 				lower(:email),
 				:password,
 				:validated_at,
-				current_timestamp(),
 				:archived_at)`,
 		u)
 
@@ -116,11 +119,7 @@ func (s *UserStore) create(q db.QueryContext, user types.User) error {
 		}
 	}
 
-	if err != nil {
-		return err
-	}
-
-	return s.writeAttributes(q, user.GetUser().UserID, user, nil)
+	return err
 }
 
 // GetByID finds the user by ID and returns it.
@@ -182,7 +181,12 @@ func (s *UserStore) getByEmail(q db.QueryContext, email string, result types.Use
 // Update updates an user.
 func (s *UserStore) Update(user types.User) error {
 	err := s.transact(func(tx *db.Tx) error {
-		return s.update(tx, user)
+		err := s.update(tx, user)
+		if err != nil {
+			return err
+		}
+
+		return s.writeAttributes(s.queryer(), user.GetUser().UserID, user, nil)
 	})
 	return err
 }
@@ -207,11 +211,7 @@ func (s *UserStore) update(q db.QueryContext, user types.User) error {
 		})
 	}
 
-	if err != nil {
-		return err
-	}
-
-	return s.writeAttributes(q, u.UserID, user, nil)
+	return err
 }
 
 // Archive sets the ArchivedAt field of an user to the current timestamp.
@@ -238,9 +238,7 @@ func (s *UserStore) archive(q db.QueryContext, userID string) error {
 
 // LoadAttributes loads all user attributes if the User is an Attributer.
 func (s *UserStore) LoadAttributes(id string, user types.User) error {
-	return s.transact(func(tx *db.Tx) error {
-		return s.loadAttributes(tx, id, user)
-	})
+	return s.loadAttributes(s.queryer(), id, user)
 }
 
 // loadAttributes loads extra attributes into a user in a given db.QueryContext
@@ -278,9 +276,7 @@ func (s *UserStore) loadAttributes(q db.QueryContext, id string, user types.User
 // WriteAttributes writes all of the user attributes if the User is an Attributer
 // and returns the written User in result.
 func (s *UserStore) WriteAttributes(user types.User, result types.User) error {
-	return s.transact(func(tx *db.Tx) error {
-		return s.writeAttributes(tx, user.GetUser().UserID, user, result)
-	})
+	return s.writeAttributes(s.queryer(), user.GetUser().UserID, user, result)
 }
 
 // writeAttributes writes all of the users attributes to their respective

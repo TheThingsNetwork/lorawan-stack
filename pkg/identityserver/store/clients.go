@@ -2,10 +2,7 @@
 
 package store
 
-import (
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-)
+import "github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 
 // ClientFactory is a function that returns a types.Client used to
 // construct the results in read operations.
@@ -24,12 +21,6 @@ type ClientStore interface {
 
 	// Archive sets the ArchivedAt field of the client to the current timestamp.
 	Archive(clientID string) error
-
-	// SetClientState allows to modify the reviewing state field of a client.
-	SetClientState(clientID string, state ttnpb.ReviewingState) error
-
-	// SetClientOfficial allows to set an unset a client as official labeled.
-	SetClientOfficial(clientID string, official bool) error
 
 	// LoadAttributes loads extra attributes into the Client if it's an Attributer.
 	LoadAttributes(client types.Client) error
