@@ -19,32 +19,6 @@ type GatewayStore struct {
 	*extraAttributesStore
 }
 
-func init() {
-	ErrGatewayNotFound.Register()
-	ErrGatewayIDTaken.Register()
-}
-
-// ErrGatewayNotFound is returned when trying to fetch a gateway that does not exist.
-var ErrGatewayNotFound = &errors.ErrDescriptor{
-	MessageFormat: "Gateway `{gateway_id}` does not exist",
-	Code:          300,
-	Type:          errors.NotFound,
-	SafeAttributes: []string{
-		"gateway_id",
-	},
-}
-
-// ErrGatewayIDTaken is returned when trying to create a new gateway with an ID
-// that already exists.
-var ErrGatewayIDTaken = &errors.ErrDescriptor{
-	MessageFormat: "Gateway id `{gateway_id}` is already taken",
-	Code:          301,
-	Type:          errors.AlreadyExists,
-	SafeAttributes: []string{
-		"gateway_id",
-	},
-}
-
 func NewGatewayStore(store storer) *GatewayStore {
 	return &GatewayStore{
 		storer: store,

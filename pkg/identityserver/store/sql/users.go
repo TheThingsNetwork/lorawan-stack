@@ -15,56 +15,6 @@ type UserStore struct {
 	*extraAttributesStore
 }
 
-func init() {
-	ErrUserNotFound.Register()
-	ErrUserEmailNotFound.Register()
-	ErrUserIDTaken.Register()
-	ErrUserEmailTaken.Register()
-}
-
-// ErrUserNotFound is returned when trying to fetch an user that does not exist.
-var ErrUserNotFound = &errors.ErrDescriptor{
-	MessageFormat: "User `{user_id}` does not exist",
-	Code:          400,
-	Type:          errors.NotFound,
-	SafeAttributes: []string{
-		"user_id",
-	},
-}
-
-// ErrUserEmailNotFound is returned when trying to find an user with an email
-// that does not exist.
-var ErrUserEmailNotFound = &errors.ErrDescriptor{
-	MessageFormat: "User with email address `{email}` does not exist",
-	Code:          401,
-	Type:          errors.NotFound,
-	SafeAttributes: []string{
-		"email",
-	},
-}
-
-// ErrUserIDTaken is returned when trying to create a new user with an ID that
-// is already taken.
-var ErrUserIDTaken = &errors.ErrDescriptor{
-	MessageFormat: "User ID `{user_id}` is already taken",
-	Code:          402,
-	Type:          errors.AlreadyExists,
-	SafeAttributes: []string{
-		"user_id",
-	},
-}
-
-// ErrUserEmailTaken is returned when trying to create a new user with an
-// email that is already taken.
-var ErrUserEmailTaken = &errors.ErrDescriptor{
-	MessageFormat: "Email address `{email}` is already taken by another account",
-	Code:          403,
-	Type:          errors.AlreadyExists,
-	SafeAttributes: []string{
-		"email",
-	},
-}
-
 func NewUserStore(store storer) *UserStore {
 	return &UserStore{
 		storer:               store,

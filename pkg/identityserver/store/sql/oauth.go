@@ -3,47 +3,9 @@
 package sql
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 )
-
-func init() {
-	ErrAuthorizationCodeNotFound.Register()
-	ErrAuthorizationCodeConflict.Register()
-	ErrRefreshTokenNotFound.Register()
-	ErrRefreshTokenConflict.Register()
-}
-
-// ErrAuthorizationCodeNotFound is returned when trying to fetch or delete an authorization code that
-// does not exist.
-var ErrAuthorizationCodeNotFound = &errors.ErrDescriptor{
-	MessageFormat: "authorization Code token does not exist",
-	Code:          501,
-	Type:          errors.NotFound,
-}
-
-// ErrAuthorizationCodeConflict is returned when trying to create an authorization code that already exists.
-var ErrAuthorizationCodeConflict = &errors.ErrDescriptor{
-	MessageFormat: "Authorization code already exists",
-	Code:          502,
-	Type:          errors.Conflict,
-}
-
-// ErrRefreshTokenNotFound is returned when trying to fetch or delete a refresh token that
-// does not exist.
-var ErrRefreshTokenNotFound = &errors.ErrDescriptor{
-	MessageFormat: "Refresh token does not exist",
-	Code:          503,
-	Type:          errors.NotFound,
-}
-
-// ErrRefreshTokenConflict is returned when trying to create a refresh token that already exists.
-var ErrRefreshTokenConflict = &errors.ErrDescriptor{
-	MessageFormat: "Refresh token already exists",
-	Code:          504,
-	Type:          errors.Conflict,
-}
 
 // OAuthStore implements store.OAuthStore.
 type OAuthStore struct {

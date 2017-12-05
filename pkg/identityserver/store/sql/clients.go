@@ -15,32 +15,6 @@ type ClientStore struct {
 	*extraAttributesStore
 }
 
-func init() {
-	ErrClientNotFound.Register()
-	ErrClientIDTaken.Register()
-}
-
-// ErrClientNotFound is returned when trying to fetch a client that does not exists.
-var ErrClientNotFound = &errors.ErrDescriptor{
-	MessageFormat: "Client `{client_id}` does not exist",
-	Code:          20,
-	Type:          errors.NotFound,
-	SafeAttributes: []string{
-		"client_id",
-	},
-}
-
-// ErrClientIDTaken is returned when trying to create a new client with an ID.
-// that already exists
-var ErrClientIDTaken = &errors.ErrDescriptor{
-	MessageFormat: "Client id `{client_id}` is already taken",
-	Code:          21,
-	Type:          errors.AlreadyExists,
-	SafeAttributes: []string{
-		"client_id",
-	},
-}
-
 func NewClientStore(store storer) *ClientStore {
 	return &ClientStore{
 		storer:               store,
