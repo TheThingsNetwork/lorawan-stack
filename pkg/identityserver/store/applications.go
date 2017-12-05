@@ -45,9 +45,9 @@ type ApplicationStore interface {
 	ListUserRights(appID string, userID string) ([]ttnpb.Right, error)
 
 	// LoadAttributes loads extra attributes into the Application.
-	LoadAttributes(app types.Application) error
+	LoadAttributes(appID string, app types.Application) error
 
 	// WriteAttributes writes the extra attributes on the Application if it is an
 	// Attributer to the store.
-	WriteAttributes(app types.Application, result types.Application) error
+	WriteAttributes(appID string, app, result types.Application) error
 }

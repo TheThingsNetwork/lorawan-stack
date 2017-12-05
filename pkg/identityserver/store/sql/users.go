@@ -3,18 +3,16 @@
 package sql
 
 import (
-	"fmt"
-
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/helpers"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 )
 
 // UserStore implements store.UserStore.
 type UserStore struct {
 	storer
+	*extraAttributesStore
 }
 
 func init() {
@@ -69,7 +67,8 @@ var ErrUserEmailTaken = &errors.ErrDescriptor{
 
 func NewUserStore(store storer) *UserStore {
 	return &UserStore{
-		storer: store,
+		storer:               store,
+		extraAttributesStore: newExtraAttributesStore(store, "user"),
 	}
 }
 
@@ -236,72 +235,35 @@ func (s *UserStore) archive(q db.QueryContext, userID string) error {
 	return err
 }
 
-// LoadAttributes loads all user attributes if the User is an Attributer.
-func (s *UserStore) LoadAttributes(id string, user types.User) error {
-	return s.loadAttributes(s.queryer(), id, user)
+// LoadAttributes loads the extra attributes in user if it is a store.Attributer.
+func (s *UserStore) LoadAttributes(userID string, user types.User) error {
+	return s.loadAttributes(s.queryer(), userID, user)
 }
 
-// loadAttributes loads extra attributes into a user in a given db.QueryContext
-// context.
-func (s *UserStore) loadAttributes(q db.QueryContext, id string, user types.User) error {
+func (s *UserStore) loadAttributes(q db.QueryContext, userID string, user types.User) error {
 	attr, ok := user.(store.Attributer)
-	if !ok {
-		return nil
-	}
-
-	// fill the user from all specified namespaces
-	for _, namespace := range attr.Namespaces() {
-		m := make(map[string]interface{})
-		err := q.SelectOne(
-			&m,
-			fmt.Sprintf(
-				`SELECT *
-					FROM %s_users
-				 	WHERE user_id = $1`,
-				namespace),
-			id)
-		if err != nil {
-			return err
-		}
-
-		err = attr.Fill(namespace, m)
-		if err != nil {
-			return err
-		}
+	if ok {
+		return s.extraAttributesStore.loadAttributes(q, userID, attr)
 	}
 
 	return nil
 }
 
-// WriteAttributes writes all of the user attributes if the User is an Attributer
-// and returns the written User in result.
-func (s *UserStore) WriteAttributes(user types.User, result types.User) error {
-	return s.writeAttributes(s.queryer(), user.GetUser().UserID, user, result)
+// WriteAttributes store the extra attributes of user if it is a store.Attributer
+// and writes the resulting user in result.
+func (s *UserStore) WriteAttributes(userID string, user, result types.User) error {
+	return s.writeAttributes(s.queryer(), userID, user, result)
 }
 
-// writeAttributes writes all of the users attributes to their respective
-// tables in a given db.QueryContext context.
-func (s *UserStore) writeAttributes(q db.QueryContext, id string, user types.User, res types.User) error {
+func (s *UserStore) writeAttributes(q db.QueryContext, userID string, user, result types.User) error {
 	attr, ok := user.(store.Attributer)
-	if !ok {
-		return nil
-	}
-
-	for _, namespace := range attr.Namespaces() {
-		query, values := helpers.WriteAttributes(attr, namespace, "users", "user_id", user.GetUser().UserID)
-
-		r := make(map[string]interface{})
-		err := q.SelectOne(r, query, values...)
-		if err != nil {
-			return err
+	if ok {
+		res, ok := result.(store.Attributer)
+		if result == nil || !ok {
+			return s.extraAttributesStore.writeAttributes(q, userID, attr, nil)
 		}
 
-		if rattr, ok := res.(store.Attributer); ok {
-			err = rattr.Fill(namespace, r)
-			if err != nil {
-				return err
-			}
-		}
+		return s.extraAttributesStore.writeAttributes(q, userID, attr, res)
 	}
 
 	return nil

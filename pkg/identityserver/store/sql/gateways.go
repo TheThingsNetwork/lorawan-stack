@@ -9,7 +9,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/helpers"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
@@ -17,6 +16,7 @@ import (
 // GatewayStore implements store.GatewayStore.
 type GatewayStore struct {
 	storer
+	*extraAttributesStore
 }
 
 func init() {
@@ -636,63 +636,35 @@ func (s *GatewayStore) listUserRights(q db.QueryContext, gtwID string, userID st
 	return rights, err
 }
 
-// LoadAttributes loads the gateways attributes into result if it is an Attributer.
-func (s *GatewayStore) LoadAttributes(gateway types.Gateway) error {
-	return s.loadAttributes(s.queryer(), gateway.GetGateway().GatewayID, gateway)
+// LoadAttributes loads the extra attributes in gtw if it is a store.Attributer.
+func (s *GatewayStore) LoadAttributes(gtwID string, gtw types.Gateway) error {
+	return s.loadAttributes(s.queryer(), gtwID, gtw)
 }
 
-func (s *GatewayStore) loadAttributes(q db.QueryContext, gtwID string, gateway types.Gateway) error {
-	attr, ok := gateway.(store.Attributer)
-	if !ok {
-		return nil
-	}
-
-	// fill the gateway from all specified namespaces
-	for _, namespace := range attr.Namespaces() {
-		m := make(map[string]interface{})
-		err := q.SelectOne(
-			&m,
-			fmt.Sprintf("SELECT * FROM %s_gateways WHERE gateway_id = $1", namespace),
-			gtwID)
-		if err != nil {
-			return err
-		}
-
-		err = attr.Fill(namespace, m)
-		if err != nil {
-			return err
-		}
+func (s *GatewayStore) loadAttributes(q db.QueryContext, gtwID string, gtw types.Gateway) error {
+	attr, ok := gtw.(store.Attributer)
+	if ok {
+		return s.extraAttributesStore.loadAttributes(q, gtwID, attr)
 	}
 
 	return nil
 }
 
-// WriteAttributes writes the gateways attributes into result if it is an Attributer.
-func (s *GatewayStore) WriteAttributes(gateway types.Gateway, result types.Gateway) error {
-	return s.writeAttributes(s.queryer(), gateway.GetGateway().GatewayID, gateway, result)
+// WriteAttributes store the extra attributes of gtw if it is a store.Attributer
+// and writes the resulting application in result.
+func (s *GatewayStore) WriteAttributes(gtwID string, gtw, result types.Gateway) error {
+	return s.writeAttributes(s.queryer(), gtwID, gtw, result)
 }
 
-func (s *GatewayStore) writeAttributes(q db.QueryContext, gtwID string, gateway types.Gateway, result types.Gateway) error {
-	attr, ok := gateway.(store.Attributer)
-	if !ok {
-		return nil
-	}
-
-	for _, namespace := range attr.Namespaces() {
-		query, values := helpers.WriteAttributes(attr, namespace, "gateways", "gateway_id", gateway.GetGateway().GatewayID)
-
-		r := make(map[string]interface{})
-		err := q.SelectOne(r, query, values...)
-		if err != nil {
-			return err
+func (s *GatewayStore) writeAttributes(q db.QueryContext, gtwID string, gtw, result types.Gateway) error {
+	attr, ok := gtw.(store.Attributer)
+	if ok {
+		res, ok := result.(store.Attributer)
+		if result == nil || !ok {
+			return s.extraAttributesStore.writeAttributes(q, gtwID, attr, nil)
 		}
 
-		if rattr, ok := result.(store.Attributer); ok {
-			err = rattr.Fill(namespace, r)
-			if err != nil {
-				return err
-			}
-		}
+		return s.extraAttributesStore.writeAttributes(q, gtwID, attr, res)
 	}
 
 	return nil

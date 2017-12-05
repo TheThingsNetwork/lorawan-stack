@@ -3,18 +3,16 @@
 package sql
 
 import (
-	"fmt"
-
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/helpers"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 )
 
 // ClientStore implements store.ClientStore.
 type ClientStore struct {
 	storer
+	*extraAttributesStore
 }
 
 func init() {
@@ -45,7 +43,8 @@ var ErrClientIDTaken = &errors.ErrDescriptor{
 
 func NewClientStore(store storer) *ClientStore {
 	return &ClientStore{
-		storer: store,
+		storer:               store,
+		extraAttributesStore: newExtraAttributesStore(store, "client"),
 	}
 }
 
@@ -57,7 +56,7 @@ func (s *ClientStore) Create(client types.Client) error {
 			return err
 		}
 
-		return s.writeAttributes(tx, client, nil)
+		return s.writeAttributes(tx, client.GetClient().ClientID, client, nil)
 	})
 	return err
 }
@@ -105,7 +104,7 @@ func (s *ClientStore) GetByID(clientID string, factory store.ClientFactory) (typ
 			return err
 		}
 
-		return s.loadAttributes(tx, result)
+		return s.loadAttributes(tx, clientID, result)
 	})
 
 	if err != nil {
@@ -157,7 +156,7 @@ func (s *ClientStore) update(q db.QueryContext, client types.Client) error {
 		return err
 	}
 
-	return s.writeAttributes(q, client, nil)
+	return s.writeAttributes(q, cli.ClientID, client, nil)
 }
 
 // Archive disables a Client.
@@ -182,66 +181,35 @@ func (s *ClientStore) archive(q db.QueryContext, clientID string) error {
 	return err
 }
 
-// LoadAttributes loads the client attributes into result if it is an Attributer.
-func (s *ClientStore) LoadAttributes(client types.Client) error {
-	return s.transact(func(tx *db.Tx) error {
-		return s.loadAttributes(tx, client)
-	})
+// LoadAttributes loads the extra attributes in cli if it is a store.Attributer.
+func (s *ClientStore) LoadAttributes(clientID string, cli types.Client) error {
+	return s.loadAttributes(s.queryer(), clientID, cli)
 }
 
-func (s *ClientStore) loadAttributes(q db.QueryContext, client types.Client) error {
-	attr, ok := client.(store.Attributer)
-	if !ok {
-		return nil
-	}
-
-	for _, namespace := range attr.Namespaces() {
-		m := make(map[string]interface{})
-		err := q.Select(
-			&m,
-			fmt.Sprintf("SELECT * FROM %s_clients WHERE client_id = $1", namespace),
-			client.GetClient().ClientID)
-		if err != nil {
-			return err
-		}
-
-		err = attr.Fill(namespace, m)
-		if err != nil {
-			return err
-		}
+func (s *ClientStore) loadAttributes(q db.QueryContext, clientID string, cli types.Client) error {
+	attr, ok := cli.(store.Attributer)
+	if ok {
+		return s.extraAttributesStore.loadAttributes(q, clientID, attr)
 	}
 
 	return nil
 }
 
-// WriteAttributes writes the client attributes into result if it is an Attributer.
-func (s *ClientStore) WriteAttributes(client, result types.Client) error {
-	return s.transact(func(tx *db.Tx) error {
-		return s.writeAttributes(tx, client, result)
-	})
+// WriteAttributes store the extra attributes of cli if it is a store.Attributer
+// and writes the resulting application in result.
+func (s *ClientStore) WriteAttributes(clientID string, cli, result types.Client) error {
+	return s.writeAttributes(s.queryer(), clientID, cli, result)
 }
 
-func (s *ClientStore) writeAttributes(q db.QueryContext, client, result types.Client) error {
-	attr, ok := client.(store.Attributer)
-	if !ok {
-		return nil
-	}
-
-	for _, namespace := range attr.Namespaces() {
-		query, values := helpers.WriteAttributes(attr, namespace, "clients", "client_id", client.GetClient().ClientID)
-
-		r := make(map[string]interface{})
-		err := q.SelectOne(r, query, values...)
-		if err != nil {
-			return err
+func (s *ClientStore) writeAttributes(q db.QueryContext, clientID string, cli, result types.Client) error {
+	attr, ok := cli.(store.Attributer)
+	if ok {
+		res, ok := result.(store.Attributer)
+		if result == nil || !ok {
+			return s.extraAttributesStore.writeAttributes(q, clientID, attr, nil)
 		}
 
-		if rattr, ok := result.(store.Attributer); ok {
-			err = rattr.Fill(namespace, r)
-			if err != nil {
-				return err
-			}
-		}
+		return s.extraAttributesStore.writeAttributes(q, clientID, attr, res)
 	}
 
 	return nil

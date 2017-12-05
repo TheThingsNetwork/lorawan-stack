@@ -30,5 +30,5 @@ type UserStore interface {
 
 	// WriteAttributes writes all of the user attributes if the User is an
 	// Attributer and returns the written User in result.
-	WriteAttributes(user, result types.User) error
+	WriteAttributes(userID string, user, result types.User) error
 }

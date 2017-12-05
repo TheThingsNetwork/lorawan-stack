@@ -9,7 +9,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/helpers"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
@@ -17,6 +16,7 @@ import (
 // ApplicationStore implements store.ApplicationStore.
 type ApplicationStore struct {
 	storer
+	*extraAttributesStore
 }
 
 func init() {
@@ -60,7 +60,8 @@ var ErrApplicationAPIKeyNotFound = &errors.ErrDescriptor{
 
 func NewApplicationStore(store storer) *ApplicationStore {
 	return &ApplicationStore{
-		storer: store,
+		storer:               store,
+		extraAttributesStore: newExtraAttributesStore(store, "application"),
 	}
 }
 
@@ -72,7 +73,7 @@ func (s *ApplicationStore) Create(application types.Application) error {
 			return err
 		}
 
-		return s.writeAttributes(tx, application, nil)
+		return s.writeAttributes(tx, application.GetApplication().ApplicationID, application, nil)
 	})
 	return err
 }
@@ -202,7 +203,7 @@ func (s *ApplicationStore) Update(application types.Application) error {
 			return err
 		}
 
-		return s.writeAttributes(tx, application, nil)
+		return s.writeAttributes(tx, application.GetApplication().ApplicationID, application, nil)
 	})
 	return err
 }
@@ -523,68 +524,35 @@ func (s *ApplicationStore) listUserRights(q db.QueryContext, appID string, userI
 	return rights, err
 }
 
-// LoadAttributes loads extra attributes into the Application.
-func (s *ApplicationStore) LoadAttributes(application types.Application) error {
-	return s.transact(func(tx *db.Tx) error {
-		return s.loadAttributes(tx, application.GetApplication().ApplicationID, application)
-	})
+// LoadAttributes loads the extra attributes in app if it is a store.Attributer.
+func (s *ApplicationStore) LoadAttributes(appID string, app types.Application) error {
+	return s.loadAttributes(s.queryer(), appID, app)
 }
 
-func (s *ApplicationStore) loadAttributes(q db.QueryContext, appID string, application types.Application) error {
-	attr, ok := application.(store.Attributer)
-	if !ok {
-		return nil
-	}
-
-	// fill the application from all specified namespaces
-	for _, namespace := range attr.Namespaces() {
-		m := make(map[string]interface{})
-		err := q.SelectOne(
-			&m,
-			fmt.Sprintf("SELECT * FROM %s_applications WHERE application_id = $1", namespace),
-			appID)
-		if err != nil {
-			return err
-		}
-
-		err = attr.Fill(namespace, m)
-		if err != nil {
-			return err
-		}
+func (s *ApplicationStore) loadAttributes(q db.QueryContext, appID string, app types.Application) error {
+	attr, ok := app.(store.Attributer)
+	if ok {
+		return s.extraAttributesStore.loadAttributes(q, appID, attr)
 	}
 
 	return nil
 }
 
-// WriteAttributes writes the extra attributes on the Application if it is an
-// Attributer to the store.
-func (s *ApplicationStore) WriteAttributes(application types.Application, result types.Application) error {
-	return s.transact(func(tx *db.Tx) error {
-		return s.writeAttributes(tx, application, result)
-	})
+// WriteAttributes store the extra attributes of app if it is a store.Attributer
+// and writes the resulting application in result.
+func (s *ApplicationStore) WriteAttributes(appID string, app, result types.Application) error {
+	return s.writeAttributes(s.queryer(), appID, app, result)
 }
 
-func (s *ApplicationStore) writeAttributes(q db.QueryContext, application, result types.Application) error {
-	attr, ok := application.(store.Attributer)
-	if !ok {
-		return nil
-	}
-
-	for _, namespace := range attr.Namespaces() {
-		query, values := helpers.WriteAttributes(attr, namespace, "applications", "application_id", application.GetApplication().ApplicationID)
-
-		r := make(map[string]interface{})
-		err := q.SelectOne(r, query, values...)
-		if err != nil {
-			return err
+func (s *ApplicationStore) writeAttributes(q db.QueryContext, appID string, app, result types.Application) error {
+	attr, ok := app.(store.Attributer)
+	if ok {
+		res, ok := result.(store.Attributer)
+		if result == nil || !ok {
+			return s.extraAttributesStore.writeAttributes(q, appID, attr, nil)
 		}
 
-		if rattr, ok := result.(store.Attributer); ok {
-			err = rattr.Fill(namespace, r)
-			if err != nil {
-				return err
-			}
-		}
+		return s.extraAttributesStore.writeAttributes(q, appID, attr, res)
 	}
 
 	return nil

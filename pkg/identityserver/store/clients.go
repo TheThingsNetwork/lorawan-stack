@@ -23,9 +23,9 @@ type ClientStore interface {
 	Archive(clientID string) error
 
 	// LoadAttributes loads extra attributes into the Client if it's an Attributer.
-	LoadAttributes(client types.Client) error
+	LoadAttributes(clientID string, client types.Client) error
 
 	// WriteAttributes writes the extra attributes on the Client if it's an
 	// Attributer to the store.
-	WriteAttributes(client, result types.Client) error
+	WriteAttributes(clientID string, client, result types.Client) error
 }

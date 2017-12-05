@@ -39,9 +39,9 @@ type GatewayStore interface {
 	ListUserRights(gtwID string, userID string) ([]ttnpb.Right, error)
 
 	// LoadAttributes loads extra attributes into the gateway if it's an Attributer.
-	LoadAttributes(gtw types.Gateway) error
+	LoadAttributes(gtwID string, gtw types.Gateway) error
 
 	// WriteAttributes writes the extra attributes on the gatewat if it's an
 	// Attributer to the store.
-	WriteAttributes(gtw, res types.Gateway) error
+	WriteAttributes(gtwID string, gtw, res types.Gateway) error
 }
