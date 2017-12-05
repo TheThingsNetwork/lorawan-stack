@@ -22,6 +22,11 @@ type UserStore interface {
 	// Update updates an user.
 	Update(user types.User) error
 
+	// TODO(gomezjdaniel): wait for CockroachDB to introduce 'ON DELETE CASCADE'
+	// 		-> https://github.com/cockroachdb/cockroach/issues/14848
+	// Delete deletes an user.
+	//Delete(userID string) error
+
 	// Archive sets the ArchivedAt field of an user to the current timestamp.
 	Archive(userID string) error
 

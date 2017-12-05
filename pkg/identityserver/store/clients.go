@@ -19,6 +19,11 @@ type ClientStore interface {
 	// Update updates the client.
 	Update(client types.Client) error
 
+	// TODO(gomezjdaniel): wait for CockroachDB to introduce 'ON DELETE CASCADE'
+	// 		-> https://github.com/cockroachdb/cockroach/issues/14848
+	// Delete deletes a client.
+	//Delete(clientID string) error
+
 	// Archive sets the ArchivedAt field of the client to the current timestamp.
 	Archive(clientID string) error
 

@@ -25,6 +25,11 @@ type GatewayStore interface {
 	// Update updates the gateway.
 	Update(gtw types.Gateway) error
 
+	// TODO(gomezjdaniel): wait for CockroachDB to introduce 'ON DELETE CASCADE'
+	// 		-> https://github.com/cockroachdb/cockroach/issues/14848
+	// Delete deletes a gateway.
+	//Delete(gtwID string) error
+
 	// Archive sets the ArchivedAt field of the gateway to the current timestamp.
 	Archive(gtwID string) error
 

@@ -25,6 +25,11 @@ type ApplicationStore interface {
 	// Update updates the application.
 	Update(app types.Application) error
 
+	// TODO(gomezjdaniel): wait for CockroachDB to introduce 'ON DELETE CASCADE'
+	// 		-> https://github.com/cockroachdb/cockroach/issues/14848
+	// Delete deletes an application.
+	//Delete(appID string) error
+
 	// Archive sets the ArchivedAt field of the application to the current timestamp.
 	Archive(appID string) error
 
