@@ -56,6 +56,7 @@ func New(logger log.Interface, iss string, store *sql.Store, authorizer Authoriz
 		authorizer: authorizer,
 	}
 
+	s.oauth.AuthorizeTokenGen = s
 	s.oauth.AccessTokenGen = s
 
 	return s
