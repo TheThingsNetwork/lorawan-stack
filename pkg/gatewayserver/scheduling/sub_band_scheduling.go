@@ -37,11 +37,7 @@ func (s *subBandScheduling) removeOldScheduling(w packetWindow) {
 
 	for windowIndex, window := range s.schedulingWindows {
 		if w == window {
-			if len(s.schedulingWindows) > windowIndex+1 {
-				s.schedulingWindows = append(s.schedulingWindows[:windowIndex], s.schedulingWindows[windowIndex+1:]...)
-			} else {
-				s.schedulingWindows = s.schedulingWindows[:windowIndex]
-			}
+			s.schedulingWindows = append(s.schedulingWindows[:windowIndex], s.schedulingWindows[windowIndex+1:]...)
 			return
 		}
 	}
