@@ -4,6 +4,7 @@ package grpcerrors
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
@@ -127,35 +128,52 @@ func (i impl) ID() string {
 	return i.id
 }
 
-// FromGRPC parses a gRPC error and returns an Error
-func FromGRPC(in error) (err errors.Error) {
+func fromWellKnown(in error) (errors.Error, bool) {
 	switch in {
 	case io.EOF:
-		return errors.ErrEOF.New(nil)
+		return errors.ErrEOF.New(nil), true
 	case context.Canceled:
-		return errors.ErrContextCanceled.New(nil)
+		return errors.ErrContextCanceled.New(nil), true
 	case context.DeadlineExceeded:
-		return errors.ErrContextDeadlineExceeded.New(nil)
+		return errors.ErrContextDeadlineExceeded.New(nil), true
 	case grpc.ErrClientConnClosing:
-		return ErrClientConnClosing.New(nil)
+		return ErrClientConnClosing.New(nil), true
 	case grpc.ErrClientConnTimeout:
-		return ErrClientConnTimeout.New(nil)
+		return ErrClientConnTimeout.New(nil), true
 	case grpc.ErrServerStopped:
-		return ErrServerStopped.New(nil)
+		return ErrServerStopped.New(nil), true
+	}
+	return nil, false
+}
+
+func fromStatus(status *status.Status) (errors.Error, bool) {
+	switch {
+	case status.Code() == codes.FailedPrecondition && status.Message() == ErrClientConnClosing.MessageFormat:
+		return ErrClientConnClosing.New(nil), true
+	case status.Code() == codes.Unavailable && status.Message() == ErrConnClosing.MessageFormat:
+		return ErrConnClosing.New(nil), true
+	case status.Code() == codes.Canceled && status.Message() == errors.ErrContextCanceled.MessageFormat:
+		return errors.ErrContextCanceled.New(nil), true
+	}
+	return nil, false
+}
+
+// FromGRPC parses a gRPC error and returns an Error
+func FromGRPC(in error) (err errors.Error) {
+	if in == nil {
+		return nil
 	}
 	if err, ok := in.(errors.Error); ok {
 		return err
 	}
+	if wellKnown, ok := fromWellKnown(in); ok {
+		return wellKnown
+	}
 	if status, ok := status.FromError(in); ok {
-		out := &impl{Status: status, code: errors.NoCode}
-		switch {
-		case status.Code() == codes.FailedPrecondition && status.Message() == ErrClientConnClosing.MessageFormat:
-			return ErrClientConnClosing.New(nil)
-		case status.Code() == codes.Unavailable && status.Message() == ErrConnClosing.MessageFormat:
-			return ErrConnClosing.New(nil)
-		case status.Code() == codes.Canceled && status.Message() == errors.ErrContextCanceled.MessageFormat:
-			return errors.ErrContextCanceled.New(nil)
+		if status, ok := fromStatus(status); ok {
+			return status
 		}
+		out := &impl{Status: status, code: errors.NoCode}
 		for _, details := range status.Details() {
 			if details, ok := details.(*structpb.Struct); ok {
 				m, err := goproto.Map(details)
@@ -194,27 +212,24 @@ func FromGRPC(in error) (err errors.Error) {
 
 // ToGRPC turns an error into a gRPC error
 func ToGRPC(in error) (err error) {
-	switch in {
-	case io.EOF:
-		in = errors.ErrEOF.New(nil)
-	case context.Canceled:
-		in = errors.ErrContextCanceled.New(nil)
-	case context.DeadlineExceeded:
-		in = errors.ErrContextDeadlineExceeded.New(nil)
-	case grpc.ErrClientConnClosing:
-		in = ErrClientConnClosing.New(nil)
-	case grpc.ErrClientConnTimeout:
-		in = ErrClientConnTimeout.New(nil)
-	case grpc.ErrServerStopped:
-		in = ErrServerStopped.New(nil)
+	if in == nil {
+		return nil
 	}
-
+	if _, ok := status.FromError(in); ok {
+		return in
+	}
+	if wellKnown, ok := fromWellKnown(in); ok {
+		return wellKnown
+	}
 	e, ok := in.(errors.Error)
 	if ok {
 		e = errors.Safe(e)
 	} else {
 		e = errors.Safe(errors.From(in))
-		log.WithField("in_error", in).Error("Sending unknown error over gRPC")
+		log.WithFields(log.Fields(
+			"in_error", in,
+			"in_error_type", fmt.Sprintf("%T", in),
+		)).Warn("An unknown error type was sent over gRPC, please use the TTN errors package instead")
 	}
 
 	details, err := goproto.Struct(map[string]interface{}{
