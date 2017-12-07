@@ -3,6 +3,7 @@
 package scheduling
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -10,7 +11,11 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-const dutyCycleWindow = 5 * time.Minute
+const (
+	dutyCycleWindow = 5 * time.Minute
+
+	cleanupDelay = 2 * time.Minute
+)
 
 type packetWindow struct {
 	window     Span
@@ -31,26 +36,28 @@ type subBandScheduling struct {
 	mu sync.Mutex
 }
 
-func (s *subBandScheduling) removeOldScheduling(w packetWindow) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	for windowIndex, window := range s.schedulingWindows {
-		if w == window {
-			s.schedulingWindows = append(s.schedulingWindows[:windowIndex], s.schedulingWindows[windowIndex+1:]...)
+func (s *subBandScheduling) bgCleanup(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
 			return
+		case <-time.After(cleanupDelay):
+			s.mu.Lock()
+			for i, w := range s.schedulingWindows {
+				if w.window.End().Add(dutyCycleWindow).Before(time.Now()) {
+					s.schedulingWindows = append(s.schedulingWindows[:i], s.schedulingWindows[i+1:]...)
+				}
+			}
+			s.mu.Unlock()
 		}
 	}
 }
 
 func (s *subBandScheduling) swoopOldScheduling(w packetWindow) {
 	time.Sleep(w.window.End().Sub(time.Now()) + dutyCycleWindow)
-	s.removeOldScheduling(w)
 }
 
 func (s *subBandScheduling) addScheduling(w packetWindow) {
-	go s.swoopOldScheduling(w)
-
 	for i, window := range s.schedulingWindows {
 		if w.window.Precedes(window.window) {
 			s.schedulingWindows = append(s.schedulingWindows[:i], append([]packetWindow{w}, s.schedulingWindows[i:]...)...)

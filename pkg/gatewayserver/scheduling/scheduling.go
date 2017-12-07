@@ -4,6 +4,7 @@
 package scheduling
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -36,7 +37,7 @@ type Scheduler interface {
 }
 
 // FrequencyPlanScheduler returns a scheduler based on the frequency plan
-func FrequencyPlanScheduler(fp ttnpb.FrequencyPlan) (Scheduler, error) {
+func FrequencyPlanScheduler(ctx context.Context, fp ttnpb.FrequencyPlan) (Scheduler, error) {
 	scheduler := &frequencyPlanScheduling{
 		dwellTime:  fp.DwellTime,
 		timeOffAir: fp.TimeOffAir,
@@ -49,12 +50,14 @@ func FrequencyPlanScheduler(fp ttnpb.FrequencyPlan) (Scheduler, error) {
 	}
 
 	for _, subBand := range band.BandDutyCycles {
-		scheduler.subBands = append(scheduler.subBands, &subBandScheduling{
+		scheduling := &subBandScheduling{
 			dutyCycle:         subBand,
 			schedulingWindows: []packetWindow{},
 
 			mu: sync.Mutex{},
-		})
+		}
+		scheduler.subBands = append(scheduler.subBands, scheduling)
+		go scheduling.bgCleanup(ctx)
 	}
 
 	return scheduler, nil
