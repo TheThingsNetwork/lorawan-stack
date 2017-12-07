@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/RangelReale/osin"
-	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
@@ -17,9 +17,9 @@ var clientFactory = func() types.Client {
 	return &ttnpb.Client{}
 }
 
+// storage implements osin.Storage.
 type storage struct {
-	keys  *auth.Keys
-	store store.Store
+	store *sql.Store
 }
 
 // UserData is the userdata that gets carried around with authorization requests.
@@ -76,14 +76,14 @@ func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 		return nil, err
 	}
 
-	client, err := s.store.Clients.GetByID(data.ClientID, clientFactory)
-	if err != nil {
-		return nil, err
-	}
-
 	// ensure the expiration
 	if exp := data.CreatedAt.Add(data.ExpiresIn); exp.Before(time.Now()) {
 		return nil, fmt.Errorf("Authorization code is expired by %v", time.Now().Sub(exp))
+	}
+
+	client, err := s.store.Clients.GetByID(data.ClientID, clientFactory)
+	if err != nil {
+		return nil, err
 	}
 
 	return &osin.AuthorizeData{
@@ -107,48 +107,76 @@ func (s *storage) RemoveAuthorize(code string) error {
 
 // SaveAccess saves the access data for later use.
 func (s *storage) SaveAccess(data *osin.AccessData) error {
-	if data.RefreshToken != "" {
-		err := s.store.OAuth.SaveRefreshToken(&types.RefreshData{
+	userID := ""
+	udata, ok := data.UserData.(*UserData)
+	if ok && udata != nil {
+		userID = udata.UserID
+	}
+
+	err := s.store.Transact(func(s *store.Store) error {
+		err := s.OAuth.SaveAccessToken(&types.AccessData{
+			AccessToken: data.AccessToken,
+			ClientID:    data.Client.GetId(),
+			UserID:      userID,
+			Scope:       data.Scope,
+			CreatedAt:   data.CreatedAt,
+			RedirectURI: data.RedirectUri,
+			ExpiresIn:   time.Duration(data.ExpiresIn) * time.Second,
+		})
+		if err != nil {
+			return err
+		}
+
+		if data.RefreshToken == "" {
+			return nil
+		}
+
+		return s.OAuth.SaveRefreshToken(&types.RefreshData{
 			RefreshToken: data.RefreshToken,
 			ClientID:     data.Client.GetId(),
+			UserID:       userID,
 			Scope:        data.Scope,
 			CreatedAt:    data.CreatedAt,
 			RedirectURI:  data.RedirectUri,
 		})
+	})
 
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // LoadAccess loads the access data based on the access token.
 func (s *storage) LoadAccess(accessToken string) (*osin.AccessData, error) {
-	claims, err := auth.ClaimsFromToken(s.keys, accessToken)
+	data, err := s.store.OAuth.GetAccessToken(accessToken)
 	if err != nil {
 		return nil, err
 	}
 
-	client, err := s.store.Clients.GetByID(claims.Client, clientFactory)
+	// ensure the expiration
+	if exp := data.CreatedAt.Add(data.ExpiresIn); exp.Before(time.Now()) {
+		return nil, fmt.Errorf("Access token is expired by %v", time.Now().Sub(exp))
+	}
+
+	client, err := s.store.Clients.GetByID(data.ClientID, clientFactory)
 	if err != nil {
 		return nil, err
 	}
 
 	return &osin.AccessData{
-		Client:    client,
-		ExpiresIn: int32(time.Unix(claims.ExpiresAt, 0).Sub(time.Now()).Seconds()),
-		Scope:     Scope(claims.Rights),
-		CreatedAt: time.Unix(claims.IssuedAt, 0),
+		AccessToken: data.AccessToken,
+		Client:      client,
+		ExpiresIn:   int32(data.ExpiresIn.Seconds()),
+		Scope:       data.Scope,
+		RedirectUri: data.RedirectURI,
+		CreatedAt:   data.CreatedAt,
 		UserData: &UserData{
-			UserID: claims.Creator,
+			UserID: data.UserID,
 		},
 	}, nil
 }
 
 // RemoveAccess revokes access data.
 func (s *storage) RemoveAccess(accessToken string) error {
-	// Access tokens aren't saved in the database, so do nothing.
-	return nil
+	return s.store.OAuth.DeleteAccessToken(accessToken)
 }
 
 // LoadRefresh loads the access data based on the refresh token.
@@ -169,6 +197,9 @@ func (s *storage) LoadRefresh(refreshToken string) (*osin.AccessData, error) {
 		Scope:        data.Scope,
 		CreatedAt:    data.CreatedAt,
 		RedirectUri:  data.RedirectURI,
+		UserData: &UserData{
+			UserID: data.UserID,
+		},
 	}, nil
 }
 

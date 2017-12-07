@@ -4,9 +4,6 @@ package oauth
 
 import (
 	"context"
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -15,9 +12,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
-	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
@@ -58,10 +53,6 @@ var (
 // cleanStore returns a new store instance attached to a newly created database
 // where all migrations has been applied and also has been feed with some users.
 func cleanStore(t testing.TB, database string) *sql.Store {
-	if s != nil {
-		return s
-	}
-
 	logger := test.GetLogger(t).WithField("tag", "OAuth")
 
 	// open database connection
@@ -92,45 +83,41 @@ func cleanStore(t testing.TB, database string) *sql.Store {
 		return nil
 	}
 
-	s = sql.FromDB(db)
-
-	return s
+	return sql.FromDB(db)
 }
 
-func testServer(t *testing.T) (*web.Server, *auth.Keys) {
+func testServer(t *testing.T) *web.Server {
 	logger := test.GetLogger(t).WithField("tag", "OAuth")
 
 	a := assertions.New(t)
 
-	key, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
-	a.So(err, should.BeNil)
+	if s == nil {
+		store := cleanStore(t, database)
 
-	keys := auth.NewKeys(issuer)
+		err := store.Clients.Create(client)
+		a.So(err, should.BeNil)
 
-	err = keys.Rotate("", key)
-	a.So(err, should.BeNil)
+		err = store.Users.Create(&ttnpb.User{
+			UserIdentifier: ttnpb.UserIdentifier{
+				UserID: userID,
+			},
+		})
+		a.So(err, should.BeNil)
 
-	store := cleanStore(t, database)
+		s = store
+	}
 
-	_ = store.Clients.Create(client)
-
-	_ = store.Users.Create(&ttnpb.User{
-		UserIdentifier: ttnpb.UserIdentifier{
-			UserID: userID,
-		},
-	})
-
-	server := New(issuer, keys, store.Store, authorizer)
+	server := New(issuer, s, authorizer)
 
 	mux := web.New(logger)
 	server.Register(mux)
 
-	return mux, keys
+	return mux
 }
 
 func TestAuthorizationFlowJSON(t *testing.T) {
 	a := assertions.New(t)
-	server, keys := testServer(t)
+	server := testServer(t)
 
 	state := "state"
 	rights := []ttnpb.Right{
@@ -204,20 +191,27 @@ func TestAuthorizationFlowJSON(t *testing.T) {
 		a.So(tok.AccessToken, should.NotBeEmpty)
 		a.So(tok.TokenType, should.Equal, "bearer")
 
-		claims, err := auth.ClaimsFromToken(keys, tok.AccessToken)
-		a.So(err, should.BeNil)
+		{
+			found, err := s.OAuth.GetAccessToken(tok.AccessToken)
+			a.So(err, should.BeNil)
+			a.So(found.ClientID, should.Equal, client.ClientID)
+			a.So(found.UserID, should.Equal, userID)
+			a.So(found.Scope, should.Equal, Scope(rights))
+		}
 
-		a.So(claims.Rights, should.Resemble, rights)
-		a.So(claims.Client, should.Resemble, client.ClientID)
-		a.So(claims.Issuer, should.Resemble, issuer)
-		a.So(claims.Subject, should.Resemble, "user:"+userID)
-		a.So(claims.UserID(), should.Resemble, userID)
+		{
+			found, err := s.OAuth.GetRefreshToken(tok.RefreshToken)
+			a.So(err, should.BeNil)
+			a.So(found.ClientID, should.Equal, client.ClientID)
+			a.So(found.UserID, should.Equal, userID)
+			a.So(found.Scope, should.Equal, Scope(rights))
+		}
 	}
 }
 
 func TestAuthorizationFlowForm(t *testing.T) {
 	a := assertions.New(t)
-	server, keys := testServer(t)
+	server := testServer(t)
 
 	state := "state"
 	rights := []ttnpb.Right{
@@ -291,18 +285,21 @@ func TestAuthorizationFlowForm(t *testing.T) {
 		a.So(tok.AccessToken, should.NotBeEmpty)
 		a.So(tok.TokenType, should.Equal, "bearer")
 
-		claims, err := auth.ClaimsFromToken(keys, tok.AccessToken)
-		a.So(err, should.BeNil)
+		{
+			found, err := s.OAuth.GetAccessToken(tok.AccessToken)
+			a.So(err, should.BeNil)
+			a.So(found.ClientID, should.Equal, client.ClientID)
+			a.So(found.UserID, should.Equal, userID)
+			a.So(found.Scope, should.Equal, Scope(rights))
+		}
 
-		a.So(claims.Rights, should.Resemble, rights)
-		a.So(claims.Client, should.Resemble, client.ClientID)
-		a.So(claims.Issuer, should.Resemble, issuer)
-		a.So(claims.Subject, should.Resemble, "user:"+userID)
-		a.So(claims.UserID(), should.Resemble, userID)
-		a.So(claims.Valid(), should.BeNil)
-		a.So([]time.Time{time.Now().Add(-10 * time.Second), time.Unix(claims.IssuedAt, 0)}, should.BeChronological)
-		a.So([]time.Time{time.Unix(claims.IssuedAt, 0), time.Now().Add(1 * time.Second)}, should.BeChronological)
-		a.So([]time.Time{time.Now().Add(time.Hour - 5*time.Second), time.Unix(claims.ExpiresAt, 0), time.Now().Add(time.Hour + 5*time.Second)}, should.BeChronological)
+		{
+			found, err := s.OAuth.GetRefreshToken(tok.RefreshToken)
+			a.So(err, should.BeNil)
+			a.So(found.ClientID, should.Equal, client.ClientID)
+			a.So(found.UserID, should.Equal, userID)
+			a.So(found.Scope, should.Equal, Scope(rights))
+		}
 	}
 }
 

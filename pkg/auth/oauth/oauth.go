@@ -8,8 +8,7 @@ import (
 	"net/url"
 
 	"github.com/RangelReale/osin"
-	"github.com/TheThingsNetwork/ttn/pkg/auth"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/web"
@@ -18,14 +17,13 @@ import (
 
 // Server represents an OAuth 2.0 Server.
 type Server struct {
-	keys       *auth.Keys
 	iss        string
 	oauth      *osin.Server
 	authorizer Authorizer
 }
 
 // New returns a new *Server that is ready to use.
-func New(iss string, keys *auth.Keys, store store.Store, authorizer Authorizer) *Server {
+func New(iss string, store *sql.Store, authorizer Authorizer) *Server {
 	config := &osin.ServerConfig{
 		AuthorizationExpiration:     60 * 5,  // 5 minutes
 		AccessExpiration:            60 * 60, // 1 hour
@@ -41,17 +39,15 @@ func New(iss string, keys *auth.Keys, store store.Store, authorizer Authorizer) 
 		AllowedAccessTypes: osin.AllowedAccessType{
 			osin.AUTHORIZATION_CODE,
 			osin.REFRESH_TOKEN,
-			osin.CLIENT_CREDENTIALS,
+			osin.PASSWORD,
 		},
 	}
 
 	storage := &storage{
-		keys:  keys,
 		store: store,
 	}
 
 	s := &Server{
-		keys:       keys,
 		iss:        iss,
 		oauth:      osin.NewServer(config, storage),
 		authorizer: authorizer,

@@ -3,54 +3,17 @@
 package oauth
 
 import (
-	"time"
-
 	"github.com/RangelReale/osin"
-	"github.com/TheThingsNetwork/ttn/pkg/auth"
-	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/labstack/gommon/random"
+	"github.com/TheThingsNetwork/ttn/pkg/random"
 )
 
-// GenerateAccessToken generates the JWT access token based on the access token request.
-func (s *Server) GenerateAccessToken(data *osin.AccessData, generateRefresh bool) (string, string, error) {
-	_, key, err := s.keys.GetCurrentPrivateKey()
-	if err != nil {
-		return "", "", err
+// GenerateAccessToken generates 64-length access and refresh tokens based on the ttn random generator.
+func (s *Server) GenerateAccessToken(data *osin.AccessData, generateRefresh bool) (accessToken string, refreshToken string, err error) {
+	accessToken = random.String(64)
+
+	if generateRefresh {
+		refreshToken = random.String(64)
 	}
 
-	rights, err := ParseScope(data.Scope)
-	if err != nil {
-		return "", "", err
-	}
-
-	userID := ""
-	udata, ok := data.UserData.(*UserData)
-	if ok && udata != nil {
-		userID = udata.UserID
-	}
-
-	claims := &auth.Claims{
-		StandardClaims: jwt.StandardClaims{
-			Issuer:    s.iss,
-			ExpiresAt: data.ExpireAt().Unix(),
-			Subject:   auth.UserSubject(userID),
-			IssuedAt:  time.Now().Add(-5 * time.Second).Unix(),
-		},
-		Creator: userID,
-		Rights:  rights,
-		Client:  data.Client.GetId(),
-	}
-
-	accessToken, err := claims.Sign(key)
-	if err != nil {
-		return "", "", err
-	}
-
-	if !generateRefresh {
-		return accessToken, "", nil
-	}
-
-	refreshToken := random.String(64)
-
-	return accessToken, refreshToken, err
+	return
 }
