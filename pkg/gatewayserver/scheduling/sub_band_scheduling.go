@@ -101,8 +101,8 @@ func (s *subBandScheduling) schedule(w Window, timeOffAir *ttnpb.FrequencyPlan_T
 	return nil
 }
 
-// AskScheduling requires a scheduling window if there is no time.Time constraint
-func (s *subBandScheduling) AskScheduling(minimum time.Time, d time.Duration, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) (Window, error) {
+// ScheduleFlexible requires a scheduling window if there is no time.Time constraint
+func (s *subBandScheduling) ScheduleFlexible(minimum time.Time, d time.Duration, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) (Window, error) {
 	var addMinimum = true
 	potentialTimings := []time.Time{}
 	emissionWindows := []Window{}

@@ -29,8 +29,8 @@ var (
 type Scheduler interface {
 	// Schedule adds the requested time window to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns ErrScheduleFull. If another error prevents scheduling, it is returned.
 	Schedule(w Window, channel uint64) error
-	// AskScheduling requires a scheduling window if there is no time.Time constraint
-	AskScheduling(minimum time.Time, d time.Duration, channel uint64) (Window, error)
+	// ScheduleFlexible requires a scheduling window if there is no time.Time constraint
+	ScheduleFlexible(minimum time.Time, d time.Duration, channel uint64) (Window, error)
 	// RegisterEmission that has happened during that time window, on that specific channel
 	RegisterEmission(w Window, channel uint64) error
 }
@@ -90,13 +90,13 @@ func (f frequencyPlanScheduling) Schedule(w Window, channel uint64) error {
 	return subBand.Schedule(w, f.timeOffAir)
 }
 
-func (f frequencyPlanScheduling) AskScheduling(minimum time.Time, d time.Duration, channel uint64) (Window, error) {
+func (f frequencyPlanScheduling) ScheduleFlexible(minimum time.Time, d time.Duration, channel uint64) (Window, error) {
 	subBand, err := f.findSubBand(channel)
 	if err != nil {
 		return Window{}, err
 	}
 
-	w, err := subBand.AskScheduling(minimum, d, f.timeOffAir)
+	w, err := subBand.ScheduleFlexible(minimum, d, f.timeOffAir)
 	return w, err
 }
 
