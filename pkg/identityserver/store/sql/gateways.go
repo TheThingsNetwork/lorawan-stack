@@ -234,14 +234,13 @@ func (s *GatewayStore) userGateways(q db.QueryContext, userID string) ([]ttnpb.G
 	var gateways []ttnpb.Gateway
 	err := q.Select(
 		&gateways,
-		`SELECT *
+		`SELECT DISTINCT gateways.*
 			FROM gateways
-			WHERE gateway_id
-			IN (
-				SELECT
-					DISTINCT gateway_id
-					FROM gateways_collaborators
-					WHERE user_id = $1
+			JOIN gateways_collaborators
+			ON (
+				gateways.gateway_id = gateways_collaborators.gateway_id
+				AND
+				user_id = $1
 			)`,
 		userID)
 
@@ -625,7 +624,7 @@ func (s *GatewayStore) loadAttributes(q db.QueryContext, gtwID string, gtw types
 }
 
 // WriteAttributes store the extra attributes of gtw if it is a store.Attributer
-// and writes the resulting application in result.
+// and writes the resulting gateway in result.
 func (s *GatewayStore) WriteAttributes(gtwID string, gtw, result types.Gateway) error {
 	return s.writeAttributes(s.queryer(), gtwID, gtw, result)
 }

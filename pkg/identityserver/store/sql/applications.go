@@ -134,14 +134,13 @@ func (s *ApplicationStore) userApplications(q db.QueryContext, userID string) ([
 	var applications []ttnpb.Application
 	err := q.Select(
 		&applications,
-		`SELECT *
+		`SELECT DISTINCT applications.*
 			FROM applications
-			WHERE application_id
-			IN (
-				SELECT
-					DISTINCT application_id
-					FROM applications_collaborators
-					WHERE user_id = $1
+			JOIN applications_collaborators
+			ON (
+				applications.application_id = applications_collaborators.application_id
+				AND
+				user_id = $1
 			)`,
 		userID)
 
