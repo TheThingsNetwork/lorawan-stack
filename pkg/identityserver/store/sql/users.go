@@ -107,14 +107,9 @@ func (s *UserStore) getByID(q db.QueryContext, userID string, result types.User)
 }
 
 // GetByEmail finds the user by email address and returns it.
-<<<<<<< HEAD
 func (s *UserStore) GetByEmail(email string, factory store.UserFactory) (types.User, error) {
 	result := factory()
-=======
-func (s *UserStore) GetByEmail(email string, resultFunc store.UserFactory) (types.User, error) {
-	result := resultFunc()
 
->>>>>>> is: Review transactions
 	err := s.transact(func(tx *db.Tx) error {
 		err := s.getByEmail(tx, email, result)
 		if err != nil {
