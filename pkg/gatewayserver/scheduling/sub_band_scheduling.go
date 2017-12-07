@@ -73,17 +73,17 @@ func (s *subBandScheduling) Schedule(w Window, timeOffAir *ttnpb.FrequencyPlan_T
 }
 
 func (s *subBandScheduling) schedule(w Window, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) error {
-	windowWithTOA := packetWindow{window: w, toa: w.timeOffAir(timeOffAir)}
+	windowWithTimeOffAir := packetWindow{window: w, toa: w.timeOffAir(timeOffAir)}
 
 	emissionWindows := []Window{w}
 
-	for _, window := range s.schedulingWindows {
-		emissionWindows = append(emissionWindows, window.window)
+	for _, scheduledWindow := range s.schedulingWindows {
+		emissionWindows = append(emissionWindows, scheduledWindow.window)
 
-		if window.window.Overlaps(w) {
+		if scheduledWindow.window.Overlaps(w) {
 			return ErrOverlap
 		}
-		if window.withTimeOffAir().Overlaps(windowWithTOA.withTimeOffAir()) {
+		if scheduledWindow.withTimeOffAir().Overlaps(windowWithTimeOffAir.withTimeOffAir()) {
 			return ErrTimeOffAir
 		}
 	}
@@ -96,7 +96,7 @@ func (s *subBandScheduling) schedule(w Window, timeOffAir *ttnpb.FrequencyPlan_T
 		return ErrDutyCycleFull
 	}
 
-	s.addScheduling(windowWithTOA)
+	s.addScheduling(windowWithTimeOffAir)
 
 	return nil
 }
