@@ -107,6 +107,94 @@ func (s *OAuthStore) deleteAuthorizationCode(q db.QueryContext, authorizationCod
 	return err
 }
 
+// SaveAccessToken saves the access data.
+func (s *OAuthStore) SaveAccessToken(access *types.AccessData) error {
+	return s.saveAccessToken(s.queryer(), access)
+}
+
+func (s *OAuthStore) saveAccessToken(q db.QueryContext, access *types.AccessData) error {
+	result := new(string)
+	err := q.NamedSelectOne(
+		result,
+		`INSERT
+			INTO access_tokens (
+				access_token,
+				client_id,
+				user_id,
+				created_at,
+				expires_in,
+				scope,
+				redirect_uri
+			)
+			VALUES (
+				:access_token,
+				:client_id,
+				:user_id,
+				:created_at,
+				:expires_in,
+				:scope,
+				:redirect_uri
+			)
+			RETURNING access_token`,
+		access,
+	)
+
+	if _, dup := db.IsDuplicate(err); dup {
+		return ErrAccessTokenConflict.New(nil)
+	}
+
+	return err
+}
+
+// GetRefreshToken finds the access token.
+func (s *OAuthStore) GetAccessToken(accessToken string) (*types.AccessData, error) {
+	return s.getAccessToken(s.queryer(), accessToken)
+}
+
+func (s *OAuthStore) getAccessToken(q db.QueryContext, accessToken string) (*types.AccessData, error) {
+	result := new(types.AccessData)
+	err := q.SelectOne(
+		result,
+		`SELECT *
+			FROM access_tokens
+			WHERE access_token = $1`,
+		accessToken,
+	)
+
+	if db.IsNoRows(err) {
+		return nil, ErrAccessTokenNotFound.New(nil)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// DeleteRefreshToken deletes the access token from the database.
+func (s *OAuthStore) DeleteAccessToken(accessToken string) error {
+	return s.deleteAccessToken(s.queryer(), accessToken)
+}
+
+func (s *OAuthStore) deleteAccessToken(q db.QueryContext, accessToken string) error {
+	token := new(string)
+	err := q.SelectOne(
+		token,
+		`DELETE
+			FROM access_tokens
+			WHERE access_token = $1
+			RETURNING access_token`,
+		accessToken,
+	)
+
+	if db.IsNoRows(err) {
+		return ErrAccessTokenNotFound.New(nil)
+	}
+
+	return err
+}
+
 // SaveRefreshToken saves the refresh token.
 func (s *OAuthStore) SaveRefreshToken(access *types.RefreshData) error {
 	return s.saveRefreshToken(s.queryer(), access)
@@ -120,6 +208,7 @@ func (s *OAuthStore) saveRefreshToken(q db.QueryContext, refresh *types.RefreshD
 			INTO refresh_tokens (
 				refresh_token,
 				client_id,
+				user_id,
 				created_at,
 				scope,
 				redirect_uri
@@ -127,6 +216,7 @@ func (s *OAuthStore) saveRefreshToken(q db.QueryContext, refresh *types.RefreshD
 			VALUES (
 				:refresh_token,
 				:client_id,
+				:user_id,
 				:created_at,
 				:scope,
 				:redirect_uri

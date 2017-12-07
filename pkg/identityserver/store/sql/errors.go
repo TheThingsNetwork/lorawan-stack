@@ -19,6 +19,8 @@ func init() {
 	ErrAuthorizationCodeConflict.Register()
 	ErrRefreshTokenNotFound.Register()
 	ErrRefreshTokenConflict.Register()
+	ErrAccessTokenNotFound.Register()
+	ErrAccessTokenConflict.Register()
 
 	ErrUserNotFound.Register()
 	ErrUserEmailNotFound.Register()
@@ -128,6 +130,22 @@ var ErrRefreshTokenNotFound = &errors.ErrDescriptor{
 var ErrRefreshTokenConflict = &errors.ErrDescriptor{
 	MessageFormat: "Refresh token already exists",
 	Code:          504,
+	Type:          errors.Conflict,
+}
+
+// ErrAccessTokenNotFound is returned when trying to fetch or delete an access
+// token that does not exist.
+var ErrAccessTokenNotFound = &errors.ErrDescriptor{
+	MessageFormat: "Access token does not exist",
+	Code:          505,
+	Type:          errors.NotFound,
+}
+
+// ErrAccessTokenConflict is returned when trying to create an access token that
+// already exists.
+var ErrAccessTokenConflict = &errors.ErrDescriptor{
+	MessageFormat: "Access token already exists",
+	Code:          506,
 	Type:          errors.Conflict,
 }
 

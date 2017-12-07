@@ -12,7 +12,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-func TestAuthorizationCode(t *testing.T) {
+func TestOAuthAuthorizationCode(t *testing.T) {
 	a := assertions.New(t)
 	s := cleanStore(t, database)
 
@@ -41,6 +41,7 @@ func TestAuthorizationCode(t *testing.T) {
 
 	a.So(found.AuthorizationCode, should.Equal, data.AuthorizationCode)
 	a.So(found.ClientID, should.Equal, data.ClientID)
+	a.So(found.UserID, should.Equal, data.UserID)
 	a.So(found.ExpiresIn, should.Equal, data.ExpiresIn)
 	a.So(found.Scope, should.Equal, data.Scope)
 	a.So(found.RedirectURI, should.Equal, data.RedirectURI)
@@ -57,10 +58,55 @@ func TestAuthorizationCode(t *testing.T) {
 	a.So(err, should.NotBeNil)
 }
 
-func TestRefreshToken(t *testing.T) {
+func TestOAuthAccessToken(t *testing.T) {
 	a := assertions.New(t)
-
 	s := cleanStore(t, database)
+
+	userID := testUsers()["john-doe"].UserID
+
+	client := testClients()["test-client"]
+	err := s.Clients.Create(client)
+	a.So(err, should.BeNil)
+
+	data := &types.AccessData{
+		AccessToken: "123456",
+		ClientID:    client.ClientIdentifier.ClientID,
+		UserID:      userID,
+		CreatedAt:   time.Now(),
+		ExpiresIn:   time.Hour,
+		Scope:       "scope",
+		RedirectURI: "https://example.com/oauth/callback",
+	}
+
+	err = s.OAuth.SaveAccessToken(data)
+	a.So(err, should.BeNil)
+
+	found, err := s.OAuth.GetAccessToken(data.AccessToken)
+	a.So(err, should.BeNil)
+
+	a.So(found.AccessToken, should.Equal, data.AccessToken)
+	a.So(found.ClientID, should.Equal, data.ClientID)
+	a.So(found.UserID, should.Equal, data.UserID)
+	a.So(found.Scope, should.Equal, data.Scope)
+	a.So(found.RedirectURI, should.Equal, data.RedirectURI)
+	a.So(found.ExpiresIn, should.Equal, data.ExpiresIn)
+
+	c, err := s.Clients.GetByID(found.ClientID, clientFactory)
+	a.So(err, should.BeNil)
+	a.So(c, test.ShouldBeClientIgnoringAutoFields, client)
+
+	err = s.OAuth.DeleteAccessToken(data.AccessToken)
+	a.So(err, should.BeNil)
+
+	_, err = s.OAuth.GetAccessToken(data.AccessToken)
+	a.So(err, should.NotBeNil)
+}
+
+func TestOAuthRefreshToken(t *testing.T) {
+	a := assertions.New(t)
+	s := cleanStore(t, database)
+
+	userID := testUsers()["john-doe"].UserID
 
 	client := testClients()["test-client"]
 	err := s.Clients.Create(client)
@@ -69,6 +115,7 @@ func TestRefreshToken(t *testing.T) {
 	data := &types.RefreshData{
 		RefreshToken: "123456",
 		ClientID:     client.ClientIdentifier.ClientID,
+		UserID:       userID,
 		CreatedAt:    time.Now(),
 		Scope:        "scope",
 		RedirectURI:  "https://example.com/oauth/callback",
@@ -82,6 +129,7 @@ func TestRefreshToken(t *testing.T) {
 
 	a.So(found.RefreshToken, should.Equal, data.RefreshToken)
 	a.So(found.ClientID, should.Equal, data.ClientID)
+	a.So(found.UserID, should.Equal, data.UserID)
 	a.So(found.Scope, should.Equal, data.Scope)
 	a.So(found.RedirectURI, should.Equal, data.RedirectURI)
 

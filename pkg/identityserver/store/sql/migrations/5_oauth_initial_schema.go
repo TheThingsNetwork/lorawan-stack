@@ -15,19 +15,31 @@ func init() {
 			user_id              STRING(36) REFERENCES users(user_id) NOT NULL
 		);
 
+		CREATE TABLE IF NOT EXISTS access_tokens (
+			access_token    STRING(64) PRIMARY KEY,
+			client_id       STRING(36) REFERENCES clients(client_id) NOT NULL,
+			user_id         STRING(36) REFERENCES users(user_id) NOT NULL,
+			created_at      TIMESTAMP DEFAULT current_timestamp(),
+			expires_in      INTEGER,
+			scope           STRING,
+			redirect_uri    STRING
+		);
+
 		CREATE TABLE IF NOT EXISTS refresh_tokens (
 			refresh_token   STRING(64) PRIMARY KEY,
 			client_id       STRING(36) REFERENCES clients(client_id) NOT NULL,
+			user_id         STRING(36) REFERENCES users(user_id) NOT NULL,
 			created_at      TIMESTAMP DEFAULT current_timestamp(),
-			scope		    STRING,
+			scope		        STRING,
 			redirect_uri    STRING
 		);
 	`
 
 	const backwards = `
 		DROP TABLE IF EXISTS refresh_tokens;
+		DROP TABLE IF EXISTS access_tokens;
 		DROP TABLE IF EXISTS authorization_codes;
 	`
 
-	Registry.Register(5, "5_tokens_initial_schema", forwards, backwards)
+	Registry.Register(5, "5_oauth_initial_schema", forwards, backwards)
 }
