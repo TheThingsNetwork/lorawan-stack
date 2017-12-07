@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/RangelReale/osin"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
@@ -58,6 +59,9 @@ func New(logger log.Interface, iss string, store *sql.Store, authorizer Authoriz
 
 	s.oauth.AuthorizeTokenGen = s
 	s.oauth.AccessTokenGen = s
+	s.oauth.Now = func() time.Time {
+		return time.Now().UTC()
+	}
 
 	return s
 }
