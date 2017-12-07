@@ -126,11 +126,11 @@ func (s *ClientStore) update(q db.QueryContext, client types.Client) error {
 				description = :description,
 				secret = :secret,
 				redirect_uri = :redirect_uri,
-			  grants = :grants,
-			  state = :state,
-			  official_labeled = :official_labeled,
-			  rights = :rights,
-			  updated_at = current_timestamp()
+				grants = :grants,
+				state = :state,
+				official_labeled = :official_labeled,
+				rights = :rights,
+				updated_at = current_timestamp()
 			WHERE client_id = :client_id`,
 		cli)
 
