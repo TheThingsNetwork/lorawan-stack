@@ -38,12 +38,6 @@
   revision = "0d8b4682f140f0fe486ef7e3d2f70665f3066906"
 
 [[projects]]
-  name = "github.com/dgrijalva/jwt-go"
-  packages = ["."]
-  revision = "dbeaa9332f19a944acb5736b4456cfcc02140e29"
-  version = "v3.1.0"
-
-[[projects]]
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
   revision = "629574ca2a5df945712d3079857300b5e4da0236"
@@ -153,7 +147,7 @@
 
 [[projects]]
   name = "github.com/labstack/gommon"
-  packages = ["color","log","random"]
+  packages = ["color","log"]
   revision = "57409ada9da0f2afad6664c49502f8c50fbd8476"
   version = "0.2.3"
 
@@ -377,6 +371,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c7237925cc72f65a55de46baca666af4981ff9553d0a98b1511b21013c8cbcb3"
+  inputs-digest = "db3c95f63c1171f1743f26547f0446fd3732732aebff7ff44470afdc87316c96"
   solver-name = "gps-cdcl"
   solver-version = 1
