@@ -53,10 +53,6 @@ func (s *subBandScheduling) bgCleanup(ctx context.Context) {
 	}
 }
 
-func (s *subBandScheduling) swoopOldScheduling(w packetWindow) {
-	time.Sleep(w.window.End().Sub(time.Now()) + dutyCycleWindow)
-}
-
 func (s *subBandScheduling) addScheduling(w packetWindow) {
 	for i, window := range s.schedulingWindows {
 		if w.window.Precedes(window.window) {
