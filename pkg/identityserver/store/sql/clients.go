@@ -97,8 +97,8 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 }
 
 // GetByID finds a client by ID and retrieves it.
-func (s *ClientStore) GetByID(clientID string, resultFunc store.ClientFactory) (types.Client, error) {
-	result := resultFunc()
+func (s *ClientStore) GetByID(clientID string, factory store.ClientFactory) (types.Client, error) {
+	result := factory()
 	err := s.transact(func(tx *db.Tx) error {
 		return s.client(tx, clientID, result)
 	})

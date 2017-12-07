@@ -124,8 +124,8 @@ func (s *UserStore) create(q db.QueryContext, user types.User) error {
 }
 
 // GetByID finds the user by ID and returns it.
-func (s *UserStore) GetByID(userID string, resultFunc store.UserFactory) (types.User, error) {
-	result := resultFunc()
+func (s *UserStore) GetByID(userID string, factory store.UserFactory) (types.User, error) {
+	result := factory()
 	err := s.transact(func(tx *db.Tx) error {
 		return s.getByID(tx, userID, result)
 	})
@@ -152,8 +152,8 @@ func (s *UserStore) getByID(q db.QueryContext, userID string, result types.User)
 }
 
 // GetByEmail finds the user by email address and returns it.
-func (s *UserStore) GetByEmail(email string, resultFunc store.UserFactory) (types.User, error) {
-	result := resultFunc()
+func (s *UserStore) GetByEmail(email string, factory store.UserFactory) (types.User, error) {
+	result := factory()
 	err := s.transact(func(tx *db.Tx) error {
 		return s.getByEmail(tx, email, result)
 	})

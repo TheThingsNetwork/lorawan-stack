@@ -168,8 +168,8 @@ func (s *GatewayStore) addAntennasQuery(gtwID string, antennas []ttnpb.GatewayAn
 }
 
 // GetByID finds a gateway by ID and retrieves it.
-func (s *GatewayStore) GetByID(gtwID string, resultFunc store.GatewayFactory) (types.Gateway, error) {
-	result := resultFunc()
+func (s *GatewayStore) GetByID(gtwID string, factory store.GatewayFactory) (types.Gateway, error) {
+	result := factory()
 	err := s.transact(func(tx *db.Tx) error {
 		return s.getByID(tx, gtwID, result)
 	})
@@ -216,7 +216,7 @@ func (s *GatewayStore) gateway(q db.QueryContext, gtwID string, result types.Gat
 }
 
 // ListByUser returns all the gateways to which a given user is collaborator.
-func (s *GatewayStore) ListByUser(userID string, resultFunc store.GatewayFactory) ([]types.Gateway, error) {
+func (s *GatewayStore) ListByUser(userID string, factory store.GatewayFactory) ([]types.Gateway, error) {
 	var gateways []types.Gateway
 	err := s.transact(func(tx *db.Tx) error {
 		gtwIDs, err := s.userGateways(tx, userID)
@@ -225,7 +225,7 @@ func (s *GatewayStore) ListByUser(userID string, resultFunc store.GatewayFactory
 		}
 
 		for _, gtwID := range gtwIDs {
-			result := resultFunc()
+			result := factory()
 
 			err := s.getByID(tx, gtwID, result)
 			if err != nil {

@@ -103,8 +103,8 @@ func (s *ApplicationStore) create(q db.QueryContext, application types.Applicati
 }
 
 // GetByID finds the application by ID and retrieves it.
-func (s *ApplicationStore) GetByID(appID string, resultFunc store.ApplicationFactory) (types.Application, error) {
-	result := resultFunc()
+func (s *ApplicationStore) GetByID(appID string, factory store.ApplicationFactory) (types.Application, error) {
+	result := factory()
 	err := s.transact(func(tx *db.Tx) error {
 		return s.getByID(tx, appID, result)
 	}, db.ReadOnly(true))
@@ -141,7 +141,7 @@ func (s *ApplicationStore) application(q db.QueryContext, appID string, result t
 }
 
 // FindByUser returns the Applications to which an User is a collaborator.
-func (s *ApplicationStore) ListByUser(userID string, resultFunc store.ApplicationFactory) ([]types.Application, error) {
+func (s *ApplicationStore) ListByUser(userID string, factory store.ApplicationFactory) ([]types.Application, error) {
 	var result []types.Application
 	err := s.transact(func(tx *db.Tx) error {
 		appIDs, err := s.userApplications(tx, userID)
@@ -150,7 +150,7 @@ func (s *ApplicationStore) ListByUser(userID string, resultFunc store.Applicatio
 		}
 
 		for _, appID := range appIDs {
-			app := resultFunc()
+			app := factory()
 
 			err := s.getByID(tx, appID, app)
 			if err != nil {
