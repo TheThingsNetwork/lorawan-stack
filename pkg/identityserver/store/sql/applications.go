@@ -45,12 +45,10 @@ func (s *ApplicationStore) create(q db.QueryContext, application types.Applicati
 		`INSERT
 			INTO applications (
 				application_id,
-				description,
-				archived_at)
+				description)
 			VALUES (
 				:application_id,
-				:description,
-				:archived_at)`,
+				:description)`,
 		app)
 
 	if _, yes := db.IsDuplicate(err); yes {
@@ -196,28 +194,6 @@ func (s *ApplicationStore) syncUpdatedAt(q db.QueryContext, appID string) error 
 		&id,
 		`UPDATE applications
 			SET updated_at = current_timestamp()
-			WHERE application_id = $1
-			RETURNING application_id`,
-		appID)
-	if db.IsNoRows(err) {
-		return ErrApplicationNotFound.New(errors.Attributes{
-			"application_id": appID,
-		})
-	}
-	return err
-}
-
-// Archive disables the Application.
-func (s *ApplicationStore) Archive(appID string) error {
-	return s.archive(s.queryer(), appID)
-}
-
-func (s *ApplicationStore) archive(q db.QueryContext, appID string) error {
-	var id string
-	err := q.SelectOne(
-		&id,
-		`UPDATE applications
-			SET archived_at = current_timestamp()
 			WHERE application_id = $1
 			RETURNING application_id`,
 		appID)

@@ -163,20 +163,6 @@ func TestApplicationCollaborators(t *testing.T) {
 	}
 }
 
-func TestApplicationArchive(t *testing.T) {
-	a := assertions.New(t)
-	s := testStore(t)
-
-	app := testApplications()["demo-app"]
-
-	err := s.Applications.Archive(app.ApplicationID)
-	a.So(err, should.BeNil)
-
-	found, err := s.Applications.GetByID(app.ApplicationID, applicationFactory)
-	a.So(err, should.BeNil)
-	a.So(found.GetApplication().ArchivedAt.IsZero(), should.BeFalse)
-}
-
 func TestApplicationUpdate(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore(t)

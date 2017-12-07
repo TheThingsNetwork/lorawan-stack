@@ -30,9 +30,6 @@ type GatewayStore interface {
 	// Delete deletes a gateway.
 	//Delete(gtwID string) error
 
-	// Archive sets the ArchivedAt field of the gateway to the current timestamp.
-	Archive(gtwID string) error
-
 	// SetCollaborator inserts or updates a collaborator within a gateway.
 	// If the list of rights is empty the collaborator will be unset.
 	SetCollaborator(collaborator ttnpb.GatewayCollaborator) error

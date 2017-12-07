@@ -52,17 +52,12 @@ func TestUserTx(t *testing.T) {
 		}
 
 		john.Name = "PEPE"
-		if err := s.Users.Update(john); err != nil {
-			return err
-		}
-
-		return s.Users.Archive(john.UserID)
+		return s.Users.Update(john)
 	})
 	a.So(err, should.BeNil)
 
 	found, err := s.Users.GetByID(john.UserID, userFactory)
 	a.So(err, should.BeNil)
-	john.ArchivedAt = found.GetUser().ArchivedAt
 	a.So(found, test.ShouldBeUserIgnoringAutoFields, john)
 }
 
@@ -125,20 +120,6 @@ func TestUserUpdate(t *testing.T) {
 		a.So(err, should.NotBeNil)
 		a.So(ErrUserEmailTaken.Describes(err), should.BeTrue)
 	}
-}
-
-func TestUserArchive(t *testing.T) {
-	a := assertions.New(t)
-	s := testStore(t)
-
-	bob := testUsers()["bob"]
-
-	err := s.Users.Archive(bob.UserID)
-	a.So(err, should.BeNil)
-
-	found, err := s.Users.GetByID(bob.UserID, userFactory)
-	a.So(err, should.BeNil)
-	a.So(found.GetUser().ArchivedAt.IsZero(), should.BeFalse)
 }
 
 func BenchmarkUserCreate(b *testing.B) {

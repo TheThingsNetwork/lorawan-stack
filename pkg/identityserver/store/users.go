@@ -27,9 +27,6 @@ type UserStore interface {
 	// Delete deletes an user.
 	//Delete(userID string) error
 
-	// Archive sets the ArchivedAt field of an user to the current timestamp.
-	Archive(userID string) error
-
 	// LoadAttributes loads all user attributes if the User is an Attributer.
 	LoadAttributes(userID string, user types.User) error
 

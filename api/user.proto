@@ -46,9 +46,4 @@ message User {
   // updated_at is the last time the user was updated.
   // This is a read-only field.
   google.protobuf.Timestamp updated_at = 9 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-
-  // archived_at is the time when the user was archived and therefore
-  // permantly disabled.
-  // This is a read-only field.
-  google.protobuf.Timestamp archived_at = 10 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }

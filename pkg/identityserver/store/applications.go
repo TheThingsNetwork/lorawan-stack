@@ -30,9 +30,6 @@ type ApplicationStore interface {
 	// Delete deletes an application.
 	//Delete(appID string) error
 
-	// Archive sets the ArchivedAt field of the application to the current timestamp.
-	Archive(appID string) error
-
 	// AddAPIKey adds a new application API key to a given application.
 	AddAPIKey(appID string, key ttnpb.APIKey) error
 

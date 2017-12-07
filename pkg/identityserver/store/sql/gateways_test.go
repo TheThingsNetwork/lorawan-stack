@@ -241,18 +241,3 @@ func TestGatewayUpdate(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 }
-
-func TestGatewayArchive(t *testing.T) {
-	a := assertions.New(t)
-	s := testStore(t)
-
-	gtw := testGateways()["bob-gateway"]
-
-	err := s.Gateways.Archive(gtw.GatewayID)
-	a.So(err, should.BeNil)
-
-	found, err := s.Gateways.GetByID(gtw.GatewayID, gatewayFactory)
-	a.So(err, should.BeNil)
-
-	a.So(found.GetGateway().ArchivedAt.IsZero(), should.BeFalse)
-}

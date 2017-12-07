@@ -78,7 +78,6 @@ func ShouldBeGatewayIgnoringAutoFields(actual interface{}, expected ...interface
 		assertions.ShouldResemble(a.Antennas, b.Antennas),
 		assertions.ShouldResemble(a.Attributes, b.Attributes),
 		assertions.ShouldResemble(a.ClusterAddress, b.ClusterAddress),
-		assertions.ShouldBeTrue(a.ArchivedAt.Equal(b.ArchivedAt)),
 	)
 }
 

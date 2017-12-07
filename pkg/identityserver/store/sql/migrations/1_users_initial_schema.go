@@ -12,8 +12,7 @@ func init() {
 			validated_at   TIMESTAMP,
 			admin          BOOL DEFAULT false,
 			created_at     TIMESTAMP DEFAULT current_timestamp(),
-			updated_at     TIMESTAMP DEFAULT current_timestamp(),
-			archived_at    TIMESTAMP
+			updated_at     TIMESTAMP DEFAULT current_timestamp()
 		);
 		CREATE UNIQUE INDEX IF NOT EXISTS users_email ON users (email);
 	`

@@ -24,9 +24,6 @@ type ClientStore interface {
 	// Delete deletes a client.
 	//Delete(clientID string) error
 
-	// Archive sets the ArchivedAt field of the client to the current timestamp.
-	Archive(clientID string) error
-
 	// LoadAttributes loads extra attributes into the Client if it's an Attributer.
 	LoadAttributes(clientID string, client types.Client) error
 

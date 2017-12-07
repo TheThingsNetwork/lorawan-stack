@@ -68,18 +68,3 @@ func TestClientUpdate(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeClientIgnoringAutoFields, client)
 }
-
-func TestClientArchive(t *testing.T) {
-	a := assertions.New(t)
-	s := testStore(t)
-
-	client := testClients()["test-client"]
-
-	err := s.Clients.Archive(client.ClientID)
-	a.So(err, should.BeNil)
-
-	found, err := s.Clients.GetByID(client.ClientID, clientFactory)
-	a.So(err, should.BeNil)
-
-	a.So(found.GetClient().ArchivedAt.IsZero(), should.BeFalse)
-}

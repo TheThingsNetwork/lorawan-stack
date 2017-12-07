@@ -66,8 +66,7 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 				grants,
 				state,
 				rights,
-				official_labeled,
-				archived_at)
+				official_labeled)
 			VALUES (
 				:client_id,
 				:description,
@@ -76,8 +75,7 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 				:grants_converted,
 				:state,
 				:rights_converted,
-				:official_labeled,
-				:archived_at)`,
+				:official_labeled)`,
 		cli)
 
 	if _, yes := db.IsDuplicate(err); yes {
@@ -197,28 +195,6 @@ func (s *ClientStore) update(q db.QueryContext, client types.Client) error {
 		})
 	}
 
-	return err
-}
-
-// Archive disables a Client.
-func (s *ClientStore) Archive(clientID string) error {
-	return s.archive(s.queryer(), clientID)
-}
-
-func (s *ClientStore) archive(q db.QueryContext, clientID string) error {
-	var i string
-	err := q.SelectOne(
-		&i,
-		`UPDATE clients
-			SET archived_at = current_timestamp()
-			WHERE client_id = $1
-			RETURNING client_id`,
-		clientID)
-	if db.IsNoRows(err) {
-		return ErrClientNotFound.New(errors.Attributes{
-			"client_id": clientID,
-		})
-	}
 	return err
 }
 

@@ -54,11 +54,6 @@ message Client {
   // updated_at is the last time the client was updated.
   // This is a read-only field.
   google.protobuf.Timestamp updated_at = 11 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-
-  // archived_at is the time when the client was archived and therefore
-  // permantly disabled.
-  // This a read-only field.
-  google.protobuf.Timestamp archived_at = 12 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 // ReviewingState enum defines all the possible admin reviewing states that a

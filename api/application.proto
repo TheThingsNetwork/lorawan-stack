@@ -26,11 +26,6 @@ message Application {
   // updated_at is the last time the application was updated.
   // This is a read-only field.
   google.protobuf.Timestamp updated_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-
-  // archived_at is the time when the application was archived and therefore
-  // permantly disabled.
-  // This a read-only field.
-  google.protobuf.Timestamp archived_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 // ApplicationUp wraps multiple application-layer uplink types

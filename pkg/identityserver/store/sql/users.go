@@ -44,15 +44,13 @@ func (s *UserStore) create(q db.QueryContext, user types.User) error {
 				name,
 				email,
 				password,
-				validated_at,
-				archived_at)
+				validated_at)
 			VALUES (
 				lower(:user_id),
 				:name,
 				lower(:email),
 				:password,
-				:validated_at,
-				:archived_at)`,
+				:validated_at)`,
 		u)
 
 	if duplicates, yes := db.IsDuplicate(err); yes {
@@ -174,28 +172,6 @@ func (s *UserStore) update(q db.QueryContext, user types.User) error {
 		})
 	}
 
-	return err
-}
-
-// Archive sets the ArchivedAt field of an user to the current timestamp.
-func (s *UserStore) Archive(userID string) error {
-	return s.archive(s.queryer(), userID)
-}
-
-func (s *UserStore) archive(q db.QueryContext, userID string) error {
-	var i string
-	err := q.SelectOne(
-		&i,
-		`UPDATE users
-			SET archived_at = current_timestamp()
-			WHERE user_id = $1
-			RETURNING user_id`,
-		userID)
-	if db.IsNoRows(err) {
-		return ErrUserNotFound.New(errors.Attributes{
-			"user_id": userID,
-		})
-	}
 	return err
 }
 

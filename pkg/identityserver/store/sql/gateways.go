@@ -64,8 +64,7 @@ func (s *GatewayStore) create(q db.QueryContext, gateway types.Gateway) error {
 					privacy_settings,
 					auto_update,
 					platform,
-					cluster_address,
-					archived_at)
+					cluster_address)
 			VALUES (
 					:gateway_id,
 					:description,
@@ -74,8 +73,7 @@ func (s *GatewayStore) create(q db.QueryContext, gateway types.Gateway) error {
 					:privacy_settings,
 					:auto_update,
 					:platform,
-					:cluster_address,
-					:archived_at)`,
+					:cluster_address)`,
 		gtw)
 
 	if _, yes := db.IsDuplicate(err); yes {
@@ -315,28 +313,6 @@ func (s *GatewayStore) updateAntennas(q db.QueryContext, gtwID string, antennas 
 	}
 
 	return s.addAntennas(q, gtwID, antennas)
-}
-
-// Archive disables a Gateway.
-func (s *GatewayStore) Archive(gtwID string) error {
-	return s.archive(s.queryer(), gtwID)
-}
-
-func (s *GatewayStore) archive(q db.QueryContext, gtwID string) error {
-	var id string
-	err := q.SelectOne(
-		&id,
-		`UPDATE gateways
-			SET archived_at = current_timestamp()
-			WHERE gateway_id = $1
-			returning gateway_id`,
-		gtwID)
-	if db.IsNoRows(err) {
-		return ErrGatewayNotFound.New(errors.Attributes{
-			"gateway_id": gtwID,
-		})
-	}
-	return err
 }
 
 // updateAttributes removes the attributes that no longer exists for the gateway

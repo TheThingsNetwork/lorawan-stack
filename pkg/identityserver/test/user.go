@@ -73,6 +73,5 @@ func ShouldBeUserIgnoringAutoFields(actual interface{}, expected ...interface{})
 		assertions.ShouldEqual(a.Password, b.Password),
 		assertions.ShouldBeTrue(a.ValidatedAt.Equal(b.ValidatedAt)),
 		assertions.ShouldEqual(a.Admin, b.Admin),
-		assertions.ShouldBeTrue(a.ArchivedAt.Equal(b.ArchivedAt)),
 	)
 }
