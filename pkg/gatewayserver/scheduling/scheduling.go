@@ -108,6 +108,6 @@ func (f frequencyPlanScheduling) RegisterEmission(w Window, channel uint64) erro
 
 	subBand.mu.Lock()
 	defer subBand.mu.Unlock()
-	subBand.addScheduling(packetWindow{window: w, toa: w.timeOffAir(f.timeOffAir)})
+	subBand.addScheduling(packetWindow{window: w, timeOffAir: w.timeOffAir(f.timeOffAir)})
 	return nil
 }

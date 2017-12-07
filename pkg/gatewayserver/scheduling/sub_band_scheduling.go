@@ -13,14 +13,14 @@ import (
 const dutyCycleWindow = 5 * time.Minute
 
 type packetWindow struct {
-	window Window
-	toa    Window
+	window     Window
+	timeOffAir Window
 }
 
 func (w packetWindow) withTimeOffAir() Window {
 	return Window{
 		Start:    w.window.Start,
-		Duration: w.window.Duration + w.toa.Duration,
+		Duration: w.window.Duration + w.timeOffAir.Duration,
 	}
 }
 
@@ -73,7 +73,7 @@ func (s *subBandScheduling) Schedule(w Window, timeOffAir *ttnpb.FrequencyPlan_T
 }
 
 func (s *subBandScheduling) schedule(w Window, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) error {
-	windowWithTimeOffAir := packetWindow{window: w, toa: w.timeOffAir(timeOffAir)}
+	windowWithTimeOffAir := packetWindow{window: w, timeOffAir: w.timeOffAir(timeOffAir)}
 
 	emissionWindows := []Window{w}
 
@@ -157,6 +157,6 @@ func firstMomentConsideringDutyCycle(windows []Window, dutyCycle float32, minimu
 
 func createPacketWindow(start time.Time, duration time.Duration, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) packetWindow {
 	window := Window{Start: start, Duration: duration}
-	finalEmissionWindow := packetWindow{window: window, toa: window.timeOffAir(timeOffAir)}
+	finalEmissionWindow := packetWindow{window: window, timeOffAir: window.timeOffAir(timeOffAir)}
 	return finalEmissionWindow
 }
