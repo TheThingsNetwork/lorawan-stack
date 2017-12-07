@@ -10,6 +10,7 @@ import (
 	"github.com/RangelReale/osin"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/web"
 	"github.com/labstack/echo"
@@ -17,13 +18,14 @@ import (
 
 // Server represents an OAuth 2.0 Server.
 type Server struct {
+	logger     log.Interface
 	iss        string
 	oauth      *osin.Server
 	authorizer Authorizer
 }
 
 // New returns a new *Server that is ready to use.
-func New(iss string, store *sql.Store, authorizer Authorizer) *Server {
+func New(logger log.Interface, iss string, store *sql.Store, authorizer Authorizer) *Server {
 	config := &osin.ServerConfig{
 		AuthorizationExpiration:     60 * 5,  // 5 minutes
 		AccessExpiration:            60 * 60, // 1 hour
@@ -48,6 +50,7 @@ func New(iss string, store *sql.Store, authorizer Authorizer) *Server {
 	}
 
 	s := &Server{
+		logger:     logger,
 		iss:        iss,
 		oauth:      osin.NewServer(config, storage),
 		authorizer: authorizer,
@@ -92,7 +95,7 @@ func (s *Server) tokenHandler(c echo.Context) error {
 
 	ar := s.oauth.HandleAccessRequest(resp, req)
 	if ar == nil {
-		return output(c, resp)
+		return s.output(c, resp)
 	}
 
 	client := ar.Client.(types.Client).GetClient()
@@ -111,7 +114,7 @@ func (s *Server) tokenHandler(c echo.Context) error {
 
 	s.oauth.FinishAccessRequest(resp, req, ar)
 
-	return output(c, resp)
+	return s.output(c, resp)
 }
 
 func (s *Server) authorizationHandler(c echo.Context) error {
@@ -121,7 +124,7 @@ func (s *Server) authorizationHandler(c echo.Context) error {
 
 	ar := s.oauth.HandleAuthorizeRequest(resp, req)
 	if ar == nil {
-		return output(c, resp)
+		return s.output(c, resp)
 	}
 	client := ar.Client.(types.Client)
 
@@ -129,7 +132,7 @@ func (s *Server) authorizationHandler(c echo.Context) error {
 	if !client.GetClient().HasGrant(ttnpb.GRANT_AUTHORIZATION_CODE) {
 		resp.SetError(osin.E_INVALID_CLIENT, "")
 		s.oauth.FinishAuthorizeRequest(resp, req, ar)
-		return output(c, resp)
+		return s.output(c, resp)
 	}
 
 	scope, err := ParseScope(ar.Scope)
@@ -162,12 +165,20 @@ func (s *Server) authorizationHandler(c echo.Context) error {
 	ar.Authorized = authorized
 
 	s.oauth.FinishAuthorizeRequest(resp, req, ar)
-	return output(c, resp)
+	return s.output(c, resp)
 }
 
-func output(c echo.Context, resp *osin.Response) error {
+func (s *Server) output(c echo.Context, resp *osin.Response) error {
 	if resp.IsError && resp.InternalError != nil {
-		// TODO: log internal error
+		s.logger.WithError(resp.InternalError).WithFields(log.Fields(
+			"StatusCode", resp.StatusCode,
+			"StatusText", resp.StatusText,
+			"ErrorStatusCode", resp.ErrorStatusCode,
+			"URL", resp.URL,
+			"ErrorId", resp.ErrorId,
+			"Output", resp.Output,
+		)).Error("OAuth provider error when handling a request")
+
 		return echo.NewHTTPError(400, "Something went wrong")
 	}
 

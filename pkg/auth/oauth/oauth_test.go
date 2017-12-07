@@ -17,6 +17,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/TheThingsNetwork/ttn/pkg/web"
@@ -52,35 +53,29 @@ var (
 
 // cleanStore returns a new store instance attached to a newly created database
 // where all migrations has been applied and also has been feed with some users.
-func cleanStore(t testing.TB, database string) *sql.Store {
-	logger := test.GetLogger(t).WithField("tag", "OAuth")
-
+func cleanStore(logger log.Interface, database string) *sql.Store {
 	// open database connection
 	db, err := db.Open(context.Background(), fmt.Sprintf(address, database), migrations.Registry)
 	if err != nil {
 		logger.WithError(err).Fatal("Failed to establish a connection with the CockroachDB instance")
-		return nil
 	}
 
 	// drop database
 	_, err = db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE", database))
 	if err != nil {
 		logger.WithError(err).Fatalf("Failed to delete database `%s`", database)
-		return nil
 	}
 
 	// create it again
 	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s", database))
 	if err != nil {
 		logger.WithError(err).Fatalf("Failed to create database `%s`", database)
-		return nil
 	}
 
 	// apply all migrations
 	err = db.MigrateAll()
 	if err != nil {
 		logger.WithError(err).Fatal("Failed to apply the migrations from the registry")
-		return nil
 	}
 
 	return sql.FromDB(db)
@@ -92,7 +87,7 @@ func testServer(t *testing.T) *web.Server {
 	a := assertions.New(t)
 
 	if s == nil {
-		store := cleanStore(t, database)
+		store := cleanStore(logger, database)
 
 		err := store.Clients.Create(client)
 		a.So(err, should.BeNil)
@@ -107,7 +102,7 @@ func testServer(t *testing.T) *web.Server {
 		s = store
 	}
 
-	server := New(issuer, s, authorizer)
+	server := New(logger, issuer, s, authorizer)
 
 	mux := web.New(logger)
 	server.Register(mux)
