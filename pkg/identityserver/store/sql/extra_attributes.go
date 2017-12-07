@@ -50,13 +50,13 @@ func (s *extraAttributesStore) loadAttributes(q db.QueryContext, entityID string
 	return nil
 }
 
-// WriteAttributes writes the extra attributes on the Application if it is an
+// StoreAttributes writes the extra attributes on the Application if it is an
 // Attributer to the store.
-func (s *extraAttributesStore) WriteAttributes(entityID string, attributer, result store.Attributer) error {
-	return s.writeAttributes(s.queryer(), entityID, attributer, result)
+func (s *extraAttributesStore) StoreAttributes(entityID string, attributer, result store.Attributer) error {
+	return s.storeAttributes(s.queryer(), entityID, attributer, result)
 }
 
-func (s *extraAttributesStore) writeAttributes(q db.QueryContext, entityID string, attributer, result store.Attributer) error {
+func (s *extraAttributesStore) storeAttributes(q db.QueryContext, entityID string, attributer, result store.Attributer) error {
 	for _, namespace := range attributer.Namespaces() {
 		m := attributer.Attributes(namespace)
 		values := make([]interface{}, 0, len(m)+1)

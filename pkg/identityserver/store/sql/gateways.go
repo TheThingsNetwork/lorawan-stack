@@ -47,7 +47,7 @@ func (s *GatewayStore) Create(gateway types.Gateway) error {
 			return err
 		}
 
-		return s.writeAttributes(tx, gtw.GatewayID, gateway, nil)
+		return s.storeAttributes(tx, gtw.GatewayID, gateway, nil)
 	})
 	return err
 }
@@ -275,7 +275,7 @@ func (s *GatewayStore) Update(gateway types.Gateway) error {
 			return err
 		}
 
-		return s.writeAttributes(tx, gtw.GatewayID, gateway, nil)
+		return s.storeAttributes(tx, gtw.GatewayID, gateway, nil)
 	})
 	return err
 }
@@ -623,21 +623,21 @@ func (s *GatewayStore) loadAttributes(q db.QueryContext, gtwID string, gtw types
 	return nil
 }
 
-// WriteAttributes store the extra attributes of gtw if it is a store.Attributer
+// StoreAttributes store the extra attributes of gtw if it is a store.Attributer
 // and writes the resulting gateway in result.
-func (s *GatewayStore) WriteAttributes(gtwID string, gtw, result types.Gateway) error {
-	return s.writeAttributes(s.queryer(), gtwID, gtw, result)
+func (s *GatewayStore) StoreAttributes(gtwID string, gtw, result types.Gateway) error {
+	return s.storeAttributes(s.queryer(), gtwID, gtw, result)
 }
 
-func (s *GatewayStore) writeAttributes(q db.QueryContext, gtwID string, gtw, result types.Gateway) error {
+func (s *GatewayStore) storeAttributes(q db.QueryContext, gtwID string, gtw, result types.Gateway) error {
 	attr, ok := gtw.(store.Attributer)
 	if ok {
 		res, ok := result.(store.Attributer)
 		if result == nil || !ok {
-			return s.extraAttributesStore.writeAttributes(q, gtwID, attr, nil)
+			return s.extraAttributesStore.storeAttributes(q, gtwID, attr, nil)
 		}
 
-		return s.extraAttributesStore.writeAttributes(q, gtwID, attr, res)
+		return s.extraAttributesStore.storeAttributes(q, gtwID, attr, res)
 	}
 
 	return nil

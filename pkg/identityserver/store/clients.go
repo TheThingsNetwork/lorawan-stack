@@ -30,7 +30,7 @@ type ClientStore interface {
 	// LoadAttributes loads extra attributes into the Client if it's an Attributer.
 	LoadAttributes(clientID string, client types.Client) error
 
-	// WriteAttributes writes the extra attributes on the Client if it's an
+	// StoreAttributes writes the extra attributes on the Client if it's an
 	// Attributer to the store.
-	WriteAttributes(clientID string, client, result types.Client) error
+	StoreAttributes(clientID string, client, result types.Client) error
 }

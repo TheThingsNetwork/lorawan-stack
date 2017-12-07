@@ -30,7 +30,7 @@ func (s *ClientStore) Create(client types.Client) error {
 			return err
 		}
 
-		return s.writeAttributes(tx, client.GetClient().ClientID, client, nil)
+		return s.storeAttributes(tx, client.GetClient().ClientID, client, nil)
 	})
 	return err
 }
@@ -112,7 +112,7 @@ func (s *ClientStore) Update(client types.Client) error {
 			return err
 		}
 
-		return s.writeAttributes(tx, client.GetClient().ClientID, client, nil)
+		return s.storeAttributes(tx, client.GetClient().ClientID, client, nil)
 	})
 	return err
 }
@@ -179,21 +179,21 @@ func (s *ClientStore) loadAttributes(q db.QueryContext, clientID string, cli typ
 	return nil
 }
 
-// WriteAttributes store the extra attributes of cli if it is a store.Attributer
+// StoreAttributes store the extra attributes of cli if it is a store.Attributer
 // and writes the resulting application in result.
-func (s *ClientStore) WriteAttributes(clientID string, cli, result types.Client) error {
-	return s.writeAttributes(s.queryer(), clientID, cli, result)
+func (s *ClientStore) StoreAttributes(clientID string, cli, result types.Client) error {
+	return s.storeAttributes(s.queryer(), clientID, cli, result)
 }
 
-func (s *ClientStore) writeAttributes(q db.QueryContext, clientID string, cli, result types.Client) error {
+func (s *ClientStore) storeAttributes(q db.QueryContext, clientID string, cli, result types.Client) error {
 	attr, ok := cli.(store.Attributer)
 	if ok {
 		res, ok := result.(store.Attributer)
 		if result == nil || !ok {
-			return s.extraAttributesStore.writeAttributes(q, clientID, attr, nil)
+			return s.extraAttributesStore.storeAttributes(q, clientID, attr, nil)
 		}
 
-		return s.extraAttributesStore.writeAttributes(q, clientID, attr, res)
+		return s.extraAttributesStore.storeAttributes(q, clientID, attr, res)
 	}
 
 	return nil

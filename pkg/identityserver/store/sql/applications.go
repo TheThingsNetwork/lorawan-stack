@@ -34,7 +34,7 @@ func (s *ApplicationStore) Create(application types.Application) error {
 			return err
 		}
 
-		return s.writeAttributes(tx, application.GetApplication().ApplicationID, application, nil)
+		return s.storeAttributes(tx, application.GetApplication().ApplicationID, application, nil)
 	})
 	return err
 }
@@ -163,7 +163,7 @@ func (s *ApplicationStore) Update(application types.Application) error {
 			return err
 		}
 
-		return s.writeAttributes(tx, application.GetApplication().ApplicationID, application, nil)
+		return s.storeAttributes(tx, application.GetApplication().ApplicationID, application, nil)
 	})
 	return err
 }
@@ -498,21 +498,21 @@ func (s *ApplicationStore) loadAttributes(q db.QueryContext, appID string, app t
 	return nil
 }
 
-// WriteAttributes store the extra attributes of app if it is a store.Attributer
+// StoreAttributes store the extra attributes of app if it is a store.Attributer
 // and writes the resulting application in result.
-func (s *ApplicationStore) WriteAttributes(appID string, app, result types.Application) error {
-	return s.writeAttributes(s.queryer(), appID, app, result)
+func (s *ApplicationStore) StoreAttributes(appID string, app, result types.Application) error {
+	return s.storeAttributes(s.queryer(), appID, app, result)
 }
 
-func (s *ApplicationStore) writeAttributes(q db.QueryContext, appID string, app, result types.Application) error {
+func (s *ApplicationStore) storeAttributes(q db.QueryContext, appID string, app, result types.Application) error {
 	attr, ok := app.(store.Attributer)
 	if ok {
 		res, ok := result.(store.Attributer)
 		if result == nil || !ok {
-			return s.extraAttributesStore.writeAttributes(q, appID, attr, nil)
+			return s.extraAttributesStore.storeAttributes(q, appID, attr, nil)
 		}
 
-		return s.extraAttributesStore.writeAttributes(q, appID, attr, res)
+		return s.extraAttributesStore.storeAttributes(q, appID, attr, res)
 	}
 
 	return nil

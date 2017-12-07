@@ -30,7 +30,7 @@ func (s *UserStore) Create(user types.User) error {
 			return err
 		}
 
-		return s.writeAttributes(tx, user.GetUser().UserID, user, nil)
+		return s.storeAttributes(tx, user.GetUser().UserID, user, nil)
 	})
 	return err
 }
@@ -149,7 +149,7 @@ func (s *UserStore) Update(user types.User) error {
 			return err
 		}
 
-		return s.writeAttributes(s.queryer(), user.GetUser().UserID, user, nil)
+		return s.storeAttributes(s.queryer(), user.GetUser().UserID, user, nil)
 	})
 	return err
 }
@@ -213,21 +213,21 @@ func (s *UserStore) loadAttributes(q db.QueryContext, userID string, user types.
 	return nil
 }
 
-// WriteAttributes store the extra attributes of user if it is a store.Attributer
+// StoreAttributes store the extra attributes of user if it is a store.Attributer
 // and writes the resulting user in result.
-func (s *UserStore) WriteAttributes(userID string, user, result types.User) error {
-	return s.writeAttributes(s.queryer(), userID, user, result)
+func (s *UserStore) StoreAttributes(userID string, user, result types.User) error {
+	return s.storeAttributes(s.queryer(), userID, user, result)
 }
 
-func (s *UserStore) writeAttributes(q db.QueryContext, userID string, user, result types.User) error {
+func (s *UserStore) storeAttributes(q db.QueryContext, userID string, user, result types.User) error {
 	attr, ok := user.(store.Attributer)
 	if ok {
 		res, ok := result.(store.Attributer)
 		if result == nil || !ok {
-			return s.extraAttributesStore.writeAttributes(q, userID, attr, nil)
+			return s.extraAttributesStore.storeAttributes(q, userID, attr, nil)
 		}
 
-		return s.extraAttributesStore.writeAttributes(q, userID, attr, res)
+		return s.extraAttributesStore.storeAttributes(q, userID, attr, res)
 	}
 
 	return nil

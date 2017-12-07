@@ -33,7 +33,7 @@ type UserStore interface {
 	// LoadAttributes loads all user attributes if the User is an Attributer.
 	LoadAttributes(userID string, user types.User) error
 
-	// WriteAttributes writes all of the user attributes if the User is an
+	// StoreAttributes writes all of the user attributes if the User is an
 	// Attributer and returns the written User in result.
-	WriteAttributes(userID string, user, result types.User) error
+	StoreAttributes(userID string, user, result types.User) error
 }

@@ -46,7 +46,7 @@ type GatewayStore interface {
 	// LoadAttributes loads extra attributes into the gateway if it's an Attributer.
 	LoadAttributes(gtwID string, gtw types.Gateway) error
 
-	// WriteAttributes writes the extra attributes on the gatewat if it's an
+	// StoreAttributes writes the extra attributes on the gatewat if it's an
 	// Attributer to the store.
-	WriteAttributes(gtwID string, gtw, res types.Gateway) error
+	StoreAttributes(gtwID string, gtw, res types.Gateway) error
 }

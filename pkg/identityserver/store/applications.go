@@ -52,7 +52,7 @@ type ApplicationStore interface {
 	// LoadAttributes loads extra attributes into the Application.
 	LoadAttributes(appID string, app types.Application) error
 
-	// WriteAttributes writes the extra attributes on the Application if it is an
+	// StoreAttributes writes the extra attributes on the Application if it is an
 	// Attributer to the store.
-	WriteAttributes(appID string, app, result types.Application) error
+	StoreAttributes(appID string, app, result types.Application) error
 }
