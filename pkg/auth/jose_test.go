@@ -5,23 +5,63 @@ package auth
 import (
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/apikey"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
-func TestJOSEHeader(t *testing.T) {
+func TestJOSEEncoding(t *testing.T) {
 	a := assertions.New(t)
 
-	// apikey
-	key, err := apikey.GenerateApplicationAPIKey("")
-	a.So(err, should.BeNil)
-	a.So(key, should.NotBeEmpty)
+	// Access Token
+	{
+		key, err := GenerateAccessToken("local")
+		a.So(err, should.BeNil)
+		a.So(key, should.NotBeEmpty)
 
-	header, err := JOSEHeader(key)
-	a.So(err, should.BeNil)
-	a.So(header, should.Resemble, &Header{
-		Type:      apikey.Type,
-		Algorithm: "secret",
-	})
+		header, payload, err := Decode(key)
+		a.So(err, should.BeNil)
+		a.So(header, should.Resemble, &Header{
+			Type:      typeToken,
+			Algorithm: alg,
+		})
+		a.So(payload, should.Resemble, &Payload{
+			Issuer: "local",
+		})
+	}
+
+	// Application API Key
+	{
+		key, err := GenerateApplicationAPIKey("foo.issuer")
+		a.So(err, should.BeNil)
+		a.So(key, should.NotBeEmpty)
+
+		header, payload, err := Decode(key)
+		a.So(err, should.BeNil)
+		a.So(header, should.Resemble, &Header{
+			Type:      typeKey,
+			Algorithm: alg,
+		})
+		a.So(payload, should.Resemble, &Payload{
+			Issuer: "foo.issuer",
+			Type:   typeApplication,
+		})
+	}
+
+	// Gateway API Key
+	{
+		key, err := GenerateGatewayAPIKey("")
+		a.So(err, should.BeNil)
+		a.So(key, should.NotBeEmpty)
+
+		header, payload, err := Decode(key)
+		a.So(err, should.BeNil)
+		a.So(header, should.Resemble, &Header{
+			Type:      typeKey,
+			Algorithm: alg,
+		})
+		a.So(payload, should.Resemble, &Payload{
+			Issuer: "",
+			Type:   typeGateway,
+		})
+	}
 }
