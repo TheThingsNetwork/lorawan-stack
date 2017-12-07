@@ -16,7 +16,7 @@ func init() {
 		);
 
 		CREATE TABLE IF NOT EXISTS access_tokens (
-			access_token    STRING(64) PRIMARY KEY,
+			access_token    STRING PRIMARY KEY,
 			client_id       STRING(36) REFERENCES clients(client_id) NOT NULL,
 			user_id         STRING(36) REFERENCES users(user_id) NOT NULL,
 			created_at      TIMESTAMP DEFAULT current_timestamp(),
