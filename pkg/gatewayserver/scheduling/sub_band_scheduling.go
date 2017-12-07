@@ -13,12 +13,12 @@ import (
 const dutyCycleWindow = 5 * time.Minute
 
 type packetWindow struct {
-	window     Window
-	timeOffAir Window
+	window     Span
+	timeOffAir Span
 }
 
-func (w packetWindow) withTimeOffAir() Window {
-	return Window{
+func (w packetWindow) withTimeOffAir() Span {
+	return Span{
 		Start:    w.window.Start,
 		Duration: w.window.Duration + w.timeOffAir.Duration,
 	}
@@ -61,17 +61,17 @@ func (s *subBandScheduling) addScheduling(w packetWindow) {
 }
 
 // Schedule adds the requested time window to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns ErrScheduleFull. If another error prevents scheduling, it is returned.
-func (s *subBandScheduling) Schedule(w Window, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) error {
+func (s *subBandScheduling) Schedule(w Span, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	err := s.schedule(w, timeOffAir)
 	return err
 }
 
-func (s *subBandScheduling) schedule(w Window, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) error {
+func (s *subBandScheduling) schedule(w Span, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) error {
 	windowWithTimeOffAir := packetWindow{window: w, timeOffAir: w.timeOffAir(timeOffAir)}
 
-	emissionWindows := []Window{w}
+	emissionWindows := []Span{w}
 
 	for _, scheduledWindow := range s.schedulingWindows {
 		emissionWindows = append(emissionWindows, scheduledWindow.window)
@@ -84,8 +84,8 @@ func (s *subBandScheduling) schedule(w Window, timeOffAir *ttnpb.FrequencyPlan_T
 		}
 	}
 
-	precedingWindowsAirtime := windowDurationSum(emissionWindows, w.End().Add(-1*dutyCycleWindow), w.End())
-	prolongingWindowsAirtime := windowDurationSum(emissionWindows, w.Start, w.Start.Add(dutyCycleWindow))
+	precedingWindowsAirtime := spanDurationSum(emissionWindows, w.End().Add(-1*dutyCycleWindow), w.End())
+	prolongingWindowsAirtime := spanDurationSum(emissionWindows, w.Start, w.Start.Add(dutyCycleWindow))
 
 	if prolongingWindowsAirtime > s.dutyCycle.MaxEmissionDuring(dutyCycleWindow) ||
 		precedingWindowsAirtime > s.dutyCycle.MaxEmissionDuring(dutyCycleWindow) {
@@ -98,10 +98,10 @@ func (s *subBandScheduling) schedule(w Window, timeOffAir *ttnpb.FrequencyPlan_T
 }
 
 // ScheduleFlexible requires a scheduling window if there is no time.Time constraint
-func (s *subBandScheduling) ScheduleFlexible(minimum time.Time, d time.Duration, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) (Window, error) {
+func (s *subBandScheduling) ScheduleFlexible(minimum time.Time, d time.Duration, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) (Span, error) {
 	var addMinimum = true
 	potentialTimings := []time.Time{}
-	emissionWindows := []Window{}
+	emissionWindows := []Span{}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -125,7 +125,7 @@ func (s *subBandScheduling) ScheduleFlexible(minimum time.Time, d time.Duration,
 
 	var potentialTiming time.Time
 	for _, potentialTiming = range potentialTimings {
-		w := Window{Start: potentialTiming, Duration: d}
+		w := Span{Start: potentialTiming, Duration: d}
 		err := s.schedule(w, timeOffAir)
 		if err != nil {
 			continue
@@ -135,16 +135,16 @@ func (s *subBandScheduling) ScheduleFlexible(minimum time.Time, d time.Duration,
 	}
 
 	start := firstMomentConsideringDutyCycle(emissionWindows, s.dutyCycle.DutyCycle, potentialTiming, d)
-	w := Window{Start: start, Duration: d}
+	w := Span{Start: start, Duration: d}
 	err := s.schedule(w, timeOffAir)
 	return w, err
 }
 
-func firstMomentConsideringDutyCycle(windows []Window, dutyCycle float32, minimum time.Time, duration time.Duration) time.Time {
+func firstMomentConsideringDutyCycle(spans []Span, dutyCycle float32, minimum time.Time, duration time.Duration) time.Time {
 	maxAirtime := time.Duration(dutyCycle * float32(dutyCycleWindow))
-	lastWindow := windows[len(windows)-1]
+	lastWindow := spans[len(spans)-1]
 
-	precedingWindowsAirtime := windowDurationSum(windows, minimum.Add(-1*dutyCycleWindow).Add(duration), minimum.Add(duration)) + duration
+	precedingWindowsAirtime := spanDurationSum(spans, minimum.Add(-1*dutyCycleWindow).Add(duration), minimum.Add(duration)) + duration
 
 	margin := maxAirtime - (precedingWindowsAirtime - duration)
 	minimum = lastWindow.Start.Add(-1 * margin).Add(dutyCycleWindow)
@@ -152,7 +152,7 @@ func firstMomentConsideringDutyCycle(windows []Window, dutyCycle float32, minimu
 }
 
 func createPacketWindow(start time.Time, duration time.Duration, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) packetWindow {
-	window := Window{Start: start, Duration: duration}
+	window := Span{Start: start, Duration: duration}
 	finalEmissionWindow := packetWindow{window: window, timeOffAir: window.timeOffAir(timeOffAir)}
 	return finalEmissionWindow
 }

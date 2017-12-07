@@ -8,99 +8,99 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-// Window is a time window requested for usage by the consumer entity.
-type Window struct {
+// Span is a time window requested for usage by the consumer entity.
+type Span struct {
 	Start    time.Time
 	Duration time.Duration
 }
 
-// End returns the timestamp at which the window ends
-func (w Window) End() time.Time {
-	return w.Start.Add(w.Duration)
+// End returns the timestamp at which the timespan ends
+func (s Span) End() time.Time {
+	return s.Start.Add(s.Duration)
 }
 
-// Precedes returns true if a portion of the window is located before the window passed as a parameter
-func (w Window) Precedes(newW Window) bool {
-	return w.Start.Before(newW.Start)
+// Precedes returns true if a portion of the timespan is located before the span passed as a parameter
+func (s Span) Precedes(newS Span) bool {
+	return s.Start.Before(newS.Start)
 }
 
-// Contains returns true if the given time is contained between the beginning and the end of this window
-func (w Window) Contains(ts time.Time) bool {
-	if ts.Before(w.Start) {
+// Contains returns true if the given time is contained between the beginning and the end of this timespan
+func (s Span) Contains(ts time.Time) bool {
+	if ts.Before(s.Start) {
 		return false
 	}
-	if ts.After(w.End()) {
+	if ts.After(s.End()) {
 		return false
 	}
 	return true
 }
 
-// IsProlongedBy returns true if after the window ends, there is still a portion of the window passed as parameter
-func (w Window) IsProlongedBy(newW Window) bool {
-	return w.End().Before(newW.End())
+// IsProlongedBy returns true if after the span ends, there is still a portion of the span passed as parameter
+func (s Span) IsProlongedBy(newS Span) bool {
+	return s.End().Before(newS.End())
 }
 
-// Overlaps returns true if the two time windows overlap
-func (w Window) Overlaps(newW Window) bool {
-	if newW.End().Before(w.Start) || newW.End() == w.Start {
+// Overlaps returns true if the two timespans overlap
+func (s Span) Overlaps(newS Span) bool {
+	if newS.End().Before(s.Start) || newS.End() == s.Start {
 		return false
 	}
 
-	if w.End().Before(newW.Start) || w.End() == newW.Start {
+	if s.End().Before(newS.Start) || s.End() == newS.Start {
 		return false
 	}
 
 	return true
 }
 
-func filterWithinInterval(windows []Window, start, end time.Time) []Window {
-	filteredWindows := []Window{}
+func filterWithinInterval(spans []Span, start, end time.Time) []Span {
+	filteredSpans := []Span{}
 
-	for _, window := range windows {
-		if window.End().Before(start) || window.Start.After(end) {
+	for _, span := range spans {
+		if span.End().Before(start) || span.Start.After(end) {
 			continue
 		}
 
-		filteredWindows = append(filteredWindows, window)
+		filteredSpans = append(filteredSpans, span)
 	}
 
-	return filteredWindows
+	return filteredSpans
 }
 
-// windowDurationSum takes an array of non-overlapping windows, a start and an end time, and determines the sum of the duration of these windows within the interval determined by start and end.
-func windowDurationSum(windows []Window, start, end time.Time) time.Duration {
+// spanDurationSum takes an array of non-overlapping spans, a start and an end time, and determines the sum of the duration of these spans within the interval determined by start and end.
+func spanDurationSum(spans []Span, start, end time.Time) time.Duration {
 	var duration time.Duration
 
-	windows = filterWithinInterval(windows, start, end)
-	for _, window := range windows {
-		windowInterval := struct {
+	spans = filterWithinInterval(spans, start, end)
+	for _, span := range spans {
+		spanInterval := struct {
 			start, end time.Time
-		}{start: window.Start, end: window.End()}
+		}{start: span.Start, end: span.End()}
 
-		if windowInterval.start.Before(start) {
-			windowInterval.start = start
+		if spanInterval.start.Before(start) {
+			spanInterval.start = start
 		}
-		if windowInterval.end.After(end) {
-			windowInterval.end = end
+		if spanInterval.end.After(end) {
+			spanInterval.end = end
 		}
 
-		duration = duration + windowInterval.end.Sub(windowInterval.start)
+		duration = duration + spanInterval.end.Sub(spanInterval.start)
 	}
 
 	return duration
 }
 
-func (w Window) timeOffAir(timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) (timeOffAirWindow Window) {
-	timeOffAirWindow = Window{Start: w.End(), Duration: 0}
+func (s Span) timeOffAir(timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) (timeOffAirSpan Span) {
+	timeOffAirSpan = Span{Start: s.End(), Duration: 0}
 
 	if timeOffAir == nil {
 		return
 	}
 
-	timeOffAirWindow.Duration = time.Duration(timeOffAir.Fraction * float32(w.Duration))
+	timeOffAirSpan.Duration = time.Duration(timeOffAir.Fraction * float32(s.Duration))
 	if timeOffAir.Duration != nil {
-		if *timeOffAir.Duration > timeOffAirWindow.Duration {
-			timeOffAirWindow.Duration = *timeOffAir.Duration
+		if *timeOffAir.Duration > timeOffAirSpan.Duration {
+			timeOffAirSpan.Duration = *timeOffAir.Duration
 		}
 	}
 

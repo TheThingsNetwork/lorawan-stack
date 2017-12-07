@@ -30,11 +30,11 @@ func TestEmptyScheduler(t *testing.T) {
 	_, err = s.ScheduleFlexible(askingTime, askingDuration, 0)
 	a.So(err, should.NotBeNil)
 
-	w := scheduling.Window{Start: askingTime, Duration: askingDuration}
-	err = s.RegisterEmission(w, 0)
+	span := scheduling.Span{Start: askingTime, Duration: askingDuration}
+	err = s.RegisterEmission(span, 0)
 	a.So(err, should.NotBeNil)
 
-	err = s.Schedule(w, 0)
+	err = s.Schedule(span, 0)
 	a.So(err, should.NotBeNil)
 }
 
@@ -55,7 +55,7 @@ func TestDwellTimeBlocking(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	err = s.Schedule(scheduling.Window{Start: time.Now(), Duration: time.Minute}, 0)
+	err = s.Schedule(scheduling.Span{Start: time.Now(), Duration: time.Minute}, 0)
 	a.So(err, should.NotBeNil)
 }
 
@@ -68,7 +68,7 @@ func TestScheduleFlexible(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	askingTime := time.Now()
-	err = s.Schedule(scheduling.Window{Start: askingTime, Duration: time.Microsecond}, 863000000)
+	err = s.Schedule(scheduling.Span{Start: askingTime, Duration: time.Microsecond}, 863000000)
 	a.So(err, should.BeNil)
 
 	schedule, err := s.ScheduleFlexible(askingTime.Add(time.Hour), time.Microsecond, 863000000)
@@ -89,7 +89,7 @@ func TestScheduleFlexible2(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	askingTime := time.Now()
-	err = s.Schedule(scheduling.Window{Start: askingTime, Duration: time.Microsecond}, 863000000)
+	err = s.Schedule(scheduling.Span{Start: askingTime, Duration: time.Microsecond}, 863000000)
 	a.So(err, should.BeNil)
 
 	schedule, err := s.ScheduleFlexible(askingTime.Add(time.Hour), time.Microsecond, 863000000)
@@ -113,7 +113,7 @@ func TestScheduleFlexibleFullDutyCycle(t *testing.T) {
 
 	askingTime := time.Now()
 	scheduleDuration := time.Duration(180 * time.Millisecond)
-	err = s.Schedule(scheduling.Window{Start: askingTime, Duration: scheduleDuration}, 863000000)
+	err = s.Schedule(scheduling.Span{Start: askingTime, Duration: scheduleDuration}, 863000000)
 	a.So(err, should.BeNil)
 
 	schedule, err := s.ScheduleFlexible(askingTime, scheduleDuration, 863000000)
@@ -139,7 +139,7 @@ func TestScheduleFlexibleFullDutyCycleAfterRegisteredEmission(t *testing.T) {
 
 	askingTime := time.Now()
 	scheduleDuration := time.Duration(180 * time.Millisecond)
-	err = s.RegisterEmission(scheduling.Window{Start: askingTime, Duration: scheduleDuration}, 863000000)
+	err = s.RegisterEmission(scheduling.Span{Start: askingTime, Duration: scheduleDuration}, 863000000)
 	a.So(err, should.BeNil)
 
 	schedule, err := s.ScheduleFlexible(askingTime, scheduleDuration, 863000000)
@@ -159,16 +159,16 @@ func TestScheduleFullDutyCycle(t *testing.T) {
 
 	askingTime := time.Now()
 	scheduleDuration := time.Duration(180 * time.Millisecond)
-	err = s.Schedule(scheduling.Window{Start: askingTime, Duration: scheduleDuration}, 863000000)
+	err = s.Schedule(scheduling.Span{Start: askingTime, Duration: scheduleDuration}, 863000000)
 	a.So(err, should.BeNil)
 
-	err = s.Schedule(scheduling.Window{Start: askingTime, Duration: scheduleDuration}, 863000000)
+	err = s.Schedule(scheduling.Span{Start: askingTime, Duration: scheduleDuration}, 863000000)
 	a.So(err, should.NotBeNil)
 
-	err = s.Schedule(scheduling.Window{Start: askingTime.Add(200 * time.Millisecond), Duration: scheduleDuration}, 863000000)
+	err = s.Schedule(scheduling.Span{Start: askingTime.Add(200 * time.Millisecond), Duration: scheduleDuration}, 863000000)
 	a.So(err, should.NotBeNil)
 
-	err = s.Schedule(scheduling.Window{Start: askingTime.Add(5 * time.Minute).Add(-120 * time.Millisecond), Duration: scheduleDuration}, 863000000)
+	err = s.Schedule(scheduling.Span{Start: askingTime.Add(5 * time.Minute).Add(-120 * time.Millisecond), Duration: scheduleDuration}, 863000000)
 	a.So(err, should.BeNil)
 }
 
@@ -183,14 +183,14 @@ func TestScheduleOrdering(t *testing.T) {
 	askingTime := time.Now().Add(time.Minute)
 	scheduleDuration := time.Duration(time.Millisecond)
 
-	w, err := s.ScheduleFlexible(askingTime, scheduleDuration, 863000000)
+	s, err := s.ScheduleFlexible(askingTime, scheduleDuration, 863000000)
 	a.So(err, should.BeNil)
-	a.So(w.Start, should.Equal, askingTime)
+	a.So(s.Start, should.Equal, askingTime)
 
-	err = s.Schedule(scheduling.Window{Start: askingTime.Add(time.Second), Duration: scheduleDuration}, 863000000)
+	err = s.Schedule(scheduling.Span{Start: askingTime.Add(time.Second), Duration: scheduleDuration}, 863000000)
 	a.So(err, should.BeNil)
 
-	err = s.Schedule(scheduling.Window{Start: askingTime.Add(50 * scheduleDuration), Duration: scheduleDuration}, 863000000)
+	err = s.Schedule(scheduling.Span{Start: askingTime.Add(50 * scheduleDuration), Duration: scheduleDuration}, 863000000)
 	a.So(err, should.BeNil)
 }
 
@@ -208,9 +208,9 @@ func TestTimeOffAirError(t *testing.T) {
 
 	askingTime := time.Now()
 	scheduleDuration := time.Duration(60 * time.Millisecond)
-	err = s.Schedule(scheduling.Window{Start: askingTime, Duration: scheduleDuration}, 863000000)
+	err = s.Schedule(scheduling.Span{Start: askingTime, Duration: scheduleDuration}, 863000000)
 	a.So(err, should.BeNil)
 
-	err = s.Schedule(scheduling.Window{Start: askingTime.Add(90 * time.Millisecond), Duration: scheduleDuration}, 863000000)
+	err = s.Schedule(scheduling.Span{Start: askingTime.Add(90 * time.Millisecond), Duration: scheduleDuration}, 863000000)
 	a.So(err, should.NotBeNil)
 }

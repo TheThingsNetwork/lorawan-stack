@@ -15,7 +15,7 @@ func TestWindowDurationSum(t *testing.T) {
 
 	startingTime := time.Now()
 
-	windows := []Window{
+	spans := []Span{
 		{
 			Start:    startingTime.Add(-1 * time.Second),
 			Duration: 2 * time.Second,
@@ -33,6 +33,6 @@ func TestWindowDurationSum(t *testing.T) {
 			Duration: time.Second,
 		},
 	}
-	durationSum := windowDurationSum(windows, startingTime, startingTime.Add(3*time.Second))
+	durationSum := spanDurationSum(spans, startingTime, startingTime.Add(3*time.Second))
 	a.So(durationSum, should.Equal, 2*time.Second)
 }

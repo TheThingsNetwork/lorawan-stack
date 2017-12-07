@@ -15,19 +15,19 @@ func TestWindowTiming(t *testing.T) {
 	a := assertions.New(t)
 
 	testingTime := time.Now()
-	w := Window{
+	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
 	}
 
-	a.So(w.End(), should.Equal, testingTime.Add(time.Second))
+	a.So(s.End(), should.Equal, testingTime.Add(time.Second))
 }
 
 func TestWindowContains(t *testing.T) {
 	a := assertions.New(t)
 
 	testingTime := time.Now()
-	w := Window{
+	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
 	}
@@ -43,7 +43,7 @@ func TestWindowContains(t *testing.T) {
 	}
 
 	for compared, result := range comparisons {
-		a.So(w.Contains(compared), should.Equal, result)
+		a.So(s.Contains(compared), should.Equal, result)
 	}
 }
 
@@ -51,12 +51,12 @@ func TestPrecedingComparison(t *testing.T) {
 	a := assertions.New(t)
 
 	testingTime := time.Now()
-	w := Window{
+	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
 	}
 
-	comparisons := map[Window]bool{
+	comparisons := map[Span]bool{
 		{Start: testingTime.Add(-1 * time.Second), Duration: 2 * time.Second}:  true,
 		{Start: testingTime.Add(-1 * time.Second), Duration: time.Millisecond}: true,
 		{Start: testingTime.Add(-1 * time.Second), Duration: time.Minute}:      true,
@@ -75,7 +75,7 @@ func TestPrecedingComparison(t *testing.T) {
 	}
 
 	for compared, result := range comparisons {
-		a.So(compared.Precedes(w), should.Equal, result)
+		a.So(compared.Precedes(s), should.Equal, result)
 	}
 }
 
@@ -83,12 +83,12 @@ func TestIsProlongedByComparison(t *testing.T) {
 	a := assertions.New(t)
 
 	testingTime := time.Now()
-	w := Window{
+	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
 	}
 
-	comparisons := map[Window]bool{
+	comparisons := map[Span]bool{
 		{Start: testingTime.Add(-1 * time.Second), Duration: 2 * time.Second}:  false,
 		{Start: testingTime.Add(-1 * time.Second), Duration: time.Millisecond}: false,
 		{Start: testingTime.Add(-1 * time.Second), Duration: time.Minute}:      true,
@@ -107,7 +107,7 @@ func TestIsProlongedByComparison(t *testing.T) {
 	}
 
 	for compared, result := range comparisons {
-		a.So(w.IsProlongedBy(compared), should.Equal, result)
+		a.So(s.IsProlongedBy(compared), should.Equal, result)
 	}
 }
 
@@ -115,12 +115,12 @@ func TestOverlap(t *testing.T) {
 	a := assertions.New(t)
 
 	testingTime := time.Now()
-	w := Window{
+	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
 	}
 
-	comparisons := map[Window]bool{
+	comparisons := map[Span]bool{
 		{Start: testingTime.Add(-1 * time.Second), Duration: time.Second}:      false,
 		{Start: testingTime.Add(-1 * time.Second), Duration: 2 * time.Second}:  true,
 		{Start: testingTime.Add(-1 * time.Second), Duration: time.Millisecond}: false,
@@ -140,7 +140,7 @@ func TestOverlap(t *testing.T) {
 	}
 
 	for compared, result := range comparisons {
-		a.So(w.Overlaps(compared), should.Equal, result)
+		a.So(s.Overlaps(compared), should.Equal, result)
 	}
 }
 
@@ -148,7 +148,7 @@ func TestTimeOffAir(t *testing.T) {
 	a := assertions.New(t)
 
 	testingTime := time.Now()
-	w := Window{
+	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
 	}
@@ -160,15 +160,15 @@ func TestTimeOffAir(t *testing.T) {
 	}
 
 	for compared, result := range comparisons {
-		toaWindow := w.timeOffAir(&compared)
-		a.So(toaWindow.Start, should.Equal, w.End())
-		a.So(toaWindow.Duration, should.Equal, result)
+		timeOffAirWindow := s.timeOffAir(&compared)
+		a.So(timeOffAirWindow.Start, should.Equal, s.End())
+		a.So(timeOffAirWindow.Duration, should.Equal, result)
 	}
 
-	toaDurations := []time.Duration{time.Millisecond, time.Second, time.Minute}
-	for _, toaDuration := range toaDurations {
-		toa := &ttnpb.FrequencyPlan_TimeOffAir{Duration: &toaDuration}
-		a.So(w.timeOffAir(toa).Duration, should.Equal, toaDuration)
+	timeOffAirDurations := []time.Duration{time.Millisecond, time.Second, time.Minute}
+	for _, timeOffAirDuration := range timeOffAirDurations {
+		toa := &ttnpb.FrequencyPlan_TimeOffAir{Duration: &timeOffAirDuration}
+		a.So(w.timeOffAir(toa).Duration, should.Equal, timeOffAirDuration)
 	}
 
 	nilTOAWindow := w.timeOffAir(nil)

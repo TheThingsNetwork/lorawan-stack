@@ -25,14 +25,14 @@ var (
 	ErrDwellTime = errors.New("Packet time-on-air duration is greater than this band's dwell time")
 )
 
-// Scheduler is an abstraction for an entity that manages the packet's time windows.
+// Scheduler is an abstraction for an entity that manages the packet's timespans.
 type Scheduler interface {
-	// Schedule adds the requested time window to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns ErrScheduleFull. If another error prevents scheduling, it is returned.
-	Schedule(w Window, channel uint64) error
+	// Schedule adds the requested timespan to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns ErrScheduleFull. If another error prevents scheduling, it is returned.
+	Schedule(s Span, channel uint64) error
 	// ScheduleFlexible requires a scheduling window if there is no time.Time constraint
-	ScheduleFlexible(minimum time.Time, d time.Duration, channel uint64) (Window, error)
-	// RegisterEmission that has happened during that time window, on that specific channel
-	RegisterEmission(w Window, channel uint64) error
+	ScheduleFlexible(minimum time.Time, d time.Duration, channel uint64) (Span, error)
+	// RegisterEmission that has happened during that timespan, on that specific channel
+	RegisterEmission(s Span, channel uint64) error
 }
 
 // FrequencyPlanScheduler returns a scheduler based on the frequency plan
@@ -77,8 +77,8 @@ func (f frequencyPlanScheduling) findSubBand(channel uint64) (*subBandScheduling
 	return nil, ErrNoSubBandFound
 }
 
-func (f frequencyPlanScheduling) Schedule(w Window, channel uint64) error {
-	if f.dwellTime != nil && *f.dwellTime < w.Duration {
+func (f frequencyPlanScheduling) Schedule(s Span, channel uint64) error {
+	if f.dwellTime != nil && *f.dwellTime < s.Duration {
 		return ErrDwellTime
 	}
 
@@ -87,20 +87,20 @@ func (f frequencyPlanScheduling) Schedule(w Window, channel uint64) error {
 		return err
 	}
 
-	return subBand.Schedule(w, f.timeOffAir)
+	return subBand.Schedule(s, f.timeOffAir)
 }
 
-func (f frequencyPlanScheduling) ScheduleFlexible(minimum time.Time, d time.Duration, channel uint64) (Window, error) {
+func (f frequencyPlanScheduling) ScheduleFlexible(minimum time.Time, d time.Duration, channel uint64) (Span, error) {
 	subBand, err := f.findSubBand(channel)
 	if err != nil {
-		return Window{}, err
+		return Span{}, err
 	}
 
-	w, err := subBand.ScheduleFlexible(minimum, d, f.timeOffAir)
-	return w, err
+	s, err := subBand.ScheduleFlexible(minimum, d, f.timeOffAir)
+	return s, err
 }
 
-func (f frequencyPlanScheduling) RegisterEmission(w Window, channel uint64) error {
+func (f frequencyPlanScheduling) RegisterEmission(s Span, channel uint64) error {
 	subBand, err := f.findSubBand(channel)
 	if err != nil {
 		return err
@@ -108,6 +108,6 @@ func (f frequencyPlanScheduling) RegisterEmission(w Window, channel uint64) erro
 
 	subBand.mu.Lock()
 	defer subBand.mu.Unlock()
-	subBand.addScheduling(packetWindow{window: w, timeOffAir: w.timeOffAir(f.timeOffAir)})
+	subBand.addScheduling(packetWindow{window: s, timeOffAir: s.timeOffAir(f.timeOffAir)})
 	return nil
 }
