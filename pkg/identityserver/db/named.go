@@ -5,8 +5,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"database/sql/driver"
-	"reflect"
 
 	"github.com/gomezjdaniel/sqlx"
 )
@@ -50,22 +48,6 @@ func compileNamedQuery(query string, arg interface{}) (string, []interface{}, er
 		return "", nil, err
 	}
 	bound = sqlx.Rebind(sqlx.DOLLAR, bound)
-
-	for i, arg := range args {
-		// continue if implements driver.Valuer
-		if _, ok := arg.(driver.Valuer); ok {
-			continue
-		}
-
-		// wrap into Array if it's an int32 (or int32 like) slice
-		typ := reflect.TypeOf(arg)
-		if typ.Kind() == reflect.Ptr {
-			typ = typ.Elem()
-		}
-		if isInt32Slice(typ) {
-			args[i] = Array(arg)
-		}
-	}
 
 	return bound, args, nil
 }

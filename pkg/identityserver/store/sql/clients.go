@@ -7,6 +7,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 // ClientStore implements store.ClientStore.
@@ -36,8 +37,26 @@ func (s *ClientStore) Create(client types.Client) error {
 }
 
 func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
-	cli := client.GetClient()
-	_, err := q.NamedExec(
+	var cli struct {
+		*ttnpb.Client
+		GrantsConverted db.Int32Slice
+		RightsConverted db.Int32Slice
+	}
+	cli.Client = client.GetClient()
+
+	rights, err := db.NewInt32Slice(cli.Client.Rights)
+	if err != nil {
+		return err
+	}
+	cli.RightsConverted = rights
+
+	grants, err := db.NewInt32Slice(cli.Client.Grants)
+	if err != nil {
+		return err
+	}
+	cli.GrantsConverted = grants
+
+	_, err = q.NamedExec(
 		`INSERT
 			INTO clients (
 				client_id,
@@ -54,9 +73,9 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 				:description,
 				:secret,
 				:redirect_uri,
-				:grants,
+				:grants_converted,
 				:state,
-				:rights,
+				:rights_converted,
 				:official_labeled,
 				:archived_at)`,
 		cli)
@@ -73,7 +92,6 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 // GetByID finds a client by ID and retrieves it.
 func (s *ClientStore) GetByID(clientID string, factory store.ClientFactory) (types.Client, error) {
 	result := factory()
-
 	err := s.transact(func(tx *db.Tx) error {
 		err := s.getByID(tx, clientID, result)
 		if err != nil {
@@ -91,8 +109,25 @@ func (s *ClientStore) GetByID(clientID string, factory store.ClientFactory) (typ
 }
 
 func (s *ClientStore) getByID(q db.QueryContext, clientID string, result types.Client) error {
-	err := q.SelectOne(result,
-		`SELECT *
+	var res struct {
+		*ttnpb.Client
+		GrantsConverted db.Int32Slice
+		RightsConverted db.Int32Slice
+	}
+
+	err := q.SelectOne(&res,
+		`SELECT
+				client_id,
+				description,
+				secret,
+				redirect_uri,
+				grants AS grants_converted,
+				state,
+				rights AS rights_converted,
+				official_labeled,
+				created_at,
+				updated_at,
+				archived_at
 			FROM clients
 			WHERE client_id = $1`,
 		clientID)
@@ -101,6 +136,11 @@ func (s *ClientStore) getByID(q db.QueryContext, clientID string, result types.C
 			"client_id": clientID,
 		})
 	}
+
+	res.RightsConverted.SetInto(&res.Client.Rights)
+	res.GrantsConverted.SetInto(&res.Client.Grants)
+	*(result.GetClient()) = *res.Client
+
 	return err
 }
 
@@ -118,18 +158,35 @@ func (s *ClientStore) Update(client types.Client) error {
 }
 
 func (s *ClientStore) update(q db.QueryContext, client types.Client) error {
-	cli := client.GetClient()
+	var cli struct {
+		*ttnpb.Client
+		GrantsConverted db.Int32Slice
+		RightsConverted db.Int32Slice
+	}
+	cli.Client = client.GetClient()
 
-	_, err := q.NamedExec(
+	rights, err := db.NewInt32Slice(cli.Client.Rights)
+	if err != nil {
+		return err
+	}
+	cli.RightsConverted = rights
+
+	grants, err := db.NewInt32Slice(cli.Client.Grants)
+	if err != nil {
+		return err
+	}
+	cli.GrantsConverted = grants
+
+	_, err = q.NamedExec(
 		`UPDATE clients
 			SET
 				description = :description,
 				secret = :secret,
 				redirect_uri = :redirect_uri,
-				grants = :grants,
+				grants = :grants_converted,
 				state = :state,
 				official_labeled = :official_labeled,
-				rights = :rights,
+				rights = :rights_converted,
 				updated_at = current_timestamp()
 			WHERE client_id = :client_id`,
 		cli)

@@ -66,7 +66,7 @@ func TestClientUpdate(t *testing.T) {
 
 	found, err := s.Clients.GetByID(client.ClientID, clientFactory)
 	a.So(err, should.BeNil)
-	a.So(client, test.ShouldBeClientIgnoringAutoFields, found)
+	a.So(found, test.ShouldBeClientIgnoringAutoFields, client)
 }
 
 func TestClientArchive(t *testing.T) {
