@@ -39,7 +39,7 @@ var ErrMICComputeFailed = &errors.ErrDescriptor{
 // ErrUnsupportedLoRaWANMajorVersion represents error ocurring when unsupported LoRaWAN MAC version is specified.
 var ErrUnsupportedLoRaWANMajorVersion = &errors.ErrDescriptor{
 	MessageFormat: "Unsupported LoRaWAN major version: {major}",
-	Type:          errors.NotImplemented,
+	Type:          errors.InvalidArgument,
 	Code:          2,
 }
 
@@ -62,131 +62,138 @@ var ErrMissingPayload = &errors.ErrDescriptor{
 var ErrMICMismatch = &errors.ErrDescriptor{
 	MessageFormat: "MIC mismatch",
 	Type:          errors.InvalidArgument,
-	Code:          6,
+	Code:          5,
 }
 
 // ErrAppKeyNotFound represents error ocurring when AppKey was not found for device.
 var ErrAppKeyNotFound = &errors.ErrDescriptor{
 	MessageFormat: "AppKey not found for device",
 	Type:          errors.NotFound,
-	Code:          7,
+	Code:          6,
 }
 
 // ErrNwkKeyNotFound represents error ocurring when NwkKey was not found for device.
 var ErrNwkKeyNotFound = &errors.ErrDescriptor{
 	MessageFormat: "NwkKey not found for device",
 	Type:          errors.NotFound,
-	Code:          8,
+	Code:          7,
 }
 
 // ErrAppKeyEnvelopeNotFound represents error ocurring when AppKey envelope was not found for device.
 var ErrAppKeyEnvelopeNotFound = &errors.ErrDescriptor{
 	MessageFormat: "AppKey envelope not found for device",
 	Type:          errors.NotFound,
-	Code:          9,
+	Code:          8,
 }
 
 // ErrNwkKeyEnvelopeNotFound represents error ocurring when NwkKey envelope was not found for device.
 var ErrNwkKeyEnvelopeNotFound = &errors.ErrDescriptor{
 	MessageFormat: "NwkKey envelope not found for device",
 	Type:          errors.NotFound,
-	Code:          10,
+	Code:          9,
 }
 
 // ErrMICCheckFailed represents error ocurring when MIC check failed.
 var ErrMICCheckFailed = &errors.ErrDescriptor{
 	MessageFormat: "MIC check failed",
 	Type:          errors.Unknown,
-	Code:          11,
+	Code:          10,
 }
 
 // ErrUnsupportedLoRaWANMACVersion represents error ocurring when unsupported LoRaWAN MAC version is specified.
 var ErrUnsupportedLoRaWANMACVersion = &errors.ErrDescriptor{
 	MessageFormat: "Unsupported LoRaWAN MAC version: {version}",
-	Type:          errors.NotImplemented,
-	Code:          12,
+	Type:          errors.InvalidArgument,
+	Code:          11,
 }
 
 // ErrMissingDevAddr represents error ocurring when DevAddr is missing.
 var ErrMissingDevAddr = &errors.ErrDescriptor{
 	MessageFormat: "DevAddr is missing",
 	Type:          errors.InvalidArgument,
-	Code:          13,
+	Code:          12,
 }
 
 // ErrMissingJoinEUI represents error ocurring when JoinEUI is missing.
 var ErrMissingJoinEUI = &errors.ErrDescriptor{
 	MessageFormat: "JoinEUI is missing",
 	Type:          errors.InvalidArgument,
-	Code:          14,
+	Code:          13,
 }
 
 // ErrMissingDevEUI represents error ocurring when DevEUI is missing.
 var ErrMissingDevEUI = &errors.ErrDescriptor{
 	MessageFormat: "DevEUI is missing",
 	Type:          errors.InvalidArgument,
-	Code:          15,
+	Code:          14,
 }
 
 // ErrMissingJoinRequest represents error ocurring when join request is missing.
 var ErrMissingJoinRequest = &errors.ErrDescriptor{
 	MessageFormat: "Join request is missing",
 	Type:          errors.InvalidArgument,
-	Code:          16,
+	Code:          15,
 }
 
 // ErrUnmarshalFailed represents error ocurring when payload unmarshaling fails.
 var ErrUnmarshalFailed = &errors.ErrDescriptor{
 	MessageFormat: "Failed to unmarshal payload",
 	Type:          errors.InvalidArgument,
-	Code:          17,
+	Code:          16,
 }
 
-// ErrForwardJoinRequest represents error ocurring when forwarding requests to other join servers is not implemented yet.
+// ErrForwardJoinRequest represents error ocurring when forwarding join request.
 var ErrForwardJoinRequest = &errors.ErrDescriptor{
-	MessageFormat: "Forwarding requests to other join servers is not implemented yet",
-	Type:          errors.NotImplemented,
-	Code:          18,
+	MessageFormat: "Failed to forward join request",
+	Type:          errors.Unknown,
+	Code:          17,
 }
 
 // ErrComputeJoinAcceptMIC represents error ocurring when computation of join accept MIC fails.
 var ErrComputeJoinAcceptMIC = &errors.ErrDescriptor{
 	MessageFormat: "Failed to compute join accept MIC",
 	Type:          errors.Unknown,
-	Code:          21,
+	Code:          18,
 }
 
 // ErrEncryptPayloadFailed represents error ocurring when encryption of join accept fails.
 var ErrEncryptPayloadFailed = &errors.ErrDescriptor{
 	MessageFormat: "Failed to encrypt join accept",
 	Type:          errors.Unknown,
-	Code:          22,
+	Code:          19,
 }
 
 // ErrDevNonceTooSmall represents error ocurring when DevNonce is too small.
 var ErrDevNonceTooSmall = &errors.ErrDescriptor{
 	MessageFormat: "DevNonce is too small",
 	Type:          errors.InvalidArgument,
-	Code:          23,
+	Code:          20,
 }
 
 // ErrDevNonceReused represents error ocurring when DevNonce has already been used.
 var ErrDevNonceReused = &errors.ErrDescriptor{
 	MessageFormat: "DevNonce has already been used",
 	Type:          errors.InvalidArgument,
-	Code:          24,
+	Code:          21,
 }
 
 // ErrCorruptRegistry represents error ocurring when join server registry is corrupted.
 var ErrCorruptRegistry = &errors.ErrDescriptor{
 	MessageFormat: "Registry is corrupt",
 	Type:          errors.Internal,
-	Code:          25,
+	Code:          22,
 }
 
 // ErrMACVersionMismatch represents error ocurring when selected MAC version does not match version stored in join server registry.
 var ErrMACVersionMismatch = &errors.ErrDescriptor{
 	MessageFormat: "Device MAC version mismatch, in registry: {registered}, selected: {selected}",
 	Type:          errors.Internal,
-	Code:          26,
+	Code:          23,
+}
+
+// ErrDevNonceTooHigh represents error ocurring when DevNonce is too high.
+var ErrDevNonceTooHigh = &errors.ErrDescriptor{
+	MessageFormat: "DevNonce is too high",
+	Type:          errors.InvalidArgument,
+	Code:          24,
 }

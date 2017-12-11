@@ -4,6 +4,7 @@ package joinserver
 
 import (
 	"encoding/binary"
+	"math"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/crypto"
@@ -102,14 +103,14 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 
 	msg := req.GetPayload()
-	if msg.GetMType() != ttnpb.MType_JOIN_REQUEST {
-		return nil, ErrWrongPayloadType.New(errors.Attributes{
-			"type": req.Payload.MType,
-		})
-	}
 	if msg.GetMajor() != ttnpb.Major_LORAWAN_R1 {
 		return nil, ErrUnsupportedLoRaWANMajorVersion.New(errors.Attributes{
 			"major": msg.GetMajor(),
+		})
+	}
+	if msg.GetMType() != ttnpb.MType_JOIN_REQUEST {
+		return nil, ErrWrongPayloadType.New(errors.Attributes{
+			"type": req.Payload.MType,
 		})
 	}
 
@@ -141,7 +142,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	if !match {
 		// TODO determine the cluster containing the device
 		// https://github.com/TheThingsIndustries/ttn/issues/244
-		return nil, ErrForwardJoinRequest.New(nil)
+		return nil, ErrForwardJoinRequest.NewWithCause(nil, deviceregistry.ErrDeviceNotFound.New(errors.Attributes{
+			"id": &ttnpb.EndDeviceIdentifiers{JoinEUI: &pld.JoinEUI}}))
 	}
 
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
@@ -202,11 +204,14 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 
 	dn := binary.LittleEndian.Uint16(pld.DevNonce[:])
-	if !dev.GetDisableNonceCheck() {
+	if !dev.GetDisableJoinNonceCheck() {
 		switch req.SelectedMacVersion {
 		case ttnpb.MAC_V1_1:
 			if uint32(dn) < dev.NextDevNonce {
 				return nil, ErrDevNonceTooSmall.New(nil)
+			}
+			if dev.NextDevNonce == math.MaxUint32 {
+				return nil, ErrDevNonceTooHigh.New(nil)
 			}
 			dev.NextDevNonce = uint32(dn + 1)
 		case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
@@ -216,7 +221,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				}
 			}
 		default:
-			panic("unreachable")
+			panic("This statement is unreachable. Fix version check.")
 		}
 	}
 
@@ -295,7 +300,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			Lifetime: nil,
 		}
 	default:
-		panic("unreachable")
+		panic("This statement is unreachable. Fix version check.")
 	}
 
 	dev.UsedDevNonces = append(dev.UsedDevNonces, uint32(dn))

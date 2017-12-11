@@ -133,9 +133,8 @@ message EndDevice {
   // - field names are written in snake_case
   google.protobuf.Struct attributes = 23;
 
-  // DisableNonceCheck specifies whether LoRaWAN 1.1 DevNonce check procedure
-  // should be disabled for the device and LoRaWAN 1.0 procedure used instead.
-  bool disable_nonce_check = 24;
+  // DisableJoinNonceCheck specifies whether LoRaWAN DevNonce check procedure should be disabled
+  bool disable_join_nonce_check = 24;
 
   google.protobuf.Timestamp created_at = 97 [(gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 98 [(gogoproto.stdtime) = true];
