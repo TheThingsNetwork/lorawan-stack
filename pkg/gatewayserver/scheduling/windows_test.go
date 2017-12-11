@@ -168,9 +168,9 @@ func TestTimeOffAir(t *testing.T) {
 	timeOffAirDurations := []time.Duration{time.Millisecond, time.Second, time.Minute}
 	for _, timeOffAirDuration := range timeOffAirDurations {
 		toa := &ttnpb.FrequencyPlan_TimeOffAir{Duration: &timeOffAirDuration}
-		a.So(w.timeOffAir(toa).Duration, should.Equal, timeOffAirDuration)
+		a.So(s.timeOffAir(toa).Duration, should.Equal, timeOffAirDuration)
 	}
 
-	nilTOAWindow := w.timeOffAir(nil)
+	nilTOAWindow := s.timeOffAir(nil)
 	a.So(nilTOAWindow.Duration, should.Equal, time.Duration(0))
 }
