@@ -67,25 +67,25 @@ type TxPacket struct {
 
 // Stat contains a status message
 type Stat struct {
-	Time ExpandedTime `json:"time"` // UTC 'system' time of the gateway, ISO 8601 'expanded' format (e.g 2014-01-12 08:59:28 GMT)
-	Boot ExpandedTime `json:"boot"` // UTC 'boot' time of the gateway, ISO 8601 'expanded' format (e.g 2014-01-12 08:59:28 GMT)
-	Lati float64      `json:"lati"` // GPS latitude of the gateway in degree (float, N is +)
-	Long float64      `json:"long"` // GPS latitude of the gateway in degree (float, E is +)
-	Alti int32        `json:"alti"` // GPS altitude of the gateway in meter RX (integer)
-	RXNb uint32       `json:"rxnb"` // Number of radio packets received (unsigned integer)
-	RXOK uint32       `json:"rxok"` // Number of radio packets received with a valid PHY CRC
-	RXFW uint32       `json:"rxfw"` // Number of radio packets forwarded (unsigned integer)
-	ACKR float64      `json:"ackr"` // Percentage of upstream datagrams that were acknowledged
-	DWNb uint32       `json:"dwnb"` // Number of downlink datagrams received (unsigned integer)
-	TXNb uint32       `json:"txnb"` // Number of packets emitted (unsigned integer)
-	LMOK uint32       `json:"lmok"` // Number of packets received from link testing mote, with CRC OK (unsigned inteter)
-	LMST uint32       `json:"lmst"` // Sequence number of the first packet received from link testing mote (unsigned integer)
-	LMNW uint32       `json:"lmnw"` // Sequence number of the last packet received from link testing mote (unsigned integer)
-	LPPS uint32       `json:"lpps"` // Number of lost PPS pulses (unsigned integer)
-	Temp int32        `json:"temp"` // Temperature of the Gateway (signed integer)
-	FPGA uint32       `json:"fpga"` // Version of Gateway FPGA (unsigned integer)
-	DSP  uint32       `json:"dsp"`  // Version of Gateway DSP software (unsigned interger)
-	HAL  string       `json:"hal"`  // Version of Gateway driver (format X.X.X)
+	Time ExpandedTime  `json:"time"`           // UTC 'system' time of the gateway, ISO 8601 'expanded' format (e.g 2014-01-12 08:59:28 GMT)
+	Boot *ExpandedTime `json:"boot,omitempty"` // UTC 'boot' time of the gateway, ISO 8601 'expanded' format (e.g 2014-01-12 08:59:28 GMT)
+	Lati *float64      `json:"lati,omitempty"` // GPS latitude of the gateway in degree (float, N is +)
+	Long *float64      `json:"long,omitempty"` // GPS latitude of the gateway in degree (float, E is +)
+	Alti *int32        `json:"alti,omitempty"` // GPS altitude of the gateway in meter RX (integer)
+	RXNb uint32        `json:"rxnb"`           // Number of radio packets received (unsigned integer)
+	RXOK uint32        `json:"rxok"`           // Number of radio packets received with a valid PHY CRC
+	RXFW uint32        `json:"rxfw"`           // Number of radio packets forwarded (unsigned integer)
+	ACKR float64       `json:"ackr"`           // Percentage of upstream datagrams that were acknowledged
+	DWNb uint32        `json:"dwnb"`           // Number of downlink datagrams received (unsigned integer)
+	TXNb uint32        `json:"txnb"`           // Number of packets emitted (unsigned integer)
+	LMOK *uint32       `json:"lmok,omitempty"` // Number of packets received from link testing mote, with CRC OK (unsigned inteter)
+	LMST *uint32       `json:"lmst,omitempty"` // Sequence number of the first packet received from link testing mote (unsigned integer)
+	LMNW *uint32       `json:"lmnw,omitempty"` // Sequence number of the last packet received from link testing mote (unsigned integer)
+	LPPS *uint32       `json:"lpps,omitempty"` // Number of lost PPS pulses (unsigned integer)
+	Temp *int32        `json:"temp,omitempty"` // Temperature of the Gateway (signed integer)
+	FPGA *uint32       `json:"fpga,omitempty"` // Version of Gateway FPGA (unsigned integer)
+	DSP  *uint32       `json:"dsp,omitempty"`  // Version of Gateway DSP software (unsigned interger)
+	HAL  *string       `json:"hal,omitempty"`  // Version of Gateway driver (format X.X.X)
 }
 
 // TxError is returned in the TxPacketAck

@@ -34,7 +34,7 @@ func TestStatusPacket(t *testing.T) {
 	a := assertions.New(t)
 	a.So(d, should.NotBeNil)
 	a.So(d.Stat, should.NotBeNil)
-	a.So(d.Stat.Alti, should.Equal, 66)
+	a.So(*d.Stat.Alti, should.Equal, 66)
 	a.So(d.Stat.RXNb, should.Equal, 0)
 	a.So(d.Stat.RXOK, should.Equal, 0)
 	a.So(d.Stat.RXFW, should.Equal, 0)
