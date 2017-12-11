@@ -12,8 +12,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db/migrations"
 	"github.com/cockroachdb/cockroach-go/crdb"
 
-	// TODO(gomezjdaniel): see issue #165
-	"github.com/gomezjdaniel/sqlx"
+	"github.com/jmoiron/sqlx"
 
 	// include pq for the postgres driver
 	_ "github.com/lib/pq"

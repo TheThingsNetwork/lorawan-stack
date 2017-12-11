@@ -6,7 +6,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/gomezjdaniel/sqlx"
+	"github.com/jmoiron/sqlx"
 )
 
 // Tx is the type of a transaction.

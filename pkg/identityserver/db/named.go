@@ -6,7 +6,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/gomezjdaniel/sqlx"
+	"github.com/jmoiron/sqlx"
 )
 
 // namedExec executes the named query using the provided argument and returns

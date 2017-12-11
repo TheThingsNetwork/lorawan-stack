@@ -5,7 +5,7 @@ package db
 import (
 	"unicode"
 
-	"github.com/gomezjdaniel/sqlx"
+	"github.com/jmoiron/sqlx"
 )
 
 func init() {

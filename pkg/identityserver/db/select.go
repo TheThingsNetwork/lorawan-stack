@@ -8,7 +8,7 @@ import (
 	"reflect"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/gomezjdaniel/sqlx"
+	"github.com/jmoiron/sqlx"
 )
 
 // selectOne selects one item from the database and writes it to dest, which can

@@ -74,12 +74,6 @@
   revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/gomezjdaniel/sqlx"
-  packages = [".","reflectx"]
-  revision = "c168fc84a1a38975ed9360159682054ebb14f5c9"
-
-[[projects]]
   name = "github.com/gorilla/securecookie"
   packages = ["."]
   revision = "667fe4e3466a040b780561fe9b51a83a3753eefc"
@@ -132,6 +126,12 @@
   name = "github.com/jacobsa/crypto"
   packages = ["cmac","common"]
   revision = "c73681c634de898c869684602cf0c0d2ce938c4d"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/jmoiron/sqlx"
+  packages = [".","reflectx"]
+  revision = "99f3ad6d85ae53d0fecf788ab62d0e9734b3c117"
 
 [[projects]]
   branch = "master"
@@ -377,6 +377,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "52f178ad04c5ac49e888cdddc64c398c88a94538012a7541b2c4038b6ec2e47e"
+  inputs-digest = "c7237925cc72f65a55de46baca666af4981ff9553d0a98b1511b21013c8cbcb3"
   solver-name = "gps-cdcl"
   solver-version = 1
