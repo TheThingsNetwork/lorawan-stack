@@ -72,18 +72,26 @@ type RxMetadata struct {
 	// Gateway's internal timestamp when the Rx finished (nanoseconds)
 	// NOTE: most gateways use microsecond timestamps, so conversion may be needed
 	Timestamp uint64 `protobuf:"varint,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	// Gateway's internal timestamp when the Rx finished (nanoseconds), encrypted with an AES key
-	EncryptedTimestamp string `protobuf:"bytes,5,opt,name=encrypted_timestamp,json=encryptedTimestamp,proto3" json:"encrypted_timestamp,omitempty"`
+	// Types that are valid to be assigned to FineTimestamp:
+	//	*RxMetadata_EncryptedFineTimestamp
+	//	*RxMetadata_FineTimestampValue
+	FineTimestamp isRxMetadata_FineTimestamp `protobuf_oneof:"fine_timestamp"`
 	// Real time
-	Time *time.Time `protobuf:"bytes,6,opt,name=time,stdtime" json:"time,omitempty"`
+	Time *time.Time `protobuf:"bytes,7,opt,name=time,stdtime" json:"time,omitempty"`
 	// Received signal strength in dBm
-	RSSI float32 `protobuf:"fixed32,7,opt,name=rssi,proto3" json:"rssi,omitempty"`
+	RSSI float32 `protobuf:"fixed32,8,opt,name=rssi,proto3" json:"rssi,omitempty"`
+	// Received channel power in dBm
+	ChannelRSSI float32 `protobuf:"fixed32,9,opt,name=channel_rssi,json=channelRssi,proto3" json:"channel_rssi,omitempty"`
+	// Standard deviation of the RSSI
+	RSSIStandardDeviation float32 `protobuf:"fixed32,10,opt,name=rssi_standard_deviation,json=rssiStandardDeviation,proto3" json:"rssi_standard_deviation,omitempty"`
 	// Signal-to-noise-ratio in dB
-	SNR float32 `protobuf:"fixed32,8,opt,name=snr,proto3" json:"snr,omitempty"`
+	SNR float32 `protobuf:"fixed32,11,opt,name=snr,proto3" json:"snr,omitempty"`
+	// Frequency offset (Hz)
+	FrequencyOffset int64 `protobuf:"varint,12,opt,name=frequency_offset,json=frequencyOffset,proto3" json:"frequency_offset,omitempty"`
 	// Location of the antenna
-	Location *Location `protobuf:"bytes,9,opt,name=location" json:"location,omitempty"`
+	Location *Location `protobuf:"bytes,13,opt,name=location" json:"location,omitempty"`
 	// ID of the AES key the fine timestamps were encrypted with
-	AESKeyID string `protobuf:"bytes,10,opt,name=aes_key_id,json=aesKeyId,proto3" json:"aes_key_id,omitempty"`
+	AESKeyID string `protobuf:"bytes,14,opt,name=aes_key_id,json=aesKeyId,proto3" json:"aes_key_id,omitempty"`
 	// Advanced metadata fields
 	// - can be used for advanced information or experimental features that are not yet formally defined in the API
 	// - field names are written in snake_case
@@ -94,6 +102,31 @@ func (m *RxMetadata) Reset()                    { *m = RxMetadata{} }
 func (m *RxMetadata) String() string            { return proto.CompactTextString(m) }
 func (*RxMetadata) ProtoMessage()               {}
 func (*RxMetadata) Descriptor() ([]byte, []int) { return fileDescriptorMetadata, []int{0} }
+
+type isRxMetadata_FineTimestamp interface {
+	isRxMetadata_FineTimestamp()
+	Equal(interface{}) bool
+	VerboseEqual(interface{}) error
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type RxMetadata_EncryptedFineTimestamp struct {
+	EncryptedFineTimestamp string `protobuf:"bytes,5,opt,name=encrypted_fine_timestamp,json=encryptedFineTimestamp,proto3,oneof"`
+}
+type RxMetadata_FineTimestampValue struct {
+	FineTimestampValue uint64 `protobuf:"varint,6,opt,name=fine_timestamp_value,json=fineTimestampValue,proto3,oneof"`
+}
+
+func (*RxMetadata_EncryptedFineTimestamp) isRxMetadata_FineTimestamp() {}
+func (*RxMetadata_FineTimestampValue) isRxMetadata_FineTimestamp()     {}
+
+func (m *RxMetadata) GetFineTimestamp() isRxMetadata_FineTimestamp {
+	if m != nil {
+		return m.FineTimestamp
+	}
+	return nil
+}
 
 func (m *RxMetadata) GetAntennaIndex() uint32 {
 	if m != nil {
@@ -116,11 +149,18 @@ func (m *RxMetadata) GetTimestamp() uint64 {
 	return 0
 }
 
-func (m *RxMetadata) GetEncryptedTimestamp() string {
-	if m != nil {
-		return m.EncryptedTimestamp
+func (m *RxMetadata) GetEncryptedFineTimestamp() string {
+	if x, ok := m.GetFineTimestamp().(*RxMetadata_EncryptedFineTimestamp); ok {
+		return x.EncryptedFineTimestamp
 	}
 	return ""
+}
+
+func (m *RxMetadata) GetFineTimestampValue() uint64 {
+	if x, ok := m.GetFineTimestamp().(*RxMetadata_FineTimestampValue); ok {
+		return x.FineTimestampValue
+	}
+	return 0
 }
 
 func (m *RxMetadata) GetTime() *time.Time {
@@ -137,9 +177,30 @@ func (m *RxMetadata) GetRSSI() float32 {
 	return 0
 }
 
+func (m *RxMetadata) GetChannelRSSI() float32 {
+	if m != nil {
+		return m.ChannelRSSI
+	}
+	return 0
+}
+
+func (m *RxMetadata) GetRSSIStandardDeviation() float32 {
+	if m != nil {
+		return m.RSSIStandardDeviation
+	}
+	return 0
+}
+
 func (m *RxMetadata) GetSNR() float32 {
 	if m != nil {
 		return m.SNR
+	}
+	return 0
+}
+
+func (m *RxMetadata) GetFrequencyOffset() int64 {
+	if m != nil {
+		return m.FrequencyOffset
 	}
 	return 0
 }
@@ -163,6 +224,71 @@ func (m *RxMetadata) GetAdvanced() *google_protobuf3.Struct {
 		return m.Advanced
 	}
 	return nil
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*RxMetadata) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _RxMetadata_OneofMarshaler, _RxMetadata_OneofUnmarshaler, _RxMetadata_OneofSizer, []interface{}{
+		(*RxMetadata_EncryptedFineTimestamp)(nil),
+		(*RxMetadata_FineTimestampValue)(nil),
+	}
+}
+
+func _RxMetadata_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*RxMetadata)
+	// fine_timestamp
+	switch x := m.FineTimestamp.(type) {
+	case *RxMetadata_EncryptedFineTimestamp:
+		_ = b.EncodeVarint(5<<3 | proto.WireBytes)
+		_ = b.EncodeStringBytes(x.EncryptedFineTimestamp)
+	case *RxMetadata_FineTimestampValue:
+		_ = b.EncodeVarint(6<<3 | proto.WireVarint)
+		_ = b.EncodeVarint(x.FineTimestampValue)
+	case nil:
+	default:
+		return fmt.Errorf("RxMetadata.FineTimestamp has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _RxMetadata_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*RxMetadata)
+	switch tag {
+	case 5: // fine_timestamp.encrypted_fine_timestamp
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		x, err := b.DecodeStringBytes()
+		m.FineTimestamp = &RxMetadata_EncryptedFineTimestamp{x}
+		return true, err
+	case 6: // fine_timestamp.fine_timestamp_value
+		if wire != proto.WireVarint {
+			return true, proto.ErrInternalBadWireType
+		}
+		x, err := b.DecodeVarint()
+		m.FineTimestamp = &RxMetadata_FineTimestampValue{x}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _RxMetadata_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*RxMetadata)
+	// fine_timestamp
+	switch x := m.FineTimestamp.(type) {
+	case *RxMetadata_EncryptedFineTimestamp:
+		n += proto.SizeVarint(5<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(len(x.EncryptedFineTimestamp)))
+		n += len(x.EncryptedFineTimestamp)
+	case *RxMetadata_FineTimestampValue:
+		n += proto.SizeVarint(6<<3 | proto.WireVarint)
+		n += proto.SizeVarint(x.FineTimestampValue)
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
 }
 
 // TxMetadata contains metadata for a to-be-transmitted message.
@@ -315,8 +441,14 @@ func (this *RxMetadata) VerboseEqual(that interface{}) error {
 	if this.Timestamp != that1.Timestamp {
 		return fmt.Errorf("Timestamp this(%v) Not Equal that(%v)", this.Timestamp, that1.Timestamp)
 	}
-	if this.EncryptedTimestamp != that1.EncryptedTimestamp {
-		return fmt.Errorf("EncryptedTimestamp this(%v) Not Equal that(%v)", this.EncryptedTimestamp, that1.EncryptedTimestamp)
+	if that1.FineTimestamp == nil {
+		if this.FineTimestamp != nil {
+			return fmt.Errorf("this.FineTimestamp != nil && that1.FineTimestamp == nil")
+		}
+	} else if this.FineTimestamp == nil {
+		return fmt.Errorf("this.FineTimestamp == nil && that1.FineTimestamp != nil")
+	} else if err := this.FineTimestamp.VerboseEqual(that1.FineTimestamp); err != nil {
+		return err
 	}
 	if that1.Time == nil {
 		if this.Time != nil {
@@ -328,8 +460,17 @@ func (this *RxMetadata) VerboseEqual(that interface{}) error {
 	if this.RSSI != that1.RSSI {
 		return fmt.Errorf("RSSI this(%v) Not Equal that(%v)", this.RSSI, that1.RSSI)
 	}
+	if this.ChannelRSSI != that1.ChannelRSSI {
+		return fmt.Errorf("ChannelRSSI this(%v) Not Equal that(%v)", this.ChannelRSSI, that1.ChannelRSSI)
+	}
+	if this.RSSIStandardDeviation != that1.RSSIStandardDeviation {
+		return fmt.Errorf("RSSIStandardDeviation this(%v) Not Equal that(%v)", this.RSSIStandardDeviation, that1.RSSIStandardDeviation)
+	}
 	if this.SNR != that1.SNR {
 		return fmt.Errorf("SNR this(%v) Not Equal that(%v)", this.SNR, that1.SNR)
+	}
+	if this.FrequencyOffset != that1.FrequencyOffset {
+		return fmt.Errorf("FrequencyOffset this(%v) Not Equal that(%v)", this.FrequencyOffset, that1.FrequencyOffset)
 	}
 	if !this.Location.Equal(that1.Location) {
 		return fmt.Errorf("Location this(%v) Not Equal that(%v)", this.Location, that1.Location)
@@ -339,6 +480,66 @@ func (this *RxMetadata) VerboseEqual(that interface{}) error {
 	}
 	if !this.Advanced.Equal(that1.Advanced) {
 		return fmt.Errorf("Advanced this(%v) Not Equal that(%v)", this.Advanced, that1.Advanced)
+	}
+	return nil
+}
+func (this *RxMetadata_EncryptedFineTimestamp) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*RxMetadata_EncryptedFineTimestamp)
+	if !ok {
+		that2, ok := that.(RxMetadata_EncryptedFineTimestamp)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *RxMetadata_EncryptedFineTimestamp")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *RxMetadata_EncryptedFineTimestamp but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *RxMetadata_EncryptedFineTimestamp but is not nil && this == nil")
+	}
+	if this.EncryptedFineTimestamp != that1.EncryptedFineTimestamp {
+		return fmt.Errorf("EncryptedFineTimestamp this(%v) Not Equal that(%v)", this.EncryptedFineTimestamp, that1.EncryptedFineTimestamp)
+	}
+	return nil
+}
+func (this *RxMetadata_FineTimestampValue) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*RxMetadata_FineTimestampValue)
+	if !ok {
+		that2, ok := that.(RxMetadata_FineTimestampValue)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *RxMetadata_FineTimestampValue")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *RxMetadata_FineTimestampValue but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *RxMetadata_FineTimestampValue but is not nil && this == nil")
+	}
+	if this.FineTimestampValue != that1.FineTimestampValue {
+		return fmt.Errorf("FineTimestampValue this(%v) Not Equal that(%v)", this.FineTimestampValue, that1.FineTimestampValue)
 	}
 	return nil
 }
@@ -379,7 +580,13 @@ func (this *RxMetadata) Equal(that interface{}) bool {
 	if this.Timestamp != that1.Timestamp {
 		return false
 	}
-	if this.EncryptedTimestamp != that1.EncryptedTimestamp {
+	if that1.FineTimestamp == nil {
+		if this.FineTimestamp != nil {
+			return false
+		}
+	} else if this.FineTimestamp == nil {
+		return false
+	} else if !this.FineTimestamp.Equal(that1.FineTimestamp) {
 		return false
 	}
 	if that1.Time == nil {
@@ -392,7 +599,16 @@ func (this *RxMetadata) Equal(that interface{}) bool {
 	if this.RSSI != that1.RSSI {
 		return false
 	}
+	if this.ChannelRSSI != that1.ChannelRSSI {
+		return false
+	}
+	if this.RSSIStandardDeviation != that1.RSSIStandardDeviation {
+		return false
+	}
 	if this.SNR != that1.SNR {
+		return false
+	}
+	if this.FrequencyOffset != that1.FrequencyOffset {
 		return false
 	}
 	if !this.Location.Equal(that1.Location) {
@@ -402,6 +618,66 @@ func (this *RxMetadata) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.Advanced.Equal(that1.Advanced) {
+		return false
+	}
+	return true
+}
+func (this *RxMetadata_EncryptedFineTimestamp) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*RxMetadata_EncryptedFineTimestamp)
+	if !ok {
+		that2, ok := that.(RxMetadata_EncryptedFineTimestamp)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.EncryptedFineTimestamp != that1.EncryptedFineTimestamp {
+		return false
+	}
+	return true
+}
+func (this *RxMetadata_FineTimestampValue) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*RxMetadata_FineTimestampValue)
+	if !ok {
+		that2, ok := that.(RxMetadata_FineTimestampValue)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.FineTimestampValue != that1.FineTimestampValue {
 		return false
 	}
 	return true
@@ -614,46 +890,64 @@ func (m *RxMetadata) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		i = encodeVarintMetadata(dAtA, i, m.Timestamp)
 	}
-	if len(m.EncryptedTimestamp) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.EncryptedTimestamp)))
-		i += copy(dAtA[i:], m.EncryptedTimestamp)
-	}
-	if m.Time != nil {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.Time)))
-		n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Time, dAtA[i:])
+	if m.FineTimestamp != nil {
+		nn2, err := m.FineTimestamp.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n2
+		i += nn2
 	}
-	if m.RSSI != 0 {
-		dAtA[i] = 0x3d
+	if m.Time != nil {
+		dAtA[i] = 0x3a
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSI))
-		i += 4
-	}
-	if m.SNR != 0 {
-		dAtA[i] = 0x45
-		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.SNR))
-		i += 4
-	}
-	if m.Location != nil {
-		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(m.Location.Size()))
-		n3, err := m.Location.MarshalTo(dAtA[i:])
+		i = encodeVarintMetadata(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.Time)))
+		n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Time, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
 		i += n3
 	}
+	if m.RSSI != 0 {
+		dAtA[i] = 0x45
+		i++
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSI))
+		i += 4
+	}
+	if m.ChannelRSSI != 0 {
+		dAtA[i] = 0x4d
+		i++
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.ChannelRSSI))
+		i += 4
+	}
+	if m.RSSIStandardDeviation != 0 {
+		dAtA[i] = 0x55
+		i++
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSIStandardDeviation))
+		i += 4
+	}
+	if m.SNR != 0 {
+		dAtA[i] = 0x5d
+		i++
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.SNR))
+		i += 4
+	}
+	if m.FrequencyOffset != 0 {
+		dAtA[i] = 0x60
+		i++
+		i = encodeVarintMetadata(dAtA, i, uint64(m.FrequencyOffset))
+	}
+	if m.Location != nil {
+		dAtA[i] = 0x6a
+		i++
+		i = encodeVarintMetadata(dAtA, i, uint64(m.Location.Size()))
+		n4, err := m.Location.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n4
+	}
 	if len(m.AESKeyID) > 0 {
-		dAtA[i] = 0x52
+		dAtA[i] = 0x72
 		i++
 		i = encodeVarintMetadata(dAtA, i, uint64(len(m.AESKeyID)))
 		i += copy(dAtA[i:], m.AESKeyID)
@@ -664,15 +958,30 @@ func (m *RxMetadata) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x6
 		i++
 		i = encodeVarintMetadata(dAtA, i, uint64(m.Advanced.Size()))
-		n4, err := m.Advanced.MarshalTo(dAtA[i:])
+		n5, err := m.Advanced.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n4
+		i += n5
 	}
 	return i, nil
 }
 
+func (m *RxMetadata_EncryptedFineTimestamp) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	dAtA[i] = 0x2a
+	i++
+	i = encodeVarintMetadata(dAtA, i, uint64(len(m.EncryptedFineTimestamp)))
+	i += copy(dAtA[i:], m.EncryptedFineTimestamp)
+	return i, nil
+}
+func (m *RxMetadata_FineTimestampValue) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	dAtA[i] = 0x30
+	i++
+	i = encodeVarintMetadata(dAtA, i, m.FineTimestampValue)
+	return i, nil
+}
 func (m *TxMetadata) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -691,11 +1000,11 @@ func (m *TxMetadata) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintMetadata(dAtA, i, uint64(m.GatewayIdentifier.Size()))
-	n5, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
+	n6, err := m.GatewayIdentifier.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n5
+	i += n6
 	if m.Timestamp != 0 {
 		dAtA[i] = 0x10
 		i++
@@ -705,11 +1014,11 @@ func (m *TxMetadata) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintMetadata(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.Time)))
-		n6, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Time, dAtA[i:])
+		n7, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Time, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n6
+		i += n7
 	}
 	if m.Advanced != nil {
 		dAtA[i] = 0x9a
@@ -717,11 +1026,11 @@ func (m *TxMetadata) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x6
 		i++
 		i = encodeVarintMetadata(dAtA, i, uint64(m.Advanced.Size()))
-		n7, err := m.Advanced.MarshalTo(dAtA[i:])
+		n8, err := m.Advanced.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n7
+		i += n8
 	}
 	return i, nil
 }
@@ -787,7 +1096,13 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 	this.AntennaIndex = r.Uint32()
 	this.ChannelIndex = r.Uint32()
 	this.Timestamp = uint64(r.Uint32())
-	this.EncryptedTimestamp = randStringMetadata(r)
+	oneofNumber_FineTimestamp := []int32{5, 6}[r.Intn(2)]
+	switch oneofNumber_FineTimestamp {
+	case 5:
+		this.FineTimestamp = NewPopulatedRxMetadata_EncryptedFineTimestamp(r, easy)
+	case 6:
+		this.FineTimestamp = NewPopulatedRxMetadata_FineTimestampValue(r, easy)
+	}
 	if r.Intn(10) != 0 {
 		this.Time = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
@@ -795,9 +1110,21 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 	if r.Intn(2) == 0 {
 		this.RSSI *= -1
 	}
+	this.ChannelRSSI = r.Float32()
+	if r.Intn(2) == 0 {
+		this.ChannelRSSI *= -1
+	}
+	this.RSSIStandardDeviation = r.Float32()
+	if r.Intn(2) == 0 {
+		this.RSSIStandardDeviation *= -1
+	}
 	this.SNR = r.Float32()
 	if r.Intn(2) == 0 {
 		this.SNR *= -1
+	}
+	this.FrequencyOffset = r.Int63()
+	if r.Intn(2) == 0 {
+		this.FrequencyOffset *= -1
 	}
 	if r.Intn(10) != 0 {
 		this.Location = NewPopulatedLocation(r, easy)
@@ -811,6 +1138,16 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 	return this
 }
 
+func NewPopulatedRxMetadata_EncryptedFineTimestamp(r randyMetadata, easy bool) *RxMetadata_EncryptedFineTimestamp {
+	this := &RxMetadata_EncryptedFineTimestamp{}
+	this.EncryptedFineTimestamp = randStringMetadata(r)
+	return this
+}
+func NewPopulatedRxMetadata_FineTimestampValue(r randyMetadata, easy bool) *RxMetadata_FineTimestampValue {
+	this := &RxMetadata_FineTimestampValue{}
+	this.FineTimestampValue = uint64(r.Uint32())
+	return this
+}
 func NewPopulatedTxMetadata(r randyMetadata, easy bool) *TxMetadata {
 	this := &TxMetadata{}
 	v2 := NewPopulatedGatewayIdentifier(r, easy)
@@ -937,9 +1274,8 @@ func (m *RxMetadata) Size() (n int) {
 	if m.Timestamp != 0 {
 		n += 1 + sovMetadata(m.Timestamp)
 	}
-	l = len(m.EncryptedTimestamp)
-	if l > 0 {
-		n += 1 + l + sovMetadata(uint64(l))
+	if m.FineTimestamp != nil {
+		n += m.FineTimestamp.Size()
 	}
 	if m.Time != nil {
 		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.Time)
@@ -948,8 +1284,17 @@ func (m *RxMetadata) Size() (n int) {
 	if m.RSSI != 0 {
 		n += 5
 	}
+	if m.ChannelRSSI != 0 {
+		n += 5
+	}
+	if m.RSSIStandardDeviation != 0 {
+		n += 5
+	}
 	if m.SNR != 0 {
 		n += 5
+	}
+	if m.FrequencyOffset != 0 {
+		n += 1 + sovMetadata(uint64(m.FrequencyOffset))
 	}
 	if m.Location != nil {
 		l = m.Location.Size()
@@ -966,6 +1311,19 @@ func (m *RxMetadata) Size() (n int) {
 	return n
 }
 
+func (m *RxMetadata_EncryptedFineTimestamp) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.EncryptedFineTimestamp)
+	n += 1 + l + sovMetadata(uint64(l))
+	return n
+}
+func (m *RxMetadata_FineTimestampValue) Size() (n int) {
+	var l int
+	_ = l
+	n += 1 + sovMetadata(m.FineTimestampValue)
+	return n
+}
 func (m *TxMetadata) Size() (n int) {
 	var l int
 	_ = l
@@ -1137,7 +1495,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			}
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EncryptedTimestamp", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field EncryptedFineTimestamp", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1162,9 +1520,29 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.EncryptedTimestamp = string(dAtA[iNdEx:postIndex])
+			m.FineTimestamp = &RxMetadata_EncryptedFineTimestamp{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FineTimestampValue", wireType)
+			}
+			var v uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetadata
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.FineTimestamp = &RxMetadata_FineTimestampValue{v}
+		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Time", wireType)
 			}
@@ -1197,7 +1575,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 7:
+		case 8:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RSSI", wireType)
 			}
@@ -1208,7 +1586,29 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
 			m.RSSI = math.Float32frombits(v)
-		case 8:
+		case 9:
+			if wireType != 5 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ChannelRSSI", wireType)
+			}
+			var v uint32
+			if (iNdEx + 4) > l {
+				return io.ErrUnexpectedEOF
+			}
+			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			iNdEx += 4
+			m.ChannelRSSI = math.Float32frombits(v)
+		case 10:
+			if wireType != 5 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RSSIStandardDeviation", wireType)
+			}
+			var v uint32
+			if (iNdEx + 4) > l {
+				return io.ErrUnexpectedEOF
+			}
+			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			iNdEx += 4
+			m.RSSIStandardDeviation = math.Float32frombits(v)
+		case 11:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SNR", wireType)
 			}
@@ -1219,7 +1619,26 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
 			m.SNR = math.Float32frombits(v)
-		case 9:
+		case 12:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyOffset", wireType)
+			}
+			m.FrequencyOffset = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetadata
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.FrequencyOffset |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 13:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Location", wireType)
 			}
@@ -1252,7 +1671,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 10:
+		case 14:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AESKeyID", wireType)
 			}
@@ -1742,53 +2161,61 @@ func init() {
 }
 
 var fileDescriptorMetadata = []byte{
-	// 760 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0xbf, 0x6f, 0xdb, 0x46,
-	0x18, 0xe5, 0x49, 0x8c, 0x42, 0x5d, 0x63, 0x55, 0xbd, 0xa0, 0x2d, 0x2d, 0x18, 0x27, 0x21, 0x5d,
-	0xd4, 0xa0, 0xa5, 0x00, 0xbb, 0xfd, 0x03, 0x22, 0x57, 0x15, 0x88, 0xa4, 0x52, 0x70, 0x54, 0x50,
-	0xb4, 0x8b, 0x70, 0x22, 0x2f, 0x14, 0x61, 0x89, 0x14, 0xc8, 0x53, 0x12, 0x0d, 0x05, 0x32, 0x7a,
-	0xcc, 0xd8, 0xad, 0x05, 0xba, 0x64, 0xe8, 0xe0, 0xd1, 0xa3, 0x47, 0x8f, 0x1e, 0xdd, 0x45, 0xb5,
-	0x8e, 0x43, 0x3d, 0x7a, 0xf4, 0x58, 0xf0, 0x48, 0x51, 0xb5, 0x3b, 0xf4, 0x07, 0x32, 0x89, 0xdf,
-	0x7b, 0xef, 0xbb, 0xfb, 0xde, 0xfb, 0x0e, 0x82, 0xbb, 0xae, 0xc7, 0xc7, 0xf3, 0x91, 0x61, 0x07,
-	0xd3, 0xd6, 0x60, 0xcc, 0x06, 0x63, 0xcf, 0x77, 0xa3, 0x1e, 0xe3, 0x2f, 0x83, 0xf0, 0xa0, 0xc5,
-	0xb9, 0xdf, 0xa2, 0x33, 0xaf, 0x35, 0x65, 0x9c, 0x3a, 0x94, 0x53, 0x63, 0x16, 0x06, 0x3c, 0x40,
-	0x25, 0xce, 0x7d, 0xe3, 0xc5, 0x5e, 0xed, 0xf3, 0xbf, 0xf4, 0xba, 0x81, 0x1b, 0xb4, 0x24, 0x3d,
-	0x9a, 0x3f, 0x97, 0x95, 0x2c, 0xe4, 0x57, 0xda, 0x56, 0xfb, 0xf2, 0xdf, 0x5c, 0xe5, 0x39, 0xcc,
-	0xe7, 0xde, 0x73, 0x8f, 0x85, 0x51, 0xd6, 0xb6, 0xe3, 0x06, 0x81, 0x3b, 0x61, 0x9b, 0xc3, 0x23,
-	0x1e, 0xce, 0x6d, 0x9e, 0xb1, 0xf5, 0xdb, 0x2c, 0xf7, 0xa6, 0x2c, 0xe2, 0x74, 0x3a, 0x4b, 0x05,
-	0x0f, 0xfe, 0x28, 0x42, 0x48, 0x5e, 0x7d, 0x93, 0x39, 0x40, 0x6d, 0x08, 0x5d, 0xca, 0xd9, 0x4b,
-	0xba, 0x18, 0x7a, 0x8e, 0x0e, 0x1a, 0xa0, 0xf9, 0xde, 0xee, 0xb6, 0x91, 0x1a, 0x32, 0xba, 0x29,
-	0x63, 0xe6, 0x33, 0xb4, 0xb5, 0xd3, 0x65, 0x5d, 0x39, 0x5b, 0xd6, 0x01, 0x29, 0xbb, 0x6b, 0x12,
-	0x7d, 0x02, 0xb7, 0xa8, 0xcf, 0x99, 0xef, 0xd3, 0xa1, 0xe7, 0x3b, 0xec, 0x95, 0x5e, 0x68, 0x80,
-	0xe6, 0x16, 0xb9, 0x97, 0x81, 0x66, 0x82, 0x25, 0x22, 0x7b, 0x4c, 0x7d, 0x9f, 0x4d, 0x32, 0x51,
-	0x31, 0x15, 0x65, 0x60, 0x2a, 0xda, 0x81, 0xe5, 0x7c, 0x5e, 0x5d, 0x6d, 0x80, 0xa6, 0x4a, 0x36,
-	0x00, 0x6a, 0xc1, 0xfb, 0xcc, 0xb7, 0xc3, 0xc5, 0x8c, 0x33, 0x67, 0xb8, 0xd1, 0xdd, 0x69, 0x80,
-	0x66, 0x99, 0xa0, 0x9c, 0x1a, 0xe4, 0x0d, 0x5f, 0x40, 0x35, 0x91, 0xe9, 0x25, 0x69, 0xab, 0x66,
-	0xa4, 0xd9, 0x18, 0xeb, 0x6c, 0x8c, 0x5c, 0xd9, 0x56, 0xdf, 0xfc, 0x5e, 0x07, 0x44, 0xaa, 0xd1,
-	0x0e, 0x54, 0xc3, 0x28, 0xf2, 0xf4, 0xbb, 0x0d, 0xd0, 0x2c, 0xb4, 0x35, 0xb1, 0xac, 0xab, 0xc4,
-	0xb2, 0x4c, 0x22, 0x51, 0xb4, 0x0d, 0x8b, 0x91, 0x1f, 0xea, 0x9a, 0x24, 0xef, 0x8a, 0x65, 0xbd,
-	0x68, 0xf5, 0x08, 0x49, 0x30, 0xf4, 0x19, 0xd4, 0x26, 0x81, 0x4d, 0xb9, 0x17, 0xf8, 0x7a, 0x59,
-	0x5e, 0x59, 0x5d, 0x27, 0xf9, 0x24, 0xc3, 0x49, 0xae, 0x40, 0x0f, 0x21, 0xa4, 0x2c, 0x1a, 0x1e,
-	0x30, 0x99, 0x3c, 0x4c, 0x4c, 0xb4, 0xef, 0x89, 0x65, 0x5d, 0x7b, 0xd4, 0xb1, 0x1e, 0xb3, 0x85,
-	0xf9, 0x15, 0xd1, 0x28, 0x8b, 0x92, 0x2f, 0x07, 0xed, 0x41, 0x8d, 0x3a, 0x2f, 0xa8, 0x6f, 0x33,
-	0x47, 0xb7, 0xe5, 0xc9, 0x1f, 0xff, 0xcd, 0x8c, 0x25, 0x9f, 0x01, 0xc9, 0x85, 0x0f, 0x7e, 0x03,
-	0x10, 0x0e, 0xde, 0xed, 0xa6, 0x6f, 0xec, 0xa7, 0x70, 0x7b, 0x3f, 0xeb, 0xb8, 0x8b, 0xff, 0x29,
-	0xee, 0xff, 0xe5, 0xed, 0x57, 0x00, 0xb5, 0x75, 0xa6, 0xa8, 0x06, 0xb5, 0x09, 0xe5, 0x1e, 0x9f,
-	0x3b, 0x4c, 0xfa, 0x2a, 0x90, 0xbc, 0x4e, 0x26, 0x9e, 0x04, 0xbe, 0x9b, 0x92, 0x05, 0x49, 0x6e,
-	0x80, 0xa4, 0x93, 0x4e, 0xb2, 0xce, 0x64, 0xea, 0x3b, 0x24, 0xaf, 0x25, 0x67, 0xdb, 0xf3, 0x90,
-	0xda, 0x0b, 0xf9, 0x14, 0x13, 0x2e, 0xab, 0x91, 0x01, 0x4b, 0x51, 0x30, 0x0f, 0x6d, 0x26, 0x1f,
-	0x5f, 0x65, 0xf7, 0xa3, 0xdb, 0x7b, 0xb6, 0x24, 0x4b, 0x32, 0xd5, 0xc3, 0x1f, 0x60, 0xe5, 0x26,
-	0x83, 0x10, 0xac, 0x58, 0xfd, 0x67, 0x64, 0xbf, 0x33, 0x7c, 0xd6, 0x7b, 0xdc, 0xeb, 0x7f, 0xdb,
-	0xab, 0x2a, 0xa8, 0x02, 0x61, 0x86, 0x75, 0x9f, 0x5a, 0x55, 0x80, 0x3e, 0x80, 0x5b, 0x59, 0xbd,
-	0xdf, 0xef, 0x7d, 0x6d, 0x76, 0xab, 0x05, 0x74, 0x1f, 0xbe, 0x9f, 0x41, 0xa4, 0xd3, 0x35, 0xad,
-	0x01, 0xf9, 0xae, 0x5a, 0x44, 0xdb, 0xf0, 0xc3, 0x0c, 0x34, 0x9f, 0x0e, 0xbb, 0x9d, 0xfe, 0x93,
-	0xfe, 0xfe, 0xa3, 0x81, 0xd9, 0xef, 0x55, 0xd5, 0x9a, 0x7a, 0xf8, 0x0b, 0x56, 0xda, 0x3f, 0x81,
-	0xd3, 0x15, 0x06, 0x67, 0x2b, 0x0c, 0xce, 0x57, 0x18, 0x5c, 0xac, 0x30, 0xb8, 0x5c, 0x61, 0xe5,
-	0x6a, 0x85, 0x95, 0xeb, 0x15, 0x06, 0xaf, 0x05, 0x56, 0x0e, 0x05, 0x56, 0xde, 0x0a, 0x0c, 0x8e,
-	0x04, 0x56, 0x8e, 0x05, 0x06, 0x27, 0x02, 0x83, 0x53, 0x81, 0xc1, 0x99, 0xc0, 0xe0, 0x5c, 0x60,
-	0xe5, 0x42, 0x60, 0x70, 0x29, 0xb0, 0x72, 0x25, 0x30, 0xb8, 0x16, 0x58, 0x79, 0x1d, 0x63, 0xe5,
-	0x30, 0xc6, 0xe0, 0x4d, 0x8c, 0x95, 0x1f, 0x63, 0x0c, 0x7e, 0x8e, 0xb1, 0xf2, 0x36, 0xc6, 0xca,
-	0x51, 0x8c, 0xc1, 0x71, 0x8c, 0xc1, 0x49, 0x8c, 0xc1, 0xf7, 0x9f, 0xfe, 0xd3, 0x1f, 0xdc, 0xec,
-	0xc0, 0x4d, 0x7e, 0x67, 0xa3, 0x51, 0x49, 0xae, 0x7a, 0xef, 0xcf, 0x00, 0x00, 0x00, 0xff, 0xff,
-	0x1e, 0xbf, 0x46, 0xcf, 0x7f, 0x05, 0x00, 0x00,
+	// 888 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x94, 0x3f, 0x6c, 0xdb, 0x46,
+	0x14, 0xc6, 0x79, 0x92, 0xec, 0xc8, 0x67, 0x5b, 0x56, 0xaf, 0x75, 0x42, 0x1b, 0xc6, 0x51, 0x70,
+	0x17, 0x25, 0x68, 0x29, 0x40, 0x6e, 0x97, 0x6e, 0x91, 0xe3, 0x28, 0x42, 0x52, 0x29, 0x3d, 0x2a,
+	0x2d, 0xda, 0x85, 0x38, 0x93, 0x27, 0x9a, 0xb0, 0x7c, 0x54, 0xc9, 0x93, 0x13, 0x0d, 0x05, 0x32,
+	0x7a, 0xcc, 0xd8, 0xad, 0x05, 0xba, 0x64, 0xe8, 0x90, 0x31, 0x63, 0x46, 0x8f, 0x1e, 0xd3, 0x45,
+	0x8d, 0x8e, 0x4b, 0xd0, 0x29, 0x63, 0xc6, 0x82, 0x47, 0x8a, 0x8e, 0x9d, 0xa1, 0x7f, 0x90, 0x49,
+	0x7c, 0xdf, 0xf7, 0xfb, 0xc8, 0xbb, 0x77, 0xef, 0x04, 0x9b, 0x9e, 0x2f, 0x0e, 0xc6, 0xfb, 0xa6,
+	0x13, 0x1c, 0x35, 0xfa, 0x07, 0xac, 0x7f, 0xe0, 0x73, 0x2f, 0xea, 0x32, 0xf1, 0x30, 0x08, 0x0f,
+	0x1b, 0x42, 0xf0, 0x06, 0x1d, 0xf9, 0x8d, 0x23, 0x26, 0xa8, 0x4b, 0x05, 0x35, 0x47, 0x61, 0x20,
+	0x02, 0xb4, 0x28, 0x04, 0x37, 0x8f, 0x77, 0x36, 0x3f, 0x7f, 0x27, 0xeb, 0x05, 0x5e, 0xd0, 0x50,
+	0xf6, 0xfe, 0x78, 0xa0, 0x2a, 0x55, 0xa8, 0xa7, 0x34, 0xb6, 0xf9, 0xe5, 0xbf, 0xf9, 0x94, 0xef,
+	0x32, 0x2e, 0xfc, 0x81, 0xcf, 0xc2, 0x28, 0x8b, 0x6d, 0x79, 0x41, 0xe0, 0x0d, 0xd9, 0xf9, 0xcb,
+	0x23, 0x11, 0x8e, 0x1d, 0x91, 0xb9, 0xc6, 0x65, 0x57, 0xf8, 0x47, 0x2c, 0x12, 0xf4, 0x68, 0x94,
+	0x02, 0xdb, 0x7f, 0x2d, 0x40, 0x48, 0x1e, 0x7d, 0x9d, 0xed, 0x00, 0xb5, 0x20, 0xf4, 0xa8, 0x60,
+	0x0f, 0xe9, 0xc4, 0xf6, 0x5d, 0x1d, 0xd4, 0x40, 0x7d, 0xb9, 0xb9, 0x61, 0xa6, 0x1b, 0x32, 0xdb,
+	0xa9, 0xd3, 0xc9, 0xd7, 0xd0, 0x2a, 0x9f, 0x4e, 0x0d, 0xed, 0x6c, 0x6a, 0x00, 0xb2, 0xe4, 0xcd,
+	0x4d, 0xf4, 0x29, 0x5c, 0xa5, 0x5c, 0x30, 0xce, 0xa9, 0xed, 0x73, 0x97, 0x3d, 0xd2, 0x0b, 0x35,
+	0x50, 0x5f, 0x25, 0x2b, 0x99, 0xd8, 0x49, 0xb4, 0x04, 0x72, 0x0e, 0x28, 0xe7, 0x6c, 0x98, 0x41,
+	0xc5, 0x14, 0xca, 0xc4, 0x14, 0xda, 0x82, 0x4b, 0xf9, 0x7a, 0xf5, 0x52, 0x0d, 0xd4, 0x4b, 0xe4,
+	0x5c, 0x40, 0x5f, 0x41, 0x9d, 0x71, 0x27, 0x9c, 0x8c, 0x04, 0x73, 0xed, 0x81, 0xcf, 0x99, 0x7d,
+	0x0e, 0x2f, 0xd4, 0x40, 0x7d, 0xe9, 0x8e, 0x46, 0xae, 0xe6, 0xc4, 0x6d, 0x9f, 0xb3, 0x7e, 0x9e,
+	0x6d, 0xc2, 0x4f, 0x2e, 0x26, 0xec, 0x63, 0x3a, 0x1c, 0x33, 0x7d, 0x31, 0xf9, 0xc8, 0x1d, 0x8d,
+	0xa0, 0xc1, 0xbb, 0xf8, 0xb7, 0x89, 0x87, 0xbe, 0x80, 0xa5, 0x04, 0xd7, 0xaf, 0xa8, 0xae, 0x6c,
+	0x9a, 0x69, 0x6b, 0xcd, 0x79, 0x6b, 0xcd, 0x1c, 0x6f, 0x95, 0x9e, 0xfc, 0x69, 0x00, 0xa2, 0x68,
+	0xb4, 0x05, 0x4b, 0x61, 0x14, 0xf9, 0x7a, 0xb9, 0x06, 0xea, 0x85, 0x56, 0x59, 0x4e, 0x8d, 0x12,
+	0xb1, 0xac, 0x0e, 0x51, 0x2a, 0x6a, 0xc2, 0xf9, 0x8e, 0x6d, 0x45, 0x2d, 0x29, 0x6a, 0x4d, 0x4e,
+	0x8d, 0xe5, 0xdd, 0x54, 0x57, 0xf0, 0x72, 0x06, 0x91, 0x24, 0xf3, 0x0d, 0xbc, 0x96, 0xb0, 0x76,
+	0x24, 0x28, 0x77, 0x69, 0xe8, 0xda, 0x2e, 0x3b, 0xf6, 0xa9, 0xf0, 0x03, 0xae, 0x43, 0x15, 0xdf,
+	0x90, 0x53, 0x63, 0x3d, 0xc9, 0x59, 0x19, 0x71, 0x6b, 0x0e, 0x90, 0xf5, 0x24, 0xf9, 0x9e, 0x8c,
+	0x36, 0x60, 0x31, 0xe2, 0xa1, 0xbe, 0xac, 0xe2, 0x57, 0xe4, 0xd4, 0x28, 0x5a, 0x5d, 0x42, 0x12,
+	0x0d, 0x5d, 0x87, 0xd5, 0x41, 0xc8, 0x7e, 0x1c, 0x33, 0xee, 0x4c, 0xec, 0x60, 0x30, 0x88, 0x98,
+	0xd0, 0x57, 0x6a, 0xa0, 0x5e, 0x24, 0x6b, 0xb9, 0xde, 0x53, 0x32, 0xfa, 0x0c, 0x96, 0x87, 0x81,
+	0x93, 0xae, 0x64, 0x55, 0x35, 0xa9, 0x3a, 0x1f, 0x9d, 0x7b, 0x99, 0x4e, 0x72, 0x02, 0xdd, 0x80,
+	0x90, 0xb2, 0xc8, 0x3e, 0x64, 0x6a, 0xd4, 0x2a, 0xc9, 0x81, 0xb5, 0x56, 0xe4, 0xd4, 0x28, 0xdf,
+	0xdc, 0xb3, 0xee, 0xb2, 0x49, 0xe7, 0x16, 0x29, 0x53, 0x16, 0x25, 0x4f, 0x2e, 0xda, 0x81, 0x65,
+	0xea, 0x1e, 0x53, 0xee, 0x30, 0x57, 0x77, 0xd4, 0x9b, 0xaf, 0xbd, 0xd7, 0x7e, 0x4b, 0xcd, 0x3d,
+	0xc9, 0xc1, 0x56, 0x15, 0x56, 0x2e, 0x9e, 0xf1, 0xf6, 0x1f, 0x00, 0xc2, 0xfe, 0x87, 0x1d, 0xf6,
+	0x0b, 0x23, 0x5a, 0xb8, 0x3c, 0xa2, 0xf3, 0x91, 0x29, 0xfe, 0xa7, 0x91, 0xf9, 0x3f, 0xbb, 0xdd,
+	0xfe, 0x1d, 0xc0, 0xf2, 0xbc, 0xcb, 0x68, 0x13, 0x96, 0x87, 0x54, 0xf8, 0x62, 0xec, 0x32, 0xb5,
+	0xaf, 0x02, 0xc9, 0xeb, 0x64, 0xc5, 0xc3, 0x80, 0x7b, 0xa9, 0x59, 0x50, 0xe6, 0xb9, 0x90, 0x24,
+	0xe9, 0x30, 0x4b, 0x26, 0xab, 0x5e, 0x20, 0x79, 0xad, 0x3c, 0xc7, 0x19, 0x87, 0xd4, 0x99, 0xa8,
+	0xdb, 0x98, 0x78, 0x59, 0x8d, 0x4c, 0xb8, 0x18, 0x05, 0xe3, 0xd0, 0x61, 0xea, 0xea, 0x55, 0x9a,
+	0x57, 0x2f, 0x9f, 0xbc, 0xa5, 0x5c, 0x92, 0x51, 0x37, 0x7e, 0x82, 0x95, 0x8b, 0x0e, 0x42, 0xb0,
+	0x62, 0xf5, 0x1e, 0x90, 0xdd, 0x3d, 0xfb, 0x41, 0xf7, 0x6e, 0xb7, 0xf7, 0x5d, 0xb7, 0xaa, 0xa1,
+	0x0a, 0x84, 0x99, 0xd6, 0xbe, 0x6f, 0x55, 0x01, 0xfa, 0x08, 0xae, 0x66, 0xf5, 0x6e, 0xaf, 0x7b,
+	0xbb, 0xd3, 0xae, 0x16, 0xd0, 0xc7, 0x70, 0x2d, 0x93, 0xc8, 0x5e, 0xbb, 0x63, 0xf5, 0xc9, 0xf7,
+	0xd5, 0x22, 0xda, 0x80, 0xeb, 0x99, 0xd8, 0xb9, 0x6f, 0xb7, 0xf7, 0x7a, 0xf7, 0x7a, 0xbb, 0x37,
+	0xfb, 0x9d, 0x5e, 0xb7, 0x5a, 0xda, 0x2c, 0x9d, 0xfc, 0x86, 0xb5, 0xd6, 0x2f, 0xe0, 0x74, 0x86,
+	0xc1, 0xd9, 0x0c, 0x83, 0x97, 0x33, 0x0c, 0x5e, 0xcd, 0x30, 0x78, 0x3d, 0xc3, 0xda, 0x9b, 0x19,
+	0xd6, 0xde, 0xce, 0x30, 0x78, 0x2c, 0xb1, 0x76, 0x22, 0xb1, 0xf6, 0x54, 0x62, 0xf0, 0x4c, 0x62,
+	0xed, 0xb9, 0xc4, 0xe0, 0x85, 0xc4, 0xe0, 0x54, 0x62, 0x70, 0x26, 0x31, 0x78, 0x29, 0xb1, 0xf6,
+	0x4a, 0x62, 0xf0, 0x5a, 0x62, 0xed, 0x8d, 0xc4, 0xe0, 0xad, 0xc4, 0xda, 0xe3, 0x18, 0x6b, 0x27,
+	0x31, 0x06, 0x4f, 0x62, 0xac, 0xfd, 0x1c, 0x63, 0xf0, 0x6b, 0x8c, 0xb5, 0xa7, 0x31, 0xd6, 0x9e,
+	0xc5, 0x18, 0x3c, 0x8f, 0x31, 0x78, 0x11, 0x63, 0xf0, 0xc3, 0xf5, 0x7f, 0xfa, 0x8f, 0x1f, 0x1d,
+	0x7a, 0xc9, 0xef, 0x68, 0x7f, 0x7f, 0x51, 0x1d, 0xf5, 0xce, 0xdf, 0x01, 0x00, 0x00, 0xff, 0xff,
+	0x87, 0x4c, 0x8a, 0xce, 0x82, 0x06, 0x00, 0x00,
 }
