@@ -42,8 +42,8 @@ message RxMetadata {
   // Location of the antenna
   Location location = 9;
 
-  // Index of the AES key the fine timestamps were encrypted with
-  uint32 aes_key_index = 10 [(gogoproto.customname) = "AESKeyIndex"];
+  // ID of the AES key the fine timestamps were encrypted with
+  string aes_key_id = 10 [(gogoproto.customname) = "AESKeyID"];
 
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API
