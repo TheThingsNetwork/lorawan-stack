@@ -23,21 +23,28 @@ message RxMetadata {
   // Index of the channel that received the message
   uint32 channel_index = 3;
 
-  // Gateway's internal timestamp when the Rx finished (nanoseconds)
-  // NOTE: most gateways use microsecond timestamps, so conversion may be needed
-  uint64 timestamp = 4;
+  oneof concentrator_timestamp {
+    // Gateway's internal timestamp when the Rx finished (nanoseconds)
+    // NOTE: most gateways use microsecond timestamps, so conversion may be needed
+    uint64 timestamp = 4;
+    // Gateway's internal timestamp when the Rx finished (nanoseconds), encrypted with an AES key
+    string encrypted_timestamp = 5;
+  }
 
   // Real time
-  google.protobuf.Timestamp time = 5 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp time = 6 [(gogoproto.stdtime) = true];
 
   // Received signal strength in dBm
-  float rssi = 6 [(gogoproto.customname) = "RSSI"];
+  float rssi = 7 [(gogoproto.customname) = "RSSI"];
 
   // Signal-to-noise-ratio in dB
-  float snr = 7 [(gogoproto.customname) = "SNR"];
+  float snr = 8 [(gogoproto.customname) = "SNR"];
 
   // Location of the antenna
-  Location location = 8;
+  Location location = 9;
+
+  // Index of the AES key the fine timestamps were encrypted with
+  uint32 aes_key_index = 10 [(gogoproto.customname) = "AESKeyIndex"];
 
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API
