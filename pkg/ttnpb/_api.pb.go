@@ -66,7 +66,6 @@ It has these top-level messages:
 	ClientIdentifier
 	PullConfigurationRequest
 	IdentityServerSettings
-	GetSettingsRequest
 	UpdateSettingsRequest
 	CreateUserRequest
 	UpdateUserRequest

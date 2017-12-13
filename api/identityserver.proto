@@ -68,12 +68,6 @@ message IdentityServerSettings {
   repeated string allowed_emails = 5;
 }
 
-message GetSettingsRequest {
-  // projection_mask is the set of field paths that represents the settings that
-  // will be returned in the operation. If the list is empty all settings will be returned.
-  google.protobuf.FieldMask projection_mask = 1;
-}
-
 message UpdateSettingsRequest {
   // settings are the settings to be updated.
   IdentityServerSettings settings = 1 [(gogoproto.nullable) = false];
@@ -87,8 +81,8 @@ message UpdateSettingsRequest {
 // IsSettings is the service that provided methods to manage the settings of an
 // Identity Server within a tenant.
 service IsSettings {
-  // GetSettings returns the value of the specified settings.
-  rpc GetSettings(GetSettingsRequest) returns (IdentityServerSettings);
+  // GetSettings returns the settings.
+  rpc GetSettings(google.protobuf.Empty) returns (IdentityServerSettings);
 
   // UpdateSettings updates the settings.
   rpc UpdateSettings(UpdateSettingsRequest) returns (google.protobuf.Empty);

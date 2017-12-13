@@ -14,42 +14,6 @@ func TestSettingsValidations(t *testing.T) {
 	a := assertions.New(t)
 
 	{
-		// request with no projection mask (good)
-		req := &GetSettingsRequest{}
-		a.So(req.Validate(), should.BeNil)
-
-		// request with empty projection mask (good)
-		req = &GetSettingsRequest{
-			ProjectionMask: &pbtypes.FieldMask{},
-		}
-		a.So(req.Validate(), should.BeNil)
-
-		// request with empty projection mask (good)
-		req = &GetSettingsRequest{
-			ProjectionMask: &pbtypes.FieldMask{
-				Paths: []string{},
-			},
-		}
-		a.So(req.Validate(), should.BeNil)
-
-		// request with invalid field path (bad)
-		req = &GetSettingsRequest{
-			ProjectionMask: &pbtypes.FieldMask{
-				Paths: []string{"foo"},
-			},
-		}
-		a.So(ErrInvalidPathFieldMask.Describes(req.Validate()), should.BeTrue)
-
-		// request with correct field paths (good)
-		req = &GetSettingsRequest{
-			ProjectionMask: &pbtypes.FieldMask{
-				Paths: []string{"blacklisted_ids", "allowed_emails"},
-			},
-		}
-		a.So(req.Validate(), should.BeEmpty)
-	}
-
-	{
 		// empty request without update mask (bad)
 		req := &UpdateSettingsRequest{}
 		err := req.Validate()
@@ -69,7 +33,7 @@ func TestSettingsValidations(t *testing.T) {
 		// good request
 		req = &UpdateSettingsRequest{
 			Settings: IdentityServerSettings{
-				UserRegistration: IdentityServerSettings_UserRegistrationFlow{
+				IdentityServerSettings_UserRegistrationFlow: IdentityServerSettings_UserRegistrationFlow{
 					SkipValidation: true,
 				},
 			},
