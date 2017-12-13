@@ -125,6 +125,7 @@ func initSubStores(s storer) {
 	store.Gateways = NewGatewayStore(s)
 	store.Clients = NewClientStore(s)
 	store.OAuth = NewOAuthStore(s)
+	store.Settings = NewSettingStore(s)
 }
 
 func (s *Store) MigrateAll() error {

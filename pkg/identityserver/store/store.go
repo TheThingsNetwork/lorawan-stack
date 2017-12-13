@@ -18,6 +18,9 @@ type Store struct {
 
 	// OAuth is the OAuth store.
 	OAuth OAuthStore
+
+	// Settings is the settings store.
+	Settings SettingStore
 }
 
 // Attributer is the interface providing methods to extend basic IS data types.

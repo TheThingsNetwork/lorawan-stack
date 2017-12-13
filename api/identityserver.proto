@@ -53,7 +53,7 @@ message IdentityServerSettings {
     bool admin_approval = 3;
   }
   // user_registration are the settings used to configure the user registration flow.
-  UserRegistrationFlow user_registration = 2 [(gogoproto.nullable) = false];
+  UserRegistrationFlow user_registration = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // validation_token_ttl denotes the time an account validation token is valid
   // after being issued.
