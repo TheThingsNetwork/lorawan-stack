@@ -14,6 +14,7 @@ import "github.com/TheThingsNetwork/ttn/api/user.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
 
 package ttn.v3;
 
@@ -36,8 +37,12 @@ service GtwGr {
 }
 
 message IdentityServerSettings {
+  // updated_at is the last time the settings were updated.
+  // This is a read-only field.
+  google.protobuf.Timestamp updated_at = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
   // blacklisted_ids is the list of IDs that are not allowed to use in the network.
-  repeated string blacklisted_ids = 1 [(gogoproto.customname) = "BlacklistedIDs"];
+  repeated string blacklisted_ids = 2 [(gogoproto.customname) = "BlacklistedIDs"];
 
   message UserRegistrationFlow {
     // skip_validation denotes whether if users need to validate their email
@@ -53,14 +58,14 @@ message IdentityServerSettings {
     bool admin_approval = 3;
   }
   // user_registration are the settings used to configure the user registration flow.
-  UserRegistrationFlow user_registration = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserRegistrationFlow user_registration = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // validation_token_ttl denotes the time an account validation token is valid
   // after being issued.
-  google.protobuf.Duration validation_token_ttl = 3 [(gogoproto.customname) = "ValidationTokenTTL", (gogoproto.nullable) = false, (gogoproto.stdduration) = true];
+  google.protobuf.Duration validation_token_ttl = 4 [(gogoproto.customname) = "ValidationTokenTTL", (gogoproto.nullable) = false, (gogoproto.stdduration) = true];
 
   // allowed_emails is a list of globs to restrict emails to. If empty all emails are valid.
-  repeated string allowed_emails = 4;
+  repeated string allowed_emails = 5;
 }
 
 message GetSettingsRequest {

@@ -38,7 +38,8 @@ func (s *SettingStore) get(q db.QueryContext) (*ttnpb.IdentityServerSettings, er
 				validation_token_ttl,
 				skip_validation,
 				self_registration,
-				admin_approval
+				admin_approval,
+				updated_at
 			FROM settings
 			WHERE id = 1`)
 	if err != nil {
