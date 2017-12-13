@@ -158,9 +158,8 @@ service IsUser {
   // CreateUser creates a new user on the network.
   rpc CreateUser(CreateUserRequest) returns (google.protobuf.Empty);
 
-  // GetUser returns the profile of an user by ID. If the user identifier is empty it
-  // returns the profile of the authenticated user.
-  rpc GetUser(UserIdentifier) returns (User);
+  // GetUser returns the current user.
+  rpc GetUser(google.protobuf.Empty) returns (User);
 
   // UpdateUser edits the profile of the authenticated user.
   rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty);
