@@ -34,6 +34,9 @@ type OAuthStore interface {
 	// DeleteRefreshToken deletes the refresh token from the database.
 	DeleteRefreshToken(refreshToken string) error
 
+	// ListAuthorizedClients returns a list of clients authorized by a given user.
+	ListAuthorizedClients(userID string, factory ClientFactory) ([]types.Client, error)
+
 	// RevokeAuthorizedClient deletes the access tokens and refresh token
 	// granted to a client by a given user.
 	RevokeAuthorizedClient(userID, clientID string) error

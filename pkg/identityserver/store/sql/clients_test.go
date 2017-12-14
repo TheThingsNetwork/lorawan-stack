@@ -14,7 +14,6 @@ import (
 
 var clientFactory = func() types.Client {
 	return &ttnpb.Client{}
-
 }
 
 func testClients() map[string]*ttnpb.Client {

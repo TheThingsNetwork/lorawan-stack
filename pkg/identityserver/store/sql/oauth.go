@@ -4,6 +4,7 @@ package sql
 
 import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 )
 
@@ -279,6 +280,68 @@ func (s *OAuthStore) deleteRefreshToken(q db.QueryContext, refreshToken string) 
 	}
 
 	return err
+}
+
+func (s *OAuthStore) ListAuthorizedClients(userID string, factory store.ClientFactory) ([]types.Client, error) {
+	var result []types.Client
+
+	err := s.transact(func(tx *db.Tx) error {
+		clientIDs, err := s.listAuthorizedClients(tx, userID)
+		if err != nil {
+			return err
+		}
+
+		for _, clientID := range clientIDs {
+			client := factory()
+
+			err := (s.store().Clients.(*ClientStore)).getByID(tx, clientID, client)
+			if err != nil {
+				return err
+			}
+
+			err = (s.store().Clients.(*ClientStore)).loadAttributes(tx, clientID, client)
+			if err != nil {
+				return err
+			}
+
+			result = append(result, client)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (s *OAuthStore) listAuthorizedClients(q db.QueryContext, userID string) ([]string, error) {
+	var clientIDs []string
+	err := q.Select(
+		&clientIDs,
+		`SELECT DISTINCT clients.client_id
+			FROM clients
+			JOIN refresh_tokens
+			ON (
+				clients.client_id = refresh_tokens.client_id AND refresh_tokens.user_id = $1
+			)
+			JOIN access_tokens
+			ON (
+				clients.client_id = access_tokens.client_id AND access_tokens.user_id = $1
+			)`,
+		userID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(clientIDs) == 0 {
+		return make([]string, 0), nil
+	}
+
+	return clientIDs, nil
 }
 
 // RevokeAuthorizedClient deletes the access tokens and refresh token

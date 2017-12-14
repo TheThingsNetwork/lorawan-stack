@@ -135,7 +135,7 @@ func TestOAuthRefreshToken(t *testing.T) {
 	a.So(err, should.NotBeNil)
 }
 
-func TestOAuthRevokeClient(t *testing.T) {
+func TestOAuthAuthorizedClients(t *testing.T) {
 	a := assertions.New(t)
 	s := cleanStore(t, database)
 
@@ -167,10 +167,16 @@ func TestOAuthRevokeClient(t *testing.T) {
 	err = s.OAuth.SaveRefreshToken(refreshData)
 	a.So(err, should.BeNil)
 
-	err = s.OAuth.RevokeAuthorizedClient(userID, client.ClientID)
+	found, err := s.OAuth.ListAuthorizedClients(userID, clientFactory)
+	a.So(err, should.BeNil)
+	if a.So(found, should.HaveLength, 1) {
+		a.So(found[0], test.ShouldBeClientIgnoringAutoFields, client)
+	}
+
+	/*err = s.OAuth.RevokeAuthorizedClient(userID, client.ClientID)
 	a.So(err, should.BeNil)
 
 	err = s.OAuth.RevokeAuthorizedClient(userID, client.ClientID)
 	a.So(err, should.NotBeNil)
-	a.So(ErrRefreshTokenNotFound.Describes(err), should.BeTrue)
+	a.So(ErrRefreshTokenNotFound.Describes(err), should.BeTrue)*/
 }
