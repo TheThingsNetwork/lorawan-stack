@@ -5,6 +5,7 @@ package sql
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
@@ -120,6 +121,33 @@ func TestUserUpdate(t *testing.T) {
 		a.So(err, should.NotBeNil)
 		a.So(ErrUserEmailTaken.Describes(err), should.BeTrue)
 	}
+}
+
+func TestUserValidationToken(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore(t)
+
+	userID := testUsers()["bob"].UserID
+	token := &types.ValidationToken{
+		ValidationToken: "foo-token",
+		CreatedAt:       time.Now(),
+		ExpiresIn:       3600,
+	}
+
+	err := s.Users.SaveValidationToken(userID, token)
+	a.So(err, should.BeNil)
+
+	found, err := s.Users.GetValidationToken(userID, token.ValidationToken)
+	a.So(err, should.BeNil)
+	a.So(found.ValidationToken, should.Equal, token.ValidationToken)
+	a.So(found.CreatedAt.Equal(token.CreatedAt), should.BeTrue)
+	a.So(found.ExpiresIn, should.Equal, token.ExpiresIn)
+
+	err = s.Users.DeleteValidationToken(userID, token.ValidationToken)
+	a.So(err, should.BeNil)
+
+	_, err = s.Users.GetValidationToken(userID, token.ValidationToken)
+	a.So(ErrValidationTokenNotFound.Describes(err), should.BeTrue)
 }
 
 func BenchmarkUserCreate(b *testing.B) {

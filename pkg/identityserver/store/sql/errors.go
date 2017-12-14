@@ -26,6 +26,7 @@ func init() {
 	ErrUserEmailNotFound.Register()
 	ErrUserIDTaken.Register()
 	ErrUserEmailTaken.Register()
+	ErrValidationTokenNotFound.Register()
 }
 
 // ErrApplicationNotFound is returned when trying to fetch an application that
@@ -190,4 +191,11 @@ var ErrUserEmailTaken = &errors.ErrDescriptor{
 	SafeAttributes: []string{
 		"email",
 	},
+}
+
+// ErrValidationTokenNotFound is returned when trying to get a token that does not exist.
+var ErrValidationTokenNotFound = &errors.ErrDescriptor{
+	MessageFormat: "Validation token not found",
+	Code:          404,
+	Type:          errors.NotFound,
 }

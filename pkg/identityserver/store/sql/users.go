@@ -175,6 +175,79 @@ func (s *UserStore) update(q db.QueryContext, user types.User) error {
 	return err
 }
 
+// SaveValidationToken saves the validation token.
+func (s *UserStore) SaveValidationToken(userID string, token *types.ValidationToken) error {
+	return s.saveValidationToken(s.queryer(), userID, token)
+}
+
+func (s *UserStore) saveValidationToken(q db.QueryContext, userID string, token *types.ValidationToken) error {
+	_, err := q.Exec(
+		`INSERT
+			INTO validation_tokens (
+				validation_token,
+				user_id,
+				created_at,
+				expires_in
+			)
+			VALUES (
+				$1,
+				$2,
+				$3,
+				$4)`,
+		token.ValidationToken,
+		userID,
+		token.CreatedAt,
+		token.ExpiresIn)
+	return err
+}
+
+// GetValidationToken retrieves the validation token.
+func (s *UserStore) GetValidationToken(userID, token string) (*types.ValidationToken, error) {
+	return s.getValidationToken(s.queryer(), userID, token)
+}
+
+func (s *UserStore) getValidationToken(q db.QueryContext, userID, token string) (*types.ValidationToken, error) {
+	t := new(types.ValidationToken)
+	err := q.SelectOne(
+		t,
+		`SELECT
+				validation_token,
+				created_at,
+				expires_in
+			FROM validation_tokens
+			WHERE validation_token = $1 AND user_id = $2`,
+		token,
+		userID)
+	if db.IsNoRows(err) {
+		return nil, ErrValidationTokenNotFound.New(nil)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return t, nil
+}
+
+// DeleteValidationToken deletes the validation token.
+func (s *UserStore) DeleteValidationToken(userID, token string) error {
+	return s.deleteValidationToken(s.queryer(), userID, token)
+}
+
+func (s *UserStore) deleteValidationToken(q db.QueryContext, userID, token string) error {
+	t := new(string)
+	err := q.SelectOne(
+		t,
+		`DELETE
+			FROM validation_tokens
+			WHERE validation_token = $1 AND user_id = $2
+			RETURNING validation_token`,
+		token,
+		userID)
+	if db.IsNoRows(err) {
+		return ErrValidationTokenNotFound.New(nil)
+	}
+	return err
+}
+
 // LoadAttributes loads the extra attributes in user if it is a store.Attributer.
 func (s *UserStore) LoadAttributes(userID string, user types.User) error {
 	return s.loadAttributes(s.queryer(), userID, user)

@@ -27,6 +27,15 @@ type UserStore interface {
 	// Delete deletes an user.
 	//Delete(userID string) error
 
+	// SaveValidationToken saves the validation token.
+	SaveValidationToken(userID string, token *types.ValidationToken) error
+
+	// GetValidationToken retrieves the validation token.
+	GetValidationToken(userID, token string) (*types.ValidationToken, error)
+
+	// DeleteValidationToken deletes the validation token.
+	DeleteValidationToken(userID, token string) error
+
 	// LoadAttributes loads all user attributes if the User is an Attributer.
 	LoadAttributes(userID string, user types.User) error
 
