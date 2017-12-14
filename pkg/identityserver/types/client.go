@@ -11,6 +11,8 @@ import (
 type Client interface {
 	osin.Client
 
+	osin.ClientSecretMatcher
+
 	// GetClient returns the ttnpb.Client that represents this client.
 	GetClient() *ttnpb.Client
 }

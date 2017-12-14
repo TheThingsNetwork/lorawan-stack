@@ -2,7 +2,10 @@
 
 package ttnpb
 
-import "regexp"
+import (
+	"crypto/subtle"
+	"regexp"
+)
 
 // GetClient returns the base Client itself.
 func (c *Client) GetClient() *Client {
@@ -22,6 +25,11 @@ func (c *Client) GetRedirectUri() string {
 // GetUserData implements osin.Client.
 func (c *Client) GetUserData() interface{} {
 	return nil
+}
+
+// ClientSecretMatches implements osin.ClientSecretMatcher.
+func (c *Client) ClientSecretMatches(secret string) bool {
+	return subtle.ConstantTimeCompare([]byte(c.Secret), []byte(secret)) == 1
 }
 
 func (c *Client) HasGrant(grant GrantType) bool {
