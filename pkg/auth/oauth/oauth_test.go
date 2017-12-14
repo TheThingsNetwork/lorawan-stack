@@ -160,6 +160,8 @@ func TestAuthorizationFlowJSON(t *testing.T) {
 
 	}
 
+	var accessToken string
+
 	// exchange code
 	{
 		uri = "https://" + issuer + "/oauth/token"
@@ -201,6 +203,35 @@ func TestAuthorizationFlowJSON(t *testing.T) {
 			a.So(found.UserID, should.Equal, userID)
 			a.So(found.Scope, should.Equal, Scope(rights))
 		}
+
+		accessToken = tok.AccessToken
+	}
+
+	// introspect the token using the info endpoint
+	{
+		uri = "https://" + issuer + "/oauth/info"
+		req := httptest.NewRequest("POST", uri, nil)
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
+
+		w := httptest.NewRecorder()
+
+		server.ServeHTTP(w, req)
+		resp := w.Result()
+
+		a.So(resp.StatusCode, should.Equal, http.StatusOK)
+
+		body, err := ioutil.ReadAll(resp.Body)
+		a.So(err, should.BeNil)
+
+		tok := make(map[string]interface{})
+		err = json.Unmarshal(body, &tok)
+		a.So(err, should.BeNil)
+
+		a.So(tok["access_token"], should.Equal, accessToken)
+		a.So(tok["token_type"], should.Equal, "bearer")
+		a.So(tok["client_id"], should.Equal, client.ClientID)
+		a.So(tok["scope"], should.Equal, Scope(rights))
+		a.So(tok["expires_in"], should.Equal, AccessExpiration)
 	}
 }
 
@@ -254,6 +285,8 @@ func TestAuthorizationFlowForm(t *testing.T) {
 		code = u.Query().Get("code")
 	}
 
+	var accessToken string
+
 	// exchange code
 	{
 		uri = "https://" + issuer + "/oauth/token"
@@ -295,6 +328,35 @@ func TestAuthorizationFlowForm(t *testing.T) {
 			a.So(found.UserID, should.Equal, userID)
 			a.So(found.Scope, should.Equal, Scope(rights))
 		}
+
+		accessToken = tok.AccessToken
+	}
+
+	// introspect the token using the info endpoint
+	{
+		uri = "https://" + issuer + "/oauth/info"
+		req := httptest.NewRequest("POST", uri, nil)
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
+
+		w := httptest.NewRecorder()
+
+		server.ServeHTTP(w, req)
+		resp := w.Result()
+
+		a.So(resp.StatusCode, should.Equal, http.StatusOK)
+
+		body, err := ioutil.ReadAll(resp.Body)
+		a.So(err, should.BeNil)
+
+		tok := make(map[string]interface{})
+		err = json.Unmarshal(body, &tok)
+		a.So(err, should.BeNil)
+
+		a.So(tok["access_token"], should.Equal, accessToken)
+		a.So(tok["token_type"], should.Equal, "bearer")
+		a.So(tok["client_id"], should.Equal, client.ClientID)
+		a.So(tok["scope"], should.Equal, Scope(rights))
+		a.So(tok["expires_in"], should.Equal, AccessExpiration)
 	}
 }
 

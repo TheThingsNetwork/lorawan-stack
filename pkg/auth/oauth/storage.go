@@ -119,7 +119,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 			ClientID:    data.Client.GetId(),
 			UserID:      userID,
 			Scope:       data.Scope,
-			CreatedAt:   data.CreatedAt,
+			CreatedAt:   data.CreatedAt.Add(time.Second),
 			RedirectURI: data.RedirectUri,
 			ExpiresIn:   time.Duration(data.ExpiresIn) * time.Second,
 		})

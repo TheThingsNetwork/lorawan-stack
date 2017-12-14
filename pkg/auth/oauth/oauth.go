@@ -17,6 +17,14 @@ import (
 	"github.com/labstack/echo"
 )
 
+const (
+	// AuthorizationExpiration is the authorization code expiration in seconds (default 5 minutes).
+	AuthorizationExpiration = 300
+
+	// AccessExpiration is the access token expiration in seconds (default 1 hour).
+	AccessExpiration = 3600
+)
+
 // Server represents an OAuth 2.0 Server.
 type Server struct {
 	logger     log.Interface
@@ -28,8 +36,8 @@ type Server struct {
 // New returns a new *Server that is ready to use.
 func New(logger log.Interface, iss string, store *sql.Store, authorizer Authorizer) *Server {
 	config := &osin.ServerConfig{
-		AuthorizationExpiration:     60 * 5,  // 5 minutes
-		AccessExpiration:            60 * 60, // 1 hour
+		AuthorizationExpiration:     AuthorizationExpiration,
+		AccessExpiration:            AccessExpiration,
 		ErrorStatusCode:             http.StatusUnauthorized,
 		RequirePKCEForPublicClients: false,
 		RedirectUriSeparator:        "",
@@ -71,6 +79,7 @@ func (s *Server) Register(server *web.Server) {
 	group := server.Group.Group("/oauth")
 	group.Any("/token", s.tokenHandler)
 	group.Any("/authorize", s.authorizationHandler)
+	group.Any("/info", s.infoHandler)
 }
 
 type tokenRequest struct {
@@ -170,6 +179,20 @@ func (s *Server) authorizationHandler(c echo.Context) error {
 	ar.Authorized = authorized
 
 	s.oauth.FinishAuthorizeRequest(resp, req, ar)
+	return s.output(c, resp)
+}
+
+func (s *Server) infoHandler(c echo.Context) error {
+	req := c.Request()
+	resp := s.oauth.NewResponse()
+	defer resp.Close()
+
+	ir := s.oauth.HandleInfoRequest(resp, req)
+	if ir == nil {
+		return s.output(c, resp)
+	}
+
+	s.oauth.FinishInfoRequest(resp, req, ir)
 	return s.output(c, resp)
 }
 
