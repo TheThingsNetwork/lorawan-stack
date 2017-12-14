@@ -280,3 +280,43 @@ func (s *OAuthStore) deleteRefreshToken(q db.QueryContext, refreshToken string) 
 
 	return err
 }
+
+// RevokeAuthorizedClient deletes the access tokens and refresh token
+// granted to a client by a given user.
+func (s *OAuthStore) RevokeAuthorizedClient(userID, clientID string) error {
+	err := s.transact(func(tx *db.Tx) error {
+		err := s.deleteAccessTokensByUserAndClient(tx, userID, clientID)
+		if err != nil {
+			return err
+		}
+
+		return s.deleteRefreshTokenByUserAndClient(tx, userID, clientID)
+	})
+	return err
+}
+
+func (s *OAuthStore) deleteAccessTokensByUserAndClient(q db.QueryContext, userID, clientID string) error {
+	_, err := q.Exec(
+		`DELETE
+			FROM access_tokens
+			WHERE user_id = $1 AND client_id = $2`,
+		userID,
+		clientID)
+	return err
+}
+
+func (s *OAuthStore) deleteRefreshTokenByUserAndClient(q db.QueryContext, userID, clientID string) error {
+	res := new(string)
+	err := q.SelectOne(
+		res,
+		`DELETE
+			FROM refresh_tokens
+			WHERE user_id = $1 AND client_id = $2
+			RETURNING refresh_token`,
+		userID,
+		clientID)
+	if db.IsNoRows(err) {
+		return ErrRefreshTokenNotFound.New(nil)
+	}
+	return err
+}

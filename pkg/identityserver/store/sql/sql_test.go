@@ -76,5 +76,7 @@ func cleanStore(t testing.TB, database string) *Store {
 		}
 	}
 
+	testClientCreate(t, s)
+
 	return s
 }

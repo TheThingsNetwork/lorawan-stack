@@ -35,9 +35,8 @@ func testClients() map[string]*ttnpb.Client {
 	}
 }
 
-func TestClientCreate(t *testing.T) {
+func testClientCreate(t testing.TB, s *Store) {
 	a := assertions.New(t)
-	s := testStore(t)
 
 	clients := testClients()
 

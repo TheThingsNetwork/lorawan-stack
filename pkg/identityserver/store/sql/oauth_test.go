@@ -17,10 +17,7 @@ func TestOAuthAuthorizationCode(t *testing.T) {
 	s := cleanStore(t, database)
 
 	userID := testUsers()["john-doe"].UserID
-
 	client := testClients()["test-client"]
-	err := s.Clients.Create(client)
-	a.So(err, should.BeNil)
 
 	data := &types.AuthorizationData{
 		AuthorizationCode: "123456",
@@ -33,7 +30,7 @@ func TestOAuthAuthorizationCode(t *testing.T) {
 		UserID:            userID,
 	}
 
-	err = s.OAuth.SaveAuthorizationCode(data)
+	err := s.OAuth.SaveAuthorizationCode(data)
 	a.So(err, should.BeNil)
 
 	found, err := s.OAuth.GetAuthorizationCode(data.AuthorizationCode)
@@ -63,10 +60,7 @@ func TestOAuthAccessToken(t *testing.T) {
 	s := cleanStore(t, database)
 
 	userID := testUsers()["john-doe"].UserID
-
 	client := testClients()["test-client"]
-	err := s.Clients.Create(client)
-	a.So(err, should.BeNil)
 
 	data := &types.AccessData{
 		AccessToken: "123456",
@@ -78,7 +72,7 @@ func TestOAuthAccessToken(t *testing.T) {
 		RedirectURI: "https://example.com/oauth/callback",
 	}
 
-	err = s.OAuth.SaveAccessToken(data)
+	err := s.OAuth.SaveAccessToken(data)
 	a.So(err, should.BeNil)
 
 	found, err := s.OAuth.GetAccessToken(data.AccessToken)
@@ -107,10 +101,7 @@ func TestOAuthRefreshToken(t *testing.T) {
 	s := cleanStore(t, database)
 
 	userID := testUsers()["john-doe"].UserID
-
 	client := testClients()["test-client"]
-	err := s.Clients.Create(client)
-	a.So(err, should.BeNil)
 
 	data := &types.RefreshData{
 		RefreshToken: "123456",
@@ -121,7 +112,7 @@ func TestOAuthRefreshToken(t *testing.T) {
 		RedirectURI:  "https://example.com/oauth/callback",
 	}
 
-	err = s.OAuth.SaveRefreshToken(data)
+	err := s.OAuth.SaveRefreshToken(data)
 	a.So(err, should.BeNil)
 
 	found, err := s.OAuth.GetRefreshToken(data.RefreshToken)
@@ -142,4 +133,44 @@ func TestOAuthRefreshToken(t *testing.T) {
 
 	_, err = s.OAuth.GetRefreshToken(data.RefreshToken)
 	a.So(err, should.NotBeNil)
+}
+
+func TestOAuthRevokeClient(t *testing.T) {
+	a := assertions.New(t)
+	s := cleanStore(t, database)
+
+	userID := testUsers()["john-doe"].UserID
+	client := testClients()["test-client"]
+
+	accessData := &types.AccessData{
+		AccessToken: "123456",
+		ClientID:    client.ClientIdentifier.ClientID,
+		UserID:      userID,
+		CreatedAt:   time.Now(),
+		ExpiresIn:   time.Hour,
+		Scope:       "scope",
+		RedirectURI: "https://example.com/oauth/callback",
+	}
+
+	err := s.OAuth.SaveAccessToken(accessData)
+	a.So(err, should.BeNil)
+
+	refreshData := &types.RefreshData{
+		RefreshToken: "123456",
+		ClientID:     client.ClientIdentifier.ClientID,
+		UserID:       userID,
+		CreatedAt:    time.Now(),
+		Scope:        "scope",
+		RedirectURI:  "https://example.com/oauth/callback",
+	}
+
+	err = s.OAuth.SaveRefreshToken(refreshData)
+	a.So(err, should.BeNil)
+
+	err = s.OAuth.RevokeAuthorizedClient(userID, client.ClientID)
+	a.So(err, should.BeNil)
+
+	err = s.OAuth.RevokeAuthorizedClient(userID, client.ClientID)
+	a.So(err, should.NotBeNil)
+	a.So(ErrRefreshTokenNotFound.Describes(err), should.BeTrue)
 }
