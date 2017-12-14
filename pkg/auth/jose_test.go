@@ -18,10 +18,10 @@ func TestJOSEEncoding(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(key, should.NotBeEmpty)
 
-		header, payload, err := Decode(key)
+		header, payload, err := DecodeTokenOrKey(key)
 		a.So(err, should.BeNil)
 		a.So(header, should.Resemble, &Header{
-			Type:      typeToken,
+			Type:      Token,
 			Algorithm: alg,
 		})
 		a.So(payload, should.Resemble, &Payload{
@@ -35,15 +35,15 @@ func TestJOSEEncoding(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(key, should.NotBeEmpty)
 
-		header, payload, err := Decode(key)
+		header, payload, err := DecodeTokenOrKey(key)
 		a.So(err, should.BeNil)
 		a.So(header, should.Resemble, &Header{
-			Type:      typeKey,
+			Type:      Key,
 			Algorithm: alg,
 		})
 		a.So(payload, should.Resemble, &Payload{
 			Issuer: "foo.issuer",
-			Type:   typeApplication,
+			Type:   ApplicationKey,
 		})
 	}
 
@@ -53,15 +53,33 @@ func TestJOSEEncoding(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(key, should.NotBeEmpty)
 
-		header, payload, err := Decode(key)
+		header, payload, err := DecodeTokenOrKey(key)
 		a.So(err, should.BeNil)
 		a.So(header, should.Resemble, &Header{
-			Type:      typeKey,
+			Type:      Key,
 			Algorithm: alg,
 		})
 		a.So(payload, should.Resemble, &Payload{
 			Issuer: "",
-			Type:   typeGateway,
+			Type:   GatewayKey,
+		})
+	}
+
+	// User API Key
+	{
+		key, err := GenerateUserAPIKey("")
+		a.So(err, should.BeNil)
+		a.So(key, should.NotBeEmpty)
+
+		header, payload, err := DecodeTokenOrKey(key)
+		a.So(err, should.BeNil)
+		a.So(header, should.Resemble, &Header{
+			Type:      Key,
+			Algorithm: alg,
+		})
+		a.So(payload, should.Resemble, &Payload{
+			Issuer: "",
+			Type:   UserKey,
 		})
 	}
 }

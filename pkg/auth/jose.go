@@ -12,12 +12,6 @@ import (
 )
 
 const (
-	// typeKey is the JOSE type for the API Key.
-	typeKey = "key"
-
-	// typeKey is the JOSE type for the Access Token.
-	typeToken = "token"
-
 	// alg is the JOSE algorithm for the Access Token and API Key.
 	alg = "secret"
 
@@ -30,32 +24,6 @@ var (
 	enc = base64.RawURLEncoding
 )
 
-// apiKeyType denotes the API key type.
-type apiKeyType int
-
-const (
-	// typeInvalid is an invalid type.
-	typeInvalid apiKeyType = iota
-
-	// typeApplication denotes it is an application API key.
-	typeApplication
-
-	// typeGateway denotes it is a gateway API key.
-	typeGateway
-)
-
-// String implements fmt.Stringer.
-func (k apiKeyType) String() string {
-	switch k {
-	case typeApplication:
-		return "application"
-	case typeGateway:
-		return "gateway"
-	default:
-		return "invalid type"
-	}
-}
-
 // Header is the JOSE header.
 type Header struct {
 	Algorithm string `json:"alg"`
@@ -65,33 +33,10 @@ type Header struct {
 // Payload is the payload used to generate API keys and Access Tokens.
 type Payload struct {
 	Issuer string     `json:"iss,omitempty"`
-	Type   apiKeyType `json:"type,omitempty"`
+	Type   APIKeyType `json:"type,omitempty"`
 }
 
-// GenerateApplicationAPIKey generates an application API Key using the JOSE header.
-func GenerateApplicationAPIKey(issuer string) (string, error) {
-	return generate(typeKey, &Payload{
-		Issuer: issuer,
-		Type:   typeApplication,
-	})
-}
-
-// GenerateApplicationAPIKey generates a gateway API Key using the JOSE header.
-func GenerateGatewayAPIKey(issuer string) (string, error) {
-	return generate(typeKey, &Payload{
-		Issuer: issuer,
-		Type:   typeGateway,
-	})
-}
-
-// GenerateApplicationAPIKey generates an Access Token using the JOSE header.
-func GenerateAccessToken(issuer string) (string, error) {
-	return generate(typeToken, &Payload{
-		Issuer: issuer,
-	})
-}
-
-func Decode(value string) (*Header, *Payload, error) {
+func DecodeTokenOrKey(value string) (*Header, *Payload, error) {
 	parts := strings.Split(value, ".")
 	if len(parts) != 3 {
 		return nil, nil, errors.New("Invalid number of segments")
