@@ -133,25 +133,27 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		}
 	}
 
-	match := false
-	for _, px := range js.euiPrefixes {
-		if px.Matches(pld.JoinEUI) {
-			match = true
-		}
-	}
-	if !match {
-		// TODO determine the cluster containing the device
-		// https://github.com/TheThingsIndustries/ttn/issues/244
-		return nil, ErrForwardJoinRequest.NewWithCause(nil, deviceregistry.ErrDeviceNotFound.New(errors.Attributes{
-			"id": &ttnpb.EndDeviceIdentifiers{JoinEUI: &pld.JoinEUI}}))
-	}
-
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
 		DevEUI:  &pld.DevEUI,
 		JoinEUI: &pld.JoinEUI,
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	if dev.LoRaWANVersion != ttnpb.MAC_V1_0 {
+		match := false
+		for _, px := range js.euiPrefixes {
+			if px.Matches(pld.JoinEUI) {
+				match = true
+			}
+		}
+		if !match {
+			// TODO determine the cluster containing the device
+			// https://github.com/TheThingsIndustries/ttn/issues/244
+			return nil, ErrForwardJoinRequest.NewWithCause(nil, deviceregistry.ErrDeviceNotFound.New(errors.Attributes{
+				"id": &ttnpb.EndDeviceIdentifiers{JoinEUI: &pld.JoinEUI}}))
+		}
 	}
 
 	// Registered version is lower than selected.
