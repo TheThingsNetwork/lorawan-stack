@@ -68,7 +68,7 @@ func claims(ctx context.Context, t TokenInfoProvider, k KeyInfoProvider) (*auth.
 		}
 
 		claims = &Claims{
-			Subject: types.UserSubject(data.UserID),
+			Subject: auth.UserSubject(data.UserID),
 			Source:  auth.Token,
 			Rights:  rights,
 		}
@@ -85,11 +85,11 @@ func claims(ctx context.Context, t TokenInfoProvider, k KeyInfoProvider) (*auth.
 
 		switch payload.Type {
 		case auth.ApplicationKey:
-			claims.Subject = types.ApplicationSubject(entityID)
+			claims.Subject = auth.ApplicationSubject(entityID)
 		case auth.GatewayKey:
-			claims.Subject = types.GatewaySubject(entityID)
+			claims.Subject = auth.GatewaySubject(entityID)
 		case auth.UserKey:
-			claims.Subject = types.UserSubject(entityID)
+			claims.Subject = auth.UserSubject(entityID)
 		default:
 			return nil, errors.Errorf("Invalid API key type `%s`", payload.Type)
 		}
