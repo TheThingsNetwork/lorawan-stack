@@ -15,6 +15,8 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/peer"
 )
 
 var supportedMACVersions = [...]ttnpb.MACVersion{
@@ -52,6 +54,10 @@ func New(conf *Config) *JoinServer {
 	}
 }
 
+func keyPointer(key types.AES128Key) *types.AES128Key {
+	return &key
+}
+
 func checkMIC(key types.AES128Key, rawPayload []byte) error {
 	if n := len(rawPayload); n != 23 {
 		return errors.Errorf("Expected length of raw payload to be equal to 23, got %d", n)
@@ -68,12 +74,13 @@ func checkMIC(key types.AES128Key, rawPayload []byte) error {
 	return nil
 }
 
-func keyPointer(key types.AES128Key) *types.AES128Key {
-	return &key
-}
-
 // HandleJoin is called by the network server to join a device
 func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (resp *ttnpb.JoinResponse, err error) {
+	peer, ok := peer.FromContext(ctx)
+	if !ok {
+		return nil, errors.New("Failed to determine peer from context")
+	}
+
 	supported := false
 	for _, v := range supportedMACVersions {
 		supported = v == req.SelectedMacVersion
@@ -139,6 +146,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	if peer.Addr.String() != dev.NetworkServerURL {
+		return nil, errors.New("Network Server URL mismatch")
 	}
 
 	if dev.LoRaWANVersion != ttnpb.MAC_V1_0 {
@@ -256,19 +267,19 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			SessionKeys: ttnpb.SessionKeys{
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
 					Key:      keyPointer(crypto.DeriveFNwkSIntKey(nwkKey, jn, pld.JoinEUI, pld.DevNonce)),
-					KekLabel: "",
+					KEKLabel: "",
 				},
 				SNwkSIntKey: &ttnpb.KeyEnvelope{
 					Key:      keyPointer(crypto.DeriveSNwkSIntKey(nwkKey, jn, pld.JoinEUI, pld.DevNonce)),
-					KekLabel: "",
+					KEKLabel: "",
 				},
 				NwkSEncKey: &ttnpb.KeyEnvelope{
 					Key:      keyPointer(crypto.DeriveNwkSEncKey(nwkKey, jn, pld.JoinEUI, pld.DevNonce)),
-					KekLabel: "",
+					KEKLabel: "",
 				},
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key:      keyPointer(crypto.DeriveAppSKey(appKey, jn, pld.JoinEUI, pld.DevNonce)),
-					KekLabel: "",
+					KEKLabel: "",
 				},
 			},
 			Lifetime: nil,
@@ -292,11 +303,11 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			SessionKeys: ttnpb.SessionKeys{
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
 					Key:      keyPointer(crypto.DeriveLegacyNwkSKey(appKey, jn, req.NetID, pld.DevNonce)),
-					KekLabel: "",
+					KEKLabel: "",
 				},
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key:      keyPointer(crypto.DeriveLegacyAppSKey(appKey, jn, req.NetID, pld.DevNonce)),
-					KekLabel: "",
+					KEKLabel: "",
 				},
 			},
 			Lifetime: nil,
@@ -307,10 +318,60 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 	dev.UsedDevNonces = append(dev.UsedDevNonces, uint32(dn))
 	dev.NextJoinNonce++
+	dev.EndDevice.Session = &ttnpb.Session{
+		SessionKeys: ttnpb.SessionKeys{
+			SessionKeyID: resp.GetSessionKeyID(),
+			AppSKey:      resp.GetAppSKey(),
+		},
+	}
 	if err := dev.Update(); err != nil {
 		js.Component.Logger().WithField("device", dev).WithError(err).Error("Failed to update device")
 	}
 	return resp, nil
+}
+
+func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.AppSKeyRequest) (*ttnpb.AppSKeyResponse, error) {
+	peer, ok := peer.FromContext(ctx)
+	if !ok {
+		return nil, errors.New("Failed to determine peer from context")
+	}
+
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, errors.New("Missing metadata")
+	}
+	appIDs, ok := md["application_id"]
+	if !ok {
+		return nil, errors.New("Missing application_id field in metadata")
+	}
+	if len(appIDs) != 1 {
+		return nil, errors.Errorf("Expected length of application_id field in metadata equal to %d, got %d", 1, len(appIDs))
+	}
+	dev, err := deviceregistry.FindOneDeviceByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
+		DevEUI:        &req.DevEUI,
+		ApplicationID: appIDs[0],
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if peer.Addr.String() != dev.ApplicationServerURL {
+		return nil, errors.New("Application Server URL mismatch")
+	}
+	s := dev.GetSession()
+	if s == nil {
+		return nil, errors.New("Device has no active session")
+	}
+	if s.GetSessionKeyID() != req.GetSessionKeyID() {
+		return nil, errors.New("Session key ID mismatch")
+	}
+	appSKey := s.GetAppSKey()
+	if appSKey == nil {
+		return nil, errors.New("AppSKey not found")
+	}
+	return &ttnpb.AppSKeyResponse{
+		AppSKey: *appSKey,
+	}, nil
 }
 
 // RegisterServices registers services provided by js at s.

@@ -10,7 +10,7 @@ package ttn.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
-// The As service connects an application or integration to a application server.
+// The As service connects an application or integration to an application server.
 service As {
   rpc Subscribe(EndDeviceIdentifiers) returns (stream ApplicationUp);
 }

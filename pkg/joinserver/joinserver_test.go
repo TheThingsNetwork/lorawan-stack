@@ -3,6 +3,7 @@
 package joinserver_test
 
 import (
+	"net"
 	"testing"
 	"time"
 
@@ -21,6 +22,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"golang.org/x/net/context"
+	"google.golang.org/grpc/peer"
 )
 
 const appID = "test"
@@ -119,14 +121,15 @@ func TestHandleJoin(t *testing.T) {
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
 						Key:      &appKey,
-						KekLabel: "",
+						KEKLabel: "",
 					},
 					NwkKey: &ttnpb.KeyEnvelope{
 						Key:      &nwkKey,
-						KekLabel: "",
+						KEKLabel: "",
 					},
 				},
-				LoRaWANVersion: ttnpb.MAC_V1_1,
+				LoRaWANVersion:   ttnpb.MAC_V1_1,
+				NetworkServerURL: net.IPv4(0x42, 0x42, 0x42, 0x42).String(),
 			},
 			1,
 			1,
@@ -186,7 +189,7 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x00},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
-						KekLabel: "",
+						KEKLabel: "",
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: KeyPointer(crypto.DeriveSNwkSIntKey(
@@ -194,7 +197,7 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x00},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
-						KekLabel: "",
+						KEKLabel: "",
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: KeyPointer(crypto.DeriveFNwkSIntKey(
@@ -202,7 +205,7 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x00},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
-						KekLabel: "",
+						KEKLabel: "",
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
 						Key: KeyPointer(crypto.DeriveNwkSEncKey(
@@ -210,7 +213,7 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x00},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
-						KekLabel: "",
+						KEKLabel: "",
 					},
 				},
 				Lifetime: nil,
@@ -230,14 +233,15 @@ func TestHandleJoin(t *testing.T) {
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
 						Key:      &appKey,
-						KekLabel: "",
+						KEKLabel: "",
 					},
 					NwkKey: &ttnpb.KeyEnvelope{
 						Key:      &nwkKey,
-						KekLabel: "",
+						KEKLabel: "",
 					},
 				},
-				LoRaWANVersion: ttnpb.MAC_V1_1,
+				LoRaWANVersion:   ttnpb.MAC_V1_1,
+				NetworkServerURL: net.IPv4(0x42, 0x42, 0x42, 0x42).String(),
 			},
 			0x2443,
 			0x424243,
@@ -297,7 +301,7 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x42, 0x42, 0x42},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x42, 0x24})),
-						KekLabel: "",
+						KEKLabel: "",
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: KeyPointer(crypto.DeriveSNwkSIntKey(
@@ -305,7 +309,7 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x42, 0x42, 0x42},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x42, 0x24})),
-						KekLabel: "",
+						KEKLabel: "",
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: KeyPointer(crypto.DeriveFNwkSIntKey(
@@ -313,7 +317,7 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x42, 0x42, 0x42},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x42, 0x24})),
-						KekLabel: "",
+						KEKLabel: "",
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
 						Key: KeyPointer(crypto.DeriveNwkSEncKey(
@@ -321,7 +325,7 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x42, 0x42, 0x42},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x42, 0x24})),
-						KekLabel: "",
+						KEKLabel: "",
 					},
 				},
 				Lifetime: nil,
@@ -341,14 +345,15 @@ func TestHandleJoin(t *testing.T) {
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
 						Key:      &appKey,
-						KekLabel: "",
+						KEKLabel: "",
 					},
 					NwkKey: &ttnpb.KeyEnvelope{
 						Key:      &nwkKey,
-						KekLabel: "",
+						KEKLabel: "",
 					},
 				},
-				LoRaWANVersion: ttnpb.MAC_V1_1,
+				LoRaWANVersion:   ttnpb.MAC_V1_1,
+				NetworkServerURL: net.IPv4(0x42, 0x42, 0x42, 0x42).String(),
 			},
 			0x2442,
 			0x424242,
@@ -397,10 +402,11 @@ func TestHandleJoin(t *testing.T) {
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
 						Key:      &appKey,
-						KekLabel: "",
+						KEKLabel: "",
 					},
 				},
-				LoRaWANVersion: ttnpb.MAC_V1_0_2,
+				LoRaWANVersion:   ttnpb.MAC_V1_0_2,
+				NetworkServerURL: net.IPv4(0x42, 0x42, 0x42, 0x42).String(),
 			},
 			0,
 			1,
@@ -461,7 +467,7 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x00},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
-						KekLabel: "",
+						KEKLabel: "",
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
 						Key: KeyPointer(crypto.DeriveLegacyAppSKey(
@@ -469,7 +475,7 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x00},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
-						KekLabel: "",
+						KEKLabel: "",
 					},
 				},
 				Lifetime: nil,
@@ -488,10 +494,11 @@ func TestHandleJoin(t *testing.T) {
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
 						Key:      &appKey,
-						KekLabel: "",
+						KEKLabel: "",
 					},
 				},
-				LoRaWANVersion: ttnpb.MAC_V1_0_1,
+				LoRaWANVersion:   ttnpb.MAC_V1_0_1,
+				NetworkServerURL: net.IPv4(0x42, 0x42, 0x42, 0x42).String(),
 			},
 			0,
 			1,
@@ -552,7 +559,7 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x00},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
-						KekLabel: "",
+						KEKLabel: "",
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
 						Key: KeyPointer(crypto.DeriveLegacyAppSKey(
@@ -560,7 +567,7 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x00},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
-						KekLabel: "",
+						KEKLabel: "",
 					},
 				},
 				Lifetime: nil,
@@ -579,10 +586,11 @@ func TestHandleJoin(t *testing.T) {
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
 						Key:      &appKey,
-						KekLabel: "",
+						KEKLabel: "",
 					},
 				},
-				LoRaWANVersion: ttnpb.MAC_V1_0,
+				LoRaWANVersion:   ttnpb.MAC_V1_0,
+				NetworkServerURL: net.IPv4(0x42, 0x42, 0x42, 0x42).String(),
 			},
 			0,
 			1,
@@ -643,7 +651,7 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x00},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
-						KekLabel: "",
+						KEKLabel: "",
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
 						Key: KeyPointer(crypto.DeriveLegacyAppSKey(
@@ -651,7 +659,7 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x00},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
-						KekLabel: "",
+						KEKLabel: "",
 					},
 				},
 				Lifetime: nil,
@@ -670,10 +678,11 @@ func TestHandleJoin(t *testing.T) {
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
 						Key:      &appKey,
-						KekLabel: "",
+						KEKLabel: "",
 					},
 				},
-				LoRaWANVersion: ttnpb.MAC_V1_0,
+				LoRaWANVersion:   ttnpb.MAC_V1_0,
+				NetworkServerURL: net.IPv4(0x42, 0x42, 0x42, 0x42).String(),
 			},
 			0,
 			0x424243,
@@ -734,7 +743,7 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x42, 0x42, 0x42},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x42, 0x24})),
-						KekLabel: "",
+						KEKLabel: "",
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
 						Key: KeyPointer(crypto.DeriveLegacyAppSKey(
@@ -742,7 +751,7 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x42, 0x42, 0x42},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x42, 0x24})),
-						KekLabel: "",
+						KEKLabel: "",
 					},
 				},
 				Lifetime: nil,
@@ -761,10 +770,11 @@ func TestHandleJoin(t *testing.T) {
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
 						Key:      &appKey,
-						KekLabel: "",
+						KEKLabel: "",
 					},
 				},
-				LoRaWANVersion: ttnpb.MAC_V1_0,
+				LoRaWANVersion:   ttnpb.MAC_V1_0,
+				NetworkServerURL: net.IPv4(0x42, 0x42, 0x42, 0x42).String(),
 			},
 			0,
 			0x424242,
@@ -824,7 +834,13 @@ func TestHandleJoin(t *testing.T) {
 				a.So(pretty.Diff(dev[0].EndDevice, tc.Device), should.BeEmpty)
 			}
 
-			resp, err := js.HandleJoin(context.Background(), tc.JoinRequest)
+			ctx := peer.NewContext(context.Background(), &peer.Peer{
+				Addr: &net.IPAddr{
+					IP: net.IPv4(0x42, 0x42, 0x42, 0x42),
+				},
+			})
+
+			resp, err := js.HandleJoin(ctx, tc.JoinRequest)
 			if tc.Error != nil {
 				a.So(errors.From(err).Attributes(), should.Resemble, errors.From(tc.Error).Attributes())
 				a.So(errors.From(err).Code(), should.Resemble, errors.From(tc.Error).Code())
