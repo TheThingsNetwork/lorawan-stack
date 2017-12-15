@@ -150,6 +150,55 @@ func TestUserValidationToken(t *testing.T) {
 	a.So(ErrValidationTokenNotFound.Describes(err), should.BeTrue)
 }
 
+func TestUserAPIKeys(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore(t)
+
+	userID := testUsers()["bob"].UserID
+	key := &ttnpb.APIKey{
+		Key:    "abcabcabc",
+		Name:   "foo",
+		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
+	}
+
+	list, err := s.Users.ListAPIKeys(userID)
+	a.So(err, should.BeNil)
+	a.So(list, should.HaveLength, 0)
+
+	err = s.Users.SaveAPIKey(userID, key)
+	a.So(err, should.BeNil)
+
+	key2 := &ttnpb.APIKey{
+		Key:    "123abc",
+		Name:   "foo",
+		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
+	}
+	err = s.Users.SaveAPIKey(userID, key2)
+	a.So(err, should.NotBeNil)
+	a.So(ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
+
+	found, err := s.Users.GetAPIKey(userID, key.Name)
+	a.So(err, should.BeNil)
+	a.So(found, should.Resemble, key)
+
+	key.Rights = append(key.Rights, ttnpb.Right(5))
+	err = s.Users.UpdateAPIKey(userID, key)
+	a.So(err, should.BeNil)
+
+	list, err = s.Users.ListAPIKeys(userID)
+	a.So(err, should.BeNil)
+	if a.So(list, should.HaveLength, 1) {
+		a.So(list[0], should.Resemble, key)
+	}
+
+	err = s.Users.DeleteAPIKey(userID, key.Name)
+	a.So(err, should.BeNil)
+
+	found, err = s.Users.GetAPIKey(userID, key.Name)
+	a.So(err, should.NotBeNil)
+	a.So(ErrAPIKeyNotFound.Describes(err), should.BeTrue)
+}
+
 func BenchmarkUserCreate(b *testing.B) {
 	s := testStore(b)
 

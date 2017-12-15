@@ -3,10 +3,14 @@
 package sql
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 // UserStore implements store.UserStore.
@@ -245,6 +249,209 @@ func (s *UserStore) deleteValidationToken(q db.QueryContext, userID, token strin
 	if db.IsNoRows(err) {
 		return ErrValidationTokenNotFound.New(nil)
 	}
+	return err
+}
+
+func (s *UserStore) SaveAPIKey(userID string, key *ttnpb.APIKey) error {
+	err := s.transact(func(tx *db.Tx) error {
+		err := s.saveAPIKey(tx, userID, key)
+		if err != nil {
+			return err
+		}
+
+		return s.saveAPIKeyRights(tx, userID, key)
+	})
+	return err
+}
+
+func (s *UserStore) saveAPIKey(q db.QueryContext, userID string, key *ttnpb.APIKey) error {
+	_, err := q.Exec(
+		`INSERT
+			INTO users_api_keys (user_id, key, key_name)
+			VALUES ($1, $2, $3)`,
+		userID,
+		key.Key,
+		key.Name)
+	if _, yes := db.IsDuplicate(err); yes {
+		return ErrAPIKeyNameConflict.New(errors.Attributes{
+			"name": key.Name,
+		})
+	}
+	return err
+}
+
+func (s *UserStore) saveAPIKeyRights(q db.QueryContext, userID string, key *ttnpb.APIKey) error {
+	query, args := s.saveAPIKeyRightsQuery(userID, key)
+	_, err := q.Exec(query, args...)
+	return err
+}
+
+func (s *UserStore) saveAPIKeyRightsQuery(userID string, key *ttnpb.APIKey) (string, []interface{}) {
+	args := make([]interface{}, 1+len(key.Rights))
+	args[0] = key.Key
+
+	boundValues := make([]string, len(key.Rights))
+
+	for i, right := range key.Rights {
+		args[i+1] = right
+		boundValues[i] = fmt.Sprintf("($1, $%d)", i+2)
+	}
+
+	query := fmt.Sprintf(
+		`INSERT
+			INTO users_api_keys_rights (key, "right")
+			VALUES %s
+			ON CONFLICT (key, "right")
+			DO NOTHING`,
+		strings.Join(boundValues, ", "))
+
+	return query, args
+}
+
+func (s *UserStore) GetAPIKey(userID, keyName string) (*ttnpb.APIKey, error) {
+	var key *ttnpb.APIKey
+	var err error
+	err = s.transact(func(tx *db.Tx) error {
+		key, err = s.getAPIKey(tx, userID, keyName)
+		if err != nil {
+			return err
+		}
+
+		key.Rights, err = s.getAPIKeyRights(tx, key.Key)
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+	return key, nil
+}
+
+func (s *UserStore) getAPIKey(q db.QueryContext, userID, keyName string) (*ttnpb.APIKey, error) {
+	res := new(ttnpb.APIKey)
+	err := q.SelectOne(
+		res,
+		`SELECT
+				key,
+				key_name AS name
+			FROM users_api_keys
+			WHERE user_id = $1 AND key_name = $2`,
+		userID,
+		keyName)
+	if db.IsNoRows(err) {
+		return nil, ErrAPIKeyNotFound.New(errors.Attributes{
+			"name": keyName,
+		})
+	}
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (s *UserStore) getAPIKeyRights(q db.QueryContext, key string) ([]ttnpb.Right, error) {
+	var res []ttnpb.Right
+	err := q.Select(
+		&res,
+		`SELECT
+				"right"
+			FROM users_api_keys_rights
+			WHERE key = $1`,
+		key)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (s *UserStore) ListAPIKeys(userID string) ([]*ttnpb.APIKey, error) {
+	var res []*ttnpb.APIKey
+	var err error
+	err = s.transact(func(tx *db.Tx) error {
+		res, err = s.listAPIKeys(tx, userID)
+		if err != nil {
+			return err
+		}
+
+		for i, key := range res {
+			res[i].Rights, err = s.getAPIKeyRights(tx, key.Key)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (s *UserStore) listAPIKeys(q db.QueryContext, userID string) ([]*ttnpb.APIKey, error) {
+	var res []*ttnpb.APIKey
+	err := q.Select(
+		&res,
+		`SELECT
+				key,
+				key_name AS name
+			FROM users_api_keys
+			WHERE user_id = $1`,
+		userID)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (s *UserStore) UpdateAPIKey(userID string, key *ttnpb.APIKey) error {
+	err := s.transact(func(tx *db.Tx) error {
+		err := s.deleteAPIKeyRights(tx, key.Key)
+		if err != nil {
+			return err
+		}
+
+		return s.saveAPIKeyRights(tx, userID, key)
+	})
+	return err
+}
+
+func (s *UserStore) DeleteAPIKey(userID, keyName string) error {
+	err := s.transact(func(tx *db.Tx) error {
+		key, err := s.getAPIKey(tx, userID, keyName)
+		if err != nil {
+			return err
+		}
+
+		err = s.deleteAPIKeyRights(tx, key.Key)
+		if err != nil {
+			return err
+		}
+
+		return s.deleteAPIKey(tx, userID, keyName)
+	})
+	return err
+}
+
+func (s *UserStore) deleteAPIKey(q db.QueryContext, userID, keyName string) error {
+	res := new(string)
+	err := q.SelectOne(
+		res,
+		`DELETE
+			FROM users_api_keys
+			WHERE user_id = $1 AND key_name = $2
+			RETURNING key`,
+		userID,
+		keyName)
+	if db.IsNoRows(err) {
+		return ErrAPIKeyNotFound.New(errors.Attributes{
+			"name": keyName,
+		})
+	}
+	return err
+}
+
+func (s *UserStore) deleteAPIKeyRights(q db.QueryContext, key string) error {
+	_, err := q.Exec(`DELETE FROM users_api_keys_rights WHERE key = $1`, key)
 	return err
 }
 

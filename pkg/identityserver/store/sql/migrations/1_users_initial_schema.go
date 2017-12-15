@@ -22,9 +22,24 @@ func init() {
 			created_at         TIMESTAMP DEFAULT current_timestamp(),
 			expires_in         INTEGER
 		);
+
+		CREATE TABLE IF NOT EXISTS users_api_keys (
+			user_id    STRING(36) NOT NULL REFERENCES users(user_id),
+			key        STRING PRIMARY KEY,
+			key_name   STRING(36) NOT NULL,
+			UNIQUE(user_id, key_name)
+		);
+
+		CREATE TABLE IF NOT EXISTS users_api_keys_rights (
+			key       STRING NOT NULL REFERENCES users_api_keys(key),
+			"right"   STRING NOT NULL,
+			PRIMARY KEY(key, "right")
+		);
 	`
 
 	const backwards = `
+		DROP TABLE IF EXISTS users_api_keys_rights;
+		DROP TABLE IF EXISTS users_api_keys;
 		DROP TABLE IF EXISTS validation_tokens;
 		DROP TABLE IF EXISTS users;
 	`

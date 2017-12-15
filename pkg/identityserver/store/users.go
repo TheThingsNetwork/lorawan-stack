@@ -2,7 +2,10 @@
 
 package store
 
-import "github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+import (
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+)
 
 // UserFactory is a function that returns a types.User used to
 // construct the results in read operations.
@@ -35,6 +38,21 @@ type UserStore interface {
 
 	// DeleteValidationToken deletes the validation token.
 	DeleteValidationToken(userID, token string) error
+
+	// SaveAPIKey stores an API Key attached to an user.
+	SaveAPIKey(userID string, key *ttnpb.APIKey) error
+
+	// GetAPIKey retrieves an API key from an user.
+	GetAPIKey(userID, keyName string) (*ttnpb.APIKey, error)
+
+	// UpdateAPIKey updates the right of an API key.
+	UpdateAPIKey(userID string, key *ttnpb.APIKey) error
+
+	// ListAPIKey list all the API keys that an user has.
+	ListAPIKeys(userID string) ([]*ttnpb.APIKey, error)
+
+	// DeleteAPIKey deletes a given API key from an user.
+	DeleteAPIKey(userID, keyName string) error
 
 	// LoadAttributes loads all user attributes if the User is an Attributer.
 	LoadAttributes(userID string, user types.User) error

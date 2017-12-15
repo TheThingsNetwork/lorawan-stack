@@ -27,6 +27,9 @@ func init() {
 	ErrUserIDTaken.Register()
 	ErrUserEmailTaken.Register()
 	ErrValidationTokenNotFound.Register()
+
+	ErrAPIKeyNotFound.Register()
+	ErrAPIKeyNameConflict.Register()
 }
 
 // ErrApplicationNotFound is returned when trying to fetch an application that
@@ -198,4 +201,25 @@ var ErrValidationTokenNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Validation token not found",
 	Code:          404,
 	Type:          errors.NotFound,
+}
+
+// ErrAPIKeyNotFound is returned when trying to fetch an API key that does not exist.
+var ErrAPIKeyNotFound = &errors.ErrDescriptor{
+	MessageFormat: "API key `{name}` does not exist",
+	Code:          405,
+	Type:          errors.NotFound,
+	SafeAttributes: []string{
+		"name",
+	},
+}
+
+// ErrAPIKeyNameConflict is returned when trying to create an API key with a name
+// that already exists in the namespace.
+var ErrAPIKeyNameConflict = &errors.ErrDescriptor{
+	MessageFormat: "API key name `{name}` is already taken",
+	Code:          406,
+	Type:          errors.Conflict,
+	SafeAttributes: []string{
+		"name",
+	},
 }
