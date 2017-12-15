@@ -27,6 +27,16 @@ type UserData struct {
 	UserID string
 }
 
+// getUserID returns the UserID of the input if it a ptr to an UserData, otherwise empty string.
+func getUserID(data interface{}) string {
+	userID := ""
+	udata, ok := data.(*UserData)
+	if ok && udata != nil {
+		userID = udata.UserID
+	}
+	return userID
+}
+
 // Clone the store if needed.
 func (s *storage) Clone() osin.Storage {
 	return s
@@ -51,12 +61,6 @@ func (s *storage) GetClient(clientID string) (osin.Client, error) {
 
 // SaveAuthorize saves authorization data.
 func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
-	userID := ""
-	udata, ok := data.UserData.(*UserData)
-	if ok && udata != nil {
-		userID = udata.UserID
-	}
-
 	return s.store.OAuth.SaveAuthorizationCode(&types.AuthorizationData{
 		AuthorizationCode: data.Code,
 		ClientID:          data.Client.GetId(),
@@ -65,7 +69,7 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 		Scope:             data.Scope,
 		RedirectURI:       data.RedirectUri,
 		State:             data.State,
-		UserID:            userID,
+		UserID:            getUserID(data.UserData),
 	})
 }
 
@@ -107,17 +111,11 @@ func (s *storage) RemoveAuthorize(code string) error {
 
 // SaveAccess saves the access data for later use.
 func (s *storage) SaveAccess(data *osin.AccessData) error {
-	userID := ""
-	udata, ok := data.UserData.(*UserData)
-	if ok && udata != nil {
-		userID = udata.UserID
-	}
-
 	err := s.store.Transact(func(s *store.Store) error {
 		err := s.OAuth.SaveAccessToken(&types.AccessData{
 			AccessToken: data.AccessToken,
 			ClientID:    data.Client.GetId(),
-			UserID:      userID,
+			UserID:      getUserID(data.UserData),
 			Scope:       data.Scope,
 			CreatedAt:   data.CreatedAt.Add(time.Second),
 			RedirectURI: data.RedirectUri,

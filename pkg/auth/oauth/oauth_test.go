@@ -232,6 +232,7 @@ func TestAuthorizationFlowJSON(t *testing.T) {
 		a.So(tok["client_id"], should.Equal, client.ClientID)
 		a.So(tok["scope"], should.Equal, Scope(rights))
 		a.So(tok["expires_in"], should.Equal, AccessExpiration)
+		a.So(tok["user_id"], should.Equal, userID)
 	}
 }
 
@@ -357,6 +358,7 @@ func TestAuthorizationFlowForm(t *testing.T) {
 		a.So(tok["client_id"], should.Equal, client.ClientID)
 		a.So(tok["scope"], should.Equal, Scope(rights))
 		a.So(tok["expires_in"], should.Equal, AccessExpiration)
+		a.So(tok["user_id"], should.Equal, userID)
 	}
 }
 

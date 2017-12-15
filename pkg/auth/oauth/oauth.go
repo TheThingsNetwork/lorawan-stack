@@ -192,7 +192,9 @@ func (s *Server) infoHandler(c echo.Context) error {
 		return s.output(c, resp)
 	}
 
+	resp.Output["user_id"] = getUserID(ir.AccessData.UserData)
 	s.oauth.FinishInfoRequest(resp, req, ir)
+
 	return s.output(c, resp)
 }
 
