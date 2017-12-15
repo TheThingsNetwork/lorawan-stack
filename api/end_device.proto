@@ -17,10 +17,10 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 message KeyEnvelope {
   // The (encrypted) key
-  bytes key = 1 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.AES128Key"];
+  bytes key = 1 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.AES128Key", (gogoproto.jsontag) = "AESKey"];
 
   // The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key
-  string kek_label = 2;
+  string kek_label = 2 [(gogoproto.customname) = "KEKLabel", (gogoproto.jsontag) = "KEKLabel"];
 }
 
 // Root keys for a LoRaWAN device.

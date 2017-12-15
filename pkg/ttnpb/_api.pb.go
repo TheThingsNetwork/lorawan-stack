@@ -97,6 +97,8 @@ It has these top-level messages:
 	UpdateClientRequest
 	JoinRequest
 	JoinResponse
+	AppSKeyRequest
+	AppSKeyResponse
 	Message
 	MHDR
 	MACPayload
