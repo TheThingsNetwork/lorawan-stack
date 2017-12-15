@@ -6452,7 +6452,7 @@ func NewPopulatedGenerateUserAPIKeyRequest(r randyIdentityserver, easy bool) *Ge
 	v12 := r.Intn(10)
 	this.Rights = make([]Right, v12)
 	for i := 0; i < v12; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(30)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -6480,7 +6480,7 @@ func NewPopulatedUpdateUserAPIKeyRequest(r randyIdentityserver, easy bool) *Upda
 	v15 := r.Intn(10)
 	this.Rights = make([]Right, v15)
 	for i := 0; i < v15; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(30)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -6561,7 +6561,7 @@ func NewPopulatedGenerateApplicationAPIKeyRequest(r randyIdentityserver, easy bo
 	v24 := r.Intn(10)
 	this.Rights = make([]Right, v24)
 	for i := 0; i < v24; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(30)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -6591,7 +6591,7 @@ func NewPopulatedUpdateApplicationAPIKeyRequest(r randyIdentityserver, easy bool
 	v28 := r.Intn(10)
 	this.Rights = make([]Right, v28)
 	for i := 0; i < v28; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(30)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -6628,7 +6628,7 @@ func NewPopulatedListApplicationRightsResponse(r randyIdentityserver, easy bool)
 	v32 := r.Intn(10)
 	this.Rights = make([]Right, v32)
 	for i := 0; i < v32; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(30)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -6678,7 +6678,7 @@ func NewPopulatedGenerateGatewayAPIKeyRequest(r randyIdentityserver, easy bool) 
 	v39 := r.Intn(10)
 	this.Rights = make([]Right, v39)
 	for i := 0; i < v39; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(30)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -6708,7 +6708,7 @@ func NewPopulatedUpdateGatewayAPIKeyRequest(r randyIdentityserver, easy bool) *U
 	v43 := r.Intn(10)
 	this.Rights = make([]Right, v43)
 	for i := 0; i < v43; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(30)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -6745,7 +6745,7 @@ func NewPopulatedListGatewayRightsResponse(r randyIdentityserver, easy bool) *Li
 	v47 := r.Intn(10)
 	this.Rights = make([]Right, v47)
 	for i := 0; i < v47; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(30)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
