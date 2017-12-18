@@ -137,17 +137,41 @@ func TestUserValidationToken(t *testing.T) {
 	err := s.Users.SaveValidationToken(userID, token)
 	a.So(err, should.BeNil)
 
-	found, err := s.Users.GetValidationToken(userID, token.ValidationToken)
+	uID, found, err := s.Users.GetValidationToken(token.ValidationToken)
 	a.So(err, should.BeNil)
+	a.So(uID, should.Equal, userID)
 	a.So(found.ValidationToken, should.Equal, token.ValidationToken)
-	a.So(found.CreatedAt.Equal(token.CreatedAt), should.BeTrue)
+	a.So(found.CreatedAt, should.HappenWithin, time.Millisecond, token.CreatedAt)
 	a.So(found.ExpiresIn, should.Equal, token.ExpiresIn)
 
-	err = s.Users.DeleteValidationToken(userID, token.ValidationToken)
+	err = s.Users.DeleteValidationToken(token.ValidationToken)
 	a.So(err, should.BeNil)
 
-	_, err = s.Users.GetValidationToken(userID, token.ValidationToken)
+	_, _, err = s.Users.GetValidationToken(token.ValidationToken)
 	a.So(ErrValidationTokenNotFound.Describes(err), should.BeTrue)
+
+	err = s.Users.SaveValidationToken(userID, token)
+	a.So(err, should.BeNil)
+
+	newToken := &types.ValidationToken{
+		ValidationToken: "bar-token",
+		CreatedAt:       time.Now(),
+		ExpiresIn:       3600,
+	}
+
+	// previous token will be erased
+	err = s.Users.SaveValidationToken(userID, newToken)
+	a.So(err, should.BeNil)
+
+	_, _, err = s.Users.GetValidationToken(token.ValidationToken)
+	a.So(ErrValidationTokenNotFound.Describes(err), should.BeTrue)
+
+	uID, found, err = s.Users.GetValidationToken(newToken.ValidationToken)
+	a.So(err, should.BeNil)
+	a.So(uID, should.Equal, userID)
+	a.So(found.ValidationToken, should.Equal, newToken.ValidationToken)
+	a.So(found.CreatedAt, should.HappenWithin, time.Millisecond, newToken.CreatedAt)
+	a.So(found.ExpiresIn, should.Equal, newToken.ExpiresIn)
 }
 
 func TestUserAPIKeys(t *testing.T) {

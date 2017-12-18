@@ -34,10 +34,10 @@ type UserStore interface {
 	SaveValidationToken(userID string, token *types.ValidationToken) error
 
 	// GetValidationToken retrieves the validation token.
-	GetValidationToken(userID, token string) (*types.ValidationToken, error)
+	GetValidationToken(token string) (string, *types.ValidationToken, error)
 
 	// DeleteValidationToken deletes the validation token.
-	DeleteValidationToken(userID, token string) error
+	DeleteValidationToken(token string) error
 
 	// SaveAPIKey stores an API Key attached to an user.
 	SaveAPIKey(userID string, key *ttnpb.APIKey) error

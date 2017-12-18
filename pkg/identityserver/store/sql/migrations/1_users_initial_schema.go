@@ -17,8 +17,9 @@ func init() {
 		CREATE UNIQUE INDEX IF NOT EXISTS users_email ON users (email);
 
 		CREATE TABLE IF NOT EXISTS validation_tokens (
-			validation_token   STRING PRIMARY KEY,
-			user_id            STRING(36) REFERENCES users(user_id) NOT NULL,
+			id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			validation_token   STRING UNIQUE NOT NULL,
+			user_id            STRING(36) REFERENCES users(user_id) UNIQUE NOT NULL,
 			created_at         TIMESTAMP DEFAULT current_timestamp(),
 			expires_in         INTEGER
 		);

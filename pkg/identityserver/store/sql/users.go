@@ -193,11 +193,12 @@ func (s *UserStore) saveValidationToken(q db.QueryContext, userID string, token 
 				created_at,
 				expires_in
 			)
-			VALUES (
-				$1,
-				$2,
-				$3,
-				$4)`,
+			VALUES ($1, $2, $3, $4)
+			ON CONFLICT (user_id)
+			DO UPDATE SET
+				validation_token = excluded.validation_token,
+				created_at = excluded.created_at,
+				expires_in = excluded.expires_in`,
 		token.ValidationToken,
 		userID,
 		token.CreatedAt,
@@ -206,46 +207,48 @@ func (s *UserStore) saveValidationToken(q db.QueryContext, userID string, token 
 }
 
 // GetValidationToken retrieves the validation token.
-func (s *UserStore) GetValidationToken(userID, token string) (*types.ValidationToken, error) {
-	return s.getValidationToken(s.queryer(), userID, token)
+func (s *UserStore) GetValidationToken(token string) (string, *types.ValidationToken, error) {
+	return s.getValidationToken(s.queryer(), token)
 }
 
-func (s *UserStore) getValidationToken(q db.QueryContext, userID, token string) (*types.ValidationToken, error) {
-	t := new(types.ValidationToken)
+func (s *UserStore) getValidationToken(q db.QueryContext, token string) (string, *types.ValidationToken, error) {
+	var t struct {
+		*types.ValidationToken
+		UserID string
+	}
 	err := q.SelectOne(
-		t,
+		&t,
 		`SELECT
+				user_id,
 				validation_token,
 				created_at,
 				expires_in
 			FROM validation_tokens
-			WHERE validation_token = $1 AND user_id = $2`,
-		token,
-		userID)
+			WHERE validation_token = $1`,
+		token)
 	if db.IsNoRows(err) {
-		return nil, ErrValidationTokenNotFound.New(nil)
+		return "", nil, ErrValidationTokenNotFound.New(nil)
 	}
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
-	return t, nil
+	return t.UserID, t.ValidationToken, nil
 }
 
 // DeleteValidationToken deletes the validation token.
-func (s *UserStore) DeleteValidationToken(userID, token string) error {
-	return s.deleteValidationToken(s.queryer(), userID, token)
+func (s *UserStore) DeleteValidationToken(token string) error {
+	return s.deleteValidationToken(s.queryer(), token)
 }
 
-func (s *UserStore) deleteValidationToken(q db.QueryContext, userID, token string) error {
+func (s *UserStore) deleteValidationToken(q db.QueryContext, token string) error {
 	t := new(string)
 	err := q.SelectOne(
 		t,
 		`DELETE
 			FROM validation_tokens
-			WHERE validation_token = $1 AND user_id = $2
+			WHERE validation_token = $1
 			RETURNING validation_token`,
-		token,
-		userID)
+		token)
 	if db.IsNoRows(err) {
 		return ErrValidationTokenNotFound.New(nil)
 	}
