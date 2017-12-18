@@ -106,7 +106,7 @@ func claims(ctx context.Context, t TokenInfoProvider, k KeyInfoProvider) (*auth.
 // the claims based on the authentication value in the request metadata.
 // Empty claims are injected if authentication is missing in the request metadata.
 func UnaryServerInterceptor(t TokenInfoProvider, k KeyInfoProvider) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInterceptor, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		c, err := claims(ctx, t, k)
 		if err != nil {
 			return nil, err
@@ -121,9 +121,9 @@ func UnaryServerInterceptor(t TokenInfoProvider, k KeyInfoProvider) grpc.UnarySe
 // Empty claims are injected if authentication is missing in the request metadata.
 func StreamServerInterceptor(t TokenInfoProvider, k KeyInfoProvider) grpc.StreamServerInterceptor {
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
-		c, err := claims(ctx, t, k)
+		c, err := claims(stream.Context(), t, k)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		wrapped := grpc_middleware.WrapServerStream(stream)
