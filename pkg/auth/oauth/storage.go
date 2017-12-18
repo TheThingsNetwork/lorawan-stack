@@ -132,7 +132,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 		return s.OAuth.SaveRefreshToken(&types.RefreshData{
 			RefreshToken: data.RefreshToken,
 			ClientID:     data.Client.GetId(),
-			UserID:       userID,
+			UserID:       getUserID(data.UserData),
 			Scope:        data.Scope,
 			CreatedAt:    data.CreatedAt,
 			RedirectURI:  data.RedirectUri,
