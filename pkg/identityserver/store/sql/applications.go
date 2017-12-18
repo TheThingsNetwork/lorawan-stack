@@ -17,12 +17,14 @@ import (
 type ApplicationStore struct {
 	storer
 	*extraAttributesStore
+	*apiKeysStore
 }
 
 func NewApplicationStore(store storer) *ApplicationStore {
 	return &ApplicationStore{
 		storer:               store,
 		extraAttributesStore: newExtraAttributesStore(store, "application"),
+		apiKeysStore:         newAPIKeysStore(store, "application"),
 	}
 }
 
@@ -184,141 +186,6 @@ func (s *ApplicationStore) update(q db.QueryContext, application types.Applicati
 		})
 	}
 
-	return err
-}
-
-// syncUpdatedAt modifies the application UpdatedAt field to the current timestamp.
-func (s *ApplicationStore) syncUpdatedAt(q db.QueryContext, appID string) error {
-	var id string
-	err := q.SelectOne(
-		&id,
-		`UPDATE applications
-			SET updated_at = current_timestamp()
-			WHERE application_id = $1
-			RETURNING application_id`,
-		appID)
-	if db.IsNoRows(err) {
-		return ErrApplicationNotFound.New(errors.Attributes{
-			"application_id": appID,
-		})
-	}
-	return err
-}
-
-// AddAPIKey adds a new Application API key to a given Application.
-func (s *ApplicationStore) AddAPIKey(appID string, key ttnpb.APIKey) error {
-	err := s.transact(func(tx *db.Tx) error {
-		err := s.addAPIKey(tx, appID, key)
-		if err != nil {
-			return err
-		}
-
-		return s.syncUpdatedAt(tx, appID)
-	})
-	return err
-}
-
-func (s *ApplicationStore) addAPIKey(q db.QueryContext, appID string, key ttnpb.APIKey) error {
-	query, args := s.addAPIKeyQuery(appID, key)
-	_, err := q.Exec(query, args...)
-	return err
-}
-
-func (s *ApplicationStore) addAPIKeyQuery(appID string, key ttnpb.APIKey) (string, []interface{}) {
-	args := make([]interface{}, 3+len(key.Rights))
-	args[0] = appID
-	args[1] = key.Name
-	args[2] = key.Key
-
-	boundValues := make([]string, len(key.Rights))
-
-	for i, right := range key.Rights {
-		args[i+3] = right
-		boundValues[i] = fmt.Sprintf("($1, $2, $3, $%d)", i+4)
-	}
-
-	query := fmt.Sprintf(
-		`INSERT
-			INTO applications_api_keys (application_id, name, key, "right")
-			VALUES %s
-			ON CONFLICT (application_id, name, "right")
-			DO NOTHING`,
-		strings.Join(boundValues, ", "))
-
-	return query, args
-}
-
-func (s *ApplicationStore) listAPIKeys(q db.QueryContext, appID string) ([]ttnpb.APIKey, error) {
-	var keys []struct {
-		ttnpb.APIKey
-		Right ttnpb.Right
-	}
-	err := q.Select(
-		&keys,
-		`SELECT name, key, "right"
-			FROM applications_api_keys
-			WHERE application_id = $1`,
-		appID)
-
-	if len(keys) == 0 {
-		return nil, nil
-	}
-
-	if !db.IsNoRows(err) && err != nil {
-		return nil, err
-	}
-
-	byName := make(map[string]*ttnpb.APIKey)
-	for _, key := range keys {
-		if k, ok := byName[key.Name]; ok {
-			k.Rights = append(k.Rights, key.Right)
-			continue
-		}
-
-		byName[key.Name] = &ttnpb.APIKey{
-			Name:   key.Name,
-			Key:    key.Key,
-			Rights: []ttnpb.Right{key.Right},
-		}
-	}
-
-	apiKeys := make([]ttnpb.APIKey, 0, len(byName))
-	for _, key := range byName {
-		apiKeys = append(apiKeys, *key)
-	}
-
-	return apiKeys, nil
-}
-
-// RemoveAPIKey removes an Application API key from a given Application.
-func (s *ApplicationStore) RemoveAPIKey(appID string, keyName string) error {
-	err := s.transact(func(tx *db.Tx) error {
-		err := s.removeAPIKey(tx, appID, keyName)
-		if err != nil {
-			return err
-		}
-
-		return s.syncUpdatedAt(tx, appID)
-	})
-	return err
-}
-
-func (s *ApplicationStore) removeAPIKey(q db.QueryContext, appID string, keyName string) error {
-	var i string
-	err := q.SelectOne(
-		&i,
-		`DELETE
-			FROM applications_api_keys
-			WHERE application_id = $1 AND name = $2
-			RETURNING application_id`,
-		appID,
-		keyName)
-	if db.IsNoRows(err) {
-		return ErrApplicationAPIKeyNotFound.New(errors.Attributes{
-			"application_id": appID,
-			"key_name":       keyName,
-		})
-	}
 	return err
 }
 

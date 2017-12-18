@@ -45,31 +45,53 @@ func TestApplicationCreate(t *testing.T) {
 	}
 }
 
-func TestApplicationAPIKeyManagement(t *testing.T) {
+func TestApplicationAPIKeys(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore(t)
 
-	app := testApplications()["demo-app"]
-	key := ttnpb.APIKey{
-		Name: "test-key",
-		Key:  "123",
-		Rights: []ttnpb.Right{
-			ttnpb.Right(1),
-			ttnpb.Right(2),
-		},
+	appID := testApplications()["demo-app"].ApplicationID
+	key := &ttnpb.APIKey{
+		Key:    "abcabcabc",
+		Name:   "foo",
+		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
 	}
 
-	// add API key
-	{
-		err := s.Applications.AddAPIKey(app.ApplicationID, key)
-		a.So(err, should.BeNil)
+	list, err := s.Applications.ListAPIKeys(appID)
+	a.So(err, should.BeNil)
+	a.So(list, should.HaveLength, 0)
+
+	err = s.Applications.SaveAPIKey(appID, key)
+	a.So(err, should.BeNil)
+
+	key2 := &ttnpb.APIKey{
+		Key:    "123abc",
+		Name:   "foo",
+		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
+	}
+	err = s.Applications.SaveAPIKey(appID, key2)
+	a.So(err, should.NotBeNil)
+	a.So(ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
+
+	found, err := s.Applications.GetAPIKey(appID, key.Name)
+	a.So(err, should.BeNil)
+	a.So(found, should.Resemble, key)
+
+	key.Rights = append(key.Rights, ttnpb.Right(5))
+	err = s.Applications.UpdateAPIKey(appID, key)
+	a.So(err, should.BeNil)
+
+	list, err = s.Applications.ListAPIKeys(appID)
+	a.So(err, should.BeNil)
+	if a.So(list, should.HaveLength, 1) {
+		a.So(list[0], should.Resemble, key)
 	}
 
-	// delete API key
-	{
-		err := s.Applications.RemoveAPIKey(app.ApplicationID, key.Name)
-		a.So(err, should.BeNil)
-	}
+	err = s.Applications.DeleteAPIKey(appID, key.Name)
+	a.So(err, should.BeNil)
+
+	found, err = s.Applications.GetAPIKey(appID, key.Name)
+	a.So(err, should.NotBeNil)
+	a.So(ErrAPIKeyNotFound.Describes(err), should.BeTrue)
 }
 
 func TestApplicationRetrieve(t *testing.T) {

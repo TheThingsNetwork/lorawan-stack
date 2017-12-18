@@ -20,7 +20,7 @@ type ApplicationStore interface {
 	GetByID(appID string, factory ApplicationFactory) (types.Application, error)
 
 	// ListByUser returns the applications to which an user is a collaborator.
-	ListByUser(userID string, factory ApplicationFactory) ([]types.Application, error)
+	ListByUser(appID string, factory ApplicationFactory) ([]types.Application, error)
 
 	// Update updates the application.
 	Update(app types.Application) error
@@ -30,11 +30,20 @@ type ApplicationStore interface {
 	// Delete deletes an application.
 	//Delete(appID string) error
 
-	// AddAPIKey adds a new application API key to a given application.
-	AddAPIKey(appID string, key ttnpb.APIKey) error
+	// SaveAPIKey stores an API Key attached to an application.
+	SaveAPIKey(appID string, key *ttnpb.APIKey) error
 
-	// RemoveAPIKey removes an application API key from a given application.
-	RemoveAPIKey(appID string, keyName string) error
+	// GetAPIKey retrieves an API key from an application.
+	GetAPIKey(appID, keyName string) (*ttnpb.APIKey, error)
+
+	// UpdateAPIKey updates the right of an API key.
+	UpdateAPIKey(appID string, key *ttnpb.APIKey) error
+
+	// ListAPIKey list all the API keys that an application has.
+	ListAPIKeys(appID string) ([]*ttnpb.APIKey, error)
+
+	// DeleteAPIKey deletes a given API key from an application.
+	DeleteAPIKey(appID, keyName string) error
 
 	// SetCollaborator inserts or updates a collaborator within an application.
 	// If the list of rights is empty the collaborator will be unset.

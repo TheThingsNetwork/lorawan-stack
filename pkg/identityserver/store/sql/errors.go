@@ -7,7 +7,6 @@ import "github.com/TheThingsNetwork/ttn/pkg/errors"
 func init() {
 	ErrApplicationNotFound.Register()
 	ErrApplicationIDTaken.Register()
-	ErrApplicationAPIKeyNotFound.Register()
 
 	ErrClientNotFound.Register()
 	ErrClientIDTaken.Register()
@@ -49,17 +48,6 @@ var ErrApplicationIDTaken = &errors.ErrDescriptor{
 	MessageFormat: "Application id `{application_id}` is already taken",
 	Code:          2,
 	Type:          errors.AlreadyExists,
-	SafeAttributes: []string{
-		"application_id",
-	},
-}
-
-// ErrApplicationAPIKeyNotFound is returned when trying to access or delete
-// an application API key that does not exist.
-var ErrApplicationAPIKeyNotFound = &errors.ErrDescriptor{
-	MessageFormat: "API key `{key_name}` does not exist for application `{application_id}`",
-	Code:          3,
-	Type:          errors.NotFound,
 	SafeAttributes: []string{
 		"application_id",
 	},
