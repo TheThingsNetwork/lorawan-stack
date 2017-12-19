@@ -5,6 +5,7 @@ package joinserver
 import (
 	"encoding/binary"
 	"math"
+	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/crypto"
@@ -320,10 +321,9 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	dev.UsedDevNonces = append(dev.UsedDevNonces, uint32(dn))
 	dev.NextJoinNonce++
 	dev.EndDevice.Session = &ttnpb.Session{
-		SessionKeys: ttnpb.SessionKeys{
-			SessionKeyID: resp.GetSessionKeyID(),
-			AppSKey:      resp.GetAppSKey(),
-		},
+		StartedAt:   time.Now(),
+		DevAddr:     req.DevAddr,
+		SessionKeys: resp.SessionKeys,
 	}
 	if err := dev.Update(); err != nil {
 		js.Component.Logger().WithField("device", dev).WithError(err).Error("Failed to update device")
