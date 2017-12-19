@@ -13,6 +13,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/deviceregistry"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	. "github.com/TheThingsNetwork/ttn/pkg/joinserver"
+	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
 	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/TheThingsNetwork/ttn/pkg/store/mapstore"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -22,7 +23,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"golang.org/x/net/context"
-	"google.golang.org/grpc/peer"
 )
 
 const appID = "test"
@@ -834,11 +834,9 @@ func TestHandleJoin(t *testing.T) {
 				a.So(pretty.Diff(dev[0].EndDevice, tc.Device), should.BeEmpty)
 			}
 
-			ctx := peer.NewContext(context.Background(), &peer.Peer{
-				Addr: &net.IPAddr{
-					IP: net.IPv4(0x42, 0x42, 0x42, 0x42),
-				},
-			})
+			ctx := (rpcmetadata.MD{
+				NetAddress: tc.Device.NetworkServerURL,
+			}).ToIncomingContext(context.Background())
 
 			resp, err := js.HandleJoin(ctx, tc.JoinRequest)
 			if tc.Error != nil {

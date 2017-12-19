@@ -4,6 +4,7 @@ package joinserver
 
 import (
 	"encoding/binary"
+	"fmt"
 	"math"
 	"time"
 
@@ -11,13 +12,12 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/crypto"
 	"github.com/TheThingsNetwork/ttn/pkg/deviceregistry"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/peer"
 )
 
 var supportedMACVersions = [...]ttnpb.MACVersion{
@@ -77,11 +77,6 @@ func checkMIC(key types.AES128Key, rawPayload []byte) error {
 
 // HandleJoin is called by the network server to join a device
 func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (resp *ttnpb.JoinResponse, err error) {
-	peer, ok := peer.FromContext(ctx)
-	if !ok {
-		return nil, errors.New("Failed to determine peer from context")
-	}
-
 	supported := false
 	for _, v := range supportedMACVersions {
 		supported = v == req.SelectedMacVersion
@@ -149,7 +144,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		return nil, err
 	}
 
-	if peer.Addr.String() != dev.NetworkServerURL {
+	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.NetworkServerURL {
+		fmt.Println(rpcmetadata.FromIncomingContext(ctx).NetAddress)
 		return nil, errors.New("Network Server URL mismatch")
 	}
 
@@ -322,7 +318,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	dev.NextJoinNonce++
 	dev.EndDevice.Session = &ttnpb.Session{
 		StartedAt:   time.Now(),
-		DevAddr:     req.DevAddr,
+		DevAddr:     &devAddr,
 		SessionKeys: resp.SessionKeys,
 	}
 	if err := dev.Update(); err != nil {
@@ -332,31 +328,14 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 }
 
 func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
-	peer, ok := peer.FromContext(ctx)
-	if !ok {
-		return nil, errors.New("Failed to determine peer from context")
-	}
-
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return nil, errors.New("Missing metadata")
-	}
-	appIDs, ok := md["application_id"]
-	if !ok {
-		return nil, errors.New("Missing application_id field in metadata")
-	}
-	if len(appIDs) != 1 {
-		return nil, errors.Errorf("Expected length of application_id field in metadata equal to %d, got %d", 1, len(appIDs))
-	}
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
-		DevEUI:        &req.DevEUI,
-		ApplicationID: appIDs[0],
+		DevEUI: &req.DevEUI,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	if peer.Addr.String() != dev.ApplicationServerURL {
+	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.ApplicationServerURL {
 		return nil, errors.New("Application Server URL mismatch")
 	}
 	s := dev.GetSession()
@@ -365,6 +344,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 			return nil, errors.New("Device has no session associated")
 		}
 	}
+
 	if s.GetSessionKeyID() != req.GetSessionKeyID() {
 		return nil, errors.New("Session key ID mismatch")
 	}
@@ -379,11 +359,6 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 }
 
 func (js *JoinServer) GetNwkKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkKeyResponse, error) {
-	peer, ok := peer.FromContext(ctx)
-	if !ok {
-		return nil, errors.New("Failed to determine peer from context")
-	}
-
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
 		DevEUI: &req.DevEUI,
 	})
@@ -391,9 +366,10 @@ func (js *JoinServer) GetNwkKeys(ctx context.Context, req *ttnpb.SessionKeyReque
 		return nil, err
 	}
 
-	if peer.Addr.String() != dev.ApplicationServerURL {
-		return nil, errors.New("Application Server URL mismatch")
+	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.NetworkServerURL {
+		return nil, errors.New("Network Server URL mismatch")
 	}
+
 	s := dev.GetSession()
 	if s == nil {
 		if s = dev.GetSessionFallback(); s == nil {
