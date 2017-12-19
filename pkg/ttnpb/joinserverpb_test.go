@@ -20,15 +20,15 @@ var _ = golang_proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-func TestAppSKeyRequestProto(t *testing.T) {
+func TestSessionKeyRequestProto(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedAppSKeyRequest(popr, false)
+	p := NewPopulatedSessionKeyRequest(popr, false)
 	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &AppSKeyRequest{}
+	msg := &SessionKeyRequest{}
 	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -54,10 +54,10 @@ func TestAppSKeyRequestProto(t *testing.T) {
 	}
 }
 
-func TestAppSKeyRequestMarshalTo(t *testing.T) {
+func TestSessionKeyRequestMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedAppSKeyRequest(popr, false)
+	p := NewPopulatedSessionKeyRequest(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
 	for i := range dAtA {
@@ -67,7 +67,7 @@ func TestAppSKeyRequestMarshalTo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &AppSKeyRequest{}
+	msg := &SessionKeyRequest{}
 	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -82,12 +82,12 @@ func TestAppSKeyRequestMarshalTo(t *testing.T) {
 	}
 }
 
-func BenchmarkAppSKeyRequestProtoMarshal(b *testing.B) {
+func BenchmarkSessionKeyRequestProtoMarshal(b *testing.B) {
 	popr := math_rand.New(math_rand.NewSource(616))
 	total := 0
-	pops := make([]*AppSKeyRequest, 10000)
+	pops := make([]*SessionKeyRequest, 10000)
 	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedAppSKeyRequest(popr, false)
+		pops[i] = NewPopulatedSessionKeyRequest(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -100,18 +100,120 @@ func BenchmarkAppSKeyRequestProtoMarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func BenchmarkAppSKeyRequestProtoUnmarshal(b *testing.B) {
+func BenchmarkSessionKeyRequestProtoUnmarshal(b *testing.B) {
 	popr := math_rand.New(math_rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedAppSKeyRequest(popr, false))
+		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedSessionKeyRequest(popr, false))
 		if err != nil {
 			panic(err)
 		}
 		datas[i] = dAtA
 	}
-	msg := &AppSKeyRequest{}
+	msg := &SessionKeyRequest{}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		total += len(datas[i%10000])
+		if err := github_com_gogo_protobuf_proto.Unmarshal(datas[i%10000], msg); err != nil {
+			panic(err)
+		}
+	}
+	b.SetBytes(int64(total / b.N))
+}
+
+func TestNwkKeyResponseProto(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := math_rand.New(math_rand.NewSource(seed))
+	p := NewPopulatedNwkKeyResponse(popr, false)
+	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	msg := &NwkKeyResponse{}
+	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	littlefuzz := make([]byte, len(dAtA))
+	copy(littlefuzz, dAtA)
+	for i := range dAtA {
+		dAtA[i] = byte(popr.Intn(256))
+	}
+	if err := p.VerboseEqual(msg); err != nil {
+		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
+	}
+	if len(littlefuzz) > 0 {
+		fuzzamount := 100
+		for i := 0; i < fuzzamount; i++ {
+			littlefuzz[popr.Intn(len(littlefuzz))] = byte(popr.Intn(256))
+			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
+		}
+		// shouldn't panic
+		_ = github_com_gogo_protobuf_proto.Unmarshal(littlefuzz, msg)
+	}
+}
+
+func TestNwkKeyResponseMarshalTo(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := math_rand.New(math_rand.NewSource(seed))
+	p := NewPopulatedNwkKeyResponse(popr, false)
+	size := p.Size()
+	dAtA := make([]byte, size)
+	for i := range dAtA {
+		dAtA[i] = byte(popr.Intn(256))
+	}
+	_, err := p.MarshalTo(dAtA)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	msg := &NwkKeyResponse{}
+	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	for i := range dAtA {
+		dAtA[i] = byte(popr.Intn(256))
+	}
+	if err := p.VerboseEqual(msg); err != nil {
+		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
+	}
+}
+
+func BenchmarkNwkKeyResponseProtoMarshal(b *testing.B) {
+	popr := math_rand.New(math_rand.NewSource(616))
+	total := 0
+	pops := make([]*NwkKeyResponse, 10000)
+	for i := 0; i < 10000; i++ {
+		pops[i] = NewPopulatedNwkKeyResponse(popr, false)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		dAtA, err := github_com_gogo_protobuf_proto.Marshal(pops[i%10000])
+		if err != nil {
+			panic(err)
+		}
+		total += len(dAtA)
+	}
+	b.SetBytes(int64(total / b.N))
+}
+
+func BenchmarkNwkKeyResponseProtoUnmarshal(b *testing.B) {
+	popr := math_rand.New(math_rand.NewSource(616))
+	total := 0
+	datas := make([][]byte, 10000)
+	for i := 0; i < 10000; i++ {
+		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedNwkKeyResponse(popr, false))
+		if err != nil {
+			panic(err)
+		}
+		datas[i] = dAtA
+	}
+	msg := &NwkKeyResponse{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
@@ -224,16 +326,37 @@ func BenchmarkAppSKeyResponseProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestAppSKeyRequestJSON(t *testing.T) {
+func TestSessionKeyRequestJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedAppSKeyRequest(popr, true)
+	p := NewPopulatedSessionKeyRequest(popr, true)
 	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &AppSKeyRequest{}
+	msg := &SessionKeyRequest{}
+	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	if err := p.VerboseEqual(msg); err != nil {
+		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
+	}
+}
+func TestNwkKeyResponseJSON(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := math_rand.New(math_rand.NewSource(seed))
+	p := NewPopulatedNwkKeyResponse(popr, true)
+	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
+	jsondata, err := marshaler.MarshalToString(p)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	msg := &NwkKeyResponse{}
 	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
@@ -266,12 +389,12 @@ func TestAppSKeyResponseJSON(t *testing.T) {
 		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
 	}
 }
-func TestAppSKeyRequestProtoText(t *testing.T) {
+func TestSessionKeyRequestProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedAppSKeyRequest(popr, true)
+	p := NewPopulatedSessionKeyRequest(popr, true)
 	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
-	msg := &AppSKeyRequest{}
+	msg := &SessionKeyRequest{}
 	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -283,12 +406,46 @@ func TestAppSKeyRequestProtoText(t *testing.T) {
 	}
 }
 
-func TestAppSKeyRequestProtoCompactText(t *testing.T) {
+func TestSessionKeyRequestProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedAppSKeyRequest(popr, true)
+	p := NewPopulatedSessionKeyRequest(popr, true)
 	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
-	msg := &AppSKeyRequest{}
+	msg := &SessionKeyRequest{}
+	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	if err := p.VerboseEqual(msg); err != nil {
+		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
+	}
+}
+
+func TestNwkKeyResponseProtoText(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := math_rand.New(math_rand.NewSource(seed))
+	p := NewPopulatedNwkKeyResponse(popr, true)
+	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
+	msg := &NwkKeyResponse{}
+	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	if err := p.VerboseEqual(msg); err != nil {
+		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
+	}
+}
+
+func TestNwkKeyResponseProtoCompactText(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := math_rand.New(math_rand.NewSource(seed))
+	p := NewPopulatedNwkKeyResponse(popr, true)
+	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
+	msg := &NwkKeyResponse{}
 	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -334,14 +491,29 @@ func TestAppSKeyResponseProtoCompactText(t *testing.T) {
 	}
 }
 
-func TestAppSKeyRequestVerboseEqual(t *testing.T) {
+func TestSessionKeyRequestVerboseEqual(t *testing.T) {
 	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedAppSKeyRequest(popr, false)
+	p := NewPopulatedSessionKeyRequest(popr, false)
 	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
-	msg := &AppSKeyRequest{}
+	msg := &SessionKeyRequest{}
+	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+		panic(err)
+	}
+	if err := p.VerboseEqual(msg); err != nil {
+		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
+	}
+}
+func TestNwkKeyResponseVerboseEqual(t *testing.T) {
+	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	p := NewPopulatedNwkKeyResponse(popr, false)
+	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	if err != nil {
+		panic(err)
+	}
+	msg := &NwkKeyResponse{}
 	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
@@ -364,10 +536,10 @@ func TestAppSKeyResponseVerboseEqual(t *testing.T) {
 		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
 	}
 }
-func TestAppSKeyRequestSize(t *testing.T) {
+func TestSessionKeyRequestSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedAppSKeyRequest(popr, true)
+	p := NewPopulatedSessionKeyRequest(popr, true)
 	size2 := github_com_gogo_protobuf_proto.Size(p)
 	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
 	if err != nil {
@@ -386,12 +558,48 @@ func TestAppSKeyRequestSize(t *testing.T) {
 	}
 }
 
-func BenchmarkAppSKeyRequestSize(b *testing.B) {
+func BenchmarkSessionKeyRequestSize(b *testing.B) {
 	popr := math_rand.New(math_rand.NewSource(616))
 	total := 0
-	pops := make([]*AppSKeyRequest, 1000)
+	pops := make([]*SessionKeyRequest, 1000)
 	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedAppSKeyRequest(popr, false)
+		pops[i] = NewPopulatedSessionKeyRequest(popr, false)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		total += pops[i%1000].Size()
+	}
+	b.SetBytes(int64(total / b.N))
+}
+
+func TestNwkKeyResponseSize(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := math_rand.New(math_rand.NewSource(seed))
+	p := NewPopulatedNwkKeyResponse(popr, true)
+	size2 := github_com_gogo_protobuf_proto.Size(p)
+	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	size := p.Size()
+	if len(dAtA) != size {
+		t.Errorf("seed = %d, size %v != marshalled size %v", seed, size, len(dAtA))
+	}
+	if size2 != size {
+		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
+	}
+	size3 := github_com_gogo_protobuf_proto.Size(p)
+	if size3 != size {
+		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
+	}
+}
+
+func BenchmarkNwkKeyResponseSize(b *testing.B) {
+	popr := math_rand.New(math_rand.NewSource(616))
+	total := 0
+	pops := make([]*NwkKeyResponse, 1000)
+	for i := 0; i < 1000; i++ {
+		pops[i] = NewPopulatedNwkKeyResponse(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

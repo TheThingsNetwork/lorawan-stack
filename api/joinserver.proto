@@ -10,16 +10,28 @@ package ttn.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
-// The NsJs service connects a network server to a join server.
-service NsJs {
-  rpc HandleJoin(JoinRequest) returns (JoinResponse);
-}
-
-message AppSKeyRequest{
+message SessionKeyRequest{
   // Join Server issued identifier for the session keys
   string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
   // LoRaWAN DevEUI.
   bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
+}
+
+message NwkKeyResponse {
+  // The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode)
+  KeyEnvelope f_nwk_s_int_key = 1 [(gogoproto.nullable) = false];
+
+  // The (encrypted) Serving Network Session Integrity Key
+  KeyEnvelope s_nwk_s_int_key = 2 [(gogoproto.nullable) = false];
+
+  // The (encrypted) Network Session Encryption Key
+  KeyEnvelope nwk_s_enc_key = 3 [(gogoproto.nullable) = false];
+}
+
+// The NsJs service connects a network server to a join server.
+service NsJs {
+  rpc HandleJoin(JoinRequest) returns (JoinResponse);
+  rpc GetNwkKeys(SessionKeyRequest) returns (NwkKeyResponse);
 }
 
 message AppSKeyResponse {
@@ -29,5 +41,5 @@ message AppSKeyResponse {
 
 // The AsJs service connects an application server to a join server.
 service AsJs {
-  rpc GetAppSKey(AppSKeyRequest) returns (AppSKeyResponse);
+  rpc GetAppSKey(SessionKeyRequest) returns (AppSKeyResponse);
 }

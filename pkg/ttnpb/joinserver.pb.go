@@ -24,23 +24,58 @@ var _ = golang_proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-type AppSKeyRequest struct {
+type SessionKeyRequest struct {
 	// Join Server issued identifier for the session keys
 	SessionKeyID string `protobuf:"bytes,1,opt,name=session_key_id,json=sessionKeyId,proto3" json:"session_key_id,omitempty"`
 	// LoRaWAN DevEUI.
 	DevEUI github_com_TheThingsNetwork_ttn_pkg_types.EUI64 `protobuf:"bytes,2,opt,name=dev_eui,json=devEui,proto3,customtype=github.com/TheThingsNetwork/ttn/pkg/types.EUI64" json:"dev_eui"`
 }
 
-func (m *AppSKeyRequest) Reset()                    { *m = AppSKeyRequest{} }
-func (m *AppSKeyRequest) String() string            { return proto.CompactTextString(m) }
-func (*AppSKeyRequest) ProtoMessage()               {}
-func (*AppSKeyRequest) Descriptor() ([]byte, []int) { return fileDescriptorJoinserver, []int{0} }
+func (m *SessionKeyRequest) Reset()                    { *m = SessionKeyRequest{} }
+func (m *SessionKeyRequest) String() string            { return proto.CompactTextString(m) }
+func (*SessionKeyRequest) ProtoMessage()               {}
+func (*SessionKeyRequest) Descriptor() ([]byte, []int) { return fileDescriptorJoinserver, []int{0} }
 
-func (m *AppSKeyRequest) GetSessionKeyID() string {
+func (m *SessionKeyRequest) GetSessionKeyID() string {
 	if m != nil {
 		return m.SessionKeyID
 	}
 	return ""
+}
+
+type NwkKeyResponse struct {
+	// The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode)
+	FNwkSIntKey KeyEnvelope `protobuf:"bytes,1,opt,name=f_nwk_s_int_key,json=fNwkSIntKey" json:"f_nwk_s_int_key"`
+	// The (encrypted) Serving Network Session Integrity Key
+	SNwkSIntKey KeyEnvelope `protobuf:"bytes,2,opt,name=s_nwk_s_int_key,json=sNwkSIntKey" json:"s_nwk_s_int_key"`
+	// The (encrypted) Network Session Encryption Key
+	NwkSEncKey KeyEnvelope `protobuf:"bytes,3,opt,name=nwk_s_enc_key,json=nwkSEncKey" json:"nwk_s_enc_key"`
+}
+
+func (m *NwkKeyResponse) Reset()                    { *m = NwkKeyResponse{} }
+func (m *NwkKeyResponse) String() string            { return proto.CompactTextString(m) }
+func (*NwkKeyResponse) ProtoMessage()               {}
+func (*NwkKeyResponse) Descriptor() ([]byte, []int) { return fileDescriptorJoinserver, []int{1} }
+
+func (m *NwkKeyResponse) GetFNwkSIntKey() KeyEnvelope {
+	if m != nil {
+		return m.FNwkSIntKey
+	}
+	return KeyEnvelope{}
+}
+
+func (m *NwkKeyResponse) GetSNwkSIntKey() KeyEnvelope {
+	if m != nil {
+		return m.SNwkSIntKey
+	}
+	return KeyEnvelope{}
+}
+
+func (m *NwkKeyResponse) GetNwkSEncKey() KeyEnvelope {
+	if m != nil {
+		return m.NwkSEncKey
+	}
+	return KeyEnvelope{}
 }
 
 type AppSKeyResponse struct {
@@ -51,7 +86,7 @@ type AppSKeyResponse struct {
 func (m *AppSKeyResponse) Reset()                    { *m = AppSKeyResponse{} }
 func (m *AppSKeyResponse) String() string            { return proto.CompactTextString(m) }
 func (*AppSKeyResponse) ProtoMessage()               {}
-func (*AppSKeyResponse) Descriptor() ([]byte, []int) { return fileDescriptorJoinserver, []int{1} }
+func (*AppSKeyResponse) Descriptor() ([]byte, []int) { return fileDescriptorJoinserver, []int{2} }
 
 func (m *AppSKeyResponse) GetAppSKey() KeyEnvelope {
 	if m != nil {
@@ -61,12 +96,14 @@ func (m *AppSKeyResponse) GetAppSKey() KeyEnvelope {
 }
 
 func init() {
-	proto.RegisterType((*AppSKeyRequest)(nil), "ttn.v3.AppSKeyRequest")
-	golang_proto.RegisterType((*AppSKeyRequest)(nil), "ttn.v3.AppSKeyRequest")
+	proto.RegisterType((*SessionKeyRequest)(nil), "ttn.v3.SessionKeyRequest")
+	golang_proto.RegisterType((*SessionKeyRequest)(nil), "ttn.v3.SessionKeyRequest")
+	proto.RegisterType((*NwkKeyResponse)(nil), "ttn.v3.NwkKeyResponse")
+	golang_proto.RegisterType((*NwkKeyResponse)(nil), "ttn.v3.NwkKeyResponse")
 	proto.RegisterType((*AppSKeyResponse)(nil), "ttn.v3.AppSKeyResponse")
 	golang_proto.RegisterType((*AppSKeyResponse)(nil), "ttn.v3.AppSKeyResponse")
 }
-func (this *AppSKeyRequest) VerboseEqual(that interface{}) error {
+func (this *SessionKeyRequest) VerboseEqual(that interface{}) error {
 	if that == nil {
 		if this == nil {
 			return nil
@@ -74,22 +111,22 @@ func (this *AppSKeyRequest) VerboseEqual(that interface{}) error {
 		return fmt.Errorf("that == nil && this != nil")
 	}
 
-	that1, ok := that.(*AppSKeyRequest)
+	that1, ok := that.(*SessionKeyRequest)
 	if !ok {
-		that2, ok := that.(AppSKeyRequest)
+		that2, ok := that.(SessionKeyRequest)
 		if ok {
 			that1 = &that2
 		} else {
-			return fmt.Errorf("that is not of type *AppSKeyRequest")
+			return fmt.Errorf("that is not of type *SessionKeyRequest")
 		}
 	}
 	if that1 == nil {
 		if this == nil {
 			return nil
 		}
-		return fmt.Errorf("that is type *AppSKeyRequest but is nil && this != nil")
+		return fmt.Errorf("that is type *SessionKeyRequest but is nil && this != nil")
 	} else if this == nil {
-		return fmt.Errorf("that is type *AppSKeyRequest but is not nil && this == nil")
+		return fmt.Errorf("that is type *SessionKeyRequest but is not nil && this == nil")
 	}
 	if this.SessionKeyID != that1.SessionKeyID {
 		return fmt.Errorf("SessionKeyID this(%v) Not Equal that(%v)", this.SessionKeyID, that1.SessionKeyID)
@@ -99,7 +136,7 @@ func (this *AppSKeyRequest) VerboseEqual(that interface{}) error {
 	}
 	return nil
 }
-func (this *AppSKeyRequest) Equal(that interface{}) bool {
+func (this *SessionKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
 		if this == nil {
 			return true
@@ -107,9 +144,9 @@ func (this *AppSKeyRequest) Equal(that interface{}) bool {
 		return false
 	}
 
-	that1, ok := that.(*AppSKeyRequest)
+	that1, ok := that.(*SessionKeyRequest)
 	if !ok {
-		that2, ok := that.(AppSKeyRequest)
+		that2, ok := that.(SessionKeyRequest)
 		if ok {
 			that1 = &that2
 		} else {
@@ -128,6 +165,78 @@ func (this *AppSKeyRequest) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.DevEUI.Equal(that1.DevEUI) {
+		return false
+	}
+	return true
+}
+func (this *NwkKeyResponse) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*NwkKeyResponse)
+	if !ok {
+		that2, ok := that.(NwkKeyResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *NwkKeyResponse")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *NwkKeyResponse but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *NwkKeyResponse but is not nil && this == nil")
+	}
+	if !this.FNwkSIntKey.Equal(&that1.FNwkSIntKey) {
+		return fmt.Errorf("FNwkSIntKey this(%v) Not Equal that(%v)", this.FNwkSIntKey, that1.FNwkSIntKey)
+	}
+	if !this.SNwkSIntKey.Equal(&that1.SNwkSIntKey) {
+		return fmt.Errorf("SNwkSIntKey this(%v) Not Equal that(%v)", this.SNwkSIntKey, that1.SNwkSIntKey)
+	}
+	if !this.NwkSEncKey.Equal(&that1.NwkSEncKey) {
+		return fmt.Errorf("NwkSEncKey this(%v) Not Equal that(%v)", this.NwkSEncKey, that1.NwkSEncKey)
+	}
+	return nil
+}
+func (this *NwkKeyResponse) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*NwkKeyResponse)
+	if !ok {
+		that2, ok := that.(NwkKeyResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if !this.FNwkSIntKey.Equal(&that1.FNwkSIntKey) {
+		return false
+	}
+	if !this.SNwkSIntKey.Equal(&that1.SNwkSIntKey) {
+		return false
+	}
+	if !this.NwkSEncKey.Equal(&that1.NwkSEncKey) {
 		return false
 	}
 	return true
@@ -205,6 +314,7 @@ const _ = grpc.SupportPackageIsVersion4
 
 type NsJsClient interface {
 	HandleJoin(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*JoinResponse, error)
+	GetNwkKeys(ctx context.Context, in *SessionKeyRequest, opts ...grpc.CallOption) (*NwkKeyResponse, error)
 }
 
 type nsJsClient struct {
@@ -224,10 +334,20 @@ func (c *nsJsClient) HandleJoin(ctx context.Context, in *JoinRequest, opts ...gr
 	return out, nil
 }
 
+func (c *nsJsClient) GetNwkKeys(ctx context.Context, in *SessionKeyRequest, opts ...grpc.CallOption) (*NwkKeyResponse, error) {
+	out := new(NwkKeyResponse)
+	err := grpc.Invoke(ctx, "/ttn.v3.NsJs/GetNwkKeys", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for NsJs service
 
 type NsJsServer interface {
 	HandleJoin(context.Context, *JoinRequest) (*JoinResponse, error)
+	GetNwkKeys(context.Context, *SessionKeyRequest) (*NwkKeyResponse, error)
 }
 
 func RegisterNsJsServer(s *grpc.Server, srv NsJsServer) {
@@ -252,6 +372,24 @@ func _NsJs_HandleJoin_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NsJs_GetNwkKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SessionKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NsJsServer).GetNwkKeys(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.v3.NsJs/GetNwkKeys",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NsJsServer).GetNwkKeys(ctx, req.(*SessionKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _NsJs_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ttn.v3.NsJs",
 	HandlerType: (*NsJsServer)(nil),
@@ -259,6 +397,10 @@ var _NsJs_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "HandleJoin",
 			Handler:    _NsJs_HandleJoin_Handler,
+		},
+		{
+			MethodName: "GetNwkKeys",
+			Handler:    _NsJs_GetNwkKeys_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -268,7 +410,7 @@ var _NsJs_serviceDesc = grpc.ServiceDesc{
 // Client API for AsJs service
 
 type AsJsClient interface {
-	GetAppSKey(ctx context.Context, in *AppSKeyRequest, opts ...grpc.CallOption) (*AppSKeyResponse, error)
+	GetAppSKey(ctx context.Context, in *SessionKeyRequest, opts ...grpc.CallOption) (*AppSKeyResponse, error)
 }
 
 type asJsClient struct {
@@ -279,7 +421,7 @@ func NewAsJsClient(cc *grpc.ClientConn) AsJsClient {
 	return &asJsClient{cc}
 }
 
-func (c *asJsClient) GetAppSKey(ctx context.Context, in *AppSKeyRequest, opts ...grpc.CallOption) (*AppSKeyResponse, error) {
+func (c *asJsClient) GetAppSKey(ctx context.Context, in *SessionKeyRequest, opts ...grpc.CallOption) (*AppSKeyResponse, error) {
 	out := new(AppSKeyResponse)
 	err := grpc.Invoke(ctx, "/ttn.v3.AsJs/GetAppSKey", in, out, c.cc, opts...)
 	if err != nil {
@@ -291,7 +433,7 @@ func (c *asJsClient) GetAppSKey(ctx context.Context, in *AppSKeyRequest, opts ..
 // Server API for AsJs service
 
 type AsJsServer interface {
-	GetAppSKey(context.Context, *AppSKeyRequest) (*AppSKeyResponse, error)
+	GetAppSKey(context.Context, *SessionKeyRequest) (*AppSKeyResponse, error)
 }
 
 func RegisterAsJsServer(s *grpc.Server, srv AsJsServer) {
@@ -299,7 +441,7 @@ func RegisterAsJsServer(s *grpc.Server, srv AsJsServer) {
 }
 
 func _AsJs_GetAppSKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AppSKeyRequest)
+	in := new(SessionKeyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -311,7 +453,7 @@ func _AsJs_GetAppSKey_Handler(srv interface{}, ctx context.Context, dec func(int
 		FullMethod: "/ttn.v3.AsJs/GetAppSKey",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AsJsServer).GetAppSKey(ctx, req.(*AppSKeyRequest))
+		return srv.(AsJsServer).GetAppSKey(ctx, req.(*SessionKeyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -329,7 +471,7 @@ var _AsJs_serviceDesc = grpc.ServiceDesc{
 	Metadata: "github.com/TheThingsNetwork/ttn/api/joinserver.proto",
 }
 
-func (m *AppSKeyRequest) Marshal() (dAtA []byte, err error) {
+func (m *SessionKeyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -339,7 +481,7 @@ func (m *AppSKeyRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *AppSKeyRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *SessionKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -361,6 +503,48 @@ func (m *AppSKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *NwkKeyResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *NwkKeyResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintJoinserver(dAtA, i, uint64(m.FNwkSIntKey.Size()))
+	n2, err := m.FNwkSIntKey.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n2
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintJoinserver(dAtA, i, uint64(m.SNwkSIntKey.Size()))
+	n3, err := m.SNwkSIntKey.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n3
+	dAtA[i] = 0x1a
+	i++
+	i = encodeVarintJoinserver(dAtA, i, uint64(m.NwkSEncKey.Size()))
+	n4, err := m.NwkSEncKey.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n4
+	return i, nil
+}
+
 func (m *AppSKeyResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -379,11 +563,11 @@ func (m *AppSKeyResponse) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintJoinserver(dAtA, i, uint64(m.AppSKey.Size()))
-	n2, err := m.AppSKey.MarshalTo(dAtA[i:])
+	n5, err := m.AppSKey.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n2
+	i += n5
 	return i, nil
 }
 
@@ -396,8 +580,8 @@ func encodeVarintJoinserver(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return offset + 1
 }
-func NewPopulatedAppSKeyRequest(r randyJoinserver, easy bool) *AppSKeyRequest {
-	this := &AppSKeyRequest{}
+func NewPopulatedSessionKeyRequest(r randyJoinserver, easy bool) *SessionKeyRequest {
+	this := &SessionKeyRequest{}
 	this.SessionKeyID = randStringJoinserver(r)
 	v1 := github_com_TheThingsNetwork_ttn_pkg_types.NewPopulatedEUI64(r)
 	this.DevEUI = *v1
@@ -406,10 +590,23 @@ func NewPopulatedAppSKeyRequest(r randyJoinserver, easy bool) *AppSKeyRequest {
 	return this
 }
 
+func NewPopulatedNwkKeyResponse(r randyJoinserver, easy bool) *NwkKeyResponse {
+	this := &NwkKeyResponse{}
+	v2 := NewPopulatedKeyEnvelope(r, easy)
+	this.FNwkSIntKey = *v2
+	v3 := NewPopulatedKeyEnvelope(r, easy)
+	this.SNwkSIntKey = *v3
+	v4 := NewPopulatedKeyEnvelope(r, easy)
+	this.NwkSEncKey = *v4
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
 func NewPopulatedAppSKeyResponse(r randyJoinserver, easy bool) *AppSKeyResponse {
 	this := &AppSKeyResponse{}
-	v2 := NewPopulatedKeyEnvelope(r, easy)
-	this.AppSKey = *v2
+	v5 := NewPopulatedKeyEnvelope(r, easy)
+	this.AppSKey = *v5
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -434,9 +631,9 @@ func randUTF8RuneJoinserver(r randyJoinserver) rune {
 	return rune(ru + 61)
 }
 func randStringJoinserver(r randyJoinserver) string {
-	v3 := r.Intn(100)
-	tmps := make([]rune, v3)
-	for i := 0; i < v3; i++ {
+	v6 := r.Intn(100)
+	tmps := make([]rune, v6)
+	for i := 0; i < v6; i++ {
 		tmps[i] = randUTF8RuneJoinserver(r)
 	}
 	return string(tmps)
@@ -458,11 +655,11 @@ func randFieldJoinserver(dAtA []byte, r randyJoinserver, fieldNumber int, wire i
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateJoinserver(dAtA, uint64(key))
-		v4 := r.Int63()
+		v7 := r.Int63()
 		if r.Intn(2) == 0 {
-			v4 *= -1
+			v7 *= -1
 		}
-		dAtA = encodeVarintPopulateJoinserver(dAtA, uint64(v4))
+		dAtA = encodeVarintPopulateJoinserver(dAtA, uint64(v7))
 	case 1:
 		dAtA = encodeVarintPopulateJoinserver(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -487,7 +684,7 @@ func encodeVarintPopulateJoinserver(dAtA []byte, v uint64) []byte {
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
 }
-func (m *AppSKeyRequest) Size() (n int) {
+func (m *SessionKeyRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.SessionKeyID)
@@ -495,6 +692,18 @@ func (m *AppSKeyRequest) Size() (n int) {
 		n += 1 + l + sovJoinserver(uint64(l))
 	}
 	l = m.DevEUI.Size()
+	n += 1 + l + sovJoinserver(uint64(l))
+	return n
+}
+
+func (m *NwkKeyResponse) Size() (n int) {
+	var l int
+	_ = l
+	l = m.FNwkSIntKey.Size()
+	n += 1 + l + sovJoinserver(uint64(l))
+	l = m.SNwkSIntKey.Size()
+	n += 1 + l + sovJoinserver(uint64(l))
+	l = m.NwkSEncKey.Size()
 	n += 1 + l + sovJoinserver(uint64(l))
 	return n
 }
@@ -520,7 +729,7 @@ func sovJoinserver(x uint64) (n int) {
 func sozJoinserver(x uint64) (n int) {
 	return sovJoinserver((x << 1) ^ uint64((int64(x) >> 63)))
 }
-func (m *AppSKeyRequest) Unmarshal(dAtA []byte) error {
+func (m *SessionKeyRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -543,10 +752,10 @@ func (m *AppSKeyRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: AppSKeyRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: SessionKeyRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AppSKeyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: SessionKeyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -605,6 +814,146 @@ func (m *AppSKeyRequest) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if err := m.DevEUI.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipJoinserver(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *NwkKeyResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowJoinserver
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: NwkKeyResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: NwkKeyResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FNwkSIntKey", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJoinserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.FNwkSIntKey.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SNwkSIntKey", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJoinserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.SNwkSIntKey.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NwkSEncKey", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJoinserver
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthJoinserver
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.NwkSEncKey.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -822,36 +1171,41 @@ func init() {
 }
 
 var fileDescriptorJoinserver = []byte{
-	// 484 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0x31, 0x4c, 0xdb, 0x40,
-	0x14, 0x86, 0xef, 0x55, 0x51, 0x10, 0xd7, 0x88, 0x56, 0x6e, 0xd5, 0xa2, 0x0c, 0x2f, 0x88, 0x89,
-	0x0e, 0xb5, 0xa5, 0x40, 0xe9, 0x54, 0x55, 0x89, 0x88, 0x4a, 0x88, 0xc4, 0x10, 0x60, 0x61, 0x89,
-	0x12, 0xfc, 0x9a, 0xb8, 0xa1, 0x77, 0xd7, 0xdc, 0xc5, 0x95, 0x37, 0x46, 0xc6, 0x8e, 0xdd, 0xda,
-	0xa1, 0x03, 0x23, 0x23, 0x23, 0x63, 0x46, 0x46, 0xd4, 0x21, 0xc2, 0xe7, 0x85, 0x91, 0x91, 0xb1,
-	0x8a, 0x9d, 0xd2, 0xa2, 0x0e, 0xcd, 0xe6, 0xff, 0xbd, 0xf7, 0xbf, 0xf7, 0xe9, 0xf7, 0xf1, 0xb5,
-	0x6e, 0x60, 0x7a, 0xc3, 0x8e, 0x7b, 0x20, 0x3f, 0x7a, 0xbb, 0x3d, 0xda, 0xed, 0x05, 0xa2, 0xab,
-	0xb7, 0xc9, 0x7c, 0x96, 0x83, 0xbe, 0x67, 0x8c, 0xf0, 0xda, 0x2a, 0xf0, 0x3e, 0xc8, 0x40, 0x68,
-	0x1a, 0x84, 0x34, 0x70, 0xd5, 0x40, 0x1a, 0xe9, 0xe4, 0x8d, 0x11, 0x6e, 0xb8, 0x5a, 0x7c, 0xf9,
-	0x97, 0xbb, 0x2b, 0xbb, 0xd2, 0x4b, 0xdb, 0x9d, 0xe1, 0xfb, 0x54, 0xa5, 0x22, 0xfd, 0xca, 0x6c,
-	0x45, 0x77, 0xd6, 0x63, 0xd3, 0xf9, 0x99, 0xe0, 0x48, 0xf8, 0x2d, 0x9f, 0xc2, 0xe0, 0x80, 0x32,
-	0xd7, 0xf2, 0x0f, 0xe0, 0x0b, 0x15, 0xa5, 0x76, 0x1a, 0x14, 0x35, 0xe9, 0xd3, 0x90, 0xb4, 0x71,
-	0xd6, 0xf9, 0x82, 0x26, 0xad, 0x03, 0x29, 0x5a, 0x7d, 0x8a, 0x5a, 0x81, 0xbf, 0x08, 0x4b, 0xb0,
-	0x32, 0x5f, 0x7d, 0x6c, 0xc7, 0xa5, 0xc2, 0x4e, 0xd6, 0x69, 0x50, 0x54, 0xdf, 0x68, 0x16, 0xf4,
-	0x1f, 0xe5, 0x3b, 0xfb, 0x7c, 0xce, 0xa7, 0xb0, 0x45, 0xc3, 0x60, 0xf1, 0xc1, 0x12, 0xac, 0x14,
-	0xaa, 0x95, 0xd1, 0xb8, 0xc4, 0x7e, 0x8e, 0x4b, 0xde, 0xff, 0xc8, 0x54, 0xbf, 0xeb, 0x99, 0x48,
-	0x91, 0x76, 0x6b, 0x7b, 0xf5, 0xf5, 0x35, 0x3b, 0x2e, 0xe5, 0x37, 0x28, 0xac, 0xed, 0xd5, 0x9b,
-	0x79, 0x9f, 0xc2, 0xda, 0x30, 0x58, 0xde, 0xe4, 0x8f, 0xee, 0x28, 0xb5, 0x92, 0x42, 0x93, 0xf3,
-	0x8a, 0xcf, 0xb7, 0x95, 0x6a, 0xe9, 0x09, 0x64, 0x4a, 0xf8, 0xb0, 0xfc, 0xc4, 0xcd, 0xa2, 0x76,
-	0x1b, 0x14, 0xd5, 0x44, 0x48, 0x87, 0x52, 0x51, 0x35, 0x37, 0xa1, 0x68, 0xce, 0xb5, 0x33, 0x7b,
-	0xf9, 0x2d, 0xcf, 0x6d, 0xeb, 0x2d, 0xed, 0xbc, 0xe6, 0x7c, 0xb3, 0x2d, 0xfc, 0x43, 0xda, 0x92,
-	0x81, 0x70, 0xee, 0x9c, 0x13, 0x35, 0x0d, 0xa2, 0xf8, 0xf4, 0x7e, 0x31, 0xbb, 0x5b, 0xae, 0xf1,
-	0x5c, 0x65, 0xb2, 0xe0, 0x0d, 0xe7, 0xef, 0xc8, 0x4c, 0xa9, 0x9c, 0x67, 0xbf, 0x67, 0xef, 0x87,
-	0x59, 0x7c, 0xfe, 0x4f, 0x3d, 0x5b, 0x53, 0xfd, 0x06, 0xa3, 0x18, 0xe1, 0x22, 0x46, 0xb8, 0x8c,
-	0x11, 0xae, 0x62, 0x84, 0xeb, 0x18, 0xd9, 0x4d, 0x8c, 0xec, 0x36, 0x46, 0x38, 0xb2, 0xc8, 0x8e,
-	0x2d, 0xb2, 0x13, 0x8b, 0x70, 0x6a, 0x91, 0x9d, 0x59, 0x84, 0x73, 0x8b, 0x30, 0xb2, 0x08, 0x17,
-	0x16, 0xe1, 0xd2, 0x22, 0xbb, 0xb2, 0x08, 0xd7, 0x16, 0xd9, 0x8d, 0x45, 0xb8, 0xb5, 0xc8, 0x8e,
-	0x12, 0x64, 0xc7, 0x09, 0xc2, 0x97, 0x04, 0xd9, 0xd7, 0x04, 0xe1, 0x7b, 0x82, 0xec, 0x24, 0x41,
-	0x76, 0x9a, 0x20, 0x9c, 0x25, 0x08, 0xe7, 0x09, 0xc2, 0xfe, 0x8b, 0x99, 0xfe, 0x85, 0x11, 0xaa,
-	0xd3, 0xc9, 0xa7, 0x2f, 0x64, 0xf5, 0x57, 0x00, 0x00, 0x00, 0xff, 0xff, 0xbb, 0xf4, 0x52, 0x27,
-	0xf6, 0x02, 0x00, 0x00,
+	// 563 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x93, 0x3f, 0x4c, 0xdb, 0x4e,
+	0x14, 0xc7, 0xef, 0xf1, 0x43, 0x41, 0x1c, 0xfc, 0xa0, 0x75, 0xab, 0x96, 0x66, 0x78, 0x41, 0x4c,
+	0x74, 0xa8, 0x2d, 0x01, 0xa5, 0x4b, 0xa5, 0x96, 0x88, 0xa8, 0x84, 0x48, 0x19, 0x12, 0x58, 0x58,
+	0xac, 0x24, 0x7e, 0x04, 0xd7, 0xf4, 0xec, 0xe6, 0x2e, 0x8e, 0xb2, 0x31, 0x32, 0x76, 0xec, 0xd6,
+	0x6e, 0x65, 0x64, 0x64, 0x64, 0x64, 0x64, 0x44, 0x1d, 0x22, 0x7c, 0x5e, 0x18, 0x19, 0x19, 0xab,
+	0xd8, 0xfc, 0xaf, 0xd4, 0x64, 0xf3, 0xbb, 0xf7, 0x3e, 0x5f, 0x7f, 0xdf, 0xbb, 0x77, 0x7c, 0xa9,
+	0xe9, 0xaa, 0x9d, 0x76, 0xdd, 0x6c, 0xf8, 0x5f, 0xac, 0x8d, 0x1d, 0xda, 0xd8, 0x71, 0x45, 0x53,
+	0x96, 0x49, 0x75, 0xfc, 0x96, 0x67, 0x29, 0x25, 0xac, 0x5a, 0xe0, 0x5a, 0x9f, 0x7d, 0x57, 0x48,
+	0x6a, 0x85, 0xd4, 0x32, 0x83, 0x96, 0xaf, 0x7c, 0x23, 0xa3, 0x94, 0x30, 0xc3, 0xc5, 0xec, 0x9b,
+	0x7b, 0x74, 0xd3, 0x6f, 0xfa, 0x56, 0x92, 0xae, 0xb7, 0xb7, 0x93, 0x28, 0x09, 0x92, 0xaf, 0x14,
+	0xcb, 0x9a, 0xc3, 0xfe, 0xec, 0xba, 0x7e, 0x28, 0x73, 0x24, 0x1c, 0xdb, 0xa1, 0xd0, 0x6d, 0x50,
+	0x4a, 0xcd, 0xfd, 0x02, 0xfe, 0xb4, 0x4a, 0x52, 0xba, 0xbe, 0x28, 0x51, 0xb7, 0x42, 0x5f, 0xdb,
+	0x24, 0x95, 0xb1, 0xcc, 0xa7, 0x64, 0x7a, 0x68, 0x7b, 0xd4, 0xb5, 0x5d, 0x67, 0x06, 0x66, 0x61,
+	0x7e, 0x3c, 0xff, 0x44, 0xf7, 0x72, 0x93, 0x77, 0xe5, 0xc5, 0xd5, 0xca, 0xa4, 0xbc, 0x8b, 0x1c,
+	0x63, 0x8b, 0x8f, 0x39, 0x14, 0xda, 0xd4, 0x76, 0x67, 0x46, 0x66, 0x61, 0x7e, 0x32, 0xbf, 0x72,
+	0xd2, 0xcb, 0xb1, 0xdf, 0xbd, 0x9c, 0x35, 0xc8, 0x5c, 0xe0, 0x35, 0x2d, 0xd5, 0x0d, 0x48, 0x9a,
+	0x85, 0xcd, 0xe2, 0xf2, 0x92, 0xee, 0xe5, 0x32, 0xab, 0x14, 0x16, 0x36, 0x8b, 0x95, 0x8c, 0x43,
+	0x61, 0xa1, 0xed, 0xce, 0x9d, 0x02, 0x9f, 0x2a, 0x77, 0xbc, 0xc4, 0xa5, 0x0c, 0x7c, 0x21, 0xc9,
+	0xf8, 0xc0, 0xa7, 0xb7, 0x6d, 0xd1, 0xf1, 0x6c, 0x69, 0xbb, 0x42, 0xf5, 0xad, 0x26, 0x3e, 0x27,
+	0x16, 0x9e, 0x99, 0xe9, 0xcc, 0xcd, 0x12, 0x75, 0x0b, 0x22, 0xa4, 0x5d, 0x3f, 0xa0, 0xfc, 0x68,
+	0xdf, 0x4b, 0x65, 0x62, 0xbb, 0xdc, 0xf1, 0xaa, 0x45, 0xa1, 0x4a, 0xd4, 0xed, 0x0b, 0xc8, 0x47,
+	0x02, 0x23, 0x03, 0x05, 0xe4, 0x3d, 0x81, 0xf7, 0xfc, 0xff, 0x14, 0x27, 0xd1, 0x48, 0xf0, 0xff,
+	0x06, 0xe1, 0x5c, 0x74, 0xbc, 0x6a, 0x41, 0x34, 0x4a, 0xd4, 0x9d, 0x5b, 0xe3, 0xd3, 0x2b, 0x41,
+	0x50, 0xbd, 0xdf, 0xd2, 0x5b, 0x3e, 0x5e, 0x0b, 0x02, 0x5b, 0x0e, 0xd7, 0xcc, 0x58, 0x2d, 0xc5,
+	0x17, 0xf6, 0x80, 0x8f, 0x96, 0xe5, 0xba, 0x34, 0xde, 0x71, 0xbe, 0x56, 0x13, 0xce, 0x2e, 0xad,
+	0xfb, 0xae, 0x30, 0x6e, 0xd1, 0x7e, 0x74, 0x7d, 0xb9, 0xd9, 0xe7, 0x0f, 0x0f, 0x6f, 0x67, 0xc9,
+	0x3f, 0x91, 0x4a, 0x07, 0x2c, 0x8d, 0x57, 0x37, 0x35, 0x7f, 0xed, 0x46, 0xf6, 0xc5, 0x4d, 0xea,
+	0xe1, 0x65, 0x2c, 0xac, 0xf1, 0xd1, 0x95, 0xbe, 0x83, 0x8f, 0x89, 0xd0, 0x75, 0x5f, 0xff, 0x12,
+	0x7a, 0x79, 0x93, 0x7a, 0x34, 0x83, 0xfc, 0x0f, 0x38, 0x89, 0x10, 0x4e, 0x23, 0x84, 0xb3, 0x08,
+	0xe1, 0x3c, 0x42, 0xb8, 0x88, 0x90, 0x5d, 0x46, 0xc8, 0xae, 0x22, 0x84, 0x3d, 0x8d, 0x6c, 0x5f,
+	0x23, 0x3b, 0xd0, 0x08, 0x87, 0x1a, 0xd9, 0x91, 0x46, 0x38, 0xd6, 0x08, 0x27, 0x1a, 0xe1, 0x54,
+	0x23, 0x9c, 0x69, 0x64, 0xe7, 0x1a, 0xe1, 0x42, 0x23, 0xbb, 0xd4, 0x08, 0x57, 0x1a, 0xd9, 0x5e,
+	0x8c, 0x6c, 0x3f, 0x46, 0xf8, 0x16, 0x23, 0xfb, 0x1e, 0x23, 0xfc, 0x8c, 0x91, 0x1d, 0xc4, 0xc8,
+	0x0e, 0x63, 0x84, 0xa3, 0x18, 0xe1, 0x38, 0x46, 0xd8, 0x7a, 0x3d, 0xd4, 0x8e, 0x2a, 0x11, 0xd4,
+	0xeb, 0x99, 0xe4, 0xf1, 0x2c, 0xfe, 0x09, 0x00, 0x00, 0xff, 0xff, 0xa1, 0xd6, 0x3d, 0xc6, 0x11,
+	0x04, 0x00, 0x00,
 }

@@ -331,7 +331,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	return resp, nil
 }
 
-func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.AppSKeyRequest) (*ttnpb.AppSKeyResponse, error) {
+func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
 	peer, ok := peer.FromContext(ctx)
 	if !ok {
 		return nil, errors.New("Failed to determine peer from context")
@@ -375,6 +375,51 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.AppSKeyRequest)
 	// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
 	return &ttnpb.AppSKeyResponse{
 		AppSKey: *appSKey,
+	}, nil
+}
+
+func (js *JoinServer) GetNwkKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkKeyResponse, error) {
+	peer, ok := peer.FromContext(ctx)
+	if !ok {
+		return nil, errors.New("Failed to determine peer from context")
+	}
+
+	dev, err := deviceregistry.FindOneDeviceByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
+		DevEUI: &req.DevEUI,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if peer.Addr.String() != dev.ApplicationServerURL {
+		return nil, errors.New("Application Server URL mismatch")
+	}
+	s := dev.GetSession()
+	if s == nil {
+		if s = dev.GetSessionFallback(); s == nil {
+			return nil, errors.New("Device has no session associated")
+		}
+	}
+	if s.GetSessionKeyID() != req.GetSessionKeyID() {
+		return nil, errors.New("Session key ID mismatch")
+	}
+	nwkSEncKey := s.GetNwkSEncKey()
+	if nwkSEncKey == nil {
+		return nil, errors.New("NwkSEncKey not found")
+	}
+	fNwkSIntKey := s.GetFNwkSIntKey()
+	if fNwkSIntKey == nil {
+		return nil, errors.New("FNwkSIntKey not found")
+	}
+	sNwkSIntKey := s.GetSNwkSIntKey()
+	if sNwkSIntKey == nil {
+		return nil, errors.New("SNwkSIntKey not found")
+	}
+	// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
+	return &ttnpb.NwkKeyResponse{
+		NwkSEncKey:  *nwkSEncKey,
+		FNwkSIntKey: *fNwkSIntKey,
+		SNwkSIntKey: *sNwkSIntKey,
 	}, nil
 }
 
