@@ -29,7 +29,7 @@ func (c *Client) GetUserData() interface{} {
 
 // ClientSecretMatches implements osin.ClientSecretMatcher.
 func (c *Client) ClientSecretMatches(secret string) bool {
-	return subtle.ConstantTimeCompare([]byte(c.Secret), []byte(secret)) == 1
+	return subtle.ConstantTimeEq(int32(len(c.Secret)), int32(len(secret))) == 1 && subtle.ConstantTimeCompare([]byte(c.Secret), []byte(secret)) == 1
 }
 
 func (c *Client) HasGrant(grant GrantType) bool {
