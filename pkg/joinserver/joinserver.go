@@ -277,6 +277,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 					Key:      keyPointer(crypto.DeriveNwkSEncKey(nwkKey, jn, pld.JoinEUI, pld.DevNonce)),
 					KEKLabel: "",
 				},
+				// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key:      keyPointer(crypto.DeriveAppSKey(appKey, jn, pld.JoinEUI, pld.DevNonce)),
 					KEKLabel: "",
@@ -371,6 +372,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.AppSKeyRequest)
 	if appSKey == nil {
 		return nil, errors.New("AppSKey not found")
 	}
+	// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
 	return &ttnpb.AppSKeyResponse{
 		AppSKey: *appSKey,
 	}, nil
