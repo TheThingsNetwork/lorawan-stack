@@ -321,4 +321,5 @@ func (js *JoinServer) RegisterServices(s *grpc.Server) {
 
 // RegisterHandlers registers gRPC handlers.
 func (js *JoinServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
+	ttnpb.RegisterDeviceRegistryHandler(js.Context(), s, conn)
 }
