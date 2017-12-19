@@ -360,7 +360,9 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.AppSKeyRequest)
 	}
 	s := dev.GetSession()
 	if s == nil {
-		return nil, errors.New("Device has no active session")
+		if s = dev.GetSessionFallback(); s == nil {
+			return nil, errors.New("Device has no session associated")
+		}
 	}
 	if s.GetSessionKeyID() != req.GetSessionKeyID() {
 		return nil, errors.New("Session key ID mismatch")
