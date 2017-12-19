@@ -36,8 +36,8 @@ type ApplicationStore interface {
 	// GetAPIKey retrieves an API key from an application.
 	GetAPIKey(appID, keyName string) (*ttnpb.APIKey, error)
 
-	// UpdateAPIKey updates the right of an API key.
-	UpdateAPIKey(appID string, key *ttnpb.APIKey) error
+	// UpdateAPIKeyRights updates the right of an API key.
+	UpdateAPIKeyRights(appID, keyName string, rights []ttnpb.Right) error
 
 	// ListAPIKey list all the API keys that an application has.
 	ListAPIKeys(appID string) ([]*ttnpb.APIKey, error)

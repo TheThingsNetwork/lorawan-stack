@@ -45,8 +45,8 @@ type UserStore interface {
 	// GetAPIKey retrieves an API key from an user.
 	GetAPIKey(userID, keyName string) (*ttnpb.APIKey, error)
 
-	// UpdateAPIKey updates the right of an API key.
-	UpdateAPIKey(userID string, key *ttnpb.APIKey) error
+	// UpdateAPIKeyRights updates the right of an API key.
+	UpdateAPIKeyRights(userID, keyName string, rights []ttnpb.Right) error
 
 	// ListAPIKey list all the API keys that an user has.
 	ListAPIKeys(userID string) ([]*ttnpb.APIKey, error)

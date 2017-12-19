@@ -206,7 +206,7 @@ func TestUserAPIKeys(t *testing.T) {
 	a.So(found, should.Resemble, key)
 
 	key.Rights = append(key.Rights, ttnpb.Right(5))
-	err = s.Users.UpdateAPIKey(userID, key)
+	err = s.Users.UpdateAPIKeyRights(userID, key.Name, key.Rights)
 	a.So(err, should.BeNil)
 
 	list, err = s.Users.ListAPIKeys(userID)

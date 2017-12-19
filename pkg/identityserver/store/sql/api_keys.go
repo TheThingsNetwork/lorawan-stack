@@ -32,7 +32,7 @@ func (s *apiKeysStore) SaveAPIKey(entityID string, key *ttnpb.APIKey) error {
 			return err
 		}
 
-		return s.saveAPIKeyRights(tx, entityID, key)
+		return s.saveAPIKeyRights(tx, key.Key, key.Rights)
 	})
 	return err
 }
@@ -54,19 +54,19 @@ func (s *apiKeysStore) saveAPIKey(q db.QueryContext, entityID string, key *ttnpb
 	return err
 }
 
-func (s *apiKeysStore) saveAPIKeyRights(q db.QueryContext, entityID string, key *ttnpb.APIKey) error {
-	query, args := s.saveAPIKeyRightsQuery(entityID, key)
+func (s *apiKeysStore) saveAPIKeyRights(q db.QueryContext, key string, rights []ttnpb.Right) error {
+	query, args := s.saveAPIKeyRightsQuery(key, rights)
 	_, err := q.Exec(query, args...)
 	return err
 }
 
-func (s *apiKeysStore) saveAPIKeyRightsQuery(entityID string, key *ttnpb.APIKey) (string, []interface{}) {
-	args := make([]interface{}, 1+len(key.Rights))
-	args[0] = key.Key
+func (s *apiKeysStore) saveAPIKeyRightsQuery(key string, rights []ttnpb.Right) (string, []interface{}) {
+	args := make([]interface{}, 1+len(rights))
+	args[0] = key
 
-	boundValues := make([]string, len(key.Rights))
+	boundValues := make([]string, len(rights))
 
-	for i, right := range key.Rights {
+	for i, right := range rights {
 		args[i+1] = right
 		boundValues[i] = fmt.Sprintf("($1, $%d)", i+2)
 	}
@@ -181,14 +181,19 @@ func (s *apiKeysStore) listAPIKeys(q db.QueryContext, entityID string) ([]*ttnpb
 	return res, nil
 }
 
-func (s *apiKeysStore) UpdateAPIKey(entityID string, key *ttnpb.APIKey) error {
+func (s *apiKeysStore) UpdateAPIKeyRights(entityID, keyName string, rights []ttnpb.Right) error {
 	err := s.transact(func(tx *db.Tx) error {
-		err := s.deleteAPIKeyRights(tx, key.Key)
+		key, err := s.getAPIKey(tx, entityID, keyName)
 		if err != nil {
 			return err
 		}
 
-		return s.saveAPIKeyRights(tx, entityID, key)
+		err = s.deleteAPIKeyRights(tx, key.Key)
+		if err != nil {
+			return err
+		}
+
+		return s.saveAPIKeyRights(tx, key.Key, rights)
 	})
 	return err
 }

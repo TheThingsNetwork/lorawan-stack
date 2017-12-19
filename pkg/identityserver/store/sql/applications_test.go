@@ -77,7 +77,7 @@ func TestApplicationAPIKeys(t *testing.T) {
 	a.So(found, should.Resemble, key)
 
 	key.Rights = append(key.Rights, ttnpb.Right(5))
-	err = s.Applications.UpdateAPIKey(appID, key)
+	err = s.Applications.UpdateAPIKeyRights(appID, key.Name, key.Rights)
 	a.So(err, should.BeNil)
 
 	list, err = s.Applications.ListAPIKeys(appID)
