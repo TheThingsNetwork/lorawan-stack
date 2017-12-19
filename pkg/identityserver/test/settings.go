@@ -4,6 +4,7 @@ package test
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -40,7 +41,7 @@ func ShouldBeSettings(actual interface{}, expected ...interface{}) string {
 
 	return all(
 		ShouldBeSettingsIgnoringAutoFields(a, b),
-		assertions.ShouldBeTrue(a.UpdatedAt.Equal(b.UpdatedAt)),
+		assertions.ShouldHappenWithin(a.UpdatedAt, time.Millisecond, b.UpdatedAt),
 	)
 }
 
