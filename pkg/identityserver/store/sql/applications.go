@@ -191,7 +191,7 @@ func (s *ApplicationStore) update(q db.QueryContext, application types.Applicati
 
 // SetCollaborator inserts or modifies a collaborator within an entity.
 // If the provided list of rights is empty the collaborator will be unset.
-func (s *ApplicationStore) SetCollaborator(collaborator ttnpb.ApplicationCollaborator) error {
+func (s *ApplicationStore) SetCollaborator(collaborator *ttnpb.ApplicationCollaborator) error {
 	if len(collaborator.Rights) == 0 {
 		return s.unsetCollaborator(s.queryer(), collaborator.ApplicationID, collaborator.UserID)
 	}
@@ -210,7 +210,7 @@ func (s *ApplicationStore) unsetCollaborator(q db.QueryContext, appID, userID st
 	return err
 }
 
-func (s *ApplicationStore) setCollaborator(q db.QueryContext, collaborator ttnpb.ApplicationCollaborator) error {
+func (s *ApplicationStore) setCollaborator(q db.QueryContext, collaborator *ttnpb.ApplicationCollaborator) error {
 	query, args := s.removeRightsDiffQuery(collaborator)
 	_, err := q.Exec(query, args...)
 	if err != nil {
@@ -223,7 +223,7 @@ func (s *ApplicationStore) setCollaborator(q db.QueryContext, collaborator ttnpb
 	return err
 }
 
-func (s *ApplicationStore) removeRightsDiffQuery(collaborator ttnpb.ApplicationCollaborator) (string, []interface{}) {
+func (s *ApplicationStore) removeRightsDiffQuery(collaborator *ttnpb.ApplicationCollaborator) (string, []interface{}) {
 	args := make([]interface{}, 2+len(collaborator.Rights))
 	args[0] = collaborator.ApplicationID
 	args[1] = collaborator.UserID
@@ -268,13 +268,13 @@ func (s *ApplicationStore) addRightsQuery(appID, userID string, rights []ttnpb.R
 }
 
 // ListCollaborators retrieves all the collaborators from an entity.
-func (s *ApplicationStore) ListCollaborators(appID string) ([]ttnpb.ApplicationCollaborator, error) {
+func (s *ApplicationStore) ListCollaborators(appID string) ([]*ttnpb.ApplicationCollaborator, error) {
 	return s.listCollaborators(s.queryer(), appID)
 }
 
-func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID string) ([]ttnpb.ApplicationCollaborator, error) {
+func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID string) ([]*ttnpb.ApplicationCollaborator, error) {
 	var collaborators []struct {
-		ttnpb.ApplicationCollaborator
+		*ttnpb.ApplicationCollaborator
 		Right ttnpb.Right
 	}
 	err := q.Select(
@@ -301,9 +301,9 @@ func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID string) ([
 		byUser[collaborator.UserID].Rights = append(byUser[collaborator.UserID].Rights, collaborator.Right)
 	}
 
-	result := make([]ttnpb.ApplicationCollaborator, 0, len(byUser))
+	result := make([]*ttnpb.ApplicationCollaborator, 0, len(byUser))
 	for _, collaborator := range byUser {
-		result = append(result, *collaborator)
+		result = append(result, collaborator)
 	}
 
 	return result, nil

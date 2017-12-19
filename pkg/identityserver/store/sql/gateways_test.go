@@ -209,7 +209,7 @@ func TestGatewayCollaborators(t *testing.T) {
 		a.So(collaborators, should.HaveLength, 0)
 	}
 
-	collaborator := ttnpb.GatewayCollaborator{
+	collaborator := &ttnpb.GatewayCollaborator{
 		GatewayIdentifier: ttnpb.GatewayIdentifier{gtw.GatewayID},
 		UserIdentifier:    ttnpb.UserIdentifier{user.UserID},
 		Rights: []ttnpb.Right{

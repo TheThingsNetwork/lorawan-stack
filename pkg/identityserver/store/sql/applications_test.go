@@ -119,7 +119,7 @@ func TestApplicationCollaborators(t *testing.T) {
 		a.So(collaborators, should.HaveLength, 0)
 	}
 
-	collaborator := ttnpb.ApplicationCollaborator{
+	collaborator := &ttnpb.ApplicationCollaborator{
 		ApplicationIdentifier: ttnpb.ApplicationIdentifier{app.ApplicationID},
 		UserIdentifier:        ttnpb.UserIdentifier{user.UserID},
 		Rights: []ttnpb.Right{

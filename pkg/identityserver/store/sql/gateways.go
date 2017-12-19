@@ -540,7 +540,7 @@ func (s *GatewayStore) listRadios(q db.QueryContext, gtwID string) ([]ttnpb.Gate
 
 // SetCollaborator inserts or modifies a collaborator within an entity.
 // If the provided list of rights is empty the collaborator will be unset.
-func (s *GatewayStore) SetCollaborator(collaborator ttnpb.GatewayCollaborator) error {
+func (s *GatewayStore) SetCollaborator(collaborator *ttnpb.GatewayCollaborator) error {
 	if len(collaborator.Rights) == 0 {
 		return s.unsetCollaborator(s.queryer(), collaborator.GatewayID, collaborator.UserID)
 	}
@@ -559,7 +559,7 @@ func (s *GatewayStore) unsetCollaborator(q db.QueryContext, gtwID, userID string
 	return err
 }
 
-func (s *GatewayStore) setCollaborator(q db.QueryContext, collaborator ttnpb.GatewayCollaborator) error {
+func (s *GatewayStore) setCollaborator(q db.QueryContext, collaborator *ttnpb.GatewayCollaborator) error {
 	query, args := s.removeRightsDiffQuery(collaborator)
 	_, err := q.Exec(query, args...)
 	if err != nil {
@@ -572,7 +572,7 @@ func (s *GatewayStore) setCollaborator(q db.QueryContext, collaborator ttnpb.Gat
 	return err
 }
 
-func (s *GatewayStore) removeRightsDiffQuery(collaborator ttnpb.GatewayCollaborator) (string, []interface{}) {
+func (s *GatewayStore) removeRightsDiffQuery(collaborator *ttnpb.GatewayCollaborator) (string, []interface{}) {
 	args := make([]interface{}, 2+len(collaborator.Rights))
 	args[0] = collaborator.GatewayID
 	args[1] = collaborator.UserID
@@ -617,13 +617,13 @@ func (s *GatewayStore) addRightsQuery(gtwID, userID string, rights []ttnpb.Right
 }
 
 // ListCollaborators retrieves all the collaborators from an entity.
-func (s *GatewayStore) ListCollaborators(gtwID string) ([]ttnpb.GatewayCollaborator, error) {
+func (s *GatewayStore) ListCollaborators(gtwID string) ([]*ttnpb.GatewayCollaborator, error) {
 	return s.listCollaborators(s.queryer(), gtwID)
 }
 
-func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID string) ([]ttnpb.GatewayCollaborator, error) {
+func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID string) ([]*ttnpb.GatewayCollaborator, error) {
 	var collaborators []struct {
-		ttnpb.GatewayCollaborator
+		*ttnpb.GatewayCollaborator
 		Right ttnpb.Right
 	}
 	err := q.Select(
@@ -650,9 +650,9 @@ func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID string) ([]ttn
 		byUser[collaborator.UserID].Rights = append(byUser[collaborator.UserID].Rights, collaborator.Right)
 	}
 
-	result := make([]ttnpb.GatewayCollaborator, 0, len(byUser))
+	result := make([]*ttnpb.GatewayCollaborator, 0, len(byUser))
 	for _, collaborator := range byUser {
-		result = append(result, *collaborator)
+		result = append(result, collaborator)
 	}
 
 	return result, nil
