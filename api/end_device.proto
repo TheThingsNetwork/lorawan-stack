@@ -61,7 +61,7 @@ message Session {
   uint32 next_f_cnt_up = 4;
   uint32 next_n_f_cnt_down = 5;
   uint32 next_a_f_cnt_down = 6;
-  google.protobuf.Timestamp started = 7 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp started_at = 7 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
 }
 
 message EndDevice {
