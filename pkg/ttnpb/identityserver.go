@@ -34,9 +34,8 @@ func (req *UpdateSettingsRequest) Validate() error {
 			FieldPathSettingsValidationTokenTTL.MatchString(path),
 			FieldPathSettingsAllowedEmails.MatchString(path):
 		default:
-			return ErrInvalidPathFieldMask.New(errors.Attributes{
-				"fieldmask_name": "update_mask",
-				"path":           path,
+			return ErrInvalidPathUpdateMask.New(errors.Attributes{
+				"path": path,
 			})
 		}
 
@@ -77,9 +76,8 @@ func (req *UpdateUserRequest) Validate() error {
 		case FieldPathUserEmail.MatchString(path):
 			err = validate.Field(req.User.Email, validate.Email).DescribeFieldName("Email")
 		default:
-			return ErrInvalidPathFieldMask.New(errors.Attributes{
-				"fieldmask_name": "update_mask",
-				"path":           path,
+			return ErrInvalidPathUpdateMask.New(errors.Attributes{
+				"path": path,
 			})
 		}
 
@@ -147,9 +145,8 @@ func (req *UpdateApplicationRequest) Validate() error {
 		switch true {
 		case FieldPathApplicationDescription.MatchString(path):
 		default:
-			return ErrInvalidPathFieldMask.New(errors.Attributes{
-				"fieldmask_name": "update_mask",
-				"path":           path,
+			return ErrInvalidPathUpdateMask.New(errors.Attributes{
+				"path": path,
 			})
 		}
 	}
@@ -252,9 +249,8 @@ func (req *UpdateGatewayRequest) Validate() error {
 		case FieldPathGatewayContactAccountUserID.MatchString(path):
 			err = validate.Field(req.Gateway.ContactAccount.UserID, validate.NotRequired, validate.ID).DescribeFieldName("Contact account: user ID")
 		default:
-			return ErrInvalidPathFieldMask.New(errors.Attributes{
-				"fieldmask_name": "update_mask",
-				"path":           path,
+			return ErrInvalidPathUpdateMask.New(errors.Attributes{
+				"path": path,
 			})
 		}
 
@@ -359,9 +355,8 @@ func (req *UpdateClientRequest) Validate() error {
 		case FieldPathClientRights.MatchString(path):
 			err = validate.Field(req.Client.Rights, validate.MinLength(1), validate.In(validClientRights)).DescribeFieldName("Rights")
 		default:
-			return ErrInvalidPathFieldMask.New(errors.Attributes{
-				"fieldmask_name": "update_mask",
-				"path":           path,
+			return ErrInvalidPathUpdateMask.New(errors.Attributes{
+				"path": path,
 			})
 		}
 
