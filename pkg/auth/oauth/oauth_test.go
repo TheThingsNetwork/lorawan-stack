@@ -164,7 +164,7 @@ func TestAuthorizationFlowJSON(t *testing.T) {
 
 	// exchange code
 	{
-		uri = "https://" + issuer + "/oauth/token"
+		uri = fmt.Sprintf("https://%s/oauth/token", issuer)
 		req := httptest.NewRequest("POST", uri, strings.NewReader(fmt.Sprintf(`{"code":"%s", "grant_type": "authorization_code", "redirect_uri": "%s"}`, code, client.RedirectURI)))
 		req.Header.Set("Content-Type", "application/json")
 
@@ -209,7 +209,7 @@ func TestAuthorizationFlowJSON(t *testing.T) {
 
 	// introspect the token using the info endpoint
 	{
-		uri = "https://" + issuer + "/oauth/info"
+		uri = fmt.Sprintf("https://%s/oauth/info", issuer)
 		req := httptest.NewRequest("POST", uri, nil)
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
 
@@ -290,7 +290,7 @@ func TestAuthorizationFlowForm(t *testing.T) {
 
 	// exchange code
 	{
-		uri = "https://" + issuer + "/oauth/token"
+		uri = fmt.Sprintf("https://%s/oauth/token", issuer)
 		req := httptest.NewRequest("POST", uri, strings.NewReader(fmt.Sprintf("code=%s&grant_type=authorization_code&redirect_uri=%s", code, client.RedirectURI)))
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
@@ -335,7 +335,7 @@ func TestAuthorizationFlowForm(t *testing.T) {
 
 	// introspect the token using the info endpoint
 	{
-		uri = "https://" + issuer + "/oauth/info"
+		uri = fmt.Sprintf("https://%s/oauth/info", issuer)
 		req := httptest.NewRequest("POST", uri, nil)
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
 
