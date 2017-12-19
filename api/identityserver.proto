@@ -127,14 +127,14 @@ message GenerateUserAPIKeyRequest {
 
 message ListUserAPIKeysResponse {
   // api_keys are the API keys that the user has currently registered.
-  repeated APIKey api_keys = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
+  repeated APIKey api_keys = 1 [(gogoproto.customname) = "APIKeys"];
 }
 
 message UpdateUserAPIKeyRequest {
-  // name is the name of the user API key to be updated.
+  // name is the name of the API key to be generated.
   string name = 1;
 
-  // rights are the list of rights that will be set.
+  // rights the are rights the generated API key will bear.
   repeated Right rights = 2;
 }
 
@@ -150,7 +150,7 @@ message ValidateUserEmailRequest {
 
 message ListAuthorizedClientsResponse {
   // clients is the list of clients an user has currently authorized.
-  repeated Client clients = 1 [(gogoproto.nullable) = false];
+  repeated Client clients = 1;
 }
 
 // IsUser is the interface that provides methods to manage users in the Identity Server.
@@ -207,7 +207,7 @@ message CreateApplicationRequest {
 
 message ListApplicationsResponse {
   // applications is the list of applications the authenticated user has access to.
-  repeated Application applications = 1 [(gogoproto.nullable) = false];
+  repeated Application applications = 1;
 }
 
 message UpdateApplicationRequest {
@@ -233,7 +233,7 @@ message GenerateApplicationAPIKeyRequest {
 
 message ListApplicationAPIKeysResponse {
   // api_keys are the API keys that the application has currently registered.
-  repeated APIKey api_keys = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
+  repeated APIKey api_keys = 1 [(gogoproto.customname) = "APIKeys"];
 }
 
 message UpdateApplicationAPIKeyRequest {
@@ -257,7 +257,7 @@ message RemoveApplicationAPIKeyRequest {
 
 message ListApplicationCollaboratorsResponse {
   // collaborators is the list of collaborators the application has.
-  repeated ApplicationCollaborator collaborators = 1 [(gogoproto.nullable) = false];
+  repeated ApplicationCollaborator collaborators = 1;
 }
 
 message ListApplicationRightsResponse {
@@ -316,7 +316,7 @@ message CreateGatewayRequest {
 
 message ListGatewaysResponse {
   // gateways it the list of gateways the authenticated user has access to.
-  repeated Gateway gateways = 1 [(gogoproto.nullable) = false];
+  repeated Gateway gateways = 1;
 }
 
 message UpdateGatewayRequest {
@@ -342,7 +342,7 @@ message GenerateGatewayAPIKeyRequest {
 
 message ListGatewayAPIKeysResponse {
   // api_keys are the API keys that the gateways has currently registered.
-  repeated APIKey api_keys = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKeys"];
+  repeated APIKey api_keys = 1 [(gogoproto.customname) = "APIKeys"];
 }
 
 message UpdateGatewayAPIKeyRequest {
@@ -366,7 +366,7 @@ message RemoveGatewayAPIKeyRequest {
 
 message ListGatewayCollaboratorsResponse {
   // collaborators is the list of collaborators a gateway has.
-  repeated GatewayCollaborator collaborators = 1 [(gogoproto.nullable) = false];
+  repeated GatewayCollaborator collaborators = 1;
 }
 
 message ListGatewayRightsResponse {
@@ -424,7 +424,7 @@ message CreateClientRequest {
 
 message ListClientsResponse {
   // clients is a list of third-party clients.
-  repeated Client clients = 1 [(gogoproto.nullable) = false];
+  repeated Client clients = 1;
 }
 
 message UpdateClientRequest {
