@@ -30,6 +30,21 @@ type GatewayStore interface {
 	// Delete deletes a gateway.
 	//Delete(gtwID string) error
 
+	// SaveAPIKey stores an API Key attached to a gateway.
+	SaveAPIKey(gtwID string, key *ttnpb.APIKey) error
+
+	// GetAPIKey retrieves an API key from a gateway.
+	GetAPIKey(gtwID, keyName string) (*ttnpb.APIKey, error)
+
+	// UpdateAPIKeyRights updates the right of an API key.
+	UpdateAPIKeyRights(gtwID, keyName string, rights []ttnpb.Right) error
+
+	// ListAPIKey list all the API keys that a gateway has.
+	ListAPIKeys(gtwID string) ([]*ttnpb.APIKey, error)
+
+	// DeleteAPIKey deletes a given API key from a gateway.
+	DeleteAPIKey(gtwID, keyName string) error
+
 	// SetCollaborator inserts or updates a collaborator within a gateway.
 	// If the list of rights is empty the collaborator will be unset.
 	SetCollaborator(collaborator *ttnpb.GatewayCollaborator) error

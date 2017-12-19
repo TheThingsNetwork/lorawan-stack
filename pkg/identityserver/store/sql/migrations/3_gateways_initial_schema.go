@@ -47,9 +47,22 @@ func init() {
 			"right"      STRING NOT NULL,
 			PRIMARY KEY(gateway_id, user_id, "right")
 		);
+		CREATE TABLE IF NOT EXISTS gateways_api_keys (
+			gateway_id   STRING(36) NOT NULL REFERENCES gateways(gateway_id),
+			key          STRING PRIMARY KEY,
+			key_name     STRING(36) NOT NULL,
+			UNIQUE(gateway_id, key_name)
+		);
+		CREATE TABLE IF NOT EXISTS gateways_api_keys_rights (
+			key       STRING NOT NULL REFERENCES gateways_api_keys(key),
+			"right"   STRING NOT NULL,
+			PRIMARY KEY(key, "right")
+		);
 	`
 
 	const backwards = `
+		DROP TABLE IF EXISTS gateways_api_keys_rights;
+		DROP TABLE IF EXISTS gateways_api_keys;
 		DROP TABLE IF EXISTS gateways_attributes;
 		DROP TABLE IF EXISTS gateways_antennas;
 		DROP TABLE IF EXISTS gateways_radios;

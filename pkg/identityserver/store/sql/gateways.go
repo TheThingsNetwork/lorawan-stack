@@ -17,11 +17,14 @@ import (
 type GatewayStore struct {
 	storer
 	*extraAttributesStore
+	*apiKeysStore
 }
 
 func NewGatewayStore(store storer) *GatewayStore {
 	return &GatewayStore{
-		storer: store,
+		storer:               store,
+		extraAttributesStore: newExtraAttributesStore(store, "gateway"),
+		apiKeysStore:         newAPIKeysStore(store, "gateway"),
 	}
 }
 

@@ -78,6 +78,55 @@ func TestGatewayCreate(t *testing.T) {
 	}
 }
 
+func TestGatewayAPIKeys(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore(t)
+
+	gtwID := testGateways()["test-gateway"].GatewayID
+	key := &ttnpb.APIKey{
+		Key:    "abcabcabc",
+		Name:   "foo",
+		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
+	}
+
+	list, err := s.Gateways.ListAPIKeys(gtwID)
+	a.So(err, should.BeNil)
+	a.So(list, should.HaveLength, 0)
+
+	err = s.Gateways.SaveAPIKey(gtwID, key)
+	a.So(err, should.BeNil)
+
+	key2 := &ttnpb.APIKey{
+		Key:    "123abc",
+		Name:   "foo",
+		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
+	}
+	err = s.Gateways.SaveAPIKey(gtwID, key2)
+	a.So(err, should.NotBeNil)
+	a.So(ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
+
+	found, err := s.Gateways.GetAPIKey(gtwID, key.Name)
+	a.So(err, should.BeNil)
+	a.So(found, should.Resemble, key)
+
+	key.Rights = append(key.Rights, ttnpb.Right(5))
+	err = s.Gateways.UpdateAPIKeyRights(gtwID, key.Name, key.Rights)
+	a.So(err, should.BeNil)
+
+	list, err = s.Gateways.ListAPIKeys(gtwID)
+	a.So(err, should.BeNil)
+	if a.So(list, should.HaveLength, 1) {
+		a.So(list[0], should.Resemble, key)
+	}
+
+	err = s.Gateways.DeleteAPIKey(gtwID, key.Name)
+	a.So(err, should.BeNil)
+
+	found, err = s.Gateways.GetAPIKey(gtwID, key.Name)
+	a.So(err, should.NotBeNil)
+	a.So(ErrAPIKeyNotFound.Describes(err), should.BeTrue)
+}
+
 func TestGatewayAttributes(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore(t)
