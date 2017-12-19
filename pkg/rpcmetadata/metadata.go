@@ -22,7 +22,7 @@ type MD struct {
 	Offset         uint64
 }
 
-// GetRequestMetadata returns the request matadata with per-rpc credentials
+// GetRequestMetadata returns the request metadata with per-rpc credentials
 func (m MD) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
 	if m.AuthType == "" || m.AuthValue == "" {
 		return nil, nil
@@ -40,8 +40,8 @@ func (m MD) RequireTransportSecurity() bool {
 	return true
 }
 
-// ToOutgoingContext puts the TTN metadata fields in a context.Context
-func (m MD) ToOutgoingContext(ctx context.Context) context.Context {
+// ToMetadata puts the TTN metadata fields in a metadata.MD
+func (m MD) ToMetadata() metadata.MD {
 	var pairs []string
 	if m.ID != "" {
 		pairs = append(pairs, "id", m.ID)
@@ -61,15 +61,25 @@ func (m MD) ToOutgoingContext(ctx context.Context) context.Context {
 	if m.Offset != 0 {
 		pairs = append(pairs, "offset", strconv.FormatUint(m.Offset, 10))
 	}
+	return metadata.Pairs(pairs...)
+}
 
+// ToOutgoingContext puts the TTN metadata fields in an outgoing context.Context
+func (m MD) ToOutgoingContext(ctx context.Context) context.Context {
 	md, _ := metadata.FromOutgoingContext(ctx)
-	md = metadata.Join(metadata.Pairs(pairs...), md)
+	md = metadata.Join(m.ToMetadata(), md)
 	return metadata.NewOutgoingContext(ctx, md)
 }
 
-// FromIncomingContext returns the TTN metadata from the context.Context
-func FromIncomingContext(ctx context.Context) (m MD) {
+// ToIncomingContext puts the TTN metadata fields in an incoming context.Context
+func (m MD) ToIncomingContext(ctx context.Context) context.Context {
 	md, _ := metadata.FromIncomingContext(ctx)
+	md = metadata.Join(m.ToMetadata(), md)
+	return metadata.NewIncomingContext(ctx, md)
+}
+
+// FromMetadata returns the TTN metadata from metadata.MD
+func FromMetadata(md metadata.MD) (m MD) {
 	if id, ok := md["id"]; ok && len(id) > 0 {
 		m.ID = id[0]
 	}
@@ -94,4 +104,16 @@ func FromIncomingContext(ctx context.Context) (m MD) {
 		m.Offset, _ = strconv.ParseUint(offset[0], 10, 64)
 	}
 	return
+}
+
+// FromIncomingContext returns the TTN metadata from the outgoing context.Context
+func FromOutgoingContext(ctx context.Context) (m MD) {
+	md, _ := metadata.FromOutgoingContext(ctx)
+	return FromMetadata(md)
+}
+
+// FromOutgoingContext returns the TTN metadata from the incoming context.Context
+func FromIncomingContext(ctx context.Context) (m MD) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	return FromMetadata(md)
 }
