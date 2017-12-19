@@ -10,6 +10,7 @@ func init() {
 			email          TEXT NOT NULL UNIQUE,
 			password       TEXT NOT NULL,
 			validated_at   TIMESTAMP,
+			state          INT NOT NULL DEFAULT 0,
 			admin          BOOL DEFAULT false,
 			created_at     TIMESTAMP DEFAULT current_timestamp(),
 			updated_at     TIMESTAMP DEFAULT current_timestamp()
