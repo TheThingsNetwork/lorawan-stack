@@ -137,11 +137,11 @@ message EndDevice {
   // DisableJoinNonceCheck specifies whether LoRaWAN DevNonce check procedure should be disabled
   bool disable_join_nonce_check = 24;
 
-  // NetworkServerURL specifies URL of the Network Server associated with this device.
-  string NetworkServerURL = 25;
+  // NetworkServerURL specifies URL(host:port) of the Network Server associated with this device.
+  string network_server_url = 25 [(gogoproto.customname) = "NetworkServerURL"];
 
-  // ApplicationServerURL specifies URL of the Application Server associated with this device.
-  string ApplicationServerURL = 26;
+  // ApplicationServerURL specifies URL(host:port) of the Application Server associated with this device.
+  string application_server_url = 26 [(gogoproto.customname) = "ApplicationServerURL"];
 
   google.protobuf.Timestamp created_at = 97 [(gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 98 [(gogoproto.stdtime) = true];
