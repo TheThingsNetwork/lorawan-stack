@@ -30,7 +30,7 @@ func init() {
 			client_id       STRING(36) REFERENCES clients(client_id) NOT NULL,
 			user_id         STRING(36) REFERENCES users(user_id) NOT NULL,
 			created_at      TIMESTAMP DEFAULT current_timestamp(),
-			scope		        STRING,
+			scope           STRING,
 			redirect_uri    STRING
 		);
 	`
