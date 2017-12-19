@@ -3,6 +3,7 @@
 package sql
 
 import (
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
@@ -347,39 +348,64 @@ func (s *OAuthStore) listAuthorizedClients(q db.QueryContext, userID string) ([]
 // RevokeAuthorizedClient deletes the access tokens and refresh token
 // granted to a client by a given user.
 func (s *OAuthStore) RevokeAuthorizedClient(userID, clientID string) error {
+	rows := 0
 	err := s.transact(func(tx *db.Tx) error {
-		err := s.deleteAccessTokensByUserAndClient(tx, userID, clientID)
+		rowsa, err := s.deleteAccessTokensByUserAndClient(tx, userID, clientID)
 		if err != nil {
 			return err
 		}
 
-		return s.deleteRefreshTokenByUserAndClient(tx, userID, clientID)
+		rowsr, err := s.deleteRefreshTokenByUserAndClient(tx, userID, clientID)
+		if err != nil {
+			return err
+		}
+
+		rows = rowsa + rowsr
+
+		return nil
 	})
-	return err
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return ErrAuthorizedClientNotFound.New(errors.Attributes{
+			"user_id":   userID,
+			"client_id": clientID,
+		})
+	}
+	return nil
 }
 
-func (s *OAuthStore) deleteAccessTokensByUserAndClient(q db.QueryContext, userID, clientID string) error {
-	_, err := q.Exec(
+func (s *OAuthStore) deleteAccessTokensByUserAndClient(q db.QueryContext, userID, clientID string) (int, error) {
+	res, err := q.Exec(
 		`DELETE
 			FROM access_tokens
 			WHERE user_id = $1 AND client_id = $2`,
 		userID,
 		clientID)
-	return err
+	if err != nil {
+		return 0, err
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return int(rows), nil
 }
 
-func (s *OAuthStore) deleteRefreshTokenByUserAndClient(q db.QueryContext, userID, clientID string) error {
-	res := new(string)
-	err := q.SelectOne(
-		res,
+func (s *OAuthStore) deleteRefreshTokenByUserAndClient(q db.QueryContext, userID, clientID string) (int, error) {
+	res, err := q.Exec(
 		`DELETE
 			FROM refresh_tokens
-			WHERE user_id = $1 AND client_id = $2
-			RETURNING refresh_token`,
+			WHERE user_id = $1 AND client_id = $2`,
 		userID,
 		clientID)
-	if db.IsNoRows(err) {
-		return ErrRefreshTokenNotFound.New(nil)
+	if err != nil {
+		return 0, err
 	}
-	return err
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return int(rows), nil
 }

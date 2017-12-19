@@ -20,6 +20,7 @@ func init() {
 	ErrRefreshTokenConflict.Register()
 	ErrAccessTokenNotFound.Register()
 	ErrAccessTokenConflict.Register()
+	ErrAuthorizedClientNotFound.Register()
 
 	ErrUserNotFound.Register()
 	ErrUserEmailNotFound.Register()
@@ -139,6 +140,18 @@ var ErrAccessTokenConflict = &errors.ErrDescriptor{
 	MessageFormat: "Access token already exists",
 	Code:          506,
 	Type:          errors.Conflict,
+}
+
+// ErrAuthorizedClientNotFound is returned when an user tries to revoke an (non-existant)
+// authorized client.
+var ErrAuthorizedClientNotFound = &errors.ErrDescriptor{
+	MessageFormat: "User `{user_id}` has not authorized client `{client_id}`",
+	Code:          507,
+	Type:          errors.NotFound,
+	SafeAttributes: []string{
+		"user_id",
+		"client_id",
+	},
 }
 
 // ErrUserNotFound is returned when trying to fetch an user that does not exist.
