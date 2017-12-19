@@ -15,12 +15,14 @@ func New() *Mock {
 }
 
 // Send implements email.Provider.
+// It pushs the data value to a variable that can be accessed through the Data method of this package.
 func (m *Mock) Send(recipient string, tmpl *templates.Template, data interface{}) error {
 	last = data
 	return nil
 }
 
-// Data returns the value of the template data of the lastest sent email.
+// Data pops the value of the template data of the lastest sent email.
 func Data() interface{} {
+	defer func() { last = nil }()
 	return last
 }
