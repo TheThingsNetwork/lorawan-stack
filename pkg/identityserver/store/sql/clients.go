@@ -113,7 +113,8 @@ func (s *ClientStore) getByID(q db.QueryContext, clientID string, result types.C
 		RightsConverted db.Int32Slice
 	}
 
-	err := q.SelectOne(&res,
+	err := q.SelectOne(
+		&res,
 		`SELECT
 				client_id,
 				description,
@@ -124,8 +125,7 @@ func (s *ClientStore) getByID(q db.QueryContext, clientID string, result types.C
 				rights AS rights_converted,
 				official_labeled,
 				created_at,
-				updated_at,
-				archived_at
+				updated_at
 			FROM clients
 			WHERE client_id = $1`,
 		clientID)
@@ -135,11 +135,15 @@ func (s *ClientStore) getByID(q db.QueryContext, clientID string, result types.C
 		})
 	}
 
+	if err != nil {
+		return err
+	}
+
 	res.RightsConverted.SetInto(&res.Client.Rights)
 	res.GrantsConverted.SetInto(&res.Client.Grants)
 	*(result.GetClient()) = *res.Client
 
-	return err
+	return nil
 }
 
 // Update updates the client.
