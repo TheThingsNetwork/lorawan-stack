@@ -23,6 +23,8 @@ var AllUserRights = []Right{
 	RIGHT_USER_CLIENTS_LIST,
 	RIGHT_USER_CLIENTS_CREATE,
 	RIGHT_USER_CLIENTS_MANAGE,
+	RIGHT_USER_KEYS,
+	RIGHT_USER_ADMIN,
 }
 
 // AllApplicationRights is the set that contains all the rights that are to applications.

@@ -456,7 +456,7 @@ func NewPopulatedClient(r randyClient, easy bool) *Client {
 	v3 := r.Intn(10)
 	this.Rights = make([]Right, v3)
 	for i := 0; i < v3; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(30)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 16, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
 	}
 	v4 := NewPopulatedUserIdentifier(r, easy)
 	this.Creator = *v4

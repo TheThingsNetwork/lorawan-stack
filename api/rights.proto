@@ -56,6 +56,9 @@ enum Right {
   // RIGHT_USER_ADMIN is the right to performs actions that requires the user to be an admin.
   RIGHT_USER_ADMIN = 15;
 
+  // RIGHT_USER_KEYS is the right to view and manage user API keys.
+  RIGHT_USER_KEYS = 16;
+
 
   // RIGHT_APPLICATION_INFO is the right to see basic information about the application.
   // This does not include API keys.
