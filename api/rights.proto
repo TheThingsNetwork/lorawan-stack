@@ -38,17 +38,11 @@ enum Right {
   // the users account.
   RIGHT_USER_APPLICATIONS_CREATE = 6;
 
-  // RIGHT_USER_APPLICATIONS_ACCESS is the right to manage applications in the users account.
-  RIGHT_USER_APPLICATIONS_ACCESS = 8;
-
   // RIGHT_USER_GATEWAYS_LIST is the right to list gateways the user is collaborator of.
   RIGHT_USER_GATEWAYS_LIST = 9;
 
   // RIGHT_USER_GATEWAYS_CREATE is the right to register a gateway in the users account.
   RIGHT_USER_GATEWAYS_CREATE = 10;
-
-  // RIGHT_USER_GATEWAYS_ACCESS is the right to manage gateways in the users account.
-  RIGHT_USER_GATEWAYS_ACCESS = 11;
 
   // RIGHT_USER_CLIENTS_LIST is the right to list the OAuth clients of the user.
   RIGHT_USER_CLIENTS_LIST = 12;

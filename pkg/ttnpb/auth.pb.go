@@ -234,12 +234,12 @@ func encodeVarintAuth(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedAPIKey(r randyAuth, easy bool) *APIKey {
 	this := &APIKey{}
-	this.Key = randStringAuth(r)
-	this.Name = randStringAuth(r)
+	this.Key = string(randStringAuth(r))
+	this.Name = string(randStringAuth(r))
 	v1 := r.Intn(10)
 	this.Rights = make([]Right, v1)
 	for i := 0; i < v1; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -312,7 +312,7 @@ func randFieldAuth(dAtA []byte, r randyAuth, fieldNumber int, wire int) []byte {
 }
 func encodeVarintPopulateAuth(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -350,7 +350,7 @@ func sovAuth(x uint64) (n int) {
 	return n
 }
 func sozAuth(x uint64) (n int) {
-	return sovAuth((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovAuth(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (m *APIKey) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

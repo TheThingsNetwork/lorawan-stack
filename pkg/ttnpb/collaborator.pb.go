@@ -351,7 +351,7 @@ func NewPopulatedApplicationCollaborator(r randyCollaborator, easy bool) *Applic
 	v3 := r.Intn(10)
 	this.Rights = make([]Right, v3)
 	for i := 0; i < v3; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -367,7 +367,7 @@ func NewPopulatedGatewayCollaborator(r randyCollaborator, easy bool) *GatewayCol
 	v6 := r.Intn(10)
 	this.Rights = make([]Right, v6)
 	for i := 0; i < v6; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -440,7 +440,7 @@ func randFieldCollaborator(dAtA []byte, r randyCollaborator, fieldNumber int, wi
 }
 func encodeVarintPopulateCollaborator(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -491,7 +491,7 @@ func sovCollaborator(x uint64) (n int) {
 	return n
 }
 func sozCollaborator(x uint64) (n int) {
-	return sovCollaborator((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovCollaborator(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (m *ApplicationCollaborator) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

@@ -243,7 +243,7 @@ func _RxMetadata_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 		_ = b.EncodeStringBytes(x.EncryptedFineTimestamp)
 	case *RxMetadata_FineTimestampValue:
 		_ = b.EncodeVarint(6<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(x.FineTimestampValue)
+		_ = b.EncodeVarint(uint64(x.FineTimestampValue))
 	case nil:
 	default:
 		return fmt.Errorf("RxMetadata.FineTimestamp has unexpected type %T", x)
@@ -283,7 +283,7 @@ func _RxMetadata_OneofSizer(msg proto.Message) (n int) {
 		n += len(x.EncryptedFineTimestamp)
 	case *RxMetadata_FineTimestampValue:
 		n += proto.SizeVarint(6<<3 | proto.WireVarint)
-		n += proto.SizeVarint(x.FineTimestampValue)
+		n += proto.SizeVarint(uint64(x.FineTimestampValue))
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
@@ -888,7 +888,7 @@ func (m *RxMetadata) MarshalTo(dAtA []byte) (int, error) {
 	if m.Timestamp != 0 {
 		dAtA[i] = 0x20
 		i++
-		i = encodeVarintMetadata(dAtA, i, m.Timestamp)
+		i = encodeVarintMetadata(dAtA, i, uint64(m.Timestamp))
 	}
 	if m.FineTimestamp != nil {
 		nn2, err := m.FineTimestamp.MarshalTo(dAtA[i:])
@@ -910,25 +910,25 @@ func (m *RxMetadata) MarshalTo(dAtA []byte) (int, error) {
 	if m.RSSI != 0 {
 		dAtA[i] = 0x45
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSI))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.RSSI))))
 		i += 4
 	}
 	if m.ChannelRSSI != 0 {
 		dAtA[i] = 0x4d
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.ChannelRSSI))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.ChannelRSSI))))
 		i += 4
 	}
 	if m.RSSIStandardDeviation != 0 {
 		dAtA[i] = 0x55
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSIStandardDeviation))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.RSSIStandardDeviation))))
 		i += 4
 	}
 	if m.SNR != 0 {
 		dAtA[i] = 0x5d
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.SNR))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.SNR))))
 		i += 4
 	}
 	if m.FrequencyOffset != 0 {
@@ -979,7 +979,7 @@ func (m *RxMetadata_FineTimestampValue) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x30
 	i++
-	i = encodeVarintMetadata(dAtA, i, m.FineTimestampValue)
+	i = encodeVarintMetadata(dAtA, i, uint64(m.FineTimestampValue))
 	return i, nil
 }
 func (m *TxMetadata) Marshal() (dAtA []byte, err error) {
@@ -1008,7 +1008,7 @@ func (m *TxMetadata) MarshalTo(dAtA []byte) (int, error) {
 	if m.Timestamp != 0 {
 		dAtA[i] = 0x10
 		i++
-		i = encodeVarintMetadata(dAtA, i, m.Timestamp)
+		i = encodeVarintMetadata(dAtA, i, uint64(m.Timestamp))
 	}
 	if m.Time != nil {
 		dAtA[i] = 0x1a
@@ -1053,13 +1053,13 @@ func (m *Location) MarshalTo(dAtA []byte) (int, error) {
 	if m.Latitude != 0 {
 		dAtA[i] = 0xd
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Latitude))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.Latitude))))
 		i += 4
 	}
 	if m.Longitude != 0 {
 		dAtA[i] = 0x15
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Longitude))
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.Longitude))))
 		i += 4
 	}
 	if m.Altitude != 0 {
@@ -1093,9 +1093,9 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 	this := &RxMetadata{}
 	v1 := NewPopulatedGatewayIdentifier(r, easy)
 	this.GatewayIdentifier = *v1
-	this.AntennaIndex = r.Uint32()
-	this.ChannelIndex = r.Uint32()
-	this.Timestamp = uint64(r.Uint32())
+	this.AntennaIndex = uint32(r.Uint32())
+	this.ChannelIndex = uint32(r.Uint32())
+	this.Timestamp = uint64(uint64(r.Uint32()))
 	oneofNumber_FineTimestamp := []int32{5, 6}[r.Intn(2)]
 	switch oneofNumber_FineTimestamp {
 	case 5:
@@ -1106,30 +1106,30 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 	if r.Intn(10) != 0 {
 		this.Time = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
-	this.RSSI = r.Float32()
+	this.RSSI = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.RSSI *= -1
 	}
-	this.ChannelRSSI = r.Float32()
+	this.ChannelRSSI = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.ChannelRSSI *= -1
 	}
-	this.RSSIStandardDeviation = r.Float32()
+	this.RSSIStandardDeviation = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.RSSIStandardDeviation *= -1
 	}
-	this.SNR = r.Float32()
+	this.SNR = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.SNR *= -1
 	}
-	this.FrequencyOffset = r.Int63()
+	this.FrequencyOffset = int64(r.Int63())
 	if r.Intn(2) == 0 {
 		this.FrequencyOffset *= -1
 	}
 	if r.Intn(10) != 0 {
 		this.Location = NewPopulatedLocation(r, easy)
 	}
-	this.AESKeyID = randStringMetadata(r)
+	this.AESKeyID = string(randStringMetadata(r))
 	if r.Intn(10) == 0 {
 		this.Advanced = google_protobuf3.NewPopulatedStruct(r, easy)
 	}
@@ -1140,19 +1140,19 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 
 func NewPopulatedRxMetadata_EncryptedFineTimestamp(r randyMetadata, easy bool) *RxMetadata_EncryptedFineTimestamp {
 	this := &RxMetadata_EncryptedFineTimestamp{}
-	this.EncryptedFineTimestamp = randStringMetadata(r)
+	this.EncryptedFineTimestamp = string(randStringMetadata(r))
 	return this
 }
 func NewPopulatedRxMetadata_FineTimestampValue(r randyMetadata, easy bool) *RxMetadata_FineTimestampValue {
 	this := &RxMetadata_FineTimestampValue{}
-	this.FineTimestampValue = uint64(r.Uint32())
+	this.FineTimestampValue = uint64(uint64(r.Uint32()))
 	return this
 }
 func NewPopulatedTxMetadata(r randyMetadata, easy bool) *TxMetadata {
 	this := &TxMetadata{}
 	v2 := NewPopulatedGatewayIdentifier(r, easy)
 	this.GatewayIdentifier = *v2
-	this.Timestamp = uint64(r.Uint32())
+	this.Timestamp = uint64(uint64(r.Uint32()))
 	if r.Intn(10) != 0 {
 		this.Time = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
@@ -1166,19 +1166,19 @@ func NewPopulatedTxMetadata(r randyMetadata, easy bool) *TxMetadata {
 
 func NewPopulatedLocation(r randyMetadata, easy bool) *Location {
 	this := &Location{}
-	this.Latitude = r.Float32()
+	this.Latitude = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.Latitude *= -1
 	}
-	this.Longitude = r.Float32()
+	this.Longitude = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.Longitude *= -1
 	}
-	this.Altitude = r.Int31()
+	this.Altitude = int32(r.Int31())
 	if r.Intn(2) == 0 {
 		this.Altitude *= -1
 	}
-	this.Accuracy = r.Int31()
+	this.Accuracy = int32(r.Int31())
 	if r.Intn(2) == 0 {
 		this.Accuracy *= -1
 	}
@@ -1254,7 +1254,7 @@ func randFieldMetadata(dAtA []byte, r randyMetadata, fieldNumber int, wire int) 
 }
 func encodeVarintPopulateMetadata(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -1272,7 +1272,7 @@ func (m *RxMetadata) Size() (n int) {
 		n += 1 + sovMetadata(uint64(m.ChannelIndex))
 	}
 	if m.Timestamp != 0 {
-		n += 1 + sovMetadata(m.Timestamp)
+		n += 1 + sovMetadata(uint64(m.Timestamp))
 	}
 	if m.FineTimestamp != nil {
 		n += m.FineTimestamp.Size()
@@ -1321,7 +1321,7 @@ func (m *RxMetadata_EncryptedFineTimestamp) Size() (n int) {
 func (m *RxMetadata_FineTimestampValue) Size() (n int) {
 	var l int
 	_ = l
-	n += 1 + sovMetadata(m.FineTimestampValue)
+	n += 1 + sovMetadata(uint64(m.FineTimestampValue))
 	return n
 }
 func (m *TxMetadata) Size() (n int) {
@@ -1330,7 +1330,7 @@ func (m *TxMetadata) Size() (n int) {
 	l = m.GatewayIdentifier.Size()
 	n += 1 + l + sovMetadata(uint64(l))
 	if m.Timestamp != 0 {
-		n += 1 + sovMetadata(m.Timestamp)
+		n += 1 + sovMetadata(uint64(m.Timestamp))
 	}
 	if m.Time != nil {
 		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.Time)
@@ -1375,7 +1375,7 @@ func sovMetadata(x uint64) (n int) {
 	return n
 }
 func sozMetadata(x uint64) (n int) {
-	return sovMetadata((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovMetadata(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -1583,9 +1583,9 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
-			m.RSSI = math.Float32frombits(v)
+			m.RSSI = float32(math.Float32frombits(v))
 		case 9:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ChannelRSSI", wireType)
@@ -1594,9 +1594,9 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
-			m.ChannelRSSI = math.Float32frombits(v)
+			m.ChannelRSSI = float32(math.Float32frombits(v))
 		case 10:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RSSIStandardDeviation", wireType)
@@ -1605,9 +1605,9 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
-			m.RSSIStandardDeviation = math.Float32frombits(v)
+			m.RSSIStandardDeviation = float32(math.Float32frombits(v))
 		case 11:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SNR", wireType)
@@ -1616,9 +1616,9 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
-			m.SNR = math.Float32frombits(v)
+			m.SNR = float32(math.Float32frombits(v))
 		case 12:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyOffset", wireType)
@@ -1956,9 +1956,9 @@ func (m *Location) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
-			m.Latitude = math.Float32frombits(v)
+			m.Latitude = float32(math.Float32frombits(v))
 		case 2:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Longitude", wireType)
@@ -1967,9 +1967,9 @@ func (m *Location) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
-			m.Longitude = math.Float32frombits(v)
+			m.Longitude = float32(math.Float32frombits(v))
 		case 3:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Altitude", wireType)
