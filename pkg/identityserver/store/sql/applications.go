@@ -267,6 +267,39 @@ func (s *ApplicationStore) addRightsQuery(appID, userID string, rights []ttnpb.R
 	return query, args
 }
 
+// HasUserRights checks whether an user has a set of given rights to an application.
+func (s *ApplicationStore) HasUserRights(appID, userID string, rights ...ttnpb.Right) (bool, error) {
+	return s.hasUserRights(s.queryer(), appID, userID, rights...)
+}
+
+func (s *ApplicationStore) hasUserRights(q db.QueryContext, appID, userID string, rights ...ttnpb.Right) (bool, error) {
+	clauses := make([]string, 0, len(rights))
+	args := make([]interface{}, 0, len(rights)+1)
+	args = append(args, userID)
+
+	for i, right := range rights {
+		args = append(args, right)
+		clauses = append(clauses, fmt.Sprintf(`"right" = $%d`, i+2))
+	}
+
+	res := new(string)
+	err := q.SelectOne(
+		res,
+		fmt.Sprintf(
+			`SELECT
+				DISTINCT user_id
+				FROM applications_collaborators
+				WHERE user_id = $1 AND (%s)`, strings.Join(clauses, " OR ")),
+		args...)
+	if db.IsNoRows(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 // ListCollaborators retrieves all the collaborators from an entity.
 func (s *ApplicationStore) ListCollaborators(appID string) ([]*ttnpb.ApplicationCollaborator, error) {
 	return s.listCollaborators(s.queryer(), appID)

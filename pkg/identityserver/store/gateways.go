@@ -34,6 +34,9 @@ type GatewayStore interface {
 	// If the list of rights is empty the collaborator will be unset.
 	SetCollaborator(collaborator *ttnpb.GatewayCollaborator) error
 
+	// HasUserRights checks whether an user has a set of given rights to a gateway.
+	HasUserRights(gtwID, userID string, rights ...ttnpb.Right) (bool, error)
+
 	// ListCollaborators retrieves all the gateway collaborators.
 	ListCollaborators(gtwID string) ([]*ttnpb.GatewayCollaborator, error)
 

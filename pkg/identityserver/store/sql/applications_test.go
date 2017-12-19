@@ -134,6 +134,17 @@ func TestApplicationCollaborators(t *testing.T) {
 		a.So(err, should.BeNil)
 	}
 
+	// test HasUserRights method
+	{
+		yes, err := s.Applications.HasUserRights(app.ApplicationID, user.UserID, ttnpb.Right(0))
+		a.So(yes, should.BeFalse)
+		a.So(err, should.BeNil)
+
+		yes, err = s.Applications.HasUserRights(app.ApplicationID, user.UserID, collaborator.Rights...)
+		a.So(yes, should.BeTrue)
+		a.So(err, should.BeNil)
+	}
+
 	// check that it was added
 	{
 		collaborators, err := s.Applications.ListCollaborators(app.ApplicationID)

@@ -227,7 +227,17 @@ func TestGatewayCollaborators(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(collaborators, should.HaveLength, 1)
 		a.So(collaborators, should.Contain, collaborator)
+	}
 
+	// test HasUserRights method
+	{
+		yes, err := s.Gateways.HasUserRights(gtw.GatewayID, user.UserID, ttnpb.Right(0))
+		a.So(yes, should.BeFalse)
+		a.So(err, should.BeNil)
+
+		yes, err = s.Gateways.HasUserRights(gtw.GatewayID, user.UserID, collaborator.Rights...)
+		a.So(yes, should.BeTrue)
+		a.So(err, should.BeNil)
 	}
 
 	// fetch gateways where Bob is collaborator

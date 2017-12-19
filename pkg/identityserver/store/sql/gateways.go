@@ -616,6 +616,39 @@ func (s *GatewayStore) addRightsQuery(gtwID, userID string, rights []ttnpb.Right
 	return query, args
 }
 
+// HasUserRights checks whether an user has a set of given rights to a gateway.
+func (s *GatewayStore) HasUserRights(gtwID, userID string, rights ...ttnpb.Right) (bool, error) {
+	return s.hasUserRights(s.queryer(), gtwID, userID, rights...)
+}
+
+func (s *GatewayStore) hasUserRights(q db.QueryContext, gtwID, userID string, rights ...ttnpb.Right) (bool, error) {
+	clauses := make([]string, 0, len(rights))
+	args := make([]interface{}, 0, len(rights)+1)
+	args = append(args, userID)
+
+	for i, right := range rights {
+		args = append(args, right)
+		clauses = append(clauses, fmt.Sprintf(`"right" = $%d`, i+2))
+	}
+
+	res := new(string)
+	err := q.SelectOne(
+		res,
+		fmt.Sprintf(
+			`SELECT
+				DISTINCT user_id
+				FROM gateways_collaborators
+				WHERE user_id = $1 AND (%s)`, strings.Join(clauses, " OR ")),
+		args...)
+	if db.IsNoRows(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 // ListCollaborators retrieves all the collaborators from an entity.
 func (s *GatewayStore) ListCollaborators(gtwID string) ([]*ttnpb.GatewayCollaborator, error) {
 	return s.listCollaborators(s.queryer(), gtwID)

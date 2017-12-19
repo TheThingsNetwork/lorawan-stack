@@ -49,6 +49,9 @@ type ApplicationStore interface {
 	// If the list of rights is empty the collaborator will be unset.
 	SetCollaborator(collaborator *ttnpb.ApplicationCollaborator) error
 
+	// HasUserRights checks whether an user has a set of given rights to an application.
+	HasUserRights(appID, userID string, rights ...ttnpb.Right) (bool, error)
+
 	// ListCollaborators retrieves all the collaborators from an application.
 	ListCollaborators(appID string) ([]*ttnpb.ApplicationCollaborator, error)
 
