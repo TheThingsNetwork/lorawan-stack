@@ -14,7 +14,7 @@ install:
 - go get -u github.com/dgrijalva/jwt-go
 before_script:
 - docker run -d -p 127.0.0.1:6379:6379 redis
-- docker run -d -p 127.0.0.1:26257:26257 cockroachdb/cockroach:v1.1.1 start --insecure
+- docker run -d -p 127.0.0.1:26257:26257 cockroachdb/cockroach:v1.1.3 start --insecure
 script:
 - make go.protos.clean
 - make go.protos

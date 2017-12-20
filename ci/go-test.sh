@@ -10,13 +10,13 @@ then
   mkdir -p ./deps
 fi
 
-if [[ ! -f ./deps/cockroach-v1.1.1 ]]
+if [[ ! -f ./deps/cockroach-v1.1.3 ]]
 then
-  wget -qO- https://binaries.cockroachdb.com/cockroach-v1.1.1.linux-amd64.tgz | tar xvz
-  mv ./cockroach-v1.1.1.linux-amd64/cockroach ./deps/cockroach-v1.1.1
-  chmod +x ./deps/cockroach-v1.1.1
+  wget -qO- https://binaries.cockroachdb.com/cockroach-v1.1.3.linux-amd64.tgz | tar xvz
+  mv ./cockroach-v1.1.3.linux-amd64/cockroach ./deps/cockroach-v1.1.3
+  chmod +x ./deps/cockroach-v1.1.3
 fi
-./deps/cockroach-v1.1.1 start --host localhost --insecure &
+./deps/cockroach-v1.1.3 start --host localhost --insecure &
 
 if [[ ! -f ./deps/redis-v4.0.2 ]]
 then
