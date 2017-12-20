@@ -9,12 +9,10 @@ import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
-import google_protobuf1 "github.com/gogo/protobuf/types"
+import google_protobuf3 "github.com/gogo/protobuf/types"
 import _ "github.com/gogo/protobuf/types"
 
 import time "time"
-
-import bytes "bytes"
 
 import context "context"
 import grpc "google.golang.org/grpc"
@@ -197,70 +195,6 @@ func _ApplicationUp_OneofSizer(msg proto.Message) (n int) {
 	return n
 }
 
-type ApplicationUplink struct {
-	FPort      uint32 `protobuf:"varint,1,opt,name=f_port,json=fPort,proto3" json:"f_port,omitempty"`
-	FCnt       uint32 `protobuf:"varint,2,opt,name=f_cnt,json=fCnt,proto3" json:"f_cnt,omitempty"`
-	FrmPayload []byte `protobuf:"bytes,3,opt,name=frm_payload,json=frmPayload,proto3" json:"frm_payload,omitempty"`
-}
-
-func (m *ApplicationUplink) Reset()                    { *m = ApplicationUplink{} }
-func (m *ApplicationUplink) String() string            { return proto.CompactTextString(m) }
-func (*ApplicationUplink) ProtoMessage()               {}
-func (*ApplicationUplink) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{2} }
-
-func (m *ApplicationUplink) GetFPort() uint32 {
-	if m != nil {
-		return m.FPort
-	}
-	return 0
-}
-
-func (m *ApplicationUplink) GetFCnt() uint32 {
-	if m != nil {
-		return m.FCnt
-	}
-	return 0
-}
-
-func (m *ApplicationUplink) GetFrmPayload() []byte {
-	if m != nil {
-		return m.FrmPayload
-	}
-	return nil
-}
-
-type ApplicationDownlink struct {
-	FPort      uint32 `protobuf:"varint,1,opt,name=f_port,json=fPort,proto3" json:"f_port,omitempty"`
-	FCnt       uint32 `protobuf:"varint,2,opt,name=f_cnt,json=fCnt,proto3" json:"f_cnt,omitempty"`
-	FrmPayload []byte `protobuf:"bytes,3,opt,name=frm_payload,json=frmPayload,proto3" json:"frm_payload,omitempty"`
-}
-
-func (m *ApplicationDownlink) Reset()                    { *m = ApplicationDownlink{} }
-func (m *ApplicationDownlink) String() string            { return proto.CompactTextString(m) }
-func (*ApplicationDownlink) ProtoMessage()               {}
-func (*ApplicationDownlink) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{3} }
-
-func (m *ApplicationDownlink) GetFPort() uint32 {
-	if m != nil {
-		return m.FPort
-	}
-	return 0
-}
-
-func (m *ApplicationDownlink) GetFCnt() uint32 {
-	if m != nil {
-		return m.FCnt
-	}
-	return 0
-}
-
-func (m *ApplicationDownlink) GetFrmPayload() []byte {
-	if m != nil {
-		return m.FrmPayload
-	}
-	return nil
-}
-
 type ApplicationDownlinks struct {
 	Downlinks []*ApplicationDownlink `protobuf:"bytes,1,rep,name=downlinks" json:"downlinks,omitempty"`
 }
@@ -268,7 +202,7 @@ type ApplicationDownlinks struct {
 func (m *ApplicationDownlinks) Reset()                    { *m = ApplicationDownlinks{} }
 func (m *ApplicationDownlinks) String() string            { return proto.CompactTextString(m) }
 func (*ApplicationDownlinks) ProtoMessage()               {}
-func (*ApplicationDownlinks) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{4} }
+func (*ApplicationDownlinks) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{2} }
 
 func (m *ApplicationDownlinks) GetDownlinks() []*ApplicationDownlink {
 	if m != nil {
@@ -285,7 +219,7 @@ type DownlinkQueueRequest struct {
 func (m *DownlinkQueueRequest) Reset()                    { *m = DownlinkQueueRequest{} }
 func (m *DownlinkQueueRequest) String() string            { return proto.CompactTextString(m) }
 func (*DownlinkQueueRequest) ProtoMessage()               {}
-func (*DownlinkQueueRequest) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{5} }
+func (*DownlinkQueueRequest) Descriptor() ([]byte, []int) { return fileDescriptorApplication, []int{3} }
 
 func (m *DownlinkQueueRequest) GetDownlinks() []*ApplicationDownlink {
 	if m != nil {
@@ -299,10 +233,6 @@ func init() {
 	golang_proto.RegisterType((*Application)(nil), "ttn.v3.Application")
 	proto.RegisterType((*ApplicationUp)(nil), "ttn.v3.ApplicationUp")
 	golang_proto.RegisterType((*ApplicationUp)(nil), "ttn.v3.ApplicationUp")
-	proto.RegisterType((*ApplicationUplink)(nil), "ttn.v3.ApplicationUplink")
-	golang_proto.RegisterType((*ApplicationUplink)(nil), "ttn.v3.ApplicationUplink")
-	proto.RegisterType((*ApplicationDownlink)(nil), "ttn.v3.ApplicationDownlink")
-	golang_proto.RegisterType((*ApplicationDownlink)(nil), "ttn.v3.ApplicationDownlink")
 	proto.RegisterType((*ApplicationDownlinks)(nil), "ttn.v3.ApplicationDownlinks")
 	golang_proto.RegisterType((*ApplicationDownlinks)(nil), "ttn.v3.ApplicationDownlinks")
 	proto.RegisterType((*DownlinkQueueRequest)(nil), "ttn.v3.DownlinkQueueRequest")
@@ -524,138 +454,6 @@ func (this *ApplicationUp_UplinkMessage) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *ApplicationUplink) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*ApplicationUplink)
-	if !ok {
-		that2, ok := that.(ApplicationUplink)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *ApplicationUplink")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *ApplicationUplink but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *ApplicationUplink but is not nil && this == nil")
-	}
-	if this.FPort != that1.FPort {
-		return fmt.Errorf("FPort this(%v) Not Equal that(%v)", this.FPort, that1.FPort)
-	}
-	if this.FCnt != that1.FCnt {
-		return fmt.Errorf("FCnt this(%v) Not Equal that(%v)", this.FCnt, that1.FCnt)
-	}
-	if !bytes.Equal(this.FrmPayload, that1.FrmPayload) {
-		return fmt.Errorf("FrmPayload this(%v) Not Equal that(%v)", this.FrmPayload, that1.FrmPayload)
-	}
-	return nil
-}
-func (this *ApplicationUplink) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*ApplicationUplink)
-	if !ok {
-		that2, ok := that.(ApplicationUplink)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if this.FPort != that1.FPort {
-		return false
-	}
-	if this.FCnt != that1.FCnt {
-		return false
-	}
-	if !bytes.Equal(this.FrmPayload, that1.FrmPayload) {
-		return false
-	}
-	return true
-}
-func (this *ApplicationDownlink) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*ApplicationDownlink)
-	if !ok {
-		that2, ok := that.(ApplicationDownlink)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *ApplicationDownlink")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *ApplicationDownlink but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *ApplicationDownlink but is not nil && this == nil")
-	}
-	if this.FPort != that1.FPort {
-		return fmt.Errorf("FPort this(%v) Not Equal that(%v)", this.FPort, that1.FPort)
-	}
-	if this.FCnt != that1.FCnt {
-		return fmt.Errorf("FCnt this(%v) Not Equal that(%v)", this.FCnt, that1.FCnt)
-	}
-	if !bytes.Equal(this.FrmPayload, that1.FrmPayload) {
-		return fmt.Errorf("FrmPayload this(%v) Not Equal that(%v)", this.FrmPayload, that1.FrmPayload)
-	}
-	return nil
-}
-func (this *ApplicationDownlink) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*ApplicationDownlink)
-	if !ok {
-		that2, ok := that.(ApplicationDownlink)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if this.FPort != that1.FPort {
-		return false
-	}
-	if this.FCnt != that1.FCnt {
-		return false
-	}
-	if !bytes.Equal(this.FrmPayload, that1.FrmPayload) {
-		return false
-	}
-	return true
-}
 func (this *ApplicationDownlinks) VerboseEqual(that interface{}) error {
 	if that == nil {
 		if this == nil {
@@ -802,10 +600,10 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for NsApplicationDownlinkQueue service
 
 type NsApplicationDownlinkQueueClient interface {
-	DownlinkQueueReplace(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
-	DownlinkQueuePush(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	DownlinkQueueReplace(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
+	DownlinkQueuePush(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
 	DownlinkQueueList(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*ApplicationDownlinks, error)
-	DownlinkQueueClear(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	DownlinkQueueClear(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
 }
 
 type nsApplicationDownlinkQueueClient struct {
@@ -816,8 +614,8 @@ func NewNsApplicationDownlinkQueueClient(cc *grpc.ClientConn) NsApplicationDownl
 	return &nsApplicationDownlinkQueueClient{cc}
 }
 
-func (c *nsApplicationDownlinkQueueClient) DownlinkQueueReplace(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *nsApplicationDownlinkQueueClient) DownlinkQueueReplace(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
+	out := new(google_protobuf3.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.NsApplicationDownlinkQueue/DownlinkQueueReplace", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -825,8 +623,8 @@ func (c *nsApplicationDownlinkQueueClient) DownlinkQueueReplace(ctx context.Cont
 	return out, nil
 }
 
-func (c *nsApplicationDownlinkQueueClient) DownlinkQueuePush(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *nsApplicationDownlinkQueueClient) DownlinkQueuePush(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
+	out := new(google_protobuf3.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.NsApplicationDownlinkQueue/DownlinkQueuePush", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -843,8 +641,8 @@ func (c *nsApplicationDownlinkQueueClient) DownlinkQueueList(ctx context.Context
 	return out, nil
 }
 
-func (c *nsApplicationDownlinkQueueClient) DownlinkQueueClear(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *nsApplicationDownlinkQueueClient) DownlinkQueueClear(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
+	out := new(google_protobuf3.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.NsApplicationDownlinkQueue/DownlinkQueueClear", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -855,10 +653,10 @@ func (c *nsApplicationDownlinkQueueClient) DownlinkQueueClear(ctx context.Contex
 // Server API for NsApplicationDownlinkQueue service
 
 type NsApplicationDownlinkQueueServer interface {
-	DownlinkQueueReplace(context.Context, *DownlinkQueueRequest) (*google_protobuf1.Empty, error)
-	DownlinkQueuePush(context.Context, *DownlinkQueueRequest) (*google_protobuf1.Empty, error)
+	DownlinkQueueReplace(context.Context, *DownlinkQueueRequest) (*google_protobuf3.Empty, error)
+	DownlinkQueuePush(context.Context, *DownlinkQueueRequest) (*google_protobuf3.Empty, error)
 	DownlinkQueueList(context.Context, *EndDeviceIdentifiers) (*ApplicationDownlinks, error)
-	DownlinkQueueClear(context.Context, *EndDeviceIdentifiers) (*google_protobuf1.Empty, error)
+	DownlinkQueueClear(context.Context, *EndDeviceIdentifiers) (*google_protobuf3.Empty, error)
 }
 
 func RegisterNsApplicationDownlinkQueueServer(s *grpc.Server, srv NsApplicationDownlinkQueueServer) {
@@ -965,10 +763,10 @@ var _NsApplicationDownlinkQueue_serviceDesc = grpc.ServiceDesc{
 // Client API for AsApplicationDownlinkQueue service
 
 type AsApplicationDownlinkQueueClient interface {
-	DownlinkQueueReplace(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
-	DownlinkQueuePush(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	DownlinkQueueReplace(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
+	DownlinkQueuePush(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
 	DownlinkQueueList(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*ApplicationDownlinks, error)
-	DownlinkQueueClear(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	DownlinkQueueClear(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
 }
 
 type asApplicationDownlinkQueueClient struct {
@@ -979,8 +777,8 @@ func NewAsApplicationDownlinkQueueClient(cc *grpc.ClientConn) AsApplicationDownl
 	return &asApplicationDownlinkQueueClient{cc}
 }
 
-func (c *asApplicationDownlinkQueueClient) DownlinkQueueReplace(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *asApplicationDownlinkQueueClient) DownlinkQueueReplace(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
+	out := new(google_protobuf3.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.AsApplicationDownlinkQueue/DownlinkQueueReplace", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -988,8 +786,8 @@ func (c *asApplicationDownlinkQueueClient) DownlinkQueueReplace(ctx context.Cont
 	return out, nil
 }
 
-func (c *asApplicationDownlinkQueueClient) DownlinkQueuePush(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *asApplicationDownlinkQueueClient) DownlinkQueuePush(ctx context.Context, in *DownlinkQueueRequest, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
+	out := new(google_protobuf3.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.AsApplicationDownlinkQueue/DownlinkQueuePush", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -1006,8 +804,8 @@ func (c *asApplicationDownlinkQueueClient) DownlinkQueueList(ctx context.Context
 	return out, nil
 }
 
-func (c *asApplicationDownlinkQueueClient) DownlinkQueueClear(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *asApplicationDownlinkQueueClient) DownlinkQueueClear(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
+	out := new(google_protobuf3.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.AsApplicationDownlinkQueue/DownlinkQueueClear", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -1018,10 +816,10 @@ func (c *asApplicationDownlinkQueueClient) DownlinkQueueClear(ctx context.Contex
 // Server API for AsApplicationDownlinkQueue service
 
 type AsApplicationDownlinkQueueServer interface {
-	DownlinkQueueReplace(context.Context, *DownlinkQueueRequest) (*google_protobuf1.Empty, error)
-	DownlinkQueuePush(context.Context, *DownlinkQueueRequest) (*google_protobuf1.Empty, error)
+	DownlinkQueueReplace(context.Context, *DownlinkQueueRequest) (*google_protobuf3.Empty, error)
+	DownlinkQueuePush(context.Context, *DownlinkQueueRequest) (*google_protobuf3.Empty, error)
 	DownlinkQueueList(context.Context, *EndDeviceIdentifiers) (*ApplicationDownlinks, error)
-	DownlinkQueueClear(context.Context, *EndDeviceIdentifiers) (*google_protobuf1.Empty, error)
+	DownlinkQueueClear(context.Context, *EndDeviceIdentifiers) (*google_protobuf3.Empty, error)
 }
 
 func RegisterAsApplicationDownlinkQueueServer(s *grpc.Server, srv AsApplicationDownlinkQueueServer) {
@@ -1234,74 +1032,6 @@ func (m *ApplicationUp_UplinkMessage) MarshalTo(dAtA []byte) (int, error) {
 	}
 	return i, nil
 }
-func (m *ApplicationUplink) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ApplicationUplink) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.FPort != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintApplication(dAtA, i, uint64(m.FPort))
-	}
-	if m.FCnt != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintApplication(dAtA, i, uint64(m.FCnt))
-	}
-	if len(m.FrmPayload) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintApplication(dAtA, i, uint64(len(m.FrmPayload)))
-		i += copy(dAtA[i:], m.FrmPayload)
-	}
-	return i, nil
-}
-
-func (m *ApplicationDownlink) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ApplicationDownlink) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.FPort != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintApplication(dAtA, i, uint64(m.FPort))
-	}
-	if m.FCnt != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintApplication(dAtA, i, uint64(m.FCnt))
-	}
-	if len(m.FrmPayload) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintApplication(dAtA, i, uint64(len(m.FrmPayload)))
-		i += copy(dAtA[i:], m.FrmPayload)
-	}
-	return i, nil
-}
-
 func (m *ApplicationDownlinks) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1414,40 +1144,12 @@ func NewPopulatedApplicationUp_UplinkMessage(r randyApplication, easy bool) *App
 	this.UplinkMessage = NewPopulatedApplicationUplink(r, easy)
 	return this
 }
-func NewPopulatedApplicationUplink(r randyApplication, easy bool) *ApplicationUplink {
-	this := &ApplicationUplink{}
-	this.FPort = r.Uint32()
-	this.FCnt = r.Uint32()
-	v4 := r.Intn(100)
-	this.FrmPayload = make([]byte, v4)
-	for i := 0; i < v4; i++ {
-		this.FrmPayload[i] = byte(r.Intn(256))
-	}
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedApplicationDownlink(r randyApplication, easy bool) *ApplicationDownlink {
-	this := &ApplicationDownlink{}
-	this.FPort = r.Uint32()
-	this.FCnt = r.Uint32()
-	v5 := r.Intn(100)
-	this.FrmPayload = make([]byte, v5)
-	for i := 0; i < v5; i++ {
-		this.FrmPayload[i] = byte(r.Intn(256))
-	}
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
 func NewPopulatedApplicationDownlinks(r randyApplication, easy bool) *ApplicationDownlinks {
 	this := &ApplicationDownlinks{}
 	if r.Intn(10) != 0 {
-		v6 := r.Intn(5)
-		this.Downlinks = make([]*ApplicationDownlink, v6)
-		for i := 0; i < v6; i++ {
+		v4 := r.Intn(5)
+		this.Downlinks = make([]*ApplicationDownlink, v4)
+		for i := 0; i < v4; i++ {
 			this.Downlinks[i] = NewPopulatedApplicationDownlink(r, easy)
 		}
 	}
@@ -1459,14 +1161,14 @@ func NewPopulatedApplicationDownlinks(r randyApplication, easy bool) *Applicatio
 func NewPopulatedDownlinkQueueRequest(r randyApplication, easy bool) *DownlinkQueueRequest {
 	this := &DownlinkQueueRequest{}
 	if r.Intn(10) != 0 {
-		v7 := r.Intn(5)
-		this.Downlinks = make([]*ApplicationDownlink, v7)
-		for i := 0; i < v7; i++ {
+		v5 := r.Intn(5)
+		this.Downlinks = make([]*ApplicationDownlink, v5)
+		for i := 0; i < v5; i++ {
 			this.Downlinks[i] = NewPopulatedApplicationDownlink(r, easy)
 		}
 	}
-	v8 := NewPopulatedEndDeviceIdentifiers(r, easy)
-	this.EndDeviceIdentifiers = *v8
+	v6 := NewPopulatedEndDeviceIdentifiers(r, easy)
+	this.EndDeviceIdentifiers = *v6
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1491,9 +1193,9 @@ func randUTF8RuneApplication(r randyApplication) rune {
 	return rune(ru + 61)
 }
 func randStringApplication(r randyApplication) string {
-	v9 := r.Intn(100)
-	tmps := make([]rune, v9)
-	for i := 0; i < v9; i++ {
+	v7 := r.Intn(100)
+	tmps := make([]rune, v7)
+	for i := 0; i < v7; i++ {
 		tmps[i] = randUTF8RuneApplication(r)
 	}
 	return string(tmps)
@@ -1515,11 +1217,11 @@ func randFieldApplication(dAtA []byte, r randyApplication, fieldNumber int, wire
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateApplication(dAtA, uint64(key))
-		v10 := r.Int63()
+		v8 := r.Int63()
 		if r.Intn(2) == 0 {
-			v10 *= -1
+			v8 *= -1
 		}
-		dAtA = encodeVarintPopulateApplication(dAtA, uint64(v10))
+		dAtA = encodeVarintPopulateApplication(dAtA, uint64(v8))
 	case 1:
 		dAtA = encodeVarintPopulateApplication(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -1592,38 +1294,6 @@ func (m *ApplicationUp_UplinkMessage) Size() (n int) {
 	}
 	return n
 }
-func (m *ApplicationUplink) Size() (n int) {
-	var l int
-	_ = l
-	if m.FPort != 0 {
-		n += 1 + sovApplication(uint64(m.FPort))
-	}
-	if m.FCnt != 0 {
-		n += 1 + sovApplication(uint64(m.FCnt))
-	}
-	l = len(m.FrmPayload)
-	if l > 0 {
-		n += 1 + l + sovApplication(uint64(l))
-	}
-	return n
-}
-
-func (m *ApplicationDownlink) Size() (n int) {
-	var l int
-	_ = l
-	if m.FPort != 0 {
-		n += 1 + sovApplication(uint64(m.FPort))
-	}
-	if m.FCnt != 0 {
-		n += 1 + sovApplication(uint64(m.FCnt))
-	}
-	l = len(m.FrmPayload)
-	if l > 0 {
-		n += 1 + l + sovApplication(uint64(l))
-	}
-	return n
-}
-
 func (m *ApplicationDownlinks) Size() (n int) {
 	var l int
 	_ = l
@@ -2010,244 +1680,6 @@ func (m *ApplicationUp) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ApplicationUplink) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowApplication
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ApplicationUplink: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ApplicationUplink: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FPort", wireType)
-			}
-			m.FPort = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApplication
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.FPort |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FCnt", wireType)
-			}
-			m.FCnt = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApplication
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.FCnt |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FrmPayload", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApplication
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthApplication
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.FrmPayload = append(m.FrmPayload[:0], dAtA[iNdEx:postIndex]...)
-			if m.FrmPayload == nil {
-				m.FrmPayload = []byte{}
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipApplication(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthApplication
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ApplicationDownlink) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowApplication
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ApplicationDownlink: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ApplicationDownlink: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FPort", wireType)
-			}
-			m.FPort = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApplication
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.FPort |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FCnt", wireType)
-			}
-			m.FCnt = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApplication
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.FCnt |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FrmPayload", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApplication
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthApplication
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.FrmPayload = append(m.FrmPayload[:0], dAtA[iNdEx:postIndex]...)
-			if m.FrmPayload == nil {
-				m.FrmPayload = []byte{}
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipApplication(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthApplication
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *ApplicationDownlinks) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -2553,61 +1985,57 @@ func init() {
 }
 
 var fileDescriptorApplication = []byte{
-	// 886 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0x3d, 0x6c, 0xdb, 0x46,
-	0x14, 0xe6, 0xf9, 0xaf, 0xf1, 0x29, 0x32, 0x90, 0x8b, 0x6b, 0xa8, 0x8c, 0x71, 0x12, 0x38, 0xb9,
-	0x05, 0x42, 0x02, 0x4a, 0x0b, 0xb4, 0xcd, 0x50, 0x48, 0xb6, 0x83, 0xa6, 0x70, 0x53, 0x85, 0x70,
-	0x86, 0x06, 0x05, 0x58, 0x4a, 0x3c, 0x52, 0x84, 0x45, 0xde, 0x85, 0x3c, 0xc6, 0x08, 0x8a, 0x02,
-	0x41, 0xa7, 0x8c, 0x01, 0xba, 0x78, 0x29, 0xda, 0x31, 0x4b, 0x01, 0x8f, 0x41, 0xa7, 0x8c, 0x1e,
-	0x8d, 0x76, 0xc9, 0x94, 0x46, 0x64, 0x87, 0x8c, 0x19, 0x33, 0x16, 0x3a, 0x92, 0x12, 0x15, 0x49,
-	0x71, 0xda, 0xaa, 0x13, 0x75, 0xf7, 0xbe, 0xbf, 0xf7, 0xee, 0x28, 0x09, 0x7e, 0xe4, 0xb8, 0xbc,
-	0x1b, 0xb5, 0xd5, 0x0e, 0xf5, 0xb4, 0xfd, 0x2e, 0xd9, 0xef, 0xba, 0xbe, 0x13, 0xde, 0x20, 0xfc,
-	0x90, 0x06, 0x07, 0x1a, 0xe7, 0xbe, 0x66, 0x32, 0x57, 0x33, 0x19, 0xeb, 0xb9, 0x1d, 0x93, 0xbb,
-	0xd4, 0x57, 0x59, 0x40, 0x39, 0x45, 0x2b, 0x9c, 0xfb, 0xea, 0xdd, 0x2b, 0xf2, 0x5b, 0xd1, 0x5d,
-	0x8b, 0xf8, 0xdc, 0xb5, 0x5d, 0x12, 0x84, 0x29, 0x5d, 0xbe, 0xfa, 0x36, 0x34, 0x66, 0xde, 0xeb,
-	0x51, 0xd3, 0x32, 0x6c, 0x1a, 0x78, 0x26, 0xe7, 0x24, 0xc8, 0xc8, 0x97, 0x0b, 0x64, 0x87, 0x3a,
-	0x54, 0x13, 0xdb, 0xed, 0xc8, 0x16, 0x2b, 0xb1, 0x10, 0x9f, 0x32, 0xf8, 0xa6, 0x43, 0xa9, 0xd3,
-	0x23, 0x69, 0x23, 0xbe, 0x4f, 0xb9, 0xe8, 0x23, 0x4f, 0x72, 0x29, 0xab, 0x0e, 0x35, 0x88, 0xc7,
-	0xf8, 0xbd, 0xac, 0x58, 0x7d, 0xbd, 0xc8, 0x5d, 0x8f, 0x84, 0xdc, 0xf4, 0x58, 0x0a, 0x50, 0x92,
-	0x45, 0x58, 0x6a, 0x8c, 0x86, 0x83, 0x3e, 0x85, 0x8b, 0xae, 0x15, 0x56, 0x40, 0x0d, 0x6c, 0x95,
-	0xea, 0x58, 0x4d, 0x87, 0xa4, 0x16, 0x10, 0xd7, 0x47, 0xa3, 0x68, 0x9e, 0x3b, 0x79, 0x56, 0x95,
-	0x4e, 0x9f, 0x55, 0x81, 0x3e, 0x20, 0xa1, 0x1a, 0x2c, 0x59, 0x24, 0xec, 0x04, 0x2e, 0x1b, 0x00,
-	0x2b, 0x0b, 0x35, 0xb0, 0xb5, 0xaa, 0x17, 0xb7, 0xd0, 0x36, 0x84, 0x9d, 0x80, 0x98, 0x9c, 0x58,
-	0x86, 0xc9, 0x2b, 0x8b, 0xc2, 0x44, 0x56, 0xd3, 0x8c, 0x6a, 0x9e, 0x51, 0xdd, 0xcf, 0x33, 0xa6,
-	0x06, 0x0f, 0xff, 0xac, 0x02, 0x7d, 0x35, 0xe3, 0x35, 0xf8, 0x40, 0x24, 0x62, 0x56, 0x2e, 0xb2,
-	0xf4, 0x4f, 0x44, 0x32, 0x5e, 0x83, 0xa3, 0xab, 0xf0, 0x7c, 0xc4, 0x46, 0x07, 0x53, 0x59, 0xae,
-	0x81, 0xad, 0xb5, 0x7a, 0x25, 0x6f, 0xb8, 0x95, 0x9e, 0xdc, 0xb5, 0xbc, 0xae, 0x97, 0x22, 0x36,
-	0x5c, 0xa0, 0x0f, 0xe1, 0x46, 0x91, 0x6c, 0x30, 0x33, 0x30, 0x3d, 0x32, 0x90, 0x59, 0x11, 0x3d,
-	0xaf, 0x17, 0xc0, 0xad, 0xbc, 0x86, 0x3e, 0x83, 0x6b, 0x16, 0x3d, 0xf4, 0x0b, 0xa6, 0xef, 0x9c,
-	0x61, 0x5a, 0x1e, 0xe0, 0x47, 0xb6, 0x1f, 0xc3, 0xca, 0xb8, 0x40, 0xc1, 0xf8, 0x9c, 0x30, 0xde,
-	0x18, 0x23, 0x0c, 0xad, 0x95, 0xaf, 0x61, 0xb9, 0x70, 0x84, 0xb7, 0x18, 0x6a, 0xc2, 0xb5, 0x88,
-	0xf5, 0x5c, 0xff, 0xc0, 0xf0, 0x48, 0x18, 0x9a, 0x0e, 0xc9, 0x4e, 0xfc, 0xbd, 0x29, 0x27, 0x7e,
-	0x4b, 0x00, 0x3f, 0x97, 0xf4, 0x72, 0x4a, 0xf9, 0x32, 0x65, 0x34, 0x97, 0xe0, 0x42, 0xc4, 0x94,
-	0x6f, 0xe1, 0x85, 0x09, 0x2c, 0x7a, 0x17, 0xae, 0xd8, 0x06, 0xa3, 0x01, 0x17, 0xb2, 0x65, 0x7d,
-	0xd9, 0x6e, 0xd1, 0x80, 0xa3, 0x8b, 0x70, 0xd9, 0x36, 0x3a, 0x3e, 0x17, 0x57, 0xa3, 0xac, 0x2f,
-	0xd9, 0xdb, 0x3e, 0x47, 0x55, 0x58, 0xb2, 0x03, 0xcf, 0xc8, 0xde, 0x15, 0x71, 0x29, 0xce, 0xeb,
-	0xd0, 0x0e, 0xbc, 0x6c, 0x1c, 0x4a, 0x1b, 0x5e, 0x2c, 0x38, 0xec, 0xd0, 0x43, 0x7f, 0xfe, 0x1e,
-	0x37, 0xe1, 0xfa, 0x14, 0x8f, 0x10, 0x7d, 0x02, 0x57, 0xad, 0x7c, 0x51, 0x01, 0xb5, 0xc5, 0xad,
-	0x52, 0xfd, 0xd2, 0x94, 0x11, 0xe5, 0x04, 0x7d, 0x84, 0x56, 0x8e, 0x00, 0x5c, 0xcf, 0xf7, 0x6f,
-	0x46, 0x24, 0x22, 0x3a, 0xb9, 0x13, 0x91, 0x90, 0xff, 0x07, 0x4d, 0xb4, 0x0b, 0x21, 0xf1, 0x2d,
-	0xc3, 0x22, 0x77, 0xdd, 0x0e, 0x11, 0x1d, 0x96, 0xea, 0x9b, 0x39, 0x77, 0xd7, 0xb7, 0x76, 0x44,
-	0x61, 0xfa, 0x2b, 0xba, 0x4a, 0xf2, 0x7a, 0xfd, 0xf7, 0x05, 0x28, 0xdf, 0x08, 0xa7, 0x78, 0x89,
-	0x9c, 0x68, 0x6f, 0x22, 0x38, 0xeb, 0x99, 0x1d, 0x82, 0x86, 0x4e, 0xd3, 0xda, 0x92, 0x37, 0x26,
-	0x5e, 0xc1, 0xdd, 0xc1, 0x17, 0x11, 0xba, 0x0e, 0x2f, 0x8c, 0xe1, 0x5b, 0x51, 0xd8, 0xfd, 0x97,
-	0x52, 0x5f, 0xbd, 0x26, 0xb5, 0xe7, 0x86, 0x1c, 0xbd, 0xb1, 0x7f, 0x79, 0xf3, 0x0d, 0x93, 0x0d,
-	0xd1, 0x17, 0x10, 0x8d, 0x09, 0x6e, 0xf7, 0x88, 0x19, 0x9c, 0xa1, 0x38, 0x23, 0x5c, 0xfd, 0xb7,
-	0x65, 0x28, 0x37, 0x66, 0x0f, 0xf5, 0x18, 0xcc, 0x73, 0xaa, 0x4a, 0xfb, 0x87, 0x3f, 0xfe, 0xfa,
-	0x71, 0xe1, 0x1b, 0xe5, 0xb6, 0x66, 0x86, 0xc5, 0x5f, 0xb7, 0x50, 0xfb, 0x6e, 0x74, 0x43, 0xd4,
-	0x42, 0xc1, 0x70, 0xad, 0xef, 0xb5, 0x74, 0x7b, 0x1c, 0x93, 0x3e, 0xd2, 0x72, 0x96, 0xe0, 0xf2,
-	0x1d, 0x11, 0xf9, 0x57, 0x30, 0xb7, 0xa3, 0xcb, 0xf3, 0xca, 0xff, 0x67, 0xde, 0x9f, 0xc0, 0x9c,
-	0xef, 0x87, 0xb2, 0x27, 0x52, 0x5f, 0x43, 0x3b, 0x93, 0xa9, 0x67, 0x46, 0x9d, 0x9d, 0xef, 0x08,
-	0xcc, 0xef, 0xba, 0xe5, 0xd1, 0x3e, 0x98, 0x4b, 0xb4, 0xe6, 0xcf, 0xe0, 0xa4, 0x8f, 0xc1, 0x69,
-	0x1f, 0x83, 0xa7, 0x7d, 0x0c, 0x9e, 0xf7, 0x31, 0x78, 0xd1, 0xc7, 0xd2, 0xcb, 0x3e, 0x96, 0x5e,
-	0xf5, 0x31, 0xb8, 0x1f, 0x63, 0xe9, 0x41, 0x8c, 0xa5, 0x47, 0x31, 0x06, 0xc7, 0x31, 0x96, 0x1e,
-	0xc7, 0x18, 0x3c, 0x89, 0x31, 0x38, 0x89, 0x31, 0x38, 0x8d, 0x31, 0x78, 0x1a, 0x63, 0xe9, 0x79,
-	0x8c, 0xc1, 0x8b, 0x18, 0x4b, 0x2f, 0x63, 0x0c, 0x5e, 0xc5, 0x58, 0xba, 0x9f, 0x60, 0xe9, 0x41,
-	0x82, 0xc1, 0xc3, 0x04, 0x4b, 0x47, 0x09, 0x06, 0xbf, 0x24, 0x58, 0x7a, 0x94, 0x60, 0xe9, 0x38,
-	0xc1, 0xe0, 0x71, 0x82, 0xc1, 0x93, 0x04, 0x83, 0xdb, 0xef, 0x9f, 0xf5, 0x2f, 0x8a, 0x1d, 0x38,
-	0x83, 0x27, 0x6b, 0xb7, 0x57, 0x44, 0xff, 0x57, 0xfe, 0x0e, 0x00, 0x00, 0xff, 0xff, 0x30, 0x42,
-	0x51, 0xcf, 0xef, 0x09, 0x00, 0x00,
+	// 829 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0x3d, 0x4c, 0x23, 0x47,
+	0x18, 0xdd, 0xb1, 0x81, 0xe0, 0x71, 0x40, 0xca, 0x08, 0x21, 0x67, 0x41, 0x63, 0xcb, 0x95, 0x13,
+	0x89, 0x5d, 0xc9, 0x24, 0x52, 0x12, 0x8a, 0xc8, 0xe6, 0x47, 0x21, 0x22, 0x04, 0x2c, 0x28, 0x82,
+	0x22, 0x59, 0x6b, 0xef, 0xb0, 0x5e, 0x61, 0xef, 0x0e, 0xbb, 0xb3, 0x20, 0x14, 0x45, 0x42, 0xa9,
+	0x28, 0x91, 0xd2, 0xd0, 0x44, 0xb9, 0x92, 0xe6, 0x24, 0x4a, 0x74, 0x15, 0x25, 0x25, 0xba, 0x6b,
+	0xa8, 0x38, 0xbc, 0x7b, 0x05, 0x25, 0x25, 0xe5, 0x69, 0xff, 0xec, 0x35, 0xd8, 0xc0, 0xdd, 0xf9,
+	0xaa, 0xf1, 0xcc, 0xf7, 0xde, 0xfb, 0xde, 0xf7, 0x63, 0xd9, 0xf0, 0x7b, 0x45, 0x65, 0x35, 0xab,
+	0x22, 0x54, 0xf5, 0x86, 0xb8, 0x56, 0x23, 0x6b, 0x35, 0x55, 0x53, 0xcc, 0x65, 0xc2, 0x76, 0x75,
+	0x63, 0x4b, 0x64, 0x4c, 0x13, 0x25, 0xaa, 0x8a, 0x12, 0xa5, 0x75, 0xb5, 0x2a, 0x31, 0x55, 0xd7,
+	0x04, 0x6a, 0xe8, 0x4c, 0x47, 0x43, 0x8c, 0x69, 0xc2, 0xce, 0x34, 0xff, 0x2c, 0xba, 0x2a, 0x13,
+	0x8d, 0xa9, 0x9b, 0x2a, 0x31, 0x4c, 0x9f, 0xce, 0xe7, 0x9f, 0x43, 0x6b, 0x10, 0xd3, 0x94, 0x14,
+	0x12, 0x72, 0x66, 0x9e, 0xc3, 0xa1, 0xd2, 0x5e, 0x5d, 0x97, 0xe4, 0xf2, 0xa6, 0x6e, 0x34, 0x24,
+	0xc6, 0x88, 0x11, 0x90, 0xa7, 0x22, 0x64, 0x45, 0x57, 0x74, 0xd1, 0x7b, 0xae, 0x58, 0x9b, 0xde,
+	0xcd, 0xbb, 0x78, 0x9f, 0x02, 0xf8, 0xa4, 0xa2, 0xeb, 0x4a, 0x9d, 0xf8, 0xc5, 0x6b, 0x9a, 0xce,
+	0xbc, 0xda, 0x43, 0x27, 0x13, 0x41, 0xb4, 0xa5, 0x41, 0x1a, 0x94, 0xed, 0x05, 0xc1, 0xf4, 0xfd,
+	0x20, 0x53, 0x1b, 0xc4, 0x64, 0x52, 0x83, 0xfa, 0x80, 0xac, 0x13, 0x87, 0xc9, 0x42, 0xbb, 0xa1,
+	0xe8, 0x27, 0x18, 0x57, 0x65, 0x33, 0x05, 0x32, 0x20, 0x97, 0xcc, 0x63, 0xc1, 0x6f, 0xac, 0x10,
+	0x41, 0x2c, 0xb6, 0xdb, 0x57, 0x1c, 0x3e, 0xbf, 0x4a, 0x73, 0x17, 0x57, 0x69, 0x50, 0x72, 0x49,
+	0x28, 0x03, 0x93, 0x32, 0x31, 0xab, 0x86, 0x4a, 0x5d, 0x60, 0x2a, 0x96, 0x01, 0xb9, 0x44, 0x29,
+	0xfa, 0x84, 0x66, 0x21, 0xac, 0x1a, 0x44, 0x62, 0x44, 0x2e, 0x4b, 0x2c, 0x15, 0xf7, 0x92, 0xf0,
+	0x82, 0xef, 0x51, 0x08, 0x3d, 0x0a, 0x6b, 0xa1, 0x47, 0x3f, 0xc1, 0xe1, 0xdb, 0x34, 0x28, 0x25,
+	0x02, 0x5e, 0x81, 0xb9, 0x22, 0x16, 0x95, 0x43, 0x91, 0x81, 0x0f, 0x11, 0x09, 0x78, 0x05, 0x86,
+	0x66, 0xe0, 0x97, 0x16, 0x6d, 0x0f, 0x26, 0x35, 0x98, 0x01, 0xb9, 0xd1, 0x7c, 0x2a, 0x2c, 0x78,
+	0xc5, 0x9f, 0xdc, 0x42, 0x18, 0x2f, 0x25, 0x2d, 0xda, 0xba, 0xa0, 0xef, 0xe0, 0x78, 0x94, 0x5c,
+	0xa6, 0x92, 0x21, 0x35, 0x88, 0x2b, 0x33, 0xe4, 0xd5, 0x3c, 0x16, 0x01, 0xaf, 0x84, 0x31, 0xf4,
+	0x33, 0x1c, 0x95, 0xf5, 0x5d, 0x2d, 0x92, 0xf4, 0x8b, 0x27, 0x92, 0x8e, 0xb8, 0xf8, 0x76, 0xda,
+	0x1f, 0x60, 0xaa, 0x53, 0x20, 0x92, 0x78, 0xd8, 0x4b, 0x3c, 0xde, 0x41, 0x68, 0xa5, 0xce, 0xfe,
+	0x01, 0x47, 0x22, 0x23, 0x5c, 0xa7, 0xa8, 0x08, 0x47, 0x2d, 0x5a, 0x57, 0xb5, 0xad, 0x72, 0xb0,
+	0xd7, 0xc1, 0xc4, 0xbf, 0xee, 0x32, 0xf1, 0x75, 0x0f, 0xf8, 0x0b, 0x57, 0x1a, 0xf1, 0x29, 0xbf,
+	0xf9, 0x8c, 0xe2, 0x00, 0x8c, 0x59, 0x34, 0xbb, 0x0a, 0xc7, 0x22, 0xd8, 0x39, 0x7d, 0x57, 0x73,
+	0x31, 0x26, 0xfa, 0x11, 0x26, 0xe4, 0xf0, 0x92, 0x02, 0x99, 0x78, 0x2e, 0x99, 0x9f, 0xe8, 0x22,
+	0x1e, 0x12, 0x4a, 0x6d, 0x74, 0xf6, 0x08, 0xc0, 0xb1, 0xf0, 0x7d, 0xd5, 0x22, 0x16, 0x29, 0x91,
+	0x6d, 0x8b, 0x98, 0xec, 0x13, 0x34, 0xd1, 0x3c, 0x84, 0x44, 0x93, 0xcb, 0x32, 0xd9, 0x51, 0xab,
+	0xc4, 0x5b, 0xcd, 0x64, 0x7e, 0x32, 0xe4, 0xce, 0x6b, 0xf2, 0x9c, 0x17, 0xe8, 0xbe, 0xdc, 0x09,
+	0x12, 0xc6, 0xf3, 0xaf, 0x63, 0x90, 0x5f, 0x36, 0xbb, 0xe4, 0xf2, 0x7c, 0xa2, 0xa5, 0x07, 0xc6,
+	0x69, 0x5d, 0xaa, 0x12, 0xd4, 0xca, 0xd4, 0xad, 0x2c, 0x7e, 0xfc, 0xc1, 0xf2, 0xce, 0xbb, 0x5f,
+	0x61, 0xb4, 0x08, 0xbf, 0xea, 0xc0, 0xaf, 0x58, 0x66, 0xed, 0x23, 0xa5, 0x7e, 0xbf, 0x27, 0xb5,
+	0xa4, 0x9a, 0x0c, 0x3d, 0x5a, 0x3f, 0x3f, 0xf9, 0x48, 0x67, 0x4d, 0xf4, 0x2b, 0x44, 0x1d, 0x82,
+	0xb3, 0x75, 0x22, 0x19, 0x4f, 0x28, 0xf6, 0x30, 0x97, 0x7f, 0x35, 0x08, 0xf9, 0x42, 0xef, 0xa6,
+	0x9e, 0x80, 0x7e, 0x76, 0x35, 0x5b, 0xf9, 0xe7, 0xcd, 0xbb, 0x7f, 0x63, 0x7f, 0x66, 0x37, 0x44,
+	0xc9, 0x8c, 0xfe, 0x96, 0x98, 0xe2, 0x5f, 0xed, 0x0d, 0x11, 0x22, 0x81, 0xb2, 0x2a, 0xff, 0x2d,
+	0xfa, 0xcf, 0x9d, 0x18, 0xff, 0xf0, 0xc3, 0x81, 0x83, 0xa9, 0x6d, 0xcf, 0xf2, 0x4b, 0xd0, 0xb7,
+	0xd1, 0x85, 0x7e, 0xf9, 0xcf, 0xe9, 0xf7, 0x3f, 0xd0, 0xe7, 0xfd, 0xc8, 0x2e, 0x79, 0xae, 0x17,
+	0xd0, 0xdc, 0x43, 0xd7, 0x3d, 0xad, 0xf6, 0xf6, 0x77, 0x04, 0xfa, 0xb7, 0x6e, 0xa1, 0xb5, 0x6f,
+	0xfb, 0x62, 0xad, 0xf8, 0x3f, 0x38, 0x6f, 0x62, 0x70, 0xd1, 0xc4, 0xe0, 0xb2, 0x89, 0xc1, 0x75,
+	0x13, 0x83, 0x9b, 0x26, 0xe6, 0x6e, 0x9b, 0x98, 0xbb, 0x6b, 0x62, 0xb0, 0x6f, 0x63, 0xee, 0xc0,
+	0xc6, 0xdc, 0xb1, 0x8d, 0xc1, 0x89, 0x8d, 0xb9, 0x53, 0x1b, 0x83, 0x33, 0x1b, 0x83, 0x73, 0x1b,
+	0x83, 0x0b, 0x1b, 0x83, 0x4b, 0x1b, 0x73, 0xd7, 0x36, 0x06, 0x37, 0x36, 0xe6, 0x6e, 0x6d, 0x0c,
+	0xee, 0x6c, 0xcc, 0xed, 0x3b, 0x98, 0x3b, 0x70, 0x30, 0x38, 0x74, 0x30, 0x77, 0xe4, 0x60, 0xf0,
+	0xc2, 0xc1, 0xdc, 0xb1, 0x83, 0xb9, 0x13, 0x07, 0x83, 0x53, 0x07, 0x83, 0x33, 0x07, 0x83, 0x8d,
+	0x6f, 0x9e, 0xfa, 0xff, 0x41, 0xb7, 0x14, 0xf7, 0xa4, 0x95, 0xca, 0x90, 0x57, 0xff, 0xf4, 0xfb,
+	0x00, 0x00, 0x00, 0xff, 0xff, 0xf1, 0x6b, 0xc4, 0xbf, 0x5d, 0x09, 0x00, 0x00,
 }

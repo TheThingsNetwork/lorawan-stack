@@ -94,8 +94,8 @@ func (m *MACCommands) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 			if !ok {
 				return errors.Errorf("Unknown Uplink MAC command with CID 0x%x", cid)
 			}
-			if len(b) < int(payloadLen)+1 {
-				return errors.Errorf("Expected length of Uplink %s payload to be %d, got %d", cid, payloadLen-1, len(b)-1)
+			if len(b)-1 < int(payloadLen) {
+				return errors.Errorf("Expected length of Uplink %s payload to be %d, got %d", cid, payloadLen, len(b)-1)
 			}
 			rawPayload = b[:payloadLen+1]
 			b = b[payloadLen+1:]
@@ -159,8 +159,8 @@ func (m *MACCommands) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 			if !ok {
 				return errors.New("Unknown Downlink MAC command")
 			}
-			if len(b) < int(payloadLen)+1 {
-				return errors.Errorf("Expected length of Downlink %s payload to be %d, got %d", cid, payloadLen-1, len(b)-1)
+			if len(b)-1 < int(payloadLen) {
+				return errors.Errorf("Expected length of Downlink %s payload to be %d, got %d", cid, payloadLen, len(b)-1)
 			}
 			rawPayload = b[:payloadLen+1]
 			b = b[payloadLen+1:]

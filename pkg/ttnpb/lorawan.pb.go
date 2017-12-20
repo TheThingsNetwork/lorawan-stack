@@ -8,7 +8,7 @@ import golang_proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
-import google_protobuf3 "github.com/gogo/protobuf/types"
+import google_protobuf1 "github.com/gogo/protobuf/types"
 import _ "github.com/gogo/protobuf/types"
 
 import github_com_TheThingsNetwork_ttn_pkg_types "github.com/TheThingsNetwork/ttn/pkg/types"
@@ -637,7 +637,7 @@ type MACPayload struct {
 	FHDR           `protobuf:"bytes,1,opt,name=f_hdr,json=fHdr,embedded=f_hdr" json:"f_hdr"`
 	FPort          uint32                   `protobuf:"varint,2,opt,name=f_port,json=fPort,proto3" json:"f_port,omitempty"`
 	FRMPayload     []byte                   `protobuf:"bytes,3,opt,name=frm_payload,json=frmPayload,proto3" json:"frm_payload,omitempty"`
-	DecodedPayload *google_protobuf3.Struct `protobuf:"bytes,4,opt,name=decoded_payload,json=decodedPayload" json:"decoded_payload,omitempty"`
+	DecodedPayload *google_protobuf1.Struct `protobuf:"bytes,4,opt,name=decoded_payload,json=decodedPayload" json:"decoded_payload,omitempty"`
 }
 
 func (m *MACPayload) Reset()                    { *m = MACPayload{} }
@@ -659,7 +659,7 @@ func (m *MACPayload) GetFRMPayload() []byte {
 	return nil
 }
 
-func (m *MACPayload) GetDecodedPayload() *google_protobuf3.Struct {
+func (m *MACPayload) GetDecodedPayload() *google_protobuf1.Struct {
 	if m != nil {
 		return m.DecodedPayload
 	}
@@ -11802,7 +11802,7 @@ func (m *MACPayload) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.DecodedPayload == nil {
-				m.DecodedPayload = &google_protobuf3.Struct{}
+				m.DecodedPayload = &google_protobuf1.Struct{}
 			}
 			if err := m.DecodedPayload.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err

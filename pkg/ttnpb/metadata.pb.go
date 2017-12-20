@@ -8,7 +8,7 @@ import golang_proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
-import google_protobuf3 "github.com/gogo/protobuf/types"
+import google_protobuf1 "github.com/gogo/protobuf/types"
 import _ "github.com/gogo/protobuf/types"
 
 import time "time"
@@ -111,7 +111,7 @@ type RxMetadata struct {
 	// Advanced metadata fields
 	// - can be used for advanced information or experimental features that are not yet formally defined in the API
 	// - field names are written in snake_case
-	Advanced *google_protobuf3.Struct `protobuf:"bytes,99,opt,name=advanced" json:"advanced,omitempty"`
+	Advanced *google_protobuf1.Struct `protobuf:"bytes,99,opt,name=advanced" json:"advanced,omitempty"`
 }
 
 func (m *RxMetadata) Reset()                    { *m = RxMetadata{} }
@@ -210,7 +210,7 @@ func (m *RxMetadata) GetAESKeyID() string {
 	return ""
 }
 
-func (m *RxMetadata) GetAdvanced() *google_protobuf3.Struct {
+func (m *RxMetadata) GetAdvanced() *google_protobuf1.Struct {
 	if m != nil {
 		return m.Advanced
 	}
@@ -234,7 +234,7 @@ type TxMetadata struct {
 	// Advanced metadata fields
 	// - can be used for advanced information or experimental features that are not yet formally defined in the API
 	// - field names are written in snake_case
-	Advanced *google_protobuf3.Struct `protobuf:"bytes,99,opt,name=advanced" json:"advanced,omitempty"`
+	Advanced *google_protobuf1.Struct `protobuf:"bytes,99,opt,name=advanced" json:"advanced,omitempty"`
 }
 
 func (m *TxMetadata) Reset()                    { *m = TxMetadata{} }
@@ -270,7 +270,7 @@ func (m *TxMetadata) GetInvertPolarity() bool {
 	return false
 }
 
-func (m *TxMetadata) GetAdvanced() *google_protobuf3.Struct {
+func (m *TxMetadata) GetAdvanced() *google_protobuf1.Struct {
 	if m != nil {
 		return m.Advanced
 	}
@@ -926,7 +926,7 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 	}
 	this.AESKeyID = randStringMetadata(r)
 	if r.Intn(10) != 0 {
-		this.Advanced = google_protobuf3.NewPopulatedStruct(r, easy)
+		this.Advanced = google_protobuf1.NewPopulatedStruct(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -943,7 +943,7 @@ func NewPopulatedTxMetadata(r randyMetadata, easy bool) *TxMetadata {
 	this.EnableCRC = bool(r.Intn(2) == 0)
 	this.InvertPolarity = bool(r.Intn(2) == 0)
 	if r.Intn(10) != 0 {
-		this.Advanced = google_protobuf3.NewPopulatedStruct(r, easy)
+		this.Advanced = google_protobuf1.NewPopulatedStruct(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -1502,7 +1502,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Advanced == nil {
-				m.Advanced = &google_protobuf3.Struct{}
+				m.Advanced = &google_protobuf1.Struct{}
 			}
 			if err := m.Advanced.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1704,7 +1704,7 @@ func (m *TxMetadata) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Advanced == nil {
-				m.Advanced = &google_protobuf3.Struct{}
+				m.Advanced = &google_protobuf1.Struct{}
 			}
 			if err := m.Advanced.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err

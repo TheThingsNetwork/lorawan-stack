@@ -9,7 +9,7 @@ import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
-import google_protobuf1 "github.com/gogo/protobuf/types"
+import google_protobuf3 "github.com/gogo/protobuf/types"
 import google_protobuf4 "github.com/gogo/protobuf/types"
 
 import context "context"
@@ -131,10 +131,10 @@ type NsDeviceRegistryClient interface {
 	// If there are multiple matches, an error will be returned.
 	GetDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*EndDevice, error)
 	// SetDevice creates or updates the device
-	SetDevice(ctx context.Context, in *SetDeviceRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	SetDevice(ctx context.Context, in *SetDeviceRequest, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
 	// DeleteDevice deletes the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
-	DeleteDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	DeleteDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
 }
 
 type nsDeviceRegistryClient struct {
@@ -163,8 +163,8 @@ func (c *nsDeviceRegistryClient) GetDevice(ctx context.Context, in *EndDeviceIde
 	return out, nil
 }
 
-func (c *nsDeviceRegistryClient) SetDevice(ctx context.Context, in *SetDeviceRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *nsDeviceRegistryClient) SetDevice(ctx context.Context, in *SetDeviceRequest, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
+	out := new(google_protobuf3.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.NsDeviceRegistry/SetDevice", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -172,8 +172,8 @@ func (c *nsDeviceRegistryClient) SetDevice(ctx context.Context, in *SetDeviceReq
 	return out, nil
 }
 
-func (c *nsDeviceRegistryClient) DeleteDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *nsDeviceRegistryClient) DeleteDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
+	out := new(google_protobuf3.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.NsDeviceRegistry/DeleteDevice", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -190,10 +190,10 @@ type NsDeviceRegistryServer interface {
 	// If there are multiple matches, an error will be returned.
 	GetDevice(context.Context, *EndDeviceIdentifiers) (*EndDevice, error)
 	// SetDevice creates or updates the device
-	SetDevice(context.Context, *SetDeviceRequest) (*google_protobuf1.Empty, error)
+	SetDevice(context.Context, *SetDeviceRequest) (*google_protobuf3.Empty, error)
 	// DeleteDevice deletes the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
-	DeleteDevice(context.Context, *EndDeviceIdentifiers) (*google_protobuf1.Empty, error)
+	DeleteDevice(context.Context, *EndDeviceIdentifiers) (*google_protobuf3.Empty, error)
 }
 
 func RegisterNsDeviceRegistryServer(s *grpc.Server, srv NsDeviceRegistryServer) {
@@ -306,10 +306,10 @@ type AsDeviceRegistryClient interface {
 	// If there are multiple matches, an error will be returned.
 	GetDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*EndDevice, error)
 	// SetDevice creates or updates the device
-	SetDevice(ctx context.Context, in *SetDeviceRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	SetDevice(ctx context.Context, in *SetDeviceRequest, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
 	// DeleteDevice deletes the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
-	DeleteDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	DeleteDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
 }
 
 type asDeviceRegistryClient struct {
@@ -338,8 +338,8 @@ func (c *asDeviceRegistryClient) GetDevice(ctx context.Context, in *EndDeviceIde
 	return out, nil
 }
 
-func (c *asDeviceRegistryClient) SetDevice(ctx context.Context, in *SetDeviceRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *asDeviceRegistryClient) SetDevice(ctx context.Context, in *SetDeviceRequest, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
+	out := new(google_protobuf3.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.AsDeviceRegistry/SetDevice", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -347,8 +347,8 @@ func (c *asDeviceRegistryClient) SetDevice(ctx context.Context, in *SetDeviceReq
 	return out, nil
 }
 
-func (c *asDeviceRegistryClient) DeleteDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *asDeviceRegistryClient) DeleteDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
+	out := new(google_protobuf3.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.AsDeviceRegistry/DeleteDevice", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -365,10 +365,10 @@ type AsDeviceRegistryServer interface {
 	// If there are multiple matches, an error will be returned.
 	GetDevice(context.Context, *EndDeviceIdentifiers) (*EndDevice, error)
 	// SetDevice creates or updates the device
-	SetDevice(context.Context, *SetDeviceRequest) (*google_protobuf1.Empty, error)
+	SetDevice(context.Context, *SetDeviceRequest) (*google_protobuf3.Empty, error)
 	// DeleteDevice deletes the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
-	DeleteDevice(context.Context, *EndDeviceIdentifiers) (*google_protobuf1.Empty, error)
+	DeleteDevice(context.Context, *EndDeviceIdentifiers) (*google_protobuf3.Empty, error)
 }
 
 func RegisterAsDeviceRegistryServer(s *grpc.Server, srv AsDeviceRegistryServer) {
@@ -481,10 +481,10 @@ type JsDeviceRegistryClient interface {
 	// If there are multiple matches, an error will be returned.
 	GetDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*EndDevice, error)
 	// SetDevice creates or updates the device
-	SetDevice(ctx context.Context, in *SetDeviceRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	SetDevice(ctx context.Context, in *SetDeviceRequest, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
 	// DeleteDevice deletes the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
-	DeleteDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	DeleteDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
 }
 
 type jsDeviceRegistryClient struct {
@@ -513,8 +513,8 @@ func (c *jsDeviceRegistryClient) GetDevice(ctx context.Context, in *EndDeviceIde
 	return out, nil
 }
 
-func (c *jsDeviceRegistryClient) SetDevice(ctx context.Context, in *SetDeviceRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *jsDeviceRegistryClient) SetDevice(ctx context.Context, in *SetDeviceRequest, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
+	out := new(google_protobuf3.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.JsDeviceRegistry/SetDevice", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -522,8 +522,8 @@ func (c *jsDeviceRegistryClient) SetDevice(ctx context.Context, in *SetDeviceReq
 	return out, nil
 }
 
-func (c *jsDeviceRegistryClient) DeleteDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *jsDeviceRegistryClient) DeleteDevice(ctx context.Context, in *EndDeviceIdentifiers, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
+	out := new(google_protobuf3.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.JsDeviceRegistry/DeleteDevice", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -540,10 +540,10 @@ type JsDeviceRegistryServer interface {
 	// If there are multiple matches, an error will be returned.
 	GetDevice(context.Context, *EndDeviceIdentifiers) (*EndDevice, error)
 	// SetDevice creates or updates the device
-	SetDevice(context.Context, *SetDeviceRequest) (*google_protobuf1.Empty, error)
+	SetDevice(context.Context, *SetDeviceRequest) (*google_protobuf3.Empty, error)
 	// DeleteDevice deletes the device that matches the given identifiers.
 	// If there are multiple matches, an error will be returned.
-	DeleteDevice(context.Context, *EndDeviceIdentifiers) (*google_protobuf1.Empty, error)
+	DeleteDevice(context.Context, *EndDeviceIdentifiers) (*google_protobuf3.Empty, error)
 }
 
 func RegisterJsDeviceRegistryServer(s *grpc.Server, srv JsDeviceRegistryServer) {

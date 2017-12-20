@@ -35,8 +35,6 @@ It is generated from these files:
 It has these top-level messages:
 	Application
 	ApplicationUp
-	ApplicationUplink
-	ApplicationDownlink
 	ApplicationDownlinks
 	DownlinkQueueRequest
 	APIKey
@@ -147,6 +145,8 @@ It has these top-level messages:
 	ProcessDownlinkMessageRequest
 	UplinkMessage
 	DownlinkMessage
+	ApplicationUplink
+	ApplicationDownlink
 	RxMetadata
 	TxMetadata
 	Location

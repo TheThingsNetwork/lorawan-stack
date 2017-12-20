@@ -14,7 +14,6 @@
 
 syntax = "proto3";
 
-import "github.com/TheThingsNetwork/ttn/api/end_device.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/lorawan.proto";
 import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
@@ -140,4 +139,18 @@ message DownlinkMessage {
 
   // Tx metadata for the gateway
   TxMetadata tx_metadata = 5 [(gogoproto.nullable) = false];
+}
+
+message ApplicationUplink {
+  uint32 f_port = 1;
+  uint32 f_cnt = 2;
+  bytes frm_payload = 3;
+  // TODO: Add Metadata
+}
+
+message ApplicationDownlink {
+  uint32 f_port = 1;
+  uint32 f_cnt = 2;
+  bytes frm_payload = 3;
+  // TODO: Add "hints" for NS
 }

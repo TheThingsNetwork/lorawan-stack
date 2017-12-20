@@ -8,7 +8,7 @@ import golang_proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
-import google_protobuf1 "github.com/gogo/protobuf/types"
+import google_protobuf3 "github.com/gogo/protobuf/types"
 
 import context "context"
 import grpc "google.golang.org/grpc"
@@ -30,9 +30,9 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for GsNs service
 
 type GsNsClient interface {
-	StartServingGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
-	StopServingGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
-	HandleUplink(ctx context.Context, in *UplinkMessage, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	StartServingGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
+	StopServingGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
+	HandleUplink(ctx context.Context, in *UplinkMessage, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
 }
 
 type gsNsClient struct {
@@ -43,8 +43,8 @@ func NewGsNsClient(cc *grpc.ClientConn) GsNsClient {
 	return &gsNsClient{cc}
 }
 
-func (c *gsNsClient) StartServingGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *gsNsClient) StartServingGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
+	out := new(google_protobuf3.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.GsNs/StartServingGateway", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -52,8 +52,8 @@ func (c *gsNsClient) StartServingGateway(ctx context.Context, in *GatewayIdentif
 	return out, nil
 }
 
-func (c *gsNsClient) StopServingGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *gsNsClient) StopServingGateway(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
+	out := new(google_protobuf3.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.GsNs/StopServingGateway", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -61,8 +61,8 @@ func (c *gsNsClient) StopServingGateway(ctx context.Context, in *GatewayIdentifi
 	return out, nil
 }
 
-func (c *gsNsClient) HandleUplink(ctx context.Context, in *UplinkMessage, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *gsNsClient) HandleUplink(ctx context.Context, in *UplinkMessage, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
+	out := new(google_protobuf3.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.GsNs/HandleUplink", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -73,9 +73,9 @@ func (c *gsNsClient) HandleUplink(ctx context.Context, in *UplinkMessage, opts .
 // Server API for GsNs service
 
 type GsNsServer interface {
-	StartServingGateway(context.Context, *GatewayIdentifiers) (*google_protobuf1.Empty, error)
-	StopServingGateway(context.Context, *GatewayIdentifiers) (*google_protobuf1.Empty, error)
-	HandleUplink(context.Context, *UplinkMessage) (*google_protobuf1.Empty, error)
+	StartServingGateway(context.Context, *GatewayIdentifiers) (*google_protobuf3.Empty, error)
+	StopServingGateway(context.Context, *GatewayIdentifiers) (*google_protobuf3.Empty, error)
+	HandleUplink(context.Context, *UplinkMessage) (*google_protobuf3.Empty, error)
 }
 
 func RegisterGsNsServer(s *grpc.Server, srv GsNsServer) {

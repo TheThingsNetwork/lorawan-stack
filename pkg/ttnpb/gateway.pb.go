@@ -9,7 +9,7 @@ import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/gogo/protobuf/types"
-import google_protobuf3 "github.com/gogo/protobuf/types"
+import google_protobuf1 "github.com/gogo/protobuf/types"
 import _ "github.com/gogo/protobuf/types"
 
 import time "time"
@@ -378,7 +378,7 @@ type GatewayStatus struct {
 	// Advanced metadata fields
 	// - can be used for advanced information or experimental features that are not yet formally defined in the API
 	// - field names are written in snake_case
-	Advanced *google_protobuf3.Struct `protobuf:"bytes,99,opt,name=advanced" json:"advanced,omitempty"`
+	Advanced *google_protobuf1.Struct `protobuf:"bytes,99,opt,name=advanced" json:"advanced,omitempty"`
 }
 
 func (m *GatewayStatus) Reset()                    { *m = GatewayStatus{} }
@@ -442,7 +442,7 @@ func (m *GatewayStatus) GetMetrics() map[string]float32 {
 	return nil
 }
 
-func (m *GatewayStatus) GetAdvanced() *google_protobuf3.Struct {
+func (m *GatewayStatus) GetAdvanced() *google_protobuf1.Struct {
 	if m != nil {
 		return m.Advanced
 	}
@@ -1904,7 +1904,7 @@ func NewPopulatedGatewayStatus(r randyGateway, easy bool) *GatewayStatus {
 		}
 	}
 	if r.Intn(10) != 0 {
-		this.Advanced = google_protobuf3.NewPopulatedStruct(r, easy)
+		this.Advanced = google_protobuf1.NewPopulatedStruct(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -3720,7 +3720,7 @@ func (m *GatewayStatus) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Advanced == nil {
-				m.Advanced = &google_protobuf3.Struct{}
+				m.Advanced = &google_protobuf1.Struct{}
 			}
 			if err := m.Advanced.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err

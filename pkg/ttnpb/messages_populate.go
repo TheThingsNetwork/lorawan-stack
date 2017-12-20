@@ -20,15 +20,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 )
 
-type randyMessages interface {
-	Float32() float32
-	Float64() float64
-	Int63() int64
-	Int31() int32
-	Uint32() uint32
-	Intn(n int) int
-}
-
 func NewPopulatedUplinkMessage(r randyMessages, easy bool) *UplinkMessage {
 	defer func() {
 		if r := recover(); r != nil {

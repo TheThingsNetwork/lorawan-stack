@@ -9,7 +9,7 @@ import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/gogo/protobuf/types"
-import google_protobuf1 "github.com/gogo/protobuf/types"
+import google_protobuf3 "github.com/gogo/protobuf/types"
 
 import time "time"
 
@@ -984,7 +984,7 @@ type NsGsClient interface {
 	// ScheduleDownlink instructs the gateway server to schedule a downlink message.
 	// The gateway server may refuse if there are any conflicts in the schedule or
 	// if a duty cycle prevents the gateway from transmitting.
-	ScheduleDownlink(ctx context.Context, in *DownlinkMessage, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	ScheduleDownlink(ctx context.Context, in *DownlinkMessage, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
 }
 
 type nsGsClient struct {
@@ -995,8 +995,8 @@ func NewNsGsClient(cc *grpc.ClientConn) NsGsClient {
 	return &nsGsClient{cc}
 }
 
-func (c *nsGsClient) ScheduleDownlink(ctx context.Context, in *DownlinkMessage, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
-	out := new(google_protobuf1.Empty)
+func (c *nsGsClient) ScheduleDownlink(ctx context.Context, in *DownlinkMessage, opts ...grpc.CallOption) (*google_protobuf3.Empty, error) {
+	out := new(google_protobuf3.Empty)
 	err := grpc.Invoke(ctx, "/ttn.v3.NsGs/ScheduleDownlink", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -1010,7 +1010,7 @@ type NsGsServer interface {
 	// ScheduleDownlink instructs the gateway server to schedule a downlink message.
 	// The gateway server may refuse if there are any conflicts in the schedule or
 	// if a duty cycle prevents the gateway from transmitting.
-	ScheduleDownlink(context.Context, *DownlinkMessage) (*google_protobuf1.Empty, error)
+	ScheduleDownlink(context.Context, *DownlinkMessage) (*google_protobuf3.Empty, error)
 }
 
 func RegisterNsGsServer(s *grpc.Server, srv NsGsServer) {

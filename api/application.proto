@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
+import "github.com/TheThingsNetwork/ttn/api/messages.proto";
 import "github.com/TheThingsNetwork/ttn/api/payload_formatter.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
@@ -58,20 +59,6 @@ message ApplicationUp {
     // Downlink not acked
     // Downlink queue invalidated (LoRaWAN 1.0)
   }
-}
-
-message ApplicationUplink {
-  uint32 f_port = 1;
-  uint32 f_cnt = 2;
-  bytes frm_payload = 3;
-  // TODO: Add Metadata
-}
-
-message ApplicationDownlink {
-  uint32 f_port = 1;
-  uint32 f_cnt = 2;
-  bytes frm_payload = 3;
-  // TODO: Add "hints" for NS
 }
 
 message ApplicationDownlinks {
