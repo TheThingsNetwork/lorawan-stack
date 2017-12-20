@@ -4,7 +4,6 @@ package joinserver
 
 import (
 	"encoding/binary"
-	"fmt"
 	"math"
 	"time"
 
@@ -145,7 +144,6 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 
 	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.NetworkServerURL {
-		fmt.Println(rpcmetadata.FromIncomingContext(ctx).NetAddress)
 		return nil, errors.New("Network Server URL mismatch")
 	}
 
@@ -317,7 +315,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	dev.UsedDevNonces = append(dev.UsedDevNonces, uint32(dn))
 	dev.NextJoinNonce++
 	dev.EndDevice.Session = &ttnpb.Session{
-		StartedAt:   time.Now(),
+		StartedAt:   time.Now().UTC(),
 		DevAddr:     &devAddr,
 		SessionKeys: resp.SessionKeys,
 	}
@@ -372,13 +370,15 @@ func (js *JoinServer) GetNwkKeys(ctx context.Context, req *ttnpb.SessionKeyReque
 
 	s := dev.GetSession()
 	if s == nil {
-		if s = dev.GetSessionFallback(); s == nil {
-			return nil, errors.New("Device has no session associated")
-		}
+		return nil, errors.New("Device has no session associated")
 	}
 	if s.GetSessionKeyID() != req.GetSessionKeyID() {
-		return nil, errors.New("Session key ID mismatch")
+		s = dev.GetSessionFallback()
+		if s == nil || s.GetSessionKeyID() != req.GetSessionKeyID() {
+			return nil, errors.New("Session key ID mismatch")
+		}
 	}
+
 	nwkSEncKey := s.GetNwkSEncKey()
 	if nwkSEncKey == nil {
 		return nil, errors.New("NwkSEncKey not found")

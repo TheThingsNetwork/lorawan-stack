@@ -106,13 +106,13 @@ func FromMetadata(md metadata.MD) (m MD) {
 	return
 }
 
-// FromIncomingContext returns the TTN metadata from the outgoing context.Context
+// FromOutgoingContext returns the TTN metadata from the outgoing context.Context
 func FromOutgoingContext(ctx context.Context) (m MD) {
 	md, _ := metadata.FromOutgoingContext(ctx)
 	return FromMetadata(md)
 }
 
-// FromOutgoingContext returns the TTN metadata from the incoming context.Context
+// FromIncomingContext returns the TTN metadata from the incoming context.Context
 func FromIncomingContext(ctx context.Context) (m MD) {
 	md, _ := metadata.FromIncomingContext(ctx)
 	return FromMetadata(md)
