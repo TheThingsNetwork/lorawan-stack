@@ -19,9 +19,10 @@ func init() {
 		);
 
 		CREATE TABLE IF NOT EXISTS applications_api_keys_rights (
-			key       STRING NOT NULL REFERENCES applications_api_keys(key),
-			"right"   STRING NOT NULL,
-			PRIMARY KEY(key, "right")
+			application_id   STRING(36) NOT NULL REFERENCES applications(application_id),
+			key_name         STRING(36) NOT NULL,
+			"right"          STRING NOT NULL,
+			PRIMARY KEY(application_id, key_name, "right")
 		);
 
 		CREATE TABLE IF NOT EXISTS applications_collaborators (
@@ -34,6 +35,7 @@ func init() {
 
 	const backwards = `
 		DROP TABLE IF EXISTS applications_collaborators;
+		DROP TABLE IF EXISTS applications_api_keys_rights;
 		DROP TABLE IF EXISTS applications_api_keys;
 		DROP TABLE IF EXISTS applications;
 	`

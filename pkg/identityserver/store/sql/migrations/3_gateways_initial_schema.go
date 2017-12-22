@@ -54,9 +54,10 @@ func init() {
 			UNIQUE(gateway_id, key_name)
 		);
 		CREATE TABLE IF NOT EXISTS gateways_api_keys_rights (
-			key       STRING NOT NULL REFERENCES gateways_api_keys(key),
-			"right"   STRING NOT NULL,
-			PRIMARY KEY(key, "right")
+			gateway_id   STRING(36) NOT NULL REFERENCES gateways(gateway_id),
+			key_name     STRING(36) NOT NULL,
+			"right"      STRING NOT NULL,
+			PRIMARY KEY(gateway_id, key_name, "right")
 		);
 	`
 

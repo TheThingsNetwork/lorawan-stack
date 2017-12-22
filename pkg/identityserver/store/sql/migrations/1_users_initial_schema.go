@@ -33,9 +33,10 @@ func init() {
 		);
 
 		CREATE TABLE IF NOT EXISTS users_api_keys_rights (
-			key       STRING NOT NULL REFERENCES users_api_keys(key),
-			"right"   STRING NOT NULL,
-			PRIMARY KEY(key, "right")
+			user_id    STRING(36) NOT NULL REFERENCES users(user_id),
+			key_name   STRING(36) NOT NULL,
+			"right"    STRING NOT NULL,
+			PRIMARY KEY(user_id, key_name, "right")
 		);
 	`
 

@@ -32,7 +32,7 @@ func (s *apiKeysStore) SaveAPIKey(entityID string, key *ttnpb.APIKey) error {
 			return err
 		}
 
-		return s.saveAPIKeyRights(tx, key.Key, key.Rights)
+		return s.saveAPIKeyRights(tx, entityID, key.Name, key.Rights)
 	})
 	return err
 }
@@ -54,31 +54,34 @@ func (s *apiKeysStore) saveAPIKey(q db.QueryContext, entityID string, key *ttnpb
 	return err
 }
 
-func (s *apiKeysStore) saveAPIKeyRights(q db.QueryContext, key string, rights []ttnpb.Right) error {
-	query, args := s.saveAPIKeyRightsQuery(key, rights)
+func (s *apiKeysStore) saveAPIKeyRights(q db.QueryContext, entityID, keyName string, rights []ttnpb.Right) error {
+	query, args := s.saveAPIKeyRightsQuery(entityID, keyName, rights)
 	_, err := q.Exec(query, args...)
 	return err
 }
 
-func (s *apiKeysStore) saveAPIKeyRightsQuery(key string, rights []ttnpb.Right) (string, []interface{}) {
-	args := make([]interface{}, 1+len(rights))
-	args[0] = key
+func (s *apiKeysStore) saveAPIKeyRightsQuery(entityID, keyName string, rights []ttnpb.Right) (string, []interface{}) {
+	args := make([]interface{}, 2+len(rights))
+	args[0] = entityID
+	args[1] = keyName
 
 	boundValues := make([]string, len(rights))
 
 	for i, right := range rights {
-		args[i+1] = right
-		boundValues[i] = fmt.Sprintf("($1, $%d)", i+2)
+		args[i+2] = right
+		boundValues[i] = fmt.Sprintf("($1, $2, $%d)", i+3)
 	}
 
 	query := fmt.Sprintf(`
 		INSERT
-			INTO %ss_api_keys_rights (key, "right")
+			INTO %ss_api_keys_rights (%s, key_name, "right")
 			VALUES %s
-			ON CONFLICT (key, "right")
+			ON CONFLICT (%s, key_name, "right")
 			DO NOTHING`,
 		s.entity,
-		strings.Join(boundValues, ", "))
+		s.foreignKey,
+		strings.Join(boundValues, ", "),
+		s.foreignKey)
 
 	return query, args
 }
@@ -92,7 +95,7 @@ func (s *apiKeysStore) GetAPIKey(entityID, keyName string) (*ttnpb.APIKey, error
 			return err
 		}
 
-		key.Rights, err = s.getAPIKeyRights(tx, key.Key)
+		key.Rights, err = s.getAPIKeyRights(tx, entityID, keyName)
 		return err
 	})
 	if err != nil {
@@ -124,7 +127,7 @@ func (s *apiKeysStore) getAPIKey(q db.QueryContext, entityID, keyName string) (*
 	return res, nil
 }
 
-func (s *apiKeysStore) getAPIKeyRights(q db.QueryContext, key string) ([]ttnpb.Right, error) {
+func (s *apiKeysStore) getAPIKeyRights(q db.QueryContext, entityID, keyName string) ([]ttnpb.Right, error) {
 	var res []ttnpb.Right
 	err := q.Select(
 		&res,
@@ -132,8 +135,9 @@ func (s *apiKeysStore) getAPIKeyRights(q db.QueryContext, key string) ([]ttnpb.R
 			SELECT
 				"right"
 			FROM %ss_api_keys_rights
-			WHERE key = $1`, s.entity),
-		key)
+			WHERE %s = $1 AND key_name = $2`, s.entity, s.foreignKey),
+		entityID,
+		keyName)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +154,7 @@ func (s *apiKeysStore) ListAPIKeys(entityID string) ([]*ttnpb.APIKey, error) {
 		}
 
 		for i, key := range res {
-			res[i].Rights, err = s.getAPIKeyRights(tx, key.Key)
+			res[i].Rights, err = s.getAPIKeyRights(tx, entityID, key.Name)
 			if err != nil {
 				return err
 			}
@@ -183,29 +187,19 @@ func (s *apiKeysStore) listAPIKeys(q db.QueryContext, entityID string) ([]*ttnpb
 
 func (s *apiKeysStore) UpdateAPIKeyRights(entityID, keyName string, rights []ttnpb.Right) error {
 	err := s.transact(func(tx *db.Tx) error {
-		key, err := s.getAPIKey(tx, entityID, keyName)
+		err := s.deleteAPIKeyRights(tx, entityID, keyName)
 		if err != nil {
 			return err
 		}
 
-		err = s.deleteAPIKeyRights(tx, key.Key)
-		if err != nil {
-			return err
-		}
-
-		return s.saveAPIKeyRights(tx, key.Key, rights)
+		return s.saveAPIKeyRights(tx, entityID, keyName, rights)
 	})
 	return err
 }
 
 func (s *apiKeysStore) DeleteAPIKey(entityID, keyName string) error {
 	err := s.transact(func(tx *db.Tx) error {
-		key, err := s.getAPIKey(tx, entityID, keyName)
-		if err != nil {
-			return err
-		}
-
-		err = s.deleteAPIKeyRights(tx, key.Key)
+		err := s.deleteAPIKeyRights(tx, entityID, keyName)
 		if err != nil {
 			return err
 		}
@@ -234,12 +228,34 @@ func (s *apiKeysStore) deleteAPIKey(q db.QueryContext, entityID, keyName string)
 	return err
 }
 
-func (s *apiKeysStore) deleteAPIKeyRights(q db.QueryContext, key string) error {
+func (s *apiKeysStore) deleteAPIKeyRights(q db.QueryContext, entityID, keyName string) error {
 	_, err := q.Exec(
 		fmt.Sprintf(`
 			DELETE
 				FROM %ss_api_keys_rights
-				WHERE key = $1`, s.entity),
-		key)
+				WHERE %s = $1 AND key_name = $2`, s.entity, s.foreignKey),
+		entityID,
+		keyName)
+	return err
+}
+
+func (s *apiKeysStore) deleteAPIKeys(q db.QueryContext, entityID string) error {
+	_, err := q.Exec(
+		fmt.Sprintf(`
+			DELETE
+				FROM %ss_api_keys_rights
+				WHERE %s = $1`, s.entity, s.foreignKey),
+		entityID)
+	if err != nil {
+		return err
+	}
+
+	_, err = q.Exec(
+		fmt.Sprintf(`
+			DELETE
+				FROM %ss_api_keys
+				WHERE %s = $1`, s.entity, s.foreignKey),
+		entityID)
+
 	return err
 }
