@@ -210,3 +210,48 @@ func TestApplicationUpdate(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(found.GetApplication().Description, should.Equal, app.Description)
 }
+
+func TestApplicationDelete(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore(t)
+
+	userID := testUsers()["bob"].UserID
+	appID := "delete-test"
+
+	testApplicationDeleteFeedDatabase(t, userID, appID)
+
+	err := s.Applications.Delete(appID)
+	a.So(err, should.BeNil)
+
+	found, err := s.Applications.GetByID(appID, applicationFactory)
+	a.So(err, should.NotBeNil)
+	a.So(ErrApplicationNotFound.Describes(err), should.BeTrue)
+	a.So(found, should.BeNil)
+}
+
+func testApplicationDeleteFeedDatabase(t *testing.T, userID, appID string) {
+	a := assertions.New(t)
+	s := testStore(t)
+
+	app := &ttnpb.Application{
+		ApplicationIdentifier: ttnpb.ApplicationIdentifier{appID},
+	}
+	err := s.Applications.Create(app)
+	a.So(err, should.BeNil)
+
+	collaborator := &ttnpb.ApplicationCollaborator{
+		ApplicationIdentifier: app.ApplicationIdentifier,
+		UserIdentifier:        ttnpb.UserIdentifier{userID},
+		Rights:                []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
+	}
+	err = s.Applications.SetCollaborator(collaborator)
+	a.So(err, should.BeNil)
+
+	key := &ttnpb.APIKey{
+		Name:   "foo",
+		Key:    "123",
+		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
+	}
+	err = s.Applications.SaveAPIKey(appID, key)
+	a.So(err, should.BeNil)
+}

@@ -25,10 +25,9 @@ type ApplicationStore interface {
 	// Update updates the application.
 	Update(app types.Application) error
 
-	// TODO(gomezjdaniel): wait for CockroachDB to introduce 'ON DELETE CASCADE'
-	// 		-> https://github.com/cockroachdb/cockroach/issues/14848
+	// TODO(gomezjdaniel#274): use sql 'ON DELETE CASCADE' when CockroachDB implements it.
 	// Delete deletes an application.
-	//Delete(appID string) error
+	Delete(appID string) error
 
 	// SaveAPIKey stores an API Key attached to an application.
 	SaveAPIKey(appID string, key *ttnpb.APIKey) error

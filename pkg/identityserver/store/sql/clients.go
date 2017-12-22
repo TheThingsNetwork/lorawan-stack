@@ -202,6 +202,54 @@ func (s *ClientStore) update(q db.QueryContext, client types.Client) error {
 	return err
 }
 
+// Delete deletes an client.
+func (s *ClientStore) Delete(clientID string) error {
+	err := s.transact(func(tx *db.Tx) error {
+		oauth, ok := s.store().OAuth.(*OAuthStore)
+		if !ok {
+			return errors.Errorf("Expected ptr to OAuthStore but got %T", s.store().OAuth)
+		}
+
+		err := oauth.deleteAuthorizationCodesByClient(tx, clientID)
+		if err != nil {
+			return err
+		}
+
+		err = oauth.deleteAccessTokensByClient(tx, clientID)
+		if err != nil {
+			return err
+		}
+
+		err = oauth.deleteRefreshTokensByClient(tx, clientID)
+		if err != nil {
+			return err
+		}
+
+		return s.delete(tx, clientID)
+	})
+
+	return err
+}
+
+// delete deletes the client itself. All rows in other tables that references
+// this entity must be delete before this one gets deleted.
+func (s *ClientStore) delete(q db.QueryContext, clientID string) error {
+	id := new(string)
+	err := q.SelectOne(
+		id,
+		`DELETE
+			FROM clients
+			WHERE client_id = $1
+			RETURNING client_id`,
+		clientID)
+	if db.IsNoRows(err) {
+		return ErrClientNotFound.New(errors.Attributes{
+			"client_id": clientID,
+		})
+	}
+	return err
+}
+
 // LoadAttributes loads the extra attributes in cli if it is a store.Attributer.
 func (s *ClientStore) LoadAttributes(clientID string, cli types.Client) error {
 	return s.loadAttributes(s.queryer(), clientID, cli)
@@ -217,7 +265,7 @@ func (s *ClientStore) loadAttributes(q db.QueryContext, clientID string, cli typ
 }
 
 // StoreAttributes store the extra attributes of cli if it is a store.Attributer
-// and writes the resulting application in result.
+// and writes the resulting client in result.
 func (s *ClientStore) StoreAttributes(clientID string, cli, result types.Client) error {
 	return s.storeAttributes(s.queryer(), clientID, cli, result)
 }

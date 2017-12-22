@@ -19,10 +19,9 @@ type ClientStore interface {
 	// Update updates the client.
 	Update(client types.Client) error
 
-	// TODO(gomezjdaniel): wait for CockroachDB to introduce 'ON DELETE CASCADE'
-	// 		-> https://github.com/cockroachdb/cockroach/issues/14848
+	// TODO(gomezjdaniel#274): use sql 'ON DELETE CASCADE' when CockroachDB implements it.
 	// Delete deletes a client.
-	//Delete(clientID string) error
+	Delete(clientID string) error
 
 	// LoadAttributes loads extra attributes into the Client if it's an Attributer.
 	LoadAttributes(clientID string, client types.Client) error

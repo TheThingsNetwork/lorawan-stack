@@ -25,10 +25,9 @@ type GatewayStore interface {
 	// Update updates the gateway.
 	Update(gtw types.Gateway) error
 
-	// TODO(gomezjdaniel): wait for CockroachDB to introduce 'ON DELETE CASCADE'
-	// 		-> https://github.com/cockroachdb/cockroach/issues/14848
+	// TODO(gomezjdaniel#274): use sql 'ON DELETE CASCADE' when CockroachDB implements it.
 	// Delete deletes a gateway.
-	//Delete(gtwID string) error
+	Delete(gtwID string) error
 
 	// SaveAPIKey stores an API Key attached to a gateway.
 	SaveAPIKey(gtwID string, key *ttnpb.APIKey) error

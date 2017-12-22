@@ -173,10 +173,10 @@ func TestOAuthAuthorizedClients(t *testing.T) {
 		a.So(found[0], test.ShouldBeClientIgnoringAutoFields, client)
 	}
 
-	/*err = s.OAuth.RevokeAuthorizedClient(userID, client.ClientID)
+	err = s.OAuth.RevokeAuthorizedClient(userID, client.ClientID)
 	a.So(err, should.BeNil)
 
 	err = s.OAuth.RevokeAuthorizedClient(userID, client.ClientID)
 	a.So(err, should.NotBeNil)
-	a.So(ErrRefreshTokenNotFound.Describes(err), should.BeTrue)*/
+	a.So(ErrAuthorizedClientNotFound.Describes(err), should.BeTrue)
 }

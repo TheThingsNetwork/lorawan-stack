@@ -66,3 +66,56 @@ func TestClientUpdate(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeClientIgnoringAutoFields, client)
 }
+
+func TestClientDelete(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore(t)
+
+	userID := testUsers()["bob"].UserID
+	clientID := "delete-test"
+
+	testClientDeleteFeedDatabase(t, userID, clientID)
+
+	err := s.Clients.Delete(clientID)
+	a.So(err, should.BeNil)
+
+	found, err := s.Clients.GetByID(clientID, clientFactory)
+	a.So(err, should.NotBeNil)
+	a.So(ErrClientNotFound.Describes(err), should.BeTrue)
+	a.So(found, should.BeNil)
+}
+
+func testClientDeleteFeedDatabase(t *testing.T, userID, clientID string) {
+	a := assertions.New(t)
+	s := testStore(t)
+
+	client := &ttnpb.Client{
+		ClientIdentifier: ttnpb.ClientIdentifier{clientID},
+	}
+	err := s.Clients.Create(client)
+	a.So(err, should.BeNil)
+
+	oauth, ok := s.store().OAuth.(*OAuthStore)
+	if a.So(ok, should.BeTrue) {
+		err := oauth.saveAuthorizationCode(s.queryer(), &types.AuthorizationData{
+			AuthorizationCode: "123",
+			ClientID:          clientID,
+			UserID:            userID,
+		})
+		a.So(err, should.BeNil)
+
+		err = oauth.saveAccessToken(s.queryer(), &types.AccessData{
+			AccessToken: "123",
+			ClientID:    clientID,
+			UserID:      userID,
+		})
+		a.So(err, should.BeNil)
+
+		err = oauth.saveRefreshToken(s.queryer(), &types.RefreshData{
+			RefreshToken: "123",
+			ClientID:     clientID,
+			UserID:       userID,
+		})
+		a.So(err, should.BeNil)
+	}
+}

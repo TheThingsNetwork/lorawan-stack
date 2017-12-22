@@ -223,6 +223,41 @@ func TestUserAPIKeys(t *testing.T) {
 	a.So(ErrAPIKeyNotFound.Describes(err), should.BeTrue)
 }
 
+func TestUserDelete(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore(t)
+
+	id := "test-delete"
+
+	err := s.Users.Create(&ttnpb.User{
+		UserIdentifier: ttnpb.UserIdentifier{id},
+		Email:          "foo",
+		Password:       "123",
+		Name:           "bar",
+	})
+	a.So(err, should.BeNil)
+
+	key := &ttnpb.APIKey{
+		Name:   "foo",
+		Key:    "123",
+		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
+	}
+	err = s.Users.SaveAPIKey(id, key)
+	a.So(err, should.BeNil)
+
+	testApplicationDeleteFeedDatabase(t, id, id)
+	testGatewayDeleteFeedDatabase(t, id, id)
+	testClientDeleteFeedDatabase(t, id, id)
+
+	err = s.Users.Delete(id)
+	a.So(err, should.BeNil)
+
+	found, err := s.Users.GetByID(id, userFactory)
+	a.So(err, should.NotBeNil)
+	a.So(ErrUserNotFound.Describes(err), should.BeTrue)
+	a.So(found, should.BeNil)
+}
+
 func BenchmarkUserCreate(b *testing.B) {
 	s := testStore(b)
 

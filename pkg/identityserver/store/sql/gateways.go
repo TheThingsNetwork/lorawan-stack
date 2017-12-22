@@ -541,6 +541,76 @@ func (s *GatewayStore) listRadios(q db.QueryContext, gtwID string) ([]ttnpb.Gate
 	return radios, nil
 }
 
+// Delete deletes an gateway.
+func (s *GatewayStore) Delete(gtwID string) error {
+	err := s.transact(func(tx *db.Tx) error {
+		err := s.deleteCollaborators(tx, gtwID)
+		if err != nil {
+			return err
+		}
+
+		err = s.deleteAPIKeys(tx, gtwID)
+		if err != nil {
+			return err
+		}
+
+		err = s.removeAntennas(tx, gtwID)
+		if err != nil {
+			return err
+		}
+
+		err = s.removeAttributes(tx, gtwID)
+		if err != nil {
+			return err
+		}
+
+		return s.delete(tx, gtwID)
+	})
+
+	return err
+}
+
+// delete deletes the gateway itself. All rows in other tables that references
+// this entity must be delete before this one gets deleted.
+func (s *GatewayStore) delete(q db.QueryContext, gtwID string) error {
+	id := new(string)
+	err := q.SelectOne(
+		id,
+		`DELETE
+			FROM gateways
+			WHERE gateway_id = $1
+			RETURNING gateway_id`,
+		gtwID)
+	if db.IsNoRows(err) {
+		return ErrGatewayNotFound.New(errors.Attributes{
+			"gateway_id": gtwID,
+		})
+	}
+	return err
+}
+
+// removeAntennas removes all the antennas from a gateway.
+func (s *GatewayStore) removeAntennas(q db.QueryContext, gtwID string) error {
+	_, err := q.Exec("DELETE FROM gateways_antennas WHERE gateway_id = $1", gtwID)
+	return err
+}
+
+// removeAttributes removes all the attributes from a gateway.
+func (s *GatewayStore) removeAttributes(q db.QueryContext, gtwID string) error {
+	_, err := q.Exec("DELETE FROM gateways_attributes WHERE gateway_id = $1", gtwID)
+	return err
+}
+
+// deleteCollaborators deletes all the collaborators from one gateway.
+func (s *GatewayStore) deleteCollaborators(q db.QueryContext, gtwID string) error {
+	_, err := q.Exec(
+		`DELETE
+			FROM gateways_collaborators
+			WHERE gateway_id = $1`,
+		gtwID)
+	return err
+}
+
 // SetCollaborator inserts or modifies a collaborator within an entity.
 // If the provided list of rights is empty the collaborator will be unset.
 func (s *GatewayStore) SetCollaborator(collaborator *ttnpb.GatewayCollaborator) error {

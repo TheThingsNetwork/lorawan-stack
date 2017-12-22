@@ -109,6 +109,16 @@ func (s *OAuthStore) deleteAuthorizationCode(q db.QueryContext, authorizationCod
 	return err
 }
 
+func (s *OAuthStore) deleteAuthorizationCodesByUser(q db.QueryContext, userID string) error {
+	_, err := q.Exec(`DELETE FROM authorization_codes WHERE user_id = $1`, userID)
+	return err
+}
+
+func (s *OAuthStore) deleteAuthorizationCodesByClient(q db.QueryContext, clientID string) error {
+	_, err := q.Exec(`DELETE FROM authorization_codes WHERE client_id = $1`, clientID)
+	return err
+}
+
 // SaveAccessToken saves the access data.
 func (s *OAuthStore) SaveAccessToken(access *types.AccessData) error {
 	return s.saveAccessToken(s.queryer(), access)
@@ -197,6 +207,11 @@ func (s *OAuthStore) deleteAccessToken(q db.QueryContext, accessToken string) er
 	return err
 }
 
+func (s *OAuthStore) deleteAccessTokensByClient(q db.QueryContext, clientID string) error {
+	_, err := q.Exec(`DELETE FROM access_tokens WHERE client_id = $1`, clientID)
+	return err
+}
+
 // SaveRefreshToken saves the refresh token.
 func (s *OAuthStore) SaveRefreshToken(access *types.RefreshData) error {
 	return s.saveRefreshToken(s.queryer(), access)
@@ -280,6 +295,11 @@ func (s *OAuthStore) deleteRefreshToken(q db.QueryContext, refreshToken string) 
 		return ErrRefreshTokenNotFound.New(nil)
 	}
 
+	return err
+}
+
+func (s *OAuthStore) deleteRefreshTokensByClient(q db.QueryContext, clientID string) error {
+	_, err := q.Exec(`DELETE FROM refresh_tokens WHERE client_id = $1`, clientID)
 	return err
 }
 

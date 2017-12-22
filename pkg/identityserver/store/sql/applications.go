@@ -189,6 +189,54 @@ func (s *ApplicationStore) update(q db.QueryContext, application types.Applicati
 	return err
 }
 
+// Delete deletes an application.
+func (s *ApplicationStore) Delete(appID string) error {
+	err := s.transact(func(tx *db.Tx) error {
+		err := s.deleteCollaborators(tx, appID)
+		if err != nil {
+			return err
+		}
+
+		err = s.deleteAPIKeys(tx, appID)
+		if err != nil {
+			return err
+		}
+
+		return s.delete(tx, appID)
+	})
+
+	return err
+}
+
+// delete deletes the application itself. All rows in other tables that references
+// this entity must be delete before this one gets deleted.
+func (s *ApplicationStore) delete(q db.QueryContext, appID string) error {
+	id := new(string)
+	err := q.SelectOne(
+		id,
+		`DELETE
+			FROM applications
+			WHERE application_id = $1
+			RETURNING application_id`,
+		appID)
+	if db.IsNoRows(err) {
+		return ErrApplicationNotFound.New(errors.Attributes{
+			"application_id": appID,
+		})
+	}
+	return err
+}
+
+// deleteCollaborators deletes all the collaborators from one application.
+func (s *ApplicationStore) deleteCollaborators(q db.QueryContext, appID string) error {
+	_, err := q.Exec(
+		`DELETE
+			FROM applications_collaborators
+			WHERE application_id = $1`,
+		appID)
+	return err
+}
+
 // SetCollaborator inserts or modifies a collaborator within an entity.
 // If the provided list of rights is empty the collaborator will be unset.
 func (s *ApplicationStore) SetCollaborator(collaborator *ttnpb.ApplicationCollaborator) error {

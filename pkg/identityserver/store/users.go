@@ -25,10 +25,9 @@ type UserStore interface {
 	// Update updates an user.
 	Update(user types.User) error
 
-	// TODO(gomezjdaniel): wait for CockroachDB to introduce 'ON DELETE CASCADE'
-	// 		-> https://github.com/cockroachdb/cockroach/issues/14848
+	// TODO(gomezjdaniel#274): use sql 'ON DELETE CASCADE' when CockroachDB implements it.
 	// Delete deletes an user.
-	//Delete(userID string) error
+	Delete(userID string) error
 
 	// SaveValidationToken saves the validation token.
 	SaveValidationToken(userID string, token *types.ValidationToken) error

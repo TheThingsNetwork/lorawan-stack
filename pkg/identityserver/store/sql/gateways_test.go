@@ -320,7 +320,7 @@ func TestGatewayCollaborators(t *testing.T) {
 		}
 	}
 
-	/*// remove collaborator
+	// remove collaborator
 	{
 		collaborator.Rights = []ttnpb.Right{}
 		err := s.Gateways.SetCollaborator(collaborator)
@@ -329,7 +329,7 @@ func TestGatewayCollaborators(t *testing.T) {
 		collaborators, err := s.Gateways.ListCollaborators(gtw.GatewayID)
 		a.So(err, should.BeNil)
 		a.So(collaborators, should.HaveLength, 0)
-	}*/
+	}
 }
 
 func TestGatewayUpdate(t *testing.T) {
@@ -345,4 +345,49 @@ func TestGatewayUpdate(t *testing.T) {
 	found, err := s.Gateways.GetByID(gtw.GatewayID, gatewayFactory)
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
+}
+
+func TestGatewayDelete(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore(t)
+
+	userID := testUsers()["bob"].UserID
+	gtwID := "delete-test"
+
+	testGatewayDeleteFeedDatabase(t, userID, gtwID)
+
+	err := s.Gateways.Delete(gtwID)
+	a.So(err, should.BeNil)
+
+	found, err := s.Gateways.GetByID(gtwID, gatewayFactory)
+	a.So(err, should.NotBeNil)
+	a.So(ErrGatewayNotFound.Describes(err), should.BeTrue)
+	a.So(found, should.BeNil)
+}
+
+func testGatewayDeleteFeedDatabase(t *testing.T, userID, gtwID string) {
+	a := assertions.New(t)
+	s := testStore(t)
+
+	gtw := testGateways()["test-gateway"]
+	gtw.GatewayID = gtwID
+
+	err := s.Gateways.Create(gtw)
+	a.So(err, should.BeNil)
+
+	collaborator := &ttnpb.GatewayCollaborator{
+		GatewayIdentifier: gtw.GatewayIdentifier,
+		UserIdentifier:    ttnpb.UserIdentifier{userID},
+		Rights:            []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
+	}
+	err = s.Gateways.SetCollaborator(collaborator)
+	a.So(err, should.BeNil)
+
+	key := &ttnpb.APIKey{
+		Name:   "foo",
+		Key:    "123",
+		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
+	}
+	err = s.Gateways.SaveAPIKey(gtwID, key)
+	a.So(err, should.BeNil)
 }

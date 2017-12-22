@@ -182,6 +182,109 @@ func (s *UserStore) update(q db.QueryContext, user types.User) error {
 	return err
 }
 
+// Delete deletes an user.
+func (s *UserStore) Delete(userID string) error {
+	err := s.transact(func(tx *db.Tx) error {
+		// unset as application collaborator where possible
+		applications, ok := s.store().Applications.(*ApplicationStore)
+		if !ok {
+			return errors.Errorf("Expected ptr to ApplicationStore but got %T", s.store().Applications)
+		}
+
+		apps, err := applications.userApplications(tx, userID)
+		if err != nil {
+			return err
+		}
+
+		for _, app := range apps {
+			err := applications.unsetCollaborator(tx, app.ApplicationID, userID)
+			if err != nil {
+				return err
+			}
+		}
+
+		// unset as gateway collaborator where possible
+		gateways, ok := s.store().Gateways.(*GatewayStore)
+		if !ok {
+			return errors.Errorf("Expected ptr to GatewayStore but got %T", s.store().Gateways)
+		}
+
+		gtws, err := gateways.userGateways(tx, userID)
+		if err != nil {
+			return err
+		}
+
+		for _, gtw := range gtws {
+			err := gateways.unsetCollaborator(tx, gtw.GatewayID, userID)
+			if err != nil {
+				return err
+			}
+		}
+
+		// revoke all authorized clients
+		oauth, ok := s.store().OAuth.(*OAuthStore)
+		if !ok {
+			return errors.Errorf("Expected ptr to OAuthStore but got %T", s.store().OAuth)
+		}
+
+		err = oauth.deleteAuthorizationCodesByUser(tx, userID)
+		if err != nil {
+			return err
+		}
+
+		clientIDs, err := oauth.listAuthorizedClients(tx, userID)
+		for _, clientID := range clientIDs {
+			_, err := oauth.deleteAccessTokensByUserAndClient(tx, userID, clientID)
+			if err != nil {
+				return err
+			}
+
+			_, err = oauth.deleteRefreshTokenByUserAndClient(tx, userID, clientID)
+			if err != nil {
+				return err
+			}
+		}
+
+		// delete api keys
+		err = s.deleteAPIKeys(tx, userID)
+		if err != nil {
+			return err
+		}
+
+		// delete validation tokens
+		err = s.deleteValidationTokens(tx, userID)
+		if err != nil {
+			return err
+		}
+
+		return s.delete(tx, userID)
+	})
+
+	return err
+}
+
+func (s *UserStore) delete(q db.QueryContext, userID string) error {
+	id := new(string)
+	err := q.SelectOne(
+		id,
+		`DELETE
+			FROM users
+			WHERE user_id = $1
+			RETURNING user_id`,
+		userID)
+	if db.IsNoRows(err) {
+		return ErrUserNotFound.New(errors.Attributes{
+			"user_id": userID,
+		})
+	}
+	return err
+}
+
+func (s *UserStore) deleteValidationTokens(q db.QueryContext, userID string) error {
+	_, err := q.Exec(`DELETE FROM validation_tokens WHERE user_id = $1`, userID)
+	return err
+}
+
 // SaveValidationToken saves the validation token.
 func (s *UserStore) SaveValidationToken(userID string, token *types.ValidationToken) error {
 	return s.saveValidationToken(s.queryer(), userID, token)
