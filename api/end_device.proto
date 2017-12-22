@@ -16,41 +16,41 @@ package ttn.v3;
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 message KeyEnvelope {
-  // The (encrypted) key
+  // The (encrypted) key.
   bytes key = 1 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.AES128Key"];
 
-  // The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key
+  // The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key.
   string kek_label = 2 [(gogoproto.customname) = "KEKLabel"];
 }
 
 // Root keys for a LoRaWAN device.
 message RootKeys {
-  // Join Server issued identifier for the root keys
+  // Join Server issued identifier for the root keys.
   string root_key_id = 1 [(gogoproto.customname) = "RootKeyID"];
 
-  // The (encrypted) Application Key
+  // The (encrypted) Application Key.
   KeyEnvelope app_key = 2;
 
-  // The (encrypted) Network Key
+  // The (encrypted) Network Key.
   KeyEnvelope nwk_key = 3;
 }
 
 // Session keys for a LoRaWAN session.
-// Only the components for which the keys were meant, will have the key-encryption-key (KEK) to decrypt the individual keys
+// Only the components for which the keys were meant, will have the key-encryption-key (KEK) to decrypt the individual keys.
 message SessionKeys {
-  // Join Server issued identifier for the session keys
+  // Join Server issued identifier for the session keys.
   string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
 
-  // The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode)
+  // The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode).
   KeyEnvelope f_nwk_s_int_key = 2;
 
-  // The (encrypted) Serving Network Session Integrity Key
+  // The (encrypted) Serving Network Session Integrity Key.
   KeyEnvelope s_nwk_s_int_key = 3;
 
-  // The (encrypted) Network Session Encryption Key
+  // The (encrypted) Network Session Encryption Key.
   KeyEnvelope nwk_s_enc_key = 4;
 
-  // The (encrypted) Application Session Key
+  // The (encrypted) Application Session Key.
   KeyEnvelope app_s_key = 5;
 }
 
@@ -67,81 +67,81 @@ message Session {
 message EndDevice {
   EndDeviceIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // Root keys of the device
+  // Root keys of the device.
   RootKeys root_keys = 2;
 
-  // Next DevNonce to be expected (in case of LoRaWAN 1.1)
+  // Next DevNonce to be expected (in case of LoRaWAN 1.1).
   uint32 next_dev_nonce = 3;
 
-  // Used DevNonces (in case of LoRaWAN 1.0)
+  // Used DevNonces (in case of LoRaWAN 1.0).
   repeated uint32 used_dev_nonces = 4;
 
-  // Next JoinNonce/AppNonce to be used (in case of LoRaWAN 1.1)
+  // Next JoinNonce/AppNonce to be used (in case of LoRaWAN 1.1).
   uint32 next_join_nonce = 5;
 
-  // Used JoinNonces/AppNonce (in case of LoRaWAN 1.0)
+  // Used JoinNonces/AppNonce (in case of LoRaWAN 1.0).
   repeated uint32 used_join_nonces = 6;
 
-  // Next Rejoin counter (type 0/2) to expect
+  // Next Rejoin counter (type 0/2) to expect.
   uint32 next_rj_count_0 = 7 [(gogoproto.customname) = "NextRJCount0"];
 
-  // Next Rejoin counter (type 1) to expect
+  // Next Rejoin counter (type 1) to expect.
   uint32 next_rj_count_1 = 8 [(gogoproto.customname) = "NextRJCount1"];
 
-  // Indicator that the device may reset the frame counters (not LoRaWAN compliant)
+  // Indicator that the device may reset the frame counters (not LoRaWAN compliant).
   bool f_cnt_resets = 9;
 
-  // Current session
+  // Current session.
   Session session = 10;
 
-  // Fallback session (stored until RekeyInd received)
+  // Fallback session (stored until RekeyInd received).
   Session session_fallback = 11;
 
-  // LoRaWAN MAC version
+  // LoRaWAN MAC version.
   MACVersion lorawan_version = 12 [(gogoproto.customname) = "LoRaWANVersion"];
 
-  // LoRaWAN PHY version
+  // LoRaWAN PHY version.
   PHYVersion lorawan_phy_version = 13 [(gogoproto.customname) = "LoRaWANPHYVersion"];
 
   // frequency_plan_id indicates the ID of the frequency plan.
   string frequency_plan_id = 14 [(gogoproto.customname) = "FrequencyPlanID"];
 
-  // Min frequency the device is capable of using
+  // Min frequency the device is capable of using.
   uint64 min_frequency = 15;
 
-  // Max frequency the device is capable of using
+  // Max frequency the device is capable of using.
   uint64 max_frequency = 16;
 
-  // Max transmission power the device is capable of using
+  // Max transmission power the device is capable of using.
   uint64 max_tx_power = 17;
 
-  // LoRaWAN MAC settings for the device
+  // LoRaWAN MAC settings for the device.
   MACSettings mac_settings = 18 [(gogoproto.customname) = "MACSettings"];
 
-  // MAC info sent by the device
+  // MAC info sent by the device.
   MACInfo mac_info = 19 [(gogoproto.customname) = "MACInfo"];
 
-  // Current LoRaWAN MAC state
+  // Current LoRaWAN MAC state.
   MACState mac_state = 20 [(gogoproto.customname) = "MACState"];
 
-  // Desired LoRaWAN MAC state
+  // Desired LoRaWAN MAC state.
   MACState mac_state_desired = 21 [(gogoproto.customname) = "MACStateDesired"];
 
-  // Location of the device
+  // Location of the device.
   Location location = 22;
 
   // Device Attributes
   // - field names are written in snake_case
   google.protobuf.Struct attributes = 23;
 
-  // DisableJoinNonceCheck specifies whether LoRaWAN DevNonce check procedure should be disabled
+  // DisableJoinNonceCheck specifies whether LoRaWAN DevNonce check procedure should be disabled.
   bool disable_join_nonce_check = 24;
 
-  // NetworkServerURL specifies URL(host:port) of the Network Server associated with this device.
-  string network_server_url = 25 [(gogoproto.customname) = "NetworkServerURL"];
+  // NetworkServerAddress specifies Address(host:port) of the Network Server associated with this device.
+  string network_server_address = 25 [(gogoproto.customname) = "NetworkServerAddress"];
 
-  // ApplicationServerURL specifies URL(host:port) of the Application Server associated with this device.
-  string application_server_url = 26 [(gogoproto.customname) = "ApplicationServerURL"];
+  // ApplicationServerAddress specifies Address(host:port) of the Application Server associated with this device.
+  string application_server_address = 26 [(gogoproto.customname) = "ApplicationServerAddress"];
 
   google.protobuf.Timestamp created_at = 97 [(gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 98 [(gogoproto.stdtime) = true];

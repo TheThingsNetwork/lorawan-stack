@@ -98,7 +98,7 @@ It has these top-level messages:
 	JoinRequest
 	JoinResponse
 	SessionKeyRequest
-	NwkKeyResponse
+	NwkSKeysResponse
 	AppSKeyResponse
 	Message
 	MHDR
