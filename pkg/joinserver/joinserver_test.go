@@ -35,6 +35,8 @@ var (
 	}
 	nwkKey = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	appKey = types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	nsAddr = net.IPv4(0x42, 0x42, 0x42, 0x42).String()
+	asAddr = net.IPv4(0x42, 0x42, 0x42, 0xff).String()
 )
 
 func mustEncryptJoinAccept(key types.AES128Key, pld []byte) []byte {
@@ -128,8 +130,8 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				LoRaWANVersion:   ttnpb.MAC_V1_1,
-				NetworkServerURL: net.IPv4(0x42, 0x42, 0x42, 0x42).String(),
+				LoRaWANVersion:       ttnpb.MAC_V1_1,
+				NetworkServerAddress: nsAddr,
 			},
 			1,
 			1,
@@ -240,8 +242,8 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				LoRaWANVersion:   ttnpb.MAC_V1_1,
-				NetworkServerURL: net.IPv4(0x42, 0x42, 0x42, 0x42).String(),
+				LoRaWANVersion:       ttnpb.MAC_V1_1,
+				NetworkServerAddress: nsAddr,
 			},
 			0x2443,
 			0x424243,
@@ -352,8 +354,8 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				LoRaWANVersion:   ttnpb.MAC_V1_1,
-				NetworkServerURL: net.IPv4(0x42, 0x42, 0x42, 0x42).String(),
+				LoRaWANVersion:       ttnpb.MAC_V1_1,
+				NetworkServerAddress: nsAddr,
 			},
 			0x2442,
 			0x424242,
@@ -391,6 +393,65 @@ func TestHandleJoin(t *testing.T) {
 			ErrDevNonceTooSmall.New(nil),
 		},
 		{
+			"1.1 address mismatch",
+			&ttnpb.EndDevice{
+				NextDevNonce:  0,
+				NextJoinNonce: 0,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				RootKeys: &ttnpb.RootKeys{
+					AppKey: &ttnpb.KeyEnvelope{
+						Key:      &appKey,
+						KEKLabel: "",
+					},
+					NwkKey: &ttnpb.KeyEnvelope{
+						Key:      &nwkKey,
+						KEKLabel: "",
+					},
+				},
+				LoRaWANVersion:       ttnpb.MAC_V1_1,
+				NetworkServerAddress: net.IPv4(0x45, 0x44, 0x43, 0x43).String(),
+			},
+			1,
+			1,
+			[]uint32{0},
+			&ttnpb.JoinRequest{
+				SelectedMacVersion: ttnpb.MAC_V1_1,
+				RawPayload: []byte{
+					/* MHDR */
+					0x00,
+
+					/* MACPayload */
+					/** JoinEUI **/
+					0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+					/** DevEUI **/
+					0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+					/** DevNonce **/
+					0x00, 0x00,
+
+					/* MIC */
+					0x19, 0x86, 0x7c, 0x5f,
+				},
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				},
+				NetID: types.NetID{0x42, 0xff, 0xff},
+				DownlinkSettings: ttnpb.DLSettings{
+					OptNeg:      true,
+					Rx1DROffset: 0x7,
+					Rx2DR:       0xf,
+				},
+				RxDelay: 0x42,
+				CFList:  nil,
+			},
+			nil,
+			ErrAddressMismatch.New(errors.Attributes{
+				"component": "network server",
+			}),
+		},
+		{
 			"1.0.2 new device",
 			&ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52},
@@ -405,8 +466,8 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				LoRaWANVersion:   ttnpb.MAC_V1_0_2,
-				NetworkServerURL: net.IPv4(0x42, 0x42, 0x42, 0x42).String(),
+				LoRaWANVersion:       ttnpb.MAC_V1_0_2,
+				NetworkServerAddress: nsAddr,
 			},
 			0,
 			1,
@@ -497,8 +558,8 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				LoRaWANVersion:   ttnpb.MAC_V1_0_1,
-				NetworkServerURL: net.IPv4(0x42, 0x42, 0x42, 0x42).String(),
+				LoRaWANVersion:       ttnpb.MAC_V1_0_1,
+				NetworkServerAddress: nsAddr,
 			},
 			0,
 			1,
@@ -589,8 +650,8 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				LoRaWANVersion:   ttnpb.MAC_V1_0,
-				NetworkServerURL: net.IPv4(0x42, 0x42, 0x42, 0x42).String(),
+				LoRaWANVersion:       ttnpb.MAC_V1_0,
+				NetworkServerAddress: nsAddr,
 			},
 			0,
 			1,
@@ -681,8 +742,8 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				LoRaWANVersion:   ttnpb.MAC_V1_0,
-				NetworkServerURL: net.IPv4(0x42, 0x42, 0x42, 0x42).String(),
+				LoRaWANVersion:       ttnpb.MAC_V1_0,
+				NetworkServerAddress: nsAddr,
 			},
 			0,
 			0x424243,
@@ -773,8 +834,8 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 				},
-				LoRaWANVersion:   ttnpb.MAC_V1_0,
-				NetworkServerURL: net.IPv4(0x42, 0x42, 0x42, 0x42).String(),
+				LoRaWANVersion:       ttnpb.MAC_V1_0,
+				NetworkServerAddress: nsAddr,
 			},
 			0,
 			0x424242,
@@ -835,9 +896,10 @@ func TestHandleJoin(t *testing.T) {
 			}
 
 			ctx := (rpcmetadata.MD{
-				NetAddress: tc.Device.NetworkServerURL,
+				NetAddress: nsAddr,
 			}).ToIncomingContext(context.Background())
 
+			start := time.Now()
 			resp, err := js.HandleJoin(ctx, tc.JoinRequest)
 			if tc.Error != nil {
 				a.So(errors.From(err).Attributes(), should.Resemble, errors.From(tc.Error).Attributes())
@@ -855,16 +917,481 @@ func TestHandleJoin(t *testing.T) {
 			// ensure the stored device nonces are updated
 			time.Sleep(time.Millisecond)
 
-			resp, err = js.HandleJoin(context.Background(), tc.JoinRequest)
-			a.So(err, should.BeError)
-			a.So(resp, should.BeNil)
-
 			dev, err = reg.FindDeviceByIdentifiers(&tc.Device.EndDeviceIdentifiers)
 			a.So(err, should.BeNil)
 			if a.So(dev, should.NotBeNil) && a.So(dev, should.HaveLength, 1) {
 				a.So(dev[0].GetNextDevNonce(), should.Equal, tc.NextNextDevNonce)
 				a.So(dev[0].GetNextJoinNonce(), should.Equal, tc.NextNextJoinNonce)
 				a.So(pretty.Diff(dev[0].GetUsedDevNonces(), tc.NextUsedDevNonces), should.BeEmpty)
+				if s := dev[0].GetSession(); tc.Error == nil && a.So(s, should.NotBeNil) {
+					a.So(s.DevAddr, should.Resemble, tc.JoinRequest.EndDeviceIdentifiers.DevAddr)
+					a.So(s.SessionKeys, should.Resemble, resp.SessionKeys)
+					a.So([]time.Time{start, s.StartedAt, time.Now()}, should.BeChronological)
+				}
+			}
+
+			resp, err = js.HandleJoin(context.Background(), tc.JoinRequest)
+			a.So(err, should.BeError)
+			a.So(resp, should.BeNil)
+		})
+	}
+}
+
+func TestGetAppSKey(t *testing.T) {
+	a := assertions.New(t)
+
+	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+	js := New(&Config{
+		Component:       component.New(test.GetLogger(t), &component.Config{shared.DefaultServiceBase}),
+		Registry:        reg,
+		JoinEUIPrefixes: joinEUIPrefixes,
+	})
+
+	req := ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
+	req.DevEUI = types.EUI64{}
+	resp, err := js.GetAppSKey(context.Background(), req)
+	a.So(err, should.NotBeNil)
+	a.So(resp, should.BeNil)
+
+	req = ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
+	req.SessionKeyID = ""
+	resp, err = js.GetAppSKey(context.Background(), req)
+	a.So(err, should.NotBeNil)
+	a.So(resp, should.BeNil)
+
+	for _, tc := range []struct {
+		Name string
+
+		Device *ttnpb.EndDevice
+
+		KeyRequest  *ttnpb.SessionKeyRequest
+		KeyResponse *ttnpb.AppSKeyResponse
+
+		Error error
+	}{
+		{
+			"Valid session",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				ApplicationServerAddress: asAddr,
+				Session: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "test",
+						AppSKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff},
+							KEKLabel: "test",
+						},
+					},
+				},
+			},
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			&ttnpb.AppSKeyResponse{
+				AppSKey: ttnpb.KeyEnvelope{
+					Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff},
+					KEKLabel: "test",
+				},
+			},
+			nil,
+		},
+		{
+			"Valid fallback",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				ApplicationServerAddress: asAddr,
+				Session: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "zest",
+					},
+				},
+				SessionFallback: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "test",
+						AppSKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff},
+							KEKLabel: "test",
+						},
+					},
+				},
+			},
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			&ttnpb.AppSKeyResponse{
+				AppSKey: ttnpb.KeyEnvelope{
+					Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff},
+					KEKLabel: "test",
+				},
+			},
+			nil,
+		},
+		{
+			"No session",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				ApplicationServerAddress: asAddr,
+			},
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			nil,
+			ErrNoSession.New(nil),
+		},
+		{
+			"ID mismatch",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				ApplicationServerAddress: asAddr,
+				Session: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "zest",
+					},
+				},
+				SessionFallback: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "fest",
+					},
+				},
+			},
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			nil,
+			ErrSessionKeyIDMismatch.New(nil),
+		},
+		{
+			"ID mismatch no fallback",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				ApplicationServerAddress: asAddr,
+				Session: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "zest",
+					},
+				},
+			},
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			nil,
+			ErrSessionKeyIDMismatch.New(nil),
+		},
+		{
+			"Address mismatch",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				ApplicationServerAddress: "test",
+			},
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			nil,
+			ErrAddressMismatch.New(errors.Attributes{
+				"component": "application server",
+			}),
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+			js := New(&Config{
+				Component:       component.New(test.GetLogger(t), &component.Config{shared.DefaultServiceBase}),
+				Registry:        reg,
+				JoinEUIPrefixes: joinEUIPrefixes,
+			})
+
+			_, err := reg.Create(tc.Device)
+			if !a.So(err, should.BeNil) {
+				return
+			}
+
+			dev, err := reg.FindDeviceByIdentifiers(&tc.Device.EndDeviceIdentifiers)
+			a.So(err, should.BeNil)
+			if a.So(dev, should.NotBeNil) && a.So(dev, should.HaveLength, 1) {
+				a.So(pretty.Diff(dev[0].EndDevice, tc.Device), should.BeEmpty)
+			}
+
+			ctx := (rpcmetadata.MD{
+				NetAddress: asAddr,
+			}).ToIncomingContext(context.Background())
+
+			resp, err := js.GetAppSKey(ctx, tc.KeyRequest)
+			if tc.Error != nil {
+				a.So(errors.From(err).Attributes(), should.Resemble, errors.From(tc.Error).Attributes())
+				a.So(errors.From(err).Code(), should.Resemble, errors.From(tc.Error).Code())
+				a.So(resp, should.BeNil)
+				return
+			}
+
+			a.So(err, should.BeNil)
+			if !a.So(resp, should.Resemble, tc.KeyResponse) {
+				pretty.Ldiff(t, resp, tc.KeyResponse)
+			}
+		})
+	}
+}
+
+func TestGetNwkSKeys(t *testing.T) {
+	a := assertions.New(t)
+
+	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+	js := New(&Config{
+		Component:       component.New(test.GetLogger(t), &component.Config{shared.DefaultServiceBase}),
+		Registry:        reg,
+		JoinEUIPrefixes: joinEUIPrefixes,
+	})
+
+	req := ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
+	req.DevEUI = types.EUI64{}
+	resp, err := js.GetNwkSKeys(context.Background(), req)
+	a.So(err, should.NotBeNil)
+	a.So(resp, should.BeNil)
+
+	req = ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
+	req.SessionKeyID = ""
+	resp, err = js.GetNwkSKeys(context.Background(), req)
+	a.So(err, should.NotBeNil)
+	a.So(resp, should.BeNil)
+
+	for _, tc := range []struct {
+		Name string
+
+		Device *ttnpb.EndDevice
+
+		KeyRequest  *ttnpb.SessionKeyRequest
+		KeyResponse *ttnpb.NwkSKeysResponse
+
+		Error error
+	}{
+		{
+			"Valid request",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				NetworkServerAddress: nsAddr,
+				Session: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "test",
+						FNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff},
+							KEKLabel: "test",
+						},
+						SNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff},
+							KEKLabel: "test",
+						},
+						NwkSEncKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff},
+							KEKLabel: "test",
+						},
+					},
+				},
+			},
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			&ttnpb.NwkSKeysResponse{
+				FNwkSIntKey: ttnpb.KeyEnvelope{
+					Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff},
+					KEKLabel: "test",
+				},
+				SNwkSIntKey: ttnpb.KeyEnvelope{
+					Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff},
+					KEKLabel: "test",
+				},
+				NwkSEncKey: ttnpb.KeyEnvelope{
+					Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff},
+					KEKLabel: "test",
+				},
+			},
+			nil,
+		},
+		{
+			"Valid fallback",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				NetworkServerAddress: nsAddr,
+				Session: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "zest",
+					},
+				},
+				SessionFallback: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "test",
+						FNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff},
+							KEKLabel: "test",
+						},
+						SNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff},
+							KEKLabel: "test",
+						},
+						NwkSEncKey: &ttnpb.KeyEnvelope{
+							Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff},
+							KEKLabel: "test",
+						},
+					},
+				},
+			},
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			&ttnpb.NwkSKeysResponse{
+				FNwkSIntKey: ttnpb.KeyEnvelope{
+					Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff},
+					KEKLabel: "test",
+				},
+				SNwkSIntKey: ttnpb.KeyEnvelope{
+					Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff},
+					KEKLabel: "test",
+				},
+				NwkSEncKey: ttnpb.KeyEnvelope{
+					Key:      &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff},
+					KEKLabel: "test",
+				},
+			},
+			nil,
+		},
+		{
+			"No session",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				NetworkServerAddress: nsAddr,
+			},
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			nil,
+			ErrNoSession.New(nil),
+		},
+		{
+			"ID mismatch",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				NetworkServerAddress: nsAddr,
+				Session: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "zest",
+					},
+				},
+				SessionFallback: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "fest",
+					},
+				},
+			},
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			nil,
+			ErrSessionKeyIDMismatch.New(nil),
+		},
+		{
+			"ID mismatch no fallback",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				NetworkServerAddress: nsAddr,
+				Session: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: "zest",
+					},
+				},
+			},
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			nil,
+			ErrSessionKeyIDMismatch.New(nil),
+		},
+		{
+			"Address mismatch",
+			&ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI: &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				NetworkServerAddress: "test",
+			},
+			&ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: "test",
+			},
+			nil,
+			ErrAddressMismatch.New(errors.Attributes{
+				"component": "network server",
+			}),
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+			js := New(&Config{
+				Component:       component.New(test.GetLogger(t), &component.Config{shared.DefaultServiceBase}),
+				Registry:        reg,
+				JoinEUIPrefixes: joinEUIPrefixes,
+			})
+
+			_, err := reg.Create(tc.Device)
+			if !a.So(err, should.BeNil) {
+				return
+			}
+
+			dev, err := reg.FindDeviceByIdentifiers(&tc.Device.EndDeviceIdentifiers)
+			a.So(err, should.BeNil)
+			if a.So(dev, should.NotBeNil) && a.So(dev, should.HaveLength, 1) {
+				a.So(pretty.Diff(dev[0].EndDevice, tc.Device), should.BeEmpty)
+			}
+
+			ctx := (rpcmetadata.MD{
+				NetAddress: nsAddr,
+			}).ToIncomingContext(context.Background())
+
+			resp, err := js.GetNwkSKeys(ctx, tc.KeyRequest)
+			if tc.Error != nil {
+				a.So(errors.From(err).Attributes(), should.Resemble, errors.From(tc.Error).Attributes())
+				a.So(errors.From(err).Code(), should.Resemble, errors.From(tc.Error).Code())
+				a.So(resp, should.BeNil)
+				return
+			}
+
+			a.So(err, should.BeNil)
+			if !a.So(resp, should.Resemble, tc.KeyResponse) {
+				pretty.Ldiff(t, resp, tc.KeyResponse)
 			}
 		})
 	}
