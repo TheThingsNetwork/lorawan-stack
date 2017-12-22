@@ -56,7 +56,7 @@ func init() {
 		DefaultMaxEIRP: 16,
 		TxOffset:       []float32{0, -2, -4, -6, -8, -10, -12, -14},
 
-		Rx1Parameters: func(dataRateIndex, frequency, rx1DROffset int, dwellTime bool) (int, int) {
+		Rx1Parameters: func(frequency uint64, dataRateIndex, rx1DROffset int, dwellTime bool) (int, uint64) {
 			minDR := 0
 			effectiveRx1DROffset := rx1DROffset
 			if effectiveRx1DROffset > 5 {

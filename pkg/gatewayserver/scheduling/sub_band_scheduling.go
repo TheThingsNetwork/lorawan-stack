@@ -91,8 +91,8 @@ func (s *subBandScheduling) schedule(w Window, timeOffAir *ttnpb.FrequencyPlan_T
 	precedingWindowsAirtime := windowDurationSum(emissionWindows, w.End().Add(-1*dutyCycleWindow), w.End())
 	prolongingWindowsAirtime := windowDurationSum(emissionWindows, w.Start, w.Start.Add(dutyCycleWindow))
 
-	if prolongingWindowsAirtime > s.dutyCycle.MaxAirTimeDuring(dutyCycleWindow) ||
-		precedingWindowsAirtime > s.dutyCycle.MaxAirTimeDuring(dutyCycleWindow) {
+	if prolongingWindowsAirtime > s.dutyCycle.MaxEmissionDuring(dutyCycleWindow) ||
+		precedingWindowsAirtime > s.dutyCycle.MaxEmissionDuring(dutyCycleWindow) {
 		return ErrDutyCycleFull
 	}
 

@@ -15,7 +15,7 @@ func init() {
 	uplinkChannels := make([]Channel, 0)
 	for i := 0; i < 96; i++ {
 		uplinkChannels = append(uplinkChannels, Channel{
-			Frequency:       470300000 + 200000*i,
+			Frequency:       uint64(470300000 + 200000*i),
 			DataRateIndexes: []int{0, 1, 2, 3, 4, 5},
 		})
 	}
@@ -23,7 +23,7 @@ func init() {
 	downlinkChannels := make([]Channel, 0)
 	for i := 0; i < 48; i++ {
 		downlinkChannels = append(downlinkChannels, Channel{
-			Frequency:       500300000 + 200000*i,
+			Frequency:       uint64(500300000 + 200000*i),
 			DataRateIndexes: []int{0, 1, 2, 3, 4, 5},
 		})
 	}
@@ -66,8 +66,8 @@ func init() {
 		DefaultMaxEIRP: 19.15,
 		TxOffset:       []float32{0, -2, -4, -6, -8, -10, -12, -14},
 
-		Rx1Parameters: func(dataRateIndex, frequency, rx1DROffset int, _ bool) (int, int) {
-			outDataRateIndex := dataRateIndex - rx1DROffset
+		Rx1Parameters: func(frequency uint64, dataRateIndex, Rx1DROffset int, _ bool) (int, uint64) {
+			outDataRateIndex := dataRateIndex - Rx1DROffset
 			if outDataRateIndex < 0 {
 				outDataRateIndex = 0
 			}

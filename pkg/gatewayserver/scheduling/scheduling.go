@@ -43,7 +43,7 @@ func FrequencyPlanScheduler(fp ttnpb.FrequencyPlan) (Scheduler, error) {
 		subBands:   []*subBandScheduling{},
 	}
 
-	band, err := band.GetByID(band.BandID(fp.BandID))
+	band, err := band.GetByID(fp.BandID)
 	if err != nil {
 		return nil, errors.NewWithCause("Could not find band associated to that frequency plan", err)
 	}

@@ -61,13 +61,13 @@ type DataRate struct {
 // Channel abstracts a band's channel properties
 type Channel struct {
 	// Frequency indicates the frequency of the channel
-	Frequency int
+	Frequency uint64
 	// DataRateIndexes indicates the data rates accepted on this channel
 	DataRateIndexes []int
 }
 
 // Rx1Emission takes the uplink's emission parameters, and returns downlink datarate index and channel
-type Rx1Emission func(dataRateIndex, frequency, rx1DROffset int, dwellTime bool) (int, int)
+type Rx1Emission func(frequency uint64, dataRateIndex, Rx1DROffset int, dwellTime bool) (int, uint64)
 
 // Rx2Parameters contains downlink datarate index and channel
 type Rx2Parameters struct {
@@ -125,9 +125,19 @@ type Band struct {
 
 // DutyCycle for the [MinFrequency;MaxFrequency[ sub-band
 type DutyCycle struct {
-	MinFrequency int
-	MaxFrequency int
+	MinFrequency uint64
+	MaxFrequency uint64
 	DutyCycle    float32
+}
+
+// Comprises returns whether the duty cycle applies to that channel
+func (d DutyCycle) Comprises(channel uint64) bool {
+	return channel >= d.MinFrequency && channel < d.MaxFrequency
+}
+
+// MaxEmissionDuring the period passed as parameter, that is allowed by that duty cycle.
+func (d DutyCycle) MaxEmissionDuring(period time.Duration) time.Duration {
+	return time.Duration(d.DutyCycle * float32(period))
 }
 
 // All contains all the bands available
