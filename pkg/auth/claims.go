@@ -4,10 +4,32 @@ package auth
 
 import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 
+// EntityType is the type that defines what are the valid entity types for claims.
+type EntityType string
+
+const (
+	// EntityUser is an user.
+	EntityUser EntityType = "user"
+
+	// EntityApplication is an application.
+	EntityApplication = "application"
+
+	// EntityGateway is a gateway.
+	EntityGateway = "gateway"
+)
+
+// String implements fmt.Stringer.
+func (e EntityType) String() string {
+	return string(e)
+}
+
 // Claims is the type that represents a claims to do something on the network.
 type Claims struct {
-	// Subject is the entity this claims are intended for.
-	Subject string
+	// EntityID is the ID of the entity this claims are intended for.
+	EntityID string
+
+	// EntityTyp is the type of entity this claims are intended for.
+	EntityTyp EntityType
 
 	// Source is the source of this claims, either an API key or a token.
 	Source string
@@ -18,20 +40,29 @@ type Claims struct {
 
 // UserID returns the user ID of the user profile this claims are for, or the
 // empty string if it is not for a user.
-func (c *Claims) UserID() string {
-	return splitprefix(UserPrefix, c.Subject)
+func (c *Claims) UserID() (id string) {
+	if c.EntityTyp == EntityUser {
+		id = c.EntityID
+	}
+	return
 }
 
 // ApplicationID returns the application ID  of the application this claims are
 // for, or the empty string if it is not for an application.
-func (c *Claims) ApplicationID() string {
-	return splitprefix(ApplicationPrefix, c.Subject)
+func (c *Claims) ApplicationID() (id string) {
+	if c.EntityTyp == EntityApplication {
+		id = c.EntityID
+	}
+	return
 }
 
 // GatewayID returns the gateway ID of the gateway this claims are for, or the
 // empty string if it is not for a gateway.
-func (c *Claims) GatewayID() string {
-	return splitprefix(GatewayPrefix, c.Subject)
+func (c *Claims) GatewayID() (id string) {
+	if c.EntityTyp == EntityGateway {
+		id = c.EntityID
+	}
+	return
 }
 
 // HasRights checks whether or not the provided rights are included in the claims.
