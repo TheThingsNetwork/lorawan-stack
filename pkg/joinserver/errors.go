@@ -27,6 +27,14 @@ func init() {
 	ErrDevNonceReused.Register()
 	ErrCorruptRegistry.Register()
 	ErrMACVersionMismatch.Register()
+	ErrAddressMismatch.Register()
+	ErrNoSession.Register()
+	ErrAppSKeyEnvelopeNotFound.Register()
+	ErrNwkSEncKeyEnvelopeNotFound.Register()
+	ErrFNwkSIntKeyEnvelopeNotFound.Register()
+	ErrSNwkSIntKeyEnvelopeNotFound.Register()
+	ErrMissingSessionKeyID.Register()
+	ErrSessionKeyIDMismatch.Register()
 }
 
 // ErrMICComputeFailed represents error occurring when MIC computation fails.
@@ -196,4 +204,60 @@ var ErrDevNonceTooHigh = &errors.ErrDescriptor{
 	MessageFormat: "DevNonce is too high",
 	Type:          errors.InvalidArgument,
 	Code:          24,
+}
+
+// ErrAddressMismatch represents error ocurring when the address of a component does not match the one associated with the device.
+var ErrAddressMismatch = &errors.ErrDescriptor{
+	MessageFormat: "{component} address mismatch",
+	Type:          errors.PermissionDenied,
+	Code:          25,
+}
+
+// ErrNoSession represents error ocurring when there is no session associated with the device.
+var ErrNoSession = &errors.ErrDescriptor{
+	MessageFormat: "Device has no session associated with it",
+	Type:          errors.NotFound,
+	Code:          26,
+}
+
+// ErrSessionKeyIDMismatch represents error ocurring when the specified Session Key ID does not match any of the ones associated with the device.
+var ErrSessionKeyIDMismatch = &errors.ErrDescriptor{
+	MessageFormat: "Session key ID mismatch",
+	Type:          errors.InvalidArgument,
+	Code:          27,
+}
+
+// ErrAppSKeyEnvelopeNotFound represents error ocurring when AppSKey envelope was not found for device.
+var ErrAppSKeyEnvelopeNotFound = &errors.ErrDescriptor{
+	MessageFormat: "AppSKey envelope not found for device",
+	Type:          errors.NotFound,
+	Code:          28,
+}
+
+// ErrNwkSEncKeyEnvelopeNotFound represents error ocurring when NwkSEncKey envelope was not found for device.
+var ErrNwkSEncKeyEnvelopeNotFound = &errors.ErrDescriptor{
+	MessageFormat: "NwkSEncKey envelope not found for device",
+	Type:          errors.NotFound,
+	Code:          29,
+}
+
+// ErrFNwkSIntKeyEnvelopeNotFound represents error ocurring when FNwkSIntKey envelope was not found for device.
+var ErrFNwkSIntKeyEnvelopeNotFound = &errors.ErrDescriptor{
+	MessageFormat: "FNwkSIntKey envelope not found for device",
+	Type:          errors.NotFound,
+	Code:          30,
+}
+
+// ErrSNwkSIntKeyEnvelopeNotFound represents error ocurring when SNwkSIntKey envelope was not found for device.
+var ErrSNwkSIntKeyEnvelopeNotFound = &errors.ErrDescriptor{
+	MessageFormat: "SNwkSIntKey envelope not found for device",
+	Type:          errors.NotFound,
+	Code:          31,
+}
+
+// ErrMissingSessionKeyID represents error ocurring when SessionKeyID is missing.
+var ErrMissingSessionKeyID = &errors.ErrDescriptor{
+	MessageFormat: "SessionKeyID is missing",
+	Type:          errors.InvalidArgument,
+	Code:          32,
 }

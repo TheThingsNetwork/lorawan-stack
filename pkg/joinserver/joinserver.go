@@ -143,8 +143,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		return nil, err
 	}
 
-	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.NetworkServerURL {
-		return nil, errors.New("Network Server URL mismatch")
+	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.NetworkServerAddress {
+		return nil, ErrAddressMismatch.New(errors.Attributes{
+			"component": "network server",
+		})
 	}
 
 	if dev.LoRaWANVersion != ttnpb.MAC_V1_0 {
@@ -326,6 +328,13 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 }
 
 func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
+	if req.DevEUI.IsZero() {
+		return nil, ErrMissingDevEUI.New(nil)
+	}
+	if req.SessionKeyID == "" {
+		return nil, ErrMissingSessionKeyID.New(nil)
+	}
+
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
 		DevEUI: &req.DevEUI,
 	})
@@ -333,22 +342,26 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		return nil, err
 	}
 
-	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.ApplicationServerURL {
-		return nil, errors.New("Application Server URL mismatch")
+	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.ApplicationServerAddress {
+		return nil, ErrAddressMismatch.New(errors.Attributes{
+			"component": "application server",
+		})
 	}
+
 	s := dev.GetSession()
 	if s == nil {
-		if s = dev.GetSessionFallback(); s == nil {
-			return nil, errors.New("Device has no session associated")
+		return nil, ErrNoSession.New(nil)
+	}
+	if s.GetSessionKeyID() != req.GetSessionKeyID() {
+		s = dev.GetSessionFallback()
+		if s == nil || s.GetSessionKeyID() != req.GetSessionKeyID() {
+			return nil, ErrSessionKeyIDMismatch.New(nil)
 		}
 	}
 
-	if s.GetSessionKeyID() != req.GetSessionKeyID() {
-		return nil, errors.New("Session key ID mismatch")
-	}
 	appSKey := s.GetAppSKey()
 	if appSKey == nil {
-		return nil, errors.New("AppSKey not found")
+		return nil, ErrAppSKeyEnvelopeNotFound.New(nil)
 	}
 	// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
 	return &ttnpb.AppSKeyResponse{
@@ -356,7 +369,14 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 	}, nil
 }
 
-func (js *JoinServer) GetNwkKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkKeyResponse, error) {
+func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
+	if req.DevEUI.IsZero() {
+		return nil, ErrMissingDevEUI.New(nil)
+	}
+	if req.SessionKeyID == "" {
+		return nil, ErrMissingSessionKeyID.New(nil)
+	}
+
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
 		DevEUI: &req.DevEUI,
 	})
@@ -364,35 +384,37 @@ func (js *JoinServer) GetNwkKeys(ctx context.Context, req *ttnpb.SessionKeyReque
 		return nil, err
 	}
 
-	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.NetworkServerURL {
-		return nil, errors.New("Network Server URL mismatch")
+	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.NetworkServerAddress {
+		return nil, ErrAddressMismatch.New(errors.Attributes{
+			"component": "network server",
+		})
 	}
 
 	s := dev.GetSession()
 	if s == nil {
-		return nil, errors.New("Device has no session associated")
+		return nil, ErrNoSession.New(nil)
 	}
 	if s.GetSessionKeyID() != req.GetSessionKeyID() {
 		s = dev.GetSessionFallback()
 		if s == nil || s.GetSessionKeyID() != req.GetSessionKeyID() {
-			return nil, errors.New("Session key ID mismatch")
+			return nil, ErrSessionKeyIDMismatch.New(nil)
 		}
 	}
 
 	nwkSEncKey := s.GetNwkSEncKey()
 	if nwkSEncKey == nil {
-		return nil, errors.New("NwkSEncKey not found")
+		return nil, ErrNwkSEncKeyEnvelopeNotFound.New(nil)
 	}
 	fNwkSIntKey := s.GetFNwkSIntKey()
 	if fNwkSIntKey == nil {
-		return nil, errors.New("FNwkSIntKey not found")
+		return nil, ErrFNwkSIntKeyEnvelopeNotFound.New(nil)
 	}
 	sNwkSIntKey := s.GetSNwkSIntKey()
 	if sNwkSIntKey == nil {
-		return nil, errors.New("SNwkSIntKey not found")
+		return nil, ErrSNwkSIntKeyEnvelopeNotFound.New(nil)
 	}
 	// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
-	return &ttnpb.NwkKeyResponse{
+	return &ttnpb.NwkSKeysResponse{
 		NwkSEncKey:  *nwkSEncKey,
 		FNwkSIntKey: *fNwkSIntKey,
 		SNwkSIntKey: *sNwkSIntKey,
