@@ -34,7 +34,20 @@ type subBandScheduling struct {
 	dutyCycle         band.DutyCycle
 	schedulingWindows []packetWindow
 
+	currentConcentratorTimestamp uint64
+
 	mu sync.Mutex
+}
+
+func (s *subBandScheduling) expired(t Timestamp) bool {
+	switch t.(type) {
+	case realTime:
+		return time.Time(t.(realTime)).Add(dutyCycleWindow).Before(time.Now())
+	case concentratorTimestamp:
+		return uint64(t.(concentratorTimestamp))+uint64(dutyCycleWindow) < s.currentConcentratorTimestamp
+	default:
+		return false
+	}
 }
 
 func (s *subBandScheduling) bgCleanup(ctx context.Context) {
@@ -45,8 +58,10 @@ func (s *subBandScheduling) bgCleanup(ctx context.Context) {
 		case <-time.After(cleanupDelay):
 			s.mu.Lock()
 			for i, w := range s.schedulingWindows {
-				if w.window.End().Add(dutyCycleWindow).Before(time.Now()) {
-					s.schedulingWindows = append(s.schedulingWindows[:i], s.schedulingWindows[i+1:]...)
+				if realTime, ok := w.window.End().(realTime); ok {
+					if time.Time(realTime).Add(dutyCycleWindow).Before(time.Now()) {
+						s.schedulingWindows = append(s.schedulingWindows[:i], s.schedulingWindows[i+1:]...)
+					}
 				}
 			}
 			s.mu.Unlock()
@@ -112,7 +127,7 @@ func (s *subBandScheduling) schedule(w Span, timeOffAir *ttnpb.FrequencyPlan_Tim
 }
 
 // ScheduleAnytime requires a scheduling window if there is no time.Time constraint.
-func (s *subBandScheduling) ScheduleAnytime(minimum time.Time, d time.Duration, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) (Span, error) {
+func (s *subBandScheduling) ScheduleAnytime(minimum Timestamp, d time.Duration, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) (Span, error) {
 	minimumSpan := Span{Start: minimum, Duration: d}
 	if err := s.ScheduleAt(minimumSpan, timeOffAir); err == nil {
 		return minimumSpan, nil
@@ -121,7 +136,7 @@ func (s *subBandScheduling) ScheduleAnytime(minimum time.Time, d time.Duration, 
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	potentialTimings := []time.Time{}
+	potentialTimings := []Timestamp{}
 	emissionWindows := []Span{}
 
 	for _, window := range s.schedulingWindows {
@@ -134,7 +149,7 @@ func (s *subBandScheduling) ScheduleAnytime(minimum time.Time, d time.Duration, 
 		}
 	}
 
-	var potentialTiming time.Time
+	var potentialTiming Timestamp
 	for _, potentialTiming = range potentialTimings {
 		w := Span{Start: potentialTiming, Duration: d}
 		err := s.schedule(w, timeOffAir)
@@ -151,7 +166,7 @@ func (s *subBandScheduling) ScheduleAnytime(minimum time.Time, d time.Duration, 
 	return w, err
 }
 
-func firstMomentConsideringDutyCycle(spans []Span, dutyCycle float32, minimum time.Time, duration time.Duration) time.Time {
+func firstMomentConsideringDutyCycle(spans []Span, dutyCycle float32, minimum Timestamp, duration time.Duration) Timestamp {
 	if len(spans) == 0 {
 		return minimum
 	}
@@ -165,7 +180,7 @@ func firstMomentConsideringDutyCycle(spans []Span, dutyCycle float32, minimum ti
 	return lastWindow.Start.Add(-1 * margin).Add(dutyCycleWindow)
 }
 
-func createPacketWindow(start time.Time, duration time.Duration, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) packetWindow {
+func createPacketWindow(start Timestamp, duration time.Duration, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) packetWindow {
 	window := Span{Start: start, Duration: duration}
 	finalEmissionWindow := packetWindow{window: window, timeOffAir: window.timeOffAir(timeOffAir)}
 	return finalEmissionWindow

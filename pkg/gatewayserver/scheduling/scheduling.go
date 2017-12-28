@@ -56,10 +56,12 @@ func init() {
 type Scheduler interface {
 	// ScheduleAt adds the requested timespan to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns ErrScheduleFull. If another error prevents scheduling, it is returned.
 	ScheduleAt(s Span, channel uint64) error
-	// ScheduleAnytime requires a scheduling window if there is no time.Time constraint.
-	ScheduleAnytime(minimum time.Time, d time.Duration, channel uint64) (Span, error)
+	// ScheduleAnytime requires a scheduling window if there is no timestamp constraint.
+	ScheduleAnytime(minimum Timestamp, d time.Duration, channel uint64) (Span, error)
 	// RegisterEmission that has happened during that timespan, on that specific channel.
 	RegisterEmission(s Span, channel uint64) error
+	// SetCurrentConcentratorTimestamp
+	SetCurrentConcentratorTimestamp(uint64)
 }
 
 // FrequencyPlanScheduler returns a scheduler based on the frequency plan, and starts a goroutine for cleanup. The scheduler is based on the dwell time, time off air, and the frequency plan's band. Assumption is made that no two duty cycles on a given band overlap.
@@ -96,6 +98,12 @@ type frequencyPlanScheduling struct {
 	subBands []*subBandScheduling
 }
 
+func (f *frequencyPlanScheduling) SetCurrentConcentratorTimestamp(ts uint64) {
+	for _, subBand := range f.subBands {
+		subBand.currentConcentratorTimestamp = ts
+	}
+}
+
 func (f frequencyPlanScheduling) findSubBand(channel uint64) (*subBandScheduling, error) {
 	for _, subBand := range f.subBands {
 		if subBand.dutyCycle.Comprises(channel) {
@@ -119,7 +127,7 @@ func (f frequencyPlanScheduling) ScheduleAt(s Span, channel uint64) error {
 	return subBand.ScheduleAt(s, f.timeOffAir)
 }
 
-func (f frequencyPlanScheduling) ScheduleAnytime(minimum time.Time, d time.Duration, channel uint64) (Span, error) {
+func (f frequencyPlanScheduling) ScheduleAnytime(minimum Timestamp, d time.Duration, channel uint64) (Span, error) {
 	subBand, err := f.findSubBand(channel)
 	if err != nil {
 		return Span{}, err

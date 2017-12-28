@@ -14,25 +14,25 @@ import (
 func TestWindowTiming(t *testing.T) {
 	a := assertions.New(t)
 
-	testingTime := time.Now()
+	testingTime := FromSystemTimestamp(time.Now())
 	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
 	}
 
-	a.So(s.End(), should.Equal, testingTime.Add(time.Second))
+	a.So(s.End().Equal(testingTime.Add(time.Second)), should.BeTrue)
 }
 
 func TestWindowContains(t *testing.T) {
 	a := assertions.New(t)
 
-	testingTime := time.Now()
+	testingTime := FromSystemTimestamp(time.Now())
 	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
 	}
 
-	comparisons := map[time.Time]bool{
+	comparisons := map[Timestamp]bool{
 		testingTime: true,
 
 		testingTime.Add(time.Second):      true,
@@ -50,7 +50,7 @@ func TestWindowContains(t *testing.T) {
 func TestPrecedingComparison(t *testing.T) {
 	a := assertions.New(t)
 
-	testingTime := time.Now()
+	testingTime := FromSystemTimestamp(time.Now())
 	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
@@ -82,7 +82,7 @@ func TestPrecedingComparison(t *testing.T) {
 func TestIsProlongedByComparison(t *testing.T) {
 	a := assertions.New(t)
 
-	testingTime := time.Now()
+	testingTime := FromSystemTimestamp(time.Now())
 	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
@@ -114,7 +114,7 @@ func TestIsProlongedByComparison(t *testing.T) {
 func TestOverlap(t *testing.T) {
 	a := assertions.New(t)
 
-	testingTime := time.Now()
+	testingTime := FromSystemTimestamp(time.Now())
 	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
@@ -147,7 +147,7 @@ func TestOverlap(t *testing.T) {
 func TestTimeOffAir(t *testing.T) {
 	a := assertions.New(t)
 
-	testingTime := time.Now()
+	testingTime := FromSystemTimestamp(time.Now())
 	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
@@ -161,7 +161,7 @@ func TestTimeOffAir(t *testing.T) {
 
 	for compared, result := range comparisons {
 		timeOffAirWindow := s.timeOffAir(&compared)
-		a.So(timeOffAirWindow.Start, should.Equal, s.End())
+		a.So(timeOffAirWindow.Start.Equal(s.End()), should.BeTrue)
 		a.So(timeOffAirWindow.Duration, should.Equal, result)
 	}
 
