@@ -12,6 +12,7 @@ const DefaultCacheExpiry = time.Hour
 
 type cacheEntry struct {
 	fp      ttnpb.FrequencyPlan
+	err     error
 	lastHit time.Time
 }
 
@@ -48,15 +49,14 @@ func (c *cache) GetAllIDs() []string {
 func (c *cache) GetByID(id string) (ttnpb.FrequencyPlan, error) {
 	entry, hit := c.fps[id]
 	if hit && entry.lastHit.After(time.Now().Add(-1*c.expiry)) {
-		return entry.fp, nil
+		return entry.fp, entry.err
 	}
 
 	fp, err := c.s.GetByID(id)
-	if err == nil {
-		c.fps[id] = cacheEntry{
-			fp:      fp,
-			lastHit: time.Now(),
-		}
+	c.fps[id] = cacheEntry{
+		fp:      fp,
+		err:     err,
+		lastHit: time.Now(),
 	}
 	return fp, err
 }
