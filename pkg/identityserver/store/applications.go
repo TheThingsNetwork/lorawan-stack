@@ -52,7 +52,8 @@ type ApplicationStore interface {
 	HasUserRights(appID, userID string, rights ...ttnpb.Right) (bool, error)
 
 	// ListCollaborators retrieves all the collaborators from an application.
-	ListCollaborators(appID string) ([]*ttnpb.ApplicationCollaborator, error)
+	// Optionally a list of rights can be passed to filter them.
+	ListCollaborators(appID string, rights ...ttnpb.Right) ([]*ttnpb.ApplicationCollaborator, error)
 
 	// ListUserRights returns the rights a given User has for an Application.
 	ListUserRights(appID string, userID string) ([]ttnpb.Right, error)

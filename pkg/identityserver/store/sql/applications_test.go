@@ -153,6 +153,23 @@ func TestApplicationCollaborators(t *testing.T) {
 		a.So(collaborators, should.Contain, collaborator)
 	}
 
+	// test ListCollaborators filter
+	{
+		collaborators, err := s.Applications.ListCollaborators(app.ApplicationID, ttnpb.Right(999))
+		a.So(err, should.BeNil)
+		a.So(collaborators, should.HaveLength, 0)
+
+		collaborators, err = s.Applications.ListCollaborators(app.ApplicationID, ttnpb.Right(1))
+		a.So(err, should.BeNil)
+		a.So(collaborators, should.HaveLength, 1)
+		a.So(collaborators, should.Contain, collaborator)
+
+		collaborators, err = s.Applications.ListCollaborators(app.ApplicationID, ttnpb.Right(1), ttnpb.Right(3))
+		a.So(err, should.BeNil)
+		a.So(collaborators, should.HaveLength, 0)
+
+	}
+
 	// fetch applications where Alice is collaborator
 	{
 		apps, err := s.Applications.ListByUser(user.UserID, applicationFactory)

@@ -349,21 +349,51 @@ func (s *ApplicationStore) hasUserRights(q db.QueryContext, appID, userID string
 }
 
 // ListCollaborators retrieves all the collaborators from an entity.
-func (s *ApplicationStore) ListCollaborators(appID string) ([]*ttnpb.ApplicationCollaborator, error) {
-	return s.listCollaborators(s.queryer(), appID)
+func (s *ApplicationStore) ListCollaborators(appID string, rights ...ttnpb.Right) ([]*ttnpb.ApplicationCollaborator, error) {
+	return s.listCollaborators(s.queryer(), appID, rights...)
 }
 
-func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID string) ([]*ttnpb.ApplicationCollaborator, error) {
+func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID string, rights ...ttnpb.Right) ([]*ttnpb.ApplicationCollaborator, error) {
+	query := ""
+	args := make([]interface{}, 1)
+	args[0] = appID
+
+	if len(rights) == 0 {
+		query = `
+		SELECT user_id, "right"
+			FROM applications_collaborators
+			WHERE application_id = $1`
+	} else {
+		rightsClause := make([]string, 0, len(rights))
+		for _, right := range rights {
+			rightsClause = append(rightsClause, fmt.Sprintf(`"right" = '%d'`, right))
+		}
+
+		query = fmt.Sprintf(`
+			SELECT user_id, "right"
+	    	FROM applications_collaborators
+	    	WHERE application_id = $1 AND user_id IN
+	    	(
+	      	SELECT user_id
+	      		FROM
+	      			(
+	          		SELECT user_id, count(user_id) as count
+	          	  	FROM applications_collaborators
+	          			WHERE application_id = $1 AND (%s)
+	          			GROUP BY user_id
+	      			)
+	      		WHERE count = $2
+	  		)`,
+			strings.Join(rightsClause, " OR "))
+
+		args = append(args, len(rights))
+	}
+
 	var collaborators []struct {
 		*ttnpb.ApplicationCollaborator
 		Right ttnpb.Right
 	}
-	err := q.Select(
-		&collaborators,
-		`SELECT user_id, "right"
-			FROM applications_collaborators
-			WHERE application_id = $1`,
-		appID)
+	err := q.Select(&collaborators, query, args...)
 	if !db.IsNoRows(err) && err != nil {
 		return nil, err
 	}

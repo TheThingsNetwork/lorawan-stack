@@ -723,21 +723,51 @@ func (s *GatewayStore) hasUserRights(q db.QueryContext, gtwID, userID string, ri
 }
 
 // ListCollaborators retrieves all the collaborators from an entity.
-func (s *GatewayStore) ListCollaborators(gtwID string) ([]*ttnpb.GatewayCollaborator, error) {
-	return s.listCollaborators(s.queryer(), gtwID)
+func (s *GatewayStore) ListCollaborators(gtwID string, rights ...ttnpb.Right) ([]*ttnpb.GatewayCollaborator, error) {
+	return s.listCollaborators(s.queryer(), gtwID, rights...)
 }
 
-func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID string) ([]*ttnpb.GatewayCollaborator, error) {
+func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID string, rights ...ttnpb.Right) ([]*ttnpb.GatewayCollaborator, error) {
+	query := ""
+	args := make([]interface{}, 1)
+	args[0] = gtwID
+
+	if len(rights) == 0 {
+		query = `
+		SELECT user_id, "right"
+			FROM gateways_collaborators
+			WHERE gateway_id = $1`
+	} else {
+		rightsClause := make([]string, 0, len(rights))
+		for _, right := range rights {
+			rightsClause = append(rightsClause, fmt.Sprintf(`"right" = '%d'`, right))
+		}
+
+		query = fmt.Sprintf(`
+			SELECT user_id, "right"
+	    	FROM gateways_collaborators
+	    	WHERE gateway_id = $1 AND user_id IN
+	    	(
+	      	SELECT user_id
+	      		FROM
+	      			(
+	          		SELECT user_id, count(user_id) as count
+	          	  	FROM gateways_collaborators
+	          			WHERE gateway_id = $1 AND (%s)
+	          			GROUP BY user_id
+	      			)
+	      		WHERE count = $2
+	  		)`,
+			strings.Join(rightsClause, " OR "))
+
+		args = append(args, len(rights))
+	}
+
 	var collaborators []struct {
 		*ttnpb.GatewayCollaborator
 		Right ttnpb.Right
 	}
-	err := q.Select(
-		&collaborators,
-		`SELECT user_id, "right"
-			FROM gateways_collaborators
-			WHERE gateway_id = $1`,
-		gtwID)
+	err := q.Select(&collaborators, query, args...)
 	if !db.IsNoRows(err) && err != nil {
 		return nil, err
 	}

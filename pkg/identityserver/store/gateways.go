@@ -52,7 +52,8 @@ type GatewayStore interface {
 	HasUserRights(gtwID, userID string, rights ...ttnpb.Right) (bool, error)
 
 	// ListCollaborators retrieves all the gateway collaborators.
-	ListCollaborators(gtwID string) ([]*ttnpb.GatewayCollaborator, error)
+	// Optionally a list of rights can be passed to filter them.
+	ListCollaborators(gtwID string, rights ...ttnpb.Right) ([]*ttnpb.GatewayCollaborator, error)
 
 	// ListUserRights returns the rights the user has for a gateway.
 	ListUserRights(gtwID string, userID string) ([]ttnpb.Right, error)
