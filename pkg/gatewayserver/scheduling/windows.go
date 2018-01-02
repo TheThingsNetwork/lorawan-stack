@@ -97,10 +97,8 @@ func (s Span) timeOffAir(timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) (timeOffAir
 	}
 
 	timeOffAirSpan.Duration = time.Duration(timeOffAir.Fraction * float32(s.Duration))
-	if timeOffAir.Duration != nil {
-		if *timeOffAir.Duration > timeOffAirSpan.Duration {
-			timeOffAirSpan.Duration = *timeOffAir.Duration
-		}
+	if timeOffAir.Duration != nil && *timeOffAir.Duration > timeOffAirSpan.Duration {
+		timeOffAirSpan.Duration = *timeOffAir.Duration
 	}
 
 	return

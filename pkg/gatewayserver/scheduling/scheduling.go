@@ -125,8 +125,7 @@ func (f frequencyPlanScheduling) ScheduleFlexible(minimum time.Time, d time.Dura
 		return Span{}, err
 	}
 
-	s, err := subBand.ScheduleFlexible(minimum, d, f.timeOffAir)
-	return s, err
+	return subBand.ScheduleFlexible(minimum, d, f.timeOffAir)
 }
 
 func (f frequencyPlanScheduling) RegisterEmission(s Span, channel uint64) error {
