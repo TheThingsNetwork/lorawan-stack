@@ -15,20 +15,17 @@ import (
 	"google.golang.org/grpc"
 )
 
-// TokenInfoProvider is the interface that online validates and introspects
-// OAuth access tokens.
-type TokenInfoProvider interface {
+// TokenKeyInfoProvider is the interface that validates and introspects OAuth
+// access tokens and API keys.
+type TokenKeyInfoProvider interface {
 	// TokenInfo returns the access data of an OAuth access token.
 	// It returns error if token is expired.
 	TokenInfo(accessToken string) (*types.AccessData, error)
-}
 
-// KeyInfoProvider is the interface that online validates and introspects API keys.
-type KeyInfoProvider interface {
 	// KeyInfo returns the entityID an API key belongs to and its rights.
 	// The Resource Server must check that the entityID of the API key matches
 	// with the resource that is trying to being access to.
-	KeyInfo(key string) (string, *ttnpb.APIKey, error)
+	KeyInfo(key string, typ auth.APIKeyType) (string, *ttnpb.APIKey, error)
 }
 
 // claims constructs the claims based on the authentication values in the request
@@ -38,7 +35,7 @@ type KeyInfoProvider interface {
 //       the TokenInfoProvider and then claims are built based on this.
 //   - A key is provided: it is introspected (and therefore validated) through
 //       the KeyInfoProvider and then claims are built based on this.
-func claims(ctx context.Context, t TokenInfoProvider, k KeyInfoProvider) (*auth.Claims, error) {
+func claims(ctx context.Context, tokenkey TokenKeyInfoProvider) (*auth.Claims, error) {
 	md := rpcmetadata.FromIncomingContext(ctx)
 
 	if md.AuthType == "" && md.AuthValue == "" {
@@ -57,7 +54,7 @@ func claims(ctx context.Context, t TokenInfoProvider, k KeyInfoProvider) (*auth.
 	var claims *auth.Claims
 	switch header.Type {
 	case auth.Token:
-		data, err := t.TokenInfo(md.AuthValue)
+		data, err := tokenkey.TokenInfo(md.AuthValue)
 		if err != nil {
 			return nil, err
 		}
@@ -67,14 +64,14 @@ func claims(ctx context.Context, t TokenInfoProvider, k KeyInfoProvider) (*auth.
 			return nil, err
 		}
 
-		claims = &Claims{
+		claims = &auth.Claims{
 			EntityID:  data.UserID,
 			EntityTyp: auth.EntityUser,
 			Source:    auth.Token,
 			Rights:    rights,
 		}
 	case auth.Key:
-		entityID, key, err := k.KeyInfo(md.AuthValue)
+		entityID, key, err := tokenkey.KeyInfo(md.AuthValue, payload.Type)
 		if err != nil {
 			return nil, err
 		}
@@ -105,9 +102,9 @@ func claims(ctx context.Context, t TokenInfoProvider, k KeyInfoProvider) (*auth.
 // UnaryServerInterceptor returns a new unary server interceptor that construct
 // the claims based on the authentication value in the request metadata.
 // Empty claims are injected if authentication is missing in the request metadata.
-func UnaryServerInterceptor(t TokenInfoProvider, k KeyInfoProvider) grpc.UnaryServerInterceptor {
+func UnaryServerInterceptor(tokenkey TokenKeyInfoProvider) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		c, err := claims(ctx, t, k)
+		c, err := claims(ctx, tokenkey)
 		if err != nil {
 			return nil, err
 		}
@@ -119,9 +116,9 @@ func UnaryServerInterceptor(t TokenInfoProvider, k KeyInfoProvider) grpc.UnarySe
 // StreamServerInterceptor returns a new unary server interceptor that construct
 // the claims based on the authentication value in the request metadata.
 // Empty claims are injected if authentication is missing in the request metadata.
-func StreamServerInterceptor(t TokenInfoProvider, k KeyInfoProvider) grpc.StreamServerInterceptor {
+func StreamServerInterceptor(tokenkey TokenKeyInfoProvider) grpc.StreamServerInterceptor {
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
-		c, err := claims(stream.Context(), t, k)
+		c, err := claims(stream.Context(), tokenkey)
 		if err != nil {
 			return err
 		}
