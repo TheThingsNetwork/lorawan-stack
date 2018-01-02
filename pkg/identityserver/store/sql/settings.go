@@ -42,6 +42,9 @@ func (s *SettingStore) get(q db.QueryContext) (*ttnpb.IdentityServerSettings, er
 				updated_at
 			FROM settings
 			WHERE id = 1`)
+	if db.IsNoRows(err) {
+		return nil, ErrSettingsNotFound.New(nil)
+	}
 	if err != nil {
 		return nil, err
 	}

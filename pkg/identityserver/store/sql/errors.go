@@ -30,6 +30,8 @@ func init() {
 
 	ErrAPIKeyNotFound.Register()
 	ErrAPIKeyNameConflict.Register()
+
+	ErrSettingsNotFound.Register()
 }
 
 // ErrApplicationNotFound is returned when trying to fetch an application that
@@ -223,4 +225,12 @@ var ErrAPIKeyNameConflict = &errors.ErrDescriptor{
 	SafeAttributes: []string{
 		"name",
 	},
+}
+
+// ErrSettingsNotFound is returned when trying to fetch the Identity Server
+// settings from the database but these are not set.
+var ErrSettingsNotFound = &errors.ErrDescriptor{
+	MessageFormat: "settings not found",
+	Code:          407,
+	Type:          errors.NotFound,
 }
