@@ -17,7 +17,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-func TestDeviceRegistry(t *testing.T) {
+func TestRegistry(t *testing.T) {
 	a := assertions.New(t)
 	r := New(store.NewTypedStoreClient(mapstore.New()))
 
@@ -31,7 +31,56 @@ func TestDeviceRegistry(t *testing.T) {
 		a.So(device.EndDevice, should.Resemble, ed)
 	}
 
-	found, err := r.FindDeviceByIdentifiers(&ttnpb.EndDeviceIdentifiers{
+	found, err := r.FindBy(ed)
+	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
+		a.So(pretty.Diff(found[0].EndDevice, ed), should.BeEmpty)
+	}
+
+	updated := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+	for device.EndDeviceIdentifiers == updated.EndDeviceIdentifiers {
+		updated = ttnpb.NewPopulatedEndDevice(test.Randy, false)
+	}
+	device.EndDevice = updated
+	if !a.So(device.Update(), should.BeNil) {
+		return
+	}
+
+	found, err = r.FindBy(ed)
+	a.So(err, should.BeNil)
+	if a.So(found, should.NotBeNil) {
+		a.So(found, should.HaveLength, 0)
+	}
+
+	found, err = r.FindBy(updated)
+	a.So(err, should.BeNil)
+	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
+		a.So(pretty.Diff(found[0].EndDevice, updated), should.BeEmpty)
+	}
+
+	a.So(device.Delete(), should.BeNil)
+
+	found, err = r.FindBy(updated)
+	a.So(err, should.BeNil)
+	if a.So(found, should.NotBeNil) {
+		a.So(found, should.HaveLength, 0)
+	}
+}
+
+func TestFindDeviceByIdentifiers(t *testing.T) {
+	a := assertions.New(t)
+	r := New(store.NewTypedStoreClient(mapstore.New()))
+
+	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+
+	device, err := r.Create(ed)
+	if !a.So(err, should.BeNil) {
+		return
+	}
+	if a.So(device, should.NotBeNil) {
+		a.So(device.EndDevice, should.Resemble, ed)
+	}
+
+	found, err := FindDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
 		DevEUI:        ed.DevEUI,
 		JoinEUI:       ed.JoinEUI,
 		DevAddr:       ed.DevAddr,
@@ -52,7 +101,7 @@ func TestDeviceRegistry(t *testing.T) {
 		return
 	}
 
-	found, err = r.FindDeviceByIdentifiers(&ttnpb.EndDeviceIdentifiers{
+	found, err = FindDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
 		DevEUI:        ed.DevEUI,
 		JoinEUI:       ed.JoinEUI,
 		DevAddr:       ed.DevAddr,
@@ -64,7 +113,7 @@ func TestDeviceRegistry(t *testing.T) {
 		a.So(found, should.HaveLength, 0)
 	}
 
-	found, err = r.FindDeviceByIdentifiers(&ttnpb.EndDeviceIdentifiers{
+	found, err = FindDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
 		DevEUI:        updated.DevEUI,
 		JoinEUI:       updated.JoinEUI,
 		DevAddr:       updated.DevAddr,
@@ -78,7 +127,7 @@ func TestDeviceRegistry(t *testing.T) {
 
 	a.So(device.Delete(), should.BeNil)
 
-	found, err = r.FindDeviceByIdentifiers(&ttnpb.EndDeviceIdentifiers{
+	found, err = FindDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
 		DevEUI:        updated.DevEUI,
 		JoinEUI:       updated.JoinEUI,
 		DevAddr:       updated.DevAddr,
@@ -178,7 +227,7 @@ func ExampleRegistry() {
 		panic(fmt.Errorf("Failed to update device %s", err))
 	}
 
-	devs, err := r.FindDeviceByIdentifiers(&ttnpb.EndDeviceIdentifiers{
+	devs, err := FindDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
 		ApplicationID: "test",
 	})
 	if err != nil {

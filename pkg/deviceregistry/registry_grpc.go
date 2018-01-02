@@ -54,39 +54,39 @@ type RegistryRPC struct {
 	}
 }
 
-// Option represents RegistryRPC option
-type Option func(*RegistryRPC)
+// OptionRPC represents RegistryRPC option
+type OptionRPC func(*RegistryRPC)
 
 // WithListDevicesCheck sets a check to ListDevices method of RegistryRPC instance.
 // ListDevices first executes fn and if error is returned by it,
 // returns error, otherwise execution advances as usual.
-func WithListDevicesCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) Option {
+func WithListDevicesCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) OptionRPC {
 	return func(r *RegistryRPC) { r.checks.ListDevices = fn }
 }
 
 // WithGetDeviceCheck sets a check to GetDevice method of RegistryRPC instance.
 // GetDevice first executes fn and if error is returned by it,
 // returns error, otherwise execution advances as usual.
-func WithGetDeviceCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) Option {
+func WithGetDeviceCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) OptionRPC {
 	return func(r *RegistryRPC) { r.checks.GetDevice = fn }
 }
 
 // WithSetDeviceCheck sets a check to SetDevice method of RegistryRPC instance.
 // SetDevice first executes fn and if error is returned by it,
 // returns error, otherwise execution advances as usual.
-func WithSetDeviceCheck(fn func(context.Context, *ttnpb.EndDevice) error) Option {
+func WithSetDeviceCheck(fn func(context.Context, *ttnpb.EndDevice) error) OptionRPC {
 	return func(r *RegistryRPC) { r.checks.SetDevice = fn }
 }
 
 // WithDeleteDeviceCheck sets a check to DeleteDevice method of RegistryRPC instance.
 // DeleteDevice first executes fn and if error is returned by it,
 // returns error, otherwise execution advances as usual.
-func WithDeleteDeviceCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) Option {
+func WithDeleteDeviceCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) OptionRPC {
 	return func(r *RegistryRPC) { r.checks.DeleteDevice = fn }
 }
 
 // NewRPC returns a new instance of RegistryRPC
-func NewRPC(c *component.Component, r Interface, opts ...Option) *RegistryRPC {
+func NewRPC(c *component.Component, r Interface, opts ...OptionRPC) *RegistryRPC {
 	rpc := &RegistryRPC{
 		Component: c,
 		Interface: r,
@@ -108,7 +108,7 @@ func (r *RegistryRPC) ListDevices(ctx context.Context, filter *ttnpb.EndDeviceId
 		}
 	}
 
-	devs, err := r.Interface.FindDeviceByIdentifiers(filter)
+	devs, err := FindDeviceByIdentifiers(r.Interface, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (r *RegistryRPC) GetDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifi
 		}
 	}
 
-	devs, err := r.Interface.FindDeviceByIdentifiers(id)
+	devs, err := FindDeviceByIdentifiers(r.Interface, id)
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +164,7 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, dev *ttnpb.EndDevice) (*pbt
 		}
 	}
 
-	devs, err := r.Interface.FindDeviceByIdentifiers(&ttnpb.EndDeviceIdentifiers{DeviceID: dev.DeviceID})
+	devs, err := FindDeviceByIdentifiers(r.Interface, &ttnpb.EndDeviceIdentifiers{DeviceID: dev.DeviceID})
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +195,7 @@ func (r *RegistryRPC) DeleteDevice(ctx context.Context, id *ttnpb.EndDeviceIdent
 		}
 	}
 
-	devs, err := r.Interface.FindDeviceByIdentifiers(id)
+	devs, err := FindDeviceByIdentifiers(r.Interface, id)
 	if err != nil {
 		return nil, err
 	}

@@ -889,7 +889,7 @@ func TestHandleJoin(t *testing.T) {
 				return
 			}
 
-			dev, err := reg.FindDeviceByIdentifiers(&tc.Device.EndDeviceIdentifiers)
+			dev, err := deviceregistry.FindDeviceByIdentifiers(reg, &tc.Device.EndDeviceIdentifiers)
 			a.So(err, should.BeNil)
 			if a.So(dev, should.NotBeNil) && a.So(dev, should.HaveLength, 1) {
 				a.So(pretty.Diff(dev[0].EndDevice, tc.Device), should.BeEmpty)
@@ -917,7 +917,7 @@ func TestHandleJoin(t *testing.T) {
 			// ensure the stored device nonces are updated
 			time.Sleep(time.Millisecond)
 
-			dev, err = reg.FindDeviceByIdentifiers(&tc.Device.EndDeviceIdentifiers)
+			dev, err = deviceregistry.FindDeviceByIdentifiers(reg, &tc.Device.EndDeviceIdentifiers)
 			a.So(err, should.BeNil)
 			if a.So(dev, should.NotBeNil) && a.So(dev, should.HaveLength, 1) {
 				a.So(dev[0].GetNextDevNonce(), should.Equal, tc.NextNextDevNonce)
@@ -1125,7 +1125,7 @@ func TestGetAppSKey(t *testing.T) {
 				return
 			}
 
-			dev, err := reg.FindDeviceByIdentifiers(&tc.Device.EndDeviceIdentifiers)
+			dev, err := deviceregistry.FindDeviceByIdentifiers(reg, &tc.Device.EndDeviceIdentifiers)
 			a.So(err, should.BeNil)
 			if a.So(dev, should.NotBeNil) && a.So(dev, should.HaveLength, 1) {
 				a.So(pretty.Diff(dev[0].EndDevice, tc.Device), should.BeEmpty)
@@ -1371,7 +1371,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				return
 			}
 
-			dev, err := reg.FindDeviceByIdentifiers(&tc.Device.EndDeviceIdentifiers)
+			dev, err := deviceregistry.FindDeviceByIdentifiers(reg, &tc.Device.EndDeviceIdentifiers)
 			a.So(err, should.BeNil)
 			if a.So(dev, should.NotBeNil) && a.So(dev, should.HaveLength, 1) {
 				a.So(pretty.Diff(dev[0].EndDevice, tc.Device), should.BeEmpty)
