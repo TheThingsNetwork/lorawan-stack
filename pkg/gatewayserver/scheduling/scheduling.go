@@ -44,6 +44,14 @@ var (
 	}
 )
 
+func init() {
+	ErrDutyCycleFull.Register()
+	ErrOverlap.Register()
+	ErrTimeOffAir.Register()
+	ErrNoSubBandFound.Register()
+	ErrDwellTime.Register()
+}
+
 // Scheduler is an abstraction for an entity that manages the packet's timespans.
 type Scheduler interface {
 	// Schedule adds the requested timespan to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns ErrScheduleFull. If another error prevents scheduling, it is returned.
