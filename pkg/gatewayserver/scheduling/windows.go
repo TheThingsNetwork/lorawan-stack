@@ -73,18 +73,17 @@ func spanDurationSum(spans []Span, start, end time.Time) time.Duration {
 
 	spans = filterWithinInterval(spans, start, end)
 	for _, span := range spans {
-		spanInterval := struct {
-			start, end time.Time
-		}{start: span.Start, end: span.End()}
+		spanStart := span.Start
+		spanEnd := span.End()
 
-		if spanInterval.start.Before(start) {
-			spanInterval.start = start
+		if spanStart.Before(start) {
+			spanStart = start
 		}
-		if spanInterval.end.After(end) {
-			spanInterval.end = end
+		if spanEnd.After(end) {
+			spanEnd = end
 		}
 
-		duration = duration + spanInterval.end.Sub(spanInterval.start)
+		duration = duration + spanStart.Sub(spanEnd)
 	}
 
 	return duration
