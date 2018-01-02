@@ -32,8 +32,11 @@ type GatewayStore interface {
 	// SaveAPIKey stores an API Key attached to a gateway.
 	SaveAPIKey(gtwID string, key *ttnpb.APIKey) error
 
-	// GetAPIKey retrieves an API key from a gateway.
-	GetAPIKey(gtwID, keyName string) (*ttnpb.APIKey, error)
+	// GetAPIKey retrieves an API key by value and the gateway ID.
+	GetAPIKey(key string) (string, *ttnpb.APIKey, error)
+
+	// GetAPIKeyByName retrieves an API key from a gateway.
+	GetAPIKeyByName(gtwID, keyName string) (*ttnpb.APIKey, error)
 
 	// UpdateAPIKeyRights updates the right of an API key.
 	UpdateAPIKeyRights(gtwID, keyName string, rights []ttnpb.Right) error

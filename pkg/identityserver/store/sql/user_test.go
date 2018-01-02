@@ -201,7 +201,7 @@ func TestUserAPIKeys(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
-	found, err := s.Users.GetAPIKey(userID, key.Name)
+	found, err := s.Users.GetAPIKeyByName(userID, key.Name)
 	a.So(err, should.BeNil)
 	a.So(found, should.Resemble, key)
 
@@ -218,7 +218,7 @@ func TestUserAPIKeys(t *testing.T) {
 	err = s.Users.DeleteAPIKey(userID, key.Name)
 	a.So(err, should.BeNil)
 
-	found, err = s.Users.GetAPIKey(userID, key.Name)
+	found, err = s.Users.GetAPIKeyByName(userID, key.Name)
 	a.So(err, should.NotBeNil)
 	a.So(ErrAPIKeyNotFound.Describes(err), should.BeTrue)
 }

@@ -105,7 +105,7 @@ func TestGatewayAPIKeys(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
-	found, err := s.Gateways.GetAPIKey(gtwID, key.Name)
+	found, err := s.Gateways.GetAPIKeyByName(gtwID, key.Name)
 	a.So(err, should.BeNil)
 	a.So(found, should.Resemble, key)
 
@@ -122,7 +122,7 @@ func TestGatewayAPIKeys(t *testing.T) {
 	err = s.Gateways.DeleteAPIKey(gtwID, key.Name)
 	a.So(err, should.BeNil)
 
-	found, err = s.Gateways.GetAPIKey(gtwID, key.Name)
+	found, err = s.Gateways.GetAPIKeyByName(gtwID, key.Name)
 	a.So(err, should.NotBeNil)
 	a.So(ErrAPIKeyNotFound.Describes(err), should.BeTrue)
 }

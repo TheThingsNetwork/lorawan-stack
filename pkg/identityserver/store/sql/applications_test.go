@@ -72,7 +72,7 @@ func TestApplicationAPIKeys(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
-	found, err := s.Applications.GetAPIKey(appID, key.Name)
+	found, err := s.Applications.GetAPIKeyByName(appID, key.Name)
 	a.So(err, should.BeNil)
 	a.So(found, should.Resemble, key)
 
@@ -89,7 +89,7 @@ func TestApplicationAPIKeys(t *testing.T) {
 	err = s.Applications.DeleteAPIKey(appID, key.Name)
 	a.So(err, should.BeNil)
 
-	found, err = s.Applications.GetAPIKey(appID, key.Name)
+	found, err = s.Applications.GetAPIKeyByName(appID, key.Name)
 	a.So(err, should.NotBeNil)
 	a.So(ErrAPIKeyNotFound.Describes(err), should.BeTrue)
 }

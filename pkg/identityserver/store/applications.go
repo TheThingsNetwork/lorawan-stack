@@ -32,8 +32,11 @@ type ApplicationStore interface {
 	// SaveAPIKey stores an API Key attached to an application.
 	SaveAPIKey(appID string, key *ttnpb.APIKey) error
 
-	// GetAPIKey retrieves an API key from an application.
-	GetAPIKey(appID, keyName string) (*ttnpb.APIKey, error)
+	// GetAPIKey retrieves an API key by value and the appplication ID.
+	GetAPIKey(key string) (string, *ttnpb.APIKey, error)
+
+	// GetAPIKeyByName retrieves an API key from an application.
+	GetAPIKeyByName(appID, keyName string) (*ttnpb.APIKey, error)
 
 	// UpdateAPIKeyRights updates the right of an API key.
 	UpdateAPIKeyRights(appID, keyName string, rights []ttnpb.Right) error

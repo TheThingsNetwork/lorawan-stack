@@ -86,11 +86,54 @@ func (s *apiKeysStore) saveAPIKeyRightsQuery(entityID, keyName string, rights []
 	return query, args
 }
 
-func (s *apiKeysStore) GetAPIKey(entityID, keyName string) (*ttnpb.APIKey, error) {
+func (s *apiKeysStore) GetAPIKey(key string) (string, *ttnpb.APIKey, error) {
+	var entityID string
+	var apiKey *ttnpb.APIKey
+	var err error
+	err = s.transact(func(tx *db.Tx) error {
+		entityID, apiKey, err = s.getAPIKey(tx, key)
+		if err != nil {
+			return err
+		}
+
+		apiKey.Rights, err = s.getAPIKeyRights(tx, entityID, apiKey.Name)
+		return err
+	})
+	if err != nil {
+		return "", nil, err
+	}
+	return entityID, apiKey, nil
+}
+
+func (s *apiKeysStore) getAPIKey(q db.QueryContext, key string) (string, *ttnpb.APIKey, error) {
+	var res struct {
+		EntityID string
+		*ttnpb.APIKey
+	}
+	err := q.SelectOne(
+		res,
+		fmt.Sprintf(`
+			SELECT
+				key,
+				key_name AS name,
+				%s AS entity_id
+			FROM %ss_api_keys
+			WHERE key = $1`, s.foreignKey, s.entity),
+		key)
+	if db.IsNoRows(err) {
+		return "", nil, ErrAPIKeyNotFound.New(nil)
+	}
+	if err != nil {
+		return "", nil, err
+	}
+	return res.EntityID, res.APIKey, nil
+}
+
+func (s *apiKeysStore) GetAPIKeyByName(entityID, keyName string) (*ttnpb.APIKey, error) {
 	var key *ttnpb.APIKey
 	var err error
 	err = s.transact(func(tx *db.Tx) error {
-		key, err = s.getAPIKey(tx, entityID, keyName)
+		key, err = s.getAPIKeyByName(tx, entityID, keyName)
 		if err != nil {
 			return err
 		}
@@ -104,7 +147,7 @@ func (s *apiKeysStore) GetAPIKey(entityID, keyName string) (*ttnpb.APIKey, error
 	return key, nil
 }
 
-func (s *apiKeysStore) getAPIKey(q db.QueryContext, entityID, keyName string) (*ttnpb.APIKey, error) {
+func (s *apiKeysStore) getAPIKeyByName(q db.QueryContext, entityID, keyName string) (*ttnpb.APIKey, error) {
 	res := new(ttnpb.APIKey)
 	err := q.SelectOne(
 		res,

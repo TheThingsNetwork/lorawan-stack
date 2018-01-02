@@ -41,8 +41,11 @@ type UserStore interface {
 	// SaveAPIKey stores an API Key attached to an user.
 	SaveAPIKey(userID string, key *ttnpb.APIKey) error
 
-	// GetAPIKey retrieves an API key from an user.
-	GetAPIKey(userID, keyName string) (*ttnpb.APIKey, error)
+	// GetAPIKey retrieves an API key by value and the user ID.
+	GetAPIKey(key string) (string, *ttnpb.APIKey, error)
+
+	// GetAPIKeyByName retrieves an API key from an user.
+	GetAPIKeyByName(userID, keyName string) (*ttnpb.APIKey, error)
 
 	// UpdateAPIKeyRights updates the right of an API key.
 	UpdateAPIKeyRights(userID, keyName string, rights []ttnpb.Right) error
