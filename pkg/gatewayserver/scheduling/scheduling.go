@@ -134,8 +134,6 @@ func (f frequencyPlanScheduling) RegisterEmission(s Span, channel uint64) error 
 		return err
 	}
 
-	subBand.mu.Lock()
-	defer subBand.mu.Unlock()
-	subBand.addScheduling(packetWindow{window: s, timeOffAir: s.timeOffAir(f.timeOffAir)})
+	subBand.RegisterEmission(packetWindow{window: s, timeOffAir: s.timeOffAir(f.timeOffAir)})
 	return nil
 }

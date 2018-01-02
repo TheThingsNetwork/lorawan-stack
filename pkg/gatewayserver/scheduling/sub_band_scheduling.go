@@ -64,6 +64,12 @@ func (s *subBandScheduling) addScheduling(w packetWindow) {
 	s.schedulingWindows = append(s.schedulingWindows, w)
 }
 
+func (s *subBandScheduling) RegisterEmission(w packetWindow) {
+	s.mu.Lock()
+	s.addScheduling(w)
+	s.mu.Unlock()
+}
+
 // Schedule adds the requested time window to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns ErrScheduleFull. If another error prevents scheduling, it is returned.
 func (s *subBandScheduling) Schedule(w Span, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) error {
 	s.mu.Lock()
