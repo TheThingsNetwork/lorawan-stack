@@ -3,7 +3,6 @@
 package oauth
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/RangelReale/osin"
@@ -81,8 +80,8 @@ func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 	}
 
 	// ensure the expiration
-	if exp := data.CreatedAt.Add(data.ExpiresIn); exp.Before(time.Now()) {
-		return nil, fmt.Errorf("Authorization code is expired by %v", time.Now().Sub(exp))
+	if err := data.IsExpired(); err != nil {
+		return nil, err
 	}
 
 	client, err := s.store.Clients.GetByID(data.ClientID, clientFactory)
@@ -150,8 +149,8 @@ func (s *storage) LoadAccess(accessToken string) (*osin.AccessData, error) {
 	}
 
 	// ensure the expiration
-	if exp := data.CreatedAt.Add(data.ExpiresIn); exp.Before(time.Now()) {
-		return nil, fmt.Errorf("Access token is expired by %v", time.Now().Sub(exp))
+	if err := data.IsExpired(); err != nil {
+		return nil, err
 	}
 
 	client, err := s.store.Clients.GetByID(data.ClientID, clientFactory)

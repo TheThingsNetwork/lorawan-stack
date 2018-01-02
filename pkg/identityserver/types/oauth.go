@@ -2,7 +2,11 @@
 
 package types
 
-import "time"
+import (
+	"time"
+
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
+)
 
 // AuthorizationData is the data stored for an authorization code.
 type AuthorizationData struct {
@@ -31,6 +35,14 @@ type AuthorizationData struct {
 	UserID string
 }
 
+// IsExpired returns error if the receiver is expired.
+func (a *AuthorizationData) IsExpired() error {
+	if exp := a.CreatedAt.Add(a.ExpiresIn); exp.Before(time.Now()) {
+		return errors.Errorf("Authorization code is expired by %v", time.Now().Sub(exp))
+	}
+	return nil
+}
+
 // AccessData is the data stored for access tokens.
 type AccessData struct {
 	// AccessToken is the actual opaque access token.
@@ -53,6 +65,14 @@ type AccessData struct {
 
 	// RedirectURI is the redirect URI from the request.
 	RedirectURI string
+}
+
+// IsExpired returns error if the receiver is expired.
+func (a *AccessData) IsExpired() error {
+	if exp := a.CreatedAt.Add(a.ExpiresIn); exp.Before(time.Now()) {
+		return errors.Errorf("Access token is expired by %v", time.Now().Sub(exp))
+	}
+	return nil
 }
 
 // RefreshData is the data stored for refresh tokens.
