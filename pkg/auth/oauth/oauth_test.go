@@ -44,6 +44,7 @@ var (
 		Rights: []ttnpb.Right{
 			ttnpb.RIGHT_USER_PROFILE_READ,
 		},
+		Creator: ttnpb.UserIdentifier{userID},
 	}
 	authorizer = &TestAuthorizer{
 		Body: "<html />",
@@ -89,14 +90,14 @@ func testServer(t *testing.T) *web.Server {
 	if s == nil {
 		store := cleanStore(logger, database)
 
-		err := store.Clients.Create(client)
-		a.So(err, should.BeNil)
-
-		err = store.Users.Create(&ttnpb.User{
+		err := store.Users.Create(&ttnpb.User{
 			UserIdentifier: ttnpb.UserIdentifier{
 				UserID: userID,
 			},
 		})
+		a.So(err, should.BeNil)
+
+		err = store.Clients.Create(client)
 		a.So(err, should.BeNil)
 
 		s = store

@@ -16,6 +16,9 @@ type ClientStore interface {
 	// GetByID finds a client by ID and retrieves it.
 	GetByID(clientID string, factory ClientFactory) (types.Client, error)
 
+	// ListByUser list all the clients an user has created.
+	ListByUser(userID string, factory ClientFactory) ([]types.Client, error)
+
 	// Update updates the client.
 	Update(client types.Client) error
 

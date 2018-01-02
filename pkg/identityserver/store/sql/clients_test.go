@@ -24,12 +24,15 @@ func testClients() map[string]*ttnpb.Client {
 			RedirectURI:      "/oauth/callback",
 			Grants:           []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_PASSWORD},
 			Rights:           []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
+			Creator:          ttnpb.UserIdentifier{"bob"},
 		},
 		"foo-client": {
 			ClientIdentifier: ttnpb.ClientIdentifier{"foo-client"},
 			Secret:           "foofoofoo",
 			RedirectURI:      "https://foo.bar/oauth/callback",
 			Grants:           []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE},
+			Rights:           []ttnpb.Right{ttnpb.RIGHT_USER_ADMIN, ttnpb.RIGHT_GATEWAY_INFO},
+			Creator:          ttnpb.UserIdentifier{"bob"},
 		},
 	}
 }
@@ -49,6 +52,28 @@ func testClientCreate(t testing.TB, s *Store) {
 		err := s.Clients.Create(client)
 		a.So(err, should.NotBeNil)
 		a.So(ErrClientIDTaken.Describes(err), should.BeTrue)
+	}
+}
+
+func TestClientList(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore(t)
+
+	userID := testUsers()["bob"].UserID
+	client1 := testClients()["test-client"]
+	client2 := testClients()["foo-client"]
+
+	clients, err := s.Clients.ListByUser(userID, clientFactory)
+	a.So(err, should.BeNil)
+	if a.So(clients, should.HaveLength, 2) {
+		for _, client := range clients {
+			switch client.GetClient().ClientID {
+			case client1.ClientID:
+				a.So(client, test.ShouldBeClientIgnoringAutoFields, client1)
+			case client2.ClientID:
+				a.So(client, test.ShouldBeClientIgnoringAutoFields, client2)
+			}
+		}
 	}
 }
 
@@ -91,6 +116,7 @@ func testClientDeleteFeedDatabase(t *testing.T, userID, clientID string) {
 
 	client := &ttnpb.Client{
 		ClientIdentifier: ttnpb.ClientIdentifier{clientID},
+		Creator:          ttnpb.UserIdentifier{userID},
 	}
 	err := s.Clients.Create(client)
 	a.So(err, should.BeNil)

@@ -245,6 +245,24 @@ func (s *UserStore) Delete(userID string) error {
 			}
 		}
 
+		// delete created clients
+		clients, ok := s.store().Clients.(*ClientStore)
+		if !ok {
+			return errors.Errorf("Expected ptr to ClientStore but got %T", s.store().Clients)
+		}
+
+		found, err := clients.userClients(tx, userID)
+		if err != nil {
+			return err
+		}
+
+		for _, client := range found {
+			err := clients.delete(tx, client.GetClient().ClientID)
+			if err != nil {
+				return err
+			}
+		}
+
 		// delete api keys
 		err = s.deleteAPIKeys(tx, userID)
 		if err != nil {

@@ -39,10 +39,12 @@ func (s *ClientStore) Create(client types.Client) error {
 func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 	var cli struct {
 		*ttnpb.Client
+		CreatorID       string
 		GrantsConverted db.Int32Slice
 		RightsConverted db.Int32Slice
 	}
 	cli.Client = client.GetClient()
+	cli.CreatorID = cli.Creator.UserID
 
 	rights, err := db.NewInt32Slice(cli.Client.Rights)
 	if err != nil {
@@ -66,6 +68,7 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 				grants,
 				state,
 				rights,
+				creator_id,
 				official_labeled)
 			VALUES (
 				:client_id,
@@ -75,6 +78,7 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 				:grants_converted,
 				:state,
 				:rights_converted,
+				:creator_id,
 				:official_labeled)`,
 		cli)
 
@@ -109,6 +113,7 @@ func (s *ClientStore) GetByID(clientID string, factory store.ClientFactory) (typ
 func (s *ClientStore) getByID(q db.QueryContext, clientID string, result types.Client) error {
 	var res struct {
 		*ttnpb.Client
+		CreatorID       string
 		GrantsConverted db.Int32Slice
 		RightsConverted db.Int32Slice
 	}
@@ -124,6 +129,7 @@ func (s *ClientStore) getByID(q db.QueryContext, clientID string, result types.C
 				state,
 				rights AS rights_converted,
 				official_labeled,
+				creator_id,
 				created_at,
 				updated_at
 			FROM clients
@@ -142,8 +148,86 @@ func (s *ClientStore) getByID(q db.QueryContext, clientID string, result types.C
 	res.RightsConverted.SetInto(&res.Client.Rights)
 	res.GrantsConverted.SetInto(&res.Client.Grants)
 	*(result.GetClient()) = *res.Client
+	result.GetClient().Creator.UserID = res.CreatorID
 
 	return nil
+}
+
+// ListByUser returns all the clients an user is creator to.
+func (s *ClientStore) ListByUser(userID string, factory store.ClientFactory) ([]types.Client, error) {
+	var result []types.Client
+
+	err := s.transact(func(tx *db.Tx) error {
+		clients, err := s.userClients(tx, userID)
+		if err != nil {
+			return err
+		}
+
+		for _, client := range clients {
+			cli := factory()
+			*(cli.GetClient()) = *client
+
+			err := s.loadAttributes(tx, cli.GetClient().ClientID, cli)
+			if err != nil {
+				return err
+			}
+
+			result = append(result, cli)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (s *ClientStore) userClients(q db.QueryContext, userID string) ([]*ttnpb.Client, error) {
+	var clients []struct {
+		CreatorID       string
+		GrantsConverted db.Int32Slice
+		RightsConverted db.Int32Slice
+		*ttnpb.Client
+	}
+	err := q.Select(
+		&clients,
+		`SELECT
+				client_id,
+				description,
+				secret,
+				redirect_uri,
+				grants AS grants_converted,
+				state,
+				rights AS rights_converted,
+				official_labeled,
+				creator_id,
+				created_at,
+				updated_at
+			FROM clients
+			WHERE	creator_id = $1`,
+		userID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(clients) == 0 {
+		return make([]*ttnpb.Client, 0), nil
+	}
+
+	res := make([]*ttnpb.Client, 0, len(clients))
+	for _, client := range clients {
+		client.RightsConverted.SetInto(&client.Client.Rights)
+		client.GrantsConverted.SetInto(&client.Client.Grants)
+		client.Client.Creator.UserID = client.CreatorID
+
+		res = append(res, client.Client)
+	}
+
+	return res, nil
 }
 
 // Update updates the client.
@@ -162,10 +246,12 @@ func (s *ClientStore) Update(client types.Client) error {
 func (s *ClientStore) update(q db.QueryContext, client types.Client) error {
 	var cli struct {
 		*ttnpb.Client
+		CreatorID       string
 		GrantsConverted db.Int32Slice
 		RightsConverted db.Int32Slice
 	}
 	cli.Client = client.GetClient()
+	cli.CreatorID = cli.Creator.UserID
 
 	rights, err := db.NewInt32Slice(cli.Client.Rights)
 	if err != nil {
@@ -189,6 +275,7 @@ func (s *ClientStore) update(q db.QueryContext, client types.Client) error {
 				state = :state,
 				official_labeled = :official_labeled,
 				rights = :rights_converted,
+				creator_id = :creator_id,
 				updated_at = current_timestamp()
 			WHERE client_id = :client_id`,
 		cli)

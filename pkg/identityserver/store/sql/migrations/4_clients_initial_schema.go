@@ -13,6 +13,7 @@ func init() {
 			official_labeled   BOOL DEFAULT false,
 			grants             TEXT,
 			rights             TEXT,
+			creator_id         STRING NOT NULL REFERENCES users(user_id),
 			created_at         TIMESTAMP DEFAULT current_timestamp(),
 			updated_at         TIMESTAMP DEFAULT current_timestamp()
 		);
