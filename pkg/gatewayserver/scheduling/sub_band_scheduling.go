@@ -111,6 +111,11 @@ func (s *subBandScheduling) ScheduleFlexible(minimum time.Time, d time.Duration,
 	potentialTimings := []time.Time{}
 	emissionWindows := []Span{}
 
+	minimumSpan := Span{Start: minimum, Duration: d}
+	if err := s.Schedule(minimumSpan, timeOffAir); err == nil {
+		return minimumSpan, nil
+	}
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
