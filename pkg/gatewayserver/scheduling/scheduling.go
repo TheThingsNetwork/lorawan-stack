@@ -54,7 +54,7 @@ type Scheduler interface {
 	RegisterEmission(s Span, channel uint64) error
 }
 
-// FrequencyPlanScheduler returns a scheduler based on the frequency plan
+// FrequencyPlanScheduler returns a scheduler based on the frequency plan, and starts a goroutine for cleanup.
 func FrequencyPlanScheduler(ctx context.Context, fp ttnpb.FrequencyPlan) (Scheduler, error) {
 	scheduler := &frequencyPlanScheduling{
 		dwellTime:  fp.DwellTime,
