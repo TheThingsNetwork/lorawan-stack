@@ -15,15 +15,33 @@ import (
 
 var (
 	// ErrDutyCycleFull is returned is the duty cycle prevents scheduling of a downlink
-	ErrDutyCycleFull = errors.New("Duty cycle full")
+	ErrDutyCycleFull = &errors.ErrDescriptor{
+		Code:           1,
+		MessageFormat:  "Duty cycle between { min_frequency } and { max_frequency } full, exceeded quota of { quota }",
+		SafeAttributes: []string{"min_frequency", "max_frequency", "quota"},
+	}
 	// ErrOverlap is returned if there is an already existing scheduling overlapping
-	ErrOverlap = errors.New("Window overlap")
+	ErrOverlap = &errors.ErrDescriptor{
+		Code:          2,
+		MessageFormat: "Window overlap",
+	}
 	// ErrTimeOffAir is returned if time-off-air constraints prevent scheduling of the new downlink
-	ErrTimeOffAir = errors.New("Time-off-air constraints prevent scheduling")
+	ErrTimeOffAir = &errors.ErrDescriptor{
+		Code:          3,
+		MessageFormat: "Time-off-air constraints prevent scheduling",
+	}
 	// ErrNoSubBandFound is returned when an operation fails because there is no sub band for the given channel
-	ErrNoSubBandFound = errors.New("No sub band found for the given channel")
+	ErrNoSubBandFound = &errors.ErrDescriptor{
+		Code:           4,
+		MessageFormat:  "No sub band found for the given channel { channel }",
+		SafeAttributes: []string{"channel"},
+	}
 	// ErrDwellTime is returned when an operation fails because the packet does not respect the dwell time
-	ErrDwellTime = errors.New("Packet time-on-air duration is greater than this band's dwell time")
+	ErrDwellTime = &errors.ErrDescriptor{
+		Code:           5,
+		MessageFormat:  "Packet time-on-air duration is greater than this band's dwell time ({ packet_duration } > { dwell_time })",
+		SafeAttributes: []string{"packet_duration", "dwell_time"},
+	}
 )
 
 // Scheduler is an abstraction for an entity that manages the packet's timespans.
@@ -77,12 +95,12 @@ func (f frequencyPlanScheduling) findSubBand(channel uint64) (*subBandScheduling
 		}
 	}
 
-	return nil, ErrNoSubBandFound
+	return nil, ErrNoSubBandFound.New(errors.Attributes{"channel": channel})
 }
 
 func (f frequencyPlanScheduling) Schedule(s Span, channel uint64) error {
 	if f.dwellTime != nil && *f.dwellTime < s.Duration {
-		return ErrDwellTime
+		return ErrDwellTime.New(errors.Attributes{"packet_duration": s.Duration, "dwell_time": *f.dwellTime})
 	}
 
 	subBand, err := f.findSubBand(channel)

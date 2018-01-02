@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/band"
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
@@ -80,10 +81,10 @@ func (s *subBandScheduling) schedule(w Span, timeOffAir *ttnpb.FrequencyPlan_Tim
 		emissionWindows = append(emissionWindows, scheduledWindow.window)
 
 		if scheduledWindow.window.Overlaps(w) {
-			return ErrOverlap
+			return ErrOverlap.New(errors.Attributes{})
 		}
 		if scheduledWindow.withTimeOffAir().Overlaps(windowWithTimeOffAir.withTimeOffAir()) {
-			return ErrTimeOffAir
+			return ErrTimeOffAir.New(errors.Attributes{})
 		}
 	}
 
@@ -92,7 +93,11 @@ func (s *subBandScheduling) schedule(w Span, timeOffAir *ttnpb.FrequencyPlan_Tim
 
 	if prolongingWindowsAirtime > s.dutyCycle.MaxEmissionDuring(dutyCycleWindow) ||
 		precedingWindowsAirtime > s.dutyCycle.MaxEmissionDuring(dutyCycleWindow) {
-		return ErrDutyCycleFull
+		return ErrDutyCycleFull.New(errors.Attributes{
+			"min_frequency": s.dutyCycle.MinFrequency,
+			"max_frequency": s.dutyCycle.MaxFrequency,
+			"quota":         s.dutyCycle.DutyCycle,
+		})
 	}
 
 	s.addScheduling(windowWithTimeOffAir)
