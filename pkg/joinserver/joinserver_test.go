@@ -52,7 +52,7 @@ func TestHandleJoin(t *testing.T) {
 
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 	js := New(&Config{
-		Component:       component.New(test.GetLogger(t), &component.Config{shared.DefaultServiceBase}),
+		Component:       component.New(test.GetLogger(t), &component.Config{ServiceBase: shared.DefaultServiceBase}),
 		Registry:        reg,
 		JoinEUIPrefixes: joinEUIPrefixes,
 	})
@@ -879,7 +879,7 @@ func TestHandleJoin(t *testing.T) {
 
 			reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 			js := New(&Config{
-				Component:       component.New(test.GetLogger(t), &component.Config{shared.DefaultServiceBase}),
+				Component:       component.New(test.GetLogger(t), &component.Config{ServiceBase: shared.DefaultServiceBase}),
 				Registry:        reg,
 				JoinEUIPrefixes: joinEUIPrefixes,
 			})

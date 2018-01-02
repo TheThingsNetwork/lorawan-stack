@@ -13,6 +13,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/log/middleware/sentry"
+	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
 	"github.com/TheThingsNetwork/ttn/pkg/web"
 	raven "github.com/getsentry/raven-go"
@@ -22,6 +23,7 @@ import (
 // Config is the type of configuration for Components
 type Config struct {
 	config.ServiceBase `name:",squash" yaml:",inline"`
+	claims.TokenKeyInfoProvider
 }
 
 // Component is a base component for The Things Network cluster
