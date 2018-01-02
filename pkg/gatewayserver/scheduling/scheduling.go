@@ -107,7 +107,7 @@ func (f frequencyPlanScheduling) findSubBand(channel uint64) (*subBandScheduling
 }
 
 func (f frequencyPlanScheduling) Schedule(s Span, channel uint64) error {
-	if f.dwellTime != nil && *f.dwellTime < s.Duration {
+	if f.dwellTime != nil && s.Duration > *f.dwellTime {
 		return ErrDwellTime.New(errors.Attributes{"packet_duration": s.Duration, "dwell_time": *f.dwellTime})
 	}
 
