@@ -110,3 +110,25 @@ func TestCacheStore(t *testing.T) {
 	case <-stored:
 	}
 }
+
+func BenchmarkCacheGetByID(b *testing.B) {
+	dummy := DummyStore{}
+	store := frequencyplans.Cache(dummy, frequencyplans.DefaultCacheExpiry)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		if _, err := store.GetByID(validFrequencyPlanID); err != nil {
+			b.Error("Unexpected return:", err)
+		}
+	}
+}
+
+func BenchmarkCacheGetAllIDs(b *testing.B) {
+	dummy := DummyStore{}
+	store := frequencyplans.Cache(dummy, frequencyplans.DefaultCacheExpiry)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		store.GetAllIDs()
+	}
+}

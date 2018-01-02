@@ -3,6 +3,7 @@
 package frequencyplans
 
 import (
+	"sync"
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -24,20 +25,27 @@ type cache struct {
 
 	idsCache   []string
 	idsLastHit time.Time
+
+	mu sync.Mutex
 }
 
 // Cache wraps the given store with a cache, so that all returned frequency plans are cached for `expiry`.
 func Cache(s Store, expiry time.Duration) Store {
 	return &cache{
 		s:      s,
+		mu:     sync.Mutex{},
 		fps:    make(map[string]cacheEntry),
 		expiry: expiry,
 	}
 }
 
 func (c *cache) GetAllIDs() []string {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	if c.idsLastHit.After(time.Now().Add(-1 * c.expiry)) {
-		return c.idsCache
+		idsCache := c.idsCache
+		return idsCache
 	}
 
 	ids := c.s.GetAllIDs()
@@ -47,9 +55,14 @@ func (c *cache) GetAllIDs() []string {
 }
 
 func (c *cache) GetByID(id string) (ttnpb.FrequencyPlan, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	entry, hit := c.fps[id]
 	if hit && entry.lastHit.After(time.Now().Add(-1*c.expiry)) {
-		return entry.fp, entry.err
+		fp := entry.fp
+		err := entry.err
+		return fp, err
 	}
 
 	fp, err := c.s.GetByID(id)
