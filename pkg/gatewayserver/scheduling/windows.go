@@ -19,8 +19,8 @@ func (s Span) End() time.Time {
 	return s.Start.Add(s.Duration)
 }
 
-// Precedes returns true if a portion of the timespan is located before the span passed as a parameter
-func (s Span) Precedes(other Span) bool {
+// StartsBefore returns true if a portion of the timespan is located before the span passed as a parameter
+func (s Span) StartsBefore(other Span) bool {
 	return s.Start.Before(other.Start)
 }
 

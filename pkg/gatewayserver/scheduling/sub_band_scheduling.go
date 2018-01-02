@@ -56,7 +56,7 @@ func (s *subBandScheduling) bgCleanup(ctx context.Context) {
 
 func (s *subBandScheduling) addScheduling(w packetWindow) {
 	for i, window := range s.schedulingWindows {
-		if w.window.Precedes(window.window) {
+		if w.window.StartsBefore(window.window) {
 			s.schedulingWindows = append(s.schedulingWindows[:i], append([]packetWindow{w}, s.schedulingWindows[i:]...)...)
 			return
 		}

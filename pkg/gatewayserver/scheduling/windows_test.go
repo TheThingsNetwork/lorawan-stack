@@ -75,7 +75,7 @@ func TestPrecedingComparison(t *testing.T) {
 	}
 
 	for compared, result := range comparisons {
-		a.So(compared.Precedes(s), should.Equal, result)
+		a.So(compared.StartsBefore(s), should.Equal, result)
 	}
 }
 
