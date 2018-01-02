@@ -83,7 +83,7 @@ func spanDurationSum(spans []Span, start, end time.Time) time.Duration {
 			spanEnd = end
 		}
 
-		duration = duration + spanStart.Sub(spanEnd)
+		duration = duration + spanEnd.Sub(spanStart)
 	}
 
 	return duration
