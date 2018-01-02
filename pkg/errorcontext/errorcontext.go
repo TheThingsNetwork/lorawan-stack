@@ -1,4 +1,4 @@
-// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+// Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 // Package errorcontext implements a Context that can be canceled with a specific error instead of the usual context.Canceled.
 package errorcontext

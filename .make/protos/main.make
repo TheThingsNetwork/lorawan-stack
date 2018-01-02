@@ -1,4 +1,4 @@
-# Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+# Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 GOGO_REPO=github.com/gogo/protobuf
 GRPC_GATEWAY_REPO=github.com/grpc-ecosystem/grpc-gateway

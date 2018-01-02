@@ -1,4 +1,4 @@
-# Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+# Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 # This makefile contains variables related to the git commit, branch and tags
 # as well as rules to execute git hooks

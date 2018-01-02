@@ -1,4 +1,4 @@
-# Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+# Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 # Go
 GO_PROTO_TYPES = any duration empty struct timestamp field_mask
