@@ -121,25 +121,17 @@ func (s *subBandScheduling) ScheduleAnytime(minimum time.Time, d time.Duration, 
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	considerMinimum := true
 	potentialTimings := []time.Time{}
 	emissionWindows := []Span{}
 
 	for _, window := range s.schedulingWindows {
 		emissionWindows = append(emissionWindows, window.window)
 		windowWithTimeOffAir := window.withTimeOffAir()
-		if windowWithTimeOffAir.Contains(minimum) {
-			considerMinimum = false
-		}
 
 		windowEnd := windowWithTimeOffAir.End()
 		if windowEnd.After(minimum) {
 			potentialTimings = append(potentialTimings, windowEnd)
 		}
-	}
-
-	if considerMinimum {
-		potentialTimings = append(potentialTimings, minimum)
 	}
 
 	var potentialTiming time.Time
