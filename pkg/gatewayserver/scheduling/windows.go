@@ -67,8 +67,8 @@ func filterWithinInterval(spans []Span, start, end time.Time) []Span {
 	return filteredSpans
 }
 
-// spanDurationSum takes an array of non-overlapping spans, a start and an end time, and determines the sum of the duration of these spans within the interval determined by start and end.
-func spanDurationSum(spans []Span, start, end time.Time) time.Duration {
+// sumWithinInterval takes an array of non-overlapping spans, a start and an end time, and determines the sum of the duration of these spans within the interval determined by start and end.
+func sumWithinInterval(spans []Span, start, end time.Time) time.Duration {
 	var duration time.Duration
 
 	spans = filterWithinInterval(spans, start, end)
