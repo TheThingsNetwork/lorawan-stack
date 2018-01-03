@@ -4,7 +4,9 @@ package sql
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
@@ -126,6 +128,31 @@ func initSubStores(s storer) {
 	store.Clients = NewClientStore(s)
 	store.OAuth = NewOAuthStore(s)
 	store.Settings = NewSettingStore(s)
+}
+
+func (s *Store) Init(recreateDatabase bool) error {
+	database := ""
+	err := s.db.SelectOne(&database, `SELECT current_database()`)
+	if db.IsNoRows(err) {
+		return errors.New("No database specified")
+	}
+	if err != nil {
+		return err
+	}
+
+	if recreateDatabase {
+		_, err = s.db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s", database))
+		if err != nil {
+			return err
+		}
+	}
+
+	_, err = s.db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", database))
+	if err != nil {
+		return err
+	}
+
+	return s.MigrateAll()
 }
 
 func (s *Store) MigrateAll() error {
