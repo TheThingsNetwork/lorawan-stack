@@ -71,7 +71,7 @@ func (s *subBandScheduling) RegisterEmission(w packetWindow) {
 }
 
 // Schedule adds the requested time window to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns ErrScheduleFull. If another error prevents scheduling, it is returned.
-func (s *subBandScheduling) Schedule(w Span, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) error {
+func (s *subBandScheduling) ScheduleAt(w Span, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) error {
 	s.mu.Lock()
 	err := s.schedule(w, timeOffAir)
 	s.mu.Unlock()
@@ -111,10 +111,10 @@ func (s *subBandScheduling) schedule(w Span, timeOffAir *ttnpb.FrequencyPlan_Tim
 	return nil
 }
 
-// ScheduleFlexible requires a scheduling window if there is no time.Time constraint
-func (s *subBandScheduling) ScheduleFlexible(minimum time.Time, d time.Duration, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) (Span, error) {
+// ScheduleAnytime requires a scheduling window if there is no time.Time constraint
+func (s *subBandScheduling) ScheduleAnytime(minimum time.Time, d time.Duration, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) (Span, error) {
 	minimumSpan := Span{Start: minimum, Duration: d}
-	if err := s.Schedule(minimumSpan, timeOffAir); err == nil {
+	if err := s.ScheduleAt(minimumSpan, timeOffAir); err == nil {
 		return minimumSpan, nil
 	}
 

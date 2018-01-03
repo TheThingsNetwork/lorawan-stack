@@ -54,10 +54,10 @@ func init() {
 
 // Scheduler is an abstraction for an entity that manages the packet's timespans.
 type Scheduler interface {
-	// Schedule adds the requested timespan to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns ErrScheduleFull. If another error prevents scheduling, it is returned.
-	Schedule(s Span, channel uint64) error
-	// ScheduleFlexible requires a scheduling window if there is no time.Time constraint
-	ScheduleFlexible(minimum time.Time, d time.Duration, channel uint64) (Span, error)
+	// ScheduleAt adds the requested timespan to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns ErrScheduleFull. If another error prevents scheduling, it is returned.
+	ScheduleAt(s Span, channel uint64) error
+	// ScheduleAnytime requires a scheduling window if there is no time.Time constraint
+	ScheduleAnytime(minimum time.Time, d time.Duration, channel uint64) (Span, error)
 	// RegisterEmission that has happened during that timespan, on that specific channel
 	RegisterEmission(s Span, channel uint64) error
 }
@@ -106,7 +106,7 @@ func (f frequencyPlanScheduling) findSubBand(channel uint64) (*subBandScheduling
 	return nil, ErrNoSubBandFound.New(errors.Attributes{"channel": channel})
 }
 
-func (f frequencyPlanScheduling) Schedule(s Span, channel uint64) error {
+func (f frequencyPlanScheduling) ScheduleAt(s Span, channel uint64) error {
 	if f.dwellTime != nil && s.Duration > *f.dwellTime {
 		return ErrDwellTime.New(errors.Attributes{"packet_duration": s.Duration, "dwell_time": *f.dwellTime})
 	}
@@ -116,16 +116,16 @@ func (f frequencyPlanScheduling) Schedule(s Span, channel uint64) error {
 		return err
 	}
 
-	return subBand.Schedule(s, f.timeOffAir)
+	return subBand.ScheduleAt(s, f.timeOffAir)
 }
 
-func (f frequencyPlanScheduling) ScheduleFlexible(minimum time.Time, d time.Duration, channel uint64) (Span, error) {
+func (f frequencyPlanScheduling) ScheduleAnytime(minimum time.Time, d time.Duration, channel uint64) (Span, error) {
 	subBand, err := f.findSubBand(channel)
 	if err != nil {
 		return Span{}, err
 	}
 
-	return subBand.ScheduleFlexible(minimum, d, f.timeOffAir)
+	return subBand.ScheduleAnytime(minimum, d, f.timeOffAir)
 }
 
 func (f frequencyPlanScheduling) RegisterEmission(s Span, channel uint64) error {
