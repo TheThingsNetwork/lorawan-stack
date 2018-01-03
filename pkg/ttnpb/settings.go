@@ -49,3 +49,21 @@ func (s *IdentityServerSettings) IsEmailAllowed(email string) bool {
 
 	return found
 }
+
+// IsIDAllowed checks whether an ID is allowed to be used given the list of
+// blacklisted IDs contained in the settings.
+func (s *IdentityServerSettings) IsIDAllowed(id string) bool {
+	if s.BlacklistedIDs == nil || len(s.BlacklistedIDs) == 0 {
+		return true
+	}
+
+	allowed := true
+	for _, blacklistedID := range s.BlacklistedIDs {
+		allowed = id != blacklistedID
+		if !allowed {
+			break
+		}
+	}
+
+	return allowed
+}

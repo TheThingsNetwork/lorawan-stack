@@ -30,3 +30,21 @@ func TestSettingsIsEmailAllowed(t *testing.T) {
 	a.So(s.IsEmailAllowed("foo@ttn.org"), should.BeTrue)
 	a.So(s.IsEmailAllowed("foo@TTN.org"), should.BeTrue)
 }
+
+func TestSettingsIDAllowed(t *testing.T) {
+	a := assertions.New(t)
+	s := &IdentityServerSettings{}
+
+	// all ids are allowed
+	s.BlacklistedIDs = nil
+	a.So(s.IsIDAllowed("foobar"), should.BeTrue)
+	a.So(s.IsIDAllowed("admin"), should.BeTrue)
+	s.BlacklistedIDs = []string{}
+	a.So(s.IsIDAllowed("foobar"), should.BeTrue)
+	a.So(s.IsIDAllowed("admin"), should.BeTrue)
+
+	// `admin` is blacklisted
+	s.BlacklistedIDs = []string{"admin"}
+	a.So(s.IsIDAllowed("foobar"), should.BeTrue)
+	a.So(s.IsIDAllowed("admin"), should.BeFalse)
+}
