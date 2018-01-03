@@ -160,6 +160,10 @@ func (s *subBandScheduling) ScheduleFlexible(minimum time.Time, d time.Duration,
 }
 
 func firstMomentConsideringDutyCycle(spans []Span, dutyCycle float32, minimum time.Time, duration time.Duration) time.Time {
+	if len(spans) == 0 {
+		return minimum
+	}
+
 	maxAirtime := time.Duration(dutyCycle * float32(dutyCycleWindow))
 	lastWindow := spans[len(spans)-1]
 
