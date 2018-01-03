@@ -1,6 +1,6 @@
 // Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-// Package scheduling offer convenience methods to manage RF packets that must respect scheduling constraints
+// Package scheduling offer convenience methods to manage RF packets that must respect scheduling constraints.
 package scheduling
 
 import (
@@ -14,29 +14,29 @@ import (
 )
 
 var (
-	// ErrDutyCycleFull is returned is the duty cycle prevents scheduling of a downlink
+	// ErrDutyCycleFull is returned is the duty cycle prevents scheduling of a downlink.
 	ErrDutyCycleFull = &errors.ErrDescriptor{
 		Code:           1,
 		MessageFormat:  "Duty cycle between { min_frequency } and { max_frequency } full, exceeded quota of { quota }",
 		SafeAttributes: []string{"min_frequency", "max_frequency", "quota"},
 	}
-	// ErrOverlap is returned if there is an already existing scheduling overlapping
+	// ErrOverlap is returned if there is an already existing scheduling overlapping.
 	ErrOverlap = &errors.ErrDescriptor{
 		Code:          2,
 		MessageFormat: "Window overlap",
 	}
-	// ErrTimeOffAir is returned if time-off-air constraints prevent scheduling of the new downlink
+	// ErrTimeOffAir is returned if time-off-air constraints prevent scheduling of the new downlink.
 	ErrTimeOffAir = &errors.ErrDescriptor{
 		Code:          3,
 		MessageFormat: "Time-off-air constraints prevent scheduling",
 	}
-	// ErrNoSubBandFound is returned when an operation fails because there is no sub band for the given channel
+	// ErrNoSubBandFound is returned when an operation fails because there is no sub band for the given channel.
 	ErrNoSubBandFound = &errors.ErrDescriptor{
 		Code:           4,
 		MessageFormat:  "No sub band found for the given channel { channel }",
 		SafeAttributes: []string{"channel"},
 	}
-	// ErrDwellTime is returned when an operation fails because the packet does not respect the dwell time
+	// ErrDwellTime is returned when an operation fails because the packet does not respect the dwell time.
 	ErrDwellTime = &errors.ErrDescriptor{
 		Code:           5,
 		MessageFormat:  "Packet time-on-air duration is greater than this band's dwell time ({ packet_duration } > { dwell_time })",
@@ -56,9 +56,9 @@ func init() {
 type Scheduler interface {
 	// ScheduleAt adds the requested timespan to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns ErrScheduleFull. If another error prevents scheduling, it is returned.
 	ScheduleAt(s Span, channel uint64) error
-	// ScheduleAnytime requires a scheduling window if there is no time.Time constraint
+	// ScheduleAnytime requires a scheduling window if there is no time.Time constraint.
 	ScheduleAnytime(minimum time.Time, d time.Duration, channel uint64) (Span, error)
-	// RegisterEmission that has happened during that timespan, on that specific channel
+	// RegisterEmission that has happened during that timespan, on that specific channel.
 	RegisterEmission(s Span, channel uint64) error
 }
 

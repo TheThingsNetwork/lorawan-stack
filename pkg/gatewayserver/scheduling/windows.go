@@ -14,17 +14,17 @@ type Span struct {
 	Duration time.Duration
 }
 
-// End returns the timestamp at which the timespan ends
+// End returns the timestamp at which the timespan ends.
 func (s Span) End() time.Time {
 	return s.Start.Add(s.Duration)
 }
 
-// StartsBefore returns true if a portion of the timespan is located before the span passed as a parameter
+// StartsBefore returns true if a portion of the timespan is located before the span passed as a parameter.
 func (s Span) StartsBefore(other Span) bool {
 	return s.Start.Before(other.Start)
 }
 
-// Contains returns true if the given time is contained between the beginning and the end of this timespan
+// Contains returns true if the given time is contained between the beginning and the end of this timespan.
 func (s Span) Contains(ts time.Time) bool {
 	if ts.Before(s.Start) {
 		return false
@@ -35,12 +35,12 @@ func (s Span) Contains(ts time.Time) bool {
 	return true
 }
 
-// IsProlongedBy returns true if after the span ends, there is still a portion of the span passed as parameter
+// IsProlongedBy returns true if after the span ends, there is still a portion of the span passed as parameter.
 func (s Span) IsProlongedBy(other Span) bool {
 	return s.End().Before(other.End())
 }
 
-// Overlaps returns true if the two timespans overlap
+// Overlaps returns true if the two timespans overlap.
 func (s Span) Overlaps(other Span) bool {
 	if other.End().Before(s.Start) || other.End() == s.Start {
 		return false

@@ -111,7 +111,7 @@ func (s *subBandScheduling) schedule(w Span, timeOffAir *ttnpb.FrequencyPlan_Tim
 	return nil
 }
 
-// ScheduleAnytime requires a scheduling window if there is no time.Time constraint
+// ScheduleAnytime requires a scheduling window if there is no time.Time constraint.
 func (s *subBandScheduling) ScheduleAnytime(minimum time.Time, d time.Duration, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) (Span, error) {
 	minimumSpan := Span{Start: minimum, Duration: d}
 	if err := s.ScheduleAt(minimumSpan, timeOffAir); err == nil {
