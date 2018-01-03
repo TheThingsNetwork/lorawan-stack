@@ -1,4 +1,4 @@
-// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+// Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 package api_test
 
@@ -32,21 +32,21 @@ func TestGateway(t *testing.T) {
 			"version": "1.2",
 		},
 		Antennas: []ttnpb.GatewayAntenna{
-			ttnpb.GatewayAntenna{
+			{
 				Gain: 1.1,
 				Location: ttnpb.Location{
 					Latitude:  1.1,
 					Longitude: 1.1,
 				},
 			},
-			ttnpb.GatewayAntenna{
+			{
 				Gain: 2.2,
 				Location: ttnpb.Location{
 					Latitude:  2.2,
 					Longitude: 2.2,
 				},
 			},
-			ttnpb.GatewayAntenna{
+			{
 				Gain: 3,
 				Location: ttnpb.Location{
 					Latitude:  3,

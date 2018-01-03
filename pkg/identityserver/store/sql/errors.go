@@ -144,7 +144,7 @@ var ErrAccessTokenConflict = &errors.ErrDescriptor{
 	Type:          errors.Conflict,
 }
 
-// ErrAuthorizedClientNotFound is returned when an user tries to revoke an (non-existant)
+// ErrAuthorizedClientNotFound is returned when an user tries to revoke an (non-existent)
 // authorized client.
 var ErrAuthorizedClientNotFound = &errors.ErrDescriptor{
 	MessageFormat: "User `{user_id}` has not authorized client `{client_id}`",

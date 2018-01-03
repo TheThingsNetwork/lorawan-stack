@@ -40,7 +40,7 @@ func (s *IdentityServerSettings) IsEmailAllowed(email string) bool {
 	}
 
 	found := false
-	for i, _ := range s.AllowedEmails {
+	for i := range s.AllowedEmails {
 		found = glob.MustCompile(strings.ToLower(s.AllowedEmails[i])).Match(strings.ToLower(email))
 		if found {
 			break
