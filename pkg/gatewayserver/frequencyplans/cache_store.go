@@ -44,8 +44,7 @@ func (c *cache) GetAllIDs() []string {
 	defer c.mu.Unlock()
 
 	if c.idsLastHit.After(time.Now().Add(-1 * c.expiry)) {
-		idsCache := c.idsCache
-		return idsCache
+		return c.idsCache
 	}
 
 	ids := c.s.GetAllIDs()
@@ -60,9 +59,7 @@ func (c *cache) GetByID(id string) (ttnpb.FrequencyPlan, error) {
 
 	entry, hit := c.fps[id]
 	if hit && entry.lastHit.After(time.Now().Add(-1*c.expiry)) {
-		fp := entry.fp
-		err := entry.err
-		return fp, err
+		return entry.fp, entry.err
 	}
 
 	fp, err := c.s.GetByID(id)
