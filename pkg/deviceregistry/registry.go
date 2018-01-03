@@ -36,7 +36,7 @@ func (r *Registry) Create(ed *ttnpb.EndDevice) (*Device, error) {
 	return newDevice(ed, r.store, id, ed), nil
 }
 
-// FindBy searches for devices matching specified device fields in underlying store.Interface.
+// FindBy searches for devices matching specified device fields in underlying store.Interface. The returned slice contains unique devices, matching at least one of values in eds.
 func (r *Registry) FindBy(eds ...*ttnpb.EndDevice) ([]*Device, error) {
 	found := make(map[store.PrimaryKey]*ttnpb.EndDevice)
 	for i, ed := range eds {
