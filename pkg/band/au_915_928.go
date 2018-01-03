@@ -86,8 +86,8 @@ func init() {
 			return offset
 		}(),
 
-		Rx1Parameters: func(frequency uint64, dataRateIndex, RX1DROffset int, _ bool) (int, uint64) {
-			outDataRateIndex := dataRateIndex + 8 - RX1DROffset
+		Rx1Parameters: func(frequency uint64, dataRateIndex, rx1DROffset int, _ bool) (int, uint64) {
+			outDataRateIndex := dataRateIndex + 8 - rx1DROffset
 			if outDataRateIndex < 8 {
 				outDataRateIndex = 8
 			} else if outDataRateIndex > 13 {

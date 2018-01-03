@@ -63,10 +63,10 @@ func init() {
 			return offset
 		}(),
 
-		Rx1Parameters: func(frequency uint64, dataRateIndex, Rx1DROffset int, _ bool) (int, uint64) {
-			effectiveRx1DROffset := Rx1DROffset
+		Rx1Parameters: func(frequency uint64, dataRateIndex, rx1DROffset int, _ bool) (int, uint64) {
+			effectiveRx1DROffset := rx1DROffset
 			if effectiveRx1DROffset > 5 {
-				effectiveRx1DROffset = 5 - Rx1DROffset
+				effectiveRx1DROffset = 5 - rx1DROffset
 			}
 
 			outDataRateIndex := dataRateIndex - effectiveRx1DROffset

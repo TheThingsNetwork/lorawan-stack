@@ -67,7 +67,7 @@ type Channel struct {
 }
 
 // Rx1Emission takes the uplink's emission parameters, and returns downlink datarate index and channel
-type Rx1Emission func(frequency uint64, dataRateIndex, Rx1DROffset int, dwellTime bool) (int, uint64)
+type Rx1Emission func(frequency uint64, dataRateIndex, rx1DROffset int, dwellTime bool) (int, uint64)
 
 // Rx2Parameters contains downlink datarate index and channel
 type Rx2Parameters struct {
