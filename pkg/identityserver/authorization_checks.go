@@ -1,6 +1,6 @@
-// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+// Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package api
+package identityserver
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 
 // userCheck checks whether claims are intended for an user and then if the user
 // has the given set of rights with it. It returns the user ID.
-func (g *GRPC) userCheck(ctx context.Context, rights ...ttnpb.Right) (string, error) {
+func (is *IdentityServer) userCheck(ctx context.Context, rights ...ttnpb.Right) (string, error) {
 	claims := claims.FromContext(ctx)
 
 	userID := claims.UserID()
@@ -29,13 +29,13 @@ func (g *GRPC) userCheck(ctx context.Context, rights ...ttnpb.Right) (string, er
 
 // adminCheck undercalls `userCheck` with `user:admin` right and then fetches
 // from the store the user to check if it has activated the admin flag.
-func (g *GRPC) adminCheck(ctx context.Context) error {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_ADMIN)
+func (is *IdentityServer) adminCheck(ctx context.Context) error {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_ADMIN)
 	if err != nil {
 		return err
 	}
 
-	found, err := g.store.Users.GetByID(userID, g.factories.user)
+	found, err := is.store.Users.GetByID(userID, is.factories.user)
 	if err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func (g *GRPC) adminCheck(ctx context.Context) error {
 //			with the application ID that the request is trying to access to.
 // 	-	If they come from an access token: checks whether the user is collaborator of the
 //      application with the given set of rights.
-func (g *GRPC) applicationCheck(ctx context.Context, appID string, rights ...ttnpb.Right) error {
+func (is *IdentityServer) applicationCheck(ctx context.Context, appID string, rights ...ttnpb.Right) error {
 	claims := claims.FromContext(ctx)
 
 	if !claims.HasRights(rights...) {
@@ -70,7 +70,7 @@ func (g *GRPC) applicationCheck(ctx context.Context, appID string, rights ...ttn
 			return ErrNotAuthorized
 		}
 
-		authorized, err = g.store.Applications.HasUserRights(appID, userID, rights...)
+		authorized, err = is.store.Applications.HasUserRights(appID, userID, rights...)
 		if err != nil {
 			return err
 		}
@@ -88,7 +88,7 @@ func (g *GRPC) applicationCheck(ctx context.Context, appID string, rights ...ttn
 //			with the gateway ID that the request is trying to access to.
 // 	-	If they come from an access token: checks whether the user is collaborator of the
 //      gateway application with the given set of rights.
-func (g *GRPC) gatewayCheck(ctx context.Context, gtwID string, rights ...ttnpb.Right) error {
+func (is *IdentityServer) gatewayCheck(ctx context.Context, gtwID string, rights ...ttnpb.Right) error {
 	claims := claims.FromContext(ctx)
 
 	if !claims.HasRights(rights...) {
@@ -106,7 +106,7 @@ func (g *GRPC) gatewayCheck(ctx context.Context, gtwID string, rights ...ttnpb.R
 			return ErrNotAuthorized
 		}
 
-		authorized, err = g.store.Gateways.HasUserRights(gtwID, userID, rights...)
+		authorized, err = is.store.Gateways.HasUserRights(gtwID, userID, rights...)
 		if err != nil {
 			return err
 		}

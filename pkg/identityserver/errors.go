@@ -1,6 +1,6 @@
-// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+// Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package api
+package identityserver
 
 import "github.com/TheThingsNetwork/ttn/pkg/errors"
 

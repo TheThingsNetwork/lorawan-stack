@@ -1,6 +1,6 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package api
+package identityserver
 
 import (
 	"context"
@@ -12,18 +12,18 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
-var _ ttnpb.IsClientServer = new(GRPC)
+var _ ttnpb.IsClientServer = new(IdentityServer)
 
 // CreateClient creates a client.
 // The created client has a random secret and has set by default as false the
 // official labeled flag and has the refresh_token and authorization_code grants.
-func (g *GRPC) CreateClient(ctx context.Context, req *ttnpb.CreateClientRequest) (*pbtypes.Empty, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_CLIENTS_CREATE)
+func (is *IdentityServer) CreateClient(ctx context.Context, req *ttnpb.CreateClientRequest) (*pbtypes.Empty, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_CLIENTS_CREATE)
 	if err != nil {
 		return nil, err
 	}
 
-	settings, err := g.store.Settings.Get()
+	settings, err := is.store.Settings.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func (g *GRPC) CreateClient(ctx context.Context, req *ttnpb.CreateClientRequest)
 		})
 	}
 
-	return nil, g.store.Clients.Create(&ttnpb.Client{
+	return nil, is.store.Clients.Create(&ttnpb.Client{
 		ClientIdentifier: req.Client.ClientIdentifier,
 		Description:      req.Client.Description,
 		RedirectURI:      req.Client.RedirectURI,
@@ -49,13 +49,13 @@ func (g *GRPC) CreateClient(ctx context.Context, req *ttnpb.CreateClientRequest)
 }
 
 // GetClients returns a client.
-func (g *GRPC) GetClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*ttnpb.Client, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_CLIENTS_LIST)
+func (is *IdentityServer) GetClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*ttnpb.Client, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_CLIENTS_LIST)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := g.store.Clients.GetByID(req.ClientID, g.factories.client)
+	found, err := is.store.Clients.GetByID(req.ClientID, is.factories.client)
 	if err != nil {
 		return nil, err
 	}
@@ -69,13 +69,13 @@ func (g *GRPC) GetClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*ttn
 }
 
 // ListClients returns all the clients an user has created.
-func (g *GRPC) ListClients(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListClientsResponse, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_CLIENTS_LIST)
+func (is *IdentityServer) ListClients(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListClientsResponse, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_CLIENTS_LIST)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := g.store.Clients.ListByUser(userID, g.factories.client)
+	found, err := is.store.Clients.ListByUser(userID, is.factories.client)
 	if err != nil {
 		return nil, err
 	}
@@ -93,13 +93,13 @@ func (g *GRPC) ListClients(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListCl
 
 // UpdateClient updates a client.
 // TODO(gomezjdaniel): support to update the RedirectURI and rights (scope).
-func (g *GRPC) UpdateClient(ctx context.Context, req *ttnpb.UpdateClientRequest) (*pbtypes.Empty, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_CLIENTS_MANAGE)
+func (is *IdentityServer) UpdateClient(ctx context.Context, req *ttnpb.UpdateClientRequest) (*pbtypes.Empty, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_CLIENTS_MANAGE)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := g.store.Clients.GetByID(req.Client.ClientID, g.factories.client)
+	found, err := is.store.Clients.GetByID(req.Client.ClientID, is.factories.client)
 	if err != nil {
 		return nil, err
 	}
@@ -120,17 +120,17 @@ func (g *GRPC) UpdateClient(ctx context.Context, req *ttnpb.UpdateClientRequest)
 		}
 	}
 
-	return nil, g.store.Clients.Update(found)
+	return nil, is.store.Clients.Update(found)
 }
 
 // DeleteClient deletes a client.
-func (g *GRPC) DeleteClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*pbtypes.Empty, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_CLIENTS_MANAGE)
+func (is *IdentityServer) DeleteClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*pbtypes.Empty, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_CLIENTS_MANAGE)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := g.store.Clients.GetByID(req.ClientID, g.factories.client)
+	found, err := is.store.Clients.GetByID(req.ClientID, is.factories.client)
 	if err != nil {
 		return nil, err
 	}
@@ -140,5 +140,5 @@ func (g *GRPC) DeleteClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*
 		return nil, ErrNotAuthorized
 	}
 
-	return nil, g.store.Clients.Delete(req.ClientID)
+	return nil, is.store.Clients.Delete(req.ClientID)
 }

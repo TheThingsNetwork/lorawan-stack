@@ -1,6 +1,6 @@
-// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+// Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package api_test
+package identityserver
 
 import (
 	"context"
@@ -17,8 +17,8 @@ import (
 
 func TestSettings(t *testing.T) {
 	a := assertions.New(t)
-	g := getGRPC(t)
-	defer store.Settings.Set(settings)
+	is := getIS(t)
+	defer is.store.Settings.Set(testSettings())
 
 	user := testUsers()["alice"]
 
@@ -29,12 +29,12 @@ func TestSettings(t *testing.T) {
 		Rights:    ttnpb.AllUserRights,
 	})
 
-	resp, err := g.GetSettings(ctx, &pbtypes.Empty{})
+	resp, err := is.GetSettings(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
-	a.So(resp, test.ShouldBeSettingsIgnoringAutoFields, settings)
+	a.So(resp, test.ShouldBeSettingsIgnoringAutoFields, testSettings())
 
 	// modify settings
-	_, err = g.UpdateSettings(ctx, &ttnpb.UpdateSettingsRequest{
+	_, err = is.UpdateSettings(ctx, &ttnpb.UpdateSettingsRequest{
 		Settings: ttnpb.IdentityServerSettings{
 			IdentityServerSettings_UserRegistrationFlow: ttnpb.IdentityServerSettings_UserRegistrationFlow{
 				SelfRegistration: true,
@@ -47,8 +47,9 @@ func TestSettings(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	resp, err = g.GetSettings(ctx, &pbtypes.Empty{})
+	resp, err = is.GetSettings(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	a.So(resp.AllowedEmails, should.HaveLength, 0)
 	a.So(resp.IdentityServerSettings_UserRegistrationFlow.SelfRegistration, should.BeTrue)
+	a.So(resp.IdentityServerSettings_UserRegistrationFlow.SkipValidation, should.BeFalse)
 }

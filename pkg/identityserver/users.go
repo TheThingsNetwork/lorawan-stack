@@ -1,6 +1,6 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package api
+package identityserver
 
 import (
 	"context"
@@ -19,12 +19,12 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
-// make sure GRPC implements ttnpb.IsUserServer.
-var _ ttnpb.IsUserServer = new(GRPC)
+// make sure IdentityServer implements ttnpb.IsUserServer.
+var _ ttnpb.IsUserServer = new(IdentityServer)
 
 // CreateUser creates an user in the network.
-func (g *GRPC) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequest) (*pbtypes.Empty, error) {
-	settings, err := g.store.Settings.Get()
+func (is *IdentityServer) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequest) (*pbtypes.Empty, error) {
+	settings, err := is.store.Settings.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -63,10 +63,10 @@ func (g *GRPC) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequest) (*p
 	if settings.SkipValidation {
 		user.ValidatedAt = time.Now()
 
-		return nil, g.store.Users.Create(user)
+		return nil, is.store.Users.Create(user)
 	}
 
-	err = g.store.Transact(func(s *store.Store) error {
+	err = is.store.Transact(func(s *store.Store) error {
 		err := s.Users.Create(user)
 		if err != nil {
 			return err
@@ -83,7 +83,7 @@ func (g *GRPC) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequest) (*p
 			return err
 		}
 
-		return g.email.Send(
+		return is.email.Send(
 			user.Email,
 			templates.EmailValidation(),
 			map[string]interface{}{
@@ -96,13 +96,13 @@ func (g *GRPC) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequest) (*p
 }
 
 // GetUser returns the account of the current user.
-func (g *GRPC) GetUser(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.User, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_PROFILE_READ)
+func (is *IdentityServer) GetUser(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.User, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_PROFILE_READ)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := g.store.Users.GetByID(userID, g.factories.user)
+	found, err := is.store.Users.GetByID(userID, is.factories.user)
 	if err != nil {
 		return nil, err
 	}
@@ -114,18 +114,18 @@ func (g *GRPC) GetUser(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.User, erro
 
 // UpdateUser updates the account of the current user.
 // If the email is modified a validation email will be sent.
-func (g *GRPC) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (*pbtypes.Empty, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
+func (is *IdentityServer) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (*pbtypes.Empty, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := g.store.Users.GetByID(userID, g.factories.user)
+	found, err := is.store.Users.GetByID(userID, is.factories.user)
 	if err != nil {
 		return nil, err
 	}
 
-	settings, err := g.store.Settings.Get()
+	settings, err := is.store.Settings.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -156,11 +156,11 @@ func (g *GRPC) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (*p
 	}
 
 	if !newEmail {
-		return nil, g.store.Users.Update(found)
+		return nil, is.store.Users.Update(found)
 	}
 
-	err = g.store.Transact(func(s *store.Store) error {
-		err := g.store.Users.Update(found)
+	err = is.store.Transact(func(s *store.Store) error {
+		err := is.store.Users.Update(found)
 		if err != nil {
 			return err
 		}
@@ -171,12 +171,12 @@ func (g *GRPC) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (*p
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 
-		err = g.store.Users.SaveValidationToken(userID, token)
+		err = is.store.Users.SaveValidationToken(userID, token)
 		if err != nil {
 			return err
 		}
 
-		return g.email.Send(
+		return is.email.Send(
 			found.GetUser().Email,
 			templates.EmailValidation(),
 			map[string]interface{}{
@@ -189,13 +189,13 @@ func (g *GRPC) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (*p
 }
 
 // UpdateUserPassword updates the password of the current user.
-func (g *GRPC) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*pbtypes.Empty, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
+func (is *IdentityServer) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*pbtypes.Empty, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := g.store.Users.GetByID(userID, g.factories.user)
+	found, err := is.store.Users.GetByID(userID, is.factories.user)
 	if err != nil {
 		return nil, err
 	}
@@ -216,23 +216,23 @@ func (g *GRPC) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateUserPass
 
 	found.GetUser().Password = string(hashed)
 
-	return nil, g.store.Users.Update(found)
+	return nil, is.store.Users.Update(found)
 }
 
 // DeleteUser deletes the account of the current user.
-func (g *GRPC) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.Empty, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_DELETE)
+func (is *IdentityServer) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.Empty, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_DELETE)
 	if err != nil {
 		return nil, err
 	}
 
-	err = g.store.Transact(func(s *store.Store) error {
+	err = is.store.Transact(func(s *store.Store) error {
 		err := s.Users.Delete(userID)
 		if err != nil {
 			return err
 		}
 
-		apps, err := s.Applications.ListByUser(userID, g.factories.application)
+		apps, err := s.Applications.ListByUser(userID, is.factories.application)
 		if err != nil {
 			return err
 		}
@@ -250,7 +250,7 @@ func (g *GRPC) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.Empty
 			}
 		}
 
-		gtws, err := s.Gateways.ListByUser(userID, g.factories.gateway)
+		gtws, err := s.Gateways.ListByUser(userID, is.factories.gateway)
 		if err != nil {
 			return err
 		}
@@ -275,8 +275,8 @@ func (g *GRPC) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.Empty
 }
 
 // GenerateUserAPIKey generates an user API key and returns it.
-func (g *GRPC) GenerateUserAPIKey(ctx context.Context, req *ttnpb.GenerateUserAPIKeyRequest) (*ttnpb.APIKey, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_KEYS)
+func (is *IdentityServer) GenerateUserAPIKey(ctx context.Context, req *ttnpb.GenerateUserAPIKeyRequest) (*ttnpb.APIKey, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -294,7 +294,7 @@ func (g *GRPC) GenerateUserAPIKey(ctx context.Context, req *ttnpb.GenerateUserAP
 		Rights: req.Rights,
 	}
 
-	err = g.store.Users.SaveAPIKey(userID, key)
+	err = is.store.Users.SaveAPIKey(userID, key)
 	if err != nil {
 		return nil, err
 	}
@@ -303,13 +303,13 @@ func (g *GRPC) GenerateUserAPIKey(ctx context.Context, req *ttnpb.GenerateUserAP
 }
 
 // ListUserAPIKeys returns all the API keys from the current user.
-func (g *GRPC) ListUserAPIKeys(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListUserAPIKeysResponse, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_KEYS)
+func (is *IdentityServer) ListUserAPIKeys(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListUserAPIKeysResponse, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := g.store.Users.ListAPIKeys(userID)
+	found, err := is.store.Users.ListAPIKeys(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -320,28 +320,28 @@ func (g *GRPC) ListUserAPIKeys(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Li
 }
 
 // UpdateUserAPIKey updates an API key from the current user.
-func (g *GRPC) UpdateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (*pbtypes.Empty, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
+func (is *IdentityServer) UpdateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (*pbtypes.Empty, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, g.store.Users.UpdateAPIKeyRights(userID, req.Name, req.Rights)
+	return nil, is.store.Users.UpdateAPIKeyRights(userID, req.Name, req.Rights)
 }
 
 // RemoveUserAPIKey removes an API key from the current user.
-func (g *GRPC) RemoveUserAPIKey(ctx context.Context, req *ttnpb.RemoveUserAPIKeyRequest) (*pbtypes.Empty, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_KEYS)
+func (is *IdentityServer) RemoveUserAPIKey(ctx context.Context, req *ttnpb.RemoveUserAPIKeyRequest) (*pbtypes.Empty, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, g.store.Users.DeleteAPIKey(userID, req.Name)
+	return nil, is.store.Users.DeleteAPIKey(userID, req.Name)
 }
 
 // ValidateUserEmail validates the user's email with the token sent to the email.
-func (g *GRPC) ValidateUserEmail(ctx context.Context, req *ttnpb.ValidateUserEmailRequest) (*pbtypes.Empty, error) {
-	err := g.store.Transact(func(store *store.Store) error {
+func (is *IdentityServer) ValidateUserEmail(ctx context.Context, req *ttnpb.ValidateUserEmailRequest) (*pbtypes.Empty, error) {
+	err := is.store.Transact(func(store *store.Store) error {
 		userID, token, err := store.Users.GetValidationToken(req.Token)
 		if err != nil {
 			return err
@@ -351,7 +351,7 @@ func (g *GRPC) ValidateUserEmail(ctx context.Context, req *ttnpb.ValidateUserEma
 			return errors.New("token expired")
 		}
 
-		user, err := store.Users.GetByID(userID, g.factories.user)
+		user, err := store.Users.GetByID(userID, is.factories.user)
 		if err != nil {
 			return err
 		}
@@ -371,13 +371,13 @@ func (g *GRPC) ValidateUserEmail(ctx context.Context, req *ttnpb.ValidateUserEma
 
 // RequestUserEmailValidation requests a new validation email if the user's emai
 // isn't validated yet.
-func (g *GRPC) RequestUserEmailValidation(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.Empty, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
+func (is *IdentityServer) RequestUserEmailValidation(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.Empty, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
 	if err != nil {
 		return nil, err
 	}
 
-	user, err := g.store.Users.GetByID(userID, g.factories.user)
+	user, err := is.store.Users.GetByID(userID, is.factories.user)
 	if err != nil {
 		return nil, err
 	}
@@ -386,7 +386,7 @@ func (g *GRPC) RequestUserEmailValidation(ctx context.Context, _ *pbtypes.Empty)
 		return nil, errors.New("email already validated")
 	}
 
-	settings, err := g.store.Settings.Get()
+	settings, err := is.store.Settings.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -397,12 +397,12 @@ func (g *GRPC) RequestUserEmailValidation(ctx context.Context, _ *pbtypes.Empty)
 		ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 	}
 
-	err = g.store.Users.SaveValidationToken(userID, token)
+	err = is.store.Users.SaveValidationToken(userID, token)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, g.email.Send(
+	return nil, is.email.Send(
 		user.GetUser().Email,
 		templates.EmailValidation(),
 		map[string]interface{}{
@@ -414,13 +414,13 @@ func (g *GRPC) RequestUserEmailValidation(ctx context.Context, _ *pbtypes.Empty)
 
 // ListAuthorizedClients returns all the authorized third-party clients that
 // the current user has.
-func (g *GRPC) ListAuthorizedClients(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListAuthorizedClientsResponse, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_AUTHORIZEDCLIENTS)
+func (is *IdentityServer) ListAuthorizedClients(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListAuthorizedClientsResponse, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_AUTHORIZEDCLIENTS)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := g.store.OAuth.ListAuthorizedClients(userID, g.factories.client)
+	found, err := is.store.OAuth.ListAuthorizedClients(userID, is.factories.client)
 	if err != nil {
 		return nil, err
 	}
@@ -441,11 +441,11 @@ func (g *GRPC) ListAuthorizedClients(ctx context.Context, _ *pbtypes.Empty) (*tt
 }
 
 // RevokeAuthorizedClient revokes an authorized third-party client.
-func (g *GRPC) RevokeAuthorizedClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*pbtypes.Empty, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_AUTHORIZEDCLIENTS)
+func (is *IdentityServer) RevokeAuthorizedClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*pbtypes.Empty, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_AUTHORIZEDCLIENTS)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, g.store.OAuth.RevokeAuthorizedClient(userID, req.ClientID)
+	return nil, is.store.OAuth.RevokeAuthorizedClient(userID, req.ClientID)
 }

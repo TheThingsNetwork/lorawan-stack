@@ -1,6 +1,6 @@
-// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+// Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package api_test
+package identityserver
 
 import (
 	"context"
@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
-	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/api"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/claims"
@@ -20,7 +19,7 @@ import (
 
 func TestApplication(t *testing.T) {
 	a := assertions.New(t)
-	g := getGRPC(t)
+	is := getIS(t)
 
 	user := testUsers()["bob"]
 
@@ -35,14 +34,14 @@ func TestApplication(t *testing.T) {
 		Rights:    append(ttnpb.AllUserRights, ttnpb.AllApplicationRights...),
 	})
 
-	_, err := g.CreateApplication(ctx, &ttnpb.CreateApplicationRequest{
+	_, err := is.CreateApplication(ctx, &ttnpb.CreateApplicationRequest{
 		Application: app,
 	})
 	a.So(err, should.BeNil)
 
 	// can't create applications with blacklisted ids
-	for _, id := range settings.BlacklistedIDs {
-		_, err := g.CreateApplication(ctx, &ttnpb.CreateApplicationRequest{
+	for _, id := range testSettings().BlacklistedIDs {
+		_, err := is.CreateApplication(ctx, &ttnpb.CreateApplicationRequest{
 			Application: ttnpb.Application{
 				ApplicationIdentifier: ttnpb.ApplicationIdentifier{id},
 			},
@@ -51,18 +50,18 @@ func TestApplication(t *testing.T) {
 		a.So(ErrBlacklistedID.Describes(err), should.BeTrue)
 	}
 
-	found, err := g.GetApplication(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	found, err := is.GetApplication(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeApplicationIgnoringAutoFields, app)
 
-	apps, err := g.ListApplications(ctx, &pbtypes.Empty{})
+	apps, err := is.ListApplications(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	if a.So(apps.Applications, should.HaveLength, 1) {
 		a.So(apps.Applications[0], test.ShouldBeApplicationIgnoringAutoFields, app)
 	}
 
 	app.Description = "foo"
-	_, err = g.UpdateApplication(ctx, &ttnpb.UpdateApplicationRequest{
+	_, err = is.UpdateApplication(ctx, &ttnpb.UpdateApplicationRequest{
 		Application: app,
 		UpdateMask: pbtypes.FieldMask{
 			Paths: []string{"description"},
@@ -70,12 +69,12 @@ func TestApplication(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	found, err = g.GetApplication(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	found, err = is.GetApplication(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeApplicationIgnoringAutoFields, app)
 
 	// generate a new API key
-	key, err := g.GenerateApplicationAPIKey(ctx, &ttnpb.GenerateApplicationAPIKeyRequest{
+	key, err := is.GenerateApplicationAPIKey(ctx, &ttnpb.GenerateApplicationAPIKeyRequest{
 		ApplicationIdentifier: app.ApplicationIdentifier,
 		Name:   "foo",
 		Rights: ttnpb.AllApplicationRights,
@@ -87,7 +86,7 @@ func TestApplication(t *testing.T) {
 
 	// update api key
 	key.Rights = []ttnpb.Right{ttnpb.Right(10)}
-	_, err = g.UpdateApplicationAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
+	_, err = is.UpdateApplicationAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 		ApplicationIdentifier: app.ApplicationIdentifier,
 		Name:   key.Name,
 		Rights: key.Rights,
@@ -95,7 +94,7 @@ func TestApplication(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	// can't generate another API Key with the same name
-	_, err = g.GenerateApplicationAPIKey(ctx, &ttnpb.GenerateApplicationAPIKeyRequest{
+	_, err = is.GenerateApplicationAPIKey(ctx, &ttnpb.GenerateApplicationAPIKeyRequest{
 		ApplicationIdentifier: app.ApplicationIdentifier,
 		Name:   key.Name,
 		Rights: []ttnpb.Right{ttnpb.Right(1)},
@@ -103,19 +102,19 @@ func TestApplication(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
-	keys, err := g.ListApplicationAPIKeys(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	keys, err := is.ListApplicationAPIKeys(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
 	a.So(err, should.BeNil)
 	if a.So(keys.APIKeys, should.HaveLength, 1) {
 		sort.Slice(keys.APIKeys[0].Rights, func(i, j int) bool { return keys.APIKeys[0].Rights[i] < keys.APIKeys[0].Rights[j] })
 		a.So(keys.APIKeys[0], should.Resemble, key)
 	}
 
-	_, err = g.RemoveApplicationAPIKey(ctx, &ttnpb.RemoveApplicationAPIKeyRequest{
+	_, err = is.RemoveApplicationAPIKey(ctx, &ttnpb.RemoveApplicationAPIKeyRequest{
 		ApplicationIdentifier: app.ApplicationIdentifier,
 		Name: key.Name,
 	})
 
-	keys, err = g.ListApplicationAPIKeys(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	keys, err = is.ListApplicationAPIKeys(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
 	a.So(err, should.BeNil)
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
@@ -127,14 +126,14 @@ func TestApplication(t *testing.T) {
 		Rights:                []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
 	}
 
-	_, err = g.SetApplicationCollaborator(ctx, collab)
+	_, err = is.SetApplicationCollaborator(ctx, collab)
 	a.So(err, should.BeNil)
 
-	rights, err := g.ListApplicationRights(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	rights, err := is.ListApplicationRights(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
 	a.So(err, should.BeNil)
 	a.So(rights.Rights, should.Resemble, ttnpb.AllApplicationRights)
 
-	collabs, err := g.ListApplicationCollaborators(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	collabs, err := is.ListApplicationCollaborators(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 2)
 	a.So(collabs.Collaborators, should.Contain, collab)
@@ -145,25 +144,25 @@ func TestApplication(t *testing.T) {
 	})
 
 	// while there is two collaborators can't unset the only collab with COLLABORATORS right
-	_, err = g.SetApplicationCollaborator(ctx, &ttnpb.ApplicationCollaborator{
+	_, err = is.SetApplicationCollaborator(ctx, &ttnpb.ApplicationCollaborator{
 		ApplicationIdentifier: app.ApplicationIdentifier,
 		UserIdentifier:        user.UserIdentifier,
 	})
 	a.So(err, should.NotBeNil)
 
-	collabs, err = g.ListApplicationCollaborators(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	collabs, err = is.ListApplicationCollaborators(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 2)
 
 	// unset the last added collaborator
 	collab.Rights = []ttnpb.Right{}
-	_, err = g.SetApplicationCollaborator(ctx, collab)
+	_, err = is.SetApplicationCollaborator(ctx, collab)
 	a.So(err, should.BeNil)
 
-	collabs, err = g.ListApplicationCollaborators(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	collabs, err = is.ListApplicationCollaborators(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 1)
 
-	_, err = g.DeleteApplication(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	_, err = is.DeleteApplication(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
 	a.So(err, should.BeNil)
 }

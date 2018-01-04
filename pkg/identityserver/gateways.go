@@ -1,6 +1,6 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package api
+package identityserver
 
 import (
 	"context"
@@ -13,19 +13,19 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
-var _ ttnpb.IsGatewayServer = new(GRPC)
+var _ ttnpb.IsGatewayServer = new(IdentityServer)
 
 const APIKeyName = "Default API Key"
 
 // CreateGateway creates a gateway in the network, sets the user as collaborator
 // with all rights and creates an API key
-func (g *GRPC) CreateGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (*pbtypes.Empty, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_GATEWAYS_CREATE)
+func (is *IdentityServer) CreateGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (*pbtypes.Empty, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_GATEWAYS_CREATE)
 	if err != nil {
 		return nil, err
 	}
 
-	settings, err := g.store.Settings.Get()
+	settings, err := is.store.Settings.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (g *GRPC) CreateGateway(ctx context.Context, req *ttnpb.CreateGatewayReques
 		})
 	}
 
-	err = g.store.Transact(func(s *store.Store) error {
+	err = is.store.Transact(func(s *store.Store) error {
 		err = s.Gateways.Create(&ttnpb.Gateway{
 			GatewayIdentifier: req.Gateway.GatewayIdentifier,
 			Description:       req.Gateway.Description,
@@ -81,13 +81,13 @@ func (g *GRPC) CreateGateway(ctx context.Context, req *ttnpb.CreateGatewayReques
 }
 
 // GetGateway returns a gateway information.
-func (g *GRPC) GetGateway(ctx context.Context, req *ttnpb.GatewayIdentifier) (*ttnpb.Gateway, error) {
-	err := g.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_INFO)
+func (is *IdentityServer) GetGateway(ctx context.Context, req *ttnpb.GatewayIdentifier) (*ttnpb.Gateway, error) {
+	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_INFO)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := g.store.Gateways.GetByID(req.GatewayID, g.factories.gateway)
+	found, err := is.store.Gateways.GetByID(req.GatewayID, is.factories.gateway)
 	if err != nil {
 		return nil, err
 	}
@@ -96,13 +96,13 @@ func (g *GRPC) GetGateway(ctx context.Context, req *ttnpb.GatewayIdentifier) (*t
 }
 
 // ListGateways returns all the gateways the current user is collaborator of.
-func (g *GRPC) ListGateways(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListGatewaysResponse, error) {
-	userID, err := g.userCheck(ctx, ttnpb.RIGHT_USER_GATEWAYS_LIST)
+func (is *IdentityServer) ListGateways(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListGatewaysResponse, error) {
+	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_GATEWAYS_LIST)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := g.store.Gateways.ListByUser(userID, g.factories.gateway)
+	found, err := is.store.Gateways.ListByUser(userID, is.factories.gateway)
 	if err != nil {
 		return nil, err
 	}
@@ -119,13 +119,13 @@ func (g *GRPC) ListGateways(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListG
 }
 
 // UpdateGateway updates a gateway.
-func (g *GRPC) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (*pbtypes.Empty, error) {
-	err := g.gatewayCheck(ctx, req.Gateway.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC)
+func (is *IdentityServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (*pbtypes.Empty, error) {
+	err := is.gatewayCheck(ctx, req.Gateway.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := g.store.Gateways.GetByID(req.Gateway.GatewayID, g.factories.gateway)
+	found, err := is.store.Gateways.GetByID(req.Gateway.GatewayID, is.factories.gateway)
 	if err != nil {
 		return nil, err
 	}
@@ -171,22 +171,22 @@ func (g *GRPC) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGatewayReques
 		}
 	}
 
-	return nil, g.store.Gateways.Update(gtw)
+	return nil, is.store.Gateways.Update(gtw)
 }
 
 // DeleteGateway deletes a gateway.
-func (g *GRPC) DeleteGateway(ctx context.Context, req *ttnpb.GatewayIdentifier) (*pbtypes.Empty, error) {
-	err := g.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_DELETE)
+func (is *IdentityServer) DeleteGateway(ctx context.Context, req *ttnpb.GatewayIdentifier) (*pbtypes.Empty, error) {
+	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_DELETE)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, g.store.Gateways.Delete(req.GatewayID)
+	return nil, is.store.Gateways.Delete(req.GatewayID)
 }
 
 // GenerateGatewayAPIKey generates a gateway API key and returns it.
-func (g *GRPC) GenerateGatewayAPIKey(ctx context.Context, req *ttnpb.GenerateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
-	err := g.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+func (is *IdentityServer) GenerateGatewayAPIKey(ctx context.Context, req *ttnpb.GenerateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
+	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -202,7 +202,7 @@ func (g *GRPC) GenerateGatewayAPIKey(ctx context.Context, req *ttnpb.GenerateGat
 		Rights: req.Rights,
 	}
 
-	err = g.store.Gateways.SaveAPIKey(req.GatewayID, key)
+	err = is.store.Gateways.SaveAPIKey(req.GatewayID, key)
 	if err != nil {
 		return nil, err
 	}
@@ -211,13 +211,13 @@ func (g *GRPC) GenerateGatewayAPIKey(ctx context.Context, req *ttnpb.GenerateGat
 }
 
 // ListGatewayAPIKeys list all the API keys from a gateway.
-func (g *GRPC) ListGatewayAPIKeys(ctx context.Context, req *ttnpb.GatewayIdentifier) (*ttnpb.ListGatewayAPIKeysResponse, error) {
-	err := g.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+func (is *IdentityServer) ListGatewayAPIKeys(ctx context.Context, req *ttnpb.GatewayIdentifier) (*ttnpb.ListGatewayAPIKeysResponse, error) {
+	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := g.store.Gateways.ListAPIKeys(req.GatewayID)
+	found, err := is.store.Gateways.ListAPIKeys(req.GatewayID)
 	if err != nil {
 		return nil, err
 	}
@@ -228,35 +228,35 @@ func (g *GRPC) ListGatewayAPIKeys(ctx context.Context, req *ttnpb.GatewayIdentif
 }
 
 // UpdateGatewayAPIKey updates an API key rights.
-func (g *GRPC) UpdateGatewayAPIKey(ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := g.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+func (is *IdentityServer) UpdateGatewayAPIKey(ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest) (*pbtypes.Empty, error) {
+	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, g.store.Gateways.UpdateAPIKeyRights(req.GatewayID, req.Name, req.Rights)
+	return nil, is.store.Gateways.UpdateAPIKeyRights(req.GatewayID, req.Name, req.Rights)
 }
 
 // RemoveGatewayAPIKey removes a gateway API key.
-func (g *GRPC) RemoveGatewayAPIKey(ctx context.Context, req *ttnpb.RemoveGatewayAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := g.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+func (is *IdentityServer) RemoveGatewayAPIKey(ctx context.Context, req *ttnpb.RemoveGatewayAPIKeyRequest) (*pbtypes.Empty, error) {
+	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, g.store.Gateways.DeleteAPIKey(req.GatewayID, req.Name)
+	return nil, is.store.Gateways.DeleteAPIKey(req.GatewayID, req.Name)
 }
 
 // SetGatewayCollaborator sets or unsets a gateway collaborator. It returns error
 // if after unset a collaborators there is no at least one collaborator with
 // `gateway:settings:collaborators` right.
-func (g *GRPC) SetGatewayCollaborator(ctx context.Context, req *ttnpb.GatewayCollaborator) (*pbtypes.Empty, error) {
-	err := g.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
+func (is *IdentityServer) SetGatewayCollaborator(ctx context.Context, req *ttnpb.GatewayCollaborator) (*pbtypes.Empty, error) {
+	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
 	if err != nil {
 		return nil, err
 	}
 
-	err = g.store.Transact(func(s *store.Store) error {
+	err = is.store.Transact(func(s *store.Store) error {
 		err := s.Gateways.SetCollaborator(req)
 		if err != nil {
 			return err
@@ -279,13 +279,13 @@ func (g *GRPC) SetGatewayCollaborator(ctx context.Context, req *ttnpb.GatewayCol
 }
 
 // ListGatewayCollaborators returns all the collaborators that a gateway has.
-func (g *GRPC) ListGatewayCollaborators(ctx context.Context, req *ttnpb.GatewayIdentifier) (*ttnpb.ListGatewayCollaboratorsResponse, error) {
-	err := g.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
+func (is *IdentityServer) ListGatewayCollaborators(ctx context.Context, req *ttnpb.GatewayIdentifier) (*ttnpb.ListGatewayCollaboratorsResponse, error) {
+	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := g.store.Gateways.ListCollaborators(req.GatewayID)
+	found, err := is.store.Gateways.ListCollaborators(req.GatewayID)
 	if err != nil {
 		return nil, err
 	}
@@ -296,13 +296,13 @@ func (g *GRPC) ListGatewayCollaborators(ctx context.Context, req *ttnpb.GatewayI
 }
 
 // ListGatewayRights returns the rights the caller user has to a gateway.
-func (g *GRPC) ListGatewayRights(ctx context.Context, req *ttnpb.GatewayIdentifier) (*ttnpb.ListGatewayRightsResponse, error) {
-	userID, err := g.userCheck(ctx)
+func (is *IdentityServer) ListGatewayRights(ctx context.Context, req *ttnpb.GatewayIdentifier) (*ttnpb.ListGatewayRightsResponse, error) {
+	userID, err := is.userCheck(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	rights, err := g.store.Gateways.ListUserRights(req.GatewayID, userID)
+	rights, err := is.store.Gateways.ListUserRights(req.GatewayID, userID)
 	if err != nil {
 		return nil, err
 	}

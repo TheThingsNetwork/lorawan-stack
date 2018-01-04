@@ -1,6 +1,6 @@
-// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+// Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package api
+package identityserver
 
 import (
 	"context"
@@ -10,16 +10,16 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
-var _ ttnpb.IsSettingsServer = new(GRPC)
+var _ ttnpb.IsSettingsServer = new(IdentityServer)
 
 // GetSettings fetches the current dynamic settings of the Identity Server.
-func (g *GRPC) GetSettings(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.IdentityServerSettings, error) {
-	err := g.adminCheck(ctx)
+func (is *IdentityServer) GetSettings(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.IdentityServerSettings, error) {
+	err := is.adminCheck(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	settings, err := g.store.Settings.Get()
+	settings, err := is.store.Settings.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -28,12 +28,12 @@ func (g *GRPC) GetSettings(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Identi
 }
 
 // UpdateSettings updates the dynamic settings.
-func (g *GRPC) UpdateSettings(ctx context.Context, req *ttnpb.UpdateSettingsRequest) (*pbtypes.Empty, error) {
-	if err := g.adminCheck(ctx); err != nil {
+func (is *IdentityServer) UpdateSettings(ctx context.Context, req *ttnpb.UpdateSettingsRequest) (*pbtypes.Empty, error) {
+	if err := is.adminCheck(ctx); err != nil {
 		return nil, err
 	}
 
-	settings, err := g.store.Settings.Get()
+	settings, err := is.store.Settings.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -65,5 +65,5 @@ func (g *GRPC) UpdateSettings(ctx context.Context, req *ttnpb.UpdateSettingsRequ
 		}
 	}
 
-	return nil, g.store.Settings.Set(settings)
+	return nil, is.store.Settings.Set(settings)
 }

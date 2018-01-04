@@ -1,13 +1,12 @@
-// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+// Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package api_test
+package identityserver
 
 import (
 	"context"
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
-	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/api"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/claims"
@@ -19,7 +18,7 @@ import (
 
 func TestClient(t *testing.T) {
 	a := assertions.New(t)
-	g := getGRPC(t)
+	is := getIS(t)
 
 	user := testUsers()["bob"]
 
@@ -42,14 +41,14 @@ func TestClient(t *testing.T) {
 		Rights:    append(ttnpb.AllUserRights),
 	})
 
-	_, err := g.CreateClient(ctx, &ttnpb.CreateClientRequest{
+	_, err := is.CreateClient(ctx, &ttnpb.CreateClientRequest{
 		Client: cli,
 	})
 	a.So(err, should.BeNil)
 
 	// can't create clients with blacklisted ids
-	for _, id := range settings.BlacklistedIDs {
-		_, err := g.CreateClient(ctx, &ttnpb.CreateClientRequest{
+	for _, id := range testSettings().BlacklistedIDs {
+		_, err := is.CreateClient(ctx, &ttnpb.CreateClientRequest{
 			Client: ttnpb.Client{
 				ClientIdentifier: ttnpb.ClientIdentifier{id},
 			},
@@ -58,18 +57,18 @@ func TestClient(t *testing.T) {
 		a.So(ErrBlacklistedID.Describes(err), should.BeTrue)
 	}
 
-	found, err := g.GetClient(ctx, &ttnpb.ClientIdentifier{cli.ClientID})
+	found, err := is.GetClient(ctx, &ttnpb.ClientIdentifier{cli.ClientID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeClientIgnoringAutoFields, cli)
 
-	clients, err := g.ListClients(ctx, &pbtypes.Empty{})
+	clients, err := is.ListClients(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	if a.So(clients.Clients, should.HaveLength, 1) {
 		a.So(clients.Clients[0], test.ShouldBeClientIgnoringAutoFields, cli)
 	}
 
 	cli.Description = "foo"
-	_, err = g.UpdateClient(ctx, &ttnpb.UpdateClientRequest{
+	_, err = is.UpdateClient(ctx, &ttnpb.UpdateClientRequest{
 		Client: cli,
 		UpdateMask: pbtypes.FieldMask{
 			Paths: []string{"description"},
@@ -77,14 +76,14 @@ func TestClient(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	found, err = g.GetClient(ctx, &ttnpb.ClientIdentifier{cli.ClientID})
+	found, err = is.GetClient(ctx, &ttnpb.ClientIdentifier{cli.ClientID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeClientIgnoringAutoFields, cli)
 
-	_, err = g.DeleteClient(ctx, &ttnpb.ClientIdentifier{cli.ClientID})
+	_, err = is.DeleteClient(ctx, &ttnpb.ClientIdentifier{cli.ClientID})
 	a.So(err, should.BeNil)
 
-	found, err = g.GetClient(ctx, &ttnpb.ClientIdentifier{cli.ClientID})
+	found, err = is.GetClient(ctx, &ttnpb.ClientIdentifier{cli.ClientID})
 	a.So(found, should.BeNil)
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrClientNotFound.Describes(err), should.BeTrue)

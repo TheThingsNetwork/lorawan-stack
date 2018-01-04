@@ -1,6 +1,6 @@
-// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+// Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package api_test
+package identityserver
 
 import (
 	"context"
@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
-	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/api"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/mock"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
@@ -22,7 +21,7 @@ import (
 
 func TestUser(t *testing.T) {
 	a := assertions.New(t)
-	g := getGRPC(t)
+	is := getIS(t)
 
 	user := ttnpb.User{
 		UserIdentifier: ttnpb.UserIdentifier{"daniel"},
@@ -40,7 +39,7 @@ func TestUser(t *testing.T) {
 
 	// can't create an account using a not allowed email
 	user.Email = "foo@foo.com"
-	_, err := g.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
+	_, err := is.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
 		User: user,
 	})
 	a.So(err, should.NotBeNil)
@@ -48,9 +47,9 @@ func TestUser(t *testing.T) {
 	user.Email = "foo@bar.com"
 
 	// can't create account using a blacklisted id
-	for _, id := range settings.BlacklistedIDs {
+	for _, id := range testSettings().BlacklistedIDs {
 		user.UserID = id
-		_, err = g.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
+		_, err = is.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
 			User: user,
 		})
 		a.So(err, should.NotBeNil)
@@ -59,25 +58,25 @@ func TestUser(t *testing.T) {
 	user.UserID = "daniel"
 
 	// create the account
-	_, err = g.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
+	_, err = is.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
 		User: user,
 	})
 	a.So(err, should.BeNil)
 
 	// can't retrieve profile without proper claims
-	found, err := g.GetUser(context.Background(), &pbtypes.Empty{})
+	found, err := is.GetUser(context.Background(), &pbtypes.Empty{})
 	a.So(found, should.BeNil)
 	a.So(err, should.Equal, ErrNotAuthorized)
 
 	// check that response doesnt include password within
-	found, err = g.GetUser(ctx, &pbtypes.Empty{})
+	found, err = is.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	a.So(found.UserIdentifier.UserID, should.Equal, user.UserID)
 	a.So(found.Name, should.Equal, user.Name)
 	a.So(found.Password, should.HaveLength, 0)
 	a.So(found.Email, should.Equal, user.Email)
 	a.So(found.ValidatedAt.IsZero(), should.BeTrue)
-	if settings.IdentityServerSettings_UserRegistrationFlow.AdminApproval {
+	if testSettings().IdentityServerSettings_UserRegistrationFlow.AdminApproval {
 		a.So(found.State, should.Equal, ttnpb.STATE_PENDING)
 	} else {
 		a.So(found.State, should.Equal, ttnpb.STATE_APPROVED)
@@ -88,31 +87,31 @@ func TestUser(t *testing.T) {
 	if a.So(ok, should.BeTrue) && a.So(data["token"], should.NotBeEmpty) {
 		token := data["token"].(string)
 
-		_, err := g.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
+		_, err := is.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
 			Token: token,
 		})
 		a.So(err, should.BeNil)
 
-		found, err := g.GetUser(ctx, &pbtypes.Empty{})
+		found, err := is.GetUser(ctx, &pbtypes.Empty{})
 		a.So(err, should.BeNil)
 		a.So(found.ValidatedAt.IsZero(), should.BeFalse)
 	}
 
 	// try to update the user password providing a wrong old password
-	_, err = g.UpdateUserPassword(ctx, &ttnpb.UpdateUserPasswordRequest{
+	_, err = is.UpdateUserPassword(ctx, &ttnpb.UpdateUserPasswordRequest{
 		New: "heheh",
 	})
 	a.So(err, should.NotBeNil)
 	a.So(ErrPasswordsDoNotMatch.Describes(err), should.BeTrue)
 
-	_, err = g.UpdateUserPassword(ctx, &ttnpb.UpdateUserPasswordRequest{
+	_, err = is.UpdateUserPassword(ctx, &ttnpb.UpdateUserPasswordRequest{
 		Old: user.Password,
 		New: "heheh",
 	})
 	a.So(err, should.BeNil)
 
 	// generate a new API key
-	key, err := g.GenerateUserAPIKey(ctx, &ttnpb.GenerateUserAPIKeyRequest{
+	key, err := is.GenerateUserAPIKey(ctx, &ttnpb.GenerateUserAPIKeyRequest{
 		Name:   "foo",
 		Rights: ttnpb.AllUserRights,
 	})
@@ -123,37 +122,37 @@ func TestUser(t *testing.T) {
 
 	// update api key
 	key.Rights = []ttnpb.Right{ttnpb.Right(10)}
-	_, err = g.UpdateUserAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
+	_, err = is.UpdateUserAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 		Name:   key.Name,
 		Rights: key.Rights,
 	})
 	a.So(err, should.BeNil)
 
 	// can't generate another API Key with the same name
-	_, err = g.GenerateUserAPIKey(ctx, &ttnpb.GenerateUserAPIKeyRequest{
+	_, err = is.GenerateUserAPIKey(ctx, &ttnpb.GenerateUserAPIKeyRequest{
 		Name:   key.Name,
 		Rights: []ttnpb.Right{ttnpb.Right(1)},
 	})
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
-	keys, err := g.ListUserAPIKeys(ctx, &pbtypes.Empty{})
+	keys, err := is.ListUserAPIKeys(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	if a.So(keys.APIKeys, should.HaveLength, 1) {
 		sort.Slice(keys.APIKeys[0].Rights, func(i, j int) bool { return keys.APIKeys[0].Rights[i] < keys.APIKeys[0].Rights[j] })
 		a.So(keys.APIKeys[0], should.Resemble, key)
 	}
 
-	_, err = g.RemoveUserAPIKey(ctx, &ttnpb.RemoveUserAPIKeyRequest{
+	_, err = is.RemoveUserAPIKey(ctx, &ttnpb.RemoveUserAPIKeyRequest{
 		Name: key.Name,
 	})
 
-	keys, err = g.ListUserAPIKeys(ctx, &pbtypes.Empty{})
+	keys, err = is.ListUserAPIKeys(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
 	// update the user's email
-	_, err = g.UpdateUser(ctx, &ttnpb.UpdateUserRequest{
+	_, err = is.UpdateUser(ctx, &ttnpb.UpdateUserRequest{
 		User: ttnpb.User{
 			Email: "newfoo@bar.com",
 		},
@@ -164,7 +163,7 @@ func TestUser(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	// check that the field validated_at has been reset
-	found, err = g.GetUser(ctx, &pbtypes.Empty{})
+	found, err = is.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	a.So(found.UserIdentifier.UserID, should.Equal, user.UserID)
 	a.So(found.ValidatedAt.IsZero(), should.BeTrue)
@@ -179,17 +178,17 @@ func TestUser(t *testing.T) {
 	a.So(token, should.NotBeEmpty)
 
 	// request a new validation token
-	_, err = g.RequestUserEmailValidation(ctx, &pbtypes.Empty{})
+	_, err = is.RequestUserEmailValidation(ctx, &pbtypes.Empty{})
 
 	// check that the old validation token doesnt work because we requested a new one
-	_, err = g.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
+	_, err = is.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
 		Token: token,
 	})
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrValidationTokenNotFound.Describes(err), should.BeTrue)
 
 	// and therefore the email isn't validated yet
-	found, err = g.GetUser(ctx, &pbtypes.Empty{})
+	found, err = is.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	a.So(found.UserIdentifier.UserID, should.Equal, user.UserID)
 	a.So(found.ValidatedAt.IsZero(), should.BeTrue)
@@ -202,12 +201,12 @@ func TestUser(t *testing.T) {
 	a.So(token, should.NotBeEmpty)
 
 	// validate the email
-	_, err = g.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
+	_, err = is.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
 		Token: token,
 	})
 	a.So(err, should.BeNil)
 
-	found, err = g.GetUser(ctx, &pbtypes.Empty{})
+	found, err = is.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	a.So(found.UserIdentifier.UserID, should.Equal, user.UserID)
 	a.So(found.ValidatedAt.IsZero(), should.BeFalse)
@@ -222,7 +221,7 @@ func TestUser(t *testing.T) {
 		RedirectURI:      "foo.ttn.dev/oauth",
 		Creator:          ttnpb.UserIdentifier{user.UserID},
 	}
-	err = store.Clients.Create(client)
+	err = is.store.Clients.Create(client)
 	a.So(err, should.BeNil)
 
 	refreshData := &types.RefreshData{
@@ -231,7 +230,7 @@ func TestUser(t *testing.T) {
 		ClientID:     client.ClientID,
 		CreatedAt:    time.Now(),
 	}
-	err = store.OAuth.SaveRefreshToken(refreshData)
+	err = is.store.OAuth.SaveRefreshToken(refreshData)
 	a.So(err, should.BeNil)
 
 	accessData := &types.AccessData{
@@ -241,10 +240,10 @@ func TestUser(t *testing.T) {
 		CreatedAt:   time.Now(),
 		ExpiresIn:   3600,
 	}
-	err = store.OAuth.SaveAccessToken(accessData)
+	err = is.store.OAuth.SaveAccessToken(accessData)
 	a.So(err, should.BeNil)
 
-	clients, err := g.ListAuthorizedClients(ctx, &pbtypes.Empty{})
+	clients, err := is.ListAuthorizedClients(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	if a.So(clients.Clients, should.HaveLength, 1) {
 		cli := clients.Clients[0]
@@ -256,17 +255,17 @@ func TestUser(t *testing.T) {
 		a.So(cli.Grants, should.BeEmpty)
 	}
 
-	_, err = g.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifier{"non-existent-client"})
+	_, err = is.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifier{"non-existent-client"})
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrAuthorizedClientNotFound.Describes(err), should.BeTrue)
 
-	_, err = g.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifier{client.ClientID})
+	_, err = is.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifier{client.ClientID})
 	a.So(err, should.BeNil)
 
-	clients, err = g.ListAuthorizedClients(ctx, &pbtypes.Empty{})
+	clients, err = is.ListAuthorizedClients(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	a.So(clients.Clients, should.HaveLength, 0)
 
-	_, err = g.DeleteUser(ctx, &pbtypes.Empty{})
+	_, err = is.DeleteUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 }
