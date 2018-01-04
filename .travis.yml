@@ -22,6 +22,7 @@ script:
 - make go.unconvert
 - make go.fmt
 - make go.lint-travis-comment --no-print-directory
+- make headers.check
 - git diff --exit-code
 - GOARCH=amd64 make test
 - GOARCH=386 make test
