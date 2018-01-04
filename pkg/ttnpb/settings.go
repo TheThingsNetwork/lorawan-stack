@@ -2,12 +2,7 @@
 
 package ttnpb
 
-import (
-	"regexp"
-	"strings"
-
-	"github.com/gobwas/glob"
-)
+import "regexp"
 
 var (
 	// FieldPathSettingsBlacklistedIDs is the field path for the blacklisted IDs field.
@@ -31,39 +26,3 @@ var (
 	// FieldPathSettingsAllowedEmails is the field path for the allowed emails field.
 	FieldPathSettingsAllowedEmails = regexp.MustCompile(`^allowed_emails$`)
 )
-
-// IsEmailAllowed checks whether an input email is allowed given the glob list
-// of allowed emails in the settings.
-func (s *IdentityServerSettings) IsEmailAllowed(email string) bool {
-	if s.AllowedEmails == nil || len(s.AllowedEmails) == 0 {
-		return true
-	}
-
-	found := false
-	for i := range s.AllowedEmails {
-		found = glob.MustCompile(strings.ToLower(s.AllowedEmails[i])).Match(strings.ToLower(email))
-		if found {
-			break
-		}
-	}
-
-	return found
-}
-
-// IsIDAllowed checks whether an ID is allowed to be used given the list of
-// blacklisted IDs contained in the settings.
-func (s *IdentityServerSettings) IsIDAllowed(id string) bool {
-	if s.BlacklistedIDs == nil || len(s.BlacklistedIDs) == 0 {
-		return true
-	}
-
-	allowed := true
-	for _, blacklistedID := range s.BlacklistedIDs {
-		allowed = id != blacklistedID
-		if !allowed {
-			break
-		}
-	}
-
-	return allowed
-}

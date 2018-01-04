@@ -1,4 +1,4 @@
-// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+// Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 package api
 
@@ -8,6 +8,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
 )
@@ -28,7 +29,7 @@ func (g *GRPC) CreateApplication(ctx context.Context, req *ttnpb.CreateApplicati
 	}
 
 	// check for blacklisted ids
-	if !settings.IsIDAllowed(req.Application.ApplicationID) {
+	if !util.IsIDAllowed(req.Application.ApplicationID, settings.BlacklistedIDs) {
 		return nil, ErrBlacklistedID.New(errors.Attributes{
 			"id": req.Application.ApplicationID,
 		})

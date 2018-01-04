@@ -1,4 +1,4 @@
-// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+// Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 package api
 
@@ -12,6 +12,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/random"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	ttntypes "github.com/TheThingsNetwork/ttn/pkg/types"
@@ -29,14 +30,14 @@ func (g *GRPC) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequest) (*p
 	}
 
 	// check for blacklisted ids
-	if !settings.IsIDAllowed(req.User.UserID) {
+	if !util.IsIDAllowed(req.User.UserID, settings.BlacklistedIDs) {
 		return nil, ErrBlacklistedID.New(errors.Attributes{
 			"id": req.User.UserID,
 		})
 	}
 
 	// check for allowed emails
-	if !settings.IsEmailAllowed(req.User.Email) {
+	if !util.IsEmailAllowed(req.User.Email, settings.AllowedEmails) {
 		return nil, ErrNotAllowedEmail.New(errors.Attributes{
 			"email": req.User.Email,
 		})
@@ -140,7 +141,7 @@ func (g *GRPC) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (*p
 				found.GetUser().ValidatedAt = time.Time{}
 			}
 
-			if !settings.IsEmailAllowed(req.User.Email) {
+			if !util.IsEmailAllowed(req.User.Email, settings.AllowedEmails) {
 				return nil, ErrNotAllowedEmail.New(errors.Attributes{
 					"email": req.User.Email,
 				})
