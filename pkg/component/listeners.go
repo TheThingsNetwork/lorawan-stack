@@ -24,39 +24,40 @@ func (c *Component) tlsConfig() (*tls.Config, error) {
 	}, nil
 }
 
-type listener struct {
-	c   *Component
-	lis net.Listener
-	tcp cmux.CMux
-	tls cmux.CMux
-}
-
 // Listener that accepts multiple protocols on the same port
 type Listener interface {
-	TLS() (cmux.CMux, error)
-	TCP() (cmux.CMux, error)
+	TLS() (net.Listener, error)
+	TCP() (net.Listener, error)
 	Close() error
 }
 
-func (l *listener) TLS() (cmux.CMux, error) {
-	if l.tls == nil {
-		config, err := l.c.tlsConfig()
-		if err != nil {
-			return nil, err
-		}
-		tcp, err := l.TCP()
-		if err != nil {
-			return nil, err
-		}
-		l.tls = cmux.New(tls.NewListener(tcp.Match(cmux.TLS()), config))
-	}
-	return l.tls, nil
+type listener struct {
+	c       *Component
+	lis     net.Listener
+	mux     cmux.CMux
+	tcp     net.Listener
+	tcpUsed bool
+	tls     net.Listener
+	tlsUsed bool
 }
 
-func (l *listener) TCP() (cmux.CMux, error) {
-	if l.tcp == nil {
-		l.tcp = cmux.New(l.lis)
+func (l *listener) TLS() (net.Listener, error) {
+	if l.tlsUsed {
+		return nil, errors.New("TLS listener already in use")
 	}
+	config, err := l.c.tlsConfig()
+	if err != nil {
+		return nil, err
+	}
+	l.tlsUsed = true
+	return tls.NewListener(l.tls, config), nil
+}
+
+func (l *listener) TCP() (net.Listener, error) {
+	if l.tcpUsed {
+		return nil, errors.New("TCP listener already in use")
+	}
+	l.tcpUsed = true
 	return l.tcp, nil
 }
 
@@ -73,32 +74,21 @@ func (c *Component) Listen(address string) (Listener, error) {
 		if err != nil {
 			return nil, err
 		}
-		l = &listener{c: c, lis: lis}
+		mux := cmux.New(lis)
+		l = &listener{
+			c:   c,
+			lis: lis,
+			mux: mux,
+			tls: mux.Match(cmux.TLS()),
+			tcp: mux.Match(cmux.Any()),
+		}
 		c.listeners[address] = l
+		go func() {
+			c.logger.WithField("address", l.lis.Addr().String()).Debug("Start serving")
+			if err := l.mux.Serve(); err != nil {
+				c.logger.WithError(err).Errorf("Error in Listener %s", l.lis.Addr())
+			}
+		}()
 	}
 	return l, nil
-}
-
-func (c *Component) startListeners() {
-	for _, lis := range c.listeners {
-		l := lis // shadow the listener
-		if l.tcp != nil {
-			go func() {
-				c.logger.WithField("address", l.lis.Addr().String()).Debug("Start serving (TCP)")
-				err := l.tcp.Serve()
-				if err != nil {
-					c.logger.WithError(err).Errorf("Error in TCP Listener %s", l.lis.Addr())
-				}
-			}()
-		}
-		if l.tls != nil {
-			go func() {
-				c.logger.WithField("address", l.lis.Addr().String()).Debug("Start serving (TLS)")
-				err := l.tls.Serve()
-				if err != nil {
-					c.logger.WithError(err).Errorf("Error in TLS Listener %s", l.lis.Addr())
-				}
-			}()
-		}
-	}
 }

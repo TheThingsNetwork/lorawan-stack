@@ -9,7 +9,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/web"
 	"github.com/labstack/echo"
-	"github.com/soheilhy/cmux"
 )
 
 // RegisterWeb registers a web subsystem to the component
@@ -18,31 +17,20 @@ func (c *Component) RegisterWeb(s web.Registerer) {
 }
 
 func (c *Component) listenWeb() (err error) {
-	serve := func(mux cmux.CMux) {
-		h2 := mux.Match(cmux.HTTP2())
-		go func() {
-			if err := http.Serve(h2, c.web); err != nil {
-				c.logger.WithError(err).Errorf("Error serving HTTP on %s", h2.Addr())
-			}
-		}()
-		h1 := mux.Match(cmux.HTTP1Fast())
-		go func() {
-			if err := http.Serve(h1, c.web); err != nil {
-				c.logger.WithError(err).Errorf("Error serving HTTP on %s", h1.Addr())
-			}
-		}()
-	}
-
 	if c.config.HTTP.Listen != "" {
 		l, err := c.Listen(c.config.HTTP.Listen)
 		if err != nil {
 			return errors.NewWithCause("Could not listen on HTTP port", err)
 		}
-		mux, err := l.TCP()
+		lis, err := l.TCP()
 		if err != nil {
-			return errors.NewWithCause("Could not create TCP mux on top of HTTP listener", err)
+			return errors.NewWithCause("Could not create TCP HTTP listener", err)
 		}
-		serve(mux)
+		go func() {
+			if err := http.Serve(lis, c.web); err != nil {
+				c.logger.WithError(err).Errorf("Error serving HTTP on %s", lis.Addr())
+			}
+		}()
 	}
 
 	if c.config.HTTP.ListenTLS != "" {
@@ -50,11 +38,15 @@ func (c *Component) listenWeb() (err error) {
 		if err != nil {
 			return errors.NewWithCause("Could not listen on HTTP/tls port", err)
 		}
-		mux, err := l.TLS()
+		lis, err := l.TLS()
 		if err != nil {
-			return errors.NewWithCause("Could not create TLS mux on top of HTTP/tls listener", err)
+			return errors.NewWithCause("Could not create TLS HTTP listener", err)
 		}
-		serve(mux)
+		go func() {
+			if err := http.Serve(lis, c.web); err != nil {
+				c.logger.WithError(err).Errorf("Error serving HTTP on %s", lis.Addr())
+			}
+		}()
 	}
 
 	if c.config.HTTP.PProf {

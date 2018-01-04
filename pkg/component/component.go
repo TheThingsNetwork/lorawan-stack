@@ -99,19 +99,21 @@ func (c *Component) Start() (err error) {
 	signals := make(chan os.Signal)
 	signal.Notify(signals, os.Interrupt, os.Kill, syscall.SIGTERM)
 
-	c.logger.Debug("Starting servers")
-
 	if c.grpc != nil {
+		c.logger.Debug("Setting up gRPC server...")
 		if err = c.listenGRPC(); err != nil {
+			c.logger.WithError(err).Error("Could not start gRPC server")
 			return err
 		}
 	}
+	c.logger.Debug("Started gRPC server")
 
+	c.logger.Debug("Setting up HTTP server...")
 	if err = c.listenWeb(); err != nil {
+		c.logger.WithError(err).Error("Could not start HTTP server")
 		return err
 	}
-
-	c.startListeners()
+	c.logger.Debug("Started HTTP server")
 
 	for {
 		select {
@@ -137,6 +139,7 @@ func (c *Component) Close() {
 	}
 
 	if c.grpc != nil {
+		c.logger.Debug("Stopping gRPC server...")
 		c.grpc.Stop()
 		c.logger.Debug("Stopped gRPC server")
 	}

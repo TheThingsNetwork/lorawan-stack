@@ -10,7 +10,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/rpclog"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
 	"github.com/labstack/echo"
-	"github.com/soheilhy/cmux"
 )
 
 func (c *Component) initGRPC() {
@@ -49,11 +48,10 @@ func (c *Component) listenGRPC() (err error) {
 		if err != nil {
 			return errors.NewWithCause("Could not listen on gRPC port", err)
 		}
-		mux, err := l.TCP()
+		lis, err := l.TCP()
 		if err != nil {
-			return errors.NewWithCause("Could not create TCP mux on top of gRPC listener", err)
+			return errors.NewWithCause("Could not create TCP gRPC listener", err)
 		}
-		lis := mux.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
 		go func() {
 			if err := c.grpc.Serve(lis); err != nil {
 				c.logger.WithError(err).Errorf("Error serving gRPC on %s", lis.Addr())
@@ -65,11 +63,10 @@ func (c *Component) listenGRPC() (err error) {
 		if err != nil {
 			return errors.NewWithCause("Could not listen on gRPC/tls port", err)
 		}
-		mux, err := l.TLS()
+		lis, err := l.TLS()
 		if err != nil {
-			return errors.NewWithCause("Could not create TLS mux on top of gRPC/tls listener", err)
+			return errors.NewWithCause("Could not create TLS gRPC listener", err)
 		}
-		lis := mux.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
 		go func() {
 			if err := c.grpc.Serve(lis); err != nil {
 				c.logger.WithError(err).Errorf("Error serving gRPC/tls on %s", lis.Addr())
