@@ -283,9 +283,7 @@ func (is *IdentityServer) GenerateUserAPIKey(ctx context.Context, req *ttnpb.Gen
 		return nil, err
 	}
 
-	//  TODO(gomezjdaniel): use the tenantID from the request metadata to generate
-	//  to generate the user API key.
-	k, err := auth.GenerateUserAPIKey("")
+	k, err := auth.GenerateUserAPIKey(is.config.Hostname)
 	if err != nil {
 		return nil, err
 	}

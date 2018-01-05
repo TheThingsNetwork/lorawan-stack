@@ -135,8 +135,7 @@ func (is *IdentityServer) GenerateApplicationAPIKey(ctx context.Context, req *tt
 		return nil, err
 	}
 
-	// TODO(gomezjdaniel): add issuer
-	k, err := auth.GenerateApplicationAPIKey("")
+	k, err := auth.GenerateApplicationAPIKey(is.config.Hostname)
 	if err != nil {
 		return nil, err
 	}

@@ -54,7 +54,7 @@ func (is *IdentityServer) CreateGateway(ctx context.Context, req *ttnpb.CreateGa
 			return err
 		}
 
-		k, err := auth.GenerateGatewayAPIKey("")
+		k, err := auth.GenerateGatewayAPIKey(is.config.Hostname)
 		if err != nil {
 			return err
 		}
@@ -191,7 +191,7 @@ func (is *IdentityServer) GenerateGatewayAPIKey(ctx context.Context, req *ttnpb.
 		return nil, err
 	}
 
-	k, err := auth.GenerateGatewayAPIKey("")
+	k, err := auth.GenerateGatewayAPIKey(is.config.Hostname)
 	if err != nil {
 		return nil, err
 	}
