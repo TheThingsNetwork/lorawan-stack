@@ -9,6 +9,15 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
+func BenchmarkKeyDecoding(b *testing.B) {
+	key, _ := GenerateApplicationAPIKey("foo.issuer")
+	b.ResetTimer()
+
+	for n := 0; n < b.N; n++ {
+		DecodeTokenOrKey(key)
+	}
+}
+
 func TestJOSEEncoding(t *testing.T) {
 	a := assertions.New(t)
 
