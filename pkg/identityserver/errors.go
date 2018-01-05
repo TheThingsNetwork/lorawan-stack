@@ -6,33 +6,58 @@ import "github.com/TheThingsNetwork/ttn/pkg/errors"
 
 func init() {
 	ErrBlacklistedID.Register()
-	ErrNotAllowedEmail.Register()
-	ErrPasswordsDoNotMatch.Register()
+	ErrEmailAddressNotAllowed.Register()
+	ErrInvalidPassword.Register()
+	ErrNotAuthorized.Register()
+	ErrSetApplicationCollaboratorFailed.Register()
+	ErrSetGatewayCollaboratorFailed.Register()
 }
-
-// ErrNotAuthorized is returned when trying to access a protected resource without
-// authorization.
-var ErrNotAuthorized = errors.New("not authorized")
 
 // ErrBlacklistedID is returned when trying to register an entity using a blacklisted ID.
 var ErrBlacklistedID = &errors.ErrDescriptor{
-	MessageFormat: "{id} is not an allowed ID",
+	MessageFormat: "`{id} is not an allowed ID",
 	Code:          1,
 	Type:          errors.InvalidArgument,
 }
 
-// ErrNotAllowedEmail is returned when trying to set in an user account a not
-// allowed email.
-var ErrNotAllowedEmail = &errors.ErrDescriptor{
-	MessageFormat: "{email} is not an allowed email",
+// ErrEmailAddressNotAllowed is returned when trying to set in a user account an
+// email address that is not allowed
+var ErrEmailAddressNotAllowed = &errors.ErrDescriptor{
+	MessageFormat: "Email address `{email}` is not allowed. Current allowed email addresses by the network administrators are in the following form: {allowed_emails}",
 	Code:          2,
 	Type:          errors.InvalidArgument,
 }
 
-// ErrPasswordDoNotMatch is returned when trying to update the user's account
+// ErrInvalidPassword is returned when trying to update the user's account
 // password while providing a wrong current password.
-var ErrPasswordsDoNotMatch = &errors.ErrDescriptor{
-	MessageFormat: "Passwords do not match each other",
+var ErrInvalidPassword = &errors.ErrDescriptor{
+	MessageFormat: "Invalid password",
 	Code:          3,
-	Type:          errors.InvalidArgument,
+	Type:          errors.Unauthorized,
+}
+
+// ErrNotAuthorized is returned when trying to access a protected resource without
+// authorization.
+var ErrNotAuthorized = &errors.ErrDescriptor{
+	MessageFormat: "Not authorized",
+	Code:          4,
+	Type:          errors.Unauthorized,
+}
+
+// ErrSetApplicationCollaboratorFailed is returned when after modifying the
+// collaborators of an application there is no collaborator with
+// `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right.
+var ErrSetApplicationCollaboratorFailed = &errors.ErrDescriptor{
+	MessageFormat: "Failed to modify collaborators: application `{application_id}` must have at least one collaborator with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right",
+	Code:          5,
+	Type:          errors.Conflict,
+}
+
+// ErrSetGatewayCollaboratorFailed is returned when after modifying the
+// collaborators of a gateway there is no collaborator with
+// `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` right.
+var ErrSetGatewayCollaboratorFailed = &errors.ErrDescriptor{
+	MessageFormat: "Failed to modify collaborators: gateway `{gateway_id}` must have at least one collaborator with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` right",
+	Code:          6,
+	Type:          errors.Conflict,
 }

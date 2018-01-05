@@ -249,7 +249,7 @@ func (is *IdentityServer) RemoveGatewayAPIKey(ctx context.Context, req *ttnpb.Re
 
 // SetGatewayCollaborator sets or unsets a gateway collaborator. It returns error
 // if after unset a collaborators there is no at least one collaborator with
-// `gateway:settings:collaborators` right.
+// `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` right.
 func (is *IdentityServer) SetGatewayCollaborator(ctx context.Context, req *ttnpb.GatewayCollaborator) (*pbtypes.Empty, error) {
 	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
 	if err != nil {
@@ -269,7 +269,9 @@ func (is *IdentityServer) SetGatewayCollaborator(ctx context.Context, req *ttnpb
 		}
 
 		if len(collaborators) == 0 {
-			return errors.Errorf("failed to unset collaborator: `%s` must have at least one collaborator with `gateway:settings:collaborators right", req.GatewayID)
+			return ErrSetGatewayCollaboratorFailed.New(errors.Attributes{
+				"gateway_id": req.GatewayID,
+			})
 		}
 
 		return nil

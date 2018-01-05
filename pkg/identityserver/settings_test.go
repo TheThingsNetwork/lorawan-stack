@@ -23,10 +23,10 @@ func TestSettings(t *testing.T) {
 	user := testUsers()["alice"]
 
 	ctx := claims.NewContext(context.Background(), &auth.Claims{
-		EntityID:  user.UserID,
-		EntityTyp: auth.EntityUser,
-		Source:    auth.Token,
-		Rights:    ttnpb.AllUserRights,
+		EntityID:   user.UserID,
+		EntityType: auth.EntityUser,
+		Source:     auth.Token,
+		Rights:     ttnpb.AllUserRights,
 	})
 
 	resp, err := is.GetSettings(ctx, &pbtypes.Empty{})

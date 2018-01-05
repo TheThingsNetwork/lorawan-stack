@@ -1,4 +1,4 @@
-// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+// Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 package sendgrid
 
@@ -30,7 +30,7 @@ type SendGrid struct {
 // SendGridOpt is the type of functions that configure the provider.
 type SendGridOpt func(*SendGrid)
 
-// EnableSandoxMode allows to activate the sandbox mode for testing purposes.
+// EnableSandoxMode sets the sandbox mode for testing purposes.
 func EnableSandboxMode(s *SendGrid) {
 	s.sandboxMode = true
 }

@@ -541,7 +541,7 @@ func (s *GatewayStore) listRadios(q db.QueryContext, gtwID string) ([]ttnpb.Gate
 	return radios, nil
 }
 
-// Delete deletes an gateway.
+// Delete deletes a gateway.
 func (s *GatewayStore) Delete(gtwID string) error {
 	err := s.transact(func(tx *db.Tx) error {
 		err := s.deleteCollaborators(tx, gtwID)

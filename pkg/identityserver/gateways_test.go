@@ -56,10 +56,10 @@ func TestGateway(t *testing.T) {
 	}
 
 	ctx := claims.NewContext(context.Background(), &auth.Claims{
-		EntityID:  user.UserID,
-		EntityTyp: auth.EntityUser,
-		Source:    auth.Token,
-		Rights:    append(ttnpb.AllUserRights, ttnpb.AllGatewayRights...),
+		EntityID:   user.UserID,
+		EntityType: auth.EntityUser,
+		Source:     auth.Token,
+		Rights:     append(ttnpb.AllUserRights, ttnpb.AllGatewayRights...),
 	})
 
 	_, err := is.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{

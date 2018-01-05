@@ -35,10 +35,10 @@ func TestClient(t *testing.T) {
 	}
 
 	ctx := claims.NewContext(context.Background(), &auth.Claims{
-		EntityID:  user.UserID,
-		EntityTyp: auth.EntityUser,
-		Source:    auth.Token,
-		Rights:    append(ttnpb.AllUserRights),
+		EntityID:   user.UserID,
+		EntityType: auth.EntityUser,
+		Source:     auth.Token,
+		Rights:     append(ttnpb.AllUserRights),
 	})
 
 	_, err := is.CreateClient(ctx, &ttnpb.CreateClientRequest{

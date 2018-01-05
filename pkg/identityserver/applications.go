@@ -193,8 +193,8 @@ func (is *IdentityServer) RemoveApplicationAPIKey(ctx context.Context, req *ttnp
 }
 
 // SetApplicationCollaborators allows to set and unset an application collaborator.
-// It fails if after unset a collaborator there are no at least one collaborator
-// with `application:settings:collaborators` right.
+// It fails if after unset a collaborator there is no at least one collaborator
+// with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right.
 func (is *IdentityServer) SetApplicationCollaborator(ctx context.Context, req *ttnpb.ApplicationCollaborator) (*pbtypes.Empty, error) {
 	err := is.applicationCheck(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
 	if err != nil {
@@ -214,7 +214,9 @@ func (is *IdentityServer) SetApplicationCollaborator(ctx context.Context, req *t
 		}
 
 		if len(collaborators) == 0 {
-			return errors.Errorf("failed to unset collaborator: `%s` must have at least one collaborator with `application:settings:collaborators right", req.ApplicationID)
+			return ErrSetApplicationCollaboratorFailed.New(errors.Attributes{
+				"application_id": req.ApplicationID,
+			})
 		}
 
 		return nil

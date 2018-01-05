@@ -31,10 +31,10 @@ func TestUser(t *testing.T) {
 	}
 
 	ctx := claims.NewContext(context.Background(), &auth.Claims{
-		EntityID:  user.UserID,
-		EntityTyp: auth.EntityUser,
-		Source:    auth.Token,
-		Rights:    ttnpb.AllUserRights,
+		EntityID:   user.UserID,
+		EntityType: auth.EntityUser,
+		Source:     auth.Token,
+		Rights:     ttnpb.AllUserRights,
 	})
 
 	// can't create an account using a not allowed email
@@ -43,7 +43,7 @@ func TestUser(t *testing.T) {
 		User: user,
 	})
 	a.So(err, should.NotBeNil)
-	a.So(ErrNotAllowedEmail.Describes(err), should.BeTrue)
+	a.So(ErrEmailAddressNotAllowed.Describes(err), should.BeTrue)
 	user.Email = "foo@bar.com"
 
 	// can't create account using a blacklisted id
@@ -66,7 +66,8 @@ func TestUser(t *testing.T) {
 	// can't retrieve profile without proper claims
 	found, err := is.GetUser(context.Background(), &pbtypes.Empty{})
 	a.So(found, should.BeNil)
-	a.So(err, should.Equal, ErrNotAuthorized)
+	a.So(err, should.NotBeNil)
+	a.So(ErrNotAuthorized.Describes(err), should.BeTrue)
 
 	// check that response doesnt include password within
 	found, err = is.GetUser(ctx, &pbtypes.Empty{})
@@ -102,7 +103,7 @@ func TestUser(t *testing.T) {
 		New: "heheh",
 	})
 	a.So(err, should.NotBeNil)
-	a.So(ErrPasswordsDoNotMatch.Describes(err), should.BeTrue)
+	a.So(ErrInvalidPassword.Describes(err), should.BeTrue)
 
 	_, err = is.UpdateUserPassword(ctx, &ttnpb.UpdateUserPasswordRequest{
 		Old: user.Password,

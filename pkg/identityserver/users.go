@@ -38,8 +38,9 @@ func (is *IdentityServer) CreateUser(ctx context.Context, req *ttnpb.CreateUserR
 
 	// check for allowed emails
 	if !util.IsEmailAllowed(req.User.Email, settings.AllowedEmails) {
-		return nil, ErrNotAllowedEmail.New(errors.Attributes{
-			"email": req.User.Email,
+		return nil, ErrEmailAddressNotAllowed.New(errors.Attributes{
+			"email":          req.User.Email,
+			"allowed_emails": settings.AllowedEmails,
 		})
 	}
 
@@ -142,8 +143,9 @@ func (is *IdentityServer) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserR
 			}
 
 			if !util.IsEmailAllowed(req.User.Email, settings.AllowedEmails) {
-				return nil, ErrNotAllowedEmail.New(errors.Attributes{
-					"email": req.User.Email,
+				return nil, ErrEmailAddressNotAllowed.New(errors.Attributes{
+					"email":          req.User.Email,
+					"allowed_emails": settings.AllowedEmails,
 				})
 			}
 
@@ -206,7 +208,7 @@ func (is *IdentityServer) UpdateUserPassword(ctx context.Context, req *ttnpb.Upd
 	}
 
 	if !matches {
-		return nil, ErrPasswordsDoNotMatch.New(nil)
+		return nil, ErrInvalidPassword.New(nil)
 	}
 
 	hashed, err := ttntypes.Hash(req.New)
@@ -246,7 +248,7 @@ func (is *IdentityServer) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pb
 			}
 
 			if len(c) == 0 {
-				return errors.Errorf("Failed to delete user `%s`: cannot leave application `%s` without at least one collaborator with `application:settings:collaborators` right", userID, appID)
+				return errors.Errorf("Failed to delete user `%s`: cannot leave application `%s` without at least one collaborator with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right", userID, appID)
 			}
 		}
 
@@ -264,7 +266,7 @@ func (is *IdentityServer) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pb
 			}
 
 			if len(c) == 0 {
-				return errors.Errorf("Failed to delete user `%s`: cannot leave gateway `%s` without at least one collaborator with `gateway:settings:collaborators` right", userID, gtwID)
+				return errors.Errorf("Failed to delete user `%s`: cannot leave gateway `%s` without at least one collaborator with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` right", userID, gtwID)
 			}
 		}
 
@@ -369,7 +371,7 @@ func (is *IdentityServer) ValidateUserEmail(ctx context.Context, req *ttnpb.Vali
 	return nil, err
 }
 
-// RequestUserEmailValidation requests a new validation email if the user's emai
+// RequestUserEmailValidation requests a new validation email if the user's email
 // isn't validated yet.
 func (is *IdentityServer) RequestUserEmailValidation(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.Empty, error) {
 	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)

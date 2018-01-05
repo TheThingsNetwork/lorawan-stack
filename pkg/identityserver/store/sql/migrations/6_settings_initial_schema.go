@@ -1,10 +1,10 @@
-// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+// Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 package migrations
 
 func init() {
 	// The check constraint in the column `id` enforces the table to have only
-	// one row at much.
+	// one row at most.
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS settings (
 			id                     INT PRIMARY KEY DEFAULT 1 CHECK (id = 1),

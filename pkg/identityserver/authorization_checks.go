@@ -17,17 +17,17 @@ func (is *IdentityServer) userCheck(ctx context.Context, rights ...ttnpb.Right) 
 
 	userID := claims.UserID()
 	if userID == "" {
-		return "", ErrNotAuthorized
+		return "", ErrNotAuthorized.New(nil)
 	}
 
 	if !claims.HasRights(rights...) {
-		return "", ErrNotAuthorized
+		return "", ErrNotAuthorized.New(nil)
 	}
 
 	return userID, nil
 }
 
-// adminCheck undercalls `userCheck` with `user:admin` right and then fetches
+// adminCheck undercalls `userCheck` with `RIGHT_USER_ADMIN` right and then fetches
 // from the store the user to check if it has activated the admin flag.
 func (is *IdentityServer) adminCheck(ctx context.Context) error {
 	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_ADMIN)
@@ -41,7 +41,7 @@ func (is *IdentityServer) adminCheck(ctx context.Context) error {
 	}
 
 	if !found.GetUser().Admin {
-		return ErrNotAuthorized
+		return ErrNotAuthorized.New(nil)
 	}
 
 	return nil
@@ -56,7 +56,7 @@ func (is *IdentityServer) applicationCheck(ctx context.Context, appID string, ri
 	claims := claims.FromContext(ctx)
 
 	if !claims.HasRights(rights...) {
-		return ErrNotAuthorized
+		return ErrNotAuthorized.New(nil)
 	}
 
 	var authorized bool
@@ -67,7 +67,7 @@ func (is *IdentityServer) applicationCheck(ctx context.Context, appID string, ri
 	case auth.Token:
 		userID := claims.UserID()
 		if len(userID) == 0 {
-			return ErrNotAuthorized
+			return ErrNotAuthorized.New(nil)
 		}
 
 		authorized, err = is.store.Applications.HasUserRights(appID, userID, rights...)
@@ -77,7 +77,7 @@ func (is *IdentityServer) applicationCheck(ctx context.Context, appID string, ri
 	}
 
 	if !authorized {
-		return ErrNotAuthorized
+		return ErrNotAuthorized.New(nil)
 	}
 
 	return nil
@@ -92,7 +92,7 @@ func (is *IdentityServer) gatewayCheck(ctx context.Context, gtwID string, rights
 	claims := claims.FromContext(ctx)
 
 	if !claims.HasRights(rights...) {
-		return ErrNotAuthorized
+		return ErrNotAuthorized.New(nil)
 	}
 
 	var authorized bool
@@ -103,7 +103,7 @@ func (is *IdentityServer) gatewayCheck(ctx context.Context, gtwID string, rights
 	case auth.Token:
 		userID := claims.UserID()
 		if len(userID) == 0 {
-			return ErrNotAuthorized
+			return ErrNotAuthorized.New(nil)
 		}
 
 		authorized, err = is.store.Gateways.HasUserRights(gtwID, userID, rights...)
@@ -113,7 +113,7 @@ func (is *IdentityServer) gatewayCheck(ctx context.Context, gtwID string, rights
 	}
 
 	if !authorized {
-		return ErrNotAuthorized
+		return ErrNotAuthorized.New(nil)
 	}
 
 	return nil

@@ -62,7 +62,7 @@ func (is *IdentityServer) GetClient(ctx context.Context, req *ttnpb.ClientIdenti
 
 	// ensure the user is the client's creator
 	if found.GetClient().Creator.UserID != userID {
-		return nil, ErrNotAuthorized
+		return nil, ErrNotAuthorized.New(nil)
 	}
 
 	return found.GetClient(), err
@@ -106,7 +106,7 @@ func (is *IdentityServer) UpdateClient(ctx context.Context, req *ttnpb.UpdateCli
 
 	// ensure the user is the client's creator
 	if found.GetClient().Creator.UserID != userID {
-		return nil, ErrNotAuthorized
+		return nil, ErrNotAuthorized.New(nil)
 	}
 
 	for _, path := range req.UpdateMask.Paths {
@@ -137,7 +137,7 @@ func (is *IdentityServer) DeleteClient(ctx context.Context, req *ttnpb.ClientIde
 
 	// ensure the user is the client's creator
 	if found.GetClient().Creator.UserID != userID {
-		return nil, ErrNotAuthorized
+		return nil, ErrNotAuthorized.New(nil)
 	}
 
 	return nil, is.store.Clients.Delete(req.ClientID)
