@@ -91,7 +91,18 @@ func marshalNested(v reflect.Value) interface{} {
 			return marshal(m)
 		}
 	case reflect.Slice, reflect.Array:
-		switch v.Type().Elem().Kind() {
+		switch e := v.Type().Elem(); e.Kind() {
+		case reflect.Ptr:
+			switch se := e.Elem(); se.Kind() {
+			case reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
+			default:
+				n := v.Len()
+				sl := reflect.MakeSlice(se, n, n)
+				for i := 0; i < n; i++ {
+					sl.Index(i).Set(reflect.Indirect(v.Index(i)))
+				}
+				return sl.Interface()
+			}
 		case reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
 		default:
 			return v.Interface()
