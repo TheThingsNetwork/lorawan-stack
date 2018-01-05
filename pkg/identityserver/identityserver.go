@@ -33,10 +33,18 @@ type IdentityServer struct {
 
 // Config defines the needed parameters to start the Identity Server.
 type Config struct {
-	DSN              string
-	Hostname         string
+	// DSN is the Data Source Name used by the store to connect to the database.
+	DSN string
+
+	// Hostname denotes the Identity Server hostname. It is used as issuer when
+	// generating access tokens and API keys.
+	Hostname string
+
+	// RecreateDatabase denotes if the database is recreated when the store is initialized.
+	// WARNING: it will erase all the previous data
 	RecreateDatabase bool
 
+	// defaultSettings are the default settings loaded in the store when it first-time initialized.
 	defaultSettings *ttnpb.IdentityServerSettings
 }
 
