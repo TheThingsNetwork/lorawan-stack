@@ -7,6 +7,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
+	"github.com/jaytaylor/html2text"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
@@ -30,21 +31,23 @@ type SendGrid struct {
 // SendGridOpt is the type of functions that configure the provider.
 type SendGridOpt func(*SendGrid)
 
-// EnableSandoxMode sets the sandbox mode for testing purposes.
-func EnableSandboxMode(s *SendGrid) {
-	s.sandboxMode = true
+// SandoxMode sets the sandbox mode for testing purposes.
+func SandboxMode(enabled bool) SendGridOpt {
+	return func(s *SendGrid) {
+		s.sandboxMode = enabled
+	}
 }
 
-// SetFromEmail allows to replace the default from email.
-func SetFromEmail(name, address string) SendGridOpt {
+// SenderAddress sets the given address as from email address.
+func SenderAddress(name, address string) SendGridOpt {
 	return func(s *SendGrid) {
 		s.fromEmail = mail.NewEmail(name, address)
 	}
 }
 
-// SetTemplateRenderer allows to replace the default renderer that relies on
-// `text/template` package.
-func SetTemplateRenderer(renderer templates.Renderer) SendGridOpt {
+// TemplateRenderer sets the given template renderer and therefore replaces
+// the default templates.DefaultRenderer.
+func TemplateRenderer(renderer templates.Renderer) SendGridOpt {
 	return func(s *SendGrid) {
 		s.renderer = renderer
 	}
@@ -59,8 +62,8 @@ func New(logger log.Interface, apiKey string, opts ...SendGridOpt) *SendGrid {
 		renderer:  templates.DefaultRenderer{},
 	}
 
-	for _, fn := range opts {
-		fn(provider)
+	for _, opt := range opts {
+		opt(provider)
 	}
 
 	return provider
@@ -114,11 +117,17 @@ func (s *SendGrid) buildEmail(to string, tmpl *templates.Template, data interfac
 		return nil, err
 	}
 
+	text, err := html2text.FromString(content, html2text.Options{PrettyTables: true})
+	if err != nil {
+		return nil, err
+	}
+
 	message := mail.NewV3MailInit(
 		s.fromEmail,
 		subject,
 		mail.NewEmail("", to),
-		mail.NewContent("text/hml", content),
+		mail.NewContent("text/html", content),
+		mail.NewContent("text/plain", text),
 	)
 
 	if s.sandboxMode {

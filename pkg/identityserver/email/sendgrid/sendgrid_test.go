@@ -17,10 +17,15 @@ func TestSendGrid(t *testing.T) {
 
 	tmpl := &templates.Template{
 		Subject: "Hi",
-		Message: "{{.name}}!",
+		Message: "<b>{{.name}}!</b>",
 	}
 
-	sendgrid := New(test.GetLogger(t), "API_KEY", EnableSandboxMode, SetFromEmail("Foo", "foo@foo.local"))
+	sendgrid := New(
+		test.GetLogger(t),
+		"API_KEY",
+		SandboxMode(true),
+		SenderAddress("Foo", "foo@foo.local"),
+	)
 
 	a.So(sendgrid.client, should.NotBeNil)
 	a.So(sendgrid.sandboxMode, should.BeTrue)
@@ -33,6 +38,8 @@ func TestSendGrid(t *testing.T) {
 	a.So(message.From, should.Resemble, mail.NewEmail("Foo", "foo@foo.local"))
 	a.So(message.Subject, should.Equal, tmpl.Subject)
 	a.So(message.Personalizations[0].To, should.Contain, mail.NewEmail("", "john@doe.com"))
-	a.So(message.Content, should.Contain, mail.NewContent("text/hml", "john!"))
+	a.So(message.Content, should.HaveLength, 2)
+	a.So(message.Content, should.Contain, mail.NewContent("text/html", "<b>john!</b>"))
+	a.So(message.Content, should.Contain, mail.NewContent("text/plain", "*john!*"))
 	a.So(*(message.MailSettings.SandboxMode.Enable), should.BeTrue)
 }
