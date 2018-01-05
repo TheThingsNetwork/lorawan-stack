@@ -53,6 +53,8 @@ func testConfig() *Config {
 		Hostname:         "development.identityserver.ttn",
 		DSN:              fmt.Sprintf(address, database),
 		RecreateDatabase: true,
+		DisplayName:      "The Things Network",
+		HomeURL:          "https://www.thethingsnetwork.org",
 	}
 }
 

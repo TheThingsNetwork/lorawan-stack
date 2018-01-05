@@ -88,8 +88,10 @@ func (is *IdentityServer) CreateUser(ctx context.Context, req *ttnpb.CreateUserR
 			user.Email,
 			templates.EmailValidation(),
 			map[string]interface{}{
-				templates.EmailValidationHostname: "",
-				templates.EmailValidationToken:    token.ValidationToken,
+				templates.EmailValidationDisplayName: is.config.DisplayName,
+				templates.EmailValidationHomeURL:     is.config.HomeURL,
+				templates.EmailValidationHostname:    is.config.Hostname,
+				templates.EmailValidationToken:       token.ValidationToken,
 			})
 	})
 
@@ -182,8 +184,10 @@ func (is *IdentityServer) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserR
 			found.GetUser().Email,
 			templates.EmailValidation(),
 			map[string]interface{}{
-				templates.EmailValidationHostname: "",
-				templates.EmailValidationToken:    token.ValidationToken,
+				templates.EmailValidationDisplayName: is.config.DisplayName,
+				templates.EmailValidationHomeURL:     is.config.HomeURL,
+				templates.EmailValidationHostname:    is.config.Hostname,
+				templates.EmailValidationToken:       token.ValidationToken,
 			})
 	})
 
@@ -406,8 +410,10 @@ func (is *IdentityServer) RequestUserEmailValidation(ctx context.Context, _ *pbt
 		user.GetUser().Email,
 		templates.EmailValidation(),
 		map[string]interface{}{
-			templates.EmailValidationHostname: "",
-			templates.EmailValidationToken:    token.ValidationToken,
+			templates.EmailValidationDisplayName: is.config.DisplayName,
+			templates.EmailValidationHomeURL:     is.config.HomeURL,
+			templates.EmailValidationHostname:    is.config.Hostname,
+			templates.EmailValidationToken:       token.ValidationToken,
 		},
 	)
 }

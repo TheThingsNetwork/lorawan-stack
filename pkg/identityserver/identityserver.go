@@ -44,6 +44,14 @@ type Config struct {
 	// WARNING: it will erase all the previous data
 	RecreateDatabase bool
 
+	// DisplayName is the display name of the organization that runs the network.
+	// e.g. The Things Network
+	DisplayName string
+
+	// HomeURL is the home url of the organization that runs the network.
+	// e.g. https://www.thethingsnetwork.org
+	HomeURL string
+
 	// defaultSettings are the default settings loaded in the store when it first-time initialized.
 	defaultSettings *ttnpb.IdentityServerSettings
 }

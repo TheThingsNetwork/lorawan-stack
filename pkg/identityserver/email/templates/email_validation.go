@@ -1,12 +1,20 @@
-// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+// Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 package templates
 
-// EmailValidationHostname is the template field used to place the base URL.
-const EmailValidationHostname = "hostname"
+const (
+	// EmailValidationDisplayName is the template field used to place the tenant display name.
+	EmailValidationDisplayName = "display_name"
 
-// EmailValidationToken is the template field used to place the validation token.
-const EmailValidationToken = "token"
+	// EmailValidationHomeURL is the template field used to place the tenant home url.
+	EmailValidationHomeURL = "home_url"
+
+	// EmailValidationHostname is the template field used to place the base URL.
+	EmailValidationHostname = "hostname"
+
+	// EmailValidationToken is the template field used to place the validation token.
+	EmailValidationToken = "token"
+)
 
 // EmailValidation is used to send emails asking to validate an email address.
 func EmailValidation() *Template {
@@ -17,7 +25,7 @@ func EmailValidation() *Template {
 
 <p>
 	You recently registered an account at
-	<a href='https://thethingsnetwork.org'>The Things Network</a> using
+	<a href='{{.home_url}}'>{{.display_name}}</a> using
 	this email address.
 </p>
 
