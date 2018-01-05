@@ -14,6 +14,30 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
+// slicify recursively replaces (sub-)maps in m by slices.
+func slicify(m map[string]interface{}) interface{} {
+	for k, v := range m {
+		sm, ok := v.(map[string]interface{})
+		if ok {
+			v = slicify(sm)
+			m[k] = v
+		}
+	}
+
+	sl := make([]interface{}, len(m))
+	for k, v := range m {
+		i, err := strconv.Atoi(k)
+		if err != nil {
+			return m
+		}
+		if len(sl) <= i {
+			sl = append(sl, make([]interface{}, 1+i-len(sl))...)
+		}
+		sl[i] = v
+	}
+	return sl
+}
+
 func unflattened(m map[string]interface{}) map[string]interface{} {
 	out := make(map[string]interface{}, len(m))
 	for k, v := range m {
@@ -48,31 +72,50 @@ type MapUnmarshaler interface {
 // UnmarshalMap uses the inverse of the encodings that
 // Marshal uses.
 func UnmarshalMap(m map[string]interface{}, v interface{}) error {
+	m = unflattened(m)
 	switch t := v.(type) {
 	case MapUnmarshaler:
 		return t.UnmarshalMap(m)
-	case map[string]interface{}:
-		for k, v := range unflattened(m) {
-			t[k] = v
-		}
-		return nil
 	default:
-		return mapstructure.Decode(unflattened(m), v)
+		if len(m) == 0 {
+			return nil
+		}
+		dec, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+			ZeroFields:       true,
+			WeaklyTypedInput: true,
+			Result:           v,
+		})
+		if err != nil {
+			panic(errors.NewWithCause("github.com/TheThingsNetwork/ttn/pkg/store.UnmarshalMap: Failed to intialize decoder", err))
+		}
+		return dec.Decode(slicify(m))
 	}
 }
 
-func fieldByFlatName(typ reflect.Type, name string) (f reflect.StructField, ok bool) {
+func typeByFlatName(typ reflect.Type, name string) (reflect.Type, bool) {
 	if name == "" {
-		panic(errors.New("github.com/TheThingsNetwork/ttn/pkg/store.fieldByFlatName: empty name specified"))
+		panic(errors.New("github.com/TheThingsNetwork/ttn/pkg/store.typeByFlatName: empty name specified"))
 	}
 	for _, name := range strings.Split(name, Separator) {
-		f, ok = typ.FieldByName(name)
-		if !ok {
-			break
+		if typ.Kind() == reflect.Ptr {
+			typ = typ.Elem()
 		}
-		typ = f.Type
+		switch typ.Kind() {
+		case reflect.Struct:
+			f, ok := typ.FieldByName(name)
+			if !ok {
+				return nil, false
+			}
+			typ = f.Type
+		case reflect.Slice, reflect.Array:
+			typ = typ.Elem()
+		case reflect.Map:
+			typ = typ.Key()
+		default:
+			return nil, false
+		}
 	}
-	return f, ok
+	return typ, true
 }
 
 func bytesToType(b []byte, typ reflect.Type) (interface{}, error) {
@@ -179,11 +222,11 @@ func UnmarshalByteMap(bm map[string][]byte, v interface{}) error {
 	switch typ.Kind() {
 	case reflect.Struct:
 		for k, bv := range bm {
-			f, ok := fieldByFlatName(typ, k)
+			it, ok := typeByFlatName(typ, k)
 			if !ok {
 				return errors.Errorf("field %s does not exist on type specified", k)
 			}
-			iv, err := bytesToType(bv, f.Type)
+			iv, err := bytesToType(bv, it)
 			if err != nil {
 				return err
 			}

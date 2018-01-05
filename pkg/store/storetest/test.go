@@ -3,8 +3,6 @@
 package storetest
 
 import (
-	"testing"
-
 	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -15,7 +13,7 @@ type testingT interface {
 }
 
 // TestTypedStore executes a black-box test for the given typed store
-func TestTypedStore(t *testing.T, s store.TypedStore) {
+func TestTypedStore(t testingT, s store.TypedStore) {
 	a := assertions.New(t)
 
 	old := map[string]interface{}{

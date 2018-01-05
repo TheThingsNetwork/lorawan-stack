@@ -3,6 +3,7 @@
 package store
 
 import (
+	"os"
 	"reflect"
 	"strconv"
 	"testing"
@@ -11,9 +12,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-func ToBytes(v interface{}) ([]byte, error) {
-	return toBytes(v)
-}
+var ToBytes = toBytes
 
 func TestToBytes(t *testing.T) {
 	a := assertions.New(t)
@@ -57,4 +56,36 @@ func TestToBytes(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(got, should.Resemble, append([]byte{byte(RawEncoding)}, b...))
 	})
+}
+
+func TestFlattened(t *testing.T) {
+	for _, tc := range []struct {
+		in  map[string]interface{}
+		out map[string]interface{}
+	}{
+		{
+			map[string]interface{}{
+				"foo": map[string]interface{}{
+					"bar": os.Stdout,
+					"baz": map[string]string{"test": "foo"},
+					"recursive": map[string]interface{}{
+						"hello": struct{ hi string }{"hello"},
+					},
+				},
+				"42": map[string]interface{}{
+					"foo": 42,
+					"baz": "baz",
+				},
+			},
+			map[string]interface{}{
+				"foo.bar":             os.Stdout,
+				"foo.baz":             map[string]string{"test": "foo"},
+				"foo.recursive.hello": struct{ hi string }{"hello"},
+				"42.foo":              42,
+				"42.baz":              "baz",
+			},
+		},
+	} {
+		assertions.New(t).So(flattened(tc.in), should.Resemble, tc.out)
+	}
 }

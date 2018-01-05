@@ -3,6 +3,8 @@
 package store_test
 
 import (
+	"reflect"
+	"strconv"
 	"testing"
 
 	. "github.com/TheThingsNetwork/ttn/pkg/store"
@@ -11,49 +13,38 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-func TestUnmarshal(t *testing.T) {
-	type SubSubStruct struct {
-		String string
-		Int    int
-	}
-	type SubStruct struct {
-		String       string
-		Int          int
-		SubSubStruct SubSubStruct
-	}
-	type Struct struct {
-		String    string
-		Int       int
-		SubStruct SubStruct
-	}
+func TestUnmarshalMap(t *testing.T) {
+	for i, v := range values {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+			rv := reflect.New(reflect.TypeOf(v.unmarshaled))
 
-	a := assertions.New(t)
-
-	input := map[string]interface{}{
-		"String":                        "string",
-		"Int":                           42,
-		"SubStruct.String":              "string",
-		"SubStruct.Int":                 42,
-		"SubStruct.SubSubStruct.String": "string",
-		"SubStruct.SubSubStruct.Int":    42,
+			if _, ok := v.unmarshaled.(map[string]interface{}); ok {
+				t.Skip("Skipping special case, when unmarshaled value is map[string]interface{} as we don't know the type of values to unmarshal to")
+			}
+			err := UnmarshalMap(v.marshaled, rv.Interface())
+			a.So(err, should.BeNil)
+			if !a.So(rv.Elem().Interface(), should.Resemble, v.unmarshaled) {
+				pretty.Ldiff(t, rv.Elem().Interface(), v.unmarshaled)
+			}
+		})
 	}
-	expected := Struct{
-		"string",
-		42,
-		SubStruct{
-			"string",
-			42,
-			SubSubStruct{
-				"string",
-				42,
-			},
-		},
-	}
+}
 
-	var v Struct
-	err := UnmarshalMap(input, &v)
-	a.So(err, should.BeNil)
-	if !a.So(v, should.Resemble, expected) {
-		t.Log(pretty.Sprintf("\n%# v\n does not resemble\n %# v\n", v, expected))
+func TestUnmarshalByteMap(t *testing.T) {
+	for i, v := range values {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+			rv := reflect.New(reflect.TypeOf(v.unmarshaled))
+
+			if _, ok := v.unmarshaled.(map[string]interface{}); ok {
+				t.Skip("Skipping special case when unmarshaled value is map[string]interface{} as we don't know the type of values to unmarshal to")
+			}
+			err := UnmarshalByteMap(v.bytes, rv.Interface())
+			a.So(err, should.BeNil)
+			if !a.So(rv.Elem().Interface(), should.Resemble, v.unmarshaled) {
+				pretty.Ldiff(t, rv.Elem().Interface(), v.unmarshaled)
+			}
+		})
 	}
 }
