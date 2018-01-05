@@ -129,6 +129,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/jaytaylor/html2text"
+  packages = ["."]
+  revision = "7cd445abb89c7dbb8220e616a1805fc904cc541b"
+
+[[projects]]
+  branch = "master"
   name = "github.com/jmoiron/sqlx"
   packages = [".","reflectx"]
   revision = "de8647470aafe4854c976707c431dbe1eb2822c6"
@@ -182,6 +188,12 @@
   version = "v0.0.3"
 
 [[projects]]
+  name = "github.com/mattn/go-runewidth"
+  packages = ["."]
+  revision = "9e777a8366cce605130a531d2cd6363d07ad7317"
+  version = "v0.0.2"
+
+[[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
   packages = ["pbutil"]
   revision = "3247c84500bff8d9fb6d579d800f20b3e091582c"
@@ -204,6 +216,12 @@
   packages = ["."]
   revision = "d311cb43c92434ec4072dfbbda3400741d0a6337"
   version = "v0.3.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/olekukonko/tablewriter"
+  packages = ["."]
+  revision = "96aac992fc8b1a4c83841a6c3e7178d20d989625"
 
 [[projects]]
   name = "github.com/pborman/uuid"
@@ -264,7 +282,6 @@
   name = "github.com/smartystreets/assertions"
   packages = [".","internal/go-render/render","internal/oglematchers","should"]
   revision = "0b37b35ec7434b77e77a4bb29b79677cced992ea"
-  version = "1.8.1"
 
 [[projects]]
   name = "github.com/soheilhy/cmux"
@@ -307,6 +324,12 @@
   name = "github.com/spf13/viper"
   packages = ["."]
   revision = "aafc9e6bc7b7bb53ddaa75a5ef49a17d6e654be5"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/ssor/bom"
+  packages = ["."]
+  revision = "6386211fdfcf24c0bfbdaceafd02849ed9a8a509"
 
 [[projects]]
   branch = "master"
