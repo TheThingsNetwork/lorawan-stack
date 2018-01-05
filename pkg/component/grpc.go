@@ -7,12 +7,15 @@ import (
 	"net/http"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/rpclog"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
 	"github.com/labstack/echo"
 	"github.com/soheilhy/cmux"
 )
 
 func (c *Component) initGRPC() {
+	rpclog.ReplaceGrpcLogger(c.logger.WithField("namespace", "grpc"))
+
 	c.grpc = rpcserver.New(
 		c.ctx,
 		rpcserver.WithContextFiller(func(ctx context.Context) context.Context {

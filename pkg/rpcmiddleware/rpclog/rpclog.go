@@ -34,13 +34,13 @@ func (l *ttnGrpcLogger) Fatalln(args ...interface{}) {
 }
 
 func (l *ttnGrpcLogger) Print(args ...interface{}) {
-	l.logger.Info(fmt.Sprint(args...))
+	l.logger.Debug(fmt.Sprint(args...))
 }
 
 func (l *ttnGrpcLogger) Printf(format string, args ...interface{}) {
-	l.logger.Info(fmt.Sprintf(format, args...))
+	l.logger.Debug(fmt.Sprintf(format, args...))
 }
 
 func (l *ttnGrpcLogger) Println(args ...interface{}) {
-	l.logger.Info(fmt.Sprint(args...))
+	l.logger.Debug(fmt.Sprint(args...))
 }
