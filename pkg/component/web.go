@@ -4,9 +4,11 @@ package component
 
 import (
 	"net/http"
+	"net/http/pprof"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/web"
+	"github.com/labstack/echo"
 	"github.com/soheilhy/cmux"
 )
 
@@ -53,6 +55,15 @@ func (c *Component) listenWeb() (err error) {
 			return errors.NewWithCause("Could not create TLS mux on top of HTTP/tls listener", err)
 		}
 		serve(mux)
+	}
+
+	if c.config.HTTP.PProf {
+		var pprofMiddleware []echo.MiddlewareFunc
+
+		// TODO: Add auth to pprof endpoints
+
+		c.web.GET("/debug/pprof/", echo.WrapHandler(http.HandlerFunc(pprof.Index)), pprofMiddleware...)
+		c.web.GET("/debug/pprof/profile", echo.WrapHandler(http.HandlerFunc(pprof.Profile)), pprofMiddleware...)
 	}
 
 	return nil

@@ -26,6 +26,7 @@ var DefaultTLSConfig = config.TLS{
 // DefaultHTTPConfig is the default HTTP config.
 var DefaultHTTPConfig = config.HTTP{
 	Listen: ":80",
+	PProf:  true,
 }
 
 // DefaultIdentityConfig is the default Identity config.

@@ -39,6 +39,7 @@ type GRPC struct {
 type HTTP struct {
 	Listen    string `name:"listen" description:"Address for the HTTP server to listen on"`
 	ListenTLS string `name:"listen-tls" description:"Address for the HTTPS server to listen on"`
+	PProf     bool   `name:"pprof" description:"Expose pprof over HTTP"`
 }
 
 // Identity represents identity configuration
