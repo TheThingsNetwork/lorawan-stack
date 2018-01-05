@@ -54,39 +54,39 @@ type RegistryRPC struct {
 	}
 }
 
-// OptionRPC represents RegistryRPC option
-type OptionRPC func(*RegistryRPC)
+// RPCOption represents RegistryRPC option
+type RPCOption func(*RegistryRPC)
 
 // WithListDevicesCheck sets a check to ListDevices method of RegistryRPC instance.
 // ListDevices first executes fn and if error is returned by it,
 // returns error, otherwise execution advances as usual.
-func WithListDevicesCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) OptionRPC {
+func WithListDevicesCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) RPCOption {
 	return func(r *RegistryRPC) { r.checks.ListDevices = fn }
 }
 
 // WithGetDeviceCheck sets a check to GetDevice method of RegistryRPC instance.
 // GetDevice first executes fn and if error is returned by it,
 // returns error, otherwise execution advances as usual.
-func WithGetDeviceCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) OptionRPC {
+func WithGetDeviceCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) RPCOption {
 	return func(r *RegistryRPC) { r.checks.GetDevice = fn }
 }
 
 // WithSetDeviceCheck sets a check to SetDevice method of RegistryRPC instance.
 // SetDevice first executes fn and if error is returned by it,
 // returns error, otherwise execution advances as usual.
-func WithSetDeviceCheck(fn func(context.Context, *ttnpb.EndDevice) error) OptionRPC {
+func WithSetDeviceCheck(fn func(context.Context, *ttnpb.EndDevice) error) RPCOption {
 	return func(r *RegistryRPC) { r.checks.SetDevice = fn }
 }
 
 // WithDeleteDeviceCheck sets a check to DeleteDevice method of RegistryRPC instance.
 // DeleteDevice first executes fn and if error is returned by it,
 // returns error, otherwise execution advances as usual.
-func WithDeleteDeviceCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) OptionRPC {
+func WithDeleteDeviceCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) RPCOption {
 	return func(r *RegistryRPC) { r.checks.DeleteDevice = fn }
 }
 
 // NewRPC returns a new instance of RegistryRPC
-func NewRPC(c *component.Component, r Interface, opts ...OptionRPC) *RegistryRPC {
+func NewRPC(c *component.Component, r Interface, opts ...RPCOption) *RegistryRPC {
 	rpc := &RegistryRPC{
 		Component: c,
 		Interface: r,
