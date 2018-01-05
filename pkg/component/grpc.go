@@ -20,13 +20,10 @@ func (c *Component) initGRPC() {
 		rpcserver.WithContextFiller(func(ctx context.Context) context.Context {
 			// TODO: Fill globals in call context (data stores, config, ...)
 			return ctx
-		}))
-	if c.config.TokenKeyInfoProvider != nil {
-		grpcOpts = append(grpcOpts,
-			rpcserver.WithUnaryInterceptors(claims.UnaryServerInterceptor(c.config.TokenKeyInfoProvider)),
-			rpcserver.WithStreamInterceptors(claims.StreamServerInterceptor(c.config.TokenKeyInfoProvider)))
-	}
-	c.grpc = rpcserver.New(c.ctx, grpcOpts...)
+		}),
+		rpcserver.WithSentry(c.sentry),
+		rpcserver.WithTokenKeyInfoProvider(c.TokenKeyInfoProvider),
+	)
 }
 
 func (c *Component) setupGRPC() (err error) {

@@ -25,7 +25,7 @@ type TokenKeyInfoProvider interface {
 	// KeyInfo returns the entityID an API key belongs to and its rights.
 	// The Resource Server must check that the entityID of the API key matches
 	// with the resource that is trying to being access to.
-	KeyInfo(key string, typ auth.APIKeyType) (string, *ttnpb.APIKey, error)
+	KeyInfo(key string) (string, *ttnpb.APIKey, error)
 }
 
 // claims constructs the claims based on the authentication values in the request
@@ -65,13 +65,13 @@ func claims(ctx context.Context, tokenkey TokenKeyInfoProvider) (*auth.Claims, e
 		}
 
 		claims = &auth.Claims{
-			EntityID:  data.UserID,
-			EntityTyp: auth.EntityUser,
-			Source:    auth.Token,
-			Rights:    rights,
+			EntityID:   data.UserID,
+			EntityType: auth.EntityUser,
+			Source:     auth.Token,
+			Rights:     rights,
 		}
 	case auth.Key:
-		entityID, key, err := tokenkey.KeyInfo(md.AuthValue, payload.Type)
+		entityID, key, err := tokenkey.KeyInfo(md.AuthValue)
 		if err != nil {
 			return nil, err
 		}
@@ -84,11 +84,11 @@ func claims(ctx context.Context, tokenkey TokenKeyInfoProvider) (*auth.Claims, e
 
 		switch payload.Type {
 		case auth.ApplicationKey:
-			claims.EntityTyp = auth.EntityApplication
+			claims.EntityType = auth.EntityApplication
 		case auth.GatewayKey:
-			claims.EntityTyp = auth.EntityGateway
+			claims.EntityType = auth.EntityGateway
 		case auth.UserKey:
-			claims.EntityTyp = auth.EntityUser
+			claims.EntityType = auth.EntityUser
 		default:
 			return nil, errors.Errorf("Invalid API key type `%s`", payload.Type)
 		}

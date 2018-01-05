@@ -35,6 +35,7 @@ var DefaultIdentityConfig = config.Identity{
 		"ttn-account-v2":  "https://account.thethingsnetwork.org",
 		"ttn-identity-v3": "https://identity.thethingsnetwork.org",
 	},
+	Secret: "development",
 }
 
 // DefaultGRPCConfig is the default config for GRPC.

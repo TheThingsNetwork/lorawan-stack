@@ -23,6 +23,9 @@ const (
 
 	// AccessExpiration is the access token expiration in seconds (default 1 hour).
 	AccessExpiration = 3600
+
+	// TokenType is the access token type to return.
+	TokenType = "bearer"
 )
 
 // Server represents an OAuth 2.0 Server.

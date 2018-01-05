@@ -33,8 +33,13 @@ func (t *tokenKeyProvider) TokenInfo(accessToken string) (*types.AccessData, err
 	return data, nil
 }
 
-func (t *tokenKeyProvider) KeyInfo(key string, typ auth.APIKeyType) (string, *ttnpb.APIKey, error) {
-	switch typ {
+func (t *tokenKeyProvider) KeyInfo(key string) (string, *ttnpb.APIKey, error) {
+	_, payload, err := auth.DecodeTokenOrKey(key)
+	if err != nil {
+		return "", nil, err
+	}
+
+	switch payload.Type {
 	case auth.UserKey:
 		return t.store.Users.GetAPIKey(key)
 	case auth.ApplicationKey:

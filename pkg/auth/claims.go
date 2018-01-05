@@ -4,12 +4,12 @@ package auth
 
 import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 
-// EntityType is the type that defines what are the valid entity types for claims.
-type EntityType string
+// Entity is an enum that defines the valids entity types for claims.
+type Entity string
 
 const (
 	// EntityUser is an user.
-	EntityUser EntityType = "user"
+	EntityUser Entity = "user"
 
 	// EntityApplication is an application.
 	EntityApplication = "application"
@@ -19,7 +19,7 @@ const (
 )
 
 // String implements fmt.Stringer.
-func (e EntityType) String() string {
+func (e Entity) String() string {
 	return string(e)
 }
 
@@ -28,8 +28,8 @@ type Claims struct {
 	// EntityID is the ID of the entity this claims are intended for.
 	EntityID string
 
-	// EntityTyp is the type of entity this claims are intended for.
-	EntityTyp EntityType
+	// EntityType is the type of entity this claims are intended for.
+	EntityType Entity
 
 	// Source is the source of this claims, either an API key or a token.
 	Source string
@@ -41,7 +41,7 @@ type Claims struct {
 // UserID returns the user ID of the user profile this claims are for, or the
 // empty string if it is not for a user.
 func (c *Claims) UserID() (id string) {
-	if c.EntityTyp == EntityUser {
+	if c.EntityType == EntityUser {
 		id = c.EntityID
 	}
 	return
@@ -50,7 +50,7 @@ func (c *Claims) UserID() (id string) {
 // ApplicationID returns the application ID  of the application this claims are
 // for, or the empty string if it is not for an application.
 func (c *Claims) ApplicationID() (id string) {
-	if c.EntityTyp == EntityApplication {
+	if c.EntityType == EntityApplication {
 		id = c.EntityID
 	}
 	return
@@ -59,7 +59,7 @@ func (c *Claims) ApplicationID() (id string) {
 // GatewayID returns the gateway ID of the gateway this claims are for, or the
 // empty string if it is not for a gateway.
 func (c *Claims) GatewayID() (id string) {
-	if c.EntityTyp == EntityGateway {
+	if c.EntityType == EntityGateway {
 		id = c.EntityID
 	}
 	return

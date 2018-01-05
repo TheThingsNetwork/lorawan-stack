@@ -110,12 +110,15 @@ var defaultOptions = []Option{
 	WithDefaultSettings(defaultSettings),
 }
 
-// New retrieves a new IdentityServer.
+// New returns a new IdentityServer.
 func New(comp *component.Component, config *Config, opts ...Option) (*IdentityServer, error) {
 	store, err := sql.Open(config.DSN)
 	if err != nil {
 		return nil, err
 	}
+
+	// replace the TokenKeyInfoProvider for a local one
+	comp.TokenKeyInfoProvider = &tokenKeyProvider{store}
 
 	is := &IdentityServer{
 		Component: comp,
