@@ -12,8 +12,8 @@ import (
 
 func TestRightStringer(t *testing.T) {
 	a := assertions.New(t)
-	a.So(RIGHT_APPLICATION_DELETE.TextString(), should.Equal, "application:delete")
-	a.So(Right(1234).TextString(), should.Equal, "1234")
+	a.So(RIGHT_APPLICATION_DELETE.String(), should.Equal, "RIGHT_APPLICATION_DELETE")
+	a.So(Right(1234).String(), should.Equal, "1234")
 	a.So(RIGHT_APPLICATION_DELETE.String(), should.Equal, Right_name[int32(RIGHT_APPLICATION_DELETE)])
 	a.So(Right(1234).String(), should.Equal, "1234")
 }
@@ -23,10 +23,10 @@ func TestRightText(t *testing.T) {
 
 	text, err := RIGHT_APPLICATION_DELETE.MarshalText()
 	a.So(err, should.BeNil)
-	a.So(string(text), should.Equal, "application:delete")
+	a.So(string(text), should.Equal, "RIGHT_APPLICATION_DELETE")
 
 	var right Right
-	err = (&right).UnmarshalText([]byte("application:delete"))
+	err = (&right).UnmarshalText([]byte("RIGHT_APPLICATION_DELETE"))
 	a.So(err, should.BeNil)
 	a.So(right, should.Equal, RIGHT_APPLICATION_DELETE)
 
@@ -39,10 +39,10 @@ func TestRightJSON(t *testing.T) {
 
 	b, err := json.Marshal(RIGHT_APPLICATION_DELETE)
 	a.So(err, should.BeNil)
-	a.So(b, should.Resemble, []byte(`"application:delete"`))
+	a.So(b, should.Resemble, []byte(`"RIGHT_APPLICATION_DELETE"`))
 
 	var right Right
-	err = json.Unmarshal([]byte(`"application:delete"`), &right)
+	err = json.Unmarshal([]byte(`"RIGHT_APPLICATION_DELETE"`), &right)
 	a.So(err, should.BeNil)
 	a.So(right, should.Equal, RIGHT_APPLICATION_DELETE)
 

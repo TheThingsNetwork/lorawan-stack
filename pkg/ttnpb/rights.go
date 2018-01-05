@@ -4,7 +4,6 @@ package ttnpb
 
 import (
 	"strconv"
-	"strings"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/gogo/protobuf/jsonpb"
@@ -23,8 +22,8 @@ var AllUserRights = []Right{
 	RIGHT_USER_CLIENTS_LIST,
 	RIGHT_USER_CLIENTS_CREATE,
 	RIGHT_USER_CLIENTS_MANAGE,
-	RIGHT_USER_KEYS,
 	RIGHT_USER_ADMIN,
+	RIGHT_USER_KEYS,
 }
 
 // AllApplicationRights is the set that contains all the rights that are to applications.
@@ -54,28 +53,16 @@ var AllGatewayRights = []Right{
 
 // ParseRight parses the string specified into a Right.
 func ParseRight(str string) (Right, error) {
-	val, ok := Right_value["RIGHT_"+strings.ToUpper(strings.Replace(str, ":", "_", -1))]
+	val, ok := Right_value[str]
 	if !ok {
-		val, ok = Right_value[str]
-		if !ok {
-			return -1, errors.Errorf("Could not parse right `%s`", str)
-		}
+		return Right(0), errors.Errorf("Could not parse right `%s`", str)
 	}
 	return Right(val), nil
 }
 
-// TextString returns a textual string representation of the right.
-func (r Right) TextString() string {
-	str, ok := Right_name[int32(r)]
-	if ok {
-		return strings.ToLower(strings.Replace(strings.TrimPrefix(str, "RIGHT_"), "_", ":", -1))
-	}
-	return strconv.Itoa(int(r))
-}
-
 // MarshalText implements encoding.TextMarshaler interface.
 func (r Right) MarshalText() ([]byte, error) {
-	return []byte(r.TextString()), nil
+	return []byte(r.String()), nil
 }
 
 // MarshalJSON implements json.Marshaler interface.
