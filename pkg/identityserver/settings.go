@@ -10,8 +10,6 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
-var _ ttnpb.IsSettingsServer = new(IdentityServer)
-
 // GetSettings fetches the current dynamic settings of the Identity Server.
 func (is *IdentityServer) GetSettings(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.IdentityServerSettings, error) {
 	err := is.adminCheck(ctx)

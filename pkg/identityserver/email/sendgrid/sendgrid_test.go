@@ -5,12 +5,15 @@ package sendgrid
 import (
 	"testing"
 
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
+
+var _ email.Provider = new(SendGrid)
 
 func TestSendGrid(t *testing.T) {
 	a := assertions.New(t)

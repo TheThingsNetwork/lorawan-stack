@@ -19,9 +19,6 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
-// make sure IdentityServer implements ttnpb.IsUserServer.
-var _ ttnpb.IsUserServer = new(IdentityServer)
-
 // CreateUser creates an user in the network.
 func (is *IdentityServer) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequest) (*pbtypes.Empty, error) {
 	settings, err := is.store.Settings.Get()

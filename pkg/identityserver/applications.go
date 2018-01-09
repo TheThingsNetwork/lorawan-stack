@@ -13,8 +13,6 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
-var _ ttnpb.IsApplicationServer = new(IdentityServer)
-
 // CreateApplication creates an application and sets the user as collaborator
 // with all possible rights.
 func (is *IdentityServer) CreateApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (*pbtypes.Empty, error) {

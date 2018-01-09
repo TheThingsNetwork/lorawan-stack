@@ -13,8 +13,6 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
-var _ ttnpb.IsGatewayServer = new(IdentityServer)
-
 const APIKeyName = "Default API Key"
 
 // CreateGateway creates a gateway in the network, sets the user as collaborator

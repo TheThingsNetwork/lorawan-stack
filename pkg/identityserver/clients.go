@@ -12,8 +12,6 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
-var _ ttnpb.IsClientServer = new(IdentityServer)
-
 // CreateClient creates a client.
 // The created client has a random secret and has set by default as false the
 // official labeled flag and has the refresh_token and authorization_code grants.

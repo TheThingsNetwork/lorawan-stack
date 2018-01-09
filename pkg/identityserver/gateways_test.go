@@ -14,6 +14,8 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
+var _ ttnpb.IsGatewayServer = new(IdentityServer)
+
 func TestGateway(t *testing.T) {
 	a := assertions.New(t)
 	is := getIS(t)

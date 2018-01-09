@@ -12,6 +12,8 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
+var _ ttnpb.IsSettingsServer = new(IdentityServer)
+
 func TestSettings(t *testing.T) {
 	a := assertions.New(t)
 	is := getIS(t)

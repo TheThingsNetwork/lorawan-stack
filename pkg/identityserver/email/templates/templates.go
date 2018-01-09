@@ -7,8 +7,6 @@ import (
 	"text/template"
 )
 
-var _ Renderer = new(DefaultRenderer)
-
 // Template is the type that describes an email template.
 type Template struct {
 	Name    string

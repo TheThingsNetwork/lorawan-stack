@@ -4,15 +4,12 @@ package sendgrid
 
 import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/jaytaylor/html2text"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
-
-var _ email.Provider = new(SendGrid)
 
 const (
 	defaultFromName  = ""
@@ -45,7 +42,7 @@ func SenderAddress(name, address string) SendGridOpt {
 	}
 }
 
-// TemplateRenderer sets the given template renderer and therefore replaces
+// TemplateRenderer sets the given template renderer and therefore replaces.
 // the default templates.DefaultRenderer.
 func TemplateRenderer(renderer templates.Renderer) SendGridOpt {
 	return func(s *SendGrid) {
