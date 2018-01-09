@@ -17,8 +17,9 @@ var (
 	name   = "ttn-identityserver"
 	mgr    = conf.InitializeWithDefaults(name, &identityserver.Config{
 		RecreateDatabase: true,
-		ServiceBase:      shared.DefaultServiceBase,
 		DSN:              "postgres://root@localhost:26257/is_development_build?sslmode=disable",
+		Hostname:         "development.is.ttn",
+		DisplayName:      "Development Identity Server",
 	})
 	config = new(identityserver.Config)
 
@@ -42,7 +43,7 @@ var (
 
 			// create logger
 			logger, err = log.NewLogger(
-				log.WithLevel(config.Log.Level),
+				log.WithLevel(shared.DefaultServiceBase.Log.Level),
 				log.WithHandler(log.NewCLI(os.Stdout)),
 			)
 			return err
