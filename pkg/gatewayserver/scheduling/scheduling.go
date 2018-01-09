@@ -1,4 +1,4 @@
-// Copyright © 2017 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+// Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 // Package scheduling offer convenience methods to manage RF packets that must respect scheduling constraints.
 package scheduling
