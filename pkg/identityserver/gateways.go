@@ -299,17 +299,32 @@ func (is *IdentityServer) ListGatewayCollaborators(ctx context.Context, req *ttn
 
 // ListGatewayRights returns the rights the caller user has to a gateway.
 func (is *IdentityServer) ListGatewayRights(ctx context.Context, req *ttnpb.GatewayIdentifier) (*ttnpb.ListGatewayRightsResponse, error) {
-	userID, err := is.userCheck(ctx)
+	claims, err := is.claimsFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	rights, err := is.store.Gateways.ListUserRights(req.GatewayID, userID)
-	if err != nil {
-		return nil, err
+	resp := new(ttnpb.ListGatewayRightsResponse)
+
+	switch claims.Source {
+	case auth.Token:
+		userID := claims.UserID()
+
+		rights, err := is.store.Gateways.ListUserRights(req.GatewayID, userID)
+		if err != nil {
+			return nil, err
+		}
+
+		// result rights are the intersection between the scope of the Client
+		// and the rights that the user has to the application.
+		resp.Rights = util.RightsIntersection(claims.Rights, rights)
+	case auth.Key:
+		if claims.GatewayID() != req.GatewayID {
+			return nil, ErrNotAuthorized.New(nil)
+		}
+
+		resp.Rights = claims.Rights
 	}
 
-	return &ttnpb.ListGatewayRightsResponse{
-		Rights: rights,
-	}, nil
+	return resp, nil
 }

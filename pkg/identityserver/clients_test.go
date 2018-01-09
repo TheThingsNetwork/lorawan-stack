@@ -3,13 +3,10 @@
 package identityserver
 
 import (
-	"context"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
-	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
@@ -23,7 +20,7 @@ func TestClient(t *testing.T) {
 	user := testUsers()["bob"]
 
 	cli := ttnpb.Client{
-		ClientIdentifier: ttnpb.ClientIdentifier{"test-client"},
+		ClientIdentifier: ttnpb.ClientIdentifier{"foo-client"},
 		Description:      "description foobarbaz",
 		RedirectURI:      "foo.local/oauth",
 		Secret:           "bar",
@@ -34,12 +31,7 @@ func TestClient(t *testing.T) {
 		Creator:          ttnpb.UserIdentifier{user.UserID},
 	}
 
-	ctx := claims.NewContext(context.Background(), &auth.Claims{
-		EntityID:   user.UserID,
-		EntityType: auth.EntityUser,
-		Source:     auth.Token,
-		Rights:     append(ttnpb.AllUserRights),
-	})
+	ctx := testCtx()
 
 	_, err := is.CreateClient(ctx, &ttnpb.CreateClientRequest{
 		Client: cli,

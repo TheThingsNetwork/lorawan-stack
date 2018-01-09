@@ -6,14 +6,16 @@ import (
 	"context"
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
-	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 // userCheck checks whether claims are intended for an user and then if the user
 // has the given set of rights with it. It returns the user ID.
 func (is *IdentityServer) userCheck(ctx context.Context, rights ...ttnpb.Right) (string, error) {
-	claims := claims.FromContext(ctx)
+	claims, err := is.claimsFromContext(ctx)
+	if err != nil {
+		return "", err
+	}
 
 	userID := claims.UserID()
 	if userID == "" {
@@ -53,14 +55,16 @@ func (is *IdentityServer) adminCheck(ctx context.Context) error {
 // 	-	If they come from an access token: checks whether the user is collaborator of the
 //      application with the given set of rights.
 func (is *IdentityServer) applicationCheck(ctx context.Context, appID string, rights ...ttnpb.Right) error {
-	claims := claims.FromContext(ctx)
+	claims, err := is.claimsFromContext(ctx)
+	if err != nil {
+		return err
+	}
 
 	if !claims.HasRights(rights...) {
 		return ErrNotAuthorized.New(nil)
 	}
 
 	var authorized bool
-	var err error
 	switch claims.Source {
 	case auth.Key:
 		authorized = claims.ApplicationID() == appID
@@ -89,14 +93,16 @@ func (is *IdentityServer) applicationCheck(ctx context.Context, appID string, ri
 // 	-	If they come from an access token: checks whether the user is collaborator of the
 //      gateway application with the given set of rights.
 func (is *IdentityServer) gatewayCheck(ctx context.Context, gtwID string, rights ...ttnpb.Right) error {
-	claims := claims.FromContext(ctx)
+	claims, err := is.claimsFromContext(ctx)
+	if err != nil {
+		return err
+	}
 
 	if !claims.HasRights(rights...) {
 		return ErrNotAuthorized.New(nil)
 	}
 
 	var authorized bool
-	var err error
 	switch claims.Source {
 	case auth.Key:
 		authorized = claims.GatewayID() == gtwID

@@ -22,7 +22,6 @@ func (c *Component) initGRPC() {
 			return ctx
 		}),
 		rpcserver.WithSentry(c.sentry),
-		rpcserver.WithTokenKeyInfoProvider(c.TokenKeyInfoProvider),
 	)
 }
 

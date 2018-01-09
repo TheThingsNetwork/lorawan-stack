@@ -59,7 +59,6 @@ type HTTP struct {
 type Identity struct {
 	Servers map[string]string `name:"servers" description:"TTN Identity Servers (id=https://...)"`
 	Keys    map[string]string `name:"keys" description:"TTN Identity Server Public Keys (id=/path/to/...)"`
-	Secret  string            `name:"secret" description:"Shared secret needed to call the Token/Key introspection service"`
 }
 
 // Redis represents Redis configuration

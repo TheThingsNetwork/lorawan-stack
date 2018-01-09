@@ -3,14 +3,19 @@
 package identityserver
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/cmd/shared"
+	"github.com/TheThingsNetwork/ttn/pkg/auth"
+	"github.com/TheThingsNetwork/ttn/pkg/auth/oauth"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
+	"google.golang.org/grpc/metadata"
 )
 
 const (
@@ -19,6 +24,15 @@ const (
 )
 
 var testIS *IdentityServer
+var accessToken string
+
+func init() {
+	token, err := auth.GenerateAccessToken("")
+	if err != nil {
+		panic(err)
+	}
+	accessToken = token
+}
 
 func getIS(t testing.TB) *IdentityServer {
 	if testIS == nil {
@@ -42,10 +56,24 @@ func getIS(t testing.TB) *IdentityServer {
 			}
 		}
 
+		err = is.store.Clients.Create(testClient())
+		if err != nil {
+			logger.WithError(err).Fatal("Failed to create test client")
+		}
+
+		err = is.store.OAuth.SaveAccessToken(testAccessData())
+		if err != nil {
+			logger.WithError(err).Fatal("Failed to save test access data")
+		}
+
 		testIS = is
 	}
 
 	return testIS
+}
+
+func testCtx() context.Context {
+	return metadata.NewIncomingContext(context.Background(), metadata.Pairs("authorization", fmt.Sprintf("Bearer %s", testAccessData().AccessToken)))
 }
 
 func testConfig() *Config {
@@ -66,6 +94,37 @@ func testSettings() *ttnpb.IdentityServerSettings {
 	}
 }
 
+func testAccessData() *types.AccessData {
+	cli := testClient()
+
+	return &types.AccessData{
+		AccessToken: accessToken,
+		RedirectURI: cli.RedirectURI,
+		Scope:       oauth.Scope(cli.Rights),
+		ExpiresIn:   time.Duration(time.Hour),
+		CreatedAt:   time.Now(),
+		ClientID:    cli.ClientID,
+		UserID:      testUsers()["bob"].UserID,
+	}
+}
+
+func testClient() *ttnpb.Client {
+	cli := &ttnpb.Client{
+		ClientIdentifier: ttnpb.ClientIdentifier{"test-client"},
+		Description:      "foo description",
+		Creator:          testUsers()["alice"].UserIdentifier,
+		Secret:           "secret",
+		RedirectURI:      "localhost",
+		Rights:           make([]ttnpb.Right, 0, 50),
+	}
+
+	cli.Rights = append(cli.Rights, ttnpb.AllUserRights...)
+	cli.Rights = append(cli.Rights, ttnpb.AllApplicationRights...)
+	cli.Rights = append(cli.Rights, ttnpb.AllGatewayRights...)
+
+	return cli
+}
+
 func testUsers() map[string]*ttnpb.User {
 	return map[string]*ttnpb.User{
 		"alice": {
@@ -78,6 +137,7 @@ func testUsers() map[string]*ttnpb.User {
 			UserIdentifier: ttnpb.UserIdentifier{"bob"},
 			Password:       "1234567",
 			Email:          "bob@bob.com",
+			Admin:          true,
 		},
 		"john-doe": {
 			UserIdentifier: ttnpb.UserIdentifier{"john-doe"},

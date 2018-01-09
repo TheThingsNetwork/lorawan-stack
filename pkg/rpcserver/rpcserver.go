@@ -12,7 +12,6 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/errors/grpcerrors"
-	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/fillcontext"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/rpclog"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/sentry"
@@ -80,15 +79,6 @@ func WithStreamInterceptors(interceptors ...grpc.StreamServerInterceptor) Option
 func WithUnaryInterceptors(interceptors ...grpc.UnaryServerInterceptor) Option {
 	return func(o *options) {
 		o.unaryInterceptors = append(o.unaryInterceptors, interceptors...)
-	}
-}
-
-// WithTokenKeyInfoProvider adds both an unary and stream claims interceptor
-// with the given claims.TokenKeyInfoProvider.
-func WithTokenKeyInfoProvider(provider claims.TokenKeyInfoProvider) Option {
-	return func(o *options) {
-		o.unaryInterceptors = append(o.unaryInterceptors, claims.UnaryServerInterceptor(provider))
-		o.streamInterceptors = append(o.streamInterceptors, claims.StreamServerInterceptor(provider))
 	}
 }
 

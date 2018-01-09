@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
+	"github.com/TheThingsNetwork/ttn/pkg/auth/oauth"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/mock"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
-	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
@@ -23,19 +23,17 @@ func TestUser(t *testing.T) {
 	a := assertions.New(t)
 	is := getIS(t)
 
+	prev := accessToken
+	defer func() {
+		accessToken = prev
+	}()
+
 	user := ttnpb.User{
 		UserIdentifier: ttnpb.UserIdentifier{"daniel"},
 		Password:       "12345",
 		Email:          "foo@bar.com",
 		Name:           "hi",
 	}
-
-	ctx := claims.NewContext(context.Background(), &auth.Claims{
-		EntityID:   user.UserID,
-		EntityType: auth.EntityUser,
-		Source:     auth.Token,
-		Rights:     ttnpb.AllUserRights,
-	})
 
 	// can't create an account using a not allowed email
 	user.Email = "foo@foo.com"
@@ -68,6 +66,27 @@ func TestUser(t *testing.T) {
 	a.So(found, should.BeNil)
 	a.So(err, should.NotBeNil)
 	a.So(ErrNotAuthorized.Describes(err), should.BeTrue)
+
+	client := testClient()
+
+	refreshData := &types.RefreshData{
+		RefreshToken: "123",
+		UserID:       user.UserID,
+		ClientID:     client.ClientID,
+		CreatedAt:    time.Now(),
+	}
+	err = is.store.OAuth.SaveRefreshToken(refreshData)
+	a.So(err, should.BeNil)
+
+	accessData := testAccessData()
+	accessData.AccessToken = accessData.AccessToken[:len(accessData.AccessToken)-1]
+	accessData.UserID = user.UserID
+
+	err = is.store.OAuth.SaveAccessToken(accessData)
+	a.So(err, should.BeNil)
+
+	accessToken = accessData.AccessToken
+	ctx := testCtx()
 
 	// check that response doesnt include password within
 	found, err = is.GetUser(ctx, &pbtypes.Empty{})
@@ -212,38 +231,6 @@ func TestUser(t *testing.T) {
 	a.So(found.UserIdentifier.UserID, should.Equal, user.UserID)
 	a.So(found.ValidatedAt.IsZero(), should.BeFalse)
 
-	// create a fake authorized client to the user
-	client := &ttnpb.Client{
-		ClientIdentifier: ttnpb.ClientIdentifier{"test-client"},
-		Description:      "description",
-		Secret:           "secret",
-		Grants:           []ttnpb.GrantType{ttnpb.GRANT_PASSWORD},
-		Rights:           []ttnpb.Right{ttnpb.Right(1)},
-		RedirectURI:      "foo.ttn.dev/oauth",
-		Creator:          ttnpb.UserIdentifier{user.UserID},
-	}
-	err = is.store.Clients.Create(client)
-	a.So(err, should.BeNil)
-
-	refreshData := &types.RefreshData{
-		RefreshToken: "123",
-		UserID:       user.UserID,
-		ClientID:     client.ClientID,
-		CreatedAt:    time.Now(),
-	}
-	err = is.store.OAuth.SaveRefreshToken(refreshData)
-	a.So(err, should.BeNil)
-
-	accessData := &types.AccessData{
-		AccessToken: "456",
-		UserID:      user.UserID,
-		ClientID:    client.ClientID,
-		CreatedAt:   time.Now(),
-		ExpiresIn:   3600,
-	}
-	err = is.store.OAuth.SaveAccessToken(accessData)
-	a.So(err, should.BeNil)
-
 	clients, err := is.ListAuthorizedClients(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	if a.So(clients.Clients, should.HaveLength, 1) {
@@ -263,10 +250,45 @@ func TestUser(t *testing.T) {
 	_, err = is.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifier{client.ClientID})
 	a.So(err, should.BeNil)
 
-	clients, err = is.ListAuthorizedClients(ctx, &pbtypes.Empty{})
+	// create a fake authorized client to the user
+	client = &ttnpb.Client{
+		ClientIdentifier: ttnpb.ClientIdentifier{"bar-client"},
+		Description:      "description",
+		Secret:           "secret",
+		Grants:           []ttnpb.GrantType{ttnpb.GRANT_PASSWORD},
+		Rights:           []ttnpb.Right{},
+		RedirectURI:      "foo.ttn.dev/oauth",
+		Creator:          testUsers()["john-doe"].UserIdentifier,
+	}
+	client.Rights = append(client.Rights, ttnpb.AllUserRights...)
+	err = is.store.Clients.Create(client)
 	a.So(err, should.BeNil)
-	a.So(clients.Clients, should.HaveLength, 0)
 
-	_, err = is.DeleteUser(ctx, &pbtypes.Empty{})
+	accessToken, err = auth.GenerateAccessToken("")
+	a.So(err, should.BeNil)
+	ctx = testCtx()
+
+	accessData = &types.AccessData{
+		AccessToken: accessToken,
+		UserID:      user.UserID,
+		ClientID:    client.ClientID,
+		CreatedAt:   time.Now().UTC(),
+		ExpiresIn:   time.Duration(time.Hour),
+		Scope:       oauth.Scope(client.Rights),
+	}
+	err = is.store.OAuth.SaveAccessToken(accessData)
+	a.So(err, should.BeNil)
+
+	refreshData = &types.RefreshData{
+		RefreshToken: "123",
+		UserID:       user.UserID,
+		ClientID:     client.ClientID,
+		CreatedAt:    time.Now(),
+		Scope:        oauth.Scope(client.Rights),
+	}
+	err = is.store.OAuth.SaveRefreshToken(refreshData)
+	a.So(err, should.BeNil)
+
+	_, err = is.DeleteUser(testCtx(), &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 }

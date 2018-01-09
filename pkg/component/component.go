@@ -13,9 +13,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/log/middleware/sentry"
-	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
-	"github.com/TheThingsNetwork/ttn/pkg/tokenkey"
 	"github.com/TheThingsNetwork/ttn/pkg/web"
 	raven "github.com/getsentry/raven-go"
 	"google.golang.org/grpc"
@@ -46,8 +44,6 @@ type Component struct {
 	loopback *grpc.ClientConn
 
 	listeners map[string]*listener
-
-	claims.TokenKeyInfoProvider
 }
 
 // New returns a new component
@@ -71,7 +67,6 @@ func New(logger log.Stack, config *Config) *Component {
 	}
 
 	c.web = web.New(c.logger)
-	c.TokenKeyInfoProvider = tokenkey.New(config.ServiceBase.Identity.Secret)
 
 	return c
 }

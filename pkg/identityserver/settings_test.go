@@ -3,12 +3,9 @@
 package identityserver
 
 import (
-	"context"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
-	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
@@ -20,14 +17,7 @@ func TestSettings(t *testing.T) {
 	is := getIS(t)
 	defer is.store.Settings.Set(testSettings())
 
-	user := testUsers()["alice"]
-
-	ctx := claims.NewContext(context.Background(), &auth.Claims{
-		EntityID:   user.UserID,
-		EntityType: auth.EntityUser,
-		Source:     auth.Token,
-		Rights:     ttnpb.AllUserRights,
-	})
+	ctx := testCtx()
 
 	resp, err := is.GetSettings(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)

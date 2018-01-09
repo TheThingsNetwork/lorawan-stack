@@ -3,14 +3,11 @@
 package identityserver
 
 import (
-	"context"
 	"sort"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
-	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
@@ -27,12 +24,7 @@ func TestApplication(t *testing.T) {
 		ApplicationIdentifier: ttnpb.ApplicationIdentifier{"foo-app"},
 	}
 
-	ctx := claims.NewContext(context.Background(), &auth.Claims{
-		EntityID:   user.UserID,
-		EntityType: auth.EntityUser,
-		Source:     auth.Token,
-		Rights:     append(ttnpb.AllUserRights, ttnpb.AllApplicationRights...),
-	})
+	ctx := testCtx()
 
 	_, err := is.CreateApplication(ctx, &ttnpb.CreateApplicationRequest{
 		Application: app,

@@ -133,9 +133,6 @@ func New(comp *component.Component, config *Config, opts ...Option) (*IdentitySe
 		return nil, err
 	}
 
-	// replace the TokenKeyInfoProvider for a local one
-	comp.TokenKeyInfoProvider = &tokenKeyProvider{store}
-
 	is := &IdentityServer{
 		Component: comp,
 		store:     store,
