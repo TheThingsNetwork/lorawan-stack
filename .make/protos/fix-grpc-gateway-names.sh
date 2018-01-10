@@ -34,7 +34,7 @@ for f in ${protos[@]}; do
   if grep -q '(gogoproto.customname)' "${f}"; then
     for l in `grep '(gogoproto.customname)' "${f}"`; do
       from=`echo "${l}" | perl \
-        -pe 's![[:space:]]*(repeated[[:space:]]+)?[[:alnum:]_.]+[[:space:]]+([[:alnum:]_]+)[[:space:]]*=[[:space:]]*[0-9]+.*!\2!;' \
+        -pe 's![[:space:]]*(repeated[[:space:]]+)?([[:alnum:]_.]+|map<[[:space:]]*[[:alnum:]]+[[:space:]]*,[[:space:]]*[[:alnum:]_.]+[[:space:]]*>)[[:space:]]+([[:alnum:]_]+)[[:space:]]*=[[:space:]]*[0-9]+.*!\3!;' \
         -pe 's!(^[[:alnum:]])([[:alnum:]]*)|_([[:alnum:]])([[:alnum:]]*)!\U\1\3\E\2\4!g;'`
       to=`echo "${l}" | perl \
         -pe 's!.*\(gogoproto.customname\)[[:space:]]*=[[:space:]]*"([[:alnum:]]+)".*!\1!'`
