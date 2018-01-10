@@ -222,11 +222,23 @@ func (req *ApplicationCollaborator) Validate() error {
 
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *CreateGatewayRequest) Validate() error {
-	return validate.All(
+	validations := make([]validate.Errors, 0, 4)
+	validations = append(validations,
 		validate.Field(req.Gateway.GatewayID, validate.ID).DescribeFieldName("Gateway ID"),
 		validate.Field(req.Gateway.FrequencyPlanID, validate.Required).DescribeFieldName("Frequency plan ID"),
-		validate.Field(req.Gateway.ClusterAddress, validate.Required).DescribeFieldName("Cluster adddress"),
+		validate.Field(req.Gateway.ClusterAddress, validate.Required).DescribeFieldName("Cluster Address"),
 	)
+
+	if req.Gateway.ContactAccount != nil {
+		validations = append(validations, validate.Field(req.Gateway.ContactAccount.UserID, validate.NotRequired, validate.ID).DescribeFieldName("Contact account: User ID"))
+	}
+
+	// if radios are set check for each one that frequency is present.
+	for _, radio := range req.Gateway.Radios {
+		validations = append(validations, validate.Field(radio.Frequency, validate.Required).DescribeFieldName("Radio Frequency"))
+	}
+
+	return validate.All(validations...)
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.
@@ -248,25 +260,23 @@ func (req *UpdateGatewayRequest) Validate() error {
 	for _, path := range paths {
 		switch true {
 		case FieldPathGatewayDescription.MatchString(path):
-		case FieldPathGatewayFrequencyPlanID.MatchString(path):
-			err = validate.Field(req.Gateway.FrequencyPlanID, validate.Required).DescribeFieldName("Frequency plan ID")
 		case FieldPathGatewayPrivacySettingsStatusPublic.MatchString(path),
 			FieldPathGatewayPrivacySettingsLocationPublic.MatchString(path),
 			FieldPathGatewayPrivacySettingsContactable.MatchString(path),
 			FieldPathGatewayAutoUpdate.MatchString(path),
 			FieldPathGatewayPlatform.MatchString(path),
-			FieldPathGatewayAntennaGain.MatchString(path),
-			FieldPathGatewayAntennaLocationLatitude.MatchString(path),
-			FieldPathGatewayAntennaLocationLongitude.MatchString(path),
-			FieldPathGatewayAntennaLocationAltitude.MatchString(path),
-			FieldPathGatewayAntennaLocationAccuracy.MatchString(path),
-			FieldPathGatewayAntennaLocationSource.MatchString(path),
-			FieldPathGatewayAntennaType.MatchString(path),
-			FieldPathGatewayAntennaModel.MatchString(path),
-			FieldPathGatewayAntennaPlacement.MatchString(path),
+			FieldPathGatewayAntennas.MatchString(path),
 			FieldPathGatewayAttributes.MatchString(path):
+		case FieldPathGatewayAPIKey.MatchString(path):
+			err = validate.Field(req.Gateway.APIKey, validate.Required).DescribeFieldName("Device Configuration: API Key")
 		case FieldPathGatewayClusterAddress.MatchString(path):
-			err = validate.Field(req.Gateway.ClusterAddress, validate.Required).DescribeFieldName("Cluster adddress")
+			err = validate.Field(req.Gateway.ClusterAddress, validate.Required).DescribeFieldName("Device Configuration: Cluster Address")
+		case FieldPathGatewayFrequencyPlanID.MatchString(path):
+			err = validate.Field(req.Gateway.FrequencyPlanID, validate.Required).DescribeFieldName("Device Configuration: Frequency plan ID")
+		case FieldPathGatewayRadios.MatchString(path):
+			for _, radio := range req.Gateway.Radios {
+				validations = append(validations, validate.Field(radio.Frequency, validate.Required).DescribeFieldName("Device Configuration: Radio Frequency"))
+			}
 		case FieldPathGatewayContactAccountUserID.MatchString(path):
 			err = validate.Field(req.Gateway.ContactAccount.UserID, validate.NotRequired, validate.ID).DescribeFieldName("Contact account: user ID")
 		default:

@@ -50,7 +50,7 @@ It has these top-level messages:
 	Gateway
 	GatewayPrivacySettings
 	GatewayAntenna
-	GatewayConfiguration
+	GatewayRadio
 	GatewayStatus
 	GatewayObservations
 	GatewayUp
@@ -62,6 +62,7 @@ It has these top-level messages:
 	GatewayIdentifier
 	EndDeviceIdentifiers
 	ClientIdentifier
+	PullConfigurationRequest
 	IdentityServerSettings
 	GetSettingsRequest
 	UpdateSettingsRequest

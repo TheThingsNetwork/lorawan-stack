@@ -4,6 +4,7 @@ package ttnpb
 
 import (
 	"database/sql/driver"
+	"encoding/json"
 	"regexp"
 	"strings"
 
@@ -25,12 +26,30 @@ func (g *Gateway) SetAntennas(antennas []GatewayAntenna) {
 	g.Antennas = antennas
 }
 
+// SetAntennas sets the radios.
+func (g *Gateway) SetRadios(radios []GatewayRadio) {
+	g.Radios = radios
+}
+
 var (
 	// FieldPathGatewayDescription is the field path for the gateway description field.
 	FieldPathGatewayDescription = regexp.MustCompile(`^description$`)
 
+	// FieldPathGatewayAPIKey is the field path for the gateway API Key that is used
+	// in the device configuration.
+	FieldPathGatewayAPIKey = regexp.MustCompile(`^api_key$`)
+
 	// FieldPathGatewayFrequencyPlanID is the field path for the gateway frequency plan ID field.
 	FieldPathGatewayFrequencyPlanID = regexp.MustCompile(`^frequency_plan_id$`)
+
+	// FieldPathGatewayClusterAddress is the field path for the gateway cluster address field.
+	FieldPathGatewayClusterAddress = regexp.MustCompile(`^cluster_address$`)
+
+	// FieldPathGatewayAntennas is the field path for the antennas.
+	FieldPathGatewayAntennas = regexp.MustCompile(`^antennas$`)
+
+	// FieldPathGatewayRadios is the field path for the radios.
+	FieldPathGatewayRadios = regexp.MustCompile(`^radios$`)
 
 	// FieldPathGatewaySettingsStatusPublic is the field path for the gateway privacy setting status public field.
 	FieldPathGatewayPrivacySettingsStatusPublic = regexp.MustCompile(`^privacy_settings.status_public$`)
@@ -47,38 +66,8 @@ var (
 	// FieldPathGatewayPlatform is the field path for the gateway platform field.
 	FieldPathGatewayPlatform = regexp.MustCompile(`^platform$`)
 
-	// FieldPathGatewayAntennaGain is the field path for the gain field of an indexed antenna.
-	FieldPathGatewayAntennaGain = regexp.MustCompile(`^antennas\.(\d).gain$`)
-
-	// FieldPathGatewayAntennaLocationLatitude is the field path for the latitude field of an indexed antenna.
-	FieldPathGatewayAntennaLocationLatitude = regexp.MustCompile(`^antennas\.(\d).latitude$`)
-
-	// FieldPathGatewayAntennaLocationLongitude is the field path for the longitude field of an indexed antenna.
-	FieldPathGatewayAntennaLocationLongitude = regexp.MustCompile(`^antennas\.(\d).longitude$`)
-
-	// FieldPathGatewayAntennaLocationAltitude is the field path for the altitude field of an indexed antenna.
-	FieldPathGatewayAntennaLocationAltitude = regexp.MustCompile(`^antennas\.(\d).altitude$`)
-
-	// FieldPathGatewayAntennaLocationAccuracy is the field path for the accuracy field of an indexed antenna.
-	FieldPathGatewayAntennaLocationAccuracy = regexp.MustCompile(`^antennas\.(\d).accuracy$`)
-
-	// FieldPathGatewayAntennaLocationSource is the field path for the source field of an indexed antenna.
-	FieldPathGatewayAntennaLocationSource = regexp.MustCompile(`^antennas\.(\d).source$`)
-
-	// FieldPathGatewayAntennaType is the field path for the type field of an indexed antenna.
-	FieldPathGatewayAntennaType = regexp.MustCompile(`^antennas\.(\d).type$`)
-
-	// FieldPathGatewayAntennaModel is the field path for the model field of an indexed antenna.
-	FieldPathGatewayAntennaModel = regexp.MustCompile(`^antennas\.(\d).model$`)
-
-	// FieldPathGatewayAntennaPlacement is the field path for the placement field of an indexed antenna.
-	FieldPathGatewayAntennaPlacement = regexp.MustCompile(`^antennas\.(\d).placement$`)
-
 	// FieldPathGatewayAttributes is the field path for an attribute in the attributes map.
-	FieldPathGatewayAttributes = regexp.MustCompile(`^attributes\.(.*)$`)
-
-	// FieldPathGatewayClusterAddress is the field path for the gateway cluster address field.
-	FieldPathGatewayClusterAddress = regexp.MustCompile(`^cluster_address$`)
+	FieldPathGatewayAttributes = regexp.MustCompile(`^attributes\.(.+)$`)
 
 	// FieldPathGatewayContactAccountUserID is the field path for the gateway contact account user ID field.
 	FieldPathGatewayContactAccountUserID = regexp.MustCompile(`^contact_account.user_id$`)
@@ -129,6 +118,35 @@ func (p *GatewayPrivacySettings) Scan(src interface{}) error {
 			p.Contactable = true
 		}
 	}
+
+	return nil
+}
+
+// Value implements driver.Valuer interface.
+func (p GatewayRadio_TxConfiguration) Value() (driver.Value, error) {
+	b, err := json.Marshal([]uint32{p.MinFrequency, p.MaxFrequency, p.NotchFrequency})
+	if err != nil {
+		return nil, err
+	}
+
+	return string(b[:]), nil
+}
+
+// Scan implements sql.Scanner interface.
+func (p *GatewayRadio_TxConfiguration) Scan(src interface{}) error {
+	str, ok := src.(string)
+	if !ok {
+		return errors.Errorf("Invalid type assertion. Got %T instead of string", src)
+	}
+
+	var values []uint32
+	if err := json.Unmarshal([]byte(str), &values); err != nil {
+		return err
+	}
+
+	p.MinFrequency = values[0]
+	p.MaxFrequency = values[1]
+	p.NotchFrequency = values[2]
 
 	return nil
 }

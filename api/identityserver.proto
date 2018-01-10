@@ -19,11 +19,20 @@ package ttn.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
+message PullConfigurationRequest {
+  // gateway_id is the gateway's ID to be fetched in the stream.
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // projection_mask is the symbolic set of fields that will be filtered in the
+  // response. If empty all fields will be returned.
+  google.protobuf.FieldMask projection_mask = 2;
+}
+
 // GtwGr implements a Gateway Registry service.
 service GtwGr {
-  // PullConfiguration sends a new GatewayConfiguration, with all the latest values,
+  // PullConfiguration sends a new DeviceConfiguration, with all the latest values,
   // at connection and when a gateway's configuration is updated.
-  rpc PullConfiguration(GatewayIdentifier) returns (stream GatewayConfiguration);
+  rpc PullConfiguration(PullConfigurationRequest) returns (stream Gateway);
 }
 
 message IdentityServerSettings {

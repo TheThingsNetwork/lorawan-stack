@@ -407,6 +407,11 @@ func TestGatewayValidations(t *testing.T) {
 				GatewayIdentifier: GatewayIdentifier{"foo-gtw"},
 				FrequencyPlanID:   "foo",
 				ClusterAddress:    "foo",
+				Radios: []GatewayRadio{
+					{
+						Frequency: 12,
+					},
+				},
 			},
 		}
 		a.So(req.Validate(), should.BeNil)
@@ -414,9 +419,11 @@ func TestGatewayValidations(t *testing.T) {
 
 	{
 		// request without update mask (bad)
-		req := &UpdateApplicationRequest{
-			Application: Application{
-				ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+		req := &UpdateGatewayRequest{
+			Gateway: Gateway{
+				GatewayIdentifier: GatewayIdentifier{"__foo-gtw"},
+				FrequencyPlanID:   "foo",
+				ClusterAddress:    "foo",
 			},
 		}
 		err := req.Validate()
@@ -424,9 +431,11 @@ func TestGatewayValidations(t *testing.T) {
 		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
 
 		// request with an invalid update mask (bad)
-		req = &UpdateApplicationRequest{
-			Application: Application{
-				ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+		req = &UpdateGatewayRequest{
+			Gateway: Gateway{
+				GatewayIdentifier: GatewayIdentifier{"__foo-gtw"},
+				FrequencyPlanID:   "foo",
+				ClusterAddress:    "foo",
 			},
 			UpdateMask: pbtypes.FieldMask{
 				Paths: []string{"descriptio"},
@@ -437,9 +446,9 @@ func TestGatewayValidations(t *testing.T) {
 		a.So(ErrInvalidPathFieldMask.Describes(err), should.BeTrue)
 
 		// good request
-		req = &UpdateApplicationRequest{
-			Application: Application{
-				ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+		req = &UpdateGatewayRequest{
+			Gateway: Gateway{
+				GatewayIdentifier: GatewayIdentifier{"foo-gtw"},
 			},
 			UpdateMask: pbtypes.FieldMask{
 				Paths: []string{"description"},

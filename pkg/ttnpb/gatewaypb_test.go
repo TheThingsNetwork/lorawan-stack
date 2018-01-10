@@ -329,15 +329,15 @@ func BenchmarkGatewayAntennaProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestGatewayConfigurationProto(t *testing.T) {
+func TestGatewayRadioProto(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration(popr, false)
+	p := NewPopulatedGatewayRadio(popr, false)
 	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &GatewayConfiguration{}
+	msg := &GatewayRadio{}
 	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -363,10 +363,10 @@ func TestGatewayConfigurationProto(t *testing.T) {
 	}
 }
 
-func TestGatewayConfigurationMarshalTo(t *testing.T) {
+func TestGatewayRadioMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration(popr, false)
+	p := NewPopulatedGatewayRadio(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
 	for i := range dAtA {
@@ -376,7 +376,7 @@ func TestGatewayConfigurationMarshalTo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &GatewayConfiguration{}
+	msg := &GatewayRadio{}
 	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -391,12 +391,12 @@ func TestGatewayConfigurationMarshalTo(t *testing.T) {
 	}
 }
 
-func BenchmarkGatewayConfigurationProtoMarshal(b *testing.B) {
+func BenchmarkGatewayRadioProtoMarshal(b *testing.B) {
 	popr := math_rand.New(math_rand.NewSource(616))
 	total := 0
-	pops := make([]*GatewayConfiguration, 10000)
+	pops := make([]*GatewayRadio, 10000)
 	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedGatewayConfiguration(popr, false)
+		pops[i] = NewPopulatedGatewayRadio(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -409,18 +409,18 @@ func BenchmarkGatewayConfigurationProtoMarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func BenchmarkGatewayConfigurationProtoUnmarshal(b *testing.B) {
+func BenchmarkGatewayRadioProtoUnmarshal(b *testing.B) {
 	popr := math_rand.New(math_rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedGatewayConfiguration(popr, false))
+		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedGatewayRadio(popr, false))
 		if err != nil {
 			panic(err)
 		}
 		datas[i] = dAtA
 	}
-	msg := &GatewayConfiguration{}
+	msg := &GatewayRadio{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
@@ -431,15 +431,15 @@ func BenchmarkGatewayConfigurationProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestGatewayConfiguration_GatewayAntennaConfigurationProto(t *testing.T) {
+func TestGatewayRadio_TxConfigurationProto(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_GatewayAntennaConfiguration(popr, false)
+	p := NewPopulatedGatewayRadio_TxConfiguration(popr, false)
 	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &GatewayConfiguration_GatewayAntennaConfiguration{}
+	msg := &GatewayRadio_TxConfiguration{}
 	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -465,10 +465,10 @@ func TestGatewayConfiguration_GatewayAntennaConfigurationProto(t *testing.T) {
 	}
 }
 
-func TestGatewayConfiguration_GatewayAntennaConfigurationMarshalTo(t *testing.T) {
+func TestGatewayRadio_TxConfigurationMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_GatewayAntennaConfiguration(popr, false)
+	p := NewPopulatedGatewayRadio_TxConfiguration(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
 	for i := range dAtA {
@@ -478,7 +478,7 @@ func TestGatewayConfiguration_GatewayAntennaConfigurationMarshalTo(t *testing.T)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &GatewayConfiguration_GatewayAntennaConfiguration{}
+	msg := &GatewayRadio_TxConfiguration{}
 	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -493,12 +493,12 @@ func TestGatewayConfiguration_GatewayAntennaConfigurationMarshalTo(t *testing.T)
 	}
 }
 
-func BenchmarkGatewayConfiguration_GatewayAntennaConfigurationProtoMarshal(b *testing.B) {
+func BenchmarkGatewayRadio_TxConfigurationProtoMarshal(b *testing.B) {
 	popr := math_rand.New(math_rand.NewSource(616))
 	total := 0
-	pops := make([]*GatewayConfiguration_GatewayAntennaConfiguration, 10000)
+	pops := make([]*GatewayRadio_TxConfiguration, 10000)
 	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedGatewayConfiguration_GatewayAntennaConfiguration(popr, false)
+		pops[i] = NewPopulatedGatewayRadio_TxConfiguration(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -511,222 +511,18 @@ func BenchmarkGatewayConfiguration_GatewayAntennaConfigurationProtoMarshal(b *te
 	b.SetBytes(int64(total / b.N))
 }
 
-func BenchmarkGatewayConfiguration_GatewayAntennaConfigurationProtoUnmarshal(b *testing.B) {
+func BenchmarkGatewayRadio_TxConfigurationProtoUnmarshal(b *testing.B) {
 	popr := math_rand.New(math_rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedGatewayConfiguration_GatewayAntennaConfiguration(popr, false))
+		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedGatewayRadio_TxConfiguration(popr, false))
 		if err != nil {
 			panic(err)
 		}
 		datas[i] = dAtA
 	}
-	msg := &GatewayConfiguration_GatewayAntennaConfiguration{}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		total += len(datas[i%10000])
-		if err := github_com_gogo_protobuf_proto.Unmarshal(datas[i%10000], msg); err != nil {
-			panic(err)
-		}
-	}
-	b.SetBytes(int64(total / b.N))
-}
-
-func TestGatewayConfiguration_RadioProto(t *testing.T) {
-	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_Radio(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
-	if err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	msg := &GatewayConfiguration_Radio{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	littlefuzz := make([]byte, len(dAtA))
-	copy(littlefuzz, dAtA)
-	for i := range dAtA {
-		dAtA[i] = byte(popr.Intn(256))
-	}
-	if err := p.VerboseEqual(msg); err != nil {
-		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
-	}
-	if !p.Equal(msg) {
-		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
-	}
-	if len(littlefuzz) > 0 {
-		fuzzamount := 100
-		for i := 0; i < fuzzamount; i++ {
-			littlefuzz[popr.Intn(len(littlefuzz))] = byte(popr.Intn(256))
-			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
-		}
-		// shouldn't panic
-		_ = github_com_gogo_protobuf_proto.Unmarshal(littlefuzz, msg)
-	}
-}
-
-func TestGatewayConfiguration_RadioMarshalTo(t *testing.T) {
-	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_Radio(popr, false)
-	size := p.Size()
-	dAtA := make([]byte, size)
-	for i := range dAtA {
-		dAtA[i] = byte(popr.Intn(256))
-	}
-	_, err := p.MarshalTo(dAtA)
-	if err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	msg := &GatewayConfiguration_Radio{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	for i := range dAtA {
-		dAtA[i] = byte(popr.Intn(256))
-	}
-	if err := p.VerboseEqual(msg); err != nil {
-		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
-	}
-	if !p.Equal(msg) {
-		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
-	}
-}
-
-func BenchmarkGatewayConfiguration_RadioProtoMarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
-	total := 0
-	pops := make([]*GatewayConfiguration_Radio, 10000)
-	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedGatewayConfiguration_Radio(popr, false)
-	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(pops[i%10000])
-		if err != nil {
-			panic(err)
-		}
-		total += len(dAtA)
-	}
-	b.SetBytes(int64(total / b.N))
-}
-
-func BenchmarkGatewayConfiguration_RadioProtoUnmarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
-	total := 0
-	datas := make([][]byte, 10000)
-	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedGatewayConfiguration_Radio(popr, false))
-		if err != nil {
-			panic(err)
-		}
-		datas[i] = dAtA
-	}
-	msg := &GatewayConfiguration_Radio{}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		total += len(datas[i%10000])
-		if err := github_com_gogo_protobuf_proto.Unmarshal(datas[i%10000], msg); err != nil {
-			panic(err)
-		}
-	}
-	b.SetBytes(int64(total / b.N))
-}
-
-func TestGatewayConfiguration_Radio_TxConfigurationProto(t *testing.T) {
-	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_Radio_TxConfiguration(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
-	if err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	msg := &GatewayConfiguration_Radio_TxConfiguration{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	littlefuzz := make([]byte, len(dAtA))
-	copy(littlefuzz, dAtA)
-	for i := range dAtA {
-		dAtA[i] = byte(popr.Intn(256))
-	}
-	if err := p.VerboseEqual(msg); err != nil {
-		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
-	}
-	if !p.Equal(msg) {
-		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
-	}
-	if len(littlefuzz) > 0 {
-		fuzzamount := 100
-		for i := 0; i < fuzzamount; i++ {
-			littlefuzz[popr.Intn(len(littlefuzz))] = byte(popr.Intn(256))
-			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
-		}
-		// shouldn't panic
-		_ = github_com_gogo_protobuf_proto.Unmarshal(littlefuzz, msg)
-	}
-}
-
-func TestGatewayConfiguration_Radio_TxConfigurationMarshalTo(t *testing.T) {
-	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_Radio_TxConfiguration(popr, false)
-	size := p.Size()
-	dAtA := make([]byte, size)
-	for i := range dAtA {
-		dAtA[i] = byte(popr.Intn(256))
-	}
-	_, err := p.MarshalTo(dAtA)
-	if err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	msg := &GatewayConfiguration_Radio_TxConfiguration{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	for i := range dAtA {
-		dAtA[i] = byte(popr.Intn(256))
-	}
-	if err := p.VerboseEqual(msg); err != nil {
-		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
-	}
-	if !p.Equal(msg) {
-		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
-	}
-}
-
-func BenchmarkGatewayConfiguration_Radio_TxConfigurationProtoMarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
-	total := 0
-	pops := make([]*GatewayConfiguration_Radio_TxConfiguration, 10000)
-	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedGatewayConfiguration_Radio_TxConfiguration(popr, false)
-	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(pops[i%10000])
-		if err != nil {
-			panic(err)
-		}
-		total += len(dAtA)
-	}
-	b.SetBytes(int64(total / b.N))
-}
-
-func BenchmarkGatewayConfiguration_Radio_TxConfigurationProtoUnmarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
-	total := 0
-	datas := make([][]byte, 10000)
-	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedGatewayConfiguration_Radio_TxConfiguration(popr, false))
-		if err != nil {
-			panic(err)
-		}
-		datas[i] = dAtA
-	}
-	msg := &GatewayConfiguration_Radio_TxConfiguration{}
+	msg := &GatewayRadio_TxConfiguration{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
@@ -1004,16 +800,16 @@ func TestGatewayAntennaJSON(t *testing.T) {
 		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
 	}
 }
-func TestGatewayConfigurationJSON(t *testing.T) {
+func TestGatewayRadioJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration(popr, true)
+	p := NewPopulatedGatewayRadio(popr, true)
 	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &GatewayConfiguration{}
+	msg := &GatewayRadio{}
 	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
@@ -1025,58 +821,16 @@ func TestGatewayConfigurationJSON(t *testing.T) {
 		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
 	}
 }
-func TestGatewayConfiguration_GatewayAntennaConfigurationJSON(t *testing.T) {
+func TestGatewayRadio_TxConfigurationJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_GatewayAntennaConfiguration(popr, true)
+	p := NewPopulatedGatewayRadio_TxConfiguration(popr, true)
 	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &GatewayConfiguration_GatewayAntennaConfiguration{}
-	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
-	if err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	if err := p.VerboseEqual(msg); err != nil {
-		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
-	}
-	if !p.Equal(msg) {
-		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
-	}
-}
-func TestGatewayConfiguration_RadioJSON(t *testing.T) {
-	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_Radio(popr, true)
-	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
-	jsondata, err := marshaler.MarshalToString(p)
-	if err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	msg := &GatewayConfiguration_Radio{}
-	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
-	if err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	if err := p.VerboseEqual(msg); err != nil {
-		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
-	}
-	if !p.Equal(msg) {
-		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
-	}
-}
-func TestGatewayConfiguration_Radio_TxConfigurationJSON(t *testing.T) {
-	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_Radio_TxConfiguration(popr, true)
-	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
-	jsondata, err := marshaler.MarshalToString(p)
-	if err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	msg := &GatewayConfiguration_Radio_TxConfiguration{}
+	msg := &GatewayRadio_TxConfiguration{}
 	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
@@ -1232,12 +986,12 @@ func TestGatewayAntennaProtoCompactText(t *testing.T) {
 	}
 }
 
-func TestGatewayConfigurationProtoText(t *testing.T) {
+func TestGatewayRadioProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration(popr, true)
+	p := NewPopulatedGatewayRadio(popr, true)
 	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
-	msg := &GatewayConfiguration{}
+	msg := &GatewayRadio{}
 	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1249,12 +1003,12 @@ func TestGatewayConfigurationProtoText(t *testing.T) {
 	}
 }
 
-func TestGatewayConfigurationProtoCompactText(t *testing.T) {
+func TestGatewayRadioProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration(popr, true)
+	p := NewPopulatedGatewayRadio(popr, true)
 	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
-	msg := &GatewayConfiguration{}
+	msg := &GatewayRadio{}
 	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1266,12 +1020,12 @@ func TestGatewayConfigurationProtoCompactText(t *testing.T) {
 	}
 }
 
-func TestGatewayConfiguration_GatewayAntennaConfigurationProtoText(t *testing.T) {
+func TestGatewayRadio_TxConfigurationProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_GatewayAntennaConfiguration(popr, true)
+	p := NewPopulatedGatewayRadio_TxConfiguration(popr, true)
 	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
-	msg := &GatewayConfiguration_GatewayAntennaConfiguration{}
+	msg := &GatewayRadio_TxConfiguration{}
 	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1283,80 +1037,12 @@ func TestGatewayConfiguration_GatewayAntennaConfigurationProtoText(t *testing.T)
 	}
 }
 
-func TestGatewayConfiguration_GatewayAntennaConfigurationProtoCompactText(t *testing.T) {
+func TestGatewayRadio_TxConfigurationProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_GatewayAntennaConfiguration(popr, true)
+	p := NewPopulatedGatewayRadio_TxConfiguration(popr, true)
 	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
-	msg := &GatewayConfiguration_GatewayAntennaConfiguration{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	if err := p.VerboseEqual(msg); err != nil {
-		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
-	}
-	if !p.Equal(msg) {
-		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
-	}
-}
-
-func TestGatewayConfiguration_RadioProtoText(t *testing.T) {
-	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_Radio(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
-	msg := &GatewayConfiguration_Radio{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	if err := p.VerboseEqual(msg); err != nil {
-		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
-	}
-	if !p.Equal(msg) {
-		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
-	}
-}
-
-func TestGatewayConfiguration_RadioProtoCompactText(t *testing.T) {
-	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_Radio(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
-	msg := &GatewayConfiguration_Radio{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	if err := p.VerboseEqual(msg); err != nil {
-		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
-	}
-	if !p.Equal(msg) {
-		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
-	}
-}
-
-func TestGatewayConfiguration_Radio_TxConfigurationProtoText(t *testing.T) {
-	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_Radio_TxConfiguration(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
-	msg := &GatewayConfiguration_Radio_TxConfiguration{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	if err := p.VerboseEqual(msg); err != nil {
-		t.Fatalf("seed = %d, %#v !VerboseProto %#v, since %v", seed, msg, p, err)
-	}
-	if !p.Equal(msg) {
-		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
-	}
-}
-
-func TestGatewayConfiguration_Radio_TxConfigurationProtoCompactText(t *testing.T) {
-	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_Radio_TxConfiguration(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
-	msg := &GatewayConfiguration_Radio_TxConfiguration{}
+	msg := &GatewayRadio_TxConfiguration{}
 	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1481,14 +1167,14 @@ func TestGatewayAntennaVerboseEqual(t *testing.T) {
 		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
 	}
 }
-func TestGatewayConfigurationVerboseEqual(t *testing.T) {
+func TestGatewayRadioVerboseEqual(t *testing.T) {
 	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedGatewayConfiguration(popr, false)
+	p := NewPopulatedGatewayRadio(popr, false)
 	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
-	msg := &GatewayConfiguration{}
+	msg := &GatewayRadio{}
 	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
@@ -1496,44 +1182,14 @@ func TestGatewayConfigurationVerboseEqual(t *testing.T) {
 		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
 	}
 }
-func TestGatewayConfiguration_GatewayAntennaConfigurationVerboseEqual(t *testing.T) {
+func TestGatewayRadio_TxConfigurationVerboseEqual(t *testing.T) {
 	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedGatewayConfiguration_GatewayAntennaConfiguration(popr, false)
+	p := NewPopulatedGatewayRadio_TxConfiguration(popr, false)
 	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
-	msg := &GatewayConfiguration_GatewayAntennaConfiguration{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
-		panic(err)
-	}
-	if err := p.VerboseEqual(msg); err != nil {
-		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
-	}
-}
-func TestGatewayConfiguration_RadioVerboseEqual(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedGatewayConfiguration_Radio(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
-	if err != nil {
-		panic(err)
-	}
-	msg := &GatewayConfiguration_Radio{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
-		panic(err)
-	}
-	if err := p.VerboseEqual(msg); err != nil {
-		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
-	}
-}
-func TestGatewayConfiguration_Radio_TxConfigurationVerboseEqual(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedGatewayConfiguration_Radio_TxConfiguration(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
-	if err != nil {
-		panic(err)
-	}
-	msg := &GatewayConfiguration_Radio_TxConfiguration{}
+	msg := &GatewayRadio_TxConfiguration{}
 	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
@@ -1679,10 +1335,10 @@ func BenchmarkGatewayAntennaSize(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestGatewayConfigurationSize(t *testing.T) {
+func TestGatewayRadioSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration(popr, true)
+	p := NewPopulatedGatewayRadio(popr, true)
 	size2 := github_com_gogo_protobuf_proto.Size(p)
 	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
 	if err != nil {
@@ -1701,12 +1357,12 @@ func TestGatewayConfigurationSize(t *testing.T) {
 	}
 }
 
-func BenchmarkGatewayConfigurationSize(b *testing.B) {
+func BenchmarkGatewayRadioSize(b *testing.B) {
 	popr := math_rand.New(math_rand.NewSource(616))
 	total := 0
-	pops := make([]*GatewayConfiguration, 1000)
+	pops := make([]*GatewayRadio, 1000)
 	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedGatewayConfiguration(popr, false)
+		pops[i] = NewPopulatedGatewayRadio(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -1715,10 +1371,10 @@ func BenchmarkGatewayConfigurationSize(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestGatewayConfiguration_GatewayAntennaConfigurationSize(t *testing.T) {
+func TestGatewayRadio_TxConfigurationSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_GatewayAntennaConfiguration(popr, true)
+	p := NewPopulatedGatewayRadio_TxConfiguration(popr, true)
 	size2 := github_com_gogo_protobuf_proto.Size(p)
 	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
 	if err != nil {
@@ -1737,84 +1393,12 @@ func TestGatewayConfiguration_GatewayAntennaConfigurationSize(t *testing.T) {
 	}
 }
 
-func BenchmarkGatewayConfiguration_GatewayAntennaConfigurationSize(b *testing.B) {
+func BenchmarkGatewayRadio_TxConfigurationSize(b *testing.B) {
 	popr := math_rand.New(math_rand.NewSource(616))
 	total := 0
-	pops := make([]*GatewayConfiguration_GatewayAntennaConfiguration, 1000)
+	pops := make([]*GatewayRadio_TxConfiguration, 1000)
 	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedGatewayConfiguration_GatewayAntennaConfiguration(popr, false)
-	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		total += pops[i%1000].Size()
-	}
-	b.SetBytes(int64(total / b.N))
-}
-
-func TestGatewayConfiguration_RadioSize(t *testing.T) {
-	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_Radio(popr, true)
-	size2 := github_com_gogo_protobuf_proto.Size(p)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
-	if err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	size := p.Size()
-	if len(dAtA) != size {
-		t.Errorf("seed = %d, size %v != marshalled size %v", seed, size, len(dAtA))
-	}
-	if size2 != size {
-		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
-	}
-	size3 := github_com_gogo_protobuf_proto.Size(p)
-	if size3 != size {
-		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
-	}
-}
-
-func BenchmarkGatewayConfiguration_RadioSize(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
-	total := 0
-	pops := make([]*GatewayConfiguration_Radio, 1000)
-	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedGatewayConfiguration_Radio(popr, false)
-	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		total += pops[i%1000].Size()
-	}
-	b.SetBytes(int64(total / b.N))
-}
-
-func TestGatewayConfiguration_Radio_TxConfigurationSize(t *testing.T) {
-	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedGatewayConfiguration_Radio_TxConfiguration(popr, true)
-	size2 := github_com_gogo_protobuf_proto.Size(p)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
-	if err != nil {
-		t.Fatalf("seed = %d, err = %v", seed, err)
-	}
-	size := p.Size()
-	if len(dAtA) != size {
-		t.Errorf("seed = %d, size %v != marshalled size %v", seed, size, len(dAtA))
-	}
-	if size2 != size {
-		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
-	}
-	size3 := github_com_gogo_protobuf_proto.Size(p)
-	if size3 != size {
-		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
-	}
-}
-
-func BenchmarkGatewayConfiguration_Radio_TxConfigurationSize(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
-	total := 0
-	pops := make([]*GatewayConfiguration_Radio_TxConfiguration, 1000)
-	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedGatewayConfiguration_Radio_TxConfiguration(popr, false)
+		pops[i] = NewPopulatedGatewayRadio_TxConfiguration(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

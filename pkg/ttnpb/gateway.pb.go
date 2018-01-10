@@ -58,36 +58,42 @@ type Gateway struct {
 	GatewayIdentifier `protobuf:"bytes,1,opt,name=id,embedded=id" json:"id"`
 	// description is the description of the gateway.
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// api_key is the API key that the Gateway Agent used uses to authenticate the
+	// gateway to other components of the network.
+	APIKey APIKey `protobuf:"bytes,3,opt,name=api_key,json=apiKey" json:"api_key"`
 	// frequency_plan_id indicates the ID of the frequency plan.
-	FrequencyPlanID string `protobuf:"bytes,3,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
+	FrequencyPlanID string `protobuf:"bytes,4,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
+	// cluster_address indicates the URI of the gateway server cluster to connect to,
+	// in a "<ip>:<port>" format.
+	ClusterAddress string `protobuf:"bytes,5,opt,name=cluster_address,json=clusterAddress,proto3" json:"cluster_address,omitempty"`
+	// antennas contains the information for every antenna of the gateway.
+	Antennas []GatewayAntenna `protobuf:"bytes,6,rep,name=antennas" json:"antennas"`
+	// radios are the gateway concentrator's radios.
+	Radios []GatewayRadio `protobuf:"bytes,7,rep,name=radios" json:"radios"`
 	// activated_at denotes when the gateway was activated.
 	// This a read-only field.
-	ActivatedAt time.Time `protobuf:"bytes,4,opt,name=activated_at,json=activatedAt,stdtime" json:"activated_at"`
+	ActivatedAt time.Time `protobuf:"bytes,8,opt,name=activated_at,json=activatedAt,stdtime" json:"activated_at"`
 	// privacy_settings defines the different privacy settings for this gateway.
-	PrivacySettings GatewayPrivacySettings `protobuf:"bytes,5,opt,name=privacy_settings,json=privacySettings" json:"privacy_settings"`
+	PrivacySettings GatewayPrivacySettings `protobuf:"bytes,9,opt,name=privacy_settings,json=privacySettings" json:"privacy_settings"`
 	// auto_update indicates whether or not the gateway should be able to
 	// automatically fetch and execute firmware updates.
-	AutoUpdate bool `protobuf:"varint,6,opt,name=auto_update,json=autoUpdate,proto3" json:"auto_update,omitempty"`
+	// It is true by default.
+	AutoUpdate bool `protobuf:"varint,10,opt,name=auto_update,json=autoUpdate,proto3" json:"auto_update,omitempty"`
 	// platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS".
-	Platform string `protobuf:"bytes,7,opt,name=platform,proto3" json:"platform,omitempty"`
-	// antennas is all the antennas that the gateway has.
-	Antennas []GatewayAntenna `protobuf:"bytes,8,rep,name=antennas" json:"antennas"`
+	Platform string `protobuf:"bytes,11,opt,name=platform,proto3" json:"platform,omitempty"`
 	// attributes is a free form map of attributes.
-	Attributes map[string]string `protobuf:"bytes,9,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	// cluster_address indicates the URI of the gateway server cluster to connect
-	// to, in a "<ip>:<port>" format.
-	ClusterAddress string `protobuf:"bytes,10,opt,name=cluster_address,json=clusterAddress,proto3" json:"cluster_address,omitempty"`
+	Attributes map[string]string `protobuf:"bytes,12,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// contact_account is the user ID that will be displayed (given the set privacy
 	// settings) as contact person for this gateway.
-	// TODO(gomezjdaniel#222): allow to use an organization ID as contact account when
-	// they are added.
-	ContactAccount UserIdentifier `protobuf:"bytes,11,opt,name=contact_account,json=contactAccount" json:"contact_account"`
+	// TODO(gomezjdaniel#222): allow to use an organization ID as contact account
+	// when they are added.
+	ContactAccount *UserIdentifier `protobuf:"bytes,13,opt,name=contact_account,json=contactAccount" json:"contact_account,omitempty"`
 	// created_at is the time when the gateway was created.
 	// This a read-only field.
-	CreatedAt time.Time `protobuf:"bytes,12,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
+	CreatedAt time.Time `protobuf:"bytes,14,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
 	// updated_at is the last time the gateway was updated.
 	// This a read-only field.
-	UpdatedAt time.Time `protobuf:"bytes,13,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at"`
+	UpdatedAt time.Time `protobuf:"bytes,15,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at"`
 }
 
 func (m *Gateway) Reset()                    { *m = Gateway{} }
@@ -102,11 +108,39 @@ func (m *Gateway) GetDescription() string {
 	return ""
 }
 
+func (m *Gateway) GetAPIKey() APIKey {
+	if m != nil {
+		return m.APIKey
+	}
+	return APIKey{}
+}
+
 func (m *Gateway) GetFrequencyPlanID() string {
 	if m != nil {
 		return m.FrequencyPlanID
 	}
 	return ""
+}
+
+func (m *Gateway) GetClusterAddress() string {
+	if m != nil {
+		return m.ClusterAddress
+	}
+	return ""
+}
+
+func (m *Gateway) GetAntennas() []GatewayAntenna {
+	if m != nil {
+		return m.Antennas
+	}
+	return nil
+}
+
+func (m *Gateway) GetRadios() []GatewayRadio {
+	if m != nil {
+		return m.Radios
+	}
+	return nil
 }
 
 func (m *Gateway) GetActivatedAt() time.Time {
@@ -137,13 +171,6 @@ func (m *Gateway) GetPlatform() string {
 	return ""
 }
 
-func (m *Gateway) GetAntennas() []GatewayAntenna {
-	if m != nil {
-		return m.Antennas
-	}
-	return nil
-}
-
 func (m *Gateway) GetAttributes() map[string]string {
 	if m != nil {
 		return m.Attributes
@@ -151,18 +178,11 @@ func (m *Gateway) GetAttributes() map[string]string {
 	return nil
 }
 
-func (m *Gateway) GetClusterAddress() string {
-	if m != nil {
-		return m.ClusterAddress
-	}
-	return ""
-}
-
-func (m *Gateway) GetContactAccount() UserIdentifier {
+func (m *Gateway) GetContactAccount() *UserIdentifier {
 	if m != nil {
 		return m.ContactAccount
 	}
-	return UserIdentifier{}
+	return nil
 }
 
 func (m *Gateway) GetCreatedAt() time.Time {
@@ -271,151 +291,65 @@ func (m *GatewayAntenna) GetPlacement() GatewayAntennaPlacement {
 	return PLACEMENT_INDOOR
 }
 
-// GatewayConfiguration contains SX1301-related information used to configure
-// the gateway's concentrator.
-type GatewayConfiguration struct {
-	// api_key is the API key that is used to authenticate the gateway to other
-	// components of the network.
-	APIKey string `protobuf:"bytes,1,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
-	// frequency_plan_id indicates the ID of the frequency plan.
-	FrequencyPlanID string `protobuf:"bytes,2,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
-	// cluster_address indicates the URI of the gateway server cluster to connect to,
-	// in a "<ip>:<port>" format.
-	ClusterAddress string                                             `protobuf:"bytes,3,opt,name=cluster_address,json=clusterAddress,proto3" json:"cluster_address,omitempty"`
-	Antennas       []GatewayConfiguration_GatewayAntennaConfiguration `protobuf:"bytes,4,rep,name=antennas" json:"antennas"`
-	Radios         []GatewayConfiguration_Radio                       `protobuf:"bytes,6,rep,name=radios" json:"radios"`
+// Radio defines the configuration of a SX1301 radio.
+type GatewayRadio struct {
+	// frequency is the base frequency of the radio in Hz.
+	Frequency uint32 `protobuf:"varint,1,opt,name=frequency,proto3" json:"frequency,omitempty"`
+	// tx_configuration is the configuration for emitting Tx packets in case
+	// that Tx messages are enabled for this radio.
+	TxConfiguration *GatewayRadio_TxConfiguration `protobuf:"bytes,2,opt,name=tx_configuration,json=txConfiguration" json:"tx_configuration,omitempty"`
 }
 
-func (m *GatewayConfiguration) Reset()                    { *m = GatewayConfiguration{} }
-func (m *GatewayConfiguration) String() string            { return proto.CompactTextString(m) }
-func (*GatewayConfiguration) ProtoMessage()               {}
-func (*GatewayConfiguration) Descriptor() ([]byte, []int) { return fileDescriptorGateway, []int{3} }
+func (m *GatewayRadio) Reset()                    { *m = GatewayRadio{} }
+func (m *GatewayRadio) String() string            { return proto.CompactTextString(m) }
+func (*GatewayRadio) ProtoMessage()               {}
+func (*GatewayRadio) Descriptor() ([]byte, []int) { return fileDescriptorGateway, []int{3} }
 
-func (m *GatewayConfiguration) GetAPIKey() string {
-	if m != nil {
-		return m.APIKey
-	}
-	return ""
-}
-
-func (m *GatewayConfiguration) GetFrequencyPlanID() string {
-	if m != nil {
-		return m.FrequencyPlanID
-	}
-	return ""
-}
-
-func (m *GatewayConfiguration) GetClusterAddress() string {
-	if m != nil {
-		return m.ClusterAddress
-	}
-	return ""
-}
-
-func (m *GatewayConfiguration) GetAntennas() []GatewayConfiguration_GatewayAntennaConfiguration {
-	if m != nil {
-		return m.Antennas
-	}
-	return nil
-}
-
-func (m *GatewayConfiguration) GetRadios() []GatewayConfiguration_Radio {
-	if m != nil {
-		return m.Radios
-	}
-	return nil
-}
-
-type GatewayConfiguration_GatewayAntennaConfiguration struct {
-	// gain is the antenna gain relative to this gateway, in dBi.
-	Gain float32 `protobuf:"fixed32,1,opt,name=gain,proto3" json:"gain,omitempty"`
-	// location is the antenna's location.
-	Location Location `protobuf:"bytes,2,opt,name=location" json:"location"`
-}
-
-func (m *GatewayConfiguration_GatewayAntennaConfiguration) Reset() {
-	*m = GatewayConfiguration_GatewayAntennaConfiguration{}
-}
-func (m *GatewayConfiguration_GatewayAntennaConfiguration) String() string {
-	return proto.CompactTextString(m)
-}
-func (*GatewayConfiguration_GatewayAntennaConfiguration) ProtoMessage() {}
-func (*GatewayConfiguration_GatewayAntennaConfiguration) Descriptor() ([]byte, []int) {
-	return fileDescriptorGateway, []int{3, 0}
-}
-
-func (m *GatewayConfiguration_GatewayAntennaConfiguration) GetGain() float32 {
-	if m != nil {
-		return m.Gain
-	}
-	return 0
-}
-
-func (m *GatewayConfiguration_GatewayAntennaConfiguration) GetLocation() Location {
-	if m != nil {
-		return m.Location
-	}
-	return Location{}
-}
-
-type GatewayConfiguration_Radio struct {
-	Frequency       uint32                                      `protobuf:"varint,1,opt,name=frequency,proto3" json:"frequency,omitempty"`
-	TxConfiguration *GatewayConfiguration_Radio_TxConfiguration `protobuf:"bytes,2,opt,name=tx_configuration,json=txConfiguration" json:"tx_configuration,omitempty"`
-}
-
-func (m *GatewayConfiguration_Radio) Reset()         { *m = GatewayConfiguration_Radio{} }
-func (m *GatewayConfiguration_Radio) String() string { return proto.CompactTextString(m) }
-func (*GatewayConfiguration_Radio) ProtoMessage()    {}
-func (*GatewayConfiguration_Radio) Descriptor() ([]byte, []int) {
-	return fileDescriptorGateway, []int{3, 1}
-}
-
-func (m *GatewayConfiguration_Radio) GetFrequency() uint32 {
+func (m *GatewayRadio) GetFrequency() uint32 {
 	if m != nil {
 		return m.Frequency
 	}
 	return 0
 }
 
-func (m *GatewayConfiguration_Radio) GetTxConfiguration() *GatewayConfiguration_Radio_TxConfiguration {
+func (m *GatewayRadio) GetTxConfiguration() *GatewayRadio_TxConfiguration {
 	if m != nil {
 		return m.TxConfiguration
 	}
 	return nil
 }
 
-type GatewayConfiguration_Radio_TxConfiguration struct {
-	MinFrequency   uint32 `protobuf:"varint,1,opt,name=min_frequency,json=minFrequency,proto3" json:"min_frequency,omitempty"`
-	MaxFrequency   uint32 `protobuf:"varint,2,opt,name=max_frequency,json=maxFrequency,proto3" json:"max_frequency,omitempty"`
+type GatewayRadio_TxConfiguration struct {
+	// min_frequency is the minimun frequency for Tx messages.
+	MinFrequency uint32 `protobuf:"varint,1,opt,name=min_frequency,json=minFrequency,proto3" json:"min_frequency,omitempty"`
+	// max_frequency is the maximum frequency for Tx messages.
+	MaxFrequency uint32 `protobuf:"varint,2,opt,name=max_frequency,json=maxFrequency,proto3" json:"max_frequency,omitempty"`
+	// notch_frequency is the notch frequency for Tx messages.
 	NotchFrequency uint32 `protobuf:"varint,3,opt,name=notch_frequency,json=notchFrequency,proto3" json:"notch_frequency,omitempty"`
 }
 
-func (m *GatewayConfiguration_Radio_TxConfiguration) Reset() {
-	*m = GatewayConfiguration_Radio_TxConfiguration{}
-}
-func (m *GatewayConfiguration_Radio_TxConfiguration) String() string {
-	return proto.CompactTextString(m)
-}
-func (*GatewayConfiguration_Radio_TxConfiguration) ProtoMessage() {}
-func (*GatewayConfiguration_Radio_TxConfiguration) Descriptor() ([]byte, []int) {
-	return fileDescriptorGateway, []int{3, 1, 0}
+func (m *GatewayRadio_TxConfiguration) Reset()         { *m = GatewayRadio_TxConfiguration{} }
+func (m *GatewayRadio_TxConfiguration) String() string { return proto.CompactTextString(m) }
+func (*GatewayRadio_TxConfiguration) ProtoMessage()    {}
+func (*GatewayRadio_TxConfiguration) Descriptor() ([]byte, []int) {
+	return fileDescriptorGateway, []int{3, 0}
 }
 
-func (m *GatewayConfiguration_Radio_TxConfiguration) GetMinFrequency() uint32 {
+func (m *GatewayRadio_TxConfiguration) GetMinFrequency() uint32 {
 	if m != nil {
 		return m.MinFrequency
 	}
 	return 0
 }
 
-func (m *GatewayConfiguration_Radio_TxConfiguration) GetMaxFrequency() uint32 {
+func (m *GatewayRadio_TxConfiguration) GetMaxFrequency() uint32 {
 	if m != nil {
 		return m.MaxFrequency
 	}
 	return 0
 }
 
-func (m *GatewayConfiguration_Radio_TxConfiguration) GetNotchFrequency() uint32 {
+func (m *GatewayRadio_TxConfiguration) GetNotchFrequency() uint32 {
 	if m != nil {
 		return m.NotchFrequency
 	}
@@ -606,14 +540,10 @@ func init() {
 	golang_proto.RegisterType((*GatewayPrivacySettings)(nil), "ttn.v3.GatewayPrivacySettings")
 	proto.RegisterType((*GatewayAntenna)(nil), "ttn.v3.GatewayAntenna")
 	golang_proto.RegisterType((*GatewayAntenna)(nil), "ttn.v3.GatewayAntenna")
-	proto.RegisterType((*GatewayConfiguration)(nil), "ttn.v3.GatewayConfiguration")
-	golang_proto.RegisterType((*GatewayConfiguration)(nil), "ttn.v3.GatewayConfiguration")
-	proto.RegisterType((*GatewayConfiguration_GatewayAntennaConfiguration)(nil), "ttn.v3.GatewayConfiguration.GatewayAntennaConfiguration")
-	golang_proto.RegisterType((*GatewayConfiguration_GatewayAntennaConfiguration)(nil), "ttn.v3.GatewayConfiguration.GatewayAntennaConfiguration")
-	proto.RegisterType((*GatewayConfiguration_Radio)(nil), "ttn.v3.GatewayConfiguration.Radio")
-	golang_proto.RegisterType((*GatewayConfiguration_Radio)(nil), "ttn.v3.GatewayConfiguration.Radio")
-	proto.RegisterType((*GatewayConfiguration_Radio_TxConfiguration)(nil), "ttn.v3.GatewayConfiguration.Radio.TxConfiguration")
-	golang_proto.RegisterType((*GatewayConfiguration_Radio_TxConfiguration)(nil), "ttn.v3.GatewayConfiguration.Radio.TxConfiguration")
+	proto.RegisterType((*GatewayRadio)(nil), "ttn.v3.GatewayRadio")
+	golang_proto.RegisterType((*GatewayRadio)(nil), "ttn.v3.GatewayRadio")
+	proto.RegisterType((*GatewayRadio_TxConfiguration)(nil), "ttn.v3.GatewayRadio.TxConfiguration")
+	golang_proto.RegisterType((*GatewayRadio_TxConfiguration)(nil), "ttn.v3.GatewayRadio.TxConfiguration")
 	proto.RegisterType((*GatewayStatus)(nil), "ttn.v3.GatewayStatus")
 	golang_proto.RegisterType((*GatewayStatus)(nil), "ttn.v3.GatewayStatus")
 	proto.RegisterType((*GatewayObservations)(nil), "ttn.v3.GatewayObservations")
@@ -659,8 +589,30 @@ func (this *Gateway) VerboseEqual(that interface{}) error {
 	if this.Description != that1.Description {
 		return fmt.Errorf("Description this(%v) Not Equal that(%v)", this.Description, that1.Description)
 	}
+	if !this.APIKey.Equal(&that1.APIKey) {
+		return fmt.Errorf("APIKey this(%v) Not Equal that(%v)", this.APIKey, that1.APIKey)
+	}
 	if this.FrequencyPlanID != that1.FrequencyPlanID {
 		return fmt.Errorf("FrequencyPlanID this(%v) Not Equal that(%v)", this.FrequencyPlanID, that1.FrequencyPlanID)
+	}
+	if this.ClusterAddress != that1.ClusterAddress {
+		return fmt.Errorf("ClusterAddress this(%v) Not Equal that(%v)", this.ClusterAddress, that1.ClusterAddress)
+	}
+	if len(this.Antennas) != len(that1.Antennas) {
+		return fmt.Errorf("Antennas this(%v) Not Equal that(%v)", len(this.Antennas), len(that1.Antennas))
+	}
+	for i := range this.Antennas {
+		if !this.Antennas[i].Equal(&that1.Antennas[i]) {
+			return fmt.Errorf("Antennas this[%v](%v) Not Equal that[%v](%v)", i, this.Antennas[i], i, that1.Antennas[i])
+		}
+	}
+	if len(this.Radios) != len(that1.Radios) {
+		return fmt.Errorf("Radios this(%v) Not Equal that(%v)", len(this.Radios), len(that1.Radios))
+	}
+	for i := range this.Radios {
+		if !this.Radios[i].Equal(&that1.Radios[i]) {
+			return fmt.Errorf("Radios this[%v](%v) Not Equal that[%v](%v)", i, this.Radios[i], i, that1.Radios[i])
+		}
 	}
 	if !this.ActivatedAt.Equal(that1.ActivatedAt) {
 		return fmt.Errorf("ActivatedAt this(%v) Not Equal that(%v)", this.ActivatedAt, that1.ActivatedAt)
@@ -674,14 +626,6 @@ func (this *Gateway) VerboseEqual(that interface{}) error {
 	if this.Platform != that1.Platform {
 		return fmt.Errorf("Platform this(%v) Not Equal that(%v)", this.Platform, that1.Platform)
 	}
-	if len(this.Antennas) != len(that1.Antennas) {
-		return fmt.Errorf("Antennas this(%v) Not Equal that(%v)", len(this.Antennas), len(that1.Antennas))
-	}
-	for i := range this.Antennas {
-		if !this.Antennas[i].Equal(&that1.Antennas[i]) {
-			return fmt.Errorf("Antennas this[%v](%v) Not Equal that[%v](%v)", i, this.Antennas[i], i, that1.Antennas[i])
-		}
-	}
 	if len(this.Attributes) != len(that1.Attributes) {
 		return fmt.Errorf("Attributes this(%v) Not Equal that(%v)", len(this.Attributes), len(that1.Attributes))
 	}
@@ -690,10 +634,7 @@ func (this *Gateway) VerboseEqual(that interface{}) error {
 			return fmt.Errorf("Attributes this[%v](%v) Not Equal that[%v](%v)", i, this.Attributes[i], i, that1.Attributes[i])
 		}
 	}
-	if this.ClusterAddress != that1.ClusterAddress {
-		return fmt.Errorf("ClusterAddress this(%v) Not Equal that(%v)", this.ClusterAddress, that1.ClusterAddress)
-	}
-	if !this.ContactAccount.Equal(&that1.ContactAccount) {
+	if !this.ContactAccount.Equal(that1.ContactAccount) {
 		return fmt.Errorf("ContactAccount this(%v) Not Equal that(%v)", this.ContactAccount, that1.ContactAccount)
 	}
 	if !this.CreatedAt.Equal(that1.CreatedAt) {
@@ -735,8 +676,30 @@ func (this *Gateway) Equal(that interface{}) bool {
 	if this.Description != that1.Description {
 		return false
 	}
+	if !this.APIKey.Equal(&that1.APIKey) {
+		return false
+	}
 	if this.FrequencyPlanID != that1.FrequencyPlanID {
 		return false
+	}
+	if this.ClusterAddress != that1.ClusterAddress {
+		return false
+	}
+	if len(this.Antennas) != len(that1.Antennas) {
+		return false
+	}
+	for i := range this.Antennas {
+		if !this.Antennas[i].Equal(&that1.Antennas[i]) {
+			return false
+		}
+	}
+	if len(this.Radios) != len(that1.Radios) {
+		return false
+	}
+	for i := range this.Radios {
+		if !this.Radios[i].Equal(&that1.Radios[i]) {
+			return false
+		}
 	}
 	if !this.ActivatedAt.Equal(that1.ActivatedAt) {
 		return false
@@ -750,14 +713,6 @@ func (this *Gateway) Equal(that interface{}) bool {
 	if this.Platform != that1.Platform {
 		return false
 	}
-	if len(this.Antennas) != len(that1.Antennas) {
-		return false
-	}
-	for i := range this.Antennas {
-		if !this.Antennas[i].Equal(&that1.Antennas[i]) {
-			return false
-		}
-	}
 	if len(this.Attributes) != len(that1.Attributes) {
 		return false
 	}
@@ -766,10 +721,7 @@ func (this *Gateway) Equal(that interface{}) bool {
 			return false
 		}
 	}
-	if this.ClusterAddress != that1.ClusterAddress {
-		return false
-	}
-	if !this.ContactAccount.Equal(&that1.ContactAccount) {
+	if !this.ContactAccount.Equal(that1.ContactAccount) {
 		return false
 	}
 	if !this.CreatedAt.Equal(that1.CreatedAt) {
@@ -936,7 +888,7 @@ func (this *GatewayAntenna) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *GatewayConfiguration) VerboseEqual(that interface{}) error {
+func (this *GatewayRadio) VerboseEqual(that interface{}) error {
 	if that == nil {
 		if this == nil {
 			return nil
@@ -944,192 +896,22 @@ func (this *GatewayConfiguration) VerboseEqual(that interface{}) error {
 		return fmt.Errorf("that == nil && this != nil")
 	}
 
-	that1, ok := that.(*GatewayConfiguration)
+	that1, ok := that.(*GatewayRadio)
 	if !ok {
-		that2, ok := that.(GatewayConfiguration)
+		that2, ok := that.(GatewayRadio)
 		if ok {
 			that1 = &that2
 		} else {
-			return fmt.Errorf("that is not of type *GatewayConfiguration")
+			return fmt.Errorf("that is not of type *GatewayRadio")
 		}
 	}
 	if that1 == nil {
 		if this == nil {
 			return nil
 		}
-		return fmt.Errorf("that is type *GatewayConfiguration but is nil && this != nil")
+		return fmt.Errorf("that is type *GatewayRadio but is nil && this != nil")
 	} else if this == nil {
-		return fmt.Errorf("that is type *GatewayConfiguration but is not nil && this == nil")
-	}
-	if this.APIKey != that1.APIKey {
-		return fmt.Errorf("APIKey this(%v) Not Equal that(%v)", this.APIKey, that1.APIKey)
-	}
-	if this.FrequencyPlanID != that1.FrequencyPlanID {
-		return fmt.Errorf("FrequencyPlanID this(%v) Not Equal that(%v)", this.FrequencyPlanID, that1.FrequencyPlanID)
-	}
-	if this.ClusterAddress != that1.ClusterAddress {
-		return fmt.Errorf("ClusterAddress this(%v) Not Equal that(%v)", this.ClusterAddress, that1.ClusterAddress)
-	}
-	if len(this.Antennas) != len(that1.Antennas) {
-		return fmt.Errorf("Antennas this(%v) Not Equal that(%v)", len(this.Antennas), len(that1.Antennas))
-	}
-	for i := range this.Antennas {
-		if !this.Antennas[i].Equal(&that1.Antennas[i]) {
-			return fmt.Errorf("Antennas this[%v](%v) Not Equal that[%v](%v)", i, this.Antennas[i], i, that1.Antennas[i])
-		}
-	}
-	if len(this.Radios) != len(that1.Radios) {
-		return fmt.Errorf("Radios this(%v) Not Equal that(%v)", len(this.Radios), len(that1.Radios))
-	}
-	for i := range this.Radios {
-		if !this.Radios[i].Equal(&that1.Radios[i]) {
-			return fmt.Errorf("Radios this[%v](%v) Not Equal that[%v](%v)", i, this.Radios[i], i, that1.Radios[i])
-		}
-	}
-	return nil
-}
-func (this *GatewayConfiguration) Equal(that interface{}) bool {
-	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	}
-
-	that1, ok := that.(*GatewayConfiguration)
-	if !ok {
-		that2, ok := that.(GatewayConfiguration)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	} else if this == nil {
-		return false
-	}
-	if this.APIKey != that1.APIKey {
-		return false
-	}
-	if this.FrequencyPlanID != that1.FrequencyPlanID {
-		return false
-	}
-	if this.ClusterAddress != that1.ClusterAddress {
-		return false
-	}
-	if len(this.Antennas) != len(that1.Antennas) {
-		return false
-	}
-	for i := range this.Antennas {
-		if !this.Antennas[i].Equal(&that1.Antennas[i]) {
-			return false
-		}
-	}
-	if len(this.Radios) != len(that1.Radios) {
-		return false
-	}
-	for i := range this.Radios {
-		if !this.Radios[i].Equal(&that1.Radios[i]) {
-			return false
-		}
-	}
-	return true
-}
-func (this *GatewayConfiguration_GatewayAntennaConfiguration) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*GatewayConfiguration_GatewayAntennaConfiguration)
-	if !ok {
-		that2, ok := that.(GatewayConfiguration_GatewayAntennaConfiguration)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *GatewayConfiguration_GatewayAntennaConfiguration")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *GatewayConfiguration_GatewayAntennaConfiguration but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *GatewayConfiguration_GatewayAntennaConfiguration but is not nil && this == nil")
-	}
-	if this.Gain != that1.Gain {
-		return fmt.Errorf("Gain this(%v) Not Equal that(%v)", this.Gain, that1.Gain)
-	}
-	if !this.Location.Equal(&that1.Location) {
-		return fmt.Errorf("Location this(%v) Not Equal that(%v)", this.Location, that1.Location)
-	}
-	return nil
-}
-func (this *GatewayConfiguration_GatewayAntennaConfiguration) Equal(that interface{}) bool {
-	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	}
-
-	that1, ok := that.(*GatewayConfiguration_GatewayAntennaConfiguration)
-	if !ok {
-		that2, ok := that.(GatewayConfiguration_GatewayAntennaConfiguration)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	} else if this == nil {
-		return false
-	}
-	if this.Gain != that1.Gain {
-		return false
-	}
-	if !this.Location.Equal(&that1.Location) {
-		return false
-	}
-	return true
-}
-func (this *GatewayConfiguration_Radio) VerboseEqual(that interface{}) error {
-	if that == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that == nil && this != nil")
-	}
-
-	that1, ok := that.(*GatewayConfiguration_Radio)
-	if !ok {
-		that2, ok := that.(GatewayConfiguration_Radio)
-		if ok {
-			that1 = &that2
-		} else {
-			return fmt.Errorf("that is not of type *GatewayConfiguration_Radio")
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return nil
-		}
-		return fmt.Errorf("that is type *GatewayConfiguration_Radio but is nil && this != nil")
-	} else if this == nil {
-		return fmt.Errorf("that is type *GatewayConfiguration_Radio but is not nil && this == nil")
+		return fmt.Errorf("that is type *GatewayRadio but is not nil && this == nil")
 	}
 	if this.Frequency != that1.Frequency {
 		return fmt.Errorf("Frequency this(%v) Not Equal that(%v)", this.Frequency, that1.Frequency)
@@ -1139,7 +921,7 @@ func (this *GatewayConfiguration_Radio) VerboseEqual(that interface{}) error {
 	}
 	return nil
 }
-func (this *GatewayConfiguration_Radio) Equal(that interface{}) bool {
+func (this *GatewayRadio) Equal(that interface{}) bool {
 	if that == nil {
 		if this == nil {
 			return true
@@ -1147,9 +929,9 @@ func (this *GatewayConfiguration_Radio) Equal(that interface{}) bool {
 		return false
 	}
 
-	that1, ok := that.(*GatewayConfiguration_Radio)
+	that1, ok := that.(*GatewayRadio)
 	if !ok {
-		that2, ok := that.(GatewayConfiguration_Radio)
+		that2, ok := that.(GatewayRadio)
 		if ok {
 			that1 = &that2
 		} else {
@@ -1172,7 +954,7 @@ func (this *GatewayConfiguration_Radio) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *GatewayConfiguration_Radio_TxConfiguration) VerboseEqual(that interface{}) error {
+func (this *GatewayRadio_TxConfiguration) VerboseEqual(that interface{}) error {
 	if that == nil {
 		if this == nil {
 			return nil
@@ -1180,22 +962,22 @@ func (this *GatewayConfiguration_Radio_TxConfiguration) VerboseEqual(that interf
 		return fmt.Errorf("that == nil && this != nil")
 	}
 
-	that1, ok := that.(*GatewayConfiguration_Radio_TxConfiguration)
+	that1, ok := that.(*GatewayRadio_TxConfiguration)
 	if !ok {
-		that2, ok := that.(GatewayConfiguration_Radio_TxConfiguration)
+		that2, ok := that.(GatewayRadio_TxConfiguration)
 		if ok {
 			that1 = &that2
 		} else {
-			return fmt.Errorf("that is not of type *GatewayConfiguration_Radio_TxConfiguration")
+			return fmt.Errorf("that is not of type *GatewayRadio_TxConfiguration")
 		}
 	}
 	if that1 == nil {
 		if this == nil {
 			return nil
 		}
-		return fmt.Errorf("that is type *GatewayConfiguration_Radio_TxConfiguration but is nil && this != nil")
+		return fmt.Errorf("that is type *GatewayRadio_TxConfiguration but is nil && this != nil")
 	} else if this == nil {
-		return fmt.Errorf("that is type *GatewayConfiguration_Radio_TxConfiguration but is not nil && this == nil")
+		return fmt.Errorf("that is type *GatewayRadio_TxConfiguration but is not nil && this == nil")
 	}
 	if this.MinFrequency != that1.MinFrequency {
 		return fmt.Errorf("MinFrequency this(%v) Not Equal that(%v)", this.MinFrequency, that1.MinFrequency)
@@ -1208,7 +990,7 @@ func (this *GatewayConfiguration_Radio_TxConfiguration) VerboseEqual(that interf
 	}
 	return nil
 }
-func (this *GatewayConfiguration_Radio_TxConfiguration) Equal(that interface{}) bool {
+func (this *GatewayRadio_TxConfiguration) Equal(that interface{}) bool {
 	if that == nil {
 		if this == nil {
 			return true
@@ -1216,9 +998,9 @@ func (this *GatewayConfiguration_Radio_TxConfiguration) Equal(that interface{}) 
 		return false
 	}
 
-	that1, ok := that.(*GatewayConfiguration_Radio_TxConfiguration)
+	that1, ok := that.(*GatewayRadio_TxConfiguration)
 	if !ok {
-		that2, ok := that.(GatewayConfiguration_Radio_TxConfiguration)
+		that2, ok := that.(GatewayRadio_TxConfiguration)
 		if ok {
 			that1 = &that2
 		} else {
@@ -1569,47 +1351,29 @@ func (m *Gateway) MarshalTo(dAtA []byte) (int, error) {
 		i = encodeVarintGateway(dAtA, i, uint64(len(m.Description)))
 		i += copy(dAtA[i:], m.Description)
 	}
-	if len(m.FrequencyPlanID) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.FrequencyPlanID)))
-		i += copy(dAtA[i:], m.FrequencyPlanID)
-	}
-	dAtA[i] = 0x22
+	dAtA[i] = 0x1a
 	i++
-	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ActivatedAt)))
-	n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ActivatedAt, dAtA[i:])
+	i = encodeVarintGateway(dAtA, i, uint64(m.APIKey.Size()))
+	n2, err := m.APIKey.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n2
-	dAtA[i] = 0x2a
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.PrivacySettings.Size()))
-	n3, err := m.PrivacySettings.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	if len(m.FrequencyPlanID) > 0 {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.FrequencyPlanID)))
+		i += copy(dAtA[i:], m.FrequencyPlanID)
 	}
-	i += n3
-	if m.AutoUpdate {
-		dAtA[i] = 0x30
+	if len(m.ClusterAddress) > 0 {
+		dAtA[i] = 0x2a
 		i++
-		if m.AutoUpdate {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if len(m.Platform) > 0 {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.Platform)))
-		i += copy(dAtA[i:], m.Platform)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.ClusterAddress)))
+		i += copy(dAtA[i:], m.ClusterAddress)
 	}
 	if len(m.Antennas) > 0 {
 		for _, msg := range m.Antennas {
-			dAtA[i] = 0x42
+			dAtA[i] = 0x32
 			i++
 			i = encodeVarintGateway(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
@@ -1619,9 +1383,53 @@ func (m *Gateway) MarshalTo(dAtA []byte) (int, error) {
 			i += n
 		}
 	}
+	if len(m.Radios) > 0 {
+		for _, msg := range m.Radios {
+			dAtA[i] = 0x3a
+			i++
+			i = encodeVarintGateway(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	dAtA[i] = 0x42
+	i++
+	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ActivatedAt)))
+	n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ActivatedAt, dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n3
+	dAtA[i] = 0x4a
+	i++
+	i = encodeVarintGateway(dAtA, i, uint64(m.PrivacySettings.Size()))
+	n4, err := m.PrivacySettings.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n4
+	if m.AutoUpdate {
+		dAtA[i] = 0x50
+		i++
+		if m.AutoUpdate {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if len(m.Platform) > 0 {
+		dAtA[i] = 0x5a
+		i++
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.Platform)))
+		i += copy(dAtA[i:], m.Platform)
+	}
 	if len(m.Attributes) > 0 {
 		for k := range m.Attributes {
-			dAtA[i] = 0x4a
+			dAtA[i] = 0x62
 			i++
 			v := m.Attributes[k]
 			mapSize := 1 + len(k) + sovGateway(uint64(len(k))) + 1 + len(v) + sovGateway(uint64(len(v)))
@@ -1636,36 +1444,32 @@ func (m *Gateway) MarshalTo(dAtA []byte) (int, error) {
 			i += copy(dAtA[i:], v)
 		}
 	}
-	if len(m.ClusterAddress) > 0 {
-		dAtA[i] = 0x52
+	if m.ContactAccount != nil {
+		dAtA[i] = 0x6a
 		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.ClusterAddress)))
-		i += copy(dAtA[i:], m.ClusterAddress)
+		i = encodeVarintGateway(dAtA, i, uint64(m.ContactAccount.Size()))
+		n5, err := m.ContactAccount.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n5
 	}
-	dAtA[i] = 0x5a
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.ContactAccount.Size()))
-	n4, err := m.ContactAccount.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n4
-	dAtA[i] = 0x62
+	dAtA[i] = 0x72
 	i++
 	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n5, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n5
-	dAtA[i] = 0x6a
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n6, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
+	n6, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n6
+	dAtA[i] = 0x7a
+	i++
+	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
+	n7, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n7
 	return i, nil
 }
 
@@ -1741,11 +1545,11 @@ func (m *GatewayAntenna) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintGateway(dAtA, i, uint64(m.Location.Size()))
-	n7, err := m.Location.MarshalTo(dAtA[i:])
+	n8, err := m.Location.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n7
+	i += n8
 	if len(m.Type) > 0 {
 		dAtA[i] = 0x1a
 		i++
@@ -1766,7 +1570,7 @@ func (m *GatewayAntenna) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *GatewayConfiguration) Marshal() (dAtA []byte, err error) {
+func (m *GatewayRadio) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -1776,99 +1580,7 @@ func (m *GatewayConfiguration) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *GatewayConfiguration) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.APIKey) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.APIKey)))
-		i += copy(dAtA[i:], m.APIKey)
-	}
-	if len(m.FrequencyPlanID) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.FrequencyPlanID)))
-		i += copy(dAtA[i:], m.FrequencyPlanID)
-	}
-	if len(m.ClusterAddress) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.ClusterAddress)))
-		i += copy(dAtA[i:], m.ClusterAddress)
-	}
-	if len(m.Antennas) > 0 {
-		for _, msg := range m.Antennas {
-			dAtA[i] = 0x22
-			i++
-			i = encodeVarintGateway(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if len(m.Radios) > 0 {
-		for _, msg := range m.Radios {
-			dAtA[i] = 0x32
-			i++
-			i = encodeVarintGateway(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	return i, nil
-}
-
-func (m *GatewayConfiguration_GatewayAntennaConfiguration) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *GatewayConfiguration_GatewayAntennaConfiguration) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Gain != 0 {
-		dAtA[i] = 0xd
-		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Gain))
-		i += 4
-	}
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.Location.Size()))
-	n8, err := m.Location.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n8
-	return i, nil
-}
-
-func (m *GatewayConfiguration_Radio) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *GatewayConfiguration_Radio) MarshalTo(dAtA []byte) (int, error) {
+func (m *GatewayRadio) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -1891,7 +1603,7 @@ func (m *GatewayConfiguration_Radio) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *GatewayConfiguration_Radio_TxConfiguration) Marshal() (dAtA []byte, err error) {
+func (m *GatewayRadio_TxConfiguration) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -1901,7 +1613,7 @@ func (m *GatewayConfiguration_Radio_TxConfiguration) Marshal() (dAtA []byte, err
 	return dAtA[:n], nil
 }
 
-func (m *GatewayConfiguration_Radio_TxConfiguration) MarshalTo(dAtA []byte) (int, error) {
+func (m *GatewayRadio_TxConfiguration) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -2138,35 +1850,46 @@ func NewPopulatedGateway(r randyGateway, easy bool) *Gateway {
 	v1 := NewPopulatedGatewayIdentifier(r, easy)
 	this.GatewayIdentifier = *v1
 	this.Description = randStringGateway(r)
+	v2 := NewPopulatedAPIKey(r, easy)
+	this.APIKey = *v2
 	this.FrequencyPlanID = randStringGateway(r)
-	v2 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.ActivatedAt = *v2
-	v3 := NewPopulatedGatewayPrivacySettings(r, easy)
-	this.PrivacySettings = *v3
+	this.ClusterAddress = randStringGateway(r)
+	if r.Intn(10) != 0 {
+		v3 := r.Intn(5)
+		this.Antennas = make([]GatewayAntenna, v3)
+		for i := 0; i < v3; i++ {
+			v4 := NewPopulatedGatewayAntenna(r, easy)
+			this.Antennas[i] = *v4
+		}
+	}
+	if r.Intn(10) != 0 {
+		v5 := r.Intn(5)
+		this.Radios = make([]GatewayRadio, v5)
+		for i := 0; i < v5; i++ {
+			v6 := NewPopulatedGatewayRadio(r, easy)
+			this.Radios[i] = *v6
+		}
+	}
+	v7 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.ActivatedAt = *v7
+	v8 := NewPopulatedGatewayPrivacySettings(r, easy)
+	this.PrivacySettings = *v8
 	this.AutoUpdate = bool(r.Intn(2) == 0)
 	this.Platform = randStringGateway(r)
 	if r.Intn(10) != 0 {
-		v4 := r.Intn(5)
-		this.Antennas = make([]GatewayAntenna, v4)
-		for i := 0; i < v4; i++ {
-			v5 := NewPopulatedGatewayAntenna(r, easy)
-			this.Antennas[i] = *v5
-		}
-	}
-	if r.Intn(10) != 0 {
-		v6 := r.Intn(10)
+		v9 := r.Intn(10)
 		this.Attributes = make(map[string]string)
-		for i := 0; i < v6; i++ {
+		for i := 0; i < v9; i++ {
 			this.Attributes[randStringGateway(r)] = randStringGateway(r)
 		}
 	}
-	this.ClusterAddress = randStringGateway(r)
-	v7 := NewPopulatedUserIdentifier(r, easy)
-	this.ContactAccount = *v7
-	v8 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.CreatedAt = *v8
-	v9 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.UpdatedAt = *v9
+	if r.Intn(10) != 0 {
+		this.ContactAccount = NewPopulatedUserIdentifier(r, easy)
+	}
+	v10 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.CreatedAt = *v10
+	v11 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.UpdatedAt = *v11
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2188,8 +1911,8 @@ func NewPopulatedGatewayAntenna(r randyGateway, easy bool) *GatewayAntenna {
 	if r.Intn(2) == 0 {
 		this.Gain *= -1
 	}
-	v10 := NewPopulatedLocation(r, easy)
-	this.Location = *v10
+	v12 := NewPopulatedLocation(r, easy)
+	this.Location = *v12
 	this.Type = randStringGateway(r)
 	this.Model = randStringGateway(r)
 	this.Placement = GatewayAntennaPlacement([]int32{0, 1}[r.Intn(2)])
@@ -2198,58 +1921,19 @@ func NewPopulatedGatewayAntenna(r randyGateway, easy bool) *GatewayAntenna {
 	return this
 }
 
-func NewPopulatedGatewayConfiguration(r randyGateway, easy bool) *GatewayConfiguration {
-	this := &GatewayConfiguration{}
-	this.APIKey = randStringGateway(r)
-	this.FrequencyPlanID = randStringGateway(r)
-	this.ClusterAddress = randStringGateway(r)
-	if r.Intn(10) != 0 {
-		v11 := r.Intn(5)
-		this.Antennas = make([]GatewayConfiguration_GatewayAntennaConfiguration, v11)
-		for i := 0; i < v11; i++ {
-			v12 := NewPopulatedGatewayConfiguration_GatewayAntennaConfiguration(r, easy)
-			this.Antennas[i] = *v12
-		}
-	}
-	if r.Intn(10) != 0 {
-		v13 := r.Intn(5)
-		this.Radios = make([]GatewayConfiguration_Radio, v13)
-		for i := 0; i < v13; i++ {
-			v14 := NewPopulatedGatewayConfiguration_Radio(r, easy)
-			this.Radios[i] = *v14
-		}
-	}
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedGatewayConfiguration_GatewayAntennaConfiguration(r randyGateway, easy bool) *GatewayConfiguration_GatewayAntennaConfiguration {
-	this := &GatewayConfiguration_GatewayAntennaConfiguration{}
-	this.Gain = r.Float32()
-	if r.Intn(2) == 0 {
-		this.Gain *= -1
-	}
-	v15 := NewPopulatedLocation(r, easy)
-	this.Location = *v15
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedGatewayConfiguration_Radio(r randyGateway, easy bool) *GatewayConfiguration_Radio {
-	this := &GatewayConfiguration_Radio{}
+func NewPopulatedGatewayRadio(r randyGateway, easy bool) *GatewayRadio {
+	this := &GatewayRadio{}
 	this.Frequency = r.Uint32()
 	if r.Intn(10) != 0 {
-		this.TxConfiguration = NewPopulatedGatewayConfiguration_Radio_TxConfiguration(r, easy)
+		this.TxConfiguration = NewPopulatedGatewayRadio_TxConfiguration(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
 }
 
-func NewPopulatedGatewayConfiguration_Radio_TxConfiguration(r randyGateway, easy bool) *GatewayConfiguration_Radio_TxConfiguration {
-	this := &GatewayConfiguration_Radio_TxConfiguration{}
+func NewPopulatedGatewayRadio_TxConfiguration(r randyGateway, easy bool) *GatewayRadio_TxConfiguration {
+	this := &GatewayRadio_TxConfiguration{}
 	this.MinFrequency = r.Uint32()
 	this.MaxFrequency = r.Uint32()
 	this.NotchFrequency = r.Uint32()
@@ -2268,35 +1952,35 @@ func NewPopulatedGatewayStatus(r randyGateway, easy bool) *GatewayStatus {
 	}
 	this.Platform = randStringGateway(r)
 	if r.Intn(10) != 0 {
-		v16 := r.Intn(10)
+		v13 := r.Intn(10)
 		this.Versions = make(map[string]string)
-		for i := 0; i < v16; i++ {
+		for i := 0; i < v13; i++ {
 			this.Versions[randStringGateway(r)] = randStringGateway(r)
 		}
 	}
 	if r.Intn(10) != 0 {
-		v17 := r.Intn(5)
-		this.AntennasLocation = make([]*Location, v17)
-		for i := 0; i < v17; i++ {
+		v14 := r.Intn(5)
+		this.AntennasLocation = make([]*Location, v14)
+		for i := 0; i < v14; i++ {
 			this.AntennasLocation[i] = NewPopulatedLocation(r, easy)
 		}
 	}
-	v18 := r.Intn(10)
-	this.IP = make([]string, v18)
-	for i := 0; i < v18; i++ {
+	v15 := r.Intn(10)
+	this.IP = make([]string, v15)
+	for i := 0; i < v15; i++ {
 		this.IP[i] = randStringGateway(r)
 	}
 	if r.Intn(10) != 0 {
 		this.RTT = github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
 	}
 	if r.Intn(10) != 0 {
-		v19 := r.Intn(10)
+		v16 := r.Intn(10)
 		this.Metrics = make(map[string]float32)
-		for i := 0; i < v19; i++ {
-			v20 := randStringGateway(r)
-			this.Metrics[v20] = r.Float32()
+		for i := 0; i < v16; i++ {
+			v17 := randStringGateway(r)
+			this.Metrics[v17] = r.Float32()
 			if r.Intn(2) == 0 {
-				this.Metrics[v20] *= -1
+				this.Metrics[v17] *= -1
 			}
 		}
 	}
@@ -2349,9 +2033,9 @@ func randUTF8RuneGateway(r randyGateway) rune {
 	return rune(ru + 61)
 }
 func randStringGateway(r randyGateway) string {
-	v21 := r.Intn(100)
-	tmps := make([]rune, v21)
-	for i := 0; i < v21; i++ {
+	v18 := r.Intn(100)
+	tmps := make([]rune, v18)
+	for i := 0; i < v18; i++ {
 		tmps[i] = randUTF8RuneGateway(r)
 	}
 	return string(tmps)
@@ -2373,11 +2057,11 @@ func randFieldGateway(dAtA []byte, r randyGateway, fieldNumber int, wire int) []
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateGateway(dAtA, uint64(key))
-		v22 := r.Int63()
+		v19 := r.Int63()
 		if r.Intn(2) == 0 {
-			v22 *= -1
+			v19 *= -1
 		}
-		dAtA = encodeVarintPopulateGateway(dAtA, uint64(v22))
+		dAtA = encodeVarintPopulateGateway(dAtA, uint64(v19))
 	case 1:
 		dAtA = encodeVarintPopulateGateway(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -2411,9 +2095,27 @@ func (m *Gateway) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovGateway(uint64(l))
 	}
+	l = m.APIKey.Size()
+	n += 1 + l + sovGateway(uint64(l))
 	l = len(m.FrequencyPlanID)
 	if l > 0 {
 		n += 1 + l + sovGateway(uint64(l))
+	}
+	l = len(m.ClusterAddress)
+	if l > 0 {
+		n += 1 + l + sovGateway(uint64(l))
+	}
+	if len(m.Antennas) > 0 {
+		for _, e := range m.Antennas {
+			l = e.Size()
+			n += 1 + l + sovGateway(uint64(l))
+		}
+	}
+	if len(m.Radios) > 0 {
+		for _, e := range m.Radios {
+			l = e.Size()
+			n += 1 + l + sovGateway(uint64(l))
+		}
 	}
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.ActivatedAt)
 	n += 1 + l + sovGateway(uint64(l))
@@ -2426,12 +2128,6 @@ func (m *Gateway) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovGateway(uint64(l))
 	}
-	if len(m.Antennas) > 0 {
-		for _, e := range m.Antennas {
-			l = e.Size()
-			n += 1 + l + sovGateway(uint64(l))
-		}
-	}
 	if len(m.Attributes) > 0 {
 		for k, v := range m.Attributes {
 			_ = k
@@ -2440,12 +2136,10 @@ func (m *Gateway) Size() (n int) {
 			n += mapEntrySize + 1 + sovGateway(uint64(mapEntrySize))
 		}
 	}
-	l = len(m.ClusterAddress)
-	if l > 0 {
+	if m.ContactAccount != nil {
+		l = m.ContactAccount.Size()
 		n += 1 + l + sovGateway(uint64(l))
 	}
-	l = m.ContactAccount.Size()
-	n += 1 + l + sovGateway(uint64(l))
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)
 	n += 1 + l + sovGateway(uint64(l))
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)
@@ -2490,48 +2184,7 @@ func (m *GatewayAntenna) Size() (n int) {
 	return n
 }
 
-func (m *GatewayConfiguration) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.APIKey)
-	if l > 0 {
-		n += 1 + l + sovGateway(uint64(l))
-	}
-	l = len(m.FrequencyPlanID)
-	if l > 0 {
-		n += 1 + l + sovGateway(uint64(l))
-	}
-	l = len(m.ClusterAddress)
-	if l > 0 {
-		n += 1 + l + sovGateway(uint64(l))
-	}
-	if len(m.Antennas) > 0 {
-		for _, e := range m.Antennas {
-			l = e.Size()
-			n += 1 + l + sovGateway(uint64(l))
-		}
-	}
-	if len(m.Radios) > 0 {
-		for _, e := range m.Radios {
-			l = e.Size()
-			n += 1 + l + sovGateway(uint64(l))
-		}
-	}
-	return n
-}
-
-func (m *GatewayConfiguration_GatewayAntennaConfiguration) Size() (n int) {
-	var l int
-	_ = l
-	if m.Gain != 0 {
-		n += 5
-	}
-	l = m.Location.Size()
-	n += 1 + l + sovGateway(uint64(l))
-	return n
-}
-
-func (m *GatewayConfiguration_Radio) Size() (n int) {
+func (m *GatewayRadio) Size() (n int) {
 	var l int
 	_ = l
 	if m.Frequency != 0 {
@@ -2544,7 +2197,7 @@ func (m *GatewayConfiguration_Radio) Size() (n int) {
 	return n
 }
 
-func (m *GatewayConfiguration_Radio_TxConfiguration) Size() (n int) {
+func (m *GatewayRadio_TxConfiguration) Size() (n int) {
 	var l int
 	_ = l
 	if m.MinFrequency != 0 {
@@ -2747,6 +2400,36 @@ func (m *Gateway) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field APIKey", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGateway
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGateway
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.APIKey.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyPlanID", wireType)
 			}
 			var stringLen uint64
@@ -2774,89 +2457,9 @@ func (m *Gateway) Unmarshal(dAtA []byte) error {
 			}
 			m.FrequencyPlanID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ActivatedAt", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGateway
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGateway
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ActivatedAt, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PrivacySettings", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGateway
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGateway
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.PrivacySettings.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 6:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AutoUpdate", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGateway
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.AutoUpdate = bool(v != 0)
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Platform", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ClusterAddress", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2881,9 +2484,9 @@ func (m *Gateway) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Platform = string(dAtA[iNdEx:postIndex])
+			m.ClusterAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 8:
+		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Antennas", wireType)
 			}
@@ -2914,7 +2517,147 @@ func (m *Gateway) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Radios", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGateway
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGateway
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Radios = append(m.Radios, GatewayRadio{})
+			if err := m.Radios[len(m.Radios)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ActivatedAt", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGateway
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGateway
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ActivatedAt, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PrivacySettings", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGateway
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGateway
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.PrivacySettings.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AutoUpdate", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGateway
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.AutoUpdate = bool(v != 0)
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Platform", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGateway
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGateway
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Platform = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 12:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Attributes", wireType)
 			}
@@ -3032,36 +2775,7 @@ func (m *Gateway) Unmarshal(dAtA []byte) error {
 			}
 			m.Attributes[mapkey] = mapvalue
 			iNdEx = postIndex
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClusterAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGateway
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGateway
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ClusterAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 11:
+		case 13:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContactAccount", wireType)
 			}
@@ -3087,11 +2801,14 @@ func (m *Gateway) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
+			if m.ContactAccount == nil {
+				m.ContactAccount = &UserIdentifier{}
+			}
 			if err := m.ContactAccount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 12:
+		case 14:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
 			}
@@ -3121,7 +2838,7 @@ func (m *Gateway) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 13:
+		case 15:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAt", wireType)
 			}
@@ -3450,7 +3167,7 @@ func (m *GatewayAntenna) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *GatewayConfiguration) Unmarshal(dAtA []byte) error {
+func (m *GatewayRadio) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3473,300 +3190,10 @@ func (m *GatewayConfiguration) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: GatewayConfiguration: wiretype end group for non-group")
+			return fmt.Errorf("proto: GatewayRadio: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GatewayConfiguration: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field APIKey", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGateway
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGateway
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.APIKey = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FrequencyPlanID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGateway
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGateway
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.FrequencyPlanID = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClusterAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGateway
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGateway
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ClusterAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Antennas", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGateway
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGateway
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Antennas = append(m.Antennas, GatewayConfiguration_GatewayAntennaConfiguration{})
-			if err := m.Antennas[len(m.Antennas)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Radios", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGateway
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGateway
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Radios = append(m.Radios, GatewayConfiguration_Radio{})
-			if err := m.Radios[len(m.Radios)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGateway(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGateway
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *GatewayConfiguration_GatewayAntennaConfiguration) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGateway
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: GatewayAntennaConfiguration: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GatewayAntennaConfiguration: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 5 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Gain", wireType)
-			}
-			var v uint32
-			if (iNdEx + 4) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
-			iNdEx += 4
-			m.Gain = math.Float32frombits(v)
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Location", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGateway
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGateway
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.Location.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGateway(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGateway
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *GatewayConfiguration_Radio) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGateway
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Radio: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Radio: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: GatewayRadio: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -3815,7 +3242,7 @@ func (m *GatewayConfiguration_Radio) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.TxConfiguration == nil {
-				m.TxConfiguration = &GatewayConfiguration_Radio_TxConfiguration{}
+				m.TxConfiguration = &GatewayRadio_TxConfiguration{}
 			}
 			if err := m.TxConfiguration.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -3842,7 +3269,7 @@ func (m *GatewayConfiguration_Radio) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *GatewayConfiguration_Radio_TxConfiguration) Unmarshal(dAtA []byte) error {
+func (m *GatewayRadio_TxConfiguration) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4790,94 +4217,92 @@ func init() {
 }
 
 var fileDescriptorGateway = []byte{
-	// 1418 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x57, 0x3d, 0x6c, 0xdb, 0x48,
-	0x16, 0x26, 0x25, 0x59, 0x96, 0x9e, 0x6c, 0xcb, 0x99, 0x38, 0x8e, 0x4e, 0x17, 0x8c, 0x7c, 0x0e,
-	0x0e, 0xf1, 0x1d, 0x70, 0x32, 0xce, 0xbe, 0x3b, 0x18, 0xb9, 0x0b, 0x72, 0xf2, 0xcf, 0x06, 0x46,
-	0x7e, 0x6c, 0x30, 0x72, 0x8a, 0x00, 0x0b, 0x62, 0x44, 0x8e, 0xe5, 0x81, 0x25, 0x92, 0x4b, 0x8e,
-	0x14, 0xab, 0x4b, 0xb1, 0x85, 0x81, 0x6d, 0x52, 0xa6, 0xdb, 0x05, 0xb6, 0x49, 0xb1, 0x45, 0xca,
-	0x60, 0xab, 0x6c, 0x97, 0x32, 0x65, 0x2a, 0x6f, 0x4c, 0x35, 0x29, 0x53, 0xa6, 0x5c, 0x70, 0x66,
-	0x48, 0x4b, 0xb2, 0x37, 0xb1, 0x81, 0xad, 0x4c, 0x7e, 0xf3, 0x7d, 0xef, 0x6f, 0xde, 0xe3, 0x93,
-	0xe1, 0x9f, 0x4d, 0xc6, 0xf7, 0x3a, 0x8d, 0xaa, 0xe5, 0xb6, 0x17, 0xeb, 0x7b, 0xb4, 0xbe, 0xc7,
-	0x9c, 0x66, 0xf0, 0x80, 0xf2, 0x27, 0xae, 0xbf, 0xbf, 0xc8, 0xb9, 0xb3, 0x48, 0x3c, 0xb6, 0xd8,
-	0x24, 0x9c, 0x3e, 0x21, 0xbd, 0xaa, 0xe7, 0xbb, 0xdc, 0x45, 0x59, 0xce, 0x9d, 0x6a, 0x77, 0xb9,
-	0xfc, 0x8f, 0x01, 0x69, 0xd3, 0x6d, 0xba, 0x8b, 0xe2, 0xb8, 0xd1, 0xd9, 0x15, 0x6f, 0xe2, 0x45,
-	0x3c, 0x49, 0x59, 0x79, 0xe9, 0x3c, 0x9e, 0xda, 0x94, 0x13, 0x9b, 0x70, 0xa2, 0x34, 0xff, 0x3e,
-	0x8f, 0x86, 0xd9, 0xd4, 0xe1, 0x6c, 0x97, 0x51, 0x3f, 0x50, 0x32, 0xdc, 0x74, 0xdd, 0x66, 0x8b,
-	0x9e, 0x04, 0x64, 0x77, 0x7c, 0xc2, 0x99, 0xeb, 0xa8, 0xf3, 0x6b, 0xa3, 0xe7, 0x01, 0xf7, 0x3b,
-	0x16, 0x57, 0xa7, 0x95, 0xd1, 0x53, 0xce, 0xda, 0x34, 0xe0, 0xa4, 0xed, 0x49, 0xc2, 0xfc, 0x4f,
-	0x59, 0x18, 0xbf, 0x23, 0x4b, 0x82, 0x96, 0x21, 0xc5, 0xec, 0x92, 0x3e, 0xa7, 0x2f, 0x14, 0x96,
-	0xfe, 0x54, 0x95, 0x95, 0xa9, 0xaa, 0xc3, 0xcd, 0x24, 0xb0, 0xd5, 0xdc, 0x9b, 0xa3, 0x8a, 0xf6,
-	0xf6, 0xa8, 0xa2, 0x1b, 0x29, 0x66, 0xa3, 0x39, 0x28, 0xd8, 0x34, 0xb0, 0x7c, 0xe6, 0x45, 0x41,
-	0x95, 0x52, 0x73, 0xfa, 0x42, 0xde, 0x18, 0x84, 0xd0, 0x6d, 0xb8, 0xb4, 0xeb, 0xd3, 0x6f, 0x3a,
-	0xd4, 0xb1, 0x7a, 0xa6, 0xd7, 0x22, 0x8e, 0xc9, 0xec, 0x52, 0x3a, 0xe2, 0xad, 0x5e, 0x0e, 0x8f,
-	0x2a, 0xc5, 0xaf, 0xe2, 0xc3, 0xed, 0x16, 0x71, 0x36, 0xd7, 0x8d, 0xe2, 0xee, 0x10, 0x60, 0xa3,
-	0x3b, 0x30, 0x41, 0x2c, 0xce, 0xba, 0x84, 0x53, 0xdb, 0x24, 0xbc, 0x94, 0x11, 0x11, 0x96, 0xab,
-	0x32, 0xb7, 0x6a, 0x9c, 0x5b, 0xb5, 0x1e, 0xe7, 0x26, 0x43, 0x7c, 0xf6, 0x6b, 0x45, 0x37, 0x0a,
-	0x89, 0xb2, 0xc6, 0xd1, 0x16, 0x4c, 0x7b, 0x3e, 0xeb, 0x12, 0xab, 0x67, 0x06, 0x94, 0xf3, 0xe8,
-	0x02, 0x4a, 0x63, 0xc2, 0x18, 0x1e, 0x49, 0x77, 0x5b, 0xd2, 0x1e, 0x2a, 0xd6, 0x6a, 0x26, 0x32,
-	0x68, 0x14, 0xbd, 0x61, 0x18, 0x55, 0xa0, 0x40, 0x3a, 0xdc, 0x35, 0x3b, 0x9e, 0x4d, 0x38, 0x2d,
-	0x65, 0xe7, 0xf4, 0x85, 0x9c, 0x01, 0x11, 0xb4, 0x23, 0x10, 0x54, 0x86, 0x9c, 0xd7, 0x22, 0x7c,
-	0xd7, 0xf5, 0xdb, 0xa5, 0x71, 0x51, 0x9a, 0xe4, 0x1d, 0xad, 0x40, 0x8e, 0x38, 0x9c, 0x3a, 0x0e,
-	0x09, 0x4a, 0xb9, 0xb9, 0xf4, 0x42, 0x61, 0x69, 0x76, 0x24, 0x8a, 0x9a, 0x3c, 0x56, 0xde, 0x13,
-	0x36, 0xba, 0x0d, 0x40, 0x38, 0xf7, 0x59, 0xa3, 0xc3, 0x69, 0x50, 0xca, 0x0b, 0x6d, 0x65, 0x44,
-	0x5b, 0xad, 0x25, 0x8c, 0x0d, 0x87, 0xfb, 0x3d, 0x63, 0x40, 0x82, 0x6e, 0x40, 0xd1, 0x6a, 0x75,
-	0x02, 0x4e, 0x7d, 0x93, 0xd8, 0xb6, 0x4f, 0x83, 0xa0, 0x04, 0x22, 0xba, 0x29, 0x05, 0xd7, 0x24,
-	0x8a, 0x36, 0xa0, 0x68, 0xb9, 0x0e, 0x27, 0x16, 0x37, 0x89, 0x65, 0xb9, 0x1d, 0x87, 0x97, 0x0a,
-	0xa2, 0x60, 0x49, 0xa8, 0x3b, 0x01, 0xf5, 0x07, 0x9a, 0x43, 0x86, 0x3a, 0xa5, 0x44, 0x35, 0xa9,
-	0x41, 0x6b, 0x00, 0x96, 0x4f, 0xe3, 0xfb, 0x9b, 0xb8, 0xc0, 0xfd, 0xe5, 0x95, 0xae, 0x26, 0x8c,
-	0xc8, 0x3a, 0x0b, 0x23, 0x93, 0x17, 0x31, 0xa2, 0x74, 0x35, 0x5e, 0xbe, 0x05, 0xc5, 0x91, 0xc2,
-	0xa0, 0x69, 0x48, 0xef, 0xd3, 0x9e, 0xe8, 0xfb, 0xbc, 0x11, 0x3d, 0xa2, 0x19, 0x18, 0xeb, 0x92,
-	0x56, 0x87, 0xaa, 0x6e, 0x96, 0x2f, 0x37, 0x53, 0x2b, 0xfa, 0xfc, 0xa1, 0x0e, 0xb3, 0x67, 0xb7,
-	0x08, 0xba, 0x0e, 0x93, 0x01, 0x27, 0xbc, 0x13, 0x98, 0x5e, 0xa7, 0xd1, 0x62, 0x96, 0x30, 0x98,
-	0x33, 0x26, 0x24, 0xb8, 0x2d, 0xb0, 0xa8, 0xf0, 0x2d, 0xd7, 0x12, 0xf3, 0x1b, 0xd3, 0x52, 0x82,
-	0x36, 0x15, 0xc3, 0x8a, 0x38, 0x07, 0x05, 0x55, 0x43, 0xd2, 0x68, 0x51, 0x31, 0x2e, 0x39, 0x63,
-	0x10, 0x9a, 0xff, 0x45, 0x87, 0xa9, 0xe1, 0x3e, 0x41, 0x08, 0x32, 0x4d, 0xc2, 0x1c, 0xe1, 0x39,
-	0x65, 0x88, 0x67, 0xb4, 0x04, 0xb9, 0xd8, 0xb4, 0x70, 0x55, 0x58, 0x9a, 0x8e, 0xaf, 0xee, 0x9e,
-	0xc2, 0xe3, 0xfe, 0x8a, 0x79, 0x91, 0x1d, 0xde, 0xf3, 0xa4, 0xd7, 0xbc, 0x21, 0x9e, 0xa3, 0x9a,
-	0xb4, 0x5d, 0x9b, 0xb6, 0xc4, 0xf4, 0xe5, 0x0d, 0xf9, 0x82, 0x6e, 0x41, 0xde, 0x6b, 0x11, 0x8b,
-	0xb6, 0xa9, 0xc3, 0xc5, 0x28, 0x4d, 0x9d, 0x6a, 0x44, 0x15, 0xdc, 0x76, 0x4c, 0x33, 0x4e, 0x14,
-	0xf3, 0xaf, 0xc6, 0x60, 0x46, 0xd1, 0xd6, 0x5c, 0x67, 0x97, 0x35, 0xd5, 0xb7, 0x0d, 0x5d, 0x87,
-	0x71, 0xe2, 0x31, 0x33, 0xb9, 0x97, 0x55, 0x08, 0x8f, 0x2a, 0xd9, 0xda, 0xf6, 0xe6, 0x5d, 0xda,
-	0x33, 0xb2, 0xc4, 0x63, 0x77, 0x69, 0xef, 0xec, 0x0f, 0x4b, 0xea, 0x02, 0x1f, 0x96, 0x33, 0xc6,
-	0x20, 0x7d, 0xe6, 0x18, 0x3c, 0x1e, 0x18, 0xd5, 0x8c, 0x18, 0xb7, 0x95, 0x91, 0x2c, 0x87, 0xc2,
-	0x1f, 0x49, 0x7d, 0xe8, 0xec, 0xd4, 0x30, 0xff, 0x1f, 0xb2, 0x3e, 0xb1, 0x99, 0x1b, 0x94, 0xb2,
-	0xc2, 0xf2, 0xfc, 0x67, 0x2d, 0x1b, 0x11, 0x55, 0xd9, 0x50, 0xba, 0x32, 0x85, 0x3f, 0x7f, 0xc6,
-	0xe1, 0x1f, 0xd5, 0x15, 0xe5, 0xef, 0x52, 0x30, 0x26, 0xdc, 0xa3, 0x6b, 0x90, 0x4f, 0x4a, 0x29,
-	0xcc, 0x4e, 0x1a, 0x27, 0x00, 0xfa, 0x1a, 0xa6, 0xf9, 0x81, 0x69, 0x0d, 0xc6, 0xa0, 0x7c, 0x2c,
-	0x7d, 0x39, 0xb5, 0x6a, 0xfd, 0x60, 0x08, 0x35, 0x8a, 0x7c, 0x18, 0x28, 0x7f, 0xab, 0x43, 0x71,
-	0x84, 0x14, 0xcd, 0x5e, 0x9b, 0x39, 0xe6, 0x68, 0x50, 0x13, 0x6d, 0xe6, 0x24, 0x4d, 0x20, 0x48,
-	0xe4, 0x60, 0x80, 0x94, 0x52, 0x24, 0x72, 0x70, 0x42, 0xba, 0x01, 0x45, 0xc7, 0xe5, 0xd6, 0xde,
-	0x00, 0x2d, 0x2d, 0x68, 0x53, 0x02, 0x4e, 0x88, 0xf3, 0x47, 0x19, 0x98, 0x54, 0x69, 0x3c, 0x14,
-	0x13, 0x8e, 0xfe, 0x05, 0x99, 0x68, 0xbb, 0xaa, 0x05, 0xfa, 0xb9, 0x2f, 0x53, 0x46, 0x7c, 0x95,
-	0x04, 0x3b, 0x9a, 0xa0, 0x86, 0xeb, 0x72, 0x53, 0x48, 0x53, 0xe7, 0x94, 0xe6, 0x22, 0x49, 0x04,
-	0x0e, 0x2d, 0x98, 0xf4, 0xc8, 0x82, 0xb9, 0x0d, 0xb9, 0x2e, 0xf5, 0x03, 0xe6, 0x3a, 0x71, 0xd7,
-	0x5e, 0x1f, 0xb9, 0x00, 0x19, 0x79, 0xf5, 0x91, 0x62, 0xc9, 0x45, 0x91, 0x88, 0xd0, 0x2d, 0xb8,
-	0x14, 0xb7, 0xa9, 0x99, 0xb4, 0xcb, 0x98, 0xb0, 0x74, 0xaa, 0x5d, 0x8c, 0xe9, 0x98, 0x1a, 0x23,
-	0x68, 0x16, 0x52, 0xcc, 0x13, 0x5d, 0x9d, 0x5f, 0xcd, 0x86, 0x47, 0x95, 0xd4, 0xe6, 0xb6, 0x91,
-	0x62, 0x1e, 0x5a, 0x81, 0xb4, 0xcf, 0xb9, 0xd8, 0x87, 0xd1, 0x0f, 0x8d, 0xd1, 0x64, 0xd7, 0xe3,
-	0x49, 0x29, 0x84, 0x47, 0x95, 0xb4, 0x51, 0xaf, 0x3f, 0x8f, 0x52, 0x8e, 0x24, 0xe8, 0x7f, 0x30,
-	0xde, 0xa6, 0xdc, 0x67, 0x56, 0xbc, 0x31, 0xe7, 0xcf, 0x4e, 0xe8, 0xbe, 0x24, 0xc9, 0x7c, 0x62,
-	0x09, 0x5a, 0x86, 0x1c, 0xb1, 0xbb, 0xc4, 0xb1, 0xa8, 0x5d, 0xb2, 0x84, 0xf3, 0xab, 0xa7, 0x9c,
-	0x3f, 0x14, 0xbf, 0x9e, 0x8c, 0x84, 0x58, 0xfe, 0x2f, 0x4c, 0x0e, 0x95, 0xe7, 0x22, 0xeb, 0xa2,
-	0x7c, 0x13, 0x26, 0x06, 0x43, 0xf9, 0x92, 0x36, 0x35, 0xb8, 0x6a, 0x7e, 0x4e, 0xc3, 0x65, 0x95,
-	0xd5, 0x56, 0x23, 0xa0, 0x7e, 0x57, 0x14, 0x25, 0x40, 0x06, 0xcc, 0xb4, 0x48, 0xc0, 0xcd, 0x8e,
-	0xd7, 0x62, 0xce, 0xbe, 0xe9, 0x53, 0x8b, 0xb2, 0x2e, 0xb5, 0xcf, 0xdd, 0x76, 0x28, 0x52, 0xef,
-	0x08, 0xb1, 0xa1, 0xb4, 0xe8, 0x2f, 0x30, 0xa1, 0xcc, 0xc9, 0x1d, 0x1f, 0x05, 0x93, 0x31, 0x0a,
-	0x12, 0x5b, 0x13, 0x2b, 0xfc, 0x11, 0xcc, 0x0a, 0xb7, 0xb6, 0xfb, 0xc4, 0x19, 0x76, 0x9c, 0x3e,
-	0xa7, 0x63, 0x11, 0xf6, 0xba, 0x92, 0x27, 0xae, 0xff, 0x0a, 0x53, 0x89, 0x49, 0xe9, 0x3c, 0x23,
-	0x9c, 0x4f, 0xc6, 0xa8, 0x74, 0x1f, 0x67, 0xad, 0x56, 0x6c, 0xe2, 0x7c, 0xec, 0x22, 0x59, 0xcb,
-	0xee, 0x18, 0xcc, 0x5a, 0x99, 0x93, 0x8e, 0xb3, 0x32, 0x6b, 0x89, 0x49, 0xb7, 0xff, 0x81, 0xc2,
-	0x80, 0x5b, 0xd5, 0xb2, 0x57, 0xce, 0x6c, 0x3a, 0x03, 0x4e, 0x5c, 0xfc, 0xfd, 0x1e, 0x5c, 0xfd,
-	0x9d, 0xf5, 0x87, 0x66, 0x60, 0x7a, 0xfb, 0x5e, 0x6d, 0x6d, 0xe3, 0xfe, 0xc6, 0x83, 0xba, 0xb9,
-	0xf9, 0x60, 0x7d, 0x6b, 0xcb, 0x98, 0xd6, 0xd0, 0x15, 0xb8, 0x74, 0x82, 0x6e, 0xed, 0xd4, 0x05,
-	0xac, 0x97, 0x33, 0x87, 0x3f, 0x62, 0x6d, 0xf5, 0x7b, 0xfd, 0xcd, 0x31, 0xd6, 0xdf, 0x1e, 0x63,
-	0xfd, 0xdd, 0x31, 0xd6, 0xdf, 0x1f, 0x63, 0xfd, 0xc3, 0x31, 0xd6, 0x3e, 0x1e, 0x63, 0xed, 0xd3,
-	0x31, 0xd6, 0x9f, 0x86, 0x58, 0x3b, 0x0c, 0xb1, 0xf6, 0x22, 0xc4, 0xfa, 0xcb, 0x10, 0x6b, 0xaf,
-	0x42, 0xac, 0xbf, 0x0e, 0xb1, 0xfe, 0x26, 0xc4, 0xfa, 0xdb, 0x10, 0xeb, 0xef, 0x42, 0xac, 0xbd,
-	0x0f, 0xb1, 0xfe, 0x21, 0xc4, 0xda, 0xc7, 0x10, 0xeb, 0x9f, 0x42, 0xac, 0x3d, 0xed, 0x63, 0xed,
-	0xb0, 0x8f, 0xf5, 0x67, 0x7d, 0xac, 0x3d, 0xef, 0x63, 0xfd, 0x87, 0x3e, 0xd6, 0x5e, 0xf4, 0xb1,
-	0xf6, 0xb2, 0x8f, 0xf5, 0x57, 0x7d, 0xac, 0xbf, 0xee, 0x63, 0xfd, 0xf1, 0xdf, 0xbe, 0xf4, 0x1f,
-	0x8b, 0xb7, 0xdf, 0x8c, 0xfe, 0x7a, 0x8d, 0x46, 0x56, 0x14, 0x7e, 0xf9, 0xb7, 0x00, 0x00, 0x00,
-	0xff, 0xff, 0xdd, 0xaa, 0x78, 0x82, 0x83, 0x0d, 0x00, 0x00,
+	// 1381 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x56, 0x3d, 0x6c, 0xdb, 0xc6,
+	0x1e, 0xe7, 0x49, 0xb2, 0x2c, 0x9f, 0x6c, 0xc9, 0xb9, 0x38, 0x0e, 0x9f, 0x10, 0x9c, 0xfc, 0x9c,
+	0xf7, 0x10, 0xbf, 0x07, 0x54, 0x46, 0xed, 0x7e, 0x04, 0x69, 0x83, 0x40, 0xb6, 0xd3, 0xc0, 0xc8,
+	0x87, 0x0d, 0x46, 0xce, 0xd0, 0x85, 0x38, 0x91, 0x67, 0xf9, 0x60, 0x89, 0x64, 0xc9, 0xa3, 0x62,
+	0x6d, 0x19, 0x32, 0x78, 0x0c, 0xd0, 0x25, 0x5b, 0x0b, 0x74, 0xc9, 0x98, 0x31, 0xe8, 0x94, 0x6e,
+	0x19, 0x33, 0x66, 0x72, 0x63, 0x6a, 0xc9, 0x98, 0x31, 0x63, 0xc1, 0xbb, 0x23, 0xf5, 0x61, 0xb7,
+	0xb1, 0x27, 0xf1, 0x7e, 0xf7, 0xfb, 0xfd, 0xbf, 0xee, 0x7f, 0xff, 0x13, 0xfc, 0xb2, 0xc5, 0xf8,
+	0x5e, 0xd8, 0xac, 0x59, 0x6e, 0x67, 0xb9, 0xb1, 0x47, 0x1b, 0x7b, 0xcc, 0x69, 0x05, 0x0f, 0x28,
+	0x7f, 0xec, 0xfa, 0xfb, 0xcb, 0x9c, 0x3b, 0xcb, 0xc4, 0x63, 0xcb, 0x2d, 0xc2, 0xe9, 0x63, 0xd2,
+	0xab, 0x79, 0xbe, 0xcb, 0x5d, 0x94, 0xe7, 0xdc, 0xa9, 0x75, 0x57, 0x2b, 0x5f, 0x0c, 0x49, 0x5b,
+	0x6e, 0xcb, 0x5d, 0x16, 0xdb, 0xcd, 0x70, 0x57, 0xac, 0xc4, 0x42, 0x7c, 0x49, 0x59, 0xa5, 0x76,
+	0x16, 0x4f, 0x24, 0xe4, 0x7b, 0x8a, 0xbf, 0x72, 0x16, 0x7e, 0x87, 0x72, 0x62, 0x13, 0x4e, 0x94,
+	0xe6, 0xeb, 0xb3, 0x68, 0x98, 0x4d, 0x1d, 0xce, 0x76, 0x19, 0xf5, 0x03, 0x25, 0xc3, 0x2d, 0xd7,
+	0x6d, 0xb5, 0xe9, 0x20, 0x01, 0x3b, 0xf4, 0x09, 0x67, 0xae, 0xa3, 0xf6, 0xaf, 0x8c, 0xef, 0x07,
+	0xdc, 0x0f, 0x2d, 0xae, 0x76, 0xab, 0xe3, 0xbb, 0x9c, 0x75, 0x68, 0xc0, 0x49, 0xc7, 0x93, 0x84,
+	0xc5, 0x9f, 0x27, 0xe1, 0xe4, 0x1d, 0x59, 0x42, 0xb4, 0x0a, 0x33, 0xcc, 0xd6, 0xc1, 0x02, 0x58,
+	0x2a, 0xae, 0xfc, 0xab, 0x26, 0x2b, 0x59, 0x53, 0x9b, 0x9b, 0x69, 0x60, 0x6b, 0x85, 0x37, 0x47,
+	0x55, 0xed, 0xed, 0x51, 0x15, 0x18, 0x19, 0x66, 0xa3, 0x05, 0x58, 0xb4, 0x69, 0x60, 0xf9, 0xcc,
+	0x8b, 0x83, 0xd2, 0x33, 0x0b, 0x60, 0x69, 0xca, 0x18, 0x86, 0xd0, 0xb7, 0x70, 0x92, 0x78, 0xcc,
+	0xdc, 0xa7, 0x3d, 0x3d, 0x2b, 0x6c, 0x97, 0x12, 0xdb, 0xf5, 0xed, 0xcd, 0xbb, 0xb4, 0xb7, 0x56,
+	0x8a, 0x0d, 0x46, 0x47, 0xd5, 0xbc, 0x5c, 0x1b, 0x79, 0xe2, 0xb1, 0xbb, 0xb4, 0x87, 0x6e, 0xc1,
+	0x0b, 0xbb, 0x3e, 0xfd, 0x29, 0xa4, 0x8e, 0xd5, 0x33, 0xbd, 0x36, 0x71, 0x4c, 0x66, 0xeb, 0xb9,
+	0xd8, 0xc1, 0xda, 0xc5, 0xe8, 0xa8, 0x5a, 0xfe, 0x21, 0xd9, 0xdc, 0x6e, 0x13, 0x67, 0x73, 0xc3,
+	0x28, 0xef, 0x8e, 0x00, 0x36, 0xba, 0x06, 0xcb, 0x56, 0x3b, 0x0c, 0x38, 0xf5, 0x4d, 0x62, 0xdb,
+	0x3e, 0x0d, 0x02, 0x7d, 0x42, 0xc4, 0x57, 0x52, 0x70, 0x5d, 0xa2, 0xe8, 0x3a, 0x2c, 0x10, 0x87,
+	0x53, 0xc7, 0x21, 0x81, 0x9e, 0x5f, 0xc8, 0x2e, 0x15, 0x57, 0xe6, 0xc7, 0xf2, 0xaf, 0xcb, 0xed,
+	0xb5, 0x5c, 0x1c, 0xab, 0x91, 0xb2, 0xd1, 0x0a, 0xcc, 0xfb, 0xc4, 0x66, 0x6e, 0xa0, 0x4f, 0x0a,
+	0xdd, 0xdc, 0x98, 0xce, 0x88, 0x37, 0x95, 0x4a, 0x31, 0xd1, 0x1d, 0x38, 0x4d, 0x2c, 0xce, 0xba,
+	0x84, 0x53, 0xdb, 0x24, 0x5c, 0x2f, 0x88, 0xaa, 0x54, 0x6a, 0xf2, 0xac, 0x6a, 0xc9, 0x59, 0xd5,
+	0x1a, 0xc9, 0x59, 0xc9, 0x92, 0x3f, 0xfb, 0xb3, 0x0a, 0x8c, 0x62, 0xaa, 0xac, 0x73, 0xb4, 0x05,
+	0x67, 0x3d, 0x9f, 0x75, 0x89, 0xd5, 0x33, 0x03, 0xca, 0x79, 0xdc, 0x50, 0xfa, 0x94, 0x30, 0x86,
+	0xc7, 0xc2, 0xd8, 0x96, 0xb4, 0x87, 0x8a, 0xa5, 0x02, 0x2a, 0x7b, 0xa3, 0x30, 0xaa, 0xc2, 0x22,
+	0x09, 0xb9, 0x6b, 0x86, 0x9e, 0x4d, 0x38, 0xd5, 0xe1, 0x02, 0x58, 0x2a, 0x18, 0x30, 0x86, 0x76,
+	0x04, 0x82, 0x2a, 0xb0, 0xe0, 0xb5, 0x09, 0xdf, 0x75, 0xfd, 0x8e, 0x5e, 0x14, 0xa5, 0x4c, 0xd7,
+	0xe8, 0x16, 0x84, 0x84, 0x73, 0x9f, 0x35, 0x43, 0x4e, 0x03, 0x7d, 0x5a, 0x94, 0xa3, 0x3a, 0x16,
+	0x47, 0xad, 0x9e, 0x32, 0x6e, 0x3b, 0xdc, 0xef, 0x19, 0x43, 0x12, 0x74, 0x0b, 0x96, 0x2d, 0xd7,
+	0xe1, 0xc4, 0xe2, 0x26, 0xb1, 0x2c, 0x37, 0x74, 0xb8, 0x3e, 0x23, 0xb2, 0x49, 0x0f, 0x63, 0x27,
+	0xa0, 0xfe, 0xa0, 0x13, 0x8d, 0x92, 0xa2, 0xd7, 0x25, 0x1b, 0xad, 0x43, 0x68, 0xf9, 0x34, 0x29,
+	0x6b, 0xe9, 0x1c, 0x65, 0x9d, 0x52, 0xba, 0xba, 0x30, 0x22, 0xd3, 0x17, 0x46, 0xca, 0xe7, 0x31,
+	0xa2, 0x74, 0x75, 0x5e, 0xb9, 0x09, 0xcb, 0x63, 0x99, 0xa2, 0x59, 0x98, 0x8d, 0xaf, 0x00, 0x10,
+	0x55, 0x8b, 0x3f, 0xd1, 0x1c, 0x9c, 0xe8, 0x92, 0x76, 0x48, 0xd5, 0xa5, 0x91, 0x8b, 0x1b, 0x99,
+	0xeb, 0x60, 0xf1, 0x10, 0xc0, 0xf9, 0xd3, 0x4f, 0x0e, 0x5d, 0x85, 0x33, 0x01, 0x27, 0x3c, 0x0c,
+	0x4c, 0x2f, 0x6c, 0xb6, 0x99, 0x25, 0x0c, 0x16, 0x8c, 0x69, 0x09, 0x6e, 0x0b, 0x2c, 0x6e, 0xfc,
+	0xb6, 0x6b, 0x89, 0x31, 0x91, 0xd0, 0x32, 0x82, 0x56, 0x4a, 0x60, 0x45, 0x5c, 0x80, 0x45, 0x55,
+	0x43, 0xd2, 0x6c, 0x53, 0x71, 0x3f, 0x0b, 0xc6, 0x30, 0xb4, 0xf8, 0x07, 0x80, 0xa5, 0xd1, 0x3b,
+	0x80, 0x10, 0xcc, 0xb5, 0x08, 0x73, 0x84, 0xe7, 0x8c, 0x21, 0xbe, 0xd1, 0x0a, 0x2c, 0x24, 0xa6,
+	0x85, 0xab, 0xe2, 0xca, 0x6c, 0x72, 0x68, 0xf7, 0x14, 0x9e, 0xdc, 0x9d, 0x84, 0x17, 0xdb, 0xe1,
+	0x3d, 0x4f, 0x7a, 0x9d, 0x32, 0xc4, 0x77, 0x5c, 0x93, 0x8e, 0x6b, 0xd3, 0xb6, 0xbc, 0xe7, 0x86,
+	0x5c, 0xa0, 0x9b, 0x70, 0xca, 0x6b, 0x13, 0x8b, 0x76, 0xa8, 0xc3, 0xc5, 0x15, 0x2e, 0x9d, 0xe8,
+	0x2c, 0x15, 0xdc, 0x76, 0x42, 0x33, 0x06, 0x8a, 0xc5, 0xa7, 0x19, 0x38, 0x3d, 0x7c, 0x1f, 0xd1,
+	0x15, 0x38, 0x95, 0xce, 0x0a, 0x91, 0xc6, 0x8c, 0x31, 0x00, 0xe2, 0x6b, 0xc5, 0x0f, 0x4c, 0xcb,
+	0x75, 0x76, 0x59, 0x4b, 0x0d, 0x5b, 0x95, 0xd3, 0x7f, 0x4e, 0xbb, 0xdd, 0xb5, 0xc6, 0xc1, 0xfa,
+	0x30, 0xd7, 0x28, 0xf3, 0x51, 0xa0, 0xf2, 0x14, 0xc0, 0xf2, 0x18, 0x29, 0x3e, 0xc7, 0x0e, 0x73,
+	0xcc, 0xf1, 0x30, 0xa6, 0x3b, 0xcc, 0x49, 0xe7, 0x9a, 0x20, 0x91, 0x83, 0x21, 0x52, 0x46, 0x91,
+	0xc8, 0xc1, 0x80, 0x74, 0x0d, 0x96, 0x1d, 0x97, 0x5b, 0x7b, 0x43, 0xb4, 0xac, 0xa0, 0x95, 0x04,
+	0x9c, 0x12, 0x17, 0x8f, 0x72, 0x70, 0x46, 0x05, 0xfe, 0x50, 0x74, 0x0b, 0xfa, 0x0a, 0xe6, 0xe2,
+	0x07, 0x41, 0xcd, 0xfc, 0x7f, 0xea, 0xf2, 0x9c, 0xe8, 0x70, 0xc1, 0x8e, 0x4f, 0xa3, 0xe9, 0xba,
+	0xdc, 0x14, 0xd2, 0xcc, 0x19, 0xa5, 0x85, 0x58, 0x12, 0x83, 0x23, 0x33, 0x24, 0x7b, 0x62, 0x86,
+	0x14, 0xba, 0xd4, 0x0f, 0x98, 0xeb, 0x04, 0x7a, 0x4e, 0x4c, 0x90, 0xab, 0x63, 0x25, 0x97, 0x91,
+	0xd7, 0x1e, 0x29, 0x96, 0x9c, 0x22, 0xa9, 0x08, 0xdd, 0x84, 0x17, 0x92, 0xd9, 0x6c, 0xa6, 0x0d,
+	0x39, 0x21, 0x2c, 0x9d, 0x68, 0x48, 0x63, 0x36, 0xa1, 0x26, 0x08, 0x9a, 0x87, 0x19, 0xe6, 0x89,
+	0x27, 0x60, 0x6a, 0x2d, 0x1f, 0x1d, 0x55, 0x33, 0x9b, 0xdb, 0x46, 0x86, 0x79, 0xe8, 0x3a, 0xcc,
+	0xfa, 0x9c, 0xeb, 0x93, 0xea, 0x6d, 0x1c, 0x4f, 0x76, 0x43, 0x9d, 0xea, 0x5a, 0x31, 0x3a, 0xaa,
+	0x66, 0x8d, 0x46, 0xe3, 0x79, 0x9c, 0x72, 0x2c, 0x41, 0xdf, 0xc3, 0xc9, 0x0e, 0xe5, 0x3e, 0xb3,
+	0x02, 0xbd, 0x20, 0xc2, 0x58, 0x3c, 0x3d, 0xa1, 0xfb, 0x92, 0x24, 0xf3, 0x49, 0x24, 0x68, 0x15,
+	0x16, 0x88, 0xdd, 0x25, 0x8e, 0x45, 0x6d, 0xdd, 0x12, 0xce, 0x2f, 0x9f, 0x70, 0xfe, 0x50, 0x3c,
+	0xf8, 0x46, 0x4a, 0xac, 0x7c, 0x07, 0x67, 0x46, 0xca, 0x73, 0x9e, 0xd1, 0x53, 0xb9, 0x01, 0xa7,
+	0x87, 0x43, 0xf9, 0x9c, 0x36, 0x33, 0x3c, 0xb6, 0x7e, 0xcf, 0xc2, 0x8b, 0x2a, 0xab, 0xad, 0x66,
+	0x40, 0xfd, 0xae, 0x28, 0x4a, 0x80, 0x0c, 0x38, 0xd7, 0x26, 0x01, 0x37, 0x43, 0xaf, 0xcd, 0x9c,
+	0x7d, 0xd3, 0xa7, 0x16, 0x65, 0x5d, 0x6a, 0x9f, 0xb9, 0xed, 0x50, 0xac, 0xde, 0x11, 0x62, 0x43,
+	0x69, 0xd1, 0xbf, 0xe1, 0xb4, 0x32, 0x27, 0x5f, 0x8a, 0x38, 0x98, 0x9c, 0x51, 0x94, 0xd8, 0xba,
+	0x78, 0x0e, 0x1e, 0xc1, 0x79, 0xe1, 0xd6, 0x76, 0x1f, 0x3b, 0xa3, 0x8e, 0xb3, 0x67, 0x74, 0x2c,
+	0xc2, 0xde, 0x50, 0xf2, 0xd4, 0xf5, 0x7f, 0x61, 0x29, 0x35, 0x29, 0x9d, 0xe7, 0x84, 0xf3, 0x99,
+	0x04, 0x95, 0xee, 0x93, 0xac, 0xd5, 0xb8, 0x4e, 0x9d, 0x4f, 0x9c, 0x27, 0x6b, 0xd9, 0x1d, 0xc3,
+	0x59, 0x2b, 0x73, 0xd2, 0x71, 0x5e, 0x66, 0x2d, 0x31, 0xe9, 0xf6, 0x1b, 0x58, 0x1c, 0x72, 0xab,
+	0x5a, 0xf6, 0xd2, 0xa9, 0x4d, 0x67, 0xc0, 0x81, 0x8b, 0xff, 0xdf, 0x83, 0x97, 0xff, 0x66, 0x94,
+	0xa2, 0x39, 0x38, 0xbb, 0x7d, 0xaf, 0xbe, 0x7e, 0xfb, 0xfe, 0xed, 0x07, 0x0d, 0x73, 0xf3, 0xc1,
+	0xc6, 0xd6, 0x96, 0x31, 0xab, 0xa1, 0x4b, 0xf0, 0xc2, 0x00, 0xdd, 0xda, 0x69, 0x08, 0x18, 0x54,
+	0x72, 0x87, 0xbf, 0x61, 0x6d, 0xed, 0x17, 0xf0, 0xe6, 0x18, 0x83, 0xb7, 0xc7, 0x18, 0xbc, 0x3b,
+	0xc6, 0xe0, 0xfd, 0x31, 0x06, 0x1f, 0x8e, 0xb1, 0xf6, 0xf1, 0x18, 0x6b, 0x9f, 0x8e, 0x31, 0x78,
+	0x12, 0x61, 0xed, 0x30, 0xc2, 0xda, 0x8b, 0x08, 0x83, 0x97, 0x11, 0xd6, 0x5e, 0x45, 0x18, 0xbc,
+	0x8e, 0x30, 0x78, 0x13, 0x61, 0xf0, 0x36, 0xc2, 0xe0, 0x5d, 0x84, 0xb5, 0xf7, 0x11, 0x06, 0x1f,
+	0x22, 0xac, 0x7d, 0x8c, 0x30, 0xf8, 0x14, 0x61, 0xed, 0x49, 0x1f, 0x6b, 0x87, 0x7d, 0x0c, 0x9e,
+	0xf5, 0xb1, 0xf6, 0xbc, 0x8f, 0xc1, 0xaf, 0x7d, 0xac, 0xbd, 0xe8, 0x63, 0xed, 0x65, 0x1f, 0x83,
+	0x57, 0x7d, 0x0c, 0x5e, 0xf7, 0x31, 0xf8, 0xf1, 0x7f, 0x9f, 0xfb, 0x93, 0xed, 0xed, 0xb7, 0xe2,
+	0x5f, 0xaf, 0xd9, 0xcc, 0x8b, 0xc2, 0xaf, 0xfe, 0x15, 0x00, 0x00, 0xff, 0xff, 0xfd, 0xcf, 0x1a,
+	0xbd, 0x66, 0x0c, 0x00, 0x00,
 }
