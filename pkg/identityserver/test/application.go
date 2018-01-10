@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 )
 
 func defaultApplication(in interface{}) (*ttnpb.Application, error) {
-	if app, ok := in.(types.Application); ok {
+	if app, ok := in.(store.Application); ok {
 		return app.GetApplication(), nil
 	}
 

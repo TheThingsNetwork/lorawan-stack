@@ -8,11 +8,10 @@ import (
 	"github.com/RangelReale/osin"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-var clientFactory = func() types.Client {
+var clientFactory = func() store.Client {
 	return &ttnpb.Client{}
 }
 
@@ -60,7 +59,7 @@ func (s *storage) GetClient(clientID string) (osin.Client, error) {
 
 // SaveAuthorize saves authorization data.
 func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
-	return s.store.OAuth.SaveAuthorizationCode(&types.AuthorizationData{
+	return s.store.OAuth.SaveAuthorizationCode(&store.AuthorizationData{
 		AuthorizationCode: data.Code,
 		ClientID:          data.Client.GetId(),
 		CreatedAt:         data.CreatedAt,
@@ -111,7 +110,7 @@ func (s *storage) RemoveAuthorize(code string) error {
 // SaveAccess saves the access data for later use.
 func (s *storage) SaveAccess(data *osin.AccessData) error {
 	err := s.store.Transact(func(s *store.Store) error {
-		err := s.OAuth.SaveAccessToken(&types.AccessData{
+		err := s.OAuth.SaveAccessToken(&store.AccessData{
 			AccessToken: data.AccessToken,
 			ClientID:    data.Client.GetId(),
 			UserID:      getUserID(data.UserData),
@@ -128,7 +127,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 			return nil
 		}
 
-		return s.OAuth.SaveRefreshToken(&types.RefreshData{
+		return s.OAuth.SaveRefreshToken(&store.RefreshData{
 			RefreshToken: data.RefreshToken,
 			ClientID:     data.Client.GetId(),
 			UserID:       getUserID(data.UserData),

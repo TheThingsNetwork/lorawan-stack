@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 )
 
 func defaultClient(in interface{}) (*ttnpb.Client, error) {
-	if cli, ok := in.(types.Client); ok {
+	if cli, ok := in.(store.Client); ok {
 		return cli.GetClient(), nil
 	}
 

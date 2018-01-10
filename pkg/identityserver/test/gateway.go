@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 )
 
 func defaultGateway(in interface{}) (*ttnpb.Gateway, error) {
-	if gtw, ok := in.(types.Gateway); ok {
+	if gtw, ok := in.(store.Gateway); ok {
 		return gtw.GetGateway(), nil
 	}
 

@@ -12,7 +12,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/auth/oauth"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"google.golang.org/grpc/metadata"
@@ -94,10 +94,10 @@ func testSettings() *ttnpb.IdentityServerSettings {
 	}
 }
 
-func testAccessData() *types.AccessData {
+func testAccessData() *store.AccessData {
 	cli := testClient()
 
-	return &types.AccessData{
+	return &store.AccessData{
 		AccessToken: accessToken,
 		RedirectURI: cli.RedirectURI,
 		Scope:       oauth.Scope(cli.Rights),

@@ -3,7 +3,7 @@
 package oauth
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/labstack/echo"
 )
 
@@ -18,5 +18,5 @@ type Authorizer interface {
 	// - renders the authorization form if it is not a form accept
 	// - accepts the user input from the authorization form and uses this input to decide
 	//   whether or not the client should be authorized.
-	Authorize(c echo.Context, client types.Client) (authorized bool, err error)
+	Authorize(c echo.Context, client store.Client) (authorized bool, err error)
 }

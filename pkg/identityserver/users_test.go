@@ -11,8 +11,8 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/auth/oauth"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/mock"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
@@ -71,7 +71,7 @@ func TestUser(t *testing.T) {
 
 	client := testClient()
 
-	refreshData := &types.RefreshData{
+	refreshData := &store.RefreshData{
 		RefreshToken: "123",
 		UserID:       user.UserID,
 		ClientID:     client.ClientID,
@@ -270,7 +270,7 @@ func TestUser(t *testing.T) {
 	a.So(err, should.BeNil)
 	ctx = testCtx()
 
-	accessData = &types.AccessData{
+	accessData = &store.AccessData{
 		AccessToken: accessToken,
 		UserID:      user.UserID,
 		ClientID:    client.ClientID,
@@ -281,7 +281,7 @@ func TestUser(t *testing.T) {
 	err = is.store.OAuth.SaveAccessToken(accessData)
 	a.So(err, should.BeNil)
 
-	refreshData = &types.RefreshData{
+	refreshData = &store.RefreshData{
 		RefreshToken: "123",
 		UserID:       user.UserID,
 		ClientID:     client.ClientID,

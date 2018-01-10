@@ -2,28 +2,33 @@
 
 package store
 
-import (
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-)
+import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 
-// ApplicationFactory is a function that returns a types.Application used to
-// construct the results in read operations.
-type ApplicationFactory func() types.Application
+// Application is the interface of all things that can be an application. This can
+// be used to build richer user types that can still be read and written to a database.
+type Application interface {
+	// GetApplication returns the ttnpb.Application that represents this
+	// application.
+	GetApplication() *ttnpb.Application
+}
+
+// ApplicationFactory is a function that returns a Application used to construct
+// the results in read operations.
+type ApplicationFactory func() Application
 
 // ApplicationStore is a store that holds Applications.
 type ApplicationStore interface {
 	// Create creates a new application.
-	Create(app types.Application) error
+	Create(app Application) error
 
 	// GetByID finds the application by ID and retrieves it.
-	GetByID(appID string, factory ApplicationFactory) (types.Application, error)
+	GetByID(appID string, factory ApplicationFactory) (Application, error)
 
 	// ListByUser returns the applications to which an user is a collaborator.
-	ListByUser(appID string, factory ApplicationFactory) ([]types.Application, error)
+	ListByUser(appID string, factory ApplicationFactory) ([]Application, error)
 
 	// Update updates the application.
-	Update(app types.Application) error
+	Update(app Application) error
 
 	// TODO(gomezjdaniel#274): use sql 'ON DELETE CASCADE' when CockroachDB implements it.
 	// Delete deletes an application.
@@ -62,9 +67,9 @@ type ApplicationStore interface {
 	ListUserRights(appID string, userID string) ([]ttnpb.Right, error)
 
 	// LoadAttributes loads extra attributes into the Application.
-	LoadAttributes(appID string, app types.Application) error
+	LoadAttributes(appID string, app Application) error
 
 	// StoreAttributes writes the extra attributes on the Application if it is an
 	// Attributer to the store.
-	StoreAttributes(appID string, app, result types.Application) error
+	StoreAttributes(appID string, app, result Application) error
 }

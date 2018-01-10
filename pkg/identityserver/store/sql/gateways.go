@@ -9,7 +9,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
@@ -29,7 +28,7 @@ func NewGatewayStore(store storer) *GatewayStore {
 }
 
 // Create creates a new gateway.
-func (s *GatewayStore) Create(gateway types.Gateway) error {
+func (s *GatewayStore) Create(gateway store.Gateway) error {
 	err := s.transact(func(tx *db.Tx) error {
 		err := s.create(tx, gateway)
 		if err != nil {
@@ -61,7 +60,7 @@ func (s *GatewayStore) Create(gateway types.Gateway) error {
 	return err
 }
 
-func (s *GatewayStore) create(q db.QueryContext, gateway types.Gateway) error {
+func (s *GatewayStore) create(q db.QueryContext, gateway store.Gateway) error {
 	gtw := gateway.GetGateway()
 	_, err := q.Exec(
 		`INSERT
@@ -187,7 +186,7 @@ func (s *GatewayStore) addRadiosQuery(gtwID string, radios []ttnpb.GatewayRadio)
 }
 
 // GetByID finds a gateway by ID and retrieves it.
-func (s *GatewayStore) GetByID(gtwID string, factory store.GatewayFactory) (types.Gateway, error) {
+func (s *GatewayStore) GetByID(gtwID string, factory store.GatewayFactory) (store.Gateway, error) {
 	result := factory()
 
 	err := s.transact(func(tx *db.Tx) error {
@@ -226,7 +225,7 @@ func (s *GatewayStore) GetByID(gtwID string, factory store.GatewayFactory) (type
 
 // gateway fetchs a gateway from the database without antennas and attributes and
 // saves it into result.
-func (s *GatewayStore) gateway(q db.QueryContext, gtwID string, result types.Gateway) error {
+func (s *GatewayStore) gateway(q db.QueryContext, gtwID string, result store.Gateway) error {
 	err := q.SelectOne(
 		result,
 		`SELECT *
@@ -242,8 +241,8 @@ func (s *GatewayStore) gateway(q db.QueryContext, gtwID string, result types.Gat
 }
 
 // FindByUser returns the Gateways to which an User is a collaborator.
-func (s *GatewayStore) ListByUser(userID string, factory store.GatewayFactory) ([]types.Gateway, error) {
-	var result []types.Gateway
+func (s *GatewayStore) ListByUser(userID string, factory store.GatewayFactory) ([]store.Gateway, error) {
+	var result []store.Gateway
 
 	err := s.transact(func(tx *db.Tx) error {
 		gateways, err := s.userGateways(tx, userID)
@@ -319,7 +318,7 @@ func (s *GatewayStore) userGateways(q db.QueryContext, userID string) ([]ttnpb.G
 }
 
 // Update updates the gateway.
-func (s *GatewayStore) Update(gateway types.Gateway) error {
+func (s *GatewayStore) Update(gateway store.Gateway) error {
 	err := s.transact(func(tx *db.Tx) error {
 		err := s.update(tx, gateway)
 		if err != nil {
@@ -348,7 +347,7 @@ func (s *GatewayStore) Update(gateway types.Gateway) error {
 	return err
 }
 
-func (s *GatewayStore) update(q db.QueryContext, gateway types.Gateway) error {
+func (s *GatewayStore) update(q db.QueryContext, gateway store.Gateway) error {
 	gtw := gateway.GetGateway()
 
 	var id string
@@ -813,11 +812,11 @@ func (s *GatewayStore) listUserRights(q db.QueryContext, gtwID string, userID st
 }
 
 // LoadAttributes loads the extra attributes in gtw if it is a store.Attributer.
-func (s *GatewayStore) LoadAttributes(gtwID string, gtw types.Gateway) error {
+func (s *GatewayStore) LoadAttributes(gtwID string, gtw store.Gateway) error {
 	return s.loadAttributes(s.queryer(), gtwID, gtw)
 }
 
-func (s *GatewayStore) loadAttributes(q db.QueryContext, gtwID string, gtw types.Gateway) error {
+func (s *GatewayStore) loadAttributes(q db.QueryContext, gtwID string, gtw store.Gateway) error {
 	attr, ok := gtw.(store.Attributer)
 	if ok {
 		return s.extraAttributesStore.loadAttributes(q, gtwID, attr)
@@ -828,11 +827,11 @@ func (s *GatewayStore) loadAttributes(q db.QueryContext, gtwID string, gtw types
 
 // StoreAttributes store the extra attributes of gtw if it is a store.Attributer
 // and writes the resulting gateway in result.
-func (s *GatewayStore) StoreAttributes(gtwID string, gtw, result types.Gateway) error {
+func (s *GatewayStore) StoreAttributes(gtwID string, gtw, result store.Gateway) error {
 	return s.storeAttributes(s.queryer(), gtwID, gtw, result)
 }
 
-func (s *GatewayStore) storeAttributes(q db.QueryContext, gtwID string, gtw, result types.Gateway) error {
+func (s *GatewayStore) storeAttributes(q db.QueryContext, gtwID string, gtw, result store.Gateway) error {
 	attr, ok := gtw.(store.Attributer)
 	if ok {
 		res, ok := result.(store.Attributer)

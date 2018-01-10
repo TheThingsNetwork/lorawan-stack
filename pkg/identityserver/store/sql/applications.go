@@ -9,7 +9,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
@@ -29,7 +28,7 @@ func NewApplicationStore(store storer) *ApplicationStore {
 }
 
 // Create creates a new application.
-func (s *ApplicationStore) Create(application types.Application) error {
+func (s *ApplicationStore) Create(application store.Application) error {
 	err := s.transact(func(tx *db.Tx) error {
 		err := s.create(tx, application)
 		if err != nil {
@@ -41,7 +40,7 @@ func (s *ApplicationStore) Create(application types.Application) error {
 	return err
 }
 
-func (s *ApplicationStore) create(q db.QueryContext, application types.Application) error {
+func (s *ApplicationStore) create(q db.QueryContext, application store.Application) error {
 	app := application.GetApplication()
 	_, err := q.NamedExec(
 		`INSERT
@@ -63,7 +62,7 @@ func (s *ApplicationStore) create(q db.QueryContext, application types.Applicati
 }
 
 // GetByID finds the application by ID and retrieves it.
-func (s *ApplicationStore) GetByID(appID string, factory store.ApplicationFactory) (types.Application, error) {
+func (s *ApplicationStore) GetByID(appID string, factory store.ApplicationFactory) (store.Application, error) {
 	result := factory()
 
 	err := s.transact(func(tx *db.Tx) error {
@@ -82,7 +81,7 @@ func (s *ApplicationStore) GetByID(appID string, factory store.ApplicationFactor
 	return result, nil
 }
 
-func (s *ApplicationStore) getByID(q db.QueryContext, appID string, result types.Application) error {
+func (s *ApplicationStore) getByID(q db.QueryContext, appID string, result store.Application) error {
 	err := q.SelectOne(
 		result,
 		`SELECT *
@@ -99,8 +98,8 @@ func (s *ApplicationStore) getByID(q db.QueryContext, appID string, result types
 }
 
 // FindByUser returns the Applications to which an User is a collaborator.
-func (s *ApplicationStore) ListByUser(userID string, factory store.ApplicationFactory) ([]types.Application, error) {
-	var result []types.Application
+func (s *ApplicationStore) ListByUser(userID string, factory store.ApplicationFactory) ([]store.Application, error) {
+	var result []store.Application
 
 	err := s.transact(func(tx *db.Tx) error {
 		applications, err := s.userApplications(tx, userID)
@@ -156,7 +155,7 @@ func (s *ApplicationStore) userApplications(q db.QueryContext, userID string) ([
 }
 
 // Edit updates the Application and returns the updated Application.
-func (s *ApplicationStore) Update(application types.Application) error {
+func (s *ApplicationStore) Update(application store.Application) error {
 	err := s.transact(func(tx *db.Tx) error {
 		err := s.update(tx, application)
 		if err != nil {
@@ -168,7 +167,7 @@ func (s *ApplicationStore) Update(application types.Application) error {
 	return err
 }
 
-func (s *ApplicationStore) update(q db.QueryContext, application types.Application) error {
+func (s *ApplicationStore) update(q db.QueryContext, application store.Application) error {
 	app := application.GetApplication()
 
 	var id string
@@ -439,11 +438,11 @@ func (s *ApplicationStore) listUserRights(q db.QueryContext, appID string, userI
 }
 
 // LoadAttributes loads the extra attributes in app if it is a store.Attributer.
-func (s *ApplicationStore) LoadAttributes(appID string, app types.Application) error {
+func (s *ApplicationStore) LoadAttributes(appID string, app store.Application) error {
 	return s.loadAttributes(s.queryer(), appID, app)
 }
 
-func (s *ApplicationStore) loadAttributes(q db.QueryContext, appID string, app types.Application) error {
+func (s *ApplicationStore) loadAttributes(q db.QueryContext, appID string, app store.Application) error {
 	attr, ok := app.(store.Attributer)
 	if ok {
 		return s.extraAttributesStore.loadAttributes(q, appID, attr)
@@ -454,11 +453,11 @@ func (s *ApplicationStore) loadAttributes(q db.QueryContext, appID string, app t
 
 // StoreAttributes store the extra attributes of app if it is a store.Attributer
 // and writes the resulting application in result.
-func (s *ApplicationStore) StoreAttributes(appID string, app, result types.Application) error {
+func (s *ApplicationStore) StoreAttributes(appID string, app, result store.Application) error {
 	return s.storeAttributes(s.queryer(), appID, app, result)
 }
 
-func (s *ApplicationStore) storeAttributes(q db.QueryContext, appID string, app, result types.Application) error {
+func (s *ApplicationStore) storeAttributes(q db.QueryContext, appID string, app, result store.Application) error {
 	attr, ok := app.(store.Attributer)
 	if ok {
 		res, ok := result.(store.Attributer)

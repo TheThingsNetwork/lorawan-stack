@@ -5,14 +5,14 @@ package sql
 import (
 	"testing"
 
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
-var clientFactory = func() types.Client {
+var clientFactory = func() store.Client {
 	return &ttnpb.Client{}
 }
 
@@ -123,21 +123,21 @@ func testClientDeleteFeedDatabase(t *testing.T, userID, clientID string) {
 
 	oauth, ok := s.store().OAuth.(*OAuthStore)
 	if a.So(ok, should.BeTrue) {
-		err := oauth.saveAuthorizationCode(s.queryer(), &types.AuthorizationData{
+		err := oauth.saveAuthorizationCode(s.queryer(), &store.AuthorizationData{
 			AuthorizationCode: "123",
 			ClientID:          clientID,
 			UserID:            userID,
 		})
 		a.So(err, should.BeNil)
 
-		err = oauth.saveAccessToken(s.queryer(), &types.AccessData{
+		err = oauth.saveAccessToken(s.queryer(), &store.AccessData{
 			AccessToken: "123",
 			ClientID:    clientID,
 			UserID:      userID,
 		})
 		a.So(err, should.BeNil)
 
-		err = oauth.saveRefreshToken(s.queryer(), &types.RefreshData{
+		err = oauth.saveRefreshToken(s.queryer(), &store.RefreshData{
 			RefreshToken: "123",
 			ClientID:     clientID,
 			UserID:       userID,

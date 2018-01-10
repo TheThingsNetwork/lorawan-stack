@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 )
 
 func defaultUser(in interface{}) (*ttnpb.User, error) {
-	if u, ok := in.(types.User); ok {
+	if u, ok := in.(store.User); ok {
 		return u.GetUser(), nil
 	}
 

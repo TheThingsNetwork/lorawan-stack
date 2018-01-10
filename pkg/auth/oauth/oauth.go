@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/RangelReale/osin"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/web"
@@ -115,7 +115,7 @@ func (s *Server) tokenHandler(c echo.Context) error {
 		return s.output(c, resp)
 	}
 
-	client := ar.Client.(types.Client).GetClient()
+	client := ar.Client.(store.Client).GetClient()
 
 	switch ar.Type {
 	case osin.AUTHORIZATION_CODE:
@@ -143,7 +143,7 @@ func (s *Server) authorizationHandler(c echo.Context) error {
 	if ar == nil {
 		return s.output(c, resp)
 	}
-	client := ar.Client.(types.Client)
+	client := ar.Client.(store.Client)
 
 	// make sure client supports authorization code
 	if !client.GetClient().HasGrant(ttnpb.GRANT_AUTHORIZATION_CODE) {

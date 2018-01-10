@@ -14,9 +14,9 @@ import (
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
@@ -375,7 +375,7 @@ type authBody struct {
 	Authorize bool `json:"auth" form:"authorize"`
 }
 
-func (a *TestAuthorizer) Authorize(c echo.Context, client types.Client) (bool, error) {
+func (a *TestAuthorizer) Authorize(c echo.Context, client store.Client) (bool, error) {
 	if c.Request().Method != "POST" {
 		c.HTML(http.StatusOK, a.Body)
 	}

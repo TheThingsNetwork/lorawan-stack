@@ -8,7 +8,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/mock"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
@@ -72,7 +71,7 @@ func WithUserFactory(factory store.UserFactory) Option {
 	}
 }
 
-var defaultUserFactory = func() types.User {
+var defaultUserFactory = func() store.User {
 	return &ttnpb.User{}
 }
 
@@ -83,7 +82,7 @@ func WithApplicationFactory(factory store.ApplicationFactory) Option {
 	}
 }
 
-var defaultApplicationFactory = func() types.Application {
+var defaultApplicationFactory = func() store.Application {
 	return &ttnpb.Application{}
 }
 
@@ -94,7 +93,7 @@ func WithGatewayFactory(factory store.GatewayFactory) Option {
 	}
 }
 
-var defaultGatewayFactory = func() types.Gateway {
+var defaultGatewayFactory = func() store.Gateway {
 	return &ttnpb.Gateway{}
 }
 
@@ -105,7 +104,7 @@ func WithClientFactory(factory store.ClientFactory) Option {
 	}
 }
 
-var defaultClientFactory = func() types.Client {
+var defaultClientFactory = func() store.Client {
 	return &ttnpb.Client{}
 }
 

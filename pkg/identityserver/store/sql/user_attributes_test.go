@@ -6,18 +6,18 @@ import (
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
-var userWithFooFactory = func() types.User {
+var userWithFooFactory = func() store.User {
 	return &userWithFoo{}
 }
 
-// userWithFoo implements both types.User and store.Attributer interfaces.
+// userWithFoo implements both store.User and store.Attributer interfaces.
 type userWithFoo struct {
 	*ttnpb.User
 	Foo string

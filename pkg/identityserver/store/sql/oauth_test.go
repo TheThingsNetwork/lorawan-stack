@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -19,7 +19,7 @@ func TestOAuthAuthorizationCode(t *testing.T) {
 	userID := testUsers()["john-doe"].UserID
 	client := testClients()["test-client"]
 
-	data := &types.AuthorizationData{
+	data := &store.AuthorizationData{
 		AuthorizationCode: "123456",
 		ClientID:          client.ClientIdentifier.ClientID,
 		CreatedAt:         time.Now(),
@@ -62,7 +62,7 @@ func TestOAuthAccessToken(t *testing.T) {
 	userID := testUsers()["john-doe"].UserID
 	client := testClients()["test-client"]
 
-	data := &types.AccessData{
+	data := &store.AccessData{
 		AccessToken: "123456",
 		ClientID:    client.ClientIdentifier.ClientID,
 		UserID:      userID,
@@ -103,7 +103,7 @@ func TestOAuthRefreshToken(t *testing.T) {
 	userID := testUsers()["john-doe"].UserID
 	client := testClients()["test-client"]
 
-	data := &types.RefreshData{
+	data := &store.RefreshData{
 		RefreshToken: "123456",
 		ClientID:     client.ClientIdentifier.ClientID,
 		UserID:       userID,
@@ -142,7 +142,7 @@ func TestOAuthAuthorizedClients(t *testing.T) {
 	userID := testUsers()["john-doe"].UserID
 	client := testClients()["test-client"]
 
-	accessData := &types.AccessData{
+	accessData := &store.AccessData{
 		AccessToken: "123456",
 		ClientID:    client.ClientIdentifier.ClientID,
 		UserID:      userID,
@@ -155,7 +155,7 @@ func TestOAuthAuthorizedClients(t *testing.T) {
 	err := s.OAuth.SaveAccessToken(accessData)
 	a.So(err, should.BeNil)
 
-	refreshData := &types.RefreshData{
+	refreshData := &store.RefreshData{
 		RefreshToken: "123456",
 		ClientID:     client.ClientIdentifier.ClientID,
 		UserID:       userID,

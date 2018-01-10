@@ -11,11 +11,10 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/random"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	ttntypes "github.com/TheThingsNetwork/ttn/pkg/types"
+	"github.com/TheThingsNetwork/ttn/pkg/types"
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
@@ -41,7 +40,7 @@ func (is *IdentityServer) CreateUser(ctx context.Context, req *ttnpb.CreateUserR
 		})
 	}
 
-	password, err := ttntypes.Hash(req.User.Password)
+	password, err := types.Hash(req.User.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +69,7 @@ func (is *IdentityServer) CreateUser(ctx context.Context, req *ttnpb.CreateUserR
 			return err
 		}
 
-		token := &types.ValidationToken{
+		token := &store.ValidationToken{
 			ValidationToken: random.String(64),
 			CreatedAt:       time.Now(),
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
@@ -166,7 +165,7 @@ func (is *IdentityServer) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserR
 			return err
 		}
 
-		token := &types.ValidationToken{
+		token := &store.ValidationToken{
 			ValidationToken: random.String(64),
 			CreatedAt:       time.Now(),
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
@@ -203,7 +202,7 @@ func (is *IdentityServer) UpdateUserPassword(ctx context.Context, req *ttnpb.Upd
 		return nil, err
 	}
 
-	matches, err := ttntypes.Password(found.GetUser().Password).Validate(req.Old)
+	matches, err := types.Password(found.GetUser().Password).Validate(req.Old)
 	if err != nil {
 		return nil, err
 	}
@@ -212,7 +211,7 @@ func (is *IdentityServer) UpdateUserPassword(ctx context.Context, req *ttnpb.Upd
 		return nil, ErrInvalidPassword.New(nil)
 	}
 
-	hashed, err := ttntypes.Hash(req.New)
+	hashed, err := types.Hash(req.New)
 	if err != nil {
 		return nil, err
 	}
@@ -392,7 +391,7 @@ func (is *IdentityServer) RequestUserEmailValidation(ctx context.Context, _ *pbt
 		return nil, err
 	}
 
-	token := &types.ValidationToken{
+	token := &store.ValidationToken{
 		ValidationToken: random.String(64),
 		CreatedAt:       time.Now(),
 		ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),

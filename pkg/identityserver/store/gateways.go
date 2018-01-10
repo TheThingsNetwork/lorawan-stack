@@ -2,28 +2,37 @@
 
 package store
 
-import (
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-)
+import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 
-// GatewayFactory is a function that returns a types.Gateway used to
-// construct the results in read operations.
-type GatewayFactory func() types.Gateway
+// Gateway is the interface of all things that can be a gateway.
+type Gateway interface {
+	// GetGateway returns the ttnpb.Gateway that represents this gateway.
+	GetGateway() *ttnpb.Gateway
+
+	// SetAttributes sets the free-form attributes.
+	SetAttributes(attributes map[string]string)
+
+	// SetAntennas sets the antennas.
+	SetAntennas(antennas []ttnpb.GatewayAntenna)
+}
+
+// GatewayFactory is a function that returns a Gateway used to construct the
+// results in read operations.
+type GatewayFactory func() Gateway
 
 // GatewayStore is a store that holds Gateways.
 type GatewayStore interface {
 	// Create creates a new gateway.
-	Create(gtw types.Gateway) error
+	Create(gtw Gateway) error
 
 	// GetByID finds a gateway by ID and retrieves it.
-	GetByID(gtwID string, factory GatewayFactory) (types.Gateway, error)
+	GetByID(gtwID string, factory GatewayFactory) (Gateway, error)
 
 	// ListByUser returns all the gateways to which an user is collaborator.
-	ListByUser(userID string, factory GatewayFactory) ([]types.Gateway, error)
+	ListByUser(userID string, factory GatewayFactory) ([]Gateway, error)
 
 	// Update updates the gateway.
-	Update(gtw types.Gateway) error
+	Update(gtw Gateway) error
 
 	// TODO(gomezjdaniel#274): use sql 'ON DELETE CASCADE' when CockroachDB implements it.
 	// Delete deletes a gateway.
@@ -62,9 +71,9 @@ type GatewayStore interface {
 	ListUserRights(gtwID string, userID string) ([]ttnpb.Right, error)
 
 	// LoadAttributes loads extra attributes into the gateway if it's an Attributer.
-	LoadAttributes(gtwID string, gtw types.Gateway) error
+	LoadAttributes(gtwID string, gtw Gateway) error
 
 	// StoreAttributes writes the extra attributes on the gatewat if it's an
 	// Attributer to the store.
-	StoreAttributes(gtwID string, gtw, res types.Gateway) error
+	StoreAttributes(gtwID string, gtw, res Gateway) error
 }

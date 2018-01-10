@@ -6,7 +6,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
@@ -24,7 +23,7 @@ func NewClientStore(store storer) *ClientStore {
 }
 
 // Create creates a client.
-func (s *ClientStore) Create(client types.Client) error {
+func (s *ClientStore) Create(client store.Client) error {
 	err := s.transact(func(tx *db.Tx) error {
 		err := s.create(tx, client)
 		if err != nil {
@@ -36,7 +35,7 @@ func (s *ClientStore) Create(client types.Client) error {
 	return err
 }
 
-func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
+func (s *ClientStore) create(q db.QueryContext, client store.Client) error {
 	var cli struct {
 		*ttnpb.Client
 		CreatorID       string
@@ -92,7 +91,7 @@ func (s *ClientStore) create(q db.QueryContext, client types.Client) error {
 }
 
 // GetByID finds a client by ID and retrieves it.
-func (s *ClientStore) GetByID(clientID string, factory store.ClientFactory) (types.Client, error) {
+func (s *ClientStore) GetByID(clientID string, factory store.ClientFactory) (store.Client, error) {
 	result := factory()
 	err := s.transact(func(tx *db.Tx) error {
 		err := s.getByID(tx, clientID, result)
@@ -110,7 +109,7 @@ func (s *ClientStore) GetByID(clientID string, factory store.ClientFactory) (typ
 	return result, nil
 }
 
-func (s *ClientStore) getByID(q db.QueryContext, clientID string, result types.Client) error {
+func (s *ClientStore) getByID(q db.QueryContext, clientID string, result store.Client) error {
 	var res struct {
 		*ttnpb.Client
 		CreatorID       string
@@ -154,8 +153,8 @@ func (s *ClientStore) getByID(q db.QueryContext, clientID string, result types.C
 }
 
 // ListByUser returns all the clients an user is creator to.
-func (s *ClientStore) ListByUser(userID string, factory store.ClientFactory) ([]types.Client, error) {
-	var result []types.Client
+func (s *ClientStore) ListByUser(userID string, factory store.ClientFactory) ([]store.Client, error) {
+	var result []store.Client
 
 	err := s.transact(func(tx *db.Tx) error {
 		clients, err := s.userClients(tx, userID)
@@ -231,7 +230,7 @@ func (s *ClientStore) userClients(q db.QueryContext, userID string) ([]*ttnpb.Cl
 }
 
 // Update updates the client.
-func (s *ClientStore) Update(client types.Client) error {
+func (s *ClientStore) Update(client store.Client) error {
 	err := s.transact(func(tx *db.Tx) error {
 		err := s.update(tx, client)
 		if err != nil {
@@ -243,7 +242,7 @@ func (s *ClientStore) Update(client types.Client) error {
 	return err
 }
 
-func (s *ClientStore) update(q db.QueryContext, client types.Client) error {
+func (s *ClientStore) update(q db.QueryContext, client store.Client) error {
 	var cli struct {
 		*ttnpb.Client
 		CreatorID       string
@@ -338,11 +337,11 @@ func (s *ClientStore) delete(q db.QueryContext, clientID string) error {
 }
 
 // LoadAttributes loads the extra attributes in cli if it is a store.Attributer.
-func (s *ClientStore) LoadAttributes(clientID string, cli types.Client) error {
+func (s *ClientStore) LoadAttributes(clientID string, cli store.Client) error {
 	return s.loadAttributes(s.queryer(), clientID, cli)
 }
 
-func (s *ClientStore) loadAttributes(q db.QueryContext, clientID string, cli types.Client) error {
+func (s *ClientStore) loadAttributes(q db.QueryContext, clientID string, cli store.Client) error {
 	attr, ok := cli.(store.Attributer)
 	if ok {
 		return s.extraAttributesStore.loadAttributes(q, clientID, attr)
@@ -353,11 +352,11 @@ func (s *ClientStore) loadAttributes(q db.QueryContext, clientID string, cli typ
 
 // StoreAttributes store the extra attributes of cli if it is a store.Attributer
 // and writes the resulting client in result.
-func (s *ClientStore) StoreAttributes(clientID string, cli, result types.Client) error {
+func (s *ClientStore) StoreAttributes(clientID string, cli, result store.Client) error {
 	return s.storeAttributes(s.queryer(), clientID, cli, result)
 }
 
-func (s *ClientStore) storeAttributes(q db.QueryContext, clientID string, cli, result types.Client) error {
+func (s *ClientStore) storeAttributes(q db.QueryContext, clientID string, cli, result store.Client) error {
 	attr, ok := cli.(store.Attributer)
 	if ok {
 		res, ok := result.(store.Attributer)

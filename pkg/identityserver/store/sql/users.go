@@ -6,7 +6,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 )
 
 // UserStore implements store.UserStore.
@@ -25,7 +24,7 @@ func NewUserStore(store storer) *UserStore {
 }
 
 // Create creates an user.
-func (s *UserStore) Create(user types.User) error {
+func (s *UserStore) Create(user store.User) error {
 	err := s.transact(func(tx *db.Tx) error {
 		err := s.create(tx, user)
 		if err != nil {
@@ -37,7 +36,7 @@ func (s *UserStore) Create(user types.User) error {
 	return err
 }
 
-func (s *UserStore) create(q db.QueryContext, user types.User) error {
+func (s *UserStore) create(q db.QueryContext, user store.User) error {
 	u := user.GetUser()
 	_, err := q.NamedExec(
 		`INSERT
@@ -76,7 +75,7 @@ func (s *UserStore) create(q db.QueryContext, user types.User) error {
 }
 
 // GetByID finds the user by ID and returns it.
-func (s *UserStore) GetByID(userID string, factory store.UserFactory) (types.User, error) {
+func (s *UserStore) GetByID(userID string, factory store.UserFactory) (store.User, error) {
 	result := factory()
 
 	err := s.transact(func(tx *db.Tx) error {
@@ -95,7 +94,7 @@ func (s *UserStore) GetByID(userID string, factory store.UserFactory) (types.Use
 	return result, nil
 }
 
-func (s *UserStore) getByID(q db.QueryContext, userID string, result types.User) error {
+func (s *UserStore) getByID(q db.QueryContext, userID string, result store.User) error {
 	err := q.SelectOne(
 		result,
 		`SELECT *
@@ -111,7 +110,7 @@ func (s *UserStore) getByID(q db.QueryContext, userID string, result types.User)
 }
 
 // GetByEmail finds the user by email address and returns it.
-func (s *UserStore) GetByEmail(email string, factory store.UserFactory) (types.User, error) {
+func (s *UserStore) GetByEmail(email string, factory store.UserFactory) (store.User, error) {
 	result := factory()
 
 	err := s.transact(func(tx *db.Tx) error {
@@ -130,7 +129,7 @@ func (s *UserStore) GetByEmail(email string, factory store.UserFactory) (types.U
 	return result, nil
 }
 
-func (s *UserStore) getByEmail(q db.QueryContext, email string, result types.User) error {
+func (s *UserStore) getByEmail(q db.QueryContext, email string, result store.User) error {
 	err := q.SelectOne(
 		result,
 		`SELECT *
@@ -146,7 +145,7 @@ func (s *UserStore) getByEmail(q db.QueryContext, email string, result types.Use
 }
 
 // Update updates an user.
-func (s *UserStore) Update(user types.User) error {
+func (s *UserStore) Update(user store.User) error {
 	err := s.transact(func(tx *db.Tx) error {
 		err := s.update(tx, user)
 		if err != nil {
@@ -158,7 +157,7 @@ func (s *UserStore) Update(user types.User) error {
 	return err
 }
 
-func (s *UserStore) update(q db.QueryContext, user types.User) error {
+func (s *UserStore) update(q db.QueryContext, user store.User) error {
 	u := user.GetUser()
 
 	_, err := q.NamedExec(
@@ -305,11 +304,11 @@ func (s *UserStore) deleteValidationTokens(q db.QueryContext, userID string) err
 }
 
 // SaveValidationToken saves the validation token.
-func (s *UserStore) SaveValidationToken(userID string, token *types.ValidationToken) error {
+func (s *UserStore) SaveValidationToken(userID string, token *store.ValidationToken) error {
 	return s.saveValidationToken(s.queryer(), userID, token)
 }
 
-func (s *UserStore) saveValidationToken(q db.QueryContext, userID string, token *types.ValidationToken) error {
+func (s *UserStore) saveValidationToken(q db.QueryContext, userID string, token *store.ValidationToken) error {
 	_, err := q.Exec(
 		`INSERT
 			INTO validation_tokens (
@@ -332,13 +331,13 @@ func (s *UserStore) saveValidationToken(q db.QueryContext, userID string, token 
 }
 
 // GetValidationToken retrieves the validation token.
-func (s *UserStore) GetValidationToken(token string) (string, *types.ValidationToken, error) {
+func (s *UserStore) GetValidationToken(token string) (string, *store.ValidationToken, error) {
 	return s.getValidationToken(s.queryer(), token)
 }
 
-func (s *UserStore) getValidationToken(q db.QueryContext, token string) (string, *types.ValidationToken, error) {
+func (s *UserStore) getValidationToken(q db.QueryContext, token string) (string, *store.ValidationToken, error) {
 	var t struct {
-		*types.ValidationToken
+		*store.ValidationToken
 		UserID string
 	}
 	err := q.SelectOne(
@@ -381,11 +380,11 @@ func (s *UserStore) deleteValidationToken(q db.QueryContext, token string) error
 }
 
 // LoadAttributes loads the extra attributes in user if it is a store.Attributer.
-func (s *UserStore) LoadAttributes(userID string, user types.User) error {
+func (s *UserStore) LoadAttributes(userID string, user store.User) error {
 	return s.loadAttributes(s.queryer(), userID, user)
 }
 
-func (s *UserStore) loadAttributes(q db.QueryContext, userID string, user types.User) error {
+func (s *UserStore) loadAttributes(q db.QueryContext, userID string, user store.User) error {
 	attr, ok := user.(store.Attributer)
 	if ok {
 		return s.extraAttributesStore.loadAttributes(q, userID, attr)
@@ -396,11 +395,11 @@ func (s *UserStore) loadAttributes(q db.QueryContext, userID string, user types.
 
 // StoreAttributes store the extra attributes of user if it is a store.Attributer
 // and writes the resulting user in result.
-func (s *UserStore) StoreAttributes(userID string, user, result types.User) error {
+func (s *UserStore) StoreAttributes(userID string, user, result store.User) error {
 	return s.storeAttributes(s.queryer(), userID, user, result)
 }
 
-func (s *UserStore) storeAttributes(q db.QueryContext, userID string, user, result types.User) error {
+func (s *UserStore) storeAttributes(q db.QueryContext, userID string, user, result store.User) error {
 	attr, ok := user.(store.Attributer)
 	if ok {
 		res, ok := result.(store.Attributer)

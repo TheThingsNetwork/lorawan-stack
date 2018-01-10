@@ -9,13 +9,12 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/types"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
-var userFactory = func() types.User {
+var userFactory = func() store.User {
 	return &ttnpb.User{}
 }
 
@@ -128,7 +127,7 @@ func TestUserValidationToken(t *testing.T) {
 	s := testStore(t)
 
 	userID := testUsers()["bob"].UserID
-	token := &types.ValidationToken{
+	token := &store.ValidationToken{
 		ValidationToken: "foo-token",
 		CreatedAt:       time.Now(),
 		ExpiresIn:       3600,
@@ -153,7 +152,7 @@ func TestUserValidationToken(t *testing.T) {
 	err = s.Users.SaveValidationToken(userID, token)
 	a.So(err, should.BeNil)
 
-	newToken := &types.ValidationToken{
+	newToken := &store.ValidationToken{
 		ValidationToken: "bar-token",
 		CreatedAt:       time.Now(),
 		ExpiresIn:       3600,
