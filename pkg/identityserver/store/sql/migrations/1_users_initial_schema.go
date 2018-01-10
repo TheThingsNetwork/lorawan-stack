@@ -6,7 +6,7 @@ func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS users (
 			user_id        STRING(36) PRIMARY KEY,
-			name           STRING NOT NULL,
+			display_name   STRING NOT NULL,
 			email          TEXT NOT NULL UNIQUE,
 			password       TEXT NOT NULL,
 			validated_at   TIMESTAMP,

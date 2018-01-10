@@ -24,8 +24,8 @@ message User {
   // password is the user's password.
   string password = 3;
 
-  // name is the user's full name.
-  string name = 4;
+  // display_name is the user's full name.
+  string display_name = 4;
 
   // validated_at denotes the time the email was validated at.
   // This is a read-only field.

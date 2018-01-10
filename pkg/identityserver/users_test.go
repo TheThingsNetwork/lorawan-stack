@@ -34,7 +34,7 @@ func TestUser(t *testing.T) {
 		UserIdentifier: ttnpb.UserIdentifier{"daniel"},
 		Password:       "12345",
 		Email:          "foo@bar.com",
-		Name:           "hi",
+		DisplayName:    "hi",
 	}
 
 	// can't create an account using a not allowed email
@@ -94,7 +94,7 @@ func TestUser(t *testing.T) {
 	found, err = is.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	a.So(found.UserIdentifier.UserID, should.Equal, user.UserID)
-	a.So(found.Name, should.Equal, user.Name)
+	a.So(found.DisplayName, should.Equal, user.DisplayName)
 	a.So(found.Password, should.HaveLength, 0)
 	a.So(found.Email, should.Equal, user.Email)
 	a.So(found.ValidatedAt.IsZero(), should.BeTrue)

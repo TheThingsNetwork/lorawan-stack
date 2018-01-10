@@ -72,7 +72,7 @@ func (req *UpdateUserRequest) Validate() error {
 	var err validate.Errors
 	for _, path := range paths {
 		switch true {
-		case FieldPathUserName.MatchString(path):
+		case FieldPathUserDisplayName.MatchString(path):
 		case FieldPathUserEmail.MatchString(path):
 			err = validate.Field(req.User.Email, validate.Email).DescribeFieldName("Email")
 		default:

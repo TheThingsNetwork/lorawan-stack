@@ -57,7 +57,7 @@ func TestUserValidations(t *testing.T) {
 		req = &CreateUserRequest{
 			User: User{
 				UserIdentifier: UserIdentifier{"alice"},
-				Name:           "Ali Ce",
+				DisplayName:    "Ali Ce",
 				Password:       "12345678abC",
 				Email:          "alice@alice.",
 			},
@@ -68,7 +68,7 @@ func TestUserValidations(t *testing.T) {
 		req = &CreateUserRequest{
 			User: User{
 				UserIdentifier: UserIdentifier{"alice"},
-				Name:           "Ali Ce",
+				DisplayName:    "Ali Ce",
 				Password:       "12345678abC",
 				Email:          "alice@alice.com",
 			},
@@ -86,7 +86,7 @@ func TestUserValidations(t *testing.T) {
 		// request with an invalid path in the update mask (bad)
 		req = &UpdateUserRequest{
 			UpdateMask: pbtypes.FieldMask{
-				Paths: []string{"name", "foo"},
+				Paths: []string{"display_name", "foo"},
 			},
 		}
 		err = req.Validate()
@@ -100,7 +100,7 @@ func TestUserValidations(t *testing.T) {
 				Email:          "alice@ttn.com",
 			},
 			UpdateMask: pbtypes.FieldMask{
-				Paths: []string{"name", "email"},
+				Paths: []string{"display_name", "email"},
 			},
 		}
 		a.So(req.Validate(), should.BeNil)
