@@ -71,13 +71,14 @@ func ShouldBeGatewayIgnoringAutoFields(actual interface{}, expected ...interface
 		assertions.ShouldEqual(a.GatewayID, b.GatewayID),
 		assertions.ShouldEqual(a.Description, b.Description),
 		assertions.ShouldEqual(a.FrequencyPlanID, b.FrequencyPlanID),
+		assertions.ShouldEqual(a.ClusterAddress, b.ClusterAddress),
+		assertions.ShouldResemble(a.Antennas, b.Antennas),
+		assertions.ShouldResemble(a.Radios, b.Radios),
 		assertions.ShouldBeTrue(a.ActivatedAt.Equal(b.ActivatedAt)),
 		assertions.ShouldResemble(a.PrivacySettings, b.PrivacySettings),
 		assertions.ShouldEqual(a.AutoUpdate, b.AutoUpdate),
 		assertions.ShouldResemble(a.Platform, b.Platform),
-		assertions.ShouldResemble(a.Antennas, b.Antennas),
 		assertions.ShouldResemble(a.Attributes, b.Attributes),
-		assertions.ShouldResemble(a.ClusterAddress, b.ClusterAddress),
 	)
 }
 

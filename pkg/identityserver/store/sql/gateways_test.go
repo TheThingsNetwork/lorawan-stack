@@ -21,11 +21,11 @@ func testGateways() map[string]*ttnpb.Gateway {
 		"test-gateway": {
 			GatewayIdentifier: ttnpb.GatewayIdentifier{"test-gateway"},
 			Description:       "My description",
-			FrequencyPlanID:   "868_3",
 			Platform:          "Kerklink",
 			Attributes: map[string]string{
 				"foo": "bar",
 			},
+			FrequencyPlanID: "868_3",
 			Antennas: []ttnpb.GatewayAntenna{
 				{
 					Location: ttnpb.Location{
@@ -39,15 +39,21 @@ func testGateways() map[string]*ttnpb.Gateway {
 		"bob-gateway": {
 			GatewayIdentifier: ttnpb.GatewayIdentifier{"bob-gateway"},
 			Description:       "My description",
-			FrequencyPlanID:   "868_3",
-			ClusterAddress:    "network.eu",
 			Attributes: map[string]string{
 				"Modulation": "12345",
 				"RFCH":       "111",
 			},
+			FrequencyPlanID: "868_3",
+			ClusterAddress:  "network.eu",
 			Antennas: []ttnpb.GatewayAntenna{
 				{
-					Gain: 12.22},
+					Gain: 12.12,
+				},
+			},
+			Radios: []ttnpb.GatewayRadio{
+				{
+					Frequency: 10,
+				},
 			},
 		},
 	}
@@ -139,6 +145,46 @@ func TestGatewayAntennas(t *testing.T) {
 	// delete previously added antenna
 	{
 		gtw.Antennas = gtw.Antennas[:1]
+
+		err := s.Gateways.Update(gtw)
+		a.So(err, should.BeNil)
+
+		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewayFactory)
+		a.So(err, should.BeNil)
+		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
+	}
+}
+
+func TestGatewayRadios(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore(t)
+
+	gtw := testGateways()["bob-gateway"]
+
+	// check that all radios were registered
+	{
+		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewayFactory)
+		a.So(err, should.BeNil)
+		if a.So(found.GetGateway().Radios, should.HaveLength, 1) {
+			a.So(found.GetGateway().Radios[0], should.Resemble, gtw.Radios[0])
+			gtw = found.GetGateway()
+		}
+	}
+
+	// add a new radio
+	{
+		gtw.Radios = append(gtw.Radios, ttnpb.GatewayRadio{Frequency: 10})
+		err := s.Gateways.Update(gtw)
+		a.So(err, should.BeNil)
+
+		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewayFactory)
+		a.So(err, should.BeNil)
+		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
+	}
+
+	// delete previously added radio
+	{
+		gtw.Radios = gtw.Radios[:1]
 
 		err := s.Gateways.Update(gtw)
 		a.So(err, should.BeNil)

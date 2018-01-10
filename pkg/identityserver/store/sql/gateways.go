@@ -47,6 +47,12 @@ func (s *GatewayStore) Create(gateway types.Gateway) error {
 			return err
 		}
 
+		// store radios
+		err = s.addRadios(tx, gtw.GatewayID, gtw.Radios)
+		if err != nil {
+			return err
+		}
+
 		return s.storeAttributes(tx, gtw.GatewayID, gateway, nil)
 	})
 	return err
@@ -54,7 +60,7 @@ func (s *GatewayStore) Create(gateway types.Gateway) error {
 
 func (s *GatewayStore) create(q db.QueryContext, gateway types.Gateway) error {
 	gtw := gateway.GetGateway()
-	_, err := q.NamedExec(
+	_, err := q.Exec(
 		`INSERT
 			INTO gateways (
 					gateway_id,
@@ -66,15 +72,22 @@ func (s *GatewayStore) create(q db.QueryContext, gateway types.Gateway) error {
 					platform,
 					cluster_address)
 			VALUES (
-					:gateway_id,
-					:description,
-					:frequency_plan_id,
-					:activated_at,
-					:privacy_settings,
-					:auto_update,
-					:platform,
-					:cluster_address)`,
-		gtw)
+					$1,
+					$2,
+					$3,
+					$4,
+					$5,
+					$6,
+					$7,
+					$8)`,
+		gtw.GatewayID,
+		gtw.Description,
+		gtw.FrequencyPlanID,
+		gtw.ActivatedAt,
+		gtw.PrivacySettings,
+		gtw.AutoUpdate,
+		gtw.Platform,
+		gtw.ClusterAddress)
 
 	if _, yes := db.IsDuplicate(err); yes {
 		return ErrGatewayIDTaken.New(errors.Attributes{
@@ -133,6 +146,43 @@ func (s *GatewayStore) addAntennasQuery(gtwID string, antennas []ttnpb.GatewayAn
 	return query, args
 }
 
+func (s *GatewayStore) addRadios(q db.QueryContext, gtwID string, radios []ttnpb.GatewayRadio) error {
+	if len(radios) == 0 {
+		return nil
+	}
+	query, args := s.addRadiosQuery(gtwID, radios)
+	_, err := q.Exec(query, args...)
+	return err
+}
+
+func (s *GatewayStore) addRadiosQuery(gtwID string, radios []ttnpb.GatewayRadio) (string, []interface{}) {
+	args := make([]interface{}, 1+2*len(radios))
+	args[0] = gtwID
+
+	boundValues := make([]string, len(radios))
+
+	i := 0
+	for j, radio := range radios {
+		args[i+1] = radio.Frequency
+		args[i+2] = radio.TxConfiguration
+
+		boundValues[j] = fmt.Sprintf("($1, $%d, $%d)", i+2, i+3)
+
+		i += 2
+	}
+
+	query := fmt.Sprintf(
+		`INSERT
+			INTO gateways_radios (
+					gateway_id,
+					frequency,
+					tx_configuration)
+			VALUES %s`,
+		strings.Join(boundValues, ", "))
+
+	return query, args
+}
+
 // GetByID finds a gateway by ID and retrieves it.
 func (s *GatewayStore) GetByID(gtwID string, factory store.GatewayFactory) (types.Gateway, error) {
 	result := factory()
@@ -154,6 +204,12 @@ func (s *GatewayStore) GetByID(gtwID string, factory store.GatewayFactory) (type
 			return err
 		}
 		result.SetAntennas(antennas)
+
+		radios, err := s.listRadios(tx, gtwID)
+		if err != nil {
+			return err
+		}
+		result.SetRadios(radios)
 
 		return s.loadAttributes(tx, gtwID, result)
 	})
@@ -209,6 +265,12 @@ func (s *GatewayStore) ListByUser(userID string, factory store.GatewayFactory) (
 				return err
 			}
 			gtw.SetAntennas(antennas)
+
+			radios, err := s.listRadios(tx, gtwID)
+			if err != nil {
+				return err
+			}
+			gtw.SetRadios(radios)
 
 			err = s.loadAttributes(tx, gtwID, gtw)
 			if err != nil {
@@ -273,6 +335,11 @@ func (s *GatewayStore) Update(gateway types.Gateway) error {
 			return err
 		}
 
+		err = s.updateRadios(tx, gtw.GatewayID, gtw.Radios)
+		if err != nil {
+			return err
+		}
+
 		return s.storeAttributes(tx, gtw.GatewayID, gateway, nil)
 	})
 	return err
@@ -313,6 +380,15 @@ func (s *GatewayStore) updateAntennas(q db.QueryContext, gtwID string, antennas 
 	}
 
 	return s.addAntennas(q, gtwID, antennas)
+}
+
+func (s *GatewayStore) updateRadios(q db.QueryContext, gtwID string, radios []ttnpb.GatewayRadio) error {
+	_, err := q.Exec("DELETE FROM gateways_radios WHERE gateway_id = $1", gtwID)
+	if err != nil {
+		return err
+	}
+
+	return s.addRadios(q, gtwID, radios)
 }
 
 // updateAttributes removes the attributes that no longer exists for the gateway
@@ -445,6 +521,21 @@ func (s *GatewayStore) listAntennas(q db.QueryContext, gtwID string) ([]ttnpb.Ga
 	}
 
 	return result, nil
+}
+
+func (s *GatewayStore) listRadios(q db.QueryContext, gtwID string) ([]ttnpb.GatewayRadio, error) {
+	var radios []ttnpb.GatewayRadio
+	err := q.Select(
+		&radios,
+		`SELECT frequency, tx_configuration
+			FROM gateways_radios
+			WHERE gateway_id = $1
+			ORDER BY created_at ASC`,
+		gtwID)
+	if !db.IsNoRows(err) && err != nil {
+		return nil, err
+	}
+	return radios, nil
 }
 
 // SetCollaborator inserts or modifies a collaborator within an entity.

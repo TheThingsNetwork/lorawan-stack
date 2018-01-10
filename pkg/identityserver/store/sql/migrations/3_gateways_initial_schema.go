@@ -34,6 +34,13 @@ func init() {
 			altitude     INT,
 			created_at   TIMESTAMP DEFAULT current_timestamp()
 		);
+		CREATE TABLE IF NOT EXISTS gateways_radios (
+			radio_id           UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+			gateway_id         STRING(36) REFERENCES gateways(gateway_id) NOT NULL,
+			frequency          INT,
+			tx_configuration   STRING,
+			created_at         TIMESTAMP DEFAULT current_timestamp()
+		);
 		CREATE TABLE IF NOT EXISTS gateways_collaborators (
 			gateway_id   STRING(36) REFERENCES gateways(gateway_id),
 			user_id      STRING(36) REFERENCES users(user_id),
@@ -45,6 +52,7 @@ func init() {
 	const backwards = `
 		DROP TABLE IF EXISTS gateways_attributes;
 		DROP TABLE IF EXISTS gateways_antennas;
+		DROP TABLE IF EXISTS gateways_radios;
 		DROP TABLE IF EXISTS gateways_collaborators;
 		DROP TABLE IF EXISTS gateways;
 	`

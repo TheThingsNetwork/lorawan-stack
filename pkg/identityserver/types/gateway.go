@@ -14,4 +14,7 @@ type Gateway interface {
 
 	// SetAntennas sets the antennas.
 	SetAntennas(antennas []ttnpb.GatewayAntenna)
+
+	// SetRadios sets the radios.
+	SetRadios(radios []ttnpb.GatewayRadio)
 }
