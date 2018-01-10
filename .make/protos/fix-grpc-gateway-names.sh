@@ -17,12 +17,13 @@ genPaths=()
 IFS_BAK=${IFS}
 IFS="
 "
+
 for f in ${protos[@]}; do
   if grep -q '(google.api.http)' "${f}"; then
     path=${f%".proto"}".pb.gw.go"
     if grep -q 'option go_package' "${f}"; then
       goPackage=`grep 'option go_package' "${f}" | perl \
-        -pe 's![[:space:]]*option[[:space:]]+go_package[[:space:]]*=[[:space:]]*"([[:alnum:]./]+)".*!\1!'`
+        -pe 's![[:space:]]*option[[:space:]]+go_package[[:space:]]*=[[:space:]]*"([[:alnum:]_./]+)".*!\1!'`
       newPath=${GOPATH:-"${HOME}/go"}"/src/""${goPackage}"/`basename "${path}"`
       mv ${path} ${newPath}
       path=${newPath}
