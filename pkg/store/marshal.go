@@ -140,7 +140,7 @@ func marshal(s interface{}) map[string]interface{} {
 	switch t.Kind() {
 	case reflect.Map:
 		if t.Key().Kind() != reflect.String {
-			panic(errors.Errorf("github.com/TheThingsNetwork/ttn/pkg/store.marshal: expected the map key kind to be string, got %s", t.Elem().Kind()))
+			panic(errors.Errorf("Expected the map key kind to be string, got %s", t.Elem().Kind()))
 		}
 		for _, k := range v.MapKeys() {
 			// https://stackoverflow.com/questions/14142667/reflect-value-mapindex-returns-a-value-different-from-reflect-valueof
@@ -160,7 +160,7 @@ func marshal(s interface{}) map[string]interface{} {
 			vals[f.Name] = fv
 		}
 	default:
-		panic(errors.Errorf("github.com/TheThingsNetwork/ttn/pkg/store.marshal: expected argument to be a struct or map with string keys, got %s", t.Kind()))
+		panic(errors.Errorf("Expected argument to be a struct or map with string keys, got %s", t.Kind()))
 	}
 
 	out := make(map[string]interface{}, len(vals))

@@ -86,7 +86,7 @@ func UnmarshalMap(m map[string]interface{}, v interface{}) error {
 			Result:           v,
 		})
 		if err != nil {
-			panic(errors.NewWithCause("github.com/TheThingsNetwork/ttn/pkg/store.UnmarshalMap: Failed to intialize decoder", err))
+			panic(errors.NewWithCause("Failed to intialize decoder", err))
 		}
 		return dec.Decode(slicify(m))
 	}
@@ -94,7 +94,7 @@ func UnmarshalMap(m map[string]interface{}, v interface{}) error {
 
 func typeByFlatName(typ reflect.Type, name string) (reflect.Type, bool) {
 	if name == "" {
-		panic(errors.New("github.com/TheThingsNetwork/ttn/pkg/store.typeByFlatName: empty name specified"))
+		panic(errors.New("Empty name specified"))
 	}
 	for _, name := range strings.Split(name, Separator) {
 		if typ.Kind() == reflect.Ptr {
