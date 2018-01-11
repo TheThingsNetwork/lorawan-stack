@@ -38,7 +38,6 @@
 [[constraint]]
   branch = "master"
   name = "github.com/mitchellh/mapstructure"
-  source = "https://github.com/rvolosatovs/mapstructure.git"
 
 [[constraint]]
   branch = "master"
