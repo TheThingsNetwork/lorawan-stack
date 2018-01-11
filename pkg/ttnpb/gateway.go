@@ -31,6 +31,11 @@ func (g *Gateway) SetRadios(radios []GatewayRadio) {
 	g.Radios = radios
 }
 
+// SetAntennas sets the API key.
+func (g *Gateway) SetAPIKey(key *APIKey) {
+	g.APIKey = *key
+}
+
 var (
 	// FieldPathGatewayDescription is the field path for the gateway description field.
 	FieldPathGatewayDescription = regexp.MustCompile(`^description$`)

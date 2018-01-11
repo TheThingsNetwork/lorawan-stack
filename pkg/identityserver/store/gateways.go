@@ -14,6 +14,12 @@ type Gateway interface {
 
 	// SetAntennas sets the antennas.
 	SetAntennas(antennas []ttnpb.GatewayAntenna)
+
+	// SetRadios sets the radios.
+	SetRadios(radios []ttnpb.GatewayRadio)
+
+	// SetAPIKey sets the API key.
+	SetAPIKey(key *ttnpb.APIKey)
 }
 
 // GatewayFactory is a function that returns a Gateway used to construct the
@@ -40,6 +46,10 @@ type GatewayStore interface {
 
 	// SaveAPIKey stores an API Key attached to a gateway.
 	SaveAPIKey(gtwID string, key *ttnpb.APIKey) error
+
+	// SetLockedAPIKey sets an existing api key from a gateway as locked.
+	// Therefore it can't be removed.
+	SetLockedAPIKey(gtwID, key string) error
 
 	// GetAPIKey retrieves an API key by value and the gateway ID.
 	GetAPIKey(key string) (string, *ttnpb.APIKey, error)

@@ -66,10 +66,18 @@ func TestGateway(t *testing.T) {
 	a.So(err, should.BeNil)
 	if a.So(keys.APIKeys, should.HaveLength, 1) {
 		k := keys.APIKeys[0]
-		a.So(k.Name, should.Equal, APIKeyName)
+		a.So(k.Name, should.NotBeEmpty)
 		a.So(k.Key, should.NotBeEmpty)
 		a.So(k.Rights, should.HaveLength, 1)
 		a.So(k.Rights, should.Contain, ttnpb.RIGHT_GATEWAY_INFO)
+
+		// also the key can't be deleted if it is not rotated
+		_, err := is.RemoveGatewayAPIKey(ctx, &ttnpb.RemoveGatewayAPIKeyRequest{
+			GatewayIdentifier: gtw.GatewayIdentifier,
+			Name:              k.Name,
+		})
+		a.So(err, should.NotBeNil)
+		a.So(ErrRemoveGatewayAPIKeyFailed.Describes(err), should.BeTrue)
 	}
 
 	// can't create gateways with blacklisted ids

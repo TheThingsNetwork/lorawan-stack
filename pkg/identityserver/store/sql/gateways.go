@@ -213,6 +213,12 @@ func (s *GatewayStore) GetByID(gtwID string, factory store.GatewayFactory) (stor
 		}
 		result.SetRadios(radios)
 
+		key, err := s.getLockedAPIKey(tx, gtwID)
+		if err != nil {
+			return err
+		}
+		result.SetAPIKey(key)
+
 		return s.loadAttributes(tx, gtwID, result)
 	})
 
@@ -273,6 +279,12 @@ func (s *GatewayStore) ListByUser(userID string, factory store.GatewayFactory) (
 				return err
 			}
 			gtw.SetRadios(radios)
+
+			key, err := s.getLockedAPIKey(tx, gtwID)
+			if err != nil {
+				return err
+			}
+			gtw.SetAPIKey(key)
 
 			err = s.loadAttributes(tx, gtwID, gtw)
 			if err != nil {
@@ -340,6 +352,13 @@ func (s *GatewayStore) Update(gateway store.Gateway) error {
 		err = s.updateRadios(tx, gtw.GatewayID, gtw.Radios)
 		if err != nil {
 			return err
+		}
+
+		if len(gtw.APIKey.Key) != 0 {
+			err = s.setLockedAPIKey(tx, gtw.GatewayID, gtw.APIKey.Key)
+			if err != nil {
+				return err
+			}
 		}
 
 		return s.storeAttributes(tx, gtw.GatewayID, gateway, nil)
@@ -548,6 +567,11 @@ func (s *GatewayStore) Delete(gtwID string) error {
 			return err
 		}
 
+		err = s.deleteLockedAPIKey(tx, gtwID)
+		if err != nil {
+			return err
+		}
+
 		err = s.deleteAPIKeys(tx, gtwID)
 		if err != nil {
 			return err
@@ -607,6 +631,56 @@ func (s *GatewayStore) deleteCollaborators(q db.QueryContext, gtwID string) erro
 			FROM gateways_collaborators
 			WHERE gateway_id = $1`,
 		gtwID)
+	return err
+}
+
+// SetLockedAPIKey sets an existing api key from a gateway as locked.
+// Therefore it can't be removed.
+func (s *GatewayStore) SetLockedAPIKey(gtwID, keyName string) error {
+	return s.setLockedAPIKey(s.queryer(), gtwID, keyName)
+}
+
+func (s *GatewayStore) setLockedAPIKey(q db.QueryContext, gtwID, key string) error {
+	_, err := q.Exec(
+		`UPSERT
+			INTO gateways_locked_api_keys (gateway_id, key)
+			VALUES ($1, $2)`,
+		gtwID,
+		key)
+	return err
+}
+
+func (s *GatewayStore) getLockedAPIKey(q db.QueryContext, gtwID string) (*ttnpb.APIKey, error) {
+	var k string
+	err := q.SelectOne(
+		&k,
+		`SELECT
+				key
+			FROM gateways_locked_api_keys
+			WHERE gateway_id = $1`,
+		gtwID)
+	if db.IsNoRows(err) {
+		return new(ttnpb.APIKey), nil
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	_, key, err := s.getAPIKey(q, k)
+	if err != nil {
+		return nil, err
+	}
+
+	key.Rights, err = s.getAPIKeyRights(q, gtwID, key.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	return key, nil
+}
+
+func (s *GatewayStore) deleteLockedAPIKey(q db.QueryContext, gtwID string) error {
+	_, err := q.Exec("DELETE FROM gateways_locked_api_keys WHERE gateway_id = $1", gtwID)
 	return err
 }
 
@@ -703,9 +777,9 @@ func (s *GatewayStore) hasUserRights(q db.QueryContext, gtwID, userID string, ri
 		clauses = append(clauses, fmt.Sprintf(`"right" = $%d`, i+2))
 	}
 
-	res := new(string)
+	id := ""
 	err := q.SelectOne(
-		res,
+		&id,
 		fmt.Sprintf(
 			`SELECT
 				DISTINCT user_id

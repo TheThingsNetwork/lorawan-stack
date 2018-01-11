@@ -111,7 +111,7 @@ func (s *apiKeysStore) getAPIKey(q db.QueryContext, key string) (string, *ttnpb.
 		*ttnpb.APIKey
 	}
 	err := q.SelectOne(
-		res,
+		&res,
 		fmt.Sprintf(`
 			SELECT
 				key,

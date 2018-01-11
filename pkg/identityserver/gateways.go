@@ -13,8 +13,6 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
-const APIKeyName = "Default API Key"
-
 // CreateGateway creates a gateway in the network, sets the user as collaborator
 // with all rights and creates an API key
 func (is *IdentityServer) CreateGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (*pbtypes.Empty, error) {
@@ -58,12 +56,17 @@ func (is *IdentityServer) CreateGateway(ctx context.Context, req *ttnpb.CreateGa
 		}
 
 		key := &ttnpb.APIKey{
-			Name:   APIKeyName,
+			Name:   "Auto-generated API key",
 			Key:    k,
 			Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO},
 		}
 
 		err = s.Gateways.SaveAPIKey(req.Gateway.GatewayID, key)
+		if err != nil {
+			return err
+		}
+
+		err = s.Gateways.SetLockedAPIKey(req.Gateway.GatewayID, key.Key)
 		if err != nil {
 			return err
 		}
@@ -162,6 +165,12 @@ func (is *IdentityServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGa
 			gtw.ClusterAddress = req.Gateway.ClusterAddress
 		case ttnpb.FieldPathGatewayContactAccountUserID.MatchString(path):
 			gtw.ContactAccount.UserID = req.Gateway.ContactAccount.UserID
+		case ttnpb.FieldPathGatewayAPIKey.MatchString(path):
+			_, key, err := is.store.Gateways.GetAPIKey(req.Gateway.APIKey.Key)
+			if err != nil {
+				return nil, err
+			}
+			gtw.APIKey = *key
 		default:
 			return nil, ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
 				"path": path,
@@ -240,6 +249,18 @@ func (is *IdentityServer) RemoveGatewayAPIKey(ctx context.Context, req *ttnpb.Re
 	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
+	}
+
+	found, err := is.store.Gateways.GetByID(req.GatewayID, is.factories.gateway)
+	if err != nil {
+		return nil, err
+	}
+
+	if found.GetGateway().APIKey.Name == req.Name {
+		return nil, ErrRemoveGatewayAPIKeyFailed.New(errors.Attributes{
+			"gateway_id": req.GatewayID,
+			"key_name":   req.Name,
+		})
 	}
 
 	return nil, is.store.Gateways.DeleteAPIKey(req.GatewayID, req.Name)
