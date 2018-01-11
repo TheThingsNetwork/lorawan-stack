@@ -33,38 +33,40 @@ type IdentityServer struct {
 // Config defines the needed parameters to start the Identity Server.
 type Config struct {
 	// DSN is the Data Source Name used by the store to connect to the database.
-	DSN string
+	DSN string `name:"dsn" description:"Data Source Name to connect to the database"`
 
 	// Hostname denotes the Identity Server hostname. It is used as issuer when
 	// generating access tokens and API keys.
-	Hostname string
+	Hostname string `name:"hostname" description:"Hostname where this server is running. Used as issuer when generating access tokens and API keys"`
 
 	// RecreateDatabase denotes if the database is recreated when the store is initialized.
 	// WARNING: it will erase all the previous data
-	RecreateDatabase bool
+	RecreateDatabase bool `name:"recreate-database" description:"Recreates the database when the server is initialized. WARNING: it deletes all previous data"`
 
 	// DisplayName is the display name of the organization that runs the network.
 	// e.g. The Things Network
-	DisplayName string
+	DisplayName string `name:"display-name" description:"The display name of the organization who is in behalf of this server"`
 
-	// HomeURL is the home url of the organization that runs the network.
-	// e.g. https://www.thethingsnetwork.org
-	HomeURL string
+	// PublicURL is the public url this server will use to serve content such as
+	// email content. e.g. https://www.thethingsnetwork.org
+	PublicURL string `name:"public-url" description:"Public URL this server uses to serve content such as email content"`
 
-	// defaultSettings are the default settings loaded in the store when it first-time initialized.
+	// defaultSettings are the default settings within the tenant loaded in the store
+	// when it first-time initialized.
 	defaultSettings *ttnpb.IdentityServerSettings
 }
 
+// Option is the type for options of the Identity Server.
 type Option func(*IdentityServer)
 
-// WithEmailProvider allows to replace the default (mock) email provider.
+// WithEmailProvider replaces the default (mock) email provider.
 func WithEmailProvider(provider email.Provider) Option {
 	return func(is *IdentityServer) {
 		is.email = provider
 	}
 }
 
-// WithUserFactory allows to replace the default user ttnpb.User factory.
+// WithUserFactory replaces the default user ttnpb.User factory.
 func WithUserFactory(factory store.UserFactory) Option {
 	return func(is *IdentityServer) {
 		is.factories.user = factory
@@ -75,7 +77,7 @@ var defaultUserFactory = func() store.User {
 	return &ttnpb.User{}
 }
 
-// WithApplicationFactory allows to replace the default application ttnpb.Application factory.
+// WithApplicationFactory replaces the default application ttnpb.Application factory.
 func WithApplicationFactory(factory store.ApplicationFactory) Option {
 	return func(is *IdentityServer) {
 		is.factories.application = factory
@@ -86,7 +88,7 @@ var defaultApplicationFactory = func() store.Application {
 	return &ttnpb.Application{}
 }
 
-// WithGatewayFactory allows to replace the default gateway ttnpb.Gateway factory.
+// WithGatewayFactory replaces the default gateway ttnpb.Gateway factory.
 func WithGatewayFactory(factory store.GatewayFactory) Option {
 	return func(is *IdentityServer) {
 		is.factories.gateway = factory
@@ -97,7 +99,7 @@ var defaultGatewayFactory = func() store.Gateway {
 	return &ttnpb.Gateway{}
 }
 
-// WithClientFactory allows to replace the default client ttnpb.Client factory.
+// WithClientFactory replaces the default client ttnpb.Client factory.
 func WithClientFactory(factory store.ClientFactory) Option {
 	return func(is *IdentityServer) {
 		is.factories.client = factory
@@ -108,8 +110,8 @@ var defaultClientFactory = func() store.Client {
 	return &ttnpb.Client{}
 }
 
-// WithDefaultSettings allows to replace the default settings that are loaded
-// when the store is first-time initialized.
+// WithDefaultSettings replaces the default settings that are loaded when the
+// store is first-time initialized.
 func WithDefaultSettings(settings *ttnpb.IdentityServerSettings) Option {
 	return func(is *IdentityServer) {
 		is.config.defaultSettings = settings

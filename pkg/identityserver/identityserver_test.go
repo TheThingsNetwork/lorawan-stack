@@ -18,13 +18,17 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-const (
-	address  = "postgres://root@localhost:26257/%s?sslmode=disable"
-	database = "is_development_tests"
+var (
+	testConfig = &Config{
+		Hostname:         "development.identityserver.ttn",
+		DSN:              "postgres://root@localhost:26257/is_development_tests?sslmode=disable",
+		RecreateDatabase: true,
+		DisplayName:      "The Things Network",
+		PublicURL:        "https://www.thethingsnetwork.org",
+	}
+	testIS      *IdentityServer
+	accessToken string
 )
-
-var testIS *IdentityServer
-var accessToken string
 
 func init() {
 	token, err := auth.GenerateAccessToken("")
@@ -39,7 +43,7 @@ func getIS(t testing.TB) *IdentityServer {
 		logger := test.GetLogger(t)
 		comp := component.New(logger, &component.Config{ServiceBase: shared.DefaultServiceBase})
 
-		is, err := New(comp, testConfig(), WithDefaultSettings(testSettings()))
+		is, err := New(comp, testConfig, WithDefaultSettings(testSettings()))
 		if err != nil {
 			logger.WithError(err).Fatal("Failed to create an Identity Server instance")
 		}
@@ -73,17 +77,10 @@ func getIS(t testing.TB) *IdentityServer {
 }
 
 func testCtx() context.Context {
-	return metadata.NewIncomingContext(context.Background(), metadata.Pairs("authorization", fmt.Sprintf("Bearer %s", testAccessData().AccessToken)))
-}
-
-func testConfig() *Config {
-	return &Config{
-		Hostname:         "development.identityserver.ttn",
-		DSN:              fmt.Sprintf(address, database),
-		RecreateDatabase: true,
-		DisplayName:      "The Things Network",
-		HomeURL:          "https://www.thethingsnetwork.org",
-	}
+	return metadata.NewIncomingContext(
+		context.Background(),
+		metadata.Pairs("authorization", fmt.Sprintf("Bearer %s", testAccessData().AccessToken)),
+	)
 }
 
 func testSettings() *ttnpb.IdentityServerSettings {
