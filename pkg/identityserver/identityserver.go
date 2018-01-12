@@ -4,6 +4,7 @@ package identityserver
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email"
@@ -12,6 +13,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/TheThingsNetwork/ttn/pkg/version"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
 )
@@ -44,7 +46,7 @@ type Config struct {
 
 	// RecreateDatabase denotes if the database is recreated when the store is initialized.
 	// WARNING: it will erase all the previous data
-	RecreateDatabase bool `name:"recreate-database" description:"Recreates the database when the server is initialized. WARNING: it deletes all previous data"`
+	RecreateDatabase bool `name:"recreate-database" description:"Development-only flag. Recreates the database when the server is initialized. WARNING: it deletes all previous data"`
 
 	// OrganizationName is the display name of the organization that runs the network.
 	// e.g. The Things Network
@@ -138,6 +140,11 @@ func New(comp *component.Component, config *Config, opts ...Option) (*IdentitySe
 	store, err := sql.Open(config.DSN)
 	if err != nil {
 		return nil, err
+	}
+
+	// only allow to recreate database on development version
+	if !strings.Contains(version.TTN, "dev") {
+		config.RecreateDatabase = false
 	}
 
 	is := &IdentityServer{
