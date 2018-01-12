@@ -99,6 +99,7 @@ func (id NetID) ID() []byte {
 	}
 }
 
+// IDBits returns the bit-length of ID of id.
 func (id NetID) IDBits() uint {
 	switch id.Type() {
 	case 0, 1:
@@ -111,6 +112,7 @@ func (id NetID) IDBits() uint {
 	panic(fmt.Errorf("Unmatched NetID type: %d", id.Type()))
 }
 
+// NewNetID returns new NetID.
 func NewNetID(typ byte, id []byte) (netID NetID, err error) {
 	if typ > 7 {
 		return NetID{}, fmt.Errorf("NetID must be lower or equal to 7, got: %d", typ)

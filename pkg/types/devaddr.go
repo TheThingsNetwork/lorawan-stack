@@ -124,7 +124,151 @@ func (addr DevAddr) AfterOrEqual(a DevAddr) bool {
 	return addr.After(a) || addr == a
 }
 
-// ErrInvalidDevAddrPrefix can be returned when unmarshaling an invalid slice into a prefix
+// NetIDType returns the NetID type of the DevAddr.
+func (addr DevAddr) NetIDType() byte {
+	for i := uint(7); i >= 0; i-- {
+		if addr[0]&(1<<i) == 0 {
+			return byte(7 - i)
+		}
+	}
+	panic(errors.New("Unmatched NetID type"))
+}
+
+// NwkAddr returns NwkAddr of the DevAddr.
+func (addr DevAddr) NwkAddr() []byte {
+	switch addr.NetIDType() {
+	case 0:
+		return []byte{addr[0] & 0x01, addr[1], addr[2], addr[3]}
+	case 1:
+		return []byte{addr[1], addr[2], addr[3]}
+	case 2:
+		return []byte{addr[1] & 0x0f, addr[2], addr[3]}
+	case 3:
+		return []byte{addr[1] & 0x03, addr[2], addr[3]}
+	case 4:
+		return []byte{addr[2], addr[3]}
+	case 5:
+		return []byte{addr[2] & 0x1f, addr[3]}
+	case 6:
+		return []byte{addr[2] & 0x03, addr[3]}
+	case 7:
+		return []byte{addr[3] & 0x7f}
+	}
+	panic(fmt.Errorf("Unmatched NetID type: %d", addr.NetIDType()))
+}
+
+// NwkID returns NwkID of the DevAddr.
+func (addr DevAddr) NwkID() []byte {
+	switch addr.NetIDType() {
+	case 0:
+		return []byte{(addr[0] & 0x7f) >> 1}
+	case 1:
+		return []byte{addr[0] & 0x3f}
+	case 2:
+		return []byte{(addr[0] & 0x1f) >> 4, (addr[0] << 4) | (addr[1] >> 4)}
+	case 3:
+		return []byte{(addr[0] >> 2) & 0x03, (addr[0] << 6) | (addr[1] >> 2)}
+	case 4:
+		return []byte{addr[0] & 0x08, addr[1]}
+	case 5:
+		return []byte{((addr[0] & 0x03) << 3) | (addr[1] >> 5), (addr[1] << 3) | (addr[2] >> 5)}
+	case 6:
+		return []byte{((addr[0] & 0x01) << 6) | (addr[1] >> 2), (addr[1] << 6) | (addr[2] >> 2)}
+	case 7:
+		return []byte{addr[1] >> 7, (addr[1] << 1) | (addr[2] >> 7), (addr[2] << 1) | (addr[3] >> 7)}
+	}
+	panic(fmt.Errorf("Unmatched NetID type: %d", addr.NetIDType()))
+}
+
+// NwkAddrBits returns the length of NwkAddr field of netID in bits.
+func NwkAddrBits(netID NetID) uint {
+	switch netID.Type() {
+	case 0:
+		return 25
+	case 1:
+		return 24
+	case 2:
+		return 20
+	case 3:
+		return 18
+	case 4:
+		return 16
+	case 5:
+		return 13
+	case 6:
+		return 10
+	case 7:
+		return 7
+	}
+	panic(fmt.Errorf("Unmatched NetID type: %d", netID.Type()))
+}
+
+// NwkAddrBits returns the length of NwkAddr field of netID in bytes.
+func NwkAddrLength(netID NetID) int {
+	return int((NwkAddrBits(netID) + 7) / 8)
+}
+
+// NewDevAddr returns new DevAddr.
+func NewDevAddr(netID NetID, nwkAddr []byte) (addr DevAddr) {
+	if len(nwkAddr) < 4 {
+		nwkAddr = append(make([]byte, 4-len(nwkAddr)), nwkAddr...)
+	}
+	copy(addr[:], nwkAddr)
+
+	nwkID := netID.ID()
+	t := netID.Type()
+	switch t {
+	case 0:
+		addr[0] |= nwkID[0] << 1
+		addr[0] &^= 0x80
+	case 1:
+		addr[0] |= nwkID[0]
+		addr[0] |= 0x80
+		addr[0] &^= 0x40
+	case 2:
+		addr[1] |= nwkID[1] << 4
+		addr[0] |= nwkID[1] >> 4
+		addr[0] |= nwkID[0] << 4
+		addr[0] |= 0xc0
+		addr[0] &^= 0x20
+	case 3:
+		addr[1] |= nwkID[2] << 2
+		addr[0] |= nwkID[2] >> 6
+		addr[0] |= nwkID[1] << 2
+		addr[0] |= 0xe0
+		addr[0] &^= 0x10
+	case 4:
+		addr[0] |= nwkID[1]
+		addr[1] |= nwkID[2]
+		addr[0] |= 0xf0
+		addr[0] &^= 0x08
+	case 5:
+		addr[2] |= nwkID[2] << 5
+		addr[1] |= nwkID[2] >> 3
+		addr[1] |= nwkID[1] << 5
+		addr[0] |= nwkID[1] >> 3
+		addr[0] |= 0xf8
+		addr[0] &^= 0x04
+	case 6:
+		addr[2] |= nwkID[2] << 2
+		addr[1] |= nwkID[2] >> 6
+		addr[1] |= nwkID[1] << 2
+		addr[0] |= nwkID[1] >> 6
+		addr[0] |= 0xfc
+		addr[0] &^= 0x02
+	case 7:
+		addr[3] |= nwkID[2] << 7
+		addr[2] |= nwkID[2] >> 1
+		addr[2] |= nwkID[1] << 7
+		addr[1] |= nwkID[1] >> 1
+		addr[1] |= nwkID[0] << 7
+		addr[0] |= 0xfe
+		addr[0] &^= 0x01
+	}
+	return addr
+}
+
+// ErrInvalidDevAddrPrefix can be returned when unmarshaling an invalid slice into a prefix.
 var ErrInvalidDevAddrPrefix = errors.New("invalid device address prefix")
 
 // DevAddrPrefix is a DevAddr with a prefix length.
@@ -289,12 +433,7 @@ func (prefix *DevAddrPrefix) Scan(src interface{}) error {
 	return prefix.UnmarshalText(data)
 }
 
-// NwkID of the DevAddr.
-func (addr DevAddr) NwkID() byte {
-	return addr[0] >> 1
-}
-
-// WithPrefix returns the DevAddr, but with the first length bits replaced by the Prefix
+// WithPrefix returns the DevAddr, but with the first length bits replaced by the Prefix.
 func (addr DevAddr) WithPrefix(prefix DevAddrPrefix) (prefixed DevAddr) {
 	k := uint(prefix.Length)
 	for i := 0; i < 4; i++ {

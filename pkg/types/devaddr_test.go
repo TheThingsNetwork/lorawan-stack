@@ -11,37 +11,116 @@ import (
 )
 
 func TestDevAddr(t *testing.T) {
-	a := assertions.New(t)
+	for _, tc := range []struct {
+		DevAddr       DevAddr
+		NetIDType     byte
+		NwkID         []byte
+		NwkAddr       []byte
+		NwkAddrBits   uint
+		NwkAddrLength int
+	}{
+		{
+			DevAddr{0x3e, 0xff, 0xff, 0x42},
+			0,
+			[]byte{0x1f},
+			[]byte{0x00, 0xff, 0xff, 0x42},
+			25,
+			4,
+		},
+		{
+			DevAddr{0x9f, 0xff, 0xff, 0x42},
+			1,
+			[]byte{0x1f},
+			[]byte{0xff, 0xff, 0x42},
+			24,
+			3,
+		},
+		{
+			DevAddr{0xcf, 0xff, 0xff, 0x42},
+			2,
+			[]byte{0x00, 0xff},
+			[]byte{0x0f, 0xff, 0x42},
+			20,
+			3,
+		},
+		{
+			DevAddr{0xe3, 0xfc, 0xff, 0x42},
+			3,
+			[]byte{0x00, 0xff},
+			[]byte{0x00, 0xff, 0x42},
+			18,
+			3,
+		},
+		{
+			DevAddr{0xf0, 0xff, 0xff, 0x42},
+			4,
+			[]byte{0x00, 0xff},
+			[]byte{0xff, 0x42},
+			16,
+			2,
+		},
+		{
+			DevAddr{0xf8, 0x1f, 0xff, 0x42},
+			5,
+			[]byte{0x00, 0xff},
+			[]byte{0x1f, 0x42},
+			13,
+			2,
+		},
+		{
+			DevAddr{0xfc, 0x03, 0xff, 0x42},
+			6,
+			[]byte{0x00, 0xff},
+			[]byte{0x03, 0x42},
+			10,
+			2,
+		},
+		{
+			DevAddr{0xfe, 0xff, 0xff, 0xc2},
+			7,
+			[]byte{0x01, 0xff, 0xff},
+			[]byte{0x42},
+			7,
+			1,
+		},
+	} {
+		t.Run(string(tc.NetIDType+'0'), func(t *testing.T) {
+			a := assertions.New(t)
 
-	devAddr := DevAddr{0x26, 0x12, 0x34, 0x56}
-	a.So(devAddr.NwkID(), should.Equal, 0x13)
+			netID, err := NewNetID(tc.NetIDType, tc.NwkID)
+			if !a.So(err, should.BeNil) {
+				return
+			}
 
-	prefix := DevAddrPrefix{DevAddr{0x26}, 7}
-	a.So(prefix.Matches(devAddr), should.BeTrue)
+			a.So(NwkAddrBits(netID), should.Equal, tc.NwkAddrBits)
+			a.So(NwkAddrLength(netID), should.Equal, tc.NwkAddrLength)
 
-	addr := DevAddr{1, 2, 3, 4}
-	a.So(addr.HasPrefix(DevAddrPrefix{DevAddr{0, 0, 0, 0}, 0}), should.BeTrue)
-	a.So(addr.HasPrefix(DevAddrPrefix{DevAddr{1, 2, 3, 0}, 24}), should.BeTrue)
-	a.So(addr.HasPrefix(DevAddrPrefix{DevAddr{2, 2, 3, 4}, 31}), should.BeFalse)
-	a.So(addr.HasPrefix(DevAddrPrefix{DevAddr{1, 1, 3, 4}, 31}), should.BeFalse)
-	a.So(addr.HasPrefix(DevAddrPrefix{DevAddr{1, 1, 1, 1}, 15}), should.BeFalse)
+			devAddr := NewDevAddr(netID, tc.NwkAddr)
+			a.So(err, should.BeNil)
+			if !a.So(devAddr, should.Equal, tc.DevAddr) {
+				return
+			}
+
+			a.So(devAddr.NetIDType(), should.Equal, tc.NetIDType)
+			a.So(devAddr.NwkID(), should.Resemble, tc.NwkID)
+			a.So(devAddr.NwkAddr(), should.Resemble, tc.NwkAddr)
+		})
+	}
 }
 
-func TestSortDevAddrPrefixList(t *testing.T) {
+func TestDevAddrPrefix(t *testing.T) {
 	a := assertions.New(t)
 
 	devAddr := DevAddr{0x26, 0x12, 0x34, 0x56}
-	a.So(devAddr.NwkID(), should.Equal, 0x13)
-
 	prefix := DevAddrPrefix{DevAddr{0x26}, 7}
 	a.So(prefix.Matches(devAddr), should.BeTrue)
 
-	addr := DevAddr{1, 2, 3, 4}
-	a.So(addr.HasPrefix(DevAddrPrefix{DevAddr{0, 0, 0, 0}, 0}), should.BeTrue)
-	a.So(addr.HasPrefix(DevAddrPrefix{DevAddr{1, 2, 3, 0}, 24}), should.BeTrue)
-	a.So(addr.HasPrefix(DevAddrPrefix{DevAddr{2, 2, 3, 4}, 31}), should.BeFalse)
-	a.So(addr.HasPrefix(DevAddrPrefix{DevAddr{1, 1, 3, 4}, 31}), should.BeFalse)
-	a.So(addr.HasPrefix(DevAddrPrefix{DevAddr{1, 1, 1, 1}, 15}), should.BeFalse)
+	devAddr = DevAddr{1, 2, 3, 4}
+	a.So(devAddr.HasPrefix(DevAddrPrefix{DevAddr{0, 0, 0, 0}, 0}), should.BeTrue)
+	a.So(devAddr.HasPrefix(DevAddrPrefix{DevAddr{1, 2, 3, 0}, 24}), should.BeTrue)
+	a.So(devAddr.HasPrefix(DevAddrPrefix{DevAddr{2, 2, 3, 4}, 31}), should.BeFalse)
+	a.So(devAddr.HasPrefix(DevAddrPrefix{DevAddr{1, 1, 3, 4}, 31}), should.BeFalse)
+	a.So(devAddr.HasPrefix(DevAddrPrefix{DevAddr{1, 1, 1, 1}, 15}), should.BeFalse)
 }
 
 func ExampleDevAddr_MarshalText() {
