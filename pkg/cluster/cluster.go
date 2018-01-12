@@ -4,10 +4,16 @@ package cluster
 
 import (
 	"context"
+	"os"
 
 	"github.com/TheThingsNetwork/ttn/pkg/config"
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/rpcclient"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/connectivity"
+	"google.golang.org/grpc/credentials"
 )
 
 // Cluster interface
@@ -24,11 +30,122 @@ type Cluster interface {
 // CustomNew allows you to replace clustering logic. New will call CustomNew if not nil.
 var CustomNew func(ctx context.Context, config *config.ServiceBase, services ...rpcserver.Registerer) (Cluster, error)
 
-// New cluster
+// New instantiates a new clustering handler
 func New(ctx context.Context, config *config.ServiceBase, services ...rpcserver.Registerer) (Cluster, error) {
 	if CustomNew != nil {
 		return CustomNew(ctx, config, services...)
 	}
 
-	return nil, nil // TODO
+	c := &cluster{
+		ctx:   ctx,
+		tls:   config.Cluster.TLS,
+		peers: make(map[string]*peer),
+	}
+
+	self := &peer{
+		name:   config.Cluster.Name,
+		target: config.Cluster.Address,
+	}
+	if self.name == "" {
+		self.name, _ = os.Hostname()
+	}
+	if self.target == "" {
+		if c.tls {
+			self.target = config.GRPC.ListenTLS
+		} else {
+			self.target = config.GRPC.Listen
+		}
+	}
+	for _, service := range services {
+		if roles := service.Roles(); len(roles) > 0 {
+			self.roles = append(self.roles, roles...)
+		}
+	}
+
+	c.peers[self.name] = self
+
+	tryAddPeer := func(name string, target string, role ttnpb.PeerInfo_Role) {
+		if !self.HasRole(role) && target != "" {
+			c.peers[name] = &peer{
+				name:   name,
+				target: target,
+				roles:  []ttnpb.PeerInfo_Role{role},
+			}
+		}
+	}
+
+	tryAddPeer("is", config.Cluster.IdentityServer, ttnpb.PeerInfo_IDENTITY_SERVER)
+	tryAddPeer("gs", config.Cluster.GatewayServer, ttnpb.PeerInfo_GATEWAY_SERVER)
+	tryAddPeer("ns", config.Cluster.NetworkServer, ttnpb.PeerInfo_NETWORK_SERVER)
+	tryAddPeer("as", config.Cluster.ApplicationServer, ttnpb.PeerInfo_APPLICATION_SERVER)
+	tryAddPeer("js", config.Cluster.JoinServer, ttnpb.PeerInfo_JOIN_SERVER)
+
+	for _, join := range config.Cluster.Join {
+		c.peers[join] = &peer{
+			name:   join,
+			target: join,
+		}
+	}
+
+	return c, nil
+}
+
+type cluster struct {
+	ctx   context.Context
+	tls   bool
+	peers map[string]*peer
+}
+
+func (c *cluster) Connect() (err error) {
+	options := rpcclient.DefaultDialOptions(c.ctx)
+	// TODO: Use custom WithBalancer DialOption?
+	if c.tls {
+		options = append(options, grpc.WithTransportCredentials(credentials.NewTLS(nil))) // TODO: Get *tls.Config from context
+	} else {
+		options = append(options, grpc.WithInsecure())
+	}
+	for _, peer := range c.peers {
+		peer.ctx, peer.cancel = context.WithCancel(c.ctx)
+		peer.conn, err = grpc.DialContext(peer.ctx, peer.target, options...)
+		if err != nil {
+			return errors.NewWithCause("Could not connect to peer", err)
+		}
+	}
+	return nil
+}
+
+func (c *cluster) Leave() error {
+	for _, peer := range c.peers {
+		if peer.conn != nil {
+			if err := peer.conn.Close(); err != nil {
+				return err
+			}
+		}
+		if peer.cancel != nil {
+			peer.cancel()
+		}
+	}
+	return nil
+}
+
+func (c *cluster) GetPeer(role ttnpb.PeerInfo_Role, tags []string, shardKey []byte) Peer {
+	var matches []Peer
+	for _, peer := range c.peers {
+		if !peer.HasRole(role) {
+			continue
+		}
+		for _, tag := range tags {
+			if !peer.HasTag(tag) {
+				continue
+			}
+		}
+		if conn := peer.Conn(); conn != nil && conn.GetState() == connectivity.Ready {
+			matches = append(matches, peer)
+		}
+	}
+	if len(matches) == 1 {
+		// TODO: Select the right SubConn for shardKey?
+		return matches[0]
+	}
+	return nil
 }

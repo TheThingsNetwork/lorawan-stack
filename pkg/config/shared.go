@@ -29,6 +29,19 @@ type TLS struct {
 	Key         string `name:"key" description:"Location of TLS private key"`
 }
 
+// Cluster represents clustering configuration
+type Cluster struct {
+	Join              []string `name:"join" description:"Addresses of cluster peers to join"`
+	Name              string   `name:"name" description:"Name of the current cluster peer (default: $HOSTNAME)"`
+	Address           string   `name:"address" description:"Address to use for cluster communication"`
+	IdentityServer    string   `name:"identity-server" description:"Address for the identity server"`
+	GatewayServer     string   `name:"gateway-server" description:"Address for the gateway server"`
+	NetworkServer     string   `name:"network-server" description:"Address for the network server"`
+	ApplicationServer string   `name:"application-server" description:"Address for the application server"`
+	JoinServer        string   `name:"join-server" description:"Address for the join server"`
+	TLS               bool     `name:"tls" description:"Do cluster gRPC over TLS"`
+}
+
 // GRPC represents gRPC listener configuration
 type GRPC struct {
 	Listen    string `name:"listen" description:"Address for the TCP gRPC server to listen on"`
@@ -66,6 +79,7 @@ type RemoteProviderConfig struct {
 // ServiceBase represents base service configuration
 type ServiceBase struct {
 	Base         `name:",squash"`
+	Cluster      Cluster               `name:"cluster"`
 	GRPC         GRPC                  `name:"grpc"`
 	HTTP         HTTP                  `name:"http"`
 	TLS          TLS                   `name:"tls"`

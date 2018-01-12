@@ -99,9 +99,6 @@ func (c *Component) Start() (err error) {
 		sub.RegisterRoutes(c.web)
 	}
 
-	signals := make(chan os.Signal)
-	signal.Notify(signals, os.Interrupt, os.Kill, syscall.SIGTERM)
-
 	if c.grpc != nil {
 		c.logger.Debug("Setting up gRPC server...")
 		if err = c.listenGRPC(); err != nil {
@@ -117,6 +114,25 @@ func (c *Component) Start() (err error) {
 		return err
 	}
 	c.logger.Debug("Started HTTP server")
+
+	c.logger.Debug("Initializing cluster...")
+	if err := c.initCluster(); err != nil {
+		return err
+	}
+
+	if err := c.cluster.Connect(); err != nil {
+		c.logger.WithError(err).Error("Could not connect to cluster")
+		return err
+	}
+	defer func() {
+		c.logger.Debug("Leaving cluster...")
+		if err := c.cluster.Leave(); err != nil {
+			c.logger.WithError(err).Error("Could not leave cluster")
+		}
+	}()
+
+	signals := make(chan os.Signal)
+	signal.Notify(signals, os.Interrupt, os.Kill, syscall.SIGTERM)
 
 	for {
 		select {
