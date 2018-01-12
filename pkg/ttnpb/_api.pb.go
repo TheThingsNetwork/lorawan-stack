@@ -12,6 +12,7 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/applicationserver.proto
 	github.com/TheThingsNetwork/ttn/api/auth.proto
 	github.com/TheThingsNetwork/ttn/api/client.proto
+	github.com/TheThingsNetwork/ttn/api/cluster.proto
 	github.com/TheThingsNetwork/ttn/api/collaborator.proto
 	github.com/TheThingsNetwork/ttn/api/end_device.proto
 	github.com/TheThingsNetwork/ttn/api/gateway.proto
@@ -36,6 +37,7 @@ It has these top-level messages:
 	DownlinkQueueRequest
 	APIKey
 	Client
+	PeerInfo
 	ApplicationCollaborator
 	GatewayCollaborator
 	KeyEnvelope

@@ -1,0 +1,31 @@
+// Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+package ttn.v3;
+
+option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+
+// PeerInfo
+message PeerInfo {
+  // Port on which the gRPC server is exposed.
+  uint32 grpc_port = 1 [(gogoproto.customname) = "GRPCPort"];
+  // Indicates whether the gRPC server uses TLS.
+  bool tls = 2 [(gogoproto.customname) = "TLS"];
+  // Roles of the peer ()
+  repeated Role roles = 3;
+
+  enum Role {
+    none = 0;
+    IDENTITY_SERVER = 1;
+    GATEWAY_SERVER = 2;
+    NETWORK_SERVER = 3;
+    APPLICATION_SERVER = 4;
+    JOIN_SERVER = 5;
+  }
+
+  // Tags of the peer
+  repeated string tags = 4;
+}
