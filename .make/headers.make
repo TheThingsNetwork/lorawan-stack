@@ -10,7 +10,8 @@
 
 YEAR ?= $(shell date +%Y)
 COMMENT ?= \\(\#\\|//\\)
-HEADER ?= $(COMMENT) Copyright © $(YEAR) The Things Network Foundation
+HEADER_PREFIX = $(COMMENT) Copyright © $(YEAR)
+HEADER = $(HEADER_PREFIX) The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
 empty = echo ""
 no_blanks = sed '/^$$/d'
