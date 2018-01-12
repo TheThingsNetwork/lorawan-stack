@@ -9,21 +9,13 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-var _ Renderer = new(DefaultRenderer)
-
-func TestDefaultRenderer(t *testing.T) {
+func TestRender(t *testing.T) {
 	a := assertions.New(t)
 
-	tmpl := &Template{
-		Subject: "Hi",
-		Message: "<b>{{.name}}!</b>",
-	}
-
-	renderer := new(DefaultRenderer)
-	subject, body, err := renderer.Render(tmpl, map[string]interface{}{
-		"name": "john",
-	})
+	subject, message, err := render("Hello {{.Name}}", "<b>{{.Name}}!</b>", struct {
+		Name string
+	}{"john"})
 	a.So(err, should.BeNil)
-	a.So(subject, should.Equal, "Hi")
-	a.So(body, should.Equal, "<b>john!</b>")
+	a.So(subject, should.Equal, "Hello john")
+	a.So(message, should.Equal, "<b>john!</b>")
 }

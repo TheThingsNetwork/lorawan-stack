@@ -16,8 +16,8 @@ func New() *Mock {
 
 // Send implements email.Provider.
 // It pushs the data value to a variable that can be accessed through the Data method of this package.
-func (m *Mock) Send(recipient string, tmpl *templates.Template, data interface{}) error {
-	last = data
+func (m *Mock) Send(recipient string, template templates.Template) error {
+	last = template
 	return nil
 }
 

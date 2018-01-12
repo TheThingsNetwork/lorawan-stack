@@ -2,30 +2,26 @@
 
 package templates
 
-const (
-	// EmailValidationDisplayName is the template field used to place the tenant display name.
-	EmailValidationDisplayName = "display_name"
+// EmailValidation is the email template used to validate an email address.
+type EmailValidation struct {
+	PublicURL        string
+	OrganizationName string
+	Token            string
+}
 
-	// EmailValidationHomeURL is the template field used to place the tenant home url.
-	EmailValidationHomeURL = "home_url"
+// Name implements Template.
+func (t *EmailValidation) Name() string {
+	return "Email Validation"
+}
 
-	// EmailValidationHostname is the template field used to place the base URL.
-	EmailValidationHostname = "hostname"
-
-	// EmailValidationToken is the template field used to place the validation token.
-	EmailValidationToken = "token"
-)
-
-// EmailValidation is used to send emails asking to validate an email address.
-func EmailValidation() *Template {
-	return &Template{
-		Name:    "Email validation",
-		Subject: "Your email needs to be validated",
-		Message: `<h1>Email verification</h1>
+// Render implements Template.
+func (t *EmailValidation) Render() (string, string, error) {
+	subject := "Your email needs to be validated"
+	message := `<h1>Email verification</h1>
 
 <p>
 	You recently registered an account at
-	<a href='{{.home_url}}'>{{.display_name}}</a> using
+	<a href='{{.PublicURL}}'>{{.OrganizationName}}</a> using
 	this email address.
 </p>
 
@@ -35,11 +31,12 @@ func EmailValidation() *Template {
 </p>
 
 <p>
-	<a class='button' href='{{.hostname}}/validate/{{.token}}'>Activate account</a>
+	<a class='button' href='{{.PublicURL}}/api/v3/validate/{{.Token}}'>Activate account</a>
 </p>
 
 <p class='extra'>
 	If you did not register an account, you can ignore this e-mail.
-</p>`,
-	}
+</p>`
+
+	return render(subject, message, t)
 }

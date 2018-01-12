@@ -7,33 +7,32 @@ import (
 	"text/template"
 )
 
-// Template is the type that describes an email template.
-type Template struct {
-	Name    string
-	Subject string
-	Message string
+// Template is the interface of those things that are an email template.
+type Template interface {
+	// Name returns the template's name.
+	Name() string
+
+	// Render renders the subject and message of the template returning it.
+	Render() (string, string, error)
 }
 
-// Renderer is the interface that describes an email template renderer.
-type Renderer interface {
-	// Render compiles a template with the provided data and returns the
-	// subject and the content.
-	Render(tmpl *Template, data interface{}) (string, string, error)
-}
-
-// DefaultRenderer is a renderer that relies on the `text/template` package to
-// compile the template. It only compiles the `Message` field of the template.
-type DefaultRenderer struct{}
-
-// Render implements Renderer.
-func (r DefaultRenderer) Render(tmpl *Template, data interface{}) (string, string, error) {
+// render renders subject and message using the given data.
+func render(subject, message string, data interface{}) (string, string, error) {
 	t := template.New("")
-	t, _ = t.Parse(tmpl.Message)
+	t, _ = t.Parse(subject)
 
 	buf := new(bytes.Buffer)
 	if err := t.Execute(buf, data); err != nil {
 		return "", "", err
 	}
+	subject = buf.String()
 
-	return tmpl.Subject, buf.String(), nil
+	buf.Reset()
+
+	t, _ = t.Parse(message)
+	if err := t.Execute(buf, data); err != nil {
+		return "", "", err
+	}
+
+	return subject, buf.String(), nil
 }

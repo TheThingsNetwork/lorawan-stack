@@ -21,7 +21,6 @@ type SendGrid struct {
 	logger      log.Interface
 	client      *sendgrid.Client
 	fromEmail   *mail.Email
-	renderer    templates.Renderer
 	sandboxMode bool
 }
 
@@ -42,21 +41,12 @@ func SenderAddress(name, address string) SendGridOpt {
 	}
 }
 
-// TemplateRenderer sets the given template renderer and therefore replaces.
-// the default templates.DefaultRenderer.
-func TemplateRenderer(renderer templates.Renderer) SendGridOpt {
-	return func(s *SendGrid) {
-		s.renderer = renderer
-	}
-}
-
 // New creates a SendGrid email provider.
 func New(logger log.Interface, apiKey string, opts ...SendGridOpt) *SendGrid {
 	provider := &SendGrid{
 		logger:    logger.WithField("provider", "SendGrid"),
 		client:    sendgrid.NewSendClient(apiKey),
 		fromEmail: mail.NewEmail(defaultFromName, defaultFromEmail),
-		renderer:  templates.DefaultRenderer{},
 	}
 
 	for _, opt := range opts {
@@ -67,15 +57,15 @@ func New(logger log.Interface, apiKey string, opts ...SendGridOpt) *SendGrid {
 }
 
 // Send sends an email to recipient using the provided template along with the data.
-func (s *SendGrid) Send(recipient string, tmpl *templates.Template, data interface{}) error {
-	message, err := s.buildEmail(recipient, tmpl, data)
+func (s *SendGrid) Send(recipient string, template templates.Template) error {
+	message, err := s.buildEmail(recipient, template)
 	if err != nil {
 		return err
 	}
 
 	logger := s.logger.WithFields(log.Fields(
 		"recipient", recipient,
-		"template.name", tmpl.Name,
+		"template.name", template.Name(),
 	))
 
 	logger.Info("Sending email ...")
@@ -86,7 +76,6 @@ func (s *SendGrid) Send(recipient string, tmpl *templates.Template, data interfa
 		logger.WithFields(log.Fields(
 			"response.status_code", response.StatusCode,
 			"response.body", response.Body,
-			"template.data", data,
 		)).WithError(err).Error("Failed to send email")
 
 		return err
@@ -96,7 +85,6 @@ func (s *SendGrid) Send(recipient string, tmpl *templates.Template, data interfa
 		logger.WithFields(log.Fields(
 			"response.status_code", response.StatusCode,
 			"response.body", response.Body,
-			"template.data", data,
 		)).Error("Failed to send email")
 
 		return errors.Errorf("Failed to send email. Status code `%d`", response.StatusCode)
@@ -108,8 +96,8 @@ func (s *SendGrid) Send(recipient string, tmpl *templates.Template, data interfa
 }
 
 // buildEmail builds the email that will be sent using the underlying SendGrid client.
-func (s *SendGrid) buildEmail(to string, tmpl *templates.Template, data interface{}) (*mail.SGMailV3, error) {
-	subject, content, err := s.renderer.Render(tmpl, data)
+func (s *SendGrid) buildEmail(recipient string, template templates.Template) (*mail.SGMailV3, error) {
+	subject, content, err := template.Render()
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +110,7 @@ func (s *SendGrid) buildEmail(to string, tmpl *templates.Template, data interfac
 	message := mail.NewV3MailInit(
 		s.fromEmail,
 		subject,
-		mail.NewEmail("", to),
+		mail.NewEmail("", recipient),
 		mail.NewContent("text/html", content),
 		mail.NewContent("text/plain", text),
 	)

@@ -3,10 +3,10 @@
 package sendgrid
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"github.com/smartystreets/assertions"
@@ -15,13 +15,20 @@ import (
 
 var _ email.Provider = new(SendGrid)
 
-func TestSendGrid(t *testing.T) {
-	a := assertions.New(t)
+type template struct {
+	name string
+}
 
-	tmpl := &templates.Template{
-		Subject: "Hi",
-		Message: "<b>{{.name}}!</b>",
-	}
+func (t *template) Name() string {
+	return "template"
+}
+
+func (t *template) Render() (string, string, error) {
+	return "hello", fmt.Sprintf("<b>%s!</b>", t.name), nil
+}
+
+func TestSendGridBuildEmail(t *testing.T) {
+	a := assertions.New(t)
 
 	sendgrid := New(
 		test.GetLogger(t),
@@ -34,12 +41,10 @@ func TestSendGrid(t *testing.T) {
 	a.So(sendgrid.sandboxMode, should.BeTrue)
 	a.So(sendgrid.fromEmail, should.Resemble, mail.NewEmail("Foo", "foo@foo.local"))
 
-	message, err := sendgrid.buildEmail("john@doe.com", tmpl, map[string]interface{}{
-		"name": "john",
-	})
+	message, err := sendgrid.buildEmail("john@doe.com", &template{"john"})
 	a.So(err, should.BeNil)
 	a.So(message.From, should.Resemble, mail.NewEmail("Foo", "foo@foo.local"))
-	a.So(message.Subject, should.Equal, tmpl.Subject)
+	a.So(message.Subject, should.Equal, "hello")
 	a.So(message.Personalizations[0].To, should.Contain, mail.NewEmail("", "john@doe.com"))
 	a.So(message.Content, should.HaveLength, 2)
 	a.So(message.Content, should.Contain, mail.NewContent("text/html", "<b>john!</b>"))
