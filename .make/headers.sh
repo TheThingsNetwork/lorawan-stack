@@ -48,7 +48,7 @@ ok=1
 
 for i in `seq 1 ${LINES}`; do
   hline=`echo -e ${HEADER} | sed $i'q;d'`
-  sed $i'q;d' "$FILE" | grep -q ^$hline$ || ok=0
+  sed $i'q;d' "$FILE" | grep -q "^$hline" || ok=0
 done
 
 if [[ $ok -ne 1 ]]; then

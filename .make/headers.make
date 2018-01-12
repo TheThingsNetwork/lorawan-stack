@@ -38,7 +38,7 @@ headers.check:
 	@$(log) "Checking headers in `echo $$($(__HEADER_FILES)) | $(count)` files"
 	@CODE=0; \
 	for file in `$(__HEADER_FILES)`; do \
-		"$(MAKE_DIR)/headers.sh" check "$(HEADER)" "$$file" || { $(err) "Incorrect or missing header in $$file"; CODE=1; }; \
+		"$(MAKE_DIR)/headers.sh" check "$(HEADER_PREFIX)" "$$file" || { $(err) "Incorrect or missing header in $$file"; CODE=1; }; \
 	done; \
 	exit $$CODE
 
@@ -59,7 +59,7 @@ headers.fix:
 headers.remove:
 	@$(log) "Removing headers in `echo $$($(__HEADER_FILES)) | $(count)` files"
 	@for file in `$(__HEADER_FILES)`; do \
-		"$(MAKE_DIR)/headers.sh" remove "$(HEADER)" "$$file" "$(COMMENT)"; \
+		"$(MAKE_DIR)/headers.sh" remove "$(HEADER_PREFIX)" "$$file" "$(COMMENT)"; \
 		code=$$?; \
 		if [[ $$code -eq 2 ]]; then \
 			$(log) "Removed header in \`$$file\`"; \
