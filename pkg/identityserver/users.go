@@ -47,7 +47,7 @@ func (is *IdentityServer) CreateUser(ctx context.Context, req *ttnpb.CreateUserR
 
 	user := &ttnpb.User{
 		UserIdentifier: req.User.UserIdentifier,
-		DisplayName:    req.User.DisplayName,
+		Name:           req.User.Name,
 		Email:          req.User.Email,
 		Password:       string(password),
 		State:          ttnpb.STATE_PENDING,
@@ -128,8 +128,8 @@ func (is *IdentityServer) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	newEmail := false
 	for _, path := range req.UpdateMask.Paths {
 		switch {
-		case ttnpb.FieldPathUserDisplayName.MatchString(path):
-			found.GetUser().DisplayName = req.User.DisplayName
+		case ttnpb.FieldPathUserName.MatchString(path):
+			found.GetUser().Name = req.User.Name
 		case ttnpb.FieldPathUserEmail.MatchString(path):
 			if strings.ToLower(req.User.Email) != strings.ToLower(found.GetUser().Email) {
 				newEmail = true

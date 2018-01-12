@@ -51,7 +51,7 @@ func TestUserTx(t *testing.T) {
 			return err
 		}
 
-		john.DisplayName = "PEPE"
+		john.Name = "PEPE"
 		return s.Users.Update(john)
 	})
 	a.So(err, should.BeNil)
@@ -232,7 +232,7 @@ func TestUserDelete(t *testing.T) {
 		UserIdentifier: ttnpb.UserIdentifier{id},
 		Email:          "foo",
 		Password:       "123",
-		DisplayName:    "bar",
+		Name:           "bar",
 	})
 	a.So(err, should.BeNil)
 

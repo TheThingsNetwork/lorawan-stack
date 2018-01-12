@@ -10,8 +10,8 @@ func (u *User) GetUser() *User {
 }
 
 var (
-	// FieldPathUserDisplayName is the field path for the user name field.
-	FieldPathUserDisplayName = regexp.MustCompile(`^display_name$`)
+	// FieldPathUserName is the field path for the user name field.
+	FieldPathUserName = regexp.MustCompile(`^name$`)
 
 	// FieldPathUserEmail is the field path for the user email field.
 	FieldPathUserEmail = regexp.MustCompile(`^email$`)

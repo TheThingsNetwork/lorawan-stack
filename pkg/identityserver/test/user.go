@@ -69,7 +69,7 @@ func ShouldBeUserIgnoringAutoFields(actual interface{}, expected ...interface{})
 	return all(
 		assertions.ShouldEqual(a.UserID, b.UserID),
 		assertions.ShouldEqual(a.Email, b.Email),
-		assertions.ShouldEqual(a.DisplayName, b.DisplayName),
+		assertions.ShouldEqual(a.Name, b.Name),
 		assertions.ShouldEqual(a.Password, b.Password),
 		assertions.ShouldBeTrue(a.ValidatedAt.Equal(b.ValidatedAt)),
 		assertions.ShouldEqual(a.Admin, b.Admin),

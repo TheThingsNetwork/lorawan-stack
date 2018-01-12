@@ -42,7 +42,7 @@ func (s *UserStore) create(q db.QueryContext, user store.User) error {
 		`INSERT
 			INTO users (
 				user_id,
-				display_name,
+				name,
 				email,
 				admin,
 				state,
@@ -50,7 +50,7 @@ func (s *UserStore) create(q db.QueryContext, user store.User) error {
 				validated_at)
 			VALUES (
 				lower(:user_id),
-				:display_name,
+				:name,
 				lower(:email),
 				:admin,
 				:state,
@@ -163,7 +163,7 @@ func (s *UserStore) update(q db.QueryContext, user store.User) error {
 	_, err := q.NamedExec(
 		`UPDATE users
 			SET
-				display_name = :display_name,
+				name = :name,
 				email = lower(:email),
 				validated_at = :validated_at,
 				password = :password,

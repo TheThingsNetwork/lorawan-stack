@@ -14,7 +14,7 @@ import (
 func user() *ttnpb.User {
 	return &ttnpb.User{
 		UserIdentifier: ttnpb.UserIdentifier{"alice"},
-		DisplayName:    "Ali Ce",
+		Name:           "Ali Ce",
 		Password:       "123456",
 		Email:          "alice@alice.com",
 	}
