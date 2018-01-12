@@ -152,7 +152,7 @@ func (s *ClientStore) getByID(q db.QueryContext, clientID string, result store.C
 	return nil
 }
 
-// ListByUser returns all the clients an user is creator to.
+// ListByUser returns all the clients created by the user.
 func (s *ClientStore) ListByUser(userID string, factory store.ClientFactory) ([]store.Client, error) {
 	var result []store.Client
 
@@ -288,7 +288,7 @@ func (s *ClientStore) update(q db.QueryContext, client store.Client) error {
 	return err
 }
 
-// Delete deletes an client.
+// Delete deletes a client.
 func (s *ClientStore) Delete(clientID string) error {
 	err := s.transact(func(tx *db.Tx) error {
 		oauth, ok := s.store().OAuth.(*OAuthStore)
@@ -318,7 +318,7 @@ func (s *ClientStore) Delete(clientID string) error {
 }
 
 // delete deletes the client itself. All rows in other tables that references
-// this entity must be delete before this one gets deleted.
+// this entity must be deleted before this one gets deleted.
 func (s *ClientStore) delete(q db.QueryContext, clientID string) error {
 	id := new(string)
 	err := q.SelectOne(

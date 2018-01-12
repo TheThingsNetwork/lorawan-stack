@@ -12,7 +12,7 @@ import (
 
 // GetSettings fetches the current dynamic settings of the Identity Server.
 func (is *IdentityServer) GetSettings(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.IdentityServerSettings, error) {
-	err := is.adminCheck(ctx)
+	err := is.enforceAdmin(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func (is *IdentityServer) GetSettings(ctx context.Context, _ *pbtypes.Empty) (*t
 
 // UpdateSettings updates the dynamic settings.
 func (is *IdentityServer) UpdateSettings(ctx context.Context, req *ttnpb.UpdateSettingsRequest) (*pbtypes.Empty, error) {
-	if err := is.adminCheck(ctx); err != nil {
+	if err := is.enforceAdmin(ctx); err != nil {
 		return nil, err
 	}
 
@@ -37,7 +37,7 @@ func (is *IdentityServer) UpdateSettings(ctx context.Context, req *ttnpb.UpdateS
 	}
 
 	for _, path := range req.UpdateMask.Paths {
-		switch true {
+		switch {
 		case ttnpb.FieldPathSettingsBlacklistedIDs.MatchString(path):
 			if req.Settings.BlacklistedIDs == nil {
 				req.Settings.BlacklistedIDs = []string{}

@@ -16,7 +16,7 @@ import (
 // CreateGateway creates a gateway in the network, sets the user as collaborator
 // with all rights and creates an API key
 func (is *IdentityServer) CreateGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (*pbtypes.Empty, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_GATEWAYS_CREATE)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_GATEWAYS_CREATE)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (is *IdentityServer) CreateGateway(ctx context.Context, req *ttnpb.CreateGa
 
 // GetGateway returns a gateway information.
 func (is *IdentityServer) GetGateway(ctx context.Context, req *ttnpb.GatewayIdentifier) (*ttnpb.Gateway, error) {
-	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_INFO)
+	err := is.enforceGatewayRights(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_INFO)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (is *IdentityServer) GetGateway(ctx context.Context, req *ttnpb.GatewayIden
 
 // ListGateways returns all the gateways the current user is collaborator of.
 func (is *IdentityServer) ListGateways(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListGatewaysResponse, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_GATEWAYS_LIST)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_GATEWAYS_LIST)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func (is *IdentityServer) ListGateways(ctx context.Context, _ *pbtypes.Empty) (*
 
 // UpdateGateway updates a gateway.
 func (is *IdentityServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (*pbtypes.Empty, error) {
-	err := is.gatewayCheck(ctx, req.Gateway.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC)
+	err := is.enforceGatewayRights(ctx, req.Gateway.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func (is *IdentityServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	gtw := found.GetGateway()
 
 	for _, path := range req.UpdateMask.Paths {
-		switch true {
+		switch {
 		case ttnpb.FieldPathGatewayDescription.MatchString(path):
 			gtw.Description = req.Gateway.Description
 		case ttnpb.FieldPathGatewayFrequencyPlanID.MatchString(path):
@@ -183,7 +183,7 @@ func (is *IdentityServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGa
 
 // DeleteGateway deletes a gateway.
 func (is *IdentityServer) DeleteGateway(ctx context.Context, req *ttnpb.GatewayIdentifier) (*pbtypes.Empty, error) {
-	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_DELETE)
+	err := is.enforceGatewayRights(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_DELETE)
 	if err != nil {
 		return nil, err
 	}
@@ -193,7 +193,7 @@ func (is *IdentityServer) DeleteGateway(ctx context.Context, req *ttnpb.GatewayI
 
 // GenerateGatewayAPIKey generates a gateway API key and returns it.
 func (is *IdentityServer) GenerateGatewayAPIKey(ctx context.Context, req *ttnpb.GenerateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
-	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+	err := is.enforceGatewayRights(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -219,7 +219,7 @@ func (is *IdentityServer) GenerateGatewayAPIKey(ctx context.Context, req *ttnpb.
 
 // ListGatewayAPIKeys list all the API keys from a gateway.
 func (is *IdentityServer) ListGatewayAPIKeys(ctx context.Context, req *ttnpb.GatewayIdentifier) (*ttnpb.ListGatewayAPIKeysResponse, error) {
-	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+	err := is.enforceGatewayRights(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -236,7 +236,7 @@ func (is *IdentityServer) ListGatewayAPIKeys(ctx context.Context, req *ttnpb.Gat
 
 // UpdateGatewayAPIKey updates an API key rights.
 func (is *IdentityServer) UpdateGatewayAPIKey(ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+	err := is.enforceGatewayRights(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -246,7 +246,7 @@ func (is *IdentityServer) UpdateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 
 // RemoveGatewayAPIKey removes a gateway API key.
 func (is *IdentityServer) RemoveGatewayAPIKey(ctx context.Context, req *ttnpb.RemoveGatewayAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+	err := is.enforceGatewayRights(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -270,7 +270,7 @@ func (is *IdentityServer) RemoveGatewayAPIKey(ctx context.Context, req *ttnpb.Re
 // if after unset a collaborators there is no at least one collaborator with
 // `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` right.
 func (is *IdentityServer) SetGatewayCollaborator(ctx context.Context, req *ttnpb.GatewayCollaborator) (*pbtypes.Empty, error) {
-	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
+	err := is.enforceGatewayRights(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
 	if err != nil {
 		return nil, err
 	}
@@ -301,7 +301,7 @@ func (is *IdentityServer) SetGatewayCollaborator(ctx context.Context, req *ttnpb
 
 // ListGatewayCollaborators returns all the collaborators that a gateway has.
 func (is *IdentityServer) ListGatewayCollaborators(ctx context.Context, req *ttnpb.GatewayIdentifier) (*ttnpb.ListGatewayCollaboratorsResponse, error) {
-	err := is.gatewayCheck(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
+	err := is.enforceGatewayRights(ctx, req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
 	if err != nil {
 		return nil, err
 	}

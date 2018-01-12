@@ -11,6 +11,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/auth/oauth"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/mock"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -105,9 +106,9 @@ func TestUser(t *testing.T) {
 	}
 
 	// extract the validation token from the email and validate the user account
-	data, ok := mock.Data().(map[string]interface{})
-	if a.So(ok, should.BeTrue) && a.So(data["token"], should.NotBeEmpty) {
-		token := data["token"].(string)
+	data, ok := mock.Data().(*templates.EmailValidation)
+	if a.So(ok, should.BeTrue) && a.So(data.Token, should.NotBeEmpty) {
+		token := data.Token
 
 		_, err := is.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
 			Token: token,
@@ -193,9 +194,9 @@ func TestUser(t *testing.T) {
 	token := ""
 
 	// extract the token from mail
-	data, ok = mock.Data().(map[string]interface{})
-	if a.So(ok, should.BeTrue) && a.So(data["token"], should.NotBeEmpty) {
-		token = data["token"].(string)
+	data, ok = mock.Data().(*templates.EmailValidation)
+	if a.So(ok, should.BeTrue) && a.So(data.Token, should.NotBeEmpty) {
+		token = data.Token
 	}
 	a.So(token, should.NotBeEmpty)
 
@@ -216,9 +217,9 @@ func TestUser(t *testing.T) {
 	a.So(found.ValidatedAt.IsZero(), should.BeTrue)
 
 	// get the latest sent validation token
-	data, ok = mock.Data().(map[string]interface{})
+	data, ok = mock.Data().(*templates.EmailValidation)
 	if a.So(ok, should.BeTrue) {
-		token = data["token"].(string)
+		token = data.Token
 	}
 	a.So(token, should.NotBeEmpty)
 

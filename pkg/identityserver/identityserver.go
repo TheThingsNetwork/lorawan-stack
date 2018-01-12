@@ -3,9 +3,12 @@
 package identityserver
 
 import (
+	"fmt"
+
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/mock"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/sendgrid"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -43,13 +46,16 @@ type Config struct {
 	// WARNING: it will erase all the previous data
 	RecreateDatabase bool `name:"recreate-database" description:"Recreates the database when the server is initialized. WARNING: it deletes all previous data"`
 
-	// DisplayName is the display name of the organization that runs the network.
+	// OrganizationName is the display name of the organization that runs the network.
 	// e.g. The Things Network
-	DisplayName string `name:"display-name" description:"The display name of the organization who is in behalf of this server"`
+	OrganizationName string `name:"organization-name" description:"The name of the organization who is in behalf of this server"`
 
 	// PublicURL is the public url this server will use to serve content such as
 	// email content. e.g. https://www.thethingsnetwork.org
 	PublicURL string `name:"public-url" description:"Public URL this server uses to serve content such as email content"`
+
+	// SendGridAPIKey is the API key issued by SendGrid to send emails using its service.
+	SendGridAPIKey string `name:"sendgrid-api-key" description:"SendGrid API Key. If left blank the mock email provider will be used"`
 
 	// defaultSettings are the default settings within the tenant loaded in the store
 	// when it first-time initialized.
@@ -141,6 +147,10 @@ func New(comp *component.Component, config *Config, opts ...Option) (*IdentitySe
 	}
 
 	opts = append(defaultOptions, opts...)
+
+	if len(config.SendGridAPIKey) != 0 {
+		opts = append(opts, WithEmailProvider(sendgrid.New(comp.Logger(), config.SendGridAPIKey, sendgrid.SenderAddress(config.OrganizationName, fmt.Sprintf("noreply@%s", config.Hostname)))))
+	}
 
 	for _, opt := range opts {
 		opt(is)

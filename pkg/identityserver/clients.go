@@ -16,7 +16,7 @@ import (
 // The created client has a random secret and has set by default as false the
 // official labeled flag and has the refresh_token and authorization_code grants.
 func (is *IdentityServer) CreateClient(ctx context.Context, req *ttnpb.CreateClientRequest) (*pbtypes.Empty, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_CLIENTS_CREATE)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_CREATE)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (is *IdentityServer) CreateClient(ctx context.Context, req *ttnpb.CreateCli
 
 // GetClients returns a client.
 func (is *IdentityServer) GetClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*ttnpb.Client, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_CLIENTS_LIST)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_LIST)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (is *IdentityServer) GetClient(ctx context.Context, req *ttnpb.ClientIdenti
 
 // ListClients returns all the clients an user has created.
 func (is *IdentityServer) ListClients(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListClientsResponse, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_CLIENTS_LIST)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_LIST)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (is *IdentityServer) ListClients(ctx context.Context, _ *pbtypes.Empty) (*t
 // UpdateClient updates a client.
 // TODO(gomezjdaniel): support to update the RedirectURI and rights (scope).
 func (is *IdentityServer) UpdateClient(ctx context.Context, req *ttnpb.UpdateClientRequest) (*pbtypes.Empty, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_CLIENTS_MANAGE)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_MANAGE)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (is *IdentityServer) UpdateClient(ctx context.Context, req *ttnpb.UpdateCli
 	}
 
 	for _, path := range req.UpdateMask.Paths {
-		switch true {
+		switch {
 		case ttnpb.FieldPathClientDescription.MatchString(path):
 			found.GetClient().Description = req.Client.Description
 		default:
@@ -123,7 +123,7 @@ func (is *IdentityServer) UpdateClient(ctx context.Context, req *ttnpb.UpdateCli
 
 // DeleteClient deletes a client.
 func (is *IdentityServer) DeleteClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*pbtypes.Empty, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_CLIENTS_MANAGE)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_MANAGE)
 	if err != nil {
 		return nil, err
 	}

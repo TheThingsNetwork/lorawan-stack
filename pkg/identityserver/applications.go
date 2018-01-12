@@ -16,7 +16,7 @@ import (
 // CreateApplication creates an application and sets the user as collaborator
 // with all possible rights.
 func (is *IdentityServer) CreateApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (*pbtypes.Empty, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_APPLICATIONS_CREATE)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_APPLICATIONS_CREATE)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (is *IdentityServer) CreateApplication(ctx context.Context, req *ttnpb.Crea
 
 // GetApplication returns an application.
 func (is *IdentityServer) GetApplication(ctx context.Context, req *ttnpb.ApplicationIdentifier) (*ttnpb.Application, error) {
-	err := is.applicationCheck(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_INFO)
+	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_INFO)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (is *IdentityServer) GetApplication(ctx context.Context, req *ttnpb.Applica
 
 // ListApplications returns all applications where the user is collaborator.
 func (is *IdentityServer) ListApplications(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListApplicationsResponse, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_APPLICATIONS_LIST)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_APPLICATIONS_LIST)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (is *IdentityServer) ListApplications(ctx context.Context, _ *pbtypes.Empty
 
 // UpdateApplication updates an application.
 func (is *IdentityServer) UpdateApplication(ctx context.Context, req *ttnpb.UpdateApplicationRequest) (*pbtypes.Empty, error) {
-	err := is.applicationCheck(ctx, req.Application.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC)
+	err := is.enforceApplicationRights(ctx, req.Application.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func (is *IdentityServer) UpdateApplication(ctx context.Context, req *ttnpb.Upda
 	}
 
 	for _, path := range req.UpdateMask.Paths {
-		switch true {
+		switch {
 		case ttnpb.FieldPathApplicationDescription.MatchString(path):
 			found.GetApplication().Description = req.Application.Description
 		default:
@@ -118,7 +118,7 @@ func (is *IdentityServer) UpdateApplication(ctx context.Context, req *ttnpb.Upda
 
 // DeleteApplication deletes an application.
 func (is *IdentityServer) DeleteApplication(ctx context.Context, req *ttnpb.ApplicationIdentifier) (*pbtypes.Empty, error) {
-	err := is.applicationCheck(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_DELETE)
+	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_DELETE)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func (is *IdentityServer) DeleteApplication(ctx context.Context, req *ttnpb.Appl
 
 // GenerateApplicationKey generates an application API key and returns it.
 func (is *IdentityServer) GenerateApplicationAPIKey(ctx context.Context, req *ttnpb.GenerateApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
-	err := is.applicationCheck(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +154,7 @@ func (is *IdentityServer) GenerateApplicationAPIKey(ctx context.Context, req *tt
 
 // ListApplicationAPIKeys list all the API keys of an application.
 func (is *IdentityServer) ListApplicationAPIKeys(ctx context.Context, req *ttnpb.ApplicationIdentifier) (*ttnpb.ListApplicationAPIKeysResponse, error) {
-	err := is.applicationCheck(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func (is *IdentityServer) ListApplicationAPIKeys(ctx context.Context, req *ttnpb
 
 // UpdateApplicationAPIKey updates the rights of an application API key.
 func (is *IdentityServer) UpdateApplicationAPIKey(ctx context.Context, req *ttnpb.UpdateApplicationAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := is.applicationCheck(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +181,7 @@ func (is *IdentityServer) UpdateApplicationAPIKey(ctx context.Context, req *ttnp
 
 // RemoveApplicationAPIKey removes an application API key.
 func (is *IdentityServer) RemoveApplicationAPIKey(ctx context.Context, req *ttnpb.RemoveApplicationAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := is.applicationCheck(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -193,7 +193,7 @@ func (is *IdentityServer) RemoveApplicationAPIKey(ctx context.Context, req *ttnp
 // It fails if after unset a collaborator there is no at least one collaborator
 // with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right.
 func (is *IdentityServer) SetApplicationCollaborator(ctx context.Context, req *ttnpb.ApplicationCollaborator) (*pbtypes.Empty, error) {
-	err := is.applicationCheck(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
+	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
 	if err != nil {
 		return nil, err
 	}
@@ -224,7 +224,7 @@ func (is *IdentityServer) SetApplicationCollaborator(ctx context.Context, req *t
 
 // ListApplicationCollaborators returns all the collaborators from an application.
 func (is *IdentityServer) ListApplicationCollaborators(ctx context.Context, req *ttnpb.ApplicationIdentifier) (*ttnpb.ListApplicationCollaboratorsResponse, error) {
-	err := is.applicationCheck(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
+	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
 	if err != nil {
 		return nil, err
 	}

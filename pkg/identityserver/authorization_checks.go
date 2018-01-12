@@ -9,9 +9,10 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-// userCheck checks whether claims are intended for an user and then if the user
-// has the given set of rights with it. It returns the user ID.
-func (is *IdentityServer) userCheck(ctx context.Context, rights ...ttnpb.Right) (string, error) {
+// enforceUserRights is a hook that checks whether if the given authorization
+// credentials are allowed to perform an action given the set of passed rights and
+// returns the User ID attached to the credentials.
+func (is *IdentityServer) enforceUserRights(ctx context.Context, rights ...ttnpb.Right) (string, error) {
 	claims, err := is.claimsFromContext(ctx)
 	if err != nil {
 		return "", err
@@ -29,10 +30,9 @@ func (is *IdentityServer) userCheck(ctx context.Context, rights ...ttnpb.Right) 
 	return userID, nil
 }
 
-// adminCheck undercalls `userCheck` with `RIGHT_USER_ADMIN` right and then fetches
-// from the store the user to check if it has activated the admin flag.
-func (is *IdentityServer) adminCheck(ctx context.Context) error {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_ADMIN)
+// enforceAdmin checks whether the given credentials are enough to access an admin resource.
+func (is *IdentityServer) enforceAdmin(ctx context.Context) error {
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_ADMIN)
 	if err != nil {
 		return err
 	}
@@ -49,12 +49,9 @@ func (is *IdentityServer) adminCheck(ctx context.Context) error {
 	return nil
 }
 
-// applicationCheck checks whether claims have the given set of rights and then:
-// 	-	If they come from an API key: checks whether the API key application ID matches
-//			with the application ID that the request is trying to access to.
-// 	-	If they come from an access token: checks whether the user is collaborator of the
-//      application with the given set of rights.
-func (is *IdentityServer) applicationCheck(ctx context.Context, appID string, rights ...ttnpb.Right) error {
+// enforceApplicationRights is a hook that checks whether if the given authorization
+// credentials are allowed to access the application with the given rights.
+func (is *IdentityServer) enforceApplicationRights(ctx context.Context, appID string, rights ...ttnpb.Right) error {
 	claims, err := is.claimsFromContext(ctx)
 	if err != nil {
 		return err
@@ -87,12 +84,9 @@ func (is *IdentityServer) applicationCheck(ctx context.Context, appID string, ri
 	return nil
 }
 
-// gatewayCheck checks whether claims have the given set of rights and then:
-// 	-	If they come from an API key: checks whether the API key gateway ID matches
-//			with the gateway ID that the request is trying to access to.
-// 	-	If they come from an access token: checks whether the user is collaborator of the
-//      gateway application with the given set of rights.
-func (is *IdentityServer) gatewayCheck(ctx context.Context, gtwID string, rights ...ttnpb.Right) error {
+// enforceGatewayRights is a hook that checks whether if the given authorization
+// credentials are allowed to access the gateway with the given rights.
+func (is *IdentityServer) enforceGatewayRights(ctx context.Context, gtwID string, rights ...ttnpb.Right) error {
 	claims, err := is.claimsFromContext(ctx)
 	if err != nil {
 		return err

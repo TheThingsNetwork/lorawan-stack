@@ -80,15 +80,11 @@ func (is *IdentityServer) CreateUser(ctx context.Context, req *ttnpb.CreateUserR
 			return err
 		}
 
-		return is.email.Send(
-			user.Email,
-			templates.EmailValidation(),
-			map[string]interface{}{
-				templates.EmailValidationDisplayName: is.config.DisplayName,
-				templates.EmailValidationHomeURL:     is.config.PublicURL,
-				templates.EmailValidationHostname:    is.config.Hostname,
-				templates.EmailValidationToken:       token.ValidationToken,
-			})
+		return is.email.Send(user.Email, &templates.EmailValidation{
+			OrganizationName: is.config.OrganizationName,
+			PublicURL:        is.config.PublicURL,
+			Token:            token.ValidationToken,
+		})
 	})
 
 	return nil, err
@@ -96,7 +92,7 @@ func (is *IdentityServer) CreateUser(ctx context.Context, req *ttnpb.CreateUserR
 
 // GetUser returns the account of the current user.
 func (is *IdentityServer) GetUser(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.User, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_PROFILE_READ)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_PROFILE_READ)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +110,7 @@ func (is *IdentityServer) GetUser(ctx context.Context, _ *pbtypes.Empty) (*ttnpb
 // UpdateUser updates the account of the current user.
 // If the email is modified a validation email will be sent.
 func (is *IdentityServer) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (*pbtypes.Empty, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +127,7 @@ func (is *IdentityServer) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserR
 
 	newEmail := false
 	for _, path := range req.UpdateMask.Paths {
-		switch true {
+		switch {
 		case ttnpb.FieldPathUserDisplayName.MatchString(path):
 			found.GetUser().DisplayName = req.User.DisplayName
 		case ttnpb.FieldPathUserEmail.MatchString(path):
@@ -176,15 +172,11 @@ func (is *IdentityServer) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserR
 			return err
 		}
 
-		return is.email.Send(
-			found.GetUser().Email,
-			templates.EmailValidation(),
-			map[string]interface{}{
-				templates.EmailValidationDisplayName: is.config.DisplayName,
-				templates.EmailValidationHomeURL:     is.config.PublicURL,
-				templates.EmailValidationHostname:    is.config.Hostname,
-				templates.EmailValidationToken:       token.ValidationToken,
-			})
+		return is.email.Send(found.GetUser().Email, &templates.EmailValidation{
+			OrganizationName: is.config.OrganizationName,
+			PublicURL:        is.config.PublicURL,
+			Token:            token.ValidationToken,
+		})
 	})
 
 	return nil, err
@@ -192,7 +184,7 @@ func (is *IdentityServer) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserR
 
 // UpdateUserPassword updates the password of the current user.
 func (is *IdentityServer) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*pbtypes.Empty, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
 	if err != nil {
 		return nil, err
 	}
@@ -223,7 +215,7 @@ func (is *IdentityServer) UpdateUserPassword(ctx context.Context, req *ttnpb.Upd
 
 // DeleteUser deletes the account of the current user.
 func (is *IdentityServer) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.Empty, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_DELETE)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_DELETE)
 	if err != nil {
 		return nil, err
 	}
@@ -278,7 +270,7 @@ func (is *IdentityServer) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pb
 
 // GenerateUserAPIKey generates an user API key and returns it.
 func (is *IdentityServer) GenerateUserAPIKey(ctx context.Context, req *ttnpb.GenerateUserAPIKeyRequest) (*ttnpb.APIKey, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_KEYS)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -304,7 +296,7 @@ func (is *IdentityServer) GenerateUserAPIKey(ctx context.Context, req *ttnpb.Gen
 
 // ListUserAPIKeys returns all the API keys from the current user.
 func (is *IdentityServer) ListUserAPIKeys(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListUserAPIKeysResponse, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_KEYS)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -321,7 +313,7 @@ func (is *IdentityServer) ListUserAPIKeys(ctx context.Context, _ *pbtypes.Empty)
 
 // UpdateUserAPIKey updates an API key from the current user.
 func (is *IdentityServer) UpdateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (*pbtypes.Empty, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
 	if err != nil {
 		return nil, err
 	}
@@ -331,7 +323,7 @@ func (is *IdentityServer) UpdateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 
 // RemoveUserAPIKey removes an API key from the current user.
 func (is *IdentityServer) RemoveUserAPIKey(ctx context.Context, req *ttnpb.RemoveUserAPIKeyRequest) (*pbtypes.Empty, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_KEYS)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -348,7 +340,7 @@ func (is *IdentityServer) ValidateUserEmail(ctx context.Context, req *ttnpb.Vali
 		}
 
 		if token.IsExpired() {
-			return errors.New("token expired")
+			return ErrValidationTokenExpired.New(nil)
 		}
 
 		user, err := store.Users.GetByID(userID, is.factories.user)
@@ -372,7 +364,7 @@ func (is *IdentityServer) ValidateUserEmail(ctx context.Context, req *ttnpb.Vali
 // RequestUserEmailValidation requests a new validation email if the user's email
 // isn't validated yet.
 func (is *IdentityServer) RequestUserEmailValidation(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.Empty, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
 	if err != nil {
 		return nil, err
 	}
@@ -383,7 +375,9 @@ func (is *IdentityServer) RequestUserEmailValidation(ctx context.Context, _ *pbt
 	}
 
 	if !user.GetUser().ValidatedAt.IsZero() {
-		return nil, errors.New("email already validated")
+		return nil, ErrEmailAlreadyValidated.New(errors.Attributes{
+			"email": user.GetUser().Email,
+		})
 	}
 
 	settings, err := is.store.Settings.Get()
@@ -402,22 +396,17 @@ func (is *IdentityServer) RequestUserEmailValidation(ctx context.Context, _ *pbt
 		return nil, err
 	}
 
-	return nil, is.email.Send(
-		user.GetUser().Email,
-		templates.EmailValidation(),
-		map[string]interface{}{
-			templates.EmailValidationDisplayName: is.config.DisplayName,
-			templates.EmailValidationHomeURL:     is.config.PublicURL,
-			templates.EmailValidationHostname:    is.config.Hostname,
-			templates.EmailValidationToken:       token.ValidationToken,
-		},
-	)
+	return nil, is.email.Send(user.GetUser().Email, &templates.EmailValidation{
+		OrganizationName: is.config.OrganizationName,
+		PublicURL:        is.config.PublicURL,
+		Token:            token.ValidationToken,
+	})
 }
 
 // ListAuthorizedClients returns all the authorized third-party clients that
 // the current user has.
 func (is *IdentityServer) ListAuthorizedClients(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListAuthorizedClientsResponse, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_AUTHORIZEDCLIENTS)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_AUTHORIZEDCLIENTS)
 	if err != nil {
 		return nil, err
 	}
@@ -444,7 +433,7 @@ func (is *IdentityServer) ListAuthorizedClients(ctx context.Context, _ *pbtypes.
 
 // RevokeAuthorizedClient revokes an authorized third-party client.
 func (is *IdentityServer) RevokeAuthorizedClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*pbtypes.Empty, error) {
-	userID, err := is.userCheck(ctx, ttnpb.RIGHT_USER_AUTHORIZEDCLIENTS)
+	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_AUTHORIZEDCLIENTS)
 	if err != nil {
 		return nil, err
 	}

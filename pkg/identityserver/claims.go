@@ -5,17 +5,17 @@ package identityserver
 import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 
 // entity is an enum that defines the valids entity types for claims.
-type entity string
+type entity int
 
 const (
 	// EntityUser is an user.
-	entityUser entity = "user"
+	entityUser = iota
 
 	// EntityApplication is an application.
-	entityApplication = "application"
+	entityApplication
 
 	// EntityGateway is a gateway.
-	entityGateway = "gateway"
+	entityGateway
 )
 
 // claims is the type that represents a claims to do something in the Identity Server.
