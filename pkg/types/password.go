@@ -56,13 +56,13 @@ func (p Password) Validate(plain string) (bool, error) {
 }
 
 // Equals safely checks wether or not the other hashed password and this one are the same.
-// This can be used in schemes where the password is hashed at the client side
+// This can be used in schemes where the password is hashed at the client side.
 // and the hash is sent over instead of the plaintext password.
 func (p Password) Equals(other Password) bool {
 	return subtle.ConstantTimeEq(int32(len(other)), int32(len(p))) == 1 && subtle.ConstantTimeCompare([]byte(p), []byte(other)) == 1
 }
 
-// HashingMethod is a method to hash a password
+// HashingMethod is a method to hash a password.
 type HashingMethod interface {
 	Name() string
 	Hash(plain string) (string, error)

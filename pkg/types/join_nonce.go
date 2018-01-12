@@ -8,55 +8,55 @@ import (
 	"strings"
 )
 
-// JoinNonce is randomly generated in the join procedure
+// JoinNonce is randomly generated in the join procedure.
 type JoinNonce [3]byte
 
-// IsZero returns true iff the type is zero
+// IsZero returns true iff the type is zero.
 func (jn JoinNonce) IsZero() bool { return jn == [3]byte{} }
 
-// String implements the Stringer interface
+// String implements the Stringer interface.
 func (jn JoinNonce) String() string { return strings.ToUpper(hex.EncodeToString(jn[:])) }
 
-// GoString implements the GoStringer interface
+// GoString implements the GoStringer interface.
 func (jn JoinNonce) GoString() string { return jn.String() }
 
-// Size implements the Sizer interface
+// Size implements the Sizer interface.
 func (jn JoinNonce) Size() int { return 3 }
 
-// Equal returns true iff nonces are equal
+// Equal returns true iff nonces are equal.
 func (jn JoinNonce) Equal(other JoinNonce) bool { return jn == other }
 
-// Marshal implements the proto.Marshaler interface
+// Marshal implements the proto.Marshaler interface.
 func (jn JoinNonce) Marshal() ([]byte, error) { return jn.MarshalBinary() }
 
-// MarshalTo implements the MarshalerTo function required by generated protobuf
+// MarshalTo implements the MarshalerTo function required by generated protobuf.
 func (jn JoinNonce) MarshalTo(data []byte) (int, error) { return marshalBinaryBytesTo(data, jn[:]) }
 
-// Unmarshal implements the proto.Unmarshaler interface
+// Unmarshal implements the proto.Unmarshaler interface.
 func (jn *JoinNonce) Unmarshal(data []byte) error { return jn.UnmarshalBinary(data) }
 
-// MarshalJSON implements the json.Marshaler interface
+// MarshalJSON implements the json.Marshaler interface.
 func (jn JoinNonce) MarshalJSON() ([]byte, error) { return marshalJSONBytes(jn[:]) }
 
-// UnmarshalJSON implements the json.Unmarshaler interface
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (jn *JoinNonce) UnmarshalJSON(data []byte) error {
 	*jn = [3]byte{}
 	return unmarshalJSONBytes(jn[:], data)
 }
 
-// MarshalBinary implements the encoding.BinaryMarshaler interface
+// MarshalBinary implements the encoding.BinaryMarshaler interface.
 func (jn JoinNonce) MarshalBinary() ([]byte, error) { return marshalBinaryBytes(jn[:]) }
 
-// UnmarshalBinary implements the encoding.BinaryUnmarshaler interface
+// UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
 func (jn *JoinNonce) UnmarshalBinary(data []byte) error {
 	*jn = [3]byte{}
 	return unmarshalBinaryBytes(jn[:], data)
 }
 
-// MarshalText implements the encoding.TextMarshaler interface
+// MarshalText implements the encoding.TextMarshaler interface.
 func (jn JoinNonce) MarshalText() ([]byte, error) { return marshalTextBytes(jn[:]) }
 
-// UnmarshalText implements the encoding.TextUnmarshaler interface
+// UnmarshalText implements the encoding.TextUnmarshaler interface.
 func (jn *JoinNonce) UnmarshalText(data []byte) error {
 	*jn = [3]byte{}
 	return unmarshalTextBytes(jn[:], data)

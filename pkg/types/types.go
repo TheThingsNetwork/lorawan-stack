@@ -11,7 +11,7 @@ import (
 	"errors"
 )
 
-// Interface all types in pkg/types must implement
+// Interface all types in pkg/types must implement.
 type Interface interface {
 	IsZero() bool
 	String() string
@@ -30,10 +30,10 @@ type Interface interface {
 	Scan(src interface{}) error
 }
 
-// ErrInvalidLength can be returned when unmarshaling a slice of invalid length
+// ErrInvalidLength can be returned when unmarshaling a slice of invalid length.
 var ErrInvalidLength = errors.New("invalid length")
 
-// ErrTypeAssertion can be returned when trying to assert one variable
+// ErrTypeAssertion can be returned when trying to assert one variable.
 var ErrTypeAssertion = errors.New("invalid type assertion")
 
 var base64Encoding = base64.StdEncoding

@@ -19,7 +19,7 @@ func randy8(r randy) (b [8]byte) {
 	return
 }
 
-// NewPopulatedDevNonce returns a random DevNonce
+// NewPopulatedDevNonce returns a random DevNonce.
 func NewPopulatedDevNonce(r randy) *DevNonce {
 	var dn DevNonce
 	r8 := randy8(r)
@@ -27,7 +27,7 @@ func NewPopulatedDevNonce(r randy) *DevNonce {
 	return &dn
 }
 
-// NewPopulatedJoinNonce returns a random JoinNonce
+// NewPopulatedJoinNonce returns a random JoinNonce.
 func NewPopulatedJoinNonce(r randy) *JoinNonce {
 	var jn JoinNonce
 	r8 := randy8(r)
@@ -35,7 +35,7 @@ func NewPopulatedJoinNonce(r randy) *JoinNonce {
 	return &jn
 }
 
-// NewPopulatedNetID returns a random NetID
+// NewPopulatedNetID returns a random NetID.
 func NewPopulatedNetID(r randy) *NetID {
 	var id NetID
 	r8 := randy8(r)
@@ -43,7 +43,7 @@ func NewPopulatedNetID(r randy) *NetID {
 	return &id
 }
 
-// NewPopulatedDevAddr returns a random DevAddr
+// NewPopulatedDevAddr returns a random DevAddr.
 func NewPopulatedDevAddr(r randy) *DevAddr {
 	var addr DevAddr
 	r8 := randy8(r)
@@ -51,7 +51,7 @@ func NewPopulatedDevAddr(r randy) *DevAddr {
 	return &addr
 }
 
-// NewPopulatedDevAddrPrefix returns a random DevAddrPrefix
+// NewPopulatedDevAddrPrefix returns a random DevAddrPrefix.
 func NewPopulatedDevAddrPrefix(r randy) *DevAddrPrefix {
 	var prefix DevAddrPrefix
 	prefix.DevAddr = *NewPopulatedDevAddr(r)
@@ -59,7 +59,7 @@ func NewPopulatedDevAddrPrefix(r randy) *DevAddrPrefix {
 	return &prefix
 }
 
-// NewPopulatedEUI64 returns a random EUI64
+// NewPopulatedEUI64 returns a random EUI64.
 func NewPopulatedEUI64(r randy) *EUI64 {
 	var eui EUI64
 	r8 := randy8(r)
@@ -67,7 +67,7 @@ func NewPopulatedEUI64(r randy) *EUI64 {
 	return &eui
 }
 
-// NewPopulatedAES128Key returns a random AES128Key
+// NewPopulatedAES128Key returns a random AES128Key.
 func NewPopulatedAES128Key(r randy) *AES128Key {
 	var key AES128Key
 	r8a := randy8(r)
