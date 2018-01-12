@@ -16,6 +16,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/rpclog"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/sentry"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver/internal/jsonpb"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/getsentry/raven-go"
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
@@ -172,6 +173,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 
 // Registerer allows components to register their services to the gRPC server and the HTTP gateway
 type Registerer interface {
+	Roles() []ttnpb.PeerInfo_Role
 	RegisterServices(s *grpc.Server)
 	RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn)
 }

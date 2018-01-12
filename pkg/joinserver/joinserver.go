@@ -421,6 +421,11 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 	}, nil
 }
 
+// Roles of the gRPC service
+func (js *JoinServer) Roles() []ttnpb.PeerInfo_Role {
+	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_JOIN_SERVER}
+}
+
 // RegisterServices registers services provided by js at s.
 func (js *JoinServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterNsJsServer(s, js)
