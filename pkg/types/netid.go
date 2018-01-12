@@ -5,6 +5,7 @@ package types
 import (
 	"database/sql/driver"
 	"encoding/hex"
+	"fmt"
 	"strings"
 )
 
@@ -62,11 +63,6 @@ func (id *NetID) UnmarshalText(data []byte) error {
 	return unmarshalTextBytes(id[:], data)
 }
 
-// NwkID contained in the NetID
-func (id NetID) NwkID() byte {
-	return id[2] & 127
-}
-
 // Value implements driver.Valuer interface.
 func (id NetID) Value() (driver.Value, error) {
 	return id.MarshalText()
@@ -79,4 +75,76 @@ func (id *NetID) Scan(src interface{}) error {
 		return ErrTypeAssertion
 	}
 	return id.UnmarshalText(data)
+}
+
+// Type returns NetID type.
+func (id NetID) Type() byte {
+	return id[0] >> 5
+}
+
+// ID returns ID contained in the NetID.
+func (id NetID) ID() []byte {
+	switch id.Type() {
+	case 0, 1:
+		// 6 LSB
+		return []byte{id[2] & 0x3f}
+	case 2:
+		// 9 LSB
+		return []byte{id[1] & 0x01, id[2]}
+	case 3, 4, 5, 6, 7:
+		// 21 LSB
+		return []byte{id[0] & 0x1f, id[1], id[2]}
+	default:
+		panic(fmt.Errorf("Unmatched NetID type: %d", id.Type()))
+	}
+}
+
+func (id NetID) IDBits() uint {
+	switch id.Type() {
+	case 0, 1:
+		return 6
+	case 2:
+		return 9
+	case 3, 4, 5, 6, 7:
+		return 21
+	}
+	panic(fmt.Errorf("Unmatched NetID type: %d", id.Type()))
+}
+
+func NewNetID(typ byte, id []byte) (netID NetID, err error) {
+	if typ > 7 {
+		return NetID{}, fmt.Errorf("NetID must be lower or equal to 7, got: %d", typ)
+	}
+
+	if len(id) < 3 {
+		id = append(make([]byte, 3-len(id)), id...)
+	}
+	copy(netID[:], id)
+
+	switch typ {
+	case 0:
+		netID[0] &^= 0xe0
+	case 1:
+		netID[0] |= 0x20
+		netID[0] &^= 0xc0
+	case 2:
+		netID[0] |= 0x40
+		netID[0] &^= 0xa0
+	case 3:
+		netID[0] |= 0x60
+		netID[0] &^= 0x80
+	case 4:
+		netID[0] |= 0x80
+		netID[0] &^= 0x60
+	case 5:
+		netID[0] |= 0xa0
+		netID[0] &^= 0x40
+	case 6:
+		netID[0] |= 0xc0
+		netID[0] &^= 0x20
+	case 7:
+		netID[0] |= 0xe0
+		netID[0] &^= 0x00
+	}
+	return netID, nil
 }
