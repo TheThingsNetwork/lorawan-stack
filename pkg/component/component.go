@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/TheThingsNetwork/ttn/pkg/cluster"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/log/middleware/sentry"
@@ -31,6 +32,8 @@ type Component struct {
 	config *Config
 	logger log.Stack
 	sentry *raven.Client
+
+	cluster cluster.Cluster
 
 	grpc           *rpcserver.Server
 	grpcSubsystems []rpcserver.Registerer
