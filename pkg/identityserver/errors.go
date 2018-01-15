@@ -11,7 +11,6 @@ func init() {
 	ErrNotAuthorized.Register()
 	ErrSetApplicationCollaboratorFailed.Register()
 	ErrSetGatewayCollaboratorFailed.Register()
-	ErrRemoveGatewayAPIKeyFailed.Register()
 	ErrEmailAlreadyValidated.Register()
 	ErrValidationTokenExpired.Register()
 }
@@ -69,20 +68,11 @@ var ErrSetGatewayCollaboratorFailed = &errors.ErrDescriptor{
 	SafeAttributes: []string{"gateway_id"},
 }
 
-// ErrRemoveGatewayAPIKeyFailed is returned when trying to remove the API key
-// that's used as value to be sent to the gateway agent.
-var ErrRemoveGatewayAPIKeyFailed = &errors.ErrDescriptor{
-	MessageFormat:  "Failed to remove gateway `{gateway_id}` API key `{key_name}`: key must be rotated",
-	Code:           7,
-	Type:           errors.Unauthorized,
-	SafeAttributes: []string{"gateway_id", "key_name"},
-}
-
 // ErrEmailAlreadyValidated is returned when calling 'RequestUserEmailValidation'
 // when the email is already validated.
 var ErrEmailAlreadyValidated = &errors.ErrDescriptor{
 	MessageFormat:  "Email `{email}` is already validated",
-	Code:           8,
+	Code:           7,
 	Type:           errors.Unauthorized,
 	SafeAttributes: []string{"email"},
 }
@@ -91,6 +81,6 @@ var ErrEmailAlreadyValidated = &errors.ErrDescriptor{
 // using an expired token.
 var ErrValidationTokenExpired = &errors.ErrDescriptor{
 	MessageFormat: "Token is expired",
-	Code:          9,
+	Code:          8,
 	Type:          errors.Unauthorized,
 }

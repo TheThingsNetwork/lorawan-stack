@@ -61,25 +61,6 @@ func TestGateway(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	// check that a api key has been created
-	keys, err := is.ListGatewayAPIKeys(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
-	a.So(err, should.BeNil)
-	if a.So(keys.APIKeys, should.HaveLength, 1) {
-		k := keys.APIKeys[0]
-		a.So(k.Name, should.NotBeEmpty)
-		a.So(k.Key, should.NotBeEmpty)
-		a.So(k.Rights, should.HaveLength, 1)
-		a.So(k.Rights, should.Contain, ttnpb.RIGHT_GATEWAY_INFO)
-
-		// also the key can't be deleted if it is not rotated
-		_, err := is.RemoveGatewayAPIKey(ctx, &ttnpb.RemoveGatewayAPIKeyRequest{
-			GatewayIdentifier: gtw.GatewayIdentifier,
-			Name:              k.Name,
-		})
-		a.So(err, should.NotBeNil)
-		a.So(ErrRemoveGatewayAPIKeyFailed.Describes(err), should.BeTrue)
-	}
-
 	// can't create gateways with blacklisted ids
 	for _, id := range testSettings().BlacklistedIDs {
 		_, err := is.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{
@@ -143,11 +124,11 @@ func TestGateway(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
-	keys, err = is.ListGatewayAPIKeys(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	keys, err := is.ListGatewayAPIKeys(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
 	a.So(err, should.BeNil)
-	if a.So(keys.APIKeys, should.HaveLength, 2) {
-		sort.Slice(keys.APIKeys[1].Rights, func(i, j int) bool { return keys.APIKeys[0].Rights[i] < keys.APIKeys[0].Rights[j] })
-		a.So(keys.APIKeys[1], should.Resemble, key)
+	if a.So(keys.APIKeys, should.HaveLength, 1) {
+		sort.Slice(keys.APIKeys[0].Rights, func(i, j int) bool { return keys.APIKeys[0].Rights[i] < keys.APIKeys[0].Rights[j] })
+		a.So(keys.APIKeys[0], should.Resemble, key)
 	}
 
 	_, err = is.RemoveGatewayAPIKey(ctx, &ttnpb.RemoveGatewayAPIKeyRequest{
@@ -157,7 +138,7 @@ func TestGateway(t *testing.T) {
 
 	keys, err = is.ListGatewayAPIKeys(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
 	a.So(err, should.BeNil)
-	a.So(keys.APIKeys, should.HaveLength, 1)
+	a.So(keys.APIKeys, should.HaveLength, 0)
 
 	// set new collaborator
 	alice := testUsers()["alice"]

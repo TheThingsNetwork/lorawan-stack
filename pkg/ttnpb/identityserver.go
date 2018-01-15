@@ -236,15 +236,13 @@ func (req *UpdateGatewayRequest) Validate() error {
 			FieldPathGatewayPlatform.MatchString(path),
 			FieldPathGatewayAntennas.MatchString(path),
 			FieldPathGatewayAttributes.MatchString(path):
-		case FieldPathGatewayAPIKey.MatchString(path):
-			err = validate.Field(req.Gateway.APIKey, validate.Required).DescribeFieldName("Device Configuration: API Key")
 		case FieldPathGatewayClusterAddress.MatchString(path):
-			err = validate.Field(req.Gateway.ClusterAddress, validate.Required).DescribeFieldName("Device Configuration: Cluster Address")
+			err = validate.Field(req.Gateway.ClusterAddress, validate.Required).DescribeFieldName("Cluster Address")
 		case FieldPathGatewayFrequencyPlanID.MatchString(path):
-			err = validate.Field(req.Gateway.FrequencyPlanID, validate.Required).DescribeFieldName("Device Configuration: Frequency plan ID")
+			err = validate.Field(req.Gateway.FrequencyPlanID, validate.Required).DescribeFieldName("Frequency plan ID")
 		case FieldPathGatewayRadios.MatchString(path):
 			for _, radio := range req.Gateway.Radios {
-				validations = append(validations, validate.Field(radio.Frequency, validate.Required).DescribeFieldName("Device Configuration: Radio Frequency"))
+				validations = append(validations, validate.Field(radio.Frequency, validate.Required).DescribeFieldName("Radio Frequency"))
 			}
 		case FieldPathGatewayContactAccountUserID.MatchString(path):
 			err = validate.Field(req.Gateway.ContactAccount.UserID, validate.NotRequired, validate.ID).DescribeFieldName("Contact account: user ID")

@@ -22,54 +22,50 @@ message Gateway {
   // description is the description of the gateway.
   string description = 2;
 
-  // api_key is the API key that the Gateway Agent used uses to authenticate the
-  // gateway to other components of the network.
-  APIKey api_key = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "APIKey"];
-
   // frequency_plan_id indicates the ID of the frequency plan.
-  string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID"];
+  string frequency_plan_id = 3 [(gogoproto.customname) = "FrequencyPlanID"];
 
   // cluster_address indicates the URI of the gateway server cluster to connect to,
   // in a "<ip>:<port>" format.
-  string cluster_address = 5;
+  string cluster_address = 4;
 
   // antennas contains the information for every antenna of the gateway.
-  repeated GatewayAntenna antennas = 6 [(gogoproto.nullable) = false];
+  repeated GatewayAntenna antennas = 5 [(gogoproto.nullable) = false];
 
   // radios are the gateway concentrator's radios.
-  repeated GatewayRadio radios = 7 [(gogoproto.nullable) = false];
+  repeated GatewayRadio radios = 6 [(gogoproto.nullable) = false];
 
   // activated_at denotes when the gateway was activated.
   // This a read-only field.
-  google.protobuf.Timestamp activated_at = 8 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  google.protobuf.Timestamp activated_at = 7 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
 
   // privacy_settings defines the different privacy settings for this gateway.
-  GatewayPrivacySettings privacy_settings = 9 [(gogoproto.nullable) = false];
+  GatewayPrivacySettings privacy_settings = 8 [(gogoproto.nullable) = false];
 
   // auto_update indicates whether or not the gateway should be able to
   // automatically fetch and execute firmware updates.
   // It is true by default.
-  bool auto_update = 10;
+  bool auto_update = 9;
 
   // platform is the gateway platform, e.g. "The Things Gateway" or "Kerklink iBTS".
-  string platform = 11;
+  string platform = 10;
 
   // attributes is a free form map of attributes.
-  map<string, string> attributes = 12;
+  map<string, string> attributes = 11;
 
   // contact_account is the user ID that will be displayed (given the set privacy
   // settings) as contact person for this gateway.
   // TODO(gomezjdaniel#222): allow to use an organization ID as contact account
   // when they are added.
-  UserIdentifier contact_account = 13;
+  UserIdentifier contact_account = 12;
 
   // created_at is the time when the gateway was created.
   // This a read-only field.
-  google.protobuf.Timestamp created_at = 14 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 13 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // updated_at is the last time the gateway was updated.
   // This a read-only field.
-  google.protobuf.Timestamp updated_at = 15 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 14 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 // GatewayPrivacySettings is the message that defines the different privacy settings
