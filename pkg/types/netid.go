@@ -5,6 +5,7 @@ package types
 import (
 	"database/sql/driver"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -99,7 +100,7 @@ func (id NetID) ID() []byte {
 	}
 }
 
-// IDBits returns the bit-length of ID of id.
+// IDBits returns the bit-length of ID represented by the NetID.
 func (id NetID) IDBits() uint {
 	switch id.Type() {
 	case 0, 1:
@@ -115,38 +116,16 @@ func (id NetID) IDBits() uint {
 // NewNetID returns new NetID.
 func NewNetID(typ byte, id []byte) (netID NetID, err error) {
 	if typ > 7 {
-		return NetID{}, fmt.Errorf("NetID must be lower or equal to 7, got: %d", typ)
+		return NetID{}, fmt.Errorf("NetID type must be lower or equal to 7, got: %d", typ)
 	}
 
 	if len(id) < 3 {
 		id = append(make([]byte, 3-len(id)), id...)
 	}
-	copy(netID[:], id)
-
-	switch typ {
-	case 0:
-		netID[0] &^= 0xe0
-	case 1:
-		netID[0] |= 0x20
-		netID[0] &^= 0xc0
-	case 2:
-		netID[0] |= 0x40
-		netID[0] &^= 0xa0
-	case 3:
-		netID[0] |= 0x60
-		netID[0] &^= 0x80
-	case 4:
-		netID[0] |= 0x80
-		netID[0] &^= 0x60
-	case 5:
-		netID[0] |= 0xa0
-		netID[0] &^= 0x40
-	case 6:
-		netID[0] |= 0xc0
-		netID[0] &^= 0x20
-	case 7:
-		netID[0] |= 0xe0
-		netID[0] &^= 0x00
+	if id[0]&0xe0 > 0 {
+		return NetID{}, errors.New("Too many bits set in id")
 	}
+	copy(netID[:], id)
+	netID[0] = netID[0]&0x1f | typ<<5
 	return netID, nil
 }
