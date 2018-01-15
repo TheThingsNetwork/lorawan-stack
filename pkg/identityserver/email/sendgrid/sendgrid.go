@@ -24,25 +24,25 @@ type SendGrid struct {
 	sandboxMode bool
 }
 
-// SendGridOpt is the type of functions that configure the provider.
-type SendGridOpt func(*SendGrid)
+// Option is the type of functions that configure the provider.
+type Option func(*SendGrid)
 
-// SandoxMode sets the sandbox mode for testing purposes.
-func SandboxMode(enabled bool) SendGridOpt {
+// SandboxMode sets the sandbox mode for testing purposes.
+func SandboxMode(enabled bool) Option {
 	return func(s *SendGrid) {
 		s.sandboxMode = enabled
 	}
 }
 
 // SenderAddress sets the given address as from email address.
-func SenderAddress(name, address string) SendGridOpt {
+func SenderAddress(name, address string) Option {
 	return func(s *SendGrid) {
 		s.fromEmail = mail.NewEmail(name, address)
 	}
 }
 
 // New creates a SendGrid email provider.
-func New(logger log.Interface, apiKey string, opts ...SendGridOpt) *SendGrid {
+func New(logger log.Interface, apiKey string, opts ...Option) *SendGrid {
 	provider := &SendGrid{
 		logger:    logger.WithField("provider", "SendGrid"),
 		client:    sendgrid.NewSendClient(apiKey),

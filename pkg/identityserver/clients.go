@@ -46,7 +46,7 @@ func (is *IdentityServer) CreateClient(ctx context.Context, req *ttnpb.CreateCli
 	})
 }
 
-// GetClients returns a client.
+// GetClient returns a client.
 func (is *IdentityServer) GetClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*ttnpb.Client, error) {
 	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_LIST)
 	if err != nil {

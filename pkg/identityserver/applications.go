@@ -126,7 +126,7 @@ func (is *IdentityServer) DeleteApplication(ctx context.Context, req *ttnpb.Appl
 	return nil, is.store.Applications.Delete(req.ApplicationID)
 }
 
-// GenerateApplicationKey generates an application API key and returns it.
+// GenerateApplicationAPIKey generates an application API key and returns it.
 func (is *IdentityServer) GenerateApplicationAPIKey(ctx context.Context, req *ttnpb.GenerateApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
 	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
 	if err != nil {
@@ -189,7 +189,7 @@ func (is *IdentityServer) RemoveApplicationAPIKey(ctx context.Context, req *ttnp
 	return nil, is.store.Applications.DeleteAPIKey(req.ApplicationID, req.Name)
 }
 
-// SetApplicationCollaborators allows to set and unset an application collaborator.
+// SetApplicationCollaborator allows to set and unset an application collaborator.
 // It fails if after unset a collaborator there is no at least one collaborator
 // with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right.
 func (is *IdentityServer) SetApplicationCollaborator(ctx context.Context, req *ttnpb.ApplicationCollaborator) (*pbtypes.Empty, error) {
