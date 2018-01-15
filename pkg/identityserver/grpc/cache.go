@@ -56,7 +56,7 @@ func (c *TTLCache) GatewayKey(gtwID string) string {
 	return fmt.Sprintf("gateway:%s", gtwID)
 }
 
-func (c *TTLCachee) GetOrFetch(key string, fetch func() ([]ttnpb.Right, error)) ([]ttnpb.Right, error) {
+func (c *TTLCache) GetOrFetch(key string, fetch func() ([]ttnpb.Right, error)) ([]ttnpb.Right, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	e, ok := c.entries[key]
