@@ -95,7 +95,7 @@ func TestDevAddr(t *testing.T) {
 			a.So(NwkAddrBits(netID), should.Equal, tc.NwkAddrBits)
 			a.So(NwkAddrLength(netID), should.Equal, tc.NwkAddrLength)
 
-			devAddr := NewDevAddr(netID, tc.NwkAddr)
+			devAddr, err := NewDevAddr(netID, tc.NwkAddr)
 			a.So(err, should.BeNil)
 			if !a.So(devAddr, should.Equal, tc.DevAddr) {
 				return

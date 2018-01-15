@@ -124,6 +124,14 @@ func (addr DevAddr) AfterOrEqual(a DevAddr) bool {
 	return addr.After(a) || addr == a
 }
 
+// Validate returns true if the DevAddr is valid and compliant with LoRaWAN specification.
+func (addr DevAddr) Validate() error {
+	if addr[0] == 0xff {
+		return errors.New("Unknown NetID type")
+	}
+	return nil
+}
+
 // NetIDType returns the NetID type of the DevAddr.
 func (addr DevAddr) NetIDType() byte {
 	for i := uint(7); i >= 0; i-- {
@@ -209,9 +217,12 @@ func NwkAddrLength(netID NetID) int {
 }
 
 // NewDevAddr returns new DevAddr.
-func NewDevAddr(netID NetID, nwkAddr []byte) (addr DevAddr) {
+func NewDevAddr(netID NetID, nwkAddr []byte) (addr DevAddr, err error) {
 	if len(nwkAddr) < 4 {
 		nwkAddr = append(make([]byte, 4-len(nwkAddr)), nwkAddr...)
+	}
+	if nwkAddr[0]&(0xfe<<((NwkAddrBits(netID)-1)%8)) > 0 {
+		return DevAddr{}, errors.New("Too many bits set in nwkAddr")
 	}
 	copy(addr[:], nwkAddr)
 
@@ -220,52 +231,38 @@ func NewDevAddr(netID NetID, nwkAddr []byte) (addr DevAddr) {
 	switch t {
 	case 0:
 		addr[0] |= nwkID[0] << 1
-		addr[0] &^= 0x80
 	case 1:
 		addr[0] |= nwkID[0]
-		addr[0] |= 0x80
-		addr[0] &^= 0x40
 	case 2:
 		addr[1] |= nwkID[1] << 4
 		addr[0] |= nwkID[1] >> 4
 		addr[0] |= nwkID[0] << 4
-		addr[0] |= 0xc0
-		addr[0] &^= 0x20
 	case 3:
 		addr[1] |= nwkID[2] << 2
 		addr[0] |= nwkID[2] >> 6
 		addr[0] |= nwkID[1] << 2
-		addr[0] |= 0xe0
-		addr[0] &^= 0x10
 	case 4:
 		addr[0] |= nwkID[1]
 		addr[1] |= nwkID[2]
-		addr[0] |= 0xf0
-		addr[0] &^= 0x08
 	case 5:
 		addr[2] |= nwkID[2] << 5
 		addr[1] |= nwkID[2] >> 3
 		addr[1] |= nwkID[1] << 5
 		addr[0] |= nwkID[1] >> 3
-		addr[0] |= 0xf8
-		addr[0] &^= 0x04
 	case 6:
 		addr[2] |= nwkID[2] << 2
 		addr[1] |= nwkID[2] >> 6
 		addr[1] |= nwkID[1] << 2
 		addr[0] |= nwkID[1] >> 6
-		addr[0] |= 0xfc
-		addr[0] &^= 0x02
 	case 7:
 		addr[3] |= nwkID[2] << 7
 		addr[2] |= nwkID[2] >> 1
 		addr[2] |= nwkID[1] << 7
 		addr[1] |= nwkID[1] >> 1
 		addr[1] |= nwkID[0] << 7
-		addr[0] |= 0xfe
-		addr[0] &^= 0x01
 	}
-	return addr
+	addr[0] |= 0xfe << (7 - t)
+	return addr, nil
 }
 
 // ErrInvalidDevAddrPrefix can be returned when unmarshaling an invalid slice into a prefix.
