@@ -8,37 +8,45 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-type realTime time.Time
+type systemTime time.Time
 
-func (r realTime) Add(d time.Duration) Timestamp { return realTime(time.Time(r).Add(d)) }
-func (r realTime) Sub(s Timestamp) time.Duration { return time.Time(r).Sub(time.Time(s.(realTime))) }
-func (r realTime) After(s Timestamp) bool        { return time.Time(r).After(time.Time(s.(realTime))) }
-func (r realTime) Before(s Timestamp) bool       { return time.Time(r).Before(time.Time(s.(realTime))) }
-func (r realTime) Equal(s Timestamp) bool        { return time.Time(r) == time.Time(s.(realTime)) }
-
-// FromSystemTimestamp returns a Timestamp value from a system timestamp.
-func FromSystemTimestamp(t time.Time) Timestamp { return realTime(t) }
-
-type concentratorTimestamp uint64
-
-func (c concentratorTimestamp) Add(d time.Duration) Timestamp {
-	return concentratorTimestamp(uint64(c) + uint64(d))
+func (r systemTime) Add(d time.Duration) Timestamp { return systemTime(time.Time(r).Add(d)) }
+func (r systemTime) Sub(s Timestamp) time.Duration {
+	return time.Time(r).Sub(time.Time(s.(systemTime)))
 }
-func (c concentratorTimestamp) Sub(s Timestamp) time.Duration {
-	return time.Duration(uint64(c) - uint64(s.(concentratorTimestamp)))
+func (r systemTime) After(s Timestamp) bool {
+	return time.Time(r).After(time.Time(s.(systemTime)))
 }
-func (c concentratorTimestamp) After(s Timestamp) bool {
-	return uint64(c) > uint64(s.(concentratorTimestamp))
+func (r systemTime) Before(s Timestamp) bool {
+	return time.Time(r).Before(time.Time(s.(systemTime)))
 }
-func (c concentratorTimestamp) Before(s Timestamp) bool {
-	return uint64(c) < uint64(s.(concentratorTimestamp))
-}
-func (c concentratorTimestamp) Equal(s Timestamp) bool {
-	return uint64(c) == uint64(s.(concentratorTimestamp))
+func (r systemTime) Equal(s Timestamp) bool {
+	return time.Time(r) == time.Time(s.(systemTime))
 }
 
-// FromConcentratorTimestamp returns a Timestamp value from a concentrator timestamp.
-func FromConcentratorTimestamp(t uint64) Timestamp { return concentratorTimestamp(t) }
+// SystemTime returns a Timestamp value from a system timestamp.
+func SystemTime(t time.Time) Timestamp { return systemTime(t) }
+
+type concentratorTime uint64
+
+func (c concentratorTime) Add(d time.Duration) Timestamp {
+	return concentratorTime(uint64(c) + uint64(d))
+}
+func (c concentratorTime) Sub(s Timestamp) time.Duration {
+	return time.Duration(uint64(c) - uint64(s.(concentratorTime)))
+}
+func (c concentratorTime) After(s Timestamp) bool {
+	return uint64(c) > uint64(s.(concentratorTime))
+}
+func (c concentratorTime) Before(s Timestamp) bool {
+	return uint64(c) < uint64(s.(concentratorTime))
+}
+func (c concentratorTime) Equal(s Timestamp) bool {
+	return uint64(c) == uint64(s.(concentratorTime))
+}
+
+// ConcentratorTime returns a Timestamp value from a concentrator timestamp.
+func ConcentratorTime(t uint64) Timestamp { return concentratorTime(t) }
 
 // Timestamp represents a temporal value. Using two Timestamp value of different origins (concentrator, system) in the same scheduler will result in a panic.
 type Timestamp interface {

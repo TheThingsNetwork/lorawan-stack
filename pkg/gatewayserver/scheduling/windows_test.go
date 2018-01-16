@@ -14,7 +14,7 @@ import (
 func TestWindowTiming(t *testing.T) {
 	a := assertions.New(t)
 
-	testingTime := FromSystemTimestamp(time.Now())
+	testingTime := SystemTime(time.Now())
 	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
@@ -26,7 +26,7 @@ func TestWindowTiming(t *testing.T) {
 func TestWindowContains(t *testing.T) {
 	a := assertions.New(t)
 
-	testingTime := FromSystemTimestamp(time.Now())
+	testingTime := SystemTime(time.Now())
 	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
@@ -50,7 +50,7 @@ func TestWindowContains(t *testing.T) {
 func TestPrecedingComparison(t *testing.T) {
 	a := assertions.New(t)
 
-	testingTime := FromSystemTimestamp(time.Now())
+	testingTime := SystemTime(time.Now())
 	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
@@ -82,7 +82,7 @@ func TestPrecedingComparison(t *testing.T) {
 func TestIsProlongedByComparison(t *testing.T) {
 	a := assertions.New(t)
 
-	testingTime := FromSystemTimestamp(time.Now())
+	testingTime := SystemTime(time.Now())
 	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
@@ -114,7 +114,7 @@ func TestIsProlongedByComparison(t *testing.T) {
 func TestOverlap(t *testing.T) {
 	a := assertions.New(t)
 
-	testingTime := FromSystemTimestamp(time.Now())
+	testingTime := SystemTime(time.Now())
 	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,
@@ -147,7 +147,7 @@ func TestOverlap(t *testing.T) {
 func TestTimeOffAir(t *testing.T) {
 	a := assertions.New(t)
 
-	testingTime := FromSystemTimestamp(time.Now())
+	testingTime := SystemTime(time.Now())
 	s := Span{
 		Start:    testingTime,
 		Duration: time.Second,

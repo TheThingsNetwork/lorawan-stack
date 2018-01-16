@@ -26,7 +26,7 @@ func TestEmptyScheduler(t *testing.T) {
 	s, err := scheduling.FrequencyPlanScheduler(context.Background(), emptyEUFrequencyPlan())
 	a.So(err, should.BeNil)
 
-	askingTime := scheduling.FromSystemTimestamp(time.Now().Add(time.Minute))
+	askingTime := scheduling.SystemTime(time.Now().Add(time.Minute))
 	askingDuration := time.Second
 	_, err = s.ScheduleAnytime(askingTime, askingDuration, 0)
 	a.So(err, should.NotBeNil)
@@ -56,7 +56,7 @@ func TestDwellTimeBlocking(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	err = s.ScheduleAt(scheduling.Span{Start: scheduling.FromSystemTimestamp(time.Now()), Duration: time.Minute}, 0)
+	err = s.ScheduleAt(scheduling.Span{Start: scheduling.SystemTime(time.Now()), Duration: time.Minute}, 0)
 	a.So(err, should.NotBeNil)
 }
 
@@ -68,7 +68,7 @@ func TestScheduleAnytime(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	askingTime := scheduling.FromSystemTimestamp(time.Now())
+	askingTime := scheduling.SystemTime(time.Now())
 	err = s.ScheduleAt(scheduling.Span{Start: askingTime, Duration: time.Microsecond}, 863000000)
 	a.So(err, should.BeNil)
 
@@ -89,7 +89,7 @@ func TestScheduleAnytime2(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	askingTime := scheduling.FromSystemTimestamp(time.Now())
+	askingTime := scheduling.SystemTime(time.Now())
 	err = s.ScheduleAt(scheduling.Span{Start: askingTime, Duration: time.Microsecond}, 863000000)
 	a.So(err, should.BeNil)
 
@@ -112,7 +112,7 @@ func TestScheduleAnytimeFullDutyCycle(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	askingTime := scheduling.FromSystemTimestamp(time.Now())
+	askingTime := scheduling.SystemTime(time.Now())
 	scheduleDuration := time.Duration(180 * time.Millisecond)
 	err = s.ScheduleAt(scheduling.Span{Start: askingTime, Duration: scheduleDuration}, 863000000)
 	a.So(err, should.BeNil)
@@ -138,7 +138,7 @@ func TestScheduleAnytimeFullDutyCycleAfterRegisteredEmission(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	askingTime := scheduling.FromSystemTimestamp(time.Now())
+	askingTime := scheduling.SystemTime(time.Now())
 	scheduleDuration := time.Duration(180 * time.Millisecond)
 	err = s.RegisterEmission(scheduling.Span{Start: askingTime, Duration: scheduleDuration}, 863000000)
 	a.So(err, should.BeNil)
@@ -158,7 +158,7 @@ func TestScheduleFullDutyCycle(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	askingTime := scheduling.FromSystemTimestamp(time.Now())
+	askingTime := scheduling.SystemTime(time.Now())
 	scheduleDuration := time.Duration(180 * time.Millisecond)
 	err = s.ScheduleAt(scheduling.Span{Start: askingTime, Duration: scheduleDuration}, 863000000)
 	a.So(err, should.BeNil)
@@ -181,7 +181,7 @@ func TestScheduleOrdering(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	askingTime := scheduling.FromSystemTimestamp(time.Now().Add(time.Minute))
+	askingTime := scheduling.SystemTime(time.Now().Add(time.Minute))
 	scheduleDuration := time.Duration(time.Millisecond)
 
 	schedule, err := s.ScheduleAnytime(askingTime, scheduleDuration, 863000000)
@@ -207,7 +207,7 @@ func TestTimeOffAirError(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	askingTime := scheduling.FromSystemTimestamp(time.Now())
+	askingTime := scheduling.SystemTime(time.Now())
 	scheduleDuration := time.Duration(60 * time.Millisecond)
 	err = s.ScheduleAt(scheduling.Span{Start: askingTime, Duration: scheduleDuration}, 863000000)
 	a.So(err, should.BeNil)

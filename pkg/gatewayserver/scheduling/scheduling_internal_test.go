@@ -13,7 +13,7 @@ import (
 func TestWindowDurationSum(t *testing.T) {
 	a := assertions.New(t)
 
-	startingTime := FromSystemTimestamp(time.Now())
+	startingTime := SystemTime(time.Now())
 
 	spans := []Span{
 		{

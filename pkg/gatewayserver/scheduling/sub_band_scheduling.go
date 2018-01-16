@@ -34,7 +34,7 @@ type subBandScheduling struct {
 	dutyCycle         band.DutyCycle
 	schedulingWindows []packetWindow
 
-	currentConcentratorTimestamp uint64
+	currentConcentratorTime uint64
 
 	mu sync.Mutex
 }
@@ -43,8 +43,8 @@ func (s *subBandScheduling) expired(t Timestamp) bool {
 	switch t.(type) {
 	case realTime:
 		return time.Time(t.(realTime)).Add(dutyCycleWindow).Before(time.Now())
-	case concentratorTimestamp:
-		return uint64(t.(concentratorTimestamp))+uint64(dutyCycleWindow) < s.currentConcentratorTimestamp
+	case concentratorTime:
+		return uint64(t.(concentratorTime))+uint64(dutyCycleWindow) < s.currentConcentratorTime
 	default:
 		return false
 	}
