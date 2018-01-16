@@ -136,7 +136,7 @@ var defaultOptions = []Option{
 }
 
 // New returns a new IdentityServer.
-func New(comp *component.Component, config *Config, opts ...Option) (*IdentityServer, error) {
+func New(c *component.Component, config *Config, opts ...Option) (*IdentityServer, error) {
 	store, err := sql.Open(config.DSN)
 	if err != nil {
 		return nil, err
@@ -148,7 +148,7 @@ func New(comp *component.Component, config *Config, opts ...Option) (*IdentitySe
 	}
 
 	is := &IdentityServer{
-		Component: comp,
+		Component: c,
 		store:     store,
 		config:    config,
 	}
@@ -156,7 +156,7 @@ func New(comp *component.Component, config *Config, opts ...Option) (*IdentitySe
 	opts = append(defaultOptions, opts...)
 
 	if len(config.SendGridAPIKey) != 0 {
-		opts = append(opts, WithEmailProvider(sendgrid.New(comp.Logger(), config.SendGridAPIKey, sendgrid.SenderAddress(config.OrganizationName, fmt.Sprintf("noreply@%s", config.Hostname)))))
+		opts = append(opts, WithEmailProvider(sendgrid.New(c.Logger(), config.SendGridAPIKey, sendgrid.SenderAddress(config.OrganizationName, fmt.Sprintf("noreply@%s", config.Hostname)))))
 	}
 
 	for _, opt := range opts {
@@ -166,19 +166,8 @@ func New(comp *component.Component, config *Config, opts ...Option) (*IdentitySe
 	return is, nil
 }
 
-// Start initializes the store, sets the default settings in case they are not
-// set and starts the registered gRPC services.
-func (is *IdentityServer) Start() error {
-	err := is.start()
-	if err != nil {
-		return err
-	}
-
-	return is.Component.Start()
-}
-
-// start inits all the IdentityServer stuff that is not related with the base component.
-func (is *IdentityServer) start() error {
+// Init initializes the store and sets the default settings in case they aren't.
+func (is *IdentityServer) Init() error {
 	err := is.store.Init(is.config.RecreateDatabase)
 	if err != nil {
 		return err

@@ -48,7 +48,7 @@ func getIS(t testing.TB) *IdentityServer {
 			logger.WithError(err).Fatal("Failed to create an Identity Server instance")
 		}
 
-		err = is.start()
+		err = is.Init()
 		if err != nil {
 			logger.WithError(err).Fatal("Failed to initialize the Identity Server instance")
 		}
