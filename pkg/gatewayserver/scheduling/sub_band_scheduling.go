@@ -41,8 +41,8 @@ type subBandScheduling struct {
 
 func (s *subBandScheduling) expired(t Timestamp) bool {
 	switch t.(type) {
-	case realTime:
-		return time.Time(t.(realTime)).Add(dutyCycleWindow).Before(time.Now())
+	case systemTime:
+		return time.Time(t.(systemTime)).Add(dutyCycleWindow).Before(time.Now())
 	case concentratorTime:
 		return uint64(t.(concentratorTime))+uint64(dutyCycleWindow) < s.currentConcentratorTime
 	default:
@@ -58,10 +58,8 @@ func (s *subBandScheduling) bgCleanup(ctx context.Context) {
 		case <-time.After(cleanupDelay):
 			s.mu.Lock()
 			for i, w := range s.schedulingWindows {
-				if realTime, ok := w.window.End().(realTime); ok {
-					if time.Time(realTime).Add(dutyCycleWindow).Before(time.Now()) {
-						s.schedulingWindows = append(s.schedulingWindows[:i], s.schedulingWindows[i+1:]...)
-					}
+				if s.expired(w.window.End()) {
+					s.schedulingWindows = append(s.schedulingWindows[:i], s.schedulingWindows[i+1:]...)
 				}
 			}
 			s.mu.Unlock()
