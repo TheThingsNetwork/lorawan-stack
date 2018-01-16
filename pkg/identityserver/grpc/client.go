@@ -6,8 +6,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/TheThingsNetwork/ttn/pkg/validate"
 	"google.golang.org/grpc"
 )
 
@@ -58,7 +60,17 @@ func New(conn *grpc.ClientConn, opts ...Option) *RightsFetcher {
 // ListApplicationRights returns the rights the caller has to an application.
 // Either from the cache or fetching them by making the gRPC call.
 func (r *RightsFetcher) ListApplicationRights(ctx context.Context, req *ttnpb.ApplicationIdentifier, creds *rpcmetadata.MD) (*ttnpb.ListApplicationRightsResponse, error) {
-	rights, err := r.applicationsCache.GetOrFetch(authorization(creds), req.ApplicationID, func() ([]ttnpb.Right, error) {
+	err := validate.ID(req.ApplicationID)
+	if err != nil {
+		return nil, err
+	}
+
+	auth := authorization(creds)
+	if len(auth) == 0 {
+		return nil, identityserver.ErrNotAuthorized.New(nil)
+	}
+
+	rights, err := r.applicationsCache.GetOrFetch(auth, req.ApplicationID, func() ([]ttnpb.Right, error) {
 		resp, err := r.applications.ListApplicationRights(ctx, req, grpc.PerRPCCredentials(creds))
 		if err != nil {
 			return nil, err
@@ -79,7 +91,17 @@ func (r *RightsFetcher) ListApplicationRights(ctx context.Context, req *ttnpb.Ap
 // ListGatewayRights returns the rights the caller has to a gateway.
 // Either from the cache or fetching them by making the gRPC call.
 func (r *RightsFetcher) ListGatewayRights(ctx context.Context, req *ttnpb.GatewayIdentifier, creds *rpcmetadata.MD) (*ttnpb.ListGatewayRightsResponse, error) {
-	rights, err := r.gatewaysCache.GetOrFetch(authorization(creds), req.GatewayID, func() ([]ttnpb.Right, error) {
+	err := validate.ID(req.GatewayID)
+	if err != nil {
+		return nil, err
+	}
+
+	auth := authorization(creds)
+	if len(auth) == 0 {
+		return nil, identityserver.ErrNotAuthorized.New(nil)
+	}
+
+	rights, err := r.gatewaysCache.GetOrFetch(auth, req.GatewayID, func() ([]ttnpb.Right, error) {
 		resp, err := r.gateways.ListGatewayRights(ctx, req, grpc.PerRPCCredentials(creds))
 		if err != nil {
 			return nil, err
