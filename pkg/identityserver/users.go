@@ -18,9 +18,13 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
+type userService struct {
+	*IdentityServer
+}
+
 // CreateUser creates an user in the network.
-func (is *IdentityServer) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequest) (*pbtypes.Empty, error) {
-	settings, err := is.store.Settings.Get()
+func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequest) (*pbtypes.Empty, error) {
+	settings, err := s.store.Settings.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -60,11 +64,11 @@ func (is *IdentityServer) CreateUser(ctx context.Context, req *ttnpb.CreateUserR
 	if settings.SkipValidation {
 		user.ValidatedAt = time.Now()
 
-		return nil, is.store.Users.Create(user)
+		return nil, s.store.Users.Create(user)
 	}
 
-	err = is.store.Transact(func(s *store.Store) error {
-		err := s.Users.Create(user)
+	err = s.store.Transact(func(st *store.Store) error {
+		err := st.Users.Create(user)
 		if err != nil {
 			return err
 		}
@@ -75,14 +79,14 @@ func (is *IdentityServer) CreateUser(ctx context.Context, req *ttnpb.CreateUserR
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 
-		err = s.Users.SaveValidationToken(req.User.UserID, token)
+		err = st.Users.SaveValidationToken(req.User.UserID, token)
 		if err != nil {
 			return err
 		}
 
-		return is.email.Send(user.Email, &templates.EmailValidation{
-			OrganizationName: is.config.OrganizationName,
-			PublicURL:        is.config.PublicURL,
+		return s.email.Send(user.Email, &templates.EmailValidation{
+			OrganizationName: s.config.OrganizationName,
+			PublicURL:        s.config.PublicURL,
 			Token:            token.ValidationToken,
 		})
 	})
@@ -91,13 +95,13 @@ func (is *IdentityServer) CreateUser(ctx context.Context, req *ttnpb.CreateUserR
 }
 
 // GetUser returns the account of the current user.
-func (is *IdentityServer) GetUser(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.User, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_PROFILE_READ)
+func (s *userService) GetUser(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.User, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_PROFILE_READ)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := is.store.Users.GetByID(userID, is.factories.user)
+	found, err := s.store.Users.GetByID(userID, s.factories.user)
 	if err != nil {
 		return nil, err
 	}
@@ -109,18 +113,18 @@ func (is *IdentityServer) GetUser(ctx context.Context, _ *pbtypes.Empty) (*ttnpb
 
 // UpdateUser updates the account of the current user.
 // If the email is modified a validation email will be sent.
-func (is *IdentityServer) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (*pbtypes.Empty, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
+func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (*pbtypes.Empty, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := is.store.Users.GetByID(userID, is.factories.user)
+	found, err := s.store.Users.GetByID(userID, s.factories.user)
 	if err != nil {
 		return nil, err
 	}
 
-	settings, err := is.store.Settings.Get()
+	settings, err := s.store.Settings.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -152,11 +156,11 @@ func (is *IdentityServer) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	}
 
 	if !newEmail {
-		return nil, is.store.Users.Update(found)
+		return nil, s.store.Users.Update(found)
 	}
 
-	err = is.store.Transact(func(s *store.Store) error {
-		err := is.store.Users.Update(found)
+	err = s.store.Transact(func(st *store.Store) error {
+		err := st.Users.Update(found)
 		if err != nil {
 			return err
 		}
@@ -167,14 +171,14 @@ func (is *IdentityServer) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserR
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 
-		err = is.store.Users.SaveValidationToken(userID, token)
+		err = st.Users.SaveValidationToken(userID, token)
 		if err != nil {
 			return err
 		}
 
-		return is.email.Send(found.GetUser().Email, &templates.EmailValidation{
-			OrganizationName: is.config.OrganizationName,
-			PublicURL:        is.config.PublicURL,
+		return s.email.Send(found.GetUser().Email, &templates.EmailValidation{
+			OrganizationName: s.config.OrganizationName,
+			PublicURL:        s.config.PublicURL,
 			Token:            token.ValidationToken,
 		})
 	})
@@ -183,13 +187,13 @@ func (is *IdentityServer) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserR
 }
 
 // UpdateUserPassword updates the password of the current user.
-func (is *IdentityServer) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*pbtypes.Empty, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
+func (s *userService) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*pbtypes.Empty, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := is.store.Users.GetByID(userID, is.factories.user)
+	found, err := s.store.Users.GetByID(userID, s.factories.user)
 	if err != nil {
 		return nil, err
 	}
@@ -210,23 +214,23 @@ func (is *IdentityServer) UpdateUserPassword(ctx context.Context, req *ttnpb.Upd
 
 	found.GetUser().Password = string(hashed)
 
-	return nil, is.store.Users.Update(found)
+	return nil, s.store.Users.Update(found)
 }
 
 // DeleteUser deletes the account of the current user.
-func (is *IdentityServer) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.Empty, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_DELETE)
+func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.Empty, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_DELETE)
 	if err != nil {
 		return nil, err
 	}
 
-	err = is.store.Transact(func(s *store.Store) error {
-		err := s.Users.Delete(userID)
+	err = s.store.Transact(func(st *store.Store) error {
+		err := st.Users.Delete(userID)
 		if err != nil {
 			return err
 		}
 
-		apps, err := s.Applications.ListByUser(userID, is.factories.application)
+		apps, err := st.Applications.ListByUser(userID, s.factories.application)
 		if err != nil {
 			return err
 		}
@@ -234,7 +238,7 @@ func (is *IdentityServer) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pb
 		for _, app := range apps {
 			appID := app.GetApplication().ApplicationID
 
-			c, err := s.Applications.ListCollaborators(appID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
+			c, err := st.Applications.ListCollaborators(appID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
 			if err != nil {
 				return err
 			}
@@ -244,7 +248,7 @@ func (is *IdentityServer) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pb
 			}
 		}
 
-		gtws, err := s.Gateways.ListByUser(userID, is.factories.gateway)
+		gtws, err := st.Gateways.ListByUser(userID, s.factories.gateway)
 		if err != nil {
 			return err
 		}
@@ -252,7 +256,7 @@ func (is *IdentityServer) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pb
 		for _, gtw := range gtws {
 			gtwID := gtw.GetGateway().GatewayID
 
-			c, err := s.Gateways.ListCollaborators(gtwID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
+			c, err := st.Gateways.ListCollaborators(gtwID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
 			if err != nil {
 				return err
 			}
@@ -269,13 +273,13 @@ func (is *IdentityServer) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pb
 }
 
 // GenerateUserAPIKey generates an user API key and returns it.
-func (is *IdentityServer) GenerateUserAPIKey(ctx context.Context, req *ttnpb.GenerateUserAPIKeyRequest) (*ttnpb.APIKey, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_KEYS)
+func (s *userService) GenerateUserAPIKey(ctx context.Context, req *ttnpb.GenerateUserAPIKeyRequest) (*ttnpb.APIKey, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	k, err := auth.GenerateUserAPIKey(is.config.Hostname)
+	k, err := auth.GenerateUserAPIKey(s.config.Hostname)
 	if err != nil {
 		return nil, err
 	}
@@ -286,7 +290,7 @@ func (is *IdentityServer) GenerateUserAPIKey(ctx context.Context, req *ttnpb.Gen
 		Rights: req.Rights,
 	}
 
-	err = is.store.Users.SaveAPIKey(userID, key)
+	err = s.store.Users.SaveAPIKey(userID, key)
 	if err != nil {
 		return nil, err
 	}
@@ -295,13 +299,13 @@ func (is *IdentityServer) GenerateUserAPIKey(ctx context.Context, req *ttnpb.Gen
 }
 
 // ListUserAPIKeys returns all the API keys from the current user.
-func (is *IdentityServer) ListUserAPIKeys(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListUserAPIKeysResponse, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_KEYS)
+func (s *userService) ListUserAPIKeys(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListUserAPIKeysResponse, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := is.store.Users.ListAPIKeys(userID)
+	found, err := s.store.Users.ListAPIKeys(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -312,28 +316,28 @@ func (is *IdentityServer) ListUserAPIKeys(ctx context.Context, _ *pbtypes.Empty)
 }
 
 // UpdateUserAPIKey updates an API key from the current user.
-func (is *IdentityServer) UpdateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (*pbtypes.Empty, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
+func (s *userService) UpdateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (*pbtypes.Empty, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, is.store.Users.UpdateAPIKeyRights(userID, req.Name, req.Rights)
+	return nil, s.store.Users.UpdateAPIKeyRights(userID, req.Name, req.Rights)
 }
 
 // RemoveUserAPIKey removes an API key from the current user.
-func (is *IdentityServer) RemoveUserAPIKey(ctx context.Context, req *ttnpb.RemoveUserAPIKeyRequest) (*pbtypes.Empty, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_KEYS)
+func (s *userService) RemoveUserAPIKey(ctx context.Context, req *ttnpb.RemoveUserAPIKeyRequest) (*pbtypes.Empty, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, is.store.Users.DeleteAPIKey(userID, req.Name)
+	return nil, s.store.Users.DeleteAPIKey(userID, req.Name)
 }
 
 // ValidateUserEmail validates the user's email with the token sent to the email.
-func (is *IdentityServer) ValidateUserEmail(ctx context.Context, req *ttnpb.ValidateUserEmailRequest) (*pbtypes.Empty, error) {
-	err := is.store.Transact(func(store *store.Store) error {
+func (s *userService) ValidateUserEmail(ctx context.Context, req *ttnpb.ValidateUserEmailRequest) (*pbtypes.Empty, error) {
+	err := s.store.Transact(func(store *store.Store) error {
 		userID, token, err := store.Users.GetValidationToken(req.Token)
 		if err != nil {
 			return err
@@ -343,7 +347,7 @@ func (is *IdentityServer) ValidateUserEmail(ctx context.Context, req *ttnpb.Vali
 			return ErrValidationTokenExpired.New(nil)
 		}
 
-		user, err := store.Users.GetByID(userID, is.factories.user)
+		user, err := store.Users.GetByID(userID, s.factories.user)
 		if err != nil {
 			return err
 		}
@@ -363,13 +367,13 @@ func (is *IdentityServer) ValidateUserEmail(ctx context.Context, req *ttnpb.Vali
 
 // RequestUserEmailValidation requests a new validation email if the user's email
 // isn't validated yet.
-func (is *IdentityServer) RequestUserEmailValidation(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.Empty, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
+func (s *userService) RequestUserEmailValidation(ctx context.Context, _ *pbtypes.Empty) (*pbtypes.Empty, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
 	if err != nil {
 		return nil, err
 	}
 
-	user, err := is.store.Users.GetByID(userID, is.factories.user)
+	user, err := s.store.Users.GetByID(userID, s.factories.user)
 	if err != nil {
 		return nil, err
 	}
@@ -380,7 +384,7 @@ func (is *IdentityServer) RequestUserEmailValidation(ctx context.Context, _ *pbt
 		})
 	}
 
-	settings, err := is.store.Settings.Get()
+	settings, err := s.store.Settings.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -391,27 +395,27 @@ func (is *IdentityServer) RequestUserEmailValidation(ctx context.Context, _ *pbt
 		ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 	}
 
-	err = is.store.Users.SaveValidationToken(userID, token)
+	err = s.store.Users.SaveValidationToken(userID, token)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, is.email.Send(user.GetUser().Email, &templates.EmailValidation{
-		OrganizationName: is.config.OrganizationName,
-		PublicURL:        is.config.PublicURL,
+	return nil, s.email.Send(user.GetUser().Email, &templates.EmailValidation{
+		OrganizationName: s.config.OrganizationName,
+		PublicURL:        s.config.PublicURL,
 		Token:            token.ValidationToken,
 	})
 }
 
 // ListAuthorizedClients returns all the authorized third-party clients that
 // the current user has.
-func (is *IdentityServer) ListAuthorizedClients(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListAuthorizedClientsResponse, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_AUTHORIZEDCLIENTS)
+func (s *userService) ListAuthorizedClients(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListAuthorizedClientsResponse, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_AUTHORIZEDCLIENTS)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := is.store.OAuth.ListAuthorizedClients(userID, is.factories.client)
+	found, err := s.store.OAuth.ListAuthorizedClients(userID, s.factories.client)
 	if err != nil {
 		return nil, err
 	}
@@ -432,11 +436,11 @@ func (is *IdentityServer) ListAuthorizedClients(ctx context.Context, _ *pbtypes.
 }
 
 // RevokeAuthorizedClient revokes an authorized third-party client.
-func (is *IdentityServer) RevokeAuthorizedClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*pbtypes.Empty, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_AUTHORIZEDCLIENTS)
+func (s *userService) RevokeAuthorizedClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*pbtypes.Empty, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_AUTHORIZEDCLIENTS)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, is.store.OAuth.RevokeAuthorizedClient(userID, req.ClientID)
+	return nil, s.store.OAuth.RevokeAuthorizedClient(userID, req.ClientID)
 }

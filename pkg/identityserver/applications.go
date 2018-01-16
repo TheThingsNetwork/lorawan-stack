@@ -13,15 +13,19 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
+type applicationService struct {
+	*IdentityServer
+}
+
 // CreateApplication creates an application and sets the user as collaborator
 // with all possible rights.
-func (is *IdentityServer) CreateApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (*pbtypes.Empty, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_APPLICATIONS_CREATE)
+func (s *applicationService) CreateApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (*pbtypes.Empty, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_APPLICATIONS_CREATE)
 	if err != nil {
 		return nil, err
 	}
 
-	settings, err := is.store.Settings.Get()
+	settings, err := s.store.Settings.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -33,8 +37,8 @@ func (is *IdentityServer) CreateApplication(ctx context.Context, req *ttnpb.Crea
 		})
 	}
 
-	err = is.store.Transact(func(s *store.Store) error {
-		err := s.Applications.Create(&ttnpb.Application{
+	err = s.store.Transact(func(st *store.Store) error {
+		err := st.Applications.Create(&ttnpb.Application{
 			ApplicationIdentifier: req.Application.ApplicationIdentifier,
 			Description:           req.Application.Description,
 		})
@@ -42,7 +46,7 @@ func (is *IdentityServer) CreateApplication(ctx context.Context, req *ttnpb.Crea
 			return err
 		}
 
-		return s.Applications.SetCollaborator(&ttnpb.ApplicationCollaborator{
+		return st.Applications.SetCollaborator(&ttnpb.ApplicationCollaborator{
 			ApplicationIdentifier: req.Application.ApplicationIdentifier,
 			UserIdentifier:        ttnpb.UserIdentifier{userID},
 			Rights:                ttnpb.AllApplicationRights,
@@ -53,13 +57,13 @@ func (is *IdentityServer) CreateApplication(ctx context.Context, req *ttnpb.Crea
 }
 
 // GetApplication returns an application.
-func (is *IdentityServer) GetApplication(ctx context.Context, req *ttnpb.ApplicationIdentifier) (*ttnpb.Application, error) {
-	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_INFO)
+func (s *applicationService) GetApplication(ctx context.Context, req *ttnpb.ApplicationIdentifier) (*ttnpb.Application, error) {
+	err := s.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_INFO)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := is.store.Applications.GetByID(req.ApplicationID, is.factories.application)
+	found, err := s.store.Applications.GetByID(req.ApplicationID, s.factories.application)
 	if err != nil {
 		return nil, err
 	}
@@ -68,13 +72,13 @@ func (is *IdentityServer) GetApplication(ctx context.Context, req *ttnpb.Applica
 }
 
 // ListApplications returns all applications where the user is collaborator.
-func (is *IdentityServer) ListApplications(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListApplicationsResponse, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_APPLICATIONS_LIST)
+func (s *applicationService) ListApplications(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListApplicationsResponse, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_APPLICATIONS_LIST)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := is.store.Applications.ListByUser(userID, is.factories.application)
+	found, err := s.store.Applications.ListByUser(userID, s.factories.application)
 	if err != nil {
 		return nil, err
 	}
@@ -91,13 +95,13 @@ func (is *IdentityServer) ListApplications(ctx context.Context, _ *pbtypes.Empty
 }
 
 // UpdateApplication updates an application.
-func (is *IdentityServer) UpdateApplication(ctx context.Context, req *ttnpb.UpdateApplicationRequest) (*pbtypes.Empty, error) {
-	err := is.enforceApplicationRights(ctx, req.Application.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC)
+func (s *applicationService) UpdateApplication(ctx context.Context, req *ttnpb.UpdateApplicationRequest) (*pbtypes.Empty, error) {
+	err := s.enforceApplicationRights(ctx, req.Application.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := is.store.Applications.GetByID(req.Application.ApplicationID, is.factories.application)
+	found, err := s.store.Applications.GetByID(req.Application.ApplicationID, s.factories.application)
 	if err != nil {
 		return nil, err
 	}
@@ -113,27 +117,27 @@ func (is *IdentityServer) UpdateApplication(ctx context.Context, req *ttnpb.Upda
 		}
 	}
 
-	return nil, is.store.Applications.Update(found)
+	return nil, s.store.Applications.Update(found)
 }
 
 // DeleteApplication deletes an application.
-func (is *IdentityServer) DeleteApplication(ctx context.Context, req *ttnpb.ApplicationIdentifier) (*pbtypes.Empty, error) {
-	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_DELETE)
+func (s *applicationService) DeleteApplication(ctx context.Context, req *ttnpb.ApplicationIdentifier) (*pbtypes.Empty, error) {
+	err := s.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_DELETE)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, is.store.Applications.Delete(req.ApplicationID)
+	return nil, s.store.Applications.Delete(req.ApplicationID)
 }
 
 // GenerateApplicationAPIKey generates an application API key and returns it.
-func (is *IdentityServer) GenerateApplicationAPIKey(ctx context.Context, req *ttnpb.GenerateApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
-	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+func (s *applicationService) GenerateApplicationAPIKey(ctx context.Context, req *ttnpb.GenerateApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
+	err := s.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	k, err := auth.GenerateApplicationAPIKey(is.config.Hostname)
+	k, err := auth.GenerateApplicationAPIKey(s.config.Hostname)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +148,7 @@ func (is *IdentityServer) GenerateApplicationAPIKey(ctx context.Context, req *tt
 		Rights: req.Rights,
 	}
 
-	err = is.store.Applications.SaveAPIKey(req.ApplicationID, key)
+	err = s.store.Applications.SaveAPIKey(req.ApplicationID, key)
 	if err != nil {
 		return nil, err
 	}
@@ -153,13 +157,13 @@ func (is *IdentityServer) GenerateApplicationAPIKey(ctx context.Context, req *tt
 }
 
 // ListApplicationAPIKeys list all the API keys of an application.
-func (is *IdentityServer) ListApplicationAPIKeys(ctx context.Context, req *ttnpb.ApplicationIdentifier) (*ttnpb.ListApplicationAPIKeysResponse, error) {
-	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+func (s *applicationService) ListApplicationAPIKeys(ctx context.Context, req *ttnpb.ApplicationIdentifier) (*ttnpb.ListApplicationAPIKeysResponse, error) {
+	err := s.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := is.store.Applications.ListAPIKeys(req.ApplicationID)
+	found, err := s.store.Applications.ListAPIKeys(req.ApplicationID)
 	if err != nil {
 		return nil, err
 	}
@@ -170,42 +174,42 @@ func (is *IdentityServer) ListApplicationAPIKeys(ctx context.Context, req *ttnpb
 }
 
 // UpdateApplicationAPIKey updates the rights of an application API key.
-func (is *IdentityServer) UpdateApplicationAPIKey(ctx context.Context, req *ttnpb.UpdateApplicationAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+func (s *applicationService) UpdateApplicationAPIKey(ctx context.Context, req *ttnpb.UpdateApplicationAPIKeyRequest) (*pbtypes.Empty, error) {
+	err := s.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, is.store.Applications.UpdateAPIKeyRights(req.ApplicationID, req.Name, req.Rights)
+	return nil, s.store.Applications.UpdateAPIKeyRights(req.ApplicationID, req.Name, req.Rights)
 }
 
 // RemoveApplicationAPIKey removes an application API key.
-func (is *IdentityServer) RemoveApplicationAPIKey(ctx context.Context, req *ttnpb.RemoveApplicationAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+func (s *applicationService) RemoveApplicationAPIKey(ctx context.Context, req *ttnpb.RemoveApplicationAPIKeyRequest) (*pbtypes.Empty, error) {
+	err := s.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, is.store.Applications.DeleteAPIKey(req.ApplicationID, req.Name)
+	return nil, s.store.Applications.DeleteAPIKey(req.ApplicationID, req.Name)
 }
 
 // SetApplicationCollaborator allows to set and unset an application collaborator.
 // It fails if after unset a collaborator there is no at least one collaborator
 // with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right.
-func (is *IdentityServer) SetApplicationCollaborator(ctx context.Context, req *ttnpb.ApplicationCollaborator) (*pbtypes.Empty, error) {
-	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
+func (s *applicationService) SetApplicationCollaborator(ctx context.Context, req *ttnpb.ApplicationCollaborator) (*pbtypes.Empty, error) {
+	err := s.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
 	if err != nil {
 		return nil, err
 	}
 
-	err = is.store.Transact(func(s *store.Store) error {
-		err := s.Applications.SetCollaborator(req)
+	err = s.store.Transact(func(st *store.Store) error {
+		err := st.Applications.SetCollaborator(req)
 		if err != nil {
 			return err
 		}
 
 		// check that there is at least one collaborator in with SETTINGS_COLLABORATOR right
-		collaborators, err := s.Applications.ListCollaborators(req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
+		collaborators, err := st.Applications.ListCollaborators(req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
 		if err != nil {
 			return err
 		}
@@ -223,13 +227,13 @@ func (is *IdentityServer) SetApplicationCollaborator(ctx context.Context, req *t
 }
 
 // ListApplicationCollaborators returns all the collaborators from an application.
-func (is *IdentityServer) ListApplicationCollaborators(ctx context.Context, req *ttnpb.ApplicationIdentifier) (*ttnpb.ListApplicationCollaboratorsResponse, error) {
-	err := is.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
+func (s *applicationService) ListApplicationCollaborators(ctx context.Context, req *ttnpb.ApplicationIdentifier) (*ttnpb.ListApplicationCollaboratorsResponse, error) {
+	err := s.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := is.store.Applications.ListCollaborators(req.ApplicationID)
+	found, err := s.store.Applications.ListCollaborators(req.ApplicationID)
 	if err != nil {
 		return nil, err
 	}
@@ -240,8 +244,8 @@ func (is *IdentityServer) ListApplicationCollaborators(ctx context.Context, req 
 }
 
 // ListApplicationRights returns the rights the caller user has to an application.
-func (is *IdentityServer) ListApplicationRights(ctx context.Context, req *ttnpb.ApplicationIdentifier) (*ttnpb.ListApplicationRightsResponse, error) {
-	claims, err := is.claimsFromContext(ctx)
+func (s *applicationService) ListApplicationRights(ctx context.Context, req *ttnpb.ApplicationIdentifier) (*ttnpb.ListApplicationRightsResponse, error) {
+	claims, err := s.claimsFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -252,7 +256,7 @@ func (is *IdentityServer) ListApplicationRights(ctx context.Context, req *ttnpb.
 	case auth.Token:
 		userID := claims.UserID()
 
-		rights, err := is.store.Applications.ListUserRights(req.ApplicationID, userID)
+		rights, err := s.store.Applications.ListUserRights(req.ApplicationID, userID)
 		if err != nil {
 			return nil, err
 		}

@@ -10,14 +10,18 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
+type settingService struct {
+	*IdentityServer
+}
+
 // GetSettings fetches the current dynamic settings of the Identity Server.
-func (is *IdentityServer) GetSettings(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.IdentityServerSettings, error) {
-	err := is.enforceAdmin(ctx)
+func (s *settingService) GetSettings(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.IdentityServerSettings, error) {
+	err := s.enforceAdmin(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	settings, err := is.store.Settings.Get()
+	settings, err := s.store.Settings.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -26,12 +30,12 @@ func (is *IdentityServer) GetSettings(ctx context.Context, _ *pbtypes.Empty) (*t
 }
 
 // UpdateSettings updates the dynamic settings.
-func (is *IdentityServer) UpdateSettings(ctx context.Context, req *ttnpb.UpdateSettingsRequest) (*pbtypes.Empty, error) {
-	if err := is.enforceAdmin(ctx); err != nil {
+func (s *settingService) UpdateSettings(ctx context.Context, req *ttnpb.UpdateSettingsRequest) (*pbtypes.Empty, error) {
+	if err := s.enforceAdmin(ctx); err != nil {
 		return nil, err
 	}
 
-	settings, err := is.store.Settings.Get()
+	settings, err := s.store.Settings.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -63,5 +67,5 @@ func (is *IdentityServer) UpdateSettings(ctx context.Context, req *ttnpb.UpdateS
 		}
 	}
 
-	return nil, is.store.Settings.Set(settings)
+	return nil, s.store.Settings.Set(settings)
 }

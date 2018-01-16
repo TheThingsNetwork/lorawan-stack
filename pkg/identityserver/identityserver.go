@@ -27,6 +27,12 @@ type IdentityServer struct {
 	store *sql.Store
 	email email.Provider
 
+	*userService
+	*applicationService
+	*gatewayService
+	*clientService
+	*settingService
+
 	factories struct {
 		user        store.UserFactory
 		application store.ApplicationFactory
@@ -153,6 +159,12 @@ func New(c *component.Component, config *Config, opts ...Option) (*IdentityServe
 		config:    config,
 	}
 
+	is.userService = &userService{is}
+	is.applicationService = &applicationService{is}
+	is.gatewayService = &gatewayService{is}
+	is.clientService = &clientService{is}
+	is.settingService = &settingService{is}
+
 	opts = append(defaultOptions, opts...)
 
 	if len(config.SendGridAPIKey) != 0 {
@@ -189,11 +201,11 @@ func (is *IdentityServer) Init() error {
 
 // RegisterServices registers services provided by is at s.
 func (is *IdentityServer) RegisterServices(s *grpc.Server) {
-	ttnpb.RegisterIsUserServer(s, is)
-	ttnpb.RegisterIsApplicationServer(s, is)
-	ttnpb.RegisterIsGatewayServer(s, is)
-	ttnpb.RegisterIsClientServer(s, is)
-	ttnpb.RegisterIsSettingsServer(s, is)
+	ttnpb.RegisterIsUserServer(s, is.userService)
+	ttnpb.RegisterIsApplicationServer(s, is.applicationService)
+	ttnpb.RegisterIsGatewayServer(s, is.gatewayService)
+	ttnpb.RegisterIsClientServer(s, is.clientService)
+	ttnpb.RegisterIsSettingsServer(s, is.settingService)
 }
 
 // RegisterHandlers registers gRPC handlers.

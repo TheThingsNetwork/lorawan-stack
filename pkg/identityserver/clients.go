@@ -12,16 +12,20 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
+type clientService struct {
+	*IdentityServer
+}
+
 // CreateClient creates a client.
 // The created client has a random secret and has set by default as false the
 // official labeled flag and has the refresh_token and authorization_code grants.
-func (is *IdentityServer) CreateClient(ctx context.Context, req *ttnpb.CreateClientRequest) (*pbtypes.Empty, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_CREATE)
+func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClientRequest) (*pbtypes.Empty, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_CREATE)
 	if err != nil {
 		return nil, err
 	}
 
-	settings, err := is.store.Settings.Get()
+	settings, err := s.store.Settings.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +37,7 @@ func (is *IdentityServer) CreateClient(ctx context.Context, req *ttnpb.CreateCli
 		})
 	}
 
-	return nil, is.store.Clients.Create(&ttnpb.Client{
+	return nil, s.store.Clients.Create(&ttnpb.Client{
 		ClientIdentifier: req.Client.ClientIdentifier,
 		Description:      req.Client.Description,
 		RedirectURI:      req.Client.RedirectURI,
@@ -47,13 +51,13 @@ func (is *IdentityServer) CreateClient(ctx context.Context, req *ttnpb.CreateCli
 }
 
 // GetClient returns a client.
-func (is *IdentityServer) GetClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*ttnpb.Client, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_LIST)
+func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*ttnpb.Client, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_LIST)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := is.store.Clients.GetByID(req.ClientID, is.factories.client)
+	found, err := s.store.Clients.GetByID(req.ClientID, s.factories.client)
 	if err != nil {
 		return nil, err
 	}
@@ -67,13 +71,13 @@ func (is *IdentityServer) GetClient(ctx context.Context, req *ttnpb.ClientIdenti
 }
 
 // ListClients returns all the clients an user has created.
-func (is *IdentityServer) ListClients(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListClientsResponse, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_LIST)
+func (s *clientService) ListClients(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListClientsResponse, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_LIST)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := is.store.Clients.ListByUser(userID, is.factories.client)
+	found, err := s.store.Clients.ListByUser(userID, s.factories.client)
 	if err != nil {
 		return nil, err
 	}
@@ -91,13 +95,13 @@ func (is *IdentityServer) ListClients(ctx context.Context, _ *pbtypes.Empty) (*t
 
 // UpdateClient updates a client.
 // TODO(gomezjdaniel): support to update the RedirectURI and rights (scope).
-func (is *IdentityServer) UpdateClient(ctx context.Context, req *ttnpb.UpdateClientRequest) (*pbtypes.Empty, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_MANAGE)
+func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClientRequest) (*pbtypes.Empty, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_MANAGE)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := is.store.Clients.GetByID(req.Client.ClientID, is.factories.client)
+	found, err := s.store.Clients.GetByID(req.Client.ClientID, s.factories.client)
 	if err != nil {
 		return nil, err
 	}
@@ -118,17 +122,17 @@ func (is *IdentityServer) UpdateClient(ctx context.Context, req *ttnpb.UpdateCli
 		}
 	}
 
-	return nil, is.store.Clients.Update(found)
+	return nil, s.store.Clients.Update(found)
 }
 
 // DeleteClient deletes a client.
-func (is *IdentityServer) DeleteClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*pbtypes.Empty, error) {
-	userID, err := is.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_MANAGE)
+func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*pbtypes.Empty, error) {
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_MANAGE)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := is.store.Clients.GetByID(req.ClientID, is.factories.client)
+	found, err := s.store.Clients.GetByID(req.ClientID, s.factories.client)
 	if err != nil {
 		return nil, err
 	}
@@ -138,5 +142,5 @@ func (is *IdentityServer) DeleteClient(ctx context.Context, req *ttnpb.ClientIde
 		return nil, ErrNotAuthorized.New(nil)
 	}
 
-	return nil, is.store.Clients.Delete(req.ClientID)
+	return nil, s.store.Clients.Delete(req.ClientID)
 }
