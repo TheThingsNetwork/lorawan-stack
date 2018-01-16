@@ -5,6 +5,7 @@ package component
 import (
 	"net/http"
 	"net/http/pprof"
+	"strings"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/web"
@@ -27,7 +28,7 @@ func (c *Component) listenWeb() (err error) {
 			return errors.NewWithCause("Could not create TCP HTTP listener", err)
 		}
 		go func() {
-			if err := http.Serve(lis, c.web); err != nil {
+			if err := http.Serve(lis, c); err != nil {
 				c.logger.WithError(err).Errorf("Error serving HTTP on %s", lis.Addr())
 			}
 		}()
@@ -43,7 +44,7 @@ func (c *Component) listenWeb() (err error) {
 			return errors.NewWithCause("Could not create TLS HTTP listener", err)
 		}
 		go func() {
-			if err := http.Serve(lis, c.web); err != nil {
+			if err := http.Serve(lis, c); err != nil {
 				c.logger.WithError(err).Errorf("Error serving HTTP on %s", lis.Addr())
 			}
 		}()
@@ -59,4 +60,12 @@ func (c *Component) listenWeb() (err error) {
 	}
 
 	return nil
+}
+
+func (c *Component) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
+		c.grpc.ServeHTTP(w, r)
+	} else {
+		c.web.ServeHTTP(w, r)
+	}
 }
