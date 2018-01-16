@@ -9,6 +9,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/rpclog"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/labstack/echo"
 )
 
@@ -26,6 +27,9 @@ func (c *Component) initGRPC() {
 }
 
 func (c *Component) setupGRPC() (err error) {
+	if c.DeviceRegistry != nil {
+		ttnpb.RegisterDeviceRegistryServer(c.grpc.Server, c.DeviceRegistry)
+	}
 	for _, sub := range c.grpcSubsystems {
 		sub.RegisterServices(c.grpc.Server)
 	}
@@ -35,6 +39,9 @@ func (c *Component) setupGRPC() (err error) {
 		return errors.NewWithCause("Could not start loopback connection", err)
 	}
 	c.logger.Debug("Setting up gRPC gateway")
+	if c.DeviceRegistry != nil {
+		ttnpb.RegisterDeviceRegistryHandler(c.Context(), c.grpc.ServeMux, c.loopback)
+	}
 	for _, sub := range c.grpcSubsystems {
 		sub.RegisterHandlers(c.grpc.ServeMux, c.loopback)
 	}

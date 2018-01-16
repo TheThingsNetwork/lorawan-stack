@@ -14,6 +14,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/log/middleware/sentry"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/web"
 	raven "github.com/getsentry/raven-go"
 	"google.golang.org/grpc"
@@ -34,6 +35,9 @@ type Component struct {
 	sentry *raven.Client
 
 	cluster cluster.Cluster
+
+	// device registry is owned by the core component if we're running a full-stack binary.
+	DeviceRegistry ttnpb.DeviceRegistryServer
 
 	grpc           *rpcserver.Server
 	grpcSubsystems []rpcserver.Registerer
