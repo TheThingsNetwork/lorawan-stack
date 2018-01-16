@@ -270,7 +270,7 @@ message MACState {
   // Rx1 delay (Rx2 delay is Rx1 delay + 1 second)
   uint32 rx_delay = 11;
   // Data rate offset for Rx1
-  int32 rx1_data_rate_offset = 12;
+  uint32 rx1_data_rate_offset = 12;
   // Data rate index for Rx2
   uint32 rx2_data_rate_index = 13;
   // Frequency for Rx2

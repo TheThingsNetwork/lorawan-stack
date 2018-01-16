@@ -331,7 +331,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	dev.NextJoinNonce++
 	dev.EndDevice.Session = &ttnpb.Session{
 		StartedAt:   time.Now().UTC(),
-		DevAddr:     &devAddr,
+		DevAddr:     devAddr,
 		SessionKeys: resp.SessionKeys,
 	}
 	if err := dev.Store(); err != nil {

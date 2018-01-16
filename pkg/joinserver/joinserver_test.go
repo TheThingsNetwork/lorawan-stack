@@ -939,7 +939,7 @@ func TestHandleJoin(t *testing.T) {
 				a.So(dev[0].GetNextJoinNonce(), should.Equal, tc.NextNextJoinNonce)
 				a.So(pretty.Diff(dev[0].GetUsedDevNonces(), tc.NextUsedDevNonces), should.BeEmpty)
 				if s := dev[0].GetSession(); tc.Error == nil && a.So(s, should.NotBeNil) {
-					a.So(s.DevAddr, should.Resemble, tc.JoinRequest.EndDeviceIdentifiers.DevAddr)
+					a.So(s.DevAddr, should.Resemble, *tc.JoinRequest.EndDeviceIdentifiers.DevAddr)
 					a.So(s.SessionKeys, should.Resemble, resp.SessionKeys)
 					a.So([]time.Time{start, s.StartedAt, time.Now()}, should.BeChronological)
 				}
