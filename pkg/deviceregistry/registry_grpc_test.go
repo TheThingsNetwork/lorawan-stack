@@ -242,9 +242,7 @@ func TestCheck(t *testing.T) {
 	checkErr = nil
 	ret, err = dr.GetDevice(context.Background(), &dev.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
-	if !a.So(ret, should.Resemble, dev) {
-		pretty.Ldiff(t, ret, dev)
-	}
+	a.So(pretty.Diff(ret, dev), should.BeEmpty)
 
 	// List
 
@@ -263,9 +261,7 @@ func TestCheck(t *testing.T) {
 	devs, err = dr.ListDevices(context.Background(), &dev.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	if a.So(devs, should.NotBeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
-		if !a.So(devs.EndDevices[0], should.Resemble, dev) {
-			pretty.Ldiff(t, devs.EndDevices[0], dev)
-		}
+		a.So(pretty.Diff(devs.EndDevices[0], dev), should.BeEmpty)
 	}
 
 	// Delete

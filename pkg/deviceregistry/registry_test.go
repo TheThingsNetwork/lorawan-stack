@@ -179,9 +179,7 @@ func TestFindOneDeviceByIdentifiers(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) {
-		if !a.So(found.EndDevice, should.Resemble, dev.EndDevice) {
-			pretty.Ldiff(t, found.EndDevice, dev.EndDevice)
-		}
+		a.So(pretty.Diff(found.EndDevice, dev.EndDevice), should.BeEmpty)
 	}
 
 	dev, err = r.Create(ed)
