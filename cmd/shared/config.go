@@ -44,6 +44,7 @@ var DefaultGRPCConfig = config.GRPC{}
 var DefaultRedisConfig = config.Redis{
 	Address:  "localhost:6379",
 	Database: 0,
+	Prefix:   "ttn",
 }
 
 // DefaultServiceBase is the default base config for a service.

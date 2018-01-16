@@ -31,7 +31,6 @@ type Store struct {
 // Config represents Redis configuration.
 type Config struct {
 	config.Redis
-	Prefix    string
 	IndexKeys []string
 }
 

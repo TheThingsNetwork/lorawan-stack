@@ -16,8 +16,8 @@ func TestStore(t *testing.T) {
 		Redis: config.Redis{
 			Address:  shared.DefaultRedisConfig.Address,
 			Database: 9,
+			Prefix:   "test",
 		},
-		Prefix:    "test",
 		IndexKeys: []string{"foo", "bar"},
 	})
 	keys, err := s.Redis.Keys("test:*").Result()
