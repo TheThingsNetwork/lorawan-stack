@@ -51,11 +51,13 @@ func TestHandleJoin(t *testing.T) {
 	a := assertions.New(t)
 
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
-	js := New(&Config{
-		Component:       component.New(test.GetLogger(t), &component.Config{ServiceBase: shared.DefaultServiceBase}),
-		Registry:        reg,
-		JoinEUIPrefixes: joinEUIPrefixes,
-	})
+	js := New(
+		component.New(test.GetLogger(t), &component.Config{ServiceBase: shared.DefaultServiceBase}),
+		&Config{
+			Registry:        reg,
+			JoinEUIPrefixes: joinEUIPrefixes,
+		},
+	)
 
 	req := ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload = *ttnpb.NewPopulatedMessageDownlink(test.Randy, *types.NewPopulatedAES128Key(test.Randy), false)
@@ -878,11 +880,13 @@ func TestHandleJoin(t *testing.T) {
 			a := assertions.New(t)
 
 			reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
-			js := New(&Config{
-				Component:       component.New(test.GetLogger(t), &component.Config{ServiceBase: shared.DefaultServiceBase}),
-				Registry:        reg,
-				JoinEUIPrefixes: joinEUIPrefixes,
-			})
+			js := New(
+				component.New(test.GetLogger(t), &component.Config{ServiceBase: shared.DefaultServiceBase}),
+				&Config{
+					Registry:        reg,
+					JoinEUIPrefixes: joinEUIPrefixes,
+				},
+			)
 
 			_, err := reg.Create(tc.Device)
 			if !a.So(err, should.BeNil) {
@@ -941,11 +945,13 @@ func TestGetAppSKey(t *testing.T) {
 	a := assertions.New(t)
 
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
-	js := New(&Config{
-		Component:       component.New(test.GetLogger(t), &component.Config{shared.DefaultServiceBase}),
-		Registry:        reg,
-		JoinEUIPrefixes: joinEUIPrefixes,
-	})
+	js := New(
+		component.New(test.GetLogger(t), &component.Config{ServiceBase: shared.DefaultServiceBase}),
+		&Config{
+			Registry:        reg,
+			JoinEUIPrefixes: joinEUIPrefixes,
+		},
+	)
 
 	req := ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
 	req.DevEUI = types.EUI64{}
@@ -1114,11 +1120,13 @@ func TestGetAppSKey(t *testing.T) {
 			a := assertions.New(t)
 
 			reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
-			js := New(&Config{
-				Component:       component.New(test.GetLogger(t), &component.Config{shared.DefaultServiceBase}),
-				Registry:        reg,
-				JoinEUIPrefixes: joinEUIPrefixes,
-			})
+			js := New(
+				component.New(test.GetLogger(t), &component.Config{ServiceBase: shared.DefaultServiceBase}),
+				&Config{
+					Registry:        reg,
+					JoinEUIPrefixes: joinEUIPrefixes,
+				},
+			)
 
 			_, err := reg.Create(tc.Device)
 			if !a.So(err, should.BeNil) {
@@ -1155,11 +1163,13 @@ func TestGetNwkSKeys(t *testing.T) {
 	a := assertions.New(t)
 
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
-	js := New(&Config{
-		Component:       component.New(test.GetLogger(t), &component.Config{shared.DefaultServiceBase}),
-		Registry:        reg,
-		JoinEUIPrefixes: joinEUIPrefixes,
-	})
+	js := New(
+		component.New(test.GetLogger(t), &component.Config{ServiceBase: shared.DefaultServiceBase}),
+		&Config{
+			Registry:        reg,
+			JoinEUIPrefixes: joinEUIPrefixes,
+		},
+	)
 
 	req := ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
 	req.DevEUI = types.EUI64{}
@@ -1360,11 +1370,13 @@ func TestGetNwkSKeys(t *testing.T) {
 			a := assertions.New(t)
 
 			reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
-			js := New(&Config{
-				Component:       component.New(test.GetLogger(t), &component.Config{shared.DefaultServiceBase}),
-				Registry:        reg,
-				JoinEUIPrefixes: joinEUIPrefixes,
-			})
+			js := New(
+				component.New(test.GetLogger(t), &component.Config{ServiceBase: shared.DefaultServiceBase}),
+				&Config{
+					Registry:        reg,
+					JoinEUIPrefixes: joinEUIPrefixes,
+				},
+			)
 
 			_, err := reg.Create(tc.Device)
 			if !a.So(err, should.BeNil) {

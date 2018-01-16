@@ -39,19 +39,20 @@ type JoinServer struct {
 
 // Config represents the JoinServer configuration.
 type Config struct {
-	Component       *component.Component
 	Registry        deviceregistry.Interface
 	JoinEUIPrefixes []types.EUI64Prefix
 }
 
 // New returns new *JoinServer.
-func New(conf *Config) *JoinServer {
-	return &JoinServer{
-		Component:   conf.Component,
-		RegistryRPC: deviceregistry.NewRPC(conf.Component, conf.Registry),
+func New(c *component.Component, conf *Config) *JoinServer {
+	js := &JoinServer{
+		Component:   c,
+		RegistryRPC: deviceregistry.NewRPC(c, conf.Registry),
 		registry:    conf.Registry,
 		euiPrefixes: conf.JoinEUIPrefixes,
 	}
+	c.RegisterGRPC(js)
+	return js
 }
 
 func keyPointer(key types.AES128Key) *types.AES128Key {
@@ -429,10 +430,14 @@ func (js *JoinServer) Roles() []ttnpb.PeerInfo_Role {
 // RegisterServices registers services provided by js at s.
 func (js *JoinServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterNsJsServer(s, js)
-	ttnpb.RegisterDeviceRegistryServer(s, js)
+	if js.Component.DeviceRegistry == nil {
+		ttnpb.RegisterDeviceRegistryServer(s, js)
+	}
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (js *JoinServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
-	ttnpb.RegisterDeviceRegistryHandler(js.Context(), s, conn)
+	if js.Component.DeviceRegistry == nil {
+		ttnpb.RegisterDeviceRegistryHandler(js.Context(), s, conn)
+	}
 }
