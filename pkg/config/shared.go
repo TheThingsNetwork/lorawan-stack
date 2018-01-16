@@ -80,6 +80,7 @@ type RemoteProviderConfig struct {
 type ServiceBase struct {
 	Base         `name:",squash"`
 	Cluster      Cluster               `name:"cluster"`
+	Redis        Redis                 `name:"redis"`
 	GRPC         GRPC                  `name:"grpc"`
 	HTTP         HTTP                  `name:"http"`
 	TLS          TLS                   `name:"tls"`

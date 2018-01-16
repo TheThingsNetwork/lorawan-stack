@@ -49,6 +49,7 @@ var DefaultRedisConfig = config.Redis{
 // DefaultServiceBase is the default base config for a service.
 var DefaultServiceBase = config.ServiceBase{
 	Base:     DefaultBaseConfig,
+	Redis:    DefaultRedisConfig,
 	GRPC:     DefaultGRPCConfig,
 	HTTP:     DefaultHTTPConfig,
 	TLS:      DefaultTLSConfig,
