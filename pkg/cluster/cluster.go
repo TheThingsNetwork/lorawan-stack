@@ -16,21 +16,29 @@ import (
 	"google.golang.org/grpc/credentials"
 )
 
-// Cluster interface
+// Cluster interface that is implemented by all different clustering implementations.
 type Cluster interface {
-	// Connect to the cluster
+	// Connect to the cluster.
 	Connect() error
-	// Leave the cluster
+	// Leave the cluster.
 	Leave() error
 	// GetPeer returns a peer with the given role and the given tags.
 	// If the cluster contains more than one peer, the shardKey is used to select the right peer.
+	// Tagging and sharding is not part of the reference implementation. The idea of tagging is another layer of filtering
+	// peers, which allows network operators to have dedicated instances for premium customers, tenants or separated
+	// environments. The idea of sharding is that if multiple peers match the filters, we can still consistently select
+	// a single peer. The shardKey is usually the DevAddr or DevEUI to make sure duplicate messages arrive at the same NS,
+	// or any other identifier (such as an AppID) that helps achieve external consistency for API calls.
 	GetPeer(role ttnpb.PeerInfo_Role, tags []string, shardKey []byte) Peer
 }
 
-// CustomNew allows you to replace clustering logic. New will call CustomNew if not nil.
+// CustomNew allows you to replace the clustering implementation. New will call CustomNew if not nil.
 var CustomNew func(ctx context.Context, config *config.ServiceBase, services ...rpcserver.Registerer) (Cluster, error)
 
-// New instantiates a new clustering handler
+// New instantiates a new clustering implementation.
+// The basic clustering implementation allows for a cluster setup with a single-instance deployment of each component
+// (GS/NS/AS/JS).
+// Network operators can use their own clustering logic, which can be activated by setting the CustomNew variable.
 func New(ctx context.Context, config *config.ServiceBase, services ...rpcserver.Registerer) (Cluster, error) {
 	if CustomNew != nil {
 		return CustomNew(ctx, config, services...)

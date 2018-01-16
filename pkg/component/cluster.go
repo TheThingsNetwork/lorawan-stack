@@ -15,8 +15,8 @@ func (c *Component) initCluster() (err error) {
 	return nil
 }
 
-// GetPeer returns a peer with the given role and the given tags.
-// If the cluster contains more than one peer, the shardKey is used to select the right peer.
+// GetPeer returns a cluster peer with the given role and the given tags.
+// See package ../cluster for more information.
 func (c *Component) GetPeer(role ttnpb.PeerInfo_Role, tags []string, shardKey []byte) cluster.Peer {
 	return c.cluster.GetPeer(role, tags, shardKey)
 }
