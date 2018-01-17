@@ -120,8 +120,8 @@ func (c *Component) Start() (err error) {
 		return err
 	}
 
-	if err := c.cluster.Connect(); err != nil {
-		c.logger.WithError(err).Error("Could not connect to cluster")
+	if err := c.cluster.Join(); err != nil {
+		c.logger.WithError(err).Error("Could not join cluster")
 		return err
 	}
 	defer func() {

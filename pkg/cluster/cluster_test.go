@@ -55,7 +55,7 @@ func TestCluster(t *testing.T) {
 	c, err := New(context.Background(), config, []rpcserver.Registerer{}...)
 	a.So(err, should.BeNil)
 
-	a.So(c.Connect(), should.BeNil)
+	a.So(c.Join(), should.BeNil)
 
 	{
 		grpc.Dial(lis.Addr().String(), grpc.WithInsecure(), grpc.WithBlock())

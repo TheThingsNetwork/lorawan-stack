@@ -18,8 +18,8 @@ import (
 
 // Cluster interface that is implemented by all different clustering implementations.
 type Cluster interface {
-	// Connect to the cluster.
-	Connect() error
+	// Join the cluster.
+	Join() error
 	// Leave the cluster.
 	Leave() error
 	// GetPeer returns a peer with the given role and the given tags.
@@ -104,7 +104,7 @@ type cluster struct {
 	peers map[string]*peer
 }
 
-func (c *cluster) Connect() (err error) {
+func (c *cluster) Join() (err error) {
 	options := rpcclient.DefaultDialOptions(c.ctx)
 	// TODO: Use custom WithBalancer DialOption?
 	if c.tls {
