@@ -88,19 +88,19 @@ func (c *Component) Start() (err error) {
 	c.initGRPC()
 
 	if c.grpc != nil {
-		c.logger.Debug("Setting up gRPC server")
+		c.logger.Debug("Initializing gRPC server...")
 		if err = c.setupGRPC(); err != nil {
 			return err
 		}
 	}
 
-	c.logger.Debug("Setting up web server")
+	c.logger.Debug("Initializing web server...")
 	for _, sub := range c.webSubsystems {
 		sub.RegisterRoutes(c.web)
 	}
 
 	if c.grpc != nil {
-		c.logger.Debug("Setting up gRPC server...")
+		c.logger.Debug("Starting gRPC server...")
 		if err = c.listenGRPC(); err != nil {
 			c.logger.WithError(err).Error("Could not start gRPC server")
 			return err
@@ -108,7 +108,7 @@ func (c *Component) Start() (err error) {
 	}
 	c.logger.Debug("Started gRPC server")
 
-	c.logger.Debug("Setting up HTTP server...")
+	c.logger.Debug("Starting HTTP server...")
 	if err = c.listenWeb(); err != nil {
 		c.logger.WithError(err).Error("Could not start HTTP server")
 		return err
@@ -120,15 +120,18 @@ func (c *Component) Start() (err error) {
 		return err
 	}
 
+	c.logger.Debug("Joining cluster...")
 	if err := c.cluster.Join(); err != nil {
 		c.logger.WithError(err).Error("Could not join cluster")
 		return err
 	}
+	c.logger.Debug("Joined cluster")
 	defer func() {
 		c.logger.Debug("Leaving cluster...")
 		if err := c.cluster.Leave(); err != nil {
 			c.logger.WithError(err).Error("Could not leave cluster")
 		}
+		c.logger.Debug("Left cluster")
 	}()
 
 	signals := make(chan os.Signal)
