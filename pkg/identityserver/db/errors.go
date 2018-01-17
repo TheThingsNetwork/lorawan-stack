@@ -36,8 +36,6 @@ func wrap(err error) error {
 
 	if pq, ok := err.(*pq.Error); ok {
 		switch pq.Code {
-		case "3D000":
-			return sql.ErrNoRows
 		case "23505":
 			// Unique violation
 			m := re.FindStringSubmatch(err.Error())

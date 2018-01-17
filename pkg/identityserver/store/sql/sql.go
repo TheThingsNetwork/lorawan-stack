@@ -139,10 +139,7 @@ func (s *Store) Init() error {
 }
 
 func (s *Store) DropDatabase() error {
-	_, err := s.db.Exec(fmt.Sprintf("DROP DATABASE %s CASCADE", s.db.Database()))
-	if db.IsNoRows(err) {
-		return nil
-	}
+	_, err := s.db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE", s.db.Database()))
 	return err
 }
 
