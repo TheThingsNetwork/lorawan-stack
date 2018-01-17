@@ -4,7 +4,7 @@ package templates
 
 import (
 	"bytes"
-	"text/template"
+	"html/template"
 )
 
 // Template is the interface of those things that are an email template.
@@ -18,8 +18,10 @@ type Template interface {
 
 // render renders subject and message using the given data.
 func render(subject, message string, data interface{}) (string, string, error) {
-	t := template.New("")
-	t, _ = t.Parse(subject)
+	t, err := template.New("").Parse(subject)
+	if err != nil {
+		return "", "", err
+	}
 
 	buf := new(bytes.Buffer)
 	if err := t.Execute(buf, data); err != nil {
@@ -29,7 +31,11 @@ func render(subject, message string, data interface{}) (string, string, error) {
 
 	buf.Reset()
 
-	t, _ = t.Parse(message)
+	t, err = template.New("").Parse(message)
+	if err != nil {
+		return "", "", err
+	}
+
 	if err := t.Execute(buf, data); err != nil {
 		return "", "", err
 	}
