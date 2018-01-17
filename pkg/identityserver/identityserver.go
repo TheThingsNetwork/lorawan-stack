@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/mock"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/sendgrid"
@@ -41,8 +42,8 @@ type IdentityServer struct {
 
 // Config defines the needed parameters to start the Identity Server.
 type Config struct {
-	// DSN is the Data Source Name used by the store to connect to the database.
-	DSN string `name:"dsn" description:"Data Source Name to connect to the database"`
+	// DataSourceName is the data source name the store needs to open the database connection.
+	*db.DataSourceName
 
 	// Hostname denotes the Identity Server hostname. It is used as issuer when
 	// generating access tokens and API keys.
@@ -137,7 +138,7 @@ var defaultOptions = []Option{
 
 // New returns a new IdentityServer.
 func New(c *component.Component, config *Config, opts ...Option) (*IdentityServer, error) {
-	store, err := sql.Open(config.DSN)
+	store, err := sql.Open(config.DataSourceName)
 	if err != nil {
 		return nil, err
 	}

@@ -28,11 +28,16 @@ import (
 )
 
 var (
-	address  = "postgres://root@localhost:26257/%s?sslmode=disable"
-	database = "is_oauth_tests"
-	issuer   = "issuer.test.local"
-	userID   = "john-doe"
-	client   = &ttnpb.Client{
+	dsn = &db.DataSourceName{
+		DatabaseHostname: "localhost",
+		DatabasePort:     26257,
+		DatabaseName:     "is_oauth_tests",
+		DatabaseUser:     "root",
+	}
+
+	issuer = "issuer.test.local"
+	userID = "john-doe"
+	client = &ttnpb.Client{
 		ClientIdentifier: ttnpb.ClientIdentifier{ClientID: "foo"},
 		RedirectURI:      "http://example.com/oauth/callback",
 		Secret:           "secret",
@@ -54,23 +59,23 @@ var (
 
 // cleanStore returns a new store instance attached to a newly created database
 // where all migrations has been applied and also has been feed with some users.
-func cleanStore(logger log.Interface, database string) *sql.Store {
+func cleanStore(logger log.Interface, dsn *db.DataSourceName) *sql.Store {
 	// open database connection
-	db, err := db.Open(context.Background(), fmt.Sprintf(address, database), migrations.Registry)
+	db, err := db.Open(context.Background(), dsn, migrations.Registry)
 	if err != nil {
 		logger.WithError(err).Fatal("Failed to establish a connection with the CockroachDB instance")
 	}
 
 	// drop database
-	_, err = db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE", database))
+	_, err = db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE", dsn.DatabaseName))
 	if err != nil {
-		logger.WithError(err).Fatalf("Failed to delete database `%s`", database)
+		logger.WithError(err).Fatalf("Failed to delete database `%s`", dsn.DatabaseName)
 	}
 
 	// create it again
-	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s", database))
+	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s", dsn.DatabaseName))
 	if err != nil {
-		logger.WithError(err).Fatalf("Failed to create database `%s`", database)
+		logger.WithError(err).Fatalf("Failed to create database `%s`", dsn.DatabaseName)
 	}
 
 	// apply all migrations
@@ -88,7 +93,7 @@ func testServer(t *testing.T) *web.Server {
 	a := assertions.New(t)
 
 	if s == nil {
-		store := cleanStore(logger, database)
+		store := cleanStore(logger, dsn)
 
 		err := store.Users.Create(&ttnpb.User{
 			UserIdentifier: ttnpb.UserIdentifier{

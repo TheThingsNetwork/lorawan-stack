@@ -12,6 +12,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/auth/oauth"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
@@ -20,8 +21,13 @@ import (
 
 var (
 	testConfig = &Config{
-		Hostname:         "development.identityserver.ttn",
-		DSN:              "postgres://root@localhost:26257/is_development_tests?sslmode=disable",
+		DataSourceName: &db.DataSourceName{
+			DatabaseHostname: "localhost",
+			DatabasePort:     26257,
+			DatabaseName:     "is_development_tests",
+			DatabaseUser:     "root",
+		},
+		Hostname:         "localhost",
 		OrganizationName: "The Things Network",
 		PublicURL:        "https://www.thethingsnetwork.org",
 	}
@@ -45,6 +51,12 @@ func getIS(t testing.TB) *IdentityServer {
 		is, err := New(comp, testConfig, WithDefaultSettings(testSettings()))
 		if err != nil {
 			logger.WithError(err).Fatal("Failed to create an Identity Server instance")
+		}
+
+		// drop the database before initializing the IS
+		err = is.store.DropDatabase()
+		if err != nil {
+			logger.WithError(err).Fatal("Failed to drop database")
 		}
 
 		err = is.Init()

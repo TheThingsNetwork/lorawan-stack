@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
@@ -31,7 +30,7 @@ type Store struct {
 }
 
 // Open opens a new database connection and attachs it to a new store.
-func Open(dsn string) (*Store, error) {
+func Open(dsn *db.DataSourceName) (*Store, error) {
 	db, err := db.Open(context.Background(), dsn, migrations.Registry)
 	if err != nil {
 		return nil, err
@@ -131,21 +130,20 @@ func initSubStores(s storer) {
 }
 
 func (s *Store) Init() error {
-	database := ""
-	err := s.db.SelectOne(&database, `SELECT current_database()`)
-	if db.IsNoRows(err) {
-		return errors.New("No database specified")
-	}
-	if err != nil {
-		return err
-	}
-
-	_, err = s.db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", database))
+	_, err := s.db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", s.db.Database()))
 	if err != nil {
 		return err
 	}
 
 	return s.MigrateAll()
+}
+
+func (s *Store) DropDatabase() error {
+	_, err := s.db.Exec(fmt.Sprintf("DROP DATABASE %s CASCADE", s.db.Database()))
+	if db.IsNoRows(err) {
+		return nil
+	}
+	return err
 }
 
 func (s *Store) MigrateAll() error {
