@@ -124,12 +124,9 @@ func (addr DevAddr) AfterOrEqual(a DevAddr) bool {
 	return addr.After(a) || addr == a
 }
 
-// Validate returns true if the DevAddr is valid and compliant with LoRaWAN specification.
-func (addr DevAddr) Validate() error {
-	if addr[0] == 0xff {
-		return errors.New("Unknown NetID type")
-	}
-	return nil
+// HasValidNetIDType returns true if the DevAddr has NetID type, which is valid and compliant with LoRaWAN specification.
+func (addr DevAddr) HasValidNetIDType() bool {
+	return addr[0] != 0xff
 }
 
 // NetIDType returns the NetID type of the DevAddr.
