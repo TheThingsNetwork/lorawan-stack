@@ -1,5 +1,6 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
+// Package cluster defines an interface for clustering network components and provides a simple implementation.
 package cluster
 
 import (
