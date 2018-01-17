@@ -9,7 +9,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-func TestSlicesInt32(t *testing.T) {
+func TestSliceOfInt32s(t *testing.T) {
 	a := assertions.New(t)
 
 	// empty int32 slice
@@ -51,7 +51,7 @@ func TestSlicesInt32(t *testing.T) {
 	}
 }
 
-func TestSlicesString(t *testing.T) {
+func TestSliceOfStrings(t *testing.T) {
 	a := assertions.New(t)
 
 	// empty string slice
