@@ -4,7 +4,6 @@ package identityserver
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email"
@@ -13,7 +12,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/TheThingsNetwork/ttn/pkg/version"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
 )
@@ -49,10 +47,6 @@ type Config struct {
 	// Hostname denotes the Identity Server hostname. It is used as issuer when
 	// generating access tokens and API keys.
 	Hostname string `name:"hostname" description:"Hostname where this server is running. Used as issuer when generating access tokens and API keys"`
-
-	// RecreateDatabase denotes if the database is recreated when the store is initialized.
-	// WARNING: it will erase all the previous data
-	RecreateDatabase bool `name:"recreate-database" description:"Development-only flag. Recreates the database when the server is initialized. WARNING: it deletes all previous data"`
 
 	// OrganizationName is the display name of the organization that runs the network.
 	// e.g. The Things Network
@@ -148,11 +142,6 @@ func New(c *component.Component, config *Config, opts ...Option) (*IdentityServe
 		return nil, err
 	}
 
-	// only allow to recreate database on development version
-	if !strings.Contains(version.TTN, "dev") {
-		config.RecreateDatabase = false
-	}
-
 	is := &IdentityServer{
 		Component: c,
 		store:     store,
@@ -180,7 +169,7 @@ func New(c *component.Component, config *Config, opts ...Option) (*IdentityServe
 
 // Init initializes the store and sets the default settings in case they aren't.
 func (is *IdentityServer) Init() error {
-	err := is.store.Init(is.config.RecreateDatabase)
+	err := is.store.Init()
 	if err != nil {
 		return err
 	}

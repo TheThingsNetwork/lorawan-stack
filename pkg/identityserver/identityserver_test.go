@@ -22,7 +22,6 @@ var (
 	testConfig = &Config{
 		Hostname:         "development.identityserver.ttn",
 		DSN:              "postgres://root@localhost:26257/is_development_tests?sslmode=disable",
-		RecreateDatabase: true,
 		OrganizationName: "The Things Network",
 		PublicURL:        "https://www.thethingsnetwork.org",
 	}

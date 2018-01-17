@@ -13,6 +13,10 @@ include .make/headers.make
 include .make/go/main.make
 include .make/protos/main.make
 
+is.database-drop:
+	@$(log) "Dropping Cockroach database `echo $(NAME)`"
+	cockroach sql --insecure --execute="DROP DATABASE $(NAME) CASCADE;"
+
 ci.encrypt-variables:
 	keybase encrypt -b -i ci/variables.yml -o ci/variables.yml.encrypted johanstokking htdvisser romeovs ericgo
 

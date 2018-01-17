@@ -130,7 +130,7 @@ func initSubStores(s storer) {
 	store.Settings = NewSettingStore(s)
 }
 
-func (s *Store) Init(recreateDatabase bool) error {
+func (s *Store) Init() error {
 	database := ""
 	err := s.db.SelectOne(&database, `SELECT current_database()`)
 	if db.IsNoRows(err) {
@@ -138,13 +138,6 @@ func (s *Store) Init(recreateDatabase bool) error {
 	}
 	if err != nil {
 		return err
-	}
-
-	if recreateDatabase {
-		_, err = s.db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s", database))
-		if err != nil {
-			return err
-		}
 	}
 
 	_, err = s.db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", database))
