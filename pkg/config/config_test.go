@@ -68,7 +68,8 @@ type example struct {
 	NestedPtr *NestedConfig `name:"nestedptr" description:"A nested struct ptr"`
 	NotUsed   string        `name:"-"`
 
-	Custom Custom `name:"custom" description:"A custom type"`
+	Custom  Custom   `name:"custom" description:"A custom type"`
+	Customs []Custom `name:"customs" description:"A slice of custom types"`
 
 	FileOnly interface{} `name:"file-only" file-only:"true"`
 }
@@ -98,7 +99,11 @@ var (
 		NestedPtr: &NestedConfig{
 			String: "nested-bar",
 		},
-		Custom:   Custom(42),
+		Custom: Custom(42),
+		Customs: []Custom{
+			Custom(42),
+			Custom(112),
+		},
 		FileOnly: 33,
 	}
 )
@@ -155,6 +160,7 @@ func TestConfigEnv(t *testing.T) {
 	os.Setenv("TEST_NESTED_STRING", "mud")
 	os.Setenv("TEST_NESTEDPTR_STRING", "mad")
 	os.Setenv("TEST_CUSTOM", "bar")
+	os.Setenv("TEST_CUSTOMS", "bar")
 
 	// parse no command line args
 	config.Parse()
@@ -188,7 +194,10 @@ func TestConfigEnv(t *testing.T) {
 		NestedPtr: &NestedConfig{
 			String: "mad",
 		},
-		Custom:   Custom(112),
+		Custom: Custom(112),
+		Customs: []Custom{
+			Custom(112),
+		},
 		FileOnly: defaults.FileOnly,
 	})
 }
@@ -233,6 +242,8 @@ func TestConfigFlags(t *testing.T) {
 		"--nested.string", "mud",
 		"--nestedptr.string", "mad",
 		"--custom", "bar",
+		"--customs", "bar",
+		"--customs", "foo",
 		"--stringmapslice", "a=b",
 		"--stringmapslice", "a=c",
 		"--stringmapslice", "d=e",
@@ -267,7 +278,11 @@ func TestConfigFlags(t *testing.T) {
 		NestedPtr: &NestedConfig{
 			String: "mad",
 		},
-		Custom:   Custom(112),
+		Custom: Custom(112),
+		Customs: []Custom{
+			Custom(112),
+			Custom(42),
+		},
 		FileOnly: defaults.FileOnly,
 	})
 }

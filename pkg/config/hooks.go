@@ -106,10 +106,8 @@ func stringToStringMapHookFunc(f reflect.Type, t reflect.Type, data interface{})
 	return m, nil
 }
 
-var iConfigurable = reflect.TypeOf((*Configurable)(nil)).Elem()
-
 func configurableInterfaceHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
-	if f.Kind() != reflect.String || !t.Implements(iConfigurable) {
+	if f.Kind() != reflect.String || !t.Implements(configurableI) {
 		return data, nil
 	}
 
@@ -121,6 +119,31 @@ func configurableInterfaceHook(f reflect.Type, t reflect.Type, data interface{})
 	}
 
 	return u.FromConfigString(str)
+}
+
+func configurableInterfaceSliceHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	if f.Kind() != reflect.Slice || f.Elem().Kind() != reflect.String || t.Kind() != reflect.Slice || !t.Elem().Implements(configurableI) {
+		return data, nil
+	}
+
+	strs := data.([]string)
+	res := reflect.MakeSlice(t, len(strs), len(strs))
+
+	for i, str := range strs {
+		val, ok := reflect.New(t.Elem()).Interface().(Configurable)
+		if !ok {
+			return data, nil
+		}
+
+		v, err := val.FromConfigString(str)
+		if err != nil {
+			return nil, err
+		}
+
+		res.Index(i).Set(reflect.ValueOf(v))
+	}
+
+	return res.Interface(), nil
 }
 
 func stringToByteSliceHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {

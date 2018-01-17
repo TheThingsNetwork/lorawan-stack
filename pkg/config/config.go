@@ -179,6 +179,7 @@ func (m *Manager) Unmarshal(result interface{}) error {
 			stringToStringMapHookFunc,
 			stringSliceToStringHookFunc,
 			configurableInterfaceHook,
+			configurableInterfaceSliceHook,
 			stringToByteSliceHook,
 		),
 	})
@@ -271,6 +272,8 @@ type Stringer interface {
 	ConfigString() string
 }
 
+var configurableI = reflect.TypeOf((*Configurable)(nil)).Elem()
+
 func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interface{}) {
 	configValue := reflect.ValueOf(config)
 	configKind := configValue.Type().Kind()
@@ -334,6 +337,34 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				m.viper.SetDefault(name, val)
 				m.flags.StringP(name, shorthand, val, description)
 				continue
+			}
+
+			if field.Type.Kind() == reflect.Slice {
+				elem := field.Type.Elem()
+				if elem.Implements(configurableI) {
+					val := configValue.Field(i)
+					len := val.Len()
+					defs := make([]string, 0, len)
+
+					for i := 0; i < len; i++ {
+						c := val.Index(i).Interface()
+						str := fmt.Sprintf("%v", c)
+
+						if s, ok := c.(fmt.Stringer); ok {
+							str = s.String()
+						}
+
+						if s, ok := c.(Stringer); ok {
+							str = s.ConfigString()
+						}
+
+						defs = append(defs, str)
+					}
+
+					m.viper.SetDefault(name, defs)
+					m.flags.StringSliceP(name, shorthand, defs, description)
+					continue
+				}
 			}
 
 			if fieldType == reflect.Interface || fieldType == reflect.Ptr {
