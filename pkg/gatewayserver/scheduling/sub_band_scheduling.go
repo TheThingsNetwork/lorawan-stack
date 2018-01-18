@@ -40,11 +40,11 @@ type subBandScheduling struct {
 }
 
 func (s *subBandScheduling) expired(t Timestamp) bool {
-	switch t.(type) {
+	switch t := t.(type) {
 	case systemTime:
-		return time.Time(t.(systemTime)).Add(dutyCycleWindow).Before(time.Now())
+		return time.Time(t).Add(dutyCycleWindow).Before(time.Now())
 	case concentratorTime:
-		return uint64(t.(concentratorTime))+uint64(dutyCycleWindow) < s.currentConcentratorTime
+		return uint64(t)+uint64(dutyCycleWindow) < s.currentConcentratorTime
 	default:
 		return false
 	}
