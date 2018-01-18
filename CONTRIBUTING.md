@@ -33,7 +33,9 @@ A fix, feature or issue branch should be **small and focused** and should be sco
 
 Before feature branches are merged, they shall rebased on top of their target branch. Do not rebase a branch if others are still working on a derived branch.
 
-Interactive rebase (git rebase -i) may be used to rewrite commit messages that do not follow these contribution guidelines
+Keep the commits to be merged clean: adhere to the commit message format defined below and instead of adding and deleting files within a pull request, drop or fix the concerning commit that added the file.
+
+Interactive rebase (`git rebase -i`) can be used to rewrite commit messages that do not follow these contribution guidelines.
 
 ## <a name="commit"></a>Commit Messages
 
