@@ -24,7 +24,7 @@ GO_METALINTER = gometalinter
 GO_LINT_FILES = $(ALL_FILES) | $(only_go_lintable)
 
 # go flags
-GO_FLAGS ?= -a
+GO_FLAGS ?= -i
 GO_ENV = CGO_ENABLED=0
 LD_FLAGS = -ldflags "-w $(GO_TAGS)"
 GO_TAGS ?= -X github.com/TheThingsNetwork/ttn/pkg/version.GitCommit=$(GIT_COMMIT) -X github.com/TheThingsNetwork/ttn/pkg/version.BuildDate=$(BUILD_DATE) -X github.com/TheThingsNetwork/ttn/pkg/version.TTN=$(GIT_TAG) -X github.com/TheThingsNetwork/ttn/pkg/version.GitBranch=$(GIT_BRANCH)

@@ -7,8 +7,6 @@ GOARCH ?= $(shell go env GOARCH)
 # default main file
 MAIN ?= ./main.go
 
-BUILD_TYPE = production
-
 # default vendor folder
 VENDOR_DIR ?= $(PWD)/vendor
 VENDOR_FILE ?= Gopkg.toml
@@ -18,15 +16,8 @@ LAZY_GOARCH = `echo $@ | sed 's:$(RELEASE_DIR)/.*-\(.*\)-\(.*\):\2:'`
 
 # Build the executable
 $(RELEASE_DIR)/%: $(shell $(GO_FILES)) $(GO_VENDOR_FILE)
-	@$(log) "Building" [BUILD_TYPE=$(BUILD_TYPE) $(GO_ENV) GOOS=$(LAZY_GOOS) GOARCH=$(LAZY_GOARCH) $(GO) build $(GO_FLAGS) ...]
+	@$(log) "Building" [$(GO_ENV) GOOS=$(LAZY_GOOS) GOARCH=$(LAZY_GOARCH) $(GO) build $(GO_FLAGS) ...]
 	@$(GO_ENV) GOOS=$(LAZY_GOOS) GOARCH=$(LAZY_GOARCH) $(GO) build -o "$@" -v $(GO_FLAGS) $(LD_FLAGS) $(MAIN)
-
-# Enable development mode
-.PHONY: go.dev
-go.dev:
-	$(eval GO_ENV := )
-	$(eval GO_FLAGS := )
-	$(eval BUILD_TYPE := development)
 
 # link executables to a simplified name that is the same on all architectures.
 go.link:
