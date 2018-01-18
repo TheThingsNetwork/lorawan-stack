@@ -45,7 +45,7 @@ go.unconvert-staged: go.unconvert
 
 go.lint-travis: GO_PACKAGES = git diff --name-only HEAD $(TRAVIS_BRANCH) |  $(to_packages)
 go.lint-travis: log = true
-go.lint-travis: go.lint-full
+go.lint-travis: go.lint
 
 go.lint-travis-comment:
 	@if [ "$$TRAVIS_PULL_REQUEST" != "false" ]; then \
