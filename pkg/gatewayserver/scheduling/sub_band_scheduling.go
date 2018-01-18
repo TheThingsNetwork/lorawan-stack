@@ -14,8 +14,6 @@ import (
 
 const (
 	dutyCycleWindow = 5 * time.Minute
-
-	cleanupDelay = 2 * time.Minute
 )
 
 type packetWindow struct {
@@ -30,35 +28,34 @@ func (w packetWindow) withTimeOffAir() Span {
 	}
 }
 
+type schedulingWindow struct {
+	packetWindow
+
+	added time.Time
+}
+
 type subBandScheduling struct {
 	dutyCycle         band.DutyCycle
-	schedulingWindows []packetWindow
-
-	currentConcentratorTime uint64
+	schedulingWindows []schedulingWindow
 
 	mu sync.Mutex
 }
 
-func (s *subBandScheduling) expired(t Timestamp) bool {
-	switch t := t.(type) {
-	case systemTime:
-		return time.Time(t).Add(dutyCycleWindow).Before(time.Now())
-	case concentratorTime:
-		return uint64(t)+uint64(dutyCycleWindow) < s.currentConcentratorTime
-	default:
-		return false
-	}
+func (w schedulingWindow) expired() bool {
+	return time.Now().Sub(w.added) > 2*dutyCycleWindow
 }
 
 func (s *subBandScheduling) bgCleanup(ctx context.Context) {
+	cleanupTicker := time.NewTicker(dutyCycleWindow)
 	for {
 		select {
 		case <-ctx.Done():
+			cleanupTicker.Stop()
 			return
-		case <-time.After(cleanupDelay):
+		case <-cleanupTicker.C:
 			s.mu.Lock()
 			for i, w := range s.schedulingWindows {
-				if s.expired(w.window.End()) {
+				if w.expired() {
 					s.schedulingWindows = append(s.schedulingWindows[:i], s.schedulingWindows[i+1:]...)
 				}
 			}
@@ -68,13 +65,14 @@ func (s *subBandScheduling) bgCleanup(ctx context.Context) {
 }
 
 func (s *subBandScheduling) addScheduling(w packetWindow) {
+	window := schedulingWindow{packetWindow: w, added: time.Now()}
 	for i, window := range s.schedulingWindows {
 		if w.window.StartsBefore(window.window) {
-			s.schedulingWindows = append(s.schedulingWindows[:i], append([]packetWindow{w}, s.schedulingWindows[i:]...)...)
+			s.schedulingWindows = append(s.schedulingWindows[:i], append([]schedulingWindow{window}, s.schedulingWindows[i:]...)...)
 			return
 		}
 	}
-	s.schedulingWindows = append(s.schedulingWindows, w)
+	s.schedulingWindows = append(s.schedulingWindows, window)
 }
 
 func (s *subBandScheduling) RegisterEmission(w packetWindow) {

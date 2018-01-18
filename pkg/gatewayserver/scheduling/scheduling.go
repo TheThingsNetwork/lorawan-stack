@@ -60,8 +60,6 @@ type Scheduler interface {
 	ScheduleAnytime(minimum Timestamp, d time.Duration, channel uint64) (Span, error)
 	// RegisterEmission that has happened during that timespan, on that specific channel.
 	RegisterEmission(s Span, channel uint64) error
-	// SetCurrentConcentratorTime
-	SetCurrentConcentratorTime(uint64)
 }
 
 // FrequencyPlanScheduler returns a scheduler based on the frequency plan, and starts a goroutine for cleanup. The scheduler is based on the dwell time, time off air, and the frequency plan's band. Assumption is made that no two duty cycles on a given band overlap.
@@ -80,7 +78,7 @@ func FrequencyPlanScheduler(ctx context.Context, fp ttnpb.FrequencyPlan) (Schedu
 	for _, subBand := range band.BandDutyCycles {
 		scheduling := &subBandScheduling{
 			dutyCycle:         subBand,
-			schedulingWindows: []packetWindow{},
+			schedulingWindows: []schedulingWindow{},
 
 			mu: sync.Mutex{},
 		}
@@ -96,12 +94,6 @@ type frequencyPlanScheduling struct {
 	timeOffAir *ttnpb.FrequencyPlan_TimeOffAir
 
 	subBands []*subBandScheduling
-}
-
-func (f *frequencyPlanScheduling) SetCurrentConcentratorTime(ts uint64) {
-	for _, subBand := range f.subBands {
-		subBand.currentConcentratorTime = ts
-	}
 }
 
 func (f frequencyPlanScheduling) findSubBand(channel uint64) (*subBandScheduling, error) {
