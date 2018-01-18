@@ -3,7 +3,6 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "github.com/TheThingsNetwork/ttn/api/auth.proto";
 import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "google/protobuf/duration.proto";
