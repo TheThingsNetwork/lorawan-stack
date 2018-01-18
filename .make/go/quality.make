@@ -10,9 +10,6 @@ go.lint:
 	@$(log) "Linting `$(GO_PACKAGES) | $(count)` go packages"
 	@CODE=0; $(GO_METALINTER) $(GO_METALINTER_FLAGS) `$(GO_PACKAGES_ABSOLUTE)` 2> /dev/null || { CODE=1; }; exit $$CODE
 
-go.lint-full: GO_METALINTER_FLAGS=$(GO_METALINTER_FLAGS_FULL)
-go.lint-full: go.lint
-
 # fix misspellings in all packages
 go.misspell:
 	@$(log) "Fixing misspellings in `$(GO_PACKAGES) | $(count)` go packages"
