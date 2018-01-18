@@ -45,10 +45,6 @@
 
 [[constraint]]
   branch = "master"
-  name = "github.com/prometheus/client_golang"
-
-[[constraint]]
-  branch = "master"
   name = "github.com/smartystreets/assertions"
 
 [[constraint]]
@@ -66,3 +62,7 @@
 [[constraint]]
   name = "google.golang.org/grpc"
   version = "1.7.3"
+
+[[override]]
+  branch = "master"
+  name = "github.com/prometheus/client_golang"
