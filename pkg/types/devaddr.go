@@ -116,12 +116,12 @@ func (addr DevAddr) After(a DevAddr) bool {
 
 // BeforeOrEqual returns true if the DevAddr is inferior or equal to the DevAddr passed as an argument.
 func (addr DevAddr) BeforeOrEqual(a DevAddr) bool {
-	return addr.Before(a) || addr == a
+	return addr == a || addr.Before(a)
 }
 
 // AfterOrEqual returns true if the DevAddr is superior or equal to the DevAddr passed as an argument.
 func (addr DevAddr) AfterOrEqual(a DevAddr) bool {
-	return addr.After(a) || addr == a
+	return addr == a || addr.After(a)
 }
 
 // HasValidNetIDType returns true if the DevAddr has NetID type, which is valid and compliant with LoRaWAN specification.

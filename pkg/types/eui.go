@@ -110,12 +110,12 @@ func (eui EUI64) After(a EUI64) bool {
 
 // BeforeOrEqual returns true if the EUI64 is inferior or equal to the EUI64 passed as an argument.
 func (eui EUI64) BeforeOrEqual(a EUI64) bool {
-	return eui.Before(a) || eui == a
+	return eui == a || eui.Before(a)
 }
 
 // AfterOrEqual returns true if the EUI64 is superior or equal to the EUI64 passed as an argument.
 func (eui EUI64) AfterOrEqual(a EUI64) bool {
-	return eui.After(a) || eui == a
+	return eui == a || eui.After(a)
 }
 
 // ErrInvalidEUI64Prefix can be returned when unmarshaling an invalid slice into a prefix.
