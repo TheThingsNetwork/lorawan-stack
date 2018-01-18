@@ -54,7 +54,7 @@ func (s *SendGrid) Send(recipient string, template templates.Template) error {
 
 	logger := s.logger.WithFields(log.Fields(
 		"recipient", recipient,
-		"template.name", template.Name(),
+		"template.name", template.GetName(),
 	))
 
 	logger.Info("Sending email ...")

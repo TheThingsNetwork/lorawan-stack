@@ -9,8 +9,8 @@ import (
 
 // Template is the interface of those things that are an email template.
 type Template interface {
-	// Name returns the template's name.
-	Name() string
+	// GetName returns the template's name.
+	GetName() string
 
 	// Render renders the subject and message of the template returning it.
 	Render() (string, string, error)

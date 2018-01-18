@@ -9,8 +9,8 @@ type EmailValidation struct {
 	Token            string
 }
 
-// Name implements Template.
-func (t *EmailValidation) Name() string {
+// GetName implements Template.
+func (t *EmailValidation) GetName() string {
 	return "Email Validation"
 }
 
