@@ -283,6 +283,20 @@ func (prefix *EUI64Prefix) Scan(src interface{}) error {
 	return prefix.UnmarshalText(data)
 }
 
+// FromConfigString implements the config.Configurable interface
+func (prefix EUI64Prefix) FromConfigString(in string) (interface{}, error) {
+	p := new(EUI64Prefix)
+	if err := p.UnmarshalText([]byte(in)); err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+// ConfigString implements the config.Stringer interface
+func (prefix EUI64Prefix) ConfigString() string {
+	return prefix.String()
+}
+
 // WithPrefix returns the EUI64, but with the first length bits replaced by the Prefix.
 func (eui EUI64) WithPrefix(prefix EUI64Prefix) (prefixed EUI64) {
 	k := uint(prefix.Length)

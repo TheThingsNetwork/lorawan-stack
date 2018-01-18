@@ -39,8 +39,8 @@ type JoinServer struct {
 
 // Config represents the JoinServer configuration.
 type Config struct {
-	Registry        deviceregistry.Interface
-	JoinEUIPrefixes []types.EUI64Prefix
+	Registry        deviceregistry.Interface `name:"-"`
+	JoinEUIPrefixes []types.EUI64Prefix      `name:"join-eui-prefix" description:"JoinEUI prefixes handled by this JS"`
 }
 
 // New returns new *JoinServer.
