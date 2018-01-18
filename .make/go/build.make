@@ -17,7 +17,7 @@ LAZY_GOARCH = `echo $@ | sed 's:$(RELEASE_DIR)/.*-\(.*\)-\(.*\):\2:'`
 # Build the executable
 $(RELEASE_DIR)/%: $(shell $(GO_FILES)) $(GO_VENDOR_FILE)
 	@$(log) "Building" [$(GO_ENV) GOOS=$(LAZY_GOOS) GOARCH=$(LAZY_GOARCH) $(GO) build $(GO_FLAGS) ...]
-	@$(GO_ENV) GOOS=$(LAZY_GOOS) GOARCH=$(LAZY_GOARCH) $(GO) build -o "$@" -v $(GO_FLAGS) $(LD_FLAGS) $(MAIN)
+	@$(GO_ENV) GOOS=$(LAZY_GOOS) GOARCH=$(LAZY_GOARCH) $(GO) build -gcflags="-trimpath=$(GO_PATH)" -asmflags="-trimpath=$(GO_PATH)" -o "$@" -v $(GO_FLAGS) $(LD_FLAGS) $(MAIN)
 
 # link executables to a simplified name that is the same on all architectures.
 go.link:
