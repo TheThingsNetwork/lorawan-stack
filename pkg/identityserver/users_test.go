@@ -20,7 +20,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-var _ ttnpb.IsUserServer = new(IdentityServer)
+var _ ttnpb.IsUserServer = new(userService)
 
 func TestUser(t *testing.T) {
 	a := assertions.New(t)
@@ -40,7 +40,7 @@ func TestUser(t *testing.T) {
 
 	// can't create an account using a not allowed email
 	user.Email = "foo@foo.com"
-	_, err := is.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
+	_, err := is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
 		User: user,
 	})
 	a.So(err, should.NotBeNil)
@@ -50,7 +50,7 @@ func TestUser(t *testing.T) {
 	// can't create account using a blacklisted id
 	for _, id := range testSettings().BlacklistedIDs {
 		user.UserID = id
-		_, err = is.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
+		_, err = is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
 			User: user,
 		})
 		a.So(err, should.NotBeNil)
@@ -59,13 +59,13 @@ func TestUser(t *testing.T) {
 	user.UserID = "daniel"
 
 	// create the account
-	_, err = is.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
+	_, err = is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
 		User: user,
 	})
 	a.So(err, should.BeNil)
 
 	// can't retrieve profile without proper claims
-	found, err := is.GetUser(context.Background(), &pbtypes.Empty{})
+	found, err := is.userService.GetUser(context.Background(), &pbtypes.Empty{})
 	a.So(found, should.BeNil)
 	a.So(err, should.NotBeNil)
 	a.So(ErrNotAuthorized.Describes(err), should.BeTrue)
@@ -92,7 +92,7 @@ func TestUser(t *testing.T) {
 	ctx := testCtx()
 
 	// check that response doesnt include password within
-	found, err = is.GetUser(ctx, &pbtypes.Empty{})
+	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	a.So(found.UserIdentifier.UserID, should.Equal, user.UserID)
 	a.So(found.Name, should.Equal, user.Name)
@@ -110,31 +110,31 @@ func TestUser(t *testing.T) {
 	if a.So(ok, should.BeTrue) && a.So(data.Token, should.NotBeEmpty) {
 		token := data.Token
 
-		_, err := is.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
+		_, err := is.userService.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
 			Token: token,
 		})
 		a.So(err, should.BeNil)
 
-		found, err := is.GetUser(ctx, &pbtypes.Empty{})
+		found, err := is.userService.GetUser(ctx, &pbtypes.Empty{})
 		a.So(err, should.BeNil)
 		a.So(found.ValidatedAt.IsZero(), should.BeFalse)
 	}
 
 	// try to update the user password providing a wrong old password
-	_, err = is.UpdateUserPassword(ctx, &ttnpb.UpdateUserPasswordRequest{
+	_, err = is.userService.UpdateUserPassword(ctx, &ttnpb.UpdateUserPasswordRequest{
 		New: "heheh",
 	})
 	a.So(err, should.NotBeNil)
 	a.So(ErrInvalidPassword.Describes(err), should.BeTrue)
 
-	_, err = is.UpdateUserPassword(ctx, &ttnpb.UpdateUserPasswordRequest{
+	_, err = is.userService.UpdateUserPassword(ctx, &ttnpb.UpdateUserPasswordRequest{
 		Old: user.Password,
 		New: "heheh",
 	})
 	a.So(err, should.BeNil)
 
 	// generate a new API key
-	key, err := is.GenerateUserAPIKey(ctx, &ttnpb.GenerateUserAPIKeyRequest{
+	key, err := is.userService.GenerateUserAPIKey(ctx, &ttnpb.GenerateUserAPIKeyRequest{
 		Name:   "foo",
 		Rights: ttnpb.AllUserRights,
 	})
@@ -145,37 +145,37 @@ func TestUser(t *testing.T) {
 
 	// update api key
 	key.Rights = []ttnpb.Right{ttnpb.Right(10)}
-	_, err = is.UpdateUserAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
+	_, err = is.userService.UpdateUserAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 		Name:   key.Name,
 		Rights: key.Rights,
 	})
 	a.So(err, should.BeNil)
 
 	// can't generate another API Key with the same name
-	_, err = is.GenerateUserAPIKey(ctx, &ttnpb.GenerateUserAPIKeyRequest{
+	_, err = is.userService.GenerateUserAPIKey(ctx, &ttnpb.GenerateUserAPIKeyRequest{
 		Name:   key.Name,
 		Rights: []ttnpb.Right{ttnpb.Right(1)},
 	})
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
-	keys, err := is.ListUserAPIKeys(ctx, &pbtypes.Empty{})
+	keys, err := is.userService.ListUserAPIKeys(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	if a.So(keys.APIKeys, should.HaveLength, 1) {
 		sort.Slice(keys.APIKeys[0].Rights, func(i, j int) bool { return keys.APIKeys[0].Rights[i] < keys.APIKeys[0].Rights[j] })
 		a.So(keys.APIKeys[0], should.Resemble, key)
 	}
 
-	_, err = is.RemoveUserAPIKey(ctx, &ttnpb.RemoveUserAPIKeyRequest{
+	_, err = is.userService.RemoveUserAPIKey(ctx, &ttnpb.RemoveUserAPIKeyRequest{
 		Name: key.Name,
 	})
 
-	keys, err = is.ListUserAPIKeys(ctx, &pbtypes.Empty{})
+	keys, err = is.userService.ListUserAPIKeys(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
 	// update the user's email
-	_, err = is.UpdateUser(ctx, &ttnpb.UpdateUserRequest{
+	_, err = is.userService.UpdateUser(ctx, &ttnpb.UpdateUserRequest{
 		User: ttnpb.User{
 			Email: "newfoo@bar.com",
 		},
@@ -186,7 +186,7 @@ func TestUser(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	// check that the field validated_at has been reset
-	found, err = is.GetUser(ctx, &pbtypes.Empty{})
+	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	a.So(found.UserIdentifier.UserID, should.Equal, user.UserID)
 	a.So(found.ValidatedAt.IsZero(), should.BeTrue)
@@ -201,17 +201,17 @@ func TestUser(t *testing.T) {
 	a.So(token, should.NotBeEmpty)
 
 	// request a new validation token
-	_, err = is.RequestUserEmailValidation(ctx, &pbtypes.Empty{})
+	_, err = is.userService.RequestUserEmailValidation(ctx, &pbtypes.Empty{})
 
 	// check that the old validation token doesnt work because we requested a new one
-	_, err = is.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
+	_, err = is.userService.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
 		Token: token,
 	})
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrValidationTokenNotFound.Describes(err), should.BeTrue)
 
 	// and therefore the email isn't validated yet
-	found, err = is.GetUser(ctx, &pbtypes.Empty{})
+	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	a.So(found.UserIdentifier.UserID, should.Equal, user.UserID)
 	a.So(found.ValidatedAt.IsZero(), should.BeTrue)
@@ -224,17 +224,17 @@ func TestUser(t *testing.T) {
 	a.So(token, should.NotBeEmpty)
 
 	// validate the email
-	_, err = is.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
+	_, err = is.userService.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
 		Token: token,
 	})
 	a.So(err, should.BeNil)
 
-	found, err = is.GetUser(ctx, &pbtypes.Empty{})
+	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	a.So(found.UserIdentifier.UserID, should.Equal, user.UserID)
 	a.So(found.ValidatedAt.IsZero(), should.BeFalse)
 
-	clients, err := is.ListAuthorizedClients(ctx, &pbtypes.Empty{})
+	clients, err := is.userService.ListAuthorizedClients(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	if a.So(clients.Clients, should.HaveLength, 1) {
 		cli := clients.Clients[0]
@@ -246,11 +246,11 @@ func TestUser(t *testing.T) {
 		a.So(cli.Grants, should.BeEmpty)
 	}
 
-	_, err = is.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifier{"non-existent-client"})
+	_, err = is.userService.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifier{"non-existent-client"})
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrAuthorizedClientNotFound.Describes(err), should.BeTrue)
 
-	_, err = is.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifier{client.ClientID})
+	_, err = is.userService.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifier{client.ClientID})
 	a.So(err, should.BeNil)
 
 	// create a fake authorized client to the user
@@ -292,6 +292,6 @@ func TestUser(t *testing.T) {
 	err = is.store.OAuth.SaveRefreshToken(refreshData)
 	a.So(err, should.BeNil)
 
-	_, err = is.DeleteUser(testCtx(), &pbtypes.Empty{})
+	_, err = is.userService.DeleteUser(testCtx(), &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 }

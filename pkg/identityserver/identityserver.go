@@ -29,7 +29,7 @@ type IdentityServer struct {
 	*applicationService
 	*gatewayService
 	*clientService
-	*settingService
+	*adminService
 
 	factories struct {
 		user        store.UserFactory
@@ -152,7 +152,7 @@ func New(c *component.Component, config *Config, opts ...Option) (*IdentityServe
 	is.applicationService = &applicationService{is}
 	is.gatewayService = &gatewayService{is}
 	is.clientService = &clientService{is}
-	is.settingService = &settingService{is}
+	is.adminService = &adminService{is}
 
 	opts = append(defaultOptions, opts...)
 
@@ -194,7 +194,7 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterIsApplicationServer(s, is.applicationService)
 	ttnpb.RegisterIsGatewayServer(s, is.gatewayService)
 	ttnpb.RegisterIsClientServer(s, is.clientService)
-	ttnpb.RegisterIsSettingsServer(s, is.settingService)
+	ttnpb.RegisterIsAdminServer(s, is.adminService)
 }
 
 // RegisterHandlers registers gRPC handlers.

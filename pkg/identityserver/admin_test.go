@@ -12,7 +12,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-var _ ttnpb.IsSettingsServer = new(IdentityServer)
+var _ ttnpb.IsAdminServer = new(adminService)
 
 func TestSettings(t *testing.T) {
 	a := assertions.New(t)
@@ -21,12 +21,12 @@ func TestSettings(t *testing.T) {
 
 	ctx := testCtx()
 
-	resp, err := is.GetSettings(ctx, &pbtypes.Empty{})
+	resp, err := is.adminService.GetSettings(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	a.So(resp, test.ShouldBeSettingsIgnoringAutoFields, testSettings())
 
 	// modify settings
-	_, err = is.UpdateSettings(ctx, &ttnpb.UpdateSettingsRequest{
+	_, err = is.adminService.UpdateSettings(ctx, &ttnpb.UpdateSettingsRequest{
 		Settings: ttnpb.IdentityServerSettings{
 			IdentityServerSettings_UserRegistrationFlow: ttnpb.IdentityServerSettings_UserRegistrationFlow{
 				SelfRegistration: true,

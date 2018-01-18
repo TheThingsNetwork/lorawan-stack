@@ -14,7 +14,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-var _ ttnpb.IsGatewayServer = new(IdentityServer)
+var _ ttnpb.IsGatewayServer = new(gatewayService)
 
 func TestGateway(t *testing.T) {
 	a := assertions.New(t)
@@ -56,14 +56,14 @@ func TestGateway(t *testing.T) {
 
 	ctx := testCtx()
 
-	_, err := is.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{
+	_, err := is.gatewayService.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{
 		Gateway: gtw,
 	})
 	a.So(err, should.BeNil)
 
 	// can't create gateways with blacklisted ids
 	for _, id := range testSettings().BlacklistedIDs {
-		_, err := is.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{
+		_, err := is.gatewayService.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifier: ttnpb.GatewayIdentifier{id},
 			},
@@ -72,18 +72,18 @@ func TestGateway(t *testing.T) {
 		a.So(ErrBlacklistedID.Describes(err), should.BeTrue)
 	}
 
-	found, err := is.GetGateway(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	found, err := is.gatewayService.GetGateway(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 
-	gtws, err := is.ListGateways(ctx, &pbtypes.Empty{})
+	gtws, err := is.gatewayService.ListGateways(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	if a.So(gtws.Gateways, should.HaveLength, 1) {
 		a.So(gtws.Gateways[0], test.ShouldBeGatewayIgnoringAutoFields, gtw)
 	}
 
 	gtw.Description = "foo"
-	_, err = is.UpdateGateway(ctx, &ttnpb.UpdateGatewayRequest{
+	_, err = is.gatewayService.UpdateGateway(ctx, &ttnpb.UpdateGatewayRequest{
 		Gateway: gtw,
 		UpdateMask: pbtypes.FieldMask{
 			Paths: []string{"description"},
@@ -91,12 +91,12 @@ func TestGateway(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	found, err = is.GetGateway(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	found, err = is.gatewayService.GetGateway(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 
 	// generate a new API key
-	key, err := is.GenerateGatewayAPIKey(ctx, &ttnpb.GenerateGatewayAPIKeyRequest{
+	key, err := is.gatewayService.GenerateGatewayAPIKey(ctx, &ttnpb.GenerateGatewayAPIKeyRequest{
 		GatewayIdentifier: gtw.GatewayIdentifier,
 		Name:              "foo",
 		Rights:            ttnpb.AllGatewayRights,
@@ -108,7 +108,7 @@ func TestGateway(t *testing.T) {
 
 	// update api key
 	key.Rights = []ttnpb.Right{ttnpb.Right(10)}
-	_, err = is.UpdateGatewayAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
+	_, err = is.gatewayService.UpdateGatewayAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 		GatewayIdentifier: gtw.GatewayIdentifier,
 		Name:              key.Name,
 		Rights:            key.Rights,
@@ -116,7 +116,7 @@ func TestGateway(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	// can't generate another API Key with the same name
-	_, err = is.GenerateGatewayAPIKey(ctx, &ttnpb.GenerateGatewayAPIKeyRequest{
+	_, err = is.gatewayService.GenerateGatewayAPIKey(ctx, &ttnpb.GenerateGatewayAPIKeyRequest{
 		GatewayIdentifier: gtw.GatewayIdentifier,
 		Name:              key.Name,
 		Rights:            []ttnpb.Right{ttnpb.Right(1)},
@@ -124,19 +124,19 @@ func TestGateway(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
-	keys, err := is.ListGatewayAPIKeys(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	keys, err := is.gatewayService.ListGatewayAPIKeys(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
 	a.So(err, should.BeNil)
 	if a.So(keys.APIKeys, should.HaveLength, 1) {
 		sort.Slice(keys.APIKeys[0].Rights, func(i, j int) bool { return keys.APIKeys[0].Rights[i] < keys.APIKeys[0].Rights[j] })
 		a.So(keys.APIKeys[0], should.Resemble, key)
 	}
 
-	_, err = is.RemoveGatewayAPIKey(ctx, &ttnpb.RemoveGatewayAPIKeyRequest{
+	_, err = is.gatewayService.RemoveGatewayAPIKey(ctx, &ttnpb.RemoveGatewayAPIKeyRequest{
 		GatewayIdentifier: gtw.GatewayIdentifier,
 		Name:              key.Name,
 	})
 
-	keys, err = is.ListGatewayAPIKeys(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	keys, err = is.gatewayService.ListGatewayAPIKeys(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
 	a.So(err, should.BeNil)
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
@@ -148,14 +148,14 @@ func TestGateway(t *testing.T) {
 		Rights:            []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
 	}
 
-	_, err = is.SetGatewayCollaborator(ctx, collab)
+	_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
 	a.So(err, should.BeNil)
 
-	rights, err := is.ListGatewayRights(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	rights, err := is.gatewayService.ListGatewayRights(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
 	a.So(err, should.BeNil)
 	a.So(rights.Rights, should.Resemble, ttnpb.AllGatewayRights)
 
-	collabs, err := is.ListGatewayCollaborators(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	collabs, err := is.gatewayService.ListGatewayCollaborators(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 2)
 	a.So(collabs.Collaborators, should.Contain, collab)
@@ -166,25 +166,25 @@ func TestGateway(t *testing.T) {
 	})
 
 	// while there is two collaborators can't unset the only collab with COLLABORATORS right
-	_, err = is.SetGatewayCollaborator(ctx, &ttnpb.GatewayCollaborator{
+	_, err = is.gatewayService.SetGatewayCollaborator(ctx, &ttnpb.GatewayCollaborator{
 		GatewayIdentifier: gtw.GatewayIdentifier,
 		UserIdentifier:    user.UserIdentifier,
 	})
 	a.So(err, should.NotBeNil)
 
-	collabs, err = is.ListGatewayCollaborators(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	collabs, err = is.gatewayService.ListGatewayCollaborators(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 2)
 
 	// unset the last added collaborator
 	collab.Rights = []ttnpb.Right{}
-	_, err = is.SetGatewayCollaborator(ctx, collab)
+	_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
 	a.So(err, should.BeNil)
 
-	collabs, err = is.ListGatewayCollaborators(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	collabs, err = is.gatewayService.ListGatewayCollaborators(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 1)
 
-	_, err = is.DeleteGateway(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	_, err = is.gatewayService.DeleteGateway(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
 	a.So(err, should.BeNil)
 }
