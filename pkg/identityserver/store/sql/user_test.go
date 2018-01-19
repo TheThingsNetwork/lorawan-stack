@@ -59,6 +59,10 @@ func TestUserTx(t *testing.T) {
 	found, err := s.Users.GetByID(john.UserID, userFactory)
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeUserIgnoringAutoFields, john)
+
+	// delete user
+	err = s.Users.Delete(john.UserID)
+	a.So(err, should.BeNil)
 }
 
 func TestUserCreate(t *testing.T) {
@@ -70,6 +74,17 @@ func TestUserCreate(t *testing.T) {
 		a.So(err, should.NotBeNil)
 		a.So(ErrUserIDTaken.Describes(err), should.BeTrue)
 	}
+}
+
+func TestUserList(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore(t)
+
+	// TODO(gomezjdaniel): correct result is 3 instead of 4 as the example user
+	// attributer wasn't deleted it.
+	found, err := s.Users.List(userFactory)
+	a.So(err, should.BeNil)
+	a.So(found, should.HaveLength, 4)
 }
 
 func TestUserGet(t *testing.T) {

@@ -47,6 +47,9 @@ type UserStore interface {
 	// GetByEmail finds the user by email address and retrieves it.
 	GetByEmail(email string, factory UserFactory) (User, error)
 
+	// List returns all the users.
+	List(factory UserFactory) ([]User, error)
+
 	// Update updates an user.
 	Update(user User) error
 

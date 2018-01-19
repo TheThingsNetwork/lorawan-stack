@@ -29,6 +29,9 @@ type ClientStore interface {
 	// GetByID finds a client by ID and retrieves it.
 	GetByID(clientID string, factory ClientFactory) (Client, error)
 
+	// List list all the clients.
+	List(factory ClientFactory) ([]Client, error)
+
 	// ListByUser returns all the clients created by the user.
 	ListByUser(userID string, factory ClientFactory) ([]Client, error)
 

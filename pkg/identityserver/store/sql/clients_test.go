@@ -59,11 +59,19 @@ func TestClientList(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore(t, database)
 
-	userID := testUsers()["bob"].UserID
+	clients, err := s.Clients.List(clientFactory)
+	testClientList(t, clients, err)
+
+	clients, err = s.Clients.ListByUser(testUsers()["bob"].UserID, clientFactory)
+	testClientList(t, clients, err)
+}
+
+func testClientList(t *testing.T, clients []store.Client, err error) {
+	a := assertions.New(t)
+
 	client1 := testClients()["test-client"]
 	client2 := testClients()["foo-client"]
 
-	clients, err := s.Clients.ListByUser(userID, clientFactory)
 	a.So(err, should.BeNil)
 	if a.So(clients, should.HaveLength, 2) {
 		for _, client := range clients {

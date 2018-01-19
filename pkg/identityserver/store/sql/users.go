@@ -6,6 +6,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 // UserStore implements store.UserStore.
@@ -144,6 +145,47 @@ func (s *UserStore) getByEmail(q db.QueryContext, email string, result store.Use
 	return err
 }
 
+// List returns all the users.
+func (s *UserStore) List(factory store.UserFactory) ([]store.User, error) {
+	var res []store.User
+	err := s.transact(func(tx *db.Tx) error {
+		found, err := s.list(tx)
+		if err != nil {
+			return err
+		}
+
+		res = make([]store.User, 0, len(found))
+
+		for _, user := range found {
+			u := factory()
+
+			*(u.GetUser()) = *user
+
+			err := s.loadAttributes(tx, user.UserID, u)
+			if err != nil {
+				return err
+			}
+
+			res = append(res, u)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (s *UserStore) list(q db.QueryContext) ([]*ttnpb.User, error) {
+	res := make([]*ttnpb.User, 0)
+	err := q.Select(&res, `SELECT * FROM users`)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 // Update updates an user.
 func (s *UserStore) Update(user store.User) error {
 	err := s.transact(func(tx *db.Tx) error {
@@ -274,6 +316,8 @@ func (s *UserStore) Delete(userID string) error {
 		if err != nil {
 			return err
 		}
+
+		// TODO(gomezjdaniel): delete attributers.
 
 		return s.delete(tx, userID)
 	})
