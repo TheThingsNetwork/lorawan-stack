@@ -91,9 +91,13 @@ func testCtx() context.Context {
 
 func testSettings() *ttnpb.IdentityServerSettings {
 	return &ttnpb.IdentityServerSettings{
-		BlacklistedIDs:     []string{"blacklisted-id", "admin"},
+		BlacklistedIDs: []string{"blacklisted-id", "admin"},
+		IdentityServerSettings_UserRegistrationFlow: ttnpb.IdentityServerSettings_UserRegistrationFlow{
+			SelfRegistration: true,
+		},
 		AllowedEmails:      []string{"*@bar.com"},
 		ValidationTokenTTL: time.Duration(time.Hour),
+		InvitationTokenTTL: time.Duration(time.Hour),
 	}
 }
 
@@ -119,6 +123,7 @@ func testClient() *ttnpb.Client {
 		Secret:           "secret",
 		RedirectURI:      "localhost",
 		Rights:           make([]ttnpb.Right, 0, 50),
+		State:            ttnpb.STATE_APPROVED,
 	}
 
 	cli.Rights = append(cli.Rights, ttnpb.AllUserRights...)
@@ -135,6 +140,7 @@ func testUsers() map[string]*ttnpb.User {
 			Password:       "123456",
 			Admin:          true,
 			Email:          "alice@alice.com",
+			State:          ttnpb.STATE_APPROVED,
 		},
 		"bob": {
 			UserIdentifier: ttnpb.UserIdentifier{"bob"},
