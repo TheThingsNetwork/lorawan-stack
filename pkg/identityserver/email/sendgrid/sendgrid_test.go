@@ -19,7 +19,7 @@ type template struct {
 	name string
 }
 
-func (t *template) Name() string {
+func (t *template) GetName() string {
 	return "template"
 }
 
