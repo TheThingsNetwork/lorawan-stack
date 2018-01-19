@@ -163,9 +163,7 @@ func TestFindOneDeviceByIdentifiers(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		return
 	}
-	if a.So(device, should.NotBeNil) {
-		a.So(device.EndDevice, should.Resemble, ed)
-	}
+	a.So(pretty.Diff(device.EndDevice, ed), should.BeEmpty)
 
 	found, err = FindOneDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
 		DevEUI:        ed.DevEUI,
@@ -175,16 +173,13 @@ func TestFindOneDeviceByIdentifiers(t *testing.T) {
 		ApplicationID: ed.ApplicationID,
 	})
 	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) && !a.So(found.EndDevice, should.Resemble, device.EndDevice) {
-		pretty.Ldiff(t, found.EndDevice, device.EndDevice)
-	}
+	a.So(pretty.Diff(found.EndDevice, ed), should.BeEmpty)
+
 	device, err = r.Create(ed)
 	if !a.So(err, should.BeNil) {
 		return
 	}
-	if a.So(device, should.NotBeNil) {
-		a.So(device.EndDevice, should.Resemble, ed)
-	}
+	a.So(pretty.Diff(device.EndDevice, ed), should.BeEmpty)
 
 	found, err = FindOneDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
 		DevEUI:        ed.DevEUI,
