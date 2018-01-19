@@ -25,4 +25,7 @@ var (
 
 	// FieldPathSettingsAllowedEmails is the field path for the allowed emails field.
 	FieldPathSettingsAllowedEmails = regexp.MustCompile(`^allowed_emails$`)
+
+	// FieldPathSettingsInvitationTokenTTL is the field path for the invitation token TTL field.
+	FieldPathSettingsInvitationTokenTTL = regexp.MustCompile(`^invitation_token_ttl$`)
 )

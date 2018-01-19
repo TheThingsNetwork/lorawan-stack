@@ -15,4 +15,10 @@ var (
 
 	// FieldPathUserEmail is the field path for the user email field.
 	FieldPathUserEmail = regexp.MustCompile(`^email$`)
+
+	// FieldPathUserState is the field path for the user state field.
+	FieldPathUserState = regexp.MustCompile(`^state$`)
+
+	// FieldPathUserAdmin is the field path for the user admin field.
+	FieldPathUserAdmin = regexp.MustCompile(`^admin$`)
 )

@@ -32,7 +32,8 @@ func (req *UpdateSettingsRequest) Validate() error {
 			FieldPathSettingsUserRegistrationSelfRegistration.MatchString(path),
 			FieldPathSettingsUserRegistrationAdminApproval.MatchString(path),
 			FieldPathSettingsValidationTokenTTL.MatchString(path),
-			FieldPathSettingsAllowedEmails.MatchString(path):
+			FieldPathSettingsAllowedEmails.MatchString(path),
+			FieldPathSettingsInvitationTokenTTL.MatchString(path):
 		default:
 			return ErrInvalidPathUpdateMask.New(errors.Attributes{
 				"path": path,
