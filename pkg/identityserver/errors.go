@@ -13,6 +13,7 @@ func init() {
 	ErrSetGatewayCollaboratorFailed.Register()
 	ErrEmailAlreadyValidated.Register()
 	ErrValidationTokenExpired.Register()
+	ErrInvitationTokenMissing.Register()
 }
 
 // ErrBlacklistedID is returned when trying to register an entity using a blacklisted ID.
@@ -82,5 +83,13 @@ var ErrEmailAlreadyValidated = &errors.ErrDescriptor{
 var ErrValidationTokenExpired = &errors.ErrDescriptor{
 	MessageFormat: "Token is expired",
 	Code:          8,
+	Type:          errors.Unauthorized,
+}
+
+// ErrInvitationTokenMissing is returned when making a call to `CreateUser` with
+// an empty invitation token and the self user registration is disabled.
+var ErrInvitationTokenMissing = &errors.ErrDescriptor{
+	MessageFormat: "Self account registration is disabled: a valid invitation token must be provided",
+	Code:          9,
 	Type:          errors.Unauthorized,
 }

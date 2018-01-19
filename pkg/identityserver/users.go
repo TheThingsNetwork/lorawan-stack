@@ -29,6 +29,11 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		return nil, err
 	}
 
+	// check for invitation token when self registration is disallowed
+	if req.InvitationToken == "" && !settings.SelfRegistration {
+		return nil, ErrInvitationTokenMissing.New(nil)
+	}
+
 	// check for blacklisted ids
 	if !util.IsIDAllowed(req.User.UserID, settings.BlacklistedIDs) {
 		return nil, ErrBlacklistedID.New(errors.Attributes{
@@ -57,38 +62,54 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		State:          ttnpb.STATE_PENDING,
 	}
 
+	fns := []func(*store.Store) error{
+		func(store *store.Store) error {
+			return store.Users.Create(user)
+		},
+	}
+
 	if !settings.AdminApproval {
 		user.State = ttnpb.STATE_APPROVED
 	}
 
-	if settings.SkipValidation {
-		user.ValidatedAt = time.Now()
-
-		return nil, s.store.Users.Create(user)
+	if !settings.SelfRegistration {
+		fns = append(fns, func(store *store.Store) error {
+			return store.Invitations.Use(req.InvitationToken, user.UserID)
+		})
 	}
 
-	err = s.store.Transact(func(st *store.Store) error {
-		err := st.Users.Create(user)
-		if err != nil {
-			return err
-		}
-
+	if settings.SkipValidation {
+		user.ValidatedAt = time.Now().UTC()
+	} else {
 		token := &store.ValidationToken{
 			ValidationToken: random.String(64),
 			CreatedAt:       time.Now(),
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 
-		err = st.Users.SaveValidationToken(req.User.UserID, token)
-		if err != nil {
-			return err
+		fns = append(fns, func(store *store.Store) error {
+			err := store.Users.SaveValidationToken(user.UserID, token)
+			if err != nil {
+				return err
+			}
+
+			return s.email.Send(user.Email, &templates.EmailValidation{
+				OrganizationName: s.config.OrganizationName,
+				PublicURL:        s.config.PublicURL,
+				Token:            token.ValidationToken,
+			})
+		})
+	}
+
+	err = s.store.Transact(func(store *store.Store) error {
+		for _, fn := range fns {
+			err := fn(store)
+			if err != nil {
+				return err
+			}
 		}
 
-		return s.email.Send(user.Email, &templates.EmailValidation{
-			OrganizationName: s.config.OrganizationName,
-			PublicURL:        s.config.PublicURL,
-			Token:            token.ValidationToken,
-		})
+		return nil
 	})
 
 	return nil, err
