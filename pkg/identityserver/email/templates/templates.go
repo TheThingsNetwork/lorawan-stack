@@ -18,6 +18,7 @@ type Template interface {
 
 // render renders subject and message using the given data.
 func render(subject, message string, data interface{}) (string, string, error) {
+	// TODO(gomezjdaniel): add styles to the HTML version.
 	t, err := template.New("").Parse(subject)
 	if err != nil {
 		return "", "", err
