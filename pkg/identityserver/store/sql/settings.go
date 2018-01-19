@@ -36,6 +36,7 @@ func (s *SettingStore) get(q db.QueryContext) (*ttnpb.IdentityServerSettings, er
 				blacklisted_ids AS blacklisted_ids_converted,
 				allowed_emails AS allowed_emails_converted,
 				validation_token_ttl,
+				invitation_token_ttl,
 				skip_validation,
 				self_registration,
 				admin_approval,
@@ -79,6 +80,7 @@ func (s *SettingStore) set(q db.QueryContext, settings *ttnpb.IdentityServerSett
 				self_registration,
 				admin_approval,
 				validation_token_ttl,
+				invitation_token_ttl,
 				allowed_emails)
 			VALUES (
 				1,
@@ -88,6 +90,7 @@ func (s *SettingStore) set(q db.QueryContext, settings *ttnpb.IdentityServerSett
 				:self_registration,
 				:admin_approval,
 				:validation_token_ttl,
+				:invitation_token_ttl,
 				:allowed_emails_converted)
 		`,
 		input)
