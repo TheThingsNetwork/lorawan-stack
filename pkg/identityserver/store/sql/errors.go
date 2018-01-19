@@ -32,6 +32,9 @@ func init() {
 	ErrAPIKeyNameConflict.Register()
 
 	ErrSettingsNotFound.Register()
+
+	ErrInvitationNotFound.Register()
+	ErrInvitationAlreadyUsed.Register()
 }
 
 // ErrApplicationNotFound is returned when trying to fetch an application that
@@ -233,4 +236,18 @@ var ErrSettingsNotFound = &errors.ErrDescriptor{
 	MessageFormat: "settings not found",
 	Code:          407,
 	Type:          errors.NotFound,
+}
+
+// InvitationNotFound is returned when trying to use an invitation that does not exist.
+var ErrInvitationNotFound = &errors.ErrDescriptor{
+	MessageFormat: "Invitation not found",
+	Code:          408,
+	Type:          errors.NotFound,
+}
+
+// ErrInvitationAlreadyUsed is returned when trying to use an invitation that's already used.
+var ErrInvitationAlreadyUsed = &errors.ErrDescriptor{
+	MessageFormat: "Invitation already used",
+	Code:          409,
+	Type:          errors.Unauthorized,
 }

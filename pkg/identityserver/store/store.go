@@ -21,6 +21,9 @@ type Store struct {
 
 	// Settings is the settings store.
 	Settings SettingStore
+
+	// Invitations is the invitations store.
+	Invitations InvitationStore
 }
 
 // Attributer is the interface providing methods to extend basic IS data types.
