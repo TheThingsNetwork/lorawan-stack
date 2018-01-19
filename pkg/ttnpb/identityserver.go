@@ -3,9 +3,16 @@
 package ttnpb
 
 import (
+	"time"
+
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/validate"
 )
+
+// IsExpired checks whether if the invitation is expired or not.
+func (i *ListInvitationsResponse_Invitation) IsExpired() bool {
+	return i.SentAt.Add(time.Duration(i.ExpiresIn) * time.Second).Before(time.Now().UTC())
+}
 
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *UpdateSettingsRequest) Validate() error {
