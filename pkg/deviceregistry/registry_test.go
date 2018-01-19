@@ -32,6 +32,9 @@ func TestRegistry(t *testing.T) {
 	}
 
 	found, err := r.FindBy(ed)
+	if !a.So(err, should.BeNil) {
+		return
+	}
 	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
 		a.So(pretty.Diff(found[0].EndDevice, ed), should.BeEmpty)
 	}
