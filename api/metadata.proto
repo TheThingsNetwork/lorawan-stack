@@ -35,7 +35,7 @@ message RxMetadata {
   }
 
   // Real time
-  google.protobuf.Timestamp time = 7 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp time = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // Received signal strength in dBm
   float rssi = 8 [(gogoproto.customname) = "RSSI"];
@@ -75,7 +75,7 @@ message TxMetadata {
   uint64 timestamp = 2;
 
   // Real time
-  google.protobuf.Timestamp time = 3 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp time = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API

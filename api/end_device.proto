@@ -60,7 +60,7 @@ message Session {
   uint32 next_f_cnt_up = 4;
   uint32 next_n_f_cnt_down = 5;
   uint32 next_a_f_cnt_down = 6;
-  google.protobuf.Timestamp started_at = 7 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
+  google.protobuf.Timestamp started_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 message EndDevice {
@@ -142,9 +142,8 @@ message EndDevice {
   // ApplicationServerAddress specifies Address(host:port) of the Application Server associated with this device.
   string application_server_address = 26 [(gogoproto.customname) = "ApplicationServerAddress"];
 
-  google.protobuf.Timestamp created_at = 97 [(gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated_at = 98 [(gogoproto.stdtime) = true];
-
+  google.protobuf.Timestamp created_at = 97 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 98 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   reserved 99; // RFU: google.protobuf.Struct advanced = 99;
 }
 

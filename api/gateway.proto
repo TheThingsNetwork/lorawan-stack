@@ -36,7 +36,7 @@ message Gateway {
 
   // activated_at denotes when the gateway was activated.
   // This a read-only field.
-  google.protobuf.Timestamp activated_at = 7 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  google.protobuf.Timestamp activated_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // privacy_settings defines the different privacy settings for this gateway.
   GatewayPrivacySettings privacy_settings = 8 [(gogoproto.nullable) = false];
@@ -133,11 +133,11 @@ message GatewayRadio {
 
 message GatewayStatus {
   // Current time of the gateway
-  google.protobuf.Timestamp time = 1 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp time = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // Boot time of the gateway
   // - can be left out to save bandwidth; old value will be kept
-  google.protobuf.Timestamp boot_time = 2 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp boot_time = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // Gateway Platform
   // - can be left out to save bandwidth; old value will be kept
@@ -179,17 +179,17 @@ message GatewayStatus {
 // GatewayObservations as observed by the gateway server
 message GatewayObservations {
   // Time when the last uplink message was received
-  google.protobuf.Timestamp last_uplink_received = 1 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp last_uplink_received = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   // Uplink message counter. This counter may be reset to 0 when the gateway disconnects.
   uint64 uplink_count = 2;
 
   // Time when the last downlink message was received
-  google.protobuf.Timestamp last_downlink_received = 3 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp last_downlink_received = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   // Downlink message counter. This counter may be reset to 0 when the gateway disconnects.
   uint64 downlink_count = 4;
 
   // Time when the last status message was received
-  google.protobuf.Timestamp last_status_received = 5 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp last_status_received = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   // Status message counter. This counter may be reset to 0 when the gateway disconnects.
   uint64 status_count = 6;
   // Contents of the last status message
