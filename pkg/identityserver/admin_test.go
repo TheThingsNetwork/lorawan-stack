@@ -80,9 +80,9 @@ func TestAdminInvitations(t *testing.T) {
 		a.So(i.ID, should.NotBeEmpty)
 		id = i.ID
 		a.So(i.UsedAt, should.BeNil)
-		a.So(i.UserID, should.BeEmpty)
+		a.So(i.GetUserID(), should.BeEmpty)
 		a.So(i.SentAt.IsZero(), should.BeFalse)
-		a.So(i.ExpiresIn, should.NotEqual, uint32(0))
+		a.So(i.TTL, should.NotEqual, uint32(0))
 	}
 
 	// use invitation
@@ -129,9 +129,9 @@ func TestAdminInvitations(t *testing.T) {
 		a.So(i.Email, should.Equal, email)
 		a.So(i.ID, should.NotBeEmpty)
 		a.So(i.UsedAt, should.NotBeNil)
-		a.So(i.UserID, should.Equal, user.UserID)
+		a.So(i.GetUserID(), should.Equal, user.UserID)
 		a.So(i.SentAt.IsZero(), should.BeFalse)
-		a.So(i.ExpiresIn, should.NotEqual, uint32(0))
+		a.So(i.TTL, should.NotEqual, uint32(0))
 	}
 
 	// list unused invitations only
@@ -139,7 +139,7 @@ func TestAdminInvitations(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(invitations.Invitations, should.HaveLength, 0)
 
-	_, err = is.adminService.DeleteInvitation(ctx, &ttnpb.DeleteInvitationRequest{ID: id})
+	_, err = is.adminService.RevokeInvitation(ctx, &ttnpb.RevokeInvitationRequest{ID: id})
 	a.So(err, should.BeNil)
 
 	invitations, err = is.adminService.ListInvitations(ctx, &ttnpb.ListInvitationsRequest{})

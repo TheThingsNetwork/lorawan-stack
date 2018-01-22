@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 )
 
 // InvitationStore implements store.InvitationStore.
@@ -22,12 +22,12 @@ func NewInvitationStore(store storer) *InvitationStore {
 }
 
 // Save saves the invitation.
-func (s *InvitationStore) Save(token, email string, ttl uint32) error {
-	return s.save(s.queryer(), token, email, ttl)
+func (s *InvitationStore) Save(data *store.InvitationData) error {
+	return s.save(s.queryer(), data)
 }
 
-func (s *InvitationStore) save(q db.QueryContext, token, email string, ttl uint32) error {
-	_, err := q.Exec(
+func (s *InvitationStore) save(q db.QueryContext, data *store.InvitationData) error {
+	_, err := q.NamedExec(
 		`INSERT
 			INTO invitations (
 				token,
@@ -36,14 +36,11 @@ func (s *InvitationStore) save(q db.QueryContext, token, email string, ttl uint3
 				ttl
 			)
 			VALUES (
-				$1,
-				$2,
+				:token,
+				:email,
 				current_timestamp(),
-				$3
-			)`,
-		token,
-		email,
-		ttl)
+				:ttl
+			)`, data)
 	return err
 }
 
@@ -98,47 +95,39 @@ func (s *InvitationStore) use(q db.QueryContext, token, userID string) error {
 }
 
 // List lists all the saved invitations.
-func (s *InvitationStore) List() ([]*ttnpb.ListInvitationsResponse_Invitation, error) {
+func (s *InvitationStore) List() ([]*store.InvitationData, error) {
 	return s.list(s.queryer())
 }
 
-func (s *InvitationStore) list(q db.QueryContext) ([]*ttnpb.ListInvitationsResponse_Invitation, error) {
-	var res []struct {
-		*ttnpb.ListInvitationsResponse_Invitation
-		User *string
-	}
+func (s *InvitationStore) list(q db.QueryContext) ([]*store.InvitationData, error) {
+	var invitations []*store.InvitationData
 	err := q.Select(
-		&res,
+		&invitations,
 		`SELECT
 				id,
 				email,
 				sent_at,
 				ttl,
 				used_at,
-				user_id AS user
+				user_id
 			FROM invitations`)
 	if err != nil {
 		return nil, err
 	}
 
-	invitations := make([]*ttnpb.ListInvitationsResponse_Invitation, 0, len(res))
-	for _, invitation := range res {
-		if invitation.User != nil {
-			invitation.ListInvitationsResponse_Invitation.UserID = *(invitation.User)
-		}
-
-		invitations = append(invitations, invitation.ListInvitationsResponse_Invitation)
+	if invitations == nil || len(invitations) == 0 {
+		return make([]*store.InvitationData, 0), nil
 	}
 
 	return invitations, nil
 }
 
 // Delete deletes an invitation by its ID.
-func (s *InvitationStore) Delete(id string) error {
-	return s.delete(s.queryer(), id)
+func (s *InvitationStore) Delete(ID string) error {
+	return s.delete(s.queryer(), ID)
 }
 
-func (s *InvitationStore) delete(q db.QueryContext, id string) error {
-	_, err := q.Exec(`DELETE FROM invitations WHERE id = $1`, id)
+func (s *InvitationStore) delete(q db.QueryContext, ID string) error {
+	_, err := q.Exec(`DELETE FROM invitations WHERE id = $1`, ID)
 	return err
 }

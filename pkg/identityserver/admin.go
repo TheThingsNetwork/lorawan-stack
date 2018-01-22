@@ -317,9 +317,13 @@ func (s *adminService) SendInvitation(ctx context.Context, req *ttnpb.SendInvita
 		return nil, err
 	}
 
-	token := random.String(64)
+	invitation := &store.InvitationData{
+		Token: random.String(64),
+		Email: req.Email,
+		TTL:   uint32(settings.InvitationTokenTTL.Seconds()),
+	}
 
-	err = s.store.Invitations.Save(token, req.Email, uint32(settings.InvitationTokenTTL.Seconds()))
+	err = s.store.Invitations.Save(invitation)
 	if err != nil {
 		return nil, err
 	}
@@ -327,7 +331,7 @@ func (s *adminService) SendInvitation(ctx context.Context, req *ttnpb.SendInvita
 	return nil, s.email.Send(req.Email, &templates.Invitation{
 		OrganizationName: s.config.OrganizationName,
 		PublicURL:        s.config.PublicURL,
-		Token:            token,
+		Token:            invitation.Token,
 	})
 }
 
@@ -350,16 +354,23 @@ func (s *adminService) ListInvitations(ctx context.Context, req *ttnpb.ListInvit
 	for _, invitation := range invitations {
 		switch filter := req.FilterUsed; filter {
 		case ttnpb.FILTER_USED:
-			if invitation.UsedAt.IsZero() {
+			if invitation.UsedAt == nil {
 				continue
 			}
 		case ttnpb.FILTER_UNUSED:
-			if !invitation.UsedAt.IsZero() {
+			if invitation.UsedAt != nil {
 				continue
 			}
 		}
 
-		resp.Invitations = append(resp.Invitations, invitation)
+		resp.Invitations = append(resp.Invitations, &ttnpb.ListInvitationsResponse_Invitation{
+			ID:             invitation.ID,
+			Email:          invitation.Email,
+			SentAt:         invitation.SentAt,
+			UsedAt:         invitation.UsedAt,
+			TTL:            invitation.TTL,
+			UserIdentifier: ttnpb.UserIdentifier{invitation.GetUserID()},
+		})
 	}
 
 	return resp, nil

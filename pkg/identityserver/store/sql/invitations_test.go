@@ -4,8 +4,8 @@ package sql
 
 import (
 	"testing"
-	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -14,13 +14,15 @@ func TestInvitations(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore(t)
 
-	token := "123"
-	email := "foo@bar.com"
-	ttl := time.Duration(time.Hour * 24)
+	invitation := &store.InvitationData{
+		Token: "123",
+		Email: "foo@bar.com",
+		TTL:   uint32(3600),
+	}
 
 	userID := testUsers()["alice"].UserID
 
-	err := s.Invitations.Save(token, email, uint32(ttl.Seconds()))
+	err := s.Invitations.Save(invitation)
 	a.So(err, should.BeNil)
 
 	found, err := s.Invitations.List()
@@ -31,18 +33,18 @@ func TestInvitations(t *testing.T) {
 		id = i.ID
 
 		a.So(i.ID, should.NotBeEmpty)
-		a.So(i.Email, should.Equal, email)
+		a.So(i.Email, should.Equal, invitation.Email)
 		if a.So(i.SentAt, should.NotBeNil) {
 			a.So(i.SentAt.IsZero(), should.BeFalse)
 		}
 		a.So(i.UsedAt, should.BeNil)
-		a.So(i.UserID, should.BeEmpty)
+		a.So(i.GetUserID(), should.BeEmpty)
 	}
 
-	err = s.Invitations.Use(token, userID)
+	err = s.Invitations.Use(invitation.Token, userID)
 	a.So(err, should.BeNil)
 
-	err = s.Invitations.Use(token, userID)
+	err = s.Invitations.Use(invitation.Token, userID)
 	a.So(err, should.NotBeNil)
 	a.So(ErrInvitationAlreadyUsed.Describes(err), should.BeTrue)
 
@@ -52,20 +54,20 @@ func TestInvitations(t *testing.T) {
 		i := found[0]
 
 		a.So(i.ID, should.NotBeEmpty)
-		a.So(i.Email, should.Equal, email)
+		a.So(i.Email, should.Equal, invitation.Email)
 		if a.So(i.SentAt, should.NotBeNil) {
 			a.So(i.SentAt.IsZero(), should.BeFalse)
 		}
 		if a.So(i.UsedAt, should.NotBeNil) {
 			a.So(i.UsedAt.IsZero(), should.BeFalse)
 		}
-		a.So(i.UserID, should.Equal, userID)
+		a.So(i.GetUserID(), should.Equal, userID)
 	}
 
 	err = s.Invitations.Delete(id)
 	a.So(err, should.BeNil)
 
-	err = s.Invitations.Use(token, userID)
+	err = s.Invitations.Use(invitation.Token, userID)
 	a.So(err, should.NotBeNil)
 	a.So(ErrInvitationNotFound.Describes(err), should.BeTrue)
 
