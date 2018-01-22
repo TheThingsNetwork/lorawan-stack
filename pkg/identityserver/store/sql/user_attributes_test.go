@@ -68,7 +68,7 @@ func (u *userWithFoo) Fill(namespace string, attributes map[string]interface{}) 
 
 func TestUserAttributer(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	_, err := s.db.Exec(`
 		CREATE TABLE IF NOT EXISTS foo_users (

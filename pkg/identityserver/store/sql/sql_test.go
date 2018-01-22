@@ -12,12 +12,10 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 )
 
-var dsn = &db.DataSourceName{
-	DatabaseHostname: "localhost",
-	DatabasePort:     26257,
-	DatabaseName:     "is_store_tests",
-	DatabaseUser:     "root",
-}
+const (
+	address  = "postgres://root@localhost:26257/%s?sslmode=disable"
+	database = "is_store_tests"
+)
 
 // Single store instance shared across all tests.
 var testingStore *Store
@@ -25,9 +23,9 @@ var testingStore *Store
 // testStore returns a single and shared store instance everytime the method is
 // called. The first time that is called it creates  a new store instance in a
 // newly created database.
-func testStore(t testing.TB) *Store {
+func testStore(t testing.TB, database string) *Store {
 	if testingStore == nil {
-		testingStore = cleanStore(t)
+		testingStore = cleanStore(t, database)
 	}
 
 	return testingStore
@@ -35,27 +33,27 @@ func testStore(t testing.TB) *Store {
 
 // cleanStore returns a new store instance attached to a newly created database
 // where all migrations has been applied and also has been feed with some users.
-func cleanStore(t testing.TB) *Store {
+func cleanStore(t testing.TB, database string) *Store {
 	logger := test.GetLogger(t).WithField("tag", "Identity Server")
 
 	// open database connection
-	db, err := db.Open(context.Background(), dsn, migrations.Registry)
+	db, err := db.Open(context.Background(), fmt.Sprintf(address, database), migrations.Registry)
 	if err != nil {
 		logger.WithError(err).Fatal("Failed to establish a connection with the CockroachDB instance")
 		return nil
 	}
 
 	// drop database
-	_, err = db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE", dsn.DatabaseName))
+	_, err = db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE", database))
 	if err != nil {
-		logger.WithError(err).Fatalf("Failed to delete database `%s`", dsn.DatabaseName)
+		logger.WithError(err).Fatalf("Failed to delete database `%s`", database)
 		return nil
 	}
 
 	// create it again
-	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s", dsn.DatabaseName))
+	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s", database))
 	if err != nil {
-		logger.WithError(err).Fatalf("Failed to create database `%s`", dsn.DatabaseName)
+		logger.WithError(err).Fatalf("Failed to create database `%s`", database)
 		return nil
 	}
 
@@ -73,7 +71,7 @@ func cleanStore(t testing.TB) *Store {
 	for _, user := range testUsers() {
 		err := s.Users.Create(user)
 		if err != nil {
-			logger.WithError(err).Fatalf("Failed to feed test database `%s` with some users", dsn.DatabaseName)
+			logger.WithError(err).Fatalf("Failed to feed test database `%s` with some users", database)
 			return nil
 		}
 	}

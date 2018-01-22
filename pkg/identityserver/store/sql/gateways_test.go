@@ -61,7 +61,7 @@ func testGateways() map[string]*ttnpb.Gateway {
 
 func TestGatewayCreate(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	gateways := testGateways()
 
@@ -80,7 +80,7 @@ func TestGatewayCreate(t *testing.T) {
 
 func TestGatewayAPIKeys(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	gtwID := testGateways()["test-gateway"].GatewayID
 	key := &ttnpb.APIKey{
@@ -129,7 +129,7 @@ func TestGatewayAPIKeys(t *testing.T) {
 
 func TestGatewayAttributes(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	gtw := testGateways()["bob-gateway"]
 
@@ -166,7 +166,7 @@ func TestGatewayAttributes(t *testing.T) {
 
 func TestGatewayAntennas(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	gtw := testGateways()["bob-gateway"]
 
@@ -206,7 +206,7 @@ func TestGatewayAntennas(t *testing.T) {
 
 func TestGatewayRadios(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	gtw := testGateways()["bob-gateway"]
 
@@ -246,7 +246,7 @@ func TestGatewayRadios(t *testing.T) {
 
 func TestGatewayCollaborators(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	user := testUsers()["bob"]
 	gtw := testGateways()["bob-gateway"]
@@ -351,7 +351,7 @@ func TestGatewayCollaborators(t *testing.T) {
 
 func TestGatewayUpdate(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	gtw := testGateways()["bob-gateway"]
 
@@ -366,7 +366,7 @@ func TestGatewayUpdate(t *testing.T) {
 
 func TestGatewayDelete(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	userID := testUsers()["bob"].UserID
 	gtwID := "delete-test"
@@ -384,7 +384,7 @@ func TestGatewayDelete(t *testing.T) {
 
 func testGatewayDeleteFeedDatabase(t *testing.T, userID, gtwID string) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	gtw := testGateways()["test-gateway"]
 	gtw.GatewayID = gtwID

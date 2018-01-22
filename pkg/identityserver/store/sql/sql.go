@@ -30,8 +30,8 @@ type Store struct {
 }
 
 // Open opens a new database connection and attachs it to a new store.
-func Open(dsn *db.DataSourceName) (*Store, error) {
-	db, err := db.Open(context.Background(), dsn, migrations.Registry)
+func Open(connectionURI string) (*Store, error) {
+	db, err := db.Open(context.Background(), connectionURI, migrations.Registry)
 	if err != nil {
 		return nil, err
 	}

@@ -57,7 +57,7 @@ func testClientCreate(t testing.TB, s *Store) {
 
 func TestClientList(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	userID := testUsers()["bob"].UserID
 	client1 := testClients()["test-client"]
@@ -79,7 +79,7 @@ func TestClientList(t *testing.T) {
 
 func TestClientUpdate(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	client := testClients()["test-client"]
 	client.Description = "Fancy Description"
@@ -94,7 +94,7 @@ func TestClientUpdate(t *testing.T) {
 
 func TestClientDelete(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	userID := testUsers()["bob"].UserID
 	clientID := "delete-test"
@@ -112,7 +112,7 @@ func TestClientDelete(t *testing.T) {
 
 func testClientDeleteFeedDatabase(t *testing.T, userID, clientID string) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	client := &ttnpb.Client{
 		ClientIdentifier: ttnpb.ClientIdentifier{clientID},

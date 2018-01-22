@@ -12,7 +12,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/auth/oauth"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
@@ -21,12 +20,7 @@ import (
 
 var (
 	testConfig = &Config{
-		DataSourceName: &db.DataSourceName{
-			DatabaseHostname: "localhost",
-			DatabasePort:     26257,
-			DatabaseName:     "is_development_tests",
-			DatabaseUser:     "root",
-		},
+		DatabaseURI:      "postgres://root@localhost:26257/is_development_tests?sslmode=disable",
 		Hostname:         "localhost",
 		OrganizationName: "The Things Network",
 		PublicURL:        "https://www.thethingsnetwork.org",

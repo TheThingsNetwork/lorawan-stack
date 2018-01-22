@@ -28,7 +28,7 @@ func testApplications() map[string]*ttnpb.Application {
 
 func TestApplicationCreate(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	applications := testApplications()
 
@@ -47,7 +47,7 @@ func TestApplicationCreate(t *testing.T) {
 
 func TestApplicationAPIKeys(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	appID := testApplications()["demo-app"].ApplicationID
 	key := &ttnpb.APIKey{
@@ -96,7 +96,7 @@ func TestApplicationAPIKeys(t *testing.T) {
 
 func TestApplicationRetrieve(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	app := testApplications()["demo-app"]
 
@@ -107,7 +107,7 @@ func TestApplicationRetrieve(t *testing.T) {
 
 func TestApplicationCollaborators(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	user := testUsers()["alice"]
 	app := testApplications()["demo-app"]
@@ -215,7 +215,7 @@ func TestApplicationCollaborators(t *testing.T) {
 
 func TestApplicationUpdate(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	app := testApplications()["demo-app"]
 	app.Description = "New description"
@@ -230,7 +230,7 @@ func TestApplicationUpdate(t *testing.T) {
 
 func TestApplicationDelete(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	userID := testUsers()["bob"].UserID
 	appID := "delete-test"
@@ -248,7 +248,7 @@ func TestApplicationDelete(t *testing.T) {
 
 func testApplicationDeleteFeedDatabase(t *testing.T, userID, appID string) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	app := &ttnpb.Application{
 		ApplicationIdentifier: ttnpb.ApplicationIdentifier{appID},

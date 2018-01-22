@@ -76,57 +76,42 @@ type Database interface {
 	Close() error
 }
 
-// DataSourceName is the data source name that DB uses to open the database connection.
-type DataSourceName struct {
-	// DatabaseHostname is the hostname where the database is. e.g. "localhost".
-	DatabaseHostname string
-
-	// DatabasePort is the port the database can be accessed at.
-	DatabasePort int
-
-	// DatabaseName is the database name itself.
-	DatabaseName string
-
-	// DatabaseUser is the username to access the database.
-	DatabaseUser string
-
-	// DatabasePassword is the user's password to access the database.
-	DatabasePassword string
-}
-
-// String returns the data source name in an URL form.
-// It implements fmt.Stringer.
-func (d *DataSourceName) String() string {
-	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", d.DatabaseUser,
-		d.DatabasePassword, d.DatabaseHostname, d.DatabasePort, d.DatabaseName)
-}
-
 // DB implements Database.
 type DB struct {
 	db         *sqlx.DB
-	dsn        *DataSourceName
 	context    context.Context
 	migrations migrations.Registry
+	database   string
 }
 
-// Open opens a new database connection to the specified data source name.
-func Open(context context.Context, dsn *DataSourceName, migrations migrations.Registry) (*DB, error) {
-	db, err := sqlx.Open("postgres", dsn.String())
+// Open returns a new DB using the provided connection URI.
+func Open(context context.Context, connectionURI string, migrations migrations.Registry) (*DB, error) {
+	db, err := sqlx.Open("postgres", connectionURI)
 	if err != nil {
 		return nil, err
 	}
 
 	err = db.PingContext(context)
 	if err != nil {
-		return nil, errors.NewWithCause(fmt.Sprintf("Failed to ping the CockroachDB instance at `%s`. Are you sure it is running?", dsn.String()), err)
+		return nil, errors.NewWithCause(fmt.Sprintf("Failed to ping the CockroachDB instance at `%s`. Are you sure it is running?", connectionURI), err)
 	}
 
-	return &DB{
+	res := &DB{
 		db:         db,
-		dsn:        dsn,
 		context:    context,
 		migrations: migrations,
-	}, nil
+	}
+
+	// get current database
+	err = res.SelectOne(&(res.database), `SELECT current_database()`)
+	if IsNoRows(err) {
+		return nil, errors.New("No database specified")
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 // Close closes the connection to the database.
@@ -134,9 +119,9 @@ func (db *DB) Close() error {
 	return db.db.Close()
 }
 
-// Database returns the database name the receiver DB is using.
+// Database returns the database the receiver DB is connected to.
 func (db *DB) Database() string {
-	return db.dsn.DatabaseName
+	return db.database
 }
 
 // WithContext returns a new DB with the same migratons registry and with the
@@ -144,7 +129,6 @@ func (db *DB) Database() string {
 func (db *DB) WithContext(context context.Context) *DB {
 	return &DB{
 		db:         db.db,
-		dsn:        db.dsn,
 		context:    context,
 		migrations: db.migrations,
 	}

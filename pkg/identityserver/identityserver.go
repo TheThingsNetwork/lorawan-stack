@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/mock"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/sendgrid"
@@ -42,8 +41,8 @@ type IdentityServer struct {
 
 // Config defines the needed parameters to start the Identity Server.
 type Config struct {
-	// DataSourceName is the data source name the store needs to open the database connection.
-	*db.DataSourceName
+	// DatabaseURI is the database connection URI; e.g. "postgres://root@localhost:26257/is_development?sslmode=disable"
+	DatabaseURI string `name:"database-uri" description:"URI of the database to connect at"`
 
 	// Hostname denotes the Identity Server hostname. It is used as issuer when
 	// generating access tokens and API keys.
@@ -138,7 +137,7 @@ var defaultOptions = []Option{
 
 // New returns a new IdentityServer.
 func New(c *component.Component, config *Config, opts ...Option) (*IdentityServer, error) {
-	store, err := sql.Open(config.DataSourceName)
+	store, err := sql.Open(config.DatabaseURI)
 	if err != nil {
 		return nil, err
 	}

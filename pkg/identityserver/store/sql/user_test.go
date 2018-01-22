@@ -40,7 +40,7 @@ func testUsers() map[string]*ttnpb.User {
 
 func TestUserTx(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	john := testUsers()["alice"]
 	john.UserID = "john"
@@ -63,7 +63,7 @@ func TestUserTx(t *testing.T) {
 
 func TestUserCreate(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	for _, user := range testUsers() {
 		err := s.Users.Create(user)
@@ -74,7 +74,7 @@ func TestUserCreate(t *testing.T) {
 
 func TestUserGet(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	alice := testUsers()["alice"]
 	bob := testUsers()["bob"]
@@ -96,7 +96,7 @@ func TestUserGet(t *testing.T) {
 
 func TestUserUpdate(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	bob := testUsers()["bob"]
 	alice := testUsers()["alice"]
@@ -124,7 +124,7 @@ func TestUserUpdate(t *testing.T) {
 
 func TestUserValidationToken(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	userID := testUsers()["bob"].UserID
 	token := &store.ValidationToken{
@@ -175,7 +175,7 @@ func TestUserValidationToken(t *testing.T) {
 
 func TestUserAPIKeys(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	userID := testUsers()["bob"].UserID
 	key := &ttnpb.APIKey{
@@ -224,7 +224,7 @@ func TestUserAPIKeys(t *testing.T) {
 
 func TestUserDelete(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	id := "test-delete"
 
@@ -258,7 +258,7 @@ func TestUserDelete(t *testing.T) {
 }
 
 func BenchmarkUserCreate(b *testing.B) {
-	s := testStore(b)
+	s := testStore(b, database)
 
 	for n := 0; n < b.N; n++ {
 		s.Users.Create(&ttnpb.User{

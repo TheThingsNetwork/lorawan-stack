@@ -14,14 +14,10 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-var dsn = &DataSourceName{
-	DatabaseHostname: "localhost",
-	DatabasePort:     26257,
-	DatabaseName:     "is_db_tests",
-	DatabaseUser:     "root",
-}
-
-const schema = `
+const (
+	address  = "postgres://root@localhost:26257/%s?sslmode=disable"
+	database = "is_db_tests"
+	schema   = `
 	CREATE TABLE IF NOT EXISTS foo (
 		id       SERIAL PRIMARY KEY,
 		created  TIMESTAMP DEFAULT current_timestamp(),
@@ -30,6 +26,7 @@ const schema = `
 		quu      INTEGER
 	);
 	`
+)
 
 var data = []foo{
 	{
@@ -69,23 +66,23 @@ func clean(t testing.TB) Database {
 	registry.Register(1, "1_foo_schema", schema, "DROP TABLE IF EXISTS foo")
 
 	// open database connection
-	db, err := Open(context.Background(), dsn, registry)
+	db, err := Open(context.Background(), fmt.Sprintf(address, database), registry)
 	if err != nil {
 		logger.WithError(err).Fatal("Failed to establish a connection with the CockroachDB instance")
 		return nil
 	}
 
 	// drop database
-	_, err = db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE", dsn.DatabaseName))
+	_, err = db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE", database))
 	if err != nil {
-		logger.WithError(err).Fatalf("Failed to delete database `%s`", dsn.DatabaseName)
+		logger.WithError(err).Fatalf("Failed to delete database `%s`", database)
 		return nil
 	}
 
 	// create it again
-	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s", dsn.DatabaseName))
+	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s", database))
 	if err != nil {
-		logger.WithError(err).Fatalf("Failed to create database `%s`", dsn.DatabaseName)
+		logger.WithError(err).Fatalf("Failed to create database `%s`", database)
 		return nil
 	}
 
@@ -99,7 +96,7 @@ func clean(t testing.TB) Database {
 	for _, f := range data {
 		_, err = db.Exec(`INSERT INTO foo (bar, baz, quu) VALUES ($1, $2, $3) RETURNING *`, f.Bar, f.Baz, f.Quu)
 		if err != nil {
-			logger.WithError(err).Fatalf("Failed to feed the test database `%s` with some data", dsn.DatabaseName)
+			logger.WithError(err).Fatalf("Failed to feed the test database `%s` with some data", database)
 			return nil
 		}
 	}

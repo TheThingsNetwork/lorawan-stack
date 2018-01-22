@@ -14,7 +14,7 @@ import (
 
 func TestOAuthAuthorizationCode(t *testing.T) {
 	a := assertions.New(t)
-	s := cleanStore(t)
+	s := cleanStore(t, database)
 
 	userID := testUsers()["john-doe"].UserID
 	client := testClients()["test-client"]
@@ -57,7 +57,7 @@ func TestOAuthAuthorizationCode(t *testing.T) {
 
 func TestOAuthAccessToken(t *testing.T) {
 	a := assertions.New(t)
-	s := cleanStore(t)
+	s := cleanStore(t, database)
 
 	userID := testUsers()["john-doe"].UserID
 	client := testClients()["test-client"]
@@ -98,7 +98,7 @@ func TestOAuthAccessToken(t *testing.T) {
 
 func TestOAuthRefreshToken(t *testing.T) {
 	a := assertions.New(t)
-	s := cleanStore(t)
+	s := cleanStore(t, database)
 
 	userID := testUsers()["john-doe"].UserID
 	client := testClients()["test-client"]
@@ -137,7 +137,7 @@ func TestOAuthRefreshToken(t *testing.T) {
 
 func TestOAuthAuthorizedClients(t *testing.T) {
 	a := assertions.New(t)
-	s := cleanStore(t)
+	s := cleanStore(t, database)
 
 	userID := testUsers()["john-doe"].UserID
 	client := testClients()["test-client"]
