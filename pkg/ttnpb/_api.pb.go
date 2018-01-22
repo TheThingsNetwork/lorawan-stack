@@ -70,7 +70,7 @@ It has these top-level messages:
 	SendInvitationRequest
 	ListInvitationsRequest
 	ListInvitationsResponse
-	DeleteInvitationRequest
+	RevokeInvitationRequest
 	ListUsersRequest
 	ListUsersResponse
 	ListClientsRequest

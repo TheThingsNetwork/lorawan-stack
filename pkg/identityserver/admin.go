@@ -104,7 +104,7 @@ func (s *adminService) ListInvitations(ctx context.Context, req *ttnpb.ListInvit
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-func (s *adminService) DeleteInvitation(ctx context.Context, req *ttnpb.DeleteInvitationRequest) (*pbtypes.Empty, error) {
+func (s *adminService) RevokeInvitation(ctx context.Context, req *ttnpb.RevokeInvitationRequest) (*pbtypes.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
