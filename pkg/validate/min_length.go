@@ -11,7 +11,7 @@ import (
 //     - For strings checks the length
 //     - For slices checks that aren't nil and its length
 //     - For other types returns error
-func MinLength(length int) validateFn {
+func MinLength(length int) validateFn { // nolint: golint, returns unexported type on purpose
 	return func(v interface{}) error {
 		if v == nil {
 			return fmt.Errorf("MinLength validator: got %T instead of string or slice", v)
