@@ -9,7 +9,7 @@ import (
 	"io"
 	"reflect"
 
-	. "github.com/grpc-ecosystem/grpc-gateway/runtime"
+	. "github.com/grpc-ecosystem/grpc-gateway/runtime" // nolint: golint
 
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/gogo/protobuf/proto"
@@ -186,3 +186,8 @@ type protoEnum interface {
 }
 
 var typeProtoMessage = reflect.TypeOf((*proto.Message)(nil)).Elem()
+
+// Delimiter for newline encoded JSON streams.
+func (j *GoGoJSONPb) Delimiter() []byte {
+	return []byte("\n")
+}

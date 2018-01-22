@@ -7,9 +7,11 @@ sed \
   -e 's:golang/protobuf:gogo/protobuf:g' \
   -e 's:JSONPb:GoGoJSONPb:g' \
   -e '/import (/a \
-  . "github.com/grpc-ecosystem/grpc-gateway/runtime"' \
+  . "github.com/grpc-ecosystem/grpc-gateway/runtime" // nolint: golint' \
   $GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/runtime/marshal_jsonpb.go > marshaling.go
 
 goimports -w marshaling.go
 
-echo -e "// Code generated from github.com/grpc-ecosystem/grpc-gateway/runtime by copy.sh\n\n$(cat marshaling.go)" > marshaling.go
+echo "// Code generated from github.com/grpc-ecosystem/grpc-gateway/runtime by copy.sh
+
+$(cat marshaling.go)" > marshaling.go
