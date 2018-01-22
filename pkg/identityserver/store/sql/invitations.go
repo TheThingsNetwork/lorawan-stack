@@ -22,18 +22,18 @@ func NewInvitationStore(store storer) *InvitationStore {
 }
 
 // Save saves the invitation.
-func (s *InvitationStore) Save(token, email string, expiresIn uint32) error {
-	return s.save(s.queryer(), token, email, expiresIn)
+func (s *InvitationStore) Save(token, email string, ttl uint32) error {
+	return s.save(s.queryer(), token, email, ttl)
 }
 
-func (s *InvitationStore) save(q db.QueryContext, token, email string, expiresIn uint32) error {
+func (s *InvitationStore) save(q db.QueryContext, token, email string, ttl uint32) error {
 	_, err := q.Exec(
 		`INSERT
 			INTO invitations (
 				token,
 				email,
 				sent_at,
-				expires_in
+				ttl
 			)
 			VALUES (
 				$1,
@@ -43,7 +43,7 @@ func (s *InvitationStore) save(q db.QueryContext, token, email string, expiresIn
 			)`,
 		token,
 		email,
-		expiresIn)
+		ttl)
 	return err
 }
 
@@ -113,7 +113,7 @@ func (s *InvitationStore) list(q db.QueryContext) ([]*ttnpb.ListInvitationsRespo
 				id,
 				email,
 				sent_at,
-				expires_in,
+				ttl,
 				used_at,
 				user_id AS user
 			FROM invitations`)

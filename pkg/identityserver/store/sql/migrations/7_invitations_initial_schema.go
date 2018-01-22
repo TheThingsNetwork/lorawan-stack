@@ -9,7 +9,7 @@ func init() {
 			token        STRING UNIQUE NOT NULL,
 			email        STRING NOT NULL,
 			sent_at      TIMESTAMP DEFAULT current_timestamp(),
-			expires_in   INT NOT NULL,
+			ttl          INT NOT NULL,
 			used_at      TIMESTAMP,
 			user_id      STRING(36) REFERENCES users(user_id)
 		);
