@@ -89,7 +89,7 @@ go.dev-deps:
 	@$(log) "Installing go dev dependencies"
 	@$(log) "Getting dep" && $(GO) get -u github.com/golang/dep/cmd/dep
 	@$(log) "Getting gometalinter" && $(GO) get -u github.com/alecthomas/gometalinter
-	@$(log) "Getting gometalinter linters" && $(GO_METALINTER) -i -u
+	@$(log) "Getting gometalinter linters" && $(GO_METALINTER) -i
 
 DEP_FLAGS ?= $(if $(CI),-vendor-only,)
 
