@@ -3,9 +3,9 @@
 package rpclog
 
 import (
+	"context"
 	"time"
 
-	"context"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"google.golang.org/grpc"
 )
@@ -45,23 +45,22 @@ func StreamClientInterceptor(ctx context.Context, opts ...Option) grpc.StreamCli
 			level := o.levelFunc(code)
 			entry := log.FromContext(newCtx).WithError(err)
 			commit(entry, level, "Failed streaming call")
+			return clientStream, err
 		}
-		if err == nil {
-			go func() {
-				<-clientStream.Context().Done()
-				err := clientStream.Context().Err()
-				code := o.codeFunc(err)
-				level := o.levelFunc(code)
-				entry := log.FromContext(ctx).WithFields(log.Fields(
-					"grpc_code", code.String(),
-					"duration", time.Since(startTime),
-				))
-				if err != nil {
-					entry = entry.WithError(err)
-				}
-				commit(entry, level, "Finished streaming call")
-			}()
-		}
+		go func() {
+			<-clientStream.Context().Done()
+			err := clientStream.Context().Err() // nolint: vetshadow
+			code := o.codeFunc(err)
+			level := o.levelFunc(code)
+			entry := log.FromContext(ctx).WithFields(log.Fields(
+				"grpc_code", code.String(),
+				"duration", time.Since(startTime),
+			))
+			if err != nil {
+				entry = entry.WithError(err)
+			}
+			commit(entry, level, "Finished streaming call")
+		}()
 		return clientStream, err
 	}
 }
