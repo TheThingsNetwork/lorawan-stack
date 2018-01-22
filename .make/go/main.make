@@ -22,7 +22,7 @@ GO_MISSPELL= misspell
 GO_UNCONVERT= unconvert
 GO_METALINTER = gometalinter
 GO_METALINTER_EXCLUDE_REGEX=".+_populate\.go:([[:digit:]]+:){2}[[:alpha:]]+: parameter easy is unused \(unparam\)|.+\.pb\.go:.+|.+\.pb\.gw\.go:.+|.+pb_test\.go:.*|^pkg/band/[[:alpha:]]{2}(_[[:digit:]]{3}){1,2}\.go:([[:digit:]]+:){2}[[:alpha:]]+: (don't use ALL_CAPS in Go names; use CamelCase|don't use underscores in Go names;)|.+_test.go:([[:digit:]]+:):[[:alpha:]]+:.+\(dupl\)"
-GO_METALINTER_FLAGS = --enable-gc -e $(GO_METALINTER_EXCLUDE_REGEX) --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E misspell -E gofmt
+GO_METALINTER_FLAGS = --enable-gc -e $(GO_METALINTER_EXCLUDE_REGEX) --disable-all -E vet -E vetshadow -E deadcode -E gocyclo -E golint -E dupl -E ineffassign -E goconst -E gas -E misspell -E gofmt --sort=path --sort=line
 GO_LINT_FILES = $(ALL_FILES) | $(only_go_lintable)
 
 # go flags
