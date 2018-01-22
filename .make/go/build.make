@@ -39,8 +39,6 @@ $(VENDOR_FILE):
 	@$(log) "Initializing go deps"
 	@mkdir -p $(VENDOR_DIR) && cd $(VENDOR_DIR)/.. && dep init
 
-CACHE_DIR ?= .cache
-GO_MESSAGES_FILE ?= $(RELEASE_DIR)/errors.json
 
 go.translations: $(GO_MESSAGES_FILE)
 
