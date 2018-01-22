@@ -3,7 +3,9 @@
 package errors
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"sync"
 )
 
@@ -128,4 +130,42 @@ func GetAttributes(err error) Attributes {
 // GetAll returns all registered error descriptors
 func GetAll() []*ErrDescriptor {
 	return reg.GetAll()
+}
+
+// message is the structure of messages that are written to the message file.
+// It confirms to the react-intl (https://github.com/yahoo/react-intl) message format.
+type message struct {
+	// DefaultMessage is the default ICU message format.
+	DefaultMessage string `json:"defaultMessage"`
+
+	// Force indicates wether or not we want to force inclusion of this message in the
+	// final localization files (even if the message does not appear in the js source code).
+	// In the case of the messageds gathered from go code (through the errors package) this will
+	// always be true.
+	Force bool `json:"force"`
+}
+
+// WriteAll writes the errors in json format to the specified file.
+func WriteAll(filename string) {
+	descriptors := GetAll()
+	messages := make(map[string]message, len(descriptors))
+	for _, d := range descriptors {
+		id := fmt.Sprintf("$.%s.%s", d.Namespace, d.Code)
+		messages[id] = message{
+			DefaultMessage: d.MessageFormat,
+			Force:          true,
+		}
+	}
+
+	buf, err := json.MarshalIndent(messages, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+
+	buf = append(buf, byte('\n'))
+
+	err = ioutil.WriteFile(filename, buf, 0644)
+	if err != nil {
+		panic(err)
+	}
 }
