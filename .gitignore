@@ -87,3 +87,4 @@ $RECYCLE.BIN/
 /dist
 /vendor/*/
 /release
+/.cache
