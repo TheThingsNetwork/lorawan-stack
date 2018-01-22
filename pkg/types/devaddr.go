@@ -208,7 +208,7 @@ func NwkAddrBits(netID NetID) uint {
 	panic(fmt.Errorf("Unmatched NetID type: %d", netID.Type()))
 }
 
-// NwkAddrBits returns the length of NwkAddr field of netID in bytes.
+// NwkAddrLength returns the length of NwkAddr field of netID in bytes.
 func NwkAddrLength(netID NetID) int {
 	return int((NwkAddrBits(netID) + 7) / 8)
 }

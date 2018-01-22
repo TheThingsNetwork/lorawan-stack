@@ -121,6 +121,7 @@ func (eui EUI64) AfterOrEqual(a EUI64) bool {
 // ErrInvalidEUI64Prefix can be returned when unmarshaling an invalid slice into a prefix.
 var ErrInvalidEUI64Prefix = errors.New("invalid EUI prefix")
 
+// EUI64Prefix is an EUI64 with a prefix length.
 type EUI64Prefix struct {
 	EUI64  EUI64
 	Length uint8
