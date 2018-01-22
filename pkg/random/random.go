@@ -10,7 +10,7 @@ import (
 	"math/big"
 )
 
-// Interface for random
+// Interface for random.
 type Interface interface {
 	Intn(n int) int
 	String(n int) string
@@ -18,12 +18,12 @@ type Interface interface {
 	FillBytes(p []byte)
 }
 
-// TTNRandom is used as a wrapper around crypto/rand
+// TTNRandom is used as a wrapper around crypto/rand.
 type TTNRandom struct {
 	Source io.Reader
 }
 
-// New returns a new Random, in most cases you can also just use the global funcs
+// New returns a new Random, in most cases you can also just use the global funcs.
 func New() Interface {
 	return &TTNRandom{
 		Source: rand.Reader,
@@ -32,23 +32,32 @@ func New() Interface {
 
 var global = New()
 
-// Intn returns a random number in the range [0,n)
+// Intn returns a random number in the range [0,n). This func uses the global TTNRandom.
 func Intn(n int) int { return global.Intn(n) }
+
+// Intn returns a random number in the range [0,n).
 func (r *TTNRandom) Intn(n int) int {
-	i, _ := rand.Int(r.Source, big.NewInt(int64(n)))
+	i, err := rand.Int(r.Source, big.NewInt(int64(n)))
+	if err != nil {
+		panic(err) // r.Source is (very) broken.
+	}
 	return int(i.Int64())
 }
 
-// Bytes generates a random byte slice of length n
+// Bytes generates a random byte slice of length n. This func uses the global TTNRandom.
 func Bytes(n int) []byte { return global.Bytes(n) }
+
+// Bytes generates a random byte slice of length n.
 func (r *TTNRandom) Bytes(n int) []byte {
 	p := make([]byte, n)
 	r.FillBytes(p)
 	return p
 }
 
-// FillBytes fills the byte slice with random bytes. It does not use an intermediate buffer
+// FillBytes fills the byte slice with random bytes. This func uses the global TTNRandom.
 func FillBytes(p []byte) { global.FillBytes(p) }
+
+// FillBytes fills the byte slice with random bytes.
 func (r *TTNRandom) FillBytes(p []byte) {
 	_, err := r.Source.Read(p)
 	if err != nil {
@@ -56,8 +65,11 @@ func (r *TTNRandom) FillBytes(p []byte) {
 	}
 }
 
-// String returns a random string of length n, it uses the characters of base64.URLEncoding
+// String returns a random string of length n, it uses the characters of base64.URLEncoding.
+// This func uses the global TTNRandom.
 func String(n int) string { return global.String(n) }
+
+// String returns a random string of length n, it uses the characters of base64.URLEncoding.
 func (r *TTNRandom) String(n int) string {
 	b := r.Bytes(n * 6 / 8)
 	return base64.RawURLEncoding.EncodeToString(b)

@@ -10,13 +10,13 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/random"
 )
 
-// TTNRandom is used as a wrapper around math/rand
+// TTNRandom is used as a wrapper around math/rand.
 type TTNRandom struct {
 	mu sync.Mutex
 	random.Interface
 }
 
-// New returns a new Random, in most cases you can also just use the global funcs
+// New returns a new Random, in most cases you can also just use the global funcs.
 func New(seed int64) random.Interface {
 	return &TTNRandom{
 		Interface: &random.TTNRandom{
@@ -27,32 +27,40 @@ func New(seed int64) random.Interface {
 
 var global = New(time.Now().UnixNano())
 
-// Intn returns random int with max n
+// Intn returns random int with max n. This func uses the global TTNRandom.
 func Intn(n int) int { return global.Intn(n) }
+
+// Intn returns random int with max n.
 func (r *TTNRandom) Intn(n int) int {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	return r.Interface.Intn(n)
 }
 
-// String returns random string of length n
+// String returns random string of length n. This func uses the global TTNRandom.
 func String(n int) string { return global.String(n) }
+
+// String returns random string of length n.
 func (r *TTNRandom) String(n int) string {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	return r.Interface.String(n)
 }
 
-// Bytes generates a random byte slice of length n
+// Bytes generates a random byte slice of length n. This func uses the global TTNRandom.
 func Bytes(n int) []byte { return global.Bytes(n) }
+
+// Bytes generates a random byte slice of length n.
 func (r *TTNRandom) Bytes(n int) []byte {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	return r.Interface.Bytes(n)
 }
 
-// FillBytes fills the byte slice with random bytes. It does not use an intermediate buffer
+// FillBytes fills the byte slice with random bytes. This func uses the global TTNRandom.
 func FillBytes(p []byte) { global.FillBytes(p) }
+
+// FillBytes fills the byte slice with random bytes.
 func (r *TTNRandom) FillBytes(p []byte) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
