@@ -20,7 +20,10 @@ func EncryptJoinAccept(key types.AES128Key, payload []byte) (encrypted []byte, e
 	if len(payload) != 16 && len(payload) != 32 {
 		return nil, errors.Errorf("pkg/crypto: join-accept payload must be 16 or 32 bytes, got %d", len(payload))
 	}
-	cipher, _ := aes.NewCipher(key[:])
+	cipher, err := aes.NewCipher(key[:])
+	if err != nil {
+		return nil, err
+	}
 	encrypted = make([]byte, len(payload))
 	for i := 0; i < len(encrypted); i += 16 {
 		cipher.Decrypt(encrypted[i:i+16], payload[i:i+16])
@@ -36,7 +39,10 @@ func DecryptJoinAccept(key types.AES128Key, encrypted []byte) (payload []byte, e
 	if len(encrypted) != 16 && len(encrypted) != 32 {
 		return nil, errors.New("pkg/crypto: encrypted join-accept payload must be 16 or 32 bytes")
 	}
-	cipher, _ := aes.NewCipher(key[:])
+	cipher, err := aes.NewCipher(key[:])
+	if err != nil {
+		return nil, err
+	}
 	payload = make([]byte, len(encrypted))
 	for i := 0; i < len(encrypted); i += 16 {
 		cipher.Encrypt(payload[i:i+16], encrypted[i:i+16])
@@ -52,8 +58,14 @@ func ComputeJoinRequestMIC(key types.AES128Key, payload []byte) (mic [4]byte, er
 	if len(payload) != 19 {
 		return mic, errors.Errorf("pkg/crypto: expected join-request payload length to equal 19, got %d", len(payload))
 	}
-	hash, _ := cmac.New(key[:])
+	hash, err := cmac.New(key[:])
+	if err != nil {
+		return mic, err
+	}
 	_, err = hash.Write(payload)
+	if err != nil {
+		return mic, err
+	}
 	copy(mic[:], hash.Sum([]byte{}))
 	return
 }
@@ -78,8 +90,14 @@ func ComputeRejoinRequestMIC(key types.AES128Key, payload []byte) (mic [4]byte, 
 			return mic, errors.New("pkg/crypto: rejoin-request type 1 payload must be 20 bytes")
 		}
 	}
-	hash, _ := cmac.New(key[:])
+	hash, err := cmac.New(key[:])
+	if err != nil {
+		return mic, err
+	}
 	_, err = hash.Write(payload)
+	if err != nil {
+		return mic, err
+	}
 	copy(mic[:], hash.Sum([]byte{}))
 	return
 }
@@ -92,8 +110,14 @@ func ComputeLegacyJoinAcceptMIC(key types.AES128Key, payload []byte) (mic [4]byt
 	if n := len(payload); n != 13 && n != 29 {
 		return mic, errors.Errorf("pkg/crypto: join-accept payload must be 13 or 29 bytes, got %d", n)
 	}
-	hash, _ := cmac.New(key[:])
+	hash, err := cmac.New(key[:])
+	if err != nil {
+		return mic, err
+	}
 	_, err = hash.Write(payload)
+	if err != nil {
+		return mic, err
+	}
 	copy(mic[:], hash.Sum([]byte{}))
 	return
 }
@@ -105,9 +129,18 @@ func ComputeJoinAcceptMIC(jsIntKey types.AES128Key, joinReqType byte, joinEUI ty
 	if n := len(payload); n != 13 && n != 29 {
 		return mic, errors.Errorf("pkg/crypto: join-accept payload must be 13 or 29 bytes, got %d", n)
 	}
-	hash, _ := cmac.New(jsIntKey[:])
-	hash.Write(append(append([]byte{joinReqType}, joinEUI[:]...), dn[:]...))
+	hash, err := cmac.New(jsIntKey[:])
+	if err != nil {
+		return mic, err
+	}
+	_, err = hash.Write(append(append([]byte{joinReqType}, joinEUI[:]...), dn[:]...))
+	if err != nil {
+		return mic, err
+	}
 	_, err = hash.Write(payload)
+	if err != nil {
+		return mic, err
+	}
 	copy(mic[:], hash.Sum([]byte{}))
 	return
 }

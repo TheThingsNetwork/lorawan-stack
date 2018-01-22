@@ -16,7 +16,10 @@ func encrypt(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uint32, pa
 		k++
 	}
 	encrypted = make([]byte, 0, k*16)
-	cipher, _ := aes.NewCipher(key[:])
+	cipher, err := aes.NewCipher(key[:])
+	if err != nil {
+		panic(err) // types.AES128Key
+	}
 	var a [aes.BlockSize]byte
 	a[0] = 0x01
 	a[5] = dir
@@ -77,7 +80,13 @@ func computeMIC(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uint32,
 	binary.LittleEndian.PutUint32(b0[10:14], fCnt)
 	b0[15] = uint8(len(payload))
 	_, err = hash.Write(b0[:])
+	if err != nil {
+		return
+	}
 	_, err = hash.Write(payload)
+	if err != nil {
+		return
+	}
 	copy(mic[:], hash.Sum([]byte{}))
 	return
 }
@@ -109,7 +118,13 @@ func ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey types.AES128Key, confFCnt uint32,
 	binary.LittleEndian.PutUint32(b0[10:14], fCnt)
 	b0[15] = uint8(len(payload))
 	_, err = hash.Write(b0[:])
+	if err != nil {
+		return
+	}
 	_, err = hash.Write(payload)
+	if err != nil {
+		return
+	}
 	copy(mic[:2], hash.Sum([]byte{}))
 	return
 }
