@@ -100,7 +100,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		if rawPayload == nil {
 			return nil, ErrMissingPayload.New(nil)
 		}
-		if err := req.Payload.UnmarshalLoRaWAN(rawPayload); err != nil {
+		if err = req.Payload.UnmarshalLoRaWAN(rawPayload); err != nil {
 			return nil, ErrUnmarshalFailed.NewWithCause(nil, err)
 		}
 	}
@@ -328,6 +328,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	return resp, nil
 }
 
+// GetAppSKey returns the AppSKey associated with device specified by the supplied request.
 func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
 	if req.DevEUI.IsZero() {
 		return nil, ErrMissingDevEUI.New(nil)
@@ -370,6 +371,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 	}, nil
 }
 
+// GetNwkSKeys returns the NwkSKeys associated with device specified by the supplied request.
 func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
 	if req.DevEUI.IsZero() {
 		return nil, ErrMissingDevEUI.New(nil)
