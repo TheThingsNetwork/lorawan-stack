@@ -68,7 +68,6 @@ It has these top-level messages:
 	IdentityServerSettings
 	UpdateSettingsRequest
 	SendInvitationRequest
-	ListInvitationsRequest
 	ListInvitationsResponse
 	RevokeInvitationRequest
 	ListUsersRequest

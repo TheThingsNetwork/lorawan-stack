@@ -86,23 +86,6 @@ message SendInvitationRequest {
   string email = 1;
 }
 
-message ListInvitationsRequest {
-  enum FilterUsed {
-    option (gogoproto.goproto_enum_prefix) = false;
-
-    // Do not filter.
-    FILTER_NOFILTER = 0;
-
-    // List only unused invitations.
-    FILTER_UNUSED = 1;
-
-    // List only used invitations.
-    FILTER_USED = 2;
-  }
-  // filter_used is an optional field to filter the response by used or unused invitations.
-  FilterUsed filter_used = 1;
-}
-
 message ListInvitationsResponse {
   message Invitation {
     // email is the email the invitation was sent at.
@@ -115,12 +98,6 @@ message ListInvitationsResponse {
     // This value is set on the moment the invitation is issued based on the
     // `InvitationTokenTTL` setting.
     google.protobuf.Duration ttl = 3 [(gogoproto.customname) = "TTL", (gogoproto.nullable) = false, (gogoproto.stdduration) = true];
-
-    // used_at denotes when the invitation was used.
-    google.protobuf.Timestamp used_at = 4 [(gogoproto.stdtime) = true];
-
-    // user_id denotes the ID of the user's account that was created from this invitation.
-    UserIdentifier user_id = 5 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   }
   // invitation is the list of sent invitations.
   repeated Invitation invitations = 1;
@@ -184,8 +161,8 @@ service IsAdmin {
   // All invitations are expirable and the TTL is defined on a setitngs variable.
   rpc SendInvitation(SendInvitationRequest) returns (google.protobuf.Empty);
 
-  // ListInvitations lists all the sent invitations.
-  rpc ListInvitations(ListInvitationsRequest) returns (ListInvitationsResponse);
+  // ListInvitations lists all the issued invitations.
+  rpc ListInvitations(google.protobuf.Empty) returns (ListInvitationsResponse);
 
   // RevokeInvitation revokes an invitation that has not been used yet.
   rpc RevokeInvitation(RevokeInvitationRequest) returns (google.protobuf.Empty);
