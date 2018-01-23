@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	. "github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 )
 
 func TestName(t *testing.T) {
@@ -41,6 +42,7 @@ func TestHash(t *testing.T) {
 		// should not validate against wrong plain
 		{
 			other, err := h.Hash("othersecret")
+			a.So(err, should.BeNil)
 			ok, err := h.Validate(other, plain)
 			a.So(err, ShouldBeNil)
 			a.So(ok, ShouldBeFalse)
