@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -91,10 +92,76 @@ func TestFlattened(t *testing.T) {
 }
 
 func TestIsZero(t *testing.T) {
-	for _, tc := range []struct {
+	for i, tc := range []struct {
 		v      interface{}
 		isZero bool
-	}{} {
-		assertions.New(t).So(isNil(reflect.ValueOf(tc.v)), should.Equal, tc.isZero)
+	}{
+		{
+			(*time.Time)(nil),
+			true,
+		},
+		{
+			time.Time{},
+			true,
+		},
+		{
+			[]int{},
+			true,
+		},
+		{
+			([]int)(nil),
+			true,
+		},
+		{
+			nil,
+			true,
+		},
+		{
+			(interface{})(nil),
+			true,
+		},
+		{
+			struct{ a int }{42},
+			false,
+		},
+	} {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			assertions.New(t).So(isZero(reflect.ValueOf(tc.v)), should.Equal, tc.isZero)
+		})
+	}
+}
+
+func TestMapify(t *testing.T) {
+	for i, tc := range []struct {
+		input  interface{}
+		keep   func(rv reflect.Value) bool
+		output interface{}
+	}{
+		{
+			nil,
+			nil,
+			nil,
+		},
+		{
+			[]int{1, 2, 3, 0, 5},
+			nil,
+			map[string]interface{}{
+				"0": 1,
+				"1": 2,
+				"2": 3,
+				"4": 5,
+			},
+		},
+		{
+			[]interface{}{nil, nil, struct{}{}, time.Time{}, "hello", (*time.Time)(nil), (*struct{})(nil)},
+			nil,
+			map[string]interface{}{
+				"4": "hello",
+			},
+		},
+	} {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			assertions.New(t).So(mapify(tc.input, tc.keep), should.Resemble, tc.output)
+		})
 	}
 }
