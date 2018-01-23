@@ -3,8 +3,13 @@
 package shared
 
 import (
+	"github.com/TheThingsNetwork/ttn/pkg/applicationserver"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
+	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver"
+	"github.com/TheThingsNetwork/ttn/pkg/joinserver"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
+	"github.com/TheThingsNetwork/ttn/pkg/networkserver"
 )
 
 // DefaultBaseConfig is the default base component configuration.
@@ -23,6 +28,9 @@ var DefaultTLSConfig = config.TLS{
 	Key:         "",
 }
 
+// DefaultClusterConfig is the default cluster configuration.
+var DefaultClusterConfig = config.Cluster{}
+
 // DefaultHTTPConfig is the default HTTP config.
 var DefaultHTTPConfig = config.HTTP{
 	Listen: ":8080",
@@ -38,7 +46,9 @@ var DefaultIdentityConfig = config.Identity{
 }
 
 // DefaultGRPCConfig is the default config for GRPC.
-var DefaultGRPCConfig = config.GRPC{}
+var DefaultGRPCConfig = config.GRPC{
+	Listen: ":8088",
+}
 
 // DefaultRedisConfig is the default config for Redis.
 var DefaultRedisConfig = config.Redis{
@@ -50,9 +60,29 @@ var DefaultRedisConfig = config.Redis{
 // DefaultServiceBase is the default base config for a service.
 var DefaultServiceBase = config.ServiceBase{
 	Base:     DefaultBaseConfig,
+	Cluster:  DefaultClusterConfig,
 	Redis:    DefaultRedisConfig,
 	GRPC:     DefaultGRPCConfig,
 	HTTP:     DefaultHTTPConfig,
 	TLS:      DefaultTLSConfig,
 	Identity: DefaultIdentityConfig,
 }
+
+// DefaultIdentityServerConfig is the default configuration for the IdentityServer
+var DefaultIdentityServerConfig = identityserver.Config{
+	DatabaseURI:      "postgres://root@localhost:26257/is_development?sslmode=disable",
+	Hostname:         "localhost",
+	OrganizationName: "The Things Network",
+}
+
+// DefaultGatewayServerConfig is the default configuration for the GatewayServer
+var DefaultGatewayServerConfig = gatewayserver.Config{}
+
+// DefaultNetworkServerConfig is the default configuration for the NetworkServer
+var DefaultNetworkServerConfig = networkserver.Config{}
+
+// DefaultApplicationServerConfig is the default configuration for the ApplicationServer
+var DefaultApplicationServerConfig = applicationserver.Config{}
+
+// DefaultJoinServerConfig is the default configuration for the JoinServer
+var DefaultJoinServerConfig = joinserver.Config{}
