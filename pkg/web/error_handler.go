@@ -54,7 +54,7 @@ func ErrorHandler(template string) echo.HTTPErrorHandler {
 		}
 
 		if renderError != nil {
-			c.String(httpe.Code, fmt.Sprintf("%v %s\n", body.Status, body.Description))
+			_ = c.String(httpe.Code, fmt.Sprintf("%v %s\n", body.Status, body.Description))
 		}
 	}
 }

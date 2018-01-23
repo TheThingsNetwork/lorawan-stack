@@ -25,7 +25,7 @@ type Cookie struct {
 	Path     string
 	Expires  time.Time
 	MaxAge   int
-	HttpOnly bool
+	HTTPOnly bool
 }
 
 // Cookies is a middleware function that makes the handlers capable of handling cookies via
@@ -58,6 +58,9 @@ func getConfig(c echo.Context) (string, *securecookie.SecureCookie, error) {
 // Get the cookie with the specified name.
 func Get(c echo.Context, name string) (*Cookie, error) {
 	root, s, err := getConfig(c)
+	if err != nil {
+		return nil, err
+	}
 
 	cookie, err := c.Request().Cookie(name)
 	if err != nil || cookie.Value == tombstone {
@@ -68,7 +71,7 @@ func Get(c echo.Context, name string) (*Cookie, error) {
 		Path:     strings.TrimPrefix(cookie.Path, root),
 		Expires:  cookie.Expires,
 		MaxAge:   cookie.MaxAge,
-		HttpOnly: cookie.HttpOnly,
+		HTTPOnly: cookie.HttpOnly,
 	}
 
 	err = s.Decode(name, cookie.Value, &res.Value)
@@ -82,6 +85,9 @@ func Get(c echo.Context, name string) (*Cookie, error) {
 // Set the cookie with the specified name.
 func Set(c echo.Context, name string, cookie *Cookie) error {
 	root, s, err := getConfig(c)
+	if err != nil {
+		return err
+	}
 
 	str, err := s.Encode(name, &cookie.Value)
 	if err != nil {
@@ -94,7 +100,7 @@ func Set(c echo.Context, name string, cookie *Cookie) error {
 		Path:     path.Join(root, cookie.Path),
 		Expires:  cookie.Expires,
 		MaxAge:   cookie.MaxAge,
-		HttpOnly: cookie.HttpOnly,
+		HttpOnly: cookie.HTTPOnly,
 	})
 
 	return nil
@@ -103,6 +109,9 @@ func Set(c echo.Context, name string, cookie *Cookie) error {
 // Remove the cookie with the specified name (if it exists).
 func Remove(c echo.Context, name string) error {
 	root, _, err := getConfig(c)
+	if err != nil {
+		return err
+	}
 
 	cookie, err := Get(c, name)
 	if err != nil {
@@ -119,7 +128,7 @@ func Remove(c echo.Context, name string) error {
 		Path:     path.Join(root, cookie.Path),
 		Expires:  time.Unix(1, 0),
 		MaxAge:   0,
-		HttpOnly: cookie.HttpOnly,
+		HttpOnly: cookie.HTTPOnly,
 	})
 
 	return nil

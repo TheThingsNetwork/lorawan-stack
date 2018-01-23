@@ -67,13 +67,13 @@ func Normalize(mode NormalizationMode) echo.MiddlewareFunc {
 // status determines the redirection status based on the mode and the request method.
 func status(mode NormalizationMode, method string) int {
 	switch {
-	case mode == RedirectPermanent && (method == "GET" || method == "HEAD"):
+	case mode == RedirectPermanent && (method == echo.GET || method == echo.HEAD):
 		return http.StatusMovedPermanently
-	case mode == RedirectPermanent && method != "GET" && method != "HEAD":
+	case mode == RedirectPermanent && method != echo.GET && method != echo.HEAD:
 		return http.StatusPermanentRedirect
-	case mode == RedirectTemporary && (method == "GET" || method == "HEAD"):
+	case mode == RedirectTemporary && (method == echo.GET || method == echo.HEAD):
 		return http.StatusFound
-	case mode == RedirectTemporary && method != "GET" && method != "HEAD":
+	case mode == RedirectTemporary && method != echo.GET && method != echo.HEAD:
 		return http.StatusTemporaryRedirect
 	default:
 		return http.StatusFound
