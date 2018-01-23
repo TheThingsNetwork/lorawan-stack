@@ -31,11 +31,13 @@ type Config struct {
 
 // New returns new *ApplicationServer.
 func New(c *component.Component, conf *Config) *ApplicationServer {
-	return &ApplicationServer{
+	as := &ApplicationServer{
 		Component:   c,
 		RegistryRPC: deviceregistry.NewRPC(c, conf.Registry), // TODO: Add checks
 		registry:    conf.Registry,
 	}
+	c.RegisterGRPC(as)
+	return as
 }
 
 // Subscribe subscribes to application uplink messages for an EndDevice filter.
