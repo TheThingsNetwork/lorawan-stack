@@ -33,7 +33,7 @@ func ExampleMiddleware() {
 	// counter is a middleware that counts the messages
 	counter := MiddlewareFunc(func(next Handler) Handler {
 		return HandlerFunc(func(entry Entry) error {
-			messages += 1
+			messages++
 			return next.HandleLog(entry)
 		})
 	})

@@ -19,11 +19,11 @@ type Filter interface {
 	Filter(log.Entry) bool
 }
 
-// FilterFunc is a wrapper type for simple functions that filter.
-type FilterFunc func(log.Entry) bool
+// Func is a wrapper type for simple functions that filter.
+type Func func(log.Entry) bool
 
 // Filter implements Filter.
-func (fn FilterFunc) Filter(e log.Entry) bool {
+func (fn Func) Filter(e log.Entry) bool {
 	return fn(e)
 }
 
@@ -32,7 +32,7 @@ func (f *Filtered) SetFilters(filters ...Filter) {
 	f.filter = And(filters...)
 }
 
-// HandleLog implements log.Middleware.
+// Wrap  implements log.Middleware.
 func (f *Filtered) Wrap(next log.Handler) log.Handler {
 	return log.HandlerFunc(func(entry log.Entry) error {
 		if f.filter.Filter(entry) {
@@ -44,14 +44,14 @@ func (f *Filtered) Wrap(next log.Handler) log.Handler {
 }
 
 // All is a filter allows all log entries to be passed.
-var All = FilterFunc(func(e log.Entry) bool {
+var All = Func(func(e log.Entry) bool {
 	return true
 })
 
 // And is a combinator that combines filters in such a way that the log entry is only
 // passed is all filters pass it.
 func And(filters ...Filter) Filter {
-	return FilterFunc(func(e log.Entry) bool {
+	return Func(func(e log.Entry) bool {
 		for _, filter := range filters {
 			if !filter.Filter(e) {
 				return false
@@ -64,7 +64,7 @@ func And(filters ...Filter) Filter {
 
 // Or is a combinator for filters that passes a log entry only if one of the filters passes it.
 func Or(filters ...Filter) Filter {
-	return FilterFunc(func(e log.Entry) bool {
+	return Func(func(e log.Entry) bool {
 		for _, filter := range filters {
 			if filter.Filter(e) {
 				return true
@@ -78,7 +78,7 @@ func Or(filters ...Filter) Filter {
 // Field returns a filter that passes a log entry if and only if the supplied field name is present and the matcher
 // returns true when called on the field value.
 func Field(field string, matcher func(interface{}) bool) Filter {
-	return FilterFunc(func(e log.Entry) bool {
+	return Func(func(e log.Entry) bool {
 		fields := e.Fields().Fields()
 		val, ok := fields[field]
 		return ok && matcher(val)
