@@ -8,7 +8,7 @@ go.fmt:
 # lint all packages, exiting when errors occur
 go.lint:
 	@$(log) "Linting `$(GO_PACKAGES) | $(count)` go packages"
-	@CODE=0; $(GO_METALINTER) $(GO_METALINTER_FLAGS) `$(GO_PACKAGES_ABSOLUTE)` 2> /dev/null || { CODE=1; }; exit $$CODE
+	@CODE=0; $(GO_METALINTER) `$(GO_PACKAGES_ABSOLUTE)` 2> /dev/null || { CODE=1; }; exit $$CODE
 
 # fix misspellings in all packages
 go.misspell:
@@ -27,10 +27,6 @@ go.fmt-staged: go.fmt
 # lint staged packages
 go.lint-staged: GO_PACKAGES = $(STAGED_PACKAGES)
 go.lint-staged: go.lint
-
-# lint staged packages with all linters
-go.lint-staged-full: GOMETALINTER_FLAGS=$(GO_METALINTER_FLAGS_FULL)
-go.lint-staged-full: go.lint-staged
 
 # fix misspellings in all staged packages
 go.misspell-staged: GO_PACKAGES_ABSOLUTE = $(STAGED_PACKAGES_ABSOLUTE)

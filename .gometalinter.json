@@ -1,0 +1,32 @@
+{
+  "Enable": [
+    "deadcode",
+    "dupl",
+    "gas",
+    "goconst",
+    "gofmt",
+    "golint",
+    "ineffassign",
+    "misspell",
+    "vet",
+    "vetshadow"
+  ],
+  "Linters": {
+    "gas": {
+      "command": "gas -fmt=csv -exclude=G201,G202"
+    }
+  },
+  "Exclude": [
+    ".+\\.pb\\.go:.+",
+    ".+\\.pb\\.gw\\.go:.+",
+    ".+_populate\\.go:([[:digit:]]+:){2}[[:alpha:]]+: parameter easy is unused \\(unparam\\)",
+    ".+pb_test\\.go:.*",
+    "^pkg/band/[[:alpha:]]{2}(_[[:digit:]]{3}){1,2}\\.go:([[:digit:]]+:){2}[[:alpha:]]+: (don't use ALL_CAPS in Go names; use CamelCase|don't use underscores in Go names;)",
+    ".+_test.go:([[:digit:]]+:):[[:alpha:]]+:.+\\(dupl\\)"
+  ],
+  "Cyclo": 25,
+  "DuplThreshold": 200,
+  "EnableGC": true,
+  "Sort": ["path", "line"],
+  "Vendor": true
+}
