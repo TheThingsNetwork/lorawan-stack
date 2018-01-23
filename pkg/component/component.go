@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"sort"
 	"syscall"
 
 	"github.com/TheThingsNetwork/ttn/pkg/cluster"
@@ -92,6 +93,16 @@ func (c *Component) Start() (err error) {
 		if err = c.setupGRPC(); err != nil {
 			return err
 		}
+		serviceInfo := c.grpc.Server.GetServiceInfo()
+		services := make([]string, 0, len(serviceInfo))
+		for service := range serviceInfo {
+			services = append(services, service)
+		}
+		sort.Strings(services)
+		c.logger.WithFields(log.Fields(
+			"namespace", "grpc",
+			"services", services,
+		)).Debug("Exposed services")
 	}
 
 	c.logger.Debug("Initializing web server...")
