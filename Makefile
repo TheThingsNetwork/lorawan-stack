@@ -40,14 +40,24 @@ quality: go.quality
 # Cache build artifacts (speeds up dev builds)
 cache: go.install
 
-# Example builds
+# example binary
 ttn-example: MAIN=./cmd/ttn-example/main.go
 ttn-example: $(RELEASE_DIR)/ttn-example-$(GOOS)-$(GOARCH)
-ttn-example: go.link
 
-ttn-example.dev: go.dev ttn-example
+# stack binary
+ttn-stack: MAIN=./cmd/ttn-stack/main.go
+ttn-stack: $(RELEASE_DIR)/ttn-stack-$(GOOS)-$(GOARCH)
 
-ttn-example.docker: MAIN=./cmd/ttn-example/main.go
-ttn-example.docker: $(RELEASE_DIR)/ttn-example-linux-amd64
+# All binaries
+build-all: GO_FLAGS=-i -installsuffix ttn_prod
+build-all: go.clean-build ttn-stack
 
-build-all: ttn-example
+# All supported platforms
+build-all-platforms:
+	GOOS=linux GOARCH=amd64 make build-all
+	GOOS=linux GOARCH=386 make build-all
+	GOOS=linux GOARCH=arm make build-all
+	GOOS=linux GOARCH=arm64 make build-all
+	GOOS=darwin GOARCH=amd64 make build-all
+	GOOS=windows GOARCH=amd64 make build-all
+	GOOS=windows GOARCH=386 make build-all
