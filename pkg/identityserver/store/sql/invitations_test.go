@@ -32,8 +32,8 @@ func TestInvitations(t *testing.T) {
 
 		a.So(i.Email, should.Equal, invitation.Email)
 		a.So(i.Token, should.Equal, invitation.Token)
-		a.So(invitation.IssuedAt.Equal(i.IssuedAt), should.BeTrue)
-		a.So(invitation.ExpiresAt.Equal(i.ExpiresAt), should.BeTrue)
+		a.So(i.IssuedAt.IsZero(), should.BeFalse)
+		a.So(i.ExpiresAt.IsZero(), should.BeFalse)
 	}
 
 	// reissue invitation
@@ -49,8 +49,8 @@ func TestInvitations(t *testing.T) {
 
 		a.So(i.Email, should.Equal, invitation.Email)
 		a.So(i.Token, should.Equal, invitation.Token)
-		a.So(invitation.IssuedAt.Equal(i.IssuedAt), should.BeTrue)
-		a.So(invitation.ExpiresAt.Equal(i.ExpiresAt), should.BeTrue)
+		a.So(i.IssuedAt.IsZero(), should.BeFalse)
+		a.So(i.ExpiresAt.IsZero(), should.BeFalse)
 	}
 
 	err = s.Invitations.Use(invitation.Email, invitation.Token)
