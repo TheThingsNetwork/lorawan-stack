@@ -2,7 +2,8 @@
 
 package templates
 
-// EmailValidation is the email template used to validate an email address.
+// AccountCreation is the template used when an admin creates an account in
+// behalf of an user.
 type AccountCreation struct {
 	PublicURL        string
 	OrganizationName string

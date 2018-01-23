@@ -2,7 +2,8 @@
 
 package templates
 
-// EmailValidation is the email template used to validate an email address.
+// PasswordReset is the email template used to inform an user that an admin has
+// reset his account password.
 type PasswordReset struct {
 	PublicURL        string
 	OrganizationName string

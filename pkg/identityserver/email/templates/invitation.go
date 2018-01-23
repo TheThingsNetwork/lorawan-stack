@@ -2,7 +2,8 @@
 
 package templates
 
-// EmailValidation is the email template used to validate an email address.
+// Invitation is the email template used to notify a person that has been invited
+// to register an account.
 type Invitation struct {
 	PublicURL        string
 	OrganizationName string
