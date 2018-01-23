@@ -48,9 +48,29 @@ ttn-example: $(RELEASE_DIR)/ttn-example-$(GOOS)-$(GOARCH)
 ttn-stack: MAIN=./cmd/ttn-stack/main.go
 ttn-stack: $(RELEASE_DIR)/ttn-stack-$(GOOS)-$(GOARCH)
 
+# identity-server binary
+ttn-identity-server: MAIN=./cmd/ttn-identity-server/main.go
+ttn-identity-server: $(RELEASE_DIR)/ttn-identity-server-$(GOOS)-$(GOARCH)
+
+# gateway-server binary
+ttn-gateway-server: MAIN=./cmd/ttn-gateway-server/main.go
+ttn-gateway-server: $(RELEASE_DIR)/ttn-gateway-server-$(GOOS)-$(GOARCH)
+
+# network-server binary
+ttn-network-server: MAIN=./cmd/ttn-network-server/main.go
+ttn-network-server: $(RELEASE_DIR)/ttn-network-server-$(GOOS)-$(GOARCH)
+
+# application-server binary
+ttn-application-server: MAIN=./cmd/ttn-application-server/main.go
+ttn-application-server: $(RELEASE_DIR)/ttn-application-server-$(GOOS)-$(GOARCH)
+
+# join-server binary
+ttn-join-server: MAIN=./cmd/ttn-join-server/main.go
+ttn-join-server: $(RELEASE_DIR)/ttn-join-server-$(GOOS)-$(GOARCH)
+
 # All binaries
 build-all: GO_FLAGS=-i -installsuffix ttn_prod
-build-all: go.clean-build ttn-stack
+build-all: go.clean-build ttn-stack ttn-identity-server ttn-gateway-server ttn-network-server ttn-application-server ttn-join-server
 
 # All supported platforms
 build-all-platforms:
