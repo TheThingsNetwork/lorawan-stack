@@ -5,37 +5,26 @@ package deviceregistry
 import (
 	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/mohae/deepcopy"
 )
 
 // Device represents the device stored in the registry.
 type Device struct {
 	*ttnpb.EndDevice
-	stored *ttnpb.EndDevice
-
 	key   store.PrimaryKey
 	store store.Client
 }
 
-func newDevice(ed *ttnpb.EndDevice, s store.Client, k store.PrimaryKey, stored *ttnpb.EndDevice) *Device {
-	if stored == nil {
-		stored = deepcopy.Copy(ed).(*ttnpb.EndDevice)
-	}
+func newDevice(ed *ttnpb.EndDevice, s store.Client, k store.PrimaryKey) *Device {
 	return &Device{
 		EndDevice: ed,
 		store:     s,
 		key:       k,
-		stored:    stored,
 	}
 }
 
 // Update updates devices data in the underlying store.Interface.
-func (d *Device) Update() error {
-	if err := d.store.Update(d.key, d.EndDevice, d.stored); err != nil {
-		return err
-	}
-	d.stored = deepcopy.Copy(d.EndDevice).(*ttnpb.EndDevice)
-	return nil
+func (d *Device) Update(fields ...string) error {
+	return d.store.Update(d.key, d.EndDevice, fields...)
 }
 
 // Delete removes device from the underlying store.Interface.

@@ -201,4 +201,20 @@ var values = []struct {
 		map[string]interface{}{"T": time.Unix(42, 42).UTC()},
 		map[string][]byte{"T": mustToBytes(time.Unix(42, 42).UTC())},
 	},
+	{
+		struct{ Interfaces []interface{} }{[]interface{}{
+			nil,
+			(*time.Time)(nil),
+			(*struct{})(nil),
+			time.Time{},
+			&time.Time{},
+			struct{ A int }{42},
+		}},
+		map[string]interface{}{
+			"Interfaces.5.A": 42,
+		},
+		map[string][]byte{
+			"Interfaces.5.A": mustToBytes(42),
+		},
+	},
 }

@@ -2,6 +2,13 @@
 
 package store
 
+import (
+	"fmt"
+	"strings"
+
+	"github.com/kr/pretty"
+)
+
 // NewResultFunc represents a constructor of some arbitrary type.
 type NewResultFunc func() interface{}
 
@@ -12,13 +19,13 @@ type NewResultFunc func() interface{}
 // FindBy returns mapping of PrimaryKey -> value, which match field values specified in filter. Filter represents an AND relation,
 // meaning that only entries matching all the fields in filter should be returned.
 // newResultFunc is the constructor of a single value expected to be returned.
-// Update calculates the diff between old and new values and overwrites stored fields under PrimaryKey with that.
+// Update overwrites stored fields under PrimaryKey with fields of v. Optional fields parameter is a list of fieldpaths separated by a '.', which specifies the subset of v's fields, that should be updated.
 // Delete deletes the value stored under PrimaryKey specified.
 type Client interface {
 	Create(v interface{}) (PrimaryKey, error)
 	Find(id PrimaryKey, v interface{}) error
 	FindBy(filter interface{}, newResult NewResultFunc) (map[PrimaryKey]interface{}, error)
-	Update(id PrimaryKey, new, old interface{}) error
+	Update(id PrimaryKey, v interface{}, fields ...string) error
 	Delete(id PrimaryKey) error
 }
 
@@ -40,6 +47,12 @@ func (cl *typedStoreClient) Find(id PrimaryKey, v interface{}) error {
 	if err != nil {
 		return err
 	}
+	defer func() {
+		if err := recover(); err != nil {
+			pretty.Println(m)
+			fmt.Println(err)
+		}
+	}()
 	return UnmarshalMap(m, v)
 }
 
@@ -60,12 +73,23 @@ func (cl *typedStoreClient) FindBy(filter interface{}, newResult NewResultFunc) 
 	return filtered, nil
 }
 
-func (cl *typedStoreClient) Update(id PrimaryKey, new, old interface{}) error {
-	diff := Diff(MarshalMap(new), MarshalMap(old))
-	if len(diff) == 0 {
-		return nil
+func (cl *typedStoreClient) Update(id PrimaryKey, v interface{}, fields ...string) error {
+	m := MarshalMap(v)
+	pretty.Println(m)
+	if len(fields) == 0 {
+		return cl.TypedStore.Update(id, m)
 	}
-	return cl.TypedStore.Update(id, diff)
+
+	fm := make(map[string]interface{}, len(fields))
+	for _, f := range fields {
+		for k, mv := range m {
+			if strings.HasPrefix(k, f) {
+				fm[k] = mv
+				delete(m, k)
+			}
+		}
+	}
+	return cl.TypedStore.Update(id, fm)
 }
 
 type byteStoreClient struct {
@@ -114,18 +138,23 @@ func (cl *byteStoreClient) FindBy(filter interface{}, newResult NewResultFunc) (
 	return filtered, nil
 }
 
-func (cl *byteStoreClient) Update(id PrimaryKey, new, old interface{}) error {
-	nm, err := MarshalByteMap(new)
+func (cl *byteStoreClient) Update(id PrimaryKey, v interface{}, fields ...string) error {
+	m, err := MarshalByteMap(v)
 	if err != nil {
 		return err
 	}
-	om, err := MarshalByteMap(old)
-	if err != nil {
-		return err
+	if len(fields) == 0 {
+		return cl.ByteStore.Update(id, m)
 	}
-	diff := ByteDiff(nm, om)
-	if len(diff) == 0 {
-		return nil
+
+	fm := make(map[string][]byte, len(fields))
+	for _, f := range fields {
+		for k, mv := range m {
+			if strings.HasPrefix(k, f) {
+				fm[k] = mv
+				delete(m, k)
+			}
+		}
 	}
-	return cl.ByteStore.Update(id, diff)
+	return cl.ByteStore.Update(id, fm)
 }

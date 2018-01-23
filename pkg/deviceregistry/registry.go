@@ -6,7 +6,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/mohae/deepcopy"
 )
 
 // Interface represents the interface exposed by the *Registry.
@@ -33,7 +32,7 @@ func (r *Registry) Create(ed *ttnpb.EndDevice) (*Device, error) {
 	if err != nil {
 		return nil, err
 	}
-	return newDevice(ed, r.store, id, ed), nil
+	return newDevice(ed, r.store, id), nil
 }
 
 // FindBy searches for devices matching specified device fields in underlying store.Interface. The returned slice contains unique devices, matching at least one of values in eds.
@@ -54,7 +53,7 @@ func (r *Registry) FindBy(eds ...*ttnpb.EndDevice) ([]*Device, error) {
 
 	devices := make([]*Device, 0, len(found))
 	for id, ed := range found {
-		devices = append(devices, newDevice(ed, r.store, id, deepcopy.Copy(ed).(*ttnpb.EndDevice)))
+		devices = append(devices, newDevice(ed, r.store, id))
 	}
 	return devices, nil
 }
