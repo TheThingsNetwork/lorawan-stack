@@ -14,16 +14,17 @@ import (
 )
 
 // isNil is safe alternative to IsNil.
-func isNil(v reflect.Value) bool {
-	switch v.Kind() {
-	case reflect.Ptr, reflect.Slice, reflect.Map, reflect.Func, reflect.Chan, reflect.Interface:
-		return v.IsNil()
-	}
-	return false
-}
-
 func isZero(v reflect.Value) bool {
-	return !v.IsValid() || isNil(v) || reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
+	if !v.IsValid() {
+		return true
+	}
+	switch v.Kind() {
+	case reflect.Ptr, reflect.Map, reflect.Func, reflect.Chan, reflect.Interface:
+		return v.IsNil()
+	case reflect.Slice:
+		return v.IsNil() || v.Len() == 0
+	}
+	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }
 
 // flattened returns a copy of m with keys 'flattened'.
