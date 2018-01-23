@@ -138,7 +138,7 @@ func TestAdminInvitations(t *testing.T) {
 		a.So(i.ExpiresAt.IsZero(), should.BeFalse)
 	}
 
-	_, err = is.adminService.RevokeInvitation(ctx, &ttnpb.RevokeInvitationRequest{Email: email})
+	_, err = is.adminService.DeleteInvitation(ctx, &ttnpb.DeleteInvitationRequest{Email: email})
 	a.So(err, should.BeNil)
 
 	invitations, err = is.adminService.ListInvitations(ctx, &pbtypes.Empty{})

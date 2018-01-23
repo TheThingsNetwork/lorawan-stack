@@ -739,15 +739,15 @@ func BenchmarkListInvitationsResponse_InvitationProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestRevokeInvitationRequestProto(t *testing.T) {
+func TestDeleteInvitationRequestProto(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedRevokeInvitationRequest(popr, false)
+	p := NewPopulatedDeleteInvitationRequest(popr, false)
 	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &RevokeInvitationRequest{}
+	msg := &DeleteInvitationRequest{}
 	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -773,10 +773,10 @@ func TestRevokeInvitationRequestProto(t *testing.T) {
 	}
 }
 
-func TestRevokeInvitationRequestMarshalTo(t *testing.T) {
+func TestDeleteInvitationRequestMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedRevokeInvitationRequest(popr, false)
+	p := NewPopulatedDeleteInvitationRequest(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
 	for i := range dAtA {
@@ -786,7 +786,7 @@ func TestRevokeInvitationRequestMarshalTo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &RevokeInvitationRequest{}
+	msg := &DeleteInvitationRequest{}
 	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -801,12 +801,12 @@ func TestRevokeInvitationRequestMarshalTo(t *testing.T) {
 	}
 }
 
-func BenchmarkRevokeInvitationRequestProtoMarshal(b *testing.B) {
+func BenchmarkDeleteInvitationRequestProtoMarshal(b *testing.B) {
 	popr := math_rand.New(math_rand.NewSource(616))
 	total := 0
-	pops := make([]*RevokeInvitationRequest, 10000)
+	pops := make([]*DeleteInvitationRequest, 10000)
 	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedRevokeInvitationRequest(popr, false)
+		pops[i] = NewPopulatedDeleteInvitationRequest(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -819,18 +819,18 @@ func BenchmarkRevokeInvitationRequestProtoMarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func BenchmarkRevokeInvitationRequestProtoUnmarshal(b *testing.B) {
+func BenchmarkDeleteInvitationRequestProtoUnmarshal(b *testing.B) {
 	popr := math_rand.New(math_rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedRevokeInvitationRequest(popr, false))
+		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedDeleteInvitationRequest(popr, false))
 		if err != nil {
 			panic(err)
 		}
 		datas[i] = dAtA
 	}
-	msg := &RevokeInvitationRequest{}
+	msg := &DeleteInvitationRequest{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
@@ -4558,16 +4558,16 @@ func TestListInvitationsResponse_InvitationJSON(t *testing.T) {
 		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
 	}
 }
-func TestRevokeInvitationRequestJSON(t *testing.T) {
+func TestDeleteInvitationRequestJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedRevokeInvitationRequest(popr, true)
+	p := NewPopulatedDeleteInvitationRequest(popr, true)
 	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &RevokeInvitationRequest{}
+	msg := &DeleteInvitationRequest{}
 	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
@@ -5552,12 +5552,12 @@ func TestListInvitationsResponse_InvitationProtoCompactText(t *testing.T) {
 	}
 }
 
-func TestRevokeInvitationRequestProtoText(t *testing.T) {
+func TestDeleteInvitationRequestProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedRevokeInvitationRequest(popr, true)
+	p := NewPopulatedDeleteInvitationRequest(popr, true)
 	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
-	msg := &RevokeInvitationRequest{}
+	msg := &DeleteInvitationRequest{}
 	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -5569,12 +5569,12 @@ func TestRevokeInvitationRequestProtoText(t *testing.T) {
 	}
 }
 
-func TestRevokeInvitationRequestProtoCompactText(t *testing.T) {
+func TestDeleteInvitationRequestProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedRevokeInvitationRequest(popr, true)
+	p := NewPopulatedDeleteInvitationRequest(popr, true)
 	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
-	msg := &RevokeInvitationRequest{}
+	msg := &DeleteInvitationRequest{}
 	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -6881,14 +6881,14 @@ func TestListInvitationsResponse_InvitationVerboseEqual(t *testing.T) {
 		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
 	}
 }
-func TestRevokeInvitationRequestVerboseEqual(t *testing.T) {
+func TestDeleteInvitationRequestVerboseEqual(t *testing.T) {
 	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedRevokeInvitationRequest(popr, false)
+	p := NewPopulatedDeleteInvitationRequest(popr, false)
 	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
-	msg := &RevokeInvitationRequest{}
+	msg := &DeleteInvitationRequest{}
 	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
@@ -7673,10 +7673,10 @@ func BenchmarkListInvitationsResponse_InvitationSize(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestRevokeInvitationRequestSize(t *testing.T) {
+func TestDeleteInvitationRequestSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := math_rand.New(math_rand.NewSource(seed))
-	p := NewPopulatedRevokeInvitationRequest(popr, true)
+	p := NewPopulatedDeleteInvitationRequest(popr, true)
 	size2 := github_com_gogo_protobuf_proto.Size(p)
 	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
 	if err != nil {
@@ -7695,12 +7695,12 @@ func TestRevokeInvitationRequestSize(t *testing.T) {
 	}
 }
 
-func BenchmarkRevokeInvitationRequestSize(b *testing.B) {
+func BenchmarkDeleteInvitationRequestSize(b *testing.B) {
 	popr := math_rand.New(math_rand.NewSource(616))
 	total := 0
-	pops := make([]*RevokeInvitationRequest, 1000)
+	pops := make([]*DeleteInvitationRequest, 1000)
 	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedRevokeInvitationRequest(popr, false)
+		pops[i] = NewPopulatedDeleteInvitationRequest(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

@@ -104,7 +104,7 @@ message ListInvitationsResponse {
   repeated Invitation invitations = 1;
 }
 
-message RevokeInvitationRequest {
+message DeleteInvitationRequest {
   // email is the email the invitation was sent at.
   string email = 1;
 }
@@ -209,8 +209,8 @@ service IsAdmin {
     };
   };
 
-  // RevokeInvitation deletes an invitation.
-  rpc RevokeInvitation(RevokeInvitationRequest) returns (google.protobuf.Empty) {
+  // DeleteInvitation revokes an unused invitation or deletes an expired one.
+  rpc DeleteInvitation(DeleteInvitationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/admin/invitations/{email}"
     };

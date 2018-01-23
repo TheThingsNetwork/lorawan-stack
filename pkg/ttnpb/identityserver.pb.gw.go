@@ -215,8 +215,8 @@ func request_IsAdmin_ListInvitations_0(ctx context.Context, marshaler runtime.Ma
 
 }
 
-func request_IsAdmin_RevokeInvitation_0(ctx context.Context, marshaler runtime.Marshaler, client IsAdminClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq RevokeInvitationRequest
+func request_IsAdmin_DeleteInvitation_0(ctx context.Context, marshaler runtime.Marshaler, client IsAdminClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq DeleteInvitationRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -237,7 +237,7 @@ func request_IsAdmin_RevokeInvitation_0(ctx context.Context, marshaler runtime.M
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "email", err)
 	}
 
-	msg, err := client.RevokeInvitation(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.DeleteInvitation(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -1650,7 +1650,7 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 
 	})
 
-	mux.Handle("DELETE", pattern_IsAdmin_RevokeInvitation_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_IsAdmin_DeleteInvitation_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -1668,14 +1668,14 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_IsAdmin_RevokeInvitation_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_IsAdmin_DeleteInvitation_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_IsAdmin_RevokeInvitation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_IsAdmin_DeleteInvitation_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1819,7 +1819,7 @@ var (
 
 	pattern_IsAdmin_ListInvitations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"admin", "invitations"}, ""))
 
-	pattern_IsAdmin_RevokeInvitation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"admin", "invitations", "email"}, ""))
+	pattern_IsAdmin_DeleteInvitation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"admin", "invitations", "email"}, ""))
 
 	pattern_IsAdmin_GetClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"admin", "clients", "client_id"}, ""))
 
@@ -1851,7 +1851,7 @@ var (
 
 	forward_IsAdmin_ListInvitations_0 = runtime.ForwardResponseMessage
 
-	forward_IsAdmin_RevokeInvitation_0 = runtime.ForwardResponseMessage
+	forward_IsAdmin_DeleteInvitation_0 = runtime.ForwardResponseMessage
 
 	forward_IsAdmin_GetClient_0 = runtime.ForwardResponseMessage
 

@@ -388,8 +388,8 @@ func (s *adminService) ListInvitations(ctx context.Context, req *pbtypes.Empty) 
 	return resp, nil
 }
 
-// RevokeInvitation revokes an invitation that has not been used yet.
-func (s *adminService) RevokeInvitation(ctx context.Context, req *ttnpb.RevokeInvitationRequest) (*pbtypes.Empty, error) {
+// DeleteInvitation revokes an unused invitation or deletes an expired one.
+func (s *adminService) DeleteInvitation(ctx context.Context, req *ttnpb.DeleteInvitationRequest) (*pbtypes.Empty, error) {
 	err := s.enforceAdmin(ctx)
 	if err != nil {
 		return nil, err
