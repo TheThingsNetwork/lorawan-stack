@@ -13,6 +13,8 @@ import (
 
 // CodeHeader is the header where the error code will be stored
 const CodeHeader = "X-TTN-Error-Code"
+
+// IDHeader is the http header where the error ID will be put
 const IDHeader = "X-TTN-Error-ID"
 
 // TypeToHTTPStatusCode returns the corresponding http status code from an error type
@@ -90,10 +92,6 @@ func HTTPStatusToType(status int) errors.Type {
 		return errors.Unknown
 	}
 	return errors.Unknown
-}
-
-type impl struct {
-	*http.Response
 }
 
 type respError http.Response
