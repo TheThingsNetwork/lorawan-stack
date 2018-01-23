@@ -4,6 +4,7 @@ package sql
 
 import (
 	"testing"
+	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/smartystreets/assertions"
@@ -12,64 +13,66 @@ import (
 
 func TestInvitations(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	invitation := &store.InvitationData{
-		Token: "123",
-		Email: "foo@bar.com",
-		TTL:   uint32(3600),
+		Token:     "123",
+		Email:     "foo@bar.com",
+		IssuedAt:  time.Now().UTC(),
+		ExpiresAt: time.Now().UTC().Add(time.Duration(24) * time.Hour),
 	}
-
-	userID := testUsers()["alice"].UserID
 
 	err := s.Invitations.Save(invitation)
 	a.So(err, should.BeNil)
 
 	found, err := s.Invitations.List()
 	a.So(err, should.BeNil)
-	id := ""
 	if a.So(found, should.HaveLength, 1) {
 		i := found[0]
-		id = i.ID
 
-		a.So(i.ID, should.NotBeEmpty)
 		a.So(i.Email, should.Equal, invitation.Email)
-		if a.So(i.SentAt, should.NotBeNil) {
-			a.So(i.SentAt.IsZero(), should.BeFalse)
-		}
-		a.So(i.UsedAt, should.BeNil)
-		a.So(i.GetUserID(), should.BeEmpty)
+		a.So(i.Token, should.Equal, invitation.Token)
+		a.So(invitation.IssuedAt.Equal(i.IssuedAt), should.BeTrue)
+		a.So(invitation.ExpiresAt.Equal(i.ExpiresAt), should.BeTrue)
 	}
 
-	err = s.Invitations.Use(invitation.Token, userID)
+	// reissue invitation
+	invitation.Token = "123456"
+	invitation.ExpiresAt = invitation.ExpiresAt.Add(time.Hour)
+	err = s.Invitations.Save(invitation)
 	a.So(err, should.BeNil)
-
-	err = s.Invitations.Use(invitation.Token, userID)
-	a.So(err, should.NotBeNil)
-	a.So(ErrInvitationAlreadyUsed.Describes(err), should.BeTrue)
 
 	found, err = s.Invitations.List()
 	a.So(err, should.BeNil)
 	if a.So(found, should.HaveLength, 1) {
 		i := found[0]
 
-		a.So(i.ID, should.NotBeEmpty)
 		a.So(i.Email, should.Equal, invitation.Email)
-		if a.So(i.SentAt, should.NotBeNil) {
-			a.So(i.SentAt.IsZero(), should.BeFalse)
-		}
-		if a.So(i.UsedAt, should.NotBeNil) {
-			a.So(i.UsedAt.IsZero(), should.BeFalse)
-		}
-		a.So(i.GetUserID(), should.Equal, userID)
+		a.So(i.Token, should.Equal, invitation.Token)
+		a.So(invitation.IssuedAt.Equal(i.IssuedAt), should.BeTrue)
+		a.So(invitation.ExpiresAt.Equal(i.ExpiresAt), should.BeTrue)
 	}
 
-	err = s.Invitations.Delete(id)
+	err = s.Invitations.Use(invitation.Email, invitation.Token)
 	a.So(err, should.BeNil)
 
-	err = s.Invitations.Use(invitation.Token, userID)
+	err = s.Invitations.Use(invitation.Email, invitation.Token)
 	a.So(err, should.NotBeNil)
 	a.So(ErrInvitationNotFound.Describes(err), should.BeTrue)
+
+	found, err = s.Invitations.List()
+	a.So(err, should.BeNil)
+	a.So(found, should.HaveLength, 0)
+
+	err = s.Invitations.Save(invitation)
+	a.So(err, should.BeNil)
+
+	found, err = s.Invitations.List()
+	a.So(err, should.BeNil)
+	a.So(found, should.HaveLength, 1)
+
+	err = s.Invitations.Delete(invitation.Email)
+	a.So(err, should.BeNil)
 
 	found, err = s.Invitations.List()
 	a.So(err, should.BeNil)

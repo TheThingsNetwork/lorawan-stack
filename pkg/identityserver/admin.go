@@ -10,6 +10,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/random"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -312,15 +313,31 @@ func (s *adminService) SendInvitation(ctx context.Context, req *ttnpb.SendInvita
 		return nil, err
 	}
 
+	// check whether email is already registered or not
+	found, err := s.store.Users.GetByEmail(req.Email, s.factories.user)
+	if err != nil && !sql.ErrUserEmailNotFound.Describes(err) {
+		return nil, err
+	}
+
+	// if email is already being used return error
+	if found != nil {
+		return nil, ErrEmailAddressAlreadyUsed.New(errors.Attributes{
+			"email": req.Email,
+		})
+	}
+
+	// otherwise proceed to issue invitation
 	settings, err := s.store.Settings.Get()
 	if err != nil {
 		return nil, err
 	}
 
+	now := time.Now().UTC()
 	invitation := &store.InvitationData{
-		Token: random.String(64),
-		Email: req.Email,
-		TTL:   uint32(settings.InvitationTokenTTL.Seconds()),
+		Token:     random.String(64),
+		Email:     req.Email,
+		IssuedAt:  now,
+		ExpiresAt: now.Add(settings.InvitationTokenTTL),
 	}
 
 	err = s.store.Invitations.Save(invitation)
@@ -335,7 +352,7 @@ func (s *adminService) SendInvitation(ctx context.Context, req *ttnpb.SendInvita
 	})
 }
 
-func (s *adminService) ListInvitations(ctx context.Context, req *ttnpb.ListInvitationsRequest) (*ttnpb.ListInvitationsResponse, error) {
+func (s *adminService) ListInvitations(ctx context.Context, req *pbtypes.Empty) (*ttnpb.ListInvitationsResponse, error) {
 	err := s.enforceAdmin(ctx)
 	if err != nil {
 		return nil, err
@@ -350,26 +367,11 @@ func (s *adminService) ListInvitations(ctx context.Context, req *ttnpb.ListInvit
 		Invitations: make([]*ttnpb.ListInvitationsResponse_Invitation, 0, len(invitations)),
 	}
 
-	// filter results manually
 	for _, invitation := range invitations {
-		switch filter := req.FilterUsed; filter {
-		case ttnpb.FILTER_USED:
-			if invitation.UsedAt == nil {
-				continue
-			}
-		case ttnpb.FILTER_UNUSED:
-			if invitation.UsedAt != nil {
-				continue
-			}
-		}
-
 		resp.Invitations = append(resp.Invitations, &ttnpb.ListInvitationsResponse_Invitation{
-			ID:             invitation.ID,
-			Email:          invitation.Email,
-			SentAt:         invitation.SentAt,
-			UsedAt:         invitation.UsedAt,
-			TTL:            invitation.TTL,
-			UserIdentifier: ttnpb.UserIdentifier{invitation.GetUserID()},
+			Email:     invitation.Email,
+			IssuedAt:  invitation.IssuedAt,
+			ExpiresAt: invitation.ExpiresAt,
 		})
 	}
 
@@ -382,7 +384,7 @@ func (s *adminService) RevokeInvitation(ctx context.Context, req *ttnpb.RevokeIn
 		return nil, err
 	}
 
-	return nil, s.store.Invitations.Delete(req.ID)
+	return nil, s.store.Invitations.Delete(req.Email)
 }
 
 func (s *adminService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*ttnpb.Client, error) {

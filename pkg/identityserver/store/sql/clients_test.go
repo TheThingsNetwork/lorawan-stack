@@ -56,7 +56,6 @@ func testClientCreate(t testing.TB, s *Store) {
 }
 
 func TestClientList(t *testing.T) {
-	a := assertions.New(t)
 	s := testStore(t, database)
 
 	clients, err := s.Clients.List(clientFactory)

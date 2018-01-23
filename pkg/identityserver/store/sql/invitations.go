@@ -3,8 +3,6 @@
 package sql
 
 import (
-	"time"
-
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 )
@@ -32,65 +30,21 @@ func (s *InvitationStore) save(q db.QueryContext, data *store.InvitationData) er
 			INTO invitations (
 				token,
 				email,
-				sent_at,
-				ttl
+				issued_at,
+				expires_at
 			)
 			VALUES (
 				:token,
 				:email,
-				current_timestamp(),
-				:ttl
-			)`, data)
-	return err
-}
-
-// Use sets `used_at` to the current timestamp and links the invitation to an user ID.
-func (s *InvitationStore) Use(token, userID string) error {
-	err := s.transact(func(tx *db.Tx) error {
-		used, err := s.isUsed(tx, token)
-		if err != nil {
-			return err
-		}
-
-		if used {
-			return ErrInvitationAlreadyUsed.New(nil)
-		}
-
-		return s.use(tx, token, userID)
-	})
-
-	return err
-}
-
-func (s *InvitationStore) isUsed(q db.QueryContext, token string) (bool, error) {
-	var usedAt *time.Time
-	err := q.SelectOne(&usedAt, `SELECT used_at FROM invitations WHERE token = $1`, token)
-	if db.IsNoRows(err) {
-		return false, ErrInvitationNotFound.New(nil)
-	}
-	if err != nil {
-		return false, err
-	}
-	if usedAt == nil {
-		return false, nil
-	}
-	return true, nil
-}
-
-func (s *InvitationStore) use(q db.QueryContext, token, userID string) error {
-	id := ""
-	err := q.SelectOne(
-		&id,
-		`UPDATE
-				invitations
-			SET used_at = current_timestamp(), user_id = $1
-			WHERE token = $2
-			RETURNING id`,
-		userID,
-		token)
-	if db.IsNoRows(err) {
-		return ErrInvitationNotFound.New(nil)
-	}
+				:issued_at,
+				:expires_at
+			)
+			ON CONFLICT (email)
+			DO UPDATE SET
+				token = excluded.token,
+				issued_at = excluded.issued_at,
+				expires_at = excluded.expires_at
+		`, data)
 	return err
 }
 
@@ -104,12 +58,10 @@ func (s *InvitationStore) list(q db.QueryContext) ([]*store.InvitationData, erro
 	err := q.Select(
 		&invitations,
 		`SELECT
-				id,
+				token,
 				email,
-				sent_at,
-				ttl,
-				used_at,
-				user_id
+				issued_at,
+				expires_at
 			FROM invitations`)
 	if err != nil {
 		return nil, err
@@ -122,12 +74,33 @@ func (s *InvitationStore) list(q db.QueryContext) ([]*store.InvitationData, erro
 	return invitations, nil
 }
 
-// Delete deletes an invitation by its ID.
-func (s *InvitationStore) Delete(ID string) error {
-	return s.delete(s.queryer(), ID)
+// Use deletes an invitation but also takes into account the token binded to it.
+func (s *InvitationStore) Use(email, token string) error {
+	return s.use(s.queryer(), email, token)
 }
 
-func (s *InvitationStore) delete(q db.QueryContext, ID string) error {
-	_, err := q.Exec(`DELETE FROM invitations WHERE id = $1`, ID)
+func (s *InvitationStore) use(q db.QueryContext, email, token string) error {
+	id := ""
+	err := q.SelectOne(
+		&id,
+		`DELETE
+			FROM invitations
+			WHERE email = $1 AND token = $2
+			RETURNING id`,
+		email,
+		token)
+	if db.IsNoRows(err) {
+		return ErrInvitationNotFound.New(nil)
+	}
+	return err
+}
+
+// Delete deletes an invitation by its ID.
+func (s *InvitationStore) Delete(email string) error {
+	return s.delete(s.queryer(), email)
+}
+
+func (s *InvitationStore) delete(q db.QueryContext, email string) error {
+	_, err := q.Exec(`DELETE FROM invitations WHERE email = $1`, email)
 	return err
 }

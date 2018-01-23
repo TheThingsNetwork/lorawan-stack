@@ -11,7 +11,7 @@ import (
 
 // IsExpired checks whether if the invitation is expired or not.
 func (i *ListInvitationsResponse_Invitation) IsExpired() bool {
-	return i.SentAt.Add(time.Duration(i.TTL) * time.Second).Before(time.Now().UTC())
+	return i.ExpiresAt.Before(time.Now().UTC())
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.

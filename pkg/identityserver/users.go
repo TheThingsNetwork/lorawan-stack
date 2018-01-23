@@ -29,8 +29,8 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		return nil, err
 	}
 
-	// check for invitation token when self registration is disallowed
-	if req.InvitationToken == "" && !settings.SelfRegistration {
+	// if self-registration is disabled check that an invitation token is provided
+	if !settings.SelfRegistration && req.InvitationToken == "" {
 		return nil, ErrInvitationTokenMissing.New(nil)
 	}
 
@@ -38,14 +38,6 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 	if !util.IsIDAllowed(req.User.UserID, settings.BlacklistedIDs) {
 		return nil, ErrBlacklistedID.New(errors.Attributes{
 			"id": req.User.UserID,
-		})
-	}
-
-	// check for allowed emails
-	if !util.IsEmailAllowed(req.User.Email, settings.AllowedEmails) {
-		return nil, ErrEmailAddressNotAllowed.New(errors.Attributes{
-			"email":          req.User.Email,
-			"allowed_emails": settings.AllowedEmails,
 		})
 	}
 
@@ -62,19 +54,27 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		State:          ttnpb.STATE_PENDING,
 	}
 
+	if !settings.AdminApproval {
+		user.State = ttnpb.STATE_APPROVED
+	}
+
 	fns := []func(*store.Store) error{
 		func(store *store.Store) error {
 			return store.Users.Create(user)
 		},
 	}
 
-	if !settings.AdminApproval {
-		user.State = ttnpb.STATE_APPROVED
-	}
-
-	if !settings.SelfRegistration {
+	// check whether the provided email is allowed when an invitation token wasn't provided
+	if req.InvitationToken == "" {
+		if !util.IsEmailAllowed(req.User.Email, settings.AllowedEmails) {
+			return nil, ErrEmailAddressNotAllowed.New(errors.Attributes{
+				"email":          req.User.Email,
+				"allowed_emails": settings.AllowedEmails,
+			})
+		}
+	} else {
 		fns = append(fns, func(store *store.Store) error {
-			return store.Invitations.Use(req.InvitationToken, user.UserID)
+			return store.Invitations.Use(req.User.Email, req.InvitationToken)
 		})
 	}
 

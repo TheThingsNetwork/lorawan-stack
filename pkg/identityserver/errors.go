@@ -14,6 +14,7 @@ func init() {
 	ErrEmailAlreadyValidated.Register()
 	ErrValidationTokenExpired.Register()
 	ErrInvitationTokenMissing.Register()
+	ErrEmailAddressAlreadyUsed.Register()
 }
 
 // ErrBlacklistedID is returned when trying to register an entity using a blacklisted ID.
@@ -91,5 +92,13 @@ var ErrValidationTokenExpired = &errors.ErrDescriptor{
 var ErrInvitationTokenMissing = &errors.ErrDescriptor{
 	MessageFormat: "Self account registration is disabled: a valid invitation token must be provided",
 	Code:          9,
+	Type:          errors.Unauthorized,
+}
+
+// ErrEmailAddressAlreadyUsed is returned when an admin is trying to send an
+// invitation to an email that is already being used by an user.
+var ErrEmailAddressAlreadyUsed = &errors.ErrDescriptor{
+	MessageFormat: "Failed to issue invitation: the email address `{email}` is already in use",
+	Code:          10,
 	Type:          errors.Unauthorized,
 }

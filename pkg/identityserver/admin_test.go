@@ -69,20 +69,13 @@ func TestAdminInvitations(t *testing.T) {
 		a.So(invitation.Token, should.NotBeEmpty)
 	}
 
-	// gather the id to delete it later
-	id := ""
-
-	invitations, err := is.adminService.ListInvitations(ctx, &ttnpb.ListInvitationsRequest{})
+	invitations, err := is.adminService.ListInvitations(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	if a.So(invitations.Invitations, should.HaveLength, 1) {
 		i := invitations.Invitations[0]
 		a.So(i.Email, should.Equal, email)
-		a.So(i.ID, should.NotBeEmpty)
-		id = i.ID
-		a.So(i.UsedAt, should.BeNil)
-		a.So(i.GetUserID(), should.BeEmpty)
-		a.So(i.SentAt.IsZero(), should.BeFalse)
-		a.So(i.TTL, should.NotEqual, uint32(0))
+		a.So(i.IssuedAt.IsZero(), should.BeFalse)
+		a.So(i.ExpiresAt.IsZero(), should.BeFalse)
 	}
 
 	// use invitation
@@ -100,7 +93,7 @@ func TestAdminInvitations(t *testing.T) {
 	user := ttnpb.User{
 		UserIdentifier: ttnpb.UserIdentifier{"invitation-user"},
 		Password:       "lol",
-		Email:          "foofofofo@bar.com",
+		Email:          email,
 		Name:           "HI",
 	}
 
@@ -122,27 +115,33 @@ func TestAdminInvitations(t *testing.T) {
 	a.So(found.Password, should.BeEmpty)
 
 	// check invitation was used
-	invitations, err = is.adminService.ListInvitations(ctx, &ttnpb.ListInvitationsRequest{})
+	invitations, err = is.adminService.ListInvitations(ctx, &pbtypes.Empty{})
+	a.So(err, should.BeNil)
+	a.So(invitations.Invitations, should.HaveLength, 0)
+
+	// can't send invitation to an already used email address
+	_, err = is.adminService.SendInvitation(ctx, &ttnpb.SendInvitationRequest{Email: email})
+	a.So(err, should.NotBeNil)
+	a.So(ErrEmailAddressAlreadyUsed.Describes(err), should.BeTrue)
+
+	// send a new invitation but revoke it later
+	email = "bar@bazqux.com"
+	_, err = is.adminService.SendInvitation(ctx, &ttnpb.SendInvitationRequest{Email: email})
+	a.So(err, should.BeNil)
+
+	invitations, err = is.adminService.ListInvitations(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	if a.So(invitations.Invitations, should.HaveLength, 1) {
 		i := invitations.Invitations[0]
 		a.So(i.Email, should.Equal, email)
-		a.So(i.ID, should.NotBeEmpty)
-		a.So(i.UsedAt, should.NotBeNil)
-		a.So(i.GetUserID(), should.Equal, user.UserID)
-		a.So(i.SentAt.IsZero(), should.BeFalse)
-		a.So(i.TTL, should.NotEqual, uint32(0))
+		a.So(i.IssuedAt.IsZero(), should.BeFalse)
+		a.So(i.ExpiresAt.IsZero(), should.BeFalse)
 	}
 
-	// list unused invitations only
-	invitations, err = is.adminService.ListInvitations(ctx, &ttnpb.ListInvitationsRequest{FilterUsed: ttnpb.FILTER_UNUSED})
-	a.So(err, should.BeNil)
-	a.So(invitations.Invitations, should.HaveLength, 0)
-
-	_, err = is.adminService.RevokeInvitation(ctx, &ttnpb.RevokeInvitationRequest{ID: id})
+	_, err = is.adminService.RevokeInvitation(ctx, &ttnpb.RevokeInvitationRequest{Email: email})
 	a.So(err, should.BeNil)
 
-	invitations, err = is.adminService.ListInvitations(ctx, &ttnpb.ListInvitationsRequest{})
+	invitations, err = is.adminService.ListInvitations(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	a.So(invitations.Invitations, should.HaveLength, 0)
 }

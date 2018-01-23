@@ -78,7 +78,7 @@ func TestUserCreate(t *testing.T) {
 
 func TestUserList(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	// TODO(gomezjdaniel): correct result is 3 instead of 4 as the example user
 	// attributer wasn't deleted it.
