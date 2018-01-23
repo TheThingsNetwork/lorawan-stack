@@ -164,6 +164,8 @@ func New(c *component.Component, config *Config, opts ...Option) (*IdentityServe
 		opt(is)
 	}
 
+	c.RegisterGRPC(is)
+
 	return is, nil
 }
 
@@ -199,3 +201,8 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 
 // RegisterHandlers registers gRPC handlers.
 func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {}
+
+// Roles returns the roles that the identity server fulfils
+func (is *IdentityServer) Roles() []ttnpb.PeerInfo_Role {
+	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_IDENTITY_SERVER}
+}
