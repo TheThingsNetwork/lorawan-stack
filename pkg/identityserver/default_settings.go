@@ -12,6 +12,10 @@ import (
 // when the database is created for the first time.
 var defaultSettings = &ttnpb.IdentityServerSettings{
 	BlacklistedIDs: []string{
+		"me",
+		"self",
+		"this",
+		"myself",
 		"admin",
 		"administrator",
 		"root",
