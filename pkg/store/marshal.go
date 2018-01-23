@@ -13,6 +13,19 @@ import (
 	"github.com/gogo/protobuf/proto"
 )
 
+// isNil is safe alternative to IsNil.
+func isNil(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.Ptr, reflect.Slice, reflect.Map, reflect.Func, reflect.Chan, reflect.Interface:
+		return v.IsNil()
+	}
+	return false
+}
+
+func isZero(v reflect.Value) bool {
+	return !v.IsValid() || isNil(v) || reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
+}
+
 // flattened returns a copy of m with keys 'flattened'.
 // If the map contains sub-maps, the values of these sub-maps are set under the root map, each level separated by a dot
 func flattened(m map[string]interface{}) (out map[string]interface{}) {
@@ -45,13 +58,17 @@ func mapify(v interface{}, keep func(rv reflect.Value) bool) interface{} {
 	case reflect.Map:
 		m := make(map[string]interface{}, rv.Len())
 		for _, sk := range rv.MapKeys() {
-			m[sk.String()] = mapify(rv.MapIndex(sk).Interface(), keep)
+			m[sk.String()] = mapify(reflect.ValueOf(rv.MapIndex(sk).Interface()).Interface(), keep)
 		}
 		return m
 	case reflect.Slice, reflect.Array:
 		m := make(map[string]interface{}, rv.Len())
 		for i := 0; i < rv.Len(); i++ {
-			m[strconv.Itoa(i)] = mapify(rv.Index(i).Interface(), keep)
+			iv := reflect.ValueOf(rv.Index(i).Interface())
+			if isZero(iv) {
+				continue
+			}
+			m[strconv.Itoa(i)] = mapify(iv.Interface(), keep)
 		}
 		return m
 	default:
@@ -116,19 +133,6 @@ func marshalNested(v reflect.Value) interface{} {
 		return s
 	}
 	return v.Interface()
-}
-
-// isNil is safe alternative to IsNil.
-func isNil(v reflect.Value) bool {
-	switch v.Kind() {
-	case reflect.Ptr, reflect.Slice, reflect.Map, reflect.Func, reflect.Chan, reflect.Interface:
-		return v.IsNil()
-	}
-	return false
-}
-
-func isZero(v reflect.Value) bool {
-	return !v.IsValid() || isNil(v) || reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }
 
 // marhshal converts the given struct s to a map[string]interface{}

@@ -89,3 +89,12 @@ func TestFlattened(t *testing.T) {
 		assertions.New(t).So(flattened(tc.in), should.Resemble, tc.out)
 	}
 }
+
+func TestIsZero(t *testing.T) {
+	for _, tc := range []struct {
+		v      interface{}
+		isZero bool
+	}{} {
+		assertions.New(t).So(isNil(reflect.ValueOf(tc.v)), should.Equal, tc.isZero)
+	}
+}
