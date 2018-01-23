@@ -132,7 +132,10 @@ func Initialize(name string, defaults interface{}, opts ...Option) *Manager {
 		opt(m)
 	}
 
-	m.viper.BindPFlags(m.flags)
+	err := m.viper.BindPFlags(m.flags)
+	if err != nil {
+		panic(err)
+	}
 
 	return m
 }
@@ -148,7 +151,10 @@ func (m *Manager) WithConfig(defaults interface{}) *pflag.FlagSet {
 		m.setDefaults("", flags, defaults)
 	}
 
-	m.viper.BindPFlags(flags)
+	err := m.viper.BindPFlags(flags)
+	if err != nil {
+		panic(err)
+	}
 
 	return flags
 }
@@ -183,17 +189,11 @@ func (m *Manager) Unmarshal(result interface{}) error {
 			stringToByteSliceHook,
 		),
 	})
-
 	if err != nil {
 		return err
 	}
 
-	err = d.Decode(m.viper.AllSettings())
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return d.Decode(m.viper.AllSettings())
 }
 
 // the path must be in default paths
@@ -346,8 +346,8 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 					len := val.Len()
 					defs := make([]string, 0, len)
 
-					for i := 0; i < len; i++ {
-						c := val.Index(i).Interface()
+					for j := 0; j < len; j++ {
+						c := val.Index(j).Interface()
 						str := fmt.Sprintf("%v", c)
 
 						if s, ok := c.(fmt.Stringer); ok {

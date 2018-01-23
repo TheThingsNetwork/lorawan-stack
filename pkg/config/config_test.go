@@ -16,10 +16,6 @@ type EmbeddedConfig struct {
 	EmbeddedString string `name:"embedded-string" description:"Some embedded string"`
 }
 
-type EmbeddedConfigPtr struct {
-	EmbeddedString string `name:"embeddedptr-string" description:"Some embedded string"`
-}
-
 type NestedConfig struct {
 	String string `name:"string" description:"a nested string"`
 }
