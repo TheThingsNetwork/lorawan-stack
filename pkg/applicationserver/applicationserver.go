@@ -74,6 +74,7 @@ func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 
 // RegisterHandlers registers gRPC handlers.
 func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
+	ttnpb.RegisterAsApplicationDownlinkQueueHandler(as.Context(), s, conn)
 	ttnpb.RegisterAsDeviceRegistryHandler(as.Context(), s, conn)
 }
 
