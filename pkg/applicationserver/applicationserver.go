@@ -26,15 +26,14 @@ type ApplicationServer struct {
 
 // Config represents the ApplicationServer configuration.
 type Config struct {
-	Component *component.Component
-	Registry  deviceregistry.Interface
+	Registry deviceregistry.Interface
 }
 
 // New returns new *ApplicationServer.
 func New(c *component.Component, conf *Config) *ApplicationServer {
 	return &ApplicationServer{
 		Component:   c,
-		RegistryRPC: deviceregistry.NewRPC(conf.Component, conf.Registry), // TODO: Add checks
+		RegistryRPC: deviceregistry.NewRPC(c, conf.Registry), // TODO: Add checks
 		registry:    conf.Registry,
 	}
 }
