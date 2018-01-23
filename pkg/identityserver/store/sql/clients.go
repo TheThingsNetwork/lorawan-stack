@@ -223,11 +223,11 @@ func (s *ClientStore) list(q db.QueryContext) ([]*ttnpb.Client, error) {
 }
 
 // ListByUser returns all the clients created by the client.
-func (s *ClientStore) ListByUser(clientID string, factory store.ClientFactory) ([]store.Client, error) {
+func (s *ClientStore) ListByUser(userID string, factory store.ClientFactory) ([]store.Client, error) {
 	var result []store.Client
 
 	err := s.transact(func(tx *db.Tx) error {
-		clients, err := s.userClients(tx, clientID)
+		clients, err := s.userClients(tx, userID)
 		if err != nil {
 			return err
 		}
@@ -254,7 +254,7 @@ func (s *ClientStore) ListByUser(clientID string, factory store.ClientFactory) (
 	return result, nil
 }
 
-func (s *ClientStore) userClients(q db.QueryContext, clientID string) ([]*ttnpb.Client, error) {
+func (s *ClientStore) userClients(q db.QueryContext, userID string) ([]*ttnpb.Client, error) {
 	var clients []struct {
 		CreatorID       string
 		GrantsConverted db.Int32Slice
@@ -277,7 +277,7 @@ func (s *ClientStore) userClients(q db.QueryContext, clientID string) ([]*ttnpb.
 				updated_at
 			FROM clients
 			WHERE	creator_id = $1`,
-		clientID)
+		userID)
 
 	if err != nil {
 		return nil, err

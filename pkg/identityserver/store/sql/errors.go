@@ -237,7 +237,7 @@ var ErrSettingsNotFound = &errors.ErrDescriptor{
 	Type:          errors.NotFound,
 }
 
-// InvitationNotFound is returned when trying to use an invitation that does not exist.
+// ErrInvitationNotFound is returned when trying to use an invitation that does not exist.
 var ErrInvitationNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Invitation not found",
 	Code:          408,
