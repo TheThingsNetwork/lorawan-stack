@@ -94,10 +94,10 @@ message ListInvitationsResponse {
     // issued_at denotes when the invitation was issued.
     google.protobuf.Timestamp issued_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-    // ttl is the duration in seconds the invitation will be valid after being issued.
-    // This value is set on the moment the invitation is issued based on the
-    // `InvitationTokenTTL` setting.
-    google.protobuf.Duration ttl = 3 [(gogoproto.customname) = "TTL", (gogoproto.nullable) = false, (gogoproto.stdduration) = true];
+    // expires_at denotes the time the invitation will expire.
+    // This timestamp is based on the setting `InvitationTokenTTL` and is set
+    // on the time the invitation is issued.
+    google.protobuf.Timestamp expires_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   }
   // invitation is the list of sent invitations.
   repeated Invitation invitations = 1;
