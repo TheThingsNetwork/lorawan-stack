@@ -31,6 +31,10 @@ for f in ${protos[@]}; do
     genPaths+=(${path})
   fi
 
+  if grep -q '(google\.protobuf\.Empty)' "${f}"; then
+    perlArgs+=("-pe s!empty\.Empty!types.Empty!g;")
+  fi
+
   if grep -q '(gogoproto.customname)' "${f}"; then
     for l in `grep '(gogoproto.customname)' "${f}"`; do
       from=`echo "${l}" | perl \
