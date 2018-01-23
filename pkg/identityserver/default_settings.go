@@ -50,4 +50,5 @@ var defaultSettings = &ttnpb.IdentityServerSettings{
 	},
 	AllowedEmails:      []string{"*"},
 	ValidationTokenTTL: time.Hour,
+	InvitationTokenTTL: time.Duration(48) * time.Hour,
 }
