@@ -42,7 +42,7 @@ func (r *Registry) FindBy(eds ...*ttnpb.EndDevice) ([]*Device, error) {
 		if ed == nil {
 			return nil, errors.Errorf("Device %d is nil", i)
 		}
-		m, err := r.store.FindBy(ed, func() interface{} { return &ttnpb.EndDevice{} })
+		m, err := r.store.FindBy(ed, func() interface{} { return &ttnpb.EndDevice{} }, "EndDeviceIdentifiers")
 		if err != nil {
 			return nil, err
 		}
