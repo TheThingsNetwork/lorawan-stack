@@ -15,9 +15,13 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
 
-			gs := gatewayserver.New(c, &config.GS)
+			gs, err := gatewayserver.New(c, &config.GS)
+			if err != nil {
+				return err
+			}
 			_ = gs
 
+			logger.Info("Gateway server initialized, starting...")
 			return c.Start()
 		},
 	}

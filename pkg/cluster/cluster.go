@@ -23,6 +23,8 @@ type Cluster interface {
 	Join() error
 	// Leave the cluster.
 	Leave() error
+	// GetPeers returns peers with the given role and the given tags.
+	GetPeers(role ttnpb.PeerInfo_Role, tags []string) []Peer
 	// GetPeer returns a peer with the given role and the given tags.
 	// If the cluster contains more than one peer, the shardKey is used to select the right peer.
 	// Tagging and sharding is not part of the reference implementation. The idea of tagging is another layer of filtering
@@ -137,7 +139,7 @@ func (c *cluster) Leave() error {
 	return nil
 }
 
-func (c *cluster) GetPeer(role ttnpb.PeerInfo_Role, tags []string, shardKey []byte) Peer {
+func (c *cluster) GetPeers(role ttnpb.PeerInfo_Role, tags []string) []Peer {
 	var matches []Peer
 	for _, peer := range c.peers {
 		if !peer.HasRole(role) {
@@ -152,6 +154,11 @@ func (c *cluster) GetPeer(role ttnpb.PeerInfo_Role, tags []string, shardKey []by
 			matches = append(matches, peer)
 		}
 	}
+	return matches
+}
+
+func (c *cluster) GetPeer(role ttnpb.PeerInfo_Role, tags []string, shardKey []byte) Peer {
+	matches := c.GetPeers(role, tags)
 	if len(matches) == 1 {
 		// TODO: Select the right SubConn for shardKey?
 		return matches[0]

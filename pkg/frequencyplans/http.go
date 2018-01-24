@@ -52,7 +52,7 @@ func (baseURI storeFetchingConfiguration) GetList() ([]frequencyPlanDescription,
 
 	buffer, err := fetchHTTPContent(url)
 	if err != nil {
-		return nil, errors.NewWithCause("Fetching content failed", err)
+		return nil, errors.NewWithCause(fmt.Sprintf("Fetching content of %s failed", url), err)
 	}
 
 	err = yaml.Unmarshal(buffer, &list)
@@ -70,7 +70,7 @@ func (baseURI storeFetchingConfiguration) GetFrequencyPlan(filename string) (ttn
 
 	buffer, err := fetchHTTPContent(url)
 	if err != nil {
-		return frequencyPlan, errors.NewWithCause("Fetching content failed", err)
+		return frequencyPlan, errors.NewWithCause(fmt.Sprintf("Fetching content of %s failed", url), err)
 	}
 
 	err = yaml.Unmarshal(buffer, &frequencyPlan)

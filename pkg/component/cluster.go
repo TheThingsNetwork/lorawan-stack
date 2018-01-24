@@ -15,6 +15,12 @@ func (c *Component) initCluster() (err error) {
 	return nil
 }
 
+// GetPeers returns cluster peers with the given role and the given tags.
+// See package ../cluster for more information.
+func (c *Component) GetPeers(role ttnpb.PeerInfo_Role, tags []string) []cluster.Peer {
+	return c.cluster.GetPeers(role, tags)
+}
+
 // GetPeer returns a cluster peer with the given role and the given tags.
 // See package ../cluster for more information.
 func (c *Component) GetPeer(role ttnpb.PeerInfo_Role, tags []string, shardKey []byte) cluster.Peer {

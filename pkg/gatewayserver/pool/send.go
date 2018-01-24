@@ -11,19 +11,31 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
+var ErrGatewayNotConnected = &errors.ErrDescriptor{
+	MessageFormat:  "Gateway { gateway_id } not connected",
+	Code:           1,
+	Type:           errors.NotFound,
+	SafeAttributes: []string{"gateway_id"},
+}
+
+func init() {
+	ErrGatewayNotConnected.Register()
+}
+
 func (p *pool) Send(gatewayInfo ttnpb.GatewayIdentifier, downstream *ttnpb.GatewayDown) error {
 	if downstream == nil || downstream.DownlinkMessage == nil {
 		return errors.New("No downlink")
 	}
 
-	gateway, err := p.store.Fetch(gatewayInfo)
-	if err != nil {
-		return errors.New("No network link to this gateway")
+	gateway, ok := p.store.Fetch(gatewayInfo)
+	if !ok {
+		return ErrGatewayNotConnected.New(errors.Attributes{"gateway_id": gatewayInfo.GatewayID})
 	}
 
 	span := scheduling.Span{
 		Start: scheduling.ConcentratorTime(downstream.DownlinkMessage.TxMetadata.Timestamp),
 	}
+	var err error
 	span.Duration, err = toa.Compute(downstream.DownlinkMessage.RawPayload, downstream.DownlinkMessage.Settings)
 	if err != nil {
 		return err

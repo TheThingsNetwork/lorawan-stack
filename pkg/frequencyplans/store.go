@@ -15,7 +15,7 @@ type frequencyPlanDescription struct {
 	// Description in Mhz
 	Description string `yaml:"description"`
 	// BaseFrequency in Mhz
-	BaseFrequency uint8 `yaml:"base_freq"`
+	BaseFrequency uint16 `yaml:"base_freq"`
 	// Filename of the frequency plan within the repo
 	FPFilename string `yaml:"file"`
 

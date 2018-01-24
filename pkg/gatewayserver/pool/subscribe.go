@@ -141,8 +141,6 @@ func (p *pool) receivingRoutine(c connection, entry *gatewayStoreEntry, upstream
 			p.store.Remove(c.GatewayInfo)
 			return
 		case upstreamChannel <- upstreamMessage:
-		default:
-			c.Logger.Debug("No handler for upstream message, dropping message")
 		}
 	}
 }

@@ -32,8 +32,8 @@ type gatewayStore struct {
 func (s *gatewayStore) Store(gatewayID ttnpb.GatewayIdentifier, entry *gatewayStoreEntry) {
 	s.mu.Lock()
 
-	res, err := s.fetch(gatewayID)
-	if err == nil {
+	res, ok := s.fetch(gatewayID)
+	if ok {
 		close(res.channel)
 	}
 	s.store[gatewayID] = entry
@@ -41,28 +41,28 @@ func (s *gatewayStore) Store(gatewayID ttnpb.GatewayIdentifier, entry *gatewaySt
 	s.mu.Unlock()
 }
 
-func (s *gatewayStore) fetch(gatewayID ttnpb.GatewayIdentifier) (*gatewayStoreEntry, error) {
+func (s *gatewayStore) fetch(gatewayID ttnpb.GatewayIdentifier) (*gatewayStoreEntry, bool) {
 	outgoingChannel, ok := s.store[gatewayID]
 	if !ok {
-		return nil, errors.New("Gateway not found")
+		return nil, false
 	}
 
-	return outgoingChannel, nil
+	return outgoingChannel, true
 }
 
-func (s *gatewayStore) Fetch(gatewayID ttnpb.GatewayIdentifier) (*gatewayStoreEntry, error) {
+func (s *gatewayStore) Fetch(gatewayID ttnpb.GatewayIdentifier) (*gatewayStoreEntry, bool) {
 	s.mu.Lock()
-	res, err := s.fetch(gatewayID)
+	res, ok := s.fetch(gatewayID)
 	s.mu.Unlock()
 
-	return res, err
+	return res, ok
 }
 
 func (s *gatewayStore) Remove(gatewayID ttnpb.GatewayIdentifier) {
 	s.mu.Lock()
 
-	res, err := s.fetch(gatewayID)
-	if err == nil {
+	res, ok := s.fetch(gatewayID)
+	if ok {
 		close(res.channel)
 	}
 	delete(s.store, gatewayID)
@@ -112,9 +112,9 @@ func NewPool(logger log.Interface, sendTimeout time.Duration) Pool {
 }
 
 func (p *pool) GetGatewayObservations(gatewayInfo *ttnpb.GatewayIdentifier) (*ttnpb.GatewayObservations, error) {
-	gateway, err := p.store.Fetch(*gatewayInfo)
-	if err != nil {
-		return nil, err
+	gateway, ok := p.store.Fetch(*gatewayInfo)
+	if !ok {
+		return nil, ErrGatewayNotConnected.New(errors.Attributes{"gateway_id": gatewayInfo.GatewayID})
 	}
 
 	gateway.observationsLock.RLock()

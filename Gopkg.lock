@@ -14,16 +14,16 @@
   revision = "de5bf2ad457846296e2031421a34e2568e304e35"
 
 [[projects]]
-  branch = "master"
   name = "github.com/RangelReale/osin"
   packages = ["."]
   revision = "92fc3c3539125bddc695a988974243479d82f8b4"
+  version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/TheThingsNetwork/go-cayenne-lib"
   packages = ["cayennelpp"]
   revision = "ba5c7ac69c198562633ee3ad4c90e16b4b12b88d"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -41,7 +41,7 @@
   branch = "master"
   name = "github.com/cockroachdb/cockroach-go"
   packages = ["crdb"]
-  revision = "0d8b4682f140f0fe486ef7e3d2f70665f3066906"
+  revision = "59c0560478b705bf9bd12f9252224a0fad7c87df"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -67,8 +67,8 @@
     "util/runes",
     "util/strings"
   ]
-  revision = "bea32b9cd2d6f55753d94a28e959b13f0244797a"
-  version = "v0.2.2"
+  revision = "5ccd90ef52e1e632236f7326478d4faa74f99438"
+  version = "v0.2.3"
 
 [[projects]]
   branch = "master"
@@ -81,7 +81,7 @@
     "sortkeys",
     "types"
   ]
-  revision = "26de2f9a7d3b1826f275e7a97c8cad5080589426"
+  revision = "d5bc08a2c4c572e9bcff820aa125fe38ac3a3a42"
 
 [[projects]]
   branch = "master"
@@ -90,7 +90,7 @@
     "httputil",
     "httputil/header"
   ]
-  revision = "bc1419aa93d33c909e9c141b49ef46bdcbfa10b0"
+  revision = "dcea65fd03382fd4f4df9ebdac117c6e0cde2594"
 
 [[projects]]
   branch = "master"
@@ -106,13 +106,13 @@
     "ptypes/struct",
     "ptypes/timestamp"
   ]
-  revision = "c65a0412e71e8b9b3bfd22925720d23c0f054237"
+  revision = "bbd03ef6da3a115852eaf24c8a1c46aeb39aa175"
 
 [[projects]]
   name = "github.com/gorilla/securecookie"
   packages = ["."]
-  revision = "667fe4e3466a040b780561fe9b51a83a3753eefc"
-  version = "v1.1"
+  revision = "e59506cc896acb7f7bf732d4fdf5e25f7ccd8983"
+  version = "v1.1.1"
 
 [[projects]]
   branch = "master"
@@ -136,7 +136,7 @@
     "tags",
     "validator"
   ]
-  revision = "d0c54e68681ec7999ac17864470f3bee6521ba2b"
+  revision = "eb23b08d08bbe930113a6512a7a829050341448c"
 
 [[projects]]
   branch = "master"
@@ -152,7 +152,7 @@
     "runtime/internal",
     "utilities"
   ]
-  revision = "7ad17e1096c8ec3036ce9e6d7ef72125c9ed96c4"
+  revision = "d96e01322cce0c898a216f4f3d04a9a0c543450b"
 
 [[projects]]
   branch = "master"
@@ -190,7 +190,7 @@
   branch = "master"
   name = "github.com/jaytaylor/html2text"
   packages = ["."]
-  revision = "7cd445abb89c7dbb8220e616a1805fc904cc541b"
+  revision = "190166da35878a77103b951ae035a473531c1fc2"
 
 [[projects]]
   branch = "master"
@@ -199,7 +199,7 @@
     ".",
     "reflectx"
   ]
-  revision = "05cef0741ade10ca668982355b3f3f0bcf0ff0a8"
+  revision = "cf35089a197953c69420c8d0cecda90809764b1d"
 
 [[projects]]
   branch = "master"
@@ -235,13 +235,13 @@
     ".",
     "oid"
   ]
-  revision = "19c8e9ad00952ce0c64489b60e8df88bb16dd514"
+  revision = "88edab0803230a3898347e77b474f8c1820a1f20"
 
 [[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
-  revision = "d419a98cdbed11a922bf76f257b7c4be79b50e73"
-  version = "v1.7.4"
+  revision = "c3beff4c2358b44d0493c7dda585e7db7ff28ae6"
+  version = "v1.7.6"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -271,7 +271,7 @@
   branch = "master"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
-  revision = "b4575eea38cca1123ec2dc90c26529b5c5acfcff"
+  revision = "00c29f56e2386353d58c599509e8dc3801b0d716"
 
 [[projects]]
   branch = "master"
@@ -289,7 +289,7 @@
   branch = "master"
   name = "github.com/olekukonko/tablewriter"
   packages = ["."]
-  revision = "96aac992fc8b1a4c83841a6c3e7178d20d989625"
+  revision = "b8a9be070da40449e501c3c4730a889e42d87a9e"
 
 [[projects]]
   name = "github.com/pborman/uuid"
@@ -313,7 +313,7 @@
   branch = "master"
   name = "github.com/prometheus/client_golang"
   packages = ["prometheus"]
-  revision = "06bc6e01f4baf4ee783ffcd23abfcb0b0f9dfada"
+  revision = "c3324c1198cf3374996e9d3098edd46a6b55afc9"
 
 [[projects]]
   branch = "master"
@@ -329,7 +329,7 @@
     "internal/bitbucket.org/ww/goautoneg",
     "model"
   ]
-  revision = "89604d197083d4781071d3c65855d24ecfb0a563"
+  revision = "6fb6fce6f8b75884b92e1889c150403fc0872c5e"
 
 [[projects]]
   branch = "master"
@@ -337,10 +337,10 @@
   packages = [
     ".",
     "internal/util",
-    "nfsd",
+    "nfs",
     "xfs"
   ]
-  revision = "85fadb6e89903ef7cca6f6a804474cd5ea85b6e1"
+  revision = "d274e363d5759d1c916232217be421f1cc89c5fe"
 
 [[projects]]
   branch = "master"
@@ -386,8 +386,8 @@
 [[projects]]
   name = "github.com/soheilhy/cmux"
   packages = ["."]
-  revision = "bb79a83465015a27a175925ebd155e660f55e9f1"
-  version = "v0.1.3"
+  revision = "e09e9389d85d8492d313d73d1469c029e710623f"
+  version = "v0.1.4"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -401,14 +401,14 @@
 [[projects]]
   name = "github.com/spf13/cast"
   packages = ["."]
-  revision = "acbeb36b902d72a7a4c18e8f3241075e7ab763e4"
-  version = "v1.1.0"
+  revision = "8965335b8c7107321228e3e3702cab9832751bac"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
   name = "github.com/spf13/cobra"
   packages = ["."]
-  revision = "f91529fc609202eededff4de2dc0ba2f662240a3"
+  revision = "c6c44e6fdcc30161c7f4480754da7230d01c06e3"
 
 [[projects]]
   branch = "master"
@@ -420,7 +420,7 @@
   branch = "master"
   name = "github.com/spf13/pflag"
   packages = ["."]
-  revision = "4c012f6dcd9546820e378d0bdda4d8fc772cdfea"
+  revision = "ee5fd03fd6acfd43e44aea0b4135958546ed8e73"
 
 [[projects]]
   branch = "master"
@@ -454,7 +454,7 @@
     "acme/autocert",
     "pbkdf2"
   ]
-  revision = "3d37316aaa6bd9929127ac9a527abf408178ea7b"
+  revision = "91a49db82a88618983a78a06c1cbd4e00ab749ab"
 
 [[projects]]
   branch = "master"
@@ -471,7 +471,7 @@
     "lex/httplex",
     "trace"
   ]
-  revision = "0ed95abb35c445290478a5348a7b38bb154135fd"
+  revision = "22ae77b79946ea320088417e4d50825671d82d57"
 
 [[projects]]
   branch = "master"
@@ -480,16 +480,15 @@
     ".",
     "internal"
   ]
-  revision = "b28fcf2b08a19742b43084fb40ab78ac6c3d8067"
+  revision = "2f32c3ac0fa4fb807a0fcefb0b6f2468a0d99bd0"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "ef802241c90f84d84d644a2d8d0de8ee96038c9c"
+  revision = "dd2ff4accc098aceecb86b36eaa7829b2a17b1c9"
 
 [[projects]]
-  branch = "master"
   name = "golang.org/x/text"
   packages = [
     "collate",
@@ -508,7 +507,8 @@
     "unicode/rangetable",
     "width"
   ]
-  revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -531,7 +531,7 @@
     "googleapis/api/annotations",
     "googleapis/rpc/status"
   ]
-  revision = "4eb30f4778eed4c258ba66527a0d4f9ec8a36c45"
+  revision = "2c5e7ac708aaa719366570dd82bda44541ca2a63"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -566,7 +566,7 @@
   branch = "v1"
   name = "gopkg.in/jarcoal/httpmock.v1"
   packages = ["."]
-  revision = "cf52904a3cf0f78f199ecade6a6df8e245d5b25a"
+  revision = "61bcb58a07522fbdf76a4cb03c57f5a52683d636"
 
 [[projects]]
   name = "gopkg.in/redis.v5"
@@ -591,10 +591,10 @@
   version = "v1.0.5"
 
 [[projects]]
-  branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "d670f9405373e636a5a2765eea47fac0c9bc91a4"
+  revision = "7f97868eec74b32b0982dd158a51a446d1da7eb5"
+  version = "v2.1.1"
 
 [solve-meta]
   analyzer-name = "dep"

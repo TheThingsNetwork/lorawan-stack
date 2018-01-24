@@ -34,13 +34,15 @@ func TestPoolDownlinks(t *testing.T) {
 	a.So(obs.DownlinkCount, should.Equal, 0)
 	a.So(obs.LastDownlinkReceivedAt, should.BeNil)
 
-	err = p.Send(ttnpb.GatewayIdentifier{GatewayID: "gateway-nonexistant"}, &ttnpb.GatewayDown{})
+	err = p.Send(ttnpb.GatewayIdentifier{GatewayID: "gateway-nonexistant"}, &ttnpb.GatewayDown{DownlinkMessage: &ttnpb.DownlinkMessage{}})
 	a.So(err, should.NotBeNil)
 	obs, err = p.GetGatewayObservations(&gatewayIdentifier)
 	a.So(err, should.BeNil)
 	a.So(obs.DownlinkCount, should.Equal, 0)
 	a.So(obs.LastDownlinkReceivedAt, should.BeNil)
 
+	err = p.Send(gatewayIdentifier, &ttnpb.GatewayDown{})
+	a.So(err, should.NotBeNil)
 	err = p.Send(gatewayIdentifier, &ttnpb.GatewayDown{
 		DownlinkMessage: &ttnpb.DownlinkMessage{
 			Settings: ttnpb.TxSettings{
