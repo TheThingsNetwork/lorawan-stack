@@ -7,7 +7,6 @@ import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/lorawan.proto";
 import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
 import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -217,43 +216,4 @@ message MACInfo {
   PingSlotPeriod ping_slot_periodicity = 5;
 
   // TODO: Add info about failed MAC requests
-}
-
-// The DeviceRegistry service allows clients to manage their end devices
-// This service is implemented by the join server, network server and application server
-service DeviceRegistry {
-  // ListDevices returns the devices that match the given identifiers
-  rpc ListDevices(EndDeviceIdentifiers) returns (EndDevices) {
-    option (google.api.http) = {
-      get: "/applications/{application_id}/devices"
-    };
-  };
-
-  // GetDevice returns the device that matches the given identifiers.
-  // If there are multiple matches, an error will be returned.
-  rpc GetDevice(EndDeviceIdentifiers) returns (EndDevice) {
-    option (google.api.http) = {
-      get: "/applications/{application_id}/devices/{device_id}"
-    };
-  };
-
-  // SetDevice creates or updates the device
-  rpc SetDevice(EndDevice) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      post: "/applications/{ids.application_id}/devices/{ids.device_id}"
-      body: "*"
-      additional_bindings {
-        post: "/applications/{ids.application_id}/devices"
-        body: "*"
-      };
-    };
-  };
-
-  // DeleteDevice deletes the device that matches the given identifiers.
-  // If there are multiple matches, an error will be returned.
-  rpc DeleteDevice(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      delete: "/applications/{application_id}/devices/{device_id}"
-    };
-  };
 }

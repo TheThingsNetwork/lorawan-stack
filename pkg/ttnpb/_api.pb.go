@@ -15,6 +15,7 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/cluster.proto
 	github.com/TheThingsNetwork/ttn/api/collaborator.proto
 	github.com/TheThingsNetwork/ttn/api/end_device.proto
+	github.com/TheThingsNetwork/ttn/api/end_device_services.proto
 	github.com/TheThingsNetwork/ttn/api/gateway.proto
 	github.com/TheThingsNetwork/ttn/api/gatewayserver.proto
 	github.com/TheThingsNetwork/ttn/api/identifiers.proto
