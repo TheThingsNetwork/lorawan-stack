@@ -25,20 +25,20 @@ func (s *applicationService) CreateApplication(ctx context.Context, req *ttnpb.C
 		return nil, err
 	}
 
-	settings, err := s.store.Settings.Get()
-	if err != nil {
-		return nil, err
-	}
+	err = s.store.Transact(func(tx *store.Store) error {
+		settings, err := tx.Settings.Get()
+		if err != nil {
+			return err
+		}
 
-	// check for blacklisted ids
-	if !util.IsIDAllowed(req.Application.ApplicationID, settings.BlacklistedIDs) {
-		return nil, ErrBlacklistedID.New(errors.Attributes{
-			"id": req.Application.ApplicationID,
-		})
-	}
+		// check for blacklisted ids
+		if !util.IsIDAllowed(req.Application.ApplicationID, settings.BlacklistedIDs) {
+			return ErrBlacklistedID.New(errors.Attributes{
+				"id": req.Application.ApplicationID,
+			})
+		}
 
-	err = s.store.Transact(func(st *store.Store) error {
-		err := st.Applications.Create(&ttnpb.Application{
+		err = tx.Applications.Create(&ttnpb.Application{
 			ApplicationIdentifier: req.Application.ApplicationIdentifier,
 			Description:           req.Application.Description,
 		})
@@ -46,7 +46,7 @@ func (s *applicationService) CreateApplication(ctx context.Context, req *ttnpb.C
 			return err
 		}
 
-		return st.Applications.SetCollaborator(&ttnpb.ApplicationCollaborator{
+		return tx.Applications.SetCollaborator(&ttnpb.ApplicationCollaborator{
 			ApplicationIdentifier: req.Application.ApplicationIdentifier,
 			UserIdentifier:        ttnpb.UserIdentifier{userID},
 			Rights:                ttnpb.AllApplicationRights,
@@ -68,7 +68,7 @@ func (s *applicationService) GetApplication(ctx context.Context, req *ttnpb.Appl
 		return nil, err
 	}
 
-	return found.GetApplication(), err
+	return found.GetApplication(), nil
 }
 
 // ListApplications returns all applications where the user is collaborator.
@@ -101,23 +101,28 @@ func (s *applicationService) UpdateApplication(ctx context.Context, req *ttnpb.U
 		return nil, err
 	}
 
-	found, err := s.store.Applications.GetByID(req.Application.ApplicationID, s.config.Factories.Application)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, path := range req.UpdateMask.Paths {
-		switch {
-		case ttnpb.FieldPathApplicationDescription.MatchString(path):
-			found.GetApplication().Description = req.Application.Description
-		default:
-			return nil, ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-				"path": path,
-			})
+	err = s.store.Transact(func(tx *store.Store) error {
+		found, err := tx.Applications.GetByID(req.Application.ApplicationID, s.factories.application)
+		if err != nil {
+			return err
 		}
-	}
+		application := found.GetApplication()
 
-	return nil, s.store.Applications.Update(found)
+		for _, path := range req.UpdateMask.Paths {
+			switch {
+			case ttnpb.FieldPathApplicationDescription.MatchString(path):
+				application.Description = req.Application.Description
+			default:
+				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
+					"path": path,
+				})
+			}
+		}
+
+		return tx.Applications.Update(application)
+	})
+
+	return nil, err
 }
 
 // DeleteApplication deletes an application.
@@ -202,14 +207,14 @@ func (s *applicationService) SetApplicationCollaborator(ctx context.Context, req
 		return nil, err
 	}
 
-	err = s.store.Transact(func(st *store.Store) error {
-		err := st.Applications.SetCollaborator(req)
+	err = s.store.Transact(func(tx *store.Store) error {
+		err := tx.Applications.SetCollaborator(req)
 		if err != nil {
 			return err
 		}
 
 		// check that there is at least one collaborator in with SETTINGS_COLLABORATOR right
-		collaborators, err := st.Applications.ListCollaborators(req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
+		collaborators, err := tx.Applications.ListCollaborators(req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
 		if err != nil {
 			return err
 		}

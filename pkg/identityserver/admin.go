@@ -11,7 +11,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/random"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
@@ -33,45 +32,50 @@ func (s *adminService) GetSettings(ctx context.Context, _ *pbtypes.Empty) (*ttnp
 
 // UpdateSettings updates the dynamic settings.
 func (s *adminService) UpdateSettings(ctx context.Context, req *ttnpb.UpdateSettingsRequest) (*pbtypes.Empty, error) {
-	if err := s.enforceAdmin(ctx); err != nil {
-		return nil, err
-	}
-
-	settings, err := s.store.Settings.Get()
+	err := s.enforceAdmin(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, path := range req.UpdateMask.Paths {
-		switch {
-		case ttnpb.FieldPathSettingsBlacklistedIDs.MatchString(path):
-			if req.Settings.BlacklistedIDs == nil {
-				req.Settings.BlacklistedIDs = []string{}
-			}
-			settings.BlacklistedIDs = req.Settings.BlacklistedIDs
-		case ttnpb.FieldPathSettingsUserRegistrationSkipValidation.MatchString(path):
-			settings.SkipValidation = req.Settings.SkipValidation
-		case ttnpb.FieldPathSettingsUserRegistrationSelfRegistration.MatchString(path):
-			settings.SelfRegistration = req.Settings.SelfRegistration
-		case ttnpb.FieldPathSettingsUserRegistrationAdminApproval.MatchString(path):
-			settings.AdminApproval = req.Settings.AdminApproval
-		case ttnpb.FieldPathSettingsValidationTokenTTL.MatchString(path):
-			settings.ValidationTokenTTL = req.Settings.ValidationTokenTTL
-		case ttnpb.FieldPathSettingsAllowedEmails.MatchString(path):
-			if req.Settings.AllowedEmails == nil {
-				req.Settings.AllowedEmails = []string{}
-			}
-			settings.AllowedEmails = req.Settings.AllowedEmails
-		case ttnpb.FieldPathSettingsInvitationTokenTTL.MatchString(path):
-			settings.InvitationTokenTTL = req.Settings.InvitationTokenTTL
-		default:
-			return nil, ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-				"path": path,
-			})
+	err = s.store.Transact(func(tx *store.Store) error {
+		settings, err := tx.Settings.Get()
+		if err != nil {
+			return err
 		}
-	}
 
-	return nil, s.store.Settings.Set(settings)
+		for _, path := range req.UpdateMask.Paths {
+			switch {
+			case ttnpb.FieldPathSettingsBlacklistedIDs.MatchString(path):
+				if req.Settings.BlacklistedIDs == nil {
+					req.Settings.BlacklistedIDs = []string{}
+				}
+				settings.BlacklistedIDs = req.Settings.BlacklistedIDs
+			case ttnpb.FieldPathSettingsUserRegistrationSkipValidation.MatchString(path):
+				settings.SkipValidation = req.Settings.SkipValidation
+			case ttnpb.FieldPathSettingsUserRegistrationSelfRegistration.MatchString(path):
+				settings.SelfRegistration = req.Settings.SelfRegistration
+			case ttnpb.FieldPathSettingsUserRegistrationAdminApproval.MatchString(path):
+				settings.AdminApproval = req.Settings.AdminApproval
+			case ttnpb.FieldPathSettingsValidationTokenTTL.MatchString(path):
+				settings.ValidationTokenTTL = req.Settings.ValidationTokenTTL
+			case ttnpb.FieldPathSettingsAllowedEmails.MatchString(path):
+				if req.Settings.AllowedEmails == nil {
+					req.Settings.AllowedEmails = []string{}
+				}
+				settings.AllowedEmails = req.Settings.AllowedEmails
+			case ttnpb.FieldPathSettingsInvitationTokenTTL.MatchString(path):
+				settings.InvitationTokenTTL = req.Settings.InvitationTokenTTL
+			default:
+				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
+					"path": path,
+				})
+			}
+		}
+
+		return tx.Settings.Set(settings)
+	})
+
+	return nil, err
 }
 
 // CreateUser creates an account on behalf of an user. A password is generated
@@ -89,8 +93,8 @@ func (s *adminService) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequ
 	req.User.State = ttnpb.STATE_APPROVED
 
 	var token string
-	err = s.store.Transact(func(st *store.Store) error {
-		settings, err := st.Settings.Get()
+	err = s.store.Transact(func(tx *store.Store) error {
+		settings, err := tx.Settings.Get()
 		if err != nil {
 			return err
 		}
@@ -99,7 +103,7 @@ func (s *adminService) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequ
 			req.User.ValidatedAt = time.Now().UTC()
 		}
 
-		err = st.Users.Create(&req.User)
+		err = tx.Users.Create(&req.User)
 		if err != nil {
 			return err
 		}
@@ -112,9 +116,9 @@ func (s *adminService) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequ
 		// otherwise create a token and save it
 		token = random.String(64)
 
-		return st.Users.SaveValidationToken(req.User.UserID, &store.ValidationToken{
+		return tx.Users.SaveValidationToken(req.User.UserID, &store.ValidationToken{
 			ValidationToken: token,
-			CreatedAt:       time.Now(),
+			CreatedAt:       time.Now().UTC(),
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		})
 	})
@@ -192,68 +196,66 @@ func (s *adminService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequ
 		return nil, err
 	}
 
-	found, err := s.store.Users.GetByID(req.User.UserID, s.factories.user)
-	if err != nil {
-		return nil, err
-	}
-
-	settings, err := s.store.Settings.Get()
-	if err != nil {
-		return nil, err
-	}
-
-	newEmail := false
-	for _, path := range req.UpdateMask.Paths {
-		switch {
-		case ttnpb.FieldPathUserAdmin.MatchString(path):
-			found.GetUser().Admin = req.User.Admin
-		case ttnpb.FieldPathUserState.MatchString(path):
-			found.GetUser().State = req.User.State
-		case ttnpb.FieldPathUserName.MatchString(path):
-			found.GetUser().Name = req.User.Name
-		case ttnpb.FieldPathUserEmail.MatchString(path):
-			if strings.ToLower(req.User.Email) != strings.ToLower(found.GetUser().Email) {
-				newEmail = true
-				found.GetUser().ValidatedAt = time.Time{}
-			}
-
-			if !util.IsEmailAllowed(req.User.Email, settings.AllowedEmails) {
-				return nil, ErrEmailAddressNotAllowed.New(errors.Attributes{
-					"email":          req.User.Email,
-					"allowed_emails": settings.AllowedEmails,
-				})
-			}
-
-			found.GetUser().Email = req.User.Email
-		default:
-			return nil, ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-				"path": path,
-			})
-		}
-	}
-
-	if !newEmail {
-		return nil, s.store.Users.Update(found)
-	}
-
-	err = s.store.Transact(func(st *store.Store) error {
-		err := st.Users.Update(found)
+	err = s.store.Transact(func(tx *store.Store) error {
+		found, err := tx.Users.GetByID(req.User.UserID, s.factories.user)
 		if err != nil {
 			return err
+		}
+		user := found.GetUser()
+
+		settings, err := tx.Settings.Get()
+		if err != nil {
+			return err
+		}
+
+		newEmail := false
+		for _, path := range req.UpdateMask.Paths {
+			switch {
+			case ttnpb.FieldPathUserName.MatchString(path):
+				user.Name = req.User.Name
+			case ttnpb.FieldPathUserEmail.MatchString(path):
+				user.Email = req.User.Email
+
+				newEmail = strings.ToLower(user.Email) != strings.ToLower(req.User.Email)
+				if newEmail {
+					if settings.SkipValidation {
+						user.ValidatedAt = time.Now().UTC()
+					} else {
+						user.ValidatedAt = time.Time{}
+					}
+				}
+			case ttnpb.FieldPathUserAdmin.MatchString(path):
+				user.Admin = req.User.Admin
+			case ttnpb.FieldPathUserState.MatchString(path):
+				user.State = req.User.State
+			default:
+				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
+					"path": path,
+				})
+			}
+		}
+
+		err = tx.Users.Update(user)
+		if err != nil {
+			return err
+		}
+
+		if !newEmail || (newEmail && settings.SkipValidation) {
+			return nil
 		}
 
 		token := &store.ValidationToken{
 			ValidationToken: random.String(64),
-			CreatedAt:       time.Now(),
+			CreatedAt:       time.Now().UTC(),
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 
-		err = st.Users.SaveValidationToken(req.User.UserID, token)
+		err = tx.Users.SaveValidationToken(req.User.UserID, token)
 		if err != nil {
 			return err
 		}
 
-		return s.email.Send(found.GetUser().Email, &templates.EmailValidation{
+		return s.email.Send(user.Email, &templates.EmailValidation{
 			OrganizationName: s.config.OrganizationName,
 			PublicURL:        s.config.PublicURL,
 			Token:            token.ValidationToken,
@@ -271,24 +273,28 @@ func (s *adminService) ResetUserPassword(ctx context.Context, req *ttnpb.UserIde
 		return nil, err
 	}
 
-	found, err := s.store.Users.GetByID(req.UserID, s.factories.user)
-	if err != nil {
-		return nil, err
-	}
+	err = s.store.Transact(func(tx *store.Store) error {
+		found, err := tx.Users.GetByID(req.UserID, s.factories.user)
+		if err != nil {
+			return err
+		}
 
-	user := found.GetUser()
-	user.Password = random.String(8)
+		user := found.GetUser()
+		user.Password = random.String(8)
 
-	err = s.store.Users.Update(user)
-	if err != nil {
-		return nil, err
-	}
+		err = tx.Users.Update(user)
+		if err != nil {
+			return err
+		}
 
-	return nil, s.email.Send(user.Email, &templates.PasswordReset{
-		OrganizationName: s.config.OrganizationName,
-		PublicURL:        s.config.PublicURL,
-		Password:         user.Password,
+		return s.email.Send(user.Email, &templates.PasswordReset{
+			OrganizationName: s.config.OrganizationName,
+			PublicURL:        s.config.PublicURL,
+			Password:         user.Password,
+		})
 	})
+
+	return nil, err
 }
 
 // DeleteUser deletes an user.
@@ -298,21 +304,25 @@ func (s *adminService) DeleteUser(ctx context.Context, req *ttnpb.UserIdentifier
 		return nil, err
 	}
 
-	found, err := s.store.Users.GetByID(req.UserID, s.factories.user)
-	if err != nil {
-		return nil, err
-	}
+	err = s.store.Transact(func(tx *store.Store) error {
+		found, err := tx.Users.GetByID(req.UserID, s.factories.user)
+		if err != nil {
+			return err
+		}
 
-	err = s.store.Users.Delete(req.UserID)
-	if err != nil {
-		return nil, err
-	}
+		err = tx.Users.Delete(req.UserID)
+		if err != nil {
+			return err
+		}
 
-	return nil, s.email.Send(found.GetUser().Email, &templates.AccountDeleted{
-		UserID:           req.UserID,
-		OrganizationName: s.config.OrganizationName,
-		PublicURL:        s.config.PublicURL,
+		return s.email.Send(found.GetUser().Email, &templates.AccountDeleted{
+			UserID:           req.UserID,
+			OrganizationName: s.config.OrganizationName,
+			PublicURL:        s.config.PublicURL,
+		})
 	})
+
+	return nil, err
 }
 
 // SendInvitation sends by email a token that can be used to create a new account.
@@ -323,43 +333,47 @@ func (s *adminService) SendInvitation(ctx context.Context, req *ttnpb.SendInvita
 		return nil, err
 	}
 
-	// check whether email is already registered or not
-	found, err := s.store.Users.GetByEmail(req.Email, s.factories.user)
-	if err != nil && !sql.ErrUserEmailNotFound.Describes(err) {
-		return nil, err
-	}
+	err = s.store.Transact(func(tx *store.Store) error {
+		// check whether email is already registered or not
+		found, err := tx.Users.GetByEmail(req.Email, s.factories.user)
+		if err != nil && !sql.ErrUserEmailNotFound.Describes(err) {
+			return err
+		}
 
-	// if email is already being used return error
-	if found != nil {
-		return nil, ErrEmailAddressAlreadyUsed.New(errors.Attributes{
-			"email": req.Email,
+		// if email is already being used return error
+		if found != nil {
+			return ErrEmailAddressAlreadyUsed.New(errors.Attributes{
+				"email": req.Email,
+			})
+		}
+
+		// otherwise proceed to issue invitation
+		settings, err := tx.Settings.Get()
+		if err != nil {
+			return err
+		}
+
+		now := time.Now().UTC()
+		invitation := &store.InvitationData{
+			Token:     random.String(64),
+			Email:     req.Email,
+			IssuedAt:  now,
+			ExpiresAt: now.Add(settings.InvitationTokenTTL),
+		}
+
+		err = tx.Invitations.Save(invitation)
+		if err != nil {
+			return err
+		}
+
+		return s.email.Send(req.Email, &templates.Invitation{
+			OrganizationName: s.config.OrganizationName,
+			PublicURL:        s.config.PublicURL,
+			Token:            invitation.Token,
 		})
-	}
-
-	// otherwise proceed to issue invitation
-	settings, err := s.store.Settings.Get()
-	if err != nil {
-		return nil, err
-	}
-
-	now := time.Now().UTC()
-	invitation := &store.InvitationData{
-		Token:     random.String(64),
-		Email:     req.Email,
-		IssuedAt:  now,
-		ExpiresAt: now.Add(settings.InvitationTokenTTL),
-	}
-
-	err = s.store.Invitations.Save(invitation)
-	if err != nil {
-		return nil, err
-	}
-
-	return nil, s.email.Send(req.Email, &templates.Invitation{
-		OrganizationName: s.config.OrganizationName,
-		PublicURL:        s.config.PublicURL,
-		Token:            invitation.Token,
 	})
+
+	return nil, err
 }
 
 // ListInvitations lists all the issued invitations.
@@ -455,39 +469,44 @@ func (s *adminService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClient
 		return nil, err
 	}
 
-	found, err := s.store.Clients.GetByID(req.Client.ClientID, s.factories.client)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, path := range req.UpdateMask.Paths {
-		switch {
-		case ttnpb.FieldPathClientDescription.MatchString(path):
-			found.GetClient().Description = req.Client.Description
-		case ttnpb.FieldPathClientRedirectURI.MatchString(path):
-			found.GetClient().RedirectURI = req.Client.RedirectURI
-		case ttnpb.FieldPathClientRights.MatchString(path):
-			if req.Client.Rights == nil {
-				req.Client.Rights = []ttnpb.Right{}
-			}
-			found.GetClient().Rights = req.Client.Rights
-		case ttnpb.FieldPathClientOfficialLabeled.MatchString(path):
-			found.GetClient().OfficialLabeled = req.Client.OfficialLabeled
-		case ttnpb.FieldPathClientState.MatchString(path):
-			found.GetClient().State = req.Client.State
-		case ttnpb.FieldPathClientGrants.MatchString(path):
-			if req.Client.Grants == nil {
-				req.Client.Grants = []ttnpb.GrantType{}
-			}
-			found.GetClient().Grants = req.Client.Grants
-		default:
-			return nil, ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-				"path": path,
-			})
+	err = s.store.Transact(func(tx *store.Store) error {
+		found, err := tx.Clients.GetByID(req.Client.ClientID, s.factories.client)
+		if err != nil {
+			return err
 		}
-	}
+		client := found.GetClient()
 
-	return nil, s.store.Clients.Update(found)
+		for _, path := range req.UpdateMask.Paths {
+			switch {
+			case ttnpb.FieldPathClientDescription.MatchString(path):
+				client.Description = req.Client.Description
+			case ttnpb.FieldPathClientRedirectURI.MatchString(path):
+				client.RedirectURI = req.Client.RedirectURI
+			case ttnpb.FieldPathClientRights.MatchString(path):
+				if req.Client.Rights == nil {
+					req.Client.Rights = []ttnpb.Right{}
+				}
+				client.Rights = req.Client.Rights
+			case ttnpb.FieldPathClientOfficialLabeled.MatchString(path):
+				client.OfficialLabeled = req.Client.OfficialLabeled
+			case ttnpb.FieldPathClientState.MatchString(path):
+				client.State = req.Client.State
+			case ttnpb.FieldPathClientGrants.MatchString(path):
+				if req.Client.Grants == nil {
+					req.Client.Grants = []ttnpb.GrantType{}
+				}
+				client.Grants = req.Client.Grants
+			default:
+				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
+					"path": path,
+				})
+			}
+		}
+
+		return tx.Clients.Update(client)
+	})
+
+	return nil, err
 }
 
 // DeleteClient deletes the client that matches the identifier and revokes all
@@ -498,24 +517,28 @@ func (s *adminService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdenti
 		return nil, err
 	}
 
-	found, err := s.store.Clients.GetByID(req.ClientID, s.factories.client)
-	if err != nil {
-		return nil, err
-	}
+	err = s.store.Transact(func(tx *store.Store) error {
+		found, err := tx.Clients.GetByID(req.ClientID, s.factories.client)
+		if err != nil {
+			return err
+		}
 
-	user, err := s.store.Users.GetByID(found.GetClient().Creator.UserID, s.factories.user)
-	if err != nil {
-		return nil, err
-	}
+		user, err := tx.Users.GetByID(found.GetClient().Creator.UserID, s.factories.user)
+		if err != nil {
+			return err
+		}
 
-	err = s.store.Clients.Delete(req.ClientID)
-	if err != nil {
-		return nil, err
-	}
+		err = tx.Clients.Delete(req.ClientID)
+		if err != nil {
+			return err
+		}
 
-	return nil, s.email.Send(user.GetUser().Email, &templates.ClientDeleted{
-		ClientID:         req.ClientID,
-		OrganizationName: s.config.OrganizationName,
-		PublicURL:        s.config.PublicURL,
+		return s.email.Send(user.GetUser().Email, &templates.ClientDeleted{
+			ClientID:         req.ClientID,
+			OrganizationName: s.config.OrganizationName,
+			PublicURL:        s.config.PublicURL,
+		})
 	})
+
+	return nil, err
 }

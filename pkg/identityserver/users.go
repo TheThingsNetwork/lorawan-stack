@@ -87,7 +87,7 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		if !settings.SkipValidation {
 			token := &store.ValidationToken{
 				ValidationToken: random.String(64),
-				CreatedAt:       time.Now(),
+				CreatedAt:       time.Now().UTC(),
 				ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 			}
 
@@ -121,9 +121,10 @@ func (s *userService) GetUser(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Use
 		return nil, err
 	}
 
-	found.GetUser().Password = ""
+	user := found.GetUser()
+	user.Password = ""
 
-	return found.GetUser(), nil
+	return user, nil
 }
 
 // UpdateUser updates the account of the current user.
@@ -135,64 +136,69 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 		return nil, err
 	}
 
-	found, err := s.store.Users.GetByID(userID, s.config.Factories.User)
-	if err != nil {
-		return nil, err
-	}
-
-	settings, err := s.store.Settings.Get()
-	if err != nil {
-		return nil, err
-	}
-
-	newEmail := false
-	for _, path := range req.UpdateMask.Paths {
-		switch {
-		case ttnpb.FieldPathUserName.MatchString(path):
-			found.GetUser().Name = req.User.Name
-		case ttnpb.FieldPathUserEmail.MatchString(path):
-			if strings.ToLower(req.User.Email) != strings.ToLower(found.GetUser().Email) {
-				newEmail = true
-				found.GetUser().ValidatedAt = time.Time{}
-			}
-
-			if !util.IsEmailAllowed(req.User.Email, settings.AllowedEmails) {
-				return nil, ErrEmailAddressNotAllowed.New(errors.Attributes{
-					"email":          req.User.Email,
-					"allowed_emails": settings.AllowedEmails,
-				})
-			}
-
-			found.GetUser().Email = req.User.Email
-		default:
-			return nil, ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-				"path": path,
-			})
-		}
-	}
-
-	if !newEmail {
-		return nil, s.store.Users.Update(found)
-	}
-
-	err = s.store.Transact(func(st *store.Store) error {
-		err := st.Users.Update(found)
+	err = s.store.Transact(func(tx *store.Store) error {
+		found, err := tx.Users.GetByID(userID, s.factories.user)
 		if err != nil {
 			return err
+		}
+		user := found.GetUser()
+
+		settings, err := tx.Settings.Get()
+		if err != nil {
+			return err
+		}
+
+		newEmail := false
+		for _, path := range req.UpdateMask.Paths {
+			switch {
+			case ttnpb.FieldPathUserName.MatchString(path):
+				user.Name = req.User.Name
+			case ttnpb.FieldPathUserEmail.MatchString(path):
+				if !util.IsEmailAllowed(req.User.Email, settings.AllowedEmails) {
+					return ErrEmailAddressNotAllowed.New(errors.Attributes{
+						"email":          req.User.Email,
+						"allowed_emails": settings.AllowedEmails,
+					})
+				}
+
+				newEmail = strings.ToLower(user.Email) != strings.ToLower(req.User.Email)
+				if newEmail {
+					if settings.SkipValidation {
+						user.ValidatedAt = time.Now().UTC()
+					} else {
+						user.ValidatedAt = time.Time{}
+					}
+				}
+
+				user.Email = req.User.Email
+			default:
+				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
+					"path": path,
+				})
+			}
+		}
+
+		err = tx.Users.Update(user)
+		if err != nil {
+			return err
+		}
+
+		if !newEmail || (newEmail && settings.SkipValidation) {
+			return nil
 		}
 
 		token := &store.ValidationToken{
 			ValidationToken: random.String(64),
-			CreatedAt:       time.Now(),
+			CreatedAt:       time.Now().UTC(),
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 
-		err = st.Users.SaveValidationToken(userID, token)
+		err = tx.Users.SaveValidationToken(userID, token)
 		if err != nil {
 			return err
 		}
 
-		return s.email.Send(found.GetUser().Email, &templates.EmailValidation{
+		return s.email.Send(user.Email, &templates.EmailValidation{
 			OrganizationName: s.config.OrganizationName,
 			PublicURL:        s.config.PublicURL,
 			Token:            token.ValidationToken,
@@ -209,28 +215,33 @@ func (s *userService) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateU
 		return nil, err
 	}
 
-	found, err := s.store.Users.GetByID(userID, s.config.Factories.User)
-	if err != nil {
-		return nil, err
-	}
+	err = s.store.Transact(func(tx *store.Store) error {
+		found, err := tx.Users.GetByID(userID, s.factories.user)
+		if err != nil {
+			return err
+		}
+		user := found.GetUser()
 
-	matches, err := types.Password(found.GetUser().Password).Validate(req.Old)
-	if err != nil {
-		return nil, err
-	}
+		matches, err := types.Password(user.Password).Validate(req.Old)
+		if err != nil {
+			return err
+		}
 
-	if !matches {
-		return nil, ErrInvalidPassword.New(nil)
-	}
+		if !matches {
+			return ErrInvalidPassword.New(nil)
+		}
 
-	hashed, err := types.Hash(req.New)
-	if err != nil {
-		return nil, err
-	}
+		hashed, err := types.Hash(req.New)
+		if err != nil {
+			return err
+		}
 
-	found.GetUser().Password = string(hashed)
+		user.Password = string(hashed)
 
-	return nil, s.store.Users.Update(found)
+		return tx.Users.Update(user)
+	})
+
+	return nil, err
 }
 
 // DeleteUser deletes the account of the current user.
@@ -240,13 +251,13 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 		return nil, err
 	}
 
-	err = s.store.Transact(func(st *store.Store) error {
-		err := st.Users.Delete(userID)
+	err = s.store.Transact(func(tx *store.Store) error {
+		err := tx.Users.Delete(userID)
 		if err != nil {
 			return err
 		}
 
-		apps, err := st.Applications.ListByUser(userID, s.config.Factories.Application)
+		apps, err := tx.Applications.ListByUser(userID, s.factories.application)
 		if err != nil {
 			return err
 		}
@@ -254,7 +265,7 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 		for _, app := range apps {
 			appID := app.GetApplication().ApplicationID
 
-			c, err := st.Applications.ListCollaborators(appID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
+			c, err := tx.Applications.ListCollaborators(appID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
 			if err != nil {
 				return err
 			}
@@ -264,7 +275,7 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 			}
 		}
 
-		gtws, err := st.Gateways.ListByUser(userID, s.config.Factories.Gateway)
+		gtws, err := tx.Gateways.ListByUser(userID, s.factories.gateway)
 		if err != nil {
 			return err
 		}
@@ -272,7 +283,7 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 		for _, gtw := range gtws {
 			gtwID := gtw.GetGateway().GatewayID
 
-			c, err := st.Gateways.ListCollaborators(gtwID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
+			c, err := tx.Gateways.ListCollaborators(gtwID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
 			if err != nil {
 				return err
 			}
@@ -353,8 +364,8 @@ func (s *userService) RemoveUserAPIKey(ctx context.Context, req *ttnpb.RemoveUse
 
 // ValidateUserEmail validates the user's email with the token sent to the email.
 func (s *userService) ValidateUserEmail(ctx context.Context, req *ttnpb.ValidateUserEmailRequest) (*pbtypes.Empty, error) {
-	err := s.store.Transact(func(store *store.Store) error {
-		userID, token, err := store.Users.GetValidationToken(req.Token)
+	err := s.store.Transact(func(tx *store.Store) error {
+		userID, token, err := tx.Users.GetValidationToken(req.Token)
 		if err != nil {
 			return err
 		}
@@ -363,19 +374,19 @@ func (s *userService) ValidateUserEmail(ctx context.Context, req *ttnpb.Validate
 			return ErrValidationTokenExpired.New(nil)
 		}
 
-		user, err := store.Users.GetByID(userID, s.config.Factories.User)
+		user, err := tx.Users.GetByID(userID, s.factories.user)
 		if err != nil {
 			return err
 		}
 
-		user.GetUser().ValidatedAt = time.Now()
+		user.GetUser().ValidatedAt = time.Now().UTC()
 
-		err = store.Users.Update(user)
+		err = tx.Users.Update(user)
 		if err != nil {
 			return err
 		}
 
-		return store.Users.DeleteValidationToken(req.Token)
+		return tx.Users.DeleteValidationToken(req.Token)
 	})
 
 	return nil, err
@@ -389,38 +400,43 @@ func (s *userService) RequestUserEmailValidation(ctx context.Context, _ *pbtypes
 		return nil, err
 	}
 
-	user, err := s.store.Users.GetByID(userID, s.config.Factories.User)
-	if err != nil {
-		return nil, err
-	}
+	err = s.store.Transact(func(tx *store.Store) error {
+		found, err := tx.Users.GetByID(userID, s.factories.user)
+		if err != nil {
+			return err
+		}
+		user := found.GetUser()
 
-	if !user.GetUser().ValidatedAt.IsZero() {
-		return nil, ErrEmailAlreadyValidated.New(errors.Attributes{
-			"email": user.GetUser().Email,
+		if !user.ValidatedAt.IsZero() {
+			return ErrEmailAlreadyValidated.New(errors.Attributes{
+				"email": user.Email,
+			})
+		}
+
+		settings, err := tx.Settings.Get()
+		if err != nil {
+			return err
+		}
+
+		token := &store.ValidationToken{
+			ValidationToken: random.String(64),
+			CreatedAt:       time.Now().UTC(),
+			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
+		}
+
+		err = tx.Users.SaveValidationToken(userID, token)
+		if err != nil {
+			return err
+		}
+
+		return s.email.Send(user.Email, &templates.EmailValidation{
+			OrganizationName: s.config.OrganizationName,
+			PublicURL:        s.config.PublicURL,
+			Token:            token.ValidationToken,
 		})
-	}
-
-	settings, err := s.store.Settings.Get()
-	if err != nil {
-		return nil, err
-	}
-
-	token := &store.ValidationToken{
-		ValidationToken: random.String(64),
-		CreatedAt:       time.Now(),
-		ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
-	}
-
-	err = s.store.Users.SaveValidationToken(userID, token)
-	if err != nil {
-		return nil, err
-	}
-
-	return nil, s.email.Send(user.GetUser().Email, &templates.EmailValidation{
-		OrganizationName: s.config.OrganizationName,
-		PublicURL:        s.config.PublicURL,
-		Token:            token.ValidationToken,
 	})
+
+	return nil, err
 }
 
 // ListAuthorizedClients returns all the authorized third-party clients that

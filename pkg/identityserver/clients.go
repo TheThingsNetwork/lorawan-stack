@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/random"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -25,29 +26,33 @@ func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClien
 		return nil, err
 	}
 
-	settings, err := s.store.Settings.Get()
-	if err != nil {
-		return nil, err
-	}
+	err = s.store.Transact(func(tx *store.Store) error {
+		settings, err := tx.Settings.Get()
+		if err != nil {
+			return err
+		}
 
-	// check for blacklisted ids
-	if !util.IsIDAllowed(req.Client.ClientID, settings.BlacklistedIDs) {
-		return nil, ErrBlacklistedID.New(errors.Attributes{
-			"id": req.Client.ClientID,
+		// check for blacklisted ids
+		if !util.IsIDAllowed(req.Client.ClientID, settings.BlacklistedIDs) {
+			return ErrBlacklistedID.New(errors.Attributes{
+				"id": req.Client.ClientID,
+			})
+		}
+
+		return tx.Clients.Create(&ttnpb.Client{
+			ClientIdentifier: req.Client.ClientIdentifier,
+			Description:      req.Client.Description,
+			RedirectURI:      req.Client.RedirectURI,
+			Creator:          ttnpb.UserIdentifier{userID},
+			Secret:           random.String(64),
+			State:            ttnpb.STATE_PENDING,
+			OfficialLabeled:  false,
+			Grants:           []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
+			Rights:           req.Client.Rights,
 		})
-	}
-
-	return nil, s.store.Clients.Create(&ttnpb.Client{
-		ClientIdentifier: req.Client.ClientIdentifier,
-		Description:      req.Client.Description,
-		RedirectURI:      req.Client.RedirectURI,
-		Creator:          ttnpb.UserIdentifier{userID},
-		Secret:           random.String(64),
-		State:            ttnpb.STATE_PENDING,
-		OfficialLabeled:  false,
-		Grants:           []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
-		Rights:           req.Client.Rights,
 	})
+
+	return nil, err
 }
 
 // GetClient returns a client.
@@ -61,13 +66,14 @@ func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifi
 	if err != nil {
 		return nil, err
 	}
+	client := found.GetClient()
 
 	// ensure the user is the client's creator
-	if found.GetClient().Creator.UserID != userID {
+	if client.Creator.UserID != userID {
 		return nil, ErrNotAuthorized.New(nil)
 	}
 
-	return found.GetClient(), err
+	return client, err
 }
 
 // ListClients returns all the clients an user has created.
@@ -101,28 +107,33 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 		return nil, err
 	}
 
-	found, err := s.store.Clients.GetByID(req.Client.ClientID, s.config.Factories.Client)
-	if err != nil {
-		return nil, err
-	}
-
-	// ensure the user is the client's creator
-	if found.GetClient().Creator.UserID != userID {
-		return nil, ErrNotAuthorized.New(nil)
-	}
-
-	for _, path := range req.UpdateMask.Paths {
-		switch {
-		case ttnpb.FieldPathClientDescription.MatchString(path):
-			found.GetClient().Description = req.Client.Description
-		default:
-			return nil, ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-				"path": path,
-			})
+	err = s.store.Transact(func(tx *store.Store) error {
+		found, err := tx.Clients.GetByID(req.Client.ClientID, s.factories.client)
+		if err != nil {
+			return err
 		}
-	}
+		client := found.GetClient()
 
-	return nil, s.store.Clients.Update(found)
+		// ensure the user is the client's creator
+		if client.Creator.UserID != userID {
+			return ErrNotAuthorized.New(nil)
+		}
+
+		for _, path := range req.UpdateMask.Paths {
+			switch {
+			case ttnpb.FieldPathClientDescription.MatchString(path):
+				client.Description = req.Client.Description
+			default:
+				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
+					"path": path,
+				})
+			}
+		}
+
+		return tx.Clients.Update(client)
+	})
+
+	return nil, err
 }
 
 // DeleteClient deletes the client that matches the identifier and revokes all
@@ -133,15 +144,19 @@ func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdent
 		return nil, err
 	}
 
-	found, err := s.store.Clients.GetByID(req.ClientID, s.config.Factories.Client)
-	if err != nil {
-		return nil, err
-	}
+	err = s.store.Transact(func(tx *store.Store) error {
+		found, err := tx.Clients.GetByID(req.ClientID, s.factories.client)
+		if err != nil {
+			return err
+		}
 
-	// ensure the user is the client's creator
-	if found.GetClient().Creator.UserID != userID {
-		return nil, ErrNotAuthorized.New(nil)
-	}
+		// ensure the user is the client's creator
+		if found.GetClient().Creator.UserID != userID {
+			return ErrNotAuthorized.New(nil)
+		}
 
-	return nil, s.store.Clients.Delete(req.ClientID)
+		return tx.Clients.Delete(req.ClientID)
+	})
+
+	return nil, err
 }

@@ -25,20 +25,20 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 		return nil, err
 	}
 
-	settings, err := s.store.Settings.Get()
-	if err != nil {
-		return nil, err
-	}
+	err = s.store.Transact(func(tx *store.Store) error {
+		settings, err := tx.Settings.Get()
+		if err != nil {
+			return err
+		}
 
-	// check for blacklisted ids
-	if !util.IsIDAllowed(req.Gateway.GatewayID, settings.BlacklistedIDs) {
-		return nil, ErrBlacklistedID.New(errors.Attributes{
-			"id": req.Gateway.GatewayID,
-		})
-	}
+		// check for blacklisted ids
+		if !util.IsIDAllowed(req.Gateway.GatewayID, settings.BlacklistedIDs) {
+			return ErrBlacklistedID.New(errors.Attributes{
+				"id": req.Gateway.GatewayID,
+			})
+		}
 
-	err = s.store.Transact(func(st *store.Store) error {
-		err = st.Gateways.Create(&ttnpb.Gateway{
+		err = tx.Gateways.Create(&ttnpb.Gateway{
 			GatewayIdentifier: req.Gateway.GatewayIdentifier,
 			Description:       req.Gateway.Description,
 			FrequencyPlanID:   req.Gateway.FrequencyPlanID,
@@ -54,7 +54,7 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 			return err
 		}
 
-		return st.Gateways.SetCollaborator(&ttnpb.GatewayCollaborator{
+		return tx.Gateways.SetCollaborator(&ttnpb.GatewayCollaborator{
 			GatewayIdentifier: req.Gateway.GatewayIdentifier,
 			UserIdentifier:    ttnpb.UserIdentifier{userID},
 			Rights:            ttnpb.AllGatewayRights,
@@ -109,53 +109,57 @@ func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGat
 		return nil, err
 	}
 
-	found, err := s.store.Gateways.GetByID(req.Gateway.GatewayID, s.config.Factories.Gateway)
-	if err != nil {
-		return nil, err
-	}
-	gtw := found.GetGateway()
-
-	for _, path := range req.UpdateMask.Paths {
-		switch {
-		case ttnpb.FieldPathGatewayDescription.MatchString(path):
-			gtw.Description = req.Gateway.Description
-		case ttnpb.FieldPathGatewayFrequencyPlanID.MatchString(path):
-			gtw.FrequencyPlanID = req.Gateway.FrequencyPlanID
-		case ttnpb.FieldPathGatewayPrivacySettingsStatusPublic.MatchString(path):
-			gtw.PrivacySettings.StatusPublic = req.Gateway.PrivacySettings.StatusPublic
-		case ttnpb.FieldPathGatewayPrivacySettingsLocationPublic.MatchString(path):
-			gtw.PrivacySettings.LocationPublic = req.Gateway.PrivacySettings.LocationPublic
-		case ttnpb.FieldPathGatewayPrivacySettingsContactable.MatchString(path):
-			gtw.PrivacySettings.Contactable = req.Gateway.PrivacySettings.Contactable
-		case ttnpb.FieldPathGatewayAutoUpdate.MatchString(path):
-			gtw.AutoUpdate = req.Gateway.AutoUpdate
-		case ttnpb.FieldPathGatewayPlatform.MatchString(path):
-			gtw.Platform = req.Gateway.Platform
-		case ttnpb.FieldPathGatewayAntennas.MatchString(path):
-			if req.Gateway.Antennas == nil {
-				req.Gateway.Antennas = []ttnpb.GatewayAntenna{}
-			}
-			gtw.Antennas = req.Gateway.Antennas
-		case ttnpb.FieldPathGatewayAttributes.MatchString(path):
-			attr := ttnpb.FieldPathGatewayAttributes.FindStringSubmatch(path)[1]
-
-			if value, ok := req.Gateway.Attributes[attr]; ok && len(value) > 0 {
-				gtw.Attributes[attr] = value
-			} else {
-				delete(gtw.Attributes, attr)
-			}
-		case ttnpb.FieldPathGatewayClusterAddress.MatchString(path):
-			gtw.ClusterAddress = req.Gateway.ClusterAddress
-		case ttnpb.FieldPathGatewayContactAccountUserID.MatchString(path):
-			gtw.ContactAccount.UserID = req.Gateway.ContactAccount.UserID
-		default:
-			return nil, ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-				"path": path,
-			})
+	err = s.store.Transact(func(tx *store.Store) error {
+		found, err := tx.Gateways.GetByID(req.Gateway.GatewayID, s.factories.gateway)
+		if err != nil {
+			return err
 		}
-	}
+		gtw := found.GetGateway()
 
-	return nil, s.store.Gateways.Update(gtw)
+		for _, path := range req.UpdateMask.Paths {
+			switch {
+			case ttnpb.FieldPathGatewayDescription.MatchString(path):
+				gtw.Description = req.Gateway.Description
+			case ttnpb.FieldPathGatewayFrequencyPlanID.MatchString(path):
+				gtw.FrequencyPlanID = req.Gateway.FrequencyPlanID
+			case ttnpb.FieldPathGatewayPrivacySettingsStatusPublic.MatchString(path):
+				gtw.PrivacySettings.StatusPublic = req.Gateway.PrivacySettings.StatusPublic
+			case ttnpb.FieldPathGatewayPrivacySettingsLocationPublic.MatchString(path):
+				gtw.PrivacySettings.LocationPublic = req.Gateway.PrivacySettings.LocationPublic
+			case ttnpb.FieldPathGatewayPrivacySettingsContactable.MatchString(path):
+				gtw.PrivacySettings.Contactable = req.Gateway.PrivacySettings.Contactable
+			case ttnpb.FieldPathGatewayAutoUpdate.MatchString(path):
+				gtw.AutoUpdate = req.Gateway.AutoUpdate
+			case ttnpb.FieldPathGatewayPlatform.MatchString(path):
+				gtw.Platform = req.Gateway.Platform
+			case ttnpb.FieldPathGatewayAntennas.MatchString(path):
+				if req.Gateway.Antennas == nil {
+					req.Gateway.Antennas = []ttnpb.GatewayAntenna{}
+				}
+				gtw.Antennas = req.Gateway.Antennas
+			case ttnpb.FieldPathGatewayAttributes.MatchString(path):
+				attr := ttnpb.FieldPathGatewayAttributes.FindStringSubmatch(path)[1]
+
+				if value, ok := req.Gateway.Attributes[attr]; ok && len(value) > 0 {
+					gtw.Attributes[attr] = value
+				} else {
+					delete(gtw.Attributes, attr)
+				}
+			case ttnpb.FieldPathGatewayClusterAddress.MatchString(path):
+				gtw.ClusterAddress = req.Gateway.ClusterAddress
+			case ttnpb.FieldPathGatewayContactAccountUserID.MatchString(path):
+				gtw.ContactAccount.UserID = req.Gateway.ContactAccount.UserID
+			default:
+				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
+					"path": path,
+				})
+			}
+		}
+
+		return tx.Gateways.Update(gtw)
+	})
+
+	return nil, err
 }
 
 // DeleteGateway deletes a gateway.
@@ -240,14 +244,14 @@ func (s *gatewayService) SetGatewayCollaborator(ctx context.Context, req *ttnpb.
 		return nil, err
 	}
 
-	err = s.store.Transact(func(st *store.Store) error {
-		err := st.Gateways.SetCollaborator(req)
+	err = s.store.Transact(func(tx *store.Store) error {
+		err := tx.Gateways.SetCollaborator(req)
 		if err != nil {
 			return err
 		}
 
 		// check that there is at least one collaborator in with SETTINGS_COLLABORATOR right
-		collaborators, err := st.Gateways.ListCollaborators(req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
+		collaborators, err := tx.Gateways.ListCollaborators(req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
 		if err != nil {
 			return err
 		}
