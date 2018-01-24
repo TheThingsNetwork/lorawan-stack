@@ -181,12 +181,8 @@ func (s *adminService) ListUsers(ctx context.Context, req *ttnpb.ListUsersReques
 	for _, user := range users {
 		u := user.GetUser()
 
-		switch filter := req.ListUsersRequest_FilterState; filter {
-		case nil:
-		default:
-			if u.State != filter.State {
-				continue
-			}
+		if filter := req.ListUsersRequest_FilterState; filter != nil && filter.State != u.State {
+			continue
 		}
 
 		resp.Users = append(resp.Users, u)
@@ -456,12 +452,8 @@ func (s *adminService) ListClients(ctx context.Context, req *ttnpb.ListClientsRe
 	for _, client := range found {
 		cli := client.GetClient()
 
-		switch filter := req.ListClientsRequest_FilterState; filter {
-		case nil:
-		default:
-			if cli.State != filter.State {
-				continue
-			}
+		if filter := req.ListClientsRequest_FilterState; filter != nil && filter.State != cli.State {
+			continue
 		}
 
 		resp.Clients = append(resp.Clients, cli)
