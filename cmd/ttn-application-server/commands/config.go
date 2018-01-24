@@ -3,7 +3,7 @@
 package commands
 
 import (
-	"github.com/TheThingsNetwork/ttn/cmd/shared"
+	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
 	"github.com/TheThingsNetwork/ttn/pkg/applicationserver"
 	conf "github.com/TheThingsNetwork/ttn/pkg/config"
 )

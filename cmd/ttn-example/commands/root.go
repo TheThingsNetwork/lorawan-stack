@@ -5,7 +5,7 @@ package commands
 import (
 	"os"
 
-	"github.com/TheThingsNetwork/ttn/cmd/shared"
+	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	conf "github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
