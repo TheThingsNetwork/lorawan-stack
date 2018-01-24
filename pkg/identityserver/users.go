@@ -24,71 +24,74 @@ type userService struct {
 
 // CreateUser creates an user in the network.
 func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequest) (*pbtypes.Empty, error) {
-	settings, err := s.store.Settings.Get()
-	if err != nil {
-		return nil, err
-	}
+	err := s.store.Transact(func(tx *store.Store) error {
+		settings, err := tx.Settings.Get()
+		if err != nil {
+			return err
+		}
 
-	// if self-registration is disabled check that an invitation token is provided
-	if !settings.SelfRegistration && req.InvitationToken == "" {
-		return nil, ErrInvitationTokenMissing.New(nil)
-	}
+		// if self-registration is disabled check that an invitation token is provided
+		if !settings.SelfRegistration && req.InvitationToken == "" {
+			return ErrInvitationTokenMissing.New(nil)
+		}
 
-	// check for blacklisted ids
-	if !util.IsIDAllowed(req.User.UserID, settings.BlacklistedIDs) {
-		return nil, ErrBlacklistedID.New(errors.Attributes{
-			"id": req.User.UserID,
-		})
-	}
-
-	password, err := types.Hash(req.User.Password)
-	if err != nil {
-		return nil, err
-	}
-
-	user := &ttnpb.User{
-		UserIdentifier: req.User.UserIdentifier,
-		Name:           req.User.Name,
-		Email:          req.User.Email,
-		Password:       string(password),
-		State:          ttnpb.STATE_PENDING,
-	}
-
-	if !settings.AdminApproval {
-		user.State = ttnpb.STATE_APPROVED
-	}
-
-	fns := []func(*store.Store) error{
-		func(store *store.Store) error {
-			return store.Users.Create(user)
-		},
-	}
-
-	// check whether the provided email is allowed when an invitation token wasn't provided
-	if req.InvitationToken == "" {
-		if !util.IsEmailAllowed(req.User.Email, settings.AllowedEmails) {
-			return nil, ErrEmailAddressNotAllowed.New(errors.Attributes{
-				"email":          req.User.Email,
-				"allowed_emails": settings.AllowedEmails,
+		// check for blacklisted ids
+		if !util.IsIDAllowed(req.User.UserID, settings.BlacklistedIDs) {
+			return ErrBlacklistedID.New(errors.Attributes{
+				"id": req.User.UserID,
 			})
 		}
-	} else {
-		fns = append(fns, func(store *store.Store) error {
-			return store.Invitations.Use(req.User.Email, req.InvitationToken)
-		})
-	}
 
-	if settings.SkipValidation {
-		user.ValidatedAt = time.Now().UTC()
-	} else {
-		token := &store.ValidationToken{
-			ValidationToken: random.String(64),
-			CreatedAt:       time.Now(),
-			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
+		password, err := types.Hash(req.User.Password)
+		if err != nil {
+			return err
 		}
 
-		fns = append(fns, func(store *store.Store) error {
-			err := store.Users.SaveValidationToken(user.UserID, token)
+		user := &ttnpb.User{
+			UserIdentifier: req.User.UserIdentifier,
+			Name:           req.User.Name,
+			Email:          req.User.Email,
+			Password:       string(password),
+			State:          ttnpb.STATE_PENDING,
+		}
+
+		if settings.SkipValidation {
+			user.ValidatedAt = time.Now().UTC()
+		}
+
+		if !settings.AdminApproval {
+			user.State = ttnpb.STATE_APPROVED
+		}
+
+		err = tx.Users.Create(user)
+		if err != nil {
+			return err
+		}
+
+		// check whether the provided email is allowed or not when an invitation token
+		// wasn't provided
+		if req.InvitationToken == "" {
+			if !util.IsEmailAllowed(req.User.Email, settings.AllowedEmails) {
+				return ErrEmailAddressNotAllowed.New(errors.Attributes{
+					"email":          req.User.Email,
+					"allowed_emails": settings.AllowedEmails,
+				})
+			}
+		} else {
+			err = tx.Invitations.Use(req.User.Email, req.InvitationToken)
+			if err != nil {
+				return err
+			}
+		}
+
+		if !settings.SkipValidation {
+			token := &store.ValidationToken{
+				ValidationToken: random.String(64),
+				CreatedAt:       time.Now(),
+				ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
+			}
+
+			err = tx.Users.SaveValidationToken(user.UserID, token)
 			if err != nil {
 				return err
 			}
@@ -98,15 +101,6 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 				PublicURL:        s.config.PublicURL,
 				Token:            token.ValidationToken,
 			})
-		})
-	}
-
-	err = s.store.Transact(func(store *store.Store) error {
-		for _, fn := range fns {
-			err := fn(store)
-			if err != nil {
-				return err
-			}
 		}
 
 		return nil
