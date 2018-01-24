@@ -18,6 +18,9 @@ type gatewayStoreEntry struct {
 	channel chan *ttnpb.GatewayDown
 
 	scheduler scheduling.Scheduler
+
+	observations     *ttnpb.GatewayObservations
+	observationsLock *sync.RWMutex
 }
 
 type gatewayStore struct {
@@ -84,6 +87,8 @@ type PoolSubscription interface {
 type Pool interface {
 	Subscribe(gatewayInfo ttnpb.GatewayIdentifier, link PoolSubscription, fp ttnpb.FrequencyPlan) (chan *ttnpb.GatewayUp, error)
 	Send(gatewayInfo ttnpb.GatewayIdentifier, downstream *ttnpb.GatewayDown) error
+
+	GetGatewayObservations(gatewayInfo *ttnpb.GatewayIdentifier) (*ttnpb.GatewayObservations, error)
 }
 
 type pool struct {
@@ -104,4 +109,16 @@ func NewPool(logger log.Interface, sendTimeout time.Duration) Pool {
 
 		logger: logger,
 	}
+}
+
+func (p *pool) GetGatewayObservations(gatewayInfo *ttnpb.GatewayIdentifier) (*ttnpb.GatewayObservations, error) {
+	gateway, err := p.store.Fetch(*gatewayInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	gateway.observationsLock.RLock()
+	obs := gateway.observations
+	gateway.observationsLock.RUnlock()
+	return obs, nil
 }

@@ -36,8 +36,19 @@ func (p *pool) Send(gatewayInfo ttnpb.GatewayIdentifier, downstream *ttnpb.Gatew
 
 	select {
 	case gateway.channel <- downstream:
+		p.addDownstreamObservations(gateway, downstream)
 		return nil
 	case <-time.After(p.sendTimeout):
 		return errors.Errorf("Downlink could not be picked up by this gateway's sending routine in given time interval(%s)", p.sendTimeout)
 	}
+}
+
+func (p *pool) addDownstreamObservations(entry gatewayStoreEntry, down *ttnpb.GatewayDown) {
+	entry.observationsLock.Lock()
+
+	currentTime := time.Now()
+	entry.observations.LastDownlinkReceived = &currentTime
+	entry.observations.DownlinkCount = entry.observations.DownlinkCount + 1
+
+	entry.observationsLock.Unlock()
 }

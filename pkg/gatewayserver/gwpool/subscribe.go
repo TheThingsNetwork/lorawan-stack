@@ -6,6 +6,7 @@ import (
 	"io"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/scheduling"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
@@ -30,15 +31,19 @@ func (p *pool) Subscribe(gatewayInfo ttnpb.GatewayIdentifier, link PoolSubscript
 		return nil, err
 	}
 
-	p.store.Store(gatewayInfo, gatewayStoreEntry{
-		scheduler: scheduler,
-		channel:   downstreamChannel,
-	})
+	entry := gatewayStoreEntry{
+		channel: downstreamChannel,
+
+		scheduler:        scheduler,
+		observations:     &ttnpb.GatewayObservations{},
+		observationsLock: &sync.RWMutex{},
+	}
+	p.store.Store(gatewayInfo, entry)
 
 	wg := &sync.WaitGroup{}
 	// Receiving on the stream
 	wg.Add(1)
-	go p.receivingRoutine(c, upstreamChannel, wg)
+	go p.receivingRoutine(c, entry, upstreamChannel, wg)
 
 	// Sending on the stream
 	wg.Add(1)
@@ -109,7 +114,7 @@ func (p *pool) sendingRoutine(c connection, downstreamChannel chan *ttnpb.Gatewa
 	}
 }
 
-func (p *pool) receivingRoutine(c connection, upstreamChannel chan *ttnpb.GatewayUp, wg *sync.WaitGroup) {
+func (p *pool) receivingRoutine(c connection, entry gatewayStoreEntry, upstreamChannel chan *ttnpb.GatewayUp, wg *sync.WaitGroup) {
 	defer close(upstreamChannel)
 	wg.Done()
 
@@ -126,6 +131,8 @@ func (p *pool) receivingRoutine(c connection, upstreamChannel chan *ttnpb.Gatewa
 		}
 		c.Logger.Debug("Received incoming message")
 
+		p.addUpstreamObservations(entry, upstreamMessage)
+
 		select {
 		case <-ctx.Done():
 			err := ctx.Err()
@@ -138,4 +145,22 @@ func (p *pool) receivingRoutine(c connection, upstreamChannel chan *ttnpb.Gatewa
 			c.Logger.Debug("No handler for upstream message, dropping message")
 		}
 	}
+}
+
+func (p *pool) addUpstreamObservations(entry gatewayStoreEntry, up *ttnpb.GatewayUp) {
+	entry.observationsLock.Lock()
+	currentTime := time.Now()
+
+	if up.GatewayStatus != nil {
+		entry.observations.LastStatus = up.GatewayStatus
+		entry.observations.LastStatusReceived = &currentTime
+		entry.observations.StatusCount = entry.observations.StatusCount + 1
+	}
+
+	if nbUplinks := len(up.UplinkMessage); nbUplinks > 0 {
+		entry.observations.UplinkCount = entry.observations.UplinkCount + uint64(nbUplinks)
+		entry.observations.LastUplinkReceived = &currentTime
+	}
+
+	entry.observationsLock.Unlock()
 }
