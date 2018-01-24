@@ -5,19 +5,14 @@ package redis_test
 import (
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/cmd/shared"
-	"github.com/TheThingsNetwork/ttn/pkg/config"
 	. "github.com/TheThingsNetwork/ttn/pkg/store/redis"
 	"github.com/TheThingsNetwork/ttn/pkg/store/storetest"
+	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 )
 
 func TestStore(t *testing.T) {
 	s := New(&Config{
-		Redis: config.Redis{
-			Address:  shared.DefaultRedisConfig.Address,
-			Database: 9,
-			Prefix:   "test",
-		},
+		Redis:     test.RedisConfig(),
 		IndexKeys: []string{"foo", "bar"},
 	})
 	keys, err := s.Redis.Keys("test:*").Result()

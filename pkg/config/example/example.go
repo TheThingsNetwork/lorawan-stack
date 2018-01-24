@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/TheThingsNetwork/ttn/cmd/shared"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/spf13/cobra"
 	yaml "gopkg.in/yaml.v2"
@@ -29,7 +28,6 @@ var (
 	// mgr is a configuration manager for the example program, initialized
 	// with default config values.
 	mgr = config.InitializeWithDefaults("example", &Config{
-		Base:   shared.DefaultBaseConfig,
 		Int:    42,
 		String: "foo",
 	})

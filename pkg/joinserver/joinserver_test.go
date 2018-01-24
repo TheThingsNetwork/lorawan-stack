@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/cmd/shared"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/crypto"
 	"github.com/TheThingsNetwork/ttn/pkg/deviceregistry"
@@ -52,7 +51,7 @@ func TestHandleJoin(t *testing.T) {
 
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 	js := New(
-		component.New(test.GetLogger(t), &component.Config{ServiceBase: shared.DefaultServiceBase}),
+		component.New(test.GetLogger(t), &component.Config{}),
 		&Config{
 			Registry:        reg,
 			JoinEUIPrefixes: joinEUIPrefixes,
@@ -881,7 +880,7 @@ func TestHandleJoin(t *testing.T) {
 
 			reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 			js := New(
-				component.New(test.GetLogger(t), &component.Config{ServiceBase: shared.DefaultServiceBase}),
+				component.New(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Registry:        reg,
 					JoinEUIPrefixes: joinEUIPrefixes,
@@ -946,7 +945,7 @@ func TestGetAppSKey(t *testing.T) {
 
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 	js := New(
-		component.New(test.GetLogger(t), &component.Config{ServiceBase: shared.DefaultServiceBase}),
+		component.New(test.GetLogger(t), &component.Config{}),
 		&Config{
 			Registry:        reg,
 			JoinEUIPrefixes: joinEUIPrefixes,
@@ -1121,7 +1120,7 @@ func TestGetAppSKey(t *testing.T) {
 
 			reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 			js := New(
-				component.New(test.GetLogger(t), &component.Config{ServiceBase: shared.DefaultServiceBase}),
+				component.New(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Registry:        reg,
 					JoinEUIPrefixes: joinEUIPrefixes,
@@ -1164,7 +1163,7 @@ func TestGetNwkSKeys(t *testing.T) {
 
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 	js := New(
-		component.New(test.GetLogger(t), &component.Config{ServiceBase: shared.DefaultServiceBase}),
+		component.New(test.GetLogger(t), &component.Config{}),
 		&Config{
 			Registry:        reg,
 			JoinEUIPrefixes: joinEUIPrefixes,
@@ -1371,7 +1370,7 @@ func TestGetNwkSKeys(t *testing.T) {
 
 			reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 			js := New(
-				component.New(test.GetLogger(t), &component.Config{ServiceBase: shared.DefaultServiceBase}),
+				component.New(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Registry:        reg,
 					JoinEUIPrefixes: joinEUIPrefixes,

@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/cmd/shared"
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/auth/oauth"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
@@ -40,7 +39,7 @@ func init() {
 func getIS(t testing.TB) *IdentityServer {
 	if testIS == nil {
 		logger := test.GetLogger(t)
-		comp := component.New(logger, &component.Config{ServiceBase: shared.DefaultServiceBase})
+		comp := component.New(logger, &component.Config{})
 
 		is, err := New(comp, testConfig, WithDefaultSettings(testSettings()))
 		if err != nil {
