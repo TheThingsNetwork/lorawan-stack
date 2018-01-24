@@ -23,12 +23,12 @@ func TestRegistry(t *testing.T) {
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	device, err := r.Create(ed)
+	dev, err := r.Create(ed)
 	if !a.So(err, should.BeNil) {
 		return
 	}
-	if a.So(device, should.NotBeNil) {
-		a.So(device.EndDevice, should.Resemble, ed)
+	if a.So(dev, should.NotBeNil) {
+		a.So(dev.EndDevice, should.Resemble, ed)
 	}
 
 	found, err := r.FindBy(ed)
@@ -40,11 +40,11 @@ func TestRegistry(t *testing.T) {
 	}
 
 	updated := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-	for device.EndDeviceIdentifiers == updated.EndDeviceIdentifiers {
+	for dev.EndDeviceIdentifiers == updated.EndDeviceIdentifiers {
 		updated = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	}
-	device.EndDevice = updated
-	if !a.So(device.Update(store.DiffFields(updated, ed)...), should.BeNil) {
+	dev.EndDevice = updated
+	if !a.So(dev.Update(store.DiffFields(updated, ed)...), should.BeNil) {
 		return
 	}
 
@@ -60,7 +60,7 @@ func TestRegistry(t *testing.T) {
 		a.So(pretty.Diff(found[0].EndDevice, updated), should.BeEmpty)
 	}
 
-	a.So(device.Delete(), should.BeNil)
+	a.So(dev.Delete(), should.BeNil)
 
 	found, err = r.FindBy(updated)
 	a.So(err, should.BeNil)
@@ -75,12 +75,12 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	device, err := r.Create(ed)
+	dev, err := r.Create(ed)
 	if !a.So(err, should.BeNil) {
 		return
 	}
-	if a.So(device, should.NotBeNil) {
-		a.So(device.EndDevice, should.Resemble, ed)
+	if a.So(dev, should.NotBeNil) {
+		a.So(dev.EndDevice, should.Resemble, ed)
 	}
 
 	found, err := FindDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
@@ -96,11 +96,11 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 	}
 
 	updated := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-	for device.EndDeviceIdentifiers == updated.EndDeviceIdentifiers {
+	for dev.EndDeviceIdentifiers == updated.EndDeviceIdentifiers {
 		updated = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	}
-	device.EndDevice = updated
-	if !a.So(device.Update(store.DiffFields(updated, ed)...), should.BeNil) {
+	dev.EndDevice = updated
+	if !a.So(dev.Update(store.DiffFields(updated, ed)...), should.BeNil) {
 		return
 	}
 
@@ -128,7 +128,7 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 		a.So(pretty.Diff(found[0].EndDevice, updated), should.BeEmpty)
 	}
 
-	a.So(device.Delete(), should.BeNil)
+	a.So(dev.Delete(), should.BeNil)
 
 	found, err = FindDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
 		DevEUI:        updated.DevEUI,
@@ -148,6 +148,7 @@ func TestFindOneDeviceByIdentifiers(t *testing.T) {
 	r := New(store.NewTypedStoreClient(mapstore.New()))
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+	ed.Attributes = nil
 
 	found, err := FindOneDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
 		DevEUI:        ed.DevEUI,
@@ -159,11 +160,15 @@ func TestFindOneDeviceByIdentifiers(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(found, should.BeNil)
 
-	device, err := r.Create(ed)
+	dev, err := r.Create(ed)
 	if !a.So(err, should.BeNil) {
 		return
 	}
-	a.So(pretty.Diff(device.EndDevice, ed), should.BeEmpty)
+	if a.So(dev, should.NotBeNil) {
+		if !a.So(dev.EndDevice, should.Resemble, ed) {
+			pretty.Ldiff(t, dev.EndDevice, ed)
+		}
+	}
 
 	found, err = FindOneDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
 		DevEUI:        ed.DevEUI,
@@ -173,13 +178,19 @@ func TestFindOneDeviceByIdentifiers(t *testing.T) {
 		ApplicationID: ed.ApplicationID,
 	})
 	a.So(err, should.BeNil)
-	a.So(pretty.Diff(found.EndDevice, ed), should.BeEmpty)
+	if a.So(found, should.NotBeNil) {
+		if !a.So(found.EndDevice, should.Resemble, dev.EndDevice) {
+			pretty.Ldiff(t, found.EndDevice, dev.EndDevice)
+		}
+	}
 
-	device, err = r.Create(ed)
+	dev, err = r.Create(ed)
 	if !a.So(err, should.BeNil) {
 		return
 	}
-	a.So(pretty.Diff(device.EndDevice, ed), should.BeEmpty)
+	if a.So(dev, should.NotBeNil) {
+		a.So(dev.EndDevice, should.Resemble, ed)
+	}
 
 	found, err = FindOneDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
 		DevEUI:        ed.DevEUI,
@@ -210,7 +221,7 @@ func ExampleRegistry() {
 
 	dev, err := r.Create(ed)
 	if err != nil {
-		panic(fmt.Errorf("Failed to create device %s", err))
+		panic(fmt.Errorf("Failed to create dev %s", err))
 	}
 
 	dev.NextDevNonce++
@@ -222,22 +233,22 @@ func ExampleRegistry() {
 	dev.DevAddr = &devAddr
 	err = dev.Update()
 	if err != nil {
-		panic(fmt.Errorf("Failed to update device %s", err))
+		panic(fmt.Errorf("Failed to update dev %s", err))
 	}
 
 	devs, err := FindDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
 		ApplicationID: "test",
 	})
 	if err != nil {
-		panic(fmt.Errorf("Failed to find device by identifiers %s", err))
+		panic(fmt.Errorf("Failed to find dev by identifiers %s", err))
 	}
 	if len(devs) != 1 {
-		panic(fmt.Errorf("Expected to find 1 device, got %d", len(devs)))
+		panic(fmt.Errorf("Expected to find 1 dev, got %d", len(devs)))
 	}
 	dev = devs[0]
 
 	err = dev.Delete()
 	if err != nil {
-		panic(fmt.Errorf("Failed to delete device %s", err))
+		panic(fmt.Errorf("Failed to delete dev %s", err))
 	}
 }

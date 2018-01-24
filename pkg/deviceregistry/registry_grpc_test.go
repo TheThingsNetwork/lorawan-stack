@@ -24,7 +24,7 @@ func TestRegistryRPC(t *testing.T) {
 
 	dev := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	v, err := dr.SetDevice(context.Background(), dev)
+	v, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *dev})
 	if !a.So(err, should.BeNil) {
 		return
 	}
@@ -54,11 +54,11 @@ func TestSetDeviceNoCheck(t *testing.T) {
 
 	dev := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	v, err := dr.SetDevice(context.Background(), dev)
+	v, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *dev})
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 
-	v, err = dr.SetDevice(context.Background(), dev)
+	v, err = dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *dev})
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 
@@ -67,7 +67,7 @@ func TestSetDeviceNoCheck(t *testing.T) {
 		return
 	}
 
-	v, err = dr.SetDevice(context.Background(), dev)
+	v, err = dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *dev})
 	a.So(err, should.NotBeNil)
 	a.So(v, should.BeNil)
 }
@@ -195,7 +195,7 @@ func TestCheck(t *testing.T) {
 	deleteCheck := func(context.Context, *ttnpb.EndDeviceIdentifiers) error {
 		return checkErr
 	}
-	setCheck := func(context.Context, *ttnpb.EndDevice) error {
+	setCheck := func(context.Context, *ttnpb.EndDevice, ...string) error {
 		return checkErr
 	}
 
@@ -211,18 +211,18 @@ func TestCheck(t *testing.T) {
 	// Set
 
 	checkErr = errors.New("err")
-	v, err := dr.SetDevice(context.Background(), dev)
+	v, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *dev})
 	a.So(errors.From(err).Code(), should.Equal, ErrCheckFailed.Code)
 	a.So(errors.From(err).Type(), should.Equal, ErrCheckFailed.Type)
 	a.So(v, should.BeNil)
 
 	checkErr = errTest.New(nil)
-	v, err = dr.SetDevice(context.Background(), dev)
+	v, err = dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *dev})
 	a.So(err, should.Equal, checkErr)
 	a.So(v, should.BeNil)
 
 	checkErr = nil
-	v, err = dr.SetDevice(context.Background(), dev)
+	v, err = dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *dev})
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 

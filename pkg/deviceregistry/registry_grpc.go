@@ -47,10 +47,10 @@ type RegistryRPC struct {
 	*component.Component
 
 	checks struct {
-		ListDevices  func(context.Context, *ttnpb.EndDeviceIdentifiers) error
-		GetDevice    func(context.Context, *ttnpb.EndDeviceIdentifiers) error
-		SetDevice    func(context.Context, *ttnpb.EndDevice) error
-		DeleteDevice func(context.Context, *ttnpb.EndDeviceIdentifiers) error
+		ListDevices  func(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) error
+		GetDevice    func(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) error
+		SetDevice    func(ctx context.Context, dev *ttnpb.EndDevice, fields ...string) error
+		DeleteDevice func(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) error
 	}
 }
 
@@ -74,7 +74,7 @@ func WithGetDeviceCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) er
 // WithSetDeviceCheck sets a check to SetDevice method of RegistryRPC instance.
 // SetDevice first executes fn and if error is returned by it,
 // returns error, otherwise execution advances as usual.
-func WithSetDeviceCheck(fn func(context.Context, *ttnpb.EndDevice) error) RPCOption {
+func WithSetDeviceCheck(fn func(context.Context, *ttnpb.EndDevice, ...string) error) RPCOption {
 	return func(r *RegistryRPC) { r.checks.SetDevice = fn }
 }
 
@@ -154,9 +154,13 @@ func (r *RegistryRPC) GetDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifi
 }
 
 // SetDevice sets the device fields to match those of dev in underlying registry.
-func (r *RegistryRPC) SetDevice(ctx context.Context, dev *ttnpb.EndDevice) (*pbtypes.Empty, error) {
+func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest) (*pbtypes.Empty, error) {
+	var fields []string
+	if req.Fields != nil {
+		fields = req.Fields.Paths
+	}
 	if r.checks.SetDevice != nil {
-		if err := r.checks.SetDevice(ctx, dev); err != nil {
+		if err := r.checks.SetDevice(ctx, &req.Device, fields...); err != nil {
 			if errors.GetType(err) != errors.Unknown {
 				return nil, err
 			}
@@ -164,22 +168,24 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, dev *ttnpb.EndDevice) (*pbt
 		}
 	}
 
-	devs, err := FindDeviceByIdentifiers(r.Interface, &dev.EndDeviceIdentifiers)
+	devs, err := FindDeviceByIdentifiers(r.Interface, &req.Device.EndDeviceIdentifiers)
 	if err != nil {
 		return nil, err
 	}
 	switch len(devs) {
 	case 0:
-		_, err := r.Interface.Create(dev)
+		_, err := r.Interface.Create(&req.Device)
 		if err != nil {
 			return nil, err
 		}
 		return &pbtypes.Empty{}, nil
 	case 1:
-		return &pbtypes.Empty{}, devs[0].Update()
+		dev := devs[0]
+		dev.EndDevice = &req.Device
+		return &pbtypes.Empty{}, dev.Update(fields...)
 	default:
 		return nil, ErrTooManyDevices.New(errors.Attributes{
-			"id": dev.DeviceID,
+			"id": req.Device.DeviceID,
 		})
 	}
 }
