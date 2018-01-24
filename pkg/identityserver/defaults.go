@@ -51,7 +51,7 @@ var DefaultSettings = &ttnpb.IdentityServerSettings{
 	},
 	AllowedEmails:      []string{"*"},
 	ValidationTokenTTL: time.Hour,
-	InvitationTokenTTL: time.Duration(48) * time.Hour,
+	InvitationTokenTTL: time.Hour * time.Duration(24*7),
 }
 
 var DefaultFactories = Factories{
