@@ -106,14 +106,16 @@ func marshalNested(v reflect.Value) interface{} {
 	if !v.IsValid() {
 		return nil
 	}
+
+	iv := reflect.Indirect(v)
+	if !iv.IsValid() {
+		return nil
+	}
 	if m, ok := v.Interface().(MapMarshaler); ok {
 		return m.MarshalMap()
 	}
+	v = iv
 
-	v = reflect.Indirect(v)
-	if !v.IsValid() {
-		return nil
-	}
 	switch v.Kind() {
 	case reflect.Struct:
 		m := marshal(v.Interface())
@@ -180,8 +182,9 @@ func marshal(s interface{}) map[string]interface{} {
 			panic(errors.Errorf("Expected the map key kind to be string, got %s", t.Elem().Kind()))
 		}
 		for _, k := range v.MapKeys() {
-			// https://stackoverflow.com/questions/14142667/reflect-value-mapindex-returns-a-value-different-from-reflect-valueof
-			vals[k.String()] = reflect.ValueOf(v.MapIndex(k).Interface())
+			if mv := reflect.ValueOf(v.MapIndex(k).Interface()); !isZero(mv) {
+				vals[k.String()] = mv
+			}
 		}
 	case reflect.Struct:
 		for i := 0; i < t.NumField(); i++ {
@@ -189,7 +192,9 @@ func marshal(s interface{}) map[string]interface{} {
 			if f.PkgPath != "" {
 				continue
 			}
-			vals[f.Name] = v.FieldByName(f.Name)
+			if fv := reflect.ValueOf(v.FieldByName(f.Name).Interface()); !isZero(fv) {
+				vals[f.Name] = fv
+			}
 		}
 	default:
 		panic(errors.Errorf("Expected argument to be a struct or map with string keys, got %s", t.Kind()))

@@ -131,7 +131,10 @@ func TestTypedClient(t *testing.T) {
 			},
 			&Second{
 				Slice: []First{
-					First{A: 42},
+					First{
+						A: 42,
+						G: firstVal.G,
+					},
 					First{A: 42},
 					firstVal,
 				},
@@ -152,7 +155,7 @@ func TestTypedClient(t *testing.T) {
 					},
 				},
 			},
-			[]string{"Slice", "Slice.0.E", "Slice.0.F", "Slice.0.G", "SlicePtr.1", "SliceMap"},
+			[]string{"Slice", "Slice.0.B", "Slice.0.C", "Slice.0.D", "Slice.0.E", "Slice.0.F", "SlicePtr.1", "SliceMap"},
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
@@ -212,7 +215,8 @@ func TestTypedClient(t *testing.T) {
 			a.So(err, should.NotBeNil)
 
 			m, err = cl.FindBy(tc.AfterUpdate, newResult)
-			a.So(err, should.NotBeNil)
+			a.So(err, should.BeNil)
+			a.So(m, should.HaveLength, 0)
 		})
 	}
 }

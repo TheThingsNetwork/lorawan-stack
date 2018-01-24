@@ -136,11 +136,11 @@ func TestTypedStore(t testingT, s store.TypedStore) {
 			a.So(found, should.Equal, nil)
 
 			matches, err = s.FindBy(tc.AfterUpdate)
-			a.So(err, should.Equal, store.ErrNotFound)
+			a.So(err, should.BeNil)
 			a.So(matches, should.HaveLength, 0)
 
 			matches, err = s.FindBy(tc.FindBy)
-			a.So(err, should.Equal, store.ErrNotFound)
+			a.So(err, should.BeNil)
 			a.So(matches, should.HaveLength, 0)
 		})
 	}
@@ -266,10 +266,12 @@ func TestByteStore(t testingT, s store.ByteStore) {
 			a.So(found, should.Equal, nil)
 
 			matches, err = s.FindBy(tc.AfterUpdate)
-			a.So(err, should.Equal, store.ErrNotFound)
+			a.So(err, should.BeNil)
+			a.So(matches, should.HaveLength, 0)
 
 			matches, err = s.FindBy(tc.FindBy)
-			a.So(err, should.Equal, store.ErrNotFound)
+			a.So(err, should.BeNil)
+			a.So(matches, should.HaveLength, 0)
 		})
 	}
 }

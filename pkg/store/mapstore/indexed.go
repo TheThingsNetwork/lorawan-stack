@@ -164,9 +164,6 @@ func (s *indexedStore) FindBy(filters map[string]interface{}) (map[store.Primary
 	case len(fields) != 0:
 		matches = byFields
 	}
-	if len(matches) == 0 {
-		return nil, store.ErrNotFound
-	}
 	return matches, nil
 }
 

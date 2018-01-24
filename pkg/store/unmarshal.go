@@ -81,8 +81,8 @@ func UnmarshalMap(m map[string]interface{}, v interface{}) error {
 			return nil
 		}
 		dec, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-			ZeroFields:       true,
 			WeaklyTypedInput: true,
+			ZeroFields:       true,
 			Result:           v,
 		})
 		if err != nil {

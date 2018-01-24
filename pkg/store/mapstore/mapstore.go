@@ -62,9 +62,6 @@ outer:
 		matches[id] = fields
 	}
 	s.mu.RUnlock()
-	if len(matches) == 0 {
-		return nil, store.ErrNotFound
-	}
 	return matches, nil
 }
 
