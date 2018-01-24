@@ -11,6 +11,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/random"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
@@ -97,6 +98,13 @@ func (s *adminService) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequ
 		settings, err := tx.Settings.Get()
 		if err != nil {
 			return err
+		}
+
+		// check for blacklisted ids
+		if !util.IsIDAllowed(req.User.UserID, settings.BlacklistedIDs) {
+			return ErrBlacklistedID.New(errors.Attributes{
+				"id": req.User.UserID,
+			})
 		}
 
 		if settings.SkipValidation {
