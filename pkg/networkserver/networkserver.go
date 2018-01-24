@@ -84,17 +84,13 @@ func (ns *NetworkServer) DownlinkQueueClear(ctx context.Context, id *ttnpb.EndDe
 func (ns *NetworkServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterGsNsServer(s, ns)
 	ttnpb.RegisterAsNsServer(s, ns)
-	ttnpb.RegisterApplicationDownlinkQueueServer(s, ns)
-	if ns.Component.DeviceRegistry == nil {
-		ttnpb.RegisterDeviceRegistryServer(s, ns)
-	}
+	ttnpb.RegisterNsApplicationDownlinkQueueServer(s, ns)
+	ttnpb.RegisterNsDeviceRegistryServer(s, ns)
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (ns *NetworkServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
-	if ns.Component.DeviceRegistry == nil {
-		ttnpb.RegisterDeviceRegistryHandler(ns.Context(), s, conn)
-	}
+	ttnpb.RegisterNsDeviceRegistryHandler(ns.Context(), s, conn)
 }
 
 // Roles returns the roles that the network server fulfils
