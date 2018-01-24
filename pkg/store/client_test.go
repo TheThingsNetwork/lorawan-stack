@@ -67,12 +67,12 @@ var secondVal = Second{
 		"first": &firstVal,
 	},
 	SliceMap: map[string][]First{
-		"first": []First{
+		"first": {
 			firstVal,
 		},
 	},
 	SliceMapPtr: map[string][]*First{
-		"first": []*First{
+		"first": {
 			&firstVal,
 		},
 	},
@@ -118,8 +118,8 @@ func TestTypedClient(t *testing.T) {
 			&secondVal,
 			&Second{
 				Slice: []First{
-					First{A: 42},
-					First{A: 42},
+					{A: 42},
+					{A: 42},
 					firstVal,
 				},
 				SlicePtr: []*First{
@@ -131,11 +131,11 @@ func TestTypedClient(t *testing.T) {
 			},
 			&Second{
 				Slice: []First{
-					First{
+					{
 						A: 42,
 						G: firstVal.G,
 					},
-					First{A: 42},
+					{A: 42},
 					firstVal,
 				},
 				SlicePtr: []*First{
@@ -150,7 +150,7 @@ func TestTypedClient(t *testing.T) {
 				},
 				SliceMap: nil,
 				SliceMapPtr: map[string][]*First{
-					"first": []*First{
+					"first": {
 						&firstVal,
 					},
 				},

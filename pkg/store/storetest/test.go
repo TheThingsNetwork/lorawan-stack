@@ -191,7 +191,7 @@ func TestByteStore(t testingT, s store.ByteStore) {
 		},
 		{
 			map[string][]byte{
-				"a.a":   []byte{1},
+				"a.a":   {1},
 				"a.b.a": []byte("1"),
 				"a.b.c": []byte("foo"),
 				"a.c.a": []byte("bar"),
@@ -201,10 +201,10 @@ func TestByteStore(t testingT, s store.ByteStore) {
 				"a.c": nil,
 			},
 			map[string][]byte{
-				"a.a": []byte{1},
+				"a.a": {1},
 			},
 			map[string][]byte{
-				"a.a": []byte{1},
+				"a.a": {1},
 			},
 		},
 	} {
