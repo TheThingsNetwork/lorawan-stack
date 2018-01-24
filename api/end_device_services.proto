@@ -2,15 +2,21 @@
 
 syntax = "proto3";
 
-import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/end_device.proto";
+import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
 
 package ttn.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+
+message SetDeviceRequest{
+  EndDevice device = 1 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask fields = 2;
+}
 
 // The NsDeviceRegistry service allows clients to manage their end devices on the network server
 service NsDeviceRegistry {
@@ -30,12 +36,12 @@ service NsDeviceRegistry {
   };
 
   // SetDevice creates or updates the device
-  rpc SetDevice(EndDevice) returns (google.protobuf.Empty) {
+  rpc SetDevice(SetDeviceRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/ns/applications/{ids.application_id}/devices/{ids.device_id}"
+      post: "/ns/applications/{device.ids.application_id}/devices/{device.ids.device_id}"
       body: "*"
       additional_bindings {
-        post: "/ns/applications/{ids.application_id}/devices"
+        post: "/ns/applications/{device.ids.application_id}/devices"
         body: "*"
       };
     };
@@ -68,12 +74,12 @@ service AsDeviceRegistry {
   };
 
   // SetDevice creates or updates the device
-  rpc SetDevice(EndDevice) returns (google.protobuf.Empty) {
+  rpc SetDevice(SetDeviceRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/as/applications/{ids.application_id}/devices/{ids.device_id}"
+      post: "/as/applications/{device.ids.application_id}/devices/{device.ids.device_id}"
       body: "*"
       additional_bindings {
-        post: "/as/applications/{ids.application_id}/devices"
+        post: "/as/applications/{device.ids.application_id}/devices"
         body: "*"
       };
     };
@@ -106,12 +112,12 @@ service JsDeviceRegistry {
   };
 
   // SetDevice creates or updates the device
-  rpc SetDevice(EndDevice) returns (google.protobuf.Empty) {
+  rpc SetDevice(SetDeviceRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/js/applications/{ids.application_id}/devices/{ids.device_id}"
+      post: "/js/applications/{device.ids.application_id}/devices/{device.ids.device_id}"
       body: "*"
       additional_bindings {
-        post: "/js/applications/{ids.application_id}/devices"
+        post: "/js/applications/{device.ids.application_id}/devices"
         body: "*"
       };
     };

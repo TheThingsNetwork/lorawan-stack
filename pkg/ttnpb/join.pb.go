@@ -8,7 +8,7 @@ import golang_proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
-import google_protobuf4 "github.com/gogo/protobuf/types"
+import google_protobuf5 "github.com/gogo/protobuf/types"
 
 import github_com_TheThingsNetwork_ttn_pkg_types "github.com/TheThingsNetwork/ttn/pkg/types"
 
@@ -97,7 +97,7 @@ type JoinResponse struct {
 	// The session keys
 	SessionKeys `protobuf:"bytes,2,opt,name=session_keys,json=sessionKeys,embedded=session_keys" json:"session_keys"`
 	// Lifetime of the session
-	Lifetime *google_protobuf4.Duration `protobuf:"bytes,3,opt,name=lifetime" json:"lifetime,omitempty"`
+	Lifetime *google_protobuf5.Duration `protobuf:"bytes,3,opt,name=lifetime" json:"lifetime,omitempty"`
 }
 
 func (m *JoinResponse) Reset()                    { *m = JoinResponse{} }
@@ -112,7 +112,7 @@ func (m *JoinResponse) GetRawPayload() []byte {
 	return nil
 }
 
-func (m *JoinResponse) GetLifetime() *google_protobuf4.Duration {
+func (m *JoinResponse) GetLifetime() *google_protobuf5.Duration {
 	if m != nil {
 		return m.Lifetime
 	}
@@ -436,7 +436,7 @@ func NewPopulatedJoinResponse(r randyJoin, easy bool) *JoinResponse {
 	v2 := NewPopulatedSessionKeys(r, easy)
 	this.SessionKeys = *v2
 	if r.Intn(10) != 0 {
-		this.Lifetime = google_protobuf4.NewPopulatedDuration(r, easy)
+		this.Lifetime = google_protobuf5.NewPopulatedDuration(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -961,7 +961,7 @@ func (m *JoinResponse) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Lifetime == nil {
-				m.Lifetime = &google_protobuf4.Duration{}
+				m.Lifetime = &google_protobuf5.Duration{}
 			}
 			if err := m.Lifetime.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err

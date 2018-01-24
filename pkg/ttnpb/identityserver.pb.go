@@ -11,7 +11,7 @@ import _ "github.com/gogo/protobuf/gogoproto"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 import google_protobuf2 "github.com/gogo/protobuf/types"
 import _ "github.com/gogo/protobuf/types"
-import google_protobuf5 "github.com/gogo/protobuf/types"
+import google_protobuf4 "github.com/gogo/protobuf/types"
 import _ "github.com/gogo/protobuf/types"
 
 import time "time"
@@ -37,7 +37,7 @@ type PullConfigurationRequest struct {
 	GatewayIdentifier `protobuf:"bytes,1,opt,name=gateway_id,json=gatewayId,embedded=gateway_id" json:"gateway_id"`
 	// projection_mask is the symbolic set of fields that will be filtered in the
 	// response. If empty all fields will be returned.
-	ProjectionMask *google_protobuf5.FieldMask `protobuf:"bytes,2,opt,name=projection_mask,json=projectionMask" json:"projection_mask,omitempty"`
+	ProjectionMask *google_protobuf4.FieldMask `protobuf:"bytes,2,opt,name=projection_mask,json=projectionMask" json:"projection_mask,omitempty"`
 }
 
 func (m *PullConfigurationRequest) Reset()         { *m = PullConfigurationRequest{} }
@@ -47,7 +47,7 @@ func (*PullConfigurationRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptorIdentityserver, []int{0}
 }
 
-func (m *PullConfigurationRequest) GetProjectionMask() *google_protobuf5.FieldMask {
+func (m *PullConfigurationRequest) GetProjectionMask() *google_protobuf4.FieldMask {
 	if m != nil {
 		return m.ProjectionMask
 	}
@@ -163,7 +163,7 @@ type UpdateSettingsRequest struct {
 	// update_mask is the symbolic set of fields that will be affected in the update
 	// operation. Fields not included in the update_mask are not changed and ignored
 	// in the request. Must be non-empty.
-	UpdateMask google_protobuf5.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
+	UpdateMask google_protobuf4.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
 }
 
 func (m *UpdateSettingsRequest) Reset()         { *m = UpdateSettingsRequest{} }
@@ -180,11 +180,11 @@ func (m *UpdateSettingsRequest) GetSettings() IdentityServerSettings {
 	return IdentityServerSettings{}
 }
 
-func (m *UpdateSettingsRequest) GetUpdateMask() google_protobuf5.FieldMask {
+func (m *UpdateSettingsRequest) GetUpdateMask() google_protobuf4.FieldMask {
 	if m != nil {
 		return m.UpdateMask
 	}
-	return google_protobuf5.FieldMask{}
+	return google_protobuf4.FieldMask{}
 }
 
 type ResetUserPasswordResponse struct {
@@ -409,7 +409,7 @@ type UpdateUserRequest struct {
 	// update_mask is the symbolic set of fields that will be affected in the update
 	// operation. Fields not included in the update_mask are not changed and ignored
 	// in the request. Must be non-empty.
-	UpdateMask google_protobuf5.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
+	UpdateMask google_protobuf4.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
 }
 
 func (m *UpdateUserRequest) Reset()                    { *m = UpdateUserRequest{} }
@@ -424,11 +424,11 @@ func (m *UpdateUserRequest) GetUser() User {
 	return User{}
 }
 
-func (m *UpdateUserRequest) GetUpdateMask() google_protobuf5.FieldMask {
+func (m *UpdateUserRequest) GetUpdateMask() google_protobuf4.FieldMask {
 	if m != nil {
 		return m.UpdateMask
 	}
-	return google_protobuf5.FieldMask{}
+	return google_protobuf4.FieldMask{}
 }
 
 type UpdateUserPasswordRequest struct {
@@ -650,7 +650,7 @@ type UpdateApplicationRequest struct {
 	// update_mask is the set of field paths that will be affected in the update
 	// operation. Fields not included in the update_mask are not changed and ignored
 	// in the request. Must be non-empty.
-	UpdateMask google_protobuf5.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
+	UpdateMask google_protobuf4.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
 }
 
 func (m *UpdateApplicationRequest) Reset()         { *m = UpdateApplicationRequest{} }
@@ -667,11 +667,11 @@ func (m *UpdateApplicationRequest) GetApplication() Application {
 	return Application{}
 }
 
-func (m *UpdateApplicationRequest) GetUpdateMask() google_protobuf5.FieldMask {
+func (m *UpdateApplicationRequest) GetUpdateMask() google_protobuf4.FieldMask {
 	if m != nil {
 		return m.UpdateMask
 	}
-	return google_protobuf5.FieldMask{}
+	return google_protobuf4.FieldMask{}
 }
 
 type GenerateApplicationAPIKeyRequest struct {
@@ -870,7 +870,7 @@ type UpdateGatewayRequest struct {
 	// update_mask is the set of field paths that will be affected in the update
 	// operation. Fields not included in the update_mask are not changed and ignored
 	// in the request. Must be non-empty.
-	UpdateMask google_protobuf5.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
+	UpdateMask google_protobuf4.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
 }
 
 func (m *UpdateGatewayRequest) Reset()         { *m = UpdateGatewayRequest{} }
@@ -887,11 +887,11 @@ func (m *UpdateGatewayRequest) GetGateway() Gateway {
 	return Gateway{}
 }
 
-func (m *UpdateGatewayRequest) GetUpdateMask() google_protobuf5.FieldMask {
+func (m *UpdateGatewayRequest) GetUpdateMask() google_protobuf4.FieldMask {
 	if m != nil {
 		return m.UpdateMask
 	}
-	return google_protobuf5.FieldMask{}
+	return google_protobuf4.FieldMask{}
 }
 
 type GenerateGatewayAPIKeyRequest struct {
@@ -1076,7 +1076,7 @@ type UpdateClientRequest struct {
 	// update_mask is the set of field paths that will be affected in the update
 	// operation. Fields not included in the update_mask are not changed and ignored
 	// in the request. Must be non-empty.
-	UpdateMask google_protobuf5.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
+	UpdateMask google_protobuf4.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
 }
 
 func (m *UpdateClientRequest) Reset()         { *m = UpdateClientRequest{} }
@@ -1093,11 +1093,11 @@ func (m *UpdateClientRequest) GetClient() Client {
 	return Client{}
 }
 
-func (m *UpdateClientRequest) GetUpdateMask() google_protobuf5.FieldMask {
+func (m *UpdateClientRequest) GetUpdateMask() google_protobuf4.FieldMask {
 	if m != nil {
 		return m.UpdateMask
 	}
-	return google_protobuf5.FieldMask{}
+	return google_protobuf4.FieldMask{}
 }
 
 type CreateOrganizationRequest struct {
@@ -1141,7 +1141,7 @@ func (m *ListOrganizationsResponse) GetOrganizations() []*Organization {
 type UpdateOrganizationRequest struct {
 	// organization is the organization to be updated.
 	Organization Organization               `protobuf:"bytes,1,opt,name=organization" json:"organization"`
-	UpdateMask   google_protobuf5.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
+	UpdateMask   google_protobuf4.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask"`
 }
 
 func (m *UpdateOrganizationRequest) Reset()         { *m = UpdateOrganizationRequest{} }
@@ -1158,11 +1158,11 @@ func (m *UpdateOrganizationRequest) GetOrganization() Organization {
 	return Organization{}
 }
 
-func (m *UpdateOrganizationRequest) GetUpdateMask() google_protobuf5.FieldMask {
+func (m *UpdateOrganizationRequest) GetUpdateMask() google_protobuf4.FieldMask {
 	if m != nil {
 		return m.UpdateMask
 	}
-	return google_protobuf5.FieldMask{}
+	return google_protobuf4.FieldMask{}
 }
 
 type GenerateOrganizationAPIKeyRequest struct {
@@ -9863,7 +9863,7 @@ func NewPopulatedPullConfigurationRequest(r randyIdentityserver, easy bool) *Pul
 	v1 := NewPopulatedGatewayIdentifier(r, easy)
 	this.GatewayIdentifier = *v1
 	if r.Intn(10) != 0 {
-		this.ProjectionMask = google_protobuf5.NewPopulatedFieldMask(r, easy)
+		this.ProjectionMask = google_protobuf4.NewPopulatedFieldMask(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -9909,7 +9909,7 @@ func NewPopulatedUpdateSettingsRequest(r randyIdentityserver, easy bool) *Update
 	this := &UpdateSettingsRequest{}
 	v8 := NewPopulatedIdentityServerSettings(r, easy)
 	this.Settings = *v8
-	v9 := google_protobuf5.NewPopulatedFieldMask(r, easy)
+	v9 := google_protobuf4.NewPopulatedFieldMask(r, easy)
 	this.UpdateMask = *v9
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -10030,7 +10030,7 @@ func NewPopulatedUpdateUserRequest(r randyIdentityserver, easy bool) *UpdateUser
 	this := &UpdateUserRequest{}
 	v15 := NewPopulatedUser(r, easy)
 	this.User = *v15
-	v16 := google_protobuf5.NewPopulatedFieldMask(r, easy)
+	v16 := google_protobuf4.NewPopulatedFieldMask(r, easy)
 	this.UpdateMask = *v16
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -10154,7 +10154,7 @@ func NewPopulatedUpdateApplicationRequest(r randyIdentityserver, easy bool) *Upd
 	this := &UpdateApplicationRequest{}
 	v25 := NewPopulatedApplication(r, easy)
 	this.Application = *v25
-	v26 := google_protobuf5.NewPopulatedFieldMask(r, easy)
+	v26 := google_protobuf4.NewPopulatedFieldMask(r, easy)
 	this.UpdateMask = *v26
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -10279,7 +10279,7 @@ func NewPopulatedUpdateGatewayRequest(r randyIdentityserver, easy bool) *UpdateG
 	this := &UpdateGatewayRequest{}
 	v39 := NewPopulatedGateway(r, easy)
 	this.Gateway = *v39
-	v40 := google_protobuf5.NewPopulatedFieldMask(r, easy)
+	v40 := google_protobuf4.NewPopulatedFieldMask(r, easy)
 	this.UpdateMask = *v40
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -10393,7 +10393,7 @@ func NewPopulatedUpdateClientRequest(r randyIdentityserver, easy bool) *UpdateCl
 	this := &UpdateClientRequest{}
 	v51 := NewPopulatedClient(r, easy)
 	this.Client = *v51
-	v52 := google_protobuf5.NewPopulatedFieldMask(r, easy)
+	v52 := google_protobuf4.NewPopulatedFieldMask(r, easy)
 	this.UpdateMask = *v52
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -10427,7 +10427,7 @@ func NewPopulatedUpdateOrganizationRequest(r randyIdentityserver, easy bool) *Up
 	this := &UpdateOrganizationRequest{}
 	v55 := NewPopulatedOrganization(r, easy)
 	this.Organization = *v55
-	v56 := google_protobuf5.NewPopulatedFieldMask(r, easy)
+	v56 := google_protobuf4.NewPopulatedFieldMask(r, easy)
 	this.UpdateMask = *v56
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -11369,7 +11369,7 @@ func (m *PullConfigurationRequest) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.ProjectionMask == nil {
-				m.ProjectionMask = &google_protobuf5.FieldMask{}
+				m.ProjectionMask = &google_protobuf4.FieldMask{}
 			}
 			if err := m.ProjectionMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err

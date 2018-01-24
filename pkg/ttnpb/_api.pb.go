@@ -54,6 +54,7 @@ It has these top-level messages:
 	MACSettings
 	MACState
 	MACInfo
+	SetDeviceRequest
 	Gateway
 	GatewayPrivacySettings
 	GatewayAntenna
