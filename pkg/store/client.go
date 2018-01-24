@@ -3,10 +3,7 @@
 package store
 
 import (
-	"fmt"
 	"strings"
-
-	"github.com/kr/pretty"
 )
 
 // NewResultFunc represents a constructor of some arbitrary type.
@@ -19,12 +16,13 @@ type NewResultFunc func() interface{}
 // FindBy returns mapping of PrimaryKey -> value, which match field values specified in filter. Filter represents an AND relation,
 // meaning that only entries matching all the fields in filter should be returned.
 // newResultFunc is the constructor of a single value expected to be returned.
-// Update overwrites stored fields under PrimaryKey with fields of v. Optional fields parameter is a list of fieldpaths separated by a '.', which specifies the subset of v's fields, that should be updated.
+// Optional fields parameter is a list of fieldpaths separated by '.', which specifies the subset of fiters's fields, that should be used for searching. The fieldpaths can be grouped in most cases by specifying the parent identifier, i.e. to use fields "FOO.A", "FOO.B" and "FOO.C", it is possible to specify field path "FOO".
+// Update overwrites stored fields under PrimaryKey with fields of v. Optional fields parameter is a list of fieldpaths separated by '.', which specifies the subset of v's fields, that should be updated. The fieldpaths can be grouped in most cases by specifying the parent identifier, i.e. to overwrite fields "FOO.A", "FOO.B" and "FOO.C", it is possible to specify field path "FOO".
 // Delete deletes the value stored under PrimaryKey specified.
 type Client interface {
 	Create(v interface{}) (PrimaryKey, error)
 	Find(id PrimaryKey, v interface{}) error
-	FindBy(filter interface{}, newResult NewResultFunc) (map[PrimaryKey]interface{}, error)
+	FindBy(filter interface{}, newResult NewResultFunc, fields ...string) (map[PrimaryKey]interface{}, error)
 	Update(id PrimaryKey, v interface{}, fields ...string) error
 	Delete(id PrimaryKey) error
 }
@@ -47,17 +45,30 @@ func (cl *typedStoreClient) Find(id PrimaryKey, v interface{}) error {
 	if err != nil {
 		return err
 	}
-	defer func() {
-		if err := recover(); err != nil {
-			pretty.Println(m)
-			fmt.Println(err)
-		}
-	}()
 	return UnmarshalMap(m, v)
 }
 
-func (cl *typedStoreClient) FindBy(filter interface{}, newResult NewResultFunc) (map[PrimaryKey]interface{}, error) {
-	m, err := cl.TypedStore.FindBy(MarshalMap(filter))
+// filterFields returns a map, containing only values in m, which correspond to fieldpaths specified or m if none are specified. Note that filterFields may modify the input map m.
+func filterFields(m map[string]interface{}, fields ...string) map[string]interface{} {
+	if len(fields) == 0 {
+		return m
+	}
+
+	out := make(map[string]interface{}, len(m))
+	for _, f := range fields {
+		p := f + "."
+		for k, v := range m {
+			if k == f || strings.HasPrefix(k, p) {
+				out[k] = v
+				delete(m, k)
+			}
+		}
+	}
+	return out
+}
+
+func (cl *typedStoreClient) FindBy(filter interface{}, newResult NewResultFunc, fields ...string) (map[PrimaryKey]interface{}, error) {
+	m, err := cl.TypedStore.FindBy(filterFields(MarshalMap(filter), fields...))
 	if err != nil {
 		return nil, err
 	}
@@ -75,19 +86,29 @@ func (cl *typedStoreClient) FindBy(filter interface{}, newResult NewResultFunc) 
 
 func (cl *typedStoreClient) Update(id PrimaryKey, v interface{}, fields ...string) error {
 	m := MarshalMap(v)
-	pretty.Println(m)
 	if len(fields) == 0 {
 		return cl.TypedStore.Update(id, m)
 	}
 
+	// Some values, i.e. empty slices/maps do not end up in the map returned by MarshalMap, so we assume that fields specified, but not in the map are those cases, hence, those fields should be cleared.
+	toDel := make(map[string]struct{}, len(fields))
+	for _, k := range fields {
+		toDel[k] = struct{}{}
+	}
+
 	fm := make(map[string]interface{}, len(fields))
 	for _, f := range fields {
+		p := f + "."
 		for k, mv := range m {
-			if strings.HasPrefix(k, f) {
+			if k == f || strings.HasPrefix(k, p) {
 				fm[k] = mv
 				delete(m, k)
+				delete(toDel, f)
 			}
 		}
+	}
+	for k := range toDel {
+		fm[k] = nil
 	}
 	return cl.TypedStore.Update(id, fm)
 }
@@ -117,13 +138,32 @@ func (cl *byteStoreClient) Find(id PrimaryKey, v interface{}) error {
 	return UnmarshalByteMap(m, v)
 }
 
-func (cl *byteStoreClient) FindBy(filter interface{}, newResult NewResultFunc) (map[PrimaryKey]interface{}, error) {
+// filterByteFields returns a map, containing only values in m, which correspond to fieldpaths specified or m if none are specified. Note that filterByteFields may modify the input map m.
+func filterByteFields(m map[string][]byte, fields ...string) map[string][]byte {
+	if len(fields) == 0 {
+		return m
+	}
+
+	out := make(map[string][]byte, len(m))
+	for _, f := range fields {
+		p := f + "."
+		for k, v := range m {
+			if k == f || strings.HasPrefix(k, p) {
+				out[k] = v
+				delete(m, k)
+			}
+		}
+	}
+	return out
+}
+
+func (cl *byteStoreClient) FindBy(filter interface{}, newResult NewResultFunc, fields ...string) (map[PrimaryKey]interface{}, error) {
 	fm, err := MarshalByteMap(filter)
 	if err != nil {
 		return nil, err
 	}
 
-	m, err := cl.ByteStore.FindBy(fm)
+	m, err := cl.ByteStore.FindBy(filterByteFields(fm, fields...))
 	if err != nil {
 		return nil, err
 	}
@@ -147,14 +187,25 @@ func (cl *byteStoreClient) Update(id PrimaryKey, v interface{}, fields ...string
 		return cl.ByteStore.Update(id, m)
 	}
 
+	// Some values, i.e. empty slices/maps do not end up in the map returned by MarshalMap, so we assume that fields specified, but not in the map are those cases, hence, those fields should be cleared.
+	toDel := make(map[string]struct{}, len(fields))
+	for _, k := range fields {
+		toDel[k] = struct{}{}
+	}
+
 	fm := make(map[string][]byte, len(fields))
 	for _, f := range fields {
+		p := f + "."
 		for k, mv := range m {
-			if strings.HasPrefix(k, f) {
+			if k == f || strings.HasPrefix(k, p) {
 				fm[k] = mv
 				delete(m, k)
+				delete(toDel, f)
 			}
 		}
+	}
+	for k := range toDel {
+		fm[k] = nil
 	}
 	return cl.ByteStore.Update(id, fm)
 }

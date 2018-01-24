@@ -183,6 +183,28 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) 
 					return err
 				}
 			}
+			if len(fieldsDel) != 0 {
+				fieldsCurrent, err := tx.HKeys(key).Result()
+				if err != nil {
+					return err
+				}
+
+				m := make(map[string]struct{}, len(fieldsCurrent))
+				for _, k := range fieldsCurrent {
+					m[k] = struct{}{}
+				}
+
+				for _, fd := range fieldsDel {
+					p := fd + "."
+					for fc := range m {
+						// TODO optimize
+						if strings.HasPrefix(fc, p) {
+							fieldsDel = append(fieldsDel, fc)
+							delete(m, fc)
+						}
+					}
+				}
+			}
 			_, err = tx.Pipelined(func(p *redis.Pipeline) error {
 				for i, k := range idxDel {
 					if curr := idxCurrent[i]; curr != nil {

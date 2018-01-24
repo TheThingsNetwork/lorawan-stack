@@ -9,28 +9,28 @@ import (
 )
 
 type SubSubStruct struct {
-	String    string
-	Int       int
-	Bytes     []byte
 	ByteArray byteArray
+	Bytes     []byte
 	Empty     interface{}
+	Int       int
+	String    string
 }
 type SubStruct struct {
-	String       string
-	Int          int
-	Bytes        []byte
 	ByteArray    byteArray
+	Bytes        []byte
 	Empty        interface{}
+	Int          int
+	String       string
 	SubSubStruct SubSubStruct
 }
 type Struct struct {
-	String      string
-	Int         int
-	Bytes       []byte
 	ByteArray   byteArray
+	Bytes       []byte
 	Empty       interface{}
-	SubStruct   SubStruct
+	Int         int
+	String      string
 	StructSlice []SubStruct
+	SubStruct   SubStruct
 }
 
 type byteArray [2]byte
@@ -69,44 +69,44 @@ var values = []struct {
 			},
 		},
 		map[string]interface{}{
-			"string":              string("42"),
-			"int":                 int(42),
-			"bytes.0":             byte(4 + '0'),
-			"bytes.1":             byte(2 + '0'),
-			"byteArray.0":         byte(4 + '0'),
-			"byteArray.1":         byte(2 + '0'),
 			"2dSlice.0.0":         int(4),
 			"2dSlice.0.1":         int(2),
 			"2dSlice.1.0":         int(42),
-			"sub.string":          string("42"),
-			"sub.int":             int(42),
-			"sub.bytes.0":         byte(4 + '0'),
-			"sub.bytes.1":         byte(2 + '0'),
+			"byteArray.0":         byte(4 + '0'),
+			"byteArray.1":         byte(2 + '0'),
+			"bytes.0":             byte(4 + '0'),
+			"bytes.1":             byte(2 + '0'),
+			"int":                 int(42),
+			"string":              string("42"),
 			"sub.byteArray.0":     byte(4 + '0'),
 			"sub.byteArray.1":     byte(2 + '0'),
-			"sub.sub.string":      string("42"),
-			"sub.sub.int":         int(42),
-			"sub.sub.bytes.0":     byte(4 + '0'),
-			"sub.sub.bytes.1":     byte(2 + '0'),
+			"sub.bytes.0":         byte(4 + '0'),
+			"sub.bytes.1":         byte(2 + '0'),
+			"sub.int":             int(42),
+			"sub.string":          string("42"),
 			"sub.sub.byteArray.0": byte(4 + '0'),
 			"sub.sub.byteArray.1": byte(2 + '0'),
+			"sub.sub.bytes.0":     byte(4 + '0'),
+			"sub.sub.bytes.1":     byte(2 + '0'),
+			"sub.sub.int":         int(42),
+			"sub.sub.string":      string("42"),
 		},
 		map[string][]byte{
-			"string":            mustToBytes("42"),
-			"int":               mustToBytes(42),
-			"bytes":             mustToBytes("42"),
-			"byteArray":         mustToBytes("42"),
 			"2dSlice.0.0":       mustToBytes(4),
 			"2dSlice.0.1":       mustToBytes(2),
 			"2dSlice.1.0":       mustToBytes(42),
-			"sub.string":        mustToBytes("42"),
-			"sub.int":           mustToBytes(42),
-			"sub.bytes":         mustToBytes("42"),
+			"byteArray":         mustToBytes("42"),
+			"bytes":             mustToBytes("42"),
+			"int":               mustToBytes(42),
+			"string":            mustToBytes("42"),
 			"sub.byteArray":     mustToBytes("42"),
-			"sub.sub.string":    mustToBytes("42"),
-			"sub.sub.int":       mustToBytes(42),
-			"sub.sub.bytes":     mustToBytes("42"),
+			"sub.bytes":         mustToBytes("42"),
+			"sub.int":           mustToBytes(42),
+			"sub.string":        mustToBytes("42"),
 			"sub.sub.byteArray": mustToBytes("42"),
+			"sub.sub.bytes":     mustToBytes("42"),
+			"sub.sub.int":       mustToBytes(42),
+			"sub.sub.string":    mustToBytes("42"),
 		},
 	},
 	{
@@ -139,48 +139,87 @@ var values = []struct {
 			},
 		},
 		map[string]interface{}{
-			"String":                             string("42"),
-			"Int":                                int(42),
-			"Bytes.0":                            byte(4 + '0'),
-			"Bytes.1":                            byte(2 + '0'),
-			"ByteArray.0":                        byte(4 + '0'),
-			"ByteArray.1":                        byte(2 + '0'),
-			"StructSlice.0.String":               string("42"),
-			"StructSlice.0.ByteArray.0":          byte(4 + '0'),
-			"StructSlice.0.ByteArray.1":          byte(2 + '0'),
-			"StructSlice.1.Int":                  int(42),
-			"StructSlice.1.Bytes.0":              byte(4 + '0'),
-			"StructSlice.1.Bytes.1":              byte(2 + '0'),
-			"SubStruct.String":                   string("42"),
-			"SubStruct.Int":                      int(42),
-			"SubStruct.Bytes.0":                  byte(4 + '0'),
-			"SubStruct.Bytes.1":                  byte(2 + '0'),
-			"SubStruct.ByteArray.0":              byte(4 + '0'),
-			"SubStruct.ByteArray.1":              byte(2 + '0'),
-			"SubStruct.SubSubStruct.String":      string("42"),
-			"SubStruct.SubSubStruct.Int":         int(42),
-			"SubStruct.SubSubStruct.Bytes.0":     byte(4 + '0'),
-			"SubStruct.SubSubStruct.Bytes.1":     byte(2 + '0'),
-			"SubStruct.SubSubStruct.ByteArray.0": byte(4 + '0'),
-			"SubStruct.SubSubStruct.ByteArray.1": byte(2 + '0'),
+			"ByteArray.0":                            byte(4 + '0'),
+			"ByteArray.1":                            byte(2 + '0'),
+			"Bytes.0":                                byte(4 + '0'),
+			"Bytes.1":                                byte(2 + '0'),
+			"Empty":                                  nil,
+			"Int":                                    int(42),
+			"String":                                 string("42"),
+			"StructSlice.0.ByteArray.0":              byte(4 + '0'),
+			"StructSlice.0.ByteArray.1":              byte(2 + '0'),
+			"StructSlice.0.Empty":                    nil,
+			"StructSlice.0.Int":                      int(0),
+			"StructSlice.0.String":                   string("42"),
+			"StructSlice.0.SubSubStruct.ByteArray.0": byte(0),
+			"StructSlice.0.SubSubStruct.ByteArray.1": byte(0),
+			"StructSlice.0.SubSubStruct.Empty":       nil,
+			"StructSlice.0.SubSubStruct.Int":         int(0),
+			"StructSlice.0.SubSubStruct.String":      "",
+			"StructSlice.1.ByteArray.0":              byte(0),
+			"StructSlice.1.ByteArray.1":              byte(0),
+			"StructSlice.1.Bytes.0":                  byte(4 + '0'),
+			"StructSlice.1.Bytes.1":                  byte(2 + '0'),
+			"StructSlice.1.Empty":                    nil,
+			"StructSlice.1.Int":                      int(42),
+			"StructSlice.1.String":                   "",
+			"StructSlice.1.SubSubStruct.ByteArray.0": byte(0),
+			"StructSlice.1.SubSubStruct.ByteArray.1": byte(0),
+			"StructSlice.1.SubSubStruct.Empty":       nil,
+			"StructSlice.1.SubSubStruct.Int":         int(0),
+			"StructSlice.1.SubSubStruct.String":      "",
+			"SubStruct.ByteArray.0":                  byte(4 + '0'),
+			"SubStruct.ByteArray.1":                  byte(2 + '0'),
+			"SubStruct.Bytes.0":                      byte(4 + '0'),
+			"SubStruct.Bytes.1":                      byte(2 + '0'),
+			"SubStruct.Empty":                        nil,
+			"SubStruct.Int":                          int(42),
+			"SubStruct.String":                       string("42"),
+			"SubStruct.SubSubStruct.ByteArray.0":     byte(4 + '0'),
+			"SubStruct.SubSubStruct.ByteArray.1":     byte(2 + '0'),
+			"SubStruct.SubSubStruct.Bytes.0":         byte(4 + '0'),
+			"SubStruct.SubSubStruct.Bytes.1":         byte(2 + '0'),
+			"SubStruct.SubSubStruct.Empty":           nil,
+			"SubStruct.SubSubStruct.Int":             int(42),
+			"SubStruct.SubSubStruct.String":          string("42"),
 		},
+
 		map[string][]byte{
-			"String":                           mustToBytes("42"),
-			"Int":                              mustToBytes(42),
-			"Bytes":                            mustToBytes("42"),
-			"ByteArray":                        mustToBytes("42"),
-			"StructSlice.0.String":             mustToBytes("42"),
-			"StructSlice.0.ByteArray":          mustToBytes("42"),
-			"StructSlice.1.Int":                mustToBytes(42),
-			"StructSlice.1.Bytes":              mustToBytes("42"),
-			"SubStruct.String":                 mustToBytes("42"),
-			"SubStruct.Int":                    mustToBytes(42),
-			"SubStruct.Bytes":                  mustToBytes("42"),
-			"SubStruct.ByteArray":              mustToBytes("42"),
-			"SubStruct.SubSubStruct.String":    mustToBytes("42"),
-			"SubStruct.SubSubStruct.Int":       mustToBytes(42),
-			"SubStruct.SubSubStruct.Bytes":     mustToBytes("42"),
-			"SubStruct.SubSubStruct.ByteArray": mustToBytes("42"),
+			"ByteArray":                            mustToBytes("42"),
+			"Bytes":                                mustToBytes("42"),
+			"Empty":                                mustToBytes(nil),
+			"Int":                                  mustToBytes(42),
+			"String":                               mustToBytes("42"),
+			"StructSlice.0.ByteArray":              mustToBytes("42"),
+			"StructSlice.0.Bytes":                  mustToBytes(nil),
+			"StructSlice.0.Empty":                  mustToBytes(nil),
+			"StructSlice.0.Int":                    mustToBytes(0),
+			"StructSlice.0.String":                 mustToBytes("42"),
+			"StructSlice.0.SubSubStruct.ByteArray": mustToBytes([2]byte{}),
+			"StructSlice.0.SubSubStruct.Bytes":     mustToBytes([]byte{}),
+			"StructSlice.0.SubSubStruct.Empty":     mustToBytes(nil),
+			"StructSlice.0.SubSubStruct.Int":       mustToBytes(0),
+			"StructSlice.0.SubSubStruct.String":    mustToBytes(""),
+			"StructSlice.1.ByteArray":              mustToBytes([2]byte{}),
+			"StructSlice.1.Bytes":                  mustToBytes("42"),
+			"StructSlice.1.Empty":                  mustToBytes(nil),
+			"StructSlice.1.Int":                    mustToBytes(42),
+			"StructSlice.1.String":                 mustToBytes(""),
+			"StructSlice.1.SubSubStruct.ByteArray": mustToBytes([2]byte{}),
+			"StructSlice.1.SubSubStruct.Bytes":     mustToBytes(nil),
+			"StructSlice.1.SubSubStruct.Empty":     mustToBytes(nil),
+			"StructSlice.1.SubSubStruct.Int":       mustToBytes(0),
+			"StructSlice.1.SubSubStruct.String":    mustToBytes(""),
+			"SubStruct.ByteArray":                  mustToBytes("42"),
+			"SubStruct.Bytes":                      mustToBytes("42"),
+			"SubStruct.Empty":                      mustToBytes(nil),
+			"SubStruct.Int":                        mustToBytes(42),
+			"SubStruct.String":                     mustToBytes("42"),
+			"SubStruct.SubSubStruct.ByteArray":     mustToBytes("42"),
+			"SubStruct.SubSubStruct.Bytes":         mustToBytes("42"),
+			"SubStruct.SubSubStruct.Empty":         mustToBytes(nil),
+			"SubStruct.SubSubStruct.Int":           mustToBytes(42),
+			"SubStruct.SubSubStruct.String":        mustToBytes("42"),
 		},
 	},
 	{
@@ -211,9 +250,19 @@ var values = []struct {
 			struct{ A int }{42},
 		}},
 		map[string]interface{}{
+			"Interfaces.0":   nil,
+			"Interfaces.1":   nil,
+			"Interfaces.2":   nil,
+			"Interfaces.3":   time.Time{},
+			"Interfaces.4":   time.Time{},
 			"Interfaces.5.A": 42,
 		},
 		map[string][]byte{
+			"Interfaces.0":   mustToBytes(nil),
+			"Interfaces.1":   mustToBytes(nil),
+			"Interfaces.2":   mustToBytes(nil),
+			"Interfaces.3":   mustToBytes(time.Time{}),
+			"Interfaces.4":   mustToBytes(time.Time{}),
 			"Interfaces.5.A": mustToBytes(42),
 		},
 	},

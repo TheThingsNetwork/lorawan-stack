@@ -16,47 +16,93 @@ import (
 var ToBytes = toBytes
 
 func TestToBytes(t *testing.T) {
-	a := assertions.New(t)
-	for v, expected := range map[interface{}][]byte{
-		int(42):     append([]byte{byte(RawEncoding)}, []byte(strconv.FormatInt(42, 10))...),
-		int8(42):    append([]byte{byte(RawEncoding)}, []byte(strconv.FormatInt(42, 10))...),
-		int16(42):   append([]byte{byte(RawEncoding)}, []byte(strconv.FormatInt(42, 10))...),
-		int32(42):   append([]byte{byte(RawEncoding)}, []byte(strconv.FormatInt(42, 10))...),
-		int64(42):   append([]byte{byte(RawEncoding)}, []byte(strconv.FormatInt(42, 10))...),
-		uint(42):    append([]byte{byte(RawEncoding)}, []byte(strconv.FormatUint(42, 10))...),
-		uint8(42):   append([]byte{byte(RawEncoding)}, []byte(strconv.FormatUint(42, 10))...),
-		uint16(42):  append([]byte{byte(RawEncoding)}, []byte(strconv.FormatUint(42, 10))...),
-		uint32(42):  append([]byte{byte(RawEncoding)}, []byte(strconv.FormatUint(42, 10))...),
-		uint64(42):  append([]byte{byte(RawEncoding)}, []byte(strconv.FormatUint(42, 10))...),
-		float32(42): append([]byte{byte(RawEncoding)}, []byte(strconv.FormatFloat(42, 'f', -1, 32))...),
-		float64(42): append([]byte{byte(RawEncoding)}, []byte(strconv.FormatFloat(42, 'f', -1, 64))...),
-		"42":        append([]byte{byte(RawEncoding)}, '4', '2'),
+	for i, tc := range []struct {
+		v        interface{}
+		expected []byte
+	}{
+		{
+			int(42),
+			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatInt(42, 10))...),
+		},
+		{
+			int8(42),
+			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatInt(42, 10))...),
+		},
+		{
+			int16(42),
+			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatInt(42, 10))...),
+		},
+		{
+			int32(42),
+			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatInt(42, 10))...),
+		},
+		{
+			int64(42),
+			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatInt(42, 10))...),
+		},
+		{
+			uint(42),
+			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatUint(42, 10))...),
+		},
+		{
+			uint8(42),
+			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatUint(42, 10))...),
+		},
+		{
+			uint16(42),
+			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatUint(42, 10))...),
+		},
+		{
+			uint32(42),
+			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatUint(42, 10))...),
+		},
+		{
+			uint64(42),
+			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatUint(42, 10))...),
+		},
+		{
+			float32(42),
+			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatFloat(42, 'f', -1, 32))...),
+		},
+		{
+			float64(42),
+			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatFloat(42, 'f', -1, 64))...),
+		},
+		{
+			[]byte("42"),
+			append([]byte{byte(RawEncoding)}, '4', '2'),
+		},
+		{
+			"42",
+			append([]byte{byte(RawEncoding)}, '4', '2'),
+		},
+		{
+			nil,
+			append([]byte{byte(RawEncoding)}),
+		},
 	} {
-		rv := reflect.ValueOf(v)
-		ptr := reflect.New(rv.Type())
-		ptr.Elem().Set(rv)
-		t.Run(rv.Type().String(), func(t *testing.T) {
-			got, err := toBytes(v)
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+
+			got, err := toBytes(tc.v)
 			if a.So(err, should.BeNil) {
-				a.So(got, should.Resemble, expected)
+				a.So(got, should.Resemble, tc.expected)
 			}
+
+			rv := reflect.ValueOf(tc.v)
+			if !rv.IsValid() {
+				return
+			}
+
+			ptr := reflect.New(rv.Type())
+			ptr.Elem().Set(rv)
 
 			got, err = toBytes(ptr.Interface())
 			if a.So(err, should.BeNil) {
-				a.So(got, should.Resemble, expected)
+				a.So(got, should.Resemble, tc.expected)
 			}
 		})
 	}
-	t.Run(reflect.TypeOf([]byte{}).String(), func(t *testing.T) {
-		b := []byte("42")
-		got, err := toBytes(b)
-		a.So(err, should.BeNil)
-		a.So(got, should.Resemble, append([]byte{byte(RawEncoding)}, b...))
-
-		got, err = toBytes(&b)
-		a.So(err, should.BeNil)
-		a.So(got, should.Resemble, append([]byte{byte(RawEncoding)}, b...))
-	})
 }
 
 func TestFlattened(t *testing.T) {
@@ -105,8 +151,30 @@ func TestIsZero(t *testing.T) {
 			true,
 		},
 		{
+			&time.Time{},
+			true,
+		},
+		{
 			[]int{},
 			true,
+		},
+		{
+			[]interface{}{nil, nil, nil},
+			true,
+		},
+		{
+			map[string]interface{}{
+				"empty": struct{}{},
+				"map":   nil,
+			},
+			true,
+		},
+		{
+			map[string]interface{}{
+				"nonempty": struct{ A int }{42},
+				"map":      nil,
+			},
+			false,
 		},
 		{
 			([]int)(nil),
@@ -149,14 +217,39 @@ func TestMapify(t *testing.T) {
 				"0": 1,
 				"1": 2,
 				"2": 3,
+				"3": 0,
 				"4": 5,
 			},
 		},
 		{
-			[]interface{}{nil, nil, struct{}{}, time.Time{}, "hello", (*time.Time)(nil), (*struct{})(nil)},
+			[]interface{}{
+				nil,
+				nil,
+				struct{}{},
+				time.Time{},
+				"hello",
+				(*time.Time)(nil),
+				(*struct{})(nil),
+				[]interface{}{
+					1,
+					2,
+					[]interface{}{},
+				},
+			},
 			nil,
 			map[string]interface{}{
+				"0": nil,
+				"1": nil,
+				"2": struct{}{},
+				"3": time.Time{},
 				"4": "hello",
+				"5": (*time.Time)(nil),
+				"6": (*struct{})(nil),
+				"7": map[string]interface{}{
+					"0": 1,
+					"1": 2,
+					"2": map[string]interface{}{},
+				},
 			},
 		},
 	} {

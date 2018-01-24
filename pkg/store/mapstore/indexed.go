@@ -113,28 +113,59 @@ func (s *indexedStore) Update(id store.PrimaryKey, diff map[string]interface{}) 
 }
 
 func (s *indexedStore) FindBy(filters map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
-	matches := make(map[store.PrimaryKey]map[string]interface{})
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	filtered, err := s.filterIndex(filters)
+	idxs := make(map[string]interface{}, len(filters))
+	fields := make(map[string]interface{}, len(filters))
+	for k, v := range filters {
+		_, ok := s.indexes[k]
+		if ok {
+			idxs[k] = v
+		} else {
+			fields[k] = v
+		}
+	}
+
+	byFields, err := s.mapStore.FindBy(fields)
 	if err != nil {
 		return nil, err
 	}
-	sort.Slice(filtered, func(i, j int) bool { // Optimization: start with the smallest set
-		return filtered[i].Size() < filtered[j].Size()
+
+	idxKeys, err := s.filterIndex(idxs)
+	if err != nil {
+		return nil, err
+	}
+	sort.Slice(idxKeys, func(i, j int) bool { // Optimization: start with the smallest set
+		return idxKeys[i].Size() < idxKeys[j].Size()
 	})
 	var filterSet store.KeySet
-	for _, set := range filtered {
+	for _, set := range idxKeys {
 		if filterSet == nil {
 			filterSet = set
 			continue
 		}
 		filterSet.Intersect(set)
 	}
-	for id := range filterSet {
-		if fields, err := s.Find(id); err == nil {
-			matches[id] = fields
+
+	matches := make(map[store.PrimaryKey]map[string]interface{})
+	switch {
+	case len(idxs) != 0 && len(fields) != 0:
+		for k, v := range byFields {
+			if filterSet.Contains(k) {
+				matches[k] = v
+			}
 		}
+	case len(idxs) != 0:
+		for k := range filterSet {
+			if v, err := s.Find(k); err == nil {
+				matches[k] = v
+			}
+		}
+	case len(fields) != 0:
+		matches = byFields
+	}
+	if len(matches) == 0 {
+		return nil, store.ErrNotFound
 	}
 	return matches, nil
 }

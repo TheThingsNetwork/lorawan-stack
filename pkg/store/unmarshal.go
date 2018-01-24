@@ -125,6 +125,9 @@ func bytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 
 	enc := Encoding(b[0])
 	b = b[1:]
+	if len(b) == 0 {
+		return reflect.New(typ).Elem().Interface(), nil
+	}
 
 	switch enc {
 	case RawEncoding:

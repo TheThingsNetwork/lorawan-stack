@@ -13,16 +13,30 @@ import (
 	"github.com/gogo/protobuf/proto"
 )
 
-// isNil is safe alternative to IsNil.
 func isZero(v reflect.Value) bool {
 	if !v.IsValid() {
 		return true
 	}
+
 	switch v.Kind() {
-	case reflect.Ptr, reflect.Map, reflect.Func, reflect.Chan, reflect.Interface:
+	case reflect.Func, reflect.Chan:
 		return v.IsNil()
+	case reflect.Ptr, reflect.Interface:
+		return isZero(v.Elem())
+	case reflect.Map:
+		for _, k := range v.MapKeys() {
+			if !isZero(v.MapIndex(k)) {
+				return false
+			}
+		}
+		return true
 	case reflect.Slice:
-		return v.IsNil() || v.Len() == 0
+		for i := 0; i < v.Len(); i++ {
+			if !isZero(v.Index(i)) {
+				return false
+			}
+		}
+		return true
 	}
 	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }
@@ -51,7 +65,10 @@ func keepBytes(rv reflect.Value) bool {
 // mapify recursively replaces (sub-)slices in v by maps. If keep is set and returns true for encountered value, the value will be kept as-is. Look at keepBytes for an example of where this is useful.
 func mapify(v interface{}, keep func(rv reflect.Value) bool) interface{} {
 	rv := reflect.ValueOf(v)
-	if isZero(rv) || keep != nil && keep(rv) {
+	if !rv.IsValid() {
+		return nil
+	}
+	if keep != nil && keep(rv) {
 		return v
 	}
 
@@ -59,17 +76,23 @@ func mapify(v interface{}, keep func(rv reflect.Value) bool) interface{} {
 	case reflect.Map:
 		m := make(map[string]interface{}, rv.Len())
 		for _, sk := range rv.MapKeys() {
-			m[sk.String()] = mapify(reflect.ValueOf(rv.MapIndex(sk).Interface()).Interface(), keep)
+			sv := reflect.ValueOf(rv.MapIndex(sk).Interface())
+			if !sv.IsValid() {
+				m[sk.String()] = nil
+				continue
+			}
+			m[sk.String()] = mapify(sv.Interface(), keep)
 		}
 		return m
 	case reflect.Slice, reflect.Array:
 		m := make(map[string]interface{}, rv.Len())
 		for i := 0; i < rv.Len(); i++ {
-			iv := reflect.ValueOf(rv.Index(i).Interface())
-			if isZero(iv) {
+			sv := reflect.ValueOf(rv.Index(i).Interface())
+			if !sv.IsValid() {
+				m[strconv.Itoa(i)] = nil
 				continue
 			}
-			m[strconv.Itoa(i)] = mapify(iv.Interface(), keep)
+			m[strconv.Itoa(i)] = mapify(sv.Interface(), keep)
 		}
 		return m
 	default:
@@ -80,14 +103,17 @@ func mapify(v interface{}, keep func(rv reflect.Value) bool) interface{} {
 // marshalNested retrieves recursively all types for the given value
 // and returns the marshaled nested value.
 func marshalNested(v reflect.Value) interface{} {
+	if !v.IsValid() {
+		return nil
+	}
 	if m, ok := v.Interface().(MapMarshaler); ok {
 		return m.MarshalMap()
 	}
-	if isZero(v) {
-		return v.Interface()
-	}
 
 	v = reflect.Indirect(v)
+	if !v.IsValid() {
+		return nil
+	}
 	switch v.Kind() {
 	case reflect.Struct:
 		m := marshal(v.Interface())
@@ -104,7 +130,7 @@ func marshalNested(v reflect.Value) interface{} {
 		if vt.Key().Implements(reflect.TypeOf((*fmt.Stringer)(nil)).Elem()) {
 			m := make(map[string]interface{})
 			for _, vk := range v.MapKeys() {
-				m[vk.Interface().(fmt.Stringer).String()] = v.MapIndex(vk)
+				m[vk.Interface().(fmt.Stringer).String()] = reflect.ValueOf(v.MapIndex(vk).Interface())
 			}
 			return marshal(m)
 		}
@@ -112,8 +138,9 @@ func marshalNested(v reflect.Value) interface{} {
 		switch e := v.Type().Elem(); e.Kind() {
 		case reflect.Ptr:
 			switch se := e.Elem(); se.Kind() {
-			case reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
+			case reflect.Interface, reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
 			default:
+				// return simple types as-is
 				n := v.Len()
 				sl := reflect.MakeSlice(se, n, n)
 				for i := 0; i < n; i++ {
@@ -121,15 +148,16 @@ func marshalNested(v reflect.Value) interface{} {
 				}
 				return sl.Interface()
 			}
-		case reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
+		case reflect.Interface, reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
 		default:
+			// return simple types as-is
 			return v.Interface()
 		}
 
 		n := v.Len()
 		s := make([]interface{}, n, n)
 		for i := 0; i < n; i++ {
-			s[i] = marshalNested(v.Index(i))
+			s[i] = marshalNested(reflect.ValueOf(v.Index(i).Interface()))
 		}
 		return s
 	}
@@ -138,6 +166,10 @@ func marshalNested(v reflect.Value) interface{} {
 
 // marhshal converts the given struct s to a map[string]interface{}
 func marshal(s interface{}) map[string]interface{} {
+	if m, ok := s.(MapMarshaler); ok {
+		return m.MarshalMap()
+	}
+
 	v := reflect.Indirect(reflect.ValueOf(s))
 	t := v.Type()
 
@@ -157,12 +189,7 @@ func marshal(s interface{}) map[string]interface{} {
 			if f.PkgPath != "" {
 				continue
 			}
-
-			fv := v.FieldByName(f.Name)
-			if isZero(fv) && !f.Type.Implements(reflect.TypeOf((*MapMarshaler)(nil)).Elem()) {
-				continue
-			}
-			vals[f.Name] = fv
+			vals[f.Name] = v.FieldByName(f.Name)
 		}
 	default:
 		panic(errors.Errorf("Expected argument to be a struct or map with string keys, got %s", t.Kind()))
@@ -188,15 +215,14 @@ type MapMarshaler interface {
 // MarshalMap traverses the value v recursively. If v implements the MapMarshaler interface, MarshalMap calls its MarshalMap method to produce map[string]interface{}.
 // Otherwise, MarshalMap first encodes the value v as a map[string]interface{}. Default marshaler marshals slices as maps with string keys, where all keys represent integers.
 // The map produced by any of the methods will be flattened by joining sub-map values with a dot(note that slices produced by custom MarshalMap implementations won't be flattened).
-func MarshalMap(v interface{}) map[string]interface{} {
-	var im map[string]interface{}
-	m, ok := v.(MapMarshaler)
+func MarshalMap(v interface{}) (m map[string]interface{}) {
+	mm, ok := v.(MapMarshaler)
 	if ok {
-		im = m.MarshalMap()
+		m = mm.MarshalMap()
 	} else {
-		im = mapify(marshal(v), nil).(map[string]interface{})
+		m = mapify(marshal(v), nil).(map[string]interface{})
 	}
-	return flattened(im)
+	return flattened(m)
 }
 
 func toBytes(v interface{}) (b []byte, err error) {
@@ -209,6 +235,10 @@ func toBytes(v interface{}) (b []byte, err error) {
 	}()
 
 	rv := reflect.Indirect(reflect.ValueOf(v))
+	if !rv.IsValid() {
+		enc = RawEncoding
+		return []byte{}, nil
+	}
 	switch k := rv.Kind(); k {
 	case reflect.String:
 		enc = RawEncoding

@@ -6,6 +6,7 @@ import (
 	"io"
 	"math/rand"
 	"reflect"
+	"strings"
 	"sync"
 	"time"
 
@@ -61,6 +62,9 @@ outer:
 		matches[id] = fields
 	}
 	s.mu.RUnlock()
+	if len(matches) == 0 {
+		return nil, store.ErrNotFound
+	}
 	return matches, nil
 }
 
@@ -73,11 +77,17 @@ func (s *mapStore) Update(id store.PrimaryKey, diff map[string]interface{}) erro
 		return nil
 	}
 	for k, v := range diff {
-		if v == nil {
-			delete(fields, k)
+		if v != nil {
+			fields[k] = v
 			continue
 		}
-		fields[k] = v
+
+		p := k + "."
+		for sk := range fields {
+			if sk == k || strings.HasPrefix(sk, p) {
+				delete(fields, sk)
+			}
+		}
 	}
 	s.data[id] = fields
 	return nil

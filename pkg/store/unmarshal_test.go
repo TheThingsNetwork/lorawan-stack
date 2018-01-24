@@ -3,6 +3,7 @@
 package store_test
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"testing"
@@ -19,14 +20,13 @@ func TestUnmarshalMap(t *testing.T) {
 			a := assertions.New(t)
 			rv := reflect.New(reflect.TypeOf(v.unmarshaled))
 
-			if _, ok := v.unmarshaled.(map[string]interface{}); ok {
-				t.Skip("Skipping special case, when unmarshaled value is map[string]interface{} as we don't know the type of values to unmarshal to")
+			switch v.unmarshaled.(type) {
+			case map[string]interface{}, []interface{}, struct{ Interfaces []interface{} }:
+				t.Skip(fmt.Sprintf("Skipping special case, when unmarshaled value is %T as we don't know the type of values to unmarshal to", v.unmarshaled))
 			}
 			err := UnmarshalMap(v.marshaled, rv.Interface())
 			a.So(err, should.BeNil)
-			if !a.So(rv.Elem().Interface(), should.Resemble, v.unmarshaled) {
-				pretty.Ldiff(t, rv.Elem().Interface(), v.unmarshaled)
-			}
+			a.So(pretty.Diff(rv.Elem().Interface(), v.unmarshaled), should.BeEmpty)
 		})
 	}
 }
@@ -37,14 +37,13 @@ func TestUnmarshalByteMap(t *testing.T) {
 			a := assertions.New(t)
 			rv := reflect.New(reflect.TypeOf(v.unmarshaled))
 
-			if _, ok := v.unmarshaled.(map[string]interface{}); ok {
-				t.Skip("Skipping special case when unmarshaled value is map[string]interface{} as we don't know the type of values to unmarshal to")
+			switch v.unmarshaled.(type) {
+			case map[string]interface{}, []interface{}, struct{ Interfaces []interface{} }:
+				t.Skip(fmt.Sprintf("Skipping special case, when unmarshaled value is %T as we don't know the type of values to unmarshal to", v.unmarshaled))
 			}
 			err := UnmarshalByteMap(v.bytes, rv.Interface())
 			a.So(err, should.BeNil)
-			if !a.So(rv.Elem().Interface(), should.Resemble, v.unmarshaled) {
-				pretty.Ldiff(t, rv.Elem().Interface(), v.unmarshaled)
-			}
+			a.So(pretty.Diff(rv.Elem().Interface(), v.unmarshaled), should.BeEmpty)
 		})
 	}
 }

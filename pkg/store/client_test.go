@@ -37,15 +37,6 @@ type Second struct {
 	SliceMapPtr map[string][]*First
 }
 
-type Third struct {
-	Slice       []Second
-	SlicePtr    []*Second
-	Map         map[string]Second
-	MapPtr      map[string]*Second
-	SliceMap    map[string][]Second
-	SliceMapPtr map[string][]*Second
-}
-
 var firstVal = First{
 	A: 42,
 	B: 42,
@@ -161,7 +152,7 @@ func TestTypedClient(t *testing.T) {
 					},
 				},
 			},
-			[]string{"Slice", "SlicePtr.1", "SliceMap"},
+			[]string{"Slice", "Slice.0.E", "Slice.0.F", "Slice.0.G", "SlicePtr.1", "SliceMap"},
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
@@ -183,15 +174,15 @@ func TestTypedClient(t *testing.T) {
 			v := newResult()
 			err = cl.Find(k, v)
 			a.So(err, should.BeNil)
-			if !a.So(pretty.Diff(v, tc.Stored), should.BeNil) {
+			if !a.So(pretty.Diff(v, tc.Stored), should.BeEmpty) {
 				return
 			}
 
 			m, err := cl.FindBy(v, newResult)
-			if a.So(err, should.BeNil) {
+			if a.So(err, should.BeNil) && a.So(m, should.HaveLength, 1) {
 				for mk, mv := range m {
 					a.So(mk, should.Resemble, k)
-					a.So(pretty.Diff(mv, tc.Stored), should.BeNil)
+					a.So(pretty.Diff(mv, tc.Stored), should.BeEmpty)
 				}
 			}
 
@@ -201,8 +192,7 @@ func TestTypedClient(t *testing.T) {
 			v = newResult()
 			err = cl.Find(k, v)
 			a.So(err, should.BeNil)
-			if !a.So(pretty.Diff(v, tc.AfterUpdate), should.BeNil) {
-				pretty.Println(v)
+			if !a.So(pretty.Diff(v, tc.AfterUpdate), should.BeEmpty) {
 				return
 			}
 
@@ -210,7 +200,7 @@ func TestTypedClient(t *testing.T) {
 			if a.So(err, should.BeNil) {
 				for mk, mv := range m {
 					a.So(mk, should.Resemble, k)
-					a.So(pretty.Diff(mv, tc.AfterUpdate), should.BeNil)
+					a.So(pretty.Diff(mv, tc.AfterUpdate), should.BeEmpty)
 				}
 			}
 
@@ -222,7 +212,7 @@ func TestTypedClient(t *testing.T) {
 			a.So(err, should.NotBeNil)
 
 			m, err = cl.FindBy(tc.AfterUpdate, newResult)
-			a.So(err, should.BeNil)
+			a.So(err, should.NotBeNil)
 		})
 	}
 }
