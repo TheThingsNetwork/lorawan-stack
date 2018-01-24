@@ -133,7 +133,7 @@ func (s *adminService) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequ
 	})
 }
 
-// GetUser returns an user account.
+// GetUser returns the user account that matches the identifier.
 func (s *adminService) GetUser(ctx context.Context, req *ttnpb.UserIdentifier) (*ttnpb.User, error) {
 	err := s.enforceAdmin(ctx)
 	if err != nil {
@@ -183,8 +183,9 @@ func (s *adminService) ListUsers(ctx context.Context, req *ttnpb.ListUsersReques
 	return resp, nil
 }
 
-// UpdateUser updates the account of the current user.
-// If the email is modified a validation email will be sent.
+// UpdateUser updates an user account.
+// If email address is updated it sends an email to validate it if and only if
+// the `SkipValidation` setting is disabled.
 func (s *adminService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (*pbtypes.Empty, error) {
 	err := s.enforceAdmin(ctx)
 	if err != nil {
@@ -398,7 +399,7 @@ func (s *adminService) DeleteInvitation(ctx context.Context, req *ttnpb.DeleteIn
 	return nil, s.store.Invitations.Delete(req.Email)
 }
 
-// GetClient returns a client.
+// GetClient returns the client that matches the identifier.
 func (s *adminService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*ttnpb.Client, error) {
 	err := s.enforceAdmin(ctx)
 	if err != nil {
@@ -489,7 +490,8 @@ func (s *adminService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClient
 	return nil, s.store.Clients.Update(found)
 }
 
-// DeleteClient deletes a client and therefore all the user authorizations are revoked.
+// DeleteClient deletes the client that matches the identifier and revokes all
+// user authorizations.
 func (s *adminService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*pbtypes.Empty, error) {
 	err := s.enforceAdmin(ctx)
 	if err != nil {

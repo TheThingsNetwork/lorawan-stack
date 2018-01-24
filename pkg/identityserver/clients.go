@@ -125,7 +125,8 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 	return nil, s.store.Clients.Update(found)
 }
 
-// DeleteClient deletes a client.
+// DeleteClient deletes the client that matches the identifier and revokes all
+// user authorizations.
 func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*pbtypes.Empty, error) {
 	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_MANAGE)
 	if err != nil {

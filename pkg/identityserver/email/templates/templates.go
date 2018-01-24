@@ -7,7 +7,7 @@ import (
 	"html/template"
 )
 
-// Template is the interface of those things that are an email template.
+// Template is the interface of email templates.
 type Template interface {
 	// GetName returns the template's name.
 	GetName() string

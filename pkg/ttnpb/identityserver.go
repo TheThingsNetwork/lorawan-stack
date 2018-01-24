@@ -9,7 +9,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/validate"
 )
 
-// IsExpired checks whether if the invitation is expired or not.
+// IsExpired checks whether or not the invitation is expired.
 func (i *ListInvitationsResponse_Invitation) IsExpired() bool {
 	return i.ExpiresAt.Before(time.Now().UTC())
 }

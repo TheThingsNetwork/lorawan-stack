@@ -133,7 +133,8 @@ func (s *userService) GetUser(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Use
 }
 
 // UpdateUser updates the account of the current user.
-// If the email is modified a validation email will be sent.
+// If email address is updated it sends an email to validate it if and only if
+// the `SkipValidation` setting is disabled.
 func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (*pbtypes.Empty, error) {
 	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_PROFILE_WRITE)
 	if err != nil {
