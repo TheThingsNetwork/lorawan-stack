@@ -19,17 +19,17 @@ type gatewayStoreEntry struct {
 
 	scheduler scheduling.Scheduler
 
-	observations     *ttnpb.GatewayObservations
-	observationsLock *sync.RWMutex
+	observations     ttnpb.GatewayObservations
+	observationsLock sync.RWMutex
 }
 
 type gatewayStore struct {
-	store map[ttnpb.GatewayIdentifier]gatewayStoreEntry
+	store map[ttnpb.GatewayIdentifier]*gatewayStoreEntry
 
 	mu sync.Mutex
 }
 
-func (s *gatewayStore) Store(gatewayID ttnpb.GatewayIdentifier, entry gatewayStoreEntry) {
+func (s *gatewayStore) Store(gatewayID ttnpb.GatewayIdentifier, entry *gatewayStoreEntry) {
 	s.mu.Lock()
 
 	res, err := s.fetch(gatewayID)
@@ -41,16 +41,16 @@ func (s *gatewayStore) Store(gatewayID ttnpb.GatewayIdentifier, entry gatewaySto
 	s.mu.Unlock()
 }
 
-func (s *gatewayStore) fetch(gatewayID ttnpb.GatewayIdentifier) (gatewayStoreEntry, error) {
+func (s *gatewayStore) fetch(gatewayID ttnpb.GatewayIdentifier) (*gatewayStoreEntry, error) {
 	outgoingChannel, ok := s.store[gatewayID]
 	if !ok {
-		return gatewayStoreEntry{}, errors.New("Gateway not found")
+		return nil, errors.New("Gateway not found")
 	}
 
 	return outgoingChannel, nil
 }
 
-func (s *gatewayStore) Fetch(gatewayID ttnpb.GatewayIdentifier) (gatewayStoreEntry, error) {
+func (s *gatewayStore) Fetch(gatewayID ttnpb.GatewayIdentifier) (*gatewayStoreEntry, error) {
 	s.mu.Lock()
 	res, err := s.fetch(gatewayID)
 	s.mu.Unlock()
@@ -102,7 +102,7 @@ type pool struct {
 func NewPool(logger log.Interface, sendTimeout time.Duration) Pool {
 	return &pool{
 		store: &gatewayStore{
-			store: map[ttnpb.GatewayIdentifier]gatewayStoreEntry{},
+			store: map[ttnpb.GatewayIdentifier]*gatewayStoreEntry{},
 			mu:    sync.Mutex{},
 		},
 		sendTimeout: sendTimeout,
@@ -120,5 +120,5 @@ func (p *pool) GetGatewayObservations(gatewayInfo *ttnpb.GatewayIdentifier) (*tt
 	gateway.observationsLock.RLock()
 	obs := gateway.observations
 	gateway.observationsLock.RUnlock()
-	return obs, nil
+	return &obs, nil
 }

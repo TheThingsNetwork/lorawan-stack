@@ -31,12 +31,12 @@ func (p *pool) Subscribe(gatewayInfo ttnpb.GatewayIdentifier, link PoolSubscript
 		return nil, err
 	}
 
-	entry := gatewayStoreEntry{
+	entry := &gatewayStoreEntry{
 		channel: downstreamChannel,
 
 		scheduler:        scheduler,
-		observations:     &ttnpb.GatewayObservations{},
-		observationsLock: &sync.RWMutex{},
+		observations:     ttnpb.GatewayObservations{},
+		observationsLock: sync.RWMutex{},
 	}
 	p.store.Store(gatewayInfo, entry)
 
@@ -114,7 +114,7 @@ func (p *pool) sendingRoutine(c connection, downstreamChannel chan *ttnpb.Gatewa
 	}
 }
 
-func (p *pool) receivingRoutine(c connection, entry gatewayStoreEntry, upstreamChannel chan *ttnpb.GatewayUp, wg *sync.WaitGroup) {
+func (p *pool) receivingRoutine(c connection, entry *gatewayStoreEntry, upstreamChannel chan *ttnpb.GatewayUp, wg *sync.WaitGroup) {
 	defer close(upstreamChannel)
 	wg.Done()
 
@@ -147,7 +147,7 @@ func (p *pool) receivingRoutine(c connection, entry gatewayStoreEntry, upstreamC
 	}
 }
 
-func (p *pool) addUpstreamObservations(entry gatewayStoreEntry, up *ttnpb.GatewayUp) {
+func (p *pool) addUpstreamObservations(entry *gatewayStoreEntry, up *ttnpb.GatewayUp) {
 	entry.observationsLock.Lock()
 	currentTime := time.Now()
 

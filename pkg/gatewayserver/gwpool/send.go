@@ -43,7 +43,7 @@ func (p *pool) Send(gatewayInfo ttnpb.GatewayIdentifier, downstream *ttnpb.Gatew
 	}
 }
 
-func (p *pool) addDownstreamObservations(entry gatewayStoreEntry, down *ttnpb.GatewayDown) {
+func (p *pool) addDownstreamObservations(entry *gatewayStoreEntry, down *ttnpb.GatewayDown) {
 	entry.observationsLock.Lock()
 
 	currentTime := time.Now()
