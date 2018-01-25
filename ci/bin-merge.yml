@@ -4,7 +4,7 @@ image_resource:
   type: docker-image
   source:
     repository: alpine
-    tag: '3.6'
+    tag: '3.7'
 
 inputs:
 - name: ttn-linux-amd64

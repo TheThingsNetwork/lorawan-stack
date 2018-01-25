@@ -16,11 +16,11 @@ resources:
     access_key_id: ((s3-access-key))
     secret_access_key: ((s3-secret-key))
 
-- name: alpine-3.6
+- name: alpine-3.7
   type: docker-image
   source:
     repository: alpine
-    tag: '3.6'
+    tag: '3.7'
 
 - name: ttn-docker
   type: docker-image
@@ -97,7 +97,7 @@ jobs:
   plan:
   - aggregate:
     - get: ttn-src
-    - get: alpine-3.6
+    - get: alpine-3.7
       params: { save: true }
       trigger: true
     - get: ttn-bin
@@ -108,6 +108,6 @@ jobs:
     params:
       build: '.'
       dockerfile: ttn-src/Dockerfile
-      load_base: alpine-3.6
+      load_base: alpine-3.7
       build_args:
         release_dir: ttn-bin

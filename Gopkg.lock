@@ -28,8 +28,8 @@
 [[projects]]
   name = "github.com/certifi/gocertifi"
   packages = ["."]
-  revision = "a4ab0227d360091084658029ec8ae45f989fba3e"
-  version = "2017.11.05"
+  revision = "deb3ae2ef2610fde3330947281941c562861188b"
+  version = "2018.01.18"
 
 [[projects]]
   branch = "master"
@@ -47,7 +47,7 @@
   branch = "master"
   name = "github.com/getsentry/raven-go"
   packages = ["."]
-  revision = "32a13797442ccb601b11761d74232773c1402d14"
+  revision = "563b81fc02b75d664e54da31f787c2cc2186780b"
 
 [[projects]]
   name = "github.com/gobwas/glob"
@@ -65,6 +65,7 @@
   version = "v0.2.2"
 
 [[projects]]
+  branch = "master"
   name = "github.com/gogo/protobuf"
   packages = [
     "gogoproto",
@@ -74,8 +75,7 @@
     "sortkeys",
     "types"
   ]
-  revision = "342cbe0a04158f6dcb03ca0079991a51a4248c02"
-  version = "v0.5"
+  revision = "26de2f9a7d3b1826f275e7a97c8cad5080589426"
 
 [[projects]]
   branch = "master"
@@ -84,7 +84,7 @@
     "httputil",
     "httputil/header"
   ]
-  revision = "7940e40f716f12d1c5781ef37de0420157308aa7"
+  revision = "bc1419aa93d33c909e9c141b49ef46bdcbfa10b0"
 
 [[projects]]
   branch = "master"
@@ -100,7 +100,7 @@
     "ptypes/struct",
     "ptypes/timestamp"
   ]
-  revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
+  revision = "c65a0412e71e8b9b3bfd22925720d23c0f054237"
 
 [[projects]]
   name = "github.com/gorilla/securecookie"
@@ -136,17 +136,17 @@
   branch = "master"
   name = "github.com/grpc-ecosystem/go-grpc-prometheus"
   packages = ["."]
-  revision = "0dafe0d496ea71181bf2dd039e7e3f44b6bd11a7"
+  revision = "ce0256b0cfa9b64c16caf5b91dec256ad649b7d1"
 
 [[projects]]
+  branch = "master"
   name = "github.com/grpc-ecosystem/grpc-gateway"
   packages = [
     "runtime",
     "runtime/internal",
     "utilities"
   ]
-  revision = "07f5e79768022f9a3265235f0db4ac8c3f675fec"
-  version = "v1.3.1"
+  revision = "7ad17e1096c8ec3036ce9e6d7ef72125c9ed96c4"
 
 [[projects]]
   branch = "master"
@@ -193,7 +193,7 @@
     ".",
     "reflectx"
   ]
-  revision = "de8647470aafe4854c976707c431dbe1eb2822c6"
+  revision = "05cef0741ade10ca668982355b3f3f0bcf0ff0a8"
 
 [[projects]]
   branch = "master"
@@ -229,7 +229,7 @@
     ".",
     "oid"
   ]
-  revision = "83612a56d3dd153a94a629cd64925371c9adad78"
+  revision = "19c8e9ad00952ce0c64489b60e8df88bb16dd514"
 
 [[projects]]
   name = "github.com/magiconair/properties"
@@ -294,8 +294,8 @@
 [[projects]]
   name = "github.com/pelletier/go-toml"
   packages = ["."]
-  revision = "16398bac157da96aa88f98a2df640c7f32af1da2"
-  version = "v1.0.1"
+  revision = "acdc4509485b587f5e675510c4f2c63e90ff68a8"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -307,7 +307,7 @@
   branch = "master"
   name = "github.com/prometheus/client_golang"
   packages = ["prometheus"]
-  revision = "f02bfc3484a6b03d1fc00d72d86add103ef9567b"
+  revision = "06bc6e01f4baf4ee783ffcd23abfcb0b0f9dfada"
 
 [[projects]]
   branch = "master"
@@ -330,9 +330,11 @@
   name = "github.com/prometheus/procfs"
   packages = [
     ".",
+    "internal/util",
+    "nfsd",
     "xfs"
   ]
-  revision = "b15cd069a83443be3154b719d0cc9fe8117f09fb"
+  revision = "85fadb6e89903ef7cca6f6a804474cd5ea85b6e1"
 
 [[projects]]
   name = "github.com/sendgrid/rest"
@@ -350,7 +352,6 @@
   version = "v3.4.1"
 
 [[projects]]
-  branch = "master"
   name = "github.com/smartystreets/assertions"
   packages = [
     ".",
@@ -359,6 +360,7 @@
     "should"
   ]
   revision = "0b37b35ec7434b77e77a4bb29b79677cced992ea"
+  version = "1.8.1"
 
 [[projects]]
   name = "github.com/soheilhy/cmux"
@@ -372,8 +374,8 @@
     ".",
     "mem"
   ]
-  revision = "ec3a3111d1e1bdff38a61e09d5a5f5e974905611"
-  version = "v1.0.1"
+  revision = "bb8f1927f2a9d3ab41c9340aa034f6b803f4359c"
+  version = "v1.0.2"
 
 [[projects]]
   name = "github.com/spf13/cast"
@@ -385,7 +387,7 @@
   branch = "master"
   name = "github.com/spf13/cobra"
   packages = ["."]
-  revision = "b95ab734e27d33e0d8fbabf71ca990568d4e2020"
+  revision = "f91529fc609202eededff4de2dc0ba2f662240a3"
 
 [[projects]]
   branch = "master"
@@ -431,7 +433,7 @@
     "acme/autocert",
     "pbkdf2"
   ]
-  revision = "5f55bce93ad2c89f411e009659bb1fd83da36e7b"
+  revision = "3d37316aaa6bd9929127ac9a527abf408178ea7b"
 
 [[projects]]
   branch = "master"
@@ -448,7 +450,7 @@
     "lex/httplex",
     "trace"
   ]
-  revision = "ab555f366c4508dbe0802550b1b20c46c5c18aa0"
+  revision = "0ed95abb35c445290478a5348a7b38bb154135fd"
 
 [[projects]]
   branch = "master"
@@ -457,13 +459,13 @@
     ".",
     "internal"
   ]
-  revision = "30785a2c434e431ef7c507b54617d6a951d5f2b4"
+  revision = "b28fcf2b08a19742b43084fb40ab78ac6c3d8067"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "810d7000345868fc619eb81f46307107118f4ae1"
+  revision = "ef802241c90f84d84d644a2d8d0de8ee96038c9c"
 
 [[projects]]
   branch = "master"
@@ -508,7 +510,7 @@
     "googleapis/api/annotations",
     "googleapis/rpc/status"
   ]
-  revision = "a8101f21cf983e773d0c1133ebc5424792003214"
+  revision = "4eb30f4778eed4c258ba66527a0d4f9ec8a36c45"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -536,8 +538,8 @@
     "tap",
     "transport"
   ]
-  revision = "7cea4cc846bcf00cbb27595b07da5de875ef7de9"
-  version = "v1.9.1"
+  revision = "6b51017f791ae1cfbec89c52efdf444b13b550ef"
+  version = "v1.9.2"
 
 [[projects]]
   branch = "v1"
@@ -567,6 +569,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4afa11824945e21fa8cbf73cbc57ebf90046193d1a659a2ab277f2934c7f89c2"
+  inputs-digest = "deaa78e7a0813cb98352e50ec4e8fb899c114a87f0e553b6af2cf7bb10a48078"
   solver-name = "gps-cdcl"
   solver-version = 1
