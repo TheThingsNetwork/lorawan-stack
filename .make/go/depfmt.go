@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/golang/dep"
+	"github.com/golang/dep/gps"
 )
 
 func main() {
@@ -43,7 +44,9 @@ func main() {
 		logger.Fatalf("Failed to load project: %s", err)
 	}
 
-	sw, err := dep.NewSafeWriter(p.Manifest, nil, p.Lock, dep.VendorNever)
+	sw, err := dep.NewSafeWriter(p.Manifest, nil, p.Lock, dep.VendorNever, gps.CascadingPruneOptions{
+		DefaultOptions: gps.PruneNestedVendorDirs | gps.PruneUnusedPackages | gps.PruneNonGoFiles | gps.PruneGoTestFiles,
+	})
 	if err != nil {
 		logger.Fatalf("Failed to initalize dep writer: %s", err)
 	}
