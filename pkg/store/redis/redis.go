@@ -75,6 +75,10 @@ func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 	}
 
 	id := ulid.MustNew(ulid.Now(), s.entropy)
+	if len(fields) == 0 {
+		return id, nil
+	}
+
 	idStr := id.String()
 	key := s.key(idStr)
 
@@ -94,7 +98,9 @@ func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 				for _, k := range idxAdd {
 					p.SAdd(k, idStr)
 				}
-				p.HMSet(key, fieldsSet)
+				if len(fieldsSet) != 0 {
+					p.HMSet(key, fieldsSet)
+				}
 				return nil
 			})
 			return err
@@ -118,7 +124,7 @@ func (s *Store) Delete(id store.PrimaryKey) (err error) {
 	del = func() error {
 		err = s.Redis.Watch(func(tx *redis.Tx) error {
 			var idxCurrent []interface{}
-			if len(s.config.IndexKeys) > 0 {
+			if len(s.config.IndexKeys) != 0 {
 				idxCurrent, err = tx.HMGet(key, s.config.IndexKeys...).Result()
 				if err != nil {
 					return err
@@ -145,6 +151,10 @@ func (s *Store) Delete(id store.PrimaryKey) (err error) {
 
 // Update overwrites field values stored under PrimaryKey specified with values in diff and rebinds indexed keys present in diff.
 func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) {
+	if len(diff) == 0 {
+		return nil
+	}
+
 	idxDel := make([]string, 0, len(diff))
 	idxAdd := make([]string, 0, len(diff))
 	fieldsDel := make([]string, 0, len(diff))
@@ -214,10 +224,12 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) 
 				for _, k := range idxAdd {
 					p.SAdd(k, idStr)
 				}
-				if len(fieldsDel) > 0 {
+				if len(fieldsDel) != 0 {
 					p.HDel(key, fieldsDel...)
 				}
-				p.HMSet(key, fieldsSet)
+				if len(fieldsSet) != 0 {
+					p.HMSet(key, fieldsSet)
+				}
 				return nil
 			})
 			return err
@@ -266,14 +278,17 @@ func (s *Store) Find(id store.PrimaryKey) (map[string][]byte, error) {
 // FindBy returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
 // meaning that only entries matching all the fields in filter should be returned.
 func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[string][]byte, err error) {
-	keyFilter := make([]string, 0, len(filter))
-	filterFields := make([]string, 0, len(filter))
+	if len(filter) == 0 {
+		return nil, nil
+	}
+
+	idxKeys := make([]string, 0, len(filter))
+	fieldFilter := make([]string, 0, len(filter))
 	for k, v := range filter {
-		str := string(v)
-		if _, ok := s.indexKeys[str]; ok {
-			keyFilter = append(keyFilter, s.key(k, str))
+		if _, ok := s.indexKeys[k]; ok {
+			idxKeys = append(idxKeys, s.key(k, string(v)))
 		} else {
-			filterFields = append(filterFields, k)
+			fieldFilter = append(fieldFilter, k)
 		}
 	}
 
@@ -283,20 +298,18 @@ func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[s
 	find = func() error {
 		err := s.Redis.Watch(func(tx *redis.Tx) error {
 			var ids []string
-			if len(keyFilter) != 0 {
-				ids, err = tx.SInter(keyFilter...).Result()
+			if len(idxKeys) != 0 {
+				ids, err = tx.SInter(idxKeys...).Result()
 			} else {
 				ids, err = tx.Keys(s.key("*")).Result()
 				for i, key := range ids {
 					ids[i] = base(key)
 				}
-
 			}
 			if err != nil {
 				return err
 			}
 			if len(ids) == 0 {
-				out = map[store.PrimaryKey]map[string][]byte{}
 				return nil
 			}
 
@@ -305,7 +318,7 @@ func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[s
 				for _, str := range ids {
 					id, err := ulid.Parse(str)
 					if err != nil {
-						return errors.NewWithCause(fmt.Sprintf("pkg/store/redis: failed to parse %s as ULID, database inconsistent", str), err)
+						return errors.NewWithCause(fmt.Sprintf("Failed to parse %s as ULID, database inconsistent", str), err)
 					}
 					cmds[id] = newStringBytesMapCmd(p.HGetAll(s.key(str)))
 				}
@@ -326,7 +339,7 @@ func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[s
 				if len(m) == 0 {
 					continue
 				}
-				for _, k := range filterFields {
+				for _, k := range fieldFilter {
 					if !bytes.Equal(m[k], filter[k]) {
 						continue outer
 					}
@@ -334,7 +347,7 @@ func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[s
 				out[id] = m
 			}
 			return nil
-		}, keyFilter...)
+		}, idxKeys...)
 		if n != recursionLimit && err == redis.TxFailedErr {
 			return find()
 		}
