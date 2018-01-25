@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/mock"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/sendgrid"
@@ -82,7 +83,7 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 		config:    config,
 	}
 
-	config.Hostname = hostname(config.PublicURL)
+	config.Hostname, err = hostname(config.PublicURL)
 
 	is.userService = &userService{is}
 	is.applicationService = &applicationService{is}
@@ -102,13 +103,13 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 	return is, nil
 }
 
-func hostname(u string) string {
+func hostname(u string) (string, error) {
 	p, err := url.Parse(u)
 	if err != nil {
-		panic(err)
+		return "", errors.Errorf("Could not parse PublicURL %s", u)
 	}
 
-	return p.Hostname()
+	return p.Hostname(), nil
 }
 
 // Init initializes the store and sets the default settings in case they aren't.
