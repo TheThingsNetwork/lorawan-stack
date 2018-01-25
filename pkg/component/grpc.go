@@ -4,6 +4,7 @@ package component
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
@@ -38,7 +39,7 @@ func (c *Component) setupGRPC() (err error) {
 	for _, sub := range c.grpcSubsystems {
 		sub.RegisterHandlers(c.grpc.ServeMux, c.loopback)
 	}
-	c.web.Any(rpcserver.APIPrefix, echo.WrapHandler(http.StripPrefix(rpcserver.APIPrefix, c.grpc)))
+	c.web.Any(fmt.Sprintf("%s/*", rpcserver.APIPrefix), echo.WrapHandler(http.StripPrefix(rpcserver.APIPrefix, c.grpc)))
 	return nil
 }
 
