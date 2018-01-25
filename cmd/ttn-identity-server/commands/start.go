@@ -3,7 +3,6 @@
 package commands
 
 import (
-	is_init "github.com/TheThingsNetwork/ttn/cmd/internal/identityserver"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver"
@@ -17,7 +16,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
 
-			is, err := identityserver.New(c, &config.IS, is_init.Options(c, &config.IS)...)
+			is, err := identityserver.New(c, config.IS)
 			if err != nil {
 				return errors.NewWithCause("Could not create identity server", err)
 			}
