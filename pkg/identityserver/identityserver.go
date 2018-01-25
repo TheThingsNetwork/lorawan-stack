@@ -3,12 +3,9 @@
 package identityserver
 
 import (
-	"fmt"
-
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/mock"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/sendgrid"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -155,10 +152,6 @@ func New(c *component.Component, config *Config, opts ...Option) (*IdentityServe
 	is.adminService = &adminService{is}
 
 	opts = append(defaultOptions, opts...)
-
-	if len(config.SendGridAPIKey) != 0 {
-		opts = append(opts, WithEmailProvider(sendgrid.New(c.Logger(), config.SendGridAPIKey, sendgrid.SenderAddress(config.OrganizationName, fmt.Sprintf("noreply@%s", config.Hostname)))))
-	}
 
 	for _, opt := range opts {
 		opt(is)
