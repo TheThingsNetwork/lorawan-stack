@@ -7,11 +7,12 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/scheduling"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-func (p *pool) Subscribe(gatewayInfo ttnpb.GatewayIdentifier, link PoolSubscription) chan *ttnpb.GatewayUp {
+func (p *pool) Subscribe(gatewayInfo ttnpb.GatewayIdentifier, link PoolSubscription, fp ttnpb.FrequencyPlan) (chan *ttnpb.GatewayUp, error) {
 	c := connection{
 		Logger: p.logger.WithField("gateway_id", gatewayInfo.GatewayID),
 
@@ -24,7 +25,15 @@ func (p *pool) Subscribe(gatewayInfo ttnpb.GatewayIdentifier, link PoolSubscript
 	upstreamChannel := make(chan *ttnpb.GatewayUp)
 	downstreamChannel := make(chan *ttnpb.GatewayDown)
 
-	p.store.Store(gatewayInfo, downstreamChannel)
+	scheduler, err := scheduling.FrequencyPlanScheduler(link.Context(), fp)
+	if err != nil {
+		return nil, err
+	}
+
+	p.store.Store(gatewayInfo, gatewayStoreEntry{
+		scheduler: scheduler,
+		channel:   downstreamChannel,
+	})
 
 	wg := &sync.WaitGroup{}
 	// Receiving on the stream
@@ -36,7 +45,7 @@ func (p *pool) Subscribe(gatewayInfo ttnpb.GatewayIdentifier, link PoolSubscript
 	go p.sendingRoutine(c, downstreamChannel, wg)
 
 	wg.Wait()
-	return upstreamChannel
+	return upstreamChannel, nil
 }
 
 type connection struct {

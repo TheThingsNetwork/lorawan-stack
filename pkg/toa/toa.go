@@ -11,6 +11,17 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
+var ErrInvalidValue = &errors.ErrDescriptor{
+	MessageFormat:  "Invalid { value_name }: cannot be { invalid_value }",
+	Code:           1,
+	Type:           errors.InvalidArgument,
+	SafeAttributes: []string{"value_name", "invalid_value"},
+}
+
+func init() {
+	ErrInvalidValue.Register()
+}
+
 // Compute the time-on-air from the payload and RF parameters. This function only takes into account the PHY payload.
 //
 // See http://www.semtech.com/images/datasheet/LoraDesignGuide_STD.pdf, page 7
@@ -38,13 +49,19 @@ func computeLoRa(rawPayload []byte, settings ttnpb.TxSettings) (time.Duration, e
 	case "4/8":
 		cr = 4
 	default:
-		return 0, errors.New("Invalid downlink coding rate")
+		return 0, ErrInvalidValue.New(errors.Attributes{"value_name": "coding rate", "invalid_value": "different from 4/{5,6,7,8}"})
 	}
 
 	bandwidth := settings.Bandwidth / 1000 // Bandwidth in KHz
 	spreadingFactor := settings.SpreadingFactor
 
 	var de float64
+	if bandwidth == 0 {
+		return 0, ErrInvalidValue.New(errors.Attributes{"value_name": "bandwidth", "invalid_value": 0})
+	}
+	if spreadingFactor == 0 {
+		return 0, ErrInvalidValue.New(errors.Attributes{"value_name": "spreading factor", "invalid_value": 0})
+	}
 	if bandwidth == 125 && (spreadingFactor == 11 || spreadingFactor == 12) {
 		de = 1.0
 	}

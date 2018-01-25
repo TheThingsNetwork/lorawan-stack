@@ -9,38 +9,45 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/scheduling"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
+type gatewayStoreEntry struct {
+	channel chan *ttnpb.GatewayDown
+
+	scheduler scheduling.Scheduler
+}
+
 type gatewayStore struct {
-	store map[ttnpb.GatewayIdentifier]chan *ttnpb.GatewayDown
+	store map[ttnpb.GatewayIdentifier]gatewayStoreEntry
 
 	mu sync.Mutex
 }
 
-func (s *gatewayStore) Store(gatewayID ttnpb.GatewayIdentifier, outgoingChannel chan *ttnpb.GatewayDown) {
+func (s *gatewayStore) Store(gatewayID ttnpb.GatewayIdentifier, entry gatewayStoreEntry) {
 	s.mu.Lock()
 
 	res, err := s.fetch(gatewayID)
 	if err == nil {
-		close(res)
+		close(res.channel)
 	}
-	s.store[gatewayID] = outgoingChannel
+	s.store[gatewayID] = entry
 
 	s.mu.Unlock()
 }
 
-func (s *gatewayStore) fetch(gatewayID ttnpb.GatewayIdentifier) (chan *ttnpb.GatewayDown, error) {
+func (s *gatewayStore) fetch(gatewayID ttnpb.GatewayIdentifier) (gatewayStoreEntry, error) {
 	outgoingChannel, ok := s.store[gatewayID]
 	if !ok {
-		return nil, errors.New("Gateway not found")
+		return gatewayStoreEntry{}, errors.New("Gateway not found")
 	}
 
 	return outgoingChannel, nil
 }
 
-func (s *gatewayStore) Fetch(gatewayID ttnpb.GatewayIdentifier) (chan *ttnpb.GatewayDown, error) {
+func (s *gatewayStore) Fetch(gatewayID ttnpb.GatewayIdentifier) (gatewayStoreEntry, error) {
 	s.mu.Lock()
 	res, err := s.fetch(gatewayID)
 	s.mu.Unlock()
@@ -53,7 +60,7 @@ func (s *gatewayStore) Remove(gatewayID ttnpb.GatewayIdentifier) {
 
 	res, err := s.fetch(gatewayID)
 	if err == nil {
-		close(res)
+		close(res.channel)
 	}
 	delete(s.store, gatewayID)
 
@@ -75,7 +82,7 @@ type PoolSubscription interface {
 //
 // - Scheduling of downlinks
 type Pool interface {
-	Subscribe(gatewayInfo ttnpb.GatewayIdentifier, link PoolSubscription) chan *ttnpb.GatewayUp
+	Subscribe(gatewayInfo ttnpb.GatewayIdentifier, link PoolSubscription, fp ttnpb.FrequencyPlan) (chan *ttnpb.GatewayUp, error)
 	Send(gatewayInfo ttnpb.GatewayIdentifier, downstream *ttnpb.GatewayDown) error
 }
 
@@ -90,7 +97,7 @@ type pool struct {
 func NewPool(logger log.Interface, sendTimeout time.Duration) Pool {
 	return &pool{
 		store: &gatewayStore{
-			store: map[ttnpb.GatewayIdentifier]chan *ttnpb.GatewayDown{},
+			store: map[ttnpb.GatewayIdentifier]gatewayStoreEntry{},
 			mu:    sync.Mutex{},
 		},
 		sendTimeout: sendTimeout,

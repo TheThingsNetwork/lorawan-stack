@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/band"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/gwpool"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
@@ -26,7 +27,8 @@ func TestPoolUplinks(t *testing.T) {
 		NextUplink: make(chan *ttnpb.GatewayUp),
 	}
 	emptyUplink := &ttnpb.GatewayUp{}
-	upstream := p.Subscribe(ttnpb.GatewayIdentifier{GatewayID: gatewayID}, link)
+	upstream, err := p.Subscribe(ttnpb.GatewayIdentifier{GatewayID: gatewayID}, link, ttnpb.FrequencyPlan{BandID: band.EU_863_870})
+	a.So(err, should.BeNil)
 
 	go func() { link.NextUplink <- emptyUplink }()
 	newUplink := <-upstream
@@ -39,6 +41,8 @@ func TestPoolUplinks(t *testing.T) {
 }
 
 func TestDoneContextUplinks(t *testing.T) {
+	a := assertions.New(t)
+
 	p := gwpool.NewPool(test.GetLogger(t), time.Millisecond)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -54,7 +58,8 @@ func TestDoneContextUplinks(t *testing.T) {
 	}
 	cancel()
 	emptyUplink := &ttnpb.GatewayUp{}
-	upstream := p.Subscribe(ttnpb.GatewayIdentifier{GatewayID: gatewayID}, link)
+	upstream, err := p.Subscribe(ttnpb.GatewayIdentifier{GatewayID: gatewayID}, link, ttnpb.FrequencyPlan{BandID: band.EU_863_870})
+	a.So(err, should.BeNil)
 	go func() { link.NextUplink <- emptyUplink }()
 	time.Sleep(time.Millisecond)
 	select {
@@ -75,6 +80,6 @@ func TestSubscribeTwice(t *testing.T) {
 	link := &dummyLink{}
 	newLink := &dummyLink{}
 
-	p.Subscribe(gateway, link)
-	p.Subscribe(gateway, newLink)
+	p.Subscribe(gateway, link, ttnpb.FrequencyPlan{BandID: band.EU_863_870})
+	p.Subscribe(gateway, newLink, ttnpb.FrequencyPlan{BandID: band.EU_863_870})
 }

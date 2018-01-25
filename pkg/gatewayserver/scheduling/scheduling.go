@@ -107,6 +107,10 @@ func (f frequencyPlanScheduling) findSubBand(channel uint64) (*subBandScheduling
 }
 
 func (f frequencyPlanScheduling) ScheduleAt(s Span, channel uint64) error {
+	if s.Duration <= 0 {
+		return errors.New("Invalid span: duration cannot be negative")
+	}
+
 	if f.dwellTime != nil && s.Duration > *f.dwellTime {
 		return ErrDwellTime.New(errors.Attributes{"packet_duration": s.Duration, "dwell_time": *f.dwellTime})
 	}
@@ -120,6 +124,10 @@ func (f frequencyPlanScheduling) ScheduleAt(s Span, channel uint64) error {
 }
 
 func (f frequencyPlanScheduling) ScheduleAnytime(minimum Timestamp, d time.Duration, channel uint64) (Span, error) {
+	if d <= 0 {
+		return Span{}, errors.New("Invalid duration: duration cannot be negative")
+	}
+
 	subBand, err := f.findSubBand(channel)
 	if err != nil {
 		return Span{}, err
@@ -129,6 +137,10 @@ func (f frequencyPlanScheduling) ScheduleAnytime(minimum Timestamp, d time.Durat
 }
 
 func (f frequencyPlanScheduling) RegisterEmission(s Span, channel uint64) error {
+	if s.Duration <= 0 {
+		return errors.New("Invalid duration: duration cannot be negative")
+	}
+
 	subBand, err := f.findSubBand(channel)
 	if err != nil {
 		return err

@@ -65,6 +65,18 @@ func TestInvalidLoRa(t *testing.T) {
 	a.So(err, should.BeNil)
 	_, err = Compute(downlink.RawPayload, downlink.Settings)
 	a.So(err, should.NotBeNil)
+
+	downlink, err = buildLoRaDownlinkFromParameters(10, types.DataRate{LoRa: "SF7BW125"}, "1/9")
+	a.So(err, should.BeNil)
+	downlink.Settings.SpreadingFactor = 0
+	_, err = Compute(downlink.RawPayload, downlink.Settings)
+	a.So(err, should.NotBeNil)
+
+	downlink, err = buildLoRaDownlinkFromParameters(10, types.DataRate{LoRa: "SF7BW125"}, "4/5")
+	a.So(err, should.BeNil)
+	downlink.Settings.Bandwidth = 0
+	_, err = Compute(downlink.RawPayload, downlink.Settings)
+	a.So(err, should.NotBeNil)
 }
 
 func TestDifferentLoRaSFs(t *testing.T) {

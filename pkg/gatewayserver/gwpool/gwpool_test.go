@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/band"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/gwpool"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
@@ -57,7 +58,10 @@ func ExamplePool() {
 	p := gwpool.NewPool(log.Noop, time.Millisecond)
 
 	gatewayInfo := ttnpb.GatewayIdentifier{GatewayID: "my-kerlink"}
-	upMessages := p.Subscribe(gatewayInfo, newPoolConnection())
+	upMessages, err := p.Subscribe(gatewayInfo, newPoolConnection(), ttnpb.FrequencyPlan{BandID: band.EU_863_870})
+	if err != nil {
+		panic(err)
+	}
 
 	go func() {
 		for upMessage := range upMessages {
