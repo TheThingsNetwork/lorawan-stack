@@ -19,24 +19,12 @@ func isZero(v reflect.Value) bool {
 	}
 
 	switch v.Kind() {
-	case reflect.Func, reflect.Chan:
-		return v.IsNil()
 	case reflect.Ptr, reflect.Interface:
 		return isZero(v.Elem())
-	case reflect.Map:
-		for _, k := range v.MapKeys() {
-			if !isZero(v.MapIndex(k)) {
-				return false
-			}
-		}
-		return true
-	case reflect.Slice:
-		for i := 0; i < v.Len(); i++ {
-			if !isZero(v.Index(i)) {
-				return false
-			}
-		}
-		return true
+	case reflect.Func:
+		return v.IsNil()
+	case reflect.Map, reflect.Slice, reflect.Array, reflect.String, reflect.Chan:
+		return v.Len() == 0
 	}
 	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }

@@ -159,15 +159,19 @@ func TestIsZero(t *testing.T) {
 			true,
 		},
 		{
+			[]int{0},
+			false,
+		},
+		{
 			[]interface{}{nil, nil, nil},
-			true,
+			false,
 		},
 		{
 			map[string]interface{}{
 				"empty": struct{}{},
 				"map":   nil,
 			},
-			true,
+			false,
 		},
 		{
 			map[string]interface{}{
