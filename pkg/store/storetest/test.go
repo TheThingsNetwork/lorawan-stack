@@ -17,18 +17,34 @@ type testingT interface {
 }
 
 // TestTypedStore executes a black-box test for the given typed store
-func TestTypedStore(t testingT, s store.TypedStore) {
+func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 	a := assertions.New(t)
 
-	id1, err := s.Create(map[string]interface{}{})
+	s := newStore()
+
+	id1, err := s.Create(make(map[string]interface{}))
 	a.So(err, should.BeNil)
 	a.So(id1, should.NotBeNil)
 
-	id2, err := s.Create(map[string]interface{}{})
+	id2, err := s.Create(make(map[string]interface{}))
 	a.So(err, should.BeNil)
 	a.So(id2, should.NotBeNil)
 
 	a.So(id1, should.NotResemble, id2)
+
+	err = s.Update(id1, make(map[string]interface{}))
+	a.So(err, should.BeNil)
+	err = s.Update(id2, make(map[string]interface{}))
+	a.So(err, should.BeNil)
+
+	// Behavior is implementation-dependent
+	a.So(func() { s.Find(id1) }, should.NotPanic)
+	a.So(func() { s.Find(id2) }, should.NotPanic)
+
+	err = s.Delete(id1)
+	a.So(err, should.BeNil)
+	err = s.Delete(id2)
+	a.So(err, should.BeNil)
 
 	for i, tc := range []struct {
 		Stored      map[string]interface{}
@@ -81,8 +97,12 @@ func TestTypedStore(t testingT, s store.TypedStore) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
+			s := newStore()
+
 			id, err := s.Create(tc.Stored)
-			a.So(err, should.BeNil)
+			if !a.So(err, should.BeNil) {
+				return
+			}
 			a.So(id, should.NotBeNil)
 
 			found, err := s.Find(id)
@@ -106,7 +126,9 @@ func TestTypedStore(t testingT, s store.TypedStore) {
 			}
 
 			err = s.Update(id, tc.Updated)
-			a.So(err, should.BeNil)
+			if !a.So(err, should.BeNil) {
+				return
+			}
 
 			found, err = s.Find(id)
 			a.So(err, should.BeNil)
@@ -129,7 +151,9 @@ func TestTypedStore(t testingT, s store.TypedStore) {
 			}
 
 			err = s.Delete(id)
-			a.So(err, should.BeNil)
+			if !a.So(err, should.BeNil) {
+				return
+			}
 
 			found, err = s.Find(id)
 			a.So(err, should.Equal, store.ErrNotFound)
@@ -147,18 +171,34 @@ func TestTypedStore(t testingT, s store.TypedStore) {
 }
 
 // TestByteStore executes a black-box test for the given byte store
-func TestByteStore(t testingT, s store.ByteStore) {
+func TestByteStore(t testingT, newStore func() store.ByteStore) {
 	a := assertions.New(t)
 
-	id1, err := s.Create(map[string][]byte{})
+	s := newStore()
+
+	id1, err := s.Create(make(map[string][]byte))
 	a.So(err, should.BeNil)
 	a.So(id1, should.NotBeNil)
 
-	id2, err := s.Create(map[string][]byte{})
+	id2, err := s.Create(make(map[string][]byte))
 	a.So(err, should.BeNil)
 	a.So(id2, should.NotBeNil)
 
 	a.So(id1, should.NotResemble, id2)
+
+	err = s.Update(id1, make(map[string][]byte))
+	a.So(err, should.BeNil)
+	err = s.Update(id2, make(map[string][]byte))
+	a.So(err, should.BeNil)
+
+	// Behavior is implementation-dependent
+	a.So(func() { s.Find(id1) }, should.NotPanic)
+	a.So(func() { s.Find(id2) }, should.NotPanic)
+
+	err = s.Delete(id1)
+	a.So(err, should.BeNil)
+	err = s.Delete(id2)
+	a.So(err, should.BeNil)
 
 	for i, tc := range []struct {
 		Stored      map[string][]byte
@@ -175,17 +215,17 @@ func TestByteStore(t testingT, s store.ByteStore) {
 			},
 			map[string][]byte{
 				"foo": []byte("foo"),
-				"bar": []byte("bar"),
 				"qux": []byte("qux"),
 				"hey": nil,
 			},
 			map[string][]byte{
-				"foo": []byte("baz"),
+				"foo": []byte("foo"),
 				"bar": []byte("bar"),
+				"baz": []byte("baz"),
 				"qux": []byte("qux"),
 			},
 			map[string][]byte{
-				"foo": []byte("baz"),
+				"foo": []byte("foo"),
 				"bar": []byte("bar"),
 			},
 		},
@@ -211,8 +251,12 @@ func TestByteStore(t testingT, s store.ByteStore) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
+			s := newStore()
+
 			id, err := s.Create(tc.Stored)
-			a.So(err, should.BeNil)
+			if !a.So(err, should.BeNil) {
+				return
+			}
 			a.So(id, should.NotBeNil)
 
 			found, err := s.Find(id)
@@ -236,7 +280,9 @@ func TestByteStore(t testingT, s store.ByteStore) {
 			}
 
 			err = s.Update(id, tc.Updated)
-			a.So(err, should.BeNil)
+			if !a.So(err, should.BeNil) {
+				return
+			}
 
 			found, err = s.Find(id)
 			a.So(err, should.BeNil)
@@ -259,7 +305,9 @@ func TestByteStore(t testingT, s store.ByteStore) {
 			}
 
 			err = s.Delete(id)
-			a.So(err, should.BeNil)
+			if !a.So(err, should.BeNil) {
+				return
+			}
 
 			found, err = s.Find(id)
 			a.So(err, should.Equal, store.ErrNotFound)

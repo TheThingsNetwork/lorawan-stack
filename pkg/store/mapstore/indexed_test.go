@@ -5,10 +5,12 @@ package mapstore
 import (
 	"testing"
 
+	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/TheThingsNetwork/ttn/pkg/store/storetest"
 )
 
 func TestIndexedMapStore(t *testing.T) {
-	s := NewIndexed("foo", "bar")
-	storetest.TestTypedStore(t, s)
+	storetest.TestTypedStore(t, func() store.TypedStore {
+		return NewIndexed("foo", "bar")
+	})
 }

@@ -5,10 +5,12 @@ package mapstore
 import (
 	"testing"
 
+	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/TheThingsNetwork/ttn/pkg/store/storetest"
 )
 
 func TestMapStore(t *testing.T) {
-	s := New()
-	storetest.TestTypedStore(t, s)
+	storetest.TestTypedStore(t, func() store.TypedStore {
+		return New()
+	})
 }
