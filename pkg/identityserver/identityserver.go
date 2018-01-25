@@ -143,7 +143,13 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 }
 
 // RegisterHandlers registers gRPC handlers.
-func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {}
+func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
+	ttnpb.RegisterIsUserHandler(is.Context(), s, conn)
+	ttnpb.RegisterIsApplicationHandler(is.Context(), s, conn)
+	ttnpb.RegisterIsGatewayHandler(is.Context(), s, conn)
+	ttnpb.RegisterIsClientHandler(is.Context(), s, conn)
+	ttnpb.RegisterIsAdminHandler(is.Context(), s, conn)
+}
 
 // Roles returns the roles that the identity server fulfils
 func (is *IdentityServer) Roles() []ttnpb.PeerInfo_Role {
