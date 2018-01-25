@@ -3,47 +3,24 @@
 package identityserver
 
 import (
+	"net/url"
+
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/mock"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/sendgrid"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
+	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
 )
 
-// IdentityServer implements the Identity Server component behaviour.
-type IdentityServer struct {
-	*component.Component
-
-	config *Config
-
-	store *sql.Store
-	email email.Provider
-
-	*userService
-	*applicationService
-	*gatewayService
-	*clientService
-	*adminService
-
-	factories struct {
-		user        store.UserFactory
-		application store.ApplicationFactory
-		gateway     store.GatewayFactory
-		client      store.ClientFactory
-	}
-}
-
 // Config defines the needed parameters to start the Identity Server.
 type Config struct {
 	// DatabaseURI is the database connection URI; e.g. "postgres://root@localhost:26257/is_development?sslmode=disable"
 	DatabaseURI string `name:"database-uri" description:"URI of the database to connect at"`
-
-	// Hostname denotes the Identity Server hostname. It is used as issuer when
-	// generating access tokens and API keys.
-	Hostname string `name:"hostname" description:"Hostname where this server is running. Used as issuer when generating access tokens and API keys"`
 
 	// OrganizationName is the display name of the organization that runs the network.
 	// e.g. The Things Network
@@ -53,87 +30,47 @@ type Config struct {
 	// email content. e.g. https://www.thethingsnetwork.org
 	PublicURL string `name:"public-url" description:"Public URL this server uses to serve content such as email content"`
 
-	// SendGridAPIKey is the API key issued by SendGrid to send emails using its service.
-	SendGridAPIKey string `name:"sendgrid-api-key" description:"SendGrid API Key. If left blank the mock email provider will be used"`
+	// Sendgrid is the sendgrid config.
+	Sendgrid *sendgrid.Config `name:"sendgrid"`
 
-	// defaultSettings are the default settings within the tenant loaded in the store
-	// when it first-time initialized.
-	defaultSettings *ttnpb.IdentityServerSettings
+	// defaultSettings are the default settings within the tenant loaded in the storewhen it first-time initialized.
+	DefaultSettings *ttnpb.IdentityServerSettings `name:"default-settings" description:"Default settings that are loaded when the is first starts"`
+
+	// Factories are the factories used in the identity server
+	Factories Factories `name:"-"`
+
+	// Hostname denotes the Identity Server hostname. It is used as issuer when
+	// generating access tokens and API keys.
+	Hostname string `name:"-"`
 }
 
-// Option is the type for options of the Identity Server.
-type Option func(*IdentityServer)
+// IdentityServer implements the Identity Server component behaviour.
+type IdentityServer struct {
+	*component.Component
 
-// WithEmailProvider replaces the default (mock) email provider.
-func WithEmailProvider(provider email.Provider) Option {
-	return func(is *IdentityServer) {
-		is.email = provider
-	}
+	config Config
+
+	store *sql.Store
+	email email.Provider
+
+	*userService
+	*applicationService
+	*gatewayService
+	*clientService
+	*adminService
 }
 
-// WithUserFactory replaces the default user ttnpb.User factory.
-func WithUserFactory(factory store.UserFactory) Option {
-	return func(is *IdentityServer) {
-		is.factories.user = factory
-	}
-}
-
-var defaultUserFactory = func() store.User {
-	return &ttnpb.User{}
-}
-
-// WithApplicationFactory replaces the default application ttnpb.Application factory.
-func WithApplicationFactory(factory store.ApplicationFactory) Option {
-	return func(is *IdentityServer) {
-		is.factories.application = factory
-	}
-}
-
-var defaultApplicationFactory = func() store.Application {
-	return &ttnpb.Application{}
-}
-
-// WithGatewayFactory replaces the default gateway ttnpb.Gateway factory.
-func WithGatewayFactory(factory store.GatewayFactory) Option {
-	return func(is *IdentityServer) {
-		is.factories.gateway = factory
-	}
-}
-
-var defaultGatewayFactory = func() store.Gateway {
-	return &ttnpb.Gateway{}
-}
-
-// WithClientFactory replaces the default client ttnpb.Client factory.
-func WithClientFactory(factory store.ClientFactory) Option {
-	return func(is *IdentityServer) {
-		is.factories.client = factory
-	}
-}
-
-var defaultClientFactory = func() store.Client {
-	return &ttnpb.Client{}
-}
-
-// WithDefaultSettings replaces the default settings that are loaded when the
-// store is first-time initialized.
-func WithDefaultSettings(settings *ttnpb.IdentityServerSettings) Option {
-	return func(is *IdentityServer) {
-		is.config.defaultSettings = settings
-	}
-}
-
-var defaultOptions = []Option{
-	WithEmailProvider(mock.New()),
-	WithUserFactory(defaultUserFactory),
-	WithApplicationFactory(defaultApplicationFactory),
-	WithGatewayFactory(defaultGatewayFactory),
-	WithClientFactory(defaultClientFactory),
-	WithDefaultSettings(defaultSettings),
+// Factories are the factories to be used in the identity server.
+type Factories struct {
+	User        store.UserFactory
+	Application store.ApplicationFactory
+	Gateway     store.GatewayFactory
+	Client      store.ClientFactory
 }
 
 // New returns a new IdentityServer.
-func New(c *component.Component, config *Config, opts ...Option) (*IdentityServer, error) {
+func New(c *component.Component, config Config) (*IdentityServer, error) {
+	log := log.FromContext(c.Context()).WithField("namespace", "is")
 	store, err := sql.Open(config.DatabaseURI)
 	if err != nil {
 		return nil, err
@@ -145,21 +82,33 @@ func New(c *component.Component, config *Config, opts ...Option) (*IdentityServe
 		config:    config,
 	}
 
+	config.Hostname = hostname(config.PublicURL)
+
 	is.userService = &userService{is}
 	is.applicationService = &applicationService{is}
 	is.gatewayService = &gatewayService{is}
 	is.clientService = &clientService{is}
 	is.adminService = &adminService{is}
 
-	opts = append(defaultOptions, opts...)
-
-	for _, opt := range opts {
-		opt(is)
+	if config.Sendgrid != nil && config.Sendgrid.APIKey != "" {
+		is.email = sendgrid.New(log, *config.Sendgrid)
+	} else {
+		log.Warn("No sendgrid API key configured, not sending emails")
+		is.email = mock.New()
 	}
 
 	c.RegisterGRPC(is)
 
 	return is, nil
+}
+
+func hostname(u string) string {
+	p, err := url.Parse(u)
+	if err != nil {
+		panic(err)
+	}
+
+	return p.Hostname()
 }
 
 // Init initializes the store and sets the default settings in case they aren't.
@@ -172,7 +121,7 @@ func (is *IdentityServer) Init() error {
 	// set default settings if these are not set yet
 	_, err = is.store.Settings.Get()
 	if sql.ErrSettingsNotFound.Describes(err) {
-		if err := is.store.Settings.Set(is.config.defaultSettings); err != nil {
+		if err := is.store.Settings.Set(is.config.DefaultSettings); err != nil {
 			return err
 		}
 	}

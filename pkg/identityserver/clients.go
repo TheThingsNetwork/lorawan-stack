@@ -57,7 +57,7 @@ func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifi
 		return nil, err
 	}
 
-	found, err := s.store.Clients.GetByID(req.ClientID, s.factories.client)
+	found, err := s.store.Clients.GetByID(req.ClientID, s.config.Factories.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (s *clientService) ListClients(ctx context.Context, _ *pbtypes.Empty) (*ttn
 		return nil, err
 	}
 
-	found, err := s.store.Clients.ListByUser(userID, s.factories.client)
+	found, err := s.store.Clients.ListByUser(userID, s.config.Factories.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 		return nil, err
 	}
 
-	found, err := s.store.Clients.GetByID(req.Client.ClientID, s.factories.client)
+	found, err := s.store.Clients.GetByID(req.Client.ClientID, s.config.Factories.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdent
 		return nil, err
 	}
 
-	found, err := s.store.Clients.GetByID(req.ClientID, s.factories.client)
+	found, err := s.store.Clients.GetByID(req.ClientID, s.config.Factories.Client)
 	if err != nil {
 		return nil, err
 	}

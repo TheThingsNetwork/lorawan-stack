@@ -3,6 +3,8 @@
 package shared
 
 import (
+	"fmt"
+
 	"github.com/TheThingsNetwork/ttn/pkg/applicationserver"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
@@ -71,8 +73,10 @@ var DefaultServiceBase = config.ServiceBase{
 // DefaultIdentityServerConfig is the default configuration for the IdentityServer
 var DefaultIdentityServerConfig = identityserver.Config{
 	DatabaseURI:      "postgres://root@localhost:26257/is_development?sslmode=disable",
-	Hostname:         "localhost",
+	PublicURL:        fmt.Sprintf("http://localhost:%s", DefaultServiceBase.HTTP.Listen),
 	OrganizationName: "The Things Network",
+	DefaultSettings:  identityserver.DefaultSettings,
+	Factories:        identityserver.DefaultFactories,
 }
 
 // DefaultGatewayServerConfig is the default configuration for the GatewayServer

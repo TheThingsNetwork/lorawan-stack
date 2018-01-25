@@ -5,12 +5,13 @@ package identityserver
 import (
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 // defaultSettings are the default settings loaded in the Identity Server
 // when the database is created for the first time.
-var defaultSettings = &ttnpb.IdentityServerSettings{
+var DefaultSettings = &ttnpb.IdentityServerSettings{
 	BlacklistedIDs: []string{
 		"admin",
 		"administrator",
@@ -51,4 +52,11 @@ var defaultSettings = &ttnpb.IdentityServerSettings{
 	AllowedEmails:      []string{"*"},
 	ValidationTokenTTL: time.Hour,
 	InvitationTokenTTL: time.Duration(48) * time.Hour,
+}
+
+var DefaultFactories = Factories{
+	User:        func() store.User { return &ttnpb.User{} },
+	Application: func() store.Application { return &ttnpb.Application{} },
+	Gateway:     func() store.Gateway { return &ttnpb.Gateway{} },
+	Client:      func() store.Client { return &ttnpb.Client{} },
 }

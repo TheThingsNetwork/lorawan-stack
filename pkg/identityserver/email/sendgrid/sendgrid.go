@@ -16,41 +16,35 @@ const (
 	defaultFromEmail = "noreply@identityserver.ttn"
 )
 
+type Config struct {
+	// APIKey is the sendgrid api key.
+	APIKey string `name:"api-key" description:"The sendgrid API key to use"`
+
+	// SandboxMode enables sendgrid's sandbox mode for testing.
+	SandboxMode bool `name:"sandbox" description:"Set the sendgrid sandbox mode for testing"`
+
+	// From is the address the emails are sent from.
+	From string `name:"from" description:"The address the emails are sent from"`
+
+	// Name is the name of the sender.
+	Name string `name:"name" description:"The name of the sender"`
+}
+
 // SendGrid is the type that implements SendGrid as email provider.
 type SendGrid struct {
-	logger      log.Interface
-	client      *sendgrid.Client
-	fromEmail   *mail.Email
-	sandboxMode bool
-}
-
-// Option is the type of functions that configure the provider.
-type Option func(*SendGrid)
-
-// SandboxMode sets the sandbox mode for testing purposes.
-func SandboxMode(enabled bool) Option {
-	return func(s *SendGrid) {
-		s.sandboxMode = enabled
-	}
-}
-
-// SenderAddress sets the given address as from email address.
-func SenderAddress(name, address string) Option {
-	return func(s *SendGrid) {
-		s.fromEmail = mail.NewEmail(name, address)
-	}
+	logger    log.Interface
+	config    Config
+	client    *sendgrid.Client
+	fromEmail *mail.Email
 }
 
 // New creates a SendGrid email provider.
-func New(logger log.Interface, apiKey string, opts ...Option) *SendGrid {
+func New(logger log.Interface, config Config) *SendGrid {
 	provider := &SendGrid{
 		logger:    logger.WithField("provider", "SendGrid"),
-		client:    sendgrid.NewSendClient(apiKey),
-		fromEmail: mail.NewEmail(defaultFromName, defaultFromEmail),
-	}
-
-	for _, opt := range opts {
-		opt(provider)
+		client:    sendgrid.NewSendClient(config.APIKey),
+		fromEmail: mail.NewEmail(config.Name, config.From),
+		config:    config,
 	}
 
 	return provider
@@ -115,7 +109,7 @@ func (s *SendGrid) buildEmail(recipient string, template templates.Template) (*m
 		mail.NewContent("text/plain", text),
 	)
 
-	if s.sandboxMode {
+	if s.config.SandboxMode {
 		settings := mail.NewMailSettings()
 		settings.SetSandboxMode(mail.NewSetting(true))
 

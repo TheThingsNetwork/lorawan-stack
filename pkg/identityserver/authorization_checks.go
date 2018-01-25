@@ -37,7 +37,7 @@ func (is *IdentityServer) enforceAdmin(ctx context.Context) error {
 		return err
 	}
 
-	found, err := is.store.Users.GetByID(userID, is.factories.user)
+	found, err := is.store.Users.GetByID(userID, is.config.Factories.User)
 	if err != nil {
 		return err
 	}

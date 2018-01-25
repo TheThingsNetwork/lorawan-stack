@@ -71,7 +71,7 @@ func (s *gatewayService) GetGateway(ctx context.Context, req *ttnpb.GatewayIdent
 		return nil, err
 	}
 
-	found, err := s.store.Gateways.GetByID(req.GatewayID, s.factories.gateway)
+	found, err := s.store.Gateways.GetByID(req.GatewayID, s.config.Factories.Gateway)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (s *gatewayService) ListGateways(ctx context.Context, _ *pbtypes.Empty) (*t
 		return nil, err
 	}
 
-	found, err := s.store.Gateways.ListByUser(userID, s.factories.gateway)
+	found, err := s.store.Gateways.ListByUser(userID, s.config.Factories.Gateway)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGat
 		return nil, err
 	}
 
-	found, err := s.store.Gateways.GetByID(req.Gateway.GatewayID, s.factories.gateway)
+	found, err := s.store.Gateways.GetByID(req.Gateway.GatewayID, s.config.Factories.Gateway)
 	if err != nil {
 		return nil, err
 	}

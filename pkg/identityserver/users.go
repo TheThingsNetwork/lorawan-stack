@@ -101,7 +101,7 @@ func (s *userService) GetUser(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Use
 		return nil, err
 	}
 
-	found, err := s.store.Users.GetByID(userID, s.factories.user)
+	found, err := s.store.Users.GetByID(userID, s.config.Factories.User)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 		return nil, err
 	}
 
-	found, err := s.store.Users.GetByID(userID, s.factories.user)
+	found, err := s.store.Users.GetByID(userID, s.config.Factories.User)
 	if err != nil {
 		return nil, err
 	}
@@ -193,7 +193,7 @@ func (s *userService) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateU
 		return nil, err
 	}
 
-	found, err := s.store.Users.GetByID(userID, s.factories.user)
+	found, err := s.store.Users.GetByID(userID, s.config.Factories.User)
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +230,7 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 			return err
 		}
 
-		apps, err := st.Applications.ListByUser(userID, s.factories.application)
+		apps, err := st.Applications.ListByUser(userID, s.config.Factories.Application)
 		if err != nil {
 			return err
 		}
@@ -248,7 +248,7 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 			}
 		}
 
-		gtws, err := st.Gateways.ListByUser(userID, s.factories.gateway)
+		gtws, err := st.Gateways.ListByUser(userID, s.config.Factories.Gateway)
 		if err != nil {
 			return err
 		}
@@ -347,7 +347,7 @@ func (s *userService) ValidateUserEmail(ctx context.Context, req *ttnpb.Validate
 			return ErrValidationTokenExpired.New(nil)
 		}
 
-		user, err := store.Users.GetByID(userID, s.factories.user)
+		user, err := store.Users.GetByID(userID, s.config.Factories.User)
 		if err != nil {
 			return err
 		}
@@ -373,7 +373,7 @@ func (s *userService) RequestUserEmailValidation(ctx context.Context, _ *pbtypes
 		return nil, err
 	}
 
-	user, err := s.store.Users.GetByID(userID, s.factories.user)
+	user, err := s.store.Users.GetByID(userID, s.config.Factories.User)
 	if err != nil {
 		return nil, err
 	}
@@ -415,7 +415,7 @@ func (s *userService) ListAuthorizedClients(ctx context.Context, _ *pbtypes.Empt
 		return nil, err
 	}
 
-	found, err := s.store.OAuth.ListAuthorizedClients(userID, s.factories.client)
+	found, err := s.store.OAuth.ListAuthorizedClients(userID, s.config.Factories.Client)
 	if err != nil {
 		return nil, err
 	}

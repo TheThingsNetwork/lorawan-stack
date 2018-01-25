@@ -18,11 +18,13 @@ import (
 )
 
 var (
-	testConfig = &Config{
+	testConfig = Config{
 		DatabaseURI:      "postgres://root@localhost:26257/is_development_tests?sslmode=disable",
 		Hostname:         "localhost",
 		OrganizationName: "The Things Network",
 		PublicURL:        "https://www.thethingsnetwork.org",
+		DefaultSettings:  testSettings(),
+		Factories:        DefaultFactories,
 	}
 	testIS      *IdentityServer
 	accessToken string
@@ -41,7 +43,7 @@ func getIS(t testing.TB) *IdentityServer {
 		logger := test.GetLogger(t)
 		comp := component.New(logger, &component.Config{})
 
-		is, err := New(comp, testConfig, WithDefaultSettings(testSettings()))
+		is, err := New(comp, testConfig)
 		if err != nil {
 			logger.WithError(err).Fatal("Failed to create an Identity Server instance")
 		}

@@ -32,13 +32,15 @@ func TestSendGridBuildEmail(t *testing.T) {
 
 	sendgrid := New(
 		test.GetLogger(t),
-		"API_KEY",
-		SandboxMode(true),
-		SenderAddress("Foo", "foo@foo.local"),
+		Config{
+			APIKey:      "API_KEY",
+			SandboxMode: true,
+			Name:        "Foo",
+			From:        "foo@foo.local",
+		},
 	)
 
 	a.So(sendgrid.client, should.NotBeNil)
-	a.So(sendgrid.sandboxMode, should.BeTrue)
 	a.So(sendgrid.fromEmail, should.Resemble, mail.NewEmail("Foo", "foo@foo.local"))
 
 	message, err := sendgrid.buildEmail("john@doe.com", &template{"john"})
