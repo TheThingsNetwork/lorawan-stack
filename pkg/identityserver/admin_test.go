@@ -159,17 +159,21 @@ func TestAdminUsers(t *testing.T) {
 
 	old := found.GetUser().Password
 
-	_, err = is.adminService.ResetUserPassword(ctx, &ttnpb.UserIdentifier{user.UserID})
-	a.So(err, should.BeNil)
+	{
+		resp, err := is.adminService.ResetUserPassword(ctx, &ttnpb.UserIdentifier{user.UserID})
+		a.So(err, should.BeNil)
+		a.So(resp.Password, should.NotBeEmpty)
 
-	data, ok := mock.Data().(*templates.PasswordReset)
-	if a.So(ok, should.BeTrue) {
-		a.So(data.Password, should.NotBeEmpty)
+		data, ok := mock.Data().(*templates.PasswordReset)
+		if a.So(ok, should.BeTrue) {
+			a.So(data.Password, should.NotBeEmpty)
+			a.So(data.Password, should.Equal, resp.Password)
+		}
+
+		found, err = is.store.Users.GetByID(user.UserID, is.factories.user)
+		a.So(err, should.BeNil)
+		a.So(old, should.NotEqual, found.GetUser().Password)
 	}
-
-	found, err = is.store.Users.GetByID(user.UserID, is.factories.user)
-	a.So(err, should.BeNil)
-	a.So(old, should.NotEqual, found.GetUser().Password)
 
 	// make user admin
 	_, err = is.adminService.UpdateUser(ctx, &ttnpb.UpdateUserRequest{

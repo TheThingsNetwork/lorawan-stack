@@ -68,6 +68,7 @@ It has these top-level messages:
 	PullConfigurationRequest
 	IdentityServerSettings
 	UpdateSettingsRequest
+	ResetUserPasswordResponse
 	SendInvitationRequest
 	ListInvitationsResponse
 	DeleteInvitationRequest
