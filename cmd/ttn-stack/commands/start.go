@@ -3,6 +3,7 @@
 package commands
 
 import (
+	is_init "github.com/TheThingsNetwork/ttn/cmd/internal/identityserver"
 	"github.com/TheThingsNetwork/ttn/pkg/applicationserver"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/deviceregistry"
@@ -29,7 +30,7 @@ var (
 			config.AS.Registry = reg
 			config.JS.Registry = reg
 
-			is, err := identityserver.New(c, &config.IS)
+			is, err := identityserver.New(c, &config.IS, is_init.Options(c, &config.IS)...)
 			if err != nil {
 				return errors.NewWithCause("Could not create identity server", err)
 			}
