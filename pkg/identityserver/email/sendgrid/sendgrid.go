@@ -54,7 +54,7 @@ func (s *SendGrid) Send(recipient string, template templates.Template) error {
 
 	logger := s.logger.WithFields(log.Fields(
 		"recipient", recipient,
-		"template.name", template.GetName(),
+		"template_name", template.GetName(),
 	))
 
 	logger.Info("Sending email ...")
@@ -63,8 +63,8 @@ func (s *SendGrid) Send(recipient string, template templates.Template) error {
 
 	if err != nil {
 		logger.WithFields(log.Fields(
-			"response.status_code", response.StatusCode,
-			"response.body", response.Body,
+			"status_code", response.StatusCode,
+			"response", response.Body,
 		)).WithError(err).Error("Failed to send email")
 
 		return err
@@ -72,8 +72,8 @@ func (s *SendGrid) Send(recipient string, template templates.Template) error {
 
 	if response.StatusCode < 200 || response.StatusCode > 299 {
 		logger.WithFields(log.Fields(
-			"response.status_code", response.StatusCode,
-			"response.body", response.Body,
+			"status_code", response.StatusCode,
+			"response", response.Body,
 		)).Error("Failed to send email")
 
 		return errors.Errorf("Failed to send email. Status code `%d`", response.StatusCode)
