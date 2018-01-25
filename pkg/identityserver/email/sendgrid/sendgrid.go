@@ -11,11 +11,6 @@ import (
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
-const (
-	defaultFromName  = ""
-	defaultFromEmail = "noreply@identityserver.ttn"
-)
-
 type Config struct {
 	// APIKey is the sendgrid api key.
 	APIKey string `name:"api-key" description:"The sendgrid API key to use"`
