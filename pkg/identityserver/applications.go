@@ -102,7 +102,7 @@ func (s *applicationService) UpdateApplication(ctx context.Context, req *ttnpb.U
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Applications.GetByID(req.Application.ApplicationID, s.factories.application)
+		found, err := tx.Applications.GetByID(req.Application.ApplicationID, s.config.Factories.Application)
 		if err != nil {
 			return err
 		}

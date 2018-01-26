@@ -108,7 +108,7 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Clients.GetByID(req.Client.ClientID, s.factories.client)
+		found, err := tx.Clients.GetByID(req.Client.ClientID, s.config.Factories.Client)
 		if err != nil {
 			return err
 		}
@@ -145,7 +145,7 @@ func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdent
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Clients.GetByID(req.ClientID, s.factories.client)
+		found, err := tx.Clients.GetByID(req.ClientID, s.config.Factories.Client)
 		if err != nil {
 			return err
 		}

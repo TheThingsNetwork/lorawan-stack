@@ -137,7 +137,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(userID, s.factories.user)
+		found, err := tx.Users.GetByID(userID, s.config.Factories.User)
 		if err != nil {
 			return err
 		}
@@ -216,7 +216,7 @@ func (s *userService) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateU
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(userID, s.factories.user)
+		found, err := tx.Users.GetByID(userID, s.config.Factories.User)
 		if err != nil {
 			return err
 		}
@@ -257,7 +257,7 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 			return err
 		}
 
-		apps, err := tx.Applications.ListByUser(userID, s.factories.application)
+		apps, err := tx.Applications.ListByUser(userID, s.config.Factories.Application)
 		if err != nil {
 			return err
 		}
@@ -275,7 +275,7 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 			}
 		}
 
-		gtws, err := tx.Gateways.ListByUser(userID, s.factories.gateway)
+		gtws, err := tx.Gateways.ListByUser(userID, s.config.Factories.Gateway)
 		if err != nil {
 			return err
 		}
@@ -374,7 +374,7 @@ func (s *userService) ValidateUserEmail(ctx context.Context, req *ttnpb.Validate
 			return ErrValidationTokenExpired.New(nil)
 		}
 
-		user, err := tx.Users.GetByID(userID, s.factories.user)
+		user, err := tx.Users.GetByID(userID, s.config.Factories.User)
 		if err != nil {
 			return err
 		}
@@ -401,7 +401,7 @@ func (s *userService) RequestUserEmailValidation(ctx context.Context, _ *pbtypes
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(userID, s.factories.user)
+		found, err := tx.Users.GetByID(userID, s.config.Factories.User)
 		if err != nil {
 			return err
 		}

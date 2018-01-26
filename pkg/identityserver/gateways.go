@@ -110,7 +110,7 @@ func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGat
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Gateways.GetByID(req.Gateway.GatewayID, s.factories.gateway)
+		found, err := tx.Gateways.GetByID(req.Gateway.GatewayID, s.config.Factories.Gateway)
 		if err != nil {
 			return err
 		}

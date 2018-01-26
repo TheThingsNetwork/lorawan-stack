@@ -152,7 +152,7 @@ func (s *adminService) GetUser(ctx context.Context, req *ttnpb.UserIdentifier) (
 		return nil, err
 	}
 
-	found, err := s.store.Users.GetByID(req.UserID, s.factories.user)
+	found, err := s.store.Users.GetByID(req.UserID, s.config.Factories.User)
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +168,7 @@ func (s *adminService) ListUsers(ctx context.Context, req *ttnpb.ListUsersReques
 		return nil, err
 	}
 
-	users, err := s.store.Users.List(s.factories.user)
+	users, err := s.store.Users.List(s.config.Factories.User)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +201,7 @@ func (s *adminService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequ
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(req.User.UserID, s.factories.user)
+		found, err := tx.Users.GetByID(req.User.UserID, s.config.Factories.User)
 		if err != nil {
 			return err
 		}
@@ -281,7 +281,7 @@ func (s *adminService) ResetUserPassword(ctx context.Context, req *ttnpb.UserIde
 	password := random.String(8)
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(req.UserID, s.factories.user)
+		found, err := tx.Users.GetByID(req.UserID, s.config.Factories.User)
 		if err != nil {
 			return err
 		}
@@ -318,7 +318,7 @@ func (s *adminService) DeleteUser(ctx context.Context, req *ttnpb.UserIdentifier
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(req.UserID, s.factories.user)
+		found, err := tx.Users.GetByID(req.UserID, s.config.Factories.User)
 		if err != nil {
 			return err
 		}
@@ -348,7 +348,7 @@ func (s *adminService) SendInvitation(ctx context.Context, req *ttnpb.SendInvita
 
 	err = s.store.Transact(func(tx *store.Store) error {
 		// check whether email is already registered or not
-		found, err := tx.Users.GetByEmail(req.Email, s.factories.user)
+		found, err := tx.Users.GetByEmail(req.Email, s.config.Factories.User)
 		if err != nil && !sql.ErrUserEmailNotFound.Describes(err) {
 			return err
 		}
@@ -433,7 +433,7 @@ func (s *adminService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifie
 		return nil, err
 	}
 
-	found, err := s.store.Clients.GetByID(req.ClientID, s.factories.client)
+	found, err := s.store.Clients.GetByID(req.ClientID, s.config.Factories.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -448,7 +448,7 @@ func (s *adminService) ListClients(ctx context.Context, req *ttnpb.ListClientsRe
 		return nil, err
 	}
 
-	found, err := s.store.Clients.List(s.factories.client)
+	found, err := s.store.Clients.List(s.config.Factories.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -479,7 +479,7 @@ func (s *adminService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClient
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Clients.GetByID(req.Client.ClientID, s.factories.client)
+		found, err := tx.Clients.GetByID(req.Client.ClientID, s.config.Factories.Client)
 		if err != nil {
 			return err
 		}
@@ -527,12 +527,12 @@ func (s *adminService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdenti
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Clients.GetByID(req.ClientID, s.factories.client)
+		found, err := tx.Clients.GetByID(req.ClientID, s.config.Factories.Client)
 		if err != nil {
 			return err
 		}
 
-		user, err := tx.Users.GetByID(found.GetClient().Creator.UserID, s.factories.user)
+		user, err := tx.Users.GetByID(found.GetClient().Creator.UserID, s.config.Factories.User)
 		if err != nil {
 			return err
 		}

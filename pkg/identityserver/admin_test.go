@@ -154,7 +154,7 @@ func TestAdminUsers(t *testing.T) {
 	user := testUsers()["bob"]
 
 	// reset password
-	found, err := is.store.Users.GetByID(user.UserID, is.factories.user)
+	found, err := is.store.Users.GetByID(user.UserID, is.config.Factories.User)
 	a.So(err, should.BeNil)
 
 	old := found.GetUser().Password
@@ -170,7 +170,7 @@ func TestAdminUsers(t *testing.T) {
 			a.So(data.Password, should.Equal, resp.Password)
 		}
 
-		found, err = is.store.Users.GetByID(user.UserID, is.factories.user)
+		found, err = is.store.Users.GetByID(user.UserID, is.config.Factories.User)
 		a.So(err, should.BeNil)
 		a.So(old, should.NotEqual, found.GetUser().Password)
 	}
@@ -187,7 +187,7 @@ func TestAdminUsers(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	found, err = is.store.Users.GetByID(user.UserID, is.factories.user)
+	found, err = is.store.Users.GetByID(user.UserID, is.config.Factories.User)
 	a.So(err, should.BeNil)
 	a.So(found.GetUser().Admin, should.BeTrue)
 
@@ -205,7 +205,7 @@ func TestAdminUsers(t *testing.T) {
 		a.So(ddata.UserID, should.Equal, user.UserID)
 	}
 
-	_, err = is.store.Users.GetByID(user.UserID, is.factories.user)
+	_, err = is.store.Users.GetByID(user.UserID, is.config.Factories.User)
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrUserNotFound.Describes(err), should.BeTrue)
 
