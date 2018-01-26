@@ -69,7 +69,7 @@ func (l *Logger) commit(e *entry) {
 		_ = handler.HandleLog(e)
 	}
 
-	if l.Level == FatalLevel {
+	if e.Level() == FatalLevel {
 		os.Exit(1)
 	}
 }
