@@ -8,13 +8,13 @@ func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS settings (
 			id                     INT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
-			updated_at             TIMESTAMP DEFAULT current_timestamp(),
-			blacklisted_ids        STRING,
-			skip_validation        BOOL,
-			self_registration      BOOL DEFAULT true,
-			admin_approval         BOOL,
-			validation_token_ttl   INT,
-			allowed_emails         STRING
+			updated_at             TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+			blacklisted_ids        STRING NOT NULL DEFAULT '[]',
+			skip_validation        BOOL NOT NULL DEFAULT false,
+			self_registration      BOOL NOT NULL DEFAULT true,
+			admin_approval         BOOL NOT NULL DEFAULT false,
+			validation_token_ttl   INT NOT NULL,
+			allowed_emails         STRING NOT NULL DEFAULT '[]'
 		);
 	`
 	const backwards = `

@@ -6,28 +6,28 @@ func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS users (
 			user_id        STRING(36) PRIMARY KEY,
-			name           STRING NOT NULL,
-			email          TEXT NOT NULL UNIQUE,
-			password       TEXT NOT NULL,
-			validated_at   TIMESTAMP,
+			name           STRING NOT NULL DEFAULT '',
+			email          STRING UNIQUE NOT NULL,
+			password       STRING NOT NULL,
+			validated_at   TIMESTAMP DEFAULT NULL,
 			state          INT NOT NULL DEFAULT 0,
-			admin          BOOL DEFAULT false,
-			created_at     TIMESTAMP DEFAULT current_timestamp(),
-			updated_at     TIMESTAMP DEFAULT current_timestamp()
+			admin          BOOL NOT NULL DEFAULT false,
+			created_at     TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+			updated_at     TIMESTAMP NOT NULL DEFAULT current_timestamp()
 		);
 		CREATE UNIQUE INDEX IF NOT EXISTS users_email ON users (email);
 
 		CREATE TABLE IF NOT EXISTS validation_tokens (
 			id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			validation_token   STRING UNIQUE NOT NULL,
-			user_id            STRING(36) REFERENCES users(user_id) UNIQUE NOT NULL,
-			created_at         TIMESTAMP DEFAULT current_timestamp(),
-			expires_in         INTEGER
+			user_id            STRING(36) UNIQUE NOT NULL REFERENCES users(user_id),
+			created_at         TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+			expires_in         INTEGER NOT NULL
 		);
 
 		CREATE TABLE IF NOT EXISTS users_api_keys (
+			key        STRING NOT NULL PRIMARY KEY,
 			user_id    STRING(36) NOT NULL REFERENCES users(user_id),
-			key        STRING PRIMARY KEY,
 			key_name   STRING(36) NOT NULL,
 			UNIQUE(user_id, key_name)
 		);

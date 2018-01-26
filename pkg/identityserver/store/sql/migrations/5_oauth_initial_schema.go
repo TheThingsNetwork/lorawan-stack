@@ -6,32 +6,32 @@ func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS authorization_codes (
 			authorization_code   STRING(64) PRIMARY KEY,
-			client_id            STRING(36) REFERENCES clients(client_id) NOT NULL,
-			created_at           TIMESTAMP DEFAULT current_timestamp(),
-			expires_in           INTEGER,
-			scope                STRING,
-			redirect_uri         STRING,
-			state                STRING,
-			user_id              STRING(36) REFERENCES users(user_id) NOT NULL
+			client_id            STRING(36) NOT NULL REFERENCES clients(client_id),
+			created_at           TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+			expires_in           INTEGER NOT NULL,
+			scope                STRING NOT NULL,
+			redirect_uri         STRING NOT NULL,
+			state                STRING NOT NULL,
+			user_id              STRING(36) NOT NULL REFERENCES users(user_id)
 		);
 
 		CREATE TABLE IF NOT EXISTS access_tokens (
 			access_token    STRING PRIMARY KEY,
-			client_id       STRING(36) REFERENCES clients(client_id) NOT NULL,
-			user_id         STRING(36) REFERENCES users(user_id) NOT NULL,
-			created_at      TIMESTAMP DEFAULT current_timestamp(),
-			expires_in      INTEGER,
-			scope           STRING,
-			redirect_uri    STRING
+			client_id       STRING(36) NOT NULL REFERENCES clients(client_id),
+			user_id         STRING(36) NOT NULL REFERENCES users(user_id),
+			created_at      TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+			expires_in      INTEGER NOT NULL,
+			scope           STRING NOT NULL,
+			redirect_uri    STRING NOT NULL
 		);
 
 		CREATE TABLE IF NOT EXISTS refresh_tokens (
 			refresh_token   STRING(64) PRIMARY KEY,
-			client_id       STRING(36) REFERENCES clients(client_id) NOT NULL,
-			user_id         STRING(36) REFERENCES users(user_id) NOT NULL,
-			created_at      TIMESTAMP DEFAULT current_timestamp(),
-			scope           STRING,
-			redirect_uri    STRING
+			client_id       STRING(36) NOT NULL REFERENCES clients(client_id),
+			user_id         STRING(36) NOT NULL REFERENCES users(user_id),
+			created_at      TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+			scope           STRING NOT NULL,
+			redirect_uri    STRING NOT NULL
 		);
 	`
 
