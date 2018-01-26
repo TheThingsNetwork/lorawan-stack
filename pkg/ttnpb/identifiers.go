@@ -14,72 +14,82 @@
 
 package ttnpb
 
-import "github.com/TheThingsNetwork/ttn/pkg/types"
+import (
+	"github.com/TheThingsNetwork/ttn/pkg/types"
+)
 
 // IsZero returns true if all identifiers have zero-values.
-func (i UserIdentifiers) IsZero() bool {
-	return i.UserID == "" && i.Email == ""
+func (ids UserIdentifiers) IsZero() bool {
+	return ids.UserID == "" && ids.Email == ""
 }
 
 // Equals returns true if the receiver identifiers matches to other identifiers.
-func (i UserIdentifiers) Equals(other UserIdentifiers) bool {
-	return i.UserID == other.UserID && i.Email == other.Email
+func (ids UserIdentifiers) Equals(other UserIdentifiers) bool {
+	return ids.UserID == other.UserID && ids.Email == other.Email
 }
 
 // Contains returns true if other is contained in the receiver.
-func (i UserIdentifiers) Contains(other UserIdentifiers) bool {
+func (ids UserIdentifiers) Contains(other UserIdentifiers) bool {
 	if other.IsZero() {
-		return i.IsZero()
+		return ids.IsZero()
 	}
 
-	return (other.UserID == "" || i.UserID == other.UserID) &&
-		(other.Email == "" || i.Email == other.Email)
+	return (other.UserID == "" || ids.UserID == other.UserID) &&
+		(other.Email == "" || ids.Email == other.Email)
 }
 
 // Contains returns true if other is contained in the receiver.
-func (i ApplicationIdentifiers) Contains(other ApplicationIdentifiers) bool {
-	return i.ApplicationID == other.ApplicationID
+func (ids ApplicationIdentifiers) Contains(other ApplicationIdentifiers) bool {
+	return ids.ApplicationID == other.ApplicationID
 }
 
 // IsZero returns true if all identifiers have zero-values.
-func (i ApplicationIdentifiers) IsZero() bool {
-	return i.ApplicationID == ""
+func (ids ApplicationIdentifiers) IsZero() bool {
+	return ids.ApplicationID == ""
 }
 
 // GetEUI returns if set the EUI otherwise a zero-valued EUI.
-func (i GatewayIdentifiers) GetEUI() *types.EUI64 {
-	if i.EUI != nil {
-		return i.EUI
+func (ids GatewayIdentifiers) GetEUI() *types.EUI64 {
+	if ids.EUI != nil {
+		return ids.EUI
 	}
 	return new(types.EUI64)
 }
 
 // IsZero returns true if all identifiers have zero-values.
-func (i GatewayIdentifiers) IsZero() bool {
-	return i.GatewayID == "" && i.EUI == nil
+func (ids GatewayIdentifiers) IsZero() bool {
+	return ids.GatewayID == "" && ids.EUI == nil
 }
 
 // Contains returns true if other is contained in the receiver.
-func (i GatewayIdentifiers) Contains(other GatewayIdentifiers) bool {
+func (ids GatewayIdentifiers) Contains(other GatewayIdentifiers) bool {
 	if other.IsZero() {
-		return i.IsZero()
+		return ids.IsZero()
 	}
 
-	return (other.GatewayID == "" || (other.GatewayID != "" && i.GatewayID == other.GatewayID)) &&
-		((i.EUI == nil && other.EUI == nil) || (i.EUI != nil && other.EUI == nil) || i.EUI.Equal(*other.EUI))
+	return (other.GatewayID == "" || (other.GatewayID != "" && ids.GatewayID == other.GatewayID)) &&
+		((ids.EUI == nil && other.EUI == nil) || (ids.EUI != nil && other.EUI == nil) || ids.EUI.Equal(*other.EUI))
 }
 
 // IsZero returns true if all identifiers have zero-values.
-func (i ClientIdentifiers) IsZero() bool {
-	return i.ClientID == ""
+func (ids ClientIdentifiers) IsZero() bool {
+	return ids.ClientID == ""
 }
 
 // IsZero returns true if all identifiers have zero-values.
-func (i OrganizationIdentifiers) IsZero() bool {
-	return i.OrganizationID == ""
+func (ids OrganizationIdentifiers) IsZero() bool {
+	return ids.OrganizationID == ""
 }
 
 // Contains returns true if other is contained in the receiver.
-func (i OrganizationIdentifiers) Contains(other OrganizationIdentifiers) bool {
-	return i.OrganizationID == other.OrganizationID
+func (ids OrganizationIdentifiers) Contains(other OrganizationIdentifiers) bool {
+	return ids.OrganizationID == other.OrganizationID
+}
+
+func (ids EndDeviceIdentifiers) IsZero() bool {
+	return ids.GetDeviceID() == "" &&
+		ids.GetApplicationID() == "" &&
+		(ids.DevAddr == nil || ids.DevAddr.IsZero()) &&
+		(ids.DevEUI == nil || ids.DevEUI.IsZero()) &&
+		(ids.JoinEUI == nil || ids.JoinEUI.IsZero())
 }

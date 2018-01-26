@@ -17,51 +17,51 @@ package ttnpb
 import "github.com/TheThingsNetwork/ttn/pkg/validate"
 
 // Validate is used as validator function by the GRPC validator interceptor.
-func (i UserIdentifiers) Validate() error {
-	if i.IsZero() {
+func (ids UserIdentifiers) Validate() error {
+	if ids.IsZero() {
 		return ErrEmptyIdentifiers.New(nil)
 	}
 
 	return validate.All(
-		validate.Field(i.UserID, validate.NotRequired, validate.ID).DescribeFieldName("User ID"),
-		validate.Field(i.Email, validate.NotRequired, validate.Email).DescribeFieldName("Email"),
+		validate.Field(ids.UserID, validate.NotRequired, validate.ID).DescribeFieldName("User ID"),
+		validate.Field(ids.Email, validate.NotRequired, validate.Email).DescribeFieldName("Email"),
 	)
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.
-func (i ApplicationIdentifiers) Validate() error {
-	return validate.Field(i.ApplicationID, validate.ID).DescribeFieldName("Application ID")
+func (ids ApplicationIdentifiers) Validate() error {
+	return validate.Field(ids.ApplicationID, validate.ID).DescribeFieldName("Application ID")
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.
-func (i GatewayIdentifiers) Validate() error {
-	if i.IsZero() {
+func (ids GatewayIdentifiers) Validate() error {
+	if ids.IsZero() {
 		return ErrEmptyIdentifiers.New(nil)
 	}
 
 	return validate.All(
-		validate.Field(i.GatewayID, validate.NotRequired, validate.ID).DescribeFieldName("Gateway ID"),
-		validate.Field(i.EUI, validate.NotRequired).DescribeFieldName("EUI"),
+		validate.Field(ids.GatewayID, validate.NotRequired, validate.ID).DescribeFieldName("Gateway ID"),
+		validate.Field(ids.EUI, validate.NotRequired).DescribeFieldName("EUI"),
 	)
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.
-func (i ClientIdentifiers) Validate() error {
-	return validate.Field(i.ClientID, validate.ID).DescribeFieldName("Client ID")
+func (ids ClientIdentifiers) Validate() error {
+	return validate.Field(ids.ClientID, validate.ID).DescribeFieldName("Client ID")
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.
-func (i OrganizationIdentifiers) Validate() error {
-	return validate.Field(i.OrganizationID, validate.ID).DescribeFieldName("Organization ID")
+func (ids OrganizationIdentifiers) Validate() error {
+	return validate.Field(ids.OrganizationID, validate.ID).DescribeFieldName("Organization ID")
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.
-func (i OrganizationOrUserIdentifiers) Validate() error {
-	if id := i.GetUserID(); id != nil {
+func (ids OrganizationOrUserIdentifiers) Validate() error {
+	if id := ids.GetUserID(); id != nil {
 		return id.Validate()
 	}
 
-	if id := i.GetOrganizationID(); id != nil {
+	if id := ids.GetOrganizationID(); id != nil {
 		return id.Validate()
 	}
 
