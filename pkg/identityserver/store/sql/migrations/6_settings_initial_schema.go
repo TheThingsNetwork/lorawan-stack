@@ -14,7 +14,8 @@ func init() {
 			self_registration      BOOL NOT NULL DEFAULT true,
 			admin_approval         BOOL NOT NULL DEFAULT false,
 			validation_token_ttl   INT NOT NULL,
-			allowed_emails         STRING NOT NULL DEFAULT '[]'
+			allowed_emails         STRING NOT NULL DEFAULT '[]',
+			invitation_token_ttl   INT NOT NULL
 		);
 	`
 	const backwards = `
