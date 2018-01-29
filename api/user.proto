@@ -16,7 +16,7 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 // User is the message that defines an user on the network.
 message User {
   // id is the user's unique and immutable ID.
-  UserIdentifier id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIdentifier id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
 
   // email is the user's email address.
   string email = 2;

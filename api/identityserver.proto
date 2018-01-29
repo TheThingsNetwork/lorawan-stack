@@ -448,7 +448,7 @@ message UpdateApplicationRequest {
 
 message GenerateApplicationAPIKeyRequest {
   // application_id is the application's ID which API key will be added to.
-  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
 
   // name is the name of the API key to be generated.
   string name = 2;
@@ -464,7 +464,7 @@ message ListApplicationAPIKeysResponse {
 
 message UpdateApplicationAPIKeyRequest {
   // application_id is the application's ID which an API key will be modified.
-  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
 
   // name is the name of the application API key to be updated.
   string name = 2;
@@ -475,7 +475,7 @@ message UpdateApplicationAPIKeyRequest {
 
 message RemoveApplicationAPIKeyRequest {
   // application_id is the application's ID which the API key will be removed from.
-  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifier application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
 
   // name is the name of the application API key to be removed.
   string name = 2;
@@ -610,7 +610,7 @@ message UpdateGatewayRequest {
 
 message GenerateGatewayAPIKeyRequest {
   // gateway_id is the gateway's ID which API key will be added to.
-  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
 
   // name is the name of the API key to be generated.
   string name = 2;
@@ -626,7 +626,7 @@ message ListGatewayAPIKeysResponse {
 
 message UpdateGatewayAPIKeyRequest {
   // gateway_id is the gateway's ID which an API key will be modified.
-  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
 
   // name is the name of the gateway API key to be updated.
   string name = 2;
@@ -637,7 +637,7 @@ message UpdateGatewayAPIKeyRequest {
 
 message RemoveGatewayAPIKeyRequest {
   // gateway_id is the gateway's ID which API key will be removed from.
-  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifier gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
 
   // name is the name of the gateway API key to be removed.
   string name = 2;

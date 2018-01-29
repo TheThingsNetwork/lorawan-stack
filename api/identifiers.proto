@@ -11,19 +11,19 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 // UserIdentifier is the message that is used to identify an user by ID.
 message UserIdentifier {
   // user_id is the ID of the user.
-  string user_id = 1 [(gogoproto.customname) = "UserID"];
+  string user_id = 1 [(gogoproto.customname) = "UserID", (gogoproto.jsontag) = "user_id"];
 }
 
 // ApplicationIdentifier is the message that is used to identify an application.
 message ApplicationIdentifier {
   // TTN Application ID.
-  string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
+  string application_id = 1 [(gogoproto.customname) = "ApplicationID", (gogoproto.jsontag) = "application_id"];
 }
 
 // GatewayIdentifier is the message that is used to identify a gateway.
 message GatewayIdentifier {
   // TTN Gateway ID.
-  string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
+  string gateway_id = 1 [(gogoproto.customname) = "GatewayID", (gogoproto.jsontag) = "gateway_id"];
 }
 
 // End device identifiers are carried with uplink and downlink messages.
@@ -46,5 +46,5 @@ message EndDeviceIdentifiers {
 // ClientIdentifier is the message that is used to identify a client.
 message ClientIdentifier {
   // TTN Client ID.
-  string client_id = 1 [(gogoproto.customname) = "ClientID"];
+  string client_id = 1 [(gogoproto.customname) = "ClientID", (gogoproto.jsontag) = "client_id"];
 }

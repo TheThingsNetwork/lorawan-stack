@@ -15,7 +15,7 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 // Client is the message that defines a third-party client on the network.
 message Client {
   // id is the client's unique and immutable ID.
-  ClientIdentifier id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ClientIdentifier id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
 
   // description is the description of the client.
   string description = 2;
@@ -45,7 +45,7 @@ message Client {
 
   // creator is the user ID of the user who created the client.
   // This is an immutable and read-only field.
-  UserIdentifier creator = 9 [(gogoproto.nullable) = false];
+  UserIdentifier creator = 9 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "creator"];
 
   // created_at denotes when the client was created.
   // This a read-only field.
