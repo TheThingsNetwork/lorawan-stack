@@ -99,6 +99,29 @@ func (err *ErrDescriptor) Describes(e error) bool {
 	return i.Namespace() == err.Namespace && i.Code() == err.Code
 }
 
+// Causes checks if the e has, as a cause, an error described by the descriptor, or if one of the errors in the cause chain are caused by the descriptor
+func (err *ErrDescriptor) Causes(e error) bool {
+	if err.Describes(e) {
+		return true
+	}
+
+	i, ok := e.(Error)
+	if !ok {
+		return false
+	}
+
+	cause, ok := i.Attributes()[causeKey]
+	if !ok {
+		return false
+	}
+	i, ok = cause.(Error)
+	if !ok {
+		return false
+	}
+
+	return err.Causes(i)
+}
+
 // validate validates the error descriptor and returns an error if it is not valid.
 func (err *ErrDescriptor) validate() error {
 	if err.Code == NoCode {

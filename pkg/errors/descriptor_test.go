@@ -53,6 +53,7 @@ func TestDescriptorCause(t *testing.T) {
 	err := d.NewWithCause(attributes, cause)
 
 	a.So(d.Is(err), should.BeTrue)
+	a.So(d.Causes(err), should.BeTrue)
 	a.So(err.Error(), should.Equal, "[77]: You do not have access to app with id foo")
 	a.So(err.Code(), should.Equal, d.Code)
 	a.So(err.Type(), should.Equal, d.Type)
@@ -63,4 +64,41 @@ func TestDescriptorCause(t *testing.T) {
 	a.So(d.Describes(errors.New("Something else")), should.BeFalse)
 
 	a.So(Cause(err), should.Equal, cause)
+}
+
+func TestInheritedErrors(t *testing.T) {
+	a := assertions.New(t)
+
+	d := &ErrDescriptor{
+		MessageFormat: "You do not have access to app with id {app_id}",
+		Code:          77,
+		Type:          PermissionDenied,
+		registered:    true,
+	}
+	d2 := &ErrDescriptor{
+		MessageFormat: "You do not have access to app with id {app_id}",
+		Code:          790,
+		Type:          PermissionDenied,
+		registered:    true,
+	}
+
+	attributes := Attributes{
+		"app_id": "foo",
+	}
+	err := d.New(attributes)
+
+	err2 := d2.NewWithCause(attributes, err)
+	a.So(d.Causes(err2), should.BeTrue)
+
+	err3 := errors.New("Undefined error")
+	a.So(d.Causes(err3), should.BeFalse)
+
+	err4 := d2.New(attributes)
+	a.So(d.Causes(err4), should.BeFalse)
+
+	err5 := d2.NewWithCause(attributes, err3)
+	a.So(d.Causes(err5), should.BeFalse)
+
+	err6 := NewWithCause("Inherited error", err2)
+	a.So(d.Causes(err6), should.BeTrue)
 }
