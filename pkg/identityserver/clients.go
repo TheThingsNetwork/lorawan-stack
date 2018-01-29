@@ -21,7 +21,7 @@ type clientService struct {
 // The created client has a random secret and has set by default as false the
 // official labeled flag and has the refresh_token and authorization_code grants.
 func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClientRequest) (*pbtypes.Empty, error) {
-	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_CREATE)
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
 	if err != nil {
 		return nil, err
 	}
@@ -55,18 +55,29 @@ func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClien
 	return nil, err
 }
 
-// GetClient returns a client.
+// GetClient returns the client that matches the identifier.
+// It allows to be called without authorization credentials, in this case it
+// will only return the publicly information available about the client.
 func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*ttnpb.Client, error) {
-	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_LIST)
-	if err != nil {
-		return nil, err
-	}
-
 	found, err := s.store.Clients.GetByID(req.ClientID, s.config.Factories.Client)
 	if err != nil {
 		return nil, err
 	}
 	client := found.GetClient()
+
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
+	if err != nil && ErrNotAuthorized.Describes(err) {
+		return &ttnpb.Client{
+			ClientIdentifier: client.ClientIdentifier,
+			Description:      client.Description,
+			RedirectURI:      client.RedirectURI,
+			OfficialLabeled:  client.OfficialLabeled,
+			Rights:           client.Rights,
+		}, nil
+	}
+	if err != nil {
+		return nil, err
+	}
 
 	// ensure the user is the client's creator
 	if client.Creator.UserID != userID {
@@ -78,7 +89,7 @@ func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifi
 
 // ListClients returns all the clients an user has created.
 func (s *clientService) ListClients(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListClientsResponse, error) {
-	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_LIST)
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +113,7 @@ func (s *clientService) ListClients(ctx context.Context, _ *pbtypes.Empty) (*ttn
 // UpdateClient updates a client.
 // TODO(gomezjdaniel): support to update the RedirectURI and rights (scope).
 func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClientRequest) (*pbtypes.Empty, error) {
-	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_MANAGE)
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +150,7 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 // DeleteClient deletes the client that matches the identifier and revokes all
 // user authorizations.
 func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*pbtypes.Empty, error) {
-	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS_MANAGE)
+	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
 	if err != nil {
 		return nil, err
 	}

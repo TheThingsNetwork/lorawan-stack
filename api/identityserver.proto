@@ -782,6 +782,8 @@ service IsClient {
   };
 
   // GetClient returns the client that matches the identifier.
+  // It allows to be called without authorization credentials, in this case it
+  // will only return the publicly information available about the client.
   rpc GetClient(ClientIdentifier) returns (Client) {
     option (google.api.http) = {
       get: "/clients/{client_id}"

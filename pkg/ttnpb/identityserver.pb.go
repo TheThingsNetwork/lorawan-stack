@@ -6282,6 +6282,8 @@ type IsClientClient interface {
 	// has to be approved by the admins.
 	CreateClient(ctx context.Context, in *CreateClientRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// GetClient returns the client that matches the identifier.
+	// It allows to be called without authorization credentials, in this case it
+	// will only return the publicly information available about the client.
 	GetClient(ctx context.Context, in *ClientIdentifier, opts ...grpc.CallOption) (*Client, error)
 	// ListClients returns all the clients the authenticated user has created.
 	ListClients(ctx context.Context, in *google_protobuf2.Empty, opts ...grpc.CallOption) (*ListClientsResponse, error)
@@ -6352,6 +6354,8 @@ type IsClientServer interface {
 	// has to be approved by the admins.
 	CreateClient(context.Context, *CreateClientRequest) (*google_protobuf2.Empty, error)
 	// GetClient returns the client that matches the identifier.
+	// It allows to be called without authorization credentials, in this case it
+	// will only return the publicly information available about the client.
 	GetClient(context.Context, *ClientIdentifier) (*Client, error)
 	// ListClients returns all the clients the authenticated user has created.
 	ListClients(context.Context, *google_protobuf2.Empty) (*ListClientsResponse, error)
@@ -8166,7 +8170,7 @@ func NewPopulatedGenerateUserAPIKeyRequest(r randyIdentityserver, easy bool) *Ge
 	v17 := r.Intn(10)
 	this.Rights = make([]Right, v17)
 	for i := 0; i < v17; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 16, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -8193,7 +8197,7 @@ func NewPopulatedUpdateUserAPIKeyRequest(r randyIdentityserver, easy bool) *Upda
 	v19 := r.Intn(10)
 	this.Rights = make([]Right, v19)
 	for i := 0; i < v19; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 16, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -8272,7 +8276,7 @@ func NewPopulatedGenerateApplicationAPIKeyRequest(r randyIdentityserver, easy bo
 	v26 := r.Intn(10)
 	this.Rights = make([]Right, v26)
 	for i := 0; i < v26; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 16, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -8301,7 +8305,7 @@ func NewPopulatedUpdateApplicationAPIKeyRequest(r randyIdentityserver, easy bool
 	v29 := r.Intn(10)
 	this.Rights = make([]Right, v29)
 	for i := 0; i < v29; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 16, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -8337,7 +8341,7 @@ func NewPopulatedListApplicationRightsResponse(r randyIdentityserver, easy bool)
 	v32 := r.Intn(10)
 	this.Rights = make([]Right, v32)
 	for i := 0; i < v32; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 16, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -8386,7 +8390,7 @@ func NewPopulatedGenerateGatewayAPIKeyRequest(r randyIdentityserver, easy bool) 
 	v38 := r.Intn(10)
 	this.Rights = make([]Right, v38)
 	for i := 0; i < v38; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 16, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -8415,7 +8419,7 @@ func NewPopulatedUpdateGatewayAPIKeyRequest(r randyIdentityserver, easy bool) *U
 	v41 := r.Intn(10)
 	this.Rights = make([]Right, v41)
 	for i := 0; i < v41; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 16, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -8451,7 +8455,7 @@ func NewPopulatedListGatewayRightsResponse(r randyIdentityserver, easy bool) *Li
 	v44 := r.Intn(10)
 	this.Rights = make([]Right, v44)
 	for i := 0; i < v44; i++ {
-		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 9, 10, 12, 13, 14, 15, 16, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(31)])
+		this.Rights[i] = Right([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 31, 32, 33, 34, 35, 36, 37, 38, 39, 51, 52, 53, 54, 55, 56, 57, 58}[r.Intn(29)])
 	}
 	if !easy && r.Intn(10) != 0 {
 	}

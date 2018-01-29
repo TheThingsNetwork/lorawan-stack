@@ -3,6 +3,7 @@
 package identityserver
 
 import (
+	"context"
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
@@ -54,6 +55,16 @@ func TestClient(t *testing.T) {
 	found, err := is.clientService.GetClient(ctx, &ttnpb.ClientIdentifier{cli.ClientID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeClientIgnoringAutoFields, cli)
+
+	// fetch client without authorization credentisla
+	found, err = is.clientService.GetClient(context.Background(), &ttnpb.ClientIdentifier{cli.ClientID})
+	a.So(err, should.BeNil)
+	a.So(found.ClientIdentifier.ClientID, should.Equal, cli.ClientIdentifier.ClientID)
+	a.So(found.Description, should.Equal, cli.Description)
+	a.So(found.Secret, should.BeEmpty)
+	a.So(found.RedirectURI, should.Equal, cli.RedirectURI)
+	a.So(found.Creator.UserID, should.BeEmpty)
+	a.So(found.Rights, should.Resemble, cli.Rights)
 
 	clients, err := is.clientService.ListClients(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
