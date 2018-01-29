@@ -39,25 +39,20 @@ enum Right {
   RIGHT_USER_APPLICATIONS_CREATE = 6;
 
   // RIGHT_USER_GATEWAYS_LIST is the right to list gateways the user is collaborator of.
-  RIGHT_USER_GATEWAYS_LIST = 9;
+  RIGHT_USER_GATEWAYS_LIST = 7;
 
   // RIGHT_USER_GATEWAYS_CREATE is the right to register a gateway in the users account.
-  RIGHT_USER_GATEWAYS_CREATE = 10;
+  RIGHT_USER_GATEWAYS_CREATE = 8;
 
-  // RIGHT_USER_CLIENTS_LIST is the right to list the OAuth clients of the user.
-  RIGHT_USER_CLIENTS_LIST = 12;
-
-  // RIGHT_USER_CLIENTS_CREATE is the right to create a new OAuth client in the users account.
-  RIGHT_USER_CLIENTS_CREATE = 13;
-
-  // RIGHT_USER_CLIENTS_MANAGE is the right to update and delete OAuth clients of the user.
-  RIGHT_USER_CLIENTS_MANAGE = 14;
+  // RIGHT_USER_CLIENTS is the right to create, list, view, update and delete
+  // OAuth clients in the user's account.
+  RIGHT_USER_CLIENTS = 9;
 
   // RIGHT_USER_ADMIN is the right to performs actions that requires the user to be an admin.
-  RIGHT_USER_ADMIN = 15;
+  RIGHT_USER_ADMIN = 10;
 
   // RIGHT_USER_KEYS is the right to view and manage user API keys.
-  RIGHT_USER_KEYS = 16;
+  RIGHT_USER_KEYS = 11;
 
 
   // RIGHT_APPLICATION_INFO is the right to see basic information about the application.
