@@ -24,7 +24,7 @@ script:
 - make go.misspell
 - if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make go.unconvert; fi # only on pull requests
 - make go.fmt
-- if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make go.lint-travis-comment --no-print-directory; fi # only on pull requests
+- if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make go.lint-travis || true; fi # only on pull requests
 - make headers.check
 - git diff --exit-code
 - GOARCH=amd64 make test

@@ -36,16 +36,9 @@ go.misspell-staged: go.misspell
 go.unconvert-staged: GO_PACKAGES = $(STAGED_PACKAGES)
 go.unconvert-staged: go.unconvert
 
-go.lint-travis: GO_PACKAGES = git diff --name-only HEAD $(TRAVIS_BRANCH) |  $(to_packages)
-go.lint-travis: log = true
+# lint changed packages in travis
+go.lint-travis: GO_PACKAGES = git diff --name-only HEAD $(TRAVIS_BRANCH) | $(to_packages)
 go.lint-travis: go.lint
-
-go.lint-travis-comment:
-	@if [ "$$TRAVIS_PULL_REQUEST" != "false" ]; then \
-	 	REMARKS=`make go.lint-travis 2>/dev/null` || go run .make/comment.go '`gometalinter` has some remarks:' '```' "$$REMARKS" '```'; \
-	else \
-		make go.lint || true; \
-	fi
 
 # check if you have vendored packages in vendor
 VENDOR_FILE = $(GO_VENDOR_FILE)
