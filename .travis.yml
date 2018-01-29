@@ -29,5 +29,3 @@ script:
 - git diff --exit-code
 - GOARCH=amd64 make test
 - if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then GOARCH=386 make test; fi # only on pull requests
-before_install:
-- openssl aes-256-cbc -K $encrypted_29695605fa9e_key -iv $encrypted_29695605fa9e_iv -in github.pem.enc -out .make/github.pem -d
