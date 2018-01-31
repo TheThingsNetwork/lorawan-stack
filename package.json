@@ -1,0 +1,92 @@
+{
+  "name": "ttn-stack",
+  "version": "3.0.0-pre",
+  "description": "The Thing Network Stack",
+  "main": "index.js",
+  "repository": "https://github.com/TheThingsNetwork/ttn.git",
+  "author": "romeo@thethingsindustries.com",
+  "license": "MIT",
+  "devDependencies": {
+    "add-asset-html-webpack-plugin": "^2.1.2",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.1",
+    "babel-jest": "^21.2.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-react-intl": "^2.3.1",
+    "babel-plugin-react-intl-auto": "^1.0.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-plugin-transform-react-constant-elements": "^6.23.0",
+    "babel-plugin-transform-react-inline-elements": "^6.22.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "clean-webpack-plugin": "^0.1.17",
+    "css-loader": "^0.28.7",
+    "eslint": "^4.11.0",
+    "eslint-plugin-babel": "^4.1.2",
+    "eslint-plugin-flowtype": "^2.39.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-react": "^7.4.0",
+    "extract-text-webpack-plugin": "^3.0.0",
+    "file-loader": "^0.11.2",
+    "html-webpack-plugin": "^2.30.1",
+    "jest": "^21.2.1",
+    "json": "^9.0.6",
+    "json-loader": "^0.5.7",
+    "messageformat-parser": "^2.0.0",
+    "node-localstorage": "^1.3.0",
+    "react-test-renderer": "^16.0.0",
+    "style-loader": "^0.18.2",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.1",
+    "webpack": "^3.6.0",
+    "webpack-subresource-integrity": "^1.0.1"
+  },
+  "babel": {
+    "presets": [
+      "env",
+      "stage-0",
+      "react"
+    ],
+    "plugins": [
+      "transform-decorators-legacy",
+      "transform-class-properties",
+      "transform-decorators-legacy",
+      "transform-react-constant-elements",
+      "transform-react-inline-elements",
+      "transform-runtime",
+      [
+        "react-intl-auto",
+        {
+          "extractComments": true,
+          "filebase": true,
+          "removePrefix": "pkg.client"
+        }
+      ],
+      [
+        "react-intl",
+        {
+          "messagesDir": "./.cache/messages",
+          "extractSourceLocation": true
+        }
+      ]
+    ]
+  },
+  "dependencies": {
+    "react": "^16.2.0"
+  },
+  "jest": {
+    "testMatch": [
+      "<rootDir>/pkg/**/*_test.js"
+    ],
+    "transform": {
+      "^.+\\.js$": "babel-jest",
+      "\\.(css|styl|less|sass)$": "<rootDir>/config/jest/styles.transform.js",
+      "\\.(jpg|jpeg|svg|png|woff|woff2|ttf|eot|gif|webp)$": "<rootDir>/config/jest/files.transform.js"
+    }
+  }
+}
