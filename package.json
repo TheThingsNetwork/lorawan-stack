@@ -44,7 +44,8 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
     "webpack": "^3.6.0",
-    "webpack-subresource-integrity": "^1.0.1"
+    "webpack-subresource-integrity": "^1.0.1",
+    "xlsx-style": "^0.8.13"
   },
   "babel": {
     "presets": [
