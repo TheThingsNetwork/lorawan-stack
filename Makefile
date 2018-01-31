@@ -12,6 +12,7 @@ include .make/versions.make
 include .make/headers.make
 include .make/go/main.make
 include .make/protos/main.make
+include .make/js/main.make
 
 is.database-drop:
 	@$(log) "Dropping Cockroach database `echo $(NAME)`"
@@ -26,16 +27,16 @@ ci.decrypt-variables:
 messages:
 	@$(GO) run ./pkg/errors/generate_messages.go --filename config/messages.json
 
-dev-deps: go.dev-deps
+dev-deps: go.dev-deps js.dev-deps
 
 dev-cert:
 	go run $$(go env GOROOT)/src/crypto/tls/generate_cert.go -ca -host localhost
 
-deps: go.deps
+deps: go.deps js.deps
 
-test: go.test
+test: go.test js.test
 
-quality: go.quality
+quality: go.quality js.quality
 
 # Cache build artifacts (speeds up dev builds)
 cache: go.install
