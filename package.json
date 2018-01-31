@@ -79,7 +79,14 @@
     ]
   },
   "dependencies": {
-    "react": "^16.2.0"
+    "autobind-decorator": "^2.1.0",
+    "immutable": "^3.8.2",
+    "react": "^16.2.0",
+    "react-router-redux": "^4.0.8",
+    "redux": "^3.7.2",
+    "redux-form": "^7.2.1",
+    "redux-saga": "^0.16.0",
+    "ulid": "^2.3.0"
   },
   "jest": {
     "testMatch": [
