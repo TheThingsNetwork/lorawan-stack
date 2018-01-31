@@ -87,3 +87,8 @@ $RECYCLE.BIN/
 /vendor/*/
 /release
 /.cache
+/node_modules
+/public
+/stories
+/messages.xlsx
+/messages.yml
