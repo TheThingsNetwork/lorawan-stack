@@ -56,6 +56,10 @@ func (s *Store) key(str ...string) string {
 	return s.config.Prefix + separator + strings.Join(str, separator)
 }
 
+func (s *Store) newID() fmt.Stringer {
+	return ulid.MustNew(ulid.Now(), s.entropy)
+}
+
 func base(str string) string {
 	ss := strings.Split(str, separator)
 	return ss[len(ss)-1]
@@ -73,11 +77,10 @@ func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 		}
 	}
 
-	id := ulid.MustNew(ulid.Now(), s.entropy)
+	id := s.newID()
 	if len(fields) == 0 {
 		return id, nil
 	}
-
 	idStr := id.String()
 	key := s.key(idStr)
 
@@ -124,9 +127,15 @@ func (s *Store) Delete(id store.PrimaryKey) (err error) {
 		err = s.Redis.Watch(func(tx *redis.Tx) error {
 			var idxCurrent []interface{}
 			if len(s.config.IndexKeys) != 0 {
-				idxCurrent, err = tx.HMGet(key, s.config.IndexKeys...).Result()
+				typ, err := tx.Type(key).Result()
 				if err != nil {
 					return err
+				}
+				if typ == "hash" {
+					idxCurrent, err = tx.HMGet(key, s.config.IndexKeys...).Result()
+					if err != nil {
+						return err
+					}
 				}
 			}
 			_, err = tx.Pipelined(func(p *redis.Pipeline) error {
@@ -352,4 +361,79 @@ func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[s
 		return err
 	}
 	return out, find()
+}
+
+func (s *Store) Put(id store.PrimaryKey, bs ...[]byte) error {
+	if len(bs) == 0 {
+		return nil
+	}
+	idStr := id.String()
+	_, err := s.Redis.Pipelined(func(p *redis.Pipeline) error {
+		for _, b := range bs {
+			p.SAdd(idStr, b)
+		}
+		return nil
+	})
+	return err
+}
+
+func (s *Store) CreateSet(bs ...[]byte) (store.PrimaryKey, error) {
+	id := s.newID()
+	if len(bs) == 0 {
+		return id, nil
+	}
+
+	if err := s.Put(id, bs...); err != nil {
+		return nil, err
+	}
+	return id, nil
+}
+
+func (s *Store) FindSet(id store.PrimaryKey) (bs [][]byte, err error) {
+	return bs, s.Redis.SMembers(id.String()).ScanSlice(&bs)
+}
+
+func (s *Store) Contains(id store.PrimaryKey, b []byte) (bool, error) {
+	return s.Redis.SIsMember(id.String(), b).Result()
+}
+
+func (s *Store) Remove(id store.PrimaryKey, bs ...[]byte) error {
+	if len(bs) == 0 {
+		return nil
+	}
+	idStr := id.String()
+	_, err := s.Redis.Pipelined(func(p *redis.Pipeline) error {
+		for _, b := range bs {
+			p.SRem(idStr, b)
+		}
+		return nil
+	})
+	return err
+}
+
+func (s *Store) Append(id store.PrimaryKey, bs ...[]byte) error {
+	n, err := s.Redis.RPush(id.String(), bs).Result()
+	if err != nil {
+		return err
+	}
+	if n < int64(len(bs)) {
+		return errors.Errorf("Expected to store %d values, stored %d", len(bs), n)
+	}
+	return nil
+}
+
+func (s *Store) CreateList(bs ...[]byte) (store.PrimaryKey, error) {
+	id := s.newID()
+	if len(bs) == 0 {
+		return id, nil
+	}
+
+	if err := s.Append(id, bs...); err != nil {
+		return nil, err
+	}
+	return id, nil
+}
+
+func (s *Store) FindList(id store.PrimaryKey) (bs [][]byte, err error) {
+	return bs, s.Redis.LRange(id.String(), 0, -1).ScanSlice(bs)
 }

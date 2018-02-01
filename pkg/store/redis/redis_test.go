@@ -11,22 +11,28 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 )
 
-func TestStore(t *testing.T) {
-	storetest.TestByteStore(t, func() store.ByteStore {
-		s := New(&Config{
-			Redis:     test.RedisConfig(),
-			IndexKeys: []string{"foo", "bar"},
-		})
-		keys, err := s.Redis.Keys("test:*").Result()
+func newStore() *Store {
+	s := New(&Config{
+		Redis:     test.RedisConfig(),
+		IndexKeys: []string{"foo", "bar"},
+	})
+	keys, err := s.Redis.Keys("test:*").Result()
+	if err != nil {
+		panic(err)
+	}
+	if len(keys) > 0 {
+		_, err = s.Redis.Del(keys...).Result()
 		if err != nil {
 			panic(err)
 		}
-		if len(keys) > 0 {
-			_, err = s.Redis.Del(keys...).Result()
-			if err != nil {
-				panic(err)
-			}
-		}
-		return s
-	})
+	}
+	return s
+}
+
+func TestByteStore(t *testing.T) {
+	storetest.TestByteStore(t, func() store.ByteStore { return newStore() })
+}
+
+func TestByteSetStore(t *testing.T) {
+	storetest.TestByteSetStore(t, func() store.ByteSetStore { return newStore() })
 }

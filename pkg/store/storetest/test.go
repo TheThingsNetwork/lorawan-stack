@@ -3,6 +3,8 @@
 package storetest
 
 import (
+	"bytes"
+	"crypto/rand"
 	"strconv"
 	"testing"
 
@@ -326,6 +328,169 @@ func TestByteStore(t testingT, newStore func() store.ByteStore) {
 			matches, err = s.FindBy(tc.FindBy)
 			a.So(err, should.BeNil)
 			a.So(matches, should.HaveLength, 0)
+		})
+	}
+}
+
+func sameElements(a, b [][]byte) bool {
+	bm := make([]bool, len(b))
+outer:
+	for i := range a {
+		for j := range b {
+			if !bm[j] && bytes.Equal(a[i], b[j]) {
+				bm[j] = true
+				continue outer
+			}
+		}
+		return false
+	}
+
+	// Check if all values in b have been marked
+	for _, v := range bm {
+		if !v {
+			return false
+		}
+	}
+	return true
+}
+
+func randBytes(n int, exclude ...[]byte) []byte {
+	rb := make([]byte, n)
+	rand.Read(rb)
+outer:
+	for {
+		for _, eb := range exclude {
+			if bytes.Equal(rb, eb) {
+				rand.Read(rb)
+				continue outer
+			}
+		}
+		return rb
+	}
+}
+
+func TestByteSetStore(t testingT, newStore func() store.ByteSetStore) {
+	a := assertions.New(t)
+
+	s := newStore()
+
+	id1, err := s.CreateSet()
+	a.So(err, should.BeNil)
+	a.So(id1, should.NotBeNil)
+
+	id2, err := s.CreateSet()
+	a.So(err, should.BeNil)
+	a.So(id2, should.NotBeNil)
+
+	a.So(id1, should.NotResemble, id2)
+
+	// Behavior is implementation-dependent
+	a.So(func() { s.FindSet(id1) }, should.NotPanic)
+	a.So(func() { s.FindSet(id2) }, should.NotPanic)
+	a.So(func() { s.Contains(id1, []byte("non-existent")) }, should.NotPanic)
+	a.So(func() { s.Contains(id2, []byte("non-existent")) }, should.NotPanic)
+
+	err = s.Remove(id1)
+	a.So(err, should.BeNil)
+	err = s.Remove(id2)
+	a.So(err, should.BeNil)
+
+	err = s.Delete(id1)
+	a.So(err, should.BeNil)
+	err = s.Delete(id2)
+	a.So(err, should.BeNil)
+
+	for i, tc := range []struct {
+		Create      [][]byte
+		AfterCreate [][]byte
+		Put         [][]byte
+		AfterPut    [][]byte
+		Remove      [][]byte
+		AfterRemove [][]byte
+	}{
+		{
+			[][]byte{[]byte("foo")},
+			[][]byte{[]byte("foo")},
+			[][]byte{[]byte("bar")},
+			[][]byte{[]byte("foo"), []byte("bar")},
+			[][]byte{[]byte("foo")},
+			[][]byte{[]byte("bar")},
+		},
+		{
+			[][]byte{[]byte("foo"), []byte("foo"), []byte("bar"), []byte("baz"), []byte("bar")},
+			[][]byte{[]byte("foo"), []byte("bar"), []byte("baz")},
+			[][]byte{[]byte("bar"), []byte("bar"), []byte("baz"), []byte("42")},
+			[][]byte{[]byte("foo"), []byte("bar"), []byte("baz"), []byte("42")},
+			[][]byte{[]byte("bam"), []byte("bar"), []byte("foo"), []byte("bar"), []byte("baz"), []byte("bar")},
+			[][]byte{[]byte("42")},
+		},
+	} {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+
+			s := newStore()
+
+			id, err := s.CreateSet(tc.Create...)
+			if !a.So(err, should.BeNil) {
+				return
+			}
+			a.So(id, should.NotBeNil)
+
+			found, err := s.FindSet(id)
+			a.So(err, should.BeNil)
+			a.So(sameElements(found, tc.AfterCreate), should.BeTrue)
+
+			for _, b := range tc.Create {
+				v, err := s.Contains(id, b)
+				a.So(err, should.BeNil)
+				a.So(v, should.BeTrue)
+			}
+			v, err := s.Contains(id, randBytes(5, tc.Create...))
+			a.So(err, should.BeNil)
+			a.So(v, should.BeFalse)
+
+			err = s.Put(id, tc.Put...)
+			a.So(err, should.BeNil)
+			found, err = s.FindSet(id)
+			a.So(err, should.BeNil)
+			a.So(sameElements(found, tc.AfterPut), should.BeTrue)
+
+			found, err = s.FindSet(id)
+			a.So(err, should.BeNil)
+			a.So(sameElements(found, tc.AfterPut), should.BeTrue)
+
+			for _, b := range tc.AfterPut {
+				v, err := s.Contains(id, b)
+				a.So(err, should.BeNil)
+				a.So(v, should.BeTrue)
+			}
+			v, err = s.Contains(id, randBytes(5, tc.AfterPut...))
+			a.So(err, should.BeNil)
+			a.So(v, should.BeFalse)
+
+			err = s.Remove(id, tc.Remove...)
+			a.So(err, should.BeNil)
+			found, err = s.FindSet(id)
+			a.So(err, should.BeNil)
+			a.So(sameElements(found, tc.AfterRemove), should.BeTrue)
+
+			found, err = s.FindSet(id)
+			a.So(err, should.BeNil)
+			a.So(sameElements(found, tc.AfterRemove), should.BeTrue)
+
+			for _, b := range tc.AfterRemove {
+				v, err := s.Contains(id, b)
+				a.So(err, should.BeNil)
+				a.So(v, should.BeTrue)
+			}
+			v, err = s.Contains(id, randBytes(5, tc.AfterRemove...))
+			a.So(err, should.BeNil)
+			a.So(v, should.BeFalse)
+
+			err = s.Delete(id)
+			if !a.So(err, should.BeNil) {
+				return
+			}
 		})
 	}
 }
