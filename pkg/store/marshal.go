@@ -29,13 +29,13 @@ func isZero(v reflect.Value) bool {
 	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }
 
-// flattened returns a copy of m with keys 'flattened'.
+// Flattened returns a copy of m with keys 'Flattened'.
 // If the map contains sub-maps, the values of these sub-maps are set under the root map, each level separated by a dot
-func flattened(m map[string]interface{}) (out map[string]interface{}) {
+func Flattened(m map[string]interface{}) (out map[string]interface{}) {
 	out = make(map[string]interface{}, len(m))
 	for k, v := range m {
 		if sm, ok := v.(map[string]interface{}); ok {
-			sm = flattened(sm)
+			sm = Flattened(sm)
 			for sk, sv := range sm {
 				out[k+Separator+sk] = sv
 			}
@@ -90,117 +90,125 @@ func mapify(v interface{}, keep func(rv reflect.Value) bool) interface{} {
 
 // marshalNested retrieves recursively all types for the given value
 // and returns the marshaled nested value.
-func marshalNested(v reflect.Value) interface{} {
+func marshalNested(v reflect.Value) (interface{}, error) {
 	if !v.IsValid() {
-		return nil
+		return nil, nil
 	}
 
 	iv := reflect.Indirect(v)
 	if !iv.IsValid() {
-		return nil
+		return nil, nil
 	}
 	if m, ok := v.Interface().(MapMarshaler); ok {
 		return m.MarshalMap()
 	}
 	v = iv
 
+	var err error
 	switch v.Kind() {
-	case reflect.Struct:
-		m := marshal(v.Interface())
-		// do not add the converted value if there are no exported fields, ie:
-		// time.Time
-		if len(m) != 0 {
-			return m
-		}
 	case reflect.Map:
-		vt := v.Type()
-		if vt.Key().Kind() == reflect.String {
-			return marshal(v.Interface())
-		}
-		if vt.Key().Implements(reflect.TypeOf((*fmt.Stringer)(nil)).Elem()) {
-			m := make(map[string]interface{})
-			for _, vk := range v.MapKeys() {
-				m[vk.Interface().(fmt.Stringer).String()] = reflect.ValueOf(v.MapIndex(vk).Interface())
+		m := make(map[string]interface{}, v.Len())
+		switch kt := v.Type().Key(); {
+		case kt.Kind() == reflect.String:
+			for _, k := range v.MapKeys() {
+				m[k.String()], err = marshalNested(v.MapIndex(k))
+				if err != nil {
+					return nil, err
+				}
 			}
-			return marshal(m)
+			return m, nil
+		case kt.Implements(reflect.TypeOf((*fmt.Stringer)(nil)).Elem()):
+			for _, k := range v.MapKeys() {
+				m[k.Interface().(fmt.Stringer).String()], err = marshalNested(v.MapIndex(k))
+				if err != nil {
+					return nil, err
+				}
+			}
+			return m, nil
+		default:
+			return nil, errors.Errorf("Expected the map key kind to be string or implement Stringer, got %s", kt)
 		}
+	case reflect.Struct:
+		t := v.Type()
+		for i := 0; i < t.NumField(); i++ {
+			if t.Field(i).PkgPath == "" {
+				// Only attempt to marshal structs with exported fields
+				return marshal(v.Interface())
+			}
+		}
+		return v.Interface(), nil
 	case reflect.Slice, reflect.Array:
 		switch e := v.Type().Elem(); e.Kind() {
 		case reflect.Ptr:
 			switch se := e.Elem(); se.Kind() {
 			case reflect.Interface, reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
 			default:
-				// return simple types as-is
+				// return slices of pointers to simple types as slices of values of that type
 				n := v.Len()
 				sl := reflect.MakeSlice(se, n, n)
 				for i := 0; i < n; i++ {
 					sl.Index(i).Set(reflect.Indirect(v.Index(i)))
 				}
-				return sl.Interface()
+				return sl.Interface(), nil
 			}
 		case reflect.Interface, reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
 		default:
-			// return simple types as-is
-			return v.Interface()
+			// return slices of simple types as-is
+			return v.Interface(), nil
 		}
 
 		n := v.Len()
 		s := make([]interface{}, n, n)
 		for i := 0; i < n; i++ {
-			s[i] = marshalNested(reflect.ValueOf(v.Index(i).Interface()))
+			sv := v.Index(i)
+			if isZero(sv) {
+				continue
+			}
+			s[i], err = marshalNested(sv)
+			if err != nil {
+				return nil, err
+			}
 		}
-		return s
+		return s, nil
+	default:
+		return v.Interface(), nil
 	}
-	return v.Interface()
 }
 
 // marhshal converts the given struct s to a map[string]interface{}
-func marshal(s interface{}) map[string]interface{} {
-	if m, ok := s.(MapMarshaler); ok {
-		return m.MarshalMap()
+func marshal(s interface{}) (m map[string]interface{}, err error) {
+	if mm, ok := s.(MapMarshaler); ok {
+		return mm.MarshalMap()
 	}
 
 	v := reflect.Indirect(reflect.ValueOf(s))
+	if v.Kind() != reflect.Struct {
+		return nil, errors.Errorf("Expected argument to be a struct, got %s(%s)", v.Type(), v.Kind())
+	}
+
 	t := v.Type()
-
-	vals := make(map[string]reflect.Value)
-	switch t.Kind() {
-	case reflect.Map:
-		if t.Key().Kind() != reflect.String {
-			panic(errors.Errorf("Expected the map key kind to be string, got %s", t.Elem().Kind()))
+	m = make(map[string]interface{}, t.NumField())
+	for i := 0; i < t.NumField(); i++ {
+		f := t.Field(i)
+		if f.PkgPath != "" {
+			continue
 		}
-		for _, k := range v.MapKeys() {
-			if mv := reflect.ValueOf(v.MapIndex(k).Interface()); !isZero(mv) {
-				vals[k.String()] = mv
+		if fv := v.FieldByName(f.Name); !isZero(fv) {
+			m[f.Name], err = marshalNested(fv)
+			if err != nil {
+				return nil, err
 			}
 		}
-	case reflect.Struct:
-		for i := 0; i < t.NumField(); i++ {
-			f := t.Field(i)
-			if f.PkgPath != "" {
-				continue
-			}
-			if fv := reflect.ValueOf(v.FieldByName(f.Name).Interface()); !isZero(fv) {
-				vals[f.Name] = fv
-			}
-		}
-	default:
-		panic(errors.Errorf("Expected argument to be a struct or map with string keys, got %s", t.Kind()))
 	}
-
-	out := make(map[string]interface{}, len(vals))
-	for k, v := range vals {
-		out[k] = marshalNested(v)
-	}
-	return out
+	return m, nil
 }
 
 // MapMarshaler is the interface implemented by an object that can
-// marshal itself into a map[string]interface{}
+// marshal itself into a flattened map[string]interface{}
 //
 // MarshalMap encodes the receiver into map[string]interface{} and returns the result.
 type MapMarshaler interface {
-	MarshalMap() map[string]interface{}
+	MarshalMap() (map[string]interface{}, error)
 }
 
 // MarshalMap returns the map encoding of v, where v is either a struct or a map with string keys.
@@ -208,14 +216,28 @@ type MapMarshaler interface {
 // MarshalMap traverses the value v recursively. If v implements the MapMarshaler interface, MarshalMap calls its MarshalMap method to produce map[string]interface{}.
 // Otherwise, MarshalMap first encodes the value v as a map[string]interface{}. Default marshaler marshals slices as maps with string keys, where all keys represent integers.
 // The map produced by any of the methods will be flattened by joining sub-map values with a dot(note that slices produced by custom MarshalMap implementations won't be flattened).
-func MarshalMap(v interface{}) (m map[string]interface{}) {
-	mm, ok := v.(MapMarshaler)
-	if ok {
-		m = mm.MarshalMap()
-	} else {
-		m = mapify(marshal(v), nil).(map[string]interface{})
+func MarshalMap(v interface{}) (m map[string]interface{}, err error) {
+	if mm, ok := v.(MapMarshaler); ok {
+		return mm.MarshalMap()
 	}
-	return flattened(m)
+
+	m, err = marshal(v)
+	if err != nil {
+		return nil, err
+	}
+	m = Flattened(mapify(m, keepBytes).(map[string]interface{}))
+	for k, v := range m {
+		rv := reflect.ValueOf(v)
+		switch rv.Kind() {
+		case reflect.Ptr, reflect.Struct, reflect.Map, reflect.Interface, reflect.Chan, reflect.Func:
+			bv, err := toBytes(v)
+			if err != nil {
+				return nil, err
+			}
+			m[k] = bv
+		}
+	}
+	return m, nil
 }
 
 func toBytes(v interface{}) (b []byte, err error) {
@@ -298,19 +320,26 @@ type ByteMapMarshaler interface {
 // MarshalByteMap returns the byte map encoding of v.
 //
 // MarshalByteMap traverses map returned by Marshal and converts all values to bytes.
-func MarshalByteMap(v interface{}) (map[string][]byte, error) {
+func MarshalByteMap(v interface{}) (bm map[string][]byte, err error) {
 	var im map[string]interface{}
 	switch v := v.(type) {
 	case ByteMapMarshaler:
 		return v.MarshalByteMap()
 	case MapMarshaler:
-		im = v.MarshalMap()
+		im, err = v.MarshalMap()
+		if err != nil {
+			return nil, err
+		}
 	default:
-		im = mapify(marshal(v), keepBytes).(map[string]interface{})
+		im, err = marshal(v)
+		if err != nil {
+			return nil, err
+		}
+		im = Flattened(mapify(im, keepBytes).(map[string]interface{}))
 	}
 
-	bm := make(map[string][]byte, len(im))
-	for k, v := range flattened(im) {
+	bm = make(map[string][]byte, len(im))
+	for k, v := range im {
 		b, err := toBytes(v)
 		if err != nil {
 			return nil, err

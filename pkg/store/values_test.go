@@ -3,9 +3,13 @@
 package store_test
 
 import (
+	"encoding/json"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	. "github.com/TheThingsNetwork/ttn/pkg/store"
+	"github.com/gogo/protobuf/proto"
+	"github.com/mitchellh/mapstructure"
 )
 
 type SubSubStruct struct {
@@ -43,72 +47,103 @@ func mustToBytes(v interface{}) []byte {
 	return b
 }
 
+type ProtoMarshaler struct {
+	a int
+}
+
+var _ proto.Marshaler = ProtoMarshaler{}
+var _ proto.Unmarshaler = &ProtoMarshaler{}
+
+func (m ProtoMarshaler) Marshal() ([]byte, error) {
+	return []byte{byte(m.a), byte(ProtoEncoding)}, nil
+}
+
+func (m *ProtoMarshaler) Unmarshal(b []byte) error {
+	if len(b) != 2 {
+		return errors.Errorf("Encoded length must be 2, got %d", len(b))
+	}
+	if Encoding(b[1]) != ProtoEncoding {
+		return errors.Errorf("Second byte must be %d, got %d", ProtoEncoding, b[1])
+	}
+	*m = ProtoMarshaler{
+		a: int(b[0]),
+	}
+	return nil
+}
+
+type JSONMarshaler struct {
+	a int
+}
+
+var _ json.Marshaler = JSONMarshaler{}
+var _ json.Unmarshaler = &JSONMarshaler{}
+
+func (m JSONMarshaler) MarshalJSON() ([]byte, error) {
+	return []byte{byte(m.a), byte(JSONEncoding)}, nil
+}
+
+func (m *JSONMarshaler) UnmarshalJSON(b []byte) error {
+	if len(b) != 2 {
+		return errors.Errorf("Encoded length must be 2, got %d", len(b))
+	}
+	if Encoding(b[1]) != JSONEncoding {
+		return errors.Errorf("Second byte must be %d, got %d", JSONEncoding, b[1])
+	}
+	*m = JSONMarshaler{
+		a: int(b[0]),
+	}
+	return nil
+}
+
+type ProtoJSONMarshaler struct {
+	a int
+}
+
+var _ proto.Marshaler = ProtoJSONMarshaler{}
+var _ proto.Unmarshaler = &ProtoJSONMarshaler{}
+var _ json.Marshaler = ProtoJSONMarshaler{}
+var _ json.Unmarshaler = &ProtoJSONMarshaler{}
+
+func (m ProtoJSONMarshaler) Marshal() ([]byte, error) {
+	return []byte{byte(m.a), byte(ProtoEncoding)}, nil
+}
+
+func (m *ProtoJSONMarshaler) Unmarshal(b []byte) error {
+	if len(b) != 2 {
+		return errors.Errorf("Encoded length must be 2, got %d", len(b))
+	}
+	if Encoding(b[1]) != ProtoEncoding {
+		return errors.Errorf("Second byte must be %d, got %d", ProtoEncoding, b[1])
+	}
+	*m = ProtoJSONMarshaler{
+		a: int(b[0]),
+	}
+	return nil
+}
+
+func (m ProtoJSONMarshaler) MarshalJSON() ([]byte, error) {
+	return []byte{byte(m.a), byte(JSONEncoding)}, nil
+}
+
+func (m *ProtoJSONMarshaler) UnmarshalJSON(b []byte) error {
+	if len(b) != 2 {
+		return errors.Errorf("Encoded length must be 2, got %d", len(b))
+	}
+	if Encoding(b[1]) != JSONEncoding {
+		return errors.Errorf("Second byte must be %d, got %d", JSONEncoding, b[1])
+	}
+	*m = ProtoJSONMarshaler{
+		a: int(b[0]),
+	}
+	return nil
+}
+
 var values = []struct {
 	unmarshaled interface{}
 	marshaled   map[string]interface{}
 	bytes       map[string][]byte
+	decodeHooks []mapstructure.DecodeHookFunc
 }{
-	{
-		map[string]interface{}{
-			"string":    "42",
-			"int":       42,
-			"bytes":     []byte("42"),
-			"byteArray": byteArray([2]byte{'4', '2'}),
-			"2dSlice":   [][]int{{4, 2}, {42}},
-			"sub": map[string]interface{}{
-				"string":    "42",
-				"int":       42,
-				"bytes":     []byte("42"),
-				"byteArray": byteArray([2]byte{'4', '2'}),
-				"sub": map[string]interface{}{
-					"string":    "42",
-					"int":       42,
-					"bytes":     []byte("42"),
-					"byteArray": byteArray([2]byte{'4', '2'}),
-				},
-			},
-		},
-		map[string]interface{}{
-			"2dSlice.0.0":         int(4),
-			"2dSlice.0.1":         int(2),
-			"2dSlice.1.0":         int(42),
-			"byteArray.0":         byte(4 + '0'),
-			"byteArray.1":         byte(2 + '0'),
-			"bytes.0":             byte(4 + '0'),
-			"bytes.1":             byte(2 + '0'),
-			"int":                 int(42),
-			"string":              string("42"),
-			"sub.byteArray.0":     byte(4 + '0'),
-			"sub.byteArray.1":     byte(2 + '0'),
-			"sub.bytes.0":         byte(4 + '0'),
-			"sub.bytes.1":         byte(2 + '0'),
-			"sub.int":             int(42),
-			"sub.string":          string("42"),
-			"sub.sub.byteArray.0": byte(4 + '0'),
-			"sub.sub.byteArray.1": byte(2 + '0'),
-			"sub.sub.bytes.0":     byte(4 + '0'),
-			"sub.sub.bytes.1":     byte(2 + '0'),
-			"sub.sub.int":         int(42),
-			"sub.sub.string":      string("42"),
-		},
-		map[string][]byte{
-			"2dSlice.0.0":       mustToBytes(4),
-			"2dSlice.0.1":       mustToBytes(2),
-			"2dSlice.1.0":       mustToBytes(42),
-			"byteArray":         mustToBytes("42"),
-			"bytes":             mustToBytes("42"),
-			"int":               mustToBytes(42),
-			"string":            mustToBytes("42"),
-			"sub.byteArray":     mustToBytes("42"),
-			"sub.bytes":         mustToBytes("42"),
-			"sub.int":           mustToBytes(42),
-			"sub.string":        mustToBytes("42"),
-			"sub.sub.byteArray": mustToBytes("42"),
-			"sub.sub.bytes":     mustToBytes("42"),
-			"sub.sub.int":       mustToBytes(42),
-			"sub.sub.string":    mustToBytes("42"),
-		},
-	},
 	{
 		Struct{
 			String:    "42",
@@ -139,32 +174,23 @@ var values = []struct {
 			},
 		},
 		map[string]interface{}{
-			"ByteArray.0":                        byte(4 + '0'),
-			"ByteArray.1":                        byte(2 + '0'),
-			"Bytes.0":                            byte(4 + '0'),
-			"Bytes.1":                            byte(2 + '0'),
-			"Int":                                int(42),
-			"String":                             string("42"),
-			"StructSlice.0.ByteArray.0":          byte(4 + '0'),
-			"StructSlice.0.ByteArray.1":          byte(2 + '0'),
-			"StructSlice.0.String":               string("42"),
-			"StructSlice.1.ByteArray.0":          byte(0),
-			"StructSlice.1.ByteArray.1":          byte(0),
-			"StructSlice.1.Bytes.0":              byte(4 + '0'),
-			"StructSlice.1.Bytes.1":              byte(2 + '0'),
-			"StructSlice.1.Int":                  int(42),
-			"SubStruct.ByteArray.0":              byte(4 + '0'),
-			"SubStruct.ByteArray.1":              byte(2 + '0'),
-			"SubStruct.Bytes.0":                  byte(4 + '0'),
-			"SubStruct.Bytes.1":                  byte(2 + '0'),
-			"SubStruct.Int":                      int(42),
-			"SubStruct.String":                   string("42"),
-			"SubStruct.SubSubStruct.ByteArray.0": byte(4 + '0'),
-			"SubStruct.SubSubStruct.ByteArray.1": byte(2 + '0'),
-			"SubStruct.SubSubStruct.Bytes.0":     byte(4 + '0'),
-			"SubStruct.SubSubStruct.Bytes.1":     byte(2 + '0'),
-			"SubStruct.SubSubStruct.Int":         int(42),
-			"SubStruct.SubSubStruct.String":      string("42"),
+			"ByteArray":                        byteArray([2]byte{'4', '2'}),
+			"Bytes":                            []byte("42"),
+			"Int":                              int(42),
+			"String":                           string("42"),
+			"StructSlice.0.ByteArray":          byteArray([2]byte{'4', '2'}),
+			"StructSlice.0.String":             string("42"),
+			"StructSlice.1.ByteArray":          byteArray([2]byte{0, 0}),
+			"StructSlice.1.Bytes":              []byte("42"),
+			"StructSlice.1.Int":                int(42),
+			"SubStruct.ByteArray":              byteArray([2]byte{'4', '2'}),
+			"SubStruct.Bytes":                  []byte("42"),
+			"SubStruct.Int":                    int(42),
+			"SubStruct.String":                 string("42"),
+			"SubStruct.SubSubStruct.ByteArray": byteArray([2]byte{'4', '2'}),
+			"SubStruct.SubSubStruct.Bytes":     []byte("42"),
+			"SubStruct.SubSubStruct.Int":       int(42),
+			"SubStruct.SubSubStruct.String":    string("42"),
 		},
 
 		map[string][]byte{
@@ -186,6 +212,7 @@ var values = []struct {
 			"SubStruct.SubSubStruct.Int":       mustToBytes(42),
 			"SubStruct.SubSubStruct.String":    mustToBytes("42"),
 		},
+		nil,
 	},
 	{
 		struct {
@@ -194,16 +221,19 @@ var values = []struct {
 		}{},
 		map[string]interface{}{},
 		map[string][]byte{},
+		nil,
 	},
 	{
 		struct{ time.Time }{time.Unix(42, 42).UTC()},
-		map[string]interface{}{"Time": time.Unix(42, 42).UTC()},
+		map[string]interface{}{"Time": mustToBytes(time.Unix(42, 42).UTC())},
 		map[string][]byte{"Time": mustToBytes(time.Unix(42, 42).UTC())},
+		nil,
 	},
 	{
 		struct{ T time.Time }{time.Unix(42, 42).UTC()},
-		map[string]interface{}{"T": time.Unix(42, 42).UTC()},
+		map[string]interface{}{"T": mustToBytes(time.Unix(42, 42).UTC())},
 		map[string][]byte{"T": mustToBytes(time.Unix(42, 42).UTC())},
+		nil,
 	},
 	{
 		struct{ Interfaces []interface{} }{[]interface{}{
@@ -215,20 +245,43 @@ var values = []struct {
 			struct{ A int }{42},
 		}},
 		map[string]interface{}{
-			"Interfaces.0":   nil,
-			"Interfaces.1":   nil,
-			"Interfaces.2":   nil,
-			"Interfaces.3":   time.Time{},
-			"Interfaces.4":   time.Time{},
-			"Interfaces.5.A": 42,
+			"Interfaces.0": nil,
+			"Interfaces.1": nil,
+			"Interfaces.2": nil,
+			"Interfaces.3": nil,
+			"Interfaces.4": nil,
+			"Interfaces.5": mustToBytes(struct{ A int }{42}),
 		},
 		map[string][]byte{
-			"Interfaces.0":   mustToBytes(nil),
-			"Interfaces.1":   mustToBytes(nil),
-			"Interfaces.2":   mustToBytes(nil),
-			"Interfaces.3":   mustToBytes(time.Time{}),
-			"Interfaces.4":   mustToBytes(time.Time{}),
-			"Interfaces.5.A": mustToBytes(42),
+			"Interfaces.0": mustToBytes(nil),
+			"Interfaces.1": mustToBytes(nil),
+			"Interfaces.2": mustToBytes(nil),
+			"Interfaces.3": mustToBytes(nil),
+			"Interfaces.4": mustToBytes(nil),
+			"Interfaces.5": mustToBytes(struct{ A int }{42}),
 		},
+		nil,
+	},
+	{
+		struct {
+			A *ProtoMarshaler
+			B *JSONMarshaler
+			C *ProtoJSONMarshaler
+		}{
+			&ProtoMarshaler{42},
+			&JSONMarshaler{42},
+			&ProtoJSONMarshaler{42},
+		},
+		map[string]interface{}{
+			"A": mustToBytes(ProtoMarshaler{42}),
+			"B": mustToBytes(JSONMarshaler{42}),
+			"C": mustToBytes(ProtoJSONMarshaler{42}),
+		},
+		map[string][]byte{
+			"A": mustToBytes(ProtoMarshaler{42}),
+			"B": mustToBytes(JSONMarshaler{42}),
+			"C": mustToBytes(ProtoJSONMarshaler{42}),
+		},
+		nil,
 	},
 }

@@ -17,7 +17,8 @@ func TestMarshalMap(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			m := MarshalMap(v.unmarshaled)
+			m, err := MarshalMap(v.unmarshaled)
+			a.So(err, should.BeNil)
 			if !a.So(m, should.Resemble, v.marshaled) {
 				pretty.Ldiff(t, m, v.marshaled)
 			}

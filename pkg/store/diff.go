@@ -64,9 +64,19 @@ func ByteDiff(new, old map[string][]byte) (diff map[string][]byte) {
 }
 
 // DiffFields returns the fieldpaths of fields of a and b that differ in value.
-func DiffFields(a, b interface{}) (fields []string) {
-	for k := range Diff(MarshalMap(a), MarshalMap(b)) {
+func DiffFields(a, b interface{}) (fields []string, err error) {
+	ma, err := MarshalMap(a)
+	if err != nil {
+		return nil, err
+	}
+
+	mb, err := MarshalMap(b)
+	if err != nil {
+		return nil, err
+	}
+
+	for k := range Diff(ma, mb) {
 		fields = append(fields, k)
 	}
-	return fields
+	return fields, nil
 }

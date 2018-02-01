@@ -133,7 +133,7 @@ func TestFlattened(t *testing.T) {
 			},
 		},
 	} {
-		assertions.New(t).So(flattened(tc.in), should.Resemble, tc.out)
+		assertions.New(t).So(Flattened(tc.in), should.Resemble, tc.out)
 	}
 }
 
