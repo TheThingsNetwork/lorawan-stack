@@ -40,6 +40,14 @@ type PrimaryKey interface {
 	fmt.Stringer
 }
 
+type Deleter interface {
+	Delete(id PrimaryKey) error
+}
+
+type Trimmer interface {
+	Trim(id PrimaryKey, n int) error
+}
+
 // TypedStore represents a store, modeled after CRUD, which stores typed data.
 //
 // Create creates a new PrimaryKey, stores fields under that key and returns it.
@@ -53,7 +61,7 @@ type TypedStore interface {
 	Find(id PrimaryKey) (map[string]interface{}, error)
 	FindBy(filter map[string]interface{}) (map[PrimaryKey]map[string]interface{}, error)
 	Update(id PrimaryKey, diff map[string]interface{}) error
-	Delete(id PrimaryKey) error
+	Deleter
 }
 
 // ByteStore represents a store modeled after CRUD, which stores data as bytes.
@@ -69,5 +77,23 @@ type ByteStore interface {
 	Find(id PrimaryKey) (map[string][]byte, error)
 	FindBy(filter map[string][]byte) (map[PrimaryKey]map[string][]byte, error)
 	Update(id PrimaryKey, diff map[string][]byte) error
-	Delete(id PrimaryKey) error
+	Deleter
+}
+
+// ByteListStore represents a store, which stores lists of []byte values.
+type ByteListStore interface {
+	CreateList(bs ...[]byte) (PrimaryKey, error)
+	FindList(id PrimaryKey) ([][]byte, error)
+	Append(id PrimaryKey, bs ...[]byte) error
+	Deleter
+}
+
+// ByteSetStore represents a store, which stores sets of []byte values.
+type ByteSetStore interface {
+	CreateSet(bs ...[]byte) (PrimaryKey, error)
+	FindSet(id PrimaryKey) ([][]byte, error)
+	Put(id PrimaryKey, bs ...[]byte) error
+	Contains(id PrimaryKey, bs []byte) (bool, error)
+	Remove(id PrimaryKey, bs ...[]byte) error
+	Deleter
 }
