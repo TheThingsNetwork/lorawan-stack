@@ -25,6 +25,8 @@ const (
 	ProtoEncoding
 	// JSONEncoding represents case when MarshalJSON() method was used to encode value.
 	JSONEncoding
+	// JSONPBEncoding represents case when MarshalJSONPB(*jsonpb.Marshaler) method was used to encode value.
+	JSONPBEncoding
 	// UnknownEncoding represents case when unknown encoding was used to encode value(fmt.Sprint).
 	UnknownEncoding
 )

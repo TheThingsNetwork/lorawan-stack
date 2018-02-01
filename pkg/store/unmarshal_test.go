@@ -22,9 +22,9 @@ func TestUnmarshalMap(t *testing.T) {
 
 			switch v.unmarshaled.(type) {
 			case map[string]interface{}, []interface{}, struct{ Interfaces []interface{} }:
-				t.Skip(fmt.Sprintf("Skipping special case, when unmarshaled value is %T as we don't know the type of values to unmarshal to", v.unmarshaled))
+				t.Skipf("Skipping special case, when unmarshaled value is %T as we don't know the type of values to unmarshal to", v.unmarshaled)
 			}
-			err := UnmarshalMap(v.marshaled, rv.Interface())
+			err := UnmarshalMap(v.marshaled, rv.Interface(), v.decodeHooks...)
 			a.So(err, should.BeNil)
 			a.So(pretty.Diff(rv.Elem().Interface(), v.unmarshaled), should.BeEmpty)
 		})
@@ -41,7 +41,7 @@ func TestUnmarshalByteMap(t *testing.T) {
 			case map[string]interface{}, []interface{}, struct{ Interfaces []interface{} }:
 				t.Skip(fmt.Sprintf("Skipping special case, when unmarshaled value is %T as we don't know the type of values to unmarshal to", v.unmarshaled))
 			}
-			err := UnmarshalByteMap(v.bytes, rv.Interface())
+			err := UnmarshalByteMap(v.bytes, rv.Interface(), v.decodeHooks...)
 			a.So(err, should.BeNil)
 			a.So(pretty.Diff(rv.Elem().Interface(), v.unmarshaled), should.BeEmpty)
 		})

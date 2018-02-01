@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/gogo/protobuf/proto"
 	"github.com/mitchellh/mapstructure"
 )
@@ -56,6 +57,28 @@ func unflattened(m map[string]interface{}) map[string]interface{} {
 	return out
 }
 
+func isByteSlice(t reflect.Type) bool {
+	return t.Kind() == reflect.Slice && t.Elem().Kind() == reflect.Uint8
+}
+
+func fromBytesHookFunc(f reflect.Type, t reflect.Type, v interface{}) (interface{}, error) {
+	if isByteSlice(f) && !isByteSlice(t) {
+		return bytesToType(v.([]byte), t)
+	}
+	return v, nil
+}
+
+var mapUnmarshalerType = reflect.TypeOf((*MapUnmarshaler)(nil)).Elem()
+
+func toInterfaceHookFunc(f reflect.Type, t reflect.Type, v interface{}) (interface{}, error) {
+	if f.Kind() == reflect.Map && f.Elem().Kind() == reflect.Interface &&
+		t.Implements(mapUnmarshalerType) && !(t.Kind() == reflect.Interface || t.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.Interface) {
+		out := reflect.New(t).Interface().(MapUnmarshaler)
+		return out, out.UnmarshalMap(v.(map[string]interface{}))
+	}
+	return v, nil
+}
+
 // MapUnmarshaler is the interface implemented by an object that can
 // unmarshal a map[string]interface{} representation of itself.
 //
@@ -71,7 +94,7 @@ type MapUnmarshaler interface {
 //
 // UnmarshalMap uses the inverse of the encodings that
 // Marshal uses.
-func UnmarshalMap(m map[string]interface{}, v interface{}) error {
+func UnmarshalMap(m map[string]interface{}, v interface{}, hooks ...mapstructure.DecodeHookFunc) error {
 	m = unflattened(m)
 	switch t := v.(type) {
 	case MapUnmarshaler:
@@ -80,11 +103,18 @@ func UnmarshalMap(m map[string]interface{}, v interface{}) error {
 		if len(m) == 0 {
 			return nil
 		}
-		dec, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+		conf := &mapstructure.DecoderConfig{
 			WeaklyTypedInput: true,
 			ZeroFields:       true,
 			Result:           v,
-		})
+			DecodeHook: mapstructure.ComposeDecodeHookFunc(append(
+				hooks,
+				toInterfaceHookFunc,
+				fromBytesHookFunc,
+			)...),
+		}
+
+		dec, err := mapstructure.NewDecoder(conf)
 		if err != nil {
 			panic(errors.NewWithCause("Failed to intialize decoder", err))
 		}
@@ -118,9 +148,23 @@ func typeByFlatName(typ reflect.Type, name string) (reflect.Type, bool) {
 	return typ, true
 }
 
+var jsonpbUnmarshaler = &jsonpb.Unmarshaler{}
+
+var (
+	encodingBinaryUnmarshalerType = reflect.TypeOf((*encoding.BinaryUnmarshaler)(nil)).Elem()
+	encodingTextUnmarshalerType   = reflect.TypeOf((*encoding.TextUnmarshaler)(nil)).Elem()
+	protoUnmarshalerType          = reflect.TypeOf((*proto.Unmarshaler)(nil)).Elem()
+	jsonUnmarshalerType           = reflect.TypeOf((*json.Unmarshaler)(nil)).Elem()
+	jsonpbJSONPBUnmarshalerType   = reflect.TypeOf((*jsonpb.JSONPBUnmarshaler)(nil)).Elem()
+)
+
 func bytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 	if typ.Kind() == reflect.Ptr {
 		typ = typ.Elem()
+	}
+
+	if typ.Kind() == reflect.Interface {
+		return nil, errors.New("Can not decode into an interface value")
 	}
 
 	enc := Encoding(b[0])
@@ -176,33 +220,35 @@ func bytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 		}
 		return nil, errors.Errorf("can not decode raw bytes to value of type %s", typ)
 	case BinaryEncoding:
-		v, ok := reflect.New(typ).Interface().(encoding.BinaryUnmarshaler)
-		if !ok {
-			var expected encoding.BinaryUnmarshaler
-			return nil, errors.Errorf("expected %s to implement %T", typ, expected)
+		if !reflect.PtrTo(typ).Implements(encodingBinaryUnmarshalerType) {
+			return nil, errors.Errorf("expected %s to implement %s", typ, encodingBinaryUnmarshalerType)
 		}
+		v := reflect.New(typ).Interface().(encoding.BinaryUnmarshaler)
 		return v, v.UnmarshalBinary(b)
 	case TextEncoding:
-		v, ok := reflect.New(typ).Interface().(encoding.TextUnmarshaler)
-		if !ok {
-			var expected encoding.TextUnmarshaler
-			return nil, errors.Errorf("expected %s to implement %T", typ, expected)
+		if !reflect.PtrTo(typ).Implements(encodingTextUnmarshalerType) {
+			return nil, errors.Errorf("expected %s to implement %s", typ, encodingTextUnmarshalerType)
 		}
+		v := reflect.New(typ).Interface().(encoding.TextUnmarshaler)
 		return v, v.UnmarshalText(b)
 	case ProtoEncoding:
-		v, ok := reflect.New(typ).Interface().(proto.Unmarshaler)
-		if !ok {
-			var expected proto.Unmarshaler
-			return nil, errors.Errorf("expected %s to implement %T", typ, expected)
+		if !reflect.PtrTo(typ).Implements(protoUnmarshalerType) {
+			return nil, errors.Errorf("expected %s to implement %s", typ, protoUnmarshalerType)
 		}
+		v := reflect.New(typ).Interface().(proto.Unmarshaler)
 		return v, v.Unmarshal(b)
 	case JSONEncoding:
-		v, ok := reflect.New(typ).Interface().(json.Unmarshaler)
-		if !ok {
-			var expected json.Unmarshaler
-			return nil, errors.Errorf("expected %s to implement %T", typ, expected)
+		if !reflect.PtrTo(typ).Implements(jsonUnmarshalerType) {
+			return nil, errors.Errorf("expected %s to implement %s", typ, jsonUnmarshalerType)
 		}
+		v := reflect.New(typ).Interface().(json.Unmarshaler)
 		return v, v.UnmarshalJSON(b)
+	case JSONPBEncoding:
+		if !reflect.PtrTo(typ).Implements(jsonpbJSONPBUnmarshalerType) {
+			return nil, errors.Errorf("expected %s to implement %s", typ, jsonpbJSONPBUnmarshalerType)
+		}
+		v := reflect.New(typ).Interface().(jsonpb.JSONPBUnmarshaler)
+		return v, v.UnmarshalJSONPB(jsonpbUnmarshaler, b)
 	case UnknownEncoding:
 		return nil, errors.New("value is encoded using unknown encoding")
 	default:
@@ -215,7 +261,7 @@ func bytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 //
 // UnmarshalByteMap uses the inverse of the encodings that
 // MarshalByteMap uses.
-func UnmarshalByteMap(bm map[string][]byte, v interface{}) error {
+func UnmarshalByteMap(bm map[string][]byte, v interface{}, hooks ...mapstructure.DecodeHookFunc) error {
 	typ := reflect.TypeOf(v)
 	if typ.Kind() == reflect.Ptr {
 		typ = typ.Elem()

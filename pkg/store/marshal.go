@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/gogo/protobuf/proto"
 )
 
@@ -240,6 +241,8 @@ func MarshalMap(v interface{}) (m map[string]interface{}, err error) {
 	return m, nil
 }
 
+var jsonpbMarshaler = &jsonpb.Marshaler{}
+
 func toBytes(v interface{}) (b []byte, err error) {
 	var enc Encoding
 	defer func() {
@@ -301,6 +304,9 @@ func toBytes(v interface{}) (b []byte, err error) {
 	case proto.Marshaler:
 		enc = ProtoEncoding
 		return v.Marshal()
+	case jsonpb.JSONPBMarshaler:
+		enc = JSONPBEncoding
+		return v.MarshalJSONPB(jsonpbMarshaler)
 	case json.Marshaler:
 		enc = JSONEncoding
 		return v.MarshalJSON()
