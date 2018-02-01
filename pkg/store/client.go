@@ -20,7 +20,7 @@ type NewResultFunc func() interface{}
 // Update overwrites stored fields under PrimaryKey with fields of v. Optional fields parameter is a list of fieldpaths separated by '.', which specifies the subset of v's fields, that should be updated. The fieldpaths can be grouped in most cases by specifying the parent identifier, i.e. to overwrite fields "FOO.A", "FOO.B" and "FOO.C", it is possible to specify field path "FOO".
 // Delete deletes the value stored under PrimaryKey specified.
 type Client interface {
-	Create(v interface{}) (PrimaryKey, error)
+	Create(v interface{}, fields ...string) (PrimaryKey, error)
 	Find(id PrimaryKey, v interface{}) error
 	FindBy(filter interface{}, newResult NewResultFunc, fields ...string) (map[PrimaryKey]interface{}, error)
 	Update(id PrimaryKey, v interface{}, fields ...string) error
@@ -34,18 +34,6 @@ type typedStoreClient struct {
 // NewTypedStoreClient returns a new instance of the Client, which uses TypedStore as the storing backend.
 func NewTypedStoreClient(s TypedStore) Client {
 	return &typedStoreClient{s}
-}
-
-func (cl *typedStoreClient) Create(v interface{}) (PrimaryKey, error) {
-	return cl.TypedStore.Create(MarshalMap(v))
-}
-
-func (cl *typedStoreClient) Find(id PrimaryKey, v interface{}) error {
-	m, err := cl.TypedStore.Find(id)
-	if err != nil {
-		return err
-	}
-	return UnmarshalMap(m, v)
 }
 
 // filterFields returns a map, containing only values in m, which correspond to fieldpaths specified or m if none are specified. Note that filterFields may modify the input map m.
@@ -67,8 +55,28 @@ func filterFields(m map[string]interface{}, fields ...string) map[string]interfa
 	return out
 }
 
+func (cl *typedStoreClient) Create(v interface{}, fields ...string) (PrimaryKey, error) {
+	m, err := MarshalMap(v)
+	if err != nil {
+		return nil, err
+	}
+	return cl.TypedStore.Create(filterFields(m, fields...))
+}
+
+func (cl *typedStoreClient) Find(id PrimaryKey, v interface{}) error {
+	m, err := cl.TypedStore.Find(id)
+	if err != nil {
+		return err
+	}
+	return UnmarshalMap(m, v)
+}
+
 func (cl *typedStoreClient) FindBy(filter interface{}, newResult NewResultFunc, fields ...string) (map[PrimaryKey]interface{}, error) {
-	m, err := cl.TypedStore.FindBy(filterFields(MarshalMap(filter), fields...))
+	fm, err := MarshalMap(filter)
+	if err != nil {
+		return nil, err
+	}
+	m, err := cl.TypedStore.FindBy(filterFields(fm, fields...))
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +93,10 @@ func (cl *typedStoreClient) FindBy(filter interface{}, newResult NewResultFunc, 
 }
 
 func (cl *typedStoreClient) Update(id PrimaryKey, v interface{}, fields ...string) error {
-	m := MarshalMap(v)
+	m, err := MarshalMap(v)
+	if err != nil {
+		return err
+	}
 	if len(fields) == 0 {
 		return cl.TypedStore.Update(id, m)
 	}
@@ -122,22 +133,6 @@ func NewByteStoreClient(s ByteStore) Client {
 	return &byteStoreClient{s}
 }
 
-func (cl *byteStoreClient) Create(v interface{}) (PrimaryKey, error) {
-	m, err := MarshalByteMap(v)
-	if err != nil {
-		return nil, err
-	}
-	return cl.ByteStore.Create(m)
-}
-
-func (cl *byteStoreClient) Find(id PrimaryKey, v interface{}) error {
-	m, err := cl.ByteStore.Find(id)
-	if err != nil {
-		return err
-	}
-	return UnmarshalByteMap(m, v)
-}
-
 // filterByteFields returns a map, containing only values in m, which correspond to fieldpaths specified or m if none are specified. Note that filterByteFields may modify the input map m.
 func filterByteFields(m map[string][]byte, fields ...string) map[string][]byte {
 	if len(fields) == 0 {
@@ -155,6 +150,22 @@ func filterByteFields(m map[string][]byte, fields ...string) map[string][]byte {
 		}
 	}
 	return out
+}
+
+func (cl *byteStoreClient) Create(v interface{}, fields ...string) (PrimaryKey, error) {
+	m, err := MarshalByteMap(v)
+	if err != nil {
+		return nil, err
+	}
+	return cl.ByteStore.Create(filterByteFields(m, fields...))
+}
+
+func (cl *byteStoreClient) Find(id PrimaryKey, v interface{}) error {
+	m, err := cl.ByteStore.Find(id)
+	if err != nil {
+		return err
+	}
+	return UnmarshalByteMap(m, v)
 }
 
 func (cl *byteStoreClient) FindBy(filter interface{}, newResult NewResultFunc, fields ...string) (map[PrimaryKey]interface{}, error) {
