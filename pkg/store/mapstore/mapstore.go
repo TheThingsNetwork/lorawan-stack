@@ -40,12 +40,9 @@ func (s *mapStore) Create(fields map[string]interface{}) (store.PrimaryKey, erro
 
 func (s *mapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	s.mu.RLock()
-	fields, ok := s.data[id]
+	fields := s.data[id]
 	s.mu.RUnlock()
-	if ok {
-		return deepcopy.Copy(fields).(map[string]interface{}), nil
-	}
-	return nil, store.ErrNotFound
+	return deepcopy.Copy(fields).(map[string]interface{}), nil
 }
 
 func (s *mapStore) FindBy(filters map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {

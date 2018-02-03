@@ -5,6 +5,7 @@ package storetest
 import (
 	"bytes"
 	"crypto/rand"
+	"math"
 	"strconv"
 	"testing"
 
@@ -24,28 +25,23 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 
 	s := newStore()
 
-	id1, err := s.Create(make(map[string]interface{}))
+	id, err := s.Create(make(map[string]interface{}))
 	a.So(err, should.BeNil)
-	a.So(id1, should.NotBeNil)
+	a.So(id, should.NotBeNil)
 
-	id2, err := s.Create(make(map[string]interface{}))
+	idOther, err := s.Create(make(map[string]interface{}))
 	a.So(err, should.BeNil)
-	a.So(id2, should.NotBeNil)
+	a.So(id, should.NotBeNil)
 
-	a.So(id1, should.NotResemble, id2)
+	a.So(id, should.NotResemble, idOther)
 
-	err = s.Update(id1, make(map[string]interface{}))
-	a.So(err, should.BeNil)
-	err = s.Update(id2, make(map[string]interface{}))
+	err = s.Update(id, make(map[string]interface{}))
 	a.So(err, should.BeNil)
 
 	// Behavior is implementation-dependent
-	a.So(func() { s.Find(id1) }, should.NotPanic)
-	a.So(func() { s.Find(id2) }, should.NotPanic)
+	a.So(func() { s.Find(id) }, should.NotPanic)
 
-	err = s.Delete(id1)
-	a.So(err, should.BeNil)
-	err = s.Delete(id2)
+	err = s.Delete(id)
 	a.So(err, should.BeNil)
 
 	for i, tc := range []struct {
@@ -161,7 +157,7 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 			}
 
 			found, err = s.Find(id)
-			a.So(err, should.Equal, store.ErrNotFound)
+			a.So(err, should.BeNil)
 			a.So(found, should.Equal, nil)
 
 			matches, err = s.FindBy(tc.AfterUpdate)
@@ -181,28 +177,25 @@ func TestByteStore(t testingT, newStore func() store.ByteStore) {
 
 	s := newStore()
 
-	id1, err := s.Create(make(map[string][]byte))
+	id, err := s.Create(make(map[string][]byte))
 	a.So(err, should.BeNil)
-	a.So(id1, should.NotBeNil)
+	a.So(id, should.NotBeNil)
 
-	id2, err := s.Create(make(map[string][]byte))
+	idOther, err := s.Create(make(map[string][]byte))
 	a.So(err, should.BeNil)
-	a.So(id2, should.NotBeNil)
+	a.So(idOther, should.NotBeNil)
 
-	a.So(id1, should.NotResemble, id2)
-
-	err = s.Update(id1, make(map[string][]byte))
-	a.So(err, should.BeNil)
-	err = s.Update(id2, make(map[string][]byte))
-	a.So(err, should.BeNil)
+	a.So(id, should.NotResemble, idOther)
 
 	// Behavior is implementation-dependent
-	a.So(func() { s.Find(id1) }, should.NotPanic)
-	a.So(func() { s.Find(id2) }, should.NotPanic)
+	a.So(func() { s.Find(id) }, should.NotPanic)
 
-	err = s.Delete(id1)
+	err = s.Update(id, make(map[string][]byte))
 	a.So(err, should.BeNil)
-	err = s.Delete(id2)
+
+	a.So(func() { s.Find(id) }, should.NotPanic)
+
+	err = s.Delete(id)
 	a.So(err, should.BeNil)
 
 	for i, tc := range []struct {
@@ -318,7 +311,7 @@ func TestByteStore(t testingT, newStore func() store.ByteStore) {
 			}
 
 			found, err = s.Find(id)
-			a.So(err, should.Equal, store.ErrNotFound)
+			a.So(err, should.BeNil)
 			a.So(found, should.Equal, nil)
 
 			matches, err = s.FindBy(tc.AfterUpdate)
@@ -374,30 +367,28 @@ func TestByteSetStore(t testingT, newStore func() store.ByteSetStore) {
 
 	s := newStore()
 
-	id1, err := s.CreateSet()
+	id, err := s.CreateSet()
 	a.So(err, should.BeNil)
-	a.So(id1, should.NotBeNil)
+	a.So(id, should.NotBeNil)
 
-	id2, err := s.CreateSet()
+	idOther, err := s.CreateSet()
 	a.So(err, should.BeNil)
-	a.So(id2, should.NotBeNil)
+	a.So(idOther, should.NotBeNil)
 
-	a.So(id1, should.NotResemble, id2)
+	a.So(id, should.NotResemble, idOther)
 
 	// Behavior is implementation-dependent
-	a.So(func() { s.FindSet(id1) }, should.NotPanic)
-	a.So(func() { s.FindSet(id2) }, should.NotPanic)
-	a.So(func() { s.Contains(id1, []byte("non-existent")) }, should.NotPanic)
-	a.So(func() { s.Contains(id2, []byte("non-existent")) }, should.NotPanic)
+	a.So(func() { s.FindSet(id) }, should.NotPanic)
+	a.So(func() { s.Contains(id, []byte("non-existent")) }, should.NotPanic)
+	a.So(func() { s.Remove(id, []byte("non-existent")) }, should.NotPanic)
 
-	err = s.Remove(id1)
-	a.So(err, should.BeNil)
-	err = s.Remove(id2)
+	err = s.Put(id, []byte("foo"))
 	a.So(err, should.BeNil)
 
-	err = s.Delete(id1)
-	a.So(err, should.BeNil)
-	err = s.Delete(id2)
+	err = s.Put(id)
+	a.So(err, should.NotBeNil)
+
+	err = s.Delete(id)
 	a.So(err, should.BeNil)
 
 	for i, tc := range []struct {
@@ -491,6 +482,107 @@ func TestByteSetStore(t testingT, newStore func() store.ByteSetStore) {
 			if !a.So(err, should.BeNil) {
 				return
 			}
+		})
+	}
+}
+
+func TestByteListStore(t testingT, newStore func() store.ByteListStore) {
+	a := assertions.New(t)
+
+	s := newStore()
+
+	id, err := s.CreateList()
+	a.So(err, should.BeNil)
+	a.So(id, should.NotBeNil)
+
+	idOther, err := s.CreateList()
+	a.So(err, should.BeNil)
+	a.So(idOther, should.NotBeNil)
+
+	a.So(id, should.NotResemble, idOther)
+
+	// Behavior is implementation-dependent
+	a.So(func() { s.FindList(id) }, should.NotPanic)
+
+	err = s.Append(id, []byte("foo"))
+	a.So(err, should.BeNil)
+
+	err = s.Append(id)
+	a.So(err, should.NotBeNil)
+
+	err = s.Delete(id)
+	a.So(err, should.BeNil)
+
+	for i, tc := range []struct {
+		Create    [][]byte
+		Append    [][]byte
+		Trim      int
+		AfterTrim [][]byte
+	}{
+		{
+			[][]byte{[]byte("foo"), []byte("bar")},
+			[][]byte{[]byte("bar")},
+			2,
+			[][]byte{[]byte("bar"), []byte("bar")},
+		},
+		{
+			[][]byte{[]byte("foo"), []byte("bar")},
+			[][]byte{[]byte("bar"), []byte("bar")},
+			0,
+			[][]byte{},
+		},
+		{
+			[][]byte{[]byte("42"), []byte("foo"), []byte("bar")},
+			[][]byte{[]byte("42"), []byte("foo"), []byte("bar")},
+			4,
+			[][]byte{[]byte("bar"), []byte("42"), []byte("foo"), []byte("bar")},
+		},
+		{
+			[][]byte{[]byte("42"), []byte("42")},
+			[][]byte{[]byte("42")},
+			42,
+			[][]byte{[]byte("42"), []byte("42"), []byte("42")},
+		},
+		{
+			[][]byte{[]byte("42"), []byte("42")},
+			[][]byte{[]byte("42")},
+			math.MaxInt32,
+			[][]byte{[]byte("42"), []byte("42"), []byte("42")},
+		},
+	} {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+
+			s := newStore()
+
+			id, err := s.CreateList(tc.Create...)
+			if !a.So(err, should.BeNil) {
+				return
+			}
+			a.So(id, should.NotBeNil)
+
+			found, err := s.FindList(id)
+			a.So(err, should.BeNil)
+			a.So(found, should.Resemble, tc.Create)
+
+			err = s.Append(id, tc.Append...)
+			a.So(err, should.BeNil)
+
+			found, err = s.FindList(id)
+			a.So(err, should.BeNil)
+			a.So(found, should.Resemble, append(tc.Create, tc.Append...))
+
+			if v, ok := s.(store.Trimmer); ok {
+				err = v.Trim(id, tc.Trim)
+				a.So(err, should.NotBeNil)
+
+				found, err = s.FindList(id)
+				a.So(err, should.BeNil)
+				a.So(found, should.Resemble, tc.AfterTrim)
+			}
+
+			err = s.Delete(id)
+			a.So(err, should.BeNil)
 		})
 	}
 }

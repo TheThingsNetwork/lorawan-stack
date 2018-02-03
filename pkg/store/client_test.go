@@ -208,7 +208,7 @@ func TestTypedClient(t *testing.T) {
 
 			v = newResult()
 			err = cl.Find(k, v)
-			a.So(err, should.NotBeNil)
+			a.So(err, should.BeNil)
 
 			m, err = cl.FindBy(tc.AfterUpdate, newResult)
 			a.So(err, should.BeNil)

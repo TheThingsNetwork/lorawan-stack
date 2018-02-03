@@ -171,9 +171,6 @@ func (s *indexedStore) Delete(id store.PrimaryKey) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	old, err := s.mapStore.Find(id)
-	if err == store.ErrNotFound {
-		return nil
-	}
 	if err != nil {
 		return err
 	}

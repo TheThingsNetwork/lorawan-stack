@@ -3,8 +3,9 @@
 package store
 
 import (
-	"errors"
 	"fmt"
+
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 )
 
 // Encoding represents the encoding used to encode value into []byte representation.
@@ -28,9 +29,6 @@ const (
 )
 
 var (
-	// ErrNotFound represents an error returned, when entity is not found.
-	ErrNotFound = errors.New("Not found")
-
 	// ErrInvalidData represents an error returned, when value stored is not valid.
 	ErrInvalidData = errors.New("Invalid data")
 )

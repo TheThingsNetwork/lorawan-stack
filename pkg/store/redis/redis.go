@@ -258,6 +258,9 @@ func (c *stringBytesMapCmd) Result() (map[string][]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	if fields == nil || len(fields) == 0 {
+		return nil, nil
+	}
 
 	out := make(map[string][]byte, len(fields))
 	for k, v := range fields {
@@ -275,9 +278,6 @@ func (s *Store) Find(id store.PrimaryKey) (map[string][]byte, error) {
 	m, err := newStringBytesMapCmd(s.Redis.HGetAll(s.key(id.String()))).Result()
 	if err != nil {
 		return nil, err
-	}
-	if len(m) == 0 {
-		return nil, store.ErrNotFound
 	}
 	return m, nil
 }
@@ -363,10 +363,9 @@ func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[s
 	return out, find()
 }
 
-func (s *Store) Put(id store.PrimaryKey, bs ...[]byte) error {
-	if len(bs) == 0 {
-		return nil
-	}
+var ErrNoValues = errors.New("No values specified")
+
+func (s *Store) put(id store.PrimaryKey, bs ...[]byte) error {
 	idStr := id.String()
 	_, err := s.Redis.Pipelined(func(p *redis.Pipeline) error {
 		for _, b := range bs {
@@ -377,13 +376,20 @@ func (s *Store) Put(id store.PrimaryKey, bs ...[]byte) error {
 	return err
 }
 
+func (s *Store) Put(id store.PrimaryKey, bs ...[]byte) error {
+	if len(bs) == 0 {
+		return errors.New("No fields specified")
+	}
+	return s.put(id, bs...)
+}
+
 func (s *Store) CreateSet(bs ...[]byte) (store.PrimaryKey, error) {
 	id := s.newID()
 	if len(bs) == 0 {
 		return id, nil
 	}
 
-	if err := s.Put(id, bs...); err != nil {
+	if err := s.put(id, bs...); err != nil {
 		return nil, err
 	}
 	return id, nil
