@@ -33,7 +33,7 @@ func (d dummyExtractor) TxPacketAck(p udp.TxPacketAck) (ttnpb.UplinkMessage, err
 }
 
 func Example() {
-	conn, err := udp.Listen(":1700", gatewayStore, gatewayStore)
+	conn, err := udp.Listen(":1700", gatewayStore, nil)
 	if err != nil {
 		panic(err)
 	}

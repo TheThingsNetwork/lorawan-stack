@@ -9,11 +9,3 @@ type Validator interface {
 	// ValidDownlink returns true if the downlink request is considered valid.
 	ValidDownlink(packet Packet) bool
 }
-
-type alwaysValid struct{}
-
-func (a alwaysValid) ValidUplink(packet Packet) bool   { return true }
-func (a alwaysValid) ValidDownlink(packet Packet) bool { return true }
-
-// AlwaysValid returns a Validator that considers all packets valid.
-func AlwaysValid() Validator { return alwaysValid{} }

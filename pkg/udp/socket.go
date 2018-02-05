@@ -63,12 +63,12 @@ func (c *Conn) Read() (*Packet, error) {
 
 		switch packet.PacketType {
 		case PullData, TxAck:
-			if !c.validator.ValidDownlink(*packet) {
+			if c.validator != nil && !c.validator.ValidDownlink(*packet) {
 				continue
 			}
 			c.addrStore.SetDownlinkAddress(*packet.GatewayEUI, addr)
 		case PushData:
-			if !c.validator.ValidUplink(*packet) {
+			if c.validator != nil && !c.validator.ValidUplink(*packet) {
 				continue
 			}
 			c.addrStore.SetUplinkAddress(*packet.GatewayEUI, addr)
