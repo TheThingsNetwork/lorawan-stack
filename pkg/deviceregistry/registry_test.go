@@ -44,7 +44,9 @@ func TestRegistry(t *testing.T) {
 		updated = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	}
 	dev.EndDevice = updated
-	if !a.So(dev.Update(store.DiffFields(updated, ed)...), should.BeNil) {
+
+	fields, err := store.DiffFields(updated, ed)
+	if a.So(err, should.BeNil) || !a.So(dev.Update(fields...), should.BeNil) {
 		return
 	}
 
@@ -100,7 +102,9 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 		updated = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	}
 	dev.EndDevice = updated
-	if !a.So(dev.Update(store.DiffFields(updated, ed)...), should.BeNil) {
+
+	fields, err := store.DiffFields(updated, ed)
+	if a.So(err, should.BeNil) || !a.So(dev.Update(fields...), should.BeNil) {
 		return
 	}
 

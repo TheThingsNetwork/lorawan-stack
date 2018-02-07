@@ -138,6 +138,116 @@ func (m *ProtoJSONMarshaler) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+var _ MapMarshaler = CustomMarshaler{}
+var _ MapUnmarshaler = &CustomMarshaler{}
+var _ ByteMapMarshaler = CustomMarshaler{}
+var _ ByteMapUnmarshaler = &CustomMarshaler{}
+
+type CustomMarshaler struct {
+	a uint8
+	b byte
+	c []byte
+}
+
+func (cm CustomMarshaler) MarshalMap() (map[string]interface{}, error) {
+	return map[string]interface{}{
+		"aField": cm.a,
+		"bField": cm.b,
+		"cField": append(cm.c, 'X'),
+	}, nil
+}
+
+func (cm CustomMarshaler) MarshalByteMap() (map[string][]byte, error) {
+	return map[string][]byte{
+		"aField": []byte{cm.a},
+		"bField": []byte{cm.b},
+		"cField": append(cm.c, 'X', 'X'),
+	}, nil
+}
+
+func (cm *CustomMarshaler) UnmarshalMap(m map[string]interface{}) error {
+	*cm = CustomMarshaler{
+		a: m["aField"].(uint8),
+		b: m["bField"].(byte),
+		c: m["cField"].([]byte),
+	}
+	cm.c = cm.c[:len(cm.c)-1]
+	return nil
+}
+
+func (cm *CustomMarshaler) UnmarshalByteMap(m map[string][]byte) error {
+	*cm = CustomMarshaler{
+		a: m["aField"][0],
+		b: m["bField"][0],
+		c: m["cField"],
+	}
+	cm.c = cm.c[:len(cm.c)-2]
+	return nil
+}
+
+type CustomMarshalerAB struct {
+	A *CustomMarshaler
+	B *CustomMarshaler
+}
+
+func (cm CustomMarshalerAB) MarshalMap() (map[string]interface{}, error) {
+	return map[string]interface{}{
+		"A.aField": cm.A.a,
+		"A.bField": cm.A.b,
+		"A.cField": append(cm.A.c, 'X'),
+		"B.aField": cm.B.a,
+		"B.bField": cm.B.b,
+		"B.cField": append(cm.B.c, 'X'),
+	}, nil
+}
+
+func (cm CustomMarshalerAB) MarshalByteMap() (map[string][]byte, error) {
+	return map[string][]byte{
+		"A.aField": []byte{cm.A.a},
+		"A.bField": []byte{cm.A.b},
+		"A.cField": append(cm.A.c, 'X', 'X'),
+		"B.aField": []byte{cm.B.a},
+		"B.bField": []byte{cm.B.b},
+		"B.cField": append(cm.B.c, 'X', 'X'),
+	}, nil
+}
+
+func (cm *CustomMarshalerAB) UnmarshalMap(m map[string]interface{}) error {
+	*cm = CustomMarshalerAB{
+		A: &CustomMarshaler{
+			a: m["A.aField"].(uint8),
+			b: m["A.bField"].(byte),
+			c: m["A.cField"].([]byte),
+		},
+		B: &CustomMarshaler{
+			a: m["B.aField"].(uint8),
+			b: m["B.bField"].(byte),
+			c: m["B.cField"].([]byte),
+		},
+	}
+	cm.A.c = cm.A.c[:len(cm.A.c)-1]
+	cm.B.c = cm.B.c[:len(cm.B.c)-1]
+	return nil
+}
+
+func (cm *CustomMarshalerAB) UnmarshalByteMap(m map[string][]byte) error {
+	*cm = CustomMarshalerAB{
+		A: &CustomMarshaler{
+			a: m["A.aField"][0],
+			b: m["A.bField"][0],
+			c: m["A.cField"],
+		},
+		B: &CustomMarshaler{
+			a: m["B.aField"][0],
+			b: m["B.bField"][0],
+			c: m["B.cField"],
+		},
+	}
+	cm.A.c = cm.A.c[:len(cm.A.c)-2]
+	cm.B.c = cm.B.c[:len(cm.B.c)-2]
+	return nil
+}
+
 var values = []struct {
 	unmarshaled interface{}
 	marshaled   map[string]interface{}
@@ -281,6 +391,55 @@ var values = []struct {
 			"A": mustToBytes(ProtoMarshaler{42}),
 			"B": mustToBytes(JSONMarshaler{42}),
 			"C": mustToBytes(ProtoJSONMarshaler{42}),
+		},
+		nil,
+	},
+	{
+		CustomMarshaler{
+			a: 42,
+			b: 43,
+			c: []byte("foo"),
+		},
+		map[string]interface{}{
+			"aField": uint8(42),
+			"bField": byte(43),
+			"cField": []byte("fooX"),
+		},
+		map[string][]byte{
+			"aField": []byte{42},
+			"bField": []byte{43},
+			"cField": []byte("fooXX"),
+		},
+		nil,
+	},
+	{
+		CustomMarshalerAB{
+			&CustomMarshaler{
+				a: 42,
+				b: 43,
+				c: []byte("foo"),
+			},
+			&CustomMarshaler{
+				a: 4,
+				b: 5,
+				c: []byte("bar"),
+			},
+		},
+		map[string]interface{}{
+			"A.aField": uint8(42),
+			"A.bField": byte(43),
+			"A.cField": []byte("fooX"),
+			"B.aField": uint8(4),
+			"B.bField": byte(5),
+			"B.cField": []byte("barX"),
+		},
+		map[string][]byte{
+			"A.aField": []byte{42},
+			"A.bField": []byte{43},
+			"A.cField": []byte("fooXX"),
+			"B.aField": []byte{4},
+			"B.bField": []byte{5},
+			"B.cField": []byte("barXX"),
 		},
 		nil,
 	},

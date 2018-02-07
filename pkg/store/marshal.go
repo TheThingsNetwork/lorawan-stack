@@ -327,10 +327,12 @@ type ByteMapMarshaler interface {
 //
 // MarshalByteMap traverses map returned by Marshal and converts all values to bytes.
 func MarshalByteMap(v interface{}) (bm map[string][]byte, err error) {
+	if bmm, ok := v.(ByteMapMarshaler); ok {
+		return bmm.MarshalByteMap()
+	}
+
 	var im map[string]interface{}
 	switch v := v.(type) {
-	case ByteMapMarshaler:
-		return v.MarshalByteMap()
 	case MapMarshaler:
 		im, err = v.MarshalMap()
 		if err != nil {

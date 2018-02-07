@@ -29,6 +29,20 @@ func TestUnmarshalMap(t *testing.T) {
 			a.So(pretty.Diff(rv.Elem().Interface(), v.unmarshaled), should.BeEmpty)
 		})
 	}
+	t.Run("interface", func(t *testing.T) {
+		a := assertions.New(t)
+
+		type T struct {
+			A MapUnmarshaler
+		}
+		v := T{}
+		err := UnmarshalMap(map[string]interface{}{
+			"A.A": "foo",
+			"A.B": 42,
+		}, &v)
+		a.So(err, should.NotBeNil)
+		a.So(v, should.Resemble, T{nil})
+	})
 }
 
 func TestUnmarshalByteMap(t *testing.T) {
@@ -46,4 +60,18 @@ func TestUnmarshalByteMap(t *testing.T) {
 			a.So(pretty.Diff(rv.Elem().Interface(), v.unmarshaled), should.BeEmpty)
 		})
 	}
+	t.Run("interface", func(t *testing.T) {
+		a := assertions.New(t)
+
+		type T struct {
+			A MapUnmarshaler
+		}
+		v := T{}
+		err := UnmarshalByteMap(map[string][]byte{
+			"A.A": mustToBytes("foo"),
+			"A.B": mustToBytes(42),
+		}, &v)
+		a.So(err, should.NotBeNil)
+		a.So(v, should.Resemble, T{nil})
+	})
 }
