@@ -59,7 +59,7 @@ func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClien
 // It allows to be called without authorization credentials, in this case it
 // will only return the publicly information available about the client.
 func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*ttnpb.Client, error) {
-	found, err := s.store.Clients.GetByID(req.ClientID, s.config.Factories.Client)
+	found, err := s.store.Clients.GetByID(req.ClientID, s.config.Specializers.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (s *clientService) ListClients(ctx context.Context, _ *pbtypes.Empty) (*ttn
 		return nil, err
 	}
 
-	found, err := s.store.Clients.ListByUser(userID, s.config.Factories.Client)
+	found, err := s.store.Clients.ListByUser(claims.FromContext(ctx).UserID(), s.config.Specializers.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Clients.GetByID(req.Client.ClientID, s.config.Factories.Client)
+		found, err := tx.Clients.GetByID(req.Client.ClientID, s.config.Specializers.Client)
 		if err != nil {
 			return err
 		}
@@ -156,7 +156,7 @@ func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdent
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Clients.GetByID(req.ClientID, s.config.Factories.Client)
+		found, err := tx.Clients.GetByID(req.ClientID, s.config.Specializers.Client)
 		if err != nil {
 			return err
 		}

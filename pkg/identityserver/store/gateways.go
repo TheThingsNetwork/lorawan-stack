@@ -19,9 +19,8 @@ type Gateway interface {
 	SetRadios(radios []ttnpb.GatewayRadio)
 }
 
-// GatewayFactory is a function that returns a Gateway used to construct the
-// results in read operations.
-type GatewayFactory func() Gateway
+// GatewaySpecializer returns a new Gateway with the given base ttnpb.Gateway.
+type GatewaySpecializer func(ttnpb.Gateway) Gateway
 
 // GatewayStore is a store that holds Gateways.
 type GatewayStore interface {
@@ -29,10 +28,11 @@ type GatewayStore interface {
 	Create(gtw Gateway) error
 
 	// GetByID finds a gateway by ID and retrieves it.
-	GetByID(gtwID string, factory GatewayFactory) (Gateway, error)
+	GetByID(gtwID string, specializer GatewaySpecializer) (Gateway, error)
 
-	// ListByUser returns all the gateways to which an user is collaborator.
-	ListByUser(userID string, factory GatewayFactory) ([]Gateway, error)
+	// ListByOrganizationOrUser returns all the gateways to which an organization
+	// or user is collaborator of.
+	ListByOrganizationOrUser(id string, specializer GatewaySpecializer) ([]Gateway, error)
 
 	// Update updates the gateway.
 	Update(gtw Gateway) error

@@ -62,26 +62,23 @@ func (s *ApplicationStore) create(q db.QueryContext, application store.Applicati
 }
 
 // GetByID finds the application by ID and retrieves it.
-func (s *ApplicationStore) GetByID(appID string, factory store.ApplicationFactory) (store.Application, error) {
-	result := factory()
-
-	err := s.transact(func(tx *db.Tx) error {
-		err := s.getByID(tx, appID, result)
+func (s *ApplicationStore) GetByID(appID string, specializer store.ApplicationSpecializer) (result store.Application, err error) {
+	err = s.transact(func(tx *db.Tx) error {
+		application, err := s.getByID(tx, appID)
 		if err != nil {
 			return err
 		}
 
+		result = specializer(*application)
+
 		return s.loadAttributes(tx, appID, result)
 	}, db.ReadOnly(true))
 
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return
 }
 
-func (s *ApplicationStore) getByID(q db.QueryContext, appID string, result store.Application) error {
+func (s *ApplicationStore) getByID(q db.QueryContext, appID string) (*ttnpb.Application, error) {
+	result := new(ttnpb.Application)
 	err := q.SelectOne(
 		result,
 		`SELECT *
@@ -89,16 +86,19 @@ func (s *ApplicationStore) getByID(q db.QueryContext, appID string, result store
 			WHERE application_id = $1`,
 		appID)
 	if db.IsNoRows(err) {
-		return ErrApplicationNotFound.New(errors.Attributes{
+		return nil, ErrApplicationNotFound.New(errors.Attributes{
 			"application_id": appID,
 		})
 	}
-
-	return err
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
-// FindByUser returns the Applications to which an User is a collaborator.
-func (s *ApplicationStore) ListByUser(userID string, factory store.ApplicationFactory) ([]store.Application, error) {
+// ListByOrganizationOrUser returns the applications to which an organization or
+// user if collaborator of.
+func (s *ApplicationStore) ListByOrganizationOrUser(id string, specializer store.ApplicationSpecializer) ([]store.Application, error) {
 	var result []store.Application
 
 	err := s.transact(func(tx *db.Tx) error {
@@ -108,8 +108,7 @@ func (s *ApplicationStore) ListByUser(userID string, factory store.ApplicationFa
 		}
 
 		for _, application := range applications {
-			app := factory()
-			*(app.GetApplication()) = application
+			app := specializer(application)
 
 			err := s.loadAttributes(tx, app.GetApplication().ApplicationID, app)
 			if err != nil {
@@ -129,8 +128,8 @@ func (s *ApplicationStore) ListByUser(userID string, factory store.ApplicationFa
 	return result, nil
 }
 
-func (s *ApplicationStore) userApplications(q db.QueryContext, userID string) ([]ttnpb.Application, error) {
-	var applications []ttnpb.Application
+func (s *ApplicationStore) userApplications(q db.QueryContext, userID string) ([]*ttnpb.Application, error) {
+	var applications []*ttnpb.Application
 	err := q.Select(
 		&applications,
 		`SELECT DISTINCT applications.*
@@ -145,10 +144,6 @@ func (s *ApplicationStore) userApplications(q db.QueryContext, userID string) ([
 
 	if err != nil {
 		return nil, err
-	}
-
-	if len(applications) == 0 {
-		return make([]ttnpb.Application, 0), nil
 	}
 
 	return applications, nil

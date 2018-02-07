@@ -186,14 +186,14 @@ func (s *GatewayStore) addRadiosQuery(gtwID string, radios []ttnpb.GatewayRadio)
 }
 
 // GetByID finds a gateway by ID and retrieves it.
-func (s *GatewayStore) GetByID(gtwID string, factory store.GatewayFactory) (store.Gateway, error) {
-	result := factory()
-
-	err := s.transact(func(tx *db.Tx) error {
-		err := s.gateway(tx, gtwID, result)
+func (s *GatewayStore) GetByID(gtwID string, factory store.GatewaySpecializer) (result store.Gateway, err error) {
+	err = s.transact(func(tx *db.Tx) error {
+		gateway, err := s.gateway(tx, gtwID)
 		if err != nil {
 			return err
 		}
+
+		result = factory(*gateway)
 
 		attributes, err := s.listAttributes(tx, gtwID)
 		if err != nil {
@@ -216,16 +216,13 @@ func (s *GatewayStore) GetByID(gtwID string, factory store.GatewayFactory) (stor
 		return s.loadAttributes(tx, gtwID, result)
 	})
 
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return
 }
 
 // gateway fetchs a gateway from the database without antennas and attributes and
 // saves it into result.
-func (s *GatewayStore) gateway(q db.QueryContext, gtwID string, result store.Gateway) error {
+func (s *GatewayStore) gateway(q db.QueryContext, gtwID string) (*ttnpb.Gateway, error) {
+	result := new(ttnpb.Gateway)
 	err := q.SelectOne(
 		result,
 		`SELECT *
@@ -233,15 +230,19 @@ func (s *GatewayStore) gateway(q db.QueryContext, gtwID string, result store.Gat
 				WHERE gateway_id = $1`,
 		gtwID)
 	if db.IsNoRows(err) {
-		return ErrGatewayNotFound.New(errors.Attributes{
+		return nil, ErrGatewayNotFound.New(errors.Attributes{
 			"gateway_id": gtwID,
 		})
 	}
-	return err
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
-// FindByUser returns the Gateways to which an User is a collaborator.
-func (s *GatewayStore) ListByUser(userID string, factory store.GatewayFactory) ([]store.Gateway, error) {
+// ListByOrganizationOrUser returns all the gateways to which an organization
+// or user is collaborator of.
+func (s *GatewayStore) ListByOrganizationOrUser(id string, specializer store.GatewaySpecializer) ([]store.Gateway, error) {
 	var result []store.Gateway
 
 	err := s.transact(func(tx *db.Tx) error {
@@ -251,8 +252,7 @@ func (s *GatewayStore) ListByUser(userID string, factory store.GatewayFactory) (
 		}
 
 		for _, gateway := range gateways {
-			gtw := factory()
-			*(gtw.GetGateway()) = gateway
+			gtw := specializer(gateway)
 
 			gtwID := gtw.GetGateway().GatewayID
 
@@ -292,8 +292,8 @@ func (s *GatewayStore) ListByUser(userID string, factory store.GatewayFactory) (
 	return result, nil
 }
 
-func (s *GatewayStore) userGateways(q db.QueryContext, userID string) ([]ttnpb.Gateway, error) {
-	var gateways []ttnpb.Gateway
+func (s *GatewayStore) userGateways(q db.QueryContext, userID string) ([]*ttnpb.Gateway, error) {
+	var gateways []*ttnpb.Gateway
 	err := q.Select(
 		&gateways,
 		`SELECT DISTINCT gateways.*
@@ -308,10 +308,6 @@ func (s *GatewayStore) userGateways(q db.QueryContext, userID string) ([]ttnpb.G
 
 	if err != nil {
 		return nil, err
-	}
-
-	if len(gateways) == 0 {
-		return make([]ttnpb.Gateway, 0), nil
 	}
 
 	return gateways, nil

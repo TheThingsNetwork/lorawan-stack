@@ -32,9 +32,8 @@ type User interface {
 	GetUser() *ttnpb.User
 }
 
-// UserFactory is a function that returns a User used to
-// construct the results in read operations.
-type UserFactory func() User
+// UserSpecializer returns a new User with the given base ttnpb.User.
+type UserSpecializer func(ttnpb.User) User
 
 // UserStore is a store that holds Users.
 type UserStore interface {
@@ -42,13 +41,13 @@ type UserStore interface {
 	Create(user User) error
 
 	// GetByID finds the user by ID and retrieves it.
-	GetByID(userID string, factory UserFactory) (User, error)
+	GetByID(userID string, specializer UserSpecializer) (User, error)
 
 	// GetByEmail finds the user by email address and retrieves it.
-	GetByEmail(email string, factory UserFactory) (User, error)
+	GetByEmail(email string, specializer UserSpecializer) (User, error)
 
 	// List returns all the users.
-	List(factory UserFactory) ([]User, error)
+	List(specializer UserSpecializer) ([]User, error)
 
 	// Update updates an user.
 	Update(user User) error

@@ -91,25 +91,22 @@ func (s *ClientStore) create(q db.QueryContext, client store.Client) error {
 }
 
 // GetByID finds a client by ID and retrieves it.
-func (s *ClientStore) GetByID(clientID string, factory store.ClientFactory) (store.Client, error) {
-	result := factory()
-	err := s.transact(func(tx *db.Tx) error {
-		err := s.getByID(tx, clientID, result)
+func (s *ClientStore) GetByID(clientID string, factory store.ClientSpecializer) (result store.Client, err error) {
+	err = s.transact(func(tx *db.Tx) error {
+		client, err := s.getByID(tx, clientID)
 		if err != nil {
 			return err
 		}
 
+		result = factory(*client)
+
 		return s.loadAttributes(tx, clientID, result)
 	})
 
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return
 }
 
-func (s *ClientStore) getByID(q db.QueryContext, clientID string, result store.Client) error {
+func (s *ClientStore) getByID(q db.QueryContext, clientID string) (*ttnpb.Client, error) {
 	var res struct {
 		*ttnpb.Client
 		CreatorID       string
@@ -135,25 +132,24 @@ func (s *ClientStore) getByID(q db.QueryContext, clientID string, result store.C
 			WHERE client_id = $1`,
 		clientID)
 	if db.IsNoRows(err) {
-		return ErrClientNotFound.New(errors.Attributes{
+		return nil, ErrClientNotFound.New(errors.Attributes{
 			"client_id": clientID,
 		})
 	}
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	res.RightsConverted.SetInto(&res.Client.Rights)
 	res.GrantsConverted.SetInto(&res.Client.Grants)
-	*(result.GetClient()) = *res.Client
-	result.GetClient().Creator.UserID = res.CreatorID
+	res.Client.Creator.UserID = res.CreatorID
 
-	return nil
+	return res.Client, nil
 }
 
 // List returns all the clients.
-func (s *ClientStore) List(factory store.ClientFactory) ([]store.Client, error) {
+func (s *ClientStore) List(factory store.ClientSpecializer) ([]store.Client, error) {
 	var res []store.Client
 	err := s.transact(func(tx *db.Tx) error {
 		found, err := s.list(tx)
@@ -164,9 +160,7 @@ func (s *ClientStore) List(factory store.ClientFactory) ([]store.Client, error) 
 		res = make([]store.Client, 0, len(found))
 
 		for _, client := range found {
-			cli := factory()
-
-			*(cli.GetClient()) = *client
+			cli := factory(client)
 
 			err := s.loadAttributes(tx, client.ClientID, cli)
 			if err != nil {
@@ -184,9 +178,9 @@ func (s *ClientStore) List(factory store.ClientFactory) ([]store.Client, error) 
 	return res, nil
 }
 
-func (s *ClientStore) list(q db.QueryContext) ([]*ttnpb.Client, error) {
+func (s *ClientStore) list(q db.QueryContext) ([]ttnpb.Client, error) {
 	var res []struct {
-		*ttnpb.Client
+		ttnpb.Client
 		CreatorID       string
 		GrantsConverted db.Int32Slice
 		RightsConverted db.Int32Slice
@@ -210,7 +204,7 @@ func (s *ClientStore) list(q db.QueryContext) ([]*ttnpb.Client, error) {
 		return nil, err
 	}
 
-	clients := make([]*ttnpb.Client, 0, len(res))
+	clients := make([]ttnpb.Client, 0, len(res))
 	for _, client := range res {
 		client.RightsConverted.SetInto(&client.Client.Rights)
 		client.GrantsConverted.SetInto(&client.Client.Grants)
@@ -223,7 +217,7 @@ func (s *ClientStore) list(q db.QueryContext) ([]*ttnpb.Client, error) {
 }
 
 // ListByUser returns all the clients created by the client.
-func (s *ClientStore) ListByUser(userID string, factory store.ClientFactory) ([]store.Client, error) {
+func (s *ClientStore) ListByUser(userID string, factory store.ClientSpecializer) ([]store.Client, error) {
 	var result []store.Client
 
 	err := s.transact(func(tx *db.Tx) error {
@@ -233,8 +227,7 @@ func (s *ClientStore) ListByUser(userID string, factory store.ClientFactory) ([]
 		}
 
 		for _, client := range clients {
-			cli := factory()
-			*(cli.GetClient()) = *client
+			cli := factory(client)
 
 			err := s.loadAttributes(tx, cli.GetClient().ClientID, cli)
 			if err != nil {
@@ -254,12 +247,12 @@ func (s *ClientStore) ListByUser(userID string, factory store.ClientFactory) ([]
 	return result, nil
 }
 
-func (s *ClientStore) userClients(q db.QueryContext, userID string) ([]*ttnpb.Client, error) {
+func (s *ClientStore) userClients(q db.QueryContext, userID string) ([]ttnpb.Client, error) {
 	var clients []struct {
 		CreatorID       string
 		GrantsConverted db.Int32Slice
 		RightsConverted db.Int32Slice
-		*ttnpb.Client
+		ttnpb.Client
 	}
 	err := q.Select(
 		&clients,
@@ -284,10 +277,10 @@ func (s *ClientStore) userClients(q db.QueryContext, userID string) ([]*ttnpb.Cl
 	}
 
 	if len(clients) == 0 {
-		return make([]*ttnpb.Client, 0), nil
+		return make([]ttnpb.Client, 0), nil
 	}
 
-	res := make([]*ttnpb.Client, 0, len(clients))
+	res := make([]ttnpb.Client, 0, len(clients))
 	for _, client := range clients {
 		client.RightsConverted.SetInto(&client.Client.Rights)
 		client.GrantsConverted.SetInto(&client.Client.Grants)

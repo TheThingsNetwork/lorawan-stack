@@ -44,7 +44,7 @@ func TestOAuthAuthorizationCode(t *testing.T) {
 	a.So(found.RedirectURI, should.Equal, data.RedirectURI)
 	a.So(found.State, should.Equal, data.State)
 
-	c, err := s.Clients.GetByID(found.ClientID, clientFactory)
+	c, err := s.Clients.GetByID(found.ClientID, clientSpecializer)
 	a.So(err, should.BeNil)
 	a.So(c, test.ShouldBeClientIgnoringAutoFields, client)
 
@@ -85,7 +85,7 @@ func TestOAuthAccessToken(t *testing.T) {
 	a.So(found.RedirectURI, should.Equal, data.RedirectURI)
 	a.So(found.ExpiresIn, should.Equal, data.ExpiresIn)
 
-	c, err := s.Clients.GetByID(found.ClientID, clientFactory)
+	c, err := s.Clients.GetByID(found.ClientID, clientSpecializer)
 	a.So(err, should.BeNil)
 	a.So(c, test.ShouldBeClientIgnoringAutoFields, client)
 
@@ -124,7 +124,7 @@ func TestOAuthRefreshToken(t *testing.T) {
 	a.So(found.Scope, should.Equal, data.Scope)
 	a.So(found.RedirectURI, should.Equal, data.RedirectURI)
 
-	c, err := s.Clients.GetByID(found.ClientID, clientFactory)
+	c, err := s.Clients.GetByID(found.ClientID, clientSpecializer)
 	a.So(err, should.BeNil)
 	a.So(c, test.ShouldBeClientIgnoringAutoFields, client)
 
@@ -167,7 +167,7 @@ func TestOAuthAuthorizedClients(t *testing.T) {
 	err = s.OAuth.SaveRefreshToken(refreshData)
 	a.So(err, should.BeNil)
 
-	found, err := s.OAuth.ListAuthorizedClients(userID, clientFactory)
+	found, err := s.OAuth.ListAuthorizedClients(userID, clientSpecializer)
 	a.So(err, should.BeNil)
 	if a.So(found, should.HaveLength, 1) {
 		a.So(found[0], test.ShouldBeClientIgnoringAutoFields, client)

@@ -302,7 +302,7 @@ func (s *OAuthStore) deleteRefreshTokensByClient(q db.QueryContext, clientID str
 	return err
 }
 
-func (s *OAuthStore) ListAuthorizedClients(userID string, factory store.ClientFactory) ([]store.Client, error) {
+func (s *OAuthStore) ListAuthorizedClients(userID string, factory store.ClientSpecializer) ([]store.Client, error) {
 	var result []store.Client
 
 	err := s.transact(func(tx *db.Tx) error {
@@ -312,12 +312,12 @@ func (s *OAuthStore) ListAuthorizedClients(userID string, factory store.ClientFa
 		}
 
 		for _, clientID := range clientIDs {
-			client := factory()
-
-			err := (s.store().Clients.(*ClientStore)).getByID(tx, clientID, client)
+			found, err := (s.store().Clients.(*ClientStore)).getByID(tx, clientID)
 			if err != nil {
 				return err
 			}
+
+			client := factory(*found)
 
 			err = (s.store().Clients.(*ClientStore)).loadAttributes(tx, clientID, client)
 			if err != nil {

@@ -24,7 +24,7 @@ var (
 		OrganizationName: "The Things Network",
 		PublicURL:        "https://www.thethingsnetwork.org",
 		DefaultSettings:  testSettings(),
-		Factories:        DefaultFactories,
+		Specializers:     DefaultSpecializers,
 	}
 	testIS      *IdentityServer
 	accessToken string

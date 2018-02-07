@@ -37,8 +37,8 @@ type Config struct {
 	// defaultSettings are the default settings within the tenant loaded in the storewhen it first-time initialized.
 	DefaultSettings *ttnpb.IdentityServerSettings `name:"default-settings" description:"Default settings that are loaded when the is first starts"`
 
-	// Factories are the factories used in the identity server
-	Factories Factories `name:"-"`
+	// Specializers are the specializers used in the Identity Server.
+	Specializers Specializers `name:"-"`
 
 	// Hostname denotes the Identity Server hostname. It is used as issuer when
 	// generating access tokens and API keys.
@@ -61,12 +61,13 @@ type IdentityServer struct {
 	*adminService
 }
 
-// Factories are the factories to be used in the identity server.
-type Factories struct {
-	User        store.UserFactory
-	Application store.ApplicationFactory
-	Gateway     store.GatewayFactory
-	Client      store.ClientFactory
+// Specializers are the specializers to be used in the Identity Server.
+type Specializers struct {
+	User         store.UserSpecializer
+	Application  store.ApplicationSpecializer
+	Gateway      store.GatewaySpecializer
+	Client       store.ClientSpecializer
+	Organization store.OrganizationSpecializer
 }
 
 // New returns a new IdentityServer.

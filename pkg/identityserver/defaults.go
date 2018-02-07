@@ -54,9 +54,10 @@ var DefaultSettings = &ttnpb.IdentityServerSettings{
 	InvitationTokenTTL: time.Hour * time.Duration(24*7),
 }
 
-var DefaultFactories = Factories{
-	User:        func() store.User { return &ttnpb.User{} },
-	Application: func() store.Application { return &ttnpb.Application{} },
-	Gateway:     func() store.Gateway { return &ttnpb.Gateway{} },
-	Client:      func() store.Client { return &ttnpb.Client{} },
+var DefaultSpecializers = Specializers{
+	User:         func(base ttnpb.User) store.User { return &base },
+	Application:  func(base ttnpb.Application) store.Application { return &base },
+	Gateway:      func(base ttnpb.Gateway) store.Gateway { return &base },
+	Client:       func(base ttnpb.Client) store.Client { return &base },
+	Organization: func(base ttnpb.Organization) store.Organization { return &base },
 }

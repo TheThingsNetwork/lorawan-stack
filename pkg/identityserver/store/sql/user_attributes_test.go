@@ -13,8 +13,8 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-var userWithFooFactory = func() store.User {
-	return &userWithFoo{}
+var userWithFooSpecializer = func(base ttnpb.User) store.User {
+	return &userWithFoo{User: &base}
 }
 
 // userWithFoo implements both store.User and store.Attributer interfaces.
@@ -92,7 +92,7 @@ func TestUserAttributer(t *testing.T) {
 	err = s.Users.Create(withFoo)
 	a.So(err, should.BeNil)
 
-	found, err := s.Users.GetByID(withFoo.GetUser().UserID, userWithFooFactory)
+	found, err := s.Users.GetByID(withFoo.GetUser().UserID, userWithFooSpecializer)
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeUserIgnoringAutoFields, withFoo)
 }

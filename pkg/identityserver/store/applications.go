@@ -12,9 +12,8 @@ type Application interface {
 	GetApplication() *ttnpb.Application
 }
 
-// ApplicationFactory is a function that returns a Application used to construct
-// the results in read operations.
-type ApplicationFactory func() Application
+// ApplicationSpecializer returns a new Application with the given base ttnpb.Application.
+type ApplicationSpecializer func(ttnpb.Application) Application
 
 // ApplicationStore is a store that holds Applications.
 type ApplicationStore interface {
@@ -22,10 +21,11 @@ type ApplicationStore interface {
 	Create(app Application) error
 
 	// GetByID finds the application by ID and retrieves it.
-	GetByID(appID string, factory ApplicationFactory) (Application, error)
+	GetByID(appID string, specializer ApplicationSpecializer) (Application, error)
 
-	// ListByUser returns the applications to which an user is a collaborator.
-	ListByUser(appID string, factory ApplicationFactory) ([]Application, error)
+	// ListByOrganizationOrUser returns the applications to which an organization
+	// or user if collaborator of.
+	ListByOrganizationOrUser(id string, specializer ApplicationSpecializer) ([]Application, error)
 
 	// Update updates the application.
 	Update(app Application) error

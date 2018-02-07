@@ -14,8 +14,8 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-var userFactory = func() store.User {
-	return &ttnpb.User{}
+var userSpecializer = func(base ttnpb.User) store.User {
+	return &base
 }
 
 func testUsers() map[string]*ttnpb.User {
@@ -56,7 +56,7 @@ func TestUserTx(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	found, err := s.Users.GetByID(john.UserID, userFactory)
+	found, err := s.Users.GetByID(john.UserID, userSpecializer)
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeUserIgnoringAutoFields, john)
 
@@ -82,7 +82,7 @@ func TestUserList(t *testing.T) {
 
 	// TODO(gomezjdaniel): correct result is 3 instead of 4 as the example user
 	// attributer wasn't deleted it.
-	found, err := s.Users.List(userFactory)
+	found, err := s.Users.List(userSpecializer)
 	a.So(err, should.BeNil)
 	a.So(found, should.HaveLength, 4)
 }
@@ -96,14 +96,14 @@ func TestUserGet(t *testing.T) {
 
 	// Find by email
 	{
-		found, err := s.Users.GetByEmail(alice.Email, userFactory)
+		found, err := s.Users.GetByEmail(alice.Email, userSpecializer)
 		a.So(err, should.BeNil)
 		a.So(found, test.ShouldBeUserIgnoringAutoFields, alice)
 	}
 
 	// Find by user ID
 	{
-		found, err := s.Users.GetByID(bob.UserID, userFactory)
+		found, err := s.Users.GetByID(bob.UserID, userSpecializer)
 		a.So(err, should.BeNil)
 		a.So(found, test.ShouldBeUserIgnoringAutoFields, bob)
 	}
@@ -122,7 +122,7 @@ func TestUserUpdate(t *testing.T) {
 		err := s.Users.Update(alice)
 		a.So(err, should.BeNil)
 
-		updated, err := s.Users.GetByID(alice.UserID, userFactory)
+		updated, err := s.Users.GetByID(alice.UserID, userSpecializer)
 		a.So(err, should.BeNil)
 		a.So(updated, test.ShouldBeUserIgnoringAutoFields, alice)
 	}
@@ -266,7 +266,7 @@ func TestUserDelete(t *testing.T) {
 	err = s.Users.Delete(id)
 	a.So(err, should.BeNil)
 
-	found, err := s.Users.GetByID(id, userFactory)
+	found, err := s.Users.GetByID(id, userSpecializer)
 	a.So(err, should.NotBeNil)
 	a.So(ErrUserNotFound.Describes(err), should.BeTrue)
 	a.So(found, should.BeNil)

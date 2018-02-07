@@ -12,8 +12,8 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-var clientFactory = func() store.Client {
-	return &ttnpb.Client{}
+var clientSpecializer = func(base ttnpb.Client) store.Client {
+	return &base
 }
 
 func testClients() map[string]*ttnpb.Client {
@@ -58,10 +58,10 @@ func testClientCreate(t testing.TB, s *Store) {
 func TestClientList(t *testing.T) {
 	s := testStore(t, database)
 
-	clients, err := s.Clients.List(clientFactory)
+	clients, err := s.Clients.List(clientSpecializer)
 	testClientList(t, clients, err)
 
-	clients, err = s.Clients.ListByUser(testUsers()["bob"].UserID, clientFactory)
+	clients, err = s.Clients.ListByUser(testUsers()["bob"].UserID, clientSpecializer)
 	testClientList(t, clients, err)
 }
 
@@ -94,7 +94,7 @@ func TestClientUpdate(t *testing.T) {
 	err := s.Clients.Update(client)
 	a.So(err, should.BeNil)
 
-	found, err := s.Clients.GetByID(client.ClientID, clientFactory)
+	found, err := s.Clients.GetByID(client.ClientID, clientSpecializer)
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeClientIgnoringAutoFields, client)
 }
@@ -111,7 +111,7 @@ func TestClientDelete(t *testing.T) {
 	err := s.Clients.Delete(clientID)
 	a.So(err, should.BeNil)
 
-	found, err := s.Clients.GetByID(clientID, clientFactory)
+	found, err := s.Clients.GetByID(clientID, clientSpecializer)
 	a.So(err, should.NotBeNil)
 	a.So(ErrClientNotFound.Describes(err), should.BeTrue)
 	a.So(found, should.BeNil)

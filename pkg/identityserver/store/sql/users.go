@@ -76,26 +76,23 @@ func (s *UserStore) create(q db.QueryContext, user store.User) error {
 }
 
 // GetByID finds the user by ID and returns it.
-func (s *UserStore) GetByID(userID string, factory store.UserFactory) (store.User, error) {
-	result := factory()
-
-	err := s.transact(func(tx *db.Tx) error {
-		err := s.getByID(tx, userID, result)
+func (s *UserStore) GetByID(userID string, factory store.UserSpecializer) (result store.User, err error) {
+	err = s.transact(func(tx *db.Tx) error {
+		user, err := s.getByID(tx, userID)
 		if err != nil {
 			return err
 		}
 
+		result = factory(*user)
+
 		return s.loadAttributes(tx, result.GetUser().UserID, result)
 	})
 
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return
 }
 
-func (s *UserStore) getByID(q db.QueryContext, userID string, result store.User) error {
+func (s *UserStore) getByID(q db.QueryContext, userID string) (*ttnpb.User, error) {
+	result := new(ttnpb.User)
 	err := q.SelectOne(
 		result,
 		`SELECT *
@@ -103,34 +100,34 @@ func (s *UserStore) getByID(q db.QueryContext, userID string, result store.User)
 			WHERE user_id = lower($1)`,
 		userID)
 	if db.IsNoRows(err) {
-		return ErrUserNotFound.New(errors.Attributes{
+		return nil, ErrUserNotFound.New(errors.Attributes{
 			"user_id": userID,
 		})
 	}
-	return err
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // GetByEmail finds the user by email address and returns it.
-func (s *UserStore) GetByEmail(email string, factory store.UserFactory) (store.User, error) {
-	result := factory()
-
-	err := s.transact(func(tx *db.Tx) error {
-		err := s.getByEmail(tx, email, result)
+func (s *UserStore) GetByEmail(email string, factory store.UserSpecializer) (result store.User, err error) {
+	err = s.transact(func(tx *db.Tx) error {
+		user, err := s.getByEmail(tx, email)
 		if err != nil {
 			return err
 		}
 
+		result = factory(*user)
+
 		return s.loadAttributes(tx, result.GetUser().UserID, result)
 	})
 
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return
 }
 
-func (s *UserStore) getByEmail(q db.QueryContext, email string, result store.User) error {
+func (s *UserStore) getByEmail(q db.QueryContext, email string) (*ttnpb.User, error) {
+	result := new(ttnpb.User)
 	err := q.SelectOne(
 		result,
 		`SELECT *
@@ -138,15 +135,18 @@ func (s *UserStore) getByEmail(q db.QueryContext, email string, result store.Use
 			WHERE email = lower($1)`,
 		email)
 	if db.IsNoRows(err) {
-		return ErrUserEmailNotFound.New(errors.Attributes{
+		return nil, ErrUserEmailNotFound.New(errors.Attributes{
 			"email": email,
 		})
 	}
-	return err
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // List returns all the users.
-func (s *UserStore) List(factory store.UserFactory) ([]store.User, error) {
+func (s *UserStore) List(factory store.UserSpecializer) ([]store.User, error) {
 	var res []store.User
 	err := s.transact(func(tx *db.Tx) error {
 		found, err := s.list(tx)
@@ -157,9 +157,7 @@ func (s *UserStore) List(factory store.UserFactory) ([]store.User, error) {
 		res = make([]store.User, 0, len(found))
 
 		for _, user := range found {
-			u := factory()
-
-			*(u.GetUser()) = *user
+			u := factory(*user)
 
 			err := s.loadAttributes(tx, user.UserID, u)
 			if err != nil {

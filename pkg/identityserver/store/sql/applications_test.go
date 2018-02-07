@@ -12,9 +12,8 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-var applicationFactory = func() store.Application {
-	return &ttnpb.Application{}
-
+var applicationSpecializer = func(base ttnpb.Application) store.Application {
+	return &base
 }
 
 func testApplications() map[string]*ttnpb.Application {
@@ -100,7 +99,7 @@ func TestApplicationRetrieve(t *testing.T) {
 
 	app := testApplications()["demo-app"]
 
-	found, err := s.Applications.GetByID(app.ApplicationID, applicationFactory)
+	found, err := s.Applications.GetByID(app.ApplicationID, applicationSpecializer)
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeApplicationIgnoringAutoFields, app)
 }
@@ -172,7 +171,7 @@ func TestApplicationCollaborators(t *testing.T) {
 
 	// fetch applications where Alice is collaborator
 	{
-		apps, err := s.Applications.ListByUser(user.UserID, applicationFactory)
+		apps, err := s.Applications.ListByOrganizationOrUser(user.UserID, applicationSpecializer)
 		a.So(err, should.BeNil)
 		if a.So(apps, should.HaveLength, 1) {
 			a.So(apps[0].GetApplication().ApplicationID, should.Equal, app.ApplicationID)
@@ -223,7 +222,7 @@ func TestApplicationUpdate(t *testing.T) {
 	err := s.Applications.Update(app)
 	a.So(err, should.BeNil)
 
-	found, err := s.Applications.GetByID(app.ApplicationID, applicationFactory)
+	found, err := s.Applications.GetByID(app.ApplicationID, applicationSpecializer)
 	a.So(err, should.BeNil)
 	a.So(found.GetApplication().Description, should.Equal, app.Description)
 }
@@ -240,7 +239,7 @@ func TestApplicationDelete(t *testing.T) {
 	err := s.Applications.Delete(appID)
 	a.So(err, should.BeNil)
 
-	found, err := s.Applications.GetByID(appID, applicationFactory)
+	found, err := s.Applications.GetByID(appID, applicationSpecializer)
 	a.So(err, should.NotBeNil)
 	a.So(ErrApplicationNotFound.Describes(err), should.BeTrue)
 	a.So(found, should.BeNil)

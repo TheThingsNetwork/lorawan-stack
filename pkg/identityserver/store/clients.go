@@ -17,9 +17,8 @@ type Client interface {
 	GetClient() *ttnpb.Client
 }
 
-// ClientFactory is a function that returns a Client used to construct the results
-// in read operations.
-type ClientFactory func() Client
+// ClientSpecializer returns a new Client with the given base ttnpb.Client.
+type ClientSpecializer func(ttnpb.Client) Client
 
 // ClientStore is a store that holds authorized third party Clients.
 type ClientStore interface {
@@ -27,13 +26,13 @@ type ClientStore interface {
 	Create(client Client) error
 
 	// GetByID finds a client by ID and retrieves it.
-	GetByID(clientID string, factory ClientFactory) (Client, error)
+	GetByID(clientID string, specializer ClientSpecializer) (Client, error)
 
 	// List list all the clients.
-	List(factory ClientFactory) ([]Client, error)
+	List(specializer ClientSpecializer) ([]Client, error)
 
 	// ListByUser returns all the clients created by the user.
-	ListByUser(userID string, factory ClientFactory) ([]Client, error)
+	ListByUser(userID string, specializer ClientSpecializer) ([]Client, error)
 
 	// Update updates the client.
 	Update(client Client) error
