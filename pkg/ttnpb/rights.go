@@ -22,6 +22,8 @@ var AllUserRights = []Right{
 	RIGHT_USER_CLIENTS,
 	RIGHT_USER_ADMIN,
 	RIGHT_USER_KEYS,
+	RIGHT_USER_ORGANIZATIONS_CREATE,
+	RIGHT_USER_ORGANIZATIONS_LIST,
 }
 
 // AllApplicationRights is the set that contains all the rights that are to applications.
@@ -47,6 +49,19 @@ var AllGatewayRights = []Right{
 	RIGHT_GATEWAY_TRAFFIC,
 	RIGHT_GATEWAY_STATUS,
 	RIGHT_GATEWAY_LOCATION,
+}
+
+// AllOrganizationRights is the set that contains all the rights that are to organizations.
+var AllOrganizationRights = []Right{
+	RIGHT_ORGANIZATION_INFO,
+	RIGHT_ORGANIZATION_SETTINGS_BASIC,
+	RIGHT_ORGANIZATION_SETTINGS_KEYS,
+	RIGHT_ORGANIZATION_SETTINGS_MEMBERS,
+	RIGHT_ORGANIZATION_DELETE,
+	RIGHT_ORGANIZATION_APPLICATIONS_CREATE,
+	RIGHT_ORGANIZATION_APPLICATIONS_LIST,
+	RIGHT_ORGANIZATION_GATEWAYS_CREATE,
+	RIGHT_ORGANIZATION_GATEWAYS_LIST,
 }
 
 // ParseRight parses the string specified into a Right.
