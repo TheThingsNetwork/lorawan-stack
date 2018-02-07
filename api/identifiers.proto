@@ -48,3 +48,18 @@ message ClientIdentifier {
   // TTN Client ID.
   string client_id = 1 [(gogoproto.customname) = "ClientID", (gogoproto.jsontag) = "client_id"];
 }
+
+// OrganizationIdentifier is the message that is used to identify an organization.
+message OrganizationIdentifier {
+  // TTN Organization ID.
+  string organization_id = 1 [(gogoproto.customname) = "OrganizationID", (gogoproto.jsontag) = "organization_id"];
+}
+
+// OrganizationOrUserIdentifier is the message used in collaborationship messages
+// used to identify the persona entity.
+message OrganizationOrUserIdentifier {
+  oneof ID {
+    string user_id = 1 [(gogoproto.customname) = "UserID", (gogoproto.jsontag) = "user_id"];
+    string organization_id = 2 [(gogoproto.customname) = "OrganizationID", (gogoproto.jsontag) = "organization_id"];
+  }
+}

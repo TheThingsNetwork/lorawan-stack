@@ -48,7 +48,7 @@ func TestApplication(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeApplicationIgnoringAutoFields, app)
 
-	apps, err := is.applicationService.ListApplications(ctx, &pbtypes.Empty{})
+	apps, err := is.applicationService.ListApplications(ctx, &ttnpb.ListApplicationsRequest{})
 	a.So(err, should.BeNil)
 	if a.So(apps.Applications, should.HaveLength, 1) {
 		a.So(apps.Applications[0], test.ShouldBeApplicationIgnoringAutoFields, app)

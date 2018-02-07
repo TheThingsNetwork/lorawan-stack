@@ -54,6 +54,13 @@ enum Right {
   // RIGHT_USER_KEYS is the right to view and manage user API keys.
   RIGHT_USER_KEYS = 11;
 
+  // RIGHT_USER_ORGANIZATIONS_CREATE is the right to create a new organization.
+  RIGHT_USER_ORGANIZATIONS_CREATE = 17;
+
+  // RIGHT_USER_ORGANIZATIONS_LIST is the right to list all of the organizations
+  // the user is a member of.
+  RIGHT_USER_ORGANIZATIONS_LIST = 18;
+
 
   // RIGHT_APPLICATION_INFO is the right to see basic information about the application.
   // This does not include API keys.
@@ -113,4 +120,40 @@ enum Right {
 
   // RIGHT_GATEWAY_LOCATION is the right to view the location of the gateway.
   RIGHT_GATEWAY_LOCATION = 58;
+
+
+  // RIGHT_ORGANIZATION_INFO is the right to view the basic information about an
+  // organization.
+  RIGHT_ORGANIZATION_INFO = 71;
+
+  // RIGHT_ORGANIZATION_SETTINGS_BASIC is the right to manage basic settings of
+  // the organization.
+  RIGHT_ORGANIZATION_SETTINGS_BASIC = 72;
+
+  // RIGHT_ORGANIZATION_SETTINGS_KEYS is the right to view and edit API keys of
+  // the organization.
+  RIGHT_ORGANIZATION_SETTINGS_KEYS = 73;
+
+  // RIGHT_ORGANIZATION_SETTINGS_COLLABORATORS is the right to manage members
+  // of the organization.
+  RIGHT_ORGANIZATION_SETTINGS_MEMBERS = 74;
+
+  // RIGHT_ORGANIZATION_DELETE is the right to delete the organization.
+  RIGHT_ORGANIZATION_DELETE = 75;
+
+  // RIGHT_ORGANIZATION_GATEWAYS_CREATE is the right to create an application
+  // from an organization.
+  RIGHT_ORGANIZATION_APPLICATIONS_CREATE = 76;
+
+  // RIGHT_ORGANIZATION_APPLICATIONS_LIST is the right to list the applications
+  // the organization is collaborator of.
+  RIGHT_ORGANIZATION_APPLICATIONS_LIST = 77;
+
+  // RIGHT_ORGANIZATION_GATEWAYS_CREATE is the right to create a gateway from
+  // an organization.
+  RIGHT_ORGANIZATION_GATEWAYS_CREATE = 78;
+
+  // RIGHT_ORGANIZATION_GATEWAYS_LIST is the right to list the gateways the
+  // organization is collaborator of.
+  RIGHT_ORGANIZATION_GATEWAYS_LIST = 79;
 }

@@ -26,6 +26,7 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/messages.proto
 	github.com/TheThingsNetwork/ttn/api/metadata.proto
 	github.com/TheThingsNetwork/ttn/api/networkserver.proto
+	github.com/TheThingsNetwork/ttn/api/organization.proto
 	github.com/TheThingsNetwork/ttn/api/rights.proto
 	github.com/TheThingsNetwork/ttn/api/user.proto
 
@@ -65,6 +66,8 @@ It has these top-level messages:
 	GatewayIdentifier
 	EndDeviceIdentifiers
 	ClientIdentifier
+	OrganizationIdentifier
+	OrganizationOrUserIdentifier
 	PullConfigurationRequest
 	IdentityServerSettings
 	UpdateSettingsRequest
@@ -85,6 +88,7 @@ It has these top-level messages:
 	ValidateUserEmailRequest
 	ListAuthorizedClientsResponse
 	CreateApplicationRequest
+	ListApplicationsRequest
 	ListApplicationsResponse
 	UpdateApplicationRequest
 	GenerateApplicationAPIKeyRequest
@@ -94,6 +98,7 @@ It has these top-level messages:
 	ListApplicationCollaboratorsResponse
 	ListApplicationRightsResponse
 	CreateGatewayRequest
+	ListGatewaysRequest
 	ListGatewaysResponse
 	UpdateGatewayRequest
 	GenerateGatewayAPIKeyRequest
@@ -105,6 +110,15 @@ It has these top-level messages:
 	CreateClientRequest
 	ListClientsResponse
 	UpdateClientRequest
+	CreateOrganizationRequest
+	ListOrganizationsResponse
+	UpdateOrganizationRequest
+	GenerateOrganizationAPIKeyRequest
+	ListOrganizationAPIKeysResponse
+	UpdateOrganizationAPIKeyRequest
+	RemoveOrganizationAPIKeyRequest
+	ListOrganizationMembersResponse
+	ListOrganizationRightsResponse
 	JoinRequest
 	JoinResponse
 	SessionKeyRequest
@@ -127,6 +141,8 @@ It has these top-level messages:
 	RxMetadata
 	TxMetadata
 	Location
+	Organization
+	OrganizationMember
 	User
 */
 package ttnpb

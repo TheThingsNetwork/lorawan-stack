@@ -10,6 +10,7 @@ import "github.com/TheThingsNetwork/ttn/api/auth.proto";
 import "github.com/TheThingsNetwork/ttn/api/rights.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/gateway.proto";
+import "github.com/TheThingsNetwork/ttn/api/organization.proto";
 import "github.com/TheThingsNetwork/ttn/api/user.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
@@ -429,6 +430,15 @@ service IsUser {
 message CreateApplicationRequest {
   // application is the application to be created.
   Application application = 1 [(gogoproto.nullable) = false];
+
+  // organization_id is the optional organization's ID that creates the application.
+  OrganizationIdentifier organization_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+}
+
+message ListApplicationsRequest {
+  // organization_id is the optional organization's ID whose applications will be
+  // listed of.
+  OrganizationIdentifier organization_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message ListApplicationsResponse {
@@ -494,11 +504,20 @@ message ListApplicationRightsResponse {
 // IsApplication is the interface that provides methods to manage applications
 // in the Identity Server.
 service IsApplication {
-  // CreateApplication creates a new application on the network.
+  // CreateApplication creates a new application on the network and adds the
+  // authenticated user as collaborator with all the possible rights. If an
+  // organization identifier is provided the application will be created under
+  // the organization whose will be added as collaborator with all the possible
+  // rights if and only if the authenticated user is member of the organization
+  // with enough rights.
   rpc CreateApplication(CreateApplicationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/applications"
-      body: "*"
+      body: "application"
+      additional_bindings {
+        post: "/organizations/{organization_id.organization_id}/applications"
+        body: "application"
+      }
     };
   };
 
@@ -509,11 +528,16 @@ service IsApplication {
     };
   };
 
-  // ListApplications returns all the applications where the authenticated user
-  // has access to.
-  rpc ListApplications(google.protobuf.Empty) returns (ListApplicationsResponse) {
+  // ListApplications returns either all the applications which the authenticated
+  // user has access to or the applications that the organization that matches the
+  // identifier is collaborator of if and only if the authenticated user has enough
+  // rights.
+  rpc ListApplications(ListApplicationsRequest) returns (ListApplicationsResponse) {
     option (google.api.http) = {
       get: "/applications"
+      additional_bindings {
+        get: "/organizations/{organization_id.organization_id}/applications"
+      }
     };
   };
 
@@ -591,6 +615,14 @@ service IsApplication {
 message CreateGatewayRequest {
   // gateway is the gateway to be created.
   Gateway gateway = 1 [(gogoproto.nullable) = false];
+
+  // organization_id is the optional organization's ID that creates the gateway.
+  OrganizationIdentifier organization_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+}
+
+message ListGatewaysRequest {
+  // organization_id is the optional organization's ID whose gateways will be listed of.
+  OrganizationIdentifier organization_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message ListGatewaysResponse {
@@ -656,11 +688,19 @@ message ListGatewayRightsResponse {
 // IsGateway is the interface that provides methods to manage gateways in the
 // Identity Server.
 service IsGateway {
-  // CreateGateway creates a new gateway on the network and returns it.
+  // CreateGateway creates a new gateway on the network and adds the authenticated
+  // user as collaborator with all the possible rights. If an organization identifier
+  // is provided the application will be created under the organization whose
+  // will be added as collaborator with all the possible rights if and only if
+  // the authenticated user is member of the organization with enough rights.
   rpc CreateGateway(CreateGatewayRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/gateways"
-      body: "*"
+      body: "gateway"
+      additional_bindings {
+        post: "/organizations/{organization_id.organization_id}/gateways"
+        body: "gateway"
+      }
     };
   };
 
@@ -671,11 +711,15 @@ service IsGateway {
     };
   };
 
-  // ListGateways returns all the gateways which the authenticated user
-  // has access to.
-  rpc ListGateways(google.protobuf.Empty) returns (ListGatewaysResponse) {
+  // ListGateways returns either all the gateways which the authenticated user
+  // has access to or the gateways that the organization that matches the identifier
+  // is collaborator if and only if the authenticated user has enough rights.
+  rpc ListGateways(ListGatewaysRequest) returns (ListGatewaysResponse) {
     option (google.api.http) = {
       get: "/gateways"
+      additional_bindings {
+        get: "/organizations/{organization_id.organization_id}/gateways"
+      }
     };
   };
 
@@ -810,6 +854,160 @@ service IsClient {
   rpc DeleteClient(ClientIdentifier) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/clients/{client_id}"
+    };
+  };
+}
+
+message CreateOrganizationRequest {
+  // organization is the organization to be created.
+  Organization organization = 1 [(gogoproto.nullable) = false];
+}
+
+message ListOrganizationsResponse {
+  // organizations is the list of organizations an user is member of.
+  repeated Organization organizations = 1;
+}
+
+message UpdateOrganizationRequest {
+  // organization is the organization to be updated.
+  Organization organization = 1 [(gogoproto.nullable) = false];
+
+  google.protobuf.FieldMask update_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message GenerateOrganizationAPIKeyRequest {
+  // organization_id is the organization's ID which API key will be added to.
+  OrganizationIdentifier organization_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // name is the name of the API key to be generated.
+  string name = 2;
+
+  // rights the are rights the generated API key will bear.
+  repeated Right rights = 3;
+}
+
+message ListOrganizationAPIKeysResponse {
+  // api_keys are the API keys that the organization has currently registered.
+  repeated APIKey api_keys = 1 [(gogoproto.customname) = "APIKeys"];
+}
+
+message UpdateOrganizationAPIKeyRequest {
+  // organization_id is the organization's ID which API key will be added to.
+  OrganizationIdentifier organization_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // name is the name of the gateway API key to be updated.
+  string name = 2;
+
+  // rights are the list of rights that will be set.
+  repeated Right rights = 3;
+}
+
+message RemoveOrganizationAPIKeyRequest {
+  // organization_id is the organization's ID which API key will be removed from.
+  OrganizationIdentifier organization_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // name is the name of the organization API key to be removed.
+  string name = 2;
+}
+
+message ListOrganizationMembersResponse {
+  // members is the list of members that are part of the organization.
+  repeated OrganizationMember members = 1;
+}
+
+message ListOrganizationRightsResponse {
+  // rights is the list of rights the caller bears to the organization.
+  repeated Right rights = 1;
+}
+
+service IsOrganization {
+  // CreateOrganization creates an organization.
+  rpc CreateOrganization(CreateOrganizationRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/organizations"
+      body: "*"
+    };
+  };
+
+  // GetOrganization returns an organization.
+  rpc GetOrganization(OrganizationIdentifier) returns (Organization) {
+    option (google.api.http) = {
+      get: "/organizations/{organization_id}"
+    };
+  };
+
+  // ListOrganizations returns the list of organizations the caller is member of.
+  rpc ListOrganizations(google.protobuf.Empty) returns (ListOrganizationsResponse) {
+    option (google.api.http) = {
+      get: "/organizations"
+    };
+  };
+
+  // UpdateOrganization updates an organization.
+  rpc UpdateOrganization(UpdateOrganizationRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      patch: "/organizations/{organization.id.organization_id}"
+      body: "*"
+    };
+  };
+
+  // DeleteOrganization deletes an organization.
+  rpc DeleteOrganization(OrganizationIdentifier) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/organizations/{organization_id}"
+    };
+  };
+
+  // GenerateOrganizationAPIKey generates an API key and returns it.
+  rpc GenerateOrganizationAPIKey(GenerateOrganizationAPIKeyRequest) returns (APIKey) {
+    option (google.api.http) = {
+      post: "/organizations/{organization_id.organization_id}/api-keys"
+      body: "*"
+    };
+  };
+
+  // ListOrganizationAPIKeys list the API keys the organization has.
+  rpc ListOrganizationAPIKeys(OrganizationIdentifier) returns (ListOrganizationAPIKeysResponse) {
+    option (google.api.http) = {
+      get: "/organizations/{organization_id}/api-keys"
+    };
+  };
+
+  // UpdateOrganizationAPIKey updates an organization's API key.
+  rpc UpdateOrganizationAPIKey(UpdateOrganizationAPIKeyRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      patch: "/organizations/{organization_id.organization_id}/api-keys/{name}"
+      body: "*"
+    };
+  };
+
+  // RemoveOrganizationAPIKey removes an organization's API key.
+  rpc RemoveOrganizationAPIKey(RemoveOrganizationAPIKeyRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/organizations/{organization_id.organization_id}/api-keys/{name}"
+    };
+  };
+
+  // SetOrganizationMember sets a member for a given organization. If the list
+  // of rights is empty the member will be removed.
+  rpc SetOrganizationMember(OrganizationMember) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/organizations/{organization_id.organization_id}/members"
+      body: "*"
+    };
+  };
+
+  // ListOrganizationMembers returns a list of all the members that belong to an organization.
+  rpc ListOrganizationMembers(OrganizationIdentifier) returns (ListOrganizationMembersResponse) {
+    option (google.api.http) = {
+      get: "/organizations/{organization_id}/members"
+    };
+  };
+
+  // ListOrganizationRights returns the rights the caller has to an organization.
+  rpc ListOrganizationRights(OrganizationIdentifier) returns (ListOrganizationRightsResponse) {
+    option (google.api.http) = {
+      get: "/organizations/{organization_id}/rights"
     };
   };
 }

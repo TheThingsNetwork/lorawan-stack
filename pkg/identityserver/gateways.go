@@ -80,7 +80,7 @@ func (s *gatewayService) GetGateway(ctx context.Context, req *ttnpb.GatewayIdent
 }
 
 // ListGateways returns all the gateways the current user is collaborator of.
-func (s *gatewayService) ListGateways(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListGatewaysResponse, error) {
+func (s *gatewayService) ListGateways(ctx context.Context, req *ttnpb.ListGatewaysRequest) (*ttnpb.ListGatewaysResponse, error) {
 	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_GATEWAYS_LIST)
 	if err != nil {
 		return nil, err

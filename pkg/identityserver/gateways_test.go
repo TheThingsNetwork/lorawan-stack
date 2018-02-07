@@ -76,7 +76,7 @@ func TestGateway(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 
-	gtws, err := is.gatewayService.ListGateways(ctx, &pbtypes.Empty{})
+	gtws, err := is.gatewayService.ListGateways(ctx, &ttnpb.ListGatewaysRequest{})
 	a.So(err, should.BeNil)
 	if a.So(gtws.Gateways, should.HaveLength, 1) {
 		a.So(gtws.Gateways[0], test.ShouldBeGatewayIgnoringAutoFields, gtw)

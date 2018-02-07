@@ -27,6 +27,7 @@ var _ = time.Kitchen
 // User is the message that defines an user on the network.
 type User struct {
 	// id is the user's unique and immutable ID.
+	// This ID shares namespace with the organizations' IDs.
 	UserIdentifier `protobuf:"bytes,1,opt,name=id,embedded=id" json:""`
 	// email is the user's email address.
 	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`

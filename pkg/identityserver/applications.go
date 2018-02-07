@@ -72,7 +72,7 @@ func (s *applicationService) GetApplication(ctx context.Context, req *ttnpb.Appl
 }
 
 // ListApplications returns all applications where the user is collaborator.
-func (s *applicationService) ListApplications(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListApplicationsResponse, error) {
+func (s *applicationService) ListApplications(ctx context.Context, req *ttnpb.ListApplicationsRequest) (*ttnpb.ListApplicationsResponse, error) {
 	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_APPLICATIONS_LIST)
 	if err != nil {
 		return nil, err

@@ -125,6 +125,147 @@ func (m *ClientIdentifier) GetClientID() string {
 	return ""
 }
 
+// OrganizationIdentifier is the message that is used to identify an organization.
+type OrganizationIdentifier struct {
+	// TTN Organization ID.
+	OrganizationID string `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organization_id"`
+}
+
+func (m *OrganizationIdentifier) Reset()         { *m = OrganizationIdentifier{} }
+func (m *OrganizationIdentifier) String() string { return proto.CompactTextString(m) }
+func (*OrganizationIdentifier) ProtoMessage()    {}
+func (*OrganizationIdentifier) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentifiers, []int{5}
+}
+
+func (m *OrganizationIdentifier) GetOrganizationID() string {
+	if m != nil {
+		return m.OrganizationID
+	}
+	return ""
+}
+
+// OrganizationOrUserIdentifier is the message used in collaborationship messages
+// used to identify the persona entity.
+type OrganizationOrUserIdentifier struct {
+	// Types that are valid to be assigned to ID:
+	//	*OrganizationOrUserIdentifier_UserID
+	//	*OrganizationOrUserIdentifier_OrganizationID
+	ID isOrganizationOrUserIdentifier_ID `protobuf_oneof:"ID"`
+}
+
+func (m *OrganizationOrUserIdentifier) Reset()         { *m = OrganizationOrUserIdentifier{} }
+func (m *OrganizationOrUserIdentifier) String() string { return proto.CompactTextString(m) }
+func (*OrganizationOrUserIdentifier) ProtoMessage()    {}
+func (*OrganizationOrUserIdentifier) Descriptor() ([]byte, []int) {
+	return fileDescriptorIdentifiers, []int{6}
+}
+
+type isOrganizationOrUserIdentifier_ID interface {
+	isOrganizationOrUserIdentifier_ID()
+	Equal(interface{}) bool
+	VerboseEqual(interface{}) error
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type OrganizationOrUserIdentifier_UserID struct {
+	UserID string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3,oneof"`
+}
+type OrganizationOrUserIdentifier_OrganizationID struct {
+	OrganizationID string `protobuf:"bytes,2,opt,name=organization_id,json=organizationId,proto3,oneof"`
+}
+
+func (*OrganizationOrUserIdentifier_UserID) isOrganizationOrUserIdentifier_ID()         {}
+func (*OrganizationOrUserIdentifier_OrganizationID) isOrganizationOrUserIdentifier_ID() {}
+
+func (m *OrganizationOrUserIdentifier) GetID() isOrganizationOrUserIdentifier_ID {
+	if m != nil {
+		return m.ID
+	}
+	return nil
+}
+
+func (m *OrganizationOrUserIdentifier) GetUserID() string {
+	if x, ok := m.GetID().(*OrganizationOrUserIdentifier_UserID); ok {
+		return x.UserID
+	}
+	return ""
+}
+
+func (m *OrganizationOrUserIdentifier) GetOrganizationID() string {
+	if x, ok := m.GetID().(*OrganizationOrUserIdentifier_OrganizationID); ok {
+		return x.OrganizationID
+	}
+	return ""
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*OrganizationOrUserIdentifier) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _OrganizationOrUserIdentifier_OneofMarshaler, _OrganizationOrUserIdentifier_OneofUnmarshaler, _OrganizationOrUserIdentifier_OneofSizer, []interface{}{
+		(*OrganizationOrUserIdentifier_UserID)(nil),
+		(*OrganizationOrUserIdentifier_OrganizationID)(nil),
+	}
+}
+
+func _OrganizationOrUserIdentifier_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*OrganizationOrUserIdentifier)
+	// ID
+	switch x := m.ID.(type) {
+	case *OrganizationOrUserIdentifier_UserID:
+		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
+		_ = b.EncodeStringBytes(x.UserID)
+	case *OrganizationOrUserIdentifier_OrganizationID:
+		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
+		_ = b.EncodeStringBytes(x.OrganizationID)
+	case nil:
+	default:
+		return fmt.Errorf("OrganizationOrUserIdentifier.ID has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _OrganizationOrUserIdentifier_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*OrganizationOrUserIdentifier)
+	switch tag {
+	case 1: // ID.user_id
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		x, err := b.DecodeStringBytes()
+		m.ID = &OrganizationOrUserIdentifier_UserID{x}
+		return true, err
+	case 2: // ID.organization_id
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		x, err := b.DecodeStringBytes()
+		m.ID = &OrganizationOrUserIdentifier_OrganizationID{x}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _OrganizationOrUserIdentifier_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*OrganizationOrUserIdentifier)
+	// ID
+	switch x := m.ID.(type) {
+	case *OrganizationOrUserIdentifier_UserID:
+		n += proto.SizeVarint(1<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(len(x.UserID)))
+		n += len(x.UserID)
+	case *OrganizationOrUserIdentifier_OrganizationID:
+		n += proto.SizeVarint(2<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(len(x.OrganizationID)))
+		n += len(x.OrganizationID)
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
+}
+
 func init() {
 	proto.RegisterType((*UserIdentifier)(nil), "ttn.v3.UserIdentifier")
 	golang_proto.RegisterType((*UserIdentifier)(nil), "ttn.v3.UserIdentifier")
@@ -136,6 +277,10 @@ func init() {
 	golang_proto.RegisterType((*EndDeviceIdentifiers)(nil), "ttn.v3.EndDeviceIdentifiers")
 	proto.RegisterType((*ClientIdentifier)(nil), "ttn.v3.ClientIdentifier")
 	golang_proto.RegisterType((*ClientIdentifier)(nil), "ttn.v3.ClientIdentifier")
+	proto.RegisterType((*OrganizationIdentifier)(nil), "ttn.v3.OrganizationIdentifier")
+	golang_proto.RegisterType((*OrganizationIdentifier)(nil), "ttn.v3.OrganizationIdentifier")
+	proto.RegisterType((*OrganizationOrUserIdentifier)(nil), "ttn.v3.OrganizationOrUserIdentifier")
+	golang_proto.RegisterType((*OrganizationOrUserIdentifier)(nil), "ttn.v3.OrganizationOrUserIdentifier")
 }
 func (this *UserIdentifier) VerboseEqual(that interface{}) error {
 	if that == nil {
@@ -485,6 +630,258 @@ func (this *ClientIdentifier) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *OrganizationIdentifier) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*OrganizationIdentifier)
+	if !ok {
+		that2, ok := that.(OrganizationIdentifier)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *OrganizationIdentifier")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *OrganizationIdentifier but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *OrganizationIdentifier but is not nil && this == nil")
+	}
+	if this.OrganizationID != that1.OrganizationID {
+		return fmt.Errorf("OrganizationID this(%v) Not Equal that(%v)", this.OrganizationID, that1.OrganizationID)
+	}
+	return nil
+}
+func (this *OrganizationIdentifier) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*OrganizationIdentifier)
+	if !ok {
+		that2, ok := that.(OrganizationIdentifier)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.OrganizationID != that1.OrganizationID {
+		return false
+	}
+	return true
+}
+func (this *OrganizationOrUserIdentifier) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*OrganizationOrUserIdentifier)
+	if !ok {
+		that2, ok := that.(OrganizationOrUserIdentifier)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *OrganizationOrUserIdentifier")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *OrganizationOrUserIdentifier but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *OrganizationOrUserIdentifier but is not nil && this == nil")
+	}
+	if that1.ID == nil {
+		if this.ID != nil {
+			return fmt.Errorf("this.ID != nil && that1.ID == nil")
+		}
+	} else if this.ID == nil {
+		return fmt.Errorf("this.ID == nil && that1.ID != nil")
+	} else if err := this.ID.VerboseEqual(that1.ID); err != nil {
+		return err
+	}
+	return nil
+}
+func (this *OrganizationOrUserIdentifier_UserID) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*OrganizationOrUserIdentifier_UserID)
+	if !ok {
+		that2, ok := that.(OrganizationOrUserIdentifier_UserID)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *OrganizationOrUserIdentifier_UserID")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *OrganizationOrUserIdentifier_UserID but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *OrganizationOrUserIdentifier_UserID but is not nil && this == nil")
+	}
+	if this.UserID != that1.UserID {
+		return fmt.Errorf("UserID this(%v) Not Equal that(%v)", this.UserID, that1.UserID)
+	}
+	return nil
+}
+func (this *OrganizationOrUserIdentifier_OrganizationID) VerboseEqual(that interface{}) error {
+	if that == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that == nil && this != nil")
+	}
+
+	that1, ok := that.(*OrganizationOrUserIdentifier_OrganizationID)
+	if !ok {
+		that2, ok := that.(OrganizationOrUserIdentifier_OrganizationID)
+		if ok {
+			that1 = &that2
+		} else {
+			return fmt.Errorf("that is not of type *OrganizationOrUserIdentifier_OrganizationID")
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return nil
+		}
+		return fmt.Errorf("that is type *OrganizationOrUserIdentifier_OrganizationID but is nil && this != nil")
+	} else if this == nil {
+		return fmt.Errorf("that is type *OrganizationOrUserIdentifier_OrganizationID but is not nil && this == nil")
+	}
+	if this.OrganizationID != that1.OrganizationID {
+		return fmt.Errorf("OrganizationID this(%v) Not Equal that(%v)", this.OrganizationID, that1.OrganizationID)
+	}
+	return nil
+}
+func (this *OrganizationOrUserIdentifier) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*OrganizationOrUserIdentifier)
+	if !ok {
+		that2, ok := that.(OrganizationOrUserIdentifier)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if that1.ID == nil {
+		if this.ID != nil {
+			return false
+		}
+	} else if this.ID == nil {
+		return false
+	} else if !this.ID.Equal(that1.ID) {
+		return false
+	}
+	return true
+}
+func (this *OrganizationOrUserIdentifier_UserID) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*OrganizationOrUserIdentifier_UserID)
+	if !ok {
+		that2, ok := that.(OrganizationOrUserIdentifier_UserID)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.UserID != that1.UserID {
+		return false
+	}
+	return true
+}
+func (this *OrganizationOrUserIdentifier_OrganizationID) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*OrganizationOrUserIdentifier_OrganizationID)
+	if !ok {
+		that2, ok := that.(OrganizationOrUserIdentifier_OrganizationID)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.OrganizationID != that1.OrganizationID {
+		return false
+	}
+	return true
+}
 func (m *UserIdentifier) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -641,6 +1038,71 @@ func (m *ClientIdentifier) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *OrganizationIdentifier) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *OrganizationIdentifier) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.OrganizationID) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.OrganizationID)))
+		i += copy(dAtA[i:], m.OrganizationID)
+	}
+	return i, nil
+}
+
+func (m *OrganizationOrUserIdentifier) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *OrganizationOrUserIdentifier) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.ID != nil {
+		nn4, err := m.ID.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += nn4
+	}
+	return i, nil
+}
+
+func (m *OrganizationOrUserIdentifier_UserID) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.UserID)))
+	i += copy(dAtA[i:], m.UserID)
+	return i, nil
+}
+func (m *OrganizationOrUserIdentifier_OrganizationID) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.OrganizationID)))
+	i += copy(dAtA[i:], m.OrganizationID)
+	return i, nil
+}
 func encodeVarintIdentifiers(dAtA []byte, offset int, v uint64) int {
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
@@ -679,6 +1141,39 @@ func NewPopulatedClientIdentifier(r randyIdentifiers, easy bool) *ClientIdentifi
 	this.ClientID = randStringIdentifiers(r)
 	if !easy && r.Intn(10) != 0 {
 	}
+	return this
+}
+
+func NewPopulatedOrganizationIdentifier(r randyIdentifiers, easy bool) *OrganizationIdentifier {
+	this := &OrganizationIdentifier{}
+	this.OrganizationID = randStringIdentifiers(r)
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedOrganizationOrUserIdentifier(r randyIdentifiers, easy bool) *OrganizationOrUserIdentifier {
+	this := &OrganizationOrUserIdentifier{}
+	oneofNumber_ID := []int32{1, 2}[r.Intn(2)]
+	switch oneofNumber_ID {
+	case 1:
+		this.ID = NewPopulatedOrganizationOrUserIdentifier_UserID(r, easy)
+	case 2:
+		this.ID = NewPopulatedOrganizationOrUserIdentifier_OrganizationID(r, easy)
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedOrganizationOrUserIdentifier_UserID(r randyIdentifiers, easy bool) *OrganizationOrUserIdentifier_UserID {
+	this := &OrganizationOrUserIdentifier_UserID{}
+	this.UserID = randStringIdentifiers(r)
+	return this
+}
+func NewPopulatedOrganizationOrUserIdentifier_OrganizationID(r randyIdentifiers, easy bool) *OrganizationOrUserIdentifier_OrganizationID {
+	this := &OrganizationOrUserIdentifier_OrganizationID{}
+	this.OrganizationID = randStringIdentifiers(r)
 	return this
 }
 
@@ -817,6 +1312,40 @@ func (m *ClientIdentifier) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovIdentifiers(uint64(l))
 	}
+	return n
+}
+
+func (m *OrganizationIdentifier) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.OrganizationID)
+	if l > 0 {
+		n += 1 + l + sovIdentifiers(uint64(l))
+	}
+	return n
+}
+
+func (m *OrganizationOrUserIdentifier) Size() (n int) {
+	var l int
+	_ = l
+	if m.ID != nil {
+		n += m.ID.Size()
+	}
+	return n
+}
+
+func (m *OrganizationOrUserIdentifier_UserID) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.UserID)
+	n += 1 + l + sovIdentifiers(uint64(l))
+	return n
+}
+func (m *OrganizationOrUserIdentifier_OrganizationID) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.OrganizationID)
+	n += 1 + l + sovIdentifiers(uint64(l))
 	return n
 }
 
@@ -1353,6 +1882,193 @@ func (m *ClientIdentifier) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *OrganizationIdentifier) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentifiers
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: OrganizationIdentifier: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: OrganizationIdentifier: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OrganizationID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentifiers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OrganizationID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentifiers(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *OrganizationOrUserIdentifier) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowIdentifiers
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: OrganizationOrUserIdentifier: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: OrganizationOrUserIdentifier: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentifiers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ID = &OrganizationOrUserIdentifier_UserID{string(dAtA[iNdEx:postIndex])}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OrganizationID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowIdentifiers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ID = &OrganizationOrUserIdentifier_OrganizationID{string(dAtA[iNdEx:postIndex])}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipIdentifiers(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthIdentifiers
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func skipIdentifiers(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1466,40 +2182,45 @@ func init() {
 }
 
 var fileDescriptorIdentifiers = []byte{
-	// 558 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x93, 0x31, 0x4c, 0xdb, 0x4e,
-	0x18, 0xc5, 0xef, 0xfe, 0x7f, 0xea, 0x24, 0x27, 0x40, 0xc5, 0x2a, 0x12, 0x6d, 0xa5, 0xcf, 0x28,
-	0x5d, 0x60, 0x68, 0xac, 0x8a, 0x82, 0x2a, 0xa4, 0x56, 0x85, 0x26, 0xaa, 0xc8, 0xd0, 0x56, 0x16,
-	0xa9, 0xd4, 0x2e, 0x91, 0x63, 0x1f, 0xce, 0x15, 0x6a, 0x5b, 0xf6, 0xd9, 0x88, 0x8d, 0xa9, 0x62,
-	0xec, 0xd8, 0xad, 0x8c, 0x8c, 0x8c, 0x19, 0x19, 0x19, 0x19, 0x11, 0x83, 0x85, 0xcf, 0x0b, 0xea,
-	0xc4, 0xc8, 0x58, 0xf9, 0x48, 0x6a, 0x0b, 0x86, 0xa2, 0x6e, 0x77, 0xdf, 0xf7, 0xde, 0xcf, 0x7a,
-	0x7e, 0x3a, 0xb2, 0xe8, 0x30, 0xde, 0x8f, 0x7a, 0x0d, 0xcb, 0xfb, 0xaa, 0xaf, 0xf7, 0xe9, 0x7a,
-	0x9f, 0xb9, 0x4e, 0xf8, 0x8e, 0xf2, 0x6d, 0x2f, 0xd8, 0xd4, 0x39, 0x77, 0x75, 0xd3, 0x67, 0x3a,
-	0xb3, 0xa9, 0xcb, 0xd9, 0x06, 0xa3, 0x41, 0xd8, 0xf0, 0x03, 0x8f, 0x7b, 0xaa, 0xc2, 0xb9, 0xdb,
-	0x88, 0x17, 0x1e, 0x3d, 0x2d, 0xd9, 0x1d, 0xcf, 0xf1, 0x74, 0xb9, 0xee, 0x45, 0x1b, 0xf2, 0x26,
-	0x2f, 0xf2, 0x74, 0x6d, 0xab, 0xbf, 0x26, 0x93, 0x9d, 0x90, 0x06, 0x6b, 0x7f, 0x78, 0x6a, 0x83,
-	0x54, 0xa2, 0x90, 0x06, 0x5d, 0x66, 0xcf, 0xe0, 0x59, 0x3c, 0x57, 0x5b, 0x9d, 0x16, 0x89, 0xa6,
-	0x48, 0x51, 0xf3, 0x57, 0xa2, 0x8d, 0x96, 0x86, 0x12, 0x49, 0x5f, 0xdd, 0x22, 0xd3, 0x2b, 0xbe,
-	0xbf, 0xc5, 0x2c, 0x93, 0x33, 0xcf, 0x2d, 0x81, 0xda, 0x64, 0xd2, 0x2c, 0x16, 0x05, 0xef, 0x89,
-	0x48, 0xb4, 0x89, 0xb2, 0x25, 0xc7, 0xde, 0x90, 0x1a, 0x13, 0x66, 0x99, 0x59, 0x7f, 0x4f, 0xa6,
-	0xde, 0x9a, 0x9c, 0x6e, 0x9b, 0x3b, 0xa5, 0x0f, 0x2c, 0x13, 0xe2, 0x5c, 0x0f, 0x0b, 0xf8, 0x63,
-	0x91, 0x68, 0xb5, 0x91, 0x34, 0x07, 0x97, 0x24, 0x46, 0xcd, 0x19, 0x31, 0xea, 0xdf, 0xfe, 0x27,
-	0x0f, 0x5a, 0xae, 0xdd, 0xa4, 0x31, 0xb3, 0x68, 0xc1, 0x0c, 0xd5, 0x79, 0x52, 0xb3, 0xe5, 0xb0,
-	0x60, 0x8e, 0x8b, 0x44, 0xab, 0x0e, 0x95, 0x4d, 0xa3, 0x6a, 0x0f, 0x3d, 0xea, 0x8b, 0x5b, 0x01,
-	0xff, 0x93, 0xfa, 0xa9, 0x5b, 0x01, 0x6f, 0xc4, 0x51, 0x3f, 0x92, 0x8a, 0x4d, 0xe3, 0x2e, 0x8d,
-	0xd8, 0xcc, 0xd8, 0x2c, 0x9e, 0x1b, 0x5f, 0x7d, 0x79, 0x96, 0x68, 0xfa, 0xdf, 0x8a, 0xf7, 0x37,
-	0x1d, 0x9d, 0xef, 0xf8, 0x34, 0x6c, 0xb4, 0x3a, 0x6b, 0x4b, 0xcf, 0xf3, 0x5a, 0x9a, 0x34, 0x6e,
-	0x75, 0xd6, 0x0c, 0xc5, 0xa6, 0x71, 0x2b, 0x62, 0xea, 0x27, 0x52, 0xfd, 0xe2, 0x31, 0x57, 0x82,
-	0xef, 0x49, 0xf0, 0xab, 0x7f, 0x03, 0x57, 0xda, 0x1e, 0x73, 0x73, 0x72, 0x25, 0xe7, 0xe5, 0xe8,
-	0x0f, 0x24, 0x0f, 0xde, 0x35, 0x6d, 0x3b, 0x98, 0x51, 0x24, 0x7a, 0xf1, 0x2c, 0xd1, 0x9e, 0xdd,
-	0x1d, 0xdd, 0xa4, 0xf1, 0x8a, 0x6d, 0x07, 0x46, 0x9e, 0x3c, 0x3f, 0x2c, 0x8f, 0x0d, 0xf6, 0x35,
-	0x54, 0x6f, 0x93, 0xfb, 0x6f, 0xb6, 0x18, 0x75, 0x79, 0xa9, 0xd8, 0x25, 0x52, 0xb3, 0xe4, 0xac,
-	0xe8, 0xe0, 0x61, 0xde, 0xc1, 0x50, 0x98, 0xd7, 0x5a, 0x08, 0x8c, 0xaa, 0x35, 0xf4, 0xaf, 0xfe,
-	0xc4, 0xc7, 0x29, 0xe0, 0x93, 0x14, 0xf0, 0x69, 0x0a, 0xf8, 0x3c, 0x05, 0x7c, 0x91, 0x02, 0xba,
-	0x4c, 0x01, 0x5d, 0xa5, 0x80, 0x77, 0x05, 0xa0, 0x3d, 0x01, 0xe8, 0x40, 0x00, 0x3e, 0x14, 0x80,
-	0x06, 0x02, 0xf0, 0x91, 0x00, 0x7c, 0x2c, 0x00, 0x9f, 0x08, 0xc0, 0xa7, 0x02, 0xd0, 0xb9, 0x00,
-	0x7c, 0x21, 0x00, 0x5d, 0x0a, 0xc0, 0x57, 0x02, 0xd0, 0x6e, 0x06, 0x68, 0x2f, 0x03, 0xfc, 0x3d,
-	0x03, 0xf4, 0x23, 0x03, 0xbc, 0x9f, 0x01, 0x3a, 0xc8, 0x00, 0x1d, 0x66, 0x80, 0x07, 0x19, 0xe0,
-	0xa3, 0x0c, 0xf0, 0xe7, 0xf9, 0x3b, 0xfd, 0x04, 0xee, 0xfa, 0xbd, 0x9e, 0x22, 0x5f, 0xdd, 0xc2,
-	0xef, 0x00, 0x00, 0x00, 0xff, 0xff, 0x79, 0x86, 0xa4, 0xba, 0xe5, 0x03, 0x00, 0x00,
+	// 630 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x94, 0x3f, 0x4c, 0xdb, 0x40,
+	0x14, 0xc6, 0xef, 0x28, 0xcd, 0x9f, 0x13, 0xa4, 0xc5, 0x2a, 0x15, 0xfd, 0xa3, 0x67, 0xe4, 0xaa,
+	0x12, 0x0c, 0x8d, 0x5b, 0x51, 0x50, 0x85, 0xd4, 0xaa, 0xa4, 0x89, 0x4a, 0x18, 0x00, 0x59, 0x50,
+	0xa9, 0x5d, 0x90, 0x13, 0x1f, 0xce, 0x15, 0x6a, 0x5b, 0xce, 0x25, 0x88, 0x4e, 0x4c, 0x15, 0x63,
+	0xc7, 0x6e, 0x65, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x44, 0x0c, 0x16, 0x3e, 0x2f, 0xa8, 0x13,
+	0x23, 0x63, 0xe5, 0x23, 0xa9, 0x4d, 0x18, 0x4a, 0xbb, 0xdd, 0xdd, 0xfb, 0xbe, 0x9f, 0xef, 0xe9,
+	0xbb, 0x67, 0x32, 0x69, 0x33, 0xde, 0x68, 0xd5, 0x8a, 0x75, 0xf7, 0x8b, 0xbe, 0xd4, 0xa0, 0x4b,
+	0x0d, 0xe6, 0xd8, 0xcd, 0x79, 0xca, 0x37, 0x5c, 0x7f, 0x4d, 0xe7, 0xdc, 0xd1, 0x4d, 0x8f, 0xe9,
+	0xcc, 0xa2, 0x0e, 0x67, 0xab, 0x8c, 0xfa, 0xcd, 0xa2, 0xe7, 0xbb, 0xdc, 0x55, 0x32, 0x9c, 0x3b,
+	0xc5, 0xf6, 0xc4, 0xc3, 0x67, 0x29, 0xbb, 0xed, 0xda, 0xae, 0x2e, 0xcb, 0xb5, 0xd6, 0xaa, 0xdc,
+	0xc9, 0x8d, 0x5c, 0x5d, 0xda, 0xb4, 0xb7, 0xa4, 0xb0, 0xdc, 0xa4, 0x7e, 0xf5, 0x0f, 0x4f, 0x29,
+	0x92, 0x6c, 0xab, 0x49, 0xfd, 0x15, 0x66, 0x8d, 0xe0, 0x51, 0x3c, 0x96, 0x2f, 0x0d, 0x8b, 0x40,
+	0xcd, 0x48, 0x51, 0xf9, 0x57, 0xa0, 0x76, 0x8b, 0x46, 0xa6, 0x25, 0x7d, 0x5a, 0x9d, 0x0c, 0xcf,
+	0x78, 0xde, 0x3a, 0xab, 0x9b, 0x9c, 0xb9, 0x4e, 0x0a, 0x34, 0x47, 0x0a, 0x66, 0x52, 0x48, 0x78,
+	0x4f, 0x44, 0xa0, 0x0e, 0xa6, 0x2d, 0x31, 0xb6, 0x47, 0x6a, 0x0c, 0x9a, 0x69, 0xa6, 0xb6, 0x40,
+	0x86, 0xde, 0x9b, 0x9c, 0x6e, 0x98, 0x9b, 0xa9, 0x0f, 0x4c, 0x13, 0x62, 0x5f, 0x1e, 0x26, 0xf0,
+	0x47, 0x22, 0x50, 0xf3, 0x5d, 0x69, 0x0c, 0x4e, 0x49, 0x8c, 0xbc, 0xdd, 0x65, 0x68, 0xdf, 0x6e,
+	0x91, 0x7b, 0x15, 0xc7, 0x2a, 0xd3, 0x36, 0xab, 0xd3, 0x84, 0xd9, 0x54, 0xc6, 0x49, 0xde, 0x92,
+	0x87, 0x09, 0x73, 0x40, 0x04, 0x6a, 0xae, 0xa3, 0x2c, 0x1b, 0x39, 0xab, 0xe3, 0x51, 0x5e, 0x5d,
+	0x6b, 0xb0, 0x4f, 0xea, 0x87, 0xae, 0x35, 0xd8, 0xd3, 0x8e, 0xf2, 0x81, 0x64, 0x2d, 0xda, 0x5e,
+	0xa1, 0x2d, 0x36, 0xd2, 0x3f, 0x8a, 0xc7, 0x06, 0x4a, 0xaf, 0x4f, 0x02, 0x55, 0xff, 0x5b, 0xf0,
+	0xde, 0x9a, 0xad, 0xf3, 0x4d, 0x8f, 0x36, 0x8b, 0x95, 0xe5, 0xea, 0xd4, 0xcb, 0x38, 0x96, 0x32,
+	0x6d, 0x57, 0x96, 0xab, 0x46, 0xc6, 0xa2, 0xed, 0x4a, 0x8b, 0x29, 0x1f, 0x49, 0xee, 0xb3, 0xcb,
+	0x1c, 0x09, 0xbe, 0x2d, 0xc1, 0x6f, 0xfe, 0x0f, 0x9c, 0x9d, 0x73, 0x99, 0x13, 0x93, 0xb3, 0x31,
+	0x2f, 0x46, 0x2f, 0x92, 0xb8, 0xf1, 0x15, 0xd3, 0xb2, 0xfc, 0x91, 0x8c, 0x44, 0x4f, 0x9e, 0x04,
+	0xea, 0x8b, 0x9b, 0xa3, 0xcb, 0xb4, 0x3d, 0x63, 0x59, 0xbe, 0x11, 0x77, 0x1e, 0x2f, 0xa6, 0xfb,
+	0xf7, 0x77, 0x54, 0xa4, 0xcd, 0x91, 0xbb, 0xef, 0xd6, 0x19, 0x75, 0x78, 0x2a, 0xd8, 0x29, 0x92,
+	0xaf, 0xcb, 0xb3, 0x24, 0x83, 0x07, 0x71, 0x06, 0x1d, 0x61, 0x1c, 0x6b, 0x22, 0x30, 0x72, 0xf5,
+	0x8e, 0x5f, 0x6b, 0x90, 0xfb, 0x0b, 0xbe, 0x6d, 0x3a, 0xec, 0x6b, 0xef, 0x5b, 0x9c, 0x27, 0x77,
+	0xdc, 0x54, 0x25, 0xe1, 0x3e, 0x15, 0x81, 0x5a, 0xb8, 0x62, 0x8a, 0xe9, 0xbd, 0x62, 0xa3, 0xe0,
+	0x5e, 0xe1, 0x6a, 0xbb, 0x98, 0x3c, 0x4e, 0xbb, 0x16, 0xfc, 0x9e, 0x29, 0x7a, 0x7e, 0xb3, 0x29,
+	0x9a, 0x45, 0xdd, 0x39, 0x52, 0x16, 0xaf, 0x5f, 0xb1, 0xef, 0x1f, 0xae, 0x38, 0x8b, 0x7a, 0x2f,
+	0x59, 0xea, 0x27, 0x7d, 0xd5, 0x72, 0xe9, 0x27, 0x3e, 0x0c, 0x01, 0x1f, 0x85, 0x80, 0x8f, 0x43,
+	0xc0, 0xa7, 0x21, 0xe0, 0xb3, 0x10, 0xd0, 0x79, 0x08, 0xe8, 0x22, 0x04, 0xbc, 0x25, 0x00, 0x6d,
+	0x0b, 0x40, 0xbb, 0x02, 0xf0, 0x9e, 0x00, 0xb4, 0x2f, 0x00, 0x1f, 0x08, 0xc0, 0x87, 0x02, 0xf0,
+	0x91, 0x00, 0x7c, 0x2c, 0x00, 0x9d, 0x0a, 0xc0, 0x67, 0x02, 0xd0, 0xb9, 0x00, 0x7c, 0x21, 0x00,
+	0x6d, 0x45, 0x80, 0xb6, 0x23, 0xc0, 0xdf, 0x23, 0x40, 0x3f, 0x22, 0xc0, 0x3b, 0x11, 0xa0, 0xdd,
+	0x08, 0xd0, 0x5e, 0x04, 0x78, 0x3f, 0x02, 0x7c, 0x10, 0x01, 0xfe, 0x34, 0x7e, 0xa3, 0x97, 0xc1,
+	0x1d, 0xaf, 0x56, 0xcb, 0xc8, 0x5f, 0xd1, 0xc4, 0xef, 0x00, 0x00, 0x00, 0xff, 0xff, 0xc9, 0x77,
+	0xd5, 0xd2, 0xfa, 0x04, 0x00, 0x00,
 }
