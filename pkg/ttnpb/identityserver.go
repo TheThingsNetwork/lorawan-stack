@@ -190,9 +190,14 @@ func (req *RemoveApplicationAPIKeyRequest) Validate() error {
 
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *ApplicationCollaborator) Validate() error {
+	id := req.OrganizationOrUserIdentifier.GetUserID()
+	if id == "" {
+		id = req.OrganizationOrUserIdentifier.GetOrganizationID()
+	}
+
 	return validate.All(
 		validate.Field(req.ApplicationID, validate.ID).DescribeFieldName("Application ID"),
-		validate.Field(req.UserID, validate.ID).DescribeFieldName("User ID"),
+		validate.Field(id, validate.ID).DescribeFieldName("Account ID"),
 		validate.Field(req.Rights, validate.NotRequired, validate.In(AllApplicationRights)).DescribeFieldName("Rights"),
 	)
 }
@@ -204,10 +209,16 @@ func (req *CreateGatewayRequest) Validate() error {
 		validate.Field(req.Gateway.GatewayID, validate.ID).DescribeFieldName("Gateway ID"),
 		validate.Field(req.Gateway.FrequencyPlanID, validate.Required).DescribeFieldName("Frequency plan ID"),
 		validate.Field(req.Gateway.ClusterAddress, validate.Required).DescribeFieldName("Cluster Address"),
+		validate.Field(req.OrganizationID, validate.NotRequired, validate.ID).DescribeFieldName("Organization ID"),
 	)
 
 	if req.Gateway.ContactAccount != nil {
-		validations = append(validations, validate.Field(req.Gateway.ContactAccount.UserID, validate.NotRequired, validate.ID).DescribeFieldName("Contact account: User ID"))
+		id := req.Gateway.ContactAccount.GetUserID()
+		if id == "" {
+			id = req.Gateway.ContactAccount.GetOrganizationID()
+		}
+
+		validations = append(validations, validate.Field(id, validate.NotRequired, validate.ID).DescribeFieldName("Contact account: Account ID"))
 	}
 
 	// if radios are set check for each one that frequency is present.
@@ -253,7 +264,12 @@ func (req *UpdateGatewayRequest) Validate() error {
 				validations = append(validations, validate.Field(radio.Frequency, validate.Required).DescribeFieldName("Radio Frequency"))
 			}
 		case FieldPathGatewayContactAccountUserID.MatchString(path):
-			err = validate.Field(req.Gateway.ContactAccount.UserID, validate.NotRequired, validate.ID).DescribeFieldName("Contact account: user ID")
+			id := req.Gateway.ContactAccount.GetUserID()
+			if id == "" {
+				id = req.Gateway.ContactAccount.GetOrganizationID()
+			}
+
+			err = validate.Field(id, validate.NotRequired, validate.ID).DescribeFieldName("Contact account: Account ID")
 		default:
 			return ErrInvalidPathUpdateMask.New(errors.Attributes{
 				"path": path,
@@ -294,9 +310,14 @@ func (req *RemoveGatewayAPIKeyRequest) Validate() error {
 
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *GatewayCollaborator) Validate() error {
+	id := req.OrganizationOrUserIdentifier.GetUserID()
+	if id == "" {
+		id = req.OrganizationOrUserIdentifier.GetOrganizationID()
+	}
+
 	return validate.All(
 		validate.Field(req.GatewayID, validate.ID).DescribeFieldName("Gateway ID"),
-		validate.Field(req.UserID, validate.ID).DescribeFieldName("User ID"),
+		validate.Field(id, validate.ID).DescribeFieldName("Account ID"),
 		validate.Field(req.Rights, validate.NotRequired, validate.In(AllGatewayRights)).DescribeFieldName("Rights"),
 	)
 }

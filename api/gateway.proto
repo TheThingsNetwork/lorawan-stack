@@ -52,11 +52,9 @@ message Gateway {
   // attributes is a free form map of attributes.
   map<string, string> attributes = 11;
 
-  // contact_account is the user ID that will be displayed (given the set privacy
-  // settings) as contact person for this gateway.
-  // TODO(gomezjdaniel#222): allow to use an organization ID as contact account
-  // when they are added.
-  UserIdentifier contact_account = 12;
+  // contact_account is either an Organization ID or User ID that will be
+  // displayed (according the privacy settings) as contact persona for this gateway.
+  OrganizationOrUserIdentifier contact_account = 12;
 
   // created_at is the time when the gateway was created.
   // This a read-only field.
