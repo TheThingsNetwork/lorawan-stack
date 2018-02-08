@@ -32,7 +32,7 @@ func (s *organizationService) CreateOrganization(ctx context.Context, req *ttnpb
 			return err
 		}
 
-		// check for blacklisted ids
+		// Check for blacklisted IDs.
 		if !util.IsIDAllowed(req.Organization.OrganizationID, settings.BlacklistedIDs) {
 			return ErrBlacklistedID.New(errors.Attributes{
 				"id": req.Organization.OrganizationID,
@@ -260,20 +260,20 @@ func (s *organizationService) SetOrganizationMember(ctx context.Context, req *tt
 			return err
 		}
 
-		// check that after modifying the members the organization does not
-		// reach an unmanageable state
+		// Check that after modifying the members the organization does not reach an
+		// unmanageable state.
 		members, err := tx.Organizations.ListMembers(req.OrganizationID, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS)
 		if err != nil {
 			return err
 		}
 
-		// map all defined organization rights
+		// Map all defined organization rights.
 		mapped := make(map[ttnpb.Right]bool)
 		for _, right := range ttnpb.AllOrganizationRights() {
 			mapped[right] = true
 		}
 
-		// iterate over all members' rights and delete appearing rights
+		// Iterate over all members' rights and delete appearing rights.
 		for _, member := range members {
 			for _, right := range member.Rights {
 				delete(mapped, right)
@@ -281,7 +281,7 @@ func (s *organizationService) SetOrganizationMember(ctx context.Context, req *tt
 		}
 
 		if len(mapped) != 0 {
-			// flatten leftovers of the map for error formating
+			// Flatten leftovers of the map for error formating.
 			missing := make([]string, 0, len(mapped))
 			for right := range mapped {
 				missing = append(missing, right.String())
@@ -332,7 +332,7 @@ func (s *organizationService) ListOrganizationRights(ctx context.Context, req *t
 			return nil, err
 		}
 
-		// result rights are the intersection between the scope of the Client
+		// Result rights are the intersection between the scope of the Client
 		// and the rights that the user has to the organization.
 		resp.Rights = util.RightsIntersection(claims.Rights(), rights)
 	case auth.Key:

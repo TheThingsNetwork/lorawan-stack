@@ -71,12 +71,12 @@ func TestApplication(t *testing.T) {
 	key, err := is.applicationService.GenerateApplicationAPIKey(ctx, &ttnpb.GenerateApplicationAPIKeyRequest{
 		ApplicationIdentifier: app.ApplicationIdentifier,
 		Name:   "foo",
-		Rights: ttnpb.AllApplicationRights,
+		Rights: ttnpb.AllApplicationRights(),
 	})
 	a.So(err, should.BeNil)
 	a.So(key.Key, should.NotBeEmpty)
 	a.So(key.Name, should.Equal, key.Name)
-	a.So(key.Rights, should.Resemble, ttnpb.AllApplicationRights)
+	a.So(key.Rights, should.Resemble, ttnpb.AllApplicationRights())
 
 	// update api key
 	key.Rights = []ttnpb.Right{ttnpb.Right(10)}
@@ -115,9 +115,9 @@ func TestApplication(t *testing.T) {
 	// set new collaborator
 	alice := testUsers()["alice"]
 	collab := &ttnpb.ApplicationCollaborator{
-		UserIdentifier:        alice.UserIdentifier,
-		ApplicationIdentifier: app.ApplicationIdentifier,
-		Rights:                []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
+		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{alice.UserID}},
+		ApplicationIdentifier:        app.ApplicationIdentifier,
+		Rights:                       []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
 	}
 
 	_, err = is.applicationService.SetApplicationCollaborator(ctx, collab)
@@ -125,22 +125,22 @@ func TestApplication(t *testing.T) {
 
 	rights, err := is.applicationService.ListApplicationRights(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
 	a.So(err, should.BeNil)
-	a.So(rights.Rights, should.Resemble, ttnpb.AllApplicationRights)
+	a.So(rights.Rights, should.Resemble, ttnpb.AllApplicationRights())
 
 	collabs, err := is.applicationService.ListApplicationCollaborators(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 2)
 	a.So(collabs.Collaborators, should.Contain, collab)
 	a.So(collabs.Collaborators, should.Contain, &ttnpb.ApplicationCollaborator{
-		UserIdentifier:        user.UserIdentifier,
-		ApplicationIdentifier: app.ApplicationIdentifier,
-		Rights:                ttnpb.AllApplicationRights,
+		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{user.UserID}},
+		ApplicationIdentifier:        app.ApplicationIdentifier,
+		Rights:                       ttnpb.AllApplicationRights(),
 	})
 
 	// while there is two collaborators can't unset the only collab with COLLABORATORS right
 	_, err = is.applicationService.SetApplicationCollaborator(ctx, &ttnpb.ApplicationCollaborator{
-		ApplicationIdentifier: app.ApplicationIdentifier,
-		UserIdentifier:        user.UserIdentifier,
+		ApplicationIdentifier:        app.ApplicationIdentifier,
+		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{user.UserID}},
 	})
 	a.So(err, should.NotBeNil)
 

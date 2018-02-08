@@ -71,7 +71,7 @@ func (is *IdentityServer) enforceApplicationRights(ctx context.Context, appID st
 			return ErrNotAuthorized.New(nil)
 		}
 
-		authorized, err = is.store.Applications.HasUserRights(appID, userID, rights...)
+		authorized, err = is.store.Applications.HasCollaboratorRights(appID, userID, rights...)
 		if err != nil {
 			return err
 		}
@@ -106,7 +106,42 @@ func (is *IdentityServer) enforceGatewayRights(ctx context.Context, gtwID string
 			return ErrNotAuthorized.New(nil)
 		}
 
-		authorized, err = is.store.Gateways.HasUserRights(gtwID, userID, rights...)
+		authorized, err = is.store.Gateways.HasCollaboratorRights(gtwID, userID, rights...)
+		if err != nil {
+			return err
+		}
+	}
+
+	if !authorized {
+		return ErrNotAuthorized.New(nil)
+	}
+
+	return nil
+}
+
+// enforceOrganizationRights is a hook that checks whether if the given authorization
+// credentials are allowed to access the organization with the given rights.
+func (is *IdentityServer) enforceOrganizationRights(ctx context.Context, organizationID string, rights ...ttnpb.Right) error {
+	claims, err := is.claimsFromContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	if !claims.HasRights(rights...) {
+		return ErrNotAuthorized.New(nil)
+	}
+
+	var authorized bool
+	switch claims.Source {
+	case auth.Key:
+		authorized = claims.OrganizationID() == organizationID
+	case auth.Token:
+		userID := claims.UserID()
+		if len(userID) == 0 {
+			return ErrNotAuthorized.New(nil)
+		}
+
+		authorized, err = is.store.Organizations.HasMemberRights(organizationID, userID, rights...)
 		if err != nil {
 			return err
 		}

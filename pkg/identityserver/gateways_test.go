@@ -99,12 +99,12 @@ func TestGateway(t *testing.T) {
 	key, err := is.gatewayService.GenerateGatewayAPIKey(ctx, &ttnpb.GenerateGatewayAPIKeyRequest{
 		GatewayIdentifier: gtw.GatewayIdentifier,
 		Name:              "foo",
-		Rights:            ttnpb.AllGatewayRights,
+		Rights:            ttnpb.AllGatewayRights(),
 	})
 	a.So(err, should.BeNil)
 	a.So(key.Key, should.NotBeEmpty)
 	a.So(key.Name, should.Equal, key.Name)
-	a.So(key.Rights, should.Resemble, ttnpb.AllGatewayRights)
+	a.So(key.Rights, should.Resemble, ttnpb.AllGatewayRights())
 
 	// update api key
 	key.Rights = []ttnpb.Right{ttnpb.Right(10)}
@@ -143,9 +143,9 @@ func TestGateway(t *testing.T) {
 	// set new collaborator
 	alice := testUsers()["alice"]
 	collab := &ttnpb.GatewayCollaborator{
-		UserIdentifier:    alice.UserIdentifier,
-		GatewayIdentifier: gtw.GatewayIdentifier,
-		Rights:            []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
+		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{alice.UserID}},
+		GatewayIdentifier:            gtw.GatewayIdentifier,
+		Rights:                       []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
 	}
 
 	_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
@@ -153,22 +153,22 @@ func TestGateway(t *testing.T) {
 
 	rights, err := is.gatewayService.ListGatewayRights(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
 	a.So(err, should.BeNil)
-	a.So(rights.Rights, should.Resemble, ttnpb.AllGatewayRights)
+	a.So(rights.Rights, should.Resemble, ttnpb.AllGatewayRights())
 
 	collabs, err := is.gatewayService.ListGatewayCollaborators(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 2)
 	a.So(collabs.Collaborators, should.Contain, collab)
 	a.So(collabs.Collaborators, should.Contain, &ttnpb.GatewayCollaborator{
-		UserIdentifier:    user.UserIdentifier,
-		GatewayIdentifier: gtw.GatewayIdentifier,
-		Rights:            ttnpb.AllGatewayRights,
+		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{user.UserID}},
+		GatewayIdentifier:            gtw.GatewayIdentifier,
+		Rights:                       ttnpb.AllGatewayRights(),
 	})
 
 	// while there is two collaborators can't unset the only collab with COLLABORATORS right
 	_, err = is.gatewayService.SetGatewayCollaborator(ctx, &ttnpb.GatewayCollaborator{
-		GatewayIdentifier: gtw.GatewayIdentifier,
-		UserIdentifier:    user.UserIdentifier,
+		GatewayIdentifier:            gtw.GatewayIdentifier,
+		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{user.UserID}},
 	})
 	a.So(err, should.NotBeNil)
 

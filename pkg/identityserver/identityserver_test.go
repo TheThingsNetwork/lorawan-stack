@@ -126,9 +126,10 @@ func testClient() *ttnpb.Client {
 		State:            ttnpb.STATE_APPROVED,
 	}
 
-	cli.Rights = append(cli.Rights, ttnpb.AllUserRights...)
-	cli.Rights = append(cli.Rights, ttnpb.AllApplicationRights...)
-	cli.Rights = append(cli.Rights, ttnpb.AllGatewayRights...)
+	cli.Rights = append(cli.Rights, ttnpb.AllUserRights()...)
+	cli.Rights = append(cli.Rights, ttnpb.AllApplicationRights()...)
+	cli.Rights = append(cli.Rights, ttnpb.AllGatewayRights()...)
+	cli.Rights = append(cli.Rights, ttnpb.AllOrganizationRights()...)
 
 	return cli
 }

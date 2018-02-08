@@ -336,16 +336,16 @@ func TestApplicationValidations(t *testing.T) {
 
 		// request with gateway rights (bad)
 		req = &ApplicationCollaborator{
-			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
-			UserIdentifier:        UserIdentifier{"alice"},
-			Rights:                []Right{RIGHT_GATEWAY_DELETE},
+			ApplicationIdentifier:        ApplicationIdentifier{"foo-app"},
+			OrganizationOrUserIdentifier: OrganizationOrUserIdentifier{ID: &OrganizationOrUserIdentifier_UserID{"alice"}},
+			Rights: []Right{RIGHT_GATEWAY_DELETE},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// good request
 		req = &ApplicationCollaborator{
-			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
-			UserIdentifier:        UserIdentifier{"alice"},
+			ApplicationIdentifier:        ApplicationIdentifier{"foo-app"},
+			OrganizationOrUserIdentifier: OrganizationOrUserIdentifier{ID: &OrganizationOrUserIdentifier_UserID{"alice"}},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -501,16 +501,16 @@ func TestGatewayValidations(t *testing.T) {
 
 		// request with application rights (bad)
 		req = &GatewayCollaborator{
-			GatewayIdentifier: GatewayIdentifier{"foo-gtw"},
-			UserIdentifier:    UserIdentifier{"alice"},
-			Rights:            []Right{RIGHT_APPLICATION_DELETE},
+			GatewayIdentifier:            GatewayIdentifier{"foo-gtw"},
+			OrganizationOrUserIdentifier: OrganizationOrUserIdentifier{ID: &OrganizationOrUserIdentifier_UserID{"alice"}},
+			Rights: []Right{RIGHT_APPLICATION_DELETE},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// good request
 		req = &GatewayCollaborator{
-			GatewayIdentifier: GatewayIdentifier{"foo-gtw"},
-			UserIdentifier:    UserIdentifier{"alice"},
+			GatewayIdentifier:            GatewayIdentifier{"foo-gtw"},
+			OrganizationOrUserIdentifier: OrganizationOrUserIdentifier{ID: &OrganizationOrUserIdentifier_UserID{"alice"}},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}

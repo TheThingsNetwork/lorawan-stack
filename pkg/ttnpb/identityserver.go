@@ -131,7 +131,10 @@ func (req *ValidateUserEmailRequest) Validate() error {
 
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *CreateApplicationRequest) Validate() error {
-	return validate.Field(req.Application.ApplicationID, validate.ID).DescribeFieldName("Application ID")
+	return validate.All(
+		validate.Field(req.Application.ApplicationID, validate.ID).DescribeFieldName("Application ID"),
+		validate.Field(req.OrganizationID, validate.NotRequired, validate.ID).DescribeFieldName("Organization ID"),
+	)
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.
@@ -160,6 +163,11 @@ func (req *UpdateApplicationRequest) Validate() error {
 	}
 
 	return validate.All(validations...)
+}
+
+// Validate is used as validator function by the GRPC validator interceptor.
+func (req *ListApplicationsRequest) Validate() error {
+	return validate.Field(req.OrganizationID, validate.NotRequired, validate.ID).DescribeFieldName("Organization ID")
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.
@@ -280,6 +288,11 @@ func (req *UpdateGatewayRequest) Validate() error {
 	}
 
 	return validate.All(validations...)
+}
+
+// Validate is used as validator function by the GRPC validator interceptor.
+func (req *ListGatewaysRequest) Validate() error {
+	return validate.Field(req.OrganizationID, validate.NotRequired, validate.ID).DescribeFieldName("Organization ID")
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.

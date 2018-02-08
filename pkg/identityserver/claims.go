@@ -8,14 +8,17 @@ import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 type entity int
 
 const (
-	// EntityUser is an user.
+	// entityUser is an user.
 	entityUser = iota
 
-	// EntityApplication is an application.
+	// entityApplication is an application.
 	entityApplication
 
-	// EntityGateway is a gateway.
+	// entityGateway is a gateway.
 	entityGateway
+
+	// entityOrganization is an organization.
+	entityOrganization
 )
 
 // claims is the type that represents a claims to do something in the Identity Server.
@@ -55,6 +58,15 @@ func (c *claims) ApplicationID() (id string) {
 // empty string if it is not for a gateway.
 func (c *claims) GatewayID() (id string) {
 	if c.EntityType == entityGateway {
+		id = c.EntityID
+	}
+	return
+}
+
+// OrganizationID returns the organization ID of the organization this claims are
+// for, or the empty string if it is not for an organization.
+func (c *claims) OrganizationID() (id string) {
+	if c.EntityType == entityOrganization {
 		id = c.EntityID
 	}
 	return

@@ -59,6 +59,7 @@ type IdentityServer struct {
 	*gatewayService
 	*clientService
 	*adminService
+	*organizationService
 }
 
 // Specializers are the specializers to be used in the Identity Server.
@@ -91,6 +92,7 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 	is.gatewayService = &gatewayService{is}
 	is.clientService = &clientService{is}
 	is.adminService = &adminService{is}
+	is.organizationService = &organizationService{is}
 
 	if config.Sendgrid != nil && config.Sendgrid.APIKey != "" {
 		is.email = sendgrid.New(log, *config.Sendgrid)
@@ -141,6 +143,7 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterIsGatewayServer(s, is.gatewayService)
 	ttnpb.RegisterIsClientServer(s, is.clientService)
 	ttnpb.RegisterIsAdminServer(s, is.adminService)
+	ttnpb.RegisterIsOrganizationServer(s, is.organizationService)
 }
 
 // RegisterHandlers registers gRPC handlers.
@@ -150,6 +153,7 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 	ttnpb.RegisterIsGatewayHandler(is.Context(), s, conn)
 	ttnpb.RegisterIsClientHandler(is.Context(), s, conn)
 	ttnpb.RegisterIsAdminHandler(is.Context(), s, conn)
+	ttnpb.RegisterIsOrganizationHandler(is.Context(), s, conn)
 }
 
 // Roles returns the roles that the identity server fulfils

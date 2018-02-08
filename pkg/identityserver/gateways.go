@@ -20,12 +20,25 @@ type gatewayService struct {
 // CreateGateway creates a gateway in the network, sets the user as collaborator
 // with all rights and creates an API key
 func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (*pbtypes.Empty, error) {
-	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_GATEWAYS_CREATE)
-	if err != nil {
-		return nil, err
+	var id ttnpb.OrganizationOrUserIdentifier
+
+	if req.OrganizationID != "" {
+		err := s.enforceOrganizationRights(ctx, req.OrganizationID, ttnpb.RIGHT_ORGANIZATION_GATEWAYS_CREATE)
+		if err != nil {
+			return nil, err
+		}
+
+		id = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_OrganizationID{req.OrganizationID}}
+	} else {
+		userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_GATEWAYS_CREATE)
+		if err != nil {
+			return nil, err
+		}
+
+		id = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{userID}}
 	}
 
-	err = s.store.Transact(func(tx *store.Store) error {
+	err := s.store.Transact(func(tx *store.Store) error {
 		settings, err := tx.Settings.Get()
 		if err != nil {
 			return err
@@ -55,9 +68,9 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 		}
 
 		return tx.Gateways.SetCollaborator(&ttnpb.GatewayCollaborator{
-			GatewayIdentifier: req.Gateway.GatewayIdentifier,
-			UserIdentifier:    ttnpb.UserIdentifier{userID},
-			Rights:            ttnpb.AllGatewayRights(),
+			GatewayIdentifier:            req.Gateway.GatewayIdentifier,
+			OrganizationOrUserIdentifier: id,
+			Rights: ttnpb.AllGatewayRights(),
 		})
 	})
 
@@ -81,7 +94,15 @@ func (s *gatewayService) GetGateway(ctx context.Context, req *ttnpb.GatewayIdent
 
 // ListGateways returns all the gateways the current user is collaborator of.
 func (s *gatewayService) ListGateways(ctx context.Context, req *ttnpb.ListGatewaysRequest) (*ttnpb.ListGatewaysResponse, error) {
-	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_GATEWAYS_LIST)
+	var id string
+	var err error
+
+	if id = req.OrganizationID; id != "" {
+		err = s.enforceOrganizationRights(ctx, req.OrganizationID, ttnpb.RIGHT_ORGANIZATION_GATEWAYS_LIST)
+	} else {
+		id, err = s.enforceUserRights(ctx, ttnpb.RIGHT_USER_GATEWAYS_LIST)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +169,7 @@ func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGat
 			case ttnpb.FieldPathGatewayClusterAddress.MatchString(path):
 				gtw.ClusterAddress = req.Gateway.ClusterAddress
 			case ttnpb.FieldPathGatewayContactAccountUserID.MatchString(path):
-				gtw.ContactAccount.UserID = req.Gateway.ContactAccount.UserID
+				gtw.ContactAccount = &ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{req.Gateway.ContactAccount.GetUserID()}}
 			default:
 				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
 					"path": path,
@@ -298,7 +319,7 @@ func (s *gatewayService) ListGatewayRights(ctx context.Context, req *ttnpb.Gatew
 	case auth.Token:
 		userID := claims.UserID()
 
-		rights, err := s.store.Gateways.ListUserRights(req.GatewayID, userID)
+		rights, err := s.store.Gateways.ListCollaboratorRights(req.GatewayID, userID)
 		if err != nil {
 			return nil, err
 		}

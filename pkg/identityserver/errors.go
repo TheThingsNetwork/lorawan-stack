@@ -15,6 +15,7 @@ func init() {
 	ErrValidationTokenExpired.Register()
 	ErrInvitationTokenMissing.Register()
 	ErrEmailAddressAlreadyUsed.Register()
+	ErrSetOrganizationMemberFailed.Register()
 }
 
 // ErrBlacklistedID is returned when trying to register an entity using a blacklisted ID.
@@ -101,4 +102,14 @@ var ErrEmailAddressAlreadyUsed = &errors.ErrDescriptor{
 	MessageFormat: "Failed to issue invitation: the email address `{email}` is already in use",
 	Code:          10,
 	Type:          errors.Unauthorized,
+}
+
+// ErrSetOrganizationMemberFailed is returned when trying to unset or revoke
+// rights to an organization member so the organization is left without at least
+// one member with `RIGHT_ORGANIZATION_SETTINGS_MEMBERS` right.
+var ErrSetOrganizationMemberFailed = &errors.ErrDescriptor{
+	MessageFormat:  "Failed to modify members: organization `{organization_id}` must have at least one member with `RIGHT_ORGANIZATION_SETTINGS_MEMBERS` right",
+	Code:           11,
+	Type:           errors.Unauthorized,
+	SafeAttributes: []string{"organization_id"},
 }

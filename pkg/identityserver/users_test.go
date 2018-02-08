@@ -136,12 +136,12 @@ func TestUser(t *testing.T) {
 	// generate a new API key
 	key, err := is.userService.GenerateUserAPIKey(ctx, &ttnpb.GenerateUserAPIKeyRequest{
 		Name:   "foo",
-		Rights: ttnpb.AllUserRights,
+		Rights: ttnpb.AllUserRights(),
 	})
 	a.So(err, should.BeNil)
 	a.So(key.Key, should.NotBeEmpty)
 	a.So(key.Name, should.Equal, key.Name)
-	a.So(key.Rights, should.Resemble, ttnpb.AllUserRights)
+	a.So(key.Rights, should.Resemble, ttnpb.AllUserRights())
 
 	// update api key
 	key.Rights = []ttnpb.Right{ttnpb.Right(10)}
@@ -263,7 +263,7 @@ func TestUser(t *testing.T) {
 		RedirectURI:      "foo.ttn.dev/oauth",
 		Creator:          testUsers()["john-doe"].UserIdentifier,
 	}
-	client.Rights = append(client.Rights, ttnpb.AllUserRights...)
+	client.Rights = append(client.Rights, ttnpb.AllUserRights()...)
 	err = is.store.Clients.Create(client)
 	a.So(err, should.BeNil)
 
