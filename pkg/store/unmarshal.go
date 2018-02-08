@@ -180,32 +180,6 @@ func UnmarshalMap(m map[string]interface{}, v interface{}, hooks ...mapstructure
 	return dec.Decode(slicify(m))
 }
 
-func typeByFlatName(typ reflect.Type, name string) (reflect.Type, error) {
-	if name == "" {
-		panic(errors.New("Empty name specified"))
-	}
-	for _, name := range strings.Split(name, Separator) {
-		if typ.Kind() == reflect.Ptr {
-			typ = typ.Elem()
-		}
-		switch typ.Kind() {
-		case reflect.Struct:
-			f, ok := typ.FieldByName(name)
-			if !ok {
-				return nil, errors.Errorf("Field %s does not exist on structs of type %s", name, typ)
-			}
-			typ = f.Type
-		case reflect.Slice, reflect.Array, reflect.Chan:
-			typ = typ.Elem()
-		case reflect.Map:
-			typ = typ.Key()
-		default:
-			return nil, errors.Errorf("Impossible to access fields of type %s", typ)
-		}
-	}
-	return typ, nil
-}
-
 var jsonpbUnmarshaler = &jsonpb.Unmarshaler{}
 
 var (

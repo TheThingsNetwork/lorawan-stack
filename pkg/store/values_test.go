@@ -159,8 +159,8 @@ func (cm CustomMarshaler) MarshalMap() (map[string]interface{}, error) {
 
 func (cm CustomMarshaler) MarshalByteMap() (map[string][]byte, error) {
 	return map[string][]byte{
-		"aField": []byte{cm.a},
-		"bField": []byte{cm.b},
+		"aField": {cm.a},
+		"bField": {cm.b},
 		"cField": append(cm.c, 'X', 'X'),
 	}, nil
 }
@@ -203,11 +203,11 @@ func (cm CustomMarshalerAB) MarshalMap() (map[string]interface{}, error) {
 
 func (cm CustomMarshalerAB) MarshalByteMap() (map[string][]byte, error) {
 	return map[string][]byte{
-		"A.aField": []byte{cm.A.a},
-		"A.bField": []byte{cm.A.b},
+		"A.aField": {cm.A.a},
+		"A.bField": {cm.A.b},
 		"A.cField": append(cm.A.c, 'X', 'X'),
-		"B.aField": []byte{cm.B.a},
-		"B.bField": []byte{cm.B.b},
+		"B.aField": {cm.B.a},
+		"B.bField": {cm.B.b},
 		"B.cField": append(cm.B.c, 'X', 'X'),
 	}, nil
 }
@@ -406,8 +406,8 @@ var values = []struct {
 			"cField": []byte("fooX"),
 		},
 		map[string][]byte{
-			"aField": []byte{42},
-			"bField": []byte{43},
+			"aField": {42},
+			"bField": {43},
 			"cField": []byte("fooXX"),
 		},
 		nil,
@@ -434,11 +434,11 @@ var values = []struct {
 			"B.cField": []byte("barX"),
 		},
 		map[string][]byte{
-			"A.aField": []byte{42},
-			"A.bField": []byte{43},
+			"A.aField": {42},
+			"A.bField": {43},
 			"A.cField": []byte("fooXX"),
-			"B.aField": []byte{4},
-			"B.bField": []byte{5},
+			"B.aField": {4},
+			"B.bField": {5},
 			"B.cField": []byte("barXX"),
 		},
 		nil,
