@@ -63,15 +63,17 @@ type GatewayStore interface {
 	// If the list of rights is empty the collaborator will be unset.
 	SetCollaborator(collaborator *ttnpb.GatewayCollaborator) error
 
-	// HasUserRights checks whether an user has a set of given rights to a gateway.
-	HasUserRights(gtwID, userID string, rights ...ttnpb.Right) (bool, error)
+	// HasCollaboratorRights checks whether a collaborator has a given set of rights
+	// to a gateway. It returns false if the collaborationship does not exist.
+	HasCollaboratorRights(gtwID, collaboratorID string, rights ...ttnpb.Right) (bool, error)
 
 	// ListCollaborators retrieves all the gateway collaborators.
 	// Optionally a list of rights can be passed to filter them.
 	ListCollaborators(gtwID string, rights ...ttnpb.Right) ([]*ttnpb.GatewayCollaborator, error)
 
-	// ListUserRights returns the rights the user has for a gateway.
-	ListUserRights(gtwID string, userID string) ([]ttnpb.Right, error)
+	// ListCollaboratorRights returns the rights a given collaborator has for a
+	// Gateway. Returns empty list if the collaborationship does not exist.
+	ListCollaboratorRights(gtwID string, collaboratorID string) ([]ttnpb.Right, error)
 
 	// LoadAttributes loads extra attributes into the gateway if it's an Attributer.
 	LoadAttributes(gtwID string, gtw Gateway) error
