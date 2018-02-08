@@ -9,11 +9,13 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver"
 )
 
+// Config represents the Identity Server configuration.
 type Config struct {
 	conf.ServiceBase `name:",squash"`
 	IS               identityserver.Config `name:"is"`
 }
 
+// DefaultConfig contains the default Identity Server configuration.
 var DefaultConfig = Config{
 	ServiceBase: shared.DefaultServiceBase,
 	IS:          shared_identityserver.DefaultIdentityServerConfig,

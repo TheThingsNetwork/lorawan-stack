@@ -13,7 +13,7 @@ import (
 
 func app() *ttnpb.Application {
 	return &ttnpb.Application{
-		ApplicationIdentifier: ttnpb.ApplicationIdentifier{"demo-app"},
+		ApplicationIdentifier: ttnpb.ApplicationIdentifier{ApplicationID: "demo-app"},
 		Description:           "Demo application",
 	}
 }

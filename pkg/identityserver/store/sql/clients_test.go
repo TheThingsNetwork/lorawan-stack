@@ -19,20 +19,20 @@ var clientSpecializer = func(base ttnpb.Client) store.Client {
 func testClients() map[string]*ttnpb.Client {
 	return map[string]*ttnpb.Client{
 		"test-client": {
-			ClientIdentifier: ttnpb.ClientIdentifier{"test-client"},
+			ClientIdentifier: ttnpb.ClientIdentifier{ClientID: "test-client"},
 			Secret:           "123456",
 			RedirectURI:      "/oauth/callback",
 			Grants:           []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_PASSWORD},
 			Rights:           []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
-			Creator:          ttnpb.UserIdentifier{"bob"},
+			Creator:          ttnpb.UserIdentifier{UserID: "bob"},
 		},
 		"foo-client": {
-			ClientIdentifier: ttnpb.ClientIdentifier{"foo-client"},
+			ClientIdentifier: ttnpb.ClientIdentifier{ClientID: "foo-client"},
 			Secret:           "foofoofoo",
 			RedirectURI:      "https://foo.bar/oauth/callback",
 			Grants:           []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE},
 			Rights:           []ttnpb.Right{ttnpb.RIGHT_USER_ADMIN, ttnpb.RIGHT_GATEWAY_INFO},
-			Creator:          ttnpb.UserIdentifier{"bob"},
+			Creator:          ttnpb.UserIdentifier{UserID: "bob"},
 		},
 	}
 }
@@ -122,8 +122,8 @@ func testClientDeleteFeedDatabase(t *testing.T, userID, clientID string) {
 	s := testStore(t, database)
 
 	client := &ttnpb.Client{
-		ClientIdentifier: ttnpb.ClientIdentifier{clientID},
-		Creator:          ttnpb.UserIdentifier{userID},
+		ClientIdentifier: ttnpb.ClientIdentifier{ClientID: clientID},
+		Creator:          ttnpb.UserIdentifier{UserID: userID},
 	}
 	err := s.Clients.Create(client)
 	a.So(err, should.BeNil)

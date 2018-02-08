@@ -88,6 +88,9 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 	}
 
 	config.Hostname, err = hostname(config.PublicURL)
+	if err != nil {
+		return nil, err
+	}
 
 	is.userService = &userService{is}
 	is.applicationService = &applicationService{is}
@@ -139,7 +142,7 @@ func (is *IdentityServer) Init() error {
 	// set default settings if these are not set yet
 	_, err = is.store.Settings.Get()
 	if sql.ErrSettingsNotFound.Describes(err) {
-		if err := is.store.Settings.Set(is.config.DefaultSettings); err != nil {
+		if err = is.store.Settings.Set(is.config.DefaultSettings); err != nil {
 			return err
 		}
 	}

@@ -79,7 +79,7 @@ func TestUserAttributer(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	user := &ttnpb.User{
-		UserIdentifier: ttnpb.UserIdentifier{"attributer"},
+		UserIdentifier: ttnpb.UserIdentifier{UserID: "attributer"},
 		Password:       "secret",
 		Email:          "john@example.net",
 	}

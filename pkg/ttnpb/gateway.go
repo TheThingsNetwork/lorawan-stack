@@ -26,7 +26,7 @@ func (g *Gateway) SetAntennas(antennas []GatewayAntenna) {
 	g.Antennas = antennas
 }
 
-// SetAntennas sets the radios.
+// SetRadios sets the radios.
 func (g *Gateway) SetRadios(radios []GatewayRadio) {
 	g.Radios = radios
 }
@@ -47,13 +47,13 @@ var (
 	// FieldPathGatewayRadios is the field path for the radios.
 	FieldPathGatewayRadios = regexp.MustCompile(`^radios$`)
 
-	// FieldPathGatewaySettingsStatusPublic is the field path for the gateway privacy setting status public field.
+	// FieldPathGatewayPrivacySettingsStatusPublic is the field path for the gateway privacy setting status public field.
 	FieldPathGatewayPrivacySettingsStatusPublic = regexp.MustCompile(`^privacy_settings.status_public$`)
 
-	// FieldPathGatewaySettingsLocationPublic is the field path for the gateway privacy setting location public field.
+	// FieldPathGatewayPrivacySettingsLocationPublic is the field path for the gateway privacy setting location public field.
 	FieldPathGatewayPrivacySettingsLocationPublic = regexp.MustCompile(`^privacy_settings.location_public$`)
 
-	// FieldPathGatewaySettingsContactable is the field path for the gateway privacy setting contactable field.
+	// FieldPathGatewayPrivacySettingsContactable is the field path for the gateway privacy setting contactable field.
 	FieldPathGatewayPrivacySettingsContactable = regexp.MustCompile(`^privacy_settings.contactable$`)
 
 	// FieldPathGatewayAutoUpdate is the field path for the gateway auto update field.
@@ -69,13 +69,13 @@ var (
 	FieldPathGatewayContactAccountUserID = regexp.MustCompile(`^contact_account.user_id$`)
 )
 
-// GatewayPrivacySetting is an enum that defines the different gateway privacy settings.
-type GatewayPrivacySetting int32
+// gatewayPrivacySetting is an enum that defines the different gateway privacy settings.
+type gatewayPrivacySetting int32
 
 const (
-	PrivacySettingLocationPublic GatewayPrivacySetting = iota
-	PrivacySettingStatusPublic
-	PrivacySettingContactable
+	privacySettingLocationPublic gatewayPrivacySetting = iota
+	privacySettingStatusPublic
+	privacySettingContactable
 )
 
 // Value implements driver.Valuer interface.
@@ -83,15 +83,15 @@ func (p GatewayPrivacySettings) Value() (driver.Value, error) {
 	settings := make([]string, 0)
 
 	if p.LocationPublic {
-		settings = append(settings, string(PrivacySettingLocationPublic))
+		settings = append(settings, string(privacySettingLocationPublic))
 	}
 
 	if p.StatusPublic {
-		settings = append(settings, string(PrivacySettingStatusPublic))
+		settings = append(settings, string(privacySettingStatusPublic))
 	}
 
 	if p.Contactable {
-		settings = append(settings, string(PrivacySettingContactable))
+		settings = append(settings, string(privacySettingContactable))
 	}
 
 	return strings.Join(settings, ","), nil
@@ -106,11 +106,11 @@ func (p *GatewayPrivacySettings) Scan(src interface{}) error {
 
 	for _, part := range strings.Split(str, ",") {
 		switch part {
-		case string(PrivacySettingLocationPublic):
+		case string(privacySettingLocationPublic):
 			p.LocationPublic = true
-		case string(PrivacySettingStatusPublic):
+		case string(privacySettingStatusPublic):
 			p.StatusPublic = true
-		case string(PrivacySettingContactable):
+		case string(privacySettingContactable):
 			p.Contactable = true
 		}
 	}

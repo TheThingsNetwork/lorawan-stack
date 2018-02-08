@@ -21,17 +21,17 @@ var userSpecializer = func(base ttnpb.User) store.User {
 func testUsers() map[string]*ttnpb.User {
 	return map[string]*ttnpb.User{
 		"alice": {
-			UserIdentifier: ttnpb.UserIdentifier{"alice"},
+			UserIdentifier: ttnpb.UserIdentifier{UserID: "alice"},
 			Password:       "123456",
 			Email:          "alice@alice.com",
 		},
 		"bob": {
-			UserIdentifier: ttnpb.UserIdentifier{"bob"},
+			UserIdentifier: ttnpb.UserIdentifier{UserID: "bob"},
 			Password:       "1234567",
 			Email:          "bob@bob.com",
 		},
 		"john-doe": {
-			UserIdentifier: ttnpb.UserIdentifier{"john-doe"},
+			UserIdentifier: ttnpb.UserIdentifier{UserID: "john-doe"},
 			Password:       "123456",
 			Email:          "john@doe.com",
 		},
@@ -235,6 +235,7 @@ func TestUserAPIKeys(t *testing.T) {
 	found, err = s.Users.GetAPIKeyByName(userID, key.Name)
 	a.So(err, should.NotBeNil)
 	a.So(ErrAPIKeyNotFound.Describes(err), should.BeTrue)
+	a.So(found, should.BeNil)
 }
 
 func TestUserDelete(t *testing.T) {
@@ -244,7 +245,7 @@ func TestUserDelete(t *testing.T) {
 	id := "test-delete"
 
 	err := s.Users.Create(&ttnpb.User{
-		UserIdentifier: ttnpb.UserIdentifier{id},
+		UserIdentifier: ttnpb.UserIdentifier{UserID: id},
 		Email:          "foo",
 		Password:       "123",
 		Name:           "bar",
@@ -277,7 +278,7 @@ func BenchmarkUserCreate(b *testing.B) {
 
 	for n := 0; n < b.N; n++ {
 		s.Users.Create(&ttnpb.User{
-			UserIdentifier: ttnpb.UserIdentifier{string(n)},
+			UserIdentifier: ttnpb.UserIdentifier{UserID: string(n)},
 			Email:          fmt.Sprintf("%v@gmail.com", n),
 			Password:       "secret",
 		})

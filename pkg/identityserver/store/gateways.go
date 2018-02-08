@@ -23,6 +23,7 @@ type Gateway interface {
 type GatewaySpecializer func(ttnpb.Gateway) Gateway
 
 // GatewayStore is a store that holds Gateways.
+// nolint: dupl
 type GatewayStore interface {
 	// Create creates a new gateway.
 	Create(gtw Gateway) error

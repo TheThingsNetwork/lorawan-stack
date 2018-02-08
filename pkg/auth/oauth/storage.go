@@ -79,7 +79,8 @@ func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 	}
 
 	// ensure the expiration
-	if err := data.IsExpired(); err != nil {
+	err = data.IsExpired()
+	if err != nil {
 		return nil, err
 	}
 
@@ -148,7 +149,8 @@ func (s *storage) LoadAccess(accessToken string) (*osin.AccessData, error) {
 	}
 
 	// ensure the expiration
-	if err := data.IsExpired(); err != nil {
+	err = data.IsExpired()
+	if err != nil {
 		return nil, err
 	}
 

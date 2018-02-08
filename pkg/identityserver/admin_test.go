@@ -91,7 +91,7 @@ func TestAdminInvitations(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	user := ttnpb.User{
-		UserIdentifier: ttnpb.UserIdentifier{"invitation-user"},
+		UserIdentifier: ttnpb.UserIdentifier{UserID: "invitation-user"},
 		Password:       "lol",
 		Email:          email,
 		Name:           "HI",
@@ -109,7 +109,7 @@ func TestAdminInvitations(t *testing.T) {
 	defer is.store.Users.Delete(user.UserID)
 
 	// check user was created
-	found, err := is.adminService.GetUser(ctx, &ttnpb.UserIdentifier{user.UserID})
+	found, err := is.adminService.GetUser(ctx, &ttnpb.UserIdentifier{UserID: user.UserID})
 	a.So(err, should.BeNil)
 	a.So(found.UserID, should.Equal, user.UserID)
 	a.So(found.Password, should.BeEmpty)
@@ -160,7 +160,7 @@ func TestAdminUsers(t *testing.T) {
 	old := found.GetUser().Password
 
 	{
-		resp, err := is.adminService.ResetUserPassword(ctx, &ttnpb.UserIdentifier{user.UserID})
+		resp, err := is.adminService.ResetUserPassword(ctx, &ttnpb.UserIdentifier{UserID: user.UserID})
 		a.So(err, should.BeNil)
 		a.So(resp.Password, should.NotBeEmpty)
 
@@ -178,7 +178,7 @@ func TestAdminUsers(t *testing.T) {
 	// make user admin
 	_, err = is.adminService.UpdateUser(ctx, &ttnpb.UpdateUserRequest{
 		User: ttnpb.User{
-			UserIdentifier: ttnpb.UserIdentifier{user.UserID},
+			UserIdentifier: ttnpb.UserIdentifier{UserID: user.UserID},
 			Admin:          true,
 		},
 		UpdateMask: pbtypes.FieldMask{
@@ -197,7 +197,7 @@ func TestAdminUsers(t *testing.T) {
 	err = is.store.Users.Create(user)
 	a.So(err, should.BeNil)
 
-	_, err = is.adminService.DeleteUser(ctx, &ttnpb.UserIdentifier{user.UserID})
+	_, err = is.adminService.DeleteUser(ctx, &ttnpb.UserIdentifier{UserID: user.UserID})
 	a.So(err, should.BeNil)
 
 	ddata, ok := mock.Data().(*templates.AccountDeleted)
@@ -211,7 +211,7 @@ func TestAdminUsers(t *testing.T) {
 
 	// list approved users
 	resp, err := is.adminService.ListUsers(ctx, &ttnpb.ListUsersRequest{
-		ListUsersRequest_FilterState: &ttnpb.ListUsersRequest_FilterState{ttnpb.STATE_APPROVED},
+		ListUsersRequest_FilterState: &ttnpb.ListUsersRequest_FilterState{State: ttnpb.STATE_APPROVED},
 	})
 	a.So(err, should.BeNil)
 	if a.So(resp.Users, should.HaveLength, 1) {
@@ -226,12 +226,12 @@ func TestAdminClients(t *testing.T) {
 	ctx := testCtx(testUsers()["alice"].UserID)
 	client := testClient()
 
-	found, err := is.adminService.GetClient(ctx, &ttnpb.ClientIdentifier{client.ClientID})
+	found, err := is.adminService.GetClient(ctx, &ttnpb.ClientIdentifier{ClientID: client.ClientID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeClientIgnoringAutoFields, client)
 
 	clients, err := is.adminService.ListClients(ctx, &ttnpb.ListClientsRequest{
-		ListClientsRequest_FilterState: &ttnpb.ListClientsRequest_FilterState{ttnpb.STATE_PENDING},
+		ListClientsRequest_FilterState: &ttnpb.ListClientsRequest_FilterState{State: ttnpb.STATE_PENDING},
 	})
 	a.So(err, should.BeNil)
 	a.So(clients.Clients, should.HaveLength, 0)
@@ -241,7 +241,7 @@ func TestAdminClients(t *testing.T) {
 	err = is.store.Clients.Create(client)
 	a.So(err, should.BeNil)
 
-	_, err = is.adminService.DeleteClient(ctx, &ttnpb.ClientIdentifier{client.ClientID})
+	_, err = is.adminService.DeleteClient(ctx, &ttnpb.ClientIdentifier{ClientID: client.ClientID})
 	a.So(err, should.BeNil)
 
 	data, ok := mock.Data().(*templates.ClientDeleted)

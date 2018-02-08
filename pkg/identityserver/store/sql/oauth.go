@@ -157,7 +157,7 @@ func (s *OAuthStore) saveAccessToken(q db.QueryContext, access *store.AccessData
 	return err
 }
 
-// GetRefreshToken finds the access token.
+// GetAccessToken finds the access token.
 func (s *OAuthStore) GetAccessToken(accessToken string) (*store.AccessData, error) {
 	return s.getAccessToken(s.queryer(), accessToken)
 }
@@ -183,7 +183,7 @@ func (s *OAuthStore) getAccessToken(q db.QueryContext, accessToken string) (*sto
 	return result, nil
 }
 
-// DeleteRefreshToken deletes the access token from the database.
+// DeleteAccessToken deletes the access token from the database.
 func (s *OAuthStore) DeleteAccessToken(accessToken string) error {
 	return s.deleteAccessToken(s.queryer(), accessToken)
 }
@@ -302,7 +302,8 @@ func (s *OAuthStore) deleteRefreshTokensByClient(q db.QueryContext, clientID str
 	return err
 }
 
-func (s *OAuthStore) ListAuthorizedClients(userID string, factory store.ClientSpecializer) ([]store.Client, error) {
+// ListAuthorizedClients returns a list of clients authorized by a given user.
+func (s *OAuthStore) ListAuthorizedClients(userID string, specializer store.ClientSpecializer) ([]store.Client, error) {
 	var result []store.Client
 
 	err := s.transact(func(tx *db.Tx) error {
@@ -317,7 +318,7 @@ func (s *OAuthStore) ListAuthorizedClients(userID string, factory store.ClientSp
 				return err
 			}
 
-			client := factory(*found)
+			client := specializer(*found)
 
 			err = (s.store().Clients.(*ClientStore)).loadAttributes(tx, clientID, client)
 			if err != nil {

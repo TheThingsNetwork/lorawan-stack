@@ -15,6 +15,7 @@ type ClientStore struct {
 	*extraAttributesStore
 }
 
+// NewClientStore retuens a ClientStore.
 func NewClientStore(store storer) *ClientStore {
 	return &ClientStore{
 		storer:               store,

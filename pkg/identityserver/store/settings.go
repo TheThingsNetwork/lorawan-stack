@@ -4,7 +4,7 @@ package store
 
 import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 
-// Settings is the settings store.
+// SettingStore is the settings store.
 type SettingStore interface {
 	// Get returns the settings.
 	Get() (*ttnpb.IdentityServerSettings, error)

@@ -19,6 +19,7 @@ type ApplicationStore struct {
 	*apiKeysStore
 }
 
+// NewApplicationStore returns an ApplicationStore.
 func NewApplicationStore(store storer) *ApplicationStore {
 	return &ApplicationStore{
 		storer:               store,
@@ -158,7 +159,7 @@ func (s *ApplicationStore) organizationOrUserApplications(q db.QueryContext, id 
 	return applications, nil
 }
 
-// Edit updates the Application and returns the updated Application.
+// Update updates the Application and returns the updated Application.
 func (s *ApplicationStore) Update(application store.Application) error {
 	err := s.transact(func(tx *db.Tx) error {
 		err := s.update(tx, application)
@@ -364,11 +365,12 @@ func (s *ApplicationStore) ListCollaborators(appID string, rights ...ttnpb.Right
 	return s.listCollaborators(s.queryer(), appID, rights...)
 }
 
+// nolint: dupl
 func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID string, rights ...ttnpb.Right) ([]*ttnpb.ApplicationCollaborator, error) {
-	query := ""
 	args := make([]interface{}, 1)
 	args[0] = appID
 
+	var query string
 	if len(rights) == 0 {
 		query = `
 		SELECT
@@ -425,13 +427,13 @@ func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID string, ri
 		if _, exists := byUser[collaborator.AccountID]; !exists {
 			var identifier ttnpb.OrganizationOrUserIdentifier
 			if collaborator.Type == organization {
-				identifier = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_OrganizationID{collaborator.AccountID}}
+				identifier = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_OrganizationID{OrganizationID: collaborator.AccountID}}
 			} else {
-				identifier = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{collaborator.AccountID}}
+				identifier = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{UserID: collaborator.AccountID}}
 			}
 
 			byUser[collaborator.AccountID] = &ttnpb.ApplicationCollaborator{
-				ApplicationIdentifier:        ttnpb.ApplicationIdentifier{appID},
+				ApplicationIdentifier:        ttnpb.ApplicationIdentifier{ApplicationID: appID},
 				OrganizationOrUserIdentifier: identifier,
 				Rights: []ttnpb.Right{collaborator.Right},
 			}

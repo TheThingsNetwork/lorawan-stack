@@ -49,7 +49,7 @@ func getIS(t testing.TB) *IdentityServer {
 		}
 
 		for _, user := range testUsers() {
-			err := is.store.Users.Create(user)
+			err = is.store.Users.Create(user)
 			if err != nil {
 				logger.WithError(err).Fatal("Failed to feed the database with test users")
 			}
@@ -93,7 +93,7 @@ func testSettings() *ttnpb.IdentityServerSettings {
 
 func testClient() *ttnpb.Client {
 	cli := &ttnpb.Client{
-		ClientIdentifier: ttnpb.ClientIdentifier{"test-client"},
+		ClientIdentifier: ttnpb.ClientIdentifier{ClientID: "test-client"},
 		Description:      "foo description",
 		Creator:          testUsers()["alice"].UserIdentifier,
 		Secret:           "secret",
@@ -113,20 +113,20 @@ func testClient() *ttnpb.Client {
 func testUsers() map[string]*ttnpb.User {
 	return map[string]*ttnpb.User{
 		"alice": {
-			UserIdentifier: ttnpb.UserIdentifier{"alice"},
+			UserIdentifier: ttnpb.UserIdentifier{UserID: "alice"},
 			Password:       "123456",
 			Admin:          true,
 			Email:          "alice@alice.com",
 			State:          ttnpb.STATE_APPROVED,
 		},
 		"bob": {
-			UserIdentifier: ttnpb.UserIdentifier{"bob"},
+			UserIdentifier: ttnpb.UserIdentifier{UserID: "bob"},
 			Password:       "1234567",
 			Email:          "bob@bob.com",
 			Admin:          true,
 		},
 		"john-doe": {
-			UserIdentifier: ttnpb.UserIdentifier{"john-doe"},
+			UserIdentifier: ttnpb.UserIdentifier{UserID: "john-doe"},
 			Password:       "123456",
 			Email:          "john@doe.com",
 		},

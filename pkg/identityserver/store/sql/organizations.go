@@ -20,6 +20,7 @@ type OrganizationStore struct {
 	*accountStore
 }
 
+// NewOrganizationStore returns an organization store.
 func NewOrganizationStore(store storer) *OrganizationStore {
 	return &OrganizationStore{
 		storer:               store,
@@ -159,6 +160,7 @@ func (s *OrganizationStore) userOrganizations(q db.QueryContext, userID string) 
 	return organizations, nil
 }
 
+// Update updates an organization.
 func (s *OrganizationStore) Update(organization store.Organization) error {
 	err := s.transact(func(tx *db.Tx) error {
 		err := s.update(tx, organization)
@@ -199,6 +201,7 @@ func (s *OrganizationStore) update(q db.QueryContext, organization store.Organiz
 	return err
 }
 
+// Delete deletes an organization.
 func (s *OrganizationStore) Delete(organizationID string) error {
 	err := s.transact(func(tx *db.Tx) error {
 		err := s.deleteCollaborations(tx, organizationID)
@@ -312,10 +315,10 @@ func (s *OrganizationStore) ListMembers(organizationID string, rights ...ttnpb.R
 }
 
 func (s *OrganizationStore) listMembers(q db.QueryContext, organizationID string, rights ...ttnpb.Right) ([]*ttnpb.OrganizationMember, error) {
-	query := ""
 	args := make([]interface{}, 0, 2+len(rights))
 	args = append(args, organizationID)
 
+	var query string
 	if len(rights) == 0 {
 		query = `
 			SELECT
@@ -374,8 +377,8 @@ func (s *OrganizationStore) listMembers(q db.QueryContext, organizationID string
 		_, ok := byUser[row.OrganizationMember.UserID]
 		if !ok {
 			byUser[row.UserID] = new(ttnpb.OrganizationMember)
-			byUser[row.UserID].UserIdentifier = ttnpb.UserIdentifier{row.UserID}
-			byUser[row.UserID].OrganizationIdentifier = ttnpb.OrganizationIdentifier{row.OrganizationID}
+			byUser[row.UserID].UserIdentifier = ttnpb.UserIdentifier{UserID: row.UserID}
+			byUser[row.UserID].OrganizationIdentifier = ttnpb.OrganizationIdentifier{OrganizationID: row.OrganizationID}
 			byUser[row.UserID].Rights = make([]ttnpb.Right, 0, 1)
 		}
 
@@ -390,6 +393,8 @@ func (s *OrganizationStore) listMembers(q db.QueryContext, organizationID string
 	return members, nil
 }
 
+// SetMember inserts or updates a member within an organization.
+// If the list of rights is empty the member will be unset.
 func (s *OrganizationStore) SetMember(member *ttnpb.OrganizationMember) error {
 	if len(member.Rights) == 0 {
 		return s.removeMember(s.queryer(), member)

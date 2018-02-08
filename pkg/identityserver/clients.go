@@ -27,7 +27,7 @@ func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClien
 		return nil, err
 	}
 
-	err = s.store.Transact(func(tx *store.Store) error {
+	err = s.store.Transact(func(tx *store.Store) (err error) {
 		settings, err := tx.Settings.Get()
 		if err != nil {
 			return err
@@ -44,7 +44,7 @@ func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClien
 			ClientIdentifier: req.Client.ClientIdentifier,
 			Description:      req.Client.Description,
 			RedirectURI:      req.Client.RedirectURI,
-			Creator:          ttnpb.UserIdentifier{claims.FromContext(ctx).UserID()},
+			Creator:          ttnpb.UserIdentifier{UserID: claims.FromContext(ctx).UserID()},
 			Secret:           random.String(64),
 			State:            ttnpb.STATE_PENDING,
 			OfficialLabeled:  false,

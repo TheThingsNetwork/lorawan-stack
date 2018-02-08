@@ -24,7 +24,7 @@ func TestOrganization(t *testing.T) {
 	alice := testUsers()["alice"]
 
 	org := ttnpb.Organization{
-		OrganizationIdentifier: ttnpb.OrganizationIdentifier{"foo-org"},
+		OrganizationIdentifier: ttnpb.OrganizationIdentifier{OrganizationID: "foo-org"},
 	}
 
 	ctx := testCtx(user.UserID)
@@ -38,14 +38,14 @@ func TestOrganization(t *testing.T) {
 	for _, id := range testSettings().BlacklistedIDs {
 		_, err := is.organizationService.CreateOrganization(ctx, &ttnpb.CreateOrganizationRequest{
 			Organization: ttnpb.Organization{
-				OrganizationIdentifier: ttnpb.OrganizationIdentifier{id},
+				OrganizationIdentifier: ttnpb.OrganizationIdentifier{OrganizationID: id},
 			},
 		})
 		a.So(err, should.NotBeNil)
 		a.So(ErrBlacklistedID.Describes(err), should.BeTrue)
 	}
 
-	found, err := is.organizationService.GetOrganization(ctx, &ttnpb.OrganizationIdentifier{org.OrganizationID})
+	found, err := is.organizationService.GetOrganization(ctx, &ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeOrganizationIgnoringAutoFields, org)
 
@@ -64,7 +64,7 @@ func TestOrganization(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	found, err = is.organizationService.GetOrganization(ctx, &ttnpb.OrganizationIdentifier{org.OrganizationID})
+	found, err = is.organizationService.GetOrganization(ctx, &ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeOrganizationIgnoringAutoFields, org)
 
@@ -97,7 +97,7 @@ func TestOrganization(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
-	keys, err := is.organizationService.ListOrganizationAPIKeys(ctx, &ttnpb.OrganizationIdentifier{org.OrganizationID})
+	keys, err := is.organizationService.ListOrganizationAPIKeys(ctx, &ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID})
 	a.So(err, should.BeNil)
 	if a.So(keys.APIKeys, should.HaveLength, 1) {
 		sort.Slice(keys.APIKeys[0].Rights, func(i, j int) bool { return keys.APIKeys[0].Rights[i] < keys.APIKeys[0].Rights[j] })
@@ -108,8 +108,9 @@ func TestOrganization(t *testing.T) {
 		OrganizationIdentifier: org.OrganizationIdentifier,
 		Name: key.Name,
 	})
+	a.So(err, should.BeNil)
 
-	keys, err = is.organizationService.ListOrganizationAPIKeys(ctx, &ttnpb.OrganizationIdentifier{org.OrganizationID})
+	keys, err = is.organizationService.ListOrganizationAPIKeys(ctx, &ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID})
 	a.So(err, should.BeNil)
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
@@ -123,11 +124,11 @@ func TestOrganization(t *testing.T) {
 	_, err = is.organizationService.SetOrganizationMember(ctx, member)
 	a.So(err, should.BeNil)
 
-	rights, err := is.organizationService.ListOrganizationRights(ctx, &ttnpb.OrganizationIdentifier{org.OrganizationID})
+	rights, err := is.organizationService.ListOrganizationRights(ctx, &ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID})
 	a.So(err, should.BeNil)
 	a.So(rights.Rights, should.Resemble, ttnpb.AllOrganizationRights())
 
-	members, err := is.organizationService.ListOrganizationMembers(ctx, &ttnpb.OrganizationIdentifier{org.OrganizationID})
+	members, err := is.organizationService.ListOrganizationMembers(ctx, &ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID})
 	a.So(err, should.BeNil)
 	a.So(members.Members, should.HaveLength, 2)
 	a.So(members.Members, should.Contain, member)
@@ -146,12 +147,12 @@ func TestOrganization(t *testing.T) {
 		_, err = is.organizationService.SetOrganizationMember(ctx, member)
 		a.So(err, should.BeNil)
 
-		rights, err := is.organizationService.ListOrganizationRights(ctx, &ttnpb.OrganizationIdentifier{org.OrganizationID})
+		rights, err := is.organizationService.ListOrganizationRights(ctx, &ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID})
 		a.So(err, should.BeNil)
 		a.So(rights.Rights, should.HaveLength, 2)
 		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
 
-		members, err = is.organizationService.ListOrganizationMembers(ctx, &ttnpb.OrganizationIdentifier{org.OrganizationID})
+		members, err = is.organizationService.ListOrganizationMembers(ctx, &ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID})
 		a.So(err, should.BeNil)
 
 		// But it can revoke itself the INFO right.
@@ -159,7 +160,7 @@ func TestOrganization(t *testing.T) {
 		_, err = is.organizationService.SetOrganizationMember(ctx, member)
 		a.So(err, should.BeNil)
 
-		rights, err = is.organizationService.ListOrganizationRights(ctx, &ttnpb.OrganizationIdentifier{org.OrganizationID})
+		rights, err = is.organizationService.ListOrganizationRights(ctx, &ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID})
 		a.So(err, should.BeNil)
 		a.So(rights.Rights, should.HaveLength, 1)
 		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_ORGANIZATION_INFO)
@@ -178,7 +179,7 @@ func TestOrganization(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(ErrSetOrganizationMemberFailed.Describes(err), should.BeTrue)
 
-	members, err = is.organizationService.ListOrganizationMembers(ctx, &ttnpb.OrganizationIdentifier{org.OrganizationID})
+	members, err = is.organizationService.ListOrganizationMembers(ctx, &ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID})
 	a.So(err, should.BeNil)
 	a.So(members.Members, should.HaveLength, 2)
 
@@ -187,48 +188,48 @@ func TestOrganization(t *testing.T) {
 	_, err = is.organizationService.SetOrganizationMember(ctx, member)
 	a.So(err, should.BeNil)
 
-	members, err = is.organizationService.ListOrganizationMembers(ctx, &ttnpb.OrganizationIdentifier{org.OrganizationID})
+	members, err = is.organizationService.ListOrganizationMembers(ctx, &ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID})
 	a.So(err, should.BeNil)
 	a.So(members.Members, should.HaveLength, 1)
 
 	// Applications.
 	{
-		apps, err := is.applicationService.ListApplications(ctx, &ttnpb.ListApplicationsRequest{ttnpb.OrganizationIdentifier{org.OrganizationID}})
+		apps, err := is.applicationService.ListApplications(ctx, &ttnpb.ListApplicationsRequest{OrganizationIdentifier: ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID}})
 		a.So(err, should.BeNil)
 		a.So(apps.Applications, should.HaveLength, 0)
 
 		app := ttnpb.Application{
-			ApplicationIdentifier: ttnpb.ApplicationIdentifier{"org-app"},
+			ApplicationIdentifier: ttnpb.ApplicationIdentifier{ApplicationID: "org-app"},
 		}
 
 		_, err = is.applicationService.CreateApplication(ctx, &ttnpb.CreateApplicationRequest{
 			Application:            app,
-			OrganizationIdentifier: ttnpb.OrganizationIdentifier{org.OrganizationID},
+			OrganizationIdentifier: ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID},
 		})
 		a.So(err, should.BeNil)
 
-		apps, err = is.applicationService.ListApplications(ctx, &ttnpb.ListApplicationsRequest{ttnpb.OrganizationIdentifier{org.OrganizationID}})
+		apps, err = is.applicationService.ListApplications(ctx, &ttnpb.ListApplicationsRequest{OrganizationIdentifier: ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID}})
 		a.So(err, should.BeNil)
 		if a.So(apps.Applications, should.HaveLength, 1) {
 			a.So(apps.Applications[0], test.ShouldBeApplicationIgnoringAutoFields, app)
 		}
 
-		_, err = is.applicationService.DeleteApplication(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+		_, err = is.applicationService.DeleteApplication(ctx, &ttnpb.ApplicationIdentifier{ApplicationID: app.ApplicationID})
 		a.So(err, should.BeNil)
 
-		apps, err = is.applicationService.ListApplications(ctx, &ttnpb.ListApplicationsRequest{ttnpb.OrganizationIdentifier{org.OrganizationID}})
+		apps, err = is.applicationService.ListApplications(ctx, &ttnpb.ListApplicationsRequest{OrganizationIdentifier: ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID}})
 		a.So(err, should.BeNil)
 		a.So(apps.Applications, should.HaveLength, 0)
 	}
 
 	// Gateways.
 	{
-		gtws, err := is.gatewayService.ListGateways(ctx, &ttnpb.ListGatewaysRequest{ttnpb.OrganizationIdentifier{org.OrganizationID}})
+		gtws, err := is.gatewayService.ListGateways(ctx, &ttnpb.ListGatewaysRequest{OrganizationIdentifier: ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID}})
 		a.So(err, should.BeNil)
 		a.So(gtws.Gateways, should.HaveLength, 0)
 
 		gtw := ttnpb.Gateway{
-			GatewayIdentifier: ttnpb.GatewayIdentifier{"org-gtw"},
+			GatewayIdentifier: ttnpb.GatewayIdentifier{GatewayID: "org-gtw"},
 			ClusterAddress:    "localhost:1234",
 			FrequencyPlanID:   "868.8",
 			Attributes: map[string]string{
@@ -261,24 +262,24 @@ func TestOrganization(t *testing.T) {
 
 		_, err = is.gatewayService.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{
 			Gateway:                gtw,
-			OrganizationIdentifier: ttnpb.OrganizationIdentifier{org.OrganizationID},
+			OrganizationIdentifier: ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID},
 		})
 		a.So(err, should.BeNil)
 
-		gtws, err = is.gatewayService.ListGateways(ctx, &ttnpb.ListGatewaysRequest{ttnpb.OrganizationIdentifier{org.OrganizationID}})
+		gtws, err = is.gatewayService.ListGateways(ctx, &ttnpb.ListGatewaysRequest{OrganizationIdentifier: ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID}})
 		a.So(err, should.BeNil)
 		if a.So(gtws.Gateways, should.HaveLength, 1) {
 			a.So(gtws.Gateways[0], test.ShouldBeGatewayIgnoringAutoFields, gtw)
 		}
 
-		_, err = is.gatewayService.DeleteGateway(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+		_, err = is.gatewayService.DeleteGateway(ctx, &ttnpb.GatewayIdentifier{GatewayID: gtw.GatewayID})
 		a.So(err, should.BeNil)
 
-		gtws, err = is.gatewayService.ListGateways(ctx, &ttnpb.ListGatewaysRequest{ttnpb.OrganizationIdentifier{org.OrganizationID}})
+		gtws, err = is.gatewayService.ListGateways(ctx, &ttnpb.ListGatewaysRequest{OrganizationIdentifier: ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID}})
 		a.So(err, should.BeNil)
 		a.So(gtws.Gateways, should.HaveLength, 0)
 	}
 
-	_, err = is.organizationService.DeleteOrganization(ctx, &ttnpb.OrganizationIdentifier{org.OrganizationID})
+	_, err = is.organizationService.DeleteOrganization(ctx, &ttnpb.OrganizationIdentifier{OrganizationID: org.OrganizationID})
 	a.So(err, should.BeNil)
 }

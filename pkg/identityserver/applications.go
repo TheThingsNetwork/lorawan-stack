@@ -33,14 +33,14 @@ func (s *applicationService) CreateApplication(ctx context.Context, req *ttnpb.C
 			return nil, err
 		}
 
-		id = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_OrganizationID{req.OrganizationID}}
+		id = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_OrganizationID{OrganizationID: req.OrganizationID}}
 	} else {
 		err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_APPLICATIONS_CREATE)
 		if err != nil {
 			return nil, err
 		}
 
-		id = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{claims.FromContext(ctx).UserID()}}
+		id = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{UserID: claims.FromContext(ctx).UserID()}}
 	}
 
 	err := s.store.Transact(func(tx *store.Store) error {

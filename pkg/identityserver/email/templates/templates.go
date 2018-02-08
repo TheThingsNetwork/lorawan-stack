@@ -25,7 +25,7 @@ func render(subject, message string, data interface{}) (string, string, error) {
 	}
 
 	buf := new(bytes.Buffer)
-	if err := t.Execute(buf, data); err != nil {
+	if err = t.Execute(buf, data); err != nil {
 		return "", "", err
 	}
 	subject = buf.String()

@@ -23,7 +23,7 @@ func TestClient(t *testing.T) {
 	user := testUsers()["bob"]
 
 	cli := ttnpb.Client{
-		ClientIdentifier: ttnpb.ClientIdentifier{"foo-client"},
+		ClientIdentifier: ttnpb.ClientIdentifier{ClientID: "foo-client"},
 		Description:      "description foobarbaz",
 		RedirectURI:      "foo.local/oauth",
 		Secret:           "bar",
@@ -31,7 +31,7 @@ func TestClient(t *testing.T) {
 		Rights:           []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
 		State:            ttnpb.STATE_PENDING,
 		OfficialLabeled:  false,
-		Creator:          ttnpb.UserIdentifier{user.UserID},
+		Creator:          ttnpb.UserIdentifier{UserID: user.UserID},
 	}
 
 	ctx := testCtx(user.UserID)
@@ -43,21 +43,21 @@ func TestClient(t *testing.T) {
 
 	// can't create clients with blacklisted ids
 	for _, id := range testSettings().BlacklistedIDs {
-		_, err := is.clientService.CreateClient(ctx, &ttnpb.CreateClientRequest{
+		_, err = is.clientService.CreateClient(ctx, &ttnpb.CreateClientRequest{
 			Client: ttnpb.Client{
-				ClientIdentifier: ttnpb.ClientIdentifier{id},
+				ClientIdentifier: ttnpb.ClientIdentifier{ClientID: id},
 			},
 		})
 		a.So(err, should.NotBeNil)
 		a.So(ErrBlacklistedID.Describes(err), should.BeTrue)
 	}
 
-	found, err := is.clientService.GetClient(ctx, &ttnpb.ClientIdentifier{cli.ClientID})
+	found, err := is.clientService.GetClient(ctx, &ttnpb.ClientIdentifier{ClientID: cli.ClientID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeClientIgnoringAutoFields, cli)
 
 	// fetch client without authorization credentisla
-	found, err = is.clientService.GetClient(context.Background(), &ttnpb.ClientIdentifier{cli.ClientID})
+	found, err = is.clientService.GetClient(context.Background(), &ttnpb.ClientIdentifier{ClientID: cli.ClientID})
 	a.So(err, should.BeNil)
 	a.So(found.ClientIdentifier.ClientID, should.Equal, cli.ClientIdentifier.ClientID)
 	a.So(found.Description, should.Equal, cli.Description)
@@ -81,14 +81,14 @@ func TestClient(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	found, err = is.clientService.GetClient(ctx, &ttnpb.ClientIdentifier{cli.ClientID})
+	found, err = is.clientService.GetClient(ctx, &ttnpb.ClientIdentifier{ClientID: cli.ClientID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeClientIgnoringAutoFields, cli)
 
-	_, err = is.clientService.DeleteClient(ctx, &ttnpb.ClientIdentifier{cli.ClientID})
+	_, err = is.clientService.DeleteClient(ctx, &ttnpb.ClientIdentifier{ClientID: cli.ClientID})
 	a.So(err, should.BeNil)
 
-	found, err = is.clientService.GetClient(ctx, &ttnpb.ClientIdentifier{cli.ClientID})
+	found, err = is.clientService.GetClient(ctx, &ttnpb.ClientIdentifier{ClientID: cli.ClientID})
 	a.So(found, should.BeNil)
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrClientNotFound.Describes(err), should.BeTrue)

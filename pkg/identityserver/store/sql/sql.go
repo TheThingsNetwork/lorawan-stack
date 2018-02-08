@@ -131,6 +131,7 @@ func initSubStores(s storer) {
 	store.Organizations = NewOrganizationStore(s)
 }
 
+// Init creates the database if it does not exist yet and applies the unapplied migrations.
 func (s *Store) Init() error {
 	_, err := s.db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", s.db.Database()))
 	if err != nil {
@@ -140,11 +141,13 @@ func (s *Store) Init() error {
 	return s.MigrateAll()
 }
 
+// DropDatabase deletes the database.
 func (s *Store) DropDatabase() error {
 	_, err := s.db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE", s.db.Database()))
 	return err
 }
 
+// MigrateAll applies all unapplied migrations.
 func (s *Store) MigrateAll() error {
 	return s.db.MigrateAll()
 }

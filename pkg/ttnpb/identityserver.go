@@ -30,7 +30,7 @@ func (req *UpdateSettingsRequest) Validate() error {
 		switch true {
 		case FieldPathSettingsBlacklistedIDs.MatchString(path):
 			for _, id := range req.Settings.BlacklistedIDs {
-				err := validate.Field(id, validate.ID).DescribeFieldName("Blacklisted ID")
+				err = validate.Field(id, validate.ID).DescribeFieldName("Blacklisted ID")
 				if err != nil {
 					validations = append(validations, err)
 				}

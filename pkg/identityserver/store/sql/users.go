@@ -17,6 +17,7 @@ type UserStore struct {
 	*accountStore
 }
 
+// NewUserStore returns an UserStore.
 func NewUserStore(store storer) *UserStore {
 	return &UserStore{
 		storer:               store,
@@ -246,7 +247,7 @@ func (s *UserStore) Delete(userID string) error {
 		}
 
 		for _, app := range apps {
-			err := applications.unsetCollaborator(tx, app.ApplicationID, userID)
+			err = applications.unsetCollaborator(tx, app.ApplicationID, userID)
 			if err != nil {
 				return err
 			}
@@ -264,7 +265,7 @@ func (s *UserStore) Delete(userID string) error {
 		}
 
 		for _, gtw := range gtws {
-			err := gateways.unsetCollaborator(tx, gtw.GatewayID, userID)
+			err = gateways.unsetCollaborator(tx, gtw.GatewayID, userID)
 			if err != nil {
 				return err
 			}
@@ -282,8 +283,12 @@ func (s *UserStore) Delete(userID string) error {
 		}
 
 		clientIDs, err := oauth.listAuthorizedClients(tx, userID)
+		if err != nil {
+			return err
+		}
+
 		for _, clientID := range clientIDs {
-			_, err := oauth.deleteAccessTokensByUserAndClient(tx, userID, clientID)
+			_, err = oauth.deleteAccessTokensByUserAndClient(tx, userID, clientID)
 			if err != nil {
 				return err
 			}
@@ -306,7 +311,7 @@ func (s *UserStore) Delete(userID string) error {
 		}
 
 		for _, client := range found {
-			err := clients.delete(tx, client.GetClient().ClientID)
+			err = clients.delete(tx, client.GetClient().ClientID)
 			if err != nil {
 				return err
 			}

@@ -23,7 +23,7 @@ func TestGateway(t *testing.T) {
 	user := testUsers()["bob"]
 
 	gtw := ttnpb.Gateway{
-		GatewayIdentifier: ttnpb.GatewayIdentifier{"foo-gtw"},
+		GatewayIdentifier: ttnpb.GatewayIdentifier{GatewayID: "foo-gtw"},
 		ClusterAddress:    "localhost:1234",
 		FrequencyPlanID:   "868.8",
 		Attributes: map[string]string{
@@ -63,16 +63,16 @@ func TestGateway(t *testing.T) {
 
 	// can't create gateways with blacklisted ids
 	for _, id := range testSettings().BlacklistedIDs {
-		_, err := is.gatewayService.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{
+		_, err = is.gatewayService.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{
 			Gateway: ttnpb.Gateway{
-				GatewayIdentifier: ttnpb.GatewayIdentifier{id},
+				GatewayIdentifier: ttnpb.GatewayIdentifier{GatewayID: id},
 			},
 		})
 		a.So(err, should.NotBeNil)
 		a.So(ErrBlacklistedID.Describes(err), should.BeTrue)
 	}
 
-	found, err := is.gatewayService.GetGateway(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	found, err := is.gatewayService.GetGateway(ctx, &ttnpb.GatewayIdentifier{GatewayID: gtw.GatewayID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 
@@ -91,7 +91,7 @@ func TestGateway(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	found, err = is.gatewayService.GetGateway(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	found, err = is.gatewayService.GetGateway(ctx, &ttnpb.GatewayIdentifier{GatewayID: gtw.GatewayID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 
@@ -124,7 +124,7 @@ func TestGateway(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
-	keys, err := is.gatewayService.ListGatewayAPIKeys(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	keys, err := is.gatewayService.ListGatewayAPIKeys(ctx, &ttnpb.GatewayIdentifier{GatewayID: gtw.GatewayID})
 	a.So(err, should.BeNil)
 	if a.So(keys.APIKeys, should.HaveLength, 1) {
 		sort.Slice(keys.APIKeys[0].Rights, func(i, j int) bool { return keys.APIKeys[0].Rights[i] < keys.APIKeys[0].Rights[j] })
@@ -135,8 +135,9 @@ func TestGateway(t *testing.T) {
 		GatewayIdentifier: gtw.GatewayIdentifier,
 		Name:              key.Name,
 	})
+	a.So(err, should.BeNil)
 
-	keys, err = is.gatewayService.ListGatewayAPIKeys(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	keys, err = is.gatewayService.ListGatewayAPIKeys(ctx, &ttnpb.GatewayIdentifier{GatewayID: gtw.GatewayID})
 	a.So(err, should.BeNil)
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
@@ -151,11 +152,11 @@ func TestGateway(t *testing.T) {
 	_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
 	a.So(err, should.BeNil)
 
-	rights, err := is.gatewayService.ListGatewayRights(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	rights, err := is.gatewayService.ListGatewayRights(ctx, &ttnpb.GatewayIdentifier{GatewayID: gtw.GatewayID})
 	a.So(err, should.BeNil)
 	a.So(rights.Rights, should.Resemble, ttnpb.AllGatewayRights())
 
-	collabs, err := is.gatewayService.ListGatewayCollaborators(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	collabs, err := is.gatewayService.ListGatewayCollaborators(ctx, &ttnpb.GatewayIdentifier{GatewayID: gtw.GatewayID})
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 2)
 	a.So(collabs.Collaborators, should.Contain, collab)
@@ -174,7 +175,7 @@ func TestGateway(t *testing.T) {
 		_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
 		a.So(err, should.BeNil)
 
-		rights, err := is.gatewayService.ListGatewayRights(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+		rights, err := is.gatewayService.ListGatewayRights(ctx, &ttnpb.GatewayIdentifier{GatewayID: gtw.GatewayID})
 		a.So(err, should.BeNil)
 		a.So(rights.Rights, should.HaveLength, 2)
 		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
@@ -184,7 +185,7 @@ func TestGateway(t *testing.T) {
 		_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
 		a.So(err, should.BeNil)
 
-		rights, err = is.gatewayService.ListGatewayRights(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+		rights, err = is.gatewayService.ListGatewayRights(ctx, &ttnpb.GatewayIdentifier{GatewayID: gtw.GatewayID})
 		a.So(err, should.BeNil)
 		a.So(rights.Rights, should.HaveLength, 1)
 		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_GATEWAY_INFO)
@@ -211,7 +212,7 @@ func TestGateway(t *testing.T) {
 	})
 	a.So(err, should.NotBeNil)
 
-	collabs, err = is.gatewayService.ListGatewayCollaborators(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	collabs, err = is.gatewayService.ListGatewayCollaborators(ctx, &ttnpb.GatewayIdentifier{GatewayID: gtw.GatewayID})
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 2)
 
@@ -220,10 +221,10 @@ func TestGateway(t *testing.T) {
 	_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
 	a.So(err, should.BeNil)
 
-	collabs, err = is.gatewayService.ListGatewayCollaborators(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	collabs, err = is.gatewayService.ListGatewayCollaborators(ctx, &ttnpb.GatewayIdentifier{GatewayID: gtw.GatewayID})
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 1)
 
-	_, err = is.gatewayService.DeleteGateway(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+	_, err = is.gatewayService.DeleteGateway(ctx, &ttnpb.GatewayIdentifier{GatewayID: gtw.GatewayID})
 	a.So(err, should.BeNil)
 }

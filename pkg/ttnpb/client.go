@@ -13,11 +13,13 @@ func (c *Client) GetClient() *Client {
 }
 
 // GetId implements osin.Client.
+// nolint: golint
 func (c *Client) GetId() string {
 	return c.ClientIdentifier.GetClientID()
 }
 
 // GetRedirectUri implements osin.Client.
+// nolint: golint
 func (c *Client) GetRedirectUri() string {
 	return c.RedirectURI
 }
@@ -32,6 +34,7 @@ func (c *Client) ClientSecretMatches(secret string) bool {
 	return subtle.ConstantTimeEq(int32(len(c.Secret)), int32(len(secret))) == 1 && subtle.ConstantTimeCompare([]byte(c.Secret), []byte(secret)) == 1
 }
 
+// HasGrant checks whether the client has a given grant or not.
 func (c *Client) HasGrant(grant GrantType) bool {
 	for _, g := range c.Grants {
 		if g == grant {

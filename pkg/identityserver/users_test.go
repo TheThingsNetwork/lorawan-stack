@@ -27,7 +27,7 @@ func TestUser(t *testing.T) {
 	is := getIS(t)
 
 	user := ttnpb.User{
-		UserIdentifier: ttnpb.UserIdentifier{"daniel"},
+		UserIdentifier: ttnpb.UserIdentifier{UserID: "daniel"},
 		Password:       "12345",
 		Email:          "foo@bar.com",
 		Name:           "hi",
@@ -86,12 +86,12 @@ func TestUser(t *testing.T) {
 	if a.So(ok, should.BeTrue) && a.So(data.Token, should.NotBeEmpty) {
 		token := data.Token
 
-		_, err := is.userService.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
+		_, err = is.userService.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
 			Token: token,
 		})
 		a.So(err, should.BeNil)
 
-		found, err := is.userService.GetUser(ctx, &pbtypes.Empty{})
+		found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
 		a.So(err, should.BeNil)
 		a.So(found.ValidatedAt.IsZero(), should.BeFalse)
 	}
@@ -145,6 +145,7 @@ func TestUser(t *testing.T) {
 	_, err = is.userService.RemoveUserAPIKey(ctx, &ttnpb.RemoveUserAPIKeyRequest{
 		Name: key.Name,
 	})
+	a.So(err, should.BeNil)
 
 	keys, err = is.userService.ListUserAPIKeys(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
@@ -177,7 +178,8 @@ func TestUser(t *testing.T) {
 	a.So(token, should.NotBeEmpty)
 
 	// request a new validation token
-	_, err = is.userService.RequestUserEmailValidation(ctx, &pbtypes.Empty{})
+	_, err = is.RequestUserEmailValidation(ctx, &pbtypes.Empty{})
+	a.So(err, should.BeNil)
 
 	// check that the old validation token doesnt work because we requested a new one
 	_, err = is.userService.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
@@ -210,13 +212,13 @@ func TestUser(t *testing.T) {
 	a.So(found.UserIdentifier.UserID, should.Equal, user.UserID)
 	a.So(found.ValidatedAt.IsZero(), should.BeFalse)
 
-	_, err = is.userService.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifier{"non-existent-client"})
+	_, err = is.userService.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifier{ClientID: "non-existent-client"})
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrAuthorizedClientNotFound.Describes(err), should.BeTrue)
 
 	// create a fake authorized client to the user
 	client := &ttnpb.Client{
-		ClientIdentifier: ttnpb.ClientIdentifier{"bar-client"},
+		ClientIdentifier: ttnpb.ClientIdentifier{ClientID: "bar-client"},
 		Description:      "description",
 		Secret:           "secret",
 		Grants:           []ttnpb.GrantType{ttnpb.GRANT_PASSWORD},

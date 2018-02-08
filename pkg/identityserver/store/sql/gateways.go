@@ -19,6 +19,7 @@ type GatewayStore struct {
 	*apiKeysStore
 }
 
+// NewGatewayStore returns a GatewayStore.
 func NewGatewayStore(store storer) *GatewayStore {
 	return &GatewayStore{
 		storer:               store,
@@ -458,7 +459,7 @@ func (s *GatewayStore) setAttributesQuery(gtwID string, attributes map[string]st
 		boundValues[j] = fmt.Sprintf("($1, $%d, $%d)", i+1, i+2)
 
 		i += 2
-		j += 1
+		j++
 	}
 
 	query := fmt.Sprintf(
@@ -737,11 +738,12 @@ func (s *GatewayStore) ListCollaborators(gtwID string, rights ...ttnpb.Right) ([
 	return s.listCollaborators(s.queryer(), gtwID, rights...)
 }
 
+// nolint: dupl
 func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID string, rights ...ttnpb.Right) ([]*ttnpb.GatewayCollaborator, error) {
-	query := ""
 	args := make([]interface{}, 1)
 	args[0] = gtwID
 
+	var query string
 	if len(rights) == 0 {
 		query = `
 		SELECT
@@ -798,13 +800,13 @@ func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID string, rights
 		if _, exists := byUser[collaborator.AccountID]; !exists {
 			var identifier ttnpb.OrganizationOrUserIdentifier
 			if collaborator.Type == organization {
-				identifier = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_OrganizationID{collaborator.AccountID}}
+				identifier = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_OrganizationID{OrganizationID: collaborator.AccountID}}
 			} else {
-				identifier = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{collaborator.AccountID}}
+				identifier = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{UserID: collaborator.AccountID}}
 			}
 
 			byUser[collaborator.AccountID] = &ttnpb.GatewayCollaborator{
-				GatewayIdentifier:            ttnpb.GatewayIdentifier{gtwID},
+				GatewayIdentifier:            ttnpb.GatewayIdentifier{GatewayID: gtwID},
 				OrganizationOrUserIdentifier: identifier,
 				Rights: []ttnpb.Right{collaborator.Right},
 			}

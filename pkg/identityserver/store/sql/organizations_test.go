@@ -18,7 +18,7 @@ func TestOrganizations(t *testing.T) {
 
 	userID := testUsers()["alice"].UserID
 	org := &ttnpb.Organization{
-		OrganizationIdentifier: ttnpb.OrganizationIdentifier{"thethingsnetwork"},
+		OrganizationIdentifier: ttnpb.OrganizationIdentifier{OrganizationID: "thethingsnetwork"},
 		Name:  "The Things Network",
 		Email: "foo@bar.org",
 	}
@@ -44,7 +44,7 @@ func TestOrganizations(t *testing.T) {
 
 	member := &ttnpb.OrganizationMember{
 		OrganizationIdentifier: org.OrganizationIdentifier,
-		UserIdentifier:         ttnpb.UserIdentifier{userID},
+		UserIdentifier:         ttnpb.UserIdentifier{UserID: userID},
 		Rights:                 []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
 	}
 

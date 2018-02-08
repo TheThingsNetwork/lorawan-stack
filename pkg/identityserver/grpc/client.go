@@ -70,7 +70,7 @@ func (r *RightsFetcher) ListApplicationRights(ctx context.Context, req *ttnpb.Ap
 		return nil, identityserver.ErrNotAuthorized.New(nil)
 	}
 
-	rights, err := r.applicationsCache.GetOrFetch(auth, req.ApplicationID, func() ([]ttnpb.Right, error) {
+	rights, err := r.applicationsCache.GetOrFetch(auth, req.ApplicationID, func() (rights []ttnpb.Right, err error) {
 		resp, err := r.applications.ListApplicationRights(ctx, req, grpc.PerRPCCredentials(creds))
 		if err != nil {
 			return nil, err
@@ -101,7 +101,7 @@ func (r *RightsFetcher) ListGatewayRights(ctx context.Context, req *ttnpb.Gatewa
 		return nil, identityserver.ErrNotAuthorized.New(nil)
 	}
 
-	rights, err := r.gatewaysCache.GetOrFetch(auth, req.GatewayID, func() ([]ttnpb.Right, error) {
+	rights, err := r.gatewaysCache.GetOrFetch(auth, req.GatewayID, func() (rights []ttnpb.Right, err error) {
 		resp, err := r.gateways.ListGatewayRights(ctx, req, grpc.PerRPCCredentials(creds))
 		if err != nil {
 			return nil, err

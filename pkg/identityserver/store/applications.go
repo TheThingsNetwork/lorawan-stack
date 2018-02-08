@@ -16,6 +16,7 @@ type Application interface {
 type ApplicationSpecializer func(ttnpb.Application) Application
 
 // ApplicationStore is a store that holds Applications.
+// nolint: dupl
 type ApplicationStore interface {
 	// Create creates a new application.
 	Create(app Application) error

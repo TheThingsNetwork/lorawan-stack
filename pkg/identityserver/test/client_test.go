@@ -13,11 +13,11 @@ import (
 
 func client() *ttnpb.Client {
 	return &ttnpb.Client{
-		ClientIdentifier: ttnpb.ClientIdentifier{"test-client"},
+		ClientIdentifier: ttnpb.ClientIdentifier{ClientID: "test-client"},
 		Secret:           "123456",
 		RedirectURI:      "/oauth/callback",
 		Grants:           []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE},
-		Creator:          ttnpb.UserIdentifier{"bob"},
+		Creator:          ttnpb.UserIdentifier{UserID: "bob"},
 	}
 }
 

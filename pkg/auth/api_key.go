@@ -62,7 +62,7 @@ func GenerateUserAPIKey(issuer string) (string, error) {
 	})
 }
 
-// GenerateUserOrganizationKey generates an organization API Key using the JOSE header.
+// GenerateOrganizationAPIKey generates an organization API Key using the JOSE header.
 func GenerateOrganizationAPIKey(issuer string) (string, error) {
 	return generate(Key, &Payload{
 		Issuer: issuer,

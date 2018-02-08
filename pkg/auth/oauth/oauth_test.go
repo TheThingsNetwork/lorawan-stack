@@ -47,7 +47,7 @@ var (
 		Rights: []ttnpb.Right{
 			ttnpb.RIGHT_USER_PROFILE_READ,
 		},
-		Creator: ttnpb.UserIdentifier{userID},
+		Creator: ttnpb.UserIdentifier{UserID: userID},
 	}
 	authorizer = &TestAuthorizer{
 		Body: "<html />",

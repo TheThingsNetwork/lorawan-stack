@@ -38,7 +38,7 @@ func (s *adminService) UpdateSettings(ctx context.Context, req *ttnpb.UpdateSett
 		return nil, err
 	}
 
-	err = s.store.Transact(func(tx *store.Store) error {
+	err = s.store.Transact(func(tx *store.Store) (err error) {
 		settings, err := tx.Settings.Get()
 		if err != nil {
 			return err
@@ -94,7 +94,7 @@ func (s *adminService) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequ
 	req.User.State = ttnpb.STATE_APPROVED
 
 	var token string
-	err = s.store.Transact(func(tx *store.Store) error {
+	err = s.store.Transact(func(tx *store.Store) (err error) {
 		settings, err := tx.Settings.Get()
 		if err != nil {
 			return err
@@ -346,7 +346,7 @@ func (s *adminService) SendInvitation(ctx context.Context, req *ttnpb.SendInvita
 		return nil, err
 	}
 
-	err = s.store.Transact(func(tx *store.Store) error {
+	err = s.store.Transact(func(tx *store.Store) (err error) {
 		// check whether email is already registered or not
 		found, err := tx.Users.GetByEmail(req.Email, s.config.Specializers.User)
 		if err != nil && !sql.ErrUserEmailNotFound.Describes(err) {

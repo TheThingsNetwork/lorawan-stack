@@ -29,14 +29,14 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 			return nil, err
 		}
 
-		id = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_OrganizationID{req.OrganizationID}}
+		id = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_OrganizationID{OrganizationID: req.OrganizationID}}
 	} else {
 		err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_GATEWAYS_CREATE)
 		if err != nil {
 			return nil, err
 		}
 
-		id = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{claims.FromContext(ctx).UserID()}}
+		id = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{UserID: claims.FromContext(ctx).UserID()}}
 	}
 
 	err := s.store.Transact(func(tx *store.Store) error {
@@ -171,7 +171,7 @@ func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGat
 			case ttnpb.FieldPathGatewayClusterAddress.MatchString(path):
 				gtw.ClusterAddress = req.Gateway.ClusterAddress
 			case ttnpb.FieldPathGatewayContactAccountUserID.MatchString(path):
-				gtw.ContactAccount = &ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{req.Gateway.ContactAccount.GetUserID()}}
+				gtw.ContactAccount = &ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{UserID: req.Gateway.ContactAccount.GetUserID()}}
 			default:
 				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
 					"path": path,

@@ -9,7 +9,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-// defaultSettings are the default settings loaded in the Identity Server
+// DefaultSettings are the default settings loaded in the Identity Server
 // when the database is created for the first time.
 var DefaultSettings = &ttnpb.IdentityServerSettings{
 	BlacklistedIDs: []string{
@@ -54,6 +54,7 @@ var DefaultSettings = &ttnpb.IdentityServerSettings{
 	InvitationTokenTTL: time.Hour * time.Duration(24*7),
 }
 
+// DefaultSpecializers contains the specializers used in the store by default.
 var DefaultSpecializers = Specializers{
 	User:         func(base ttnpb.User) store.User { return &base },
 	Application:  func(base ttnpb.Application) store.Application { return &base },

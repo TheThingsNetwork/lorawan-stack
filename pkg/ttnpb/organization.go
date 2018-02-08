@@ -10,18 +10,18 @@ func (d *Organization) GetOrganization() *Organization {
 }
 
 var (
-	// FieldPathOrganizationRedirectURI is the field path for the organization name field.
+	// FieldPathOrganizationName is the field path for the organization name field.
 	FieldPathOrganizationName = regexp.MustCompile(`^name$`)
 
 	// FieldPathOrganizationDescription is the field path for the organization description field.
 	FieldPathOrganizationDescription = regexp.MustCompile(`^description$`)
 
-	// FieldPathOrganizationRights is the field path for the organization URL field.
+	// FieldPathOrganizationURL is the field path for the organization URL field.
 	FieldPathOrganizationURL = regexp.MustCompile(`^url$`)
 
 	// FieldPathOrganizationLocation is the field path for the organization location field.
 	FieldPathOrganizationLocation = regexp.MustCompile(`^location$`)
 
-	// FieldPathOrganizationState is the field path for the organization email field.
+	// FieldPathOrganizationEmail is the field path for the organization email field.
 	FieldPathOrganizationEmail = regexp.MustCompile(`^email$`)
 )

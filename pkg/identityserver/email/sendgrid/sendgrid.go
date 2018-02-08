@@ -11,6 +11,7 @@ import (
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
+// Config is the type that configures the SendGrid email provider.
 type Config struct {
 	// APIKey is the sendgrid api key.
 	APIKey string `name:"api-key" description:"The sendgrid API key to use"`

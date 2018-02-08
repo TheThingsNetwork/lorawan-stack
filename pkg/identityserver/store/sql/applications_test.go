@@ -19,7 +19,7 @@ var applicationSpecializer = func(base ttnpb.Application) store.Application {
 func testApplications() map[string]*ttnpb.Application {
 	return map[string]*ttnpb.Application{
 		"demo-app": {
-			ApplicationIdentifier: ttnpb.ApplicationIdentifier{"demo-app"},
+			ApplicationIdentifier: ttnpb.ApplicationIdentifier{ApplicationID: "demo-app"},
 			Description:           "Demo application",
 		},
 	}
@@ -91,6 +91,7 @@ func TestApplicationAPIKeys(t *testing.T) {
 	found, err = s.Applications.GetAPIKeyByName(appID, key.Name)
 	a.So(err, should.NotBeNil)
 	a.So(ErrAPIKeyNotFound.Describes(err), should.BeTrue)
+	a.So(found, should.BeNil)
 }
 
 func TestApplicationRetrieve(t *testing.T) {
@@ -119,7 +120,7 @@ func TestApplicationCollaborators(t *testing.T) {
 	}
 
 	collaborator := &ttnpb.ApplicationCollaborator{
-		ApplicationIdentifier:        ttnpb.ApplicationIdentifier{app.ApplicationID},
+		ApplicationIdentifier:        ttnpb.ApplicationIdentifier{ApplicationID: app.ApplicationID},
 		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{user.UserID}},
 		Rights: []ttnpb.Right{
 			ttnpb.Right(1),
@@ -254,7 +255,7 @@ func testApplicationDeleteFeedDatabase(t *testing.T, userID, appID string) {
 	s := testStore(t, database)
 
 	app := &ttnpb.Application{
-		ApplicationIdentifier: ttnpb.ApplicationIdentifier{appID},
+		ApplicationIdentifier: ttnpb.ApplicationIdentifier{ApplicationID: appID},
 	}
 	err := s.Applications.Create(app)
 	a.So(err, should.BeNil)

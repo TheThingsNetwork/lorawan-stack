@@ -10,7 +10,7 @@ type AccountDeleted struct {
 	Message          string
 }
 
-// Name implements Template.
+// GetName implements Template.
 func (t *AccountDeleted) GetName() string {
 	return "Account deleted"
 }

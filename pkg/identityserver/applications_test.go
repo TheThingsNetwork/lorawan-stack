@@ -23,7 +23,7 @@ func TestApplication(t *testing.T) {
 	user := testUsers()["bob"]
 
 	app := ttnpb.Application{
-		ApplicationIdentifier: ttnpb.ApplicationIdentifier{"foo-app"},
+		ApplicationIdentifier: ttnpb.ApplicationIdentifier{ApplicationID: "foo-app"},
 	}
 
 	ctx := testCtx(user.UserID)
@@ -35,16 +35,16 @@ func TestApplication(t *testing.T) {
 
 	// can't create applications with blacklisted ids
 	for _, id := range testSettings().BlacklistedIDs {
-		_, err := is.applicationService.CreateApplication(ctx, &ttnpb.CreateApplicationRequest{
+		_, err = is.applicationService.CreateApplication(ctx, &ttnpb.CreateApplicationRequest{
 			Application: ttnpb.Application{
-				ApplicationIdentifier: ttnpb.ApplicationIdentifier{id},
+				ApplicationIdentifier: ttnpb.ApplicationIdentifier{ApplicationID: id},
 			},
 		})
 		a.So(err, should.NotBeNil)
 		a.So(ErrBlacklistedID.Describes(err), should.BeTrue)
 	}
 
-	found, err := is.applicationService.GetApplication(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	found, err := is.applicationService.GetApplication(ctx, &ttnpb.ApplicationIdentifier{ApplicationID: app.ApplicationID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeApplicationIgnoringAutoFields, app)
 
@@ -63,7 +63,7 @@ func TestApplication(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	found, err = is.applicationService.GetApplication(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	found, err = is.applicationService.GetApplication(ctx, &ttnpb.ApplicationIdentifier{ApplicationID: app.ApplicationID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeApplicationIgnoringAutoFields, app)
 
@@ -96,7 +96,7 @@ func TestApplication(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
-	keys, err := is.applicationService.ListApplicationAPIKeys(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	keys, err := is.applicationService.ListApplicationAPIKeys(ctx, &ttnpb.ApplicationIdentifier{ApplicationID: app.ApplicationID})
 	a.So(err, should.BeNil)
 	if a.So(keys.APIKeys, should.HaveLength, 1) {
 		sort.Slice(keys.APIKeys[0].Rights, func(i, j int) bool { return keys.APIKeys[0].Rights[i] < keys.APIKeys[0].Rights[j] })
@@ -107,8 +107,9 @@ func TestApplication(t *testing.T) {
 		ApplicationIdentifier: app.ApplicationIdentifier,
 		Name: key.Name,
 	})
+	a.So(err, should.BeNil)
 
-	keys, err = is.applicationService.ListApplicationAPIKeys(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	keys, err = is.applicationService.ListApplicationAPIKeys(ctx, &ttnpb.ApplicationIdentifier{ApplicationID: app.ApplicationID})
 	a.So(err, should.BeNil)
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
@@ -123,11 +124,11 @@ func TestApplication(t *testing.T) {
 	_, err = is.applicationService.SetApplicationCollaborator(ctx, collab)
 	a.So(err, should.BeNil)
 
-	rights, err := is.applicationService.ListApplicationRights(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	rights, err := is.applicationService.ListApplicationRights(ctx, &ttnpb.ApplicationIdentifier{ApplicationID: app.ApplicationID})
 	a.So(err, should.BeNil)
 	a.So(rights.Rights, should.Resemble, ttnpb.AllApplicationRights())
 
-	collabs, err := is.applicationService.ListApplicationCollaborators(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	collabs, err := is.applicationService.ListApplicationCollaborators(ctx, &ttnpb.ApplicationIdentifier{ApplicationID: app.ApplicationID})
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 2)
 	a.So(collabs.Collaborators, should.Contain, collab)
@@ -146,7 +147,7 @@ func TestApplication(t *testing.T) {
 		_, err = is.applicationService.SetApplicationCollaborator(ctx, collab)
 		a.So(err, should.BeNil)
 
-		rights, err := is.applicationService.ListApplicationRights(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+		rights, err := is.applicationService.ListApplicationRights(ctx, &ttnpb.ApplicationIdentifier{ApplicationID: app.ApplicationID})
 		a.So(err, should.BeNil)
 		a.So(rights.Rights, should.HaveLength, 2)
 		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
@@ -156,7 +157,7 @@ func TestApplication(t *testing.T) {
 		_, err = is.applicationService.SetApplicationCollaborator(ctx, collab)
 		a.So(err, should.BeNil)
 
-		rights, err = is.applicationService.ListApplicationRights(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+		rights, err = is.applicationService.ListApplicationRights(ctx, &ttnpb.ApplicationIdentifier{ApplicationID: app.ApplicationID})
 		a.So(err, should.BeNil)
 		a.So(rights.Rights, should.HaveLength, 1)
 		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_APPLICATION_INFO)
@@ -183,7 +184,7 @@ func TestApplication(t *testing.T) {
 	})
 	a.So(err, should.NotBeNil)
 
-	collabs, err = is.applicationService.ListApplicationCollaborators(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	collabs, err = is.applicationService.ListApplicationCollaborators(ctx, &ttnpb.ApplicationIdentifier{ApplicationID: app.ApplicationID})
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 2)
 
@@ -192,10 +193,10 @@ func TestApplication(t *testing.T) {
 	_, err = is.applicationService.SetApplicationCollaborator(ctx, collab)
 	a.So(err, should.BeNil)
 
-	collabs, err = is.applicationService.ListApplicationCollaborators(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	collabs, err = is.applicationService.ListApplicationCollaborators(ctx, &ttnpb.ApplicationIdentifier{ApplicationID: app.ApplicationID})
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 1)
 
-	_, err = is.applicationService.DeleteApplication(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+	_, err = is.applicationService.DeleteApplication(ctx, &ttnpb.ApplicationIdentifier{ApplicationID: app.ApplicationID})
 	a.So(err, should.BeNil)
 }

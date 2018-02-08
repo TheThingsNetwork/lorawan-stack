@@ -13,7 +13,7 @@ type AccountCreation struct {
 	ValidationToken  string
 }
 
-// Name implements Template.
+// GetName implements Template.
 func (t *AccountCreation) GetName() string {
 	return "Account creation on behalf of the user"
 }

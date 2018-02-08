@@ -56,7 +56,7 @@ func TestUserValidations(t *testing.T) {
 		// request with an invalid email (bad)
 		req = &CreateUserRequest{
 			User: User{
-				UserIdentifier: UserIdentifier{"alice"},
+				UserIdentifier: UserIdentifier{UserID: "alice"},
 				Name:           "Ali Ce",
 				Password:       "12345678abC",
 				Email:          "alice@alice.",
@@ -67,7 +67,7 @@ func TestUserValidations(t *testing.T) {
 		// good request
 		req = &CreateUserRequest{
 			User: User{
-				UserIdentifier: UserIdentifier{"alice"},
+				UserIdentifier: UserIdentifier{UserID: "alice"},
 				Name:           "Ali Ce",
 				Password:       "12345678abC",
 				Email:          "alice@alice.com",
@@ -96,7 +96,7 @@ func TestUserValidations(t *testing.T) {
 		// good request
 		req = &UpdateUserRequest{
 			User: User{
-				UserIdentifier: UserIdentifier{"alice"},
+				UserIdentifier: UserIdentifier{UserID: "alice"},
 				Email:          "alice@ttn.com",
 			},
 			UpdateMask: pbtypes.FieldMask{
@@ -214,7 +214,7 @@ func TestApplicationValidations(t *testing.T) {
 		// good request
 		req = &CreateApplicationRequest{
 			Application: Application{
-				ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+				ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
 			},
 		}
 		a.So(req.Validate(), should.BeNil)
@@ -224,7 +224,7 @@ func TestApplicationValidations(t *testing.T) {
 		// request without update mask (bad)
 		req := &UpdateApplicationRequest{
 			Application: Application{
-				ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+				ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
 			},
 		}
 		err := req.Validate()
@@ -234,7 +234,7 @@ func TestApplicationValidations(t *testing.T) {
 		// request with an invalid update mask (bad)
 		req = &UpdateApplicationRequest{
 			Application: Application{
-				ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+				ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
 			},
 			UpdateMask: pbtypes.FieldMask{
 				Paths: []string{"descriptio"},
@@ -247,7 +247,7 @@ func TestApplicationValidations(t *testing.T) {
 		// good request
 		req = &UpdateApplicationRequest{
 			Application: Application{
-				ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+				ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
 			},
 			UpdateMask: pbtypes.FieldMask{
 				Paths: []string{"description"},
@@ -264,7 +264,7 @@ func TestApplicationValidations(t *testing.T) {
 
 		// empty list of rights (bad)
 		req = &GenerateApplicationAPIKeyRequest{
-			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
 			Name:   "foo",
 			Rights: []Right{},
 		}
@@ -272,7 +272,7 @@ func TestApplicationValidations(t *testing.T) {
 
 		// request with gateway rights (bad)
 		req = &GenerateApplicationAPIKeyRequest{
-			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
 			Name:   "foo",
 			Rights: []Right{RIGHT_GATEWAY_DELETE},
 		}
@@ -280,7 +280,7 @@ func TestApplicationValidations(t *testing.T) {
 
 		// good request
 		req = &GenerateApplicationAPIKeyRequest{
-			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
 			Name:   "foo",
 			Rights: []Right{RIGHT_APPLICATION_INFO},
 		}
@@ -294,14 +294,14 @@ func TestApplicationValidations(t *testing.T) {
 
 		// request which tries to clear the rights (bad)
 		req = &UpdateApplicationAPIKeyRequest{
-			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
 			Name: "Foo-key",
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// request with gateway rights (bad)
 		req = &UpdateApplicationAPIKeyRequest{
-			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
 			Name:   "foo",
 			Rights: []Right{RIGHT_GATEWAY_DELETE},
 		}
@@ -309,7 +309,7 @@ func TestApplicationValidations(t *testing.T) {
 
 		// good request
 		req = &UpdateApplicationAPIKeyRequest{
-			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
 			Name:   "foo",
 			Rights: []Right{RIGHT_APPLICATION_DELETE},
 		}
@@ -323,7 +323,7 @@ func TestApplicationValidations(t *testing.T) {
 
 		// good request
 		req = &RemoveApplicationAPIKeyRequest{
-			ApplicationIdentifier: ApplicationIdentifier{"foo-app"},
+			ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
 			Name: "foo",
 		}
 		a.So(req.Validate(), should.BeNil)
@@ -358,7 +358,7 @@ func TestGatewayValidations(t *testing.T) {
 		// request with invalid gateway ID
 		req := &CreateGatewayRequest{
 			Gateway: Gateway{
-				GatewayIdentifier: GatewayIdentifier{"__foo-gtw"},
+				GatewayIdentifier: GatewayIdentifier{GatewayID: "__foo-gtw"},
 				FrequencyPlanID:   "foo",
 				ClusterAddress:    "foo",
 			},
@@ -368,7 +368,7 @@ func TestGatewayValidations(t *testing.T) {
 		// good request
 		req = &CreateGatewayRequest{
 			Gateway: Gateway{
-				GatewayIdentifier: GatewayIdentifier{"foo-gtw"},
+				GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-gtw"},
 				FrequencyPlanID:   "foo",
 				ClusterAddress:    "foo",
 				Radios: []GatewayRadio{
@@ -385,7 +385,7 @@ func TestGatewayValidations(t *testing.T) {
 		// request without update mask (bad)
 		req := &UpdateGatewayRequest{
 			Gateway: Gateway{
-				GatewayIdentifier: GatewayIdentifier{"__foo-gtw"},
+				GatewayIdentifier: GatewayIdentifier{GatewayID: "__foo-gtw"},
 				FrequencyPlanID:   "foo",
 				ClusterAddress:    "foo",
 			},
@@ -397,7 +397,7 @@ func TestGatewayValidations(t *testing.T) {
 		// request with an invalid update mask (bad)
 		req = &UpdateGatewayRequest{
 			Gateway: Gateway{
-				GatewayIdentifier: GatewayIdentifier{"__foo-gtw"},
+				GatewayIdentifier: GatewayIdentifier{GatewayID: "__foo-gtw"},
 				FrequencyPlanID:   "foo",
 				ClusterAddress:    "foo",
 			},
@@ -412,7 +412,7 @@ func TestGatewayValidations(t *testing.T) {
 		// good request
 		req = &UpdateGatewayRequest{
 			Gateway: Gateway{
-				GatewayIdentifier: GatewayIdentifier{"foo-gtw"},
+				GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-gtw"},
 			},
 			UpdateMask: pbtypes.FieldMask{
 				Paths: []string{"description"},
@@ -429,7 +429,7 @@ func TestGatewayValidations(t *testing.T) {
 
 		// empty list of rights (bad)
 		req = &GenerateGatewayAPIKeyRequest{
-			GatewayIdentifier: GatewayIdentifier{"foo-app"},
+			GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-app"},
 			Name:              "foo",
 			Rights:            []Right{},
 		}
@@ -437,7 +437,7 @@ func TestGatewayValidations(t *testing.T) {
 
 		// rights for application (bad)
 		req = &GenerateGatewayAPIKeyRequest{
-			GatewayIdentifier: GatewayIdentifier{"foo-app"},
+			GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-app"},
 			Name:              "foo",
 			Rights:            []Right{RIGHT_APPLICATION_INFO},
 		}
@@ -445,7 +445,7 @@ func TestGatewayValidations(t *testing.T) {
 
 		// good request
 		req = &GenerateGatewayAPIKeyRequest{
-			GatewayIdentifier: GatewayIdentifier{"foo-app"},
+			GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-app"},
 			Name:              "foo",
 			Rights:            []Right{RIGHT_GATEWAY_DELETE},
 		}
@@ -459,14 +459,14 @@ func TestGatewayValidations(t *testing.T) {
 
 		// request which tries to clear the rights (bad)
 		req = &UpdateGatewayAPIKeyRequest{
-			GatewayIdentifier: GatewayIdentifier{"foo-app"},
+			GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-app"},
 			Name:              "Foo-key",
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// request with application rights (bad)
 		req = &UpdateGatewayAPIKeyRequest{
-			GatewayIdentifier: GatewayIdentifier{"foo-app"},
+			GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-app"},
 			Name:              "foo",
 			Rights:            []Right{RIGHT_APPLICATION_DELETE},
 		}
@@ -474,7 +474,7 @@ func TestGatewayValidations(t *testing.T) {
 
 		// good request
 		req = &UpdateGatewayAPIKeyRequest{
-			GatewayIdentifier: GatewayIdentifier{"foo-app"},
+			GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-app"},
 			Name:              "foo",
 			Rights:            []Right{RIGHT_GATEWAY_DELETE},
 		}
@@ -488,7 +488,7 @@ func TestGatewayValidations(t *testing.T) {
 
 		// good request
 		req = &RemoveGatewayAPIKeyRequest{
-			GatewayIdentifier: GatewayIdentifier{"foo-app"},
+			GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-app"},
 			Name:              "foo",
 		}
 		a.So(req.Validate(), should.BeNil)
@@ -528,7 +528,7 @@ func TestClientValidations(t *testing.T) {
 		req = &CreateClientRequest{
 			Client: Client{
 				Description:      "hi",
-				ClientIdentifier: ClientIdentifier{"foo-client"},
+				ClientIdentifier: ClientIdentifier{ClientID: "foo-client"},
 				RedirectURI:      "localhost",
 				Rights:           []Right{RIGHT_APPLICATION_INFO},
 			},
@@ -544,7 +544,7 @@ func TestClientValidations(t *testing.T) {
 		// request without update_mask (bad)
 		req = &UpdateClientRequest{
 			Client: Client{
-				ClientIdentifier: ClientIdentifier{"foo-client"},
+				ClientIdentifier: ClientIdentifier{ClientID: "foo-client"},
 				Description:      "",
 			},
 		}
@@ -555,7 +555,7 @@ func TestClientValidations(t *testing.T) {
 		// request with invalid path fields on the update_mask (bad)
 		req = &UpdateClientRequest{
 			Client: Client{
-				ClientIdentifier: ClientIdentifier{"foo-client"},
+				ClientIdentifier: ClientIdentifier{ClientID: "foo-client"},
 				Description:      "foo description",
 				RedirectURI:      "localhost",
 				Rights:           []Right{RIGHT_APPLICATION_INFO},
@@ -571,7 +571,7 @@ func TestClientValidations(t *testing.T) {
 		// good request
 		req = &UpdateClientRequest{
 			Client: Client{
-				ClientIdentifier: ClientIdentifier{"foo-client"},
+				ClientIdentifier: ClientIdentifier{ClientID: "foo-client"},
 				Description:      "foo description",
 				RedirectURI:      "ttn.com",
 				Rights:           []Right{RIGHT_APPLICATION_INFO},

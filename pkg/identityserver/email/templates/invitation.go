@@ -11,7 +11,7 @@ type Invitation struct {
 	Token            string
 }
 
-// Name implements Template.
+// GetName implements Template.
 func (t *Invitation) GetName() string {
 	return "Invitation"
 }

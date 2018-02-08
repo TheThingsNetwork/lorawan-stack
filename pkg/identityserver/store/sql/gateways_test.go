@@ -19,7 +19,7 @@ var gatewaySpecializer = func(base ttnpb.Gateway) store.Gateway {
 func testGateways() map[string]*ttnpb.Gateway {
 	return map[string]*ttnpb.Gateway{
 		"test-gateway": {
-			GatewayIdentifier: ttnpb.GatewayIdentifier{"test-gateway"},
+			GatewayIdentifier: ttnpb.GatewayIdentifier{GatewayID: "test-gateway"},
 			Description:       "My description",
 			Platform:          "Kerklink",
 			Attributes: map[string]string{
@@ -37,7 +37,7 @@ func testGateways() map[string]*ttnpb.Gateway {
 			},
 		},
 		"bob-gateway": {
-			GatewayIdentifier: ttnpb.GatewayIdentifier{"bob-gateway"},
+			GatewayIdentifier: ttnpb.GatewayIdentifier{GatewayID: "bob-gateway"},
 			Description:       "My description",
 			Attributes: map[string]string{
 				"Modulation": "12345",
@@ -125,6 +125,7 @@ func TestGatewayAPIKeys(t *testing.T) {
 	found, err = s.Gateways.GetAPIKeyByName(gtwID, key.Name)
 	a.So(err, should.NotBeNil)
 	a.So(ErrAPIKeyNotFound.Describes(err), should.BeTrue)
+	a.So(found, should.BeNil)
 }
 
 func TestGatewayAttributes(t *testing.T) {
@@ -259,8 +260,8 @@ func TestGatewayCollaborators(t *testing.T) {
 	}
 
 	collaborator := &ttnpb.GatewayCollaborator{
-		GatewayIdentifier:            ttnpb.GatewayIdentifier{gtw.GatewayID},
-		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{user.UserID}},
+		GatewayIdentifier:            ttnpb.GatewayIdentifier{GatewayID: gtw.GatewayID},
+		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{UserID: user.UserID}},
 		Rights: []ttnpb.Right{
 			ttnpb.Right(1),
 			ttnpb.Right(2),
