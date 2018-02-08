@@ -49,7 +49,7 @@ func StreamClientInterceptor(ctx context.Context, opts ...Option) grpc.StreamCli
 		}
 		go func() {
 			<-clientStream.Context().Done()
-			err := clientStream.Context().Err() // nolint: vetshadow
+			err := clientStream.Context().Err()
 			code := o.codeFunc(err)
 			level := o.levelFunc(code)
 			entry := log.FromContext(ctx).WithFields(log.Fields(

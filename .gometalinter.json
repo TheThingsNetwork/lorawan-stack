@@ -8,8 +8,7 @@
     "golint",
     "ineffassign",
     "misspell",
-    "vet",
-    "vetshadow"
+    "vet"
   ],
   "Linters": {
     "gas": {
