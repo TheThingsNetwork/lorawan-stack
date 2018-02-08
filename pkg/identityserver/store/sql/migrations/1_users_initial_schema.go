@@ -4,8 +4,13 @@ package migrations
 
 func init() {
 	const forwards = `
+		CREATE TABLE IF NOT EXISTS accounts (
+			id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			account_id   STRING(36) UNIQUE NOT NULL,
+			type         INT NOT NULL
+		);
 		CREATE TABLE IF NOT EXISTS users (
-			user_id        STRING(36) PRIMARY KEY,
+			user_id        STRING(36) PRIMARY KEY REFERENCES accounts(account_id),
 			name           STRING NOT NULL DEFAULT '',
 			email          STRING UNIQUE NOT NULL,
 			password       STRING NOT NULL,
@@ -16,7 +21,6 @@ func init() {
 			updated_at     TIMESTAMP NOT NULL DEFAULT current_timestamp()
 		);
 		CREATE UNIQUE INDEX IF NOT EXISTS users_email ON users (email);
-
 		CREATE TABLE IF NOT EXISTS validation_tokens (
 			id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			validation_token   STRING UNIQUE NOT NULL,
@@ -24,14 +28,12 @@ func init() {
 			created_at         TIMESTAMP NOT NULL DEFAULT current_timestamp(),
 			expires_in         INTEGER NOT NULL
 		);
-
 		CREATE TABLE IF NOT EXISTS users_api_keys (
 			key        STRING NOT NULL PRIMARY KEY,
 			user_id    STRING(36) NOT NULL REFERENCES users(user_id),
 			key_name   STRING(36) NOT NULL,
 			UNIQUE(user_id, key_name)
 		);
-
 		CREATE TABLE IF NOT EXISTS users_api_keys_rights (
 			user_id    STRING(36) NOT NULL REFERENCES users(user_id),
 			key_name   STRING(36) NOT NULL,
@@ -45,6 +47,7 @@ func init() {
 		DROP TABLE IF EXISTS users_api_keys;
 		DROP TABLE IF EXISTS validation_tokens;
 		DROP TABLE IF EXISTS users;
+		DROP TABLE IF EXISTS accounts;
 	`
 
 	Registry.Register(1, "1_users_initial_schema", forwards, backwards)

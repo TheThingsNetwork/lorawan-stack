@@ -10,26 +10,23 @@ func init() {
 			created_at       TIMESTAMP NOT NULL DEFAULT current_timestamp(),
 			updated_at       TIMESTAMP NOT NULL DEFAULT current_timestamp()
 		);
-
 		CREATE TABLE IF NOT EXISTS applications_api_keys (
 			key              STRING NOT NULL PRIMARY KEY,
 			application_id   STRING(36) NOT NULL REFERENCES applications(application_id),
 			key_name         STRING(36) NOT NULL,
 			UNIQUE(application_id, key_name)
 		);
-
 		CREATE TABLE IF NOT EXISTS applications_api_keys_rights (
 			application_id   STRING(36) NOT NULL REFERENCES applications(application_id),
 			key_name         STRING(36) NOT NULL,
 			"right"          STRING NOT NULL,
 			PRIMARY KEY(application_id, key_name, "right")
 		);
-
 		CREATE TABLE IF NOT EXISTS applications_collaborators (
-			application_id   STRING(36) NOT NULL REFERENCES applications(application_id),
-			user_id          STRING(36) NOT NULL REFERENCES users(user_id),
+			application_id   STRING(36) REFERENCES applications(application_id),
+			account_id       STRING(36) REFERENCES accounts(account_id),
 			"right"          STRING NOT NULL,
-			PRIMARY KEY(application_id, user_id, "right")
+			PRIMARY KEY(application_id, account_id, "right")
 		);
 	`
 

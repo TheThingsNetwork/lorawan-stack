@@ -42,10 +42,10 @@ func init() {
 			created_at         TIMESTAMP NOT NULL DEFAULT current_timestamp()
 		);
 		CREATE TABLE IF NOT EXISTS gateways_collaborators (
-			gateway_id   STRING(36) NOT NULL REFERENCES gateways(gateway_id),
-			user_id      STRING(36) NOT NULL REFERENCES users(user_id),
+			gateway_id   STRING(36) REFERENCES gateways(gateway_id),
+			account_id   STRING(36) REFERENCES accounts(account_id),
 			"right"      STRING NOT NULL,
-			PRIMARY KEY(gateway_id, user_id, "right")
+			PRIMARY KEY(gateway_id, account_id, "right")
 		);
 		CREATE TABLE IF NOT EXISTS gateways_api_keys (
 			key          STRING NOT NULL PRIMARY KEY,
