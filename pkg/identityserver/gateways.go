@@ -57,7 +57,7 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 		return tx.Gateways.SetCollaborator(&ttnpb.GatewayCollaborator{
 			GatewayIdentifier: req.Gateway.GatewayIdentifier,
 			UserIdentifier:    ttnpb.UserIdentifier{userID},
-			Rights:            ttnpb.AllGatewayRights,
+			Rights:            ttnpb.AllGatewayRights(),
 		})
 	})
 

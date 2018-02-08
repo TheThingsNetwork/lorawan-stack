@@ -107,7 +107,7 @@ func (req *UpdateUserPasswordRequest) Validate() error {
 func (req *GenerateUserAPIKeyRequest) Validate() error {
 	return validate.All(
 		validate.Field(req.Name, validate.Required).DescribeFieldName("Key name"),
-		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllUserRights)).DescribeFieldName("Rights"),
+		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllUserRights())).DescribeFieldName("Rights"),
 	)
 }
 
@@ -115,7 +115,7 @@ func (req *GenerateUserAPIKeyRequest) Validate() error {
 func (req *UpdateUserAPIKeyRequest) Validate() error {
 	return validate.All(
 		validate.Field(req.Name, validate.Required).DescribeFieldName("Key name"),
-		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllUserRights)).DescribeFieldName("Rights"),
+		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllUserRights())).DescribeFieldName("Rights"),
 	)
 }
 
@@ -167,7 +167,7 @@ func (req *GenerateApplicationAPIKeyRequest) Validate() error {
 	return validate.All(
 		validate.Field(req.ApplicationID, validate.ID).DescribeFieldName("Application ID"),
 		validate.Field(req.Name, validate.Required).DescribeFieldName("Key name"),
-		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllApplicationRights)).DescribeFieldName("Rights"),
+		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllApplicationRights())).DescribeFieldName("Rights"),
 	)
 }
 
@@ -176,7 +176,7 @@ func (req *UpdateApplicationAPIKeyRequest) Validate() error {
 	return validate.All(
 		validate.Field(req.ApplicationID, validate.ID).DescribeFieldName("Application ID"),
 		validate.Field(req.Name, validate.Required).DescribeFieldName("Key name"),
-		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllApplicationRights)).DescribeFieldName("Rights"),
+		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllApplicationRights())).DescribeFieldName("Rights"),
 	)
 }
 
@@ -198,7 +198,7 @@ func (req *ApplicationCollaborator) Validate() error {
 	return validate.All(
 		validate.Field(req.ApplicationID, validate.ID).DescribeFieldName("Application ID"),
 		validate.Field(id, validate.ID).DescribeFieldName("Account ID"),
-		validate.Field(req.Rights, validate.NotRequired, validate.In(AllApplicationRights)).DescribeFieldName("Rights"),
+		validate.Field(req.Rights, validate.NotRequired, validate.In(AllApplicationRights())).DescribeFieldName("Rights"),
 	)
 }
 
@@ -287,7 +287,7 @@ func (req *GenerateGatewayAPIKeyRequest) Validate() error {
 	return validate.All(
 		validate.Field(req.GatewayID, validate.ID).DescribeFieldName("Gateway ID"),
 		validate.Field(req.Name, validate.Required).DescribeFieldName("Key name"),
-		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllGatewayRights)).DescribeFieldName("Rights"),
+		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllGatewayRights())).DescribeFieldName("Rights"),
 	)
 }
 
@@ -296,7 +296,7 @@ func (req *UpdateGatewayAPIKeyRequest) Validate() error {
 	return validate.All(
 		validate.Field(req.GatewayID, validate.ID).DescribeFieldName("Gateway ID"),
 		validate.Field(req.Name, validate.Required).DescribeFieldName("Key name"),
-		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllGatewayRights)).DescribeFieldName("Rights"),
+		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllGatewayRights())).DescribeFieldName("Rights"),
 	)
 }
 
@@ -318,7 +318,7 @@ func (req *GatewayCollaborator) Validate() error {
 	return validate.All(
 		validate.Field(req.GatewayID, validate.ID).DescribeFieldName("Gateway ID"),
 		validate.Field(id, validate.ID).DescribeFieldName("Account ID"),
-		validate.Field(req.Rights, validate.NotRequired, validate.In(AllGatewayRights)).DescribeFieldName("Rights"),
+		validate.Field(req.Rights, validate.NotRequired, validate.In(AllGatewayRights())).DescribeFieldName("Rights"),
 	)
 }
 
