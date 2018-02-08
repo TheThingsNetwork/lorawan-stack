@@ -91,4 +91,24 @@ func TestJOSEEncoding(t *testing.T) {
 			Type:   UserKey,
 		})
 	}
+
+	// Organization API Key
+	{
+		issuer := "foo.thethingsnetwork.org"
+
+		key, err := GenerateOrganizationAPIKey(issuer)
+		a.So(err, should.BeNil)
+		a.So(key, should.NotBeEmpty)
+
+		header, payload, err := DecodeTokenOrKey(key)
+		a.So(err, should.BeNil)
+		a.So(header, should.Resemble, &Header{
+			Type:      Key,
+			Algorithm: alg,
+		})
+		a.So(payload, should.Resemble, &Payload{
+			Issuer: issuer,
+			Type:   OrganizationKey,
+		})
+	}
 }

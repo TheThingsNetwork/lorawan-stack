@@ -17,6 +17,9 @@ const (
 
 	// UserKey denotes it is an user API key.
 	UserKey
+
+	// OrganizationKey denotes it is an organization API key.
+	OrganizationKey
 )
 
 // String implements fmt.Stringer.
@@ -28,6 +31,8 @@ func (k APIKeyType) String() string {
 		return "gateway"
 	case UserKey:
 		return "user"
+	case OrganizationKey:
+		return "organization"
 	default:
 		return "invalid type"
 	}
@@ -54,5 +59,13 @@ func GenerateUserAPIKey(issuer string) (string, error) {
 	return generate(Key, &Payload{
 		Issuer: issuer,
 		Type:   UserKey,
+	})
+}
+
+// GenerateUserOrganizationKey generates an organization API Key using the JOSE header.
+func GenerateOrganizationAPIKey(issuer string) (string, error) {
+	return generate(Key, &Payload{
+		Issuer: issuer,
+		Type:   OrganizationKey,
 	})
 }
