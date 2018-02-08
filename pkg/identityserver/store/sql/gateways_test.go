@@ -259,8 +259,8 @@ func TestGatewayCollaborators(t *testing.T) {
 	}
 
 	collaborator := &ttnpb.GatewayCollaborator{
-		GatewayIdentifier: ttnpb.GatewayIdentifier{gtw.GatewayID},
-		UserIdentifier:    ttnpb.UserIdentifier{user.UserID},
+		GatewayIdentifier:            ttnpb.GatewayIdentifier{gtw.GatewayID},
+		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{user.UserID}},
 		Rights: []ttnpb.Right{
 			ttnpb.Right(1),
 			ttnpb.Right(2),
@@ -295,14 +295,18 @@ func TestGatewayCollaborators(t *testing.T) {
 
 	}
 
-	// test HasUserRights method
+	// test HasCollaboratorRights method
 	{
-		yes, err := s.Gateways.HasUserRights(gtw.GatewayID, user.UserID, ttnpb.Right(0))
+		yes, err := s.Gateways.HasCollaboratorRights(gtw.GatewayID, user.UserID, ttnpb.Right(0))
 		a.So(yes, should.BeFalse)
 		a.So(err, should.BeNil)
 
-		yes, err = s.Gateways.HasUserRights(gtw.GatewayID, user.UserID, collaborator.Rights...)
+		yes, err = s.Gateways.HasCollaboratorRights(gtw.GatewayID, user.UserID, collaborator.Rights...)
 		a.So(yes, should.BeTrue)
+		a.So(err, should.BeNil)
+
+		yes, err = s.Gateways.HasCollaboratorRights(gtw.GatewayID, user.UserID, append(collaborator.Rights, ttnpb.Right(0))...)
+		a.So(yes, should.BeFalse)
 		a.So(err, should.BeNil)
 	}
 
@@ -330,7 +334,7 @@ func TestGatewayCollaborators(t *testing.T) {
 
 	// fetch user rights
 	{
-		rights, err := s.Gateways.ListUserRights(gtw.GatewayID, user.UserID)
+		rights, err := s.Gateways.ListCollaboratorRights(gtw.GatewayID, user.UserID)
 		a.So(err, should.BeNil)
 		if a.So(rights, should.HaveLength, 3) {
 			a.So(rights, should.Resemble, collaborator.Rights)
@@ -393,9 +397,9 @@ func testGatewayDeleteFeedDatabase(t *testing.T, userID, gtwID string) {
 	a.So(err, should.BeNil)
 
 	collaborator := &ttnpb.GatewayCollaborator{
-		GatewayIdentifier: gtw.GatewayIdentifier,
-		UserIdentifier:    ttnpb.UserIdentifier{userID},
-		Rights:            []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
+		GatewayIdentifier:            gtw.GatewayIdentifier,
+		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{userID}},
+		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
 	}
 	err = s.Gateways.SetCollaborator(collaborator)
 	a.So(err, should.BeNil)

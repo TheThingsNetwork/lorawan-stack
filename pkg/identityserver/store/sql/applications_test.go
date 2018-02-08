@@ -119,8 +119,8 @@ func TestApplicationCollaborators(t *testing.T) {
 	}
 
 	collaborator := &ttnpb.ApplicationCollaborator{
-		ApplicationIdentifier: ttnpb.ApplicationIdentifier{app.ApplicationID},
-		UserIdentifier:        ttnpb.UserIdentifier{user.UserID},
+		ApplicationIdentifier:        ttnpb.ApplicationIdentifier{app.ApplicationID},
+		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{user.UserID}},
 		Rights: []ttnpb.Right{
 			ttnpb.Right(1),
 			ttnpb.Right(2),
@@ -133,14 +133,18 @@ func TestApplicationCollaborators(t *testing.T) {
 		a.So(err, should.BeNil)
 	}
 
-	// test HasUserRights method
+	// test HasCollaboratorRights method
 	{
-		yes, err := s.Applications.HasUserRights(app.ApplicationID, user.UserID, ttnpb.Right(0))
+		yes, err := s.Applications.HasCollaboratorRights(app.ApplicationID, user.UserID, ttnpb.Right(0))
 		a.So(yes, should.BeFalse)
 		a.So(err, should.BeNil)
 
-		yes, err = s.Applications.HasUserRights(app.ApplicationID, user.UserID, collaborator.Rights...)
+		yes, err = s.Applications.HasCollaboratorRights(app.ApplicationID, user.UserID, collaborator.Rights...)
 		a.So(yes, should.BeTrue)
+		a.So(err, should.BeNil)
+
+		yes, err = s.Applications.HasCollaboratorRights(app.ApplicationID, user.UserID, append(collaborator.Rights, ttnpb.Right(0))...)
+		a.So(yes, should.BeFalse)
 		a.So(err, should.BeNil)
 	}
 
@@ -193,7 +197,7 @@ func TestApplicationCollaborators(t *testing.T) {
 
 	// fetch user rights
 	{
-		rights, err := s.Applications.ListUserRights(app.ApplicationID, user.UserID)
+		rights, err := s.Applications.ListCollaboratorRights(app.ApplicationID, user.UserID)
 		a.So(err, should.BeNil)
 		if a.So(rights, should.HaveLength, 3) {
 			a.So(rights, should.Resemble, collaborator.Rights)
@@ -256,9 +260,9 @@ func testApplicationDeleteFeedDatabase(t *testing.T, userID, appID string) {
 	a.So(err, should.BeNil)
 
 	collaborator := &ttnpb.ApplicationCollaborator{
-		ApplicationIdentifier: app.ApplicationIdentifier,
-		UserIdentifier:        ttnpb.UserIdentifier{userID},
-		Rights:                []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
+		ApplicationIdentifier:        app.ApplicationIdentifier,
+		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{userID}},
+		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
 	}
 	err = s.Applications.SetCollaborator(collaborator)
 	a.So(err, should.BeNil)

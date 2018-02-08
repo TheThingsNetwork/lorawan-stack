@@ -128,6 +128,7 @@ func initSubStores(s storer) {
 	store.OAuth = NewOAuthStore(s)
 	store.Settings = NewSettingStore(s)
 	store.Invitations = NewInvitationStore(s)
+	store.Organizations = NewOrganizationStore(s)
 }
 
 func (s *Store) Init() error {

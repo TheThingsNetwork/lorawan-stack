@@ -24,6 +24,9 @@ type Store struct {
 
 	// Invitations is the invitations store.
 	Invitations InvitationStore
+
+	// Organizations is the organizations store.
+	Organizations OrganizationStore
 }
 
 // Attributer is the interface providing methods to extend basic IS data types.

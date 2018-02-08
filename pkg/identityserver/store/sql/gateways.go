@@ -246,7 +246,7 @@ func (s *GatewayStore) ListByOrganizationOrUser(id string, specializer store.Gat
 	var result []store.Gateway
 
 	err := s.transact(func(tx *db.Tx) error {
-		gateways, err := s.userGateways(tx, userID)
+		gateways, err := s.organizationOrUserGateways(tx, id)
 		if err != nil {
 			return err
 		}
@@ -292,8 +292,8 @@ func (s *GatewayStore) ListByOrganizationOrUser(id string, specializer store.Gat
 	return result, nil
 }
 
-func (s *GatewayStore) userGateways(q db.QueryContext, userID string) ([]*ttnpb.Gateway, error) {
-	var gateways []*ttnpb.Gateway
+func (s *GatewayStore) organizationOrUserGateways(q db.QueryContext, id string) ([]ttnpb.Gateway, error) {
+	var gateways []ttnpb.Gateway
 	err := q.Select(
 		&gateways,
 		`SELECT DISTINCT gateways.*
@@ -302,9 +302,18 @@ func (s *GatewayStore) userGateways(q db.QueryContext, userID string) ([]*ttnpb.
 			ON (
 				gateways.gateway_id = gateways_collaborators.gateway_id
 				AND
-				user_id = $1
+				(
+					account_id = $1
+					OR
+					account_id IN (
+						SELECT
+							organization_id
+						FROM organizations_members
+						WHERE user_id = $1
+					)
+				)
 			)`,
-		userID)
+		id)
 
 	if err != nil {
 		return nil, err
@@ -610,7 +619,7 @@ func (s *GatewayStore) deleteCollaborators(q db.QueryContext, gtwID string) erro
 // If the provided list of rights is empty the collaborator will be unset.
 func (s *GatewayStore) SetCollaborator(collaborator *ttnpb.GatewayCollaborator) error {
 	if len(collaborator.Rights) == 0 {
-		return s.unsetCollaborator(s.queryer(), collaborator.GatewayID, collaborator.UserID)
+		return s.unsetCollaborator(s.queryer(), collaborator.GatewayID, collaborator.GetCollaboratorID())
 	}
 
 	err := s.transact(func(tx *db.Tx) error {
@@ -619,11 +628,11 @@ func (s *GatewayStore) SetCollaborator(collaborator *ttnpb.GatewayCollaborator) 
 	return err
 }
 
-func (s *GatewayStore) unsetCollaborator(q db.QueryContext, gtwID, userID string) error {
+func (s *GatewayStore) unsetCollaborator(q db.QueryContext, gtwID, accountID string) error {
 	_, err := q.Exec(
 		`DELETE
 			FROM gateways_collaborators
-			WHERE gateway_id = $1 AND user_id = $2`, gtwID, userID)
+			WHERE gateway_id = $1 AND account_id = $2`, gtwID, accountID)
 	return err
 }
 
@@ -634,7 +643,7 @@ func (s *GatewayStore) setCollaborator(q db.QueryContext, collaborator *ttnpb.Ga
 		return err
 	}
 
-	query, args = s.addRightsQuery(collaborator.GatewayID, collaborator.UserID, collaborator.Rights)
+	query, args = s.addRightsQuery(collaborator.GatewayID, collaborator.GetCollaboratorID(), collaborator.Rights)
 	_, err = q.Exec(query, args...)
 
 	return err
@@ -643,7 +652,7 @@ func (s *GatewayStore) setCollaborator(q db.QueryContext, collaborator *ttnpb.Ga
 func (s *GatewayStore) removeRightsDiffQuery(collaborator *ttnpb.GatewayCollaborator) (string, []interface{}) {
 	args := make([]interface{}, 2+len(collaborator.Rights))
 	args[0] = collaborator.GatewayID
-	args[1] = collaborator.UserID
+	args[1] = collaborator.GetCollaboratorID()
 
 	boundVariables := make([]string, len(collaborator.Rights))
 
@@ -655,7 +664,7 @@ func (s *GatewayStore) removeRightsDiffQuery(collaborator *ttnpb.GatewayCollabor
 	query := fmt.Sprintf(
 		`DELETE
 			FROM gateways_collaborators
-			WHERE gateway_id = $1 AND user_id = $2 AND "right" NOT IN (%s)`,
+			WHERE gateway_id = $1 AND account_id = $2 AND "right" NOT IN (%s)`,
 		strings.Join(boundVariables, ", "))
 
 	return query, args
@@ -675,38 +684,44 @@ func (s *GatewayStore) addRightsQuery(gtwID, userID string, rights []ttnpb.Right
 
 	query := fmt.Sprintf(
 		`INSERT
-			INTO gateways_collaborators (gateway_id, user_id, "right")
+			INTO gateways_collaborators (gateway_id, account_id, "right")
 			VALUES %s
-			ON CONFLICT (gateway_id, user_id, "right")
+			ON CONFLICT (gateway_id, account_id, "right")
 			DO NOTHING`,
 		strings.Join(boundValues, " ,"))
 
 	return query, args
 }
 
-// HasUserRights checks whether an user has a set of given rights to a gateway.
-func (s *GatewayStore) HasUserRights(gtwID, userID string, rights ...ttnpb.Right) (bool, error) {
-	return s.hasUserRights(s.queryer(), gtwID, userID, rights...)
+// HasCollaboratorRights checks whether a collaborator has a given set of rights
+// to a gateway. It returns false if the collaborationship does not exist.
+func (s *GatewayStore) HasCollaboratorRights(gtwID, collaboratorID string, rights ...ttnpb.Right) (bool, error) {
+	return s.hasCollaboratorRights(s.queryer(), gtwID, collaboratorID, rights...)
 }
 
-func (s *GatewayStore) hasUserRights(q db.QueryContext, gtwID, userID string, rights ...ttnpb.Right) (bool, error) {
+func (s *GatewayStore) hasCollaboratorRights(q db.QueryContext, gtwID, collaboratorID string, rights ...ttnpb.Right) (bool, error) {
 	clauses := make([]string, 0, len(rights))
 	args := make([]interface{}, 0, len(rights)+1)
-	args = append(args, userID)
+	args = append(args, collaboratorID)
 
 	for i, right := range rights {
 		args = append(args, right)
 		clauses = append(clauses, fmt.Sprintf(`"right" = $%d`, i+2))
 	}
 
-	id := ""
+	count := 0
 	err := q.SelectOne(
-		&id,
+		&count,
 		fmt.Sprintf(
 			`SELECT
-				DISTINCT user_id
+				COUNT(DISTINCT "right")
 				FROM gateways_collaborators
-				WHERE user_id = $1 AND (%s)`, strings.Join(clauses, " OR ")),
+				WHERE (%s) AND (account_id = $1 OR account_id IN (
+					SELECT
+						organization_id
+					FROM organizations_members
+					WHERE user_id = $1
+				))`, strings.Join(clauses, " OR ")),
 		args...)
 	if db.IsNoRows(err) {
 		return false, nil
@@ -714,7 +729,7 @@ func (s *GatewayStore) hasUserRights(q db.QueryContext, gtwID, userID string, ri
 	if err != nil {
 		return false, err
 	}
-	return true, nil
+	return len(rights) == count, nil
 }
 
 // ListCollaborators retrieves all the collaborators from an entity.
@@ -729,9 +744,13 @@ func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID string, rights
 
 	if len(rights) == 0 {
 		query = `
-		SELECT user_id, "right"
-			FROM gateways_collaborators
-			WHERE gateway_id = $1`
+		SELECT
+			account_id,
+			"right",
+			type
+		FROM gateways_collaborators
+		JOIN accounts USING (account_id)
+		WHERE gateway_id = $1`
 	} else {
 		rightsClause := make([]string, 0, len(rights))
 		for _, right := range rights {
@@ -739,17 +758,23 @@ func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID string, rights
 		}
 
 		query = fmt.Sprintf(`
-			SELECT user_id, "right"
+			SELECT
+					account_id,
+					"right",
+					type
 	    	FROM gateways_collaborators
-	    	WHERE gateway_id = $1 AND user_id IN
+	    	JOIN accounts USING (account_id)
+	    	WHERE gateway_id = $1 AND account_id IN
 	    	(
-	      	SELECT user_id
+	      	SELECT account_id
 	      		FROM
 	      			(
-	          		SELECT user_id, count(user_id) as count
+	          		SELECT
+	          				account_id,
+	          				count(account_id) as count
 	          	  	FROM gateways_collaborators
 	          			WHERE gateway_id = $1 AND (%s)
-	          			GROUP BY user_id
+	          			GROUP BY account_id
 	      			)
 	      		WHERE count = $2
 	  		)`,
@@ -759,8 +784,9 @@ func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID string, rights
 	}
 
 	var collaborators []struct {
-		*ttnpb.GatewayCollaborator
-		Right ttnpb.Right
+		AccountID string
+		Right     ttnpb.Right
+		Type      int
 	}
 	err := q.Select(&collaborators, query, args...)
 	if !db.IsNoRows(err) && err != nil {
@@ -769,16 +795,23 @@ func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID string, rights
 
 	byUser := make(map[string]*ttnpb.GatewayCollaborator)
 	for _, collaborator := range collaborators {
-		if _, exists := byUser[collaborator.UserID]; !exists {
-			byUser[collaborator.UserID] = &ttnpb.GatewayCollaborator{
-				GatewayIdentifier: ttnpb.GatewayIdentifier{gtwID},
-				UserIdentifier:    ttnpb.UserIdentifier{collaborator.UserID},
-				Rights:            []ttnpb.Right{collaborator.Right},
+		if _, exists := byUser[collaborator.AccountID]; !exists {
+			var identifier ttnpb.OrganizationOrUserIdentifier
+			if collaborator.Type == organization {
+				identifier = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_OrganizationID{collaborator.AccountID}}
+			} else {
+				identifier = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{collaborator.AccountID}}
+			}
+
+			byUser[collaborator.AccountID] = &ttnpb.GatewayCollaborator{
+				GatewayIdentifier:            ttnpb.GatewayIdentifier{gtwID},
+				OrganizationOrUserIdentifier: identifier,
+				Rights: []ttnpb.Right{collaborator.Right},
 			}
 			continue
 		}
 
-		byUser[collaborator.UserID].Rights = append(byUser[collaborator.UserID].Rights, collaborator.Right)
+		byUser[collaborator.AccountID].Rights = append(byUser[collaborator.AccountID].Rights, collaborator.Right)
 	}
 
 	result := make([]*ttnpb.GatewayCollaborator, 0, len(byUser))
@@ -789,21 +822,21 @@ func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID string, rights
 	return result, nil
 }
 
-// ListUserRights returns the rights a given user has for an entity.
-func (s *GatewayStore) ListUserRights(gtwID string, userID string) ([]ttnpb.Right, error) {
-	return s.listUserRights(s.queryer(), gtwID, userID)
+// ListCollaboratorRights returns the rights a given collaborator has for a
+// Gateway. Returns empty list if the collaborationship does not exist.
+func (s *GatewayStore) ListCollaboratorRights(gtwID string, collaboratorID string) ([]ttnpb.Right, error) {
+	return s.listCollaboratorRights(s.queryer(), gtwID, collaboratorID)
 }
 
-func (s *GatewayStore) listUserRights(q db.QueryContext, gtwID string, userID string) ([]ttnpb.Right, error) {
+func (s *GatewayStore) listCollaboratorRights(q db.QueryContext, gtwID string, collaboratorID string) ([]ttnpb.Right, error) {
 	var rights []ttnpb.Right
 	err := q.Select(
 		&rights,
 		`SELECT "right"
 			FROM gateways_collaborators
-			WHERE gateway_id = $1 AND user_id = $2`,
+			WHERE gateway_id = $1 AND account_id = $2`,
 		gtwID,
-		userID)
-
+		collaboratorID)
 	return rights, err
 }
 

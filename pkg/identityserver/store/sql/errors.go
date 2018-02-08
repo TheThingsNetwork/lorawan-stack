@@ -34,6 +34,11 @@ func init() {
 	ErrSettingsNotFound.Register()
 
 	ErrInvitationNotFound.Register()
+
+	ErrOrganizationIDTaken.Register()
+	ErrOrganizationNotFound.Register()
+
+	ErrAccountIDNotFound.Register()
 }
 
 // ErrApplicationNotFound is returned when trying to fetch an application that
@@ -242,4 +247,37 @@ var ErrInvitationNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Invitation not found",
 	Code:          408,
 	Type:          errors.NotFound,
+}
+
+// ErrOrganizationIDTaken is returned when trying to create an organization using
+// an ID that is already in use by an user or organization.
+var ErrOrganizationIDTaken = &errors.ErrDescriptor{
+	MessageFormat: "Organization id `{organization_id}` is already taken",
+	Code:          409,
+	Type:          errors.Conflict,
+	SafeAttributes: []string{
+		"organization_id",
+	},
+}
+
+// ErrOrganizationNotFound is returned when trying to fetch an organization that
+// does not exists.
+var ErrOrganizationNotFound = &errors.ErrDescriptor{
+	MessageFormat: "Organization `{organization_id}` does not exist",
+	Code:          410,
+	Type:          errors.NotFound,
+	SafeAttributes: []string{
+		"organization_id",
+	},
+}
+
+// ErrAccountIDNotFound is returned when trying to delete either an user or
+// organization that does not exist.
+var ErrAccountIDNotFound = &errors.ErrDescriptor{
+	MessageFormat: "Account `{account_id}` does not exist",
+	Code:          411,
+	Type:          errors.NotFound,
+	SafeAttributes: []string{
+		"account_id",
+	},
 }

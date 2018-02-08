@@ -102,7 +102,7 @@ func (s *ApplicationStore) ListByOrganizationOrUser(id string, specializer store
 	var result []store.Application
 
 	err := s.transact(func(tx *db.Tx) error {
-		applications, err := s.userApplications(tx, userID)
+		applications, err := s.organizationOrUserApplications(tx, id)
 		if err != nil {
 			return err
 		}
@@ -128,8 +128,8 @@ func (s *ApplicationStore) ListByOrganizationOrUser(id string, specializer store
 	return result, nil
 }
 
-func (s *ApplicationStore) userApplications(q db.QueryContext, userID string) ([]*ttnpb.Application, error) {
-	var applications []*ttnpb.Application
+func (s *ApplicationStore) organizationOrUserApplications(q db.QueryContext, id string) ([]ttnpb.Application, error) {
+	var applications []ttnpb.Application
 	err := q.Select(
 		&applications,
 		`SELECT DISTINCT applications.*
@@ -138,9 +138,18 @@ func (s *ApplicationStore) userApplications(q db.QueryContext, userID string) ([
 			ON (
 				applications.application_id = applications_collaborators.application_id
 				AND
-				user_id = $1
+				(
+					account_id = $1
+					OR
+					account_id IN (
+						SELECT
+							organization_id
+						FROM organizations_members
+						WHERE user_id = $1
+					)
+				)
 			)`,
-		userID)
+		id)
 
 	if err != nil {
 		return nil, err
@@ -169,7 +178,9 @@ func (s *ApplicationStore) update(q db.QueryContext, application store.Applicati
 	err := q.NamedSelectOne(
 		&id,
 		`UPDATE applications
-			SET description = :description, updated_at = current_timestamp()
+			SET
+				description = :description,
+				updated_at = current_timestamp()
 			WHERE application_id = :application_id
 			RETURNING application_id`,
 		app)
@@ -235,7 +246,7 @@ func (s *ApplicationStore) deleteCollaborators(q db.QueryContext, appID string) 
 // If the provided list of rights is empty the collaborator will be unset.
 func (s *ApplicationStore) SetCollaborator(collaborator *ttnpb.ApplicationCollaborator) error {
 	if len(collaborator.Rights) == 0 {
-		return s.unsetCollaborator(s.queryer(), collaborator.ApplicationID, collaborator.UserID)
+		return s.unsetCollaborator(s.queryer(), collaborator.ApplicationID, collaborator.GetCollaboratorID())
 	}
 
 	err := s.transact(func(tx *db.Tx) error {
@@ -244,11 +255,11 @@ func (s *ApplicationStore) SetCollaborator(collaborator *ttnpb.ApplicationCollab
 	return err
 }
 
-func (s *ApplicationStore) unsetCollaborator(q db.QueryContext, appID, userID string) error {
+func (s *ApplicationStore) unsetCollaborator(q db.QueryContext, appID, collaboratorID string) error {
 	_, err := q.Exec(
 		`DELETE
 			FROM applications_collaborators
-			WHERE application_id = $1 AND user_id = $2`, appID, userID)
+			WHERE application_id = $1 AND account_id = $2`, appID, collaboratorID)
 	return err
 }
 
@@ -259,7 +270,7 @@ func (s *ApplicationStore) setCollaborator(q db.QueryContext, collaborator *ttnp
 		return err
 	}
 
-	query, args = s.addRightsQuery(collaborator.ApplicationID, collaborator.UserID, collaborator.Rights)
+	query, args = s.addRightsQuery(collaborator.ApplicationID, collaborator.GetCollaboratorID(), collaborator.Rights)
 	_, err = q.Exec(query, args...)
 
 	return err
@@ -268,7 +279,7 @@ func (s *ApplicationStore) setCollaborator(q db.QueryContext, collaborator *ttnp
 func (s *ApplicationStore) removeRightsDiffQuery(collaborator *ttnpb.ApplicationCollaborator) (string, []interface{}) {
 	args := make([]interface{}, 2+len(collaborator.Rights))
 	args[0] = collaborator.ApplicationID
-	args[1] = collaborator.UserID
+	args[1] = collaborator.GetCollaboratorID()
 
 	boundVariables := make([]string, len(collaborator.Rights))
 
@@ -280,7 +291,7 @@ func (s *ApplicationStore) removeRightsDiffQuery(collaborator *ttnpb.Application
 	query := fmt.Sprintf(
 		`DELETE
 			FROM applications_collaborators
-			WHERE application_id = $1 AND user_id = $2 AND "right" NOT IN (%s)`,
+			WHERE application_id = $1 AND account_id = $2 AND "right" NOT IN (%s)`,
 		strings.Join(boundVariables, ", "))
 
 	return query, args
@@ -300,38 +311,44 @@ func (s *ApplicationStore) addRightsQuery(appID, userID string, rights []ttnpb.R
 
 	query := fmt.Sprintf(
 		`INSERT
-			INTO applications_collaborators (application_id, user_id, "right")
+			INTO applications_collaborators (application_id, account_id, "right")
 			VALUES %s
-			ON CONFLICT (application_id, user_id, "right")
+			ON CONFLICT (application_id, account_id, "right")
 			DO NOTHING`,
 		strings.Join(boundValues, " ,"))
 
 	return query, args
 }
 
-// HasUserRights checks whether an user has a set of given rights to an application.
-func (s *ApplicationStore) HasUserRights(appID, userID string, rights ...ttnpb.Right) (bool, error) {
-	return s.hasUserRights(s.queryer(), appID, userID, rights...)
+// HasCollaboratorRights checks whether a collaborator has a given set of rights
+// to an application. It returns false if the collaborationship does not exist.
+func (s *ApplicationStore) HasCollaboratorRights(appID, collaboratorID string, rights ...ttnpb.Right) (bool, error) {
+	return s.hasCollaboratorRights(s.queryer(), appID, collaboratorID, rights...)
 }
 
-func (s *ApplicationStore) hasUserRights(q db.QueryContext, appID, userID string, rights ...ttnpb.Right) (bool, error) {
+func (s *ApplicationStore) hasCollaboratorRights(q db.QueryContext, appID, collaboratorID string, rights ...ttnpb.Right) (bool, error) {
 	clauses := make([]string, 0, len(rights))
 	args := make([]interface{}, 0, len(rights)+1)
-	args = append(args, userID)
+	args = append(args, collaboratorID)
 
 	for i, right := range rights {
 		args = append(args, right)
 		clauses = append(clauses, fmt.Sprintf(`"right" = $%d`, i+2))
 	}
 
-	res := new(string)
+	count := 0
 	err := q.SelectOne(
-		res,
+		&count,
 		fmt.Sprintf(
 			`SELECT
-				DISTINCT user_id
+				COUNT(DISTINCT "right")
 				FROM applications_collaborators
-				WHERE user_id = $1 AND (%s)`, strings.Join(clauses, " OR ")),
+				WHERE (%s) AND (account_id = $1 OR account_id IN (
+					SELECT
+						organization_id
+					FROM organizations_members
+					WHERE user_id = $1
+				))`, strings.Join(clauses, " OR ")),
 		args...)
 	if db.IsNoRows(err) {
 		return false, nil
@@ -339,7 +356,7 @@ func (s *ApplicationStore) hasUserRights(q db.QueryContext, appID, userID string
 	if err != nil {
 		return false, err
 	}
-	return true, nil
+	return len(rights) == count, nil
 }
 
 // ListCollaborators retrieves all the collaborators from an entity.
@@ -354,9 +371,13 @@ func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID string, ri
 
 	if len(rights) == 0 {
 		query = `
-		SELECT user_id, "right"
-			FROM applications_collaborators
-			WHERE application_id = $1`
+		SELECT
+			account_id,
+			"right",
+			type
+		FROM applications_collaborators
+		JOIN accounts USING (account_id)
+		WHERE application_id = $1`
 	} else {
 		rightsClause := make([]string, 0, len(rights))
 		for _, right := range rights {
@@ -364,17 +385,23 @@ func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID string, ri
 		}
 
 		query = fmt.Sprintf(`
-			SELECT user_id, "right"
+			SELECT
+					account_id,
+					"right",
+					type
 	    	FROM applications_collaborators
-	    	WHERE application_id = $1 AND user_id IN
+	    	JOIN accounts USING (account_id)
+	    	WHERE application_id = $1 AND account_id IN
 	    	(
-	      	SELECT user_id
+	      	SELECT account_id
 	      		FROM
 	      			(
-	          		SELECT user_id, count(user_id) as count
+	          		SELECT
+	          				account_id,
+	          				count(account_id) as count
 	          	  	FROM applications_collaborators
 	          			WHERE application_id = $1 AND (%s)
-	          			GROUP BY user_id
+	          			GROUP BY account_id
 	      			)
 	      		WHERE count = $2
 	  		)`,
@@ -384,8 +411,9 @@ func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID string, ri
 	}
 
 	var collaborators []struct {
-		*ttnpb.ApplicationCollaborator
-		Right ttnpb.Right
+		Right     ttnpb.Right
+		AccountID string
+		Type      int
 	}
 	err := q.Select(&collaborators, query, args...)
 	if !db.IsNoRows(err) && err != nil {
@@ -394,16 +422,23 @@ func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID string, ri
 
 	byUser := make(map[string]*ttnpb.ApplicationCollaborator)
 	for _, collaborator := range collaborators {
-		if _, exists := byUser[collaborator.UserID]; !exists {
-			byUser[collaborator.UserID] = &ttnpb.ApplicationCollaborator{
-				ApplicationIdentifier: ttnpb.ApplicationIdentifier{appID},
-				UserIdentifier:        ttnpb.UserIdentifier{collaborator.UserID},
-				Rights:                []ttnpb.Right{collaborator.Right},
+		if _, exists := byUser[collaborator.AccountID]; !exists {
+			var identifier ttnpb.OrganizationOrUserIdentifier
+			if collaborator.Type == organization {
+				identifier = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_OrganizationID{collaborator.AccountID}}
+			} else {
+				identifier = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{collaborator.AccountID}}
+			}
+
+			byUser[collaborator.AccountID] = &ttnpb.ApplicationCollaborator{
+				ApplicationIdentifier:        ttnpb.ApplicationIdentifier{appID},
+				OrganizationOrUserIdentifier: identifier,
+				Rights: []ttnpb.Right{collaborator.Right},
 			}
 			continue
 		}
 
-		byUser[collaborator.UserID].Rights = append(byUser[collaborator.UserID].Rights, collaborator.Right)
+		byUser[collaborator.AccountID].Rights = append(byUser[collaborator.AccountID].Rights, collaborator.Right)
 	}
 
 	result := make([]*ttnpb.ApplicationCollaborator, 0, len(byUser))
@@ -414,21 +449,26 @@ func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID string, ri
 	return result, nil
 }
 
-// ListUserRights returns the rights a given user has for an entity.
-func (s *ApplicationStore) ListUserRights(appID string, userID string) ([]ttnpb.Right, error) {
-	return s.listUserRights(s.queryer(), appID, userID)
+// ListCollaboratorRights returns the rights a given collaborator has for an
+// Application. Returns empty list if the collaborationship does not exist.
+func (s *ApplicationStore) ListCollaboratorRights(appID string, collaboratorID string) ([]ttnpb.Right, error) {
+	return s.listCollaboratorRights(s.queryer(), appID, collaboratorID)
 }
 
-func (s *ApplicationStore) listUserRights(q db.QueryContext, appID string, userID string) ([]ttnpb.Right, error) {
+func (s *ApplicationStore) listCollaboratorRights(q db.QueryContext, appID string, collaboratorID string) ([]ttnpb.Right, error) {
 	var rights []ttnpb.Right
 	err := q.Select(
-		&rights,
-		`SELECT "right"
-			FROM applications_collaborators
-			WHERE application_id = $1 AND user_id = $2`,
+		&rights, `
+		SELECT "right"
+		FROM applications_collaborators
+		WHERE application_id = $1
+		AND ( account_id = $2
+			OR account_id IN
+				( SELECT organization_id
+				FROM organizations_members
+				WHERE user_id = $2 ) )`,
 		appID,
-		userID)
-
+		collaboratorID)
 	return rights, err
 }
 

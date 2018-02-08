@@ -72,14 +72,14 @@ func (s *OrganizationStore) create(q db.QueryContext, organization store.Organiz
 }
 
 // GetByID finds the organization by ID and retrieves it.
-func (s *OrganizationStore) GetByID(organizationID string, factory store.OrganizationSpecializer) (result store.Organization, err error) {
+func (s *OrganizationStore) GetByID(organizationID string, specializer store.OrganizationSpecializer) (result store.Organization, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		organization, err := s.getByID(tx, organizationID)
 		if err != nil {
 			return err
 		}
 
-		result = factory(*organization)
+		result = specializer(*organization)
 
 		return s.loadAttributes(tx, organizationID, result)
 	})

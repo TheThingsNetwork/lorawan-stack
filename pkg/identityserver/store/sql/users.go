@@ -14,6 +14,7 @@ type UserStore struct {
 	storer
 	*extraAttributesStore
 	*apiKeysStore
+	*accountStore
 }
 
 func NewUserStore(store storer) *UserStore {
@@ -21,18 +22,26 @@ func NewUserStore(store storer) *UserStore {
 		storer:               store,
 		extraAttributesStore: newExtraAttributesStore(store, "user"),
 		apiKeysStore:         newAPIKeysStore(store, "user"),
+		accountStore:         newAccountStore(store),
 	}
 }
 
 // Create creates an user.
 func (s *UserStore) Create(user store.User) error {
 	err := s.transact(func(tx *db.Tx) error {
-		err := s.create(tx, user)
+		userID := user.GetUser().UserID
+
+		err := s.accountStore.registerUserID(tx, userID)
 		if err != nil {
 			return err
 		}
 
-		return s.storeAttributes(tx, user.GetUser().UserID, user, nil)
+		err = s.create(tx, user)
+		if err != nil {
+			return err
+		}
+
+		return s.storeAttributes(tx, userID, user, nil)
 	})
 	return err
 }
@@ -231,7 +240,7 @@ func (s *UserStore) Delete(userID string) error {
 			return errors.Errorf("Expected ptr to ApplicationStore but got %T", s.store().Applications)
 		}
 
-		apps, err := applications.userApplications(tx, userID)
+		apps, err := applications.organizationOrUserApplications(tx, userID)
 		if err != nil {
 			return err
 		}
@@ -249,7 +258,7 @@ func (s *UserStore) Delete(userID string) error {
 			return errors.Errorf("Expected ptr to GatewayStore but got %T", s.store().Gateways)
 		}
 
-		gtws, err := gateways.userGateways(tx, userID)
+		gtws, err := gateways.organizationOrUserGateways(tx, userID)
 		if err != nil {
 			return err
 		}
@@ -317,7 +326,13 @@ func (s *UserStore) Delete(userID string) error {
 
 		// TODO(gomezjdaniel): delete attributers.
 
-		return s.delete(tx, userID)
+		// delete user itself
+		err = s.delete(tx, userID)
+		if err != nil {
+			return err
+		}
+
+		return s.accountStore.deleteID(tx, userID)
 	})
 
 	return err
