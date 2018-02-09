@@ -13,8 +13,6 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-var ToBytes = toBytes
-
 func TestToBytes(t *testing.T) {
 	for i, tc := range []struct {
 		v        interface{}
@@ -84,7 +82,7 @@ func TestToBytes(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			got, err := toBytes(tc.v)
+			got, err := ToBytes(tc.v)
 			if a.So(err, should.BeNil) {
 				a.So(got, should.Resemble, tc.expected)
 			}
@@ -97,7 +95,7 @@ func TestToBytes(t *testing.T) {
 			ptr := reflect.New(rv.Type())
 			ptr.Elem().Set(rv)
 
-			got, err = toBytes(ptr.Interface())
+			got, err = ToBytes(ptr.Interface())
 			if a.So(err, should.BeNil) {
 				a.So(got, should.Resemble, tc.expected)
 			}

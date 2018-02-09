@@ -231,7 +231,7 @@ func MarshalMap(v interface{}) (m map[string]interface{}, err error) {
 		rv := reflect.ValueOf(v)
 		switch rv.Kind() {
 		case reflect.Ptr, reflect.Struct, reflect.Map, reflect.Interface, reflect.Chan, reflect.Func:
-			bv, err := toBytes(v)
+			bv, err := ToBytes(v)
 			if err != nil {
 				return nil, err
 			}
@@ -243,7 +243,7 @@ func MarshalMap(v interface{}) (m map[string]interface{}, err error) {
 
 var jsonpbMarshaler = &jsonpb.Marshaler{}
 
-func toBytes(v interface{}) (b []byte, err error) {
+func ToBytes(v interface{}) (b []byte, err error) {
 	var enc Encoding
 	defer func() {
 		if err != nil {
@@ -348,7 +348,7 @@ func MarshalByteMap(v interface{}) (bm map[string][]byte, err error) {
 
 	bm = make(map[string][]byte, len(im))
 	for k, v := range im {
-		b, err := toBytes(v)
+		b, err := ToBytes(v)
 		if err != nil {
 			return nil, err
 		}
