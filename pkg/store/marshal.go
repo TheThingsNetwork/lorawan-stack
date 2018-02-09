@@ -14,24 +14,8 @@ import (
 	"github.com/gogo/protobuf/proto"
 )
 
-func isZero(v reflect.Value) bool {
-	if !v.IsValid() {
-		return true
-	}
-
-	switch v.Kind() {
-	case reflect.Ptr, reflect.Interface:
-		return isZero(v.Elem())
-	case reflect.Func:
-		return v.IsNil()
-	case reflect.Map, reflect.Slice, reflect.Array, reflect.String, reflect.Chan:
-		return v.Len() == 0
-	}
-	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
-}
-
 // Flattened returns a copy of m with keys 'Flattened'.
-// If the map contains sub-maps, the values of these sub-maps are set under the root map, each level separated by a dot
+// If the map contains sub-maps, the values of these sub-maps are set under the root map, each level separated by Separator.
 func Flattened(m map[string]interface{}) (out map[string]interface{}) {
 	out = make(map[string]interface{}, len(m))
 	for k, v := range m {
@@ -47,12 +31,13 @@ func Flattened(m map[string]interface{}) (out map[string]interface{}) {
 	return
 }
 
-func keepBytes(rv reflect.Value) bool {
+// KeepBytes is a keep function intended to be used in Mapify.
+func KeepBytes(rv reflect.Value) bool {
 	return (rv.Kind() == reflect.Slice || rv.Kind() == reflect.Array) && rv.Type().Elem().Kind() == reflect.Uint8
 }
 
-// mapify recursively replaces (sub-)slices in v by maps. If keep is set and returns true for encountered value, the value will be kept as-is. Look at keepBytes for an example of where this is useful.
-func mapify(v interface{}, keep func(rv reflect.Value) bool) interface{} {
+// Mapify recursively replaces (sub-)slices in v by maps. If keep is set and returns true for encountered value, the value will be kept as-is. Look at keepBytes for an example of where this is useful.
+func Mapify(v interface{}, keep func(rv reflect.Value) bool) interface{} {
 	rv := reflect.ValueOf(v)
 	if !rv.IsValid() {
 		return nil
@@ -70,7 +55,7 @@ func mapify(v interface{}, keep func(rv reflect.Value) bool) interface{} {
 				m[sk.String()] = nil
 				continue
 			}
-			m[sk.String()] = mapify(sv.Interface(), keep)
+			m[sk.String()] = Mapify(sv.Interface(), keep)
 		}
 		return m
 	case reflect.Slice, reflect.Array:
@@ -81,12 +66,28 @@ func mapify(v interface{}, keep func(rv reflect.Value) bool) interface{} {
 				m[strconv.Itoa(i)] = nil
 				continue
 			}
-			m[strconv.Itoa(i)] = mapify(sv.Interface(), keep)
+			m[strconv.Itoa(i)] = Mapify(sv.Interface(), keep)
 		}
 		return m
 	default:
 		return v
 	}
+}
+
+func isZero(v reflect.Value) bool {
+	if !v.IsValid() {
+		return true
+	}
+
+	switch v.Kind() {
+	case reflect.Ptr, reflect.Interface:
+		return isZero(v.Elem())
+	case reflect.Func:
+		return v.IsNil()
+	case reflect.Map, reflect.Slice, reflect.Array, reflect.String, reflect.Chan:
+		return v.Len() == 0
+	}
+	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }
 
 // marshalNested retrieves recursively all types for the given value
@@ -226,7 +227,7 @@ func MarshalMap(v interface{}) (m map[string]interface{}, err error) {
 	if err != nil {
 		return nil, err
 	}
-	m = Flattened(mapify(m, keepBytes).(map[string]interface{}))
+	m = Flattened(Mapify(m, KeepBytes).(map[string]interface{}))
 	for k, v := range m {
 		rv := reflect.ValueOf(v)
 		switch rv.Kind() {
@@ -343,7 +344,7 @@ func MarshalByteMap(v interface{}) (bm map[string][]byte, err error) {
 		if err != nil {
 			return nil, err
 		}
-		im = Flattened(mapify(im, keepBytes).(map[string]interface{}))
+		im = Flattened(Mapify(im, KeepBytes).(map[string]interface{}))
 	}
 
 	bm = make(map[string][]byte, len(im))

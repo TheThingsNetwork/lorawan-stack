@@ -256,7 +256,7 @@ func TestMapify(t *testing.T) {
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			assertions.New(t).So(mapify(tc.input, tc.keep), should.Resemble, tc.output)
+			assertions.New(t).So(Mapify(tc.input, tc.keep), should.Resemble, tc.output)
 		})
 	}
 }

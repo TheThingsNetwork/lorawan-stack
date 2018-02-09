@@ -41,7 +41,7 @@ func TestUnflattened(t *testing.T) {
 			},
 		},
 	} {
-		assertions.New(t).So(unflattened(tc.in), should.Resemble, tc.out)
+		assertions.New(t).So(Unflattened(tc.in), should.Resemble, tc.out)
 	}
 }
 
@@ -124,7 +124,7 @@ func TestSlicify(t *testing.T) {
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			assertions.New(t).So(slicify(tc.in), should.Resemble, tc.out)
+			assertions.New(t).So(Slicify(tc.in), should.Resemble, tc.out)
 		})
 	}
 }
