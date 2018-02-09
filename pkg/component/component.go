@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package component contains the methods and structures common to all components.
 package component
 
 import (

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package filter implements a pkg/log.Handler that only logs fields that match the specified filters
 package filter
 
 import (

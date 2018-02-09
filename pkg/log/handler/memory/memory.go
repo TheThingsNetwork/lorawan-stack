@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package memory implements a pkg/log.Handler that saves all entries in process memory
 package memory
 
 import (

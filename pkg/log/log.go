@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package log contains all the structs to log TTN.
 package log
 
 // Interface is the interface for logging TTN.

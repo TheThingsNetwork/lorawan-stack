@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package sentry implements a pkg/log.Handler that sends errors to Sentry
 package sentry
 
 import (
