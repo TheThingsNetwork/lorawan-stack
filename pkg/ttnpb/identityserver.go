@@ -405,3 +405,79 @@ func (req *UpdateClientRequest) Validate() error {
 
 	return validate.All(validations...)
 }
+
+// Validate is used as validator function by the GRPC validator interceptor.
+func (req *UpdateOrganizationRequest) Validate() error {
+	mask := req.GetUpdateMask()
+	paths := mask.GetPaths()
+
+	if paths == nil || len(paths) == 0 {
+		return ErrEmptyUpdateMask.New(nil)
+	}
+
+	validations := make([]validate.Errors, 0)
+	validations = append(validations, validate.Field(req.Organization.OrganizationID, validate.ID).DescribeFieldName("Organization ID"))
+
+	var err validate.Errors
+	for _, path := range paths {
+		switch true {
+		case FieldPathOrganizationName.MatchString(path),
+			FieldPathOrganizationDescription.MatchString(path),
+			FieldPathOrganizationURL.MatchString(path),
+			FieldPathOrganizationLocation.MatchString(path):
+		case FieldPathOrganizationEmail.MatchString(path):
+			err = validate.Field(req.Organization.Email, validate.Email).DescribeFieldName("Email")
+		default:
+			return ErrInvalidPathUpdateMask.New(errors.Attributes{
+				"path": path,
+			})
+		}
+
+		validations = append(validations, err)
+	}
+
+	return validate.All(validations...)
+}
+
+// Validate is used as validator function by the GRPC validator interceptor.
+func (req *CreateOrganizationRequest) Validate() error {
+	return validate.All(
+		validate.Field(req.Organization.OrganizationID, validate.ID).DescribeFieldName("Organization ID"),
+		validate.Field(req.Organization.Email, validate.Email).DescribeFieldName("Email"),
+	)
+}
+
+// Validate is used as validator function by the GRPC validator interceptor.
+func (req *GenerateOrganizationAPIKeyRequest) Validate() error {
+	return validate.All(
+		validate.Field(req.OrganizationID, validate.ID).DescribeFieldName("Organization ID"),
+		validate.Field(req.Name, validate.Required).DescribeFieldName("Key name"),
+		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllOrganizationRights())).DescribeFieldName("Rights"),
+	)
+}
+
+// Validate is used as validator function by the GRPC validator interceptor.
+func (req *UpdateOrganizationAPIKeyRequest) Validate() error {
+	return validate.All(
+		validate.Field(req.OrganizationID, validate.ID).DescribeFieldName("Organization ID"),
+		validate.Field(req.Name, validate.Required).DescribeFieldName("Key name"),
+		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllOrganizationRights())).DescribeFieldName("Rights"),
+	)
+}
+
+// Validate is used as validator function by the GRPC validator interceptor.
+func (req *RemoveOrganizationAPIKeyRequest) Validate() error {
+	return validate.All(
+		validate.Field(req.OrganizationID, validate.ID).DescribeFieldName("Organization ID"),
+		validate.Field(req.Name, validate.Required).DescribeFieldName("Key name"),
+	)
+}
+
+// Validate is used as validator function by the GRPC validator interceptor.
+func (req *OrganizationMember) Validate() error {
+	return validate.All(
+		validate.Field(req.OrganizationID, validate.ID).DescribeFieldName("Organization ID"),
+		validate.Field(req.UserID, validate.ID).DescribeFieldName("User ID"),
+		validate.Field(req.Rights, validate.NotRequired, validate.In(AllOrganizationRights())).DescribeFieldName("Rights"),
+	)
+}

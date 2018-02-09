@@ -584,3 +584,173 @@ func TestClientValidations(t *testing.T) {
 		a.So(err, should.BeNil)
 	}
 }
+
+func TestOrganizationValidations(t *testing.T) {
+	a := assertions.New(t)
+
+	{
+		// request with invalid email
+		req := &CreateOrganizationRequest{
+			Organization: Organization{
+				OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+				Email: "bar",
+				Name:  "baz",
+			},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// good request
+		req = &CreateOrganizationRequest{
+			Organization: Organization{
+				OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+				Email: "bar@bar.com",
+				Name:  "baz",
+			},
+		}
+		a.So(req.Validate(), should.BeNil)
+	}
+
+	{
+		// request without update mask (bad)
+		req := &UpdateOrganizationRequest{
+			Organization: Organization{
+				OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+				Name: "baz",
+			},
+		}
+		err := req.Validate()
+		a.So(err, should.NotBeNil)
+		a.So(ErrEmptyUpdateMask.Describes(err), should.BeTrue)
+
+		// request with an invalid update mask (bad)
+		req = &UpdateOrganizationRequest{
+			Organization: Organization{
+				OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+				Name: "baz",
+			},
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"descriptio"},
+			},
+		}
+		err = req.Validate()
+		a.So(err, should.NotBeNil)
+		a.So(ErrInvalidPathUpdateMask.Describes(err), should.BeTrue)
+
+		// request with good update mask but invalid email
+		req = &UpdateOrganizationRequest{
+			Organization: Organization{
+				OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			},
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"email"},
+			},
+		}
+		err = req.Validate()
+		a.So(err, should.NotBeNil)
+
+		// good request
+		req = &UpdateOrganizationRequest{
+			Organization: Organization{
+				OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			},
+			UpdateMask: pbtypes.FieldMask{
+				Paths: []string{"description"},
+			},
+		}
+		err = req.Validate()
+		a.So(err, should.BeNil)
+	}
+
+	{
+		// empty request (bad)
+		req := &GenerateOrganizationAPIKeyRequest{}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// empty list of rights (bad)
+		req = &GenerateOrganizationAPIKeyRequest{
+			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			Name:   "foo",
+			Rights: []Right{},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// rights for application (bad)
+		req = &GenerateOrganizationAPIKeyRequest{
+			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			Name:   "foo",
+			Rights: []Right{RIGHT_APPLICATION_INFO},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// good request
+		req = &GenerateOrganizationAPIKeyRequest{
+			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			Name:   "foo",
+			Rights: []Right{RIGHT_ORGANIZATION_DELETE},
+		}
+		a.So(req.Validate(), should.BeNil)
+	}
+
+	{
+		// empty request (bad)
+		req := &UpdateOrganizationAPIKeyRequest{}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// request which tries to clear the rights (bad)
+		req = &UpdateOrganizationAPIKeyRequest{
+			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			Name: "Foo-key",
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// request with application rights (bad)
+		req = &UpdateOrganizationAPIKeyRequest{
+			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			Name:   "foo",
+			Rights: []Right{RIGHT_APPLICATION_DELETE},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// good request
+		req = &UpdateOrganizationAPIKeyRequest{
+			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			Name:   "foo",
+			Rights: []Right{RIGHT_ORGANIZATION_INFO},
+		}
+		a.So(req.Validate(), should.BeNil)
+	}
+
+	{
+		// empty request (bad)
+		req := &RemoveOrganizationAPIKeyRequest{}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// good request
+		req = &RemoveOrganizationAPIKeyRequest{
+			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			Name: "foo",
+		}
+		a.So(req.Validate(), should.BeNil)
+	}
+
+	{
+		// empty request (bad)
+		req := &OrganizationMember{}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// request with application rights (bad)
+		req = &OrganizationMember{
+			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			UserIdentifier:         UserIdentifier{UserID: "alice"},
+			Rights:                 []Right{RIGHT_APPLICATION_DELETE},
+		}
+		a.So(req.Validate(), should.NotBeNil)
+
+		// good request
+		req = &OrganizationMember{
+			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			UserIdentifier:         UserIdentifier{UserID: "alice"},
+		}
+		a.So(req.Validate(), should.BeNil)
+	}
+}
