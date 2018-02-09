@@ -219,10 +219,10 @@ type MapMarshaler interface {
 // The map produced by any of the methods will be flattened by joining sub-map values with a dot(note that slices produced by custom MarshalMap implementations won't be flattened).
 func MarshalMap(v interface{}) (m map[string]interface{}, err error) {
 	if mm, ok := v.(MapMarshaler); ok {
-		return mm.MarshalMap()
+		m, err = mm.MarshalMap()
+	} else {
+		m, err = marshal(v)
 	}
-
-	m, err = marshal(v)
 	if err != nil {
 		return nil, err
 	}
