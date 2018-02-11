@@ -4,7 +4,6 @@ package store
 
 import (
 	"os"
-	"strconv"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -42,89 +41,5 @@ func TestUnflattened(t *testing.T) {
 		},
 	} {
 		assertions.New(t).So(Unflattened(tc.in), should.Resemble, tc.out)
-	}
-}
-
-func TestSlicify(t *testing.T) {
-	for i, tc := range []struct {
-		in  map[string]interface{}
-		out map[string]interface{}
-	}{
-		{
-			map[string]interface{}{
-				"foo": map[string]interface{}{
-					"2": "two",
-					"5": "five",
-					"1": "one",
-				},
-				"bar": map[string]interface{}{
-					"11": "eleven",
-					"3":  "three",
-					"0":  "zero",
-				},
-				"baz": map[string]interface{}{
-					"3":  "three",
-					"0":  "zero",
-					"hi": "there",
-				},
-			},
-			map[string]interface{}{
-				"foo": []interface{}{
-					nil,
-					"one",
-					"two",
-					nil,
-					nil,
-					"five",
-				},
-				"bar": []interface{}{
-					"zero",
-					nil,
-					nil,
-					"three",
-					nil,
-					nil,
-					nil,
-					nil,
-					nil,
-					nil,
-					nil,
-					"eleven",
-				},
-				"baz": map[string]interface{}{
-					"3":  "three",
-					"0":  "zero",
-					"hi": "there",
-				},
-			},
-		},
-		{
-			map[string]interface{}{
-				"foo": map[string]interface{}{
-					"0": map[string]interface{}{
-						"1": map[string]interface{}{
-							"hello": "hi",
-						},
-					},
-					"2": "two",
-				},
-			},
-			map[string]interface{}{
-				"foo": []interface{}{
-					[]interface{}{
-						nil,
-						map[string]interface{}{
-							"hello": "hi",
-						},
-					},
-					nil,
-					"two",
-				},
-			},
-		},
-	} {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			assertions.New(t).So(Slicify(tc.in), should.Resemble, tc.out)
-		})
 	}
 }

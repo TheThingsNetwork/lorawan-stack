@@ -26,23 +26,11 @@ func TestUnmarshalMap(t *testing.T) {
 			}
 			err := UnmarshalMap(v.marshaled, rv.Interface(), v.decodeHooks...)
 			a.So(err, should.BeNil)
-			a.So(pretty.Diff(rv.Elem().Interface(), v.unmarshaled), should.BeEmpty)
+			if !a.So(rv.Elem().Interface(), should.Resemble, v.unmarshaled) {
+				pretty.Ldiff(t, rv.Elem().Interface(), v.unmarshaled)
+			}
 		})
 	}
-	t.Run("interface", func(t *testing.T) {
-		a := assertions.New(t)
-
-		type T struct {
-			A MapUnmarshaler
-		}
-		v := T{}
-		err := UnmarshalMap(map[string]interface{}{
-			"A.A": "foo",
-			"A.B": 42,
-		}, &v)
-		a.So(err, should.NotBeNil)
-		a.So(v, should.Resemble, T{nil})
-	})
 }
 
 func TestUnmarshalByteMap(t *testing.T) {
@@ -57,21 +45,9 @@ func TestUnmarshalByteMap(t *testing.T) {
 			}
 			err := UnmarshalByteMap(v.bytes, rv.Interface(), v.decodeHooks...)
 			a.So(err, should.BeNil)
-			a.So(pretty.Diff(rv.Elem().Interface(), v.unmarshaled), should.BeEmpty)
+			if !a.So(rv.Elem().Interface(), should.Resemble, v.unmarshaled) {
+				pretty.Ldiff(t, rv.Elem().Interface(), v.unmarshaled)
+			}
 		})
 	}
-	t.Run("interface", func(t *testing.T) {
-		a := assertions.New(t)
-
-		type T struct {
-			A MapUnmarshaler
-		}
-		v := T{}
-		err := UnmarshalByteMap(map[string][]byte{
-			"A.A": mustToBytes("foo"),
-			"A.B": mustToBytes(42),
-		}, &v)
-		a.So(err, should.NotBeNil)
-		a.So(v, should.Resemble, T{nil})
-	})
 }

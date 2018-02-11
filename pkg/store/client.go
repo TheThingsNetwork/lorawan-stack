@@ -87,6 +87,7 @@ func (cl *typedStoreClient) FindBy(filter interface{}, newResult NewResultFunc, 
 	if err != nil {
 		return nil, err
 	}
+
 	m, err := cl.TypedStore.FindBy(filterFields(fm, fields...))
 	if err != nil {
 		return nil, err

@@ -81,13 +81,16 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 				"a.bar": "foo",
 				"a.b.a": "1",
 				"a.b.c": "foo",
+				"a.c.b": "acb",
 			},
 			map[string]interface{}{
 				"a.b": nil,
+				"a.c": "ac",
 			},
 			map[string]interface{}{
 				"a.a":   1,
 				"a.bar": "foo",
+				"a.c":   "ac",
 			},
 			map[string]interface{}{
 				"a.a": 1,
@@ -232,16 +235,19 @@ func TestByteStore(t testingT, newStore func() store.ByteStore) {
 		{
 			map[string][]byte{
 				"a.a":   {1},
+				"a.bar": []byte("foo"),
 				"a.b.a": []byte("1"),
 				"a.b.c": []byte("foo"),
-				"a.c.a": []byte("bar"),
+				"a.c.b": []byte("acb"),
 			},
 			map[string][]byte{
 				"a.b": nil,
-				"a.c": nil,
+				"a.c": []byte("ac"),
 			},
 			map[string][]byte{
-				"a.a": {1},
+				"a.a":   {1},
+				"a.bar": []byte("foo"),
+				"a.c":   []byte("ac"),
 			},
 			map[string][]byte{
 				"a.a": {1},

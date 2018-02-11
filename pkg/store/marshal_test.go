@@ -24,24 +24,6 @@ func TestMarshalMap(t *testing.T) {
 			}
 		})
 	}
-	t.Run("interface", func(t *testing.T) {
-		a := assertions.New(t)
-
-		v := struct {
-			A interface{}
-		}{
-			map[string]interface{}{
-				"A": "foo",
-				"B": 42,
-			},
-		}
-		m, err := MarshalMap(v)
-		a.So(err, should.BeNil)
-		a.So(m, should.Resemble, map[string]interface{}{
-			"A.A": "foo",
-			"A.B": 42,
-		})
-	})
 }
 
 func TestMarshalByteMap(t *testing.T) {
@@ -56,22 +38,4 @@ func TestMarshalByteMap(t *testing.T) {
 			}
 		})
 	}
-	t.Run("interface", func(t *testing.T) {
-		a := assertions.New(t)
-
-		v := struct {
-			A interface{}
-		}{
-			map[string]interface{}{
-				"A": "foo",
-				"B": 42,
-			},
-		}
-		m, err := MarshalByteMap(v)
-		a.So(err, should.BeNil)
-		a.So(m, should.Resemble, map[string][]byte{
-			"A.A": mustToBytes("foo"),
-			"A.B": mustToBytes(42),
-		})
-	})
 }

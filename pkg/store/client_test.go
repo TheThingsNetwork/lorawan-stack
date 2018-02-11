@@ -43,12 +43,10 @@ var firstVal = First{
 	C: 42,
 	D: "42",
 	E: map[string]interface{}{
-		"foo": "bar",
-		"42":  "42",
+		"42": "42",
 	},
 	F: map[string][]byte{
-		"foo": []byte("bar"),
-		"42":  []byte("42"),
+		"42": []byte("42"),
 	},
 	G: []int{42, 42, 42},
 }
@@ -103,16 +101,14 @@ func TestTypedClient(t *testing.T) {
 				C: 43,
 				D: "43",
 				E: map[string]interface{}{
-					"foo": "bar",
-					"42":  "42",
+					"42": "42",
 				},
 				F: map[string][]byte{
-					"foo": []byte("bar"),
-					"42":  []byte("42"),
+					"42": []byte("42"),
 				},
-				G: []int{41, 43, 42},
+				G: []int{41, 43},
 			},
-			[]string{"A", "B", "C", "D", "G.0", "G.1"},
+			[]string{"A", "B", "C", "D", "G"},
 		},
 		{
 			&secondVal,
@@ -123,7 +119,6 @@ func TestTypedClient(t *testing.T) {
 					firstVal,
 				},
 				SlicePtr: []*First{
-					nil,
 					&firstVal,
 				},
 				SliceMap:    nil,
@@ -131,15 +126,11 @@ func TestTypedClient(t *testing.T) {
 			},
 			&Second{
 				Slice: []First{
-					{
-						A: 42,
-						G: firstVal.G,
-					},
+					{A: 42},
 					{A: 42},
 					firstVal,
 				},
 				SlicePtr: []*First{
-					&firstVal,
 					&firstVal,
 				},
 				Map: map[string]First{
@@ -155,7 +146,7 @@ func TestTypedClient(t *testing.T) {
 					},
 				},
 			},
-			[]string{"Slice", "Slice.0.B", "Slice.0.C", "Slice.0.D", "Slice.0.E", "Slice.0.F", "SlicePtr.1", "SliceMap"},
+			[]string{"Slice", "SlicePtr", "SliceMap"},
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
@@ -177,7 +168,8 @@ func TestTypedClient(t *testing.T) {
 			v := newResult()
 			err = cl.Find(k, v)
 			a.So(err, should.BeNil)
-			if !a.So(pretty.Diff(v, tc.Stored), should.BeEmpty) {
+			if !a.So(v, should.Resemble, v) {
+				pretty.Ldiff(t, v, tc.Stored)
 				return
 			}
 
@@ -195,7 +187,8 @@ func TestTypedClient(t *testing.T) {
 			v = newResult()
 			err = cl.Find(k, v)
 			a.So(err, should.BeNil)
-			if !a.So(pretty.Diff(v, tc.AfterUpdate), should.BeEmpty) {
+			if !a.So(v, should.Resemble, tc.AfterUpdate) {
+				pretty.Ldiff(t, v, tc.AfterUpdate)
 				return
 			}
 
@@ -203,7 +196,10 @@ func TestTypedClient(t *testing.T) {
 			if a.So(err, should.BeNil) {
 				for mk, mv := range m {
 					a.So(mk, should.Resemble, k)
-					a.So(pretty.Diff(mv, tc.AfterUpdate), should.BeEmpty)
+					if !a.So(mv, should.Resemble, tc.AfterUpdate) {
+						pretty.Ldiff(t, mv, tc.AfterUpdate)
+						return
+					}
 				}
 			}
 

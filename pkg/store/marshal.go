@@ -3,16 +3,87 @@
 package store
 
 import (
-	"encoding"
+	"bytes"
+	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"reflect"
 	"strconv"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/gogo/protobuf/jsonpb"
 	"github.com/gogo/protobuf/proto"
 )
+
+var (
+	stringType         = reflect.TypeOf("")
+	reflectValueType   = reflect.TypeOf(reflect.Value{})
+	fmtStringerType    = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
+	protoMarshalerType = reflect.TypeOf((*proto.Marshaler)(nil)).Elem()
+	gobGobEncoderType  = reflect.TypeOf((*gob.GobEncoder)(nil)).Elem()
+	jsonMarshalerType  = reflect.TypeOf((*json.Marshaler)(nil)).Elem()
+	mapMarshalerType   = reflect.TypeOf((*MapMarshaler)(nil)).Elem()
+)
+
+// NOTE: Adapted from gob package source
+// isZero reports whether the value is the zero of its type.
+func isZero(val reflect.Value) bool {
+	if !val.IsValid() {
+		return true
+	}
+
+	switch val.Kind() {
+	case reflect.Array:
+		for i := 0; i < val.Len(); i++ {
+			if !isZero(val.Index(i)) {
+				return false
+			}
+		}
+		return true
+	case reflect.Map, reflect.Slice, reflect.String:
+		return val.Len() == 0
+	case reflect.Bool:
+		return !val.Bool()
+	case reflect.Complex64, reflect.Complex128:
+		return val.Complex() == 0
+	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Ptr:
+		return val.IsNil()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return val.Int() == 0
+	case reflect.Float32, reflect.Float64:
+		return val.Float() == 0
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return val.Uint() == 0
+	case reflect.Struct:
+		for i := 0; i < val.NumField(); i++ {
+			if !isZero(val.Field(i)) {
+				return false
+			}
+		}
+		return true
+	}
+	panic("unknown type in isZero " + val.Type().String())
+}
+
+// FlattenedValue is like Flattened, but it operates on maps containing reflect.Value.
+func FlattenedValue(m map[string]reflect.Value) (out map[string]reflect.Value) {
+	out = make(map[string]reflect.Value, len(m))
+	for k, v := range m {
+		if !v.IsValid() {
+			out[k] = v
+			continue
+		}
+
+		vt := v.Type()
+		if vt.Kind() == reflect.Map && vt.Key().Kind() == reflect.String && vt.Elem() == reflectValueType {
+			for sk, sv := range FlattenedValue(v.Interface().(map[string]reflect.Value)) {
+				out[k+Separator+sk] = sv
+			}
+		} else {
+			out[k] = v
+		}
+	}
+	return out
+}
 
 // Flattened returns a copy of m with keys 'Flattened'.
 // If the map contains sub-maps, the values of these sub-maps are set under the root map, each level separated by Separator.
@@ -28,178 +99,102 @@ func Flattened(m map[string]interface{}) (out map[string]interface{}) {
 			out[k] = v
 		}
 	}
-	return
+	return out
 }
 
-// KeepBytes is a keep function intended to be used in Mapify.
-func KeepBytes(rv reflect.Value) bool {
-	return (rv.Kind() == reflect.Slice || rv.Kind() == reflect.Array) && rv.Type().Elem().Kind() == reflect.Uint8
-}
-
-// Mapify recursively replaces (sub-)slices in v by maps. If keep is set and returns true for encountered value, the value will be kept as-is. Look at keepBytes for an example of where this is useful.
-func Mapify(v interface{}, keep func(rv reflect.Value) bool) interface{} {
-	rv := reflect.ValueOf(v)
-	if !rv.IsValid() {
-		return nil
+// ToValueMap converts the input map m into a map[string]reflect.Value by calling reflect.ValueOf with each value in m.
+func ToValueMap(m map[string]interface{}) map[string]reflect.Value {
+	vm := make(map[string]reflect.Value, len(m))
+	for k, iv := range m {
+		vm[k] = reflect.ValueOf(iv)
 	}
-	if keep != nil && keep(rv) {
-		return v
-	}
-
-	switch rv.Kind() {
-	case reflect.Map:
-		m := make(map[string]interface{}, rv.Len())
-		for _, sk := range rv.MapKeys() {
-			sv := reflect.ValueOf(rv.MapIndex(sk).Interface())
-			if !sv.IsValid() {
-				m[sk.String()] = nil
-				continue
-			}
-			m[sk.String()] = Mapify(sv.Interface(), keep)
-		}
-		return m
-	case reflect.Slice, reflect.Array:
-		m := make(map[string]interface{}, rv.Len())
-		for i := 0; i < rv.Len(); i++ {
-			sv := reflect.ValueOf(rv.Index(i).Interface())
-			if !sv.IsValid() {
-				m[strconv.Itoa(i)] = nil
-				continue
-			}
-			m[strconv.Itoa(i)] = Mapify(sv.Interface(), keep)
-		}
-		return m
-	default:
-		return v
-	}
-}
-
-func isZero(v reflect.Value) bool {
-	if !v.IsValid() {
-		return true
-	}
-
-	switch v.Kind() {
-	case reflect.Ptr, reflect.Interface:
-		return isZero(v.Elem())
-	case reflect.Func:
-		return v.IsNil()
-	case reflect.Map, reflect.Slice, reflect.Array, reflect.String, reflect.Chan:
-		return v.Len() == 0
-	}
-	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
+	return vm
 }
 
 // marshalNested retrieves recursively all types for the given value
 // and returns the marshaled nested value.
-func marshalNested(v reflect.Value) (interface{}, error) {
-	if !v.IsValid() {
-		return nil, nil
-	}
-
+func marshalNested(v reflect.Value) (reflect.Value, error) {
 	iv := reflect.Indirect(v)
 	if !iv.IsValid() {
-		return nil, nil
+		return reflect.Value{}, nil
 	}
-	if m, ok := v.Interface().(MapMarshaler); ok {
-		return m.MarshalMap()
+	if v.Type().Implements(mapMarshalerType) {
+		im, err := v.Interface().(MapMarshaler).MarshalMap()
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		return reflect.ValueOf(ToValueMap(im)), nil
 	}
 	v = iv
+	t := v.Type()
 
-	var err error
-	switch v.Kind() {
+	switch t.Kind() {
 	case reflect.Map:
-		m := make(map[string]interface{}, v.Len())
-		switch kt := v.Type().Key(); {
+		m := reflect.MakeMapWithSize(reflect.MapOf(stringType, reflectValueType), v.Len())
+		switch kt := t.Key(); {
 		case kt.Kind() == reflect.String:
 			for _, k := range v.MapKeys() {
-				m[k.String()], err = marshalNested(v.MapIndex(k))
+				nv, err := marshalNested(v.MapIndex(k))
 				if err != nil {
-					return nil, err
+					return reflect.Value{}, err
 				}
+				m.SetMapIndex(k, reflect.ValueOf(nv))
 			}
 			return m, nil
-		case kt.Implements(reflect.TypeOf((*fmt.Stringer)(nil)).Elem()):
+		case kt.Implements(fmtStringerType):
 			for _, k := range v.MapKeys() {
-				m[k.Interface().(fmt.Stringer).String()], err = marshalNested(v.MapIndex(k))
+				nv, err := marshalNested(v.MapIndex(k))
 				if err != nil {
-					return nil, err
+					return reflect.Value{}, err
 				}
+				m.SetMapIndex(reflect.ValueOf(k.Interface().(fmt.Stringer).String()), reflect.ValueOf(nv))
 			}
-			return m, nil
-		default:
-			return nil, errors.Errorf("Expected the map key kind to be string or implement Stringer, got %s", kt)
 		}
+		return m, nil
 	case reflect.Struct:
-		t := v.Type()
 		for i := 0; i < t.NumField(); i++ {
 			if t.Field(i).PkgPath == "" {
 				// Only attempt to marshal structs with exported fields
-				return marshal(v.Interface())
-			}
-		}
-		return v.Interface(), nil
-	case reflect.Slice, reflect.Array:
-		switch e := v.Type().Elem(); e.Kind() {
-		case reflect.Ptr:
-			switch se := e.Elem(); se.Kind() {
-			case reflect.Interface, reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
-			default:
-				// return slices of pointers to simple types as slices of values of that type
-				n := v.Len()
-				sl := reflect.MakeSlice(se, n, n)
-				for i := 0; i < n; i++ {
-					sl.Index(i).Set(reflect.Indirect(v.Index(i)))
+				m, err := marshal(v)
+				if err != nil {
+					return reflect.Value{}, err
 				}
-				return sl.Interface(), nil
-			}
-		case reflect.Interface, reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
-		default:
-			// return slices of simple types as-is
-			return v.Interface(), nil
-		}
-
-		n := v.Len()
-		s := make([]interface{}, n, n)
-		for i := 0; i < n; i++ {
-			sv := v.Index(i)
-			if isZero(sv) {
-				continue
-			}
-			s[i], err = marshalNested(sv)
-			if err != nil {
-				return nil, err
+				return reflect.ValueOf(m), nil
 			}
 		}
-		return s, nil
+		return v, nil
 	default:
-		return v.Interface(), nil
+		return v, nil
 	}
 }
 
-// marhshal converts the given struct s to a map[string]interface{}
-func marshal(s interface{}) (m map[string]interface{}, err error) {
-	if mm, ok := s.(MapMarshaler); ok {
-		return mm.MarshalMap()
+// marhshal converts the given struct s to a map[string]reflect.Value
+func marshal(v reflect.Value) (m map[string]reflect.Value, err error) {
+	if v.Type().Implements(mapMarshalerType) {
+		im, err := v.Interface().(MapMarshaler).MarshalMap()
+		if err != nil {
+			return nil, err
+		}
+		return ToValueMap(im), nil
 	}
 
-	v := reflect.Indirect(reflect.ValueOf(s))
-	if v.Kind() != reflect.Struct {
-		return nil, errors.Errorf("Expected argument to be a struct, got %s(%s)", v.Type(), v.Kind())
-	}
-
+	v = reflect.Indirect(v)
 	t := v.Type()
-	m = make(map[string]interface{}, t.NumField())
+
+	if t.Kind() != reflect.Struct {
+		return nil, errors.Errorf("Expected argument to be a struct, got %s (kind: %s)", t, t.Kind())
+	}
+
+	m = make(map[string]reflect.Value, t.NumField())
 	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
 		if f.PkgPath != "" {
 			continue
 		}
-		if fv := v.FieldByName(f.Name); !isZero(fv) {
-			m[f.Name], err = marshalNested(fv)
-			if err != nil {
-				return nil, err
-			}
+
+		m[f.Name], err = marshalNested(v.FieldByName(f.Name))
+		if err != nil {
+			return nil, err
 		}
 	}
 	return m, nil
@@ -220,31 +215,45 @@ type MapMarshaler interface {
 // The map produced by any of the methods will be flattened by joining sub-map values with a dot(note that slices produced by custom MarshalMap implementations won't be flattened).
 func MarshalMap(v interface{}) (m map[string]interface{}, err error) {
 	if mm, ok := v.(MapMarshaler); ok {
-		m, err = mm.MarshalMap()
-	} else {
-		m, err = marshal(v)
+		return mm.MarshalMap()
 	}
+
+	vm, err := marshal(reflect.ValueOf(v))
 	if err != nil {
 		return nil, err
 	}
-	m = Flattened(Mapify(m, KeepBytes).(map[string]interface{}))
-	for k, v := range m {
-		rv := reflect.ValueOf(v)
-		switch rv.Kind() {
-		case reflect.Ptr, reflect.Struct, reflect.Map, reflect.Interface, reflect.Chan, reflect.Func:
-			bv, err := ToBytes(v)
+	if len(vm) == 0 {
+		return nil, nil
+	}
+
+	vm = FlattenedValue(vm)
+
+	m = make(map[string]interface{}, len(vm))
+	for k, v := range vm {
+		if isZero(v) {
+			continue
+		}
+		switch v.Kind() {
+		case reflect.Ptr, reflect.Struct, reflect.Map, reflect.Interface, reflect.Chan, reflect.Func, reflect.Slice, reflect.Array:
+			if v.Kind() == reflect.Slice && v.Type().Elem().Kind() == reflect.Uint8 {
+				m[k] = v.Interface()
+				continue
+			}
+
+			bv, err := ToBytesValue(v)
 			if err != nil {
 				return nil, err
 			}
 			m[k] = bv
+		default:
+			m[k] = v.Interface()
 		}
 	}
 	return m, nil
 }
 
-var jsonpbMarshaler = &jsonpb.Marshaler{}
-
-func ToBytes(v interface{}) (b []byte, err error) {
+// ToBytesValue is like ToBytes, but operates on values of type reflect.Value.
+func ToBytesValue(v reflect.Value) (b []byte, err error) {
 	var enc Encoding
 	defer func() {
 		if err != nil {
@@ -253,67 +262,92 @@ func ToBytes(v interface{}) (b []byte, err error) {
 		b = append([]byte{byte(enc)}, b...)
 	}()
 
-	rv := reflect.Indirect(reflect.ValueOf(v))
-	if !rv.IsValid() {
+	iv := reflect.Indirect(v)
+	if !iv.IsValid() || isZero(iv) {
 		enc = RawEncoding
 		return []byte{}, nil
 	}
-	switch k := rv.Kind(); k {
+
+	switch k := iv.Kind(); k {
 	case reflect.String:
 		enc = RawEncoding
-		return []byte(rv.String()), nil
+		return []byte(iv.String()), nil
 	case reflect.Bool:
 		enc = RawEncoding
-		return []byte(strconv.FormatBool(rv.Bool())), nil
+		return []byte(strconv.FormatBool(iv.Bool())), nil
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		enc = RawEncoding
-		return []byte(strconv.FormatInt(rv.Int(), 10)), nil
+		return []byte(strconv.FormatInt(iv.Int(), 10)), nil
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		enc = RawEncoding
-		return []byte(strconv.FormatUint(rv.Uint(), 10)), nil
+		return []byte(strconv.FormatUint(iv.Uint(), 10)), nil
 	case reflect.Float32:
 		enc = RawEncoding
-		return []byte(strconv.FormatFloat(rv.Float(), 'f', -1, 32)), nil
+		return []byte(strconv.FormatFloat(iv.Float(), 'f', -1, 32)), nil
 	case reflect.Float64:
 		enc = RawEncoding
-		return []byte(strconv.FormatFloat(rv.Float(), 'f', -1, 64)), nil
+		return []byte(strconv.FormatFloat(iv.Float(), 'f', -1, 64)), nil
 	case reflect.Slice, reflect.Array:
-		elem := rv.Type().Elem()
+		elem := iv.Type().Elem()
 		if elem.Kind() == reflect.Uint8 {
 			enc = RawEncoding
 
 			// Handle byte slices/arrays directly
 			if k == reflect.Slice {
-				return rv.Bytes(), nil
+				return iv.Bytes(), nil
 			}
 			var byt byte
-			out := reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(byt)), rv.Len(), rv.Len())
-			for i := 0; i < rv.Len(); i++ {
-				out.Index(i).Set(rv.Index(i))
+			out := reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(byt)), iv.Len(), iv.Len())
+			for i := 0; i < iv.Len(); i++ {
+				out.Index(i).Set(iv.Index(i))
 			}
 			return out.Bytes(), nil
 		}
 	}
 
-	switch v := v.(type) {
-	case encoding.BinaryMarshaler:
-		enc = BinaryEncoding
-		return v.MarshalBinary()
-	case encoding.TextMarshaler:
-		enc = TextEncoding
-		return v.MarshalText()
-	case proto.Marshaler:
-		enc = ProtoEncoding
-		return v.Marshal()
-	case jsonpb.JSONPBMarshaler:
-		enc = JSONPBEncoding
-		return v.MarshalJSONPB(jsonpbMarshaler)
-	case json.Marshaler:
+	t := v.Type()
+
+	switch {
+	case t.Implements(jsonMarshalerType):
 		enc = JSONEncoding
-		return v.MarshalJSON()
+		return v.Interface().(json.Marshaler).MarshalJSON()
+	case t.Implements(protoMarshalerType):
+		enc = ProtoEncoding
+		return v.Interface().(proto.Marshaler).Marshal()
+	case !t.Implements(gobGobEncoderType) && iv.Kind() == reflect.Struct:
+		it := iv.Type()
+		for i := 0; i < it.NumField(); i++ {
+			if it.Field(i).PkgPath == "" {
+				goto gobEncode
+			}
+		}
+		// The struct can not be encoded using gob, if it does not implement gob.GobEncoder
+		// and has no exported fields, hence we return an error
+		return nil, errors.Errorf("Struct type %s should have exported fields or implement gob.GobEncoder to be encoded", t)
+	case t.Kind() == reflect.Chan, t.Kind() == reflect.Func:
+		return nil, errors.Errorf("Values of type %s (kind %s), which do not implement custom marshaling logic are not supported", t, t.Kind())
 	}
-	enc = UnknownEncoding
-	return []byte(fmt.Sprint(v)), nil
+
+gobEncode:
+	enc = GobEncoding
+
+	// Encode the value as a pointer to include type info.
+	pv := reflect.New(t)
+	pv.Elem().Set(v)
+
+	buf := &bytes.Buffer{}
+	if err := gob.NewEncoder(buf).EncodeValue(pv); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+// ToBytes marshals v into a []byte value and returns the result.
+// Slices and arrays of bytes, strings, booleans and numeric types are stored in a human-readable
+// format, if value implements proto.Marshaler, result of Marshal() method is stored, otherwise encoding/gob is used.
+// Encoded values have the according Encoding byte prepended.
+func ToBytes(v interface{}) (b []byte, err error) {
+	return ToBytesValue(reflect.ValueOf(v))
 }
 
 // ByteMapMarshaler is the interface implemented by an object that can
@@ -332,24 +366,31 @@ func MarshalByteMap(v interface{}) (bm map[string][]byte, err error) {
 		return bmm.MarshalByteMap()
 	}
 
-	var im map[string]interface{}
-	switch v := v.(type) {
-	case MapMarshaler:
-		im, err = v.MarshalMap()
+	var vm map[string]reflect.Value
+	if mm, ok := v.(MapMarshaler); ok {
+		im, err := mm.MarshalMap()
 		if err != nil {
 			return nil, err
 		}
-	default:
-		im, err = marshal(v)
+		vm = ToValueMap(im)
+	} else {
+		vm, err = marshal(reflect.ValueOf(v))
 		if err != nil {
 			return nil, err
 		}
-		im = Flattened(Mapify(im, KeepBytes).(map[string]interface{}))
+		vm = FlattenedValue(vm)
+	}
+	if len(vm) == 0 {
+		return nil, nil
 	}
 
-	bm = make(map[string][]byte, len(im))
-	for k, v := range im {
-		b, err := ToBytes(v)
+	bm = make(map[string][]byte, len(vm))
+	for k, v := range vm {
+		if isZero(v) {
+			continue
+		}
+
+		b, err := ToBytesValue(v)
 		if err != nil {
 			return nil, err
 		}

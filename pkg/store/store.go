@@ -17,16 +17,12 @@ const (
 
 	// RawEncoding represents case when value is encoded into "raw" byte value.
 	RawEncoding Encoding = iota
-	// BinaryEncoding represents case when MarshalBinary() method was used to encode value.
-	BinaryEncoding
-	// TextEncoding represents case when MarshalText() method was used to encode value.
-	TextEncoding
-	// ProtoEncoding represents case when Proto() method was used to encode value.
-	ProtoEncoding
 	// JSONEncoding represents case when MarshalJSON() method was used to encode value.
 	JSONEncoding
-	// JSONPBEncoding represents case when MarshalJSONPB(*jsonpb.Marshaler) method was used to encode value.
-	JSONPBEncoding
+	// ProtoEncoding represents case when Proto() method was used to encode value.
+	ProtoEncoding
+	// GobEncoding represents case when Gob was used to encode value.
+	GobEncoding
 	// UnknownEncoding represents case when unknown encoding was used to encode value(fmt.Sprint).
 	UnknownEncoding
 )

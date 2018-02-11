@@ -12,6 +12,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -76,6 +77,22 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 	r := New(store.NewTypedStoreClient(mapstore.New()))
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+	ed.Attributes = &pbtypes.Struct{
+		Fields: map[string]*pbtypes.Value{
+			"null":   {Kind: &pbtypes.Value_NullValue{}},
+			"bool":   {Kind: &pbtypes.Value_BoolValue{BoolValue: true}},
+			"str":    {Kind: &pbtypes.Value_StringValue{StringValue: "bar"}},
+			"number": {Kind: &pbtypes.Value_NumberValue{NumberValue: 42}},
+			"list": {Kind: &pbtypes.Value_ListValue{ListValue: &pbtypes.ListValue{Values: []*pbtypes.Value{
+				{&pbtypes.Value_BoolValue{BoolValue: true}},
+				{&pbtypes.Value_StringValue{StringValue: "bar"}},
+			}}}},
+			"struct": {Kind: &pbtypes.Value_StructValue{StructValue: &pbtypes.Struct{Fields: map[string]*pbtypes.Value{
+				"bool": {Kind: &pbtypes.Value_BoolValue{BoolValue: true}},
+				"str":  {Kind: &pbtypes.Value_StringValue{StringValue: "bar"}},
+			}}}},
+		},
+	}
 
 	dev, err := r.Create(ed)
 	if !a.So(err, should.BeNil) {
@@ -94,7 +111,9 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		a.So(pretty.Diff(found[0].EndDevice, ed), should.BeEmpty)
+		if len(pretty.Diff(found[0].EndDevice, ed)) != 0 && !a.So(found[0].EndDevice, should.Resemble, ed) {
+			pretty.Ldiff(t, found[0].EndDevice, ed)
+		}
 	}
 
 	updated := ttnpb.NewPopulatedEndDevice(test.Randy, false)
@@ -223,7 +242,7 @@ func ExampleRegistry() {
 
 	dev, err := r.Create(ed)
 	if err != nil {
-		panic(fmt.Errorf("Failed to create dev %s", err))
+		panic(fmt.Errorf("Failed to create device %s", err))
 	}
 
 	dev.NextDevNonce++
@@ -235,22 +254,22 @@ func ExampleRegistry() {
 	dev.DevAddr = &devAddr
 	err = dev.Update()
 	if err != nil {
-		panic(fmt.Errorf("Failed to update dev %s", err))
+		panic(fmt.Errorf("Failed to update device %s", err))
 	}
 
 	devs, err := FindDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
 		ApplicationID: "test",
 	})
 	if err != nil {
-		panic(fmt.Errorf("Failed to find dev by identifiers %s", err))
+		panic(fmt.Errorf("Failed to find device by identifiers %s", err))
 	}
 	if len(devs) != 1 {
-		panic(fmt.Errorf("Expected to find 1 dev, got %d", len(devs)))
+		panic(fmt.Errorf("Expected to find 1 device, got %d", len(devs)))
 	}
 	dev = devs[0]
 
 	err = dev.Delete()
 	if err != nil {
-		panic(fmt.Errorf("Failed to delete dev %s", err))
+		panic(fmt.Errorf("Failed to delete device %s", err))
 	}
 }

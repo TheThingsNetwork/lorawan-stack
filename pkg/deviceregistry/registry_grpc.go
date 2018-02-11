@@ -121,7 +121,7 @@ func (r *RegistryRPC) ListDevices(ctx context.Context, filter *ttnpb.EndDeviceId
 	for i, dev := range devs {
 		eds[i] = dev.EndDevice
 	}
-	return &ttnpb.EndDevices{eds}, nil
+	return &ttnpb.EndDevices{EndDevices: eds}, nil
 }
 
 // GetDevice returns the device associated with id in underlying registry, if found.

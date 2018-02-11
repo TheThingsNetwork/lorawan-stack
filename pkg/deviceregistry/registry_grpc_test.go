@@ -93,14 +93,17 @@ func TestListDevicesNoCheck(t *testing.T) {
 	devs, err = dr.ListDevices(context.Background(), &dev1.EndDeviceIdentifiers)
 	if !a.So(err, should.BeNil) ||
 		!a.So(devs.EndDevices, should.HaveLength, 1) ||
-		!a.So(devs.EndDevices[0], should.Resemble, dev1.EndDevice) {
+		len(pretty.Diff(devs.EndDevices[0], dev1.EndDevice)) != 0 {
+
+		a.So(devs.EndDevices[0], should.Resemble, dev1.EndDevice)
+		pretty.Ldiff(t, devs.EndDevices[0], dev1.EndDevice)
 		return
 	}
 
 	devs, err = dr.ListDevices(context.Background(), &dev2.EndDeviceIdentifiers)
 	if !a.So(err, should.BeNil) ||
 		!a.So(devs.EndDevices, should.HaveLength, 1) ||
-		!a.So(devs.EndDevices[0], should.Resemble, dev2.EndDevice) {
+		len(pretty.Diff(devs.EndDevices[0], dev2.EndDevice)) != 0 && !a.So(devs.EndDevices[0], should.Resemble, dev2.EndDevice) {
 		return
 	}
 
