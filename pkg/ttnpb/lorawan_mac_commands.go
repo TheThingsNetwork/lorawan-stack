@@ -4,6 +4,7 @@ package ttnpb
 
 import proto "github.com/gogo/protobuf/proto"
 
+
 // MACCommandPayload interface is implemented by all MAC commands
 type MACCommandPayload interface {
 	proto.Message
