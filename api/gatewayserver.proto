@@ -15,7 +15,7 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // GatewayUp may contain zero or more uplink messages and/or a status message for the gateway.
 message GatewayUp {
-  repeated UplinkMessage uplink_message = 1;
+  repeated UplinkMessage uplink_messages = 1;
   GatewayStatus gateway_status = 2;
 }
 

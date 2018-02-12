@@ -68,7 +68,7 @@ func ExamplePool() {
 			if upMessage.GatewayStatus != nil {
 				fmt.Println("Gateway status received")
 			}
-			if upMessage.UplinkMessage != nil && len(upMessage.UplinkMessage) > 0 {
+			if upMessage.UplinkMessages != nil && len(upMessage.UplinkMessages) > 0 {
 				fmt.Println("Uplink received from gateway", gatewayInfo.GatewayID, "!")
 			}
 		}

@@ -47,7 +47,7 @@ func TestPoolUplinks(t *testing.T) {
 
 	go func() {
 		link.NextUplink <- &ttnpb.GatewayUp{
-			UplinkMessage: []*ttnpb.UplinkMessage{
+			UplinkMessages: []*ttnpb.UplinkMessage{
 				{},
 			},
 		}

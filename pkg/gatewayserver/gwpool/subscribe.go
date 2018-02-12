@@ -157,7 +157,7 @@ func (p *pool) addUpstreamObservations(entry *gatewayStoreEntry, up *ttnpb.Gatew
 		entry.observations.StatusCount = entry.observations.StatusCount + 1
 	}
 
-	if nbUplinks := len(up.UplinkMessage); nbUplinks > 0 {
+	if nbUplinks := len(up.UplinkMessages); nbUplinks > 0 {
 		entry.observations.UplinkCount = entry.observations.UplinkCount + uint64(nbUplinks)
 		entry.observations.LastUplinkReceived = &currentTime
 	}
