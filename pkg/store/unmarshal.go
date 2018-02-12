@@ -16,9 +16,10 @@ import (
 )
 
 var (
-	mapUnmarshalerType   = reflect.TypeOf((*MapUnmarshaler)(nil)).Elem()
-	protoUnmarshalerType = reflect.TypeOf((*proto.Unmarshaler)(nil)).Elem()
-	jsonUnmarshalerType  = reflect.TypeOf((*json.Unmarshaler)(nil)).Elem()
+	mapUnmarshalerType     = reflect.TypeOf((*MapUnmarshaler)(nil)).Elem()
+	protoUnmarshalerType   = reflect.TypeOf((*proto.Unmarshaler)(nil)).Elem()
+	jsonUnmarshalerType    = reflect.TypeOf((*json.Unmarshaler)(nil)).Elem()
+	byteMapUnmarshalerType = reflect.TypeOf((*ByteMapUnmarshaler)(nil)).Elem()
 )
 
 // Unflattened unflattens m and returns the result
@@ -207,8 +208,6 @@ func interfaceMapToByteMap(im map[string]interface{}) (bm map[string][]byte, ok 
 	}
 	return
 }
-
-var byteMapUnmarshalerType = reflect.TypeOf((*ByteMapUnmarshaler)(nil)).Elem()
 
 func unmarshalByteMapHookFunc(f reflect.Type, t reflect.Type, v interface{}) (interface{}, error) {
 	switch {
