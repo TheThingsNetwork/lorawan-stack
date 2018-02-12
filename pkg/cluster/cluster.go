@@ -6,9 +6,11 @@ package cluster
 import (
 	"context"
 	"os"
+	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcclient"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -117,7 +119,14 @@ func (c *cluster) Join() (err error) {
 	}
 	for _, peer := range c.peers {
 		peer.ctx, peer.cancel = context.WithCancel(c.ctx)
-		peer.conn, err = grpc.DialContext(peer.ctx, peer.target, options...)
+		log.FromContext(c.ctx).WithFields(log.Fields(
+			"target", peer.target,
+			"name", peer.Name(),
+			"roles", peer.Roles(),
+		)).Debug("connecting to peer...")
+		ctx, cancel := context.WithTimeout(peer.ctx, 5*time.Second)
+		defer cancel()
+		peer.conn, err = grpc.DialContext(ctx, peer.target, options...)
 		if err != nil {
 			return errors.NewWithCause("Could not connect to peer", err)
 		}

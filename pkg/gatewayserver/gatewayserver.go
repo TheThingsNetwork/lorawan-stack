@@ -31,31 +31,11 @@ type GatewayServer struct {
 	frequencyPlans frequencyplans.Store
 }
 
-// Config represents the GatewayServer configuration.
-type Config struct {
-	LocalFrequencyPlansStore    string `name:"frequency-plans-dir" description:"Directory where the frequency plans are stored"`
-	HTTPFrequencyPlansStoreRoot string `name:"frequency-plans-uri" description:"URI from where the frequency plans will be fetched, if no directory is specified"`
-}
-
 // New returns new *GatewayServer.
 func New(c *component.Component, conf *Config) (*GatewayServer, error) {
-	var (
-		fpStore frequencyplans.Store
-		err     error
-	)
-	if conf.LocalFrequencyPlansStore != "" {
-		c.Logger().Debug("Reading frequency plans from the local disk...")
-		fpStore, err = frequencyplans.ReadFileSystemStore(frequencyplans.FileSystemRootPathOption(conf.LocalFrequencyPlansStore))
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		c.Logger().Debug("Fetching frequency plans...")
-		fpStore, err = frequencyplans.RetrieveHTTPStore(frequencyplans.BaseURIOption(conf.HTTPFrequencyPlansStoreRoot))
-		if err != nil {
-			return nil, err
-		}
-		fpStore = frequencyplans.Cache(fpStore, frequencyPlansCacheDuration)
+	fpStore, err := conf.store()
+	if err != nil {
+		return nil, err
 	}
 
 	gs := &GatewayServer{

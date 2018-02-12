@@ -19,16 +19,19 @@ type GsNsServer struct {
 }
 
 func (s *GsNsServer) StartServingGateway(_ context.Context, id *ttnpb.GatewayIdentifier) (*google_protobuf2.Empty, error) {
+	println("StartServingGateway")
 	s.startServingGatewayChan <- id
 	return nil, nil
 }
 
 func (s *GsNsServer) StopServingGateway(_ context.Context, id *ttnpb.GatewayIdentifier) (*google_protobuf2.Empty, error) {
+	println("StopServingGateway")
 	s.stopServingGatewayChan <- id
 	return nil, nil
 }
 
 func (s *GsNsServer) HandleUplink(_ context.Context, up *ttnpb.UplinkMessage) (*google_protobuf2.Empty, error) {
+	println("HandleUplink")
 	s.handleUplinkChan <- up
 	return nil, nil
 }

@@ -6,6 +6,7 @@ import (
 	"context"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
@@ -131,9 +132,13 @@ func TestLink(t *testing.T) {
 
 	var link ttnpb.GtwGs_LinkClient
 	linkCtx, linkCancel := context.WithCancel(ctx)
-	link, err = client.Link(linkCtx)
+	link, err = client.Link(linkCtx, grpc.FailFast(true))
 	a.So(err, should.BeNil)
-	<-ns.startServingGatewayChan
+	select {
+	case <-ns.startServingGatewayChan:
+	case <-time.After(time.Second):
+		a.So("timeout", should.BeNil)
+	}
 
 	err = link.Send(&ttnpb.GatewayUp{
 		UplinkMessages: []*ttnpb.UplinkMessage{{RawPayload: []byte{}}},
@@ -146,7 +151,11 @@ func TestLink(t *testing.T) {
 		},
 	})
 	a.So(err, should.BeNil)
-	<-ns.handleUplinkChan
+	select {
+	case <-ns.handleUplinkChan:
+	case <-time.After(time.Second):
+		a.So("timeout", should.BeNil)
+	}
 
 	downlinkContent := []byte{1, 2, 3}
 	_, err = gs.ScheduleDownlink(ctx, &ttnpb.DownlinkMessage{
@@ -174,7 +183,11 @@ func TestLink(t *testing.T) {
 	a.So(obs, should.NotBeNil)
 
 	linkCancel()
-	<-ns.stopServingGatewayChan
+	select {
+	case <-ns.stopServingGatewayChan:
+	case <-time.After(time.Second):
+		a.So("timeout", should.BeNil)
+	}
 
 	_, err = gs.GetGatewayObservations(ctx, &ttnpb.GatewayIdentifier{GatewayID: registeredGatewayID})
 	a.So(err, should.NotBeNil) // gateway disconnected
