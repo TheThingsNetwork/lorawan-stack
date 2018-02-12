@@ -34,7 +34,7 @@ func TestPoolUplinks(t *testing.T) {
 	obs, err := p.GetGatewayObservations(&gatewayIdentifier)
 	a.So(err, should.BeNil)
 	a.So(obs.UplinkCount, should.Equal, 0)
-	a.So(obs.LastUplinkReceived, should.BeNil)
+	a.So(obs.LastUplinkReceivedAt, should.BeNil)
 
 	go func() { link.NextUplink <- emptyUplink }()
 	newUplink := <-upstream
@@ -43,7 +43,7 @@ func TestPoolUplinks(t *testing.T) {
 	obs, err = p.GetGatewayObservations(&gatewayIdentifier)
 	a.So(err, should.BeNil)
 	a.So(obs.UplinkCount, should.Equal, 0)
-	a.So(obs.LastUplinkReceived, should.BeNil)
+	a.So(obs.LastUplinkReceivedAt, should.BeNil)
 
 	go func() {
 		link.NextUplink <- &ttnpb.GatewayUp{
@@ -62,7 +62,7 @@ func TestPoolUplinks(t *testing.T) {
 	obs, err = p.GetGatewayObservations(&gatewayIdentifier)
 	a.So(err, should.BeNil)
 	a.So(obs.UplinkCount, should.Equal, 1)
-	a.So(obs.LastUplinkReceived.Unix(), should.AlmostEqual, time.Now().Unix(), 1)
+	a.So(obs.LastUplinkReceivedAt.Unix(), should.AlmostEqual, time.Now().Unix(), 1)
 
 	link.AcceptSendingUplinks = false
 	go func() { link.NextUplink <- emptyUplink }()

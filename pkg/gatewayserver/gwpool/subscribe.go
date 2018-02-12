@@ -153,13 +153,13 @@ func (p *pool) addUpstreamObservations(entry *gatewayStoreEntry, up *ttnpb.Gatew
 
 	if up.GatewayStatus != nil {
 		entry.observations.LastStatus = up.GatewayStatus
-		entry.observations.LastStatusReceived = &currentTime
+		entry.observations.LastStatusReceivedAt = &currentTime
 		entry.observations.StatusCount = entry.observations.StatusCount + 1
 	}
 
 	if nbUplinks := len(up.UplinkMessages); nbUplinks > 0 {
 		entry.observations.UplinkCount = entry.observations.UplinkCount + uint64(nbUplinks)
-		entry.observations.LastUplinkReceived = &currentTime
+		entry.observations.LastUplinkReceivedAt = &currentTime
 	}
 
 	entry.observationsLock.Unlock()

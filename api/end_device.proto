@@ -206,7 +206,7 @@ message MACInfo {
   // - If device sent DeviceModeInd MAC message, this will be set to that value
   Class device_class = 1;
   // When the last device status MAC message was received
-  google.protobuf.Timestamp last_status = 2;
+  google.protobuf.Timestamp last_status_received_at = 2 [(gogoproto.stdtime) = true];
   // Battery percentage received in last device status message
   float battery_percentage = 3;
   // Downlink margin received in last device status message

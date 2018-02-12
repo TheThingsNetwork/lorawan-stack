@@ -47,7 +47,7 @@ func (p *pool) addDownstreamObservations(entry *gatewayStoreEntry, down *ttnpb.G
 	entry.observationsLock.Lock()
 
 	currentTime := time.Now()
-	entry.observations.LastDownlinkReceived = &currentTime
+	entry.observations.LastDownlinkReceivedAt = &currentTime
 	entry.observations.DownlinkCount = entry.observations.DownlinkCount + 1
 
 	entry.observationsLock.Unlock()
