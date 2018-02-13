@@ -3,6 +3,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
 package ttn.v3;
@@ -70,9 +71,10 @@ message MHDR {
 message MACPayload {
   option (gogoproto.populate) = false;
 
-  FHDR  f_hdr       = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  uint32 f_port     = 2;
-  bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
+  FHDR  f_hdr                            = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  uint32 f_port                          = 2;
+  bytes frm_payload                      = 3 [(gogoproto.customname) = "FRMPayload"];
+  google.protobuf.Struct decoded_payload = 4;
 }
 
 message FHDR {
