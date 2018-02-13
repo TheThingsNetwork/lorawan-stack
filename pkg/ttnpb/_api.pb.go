@@ -23,6 +23,7 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/join.proto
 	github.com/TheThingsNetwork/ttn/api/joinserver.proto
 	github.com/TheThingsNetwork/ttn/api/lorawan.proto
+	github.com/TheThingsNetwork/ttn/api/messageprocessors.proto
 	github.com/TheThingsNetwork/ttn/api/messages.proto
 	github.com/TheThingsNetwork/ttn/api/metadata.proto
 	github.com/TheThingsNetwork/ttn/api/networkserver.proto
