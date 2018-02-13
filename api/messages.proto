@@ -69,6 +69,9 @@ message UplinkMessage {
 
   // Rx metadata from the gateway, one for each antenna that received the message
   repeated RxMetadata rx_metadata = 5 [(gogoproto.nullable) = false];
+
+  // Locations from various sources
+  repeated LocationSource locations = 6;
 }
 
 // Downlink message from the network to the end device
