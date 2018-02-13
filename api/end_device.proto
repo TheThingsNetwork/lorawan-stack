@@ -63,6 +63,25 @@ message Session {
   google.protobuf.Timestamp started_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
+message EndDeviceModel {
+  string brand = 1;
+  string model = 2;
+  string hardware_version = 3;
+  string firmware_version = 4;
+}
+
+enum PayloadFormatter {
+  FORMATTER_NONE = 0;
+  // Default payload formatter for the end device type. The parameter points to the repository.
+  FORMATTER_DEFAULT = 1;
+  // gRPC service payload formatter. The parameter is the host:port of the service.
+  FORMATTER_GRPC_SERVICE = 2;
+  // Custom payload formatter that executes Javascript code. The parameter points to a Javascript file.
+  FORMATTER_JAVASCRIPT = 3;
+  FORMATTER_CAYENNELPP = 4;
+  // More payload formatters can be added.
+}
+
 message EndDevice {
   EndDeviceIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
@@ -142,8 +161,16 @@ message EndDevice {
   // ApplicationServerAddress specifies Address(host:port) of the Application Server associated with this device.
   string application_server_address = 26 [(gogoproto.customname) = "ApplicationServerAddress"];
 
+  EndDeviceModel model = 27 [(gogoproto.embed) = true];
+
+  PayloadFormatter up_formatter = 28;
+  string up_formatter_parameter = 29;
+  PayloadFormatter down_formatter = 30;
+  string down_formatter_parameter = 31;
+
   google.protobuf.Timestamp created_at = 97 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 98 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
   reserved 99; // RFU: google.protobuf.Struct advanced = 99;
 }
 

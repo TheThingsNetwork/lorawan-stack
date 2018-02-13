@@ -47,6 +47,7 @@ It has these top-level messages:
 	RootKeys
 	SessionKeys
 	Session
+	EndDeviceModel
 	EndDevice
 	EndDevices
 	MACSettings
