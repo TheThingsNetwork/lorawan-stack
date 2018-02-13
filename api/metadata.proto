@@ -105,14 +105,22 @@ message Location {
 enum LocationSource {
   option (gogoproto.goproto_enum_prefix) = false;
   // The source of the location is not known or not set
-  SOURCE_UNKNOWN  = 0;
+  SOURCE_UNKNOWN               = 0;
   // The location is determined by GPS
-  SOURCE_GPS      = 1;
-  // The location is fixed by configuration
-  SOURCE_CONFIG   = 2;
+  SOURCE_GPS                   = 1;
   // The location is set in and updated from a registry
-  SOURCE_REGISTRY = 3;
-  // The location is estimated with IP Geolocation
-  SOURCE_IP_GEOLOCATION = 4;
+  SOURCE_REGISTRY              = 3;
+  // The location is estimated with IP geolocation
+  SOURCE_IP_GEOLOCATION        = 4;
+  // The location is estimated with WiFi RSSI geolocation
+  SOURCE_WIFI_RSSI_GEOLOCATION = 5;
+  // The location is estimated with BT/BLE RSSI geolocation
+  SOURCE_BT_RSSI_GEOLOCATION   = 6;
+  // The location is estimated with LoRa RSSI geolocation
+  SOURCE_LORA_RSSI_GEOLOCATION = 7;
+  // The location is estimated with LoRa TDOA geolocation
+  SOURCE_LORA_TDOA_GEOLOCATION = 8;
+  // The location is estimated by a combination of geolocation sources
+  SOURCE_COMBINED_GEOLOCATION  = 9;
   // More estimation methods can be added
 }
