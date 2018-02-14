@@ -84,8 +84,6 @@ func (c *Component) Context() context.Context {
 
 // Start starts the component
 func (c *Component) Start() (err error) {
-	defer c.Close()
-
 	c.initGRPC()
 
 	if c.grpc != nil {
@@ -137,6 +135,18 @@ func (c *Component) Start() (err error) {
 		return err
 	}
 	c.logger.Debug("Joined cluster")
+
+	return nil
+}
+
+// Run starts the component, and returns when a stop signal has been received by the process.
+func (c *Component) Run() error {
+	defer c.Close()
+
+	if err := c.Start(); err != nil {
+		return err
+	}
+
 	defer func() {
 		c.logger.Debug("Leaving cluster...")
 		if err := c.cluster.Leave(); err != nil {

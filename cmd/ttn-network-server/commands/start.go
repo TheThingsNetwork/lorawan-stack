@@ -25,7 +25,7 @@ var (
 			ns := networkserver.New(c, &config.NS)
 			_ = ns
 
-			return c.Start()
+			return c.Run()
 		},
 	}
 )

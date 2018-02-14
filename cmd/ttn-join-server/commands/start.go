@@ -25,7 +25,7 @@ var (
 			js := joinserver.New(c, &config.JS)
 			_ = js
 
-			return c.Start()
+			return c.Run()
 		},
 	}
 )

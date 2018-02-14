@@ -25,7 +25,7 @@ var (
 				return errors.NewWithCause("Could not initialize identity server", err)
 			}
 
-			return c.Start()
+			return c.Run()
 		},
 	}
 )

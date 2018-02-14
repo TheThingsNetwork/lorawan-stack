@@ -25,7 +25,7 @@ var (
 			as := applicationserver.New(c, &config.AS)
 			_ = as
 
-			return c.Start()
+			return c.Run()
 		},
 	}
 )

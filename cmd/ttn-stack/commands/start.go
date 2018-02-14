@@ -53,7 +53,7 @@ var (
 
 			// TODO: Web UI
 
-			return c.Start()
+			return c.Run()
 		},
 	}
 )

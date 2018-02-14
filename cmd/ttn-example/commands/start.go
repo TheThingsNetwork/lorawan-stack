@@ -14,7 +14,7 @@ var (
 		Short: "Start the reference component",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c := component.New(logger, config)
-			return c.Start()
+			return c.Run()
 		},
 	}
 )

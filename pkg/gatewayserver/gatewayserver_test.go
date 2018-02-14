@@ -34,7 +34,7 @@ func Example() {
 		panic(err)
 	}
 
-	gs.Start()
+	gs.Run()
 }
 
 func TestUnloadableLocalStore(t *testing.T) {
@@ -100,6 +100,8 @@ func TestLink(t *testing.T) {
 				IdentityServer: isAddr,
 				NetworkServer:  nsAddr,
 			},
+			GRPC: config.GRPC{Listen: ":8088"},
+			HTTP: config.HTTP{Listen: ":8080", PProf: true},
 		},
 	})
 
@@ -107,7 +109,9 @@ func TestLink(t *testing.T) {
 	gs, err := gatewayserver.New(c, &gatewayserver.Config{LocalFrequencyPlansStore: dir})
 	a.So(err, should.BeNil)
 	gs.RegisterServices(srv)
-	go func() { gs.Start() }()
+	err = gs.Start()
+	a.So(err, should.BeNil)
+	defer gs.Close()
 
 	md := rpcmetadata.MD{ID: registeredGatewayID}
 	ctx = md.ToOutgoingContext(ctx)
