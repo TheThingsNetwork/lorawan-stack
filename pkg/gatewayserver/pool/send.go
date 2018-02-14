@@ -27,8 +27,8 @@ func (p *pool) Send(gatewayInfo ttnpb.GatewayIdentifier, downstream *ttnpb.Gatew
 		return errors.New("No downlink")
 	}
 
-	gateway, ok := p.store.Fetch(gatewayInfo)
-	if !ok {
+	gateway := p.store.Fetch(gatewayInfo)
+	if gateway == nil {
 		return ErrGatewayNotConnected.New(errors.Attributes{"gateway_id": gatewayInfo.GatewayID})
 	}
 

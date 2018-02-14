@@ -32,38 +32,33 @@ type gatewayStore struct {
 func (s *gatewayStore) Store(gatewayID ttnpb.GatewayIdentifier, entry *gatewayStoreEntry) {
 	s.mu.Lock()
 
-	res, ok := s.fetch(gatewayID)
-	if ok {
-		close(res.channel)
+	oldEntry := s.fetch(gatewayID)
+	if oldEntry != nil {
+		close(oldEntry.channel)
 	}
 	s.store[gatewayID] = entry
 
 	s.mu.Unlock()
 }
 
-func (s *gatewayStore) fetch(gatewayID ttnpb.GatewayIdentifier) (*gatewayStoreEntry, bool) {
-	outgoingChannel, ok := s.store[gatewayID]
-	if !ok {
-		return nil, false
-	}
-
-	return outgoingChannel, true
+func (s *gatewayStore) fetch(gatewayID ttnpb.GatewayIdentifier) *gatewayStoreEntry {
+	return s.store[gatewayID]
 }
 
-func (s *gatewayStore) Fetch(gatewayID ttnpb.GatewayIdentifier) (*gatewayStoreEntry, bool) {
+func (s *gatewayStore) Fetch(gatewayID ttnpb.GatewayIdentifier) *gatewayStoreEntry {
 	s.mu.Lock()
-	res, ok := s.fetch(gatewayID)
+	entry := s.fetch(gatewayID)
 	s.mu.Unlock()
 
-	return res, ok
+	return entry
 }
 
 func (s *gatewayStore) Remove(gatewayID ttnpb.GatewayIdentifier) {
 	s.mu.Lock()
 
-	res, ok := s.fetch(gatewayID)
-	if ok {
-		close(res.channel)
+	entry := s.fetch(gatewayID)
+	if entry != nil {
+		close(entry.channel)
 	}
 	delete(s.store, gatewayID)
 
@@ -112,8 +107,8 @@ func NewPool(logger log.Interface, sendTimeout time.Duration) Pool {
 }
 
 func (p *pool) GetGatewayObservations(gatewayInfo *ttnpb.GatewayIdentifier) (*ttnpb.GatewayObservations, error) {
-	gateway, ok := p.store.Fetch(*gatewayInfo)
-	if !ok {
+	gateway := p.store.Fetch(*gatewayInfo)
+	if gateway == nil {
 		return nil, ErrGatewayNotConnected.New(errors.Attributes{"gateway_id": gatewayInfo.GatewayID})
 	}
 
