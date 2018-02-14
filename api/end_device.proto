@@ -150,7 +150,7 @@ message EndDevice {
   // ApplicationServerAddress specifies Address(host:port) of the Application Server associated with this device.
   string application_server_address = 26 [(gogoproto.customname) = "ApplicationServerAddress"];
 
-  EndDeviceModel model = 27 [(gogoproto.embed) = true];
+  EndDeviceModel model = 27 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   PayloadFormatter up_formatter = 28;
   string up_formatter_parameter = 29;

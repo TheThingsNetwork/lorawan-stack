@@ -11,13 +11,13 @@ package ttn.v3;
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 message ProcessUplinkMessageRequest {
-  EndDeviceModel device_model = 1;
+  EndDeviceModel device_model = 1 [(gogoproto.nullable) = false];
   UplinkMessage message = 2 [(gogoproto.nullable) = false];
   string parameter = 3;
 }
 
 message ProcessDownlinkMessageRequest {
-  EndDeviceModel device_model = 1;
+  EndDeviceModel device_model = 1 [(gogoproto.nullable) = false];
   DownlinkMessage message = 2 [(gogoproto.nullable) = false];
   string parameter = 3;
 }
