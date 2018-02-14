@@ -71,7 +71,7 @@ message UplinkMessage {
   repeated RxMetadata rx_metadata = 5 [(gogoproto.nullable) = false];
 
   // Locations from various sources
-  repeated LocationSource locations = 6;
+  map<string, LocationSource> locations = 6;
 }
 
 // Downlink message from the network to the end device
