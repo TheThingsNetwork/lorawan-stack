@@ -135,10 +135,10 @@ func (p *pool) receivingRoutine(c connection, entry *gatewayStoreEntry, upstream
 
 		select {
 		case <-ctx.Done():
+			p.store.Remove(c.GatewayInfo)
 			err := ctx.Err()
 			c.Logger.WithError(err).Warn("Link context done, closing receiving routine")
 			c.StreamErr.Store(err)
-			p.store.Remove(c.GatewayInfo)
 			return
 		case upstreamChannel <- upstreamMessage:
 		}
