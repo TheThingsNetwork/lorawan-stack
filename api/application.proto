@@ -4,6 +4,7 @@ syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
+import "github.com/TheThingsNetwork/ttn/api/payload_formatter.proto";
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
@@ -27,6 +28,11 @@ message Application {
   // updated_at is the last time the application was updated.
   // This is a read-only field.
   google.protobuf.Timestamp updated_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
+  PayloadFormatter up_formatter = 5;
+  string up_formatter_parameter = 6;
+  PayloadFormatter down_formatter = 7;
+  string down_formatter_parameter = 8;
 }
 
 // ApplicationUp wraps multiple application-layer uplink types
