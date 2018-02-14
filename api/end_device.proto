@@ -6,6 +6,7 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/lorawan.proto";
 import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
+import "github.com/TheThingsNetwork/ttn/api/payload_formatter.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
@@ -68,18 +69,6 @@ message EndDeviceModel {
   string model = 2;
   string hardware_version = 3;
   string firmware_version = 4;
-}
-
-enum PayloadFormatter {
-  FORMATTER_NONE = 0;
-  // Default payload formatter for the end device type. The parameter points to the repository.
-  FORMATTER_DEFAULT = 1;
-  // gRPC service payload formatter. The parameter is the host:port of the service.
-  FORMATTER_GRPC_SERVICE = 2;
-  // Custom payload formatter that executes Javascript code. The parameter points to a Javascript file.
-  FORMATTER_JAVASCRIPT = 3;
-  FORMATTER_CAYENNELPP = 4;
-  // More payload formatters can be added.
 }
 
 message EndDevice {

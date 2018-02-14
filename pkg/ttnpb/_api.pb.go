@@ -28,6 +28,7 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/metadata.proto
 	github.com/TheThingsNetwork/ttn/api/networkserver.proto
 	github.com/TheThingsNetwork/ttn/api/organization.proto
+	github.com/TheThingsNetwork/ttn/api/payload_formatter.proto
 	github.com/TheThingsNetwork/ttn/api/rights.proto
 	github.com/TheThingsNetwork/ttn/api/user.proto
 
