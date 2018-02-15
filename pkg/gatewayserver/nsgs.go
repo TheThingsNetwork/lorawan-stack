@@ -7,10 +7,10 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	google_protobuf2 "github.com/gogo/protobuf/types"
+	"github.com/gogo/protobuf/types"
 )
 
-func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*google_protobuf2.Empty, error) {
+func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*types.Empty, error) {
 	err := g.gateways.Send(down.TxMetadata.GatewayIdentifier, &ttnpb.GatewayDown{DownlinkMessage: down})
 	if err != nil {
 		return nil, errors.NewWithCause("Could not send downlink to gateway", err)

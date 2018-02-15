@@ -8,7 +8,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	google_protobuf2 "github.com/gogo/protobuf/types"
+	"github.com/gogo/protobuf/types"
 )
 
 // GsNsServer implements ttnpb.GsNsServer
@@ -18,17 +18,17 @@ type GsNsServer struct {
 	handleUplinkChan        chan *ttnpb.UplinkMessage
 }
 
-func (s *GsNsServer) StartServingGateway(_ context.Context, id *ttnpb.GatewayIdentifier) (*google_protobuf2.Empty, error) {
+func (s *GsNsServer) StartServingGateway(_ context.Context, id *ttnpb.GatewayIdentifier) (*types.Empty, error) {
 	s.startServingGatewayChan <- id
 	return nil, nil
 }
 
-func (s *GsNsServer) StopServingGateway(_ context.Context, id *ttnpb.GatewayIdentifier) (*google_protobuf2.Empty, error) {
+func (s *GsNsServer) StopServingGateway(_ context.Context, id *ttnpb.GatewayIdentifier) (*types.Empty, error) {
 	s.stopServingGatewayChan <- id
 	return nil, nil
 }
 
-func (s *GsNsServer) HandleUplink(_ context.Context, up *ttnpb.UplinkMessage) (*google_protobuf2.Empty, error) {
+func (s *GsNsServer) HandleUplink(_ context.Context, up *ttnpb.UplinkMessage) (*types.Empty, error) {
 	s.handleUplinkChan <- up
 	return nil, nil
 }

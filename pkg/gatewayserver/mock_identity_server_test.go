@@ -9,8 +9,10 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	google_protobuf2 "github.com/gogo/protobuf/types"
+	"github.com/gogo/protobuf/types"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // IsGatewayServer implements ttnpb.IsGatewayServer
@@ -18,8 +20,8 @@ type IsGatewayServer struct {
 	gateways map[ttnpb.GatewayIdentifier]ttnpb.Gateway
 }
 
-func (m *IsGatewayServer) CreateGateway(context.Context, *ttnpb.CreateGatewayRequest) (*google_protobuf2.Empty, error) {
-	panic("Not implemented")
+func (m *IsGatewayServer) CreateGateway(context.Context, *ttnpb.CreateGatewayRequest) (*types.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
 func (m *IsGatewayServer) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifier) (*ttnpb.Gateway, error) {
@@ -31,43 +33,43 @@ func (m *IsGatewayServer) GetGateway(ctx context.Context, id *ttnpb.GatewayIdent
 }
 
 func (m *IsGatewayServer) ListGateways(context.Context, *ttnpb.ListGatewaysRequest) (*ttnpb.ListGatewaysResponse, error) {
-	panic("Not implemented")
+	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
-func (m *IsGatewayServer) UpdateGateway(context.Context, *ttnpb.UpdateGatewayRequest) (*google_protobuf2.Empty, error) {
-	panic("Not implemented")
+func (m *IsGatewayServer) UpdateGateway(context.Context, *ttnpb.UpdateGatewayRequest) (*types.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
-func (m *IsGatewayServer) DeleteGateway(context.Context, *ttnpb.GatewayIdentifier) (*google_protobuf2.Empty, error) {
-	panic("Not implemented")
+func (m *IsGatewayServer) DeleteGateway(context.Context, *ttnpb.GatewayIdentifier) (*types.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
 func (m *IsGatewayServer) GenerateGatewayAPIKey(context.Context, *ttnpb.GenerateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
-	panic("Not implemented")
+	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
 func (m *IsGatewayServer) ListGatewayAPIKeys(context.Context, *ttnpb.GatewayIdentifier) (*ttnpb.ListGatewayAPIKeysResponse, error) {
-	panic("Not implemented")
+	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
-func (m *IsGatewayServer) RemoveGatewayAPIKey(context.Context, *ttnpb.RemoveGatewayAPIKeyRequest) (*google_protobuf2.Empty, error) {
-	panic("Not implemented")
+func (m *IsGatewayServer) RemoveGatewayAPIKey(context.Context, *ttnpb.RemoveGatewayAPIKeyRequest) (*types.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
-func (m *IsGatewayServer) UpdateGatewayAPIKey(context.Context, *ttnpb.UpdateGatewayAPIKeyRequest) (*google_protobuf2.Empty, error) {
-	panic("Not implemented")
+func (m *IsGatewayServer) UpdateGatewayAPIKey(context.Context, *ttnpb.UpdateGatewayAPIKeyRequest) (*types.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
-func (m *IsGatewayServer) SetGatewayCollaborator(context.Context, *ttnpb.GatewayCollaborator) (*google_protobuf2.Empty, error) {
-	panic("Not implemented")
+func (m *IsGatewayServer) SetGatewayCollaborator(context.Context, *ttnpb.GatewayCollaborator) (*types.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
 func (m *IsGatewayServer) ListGatewayCollaborators(context.Context, *ttnpb.GatewayIdentifier) (*ttnpb.ListGatewayCollaboratorsResponse, error) {
-	panic("Not implemented")
+	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
 func (m *IsGatewayServer) ListGatewayRights(context.Context, *ttnpb.GatewayIdentifier) (*ttnpb.ListGatewayRightsResponse, error) {
-	panic("Not implemented")
+	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
 func StartMockIsGatewayServer(ctx context.Context, gateways map[ttnpb.GatewayIdentifier]ttnpb.Gateway) (*grpc.Server, string) {
