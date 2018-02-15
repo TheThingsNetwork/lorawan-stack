@@ -39,7 +39,10 @@ var (
 				return errors.NewWithCause("Could not initialize identity server", err)
 			}
 
-			gs := gatewayserver.New(c, &config.GS)
+			gs, err := gatewayserver.New(c, &config.GS)
+			if err != nil {
+				return errors.NewWithCause("Could not initialize gateway server", err)
+			}
 			_ = gs
 
 			ns := networkserver.New(c, &config.NS)
@@ -53,6 +56,7 @@ var (
 
 			// TODO: Web UI
 
+			logger.Info("Starting stack...")
 			return c.Run()
 		},
 	}

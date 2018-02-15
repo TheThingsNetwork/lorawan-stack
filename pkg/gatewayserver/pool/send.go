@@ -12,7 +12,7 @@ import (
 )
 
 var ErrGatewayNotConnected = &errors.ErrDescriptor{
-	MessageFormat:  "Gateway { gateway_id } not connected",
+	MessageFormat:  "Gateway `{gateway_id}` not connected",
 	Code:           1,
 	Type:           errors.NotFound,
 	SafeAttributes: []string{"gateway_id"},
@@ -22,7 +22,7 @@ func init() {
 	ErrGatewayNotConnected.Register()
 }
 
-func (p *pool) Send(gatewayInfo ttnpb.GatewayIdentifier, downstream *ttnpb.GatewayDown) error {
+func (p *pool) Send(gatewayInfo ttnpb.GatewayIdentifier, downstream *ttnpb.GatewayDown) (err error) {
 	if downstream == nil || downstream.DownlinkMessage == nil {
 		return errors.New("No downlink")
 	}
@@ -35,15 +35,14 @@ func (p *pool) Send(gatewayInfo ttnpb.GatewayIdentifier, downstream *ttnpb.Gatew
 	span := scheduling.Span{
 		Start: scheduling.ConcentratorTime(downstream.DownlinkMessage.TxMetadata.Timestamp),
 	}
-	var err error
 	span.Duration, err = toa.Compute(downstream.DownlinkMessage.RawPayload, downstream.DownlinkMessage.Settings)
 	if err != nil {
-		return err
+		return
 	}
 
 	err = gateway.scheduler.ScheduleAt(span, downstream.DownlinkMessage.Settings.Frequency)
 	if err != nil {
-		return err
+		return
 	}
 
 	select {

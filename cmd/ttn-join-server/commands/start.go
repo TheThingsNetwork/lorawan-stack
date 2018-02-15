@@ -25,6 +25,7 @@ var (
 			js := joinserver.New(c, &config.JS)
 			_ = js
 
+			logger.Info("Starting join server...")
 			return c.Run()
 		},
 	}

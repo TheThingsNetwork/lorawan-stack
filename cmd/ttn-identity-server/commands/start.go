@@ -20,11 +20,13 @@ var (
 			if err != nil {
 				return errors.NewWithCause("Could not create identity server", err)
 			}
+			logger.Debug("Initializing identity server...")
 			err = is.Init()
 			if err != nil {
 				return errors.NewWithCause("Could not initialize identity server", err)
 			}
 
+			logger.Info("Starting identity server...")
 			return c.Run()
 		},
 	}

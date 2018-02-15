@@ -25,6 +25,7 @@ var (
 			ns := networkserver.New(c, &config.NS)
 			_ = ns
 
+			logger.Info("Starting network server...")
 			return c.Run()
 		},
 	}

@@ -14,12 +14,12 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
+// ErrNoNetworkServerFound is returned if no network server was found for a passed DevAddr.
 var ErrNoNetworkServerFound = &errors.ErrDescriptor{
-	MessageFormat:  "No network server found for DevAddr { devaddr }",
-	SafeAttributes: []string{"devaddr"},
-
-	Code: 1,
-	Type: errors.NotFound,
+	MessageFormat:  "No network server found for DevAddr `{dev_addr}`",
+	SafeAttributes: []string{"dev_addr"},
+	Code:           1,
+	Type:           errors.NotFound,
 }
 
 func init() {
@@ -31,9 +31,9 @@ type nsErrors map[string]error
 func (e nsErrors) Error() string {
 	var errors []string
 	for nsName, err := range e {
-		errors = append(errors, fmt.Sprintf("%s: %s", nsName, err))
+		errors = append(errors, fmt.Sprintf("- %s: %s", nsName, err))
 	}
-	return strings.Join(errors, " ; ")
+	return strings.Join(errors, "\n")
 }
 
 func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *ttnpb.GatewayIdentifier) (ttnpb.FrequencyPlan, error) {
@@ -45,7 +45,7 @@ func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *
 	is := ttnpb.NewIsGatewayClient(isInfo.Conn())
 	gw, err := is.GetGateway(g.Context(), gatewayID)
 	if err != nil {
-		return ttnpb.FrequencyPlan{}, errors.NewWithCause("Could not get gateway information", err)
+		return ttnpb.FrequencyPlan{}, errors.NewWithCause("Could not get gateway information from identity server", err)
 	}
 
 	fp, err := g.frequencyPlans.GetByID(gw.FrequencyPlanID)
@@ -101,8 +101,7 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) error {
 			return err
 		}
 		if err := g.forAllNS(startServingGatewayFn); err != nil {
-			logger.WithError(err).Errorf("An error occurred when signaling to the network servers "+
-				" that the gateway %s is being served", id)
+			logger.WithError(err).Error("Could not signal NS when gateway connected")
 		}
 	}()
 
@@ -118,8 +117,7 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) error {
 					return err
 				}
 				if err := g.forAllNS(stopServingGatewayFn); err != nil {
-					logger.WithError(err).Errorf("An error occurred when signaling to the network servers "+
-						" that the gateway %s is not being served anymore", id)
+					logger.WithError(err).Errorf("Could not signal NS when gateway disconnected")
 				}
 				cancel()
 			}()
@@ -147,7 +145,7 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 		if err != nil {
 			logger.WithError(err).Warn("Could not handle uplink")
 		} else {
-			logger.Debug("Uplink handled")
+			logger.Debug("Handled uplink")
 		}
 	}()
 

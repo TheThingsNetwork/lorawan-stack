@@ -25,6 +25,7 @@ var (
 			as := applicationserver.New(c, &config.AS)
 			_ = as
 
+			logger.Info("Starting application server...")
 			return c.Run()
 		},
 	}

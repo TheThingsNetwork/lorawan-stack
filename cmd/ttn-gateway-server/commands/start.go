@@ -21,7 +21,7 @@ var (
 			}
 			_ = gs
 
-			logger.Info("Gateway server initialized, starting...")
+			logger.Info("Starting gateway server...")
 			return c.Run()
 		},
 	}

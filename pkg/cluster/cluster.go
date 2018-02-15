@@ -122,7 +122,7 @@ func (c *cluster) Join() (err error) {
 			"target", peer.target,
 			"name", peer.Name(),
 			"roles", peer.Roles(),
-		)).Debug("connecting to peer...")
+		)).Debug("Connecting to peer...")
 		peer.conn, err = grpc.DialContext(peer.ctx, peer.target, options...)
 		if err != nil {
 			return errors.NewWithCause("Could not connect to peer", err)
