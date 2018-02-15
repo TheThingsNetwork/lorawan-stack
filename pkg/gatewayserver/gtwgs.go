@@ -65,12 +65,13 @@ func (g *GatewayServer) forAllNS(f func(ttnpb.GsNsClient) error) error {
 // be used to determine the gateway ID. If no authentication information is present,
 // this gateway may not be used for downlink.
 func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) error {
-	md := rpcmetadata.FromIncomingContext(link.Context())
+	ctx := link.Context()
+	md := rpcmetadata.FromIncomingContext(ctx)
 	id := ttnpb.GatewayIdentifier{
 		GatewayID: md.ID,
 	}
 
-	fp, err := g.getGatewayFrequencyPlan(link.Context(), &id)
+	fp, err := g.getGatewayFrequencyPlan(ctx, &id)
 	if err != nil {
 		return errors.NewWithCause("Could not get frequency plan for this gateway", err)
 	}
@@ -81,8 +82,6 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) error {
 	}
 
 	logger := g.Logger().WithField("gateway_id", id.GatewayID)
-
-	ctx := link.Context()
 
 	go func() {
 		startServingGatewayFn := func(nsClient ttnpb.GsNsClient) error {
