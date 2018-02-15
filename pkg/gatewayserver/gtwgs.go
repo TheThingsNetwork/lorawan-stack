@@ -14,6 +14,18 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
+var ErrNoNetworkServerFound = &errors.ErrDescriptor{
+	MessageFormat:  "No network server found for DevAddr { devaddr }",
+	SafeAttributes: []string{"devaddr"},
+
+	Code: 1,
+	Type: errors.NotFound,
+}
+
+func init() {
+	ErrNoNetworkServerFound.Register()
+}
+
 type nsErrors map[string]error
 
 func (e nsErrors) Error() string {
@@ -147,6 +159,9 @@ func (g *GatewayServer) handleUplink(logger log.Interface, uplink *ttnpb.UplinkM
 
 	ns := g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, nil, devAddrBytes)
 	if ns == nil {
+		err = ErrNoNetworkServerFound.New(errors.Attributes{
+			"devaddr": uplink.DevAddr.String(),
+		})
 		return
 	}
 
