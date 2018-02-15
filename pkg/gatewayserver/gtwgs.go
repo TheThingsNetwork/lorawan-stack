@@ -113,7 +113,9 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) error {
 			return ctx.Err()
 		case upstream := <-result:
 			if upstream != nil {
-				g.handleStatus(logger, upstream.GatewayStatus)
+				if upstream.GatewayStatus != nil {
+					g.handleStatus(logger, upstream.GatewayStatus)
+				}
 				for _, uplink := range upstream.UplinkMessages {
 					g.handleUplink(logger, uplink)
 				}
