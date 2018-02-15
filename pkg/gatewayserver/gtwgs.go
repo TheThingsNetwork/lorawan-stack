@@ -124,7 +124,11 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) error {
 				cancel()
 			}()
 			return ctx.Err()
-		case upstream := <-result:
+		case upstream, ok := <-result:
+			if !ok {
+				logger.Debug("Uplink subscription was closed")
+				return nil
+			}
 			if upstream != nil {
 				if upstream.GatewayStatus != nil {
 					g.handleStatus(ctx, upstream.GatewayStatus)
