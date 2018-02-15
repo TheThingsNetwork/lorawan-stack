@@ -140,7 +140,7 @@ func TestLink(t *testing.T) {
 	a.So(err, should.BeNil)
 	select {
 	case <-ns.startServingGatewayChan:
-	case <-time.After(time.Second):
+	case <-time.After(10 * time.Second):
 		a.So("timeout", should.BeNil)
 	}
 
@@ -157,7 +157,7 @@ func TestLink(t *testing.T) {
 	a.So(err, should.BeNil)
 	select {
 	case <-ns.handleUplinkChan:
-	case <-time.After(time.Second):
+	case <-time.After(10 * time.Second):
 		a.So("timeout", should.BeNil)
 	}
 
@@ -189,7 +189,7 @@ func TestLink(t *testing.T) {
 	linkCancel()
 	select {
 	case <-ns.stopServingGatewayChan:
-	case <-time.After(time.Second):
+	case <-time.After(10 * time.Second):
 		a.So("timeout", should.BeNil)
 	}
 
