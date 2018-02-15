@@ -177,7 +177,7 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 
 func (g *GatewayServer) handleStatus(ctx context.Context, status *ttnpb.GatewayStatus) error {
 	log.FromContext(ctx).Debug("Received status message")
-	return
+	return nil
 }
 
 // GetFrequencyPlan associated to the gateway. The gateway is ID'd by its authentication token.
