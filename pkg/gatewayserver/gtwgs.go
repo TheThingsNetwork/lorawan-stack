@@ -106,6 +106,7 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) error {
 		}
 	}()
 
+	ctx = log.WithLogger(ctx, logger)
 	for {
 		select {
 		case <-ctx.Done():
@@ -126,18 +127,18 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) error {
 		case upstream := <-result:
 			if upstream != nil {
 				if upstream.GatewayStatus != nil {
-					g.handleStatus(logger, upstream.GatewayStatus)
+					g.handleStatus(ctx, upstream.GatewayStatus)
 				}
 				for _, uplink := range upstream.UplinkMessages {
-					g.handleUplink(logger, uplink)
+					g.handleUplink(ctx, uplink)
 				}
 			}
 		}
 	}
 }
 
-func (g *GatewayServer) handleUplink(logger log.Interface, uplink *ttnpb.UplinkMessage) {
-	var err error
+func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMessage) (err error) {
+	logger := log.FromContext(ctx)
 	defer func() {
 		if err != nil {
 			logger.WithError(err).Warn("Could not handle uplink")
@@ -167,10 +168,11 @@ func (g *GatewayServer) handleUplink(logger log.Interface, uplink *ttnpb.UplinkM
 
 	nsClient := ttnpb.NewGsNsClient(ns.Conn())
 	_, err = nsClient.HandleUplink(g.Context(), uplink)
+	return
 }
 
-func (g *GatewayServer) handleStatus(logger log.Interface, status *ttnpb.GatewayStatus) {
-	logger.Debug("Received status message")
+func (g *GatewayServer) handleStatus(ctx context.Context, status *ttnpb.GatewayStatus) error {
+	log.FromContext(ctx).Debug("Received status message")
 	return
 }
 
