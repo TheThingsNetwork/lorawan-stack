@@ -6,10 +6,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
