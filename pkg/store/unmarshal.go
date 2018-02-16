@@ -182,8 +182,6 @@ func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 			return nil, err
 		}
 		return v.Elem().Interface(), nil
-	case UnknownEncoding:
-		return nil, errors.New("Value is encoded using unknown encoding")
 	default:
 		return nil, errors.New("Invalid data")
 	}

@@ -23,8 +23,6 @@ const (
 	ProtoEncoding
 	// GobEncoding represents case when Gob was used to encode value.
 	GobEncoding
-	// UnknownEncoding represents case when unknown encoding was used to encode value(fmt.Sprint).
-	UnknownEncoding
 )
 
 var (
