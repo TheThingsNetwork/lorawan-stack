@@ -108,18 +108,23 @@ func UnmarshalMap(m map[string]interface{}, v interface{}, hooks ...mapstructure
 
 // BytesToType decodes []byte value in b into a new value of type typ.
 func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
+	if len(b) == 0 {
+		return nil, ErrInvalidData
+	}
+
 	if typ.Kind() == reflect.Ptr {
 		typ = typ.Elem()
 	}
 
 	enc := Encoding(b[0])
 	b = b[1:]
-	if len(b) == 0 {
-		return reflect.New(typ).Elem().Interface(), nil
-	}
 
 	switch enc {
 	case RawEncoding:
+		if len(b) == 0 {
+			return reflect.New(typ).Elem().Interface(), nil
+		}
+
 		switch k := typ.Kind(); k {
 		case reflect.String:
 			return string(b), nil
@@ -183,7 +188,7 @@ func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 		}
 		return v.Elem().Interface(), nil
 	default:
-		return nil, errors.New("Invalid data")
+		return nil, ErrInvalidData
 	}
 }
 

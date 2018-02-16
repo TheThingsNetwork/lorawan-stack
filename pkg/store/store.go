@@ -29,7 +29,10 @@ const (
 
 var (
 	// ErrNotFound represents an error returned, when entity is not found.
-	ErrNotFound = errors.New("not found")
+	ErrNotFound = errors.New("Not found")
+
+	// ErrInvalidData represents an error returned, when value stored is not valid.
+	ErrInvalidData = errors.New("Invalid data")
 )
 
 // PrimaryKey represents the value used by store implementations to uniquely identify stored objects.
