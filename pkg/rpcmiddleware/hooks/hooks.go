@@ -8,13 +8,14 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"google.golang.org/grpc"
 )
 
-// Hook represents a gRPC middleware hook. If a hook returns an error, next hooks will not be
-// executed and the error is propagated as the result of the interceptor.
-type Hook func(ctx context.Context, req interface{}) (context.Context, error)
+// HookFunc represents a gRPC middleware hook.
+type HookFunc func(ctx context.Context, req interface{}) (context.Context, error)
+
+// MiddlewareFunc wraps HookFunc.
+type MiddlewareFunc func(HookFunc) HookFunc
 
 var filteredHooks sync.Map
 
@@ -22,7 +23,7 @@ type hooks struct {
 	mu   sync.Mutex
 	list []struct {
 		name string
-		f    Hook
+		f    MiddlewareFunc
 	}
 }
 
@@ -34,7 +35,7 @@ type hooks struct {
 //
 // Hooks are executed in order of registration. Service hooks are executed before service method
 // hooks.
-func RegisterHook(filter, name string, f Hook) {
+func RegisterHook(filter, name string, f MiddlewareFunc) {
 	val, _ := filteredHooks.LoadOrStore(filter, &hooks{})
 	hooks := val.(*hooks)
 	hooks.mu.Lock()
@@ -47,7 +48,7 @@ func RegisterHook(filter, name string, f Hook) {
 	}
 	hooks.list = append(hooks.list, struct {
 		name string
-		f    Hook
+		f    MiddlewareFunc
 	}{name, f})
 }
 
@@ -70,69 +71,65 @@ func UnregisterHook(filter, name string) bool {
 	return false
 }
 
-func executeOn(ctx context.Context, filter string, req interface{}) (context.Context, error) {
-	val, ok := filteredHooks.Load(filter)
-	if !ok {
-		return ctx, nil
+func buildChain(f HookFunc, m ...MiddlewareFunc) HookFunc {
+	if len(m) == 0 {
+		return f
 	}
-
-	var err error
-	logger := log.FromContext(ctx)
-
-	hooks := val.(*hooks)
-	hooks.mu.Lock()
-	for _, hook := range hooks.list {
-		ctx, err = hook.f(ctx, req)
-		if err != nil {
-			logger.WithError(err).WithField("name", hook.name).Debug("Hook interceptor hook failed")
-			break
-		}
-	}
-	hooks.mu.Unlock()
-	return ctx, err
+	return m[0](buildChain(f, m[1:]...))
 }
 
-func executeHooks(ctx context.Context, req interface{}, fullMethod string) (context.Context, error) {
-	var err error
-
+func filterMiddleware(fullMethod string) []MiddlewareFunc {
 	// Split the package.service part from the full method, i.e., /package.service/method.
 	service := strings.SplitN(fullMethod[1:], "/", 2)[0]
+	// Place service filter before method filter to preserve order.
+	filters := []string{"/" + service, fullMethod}
 
-	ctx, err = executeOn(ctx, "/"+service, req)
-	if err != nil {
-		return nil, err
+	var middleware []MiddlewareFunc
+	for _, filter := range filters {
+		val, ok := filteredHooks.Load(filter)
+		if !ok {
+			continue
+		}
+		hooks := val.(*hooks)
+		hooks.mu.Lock()
+		for _, hook := range hooks.list {
+			middleware = append(middleware, hook.f)
+		}
+		hooks.mu.Unlock()
 	}
-
-	ctx, err = executeOn(ctx, fullMethod, req)
-	if err != nil {
-		return nil, err
-	}
-
-	return ctx, nil
+	return middleware
 }
 
 // UnaryServerInterceptor returns a new unary server interceptor that executes registered hooks.
 func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		var err error
-		ctx, err = executeHooks(ctx, req, info.FullMethod)
-		if err != nil {
-			return nil, err
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (res interface{}, err error) {
+		inner := func(ctx context.Context, req interface{}) (context.Context, error) {
+			res, err = handler(ctx, req)
+			if err != nil {
+				return nil, err
+			}
+			return ctx, nil
 		}
 
-		return handler(ctx, req)
+		chain := buildChain(inner, filterMiddleware(info.FullMethod)...)
+		_, err = chain(ctx, req)
+		return
 	}
 }
 
 // StreamServerInterceptor returns a new stream server interceptor that executes registered hooks.
 func StreamServerInterceptor(ctx context.Context) grpc.StreamServerInterceptor {
-	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
-		var err error
-		ctx, err = executeHooks(ctx, nil, info.FullMethod)
-		if err != nil {
-			return err
+	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) (err error) {
+		inner := func(ctx context.Context, _ interface{}) (context.Context, error) {
+			err = handler(srv, stream)
+			if err != nil {
+				return nil, err
+			}
+			return ctx, nil
 		}
 
-		return handler(srv, stream)
+		chain := buildChain(inner, filterMiddleware(info.FullMethod)...)
+		_, err = chain(ctx, nil)
+		return
 	}
 }
