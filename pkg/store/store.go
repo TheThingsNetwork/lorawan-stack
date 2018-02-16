@@ -15,14 +15,16 @@ const (
 	// Separator used to separate the flattened struct fields
 	Separator = "."
 
+	// NOTE: The following list MUST NOT be reordered
+
 	// RawEncoding represents case when value is encoded into "raw" byte value.
-	RawEncoding Encoding = iota
+	RawEncoding Encoding = 1
 	// JSONEncoding represents case when MarshalJSON() method was used to encode value.
-	JSONEncoding
+	JSONEncoding Encoding = 2
 	// ProtoEncoding represents case when Proto() method was used to encode value.
-	ProtoEncoding
+	ProtoEncoding Encoding = 3
 	// GobEncoding represents case when Gob was used to encode value.
-	GobEncoding
+	GobEncoding Encoding = 4
 )
 
 var (

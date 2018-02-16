@@ -15,8 +15,9 @@ import (
 )
 
 var (
-	stringType         = reflect.TypeOf("")
-	reflectValueType   = reflect.TypeOf(reflect.Value{})
+	stringType       = reflect.TypeOf("")
+	reflectValueType = reflect.TypeOf(reflect.Value{})
+
 	fmtStringerType    = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
 	protoMarshalerType = reflect.TypeOf((*proto.Marshaler)(nil)).Elem()
 	gobGobEncoderType  = reflect.TypeOf((*gob.GobEncoder)(nil)).Elem()
