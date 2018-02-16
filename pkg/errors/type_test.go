@@ -13,6 +13,7 @@ import (
 var types = map[string]Type{
 	"Unknown":                 Unknown,
 	"Internal":                Internal,
+	"External":                External,
 	"Invalid argument":        InvalidArgument,
 	"Out of range":            OutOfRange,
 	"Not found":               NotFound,

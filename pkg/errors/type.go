@@ -18,6 +18,9 @@ const (
 	// Internal is the type of internal errors
 	Internal
 
+	// External is the type of external errors
+	External
+
 	// InvalidArgument is the type of errors that result from an invalid argument
 	// in a request
 	InvalidArgument
@@ -75,6 +78,8 @@ func (t Type) String() string {
 		return "Unknown"
 	case Internal:
 		return "Internal"
+	case External:
+		return "External"
 	case InvalidArgument:
 		return "Invalid argument"
 	case OutOfRange:
@@ -132,6 +137,8 @@ func fromString(str string) (Type, error) {
 		return Unknown, nil
 	case "internal":
 		return Internal, nil
+	case "external":
+		return External, nil
 	case "invalid argument":
 		return InvalidArgument, nil
 	case "out of range":
