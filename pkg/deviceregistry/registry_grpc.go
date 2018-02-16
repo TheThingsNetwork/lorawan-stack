@@ -164,7 +164,7 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, dev *ttnpb.EndDevice) (*pbt
 		}
 	}
 
-	devs, err := FindDeviceByIdentifiers(r.Interface, &ttnpb.EndDeviceIdentifiers{DeviceID: dev.DeviceID})
+	devs, err := FindDeviceByIdentifiers(r.Interface, &dev.EndDeviceIdentifiers)
 	if err != nil {
 		return nil, err
 	}
