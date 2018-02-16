@@ -11,6 +11,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 func newCallbackHook(name string, callback func(string)) func(HookFunc) HookFunc {
@@ -54,6 +55,17 @@ func noopStreamHandler(_ interface{}, _ grpc.ServerStream) error {
 	return nil
 }
 
+type mockStream struct {
+	ctx context.Context
+}
+
+func (s *mockStream) Context() context.Context     { return s.ctx }
+func (s *mockStream) SendMsg(m interface{}) error  { return nil }
+func (s *mockStream) RecvMsg(m interface{}) error  { return nil }
+func (s *mockStream) SetHeader(metadata.MD) error  { return nil }
+func (s *mockStream) SendHeader(metadata.MD) error { return nil }
+func (s *mockStream) SetTrailer(metadata.MD)       {}
+
 func TestRegistration(t *testing.T) {
 	a := assertions.New(t)
 
@@ -64,9 +76,9 @@ func TestRegistration(t *testing.T) {
 			FullMethod: fullMethod,
 		}, noopUnaryHandler)
 	}
-	streamInterceptor := StreamServerInterceptor(ctx)
+	streamInterceptor := StreamServerInterceptor()
 	callStream := func(fullMethod string) {
-		streamInterceptor(nil, nil, &grpc.StreamServerInfo{
+		streamInterceptor(nil, &mockStream{ctx}, &grpc.StreamServerInfo{
 			FullMethod: fullMethod,
 		}, noopStreamHandler)
 	}

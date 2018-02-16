@@ -118,7 +118,7 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 }
 
 // StreamServerInterceptor returns a new stream server interceptor that executes registered hooks.
-func StreamServerInterceptor(ctx context.Context) grpc.StreamServerInterceptor {
+func StreamServerInterceptor() grpc.StreamServerInterceptor {
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) (err error) {
 		inner := func(ctx context.Context, _ interface{}) (context.Context, error) {
 			err = handler(srv, stream)
@@ -129,7 +129,7 @@ func StreamServerInterceptor(ctx context.Context) grpc.StreamServerInterceptor {
 		}
 
 		chain := buildChain(inner, filterMiddleware(info.FullMethod)...)
-		_, err = chain(ctx, nil)
+		_, err = chain(stream.Context(), nil)
 		return
 	}
 }
