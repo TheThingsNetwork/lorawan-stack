@@ -337,6 +337,21 @@
   revision = "85fadb6e89903ef7cca6f6a804474cd5ea85b6e1"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/robertkrimen/otto"
+  packages = [
+    ".",
+    "ast",
+    "dbg",
+    "file",
+    "parser",
+    "registry",
+    "token"
+  ]
+  revision = "8fcfbcd07daef8b22ab0b215150b2414503852ae"
+  source = "github.com/romeovs/otto"
+
+[[projects]]
   name = "github.com/sendgrid/rest"
   packages = ["."]
   revision = "80b39aaf5a30edab5bf2f99d56052abe01a0d41d"
@@ -561,6 +576,15 @@
   version = "v5.2.9"
 
 [[projects]]
+  name = "gopkg.in/sourcemap.v1"
+  packages = [
+    ".",
+    "base64vlq"
+  ]
+  revision = "6e83acea0053641eff084973fee085f0c193c61a"
+  version = "v1.0.5"
+
+[[projects]]
   branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
@@ -569,6 +593,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "deaa78e7a0813cb98352e50ec4e8fb899c114a87f0e553b6af2cf7bb10a48078"
+  inputs-digest = "5587748998f19d2a97838e42d7983095e531cc3a9e7d21256f6f7c37952b0afb"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -50,3 +50,7 @@
 [[override]]
   branch = "master"
   name = "github.com/prometheus/client_golang"
+
+[[constraint]]
+  name = "github.com/robertkrimen/otto"
+  source = "github.com/romeovs/otto"
