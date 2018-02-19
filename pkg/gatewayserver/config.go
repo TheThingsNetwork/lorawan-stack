@@ -8,6 +8,8 @@ import "github.com/TheThingsNetwork/ttn/pkg/gatewayserver/frequencyplans"
 type Config struct {
 	LocalFrequencyPlansStore    string `name:"frequency-plans-dir" description:"Directory where the frequency plans are stored"`
 	HTTPFrequencyPlansStoreRoot string `name:"frequency-plans-uri" description:"URI from where the frequency plans will be fetched, if no directory is specified"`
+
+	NSTags []string `name:"network-servers.tags" description:"Network server tags to accept to connect to"`
 }
 
 func (conf Config) store() (fpStore frequencyplans.Store, err error) {

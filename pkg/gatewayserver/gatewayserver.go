@@ -29,6 +29,8 @@ type GatewayServer struct {
 
 	gateways       gwpool.Pool
 	frequencyPlans frequencyplans.Store
+
+	nsTags []string
 }
 
 // New returns new *GatewayServer.
@@ -43,6 +45,8 @@ func New(c *component.Component, conf *Config) (*GatewayServer, error) {
 
 		gateways:       gwpool.NewPool(log.FromContext(c.Context()), sendUplinkTimeout),
 		frequencyPlans: fpStore,
+
+		nsTags: conf.NSTags,
 	}
 	c.RegisterGRPC(gs)
 	return gs, nil

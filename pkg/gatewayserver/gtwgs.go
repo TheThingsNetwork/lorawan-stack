@@ -37,7 +37,7 @@ func (e nsErrors) Error() string {
 }
 
 func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *ttnpb.GatewayIdentifier) (ttnpb.FrequencyPlan, error) {
-	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, nil, nil)
+	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, g.nsTags, nil)
 	if isInfo == nil {
 		return ttnpb.FrequencyPlan{}, errors.New("No identity server to connect to")
 	}
@@ -58,7 +58,7 @@ func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *
 
 func (g *GatewayServer) forAllNS(f func(ttnpb.GsNsClient) error) error {
 	errors := nsErrors{}
-	for _, ns := range g.GetPeers(ttnpb.PeerInfo_NETWORK_SERVER, nil) {
+	for _, ns := range g.GetPeers(ttnpb.PeerInfo_NETWORK_SERVER, g.nsTags) {
 		nsClient := ttnpb.NewGsNsClient(ns.Conn())
 		err := f(nsClient)
 		if err != nil {
@@ -160,7 +160,7 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 		return
 	}
 
-	ns := g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, nil, devAddrBytes)
+	ns := g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, g.nsTags, devAddrBytes)
 	if ns == nil {
 		err = ErrNoNetworkServerFound.New(errors.Attributes{
 			"devaddr": uplink.DevAddr.String(),
