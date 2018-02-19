@@ -26,17 +26,14 @@ func TestUser(t *testing.T) {
 	a := assertions.New(t)
 	is := getIS(t)
 
-	prev := accessToken
-	defer func() {
-		accessToken = prev
-	}()
-
 	user := ttnpb.User{
 		UserIdentifier: ttnpb.UserIdentifier{"daniel"},
 		Password:       "12345",
 		Email:          "foo@bar.com",
 		Name:           "hi",
 	}
+
+	ctx := testCtx(user.UserID)
 
 	// can't create an account using a not allowed email
 	user.Email = "foo@foo.com"
@@ -69,27 +66,6 @@ func TestUser(t *testing.T) {
 	a.So(found, should.BeNil)
 	a.So(err, should.NotBeNil)
 	a.So(ErrNotAuthorized.Describes(err), should.BeTrue)
-
-	client := testClient()
-
-	refreshData := &store.RefreshData{
-		RefreshToken: "123",
-		UserID:       user.UserID,
-		ClientID:     client.ClientID,
-		CreatedAt:    time.Now(),
-	}
-	err = is.store.OAuth.SaveRefreshToken(refreshData)
-	a.So(err, should.BeNil)
-
-	accessData := testAccessData()
-	accessData.AccessToken = accessData.AccessToken[:len(accessData.AccessToken)-1]
-	accessData.UserID = user.UserID
-
-	err = is.store.OAuth.SaveAccessToken(accessData)
-	a.So(err, should.BeNil)
-
-	accessToken = accessData.AccessToken
-	ctx := testCtx()
 
 	// check that response doesnt include password within
 	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
@@ -234,27 +210,12 @@ func TestUser(t *testing.T) {
 	a.So(found.UserIdentifier.UserID, should.Equal, user.UserID)
 	a.So(found.ValidatedAt.IsZero(), should.BeFalse)
 
-	clients, err := is.userService.ListAuthorizedClients(ctx, &pbtypes.Empty{})
-	a.So(err, should.BeNil)
-	if a.So(clients.Clients, should.HaveLength, 1) {
-		cli := clients.Clients[0]
-
-		a.So(cli.ClientID, should.Equal, client.ClientID)
-		a.So(cli.Description, should.Equal, client.Description)
-		a.So(cli.Secret, should.HaveLength, 0)
-		a.So(cli.RedirectURI, should.HaveLength, 0)
-		a.So(cli.Grants, should.BeEmpty)
-	}
-
 	_, err = is.userService.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifier{"non-existent-client"})
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrAuthorizedClientNotFound.Describes(err), should.BeTrue)
 
-	_, err = is.userService.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifier{client.ClientID})
-	a.So(err, should.BeNil)
-
 	// create a fake authorized client to the user
-	client = &ttnpb.Client{
+	client := &ttnpb.Client{
 		ClientIdentifier: ttnpb.ClientIdentifier{"bar-client"},
 		Description:      "description",
 		Secret:           "secret",
@@ -267,11 +228,10 @@ func TestUser(t *testing.T) {
 	err = is.store.Clients.Create(client)
 	a.So(err, should.BeNil)
 
-	accessToken, err = auth.GenerateAccessToken("")
+	accessToken, err := auth.GenerateAccessToken("")
 	a.So(err, should.BeNil)
-	ctx = testCtx()
 
-	accessData = &store.AccessData{
+	accessData := &store.AccessData{
 		AccessToken: accessToken,
 		UserID:      user.UserID,
 		ClientID:    client.ClientID,
@@ -282,7 +242,7 @@ func TestUser(t *testing.T) {
 	err = is.store.OAuth.SaveAccessToken(accessData)
 	a.So(err, should.BeNil)
 
-	refreshData = &store.RefreshData{
+	refreshData := &store.RefreshData{
 		RefreshToken: "123",
 		UserID:       user.UserID,
 		ClientID:     client.ClientID,
@@ -292,6 +252,6 @@ func TestUser(t *testing.T) {
 	err = is.store.OAuth.SaveRefreshToken(refreshData)
 	a.So(err, should.BeNil)
 
-	_, err = is.userService.DeleteUser(testCtx(), &pbtypes.Empty{})
+	_, err = is.userService.DeleteUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 }

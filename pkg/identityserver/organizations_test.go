@@ -27,7 +27,7 @@ func TestOrganization(t *testing.T) {
 		OrganizationIdentifier: ttnpb.OrganizationIdentifier{"foo-org"},
 	}
 
-	ctx := testCtx()
+	ctx := testCtx(user.UserID)
 
 	_, err := is.organizationService.CreateOrganization(ctx, &ttnpb.CreateOrganizationRequest{
 		Organization: org,

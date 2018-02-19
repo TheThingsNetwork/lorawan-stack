@@ -7,12 +7,14 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/mock"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/sendgrid"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
+	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/hooks"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
@@ -100,6 +102,18 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 		log.Warn("No sendgrid API key configured, not sending emails")
 		is.email = mock.New()
 	}
+
+	hooks.RegisterUnaryHook("/ttn.v3.IsUser", "claims-builder", claims.UnaryHook(store))
+	hooks.RegisterUnaryHook("/ttn.v3.IsApplication", "claims-builder", claims.UnaryHook(store))
+	hooks.RegisterUnaryHook("/ttn.v3.IsGateway", "claims-builder", claims.UnaryHook(store))
+	hooks.RegisterUnaryHook("/ttn.v3.IsClient", "claims-builder", claims.UnaryHook(store))
+	hooks.RegisterUnaryHook("/ttn.v3.IsOrganization", "claims-builder", claims.UnaryHook(store))
+
+	hooks.RegisterStreamHook("/ttn.v3.IsUser", "claims-builder", claims.StreamHook(store))
+	hooks.RegisterStreamHook("/ttn.v3.IsApplication", "claims-builder", claims.StreamHook(store))
+	hooks.RegisterStreamHook("/ttn.v3.IsGateway", "claims-builder", claims.StreamHook(store))
+	hooks.RegisterStreamHook("/ttn.v3.IsClient", "claims-builder", claims.StreamHook(store))
+	hooks.RegisterStreamHook("/ttn.v3.IsOrganization", "claims-builder", claims.StreamHook(store))
 
 	c.RegisterGRPC(is)
 

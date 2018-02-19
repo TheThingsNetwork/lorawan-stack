@@ -4,17 +4,14 @@ package identityserver
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
-	"github.com/TheThingsNetwork/ttn/pkg/auth/oauth"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
-	"google.golang.org/grpc/metadata"
 )
 
 var (
@@ -26,17 +23,9 @@ var (
 		DefaultSettings:  testSettings(),
 		Specializers:     DefaultSpecializers,
 	}
-	testIS      *IdentityServer
-	accessToken string
+	testIS *IdentityServer
+	rights []ttnpb.Right
 )
-
-func init() {
-	token, err := auth.GenerateAccessToken("")
-	if err != nil {
-		panic(err)
-	}
-	accessToken = token
-}
 
 func getIS(t testing.TB) *IdentityServer {
 	if testIS == nil {
@@ -71,22 +60,23 @@ func getIS(t testing.TB) *IdentityServer {
 			logger.WithError(err).Fatal("Failed to create test client")
 		}
 
-		err = is.store.OAuth.SaveAccessToken(testAccessData())
-		if err != nil {
-			logger.WithError(err).Fatal("Failed to save test access data")
-		}
-
 		testIS = is
 	}
 
 	return testIS
 }
 
-func testCtx() context.Context {
-	return metadata.NewIncomingContext(
-		context.Background(),
-		metadata.Pairs("authorization", fmt.Sprintf("Bearer %s", testAccessData().AccessToken)),
-	)
+func init() {
+	rights = append(rights, ttnpb.AllUserRights()...)
+	rights = append(rights, ttnpb.AllApplicationRights()...)
+	rights = append(rights, ttnpb.AllGatewayRights()...)
+	rights = append(rights, ttnpb.AllOrganizationRights()...)
+}
+
+func allRights() []ttnpb.Right { return rights }
+
+func testCtx(userID string) context.Context {
+	return claims.NewContext(context.Background(), claims.New(userID, claims.User, auth.Token, rights))
 }
 
 func testSettings() *ttnpb.IdentityServerSettings {
@@ -98,20 +88,6 @@ func testSettings() *ttnpb.IdentityServerSettings {
 		AllowedEmails:      []string{"*@bar.com"},
 		ValidationTokenTTL: time.Duration(time.Hour),
 		InvitationTokenTTL: time.Duration(time.Hour),
-	}
-}
-
-func testAccessData() *store.AccessData {
-	cli := testClient()
-
-	return &store.AccessData{
-		AccessToken: accessToken,
-		RedirectURI: cli.RedirectURI,
-		Scope:       oauth.Scope(cli.Rights),
-		ExpiresIn:   time.Duration(time.Hour),
-		CreatedAt:   time.Now(),
-		ClientID:    cli.ClientID,
-		UserID:      testUsers()["bob"].UserID,
 	}
 }
 

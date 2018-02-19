@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/random"
@@ -21,7 +22,7 @@ type clientService struct {
 // The created client has a random secret and has set by default as false the
 // official labeled flag and has the refresh_token and authorization_code grants.
 func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClientRequest) (*pbtypes.Empty, error) {
-	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
+	err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +44,7 @@ func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClien
 			ClientIdentifier: req.Client.ClientIdentifier,
 			Description:      req.Client.Description,
 			RedirectURI:      req.Client.RedirectURI,
-			Creator:          ttnpb.UserIdentifier{userID},
+			Creator:          ttnpb.UserIdentifier{claims.FromContext(ctx).UserID()},
 			Secret:           random.String(64),
 			State:            ttnpb.STATE_PENDING,
 			OfficialLabeled:  false,
@@ -65,7 +66,7 @@ func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifi
 	}
 	client := found.GetClient()
 
-	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
+	err = s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
 	if err != nil && ErrNotAuthorized.Describes(err) {
 		return &ttnpb.Client{
 			ClientIdentifier: client.ClientIdentifier,
@@ -80,7 +81,7 @@ func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifi
 	}
 
 	// ensure the user is the client's creator
-	if client.Creator.UserID != userID {
+	if client.Creator.UserID != claims.FromContext(ctx).UserID() {
 		return nil, ErrNotAuthorized.New(nil)
 	}
 
@@ -89,7 +90,7 @@ func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifi
 
 // ListClients returns all the clients an user has created.
 func (s *clientService) ListClients(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ListClientsResponse, error) {
-	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
+	err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +114,7 @@ func (s *clientService) ListClients(ctx context.Context, _ *pbtypes.Empty) (*ttn
 // UpdateClient updates a client.
 // TODO(gomezjdaniel): support to update the RedirectURI and rights (scope).
 func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClientRequest) (*pbtypes.Empty, error) {
-	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
+	err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +127,7 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 		client := found.GetClient()
 
 		// ensure the user is the client's creator
-		if client.Creator.UserID != userID {
+		if client.Creator.UserID != claims.FromContext(ctx).UserID() {
 			return ErrNotAuthorized.New(nil)
 		}
 
@@ -150,7 +151,7 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 // DeleteClient deletes the client that matches the identifier and revokes all
 // user authorizations.
 func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*pbtypes.Empty, error) {
-	userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
+	err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +163,7 @@ func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdent
 		}
 
 		// ensure the user is the client's creator
-		if found.GetClient().Creator.UserID != userID {
+		if found.GetClient().Creator.UserID != claims.FromContext(ctx).UserID() {
 			return ErrNotAuthorized.New(nil)
 		}
 

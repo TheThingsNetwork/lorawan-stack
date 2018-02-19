@@ -7,6 +7,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -30,12 +31,12 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 
 		id = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_OrganizationID{req.OrganizationID}}
 	} else {
-		userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_GATEWAYS_CREATE)
+		err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_GATEWAYS_CREATE)
 		if err != nil {
 			return nil, err
 		}
 
-		id = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{userID}}
+		id = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{claims.FromContext(ctx).UserID()}}
 	}
 
 	err := s.store.Transact(func(tx *store.Store) error {
@@ -100,7 +101,8 @@ func (s *gatewayService) ListGateways(ctx context.Context, req *ttnpb.ListGatewa
 	if id = req.OrganizationID; id != "" {
 		err = s.enforceOrganizationRights(ctx, req.OrganizationID, ttnpb.RIGHT_ORGANIZATION_GATEWAYS_LIST)
 	} else {
-		id, err = s.enforceUserRights(ctx, ttnpb.RIGHT_USER_GATEWAYS_LIST)
+		id = claims.FromContext(ctx).UserID()
+		err = s.enforceUserRights(ctx, ttnpb.RIGHT_USER_GATEWAYS_LIST)
 	}
 
 	if err != nil {
@@ -308,10 +310,7 @@ func (s *gatewayService) ListGatewayCollaborators(ctx context.Context, req *ttnp
 
 // ListGatewayRights returns the rights the caller user has to a gateway.
 func (s *gatewayService) ListGatewayRights(ctx context.Context, req *ttnpb.GatewayIdentifier) (*ttnpb.ListGatewayRightsResponse, error) {
-	claims, err := s.claimsFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
+	claims := claims.FromContext(ctx)
 
 	resp := new(ttnpb.ListGatewayRightsResponse)
 

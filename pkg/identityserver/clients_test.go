@@ -34,7 +34,7 @@ func TestClient(t *testing.T) {
 		Creator:          ttnpb.UserIdentifier{user.UserID},
 	}
 
-	ctx := testCtx()
+	ctx := testCtx(user.UserID)
 
 	_, err := is.clientService.CreateClient(ctx, &ttnpb.CreateClientRequest{
 		Client: cli,

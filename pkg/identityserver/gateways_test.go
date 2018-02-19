@@ -54,7 +54,7 @@ func TestGateway(t *testing.T) {
 		},
 	}
 
-	ctx := testCtx()
+	ctx := testCtx(user.UserID)
 
 	_, err := is.gatewayService.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{
 		Gateway: gtw,

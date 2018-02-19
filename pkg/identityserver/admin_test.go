@@ -23,7 +23,7 @@ func TestAdminSettings(t *testing.T) {
 	is := getIS(t)
 	defer is.store.Settings.Set(testSettings())
 
-	ctx := testCtx()
+	ctx := testCtx(testUsers()["alice"].UserID)
 
 	resp, err := is.adminService.GetSettings(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
@@ -54,7 +54,7 @@ func TestAdminInvitations(t *testing.T) {
 	a := assertions.New(t)
 	is := getIS(t)
 
-	ctx := testCtx()
+	ctx := testCtx(testUsers()["alice"].UserID)
 	email := "bar@baz.com"
 
 	_, err := is.adminService.SendInvitation(ctx, &ttnpb.SendInvitationRequest{Email: email})
@@ -150,7 +150,7 @@ func TestAdminUsers(t *testing.T) {
 	a := assertions.New(t)
 	is := getIS(t)
 
-	ctx := testCtx()
+	ctx := testCtx(testUsers()["alice"].UserID)
 	user := testUsers()["bob"]
 
 	// reset password
@@ -223,7 +223,7 @@ func TestAdminClients(t *testing.T) {
 	a := assertions.New(t)
 	is := getIS(t)
 
-	ctx := testCtx()
+	ctx := testCtx(testUsers()["alice"].UserID)
 	client := testClient()
 
 	found, err := is.adminService.GetClient(ctx, &ttnpb.ClientIdentifier{client.ClientID})
