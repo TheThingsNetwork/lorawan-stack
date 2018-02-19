@@ -6412,8 +6412,12 @@ type IsApplicationClient interface {
 	UpdateApplicationAPIKey(ctx context.Context, in *UpdateApplicationAPIKeyRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// RemoveApplicationAPIKey removes a given API key from an application.
 	RemoveApplicationAPIKey(ctx context.Context, in *RemoveApplicationAPIKeyRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
-	// SetApplicationCollaborator sets a collaborator for a given application. If
-	// the list of rights is empty the collaborator will be removed.
+	// SetApplicationCollaborator sets a collaborationship between an user and an
+	// application upon a given set of rights.
+	//
+	// The call will return error if after perform the operation the sum of rights
+	// that all collaborators with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right
+	// is not equal to entire set of available `RIGHT_APPLICATION_XXXXXX` rights.
 	SetApplicationCollaborator(ctx context.Context, in *ApplicationCollaborator, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// ListApplicationCollaborators returns all the collaborators for a given application.
 	ListApplicationCollaborators(ctx context.Context, in *ApplicationIdentifier, opts ...grpc.CallOption) (*ListApplicationCollaboratorsResponse, error)
@@ -6568,8 +6572,12 @@ type IsApplicationServer interface {
 	UpdateApplicationAPIKey(context.Context, *UpdateApplicationAPIKeyRequest) (*google_protobuf2.Empty, error)
 	// RemoveApplicationAPIKey removes a given API key from an application.
 	RemoveApplicationAPIKey(context.Context, *RemoveApplicationAPIKeyRequest) (*google_protobuf2.Empty, error)
-	// SetApplicationCollaborator sets a collaborator for a given application. If
-	// the list of rights is empty the collaborator will be removed.
+	// SetApplicationCollaborator sets a collaborationship between an user and an
+	// application upon a given set of rights.
+	//
+	// The call will return error if after perform the operation the sum of rights
+	// that all collaborators with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right
+	// is not equal to entire set of available `RIGHT_APPLICATION_XXXXXX` rights.
 	SetApplicationCollaborator(context.Context, *ApplicationCollaborator) (*google_protobuf2.Empty, error)
 	// ListApplicationCollaborators returns all the collaborators for a given application.
 	ListApplicationCollaborators(context.Context, *ApplicationIdentifier) (*ListApplicationCollaboratorsResponse, error)
@@ -6882,8 +6890,12 @@ type IsGatewayClient interface {
 	UpdateGatewayAPIKey(ctx context.Context, in *UpdateGatewayAPIKeyRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// RemoveGatewayAPIKey removes a given API key from a gateway.
 	RemoveGatewayAPIKey(ctx context.Context, in *RemoveGatewayAPIKeyRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
-	// SetGatewayCollaborator sets a collaborator for a given gateway. If the list
-	// of rights is empty the collaborator will be removed.
+	// SetGatewayCollaborator sets a collaborationship between an user and an
+	// gateway upon a given set of rights.
+	//
+	// The call will return error if after perform the operation the sum of rights
+	// that all collaborators with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` right
+	// is not equal to entire set of available `RIGHT_GATEWAY_XXXXXX` rights.
 	SetGatewayCollaborator(ctx context.Context, in *GatewayCollaborator, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// ListGatewayCollaborators returns all the collaborators for a given gateway.
 	ListGatewayCollaborators(ctx context.Context, in *GatewayIdentifier, opts ...grpc.CallOption) (*ListGatewayCollaboratorsResponse, error)
@@ -7035,8 +7047,12 @@ type IsGatewayServer interface {
 	UpdateGatewayAPIKey(context.Context, *UpdateGatewayAPIKeyRequest) (*google_protobuf2.Empty, error)
 	// RemoveGatewayAPIKey removes a given API key from a gateway.
 	RemoveGatewayAPIKey(context.Context, *RemoveGatewayAPIKeyRequest) (*google_protobuf2.Empty, error)
-	// SetGatewayCollaborator sets a collaborator for a given gateway. If the list
-	// of rights is empty the collaborator will be removed.
+	// SetGatewayCollaborator sets a collaborationship between an user and an
+	// gateway upon a given set of rights.
+	//
+	// The call will return error if after perform the operation the sum of rights
+	// that all collaborators with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` right
+	// is not equal to entire set of available `RIGHT_GATEWAY_XXXXXX` rights.
 	SetGatewayCollaborator(context.Context, *GatewayCollaborator) (*google_protobuf2.Empty, error)
 	// ListGatewayCollaborators returns all the collaborators for a given gateway.
 	ListGatewayCollaborators(context.Context, *GatewayIdentifier) (*ListGatewayCollaboratorsResponse, error)
@@ -7556,8 +7572,12 @@ type IsOrganizationClient interface {
 	UpdateOrganizationAPIKey(ctx context.Context, in *UpdateOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// RemoveOrganizationAPIKey removes an organization's API key.
 	RemoveOrganizationAPIKey(ctx context.Context, in *RemoveOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
-	// SetOrganizationMember sets a member for a given organization. If the list
-	// of rights is empty the member will be removed.
+	// SetOrganizationMember sets a membership between an user and an organization
+	// upon a given set of rights.
+	//
+	// The call will return error if after perform the operation the sum of rights
+	// that all members with `RIGHT_ORGANIZATION_SETTINGS_COLLABORATORS` right
+	// is not equal to entire set of available `RIGHT_ORGANIZATION_XXXXXX` rights.
 	SetOrganizationMember(ctx context.Context, in *OrganizationMember, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
 	// ListOrganizationMembers returns a list of all the members that belong to an organization.
 	ListOrganizationMembers(ctx context.Context, in *OrganizationIdentifier, opts ...grpc.CallOption) (*ListOrganizationMembersResponse, error)
@@ -7702,8 +7722,12 @@ type IsOrganizationServer interface {
 	UpdateOrganizationAPIKey(context.Context, *UpdateOrganizationAPIKeyRequest) (*google_protobuf2.Empty, error)
 	// RemoveOrganizationAPIKey removes an organization's API key.
 	RemoveOrganizationAPIKey(context.Context, *RemoveOrganizationAPIKeyRequest) (*google_protobuf2.Empty, error)
-	// SetOrganizationMember sets a member for a given organization. If the list
-	// of rights is empty the member will be removed.
+	// SetOrganizationMember sets a membership between an user and an organization
+	// upon a given set of rights.
+	//
+	// The call will return error if after perform the operation the sum of rights
+	// that all members with `RIGHT_ORGANIZATION_SETTINGS_COLLABORATORS` right
+	// is not equal to entire set of available `RIGHT_ORGANIZATION_XXXXXX` rights.
 	SetOrganizationMember(context.Context, *OrganizationMember) (*google_protobuf2.Empty, error)
 	// ListOrganizationMembers returns a list of all the members that belong to an organization.
 	ListOrganizationMembers(context.Context, *OrganizationIdentifier) (*ListOrganizationMembersResponse, error)

@@ -7,6 +7,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -17,8 +18,12 @@ type applicationService struct {
 	*IdentityServer
 }
 
-// CreateApplication creates an application and sets the user as collaborator
-// with all possible rights.
+// CreateApplication creates a new application on the network and adds the
+// authenticated user as collaborator with all the possible rights. If an
+// organization identifier is provided the application will be created under
+// the organization whose will be added as collaborator with all the possible
+// rights if and only if the authenticated user is member of the organization
+// with enough rights.
 func (s *applicationService) CreateApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (*pbtypes.Empty, error) {
 	var id ttnpb.OrganizationOrUserIdentifier
 
@@ -30,12 +35,12 @@ func (s *applicationService) CreateApplication(ctx context.Context, req *ttnpb.C
 
 		id = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_OrganizationID{req.OrganizationID}}
 	} else {
-		userID, err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_APPLICATIONS_CREATE)
+		err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_APPLICATIONS_CREATE)
 		if err != nil {
 			return nil, err
 		}
 
-		id = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{userID}}
+		id = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{claims.FromContext(ctx).UserID()}}
 	}
 
 	err := s.store.Transact(func(tx *store.Store) error {
@@ -92,7 +97,8 @@ func (s *applicationService) ListApplications(ctx context.Context, req *ttnpb.Li
 	if id = req.OrganizationID; id != "" {
 		err = s.enforceOrganizationRights(ctx, req.OrganizationID, ttnpb.RIGHT_ORGANIZATION_APPLICATIONS_LIST)
 	} else {
-		id, err = s.enforceUserRights(ctx, ttnpb.RIGHT_USER_APPLICATIONS_LIST)
+		id = claims.FromContext(ctx).UserID()
+		err = s.enforceUserRights(ctx, ttnpb.RIGHT_USER_APPLICATIONS_LIST)
 	}
 
 	if err != nil {
@@ -219,14 +225,48 @@ func (s *applicationService) RemoveApplicationAPIKey(ctx context.Context, req *t
 	return nil, s.store.Applications.DeleteAPIKey(req.ApplicationID, req.Name)
 }
 
-// SetApplicationCollaborator allows to set and unset an application collaborator.
-// It fails if after unset a collaborator there is no at least one collaborator
-// with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right.
+// SetApplicationCollaborator sets a collaborationship between an user and an
+// application upon a given set of rights.
+//
+// The call will return error if after perform the operation the sum of rights
+// that all collaborators with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right
+// is not equal to entire set of available `RIGHT_APPLICATION_XXXXXX` rights.
 func (s *applicationService) SetApplicationCollaborator(ctx context.Context, req *ttnpb.ApplicationCollaborator) (*pbtypes.Empty, error) {
 	err := s.enforceApplicationRights(ctx, req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
 	if err != nil {
 		return nil, err
 	}
+
+	// The resulting set of rights is determined by the following steps:
+	// 1. Get rights of target user/organization to the application
+	// 2. The set of rights the caller can modify are the rights the caller has
+	//		to the application. We refer them as modifiable rights
+	// 3. The rights the caller cannot modify is the difference of the targer
+	//		user/organization rights minus the modifiable rights.
+	// 4. The modifiable rights the target user/organization will have is the
+	//		intersection between `2.` and the rights of the request
+	// 5. The final set of rights is given by the sum of `2.` plus `4.`
+
+	rights, err := s.store.Applications.ListCollaboratorRights(req.ApplicationID, req.GetCollaboratorID())
+	if err != nil {
+		return nil, err
+	}
+
+	claims := claims.FromContext(ctx)
+
+	// modifiable is the set of rights the caller can modify
+	var modifiable []ttnpb.Right
+	switch claims.Source() {
+	case auth.Key:
+		modifiable = claims.Rights()
+	case auth.Token:
+		modifiable, err = s.store.Applications.ListCollaboratorRights(req.ApplicationID, claims.UserID())
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req.Rights = append(util.RightsDifference(rights, modifiable), util.RightsIntersection(req.Rights, modifiable)...)
 
 	err = s.store.Transact(func(tx *store.Store) error {
 		err := tx.Applications.SetCollaborator(req)
@@ -234,15 +274,36 @@ func (s *applicationService) SetApplicationCollaborator(ctx context.Context, req
 			return err
 		}
 
-		// check that there is at least one collaborator in with SETTINGS_COLLABORATOR right
+		// check that after modifying the collaborators the application does not
+		// reach an unmanageable state
 		collaborators, err := tx.Applications.ListCollaborators(req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
 		if err != nil {
 			return err
 		}
 
-		if len(collaborators) == 0 {
+		// map all defined application rights
+		mapped := make(map[ttnpb.Right]bool)
+		for _, right := range ttnpb.AllApplicationRights() {
+			mapped[right] = true
+		}
+
+		// iterate over all collaborators' rights and delete appearing rights
+		for _, collaborator := range collaborators {
+			for _, right := range collaborator.Rights {
+				delete(mapped, right)
+			}
+		}
+
+		if len(mapped) != 0 {
+			// flatten leftovers of the map for error formating
+			missing := make([]string, 0, len(mapped))
+			for right := range mapped {
+				missing = append(missing, right.String())
+			}
+
 			return ErrSetApplicationCollaboratorFailed.New(errors.Attributes{
 				"application_id": req.ApplicationID,
+				"missing_rights": missing,
 			})
 		}
 
@@ -271,14 +332,11 @@ func (s *applicationService) ListApplicationCollaborators(ctx context.Context, r
 
 // ListApplicationRights returns the rights the caller user has to an application.
 func (s *applicationService) ListApplicationRights(ctx context.Context, req *ttnpb.ApplicationIdentifier) (*ttnpb.ListApplicationRightsResponse, error) {
-	claims, err := s.claimsFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
+	claims := claims.FromContext(ctx)
 
 	resp := new(ttnpb.ListApplicationRightsResponse)
 
-	switch claims.Source {
+	switch claims.Source() {
 	case auth.Token:
 		userID := claims.UserID()
 
@@ -289,13 +347,13 @@ func (s *applicationService) ListApplicationRights(ctx context.Context, req *ttn
 
 		// result rights are the intersection between the scope of the Client
 		// and the rights that the user has to the application.
-		resp.Rights = util.RightsIntersection(claims.Rights, rights)
+		resp.Rights = util.RightsIntersection(claims.Rights(), rights)
 	case auth.Key:
 		if claims.ApplicationID() != req.ApplicationID {
 			return nil, ErrNotAuthorized.New(nil)
 		}
 
-		resp.Rights = claims.Rights
+		resp.Rights = claims.Rights()
 	}
 
 	return resp, nil

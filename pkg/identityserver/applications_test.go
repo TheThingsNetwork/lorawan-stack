@@ -8,6 +8,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
@@ -26,7 +27,7 @@ func TestApplication(t *testing.T) {
 		ApplicationIdentifier: ttnpb.ApplicationIdentifier{"foo-app"},
 	}
 
-	ctx := testCtx()
+	ctx := testCtx(user.UserID)
 
 	_, err := is.applicationService.CreateApplication(ctx, &ttnpb.CreateApplicationRequest{
 		Application: app,
@@ -112,12 +113,12 @@ func TestApplication(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
-	// set new collaborator
+	// set a new collaborator with SETTINGS_COLLABORATOR and INFO rights
 	alice := testUsers()["alice"]
 	collab := &ttnpb.ApplicationCollaborator{
 		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{alice.UserID}},
 		ApplicationIdentifier:        app.ApplicationIdentifier,
-		Rights:                       []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
+		Rights:                       []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS},
 	}
 
 	_, err = is.applicationService.SetApplicationCollaborator(ctx, collab)
@@ -137,10 +138,49 @@ func TestApplication(t *testing.T) {
 		Rights:                       ttnpb.AllApplicationRights(),
 	})
 
-	// while there is two collaborators can't unset the only collab with COLLABORATORS right
+	// the new collaborator can't grant himself more rights
+	{
+		collab.Rights = append(collab.Rights, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+
+		ctx := testCtx(alice.UserID)
+
+		_, err = is.applicationService.SetApplicationCollaborator(ctx, collab)
+		a.So(err, should.BeNil)
+
+		rights, err := is.applicationService.ListApplicationRights(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+		a.So(err, should.BeNil)
+		a.So(rights.Rights, should.HaveLength, 2)
+		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+
+		// but it can't revoke itself the INFO right
+		collab.Rights = []ttnpb.Right{ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS}
+		_, err = is.applicationService.SetApplicationCollaborator(ctx, collab)
+		a.So(err, should.BeNil)
+
+		rights, err = is.applicationService.ListApplicationRights(ctx, &ttnpb.ApplicationIdentifier{app.ApplicationID})
+		a.So(err, should.BeNil)
+		a.So(rights.Rights, should.HaveLength, 1)
+		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_APPLICATION_INFO)
+
+		collab.Rights = []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS}
+		_, err = is.applicationService.SetApplicationCollaborator(ctx, collab)
+		a.So(err, should.BeNil)
+	}
+
+	// try to unset the main collaborator will result in error as the application
+	// will become unmanageable
 	_, err = is.applicationService.SetApplicationCollaborator(ctx, &ttnpb.ApplicationCollaborator{
 		ApplicationIdentifier:        app.ApplicationIdentifier,
 		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{user.UserID}},
+	})
+	a.So(err, should.NotBeNil)
+	a.So(ErrSetApplicationCollaboratorFailed.Describes(err), should.BeTrue)
+
+	// but we can revoke a shared right between the two collaborators
+	_, err = is.applicationService.SetApplicationCollaborator(ctx, &ttnpb.ApplicationCollaborator{
+		ApplicationIdentifier:        app.ApplicationIdentifier,
+		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{user.UserID}},
+		Rights: util.RightsDifference(ttnpb.AllApplicationRights(), []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO}),
 	})
 	a.So(err, should.NotBeNil)
 

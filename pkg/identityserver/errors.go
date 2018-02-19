@@ -51,14 +51,14 @@ var ErrNotAuthorized = &errors.ErrDescriptor{
 	Type:          errors.Unauthorized,
 }
 
-// ErrSetApplicationCollaboratorFailed is returned when after modifying the
-// collaborators of an application there is no collaborator with
-// `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right.
+// ErrSetApplicationCollaboratorFailed is returned when after modifying an
+// application's collaborators the application reaches an unmanageable state
+// as
 var ErrSetApplicationCollaboratorFailed = &errors.ErrDescriptor{
-	MessageFormat:  "Failed to modify collaborators: application `{application_id}` must have at least one collaborator with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right",
+	MessageFormat:  "Application `{application_id}` becomes unmanageable as no collaborator with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` has the following rights: {missing_rights} ",
 	Code:           5,
-	Type:           errors.Conflict,
-	SafeAttributes: []string{"application_id"},
+	Type:           errors.Unauthorized,
+	SafeAttributes: []string{"application_id", "missing_rights"},
 }
 
 // ErrSetGatewayCollaboratorFailed is returned when after modifying the

@@ -8,6 +8,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
@@ -140,12 +141,12 @@ func TestGateway(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
-	// set new collaborator
+	// set a new collaborator with SETTINGS_COLLABORATOR and INFO rights
 	alice := testUsers()["alice"]
 	collab := &ttnpb.GatewayCollaborator{
 		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{alice.UserID}},
 		GatewayIdentifier:            gtw.GatewayIdentifier,
-		Rights:                       []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
+		Rights:                       []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS},
 	}
 
 	_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
@@ -165,10 +166,49 @@ func TestGateway(t *testing.T) {
 		Rights:                       ttnpb.AllGatewayRights(),
 	})
 
-	// while there is two collaborators can't unset the only collab with COLLABORATORS right
+	// the new collaborator can't grant himself more rights
+	{
+		collab.Rights = append(collab.Rights, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+
+		ctx := testCtx(alice.UserID)
+
+		_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
+		a.So(err, should.BeNil)
+
+		rights, err := is.gatewayService.ListGatewayRights(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+		a.So(err, should.BeNil)
+		a.So(rights.Rights, should.HaveLength, 2)
+		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+
+		// but it can't revoke itself the INFO right
+		collab.Rights = []ttnpb.Right{ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS}
+		_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
+		a.So(err, should.BeNil)
+
+		rights, err = is.gatewayService.ListGatewayRights(ctx, &ttnpb.GatewayIdentifier{gtw.GatewayID})
+		a.So(err, should.BeNil)
+		a.So(rights.Rights, should.HaveLength, 1)
+		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_GATEWAY_INFO)
+
+		collab.Rights = []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS}
+		_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
+		a.So(err, should.BeNil)
+	}
+
+	// try to unset the main collaborator will result in error as the gateway
+	// will become unmanageable
 	_, err = is.gatewayService.SetGatewayCollaborator(ctx, &ttnpb.GatewayCollaborator{
 		GatewayIdentifier:            gtw.GatewayIdentifier,
 		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{user.UserID}},
+	})
+	a.So(err, should.NotBeNil)
+	a.So(ErrSetGatewayCollaboratorFailed.Describes(err), should.BeTrue)
+
+	// but we can revoke a shared right between the two collaborators
+	_, err = is.gatewayService.SetGatewayCollaborator(ctx, &ttnpb.GatewayCollaborator{
+		GatewayIdentifier:            gtw.GatewayIdentifier,
+		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{user.UserID}},
+		Rights: util.RightsDifference(ttnpb.AllGatewayRights(), []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO}),
 	})
 	a.So(err, should.NotBeNil)
 

@@ -116,8 +116,8 @@ func TestOrganization(t *testing.T) {
 	// Set a new member with SETTINGS_MEMBER and INFO rights.
 	member := &ttnpb.OrganizationMember{
 		OrganizationIdentifier: org.OrganizationIdentifier,
-		UserIdentifier:         alice.UserIdentifier,
-		Rights:                 []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
+		UserIdentifier:         ttnpb.UserIdentifier{UserID: alice.UserID},
+		Rights:                 []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_INFO, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS},
 	}
 
 	_, err = is.organizationService.SetOrganizationMember(ctx, member)
@@ -132,9 +132,9 @@ func TestOrganization(t *testing.T) {
 	a.So(members.Members, should.HaveLength, 2)
 	a.So(members.Members, should.Contain, member)
 	a.So(members.Members, should.Contain, &ttnpb.OrganizationMember{
-		UserIdentifier:         alice.UserIdentifier,
 		OrganizationIdentifier: org.OrganizationIdentifier,
-		Rights:                 []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
+		UserIdentifier:         ttnpb.UserIdentifier{UserID: user.UserID},
+		Rights:                 ttnpb.AllOrganizationRights(),
 	})
 
 	// The new member can't grant himself more rights.
@@ -173,9 +173,10 @@ func TestOrganization(t *testing.T) {
 	// To unset the main member will result in error as the organization will become unmanageable.
 	_, err = is.organizationService.SetOrganizationMember(ctx, &ttnpb.OrganizationMember{
 		OrganizationIdentifier: org.OrganizationIdentifier,
-		UserIdentifier:         user.UserIdentifier,
+		UserIdentifier:         ttnpb.UserIdentifier{UserID: user.UserID},
 	})
 	a.So(err, should.NotBeNil)
+	a.So(ErrSetOrganizationMemberFailed.Describes(err), should.BeTrue)
 
 	members, err = is.organizationService.ListOrganizationMembers(ctx, &ttnpb.OrganizationIdentifier{org.OrganizationID})
 	a.So(err, should.BeNil)

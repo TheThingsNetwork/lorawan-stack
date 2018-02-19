@@ -25,3 +25,25 @@ func TestRightsIntersection(t *testing.T) {
 		a.So(RightsIntersection(b, c), should.Resemble, []ttnpb.Right{})
 	}
 }
+
+func TestRightsDifference(t *testing.T) {
+	a := assertions.New(t)
+
+	{
+		b := []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)}
+		c := []ttnpb.Right{ttnpb.Right(2), ttnpb.Right(3)}
+		a.So(RightsDifference(b, c), should.Resemble, []ttnpb.Right{ttnpb.Right(1)})
+	}
+
+	{
+		b := []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)}
+		c := []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)}
+		a.So(RightsDifference(b, c), should.Resemble, []ttnpb.Right{})
+	}
+
+	{
+		b := []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)}
+		c := []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2), ttnpb.Right(3)}
+		a.So(RightsDifference(b, c), should.Resemble, []ttnpb.Right{})
+	}
+}

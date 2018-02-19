@@ -18,3 +18,20 @@ func RightsIntersection(a, b []ttnpb.Right) []ttnpb.Right {
 
 	return res
 }
+
+// RightsDifference returns the set of rights of `a` that are not contained in `b`.
+func RightsDifference(a, b []ttnpb.Right) []ttnpb.Right {
+	mapped := make(map[ttnpb.Right]bool)
+	for _, elemB := range b {
+		mapped[elemB] = true
+	}
+
+	res := make([]ttnpb.Right, 0)
+	for _, elemA := range a {
+		if _, exists := mapped[elemA]; !exists {
+			res = append(res, elemA)
+		}
+	}
+
+	return res
+}
