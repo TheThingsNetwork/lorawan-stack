@@ -9,7 +9,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/frequencyplans"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/gwpool"
-	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
@@ -43,7 +42,7 @@ func New(c *component.Component, conf *Config) (*GatewayServer, error) {
 	gs := &GatewayServer{
 		Component: c,
 
-		gateways:       gwpool.NewPool(log.FromContext(c.Context()), sendUplinkTimeout),
+		gateways:       gwpool.NewPool(c.Logger(), sendUplinkTimeout),
 		frequencyPlans: fpStore,
 
 		nsTags: conf.NSTags,

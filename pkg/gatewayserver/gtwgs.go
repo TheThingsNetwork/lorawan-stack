@@ -43,7 +43,7 @@ func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *
 	}
 
 	is := ttnpb.NewIsGatewayClient(isInfo.Conn())
-	gw, err := is.GetGateway(g.Context(), gatewayID)
+	gw, err := is.GetGateway(ctx, gatewayID)
 	if err != nil {
 		return ttnpb.FrequencyPlan{}, errors.NewWithCause("Could not get gateway information from identity server", err)
 	}
@@ -93,7 +93,7 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) error {
 		return err
 	}
 
-	logger := g.Logger().WithField("gateway_id", id.GatewayID)
+	logger := log.FromContext(ctx).WithField("gateway_id", id.GatewayID)
 
 	go func() {
 		startServingGatewayFn := func(nsClient ttnpb.GsNsClient) error {
