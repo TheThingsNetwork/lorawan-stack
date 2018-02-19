@@ -40,9 +40,6 @@ test: go.test js.test
 
 quality: go.quality js.quality
 
-# Cache build artifacts (speeds up dev builds)
-cache: go.install
-
 # example binary
 ttn-example: MAIN=./cmd/ttn-example/main.go
 ttn-example: $(RELEASE_DIR)/ttn-example-$(GOOS)-$(GOARCH)
@@ -72,8 +69,7 @@ ttn-join-server: MAIN=./cmd/ttn-join-server/main.go
 ttn-join-server: $(RELEASE_DIR)/ttn-join-server-$(GOOS)-$(GOARCH)
 
 # All binaries
-build-all: GO_FLAGS=-i -installsuffix ttn_prod
-build-all: go.clean-build ttn-stack ttn-identity-server ttn-gateway-server ttn-network-server ttn-application-server ttn-join-server
+build-all: ttn-stack ttn-identity-server ttn-gateway-server ttn-network-server ttn-application-server ttn-join-server
 
 # All supported platforms
 build-all-platforms:

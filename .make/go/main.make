@@ -24,7 +24,6 @@ GO_METALINTER = gometalinter
 GO_LINT_FILES = $(ALL_FILES) | $(only_go_lintable)
 
 # go flags
-GO_FLAGS ?= -i
 GO_ENV = CGO_ENABLED=0
 LD_FLAGS = -ldflags "-w $(GO_TAGS)"
 GO_TAGS ?= -X github.com/TheThingsNetwork/ttn/pkg/version.GitCommit=$(GIT_COMMIT) -X github.com/TheThingsNetwork/ttn/pkg/version.BuildDate=$(BUILD_DATE) -X github.com/TheThingsNetwork/ttn/pkg/version.TTN=$(GIT_TAG) -X github.com/TheThingsNetwork/ttn/pkg/version.GitBranch=$(GIT_BRANCH)
@@ -101,17 +100,6 @@ DEP_FLAGS ?= $(if $(CI),-vendor-only,)
 go.deps:
 	@$(log) "Installing go dependencies"
 	@dep ensure -v $(DEP_FLAGS)
-
-# install packages for faster rebuilds
-go.install:
-	@$(log) "Installing `$(EXTERNAL_PACKAGES) | $(count)` go packages"
-	@$(GO) install -v ./...
-
-# pre-build local files, ignoring failures (from unused packages or files for example)
-# use this to improve build speed
-go.pre:
-	@$(log) "Installing go packages"
-	@$(GO_FILES) | $(to_packages) | xargs $(GO) install -v || true
 
 # clean build files
 go.clean:
