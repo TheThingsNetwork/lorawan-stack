@@ -6,7 +6,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/frequencyplans"
+	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 

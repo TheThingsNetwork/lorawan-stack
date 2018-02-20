@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/band"
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/frequencyplans"
+	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
