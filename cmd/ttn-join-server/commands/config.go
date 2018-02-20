@@ -4,6 +4,7 @@ package commands
 
 import (
 	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
+	shared_joinserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/joinserver"
 	conf "github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/joinserver"
 )
@@ -15,5 +16,5 @@ type Config struct {
 
 var DefaultConfig = Config{
 	ServiceBase: shared.DefaultServiceBase,
-	JS:          shared.DefaultJoinServerConfig,
+	JS:          shared_joinserver.DefaultJoinServerConfig,
 }

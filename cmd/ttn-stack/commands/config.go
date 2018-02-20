@@ -4,6 +4,11 @@ package commands
 
 import (
 	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
+	shared_applicationserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/applicationserver"
+	shared_gatewayserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/gatewayserver"
+	shared_identityserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/identityserver"
+	shared_joinserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/joinserver"
+	shared_networkserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/networkserver"
 	"github.com/TheThingsNetwork/ttn/pkg/applicationserver"
 	conf "github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
@@ -23,9 +28,9 @@ type Config struct {
 
 var DefaultConfig = Config{
 	ServiceBase: shared.DefaultServiceBase,
-	IS:          shared.DefaultIdentityServerConfig,
-	GS:          shared.DefaultGatewayServerConfig,
-	NS:          shared.DefaultNetworkServerConfig,
-	AS:          shared.DefaultApplicationServerConfig,
-	JS:          shared.DefaultJoinServerConfig,
+	IS:          shared_identityserver.DefaultIdentityServerConfig,
+	GS:          shared_gatewayserver.DefaultGatewayServerConfig,
+	NS:          shared_networkserver.DefaultNetworkServerConfig,
+	AS:          shared_applicationserver.DefaultApplicationServerConfig,
+	JS:          shared_joinserver.DefaultJoinServerConfig,
 }

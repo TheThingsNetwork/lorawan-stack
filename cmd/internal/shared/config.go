@@ -3,15 +3,8 @@
 package shared
 
 import (
-	"fmt"
-
-	"github.com/TheThingsNetwork/ttn/pkg/applicationserver"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver"
-	"github.com/TheThingsNetwork/ttn/pkg/joinserver"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
-	"github.com/TheThingsNetwork/ttn/pkg/networkserver"
 )
 
 // DefaultBaseConfig is the default base component configuration.
@@ -69,24 +62,3 @@ var DefaultServiceBase = config.ServiceBase{
 	TLS:      DefaultTLSConfig,
 	Identity: DefaultIdentityConfig,
 }
-
-// DefaultIdentityServerConfig is the default configuration for the IdentityServer
-var DefaultIdentityServerConfig = identityserver.Config{
-	DatabaseURI:      "postgres://root@localhost:26257/is_development?sslmode=disable",
-	PublicURL:        fmt.Sprintf("http://localhost:%s", DefaultServiceBase.HTTP.Listen),
-	OrganizationName: "The Things Network",
-	DefaultSettings:  identityserver.DefaultSettings,
-	Factories:        identityserver.DefaultFactories,
-}
-
-// DefaultGatewayServerConfig is the default configuration for the GatewayServer
-var DefaultGatewayServerConfig = gatewayserver.Config{}
-
-// DefaultNetworkServerConfig is the default configuration for the NetworkServer
-var DefaultNetworkServerConfig = networkserver.Config{}
-
-// DefaultApplicationServerConfig is the default configuration for the ApplicationServer
-var DefaultApplicationServerConfig = applicationserver.Config{}
-
-// DefaultJoinServerConfig is the default configuration for the JoinServer
-var DefaultJoinServerConfig = joinserver.Config{}

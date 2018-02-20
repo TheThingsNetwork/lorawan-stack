@@ -4,6 +4,7 @@ package commands
 
 import (
 	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
+	shared_applicationserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/applicationserver"
 	"github.com/TheThingsNetwork/ttn/pkg/applicationserver"
 	conf "github.com/TheThingsNetwork/ttn/pkg/config"
 )
@@ -15,5 +16,5 @@ type Config struct {
 
 var DefaultConfig = Config{
 	ServiceBase: shared.DefaultServiceBase,
-	AS:          shared.DefaultApplicationServerConfig,
+	AS:          shared_applicationserver.DefaultApplicationServerConfig,
 }

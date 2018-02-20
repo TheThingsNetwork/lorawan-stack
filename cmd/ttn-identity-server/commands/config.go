@@ -4,6 +4,7 @@ package commands
 
 import (
 	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
+	shared_identityserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/identityserver"
 	conf "github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver"
 )
@@ -15,5 +16,5 @@ type Config struct {
 
 var DefaultConfig = Config{
 	ServiceBase: shared.DefaultServiceBase,
-	IS:          shared.DefaultIdentityServerConfig,
+	IS:          shared_identityserver.DefaultIdentityServerConfig,
 }
