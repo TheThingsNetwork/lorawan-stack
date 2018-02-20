@@ -1,7 +1,7 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-// Package gwpool abstracts the polling and sending procedures between gateways and the gateway server.
-package gwpool
+// Package pool abstracts the polling and sending procedures between gateways and the gateway server.
+package pool
 
 import (
 	"context"

@@ -1,6 +1,6 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package gwpool_test
+package pool_test
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/band"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/gwpool"
+	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/pool"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
@@ -55,7 +55,7 @@ func downlink() *ttnpb.DownlinkMessage {
 }
 
 func ExamplePool() {
-	p := gwpool.NewPool(log.Noop, time.Millisecond)
+	p := pool.NewPool(log.Noop, time.Millisecond)
 
 	gatewayInfo := ttnpb.GatewayIdentifier{GatewayID: "my-kerlink"}
 	upMessages, err := p.Subscribe(gatewayInfo, newPoolConnection(), ttnpb.FrequencyPlan{BandID: band.EU_863_870})

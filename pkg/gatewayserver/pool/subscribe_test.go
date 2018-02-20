@@ -1,6 +1,6 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package gwpool_test
+package pool_test
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/band"
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/gwpool"
+	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/pool"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/smartystreets/assertions"
@@ -18,7 +18,7 @@ import (
 func TestPoolUplinks(t *testing.T) {
 	a := assertions.New(t)
 
-	p := gwpool.NewPool(test.GetLogger(t), time.Millisecond)
+	p := pool.NewPool(test.GetLogger(t), time.Millisecond)
 
 	gatewayID := "gateway"
 	gatewayIdentifier := ttnpb.GatewayIdentifier{GatewayID: gatewayID}
@@ -73,7 +73,7 @@ func TestPoolUplinks(t *testing.T) {
 func TestDoneContextUplinks(t *testing.T) {
 	a := assertions.New(t)
 
-	p := gwpool.NewPool(test.GetLogger(t), time.Millisecond)
+	p := pool.NewPool(test.GetLogger(t), time.Millisecond)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -107,7 +107,7 @@ func TestDoneContextUplinks(t *testing.T) {
 func TestSubscribeTwice(t *testing.T) {
 	a := assertions.New(t)
 
-	p := gwpool.NewPool(test.GetLogger(t), time.Millisecond)
+	p := pool.NewPool(test.GetLogger(t), time.Millisecond)
 
 	gateway := ttnpb.GatewayIdentifier{GatewayID: "gateway"}
 
