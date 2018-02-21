@@ -6,6 +6,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/errors/grpcerrors"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
@@ -20,6 +22,9 @@ func UnaryServerInterceptor(ctx context.Context, opts ...Option) grpc.UnaryServe
 		startTime := time.Now()
 		resp, err := handler(newCtx, req)
 		code := o.codeFunc(err)
+		if err, ok := err.(errors.Error); ok {
+			code = grpcerrors.TypeToGRPCCode(err.Type())
+		}
 		level := o.levelFunc(code)
 		entry := log.FromContext(newCtx).WithFields(log.Fields(
 			"grpc_code", code.String(),
@@ -44,6 +49,9 @@ func StreamServerInterceptor(ctx context.Context, opts ...Option) grpc.StreamSer
 		startTime := time.Now()
 		err := handler(srv, wrapped)
 		code := o.codeFunc(err)
+		if err, ok := err.(errors.Error); ok {
+			code = grpcerrors.TypeToGRPCCode(err.Type())
+		}
 		level := o.levelFunc(code)
 		entry := log.FromContext(newCtx).WithFields(log.Fields(
 			"grpc_code", code.String(),
