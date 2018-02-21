@@ -174,7 +174,7 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 	}
 	switch len(devs) {
 	case 0:
-		_, err := r.Interface.Create(&req.Device)
+		_, err := r.Interface.Create(&req.Device, fields...)
 		if err != nil {
 			return nil, err
 		}

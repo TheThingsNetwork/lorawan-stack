@@ -10,7 +10,7 @@ import (
 
 // Interface represents the interface exposed by the *Registry.
 type Interface interface {
-	Create(ed *ttnpb.EndDevice) (*Device, error)
+	Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error)
 	FindBy(ed ...*ttnpb.EndDevice) ([]*Device, error)
 }
 
@@ -27,8 +27,8 @@ func New(s store.Client) *Registry {
 }
 
 // Create stores devices data in underlying store.Interface and returns a new *Device.
-func (r *Registry) Create(ed *ttnpb.EndDevice) (*Device, error) {
-	id, err := r.store.Create(ed)
+func (r *Registry) Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error) {
+	id, err := r.store.Create(ed, fields...)
 	if err != nil {
 		return nil, err
 	}
