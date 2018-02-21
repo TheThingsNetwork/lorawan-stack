@@ -47,7 +47,7 @@ func TestRegistry(t *testing.T) {
 	dev.EndDevice = updated
 
 	fields, err := store.DiffFields(updated, ed)
-	if a.So(err, should.BeNil) || !a.So(dev.Update(fields...), should.BeNil) {
+	if !a.So(err, should.BeNil) || !a.So(dev.Update(fields...), should.BeNil) {
 		return
 	}
 
@@ -123,7 +123,7 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 	dev.EndDevice = updated
 
 	fields, err := store.DiffFields(updated, ed)
-	if a.So(err, should.BeNil) || !a.So(dev.Update(fields...), should.BeNil) {
+	if !a.So(err, should.BeNil) || !a.So(dev.Update(fields...), should.BeNil) {
 		return
 	}
 
