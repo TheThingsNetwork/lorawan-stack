@@ -58,7 +58,7 @@ type Component struct {
 
 	loopback *grpc.ClientConn
 
-	listeners map[string]*listener
+	tcpListeners map[string]*listener
 
 	FrequencyPlans *frequencyplans.Store
 }
@@ -85,7 +85,7 @@ func New(logger log.Stack, config *Config) (*Component, error) {
 		config: config,
 		logger: logger,
 
-		listeners: make(map[string]*listener),
+		tcpListeners: make(map[string]*listener),
 
 		FrequencyPlans: config.FrequencyPlans.Store(),
 	}
@@ -205,7 +205,7 @@ func (c *Component) Run() error {
 func (c *Component) Close() {
 	c.cancelCtx()
 
-	for _, l := range c.listeners {
+	for _, l := range c.tcpListeners {
 		err := l.lis.Close()
 		if err == nil {
 			c.logger.Debugf("Stopped listening on %s", l.lis.Addr())

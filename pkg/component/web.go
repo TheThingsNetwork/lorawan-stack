@@ -31,7 +31,7 @@ func (c *Component) RegisterWeb(s web.Registerer) {
 
 func (c *Component) listenWeb() (err error) {
 	if c.config.HTTP.Listen != "" {
-		l, err := c.Listen(c.config.HTTP.Listen)
+		l, err := c.ListenTCP(c.config.HTTP.Listen)
 		if err != nil {
 			return errors.NewWithCause(err, "Could not listen on HTTP port")
 		}
@@ -47,7 +47,7 @@ func (c *Component) listenWeb() (err error) {
 	}
 
 	if c.config.HTTP.ListenTLS != "" {
-		l, err := c.Listen(c.config.HTTP.ListenTLS)
+		l, err := c.ListenTCP(c.config.HTTP.ListenTLS)
 		if err != nil {
 			return errors.NewWithCause(err, "Could not listen on HTTP/tls port")
 		}

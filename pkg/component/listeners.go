@@ -77,9 +77,9 @@ func (l *listener) Close() error {
 	return l.lis.Close()
 }
 
-// Listen on an address
-func (c *Component) Listen(address string) (Listener, error) {
-	l, ok := c.listeners[address]
+// ListenTCP listens on a TCP address and allows for TCP and TLS on the same port.
+func (c *Component) ListenTCP(address string) (Listener, error) {
+	l, ok := c.tcpListeners[address]
 	if !ok {
 		c.logger.WithField("address", address).Debug("Creating listener")
 		lis, err := net.Listen("tcp", address)
@@ -94,7 +94,7 @@ func (c *Component) Listen(address string) (Listener, error) {
 			tls: mux.Match(cmux.TLS()),
 			tcp: mux.Match(cmux.Any()),
 		}
-		c.listeners[address] = l
+		c.tcpListeners[address] = l
 		go func() {
 			c.logger.WithField("address", l.lis.Addr().String()).Debug("Start serving")
 			if err := l.mux.Serve(); err != nil {

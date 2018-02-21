@@ -57,7 +57,7 @@ func (c *Component) setupGRPC() (err error) {
 
 func (c *Component) listenGRPC() (err error) {
 	if c.config.GRPC.Listen != "" {
-		l, err := c.Listen(c.config.GRPC.Listen)
+		l, err := c.ListenTCP(c.config.GRPC.Listen)
 		if err != nil {
 			return errors.NewWithCause(err, "Could not listen on gRPC port")
 		}
@@ -72,7 +72,7 @@ func (c *Component) listenGRPC() (err error) {
 		}()
 	}
 	if c.config.GRPC.ListenTLS != "" {
-		l, err := c.Listen(c.config.GRPC.ListenTLS)
+		l, err := c.ListenTCP(c.config.GRPC.ListenTLS)
 		if err != nil {
 			return errors.NewWithCause(err, "Could not listen on gRPC/tls port")
 		}
