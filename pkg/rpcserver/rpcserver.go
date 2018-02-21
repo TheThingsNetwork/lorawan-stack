@@ -165,9 +165,12 @@ func New(ctx context.Context, opts ...Option) *Server {
 		)),
 	}
 	server.Server = grpc.NewServer(append(baseOptions, options.serverOptions...)...)
-	server.ServeMux = runtime.NewServeMux(runtime.WithMarshalerOption("*", &jsonpb.GoGoJSONPb{
-		OrigName: true,
-	}))
+	server.ServeMux = runtime.NewServeMux(
+		runtime.WithMarshalerOption("*", &jsonpb.GoGoJSONPb{
+			OrigName: true,
+		}),
+		runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
+	)
 	return server
 }
 
