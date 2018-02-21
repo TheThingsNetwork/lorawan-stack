@@ -126,22 +126,22 @@ func New(ctx context.Context, opts ...Option) *Server {
 	grpc_prometheus.EnableHandlingTimeHistogram()
 
 	streamInterceptors := []grpc.StreamServerInterceptor{
-		grpcerrors.StreamServerInterceptor(),
-		grpc_ctxtags.StreamServerInterceptor(ctxtagsOpts...),
 		fillcontext.StreamServerInterceptor(options.contextFillers...),
+		grpc_ctxtags.StreamServerInterceptor(ctxtagsOpts...),
 		grpc_prometheus.StreamServerInterceptor,
-		rpclog.StreamServerInterceptor(ctx), // Gets logger from global context
+		grpcerrors.StreamServerInterceptor(), // above works with gRPC errors, below works with TTN errors
 		sentry.StreamServerInterceptor(options.sentry),
+		rpclog.StreamServerInterceptor(ctx), // Gets logger from global context
 		grpc_validator.StreamServerInterceptor(),
 	}
 
 	unaryInterceptors := []grpc.UnaryServerInterceptor{
-		grpcerrors.UnaryServerInterceptor(),
-		grpc_ctxtags.UnaryServerInterceptor(ctxtagsOpts...),
 		fillcontext.UnaryServerInterceptor(options.contextFillers...),
+		grpc_ctxtags.UnaryServerInterceptor(ctxtagsOpts...),
 		grpc_prometheus.UnaryServerInterceptor,
-		rpclog.UnaryServerInterceptor(ctx), // Gets logger from global context
+		grpcerrors.UnaryServerInterceptor(), // above works with gRPC errors, below works with TTN errors
 		sentry.UnaryServerInterceptor(options.sentry),
+		rpclog.UnaryServerInterceptor(ctx), // Gets logger from global context
 		grpc_validator.UnaryServerInterceptor(),
 	}
 
