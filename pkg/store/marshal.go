@@ -308,6 +308,7 @@ func ToBytesValue(v reflect.Value) (b []byte, err error) {
 
 	t := v.Type()
 
+outer:
 	switch {
 	case t.Implements(jsonMarshalerType):
 		enc = JSONEncoding
@@ -319,7 +320,7 @@ func ToBytesValue(v reflect.Value) (b []byte, err error) {
 		it := iv.Type()
 		for i := 0; i < it.NumField(); i++ {
 			if it.Field(i).PkgPath == "" {
-				goto gobEncode
+				break outer
 			}
 		}
 		// The struct can not be encoded using gob, if it does not implement gob.GobEncoder
@@ -329,7 +330,6 @@ func ToBytesValue(v reflect.Value) (b []byte, err error) {
 		return nil, errors.Errorf("Values of type %s (kind %s), which do not implement custom marshaling logic are not supported", t, t.Kind())
 	}
 
-gobEncode:
 	enc = GobEncoding
 
 	// Encode the value as a pointer to include type info.
