@@ -104,3 +104,12 @@ func (c *Component) ListenTCP(address string) (Listener, error) {
 	}
 	return l, nil
 }
+
+// ListenUDP starts a listener on a UDP address.
+func (c *Component) ListenUDP(address string) (*net.UDPConn, error) {
+	udpAddr, err := net.ResolveUDPAddr("udp", address)
+	if err != nil {
+		return nil, err
+	}
+	return net.ListenUDP("udp", udpAddr)
+}
