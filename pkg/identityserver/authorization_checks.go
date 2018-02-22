@@ -56,7 +56,6 @@ func (is *IdentityServer) enforceApplicationRights(ctx context.Context, appID st
 	}
 
 	var authorized bool
-	var err error
 	switch claims.Source() {
 	case auth.Key:
 		authorized = claims.ApplicationID() == appID
@@ -66,6 +65,7 @@ func (is *IdentityServer) enforceApplicationRights(ctx context.Context, appID st
 			return ErrNotAuthorized.New(nil)
 		}
 
+		var err error
 		authorized, err = is.store.Applications.HasCollaboratorRights(appID, userID, rights...)
 		if err != nil {
 			return err
@@ -89,7 +89,6 @@ func (is *IdentityServer) enforceGatewayRights(ctx context.Context, gtwID string
 	}
 
 	var authorized bool
-	var err error
 	switch claims.Source() {
 	case auth.Key:
 		authorized = claims.GatewayID() == gtwID
@@ -99,6 +98,7 @@ func (is *IdentityServer) enforceGatewayRights(ctx context.Context, gtwID string
 			return ErrNotAuthorized.New(nil)
 		}
 
+		var err error
 		authorized, err = is.store.Gateways.HasCollaboratorRights(gtwID, userID, rights...)
 		if err != nil {
 			return err
@@ -122,7 +122,6 @@ func (is *IdentityServer) enforceOrganizationRights(ctx context.Context, organiz
 	}
 
 	var authorized bool
-	var err error
 	switch claims.Source() {
 	case auth.Key:
 		authorized = claims.OrganizationID() == organizationID
@@ -132,6 +131,7 @@ func (is *IdentityServer) enforceOrganizationRights(ctx context.Context, organiz
 			return ErrNotAuthorized.New(nil)
 		}
 
+		var err error
 		authorized, err = is.store.Organizations.HasMemberRights(organizationID, userID, rights...)
 		if err != nil {
 			return err
