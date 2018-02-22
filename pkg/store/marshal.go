@@ -40,13 +40,13 @@ func isZero(val reflect.Value) bool {
 			}
 		}
 		return true
-	case reflect.Map, reflect.Slice, reflect.String:
+	case reflect.String:
 		return val.Len() == 0
 	case reflect.Bool:
 		return !val.Bool()
 	case reflect.Complex64, reflect.Complex128:
 		return val.Complex() == 0
-	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Ptr:
+	case reflect.Map, reflect.Slice, reflect.Chan, reflect.Func, reflect.Interface, reflect.Ptr:
 		return val.IsNil()
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return val.Int() == 0
