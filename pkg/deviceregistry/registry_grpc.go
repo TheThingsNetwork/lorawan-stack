@@ -156,8 +156,8 @@ func (r *RegistryRPC) GetDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifi
 // SetDevice sets the device fields to match those of dev in underlying registry.
 func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest) (*pbtypes.Empty, error) {
 	var fields []string
-	if req.Fields != nil {
-		fields = req.Fields.Paths
+	if req.FieldMask != nil {
+		fields = req.FieldMask.Paths
 	}
 	if r.checks.SetDevice != nil {
 		if err := r.checks.SetDevice(ctx, &req.Device, fields...); err != nil {
