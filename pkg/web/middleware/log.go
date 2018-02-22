@@ -32,9 +32,9 @@ func Log(logger log.Interface) echo.MiddlewareFunc {
 				"duration", stop.Sub(start),
 				"method", req.Method,
 				"url", req.URL.String(),
-				"ip", req.RemoteAddr,
-				"id", c.Response().Header().Get("X-Request-ID"),
-				"size", c.Response().Size,
+				"remote_addr", req.RemoteAddr,
+				"request_id", c.Response().Header().Get("X-Request-ID"),
+				"response_size", c.Response().Size,
 				"status", status,
 				"version", version,
 			))

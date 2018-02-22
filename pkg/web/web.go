@@ -82,7 +82,7 @@ func New(logger log.Interface, opts ...Option) *Server {
 	server.Renderer = cfg.Renderer
 
 	server.Use(
-		middleware.Log(logger),
+		middleware.Log(logger.WithField("namespace", "web")),
 		middleware.ID(cfg.Prefix),
 		middleware.Normalize(cfg.NormalizationMode),
 		cookie.Cookies(cfg.Root, cfg.BlockKey, cfg.HashKey),
