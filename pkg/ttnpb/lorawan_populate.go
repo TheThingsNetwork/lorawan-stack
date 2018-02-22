@@ -24,7 +24,6 @@ func NewPopulatedMACPayload(r randyLorawan, easy bool) *MACPayload {
 	out := &MACPayload{}
 	out.FHDR = *NewPopulatedFHDR(r, easy)
 	out.FPort = uint32(r.Intn(225))
-	// TODO
 	out.FRMPayload = make([]byte, 10)
 	for i := 0; i < len(out.FRMPayload); i++ {
 		if r.Intn(2) == 0 {
@@ -217,7 +216,6 @@ func NewPopulatedMessageJoinAccept(r randyLorawan, decrypted bool) *Message {
 		pld.Rx1DROffset %= 8
 	} else {
 		pld = &JoinAcceptPayload{
-			// TODO generate
 			Encrypted: []byte{42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42},
 		}
 	}

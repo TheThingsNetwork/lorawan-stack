@@ -207,7 +207,6 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) 
 			for _, fd := range fieldsDel {
 				p := fd + store.Separator
 				for fc := range m {
-					// TODO optimize
 					if strings.HasPrefix(fc, p) {
 						fieldsDel = append(fieldsDel, fc)
 						delete(m, fc)
