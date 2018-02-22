@@ -307,40 +307,26 @@ func (s *gatewayService) SetGatewayCollaborator(ctx context.Context, req *ttnpb.
 			return err
 		}
 
-		// check that after modifying the collaborators the gateway does not
-		// reach an unmanageable state
+		// Check if the sum of rights that collaborators with `SETTINGS_COLLABORATOR`
+		// right is equal to the entire set of defined gateway rights.
 		collaborators, err := tx.Gateways.ListCollaborators(req.GatewayID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
 		if err != nil {
 			return err
 		}
 
-		// map all defined gateway rights
-		mapped := make(map[ttnpb.Right]bool)
-		for _, right := range ttnpb.AllGatewayRights() {
-			mapped[right] = true
-		}
-
-		// iterate over all collaborators' rights and delete appearing rights
+		rights = ttnpb.AllGatewayRights()
 		for _, collaborator := range collaborators {
-			for _, right := range collaborator.Rights {
-				delete(mapped, right)
+			rights = ttnpb.DifferenceRights(rights, collaborator.Rights)
+
+			if len(rights) == 0 {
+				return nil
 			}
 		}
 
-		if len(mapped) != 0 {
-			// flatten leftovers of the map for error formating
-			missing := make([]string, 0, len(mapped))
-			for right := range mapped {
-				missing = append(missing, right.String())
-			}
-
-			return ErrSetGatewayCollaboratorFailed.New(errors.Attributes{
-				"gateway_id":     req.GatewayID,
-				"missing_rights": missing,
-			})
-		}
-
-		return nil
+		return ErrSetGatewayCollaboratorFailed.New(errors.Attributes{
+			"gateway_id":     req.GatewayID,
+			"missing_rights": rights,
+		})
 	})
 
 	return nil, err

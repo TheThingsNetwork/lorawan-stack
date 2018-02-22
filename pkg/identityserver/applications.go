@@ -274,40 +274,26 @@ func (s *applicationService) SetApplicationCollaborator(ctx context.Context, req
 			return err
 		}
 
-		// check that after modifying the collaborators the application does not
-		// reach an unmanageable state
+		// Check if the sum of rights that collaborators with `SETTINGS_COLLABORATOR`
+		// right is equal to the entire set of defined application rights.
 		collaborators, err := tx.Applications.ListCollaborators(req.ApplicationID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
 		if err != nil {
 			return err
 		}
 
-		// map all defined application rights
-		mapped := make(map[ttnpb.Right]bool)
-		for _, right := range ttnpb.AllApplicationRights() {
-			mapped[right] = true
-		}
-
-		// iterate over all collaborators' rights and delete appearing rights
+		rights = ttnpb.AllApplicationRights()
 		for _, collaborator := range collaborators {
-			for _, right := range collaborator.Rights {
-				delete(mapped, right)
+			rights = ttnpb.DifferenceRights(rights, collaborator.Rights)
+
+			if len(rights) == 0 {
+				return nil
 			}
 		}
 
-		if len(mapped) != 0 {
-			// flatten leftovers of the map for error formating
-			missing := make([]string, 0, len(mapped))
-			for right := range mapped {
-				missing = append(missing, right.String())
-			}
-
-			return ErrSetApplicationCollaboratorFailed.New(errors.Attributes{
-				"application_id": req.ApplicationID,
-				"missing_rights": missing,
-			})
-		}
-
-		return nil
+		return ErrSetApplicationCollaboratorFailed.New(errors.Attributes{
+			"application_id": req.ApplicationID,
+			"missing_rights": rights,
+		})
 	})
 
 	return nil, err

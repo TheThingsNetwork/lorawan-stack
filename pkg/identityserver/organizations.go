@@ -260,40 +260,26 @@ func (s *organizationService) SetOrganizationMember(ctx context.Context, req *tt
 			return err
 		}
 
-		// Check that after modifying the members the organization does not reach an
-		// unmanageable state.
+		// Check if the sum of rights that members with `SETTINGS_MEMBER` right is
+		// equal to the entire set of defined organization rights.
 		members, err := tx.Organizations.ListMembers(req.OrganizationID, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS)
 		if err != nil {
 			return err
 		}
 
-		// Map all defined organization rights.
-		mapped := make(map[ttnpb.Right]bool)
-		for _, right := range ttnpb.AllOrganizationRights() {
-			mapped[right] = true
-		}
-
-		// Iterate over all members' rights and delete appearing rights.
+		rights = ttnpb.AllOrganizationRights()
 		for _, member := range members {
-			for _, right := range member.Rights {
-				delete(mapped, right)
+			rights = ttnpb.DifferenceRights(rights, member.Rights)
+
+			if len(rights) == 0 {
+				return nil
 			}
 		}
 
-		if len(mapped) != 0 {
-			// Flatten leftovers of the map for error formating.
-			missing := make([]string, 0, len(mapped))
-			for right := range mapped {
-				missing = append(missing, right.String())
-			}
-
-			return ErrSetOrganizationMemberFailed.New(errors.Attributes{
-				"organization_id": req.OrganizationID,
-				"missing_rights":  missing,
-			})
-		}
-
-		return nil
+		return ErrSetOrganizationMemberFailed.New(errors.Attributes{
+			"organization_id": req.OrganizationID,
+			"missing_rights":  rights,
+		})
 	})
 
 	return nil, err
