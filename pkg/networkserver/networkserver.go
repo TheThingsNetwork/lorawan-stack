@@ -31,7 +31,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/deviceregistry"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
-	"github.com/TheThingsNetwork/ttn/pkg/networkserver/mac"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 	pbtypes "github.com/gogo/protobuf/types"
@@ -267,14 +266,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
 	}
 	dev.RecentUplinks = append(dev.RecentUplinks, msg)
-
-	if err = mac.HandleUplink(ctx, dev.EndDevice, msg); err != nil {
-		return nil, errors.NewWithCause("Could not handle uplink MAC commands", err)
-	}
-
-	if err = mac.UpdateQueue(dev.EndDevice); err != nil {
-		return nil, errors.NewWithCause("Could not determine MAC commands to queue", err)
-	}
 
 	if err := dev.Update(); err != nil {
 		logger.WithError(err).Error("Failed to update device")
