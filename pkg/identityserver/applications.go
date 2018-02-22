@@ -266,7 +266,7 @@ func (s *applicationService) SetApplicationCollaborator(ctx context.Context, req
 		}
 	}
 
-	req.Rights = append(util.RightsDifference(rights, modifiable), util.RightsIntersection(req.Rights, modifiable)...)
+	req.Rights = append(ttnpb.DifferenceRights(rights, modifiable), ttnpb.IntersectRights(req.Rights, modifiable)...)
 
 	err = s.store.Transact(func(tx *store.Store) error {
 		err := tx.Applications.SetCollaborator(req)
@@ -347,7 +347,7 @@ func (s *applicationService) ListApplicationRights(ctx context.Context, req *ttn
 
 		// result rights are the intersection between the scope of the Client
 		// and the rights that the user has to the application.
-		resp.Rights = util.RightsIntersection(claims.Rights(), rights)
+		resp.Rights = ttnpb.IntersectRights(claims.Rights(), rights)
 	case auth.Key:
 		if claims.ApplicationID() != req.ApplicationID {
 			return nil, ErrNotAuthorized.New(nil)

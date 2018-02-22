@@ -299,7 +299,7 @@ func (s *gatewayService) SetGatewayCollaborator(ctx context.Context, req *ttnpb.
 		}
 	}
 
-	req.Rights = append(util.RightsDifference(rights, modifiable), util.RightsIntersection(req.Rights, modifiable)...)
+	req.Rights = append(ttnpb.DifferenceRights(rights, modifiable), ttnpb.IntersectRights(req.Rights, modifiable)...)
 
 	err = s.store.Transact(func(tx *store.Store) error {
 		err := tx.Gateways.SetCollaborator(req)
@@ -380,7 +380,7 @@ func (s *gatewayService) ListGatewayRights(ctx context.Context, req *ttnpb.Gatew
 
 		// result rights are the intersection between the scope of the Client
 		// and the rights that the user has to the gateway.
-		resp.Rights = util.RightsIntersection(claims.Rights(), rights)
+		resp.Rights = ttnpb.IntersectRights(claims.Rights(), rights)
 	case auth.Key:
 		if claims.GatewayID() != req.GatewayID {
 			return nil, ErrNotAuthorized.New(nil)

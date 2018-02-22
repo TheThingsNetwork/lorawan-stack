@@ -8,7 +8,6 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
@@ -180,7 +179,7 @@ func TestApplication(t *testing.T) {
 	_, err = is.applicationService.SetApplicationCollaborator(ctx, &ttnpb.ApplicationCollaborator{
 		ApplicationIdentifier:        app.ApplicationIdentifier,
 		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{user.UserID}},
-		Rights: util.RightsDifference(ttnpb.AllApplicationRights(), []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO}),
+		Rights: ttnpb.DifferenceRights(ttnpb.AllApplicationRights(), []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO}),
 	})
 	a.So(err, should.NotBeNil)
 

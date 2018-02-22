@@ -252,7 +252,7 @@ func (s *organizationService) SetOrganizationMember(ctx context.Context, req *tt
 		}
 	}
 
-	req.Rights = append(util.RightsDifference(rights, modifiable), util.RightsIntersection(req.Rights, modifiable)...)
+	req.Rights = append(ttnpb.DifferenceRights(rights, modifiable), ttnpb.IntersectRights(req.Rights, modifiable)...)
 
 	err = s.store.Transact(func(tx *store.Store) error {
 		err := tx.Organizations.SetMember(req)
@@ -334,7 +334,7 @@ func (s *organizationService) ListOrganizationRights(ctx context.Context, req *t
 
 		// Result rights are the intersection between the scope of the Client
 		// and the rights that the user has to the organization.
-		resp.Rights = util.RightsIntersection(claims.Rights(), rights)
+		resp.Rights = ttnpb.IntersectRights(claims.Rights(), rights)
 	case auth.Key:
 		if claims.OrganizationID() != req.OrganizationID {
 			return nil, ErrNotAuthorized.New(nil)
