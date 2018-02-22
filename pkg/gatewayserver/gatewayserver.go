@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/frequencyplans"
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/gwpool"
+	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
+	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/pool"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
@@ -26,7 +26,7 @@ const (
 type GatewayServer struct {
 	*component.Component
 
-	gateways       gwpool.Pool
+	gateways       pool.Pool
 	frequencyPlans frequencyplans.Store
 
 	nsTags []string
@@ -42,7 +42,7 @@ func New(c *component.Component, conf *Config) (*GatewayServer, error) {
 	gs := &GatewayServer{
 		Component: c,
 
-		gateways:       gwpool.NewPool(c.Logger(), sendUplinkTimeout),
+		gateways:       pool.NewPool(c.Logger(), sendUplinkTimeout),
 		frequencyPlans: fpStore,
 
 		nsTags: conf.NSTags,

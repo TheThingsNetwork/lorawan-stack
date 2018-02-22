@@ -2,7 +2,7 @@
 
 package gatewayserver
 
-import "github.com/TheThingsNetwork/ttn/pkg/gatewayserver/frequencyplans"
+import "github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
 
 // Config represents the GatewayServer configuration.
 type Config struct {
