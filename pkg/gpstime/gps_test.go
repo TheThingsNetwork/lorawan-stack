@@ -1,12 +1,12 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package timeutil_test
+package gpstime_test
 
 import (
 	"testing"
 	"time"
 
-	. "github.com/TheThingsNetwork/ttn/pkg/util/timeutil"
+	. "github.com/TheThingsNetwork/ttn/pkg/gpstime"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -91,11 +91,11 @@ func TestGPSConversion(t *testing.T) {
 		},
 	} {
 		a := assertions.New(t)
-		a.So(GPS(tc.GPS).UnixNano(), should.Resemble, tc.Time.UnixNano())
-		if IsGPSLeap(tc.GPS) {
-			a.So(TimeToGPS(tc.Time), should.Equal, tc.GPS+1)
+		a.So(Parse(tc.GPS).UnixNano(), should.Resemble, tc.Time.UnixNano())
+		if IsLeap(tc.GPS) {
+			a.So(ToGPS(tc.Time), should.Equal, tc.GPS+1)
 		} else {
-			a.So(TimeToGPS(tc.Time), should.Equal, tc.GPS)
+			a.So(ToGPS(tc.Time), should.Equal, tc.GPS)
 		}
 		if a.Failed() {
 			t.Errorf("Time: %s, Unix: %d, GPS: %d", tc.Time, tc.Time.Unix(), tc.GPS)

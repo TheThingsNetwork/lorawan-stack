@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/util/timeutil"
+	"github.com/TheThingsNetwork/ttn/pkg/gpstime"
 )
 
 // MACCommandIdentifier_uplinkLength gives the payload length of a MAC command in the uplink direction.
@@ -946,7 +946,7 @@ const maxGPSTime int64 = 1<<32 - 1
 // AppendLoRaWAN appends the marshaled DeviceTimeAns CID and payload to the slice.
 func (m *MACCommand_DeviceTimeAns) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	dst = append(dst, byte(CID_DEVICE_TIME))
-	sec := timeutil.TimeToGPS(m.Time)
+	sec := gpstime.ToGPS(m.Time)
 	if sec > maxGPSTime {
 		return nil, errors.Errorf("expected GPS time to be less or equal to %d, got %d", maxGPSTime, sec)
 	}
@@ -965,7 +965,7 @@ func (m *MACCommand_DeviceTimeAns) UnmarshalLoRaWAN(b []byte) error {
 	if err := checkMACCommand(CID_DEVICE_TIME, "DeviceTimeAns", b, 5); err != nil {
 		return err
 	}
-	m.Time = timeutil.GPS(int64(parseUint32(b[1:5])))
+	m.Time = gpstime.Parse(int64(parseUint32(b[1:5])))
 	m.Time = m.Time.Add(time.Duration(b[5]) * fractStep)
 	return nil
 }

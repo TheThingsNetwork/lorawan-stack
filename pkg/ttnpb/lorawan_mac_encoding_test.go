@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/gpstime"
 	. "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/TheThingsNetwork/ttn/pkg/util/timeutil"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -193,7 +193,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			&MACCommand_DeviceTimeAns{
-				Time: timeutil.GPS(0x42ffffff).Add(0x42 * time.Duration(math.Pow(0.5, 8)*float64(time.Second))).UTC(),
+				Time: gpstime.Parse(0x42ffffff).Add(0x42 * time.Duration(math.Pow(0.5, 8)*float64(time.Second))).UTC(),
 			},
 			&MACCommand_DeviceTimeAns{},
 			[]byte{0x0D, 0xff, 0xff, 0xff, 0x42, 0x42},

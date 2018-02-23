@@ -1,7 +1,7 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-// Package timeutil provides utilities to work with time.
-package timeutil
+// Package gpstime provides utilities to work with GPS time.
+package gpstime
 
 import (
 	"time"
@@ -33,8 +33,8 @@ var leaps = [...]int64{
 	1341118800,
 }
 
-// IsGPSLeap reports whether the given GPS time, sec seconds since January 6, 1980 UTC, is a leap second in UTC.
-func IsGPSLeap(sec int64) bool {
+// IsLeap reports whether the given GPS time, sec seconds since January 6, 1980 UTC, is a leap second in UTC.
+func IsLeap(sec int64) bool {
 	i := int64(len(leaps)) - 1
 	for ; i >= 0; i-- {
 		if sec > leaps[i] {
@@ -47,8 +47,8 @@ func IsGPSLeap(sec int64) bool {
 	return false
 }
 
-// GPS returns the local Time corresponding to the given GPS time, sec seconds since January 6, 1980 UTC.
-func GPS(sec int64) time.Time {
+// Parse returns the local Time corresponding to the given Time time, sec seconds since January 6, 1980 UTC.
+func Parse(sec int64) time.Time {
 	i := int64(len(leaps))
 	for ; i > 0; i-- {
 		if sec > leaps[i-1] {
@@ -58,8 +58,8 @@ func GPS(sec int64) time.Time {
 	return time.Unix(sec+gpsEpochSec-i, 0)
 }
 
-// TimeToGPS returns t as a GPS time, the number of seconds elapsed since January 6, 1980 UTC.
-func TimeToGPS(t time.Time) int64 {
+// ToGPS returns t as a ToGPS time, the number of seconds elapsed since January 6, 1980 UTC.
+func ToGPS(t time.Time) int64 {
 	sec := t.Unix() - gpsEpochSec
 
 	i := int64(len(leaps))
