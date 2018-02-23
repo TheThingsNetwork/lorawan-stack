@@ -10,7 +10,7 @@ import (
 	"github.com/golang/protobuf/ptypes/struct"
 )
 
-// Map returns the Struct proto as a map[string]interface{}
+// Map returns the Struct proto as a map[string]interface{}.
 func Map(p *structpb.Struct) (map[string]interface{}, error) {
 	m := make(map[string]interface{}, len(p.Fields))
 	for k, v := range p.Fields {
@@ -26,7 +26,7 @@ func Map(p *structpb.Struct) (map[string]interface{}, error) {
 	return m, nil
 }
 
-// Slice returns the ListValue proto as a []interface{}
+// Slice returns the ListValue proto as a []interface{}.
 func Slice(l *structpb.ListValue) ([]interface{}, error) {
 	s := make([]interface{}, len(l.Values))
 	for i, v := range l.Values {
@@ -39,7 +39,7 @@ func Slice(l *structpb.ListValue) ([]interface{}, error) {
 	return s, nil
 }
 
-// Interface returns the Value proto as an interface{}
+// Interface returns the Value proto as an interface{}.
 func Interface(v *structpb.Value) (interface{}, error) {
 	switch v := v.GetKind().(type) {
 	case *structpb.Value_NullValue:
@@ -59,7 +59,7 @@ func Interface(v *structpb.Value) (interface{}, error) {
 	}
 }
 
-// Struct returns the map as a Struct proto
+// Struct returns the map as a Struct proto.
 func Struct(m map[string]interface{}) (*structpb.Struct, error) {
 	p := &structpb.Struct{
 		Fields: make(map[string]*structpb.Value),
@@ -74,7 +74,7 @@ func Struct(m map[string]interface{}) (*structpb.Struct, error) {
 	return p, nil
 }
 
-// List returns the slice as a ListValue proto
+// List returns the slice as a ListValue proto.
 func List(s []interface{}) (*structpb.ListValue, error) {
 	l := &structpb.ListValue{
 		Values: make([]*structpb.Value, len(s)),
@@ -160,12 +160,12 @@ func valueFromReflect(rv reflect.Value) (*structpb.Value, error) {
 		return &structpb.Value{Kind: &structpb.Value_StringValue{fmt.Sprint(rv.Complex())}}, nil
 
 	default:
-		// either Invalid, Chan. Func, Interface or UnsafePointer
+		// either Invalid, Chan. Func, Interface or UnsafePointer.
 		return nil, errors.Errorf("Can not map a value of kind %s to a *structpb.Value", k)
 	}
 }
 
-// Value returns the value as a Value proto
+// Value returns the value as a Value proto.
 func Value(v interface{}) (*structpb.Value, error) {
 	if v == nil {
 		return &structpb.Value{Kind: &structpb.Value_NullValue{}}, nil
