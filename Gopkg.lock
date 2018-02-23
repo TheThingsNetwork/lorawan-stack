@@ -348,8 +348,8 @@
     "registry",
     "token"
   ]
-  revision = "8fcfbcd07daef8b22ab0b215150b2414503852ae"
-  source = "github.com/romeovs/otto"
+  revision = "aa9901fb34a010d4cc504d8b2ecf9ba3850d9161"
+  source = "github.com/johanstokking/otto"
 
 [[projects]]
   name = "github.com/sendgrid/rest"
@@ -593,6 +593,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "5587748998f19d2a97838e42d7983095e531cc3a9e7d21256f6f7c37952b0afb"
+  inputs-digest = "cde13e601c640dbc1ae09e33391c727b55e4bfd65f30bf2961ab1e6a0b12e408"
   solver-name = "gps-cdcl"
   solver-version = 1

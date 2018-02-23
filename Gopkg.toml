@@ -53,4 +53,4 @@
 
 [[constraint]]
   name = "github.com/robertkrimen/otto"
-  source = "github.com/romeovs/otto"
+  source = "github.com/johanstokking/otto"
