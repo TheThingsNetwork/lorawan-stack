@@ -27,6 +27,7 @@ script:
 - git diff --exit-code
 - GOARCH=amd64 make test
 - if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then GOARCH=386 make test; fi # only on pull requests
+- if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make build-all; fi # only on pull requests
 - make js.lint
 - make js.test
 - make js.vulnerabilities
