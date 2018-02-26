@@ -94,7 +94,6 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		if req.InvitationToken == "" {
 			if !isEmailAllowed(req.User.Email, settings.AllowedEmails) {
 				return ErrEmailAddressNotAllowed.New(errors.Attributes{
-					"email":          req.User.Email,
 					"allowed_emails": settings.AllowedEmails,
 				})
 			}
@@ -177,7 +176,6 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 			case ttnpb.FieldPathUserEmail.MatchString(path):
 				if !isEmailAllowed(req.User.Email, settings.AllowedEmails) {
 					return ErrEmailAddressNotAllowed.New(errors.Attributes{
-						"email":          req.User.Email,
 						"allowed_emails": settings.AllowedEmails,
 					})
 				}
@@ -429,9 +427,7 @@ func (s *userService) RequestUserEmailValidation(ctx context.Context, _ *pbtypes
 		user := found.GetUser()
 
 		if !user.ValidatedAt.IsZero() {
-			return ErrEmailAlreadyValidated.New(errors.Attributes{
-				"email": user.Email,
-			})
+			return ErrEmailAlreadyValidated.New(nil)
 		}
 
 		settings, err := tx.Settings.Get()

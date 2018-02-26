@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -93,9 +92,7 @@ func (s *GatewayStore) create(q db.QueryContext, gateway store.Gateway) error {
 		gtw.ClusterAddress)
 
 	if _, yes := db.IsDuplicate(err); yes {
-		return ErrGatewayIDTaken.New(errors.Attributes{
-			"gateway_id": gtw.GatewayID,
-		})
+		return ErrGatewayIDTaken.New(nil)
 	}
 
 	return err
@@ -231,9 +228,7 @@ func (s *GatewayStore) gateway(q db.QueryContext, gtwID string) (*ttnpb.Gateway,
 				WHERE gateway_id = $1`,
 		gtwID)
 	if db.IsNoRows(err) {
-		return nil, ErrGatewayNotFound.New(errors.Attributes{
-			"gateway_id": gtwID,
-		})
+		return nil, ErrGatewayNotFound.New(nil)
 	}
 	if err != nil {
 		return nil, err
@@ -373,9 +368,7 @@ func (s *GatewayStore) update(q db.QueryContext, gateway store.Gateway) error {
 		gtw)
 
 	if db.IsNoRows(err) {
-		return ErrGatewayNotFound.New(errors.Attributes{
-			"gateway_id": gtw.GatewayID,
-		})
+		return ErrGatewayNotFound.New(nil)
 	}
 
 	return err
@@ -592,9 +585,7 @@ func (s *GatewayStore) delete(q db.QueryContext, gtwID string) error {
 			RETURNING gateway_id`,
 		gtwID)
 	if db.IsNoRows(err) {
-		return ErrGatewayNotFound.New(errors.Attributes{
-			"gateway_id": gtwID,
-		})
+		return ErrGatewayNotFound.New(nil)
 	}
 	return err
 }

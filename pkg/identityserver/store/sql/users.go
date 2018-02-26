@@ -70,15 +70,11 @@ func (s *UserStore) create(q db.QueryContext, user store.User) error {
 		u)
 
 	if duplicates, yes := db.IsDuplicate(err); yes {
-		if email, duplicated := duplicates["email"]; duplicated {
-			return ErrUserEmailTaken.New(errors.Attributes{
-				"email": email,
-			})
+		if _, duplicated := duplicates["email"]; duplicated {
+			return ErrUserEmailTaken.New(nil)
 		}
-		if userID, duplicated := duplicates["user_id"]; duplicated {
-			return ErrUserIDTaken.New(errors.Attributes{
-				"user_id": userID,
-			})
+		if _, duplicated := duplicates["user_id"]; duplicated {
+			return ErrUserIDTaken.New(nil)
 		}
 	}
 
@@ -110,9 +106,7 @@ func (s *UserStore) getByID(q db.QueryContext, userID string) (*ttnpb.User, erro
 			WHERE user_id = lower($1)`,
 		userID)
 	if db.IsNoRows(err) {
-		return nil, ErrUserNotFound.New(errors.Attributes{
-			"user_id": userID,
-		})
+		return nil, ErrUserNotFound.New(nil)
 	}
 	if err != nil {
 		return nil, err
@@ -145,9 +139,7 @@ func (s *UserStore) getByEmail(q db.QueryContext, email string) (*ttnpb.User, er
 			WHERE email = lower($1)`,
 		email)
 	if db.IsNoRows(err) {
-		return nil, ErrUserEmailNotFound.New(errors.Attributes{
-			"email": email,
-		})
+		return nil, ErrUserNotFound.New(nil)
 	}
 	if err != nil {
 		return nil, err
@@ -224,9 +216,7 @@ func (s *UserStore) update(q db.QueryContext, user store.User) error {
 		u)
 
 	if _, yes := db.IsDuplicate(err); yes {
-		return ErrUserEmailTaken.New(errors.Attributes{
-			"email": u.Email,
-		})
+		return ErrUserEmailTaken.New(nil)
 	}
 
 	return err
@@ -353,9 +343,7 @@ func (s *UserStore) delete(q db.QueryContext, userID string) error {
 			RETURNING user_id`,
 		userID)
 	if db.IsNoRows(err) {
-		return ErrUserNotFound.New(errors.Attributes{
-			"user_id": userID,
-		})
+		return ErrUserNotFound.New(nil)
 	}
 	return err
 }

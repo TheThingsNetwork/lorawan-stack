@@ -83,9 +83,7 @@ func (s *ClientStore) create(q db.QueryContext, client store.Client) error {
 		cli)
 
 	if _, yes := db.IsDuplicate(err); yes {
-		return ErrClientIDTaken.New(errors.Attributes{
-			"client_id": cli.ClientID,
-		})
+		return ErrClientIDTaken.New(nil)
 	}
 
 	return err
@@ -133,9 +131,7 @@ func (s *ClientStore) getByID(q db.QueryContext, clientID string) (*ttnpb.Client
 			WHERE client_id = $1`,
 		clientID)
 	if db.IsNoRows(err) {
-		return nil, ErrClientNotFound.New(errors.Attributes{
-			"client_id": clientID,
-		})
+		return nil, ErrClientNotFound.New(nil)
 	}
 
 	if err != nil {
@@ -344,9 +340,7 @@ func (s *ClientStore) update(q db.QueryContext, client store.Client) error {
 		cli)
 
 	if db.IsNoRows(err) {
-		return ErrClientNotFound.New(errors.Attributes{
-			"client_id": cli.ClientID,
-		})
+		return ErrClientNotFound.New(nil)
 	}
 
 	return err
@@ -393,9 +387,7 @@ func (s *ClientStore) delete(q db.QueryContext, clientID string) error {
 			RETURNING client_id`,
 		clientID)
 	if db.IsNoRows(err) {
-		return ErrClientNotFound.New(errors.Attributes{
-			"client_id": clientID,
-		})
+		return ErrClientNotFound.New(nil)
 	}
 	return err
 }

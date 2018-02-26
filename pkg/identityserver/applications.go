@@ -290,7 +290,6 @@ func (s *applicationService) SetApplicationCollaborator(ctx context.Context, req
 		}
 
 		return ErrSetApplicationCollaboratorFailed.New(errors.Attributes{
-			"application_id": req.ApplicationID,
 			"missing_rights": rights,
 		})
 	})

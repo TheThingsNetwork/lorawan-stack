@@ -323,7 +323,6 @@ func (s *gatewayService) SetGatewayCollaborator(ctx context.Context, req *ttnpb.
 		}
 
 		return ErrSetGatewayCollaboratorFailed.New(errors.Attributes{
-			"gateway_id":     req.GatewayID,
 			"missing_rights": rights,
 		})
 	})

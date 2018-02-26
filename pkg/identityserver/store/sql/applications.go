@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -54,9 +53,7 @@ func (s *ApplicationStore) create(q db.QueryContext, application store.Applicati
 		app)
 
 	if _, yes := db.IsDuplicate(err); yes {
-		return ErrApplicationIDTaken.New(errors.Attributes{
-			"application_id": app.ApplicationID,
-		})
+		return ErrApplicationIDTaken.New(nil)
 	}
 
 	return err
@@ -87,9 +84,7 @@ func (s *ApplicationStore) getByID(q db.QueryContext, appID string) (*ttnpb.Appl
 			WHERE application_id = $1`,
 		appID)
 	if db.IsNoRows(err) {
-		return nil, ErrApplicationNotFound.New(errors.Attributes{
-			"application_id": appID,
-		})
+		return nil, ErrApplicationNotFound.New(nil)
 	}
 	if err != nil {
 		return nil, err
@@ -187,9 +182,7 @@ func (s *ApplicationStore) update(q db.QueryContext, application store.Applicati
 		app)
 
 	if db.IsNoRows(err) {
-		return ErrApplicationNotFound.New(errors.Attributes{
-			"application_id": app.ApplicationID,
-		})
+		return ErrApplicationNotFound.New(nil)
 	}
 
 	return err
@@ -226,9 +219,7 @@ func (s *ApplicationStore) delete(q db.QueryContext, appID string) error {
 			RETURNING application_id`,
 		appID)
 	if db.IsNoRows(err) {
-		return ErrApplicationNotFound.New(errors.Attributes{
-			"application_id": appID,
-		})
+		return ErrApplicationNotFound.New(nil)
 	}
 	return err
 }

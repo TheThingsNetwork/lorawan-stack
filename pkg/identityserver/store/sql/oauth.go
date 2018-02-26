@@ -3,7 +3,6 @@
 package sql
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 )
@@ -388,10 +387,7 @@ func (s *OAuthStore) RevokeAuthorizedClient(userID, clientID string) error {
 		return err
 	}
 	if rows == 0 {
-		return ErrAuthorizedClientNotFound.New(errors.Attributes{
-			"user_id":   userID,
-			"client_id": clientID,
-		})
+		return ErrAuthorizedClientNotFound.New(nil)
 	}
 	return nil
 }

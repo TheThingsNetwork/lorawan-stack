@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -103,9 +102,7 @@ func (s *OrganizationStore) getByID(q db.QueryContext, organizationID string) (*
 			WHERE organization_id = $1`,
 		organizationID)
 	if db.IsNoRows(err) {
-		return nil, ErrOrganizationNotFound.New(errors.Attributes{
-			"organization_id": organizationID,
-		})
+		return nil, ErrOrganizationNotFound.New(nil)
 	}
 	if err != nil {
 		return nil, err
@@ -193,9 +190,7 @@ func (s *OrganizationStore) update(q db.QueryContext, organization store.Organiz
 		org)
 
 	if db.IsNoRows(err) {
-		return ErrOrganizationNotFound.New(errors.Attributes{
-			"organization_id": org.OrganizationID,
-		})
+		return ErrOrganizationNotFound.New(nil)
 	}
 
 	return err
@@ -267,9 +262,7 @@ func (s *OrganizationStore) delete(q db.QueryContext, organizationID string) err
 			RETURNING organization_id`,
 		organizationID)
 	if db.IsNoRows(err) {
-		return ErrOrganizationNotFound.New(errors.Attributes{
-			"organization_id": id,
-		})
+		return ErrOrganizationNotFound.New(nil)
 	}
 	return err
 }

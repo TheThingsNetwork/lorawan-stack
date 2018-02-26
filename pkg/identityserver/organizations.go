@@ -276,8 +276,7 @@ func (s *organizationService) SetOrganizationMember(ctx context.Context, req *tt
 		}
 
 		return ErrSetOrganizationMemberFailed.New(errors.Attributes{
-			"organization_id": req.OrganizationID,
-			"missing_rights":  rights,
+			"missing_rights": rights,
 		})
 	})
 

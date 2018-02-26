@@ -23,7 +23,6 @@ func init() {
 	ErrAuthorizedClientNotFound.Register()
 
 	ErrUserNotFound.Register()
-	ErrUserEmailNotFound.Register()
 	ErrUserIDTaken.Register()
 	ErrUserEmailTaken.Register()
 	ErrValidationTokenNotFound.Register()
@@ -44,71 +43,53 @@ func init() {
 // ErrApplicationNotFound is returned when trying to fetch an application that
 // does not exist.
 var ErrApplicationNotFound = &errors.ErrDescriptor{
-	MessageFormat: "Application `{application_id}` does not exist",
+	MessageFormat: "Application does not exist",
 	Code:          1,
 	Type:          errors.NotFound,
-	SafeAttributes: []string{
-		"application_id",
-	},
 }
 
 // ErrApplicationIDTaken is returned when trying to create a new application
 // with an ID that already exists.
 var ErrApplicationIDTaken = &errors.ErrDescriptor{
-	MessageFormat: "Application id `{application_id}` is already taken",
+	MessageFormat: "Application id is already taken",
 	Code:          2,
 	Type:          errors.AlreadyExists,
-	SafeAttributes: []string{
-		"application_id",
-	},
 }
 
 // ErrClientNotFound is returned when trying to fetch a client that does not exists.
 var ErrClientNotFound = &errors.ErrDescriptor{
-	MessageFormat: "Client `{client_id}` does not exist",
+	MessageFormat: "Client does not exist",
 	Code:          20,
 	Type:          errors.NotFound,
-	SafeAttributes: []string{
-		"client_id",
-	},
 }
 
 // ErrClientIDTaken is returned when trying to create a new client with an ID.
 // that already exists
 var ErrClientIDTaken = &errors.ErrDescriptor{
-	MessageFormat: "Client id `{client_id}` is already taken",
+	MessageFormat: "Client id is already taken",
 	Code:          21,
 	Type:          errors.AlreadyExists,
-	SafeAttributes: []string{
-		"client_id",
-	},
 }
 
 // ErrGatewayNotFound is returned when trying to fetch a gateway that does not exist.
 var ErrGatewayNotFound = &errors.ErrDescriptor{
-	MessageFormat: "Gateway `{gateway_id}` does not exist",
+	MessageFormat: "Gateway does not exist",
 	Code:          300,
 	Type:          errors.NotFound,
-	SafeAttributes: []string{
-		"gateway_id",
-	},
 }
 
 // ErrGatewayIDTaken is returned when trying to create a new gateway with an ID
 // that already exists.
 var ErrGatewayIDTaken = &errors.ErrDescriptor{
-	MessageFormat: "Gateway id `{gateway_id}` is already taken",
+	MessageFormat: "Gateway id is already taken",
 	Code:          301,
 	Type:          errors.AlreadyExists,
-	SafeAttributes: []string{
-		"gateway_id",
-	},
 }
 
-// ErrAuthorizationCodeNotFound is returned when trying to fetch or delete an authorization code that
-// does not exist.
+// ErrAuthorizationCodeNotFound is returned when trying to fetch or delete an
+// authorization code that does not exist.
 var ErrAuthorizationCodeNotFound = &errors.ErrDescriptor{
-	MessageFormat: "Authorization code token does not exist",
+	MessageFormat: "Authorization code does not exist",
 	Code:          501,
 	Type:          errors.NotFound,
 }
@@ -117,7 +98,7 @@ var ErrAuthorizationCodeNotFound = &errors.ErrDescriptor{
 var ErrAuthorizationCodeConflict = &errors.ErrDescriptor{
 	MessageFormat: "Authorization code already exists",
 	Code:          502,
-	Type:          errors.Conflict,
+	Type:          errors.AlreadyExists,
 }
 
 // ErrRefreshTokenNotFound is returned when trying to fetch or delete a refresh token that
@@ -132,7 +113,7 @@ var ErrRefreshTokenNotFound = &errors.ErrDescriptor{
 var ErrRefreshTokenConflict = &errors.ErrDescriptor{
 	MessageFormat: "Refresh token already exists",
 	Code:          504,
-	Type:          errors.Conflict,
+	Type:          errors.AlreadyExists,
 }
 
 // ErrAccessTokenNotFound is returned when trying to fetch or delete an access
@@ -148,62 +129,38 @@ var ErrAccessTokenNotFound = &errors.ErrDescriptor{
 var ErrAccessTokenConflict = &errors.ErrDescriptor{
 	MessageFormat: "Access token already exists",
 	Code:          506,
-	Type:          errors.Conflict,
+	Type:          errors.AlreadyExists,
 }
 
 // ErrAuthorizedClientNotFound is returned when an user tries to revoke a
 // non-existent authorized client.
 var ErrAuthorizedClientNotFound = &errors.ErrDescriptor{
-	MessageFormat: "User `{user_id}` has not authorized client `{client_id}`",
+	MessageFormat: "Client is not authorized",
 	Code:          507,
 	Type:          errors.NotFound,
-	SafeAttributes: []string{
-		"user_id",
-		"client_id",
-	},
 }
 
 // ErrUserNotFound is returned when trying to fetch an user that does not exist.
 var ErrUserNotFound = &errors.ErrDescriptor{
-	MessageFormat: "User `{user_id}` does not exist",
+	MessageFormat: "User does not exist",
 	Code:          400,
 	Type:          errors.NotFound,
-	SafeAttributes: []string{
-		"user_id",
-	},
-}
-
-// ErrUserEmailNotFound is returned when trying to find an user with an email
-// that does not exist.
-var ErrUserEmailNotFound = &errors.ErrDescriptor{
-	MessageFormat: "User with email address `{email}` does not exist",
-	Code:          401,
-	Type:          errors.NotFound,
-	SafeAttributes: []string{
-		"email",
-	},
 }
 
 // ErrUserIDTaken is returned when trying to create a new user with an ID that
 // is already taken.
 var ErrUserIDTaken = &errors.ErrDescriptor{
-	MessageFormat: "User ID `{user_id}` is already taken",
+	MessageFormat: "User id is already taken",
 	Code:          402,
 	Type:          errors.AlreadyExists,
-	SafeAttributes: []string{
-		"user_id",
-	},
 }
 
 // ErrUserEmailTaken is returned when trying to create a new user with an
 // email that is already taken.
 var ErrUserEmailTaken = &errors.ErrDescriptor{
-	MessageFormat: "Email address `{email}` is already taken by another account",
+	MessageFormat: "Email address is already taken by another account",
 	Code:          403,
 	Type:          errors.AlreadyExists,
-	SafeAttributes: []string{
-		"email",
-	},
 }
 
 // ErrValidationTokenNotFound is returned when trying to get a token that does not exist.
@@ -215,29 +172,23 @@ var ErrValidationTokenNotFound = &errors.ErrDescriptor{
 
 // ErrAPIKeyNotFound is returned when trying to fetch an API key that does not exist.
 var ErrAPIKeyNotFound = &errors.ErrDescriptor{
-	MessageFormat: "API key `{name}` does not exist",
+	MessageFormat: "API key does not exist",
 	Code:          405,
 	Type:          errors.NotFound,
-	SafeAttributes: []string{
-		"name",
-	},
 }
 
 // ErrAPIKeyNameConflict is returned when trying to create an API key with a name
 // that already exists in the namespace.
 var ErrAPIKeyNameConflict = &errors.ErrDescriptor{
-	MessageFormat: "API key name `{name}` is already taken",
+	MessageFormat: "API key name is already taken",
 	Code:          406,
-	Type:          errors.Conflict,
-	SafeAttributes: []string{
-		"name",
-	},
+	Type:          errors.AlreadyExists,
 }
 
 // ErrSettingsNotFound is returned when trying to fetch the Identity Server
 // settings from the database but these are not set.
 var ErrSettingsNotFound = &errors.ErrDescriptor{
-	MessageFormat: "settings not found",
+	MessageFormat: "Settings not found",
 	Code:          407,
 	Type:          errors.NotFound,
 }
@@ -252,32 +203,23 @@ var ErrInvitationNotFound = &errors.ErrDescriptor{
 // ErrOrganizationIDTaken is returned when trying to create an organization using
 // an ID that is already in use by an user or organization.
 var ErrOrganizationIDTaken = &errors.ErrDescriptor{
-	MessageFormat: "Organization id `{organization_id}` is already taken",
+	MessageFormat: "Organization id is already taken",
 	Code:          409,
-	Type:          errors.Conflict,
-	SafeAttributes: []string{
-		"organization_id",
-	},
+	Type:          errors.AlreadyExists,
 }
 
 // ErrOrganizationNotFound is returned when trying to fetch an organization that
 // does not exists.
 var ErrOrganizationNotFound = &errors.ErrDescriptor{
-	MessageFormat: "Organization `{organization_id}` does not exist",
+	MessageFormat: "Organization does not exist",
 	Code:          410,
 	Type:          errors.NotFound,
-	SafeAttributes: []string{
-		"organization_id",
-	},
 }
 
 // ErrAccountIDNotFound is returned when trying to delete either an user or
 // organization that does not exist.
 var ErrAccountIDNotFound = &errors.ErrDescriptor{
-	MessageFormat: "Account `{account_id}` does not exist",
+	MessageFormat: "Account does not exist",
 	Code:          411,
 	Type:          errors.NotFound,
-	SafeAttributes: []string{
-		"account_id",
-	},
 }

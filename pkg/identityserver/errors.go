@@ -18,21 +18,22 @@ func init() {
 	ErrSetOrganizationMemberFailed.Register()
 }
 
-// ErrBlacklistedID is returned when trying to register an entity using a blacklisted ID.
+// ErrBlacklistedID is returned when trying to register an entity using a
+// blacklisted ID.
 var ErrBlacklistedID = &errors.ErrDescriptor{
-	MessageFormat:  "`{id} is not an allowed ID",
+	MessageFormat:  "`{id}` is not an allowed ID",
 	Code:           1,
 	Type:           errors.InvalidArgument,
 	SafeAttributes: []string{"id"},
 }
 
-// ErrEmailAddressNotAllowed is returned when trying to set in a user account an
-// email address that is not allowed
+// ErrEmailAddressNotAllowed is returned when trying to set in an user account
+// an email address that is not allowed.
 var ErrEmailAddressNotAllowed = &errors.ErrDescriptor{
-	MessageFormat:  "Email address `{email}` is not allowed. Current allowed email addresses by the network administrators are in the following form: {allowed_emails}",
+	MessageFormat:  "Email address is not allowed. Current allowed email addresses by the network administrators are in the following form: {allowed_emails}",
 	Code:           2,
 	Type:           errors.InvalidArgument,
-	SafeAttributes: []string{"email", "allowed_emails"},
+	SafeAttributes: []string{"allowed_emails"},
 }
 
 // ErrInvalidPassword is returned when trying to update the user's account
@@ -40,7 +41,7 @@ var ErrEmailAddressNotAllowed = &errors.ErrDescriptor{
 var ErrInvalidPassword = &errors.ErrDescriptor{
 	MessageFormat: "Invalid password",
 	Code:          3,
-	Type:          errors.Unauthorized,
+	Type:          errors.InvalidArgument,
 }
 
 // ErrNotAuthorized is returned when trying to access a protected resource without
@@ -53,31 +54,32 @@ var ErrNotAuthorized = &errors.ErrDescriptor{
 
 // ErrSetApplicationCollaboratorFailed is returned when after modifying an
 // application's collaborators the application reaches an unmanageable state
-// as
+// as the sum of rights that all collaborators with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS`
+// right is not equal to the entire set of available `RIGHT_APPLICATION_XXXXXX` rights.
 var ErrSetApplicationCollaboratorFailed = &errors.ErrDescriptor{
-	MessageFormat:  "Application `{application_id}` becomes unmanageable as no collaborator with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` has the following rights: {missing_rights} ",
+	MessageFormat:  "Failed to set collaborator: application becomes unmanageable as no collaborator with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` has the following rights: {missing_rights}",
 	Code:           5,
-	Type:           errors.Unauthorized,
-	SafeAttributes: []string{"application_id", "missing_rights"},
+	Type:           errors.InvalidArgument,
+	SafeAttributes: []string{"missing_rights"},
 }
 
-// ErrSetGatewayCollaboratorFailed is returned when after modifying the
-// collaborators of a gateway there is no collaborator with
-// `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` right.
+// ErrSetGatewayCollaboratorFailed is returned when after modifying a gateway's
+// collaborators the gateway reaches an unmanageable state as the sum of
+// rights that all collaborators with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS`
+// right is not equal to the entire set of available `RIGHT_GATEWAY_XXXXXX` rights.
 var ErrSetGatewayCollaboratorFailed = &errors.ErrDescriptor{
-	MessageFormat:  "Failed to modify collaborators: gateway `{gateway_id}` must have at least one collaborator with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` right",
+	MessageFormat:  "Failed to set collaborator: gateway becomes unmanageable as no collaborator with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` has the following rights: {missing_rights}",
 	Code:           6,
-	Type:           errors.Conflict,
-	SafeAttributes: []string{"gateway_id"},
+	Type:           errors.InvalidArgument,
+	SafeAttributes: []string{"missing_rights"},
 }
 
 // ErrEmailAlreadyValidated is returned when calling 'RequestUserEmailValidation'
 // when the email is already validated.
 var ErrEmailAlreadyValidated = &errors.ErrDescriptor{
-	MessageFormat:  "Email `{email}` is already validated",
-	Code:           7,
-	Type:           errors.Unauthorized,
-	SafeAttributes: []string{"email"},
+	MessageFormat: "Email address is already validated",
+	Code:          7,
+	Type:          errors.InvalidArgument,
 }
 
 // ErrValidationTokenExpired is returned when trying to validate an email address
@@ -85,7 +87,7 @@ var ErrEmailAlreadyValidated = &errors.ErrDescriptor{
 var ErrValidationTokenExpired = &errors.ErrDescriptor{
 	MessageFormat: "Token is expired",
 	Code:          8,
-	Type:          errors.Unauthorized,
+	Type:          errors.PermissionDenied,
 }
 
 // ErrInvitationTokenMissing is returned when making a call to `CreateUser` with
@@ -93,23 +95,24 @@ var ErrValidationTokenExpired = &errors.ErrDescriptor{
 var ErrInvitationTokenMissing = &errors.ErrDescriptor{
 	MessageFormat: "Self account registration is disabled: a valid invitation token must be provided",
 	Code:          9,
-	Type:          errors.Unauthorized,
+	Type:          errors.InvalidArgument,
 }
 
 // ErrEmailAddressAlreadyUsed is returned when an admin is trying to send an
 // invitation to an email that is already being used by an user.
 var ErrEmailAddressAlreadyUsed = &errors.ErrDescriptor{
-	MessageFormat: "Failed to issue invitation: the email address `{email}` is already in use",
+	MessageFormat: "Failed to issue invitation: the email address is already in use",
 	Code:          10,
-	Type:          errors.Unauthorized,
+	Type:          errors.InvalidArgument,
 }
 
-// ErrSetOrganizationMemberFailed is returned when trying to unset or revoke
-// rights to an organization member so the organization is left without at least
-// one member with `RIGHT_ORGANIZATION_SETTINGS_MEMBERS` right.
+// ErrSetOrganizationMemberFailed is returned when after modifying an organization's
+// members the organization reaches an unmanageable state as the sum of rights
+// that all members with `RIGHT_ORGANIZATION_SETTINGS_MEMBERS` right is not equal
+// to the entire set of available `RIGHT_ORGANIZATION_XXXXXX` rights.
 var ErrSetOrganizationMemberFailed = &errors.ErrDescriptor{
-	MessageFormat:  "Failed to modify members: organization `{organization_id}` must have at least one member with `RIGHT_ORGANIZATION_SETTINGS_MEMBERS` right",
+	MessageFormat:  "Failed to set member: organization becomes unmanageable as no member with `RIGHT_ORGANIZATION_SETTINGS_MEMBERS` has the following rights: {missing_rights}",
 	Code:           11,
-	Type:           errors.Unauthorized,
-	SafeAttributes: []string{"organization_id"},
+	Type:           errors.InvalidArgument,
+	SafeAttributes: []string{"missing_rights"},
 }

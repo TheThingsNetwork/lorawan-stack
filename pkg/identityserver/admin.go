@@ -348,15 +348,13 @@ func (s *adminService) SendInvitation(ctx context.Context, req *ttnpb.SendInvita
 	err = s.store.Transact(func(tx *store.Store) (err error) {
 		// check whether email is already registered or not
 		found, err := tx.Users.GetByEmail(req.Email, s.config.Specializers.User)
-		if err != nil && !sql.ErrUserEmailNotFound.Describes(err) {
+		if err != nil && !sql.ErrUserNotFound.Describes(err) {
 			return err
 		}
 
 		// if email is already being used return error
 		if found != nil {
-			return ErrEmailAddressAlreadyUsed.New(errors.Attributes{
-				"email": req.Email,
-			})
+			return ErrEmailAddressAlreadyUsed.New(nil)
 		}
 
 		// otherwise proceed to issue invitation
