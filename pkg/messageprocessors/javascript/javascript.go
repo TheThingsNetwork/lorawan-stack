@@ -40,7 +40,7 @@ func (h *host) createEnvironment(model *ttnpb.EndDeviceModel) map[string]interfa
 func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *ttnpb.EndDeviceModel, script string) (*ttnpb.DownlinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
-		return nil, messageprocessors.ErrNotMACPayload.New(nil)
+		return nil, messageprocessors.ErrNoMACPayload.New(nil)
 	}
 
 	decoded := payload.DecodedPayload
@@ -118,7 +118,7 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, model *ttnpb.EndDeviceModel, script string) (*ttnpb.UplinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
-		return nil, messageprocessors.ErrNotMACPayload.New(nil)
+		return nil, messageprocessors.ErrNoMACPayload.New(nil)
 	}
 
 	env := h.createEnvironment(model)

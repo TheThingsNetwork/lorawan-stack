@@ -4,14 +4,14 @@ package messageprocessors
 
 import "github.com/TheThingsNetwork/ttn/pkg/errors"
 
-// ErrNotMACPayload represents the ErrDescriptor of the error returned when the message does not
+// ErrNoMACPayload represents the ErrDescriptor of the error returned when the message does not
 // contain MACPayload.
-var ErrNotMACPayload = &errors.ErrDescriptor{
+var ErrNoMACPayload = &errors.ErrDescriptor{
 	MessageFormat: "Message does not contain MAC payload",
 	Type:          errors.InvalidArgument,
 	Code:          1,
 }
 
 func init() {
-	ErrNotMACPayload.Register()
+	ErrNoMACPayload.Register()
 }
