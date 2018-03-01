@@ -108,7 +108,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, model, script)
-		a.So(scripting.ErrInvalidOutputRange.Describes(err), should.BeTrue)
+		a.So(err, errshould.Describe, scripting.ErrInvalidOutputRange)
 	}
 
 	// Return invalid type.
@@ -119,7 +119,31 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, model, script)
-		a.So(scripting.ErrInvalidOutputType.Describes(err), should.BeTrue)
+		a.So(err, errshould.Describe, scripting.ErrInvalidOutputType)
+	}
+
+	// Return nothing.
+	{
+		script := `
+		function Encoder(payload, fport) {
+			return null
+		}
+		`
+		_, err := host.Encode(ctx, message, model, script)
+		a.So(err, errshould.Describe, scripting.ErrInvalidOutputType)
+	}
+
+	// Return an object.
+	{
+		script := `
+		function Encoder(payload, fport) {
+			return {
+				value: 42
+			}
+		}
+		`
+		_, err := host.Encode(ctx, message, model, script)
+		a.So(err, errshould.Describe, scripting.ErrInvalidOutputType)
 	}
 }
 

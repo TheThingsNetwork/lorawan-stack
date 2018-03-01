@@ -71,6 +71,12 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 		return nil, err
 	}
 
+	if value == nil || reflect.TypeOf(value).Kind() != reflect.Slice {
+		return nil, scripting.ErrInvalidOutputType.New(errors.Attributes{
+			"type": fmt.Sprintf("%T", value),
+		})
+	}
+
 	slice := reflect.ValueOf(value)
 	l := slice.Len()
 	payload.FRMPayload = make([]byte, l)
