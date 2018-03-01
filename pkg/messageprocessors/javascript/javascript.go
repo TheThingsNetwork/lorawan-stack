@@ -17,14 +17,12 @@ import (
 )
 
 type host struct {
-	ctx    context.Context
 	engine scripting.Engine
 }
 
 // New creates and returns a new Javascript payload encoder and decoder.
-func New(ctx context.Context) messageprocessors.PayloadEncodeDecoder {
+func New() messageprocessors.PayloadEncodeDecoder {
 	return &host{
-		ctx:    ctx,
 		engine: js.New(scripting.DefaultOptions),
 	}
 }
@@ -39,7 +37,7 @@ func (h *host) createEnvironment(model *ttnpb.EndDeviceModel) map[string]interfa
 }
 
 // Encode encodes the message's MAC payload DecodedPayload to FRMPayload using script.
-func (h *host) Encode(model *ttnpb.EndDeviceModel, script string, msg *ttnpb.DownlinkMessage) (*ttnpb.DownlinkMessage, error) {
+func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *ttnpb.EndDeviceModel, script string) (*ttnpb.DownlinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
 		return nil, messageprocessors.ErrNotMACPayload.New(nil)
@@ -68,7 +66,7 @@ func (h *host) Encode(model *ttnpb.EndDeviceModel, script string, msg *ttnpb.Dow
 		Encoder(env.payload, env.fport)
 	`, script)
 
-	value, err := h.engine.Run(h.ctx, script, env)
+	value, err := h.engine.Run(ctx, script, env)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +115,7 @@ func (h *host) Encode(model *ttnpb.EndDeviceModel, script string, msg *ttnpb.Dow
 }
 
 // Decode decodes the message's MAC payload FRMPayload to DecodedPayload using script.
-func (h *host) Decode(model *ttnpb.EndDeviceModel, script string, msg *ttnpb.UplinkMessage) (*ttnpb.UplinkMessage, error) {
+func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, model *ttnpb.EndDeviceModel, script string) (*ttnpb.UplinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
 		return nil, messageprocessors.ErrNotMACPayload.New(nil)
@@ -136,7 +134,7 @@ func (h *host) Decode(model *ttnpb.EndDeviceModel, script string, msg *ttnpb.Upl
 		Decoder(env.payload, env.fport)
 	`, script)
 
-	value, err := h.engine.Run(h.ctx, script, env)
+	value, err := h.engine.Run(ctx, script, env)
 	if err != nil {
 		return nil, err
 	}

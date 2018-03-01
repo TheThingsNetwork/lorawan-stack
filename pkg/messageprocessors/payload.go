@@ -3,17 +3,19 @@
 package messageprocessors
 
 import (
+	"context"
+
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 // PayloadEncoder represents a payload encoder message processor.
 type PayloadEncoder interface {
-	Encode(model *ttnpb.EndDeviceModel, parameter string, message *ttnpb.DownlinkMessage) (*ttnpb.DownlinkMessage, error)
+	Encode(ctx context.Context, message *ttnpb.DownlinkMessage, model *ttnpb.EndDeviceModel, parameter string) (*ttnpb.DownlinkMessage, error)
 }
 
 // PayloadDecoder represents a payload decoder message processor.
 type PayloadDecoder interface {
-	Decode(model *ttnpb.EndDeviceModel, parameter string, message *ttnpb.UplinkMessage) (*ttnpb.UplinkMessage, error)
+	Decode(ctx context.Context, message *ttnpb.UplinkMessage, model *ttnpb.EndDeviceModel, parameter string) (*ttnpb.UplinkMessage, error)
 }
 
 // PayloadEncodeDecoder is the interface that groups the Encode and Decode methods.

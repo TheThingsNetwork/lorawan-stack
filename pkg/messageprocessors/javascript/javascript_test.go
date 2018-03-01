@@ -20,7 +20,7 @@ func TestEncode(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := context.Background()
-	host := javascript.New(ctx)
+	host := javascript.New()
 
 	model := &ttnpb.EndDeviceModel{
 		Brand:           "The Things Products",
@@ -54,7 +54,7 @@ func TestEncode(t *testing.T) {
 			return [1, 2, 3]
 		}
 		`
-		output, err := host.Encode(model, script, message)
+		output, err := host.Encode(ctx, message, model, script)
 		a.So(err, should.BeNil)
 		a.So(output.Payload.GetMACPayload().FRMPayload, should.Resemble, []byte{1, 2, 3})
 	}
@@ -70,7 +70,7 @@ func TestEncode(t *testing.T) {
 			]
 		}
 		`
-		output, err := host.Encode(model, script, message)
+		output, err := host.Encode(ctx, message, model, script)
 		a.So(err, should.BeNil)
 		a.So(output.Payload.GetMACPayload().FRMPayload, should.Resemble, []byte{247, 174})
 	}
@@ -91,12 +91,12 @@ func TestEncode(t *testing.T) {
 			}
 		}
 		`
-		output, err := host.Encode(model, script, message)
+		output, err := host.Encode(ctx, message, model, script)
 		a.So(err, should.BeNil)
 		a.So(output.Payload.GetMACPayload().FRMPayload, should.Resemble, []byte{247, 174})
 
 		model.Model = "L-Tek FF1705"
-		_, err = host.Encode(model, script, message)
+		_, err = host.Encode(ctx, message, model, script)
 		a.So(err, errshould.Describe, scripting.ErrRuntime)
 	}
 
@@ -107,7 +107,7 @@ func TestEncode(t *testing.T) {
 			return [300, 0, 1]
 		}
 		`
-		_, err := host.Encode(model, script, message)
+		_, err := host.Encode(ctx, message, model, script)
 		a.So(scripting.ErrInvalidOutputRange.Describes(err), should.BeTrue)
 	}
 
@@ -118,7 +118,7 @@ func TestEncode(t *testing.T) {
 			return ['test']
 		}
 		`
-		_, err := host.Encode(model, script, message)
+		_, err := host.Encode(ctx, message, model, script)
 		a.So(scripting.ErrInvalidOutputType.Describes(err), should.BeTrue)
 	}
 }
@@ -127,7 +127,7 @@ func TestDecode(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := context.Background()
-	host := javascript.New(ctx)
+	host := javascript.New()
 
 	model := &ttnpb.EndDeviceModel{
 		Brand:           "The Things Products",
@@ -155,7 +155,7 @@ func TestDecode(t *testing.T) {
 			}
 		}
 		`
-		output, err := host.Decode(model, script, message)
+		output, err := host.Decode(ctx, message, model, script)
 		a.So(err, should.BeNil)
 		m, err := gogoproto.Map(output.Payload.GetMACPayload().DecodedPayload)
 		a.So(err, should.BeNil)
@@ -175,7 +175,7 @@ func TestDecode(t *testing.T) {
 			}
 		}
 		`
-		output, err := host.Decode(model, script, message)
+		output, err := host.Decode(ctx, message, model, script)
 		a.So(err, should.BeNil)
 		m, err := gogoproto.Map(output.Payload.GetMACPayload().DecodedPayload)
 		a.So(err, should.BeNil)
@@ -193,7 +193,7 @@ func TestDecode(t *testing.T) {
 			return 42
 		}
 		`
-		_, err := host.Decode(model, script, message)
+		_, err := host.Decode(ctx, message, model, script)
 		a.So(err, should.NotBeNil)
 	}
 
@@ -204,7 +204,7 @@ func TestDecode(t *testing.T) {
 			throw Error('unknown error')
 		}
 		`
-		_, err := host.Decode(model, script, message)
+		_, err := host.Decode(ctx, message, model, script)
 		a.So(err, should.NotBeNil)
 	}
 }

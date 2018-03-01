@@ -15,7 +15,7 @@ type PayloadDecoderRPC struct {
 
 // Process implements the UplinkMessageProcessorServer interface.
 func (r *PayloadDecoderRPC) Process(ctx context.Context, req *ttnpb.ProcessUplinkMessageRequest) (*ttnpb.UplinkMessage, error) {
-	return r.Decode(&req.DeviceModel, req.Parameter, &req.Message)
+	return r.Decode(ctx, &req.Message, &req.DeviceModel, req.Parameter)
 }
 
 // PayloadEncoderRPC implements the DownlinkMessageProcessorServer using a payload encoder.
@@ -25,5 +25,5 @@ type PayloadEncoderRPC struct {
 
 // Process implements the DownlinkMessageProcessorServer interface.
 func (r *PayloadEncoderRPC) Process(ctx context.Context, req *ttnpb.ProcessDownlinkMessageRequest) (*ttnpb.DownlinkMessage, error) {
-	return r.Encode(&req.DeviceModel, req.Parameter, &req.Message)
+	return r.Encode(ctx, &req.Message, &req.DeviceModel, req.Parameter)
 }
