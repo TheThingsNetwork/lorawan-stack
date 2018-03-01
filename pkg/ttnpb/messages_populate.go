@@ -20,13 +20,23 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 )
 
-func NewPopulatedUplinkMessage(r randyMessages, easy bool) *UplinkMessage {
-	defer func() {
-		if r := recover(); r != nil {
-			log.Errorf("NewPopulatedUplinkMessage: %s", r)
-		}
-	}()
-
+// NewPopulatedUplinkMessage is used for compatibility with gogoproto, and in cases, where the
+// contents of the message are not important. It's advised to use one of:
+// - NewPopulatedUplinkMessageUplink
+// - NewPopulatedUplinkMessageJoinRequest
+// - NewPopulatedUplinkMessageRejoinRequest
+func NewPopulatedUplinkMessage(r randyMessages, easy bool) (msg *UplinkMessage) {
+	switch r.Intn(3) {
+	case 0:
+		return NewPopulatedUplinkMessageUplink(r, *types.NewPopulatedAES128Key(r), *types.NewPopulatedAES128Key(r), r.Intn(2) == 1)
+	case 1:
+		return NewPopulatedUplinkMessageJoinRequest(r)
+	case 2:
+		return NewPopulatedUplinkMessageRejoinRequest(r, RejoinType(r.Intn(3)))
+	}
+	panic("unreachable")
+}
+func NewPopulatedUplinkMessageUplink(r randyLorawan, sNwkSIntKey, fNwkSIntKey types.AES128Key, confirmed bool) *UplinkMessage {
 	out := &UplinkMessage{}
 	out.Settings = *NewPopulatedTxSettings(r, false)
 	out.RxMetadata = make([]RxMetadata, 1+r.Intn(5))
@@ -34,17 +44,70 @@ func NewPopulatedUplinkMessage(r randyMessages, easy bool) *UplinkMessage {
 		out.RxMetadata[i] = *NewPopulatedRxMetadata(r, false)
 	}
 
-	msg := NewPopulatedMessageUplink(r, *types.NewPopulatedAES128Key(r), *types.NewPopulatedAES128Key(r), uint8(out.Settings.DataRateIndex), uint8(out.RxMetadata[0].ChannelIndex), r.Intn(2) == 1)
+	msg := NewPopulatedMessageUplink(r, sNwkSIntKey, fNwkSIntKey, uint8(out.Settings.DataRateIndex), uint8(out.RxMetadata[0].ChannelIndex), confirmed)
 	out.Payload = *msg
+
+	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, false)
+	devAddr := msg.GetMACPayload().DevAddr
+	out.EndDeviceIdentifiers.DevAddr = &devAddr
+
+	var err error
+	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
+	if err != nil {
+		panic(errors.NewWithCause(err, "Failed to encode uplink message to LoRaWAN"))
+	}
+	return out
+}
+
+func NewPopulatedUplinkMessageJoinRequest(r randyLorawan) *UplinkMessage {
+	out := &UplinkMessage{}
+	out.Settings = *NewPopulatedTxSettings(r, false)
+	out.RxMetadata = make([]RxMetadata, 1+r.Intn(5))
+	for i := 0; i < len(out.RxMetadata); i++ {
+		out.RxMetadata[i] = *NewPopulatedRxMetadata(r, false)
+	}
+
+	msg := NewPopulatedMessageJoinRequest(r)
+	out.Payload = *msg
+
+	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, false)
+	joinEUI := msg.GetJoinRequestPayload().JoinEUI
+	out.EndDeviceIdentifiers.JoinEUI = &joinEUI
+
+	devEUI := msg.GetJoinRequestPayload().DevEUI
+	out.EndDeviceIdentifiers.DevEUI = &devEUI
 
 	var err error
 	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
 	if err != nil {
 		panic(errors.NewWithCause(err, "failed to encode uplink message to LoRaWAN"))
 	}
+	return out
+}
+
+func NewPopulatedUplinkMessageRejoinRequest(r randyLorawan, typ RejoinType) *UplinkMessage {
+	out := &UplinkMessage{}
+	out.Settings = *NewPopulatedTxSettings(r, false)
+	out.RxMetadata = make([]RxMetadata, 1+r.Intn(5))
+	for i := 0; i < len(out.RxMetadata); i++ {
+		out.RxMetadata[i] = *NewPopulatedRxMetadata(r, false)
+	}
+
+	msg := NewPopulatedMessageRejoinRequest(r, typ)
+	out.Payload = *msg
+
 	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, false)
-	devAddr := msg.GetMACPayload().DevAddr
-	out.EndDeviceIdentifiers.DevAddr = &devAddr
+	joinEUI := msg.GetRejoinRequestPayload().JoinEUI
+	out.EndDeviceIdentifiers.JoinEUI = &joinEUI
+
+	devEUI := msg.GetRejoinRequestPayload().DevEUI
+	out.EndDeviceIdentifiers.DevEUI = &devEUI
+
+	var err error
+	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
+	if err != nil {
+		panic(errors.NewWithCause(err, "Failed to encode uplink message to LoRaWAN"))
+	}
 	return out
 }
 
