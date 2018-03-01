@@ -112,9 +112,7 @@ func (r *RegistryRPC) ListDevices(ctx context.Context, filter *ttnpb.EndDeviceId
 	if err != nil {
 		return nil, err
 	}
-	if len(devs) == 0 {
-		return nil, ErrDeviceNotFound.New(nil)
-	}
+
 	eds := make([]*ttnpb.EndDevice, len(devs))
 	for i, dev := range devs {
 		eds[i] = dev.EndDevice

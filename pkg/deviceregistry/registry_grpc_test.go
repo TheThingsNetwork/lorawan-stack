@@ -44,8 +44,8 @@ func TestRegistryRPC(t *testing.T) {
 	a.So(v, should.NotBeNil)
 
 	devs, err = dr.ListDevices(context.Background(), &dev.EndDeviceIdentifiers)
-	a.So(err, should.NotBeNil)
-	a.So(devs, should.BeNil)
+	a.So(err, should.BeNil)
+	a.So(devs.EndDevices, should.BeEmpty)
 }
 
 func TestSetDeviceNoCheck(t *testing.T) {
