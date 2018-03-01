@@ -53,6 +53,7 @@ func TypeToGRPCCode(t errors.Type) codes.Code {
 	case errors.ResourceExhausted:
 		return codes.ResourceExhausted
 	case errors.Internal:
+	case errors.External:
 	case errors.Unknown:
 	}
 	return codes.Unknown

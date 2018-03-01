@@ -47,6 +47,8 @@ func TypeToHTTPStatusCode(t errors.Type) int {
 	case errors.ResourceExhausted:
 		return http.StatusForbidden
 	case errors.Internal:
+		fallthrough
+	case errors.External:
 		return http.StatusInternalServerError
 	case errors.Unknown:
 		return http.StatusInternalServerError
