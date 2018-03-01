@@ -10,7 +10,10 @@ JS_LINT_STAGED_FILES = $(JS_STAGED_FILES) | $(no_pb)
 # lint all js files
 js.lint:
 	@$(log) "linting `$(JS_LINT_FILES) | $(count)` js files"
-	@set -o pipefail; ($(JS_LINT_FILES) || exit 0) | xargs $(ESLINT) $(ESLINT_FLAGS) | sed 's:$(PWD)/::'
+	@set -o pipefail;\
+		files=`$(JS_LINT_FILES)`;\
+		[ -n "$${files}" ] && echo $${files} | xargs $(ESLINT) $(ESLINT_FLAGS) | sed 's:$(PWD)/::'\
+		|| exit 0
 
 # lint staged js files
 js.lint-staged: JS_LINT_FILES = $(JS_LINT_STAGED_FILES)
