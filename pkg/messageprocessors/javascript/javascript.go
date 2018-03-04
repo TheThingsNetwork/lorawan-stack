@@ -50,7 +50,7 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 
 	m, err := gogoproto.Map(decoded)
 	if err != nil {
-		return nil, scripting.ErrInvalidInputType.NewWithCause(nil, err)
+		return nil, messageprocessors.ErrInvalidInput.NewWithCause(nil, err)
 	}
 
 	env := h.createEnvironment(model)
@@ -72,9 +72,7 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 	}
 
 	if value == nil || reflect.TypeOf(value).Kind() != reflect.Slice {
-		return nil, scripting.ErrInvalidOutputType.New(errors.Attributes{
-			"type": fmt.Sprintf("%T", value),
-		})
+		return nil, messageprocessors.ErrInvalidOutputType.New(nil)
 	}
 
 	slice := reflect.ValueOf(value)
@@ -93,7 +91,7 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 		case int32:
 			b = int64(i)
 		case int64:
-			b = int64(i)
+			b = i
 		case uint8:
 			b = int64(i)
 		case uint16:
@@ -101,14 +99,12 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 		case uint32:
 			b = int64(i)
 		case uint64:
-			b = i
+			b = int64(i)
 		default:
-			return nil, scripting.ErrInvalidOutputType.New(errors.Attributes{
-				"type": fmt.Sprintf("%T[]", val),
-			})
+			return nil, messageprocessors.ErrInvalidOutput.New(nil)
 		}
 		if b < 0x00 || b > 0xFF {
-			return nil, scripting.ErrInvalidOutputRange.New(errors.Attributes{
+			return nil, messageprocessors.ErrInvalidOutputRange.New(errors.Attributes{
 				"value": b,
 				"low":   0x00,
 				"high":  0xFF,
@@ -147,16 +143,12 @@ func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, model *ttnp
 
 	m, ok := value.(map[string]interface{})
 	if !ok {
-		return nil, scripting.ErrInvalidOutputType.New(errors.Attributes{
-			"type": fmt.Sprintf("%T", value),
-		})
+		return nil, messageprocessors.ErrInvalidOutput.New(nil)
 	}
 
 	s, err := gogoproto.Struct(m)
 	if err != nil {
-		return nil, scripting.ErrInvalidOutputType.NewWithCause(errors.Attributes{
-			"type": fmt.Sprintf("%#v", value),
-		}, err)
+		return nil, messageprocessors.ErrInvalidOutput.NewWithCause(nil, err)
 	}
 
 	payload.DecodedPayload = s

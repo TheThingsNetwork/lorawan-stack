@@ -8,6 +8,7 @@ import (
 
 	errshould "github.com/TheThingsNetwork/ttn/pkg/errors/should"
 	"github.com/TheThingsNetwork/ttn/pkg/gogoproto"
+	"github.com/TheThingsNetwork/ttn/pkg/messageprocessors"
 	"github.com/TheThingsNetwork/ttn/pkg/messageprocessors/javascript"
 	"github.com/TheThingsNetwork/ttn/pkg/scripting"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -108,7 +109,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, model, script)
-		a.So(err, errshould.Describe, scripting.ErrInvalidOutputRange)
+		a.So(err, errshould.Describe, messageprocessors.ErrInvalidOutputRange)
 	}
 
 	// Return invalid type.
@@ -119,7 +120,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, model, script)
-		a.So(err, errshould.Describe, scripting.ErrInvalidOutputType)
+		a.So(err, errshould.Describe, messageprocessors.ErrInvalidOutput)
 	}
 
 	// Return nothing.
@@ -130,7 +131,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, model, script)
-		a.So(err, errshould.Describe, scripting.ErrInvalidOutputType)
+		a.So(err, errshould.Describe, messageprocessors.ErrInvalidOutputType)
 	}
 
 	// Return an object.
@@ -143,7 +144,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, model, script)
-		a.So(err, errshould.Describe, scripting.ErrInvalidOutputType)
+		a.So(err, errshould.Describe, messageprocessors.ErrInvalidOutputType)
 	}
 }
 
