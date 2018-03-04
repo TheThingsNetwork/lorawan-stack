@@ -21,6 +21,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/TheThingsNetwork/go-cayenne-lib"
+  packages = ["cayennelpp"]
+  revision = "ba5c7ac69c198562633ee3ad4c90e16b4b12b88d"
+
+[[projects]]
+  branch = "master"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
   revision = "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9"
@@ -374,8 +380,8 @@
     "internal/oglematchers",
     "should"
   ]
-  revision = "0b37b35ec7434b77e77a4bb29b79677cced992ea"
-  version = "1.8.1"
+  revision = "7678a5452ebea5b7090a6b163f844c133f523da2"
+  version = "1.8.3"
 
 [[projects]]
   name = "github.com/soheilhy/cmux"
@@ -593,6 +599,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "cde13e601c640dbc1ae09e33391c727b55e4bfd65f30bf2961ab1e6a0b12e408"
+  inputs-digest = "fbef8674950995eb75cbb14b6d3c1aedc9dd2b21aca00ece6e4b2fa980e28e16"
   solver-name = "gps-cdcl"
   solver-version = 1
