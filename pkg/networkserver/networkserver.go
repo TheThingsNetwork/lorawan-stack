@@ -55,9 +55,10 @@ type NetworkServer struct {
 
 	NetID types.NetID
 
-	joinServers        *sync.Map // devEUI prefix -> ttnpb.NsJsClient
-	gateways           *sync.Map // gtwID -> ttnpb.NsGsClient
-	applicationServers *sync.Map // appID -> ttnpb.AsNs_LinkApplicationServer
+	joinServers          *sync.Map // devEUI prefix -> ttnpb.NsJsClient
+	gateways             *sync.Map // gtwID -> ttnpb.NsGsClient
+	applicationServersMu *sync.RWMutex
+	applicationServers   map[string]*applicationUplinkStream
 
 	claimedUplinks   *sync.Map // []byte -> struct{}
 	claimedDownlinks *sync.Map // []byte -> struct{}
@@ -74,14 +75,15 @@ type Config struct {
 // New returns new *NetworkServer.
 func New(c *component.Component, conf *Config) *NetworkServer {
 	ns := &NetworkServer{
-		Component:          c,
-		RegistryRPC:        deviceregistry.NewRPC(c, conf.Registry), // TODO: Add checks
-		registry:           conf.Registry,
-		joinServers:        &sync.Map{},
-		applicationServers: &sync.Map{},
-		gateways:           &sync.Map{},
-		claimedUplinks:     &sync.Map{},
-		claimedDownlinks:   &sync.Map{},
+		Component:            c,
+		RegistryRPC:          deviceregistry.NewRPC(c, conf.Registry), // TODO: Add checks
+		registry:             conf.Registry,
+		joinServers:          &sync.Map{},
+		applicationServersMu: &sync.RWMutex{},
+		applicationServers:   make(map[string]*applicationUplinkStream),
+		gateways:             &sync.Map{},
+		claimedUplinks:       &sync.Map{},
+		claimedDownlinks:     &sync.Map{},
 		hashOptions: &hashstructure.HashOptions{
 			Hasher: fnv.New64a(),
 		},
@@ -267,13 +269,14 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	}
 	dev.RecentUplinks = append(dev.RecentUplinks, msg)
 
-	if err := dev.Update(); err != nil {
+	if err := dev.Update("Session", "RecentUplinks"); err != nil {
 		logger.WithError(err).Error("Failed to update device")
 		return err
 	}
 
 	go func() {
-		cl, ok := ns.applicationServers.Load(dev.ApplicationID)
+		ns.applicationServersMu.RLock()
+		cl, ok := ns.applicationServers[dev.ApplicationID]
 		if ok {
 			up := &ttnpb.ApplicationUp{&ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
 				FPort:      pld.FPort,
@@ -282,10 +285,11 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 			}}}
 			logger := logger.WithFields(log.Fields("application_id", dev.ApplicationID, "f_cnt", up.GetUplinkMessage().GetFCnt()))
 
-			if err := cl.(ttnpb.AsNs_LinkApplicationServer).Send(up); err != nil {
+			if err := cl.Send(up); err != nil {
 				logger.WithError(err).Warn("Failed to send uplink to application server")
 			}
 		}
+		ns.applicationServersMu.RUnlock()
 	}()
 	return nil
 }
@@ -438,10 +442,53 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	}
 }
 
-// LinkApplication is called by the application server to subscribe to application events.
-func (ns *NetworkServer) LinkApplication(appID *ttnpb.ApplicationIdentifiers, stream ttnpb.AsNs_LinkApplicationServer) error {
-	ns.applicationServers.Store(appID.ApplicationID, stream)
+type applicationUplinkStream struct {
+	ttnpb.AsNs_LinkApplicationServer
+	closeCh chan struct{}
+}
+
+func (s applicationUplinkStream) Close() error {
+	close(s.closeCh)
 	return nil
+}
+
+type closer interface {
+	Close() error
+}
+
+// LinkApplication is called by the application server to subscribe to application events.
+func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifier, stream ttnpb.AsNs_LinkApplicationServer) error {
+	ws := &applicationUplinkStream{
+		stream,
+		make(chan struct{}),
+	}
+	appID := id.GetApplicationID()
+
+	ns.applicationServersMu.Lock()
+	cl, ok := ns.applicationServers[appID]
+	ns.applicationServers[appID] = ws
+	if ok {
+		if err := cl.Close(); err != nil {
+			ns.applicationServersMu.Unlock()
+			return err
+		}
+	}
+	ns.applicationServersMu.Unlock()
+
+	ctx := stream.Context()
+	select {
+	case <-ctx.Done():
+		err := ctx.Err()
+		ns.applicationServersMu.Lock()
+		cl, ok := ns.applicationServers[appID]
+		if ok && cl == ws {
+			delete(ns.applicationServers, appID)
+		}
+		ns.applicationServersMu.Unlock()
+		return err
+	case <-ws.closeCh:
+		return errors.New("Another uplink subscription started for application")
+	}
 }
 
 // DownlinkQueueReplace is called by the application server to completely replace the downlink queue for a device.
