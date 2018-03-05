@@ -51,7 +51,7 @@ func TestEncode(t *testing.T) {
 	// Return constant byte array.
 	{
 		script := `
-		function Encoder(payload, fport) {
+		function Encoder(payload, f_port) {
 			return [1, 2, 3]
 		}
 		`
@@ -63,7 +63,7 @@ func TestEncode(t *testing.T) {
 	// Encode temperature.
 	{
 		script := `
-		function Encoder(payload, fport) {
+		function Encoder(payload, f_port) {
 			var val = payload.temperature * 100
 			return [
 				(val >> 8) & 0xff,
@@ -79,7 +79,7 @@ func TestEncode(t *testing.T) {
 	// Encode temperature based on a specific model.
 	{
 		script := `
-		function Encoder(payload, fport) {
+		function Encoder(payload, f_port) {
 			switch (env.model) {
 			case "The Things Uno":
 				var val = payload.temperature * 100
@@ -104,7 +104,7 @@ func TestEncode(t *testing.T) {
 	// Return out of range values.
 	{
 		script := `
-		function Encoder(payload, fport) {
+		function Encoder(payload, f_port) {
 			return [300, 0, 1]
 		}
 		`
@@ -115,7 +115,7 @@ func TestEncode(t *testing.T) {
 	// Return invalid type.
 	{
 		script := `
-		function Encoder(payload, fport) {
+		function Encoder(payload, f_port) {
 			return ['test']
 		}
 		`
@@ -126,7 +126,7 @@ func TestEncode(t *testing.T) {
 	// Return nothing.
 	{
 		script := `
-		function Encoder(payload, fport) {
+		function Encoder(payload, f_port) {
 			return null
 		}
 		`
@@ -137,7 +137,7 @@ func TestEncode(t *testing.T) {
 	// Return an object.
 	{
 		script := `
-		function Encoder(payload, fport) {
+		function Encoder(payload, f_port) {
 			return {
 				value: 42
 			}
@@ -174,7 +174,7 @@ func TestDecode(t *testing.T) {
 	// Return constant object.
 	{
 		script := `
-		function Decoder(payload, fport) {
+		function Decoder(payload, f_port) {
 			return {
 				temperature: -21.3
 			}
@@ -192,7 +192,7 @@ func TestDecode(t *testing.T) {
 	// Parse and take brand and model into account.
 	{
 		script := `
-		function Decoder(payload, fport) {
+		function Decoder(payload, f_port) {
 			return {
 				temperature: ((payload[0] & 0x80 ? 0xffff : 0x0000) << 16 | payload[0] << 8 | payload[1]) / 100,
 				brand: env.brand,
@@ -214,7 +214,7 @@ func TestDecode(t *testing.T) {
 	// Return invalid type.
 	{
 		script := `
-		function Decoder(payload, fport) {
+		function Decoder(payload, f_port) {
 			return 42
 		}
 		`
@@ -225,7 +225,7 @@ func TestDecode(t *testing.T) {
 	// Catch error.
 	{
 		script := `
-		function Decoder(payload, fport) {
+		function Decoder(payload, f_port) {
 			throw Error('unknown error')
 		}
 		`

@@ -56,14 +56,14 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 	env := h.createEnvironment(model)
 	env["application_id"] = msg.ApplicationID
 	env["device_id"] = msg.DeviceID
-	env["deveui"] = msg.DevEUI
-	env["joineui"] = msg.JoinEUI
+	env["dev_eui"] = msg.DevEUI
+	env["join_eui"] = msg.JoinEUI
 	env["payload"] = m
-	env["fport"] = payload.FPort
+	env["f_port"] = payload.FPort
 
 	script = fmt.Sprintf(`
 		%s
-		Encoder(env.payload, env.fport)
+		Encoder(env.payload, env.f_port)
 	`, script)
 
 	value, err := h.engine.Run(ctx, script, env)
@@ -126,14 +126,14 @@ func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, model *ttnp
 	env := h.createEnvironment(model)
 	env["application_id"] = msg.ApplicationID
 	env["device_id"] = msg.DeviceID
-	env["deveui"] = msg.DevEUI
-	env["joineui"] = msg.JoinEUI
+	env["dev_eui"] = msg.DevEUI
+	env["join_eui"] = msg.JoinEUI
 	env["payload"] = payload.FRMPayload
-	env["fport"] = payload.FPort
+	env["f_port"] = payload.FPort
 
 	script = fmt.Sprintf(`
 		%s
-		Decoder(env.payload, env.fport)
+		Decoder(env.payload, env.f_port)
 	`, script)
 
 	value, err := h.engine.Run(ctx, script, env)
