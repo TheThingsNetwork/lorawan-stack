@@ -21,7 +21,9 @@ func TestToBytes(t *testing.T) {
 
 			b, err := ToBytes(tc.value)
 			if a.So(err, should.BeNil) {
-				a.So(b, should.Resemble, tc.bytes)
+				if !a.So(b, should.Resemble, tc.bytes) {
+					t.Log(pretty.Sprint("Value:", tc.value))
+				}
 			}
 		})
 	}

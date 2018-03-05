@@ -25,8 +25,8 @@ func TestBytesToType(t *testing.T) {
 				return
 			}
 			v, err := BytesToType(tc.bytes, reflect.TypeOf(tc.value))
-			if a.So(err, should.BeNil) {
-				a.So(v, should.Resemble, tc.value)
+			if a.So(err, should.BeNil) && !a.So(v, should.Resemble, tc.value) {
+				pretty.Ldiff(t, tc.value, v)
 			}
 		})
 	}
