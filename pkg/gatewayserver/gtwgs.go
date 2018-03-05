@@ -111,7 +111,8 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) error {
 		case <-ctx.Done():
 			logger.WithError(ctx.Err()).Warn("Stopped serving Rx packets")
 			go func() {
-				stopCtx, cancel := context.WithTimeout(context.Background(), time.Minute)
+				// TODO: Add tenant extraction when #433 is merged
+				stopCtx, cancel := context.WithTimeout(g.Context(), time.Minute)
 				stopServingGatewayFn := func(nsClient ttnpb.GsNsClient) error {
 					_, err := nsClient.StopServingGateway(stopCtx, &id)
 					return err
