@@ -56,5 +56,5 @@
   source = "github.com/johanstokking/otto"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/TheThingsNetwork/go-cayenne-lib"
+  version = "1.0.0"
