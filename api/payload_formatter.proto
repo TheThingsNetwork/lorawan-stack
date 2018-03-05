@@ -19,13 +19,15 @@ package ttn.lorawan.v3;
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 enum PayloadFormatter {
+  // No payload formatter to work with raw payload only.
   FORMATTER_NONE = 0;
-  // Default payload formatter for the end device type. The parameter points to the repository.
-  FORMATTER_DEFAULT = 1;
+  // Use payload formatter for the end device type from a repository.
+  FORMATTER_REPOSITORY = 1;
   // gRPC service payload formatter. The parameter is the host:port of the service.
   FORMATTER_GRPC_SERVICE = 2;
-  // Custom payload formatter that executes Javascript code. The parameter points to a Javascript file.
+  // Custom payload formatter that executes Javascript code. The parameter is a JavaScript filename.
   FORMATTER_JAVASCRIPT = 3;
+  // CayenneLPP payload formatter.
   FORMATTER_CAYENNELPP = 4;
   // More payload formatters can be added.
 }

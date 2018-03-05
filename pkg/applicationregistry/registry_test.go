@@ -206,7 +206,7 @@ func ExampleRegistry() {
 			ApplicationID: "test",
 		},
 		Description: "My test application",
-		UpFormatter: ttnpb.PayloadFormatter_FORMATTER_DEFAULT,
+		UpFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
 	}
 
 	app, err := r.Create(pb)
