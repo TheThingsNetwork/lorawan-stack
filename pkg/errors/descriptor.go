@@ -23,13 +23,19 @@ type ErrDescriptor struct {
 	// MessageFormat is the format of the error message. Attributes will be filled
 	// in when an error is created using New(). For example:
 	//
-	//   "This is an error about user {username}"
+	//   "This is an error about user `{username}`"
 	//
-	// when passed an atrtributes map with "username" set to "john" would interpolate to
+	// when passed an attributes map with "username" set to "john" would interpolate to
 	//
 	//   "This is an error about user john"
 	//
-	// The idea about this message format is that is is localizable
+	// This message format then allows error message localization.
+	//
+	// Attributes should be in snake_case, wrapped with backticks, and with no spacing between brackets.
+	// Examples:
+	//   "Device `{device_id}` already exists in Application `{application_id}`"
+	//   "Application `{application_id}` does not exist"
+	//   "Device ID `{device_id}` is not allowed"
 	MessageFormat string `json:"format"`
 
 	// Code is the code of errors that are created by this descriptor
