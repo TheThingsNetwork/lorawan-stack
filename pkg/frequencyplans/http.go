@@ -29,7 +29,7 @@ func RetrieveHTTPStore(options ...RetrieveHTTPStoreOption) (Store, error) {
 func fetchHTTPContent(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return nil, errors.NewWithCause("HTTP request failed", err)
+		return nil, errors.NewWithCause(err, "HTTP request failed")
 	}
 	defer resp.Body.Close()
 
@@ -39,7 +39,7 @@ func fetchHTTPContent(url string) ([]byte, error) {
 
 	buffer, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, errors.NewWithCause("Copying the HTTP response to a local buffer failed", err)
+		return nil, errors.NewWithCause(err, "Copying the HTTP response to a local buffer failed")
 	}
 
 	return buffer, nil
@@ -52,12 +52,12 @@ func (baseURI storeFetchingConfiguration) GetList() ([]frequencyPlanDescription,
 
 	buffer, err := fetchHTTPContent(url)
 	if err != nil {
-		return nil, errors.NewWithCause(fmt.Sprintf("Fetching content of %s failed", url), err)
+		return nil, errors.NewWithCausef(err, "Fetching content of %s failed", url)
 	}
 
 	err = yaml.Unmarshal(buffer, &list)
 	if err != nil {
-		return nil, errors.NewWithCause("Failed to parse the HTTP content as a list of frequency plans", err)
+		return nil, errors.NewWithCause(err, "Failed to parse the HTTP content as a list of frequency plans")
 	}
 
 	return list, nil
@@ -70,12 +70,12 @@ func (baseURI storeFetchingConfiguration) GetFrequencyPlan(filename string) (ttn
 
 	buffer, err := fetchHTTPContent(url)
 	if err != nil {
-		return frequencyPlan, errors.NewWithCause(fmt.Sprintf("Fetching content of %s failed", url), err)
+		return frequencyPlan, errors.NewWithCausef(err, "Fetching content of %s failed", url)
 	}
 
 	err = yaml.Unmarshal(buffer, &frequencyPlan)
 	if err != nil {
-		return frequencyPlan, errors.NewWithCause("Failed to parse the HTTP content as a frequency plan", err)
+		return frequencyPlan, errors.NewWithCause(err, "Failed to parse the HTTP content as a frequency plan")
 	}
 
 	return frequencyPlan, nil

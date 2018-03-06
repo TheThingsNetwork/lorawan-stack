@@ -70,7 +70,7 @@ func (s *StringSlice) SetInto(dest interface{}) error {
 func value(data interface{}) (driver.Value, error) {
 	m, err := json.Marshal(data)
 	if err != nil {
-		return nil, errors.NewWithCause("Failed to marshal an Int32Slice type", err)
+		return nil, errors.NewWithCause(err, "Failed to marshal an Int32Slice type")
 	}
 
 	return string(m[:]), nil
@@ -83,7 +83,7 @@ func scan(src, to interface{}) error {
 	}
 
 	if err := json.Unmarshal([]byte(str), to); err != nil {
-		return errors.NewWithCause("Failed to unmarshal text into an Int32Slice", err)
+		return errors.NewWithCause(err, "Failed to unmarshal text into an Int32Slice")
 	}
 
 	return nil

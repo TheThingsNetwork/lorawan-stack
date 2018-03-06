@@ -60,7 +60,7 @@ func wrap(err error) error {
 		return u
 	}
 
-	return errors.NewWithCause("Unexpected error", err)
+	return errors.NewWithCause(err, "Unexpected error")
 }
 
 // IsDuplicate returns the name and value of a duplicated field and a bool

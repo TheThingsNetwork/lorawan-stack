@@ -21,11 +21,11 @@ func (c *Component) listenWeb() (err error) {
 	if c.config.HTTP.Listen != "" {
 		l, err := c.Listen(c.config.HTTP.Listen)
 		if err != nil {
-			return errors.NewWithCause("Could not listen on HTTP port", err)
+			return errors.NewWithCause(err, "Could not listen on HTTP port")
 		}
 		lis, err := l.TCP()
 		if err != nil {
-			return errors.NewWithCause("Could not create TCP HTTP listener", err)
+			return errors.NewWithCause(err, "Could not create TCP HTTP listener")
 		}
 		go func() {
 			if err := http.Serve(lis, c); err != nil {
@@ -37,11 +37,11 @@ func (c *Component) listenWeb() (err error) {
 	if c.config.HTTP.ListenTLS != "" {
 		l, err := c.Listen(c.config.HTTP.ListenTLS)
 		if err != nil {
-			return errors.NewWithCause("Could not listen on HTTP/tls port", err)
+			return errors.NewWithCause(err, "Could not listen on HTTP/tls port")
 		}
 		lis, err := l.TLS()
 		if err != nil {
-			return errors.NewWithCause("Could not create TLS HTTP listener", err)
+			return errors.NewWithCause(err, "Could not create TLS HTTP listener")
 		}
 		go func() {
 			if err := http.Serve(lis, c); err != nil {

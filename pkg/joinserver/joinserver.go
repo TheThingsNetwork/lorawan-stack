@@ -132,7 +132,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	if rawPayload == nil {
 		rawPayload, err = req.Payload.MarshalLoRaWAN()
 		if err != nil {
-			panic(errors.NewWithCause("Failed to marshal join request payload", err))
+			panic(errors.NewWithCause(err, "Failed to marshal join request payload"))
 		}
 	}
 
@@ -194,7 +194,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		Major: msg.GetMajor(),
 	}).AppendLoRaWAN(b)
 	if err != nil {
-		panic(errors.NewWithCause("Failed to encode join accept MHDR", err))
+		panic(errors.NewWithCause(err, "Failed to encode join accept MHDR"))
 	}
 
 	var jn types.JoinNonce
@@ -211,7 +211,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		RxDelay:    req.RxDelay,
 	}).AppendLoRaWAN(b)
 	if err != nil {
-		panic(errors.NewWithCause("Failed to encode join accept MAC payload", err))
+		panic(errors.NewWithCause(err, "Failed to encode join accept MAC payload"))
 	}
 
 	dn := binary.LittleEndian.Uint16(pld.DevNonce[:])

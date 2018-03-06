@@ -72,7 +72,7 @@ func FrequencyPlanScheduler(ctx context.Context, fp ttnpb.FrequencyPlan) (Schedu
 
 	band, err := band.GetByID(fp.BandID)
 	if err != nil {
-		return nil, errors.NewWithCause("Could not find band associated to that frequency plan", err)
+		return nil, errors.NewWithCause(err, "Could not find band associated to that frequency plan")
 	}
 
 	for _, subBand := range band.BandDutyCycles {

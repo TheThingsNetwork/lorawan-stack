@@ -37,7 +37,7 @@ func NewPopulatedUplinkMessage(r randyMessages, easy bool) *UplinkMessage {
 	var err error
 	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
 	if err != nil {
-		panic(errors.NewWithCause("failed to encode uplink message to LoRaWAN", err))
+		panic(errors.NewWithCause(err, "failed to encode uplink message to LoRaWAN"))
 	}
 	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, false)
 	devAddr := msg.GetMACPayload().DevAddr
@@ -62,7 +62,7 @@ func NewPopulatedDownlinkMessage(r randyMessages, easy bool) *DownlinkMessage {
 	var err error
 	out.RawPayload, err = msg.AppendLoRaWAN(out.RawPayload)
 	if err != nil {
-		panic(errors.NewWithCause("failed to encode downlink message to LoRaWAN", err))
+		panic(errors.NewWithCause(err, "failed to encode downlink message to LoRaWAN"))
 	}
 	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, false)
 	devAddr := msg.GetMACPayload().DevAddr

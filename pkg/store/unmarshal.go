@@ -101,7 +101,7 @@ func UnmarshalMap(m map[string]interface{}, v interface{}, hooks ...mapstructure
 		)...),
 	})
 	if err != nil {
-		panic(errors.NewWithCause("Failed to intialize decoder", err))
+		panic(errors.NewWithCause(err, "Failed to intialize decoder"))
 	}
 	return dec.Decode(Unflattened(m))
 }
@@ -269,7 +269,7 @@ func UnmarshalByteMap(bm map[string][]byte, v interface{}, hooks ...mapstructure
 		)...),
 	})
 	if err != nil {
-		panic(errors.NewWithCause("Failed to intialize decoder", err))
+		panic(errors.NewWithCause(err, "Failed to intialize decoder"))
 	}
 	return dec.Decode(Unflattened(im))
 }

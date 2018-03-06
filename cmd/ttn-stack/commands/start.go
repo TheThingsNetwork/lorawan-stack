@@ -31,17 +31,17 @@ var (
 
 			is, err := identityserver.New(c, config.IS)
 			if err != nil {
-				return errors.NewWithCause("Could not create identity server", err)
+				return errors.NewWithCause(err, "Could not create identity server")
 			}
 
 			err = is.Init()
 			if err != nil {
-				return errors.NewWithCause("Could not initialize identity server", err)
+				return errors.NewWithCause(err, "Could not initialize identity server")
 			}
 
 			gs, err := gatewayserver.New(c, &config.GS)
 			if err != nil {
-				return errors.NewWithCause("Could not initialize gateway server", err)
+				return errors.NewWithCause(err, "Could not initialize gateway server")
 			}
 			_ = gs
 

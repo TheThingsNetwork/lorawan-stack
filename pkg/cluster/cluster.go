@@ -125,7 +125,7 @@ func (c *cluster) Join() (err error) {
 		)).Debug("Connecting to peer...")
 		peer.conn, err = grpc.DialContext(peer.ctx, peer.target, options...)
 		if err != nil {
-			return errors.NewWithCause("Could not connect to peer", err)
+			return errors.NewWithCause(err, "Could not connect to peer")
 		}
 	}
 	return nil

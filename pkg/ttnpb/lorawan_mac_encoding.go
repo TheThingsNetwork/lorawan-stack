@@ -237,7 +237,7 @@ func (m *MACCommands) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 		}
 		err := macPayload.UnmarshalLoRaWAN(rawPayload)
 		if err != nil {
-			return errors.NewWithCause("Could not unmarshal MAC command payload", err)
+			return errors.NewWithCause(err, "Could not unmarshal MAC command payload")
 		}
 		*m = append(*m, cmd)
 	}

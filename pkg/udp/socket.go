@@ -102,7 +102,7 @@ func (p *Packet) Ack() error {
 
 	ackPacket, err := p.BuildAck()
 	if err != nil {
-		return errors.NewWithCause("failed to build ack package", err)
+		return errors.NewWithCause(err, "failed to build ack package")
 	}
 	if ackPacket == nil {
 		return nil
@@ -110,7 +110,7 @@ func (p *Packet) Ack() error {
 
 	binaryAckPacket, err := ackPacket.MarshalBinary()
 	if err != nil {
-		return errors.NewWithCause("failed to convert ack packet to binary format", err)
+		return errors.NewWithCause(err, "failed to convert ack packet to binary format")
 	}
 
 	_, err = p.GatewayConn.WriteToUDP(binaryAckPacket, p.GatewayAddr)

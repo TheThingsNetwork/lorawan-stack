@@ -41,7 +41,7 @@ var (
 func mustEncryptJoinAccept(key types.AES128Key, pld []byte) []byte {
 	b, err := crypto.EncryptJoinAccept(key, pld)
 	if err != nil {
-		panic(errors.NewWithCause("failed to encrypt join accept", err))
+		panic(errors.NewWithCause(err, "failed to encrypt join accept"))
 	}
 	return b
 }

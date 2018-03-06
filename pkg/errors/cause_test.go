@@ -8,7 +8,10 @@ import (
 
 func ExampleNewWithCause() {
 	cause := fmt.Errorf("Underlying cause")
-	err := NewWithCause("Something went wrong!", cause)
+	err := NewWithCause(cause, "Something went wrong!")
+	fmt.Println(err)
+	err = NewWithCausef(cause, "Something went wrong for the %s time!", "second")
 	fmt.Println(err)
 	// Output: errors: Something went wrong! (Underlying cause)
+	// errors: Something went wrong for the second time! (Underlying cause)
 }

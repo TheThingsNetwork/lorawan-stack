@@ -99,6 +99,6 @@ func TestInheritedErrors(t *testing.T) {
 	err5 := d2.NewWithCause(attributes, err3)
 	a.So(d.Causes(err5), should.BeFalse)
 
-	err6 := NewWithCause("Inherited error", err2)
+	err6 := NewWithCause(err2, "Inherited error")
 	a.So(d.Causes(err6), should.BeTrue)
 }

@@ -120,7 +120,7 @@ func (p *Packet) UnmarshalBinary(b []byte) (err error) {
 		p.GatewayEUI = new(types.EUI64)
 		err = p.GatewayEUI.UnmarshalBinary(b[i : i+8])
 		if err != nil {
-			return errors.NewWithCause("failed to unmarshal gateway EUI", err)
+			return errors.NewWithCause(err, "failed to unmarshal gateway EUI")
 		}
 		i += 8
 	}

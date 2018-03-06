@@ -33,7 +33,7 @@ func (c *Component) setupGRPC() (err error) {
 	c.logger.Debug("Starting loopback connection")
 	c.loopback, err = rpcserver.StartLoopback(c.ctx, c.grpc.Server)
 	if err != nil {
-		return errors.NewWithCause("Could not start loopback connection", err)
+		return errors.NewWithCause(err, "Could not start loopback connection")
 	}
 	c.logger.Debug("Setting up gRPC gateway")
 	for _, sub := range c.grpcSubsystems {
@@ -47,11 +47,11 @@ func (c *Component) listenGRPC() (err error) {
 	if c.config.GRPC.Listen != "" {
 		l, err := c.Listen(c.config.GRPC.Listen)
 		if err != nil {
-			return errors.NewWithCause("Could not listen on gRPC port", err)
+			return errors.NewWithCause(err, "Could not listen on gRPC port")
 		}
 		lis, err := l.TCP()
 		if err != nil {
-			return errors.NewWithCause("Could not create TCP gRPC listener", err)
+			return errors.NewWithCause(err, "Could not create TCP gRPC listener")
 		}
 		go func() {
 			if err := c.grpc.Serve(lis); err != nil {
@@ -62,11 +62,11 @@ func (c *Component) listenGRPC() (err error) {
 	if c.config.GRPC.ListenTLS != "" {
 		l, err := c.Listen(c.config.GRPC.ListenTLS)
 		if err != nil {
-			return errors.NewWithCause("Could not listen on gRPC/tls port", err)
+			return errors.NewWithCause(err, "Could not listen on gRPC/tls port")
 		}
 		lis, err := l.TLS()
 		if err != nil {
-			return errors.NewWithCause("Could not create TLS gRPC listener", err)
+			return errors.NewWithCause(err, "Could not create TLS gRPC listener")
 		}
 		go func() {
 			if err := c.grpc.Serve(lis); err != nil {

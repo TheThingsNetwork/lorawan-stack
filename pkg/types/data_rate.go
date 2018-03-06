@@ -25,7 +25,7 @@ func (dr DataRate) SpreadingFactor() (uint8, error) {
 
 	sf, err := strconv.ParseUint(matches[1], 10, 64)
 	if err != nil {
-		return 0, errors.NewWithCause("Failed to parse spreading factor", err)
+		return 0, errors.NewWithCause(err, "Failed to parse spreading factor")
 	}
 	return uint8(sf), err
 }
@@ -40,7 +40,7 @@ func (dr DataRate) Bandwidth() (uint32, error) {
 
 	bw, err := strconv.ParseUint(matches[1], 10, 64)
 	if err != nil {
-		return 0, errors.NewWithCause("Failed to parse bandwidth", err)
+		return 0, errors.NewWithCause(err, "Failed to parse bandwidth")
 	}
 	return uint32(bw) * 1000, err
 }

@@ -59,7 +59,7 @@ func New(text string) Error {
 }
 
 // NewWithCause returns an "unknown" error with the given text and a given cause
-func NewWithCause(text string, cause error) Error {
+func NewWithCause(cause error, text string) Error {
 	return normalize(&Impl{
 		info: info{
 			Message:   text,
@@ -71,6 +71,11 @@ func NewWithCause(text string, cause error) Error {
 			},
 		},
 	})
+}
+
+// NewWithCausef returns an "unknown" error with the given formatted text and a given cause
+func NewWithCausef(cause error, text string, a ...interface{}) Error {
+	return NewWithCause(cause, fmt.Sprintf(text, a...))
 }
 
 // Errorf returns an "unknown" error with the text fomatted accoding to format.

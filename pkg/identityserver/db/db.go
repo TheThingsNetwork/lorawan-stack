@@ -6,7 +6,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db/migrations"
@@ -93,7 +92,7 @@ func Open(context context.Context, connectionURI string, migrations migrations.R
 
 	err = db.PingContext(context)
 	if err != nil {
-		return nil, errors.NewWithCause(fmt.Sprintf("Failed to ping the CockroachDB instance at `%s`. Are you sure it is running?", connectionURI), err)
+		return nil, errors.NewWithCausef(err, "Failed to ping the CockroachDB instance at `%s`. Are you sure it is running?", connectionURI)
 	}
 
 	res := &DB{

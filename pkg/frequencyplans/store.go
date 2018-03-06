@@ -61,7 +61,7 @@ func (s store) GetAllIDs() []string {
 func retrieveFrequencyPlans(config retrievalConfig) (store, error) {
 	frequencyPlansInfo, err := config.GetList()
 	if err != nil {
-		return nil, errors.NewWithCause("Failed to fetch list of frequency plans", err)
+		return nil, errors.NewWithCause(err, "Failed to fetch list of frequency plans")
 	}
 	frequencyPlansExtensions := make([]frequencyPlanDescription, 0)
 
@@ -74,7 +74,7 @@ func retrieveFrequencyPlans(config retrievalConfig) (store, error) {
 
 		frequencyPlanContent, err := config.GetFrequencyPlan(description.FPFilename)
 		if err != nil {
-			return nil, errors.NewWithCause(fmt.Sprintf("Failed to retrieve %s frequency plan content", description.ID), err)
+			return nil, errors.NewWithCausef(err, "Failed to retrieve %s frequency plan content", description.ID)
 		}
 
 		frequencyPlansStorage[description.ID] = frequencyPlanContent
@@ -88,7 +88,7 @@ func retrieveFrequencyPlans(config retrievalConfig) (store, error) {
 
 		extensionContent, err := config.GetFrequencyPlan(extensionDescription.FPFilename)
 		if err != nil {
-			return nil, errors.NewWithCause(fmt.Sprintf("Failed to retrieve %s frequency plan extension content", extensionDescription.ID), err)
+			return nil, errors.NewWithCausef(err, "Failed to retrieve %s frequency plan extension content", extensionDescription.ID)
 		}
 
 		frequencyPlansStorage[extensionDescription.ID] = originFrequencyPlan.Extend(extensionContent)

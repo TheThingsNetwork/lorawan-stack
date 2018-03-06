@@ -4,7 +4,6 @@ package redis
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"math/rand"
 	"strings"
@@ -317,7 +316,7 @@ func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[s
 				for _, str := range ids {
 					id, err := ulid.Parse(str)
 					if err != nil {
-						return errors.NewWithCause(fmt.Sprintf("Failed to parse %s as ULID, database inconsistent", str), err)
+						return errors.NewWithCausef(err, "Failed to parse %s as ULID, database inconsistent", str)
 					}
 					cmds[id] = newStringBytesMapCmd(p.HGetAll(s.key(str)))
 				}

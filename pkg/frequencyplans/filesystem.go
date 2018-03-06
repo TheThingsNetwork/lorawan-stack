@@ -22,7 +22,7 @@ func ReadFileSystemStore(options ...ReadFileSystemStoreOption) (Store, error) {
 
 	store, err := retrieveFrequencyPlans(config)
 	if err != nil {
-		return nil, errors.NewWithCause("Reading frequency plans from the file system failed", err)
+		return nil, errors.NewWithCause(err, "Reading frequency plans from the file system failed")
 	}
 
 	return store, nil
@@ -33,13 +33,13 @@ func (config storeReadConfiguration) GetList() ([]frequencyPlanDescription, erro
 
 	content, err := ioutil.ReadFile(frequencyPlanListPath)
 	if err != nil {
-		return nil, errors.NewWithCause("Reading frequency plans list failed", err)
+		return nil, errors.NewWithCause(err, "Reading frequency plans list failed")
 	}
 
 	list := []frequencyPlanDescription{}
 	err = yaml.Unmarshal(content, &list)
 	if err != nil {
-		return nil, errors.NewWithCause("Failed to parse the file content as a list of frequency plans", err)
+		return nil, errors.NewWithCause(err, "Failed to parse the file content as a list of frequency plans")
 	}
 
 	return list, nil
@@ -51,12 +51,12 @@ func (config storeReadConfiguration) GetFrequencyPlan(filename string) (ttnpb.Fr
 
 	content, err := ioutil.ReadFile(frequencyPlanPath)
 	if err != nil {
-		return frequencyPlan, errors.NewWithCause("Reading frequency plan failed", err)
+		return frequencyPlan, errors.NewWithCause(err, "Reading frequency plan failed")
 	}
 
 	err = yaml.Unmarshal(content, &frequencyPlan)
 	if err != nil {
-		return frequencyPlan, errors.NewWithCause("Failed to parse the file content as a frequency plan", err)
+		return frequencyPlan, errors.NewWithCause(err, "Failed to parse the file content as a frequency plan")
 	}
 
 	return frequencyPlan, nil

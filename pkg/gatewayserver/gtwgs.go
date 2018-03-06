@@ -45,12 +45,12 @@ func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *
 	is := ttnpb.NewIsGatewayClient(isInfo.Conn())
 	gw, err := is.GetGateway(ctx, gatewayID)
 	if err != nil {
-		return ttnpb.FrequencyPlan{}, errors.NewWithCause("Could not get gateway information from identity server", err)
+		return ttnpb.FrequencyPlan{}, errors.NewWithCause(err, "Could not get gateway information from identity server")
 	}
 
 	fp, err := g.frequencyPlans.GetByID(gw.FrequencyPlanID)
 	if err != nil {
-		return ttnpb.FrequencyPlan{}, errors.NewWithCause(fmt.Sprintf("Could not retrieve frequency plan %s", gw.FrequencyPlanID), err)
+		return ttnpb.FrequencyPlan{}, errors.NewWithCausef(err, "Could not retrieve frequency plan %s", gw.FrequencyPlanID)
 	}
 
 	return fp, nil
@@ -85,7 +85,7 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) error {
 
 	fp, err := g.getGatewayFrequencyPlan(ctx, &id)
 	if err != nil {
-		return errors.NewWithCause("Could not get frequency plan for this gateway", err)
+		return errors.NewWithCause(err, "Could not get frequency plan for this gateway")
 	}
 
 	result, err := g.gateways.Subscribe(id, link, fp)
@@ -183,7 +183,7 @@ func (g *GatewayServer) handleStatus(ctx context.Context, status *ttnpb.GatewayS
 func (g *GatewayServer) GetFrequencyPlan(ctx context.Context, r *ttnpb.FrequencyPlanRequest) (*ttnpb.FrequencyPlan, error) {
 	fp, err := g.frequencyPlans.GetByID(r.GetFrequencyPlanID())
 	if err != nil {
-		return nil, errors.NewWithCause("Could not retrieve frequency plan from storage", err)
+		return nil, errors.NewWithCause(err, "Could not retrieve frequency plan from storage")
 	}
 
 	return &fp, nil
