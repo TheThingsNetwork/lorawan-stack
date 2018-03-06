@@ -160,8 +160,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		if !match {
 			// TODO determine the cluster containing the device
 			// https://github.com/TheThingsIndustries/ttn/issues/244
-			return nil, ErrForwardJoinRequest.NewWithCause(nil, deviceregistry.ErrDeviceNotFound.New(errors.Attributes{
-				"id": &ttnpb.EndDeviceIdentifiers{JoinEUI: &pld.JoinEUI}}))
+			return nil, ErrForwardJoinRequest.NewWithCause(nil, deviceregistry.ErrDeviceNotFound.New(nil))
 		}
 	}
 

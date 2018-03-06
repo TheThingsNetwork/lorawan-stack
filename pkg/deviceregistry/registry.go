@@ -78,14 +78,10 @@ func FindOneDeviceByIdentifiers(r Interface, ids ...*ttnpb.EndDeviceIdentifiers)
 	}
 	switch len(devs) {
 	case 0:
-		return nil, ErrDeviceNotFound.New(errors.Attributes{
-			"identifiers": ids,
-		})
+		return nil, ErrDeviceNotFound.New(nil)
 	case 1:
 		return devs[0], nil
 	default:
-		return nil, ErrTooManyDevices.New(errors.Attributes{
-			"identifiers": ids,
-		})
+		return nil, ErrTooManyDevices.New(nil)
 	}
 }

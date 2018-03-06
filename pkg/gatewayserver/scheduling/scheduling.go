@@ -17,7 +17,7 @@ var (
 	// ErrDutyCycleFull is returned is the duty cycle prevents scheduling of a downlink.
 	ErrDutyCycleFull = &errors.ErrDescriptor{
 		Code:           1,
-		MessageFormat:  "Duty cycle between { min_frequency } and { max_frequency } full, exceeded quota of { quota }",
+		MessageFormat:  "Duty cycle between {min_frequency} and {max_frequency} full, exceeded quota of {quota}",
 		SafeAttributes: []string{"min_frequency", "max_frequency", "quota"},
 	}
 	// ErrOverlap is returned if there is an already existing scheduling overlapping.
@@ -30,16 +30,16 @@ var (
 		Code:          3,
 		MessageFormat: "Time-off-air constraints prevent scheduling",
 	}
-	// ErrNoSubBandFound is returned when an operation fails because there is no sub band for the given channel.
+	// ErrNoSubBandFound is returned when an operation fails because there is no sub-band for the given frequency.
 	ErrNoSubBandFound = &errors.ErrDescriptor{
 		Code:           4,
-		MessageFormat:  "No sub band found for the given channel { channel }",
-		SafeAttributes: []string{"channel"},
+		MessageFormat:  "No sub-band found for frequency {frequency} Hz",
+		SafeAttributes: []string{"frequency"},
 	}
 	// ErrDwellTime is returned when an operation fails because the packet does not respect the dwell time.
 	ErrDwellTime = &errors.ErrDescriptor{
 		Code:           5,
-		MessageFormat:  "Packet time-on-air duration is greater than this band's dwell time ({ packet_duration } > { dwell_time })",
+		MessageFormat:  "Packet time-on-air duration is greater than this band's dwell time ({packet_duration} > {dwell_time})",
 		SafeAttributes: []string{"packet_duration", "dwell_time"},
 	}
 )
@@ -103,7 +103,7 @@ func (f frequencyPlanScheduling) findSubBand(channel uint64) (*subBandScheduling
 		}
 	}
 
-	return nil, ErrNoSubBandFound.New(errors.Attributes{"channel": channel})
+	return nil, ErrNoSubBandFound.New(errors.Attributes{"frequency": channel})
 }
 
 func (f frequencyPlanScheduling) ScheduleAt(s Span, channel uint64) error {

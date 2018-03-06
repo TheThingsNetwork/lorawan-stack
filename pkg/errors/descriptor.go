@@ -31,11 +31,15 @@ type ErrDescriptor struct {
 	//
 	// This message format then allows error message localization.
 	//
-	// Attributes should be in snake_case, wrapped with backticks, and with no spacing between brackets.
+	// Attributes should be in snake_case and wrapped with backticks.
+	// There should be no spacing between brackets.
 	// Examples:
 	//   "Device `{device_id}` already exists in Application `{application_id}`"
 	//   "Application `{application_id}` does not exist"
-	//   "Device ID `{device_id}` is not allowed"
+	//   "DeviceID `{device_id}` is not allowed"
+	//
+	// In the message, code-specific diminutives and contractions (e.g. ApplicationID) must be in the TitleCase format.
+	// All other common nouns follow standard punctuation rules.
 	MessageFormat string `json:"format"`
 
 	// Code is the code of errors that are created by this descriptor

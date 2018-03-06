@@ -16,7 +16,7 @@ func TestHTTP(t *testing.T) {
 	a := assertions.New(t)
 
 	d := &errors.ErrDescriptor{
-		MessageFormat: "You do not have access to app with id {app_id}",
+		MessageFormat: "You do not have access to application `{app_id}`",
 		Code:          77,
 		Type:          errors.PermissionDenied,
 		Namespace:     "pkg/foo",
@@ -46,7 +46,7 @@ func TestHTTP(t *testing.T) {
 	a.So(got.Type(), should.Equal, err.Type())
 	a.So(got.Message(), should.Equal, err.Message())
 	a.So(got.ID(), should.Equal, err.ID())
-	a.So(got.Error(), should.Equal, "pkg/foo[77]: You do not have access to app with id foo")
+	a.So(got.Error(), should.Equal, "pkg/foo[77]: You do not have access to application `foo`")
 	a.So(got.Attributes()["app_id"], should.Resemble, attributes["app_id"])
 	a.So(got.Attributes()["count"], should.AlmostEqual, attributes["count"])
 	a.So(got.Attributes(), should.NotContainKey, "unsafe")

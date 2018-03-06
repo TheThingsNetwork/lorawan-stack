@@ -15,7 +15,7 @@ func TestDescriptor(t *testing.T) {
 	a := assertions.New(t)
 
 	d := &ErrDescriptor{
-		MessageFormat: "You do not have access to app with id {app_id}",
+		MessageFormat: "You do not have access to application `{app_id}`",
 		Code:          77,
 		Type:          PermissionDenied,
 		registered:    true,
@@ -27,7 +27,7 @@ func TestDescriptor(t *testing.T) {
 	err := d.New(attributes)
 
 	a.So(d.Describes(err), should.BeTrue)
-	a.So(err.Error(), should.Equal, "[77]: You do not have access to app with id foo")
+	a.So(err.Error(), should.Equal, "[77]: You do not have access to application `foo`")
 	a.So(err.Code(), should.Equal, d.Code)
 	a.So(err.Type(), should.Equal, d.Type)
 	a.So(err.Attributes(), should.Resemble, attributes)
@@ -40,7 +40,7 @@ func TestDescriptorCause(t *testing.T) {
 	a := assertions.New(t)
 
 	d := &ErrDescriptor{
-		MessageFormat: "You do not have access to app with id {app_id}",
+		MessageFormat: "You do not have access to application `{app_id}`",
 		Code:          77,
 		Type:          PermissionDenied,
 		registered:    true,
@@ -54,7 +54,7 @@ func TestDescriptorCause(t *testing.T) {
 
 	a.So(d.Describes(err), should.BeTrue)
 	a.So(d.Caused(err), should.BeTrue)
-	a.So(err.Error(), should.Equal, "[77]: You do not have access to app with id foo")
+	a.So(err.Error(), should.Equal, "[77]: You do not have access to application `foo`")
 	a.So(err.Code(), should.Equal, d.Code)
 	a.So(err.Type(), should.Equal, d.Type)
 	a.So(err.Attributes()["app_id"], should.Resemble, attributes["app_id"])
@@ -70,13 +70,13 @@ func TestInheritedErrors(t *testing.T) {
 	a := assertions.New(t)
 
 	d := &ErrDescriptor{
-		MessageFormat: "You do not have access to app with id {app_id}",
+		MessageFormat: "You do not have access to application `{app_id}`",
 		Code:          77,
 		Type:          PermissionDenied,
 		registered:    true,
 	}
 	d2 := &ErrDescriptor{
-		MessageFormat: "You do not have access to app with id {app_id}",
+		MessageFormat: "You do not have access to application `{app_id}`",
 		Code:          790,
 		Type:          PermissionDenied,
 		registered:    true,

@@ -12,7 +12,7 @@ import (
 )
 
 var ErrInvalidValue = &errors.ErrDescriptor{
-	MessageFormat:  "Invalid { value_name }: cannot be { invalid_value }",
+	MessageFormat:  "Invalid {value_name}: cannot be {invalid_value}",
 	Code:           1,
 	Type:           errors.InvalidArgument,
 	SafeAttributes: []string{"value_name", "invalid_value"},

@@ -13,7 +13,7 @@ import (
 var (
 	// ErrBandNotFound describes the errors returned when looking for an unknown band
 	ErrBandNotFound = &errors.ErrDescriptor{
-		MessageFormat: "Band {band} not found",
+		MessageFormat: "Band `{band}` not found",
 		Type:          errors.NotFound,
 		Code:          1,
 		SafeAttributes: []string{

@@ -14,7 +14,7 @@ import (
 // ErrDeviceNotFound represents the ErrDescriptor of the error returned
 // when the device is not found.
 var ErrDeviceNotFound = &errors.ErrDescriptor{
-	MessageFormat: "Device identified by {id} not found",
+	MessageFormat: "Device not found",
 	Type:          errors.NotFound,
 	Code:          1,
 }
@@ -22,7 +22,7 @@ var ErrDeviceNotFound = &errors.ErrDescriptor{
 // ErrTooManyDevices represents the ErrDescriptor of the error returned
 // when there are too many devices associated with the identifiers specified.
 var ErrTooManyDevices = &errors.ErrDescriptor{
-	MessageFormat: "Too many devices are identified by {id}",
+	MessageFormat: "Too many devices found",
 	Type:          errors.Conflict,
 	Code:          2,
 }
@@ -113,9 +113,7 @@ func (r *RegistryRPC) ListDevices(ctx context.Context, filter *ttnpb.EndDeviceId
 		return nil, err
 	}
 	if len(devs) == 0 {
-		return nil, ErrDeviceNotFound.New(errors.Attributes{
-			"id": filter,
-		})
+		return nil, ErrDeviceNotFound.New(nil)
 	}
 	eds := make([]*ttnpb.EndDevice, len(devs))
 	for i, dev := range devs {
@@ -141,15 +139,11 @@ func (r *RegistryRPC) GetDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifi
 	}
 	switch len(devs) {
 	case 0:
-		return nil, ErrDeviceNotFound.New(errors.Attributes{
-			"id": id,
-		})
+		return nil, ErrDeviceNotFound.New(nil)
 	case 1:
 		return devs[0].EndDevice, nil
 	default:
-		return nil, ErrTooManyDevices.New(errors.Attributes{
-			"id": id,
-		})
+		return nil, ErrTooManyDevices.New(nil)
 	}
 }
 
@@ -184,9 +178,7 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 		dev.EndDevice = &req.Device
 		return &pbtypes.Empty{}, dev.Update(fields...)
 	default:
-		return nil, ErrTooManyDevices.New(errors.Attributes{
-			"id": req.Device.DeviceID,
-		})
+		return nil, ErrTooManyDevices.New(nil)
 	}
 }
 
@@ -207,14 +199,10 @@ func (r *RegistryRPC) DeleteDevice(ctx context.Context, id *ttnpb.EndDeviceIdent
 	}
 	switch len(devs) {
 	case 0:
-		return nil, ErrDeviceNotFound.New(errors.Attributes{
-			"id": id,
-		})
+		return nil, ErrDeviceNotFound.New(nil)
 	case 1:
 		return &pbtypes.Empty{}, devs[0].Delete()
 	default:
-		return nil, ErrTooManyDevices.New(errors.Attributes{
-			"id": id,
-		})
+		return nil, ErrTooManyDevices.New(nil)
 	}
 }
