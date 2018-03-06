@@ -12,26 +12,18 @@ import (
 // ErrGatewayNotConnected is returned when trying to send a packet to a udp.Conn that has never interacted with the packet's gateway.
 var ErrGatewayNotConnected = errors.New("Not connected to the specified gateway")
 
-// Listen on a port. Requires:
+// Handle returns a UDP packet socket from a raw UDP socket. Requires:
 //
 // - A Validator object, that represents application-level validation of an incoming packet. When polling for packets, invalid packets won't be transmitted.
 //
 // - An AddressStore object, used to store gateway IP addresses, and to retrieve the addresses when sending downlinks.
-func Listen(addr string, validator Validator, addrStore AddressStore) (*Conn, error) {
-	udpAddr, err := net.ResolveUDPAddr("udp", addr)
-	if err != nil {
-		return nil, err
-	}
-	conn, err := net.ListenUDP("udp", udpAddr)
-	if err != nil {
-		return nil, err
-	}
+func Handle(conn *net.UDPConn, validator Validator, addrStore AddressStore) *Conn {
 	return &Conn{
 		addrStore:   addrStore,
 		gatewayAddr: make(map[types.EUI64]net.UDPAddr),
 		UDPConn:     conn,
 		validator:   validator,
-	}, nil
+	}
 }
 
 // Conn wraps the net.UDPConn

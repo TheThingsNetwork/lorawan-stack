@@ -4,6 +4,7 @@ package udp_test
 
 import (
 	"fmt"
+	"net"
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -33,10 +34,16 @@ func (d dummyExtractor) TxPacketAck(p udp.TxPacketAck) (ttnpb.UplinkMessage, err
 }
 
 func Example() {
-	conn, err := udp.Listen(":1700", gatewayStore, nil)
+	udpAddr, err := net.ResolveUDPAddr("udp", ":1700")
 	if err != nil {
 		panic(err)
 	}
+	udpConn, err := net.ListenUDP("udp", udpAddr)
+	if err != nil {
+		panic(err)
+	}
+
+	conn := udp.Handle(udpConn, gatewayStore, nil)
 
 	go func() {
 		var packet *udp.Packet
