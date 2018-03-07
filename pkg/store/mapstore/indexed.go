@@ -53,9 +53,9 @@ func (s *indexedStore) deindex(field string, val interface{}, id store.PrimaryKe
 	}
 }
 
-func (s *indexedStore) filterIndex(filters map[string]interface{}) ([]store.KeySet, error) {
-	filtered := make([]store.KeySet, 0, len(filters))
-	for k, v := range filters {
+func (s *indexedStore) filterIndex(filter map[string]interface{}) ([]store.KeySet, error) {
+	filtered := make([]store.KeySet, 0, len(filter))
+	for k, v := range filter {
 		index, ok := s.indexes[k]
 		if !ok {
 			return nil, fmt.Errorf(`no index "%s"`, k)
@@ -78,6 +78,10 @@ func (s *indexedStore) Create(fields map[string]interface{}) (store.PrimaryKey, 
 	if err != nil {
 		return id, err
 	}
+	if len(fields) == 0 {
+		return id, nil
+	}
+
 	for field := range s.indexes {
 		if val, ok := fields[field]; ok {
 			s.index(field, val, id)
@@ -87,6 +91,13 @@ func (s *indexedStore) Create(fields map[string]interface{}) (store.PrimaryKey, 
 }
 
 func (s *indexedStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
+	if id == nil {
+		return store.ErrNilKey
+	}
+	if len(diff) == 0 {
+		return nil
+	}
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	old, err := s.mapStore.Find(id)
@@ -112,12 +123,12 @@ func (s *indexedStore) Update(id store.PrimaryKey, diff map[string]interface{}) 
 	return nil
 }
 
-func (s *indexedStore) FindBy(filters map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
+func (s *indexedStore) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	idxs := make(map[string]interface{}, len(filters))
-	fields := make(map[string]interface{}, len(filters))
-	for k, v := range filters {
+	idxs := make(map[string]interface{}, len(filter))
+	fields := make(map[string]interface{}, len(filter))
+	for k, v := range filter {
 		_, ok := s.indexes[k]
 		if ok {
 			idxs[k] = v
@@ -161,13 +172,20 @@ func (s *indexedStore) FindBy(filters map[string]interface{}) (map[store.Primary
 				matches[k] = v
 			}
 		}
-	case len(fields) != 0:
+	default:
 		matches = byFields
+	}
+	if len(matches) == 0 {
+		return nil, nil
 	}
 	return matches, nil
 }
 
 func (s *indexedStore) Delete(id store.PrimaryKey) error {
+	if id == nil {
+		return store.ErrNilKey
+	}
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	old, err := s.mapStore.Find(id)

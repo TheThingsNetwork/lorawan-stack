@@ -14,6 +14,11 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
+var Indexed = []string{
+	"foo",
+	"bar",
+}
+
 type testingT interface {
 	Error(args ...interface{})
 	Run(string, func(t *testing.T)) bool
@@ -25,21 +30,51 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 
 	s := newStore()
 
+	m, err := s.Find(nil)
+	a.So(err, should.NotBeNil)
+	a.So(m, should.BeNil)
+
+	m, err = s.Find(bytes.NewBufferString("non-existent"))
+	a.So(err, should.BeNil)
+	a.So(m, should.BeNil)
+
+	filtered, err := s.FindBy(nil)
+	a.So(err, should.BeNil)
+	a.So(filtered, should.BeNil)
+
+	filtered, err = s.FindBy(make(map[string]interface{}))
+	a.So(err, should.BeNil)
+	a.So(filtered, should.BeNil)
+
+	err = s.Update(nil, nil)
+	a.So(err, should.NotBeNil)
+
+	err = s.Update(nil, map[string]interface{}{"foo": "bar"})
+	a.So(err, should.NotBeNil)
+
+	err = s.Update(bytes.NewBufferString("non-existent"), nil)
+	a.So(err, should.BeNil)
+
+	err = s.Update(bytes.NewBufferString("non-existentt"), make(map[string]interface{}))
+	a.So(err, should.BeNil)
+
 	id, err := s.Create(make(map[string]interface{}))
 	a.So(err, should.BeNil)
 	a.So(id, should.NotBeNil)
 
-	idOther, err := s.Create(make(map[string]interface{}))
+	id, err = s.Create(nil)
+	a.So(err, should.BeNil)
+	a.So(id, should.NotBeNil)
+
+	idOther, err := s.Create(nil)
 	a.So(err, should.BeNil)
 	a.So(id, should.NotBeNil)
 
 	a.So(id, should.NotResemble, idOther)
 
-	err = s.Update(id, make(map[string]interface{}))
+	m, err = s.Find(id)
 	a.So(err, should.BeNil)
-
-	// Behavior is implementation-dependent
-	a.So(func() { s.Find(id) }, should.NotPanic)
+	a.So(m, should.BeNil)
 
 	err = s.Delete(id)
 	a.So(err, should.BeNil)
@@ -126,6 +161,14 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 				}
 			}
 
+			matches, err = s.FindBy(nil)
+			a.So(err, should.BeNil)
+			if a.So(matches, should.HaveLength, 1) {
+				for _, v := range matches {
+					a.So(v, should.Resemble, tc.Stored)
+				}
+			}
+
 			err = s.Update(id, tc.Updated)
 			if !a.So(err, should.BeNil) {
 				return
@@ -144,6 +187,14 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 			}
 
 			matches, err = s.FindBy(tc.FindBy)
+			a.So(err, should.BeNil)
+			if a.So(matches, should.HaveLength, 1) {
+				for _, v := range matches {
+					a.So(v, should.Resemble, tc.AfterUpdate)
+				}
+			}
+
+			matches, err = s.FindBy(nil)
 			a.So(err, should.BeNil)
 			if a.So(matches, should.HaveLength, 1) {
 				for _, v := range matches {
@@ -386,7 +437,7 @@ func TestByteSetStore(t testingT, newStore func() store.ByteSetStore) {
 	a.So(err, should.BeNil)
 
 	err = s.Put(id)
-	a.So(err, should.NotBeNil)
+	a.So(err, should.BeNil)
 
 	err = s.Delete(id)
 	a.So(err, should.BeNil)

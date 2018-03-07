@@ -14,7 +14,7 @@ import (
 func newStore() *Store {
 	s := New(&Config{
 		Redis:     test.RedisConfig(),
-		IndexKeys: []string{"foo", "bar"},
+		IndexKeys: storetest.Indexed,
 	})
 	keys, err := s.Redis.Keys("test:*").Result()
 	if err != nil {
