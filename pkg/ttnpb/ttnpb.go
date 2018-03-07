@@ -21,12 +21,16 @@ import (
 )
 
 func init() {
+	gob.Register(&pbtypes.Struct{})
+	gob.Register(&pbtypes.Value_BoolValue{})
+	gob.Register(&pbtypes.Value_ListValue{})
 	gob.Register(&pbtypes.Value_NullValue{})
 	gob.Register(&pbtypes.Value_NumberValue{})
 	gob.Register(&pbtypes.Value_StringValue{})
-	gob.Register(&pbtypes.Value_BoolValue{})
 	gob.Register(&pbtypes.Value_StructValue{})
-	gob.Register(&pbtypes.Value_ListValue{})
-	gob.Register(&pbtypes.Struct{})
 	gob.Register(&pbtypes.Value{})
+	gob.Register((*Message_JoinAcceptPayload)(nil))
+	gob.Register((*Message_JoinRequestPayload)(nil))
+	gob.Register((*Message_MACPayload)(nil))
+	gob.Register((*Message_RejoinRequestPayload)(nil))
 }
