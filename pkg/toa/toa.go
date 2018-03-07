@@ -11,15 +11,36 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-var ErrInvalidValue = &errors.ErrDescriptor{
-	MessageFormat:  "Invalid {value_name}: cannot be {invalid_value}",
-	Code:           1,
-	Type:           errors.InvalidArgument,
-	SafeAttributes: []string{"value_name", "invalid_value"},
-}
+var (
+	ErrInvalidCodingRate = &errors.ErrDescriptor{
+		MessageFormat: "Invalid coding rate: cannot be different from 4/{5,6,7,8}",
+		Code:          1,
+		Type:          errors.InvalidArgument,
+	}
+	ErrUnknownModulation = &errors.ErrDescriptor{
+		MessageFormat: "Unknown modulation",
+		Code:          2,
+		Type:          errors.Unknown,
+	}
+	ErrInvalidBandwidth = &errors.ErrDescriptor{
+		MessageFormat:  "Invalid coding rate: cannot be {bandwidth}",
+		Code:           3,
+		Type:           errors.InvalidArgument,
+		SafeAttributes: []string{"bandwidth"},
+	}
+	ErrInvalidSpreadingFactor = &errors.ErrDescriptor{
+		MessageFormat:  "Invalid spreading factor: cannot be {spreading_factor}",
+		Code:           4,
+		Type:           errors.InvalidArgument,
+		SafeAttributes: []string{"spreading_factor"},
+	}
+)
 
 func init() {
-	ErrInvalidValue.Register()
+	ErrInvalidCodingRate.Register()
+	ErrUnknownModulation.Register()
+	ErrInvalidBandwidth.Register()
+	ErrInvalidSpreadingFactor.Register()
 }
 
 // Compute the time-on-air from the payload and RF parameters. This function only takes into account the PHY payload.
@@ -33,7 +54,7 @@ func Compute(rawPayload []byte, settings ttnpb.TxSettings) (time.Duration, error
 	case ttnpb.Modulation_FSK:
 		return computeFSK(rawPayload, settings), nil
 	default:
-		return 0, errors.New("Unknown modulation")
+		return 0, ErrUnknownModulation.New(nil)
 	}
 }
 
@@ -49,7 +70,7 @@ func computeLoRa(rawPayload []byte, settings ttnpb.TxSettings) (time.Duration, e
 	case "4/8":
 		cr = 4
 	default:
-		return 0, ErrInvalidValue.New(errors.Attributes{"value_name": "coding rate", "invalid_value": "different from 4/{5,6,7,8}"})
+		return 0, ErrInvalidCodingRate.New(nil)
 	}
 
 	bandwidth := settings.Bandwidth / 1000 // Bandwidth in KHz
@@ -57,10 +78,10 @@ func computeLoRa(rawPayload []byte, settings ttnpb.TxSettings) (time.Duration, e
 
 	var de float64
 	if bandwidth == 0 {
-		return 0, ErrInvalidValue.New(errors.Attributes{"value_name": "bandwidth", "invalid_value": 0})
+		return 0, ErrInvalidBandwidth.New(errors.Attributes{"bandwidth": 0})
 	}
-	if spreadingFactor == 0 {
-		return 0, ErrInvalidValue.New(errors.Attributes{"value_name": "spreading factor", "invalid_value": 0})
+	if spreadingFactor < 7 || spreadingFactor > 12 {
+		return 0, ErrInvalidSpreadingFactor.New(errors.Attributes{"spreading_factor": spreadingFactor})
 	}
 	if bandwidth == 125 && (spreadingFactor == 11 || spreadingFactor == 12) {
 		de = 1.0
