@@ -1,5 +1,6 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
+// Package store defines generic storage interfaces and provides deterministic data encoding and decoding mechanisms, as well as utilities associated with this process.
 package store
 
 import (
@@ -31,6 +32,9 @@ const (
 var (
 	// ErrInvalidData represents an error returned, when value stored is not valid.
 	ErrInvalidData = errors.New("Invalid data")
+
+	// ErrNilKey represents an error returned, when key specified is nil.
+	ErrNilKey = errors.New("Nil key specified")
 )
 
 // PrimaryKey represents the value used by store implementations to uniquely identify stored objects.
@@ -38,10 +42,13 @@ type PrimaryKey interface {
 	fmt.Stringer
 }
 
+// Deleter is an interface, which allows deleting of values stored under specified PrimaryKey.
 type Deleter interface {
 	Delete(id PrimaryKey) error
 }
 
+// Trimmer is an interface, which allows trimming size of
+// the data structure stored under PrimaryKey id to a size of n elements.
 type Trimmer interface {
 	Trim(id PrimaryKey, n int) error
 }
@@ -49,11 +56,10 @@ type Trimmer interface {
 // TypedStore represents a store, modeled after CRUD, which stores typed data.
 //
 // Create creates a new PrimaryKey, stores fields under that key and returns it.
-// Find returns the fields stored under PrimaryKey specified.
+// Find returns the fields stored under PrimaryKey specified. It returns a nil map, if key is not found.
 // FindBy returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
-// meaning that only entries matching all the fields in filter should be returned.
+// meaning that only entries matching all the fields in filter should be returned. It returns a nil map, if no value matching filter is found.
 // Update overwrites field values stored under PrimaryKey specified with values in diff.
-// Delete deletes the fields stored under PrimaryKey specified.
 type TypedStore interface {
 	Create(fields map[string]interface{}) (PrimaryKey, error)
 	Find(id PrimaryKey) (map[string]interface{}, error)
@@ -65,9 +71,9 @@ type TypedStore interface {
 // ByteStore represents a store modeled after CRUD, which stores data as bytes.
 //
 // Create creates a new PrimaryKey, stores fields under that key and returns it.
-// Find returns the fields stored under PrimaryKey specified.
+// Find returns the fields stored under PrimaryKey specified. It returns a nil map, if key is not found.
 // FindBy returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
-// meaning that only entries matching all the fields in filter should be returned.
+// meaning that only entries matching all the fields in filter should be returned. It returns a nil map, if key is not found.
 // Update overwrites field values stored under PrimaryKey specified with values in diff.
 // Delete deletes the fields stored under PrimaryKey specified.
 type ByteStore interface {
