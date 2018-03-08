@@ -53,7 +53,7 @@ func TestDescriptorCause(t *testing.T) {
 	err := d.NewWithCause(attributes, cause)
 
 	a.So(d.Describes(err), should.BeTrue)
-	a.So(d.Causes(err), should.BeTrue)
+	a.So(d.Caused(err), should.BeTrue)
 	a.So(err.Error(), should.Equal, "[77]: You do not have access to app with id foo")
 	a.So(err.Code(), should.Equal, d.Code)
 	a.So(err.Type(), should.Equal, d.Type)
@@ -88,17 +88,17 @@ func TestInheritedErrors(t *testing.T) {
 	err := d.New(attributes)
 
 	err2 := d2.NewWithCause(attributes, err)
-	a.So(d.Causes(err2), should.BeTrue)
+	a.So(d.Caused(err2), should.BeTrue)
 
 	err3 := errors.New("Undefined error")
-	a.So(d.Causes(err3), should.BeFalse)
+	a.So(d.Caused(err3), should.BeFalse)
 
 	err4 := d2.New(attributes)
-	a.So(d.Causes(err4), should.BeFalse)
+	a.So(d.Caused(err4), should.BeFalse)
 
 	err5 := d2.NewWithCause(attributes, err3)
-	a.So(d.Causes(err5), should.BeFalse)
+	a.So(d.Caused(err5), should.BeFalse)
 
 	err6 := NewWithCause(err2, "Inherited error")
-	a.So(d.Causes(err6), should.BeTrue)
+	a.So(d.Caused(err6), should.BeTrue)
 }

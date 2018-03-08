@@ -95,8 +95,9 @@ func (err *ErrDescriptor) Register() {
 	Register(err.Namespace, err)
 }
 
-// Causes checks if the e has, as a cause, an error described by the descriptor, or if one of the errors in the cause chain are caused by the descriptor
-func (err *ErrDescriptor) Causes(e error) bool {
+// Caused checks if the e has, as a cause, an error described by the descriptor,
+// or if one of the errors in the cause chain are caused by the descriptor.
+func (err *ErrDescriptor) Caused(e error) bool {
 	if err.Describes(e) {
 		return true
 	}
@@ -115,7 +116,7 @@ func (err *ErrDescriptor) Causes(e error) bool {
 		return false
 	}
 
-	return err.Causes(i)
+	return err.Caused(i)
 }
 
 // validate validates the error descriptor and returns an error if it is not valid.

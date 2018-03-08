@@ -35,7 +35,7 @@ func TestScheduleDownlinkUnregisteredGateway(t *testing.T) {
 		},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(pool.ErrGatewayNotConnected.Causes(err), should.BeTrue)
+	a.So(pool.ErrGatewayNotConnected.Caused(err), should.BeTrue)
 
 	defer gs.Close()
 }
