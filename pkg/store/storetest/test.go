@@ -4,8 +4,8 @@ package storetest
 
 import (
 	"bytes"
-	"crypto/rand"
 	"math"
+	"math/rand"
 	"strconv"
 	"testing"
 
