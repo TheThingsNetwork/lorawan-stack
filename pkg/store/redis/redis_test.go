@@ -12,11 +12,13 @@ import (
 )
 
 func newStore() *Store {
-	s := New(&Config{
+	conf := &Config{
 		Redis:     test.RedisConfig(),
-		IndexKeys: storetest.Indexed,
-	})
-	keys, err := s.Redis.Keys("test:*").Result()
+		IndexKeys: storetest.IndexedFields,
+	}
+
+	s := New(conf)
+	keys, err := s.Redis.Keys(conf.Prefix + Separator + "*").Result()
 	if err != nil {
 		panic(err)
 	}

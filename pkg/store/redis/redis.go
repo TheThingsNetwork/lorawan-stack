@@ -4,6 +4,7 @@ package redis
 
 import (
 	"bytes"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"math/rand"
@@ -19,6 +20,9 @@ import (
 )
 
 const recursionLimit = 10
+
+const SeparatorByte = ':'
+const Separator = string(SeparatorByte)
 
 // Store represents a Redis store.Interface implemntation
 type Store struct {
@@ -51,10 +55,8 @@ func New(conf *Config) *Store {
 	}
 }
 
-const separator = ":"
-
 func (s *Store) key(str ...string) string {
-	return s.config.Prefix + separator + strings.Join(str, separator)
+	return s.config.Prefix + Separator + strings.Join(str, Separator)
 }
 
 func (s *Store) newID() fmt.Stringer {
@@ -62,7 +64,7 @@ func (s *Store) newID() fmt.Stringer {
 }
 
 func base(str string) string {
-	ss := strings.Split(str, separator)
+	ss := strings.Split(str, Separator)
 	return ss[len(ss)-1]
 }
 
@@ -71,10 +73,9 @@ func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 	fieldsSet := make(map[string]string, len(fields))
 	idxAdd := make([]string, 0, len(fields))
 	for k, v := range fields {
-		str := string(v)
-		fieldsSet[k] = str
+		fieldsSet[k] = string(v)
 		if _, ok := s.indexKeys[k]; ok {
-			idxAdd = append(idxAdd, s.key(k, str))
+			idxAdd = append(idxAdd, s.key(k, hex.EncodeToString(v)))
 		}
 	}
 
@@ -96,7 +97,7 @@ func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 				return err
 			}
 			if ok {
-				return errors.Errorf("A key %s already exists", idStr)
+				return errors.Errorf("A key %s already exists", key)
 			}
 			_, err = tx.Pipelined(func(p *redis.Pipeline) error {
 				for _, k := range idxAdd {
@@ -120,7 +121,7 @@ func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 // Delete deletes the fields stored under the key associated with id.
 func (s *Store) Delete(id store.PrimaryKey) (err error) {
 	if id == nil {
-		return store.ErrNilKey
+		return store.ErrNilKey.New(nil)
 	}
 
 	idStr := id.String()
@@ -166,7 +167,7 @@ func (s *Store) Delete(id store.PrimaryKey) (err error) {
 // Update overwrites field values stored under PrimaryKey specified with values in diff and rebinds indexed keys present in diff.
 func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) {
 	if id == nil {
-		return store.ErrNilKey
+		return store.ErrNilKey.New(nil)
 	}
 	if len(diff) == 0 {
 		return nil
@@ -182,16 +183,11 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) 
 		if isIndex {
 			idxDel = append(idxDel, k)
 		}
-
 		fieldsDel = append(fieldsDel, k)
-		if v == nil {
-			continue
-		}
 
-		str := string(v)
-		fieldsSet[k] = str
+		fieldsSet[k] = string(v)
 		if isIndex {
-			idxAdd = append(idxAdd, s.key(k, str))
+			idxAdd = append(idxAdd, s.key(k, hex.EncodeToString(v)))
 		}
 	}
 
@@ -216,17 +212,23 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) 
 				return err
 			}
 
-			m := make(map[string]struct{}, len(fieldsCurrent))
+			curr := make(map[string]struct{}, len(fieldsCurrent))
 			for _, k := range fieldsCurrent {
-				m[k] = struct{}{}
+				curr[k] = struct{}{}
 			}
 
-			for _, fd := range fieldsDel {
-				p := fd + store.Separator
-				for fc := range m {
-					if strings.HasPrefix(fc, p) {
-						fieldsDel = append(fieldsDel, fc)
-						delete(m, fc)
+			for _, dk := range fieldsDel {
+				pre := dk + store.Separator
+				for ck := range curr {
+					if strings.HasPrefix(ck, pre) {
+						fieldsDel = append(fieldsDel, ck)
+						delete(curr, ck)
+					}
+				}
+				if i := strings.LastIndexByte(dk, store.SeparatorByte); i != -1 {
+					k := dk[:i]
+					if _, ok := curr[k]; ok {
+						fieldsDel = append(fieldsDel, k)
 					}
 				}
 			}
@@ -285,7 +287,7 @@ func newStringBytesMapCmd(c *redis.StringStringMapCmd) *stringBytesMapCmd {
 // Find returns the fields stored under PrimaryKey specified.
 func (s *Store) Find(id store.PrimaryKey) (map[string][]byte, error) {
 	if id == nil {
-		return nil, store.ErrNilKey
+		return nil, store.ErrNilKey.New(nil)
 	}
 
 	m, err := newStringBytesMapCmd(s.Redis.HGetAll(s.key(id.String()))).Result()
@@ -298,11 +300,15 @@ func (s *Store) Find(id store.PrimaryKey) (map[string][]byte, error) {
 // FindBy returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
 // meaning that only entries matching all the fields in filter should be returned.
 func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[string][]byte, err error) {
+	if len(filter) == 0 {
+		return nil, store.ErrEmptyFilter.New(nil)
+	}
+
 	idxKeys := make([]string, 0, len(filter))
 	fieldFilter := make([]string, 0, len(filter))
 	for k, v := range filter {
 		if _, ok := s.indexKeys[k]; ok {
-			idxKeys = append(idxKeys, s.key(k, string(v)))
+			idxKeys = append(idxKeys, s.key(k, hex.EncodeToString(v)))
 		} else {
 			fieldFilter = append(fieldFilter, k)
 		}
@@ -317,10 +323,7 @@ func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[s
 			if len(idxKeys) != 0 {
 				ids, err = tx.SInter(idxKeys...).Result()
 			} else {
-				ids, err = tx.Keys(s.key("*")).Result()
-				for i, key := range ids {
-					ids[i] = base(key)
-				}
+				return errors.New("At least one index key must be specified")
 			}
 			if err != nil {
 				return err
@@ -376,10 +379,10 @@ func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[s
 }
 
 func (s *Store) put(id store.PrimaryKey, bs ...[]byte) error {
-	idStr := id.String()
+	k := s.key(id.String())
 	_, err := s.Redis.Pipelined(func(p *redis.Pipeline) error {
 		for _, b := range bs {
-			p.SAdd(idStr, b)
+			p.SAdd(k, b)
 		}
 		return nil
 	})
@@ -388,7 +391,7 @@ func (s *Store) put(id store.PrimaryKey, bs ...[]byte) error {
 
 func (s *Store) Put(id store.PrimaryKey, bs ...[]byte) error {
 	if id == nil {
-		return store.ErrNilKey
+		return store.ErrNilKey.New(nil)
 	}
 	if len(bs) == 0 {
 		return nil
@@ -410,30 +413,30 @@ func (s *Store) CreateSet(bs ...[]byte) (store.PrimaryKey, error) {
 
 func (s *Store) FindSet(id store.PrimaryKey) (bs [][]byte, err error) {
 	if id == nil {
-		return nil, store.ErrNilKey
+		return nil, store.ErrNilKey.New(nil)
 	}
-	return bs, s.Redis.SMembers(id.String()).ScanSlice(&bs)
+	return bs, s.Redis.SMembers(s.key(id.String())).ScanSlice(&bs)
 }
 
 func (s *Store) Contains(id store.PrimaryKey, b []byte) (bool, error) {
 	if id == nil {
-		return false, store.ErrNilKey
+		return false, store.ErrNilKey.New(nil)
 	}
-	return s.Redis.SIsMember(id.String(), b).Result()
+	return s.Redis.SIsMember(s.key(id.String()), b).Result()
 }
 
 func (s *Store) Remove(id store.PrimaryKey, bs ...[]byte) error {
 	if id == nil {
-		return store.ErrNilKey
+		return store.ErrNilKey.New(nil)
 	}
 	if len(bs) == 0 {
 		return nil
 	}
 
-	idStr := id.String()
+	k := s.key(id.String())
 	_, err := s.Redis.Pipelined(func(p *redis.Pipeline) error {
 		for _, b := range bs {
-			p.SRem(idStr, b)
+			p.SRem(k, b)
 		}
 		return nil
 	})
@@ -442,13 +445,13 @@ func (s *Store) Remove(id store.PrimaryKey, bs ...[]byte) error {
 
 func (s *Store) Append(id store.PrimaryKey, bs ...[]byte) error {
 	if id == nil {
-		return store.ErrNilKey
+		return store.ErrNilKey.New(nil)
 	}
 	if len(bs) == 0 {
 		return nil
 	}
 
-	n, err := s.Redis.RPush(id.String(), bs).Result()
+	n, err := s.Redis.RPush(s.key(id.String()), bs).Result()
 	if err != nil {
 		return err
 	}
@@ -472,7 +475,7 @@ func (s *Store) CreateList(bs ...[]byte) (store.PrimaryKey, error) {
 
 func (s *Store) FindList(id store.PrimaryKey) (bs [][]byte, err error) {
 	if id == nil {
-		return nil, store.ErrNilKey
+		return nil, store.ErrNilKey.New(nil)
 	}
-	return bs, s.Redis.LRange(id.String(), 0, -1).ScanSlice(bs)
+	return bs, s.Redis.LRange(s.key(id.String()), 0, -1).ScanSlice(bs)
 }
