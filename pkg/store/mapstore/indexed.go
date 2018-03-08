@@ -92,7 +92,7 @@ func (s *indexedStore) Create(fields map[string]interface{}) (store.PrimaryKey, 
 
 func (s *indexedStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
 	if id == nil {
-		return store.ErrNilKey
+		return store.ErrNilKey.New(nil)
 	}
 	if len(diff) == 0 {
 		return nil
@@ -123,7 +123,11 @@ func (s *indexedStore) Update(id store.PrimaryKey, diff map[string]interface{}) 
 	return nil
 }
 
-func (s *indexedStore) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
+func (s *indexedStore) FindBy(filter map[string]interface{}) (matches map[store.PrimaryKey]map[string]interface{}, err error) {
+	if len(filter) == 0 {
+		return nil, store.ErrEmptyFilter.New(nil)
+	}
+
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	idxs := make(map[string]interface{}, len(filter))
@@ -137,9 +141,12 @@ func (s *indexedStore) FindBy(filter map[string]interface{}) (map[store.PrimaryK
 		}
 	}
 
-	byFields, err := s.mapStore.FindBy(fields)
-	if err != nil {
-		return nil, err
+	var byFields map[store.PrimaryKey]map[string]interface{}
+	if len(fields) > 0 {
+		byFields, err = s.mapStore.FindBy(fields)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	idxKeys, err := s.filterIndex(idxs)
@@ -158,7 +165,7 @@ func (s *indexedStore) FindBy(filter map[string]interface{}) (map[store.PrimaryK
 		filterSet.Intersect(set)
 	}
 
-	matches := make(map[store.PrimaryKey]map[string]interface{})
+	matches = make(map[store.PrimaryKey]map[string]interface{})
 	switch {
 	case len(idxs) != 0 && len(fields) != 0:
 		for k, v := range byFields {
@@ -183,7 +190,7 @@ func (s *indexedStore) FindBy(filter map[string]interface{}) (map[store.PrimaryK
 
 func (s *indexedStore) Delete(id store.PrimaryKey) error {
 	if id == nil {
-		return store.ErrNilKey
+		return store.ErrNilKey.New(nil)
 	}
 
 	s.mu.Lock()

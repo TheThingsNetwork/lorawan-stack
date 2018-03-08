@@ -11,6 +11,6 @@ import (
 
 func TestIndexedMapStore(t *testing.T) {
 	storetest.TestTypedStore(t, func() store.TypedStore {
-		return NewIndexed(storetest.Indexed...)
+		return NewIndexed(storetest.IndexedFields...)
 	})
 }

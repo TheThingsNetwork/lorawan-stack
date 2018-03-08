@@ -43,7 +43,7 @@ func (s *mapStore) Create(fields map[string]interface{}) (store.PrimaryKey, erro
 
 func (s *mapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	if id == nil {
-		return nil, store.ErrNilKey
+		return nil, store.ErrNilKey.New(nil)
 	}
 
 	s.mu.RLock()
@@ -53,6 +53,10 @@ func (s *mapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 }
 
 func (s *mapStore) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
+	if len(filter) == 0 {
+		return nil, store.ErrEmptyFilter.New(nil)
+	}
+
 	matches := make(map[store.PrimaryKey]map[string]interface{})
 	s.mu.RLock()
 outer:
@@ -74,7 +78,7 @@ outer:
 
 func (s *mapStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
 	if id == nil {
-		return store.ErrNilKey
+		return store.ErrNilKey.New(nil)
 	}
 	if len(diff) == 0 {
 		return nil
@@ -106,7 +110,7 @@ func (s *mapStore) Update(id store.PrimaryKey, diff map[string]interface{}) erro
 
 func (s *mapStore) Delete(id store.PrimaryKey) error {
 	if id == nil {
-		return store.ErrNilKey
+		return store.ErrNilKey.New(nil)
 	}
 
 	s.mu.Lock()
