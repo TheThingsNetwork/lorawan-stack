@@ -11,7 +11,7 @@ import (
 // Interface represents the interface exposed by the *Registry.
 type Interface interface {
 	Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error)
-	FindBy(ed ...*ttnpb.EndDevice) ([]*Device, error)
+	FindBy(ed *ttnpb.EndDevice, fields ...string) ([]*Device, error)
 }
 
 // Registry is responsible for mapping devices to their identities.
@@ -36,43 +36,34 @@ func (r *Registry) Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error
 }
 
 // FindBy searches for devices matching specified device fields in underlying store.Interface. The returned slice contains unique devices, matching at least one of values in eds.
-func (r *Registry) FindBy(eds ...*ttnpb.EndDevice) ([]*Device, error) {
-	found := make(map[store.PrimaryKey]*ttnpb.EndDevice)
-	for i, ed := range eds {
-		if ed == nil {
-			return nil, errors.Errorf("Device %d is nil", i)
-		}
-		m, err := r.store.FindBy(ed, func() interface{} { return &ttnpb.EndDevice{} })
-		if err != nil {
-			return nil, err
-		}
-		for id, dev := range m {
-			found[id] = dev.(*ttnpb.EndDevice)
-		}
+func (r *Registry) FindBy(ed *ttnpb.EndDevice, fields ...string) ([]*Device, error) {
+	if ed == nil {
+		return nil, errors.New("Device specified is nil")
+	}
+
+	found, err := r.store.FindBy(ed, func() interface{} { return &ttnpb.EndDevice{} }, fields...)
+	if err != nil {
+		return nil, err
 	}
 
 	devices := make([]*Device, 0, len(found))
 	for id, ed := range found {
-		devices = append(devices, newDevice(ed, r.store, id))
+		devices = append(devices, newDevice(ed.(*ttnpb.EndDevice), r.store, id))
 	}
 	return devices, nil
 }
 
 // FindDeviceByIdentifiers searches for devices matching specified device identifiers in r.
-func FindDeviceByIdentifiers(r Interface, ids ...*ttnpb.EndDeviceIdentifiers) ([]*Device, error) {
-	devs := make([]*ttnpb.EndDevice, len(ids))
-	for i, id := range ids {
-		if id == nil {
-			return nil, errors.Errorf("Identifier %d is nil", i)
-		}
-		devs[i] = &ttnpb.EndDevice{EndDeviceIdentifiers: *id}
+func FindDeviceByIdentifiers(r Interface, id *ttnpb.EndDeviceIdentifiers) ([]*Device, error) {
+	if id == nil {
+		return nil, errors.New("Identifiers specified are nil")
 	}
-	return r.FindBy(devs...)
+	return r.FindBy(&ttnpb.EndDevice{EndDeviceIdentifiers: *id}, "EndDeviceIdentifiers")
 }
 
 // FindOneDeviceByIdentifiers searches for exactly one device matching specified device identifiers in r.
-func FindOneDeviceByIdentifiers(r Interface, ids ...*ttnpb.EndDeviceIdentifiers) (*Device, error) {
-	devs, err := FindDeviceByIdentifiers(r, ids...)
+func FindOneDeviceByIdentifiers(r Interface, id *ttnpb.EndDeviceIdentifiers) (*Device, error) {
+	devs, err := FindDeviceByIdentifiers(r, id)
 	if err != nil {
 		return nil, err
 	}

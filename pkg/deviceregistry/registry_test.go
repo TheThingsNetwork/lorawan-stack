@@ -37,7 +37,9 @@ func TestRegistry(t *testing.T) {
 		return
 	}
 	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		a.So(pretty.Diff(found[0].EndDevice, ed), should.BeEmpty)
+		if !a.So(found[0].EndDevice, should.Resemble, ed) {
+			pretty.Ldiff(t, ed, found[0].EndDevice)
+		}
 	}
 
 	updated := ttnpb.NewPopulatedEndDevice(test.Randy, false)
@@ -46,8 +48,7 @@ func TestRegistry(t *testing.T) {
 	}
 	dev.EndDevice = updated
 
-	fields, err := store.DiffFields(updated, ed)
-	if !a.So(err, should.BeNil) || !a.So(dev.Update(fields...), should.BeNil) {
+	if !a.So(dev.Update(), should.BeNil) {
 		return
 	}
 
@@ -60,7 +61,10 @@ func TestRegistry(t *testing.T) {
 	found, err = r.FindBy(updated)
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		a.So(pretty.Diff(found[0].EndDevice, updated), should.BeEmpty)
+		if !a.So(found[0].EndDevice, should.Resemble, updated) {
+			pretty.Ldiff(t, updated, found[0].EndDevice)
+			return
+		}
 	}
 
 	a.So(dev.Delete(), should.BeNil)
@@ -122,8 +126,7 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 	}
 	dev.EndDevice = updated
 
-	fields, err := store.DiffFields(updated, ed)
-	if !a.So(err, should.BeNil) || !a.So(dev.Update(fields...), should.BeNil) {
+	if !a.So(dev.Update(), should.BeNil) {
 		return
 	}
 
