@@ -4,11 +4,14 @@ package storetest
 
 import (
 	"bytes"
+	"encoding/gob"
 	"math"
 	"math/rand"
+	"reflect"
 	"strconv"
 	"testing"
 
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -103,6 +106,7 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 				"bar": "bar",
 				"baz": "baz",
 				"qux": "qux",
+				"hey": nil,
 			},
 			map[string]interface{}{
 				"bar": "bar",
@@ -122,6 +126,7 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 			},
 			map[string]interface{}{
 				"a.a":   1,
+				"a.b":   nil,
 				"a.bar": "foo",
 				"a.c":   "ac",
 			},
@@ -129,6 +134,38 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 				"a.a": 1,
 			},
 		},
+		{
+			map[string]interface{}{
+				"empty": "",
+				"nil":   nil,
+			},
+			map[string]interface{}{
+				"nil.nil": nil,
+			},
+			map[string]interface{}{
+				"empty":   "",
+				"nil.nil": nil,
+			},
+			map[string]interface{}{
+				"empty": "",
+			},
+		},
+		{
+			map[string]interface{}{
+				"empty":   "",
+				"nil.nil": nil,
+			},
+			map[string]interface{}{
+				"nil": nil,
+			},
+			map[string]interface{}{
+				"empty": "",
+				"nil":   nil,
+			},
+			map[string]interface{}{
+				"empty": "",
+			},
+		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
@@ -195,160 +232,6 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 			}
 
 			matches, err = s.FindBy(nil)
-			a.So(err, should.BeNil)
-			if a.So(matches, should.HaveLength, 1) {
-				for _, v := range matches {
-					a.So(v, should.Resemble, tc.AfterUpdate)
-				}
-			}
-
-			err = s.Delete(id)
-			if !a.So(err, should.BeNil) {
-				return
-			}
-
-			found, err = s.Find(id)
-			a.So(err, should.BeNil)
-			a.So(found, should.Equal, nil)
-
-			matches, err = s.FindBy(tc.AfterUpdate)
-			a.So(err, should.BeNil)
-			a.So(matches, should.HaveLength, 0)
-
-			matches, err = s.FindBy(tc.FindBy)
-			a.So(err, should.BeNil)
-			a.So(matches, should.HaveLength, 0)
-		})
-	}
-}
-
-// TestByteStore executes a black-box test for the given byte store
-func TestByteStore(t testingT, newStore func() store.ByteStore) {
-	a := assertions.New(t)
-
-	s := newStore()
-
-	id, err := s.Create(make(map[string][]byte))
-	a.So(err, should.BeNil)
-	a.So(id, should.NotBeNil)
-
-	idOther, err := s.Create(make(map[string][]byte))
-	a.So(err, should.BeNil)
-	a.So(idOther, should.NotBeNil)
-
-	a.So(id, should.NotResemble, idOther)
-
-	// Behavior is implementation-dependent
-	a.So(func() { s.Find(id) }, should.NotPanic)
-
-	err = s.Update(id, make(map[string][]byte))
-	a.So(err, should.BeNil)
-
-	a.So(func() { s.Find(id) }, should.NotPanic)
-
-	err = s.Delete(id)
-	a.So(err, should.BeNil)
-
-	for i, tc := range []struct {
-		Stored      map[string][]byte
-		Updated     map[string][]byte
-		AfterUpdate map[string][]byte
-		FindBy      map[string][]byte
-	}{
-		{
-			map[string][]byte{
-				"foo": []byte("foo"),
-				"bar": []byte("bar"),
-				"baz": []byte("baz"),
-				"hey": []byte("there"),
-			},
-			map[string][]byte{
-				"foo": []byte("foo"),
-				"qux": []byte("qux"),
-				"hey": nil,
-			},
-			map[string][]byte{
-				"foo": []byte("foo"),
-				"bar": []byte("bar"),
-				"baz": []byte("baz"),
-				"qux": []byte("qux"),
-			},
-			map[string][]byte{
-				"foo": []byte("foo"),
-				"bar": []byte("bar"),
-			},
-		},
-		{
-			map[string][]byte{
-				"a.a":   {1},
-				"a.bar": []byte("foo"),
-				"a.b.a": []byte("1"),
-				"a.b.c": []byte("foo"),
-				"a.c.b": []byte("acb"),
-			},
-			map[string][]byte{
-				"a.b": nil,
-				"a.c": []byte("ac"),
-			},
-			map[string][]byte{
-				"a.a":   {1},
-				"a.bar": []byte("foo"),
-				"a.c":   []byte("ac"),
-			},
-			map[string][]byte{
-				"a.a": {1},
-			},
-		},
-	} {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			a := assertions.New(t)
-
-			s := newStore()
-
-			id, err := s.Create(tc.Stored)
-			if !a.So(err, should.BeNil) {
-				return
-			}
-			a.So(id, should.NotBeNil)
-
-			found, err := s.Find(id)
-			a.So(err, should.BeNil)
-			a.So(found, should.Resemble, tc.Stored)
-
-			matches, err := s.FindBy(tc.Stored)
-			a.So(err, should.BeNil)
-			if a.So(matches, should.HaveLength, 1) {
-				for _, v := range matches {
-					a.So(v, should.Resemble, tc.Stored)
-				}
-			}
-
-			matches, err = s.FindBy(tc.FindBy)
-			a.So(err, should.BeNil)
-			if a.So(matches, should.HaveLength, 1) {
-				for _, v := range matches {
-					a.So(v, should.Resemble, tc.Stored)
-				}
-			}
-
-			err = s.Update(id, tc.Updated)
-			if !a.So(err, should.BeNil) {
-				return
-			}
-
-			found, err = s.Find(id)
-			a.So(err, should.BeNil)
-			a.So(found, should.Resemble, tc.AfterUpdate)
-
-			matches, err = s.FindBy(tc.AfterUpdate)
-			a.So(err, should.BeNil)
-			if a.So(matches, should.HaveLength, 1) {
-				for _, v := range matches {
-					a.So(v, should.Resemble, tc.AfterUpdate)
-				}
-			}
-
-			matches, err = s.FindBy(tc.FindBy)
 			a.So(err, should.BeNil)
 			if a.So(matches, should.HaveLength, 1) {
 				for _, v := range matches {
@@ -636,4 +519,122 @@ func TestByteListStore(t testingT, newStore func() store.ByteListStore) {
 			a.So(err, should.BeNil)
 		})
 	}
+}
+
+// GenericStore is a TypedStore adapter for an arbitrary store, which executes methods using reflection
+// and converts the supplied/returned values to match function signatures.
+type GenericStore struct {
+	store reflect.Value
+
+	fromIfaceMap func(map[string]interface{}) interface{}
+	toIfaceMap   func(interface{}) map[string]interface{}
+}
+
+func reflectValueToError(v reflect.Value) error {
+	if !v.IsValid() {
+		return nil
+	}
+	iface := v.Interface()
+	if iface == nil {
+		return nil
+	}
+	return iface.(error)
+}
+
+func (gs GenericStore) Create(fields map[string]interface{}) (store.PrimaryKey, error) {
+	ret := gs.store.MethodByName("Create").Call([]reflect.Value{
+		reflect.ValueOf(gs.fromIfaceMap(fields)),
+	})
+	if err := reflectValueToError(ret[1]); err != nil {
+		return nil, err
+	}
+	return ret[0].Interface().(store.PrimaryKey), nil
+}
+func (gs GenericStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
+	ret := gs.store.MethodByName("Find").Call([]reflect.Value{
+		reflect.ValueOf(id),
+	})
+	if err := reflectValueToError(ret[1]); err != nil {
+		return nil, err
+	}
+	return gs.toIfaceMap(ret[0].Interface()), nil
+}
+func (gs GenericStore) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
+	ret := gs.store.MethodByName("FindBy").Call([]reflect.Value{
+		reflect.ValueOf(gs.fromIfaceMap(filter)),
+	})
+	if err := reflectValueToError(ret[1]); err != nil {
+		return nil, err
+	}
+
+	m := make(map[store.PrimaryKey]map[string]interface{}, ret[0].Len())
+	for _, k := range ret[0].MapKeys() {
+		m[k.Interface().(store.PrimaryKey)] = gs.toIfaceMap(ret[0].MapIndex(k).Interface())
+	}
+	return m, nil
+}
+func (gs GenericStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
+	return reflectValueToError(gs.store.MethodByName("Update").Call([]reflect.Value{
+		reflect.ValueOf(id),
+		reflect.ValueOf(gs.fromIfaceMap(diff)),
+	})[0])
+}
+func (gs GenericStore) Delete(id store.PrimaryKey) error {
+	return reflectValueToError(gs.store.MethodByName("Delete").Call([]reflect.Value{
+		reflect.ValueOf(id),
+	})[0])
+}
+
+// NewGenericStore returns a new generic store given a store implementation s (e.g. a ByteStore),
+// fromIfaceMap and toIfaceMap convertors.
+// The methods of s are executed using reflection and values are converted if necessary.
+func NewGenericStore(s interface{}, fromIfaceMap func(map[string]interface{}) interface{}, toIfaceMap func(interface{}) map[string]interface{}) *GenericStore {
+	return &GenericStore{
+		store:        reflect.ValueOf(s),
+		fromIfaceMap: fromIfaceMap,
+		toIfaceMap:   toIfaceMap,
+	}
+}
+
+// TestByteStore executes a black-box test for the given byte store.
+func TestByteStore(t testingT, newStore func() store.ByteStore) {
+	TestTypedStore(t, func() store.TypedStore {
+		return NewGenericStore(newStore(),
+			func(m map[string]interface{}) interface{} {
+				ret := make(map[string][]byte, len(m))
+				for k, v := range m {
+					if v == nil {
+						ret[k] = nil
+						continue
+					}
+
+					gob.Register(v)
+
+					var buf bytes.Buffer
+					if err := gob.NewEncoder(&buf).Encode(&v); err != nil {
+						panic(errors.Errorf("Failed to gob-encode %s value %s to bytes: %s", k, v, err))
+					}
+					ret[k] = buf.Bytes()
+				}
+				return ret
+			},
+			func(v interface{}) map[string]interface{} {
+				m := v.(map[string][]byte)
+
+				ret := make(map[string]interface{}, len(m))
+				for k, v := range m {
+					if len(v) == 0 {
+						ret[k] = nil
+						continue
+					}
+
+					var dv interface{}
+					if err := gob.NewDecoder(bytes.NewReader(v)).Decode(&dv); err != nil {
+						panic(errors.Errorf("Failed to gob-decode %s value %s to interface: %s", k, v, err))
+					}
+					ret[k] = dv
+				}
+				return ret
+			})
+	})
 }

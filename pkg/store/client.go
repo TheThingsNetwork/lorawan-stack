@@ -3,6 +3,7 @@
 package store
 
 import (
+	"reflect"
 	"strings"
 )
 
@@ -86,6 +87,12 @@ func (cl *typedStoreClient) FindBy(filter interface{}, newResult NewResultFunc, 
 	fm, err := MarshalMap(filter)
 	if err != nil {
 		return nil, err
+	}
+
+	for k, v := range fm {
+		if v == nil || isZero(reflect.ValueOf(v)) {
+			delete(fm, k)
+		}
 	}
 
 	m, err := cl.TypedStore.FindBy(filterFields(fm, fields...))
@@ -186,6 +193,12 @@ func (cl *byteStoreClient) FindBy(filter interface{}, newResult NewResultFunc, f
 	fm, err := MarshalByteMap(filter)
 	if err != nil {
 		return nil, err
+	}
+
+	for k, v := range fm {
+		if v == nil {
+			delete(fm, k)
+		}
 	}
 
 	m, err := cl.ByteStore.FindBy(filterByteFields(fm, fields...))

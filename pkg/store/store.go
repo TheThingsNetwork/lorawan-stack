@@ -5,8 +5,6 @@ package store
 
 import (
 	"fmt"
-
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 )
 
 // Encoding represents the encoding used to encode value into []byte representation.
@@ -15,7 +13,8 @@ type Encoding byte
 
 const (
 	// Separator used to separate the flattened struct fields
-	Separator = "."
+	SeparatorByte = '.'
+	Separator     = string(SeparatorByte)
 
 	// NOTE: The following list MUST NOT be reordered
 
@@ -27,14 +26,6 @@ const (
 	ProtoEncoding Encoding = 3
 	// GobEncoding represents case when Gob was used to encode value.
 	GobEncoding Encoding = 4
-)
-
-var (
-	// ErrInvalidData represents an error returned, when value stored is not valid.
-	ErrInvalidData = errors.New("Invalid data")
-
-	// ErrNilKey represents an error returned, when key specified is nil.
-	ErrNilKey = errors.New("Nil key specified")
 )
 
 // PrimaryKey represents the value used by store implementations to uniquely identify stored objects.

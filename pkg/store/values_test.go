@@ -3,6 +3,7 @@
 package store_test
 
 import (
+	"bytes"
 	"encoding/gob"
 	"reflect"
 	"time"
@@ -10,7 +11,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	. "github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/gogo/protobuf/proto"
-	"github.com/mitchellh/mapstructure"
 )
 
 type InterfaceStructA struct {
@@ -38,16 +38,28 @@ type SubStruct struct {
 	String       string
 	SubSubStruct SubSubStruct
 }
+
+type StructWithMap struct {
+	Map map[string]string
+}
+
 type Struct struct {
-	ByteArray    byteArray
-	Bytes        []byte
-	Empty        interface{}
-	Int          int
-	Interface    interface{}
-	String       string
-	StructSlice  []SubStruct
-	SubStruct    SubStruct
-	SubStructPtr *SubStruct
+	ByteArray         byteArray
+	Bytes             []byte
+	Empty             interface{}
+	Int               int
+	Int64             int64
+	Uint8             uint8
+	Float32           float32
+	Interface         interface{}
+	String            string
+	StructSlice       []SubStruct
+	SubStruct         SubStruct
+	SubStructPtr      *SubStruct
+	StructWithMap     StructWithMap
+	StructWithZeroMap StructWithMap
+	StructWithNilMap  StructWithMap
+	NilPtr            *struct{}
 }
 
 type byteArray [2]byte
@@ -221,23 +233,25 @@ var _ interface{} = func() interface{} {
 	return nil
 }()
 
-var values = []struct {
+var structValues = []struct {
 	unmarshaled interface{}
 	marshaled   map[string]interface{}
 	bytes       map[string][]byte
-	decodeHooks []mapstructure.DecodeHookFunc
 }{
 	{
 		Struct{
 			String:    "42",
 			Int:       42,
+			Int64:     42,
+			Uint8:     42,
+			Float32:   42.42,
 			Interface: InterfaceStructA{42},
 			Bytes:     []byte("42"),
-			ByteArray: byteArray([2]byte{'4', '2'}),
+			ByteArray: byteArray{'4', '2'},
 			StructSlice: []SubStruct{
 				{
 					String:    "42",
-					ByteArray: byteArray([2]byte{'4', '2'}),
+					ByteArray: byteArray{'4', '2'},
 				},
 				{
 					Int:       42,
@@ -253,23 +267,32 @@ var values = []struct {
 				Int:       42,
 				Interface: "42",
 				Bytes:     []byte("42"),
-				ByteArray: byteArray([2]byte{'4', '2'}),
+				ByteArray: byteArray{'4', '2'},
 				SubSubStruct: SubSubStruct{
 					String:    "42",
 					Int:       42,
 					Bytes:     []byte("42"),
-					ByteArray: byteArray([2]byte{'4', '2'}),
+					ByteArray: byteArray{'4', '2'},
 				},
 			},
 			SubStructPtr: &SubStruct{
-				String: "42",
-				Int:    42,
+				String:    "42",
+				Int:       42,
+				ByteArray: byteArray([2]byte{}),
 			},
+			NilPtr:            nil,
+			StructWithMap:     StructWithMap{Map: map[string]string{"42": "foo"}},
+			StructWithZeroMap: StructWithMap{Map: map[string]string{}},
+			StructWithNilMap:  StructWithMap{Map: (map[string]string)(nil)},
 		},
 		map[string]interface{}{
 			"ByteArray": mustToBytes(byteArray{'4', '2'}),
-			"Bytes":     []byte("42"),
+			"Bytes":     mustToBytes([]byte("42")),
+			"Empty":     nil,
+			"Float32":   float32(42.42),
 			"Int":       int(42),
+			"Int64":     int64(42),
+			"Uint8":     uint8(42),
 			"Interface": mustToBytesValue(
 				wrapValue(reflect.ValueOf(InterfaceStructA{42}),
 					reflect.TypeOf((*interface{})(nil)).Elem())),
@@ -277,7 +300,69 @@ var values = []struct {
 			"StructSlice": mustToBytes([]SubStruct{
 				{
 					String:    "42",
-					ByteArray: byteArray([2]byte{'4', '2'}),
+					ByteArray: byteArray{'4', '2'},
+				},
+				{
+					Int:       42,
+					Interface: float64(42),
+					Bytes:     []byte("42"),
+				},
+				{
+					Interface: InterfaceStructB{map[string]bool{"42": true}},
+				},
+			}),
+			"NilPtr":                nil,
+			"StructWithMap.Map":     mustToBytes(map[string]string{"42": "foo"}),
+			"StructWithZeroMap.Map": mustToBytes(map[string]string{}),
+			"StructWithNilMap.Map":  nil,
+			"SubStruct.ByteArray":   mustToBytes(byteArray{'4', '2'}),
+			"SubStruct.Bytes":       mustToBytes([]byte("42")),
+			"SubStruct.Empty":       nil,
+			"SubStruct.Int":         int(42),
+			"SubStruct.Interface": mustToBytesValue(
+				wrapValue(reflect.ValueOf("42"),
+					reflect.TypeOf((*interface{})(nil)).Elem())),
+			"SubStruct.String":                    string("42"),
+			"SubStruct.SubSubStruct.ByteArray":    mustToBytes(byteArray{'4', '2'}),
+			"SubStruct.SubSubStruct.Bytes":        mustToBytes([]byte("42")),
+			"SubStruct.SubSubStruct.Empty":        nil,
+			"SubStruct.SubSubStruct.Int":          int(42),
+			"SubStruct.SubSubStruct.Interface":    nil,
+			"SubStruct.SubSubStruct.String":       string("42"),
+			"SubStructPtr.ByteArray":              mustToBytes(byteArray{}),
+			"SubStructPtr.Bytes":                  nil,
+			"SubStructPtr.Empty":                  nil,
+			"SubStructPtr.Int":                    int(42),
+			"SubStructPtr.Interface":              nil,
+			"SubStructPtr.String":                 string("42"),
+			"SubStructPtr.SubSubStruct.ByteArray": mustToBytes(byteArray{}),
+			"SubStructPtr.SubSubStruct.Bytes":     nil,
+			"SubStructPtr.SubSubStruct.Empty":     nil,
+			"SubStructPtr.SubSubStruct.Int":       int(0),
+			"SubStructPtr.SubSubStruct.Interface": nil,
+			"SubStructPtr.SubSubStruct.String":    string(""),
+		},
+
+		map[string][]byte{
+			"ByteArray": mustToBytes(byteArray{'4', '2'}),
+			"Bytes":     mustToBytes([]byte("42")),
+			"Empty":     nil,
+			"Interface": mustToBytesValue(
+				wrapValue(reflect.ValueOf(InterfaceStructA{42}),
+					reflect.TypeOf((*interface{})(nil)).Elem())),
+			"Int":                   mustToBytes(int(42)),
+			"Float32":               mustToBytes(float32(42.42)),
+			"Int64":                 mustToBytes(int64(42)),
+			"Uint8":                 mustToBytes(uint8(42)),
+			"String":                mustToBytes("42"),
+			"NilPtr":                nil,
+			"StructWithMap.Map":     mustToBytes(map[string]string{"42": "foo"}),
+			"StructWithZeroMap.Map": mustToBytes(map[string]string{}),
+			"StructWithNilMap.Map":  nil,
+			"StructSlice": mustToBytes([]SubStruct{
+				{
+					String:    "42",
+					ByteArray: byteArray{'4', '2'},
 				},
 				{
 					Int:       42,
@@ -289,57 +374,56 @@ var values = []struct {
 				},
 			}),
 			"SubStruct.ByteArray": mustToBytes(byteArray{'4', '2'}),
-			"SubStruct.Bytes":     []byte("42"),
-			"SubStruct.Int":       int(42),
+			"SubStruct.Bytes":     mustToBytes([]byte("42")),
+			"SubStruct.Int":       mustToBytes(int(42)),
 			"SubStruct.Interface": mustToBytesValue(
 				wrapValue(reflect.ValueOf("42"),
 					reflect.TypeOf((*interface{})(nil)).Elem())),
-			"SubStruct.String":                 string("42"),
-			"SubStruct.SubSubStruct.ByteArray": mustToBytes(byteArray{'4', '2'}),
-			"SubStruct.SubSubStruct.Bytes":     []byte("42"),
-			"SubStruct.SubSubStruct.Int":       int(42),
-			"SubStruct.SubSubStruct.String":    string("42"),
-			"SubStructPtr.Int":                 int(42),
-			"SubStructPtr.String":              string("42"),
+			"SubStruct.Empty":                     nil,
+			"SubStruct.String":                    mustToBytes("42"),
+			"SubStruct.SubSubStruct.ByteArray":    mustToBytes(byteArray{'4', '2'}),
+			"SubStruct.SubSubStruct.Bytes":        mustToBytes([]byte("42")),
+			"SubStruct.SubSubStruct.Empty":        nil,
+			"SubStruct.SubSubStruct.Int":          mustToBytes(int(42)),
+			"SubStruct.SubSubStruct.Interface":    nil,
+			"SubStruct.SubSubStruct.String":       mustToBytes("42"),
+			"SubStructPtr.ByteArray":              mustToBytes(byteArray{}),
+			"SubStructPtr.Bytes":                  nil,
+			"SubStructPtr.Empty":                  nil,
+			"SubStructPtr.Int":                    mustToBytes(int(42)),
+			"SubStructPtr.Interface":              nil,
+			"SubStructPtr.String":                 mustToBytes("42"),
+			"SubStructPtr.SubSubStruct.ByteArray": mustToBytes(byteArray{}),
+			"SubStructPtr.SubSubStruct.Bytes":     nil,
+			"SubStructPtr.SubSubStruct.Empty":     nil,
+			"SubStructPtr.SubSubStruct.Int":       mustToBytes(0),
+			"SubStructPtr.SubSubStruct.Interface": nil,
+			"SubStructPtr.SubSubStruct.String":    mustToBytes(""),
 		},
-
+	},
+	{
+		struct {
+			EmptyArray [2]uint
+			EmptyBytes []byte
+			EmptyInts  []int
+			NilBytes   []byte
+		}{
+			EmptyBytes: make([]byte, 0),
+			EmptyInts:  make([]int, 0),
+			NilBytes:   ([]byte)(nil),
+		},
+		map[string]interface{}{
+			"EmptyArray": mustToBytes([2]uint{}),
+			"EmptyBytes": mustToBytes(make([]byte, 0)),
+			"EmptyInts":  mustToBytes(make([]int, 0)),
+			"NilBytes":   nil,
+		},
 		map[string][]byte{
-			"ByteArray": mustToBytes("42"),
-			"Bytes":     mustToBytes("42"),
-			"Int":       mustToBytes(42),
-			"Interface": mustToBytesValue(
-				wrapValue(reflect.ValueOf(InterfaceStructA{42}),
-					reflect.TypeOf((*interface{})(nil)).Elem())),
-			"String": mustToBytes("42"),
-			"StructSlice": mustToBytes([]SubStruct{
-				{
-					String:    "42",
-					ByteArray: byteArray([2]byte{'4', '2'}),
-				},
-				{
-					Int:       42,
-					Interface: float64(42),
-					Bytes:     []byte("42"),
-				},
-				{
-					Interface: InterfaceStructB{map[string]bool{"42": true}},
-				},
-			}),
-			"SubStruct.ByteArray": mustToBytes("42"),
-			"SubStruct.Bytes":     mustToBytes("42"),
-			"SubStruct.Int":       mustToBytes(42),
-			"SubStruct.Interface": mustToBytesValue(
-				wrapValue(reflect.ValueOf("42"),
-					reflect.TypeOf((*interface{})(nil)).Elem())),
-			"SubStruct.String":                 mustToBytes("42"),
-			"SubStruct.SubSubStruct.ByteArray": mustToBytes("42"),
-			"SubStruct.SubSubStruct.Bytes":     mustToBytes("42"),
-			"SubStruct.SubSubStruct.Int":       mustToBytes(42),
-			"SubStruct.SubSubStruct.String":    mustToBytes("42"),
-			"SubStructPtr.Int":                 mustToBytes(42),
-			"SubStructPtr.String":              mustToBytes("42"),
+			"EmptyArray": mustToBytes([2]uint{}),
+			"EmptyBytes": mustToBytes(make([]byte, 0)),
+			"EmptyInts":  mustToBytes(make([]int, 0)),
+			"NilBytes":   nil,
 		},
-		nil,
 	},
 	{
 		struct {
@@ -348,7 +432,6 @@ var values = []struct {
 		}{},
 		(map[string]interface{})(nil),
 		(map[string][]byte)(nil),
-		nil,
 	},
 	{
 		struct {
@@ -374,19 +457,16 @@ var values = []struct {
 				wrapValue(reflect.ValueOf(struct{ A int }{42}),
 					reflect.TypeOf((*interface{})(nil)).Elem())),
 		},
-		nil,
 	},
 	{
 		struct{ time.Time }{time.Unix(42, 42).UTC()},
 		map[string]interface{}{"Time": mustToBytes(time.Unix(42, 42).UTC())},
 		map[string][]byte{"Time": mustToBytes(time.Unix(42, 42).UTC())},
-		nil,
 	},
 	{
 		struct{ T time.Time }{time.Unix(42, 42).UTC()},
 		map[string]interface{}{"T": mustToBytes(time.Unix(42, 42).UTC())},
 		map[string][]byte{"T": mustToBytes(time.Unix(42, 42).UTC())},
-		nil,
 	},
 	{
 		struct{ Interfaces []interface{} }{[]interface{}{
@@ -417,7 +497,6 @@ var values = []struct {
 				struct{ A int }{42},
 			}),
 		},
-		nil,
 	},
 	{
 		struct {
@@ -431,7 +510,6 @@ var values = []struct {
 		map[string][]byte{
 			"A": mustToBytes(ProtoMarshaler{42}),
 		},
-		nil,
 	},
 	{
 		CustomMarshaler{
@@ -449,7 +527,6 @@ var values = []struct {
 			"bField": {43},
 			"cField": []byte("fooXX"),
 		},
-		nil,
 	},
 	{
 		CustomMarshalerAB{
@@ -480,6 +557,111 @@ var values = []struct {
 			"B.bField": {5},
 			"B.cField": []byte("barXX"),
 		},
+	},
+}
+
+func gobEncoded(v interface{}) []byte {
+	buf := &bytes.Buffer{}
+	if err := gob.NewEncoder(buf).Encode(v); err != nil {
+		panic(err)
+	}
+	return buf.Bytes()
+}
+
+var byteValues = []struct {
+	value interface{}
+	bytes []byte
+}{
+	{
+		int(42),
+		append([]byte{byte(GobEncoding)}, gobEncoded(int(42))...),
+	},
+	{
+		int8(42),
+		append([]byte{byte(GobEncoding)}, gobEncoded(int8(42))...),
+	},
+	{
+		int16(42),
+		append([]byte{byte(GobEncoding)}, gobEncoded(int16(42))...),
+	},
+	{
+		int32(42),
+		append([]byte{byte(GobEncoding)}, gobEncoded(int32(42))...),
+	},
+	{
+		int64(42),
+		append([]byte{byte(GobEncoding)}, gobEncoded(int64(42))...),
+	},
+	{
+		uint(42),
+		append([]byte{byte(GobEncoding)}, gobEncoded(uint(42))...),
+	},
+	{
+		uint8(42),
+		append([]byte{byte(GobEncoding)}, gobEncoded(uint8(42))...),
+	},
+	{
+		uint16(42),
+		append([]byte{byte(GobEncoding)}, gobEncoded(uint16(42))...),
+	},
+	{
+		uint32(42),
+		append([]byte{byte(GobEncoding)}, gobEncoded(uint32(42))...),
+	},
+	{
+		uint64(42),
+		append([]byte{byte(GobEncoding)}, gobEncoded(uint64(42))...),
+	},
+	{
+		float32(42),
+		append([]byte{byte(GobEncoding)}, gobEncoded(float32(42))...),
+	},
+	{
+		float64(42),
+		append([]byte{byte(GobEncoding)}, gobEncoded(float64(42))...),
+	},
+	{
+		[]byte("42"),
+		append([]byte{byte(GobEncoding)}, gobEncoded([]byte("42"))...),
+	},
+	{
+		make([]byte, 0),
+		append([]byte{byte(GobEncoding)}, gobEncoded(make([]byte, 0))...),
+	},
+	{
+		make([]int, 0),
+		append([]byte{byte(GobEncoding)}, gobEncoded(make([]int, 0))...),
+	},
+	{
+		make(map[string]interface{}),
+		append([]byte{byte(GobEncoding)}, gobEncoded(make(map[string]interface{}))...),
+	},
+	{
+		map[string]interface{}{"1": 42, "2": 32, "3": 44, "hey": "foo", "bar": "order"},
+		append([]byte{byte(GobEncoding)}, gobEncoded(map[string]interface{}{"1": 42, "2": 32, "3": 44, "hey": "foo", "bar": "order"})...),
+	},
+	{
+		"42",
+		append([]byte{byte(GobEncoding)}, gobEncoded("42")...),
+	},
+	{
+		[]interface{}{1, 2},
+		append([]byte{byte(GobEncoding)}, gobEncoded([]interface{}{1, 2})...),
+	},
+	{
+		map[string]interface{}{"asd": 42},
+		append([]byte{byte(GobEncoding)}, gobEncoded(map[string]interface{}{"asd": 42})...),
+	},
+	{
+		struct{ A int }{42},
+		append([]byte{byte(GobEncoding)}, gobEncoded(struct{ A int }{42})...),
+	},
+	{
+		&struct{ A int }{42},
+		append([]byte{byte(GobEncoding)}, gobEncoded(&struct{ A int }{42})...),
+	},
+	{
+		nil,
 		nil,
 	},
 }

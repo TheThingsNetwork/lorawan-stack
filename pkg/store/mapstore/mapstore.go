@@ -88,18 +88,17 @@ func (s *mapStore) Update(id store.PrimaryKey, diff map[string]interface{}) erro
 		return nil
 	}
 	for k, v := range diff {
-		p := k + store.Separator
 		for sk := range fields {
-			if strings.HasPrefix(sk, p) {
+			if strings.HasPrefix(sk, k+store.Separator) {
 				delete(fields, sk)
 			}
 		}
 
-		if v == nil {
-			delete(fields, k)
-		} else {
-			fields[k] = v
+		if i := strings.LastIndexByte(k, store.SeparatorByte); i != -1 {
+			delete(fields, k[:i])
 		}
+
+		fields[k] = v
 	}
 	s.data[id] = fields
 	return nil

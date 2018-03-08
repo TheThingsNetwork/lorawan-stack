@@ -3,8 +3,6 @@
 package store_test
 
 import (
-	"bytes"
-	"encoding/gob"
 	"os"
 	"reflect"
 	"strconv"
@@ -16,107 +14,14 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-func gobEncoded(v interface{}) []byte {
-	buf := &bytes.Buffer{}
-	if err := gob.NewEncoder(buf).Encode(v); err != nil {
-		panic(err)
-	}
-	return buf.Bytes()
-}
-
 func TestToBytes(t *testing.T) {
-	for i, tc := range []struct {
-		v        interface{}
-		expected []byte
-	}{
-		{
-			int(42),
-			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatInt(42, 10))...),
-		},
-		{
-			int8(42),
-			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatInt(42, 10))...),
-		},
-		{
-			int16(42),
-			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatInt(42, 10))...),
-		},
-		{
-			int32(42),
-			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatInt(42, 10))...),
-		},
-		{
-			int64(42),
-			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatInt(42, 10))...),
-		},
-		{
-			uint(42),
-			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatUint(42, 10))...),
-		},
-		{
-			uint8(42),
-			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatUint(42, 10))...),
-		},
-		{
-			uint16(42),
-			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatUint(42, 10))...),
-		},
-		{
-			uint32(42),
-			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatUint(42, 10))...),
-		},
-		{
-			uint64(42),
-			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatUint(42, 10))...),
-		},
-		{
-			float32(42),
-			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatFloat(42, 'f', -1, 32))...),
-		},
-		{
-			float64(42),
-			append([]byte{byte(RawEncoding)}, []byte(strconv.FormatFloat(42, 'f', -1, 64))...),
-		},
-		{
-			[]byte("42"),
-			append([]byte{byte(RawEncoding)}, '4', '2'),
-		},
-		{
-			"42",
-			append([]byte{byte(RawEncoding)}, '4', '2'),
-		},
-		{
-			[]interface{}{1, 2},
-			append([]byte{byte(GobEncoding)}, gobEncoded([]interface{}{1, 2})...),
-		},
-		{
-			nil,
-			append([]byte{byte(RawEncoding)}),
-		},
-		{
-			struct{ a, b int }{},
-			append([]byte{byte(RawEncoding)}),
-		},
-	} {
+	for i, tc := range byteValues {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			b, err := ToBytes(tc.v)
+			b, err := ToBytes(tc.value)
 			if a.So(err, should.BeNil) {
-				a.So(b, should.Resemble, tc.expected)
-			}
-
-			rv := reflect.ValueOf(tc.v)
-			if !rv.IsValid() {
-				return
-			}
-
-			ptr := reflect.New(rv.Type())
-			ptr.Elem().Set(rv)
-
-			b, err = ToBytes(ptr.Interface())
-			if a.So(err, should.BeNil) {
-				a.So(b, should.Resemble, tc.expected)
+				a.So(b, should.Resemble, tc.bytes)
 			}
 		})
 	}
@@ -195,7 +100,7 @@ func TestFlattenedValue(t *testing.T) {
 }
 
 func TestMarshalMap(t *testing.T) {
-	for i, v := range values {
+	for i, v := range structValues {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
@@ -209,7 +114,7 @@ func TestMarshalMap(t *testing.T) {
 }
 
 func TestMarshalByteMap(t *testing.T) {
-	for i, v := range values {
+	for i, v := range structValues {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 

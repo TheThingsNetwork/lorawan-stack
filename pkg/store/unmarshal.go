@@ -7,7 +7,6 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"reflect"
-	"strconv"
 	"strings"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
@@ -41,8 +40,17 @@ func Unflattened(m map[string]interface{}) map[string]interface{} {
 	return out
 }
 
-func isByteSlice(t reflect.Type) bool {
-	return t.Kind() == reflect.Slice && t.Elem().Kind() == reflect.Uint8
+func isNillableKind(k reflect.Kind) bool {
+	return k == reflect.Ptr ||
+		k == reflect.Map ||
+		k == reflect.Interface ||
+		k == reflect.Chan ||
+		k == reflect.Func ||
+		k == reflect.Slice
+}
+
+func isNillable(t reflect.Type) bool {
+	return isNillableKind(t.Kind())
 }
 
 // MapUnmarshaler is the interface implemented by an object that can
@@ -52,29 +60,6 @@ func isByteSlice(t reflect.Type) bool {
 // UnmarshalMap must deep copy the data if it wishes to retain the data after returning.
 type MapUnmarshaler interface {
 	UnmarshalMap(map[string]interface{}) error
-}
-
-func unmarshalMapHookFunc(f reflect.Type, t reflect.Type, v interface{}) (interface{}, error) {
-	switch {
-	case isByteSlice(f) && !isByteSlice(t):
-		return BytesToType(v.([]byte), t)
-
-	case t.Kind() == reflect.Interface,
-		t.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.Interface,
-		f.Kind() != reflect.Map:
-		return v, nil
-
-	case t.Implements(mapUnmarshalerType):
-		out := reflect.New(t.Elem()).Interface().(MapUnmarshaler)
-		return out, out.UnmarshalMap(v.(map[string]interface{}))
-
-	case reflect.PtrTo(t).Implements(mapUnmarshalerType):
-		out := reflect.New(t).Interface().(MapUnmarshaler)
-		return out, out.UnmarshalMap(v.(map[string]interface{}))
-
-	default:
-		return v, nil
-	}
 }
 
 // UnmarshalMap parses the map-encoded data and stores the result
@@ -91,104 +76,125 @@ func UnmarshalMap(m map[string]interface{}, v interface{}, hooks ...mapstructure
 		return nil
 	}
 
-	dec, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		WeaklyTypedInput: true,
-		ZeroFields:       true,
-		Result:           v,
-		DecodeHook: mapstructure.ComposeDecodeHookFunc(append(
-			hooks,
-			unmarshalMapHookFunc,
-		)...),
-	})
-	if err != nil {
-		panic(errors.NewWithCause(err, "Failed to intialize decoder"))
+	rv := reflect.ValueOf(v)
+	for rv.Kind() == reflect.Ptr && rv.IsValid() {
+		rv = rv.Elem()
 	}
-	return dec.Decode(Unflattened(m))
+	if !rv.IsValid() {
+		return ErrInvalidData.NewWithCause(nil, errors.Errorf("Indirected value is nil"))
+	}
+
+	for mk, mv := range m {
+		skeys := strings.Split(mk, Separator)
+
+		fv := rv
+		for _, sk := range skeys {
+			for fv.Kind() == reflect.Ptr {
+				if fv.IsNil() {
+					fv.Set(reflect.New(fv.Type().Elem()))
+				}
+				fv = fv.Elem()
+			}
+			if fv = fv.FieldByName(sk); !fv.IsValid() {
+				return errors.Errorf("Field `%s` specified, but does not exist on structs of type `%s`", sk, fv.Type())
+			}
+		}
+
+		rmv := reflect.ValueOf(mv)
+		switch vk := rmv.Kind(); vk {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+			reflect.Float32, reflect.Float64, reflect.Bool, reflect.String:
+			if vk != fv.Kind() {
+				return ErrInvalidData.NewWithCause(nil, errors.Errorf("Field value `%s` has kind `%s`, when `%s` is expected", mk, fv.Kind(), vk))
+			}
+			fv.Set(rmv)
+
+		case reflect.Invalid:
+			continue
+
+		case reflect.Slice:
+			if rmv.Type().Elem().Kind() == reflect.Uint8 {
+				iv, err := BytesToType(rmv.Bytes(), fv.Type())
+				if err != nil {
+					return err
+				}
+				if iv != nil {
+					fv.Set(reflect.ValueOf(iv))
+				}
+				continue
+			}
+			fallthrough
+
+		default:
+			return ErrInvalidData.NewWithCause(nil, errors.Errorf("Unmatched map value kind: `%s`", vk))
+		}
+	}
+	return nil
 }
 
 // BytesToType decodes []byte value in b into a new value of type typ.
 func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 	if len(b) == 0 {
-		return nil, ErrInvalidData
-	}
-
-	if typ.Kind() == reflect.Ptr {
-		typ = typ.Elem()
+		if !isNillable(typ) {
+			return nil, ErrInvalidData.NewWithCause(nil, errors.Errorf("Type `%s` is not nullable, but zero-length byte slice specified", typ))
+		}
+		return nil, nil
 	}
 
 	enc := Encoding(b[0])
 	b = b[1:]
 
-	switch enc {
-	case RawEncoding:
-		if len(b) == 0 {
-			return reflect.New(typ).Elem().Interface(), nil
-		}
+	rv := reflect.New(typ)
+	e := rv.Elem()
+	for e.Kind() == reflect.Ptr {
+		e.Set(reflect.New(e.Type().Elem()))
+		e = e.Elem()
+	}
 
-		switch k := typ.Kind(); k {
-		case reflect.String:
-			return string(b), nil
-		case reflect.Bool:
-			return strconv.ParseBool(string(b))
-		case reflect.Int:
-			return strconv.ParseInt(string(b), 10, 64)
-		case reflect.Int8:
-			return strconv.ParseInt(string(b), 10, 8)
-		case reflect.Int16:
-			return strconv.ParseInt(string(b), 10, 16)
-		case reflect.Int32:
-			return strconv.ParseInt(string(b), 10, 32)
-		case reflect.Int64:
-			return strconv.ParseInt(string(b), 10, 64)
-		case reflect.Uint:
-			return strconv.ParseUint(string(b), 10, 64)
-		case reflect.Uint8:
-			return strconv.ParseUint(string(b), 10, 8)
-		case reflect.Uint16:
-			return strconv.ParseUint(string(b), 10, 16)
-		case reflect.Uint32:
-			return strconv.ParseUint(string(b), 10, 32)
-		case reflect.Uint64:
-			return strconv.ParseUint(string(b), 10, 64)
-		case reflect.Float32:
-			return strconv.ParseFloat(string(b), 32)
-		case reflect.Float64:
-			return strconv.ParseFloat(string(b), 64)
-		case reflect.Slice, reflect.Array:
-			elem := typ.Elem()
-			if elem.Kind() == reflect.Uint8 {
-				// Handle byte slices/arrays directly
-				if k == reflect.Slice {
-					return b, nil
-				}
-				rv := reflect.Indirect(reflect.New(typ))
-				for i := 0; i < rv.Len(); i++ {
-					rv.Index(i).SetUint(uint64(b[i]))
-				}
-				return rv.Interface(), nil
-			}
-		}
-		return nil, errors.Errorf("Can not decode raw bytes to value of type %s", typ)
+	switch e.Kind() {
+	case reflect.Slice:
+		e.Set(reflect.MakeSlice(e.Type(), 0, 0))
+	case reflect.Map:
+		e.Set(reflect.MakeMap(e.Type()))
+	case reflect.Chan:
+		e.Set(reflect.MakeChan(e.Type(), 0))
+	case reflect.Func:
+		e.Set(reflect.MakeFunc(e.Type(), func([]reflect.Value) []reflect.Value { return nil }))
+	}
+
+	switch enc {
 	case JSONEncoding:
-		if !reflect.PtrTo(typ).Implements(jsonUnmarshalerType) {
-			return nil, errors.Errorf("Expected %s to implement %s", typ, jsonUnmarshalerType)
+		if typ.Implements(jsonUnmarshalerType) {
+			v := rv.Elem().Interface().(json.Unmarshaler)
+			return v, v.UnmarshalJSON(b)
 		}
-		v := reflect.New(typ).Interface().(json.Unmarshaler)
-		return v, v.UnmarshalJSON(b)
+		if reflect.PtrTo(typ).Implements(jsonUnmarshalerType) {
+			if err := rv.Interface().(json.Unmarshaler).UnmarshalJSON(b); err != nil {
+				return nil, err
+			}
+			return rv.Elem().Interface(), nil
+		}
+		return nil, errors.Errorf("Expected %s or %s to implement %s", typ, reflect.PtrTo(typ), jsonUnmarshalerType)
 	case ProtoEncoding:
-		if !reflect.PtrTo(typ).Implements(protoUnmarshalerType) {
-			return nil, errors.Errorf("Expected %s to implement %s", typ, protoUnmarshalerType)
+		if typ.Implements(protoUnmarshalerType) {
+			v := rv.Elem().Interface().(proto.Unmarshaler)
+			return v, v.Unmarshal(b)
 		}
-		v := reflect.New(typ).Interface().(proto.Unmarshaler)
-		return v, v.Unmarshal(b)
+		if reflect.PtrTo(typ).Implements(protoUnmarshalerType) {
+			if err := rv.Interface().(proto.Unmarshaler).Unmarshal(b); err != nil {
+				return nil, err
+			}
+			return rv.Elem().Interface(), nil
+		}
+		return nil, errors.Errorf("Expected %s or %s to implement %s", typ, reflect.PtrTo(typ), protoUnmarshalerType)
 	case GobEncoding:
-		v := reflect.New(typ)
-		if err := gob.NewDecoder(bytes.NewReader(b)).DecodeValue(v); err != nil {
+		if err := gob.NewDecoder(bytes.NewReader(b)).DecodeValue(rv.Elem()); err != nil {
 			return nil, err
 		}
-		return v.Elem().Interface(), nil
+		return rv.Elem().Interface(), nil
 	default:
-		return nil, ErrInvalidData
+		return nil, ErrInvalidData.NewWithCause(nil, errors.Errorf("Unmatched encoding"))
 	}
 }
 
@@ -199,48 +205,6 @@ func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 // UnmarshalByteMap must deep copy the data if it wishes to retain the data after returning.
 type ByteMapUnmarshaler interface {
 	UnmarshalByteMap(map[string][]byte) error
-}
-
-func interfaceMapToByteMap(im map[string]interface{}) (bm map[string][]byte, ok bool) {
-	bm = make(map[string][]byte, len(im))
-	for k, v := range im {
-		bm[k], ok = v.([]byte)
-		if !ok {
-			return nil, false
-		}
-	}
-	return
-}
-
-func unmarshalByteMapHookFunc(f reflect.Type, t reflect.Type, v interface{}) (interface{}, error) {
-	switch {
-	case isByteSlice(f):
-		return BytesToType(v.([]byte), t)
-
-	case t.Kind() == reflect.Interface,
-		t.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.Interface,
-		f.Kind() != reflect.Map:
-		return v, nil
-
-	case t.Implements(byteMapUnmarshalerType):
-		out := reflect.New(t.Elem()).Interface().(ByteMapUnmarshaler)
-		bm, ok := interfaceMapToByteMap(v.(map[string]interface{}))
-		if !ok {
-			return nil, errors.New("Mismatched hook")
-		}
-		return out, out.UnmarshalByteMap(bm)
-
-	case reflect.PtrTo(t).Implements(byteMapUnmarshalerType):
-		out := reflect.New(t).Interface().(ByteMapUnmarshaler)
-		bm, ok := interfaceMapToByteMap(v.(map[string]interface{}))
-		if !ok {
-			return nil, errors.New("Mismatched hook")
-		}
-		return out, out.UnmarshalByteMap(bm)
-
-	default:
-		return v, nil
-	}
 }
 
 // UnmarshalByteMap parses the byte map-encoded data and stores the result in the value pointed to by v.
@@ -259,17 +223,5 @@ func UnmarshalByteMap(bm map[string][]byte, v interface{}, hooks ...mapstructure
 		im[k] = v
 	}
 
-	dec, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		WeaklyTypedInput: true,
-		ZeroFields:       true,
-		Result:           v,
-		DecodeHook: mapstructure.ComposeDecodeHookFunc(append(
-			hooks,
-			unmarshalByteMapHookFunc,
-		)...),
-	})
-	if err != nil {
-		panic(errors.NewWithCause(err, "Failed to intialize decoder"))
-	}
-	return dec.Decode(Unflattened(im))
+	return UnmarshalMap(im, v)
 }
