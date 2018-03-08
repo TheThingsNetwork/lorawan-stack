@@ -3,6 +3,8 @@
 package store_test
 
 import (
+	"bytes"
+	"encoding/gob"
 	"os"
 	"reflect"
 	"strconv"
@@ -13,21 +15,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
-
-func TestToBytes(t *testing.T) {
-	for i, tc := range byteValues {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			a := assertions.New(t)
-
-			b, err := ToBytes(tc.value)
-			if a.So(err, should.BeNil) {
-				if !a.So(b, should.Resemble, tc.bytes) {
-					t.Log(pretty.Sprint("Value:", tc.value))
-				}
-			}
-		})
-	}
-}
 
 func TestFlattened(t *testing.T) {
 	for _, tc := range []struct {
@@ -98,6 +85,47 @@ func TestFlattenedValue(t *testing.T) {
 			a.So(ret[k].Interface(), should.Resemble, v.Interface())
 			a.So(ret[k].Type(), should.Equal, v.Type())
 		}
+	}
+}
+
+func TestToBytes(t *testing.T) {
+	for i, tc := range byteValues {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+
+			b, err := ToBytes(tc.value)
+			if !a.So(err, should.BeNil) || !a.So(b, should.HaveLength, len(tc.bytes)) {
+				return
+			}
+
+			if len(b) > 0 && Encoding(b[0]) == GobEncoding {
+				if !a.So(b[0], should.Resemble, tc.bytes[0]) {
+					t.Log("Encoding type mismatch")
+					return
+				}
+
+				// Gob encoding output is not deterministic, hence we need
+				// to check if value obtained by decoding the bytes
+				// using gob resembles the original value.
+				typ := reflect.TypeOf(tc.value)
+
+				ve := reflect.New(typ)
+				if err := gob.NewDecoder(bytes.NewBuffer(b[1:])).DecodeValue(ve); err != nil {
+					panic("Failed to decode testcase bytes from gob")
+				}
+
+				va := reflect.New(typ)
+				err = gob.NewDecoder(bytes.NewBuffer(tc.bytes[1:])).DecodeValue(va)
+				a.So(err, should.BeNil)
+				if !a.So(va.Interface(), should.Resemble, ve.Interface()) {
+					t.Log(pretty.Sprint("Value:", tc.value))
+				}
+			} else {
+				if !a.So(b, should.Resemble, tc.bytes) {
+					t.Log(pretty.Sprint("Value:", tc.value))
+				}
+			}
+		})
 	}
 }
 

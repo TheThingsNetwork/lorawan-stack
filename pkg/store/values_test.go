@@ -637,8 +637,8 @@ var byteValues = []struct {
 		append([]byte{byte(GobEncoding)}, gobEncoded(make(map[string]interface{}))...),
 	},
 	{
-		map[string]interface{}{"1": 42, "2": 32, "3": 44, "hey": "foo", "bar": "order"},
-		append([]byte{byte(GobEncoding)}, gobEncoded(map[string]interface{}{"1": 42, "2": 32, "3": 44, "hey": "foo", "bar": "order"})...),
+		map[string]interface{}{"1": 42, "2": uint8(32), "3": int64(44), "hey": "foo", "bar": []byte("baz")},
+		append([]byte{byte(GobEncoding)}, gobEncoded(map[string]interface{}{"1": 42, "2": uint8(32), "3": int64(44), "hey": "foo", "bar": []byte("baz")})...),
 	},
 	{
 		"42",
@@ -649,8 +649,8 @@ var byteValues = []struct {
 		append([]byte{byte(GobEncoding)}, gobEncoded([]interface{}{1, 2})...),
 	},
 	{
-		map[string]interface{}{"asd": 42},
-		append([]byte{byte(GobEncoding)}, gobEncoded(map[string]interface{}{"asd": 42})...),
+		&map[string]interface{}{"asd": uint32(42)},
+		append([]byte{byte(GobEncoding)}, gobEncoded(&map[string]interface{}{"asd": uint32(42)})...),
 	},
 	{
 		struct{ A int }{42},
@@ -659,6 +659,10 @@ var byteValues = []struct {
 	{
 		&struct{ A int }{42},
 		append([]byte{byte(GobEncoding)}, gobEncoded(&struct{ A int }{42})...),
+	},
+	{
+		struct{ V interface{} }{struct{ A int }{42}},
+		append([]byte{byte(GobEncoding)}, gobEncoded(struct{ V interface{} }{struct{ A int }{42}})...),
 	},
 	{
 		nil,

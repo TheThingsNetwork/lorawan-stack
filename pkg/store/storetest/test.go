@@ -17,9 +17,12 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-var Indexed = []string{
-	"foo",
+// IndexedKeys represents the fields, which are expected to be indexed in store implementations,
+// which support indexed fields.
+var IndexedFields = []string{
 	"bar",
+	"a.a",
+	"empty",
 }
 
 type testingT interface {
@@ -42,11 +45,11 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 	a.So(m, should.BeNil)
 
 	filtered, err := s.FindBy(nil)
-	a.So(err, should.BeNil)
+	a.So(err, should.NotBeNil)
 	a.So(filtered, should.BeNil)
 
 	filtered, err = s.FindBy(make(map[string]interface{}))
-	a.So(err, should.BeNil)
+	a.So(err, should.NotBeNil)
 	a.So(filtered, should.BeNil)
 
 	err = s.Update(nil, nil)
@@ -119,6 +122,7 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 				"a.b.a": "1",
 				"a.b.c": "foo",
 				"a.c.b": "acb",
+				"a.d":   "hello",
 			},
 			map[string]interface{}{
 				"a.b": nil,
@@ -129,9 +133,11 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 				"a.b":   nil,
 				"a.bar": "foo",
 				"a.c":   "ac",
+				"a.d":   "hello",
 			},
 			map[string]interface{}{
 				"a.a": 1,
+				"a.d": "hello",
 			},
 		},
 		{
@@ -198,14 +204,6 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 				}
 			}
 
-			matches, err = s.FindBy(nil)
-			a.So(err, should.BeNil)
-			if a.So(matches, should.HaveLength, 1) {
-				for _, v := range matches {
-					a.So(v, should.Resemble, tc.Stored)
-				}
-			}
-
 			err = s.Update(id, tc.Updated)
 			if !a.So(err, should.BeNil) {
 				return
@@ -224,14 +222,6 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 			}
 
 			matches, err = s.FindBy(tc.FindBy)
-			a.So(err, should.BeNil)
-			if a.So(matches, should.HaveLength, 1) {
-				for _, v := range matches {
-					a.So(v, should.Resemble, tc.AfterUpdate)
-				}
-			}
-
-			matches, err = s.FindBy(nil)
 			a.So(err, should.BeNil)
 			if a.So(matches, should.HaveLength, 1) {
 				for _, v := range matches {
@@ -551,11 +541,18 @@ func (gs GenericStore) Create(fields map[string]interface{}) (store.PrimaryKey, 
 	return ret[0].Interface().(store.PrimaryKey), nil
 }
 func (gs GenericStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
+	rv := reflect.Zero(reflect.TypeOf((*store.PrimaryKey)(nil)).Elem())
+	if id != nil {
+		rv = reflect.ValueOf(id)
+	}
 	ret := gs.store.MethodByName("Find").Call([]reflect.Value{
-		reflect.ValueOf(id),
+		rv,
 	})
 	if err := reflectValueToError(ret[1]); err != nil {
 		return nil, err
+	}
+	if store.IsNillableKind(ret[0].Kind()) && ret[0].IsNil() {
+		return nil, nil
 	}
 	return gs.toIfaceMap(ret[0].Interface()), nil
 }
@@ -566,6 +563,9 @@ func (gs GenericStore) FindBy(filter map[string]interface{}) (map[store.PrimaryK
 	if err := reflectValueToError(ret[1]); err != nil {
 		return nil, err
 	}
+	if store.IsNillableKind(ret[0].Kind()) && ret[0].IsNil() {
+		return nil, nil
+	}
 
 	m := make(map[store.PrimaryKey]map[string]interface{}, ret[0].Len())
 	for _, k := range ret[0].MapKeys() {
@@ -574,14 +574,22 @@ func (gs GenericStore) FindBy(filter map[string]interface{}) (map[store.PrimaryK
 	return m, nil
 }
 func (gs GenericStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
+	rv := reflect.Zero(reflect.TypeOf((*store.PrimaryKey)(nil)).Elem())
+	if id != nil {
+		rv = reflect.ValueOf(id)
+	}
 	return reflectValueToError(gs.store.MethodByName("Update").Call([]reflect.Value{
-		reflect.ValueOf(id),
+		rv,
 		reflect.ValueOf(gs.fromIfaceMap(diff)),
 	})[0])
 }
 func (gs GenericStore) Delete(id store.PrimaryKey) error {
+	rv := reflect.Zero(reflect.TypeOf((*store.PrimaryKey)(nil)).Elem())
+	if id != nil {
+		rv = reflect.ValueOf(id)
+	}
 	return reflectValueToError(gs.store.MethodByName("Delete").Call([]reflect.Value{
-		reflect.ValueOf(id),
+		rv,
 	})[0])
 }
 
@@ -601,6 +609,10 @@ func TestByteStore(t testingT, newStore func() store.ByteStore) {
 	TestTypedStore(t, func() store.TypedStore {
 		return NewGenericStore(newStore(),
 			func(m map[string]interface{}) interface{} {
+				if m == nil {
+					return (map[string][]byte)(nil)
+				}
+
 				ret := make(map[string][]byte, len(m))
 				for k, v := range m {
 					if v == nil {
@@ -619,6 +631,10 @@ func TestByteStore(t testingT, newStore func() store.ByteStore) {
 				return ret
 			},
 			func(v interface{}) map[string]interface{} {
+				if v == nil {
+					return (map[string]interface{})(nil)
+				}
+
 				m := v.(map[string][]byte)
 
 				ret := make(map[string]interface{}, len(m))

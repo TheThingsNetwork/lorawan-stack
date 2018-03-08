@@ -40,7 +40,7 @@ func Unflattened(m map[string]interface{}) map[string]interface{} {
 	return out
 }
 
-func isNillableKind(k reflect.Kind) bool {
+func IsNillableKind(k reflect.Kind) bool {
 	return k == reflect.Ptr ||
 		k == reflect.Map ||
 		k == reflect.Interface ||
@@ -49,8 +49,8 @@ func isNillableKind(k reflect.Kind) bool {
 		k == reflect.Slice
 }
 
-func isNillable(t reflect.Type) bool {
-	return isNillableKind(t.Kind())
+func IsNillableType(t reflect.Type) bool {
+	return IsNillableKind(t.Kind())
 }
 
 // MapUnmarshaler is the interface implemented by an object that can
@@ -136,7 +136,7 @@ func UnmarshalMap(m map[string]interface{}, v interface{}, hooks ...mapstructure
 // BytesToType decodes []byte value in b into a new value of type typ.
 func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 	if len(b) == 0 {
-		if !isNillable(typ) {
+		if !IsNillableType(typ) {
 			return nil, ErrInvalidData.NewWithCause(nil, errors.Errorf("Type `%s` is not nullable, but zero-length byte slice specified", typ))
 		}
 		return nil, nil

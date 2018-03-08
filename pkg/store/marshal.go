@@ -137,7 +137,7 @@ func marshalNested(v reflect.Value) (reflect.Value, error) {
 		return reflect.ValueOf(ToValueMap(im)), nil
 	}
 
-	if isNillableKind(t.Kind()) && v.IsNil() {
+	if IsNillableKind(t.Kind()) && v.IsNil() {
 		return v, nil
 	}
 
@@ -242,7 +242,7 @@ func MarshalMap(v interface{}) (m map[string]interface{}, err error) {
 
 // ToBytesValue is like ToBytes, but operates on values of type reflect.Value.
 func ToBytesValue(v reflect.Value) (b []byte, err error) {
-	if !v.IsValid() || (isNillableKind(v.Kind()) && v.IsNil()) {
+	if !v.IsValid() || (IsNillableKind(v.Kind()) && v.IsNil()) {
 		return nil, nil
 	}
 
