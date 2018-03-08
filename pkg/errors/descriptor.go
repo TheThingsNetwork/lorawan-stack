@@ -95,16 +95,6 @@ func (err *ErrDescriptor) Register() {
 	Register(err.Namespace, err)
 }
 
-// Describes checks if the passed error is an error created by this descriptor.
-func (err *ErrDescriptor) Describes(e error) bool {
-	i, ok := e.(Error)
-	if !ok {
-		return false
-	}
-
-	return i.Namespace() == err.Namespace && i.Code() == err.Code
-}
-
 // Causes checks if the e has, as a cause, an error described by the descriptor, or if one of the errors in the cause chain are caused by the descriptor
 func (err *ErrDescriptor) Causes(e error) bool {
 	if err.Describes(e) {
@@ -141,8 +131,12 @@ func (err *ErrDescriptor) validate() error {
 	return nil
 }
 
-// Is returns true if the passed in error is an instance of the error descriptor.
-func (err *ErrDescriptor) Is(in error) bool {
+// Describes returns true if the passed in error is an instance of the error descriptor.
+func (err *ErrDescriptor) Describes(in error) bool {
+	if in == nil {
+		return false
+	}
+
 	e := From(in)
 	return e.Namespace() == err.Namespace && e.Code() == err.Code
 }

@@ -37,8 +37,11 @@ func init() {
 	ErrEOF.Register()
 }
 
-// From lifts an error to be and Error.
+// From lifts an error to be an Error.
 func From(in error) Error {
+	if in == nil {
+		return nil
+	}
 	if err, ok := in.(Error); ok {
 		return err
 	}
