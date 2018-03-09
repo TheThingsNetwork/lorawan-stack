@@ -14,7 +14,7 @@ import time "time"
 
 import strconv "strconv"
 
-import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+import types "github.com/gogo/protobuf/types"
 
 import io "io"
 
@@ -245,10 +245,7 @@ func (this *Client) VerboseEqual(that interface{}) error {
 }
 func (this *Client) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Client)
@@ -261,10 +258,7 @@ func (this *Client) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -413,16 +407,16 @@ func (m *Client) MarshalTo(dAtA []byte) (int, error) {
 	i += n6
 	dAtA[i] = 0x52
 	i++
-	i = encodeVarintClient(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n7, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
+	i = encodeVarintClient(dAtA, i, uint64(types.SizeOfStdTime(m.CreatedAt)))
+	n7, err := types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n7
 	dAtA[i] = 0x5a
 	i++
-	i = encodeVarintClient(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n8, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
+	i = encodeVarintClient(dAtA, i, uint64(types.SizeOfStdTime(m.UpdatedAt)))
+	n8, err := types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -460,9 +454,9 @@ func NewPopulatedClient(r randyClient, easy bool) *Client {
 	}
 	v4 := NewPopulatedUserIdentifier(r, easy)
 	this.Creator = *v4
-	v5 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v5 := types.NewPopulatedStdTime(r, easy)
 	this.CreatedAt = *v5
-	v6 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v6 := types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v6
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -580,9 +574,9 @@ func (m *Client) Size() (n int) {
 	}
 	l = m.Creator.Size()
 	n += 1 + l + sovClient(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)
+	l = types.SizeOfStdTime(m.CreatedAt)
 	n += 1 + l + sovClient(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)
+	l = types.SizeOfStdTime(m.UpdatedAt)
 	n += 1 + l + sovClient(uint64(l))
 	return n
 }
@@ -965,7 +959,7 @@ func (m *Client) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -995,7 +989,7 @@ func (m *Client) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

@@ -16,8 +16,8 @@ import time "time"
 
 import strconv "strconv"
 
-import encoding_binary "encoding/binary"
-import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+import binary "encoding/binary"
+import types "github.com/gogo/protobuf/types"
 
 import io "io"
 
@@ -632,10 +632,7 @@ func (this *Gateway) VerboseEqual(that interface{}) error {
 }
 func (this *Gateway) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Gateway)
@@ -648,10 +645,7 @@ func (this *Gateway) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -752,10 +746,7 @@ func (this *GatewayPrivacySettings) VerboseEqual(that interface{}) error {
 }
 func (this *GatewayPrivacySettings) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GatewayPrivacySettings)
@@ -768,10 +759,7 @@ func (this *GatewayPrivacySettings) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -830,10 +818,7 @@ func (this *GatewayAntenna) VerboseEqual(that interface{}) error {
 }
 func (this *GatewayAntenna) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GatewayAntenna)
@@ -846,10 +831,7 @@ func (this *GatewayAntenna) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -905,10 +887,7 @@ func (this *GatewayRadio) VerboseEqual(that interface{}) error {
 }
 func (this *GatewayRadio) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GatewayRadio)
@@ -921,10 +900,7 @@ func (this *GatewayRadio) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -974,10 +950,7 @@ func (this *GatewayRadio_TxConfiguration) VerboseEqual(that interface{}) error {
 }
 func (this *GatewayRadio_TxConfiguration) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GatewayRadio_TxConfiguration)
@@ -990,10 +963,7 @@ func (this *GatewayRadio_TxConfiguration) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1090,10 +1060,7 @@ func (this *GatewayStatus) VerboseEqual(that interface{}) error {
 }
 func (this *GatewayStatus) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GatewayStatus)
@@ -1106,10 +1073,7 @@ func (this *GatewayStatus) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1230,10 +1194,7 @@ func (this *GatewayObservations) VerboseEqual(that interface{}) error {
 }
 func (this *GatewayObservations) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GatewayObservations)
@@ -1246,10 +1207,7 @@ func (this *GatewayObservations) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1355,8 +1313,8 @@ func (m *Gateway) MarshalTo(dAtA []byte) (int, error) {
 	}
 	dAtA[i] = 0x3a
 	i++
-	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ActivatedAt)))
-	n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ActivatedAt, dAtA[i:])
+	i = encodeVarintGateway(dAtA, i, uint64(types.SizeOfStdTime(m.ActivatedAt)))
+	n2, err := types.StdTimeMarshalTo(m.ActivatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -1414,16 +1372,16 @@ func (m *Gateway) MarshalTo(dAtA []byte) (int, error) {
 	}
 	dAtA[i] = 0x6a
 	i++
-	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n5, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
+	i = encodeVarintGateway(dAtA, i, uint64(types.SizeOfStdTime(m.CreatedAt)))
+	n5, err := types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n5
 	dAtA[i] = 0x72
 	i++
-	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n6, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
+	i = encodeVarintGateway(dAtA, i, uint64(types.SizeOfStdTime(m.UpdatedAt)))
+	n6, err := types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -1497,7 +1455,7 @@ func (m *GatewayAntenna) MarshalTo(dAtA []byte) (int, error) {
 	if m.Gain != 0 {
 		dAtA[i] = 0xd
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Gain))
+		binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Gain))
 		i += 4
 	}
 	dAtA[i] = 0x12
@@ -1611,16 +1569,16 @@ func (m *GatewayStatus) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.Time)))
-	n9, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Time, dAtA[i:])
+	i = encodeVarintGateway(dAtA, i, uint64(types.SizeOfStdTime(m.Time)))
+	n9, err := types.StdTimeMarshalTo(m.Time, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n9
 	dAtA[i] = 0x12
 	i++
-	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.BootTime)))
-	n10, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.BootTime, dAtA[i:])
+	i = encodeVarintGateway(dAtA, i, uint64(types.SizeOfStdTime(m.BootTime)))
+	n10, err := types.StdTimeMarshalTo(m.BootTime, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -1678,8 +1636,8 @@ func (m *GatewayStatus) MarshalTo(dAtA []byte) (int, error) {
 	if m.RTT != nil {
 		dAtA[i] = 0x3a
 		i++
-		i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.RTT)))
-		n11, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.RTT, dAtA[i:])
+		i = encodeVarintGateway(dAtA, i, uint64(types.SizeOfStdDuration(*m.RTT)))
+		n11, err := types.StdDurationMarshalTo(*m.RTT, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -1698,7 +1656,7 @@ func (m *GatewayStatus) MarshalTo(dAtA []byte) (int, error) {
 			i += copy(dAtA[i:], k)
 			dAtA[i] = 0x15
 			i++
-			encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(v))
+			binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(v))
 			i += 4
 		}
 	}
@@ -1735,8 +1693,8 @@ func (m *GatewayObservations) MarshalTo(dAtA []byte) (int, error) {
 	if m.LastUplinkReceivedAt != nil {
 		dAtA[i] = 0xa
 		i++
-		i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastUplinkReceivedAt)))
-		n13, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastUplinkReceivedAt, dAtA[i:])
+		i = encodeVarintGateway(dAtA, i, uint64(types.SizeOfStdTime(*m.LastUplinkReceivedAt)))
+		n13, err := types.StdTimeMarshalTo(*m.LastUplinkReceivedAt, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -1750,8 +1708,8 @@ func (m *GatewayObservations) MarshalTo(dAtA []byte) (int, error) {
 	if m.LastDownlinkReceivedAt != nil {
 		dAtA[i] = 0x1a
 		i++
-		i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastDownlinkReceivedAt)))
-		n14, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastDownlinkReceivedAt, dAtA[i:])
+		i = encodeVarintGateway(dAtA, i, uint64(types.SizeOfStdTime(*m.LastDownlinkReceivedAt)))
+		n14, err := types.StdTimeMarshalTo(*m.LastDownlinkReceivedAt, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -1765,8 +1723,8 @@ func (m *GatewayObservations) MarshalTo(dAtA []byte) (int, error) {
 	if m.LastStatusReceivedAt != nil {
 		dAtA[i] = 0x2a
 		i++
-		i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastStatusReceivedAt)))
-		n15, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastStatusReceivedAt, dAtA[i:])
+		i = encodeVarintGateway(dAtA, i, uint64(types.SizeOfStdTime(*m.LastStatusReceivedAt)))
+		n15, err := types.StdTimeMarshalTo(*m.LastStatusReceivedAt, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -1822,7 +1780,7 @@ func NewPopulatedGateway(r randyGateway, easy bool) *Gateway {
 			this.Radios[i] = *v5
 		}
 	}
-	v6 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v6 := types.NewPopulatedStdTime(r, easy)
 	this.ActivatedAt = *v6
 	v7 := NewPopulatedGatewayPrivacySettings(r, easy)
 	this.PrivacySettings = *v7
@@ -1838,9 +1796,9 @@ func NewPopulatedGateway(r randyGateway, easy bool) *Gateway {
 	if r.Intn(10) != 0 {
 		this.ContactAccount = NewPopulatedOrganizationOrUserIdentifier(r, easy)
 	}
-	v9 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v9 := types.NewPopulatedStdTime(r, easy)
 	this.CreatedAt = *v9
-	v10 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v10 := types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v10
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -1896,9 +1854,9 @@ func NewPopulatedGatewayRadio_TxConfiguration(r randyGateway, easy bool) *Gatewa
 
 func NewPopulatedGatewayStatus(r randyGateway, easy bool) *GatewayStatus {
 	this := &GatewayStatus{}
-	v12 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v12 := types.NewPopulatedStdTime(r, easy)
 	this.Time = *v12
-	v13 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v13 := types.NewPopulatedStdTime(r, easy)
 	this.BootTime = *v13
 	this.Platform = randStringGateway(r)
 	if r.Intn(10) != 0 {
@@ -1921,7 +1879,7 @@ func NewPopulatedGatewayStatus(r randyGateway, easy bool) *GatewayStatus {
 		this.IP[i] = randStringGateway(r)
 	}
 	if r.Intn(10) != 0 {
-		this.RTT = github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
+		this.RTT = types.NewPopulatedStdDuration(r, easy)
 	}
 	if r.Intn(10) != 0 {
 		v17 := r.Intn(10)
@@ -1934,7 +1892,7 @@ func NewPopulatedGatewayStatus(r randyGateway, easy bool) *GatewayStatus {
 			}
 		}
 	}
-	if r.Intn(10) == 0 {
+	if r.Intn(10) != 0 {
 		this.Advanced = google_protobuf3.NewPopulatedStruct(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -1945,15 +1903,15 @@ func NewPopulatedGatewayStatus(r randyGateway, easy bool) *GatewayStatus {
 func NewPopulatedGatewayObservations(r randyGateway, easy bool) *GatewayObservations {
 	this := &GatewayObservations{}
 	if r.Intn(10) != 0 {
-		this.LastUplinkReceivedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+		this.LastUplinkReceivedAt = types.NewPopulatedStdTime(r, easy)
 	}
 	this.UplinkCount = uint64(r.Uint32())
 	if r.Intn(10) != 0 {
-		this.LastDownlinkReceivedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+		this.LastDownlinkReceivedAt = types.NewPopulatedStdTime(r, easy)
 	}
 	this.DownlinkCount = uint64(r.Uint32())
 	if r.Intn(10) != 0 {
-		this.LastStatusReceivedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+		this.LastStatusReceivedAt = types.NewPopulatedStdTime(r, easy)
 	}
 	this.StatusCount = uint64(r.Uint32())
 	if r.Intn(10) != 0 {
@@ -2065,7 +2023,7 @@ func (m *Gateway) Size() (n int) {
 			n += 1 + l + sovGateway(uint64(l))
 		}
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.ActivatedAt)
+	l = types.SizeOfStdTime(m.ActivatedAt)
 	n += 1 + l + sovGateway(uint64(l))
 	l = m.PrivacySettings.Size()
 	n += 1 + l + sovGateway(uint64(l))
@@ -2088,9 +2046,9 @@ func (m *Gateway) Size() (n int) {
 		l = m.ContactAccount.Size()
 		n += 1 + l + sovGateway(uint64(l))
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)
+	l = types.SizeOfStdTime(m.CreatedAt)
 	n += 1 + l + sovGateway(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)
+	l = types.SizeOfStdTime(m.UpdatedAt)
 	n += 1 + l + sovGateway(uint64(l))
 	return n
 }
@@ -2163,9 +2121,9 @@ func (m *GatewayRadio_TxConfiguration) Size() (n int) {
 func (m *GatewayStatus) Size() (n int) {
 	var l int
 	_ = l
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.Time)
+	l = types.SizeOfStdTime(m.Time)
 	n += 1 + l + sovGateway(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.BootTime)
+	l = types.SizeOfStdTime(m.BootTime)
 	n += 1 + l + sovGateway(uint64(l))
 	l = len(m.Platform)
 	if l > 0 {
@@ -2192,7 +2150,7 @@ func (m *GatewayStatus) Size() (n int) {
 		}
 	}
 	if m.RTT != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.RTT)
+		l = types.SizeOfStdDuration(*m.RTT)
 		n += 1 + l + sovGateway(uint64(l))
 	}
 	if len(m.Metrics) > 0 {
@@ -2214,21 +2172,21 @@ func (m *GatewayObservations) Size() (n int) {
 	var l int
 	_ = l
 	if m.LastUplinkReceivedAt != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastUplinkReceivedAt)
+		l = types.SizeOfStdTime(*m.LastUplinkReceivedAt)
 		n += 1 + l + sovGateway(uint64(l))
 	}
 	if m.UplinkCount != 0 {
 		n += 1 + sovGateway(m.UplinkCount)
 	}
 	if m.LastDownlinkReceivedAt != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastDownlinkReceivedAt)
+		l = types.SizeOfStdTime(*m.LastDownlinkReceivedAt)
 		n += 1 + l + sovGateway(uint64(l))
 	}
 	if m.DownlinkCount != 0 {
 		n += 1 + sovGateway(m.DownlinkCount)
 	}
 	if m.LastStatusReceivedAt != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastStatusReceivedAt)
+		l = types.SizeOfStdTime(*m.LastStatusReceivedAt)
 		n += 1 + l + sovGateway(uint64(l))
 	}
 	if m.StatusCount != 0 {
@@ -2488,7 +2446,7 @@ func (m *Gateway) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ActivatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.ActivatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2748,7 +2706,7 @@ func (m *Gateway) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2778,7 +2736,7 @@ func (m *Gateway) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2950,7 +2908,7 @@ func (m *GatewayAntenna) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
 			m.Gain = math.Float32frombits(v)
 		case 2:
@@ -3345,7 +3303,7 @@ func (m *GatewayStatus) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.Time, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.Time, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3375,7 +3333,7 @@ func (m *GatewayStatus) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.BootTime, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.BootTime, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3615,7 +3573,7 @@ func (m *GatewayStatus) Unmarshal(dAtA []byte) error {
 			if m.RTT == nil {
 				m.RTT = new(time.Duration)
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.RTT, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(m.RTT, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3699,7 +3657,7 @@ func (m *GatewayStatus) Unmarshal(dAtA []byte) error {
 					if (iNdEx + 4) > l {
 						return io.ErrUnexpectedEOF
 					}
-					mapvaluetemp = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+					mapvaluetemp = binary.LittleEndian.Uint32(dAtA[iNdEx:])
 					iNdEx += 4
 					mapvalue = math.Float32frombits(mapvaluetemp)
 				} else {
@@ -3831,7 +3789,7 @@ func (m *GatewayObservations) Unmarshal(dAtA []byte) error {
 			if m.LastUplinkReceivedAt == nil {
 				m.LastUplinkReceivedAt = new(time.Time)
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.LastUplinkReceivedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(m.LastUplinkReceivedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3883,7 +3841,7 @@ func (m *GatewayObservations) Unmarshal(dAtA []byte) error {
 			if m.LastDownlinkReceivedAt == nil {
 				m.LastDownlinkReceivedAt = new(time.Time)
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.LastDownlinkReceivedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(m.LastDownlinkReceivedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3935,7 +3893,7 @@ func (m *GatewayObservations) Unmarshal(dAtA []byte) error {
 			if m.LastStatusReceivedAt == nil {
 				m.LastStatusReceivedAt = new(time.Time)
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.LastStatusReceivedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(m.LastStatusReceivedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

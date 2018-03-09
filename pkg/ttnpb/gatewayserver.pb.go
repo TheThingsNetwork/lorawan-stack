@@ -13,13 +13,11 @@ import google_protobuf1 "github.com/gogo/protobuf/types"
 
 import time "time"
 
-import (
-	context "context"
-	grpc "google.golang.org/grpc"
-)
+import context "context"
+import grpc "google.golang.org/grpc"
 
-import encoding_binary "encoding/binary"
-import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+import binary "encoding/binary"
+import types "github.com/gogo/protobuf/types"
 
 import io "io"
 
@@ -321,10 +319,7 @@ func (this *GatewayUp) VerboseEqual(that interface{}) error {
 }
 func (this *GatewayUp) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GatewayUp)
@@ -337,10 +332,7 @@ func (this *GatewayUp) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -389,10 +381,7 @@ func (this *GatewayDown) VerboseEqual(that interface{}) error {
 }
 func (this *GatewayDown) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GatewayDown)
@@ -405,10 +394,7 @@ func (this *GatewayDown) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -478,10 +464,7 @@ func (this *FrequencyPlan) VerboseEqual(that interface{}) error {
 }
 func (this *FrequencyPlan) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*FrequencyPlan)
@@ -494,10 +477,7 @@ func (this *FrequencyPlan) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -570,10 +550,7 @@ func (this *FrequencyPlan_Channel) VerboseEqual(that interface{}) error {
 }
 func (this *FrequencyPlan_Channel) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*FrequencyPlan_Channel)
@@ -586,10 +563,7 @@ func (this *FrequencyPlan_Channel) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -633,10 +607,7 @@ func (this *FrequencyPlan_Channel_ForceDataRate) VerboseEqual(that interface{}) 
 }
 func (this *FrequencyPlan_Channel_ForceDataRate) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*FrequencyPlan_Channel_ForceDataRate)
@@ -649,10 +620,7 @@ func (this *FrequencyPlan_Channel_ForceDataRate) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -699,10 +667,7 @@ func (this *FrequencyPlan_LBTConfiguration) VerboseEqual(that interface{}) error
 }
 func (this *FrequencyPlan_LBTConfiguration) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*FrequencyPlan_LBTConfiguration)
@@ -715,10 +680,7 @@ func (this *FrequencyPlan_LBTConfiguration) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -774,10 +736,7 @@ func (this *FrequencyPlan_TimeOffAir) VerboseEqual(that interface{}) error {
 }
 func (this *FrequencyPlan_TimeOffAir) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*FrequencyPlan_TimeOffAir)
@@ -790,10 +749,7 @@ func (this *FrequencyPlan_TimeOffAir) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -843,10 +799,7 @@ func (this *FrequencyPlanRequest) VerboseEqual(that interface{}) error {
 }
 func (this *FrequencyPlanRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*FrequencyPlanRequest)
@@ -859,10 +812,7 @@ func (this *FrequencyPlanRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1286,8 +1236,8 @@ func (m *FrequencyPlan) MarshalTo(dAtA []byte) (int, error) {
 	if m.DwellTime != nil {
 		dAtA[i] = 0x32
 		i++
-		i = encodeVarintGatewayserver(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.DwellTime)))
-		n6, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.DwellTime, dAtA[i:])
+		i = encodeVarintGatewayserver(dAtA, i, uint64(types.SizeOfStdDuration(*m.DwellTime)))
+		n6, err := types.StdDurationMarshalTo(*m.DwellTime, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -1380,13 +1330,13 @@ func (m *FrequencyPlan_LBTConfiguration) MarshalTo(dAtA []byte) (int, error) {
 	if m.RSSITarget != 0 {
 		dAtA[i] = 0xd
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSITarget))
+		binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSITarget))
 		i += 4
 	}
 	if m.RSSIOffset != 0 {
 		dAtA[i] = 0x15
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSIOffset))
+		binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSIOffset))
 		i += 4
 	}
 	if m.ScanTime != 0 {
@@ -1415,14 +1365,14 @@ func (m *FrequencyPlan_TimeOffAir) MarshalTo(dAtA []byte) (int, error) {
 	if m.Fraction != 0 {
 		dAtA[i] = 0xd
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Fraction))
+		binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Fraction))
 		i += 4
 	}
 	if m.Duration != nil {
 		dAtA[i] = 0x12
 		i++
-		i = encodeVarintGatewayserver(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.Duration)))
-		n9, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.Duration, dAtA[i:])
+		i = encodeVarintGatewayserver(dAtA, i, uint64(types.SizeOfStdDuration(*m.Duration)))
+		n9, err := types.StdDurationMarshalTo(*m.Duration, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -1511,7 +1461,7 @@ func NewPopulatedFrequencyPlan(r randyGatewayserver, easy bool) *FrequencyPlan {
 		this.LBT = NewPopulatedFrequencyPlan_LBTConfiguration(r, easy)
 	}
 	if r.Intn(10) != 0 {
-		this.DwellTime = github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
+		this.DwellTime = types.NewPopulatedStdDuration(r, easy)
 	}
 	if r.Intn(10) != 0 {
 		this.TimeOffAir = NewPopulatedFrequencyPlan_TimeOffAir(r, easy)
@@ -1566,7 +1516,7 @@ func NewPopulatedFrequencyPlan_TimeOffAir(r randyGatewayserver, easy bool) *Freq
 		this.Fraction *= -1
 	}
 	if r.Intn(10) != 0 {
-		this.Duration = github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
+		this.Duration = types.NewPopulatedStdDuration(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -1705,7 +1655,7 @@ func (m *FrequencyPlan) Size() (n int) {
 		n += 1 + l + sovGatewayserver(uint64(l))
 	}
 	if m.DwellTime != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.DwellTime)
+		l = types.SizeOfStdDuration(*m.DwellTime)
 		n += 1 + l + sovGatewayserver(uint64(l))
 	}
 	if m.TimeOffAir != nil {
@@ -1759,7 +1709,7 @@ func (m *FrequencyPlan_TimeOffAir) Size() (n int) {
 		n += 5
 	}
 	if m.Duration != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.Duration)
+		l = types.SizeOfStdDuration(*m.Duration)
 		n += 1 + l + sovGatewayserver(uint64(l))
 	}
 	return n
@@ -2202,7 +2152,7 @@ func (m *FrequencyPlan) Unmarshal(dAtA []byte) error {
 			if m.DwellTime == nil {
 				m.DwellTime = new(time.Duration)
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.DwellTime, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(m.DwellTime, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2468,7 +2418,7 @@ func (m *FrequencyPlan_LBTConfiguration) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
 			m.RSSITarget = math.Float32frombits(v)
 		case 2:
@@ -2479,7 +2429,7 @@ func (m *FrequencyPlan_LBTConfiguration) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
 			m.RSSIOffset = math.Float32frombits(v)
 		case 3:
@@ -2559,7 +2509,7 @@ func (m *FrequencyPlan_TimeOffAir) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
 			m.Fraction = math.Float32frombits(v)
 		case 2:
@@ -2591,7 +2541,7 @@ func (m *FrequencyPlan_TimeOffAir) Unmarshal(dAtA []byte) error {
 			if m.Duration == nil {
 				m.Duration = new(time.Duration)
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.Duration, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(m.Duration, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

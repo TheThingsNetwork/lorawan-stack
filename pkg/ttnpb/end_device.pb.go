@@ -15,8 +15,8 @@ import _ "github.com/gogo/protobuf/types"
 import github_com_TheThingsNetwork_ttn_pkg_types "github.com/TheThingsNetwork/ttn/pkg/types"
 import time "time"
 
-import encoding_binary "encoding/binary"
-import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+import binary "encoding/binary"
+import types "github.com/gogo/protobuf/types"
 
 import io "io"
 
@@ -827,10 +827,7 @@ func (this *KeyEnvelope) VerboseEqual(that interface{}) error {
 }
 func (this *KeyEnvelope) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*KeyEnvelope)
@@ -843,10 +840,7 @@ func (this *KeyEnvelope) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -900,10 +894,7 @@ func (this *RootKeys) VerboseEqual(that interface{}) error {
 }
 func (this *RootKeys) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*RootKeys)
@@ -916,10 +907,7 @@ func (this *RootKeys) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -978,10 +966,7 @@ func (this *SessionKeys) VerboseEqual(that interface{}) error {
 }
 func (this *SessionKeys) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*SessionKeys)
@@ -994,10 +979,7 @@ func (this *SessionKeys) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1069,10 +1051,7 @@ func (this *Session) VerboseEqual(that interface{}) error {
 }
 func (this *Session) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Session)
@@ -1085,10 +1064,7 @@ func (this *Session) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1157,10 +1133,7 @@ func (this *EndDeviceModel) VerboseEqual(that interface{}) error {
 }
 func (this *EndDeviceModel) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*EndDeviceModel)
@@ -1173,10 +1146,7 @@ func (this *EndDeviceModel) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1332,10 +1302,7 @@ func (this *EndDevice) VerboseEqual(that interface{}) error {
 }
 func (this *EndDevice) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*EndDevice)
@@ -1348,10 +1315,7 @@ func (this *EndDevice) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1503,10 +1467,7 @@ func (this *EndDevices) VerboseEqual(that interface{}) error {
 }
 func (this *EndDevices) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*EndDevices)
@@ -1519,10 +1480,7 @@ func (this *EndDevices) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1571,10 +1529,7 @@ func (this *MACSettings) VerboseEqual(that interface{}) error {
 }
 func (this *MACSettings) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACSettings)
@@ -1587,10 +1542,7 @@ func (this *MACSettings) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1682,10 +1634,7 @@ func (this *MACState) VerboseEqual(that interface{}) error {
 }
 func (this *MACState) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACState)
@@ -1698,10 +1647,7 @@ func (this *MACState) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1806,10 +1752,7 @@ func (this *MACInfo) VerboseEqual(that interface{}) error {
 }
 func (this *MACInfo) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACInfo)
@@ -1822,10 +1765,7 @@ func (this *MACInfo) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -2042,8 +1982,8 @@ func (m *Session) MarshalTo(dAtA []byte) (int, error) {
 	}
 	dAtA[i] = 0x3a
 	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.StartedAt)))
-	n10, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.StartedAt, dAtA[i:])
+	i = encodeVarintEndDevice(dAtA, i, uint64(types.SizeOfStdTime(m.StartedAt)))
+	n10, err := types.StdTimeMarshalTo(m.StartedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -2389,8 +2329,8 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 	i++
 	dAtA[i] = 0x6
 	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n26, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
+	i = encodeVarintEndDevice(dAtA, i, uint64(types.SizeOfStdTime(m.CreatedAt)))
+	n26, err := types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -2399,8 +2339,8 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 	i++
 	dAtA[i] = 0x6
 	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n27, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
+	i = encodeVarintEndDevice(dAtA, i, uint64(types.SizeOfStdTime(m.UpdatedAt)))
+	n27, err := types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -2615,8 +2555,8 @@ func (m *MACInfo) MarshalTo(dAtA []byte) (int, error) {
 	if m.LastStatusReceivedAt != nil {
 		dAtA[i] = 0x12
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastStatusReceivedAt)))
-		n28, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastStatusReceivedAt, dAtA[i:])
+		i = encodeVarintEndDevice(dAtA, i, uint64(types.SizeOfStdTime(*m.LastStatusReceivedAt)))
+		n28, err := types.StdTimeMarshalTo(*m.LastStatusReceivedAt, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -2625,7 +2565,7 @@ func (m *MACInfo) MarshalTo(dAtA []byte) (int, error) {
 	if m.BatteryPercentage != 0 {
 		dAtA[i] = 0x1d
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.BatteryPercentage))
+		binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.BatteryPercentage))
 		i += 4
 	}
 	if m.DownlinkMargin != 0 {
@@ -2701,7 +2641,7 @@ func NewPopulatedSession(r randyEndDevice, easy bool) *Session {
 	this.NextFCntUp = r.Uint32()
 	this.NextNFCntDown = r.Uint32()
 	this.NextAFCntDown = r.Uint32()
-	v2 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v2 := types.NewPopulatedStdTime(r, easy)
 	this.StartedAt = *v2
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -2768,7 +2708,7 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	if r.Intn(10) != 0 {
 		this.Location = NewPopulatedLocation(r, easy)
 	}
-	if r.Intn(10) == 0 {
+	if r.Intn(10) != 0 {
 		this.Attributes = google_protobuf3.NewPopulatedStruct(r, easy)
 	}
 	this.DisableJoinNonceCheck = bool(r.Intn(2) == 0)
@@ -2780,9 +2720,9 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	this.UpFormatterParameter = randStringEndDevice(r)
 	this.DownFormatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
 	this.DownFormatterParameter = randStringEndDevice(r)
-	v7 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v7 := types.NewPopulatedStdTime(r, easy)
 	this.CreatedAt = *v7
-	v8 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v8 := types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v8
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -2843,7 +2783,7 @@ func NewPopulatedMACInfo(r randyEndDevice, easy bool) *MACInfo {
 	this := &MACInfo{}
 	this.DeviceClass = Class([]int32{0, 1, 2}[r.Intn(3)])
 	if r.Intn(10) != 0 {
-		this.LastStatusReceivedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+		this.LastStatusReceivedAt = types.NewPopulatedStdTime(r, easy)
 	}
 	this.BatteryPercentage = r.Float32()
 	if r.Intn(2) == 0 {
@@ -3007,7 +2947,7 @@ func (m *Session) Size() (n int) {
 	if m.NextAFCntDown != 0 {
 		n += 1 + sovEndDevice(uint64(m.NextAFCntDown))
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.StartedAt)
+	l = types.SizeOfStdTime(m.StartedAt)
 	n += 1 + l + sovEndDevice(uint64(l))
 	return n
 }
@@ -3150,9 +3090,9 @@ func (m *EndDevice) Size() (n int) {
 	if l > 0 {
 		n += 2 + l + sovEndDevice(uint64(l))
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)
+	l = types.SizeOfStdTime(m.CreatedAt)
 	n += 2 + l + sovEndDevice(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)
+	l = types.SizeOfStdTime(m.UpdatedAt)
 	n += 2 + l + sovEndDevice(uint64(l))
 	return n
 }
@@ -3245,7 +3185,7 @@ func (m *MACInfo) Size() (n int) {
 		n += 1 + sovEndDevice(uint64(m.DeviceClass))
 	}
 	if m.LastStatusReceivedAt != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastStatusReceivedAt)
+		l = types.SizeOfStdTime(*m.LastStatusReceivedAt)
 		n += 1 + l + sovEndDevice(uint64(l))
 	}
 	if m.BatteryPercentage != 0 {
@@ -3914,7 +3854,7 @@ func (m *Session) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.StartedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.StartedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5035,7 +4975,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5065,7 +5005,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5712,7 +5652,7 @@ func (m *MACInfo) Unmarshal(dAtA []byte) error {
 			if m.LastStatusReceivedAt == nil {
 				m.LastStatusReceivedAt = new(time.Time)
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.LastStatusReceivedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(m.LastStatusReceivedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5724,7 +5664,7 @@ func (m *MACInfo) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
 			m.BatteryPercentage = math.Float32frombits(v)
 		case 4:

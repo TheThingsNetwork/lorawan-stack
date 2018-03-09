@@ -4,11 +4,10 @@
 package ttnpb
 
 import testing "testing"
-import math_rand "math/rand"
+import rand "math/rand"
 import time "time"
-import github_com_gogo_protobuf_proto "github.com/gogo/protobuf/proto"
-import github_com_gogo_protobuf_jsonpb "github.com/gogo/protobuf/jsonpb"
 import proto "github.com/gogo/protobuf/proto"
+import jsonpb "github.com/gogo/protobuf/jsonpb"
 import golang_proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
@@ -24,14 +23,14 @@ var _ = math.Inf
 
 func TestRxMetadataProto(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedRxMetadata(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &RxMetadata{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	littlefuzz := make([]byte, len(dAtA))
@@ -52,13 +51,13 @@ func TestRxMetadataProto(t *testing.T) {
 			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
 		}
 		// shouldn't panic
-		_ = github_com_gogo_protobuf_proto.Unmarshal(littlefuzz, msg)
+		_ = proto.Unmarshal(littlefuzz, msg)
 	}
 }
 
 func TestRxMetadataMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedRxMetadata(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
@@ -70,7 +69,7 @@ func TestRxMetadataMarshalTo(t *testing.T) {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &RxMetadata{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	for i := range dAtA {
@@ -85,7 +84,7 @@ func TestRxMetadataMarshalTo(t *testing.T) {
 }
 
 func BenchmarkRxMetadataProtoMarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*RxMetadata, 10000)
 	for i := 0; i < 10000; i++ {
@@ -93,7 +92,7 @@ func BenchmarkRxMetadataProtoMarshal(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(pops[i%10000])
+		dAtA, err := proto.Marshal(pops[i%10000])
 		if err != nil {
 			panic(err)
 		}
@@ -103,11 +102,11 @@ func BenchmarkRxMetadataProtoMarshal(b *testing.B) {
 }
 
 func BenchmarkRxMetadataProtoUnmarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedRxMetadata(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedRxMetadata(popr, false))
 		if err != nil {
 			panic(err)
 		}
@@ -117,7 +116,7 @@ func BenchmarkRxMetadataProtoUnmarshal(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
-		if err := github_com_gogo_protobuf_proto.Unmarshal(datas[i%10000], msg); err != nil {
+		if err := proto.Unmarshal(datas[i%10000], msg); err != nil {
 			panic(err)
 		}
 	}
@@ -126,14 +125,14 @@ func BenchmarkRxMetadataProtoUnmarshal(b *testing.B) {
 
 func TestTxMetadataProto(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedTxMetadata(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &TxMetadata{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	littlefuzz := make([]byte, len(dAtA))
@@ -154,13 +153,13 @@ func TestTxMetadataProto(t *testing.T) {
 			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
 		}
 		// shouldn't panic
-		_ = github_com_gogo_protobuf_proto.Unmarshal(littlefuzz, msg)
+		_ = proto.Unmarshal(littlefuzz, msg)
 	}
 }
 
 func TestTxMetadataMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedTxMetadata(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
@@ -172,7 +171,7 @@ func TestTxMetadataMarshalTo(t *testing.T) {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &TxMetadata{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	for i := range dAtA {
@@ -187,7 +186,7 @@ func TestTxMetadataMarshalTo(t *testing.T) {
 }
 
 func BenchmarkTxMetadataProtoMarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*TxMetadata, 10000)
 	for i := 0; i < 10000; i++ {
@@ -195,7 +194,7 @@ func BenchmarkTxMetadataProtoMarshal(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(pops[i%10000])
+		dAtA, err := proto.Marshal(pops[i%10000])
 		if err != nil {
 			panic(err)
 		}
@@ -205,11 +204,11 @@ func BenchmarkTxMetadataProtoMarshal(b *testing.B) {
 }
 
 func BenchmarkTxMetadataProtoUnmarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedTxMetadata(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedTxMetadata(popr, false))
 		if err != nil {
 			panic(err)
 		}
@@ -219,7 +218,7 @@ func BenchmarkTxMetadataProtoUnmarshal(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
-		if err := github_com_gogo_protobuf_proto.Unmarshal(datas[i%10000], msg); err != nil {
+		if err := proto.Unmarshal(datas[i%10000], msg); err != nil {
 			panic(err)
 		}
 	}
@@ -228,14 +227,14 @@ func BenchmarkTxMetadataProtoUnmarshal(b *testing.B) {
 
 func TestLocationProto(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedLocation(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &Location{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	littlefuzz := make([]byte, len(dAtA))
@@ -256,13 +255,13 @@ func TestLocationProto(t *testing.T) {
 			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
 		}
 		// shouldn't panic
-		_ = github_com_gogo_protobuf_proto.Unmarshal(littlefuzz, msg)
+		_ = proto.Unmarshal(littlefuzz, msg)
 	}
 }
 
 func TestLocationMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedLocation(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
@@ -274,7 +273,7 @@ func TestLocationMarshalTo(t *testing.T) {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &Location{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	for i := range dAtA {
@@ -289,7 +288,7 @@ func TestLocationMarshalTo(t *testing.T) {
 }
 
 func BenchmarkLocationProtoMarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*Location, 10000)
 	for i := 0; i < 10000; i++ {
@@ -297,7 +296,7 @@ func BenchmarkLocationProtoMarshal(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(pops[i%10000])
+		dAtA, err := proto.Marshal(pops[i%10000])
 		if err != nil {
 			panic(err)
 		}
@@ -307,11 +306,11 @@ func BenchmarkLocationProtoMarshal(b *testing.B) {
 }
 
 func BenchmarkLocationProtoUnmarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedLocation(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedLocation(popr, false))
 		if err != nil {
 			panic(err)
 		}
@@ -321,7 +320,7 @@ func BenchmarkLocationProtoUnmarshal(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
-		if err := github_com_gogo_protobuf_proto.Unmarshal(datas[i%10000], msg); err != nil {
+		if err := proto.Unmarshal(datas[i%10000], msg); err != nil {
 			panic(err)
 		}
 	}
@@ -330,15 +329,15 @@ func BenchmarkLocationProtoUnmarshal(b *testing.B) {
 
 func TestRxMetadataJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedRxMetadata(popr, true)
-	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
+	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &RxMetadata{}
-	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
+	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -351,15 +350,15 @@ func TestRxMetadataJSON(t *testing.T) {
 }
 func TestTxMetadataJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedTxMetadata(popr, true)
-	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
+	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &TxMetadata{}
-	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
+	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -372,15 +371,15 @@ func TestTxMetadataJSON(t *testing.T) {
 }
 func TestLocationJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedLocation(popr, true)
-	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
+	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &Location{}
-	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
+	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -393,11 +392,11 @@ func TestLocationJSON(t *testing.T) {
 }
 func TestRxMetadataProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedRxMetadata(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
+	dAtA := proto.MarshalTextString(p)
 	msg := &RxMetadata{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -410,11 +409,11 @@ func TestRxMetadataProtoText(t *testing.T) {
 
 func TestRxMetadataProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedRxMetadata(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
+	dAtA := proto.CompactTextString(p)
 	msg := &RxMetadata{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -427,11 +426,11 @@ func TestRxMetadataProtoCompactText(t *testing.T) {
 
 func TestTxMetadataProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedTxMetadata(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
+	dAtA := proto.MarshalTextString(p)
 	msg := &TxMetadata{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -444,11 +443,11 @@ func TestTxMetadataProtoText(t *testing.T) {
 
 func TestTxMetadataProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedTxMetadata(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
+	dAtA := proto.CompactTextString(p)
 	msg := &TxMetadata{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -461,11 +460,11 @@ func TestTxMetadataProtoCompactText(t *testing.T) {
 
 func TestLocationProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedLocation(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
+	dAtA := proto.MarshalTextString(p)
 	msg := &Location{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -478,11 +477,11 @@ func TestLocationProtoText(t *testing.T) {
 
 func TestLocationProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedLocation(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
+	dAtA := proto.CompactTextString(p)
 	msg := &Location{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -494,14 +493,14 @@ func TestLocationProtoCompactText(t *testing.T) {
 }
 
 func TestRxMetadataVerboseEqual(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
 	p := NewPopulatedRxMetadata(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
 	msg := &RxMetadata{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -509,14 +508,14 @@ func TestRxMetadataVerboseEqual(t *testing.T) {
 	}
 }
 func TestTxMetadataVerboseEqual(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
 	p := NewPopulatedTxMetadata(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
 	msg := &TxMetadata{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -524,14 +523,14 @@ func TestTxMetadataVerboseEqual(t *testing.T) {
 	}
 }
 func TestLocationVerboseEqual(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
 	p := NewPopulatedLocation(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
 	msg := &Location{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -540,10 +539,10 @@ func TestLocationVerboseEqual(t *testing.T) {
 }
 func TestRxMetadataSize(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedRxMetadata(popr, true)
-	size2 := github_com_gogo_protobuf_proto.Size(p)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	size2 := proto.Size(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -554,14 +553,14 @@ func TestRxMetadataSize(t *testing.T) {
 	if size2 != size {
 		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
 	}
-	size3 := github_com_gogo_protobuf_proto.Size(p)
+	size3 := proto.Size(p)
 	if size3 != size {
 		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
 	}
 }
 
 func BenchmarkRxMetadataSize(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*RxMetadata, 1000)
 	for i := 0; i < 1000; i++ {
@@ -576,10 +575,10 @@ func BenchmarkRxMetadataSize(b *testing.B) {
 
 func TestTxMetadataSize(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedTxMetadata(popr, true)
-	size2 := github_com_gogo_protobuf_proto.Size(p)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	size2 := proto.Size(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -590,14 +589,14 @@ func TestTxMetadataSize(t *testing.T) {
 	if size2 != size {
 		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
 	}
-	size3 := github_com_gogo_protobuf_proto.Size(p)
+	size3 := proto.Size(p)
 	if size3 != size {
 		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
 	}
 }
 
 func BenchmarkTxMetadataSize(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*TxMetadata, 1000)
 	for i := 0; i < 1000; i++ {
@@ -612,10 +611,10 @@ func BenchmarkTxMetadataSize(b *testing.B) {
 
 func TestLocationSize(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedLocation(popr, true)
-	size2 := github_com_gogo_protobuf_proto.Size(p)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	size2 := proto.Size(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -626,14 +625,14 @@ func TestLocationSize(t *testing.T) {
 	if size2 != size {
 		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
 	}
-	size3 := github_com_gogo_protobuf_proto.Size(p)
+	size3 := proto.Size(p)
 	if size3 != size {
 		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
 	}
 }
 
 func BenchmarkLocationSize(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*Location, 1000)
 	for i := 0; i < 1000; i++ {

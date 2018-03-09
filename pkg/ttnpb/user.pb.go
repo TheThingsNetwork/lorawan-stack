@@ -13,7 +13,7 @@ import _ "github.com/gogo/protobuf/types"
 
 import time "time"
 
-import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+import types "github.com/gogo/protobuf/types"
 
 import io "io"
 
@@ -173,10 +173,7 @@ func (this *User) VerboseEqual(that interface{}) error {
 }
 func (this *User) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*User)
@@ -189,10 +186,7 @@ func (this *User) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -268,8 +262,8 @@ func (m *User) MarshalTo(dAtA []byte) (int, error) {
 	}
 	dAtA[i] = 0x2a
 	i++
-	i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ValidatedAt)))
-	n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ValidatedAt, dAtA[i:])
+	i = encodeVarintUser(dAtA, i, uint64(types.SizeOfStdTime(m.ValidatedAt)))
+	n2, err := types.StdTimeMarshalTo(m.ValidatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -291,16 +285,16 @@ func (m *User) MarshalTo(dAtA []byte) (int, error) {
 	}
 	dAtA[i] = 0x42
 	i++
-	i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
+	i = encodeVarintUser(dAtA, i, uint64(types.SizeOfStdTime(m.CreatedAt)))
+	n3, err := types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n3
 	dAtA[i] = 0x4a
 	i++
-	i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n4, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
+	i = encodeVarintUser(dAtA, i, uint64(types.SizeOfStdTime(m.UpdatedAt)))
+	n4, err := types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -324,13 +318,13 @@ func NewPopulatedUser(r randyUser, easy bool) *User {
 	this.Email = randStringUser(r)
 	this.Password = randStringUser(r)
 	this.Name = randStringUser(r)
-	v2 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v2 := types.NewPopulatedStdTime(r, easy)
 	this.ValidatedAt = *v2
 	this.Admin = bool(r.Intn(2) == 0)
 	this.State = ReviewingState([]int32{0, 1, 2}[r.Intn(3)])
-	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v3 := types.NewPopulatedStdTime(r, easy)
 	this.CreatedAt = *v3
-	v4 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v4 := types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v4
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -426,7 +420,7 @@ func (m *User) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovUser(uint64(l))
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.ValidatedAt)
+	l = types.SizeOfStdTime(m.ValidatedAt)
 	n += 1 + l + sovUser(uint64(l))
 	if m.Admin {
 		n += 2
@@ -434,9 +428,9 @@ func (m *User) Size() (n int) {
 	if m.State != 0 {
 		n += 1 + sovUser(uint64(m.State))
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)
+	l = types.SizeOfStdTime(m.CreatedAt)
 	n += 1 + l + sovUser(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)
+	l = types.SizeOfStdTime(m.UpdatedAt)
 	n += 1 + l + sovUser(uint64(l))
 	return n
 }
@@ -626,7 +620,7 @@ func (m *User) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ValidatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.ValidatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -695,7 +689,7 @@ func (m *User) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -725,7 +719,7 @@ func (m *User) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

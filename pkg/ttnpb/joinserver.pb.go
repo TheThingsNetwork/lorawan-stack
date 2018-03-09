@@ -11,10 +11,8 @@ import _ "github.com/gogo/protobuf/gogoproto"
 
 import github_com_TheThingsNetwork_ttn_pkg_types "github.com/TheThingsNetwork/ttn/pkg/types"
 
-import (
-	context "context"
-	grpc "google.golang.org/grpc"
-)
+import context "context"
+import grpc "google.golang.org/grpc"
 
 import io "io"
 
@@ -138,10 +136,7 @@ func (this *SessionKeyRequest) VerboseEqual(that interface{}) error {
 }
 func (this *SessionKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*SessionKeyRequest)
@@ -154,10 +149,7 @@ func (this *SessionKeyRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -207,10 +199,7 @@ func (this *NwkSKeysResponse) VerboseEqual(that interface{}) error {
 }
 func (this *NwkSKeysResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*NwkSKeysResponse)
@@ -223,10 +212,7 @@ func (this *NwkSKeysResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -273,10 +259,7 @@ func (this *AppSKeyResponse) VerboseEqual(that interface{}) error {
 }
 func (this *AppSKeyResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*AppSKeyResponse)
@@ -289,10 +272,7 @@ func (this *AppSKeyResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}

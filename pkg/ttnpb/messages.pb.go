@@ -185,10 +185,7 @@ func (this *UplinkMessage) VerboseEqual(that interface{}) error {
 }
 func (this *UplinkMessage) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*UplinkMessage)
@@ -201,10 +198,7 @@ func (this *UplinkMessage) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -282,10 +276,7 @@ func (this *DownlinkMessage) VerboseEqual(that interface{}) error {
 }
 func (this *DownlinkMessage) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*DownlinkMessage)
@@ -298,10 +289,7 @@ func (this *DownlinkMessage) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}

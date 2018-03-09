@@ -12,10 +12,8 @@ import _ "google.golang.org/genproto/googleapis/api/annotations"
 import google_protobuf1 "github.com/gogo/protobuf/types"
 import google_protobuf4 "github.com/gogo/protobuf/types"
 
-import (
-	context "context"
-	grpc "google.golang.org/grpc"
-)
+import context "context"
+import grpc "google.golang.org/grpc"
 
 import io "io"
 
@@ -90,10 +88,7 @@ func (this *SetDeviceRequest) VerboseEqual(that interface{}) error {
 }
 func (this *SetDeviceRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*SetDeviceRequest)
@@ -106,10 +101,7 @@ func (this *SetDeviceRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}

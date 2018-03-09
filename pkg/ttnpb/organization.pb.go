@@ -13,7 +13,7 @@ import _ "github.com/gogo/protobuf/types"
 
 import time "time"
 
-import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+import types "github.com/gogo/protobuf/types"
 
 import io "io"
 
@@ -180,10 +180,7 @@ func (this *Organization) VerboseEqual(that interface{}) error {
 }
 func (this *Organization) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Organization)
@@ -196,10 +193,7 @@ func (this *Organization) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -272,10 +266,7 @@ func (this *OrganizationMember) VerboseEqual(that interface{}) error {
 }
 func (this *OrganizationMember) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*OrganizationMember)
@@ -288,10 +279,7 @@ func (this *OrganizationMember) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -366,16 +354,16 @@ func (m *Organization) MarshalTo(dAtA []byte) (int, error) {
 	}
 	dAtA[i] = 0x3a
 	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
+	i = encodeVarintOrganization(dAtA, i, uint64(types.SizeOfStdTime(m.CreatedAt)))
+	n2, err := types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n2
 	dAtA[i] = 0x42
 	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
+	i = encodeVarintOrganization(dAtA, i, uint64(types.SizeOfStdTime(m.UpdatedAt)))
+	n3, err := types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -452,9 +440,9 @@ func NewPopulatedOrganization(r randyOrganization, easy bool) *Organization {
 	this.URL = randStringOrganization(r)
 	this.Location = randStringOrganization(r)
 	this.Email = randStringOrganization(r)
-	v2 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v2 := types.NewPopulatedStdTime(r, easy)
 	this.CreatedAt = *v2
-	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v3 := types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v3
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -574,9 +562,9 @@ func (m *Organization) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovOrganization(uint64(l))
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)
+	l = types.SizeOfStdTime(m.CreatedAt)
 	n += 1 + l + sovOrganization(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)
+	l = types.SizeOfStdTime(m.UpdatedAt)
 	n += 1 + l + sovOrganization(uint64(l))
 	return n
 }
@@ -841,7 +829,7 @@ func (m *Organization) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -871,7 +859,7 @@ func (m *Organization) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

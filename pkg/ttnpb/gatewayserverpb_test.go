@@ -4,11 +4,10 @@
 package ttnpb
 
 import testing "testing"
-import math_rand "math/rand"
+import rand "math/rand"
 import time "time"
-import github_com_gogo_protobuf_proto "github.com/gogo/protobuf/proto"
-import github_com_gogo_protobuf_jsonpb "github.com/gogo/protobuf/jsonpb"
 import proto "github.com/gogo/protobuf/proto"
+import jsonpb "github.com/gogo/protobuf/jsonpb"
 import golang_proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
@@ -24,14 +23,14 @@ var _ = math.Inf
 
 func TestGatewayUpProto(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedGatewayUp(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &GatewayUp{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	littlefuzz := make([]byte, len(dAtA))
@@ -52,13 +51,13 @@ func TestGatewayUpProto(t *testing.T) {
 			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
 		}
 		// shouldn't panic
-		_ = github_com_gogo_protobuf_proto.Unmarshal(littlefuzz, msg)
+		_ = proto.Unmarshal(littlefuzz, msg)
 	}
 }
 
 func TestGatewayUpMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedGatewayUp(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
@@ -70,7 +69,7 @@ func TestGatewayUpMarshalTo(t *testing.T) {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &GatewayUp{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	for i := range dAtA {
@@ -85,7 +84,7 @@ func TestGatewayUpMarshalTo(t *testing.T) {
 }
 
 func BenchmarkGatewayUpProtoMarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*GatewayUp, 10000)
 	for i := 0; i < 10000; i++ {
@@ -93,7 +92,7 @@ func BenchmarkGatewayUpProtoMarshal(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(pops[i%10000])
+		dAtA, err := proto.Marshal(pops[i%10000])
 		if err != nil {
 			panic(err)
 		}
@@ -103,11 +102,11 @@ func BenchmarkGatewayUpProtoMarshal(b *testing.B) {
 }
 
 func BenchmarkGatewayUpProtoUnmarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedGatewayUp(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedGatewayUp(popr, false))
 		if err != nil {
 			panic(err)
 		}
@@ -117,7 +116,7 @@ func BenchmarkGatewayUpProtoUnmarshal(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
-		if err := github_com_gogo_protobuf_proto.Unmarshal(datas[i%10000], msg); err != nil {
+		if err := proto.Unmarshal(datas[i%10000], msg); err != nil {
 			panic(err)
 		}
 	}
@@ -126,14 +125,14 @@ func BenchmarkGatewayUpProtoUnmarshal(b *testing.B) {
 
 func TestGatewayDownProto(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedGatewayDown(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &GatewayDown{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	littlefuzz := make([]byte, len(dAtA))
@@ -154,13 +153,13 @@ func TestGatewayDownProto(t *testing.T) {
 			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
 		}
 		// shouldn't panic
-		_ = github_com_gogo_protobuf_proto.Unmarshal(littlefuzz, msg)
+		_ = proto.Unmarshal(littlefuzz, msg)
 	}
 }
 
 func TestGatewayDownMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedGatewayDown(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
@@ -172,7 +171,7 @@ func TestGatewayDownMarshalTo(t *testing.T) {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &GatewayDown{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	for i := range dAtA {
@@ -187,7 +186,7 @@ func TestGatewayDownMarshalTo(t *testing.T) {
 }
 
 func BenchmarkGatewayDownProtoMarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*GatewayDown, 10000)
 	for i := 0; i < 10000; i++ {
@@ -195,7 +194,7 @@ func BenchmarkGatewayDownProtoMarshal(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(pops[i%10000])
+		dAtA, err := proto.Marshal(pops[i%10000])
 		if err != nil {
 			panic(err)
 		}
@@ -205,11 +204,11 @@ func BenchmarkGatewayDownProtoMarshal(b *testing.B) {
 }
 
 func BenchmarkGatewayDownProtoUnmarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedGatewayDown(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedGatewayDown(popr, false))
 		if err != nil {
 			panic(err)
 		}
@@ -219,7 +218,7 @@ func BenchmarkGatewayDownProtoUnmarshal(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
-		if err := github_com_gogo_protobuf_proto.Unmarshal(datas[i%10000], msg); err != nil {
+		if err := proto.Unmarshal(datas[i%10000], msg); err != nil {
 			panic(err)
 		}
 	}
@@ -228,14 +227,14 @@ func BenchmarkGatewayDownProtoUnmarshal(b *testing.B) {
 
 func TestFrequencyPlanProto(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlan{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	littlefuzz := make([]byte, len(dAtA))
@@ -256,13 +255,13 @@ func TestFrequencyPlanProto(t *testing.T) {
 			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
 		}
 		// shouldn't panic
-		_ = github_com_gogo_protobuf_proto.Unmarshal(littlefuzz, msg)
+		_ = proto.Unmarshal(littlefuzz, msg)
 	}
 }
 
 func TestFrequencyPlanMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
@@ -274,7 +273,7 @@ func TestFrequencyPlanMarshalTo(t *testing.T) {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlan{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	for i := range dAtA {
@@ -289,7 +288,7 @@ func TestFrequencyPlanMarshalTo(t *testing.T) {
 }
 
 func BenchmarkFrequencyPlanProtoMarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*FrequencyPlan, 10000)
 	for i := 0; i < 10000; i++ {
@@ -297,7 +296,7 @@ func BenchmarkFrequencyPlanProtoMarshal(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(pops[i%10000])
+		dAtA, err := proto.Marshal(pops[i%10000])
 		if err != nil {
 			panic(err)
 		}
@@ -307,11 +306,11 @@ func BenchmarkFrequencyPlanProtoMarshal(b *testing.B) {
 }
 
 func BenchmarkFrequencyPlanProtoUnmarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedFrequencyPlan(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedFrequencyPlan(popr, false))
 		if err != nil {
 			panic(err)
 		}
@@ -321,7 +320,7 @@ func BenchmarkFrequencyPlanProtoUnmarshal(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
-		if err := github_com_gogo_protobuf_proto.Unmarshal(datas[i%10000], msg); err != nil {
+		if err := proto.Unmarshal(datas[i%10000], msg); err != nil {
 			panic(err)
 		}
 	}
@@ -330,14 +329,14 @@ func BenchmarkFrequencyPlanProtoUnmarshal(b *testing.B) {
 
 func TestFrequencyPlan_ChannelProto(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_Channel(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlan_Channel{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	littlefuzz := make([]byte, len(dAtA))
@@ -358,13 +357,13 @@ func TestFrequencyPlan_ChannelProto(t *testing.T) {
 			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
 		}
 		// shouldn't panic
-		_ = github_com_gogo_protobuf_proto.Unmarshal(littlefuzz, msg)
+		_ = proto.Unmarshal(littlefuzz, msg)
 	}
 }
 
 func TestFrequencyPlan_ChannelMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_Channel(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
@@ -376,7 +375,7 @@ func TestFrequencyPlan_ChannelMarshalTo(t *testing.T) {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlan_Channel{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	for i := range dAtA {
@@ -391,7 +390,7 @@ func TestFrequencyPlan_ChannelMarshalTo(t *testing.T) {
 }
 
 func BenchmarkFrequencyPlan_ChannelProtoMarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*FrequencyPlan_Channel, 10000)
 	for i := 0; i < 10000; i++ {
@@ -399,7 +398,7 @@ func BenchmarkFrequencyPlan_ChannelProtoMarshal(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(pops[i%10000])
+		dAtA, err := proto.Marshal(pops[i%10000])
 		if err != nil {
 			panic(err)
 		}
@@ -409,11 +408,11 @@ func BenchmarkFrequencyPlan_ChannelProtoMarshal(b *testing.B) {
 }
 
 func BenchmarkFrequencyPlan_ChannelProtoUnmarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedFrequencyPlan_Channel(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedFrequencyPlan_Channel(popr, false))
 		if err != nil {
 			panic(err)
 		}
@@ -423,7 +422,7 @@ func BenchmarkFrequencyPlan_ChannelProtoUnmarshal(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
-		if err := github_com_gogo_protobuf_proto.Unmarshal(datas[i%10000], msg); err != nil {
+		if err := proto.Unmarshal(datas[i%10000], msg); err != nil {
 			panic(err)
 		}
 	}
@@ -432,14 +431,14 @@ func BenchmarkFrequencyPlan_ChannelProtoUnmarshal(b *testing.B) {
 
 func TestFrequencyPlan_Channel_ForceDataRateProto(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_Channel_ForceDataRate(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlan_Channel_ForceDataRate{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	littlefuzz := make([]byte, len(dAtA))
@@ -460,13 +459,13 @@ func TestFrequencyPlan_Channel_ForceDataRateProto(t *testing.T) {
 			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
 		}
 		// shouldn't panic
-		_ = github_com_gogo_protobuf_proto.Unmarshal(littlefuzz, msg)
+		_ = proto.Unmarshal(littlefuzz, msg)
 	}
 }
 
 func TestFrequencyPlan_Channel_ForceDataRateMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_Channel_ForceDataRate(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
@@ -478,7 +477,7 @@ func TestFrequencyPlan_Channel_ForceDataRateMarshalTo(t *testing.T) {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlan_Channel_ForceDataRate{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	for i := range dAtA {
@@ -493,7 +492,7 @@ func TestFrequencyPlan_Channel_ForceDataRateMarshalTo(t *testing.T) {
 }
 
 func BenchmarkFrequencyPlan_Channel_ForceDataRateProtoMarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*FrequencyPlan_Channel_ForceDataRate, 10000)
 	for i := 0; i < 10000; i++ {
@@ -501,7 +500,7 @@ func BenchmarkFrequencyPlan_Channel_ForceDataRateProtoMarshal(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(pops[i%10000])
+		dAtA, err := proto.Marshal(pops[i%10000])
 		if err != nil {
 			panic(err)
 		}
@@ -511,11 +510,11 @@ func BenchmarkFrequencyPlan_Channel_ForceDataRateProtoMarshal(b *testing.B) {
 }
 
 func BenchmarkFrequencyPlan_Channel_ForceDataRateProtoUnmarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedFrequencyPlan_Channel_ForceDataRate(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedFrequencyPlan_Channel_ForceDataRate(popr, false))
 		if err != nil {
 			panic(err)
 		}
@@ -525,7 +524,7 @@ func BenchmarkFrequencyPlan_Channel_ForceDataRateProtoUnmarshal(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
-		if err := github_com_gogo_protobuf_proto.Unmarshal(datas[i%10000], msg); err != nil {
+		if err := proto.Unmarshal(datas[i%10000], msg); err != nil {
 			panic(err)
 		}
 	}
@@ -534,14 +533,14 @@ func BenchmarkFrequencyPlan_Channel_ForceDataRateProtoUnmarshal(b *testing.B) {
 
 func TestFrequencyPlan_LBTConfigurationProto(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_LBTConfiguration(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlan_LBTConfiguration{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	littlefuzz := make([]byte, len(dAtA))
@@ -562,13 +561,13 @@ func TestFrequencyPlan_LBTConfigurationProto(t *testing.T) {
 			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
 		}
 		// shouldn't panic
-		_ = github_com_gogo_protobuf_proto.Unmarshal(littlefuzz, msg)
+		_ = proto.Unmarshal(littlefuzz, msg)
 	}
 }
 
 func TestFrequencyPlan_LBTConfigurationMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_LBTConfiguration(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
@@ -580,7 +579,7 @@ func TestFrequencyPlan_LBTConfigurationMarshalTo(t *testing.T) {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlan_LBTConfiguration{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	for i := range dAtA {
@@ -595,7 +594,7 @@ func TestFrequencyPlan_LBTConfigurationMarshalTo(t *testing.T) {
 }
 
 func BenchmarkFrequencyPlan_LBTConfigurationProtoMarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*FrequencyPlan_LBTConfiguration, 10000)
 	for i := 0; i < 10000; i++ {
@@ -603,7 +602,7 @@ func BenchmarkFrequencyPlan_LBTConfigurationProtoMarshal(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(pops[i%10000])
+		dAtA, err := proto.Marshal(pops[i%10000])
 		if err != nil {
 			panic(err)
 		}
@@ -613,11 +612,11 @@ func BenchmarkFrequencyPlan_LBTConfigurationProtoMarshal(b *testing.B) {
 }
 
 func BenchmarkFrequencyPlan_LBTConfigurationProtoUnmarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedFrequencyPlan_LBTConfiguration(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedFrequencyPlan_LBTConfiguration(popr, false))
 		if err != nil {
 			panic(err)
 		}
@@ -627,7 +626,7 @@ func BenchmarkFrequencyPlan_LBTConfigurationProtoUnmarshal(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
-		if err := github_com_gogo_protobuf_proto.Unmarshal(datas[i%10000], msg); err != nil {
+		if err := proto.Unmarshal(datas[i%10000], msg); err != nil {
 			panic(err)
 		}
 	}
@@ -636,14 +635,14 @@ func BenchmarkFrequencyPlan_LBTConfigurationProtoUnmarshal(b *testing.B) {
 
 func TestFrequencyPlan_TimeOffAirProto(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_TimeOffAir(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlan_TimeOffAir{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	littlefuzz := make([]byte, len(dAtA))
@@ -664,13 +663,13 @@ func TestFrequencyPlan_TimeOffAirProto(t *testing.T) {
 			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
 		}
 		// shouldn't panic
-		_ = github_com_gogo_protobuf_proto.Unmarshal(littlefuzz, msg)
+		_ = proto.Unmarshal(littlefuzz, msg)
 	}
 }
 
 func TestFrequencyPlan_TimeOffAirMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_TimeOffAir(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
@@ -682,7 +681,7 @@ func TestFrequencyPlan_TimeOffAirMarshalTo(t *testing.T) {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlan_TimeOffAir{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	for i := range dAtA {
@@ -697,7 +696,7 @@ func TestFrequencyPlan_TimeOffAirMarshalTo(t *testing.T) {
 }
 
 func BenchmarkFrequencyPlan_TimeOffAirProtoMarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*FrequencyPlan_TimeOffAir, 10000)
 	for i := 0; i < 10000; i++ {
@@ -705,7 +704,7 @@ func BenchmarkFrequencyPlan_TimeOffAirProtoMarshal(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(pops[i%10000])
+		dAtA, err := proto.Marshal(pops[i%10000])
 		if err != nil {
 			panic(err)
 		}
@@ -715,11 +714,11 @@ func BenchmarkFrequencyPlan_TimeOffAirProtoMarshal(b *testing.B) {
 }
 
 func BenchmarkFrequencyPlan_TimeOffAirProtoUnmarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedFrequencyPlan_TimeOffAir(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedFrequencyPlan_TimeOffAir(popr, false))
 		if err != nil {
 			panic(err)
 		}
@@ -729,7 +728,7 @@ func BenchmarkFrequencyPlan_TimeOffAirProtoUnmarshal(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
-		if err := github_com_gogo_protobuf_proto.Unmarshal(datas[i%10000], msg); err != nil {
+		if err := proto.Unmarshal(datas[i%10000], msg); err != nil {
 			panic(err)
 		}
 	}
@@ -738,14 +737,14 @@ func BenchmarkFrequencyPlan_TimeOffAirProtoUnmarshal(b *testing.B) {
 
 func TestFrequencyPlanRequestProto(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlanRequest(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlanRequest{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	littlefuzz := make([]byte, len(dAtA))
@@ -766,13 +765,13 @@ func TestFrequencyPlanRequestProto(t *testing.T) {
 			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
 		}
 		// shouldn't panic
-		_ = github_com_gogo_protobuf_proto.Unmarshal(littlefuzz, msg)
+		_ = proto.Unmarshal(littlefuzz, msg)
 	}
 }
 
 func TestFrequencyPlanRequestMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlanRequest(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
@@ -784,7 +783,7 @@ func TestFrequencyPlanRequestMarshalTo(t *testing.T) {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlanRequest{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	for i := range dAtA {
@@ -799,7 +798,7 @@ func TestFrequencyPlanRequestMarshalTo(t *testing.T) {
 }
 
 func BenchmarkFrequencyPlanRequestProtoMarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*FrequencyPlanRequest, 10000)
 	for i := 0; i < 10000; i++ {
@@ -807,7 +806,7 @@ func BenchmarkFrequencyPlanRequestProtoMarshal(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(pops[i%10000])
+		dAtA, err := proto.Marshal(pops[i%10000])
 		if err != nil {
 			panic(err)
 		}
@@ -817,11 +816,11 @@ func BenchmarkFrequencyPlanRequestProtoMarshal(b *testing.B) {
 }
 
 func BenchmarkFrequencyPlanRequestProtoUnmarshal(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := github_com_gogo_protobuf_proto.Marshal(NewPopulatedFrequencyPlanRequest(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedFrequencyPlanRequest(popr, false))
 		if err != nil {
 			panic(err)
 		}
@@ -831,7 +830,7 @@ func BenchmarkFrequencyPlanRequestProtoUnmarshal(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
-		if err := github_com_gogo_protobuf_proto.Unmarshal(datas[i%10000], msg); err != nil {
+		if err := proto.Unmarshal(datas[i%10000], msg); err != nil {
 			panic(err)
 		}
 	}
@@ -840,15 +839,15 @@ func BenchmarkFrequencyPlanRequestProtoUnmarshal(b *testing.B) {
 
 func TestGatewayUpJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedGatewayUp(popr, true)
-	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
+	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &GatewayUp{}
-	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
+	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -861,15 +860,15 @@ func TestGatewayUpJSON(t *testing.T) {
 }
 func TestGatewayDownJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedGatewayDown(popr, true)
-	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
+	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &GatewayDown{}
-	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
+	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -882,15 +881,15 @@ func TestGatewayDownJSON(t *testing.T) {
 }
 func TestFrequencyPlanJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan(popr, true)
-	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
+	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlan{}
-	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
+	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -903,15 +902,15 @@ func TestFrequencyPlanJSON(t *testing.T) {
 }
 func TestFrequencyPlan_ChannelJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_Channel(popr, true)
-	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
+	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlan_Channel{}
-	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
+	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -924,15 +923,15 @@ func TestFrequencyPlan_ChannelJSON(t *testing.T) {
 }
 func TestFrequencyPlan_Channel_ForceDataRateJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_Channel_ForceDataRate(popr, true)
-	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
+	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlan_Channel_ForceDataRate{}
-	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
+	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -945,15 +944,15 @@ func TestFrequencyPlan_Channel_ForceDataRateJSON(t *testing.T) {
 }
 func TestFrequencyPlan_LBTConfigurationJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_LBTConfiguration(popr, true)
-	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
+	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlan_LBTConfiguration{}
-	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
+	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -966,15 +965,15 @@ func TestFrequencyPlan_LBTConfigurationJSON(t *testing.T) {
 }
 func TestFrequencyPlan_TimeOffAirJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_TimeOffAir(popr, true)
-	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
+	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlan_TimeOffAir{}
-	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
+	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -987,15 +986,15 @@ func TestFrequencyPlan_TimeOffAirJSON(t *testing.T) {
 }
 func TestFrequencyPlanRequestJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlanRequest(popr, true)
-	marshaler := github_com_gogo_protobuf_jsonpb.Marshaler{}
+	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &FrequencyPlanRequest{}
-	err = github_com_gogo_protobuf_jsonpb.UnmarshalString(jsondata, msg)
+	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1008,11 +1007,11 @@ func TestFrequencyPlanRequestJSON(t *testing.T) {
 }
 func TestGatewayUpProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedGatewayUp(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
+	dAtA := proto.MarshalTextString(p)
 	msg := &GatewayUp{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1025,11 +1024,11 @@ func TestGatewayUpProtoText(t *testing.T) {
 
 func TestGatewayUpProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedGatewayUp(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
+	dAtA := proto.CompactTextString(p)
 	msg := &GatewayUp{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1042,11 +1041,11 @@ func TestGatewayUpProtoCompactText(t *testing.T) {
 
 func TestGatewayDownProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedGatewayDown(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
+	dAtA := proto.MarshalTextString(p)
 	msg := &GatewayDown{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1059,11 +1058,11 @@ func TestGatewayDownProtoText(t *testing.T) {
 
 func TestGatewayDownProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedGatewayDown(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
+	dAtA := proto.CompactTextString(p)
 	msg := &GatewayDown{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1076,11 +1075,11 @@ func TestGatewayDownProtoCompactText(t *testing.T) {
 
 func TestFrequencyPlanProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
+	dAtA := proto.MarshalTextString(p)
 	msg := &FrequencyPlan{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1093,11 +1092,11 @@ func TestFrequencyPlanProtoText(t *testing.T) {
 
 func TestFrequencyPlanProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
+	dAtA := proto.CompactTextString(p)
 	msg := &FrequencyPlan{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1110,11 +1109,11 @@ func TestFrequencyPlanProtoCompactText(t *testing.T) {
 
 func TestFrequencyPlan_ChannelProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_Channel(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
+	dAtA := proto.MarshalTextString(p)
 	msg := &FrequencyPlan_Channel{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1127,11 +1126,11 @@ func TestFrequencyPlan_ChannelProtoText(t *testing.T) {
 
 func TestFrequencyPlan_ChannelProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_Channel(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
+	dAtA := proto.CompactTextString(p)
 	msg := &FrequencyPlan_Channel{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1144,11 +1143,11 @@ func TestFrequencyPlan_ChannelProtoCompactText(t *testing.T) {
 
 func TestFrequencyPlan_Channel_ForceDataRateProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_Channel_ForceDataRate(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
+	dAtA := proto.MarshalTextString(p)
 	msg := &FrequencyPlan_Channel_ForceDataRate{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1161,11 +1160,11 @@ func TestFrequencyPlan_Channel_ForceDataRateProtoText(t *testing.T) {
 
 func TestFrequencyPlan_Channel_ForceDataRateProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_Channel_ForceDataRate(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
+	dAtA := proto.CompactTextString(p)
 	msg := &FrequencyPlan_Channel_ForceDataRate{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1178,11 +1177,11 @@ func TestFrequencyPlan_Channel_ForceDataRateProtoCompactText(t *testing.T) {
 
 func TestFrequencyPlan_LBTConfigurationProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_LBTConfiguration(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
+	dAtA := proto.MarshalTextString(p)
 	msg := &FrequencyPlan_LBTConfiguration{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1195,11 +1194,11 @@ func TestFrequencyPlan_LBTConfigurationProtoText(t *testing.T) {
 
 func TestFrequencyPlan_LBTConfigurationProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_LBTConfiguration(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
+	dAtA := proto.CompactTextString(p)
 	msg := &FrequencyPlan_LBTConfiguration{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1212,11 +1211,11 @@ func TestFrequencyPlan_LBTConfigurationProtoCompactText(t *testing.T) {
 
 func TestFrequencyPlan_TimeOffAirProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_TimeOffAir(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
+	dAtA := proto.MarshalTextString(p)
 	msg := &FrequencyPlan_TimeOffAir{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1229,11 +1228,11 @@ func TestFrequencyPlan_TimeOffAirProtoText(t *testing.T) {
 
 func TestFrequencyPlan_TimeOffAirProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_TimeOffAir(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
+	dAtA := proto.CompactTextString(p)
 	msg := &FrequencyPlan_TimeOffAir{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1246,11 +1245,11 @@ func TestFrequencyPlan_TimeOffAirProtoCompactText(t *testing.T) {
 
 func TestFrequencyPlanRequestProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlanRequest(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.MarshalTextString(p)
+	dAtA := proto.MarshalTextString(p)
 	msg := &FrequencyPlanRequest{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1263,11 +1262,11 @@ func TestFrequencyPlanRequestProtoText(t *testing.T) {
 
 func TestFrequencyPlanRequestProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlanRequest(popr, true)
-	dAtA := github_com_gogo_protobuf_proto.CompactTextString(p)
+	dAtA := proto.CompactTextString(p)
 	msg := &FrequencyPlanRequest{}
-	if err := github_com_gogo_protobuf_proto.UnmarshalText(dAtA, msg); err != nil {
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1279,14 +1278,14 @@ func TestFrequencyPlanRequestProtoCompactText(t *testing.T) {
 }
 
 func TestGatewayUpVerboseEqual(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
 	p := NewPopulatedGatewayUp(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
 	msg := &GatewayUp{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1294,14 +1293,14 @@ func TestGatewayUpVerboseEqual(t *testing.T) {
 	}
 }
 func TestGatewayDownVerboseEqual(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
 	p := NewPopulatedGatewayDown(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
 	msg := &GatewayDown{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1309,14 +1308,14 @@ func TestGatewayDownVerboseEqual(t *testing.T) {
 	}
 }
 func TestFrequencyPlanVerboseEqual(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
 	p := NewPopulatedFrequencyPlan(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
 	msg := &FrequencyPlan{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1324,14 +1323,14 @@ func TestFrequencyPlanVerboseEqual(t *testing.T) {
 	}
 }
 func TestFrequencyPlan_ChannelVerboseEqual(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
 	p := NewPopulatedFrequencyPlan_Channel(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
 	msg := &FrequencyPlan_Channel{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1339,14 +1338,14 @@ func TestFrequencyPlan_ChannelVerboseEqual(t *testing.T) {
 	}
 }
 func TestFrequencyPlan_Channel_ForceDataRateVerboseEqual(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
 	p := NewPopulatedFrequencyPlan_Channel_ForceDataRate(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
 	msg := &FrequencyPlan_Channel_ForceDataRate{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1354,14 +1353,14 @@ func TestFrequencyPlan_Channel_ForceDataRateVerboseEqual(t *testing.T) {
 	}
 }
 func TestFrequencyPlan_LBTConfigurationVerboseEqual(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
 	p := NewPopulatedFrequencyPlan_LBTConfiguration(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
 	msg := &FrequencyPlan_LBTConfiguration{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1369,14 +1368,14 @@ func TestFrequencyPlan_LBTConfigurationVerboseEqual(t *testing.T) {
 	}
 }
 func TestFrequencyPlan_TimeOffAirVerboseEqual(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
 	p := NewPopulatedFrequencyPlan_TimeOffAir(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
 	msg := &FrequencyPlan_TimeOffAir{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1384,14 +1383,14 @@ func TestFrequencyPlan_TimeOffAirVerboseEqual(t *testing.T) {
 	}
 }
 func TestFrequencyPlanRequestVerboseEqual(t *testing.T) {
-	popr := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
+	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
 	p := NewPopulatedFrequencyPlanRequest(popr, false)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
 	msg := &FrequencyPlanRequest{}
-	if err := github_com_gogo_protobuf_proto.Unmarshal(dAtA, msg); err != nil {
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
 	if err := p.VerboseEqual(msg); err != nil {
@@ -1400,10 +1399,10 @@ func TestFrequencyPlanRequestVerboseEqual(t *testing.T) {
 }
 func TestGatewayUpSize(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedGatewayUp(popr, true)
-	size2 := github_com_gogo_protobuf_proto.Size(p)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	size2 := proto.Size(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1414,14 +1413,14 @@ func TestGatewayUpSize(t *testing.T) {
 	if size2 != size {
 		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
 	}
-	size3 := github_com_gogo_protobuf_proto.Size(p)
+	size3 := proto.Size(p)
 	if size3 != size {
 		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
 	}
 }
 
 func BenchmarkGatewayUpSize(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*GatewayUp, 1000)
 	for i := 0; i < 1000; i++ {
@@ -1436,10 +1435,10 @@ func BenchmarkGatewayUpSize(b *testing.B) {
 
 func TestGatewayDownSize(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedGatewayDown(popr, true)
-	size2 := github_com_gogo_protobuf_proto.Size(p)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	size2 := proto.Size(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1450,14 +1449,14 @@ func TestGatewayDownSize(t *testing.T) {
 	if size2 != size {
 		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
 	}
-	size3 := github_com_gogo_protobuf_proto.Size(p)
+	size3 := proto.Size(p)
 	if size3 != size {
 		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
 	}
 }
 
 func BenchmarkGatewayDownSize(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*GatewayDown, 1000)
 	for i := 0; i < 1000; i++ {
@@ -1472,10 +1471,10 @@ func BenchmarkGatewayDownSize(b *testing.B) {
 
 func TestFrequencyPlanSize(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan(popr, true)
-	size2 := github_com_gogo_protobuf_proto.Size(p)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	size2 := proto.Size(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1486,14 +1485,14 @@ func TestFrequencyPlanSize(t *testing.T) {
 	if size2 != size {
 		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
 	}
-	size3 := github_com_gogo_protobuf_proto.Size(p)
+	size3 := proto.Size(p)
 	if size3 != size {
 		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
 	}
 }
 
 func BenchmarkFrequencyPlanSize(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*FrequencyPlan, 1000)
 	for i := 0; i < 1000; i++ {
@@ -1508,10 +1507,10 @@ func BenchmarkFrequencyPlanSize(b *testing.B) {
 
 func TestFrequencyPlan_ChannelSize(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_Channel(popr, true)
-	size2 := github_com_gogo_protobuf_proto.Size(p)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	size2 := proto.Size(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1522,14 +1521,14 @@ func TestFrequencyPlan_ChannelSize(t *testing.T) {
 	if size2 != size {
 		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
 	}
-	size3 := github_com_gogo_protobuf_proto.Size(p)
+	size3 := proto.Size(p)
 	if size3 != size {
 		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
 	}
 }
 
 func BenchmarkFrequencyPlan_ChannelSize(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*FrequencyPlan_Channel, 1000)
 	for i := 0; i < 1000; i++ {
@@ -1544,10 +1543,10 @@ func BenchmarkFrequencyPlan_ChannelSize(b *testing.B) {
 
 func TestFrequencyPlan_Channel_ForceDataRateSize(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_Channel_ForceDataRate(popr, true)
-	size2 := github_com_gogo_protobuf_proto.Size(p)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	size2 := proto.Size(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1558,14 +1557,14 @@ func TestFrequencyPlan_Channel_ForceDataRateSize(t *testing.T) {
 	if size2 != size {
 		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
 	}
-	size3 := github_com_gogo_protobuf_proto.Size(p)
+	size3 := proto.Size(p)
 	if size3 != size {
 		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
 	}
 }
 
 func BenchmarkFrequencyPlan_Channel_ForceDataRateSize(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*FrequencyPlan_Channel_ForceDataRate, 1000)
 	for i := 0; i < 1000; i++ {
@@ -1580,10 +1579,10 @@ func BenchmarkFrequencyPlan_Channel_ForceDataRateSize(b *testing.B) {
 
 func TestFrequencyPlan_LBTConfigurationSize(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_LBTConfiguration(popr, true)
-	size2 := github_com_gogo_protobuf_proto.Size(p)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	size2 := proto.Size(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1594,14 +1593,14 @@ func TestFrequencyPlan_LBTConfigurationSize(t *testing.T) {
 	if size2 != size {
 		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
 	}
-	size3 := github_com_gogo_protobuf_proto.Size(p)
+	size3 := proto.Size(p)
 	if size3 != size {
 		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
 	}
 }
 
 func BenchmarkFrequencyPlan_LBTConfigurationSize(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*FrequencyPlan_LBTConfiguration, 1000)
 	for i := 0; i < 1000; i++ {
@@ -1616,10 +1615,10 @@ func BenchmarkFrequencyPlan_LBTConfigurationSize(b *testing.B) {
 
 func TestFrequencyPlan_TimeOffAirSize(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlan_TimeOffAir(popr, true)
-	size2 := github_com_gogo_protobuf_proto.Size(p)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	size2 := proto.Size(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1630,14 +1629,14 @@ func TestFrequencyPlan_TimeOffAirSize(t *testing.T) {
 	if size2 != size {
 		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
 	}
-	size3 := github_com_gogo_protobuf_proto.Size(p)
+	size3 := proto.Size(p)
 	if size3 != size {
 		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
 	}
 }
 
 func BenchmarkFrequencyPlan_TimeOffAirSize(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*FrequencyPlan_TimeOffAir, 1000)
 	for i := 0; i < 1000; i++ {
@@ -1652,10 +1651,10 @@ func BenchmarkFrequencyPlan_TimeOffAirSize(b *testing.B) {
 
 func TestFrequencyPlanRequestSize(t *testing.T) {
 	seed := time.Now().UnixNano()
-	popr := math_rand.New(math_rand.NewSource(seed))
+	popr := rand.New(rand.NewSource(seed))
 	p := NewPopulatedFrequencyPlanRequest(popr, true)
-	size2 := github_com_gogo_protobuf_proto.Size(p)
-	dAtA, err := github_com_gogo_protobuf_proto.Marshal(p)
+	size2 := proto.Size(p)
+	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1666,14 +1665,14 @@ func TestFrequencyPlanRequestSize(t *testing.T) {
 	if size2 != size {
 		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
 	}
-	size3 := github_com_gogo_protobuf_proto.Size(p)
+	size3 := proto.Size(p)
 	if size3 != size {
 		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
 	}
 }
 
 func BenchmarkFrequencyPlanRequestSize(b *testing.B) {
-	popr := math_rand.New(math_rand.NewSource(616))
+	popr := rand.New(rand.NewSource(616))
 	total := 0
 	pops := make([]*FrequencyPlanRequest, 1000)
 	for i := 0; i < 1000; i++ {

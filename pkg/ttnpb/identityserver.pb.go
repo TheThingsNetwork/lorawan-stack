@@ -16,12 +16,10 @@ import _ "github.com/gogo/protobuf/types"
 
 import time "time"
 
-import (
-	context "context"
-	grpc "google.golang.org/grpc"
-)
+import context "context"
+import grpc "google.golang.org/grpc"
 
-import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+import types "github.com/gogo/protobuf/types"
 
 import io "io"
 
@@ -1450,10 +1448,7 @@ func (this *PullConfigurationRequest) VerboseEqual(that interface{}) error {
 }
 func (this *PullConfigurationRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*PullConfigurationRequest)
@@ -1466,10 +1461,7 @@ func (this *PullConfigurationRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1538,10 +1530,7 @@ func (this *IdentityServerSettings) VerboseEqual(that interface{}) error {
 }
 func (this *IdentityServerSettings) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*IdentityServerSettings)
@@ -1554,10 +1543,7 @@ func (this *IdentityServerSettings) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1629,10 +1615,7 @@ func (this *IdentityServerSettings_UserRegistrationFlow) VerboseEqual(that inter
 }
 func (this *IdentityServerSettings_UserRegistrationFlow) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*IdentityServerSettings_UserRegistrationFlow)
@@ -1645,10 +1628,7 @@ func (this *IdentityServerSettings_UserRegistrationFlow) Equal(that interface{})
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1698,10 +1678,7 @@ func (this *UpdateSettingsRequest) VerboseEqual(that interface{}) error {
 }
 func (this *UpdateSettingsRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*UpdateSettingsRequest)
@@ -1714,10 +1691,7 @@ func (this *UpdateSettingsRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1761,10 +1735,7 @@ func (this *ResetUserPasswordResponse) VerboseEqual(that interface{}) error {
 }
 func (this *ResetUserPasswordResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ResetUserPasswordResponse)
@@ -1777,10 +1748,7 @@ func (this *ResetUserPasswordResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1821,10 +1789,7 @@ func (this *SendInvitationRequest) VerboseEqual(that interface{}) error {
 }
 func (this *SendInvitationRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*SendInvitationRequest)
@@ -1837,10 +1802,7 @@ func (this *SendInvitationRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1886,10 +1848,7 @@ func (this *ListInvitationsResponse) VerboseEqual(that interface{}) error {
 }
 func (this *ListInvitationsResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListInvitationsResponse)
@@ -1902,10 +1861,7 @@ func (this *ListInvitationsResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1957,10 +1913,7 @@ func (this *ListInvitationsResponse_Invitation) VerboseEqual(that interface{}) e
 }
 func (this *ListInvitationsResponse_Invitation) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListInvitationsResponse_Invitation)
@@ -1973,10 +1926,7 @@ func (this *ListInvitationsResponse_Invitation) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -2023,10 +1973,7 @@ func (this *DeleteInvitationRequest) VerboseEqual(that interface{}) error {
 }
 func (this *DeleteInvitationRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*DeleteInvitationRequest)
@@ -2039,10 +1986,7 @@ func (this *DeleteInvitationRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -2083,10 +2027,7 @@ func (this *ListUsersRequest) VerboseEqual(that interface{}) error {
 }
 func (this *ListUsersRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListUsersRequest)
@@ -2099,10 +2040,7 @@ func (this *ListUsersRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -2143,10 +2081,7 @@ func (this *ListUsersRequest_FilterState) VerboseEqual(that interface{}) error {
 }
 func (this *ListUsersRequest_FilterState) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListUsersRequest_FilterState)
@@ -2159,10 +2094,7 @@ func (this *ListUsersRequest_FilterState) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -2208,10 +2140,7 @@ func (this *ListUsersResponse) VerboseEqual(that interface{}) error {
 }
 func (this *ListUsersResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListUsersResponse)
@@ -2224,10 +2153,7 @@ func (this *ListUsersResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -2273,10 +2199,7 @@ func (this *ListClientsRequest) VerboseEqual(that interface{}) error {
 }
 func (this *ListClientsRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListClientsRequest)
@@ -2289,10 +2212,7 @@ func (this *ListClientsRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -2333,10 +2253,7 @@ func (this *ListClientsRequest_FilterState) VerboseEqual(that interface{}) error
 }
 func (this *ListClientsRequest_FilterState) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListClientsRequest_FilterState)
@@ -2349,10 +2266,7 @@ func (this *ListClientsRequest_FilterState) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -2396,10 +2310,7 @@ func (this *CreateUserRequest) VerboseEqual(that interface{}) error {
 }
 func (this *CreateUserRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*CreateUserRequest)
@@ -2412,10 +2323,7 @@ func (this *CreateUserRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -2462,10 +2370,7 @@ func (this *UpdateUserRequest) VerboseEqual(that interface{}) error {
 }
 func (this *UpdateUserRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*UpdateUserRequest)
@@ -2478,10 +2383,7 @@ func (this *UpdateUserRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -2528,10 +2430,7 @@ func (this *UpdateUserPasswordRequest) VerboseEqual(that interface{}) error {
 }
 func (this *UpdateUserPasswordRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*UpdateUserPasswordRequest)
@@ -2544,10 +2443,7 @@ func (this *UpdateUserPasswordRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -2599,10 +2495,7 @@ func (this *GenerateUserAPIKeyRequest) VerboseEqual(that interface{}) error {
 }
 func (this *GenerateUserAPIKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GenerateUserAPIKeyRequest)
@@ -2615,10 +2508,7 @@ func (this *GenerateUserAPIKeyRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -2672,10 +2562,7 @@ func (this *ListUserAPIKeysResponse) VerboseEqual(that interface{}) error {
 }
 func (this *ListUserAPIKeysResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListUserAPIKeysResponse)
@@ -2688,10 +2575,7 @@ func (this *ListUserAPIKeysResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -2745,10 +2629,7 @@ func (this *UpdateUserAPIKeyRequest) VerboseEqual(that interface{}) error {
 }
 func (this *UpdateUserAPIKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*UpdateUserAPIKeyRequest)
@@ -2761,10 +2642,7 @@ func (this *UpdateUserAPIKeyRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -2813,10 +2691,7 @@ func (this *RemoveUserAPIKeyRequest) VerboseEqual(that interface{}) error {
 }
 func (this *RemoveUserAPIKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*RemoveUserAPIKeyRequest)
@@ -2829,10 +2704,7 @@ func (this *RemoveUserAPIKeyRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -2873,10 +2745,7 @@ func (this *ValidateUserEmailRequest) VerboseEqual(that interface{}) error {
 }
 func (this *ValidateUserEmailRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ValidateUserEmailRequest)
@@ -2889,10 +2758,7 @@ func (this *ValidateUserEmailRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -2938,10 +2804,7 @@ func (this *ListAuthorizedClientsResponse) VerboseEqual(that interface{}) error 
 }
 func (this *ListAuthorizedClientsResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListAuthorizedClientsResponse)
@@ -2954,10 +2817,7 @@ func (this *ListAuthorizedClientsResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3006,10 +2866,7 @@ func (this *CreateApplicationRequest) VerboseEqual(that interface{}) error {
 }
 func (this *CreateApplicationRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*CreateApplicationRequest)
@@ -3022,10 +2879,7 @@ func (this *CreateApplicationRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3069,10 +2923,7 @@ func (this *ListApplicationsRequest) VerboseEqual(that interface{}) error {
 }
 func (this *ListApplicationsRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListApplicationsRequest)
@@ -3085,10 +2936,7 @@ func (this *ListApplicationsRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3134,10 +2982,7 @@ func (this *ListApplicationsResponse) VerboseEqual(that interface{}) error {
 }
 func (this *ListApplicationsResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListApplicationsResponse)
@@ -3150,10 +2995,7 @@ func (this *ListApplicationsResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3202,10 +3044,7 @@ func (this *UpdateApplicationRequest) VerboseEqual(that interface{}) error {
 }
 func (this *UpdateApplicationRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*UpdateApplicationRequest)
@@ -3218,10 +3057,7 @@ func (this *UpdateApplicationRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3276,10 +3112,7 @@ func (this *GenerateApplicationAPIKeyRequest) VerboseEqual(that interface{}) err
 }
 func (this *GenerateApplicationAPIKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GenerateApplicationAPIKeyRequest)
@@ -3292,10 +3125,7 @@ func (this *GenerateApplicationAPIKeyRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3352,10 +3182,7 @@ func (this *ListApplicationAPIKeysResponse) VerboseEqual(that interface{}) error
 }
 func (this *ListApplicationAPIKeysResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListApplicationAPIKeysResponse)
@@ -3368,10 +3195,7 @@ func (this *ListApplicationAPIKeysResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3428,10 +3252,7 @@ func (this *UpdateApplicationAPIKeyRequest) VerboseEqual(that interface{}) error
 }
 func (this *UpdateApplicationAPIKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*UpdateApplicationAPIKeyRequest)
@@ -3444,10 +3265,7 @@ func (this *UpdateApplicationAPIKeyRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3502,10 +3320,7 @@ func (this *RemoveApplicationAPIKeyRequest) VerboseEqual(that interface{}) error
 }
 func (this *RemoveApplicationAPIKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*RemoveApplicationAPIKeyRequest)
@@ -3518,10 +3333,7 @@ func (this *RemoveApplicationAPIKeyRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3570,10 +3382,7 @@ func (this *ListApplicationCollaboratorsResponse) VerboseEqual(that interface{})
 }
 func (this *ListApplicationCollaboratorsResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListApplicationCollaboratorsResponse)
@@ -3586,10 +3395,7 @@ func (this *ListApplicationCollaboratorsResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3640,10 +3446,7 @@ func (this *ListApplicationRightsResponse) VerboseEqual(that interface{}) error 
 }
 func (this *ListApplicationRightsResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListApplicationRightsResponse)
@@ -3656,10 +3459,7 @@ func (this *ListApplicationRightsResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3708,10 +3508,7 @@ func (this *CreateGatewayRequest) VerboseEqual(that interface{}) error {
 }
 func (this *CreateGatewayRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*CreateGatewayRequest)
@@ -3724,10 +3521,7 @@ func (this *CreateGatewayRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3771,10 +3565,7 @@ func (this *ListGatewaysRequest) VerboseEqual(that interface{}) error {
 }
 func (this *ListGatewaysRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListGatewaysRequest)
@@ -3787,10 +3578,7 @@ func (this *ListGatewaysRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3836,10 +3624,7 @@ func (this *ListGatewaysResponse) VerboseEqual(that interface{}) error {
 }
 func (this *ListGatewaysResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListGatewaysResponse)
@@ -3852,10 +3637,7 @@ func (this *ListGatewaysResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3904,10 +3686,7 @@ func (this *UpdateGatewayRequest) VerboseEqual(that interface{}) error {
 }
 func (this *UpdateGatewayRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*UpdateGatewayRequest)
@@ -3920,10 +3699,7 @@ func (this *UpdateGatewayRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3978,10 +3754,7 @@ func (this *GenerateGatewayAPIKeyRequest) VerboseEqual(that interface{}) error {
 }
 func (this *GenerateGatewayAPIKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GenerateGatewayAPIKeyRequest)
@@ -3994,10 +3767,7 @@ func (this *GenerateGatewayAPIKeyRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -4054,10 +3824,7 @@ func (this *ListGatewayAPIKeysResponse) VerboseEqual(that interface{}) error {
 }
 func (this *ListGatewayAPIKeysResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListGatewayAPIKeysResponse)
@@ -4070,10 +3837,7 @@ func (this *ListGatewayAPIKeysResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -4130,10 +3894,7 @@ func (this *UpdateGatewayAPIKeyRequest) VerboseEqual(that interface{}) error {
 }
 func (this *UpdateGatewayAPIKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*UpdateGatewayAPIKeyRequest)
@@ -4146,10 +3907,7 @@ func (this *UpdateGatewayAPIKeyRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -4204,10 +3962,7 @@ func (this *RemoveGatewayAPIKeyRequest) VerboseEqual(that interface{}) error {
 }
 func (this *RemoveGatewayAPIKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*RemoveGatewayAPIKeyRequest)
@@ -4220,10 +3975,7 @@ func (this *RemoveGatewayAPIKeyRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -4272,10 +4024,7 @@ func (this *ListGatewayCollaboratorsResponse) VerboseEqual(that interface{}) err
 }
 func (this *ListGatewayCollaboratorsResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListGatewayCollaboratorsResponse)
@@ -4288,10 +4037,7 @@ func (this *ListGatewayCollaboratorsResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -4342,10 +4088,7 @@ func (this *ListGatewayRightsResponse) VerboseEqual(that interface{}) error {
 }
 func (this *ListGatewayRightsResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListGatewayRightsResponse)
@@ -4358,10 +4101,7 @@ func (this *ListGatewayRightsResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -4407,10 +4147,7 @@ func (this *CreateClientRequest) VerboseEqual(that interface{}) error {
 }
 func (this *CreateClientRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*CreateClientRequest)
@@ -4423,10 +4160,7 @@ func (this *CreateClientRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -4472,10 +4206,7 @@ func (this *ListClientsResponse) VerboseEqual(that interface{}) error {
 }
 func (this *ListClientsResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListClientsResponse)
@@ -4488,10 +4219,7 @@ func (this *ListClientsResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -4540,10 +4268,7 @@ func (this *UpdateClientRequest) VerboseEqual(that interface{}) error {
 }
 func (this *UpdateClientRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*UpdateClientRequest)
@@ -4556,10 +4281,7 @@ func (this *UpdateClientRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -4603,10 +4325,7 @@ func (this *CreateOrganizationRequest) VerboseEqual(that interface{}) error {
 }
 func (this *CreateOrganizationRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*CreateOrganizationRequest)
@@ -4619,10 +4338,7 @@ func (this *CreateOrganizationRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -4668,10 +4384,7 @@ func (this *ListOrganizationsResponse) VerboseEqual(that interface{}) error {
 }
 func (this *ListOrganizationsResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListOrganizationsResponse)
@@ -4684,10 +4397,7 @@ func (this *ListOrganizationsResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -4736,10 +4446,7 @@ func (this *UpdateOrganizationRequest) VerboseEqual(that interface{}) error {
 }
 func (this *UpdateOrganizationRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*UpdateOrganizationRequest)
@@ -4752,10 +4459,7 @@ func (this *UpdateOrganizationRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -4810,10 +4514,7 @@ func (this *GenerateOrganizationAPIKeyRequest) VerboseEqual(that interface{}) er
 }
 func (this *GenerateOrganizationAPIKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GenerateOrganizationAPIKeyRequest)
@@ -4826,10 +4527,7 @@ func (this *GenerateOrganizationAPIKeyRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -4886,10 +4584,7 @@ func (this *ListOrganizationAPIKeysResponse) VerboseEqual(that interface{}) erro
 }
 func (this *ListOrganizationAPIKeysResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListOrganizationAPIKeysResponse)
@@ -4902,10 +4597,7 @@ func (this *ListOrganizationAPIKeysResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -4962,10 +4654,7 @@ func (this *UpdateOrganizationAPIKeyRequest) VerboseEqual(that interface{}) erro
 }
 func (this *UpdateOrganizationAPIKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*UpdateOrganizationAPIKeyRequest)
@@ -4978,10 +4667,7 @@ func (this *UpdateOrganizationAPIKeyRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5036,10 +4722,7 @@ func (this *RemoveOrganizationAPIKeyRequest) VerboseEqual(that interface{}) erro
 }
 func (this *RemoveOrganizationAPIKeyRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*RemoveOrganizationAPIKeyRequest)
@@ -5052,10 +4735,7 @@ func (this *RemoveOrganizationAPIKeyRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5104,10 +4784,7 @@ func (this *ListOrganizationMembersResponse) VerboseEqual(that interface{}) erro
 }
 func (this *ListOrganizationMembersResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListOrganizationMembersResponse)
@@ -5120,10 +4797,7 @@ func (this *ListOrganizationMembersResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5174,10 +4848,7 @@ func (this *ListOrganizationRightsResponse) VerboseEqual(that interface{}) error
 }
 func (this *ListOrganizationRightsResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ListOrganizationRightsResponse)
@@ -5190,10 +4861,7 @@ func (this *ListOrganizationRightsResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -8065,8 +7733,8 @@ func (m *IdentityServerSettings) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0xa
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(types.SizeOfStdTime(m.UpdatedAt)))
+	n3, err := types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -8096,8 +7764,8 @@ func (m *IdentityServerSettings) MarshalTo(dAtA []byte) (int, error) {
 	i += n4
 	dAtA[i] = 0x22
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.ValidationTokenTTL)))
-	n5, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.ValidationTokenTTL, dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(types.SizeOfStdDuration(m.ValidationTokenTTL)))
+	n5, err := types.StdDurationMarshalTo(m.ValidationTokenTTL, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -8119,8 +7787,8 @@ func (m *IdentityServerSettings) MarshalTo(dAtA []byte) (int, error) {
 	}
 	dAtA[i] = 0x32
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.InvitationTokenTTL)))
-	n6, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.InvitationTokenTTL, dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(types.SizeOfStdDuration(m.InvitationTokenTTL)))
+	n6, err := types.StdDurationMarshalTo(m.InvitationTokenTTL, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -8311,16 +7979,16 @@ func (m *ListInvitationsResponse_Invitation) MarshalTo(dAtA []byte) (int, error)
 	}
 	dAtA[i] = 0x12
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.IssuedAt)))
-	n9, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.IssuedAt, dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(types.SizeOfStdTime(m.IssuedAt)))
+	n9, err := types.StdTimeMarshalTo(m.IssuedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n9
 	dAtA[i] = 0x1a
 	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ExpiresAt)))
-	n10, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExpiresAt, dAtA[i:])
+	i = encodeVarintIdentityserver(dAtA, i, uint64(types.SizeOfStdTime(m.ExpiresAt)))
+	n10, err := types.StdTimeMarshalTo(m.ExpiresAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -9896,7 +9564,7 @@ func NewPopulatedPullConfigurationRequest(r randyIdentityserver, easy bool) *Pul
 
 func NewPopulatedIdentityServerSettings(r randyIdentityserver, easy bool) *IdentityServerSettings {
 	this := &IdentityServerSettings{}
-	v2 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v2 := types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v2
 	v3 := r.Intn(10)
 	this.BlacklistedIDs = make([]string, v3)
@@ -9905,14 +9573,14 @@ func NewPopulatedIdentityServerSettings(r randyIdentityserver, easy bool) *Ident
 	}
 	v4 := NewPopulatedIdentityServerSettings_UserRegistrationFlow(r, easy)
 	this.IdentityServerSettings_UserRegistrationFlow = *v4
-	v5 := github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
+	v5 := types.NewPopulatedStdDuration(r, easy)
 	this.ValidationTokenTTL = *v5
 	v6 := r.Intn(10)
 	this.AllowedEmails = make([]string, v6)
 	for i := 0; i < v6; i++ {
 		this.AllowedEmails[i] = randStringIdentityserver(r)
 	}
-	v7 := github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
+	v7 := types.NewPopulatedStdDuration(r, easy)
 	this.InvitationTokenTTL = *v7
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -9973,9 +9641,9 @@ func NewPopulatedListInvitationsResponse(r randyIdentityserver, easy bool) *List
 func NewPopulatedListInvitationsResponse_Invitation(r randyIdentityserver, easy bool) *ListInvitationsResponse_Invitation {
 	this := &ListInvitationsResponse_Invitation{}
 	this.Email = randStringIdentityserver(r)
-	v11 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v11 := types.NewPopulatedStdTime(r, easy)
 	this.IssuedAt = *v11
-	v12 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v12 := types.NewPopulatedStdTime(r, easy)
 	this.ExpiresAt = *v12
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -10625,7 +10293,7 @@ func (m *PullConfigurationRequest) Size() (n int) {
 func (m *IdentityServerSettings) Size() (n int) {
 	var l int
 	_ = l
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)
+	l = types.SizeOfStdTime(m.UpdatedAt)
 	n += 1 + l + sovIdentityserver(uint64(l))
 	if len(m.BlacklistedIDs) > 0 {
 		for _, s := range m.BlacklistedIDs {
@@ -10635,7 +10303,7 @@ func (m *IdentityServerSettings) Size() (n int) {
 	}
 	l = m.IdentityServerSettings_UserRegistrationFlow.Size()
 	n += 1 + l + sovIdentityserver(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.ValidationTokenTTL)
+	l = types.SizeOfStdDuration(m.ValidationTokenTTL)
 	n += 1 + l + sovIdentityserver(uint64(l))
 	if len(m.AllowedEmails) > 0 {
 		for _, s := range m.AllowedEmails {
@@ -10643,7 +10311,7 @@ func (m *IdentityServerSettings) Size() (n int) {
 			n += 1 + l + sovIdentityserver(uint64(l))
 		}
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.InvitationTokenTTL)
+	l = types.SizeOfStdDuration(m.InvitationTokenTTL)
 	n += 1 + l + sovIdentityserver(uint64(l))
 	return n
 }
@@ -10712,9 +10380,9 @@ func (m *ListInvitationsResponse_Invitation) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovIdentityserver(uint64(l))
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.IssuedAt)
+	l = types.SizeOfStdTime(m.IssuedAt)
 	n += 1 + l + sovIdentityserver(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.ExpiresAt)
+	l = types.SizeOfStdTime(m.ExpiresAt)
 	n += 1 + l + sovIdentityserver(uint64(l))
 	return n
 }
@@ -11475,7 +11143,7 @@ func (m *IdentityServerSettings) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -11564,7 +11232,7 @@ func (m *IdentityServerSettings) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.ValidationTokenTTL, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(&m.ValidationTokenTTL, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -11623,7 +11291,7 @@ func (m *IdentityServerSettings) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.InvitationTokenTTL, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(&m.InvitationTokenTTL, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -12191,7 +11859,7 @@ func (m *ListInvitationsResponse_Invitation) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.IssuedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.IssuedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -12221,7 +11889,7 @@ func (m *ListInvitationsResponse_Invitation) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ExpiresAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.ExpiresAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

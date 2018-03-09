@@ -9,10 +9,8 @@ import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 
-import (
-	context "context"
-	grpc "google.golang.org/grpc"
-)
+import context "context"
+import grpc "google.golang.org/grpc"
 
 import io "io"
 
@@ -134,10 +132,7 @@ func (this *ProcessUplinkMessageRequest) VerboseEqual(that interface{}) error {
 }
 func (this *ProcessUplinkMessageRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ProcessUplinkMessageRequest)
@@ -150,10 +145,7 @@ func (this *ProcessUplinkMessageRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -206,10 +198,7 @@ func (this *ProcessDownlinkMessageRequest) VerboseEqual(that interface{}) error 
 }
 func (this *ProcessDownlinkMessageRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ProcessDownlinkMessageRequest)
@@ -222,10 +211,7 @@ func (this *ProcessDownlinkMessageRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}

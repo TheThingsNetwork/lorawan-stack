@@ -18,7 +18,7 @@ import strconv "strconv"
 
 import bytes "bytes"
 
-import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+import types "github.com/gogo/protobuf/types"
 
 import io "io"
 
@@ -3161,10 +3161,7 @@ func (this *Message_RejoinRequestPayload) VerboseEqual(that interface{}) error {
 }
 func (this *Message) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Message)
@@ -3177,10 +3174,7 @@ func (this *Message) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3203,10 +3197,7 @@ func (this *Message) Equal(that interface{}) bool {
 }
 func (this *Message_MACPayload) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Message_MACPayload)
@@ -3219,10 +3210,7 @@ func (this *Message_MACPayload) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3233,10 +3221,7 @@ func (this *Message_MACPayload) Equal(that interface{}) bool {
 }
 func (this *Message_JoinRequestPayload) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Message_JoinRequestPayload)
@@ -3249,10 +3234,7 @@ func (this *Message_JoinRequestPayload) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3263,10 +3245,7 @@ func (this *Message_JoinRequestPayload) Equal(that interface{}) bool {
 }
 func (this *Message_JoinAcceptPayload) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Message_JoinAcceptPayload)
@@ -3279,10 +3258,7 @@ func (this *Message_JoinAcceptPayload) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3293,10 +3269,7 @@ func (this *Message_JoinAcceptPayload) Equal(that interface{}) bool {
 }
 func (this *Message_RejoinRequestPayload) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Message_RejoinRequestPayload)
@@ -3309,10 +3282,7 @@ func (this *Message_RejoinRequestPayload) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3356,10 +3326,7 @@ func (this *MHDR) VerboseEqual(that interface{}) error {
 }
 func (this *MHDR) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MHDR)
@@ -3372,10 +3339,7 @@ func (this *MHDR) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3428,10 +3392,7 @@ func (this *MACPayload) VerboseEqual(that interface{}) error {
 }
 func (this *MACPayload) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACPayload)
@@ -3444,10 +3405,7 @@ func (this *MACPayload) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3506,10 +3464,7 @@ func (this *FHDR) VerboseEqual(that interface{}) error {
 }
 func (this *FHDR) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*FHDR)
@@ -3522,10 +3477,7 @@ func (this *FHDR) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3587,10 +3539,7 @@ func (this *FCtrl) VerboseEqual(that interface{}) error {
 }
 func (this *FCtrl) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*FCtrl)
@@ -3603,10 +3552,7 @@ func (this *FCtrl) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3665,10 +3611,7 @@ func (this *JoinRequestPayload) VerboseEqual(that interface{}) error {
 }
 func (this *JoinRequestPayload) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*JoinRequestPayload)
@@ -3681,10 +3624,7 @@ func (this *JoinRequestPayload) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3743,10 +3683,7 @@ func (this *RejoinRequestPayload) VerboseEqual(that interface{}) error {
 }
 func (this *RejoinRequestPayload) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*RejoinRequestPayload)
@@ -3759,10 +3696,7 @@ func (this *RejoinRequestPayload) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3833,10 +3767,7 @@ func (this *JoinAcceptPayload) VerboseEqual(that interface{}) error {
 }
 func (this *JoinAcceptPayload) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*JoinAcceptPayload)
@@ -3849,10 +3780,7 @@ func (this *JoinAcceptPayload) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3917,10 +3845,7 @@ func (this *DLSettings) VerboseEqual(that interface{}) error {
 }
 func (this *DLSettings) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*DLSettings)
@@ -3933,10 +3858,7 @@ func (this *DLSettings) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -3999,10 +3921,7 @@ func (this *CFList) VerboseEqual(that interface{}) error {
 }
 func (this *CFList) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*CFList)
@@ -4015,10 +3934,7 @@ func (this *CFList) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -4099,10 +4015,7 @@ func (this *TxSettings) VerboseEqual(that interface{}) error {
 }
 func (this *TxSettings) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*TxSettings)
@@ -4115,10 +4028,7 @@ func (this *TxSettings) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5149,10 +5059,7 @@ func (this *MACCommand_DeviceModeConf_) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand)
@@ -5165,10 +5072,7 @@ func (this *MACCommand) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5185,10 +5089,7 @@ func (this *MACCommand) Equal(that interface{}) bool {
 }
 func (this *MACCommand_CID) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_CID)
@@ -5201,10 +5102,7 @@ func (this *MACCommand_CID) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5215,10 +5113,7 @@ func (this *MACCommand_CID) Equal(that interface{}) bool {
 }
 func (this *MACCommand_Proprietary_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_Proprietary_)
@@ -5231,10 +5126,7 @@ func (this *MACCommand_Proprietary_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5245,10 +5137,7 @@ func (this *MACCommand_Proprietary_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_ResetInd_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_ResetInd_)
@@ -5261,10 +5150,7 @@ func (this *MACCommand_ResetInd_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5275,10 +5161,7 @@ func (this *MACCommand_ResetInd_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_ResetConf_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_ResetConf_)
@@ -5291,10 +5174,7 @@ func (this *MACCommand_ResetConf_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5305,10 +5185,7 @@ func (this *MACCommand_ResetConf_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_LinkCheckAns_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_LinkCheckAns_)
@@ -5321,10 +5198,7 @@ func (this *MACCommand_LinkCheckAns_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5335,10 +5209,7 @@ func (this *MACCommand_LinkCheckAns_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_LinkAdrReq) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_LinkAdrReq)
@@ -5351,10 +5222,7 @@ func (this *MACCommand_LinkAdrReq) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5365,10 +5233,7 @@ func (this *MACCommand_LinkAdrReq) Equal(that interface{}) bool {
 }
 func (this *MACCommand_LinkAdrAns) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_LinkAdrAns)
@@ -5381,10 +5246,7 @@ func (this *MACCommand_LinkAdrAns) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5395,10 +5257,7 @@ func (this *MACCommand_LinkAdrAns) Equal(that interface{}) bool {
 }
 func (this *MACCommand_DutyCycleReq_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_DutyCycleReq_)
@@ -5411,10 +5270,7 @@ func (this *MACCommand_DutyCycleReq_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5425,10 +5281,7 @@ func (this *MACCommand_DutyCycleReq_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_RxParamSetupReq_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_RxParamSetupReq_)
@@ -5441,10 +5294,7 @@ func (this *MACCommand_RxParamSetupReq_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5455,10 +5305,7 @@ func (this *MACCommand_RxParamSetupReq_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_RxParamSetupAns_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_RxParamSetupAns_)
@@ -5471,10 +5318,7 @@ func (this *MACCommand_RxParamSetupAns_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5485,10 +5329,7 @@ func (this *MACCommand_RxParamSetupAns_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_DevStatusAns_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_DevStatusAns_)
@@ -5501,10 +5342,7 @@ func (this *MACCommand_DevStatusAns_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5515,10 +5353,7 @@ func (this *MACCommand_DevStatusAns_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_NewChannelReq_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_NewChannelReq_)
@@ -5531,10 +5366,7 @@ func (this *MACCommand_NewChannelReq_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5545,10 +5377,7 @@ func (this *MACCommand_NewChannelReq_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_NewChannelAns_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_NewChannelAns_)
@@ -5561,10 +5390,7 @@ func (this *MACCommand_NewChannelAns_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5575,10 +5401,7 @@ func (this *MACCommand_NewChannelAns_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_DlChannelReq) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_DlChannelReq)
@@ -5591,10 +5414,7 @@ func (this *MACCommand_DlChannelReq) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5605,10 +5425,7 @@ func (this *MACCommand_DlChannelReq) Equal(that interface{}) bool {
 }
 func (this *MACCommand_DlChannelAns) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_DlChannelAns)
@@ -5621,10 +5438,7 @@ func (this *MACCommand_DlChannelAns) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5635,10 +5449,7 @@ func (this *MACCommand_DlChannelAns) Equal(that interface{}) bool {
 }
 func (this *MACCommand_RxTimingSetupReq_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_RxTimingSetupReq_)
@@ -5651,10 +5462,7 @@ func (this *MACCommand_RxTimingSetupReq_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5665,10 +5473,7 @@ func (this *MACCommand_RxTimingSetupReq_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_TxParamSetupReq_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_TxParamSetupReq_)
@@ -5681,10 +5486,7 @@ func (this *MACCommand_TxParamSetupReq_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5695,10 +5497,7 @@ func (this *MACCommand_TxParamSetupReq_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_RekeyInd_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_RekeyInd_)
@@ -5711,10 +5510,7 @@ func (this *MACCommand_RekeyInd_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5725,10 +5521,7 @@ func (this *MACCommand_RekeyInd_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_RekeyConf_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_RekeyConf_)
@@ -5741,10 +5534,7 @@ func (this *MACCommand_RekeyConf_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5755,10 +5545,7 @@ func (this *MACCommand_RekeyConf_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_AdrParamSetupReq) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_AdrParamSetupReq)
@@ -5771,10 +5558,7 @@ func (this *MACCommand_AdrParamSetupReq) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5785,10 +5569,7 @@ func (this *MACCommand_AdrParamSetupReq) Equal(that interface{}) bool {
 }
 func (this *MACCommand_DeviceTimeAns_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_DeviceTimeAns_)
@@ -5801,10 +5582,7 @@ func (this *MACCommand_DeviceTimeAns_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5815,10 +5593,7 @@ func (this *MACCommand_DeviceTimeAns_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_ForceRejoinReq_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_ForceRejoinReq_)
@@ -5831,10 +5606,7 @@ func (this *MACCommand_ForceRejoinReq_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5845,10 +5617,7 @@ func (this *MACCommand_ForceRejoinReq_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_RejoinParamSetupReq_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_RejoinParamSetupReq_)
@@ -5861,10 +5630,7 @@ func (this *MACCommand_RejoinParamSetupReq_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5875,10 +5641,7 @@ func (this *MACCommand_RejoinParamSetupReq_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_RejoinParamSetupAns_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_RejoinParamSetupAns_)
@@ -5891,10 +5654,7 @@ func (this *MACCommand_RejoinParamSetupAns_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5905,10 +5665,7 @@ func (this *MACCommand_RejoinParamSetupAns_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_PingSlotInfoReq_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_PingSlotInfoReq_)
@@ -5921,10 +5678,7 @@ func (this *MACCommand_PingSlotInfoReq_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5935,10 +5689,7 @@ func (this *MACCommand_PingSlotInfoReq_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_PingSlotChannelReq_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_PingSlotChannelReq_)
@@ -5951,10 +5702,7 @@ func (this *MACCommand_PingSlotChannelReq_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5965,10 +5713,7 @@ func (this *MACCommand_PingSlotChannelReq_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_PingSlotChannelAns_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_PingSlotChannelAns_)
@@ -5981,10 +5726,7 @@ func (this *MACCommand_PingSlotChannelAns_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -5995,10 +5737,7 @@ func (this *MACCommand_PingSlotChannelAns_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_BeaconTimingAns_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_BeaconTimingAns_)
@@ -6011,10 +5750,7 @@ func (this *MACCommand_BeaconTimingAns_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -6025,10 +5761,7 @@ func (this *MACCommand_BeaconTimingAns_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_BeaconFreqReq_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_BeaconFreqReq_)
@@ -6041,10 +5774,7 @@ func (this *MACCommand_BeaconFreqReq_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -6055,10 +5785,7 @@ func (this *MACCommand_BeaconFreqReq_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_BeaconFreqAns_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_BeaconFreqAns_)
@@ -6071,10 +5798,7 @@ func (this *MACCommand_BeaconFreqAns_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -6085,10 +5809,7 @@ func (this *MACCommand_BeaconFreqAns_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_DeviceModeInd_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_DeviceModeInd_)
@@ -6101,10 +5822,7 @@ func (this *MACCommand_DeviceModeInd_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -6115,10 +5833,7 @@ func (this *MACCommand_DeviceModeInd_) Equal(that interface{}) bool {
 }
 func (this *MACCommand_DeviceModeConf_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_DeviceModeConf_)
@@ -6131,10 +5846,7 @@ func (this *MACCommand_DeviceModeConf_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -6178,10 +5890,7 @@ func (this *MACCommand_Proprietary) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_Proprietary) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_Proprietary)
@@ -6194,10 +5903,7 @@ func (this *MACCommand_Proprietary) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -6241,10 +5947,7 @@ func (this *MACCommand_ResetInd) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_ResetInd) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_ResetInd)
@@ -6257,10 +5960,7 @@ func (this *MACCommand_ResetInd) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -6301,10 +6001,7 @@ func (this *MACCommand_ResetConf) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_ResetConf) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_ResetConf)
@@ -6317,10 +6014,7 @@ func (this *MACCommand_ResetConf) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -6364,10 +6058,7 @@ func (this *MACCommand_LinkCheckAns) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_LinkCheckAns) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_LinkCheckAns)
@@ -6380,10 +6071,7 @@ func (this *MACCommand_LinkCheckAns) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -6444,10 +6132,7 @@ func (this *MACCommand_LinkADRReq) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_LinkADRReq) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_LinkADRReq)
@@ -6460,10 +6145,7 @@ func (this *MACCommand_LinkADRReq) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -6527,10 +6209,7 @@ func (this *MACCommand_LinkADRAns) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_LinkADRAns) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_LinkADRAns)
@@ -6543,10 +6222,7 @@ func (this *MACCommand_LinkADRAns) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -6593,10 +6269,7 @@ func (this *MACCommand_DutyCycleReq) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_DutyCycleReq) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_DutyCycleReq)
@@ -6609,10 +6282,7 @@ func (this *MACCommand_DutyCycleReq) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -6659,10 +6329,7 @@ func (this *MACCommand_RxParamSetupReq) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_RxParamSetupReq) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_RxParamSetupReq)
@@ -6675,10 +6342,7 @@ func (this *MACCommand_RxParamSetupReq) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -6731,10 +6395,7 @@ func (this *MACCommand_RxParamSetupAns) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_RxParamSetupAns) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_RxParamSetupAns)
@@ -6747,10 +6408,7 @@ func (this *MACCommand_RxParamSetupAns) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -6800,10 +6458,7 @@ func (this *MACCommand_DevStatusAns) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_DevStatusAns) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_DevStatusAns)
@@ -6816,10 +6471,7 @@ func (this *MACCommand_DevStatusAns) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -6872,10 +6524,7 @@ func (this *MACCommand_NewChannelReq) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_NewChannelReq) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_NewChannelReq)
@@ -6888,10 +6537,7 @@ func (this *MACCommand_NewChannelReq) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -6944,10 +6590,7 @@ func (this *MACCommand_NewChannelAns) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_NewChannelAns) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_NewChannelAns)
@@ -6960,10 +6603,7 @@ func (this *MACCommand_NewChannelAns) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -7010,10 +6650,7 @@ func (this *MACCommand_DLChannelReq) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_DLChannelReq) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_DLChannelReq)
@@ -7026,10 +6663,7 @@ func (this *MACCommand_DLChannelReq) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -7076,10 +6710,7 @@ func (this *MACCommand_DLChannelAns) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_DLChannelAns) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_DLChannelAns)
@@ -7092,10 +6723,7 @@ func (this *MACCommand_DLChannelAns) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -7139,10 +6767,7 @@ func (this *MACCommand_RxTimingSetupReq) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_RxTimingSetupReq) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_RxTimingSetupReq)
@@ -7155,10 +6780,7 @@ func (this *MACCommand_RxTimingSetupReq) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -7205,10 +6827,7 @@ func (this *MACCommand_TxParamSetupReq) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_TxParamSetupReq) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_TxParamSetupReq)
@@ -7221,10 +6840,7 @@ func (this *MACCommand_TxParamSetupReq) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -7271,10 +6887,7 @@ func (this *MACCommand_RekeyInd) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_RekeyInd) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_RekeyInd)
@@ -7287,10 +6900,7 @@ func (this *MACCommand_RekeyInd) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -7331,10 +6941,7 @@ func (this *MACCommand_RekeyConf) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_RekeyConf) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_RekeyConf)
@@ -7347,10 +6954,7 @@ func (this *MACCommand_RekeyConf) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -7394,10 +6998,7 @@ func (this *MACCommand_ADRParamSetupReq) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_ADRParamSetupReq) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_ADRParamSetupReq)
@@ -7410,10 +7011,7 @@ func (this *MACCommand_ADRParamSetupReq) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -7457,10 +7055,7 @@ func (this *MACCommand_DeviceTimeAns) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_DeviceTimeAns) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_DeviceTimeAns)
@@ -7473,10 +7068,7 @@ func (this *MACCommand_DeviceTimeAns) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -7526,10 +7118,7 @@ func (this *MACCommand_ForceRejoinReq) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_ForceRejoinReq) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_ForceRejoinReq)
@@ -7542,10 +7131,7 @@ func (this *MACCommand_ForceRejoinReq) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -7598,10 +7184,7 @@ func (this *MACCommand_RejoinParamSetupReq) VerboseEqual(that interface{}) error
 }
 func (this *MACCommand_RejoinParamSetupReq) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_RejoinParamSetupReq)
@@ -7614,10 +7197,7 @@ func (this *MACCommand_RejoinParamSetupReq) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -7661,10 +7241,7 @@ func (this *MACCommand_RejoinParamSetupAns) VerboseEqual(that interface{}) error
 }
 func (this *MACCommand_RejoinParamSetupAns) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_RejoinParamSetupAns)
@@ -7677,10 +7254,7 @@ func (this *MACCommand_RejoinParamSetupAns) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -7721,10 +7295,7 @@ func (this *MACCommand_PingSlotInfoReq) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_PingSlotInfoReq) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_PingSlotInfoReq)
@@ -7737,10 +7308,7 @@ func (this *MACCommand_PingSlotInfoReq) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -7784,10 +7352,7 @@ func (this *MACCommand_PingSlotChannelReq) VerboseEqual(that interface{}) error 
 }
 func (this *MACCommand_PingSlotChannelReq) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_PingSlotChannelReq)
@@ -7800,10 +7365,7 @@ func (this *MACCommand_PingSlotChannelReq) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -7850,10 +7412,7 @@ func (this *MACCommand_PingSlotChannelAns) VerboseEqual(that interface{}) error 
 }
 func (this *MACCommand_PingSlotChannelAns) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_PingSlotChannelAns)
@@ -7866,10 +7425,7 @@ func (this *MACCommand_PingSlotChannelAns) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -7916,10 +7472,7 @@ func (this *MACCommand_BeaconTimingAns) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_BeaconTimingAns) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_BeaconTimingAns)
@@ -7932,10 +7485,7 @@ func (this *MACCommand_BeaconTimingAns) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -7979,10 +7529,7 @@ func (this *MACCommand_BeaconFreqReq) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_BeaconFreqReq) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_BeaconFreqReq)
@@ -7995,10 +7542,7 @@ func (this *MACCommand_BeaconFreqReq) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -8039,10 +7583,7 @@ func (this *MACCommand_BeaconFreqAns) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_BeaconFreqAns) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_BeaconFreqAns)
@@ -8055,10 +7596,7 @@ func (this *MACCommand_BeaconFreqAns) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -8099,10 +7637,7 @@ func (this *MACCommand_DeviceModeInd) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_DeviceModeInd) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_DeviceModeInd)
@@ -8115,10 +7650,7 @@ func (this *MACCommand_DeviceModeInd) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -8159,10 +7691,7 @@ func (this *MACCommand_DeviceModeConf) VerboseEqual(that interface{}) error {
 }
 func (this *MACCommand_DeviceModeConf) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*MACCommand_DeviceModeConf)
@@ -8175,10 +7704,7 @@ func (this *MACCommand_DeviceModeConf) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -9928,8 +9454,8 @@ func (m *MACCommand_DeviceTimeAns) MarshalTo(dAtA []byte) (int, error) {
 	_ = l
 	dAtA[i] = 0x3a
 	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.Time)))
-	n56, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Time, dAtA[i:])
+	i = encodeVarintLorawan(dAtA, i, uint64(types.SizeOfStdTime(m.Time)))
+	n56, err := types.StdTimeMarshalTo(m.Time, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -10715,7 +10241,7 @@ func NewPopulatedMACCommand_ADRParamSetupReq(r randyLorawan, easy bool) *MACComm
 
 func NewPopulatedMACCommand_DeviceTimeAns(r randyLorawan, easy bool) *MACCommand_DeviceTimeAns {
 	this := &MACCommand_DeviceTimeAns{}
-	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v3 := types.NewPopulatedStdTime(r, easy)
 	this.Time = *v3
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -11667,7 +11193,7 @@ func (m *MACCommand_ADRParamSetupReq) Size() (n int) {
 func (m *MACCommand_DeviceTimeAns) Size() (n int) {
 	var l int
 	_ = l
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.Time)
+	l = types.SizeOfStdTime(m.Time)
 	n += 1 + l + sovLorawan(uint64(l))
 	return n
 }
@@ -16622,7 +16148,7 @@ func (m *MACCommand_DeviceTimeAns) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.Time, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.Time, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

@@ -1879,7 +1879,7 @@ func RegisterIsAdminHandler(ctx context.Context, mux *runtime.ServeMux, conn *gr
 func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, client IsAdminClient) error {
 
 	mux.Handle("GET", pattern_IsAdmin_GetSettings_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -1908,7 +1908,7 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 	})
 
 	mux.Handle("PATCH", pattern_IsAdmin_UpdateSettings_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -1937,7 +1937,7 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 	})
 
 	mux.Handle("POST", pattern_IsAdmin_CreateUser_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -1966,7 +1966,7 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 	})
 
 	mux.Handle("GET", pattern_IsAdmin_GetUser_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -1995,7 +1995,7 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 	})
 
 	mux.Handle("GET", pattern_IsAdmin_ListUsers_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2024,7 +2024,7 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 	})
 
 	mux.Handle("PATCH", pattern_IsAdmin_UpdateUser_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2053,7 +2053,7 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 	})
 
 	mux.Handle("POST", pattern_IsAdmin_ResetUserPassword_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2082,7 +2082,7 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 	})
 
 	mux.Handle("DELETE", pattern_IsAdmin_DeleteUser_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2111,7 +2111,7 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 	})
 
 	mux.Handle("POST", pattern_IsAdmin_SendInvitation_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2140,7 +2140,7 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 	})
 
 	mux.Handle("GET", pattern_IsAdmin_ListInvitations_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2169,7 +2169,7 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 	})
 
 	mux.Handle("DELETE", pattern_IsAdmin_DeleteInvitation_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2198,7 +2198,7 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 	})
 
 	mux.Handle("GET", pattern_IsAdmin_GetClient_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2227,7 +2227,7 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 	})
 
 	mux.Handle("GET", pattern_IsAdmin_ListClients_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2256,7 +2256,7 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 	})
 
 	mux.Handle("PATCH", pattern_IsAdmin_UpdateClient_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2285,7 +2285,7 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 	})
 
 	mux.Handle("DELETE", pattern_IsAdmin_DeleteClient_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2419,7 +2419,7 @@ func RegisterIsUserHandler(ctx context.Context, mux *runtime.ServeMux, conn *grp
 func RegisterIsUserHandlerClient(ctx context.Context, mux *runtime.ServeMux, client IsUserClient) error {
 
 	mux.Handle("POST", pattern_IsUser_CreateUser_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2448,7 +2448,7 @@ func RegisterIsUserHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 	})
 
 	mux.Handle("GET", pattern_IsUser_GetUser_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2477,7 +2477,7 @@ func RegisterIsUserHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 	})
 
 	mux.Handle("PATCH", pattern_IsUser_UpdateUser_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2506,7 +2506,7 @@ func RegisterIsUserHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 	})
 
 	mux.Handle("PUT", pattern_IsUser_UpdateUserPassword_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2535,7 +2535,7 @@ func RegisterIsUserHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 	})
 
 	mux.Handle("DELETE", pattern_IsUser_DeleteUser_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2564,7 +2564,7 @@ func RegisterIsUserHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 	})
 
 	mux.Handle("POST", pattern_IsUser_GenerateUserAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2593,7 +2593,7 @@ func RegisterIsUserHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 	})
 
 	mux.Handle("GET", pattern_IsUser_ListUserAPIKeys_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2622,7 +2622,7 @@ func RegisterIsUserHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 	})
 
 	mux.Handle("PATCH", pattern_IsUser_UpdateUserAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2651,7 +2651,7 @@ func RegisterIsUserHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 	})
 
 	mux.Handle("DELETE", pattern_IsUser_RemoveUserAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2680,7 +2680,7 @@ func RegisterIsUserHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 	})
 
 	mux.Handle("POST", pattern_IsUser_ValidateUserEmail_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2709,7 +2709,7 @@ func RegisterIsUserHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 	})
 
 	mux.Handle("POST", pattern_IsUser_RequestUserEmailValidation_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2738,7 +2738,7 @@ func RegisterIsUserHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 	})
 
 	mux.Handle("GET", pattern_IsUser_ListAuthorizedClients_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2767,7 +2767,7 @@ func RegisterIsUserHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 	})
 
 	mux.Handle("DELETE", pattern_IsUser_RevokeAuthorizedClient_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2893,7 +2893,7 @@ func RegisterIsApplicationHandler(ctx context.Context, mux *runtime.ServeMux, co
 func RegisterIsApplicationHandlerClient(ctx context.Context, mux *runtime.ServeMux, client IsApplicationClient) error {
 
 	mux.Handle("POST", pattern_IsApplication_CreateApplication_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2922,7 +2922,7 @@ func RegisterIsApplicationHandlerClient(ctx context.Context, mux *runtime.ServeM
 	})
 
 	mux.Handle("POST", pattern_IsApplication_CreateApplication_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2951,7 +2951,7 @@ func RegisterIsApplicationHandlerClient(ctx context.Context, mux *runtime.ServeM
 	})
 
 	mux.Handle("GET", pattern_IsApplication_GetApplication_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -2980,7 +2980,7 @@ func RegisterIsApplicationHandlerClient(ctx context.Context, mux *runtime.ServeM
 	})
 
 	mux.Handle("GET", pattern_IsApplication_ListApplications_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3009,7 +3009,7 @@ func RegisterIsApplicationHandlerClient(ctx context.Context, mux *runtime.ServeM
 	})
 
 	mux.Handle("GET", pattern_IsApplication_ListApplications_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3038,7 +3038,7 @@ func RegisterIsApplicationHandlerClient(ctx context.Context, mux *runtime.ServeM
 	})
 
 	mux.Handle("PATCH", pattern_IsApplication_UpdateApplication_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3067,7 +3067,7 @@ func RegisterIsApplicationHandlerClient(ctx context.Context, mux *runtime.ServeM
 	})
 
 	mux.Handle("DELETE", pattern_IsApplication_DeleteApplication_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3096,7 +3096,7 @@ func RegisterIsApplicationHandlerClient(ctx context.Context, mux *runtime.ServeM
 	})
 
 	mux.Handle("POST", pattern_IsApplication_GenerateApplicationAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3125,7 +3125,7 @@ func RegisterIsApplicationHandlerClient(ctx context.Context, mux *runtime.ServeM
 	})
 
 	mux.Handle("GET", pattern_IsApplication_ListApplicationAPIKeys_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3154,7 +3154,7 @@ func RegisterIsApplicationHandlerClient(ctx context.Context, mux *runtime.ServeM
 	})
 
 	mux.Handle("PATCH", pattern_IsApplication_UpdateApplicationAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3183,7 +3183,7 @@ func RegisterIsApplicationHandlerClient(ctx context.Context, mux *runtime.ServeM
 	})
 
 	mux.Handle("DELETE", pattern_IsApplication_RemoveApplicationAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3212,7 +3212,7 @@ func RegisterIsApplicationHandlerClient(ctx context.Context, mux *runtime.ServeM
 	})
 
 	mux.Handle("POST", pattern_IsApplication_SetApplicationCollaborator_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3241,7 +3241,7 @@ func RegisterIsApplicationHandlerClient(ctx context.Context, mux *runtime.ServeM
 	})
 
 	mux.Handle("GET", pattern_IsApplication_ListApplicationCollaborators_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3270,7 +3270,7 @@ func RegisterIsApplicationHandlerClient(ctx context.Context, mux *runtime.ServeM
 	})
 
 	mux.Handle("GET", pattern_IsApplication_ListApplicationRights_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3400,7 +3400,7 @@ func RegisterIsGatewayHandler(ctx context.Context, mux *runtime.ServeMux, conn *
 func RegisterIsGatewayHandlerClient(ctx context.Context, mux *runtime.ServeMux, client IsGatewayClient) error {
 
 	mux.Handle("POST", pattern_IsGateway_CreateGateway_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3429,7 +3429,7 @@ func RegisterIsGatewayHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 	})
 
 	mux.Handle("POST", pattern_IsGateway_CreateGateway_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3458,7 +3458,7 @@ func RegisterIsGatewayHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 	})
 
 	mux.Handle("GET", pattern_IsGateway_GetGateway_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3487,7 +3487,7 @@ func RegisterIsGatewayHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 	})
 
 	mux.Handle("GET", pattern_IsGateway_ListGateways_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3516,7 +3516,7 @@ func RegisterIsGatewayHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 	})
 
 	mux.Handle("GET", pattern_IsGateway_ListGateways_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3545,7 +3545,7 @@ func RegisterIsGatewayHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 	})
 
 	mux.Handle("PATCH", pattern_IsGateway_UpdateGateway_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3574,7 +3574,7 @@ func RegisterIsGatewayHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 	})
 
 	mux.Handle("DELETE", pattern_IsGateway_DeleteGateway_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3603,7 +3603,7 @@ func RegisterIsGatewayHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 	})
 
 	mux.Handle("POST", pattern_IsGateway_GenerateGatewayAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3632,7 +3632,7 @@ func RegisterIsGatewayHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 	})
 
 	mux.Handle("GET", pattern_IsGateway_ListGatewayAPIKeys_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3661,7 +3661,7 @@ func RegisterIsGatewayHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 	})
 
 	mux.Handle("PATCH", pattern_IsGateway_UpdateGatewayAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3690,7 +3690,7 @@ func RegisterIsGatewayHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 	})
 
 	mux.Handle("DELETE", pattern_IsGateway_RemoveGatewayAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3719,7 +3719,7 @@ func RegisterIsGatewayHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 	})
 
 	mux.Handle("POST", pattern_IsGateway_SetGatewayCollaborator_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3748,7 +3748,7 @@ func RegisterIsGatewayHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 	})
 
 	mux.Handle("GET", pattern_IsGateway_ListGatewayCollaborators_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3777,7 +3777,7 @@ func RegisterIsGatewayHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 	})
 
 	mux.Handle("GET", pattern_IsGateway_ListGatewayRights_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3907,7 +3907,7 @@ func RegisterIsClientHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 func RegisterIsClientHandlerClient(ctx context.Context, mux *runtime.ServeMux, client IsClientClient) error {
 
 	mux.Handle("POST", pattern_IsClient_CreateClient_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3936,7 +3936,7 @@ func RegisterIsClientHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 	})
 
 	mux.Handle("GET", pattern_IsClient_GetClient_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3965,7 +3965,7 @@ func RegisterIsClientHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 	})
 
 	mux.Handle("GET", pattern_IsClient_ListClients_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -3994,7 +3994,7 @@ func RegisterIsClientHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 	})
 
 	mux.Handle("PATCH", pattern_IsClient_UpdateClient_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -4023,7 +4023,7 @@ func RegisterIsClientHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 	})
 
 	mux.Handle("DELETE", pattern_IsClient_DeleteClient_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -4117,7 +4117,7 @@ func RegisterIsOrganizationHandler(ctx context.Context, mux *runtime.ServeMux, c
 func RegisterIsOrganizationHandlerClient(ctx context.Context, mux *runtime.ServeMux, client IsOrganizationClient) error {
 
 	mux.Handle("POST", pattern_IsOrganization_CreateOrganization_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -4146,7 +4146,7 @@ func RegisterIsOrganizationHandlerClient(ctx context.Context, mux *runtime.Serve
 	})
 
 	mux.Handle("GET", pattern_IsOrganization_GetOrganization_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -4175,7 +4175,7 @@ func RegisterIsOrganizationHandlerClient(ctx context.Context, mux *runtime.Serve
 	})
 
 	mux.Handle("GET", pattern_IsOrganization_ListOrganizations_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -4204,7 +4204,7 @@ func RegisterIsOrganizationHandlerClient(ctx context.Context, mux *runtime.Serve
 	})
 
 	mux.Handle("PATCH", pattern_IsOrganization_UpdateOrganization_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -4233,7 +4233,7 @@ func RegisterIsOrganizationHandlerClient(ctx context.Context, mux *runtime.Serve
 	})
 
 	mux.Handle("DELETE", pattern_IsOrganization_DeleteOrganization_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -4262,7 +4262,7 @@ func RegisterIsOrganizationHandlerClient(ctx context.Context, mux *runtime.Serve
 	})
 
 	mux.Handle("POST", pattern_IsOrganization_GenerateOrganizationAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -4291,7 +4291,7 @@ func RegisterIsOrganizationHandlerClient(ctx context.Context, mux *runtime.Serve
 	})
 
 	mux.Handle("GET", pattern_IsOrganization_ListOrganizationAPIKeys_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -4320,7 +4320,7 @@ func RegisterIsOrganizationHandlerClient(ctx context.Context, mux *runtime.Serve
 	})
 
 	mux.Handle("PATCH", pattern_IsOrganization_UpdateOrganizationAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -4349,7 +4349,7 @@ func RegisterIsOrganizationHandlerClient(ctx context.Context, mux *runtime.Serve
 	})
 
 	mux.Handle("DELETE", pattern_IsOrganization_RemoveOrganizationAPIKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -4378,7 +4378,7 @@ func RegisterIsOrganizationHandlerClient(ctx context.Context, mux *runtime.Serve
 	})
 
 	mux.Handle("POST", pattern_IsOrganization_SetOrganizationMember_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -4407,7 +4407,7 @@ func RegisterIsOrganizationHandlerClient(ctx context.Context, mux *runtime.Serve
 	})
 
 	mux.Handle("GET", pattern_IsOrganization_ListOrganizationMembers_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -4436,7 +4436,7 @@ func RegisterIsOrganizationHandlerClient(ctx context.Context, mux *runtime.Serve
 	})
 
 	mux.Handle("GET", pattern_IsOrganization_ListOrganizationRights_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {

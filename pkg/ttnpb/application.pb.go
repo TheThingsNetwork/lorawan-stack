@@ -16,12 +16,10 @@ import time "time"
 
 import bytes "bytes"
 
-import (
-	context "context"
-	grpc "google.golang.org/grpc"
-)
+import context "context"
+import grpc "google.golang.org/grpc"
 
-import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+import types "github.com/gogo/protobuf/types"
 
 import io "io"
 
@@ -363,10 +361,7 @@ func (this *Application) VerboseEqual(that interface{}) error {
 }
 func (this *Application) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Application)
@@ -379,10 +374,7 @@ func (this *Application) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -480,10 +472,7 @@ func (this *ApplicationUp_UplinkMessage) VerboseEqual(that interface{}) error {
 }
 func (this *ApplicationUp) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ApplicationUp)
@@ -496,10 +485,7 @@ func (this *ApplicationUp) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -516,10 +502,7 @@ func (this *ApplicationUp) Equal(that interface{}) bool {
 }
 func (this *ApplicationUp_UplinkMessage) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ApplicationUp_UplinkMessage)
@@ -532,10 +515,7 @@ func (this *ApplicationUp_UplinkMessage) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -582,10 +562,7 @@ func (this *ApplicationUplink) VerboseEqual(that interface{}) error {
 }
 func (this *ApplicationUplink) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ApplicationUplink)
@@ -598,10 +575,7 @@ func (this *ApplicationUplink) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -654,10 +628,7 @@ func (this *ApplicationDownlink) VerboseEqual(that interface{}) error {
 }
 func (this *ApplicationDownlink) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ApplicationDownlink)
@@ -670,10 +641,7 @@ func (this *ApplicationDownlink) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -725,10 +693,7 @@ func (this *ApplicationDownlinks) VerboseEqual(that interface{}) error {
 }
 func (this *ApplicationDownlinks) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ApplicationDownlinks)
@@ -741,10 +706,7 @@ func (this *ApplicationDownlinks) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -798,10 +760,7 @@ func (this *DownlinkQueueRequest) VerboseEqual(that interface{}) error {
 }
 func (this *DownlinkQueueRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*DownlinkQueueRequest)
@@ -814,10 +773,7 @@ func (this *DownlinkQueueRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1200,16 +1156,16 @@ func (m *Application) MarshalTo(dAtA []byte) (int, error) {
 	}
 	dAtA[i] = 0x1a
 	i++
-	i = encodeVarintApplication(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
+	i = encodeVarintApplication(dAtA, i, uint64(types.SizeOfStdTime(m.CreatedAt)))
+	n2, err := types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n2
 	dAtA[i] = 0x22
 	i++
-	i = encodeVarintApplication(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
+	i = encodeVarintApplication(dAtA, i, uint64(types.SizeOfStdTime(m.UpdatedAt)))
+	n3, err := types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -1428,9 +1384,9 @@ func NewPopulatedApplication(r randyApplication, easy bool) *Application {
 	v1 := NewPopulatedApplicationIdentifier(r, easy)
 	this.ApplicationIdentifier = *v1
 	this.Description = randStringApplication(r)
-	v2 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v2 := types.NewPopulatedStdTime(r, easy)
 	this.CreatedAt = *v2
-	v3 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v3 := types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v3
 	this.UpFormatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
 	this.UpFormatterParameter = randStringApplication(r)
@@ -1597,9 +1553,9 @@ func (m *Application) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovApplication(uint64(l))
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)
+	l = types.SizeOfStdTime(m.CreatedAt)
 	n += 1 + l + sovApplication(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)
+	l = types.SizeOfStdTime(m.UpdatedAt)
 	n += 1 + l + sovApplication(uint64(l))
 	if m.UpFormatter != 0 {
 		n += 1 + sovApplication(uint64(m.UpFormatter))
@@ -1821,7 +1777,7 @@ func (m *Application) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1851,7 +1807,7 @@ func (m *Application) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

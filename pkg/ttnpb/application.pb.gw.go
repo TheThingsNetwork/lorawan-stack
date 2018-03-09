@@ -251,7 +251,7 @@ func RegisterAsApplicationDownlinkQueueHandler(ctx context.Context, mux *runtime
 func RegisterAsApplicationDownlinkQueueHandlerClient(ctx context.Context, mux *runtime.ServeMux, client AsApplicationDownlinkQueueClient) error {
 
 	mux.Handle("POST", pattern_AsApplicationDownlinkQueue_DownlinkQueueReplace_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -280,7 +280,7 @@ func RegisterAsApplicationDownlinkQueueHandlerClient(ctx context.Context, mux *r
 	})
 
 	mux.Handle("PUT", pattern_AsApplicationDownlinkQueue_DownlinkQueuePush_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -309,7 +309,7 @@ func RegisterAsApplicationDownlinkQueueHandlerClient(ctx context.Context, mux *r
 	})
 
 	mux.Handle("GET", pattern_AsApplicationDownlinkQueue_DownlinkQueueList_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -338,7 +338,7 @@ func RegisterAsApplicationDownlinkQueueHandlerClient(ctx context.Context, mux *r
 	})
 
 	mux.Handle("DELETE", pattern_AsApplicationDownlinkQueue_DownlinkQueueClear_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {

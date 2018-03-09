@@ -9,10 +9,8 @@ import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 
-import (
-	context "context"
-	grpc "google.golang.org/grpc"
-)
+import context "context"
+import grpc "google.golang.org/grpc"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal

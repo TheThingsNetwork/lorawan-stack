@@ -15,8 +15,8 @@ import time "time"
 
 import strconv "strconv"
 
-import encoding_binary "encoding/binary"
-import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+import binary "encoding/binary"
+import types "github.com/gogo/protobuf/types"
 
 import io "io"
 
@@ -557,10 +557,7 @@ func (this *RxMetadata_FineTimestampValue) VerboseEqual(that interface{}) error 
 }
 func (this *RxMetadata) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*RxMetadata)
@@ -573,10 +570,7 @@ func (this *RxMetadata) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -632,10 +626,7 @@ func (this *RxMetadata) Equal(that interface{}) bool {
 }
 func (this *RxMetadata_EncryptedFineTimestamp) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*RxMetadata_EncryptedFineTimestamp)
@@ -648,10 +639,7 @@ func (this *RxMetadata_EncryptedFineTimestamp) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -662,10 +650,7 @@ func (this *RxMetadata_EncryptedFineTimestamp) Equal(that interface{}) bool {
 }
 func (this *RxMetadata_FineTimestampValue) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*RxMetadata_FineTimestampValue)
@@ -678,10 +663,7 @@ func (this *RxMetadata_FineTimestampValue) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -731,10 +713,7 @@ func (this *TxMetadata) VerboseEqual(that interface{}) error {
 }
 func (this *TxMetadata) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*TxMetadata)
@@ -747,10 +726,7 @@ func (this *TxMetadata) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -812,10 +788,7 @@ func (this *Location) VerboseEqual(that interface{}) error {
 }
 func (this *Location) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Location)
@@ -828,10 +801,7 @@ func (this *Location) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -899,8 +869,8 @@ func (m *RxMetadata) MarshalTo(dAtA []byte) (int, error) {
 	}
 	dAtA[i] = 0x3a
 	i++
-	i = encodeVarintMetadata(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.Time)))
-	n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Time, dAtA[i:])
+	i = encodeVarintMetadata(dAtA, i, uint64(types.SizeOfStdTime(m.Time)))
+	n3, err := types.StdTimeMarshalTo(m.Time, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -908,25 +878,25 @@ func (m *RxMetadata) MarshalTo(dAtA []byte) (int, error) {
 	if m.RSSI != 0 {
 		dAtA[i] = 0x45
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSI))
+		binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSI))
 		i += 4
 	}
 	if m.ChannelRSSI != 0 {
 		dAtA[i] = 0x4d
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.ChannelRSSI))
+		binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.ChannelRSSI))
 		i += 4
 	}
 	if m.RSSIStandardDeviation != 0 {
 		dAtA[i] = 0x55
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSIStandardDeviation))
+		binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.RSSIStandardDeviation))
 		i += 4
 	}
 	if m.SNR != 0 {
 		dAtA[i] = 0x5d
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.SNR))
+		binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.SNR))
 		i += 4
 	}
 	if m.FrequencyOffset != 0 {
@@ -1010,8 +980,8 @@ func (m *TxMetadata) MarshalTo(dAtA []byte) (int, error) {
 	}
 	dAtA[i] = 0x1a
 	i++
-	i = encodeVarintMetadata(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.Time)))
-	n7, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Time, dAtA[i:])
+	i = encodeVarintMetadata(dAtA, i, uint64(types.SizeOfStdTime(m.Time)))
+	n7, err := types.StdTimeMarshalTo(m.Time, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -1049,13 +1019,13 @@ func (m *Location) MarshalTo(dAtA []byte) (int, error) {
 	if m.Latitude != 0 {
 		dAtA[i] = 0xd
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Latitude))
+		binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Latitude))
 		i += 4
 	}
 	if m.Longitude != 0 {
 		dAtA[i] = 0x15
 		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Longitude))
+		binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Longitude))
 		i += 4
 	}
 	if m.Altitude != 0 {
@@ -1099,7 +1069,7 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 	case 6:
 		this.FineTimestamp = NewPopulatedRxMetadata_FineTimestampValue(r, easy)
 	}
-	v2 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v2 := types.NewPopulatedStdTime(r, easy)
 	this.Time = *v2
 	this.RSSI = r.Float32()
 	if r.Intn(2) == 0 {
@@ -1125,7 +1095,7 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 		this.Location = NewPopulatedLocation(r, easy)
 	}
 	this.AESKeyID = randStringMetadata(r)
-	if r.Intn(10) == 0 {
+	if r.Intn(10) != 0 {
 		this.Advanced = google_protobuf3.NewPopulatedStruct(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -1148,9 +1118,9 @@ func NewPopulatedTxMetadata(r randyMetadata, easy bool) *TxMetadata {
 	v3 := NewPopulatedGatewayIdentifier(r, easy)
 	this.GatewayIdentifier = *v3
 	this.Timestamp = uint64(r.Uint32())
-	v4 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	v4 := types.NewPopulatedStdTime(r, easy)
 	this.Time = *v4
-	if r.Intn(10) == 0 {
+	if r.Intn(10) != 0 {
 		this.Advanced = google_protobuf3.NewPopulatedStruct(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -1271,7 +1241,7 @@ func (m *RxMetadata) Size() (n int) {
 	if m.FineTimestamp != nil {
 		n += m.FineTimestamp.Size()
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.Time)
+	l = types.SizeOfStdTime(m.Time)
 	n += 1 + l + sovMetadata(uint64(l))
 	if m.RSSI != 0 {
 		n += 5
@@ -1324,7 +1294,7 @@ func (m *TxMetadata) Size() (n int) {
 	if m.Timestamp != 0 {
 		n += 1 + sovMetadata(m.Timestamp)
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.Time)
+	l = types.SizeOfStdTime(m.Time)
 	n += 1 + l + sovMetadata(uint64(l))
 	if m.Advanced != nil {
 		l = m.Advanced.Size()
@@ -1558,7 +1528,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.Time, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.Time, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1570,7 +1540,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
 			m.RSSI = math.Float32frombits(v)
 		case 9:
@@ -1581,7 +1551,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
 			m.ChannelRSSI = math.Float32frombits(v)
 		case 10:
@@ -1592,7 +1562,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
 			m.RSSIStandardDeviation = math.Float32frombits(v)
 		case 11:
@@ -1603,7 +1573,7 @@ func (m *RxMetadata) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
 			m.SNR = math.Float32frombits(v)
 		case 12:
@@ -1845,7 +1815,7 @@ func (m *TxMetadata) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.Time, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(&m.Time, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1940,7 +1910,7 @@ func (m *Location) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
 			m.Latitude = math.Float32frombits(v)
 		case 2:
@@ -1951,7 +1921,7 @@ func (m *Location) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
 			m.Longitude = math.Float32frombits(v)
 		case 3:

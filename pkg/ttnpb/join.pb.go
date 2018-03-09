@@ -178,10 +178,7 @@ func (this *JoinRequest) VerboseEqual(that interface{}) error {
 }
 func (this *JoinRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*JoinRequest)
@@ -194,10 +191,7 @@ func (this *JoinRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -265,10 +259,7 @@ func (this *JoinResponse) VerboseEqual(that interface{}) error {
 }
 func (this *JoinResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*JoinResponse)
@@ -281,10 +272,7 @@ func (this *JoinResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}

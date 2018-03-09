@@ -110,10 +110,7 @@ func (this *ApplicationCollaborator) VerboseEqual(that interface{}) error {
 }
 func (this *ApplicationCollaborator) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ApplicationCollaborator)
@@ -126,10 +123,7 @@ func (this *ApplicationCollaborator) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -192,10 +186,7 @@ func (this *GatewayCollaborator) VerboseEqual(that interface{}) error {
 }
 func (this *GatewayCollaborator) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GatewayCollaborator)
@@ -208,10 +199,7 @@ func (this *GatewayCollaborator) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}

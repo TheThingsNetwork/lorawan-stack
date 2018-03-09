@@ -314,10 +314,7 @@ func (this *UserIdentifier) VerboseEqual(that interface{}) error {
 }
 func (this *UserIdentifier) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*UserIdentifier)
@@ -330,10 +327,7 @@ func (this *UserIdentifier) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -374,10 +368,7 @@ func (this *ApplicationIdentifier) VerboseEqual(that interface{}) error {
 }
 func (this *ApplicationIdentifier) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ApplicationIdentifier)
@@ -390,10 +381,7 @@ func (this *ApplicationIdentifier) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -434,10 +422,7 @@ func (this *GatewayIdentifier) VerboseEqual(that interface{}) error {
 }
 func (this *GatewayIdentifier) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GatewayIdentifier)
@@ -450,10 +435,7 @@ func (this *GatewayIdentifier) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -518,10 +500,7 @@ func (this *EndDeviceIdentifiers) VerboseEqual(that interface{}) error {
 }
 func (this *EndDeviceIdentifiers) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*EndDeviceIdentifiers)
@@ -534,10 +513,7 @@ func (this *EndDeviceIdentifiers) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -602,10 +578,7 @@ func (this *ClientIdentifier) VerboseEqual(that interface{}) error {
 }
 func (this *ClientIdentifier) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ClientIdentifier)
@@ -618,10 +591,7 @@ func (this *ClientIdentifier) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -662,10 +632,7 @@ func (this *OrganizationIdentifier) VerboseEqual(that interface{}) error {
 }
 func (this *OrganizationIdentifier) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*OrganizationIdentifier)
@@ -678,10 +645,7 @@ func (this *OrganizationIdentifier) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -788,10 +752,7 @@ func (this *OrganizationOrUserIdentifier_OrganizationID) VerboseEqual(that inter
 }
 func (this *OrganizationOrUserIdentifier) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*OrganizationOrUserIdentifier)
@@ -804,10 +765,7 @@ func (this *OrganizationOrUserIdentifier) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -824,10 +782,7 @@ func (this *OrganizationOrUserIdentifier) Equal(that interface{}) bool {
 }
 func (this *OrganizationOrUserIdentifier_UserID) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*OrganizationOrUserIdentifier_UserID)
@@ -840,10 +795,7 @@ func (this *OrganizationOrUserIdentifier_UserID) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -854,10 +806,7 @@ func (this *OrganizationOrUserIdentifier_UserID) Equal(that interface{}) bool {
 }
 func (this *OrganizationOrUserIdentifier_OrganizationID) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*OrganizationOrUserIdentifier_OrganizationID)
@@ -870,10 +819,7 @@ func (this *OrganizationOrUserIdentifier_OrganizationID) Equal(that interface{})
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}

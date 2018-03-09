@@ -667,7 +667,7 @@ func RegisterNsDeviceRegistryHandler(ctx context.Context, mux *runtime.ServeMux,
 func RegisterNsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMux, client NsDeviceRegistryClient) error {
 
 	mux.Handle("GET", pattern_NsDeviceRegistry_ListDevices_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -696,7 +696,7 @@ func RegisterNsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 	})
 
 	mux.Handle("GET", pattern_NsDeviceRegistry_GetDevice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -725,7 +725,7 @@ func RegisterNsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 	})
 
 	mux.Handle("POST", pattern_NsDeviceRegistry_SetDevice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -754,7 +754,7 @@ func RegisterNsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 	})
 
 	mux.Handle("POST", pattern_NsDeviceRegistry_SetDevice_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -783,7 +783,7 @@ func RegisterNsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 	})
 
 	mux.Handle("DELETE", pattern_NsDeviceRegistry_DeleteDevice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -877,7 +877,7 @@ func RegisterAsDeviceRegistryHandler(ctx context.Context, mux *runtime.ServeMux,
 func RegisterAsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMux, client AsDeviceRegistryClient) error {
 
 	mux.Handle("GET", pattern_AsDeviceRegistry_ListDevices_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -906,7 +906,7 @@ func RegisterAsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 	})
 
 	mux.Handle("GET", pattern_AsDeviceRegistry_GetDevice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -935,7 +935,7 @@ func RegisterAsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 	})
 
 	mux.Handle("POST", pattern_AsDeviceRegistry_SetDevice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -964,7 +964,7 @@ func RegisterAsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 	})
 
 	mux.Handle("POST", pattern_AsDeviceRegistry_SetDevice_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -993,7 +993,7 @@ func RegisterAsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 	})
 
 	mux.Handle("DELETE", pattern_AsDeviceRegistry_DeleteDevice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -1087,7 +1087,7 @@ func RegisterJsDeviceRegistryHandler(ctx context.Context, mux *runtime.ServeMux,
 func RegisterJsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMux, client JsDeviceRegistryClient) error {
 
 	mux.Handle("GET", pattern_JsDeviceRegistry_ListDevices_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -1116,7 +1116,7 @@ func RegisterJsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 	})
 
 	mux.Handle("GET", pattern_JsDeviceRegistry_GetDevice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -1145,7 +1145,7 @@ func RegisterJsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 	})
 
 	mux.Handle("POST", pattern_JsDeviceRegistry_SetDevice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -1174,7 +1174,7 @@ func RegisterJsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 	})
 
 	mux.Handle("POST", pattern_JsDeviceRegistry_SetDevice_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
@@ -1203,7 +1203,7 @@ func RegisterJsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 	})
 
 	mux.Handle("DELETE", pattern_JsDeviceRegistry_DeleteDevice_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
 			go func(done <-chan struct{}, closed <-chan bool) {
