@@ -564,6 +564,11 @@ func (s *GatewayStore) Delete(gtwID string) error {
 			return err
 		}
 
+		err = s.removeRadios(tx, gtwID)
+		if err != nil {
+			return err
+		}
+
 		err = s.removeAttributes(tx, gtwID)
 		if err != nil {
 			return err
@@ -597,6 +602,12 @@ func (s *GatewayStore) delete(q db.QueryContext, gtwID string) error {
 // removeAntennas removes all the antennas from a gateway.
 func (s *GatewayStore) removeAntennas(q db.QueryContext, gtwID string) error {
 	_, err := q.Exec("DELETE FROM gateways_antennas WHERE gateway_id = $1", gtwID)
+	return err
+}
+
+// removeRadios removes all the radios from a gateway.
+func (s *GatewayStore) removeRadios(q db.QueryContext, gtwID string) error {
+	_, err := q.Exec("DELETE FROM gateways_radios WHERE gateway_id = $1", gtwID)
 	return err
 }
 
