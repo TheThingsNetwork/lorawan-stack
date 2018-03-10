@@ -2,9 +2,12 @@
 
 syntax = "proto3";
 
-import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsNetwork/ttn/api/end_device.proto";
+import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
+import "github.com/TheThingsNetwork/ttn/api/lorawan.proto";
 import "github.com/TheThingsNetwork/ttn/api/messages.proto";
+import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
 package ttn.v3;
 

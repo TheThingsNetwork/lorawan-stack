@@ -4,9 +4,9 @@ syntax = "proto3";
 
 package ttn.v3;
 
-import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/rights.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 

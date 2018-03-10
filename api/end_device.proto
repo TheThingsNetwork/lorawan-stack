@@ -2,11 +2,11 @@
 
 syntax = "proto3";
 
-import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/lorawan.proto";
 import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
 import "github.com/TheThingsNetwork/ttn/api/payload_formatter.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";

@@ -4,6 +4,7 @@ syntax = "proto3";
 
 import "github.com/TheThingsNetwork/ttn/api/end_device.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
+import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
