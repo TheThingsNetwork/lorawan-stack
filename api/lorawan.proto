@@ -199,7 +199,7 @@ message TxSettings {
 
 enum MACCommandIdentifier {
   option (gogoproto.goproto_enum_prefix) = false;
-  cid_rfu_0 = 0;
+  CID_RFU_0 = 0;
   CID_RESET = 1;
   CID_LINK_CHECK = 2;
   CID_LINK_ADR = 3;

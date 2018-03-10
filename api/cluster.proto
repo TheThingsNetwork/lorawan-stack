@@ -18,7 +18,7 @@ message PeerInfo {
   repeated Role roles = 3;
 
   enum Role {
-    none = 0;
+    NONE = 0;
     IDENTITY_SERVER = 1;
     GATEWAY_SERVER = 2;
     NETWORK_SERVER = 3;
