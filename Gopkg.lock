@@ -152,7 +152,7 @@
     "runtime/internal",
     "utilities"
   ]
-  revision = "d96e01322cce0c898a216f4f3d04a9a0c543450b"
+  revision = "58f78b988bc393694cef62b92c5cde77e4742ff5"
 
 [[projects]]
   branch = "master"
@@ -340,7 +340,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "d274e363d5759d1c916232217be421f1cc89c5fe"
+  revision = "54d17b57dd7d4a3aa092476596b3f8a933bde349"
 
 [[projects]]
   branch = "master"
@@ -454,7 +454,7 @@
     "acme/autocert",
     "pbkdf2"
   ]
-  revision = "91a49db82a88618983a78a06c1cbd4e00ab749ab"
+  revision = "c7dcf104e3a7a1417abc0230cb0d5240d764159d"
 
 [[projects]]
   branch = "master"
@@ -471,7 +471,7 @@
     "lex/httplex",
     "trace"
   ]
-  revision = "22ae77b79946ea320088417e4d50825671d82d57"
+  revision = "ae89d30ce0c63142b652837da33d782e2b0a9b25"
 
 [[projects]]
   branch = "master"
@@ -486,7 +486,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "dd2ff4accc098aceecb86b36eaa7829b2a17b1c9"
+  revision = "c28acc882ebcbfbe8ce9f0f14b9ac26ee138dd51"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -531,7 +531,7 @@
     "googleapis/api/annotations",
     "googleapis/rpc/status"
   ]
-  revision = "2c5e7ac708aaa719366570dd82bda44541ca2a63"
+  revision = "df60624c1e9b9d2973e889c7a1cff73155da81c4"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -544,6 +544,7 @@
     "connectivity",
     "credentials",
     "encoding",
+    "encoding/proto",
     "grpclb/grpc_lb_v1/messages",
     "grpclog",
     "internal",
@@ -559,8 +560,8 @@
     "tap",
     "transport"
   ]
-  revision = "6b51017f791ae1cfbec89c52efdf444b13b550ef"
-  version = "v1.9.2"
+  revision = "8e4536a86ab602859c20df5ebfd0bd4228d08655"
+  version = "v1.10.0"
 
 [[projects]]
   branch = "v1"
@@ -599,6 +600,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "cd5514b674a4b8cc942f8195c0a19a30eaa0ae243b51ec239b36713c69a17589"
+  inputs-digest = "25b9372dcdb5114922e631568a44030c2a986ac7fbf30c302345c7f39f7ae749"
   solver-name = "gps-cdcl"
   solver-version = 1
