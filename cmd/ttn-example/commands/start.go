@@ -16,7 +16,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c, err := component.New(logger, config)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not initialize")
+				return errors.NewWithCause(err, "Could not initialize base component")
 			}
 
 			return c.Run()

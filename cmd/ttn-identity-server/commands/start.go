@@ -16,7 +16,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
 			if err != nil {
-				return errors.NewWithCause(err, "Could not initialize")
+				return errors.NewWithCause(err, "Could not initialize base component")
 			}
 
 			is, err := identityserver.New(c, config.IS)
