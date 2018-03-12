@@ -16,7 +16,7 @@ import (
 //
 // By default, RetrieveHTTPStore fetches its frequency plans on GitHub in the TheThingsNetwork/gateway-conf repository, in the yaml-master branch. It is possible to specify another HTTP root through options.
 func RetrieveHTTPStore(options ...RetrieveHTTPStoreOption) (Store, error) {
-	baseURI := DefaultBaseURL
+	baseURI := storeFetchingConfiguration(DefaultBaseURL)
 
 	for _, option := range options {
 		option(&baseURI)

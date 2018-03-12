@@ -4,7 +4,7 @@ package frequencyplans
 
 const (
 	// DefaultBaseURL is the default URL where files will be fetched
-	DefaultBaseURL storeFetchingConfiguration = "https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/yaml-master"
+	DefaultBaseURL string = "https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/yaml-master"
 )
 
 type storeFetchingConfiguration string
