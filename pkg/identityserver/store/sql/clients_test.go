@@ -16,31 +16,29 @@ var clientSpecializer = func(base ttnpb.Client) store.Client {
 	return &base
 }
 
-func testClients() map[string]*ttnpb.Client {
-	return map[string]*ttnpb.Client{
-		"test-client": {
-			ClientIdentifier: ttnpb.ClientIdentifier{ClientID: "test-client"},
-			Secret:           "123456",
-			RedirectURI:      "/oauth/callback",
-			Grants:           []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_PASSWORD},
-			Rights:           []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
-			Creator:          ttnpb.UserIdentifier{UserID: "bob"},
-		},
-		"foo-client": {
-			ClientIdentifier: ttnpb.ClientIdentifier{ClientID: "foo-client"},
-			Secret:           "foofoofoo",
-			RedirectURI:      "https://foo.bar/oauth/callback",
-			Grants:           []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE},
-			Rights:           []ttnpb.Right{ttnpb.RIGHT_USER_ADMIN, ttnpb.RIGHT_GATEWAY_INFO},
-			Creator:          ttnpb.UserIdentifier{UserID: "bob"},
-		},
-	}
+var testClients = map[string]*ttnpb.Client{
+	"test-client": {
+		ClientIdentifier: ttnpb.ClientIdentifier{ClientID: "test-client"},
+		Secret:           "123456",
+		RedirectURI:      "/oauth/callback",
+		Grants:           []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_PASSWORD},
+		Rights:           []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
+		Creator:          ttnpb.UserIdentifier{UserID: "bob"},
+	},
+	"foo-client": {
+		ClientIdentifier: ttnpb.ClientIdentifier{ClientID: "foo-client"},
+		Secret:           "foofoofoo",
+		RedirectURI:      "https://foo.bar/oauth/callback",
+		Grants:           []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE},
+		Rights:           []ttnpb.Right{ttnpb.RIGHT_USER_ADMIN, ttnpb.RIGHT_GATEWAY_INFO},
+		Creator:          ttnpb.UserIdentifier{UserID: "bob"},
+	},
 }
 
 func testClientCreate(t testing.TB, s *Store) {
 	a := assertions.New(t)
 
-	clients := testClients()
+	clients := testClients
 
 	for _, client := range clients {
 		err := s.Clients.Create(client)
@@ -68,8 +66,8 @@ func TestClientList(t *testing.T) {
 func testClientList(t *testing.T, clients []store.Client, err error) {
 	a := assertions.New(t)
 
-	client1 := testClients()["test-client"]
-	client2 := testClients()["foo-client"]
+	client1 := testClients["test-client"]
+	client2 := testClients["foo-client"]
 
 	a.So(err, should.BeNil)
 	if a.So(clients, should.HaveLength, 2) {
@@ -88,7 +86,7 @@ func TestClientUpdate(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore(t, database)
 
-	client := testClients()["test-client"]
+	client := testClients["test-client"]
 	client.Description = "Fancy Description"
 
 	err := s.Clients.Update(client)

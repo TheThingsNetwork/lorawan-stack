@@ -14,10 +14,10 @@ import (
 
 func TestOAuthAuthorizationCode(t *testing.T) {
 	a := assertions.New(t)
-	s := cleanStore(t, database)
+	s := testStore(t, database)
 
 	userID := testUsers()["john-doe"].UserID
-	client := testClients()["test-client"]
+	client := testClients["test-client"]
 
 	data := &store.AuthorizationData{
 		AuthorizationCode: "123456",
@@ -53,14 +53,15 @@ func TestOAuthAuthorizationCode(t *testing.T) {
 
 	_, err = s.OAuth.GetAuthorizationCode(data.AuthorizationCode)
 	a.So(err, should.NotBeNil)
+	a.So(ErrAuthorizationCodeNotFound.Describes(err), should.BeTrue)
 }
 
 func TestOAuthAccessToken(t *testing.T) {
 	a := assertions.New(t)
-	s := cleanStore(t, database)
+	s := testStore(t, database)
 
 	userID := testUsers()["john-doe"].UserID
-	client := testClients()["test-client"]
+	client := testClients["test-client"]
 
 	data := &store.AccessData{
 		AccessToken: "123456",
@@ -94,14 +95,15 @@ func TestOAuthAccessToken(t *testing.T) {
 
 	_, err = s.OAuth.GetAccessToken(data.AccessToken)
 	a.So(err, should.NotBeNil)
+	a.So(ErrAccessTokenNotFound.Describes(err), should.BeTrue)
 }
 
 func TestOAuthRefreshToken(t *testing.T) {
 	a := assertions.New(t)
-	s := cleanStore(t, database)
+	s := testStore(t, database)
 
 	userID := testUsers()["john-doe"].UserID
-	client := testClients()["test-client"]
+	client := testClients["test-client"]
 
 	data := &store.RefreshData{
 		RefreshToken: "123456",
@@ -133,14 +135,15 @@ func TestOAuthRefreshToken(t *testing.T) {
 
 	_, err = s.OAuth.GetRefreshToken(data.RefreshToken)
 	a.So(err, should.NotBeNil)
+	a.So(ErrRefreshTokenNotFound.Describes(err), should.BeTrue)
 }
 
 func TestOAuthAuthorizedClients(t *testing.T) {
 	a := assertions.New(t)
-	s := cleanStore(t, database)
+	s := testStore(t, database)
 
 	userID := testUsers()["john-doe"].UserID
-	client := testClients()["test-client"]
+	client := testClients["test-client"]
 
 	accessData := &store.AccessData{
 		AccessToken: "123456",
