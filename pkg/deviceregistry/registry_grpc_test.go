@@ -20,7 +20,7 @@ import (
 
 func TestRegistryRPC(t *testing.T) {
 	a := assertions.New(t)
-	dr := NewRPC(component.New(test.GetLogger(t), &component.Config{}), New(store.NewTypedStoreClient(mapstore.New())))
+	dr := NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedStoreClient(mapstore.New())))
 
 	dev := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
@@ -50,7 +50,7 @@ func TestRegistryRPC(t *testing.T) {
 
 func TestSetDeviceNoCheck(t *testing.T) {
 	a := assertions.New(t)
-	dr := NewRPC(component.New(test.GetLogger(t), &component.Config{}), New(store.NewTypedStoreClient(mapstore.New())))
+	dr := NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedStoreClient(mapstore.New())))
 
 	dev := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
@@ -74,7 +74,7 @@ func TestSetDeviceNoCheck(t *testing.T) {
 
 func TestListDevicesNoCheck(t *testing.T) {
 	a := assertions.New(t)
-	dr := NewRPC(component.New(test.GetLogger(t), &component.Config{}), New(store.NewTypedStoreClient(mapstore.New())))
+	dr := NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedStoreClient(mapstore.New())))
 
 	devs, err := dr.ListDevices(context.Background(), nil)
 	a.So(err, should.NotBeNil)
@@ -116,7 +116,7 @@ func TestListDevicesNoCheck(t *testing.T) {
 
 func TestGetDeviceNoCheck(t *testing.T) {
 	a := assertions.New(t)
-	dr := NewRPC(component.New(test.GetLogger(t), &component.Config{}), New(store.NewTypedStoreClient(mapstore.New())))
+	dr := NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedStoreClient(mapstore.New())))
 
 	dev := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
@@ -145,7 +145,7 @@ func TestGetDeviceNoCheck(t *testing.T) {
 
 func TestDeleteDeviceNoCheck(t *testing.T) {
 	a := assertions.New(t)
-	dr := NewRPC(component.New(test.GetLogger(t), &component.Config{}), New(store.NewTypedStoreClient(mapstore.New())))
+	dr := NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedStoreClient(mapstore.New())))
 
 	dev := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
@@ -202,7 +202,7 @@ func TestCheck(t *testing.T) {
 		return checkErr
 	}
 
-	dr := NewRPC(component.New(test.GetLogger(t), &component.Config{}), New(store.NewTypedStoreClient(mapstore.New())),
+	dr := NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedStoreClient(mapstore.New())),
 		WithListDevicesCheck(listCheck),
 		WithGetDeviceCheck(getCheck),
 		WithSetDeviceCheck(setCheck),

@@ -5,6 +5,7 @@ package commands
 import (
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/deviceregistry"
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/networkserver"
 	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/TheThingsNetwork/ttn/pkg/store/redis"
@@ -16,7 +17,10 @@ var (
 		Use:   "start",
 		Short: "Start the Network Server",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			c := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
+			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
+			if err != nil {
+				return errors.NewWithCause(err, "Could not initialize")
+			}
 
 			redis := redis.New(&redis.Config{Redis: config.Redis})
 			reg := deviceregistry.New(store.NewByteStoreClient(redis))

@@ -5,6 +5,7 @@ package commands
 import (
 	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +14,11 @@ var (
 		Use:   "start",
 		Short: "Start the reference component",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			c := component.New(logger, config)
+			c, err := component.New(logger, config)
+			if err != nil {
+				return errors.NewWithCause(err, "Could not initialize")
+			}
+
 			return c.Run()
 		},
 	}

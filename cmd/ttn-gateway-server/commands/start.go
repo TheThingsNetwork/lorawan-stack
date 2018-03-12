@@ -4,6 +4,7 @@ package commands
 
 import (
 	"github.com/TheThingsNetwork/ttn/pkg/component"
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
 	"github.com/spf13/cobra"
 )
@@ -13,7 +14,10 @@ var (
 		Use:   "start",
 		Short: "Start the Gateway Server",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			c := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
+			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
+			if err != nil {
+				return errors.NewWithCause(err, "Could not initialize")
+			}
 
 			gs, err := gatewayserver.New(c, &config.GS)
 			if err != nil {

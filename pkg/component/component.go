@@ -47,8 +47,18 @@ type Component struct {
 	listeners map[string]*listener
 }
 
+// MustNew calls New and returns a new component or panics on an error.
+// In most cases, you should just use New.
+func MustNew(logger log.Stack, config *Config) *Component {
+	c, err := New(logger, config)
+	if err != nil {
+		panic(err)
+	}
+	return c
+}
+
 // New returns a new component
-func New(logger log.Stack, config *Config) *Component {
+func New(logger log.Stack, config *Config) (*Component, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	ctx = log.WithLogger(ctx, logger)
 

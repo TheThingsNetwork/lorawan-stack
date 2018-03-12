@@ -28,7 +28,7 @@ func Example() {
 		panic(err)
 	}
 
-	c := component.New(logger, &component.Config{ServiceBase: config.ServiceBase{}})
+	c := component.MustNew(logger, &component.Config{ServiceBase: config.ServiceBase{}})
 	gs, err := gatewayserver.New(c, &gatewayserver.Config{})
 	if err != nil {
 		panic(err)
@@ -40,7 +40,7 @@ func Example() {
 func TestUnloadableLocalStore(t *testing.T) {
 	a := assertions.New(t)
 
-	c := component.New(test.GetLogger(t), &component.Config{})
+	c := component.MustNew(test.GetLogger(t), &component.Config{})
 	_, err := gatewayserver.New(c, &gatewayserver.Config{
 		LocalFrequencyPlansStore: os.TempDir(),
 	})
@@ -50,7 +50,7 @@ func TestUnloadableLocalStore(t *testing.T) {
 func TestUnloadableHTTPStore(t *testing.T) {
 	a := assertions.New(t)
 
-	c := component.New(test.GetLogger(t), &component.Config{})
+	c := component.MustNew(test.GetLogger(t), &component.Config{})
 	_, err := gatewayserver.New(c, &gatewayserver.Config{
 		HTTPFrequencyPlansStoreRoot: "http://fake-address-on-fake-port:3204834",
 	})
@@ -63,7 +63,7 @@ func TestGatewayServer(t *testing.T) {
 	dir := createFPStore(a)
 	defer removeFPStore(a, dir)
 
-	c := component.New(test.GetLogger(t), &component.Config{})
+	c := component.MustNew(test.GetLogger(t), &component.Config{})
 	gs, err := gatewayserver.New(c, &gatewayserver.Config{
 		LocalFrequencyPlansStore: dir,
 	})
@@ -93,7 +93,7 @@ func TestLink(t *testing.T) {
 	_, isAddr := StartMockIsGatewayServer(ctx, registeredGateways)
 	ns, nsAddr := StartMockGsNsServer(ctx)
 
-	c := component.New(test.GetLogger(t), &component.Config{
+	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{
 			Cluster: config.Cluster{
 				Name:           "test-gateway-server",

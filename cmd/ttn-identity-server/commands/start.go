@@ -14,7 +14,10 @@ var (
 		Use:   "start",
 		Short: "Start the Identity Server",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			c := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
+			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
+			if err != nil {
+				return errors.NewWithCause(err, "Could not initialize")
+			}
 
 			is, err := identityserver.New(c, config.IS)
 			if err != nil {

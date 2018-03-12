@@ -21,7 +21,10 @@ var (
 		Use:   "start",
 		Short: "Start the Network Stack",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			c := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
+			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
+			if err != nil {
+				return errors.NewWithCause(err, "Could not initialize")
+			}
 
 			redis := redis.New(&redis.Config{Redis: config.Redis})
 			reg := deviceregistry.New(store.NewByteStoreClient(redis))

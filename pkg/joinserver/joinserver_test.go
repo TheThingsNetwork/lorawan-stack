@@ -51,7 +51,7 @@ func TestHandleJoin(t *testing.T) {
 
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 	js := New(
-		component.New(test.GetLogger(t), &component.Config{}),
+		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
 			Registry:        reg,
 			JoinEUIPrefixes: joinEUIPrefixes,
@@ -880,7 +880,7 @@ func TestHandleJoin(t *testing.T) {
 
 			reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 			js := New(
-				component.New(test.GetLogger(t), &component.Config{}),
+				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Registry:        reg,
 					JoinEUIPrefixes: joinEUIPrefixes,
@@ -945,7 +945,7 @@ func TestGetAppSKey(t *testing.T) {
 
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 	js := New(
-		component.New(test.GetLogger(t), &component.Config{}),
+		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
 			Registry:        reg,
 			JoinEUIPrefixes: joinEUIPrefixes,
@@ -1120,7 +1120,7 @@ func TestGetAppSKey(t *testing.T) {
 
 			reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 			js := New(
-				component.New(test.GetLogger(t), &component.Config{}),
+				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Registry:        reg,
 					JoinEUIPrefixes: joinEUIPrefixes,
@@ -1163,7 +1163,7 @@ func TestGetNwkSKeys(t *testing.T) {
 
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 	js := New(
-		component.New(test.GetLogger(t), &component.Config{}),
+		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
 			Registry:        reg,
 			JoinEUIPrefixes: joinEUIPrefixes,
@@ -1370,7 +1370,7 @@ func TestGetNwkSKeys(t *testing.T) {
 
 			reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 			js := New(
-				component.New(test.GetLogger(t), &component.Config{}),
+				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Registry:        reg,
 					JoinEUIPrefixes: joinEUIPrefixes,

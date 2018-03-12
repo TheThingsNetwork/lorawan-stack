@@ -30,7 +30,7 @@ var (
 func getIS(t testing.TB) *IdentityServer {
 	if testIS == nil {
 		logger := test.GetLogger(t)
-		comp := component.New(logger, &component.Config{})
+		comp := component.MustNew(logger, &component.Config{})
 
 		is, err := New(comp, testConfig)
 		if err != nil {
