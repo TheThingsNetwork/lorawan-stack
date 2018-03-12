@@ -1,17 +1,29 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package grpc
+package identityserver
 
 import (
 	"context"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver"
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/validate"
 	"google.golang.org/grpc"
 )
+
+func init() {
+	ErrEmptyCredentials.Register()
+}
+
+// ErrEmptyCredentials is returned when the authorization value of the given
+// credentials are empty.
+var ErrEmptyCredentials = &errors.ErrDescriptor{
+	MessageFormat: "Credentials cannot be empty",
+	Code:          1,
+	Type:          errors.InvalidArgument,
+}
 
 // RightsFetcher is a specialized Identity Server gRPC client that can be used
 // for listing the rights that either an API key or access token has to an
@@ -67,7 +79,7 @@ func (r *RightsFetcher) ListApplicationRights(ctx context.Context, req *ttnpb.Ap
 
 	auth := authorization(creds)
 	if len(auth) == 0 {
-		return nil, identityserver.ErrNotAuthorized.New(nil)
+		return nil, ErrEmptyCredentials.New(nil)
 	}
 
 	rights, err := r.applicationsCache.GetOrFetch(auth, req.ApplicationID, func() (rights []ttnpb.Right, err error) {
@@ -98,7 +110,7 @@ func (r *RightsFetcher) ListGatewayRights(ctx context.Context, req *ttnpb.Gatewa
 
 	auth := authorization(creds)
 	if len(auth) == 0 {
-		return nil, identityserver.ErrNotAuthorized.New(nil)
+		return nil, ErrEmptyCredentials.New(nil)
 	}
 
 	rights, err := r.gatewaysCache.GetOrFetch(auth, req.GatewayID, func() (rights []ttnpb.Right, err error) {

@@ -1,6 +1,6 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package grpc
+package identityserver
 
 import (
 	"fmt"
@@ -12,8 +12,8 @@ import (
 
 // ttlCache is a cache where all entries have a TTL and are garbage collected.
 type ttlCache struct {
-	mu      sync.RWMutex
 	ttl     time.Duration
+	mu      sync.RWMutex
 	entries map[string]*entry
 }
 
@@ -30,10 +30,10 @@ func newTTLCache(ttl time.Duration) *ttlCache {
 // GetOrFetch returns the rights of the given key or uses the given `fetch` function
 // to loads them in the cache and returns it if the key is expired or not found.
 func (c *ttlCache) GetOrFetch(auth, entityID string, fetch func() ([]ttnpb.Right, error)) ([]ttnpb.Right, error) {
+	key := fmt.Sprintf("%s:%s", auth, entityID)
+
 	c.mu.Lock()
 	defer c.mu.Unlock()
-
-	key := fmt.Sprintf("%s:%s", auth, entityID)
 
 	e, ok := c.entries[key]
 	if ok && !e.IsExpired(c.ttl) {
