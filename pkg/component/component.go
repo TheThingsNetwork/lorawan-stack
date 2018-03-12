@@ -77,9 +77,14 @@ func New(logger log.Stack, config *Config) (*Component, error) {
 		c.logger.Use(sentry.New(c.sentry))
 	}
 
-	c.web = web.New(c.logger)
+	hash, block, err := config.HTTP.Cookie.Keys()
+	if err != nil {
+		return nil, err
+	}
 
-	return c
+	c.web = web.New(c.logger, web.WithCookieSecrets(hash, block))
+
+	return c, nil
 }
 
 // Logger returns the logger of the component

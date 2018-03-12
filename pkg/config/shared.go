@@ -3,6 +3,9 @@
 package config
 
 import (
+	"encoding/hex"
+
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 )
 
@@ -48,10 +51,44 @@ type GRPC struct {
 	ListenTLS string `name:"listen-tls" description:"Address for the TLS gRPC server to listen on"`
 }
 
+// Cookie represents cookie configuration
+type Cookie struct {
+	HashKey  string `name:"hash-key" description:"Key for cookie contents verification"`
+	BlockKey string `name:"block-key" description:"Key for cookie contents encryption"`
+}
+
+// Keys parses the hash and block keys from the Cookie config
+func (c Cookie) Keys() (hash []byte, block []byte, err error) {
+	if c.HashKey != "" {
+		hash, err = hex.DecodeString(c.HashKey)
+		if err != nil {
+			return nil, nil, err
+		}
+		switch len(hash) {
+		case 16, 24, 32:
+		default:
+			return nil, nil, errors.New("invalid length for cookie hash key: must be 16, 24 or 32 bytes")
+		}
+	}
+	if c.BlockKey != "" {
+		block, err = hex.DecodeString(c.BlockKey)
+		if err != nil {
+			return nil, nil, err
+		}
+		switch len(block) {
+		case 16, 24, 32:
+		default:
+			return nil, nil, errors.New("invalid length for cookie block key: must be 16, 24 or 32 bytes")
+		}
+	}
+	return
+}
+
 // HTTP represents the HTTP and HTTPS server configuration
 type HTTP struct {
 	Listen    string `name:"listen" description:"Address for the HTTP server to listen on"`
 	ListenTLS string `name:"listen-tls" description:"Address for the HTTPS server to listen on"`
+	Cookie    Cookie `name:"cookie"`
 	PProf     bool   `name:"pprof" description:"Expose pprof over HTTP"`
 }
 
