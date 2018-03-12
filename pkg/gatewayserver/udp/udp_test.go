@@ -7,8 +7,8 @@ import (
 	"net"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/udp"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/TheThingsNetwork/ttn/pkg/udp"
 )
 
 var (
