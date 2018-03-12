@@ -15,7 +15,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/random"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/TheThingsNetwork/ttn/pkg/types"
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
@@ -43,7 +42,7 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 			})
 		}
 
-		password, err := types.Hash(req.User.Password)
+		password, err := auth.Hash(req.User.Password)
 		if err != nil {
 			return err
 		}
@@ -223,7 +222,7 @@ func (s *userService) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateU
 		}
 		user := found.GetUser()
 
-		matches, err := types.Password(user.Password).Validate(req.Old)
+		matches, err := auth.Password(user.Password).Validate(req.Old)
 		if err != nil {
 			return err
 		}
@@ -232,7 +231,7 @@ func (s *userService) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateU
 			return ErrInvalidPassword.New(nil)
 		}
 
-		hashed, err := types.Hash(req.New)
+		hashed, err := auth.Hash(req.New)
 		if err != nil {
 			return err
 		}

@@ -5,8 +5,9 @@ package pbkdf2
 import (
 	"crypto/sha256"
 	"crypto/sha512"
-	"fmt"
 	"hash"
+
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 )
 
 // Algorithm is the type of the accepted algorithms.
@@ -37,7 +38,7 @@ func parseAlgorithm(str string) (Algorithm, error) {
 	case Sha256, Sha512:
 		return alg, nil
 	default:
-		return alg, fmt.Errorf("Unsupported algorithm: %s", str)
+		return alg, errors.Errorf("Unsupported algorithm: %s", str)
 	}
 }
 
