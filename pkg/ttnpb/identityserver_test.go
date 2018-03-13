@@ -10,6 +10,25 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
+func TestIsIDAllowed(t *testing.T) {
+	a := assertions.New(t)
+
+	settings := new(IdentityServerSettings)
+
+	// all ids are allowed
+	settings.BlacklistedIDs = nil
+	a.So(settings.IsIDAllowed("foobar"), should.BeTrue)
+	a.So(settings.IsIDAllowed("admin"), should.BeTrue)
+	settings.BlacklistedIDs = []string{}
+	a.So(settings.IsIDAllowed("foobar"), should.BeTrue)
+	a.So(settings.IsIDAllowed("admin"), should.BeTrue)
+
+	// `admin` is blacklisted
+	settings.BlacklistedIDs = []string{"admin"}
+	a.So(settings.IsIDAllowed("foobar"), should.BeTrue)
+	a.So(settings.IsIDAllowed("admin"), should.BeFalse)
+}
+
 func TestSettingsValidations(t *testing.T) {
 	a := assertions.New(t)
 

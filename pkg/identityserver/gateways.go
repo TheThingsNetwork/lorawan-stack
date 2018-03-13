@@ -9,7 +9,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
 )
@@ -46,7 +45,7 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 		}
 
 		// check for blacklisted ids
-		if !util.IsIDAllowed(req.Gateway.GatewayID, settings.BlacklistedIDs) {
+		if !settings.IsIDAllowed(req.Gateway.GatewayID) {
 			return ErrBlacklistedID.New(errors.Attributes{
 				"id": req.Gateway.GatewayID,
 			})

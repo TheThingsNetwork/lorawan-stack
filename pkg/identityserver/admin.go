@@ -11,7 +11,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/random"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
@@ -101,7 +100,7 @@ func (s *adminService) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequ
 		}
 
 		// check for blacklisted ids
-		if !util.IsIDAllowed(req.User.UserID, settings.BlacklistedIDs) {
+		if !settings.IsIDAllowed(req.User.UserID) {
 			return ErrBlacklistedID.New(errors.Attributes{
 				"id": req.User.UserID,
 			})

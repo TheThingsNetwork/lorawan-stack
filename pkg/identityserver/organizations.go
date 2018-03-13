@@ -9,7 +9,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
 )
@@ -33,7 +32,7 @@ func (s *organizationService) CreateOrganization(ctx context.Context, req *ttnpb
 		}
 
 		// Check for blacklisted IDs.
-		if !util.IsIDAllowed(req.Organization.OrganizationID, settings.BlacklistedIDs) {
+		if !settings.IsIDAllowed(req.Organization.OrganizationID) {
 			return ErrBlacklistedID.New(errors.Attributes{
 				"id": req.Organization.OrganizationID,
 			})

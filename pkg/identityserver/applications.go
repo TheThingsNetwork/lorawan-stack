@@ -9,7 +9,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
 )
@@ -50,7 +49,7 @@ func (s *applicationService) CreateApplication(ctx context.Context, req *ttnpb.C
 		}
 
 		// check for blacklisted ids
-		if !util.IsIDAllowed(req.Application.ApplicationID, settings.BlacklistedIDs) {
+		if !settings.IsIDAllowed(req.Application.ApplicationID) {
 			return ErrBlacklistedID.New(errors.Attributes{
 				"id": req.Application.ApplicationID,
 			})

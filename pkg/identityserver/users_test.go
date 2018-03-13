@@ -20,6 +20,29 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
+func TestisEmailAllowed(t *testing.T) {
+	a := assertions.New(t)
+
+	var allowedEmails []string
+
+	// all emails are allowed
+	allowedEmails = []string{}
+	a.So(isEmailAllowed("foo@foo.com", allowedEmails), should.BeTrue)
+	a.So(isEmailAllowed("foo@foofofofo.com", allowedEmails), should.BeTrue)
+
+	// all emails are allowed
+	allowedEmails = []string{"*"}
+	a.So(isEmailAllowed("foo@foo.com", allowedEmails), should.BeTrue)
+	a.So(isEmailAllowed("foo@foofofofo.com", allowedEmails), should.BeTrue)
+
+	// only emails ended in @ttn.org
+	allowedEmails = []string{"*@ttn.org"}
+	a.So(isEmailAllowed("foo@foo.com", allowedEmails), should.BeFalse)
+	a.So(isEmailAllowed("foo@foofofofo.com", allowedEmails), should.BeFalse)
+	a.So(isEmailAllowed("foo@ttn.org", allowedEmails), should.BeTrue)
+	a.So(isEmailAllowed("foo@TTN.org", allowedEmails), should.BeTrue)
+}
+
 var _ ttnpb.IsUserServer = new(userService)
 
 func TestUser(t *testing.T) {

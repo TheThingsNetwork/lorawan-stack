@@ -9,6 +9,21 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/validate"
 )
 
+// IsIDAllowed checks whether an ID is allowed to be used or not given the list
+// of blacklisted IDs of the receiver.
+func (s *IdentityServerSettings) IsIDAllowed(id string) bool {
+	if s.BlacklistedIDs == nil {
+		return true
+	}
+
+	for _, blacklistedID := range s.BlacklistedIDs {
+		if blacklistedID == id {
+			return false
+		}
+	}
+	return true
+}
+
 // IsExpired checks whether or not the invitation is expired.
 func (i *ListInvitationsResponse_Invitation) IsExpired() bool {
 	return i.ExpiresAt.Before(time.Now().UTC())

@@ -12,11 +12,32 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/util"
 	"github.com/TheThingsNetwork/ttn/pkg/random"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/gobwas/glob"
 	pbtypes "github.com/gogo/protobuf/types"
 )
+
+// isEmailAllowed checks whether an input email is allowed given the glob list
+// of allowed emails in the settings.
+//
+// Note this method was not placed on ttnpb as part of the IdentityServerSettings
+// type as it makes use of an external package.
+func isEmailAllowed(email string, allowedEmails []string) bool {
+	if allowedEmails == nil || len(allowedEmails) == 0 {
+		return true
+	}
+
+	found := false
+	for i := range allowedEmails {
+		found = glob.MustCompile(strings.ToLower(allowedEmails[i])).Match(strings.ToLower(email))
+		if found {
+			break
+		}
+	}
+
+	return found
+}
 
 type userService struct {
 	*IdentityServer
@@ -36,7 +57,7 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		}
 
 		// check for blacklisted ids
-		if !util.IsIDAllowed(req.User.UserID, settings.BlacklistedIDs) {
+		if !settings.IsIDAllowed(req.User.UserID) {
 			return ErrBlacklistedID.New(errors.Attributes{
 				"id": req.User.UserID,
 			})
@@ -71,7 +92,7 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		// check whether the provided email is allowed or not when an invitation token
 		// wasn't provided
 		if req.InvitationToken == "" {
-			if !util.IsEmailAllowed(req.User.Email, settings.AllowedEmails) {
+			if !isEmailAllowed(req.User.Email, settings.AllowedEmails) {
 				return ErrEmailAddressNotAllowed.New(errors.Attributes{
 					"email":          req.User.Email,
 					"allowed_emails": settings.AllowedEmails,
@@ -154,7 +175,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 			case ttnpb.FieldPathUserName.MatchString(path):
 				user.Name = req.User.Name
 			case ttnpb.FieldPathUserEmail.MatchString(path):
-				if !util.IsEmailAllowed(req.User.Email, settings.AllowedEmails) {
+				if !isEmailAllowed(req.User.Email, settings.AllowedEmails) {
 					return ErrEmailAddressNotAllowed.New(errors.Attributes{
 						"email":          req.User.Email,
 						"allowed_emails": settings.AllowedEmails,
