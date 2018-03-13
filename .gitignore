@@ -92,3 +92,7 @@ $RECYCLE.BIN/
 /stories
 /messages.xlsx
 /messages.yml
+
+# Keypair
+cert.pem
+key.pem
