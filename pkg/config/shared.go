@@ -52,6 +52,9 @@ type GRPC struct {
 }
 
 // Cookie represents cookie configuration.
+// These 128, 192 or 256 bit keys are used to verify and encrypt cookies set by the web server.
+// Make sure that all instances of a cluster use the same keys.
+// Changing these keys will result in all sessions being invalidated.
 type Cookie struct {
 	HashKey  string `name:"hash-key" description:"Key for cookie contents verification"`
 	BlockKey string `name:"block-key" description:"Key for cookie contents encryption"`
