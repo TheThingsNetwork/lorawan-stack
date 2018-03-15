@@ -165,17 +165,10 @@ func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 
 	switch enc {
 	case JSONEncoding:
-		if typ.Implements(jsonUnmarshalerType) {
-			v := rv.Elem().Interface().(json.Unmarshaler)
-			return v, v.UnmarshalJSON(b)
+		if err := json.Unmarshal(b, rv.Interface()); err != nil {
+			return nil, err
 		}
-		if reflect.PtrTo(typ).Implements(jsonUnmarshalerType) {
-			if err := rv.Interface().(json.Unmarshaler).UnmarshalJSON(b); err != nil {
-				return nil, err
-			}
-			return rv.Elem().Interface(), nil
-		}
-		return nil, errors.Errorf("Expected %s or %s to implement %s", typ, reflect.PtrTo(typ), jsonUnmarshalerType)
+		return rv.Elem().Interface(), nil
 	case ProtoEncoding:
 		if typ.Implements(protoMessageType) {
 			v := rv.Elem().Interface().(proto.Message)

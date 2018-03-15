@@ -257,7 +257,14 @@ func ToBytesValue(v reflect.Value) (b []byte, err error) {
 	switch {
 	case t.Implements(jsonMarshalerType):
 		enc = JSONEncoding
-		return v.Interface().(json.Marshaler).MarshalJSON()
+		return json.Marshal(v.Interface())
+
+	case reflect.PtrTo(t).Implements(jsonMarshalerType):
+		enc = JSONEncoding
+		ptr := reflect.New(t)
+		ptr.Elem().Set(v)
+		return proto.Marshal(ptr.Interface().(proto.Message))
+
 	case t.Implements(protoMessageType):
 		enc = ProtoEncoding
 		return proto.Marshal(v.Interface().(proto.Message))
