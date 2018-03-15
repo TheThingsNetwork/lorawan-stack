@@ -12,6 +12,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/gogo/protobuf/proto"
 	"github.com/mitchellh/mapstructure"
+	"github.com/ugorji/go/codec"
 )
 
 var (
@@ -188,6 +189,11 @@ func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 			return rv.Elem().Interface(), nil
 		}
 		return nil, errors.Errorf("Expected %s or %s to implement %s", typ, reflect.PtrTo(typ), protoUnmarshalerType)
+	case MsgPackEncoding:
+		if err := codec.NewDecoderBytes(b, MsgPackHandle).Decode(rv.Interface()); err != nil {
+			return nil, err
+		}
+		return rv.Elem().Interface(), nil
 	case GobEncoding:
 		if err := gob.NewDecoder(bytes.NewReader(b)).DecodeValue(rv.Elem()); err != nil {
 			return nil, err

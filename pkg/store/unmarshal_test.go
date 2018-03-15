@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	. "github.com/TheThingsNetwork/ttn/pkg/store"
@@ -30,6 +31,56 @@ func TestBytesToType(t *testing.T) {
 			}
 		})
 	}
+	t.Run("MsgPack", func(t *testing.T) {
+		a := assertions.New(t)
+
+		type subStruct struct {
+			StringArray2 [2]string
+			Now          time.Time
+			ZeroTime     time.Time
+			EmptyMap     map[string]interface{}
+			NilMap       map[string]interface{}
+			skip         interface{}
+		}
+
+		expected := struct {
+			Int          int
+			Int32        int32
+			Int64        int64
+			Float64      float64
+			Uint16       uint16
+			String       string
+			Bytes        []byte
+			Ints         []int
+			MapStringInt map[string]int
+			SubStruct    subStruct
+		}{
+			Int:     42,
+			Int32:   42,
+			Int64:   -42,
+			Float64: 42,
+			Uint16:  42,
+			String:  "42",
+			Bytes:   []byte("42"),
+			Ints:    []int{4, 2},
+			MapStringInt: map[string]int{
+				"42": 42,
+				"43": 43,
+			},
+			SubStruct: subStruct{
+				StringArray2: [2]string{"foo", "bar"},
+				Now:          time.Now().UTC(),
+				ZeroTime:     time.Time{},
+				EmptyMap:     map[string]interface{}{},
+				NilMap:       nil,
+			},
+		}
+
+		v, err := BytesToType(append([]byte{byte(MsgPackEncoding)}, msgPackEncoded(expected)...), reflect.TypeOf(expected))
+		if a.So(err, should.BeNil) && !a.So(v, should.Resemble, expected) {
+			pretty.Ldiff(t, expected, v)
+		}
+	})
 }
 
 func TestUnflattened(t *testing.T) {

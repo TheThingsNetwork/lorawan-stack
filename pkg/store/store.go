@@ -5,7 +5,21 @@ package store
 
 import (
 	"fmt"
+
+	"github.com/ugorji/go/codec"
 )
+
+var MsgPackHandle codec.Handle
+
+func init() {
+	mh := &codec.MsgpackHandle{}
+	mh.Canonical = true
+	mh.InternString = true
+	mh.RawToString = true
+	mh.ErrorIfNoField = true
+	mh.ErrorIfNoArrayExpand = true
+	MsgPackHandle = mh
+}
 
 // Encoding represents the encoding used to encode value into []byte representation.
 // This is used as the first byte in the encoded []byte representation and allows for consistent decoding.
@@ -26,6 +40,8 @@ const (
 	ProtoEncoding Encoding = 3
 	// GobEncoding represents case when Gob was used to encode value.
 	GobEncoding Encoding = 4
+	// MsgPackEncoding represents case when MsgPack was used to encode value.
+	MsgPackEncoding Encoding = 5
 )
 
 // PrimaryKey represents the value used by store implementations to uniquely identify stored objects.

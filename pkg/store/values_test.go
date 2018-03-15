@@ -11,6 +11,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	. "github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/gogo/protobuf/proto"
+	"github.com/ugorji/go/codec"
 )
 
 type InterfaceStructA struct {
@@ -566,6 +567,13 @@ func gobEncoded(v interface{}) []byte {
 		panic(err)
 	}
 	return buf.Bytes()
+}
+
+func msgPackEncoded(v interface{}) (b []byte) {
+	if err := codec.NewEncoderBytes(&b, MsgPackHandle).Encode(v); err != nil {
+		panic(err)
+	}
+	return b
 }
 
 var byteValues = []struct {
