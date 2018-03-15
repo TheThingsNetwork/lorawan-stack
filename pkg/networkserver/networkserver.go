@@ -55,7 +55,7 @@ type NetworkServer struct {
 
 	NetID types.NetID
 
-	joinServers          *sync.Map // devEUI prefix -> ttnpb.NsJsClient
+	joinServers          []ttnpb.NsJsClient
 	gateways             *sync.Map // gtwID -> ttnpb.NsGsClient
 	applicationServersMu *sync.RWMutex
 	applicationServers   map[string]*applicationUplinkStream
@@ -78,7 +78,6 @@ func New(c *component.Component, conf *Config) *NetworkServer {
 		Component:            c,
 		RegistryRPC:          deviceregistry.NewRPC(c, conf.Registry), // TODO: Add checks
 		registry:             conf.Registry,
-		joinServers:          &sync.Map{},
 		applicationServersMu: &sync.RWMutex{},
 		applicationServers:   make(map[string]*applicationUplinkStream),
 		gateways:             &sync.Map{},
@@ -306,32 +305,19 @@ func (ns *NetworkServer) newDevAddr(*ttnpb.EndDevice) types.DevAddr {
 	return devAddr
 }
 
-func (ns *NetworkServer) handleJoin(ctx context.Context, uplink *ttnpb.UplinkMessage) (*pbtypes.Empty, error) {
-	logger := ns.Logger()
+func (ns *NetworkServer) handleJoin(ctx context.Context, uplink *ttnpb.UplinkMessage) error {
+	logger := ns.Logger().(log.Interface)
 
 	pld := uplink.Payload.GetJoinRequestPayload()
 	if pld == nil {
-		return nil, ErrMissingPayload.New(nil)
+		return ErrMissingPayload.New(nil)
 	}
 
 	if pld.DevEUI.IsZero() {
-		return nil, ErrMissingDevEUI.New(nil)
+		return ErrMissingDevEUI.New(nil)
 	}
 	if pld.JoinEUI.IsZero() {
-		return nil, ErrMissingJoinEUI.New(nil)
-	}
-
-	var joinServers []ttnpb.NsJsClient
-	ns.joinServers.Range(func(prefix interface{}, cl interface{}) bool {
-		if prefix.(types.EUI64Prefix).Matches(pld.DevEUI) {
-			joinServers = append(joinServers, cl.(ttnpb.NsJsClient))
-		}
-		return true
-	})
-	if len(joinServers) == 0 {
-		return nil, ErrUnconfiguredDevEUI.New(errors.Attributes{
-			"dev_eui": pld.DevEUI,
-		})
+		return ErrMissingJoinEUI.New(nil)
 	}
 
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, &ttnpb.EndDeviceIdentifiers{
@@ -342,8 +328,8 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, uplink *ttnpb.UplinkMes
 		logger.WithError(err).WithFields(log.Fields(
 			"dev_eui", pld.DevEUI,
 			"join_eui", pld.JoinEUI,
-		)).Warn("Failed to search for device in registry")
-		return nil, err
+		)).Error("Failed to search for device in registry")
+		return err
 	}
 
 	devAddr := ns.newDevAddr(dev.EndDevice)
@@ -351,7 +337,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, uplink *ttnpb.UplinkMes
 		devAddr = ns.newDevAddr(dev.EndDevice)
 	}
 
-	state := dev.GetMACState()
+	state := dev.GetMACStateDesired()
 	req := &ttnpb.JoinRequest{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			DevEUI:  &pld.DevEUI,
@@ -367,11 +353,10 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, uplink *ttnpb.UplinkMes
 	}
 
 	var errs []error
-	for _, js := range joinServers {
+	for _, js := range ns.joinServers {
 		resp, err := js.HandleJoin(ctx, req)
 		if err != nil {
 			errs = append(errs, err)
-			logger.WithError(err).Warn("Join failed")
 			continue
 		}
 
@@ -385,9 +370,14 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, uplink *ttnpb.UplinkMes
 		if err = dev.Update("Session", "SessionFallback"); err != nil {
 			logger.WithField("device", dev).WithError(err).Error("Failed to update device")
 		}
-		return &pbtypes.Empty{}, nil
+		return nil
 	}
-	return nil, errors.NewWithCause(errs[0], "Failed to perform join procedure")
+
+	for i, err := range errs {
+		logger = logger.WithField(fmt.Sprintf("error_%d", i), err)
+	}
+	logger.Warn("Join failed")
+	return errors.NewWithCause(errs[0], "Failed to perform join procedure")
 }
 
 func (ns *NetworkServer) handleRejoin(ctx context.Context, uplink *ttnpb.UplinkMessage) error {
