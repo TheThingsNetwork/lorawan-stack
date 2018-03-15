@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"hash"
 	"hash/fnv"
 	"math"
 	"math/rand"
@@ -35,14 +36,12 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/mitchellh/hashstructure"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 const recentUplinkCount = 20
-const deduplicationWindow = 5 * time.Second
 const maxFCntGap = 16384
 
 // NetworkServer implements the network server component.
@@ -60,16 +59,17 @@ type NetworkServer struct {
 	applicationServersMu *sync.RWMutex
 	applicationServers   map[string]*applicationUplinkStream
 
-	claimedUplinks   *sync.Map // []byte -> struct{}
-	claimedDownlinks *sync.Map // []byte -> struct{}
+	uplinkDeduplicator *deduplicator
 
-	hashOptions *hashstructure.HashOptions
+	hashPool *sync.Pool
 }
 
 // Config represents the NetworkServer configuration.
 type Config struct {
-	Registry    deviceregistry.Interface
-	JoinServers []ttnpb.NsJsClient
+	Registry            deviceregistry.Interface
+	JoinServers         []ttnpb.NsJsClient
+	DeduplicationWindow time.Duration
+	CooldownWindow      time.Duration
 }
 
 // New returns new *NetworkServer.
@@ -81,12 +81,10 @@ func New(c *component.Component, conf *Config) *NetworkServer {
 		applicationServersMu: &sync.RWMutex{},
 		applicationServers:   make(map[string]*applicationUplinkStream),
 		gateways:             &sync.Map{},
-		claimedUplinks:       &sync.Map{},
-		claimedDownlinks:     &sync.Map{},
-		hashOptions: &hashstructure.HashOptions{
-			Hasher: fnv.New64a(),
-		},
+		uplinkDeduplicator:   newDeduplicator(conf.DeduplicationWindow, conf.CooldownWindow),
+		hashPool:             &sync.Pool{},
 	}
+	ns.hashPool.New = func() interface{} { return fnv.New64a() }
 	c.RegisterGRPC(ns)
 	return ns
 }
@@ -384,32 +382,53 @@ func (ns *NetworkServer) handleRejoin(ctx context.Context, uplink *ttnpb.UplinkM
 	return status.Errorf(codes.Unimplemented, "not implemented")
 }
 
+func (ns *NetworkServer) sum(b []byte) ([]byte, error) {
+	h := ns.hashPool.Get().(hash.Hash)
+	n, err := h.Write(b)
+	if err != nil {
+		return nil, err
+	}
+	if n < len(b) {
+		return nil, errors.New("Short write")
+	}
+	s := h.Sum(nil)
+
+	go func() {
+		h.Reset()
+		ns.hashPool.Put(h)
+	}()
+	return s, nil
+}
+
 // HandleUplink is called by the gateway server when an uplink message arrives.
 func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*pbtypes.Empty, error) {
 	logger := ns.Logger()
 
-	if msg.GetPayload().Payload == nil {
-		b := msg.GetRawPayload()
-		if len(b) == 0 {
-			return nil, ErrMissingPayload.New(nil)
-		}
+	b := msg.GetRawPayload()
+	if len(b) == 0 {
+		return nil, ErrMissingPayload.New(nil)
+	}
 
+	if msg.GetPayload().Payload == nil {
 		if err := msg.Payload.UnmarshalLoRaWAN(b); err != nil {
 			return nil, ErrUnmarshalFailed.NewWithCause(nil, err)
 		}
 	}
 
-	sum, err := hashstructure.Hash(msg.GetPayload().Payload, ns.hashOptions)
+	s, err := ns.sum(b)
 	if err != nil {
-		panic(errors.NewWithCause(err, "Failed to hash payload"))
+		return nil, errors.NewWithCause(err, "Message hashing failed")
 	}
 
-	_, claimed := ns.claimedUplinks.LoadOrStore(sum, struct{}{})
-	if claimed {
-		logger.Info("Dropping duplicate uplink")
+	dups, ok := ns.uplinkDeduplicator.Deduplicate(string(s), msg.RxMetadata)
+	if ok {
+		logger.Debug("Dropping duplicate uplink")
 		return &pbtypes.Empty{}, nil
 	}
-	defer time.AfterFunc(deduplicationWindow, func() { ns.claimedUplinks.Delete(sum) })
+
+	for _, v := range dups[1:] {
+		msg.RxMetadata = append(msg.RxMetadata, v.([]ttnpb.RxMetadata)...)
+	}
 
 	pld := msg.GetPayload()
 	if pld.GetMajor() != ttnpb.Major_LORAWAN_R1 {

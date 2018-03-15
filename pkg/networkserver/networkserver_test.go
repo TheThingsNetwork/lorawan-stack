@@ -324,7 +324,7 @@ func handleUplinkTest() func(t *testing.T) {
 			NextNextFCntUp uint32
 			UplinkMessage  *ttnpb.UplinkMessage
 		}{
-		// TODO: Add test cases
+			// TODO: Add test cases
 		} {
 			t.Run(tc.Name, func(t *testing.T) {
 				// TODO: Implement test
