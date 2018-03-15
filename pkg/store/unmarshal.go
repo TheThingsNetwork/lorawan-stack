@@ -17,7 +17,6 @@ import (
 
 var (
 	mapUnmarshalerType     = reflect.TypeOf((*MapUnmarshaler)(nil)).Elem()
-	protoUnmarshalerType   = reflect.TypeOf((*proto.Unmarshaler)(nil)).Elem()
 	jsonUnmarshalerType    = reflect.TypeOf((*json.Unmarshaler)(nil)).Elem()
 	byteMapUnmarshalerType = reflect.TypeOf((*ByteMapUnmarshaler)(nil)).Elem()
 )
@@ -178,17 +177,17 @@ func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 		}
 		return nil, errors.Errorf("Expected %s or %s to implement %s", typ, reflect.PtrTo(typ), jsonUnmarshalerType)
 	case ProtoEncoding:
-		if typ.Implements(protoUnmarshalerType) {
-			v := rv.Elem().Interface().(proto.Unmarshaler)
-			return v, v.Unmarshal(b)
+		if typ.Implements(protoMessageType) {
+			v := rv.Elem().Interface().(proto.Message)
+			return v, proto.Unmarshal(b, v)
 		}
-		if reflect.PtrTo(typ).Implements(protoUnmarshalerType) {
-			if err := rv.Interface().(proto.Unmarshaler).Unmarshal(b); err != nil {
+		if reflect.PtrTo(typ).Implements(protoMessageType) {
+			if err := proto.Unmarshal(b, rv.Interface().(proto.Message)); err != nil {
 				return nil, err
 			}
 			return rv.Elem().Interface(), nil
 		}
-		return nil, errors.Errorf("Expected %s or %s to implement %s", typ, reflect.PtrTo(typ), protoUnmarshalerType)
+		return nil, errors.Errorf("Expected %s or %s to implement %s", typ, reflect.PtrTo(typ), protoMessageType)
 	case MsgPackEncoding:
 		if err := codec.NewDecoderBytes(b, MsgPackHandle).Decode(rv.Interface()); err != nil {
 			return nil, err

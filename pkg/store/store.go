@@ -5,11 +5,14 @@ package store
 
 import (
 	"fmt"
+	"reflect"
 
+	"github.com/gogo/protobuf/proto"
 	"github.com/ugorji/go/codec"
 )
 
 var MsgPackHandle codec.Handle
+var protoMessageType = reflect.TypeOf((*proto.Message)(nil)).Elem()
 
 func init() {
 	mh := &codec.MsgpackHandle{}

@@ -22,12 +22,11 @@ var (
 	reflectValueType = reflect.TypeOf(reflect.Value{})
 	byteSliceType    = reflect.TypeOf([]byte{})
 
-	fmtStringerType    = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
-	protoMarshalerType = reflect.TypeOf((*proto.Marshaler)(nil)).Elem()
-	gobGobEncoderType  = reflect.TypeOf((*gob.GobEncoder)(nil)).Elem()
-	jsonMarshalerType  = reflect.TypeOf((*json.Marshaler)(nil)).Elem()
-	mapMarshalerType   = reflect.TypeOf((*MapMarshaler)(nil)).Elem()
-	isZeroerType       = reflect.TypeOf((*isZeroer)(nil)).Elem()
+	fmtStringerType   = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
+	gobGobEncoderType = reflect.TypeOf((*gob.GobEncoder)(nil)).Elem()
+	jsonMarshalerType = reflect.TypeOf((*json.Marshaler)(nil)).Elem()
+	mapMarshalerType  = reflect.TypeOf((*MapMarshaler)(nil)).Elem()
+	isZeroerType      = reflect.TypeOf((*isZeroer)(nil)).Elem()
 )
 
 // isZero reports whether the value is the zero of its type.
@@ -259,9 +258,16 @@ func ToBytesValue(v reflect.Value) (b []byte, err error) {
 	case t.Implements(jsonMarshalerType):
 		enc = JSONEncoding
 		return v.Interface().(json.Marshaler).MarshalJSON()
-	case t.Implements(protoMarshalerType):
+	case t.Implements(protoMessageType):
 		enc = ProtoEncoding
-		return v.Interface().(proto.Marshaler).Marshal()
+		return proto.Marshal(v.Interface().(proto.Message))
+
+	case reflect.PtrTo(t).Implements(protoMessageType):
+		enc = ProtoEncoding
+		ptr := reflect.New(t)
+		ptr.Elem().Set(v)
+		return proto.Marshal(ptr.Interface().(proto.Message))
+
 	case t.Kind() == reflect.Chan, t.Kind() == reflect.Func:
 		return nil, errors.Errorf("Values of type %s (kind %s), which do not implement custom marshaling logic are not supported", t, t.Kind())
 	}

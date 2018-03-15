@@ -92,7 +92,11 @@ type ProtoMarshaler struct {
 }
 
 var _ proto.Marshaler = ProtoMarshaler{}
-var _ proto.Unmarshaler = &ProtoMarshaler{}
+var _ proto.Message = &ProtoMarshaler{}
+
+func (m *ProtoMarshaler) Reset()         { *m = ProtoMarshaler{} }
+func (m *ProtoMarshaler) String() string { return proto.CompactTextString(m) }
+func (*ProtoMarshaler) ProtoMessage()    {}
 
 func (m ProtoMarshaler) Marshal() ([]byte, error) {
 	return []byte{byte(m.a), byte(ProtoEncoding)}, nil

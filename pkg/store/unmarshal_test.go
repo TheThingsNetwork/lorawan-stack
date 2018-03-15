@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"runtime"
 	"strconv"
 	"testing"
 	"time"
@@ -76,9 +77,12 @@ func TestBytesToType(t *testing.T) {
 			},
 		}
 
-		v, err := BytesToType(append([]byte{byte(MsgPackEncoding)}, msgPackEncoded(expected)...), reflect.TypeOf(expected))
-		if a.So(err, should.BeNil) && !a.So(v, should.Resemble, expected) {
-			pretty.Ldiff(t, expected, v)
+		// TODO: Remove this check once 32-bit systems are supported properly by ugorji/go/codec
+		if runtime.GOARCH != "386" {
+			v, err := BytesToType(append([]byte{byte(MsgPackEncoding)}, msgPackEncoded(expected)...), reflect.TypeOf(expected))
+			if a.So(err, should.BeNil) && !a.So(v, should.Resemble, expected) {
+				pretty.Ldiff(t, expected, v)
+			}
 		}
 	})
 }
