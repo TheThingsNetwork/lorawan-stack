@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"encoding/gob"
 	"encoding/json"
-	"fmt"
 	"reflect"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
@@ -18,12 +17,8 @@ type isZeroer interface {
 }
 
 var (
-	stringType       = reflect.TypeOf("")
 	reflectValueType = reflect.TypeOf(reflect.Value{})
-	byteSliceType    = reflect.TypeOf([]byte{})
 
-	fmtStringerType   = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
-	gobGobEncoderType = reflect.TypeOf((*gob.GobEncoder)(nil)).Elem()
 	jsonMarshalerType = reflect.TypeOf((*json.Marshaler)(nil)).Elem()
 	mapMarshalerType  = reflect.TypeOf((*MapMarshaler)(nil)).Elem()
 	isZeroerType      = reflect.TypeOf((*isZeroer)(nil)).Elem()

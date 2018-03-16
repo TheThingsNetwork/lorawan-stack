@@ -17,7 +17,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-// IndexedKeys represents the fields, which are expected to be indexed in store implementations,
+// IndexedFields represents the fields, which are expected to be indexed in store implementations,
 // which support indexed fields.
 var IndexedFields = []string{
 	"bar",
@@ -286,6 +286,7 @@ outer:
 	}
 }
 
+// TestByteSetStore executes a black-box test for the given byte set store
 func TestByteSetStore(t testingT, newStore func() store.ByteSetStore) {
 	a := assertions.New(t)
 
@@ -410,6 +411,7 @@ func TestByteSetStore(t testingT, newStore func() store.ByteSetStore) {
 	}
 }
 
+// TestByteListStore executes a black-box test for the given byte list store
 func TestByteListStore(t testingT, newStore func() store.ByteListStore) {
 	a := assertions.New(t)
 
@@ -531,6 +533,7 @@ func reflectValueToError(v reflect.Value) error {
 	return iface.(error)
 }
 
+// Create is a generic Create.
 func (gs GenericStore) Create(fields map[string]interface{}) (store.PrimaryKey, error) {
 	ret := gs.store.MethodByName("Create").Call([]reflect.Value{
 		reflect.ValueOf(gs.fromIfaceMap(fields)),
@@ -540,6 +543,8 @@ func (gs GenericStore) Create(fields map[string]interface{}) (store.PrimaryKey, 
 	}
 	return ret[0].Interface().(store.PrimaryKey), nil
 }
+
+// Find is a generic Find.
 func (gs GenericStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	rv := reflect.Zero(reflect.TypeOf((*store.PrimaryKey)(nil)).Elem())
 	if id != nil {
@@ -556,6 +561,8 @@ func (gs GenericStore) Find(id store.PrimaryKey) (map[string]interface{}, error)
 	}
 	return gs.toIfaceMap(ret[0].Interface()), nil
 }
+
+// FindBy is a generic FindBy.
 func (gs GenericStore) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
 	ret := gs.store.MethodByName("FindBy").Call([]reflect.Value{
 		reflect.ValueOf(gs.fromIfaceMap(filter)),
@@ -573,6 +580,8 @@ func (gs GenericStore) FindBy(filter map[string]interface{}) (map[store.PrimaryK
 	}
 	return m, nil
 }
+
+// Update is a generic Update.
 func (gs GenericStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
 	rv := reflect.Zero(reflect.TypeOf((*store.PrimaryKey)(nil)).Elem())
 	if id != nil {
@@ -583,6 +592,8 @@ func (gs GenericStore) Update(id store.PrimaryKey, diff map[string]interface{}) 
 		reflect.ValueOf(gs.fromIfaceMap(diff)),
 	})[0])
 }
+
+// Delete is a generic Delete.
 func (gs GenericStore) Delete(id store.PrimaryKey) error {
 	rv := reflect.Zero(reflect.TypeOf((*store.PrimaryKey)(nil)).Elem())
 	if id != nil {

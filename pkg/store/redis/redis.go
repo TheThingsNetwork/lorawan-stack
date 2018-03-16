@@ -21,7 +21,10 @@ import (
 
 const recursionLimit = 10
 
+// SeparatorByte is character used to separate the keys.
 const SeparatorByte = ':'
+
+// Separator is SeparatorByte converted to a string.
 const Separator = string(SeparatorByte)
 
 // Store represents a Redis store.Interface implemntation
@@ -61,11 +64,6 @@ func (s *Store) key(str ...string) string {
 
 func (s *Store) newID() fmt.Stringer {
 	return ulid.MustNew(ulid.Now(), s.entropy)
-}
-
-func base(str string) string {
-	ss := strings.Split(str, Separator)
-	return ss[len(ss)-1]
 }
 
 // Create stores generates an ULID and stores fields under a key associated with it.
@@ -389,6 +387,7 @@ func (s *Store) put(id store.PrimaryKey, bs ...[]byte) error {
 	return err
 }
 
+// Put adds bs to set identified by id.
 func (s *Store) Put(id store.PrimaryKey, bs ...[]byte) error {
 	if id == nil {
 		return store.ErrNilKey.New(nil)
@@ -399,6 +398,7 @@ func (s *Store) Put(id store.PrimaryKey, bs ...[]byte) error {
 	return s.put(id, bs...)
 }
 
+// CreateSet creates a new set, containing bs.
 func (s *Store) CreateSet(bs ...[]byte) (store.PrimaryKey, error) {
 	id := s.newID()
 	if len(bs) == 0 {
@@ -411,6 +411,7 @@ func (s *Store) CreateSet(bs ...[]byte) (store.PrimaryKey, error) {
 	return id, nil
 }
 
+// FindSet returns set identified by id.
 func (s *Store) FindSet(id store.PrimaryKey) (bs [][]byte, err error) {
 	if id == nil {
 		return nil, store.ErrNilKey.New(nil)
@@ -418,6 +419,7 @@ func (s *Store) FindSet(id store.PrimaryKey) (bs [][]byte, err error) {
 	return bs, s.Redis.SMembers(s.key(id.String())).ScanSlice(&bs)
 }
 
+// Contains reports whether b is contained in set identified by id.
 func (s *Store) Contains(id store.PrimaryKey, b []byte) (bool, error) {
 	if id == nil {
 		return false, store.ErrNilKey.New(nil)
@@ -425,6 +427,7 @@ func (s *Store) Contains(id store.PrimaryKey, b []byte) (bool, error) {
 	return s.Redis.SIsMember(s.key(id.String()), b).Result()
 }
 
+// Remove removes bs from set identified by id.
 func (s *Store) Remove(id store.PrimaryKey, bs ...[]byte) error {
 	if id == nil {
 		return store.ErrNilKey.New(nil)
@@ -443,6 +446,7 @@ func (s *Store) Remove(id store.PrimaryKey, bs ...[]byte) error {
 	return err
 }
 
+// Append appends bs to list identified by id.
 func (s *Store) Append(id store.PrimaryKey, bs ...[]byte) error {
 	if id == nil {
 		return store.ErrNilKey.New(nil)
@@ -461,6 +465,7 @@ func (s *Store) Append(id store.PrimaryKey, bs ...[]byte) error {
 	return nil
 }
 
+// CreateList creates a new list, containing bs.
 func (s *Store) CreateList(bs ...[]byte) (store.PrimaryKey, error) {
 	id := s.newID()
 	if len(bs) == 0 {
@@ -473,6 +478,7 @@ func (s *Store) CreateList(bs ...[]byte) (store.PrimaryKey, error) {
 	return id, nil
 }
 
+// FindList returns list identified by id.
 func (s *Store) FindList(id store.PrimaryKey) (bs [][]byte, err error) {
 	if id == nil {
 		return nil, store.ErrNilKey.New(nil)

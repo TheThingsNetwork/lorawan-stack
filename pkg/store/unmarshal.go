@@ -17,9 +17,7 @@ import (
 )
 
 var (
-	mapUnmarshalerType     = reflect.TypeOf((*MapUnmarshaler)(nil)).Elem()
-	byteMapUnmarshalerType = reflect.TypeOf((*ByteMapUnmarshaler)(nil)).Elem()
-	msgpUnmarshalerType    = reflect.TypeOf((*msgp.Unmarshaler)(nil)).Elem()
+	msgpUnmarshalerType = reflect.TypeOf((*msgp.Unmarshaler)(nil)).Elem()
 )
 
 // Unflattened unflattens m and returns the result
@@ -41,6 +39,7 @@ func Unflattened(m map[string]interface{}) map[string]interface{} {
 	return out
 }
 
+// IsNillableKind reports whether k represents a nillable reflect.Kind.
 func IsNillableKind(k reflect.Kind) bool {
 	return k == reflect.Ptr ||
 		k == reflect.Map ||
@@ -50,6 +49,7 @@ func IsNillableKind(k reflect.Kind) bool {
 		k == reflect.Slice
 }
 
+// IsNillableType reports whether t represents a nillable reflect.Type.
 func IsNillableType(t reflect.Type) bool {
 	return IsNillableKind(t.Kind())
 }
@@ -135,6 +135,9 @@ func UnmarshalMap(m map[string]interface{}, v interface{}, hooks ...mapstructure
 }
 
 // BytesToType decodes []byte value in b into a new value of type typ.
+// It assumes that nil values are represented using an empty b(nil or 0-length).
+// Otherwise, it expects the first byte in b to represent the encoding method
+// used to encode the value and attempts to decode accordingly.
 func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 	if len(b) == 0 {
 		if !IsNillableType(typ) {

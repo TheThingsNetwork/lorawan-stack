@@ -17,9 +17,11 @@ var protoMessageType = reflect.TypeOf((*proto.Message)(nil)).Elem()
 type Encoding byte
 
 const (
-	// Separator used to separate the flattened struct fields
+	// SeparatorByte is character used to separate the flattened struct fields.
 	SeparatorByte = '.'
-	Separator     = string(SeparatorByte)
+
+	// Separator is SeparatorByte converted to a string.
+	Separator = string(SeparatorByte)
 
 	// NOTE: The following list MUST NOT be reordered
 
@@ -83,6 +85,9 @@ type ByteStore interface {
 }
 
 // ByteListStore represents a store, which stores lists of []byte values.
+// CreateList creates a new list, containing bs.
+// FindList returns list identified by id.
+// Append appends bs to list identified by id.
 type ByteListStore interface {
 	CreateList(bs ...[]byte) (PrimaryKey, error)
 	FindList(id PrimaryKey) ([][]byte, error)
@@ -91,6 +96,11 @@ type ByteListStore interface {
 }
 
 // ByteSetStore represents a store, which stores sets of []byte values.
+// CreateSet creates a new set, containing bs.
+// FindSet returns set identified by id.
+// Put adds bs to set identified by id.
+// Contains reports whether b is contained in set identified by id.
+// Remove removes bs from set identified by id.
 type ByteSetStore interface {
 	CreateSet(bs ...[]byte) (PrimaryKey, error)
 	FindSet(id PrimaryKey) ([][]byte, error)
