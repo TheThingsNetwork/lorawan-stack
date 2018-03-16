@@ -12,13 +12,14 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/gogo/protobuf/proto"
 	"github.com/mitchellh/mapstructure"
-	"github.com/ugorji/go/codec"
+	"github.com/tinylib/msgp/msgp"
+	"github.com/vmihailenco/msgpack"
 )
 
 var (
 	mapUnmarshalerType     = reflect.TypeOf((*MapUnmarshaler)(nil)).Elem()
-	jsonUnmarshalerType    = reflect.TypeOf((*json.Unmarshaler)(nil)).Elem()
 	byteMapUnmarshalerType = reflect.TypeOf((*ByteMapUnmarshaler)(nil)).Elem()
+	msgpUnmarshalerType    = reflect.TypeOf((*msgp.Unmarshaler)(nil)).Elem()
 )
 
 // Unflattened unflattens m and returns the result
@@ -145,52 +146,61 @@ func BytesToType(b []byte, typ reflect.Type) (interface{}, error) {
 	enc := Encoding(b[0])
 	b = b[1:]
 
-	rv := reflect.New(typ)
-	e := rv.Elem()
-	for e.Kind() == reflect.Ptr {
-		e.Set(reflect.New(e.Type().Elem()))
-		e = e.Elem()
+	pv := reflect.New(typ)
+	ev := pv.Elem()
+	iv := ev
+	for iv.Kind() == reflect.Ptr {
+		iv.Set(reflect.New(iv.Type().Elem()))
+		iv = iv.Elem()
 	}
 
-	switch e.Kind() {
+	switch iv.Kind() {
 	case reflect.Slice:
-		e.Set(reflect.MakeSlice(e.Type(), 0, 0))
+		iv.Set(reflect.MakeSlice(iv.Type(), 0, 0))
 	case reflect.Map:
-		e.Set(reflect.MakeMap(e.Type()))
+		iv.Set(reflect.MakeMap(iv.Type()))
 	case reflect.Chan:
-		e.Set(reflect.MakeChan(e.Type(), 0))
+		iv.Set(reflect.MakeChan(iv.Type(), 0))
 	case reflect.Func:
-		e.Set(reflect.MakeFunc(e.Type(), func([]reflect.Value) []reflect.Value { return nil }))
+		iv.Set(reflect.MakeFunc(iv.Type(), func([]reflect.Value) []reflect.Value { return nil }))
 	}
 
 	switch enc {
 	case JSONEncoding:
-		if err := json.Unmarshal(b, rv.Interface()); err != nil {
-			return nil, err
-		}
-		return rv.Elem().Interface(), nil
+		err := json.Unmarshal(b, pv.Interface())
+		return pv.Elem().Interface(), err
+
 	case ProtoEncoding:
-		if typ.Implements(protoMessageType) {
-			v := rv.Elem().Interface().(proto.Message)
-			return v, proto.Unmarshal(b, v)
-		}
-		if reflect.PtrTo(typ).Implements(protoMessageType) {
-			if err := proto.Unmarshal(b, rv.Interface().(proto.Message)); err != nil {
-				return nil, err
+		rv := ev
+		if !ev.Type().Implements(protoMessageType) {
+			if !pv.Type().Implements(protoMessageType) {
+				return nil, errors.Errorf("Expected %s or %s to implement %s", ev.Type(), pv.Type(), protoMessageType)
 			}
-			return rv.Elem().Interface(), nil
+			rv = pv
 		}
-		return nil, errors.Errorf("Expected %s or %s to implement %s", typ, reflect.PtrTo(typ), protoMessageType)
+
+		err := proto.Unmarshal(b, rv.Interface().(proto.Message))
+		return pv.Elem().Interface(), err
+
 	case MsgPackEncoding:
-		if err := codec.NewDecoderBytes(b, MsgPackHandle).Decode(rv.Interface()); err != nil {
-			return nil, err
+		rv := ev
+		if !ev.Type().Implements(msgpUnmarshalerType) {
+			if !pv.Type().Implements(msgpUnmarshalerType) {
+				err := msgpack.Unmarshal(b, pv.Interface())
+				return pv.Elem().Interface(), err
+			}
+			rv = pv
 		}
-		return rv.Elem().Interface(), nil
+
+		b, err := rv.Interface().(msgp.Unmarshaler).UnmarshalMsg(b)
+		if len(b) > 0 {
+			return nil, ErrInvalidData.NewWithCause(nil, errors.New("Unmarshaled data left in buffer"))
+		}
+		return pv.Elem().Interface(), err
+
 	case GobEncoding:
-		if err := gob.NewDecoder(bytes.NewReader(b)).DecodeValue(rv.Elem()); err != nil {
-			return nil, err
-		}
-		return rv.Elem().Interface(), nil
+		err := gob.NewDecoder(bytes.NewReader(b)).DecodeValue(pv.Elem())
+		return pv.Elem().Interface(), err
 	default:
 		return nil, ErrInvalidData.NewWithCause(nil, errors.Errorf("Unmatched encoding"))
 	}

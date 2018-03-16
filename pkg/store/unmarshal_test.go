@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"reflect"
-	"runtime"
 	"strconv"
 	"testing"
 	"time"
@@ -37,7 +36,7 @@ func TestBytesToType(t *testing.T) {
 
 		type subStruct struct {
 			StringArray2 [2]string
-			Now          time.Time
+			Time         time.Time
 			ZeroTime     time.Time
 			EmptyMap     map[string]interface{}
 			NilMap       map[string]interface{}
@@ -70,19 +69,16 @@ func TestBytesToType(t *testing.T) {
 			},
 			SubStruct: subStruct{
 				StringArray2: [2]string{"foo", "bar"},
-				Now:          time.Now().UTC(),
+				Time:         time.Unix(42, 42),
 				ZeroTime:     time.Time{},
 				EmptyMap:     map[string]interface{}{},
 				NilMap:       nil,
 			},
 		}
 
-		// TODO: Remove this check once 32-bit systems are supported properly by ugorji/go/codec
-		if runtime.GOARCH != "386" {
-			v, err := BytesToType(append([]byte{byte(MsgPackEncoding)}, msgPackEncoded(expected)...), reflect.TypeOf(expected))
-			if a.So(err, should.BeNil) && !a.So(v, should.Resemble, expected) {
-				pretty.Ldiff(t, expected, v)
-			}
+		v, err := BytesToType(append([]byte{byte(MsgPackEncoding)}, msgPackEncoded(expected)...), reflect.TypeOf(expected))
+		if a.So(err, should.BeNil) && !a.So(v, should.Resemble, expected) {
+			pretty.Ldiff(t, expected, v)
 		}
 	})
 }

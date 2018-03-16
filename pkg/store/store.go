@@ -8,21 +8,9 @@ import (
 	"reflect"
 
 	"github.com/gogo/protobuf/proto"
-	"github.com/ugorji/go/codec"
 )
 
-var MsgPackHandle codec.Handle
 var protoMessageType = reflect.TypeOf((*proto.Message)(nil)).Elem()
-
-func init() {
-	mh := &codec.MsgpackHandle{}
-	mh.Canonical = true
-	mh.InternString = true
-	mh.RawToString = true
-	mh.ErrorIfNoField = true
-	mh.ErrorIfNoArrayExpand = true
-	MsgPackHandle = mh
-}
 
 // Encoding represents the encoding used to encode value into []byte representation.
 // This is used as the first byte in the encoded []byte representation and allows for consistent decoding.

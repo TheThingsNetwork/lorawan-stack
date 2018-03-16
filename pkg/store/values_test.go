@@ -11,7 +11,8 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	. "github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/gogo/protobuf/proto"
-	"github.com/ugorji/go/codec"
+	"github.com/tinylib/msgp/msgp"
+	"github.com/vmihailenco/msgpack"
 )
 
 type InterfaceStructA struct {
@@ -574,7 +575,14 @@ func gobEncoded(v interface{}) []byte {
 }
 
 func msgPackEncoded(v interface{}) (b []byte) {
-	if err := codec.NewEncoderBytes(&b, MsgPackHandle).Encode(v); err != nil {
+	var err error
+	if m, ok := v.(msgp.Marshaler); ok {
+		b, err = m.MarshalMsg(nil)
+	} else {
+		b, err = msgpack.Marshal(v)
+	}
+
+	if err != nil {
 		panic(err)
 	}
 	return b
