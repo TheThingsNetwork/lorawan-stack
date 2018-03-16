@@ -5,6 +5,8 @@ package shared
 import (
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
+	"github.com/TheThingsNetwork/ttn/pkg/log/middleware/sentry"
+	raven "github.com/getsentry/raven-go"
 )
 
 // DefaultBaseConfig is the default base component configuration.
@@ -61,4 +63,20 @@ var DefaultServiceBase = config.ServiceBase{
 	HTTP:     DefaultHTTPConfig,
 	TLS:      DefaultTLSConfig,
 	Identity: DefaultIdentityConfig,
+}
+
+// SentryMiddleware generates a log.Middleware sending errors logs to Sentry from a config.
+//
+// If no Sentry config was found, the function returns nil.
+func SentryMiddleware(c config.ServiceBase) (log.Middleware, error) {
+	if c.Sentry.DSN == "" {
+		return nil, nil
+	}
+
+	s, err := raven.New(c.Sentry.DSN)
+	if err != nil {
+		return nil, err
+	}
+
+	return sentry.New(s), nil
 }
