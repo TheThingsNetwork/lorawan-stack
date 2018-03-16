@@ -9,6 +9,12 @@ import (
 	"github.com/gotnospirit/messageformat"
 )
 
+// FormatErrorSignaler is used when an error occurs during the formatting of a MessageFormat.
+var FormatErrorSignaler interface {
+	Errorf(msg string, a ...interface{})
+	WithError(err error, msg string)
+}
+
 // Format formats the values into the provided string
 func Format(format string, values Attributes) string {
 	formatter, err := messageformat.New()
@@ -26,9 +32,9 @@ func Format(format string, values Attributes) string {
 		fixed[k] = fix(v)
 	}
 
-	// todo format unsupported types
 	res, err := fm.FormatMap(fixed)
 	if err != nil {
+		FormatErrorSignaler.WithError(From(err), "Could not format the error descriptor")
 		return format
 	}
 
@@ -56,10 +62,24 @@ func fix(v interface{}) interface{} {
 	case reflect.Uintptr:
 	case reflect.Float32:
 	case reflect.Float64:
+	case reflect.Complex64:
+	case reflect.Complex128:
+	case reflect.String:
 		return v
 	case reflect.Ptr:
 		// dereference and fix
 		return fix(reflect.ValueOf(v).Elem())
+	default:
+		FormatErrorSignaler.Errorf("Non-primitive (e.g. %T) should not be used as attributes with ErrDescriptor objects", v)
 	}
 	return fmt.Sprintf("%v", v)
+}
+
+type emptyFmtErrorSignaler struct{}
+
+func (e emptyFmtErrorSignaler) Errorf(_ string, _ ...interface{}) {}
+func (e emptyFmtErrorSignaler) WithError(_ error, _ string)       {}
+
+func init() {
+	FormatErrorSignaler = emptyFmtErrorSignaler{}
 }

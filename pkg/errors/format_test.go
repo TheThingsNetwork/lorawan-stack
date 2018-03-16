@@ -45,3 +45,42 @@ func TestFormat(t *testing.T) {
 		a.So(res, should.Equal, "Found no foos")
 	}
 }
+
+type errorsCounter uint8
+
+func (c *errorsCounter) Errorf(_ string, _ ...interface{}) { *c = *c + 1 }
+
+func (c *errorsCounter) WithError(_ error, msg string) { c.Errorf(msg) }
+
+func TestAttributeType(t *testing.T) {
+	a := assertions.New(t)
+
+	counter := errorsCounter(0)
+	oldErrorSignaler := FormatErrorSignaler
+	FormatErrorSignaler = &counter
+
+	format := "Found {foo} results"
+
+	// Non-primitive types
+	{
+		initCounter := counter
+		Format(format, Attributes{
+			"foo": struct {
+				Number int
+			}{3},
+		})
+		a.So(counter, should.Equal, initCounter+1)
+	}
+
+	// Primitive types
+	{
+		initCounter := counter
+		res := Format(format, Attributes{
+			"foo": 0,
+		})
+		a.So(res, should.Equal, "Found 0 results")
+		a.So(counter, should.Equal, initCounter)
+	}
+
+	FormatErrorSignaler = oldErrorSignaler
+}
