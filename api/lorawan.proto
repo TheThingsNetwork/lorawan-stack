@@ -213,6 +213,9 @@ message TxSettings {
   // - gateway to end device: true
   // - end device to gateway: false
   bool polarization_inversion = 9;
+
+  // Index of the channel that received the message.
+  uint32 channel_index = 10;
 }
 
 enum MACCommandIdentifier {

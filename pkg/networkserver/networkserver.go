@@ -240,17 +240,13 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		return ErrCorruptMessage.NewWithCause(nil, errors.Errorf("FCnt must be lower or equal to %d", math.MaxUint16))
 	}
 
-	md := msg.GetRxMetadata()
-	if len(md) == 0 {
-		return ErrCorruptMessage.NewWithCause(nil, errors.New("Empty rx metadata"))
-	}
+	settings := msg.GetSettings()
 
-	txChIdx := md[0].GetChannelIndex()
+	txChIdx := settings.GetChannelIndex()
 	if txChIdx > math.MaxUint8 {
 		return ErrCorruptMessage.NewWithCause(nil, errors.Errorf("TxChIdx must be lower or equal to %d", math.MaxUint8))
 	}
 
-	settings := msg.GetSettings()
 	txDRIdx := settings.GetDataRateIndex()
 	if txDRIdx > math.MaxUint8 {
 		return ErrCorruptMessage.NewWithCause(nil, errors.Errorf("TxDRIdx must be lower or equal to %d", math.MaxUint8))

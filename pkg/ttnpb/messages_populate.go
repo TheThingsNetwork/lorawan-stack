@@ -44,7 +44,7 @@ func NewPopulatedUplinkMessageUplink(r randyLorawan, sNwkSIntKey, fNwkSIntKey ty
 		out.RxMetadata[i] = *NewPopulatedRxMetadata(r, false)
 	}
 
-	msg := NewPopulatedMessageUplink(r, sNwkSIntKey, fNwkSIntKey, uint8(out.Settings.DataRateIndex), uint8(out.RxMetadata[0].ChannelIndex), confirmed)
+	msg := NewPopulatedMessageUplink(r, sNwkSIntKey, fNwkSIntKey, uint8(out.Settings.DataRateIndex), uint8(out.Settings.ChannelIndex), confirmed)
 	out.Payload = *msg
 
 	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, false)

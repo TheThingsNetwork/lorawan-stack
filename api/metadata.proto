@@ -32,42 +32,39 @@ message RxMetadata {
   // Index of the antenna that received the message
   uint32 antenna_index = 2;
 
-  // Index of the channel that received the message
-  uint32 channel_index = 3;
-
   // Gateway's internal timestamp when the Rx finished (nanoseconds)
   // NOTE: most gateways use microsecond timestamps, so conversion may be needed
-  uint64 timestamp = 4;
+  uint64 timestamp = 3;
 
   // Gateway's internal fine timestamp when the Rx finished (nanoseconds), encrypted with an AES key.
-  string encrypted_fine_timestamp = 5;
+  string encrypted_fine_timestamp = 4;
 
   // Gateway's internal fine timestamp when the Rx finished (nanoseconds), decrypted.
-  uint64 fine_timestamp_value = 6;
+  uint64 fine_timestamp_value = 5;
 
   // Real time
-  google.protobuf.Timestamp time = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp time = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // Received signal strength in dBm
-  float rssi = 8 [(gogoproto.customname) = "RSSI"];
+  float rssi = 7 [(gogoproto.customname) = "RSSI"];
 
   // Received channel power in dBm
-  float channel_rssi = 9 [(gogoproto.customname) = "ChannelRSSI"];
+  float  channel_rssi = 8 [(gogoproto.customname) = "ChannelRSSI"];
 
   // Standard deviation of the RSSI
-  float rssi_standard_deviation = 10 [(gogoproto.customname) = "RSSIStandardDeviation"];
+  float rssi_standard_deviation = 9 [(gogoproto.customname) = "RSSIStandardDeviation"];
 
   // Signal-to-noise-ratio in dB
-  float snr = 11 [(gogoproto.customname) = "SNR"];
+  float snr = 10 [(gogoproto.customname) = "SNR"];
 
   // Frequency offset (Hz)
-  int64 frequency_offset = 12;
+  int64 frequency_offset = 11;
 
   // Location of the antenna
-  Location location = 13;
+  Location location = 12;
 
   // ID of the AES key the fine timestamps were encrypted with
-  string aes_key_id = 14 [(gogoproto.customname) = "AESKeyID"];
+  string aes_key_id = 13 [(gogoproto.customname) = "AESKeyID"];
 
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API

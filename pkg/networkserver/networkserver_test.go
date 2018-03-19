@@ -308,7 +308,7 @@ func handleUplinkTest() func(t *testing.T) {
 		for len(msg.GetRxMetadata()) == 0 {
 			msg = ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, *types.NewPopulatedAES128Key(test.Randy), *types.NewPopulatedAES128Key(test.Randy), false)
 		}
-		msg.RxMetadata[0].ChannelIndex = math.MaxUint8 + 1
+		msg.Settings.ChannelIndex = math.MaxUint8 + 1
 		_, err = ns.HandleUplink(context.Background(), msg)
 		a.So(err, should.NotBeNil)
 
