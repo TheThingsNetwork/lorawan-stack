@@ -21,9 +21,12 @@ func TestEncode(t *testing.T) {
 	ctx := context.Background()
 	host := cayennelpp.New()
 
-	model := &ttnpb.EndDeviceModel{
-		Brand:           "The Things Products",
-		Model:           "The Things Uno",
+	model := &ttnpb.EndDeviceVersion{
+		EndDeviceModel: ttnpb.EndDeviceModel{
+			BrandID: "The Things Products",
+			ModelID: "The Things Uno",
+		},
+
 		HardwareVersion: "1.0",
 		FirmwareVersion: "1.0.0",
 	}
@@ -108,9 +111,11 @@ func TestDecode(t *testing.T) {
 	ctx := context.Background()
 	host := cayennelpp.New()
 
-	model := &ttnpb.EndDeviceModel{
-		Brand:           "The Things Products",
-		Model:           "The Things Uno",
+	model := &ttnpb.EndDeviceVersion{
+		EndDeviceModel: ttnpb.EndDeviceModel{
+			BrandID: "The Things Products",
+			ModelID: "The Things Uno",
+		},
 		HardwareVersion: "1.0",
 		FirmwareVersion: "1.0.0",
 	}

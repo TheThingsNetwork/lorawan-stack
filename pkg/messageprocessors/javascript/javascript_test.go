@@ -23,9 +23,11 @@ func TestEncode(t *testing.T) {
 	ctx := context.Background()
 	host := javascript.New()
 
-	model := &ttnpb.EndDeviceModel{
-		Brand:           "The Things Products",
-		Model:           "The Things Uno",
+	model := &ttnpb.EndDeviceVersion{
+		EndDeviceModel: ttnpb.EndDeviceModel{
+			BrandID: "The Things Products",
+			ModelID: "The Things Uno",
+		},
 		HardwareVersion: "1.0",
 		FirmwareVersion: "1.0.0",
 	}
@@ -96,7 +98,7 @@ func TestEncode(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(output.Payload.GetMACPayload().FRMPayload, should.Resemble, []byte{247, 174})
 
-		model.Model = "L-Tek FF1705"
+		model.EndDeviceModel.ModelID = "L-Tek FF1705"
 		_, err = host.Encode(ctx, message, model, script)
 		a.So(err, errshould.Describe, scripting.ErrRuntime)
 	}
@@ -154,9 +156,11 @@ func TestDecode(t *testing.T) {
 	ctx := context.Background()
 	host := javascript.New()
 
-	model := &ttnpb.EndDeviceModel{
-		Brand:           "The Things Products",
-		Model:           "The Things Uno",
+	model := &ttnpb.EndDeviceVersion{
+		EndDeviceModel: ttnpb.EndDeviceModel{
+			BrandID: "The Things Products",
+			ModelID: "The Things Uno",
+		},
 		HardwareVersion: "1.0",
 		FirmwareVersion: "1.0.0",
 	}

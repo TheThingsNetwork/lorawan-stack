@@ -27,17 +27,17 @@ func New() messageprocessors.PayloadEncodeDecoder {
 	}
 }
 
-func (h *host) createEnvironment(model *ttnpb.EndDeviceModel) map[string]interface{} {
+func (h *host) createEnvironment(model *ttnpb.EndDeviceVersion) map[string]interface{} {
 	env := make(map[string]interface{})
-	env["brand"] = model.Brand
-	env["model"] = model.Model
+	env["brand"] = model.BrandID
+	env["model"] = model.ModelID
 	env["hardware_version"] = model.HardwareVersion
 	env["firmware_version"] = model.FirmwareVersion
 	return env
 }
 
 // Encode encodes the message's MAC payload DecodedPayload to FRMPayload using script.
-func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *ttnpb.EndDeviceModel, script string) (*ttnpb.DownlinkMessage, error) {
+func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *ttnpb.EndDeviceVersion, script string) (*ttnpb.DownlinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
 		return nil, messageprocessors.ErrNoMACPayload.New(nil)
@@ -117,7 +117,7 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 }
 
 // Decode decodes the message's MAC payload FRMPayload to DecodedPayload using script.
-func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, model *ttnpb.EndDeviceModel, script string) (*ttnpb.UplinkMessage, error) {
+func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, model *ttnpb.EndDeviceVersion, script string) (*ttnpb.UplinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
 		return nil, messageprocessors.ErrNoMACPayload.New(nil)

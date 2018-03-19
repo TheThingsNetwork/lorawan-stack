@@ -48,7 +48,10 @@ It has these top-level messages:
 	RootKeys
 	SessionKeys
 	Session
+	DeviceFormatters
+	DeviceBrand
 	EndDeviceModel
+	EndDeviceVersion
 	EndDevice
 	EndDevices
 	MACSettings

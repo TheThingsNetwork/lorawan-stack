@@ -64,11 +64,60 @@ message Session {
   google.protobuf.Timestamp started_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
+message DeviceFormatters {
+  // Type of formatter used to process uplink messages.
+  PayloadFormatter up_formatter = 1;
+
+  // Parameter used by the uplink formatter.
+  string up_formatter_parameter = 2;
+
+  // Type of formatter used to format downlink messages.
+  PayloadFormatter down_formatter = 3;
+
+  // Parameter used by the downlink formatter.
+  string down_formatter_parameter = 4;
+}
+
+message DeviceBrand {
+  // ID of the device brand.
+  string id = 1 [(gogoproto.customname) = "ID"];
+
+  // Name of the brand.
+  string name = 2;
+
+  // URL for this brand.
+  string url = 3 [(gogoproto.customname) = "URL"];
+
+  // Logos of the brand.
+  repeated string logos = 4;
+}
+
 message EndDeviceModel {
-  string brand = 1;
-  string model = 2;
-  string hardware_version = 3;
-  string firmware_version = 4;
+  // ID of the model.
+  string model_id = 1 [(gogoproto.customname) = "ModelID"];
+
+  // ID of the brand of this device.
+  string brand_id = 2 [(gogoproto.customname) = "BrandID"];
+
+  // Name of the device model.
+  string model_name = 3;
+}
+
+message EndDeviceVersion {
+  // Model of the device.
+  EndDeviceModel model = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // Hardware version of this end-device.
+  string hardware_version = 2;
+
+  // Firmware version of this end-device.
+  string firmware_version = 3;
+
+  // Photos representing the devices.
+  repeated string photos = 4;
+
+  // Default formatters defining the payload formats for this end device.
+  DeviceFormatters default_formatters = 5;
 }
 
 message EndDevice {
@@ -150,12 +199,10 @@ message EndDevice {
   // ApplicationServerAddress specifies Address(host:port) of the Application Server associated with this device.
   string application_server_address = 26 [(gogoproto.customname) = "ApplicationServerAddress"];
 
-  EndDeviceModel model = 27 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  EndDeviceVersion version = 27 [(gogoproto.embed) = true];
 
-  PayloadFormatter up_formatter = 28;
-  string up_formatter_parameter = 29;
-  PayloadFormatter down_formatter = 30;
-  string down_formatter_parameter = 31;
+  // Formatters defining the payload formats.
+  DeviceFormatters formatters = 28 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   google.protobuf.Timestamp created_at = 97 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 98 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
