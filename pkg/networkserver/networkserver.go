@@ -66,10 +66,10 @@ type NetworkServer struct {
 
 // Config represents the NetworkServer configuration.
 type Config struct {
-	Registry            deviceregistry.Interface
-	JoinServers         []ttnpb.NsJsClient
-	DeduplicationWindow time.Duration
-	CooldownWindow      time.Duration
+	Registry            deviceregistry.Interface `name:"-"`
+	JoinServers         []ttnpb.NsJsClient       `name:"-"`
+	DeduplicationWindow time.Duration            `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
+	CooldownWindow      time.Duration            `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
 }
 
 // New returns new *NetworkServer.
