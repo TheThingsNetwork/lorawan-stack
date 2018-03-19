@@ -161,7 +161,7 @@ func (ns *NetworkServer) matchDevice(devAddr types.DevAddr, txDRIdx, txChIdx uin
 
 		switch dev.EndDevice.GetLoRaWANVersion() {
 		case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-			if gap > maxFCntGap {
+			if !dev.FCntResets && gap > maxFCntGap {
 				continue
 			}
 		}
@@ -188,6 +188,8 @@ func (ns *NetworkServer) matchDevice(devAddr types.DevAddr, txDRIdx, txChIdx uin
 		var confFCnt uint32
 		if ack {
 			if len(dev.RecentDownlinks) == 0 {
+				// Uplink acknowledges a downlink, but no downlink was sent by the device,
+				// hence it must be the wrong device.
 				continue
 			}
 			pld := dev.GetRecentDownlinks()[len(dev.RecentDownlinks)-1].GetPayload()
@@ -257,10 +259,10 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		return errors.NewWithCause(err, "Failed to match device")
 	}
 
-	if len(dev.RecentUplinks) >= recentUplinkCount {
+	dev.RecentUplinks = append(dev.RecentUplinks, msg)
+	if len(dev.RecentUplinks) > recentUplinkCount {
 		dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
 	}
-	dev.RecentUplinks = append(dev.RecentUplinks, msg)
 
 	if err := dev.Update("Session", "RecentUplinks"); err != nil {
 		logger.WithError(err).Error("Failed to update device")
@@ -276,10 +278,11 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 				FCnt:       dev.Session.NextFCntUp - 1,
 				FRMPayload: pld.FRMPayload,
 			}}}
-			logger := logger.WithFields(log.Fields("application_id", dev.ApplicationID, "f_cnt", up.GetUplinkMessage().GetFCnt()))
-
 			if err := cl.Send(up); err != nil {
-				logger.WithError(err).Warn("Failed to send uplink to application server")
+				logger.WithFields(log.Fields(
+					"application_id", dev.ApplicationID,
+					"f_cnt", up.GetUplinkMessage().GetFCnt(),
+				)).WithError(err).Warn("Failed to send uplink to application server")
 			}
 		}
 		ns.applicationServersMu.RUnlock()
@@ -314,15 +317,17 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, uplink *ttnpb.UplinkMes
 		return ErrMissingJoinEUI.New(nil)
 	}
 
+	logger = logger.WithFields(log.Fields(
+		"dev_eui", pld.DevEUI,
+		"join_eui", pld.JoinEUI,
+	))
+
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, &ttnpb.EndDeviceIdentifiers{
 		DevEUI:  &pld.DevEUI,
 		JoinEUI: &pld.JoinEUI,
 	})
 	if err != nil {
-		logger.WithError(err).WithFields(log.Fields(
-			"dev_eui", pld.DevEUI,
-			"join_eui", pld.JoinEUI,
-		)).Error("Failed to search for device in registry")
+		logger.WithError(err).Error("Failed to search for device in registry")
 		return err
 	}
 
@@ -331,18 +336,21 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, uplink *ttnpb.UplinkMes
 		devAddr = ns.newDevAddr(dev.EndDevice)
 	}
 
-	state := dev.GetMACStateDesired()
+	desired := dev.GetMACStateDesired()
 	req := &ttnpb.JoinRequest{
+		RawPayload: uplink.GetRawPayload(),
+		Payload:    uplink.GetPayload(),
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			DevEUI:  &pld.DevEUI,
 			JoinEUI: &pld.JoinEUI,
 			DevAddr: &devAddr,
 		},
+		NetID:              ns.NetID,
 		SelectedMacVersion: dev.GetLoRaWANVersion(),
-		RxDelay:            state.GetRxDelay(),
+		RxDelay:            desired.GetRxDelay(),
 		DownlinkSettings: ttnpb.DLSettings{
-			Rx1DROffset: state.GetRx1DataRateOffset(),
-			Rx2DR:       state.GetRx2DataRateIndex(),
+			Rx1DROffset: desired.GetRx1DataRateOffset(),
+			Rx2DR:       desired.GetRx2DataRateIndex(),
 		},
 	}
 
@@ -362,7 +370,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, uplink *ttnpb.UplinkMes
 		}
 
 		if err = dev.Update("Session", "SessionFallback"); err != nil {
-			logger.WithField("device", dev).WithError(err).Error("Failed to update device")
+			logger.WithError(err).Error("Failed to update device")
 		}
 		return nil
 	}
@@ -378,22 +386,16 @@ func (ns *NetworkServer) handleRejoin(ctx context.Context, uplink *ttnpb.UplinkM
 	return status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-func (ns *NetworkServer) sum(b []byte) ([]byte, error) {
+func (ns *NetworkServer) sum(b []byte) []byte {
 	h := ns.hashPool.Get().(hash.Hash)
-	n, err := h.Write(b)
-	if err != nil {
-		return nil, err
-	}
-	if n < len(b) {
-		return nil, errors.New("Short write")
-	}
+	h.Write(b)
+
 	s := h.Sum(nil)
 
-	go func() {
-		h.Reset()
-		ns.hashPool.Put(h)
-	}()
-	return s, nil
+	h.Reset()
+	ns.hashPool.Put(h)
+
+	return s
 }
 
 // HandleUplink is called by the gateway server when an uplink message arrives.
@@ -405,18 +407,21 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		return nil, ErrMissingPayload.New(nil)
 	}
 
-	if msg.GetPayload().Payload == nil {
+	pld := msg.GetPayload()
+
+	if pld.Payload == nil {
 		if err := msg.Payload.UnmarshalLoRaWAN(b); err != nil {
 			return nil, ErrUnmarshalFailed.NewWithCause(nil, err)
 		}
 	}
 
-	s, err := ns.sum(b)
-	if err != nil {
-		return nil, errors.NewWithCause(err, "Message hashing failed")
+	if pld.GetMajor() != ttnpb.Major_LORAWAN_R1 {
+		return nil, ErrUnsupportedLoRaWANMajorVersion.New(errors.Attributes{
+			"major": pld.GetMajor(),
+		})
 	}
 
-	dups, ok := ns.uplinkDeduplicator.Deduplicate(string(s), msg.RxMetadata)
+	dups, ok := ns.uplinkDeduplicator.Deduplicate(string(ns.sum(b)), msg.RxMetadata)
 	if ok {
 		logger.Debug("Dropping duplicate uplink")
 		return &pbtypes.Empty{}, nil
@@ -424,13 +429,6 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 
 	for _, v := range dups[1:] {
 		msg.RxMetadata = append(msg.RxMetadata, v.([]ttnpb.RxMetadata)...)
-	}
-
-	pld := msg.GetPayload()
-	if pld.GetMajor() != ttnpb.Major_LORAWAN_R1 {
-		return nil, ErrUnsupportedLoRaWANMajorVersion.New(errors.Attributes{
-			"major": pld.GetMajor(),
-		})
 	}
 
 	switch t := pld.GetMType(); t {
@@ -457,15 +455,11 @@ func (s applicationUplinkStream) Close() error {
 	return nil
 }
 
-type closer interface {
-	Close() error
-}
-
 // LinkApplication is called by the application server to subscribe to application events.
 func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifier, stream ttnpb.AsNs_LinkApplicationServer) error {
 	ws := &applicationUplinkStream{
-		stream,
-		make(chan struct{}),
+		AsNs_LinkApplicationServer: stream,
+		closeCh:                    make(chan struct{}),
 	}
 	appID := id.GetApplicationID()
 
@@ -498,6 +492,7 @@ func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifier, stream
 
 // DownlinkQueueReplace is called by the application server to completely replace the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
+	// TODO: authentication
 	if req.EndDeviceIdentifiers.IsZero() {
 		return nil, errors.New("Empty identifiers specified")
 	}
@@ -511,6 +506,7 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 
 // DownlinkQueuePush is called by the application server to push a downlink to queue for a device.
 func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
+	// TODO: authentication
 	if req.EndDeviceIdentifiers.IsZero() {
 		return nil, errors.New("Empty identifiers specified")
 	}
@@ -524,6 +520,7 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 
 // DownlinkQueueList is called by the application server to get the current state of the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
+	// TODO: authentication
 	if id.IsZero() {
 		return nil, errors.New("Empty identifiers specified")
 	}
@@ -536,6 +533,7 @@ func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, id *ttnpb.EndDev
 
 // DownlinkQueueClear is called by the application server to clear the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueClear(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+	// TODO: authentication
 	if id.IsZero() {
 		return nil, errors.New("Empty identifiers specified")
 	}
