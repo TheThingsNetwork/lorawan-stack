@@ -14,11 +14,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
-	sendUplinkTimeout = 5 * time.Minute
-
-	frequencyPlansCacheDuration = 2 * time.Hour
-)
+const sendUplinkTimeout = 5 * time.Minute
 
 // GatewayServer implements the gateway server component.
 //
@@ -33,22 +29,17 @@ type GatewayServer struct {
 }
 
 // New returns new *GatewayServer.
-func New(c *component.Component, conf *Config) (*GatewayServer, error) {
-	fpStore, err := conf.store()
-	if err != nil {
-		return nil, err
-	}
-
+func New(c *component.Component, conf *Config) *GatewayServer {
 	gs := &GatewayServer{
 		Component: c,
 
 		gateways:       pool.NewPool(c.Logger(), sendUplinkTimeout),
-		frequencyPlans: fpStore,
+		frequencyPlans: conf.store(),
 
 		nsTags: conf.NSTags,
 	}
 	c.RegisterGRPC(gs)
-	return gs, nil
+	return gs
 }
 
 // RegisterServices registers services provided by gs at s.

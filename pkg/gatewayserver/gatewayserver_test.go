@@ -4,7 +4,6 @@ package gatewayserver_test
 
 import (
 	"context"
-	"os"
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
@@ -28,32 +27,9 @@ func Example() {
 	}
 
 	c := component.MustNew(logger, &component.Config{ServiceBase: config.ServiceBase{}})
-	gs, err := gatewayserver.New(c, &gatewayserver.Config{})
-	if err != nil {
-		panic(err)
-	}
 
+	gs := gatewayserver.New(c, &gatewayserver.Config{})
 	gs.Run()
-}
-
-func TestUnloadableLocalStore(t *testing.T) {
-	a := assertions.New(t)
-
-	c := component.MustNew(test.GetLogger(t), &component.Config{})
-	_, err := gatewayserver.New(c, &gatewayserver.Config{
-		LocalFrequencyPlansStore: os.TempDir(),
-	})
-	a.So(err, should.NotBeNil)
-}
-
-func TestUnloadableHTTPStore(t *testing.T) {
-	a := assertions.New(t)
-
-	c := component.MustNew(test.GetLogger(t), &component.Config{})
-	_, err := gatewayserver.New(c, &gatewayserver.Config{
-		HTTPFrequencyPlansStoreRoot: "http://fake-address-on-fake-port:3204834",
-	})
-	a.So(err, should.NotBeNil)
 }
 
 func TestGatewayServer(t *testing.T) {
@@ -63,10 +39,9 @@ func TestGatewayServer(t *testing.T) {
 	defer removeFPStore(a, dir)
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{})
-	gs, err := gatewayserver.New(c, &gatewayserver.Config{
-		LocalFrequencyPlansStore: dir,
+	gs := gatewayserver.New(c, &gatewayserver.Config{
+		FileFrequencyPlansStore: dir,
 	})
-	a.So(err, should.BeNil)
 
 	roles := gs.Roles()
 	a.So(len(roles), should.Equal, 1)
@@ -106,14 +81,16 @@ func TestLink(t *testing.T) {
 
 	var client ttnpb.GtwGsClient
 	srv := grpc.NewServer()
-	gs, err := gatewayserver.New(c, &gatewayserver.Config{LocalFrequencyPlansStore: dir})
-	a.So(err, should.BeNil)
+
+	gs := gatewayserver.New(c, &gatewayserver.Config{FileFrequencyPlansStore: dir})
 
 	// Initializing server and client
 	{
 		gs.RegisterServices(srv)
-		err = gs.Start()
-		a.So(err, should.BeNil)
+		err := gs.Start()
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
 		defer gs.Close()
 
 		md := rpcmetadata.MD{ID: registeredGatewayID}

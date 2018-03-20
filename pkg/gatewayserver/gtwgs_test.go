@@ -21,10 +21,9 @@ func TestGetFrequencyPlan(t *testing.T) {
 	defer removeFPStore(a, dir)
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{})
-	gs, err := gatewayserver.New(c, &gatewayserver.Config{
-		LocalFrequencyPlansStore: dir,
+	gs := gatewayserver.New(c, &gatewayserver.Config{
+		FileFrequencyPlansStore: dir,
 	})
-	a.So(err, should.BeNil)
 
 	fp, err := gs.GetFrequencyPlan(context.Background(), &ttnpb.FrequencyPlanRequest{FrequencyPlanID: "EU_863_870"})
 	a.So(err, should.BeNil)

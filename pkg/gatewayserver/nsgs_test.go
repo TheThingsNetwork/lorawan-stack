@@ -22,12 +22,11 @@ func TestScheduleDownlinkUnregisteredGateway(t *testing.T) {
 	defer removeFPStore(a, dir)
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{})
-	gs, err := gatewayserver.New(c, &gatewayserver.Config{
-		LocalFrequencyPlansStore: dir,
+	gs := gatewayserver.New(c, &gatewayserver.Config{
+		FileFrequencyPlansStore: dir,
 	})
-	a.So(err, should.BeNil)
 
-	_, err = gs.ScheduleDownlink(context.Background(), &ttnpb.DownlinkMessage{
+	_, err := gs.ScheduleDownlink(context.Background(), &ttnpb.DownlinkMessage{
 		TxMetadata: ttnpb.TxMetadata{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 				GatewayID: "unknown-downlink",

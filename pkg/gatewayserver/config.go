@@ -2,28 +2,26 @@
 
 package gatewayserver
 
-import "github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
+import (
+	"github.com/TheThingsNetwork/ttn/pkg/fetch"
+	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
+)
 
 // Config represents the GatewayServer configuration.
 type Config struct {
-	LocalFrequencyPlansStore    string `name:"frequency-plans-dir" description:"Directory where the frequency plans are stored"`
-	HTTPFrequencyPlansStoreRoot string `name:"frequency-plans-uri" description:"URI from where the frequency plans will be fetched, if no directory is specified"`
+	FileFrequencyPlansStore string `name:"frequency-plans-dir" description:"Directory where the frequency plans are stored"`
+	HTTPFrequencyPlansStore string `name:"frequency-plans-uri" description:"URI from where the frequency plans will be fetched, if no directory is specified"`
 
 	NSTags []string `name:"network-servers.tags" description:"Network server tags to accept to connect to"`
 }
 
-func (conf Config) store() (fpStore frequencyplans.Store, err error) {
-	defer func() {
-		if err == nil {
-			fpStore = frequencyplans.Cache(fpStore, frequencyPlansCacheDuration)
-		}
-	}()
-
-	if conf.LocalFrequencyPlansStore != "" {
-		fpStore, err = frequencyplans.ReadFileSystemStore(frequencyplans.FileSystemRootPathOption(conf.LocalFrequencyPlansStore))
-		return
+func (conf Config) store() frequencyplans.Store {
+	store := frequencyplans.NewStore(fetch.FromGitHubRepository("TheThingsNetwork/gateway-conf", "yaml-master", "", true))
+	if conf.FileFrequencyPlansStore != "" {
+		store.Fetcher = fetch.FromFilesystem(conf.FileFrequencyPlansStore)
+	} else if conf.HTTPFrequencyPlansStore != "" {
+		store.Fetcher = fetch.FromHTTP(conf.HTTPFrequencyPlansStore, true)
 	}
 
-	fpStore, err = frequencyplans.RetrieveHTTPStore(frequencyplans.BaseURIOption(conf.HTTPFrequencyPlansStoreRoot))
-	return
+	return store
 }

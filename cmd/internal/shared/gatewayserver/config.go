@@ -2,12 +2,7 @@
 
 package shared
 
-import (
-	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
-)
+import "github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
 
-// DefaultGatewayServerConfig is the default configuration for the GatewayServer
-var DefaultGatewayServerConfig = gatewayserver.Config{
-	HTTPFrequencyPlansStoreRoot: frequencyplans.DefaultBaseURL,
-}
+// DefaultGatewayServerConfig is the default configuration for the GatewayServer.
+var DefaultGatewayServerConfig = gatewayserver.Config{}
