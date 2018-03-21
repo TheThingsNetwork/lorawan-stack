@@ -36,12 +36,12 @@ func (key AES128Key) MarshalTo(data []byte) (int, error) { return marshalBinaryB
 func (key *AES128Key) Unmarshal(data []byte) error { return key.UnmarshalBinary(data) }
 
 // MarshalJSON implements the json.Marshaler interface.
-func (key AES128Key) MarshalJSON() ([]byte, error) { return marshalJSONBytes(key[:]) }
+func (key AES128Key) MarshalJSON() ([]byte, error) { return marshalJSONHexBytes(key[:]) }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (key *AES128Key) UnmarshalJSON(data []byte) error {
 	*key = [16]byte{}
-	return unmarshalJSONBytes(key[:], data)
+	return unmarshalJSONHexBytes(key[:], data)
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.

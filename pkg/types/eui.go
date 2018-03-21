@@ -3,10 +3,11 @@
 package types
 
 import (
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
+
 	"database/sql/driver"
 	"encoding/binary"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"math"
 	"strconv"
@@ -41,12 +42,12 @@ func (eui EUI64) MarshalTo(data []byte) (int, error) { return marshalBinaryBytes
 func (eui *EUI64) Unmarshal(data []byte) error { return eui.UnmarshalBinary(data) }
 
 // MarshalJSON implements the json.Marshaler interface.
-func (eui EUI64) MarshalJSON() ([]byte, error) { return marshalJSONBytes(eui[:]) }
+func (eui EUI64) MarshalJSON() ([]byte, error) { return marshalJSONHexBytes(eui[:]) }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (eui *EUI64) UnmarshalJSON(data []byte) error {
 	*eui = [8]byte{}
-	return unmarshalJSONBytes(eui[:], data)
+	return unmarshalJSONHexBytes(eui[:], data)
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.
@@ -188,7 +189,10 @@ func (prefix *EUI64Prefix) Unmarshal(data []byte) error { return prefix.Unmarsha
 
 // MarshalJSON implements the json.Marshaler interface.
 func (prefix EUI64Prefix) MarshalJSON() ([]byte, error) {
-	return append([]byte(`"`+base64Encoding.EncodeToString(prefix.EUI64[:])), '/', prefix.Length, '"'), nil
+	result := append([]byte(`"`+hex.EncodeToString(prefix.EUI64[:])), '/')
+	length := strconv.Itoa(int(prefix.Length))
+	result = append(result, []byte(length)...)
+	return append(result, '"'), nil
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -197,21 +201,30 @@ func (prefix *EUI64Prefix) UnmarshalJSON(data []byte) error {
 		*prefix = EUI64Prefix{}
 		return nil
 	}
-	if len(data) != 16 {
+	if len(data) != 20 && len(data) != 21 {
 		return ErrInvalidLength
 	}
-	if data[13] != '/' {
+	if data[0] != '"' || data[len(data)-1] != '"' {
+		return ErrInvalidJSONString.New(errors.Attributes{
+			"json_string": string(data),
+		})
+	}
+	if data[17] != '/' {
 		return ErrInvalidEUI64Prefix
 	}
-	b := make([]byte, base64Encoding.DecodedLen(16))
-	n, err := base64Encoding.Decode(b, data[1:13])
+	b := make([]byte, hex.DecodedLen(16))
+	n, err := hex.Decode(b, data[1:17])
 	if err != nil {
 		return err
 	}
 	if n != 8 || copy(prefix.EUI64[:], b) != 8 {
 		return ErrInvalidEUI64Prefix
 	}
-	prefix.Length = data[14]
+	length, err := strconv.Atoi(string(data[18 : len(data)-1]))
+	if err != nil {
+		return err
+	}
+	prefix.Length = uint8(length)
 	return nil
 }
 

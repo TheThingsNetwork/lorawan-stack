@@ -38,12 +38,12 @@ func (id NetID) MarshalTo(data []byte) (int, error) { return marshalBinaryBytesT
 func (id *NetID) Unmarshal(data []byte) error { return id.UnmarshalBinary(data) }
 
 // MarshalJSON implements the json.Marshaler interface.
-func (id NetID) MarshalJSON() ([]byte, error) { return marshalJSONBytes(id[:]) }
+func (id NetID) MarshalJSON() ([]byte, error) { return marshalJSONHexBytes(id[:]) }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (id *NetID) UnmarshalJSON(data []byte) error {
 	*id = [3]byte{}
-	return unmarshalJSONBytes(id[:], data)
+	return unmarshalJSONHexBytes(id[:], data)
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.

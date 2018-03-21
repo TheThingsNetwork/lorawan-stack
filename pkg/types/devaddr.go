@@ -3,10 +3,11 @@
 package types
 
 import (
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
+
 	"database/sql/driver"
 	"encoding/binary"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"math"
 	"strconv"
@@ -47,12 +48,12 @@ func (addr DevAddr) MarshalTo(data []byte) (int, error) { return marshalBinaryBy
 func (addr *DevAddr) Unmarshal(data []byte) error { return addr.UnmarshalBinary(data) }
 
 // MarshalJSON implements the json.Marshaler interface.
-func (addr DevAddr) MarshalJSON() ([]byte, error) { return marshalJSONBytes(addr[:]) }
+func (addr DevAddr) MarshalJSON() ([]byte, error) { return marshalJSONHexBytes(addr[:]) }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (addr *DevAddr) UnmarshalJSON(data []byte) error {
 	*addr = [4]byte{}
-	return unmarshalJSONBytes(addr[:], data)
+	return unmarshalJSONHexBytes(addr[:], data)
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.
@@ -332,7 +333,9 @@ func (prefix *DevAddrPrefix) Unmarshal(data []byte) error { return prefix.Unmars
 
 // MarshalJSON implements the json.Marshaler interface.
 func (prefix DevAddrPrefix) MarshalJSON() ([]byte, error) {
-	return append([]byte(`"`+base64Encoding.EncodeToString(prefix.DevAddr[:])), '/', prefix.Length, '"'), nil
+	str := append([]byte(`"`+hex.EncodeToString(prefix.DevAddr[:])), '/')
+	str = append(str, []byte(fmt.Sprintf("%d", prefix.Length))...)
+	return append(str, '"'), nil
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -341,21 +344,30 @@ func (prefix *DevAddrPrefix) UnmarshalJSON(data []byte) error {
 		*prefix = DevAddrPrefix{}
 		return nil
 	}
-	if len(data) != 12 {
+	if len(data) != 12 && len(data) != 13 {
 		return ErrInvalidLength
+	}
+	if data[0] != '"' || data[len(data)-1] != '"' {
+		return ErrInvalidJSONString.New(errors.Attributes{
+			"json_string": string(data),
+		})
 	}
 	if data[9] != '/' {
 		return ErrInvalidDevAddrPrefix
 	}
-	b := make([]byte, base64Encoding.DecodedLen(8))
-	n, err := base64Encoding.Decode(b, data[1:9])
+	b := make([]byte, hex.DecodedLen(8))
+	n, err := hex.Decode(b, data[1:9])
 	if err != nil {
 		return err
 	}
 	if n != 4 || copy(prefix.DevAddr[:], b) != 4 {
 		return ErrInvalidDevAddrPrefix
 	}
-	prefix.Length = data[10]
+	length, err := strconv.Atoi(string(data[10 : len(data)-1]))
+	if err != nil {
+		return err
+	}
+	prefix.Length = uint8(length)
 	return nil
 }
 

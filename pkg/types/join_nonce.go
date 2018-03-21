@@ -36,12 +36,12 @@ func (jn JoinNonce) MarshalTo(data []byte) (int, error) { return marshalBinaryBy
 func (jn *JoinNonce) Unmarshal(data []byte) error { return jn.UnmarshalBinary(data) }
 
 // MarshalJSON implements the json.Marshaler interface.
-func (jn JoinNonce) MarshalJSON() ([]byte, error) { return marshalJSONBytes(jn[:]) }
+func (jn JoinNonce) MarshalJSON() ([]byte, error) { return marshalJSONHexBytes(jn[:]) }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (jn *JoinNonce) UnmarshalJSON(data []byte) error {
 	*jn = [3]byte{}
-	return unmarshalJSONBytes(jn[:], data)
+	return unmarshalJSONHexBytes(jn[:], data)
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.

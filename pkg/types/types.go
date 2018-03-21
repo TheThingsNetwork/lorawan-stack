@@ -4,11 +4,11 @@
 package types
 
 import (
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
+
 	"bytes"
 	"database/sql/driver"
-	"encoding/base64"
 	"encoding/hex"
-	"errors"
 )
 
 // Interface all types in pkg/types must implement.
@@ -36,30 +36,39 @@ var ErrInvalidLength = errors.New("invalid length")
 // ErrTypeAssertion can be returned when trying to assert one variable.
 var ErrTypeAssertion = errors.New("invalid type assertion")
 
-var base64Encoding = base64.StdEncoding
+// ErrInvalidJSONString is returned when an invalid JSON string is passed as an argument.
+var ErrInvalidJSONString = &errors.ErrDescriptor{
+	MessageFormat:  "Invalid JSON string: `{json_string}`",
+	Code:           1,
+	Type:           errors.InvalidArgument,
+	SafeAttributes: []string{"json_string"},
+}
 
-func marshalJSONBytes(data []byte) ([]byte, error) {
-	n := 2 + base64.StdEncoding.EncodedLen(len(data))
-	b := make([]byte, n-1, n)
-	b[0] = '"'
-	base64.StdEncoding.Encode(b[1:], data)
+func init() {
+	ErrInvalidJSONString.Register()
+}
+
+func marshalJSONHexBytes(data []byte) ([]byte, error) {
+	hexData, err := marshalTextBytes(data)
+	if err != nil {
+		return nil, err
+	}
+	b := []byte{'"'}
+	b = append(b, hexData...)
 	return append(b, '"'), nil
 }
 
-func unmarshalJSONBytes(dst, data []byte) error {
+func unmarshalJSONHexBytes(dst, data []byte) error {
 	if string(data) == `""` {
 		return nil
 	}
 
-	b := make([]byte, base64.StdEncoding.DecodedLen(len(data)-2))
-	n, err := base64Encoding.Decode(b, data[1:len(data)-1])
-	if err != nil {
-		return err
+	if len(data) < 2 || data[0] != '"' || data[len(data)-1] != '"' {
+		return ErrInvalidJSONString.New(errors.Attributes{
+			"json_string": string(data),
+		})
 	}
-	if n != len(dst) || copy(dst, b) != len(dst) {
-		return ErrInvalidLength
-	}
-	return nil
+	return unmarshalTextBytes(dst, data[1:len(data)-1])
 }
 
 func marshalTextBytes(data []byte) ([]byte, error) {

@@ -36,12 +36,12 @@ func (dn DevNonce) MarshalTo(data []byte) (int, error) { return marshalBinaryByt
 func (dn *DevNonce) Unmarshal(data []byte) error { return dn.UnmarshalBinary(data) }
 
 // MarshalJSON implements the json.Marshaler interface.
-func (dn DevNonce) MarshalJSON() ([]byte, error) { return marshalJSONBytes(dn[:]) }
+func (dn DevNonce) MarshalJSON() ([]byte, error) { return marshalJSONHexBytes(dn[:]) }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (dn *DevNonce) UnmarshalJSON(data []byte) error {
 	*dn = [2]byte{}
-	return unmarshalJSONBytes(dn[:], data)
+	return unmarshalJSONHexBytes(dn[:], data)
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.

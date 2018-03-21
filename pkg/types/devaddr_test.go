@@ -3,6 +3,7 @@
 package types
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -115,12 +116,37 @@ func TestDevAddrPrefix(t *testing.T) {
 	prefix := DevAddrPrefix{DevAddr{0x26}, 7}
 	a.So(prefix.Matches(devAddr), should.BeTrue)
 
-	devAddr = DevAddr{1, 2, 3, 4}
-	a.So(devAddr.HasPrefix(DevAddrPrefix{DevAddr{0, 0, 0, 0}, 0}), should.BeTrue)
-	a.So(devAddr.HasPrefix(DevAddrPrefix{DevAddr{1, 2, 3, 0}, 24}), should.BeTrue)
-	a.So(devAddr.HasPrefix(DevAddrPrefix{DevAddr{2, 2, 3, 4}, 31}), should.BeFalse)
-	a.So(devAddr.HasPrefix(DevAddrPrefix{DevAddr{1, 1, 3, 4}, 31}), should.BeFalse)
-	a.So(devAddr.HasPrefix(DevAddrPrefix{DevAddr{1, 1, 1, 1}, 15}), should.BeFalse)
+	// HasPrefix
+	{
+		devAddr = DevAddr{1, 2, 3, 4}
+		a.So(devAddr.HasPrefix(DevAddrPrefix{DevAddr{0, 0, 0, 0}, 0}), should.BeTrue)
+		a.So(devAddr.HasPrefix(DevAddrPrefix{DevAddr{1, 2, 3, 0}, 24}), should.BeTrue)
+		a.So(devAddr.HasPrefix(DevAddrPrefix{DevAddr{2, 2, 3, 4}, 31}), should.BeFalse)
+		a.So(devAddr.HasPrefix(DevAddrPrefix{DevAddr{1, 1, 3, 4}, 31}), should.BeFalse)
+		a.So(devAddr.HasPrefix(DevAddrPrefix{DevAddr{1, 1, 1, 1}, 15}), should.BeFalse)
+	}
+
+	// JSON marshalling
+	{
+		content, err := json.Marshal(prefix)
+		if !a.So(err, should.BeNil) {
+			panic(err)
+		}
+
+		strContent := string(content)
+		a.So(strContent, should.ContainSubstring, "26000000/7")
+	}
+
+	// JSON unmarshalling
+	{
+		strContent := `"26000000/7"`
+		err := json.Unmarshal([]byte(strContent), &prefix)
+		if !a.So(err, should.BeNil) {
+			panic(err)
+		}
+
+		a.So(prefix, should.Equal, DevAddrPrefix{DevAddr{0x26}, 7})
+	}
 }
 
 func ExampleDevAddr_MarshalText() {
