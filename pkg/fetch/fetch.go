@@ -5,5 +5,5 @@ package fetch
 
 // Interface is an abstraction for file retrieval.
 type Interface interface {
-	File(path string) ([]byte, error)
+	File(pathElements ...string) ([]byte, error)
 }

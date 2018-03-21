@@ -20,14 +20,15 @@ func FromFilesystem(basePath string) Interface {
 	return fsFetcher{basePath: basePath}
 }
 
-func (f fsFetcher) File(path string) ([]byte, error) {
-	content, err := ioutil.ReadFile(filepath.Join(f.basePath, path))
+func (f fsFetcher) File(pathElements ...string) ([]byte, error) {
+	allElements := append([]string{f.basePath}, pathElements...)
+	content, err := ioutil.ReadFile(filepath.Join(allElements...))
 	if err == nil {
 		return content, nil
 	}
 
 	attributes := errors.Attributes{
-		"filename": path,
+		"filename": filepath.Join(pathElements...),
 	}
 	switch err := err.(type) {
 	case *os.PathError:

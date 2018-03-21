@@ -3,9 +3,9 @@
 package fetch
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors/httperrors"
 	"github.com/gregjones/httpcache"
@@ -16,8 +16,9 @@ type httpFetcher struct {
 	transport *http.Client
 }
 
-func (f httpFetcher) File(path string) ([]byte, error) {
-	url := fmt.Sprintf("%s/%s", f.baseURL, path)
+func (f httpFetcher) File(pathElements ...string) ([]byte, error) {
+	allElements := append([]string{f.baseURL}, pathElements...)
+	url := strings.Join(allElements, "/")
 	resp, err := f.transport.Get(url)
 	if err != nil {
 		return nil, err
