@@ -94,23 +94,25 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 		}
 	}()
 
+	go func() {
+		<-ctx.Done()
+		// TODO: Add tenant extraction when #433 is merged
+		stopCtx, cancel := context.WithTimeout(g.Context(), time.Minute)
+		stopServingGatewayFn := func(nsClient ttnpb.GsNsClient) error {
+			_, err := nsClient.StopServingGateway(stopCtx, &id)
+			return err
+		}
+		if err := g.forAllNS(stopServingGatewayFn); err != nil {
+			logger.WithError(err).Errorf("Could not signal NS when gateway disconnected")
+		}
+		cancel()
+	}()
+
 	ctx = log.WithLogger(ctx, logger)
 	for {
 		select {
 		case <-ctx.Done():
 			logger.WithError(ctx.Err()).Warn("Stopped serving Rx packets")
-			go func() {
-				// TODO: Add tenant extraction when #433 is merged
-				stopCtx, cancel := context.WithTimeout(g.Context(), time.Minute)
-				stopServingGatewayFn := func(nsClient ttnpb.GsNsClient) error {
-					_, err := nsClient.StopServingGateway(stopCtx, &id)
-					return err
-				}
-				if err := g.forAllNS(stopServingGatewayFn); err != nil {
-					logger.WithError(err).Errorf("Could not signal NS when gateway disconnected")
-				}
-				cancel()
-			}()
 			return ctx.Err()
 		case upstream, ok := <-result:
 			if !ok {

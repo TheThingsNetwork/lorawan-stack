@@ -5,6 +5,7 @@ package gatewayserver_test
 import (
 	"context"
 	"net"
+	"sync"
 
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -13,28 +14,26 @@ import (
 
 // GsNsServer implements ttnpb.GsNsServer
 type GsNsServer struct {
-	nbStartServingGateway uint8
-	nbStopServingGateway  uint8
-	nbHandleUplink        uint8
+	*sync.WaitGroup
 }
 
-func (s *GsNsServer) StartServingGateway(_ context.Context, id *ttnpb.GatewayIdentifier) (*types.Empty, error) {
-	s.nbStartServingGateway = s.nbStartServingGateway + 1
+func (s GsNsServer) StartServingGateway(_ context.Context, id *ttnpb.GatewayIdentifier) (*types.Empty, error) {
+	s.Done()
 	return &types.Empty{}, nil
 }
 
-func (s *GsNsServer) StopServingGateway(_ context.Context, id *ttnpb.GatewayIdentifier) (*types.Empty, error) {
-	s.nbStopServingGateway = s.nbStopServingGateway + 1
+func (s GsNsServer) StopServingGateway(_ context.Context, id *ttnpb.GatewayIdentifier) (*types.Empty, error) {
+	s.Done()
 	return &types.Empty{}, nil
 }
 
-func (s *GsNsServer) HandleUplink(_ context.Context, up *ttnpb.UplinkMessage) (*types.Empty, error) {
-	s.nbHandleUplink = s.nbHandleUplink + 1
+func (s GsNsServer) HandleUplink(_ context.Context, up *ttnpb.UplinkMessage) (*types.Empty, error) {
+	s.Done()
 	return &types.Empty{}, nil
 }
 
-func StartMockGsNsServer(ctx context.Context) (*GsNsServer, string) {
-	ns := &GsNsServer{}
+func StartMockGsNsServer(ctx context.Context) (GsNsServer, string) {
+	ns := GsNsServer{WaitGroup: &sync.WaitGroup{}}
 
 	serve := func(ctx context.Context, addr string) string {
 		srv := rpcserver.New(ctx)

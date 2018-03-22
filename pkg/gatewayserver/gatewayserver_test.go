@@ -6,7 +6,6 @@ import (
 	"context"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
@@ -147,18 +146,10 @@ func TestLink(t *testing.T) {
 
 	linkCtx, linkCancel := context.WithCancel(ctx)
 	defer linkCancel()
+	ns.Add(1)
 	link, err := client.Link(linkCtx, grpc.FailFast(true))
 	a.So(err, should.BeNil)
-
-	for startTime := time.Now(); time.Now().Sub(startTime) < 10*time.Second; time.Sleep(5 * time.Millisecond) {
-		if ns.nbStartServingGateway == 1 {
-			break
-		}
-	}
-	if !a.So(ns.nbStartServingGateway, should.Equal, 1) {
-		t.Log("The network server did not receive the StartServingGateway signal. Make sure that the link between the gateway and the gateway server was successfully established.")
-		return
-	}
+	ns.Wait()
 
 	// Sending empty uplink
 	{
@@ -170,22 +161,14 @@ func TestLink(t *testing.T) {
 
 	// Sending uplink with content
 	{
+		ns.Add(1)
 		err = link.Send(&ttnpb.GatewayUp{
 			UplinkMessages: []*ttnpb.UplinkMessage{
 				{RawPayload: []byte{}, EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{DevAddr: &types.DevAddr{}}},
 			},
 		})
 		a.So(err, should.BeNil)
-
-		for startTime := time.Now(); time.Now().Sub(startTime) < 10*time.Second; time.Sleep(5 * time.Millisecond) {
-			if ns.nbHandleUplink == 1 {
-				break
-			}
-		}
-		if !a.So(ns.nbHandleUplink, should.Equal, 1) {
-			t.Log("The network server did not receive the uplink. Make sure that the link between the gateway and the gateway server was successfully established.")
-			return
-		}
+		ns.Wait()
 	}
 
 	downlinkContent := []byte{1, 2, 3}
@@ -223,20 +206,9 @@ func TestLink(t *testing.T) {
 		a.So(obs, should.NotBeNil)
 	}
 
+	ns.Add(1)
 	linkCancel()
+	ns.Done()
 
-	for startTime := time.Now(); time.Now().Sub(startTime) < 10*time.Second; time.Sleep(5 * time.Millisecond) {
-		if ns.nbStopServingGateway == 1 {
-			break
-		}
-	}
-	if !a.So(ns.nbStopServingGateway, should.Equal, 1) {
-		t.Log("The network server did not receive the StopServingGateway signal. Make sure that the link between the gateway and the gateway server was successfully established.")
-		return
-	}
-
-	_, err = gs.GetGatewayObservations(ctx, &ttnpb.GatewayIdentifier{GatewayID: registeredGatewayID})
-	a.So(err, should.NotBeNil) // gateway disconnected
-
-	defer gs.Close()
+	gs.Close()
 }
