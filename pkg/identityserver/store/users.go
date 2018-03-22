@@ -38,55 +38,56 @@ type UserSpecializer func(ttnpb.User) User
 // UserStore is a store that holds Users.
 type UserStore interface {
 	// Create creates an user.
-	Create(user User) error
+	Create(User) error
 
 	// GetByID finds the user by ID and retrieves it.
-	GetByID(userID string, specializer UserSpecializer) (User, error)
+	GetByID(ttnpb.UserIdentifiers, UserSpecializer) (User, error)
 
 	// GetByEmail finds the user by email address and retrieves it.
-	GetByEmail(email string, specializer UserSpecializer) (User, error)
+	// TODO(gomezjdaniel): include email field as part of `UserIdentifiers`.
+	GetByEmail(string, UserSpecializer) (User, error)
 
 	// List returns all the users.
-	List(specializer UserSpecializer) ([]User, error)
+	List(UserSpecializer) ([]User, error)
 
 	// Update updates an user.
-	Update(user User) error
+	Update(User) error
 
 	// TODO(gomezjdaniel#274): use sql 'ON DELETE CASCADE' when CockroachDB implements it.
 	// Delete deletes an user.
-	Delete(userID string) error
+	Delete(ttnpb.UserIdentifiers) error
 
 	// SaveValidationToken saves the validation token.
-	SaveValidationToken(userID string, token *ValidationToken) error
+	SaveValidationToken(ttnpb.UserIdentifiers, ValidationToken) error
 
 	// GetValidationToken retrieves the validation token.
-	GetValidationToken(token string) (string, *ValidationToken, error)
+	GetValidationToken(string) (ttnpb.UserIdentifiers, *ValidationToken, error)
 
 	// DeleteValidationToken deletes the validation token.
-	DeleteValidationToken(token string) error
+	DeleteValidationToken(string) error
 
 	// SaveAPIKey stores an API Key attached to an user.
-	SaveAPIKey(userID string, key *ttnpb.APIKey) error
+	SaveAPIKey(ttnpb.UserIdentifiers, ttnpb.APIKey) error
 
 	// GetAPIKey retrieves an API key by value and the user ID.
-	GetAPIKey(key string) (string, *ttnpb.APIKey, error)
+	GetAPIKey(string) (ttnpb.UserIdentifiers, ttnpb.APIKey, error)
 
 	// GetAPIKeyByName retrieves an API key from an user.
-	GetAPIKeyByName(userID, keyName string) (*ttnpb.APIKey, error)
+	GetAPIKeyByName(ttnpb.UserIdentifiers, string) (ttnpb.APIKey, error)
 
 	// UpdateAPIKeyRights updates the right of an API key.
-	UpdateAPIKeyRights(userID, keyName string, rights []ttnpb.Right) error
+	UpdateAPIKeyRights(ttnpb.UserIdentifiers, string, []ttnpb.Right) error
 
 	// ListAPIKey list all the API keys that an user has.
-	ListAPIKeys(userID string) ([]*ttnpb.APIKey, error)
+	ListAPIKeys(ttnpb.UserIdentifiers) ([]ttnpb.APIKey, error)
 
 	// DeleteAPIKey deletes a given API key from an user.
-	DeleteAPIKey(userID, keyName string) error
+	DeleteAPIKey(ttnpb.UserIdentifiers, string) error
 
 	// LoadAttributes loads all user attributes if the User is an Attributer.
-	LoadAttributes(userID string, user User) error
+	LoadAttributes(ttnpb.UserIdentifiers, User) error
 
 	// StoreAttributes writes all of the user attributes if the User is an
 	// Attributer and returns the written User in result.
-	StoreAttributes(userID string, user, result User) error
+	StoreAttributes(ttnpb.UserIdentifiers, User) error
 }

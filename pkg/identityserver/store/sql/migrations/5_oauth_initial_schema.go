@@ -5,20 +5,22 @@ package migrations
 func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS authorization_codes (
-			authorization_code   STRING(64) PRIMARY KEY,
-			client_id            STRING(36) NOT NULL REFERENCES clients(client_id),
+			id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			authorization_code   STRING(64) UNIQUE NOT NULL,
+			client_id            UUID NOT NULL REFERENCES clients(id),
 			created_at           TIMESTAMP NOT NULL DEFAULT current_timestamp(),
 			expires_in           INTEGER NOT NULL,
 			scope                STRING NOT NULL,
 			redirect_uri         STRING NOT NULL,
 			state                STRING NOT NULL,
-			user_id              STRING(36) NOT NULL REFERENCES users(user_id)
+			user_id              UUID NOT NULL REFERENCES users(id)
 		);
 
 		CREATE TABLE IF NOT EXISTS access_tokens (
-			access_token    STRING PRIMARY KEY,
-			client_id       STRING(36) NOT NULL REFERENCES clients(client_id),
-			user_id         STRING(36) NOT NULL REFERENCES users(user_id),
+			id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			access_token    STRING UNIQUE NOT NULL,
+			client_id       UUID NOT NULL REFERENCES clients(id),
+			user_id         UUID NOT NULL REFERENCES users(id),
 			created_at      TIMESTAMP NOT NULL DEFAULT current_timestamp(),
 			expires_in      INTEGER NOT NULL,
 			scope           STRING NOT NULL,
@@ -26,9 +28,10 @@ func init() {
 		);
 
 		CREATE TABLE IF NOT EXISTS refresh_tokens (
-			refresh_token   STRING(64) PRIMARY KEY,
-			client_id       STRING(36) NOT NULL REFERENCES clients(client_id),
-			user_id         STRING(36) NOT NULL REFERENCES users(user_id),
+			id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			refresh_token   STRING(64) UNIQUE NOT NULL,
+			client_id       UUID NOT NULL REFERENCES clients(id),
+			user_id         UUID NOT NULL REFERENCES users(id),
 			created_at      TIMESTAMP NOT NULL DEFAULT current_timestamp(),
 			scope           STRING NOT NULL,
 			redirect_uri    STRING NOT NULL

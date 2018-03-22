@@ -10,5 +10,5 @@ type SettingStore interface {
 	Get() (*ttnpb.IdentityServerSettings, error)
 
 	// Set sets the settings.
-	Set(*ttnpb.IdentityServerSettings) error
+	Set(ttnpb.IdentityServerSettings) error
 }

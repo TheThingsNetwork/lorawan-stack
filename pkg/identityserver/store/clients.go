@@ -23,28 +23,28 @@ type ClientSpecializer func(ttnpb.Client) Client
 // ClientStore is a store that holds authorized third party Clients.
 type ClientStore interface {
 	// Create creates a new Client.
-	Create(client Client) error
+	Create(Client) error
 
 	// GetByID finds a client by ID and retrieves it.
-	GetByID(clientID string, specializer ClientSpecializer) (Client, error)
+	GetByID(ttnpb.ClientIdentifiers, ClientSpecializer) (Client, error)
 
 	// List list all the clients.
-	List(specializer ClientSpecializer) ([]Client, error)
+	List(ClientSpecializer) ([]Client, error)
 
 	// ListByUser returns all the clients created by the user.
-	ListByUser(userID string, specializer ClientSpecializer) ([]Client, error)
+	ListByUser(ttnpb.UserIdentifiers, ClientSpecializer) ([]Client, error)
 
 	// Update updates the client.
-	Update(client Client) error
+	Update(Client) error
 
 	// TODO(gomezjdaniel#274): use sql 'ON DELETE CASCADE' when CockroachDB implements it.
 	// Delete deletes a client.
-	Delete(clientID string) error
+	Delete(ttnpb.ClientIdentifiers) error
 
 	// LoadAttributes loads extra attributes into the Client if it's an Attributer.
-	LoadAttributes(clientID string, client Client) error
+	LoadAttributes(ttnpb.ClientIdentifiers, Client) error
 
 	// StoreAttributes writes the extra attributes on the Client if it's an
 	// Attributer to the store.
-	StoreAttributes(clientID string, client, result Client) error
+	StoreAttributes(ttnpb.ClientIdentifiers, Client) error
 }

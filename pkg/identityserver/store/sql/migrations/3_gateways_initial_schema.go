@@ -5,7 +5,8 @@ package migrations
 func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS gateways (
-			gateway_id          STRING(36) PRIMARY KEY,
+			id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			gateway_id          STRING(36) UNIQUE NOT NULL,
 			description         STRING NOT NULL DEFAULT '',
 			frequency_plan_id   STRING(36) NOT NULL,
 			activated_at        TIMESTAMP DEFAULT NULL,
@@ -17,14 +18,14 @@ func init() {
 			updated_at          TIMESTAMP NOT NULL DEFAULT current_timestamp()
 		);
 		CREATE TABLE IF NOT EXISTS gateways_attributes (
-			gateway_id   STRING(36) NOT NULL REFERENCES gateways(gateway_id),
+			gateway_id   UUID NOT NULL REFERENCES gateways(id),
 			attribute    STRING NOT NULL,
 			value        STRING NOT NULL,
 			PRIMARY KEY(gateway_id, attribute)
 		);
 		CREATE TABLE IF NOT EXISTS gateways_antennas (
 			antenna_id   STRING DEFAULT to_hex(unique_rowid()) PRIMARY KEY,
-			gateway_id   STRING(36) NOT NULL REFERENCES gateways(gateway_id),
+			gateway_id   UUID NOT NULL REFERENCES gateways(id),
 			gain         FLOAT NOT NULL DEFAULT 0.0,
 			type         STRING NOT NULL DEFAULT '',
 			model        STRING NOT NULL DEFAULT '',
@@ -36,25 +37,25 @@ func init() {
 		);
 		CREATE TABLE IF NOT EXISTS gateways_radios (
 			radio_id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			gateway_id         STRING(36) NOT NULL REFERENCES gateways(gateway_id),
+			gateway_id         UUID NOT NULL REFERENCES gateways(id),
 			frequency          INT NOT NULL CHECK (frequency > 0),
 			tx_configuration   STRING DEFAULT NULL,
 			created_at         TIMESTAMP NOT NULL DEFAULT current_timestamp()
 		);
 		CREATE TABLE IF NOT EXISTS gateways_collaborators (
-			gateway_id   STRING(36) REFERENCES gateways(gateway_id),
-			account_id   STRING(36) REFERENCES accounts(account_id),
+			gateway_id   UUID NOT NULL REFERENCES gateways(id),
+			account_id   UUID NOT NULL REFERENCES accounts(id),
 			"right"      STRING NOT NULL,
 			PRIMARY KEY(gateway_id, account_id, "right")
 		);
 		CREATE TABLE IF NOT EXISTS gateways_api_keys (
-			key          STRING NOT NULL PRIMARY KEY,
-			gateway_id   STRING(36) NOT NULL REFERENCES gateways(gateway_id),
+			gateway_id   UUID NOT NULL REFERENCES gateways(id),
 			key_name     STRING(36) NOT NULL,
-			UNIQUE(gateway_id, key_name)
+			key          STRING UNIQUE NOT NULL,
+			PRIMARY KEY(gateway_id, key_name)
 		);
 		CREATE TABLE IF NOT EXISTS gateways_api_keys_rights (
-			gateway_id   STRING(36) NOT NULL REFERENCES gateways(gateway_id),
+			gateway_id   UUID NOT NULL REFERENCES gateways(id),
 			key_name     STRING(36) NOT NULL,
 			"right"      STRING NOT NULL,
 			PRIMARY KEY(gateway_id, key_name, "right")

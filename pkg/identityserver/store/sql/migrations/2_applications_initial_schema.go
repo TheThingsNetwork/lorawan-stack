@@ -5,26 +5,27 @@ package migrations
 func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS applications (
-			application_id   STRING(36) PRIMARY KEY,
+			id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			application_id   STRING(36) UNIQUE NOT NULL,
 			description      STRING NOT NULL DEFAULT '',
 			created_at       TIMESTAMP NOT NULL DEFAULT current_timestamp(),
 			updated_at       TIMESTAMP NOT NULL DEFAULT current_timestamp()
 		);
 		CREATE TABLE IF NOT EXISTS applications_api_keys (
-			key              STRING NOT NULL PRIMARY KEY,
-			application_id   STRING(36) NOT NULL REFERENCES applications(application_id),
+			application_id   UUID NOT NULL REFERENCES applications(id),
 			key_name         STRING(36) NOT NULL,
-			UNIQUE(application_id, key_name)
+			key              STRING UNIQUE NOT NULL,
+			PRIMARY KEY(application_id, key_name)
 		);
 		CREATE TABLE IF NOT EXISTS applications_api_keys_rights (
-			application_id   STRING(36) NOT NULL REFERENCES applications(application_id),
+			application_id   UUID NOT NULL REFERENCES applications(id),
 			key_name         STRING(36) NOT NULL,
 			"right"          STRING NOT NULL,
 			PRIMARY KEY(application_id, key_name, "right")
 		);
 		CREATE TABLE IF NOT EXISTS applications_collaborators (
-			application_id   STRING(36) REFERENCES applications(application_id),
-			account_id       STRING(36) REFERENCES accounts(account_id),
+			application_id   UUID NOT NULL REFERENCES applications(id),
+			account_id       UUID NOT NULL REFERENCES accounts(id),
 			"right"          STRING NOT NULL,
 			PRIMARY KEY(application_id, account_id, "right")
 		);

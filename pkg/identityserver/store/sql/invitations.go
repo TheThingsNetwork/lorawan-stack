@@ -20,11 +20,11 @@ func NewInvitationStore(store storer) *InvitationStore {
 }
 
 // Save saves the invitation.
-func (s *InvitationStore) Save(data *store.InvitationData) error {
+func (s *InvitationStore) Save(data store.InvitationData) error {
 	return s.save(s.queryer(), data)
 }
 
-func (s *InvitationStore) save(q db.QueryContext, data *store.InvitationData) error {
+func (s *InvitationStore) save(q db.QueryContext, data store.InvitationData) error {
 	_, err := q.NamedExec(
 		`INSERT
 			INTO invitations (

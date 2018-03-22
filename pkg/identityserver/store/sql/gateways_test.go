@@ -1,11 +1,12 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package sql
+package sql_test
 
 import (
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
@@ -16,400 +17,159 @@ var gatewaySpecializer = func(base ttnpb.Gateway) store.Gateway {
 	return &base
 }
 
-func testGateways() map[string]*ttnpb.Gateway {
-	return map[string]*ttnpb.Gateway{
-		"test-gateway": {
-			GatewayIdentifier: ttnpb.GatewayIdentifier{GatewayID: "test-gateway"},
-			Description:       "My description",
-			Platform:          "Kerklink",
-			Attributes: map[string]string{
-				"foo": "bar",
-			},
-			FrequencyPlanID: "868_3",
-			Antennas: []ttnpb.GatewayAntenna{
-				{
-					Location: ttnpb.Location{
-						Latitude:  11.11,
-						Longitude: 22.22,
-						Altitude:  10,
-					},
-				},
+func TestGateways(t *testing.T) {
+	a := assertions.New(t)
+	s := testStore(t)
+
+	gateway := &ttnpb.Gateway{
+		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
+		Description:        "My description",
+		Platform:           "Kerklink",
+		Attributes: map[string]string{
+			"foo": "bar",
+		},
+		FrequencyPlanID: "868_3",
+		Radios: []ttnpb.GatewayRadio{
+			{
+				Frequency: 10,
 			},
 		},
-		"bob-gateway": {
-			GatewayIdentifier: ttnpb.GatewayIdentifier{GatewayID: "bob-gateway"},
-			Description:       "My description",
-			Attributes: map[string]string{
-				"Modulation": "12345",
-				"RFCH":       "111",
-			},
-			FrequencyPlanID: "868_3",
-			ClusterAddress:  "network.eu",
-			Antennas: []ttnpb.GatewayAntenna{
-				{
-					Gain: 12.12,
-				},
-			},
-			Radios: []ttnpb.GatewayRadio{
-				{
-					Frequency: 10,
+		ContactAccount: &ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &alice.UserIdentifiers}},
+		Antennas: []ttnpb.GatewayAntenna{
+			{
+				Location: ttnpb.Location{
+					Latitude:  11.11,
+					Longitude: 22.22,
+					Altitude:  10,
 				},
 			},
 		},
 	}
-}
 
-func TestGatewayCreate(t *testing.T) {
-	a := assertions.New(t)
-	s := testStore(t, database)
-
-	gateways := testGateways()
-
-	for _, gtw := range gateways {
-		err := s.Gateways.Create(gtw)
-		a.So(err, should.BeNil)
-	}
-
-	// Attempt to recreate them should throw an error
-	for _, gtw := range gateways {
-		err := s.Gateways.Create(gtw)
-		a.So(err, should.NotBeNil)
-		a.So(ErrGatewayIDTaken.Describes(err), should.BeTrue)
-	}
-}
-
-func TestGatewayAPIKeys(t *testing.T) {
-	a := assertions.New(t)
-	s := testStore(t, database)
-
-	gtwID := testGateways()["test-gateway"].GatewayID
-	key := &ttnpb.APIKey{
-		Key:    "abcabcabc",
-		Name:   "foo",
-		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
-	}
-
-	list, err := s.Gateways.ListAPIKeys(gtwID)
-	a.So(err, should.BeNil)
-	a.So(list, should.HaveLength, 0)
-
-	err = s.Gateways.SaveAPIKey(gtwID, key)
+	err := s.Gateways.Create(gateway)
 	a.So(err, should.BeNil)
 
-	key2 := &ttnpb.APIKey{
-		Key:    "123abc",
-		Name:   "foo",
-		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
-	}
-	err = s.Gateways.SaveAPIKey(gtwID, key2)
+	err = s.Gateways.Create(gateway)
 	a.So(err, should.NotBeNil)
-	a.So(ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
+	a.So(ErrGatewayIDTaken.Describes(err), should.BeTrue)
 
-	found, err := s.Gateways.GetAPIKeyByName(gtwID, key.Name)
+	found, err := s.Gateways.GetByID(gateway.GatewayIdentifiers, gatewaySpecializer)
 	a.So(err, should.BeNil)
-	a.So(found, should.Resemble, key)
+	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gateway)
 
-	key.Rights = append(key.Rights, ttnpb.Right(5))
-	err = s.Gateways.UpdateAPIKeyRights(gtwID, key.Name, key.Rights)
-	a.So(err, should.BeNil)
-
-	list, err = s.Gateways.ListAPIKeys(gtwID)
-	a.So(err, should.BeNil)
-	if a.So(list, should.HaveLength, 1) {
-		a.So(list[0], should.Resemble, key)
-	}
-
-	err = s.Gateways.DeleteAPIKey(gtwID, key.Name)
+	gateway.Description = ""
+	err = s.Gateways.Update(gateway)
 	a.So(err, should.BeNil)
 
-	found, err = s.Gateways.GetAPIKeyByName(gtwID, key.Name)
-	a.So(err, should.NotBeNil)
-	a.So(ErrAPIKeyNotFound.Describes(err), should.BeTrue)
-	a.So(found, should.BeNil)
-}
-
-func TestGatewayAttributes(t *testing.T) {
-	a := assertions.New(t)
-	s := testStore(t, database)
-
-	gtw := testGateways()["bob-gateway"]
-
-	// fetch gateway and check that the attributes has been registered
-	{
-		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewaySpecializer)
-		a.So(err, should.BeNil)
-		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
-	}
-
-	attributeKey := "Foo"
-
-	// add attribute
-	{
-		gtw.Attributes[attributeKey] = "bar"
-		err := s.Gateways.Update(gtw)
-		a.So(err, should.BeNil)
-		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewaySpecializer)
-		a.So(err, should.BeNil)
-		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
-	}
-
-	// delete attribute
-	{
-		delete(gtw.Attributes, attributeKey)
-		err := s.Gateways.Update(gtw)
-		a.So(err, should.BeNil)
-		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewaySpecializer)
-		a.So(err, should.BeNil)
-		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
-
-	}
-}
-
-func TestGatewayAntennas(t *testing.T) {
-	a := assertions.New(t)
-	s := testStore(t, database)
-
-	gtw := testGateways()["bob-gateway"]
-
-	// check that all antennas were registered
-	{
-		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewaySpecializer)
-		a.So(err, should.BeNil)
-		if a.So(found.GetGateway().Antennas, should.HaveLength, 1) {
-			a.So(found.GetGateway().Antennas[0], should.Resemble, gtw.Antennas[0])
-			gtw = found.GetGateway()
-		}
-	}
-
-	// add a new antenna
-	{
-		gtw.Antennas = append(gtw.Antennas, ttnpb.GatewayAntenna{Gain: 12.12})
-		err := s.Gateways.Update(gtw)
-		a.So(err, should.BeNil)
-
-		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewaySpecializer)
-		a.So(err, should.BeNil)
-		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
-	}
-
-	// delete previously added antenna
-	{
-		gtw.Antennas = gtw.Antennas[:1]
-
-		err := s.Gateways.Update(gtw)
-		a.So(err, should.BeNil)
-
-		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewaySpecializer)
-		a.So(err, should.BeNil)
-		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
-	}
-}
-
-func TestGatewayRadios(t *testing.T) {
-	a := assertions.New(t)
-	s := testStore(t, database)
-
-	gtw := testGateways()["bob-gateway"]
-
-	// check that all radios were registered
-	{
-		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewaySpecializer)
-		a.So(err, should.BeNil)
-		if a.So(found.GetGateway().Radios, should.HaveLength, 1) {
-			a.So(found.GetGateway().Radios[0], should.Resemble, gtw.Radios[0])
-			gtw = found.GetGateway()
-		}
-	}
-
-	// add a new radio
-	{
-		gtw.Radios = append(gtw.Radios, ttnpb.GatewayRadio{Frequency: 10})
-		err := s.Gateways.Update(gtw)
-		a.So(err, should.BeNil)
-
-		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewaySpecializer)
-		a.So(err, should.BeNil)
-		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
-	}
-
-	// delete previously added radio
-	{
-		gtw.Radios = gtw.Radios[:1]
-
-		err := s.Gateways.Update(gtw)
-		a.So(err, should.BeNil)
-
-		found, err := s.Gateways.GetByID(gtw.GatewayID, gatewaySpecializer)
-		a.So(err, should.BeNil)
-		a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
-	}
-}
-
-func TestGatewayCollaborators(t *testing.T) {
-	a := assertions.New(t)
-	s := testStore(t, database)
-
-	user := testUsers()["bob"]
-	gtw := testGateways()["bob-gateway"]
-
-	// check indeed that the gateway has no collaborator
-	{
-		collaborators, err := s.Gateways.ListCollaborators(gtw.GatewayID)
-		a.So(err, should.BeNil)
-		a.So(collaborators, should.HaveLength, 0)
-	}
-
-	collaborator := &ttnpb.GatewayCollaborator{
-		GatewayIdentifier:            ttnpb.GatewayIdentifier{GatewayID: gtw.GatewayID},
-		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{UserID: user.UserID}},
-		Rights: []ttnpb.Right{
-			ttnpb.Right(1),
-			ttnpb.Right(2),
-		},
-	}
-
-	// set the collaborator
-	{
-		err := s.Gateways.SetCollaborator(collaborator)
-		a.So(err, should.BeNil)
-
-		collaborators, err := s.Gateways.ListCollaborators(gtw.GatewayID)
-		a.So(err, should.BeNil)
-		a.So(collaborators, should.HaveLength, 1)
-		a.So(collaborators, should.Contain, collaborator)
-	}
-
-	// test ListCollaborators filter
-	{
-		collaborators, err := s.Gateways.ListCollaborators(gtw.GatewayID, ttnpb.Right(999))
-		a.So(err, should.BeNil)
-		a.So(collaborators, should.HaveLength, 0)
-
-		collaborators, err = s.Gateways.ListCollaborators(gtw.GatewayID, ttnpb.Right(1))
-		a.So(err, should.BeNil)
-		a.So(collaborators, should.HaveLength, 1)
-		a.So(collaborators, should.Contain, collaborator)
-
-		collaborators, err = s.Gateways.ListCollaborators(gtw.GatewayID, ttnpb.Right(1), ttnpb.Right(3))
-		a.So(err, should.BeNil)
-		a.So(collaborators, should.HaveLength, 0)
-
-	}
-
-	// test HasCollaboratorRights method
-	{
-		yes, err := s.Gateways.HasCollaboratorRights(gtw.GatewayID, user.UserID, ttnpb.Right(0))
-		a.So(yes, should.BeFalse)
-		a.So(err, should.BeNil)
-
-		yes, err = s.Gateways.HasCollaboratorRights(gtw.GatewayID, user.UserID, collaborator.Rights...)
-		a.So(yes, should.BeTrue)
-		a.So(err, should.BeNil)
-
-		yes, err = s.Gateways.HasCollaboratorRights(gtw.GatewayID, user.UserID, append(collaborator.Rights, ttnpb.Right(0))...)
-		a.So(yes, should.BeFalse)
-		a.So(err, should.BeNil)
-	}
-
-	// fetch gateways where Bob is collaborator
-	{
-		gtws, err := s.Gateways.ListByOrganizationOrUser(user.UserID, gatewaySpecializer)
-		a.So(err, should.BeNil)
-		if a.So(gtws, should.HaveLength, 1) {
-			a.So(gtws[0], test.ShouldBeGatewayIgnoringAutoFields, gtw)
-		}
-	}
-
-	// modify rights
-	{
-		collaborator.Rights = append(collaborator.Rights, ttnpb.Right(3))
-		err := s.Gateways.SetCollaborator(collaborator)
-		a.So(err, should.BeNil)
-
-		collaborators, err := s.Gateways.ListCollaborators(gtw.GatewayID)
-		a.So(err, should.BeNil)
-		if a.So(collaborators, should.HaveLength, 1) {
-			a.So(collaborators[0].Rights, should.Resemble, collaborator.Rights)
-		}
-	}
-
-	// fetch user rights
-	{
-		rights, err := s.Gateways.ListCollaboratorRights(gtw.GatewayID, user.UserID)
-		a.So(err, should.BeNil)
-		if a.So(rights, should.HaveLength, 3) {
-			a.So(rights, should.Resemble, collaborator.Rights)
-		}
-	}
-
-	// remove collaborator
-	{
-		collaborator.Rights = []ttnpb.Right{}
-		err := s.Gateways.SetCollaborator(collaborator)
-		a.So(err, should.BeNil)
-
-		collaborators, err := s.Gateways.ListCollaborators(gtw.GatewayID)
-		a.So(err, should.BeNil)
-		a.So(collaborators, should.HaveLength, 0)
-	}
-}
-
-func TestGatewayUpdate(t *testing.T) {
-	a := assertions.New(t)
-	s := testStore(t, database)
-
-	gtw := testGateways()["bob-gateway"]
-
-	gtw.Description = "Fancy new description"
-	err := s.Gateways.Update(gtw)
+	found, err = s.Gateways.GetByID(gateway.GatewayIdentifiers, gatewaySpecializer)
 	a.So(err, should.BeNil)
+	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gateway)
 
-	found, err := s.Gateways.GetByID(gtw.GatewayID, gatewaySpecializer)
-	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
-}
-
-func TestGatewayDelete(t *testing.T) {
-	a := assertions.New(t)
-	s := testStore(t, database)
-
-	userID := testUsers()["bob"].UserID
-	gtwID := "delete-test"
-
-	testGatewayDeleteFeedDatabase(t, userID, gtwID)
-
-	err := s.Gateways.Delete(gtwID)
-	a.So(err, should.BeNil)
-
-	found, err := s.Gateways.GetByID(gtwID, gatewaySpecializer)
-	a.So(err, should.NotBeNil)
-	a.So(ErrGatewayNotFound.Describes(err), should.BeTrue)
-	a.So(found, should.BeNil)
-}
-
-func testGatewayDeleteFeedDatabase(t *testing.T, userID, gtwID string) {
-	a := assertions.New(t)
-	s := testStore(t, database)
-
-	gtw := testGateways()["test-gateway"]
-	gtw.GatewayID = gtwID
-
-	err := s.Gateways.Create(gtw)
-	a.So(err, should.BeNil)
-
-	collaborator := &ttnpb.GatewayCollaborator{
-		GatewayIdentifier:            gtw.GatewayIdentifier,
-		OrganizationOrUserIdentifier: ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{userID}},
-		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
+	collaborator := ttnpb.GatewayCollaborator{
+		GatewayIdentifiers:            gateway.GatewayIdentifiers,
+		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &alice.UserIdentifiers}},
+		Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO},
 	}
+
+	collaborators, err := s.Gateways.ListCollaborators(gateway.GatewayIdentifiers)
+	a.So(err, should.BeNil)
+	a.So(collaborators, should.HaveLength, 0)
+
 	err = s.Gateways.SetCollaborator(collaborator)
 	a.So(err, should.BeNil)
 
-	key := &ttnpb.APIKey{
+	collaborators, err = s.Gateways.ListCollaborators(gateway.GatewayIdentifiers)
+	a.So(err, should.BeNil)
+	a.So(collaborators, should.HaveLength, 1)
+	a.So(collaborators, should.Contain, collaborator)
+
+	collaborators, err = s.Gateways.ListCollaborators(gateway.GatewayIdentifiers, ttnpb.Right(0))
+	a.So(err, should.BeNil)
+	a.So(collaborators, should.HaveLength, 0)
+
+	collaborators, err = s.Gateways.ListCollaborators(gateway.GatewayIdentifiers, collaborator.Rights...)
+	a.So(err, should.BeNil)
+	a.So(collaborators, should.HaveLength, 1)
+	a.So(collaborators, should.Contain, collaborator)
+
+	rights, err := s.Gateways.ListCollaboratorRights(gateway.GatewayIdentifiers, collaborator.OrganizationOrUserIdentifiers)
+	a.So(err, should.BeNil)
+	a.So(rights, should.Resemble, collaborator.Rights)
+
+	has, err := s.Gateways.HasCollaboratorRights(gateway.GatewayIdentifiers, collaborator.OrganizationOrUserIdentifiers, ttnpb.Right(0))
+	a.So(err, should.BeNil)
+	a.So(has, should.BeFalse)
+
+	has, err = s.Gateways.HasCollaboratorRights(gateway.GatewayIdentifiers, collaborator.OrganizationOrUserIdentifiers, collaborator.Rights...)
+	a.So(err, should.BeNil)
+	a.So(has, should.BeTrue)
+
+	has, err = s.Gateways.HasCollaboratorRights(gateway.GatewayIdentifiers, collaborator.OrganizationOrUserIdentifiers, ttnpb.RIGHT_GATEWAY_INFO, ttnpb.Right(0))
+	a.So(err, should.BeNil)
+	a.So(has, should.BeFalse)
+
+	collaborator.Rights = []ttnpb.Right{ttnpb.RIGHT_GATEWAY_LOCATION}
+
+	err = s.Gateways.SetCollaborator(collaborator)
+	a.So(err, should.BeNil)
+
+	collaborators, err = s.Gateways.ListCollaborators(gateway.GatewayIdentifiers)
+	a.So(err, should.BeNil)
+	a.So(collaborators, should.HaveLength, 1)
+	a.So(collaborators, should.Contain, collaborator)
+
+	collaborator.Rights = []ttnpb.Right{}
+
+	err = s.Gateways.SetCollaborator(collaborator)
+	a.So(err, should.BeNil)
+
+	collaborators, err = s.Gateways.ListCollaborators(gateway.GatewayIdentifiers)
+	a.So(err, should.BeNil)
+	a.So(collaborators, should.HaveLength, 0)
+
+	key := ttnpb.APIKey{
 		Name:   "foo",
-		Key:    "123",
+		Key:    "bar",
 		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
 	}
-	err = s.Gateways.SaveAPIKey(gtwID, key)
+
+	keys, err := s.Gateways.ListAPIKeys(gateway.GatewayIdentifiers)
 	a.So(err, should.BeNil)
+	a.So(keys, should.HaveLength, 0)
+
+	err = s.Gateways.SaveAPIKey(gateway.GatewayIdentifiers, key)
+	a.So(err, should.BeNil)
+
+	keys, err = s.Gateways.ListAPIKeys(gateway.GatewayIdentifiers)
+	a.So(err, should.BeNil)
+	if a.So(keys, should.HaveLength, 1) {
+		a.So(keys, should.Contain, key)
+	}
+
+	ids, foundKey, err := s.Gateways.GetAPIKey(key.Key)
+	a.So(err, should.BeNil)
+	a.So(ids, should.Resemble, gateway.GatewayIdentifiers)
+	a.So(foundKey, should.Resemble, key)
+
+	foundKey, err = s.Gateways.GetAPIKeyByName(gateway.GatewayIdentifiers, key.Name)
+	a.So(err, should.BeNil)
+	a.So(foundKey, should.Resemble, key)
+
+	err = s.Gateways.DeleteAPIKey(gateway.GatewayIdentifiers, key.Name)
+	a.So(err, should.BeNil)
+
+	keys, err = s.Gateways.ListAPIKeys(gateway.GatewayIdentifiers)
+	a.So(err, should.BeNil)
+	a.So(keys, should.HaveLength, 0)
+
+	// save it again. Call to `Delete` will handle it
+	err = s.Gateways.SaveAPIKey(gateway.GatewayIdentifiers, key)
+	a.So(err, should.BeNil)
+
+	err = s.Gateways.Delete(gateway.GatewayIdentifiers)
+	a.So(err, should.BeNil)
+
+	found, err = s.Gateways.GetByID(gateway.GatewayIdentifiers, gatewaySpecializer)
+	a.So(err, should.NotBeNil)
+	a.So(ErrGatewayNotFound.Describes(err), should.BeTrue)
 }

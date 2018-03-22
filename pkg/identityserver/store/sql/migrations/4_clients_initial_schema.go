@@ -5,7 +5,8 @@ package migrations
 func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS clients (
-			client_id          STRING(36) PRIMARY KEY,
+			id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			client_id          STRING(36) UNIQUE NOT NULL,
 			description        STRING NOT NULL DEFAULT '',
 			secret             STRING NOT NULL,
 			redirect_uri       STRING NOT NULL,
@@ -13,7 +14,7 @@ func init() {
 			official_labeled   BOOL NOT NULL DEFAULT false,
 			grants             STRING NOT NULL,
 			rights             STRING NOT NULL,
-			creator_id         STRING NOT NULL REFERENCES users(user_id),
+			creator_id         UUID NOT NULL REFERENCES users(id),
 			created_at         TIMESTAMP NOT NULL DEFAULT current_timestamp(),
 			updated_at         TIMESTAMP NOT NULL DEFAULT current_timestamp()
 		);

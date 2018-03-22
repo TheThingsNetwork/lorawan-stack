@@ -5,37 +5,34 @@ package migrations
 func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS organizations (
-			id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			id                UUID PRIMARY KEY REFERENCES accounts(id),
 			organization_id   STRING(36) UNIQUE NOT NULL REFERENCES accounts(account_id),
 			name              STRING NOT NULL,
-			description       STRING NOT NULL,
-			url               STRING NOT NULL,
-			location          STRING NOT NULL,
+			description       STRING NOT NULL DEFAULT '',
+			url               STRING NOT NULL DEFAULT '',
+			location          STRING NOT NULL DEFAULT '',
 			email             STRING NOT NULL,
 			created_at        TIMESTAMP NOT NULL DEFAULT current_timestamp(),
 			updated_at        TIMESTAMP NOT NULL DEFAULT current_timestamp()
 		);
 		CREATE UNIQUE INDEX IF NOT EXISTS organizations_organization_id ON organizations (organization_id);
 		CREATE TABLE IF NOT EXISTS organizations_members (
-			organization_id   STRING(36) NOT NULL REFERENCES organizations(organization_id),
-			user_id           STRING(36) NOT NULL REFERENCES users(user_id),
+			organization_id   UUID NOT NULL REFERENCES organizations(id),
+			user_id           UUID NOT NULL REFERENCES users(id),
 			"right"           STRING NOT NULL,
 			PRIMARY KEY(organization_id, user_id, "right")
 		);
 		CREATE TABLE IF NOT EXISTS organizations_api_keys (
-			id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			organization_id   STRING(36) NOT NULL REFERENCES organizations(organization_id),
-			key               STRING NOT NULL UNIQUE,
+			organization_id   UUID NOT NULL REFERENCES organizations(id),
 			key_name          STRING(36) NOT NULL,
-			UNIQUE(organization_id, key_name)
+			key               STRING NOT NULL UNIQUE,
+			PRIMARY KEY(organization_id, key_name)
 		);
 		CREATE TABLE IF NOT EXISTS organizations_api_keys_rights (
-			id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			organization_id   STRING(36) NOT NULL,
-			key_name          STRING(36) NOT NULL,
-			"right"           STRING NOT NULL,
-			UNIQUE(organization_id, key_name, "right"),
-			CONSTRAINT fk_key FOREIGN KEY (organization_id, key_name) REFERENCES organizations_api_keys (organization_id, key_name)
+			organization_id    UUID NOT NULL REFERENCES organizations(id),
+			key_name           STRING(36) NOT NULL,
+			"right"             STRING NOT NULL,
+			PRIMARY KEY(organization_id, key_name, "right")
 		);
 	`
 	const backwards = `

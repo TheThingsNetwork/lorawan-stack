@@ -3,13 +3,16 @@
 package sql
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/satori/go.uuid"
 )
+
+type organization struct {
+	ID uuid.UUID
+	ttnpb.Organization
+}
 
 // OrganizationStore implements store.OrganizationStore.
 type OrganizationStore struct {
@@ -17,6 +20,7 @@ type OrganizationStore struct {
 	*extraAttributesStore
 	*apiKeysStore
 	*accountStore
+	*UserStore
 }
 
 // NewOrganizationStore returns an organization store.
@@ -26,33 +30,63 @@ func NewOrganizationStore(store storer) *OrganizationStore {
 		extraAttributesStore: newExtraAttributesStore(store, "organization"),
 		apiKeysStore:         newAPIKeysStore(store, "organization"),
 		accountStore:         newAccountStore(store),
+		UserStore:            store.store().Users.(*UserStore),
 	}
 }
 
+func (s *OrganizationStore) getOrganizationIdentifiersFromID(q db.QueryContext, id uuid.UUID) (res ttnpb.OrganizationIdentifiers, err error) {
+	err = q.SelectOne(
+		&res,
+		`SELECT
+				organization_id
+			FROM organizations
+			WHERE id = $1`,
+		id)
+	return
+}
+
+func (s *OrganizationStore) getOrganizationID(q db.QueryContext, ids ttnpb.OrganizationIdentifiers) (id uuid.UUID, err error) {
+	err = q.SelectOne(
+		&id,
+		`SELECT
+				id
+			FROM organizations
+			WHERE organization_id = $1`,
+		ids.OrganizationID)
+	if db.IsNoRows(err) {
+		err = ErrOrganizationNotFound.New(nil)
+	}
+	return
+}
+
 // Create creates an organization.
-func (s *OrganizationStore) Create(organization store.Organization) error {
+func (s *OrganizationStore) Create(org store.Organization) error {
 	err := s.transact(func(tx *db.Tx) error {
-		organizationID := organization.GetOrganization().OrganizationID
+		o := org.GetOrganization()
 
-		err := s.accountStore.registerOrganizationID(tx, organizationID)
+		id, err := s.accountStore.registerOrganizationID(tx, o.OrganizationID)
 		if err != nil {
 			return err
 		}
 
-		err = s.create(tx, organization)
+		err = s.create(tx, organization{
+			ID:           id,
+			Organization: *o,
+		})
 		if err != nil {
 			return err
 		}
 
-		return s.storeAttributes(tx, organizationID, organization, nil)
+		return s.storeAttributes(tx, id, org)
 	})
 	return err
 }
 
-func (s *OrganizationStore) create(q db.QueryContext, organization store.Organization) error {
-	_, err := q.NamedExec(
+func (s *OrganizationStore) create(q db.QueryContext, data organization) (err error) {
+	_, err = q.NamedExec(
 		`INSERT
 			INTO organizations (
+				id,
 				organization_id,
 				name,
 				description,
@@ -61,36 +95,41 @@ func (s *OrganizationStore) create(q db.QueryContext, organization store.Organiz
 				email
 			)
 			VALUES (
+				:id,
 				lower(:organization_id),
 				:name,
 				:description,
 				:url,
 				:location,
-				lower(:email))`,
-		organization.GetOrganization())
-	return err
+				lower(:email))
+			RETURNING id`,
+		data)
+	return
 }
 
 // GetByID finds the organization by ID and retrieves it.
-func (s *OrganizationStore) GetByID(organizationID string, specializer store.OrganizationSpecializer) (result store.Organization, err error) {
+func (s *OrganizationStore) GetByID(ids ttnpb.OrganizationIdentifiers, specializer store.OrganizationSpecializer) (result store.Organization, err error) {
 	err = s.transact(func(tx *db.Tx) error {
-		organization, err := s.getByID(tx, organizationID)
+		orgID, err := s.getOrganizationID(tx, ids)
 		if err != nil {
 			return err
 		}
 
-		result = specializer(*organization)
+		organization, err := s.getByID(tx, orgID)
+		if err != nil {
+			return err
+		}
 
-		return s.loadAttributes(tx, organizationID, result)
+		result = specializer(organization)
+
+		return s.loadAttributes(tx, orgID, result)
 	})
-
 	return
 }
 
-func (s *OrganizationStore) getByID(q db.QueryContext, organizationID string) (*ttnpb.Organization, error) {
-	result := new(ttnpb.Organization)
-	err := q.SelectOne(
-		result,
+func (s *OrganizationStore) getByID(q db.QueryContext, orgID uuid.UUID) (result ttnpb.Organization, err error) {
+	err = q.SelectOne(
+		&result,
 		`SELECT
 				organization_id,
 				name,
@@ -99,81 +138,36 @@ func (s *OrganizationStore) getByID(q db.QueryContext, organizationID string) (*
 				location,
 				email
 			FROM organizations
-			WHERE organization_id = $1`,
-		organizationID)
+			WHERE id = $1`,
+		orgID)
 	if db.IsNoRows(err) {
-		return nil, ErrOrganizationNotFound.New(nil)
+		err = ErrOrganizationNotFound.New(nil)
 	}
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
-// ListByUser returns the organizations to which an user is a member of.
-func (s *OrganizationStore) ListByUser(userID string, factory store.OrganizationSpecializer) (result []store.Organization, err error) {
-	err = s.transact(func(tx *db.Tx) error {
-		organizations, err := s.userOrganizations(tx, userID)
-		if err != nil {
-			return err
-		}
-
-		for _, organization := range organizations {
-			org := factory(organization)
-
-			err := s.loadAttributes(tx, organization.OrganizationID, org)
-			if err != nil {
-				return err
-			}
-
-			result = append(result, org)
-		}
-
-		return nil
-	})
-
 	return
-}
-
-func (s *OrganizationStore) userOrganizations(q db.QueryContext, userID string) ([]ttnpb.Organization, error) {
-	var organizations []ttnpb.Organization
-	err := q.Select(
-		&organizations,
-		`SELECT
-				DISTINCT organization_id,
-				name,
-				description,
-				url,
-				location,
-				email
-			FROM organizations
-			INNER JOIN organizations_members
-			USING (organization_id)
-			WHERE user_id = $1`,
-		userID)
-	if err != nil {
-		return nil, err
-	}
-	return organizations, nil
 }
 
 // Update updates an organization.
 func (s *OrganizationStore) Update(organization store.Organization) error {
 	err := s.transact(func(tx *db.Tx) error {
-		err := s.update(tx, organization)
+		org := organization.GetOrganization()
+
+		orgID, err := s.getOrganizationID(tx, org.OrganizationIdentifiers)
 		if err != nil {
 			return err
 		}
 
-		return s.storeAttributes(tx, organization.GetOrganization().OrganizationID, organization, nil)
+		err = s.update(tx, orgID, org)
+		if err != nil {
+			return err
+		}
+
+		return s.storeAttributes(tx, orgID, organization)
 	})
 
 	return err
 }
 
-func (s *OrganizationStore) update(q db.QueryContext, organization store.Organization) error {
-	org := organization.GetOrganization()
-
+func (s *OrganizationStore) update(q db.QueryContext, orgID uuid.UUID, data *ttnpb.Organization) error {
 	var id string
 	err := q.NamedSelectOne(
 		&id,
@@ -185,9 +179,12 @@ func (s *OrganizationStore) update(q db.QueryContext, organization store.Organiz
 				location = :location,
 				email = lower(:email),
 				updated_at = current_timestamp()
-			WHERE organization_id = :organization_id
+			WHERE id = :id
 			RETURNING organization_id`,
-		org)
+		organization{
+			ID:           orgID,
+			Organization: *data,
+		})
 
 	if db.IsNoRows(err) {
 		return ErrOrganizationNotFound.New(nil)
@@ -197,40 +194,45 @@ func (s *OrganizationStore) update(q db.QueryContext, organization store.Organiz
 }
 
 // Delete deletes an organization.
-func (s *OrganizationStore) Delete(organizationID string) error {
+func (s *OrganizationStore) Delete(ids ttnpb.OrganizationIdentifiers) error {
 	err := s.transact(func(tx *db.Tx) error {
-		err := s.deleteCollaborations(tx, organizationID)
+		orgID, err := s.getOrganizationID(tx, ids)
 		if err != nil {
 			return err
 		}
 
-		err = s.deleteMembers(tx, organizationID)
+		err = s.deleteCollaborations(tx, orgID)
 		if err != nil {
 			return err
 		}
 
-		err = s.deleteAPIKeys(tx, organizationID)
+		err = s.deleteMembers(tx, orgID)
 		if err != nil {
 			return err
 		}
 
-		err = s.delete(tx, organizationID)
+		err = s.deleteAPIKeys(tx, orgID)
 		if err != nil {
 			return err
 		}
 
-		return s.accountStore.deleteID(tx, organizationID)
+		err = s.delete(tx, orgID)
+		if err != nil {
+			return err
+		}
+
+		return s.accountStore.deleteID(tx, ids.OrganizationID)
 	})
 
 	return err
 }
 
-func (s *OrganizationStore) deleteCollaborations(q db.QueryContext, organizationID string) error {
+func (s *OrganizationStore) deleteCollaborations(q db.QueryContext, orgID uuid.UUID) error {
 	_, err := q.Exec(
 		`DELETE
 				FROM applications_collaborators
 				WHERE account_id = $1`,
-		organizationID)
+		orgID)
 	if err != nil {
 		return err
 	}
@@ -239,255 +241,21 @@ func (s *OrganizationStore) deleteCollaborations(q db.QueryContext, organization
 		`DELETE
 				FROM gateways_collaborators
 				WHERE account_id = $1`,
-		organizationID)
+		orgID)
 	return err
 }
 
-func (s *OrganizationStore) deleteMembers(q db.QueryContext, organizationID string) error {
-	_, err := q.Exec(
-		`DELETE
-				FROM organizations_members
-				WHERE organization_id = $1`,
-		organizationID)
-	return err
-}
-
-func (s *OrganizationStore) delete(q db.QueryContext, organizationID string) error {
+func (s *OrganizationStore) delete(q db.QueryContext, orgID uuid.UUID) (err error) {
 	var id string
-	err := q.SelectOne(
+	err = q.SelectOne(
 		&id,
 		`DELETE
 			FROM organizations
-			WHERE organization_id = $1
+			WHERE id = $1
 			RETURNING organization_id`,
-		organizationID)
+		orgID)
 	if db.IsNoRows(err) {
-		return ErrOrganizationNotFound.New(nil)
+		err = ErrOrganizationNotFound.New(nil)
 	}
-	return err
-}
-
-// HasMemberRights checks whether an user has or not a set of given rights to
-// an organization. Returns false if the user is not part of the organization.
-func (s *OrganizationStore) HasMemberRights(organizationID, userID string, rights ...ttnpb.Right) (bool, error) {
-	return s.hasMemberRights(s.queryer(), organizationID, userID, rights...)
-}
-
-func (s *OrganizationStore) hasMemberRights(q db.QueryContext, organizationID, userID string, rights ...ttnpb.Right) (bool, error) {
-	clauses := make([]string, 0, len(rights))
-	args := make([]interface{}, 0, len(rights)+2)
-	args = append(args, organizationID, userID)
-
-	for i, right := range rights {
-		args = append(args, right)
-		clauses = append(clauses, fmt.Sprintf(`"right" = $%d`, i+3))
-	}
-
-	found := 0
-	err := q.SelectOne(
-		&found,
-		fmt.Sprintf(`
-			SELECT
-					COUNT(user_id)
-				FROM organizations_members
-				WHERE organization_id = $1 AND user_id = $2 AND (%s)`, strings.Join(clauses, " OR ")),
-		args...)
-	if db.IsNoRows(err) {
-		return false, nil
-	}
-	if err != nil {
-		return false, err
-	}
-	return (found == len(rights)), nil
-}
-
-// ListMembers retrieves all the members from an organization. Optionally a list
-// of rights can be passed to filter them.
-func (s *OrganizationStore) ListMembers(organizationID string, rights ...ttnpb.Right) ([]*ttnpb.OrganizationMember, error) {
-	return s.listMembers(s.queryer(), organizationID, rights...)
-}
-
-func (s *OrganizationStore) listMembers(q db.QueryContext, organizationID string, rights ...ttnpb.Right) ([]*ttnpb.OrganizationMember, error) {
-	args := make([]interface{}, 0, 2+len(rights))
-	args = append(args, organizationID)
-
-	var query string
-	if len(rights) == 0 {
-		query = `
-			SELECT
-				organization_id,
-				user_id,
-				"right"
-			FROM organizations_members
-			WHERE organization_id = $1`
-	} else {
-		args = append(args, len(rights))
-		clauses := make([]string, 0, len(rights))
-
-		for i, right := range rights {
-			clauses = append(clauses, fmt.Sprintf(`"right" = $%d`, i+3))
-			args = append(args, right)
-		}
-
-		query = `
-			SELECT
-				organization_id,
-				user_id,
-				"right"
-			FROM organizations_members
-			WHERE organization_id = $1 AND user_id IN (
-				SELECT
-					user_id
-				FROM (
-					SELECT
-						user_id,
-						COUNT(user_id) AS count
-					FROM organizations_members
-					WHERE organization_id = $1 AND (%s)
-					GROUP BY user_id
-				)
-				WHERE count = $2
-			)`
-
-		query = fmt.Sprintf(query, strings.Join(clauses, " OR "))
-	}
-
-	var rows []*struct {
-		*ttnpb.OrganizationMember
-		Right ttnpb.Right
-	}
-	err := q.Select(&rows, query, args...)
-	if err != nil {
-		return nil, err
-	}
-	if rows == nil || len(rows) == 0 {
-		return make([]*ttnpb.OrganizationMember, 0), nil
-	}
-
-	// map the rows by User ID
-	byUser := make(map[string]*ttnpb.OrganizationMember)
-	for _, row := range rows {
-		_, ok := byUser[row.OrganizationMember.UserID]
-		if !ok {
-			byUser[row.UserID] = new(ttnpb.OrganizationMember)
-			byUser[row.UserID].UserIdentifier = ttnpb.UserIdentifier{UserID: row.UserID}
-			byUser[row.UserID].OrganizationIdentifier = ttnpb.OrganizationIdentifier{OrganizationID: row.OrganizationID}
-			byUser[row.UserID].Rights = make([]ttnpb.Right, 0, 1)
-		}
-
-		byUser[row.UserID].Rights = append(byUser[row.UserID].Rights, row.Right)
-	}
-
-	members := make([]*ttnpb.OrganizationMember, 0, len(byUser))
-	for _, member := range byUser {
-		members = append(members, member)
-	}
-
-	return members, nil
-}
-
-// SetMember inserts or updates a member within an organization.
-// If the list of rights is empty the member will be unset.
-func (s *OrganizationStore) SetMember(member *ttnpb.OrganizationMember) error {
-	if len(member.Rights) == 0 {
-		return s.removeMember(s.queryer(), member)
-	}
-	err := s.transact(func(tx *db.Tx) error {
-		return s.setMember(tx, member)
-	})
-	return err
-}
-
-func (s *OrganizationStore) removeMember(q db.QueryContext, member *ttnpb.OrganizationMember) error {
-	_, err := q.Exec(
-		`DELETE FROM
-			organizations_members
-			WHERE organization_id = $1 AND user_id = $2`,
-		member.OrganizationID,
-		member.UserID)
-	return err
-}
-
-func (s *OrganizationStore) setMember(q db.QueryContext, member *ttnpb.OrganizationMember) error {
-	// remove rights
-	err := s.removeMember(q, member)
-	if err != nil {
-		return err
-	}
-
-	// add rights
-	values := make([]string, len(member.Rights))
-	args := make([]interface{}, len(member.Rights)+2)
-	args[0] = member.OrganizationID
-	args[1] = member.UserID
-	for i, right := range member.Rights {
-		values[i] = fmt.Sprintf("($1, $2, $%d)", i+3)
-		args[i+2] = right
-	}
-
-	query := fmt.Sprintf(
-		`INSERT
-			INTO organizations_members (organization_id, user_id, "right")
-			VALUES %s
-			ON CONFLICT (organization_id, user_id, "right")
-			DO NOTHING`,
-		strings.Join(values, ", "))
-
-	_, err = q.Exec(query, args...)
-	return err
-}
-
-// ListUserRights returns the rights a given user has for an entity.
-func (s *OrganizationStore) ListUserRights(organizationID string, userID string) ([]ttnpb.Right, error) {
-	return s.listUserRights(s.queryer(), organizationID, userID)
-}
-
-func (s *OrganizationStore) listUserRights(q db.QueryContext, organizationID string, userID string) ([]ttnpb.Right, error) {
-	var rights []ttnpb.Right
-	err := q.Select(
-		&rights,
-		`SELECT
-				"right"
-			FROM organizations_members
-			WHERE organization_id = $1 AND user_id = $2`,
-		organizationID,
-		userID)
-	if err != nil {
-		return nil, err
-	}
-	return rights, nil
-}
-
-// LoadAttributes loads the extra attributes in organization if it is a store.Attributer.
-func (s *OrganizationStore) LoadAttributes(organizationID string, organization store.Organization) error {
-	return s.loadAttributes(s.queryer(), organizationID, organization)
-}
-
-func (s *OrganizationStore) loadAttributes(q db.QueryContext, organizationID string, organization store.Organization) error {
-	attr, ok := organization.(store.Attributer)
-	if ok {
-		return s.extraAttributesStore.loadAttributes(q, organizationID, attr)
-	}
-
-	return nil
-}
-
-// StoreAttributes store the extra attributes of organization if it is a
-// store.Attributer and writes the resulting organization in result.
-func (s *OrganizationStore) StoreAttributes(organizationID string, organization, result store.Organization) error {
-	return s.storeAttributes(s.queryer(), organizationID, organization, result)
-}
-
-func (s *OrganizationStore) storeAttributes(q db.QueryContext, organizationID string, organization, result store.Organization) error {
-	attr, ok := organization.(store.Attributer)
-	if ok {
-		res, ok := result.(store.Attributer)
-		if result == nil || !ok {
-			return s.extraAttributesStore.storeAttributes(q, organizationID, attr, nil)
-		}
-
-		return s.extraAttributesStore.storeAttributes(q, organizationID, attr, res)
-	}
-
-	return nil
+	return
 }

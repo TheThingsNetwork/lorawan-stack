@@ -57,17 +57,17 @@ func (s *SettingStore) get(q db.QueryContext) (*ttnpb.IdentityServerSettings, er
 }
 
 // Set sets the settings.
-func (s *SettingStore) Set(settings *ttnpb.IdentityServerSettings) error {
+func (s *SettingStore) Set(settings ttnpb.IdentityServerSettings) error {
 	return s.set(s.queryer(), settings)
 }
 
-func (s *SettingStore) set(q db.QueryContext, settings *ttnpb.IdentityServerSettings) error {
+func (s *SettingStore) set(q db.QueryContext, settings ttnpb.IdentityServerSettings) error {
 	var input struct {
 		*ttnpb.IdentityServerSettings
 		BlacklistedIDsConverted db.StringSlice
 		AllowedEmailsConverted  db.StringSlice
 	}
-	input.IdentityServerSettings = settings
+	input.IdentityServerSettings = &settings
 	input.BlacklistedIDsConverted = db.StringSlice(settings.BlacklistedIDs)
 	input.AllowedEmailsConverted = db.StringSlice(settings.AllowedEmails)
 	_, err := q.NamedExec(

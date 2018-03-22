@@ -3,17 +3,22 @@
 package sql
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/satori/go.uuid"
 )
+
+// application represents the schema of the stored application.
+type application struct {
+	ID uuid.UUID
+	ttnpb.Application
+}
 
 // ApplicationStore implements store.ApplicationStore.
 type ApplicationStore struct {
 	storer
+	*accountStore
 	*extraAttributesStore
 	*apiKeysStore
 }
@@ -22,176 +27,152 @@ type ApplicationStore struct {
 func NewApplicationStore(store storer) *ApplicationStore {
 	return &ApplicationStore{
 		storer:               store,
+		accountStore:         newAccountStore(store),
 		extraAttributesStore: newExtraAttributesStore(store, "application"),
 		apiKeysStore:         newAPIKeysStore(store, "application"),
 	}
 }
 
+func (s *ApplicationStore) getApplicationIdentifiersFromID(q db.QueryContext, id uuid.UUID) (res ttnpb.ApplicationIdentifiers, err error) {
+	err = q.SelectOne(
+		&res,
+		`SELECT
+				application_id
+			FROM applications
+			WHERE id = $1`,
+		id)
+	return
+}
+
+// getApplicationID returns the UUID of the application that matches the identifier.
+func (s *ApplicationStore) getApplicationID(q db.QueryContext, ids ttnpb.ApplicationIdentifiers) (id uuid.UUID, err error) {
+	err = q.SelectOne(
+		&id,
+		`SELECT
+				id
+			FROM applications
+			WHERE application_id = $1`,
+		ids.ApplicationID)
+	if db.IsNoRows(err) {
+		err = ErrApplicationNotFound.New(nil)
+	}
+	return
+}
+
 // Create creates a new application.
 func (s *ApplicationStore) Create(application store.Application) error {
 	err := s.transact(func(tx *db.Tx) error {
-		err := s.create(tx, application)
+		appID, err := s.create(tx, application.GetApplication())
 		if err != nil {
 			return err
 		}
 
-		return s.storeAttributes(tx, application.GetApplication().ApplicationID, application, nil)
+		return s.storeAttributes(tx, appID, application)
 	})
 	return err
 }
 
-func (s *ApplicationStore) create(q db.QueryContext, application store.Application) error {
-	app := application.GetApplication()
-	_, err := q.NamedExec(
+func (s *ApplicationStore) create(q db.QueryContext, application *ttnpb.Application) (id uuid.UUID, err error) {
+	err = q.NamedSelectOne(
+		&id,
 		`INSERT
 			INTO applications (
 				application_id,
 				description)
 			VALUES (
 				:application_id,
-				:description)`,
-		app)
+				:description)
+			RETURNING id`,
+		application)
 
 	if _, yes := db.IsDuplicate(err); yes {
-		return ErrApplicationIDTaken.New(nil)
+		err = ErrApplicationIDTaken.New(nil)
 	}
 
-	return err
+	return
 }
 
-// GetByID finds the application by ID and retrieves it.
-func (s *ApplicationStore) GetByID(appID string, specializer store.ApplicationSpecializer) (result store.Application, err error) {
+// GetByID finds the application that matches the identifier and retrieves it.
+func (s *ApplicationStore) GetByID(id ttnpb.ApplicationIdentifiers, specializer store.ApplicationSpecializer) (result store.Application, err error) {
 	err = s.transact(func(tx *db.Tx) error {
-		application, err := s.getByID(tx, appID)
+		application, err := s.getByID(tx, id)
 		if err != nil {
 			return err
 		}
 
-		result = specializer(*application)
+		result = specializer(application.Application)
 
-		return s.loadAttributes(tx, appID, result)
+		return s.loadAttributes(tx, application.ID, result)
 	}, db.ReadOnly(true))
 
 	return
 }
 
-func (s *ApplicationStore) getByID(q db.QueryContext, appID string) (*ttnpb.Application, error) {
-	result := new(ttnpb.Application)
-	err := q.SelectOne(
-		result,
-		`SELECT *
+func (s *ApplicationStore) getByID(q db.QueryContext, id ttnpb.ApplicationIdentifiers) (result application, err error) {
+	err = q.NamedSelectOne(
+		&result,
+		`SELECT
+				id,
+				application_id,
+				description
 			FROM applications
-			WHERE application_id = $1`,
-		appID)
-	if db.IsNoRows(err) {
-		return nil, ErrApplicationNotFound.New(nil)
-	}
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
-// ListByOrganizationOrUser returns the applications to which an organization or
-// user if collaborator of.
-func (s *ApplicationStore) ListByOrganizationOrUser(id string, specializer store.ApplicationSpecializer) ([]store.Application, error) {
-	var result []store.Application
-
-	err := s.transact(func(tx *db.Tx) error {
-		applications, err := s.organizationOrUserApplications(tx, id)
-		if err != nil {
-			return err
-		}
-
-		for _, application := range applications {
-			app := specializer(application)
-
-			err := s.loadAttributes(tx, app.GetApplication().ApplicationID, app)
-			if err != nil {
-				return err
-			}
-
-			result = append(result, app)
-		}
-
-		return nil
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
-func (s *ApplicationStore) organizationOrUserApplications(q db.QueryContext, id string) ([]ttnpb.Application, error) {
-	var applications []ttnpb.Application
-	err := q.Select(
-		&applications,
-		`SELECT DISTINCT applications.*
-			FROM applications
-			JOIN applications_collaborators
-			ON (
-				applications.application_id = applications_collaborators.application_id
-				AND
-				(
-					account_id = $1
-					OR
-					account_id IN (
-						SELECT
-							organization_id
-						FROM organizations_members
-						WHERE user_id = $1
-					)
-				)
-			)`,
+			WHERE application_id = :application_id`,
 		id)
-
-	if err != nil {
-		return nil, err
+	if db.IsNoRows(err) {
+		err = ErrApplicationNotFound.New(nil)
 	}
-
-	return applications, nil
+	return
 }
 
-// Update updates the Application and returns the updated Application.
+// Update updates the Application.
 func (s *ApplicationStore) Update(application store.Application) error {
+	app := application.GetApplication()
+
 	err := s.transact(func(tx *db.Tx) error {
-		err := s.update(tx, application)
+		appID, err := s.getApplicationID(tx, app.ApplicationIdentifiers)
 		if err != nil {
 			return err
 		}
 
-		return s.storeAttributes(tx, application.GetApplication().ApplicationID, application, nil)
+		err = s.update(tx, appID, app)
+		if err != nil {
+			return err
+		}
+
+		return s.storeAttributes(tx, appID, application)
 	})
 	return err
 }
 
-func (s *ApplicationStore) update(q db.QueryContext, application store.Application) error {
-	app := application.GetApplication()
-
+func (s *ApplicationStore) update(q db.QueryContext, appID uuid.UUID, app *ttnpb.Application) (err error) {
 	var id string
-	err := q.NamedSelectOne(
+	err = q.NamedSelectOne(
 		&id,
 		`UPDATE applications
 			SET
 				description = :description,
 				updated_at = current_timestamp()
-			WHERE application_id = :application_id
+			WHERE id = :id
 			RETURNING application_id`,
-		app)
-
+		application{
+			ID:          appID,
+			Application: *app,
+		})
 	if db.IsNoRows(err) {
-		return ErrApplicationNotFound.New(nil)
+		err = ErrApplicationNotFound.New(nil)
 	}
-
-	return err
+	return
 }
 
-// Delete deletes an application.
-func (s *ApplicationStore) Delete(appID string) error {
-	err := s.transact(func(tx *db.Tx) error {
-		err := s.deleteCollaborators(tx, appID)
+// Delete deletes the application that matches the identifier.
+func (s *ApplicationStore) Delete(id ttnpb.ApplicationIdentifiers) (err error) {
+	err = s.transact(func(tx *db.Tx) error {
+		appID, err := s.getApplicationID(tx, id)
+		if err != nil {
+			return err
+		}
+
+		err = s.deleteCollaborators(tx, appID)
 		if err != nil {
 			return err
 		}
@@ -203,298 +184,22 @@ func (s *ApplicationStore) Delete(appID string) error {
 
 		return s.delete(tx, appID)
 	})
-
-	return err
+	return
 }
 
 // delete deletes the application itself. All rows in other tables that references
-// this entity must be delete before this one gets deleted.
-func (s *ApplicationStore) delete(q db.QueryContext, appID string) error {
-	id := new(string)
-	err := q.SelectOne(
-		id,
+// this entity must be deleted before this one gets deleted.
+func (s *ApplicationStore) delete(q db.QueryContext, appID uuid.UUID) (err error) {
+	var res string
+	err = q.SelectOne(
+		&res,
 		`DELETE
 			FROM applications
-			WHERE application_id = $1
+			WHERE id = $1
 			RETURNING application_id`,
 		appID)
 	if db.IsNoRows(err) {
-		return ErrApplicationNotFound.New(nil)
+		err = ErrApplicationNotFound.New(nil)
 	}
-	return err
-}
-
-// deleteCollaborators deletes all the collaborators from one application.
-func (s *ApplicationStore) deleteCollaborators(q db.QueryContext, appID string) error {
-	_, err := q.Exec(
-		`DELETE
-			FROM applications_collaborators
-			WHERE application_id = $1`,
-		appID)
-	return err
-}
-
-// SetCollaborator inserts or modifies a collaborator within an entity.
-// If the provided list of rights is empty the collaborator will be unset.
-func (s *ApplicationStore) SetCollaborator(collaborator *ttnpb.ApplicationCollaborator) error {
-	if len(collaborator.Rights) == 0 {
-		return s.unsetCollaborator(s.queryer(), collaborator.ApplicationID, collaborator.GetCollaboratorID())
-	}
-
-	err := s.transact(func(tx *db.Tx) error {
-		return s.setCollaborator(tx, collaborator)
-	})
-	return err
-}
-
-func (s *ApplicationStore) unsetCollaborator(q db.QueryContext, appID, collaboratorID string) error {
-	_, err := q.Exec(
-		`DELETE
-			FROM applications_collaborators
-			WHERE application_id = $1 AND account_id = $2`, appID, collaboratorID)
-	return err
-}
-
-func (s *ApplicationStore) setCollaborator(q db.QueryContext, collaborator *ttnpb.ApplicationCollaborator) error {
-	query, args := s.removeRightsDiffQuery(collaborator)
-	_, err := q.Exec(query, args...)
-	if err != nil {
-		return err
-	}
-
-	query, args = s.addRightsQuery(collaborator.ApplicationID, collaborator.GetCollaboratorID(), collaborator.Rights)
-	_, err = q.Exec(query, args...)
-
-	return err
-}
-
-func (s *ApplicationStore) removeRightsDiffQuery(collaborator *ttnpb.ApplicationCollaborator) (string, []interface{}) {
-	args := make([]interface{}, 2+len(collaborator.Rights))
-	args[0] = collaborator.ApplicationID
-	args[1] = collaborator.GetCollaboratorID()
-
-	boundVariables := make([]string, len(collaborator.Rights))
-
-	for i, right := range collaborator.Rights {
-		args[i+2] = right
-		boundVariables[i] = fmt.Sprintf("$%d", i+3)
-	}
-
-	query := fmt.Sprintf(
-		`DELETE
-			FROM applications_collaborators
-			WHERE application_id = $1 AND account_id = $2 AND "right" NOT IN (%s)`,
-		strings.Join(boundVariables, ", "))
-
-	return query, args
-}
-
-func (s *ApplicationStore) addRightsQuery(appID, userID string, rights []ttnpb.Right) (string, []interface{}) {
-	args := make([]interface{}, 2+len(rights))
-	args[0] = appID
-	args[1] = userID
-
-	boundValues := make([]string, len(rights))
-
-	for i, right := range rights {
-		args[i+2] = right
-		boundValues[i] = fmt.Sprintf("($1, $2, $%d)", i+3)
-	}
-
-	query := fmt.Sprintf(
-		`INSERT
-			INTO applications_collaborators (application_id, account_id, "right")
-			VALUES %s
-			ON CONFLICT (application_id, account_id, "right")
-			DO NOTHING`,
-		strings.Join(boundValues, " ,"))
-
-	return query, args
-}
-
-// HasCollaboratorRights checks whether a collaborator has a given set of rights
-// to an application. It returns false if the collaborationship does not exist.
-func (s *ApplicationStore) HasCollaboratorRights(appID, collaboratorID string, rights ...ttnpb.Right) (bool, error) {
-	return s.hasCollaboratorRights(s.queryer(), appID, collaboratorID, rights...)
-}
-
-func (s *ApplicationStore) hasCollaboratorRights(q db.QueryContext, appID, collaboratorID string, rights ...ttnpb.Right) (bool, error) {
-	clauses := make([]string, 0, len(rights))
-	args := make([]interface{}, 0, len(rights)+1)
-	args = append(args, collaboratorID)
-
-	for i, right := range rights {
-		args = append(args, right)
-		clauses = append(clauses, fmt.Sprintf(`"right" = $%d`, i+2))
-	}
-
-	count := 0
-	err := q.SelectOne(
-		&count,
-		fmt.Sprintf(
-			`SELECT
-				COUNT(DISTINCT "right")
-				FROM applications_collaborators
-				WHERE (%s) AND (account_id = $1 OR account_id IN (
-					SELECT
-						organization_id
-					FROM organizations_members
-					WHERE user_id = $1
-				))`, strings.Join(clauses, " OR ")),
-		args...)
-	if db.IsNoRows(err) {
-		return false, nil
-	}
-	if err != nil {
-		return false, err
-	}
-	return len(rights) == count, nil
-}
-
-// ListCollaborators retrieves all the collaborators from an entity.
-func (s *ApplicationStore) ListCollaborators(appID string, rights ...ttnpb.Right) ([]*ttnpb.ApplicationCollaborator, error) {
-	return s.listCollaborators(s.queryer(), appID, rights...)
-}
-
-// nolint: dupl
-func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID string, rights ...ttnpb.Right) ([]*ttnpb.ApplicationCollaborator, error) {
-	args := make([]interface{}, 1)
-	args[0] = appID
-
-	var query string
-	if len(rights) == 0 {
-		query = `
-		SELECT
-			account_id,
-			"right",
-			type
-		FROM applications_collaborators
-		JOIN accounts USING (account_id)
-		WHERE application_id = $1`
-	} else {
-		rightsClause := make([]string, 0, len(rights))
-		for _, right := range rights {
-			rightsClause = append(rightsClause, fmt.Sprintf(`"right" = '%d'`, right))
-		}
-
-		query = fmt.Sprintf(`
-			SELECT
-					account_id,
-					"right",
-					type
-	    	FROM applications_collaborators
-	    	JOIN accounts USING (account_id)
-	    	WHERE application_id = $1 AND account_id IN
-	    	(
-	      	SELECT account_id
-	      		FROM
-	      			(
-	          		SELECT
-	          				account_id,
-	          				count(account_id) as count
-	          	  	FROM applications_collaborators
-	          			WHERE application_id = $1 AND (%s)
-	          			GROUP BY account_id
-	      			)
-	      		WHERE count = $2
-	  		)`,
-			strings.Join(rightsClause, " OR "))
-
-		args = append(args, len(rights))
-	}
-
-	var collaborators []struct {
-		Right     ttnpb.Right
-		AccountID string
-		Type      int
-	}
-	err := q.Select(&collaborators, query, args...)
-	if !db.IsNoRows(err) && err != nil {
-		return nil, err
-	}
-
-	byUser := make(map[string]*ttnpb.ApplicationCollaborator)
-	for _, collaborator := range collaborators {
-		if _, exists := byUser[collaborator.AccountID]; !exists {
-			var identifier ttnpb.OrganizationOrUserIdentifier
-			if collaborator.Type == organization {
-				identifier = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_OrganizationID{OrganizationID: collaborator.AccountID}}
-			} else {
-				identifier = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{UserID: collaborator.AccountID}}
-			}
-
-			byUser[collaborator.AccountID] = &ttnpb.ApplicationCollaborator{
-				ApplicationIdentifier:        ttnpb.ApplicationIdentifier{ApplicationID: appID},
-				OrganizationOrUserIdentifier: identifier,
-				Rights: []ttnpb.Right{collaborator.Right},
-			}
-			continue
-		}
-
-		byUser[collaborator.AccountID].Rights = append(byUser[collaborator.AccountID].Rights, collaborator.Right)
-	}
-
-	result := make([]*ttnpb.ApplicationCollaborator, 0, len(byUser))
-	for _, collaborator := range byUser {
-		result = append(result, collaborator)
-	}
-
-	return result, nil
-}
-
-// ListCollaboratorRights returns the rights a given collaborator has for an
-// Application. Returns empty list if the collaborationship does not exist.
-func (s *ApplicationStore) ListCollaboratorRights(appID string, collaboratorID string) ([]ttnpb.Right, error) {
-	return s.listCollaboratorRights(s.queryer(), appID, collaboratorID)
-}
-
-func (s *ApplicationStore) listCollaboratorRights(q db.QueryContext, appID string, collaboratorID string) ([]ttnpb.Right, error) {
-	var rights []ttnpb.Right
-	err := q.Select(
-		&rights, `
-		SELECT "right"
-		FROM applications_collaborators
-		WHERE application_id = $1
-		AND ( account_id = $2
-			OR account_id IN
-				( SELECT organization_id
-				FROM organizations_members
-				WHERE user_id = $2 ) )`,
-		appID,
-		collaboratorID)
-	return rights, err
-}
-
-// LoadAttributes loads the extra attributes in app if it is a store.Attributer.
-func (s *ApplicationStore) LoadAttributes(appID string, app store.Application) error {
-	return s.loadAttributes(s.queryer(), appID, app)
-}
-
-func (s *ApplicationStore) loadAttributes(q db.QueryContext, appID string, app store.Application) error {
-	attr, ok := app.(store.Attributer)
-	if ok {
-		return s.extraAttributesStore.loadAttributes(q, appID, attr)
-	}
-
-	return nil
-}
-
-// StoreAttributes store the extra attributes of app if it is a store.Attributer
-// and writes the resulting application in result.
-func (s *ApplicationStore) StoreAttributes(appID string, app, result store.Application) error {
-	return s.storeAttributes(s.queryer(), appID, app, result)
-}
-
-func (s *ApplicationStore) storeAttributes(q db.QueryContext, appID string, app, result store.Application) error {
-	attr, ok := app.(store.Attributer)
-	if ok {
-		res, ok := result.(store.Attributer)
-		if result == nil || !ok {
-			return s.extraAttributesStore.storeAttributes(q, appID, attr, nil)
-		}
-
-		return s.extraAttributesStore.storeAttributes(q, appID, attr, res)
-	}
-
-	return nil
+	return
 }

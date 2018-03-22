@@ -9,13 +9,21 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/satori/go.uuid"
 )
+
+type gateway struct {
+	ID uuid.UUID
+	ttnpb.Gateway
+}
 
 // GatewayStore implements store.GatewayStore.
 type GatewayStore struct {
 	storer
 	*extraAttributesStore
 	*apiKeysStore
+
+	*accountStore
 }
 
 // NewGatewayStore returns a GatewayStore.
@@ -24,45 +32,72 @@ func NewGatewayStore(store storer) *GatewayStore {
 		storer:               store,
 		extraAttributesStore: newExtraAttributesStore(store, "gateway"),
 		apiKeysStore:         newAPIKeysStore(store, "gateway"),
+		accountStore:         newAccountStore(store),
 	}
+}
+
+func (s *GatewayStore) getGatewayIdentifiersFromID(q db.QueryContext, id uuid.UUID) (res ttnpb.GatewayIdentifiers, err error) {
+	err = q.SelectOne(
+		&res,
+		`SELECT
+				gateway_id
+			FROM gateways
+			WHERE id = $1`,
+		id)
+	return
+}
+
+// getGatewayID returns the UUID of the gateway that matches the identifier.
+func (s *GatewayStore) getGatewayID(q db.QueryContext, ids ttnpb.GatewayIdentifiers) (res uuid.UUID, err error) {
+	err = q.SelectOne(
+		&res,
+		`SELECT
+				id
+			FROM gateways
+			WHERE gateway_id = $1`,
+		ids.GatewayID)
+	if db.IsNoRows(err) {
+		err = ErrGatewayNotFound.New(nil)
+	}
+	return
 }
 
 // Create creates a new gateway.
 func (s *GatewayStore) Create(gateway store.Gateway) error {
 	err := s.transact(func(tx *db.Tx) error {
-		err := s.create(tx, gateway)
+		gtw := gateway.GetGateway()
+
+		gtwID, err := s.create(tx, gtw)
 		if err != nil {
 			return err
 		}
 
-		gtw := gateway.GetGateway()
-
 		// store attributes
-		err = s.setAttributes(tx, gtw.GatewayID, gtw.Attributes)
+		err = s.setAttributes(tx, gtwID, gtw.Attributes)
 		if err != nil {
 			return err
 		}
 
 		// store antennas
-		err = s.addAntennas(tx, gtw.GatewayID, gtw.Antennas)
+		err = s.addAntennas(tx, gtwID, gtw.Antennas)
 		if err != nil {
 			return err
 		}
 
 		// store radios
-		err = s.addRadios(tx, gtw.GatewayID, gtw.Radios)
+		err = s.addRadios(tx, gtwID, gtw.Radios)
 		if err != nil {
 			return err
 		}
 
-		return s.storeAttributes(tx, gtw.GatewayID, gateway, nil)
+		return s.storeAttributes(tx, gtwID, gateway)
 	})
 	return err
 }
 
-func (s *GatewayStore) create(q db.QueryContext, gateway store.Gateway) error {
-	gtw := gateway.GetGateway()
-	_, err := q.Exec(
+func (s *GatewayStore) create(q db.QueryContext, gateway *ttnpb.Gateway) (id uuid.UUID, err error) {
+	err = q.NamedSelectOne(
+		&id,
 		`INSERT
 			INTO gateways (
 					gateway_id,
@@ -74,31 +109,23 @@ func (s *GatewayStore) create(q db.QueryContext, gateway store.Gateway) error {
 					platform,
 					cluster_address)
 			VALUES (
-					$1,
-					$2,
-					$3,
-					$4,
-					$5,
-					$6,
-					$7,
-					$8)`,
-		gtw.GatewayID,
-		gtw.Description,
-		gtw.FrequencyPlanID,
-		gtw.ActivatedAt,
-		gtw.PrivacySettings,
-		gtw.AutoUpdate,
-		gtw.Platform,
-		gtw.ClusterAddress)
-
+					:gateway_id,
+					:description,
+					:frequency_plan_id,
+					:activated_at,
+					:privacy_settings,
+					:auto_update,
+					:platform,
+					:cluster_address)
+			RETURNING id`,
+		gateway)
 	if _, yes := db.IsDuplicate(err); yes {
-		return ErrGatewayIDTaken.New(nil)
+		err = ErrGatewayIDTaken.New(nil)
 	}
-
-	return err
+	return
 }
 
-func (s *GatewayStore) addAntennas(q db.QueryContext, gtwID string, antennas []ttnpb.GatewayAntenna) error {
+func (s *GatewayStore) addAntennas(q db.QueryContext, gtwID uuid.UUID, antennas []ttnpb.GatewayAntenna) error {
 	if len(antennas) == 0 {
 		return nil
 	}
@@ -107,7 +134,7 @@ func (s *GatewayStore) addAntennas(q db.QueryContext, gtwID string, antennas []t
 	return err
 }
 
-func (s *GatewayStore) addAntennasQuery(gtwID string, antennas []ttnpb.GatewayAntenna) (string, []interface{}) {
+func (s *GatewayStore) addAntennasQuery(gtwID uuid.UUID, antennas []ttnpb.GatewayAntenna) (string, []interface{}) {
 	args := make([]interface{}, 1+7*len(antennas))
 	args[0] = gtwID
 
@@ -146,7 +173,7 @@ func (s *GatewayStore) addAntennasQuery(gtwID string, antennas []ttnpb.GatewayAn
 	return query, args
 }
 
-func (s *GatewayStore) addRadios(q db.QueryContext, gtwID string, radios []ttnpb.GatewayRadio) error {
+func (s *GatewayStore) addRadios(q db.QueryContext, gtwID uuid.UUID, radios []ttnpb.GatewayRadio) error {
 	if len(radios) == 0 {
 		return nil
 	}
@@ -155,7 +182,7 @@ func (s *GatewayStore) addRadios(q db.QueryContext, gtwID string, radios []ttnpb
 	return err
 }
 
-func (s *GatewayStore) addRadiosQuery(gtwID string, radios []ttnpb.GatewayRadio) (string, []interface{}) {
+func (s *GatewayStore) addRadiosQuery(gtwID uuid.UUID, radios []ttnpb.GatewayRadio) (string, []interface{}) {
 	args := make([]interface{}, 1+2*len(radios))
 	args[0] = gtwID
 
@@ -184,14 +211,19 @@ func (s *GatewayStore) addRadiosQuery(gtwID string, radios []ttnpb.GatewayRadio)
 }
 
 // GetByID finds a gateway by ID and retrieves it.
-func (s *GatewayStore) GetByID(gtwID string, factory store.GatewaySpecializer) (result store.Gateway, err error) {
+func (s *GatewayStore) GetByID(ids ttnpb.GatewayIdentifiers, specializer store.GatewaySpecializer) (result store.Gateway, err error) {
 	err = s.transact(func(tx *db.Tx) error {
-		gateway, err := s.gateway(tx, gtwID)
+		gtwID, err := s.getGatewayID(tx, ids)
 		if err != nil {
 			return err
 		}
 
-		result = factory(*gateway)
+		gateway, err := s.getByID(tx, gtwID)
+		if err != nil {
+			return err
+		}
+
+		result = specializer(*gateway)
 
 		attributes, err := s.listAttributes(tx, gtwID)
 		if err != nil {
@@ -219,13 +251,21 @@ func (s *GatewayStore) GetByID(gtwID string, factory store.GatewaySpecializer) (
 
 // gateway fetchs a gateway from the database without antennas and attributes and
 // saves it into result.
-func (s *GatewayStore) gateway(q db.QueryContext, gtwID string) (*ttnpb.Gateway, error) {
+func (s *GatewayStore) getByID(q db.QueryContext, gtwID uuid.UUID) (*ttnpb.Gateway, error) {
 	result := new(ttnpb.Gateway)
 	err := q.SelectOne(
 		result,
-		`SELECT *
+		`SELECT
+					gateway_id,
+					description,
+					frequency_plan_id,
+					activated_at,
+					privacy_settings,
+					auto_update,
+					platform,
+					cluster_address
 				FROM gateways
-				WHERE gateway_id = $1`,
+				WHERE id = $1`,
 		gtwID)
 	if db.IsNoRows(err) {
 		return nil, ErrGatewayNotFound.New(nil)
@@ -236,126 +276,48 @@ func (s *GatewayStore) gateway(q db.QueryContext, gtwID string) (*ttnpb.Gateway,
 	return result, nil
 }
 
-// ListByOrganizationOrUser returns all the gateways to which an organization
-// or user is collaborator of.
-func (s *GatewayStore) ListByOrganizationOrUser(id string, specializer store.GatewaySpecializer) ([]store.Gateway, error) {
-	var result []store.Gateway
-
-	err := s.transact(func(tx *db.Tx) error {
-		gateways, err := s.organizationOrUserGateways(tx, id)
-		if err != nil {
-			return err
-		}
-
-		for _, gateway := range gateways {
-			gtw := specializer(gateway)
-
-			gtwID := gtw.GetGateway().GatewayID
-
-			attributes, err := s.listAttributes(tx, gtwID)
-			if err != nil {
-				return err
-			}
-			gtw.SetAttributes(attributes)
-
-			antennas, err := s.listAntennas(tx, gtwID)
-			if err != nil {
-				return err
-			}
-			gtw.SetAntennas(antennas)
-
-			radios, err := s.listRadios(tx, gtwID)
-			if err != nil {
-				return err
-			}
-			gtw.SetRadios(radios)
-
-			err = s.loadAttributes(tx, gtwID, gtw)
-			if err != nil {
-				return err
-			}
-
-			result = append(result, gtw)
-		}
-
-		return nil
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
-func (s *GatewayStore) organizationOrUserGateways(q db.QueryContext, id string) ([]ttnpb.Gateway, error) {
-	var gateways []ttnpb.Gateway
-	err := q.Select(
-		&gateways,
-		`SELECT DISTINCT gateways.*
-			FROM gateways
-			JOIN gateways_collaborators
-			ON (
-				gateways.gateway_id = gateways_collaborators.gateway_id
-				AND
-				(
-					account_id = $1
-					OR
-					account_id IN (
-						SELECT
-							organization_id
-						FROM organizations_members
-						WHERE user_id = $1
-					)
-				)
-			)`,
-		id)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return gateways, nil
-}
-
 // Update updates the gateway.
 func (s *GatewayStore) Update(gateway store.Gateway) error {
 	err := s.transact(func(tx *db.Tx) error {
-		err := s.update(tx, gateway)
-		if err != nil {
-			return err
-		}
-
 		gtw := gateway.GetGateway()
 
-		err = s.updateAttributes(tx, gtw.GatewayID, gtw.Attributes)
+		gtwID, err := s.getGatewayID(tx, gtw.GatewayIdentifiers)
 		if err != nil {
 			return err
 		}
 
-		err = s.updateAntennas(tx, gtw.GatewayID, gtw.Antennas)
+		err = s.update(tx, gtwID, gtw)
 		if err != nil {
 			return err
 		}
 
-		err = s.updateRadios(tx, gtw.GatewayID, gtw.Radios)
+		err = s.updateAttributes(tx, gtwID, gtw.Attributes)
 		if err != nil {
 			return err
 		}
 
-		return s.storeAttributes(tx, gtw.GatewayID, gateway, nil)
+		err = s.updateAntennas(tx, gtwID, gtw.Antennas)
+		if err != nil {
+			return err
+		}
+
+		err = s.updateRadios(tx, gtwID, gtw.Radios)
+		if err != nil {
+			return err
+		}
+
+		return s.storeAttributes(tx, gtwID, gateway)
 	})
 	return err
 }
 
-func (s *GatewayStore) update(q db.QueryContext, gateway store.Gateway) error {
-	gtw := gateway.GetGateway()
-
+func (s *GatewayStore) update(q db.QueryContext, gtwID uuid.UUID, data *ttnpb.Gateway) (err error) {
 	var id string
-	err := q.NamedSelectOne(
+	err = q.NamedSelectOne(
 		&id,
 		`UPDATE gateways
-			SET description = :description,
+			SET
+				description = :description,
 				frequency_plan_id = :frequency_plan_id,
 				activated_at = :activated_at,
 				privacy_settings = :privacy_settings,
@@ -363,18 +325,21 @@ func (s *GatewayStore) update(q db.QueryContext, gateway store.Gateway) error {
 				platform = :platform,
 				cluster_address = :cluster_address,
 				updated_at = current_timestamp()
-			WHERE gateway_id = :gateway_id
+			WHERE id = :id
 			RETURNING gateway_id`,
-		gtw)
+		gateway{
+			ID:      gtwID,
+			Gateway: *data,
+		})
 
 	if db.IsNoRows(err) {
-		return ErrGatewayNotFound.New(nil)
+		err = ErrGatewayNotFound.New(nil)
 	}
 
-	return err
+	return
 }
 
-func (s *GatewayStore) updateAntennas(q db.QueryContext, gtwID string, antennas []ttnpb.GatewayAntenna) error {
+func (s *GatewayStore) updateAntennas(q db.QueryContext, gtwID uuid.UUID, antennas []ttnpb.GatewayAntenna) error {
 	_, err := q.Exec("DELETE FROM gateways_antennas WHERE gateway_id = $1", gtwID)
 	if err != nil {
 		return err
@@ -383,7 +348,7 @@ func (s *GatewayStore) updateAntennas(q db.QueryContext, gtwID string, antennas 
 	return s.addAntennas(q, gtwID, antennas)
 }
 
-func (s *GatewayStore) updateRadios(q db.QueryContext, gtwID string, radios []ttnpb.GatewayRadio) error {
+func (s *GatewayStore) updateRadios(q db.QueryContext, gtwID uuid.UUID, radios []ttnpb.GatewayRadio) error {
 	_, err := q.Exec("DELETE FROM gateways_radios WHERE gateway_id = $1", gtwID)
 	if err != nil {
 		return err
@@ -394,7 +359,7 @@ func (s *GatewayStore) updateRadios(q db.QueryContext, gtwID string, radios []tt
 
 // updateAttributes removes the attributes that no longer exists for the gateway
 // given its ID and sets the rest of attributes.
-func (s *GatewayStore) updateAttributes(q db.QueryContext, gtwID string, attributes map[string]string) error {
+func (s *GatewayStore) updateAttributes(q db.QueryContext, gtwID uuid.UUID, attributes map[string]string) error {
 	query, args := s.removeAttributeDiffQuery(gtwID, attributes)
 	_, err := q.Exec(query, args...)
 	if err != nil {
@@ -407,7 +372,7 @@ func (s *GatewayStore) updateAttributes(q db.QueryContext, gtwID string, attribu
 // removeAttributeDiffQuery is the helper that construct the query to remove
 // those gateway attributes that no longer exists. It returns the query together
 // with the arguments list.
-func (s *GatewayStore) removeAttributeDiffQuery(gtwID string, attributes map[string]string) (string, []interface{}) {
+func (s *GatewayStore) removeAttributeDiffQuery(gtwID uuid.UUID, attributes map[string]string) (string, []interface{}) {
 	args := make([]interface{}, 1+len(attributes))
 	args[0] = gtwID
 
@@ -430,7 +395,11 @@ func (s *GatewayStore) removeAttributeDiffQuery(gtwID string, attributes map[str
 }
 
 // setAttributes inserts or modifies the attributes.
-func (s *GatewayStore) setAttributes(q db.QueryContext, gtwID string, attributes map[string]string) error {
+func (s *GatewayStore) setAttributes(q db.QueryContext, gtwID uuid.UUID, attributes map[string]string) error {
+	if attributes == nil || len(attributes) == 0 {
+		return nil
+	}
+
 	query, args := s.setAttributesQuery(gtwID, attributes)
 	_, err := q.Exec(query, args...)
 	return err
@@ -438,7 +407,7 @@ func (s *GatewayStore) setAttributes(q db.QueryContext, gtwID string, attributes
 
 // setAttributesQuery is a helper that constructs the upsert query for the
 // setAttributes method and returns it together with the list of arguments.
-func (s *GatewayStore) setAttributesQuery(gtwID string, attributes map[string]string) (string, []interface{}) {
+func (s *GatewayStore) setAttributesQuery(gtwID uuid.UUID, attributes map[string]string) (string, []interface{}) {
 	args := make([]interface{}, 1+2*len(attributes))
 	args[0] = gtwID
 
@@ -464,14 +433,16 @@ func (s *GatewayStore) setAttributesQuery(gtwID string, attributes map[string]st
 	return query, args
 }
 
-func (s *GatewayStore) listAttributes(q db.QueryContext, gtwID string) (map[string]string, error) {
+func (s *GatewayStore) listAttributes(q db.QueryContext, gtwID uuid.UUID) (map[string]string, error) {
 	var attrs []struct {
 		Attribute string
 		Value     string
 	}
 	err := q.Select(
 		&attrs,
-		`SELECT attribute, value
+		`SELECT
+				attribute,
+				value
 			FROM gateways_attributes
 			WHERE gateway_id = $1`,
 		gtwID)
@@ -488,7 +459,7 @@ func (s *GatewayStore) listAttributes(q db.QueryContext, gtwID string) (map[stri
 	return result, nil
 }
 
-func (s *GatewayStore) listAntennas(q db.QueryContext, gtwID string) ([]ttnpb.GatewayAntenna, error) {
+func (s *GatewayStore) listAntennas(q db.QueryContext, gtwID uuid.UUID) ([]ttnpb.GatewayAntenna, error) {
 	var antnns []struct {
 		Longitude float32
 		Latitude  float32
@@ -497,7 +468,14 @@ func (s *GatewayStore) listAntennas(q db.QueryContext, gtwID string) ([]ttnpb.Ga
 	}
 	err := q.Select(
 		&antnns,
-		`SELECT longitude, latitude, altitude, gain, type, model, placement
+		`SELECT
+				longitude,
+				latitude,
+				altitude,
+				gain,
+				type,
+				model,
+				placement
 			FROM gateways_antennas
 			WHERE gateway_id = $1
 			ORDER BY created_at ASC`,
@@ -524,11 +502,13 @@ func (s *GatewayStore) listAntennas(q db.QueryContext, gtwID string) ([]ttnpb.Ga
 	return result, nil
 }
 
-func (s *GatewayStore) listRadios(q db.QueryContext, gtwID string) ([]ttnpb.GatewayRadio, error) {
+func (s *GatewayStore) listRadios(q db.QueryContext, gtwID uuid.UUID) ([]ttnpb.GatewayRadio, error) {
 	var radios []ttnpb.GatewayRadio
 	err := q.Select(
 		&radios,
-		`SELECT frequency, tx_configuration
+		`SELECT
+				frequency,
+				tx_configuration
 			FROM gateways_radios
 			WHERE gateway_id = $1
 			ORDER BY created_at ASC`,
@@ -536,13 +516,21 @@ func (s *GatewayStore) listRadios(q db.QueryContext, gtwID string) ([]ttnpb.Gate
 	if !db.IsNoRows(err) && err != nil {
 		return nil, err
 	}
+	if radios == nil {
+		return make([]ttnpb.GatewayRadio, 0), nil
+	}
 	return radios, nil
 }
 
 // Delete deletes a gateway.
-func (s *GatewayStore) Delete(gtwID string) error {
+func (s *GatewayStore) Delete(ids ttnpb.GatewayIdentifiers) error {
 	err := s.transact(func(tx *db.Tx) error {
-		err := s.deleteCollaborators(tx, gtwID)
+		gtwID, err := s.getGatewayID(tx, ids)
+		if err != nil {
+			return err
+		}
+
+		err = s.deleteCollaborators(tx, gtwID)
 		if err != nil {
 			return err
 		}
@@ -575,13 +563,13 @@ func (s *GatewayStore) Delete(gtwID string) error {
 
 // delete deletes the gateway itself. All rows in other tables that references
 // this entity must be delete before this one gets deleted.
-func (s *GatewayStore) delete(q db.QueryContext, gtwID string) error {
+func (s *GatewayStore) delete(q db.QueryContext, gtwID uuid.UUID) error {
 	id := new(string)
 	err := q.SelectOne(
 		id,
 		`DELETE
 			FROM gateways
-			WHERE gateway_id = $1
+			WHERE id = $1
 			RETURNING gateway_id`,
 		gtwID)
 	if db.IsNoRows(err) {
@@ -591,289 +579,19 @@ func (s *GatewayStore) delete(q db.QueryContext, gtwID string) error {
 }
 
 // removeAntennas removes all the antennas from a gateway.
-func (s *GatewayStore) removeAntennas(q db.QueryContext, gtwID string) error {
+func (s *GatewayStore) removeAntennas(q db.QueryContext, gtwID uuid.UUID) error {
 	_, err := q.Exec("DELETE FROM gateways_antennas WHERE gateway_id = $1", gtwID)
 	return err
 }
 
 // removeRadios removes all the radios from a gateway.
-func (s *GatewayStore) removeRadios(q db.QueryContext, gtwID string) error {
+func (s *GatewayStore) removeRadios(q db.QueryContext, gtwID uuid.UUID) error {
 	_, err := q.Exec("DELETE FROM gateways_radios WHERE gateway_id = $1", gtwID)
 	return err
 }
 
 // removeAttributes removes all the attributes from a gateway.
-func (s *GatewayStore) removeAttributes(q db.QueryContext, gtwID string) error {
+func (s *GatewayStore) removeAttributes(q db.QueryContext, gtwID uuid.UUID) error {
 	_, err := q.Exec("DELETE FROM gateways_attributes WHERE gateway_id = $1", gtwID)
 	return err
-}
-
-// deleteCollaborators deletes all the collaborators from one gateway.
-func (s *GatewayStore) deleteCollaborators(q db.QueryContext, gtwID string) error {
-	_, err := q.Exec(
-		`DELETE
-			FROM gateways_collaborators
-			WHERE gateway_id = $1`,
-		gtwID)
-	return err
-}
-
-// SetCollaborator inserts or modifies a collaborator within an entity.
-// If the provided list of rights is empty the collaborator will be unset.
-func (s *GatewayStore) SetCollaborator(collaborator *ttnpb.GatewayCollaborator) error {
-	if len(collaborator.Rights) == 0 {
-		return s.unsetCollaborator(s.queryer(), collaborator.GatewayID, collaborator.GetCollaboratorID())
-	}
-
-	err := s.transact(func(tx *db.Tx) error {
-		return s.setCollaborator(tx, collaborator)
-	})
-	return err
-}
-
-func (s *GatewayStore) unsetCollaborator(q db.QueryContext, gtwID, accountID string) error {
-	_, err := q.Exec(
-		`DELETE
-			FROM gateways_collaborators
-			WHERE gateway_id = $1 AND account_id = $2`, gtwID, accountID)
-	return err
-}
-
-func (s *GatewayStore) setCollaborator(q db.QueryContext, collaborator *ttnpb.GatewayCollaborator) error {
-	query, args := s.removeRightsDiffQuery(collaborator)
-	_, err := q.Exec(query, args...)
-	if err != nil {
-		return err
-	}
-
-	query, args = s.addRightsQuery(collaborator.GatewayID, collaborator.GetCollaboratorID(), collaborator.Rights)
-	_, err = q.Exec(query, args...)
-
-	return err
-}
-
-func (s *GatewayStore) removeRightsDiffQuery(collaborator *ttnpb.GatewayCollaborator) (string, []interface{}) {
-	args := make([]interface{}, 2+len(collaborator.Rights))
-	args[0] = collaborator.GatewayID
-	args[1] = collaborator.GetCollaboratorID()
-
-	boundVariables := make([]string, len(collaborator.Rights))
-
-	for i, right := range collaborator.Rights {
-		args[i+2] = right
-		boundVariables[i] = fmt.Sprintf("$%d", i+3)
-	}
-
-	query := fmt.Sprintf(
-		`DELETE
-			FROM gateways_collaborators
-			WHERE gateway_id = $1 AND account_id = $2 AND "right" NOT IN (%s)`,
-		strings.Join(boundVariables, ", "))
-
-	return query, args
-}
-
-func (s *GatewayStore) addRightsQuery(gtwID, userID string, rights []ttnpb.Right) (string, []interface{}) {
-	args := make([]interface{}, 2+len(rights))
-	args[0] = gtwID
-	args[1] = userID
-
-	boundValues := make([]string, len(rights))
-
-	for i, right := range rights {
-		args[i+2] = right
-		boundValues[i] = fmt.Sprintf("($1, $2, $%d)", i+3)
-	}
-
-	query := fmt.Sprintf(
-		`INSERT
-			INTO gateways_collaborators (gateway_id, account_id, "right")
-			VALUES %s
-			ON CONFLICT (gateway_id, account_id, "right")
-			DO NOTHING`,
-		strings.Join(boundValues, " ,"))
-
-	return query, args
-}
-
-// HasCollaboratorRights checks whether a collaborator has a given set of rights
-// to a gateway. It returns false if the collaborationship does not exist.
-func (s *GatewayStore) HasCollaboratorRights(gtwID, collaboratorID string, rights ...ttnpb.Right) (bool, error) {
-	return s.hasCollaboratorRights(s.queryer(), gtwID, collaboratorID, rights...)
-}
-
-func (s *GatewayStore) hasCollaboratorRights(q db.QueryContext, gtwID, collaboratorID string, rights ...ttnpb.Right) (bool, error) {
-	clauses := make([]string, 0, len(rights))
-	args := make([]interface{}, 0, len(rights)+1)
-	args = append(args, collaboratorID)
-
-	for i, right := range rights {
-		args = append(args, right)
-		clauses = append(clauses, fmt.Sprintf(`"right" = $%d`, i+2))
-	}
-
-	count := 0
-	err := q.SelectOne(
-		&count,
-		fmt.Sprintf(
-			`SELECT
-				COUNT(DISTINCT "right")
-				FROM gateways_collaborators
-				WHERE (%s) AND (account_id = $1 OR account_id IN (
-					SELECT
-						organization_id
-					FROM organizations_members
-					WHERE user_id = $1
-				))`, strings.Join(clauses, " OR ")),
-		args...)
-	if db.IsNoRows(err) {
-		return false, nil
-	}
-	if err != nil {
-		return false, err
-	}
-	return len(rights) == count, nil
-}
-
-// ListCollaborators retrieves all the collaborators from an entity.
-func (s *GatewayStore) ListCollaborators(gtwID string, rights ...ttnpb.Right) ([]*ttnpb.GatewayCollaborator, error) {
-	return s.listCollaborators(s.queryer(), gtwID, rights...)
-}
-
-// nolint: dupl
-func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID string, rights ...ttnpb.Right) ([]*ttnpb.GatewayCollaborator, error) {
-	args := make([]interface{}, 1)
-	args[0] = gtwID
-
-	var query string
-	if len(rights) == 0 {
-		query = `
-		SELECT
-			account_id,
-			"right",
-			type
-		FROM gateways_collaborators
-		JOIN accounts USING (account_id)
-		WHERE gateway_id = $1`
-	} else {
-		rightsClause := make([]string, 0, len(rights))
-		for _, right := range rights {
-			rightsClause = append(rightsClause, fmt.Sprintf(`"right" = '%d'`, right))
-		}
-
-		query = fmt.Sprintf(`
-			SELECT
-					account_id,
-					"right",
-					type
-	    	FROM gateways_collaborators
-	    	JOIN accounts USING (account_id)
-	    	WHERE gateway_id = $1 AND account_id IN
-	    	(
-	      	SELECT account_id
-	      		FROM
-	      			(
-	          		SELECT
-	          				account_id,
-	          				count(account_id) as count
-	          	  	FROM gateways_collaborators
-	          			WHERE gateway_id = $1 AND (%s)
-	          			GROUP BY account_id
-	      			)
-	      		WHERE count = $2
-	  		)`,
-			strings.Join(rightsClause, " OR "))
-
-		args = append(args, len(rights))
-	}
-
-	var collaborators []struct {
-		AccountID string
-		Right     ttnpb.Right
-		Type      int
-	}
-	err := q.Select(&collaborators, query, args...)
-	if !db.IsNoRows(err) && err != nil {
-		return nil, err
-	}
-
-	byUser := make(map[string]*ttnpb.GatewayCollaborator)
-	for _, collaborator := range collaborators {
-		if _, exists := byUser[collaborator.AccountID]; !exists {
-			var identifier ttnpb.OrganizationOrUserIdentifier
-			if collaborator.Type == organization {
-				identifier = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_OrganizationID{OrganizationID: collaborator.AccountID}}
-			} else {
-				identifier = ttnpb.OrganizationOrUserIdentifier{ID: &ttnpb.OrganizationOrUserIdentifier_UserID{UserID: collaborator.AccountID}}
-			}
-
-			byUser[collaborator.AccountID] = &ttnpb.GatewayCollaborator{
-				GatewayIdentifier:            ttnpb.GatewayIdentifier{GatewayID: gtwID},
-				OrganizationOrUserIdentifier: identifier,
-				Rights: []ttnpb.Right{collaborator.Right},
-			}
-			continue
-		}
-
-		byUser[collaborator.AccountID].Rights = append(byUser[collaborator.AccountID].Rights, collaborator.Right)
-	}
-
-	result := make([]*ttnpb.GatewayCollaborator, 0, len(byUser))
-	for _, collaborator := range byUser {
-		result = append(result, collaborator)
-	}
-
-	return result, nil
-}
-
-// ListCollaboratorRights returns the rights a given collaborator has for a
-// Gateway. Returns empty list if the collaborationship does not exist.
-func (s *GatewayStore) ListCollaboratorRights(gtwID string, collaboratorID string) ([]ttnpb.Right, error) {
-	return s.listCollaboratorRights(s.queryer(), gtwID, collaboratorID)
-}
-
-func (s *GatewayStore) listCollaboratorRights(q db.QueryContext, gtwID string, collaboratorID string) ([]ttnpb.Right, error) {
-	var rights []ttnpb.Right
-	err := q.Select(
-		&rights,
-		`SELECT "right"
-			FROM gateways_collaborators
-			WHERE gateway_id = $1 AND account_id = $2`,
-		gtwID,
-		collaboratorID)
-	return rights, err
-}
-
-// LoadAttributes loads the extra attributes in gtw if it is a store.Attributer.
-func (s *GatewayStore) LoadAttributes(gtwID string, gtw store.Gateway) error {
-	return s.loadAttributes(s.queryer(), gtwID, gtw)
-}
-
-func (s *GatewayStore) loadAttributes(q db.QueryContext, gtwID string, gtw store.Gateway) error {
-	attr, ok := gtw.(store.Attributer)
-	if ok {
-		return s.extraAttributesStore.loadAttributes(q, gtwID, attr)
-	}
-
-	return nil
-}
-
-// StoreAttributes store the extra attributes of gtw if it is a store.Attributer
-// and writes the resulting gateway in result.
-func (s *GatewayStore) StoreAttributes(gtwID string, gtw, result store.Gateway) error {
-	return s.storeAttributes(s.queryer(), gtwID, gtw, result)
-}
-
-func (s *GatewayStore) storeAttributes(q db.QueryContext, gtwID string, gtw, result store.Gateway) error {
-	attr, ok := gtw.(store.Attributer)
-	if ok {
-		res, ok := result.(store.Attributer)
-		if result == nil || !ok {
-			return s.extraAttributesStore.storeAttributes(q, gtwID, attr, nil)
-		}
-
-		return s.extraAttributesStore.storeAttributes(q, gtwID, attr, res)
-	}
-
-	return nil
 }

@@ -1,11 +1,12 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package sql
+package sql_test
 
 import (
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
@@ -14,11 +15,11 @@ import (
 
 func TestOrganizations(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t, database)
+	s := testStore(t)
 
-	userID := testUsers()["alice"].UserID
+	userID := alice.UserIdentifiers
 	org := &ttnpb.Organization{
-		OrganizationIdentifier: ttnpb.OrganizationIdentifier{OrganizationID: "thethingsnetwork"},
+		OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "thethingsnetwork"},
 		Name:  "The Things Network",
 		Email: "foo@bar.org",
 	}
@@ -30,7 +31,7 @@ func TestOrganizations(t *testing.T) {
 	err := s.Organizations.Create(org)
 	a.So(err, should.BeNil)
 
-	found, err := s.Organizations.GetByID(org.OrganizationID, specializer)
+	found, err := s.Organizations.GetByID(org.OrganizationIdentifiers, specializer)
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeOrganizationIgnoringAutoFields, org)
 
@@ -38,24 +39,24 @@ func TestOrganizations(t *testing.T) {
 	err = s.Organizations.Update(org)
 	a.So(err, should.BeNil)
 
-	found, err = s.Organizations.GetByID(org.OrganizationID, specializer)
+	found, err = s.Organizations.GetByID(org.OrganizationIdentifiers, specializer)
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeOrganizationIgnoringAutoFields, org)
 
-	member := &ttnpb.OrganizationMember{
-		OrganizationIdentifier: org.OrganizationIdentifier,
-		UserIdentifier:         ttnpb.UserIdentifier{UserID: userID},
-		Rights:                 []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
+	member := ttnpb.OrganizationMember{
+		OrganizationIdentifiers: org.OrganizationIdentifiers,
+		UserIdentifiers:         userID,
+		Rights:                  []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
 	}
 
-	members, err := s.Organizations.ListMembers(org.OrganizationID)
+	members, err := s.Organizations.ListMembers(org.OrganizationIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(members, should.HaveLength, 0)
 
 	err = s.Organizations.SetMember(member)
 	a.So(err, should.BeNil)
 
-	members, err = s.Organizations.ListMembers(org.OrganizationID)
+	members, err = s.Organizations.ListMembers(org.OrganizationIdentifiers)
 	a.So(err, should.BeNil)
 	if a.So(members, should.HaveLength, 1) {
 		a.So(members[0], should.Resemble, member)
@@ -65,7 +66,7 @@ func TestOrganizations(t *testing.T) {
 	err = s.Organizations.SetMember(member)
 	a.So(err, should.BeNil)
 
-	members, err = s.Organizations.ListMembers(org.OrganizationID)
+	members, err = s.Organizations.ListMembers(org.OrganizationIdentifiers)
 	a.So(err, should.BeNil)
 	if a.So(members, should.HaveLength, 1) {
 		a.So(members[0], should.Resemble, member)
@@ -75,17 +76,17 @@ func TestOrganizations(t *testing.T) {
 	err = s.Organizations.SetMember(member)
 	a.So(err, should.BeNil)
 
-	members, err = s.Organizations.ListMembers(org.OrganizationID)
+	members, err = s.Organizations.ListMembers(org.OrganizationIdentifiers)
 	a.So(err, should.BeNil)
 	if a.So(members, should.HaveLength, 1) {
 		a.So(members[0], should.Resemble, member)
 	}
 
-	yes, err := s.Organizations.HasMemberRights(org.OrganizationID, userID, ttnpb.Right(1))
+	yes, err := s.Organizations.HasMemberRights(org.OrganizationIdentifiers, userID, ttnpb.Right(1))
 	a.So(err, should.BeNil)
 	a.So(yes, should.BeTrue)
 
-	yes, err = s.Organizations.HasMemberRights(org.OrganizationID, userID, ttnpb.Right(1), ttnpb.Right(99))
+	yes, err = s.Organizations.HasMemberRights(org.OrganizationIdentifiers, userID, ttnpb.Right(1), ttnpb.Right(99))
 	a.So(err, should.BeNil)
 	a.So(yes, should.BeFalse)
 
@@ -95,52 +96,146 @@ func TestOrganizations(t *testing.T) {
 		a.So(organizations[0], test.ShouldBeOrganizationIgnoringAutoFields, org)
 	}
 
+	// Test applications rights inheritance.
+	{
+		application := &ttnpb.Application{
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "org-app"},
+		}
+		err = s.Applications.Create(application)
+		a.So(err, should.BeNil)
+
+		collaborator := ttnpb.ApplicationCollaborator{
+			ApplicationIdentifiers:        application.ApplicationIdentifiers,
+			OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_OrganizationID{OrganizationID: &org.OrganizationIdentifiers}},
+			Rights: ttnpb.AllApplicationRights(),
+		}
+		err = s.Applications.SetCollaborator(collaborator)
+		a.So(err, should.BeNil)
+
+		rights, err := s.Applications.ListCollaboratorRights(application.ApplicationIdentifiers, collaborator.OrganizationOrUserIdentifiers)
+		a.So(err, should.BeNil)
+		a.So(rights, should.Resemble, collaborator.Rights)
+
+		uid := ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &userID}}
+
+		urights, err := s.Applications.ListCollaboratorRights(application.ApplicationIdentifiers, uid)
+		a.So(err, should.BeNil)
+		a.So(rights, should.Resemble, collaborator.Rights)
+		a.So(rights, should.Resemble, urights)
+
+		has, err := s.Applications.HasCollaboratorRights(application.ApplicationIdentifiers, uid, append(ttnpb.AllApplicationRights(), ttnpb.Right(0))...)
+		a.So(err, should.BeNil)
+		a.So(has, should.BeFalse)
+
+		has, err = s.Applications.HasCollaboratorRights(application.ApplicationIdentifiers, uid, ttnpb.AllApplicationRights()...)
+		a.So(err, should.BeNil)
+		a.So(has, should.BeTrue)
+
+		applications, err := s.Applications.ListByOrganizationOrUser(uid, applicationSpecializer)
+		a.So(err, should.BeNil)
+		if a.So(applications, should.HaveLength, 1) {
+			a.So(applications[0], test.ShouldBeApplicationIgnoringAutoFields, application)
+		}
+	}
+
+	// Test gateways rights inheritance.
+	// TODO(gomezjdaniel): if Antennas, Attributes and Radios are removed tests
+	// fails because <nil> =\ empty slice.
+	{
+		gateway := &ttnpb.Gateway{
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "org-gtw"},
+			Antennas:           []ttnpb.GatewayAntenna{},
+			Radios:             []ttnpb.GatewayRadio{},
+			Attributes:         make(map[string]string),
+		}
+		err = s.Gateways.Create(gateway)
+		a.So(err, should.BeNil)
+
+		collaborator := ttnpb.GatewayCollaborator{
+			GatewayIdentifiers:            gateway.GatewayIdentifiers,
+			OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_OrganizationID{OrganizationID: &org.OrganizationIdentifiers}},
+			Rights: ttnpb.AllGatewayRights(),
+		}
+		err = s.Gateways.SetCollaborator(collaborator)
+		a.So(err, should.BeNil)
+
+		rights, err := s.Gateways.ListCollaboratorRights(gateway.GatewayIdentifiers, collaborator.OrganizationOrUserIdentifiers)
+		a.So(err, should.BeNil)
+		a.So(rights, should.Resemble, collaborator.Rights)
+
+		uid := ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &userID}}
+
+		urights, err := s.Gateways.ListCollaboratorRights(gateway.GatewayIdentifiers, uid)
+		a.So(err, should.BeNil)
+		a.So(rights, should.Resemble, collaborator.Rights)
+		a.So(rights, should.Resemble, urights)
+
+		has, err := s.Gateways.HasCollaboratorRights(gateway.GatewayIdentifiers, uid, append(ttnpb.AllGatewayRights(), ttnpb.Right(0))...)
+		a.So(err, should.BeNil)
+		a.So(has, should.BeFalse)
+
+		has, err = s.Gateways.HasCollaboratorRights(gateway.GatewayIdentifiers, uid, ttnpb.AllGatewayRights()...)
+		a.So(err, should.BeNil)
+		a.So(has, should.BeTrue)
+
+		gateways, err := s.Gateways.ListByOrganizationOrUser(uid, gatewaySpecializer)
+		a.So(err, should.BeNil)
+		if a.So(gateways, should.HaveLength, 1) {
+			a.So(gateways[0], test.ShouldBeGatewayIgnoringAutoFields, gateway)
+		}
+	}
+
 	member.Rights = []ttnpb.Right{}
 	err = s.Organizations.SetMember(member)
 	a.So(err, should.BeNil)
 
-	members, err = s.Organizations.ListMembers(org.OrganizationID)
+	members, err = s.Organizations.ListMembers(org.OrganizationIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(members, should.HaveLength, 0)
 
-	key := &ttnpb.APIKey{
+	key := ttnpb.APIKey{
 		Name:   "foo",
 		Key:    "bar",
 		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
 	}
 
-	keys, err := s.Organizations.ListAPIKeys(org.OrganizationID)
+	keys, err := s.Organizations.ListAPIKeys(org.OrganizationIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(keys, should.HaveLength, 0)
 
-	err = s.Organizations.SaveAPIKey(org.OrganizationID, key)
+	err = s.Organizations.SaveAPIKey(org.OrganizationIdentifiers, key)
 	a.So(err, should.BeNil)
 
-	keys, err = s.Organizations.ListAPIKeys(org.OrganizationID)
+	keys, err = s.Organizations.ListAPIKeys(org.OrganizationIdentifiers)
 	a.So(err, should.BeNil)
 	if a.So(keys, should.HaveLength, 1) {
 		a.So(keys, should.Contain, key)
 	}
 
-	foundKey, err := s.Organizations.GetAPIKeyByName(org.OrganizationID, key.Name)
+	ids, foundKey, err := s.Organizations.GetAPIKey(key.Key)
+	a.So(err, should.BeNil)
+	a.So(ids, should.Resemble, org.OrganizationIdentifiers)
+	a.So(foundKey, should.Resemble, key)
+
+	foundKey, err = s.Organizations.GetAPIKeyByName(org.OrganizationIdentifiers, key.Name)
 	a.So(err, should.BeNil)
 	a.So(foundKey, should.Resemble, key)
 
-	err = s.Organizations.DeleteAPIKey(org.OrganizationID, key.Name)
+	err = s.Organizations.DeleteAPIKey(org.OrganizationIdentifiers, key.Name)
 	a.So(err, should.BeNil)
 
-	keys, err = s.Organizations.ListAPIKeys(org.OrganizationID)
+	keys, err = s.Organizations.ListAPIKeys(org.OrganizationIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(keys, should.HaveLength, 0)
 
 	// save it again. Call to `Delete` will handle it
-	err = s.Organizations.SaveAPIKey(org.OrganizationID, key)
+	err = s.Organizations.SaveAPIKey(org.OrganizationIdentifiers, key)
 	a.So(err, should.BeNil)
 
-	err = s.Organizations.Delete(org.OrganizationID)
+	err = s.Organizations.Delete(org.OrganizationIdentifiers)
 	a.So(err, should.BeNil)
 
-	found, err = s.Organizations.GetByID(org.OrganizationID, specializer)
+	found, err = s.Organizations.GetByID(org.OrganizationIdentifiers, specializer)
 	a.So(err, should.NotBeNil)
 	a.So(ErrOrganizationNotFound.Describes(err), should.BeTrue)
 	a.So(found, should.BeNil)

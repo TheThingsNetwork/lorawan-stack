@@ -22,7 +22,7 @@ type InvitationData struct {
 // InvitationStore is the store that holds invitations.
 type InvitationStore interface {
 	// Save saves the invitation.
-	Save(data *InvitationData) error
+	Save(data InvitationData) error
 
 	// Lists list all the saved invitations.
 	List() ([]*InvitationData, error)

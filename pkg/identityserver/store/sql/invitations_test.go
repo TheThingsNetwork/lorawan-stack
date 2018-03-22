@@ -1,21 +1,22 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package sql
+package sql_test
 
 import (
 	"testing"
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
 func TestInvitations(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t, database)
+	s := testStore(t)
 
-	invitation := &store.InvitationData{
+	invitation := store.InvitationData{
 		Token:     "123",
 		Email:     "foo@bar.com",
 		IssuedAt:  time.Now().UTC(),

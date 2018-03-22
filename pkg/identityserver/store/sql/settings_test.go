@@ -1,6 +1,6 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package sql
+package sql_test
 
 import (
 	"testing"
@@ -13,9 +13,9 @@ import (
 
 func TestSettings(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t, database)
+	s := testStore(t)
 
-	settings := &ttnpb.IdentityServerSettings{
+	settings := ttnpb.IdentityServerSettings{
 		BlacklistedIDs: []string{"a"},
 		AllowedEmails:  []string{},
 	}
@@ -24,8 +24,4 @@ func TestSettings(t *testing.T) {
 	found, err := s.Settings.Get()
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeSettingsIgnoringAutoFields, settings)
-
-	found2, err := s.Settings.Get()
-	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeSettings, found2)
 }

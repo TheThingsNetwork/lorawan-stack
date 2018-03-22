@@ -9,6 +9,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/satori/go.uuid"
 )
 
 type apiKeysStore struct {
@@ -25,19 +26,7 @@ func newAPIKeysStore(store storer, entity string) *apiKeysStore {
 	}
 }
 
-func (s *apiKeysStore) SaveAPIKey(entityID string, key *ttnpb.APIKey) error {
-	err := s.transact(func(tx *db.Tx) error {
-		err := s.saveAPIKey(tx, entityID, key)
-		if err != nil {
-			return err
-		}
-
-		return s.saveAPIKeyRights(tx, entityID, key.Name, key.Rights)
-	})
-	return err
-}
-
-func (s *apiKeysStore) saveAPIKey(q db.QueryContext, entityID string, key *ttnpb.APIKey) error {
+func (s *apiKeysStore) saveAPIKey(q db.QueryContext, entityID uuid.UUID, key ttnpb.APIKey) error {
 	_, err := q.Exec(
 		fmt.Sprintf(`
 			INSERT
@@ -54,13 +43,13 @@ func (s *apiKeysStore) saveAPIKey(q db.QueryContext, entityID string, key *ttnpb
 	return err
 }
 
-func (s *apiKeysStore) saveAPIKeyRights(q db.QueryContext, entityID, keyName string, rights []ttnpb.Right) error {
+func (s *apiKeysStore) saveAPIKeyRights(q db.QueryContext, entityID uuid.UUID, keyName string, rights []ttnpb.Right) error {
 	query, args := s.saveAPIKeyRightsQuery(entityID, keyName, rights)
 	_, err := q.Exec(query, args...)
 	return err
 }
 
-func (s *apiKeysStore) saveAPIKeyRightsQuery(entityID, keyName string, rights []ttnpb.Right) (string, []interface{}) {
+func (s *apiKeysStore) saveAPIKeyRightsQuery(entityID uuid.UUID, keyName string, rights []ttnpb.Right) (string, []interface{}) {
 	args := make([]interface{}, 2+len(rights))
 	args[0] = entityID
 	args[1] = keyName
@@ -86,31 +75,12 @@ func (s *apiKeysStore) saveAPIKeyRightsQuery(entityID, keyName string, rights []
 	return query, args
 }
 
-func (s *apiKeysStore) GetAPIKey(key string) (string, *ttnpb.APIKey, error) {
-	var entityID string
-	var apiKey *ttnpb.APIKey
-	var err error
-	err = s.transact(func(tx *db.Tx) error {
-		entityID, apiKey, err = s.getAPIKey(tx, key)
-		if err != nil {
-			return err
-		}
-
-		apiKey.Rights, err = s.getAPIKeyRights(tx, entityID, apiKey.Name)
-		return err
-	})
-	if err != nil {
-		return "", nil, err
-	}
-	return entityID, apiKey, nil
-}
-
-func (s *apiKeysStore) getAPIKey(q db.QueryContext, key string) (string, *ttnpb.APIKey, error) {
+func (s *apiKeysStore) getAPIKey(q db.QueryContext, value string) (id uuid.UUID, key ttnpb.APIKey, err error) {
 	var res struct {
-		EntityID string
-		*ttnpb.APIKey
+		EntityID uuid.UUID
+		ttnpb.APIKey
 	}
-	err := q.SelectOne(
+	err = q.SelectOne(
 		&res,
 		fmt.Sprintf(`
 			SELECT
@@ -119,38 +89,18 @@ func (s *apiKeysStore) getAPIKey(q db.QueryContext, key string) (string, *ttnpb.
 				%s AS entity_id
 			FROM %ss_api_keys
 			WHERE key = $1`, s.foreignKey, s.entity),
-		key)
+		value)
 	if db.IsNoRows(err) {
-		return "", nil, ErrAPIKeyNotFound.New(nil)
+		err = ErrAPIKeyNotFound.New(nil)
 	}
-	if err != nil {
-		return "", nil, err
-	}
-	return res.EntityID, res.APIKey, nil
+	id = res.EntityID
+	key = res.APIKey
+	return
 }
 
-func (s *apiKeysStore) GetAPIKeyByName(entityID, keyName string) (*ttnpb.APIKey, error) {
-	var key *ttnpb.APIKey
-	var err error
-	err = s.transact(func(tx *db.Tx) error {
-		key, err = s.getAPIKeyByName(tx, entityID, keyName)
-		if err != nil {
-			return err
-		}
-
-		key.Rights, err = s.getAPIKeyRights(tx, entityID, keyName)
-		return err
-	})
-	if err != nil {
-		return nil, err
-	}
-	return key, nil
-}
-
-func (s *apiKeysStore) getAPIKeyByName(q db.QueryContext, entityID, keyName string) (*ttnpb.APIKey, error) {
-	res := new(ttnpb.APIKey)
-	err := q.SelectOne(
-		res,
+func (s *apiKeysStore) getAPIKeyByName(q db.QueryContext, entityID uuid.UUID, keyName string) (key ttnpb.APIKey, err error) {
+	err = q.SelectOne(
+		&key,
 		fmt.Sprintf(`
 			SELECT
 				key,
@@ -160,17 +110,12 @@ func (s *apiKeysStore) getAPIKeyByName(q db.QueryContext, entityID, keyName stri
 		entityID,
 		keyName)
 	if db.IsNoRows(err) {
-		return nil, ErrAPIKeyNotFound.New(errors.Attributes{
-			"name": keyName,
-		})
+		err = ErrAPIKeyNotFound.New(nil)
 	}
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
+	return
 }
 
-func (s *apiKeysStore) getAPIKeyRights(q db.QueryContext, entityID, keyName string) ([]ttnpb.Right, error) {
+func (s *apiKeysStore) getAPIKeyRights(q db.QueryContext, entityID uuid.UUID, keyName string) ([]ttnpb.Right, error) {
 	var res []ttnpb.Right
 	err := q.Select(
 		&res,
@@ -187,33 +132,8 @@ func (s *apiKeysStore) getAPIKeyRights(q db.QueryContext, entityID, keyName stri
 	return res, nil
 }
 
-func (s *apiKeysStore) ListAPIKeys(entityID string) ([]*ttnpb.APIKey, error) {
-	var res []*ttnpb.APIKey
-	var err error
-	err = s.transact(func(tx *db.Tx) error {
-		res, err = s.listAPIKeys(tx, entityID)
-		if err != nil {
-			return err
-		}
-
-		for i, key := range res {
-			res[i].Rights, err = s.getAPIKeyRights(tx, entityID, key.Name)
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
-}
-
-func (s *apiKeysStore) listAPIKeys(q db.QueryContext, entityID string) ([]*ttnpb.APIKey, error) {
-	var res []*ttnpb.APIKey
-	err := q.Select(
+func (s *apiKeysStore) listAPIKeys(q db.QueryContext, entityID uuid.UUID) (res []ttnpb.APIKey, err error) {
+	err = q.Select(
 		&res,
 		fmt.Sprintf(`
 			SELECT
@@ -222,37 +142,10 @@ func (s *apiKeysStore) listAPIKeys(q db.QueryContext, entityID string) ([]*ttnpb
 			FROM %ss_api_keys
 			WHERE %s = $1`, s.entity, s.foreignKey),
 		entityID)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
+	return
 }
 
-func (s *apiKeysStore) UpdateAPIKeyRights(entityID, keyName string, rights []ttnpb.Right) error {
-	err := s.transact(func(tx *db.Tx) error {
-		err := s.deleteAPIKeyRights(tx, entityID, keyName)
-		if err != nil {
-			return err
-		}
-
-		return s.saveAPIKeyRights(tx, entityID, keyName, rights)
-	})
-	return err
-}
-
-func (s *apiKeysStore) DeleteAPIKey(entityID, keyName string) error {
-	err := s.transact(func(tx *db.Tx) error {
-		err := s.deleteAPIKeyRights(tx, entityID, keyName)
-		if err != nil {
-			return err
-		}
-
-		return s.deleteAPIKey(tx, entityID, keyName)
-	})
-	return err
-}
-
-func (s *apiKeysStore) deleteAPIKey(q db.QueryContext, entityID, keyName string) error {
+func (s *apiKeysStore) deleteAPIKey(q db.QueryContext, entityID uuid.UUID, keyName string) error {
 	res := new(string)
 	err := q.SelectOne(
 		res,
@@ -264,14 +157,12 @@ func (s *apiKeysStore) deleteAPIKey(q db.QueryContext, entityID, keyName string)
 		entityID,
 		keyName)
 	if db.IsNoRows(err) {
-		return ErrAPIKeyNotFound.New(errors.Attributes{
-			"name": keyName,
-		})
+		return ErrAPIKeyNotFound.New(nil)
 	}
 	return err
 }
 
-func (s *apiKeysStore) deleteAPIKeyRights(q db.QueryContext, entityID, keyName string) error {
+func (s *apiKeysStore) deleteAPIKeyRights(q db.QueryContext, entityID uuid.UUID, keyName string) error {
 	_, err := q.Exec(
 		fmt.Sprintf(`
 			DELETE
@@ -282,7 +173,7 @@ func (s *apiKeysStore) deleteAPIKeyRights(q db.QueryContext, entityID, keyName s
 	return err
 }
 
-func (s *apiKeysStore) deleteAPIKeys(q db.QueryContext, entityID string) error {
+func (s *apiKeysStore) deleteAPIKeys(q db.QueryContext, entityID uuid.UUID) error {
 	_, err := q.Exec(
 		fmt.Sprintf(`
 			DELETE

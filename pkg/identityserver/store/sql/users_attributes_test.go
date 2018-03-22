@@ -1,21 +1,19 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package sql
+package sql_test
 
 import (
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
+
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
-
-var userWithFooSpecializer = func(base ttnpb.User) store.User {
-	return &userWithFoo{User: &base}
-}
 
 // userWithFoo implements both store.User and store.Attributer interfaces.
 type userWithFoo struct {
@@ -68,20 +66,27 @@ func (u *userWithFoo) Fill(namespace string, attributes map[string]interface{}) 
 
 func TestUserAttributer(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t, database)
 
-	_, err := s.db.Exec(`
+	database := "is_store_attributer_test"
+	schema := `
 		CREATE TABLE IF NOT EXISTS foo_users (
-			user_id  STRING(36) REFERENCES users(user_id) NOT NULL,
-			foo		   STRING
+			id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			user_id   UUID NOT NULL REFERENCES users(id),
+			foo		    STRING
 		);
-	`)
-	a.So(err, should.BeNil)
+	`
+
+	migrations.Registry.Register(migrations.Registry.Count()+1, "test_attributer_schema", schema, "")
+	s := cleanStore(t, database)
+
+	specializer := func(base ttnpb.User) store.User {
+		return &userWithFoo{User: &base}
+	}
 
 	user := &ttnpb.User{
-		UserIdentifier: ttnpb.UserIdentifier{UserID: "attributer"},
-		Password:       "secret",
-		Email:          "john@example.net",
+		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "attributer"},
+		Password:        "secret",
+		Email:           "john@example.net",
 	}
 
 	withFoo := &userWithFoo{
@@ -89,10 +94,10 @@ func TestUserAttributer(t *testing.T) {
 		Foo:  "bar",
 	}
 
-	err = s.Users.Create(withFoo)
+	err := s.Users.Create(withFoo)
 	a.So(err, should.BeNil)
 
-	found, err := s.Users.GetByID(withFoo.GetUser().UserID, userWithFooSpecializer)
+	found, err := s.Users.GetByID(withFoo.GetUser().UserIdentifiers, specializer)
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeUserIgnoringAutoFields, withFoo)
 }

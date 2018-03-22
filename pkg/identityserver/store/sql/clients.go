@@ -3,11 +3,16 @@
 package sql
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/satori/go.uuid"
 )
+
+type client struct {
+	ID uuid.UUID
+	ttnpb.Client
+}
 
 // ClientStore implements store.ClientStore.
 type ClientStore struct {
@@ -23,42 +28,73 @@ func NewClientStore(store storer) *ClientStore {
 	}
 }
 
+func (s *ClientStore) getClientIdentifiersFromID(q db.QueryContext, id uuid.UUID) (res ttnpb.ClientIdentifiers, err error) {
+	err = q.SelectOne(
+		&res,
+		`SELECT
+				client_id
+			FROM clients
+			WHERE id = $1`,
+		id)
+	return
+}
+
+func (s *ClientStore) getClientID(q db.QueryContext, ids ttnpb.ClientIdentifiers) (res uuid.UUID, err error) {
+	err = q.SelectOne(
+		&res,
+		`SELECT
+				id
+			FROM clients
+			WHERE client_id = $1`,
+		ids.ClientID)
+	if db.IsNoRows(err) {
+		err = ErrClientNotFound.New(nil)
+	}
+	return
+}
+
 // Create creates a client.
 func (s *ClientStore) Create(client store.Client) error {
 	err := s.transact(func(tx *db.Tx) error {
-		err := s.create(tx, client)
+		cli := client.GetClient()
+
+		userID, err := s.store().Users.(*UserStore).getUserID(tx, cli.Creator)
 		if err != nil {
 			return err
 		}
 
-		return s.storeAttributes(tx, client.GetClient().ClientID, client, nil)
+		clientID, err := s.create(tx, userID, cli)
+		if err != nil {
+			return err
+		}
+
+		return s.storeAttributes(tx, clientID, client)
 	})
 	return err
 }
 
-func (s *ClientStore) create(q db.QueryContext, client store.Client) error {
+func (s *ClientStore) create(q db.QueryContext, userID uuid.UUID, data *ttnpb.Client) (id uuid.UUID, err error) {
 	var cli struct {
 		*ttnpb.Client
-		CreatorID       string
+		CreatorID       uuid.UUID
 		GrantsConverted db.Int32Slice
 		RightsConverted db.Int32Slice
 	}
-	cli.Client = client.GetClient()
-	cli.CreatorID = cli.Creator.UserID
+	cli.Client = data
+	cli.CreatorID = userID
 
-	rights, err := db.NewInt32Slice(cli.Client.Rights)
+	cli.RightsConverted, err = db.NewInt32Slice(cli.Client.Rights)
 	if err != nil {
-		return err
+		return
 	}
-	cli.RightsConverted = rights
 
-	grants, err := db.NewInt32Slice(cli.Client.Grants)
+	cli.GrantsConverted, err = db.NewInt32Slice(cli.Client.Grants)
 	if err != nil {
-		return err
+		return
 	}
-	cli.GrantsConverted = grants
 
-	_, err = q.NamedExec(
+	err = q.NamedSelectOne(
+		&id,
 		`INSERT
 			INTO clients (
 				client_id,
@@ -79,25 +115,31 @@ func (s *ClientStore) create(q db.QueryContext, client store.Client) error {
 				:state,
 				:rights_converted,
 				:creator_id,
-				:official_labeled)`,
+				:official_labeled)
+			RETURNING id`,
 		cli)
 
 	if _, yes := db.IsDuplicate(err); yes {
-		return ErrClientIDTaken.New(nil)
+		err = ErrClientIDTaken.New(nil)
 	}
 
-	return err
+	return
 }
 
 // GetByID finds a client by ID and retrieves it.
-func (s *ClientStore) GetByID(clientID string, factory store.ClientSpecializer) (result store.Client, err error) {
+func (s *ClientStore) GetByID(ids ttnpb.ClientIdentifiers, specializer store.ClientSpecializer) (result store.Client, err error) {
 	err = s.transact(func(tx *db.Tx) error {
+		clientID, err := s.getClientID(tx, ids)
+		if err != nil {
+			return err
+		}
+
 		client, err := s.getByID(tx, clientID)
 		if err != nil {
 			return err
 		}
 
-		result = factory(*client)
+		result = specializer(client)
 
 		return s.loadAttributes(tx, clientID, result)
 	})
@@ -105,15 +147,15 @@ func (s *ClientStore) GetByID(clientID string, factory store.ClientSpecializer) 
 	return
 }
 
-func (s *ClientStore) getByID(q db.QueryContext, clientID string) (*ttnpb.Client, error) {
+func (s *ClientStore) getByID(q db.QueryContext, id uuid.UUID) (client ttnpb.Client, err error) {
 	var res struct {
-		*ttnpb.Client
-		CreatorID       string
+		ttnpb.Client
+		CreatorID       uuid.UUID
 		GrantsConverted db.Int32Slice
 		RightsConverted db.Int32Slice
 	}
 
-	err := q.SelectOne(
+	err = q.SelectOne(
 		&res,
 		`SELECT
 				client_id,
@@ -128,25 +170,26 @@ func (s *ClientStore) getByID(q db.QueryContext, clientID string) (*ttnpb.Client
 				created_at,
 				updated_at
 			FROM clients
-			WHERE client_id = $1`,
-		clientID)
-	if db.IsNoRows(err) {
-		return nil, ErrClientNotFound.New(nil)
-	}
+			WHERE id = $1`,
+		id)
 
+	if db.IsNoRows(err) {
+		err = ErrClientNotFound.New(nil)
+	}
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	res.RightsConverted.SetInto(&res.Client.Rights)
 	res.GrantsConverted.SetInto(&res.Client.Grants)
-	res.Client.Creator.UserID = res.CreatorID
+	res.Client.Creator, err = s.store().Users.(*UserStore).getUserIdentifiersFromID(q, res.CreatorID)
+	client = res.Client
 
-	return res.Client, nil
+	return
 }
 
 // List returns all the clients.
-func (s *ClientStore) List(factory store.ClientSpecializer) ([]store.Client, error) {
+func (s *ClientStore) List(specializer store.ClientSpecializer) ([]store.Client, error) {
 	var res []store.Client
 	err := s.transact(func(tx *db.Tx) error {
 		found, err := s.list(tx)
@@ -157,9 +200,9 @@ func (s *ClientStore) List(factory store.ClientSpecializer) ([]store.Client, err
 		res = make([]store.Client, 0, len(found))
 
 		for _, client := range found {
-			cli := factory(client)
+			cli := specializer(client.Client)
 
-			err := s.loadAttributes(tx, client.ClientID, cli)
+			err := s.loadAttributes(tx, client.ID, cli)
 			if err != nil {
 				return err
 			}
@@ -175,10 +218,10 @@ func (s *ClientStore) List(factory store.ClientSpecializer) ([]store.Client, err
 	return res, nil
 }
 
-func (s *ClientStore) list(q db.QueryContext) ([]ttnpb.Client, error) {
+func (s *ClientStore) list(q db.QueryContext) ([]client, error) {
 	var res []struct {
-		ttnpb.Client
-		CreatorID       string
+		client
+		CreatorID       uuid.UUID
 		GrantsConverted db.Int32Slice
 		RightsConverted db.Int32Slice
 	}
@@ -201,59 +244,63 @@ func (s *ClientStore) list(q db.QueryContext) ([]ttnpb.Client, error) {
 		return nil, err
 	}
 
-	clients := make([]ttnpb.Client, 0, len(res))
+	clients := make([]client, 0, len(res))
 	for _, client := range res {
-		client.RightsConverted.SetInto(&client.Client.Rights)
-		client.GrantsConverted.SetInto(&client.Client.Grants)
-		client.Client.Creator.UserID = client.CreatorID
+		client.RightsConverted.SetInto(&client.client.Client.Rights)
+		client.GrantsConverted.SetInto(&client.client.Client.Grants)
 
-		clients = append(clients, client.Client)
+		userID, err := s.store().Users.(*UserStore).getUserIdentifiersFromID(q, client.CreatorID)
+		if err != nil {
+			return nil, err
+		}
+		client.client.Client.Creator = userID
+
+		clients = append(clients, client.client)
 	}
 
 	return clients, nil
 }
 
 // ListByUser returns all the clients created by the client.
-func (s *ClientStore) ListByUser(userID string, factory store.ClientSpecializer) ([]store.Client, error) {
-	var result []store.Client
+func (s *ClientStore) ListByUser(ids ttnpb.UserIdentifiers, specializer store.ClientSpecializer) (result []store.Client, err error) {
+	err = s.transact(func(tx *db.Tx) error {
+		userID, err := s.store().Users.(*UserStore).getUserID(tx, ids)
+		if err != nil {
+			return err
+		}
 
-	err := s.transact(func(tx *db.Tx) error {
 		clients, err := s.userClients(tx, userID)
 		if err != nil {
 			return err
 		}
 
 		for _, client := range clients {
-			cli := factory(client)
+			specialized := specializer(client.Client)
 
-			err := s.loadAttributes(tx, cli.GetClient().ClientID, cli)
+			err := s.loadAttributes(tx, client.ID, specialized)
 			if err != nil {
 				return err
 			}
 
-			result = append(result, cli)
+			result = append(result, specialized)
 		}
 
 		return nil
 	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return
 }
 
-func (s *ClientStore) userClients(q db.QueryContext, userID string) ([]ttnpb.Client, error) {
-	var clients []struct {
-		CreatorID       string
+func (s *ClientStore) userClients(q db.QueryContext, userID uuid.UUID) ([]client, error) {
+	var res []struct {
+		client
+		CreatorID       uuid.UUID
 		GrantsConverted db.Int32Slice
 		RightsConverted db.Int32Slice
-		ttnpb.Client
 	}
 	err := q.Select(
-		&clients,
+		&res,
 		`SELECT
+				id,
 				client_id,
 				description,
 				secret,
@@ -268,61 +315,74 @@ func (s *ClientStore) userClients(q db.QueryContext, userID string) ([]ttnpb.Cli
 			FROM clients
 			WHERE	creator_id = $1`,
 		userID)
-
 	if err != nil {
 		return nil, err
 	}
 
-	if len(clients) == 0 {
-		return make([]ttnpb.Client, 0), nil
+	clients := make([]client, 0, len(res))
+	for _, client := range res {
+		client.RightsConverted.SetInto(&client.client.Client.Rights)
+		client.GrantsConverted.SetInto(&client.client.Client.Grants)
+		userID, err := s.store().Users.(*UserStore).getUserIdentifiersFromID(q, client.CreatorID)
+		if err != nil {
+			return nil, err
+		}
+		client.client.Client.Creator = userID
+
+		clients = append(clients, client.client)
 	}
 
-	res := make([]ttnpb.Client, 0, len(clients))
-	for _, client := range clients {
-		client.RightsConverted.SetInto(&client.Client.Rights)
-		client.GrantsConverted.SetInto(&client.Client.Grants)
-		client.Client.Creator.UserID = client.CreatorID
-
-		res = append(res, client.Client)
-	}
-
-	return res, nil
+	return clients, nil
 }
 
 // Update updates the client.
 func (s *ClientStore) Update(client store.Client) error {
 	err := s.transact(func(tx *db.Tx) error {
-		err := s.update(tx, client)
+		cli := client.GetClient()
+
+		clientID, err := s.getClientID(tx, cli.ClientIdentifiers)
 		if err != nil {
 			return err
 		}
 
-		return s.storeAttributes(tx, client.GetClient().ClientID, client, nil)
+		err = s.update(tx, clientID, cli)
+		if err != nil {
+			return err
+		}
+
+		return s.storeAttributes(tx, clientID, client)
 	})
 	return err
 }
 
-func (s *ClientStore) update(q db.QueryContext, client store.Client) error {
-	var cli struct {
-		*ttnpb.Client
-		CreatorID       string
+func (s *ClientStore) update(q db.QueryContext, clientID uuid.UUID, data *ttnpb.Client) (err error) {
+	var input struct {
+		client
+		CreatorID       uuid.UUID
 		GrantsConverted db.Int32Slice
 		RightsConverted db.Int32Slice
 	}
-	cli.Client = client.GetClient()
-	cli.CreatorID = cli.Creator.UserID
+	input.client = client{
+		ID:     clientID,
+		Client: *data,
+	}
 
-	rights, err := db.NewInt32Slice(cli.Client.Rights)
+	input.CreatorID, err = s.store().Users.(*UserStore).getUserID(q, input.Creator)
 	if err != nil {
 		return err
 	}
-	cli.RightsConverted = rights
 
-	grants, err := db.NewInt32Slice(cli.Client.Grants)
+	rights, err := db.NewInt32Slice(input.Client.Rights)
 	if err != nil {
 		return err
 	}
-	cli.GrantsConverted = grants
+	input.RightsConverted = rights
+
+	grants, err := db.NewInt32Slice(input.Client.Grants)
+	if err != nil {
+		return err
+	}
+	input.GrantsConverted = grants
 
 	_, err = q.NamedExec(
 		`UPDATE clients
@@ -336,35 +396,35 @@ func (s *ClientStore) update(q db.QueryContext, client store.Client) error {
 				rights = :rights_converted,
 				creator_id = :creator_id,
 				updated_at = current_timestamp()
-			WHERE client_id = :client_id`,
-		cli)
+			WHERE id = :id`,
+		input)
 
 	if db.IsNoRows(err) {
-		return ErrClientNotFound.New(nil)
+		err = ErrClientNotFound.New(nil)
 	}
 
-	return err
+	return
 }
 
 // Delete deletes a client.
-func (s *ClientStore) Delete(clientID string) error {
+func (s *ClientStore) Delete(ids ttnpb.ClientIdentifiers) error {
 	err := s.transact(func(tx *db.Tx) error {
-		oauth, ok := s.store().OAuth.(*OAuthStore)
-		if !ok {
-			return errors.Errorf("Expected ptr to OAuthStore but got %T", s.store().OAuth)
-		}
-
-		err := oauth.deleteAuthorizationCodesByClient(tx, clientID)
+		clientID, err := s.getClientID(tx, ids)
 		if err != nil {
 			return err
 		}
 
-		err = oauth.deleteAccessTokensByClient(tx, clientID)
+		err = s.store().OAuth.(*OAuthStore).deleteAuthorizationCodesByClient(tx, clientID)
 		if err != nil {
 			return err
 		}
 
-		err = oauth.deleteRefreshTokensByClient(tx, clientID)
+		err = s.store().OAuth.(*OAuthStore).deleteAccessTokensByClient(tx, clientID)
+		if err != nil {
+			return err
+		}
+
+		err = s.store().OAuth.(*OAuthStore).deleteRefreshTokensByClient(tx, clientID)
 		if err != nil {
 			return err
 		}
@@ -377,51 +437,17 @@ func (s *ClientStore) Delete(clientID string) error {
 
 // delete deletes the client itself. All rows in other tables that references
 // this entity must be deleted before this one gets deleted.
-func (s *ClientStore) delete(q db.QueryContext, clientID string) error {
+func (s *ClientStore) delete(q db.QueryContext, clientID uuid.UUID) (err error) {
 	id := new(string)
-	err := q.SelectOne(
+	err = q.SelectOne(
 		id,
 		`DELETE
 			FROM clients
-			WHERE client_id = $1
+			WHERE id = $1
 			RETURNING client_id`,
 		clientID)
 	if db.IsNoRows(err) {
-		return ErrClientNotFound.New(nil)
+		err = ErrClientNotFound.New(nil)
 	}
-	return err
-}
-
-// LoadAttributes loads the extra attributes in cli if it is a store.Attributer.
-func (s *ClientStore) LoadAttributes(clientID string, cli store.Client) error {
-	return s.loadAttributes(s.queryer(), clientID, cli)
-}
-
-func (s *ClientStore) loadAttributes(q db.QueryContext, clientID string, cli store.Client) error {
-	attr, ok := cli.(store.Attributer)
-	if ok {
-		return s.extraAttributesStore.loadAttributes(q, clientID, attr)
-	}
-
-	return nil
-}
-
-// StoreAttributes store the extra attributes of cli if it is a store.Attributer
-// and writes the resulting client in result.
-func (s *ClientStore) StoreAttributes(clientID string, cli, result store.Client) error {
-	return s.storeAttributes(s.queryer(), clientID, cli, result)
-}
-
-func (s *ClientStore) storeAttributes(q db.QueryContext, clientID string, cli, result store.Client) error {
-	attr, ok := cli.(store.Attributer)
-	if ok {
-		res, ok := result.(store.Attributer)
-		if result == nil || !ok {
-			return s.extraAttributesStore.storeAttributes(q, clientID, attr, nil)
-		}
-
-		return s.extraAttributesStore.storeAttributes(q, clientID, attr, res)
-	}
-
-	return nil
+	return
 }

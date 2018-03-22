@@ -10,7 +10,8 @@ func init() {
 			type         INT NOT NULL
 		);
 		CREATE TABLE IF NOT EXISTS users (
-			user_id        STRING(36) PRIMARY KEY REFERENCES accounts(account_id),
+			id             UUID PRIMARY KEY REFERENCES accounts(id),
+			user_id        STRING(36) UNIQUE NOT NULL REFERENCES accounts(account_id),
 			name           STRING NOT NULL DEFAULT '',
 			email          STRING UNIQUE NOT NULL,
 			password       STRING NOT NULL,
@@ -24,18 +25,18 @@ func init() {
 		CREATE TABLE IF NOT EXISTS validation_tokens (
 			id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			validation_token   STRING UNIQUE NOT NULL,
-			user_id            STRING(36) UNIQUE NOT NULL REFERENCES users(user_id),
+			user_id            UUID UNIQUE NOT NULL REFERENCES users(id),
 			created_at         TIMESTAMP NOT NULL DEFAULT current_timestamp(),
 			expires_in         INTEGER NOT NULL
 		);
 		CREATE TABLE IF NOT EXISTS users_api_keys (
-			key        STRING NOT NULL PRIMARY KEY,
-			user_id    STRING(36) NOT NULL REFERENCES users(user_id),
+			user_id    UUID NOT NULL REFERENCES users(id),
 			key_name   STRING(36) NOT NULL,
-			UNIQUE(user_id, key_name)
+			key        STRING NOT NULL UNIQUE,
+			PRIMARY KEY(user_id, key_name)
 		);
 		CREATE TABLE IF NOT EXISTS users_api_keys_rights (
-			user_id    STRING(36) NOT NULL REFERENCES users(user_id),
+			user_id    UUID NOT NULL REFERENCES users(id),
 			key_name   STRING(36) NOT NULL,
 			"right"    STRING NOT NULL,
 			PRIMARY KEY(user_id, key_name, "right")

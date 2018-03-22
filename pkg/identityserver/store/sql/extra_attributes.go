@@ -8,6 +8,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	"github.com/satori/go.uuid"
 )
 
 type extraAttributesStore struct {
@@ -24,13 +25,8 @@ func newExtraAttributesStore(store storer, entity string) *extraAttributesStore 
 	}
 }
 
-// LoadAttributes loads extra attributes into the Application.
-func (s *extraAttributesStore) LoadAttributes(entityID string, attributer store.Attributer) error {
-	return s.loadAttributes(s.queryer(), entityID, attributer)
-}
-
-func (s *extraAttributesStore) loadAttributes(q db.QueryContext, entityID string, attributer store.Attributer) error {
-	// fill the application from all specified namespaces
+func (s *extraAttributesStore) loadAttributes(q db.QueryContext, entityID uuid.UUID, attributer store.Attributer) error {
+	// Fill the application from all specified namespaces.
 	for _, namespace := range attributer.Namespaces() {
 		m := make(map[string]interface{})
 		err := q.SelectOne(
@@ -50,13 +46,7 @@ func (s *extraAttributesStore) loadAttributes(q db.QueryContext, entityID string
 	return nil
 }
 
-// StoreAttributes writes the extra attributes on the Application if it is an
-// Attributer to the store.
-func (s *extraAttributesStore) StoreAttributes(entityID string, attributer, result store.Attributer) error {
-	return s.storeAttributes(s.queryer(), entityID, attributer, result)
-}
-
-func (s *extraAttributesStore) storeAttributes(q db.QueryContext, entityID string, attributer, result store.Attributer) error {
+func (s *extraAttributesStore) storeAttributes(q db.QueryContext, entityID uuid.UUID, attributer store.Attributer) error {
 	for _, namespace := range attributer.Namespaces() {
 		m := attributer.Attributes(namespace)
 		values := make([]interface{}, 0, len(m)+1)
@@ -87,13 +77,6 @@ func (s *extraAttributesStore) storeAttributes(q db.QueryContext, entityID strin
 		err := q.SelectOne(r, query, values...)
 		if !db.IsNoRows(err) && err != nil {
 			return err
-		}
-
-		if result != nil {
-			err = result.Fill(namespace, r)
-			if err != nil {
-				return err
-			}
 		}
 	}
 

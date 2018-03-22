@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 // AuthorizationData is the data stored for an authorization code.
@@ -100,36 +101,36 @@ type RefreshData struct {
 // and refresh tokens.
 type OAuthStore interface {
 	// SaveAuthorizationCode saves the authorization code.
-	SaveAuthorizationCode(authorization *AuthorizationData) error
+	SaveAuthorizationCode(AuthorizationData) error
 
 	// GetAuthorizationCode finds the authorization code.
-	GetAuthorizationCode(authorizationCode string) (*AuthorizationData, error)
+	GetAuthorizationCode(string) (AuthorizationData, error)
 
 	// DeleteAuthorizationCode deletes the authorization code.
-	DeleteAuthorizationCode(authorizationCode string) error
+	DeleteAuthorizationCode(string) error
 
 	// SaveAccessToken saves the access token.
-	SaveAccessToken(access *AccessData) error
+	SaveAccessToken(AccessData) error
 
 	// GetAccessToken finds the access token.
-	GetAccessToken(accessToken string) (*AccessData, error)
+	GetAccessToken(string) (AccessData, error)
 
 	// DeleteAccessToken deletes the access token.
-	DeleteAccessToken(accessToken string) error
+	DeleteAccessToken(string) error
 
 	// SaveRefreshToken saves the refresh token.
-	SaveRefreshToken(refresh *RefreshData) error
+	SaveRefreshToken(RefreshData) error
 
 	// GetRefreshToken finds the refresh token.
-	GetRefreshToken(refreshToken string) (*RefreshData, error)
+	GetRefreshToken(string) (RefreshData, error)
 
 	// DeleteRefreshToken deletes the refresh token from the database.
-	DeleteRefreshToken(refreshToken string) error
+	DeleteRefreshToken(string) error
 
 	// ListAuthorizedClients returns a list of clients authorized by a given user.
-	ListAuthorizedClients(userID string, specializer ClientSpecializer) ([]Client, error)
+	ListAuthorizedClients(ttnpb.UserIdentifiers, ClientSpecializer) ([]Client, error)
 
 	// RevokeAuthorizedClient deletes the access tokens and refresh token
 	// granted to a client by a given user.
-	RevokeAuthorizedClient(userID, clientID string) error
+	RevokeAuthorizedClient(ttnpb.UserIdentifiers, ttnpb.ClientIdentifiers) error
 }

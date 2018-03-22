@@ -1,6 +1,6 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package sql
+package sql_test
 
 import (
 	"context"
@@ -8,7 +8,9 @@ import (
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
+	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 )
 
@@ -23,7 +25,7 @@ var testingStore *Store
 // testStore returns a single and shared store instance everytime the method is
 // called. The first time that is called it creates  a new store instance in a
 // newly created database.
-func testStore(t testing.TB, database string) *Store {
+func testStore(t testing.TB) *Store {
 	if testingStore == nil {
 		testingStore = cleanStore(t, database)
 	}
@@ -64,19 +66,14 @@ func cleanStore(t testing.TB, database string) *Store {
 		return nil
 	}
 
-	// instantiate store
 	s := FromDB(db)
 
-	// create some users
-	for _, user := range testUsers() {
+	for _, user := range []*ttnpb.User{alice, bob} {
 		err := s.Users.Create(user)
 		if err != nil {
-			logger.WithError(err).Fatalf("Failed to feed test database `%s` with some users", database)
-			return nil
+			logger.WithError(err).Fatal("Failed to feed test store with users")
 		}
 	}
-
-	testClientCreate(t, s)
 
 	return s
 }
