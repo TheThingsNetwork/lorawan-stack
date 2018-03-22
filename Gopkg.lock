@@ -370,6 +370,12 @@
   source = "github.com/johanstokking/otto"
 
 [[projects]]
+  name = "github.com/satori/go.uuid"
+  packages = ["."]
+  revision = "f58768cc1a7a7e77a3bd49e98cdd21419399b6a3"
+  version = "v1.2.0"
+
+[[projects]]
   name = "github.com/sendgrid/rest"
   packages = ["."]
   revision = "80b39aaf5a30edab5bf2f99d56052abe01a0d41d"
@@ -631,6 +637,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7a4bec70e34923de2d9168ead5f7774cff5f277adb5df4dac77141521df4d552"
+  inputs-digest = "042afcd01ca774f309ad14705981d778af605ccbec076ca9ea0af6c0498917d0"
   solver-name = "gps-cdcl"
   solver-version = 1
