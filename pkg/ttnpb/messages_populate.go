@@ -39,9 +39,9 @@ func NewPopulatedUplinkMessage(r randyMessages, easy bool) (msg *UplinkMessage) 
 func NewPopulatedUplinkMessageUplink(r randyLorawan, sNwkSIntKey, fNwkSIntKey types.AES128Key, confirmed bool) *UplinkMessage {
 	out := &UplinkMessage{}
 	out.Settings = *NewPopulatedTxSettings(r, false)
-	out.RxMetadata = make([]RxMetadata, 1+r.Intn(5))
+	out.RxMetadata = make([]*RxMetadata, 1+r.Intn(5))
 	for i := 0; i < len(out.RxMetadata); i++ {
-		out.RxMetadata[i] = *NewPopulatedRxMetadata(r, false)
+		out.RxMetadata[i] = NewPopulatedRxMetadata(r, false)
 	}
 
 	msg := NewPopulatedMessageUplink(r, sNwkSIntKey, fNwkSIntKey, uint8(out.Settings.DataRateIndex), uint8(out.Settings.ChannelIndex), confirmed)
@@ -62,9 +62,9 @@ func NewPopulatedUplinkMessageUplink(r randyLorawan, sNwkSIntKey, fNwkSIntKey ty
 func NewPopulatedUplinkMessageJoinRequest(r randyLorawan) *UplinkMessage {
 	out := &UplinkMessage{}
 	out.Settings = *NewPopulatedTxSettings(r, false)
-	out.RxMetadata = make([]RxMetadata, 1+r.Intn(5))
+	out.RxMetadata = make([]*RxMetadata, 1+r.Intn(5))
 	for i := 0; i < len(out.RxMetadata); i++ {
-		out.RxMetadata[i] = *NewPopulatedRxMetadata(r, false)
+		out.RxMetadata[i] = NewPopulatedRxMetadata(r, false)
 	}
 
 	msg := NewPopulatedMessageJoinRequest(r)
@@ -88,9 +88,9 @@ func NewPopulatedUplinkMessageJoinRequest(r randyLorawan) *UplinkMessage {
 func NewPopulatedUplinkMessageRejoinRequest(r randyLorawan, typ RejoinType) *UplinkMessage {
 	out := &UplinkMessage{}
 	out.Settings = *NewPopulatedTxSettings(r, false)
-	out.RxMetadata = make([]RxMetadata, 1+r.Intn(5))
+	out.RxMetadata = make([]*RxMetadata, 1+r.Intn(5))
 	for i := 0; i < len(out.RxMetadata); i++ {
-		out.RxMetadata[i] = *NewPopulatedRxMetadata(r, false)
+		out.RxMetadata[i] = NewPopulatedRxMetadata(r, false)
 	}
 
 	msg := NewPopulatedMessageRejoinRequest(r, typ)

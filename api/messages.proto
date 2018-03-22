@@ -79,7 +79,7 @@ message UplinkMessage {
   TxSettings settings = 4 [(gogoproto.nullable) = false];
 
   // Rx metadata from the gateway, one for each antenna that received the message
-  repeated RxMetadata rx_metadata = 5 [(gogoproto.nullable) = false];
+  repeated RxMetadata rx_metadata = 5;
 
   // Locations from various sources
   map<string, LocationSource> locations = 6;
