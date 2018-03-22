@@ -85,7 +85,7 @@ func TestLink(t *testing.T) {
 
 	registeredGatewayID, registeredGatewayUnknownFPID := "registered-gateway", "registered-gw-unknown-fp"
 	registeredGatewayFP, registeredGatewayUnknownFP := "EU_863_870", "UNKNOWN_FP"
-	registeredGateways := map[ttnpb.GatewayIdentifier]ttnpb.Gateway{
+	registeredGateways := map[ttnpb.GatewayIdentifiers]ttnpb.Gateway{
 		{GatewayID: registeredGatewayID}:          {FrequencyPlanID: registeredGatewayFP},
 		{GatewayID: registeredGatewayUnknownFPID}: {FrequencyPlanID: registeredGatewayUnknownFP},
 	}
@@ -185,7 +185,7 @@ func TestLink(t *testing.T) {
 			},
 			RawPayload: downlinkContent,
 			TxMetadata: ttnpb.TxMetadata{
-				GatewayIdentifier: ttnpb.GatewayIdentifier{GatewayID: registeredGatewayID},
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayID},
 			},
 		})
 		a.So(err, should.BeNil)
@@ -201,7 +201,7 @@ func TestLink(t *testing.T) {
 
 	// Gateway information
 	{
-		obs, err := gs.GetGatewayObservations(ctx, &ttnpb.GatewayIdentifier{GatewayID: registeredGatewayID})
+		obs, err := gs.GetGatewayObservations(ctx, &ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayID})
 		a.So(err, should.BeNil)
 		a.So(obs, should.NotBeNil)
 	}

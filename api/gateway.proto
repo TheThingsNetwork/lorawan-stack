@@ -16,7 +16,7 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 // Gateway is the message that defines a gateway on the network.
 message Gateway {
   // id is the Gateway's unique and immutable ID.
-  GatewayIdentifier id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
+  GatewayIdentifiers id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
 
   // description is the description of the gateway.
   string description = 2;
@@ -54,7 +54,7 @@ message Gateway {
 
   // contact_account is either an Organization ID or User ID that will be
   // displayed (according the privacy settings) as contact persona for this gateway.
-  OrganizationOrUserIdentifier contact_account = 12;
+  OrganizationOrUserIdentifiers contact_account = 12;
 
   // created_at is the time when the gateway was created.
   // This a read-only field.

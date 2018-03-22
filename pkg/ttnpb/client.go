@@ -15,7 +15,7 @@ func (c *Client) GetClient() *Client {
 // GetId implements osin.Client.
 // nolint: golint
 func (c *Client) GetId() string {
-	return c.ClientIdentifier.GetClientID()
+	return c.ClientIdentifiers.GetClientID()
 }
 
 // GetRedirectUri implements osin.Client.

@@ -11,7 +11,7 @@ import (
 )
 
 func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*types.Empty, error) {
-	err := g.gateways.Send(down.TxMetadata.GatewayIdentifier, &ttnpb.GatewayDown{DownlinkMessage: down})
+	err := g.gateways.Send(down.TxMetadata.GatewayIdentifiers, &ttnpb.GatewayDown{DownlinkMessage: down})
 	if err != nil {
 		return nil, errors.NewWithCause(err, "Could not send downlink to gateway")
 	}

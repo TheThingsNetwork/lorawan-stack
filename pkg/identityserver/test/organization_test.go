@@ -13,7 +13,7 @@ import (
 
 func organization() *ttnpb.Organization {
 	return &ttnpb.Organization{
-		OrganizationIdentifier: ttnpb.OrganizationIdentifier{OrganizationID: "foo"},
+		OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "foo"},
 		Name:        "Foo Bar",
 		Description: "foo",
 		URL:         "http://foo.bar",

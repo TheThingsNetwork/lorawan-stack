@@ -24,7 +24,7 @@ func (e nsErrors) Error() string {
 	return strings.Join(errors, "\n")
 }
 
-func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *ttnpb.GatewayIdentifier) (ttnpb.FrequencyPlan, error) {
+func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *ttnpb.GatewayIdentifiers) (ttnpb.FrequencyPlan, error) {
 	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, g.nsTags, nil)
 	if isInfo == nil {
 		return ttnpb.FrequencyPlan{}, errors.New("No identity server to connect to")
@@ -67,7 +67,7 @@ func (g *GatewayServer) forAllNS(f func(ttnpb.GsNsClient) error) error {
 func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	ctx := link.Context()
 	md := rpcmetadata.FromIncomingContext(ctx)
-	id := ttnpb.GatewayIdentifier{
+	id := ttnpb.GatewayIdentifiers{
 		GatewayID: md.ID,
 	}
 

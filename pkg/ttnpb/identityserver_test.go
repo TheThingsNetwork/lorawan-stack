@@ -75,10 +75,10 @@ func TestUserValidations(t *testing.T) {
 		// request with an invalid email (bad)
 		req = &CreateUserRequest{
 			User: User{
-				UserIdentifier: UserIdentifier{UserID: "alice"},
-				Name:           "Ali Ce",
-				Password:       "12345678abC",
-				Email:          "alice@alice.",
+				UserIdentifiers: UserIdentifiers{UserID: "alice"},
+				Name:            "Ali Ce",
+				Password:        "12345678abC",
+				Email:           "alice@alice.",
 			},
 		}
 		a.So(req.Validate(), should.NotBeNil)
@@ -86,10 +86,10 @@ func TestUserValidations(t *testing.T) {
 		// good request
 		req = &CreateUserRequest{
 			User: User{
-				UserIdentifier: UserIdentifier{UserID: "alice"},
-				Name:           "Ali Ce",
-				Password:       "12345678abC",
-				Email:          "alice@alice.com",
+				UserIdentifiers: UserIdentifiers{UserID: "alice"},
+				Name:            "Ali Ce",
+				Password:        "12345678abC",
+				Email:           "alice@alice.com",
 			},
 		}
 		a.So(req.Validate(), should.BeNil)
@@ -115,8 +115,8 @@ func TestUserValidations(t *testing.T) {
 		// good request
 		req = &UpdateUserRequest{
 			User: User{
-				UserIdentifier: UserIdentifier{UserID: "alice"},
-				Email:          "alice@ttn.com",
+				UserIdentifiers: UserIdentifiers{UserID: "alice"},
+				Email:           "alice@ttn.com",
 			},
 			UpdateMask: pbtypes.FieldMask{
 				Paths: []string{"name", "email"},
@@ -233,7 +233,7 @@ func TestApplicationValidations(t *testing.T) {
 		// good request
 		req = &CreateApplicationRequest{
 			Application: Application{
-				ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
+				ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
 			},
 		}
 		a.So(req.Validate(), should.BeNil)
@@ -243,7 +243,7 @@ func TestApplicationValidations(t *testing.T) {
 		// request without update mask (bad)
 		req := &UpdateApplicationRequest{
 			Application: Application{
-				ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
+				ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
 			},
 		}
 		err := req.Validate()
@@ -253,7 +253,7 @@ func TestApplicationValidations(t *testing.T) {
 		// request with an invalid update mask (bad)
 		req = &UpdateApplicationRequest{
 			Application: Application{
-				ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
+				ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
 			},
 			UpdateMask: pbtypes.FieldMask{
 				Paths: []string{"descriptio"},
@@ -266,7 +266,7 @@ func TestApplicationValidations(t *testing.T) {
 		// good request
 		req = &UpdateApplicationRequest{
 			Application: Application{
-				ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
+				ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
 			},
 			UpdateMask: pbtypes.FieldMask{
 				Paths: []string{"description"},
@@ -283,7 +283,7 @@ func TestApplicationValidations(t *testing.T) {
 
 		// empty list of rights (bad)
 		req = &GenerateApplicationAPIKeyRequest{
-			ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
+			ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
 			Name:   "foo",
 			Rights: []Right{},
 		}
@@ -291,7 +291,7 @@ func TestApplicationValidations(t *testing.T) {
 
 		// request with gateway rights (bad)
 		req = &GenerateApplicationAPIKeyRequest{
-			ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
+			ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
 			Name:   "foo",
 			Rights: []Right{RIGHT_GATEWAY_DELETE},
 		}
@@ -299,7 +299,7 @@ func TestApplicationValidations(t *testing.T) {
 
 		// good request
 		req = &GenerateApplicationAPIKeyRequest{
-			ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
+			ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
 			Name:   "foo",
 			Rights: []Right{RIGHT_APPLICATION_INFO},
 		}
@@ -313,14 +313,14 @@ func TestApplicationValidations(t *testing.T) {
 
 		// request which tries to clear the rights (bad)
 		req = &UpdateApplicationAPIKeyRequest{
-			ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
+			ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
 			Name: "Foo-key",
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// request with gateway rights (bad)
 		req = &UpdateApplicationAPIKeyRequest{
-			ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
+			ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
 			Name:   "foo",
 			Rights: []Right{RIGHT_GATEWAY_DELETE},
 		}
@@ -328,7 +328,7 @@ func TestApplicationValidations(t *testing.T) {
 
 		// good request
 		req = &UpdateApplicationAPIKeyRequest{
-			ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
+			ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
 			Name:   "foo",
 			Rights: []Right{RIGHT_APPLICATION_DELETE},
 		}
@@ -342,7 +342,7 @@ func TestApplicationValidations(t *testing.T) {
 
 		// good request
 		req = &RemoveApplicationAPIKeyRequest{
-			ApplicationIdentifier: ApplicationIdentifier{ApplicationID: "foo-app"},
+			ApplicationIdentifiers: ApplicationIdentifiers{ApplicationID: "foo-app"},
 			Name: "foo",
 		}
 		a.So(req.Validate(), should.BeNil)
@@ -355,16 +355,16 @@ func TestApplicationValidations(t *testing.T) {
 
 		// request with gateway rights (bad)
 		req = &ApplicationCollaborator{
-			ApplicationIdentifier:        ApplicationIdentifier{"foo-app"},
-			OrganizationOrUserIdentifier: OrganizationOrUserIdentifier{ID: &OrganizationOrUserIdentifier_UserID{"alice"}},
+			ApplicationIdentifiers:        ApplicationIdentifiers{"foo-app"},
+			OrganizationOrUserIdentifiers: OrganizationOrUserIdentifiers{ID: &OrganizationOrUserIdentifiers_UserID{UserID: &UserIdentifiers{UserID: "alice"}}},
 			Rights: []Right{RIGHT_GATEWAY_DELETE},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// good request
 		req = &ApplicationCollaborator{
-			ApplicationIdentifier:        ApplicationIdentifier{"foo-app"},
-			OrganizationOrUserIdentifier: OrganizationOrUserIdentifier{ID: &OrganizationOrUserIdentifier_UserID{"alice"}},
+			ApplicationIdentifiers:        ApplicationIdentifiers{"foo-app"},
+			OrganizationOrUserIdentifiers: OrganizationOrUserIdentifiers{ID: &OrganizationOrUserIdentifiers_UserID{UserID: &UserIdentifiers{UserID: "alice"}}},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -377,9 +377,9 @@ func TestGatewayValidations(t *testing.T) {
 		// request with invalid gateway ID
 		req := &CreateGatewayRequest{
 			Gateway: Gateway{
-				GatewayIdentifier: GatewayIdentifier{GatewayID: "__foo-gtw"},
-				FrequencyPlanID:   "foo",
-				ClusterAddress:    "foo",
+				GatewayIdentifiers: GatewayIdentifiers{GatewayID: "__foo-gtw"},
+				FrequencyPlanID:    "foo",
+				ClusterAddress:     "foo",
 			},
 		}
 		a.So(req.Validate(), should.NotBeNil)
@@ -387,9 +387,9 @@ func TestGatewayValidations(t *testing.T) {
 		// good request
 		req = &CreateGatewayRequest{
 			Gateway: Gateway{
-				GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-gtw"},
-				FrequencyPlanID:   "foo",
-				ClusterAddress:    "foo",
+				GatewayIdentifiers: GatewayIdentifiers{GatewayID: "foo-gtw"},
+				FrequencyPlanID:    "foo",
+				ClusterAddress:     "foo",
 				Radios: []GatewayRadio{
 					{
 						Frequency: 12,
@@ -404,9 +404,9 @@ func TestGatewayValidations(t *testing.T) {
 		// request without update mask (bad)
 		req := &UpdateGatewayRequest{
 			Gateway: Gateway{
-				GatewayIdentifier: GatewayIdentifier{GatewayID: "__foo-gtw"},
-				FrequencyPlanID:   "foo",
-				ClusterAddress:    "foo",
+				GatewayIdentifiers: GatewayIdentifiers{GatewayID: "__foo-gtw"},
+				FrequencyPlanID:    "foo",
+				ClusterAddress:     "foo",
 			},
 		}
 		err := req.Validate()
@@ -416,9 +416,9 @@ func TestGatewayValidations(t *testing.T) {
 		// request with an invalid update mask (bad)
 		req = &UpdateGatewayRequest{
 			Gateway: Gateway{
-				GatewayIdentifier: GatewayIdentifier{GatewayID: "__foo-gtw"},
-				FrequencyPlanID:   "foo",
-				ClusterAddress:    "foo",
+				GatewayIdentifiers: GatewayIdentifiers{GatewayID: "__foo-gtw"},
+				FrequencyPlanID:    "foo",
+				ClusterAddress:     "foo",
 			},
 			UpdateMask: pbtypes.FieldMask{
 				Paths: []string{"descriptio"},
@@ -431,7 +431,7 @@ func TestGatewayValidations(t *testing.T) {
 		// good request
 		req = &UpdateGatewayRequest{
 			Gateway: Gateway{
-				GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-gtw"},
+				GatewayIdentifiers: GatewayIdentifiers{GatewayID: "foo-gtw"},
 			},
 			UpdateMask: pbtypes.FieldMask{
 				Paths: []string{"description"},
@@ -448,25 +448,25 @@ func TestGatewayValidations(t *testing.T) {
 
 		// empty list of rights (bad)
 		req = &GenerateGatewayAPIKeyRequest{
-			GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-app"},
-			Name:              "foo",
-			Rights:            []Right{},
+			GatewayIdentifiers: GatewayIdentifiers{GatewayID: "foo-app"},
+			Name:               "foo",
+			Rights:             []Right{},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// rights for application (bad)
 		req = &GenerateGatewayAPIKeyRequest{
-			GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-app"},
-			Name:              "foo",
-			Rights:            []Right{RIGHT_APPLICATION_INFO},
+			GatewayIdentifiers: GatewayIdentifiers{GatewayID: "foo-app"},
+			Name:               "foo",
+			Rights:             []Right{RIGHT_APPLICATION_INFO},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// good request
 		req = &GenerateGatewayAPIKeyRequest{
-			GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-app"},
-			Name:              "foo",
-			Rights:            []Right{RIGHT_GATEWAY_DELETE},
+			GatewayIdentifiers: GatewayIdentifiers{GatewayID: "foo-app"},
+			Name:               "foo",
+			Rights:             []Right{RIGHT_GATEWAY_DELETE},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -478,24 +478,24 @@ func TestGatewayValidations(t *testing.T) {
 
 		// request which tries to clear the rights (bad)
 		req = &UpdateGatewayAPIKeyRequest{
-			GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-app"},
-			Name:              "Foo-key",
+			GatewayIdentifiers: GatewayIdentifiers{GatewayID: "foo-app"},
+			Name:               "Foo-key",
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// request with application rights (bad)
 		req = &UpdateGatewayAPIKeyRequest{
-			GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-app"},
-			Name:              "foo",
-			Rights:            []Right{RIGHT_APPLICATION_DELETE},
+			GatewayIdentifiers: GatewayIdentifiers{GatewayID: "foo-app"},
+			Name:               "foo",
+			Rights:             []Right{RIGHT_APPLICATION_DELETE},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// good request
 		req = &UpdateGatewayAPIKeyRequest{
-			GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-app"},
-			Name:              "foo",
-			Rights:            []Right{RIGHT_GATEWAY_DELETE},
+			GatewayIdentifiers: GatewayIdentifiers{GatewayID: "foo-app"},
+			Name:               "foo",
+			Rights:             []Right{RIGHT_GATEWAY_DELETE},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -507,8 +507,8 @@ func TestGatewayValidations(t *testing.T) {
 
 		// good request
 		req = &RemoveGatewayAPIKeyRequest{
-			GatewayIdentifier: GatewayIdentifier{GatewayID: "foo-app"},
-			Name:              "foo",
+			GatewayIdentifiers: GatewayIdentifiers{GatewayID: "foo-app"},
+			Name:               "foo",
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -520,16 +520,16 @@ func TestGatewayValidations(t *testing.T) {
 
 		// request with application rights (bad)
 		req = &GatewayCollaborator{
-			GatewayIdentifier:            GatewayIdentifier{"foo-gtw"},
-			OrganizationOrUserIdentifier: OrganizationOrUserIdentifier{ID: &OrganizationOrUserIdentifier_UserID{"alice"}},
+			GatewayIdentifiers:            GatewayIdentifiers{"foo-gtw"},
+			OrganizationOrUserIdentifiers: OrganizationOrUserIdentifiers{ID: &OrganizationOrUserIdentifiers_UserID{UserID: &UserIdentifiers{UserID: "alice"}}},
 			Rights: []Right{RIGHT_APPLICATION_DELETE},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// good request
 		req = &GatewayCollaborator{
-			GatewayIdentifier:            GatewayIdentifier{"foo-gtw"},
-			OrganizationOrUserIdentifier: OrganizationOrUserIdentifier{ID: &OrganizationOrUserIdentifier_UserID{"alice"}},
+			GatewayIdentifiers:            GatewayIdentifiers{"foo-gtw"},
+			OrganizationOrUserIdentifiers: OrganizationOrUserIdentifiers{ID: &OrganizationOrUserIdentifiers_UserID{UserID: &UserIdentifiers{UserID: "alice"}}},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}
@@ -546,10 +546,10 @@ func TestClientValidations(t *testing.T) {
 		// good request
 		req = &CreateClientRequest{
 			Client: Client{
-				Description:      "hi",
-				ClientIdentifier: ClientIdentifier{ClientID: "foo-client"},
-				RedirectURI:      "localhost",
-				Rights:           []Right{RIGHT_APPLICATION_INFO},
+				Description:       "hi",
+				ClientIdentifiers: ClientIdentifiers{ClientID: "foo-client"},
+				RedirectURI:       "localhost",
+				Rights:            []Right{RIGHT_APPLICATION_INFO},
 			},
 		}
 		a.So(req.Validate(), should.BeNil)
@@ -563,8 +563,8 @@ func TestClientValidations(t *testing.T) {
 		// request without update_mask (bad)
 		req = &UpdateClientRequest{
 			Client: Client{
-				ClientIdentifier: ClientIdentifier{ClientID: "foo-client"},
-				Description:      "",
+				ClientIdentifiers: ClientIdentifiers{ClientID: "foo-client"},
+				Description:       "",
 			},
 		}
 		err := req.Validate()
@@ -574,10 +574,10 @@ func TestClientValidations(t *testing.T) {
 		// request with invalid path fields on the update_mask (bad)
 		req = &UpdateClientRequest{
 			Client: Client{
-				ClientIdentifier: ClientIdentifier{ClientID: "foo-client"},
-				Description:      "foo description",
-				RedirectURI:      "localhost",
-				Rights:           []Right{RIGHT_APPLICATION_INFO},
+				ClientIdentifiers: ClientIdentifiers{ClientID: "foo-client"},
+				Description:       "foo description",
+				RedirectURI:       "localhost",
+				Rights:            []Right{RIGHT_APPLICATION_INFO},
 			},
 			UpdateMask: pbtypes.FieldMask{
 				Paths: []string{"frequency_plan_id", "cluster_address"},
@@ -590,10 +590,10 @@ func TestClientValidations(t *testing.T) {
 		// good request
 		req = &UpdateClientRequest{
 			Client: Client{
-				ClientIdentifier: ClientIdentifier{ClientID: "foo-client"},
-				Description:      "foo description",
-				RedirectURI:      "ttn.com",
-				Rights:           []Right{RIGHT_APPLICATION_INFO},
+				ClientIdentifiers: ClientIdentifiers{ClientID: "foo-client"},
+				Description:       "foo description",
+				RedirectURI:       "ttn.com",
+				Rights:            []Right{RIGHT_APPLICATION_INFO},
 			},
 			UpdateMask: pbtypes.FieldMask{
 				Paths: []string{"redirect_uri", "rights", "description"},
@@ -611,7 +611,7 @@ func TestOrganizationValidations(t *testing.T) {
 		// request with invalid email
 		req := &CreateOrganizationRequest{
 			Organization: Organization{
-				OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+				OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
 				Email: "bar",
 				Name:  "baz",
 			},
@@ -621,7 +621,7 @@ func TestOrganizationValidations(t *testing.T) {
 		// good request
 		req = &CreateOrganizationRequest{
 			Organization: Organization{
-				OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+				OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
 				Email: "bar@bar.com",
 				Name:  "baz",
 			},
@@ -633,7 +633,7 @@ func TestOrganizationValidations(t *testing.T) {
 		// request without update mask (bad)
 		req := &UpdateOrganizationRequest{
 			Organization: Organization{
-				OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+				OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
 				Name: "baz",
 			},
 		}
@@ -644,7 +644,7 @@ func TestOrganizationValidations(t *testing.T) {
 		// request with an invalid update mask (bad)
 		req = &UpdateOrganizationRequest{
 			Organization: Organization{
-				OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+				OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
 				Name: "baz",
 			},
 			UpdateMask: pbtypes.FieldMask{
@@ -658,7 +658,7 @@ func TestOrganizationValidations(t *testing.T) {
 		// request with good update mask but invalid email
 		req = &UpdateOrganizationRequest{
 			Organization: Organization{
-				OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+				OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
 			},
 			UpdateMask: pbtypes.FieldMask{
 				Paths: []string{"email"},
@@ -670,7 +670,7 @@ func TestOrganizationValidations(t *testing.T) {
 		// good request
 		req = &UpdateOrganizationRequest{
 			Organization: Organization{
-				OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+				OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
 			},
 			UpdateMask: pbtypes.FieldMask{
 				Paths: []string{"description"},
@@ -687,7 +687,7 @@ func TestOrganizationValidations(t *testing.T) {
 
 		// empty list of rights (bad)
 		req = &GenerateOrganizationAPIKeyRequest{
-			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
 			Name:   "foo",
 			Rights: []Right{},
 		}
@@ -695,7 +695,7 @@ func TestOrganizationValidations(t *testing.T) {
 
 		// rights for application (bad)
 		req = &GenerateOrganizationAPIKeyRequest{
-			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
 			Name:   "foo",
 			Rights: []Right{RIGHT_APPLICATION_INFO},
 		}
@@ -703,7 +703,7 @@ func TestOrganizationValidations(t *testing.T) {
 
 		// good request
 		req = &GenerateOrganizationAPIKeyRequest{
-			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
 			Name:   "foo",
 			Rights: []Right{RIGHT_ORGANIZATION_DELETE},
 		}
@@ -717,14 +717,14 @@ func TestOrganizationValidations(t *testing.T) {
 
 		// request which tries to clear the rights (bad)
 		req = &UpdateOrganizationAPIKeyRequest{
-			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
 			Name: "Foo-key",
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// request with application rights (bad)
 		req = &UpdateOrganizationAPIKeyRequest{
-			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
 			Name:   "foo",
 			Rights: []Right{RIGHT_APPLICATION_DELETE},
 		}
@@ -732,7 +732,7 @@ func TestOrganizationValidations(t *testing.T) {
 
 		// good request
 		req = &UpdateOrganizationAPIKeyRequest{
-			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
 			Name:   "foo",
 			Rights: []Right{RIGHT_ORGANIZATION_INFO},
 		}
@@ -746,7 +746,7 @@ func TestOrganizationValidations(t *testing.T) {
 
 		// good request
 		req = &RemoveOrganizationAPIKeyRequest{
-			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
+			OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
 			Name: "foo",
 		}
 		a.So(req.Validate(), should.BeNil)
@@ -759,16 +759,16 @@ func TestOrganizationValidations(t *testing.T) {
 
 		// request with application rights (bad)
 		req = &OrganizationMember{
-			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
-			UserIdentifier:         UserIdentifier{UserID: "alice"},
-			Rights:                 []Right{RIGHT_APPLICATION_DELETE},
+			OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
+			UserIdentifiers:         UserIdentifiers{UserID: "alice"},
+			Rights:                  []Right{RIGHT_APPLICATION_DELETE},
 		}
 		a.So(req.Validate(), should.NotBeNil)
 
 		// good request
 		req = &OrganizationMember{
-			OrganizationIdentifier: OrganizationIdentifier{OrganizationID: "foo"},
-			UserIdentifier:         UserIdentifier{UserID: "alice"},
+			OrganizationIdentifiers: OrganizationIdentifiers{OrganizationID: "foo"},
+			UserIdentifiers:         UserIdentifiers{UserID: "alice"},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}

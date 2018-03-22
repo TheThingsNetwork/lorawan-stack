@@ -17,12 +17,12 @@ type GsNsServer struct {
 	*sync.WaitGroup
 }
 
-func (s GsNsServer) StartServingGateway(_ context.Context, id *ttnpb.GatewayIdentifier) (*types.Empty, error) {
+func (s GsNsServer) StartServingGateway(_ context.Context, id *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
 	s.Done()
 	return &types.Empty{}, nil
 }
 
-func (s GsNsServer) StopServingGateway(_ context.Context, id *ttnpb.GatewayIdentifier) (*types.Empty, error) {
+func (s GsNsServer) StopServingGateway(_ context.Context, id *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
 	s.Done()
 	return &types.Empty{}, nil
 }

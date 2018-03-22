@@ -29,7 +29,7 @@ func TestScheduleDownlinkUnregisteredGateway(t *testing.T) {
 
 	_, err = gs.ScheduleDownlink(context.Background(), &ttnpb.DownlinkMessage{
 		TxMetadata: ttnpb.TxMetadata{
-			GatewayIdentifier: ttnpb.GatewayIdentifier{
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 				GatewayID: "unknown-downlink",
 			},
 		},

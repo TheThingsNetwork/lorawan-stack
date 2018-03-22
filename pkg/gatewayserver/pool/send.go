@@ -22,7 +22,7 @@ func init() {
 	ErrGatewayNotConnected.Register()
 }
 
-func (p *pool) Send(gatewayInfo ttnpb.GatewayIdentifier, downstream *ttnpb.GatewayDown) (err error) {
+func (p *pool) Send(gatewayInfo ttnpb.GatewayIdentifiers, downstream *ttnpb.GatewayDown) (err error) {
 	if downstream == nil || downstream.DownlinkMessage == nil {
 		return errors.New("No downlink")
 	}

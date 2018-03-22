@@ -71,7 +71,7 @@ func New(conn *grpc.ClientConn, opts ...Option) *RightsFetcher {
 
 // ListApplicationRights returns the rights the caller has to an application.
 // Either from the cache or fetching them by making the gRPC call.
-func (r *RightsFetcher) ListApplicationRights(ctx context.Context, req *ttnpb.ApplicationIdentifier, creds *rpcmetadata.MD) (*ttnpb.ListApplicationRightsResponse, error) {
+func (r *RightsFetcher) ListApplicationRights(ctx context.Context, req *ttnpb.ApplicationIdentifiers, creds *rpcmetadata.MD) (*ttnpb.ListApplicationRightsResponse, error) {
 	err := validate.ID(req.ApplicationID)
 	if err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func (r *RightsFetcher) ListApplicationRights(ctx context.Context, req *ttnpb.Ap
 
 // ListGatewayRights returns the rights the caller has to a gateway.
 // Either from the cache or fetching them by making the gRPC call.
-func (r *RightsFetcher) ListGatewayRights(ctx context.Context, req *ttnpb.GatewayIdentifier, creds *rpcmetadata.MD) (*ttnpb.ListGatewayRightsResponse, error) {
+func (r *RightsFetcher) ListGatewayRights(ctx context.Context, req *ttnpb.GatewayIdentifiers, creds *rpcmetadata.MD) (*ttnpb.ListGatewayRightsResponse, error) {
 	err := validate.ID(req.GatewayID)
 	if err != nil {
 		return nil, err

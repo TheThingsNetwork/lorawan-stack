@@ -57,7 +57,7 @@ func downlink() *ttnpb.DownlinkMessage {
 func ExamplePool() {
 	p := pool.NewPool(log.Noop, time.Millisecond)
 
-	gatewayInfo := ttnpb.GatewayIdentifier{GatewayID: "my-kerlink"}
+	gatewayInfo := ttnpb.GatewayIdentifiers{GatewayID: "my-kerlink"}
 	upMessages, err := p.Subscribe(gatewayInfo, newPoolConnection(), ttnpb.FrequencyPlan{BandID: band.EU_863_870})
 	if err != nil {
 		panic(err)

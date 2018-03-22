@@ -45,7 +45,7 @@ func (s *storage) Close() {}
 
 // GetClient loads the OAuth Client by client_id.
 func (s *storage) GetClient(clientID string) (osin.Client, error) {
-	client, err := s.store.Clients.GetByID(clientID, clientSpecializer)
+	client, err := s.store.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: clientID}, clientSpecializer)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (s *storage) GetClient(clientID string) (osin.Client, error) {
 
 // SaveAuthorize saves authorization data.
 func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
-	return s.store.OAuth.SaveAuthorizationCode(&store.AuthorizationData{
+	return s.store.OAuth.SaveAuthorizationCode(store.AuthorizationData{
 		AuthorizationCode: data.Code,
 		ClientID:          data.Client.GetId(),
 		CreatedAt:         data.CreatedAt,
@@ -84,7 +84,7 @@ func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 		return nil, err
 	}
 
-	client, err := s.store.Clients.GetByID(data.ClientID, clientSpecializer)
+	client, err := s.store.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: data.ClientID}, clientSpecializer)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (s *storage) RemoveAuthorize(code string) error {
 // SaveAccess saves the access data for later use.
 func (s *storage) SaveAccess(data *osin.AccessData) error {
 	err := s.store.Transact(func(s *store.Store) error {
-		err := s.OAuth.SaveAccessToken(&store.AccessData{
+		err := s.OAuth.SaveAccessToken(store.AccessData{
 			AccessToken: data.AccessToken,
 			ClientID:    data.Client.GetId(),
 			UserID:      getUserID(data.UserData),
@@ -128,7 +128,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 			return nil
 		}
 
-		return s.OAuth.SaveRefreshToken(&store.RefreshData{
+		return s.OAuth.SaveRefreshToken(store.RefreshData{
 			RefreshToken: data.RefreshToken,
 			ClientID:     data.Client.GetId(),
 			UserID:       getUserID(data.UserData),
@@ -154,7 +154,7 @@ func (s *storage) LoadAccess(accessToken string) (*osin.AccessData, error) {
 		return nil, err
 	}
 
-	client, err := s.store.Clients.GetByID(data.ClientID, clientSpecializer)
+	client, err := s.store.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: data.ClientID}, clientSpecializer)
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +184,7 @@ func (s *storage) LoadRefresh(refreshToken string) (*osin.AccessData, error) {
 		return nil, err
 	}
 
-	client, err := s.store.Clients.GetByID(data.ClientID, clientSpecializer)
+	client, err := s.store.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: data.ClientID}, clientSpecializer)
 	if err != nil {
 		return nil, err
 	}

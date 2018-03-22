@@ -13,9 +13,9 @@ import (
 
 func gateway() *ttnpb.Gateway {
 	return &ttnpb.Gateway{
-		GatewayIdentifier: ttnpb.GatewayIdentifier{GatewayID: "test-gateway"},
-		Description:       "My description",
-		Platform:          "Kerklink",
+		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
+		Description:        "My description",
+		Platform:           "Kerklink",
 		Attributes: map[string]string{
 			"foo": "bar",
 		},

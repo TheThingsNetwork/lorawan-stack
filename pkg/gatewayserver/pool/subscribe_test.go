@@ -21,17 +21,17 @@ func TestPoolUplinks(t *testing.T) {
 	p := pool.NewPool(test.GetLogger(t), time.Millisecond)
 
 	gatewayID := "gateway"
-	gatewayIdentifier := ttnpb.GatewayIdentifier{GatewayID: gatewayID}
+	gatewayIdentifiers := ttnpb.GatewayIdentifiers{GatewayID: gatewayID}
 	link := &dummyLink{
 		AcceptSendingUplinks: true,
 
 		NextUplink: make(chan *ttnpb.GatewayUp),
 	}
 	emptyUplink := &ttnpb.GatewayUp{}
-	upstream, err := p.Subscribe(gatewayIdentifier, link, ttnpb.FrequencyPlan{BandID: band.EU_863_870})
+	upstream, err := p.Subscribe(gatewayIdentifiers, link, ttnpb.FrequencyPlan{BandID: band.EU_863_870})
 	a.So(err, should.BeNil)
 
-	obs, err := p.GetGatewayObservations(&gatewayIdentifier)
+	obs, err := p.GetGatewayObservations(&gatewayIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(obs.UplinkCount, should.Equal, 0)
 	a.So(obs.LastUplinkReceivedAt, should.BeNil)
@@ -40,7 +40,7 @@ func TestPoolUplinks(t *testing.T) {
 	newUplink := <-upstream
 	a.So(newUplink, should.Equal, emptyUplink)
 
-	obs, err = p.GetGatewayObservations(&gatewayIdentifier)
+	obs, err = p.GetGatewayObservations(&gatewayIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(obs.UplinkCount, should.Equal, 0)
 	a.So(obs.LastUplinkReceivedAt, should.BeNil)
@@ -59,7 +59,7 @@ func TestPoolUplinks(t *testing.T) {
 		t.Fail()
 	}
 
-	obs, err = p.GetGatewayObservations(&gatewayIdentifier)
+	obs, err = p.GetGatewayObservations(&gatewayIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(obs.UplinkCount, should.Equal, 1)
 	a.So(obs.LastUplinkReceivedAt.Unix(), should.AlmostEqual, time.Now().Unix(), 1)
@@ -89,7 +89,7 @@ func TestDoneContextUplinks(t *testing.T) {
 	cancel()
 
 	emptyUplink := &ttnpb.GatewayUp{}
-	upstream, err := p.Subscribe(ttnpb.GatewayIdentifier{GatewayID: gatewayID}, link, ttnpb.FrequencyPlan{BandID: band.EU_863_870})
+	upstream, err := p.Subscribe(ttnpb.GatewayIdentifiers{GatewayID: gatewayID}, link, ttnpb.FrequencyPlan{BandID: band.EU_863_870})
 	a.So(err, should.BeNil)
 
 	go func() { link.NextUplink <- emptyUplink }()
@@ -109,7 +109,7 @@ func TestSubscribeTwice(t *testing.T) {
 
 	p := pool.NewPool(test.GetLogger(t), time.Millisecond)
 
-	gateway := ttnpb.GatewayIdentifier{GatewayID: "gateway"}
+	gateway := ttnpb.GatewayIdentifiers{GatewayID: "gateway"}
 
 	link := &dummyLink{}
 	newLink := &dummyLink{}

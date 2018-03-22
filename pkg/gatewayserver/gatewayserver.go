@@ -67,6 +67,6 @@ func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
 }
 
 // GetGatewayObservations returns gateway information as observed by the gateway server.
-func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.GatewayIdentifier) (*ttnpb.GatewayObservations, error) {
+func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
 	return gs.gateways.GetGatewayObservations(id)
 }

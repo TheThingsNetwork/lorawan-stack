@@ -65,7 +65,7 @@ func request_IsAdmin_CreateUser_0(ctx context.Context, marshaler runtime.Marshal
 }
 
 func request_IsAdmin_GetUser_0(ctx context.Context, marshaler runtime.Marshaler, client IsAdminClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq UserIdentifier
+	var protoReq UserIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -140,7 +140,7 @@ func request_IsAdmin_UpdateUser_0(ctx context.Context, marshaler runtime.Marshal
 }
 
 func request_IsAdmin_ResetUserPassword_0(ctx context.Context, marshaler runtime.Marshaler, client IsAdminClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq UserIdentifier
+	var protoReq UserIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -167,7 +167,7 @@ func request_IsAdmin_ResetUserPassword_0(ctx context.Context, marshaler runtime.
 }
 
 func request_IsAdmin_DeleteUser_0(ctx context.Context, marshaler runtime.Marshaler, client IsAdminClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq UserIdentifier
+	var protoReq UserIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -243,7 +243,7 @@ func request_IsAdmin_DeleteInvitation_0(ctx context.Context, marshaler runtime.M
 }
 
 func request_IsAdmin_GetClient_0(ctx context.Context, marshaler runtime.Marshaler, client IsAdminClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq ClientIdentifier
+	var protoReq ClientIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -318,7 +318,7 @@ func request_IsAdmin_UpdateClient_0(ctx context.Context, marshaler runtime.Marsh
 }
 
 func request_IsAdmin_DeleteClient_0(ctx context.Context, marshaler runtime.Marshaler, client IsAdminClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq ClientIdentifier
+	var protoReq ClientIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -513,7 +513,7 @@ func request_IsUser_ListAuthorizedClients_0(ctx context.Context, marshaler runti
 }
 
 func request_IsUser_RevokeAuthorizedClient_0(ctx context.Context, marshaler runtime.Marshaler, client IsUserClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq ClientIdentifier
+	var protoReq ClientIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -600,7 +600,7 @@ func request_IsApplication_CreateApplication_1(ctx context.Context, marshaler ru
 }
 
 func request_IsApplication_GetApplication_0(ctx context.Context, marshaler runtime.Marshaler, client IsApplicationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq ApplicationIdentifier
+	var protoReq ApplicationIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -710,7 +710,7 @@ func request_IsApplication_UpdateApplication_0(ctx context.Context, marshaler ru
 }
 
 func request_IsApplication_DeleteApplication_0(ctx context.Context, marshaler runtime.Marshaler, client IsApplicationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq ApplicationIdentifier
+	var protoReq ApplicationIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -768,7 +768,7 @@ func request_IsApplication_GenerateApplicationAPIKey_0(ctx context.Context, mars
 }
 
 func request_IsApplication_ListApplicationAPIKeys_0(ctx context.Context, marshaler runtime.Marshaler, client IsApplicationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq ApplicationIdentifier
+	var protoReq ApplicationIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -914,7 +914,7 @@ func request_IsApplication_SetApplicationCollaborator_0(ctx context.Context, mar
 }
 
 func request_IsApplication_ListApplicationCollaborators_0(ctx context.Context, marshaler runtime.Marshaler, client IsApplicationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq ApplicationIdentifier
+	var protoReq ApplicationIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -941,7 +941,7 @@ func request_IsApplication_ListApplicationCollaborators_0(ctx context.Context, m
 }
 
 func request_IsApplication_ListApplicationRights_0(ctx context.Context, marshaler runtime.Marshaler, client IsApplicationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq ApplicationIdentifier
+	var protoReq ApplicationIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1028,7 +1028,7 @@ func request_IsGateway_CreateGateway_1(ctx context.Context, marshaler runtime.Ma
 }
 
 func request_IsGateway_GetGateway_0(ctx context.Context, marshaler runtime.Marshaler, client IsGatewayClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GatewayIdentifier
+	var protoReq GatewayIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1138,7 +1138,7 @@ func request_IsGateway_UpdateGateway_0(ctx context.Context, marshaler runtime.Ma
 }
 
 func request_IsGateway_DeleteGateway_0(ctx context.Context, marshaler runtime.Marshaler, client IsGatewayClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GatewayIdentifier
+	var protoReq GatewayIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1196,7 +1196,7 @@ func request_IsGateway_GenerateGatewayAPIKey_0(ctx context.Context, marshaler ru
 }
 
 func request_IsGateway_ListGatewayAPIKeys_0(ctx context.Context, marshaler runtime.Marshaler, client IsGatewayClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GatewayIdentifier
+	var protoReq GatewayIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1342,7 +1342,7 @@ func request_IsGateway_SetGatewayCollaborator_0(ctx context.Context, marshaler r
 }
 
 func request_IsGateway_ListGatewayCollaborators_0(ctx context.Context, marshaler runtime.Marshaler, client IsGatewayClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GatewayIdentifier
+	var protoReq GatewayIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1369,7 +1369,7 @@ func request_IsGateway_ListGatewayCollaborators_0(ctx context.Context, marshaler
 }
 
 func request_IsGateway_ListGatewayRights_0(ctx context.Context, marshaler runtime.Marshaler, client IsGatewayClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GatewayIdentifier
+	var protoReq GatewayIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1409,7 +1409,7 @@ func request_IsClient_CreateClient_0(ctx context.Context, marshaler runtime.Mars
 }
 
 func request_IsClient_GetClient_0(ctx context.Context, marshaler runtime.Marshaler, client IsClientClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq ClientIdentifier
+	var protoReq ClientIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1476,7 +1476,7 @@ func request_IsClient_UpdateClient_0(ctx context.Context, marshaler runtime.Mars
 }
 
 func request_IsClient_DeleteClient_0(ctx context.Context, marshaler runtime.Marshaler, client IsClientClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq ClientIdentifier
+	var protoReq ClientIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1516,7 +1516,7 @@ func request_IsOrganization_CreateOrganization_0(ctx context.Context, marshaler 
 }
 
 func request_IsOrganization_GetOrganization_0(ctx context.Context, marshaler runtime.Marshaler, client IsOrganizationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq OrganizationIdentifier
+	var protoReq OrganizationIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1583,7 +1583,7 @@ func request_IsOrganization_UpdateOrganization_0(ctx context.Context, marshaler 
 }
 
 func request_IsOrganization_DeleteOrganization_0(ctx context.Context, marshaler runtime.Marshaler, client IsOrganizationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq OrganizationIdentifier
+	var protoReq OrganizationIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1641,7 +1641,7 @@ func request_IsOrganization_GenerateOrganizationAPIKey_0(ctx context.Context, ma
 }
 
 func request_IsOrganization_ListOrganizationAPIKeys_0(ctx context.Context, marshaler runtime.Marshaler, client IsOrganizationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq OrganizationIdentifier
+	var protoReq OrganizationIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1787,7 +1787,7 @@ func request_IsOrganization_SetOrganizationMember_0(ctx context.Context, marshal
 }
 
 func request_IsOrganization_ListOrganizationMembers_0(ctx context.Context, marshaler runtime.Marshaler, client IsOrganizationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq OrganizationIdentifier
+	var protoReq OrganizationIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1814,7 +1814,7 @@ func request_IsOrganization_ListOrganizationMembers_0(ctx context.Context, marsh
 }
 
 func request_IsOrganization_ListOrganizationRights_0(ctx context.Context, marshaler runtime.Marshaler, client IsOrganizationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq OrganizationIdentifier
+	var protoReq OrganizationIdentifiers
 	var metadata runtime.ServerMetadata
 
 	var (

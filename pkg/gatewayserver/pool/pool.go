@@ -24,12 +24,12 @@ type gatewayStoreEntry struct {
 }
 
 type gatewayStore struct {
-	store map[ttnpb.GatewayIdentifier]*gatewayStoreEntry
+	store map[ttnpb.GatewayIdentifiers]*gatewayStoreEntry
 
 	mu sync.Mutex
 }
 
-func (s *gatewayStore) Store(gatewayID ttnpb.GatewayIdentifier, entry *gatewayStoreEntry) {
+func (s *gatewayStore) Store(gatewayID ttnpb.GatewayIdentifiers, entry *gatewayStoreEntry) {
 	s.mu.Lock()
 
 	oldEntry := s.fetch(gatewayID)
@@ -41,11 +41,11 @@ func (s *gatewayStore) Store(gatewayID ttnpb.GatewayIdentifier, entry *gatewaySt
 	s.mu.Unlock()
 }
 
-func (s *gatewayStore) fetch(gatewayID ttnpb.GatewayIdentifier) *gatewayStoreEntry {
+func (s *gatewayStore) fetch(gatewayID ttnpb.GatewayIdentifiers) *gatewayStoreEntry {
 	return s.store[gatewayID]
 }
 
-func (s *gatewayStore) Fetch(gatewayID ttnpb.GatewayIdentifier) *gatewayStoreEntry {
+func (s *gatewayStore) Fetch(gatewayID ttnpb.GatewayIdentifiers) *gatewayStoreEntry {
 	s.mu.Lock()
 	entry := s.fetch(gatewayID)
 	s.mu.Unlock()
@@ -53,7 +53,7 @@ func (s *gatewayStore) Fetch(gatewayID ttnpb.GatewayIdentifier) *gatewayStoreEnt
 	return entry
 }
 
-func (s *gatewayStore) Remove(gatewayID ttnpb.GatewayIdentifier) {
+func (s *gatewayStore) Remove(gatewayID ttnpb.GatewayIdentifiers) {
 	s.mu.Lock()
 
 	entry := s.fetch(gatewayID)
@@ -80,10 +80,10 @@ type PoolSubscription interface {
 //
 // - Scheduling of downlinks
 type Pool interface {
-	Subscribe(gatewayInfo ttnpb.GatewayIdentifier, link PoolSubscription, fp ttnpb.FrequencyPlan) (chan *ttnpb.GatewayUp, error)
-	Send(gatewayInfo ttnpb.GatewayIdentifier, downstream *ttnpb.GatewayDown) error
+	Subscribe(gatewayInfo ttnpb.GatewayIdentifiers, link PoolSubscription, fp ttnpb.FrequencyPlan) (chan *ttnpb.GatewayUp, error)
+	Send(gatewayInfo ttnpb.GatewayIdentifiers, downstream *ttnpb.GatewayDown) error
 
-	GetGatewayObservations(gatewayInfo *ttnpb.GatewayIdentifier) (*ttnpb.GatewayObservations, error)
+	GetGatewayObservations(gatewayInfo *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error)
 }
 
 type pool struct {
@@ -97,7 +97,7 @@ type pool struct {
 func NewPool(logger log.Interface, sendTimeout time.Duration) Pool {
 	return &pool{
 		store: &gatewayStore{
-			store: map[ttnpb.GatewayIdentifier]*gatewayStoreEntry{},
+			store: map[ttnpb.GatewayIdentifiers]*gatewayStoreEntry{},
 			mu:    sync.Mutex{},
 		},
 		sendTimeout: sendTimeout,
@@ -106,7 +106,7 @@ func NewPool(logger log.Interface, sendTimeout time.Duration) Pool {
 	}
 }
 
-func (p *pool) GetGatewayObservations(gatewayInfo *ttnpb.GatewayIdentifier) (*ttnpb.GatewayObservations, error) {
+func (p *pool) GetGatewayObservations(gatewayInfo *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
 	gateway := p.store.Fetch(*gatewayInfo)
 	if gateway == nil {
 		return nil, ErrGatewayNotConnected.New(errors.Attributes{"gateway_id": gatewayInfo.GatewayID})

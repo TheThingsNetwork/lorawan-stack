@@ -17,14 +17,14 @@ import (
 
 // IsGatewayServer implements ttnpb.IsGatewayServer
 type IsGatewayServer struct {
-	gateways map[ttnpb.GatewayIdentifier]ttnpb.Gateway
+	gateways map[ttnpb.GatewayIdentifiers]ttnpb.Gateway
 }
 
 func (m *IsGatewayServer) CreateGateway(context.Context, *ttnpb.CreateGatewayRequest) (*types.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
-func (m *IsGatewayServer) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifier) (*ttnpb.Gateway, error) {
+func (m *IsGatewayServer) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.Gateway, error) {
 	gateway, ok := m.gateways[*id]
 	if !ok {
 		return nil, errors.New("Gateway not found")
@@ -40,7 +40,7 @@ func (m *IsGatewayServer) UpdateGateway(context.Context, *ttnpb.UpdateGatewayReq
 	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
-func (m *IsGatewayServer) DeleteGateway(context.Context, *ttnpb.GatewayIdentifier) (*types.Empty, error) {
+func (m *IsGatewayServer) DeleteGateway(context.Context, *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
@@ -48,7 +48,7 @@ func (m *IsGatewayServer) GenerateGatewayAPIKey(context.Context, *ttnpb.Generate
 	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
-func (m *IsGatewayServer) ListGatewayAPIKeys(context.Context, *ttnpb.GatewayIdentifier) (*ttnpb.ListGatewayAPIKeysResponse, error) {
+func (m *IsGatewayServer) ListGatewayAPIKeys(context.Context, *ttnpb.GatewayIdentifiers) (*ttnpb.ListGatewayAPIKeysResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
@@ -64,15 +64,15 @@ func (m *IsGatewayServer) SetGatewayCollaborator(context.Context, *ttnpb.Gateway
 	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
-func (m *IsGatewayServer) ListGatewayCollaborators(context.Context, *ttnpb.GatewayIdentifier) (*ttnpb.ListGatewayCollaboratorsResponse, error) {
+func (m *IsGatewayServer) ListGatewayCollaborators(context.Context, *ttnpb.GatewayIdentifiers) (*ttnpb.ListGatewayCollaboratorsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
-func (m *IsGatewayServer) ListGatewayRights(context.Context, *ttnpb.GatewayIdentifier) (*ttnpb.ListGatewayRightsResponse, error) {
+func (m *IsGatewayServer) ListGatewayRights(context.Context, *ttnpb.GatewayIdentifiers) (*ttnpb.ListGatewayRightsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
-func StartMockIsGatewayServer(ctx context.Context, gateways map[ttnpb.GatewayIdentifier]ttnpb.Gateway) (*grpc.Server, string) {
+func StartMockIsGatewayServer(ctx context.Context, gateways map[ttnpb.GatewayIdentifiers]ttnpb.Gateway) (*grpc.Server, string) {
 	is := &IsGatewayServer{gateways: gateways}
 
 	serve := func(addr string) (*grpc.Server, string) {

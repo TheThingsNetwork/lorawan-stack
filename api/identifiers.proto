@@ -8,20 +8,20 @@ package ttn.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
-// UserIdentifier is the message that is used to identify an user by ID.
-message UserIdentifier {
+// UserIdentifiers is the message that is used to identify an user.
+message UserIdentifiers {
   // user_id is the ID of the user.
   string user_id = 1 [(gogoproto.customname) = "UserID", (gogoproto.jsontag) = "user_id"];
 }
 
-// ApplicationIdentifier is the message that is used to identify an application.
-message ApplicationIdentifier {
+// ApplicationIdentifiers is the message that is used to identify an application.
+message ApplicationIdentifiers {
   // TTN Application ID.
   string application_id = 1 [(gogoproto.customname) = "ApplicationID", (gogoproto.jsontag) = "application_id"];
 }
 
-// GatewayIdentifier is the message that is used to identify a gateway.
-message GatewayIdentifier {
+// GatewayIdentifiers is the message that is used to identify a gateway.
+message GatewayIdentifiers {
   // TTN Gateway ID.
   string gateway_id = 1 [(gogoproto.customname) = "GatewayID", (gogoproto.jsontag) = "gateway_id"];
 }
@@ -43,23 +43,23 @@ message EndDeviceIdentifiers {
   bytes dev_addr = 6 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
 }
 
-// ClientIdentifier is the message that is used to identify a client.
-message ClientIdentifier {
+// ClientIdentifiers is the message that is used to identify a client.
+message ClientIdentifiers {
   // TTN Client ID.
   string client_id = 1 [(gogoproto.customname) = "ClientID", (gogoproto.jsontag) = "client_id"];
 }
 
-// OrganizationIdentifier is the message that is used to identify an organization.
-message OrganizationIdentifier {
+// OrganizationIdentifiers is the message that is used to identify an organization.
+message OrganizationIdentifiers {
   // TTN Organization ID.
   string organization_id = 1 [(gogoproto.customname) = "OrganizationID", (gogoproto.jsontag) = "organization_id"];
 }
 
-// OrganizationOrUserIdentifier is the message used in collaborationship messages
+// OrganizationOrUserIdentifiers is the message used in collaborationship messages
 // used to identify the persona entity.
-message OrganizationOrUserIdentifier {
+message OrganizationOrUserIdentifiers {
   oneof ID {
-    string user_id = 1 [(gogoproto.customname) = "UserID", (gogoproto.jsontag) = "user_id"];
-    string organization_id = 2 [(gogoproto.customname) = "OrganizationID", (gogoproto.jsontag) = "organization_id"];
+    UserIdentifiers user_id = 1 [(gogoproto.customname) = "UserID"];
+    OrganizationIdentifiers organization_id = 2 [(gogoproto.customname) = "OrganizationID"];
   }
 }

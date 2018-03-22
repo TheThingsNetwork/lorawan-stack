@@ -19,15 +19,15 @@ var _ = golang_proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-func TestUserIdentifierProto(t *testing.T) {
+func TestUserIdentifiersProto(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedUserIdentifier(popr, false)
+	p := NewPopulatedUserIdentifiers(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &UserIdentifier{}
+	msg := &UserIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -53,10 +53,10 @@ func TestUserIdentifierProto(t *testing.T) {
 	}
 }
 
-func TestUserIdentifierMarshalTo(t *testing.T) {
+func TestUserIdentifiersMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedUserIdentifier(popr, false)
+	p := NewPopulatedUserIdentifiers(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
 	for i := range dAtA {
@@ -66,7 +66,7 @@ func TestUserIdentifierMarshalTo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &UserIdentifier{}
+	msg := &UserIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -81,12 +81,12 @@ func TestUserIdentifierMarshalTo(t *testing.T) {
 	}
 }
 
-func BenchmarkUserIdentifierProtoMarshal(b *testing.B) {
+func BenchmarkUserIdentifiersProtoMarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*UserIdentifier, 10000)
+	pops := make([]*UserIdentifiers, 10000)
 	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedUserIdentifier(popr, false)
+		pops[i] = NewPopulatedUserIdentifiers(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -99,18 +99,18 @@ func BenchmarkUserIdentifierProtoMarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func BenchmarkUserIdentifierProtoUnmarshal(b *testing.B) {
+func BenchmarkUserIdentifiersProtoUnmarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := proto.Marshal(NewPopulatedUserIdentifier(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedUserIdentifiers(popr, false))
 		if err != nil {
 			panic(err)
 		}
 		datas[i] = dAtA
 	}
-	msg := &UserIdentifier{}
+	msg := &UserIdentifiers{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
@@ -121,15 +121,15 @@ func BenchmarkUserIdentifierProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestApplicationIdentifierProto(t *testing.T) {
+func TestApplicationIdentifiersProto(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedApplicationIdentifier(popr, false)
+	p := NewPopulatedApplicationIdentifiers(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &ApplicationIdentifier{}
+	msg := &ApplicationIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -155,10 +155,10 @@ func TestApplicationIdentifierProto(t *testing.T) {
 	}
 }
 
-func TestApplicationIdentifierMarshalTo(t *testing.T) {
+func TestApplicationIdentifiersMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedApplicationIdentifier(popr, false)
+	p := NewPopulatedApplicationIdentifiers(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
 	for i := range dAtA {
@@ -168,7 +168,7 @@ func TestApplicationIdentifierMarshalTo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &ApplicationIdentifier{}
+	msg := &ApplicationIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -183,12 +183,12 @@ func TestApplicationIdentifierMarshalTo(t *testing.T) {
 	}
 }
 
-func BenchmarkApplicationIdentifierProtoMarshal(b *testing.B) {
+func BenchmarkApplicationIdentifiersProtoMarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*ApplicationIdentifier, 10000)
+	pops := make([]*ApplicationIdentifiers, 10000)
 	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedApplicationIdentifier(popr, false)
+		pops[i] = NewPopulatedApplicationIdentifiers(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -201,18 +201,18 @@ func BenchmarkApplicationIdentifierProtoMarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func BenchmarkApplicationIdentifierProtoUnmarshal(b *testing.B) {
+func BenchmarkApplicationIdentifiersProtoUnmarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := proto.Marshal(NewPopulatedApplicationIdentifier(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedApplicationIdentifiers(popr, false))
 		if err != nil {
 			panic(err)
 		}
 		datas[i] = dAtA
 	}
-	msg := &ApplicationIdentifier{}
+	msg := &ApplicationIdentifiers{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
@@ -223,15 +223,15 @@ func BenchmarkApplicationIdentifierProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestGatewayIdentifierProto(t *testing.T) {
+func TestGatewayIdentifiersProto(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedGatewayIdentifier(popr, false)
+	p := NewPopulatedGatewayIdentifiers(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &GatewayIdentifier{}
+	msg := &GatewayIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -257,10 +257,10 @@ func TestGatewayIdentifierProto(t *testing.T) {
 	}
 }
 
-func TestGatewayIdentifierMarshalTo(t *testing.T) {
+func TestGatewayIdentifiersMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedGatewayIdentifier(popr, false)
+	p := NewPopulatedGatewayIdentifiers(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
 	for i := range dAtA {
@@ -270,7 +270,7 @@ func TestGatewayIdentifierMarshalTo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &GatewayIdentifier{}
+	msg := &GatewayIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -285,12 +285,12 @@ func TestGatewayIdentifierMarshalTo(t *testing.T) {
 	}
 }
 
-func BenchmarkGatewayIdentifierProtoMarshal(b *testing.B) {
+func BenchmarkGatewayIdentifiersProtoMarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*GatewayIdentifier, 10000)
+	pops := make([]*GatewayIdentifiers, 10000)
 	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedGatewayIdentifier(popr, false)
+		pops[i] = NewPopulatedGatewayIdentifiers(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -303,18 +303,18 @@ func BenchmarkGatewayIdentifierProtoMarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func BenchmarkGatewayIdentifierProtoUnmarshal(b *testing.B) {
+func BenchmarkGatewayIdentifiersProtoUnmarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := proto.Marshal(NewPopulatedGatewayIdentifier(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedGatewayIdentifiers(popr, false))
 		if err != nil {
 			panic(err)
 		}
 		datas[i] = dAtA
 	}
-	msg := &GatewayIdentifier{}
+	msg := &GatewayIdentifiers{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
@@ -427,15 +427,15 @@ func BenchmarkEndDeviceIdentifiersProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestClientIdentifierProto(t *testing.T) {
+func TestClientIdentifiersProto(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedClientIdentifier(popr, false)
+	p := NewPopulatedClientIdentifiers(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &ClientIdentifier{}
+	msg := &ClientIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -461,10 +461,10 @@ func TestClientIdentifierProto(t *testing.T) {
 	}
 }
 
-func TestClientIdentifierMarshalTo(t *testing.T) {
+func TestClientIdentifiersMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedClientIdentifier(popr, false)
+	p := NewPopulatedClientIdentifiers(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
 	for i := range dAtA {
@@ -474,7 +474,7 @@ func TestClientIdentifierMarshalTo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &ClientIdentifier{}
+	msg := &ClientIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -489,12 +489,12 @@ func TestClientIdentifierMarshalTo(t *testing.T) {
 	}
 }
 
-func BenchmarkClientIdentifierProtoMarshal(b *testing.B) {
+func BenchmarkClientIdentifiersProtoMarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*ClientIdentifier, 10000)
+	pops := make([]*ClientIdentifiers, 10000)
 	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedClientIdentifier(popr, false)
+		pops[i] = NewPopulatedClientIdentifiers(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -507,18 +507,18 @@ func BenchmarkClientIdentifierProtoMarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func BenchmarkClientIdentifierProtoUnmarshal(b *testing.B) {
+func BenchmarkClientIdentifiersProtoUnmarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := proto.Marshal(NewPopulatedClientIdentifier(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedClientIdentifiers(popr, false))
 		if err != nil {
 			panic(err)
 		}
 		datas[i] = dAtA
 	}
-	msg := &ClientIdentifier{}
+	msg := &ClientIdentifiers{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
@@ -529,15 +529,15 @@ func BenchmarkClientIdentifierProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestOrganizationIdentifierProto(t *testing.T) {
+func TestOrganizationIdentifiersProto(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedOrganizationIdentifier(popr, false)
+	p := NewPopulatedOrganizationIdentifiers(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &OrganizationIdentifier{}
+	msg := &OrganizationIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -563,10 +563,10 @@ func TestOrganizationIdentifierProto(t *testing.T) {
 	}
 }
 
-func TestOrganizationIdentifierMarshalTo(t *testing.T) {
+func TestOrganizationIdentifiersMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedOrganizationIdentifier(popr, false)
+	p := NewPopulatedOrganizationIdentifiers(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
 	for i := range dAtA {
@@ -576,7 +576,7 @@ func TestOrganizationIdentifierMarshalTo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &OrganizationIdentifier{}
+	msg := &OrganizationIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -591,12 +591,12 @@ func TestOrganizationIdentifierMarshalTo(t *testing.T) {
 	}
 }
 
-func BenchmarkOrganizationIdentifierProtoMarshal(b *testing.B) {
+func BenchmarkOrganizationIdentifiersProtoMarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*OrganizationIdentifier, 10000)
+	pops := make([]*OrganizationIdentifiers, 10000)
 	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedOrganizationIdentifier(popr, false)
+		pops[i] = NewPopulatedOrganizationIdentifiers(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -609,18 +609,18 @@ func BenchmarkOrganizationIdentifierProtoMarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func BenchmarkOrganizationIdentifierProtoUnmarshal(b *testing.B) {
+func BenchmarkOrganizationIdentifiersProtoUnmarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := proto.Marshal(NewPopulatedOrganizationIdentifier(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedOrganizationIdentifiers(popr, false))
 		if err != nil {
 			panic(err)
 		}
 		datas[i] = dAtA
 	}
-	msg := &OrganizationIdentifier{}
+	msg := &OrganizationIdentifiers{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
@@ -631,15 +631,15 @@ func BenchmarkOrganizationIdentifierProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestOrganizationOrUserIdentifierProto(t *testing.T) {
+func TestOrganizationOrUserIdentifiersProto(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedOrganizationOrUserIdentifier(popr, false)
+	p := NewPopulatedOrganizationOrUserIdentifiers(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &OrganizationOrUserIdentifier{}
+	msg := &OrganizationOrUserIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -665,10 +665,10 @@ func TestOrganizationOrUserIdentifierProto(t *testing.T) {
 	}
 }
 
-func TestOrganizationOrUserIdentifierMarshalTo(t *testing.T) {
+func TestOrganizationOrUserIdentifiersMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedOrganizationOrUserIdentifier(popr, false)
+	p := NewPopulatedOrganizationOrUserIdentifiers(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
 	for i := range dAtA {
@@ -678,7 +678,7 @@ func TestOrganizationOrUserIdentifierMarshalTo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &OrganizationOrUserIdentifier{}
+	msg := &OrganizationOrUserIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -693,12 +693,12 @@ func TestOrganizationOrUserIdentifierMarshalTo(t *testing.T) {
 	}
 }
 
-func BenchmarkOrganizationOrUserIdentifierProtoMarshal(b *testing.B) {
+func BenchmarkOrganizationOrUserIdentifiersProtoMarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*OrganizationOrUserIdentifier, 10000)
+	pops := make([]*OrganizationOrUserIdentifiers, 10000)
 	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedOrganizationOrUserIdentifier(popr, false)
+		pops[i] = NewPopulatedOrganizationOrUserIdentifiers(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -711,18 +711,18 @@ func BenchmarkOrganizationOrUserIdentifierProtoMarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func BenchmarkOrganizationOrUserIdentifierProtoUnmarshal(b *testing.B) {
+func BenchmarkOrganizationOrUserIdentifiersProtoUnmarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := proto.Marshal(NewPopulatedOrganizationOrUserIdentifier(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedOrganizationOrUserIdentifiers(popr, false))
 		if err != nil {
 			panic(err)
 		}
 		datas[i] = dAtA
 	}
-	msg := &OrganizationOrUserIdentifier{}
+	msg := &OrganizationOrUserIdentifiers{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
@@ -733,16 +733,16 @@ func BenchmarkOrganizationOrUserIdentifierProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestUserIdentifierJSON(t *testing.T) {
+func TestUserIdentifiersJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedUserIdentifier(popr, true)
+	p := NewPopulatedUserIdentifiers(popr, true)
 	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &UserIdentifier{}
+	msg := &UserIdentifiers{}
 	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
@@ -754,16 +754,16 @@ func TestUserIdentifierJSON(t *testing.T) {
 		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
 	}
 }
-func TestApplicationIdentifierJSON(t *testing.T) {
+func TestApplicationIdentifiersJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedApplicationIdentifier(popr, true)
+	p := NewPopulatedApplicationIdentifiers(popr, true)
 	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &ApplicationIdentifier{}
+	msg := &ApplicationIdentifiers{}
 	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
@@ -775,16 +775,16 @@ func TestApplicationIdentifierJSON(t *testing.T) {
 		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
 	}
 }
-func TestGatewayIdentifierJSON(t *testing.T) {
+func TestGatewayIdentifiersJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedGatewayIdentifier(popr, true)
+	p := NewPopulatedGatewayIdentifiers(popr, true)
 	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &GatewayIdentifier{}
+	msg := &GatewayIdentifiers{}
 	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
@@ -817,16 +817,16 @@ func TestEndDeviceIdentifiersJSON(t *testing.T) {
 		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
 	}
 }
-func TestClientIdentifierJSON(t *testing.T) {
+func TestClientIdentifiersJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedClientIdentifier(popr, true)
+	p := NewPopulatedClientIdentifiers(popr, true)
 	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &ClientIdentifier{}
+	msg := &ClientIdentifiers{}
 	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
@@ -838,16 +838,16 @@ func TestClientIdentifierJSON(t *testing.T) {
 		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
 	}
 }
-func TestOrganizationIdentifierJSON(t *testing.T) {
+func TestOrganizationIdentifiersJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedOrganizationIdentifier(popr, true)
+	p := NewPopulatedOrganizationIdentifiers(popr, true)
 	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &OrganizationIdentifier{}
+	msg := &OrganizationIdentifiers{}
 	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
@@ -859,16 +859,16 @@ func TestOrganizationIdentifierJSON(t *testing.T) {
 		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
 	}
 }
-func TestOrganizationOrUserIdentifierJSON(t *testing.T) {
+func TestOrganizationOrUserIdentifiersJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedOrganizationOrUserIdentifier(popr, true)
+	p := NewPopulatedOrganizationOrUserIdentifiers(popr, true)
 	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &OrganizationOrUserIdentifier{}
+	msg := &OrganizationOrUserIdentifiers{}
 	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
@@ -880,12 +880,12 @@ func TestOrganizationOrUserIdentifierJSON(t *testing.T) {
 		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
 	}
 }
-func TestUserIdentifierProtoText(t *testing.T) {
+func TestUserIdentifiersProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedUserIdentifier(popr, true)
+	p := NewPopulatedUserIdentifiers(popr, true)
 	dAtA := proto.MarshalTextString(p)
-	msg := &UserIdentifier{}
+	msg := &UserIdentifiers{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -897,12 +897,12 @@ func TestUserIdentifierProtoText(t *testing.T) {
 	}
 }
 
-func TestUserIdentifierProtoCompactText(t *testing.T) {
+func TestUserIdentifiersProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedUserIdentifier(popr, true)
+	p := NewPopulatedUserIdentifiers(popr, true)
 	dAtA := proto.CompactTextString(p)
-	msg := &UserIdentifier{}
+	msg := &UserIdentifiers{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -914,12 +914,12 @@ func TestUserIdentifierProtoCompactText(t *testing.T) {
 	}
 }
 
-func TestApplicationIdentifierProtoText(t *testing.T) {
+func TestApplicationIdentifiersProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedApplicationIdentifier(popr, true)
+	p := NewPopulatedApplicationIdentifiers(popr, true)
 	dAtA := proto.MarshalTextString(p)
-	msg := &ApplicationIdentifier{}
+	msg := &ApplicationIdentifiers{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -931,12 +931,12 @@ func TestApplicationIdentifierProtoText(t *testing.T) {
 	}
 }
 
-func TestApplicationIdentifierProtoCompactText(t *testing.T) {
+func TestApplicationIdentifiersProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedApplicationIdentifier(popr, true)
+	p := NewPopulatedApplicationIdentifiers(popr, true)
 	dAtA := proto.CompactTextString(p)
-	msg := &ApplicationIdentifier{}
+	msg := &ApplicationIdentifiers{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -948,12 +948,12 @@ func TestApplicationIdentifierProtoCompactText(t *testing.T) {
 	}
 }
 
-func TestGatewayIdentifierProtoText(t *testing.T) {
+func TestGatewayIdentifiersProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedGatewayIdentifier(popr, true)
+	p := NewPopulatedGatewayIdentifiers(popr, true)
 	dAtA := proto.MarshalTextString(p)
-	msg := &GatewayIdentifier{}
+	msg := &GatewayIdentifiers{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -965,12 +965,12 @@ func TestGatewayIdentifierProtoText(t *testing.T) {
 	}
 }
 
-func TestGatewayIdentifierProtoCompactText(t *testing.T) {
+func TestGatewayIdentifiersProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedGatewayIdentifier(popr, true)
+	p := NewPopulatedGatewayIdentifiers(popr, true)
 	dAtA := proto.CompactTextString(p)
-	msg := &GatewayIdentifier{}
+	msg := &GatewayIdentifiers{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1016,12 +1016,12 @@ func TestEndDeviceIdentifiersProtoCompactText(t *testing.T) {
 	}
 }
 
-func TestClientIdentifierProtoText(t *testing.T) {
+func TestClientIdentifiersProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedClientIdentifier(popr, true)
+	p := NewPopulatedClientIdentifiers(popr, true)
 	dAtA := proto.MarshalTextString(p)
-	msg := &ClientIdentifier{}
+	msg := &ClientIdentifiers{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1033,12 +1033,12 @@ func TestClientIdentifierProtoText(t *testing.T) {
 	}
 }
 
-func TestClientIdentifierProtoCompactText(t *testing.T) {
+func TestClientIdentifiersProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedClientIdentifier(popr, true)
+	p := NewPopulatedClientIdentifiers(popr, true)
 	dAtA := proto.CompactTextString(p)
-	msg := &ClientIdentifier{}
+	msg := &ClientIdentifiers{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1050,12 +1050,12 @@ func TestClientIdentifierProtoCompactText(t *testing.T) {
 	}
 }
 
-func TestOrganizationIdentifierProtoText(t *testing.T) {
+func TestOrganizationIdentifiersProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedOrganizationIdentifier(popr, true)
+	p := NewPopulatedOrganizationIdentifiers(popr, true)
 	dAtA := proto.MarshalTextString(p)
-	msg := &OrganizationIdentifier{}
+	msg := &OrganizationIdentifiers{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1067,12 +1067,12 @@ func TestOrganizationIdentifierProtoText(t *testing.T) {
 	}
 }
 
-func TestOrganizationIdentifierProtoCompactText(t *testing.T) {
+func TestOrganizationIdentifiersProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedOrganizationIdentifier(popr, true)
+	p := NewPopulatedOrganizationIdentifiers(popr, true)
 	dAtA := proto.CompactTextString(p)
-	msg := &OrganizationIdentifier{}
+	msg := &OrganizationIdentifiers{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1084,12 +1084,12 @@ func TestOrganizationIdentifierProtoCompactText(t *testing.T) {
 	}
 }
 
-func TestOrganizationOrUserIdentifierProtoText(t *testing.T) {
+func TestOrganizationOrUserIdentifiersProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedOrganizationOrUserIdentifier(popr, true)
+	p := NewPopulatedOrganizationOrUserIdentifiers(popr, true)
 	dAtA := proto.MarshalTextString(p)
-	msg := &OrganizationOrUserIdentifier{}
+	msg := &OrganizationOrUserIdentifiers{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1101,12 +1101,12 @@ func TestOrganizationOrUserIdentifierProtoText(t *testing.T) {
 	}
 }
 
-func TestOrganizationOrUserIdentifierProtoCompactText(t *testing.T) {
+func TestOrganizationOrUserIdentifiersProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedOrganizationOrUserIdentifier(popr, true)
+	p := NewPopulatedOrganizationOrUserIdentifiers(popr, true)
 	dAtA := proto.CompactTextString(p)
-	msg := &OrganizationOrUserIdentifier{}
+	msg := &OrganizationOrUserIdentifiers{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1118,14 +1118,14 @@ func TestOrganizationOrUserIdentifierProtoCompactText(t *testing.T) {
 	}
 }
 
-func TestUserIdentifierVerboseEqual(t *testing.T) {
+func TestUserIdentifiersVerboseEqual(t *testing.T) {
 	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedUserIdentifier(popr, false)
+	p := NewPopulatedUserIdentifiers(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
-	msg := &UserIdentifier{}
+	msg := &UserIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
@@ -1133,14 +1133,14 @@ func TestUserIdentifierVerboseEqual(t *testing.T) {
 		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
 	}
 }
-func TestApplicationIdentifierVerboseEqual(t *testing.T) {
+func TestApplicationIdentifiersVerboseEqual(t *testing.T) {
 	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedApplicationIdentifier(popr, false)
+	p := NewPopulatedApplicationIdentifiers(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
-	msg := &ApplicationIdentifier{}
+	msg := &ApplicationIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
@@ -1148,14 +1148,14 @@ func TestApplicationIdentifierVerboseEqual(t *testing.T) {
 		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
 	}
 }
-func TestGatewayIdentifierVerboseEqual(t *testing.T) {
+func TestGatewayIdentifiersVerboseEqual(t *testing.T) {
 	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedGatewayIdentifier(popr, false)
+	p := NewPopulatedGatewayIdentifiers(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
-	msg := &GatewayIdentifier{}
+	msg := &GatewayIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
@@ -1178,14 +1178,14 @@ func TestEndDeviceIdentifiersVerboseEqual(t *testing.T) {
 		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
 	}
 }
-func TestClientIdentifierVerboseEqual(t *testing.T) {
+func TestClientIdentifiersVerboseEqual(t *testing.T) {
 	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedClientIdentifier(popr, false)
+	p := NewPopulatedClientIdentifiers(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
-	msg := &ClientIdentifier{}
+	msg := &ClientIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
@@ -1193,14 +1193,14 @@ func TestClientIdentifierVerboseEqual(t *testing.T) {
 		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
 	}
 }
-func TestOrganizationIdentifierVerboseEqual(t *testing.T) {
+func TestOrganizationIdentifiersVerboseEqual(t *testing.T) {
 	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedOrganizationIdentifier(popr, false)
+	p := NewPopulatedOrganizationIdentifiers(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
-	msg := &OrganizationIdentifier{}
+	msg := &OrganizationIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
@@ -1208,14 +1208,14 @@ func TestOrganizationIdentifierVerboseEqual(t *testing.T) {
 		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
 	}
 }
-func TestOrganizationOrUserIdentifierVerboseEqual(t *testing.T) {
+func TestOrganizationOrUserIdentifiersVerboseEqual(t *testing.T) {
 	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedOrganizationOrUserIdentifier(popr, false)
+	p := NewPopulatedOrganizationOrUserIdentifiers(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
-	msg := &OrganizationOrUserIdentifier{}
+	msg := &OrganizationOrUserIdentifiers{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
@@ -1223,10 +1223,10 @@ func TestOrganizationOrUserIdentifierVerboseEqual(t *testing.T) {
 		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
 	}
 }
-func TestUserIdentifierSize(t *testing.T) {
+func TestUserIdentifiersSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedUserIdentifier(popr, true)
+	p := NewPopulatedUserIdentifiers(popr, true)
 	size2 := proto.Size(p)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
@@ -1245,12 +1245,12 @@ func TestUserIdentifierSize(t *testing.T) {
 	}
 }
 
-func BenchmarkUserIdentifierSize(b *testing.B) {
+func BenchmarkUserIdentifiersSize(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*UserIdentifier, 1000)
+	pops := make([]*UserIdentifiers, 1000)
 	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedUserIdentifier(popr, false)
+		pops[i] = NewPopulatedUserIdentifiers(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -1259,10 +1259,10 @@ func BenchmarkUserIdentifierSize(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestApplicationIdentifierSize(t *testing.T) {
+func TestApplicationIdentifiersSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedApplicationIdentifier(popr, true)
+	p := NewPopulatedApplicationIdentifiers(popr, true)
 	size2 := proto.Size(p)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
@@ -1281,12 +1281,12 @@ func TestApplicationIdentifierSize(t *testing.T) {
 	}
 }
 
-func BenchmarkApplicationIdentifierSize(b *testing.B) {
+func BenchmarkApplicationIdentifiersSize(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*ApplicationIdentifier, 1000)
+	pops := make([]*ApplicationIdentifiers, 1000)
 	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedApplicationIdentifier(popr, false)
+		pops[i] = NewPopulatedApplicationIdentifiers(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -1295,10 +1295,10 @@ func BenchmarkApplicationIdentifierSize(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestGatewayIdentifierSize(t *testing.T) {
+func TestGatewayIdentifiersSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedGatewayIdentifier(popr, true)
+	p := NewPopulatedGatewayIdentifiers(popr, true)
 	size2 := proto.Size(p)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
@@ -1317,12 +1317,12 @@ func TestGatewayIdentifierSize(t *testing.T) {
 	}
 }
 
-func BenchmarkGatewayIdentifierSize(b *testing.B) {
+func BenchmarkGatewayIdentifiersSize(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*GatewayIdentifier, 1000)
+	pops := make([]*GatewayIdentifiers, 1000)
 	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedGatewayIdentifier(popr, false)
+		pops[i] = NewPopulatedGatewayIdentifiers(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -1367,10 +1367,10 @@ func BenchmarkEndDeviceIdentifiersSize(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestClientIdentifierSize(t *testing.T) {
+func TestClientIdentifiersSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedClientIdentifier(popr, true)
+	p := NewPopulatedClientIdentifiers(popr, true)
 	size2 := proto.Size(p)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
@@ -1389,12 +1389,12 @@ func TestClientIdentifierSize(t *testing.T) {
 	}
 }
 
-func BenchmarkClientIdentifierSize(b *testing.B) {
+func BenchmarkClientIdentifiersSize(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*ClientIdentifier, 1000)
+	pops := make([]*ClientIdentifiers, 1000)
 	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedClientIdentifier(popr, false)
+		pops[i] = NewPopulatedClientIdentifiers(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -1403,10 +1403,10 @@ func BenchmarkClientIdentifierSize(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestOrganizationIdentifierSize(t *testing.T) {
+func TestOrganizationIdentifiersSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedOrganizationIdentifier(popr, true)
+	p := NewPopulatedOrganizationIdentifiers(popr, true)
 	size2 := proto.Size(p)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
@@ -1425,12 +1425,12 @@ func TestOrganizationIdentifierSize(t *testing.T) {
 	}
 }
 
-func BenchmarkOrganizationIdentifierSize(b *testing.B) {
+func BenchmarkOrganizationIdentifiersSize(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*OrganizationIdentifier, 1000)
+	pops := make([]*OrganizationIdentifiers, 1000)
 	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedOrganizationIdentifier(popr, false)
+		pops[i] = NewPopulatedOrganizationIdentifiers(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -1439,10 +1439,10 @@ func BenchmarkOrganizationIdentifierSize(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestOrganizationOrUserIdentifierSize(t *testing.T) {
+func TestOrganizationOrUserIdentifiersSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedOrganizationOrUserIdentifier(popr, true)
+	p := NewPopulatedOrganizationOrUserIdentifiers(popr, true)
 	size2 := proto.Size(p)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
@@ -1461,12 +1461,12 @@ func TestOrganizationOrUserIdentifierSize(t *testing.T) {
 	}
 }
 
-func BenchmarkOrganizationOrUserIdentifierSize(b *testing.B) {
+func BenchmarkOrganizationOrUserIdentifiersSize(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*OrganizationOrUserIdentifier, 1000)
+	pops := make([]*OrganizationOrUserIdentifiers, 1000)
 	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedOrganizationOrUserIdentifier(popr, false)
+		pops[i] = NewPopulatedOrganizationOrUserIdentifiers(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

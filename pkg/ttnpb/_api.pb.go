@@ -68,13 +68,13 @@ It has these top-level messages:
 	GatewayDown
 	FrequencyPlan
 	FrequencyPlanRequest
-	UserIdentifier
-	ApplicationIdentifier
-	GatewayIdentifier
+	UserIdentifiers
+	ApplicationIdentifiers
+	GatewayIdentifiers
 	EndDeviceIdentifiers
-	ClientIdentifier
-	OrganizationIdentifier
-	OrganizationOrUserIdentifier
+	ClientIdentifiers
+	OrganizationIdentifiers
+	OrganizationOrUserIdentifiers
 	PullConfigurationRequest
 	IdentityServerSettings
 	UpdateSettingsRequest

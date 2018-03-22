@@ -13,7 +13,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-func (p *pool) Subscribe(gatewayInfo ttnpb.GatewayIdentifier, link PoolSubscription, fp ttnpb.FrequencyPlan) (chan *ttnpb.GatewayUp, error) {
+func (p *pool) Subscribe(gatewayInfo ttnpb.GatewayIdentifiers, link PoolSubscription, fp ttnpb.FrequencyPlan) (chan *ttnpb.GatewayUp, error) {
 	c := connection{
 		Logger: p.logger.WithField("gateway_id", gatewayInfo.GatewayID),
 
@@ -56,7 +56,7 @@ func (p *pool) Subscribe(gatewayInfo ttnpb.GatewayIdentifier, link PoolSubscript
 type connection struct {
 	Logger log.Interface
 
-	GatewayInfo ttnpb.GatewayIdentifier
+	GatewayInfo ttnpb.GatewayIdentifiers
 
 	Link      PoolSubscription
 	StreamErr *atomicError

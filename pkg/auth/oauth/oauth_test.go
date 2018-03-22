@@ -36,9 +36,9 @@ const (
 
 var (
 	client = &ttnpb.Client{
-		ClientIdentifier: ttnpb.ClientIdentifier{ClientID: "foo"},
-		RedirectURI:      "http://example.com/oauth/callback",
-		Secret:           "secret",
+		ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "foo"},
+		RedirectURI:       "http://example.com/oauth/callback",
+		Secret:            "secret",
 		Grants: []ttnpb.GrantType{
 			ttnpb.GRANT_AUTHORIZATION_CODE,
 			ttnpb.GRANT_REFRESH_TOKEN,
@@ -47,7 +47,7 @@ var (
 		Rights: []ttnpb.Right{
 			ttnpb.RIGHT_USER_PROFILE_READ,
 		},
-		Creator: ttnpb.UserIdentifier{UserID: userID},
+		Creator: ttnpb.UserIdentifiers{UserID: userID},
 	}
 	authorizer = &TestAuthorizer{
 		Body: "<html />",
@@ -94,7 +94,7 @@ func testServer(t *testing.T) *web.Server {
 		store := cleanStore(logger, database)
 
 		err := store.Users.Create(&ttnpb.User{
-			UserIdentifier: ttnpb.UserIdentifier{
+			UserIdentifiers: ttnpb.UserIdentifiers{
 				UserID: userID,
 			},
 		})

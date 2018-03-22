@@ -41,12 +41,12 @@ func New(c *component.Component, conf *Config) *NetworkServer {
 }
 
 // StartServingGateway is called by the gateway server to indicate that it is serving a gateway.
-func (ns *NetworkServer) StartServingGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifier) (*ptypes.Empty, error) {
+func (ns *NetworkServer) StartServingGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifiers) (*ptypes.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
 // StopServingGateway is called by the gateway server to indicate that it is no longer serving a gateway.
-func (ns *NetworkServer) StopServingGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifier) (*ptypes.Empty, error) {
+func (ns *NetworkServer) StopServingGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifiers) (*ptypes.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
@@ -56,7 +56,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, uplink *ttnpb.UplinkM
 }
 
 // LinkApplication is called by the application server to subscribe to application events.
-func (ns *NetworkServer) LinkApplication(appID *ttnpb.ApplicationIdentifier, stream ttnpb.AsNs_LinkApplicationServer) error {
+func (ns *NetworkServer) LinkApplication(appID *ttnpb.ApplicationIdentifiers, stream ttnpb.AsNs_LinkApplicationServer) error {
 	return status.Errorf(codes.Unimplemented, "not implemented")
 }
 
