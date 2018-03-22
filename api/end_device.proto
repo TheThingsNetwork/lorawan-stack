@@ -217,20 +217,20 @@ message EndDevice {
 
   EndDeviceVersion version = 28 [(gogoproto.embed) = true];
 
-  // Formatters defining the payload formats.
-  DeviceFormatters formatters = 29 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  // Queued MAC commands
-  repeated MACCommand queued_mac_commands = 30 [(gogoproto.customname) = "QueuedMACCommands"];
-
-  // Queued Application downlink messages
-  repeated ApplicationDownlink queued_application_downlinks = 31;
-
   // Recent uplink messages sorted by time
-  repeated UplinkMessage recent_uplinks = 32;
+  repeated UplinkMessage recent_uplinks = 29;
 
   // Recent downlink messages sorted by time
-  repeated DownlinkMessage recent_downlinks = 33;
+  repeated DownlinkMessage recent_downlinks = 30;
+
+  // Queued MAC commands
+  repeated MACCommand queued_mac_commands = 31 [(gogoproto.customname) = "QueuedMACCommands"];
+
+  // Queued Application downlink messages
+  repeated ApplicationDownlink queued_application_downlinks = 32;
+
+  // Formatters defining the payload formats.
+  DeviceFormatters formatters = 33 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   google.protobuf.Timestamp created_at = 97 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 98 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
