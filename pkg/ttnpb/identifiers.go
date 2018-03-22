@@ -86,6 +86,7 @@ func (ids OrganizationIdentifiers) Contains(other OrganizationIdentifiers) bool 
 	return ids.OrganizationID == other.OrganizationID
 }
 
+// IsZero reports whether ids represent zero identifiers.
 func (ids EndDeviceIdentifiers) IsZero() bool {
 	return ids.GetDeviceID() == "" &&
 		ids.GetApplicationID() == "" &&

@@ -320,31 +320,12 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	logger := ns.Logger()
 
 	pld := msg.Payload.GetMACPayload()
-	if pld == nil {
-		return ErrMissingPayload.New(nil)
-	}
-	if pld.DevAddr.IsZero() {
-		return ErrMissingDevAddr.New(nil)
-	}
+	set := msg.GetSettings()
 
-	fCnt := pld.GetFCnt()
-	if fCnt > math.MaxUint16 {
-		return ErrCorruptMessage.NewWithCause(nil, errors.Errorf("FCnt must be lower or equal to %d", math.MaxUint16))
-	}
-
-	settings := msg.GetSettings()
-
-	txChIdx := settings.GetChannelIndex()
-	if txChIdx > math.MaxUint8 {
-		return ErrCorruptMessage.NewWithCause(nil, errors.Errorf("TxChIdx must be lower or equal to %d", math.MaxUint8))
-	}
-
-	txDRIdx := settings.GetDataRateIndex()
-	if txDRIdx > math.MaxUint8 {
-		return ErrCorruptMessage.NewWithCause(nil, errors.Errorf("TxDRIdx must be lower or equal to %d", math.MaxUint8))
-	}
-
-	dev, err := ns.matchDevice(pld.DevAddr, uint8(txDRIdx), uint8(txChIdx), fCnt, pld.GetAck(), msg.Payload.GetMIC(), pld.GetFRMPayload())
+	dev, err := ns.matchDevice(pld.DevAddr,
+		uint8(set.GetDataRateIndex()), uint8(set.GetChannelIndex()),
+		pld.GetFCnt(), pld.GetAck(),
+		msg.Payload.GetMIC(), pld.GetFRMPayload())
 	if err != nil {
 		return errors.NewWithCause(err, "Failed to match device")
 	}
@@ -392,21 +373,9 @@ func (ns *NetworkServer) newDevAddr(*ttnpb.EndDevice) types.DevAddr {
 }
 
 func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator, start time.Time) error {
-	logger := ns.Logger().(log.Interface)
-
 	pld := msg.Payload.GetJoinRequestPayload()
-	if pld == nil {
-		return ErrMissingPayload.New(nil)
-	}
 
-	if pld.DevEUI.IsZero() {
-		return ErrMissingDevEUI.New(nil)
-	}
-	if pld.JoinEUI.IsZero() {
-		return ErrMissingJoinEUI.New(nil)
-	}
-
-	logger = logger.WithFields(log.Fields(
+	logger := ns.Logger().WithFields(log.Fields(
 		"dev_eui", pld.DevEUI,
 		"join_eui", pld.JoinEUI,
 	))
@@ -486,12 +455,8 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	logger := ns.Logger()
 
 	b := msg.GetRawPayload()
-	if len(b) == 0 {
-		return nil, ErrMissingPayload.New(nil)
-	}
 
 	pld := msg.GetPayload()
-
 	if pld.Payload == nil {
 		if err := msg.Payload.UnmarshalLoRaWAN(b); err != nil {
 			return nil, ErrUnmarshalFailed.NewWithCause(nil, err)
@@ -518,9 +483,8 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	case ttnpb.MType_REJOIN_REQUEST:
 		return &pbtypes.Empty{}, ns.handleRejoin(ctx, msg, acc, start)
 	default:
-		return nil, ErrWrongPayloadType.New(errors.Attributes{
-			"type": pld.GetMType(),
-		})
+		logger.Error("Unmatched MType")
+		return &pbtypes.Empty{}, nil
 	}
 }
 

@@ -67,3 +67,14 @@ func (ids OrganizationOrUserIdentifiers) Validate() error {
 
 	return ErrEmptyIdentifiers.New(nil)
 }
+
+// Validate is used as validator function by the GRPC validator interceptor.
+func (ids *EndDeviceIdentifiers) Validate() error {
+	if ids == nil || ids.IsZero() {
+		return ErrEmptyDeviceIdentifiers.New(nil)
+	}
+	return validate.All(
+		validate.Field(ids.GetDeviceID(), validate.NotRequired, validate.ID).DescribeFieldName("Device ID"),
+		validate.Field(ids.GetApplicationID(), validate.NotRequired, validate.ID).DescribeFieldName("Application ID"),
+	)
+}

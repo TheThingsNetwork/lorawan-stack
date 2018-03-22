@@ -262,12 +262,6 @@ func TestHandleUplink(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(e, should.BeNil)
 
-	msg = ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
-	msg.Payload = *ttnpb.NewPopulatedMessageDownlink(test.Randy, *types.NewPopulatedAES128Key(test.Randy), false)
-	e, err = ns.HandleUplink(context.Background(), msg)
-	a.So(err, should.NotBeNil)
-	a.So(e, should.BeNil)
-
 	t.Run("Uplink", handleUplinkTest())
 	// TODO: Test Join/Rejoin
 }

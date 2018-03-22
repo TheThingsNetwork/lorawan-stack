@@ -54,6 +54,8 @@ func init() {
 	gob.Register(&MACCommand_DeviceModeConf_{})
 }
 
+// Compare returns 1 if v represents a newer MACVersion than other,
+// 0 if they are equal and -1 otherwise.
 func (v MACVersion) Compare(other MACVersion) int {
 	vStr := v.String()
 	oStr := other.String()
