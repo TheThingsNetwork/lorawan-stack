@@ -4,13 +4,18 @@ package validate
 
 type validateFn func(v interface{}) error
 
-// All concatenates all the errors of the different fields validations and returns it.
-func All(results ...Errors) error {
-	errors := make(Errors, 0, 0)
+// All concatenates all the errors and appends them into an `Errors` type.
+func All(results ...error) error {
+	errors := make(Errors, 0, len(results))
 	for _, result := range results {
-		if len(result) != 0 {
-			errors = append(errors, result)
+		if result == nil {
+			continue
 		}
+		if e, ok := result.(Errors); ok && len(e) == 0 {
+			continue
+		}
+
+		errors = append(errors, result)
 	}
 	if len(errors) == 0 {
 		return nil
@@ -18,10 +23,10 @@ func All(results ...Errors) error {
 	return errors
 }
 
-// Field applies to the input value all the provided validator functions and
-// returns the concatenation of the returned errors.
+// Field execute all the given validation functions on v and returns an `Errors`
+// type containing all the errors of the validating functions.
 func Field(v interface{}, fns ...validateFn) Errors {
-	errors := make(Errors, 0)
+	errors := make(Errors, 0, len(fns))
 	for _, fn := range fns {
 		err := fn(v)
 

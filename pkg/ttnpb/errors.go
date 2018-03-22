@@ -7,6 +7,7 @@ import "github.com/TheThingsNetwork/ttn/pkg/errors"
 func init() {
 	ErrEmptyUpdateMask.Register()
 	ErrInvalidPathUpdateMask.Register()
+	ErrEmptyIdentifiers.Register()
 }
 
 // ErrEmptyUpdateMask is returned when the update mask is specified but empty.
@@ -20,5 +21,12 @@ var ErrEmptyUpdateMask = &errors.ErrDescriptor{
 var ErrInvalidPathUpdateMask = &errors.ErrDescriptor{
 	MessageFormat: "Invalid update_mask: `{path}` is not a valid path",
 	Code:          2,
+	Type:          errors.InvalidArgument,
+}
+
+// ErrEmptyIdentifiers is returned when the XXXIdentifiers are empty.
+var ErrEmptyIdentifiers = &errors.ErrDescriptor{
+	MessageFormat: "Identifiers must be non-empty",
+	Code:          3,
 	Type:          errors.InvalidArgument,
 }

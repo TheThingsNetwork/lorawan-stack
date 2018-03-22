@@ -25,7 +25,7 @@ func (e Errors) Error() string {
 }
 
 // DescribeFieldName allows to prefix the errors with the name of the field.
-func (e Errors) DescribeFieldName(fieldName string) Errors {
+func (e Errors) DescribeFieldName(fieldName string) error {
 	if len(e) == 0 {
 		return nil
 	}
