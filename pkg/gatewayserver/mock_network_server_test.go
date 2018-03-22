@@ -13,33 +13,28 @@ import (
 
 // GsNsServer implements ttnpb.GsNsServer
 type GsNsServer struct {
-	startServingGatewayChan chan *ttnpb.GatewayIdentifier
-	stopServingGatewayChan  chan *ttnpb.GatewayIdentifier
-	handleUplinkChan        chan *ttnpb.UplinkMessage
+	nbStartServingGateway uint8
+	nbStopServingGateway  uint8
+	nbHandleUplink        uint8
 }
 
 func (s *GsNsServer) StartServingGateway(_ context.Context, id *ttnpb.GatewayIdentifier) (*types.Empty, error) {
-	s.startServingGatewayChan <- id
-	return nil, nil
+	s.nbStartServingGateway = s.nbStartServingGateway + 1
+	return &types.Empty{}, nil
 }
 
 func (s *GsNsServer) StopServingGateway(_ context.Context, id *ttnpb.GatewayIdentifier) (*types.Empty, error) {
-	s.stopServingGatewayChan <- id
-	return nil, nil
+	s.nbStopServingGateway = s.nbStopServingGateway + 1
+	return &types.Empty{}, nil
 }
 
 func (s *GsNsServer) HandleUplink(_ context.Context, up *ttnpb.UplinkMessage) (*types.Empty, error) {
-	s.handleUplinkChan <- up
-	return nil, nil
+	s.nbHandleUplink = s.nbHandleUplink + 1
+	return &types.Empty{}, nil
 }
 
 func StartMockGsNsServer(ctx context.Context) (*GsNsServer, string) {
-	ns := &GsNsServer{
-		startServingGatewayChan: make(chan *ttnpb.GatewayIdentifier),
-		stopServingGatewayChan:  make(chan *ttnpb.GatewayIdentifier),
-
-		handleUplinkChan: make(chan *ttnpb.UplinkMessage),
-	}
+	ns := &GsNsServer{}
 
 	serve := func(ctx context.Context, addr string) string {
 		srv := rpcserver.New(ctx)

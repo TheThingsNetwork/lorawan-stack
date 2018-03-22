@@ -105,92 +105,134 @@ func TestLink(t *testing.T) {
 		},
 	})
 
+	var client ttnpb.GtwGsClient
 	srv := grpc.NewServer()
 	gs, err := gatewayserver.New(c, &gatewayserver.Config{LocalFrequencyPlansStore: dir})
 	a.So(err, should.BeNil)
-	gs.RegisterServices(srv)
-	err = gs.Start()
-	a.So(err, should.BeNil)
-	defer gs.Close()
 
-	md := rpcmetadata.MD{ID: registeredGatewayID}
-	ctx = md.ToOutgoingContext(ctx)
-	conn, err := rpcserver.StartLoopback(ctx, srv, grpc.WithPerRPCCredentials(md))
-	a.So(err, should.BeNil)
-	client := ttnpb.NewGtwGsClient(conn)
+	// Initializing server and client
+	{
+		gs.RegisterServices(srv)
+		err = gs.Start()
+		a.So(err, should.BeNil)
+		defer gs.Close()
 
-	fp, err := client.GetFrequencyPlan(log.WithLogger(ctx, log.FromContext(ctx).WithField("situation", "client_request")), &ttnpb.FrequencyPlanRequest{FrequencyPlanID: "EU_863_870"})
-	a.So(err, should.BeNil)
-	a.So(fp.BandID, should.Equal, registeredGatewayFP)
-
-	failedLinkMd := rpcmetadata.MD{ID: registeredGatewayUnknownFPID}
-	failedLinkCtx := failedLinkMd.ToOutgoingContext(ctx)
-	failedLinkConn, err := rpcserver.StartLoopback(failedLinkCtx, srv)
-	a.So(err, should.BeNil)
-	failedLinkClient := ttnpb.NewGtwGsClient(failedLinkConn)
-
-	failedLink, err := failedLinkClient.Link(failedLinkCtx)
-	a.So(err, should.BeNil)
-	_, err = failedLink.Recv()
-	a.So(err, should.NotBeNil)
-
-	var link ttnpb.GtwGs_LinkClient
-	linkCtx, linkCancel := context.WithCancel(ctx)
-	link, err = client.Link(linkCtx, grpc.FailFast(true))
-	a.So(err, should.BeNil)
-	select {
-	case <-ns.startServingGatewayChan:
-	case <-time.After(10 * time.Second):
-		a.So("timeout", should.BeNil)
+		md := rpcmetadata.MD{ID: registeredGatewayID}
+		ctx = md.ToOutgoingContext(ctx)
+		conn, err := rpcserver.StartLoopback(ctx, srv, grpc.WithPerRPCCredentials(md))
+		a.So(err, should.BeNil)
+		client = ttnpb.NewGtwGsClient(conn)
 	}
 
-	err = link.Send(&ttnpb.GatewayUp{
-		UplinkMessages: []*ttnpb.UplinkMessage{{RawPayload: []byte{}}},
-	})
+	// Frequency plan
+	{
+		fp, err := client.GetFrequencyPlan(log.WithLogger(ctx, log.FromContext(ctx).WithField("situation", "client_request")), &ttnpb.FrequencyPlanRequest{FrequencyPlanID: "EU_863_870"})
+		a.So(err, should.BeNil)
+		a.So(fp.BandID, should.Equal, registeredGatewayFP)
+	}
+
+	// Failing link
+	{
+		failedLinkMd := rpcmetadata.MD{ID: registeredGatewayUnknownFPID}
+		failedLinkCtx := failedLinkMd.ToOutgoingContext(ctx)
+		failedLinkConn, err := rpcserver.StartLoopback(failedLinkCtx, srv)
+		a.So(err, should.BeNil)
+		failedLinkClient := ttnpb.NewGtwGsClient(failedLinkConn)
+
+		failedLink, err := failedLinkClient.Link(failedLinkCtx)
+		a.So(err, should.BeNil)
+		_, err = failedLink.Recv()
+		a.So(err, should.NotBeNil)
+	}
+
+	linkCtx, linkCancel := context.WithCancel(ctx)
+	defer linkCancel()
+	link, err := client.Link(linkCtx, grpc.FailFast(true))
 	a.So(err, should.BeNil)
 
-	err = link.Send(&ttnpb.GatewayUp{
-		UplinkMessages: []*ttnpb.UplinkMessage{
-			{RawPayload: []byte{}, EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{DevAddr: &types.DevAddr{}}},
-		},
-	})
-	a.So(err, should.BeNil)
-	select {
-	case <-ns.handleUplinkChan:
-	case <-time.After(10 * time.Second):
-		a.So("timeout", should.BeNil)
+	for startTime := time.Now(); time.Now().Sub(startTime) < 10*time.Second; time.Sleep(5 * time.Millisecond) {
+		if ns.nbStartServingGateway == 1 {
+			break
+		}
+	}
+	if !a.So(ns.nbStartServingGateway, should.Equal, 1) {
+		t.Log("The network server did not receive the StartServingGateway signal. Make sure that the link between the gateway and the gateway server was successfully established.")
+		return
+	}
+
+	// Sending empty uplink
+	{
+		err = link.Send(&ttnpb.GatewayUp{
+			UplinkMessages: []*ttnpb.UplinkMessage{{RawPayload: []byte{}}},
+		})
+		a.So(err, should.BeNil)
+	}
+
+	// Sending uplink with content
+	{
+		err = link.Send(&ttnpb.GatewayUp{
+			UplinkMessages: []*ttnpb.UplinkMessage{
+				{RawPayload: []byte{}, EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{DevAddr: &types.DevAddr{}}},
+			},
+		})
+		a.So(err, should.BeNil)
+
+		for startTime := time.Now(); time.Now().Sub(startTime) < 10*time.Second; time.Sleep(5 * time.Millisecond) {
+			if ns.nbHandleUplink == 1 {
+				break
+			}
+		}
+		if !a.So(ns.nbHandleUplink, should.Equal, 1) {
+			t.Log("The network server did not receive the uplink. Make sure that the link between the gateway and the gateway server was successfully established.")
+			return
+		}
 	}
 
 	downlinkContent := []byte{1, 2, 3}
-	_, err = gs.ScheduleDownlink(ctx, &ttnpb.DownlinkMessage{
-		Settings: ttnpb.TxSettings{
-			Bandwidth:       125000,
-			CodingRate:      "4/5",
-			Frequency:       866000000,
-			Modulation:      ttnpb.Modulation_LORA,
-			SpreadingFactor: 7,
-		},
-		RawPayload: downlinkContent,
-		TxMetadata: ttnpb.TxMetadata{
-			GatewayIdentifier: ttnpb.GatewayIdentifier{GatewayID: registeredGatewayID},
-		},
-	})
-	a.So(err, should.BeNil)
 
-	down, err := link.Recv()
-	a.So(err, should.BeNil)
-	a.So(down.DownlinkMessage.Settings.Bandwidth, should.Equal, 125000)
-	a.So(len(down.DownlinkMessage.RawPayload), should.Equal, len(downlinkContent))
+	// Scheduling a downlink
+	{
+		_, err = gs.ScheduleDownlink(ctx, &ttnpb.DownlinkMessage{
+			Settings: ttnpb.TxSettings{
+				Bandwidth:       125000,
+				CodingRate:      "4/5",
+				Frequency:       866000000,
+				Modulation:      ttnpb.Modulation_LORA,
+				SpreadingFactor: 7,
+			},
+			RawPayload: downlinkContent,
+			TxMetadata: ttnpb.TxMetadata{
+				GatewayIdentifier: ttnpb.GatewayIdentifier{GatewayID: registeredGatewayID},
+			},
+		})
+		a.So(err, should.BeNil)
+	}
 
-	obs, err := gs.GetGatewayObservations(ctx, &ttnpb.GatewayIdentifier{GatewayID: registeredGatewayID})
-	a.So(err, should.BeNil)
-	a.So(obs, should.NotBeNil)
+	// Verifying the downlink has been received
+	{
+		down, err := link.Recv()
+		a.So(err, should.BeNil)
+		a.So(down.DownlinkMessage.Settings.Bandwidth, should.Equal, 125000)
+		a.So(len(down.DownlinkMessage.RawPayload), should.Equal, len(downlinkContent))
+	}
+
+	// Gateway information
+	{
+		obs, err := gs.GetGatewayObservations(ctx, &ttnpb.GatewayIdentifier{GatewayID: registeredGatewayID})
+		a.So(err, should.BeNil)
+		a.So(obs, should.NotBeNil)
+	}
 
 	linkCancel()
-	select {
-	case <-ns.stopServingGatewayChan:
-	case <-time.After(10 * time.Second):
-		a.So("timeout", should.BeNil)
+
+	for startTime := time.Now(); time.Now().Sub(startTime) < 10*time.Second; time.Sleep(5 * time.Millisecond) {
+		if ns.nbStopServingGateway == 1 {
+			break
+		}
+	}
+	if !a.So(ns.nbStopServingGateway, should.Equal, 1) {
+		t.Log("The network server did not receive the StopServingGateway signal. Make sure that the link between the gateway and the gateway server was successfully established.")
+		return
 	}
 
 	_, err = gs.GetGatewayObservations(ctx, &ttnpb.GatewayIdentifier{GatewayID: registeredGatewayID})

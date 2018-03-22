@@ -109,7 +109,7 @@ func (p *pool) sendingRoutine(c connection, downstreamChannel chan *ttnpb.Gatewa
 				p.store.Remove(c.GatewayInfo)
 				return
 			}
-			c.Logger.Debug("Sent outgoing message to the gateway")
+			c.Logger.Debug("Sent downlink message to the gateway")
 		}
 	}
 }

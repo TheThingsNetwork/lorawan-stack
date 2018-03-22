@@ -64,12 +64,15 @@ func (g *GatewayServer) forAllNS(f func(ttnpb.GsNsClient) error) error {
 // Link the gateway to the gateway server. The authentication information will
 // be used to determine the gateway ID. If no authentication information is present,
 // this gateway may not be used for downlink.
-func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) error {
+func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	ctx := link.Context()
 	md := rpcmetadata.FromIncomingContext(ctx)
 	id := ttnpb.GatewayIdentifier{
 		GatewayID: md.ID,
 	}
+
+	logger := log.FromContext(ctx).WithField("gateway_id", id.GatewayID)
+	defer logger.WithError(err).Debug("Link with gateway closed")
 
 	fp, err := g.getGatewayFrequencyPlan(ctx, &id)
 	if err != nil {
@@ -80,8 +83,6 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) error {
 	if err != nil {
 		return err
 	}
-
-	logger := log.FromContext(ctx).WithField("gateway_id", id.GatewayID)
 
 	go func() {
 		startServingGatewayFn := func(nsClient ttnpb.GsNsClient) error {
