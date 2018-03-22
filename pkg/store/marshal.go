@@ -12,61 +12,12 @@ import (
 	"github.com/gogo/protobuf/proto"
 )
 
-type isZeroer interface {
-	IsZero() bool
-}
-
 var (
 	reflectValueType = reflect.TypeOf(reflect.Value{})
 
 	jsonMarshalerType = reflect.TypeOf((*json.Marshaler)(nil)).Elem()
 	mapMarshalerType  = reflect.TypeOf((*MapMarshaler)(nil)).Elem()
-	isZeroerType      = reflect.TypeOf((*isZeroer)(nil)).Elem()
 )
-
-// isZero reports whether the value is the zero of its type.
-func isZero(v reflect.Value) bool {
-	v = reflect.Indirect(v)
-	if !v.IsValid() {
-		return true
-	}
-
-	if v.Type().Implements(isZeroerType) {
-		return v.Interface().(isZeroer).IsZero()
-	}
-
-	switch v.Kind() {
-	case reflect.Array:
-		for i := 0; i < v.Len(); i++ {
-			if !isZero(v.Index(i)) {
-				return false
-			}
-		}
-		return true
-	case reflect.String:
-		return v.Len() == 0
-	case reflect.Bool:
-		return !v.Bool()
-	case reflect.Complex64, reflect.Complex128:
-		return v.Complex() == 0
-	case reflect.Map, reflect.Slice, reflect.Chan, reflect.Func, reflect.Interface:
-		return v.IsNil()
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return v.Int() == 0
-	case reflect.Float32, reflect.Float64:
-		return v.Float() == 0
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		return v.Uint() == 0
-	case reflect.Struct:
-		for i := 0; i < v.NumField(); i++ {
-			if !isZero(v.Field(i)) {
-				return false
-			}
-		}
-		return true
-	}
-	panic("unknown type in isZero " + v.Type().String())
-}
 
 // FlattenedValue is like Flattened, but it operates on maps containing reflect.Value.
 func FlattenedValue(m map[string]reflect.Value) (out map[string]reflect.Value) {

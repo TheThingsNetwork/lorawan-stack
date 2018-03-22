@@ -3,42 +3,95 @@
 package validate
 
 import (
+	"strconv"
 	"testing"
+	"time"
+	"unsafe"
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
 func TestIsZero(t *testing.T) {
-	a := assertions.New(t)
-
-	var slice []int
-	a.So(isZero(slice), should.BeTrue)
-	slice = append(slice, 1)
-	a.So(isZero(slice), should.BeFalse)
-
-	var mp map[string]string
-	a.So(isZero(mp), should.BeTrue)
-	mp = make(map[string]string)
-	a.So(isZero(mp), should.BeFalse)
-
-	type Bar struct {
-		DevID string
+	for i, tc := range []struct {
+		v      interface{}
+		isZero bool
+	}{
+		{
+			(*time.Time)(nil),
+			true,
+		},
+		{
+			time.Time{},
+			true,
+		},
+		{
+			&time.Time{},
+			true,
+		},
+		{
+			[]int{},
+			true,
+		},
+		{
+			"",
+			true,
+		},
+		{
+			"42",
+			false,
+		},
+		{
+			[]int{0},
+			false,
+		},
+		{
+			[]interface{}{nil, nil, nil},
+			false,
+		},
+		{
+			map[string]interface{}{
+				"empty": struct{}{},
+				"map":   nil,
+			},
+			false,
+		},
+		{
+			map[string]interface{}{
+				"nonempty": struct{ A int }{42},
+				"map":      nil,
+			},
+			false,
+		},
+		{
+			([]int)(nil),
+			true,
+		},
+		{
+			nil,
+			true,
+		},
+		{
+			(interface{})(nil),
+			true,
+		},
+		{
+			struct{ a int }{42},
+			false,
+		},
+		{
+			unsafe.Pointer(nil),
+			true,
+		},
+		{
+			unsafe.Pointer(&([]byte{42})[0]),
+			false,
+		},
+	} {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			assertions.New(t).So(isZero(tc.v), should.Equal, tc.isZero)
+		})
 	}
-	var bar Bar
-	a.So(isZero(bar), should.BeTrue)
-	bar.DevID = "foo"
-	a.So(isZero(bar), should.BeFalse)
-
-	var str string
-	a.So(isZero(str), should.BeTrue)
-	str = "a"
-	a.So(isZero(str), should.BeFalse)
-
-	var b *Bar
-	a.So(isZero(b), should.BeTrue)
-	b = new(Bar)
-	a.So(isZero(b), should.BeFalse)
 }
 
 func TestRequired(t *testing.T) {
