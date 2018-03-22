@@ -43,6 +43,7 @@ import (
 
 const recentUplinkCount = 20
 const maxFCntGap = 16384
+const accumulationCapacity = 20
 
 // NetworkServer implements the network server component.
 //
@@ -59,9 +60,14 @@ type NetworkServer struct {
 	applicationServersMu *sync.RWMutex
 	applicationServers   map[string]*applicationUplinkStream
 
-	uplinkDeduplicator *deduplicator
+	metadataAccumulators *sync.Map
 
-	hashPool *sync.Pool
+	metadataAccumulatorPool *sync.Pool
+	timerPool               *sync.Pool
+	hashPool                *sync.Pool
+
+	deduplicationWindow time.Duration
+	cooldownWindow      time.Duration
 }
 
 // Config represents the NetworkServer configuration.
@@ -75,16 +81,30 @@ type Config struct {
 // New returns new *NetworkServer.
 func New(c *component.Component, conf *Config) *NetworkServer {
 	ns := &NetworkServer{
-		Component:            c,
-		RegistryRPC:          deviceregistry.NewRPC(c, conf.Registry), // TODO: Add checks
-		registry:             conf.Registry,
-		applicationServersMu: &sync.RWMutex{},
-		applicationServers:   make(map[string]*applicationUplinkStream),
-		gateways:             &sync.Map{},
-		uplinkDeduplicator:   newDeduplicator(conf.DeduplicationWindow, conf.CooldownWindow),
-		hashPool:             &sync.Pool{},
+		Component:               c,
+		RegistryRPC:             deviceregistry.NewRPC(c, conf.Registry), // TODO: Add checks
+		registry:                conf.Registry,
+		applicationServersMu:    &sync.RWMutex{},
+		applicationServers:      make(map[string]*applicationUplinkStream),
+		gateways:                &sync.Map{},
+		metadataAccumulators:    &sync.Map{},
+		metadataAccumulatorPool: &sync.Pool{},
+		timerPool:               &sync.Pool{},
+		hashPool:                &sync.Pool{},
+		deduplicationWindow:     conf.DeduplicationWindow,
+		cooldownWindow:          conf.CooldownWindow,
 	}
 	ns.hashPool.New = func() interface{} { return fnv.New64a() }
+	ns.metadataAccumulatorPool.New = func() interface{} {
+		return &metadataAccumulator{newAccumulator()}
+	}
+	ns.timerPool.New = func() interface{} {
+		t := time.NewTimer(time.Duration(0))
+		if !t.Stop() {
+			<-t.C
+		}
+		return t
+	}
 	c.RegisterGRPC(ns)
 	return ns
 }
@@ -100,6 +120,76 @@ func (ns *NetworkServer) StartServingGateway(ctx context.Context, gtwID *ttnpb.G
 func (ns *NetworkServer) StopServingGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
 	// TODO: Announce to cluster
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
+}
+
+type accumulator struct {
+	accumulation *sync.Map
+}
+
+func newAccumulator() *accumulator {
+	return &accumulator{
+		accumulation: &sync.Map{},
+	}
+}
+
+func (a *accumulator) Add(v interface{}) {
+	a.accumulation.Store(v, struct{}{})
+}
+
+func (a *accumulator) Range(f func(v interface{})) {
+	a.accumulation.Range(func(k, _ interface{}) bool {
+		f(k)
+		return true
+	})
+}
+
+func (a *accumulator) Reset() {
+	a.Range(a.accumulation.Delete)
+}
+
+type metadataAccumulator struct {
+	*accumulator
+}
+
+func (a *metadataAccumulator) Accumulated() []*ttnpb.RxMetadata {
+	md := make([]*ttnpb.RxMetadata, 0, accumulationCapacity)
+	a.accumulator.Range(func(k interface{}) {
+		md = append(md, k.(*ttnpb.RxMetadata))
+	})
+	return md
+}
+
+func (a *metadataAccumulator) Add(mds ...*ttnpb.RxMetadata) {
+	for _, md := range mds {
+		a.accumulator.Add(md)
+	}
+}
+
+func (ns *NetworkServer) deduplicateUplink(msg *ttnpb.UplinkMessage) (*metadataAccumulator, bool) {
+	start := time.Now()
+
+	h := ns.hashPool.Get().(hash.Hash)
+	h.Write(msg.GetRawPayload())
+
+	k := string(h.Sum(nil))
+
+	h.Reset()
+	ns.hashPool.Put(h)
+
+	a := ns.metadataAccumulatorPool.Get().(*metadataAccumulator)
+	lv, isDup := ns.metadataAccumulators.LoadOrStore(k, a)
+	lv.(*metadataAccumulator).Add(msg.RxMetadata...)
+
+	if isDup {
+		ns.metadataAccumulatorPool.Put(a)
+		return nil, true
+	}
+
+	go func() {
+		time.Sleep(time.Until(start.Add(ns.deduplicationWindow + ns.cooldownWindow)))
+		ns.metadataAccumulators.Delete(k)
+	}()
+	return a, false
 }
 
 // matchDevice tries to match the uplink message with a device.
@@ -180,7 +270,7 @@ func (ns *NetworkServer) matchDevice(devAddr types.DevAddr, txDRIdx, txChIdx uin
 		ses := dev.GetSession()
 
 		ke := ses.GetFNwkSIntKey()
-		if ke == nil || ke.Key == nil || ke.Key.IsZero() {
+		if ke == nil || ke.Key.IsZero() {
 			return nil, ErrCorruptRegistry.NewWithCause(nil, ErrMissingFNwkSIntKey.New(nil))
 		}
 		fNwkSIntKey := *ke.Key
@@ -200,7 +290,7 @@ func (ns *NetworkServer) matchDevice(devAddr types.DevAddr, txDRIdx, txChIdx uin
 		switch dev.LoRaWANVersion {
 		case ttnpb.MAC_V1_1:
 			ke := ses.GetSNwkSIntKey()
-			if ke == nil || ke.Key == nil || ke.Key.IsZero() {
+			if ke == nil || ke.Key.IsZero() {
 				return nil, ErrCorruptRegistry.NewWithCause(nil, ErrMissingSNwkSIntKey.New(nil))
 			}
 			sNwkSIntKey := *ke.Key
@@ -226,7 +316,7 @@ func (ns *NetworkServer) matchDevice(devAddr types.DevAddr, txDRIdx, txChIdx uin
 	return nil, ErrNotFound.New(nil)
 }
 
-func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMessage) error {
+func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator, start time.Time) error {
 	logger := ns.Logger()
 
 	pld := msg.Payload.GetMACPayload()
@@ -259,12 +349,10 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		return errors.NewWithCause(err, "Failed to match device")
 	}
 
-	dev.RecentUplinks = append(dev.RecentUplinks, msg)
-	if len(dev.RecentUplinks) > recentUplinkCount {
-		dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
-	}
+	time.Sleep(time.Until(start.Add(ns.deduplicationWindow)))
+	msg.RxMetadata = append(msg.RxMetadata, acc.Accumulated()...)
 
-	if err := dev.Update("Session", "RecentUplinks"); err != nil {
+	if err := dev.Update("Session", "SessionFallback", "RecentUplinks"); err != nil {
 		logger.WithError(err).Error("Failed to update device")
 		return err
 	}
@@ -277,6 +365,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 				FPort:      pld.FPort,
 				FCnt:       dev.Session.NextFCntUp - 1,
 				FRMPayload: pld.FRMPayload,
+				RxMetadata: msg.RxMetadata,
 			}}}
 			if err := cl.Send(up); err != nil {
 				logger.WithFields(log.Fields(
@@ -302,10 +391,10 @@ func (ns *NetworkServer) newDevAddr(*ttnpb.EndDevice) types.DevAddr {
 	return devAddr
 }
 
-func (ns *NetworkServer) handleJoin(ctx context.Context, uplink *ttnpb.UplinkMessage) error {
+func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator, start time.Time) error {
 	logger := ns.Logger().(log.Interface)
 
-	pld := uplink.Payload.GetJoinRequestPayload()
+	pld := msg.Payload.GetJoinRequestPayload()
 	if pld == nil {
 		return ErrMissingPayload.New(nil)
 	}
@@ -336,10 +425,11 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, uplink *ttnpb.UplinkMes
 		devAddr = ns.newDevAddr(dev.EndDevice)
 	}
 
-	desired := dev.GetMACStateDesired()
+	stDes := dev.GetMACStateDesired()
+
 	req := &ttnpb.JoinRequest{
-		RawPayload: uplink.GetRawPayload(),
-		Payload:    uplink.GetPayload(),
+		RawPayload: msg.GetRawPayload(),
+		Payload:    msg.GetPayload(),
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			DevEUI:  &pld.DevEUI,
 			JoinEUI: &pld.JoinEUI,
@@ -347,10 +437,11 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, uplink *ttnpb.UplinkMes
 		},
 		NetID:              ns.NetID,
 		SelectedMacVersion: dev.GetLoRaWANVersion(),
-		RxDelay:            desired.GetRxDelay(),
+		RxDelay:            stDes.GetRxDelay(),
+		CFList:             nil, // TODO: Add if required
 		DownlinkSettings: ttnpb.DLSettings{
-			Rx1DROffset: desired.GetRx1DataRateOffset(),
-			Rx2DR:       desired.GetRx2DataRateIndex(),
+			Rx1DROffset: stDes.GetRx1DataRateOffset(),
+			Rx2DR:       stDes.GetRx2DataRateIndex(),
 		},
 	}
 
@@ -369,7 +460,10 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, uplink *ttnpb.UplinkMes
 			StartedAt:   time.Now(),
 		}
 
-		if err = dev.Update("Session", "SessionFallback"); err != nil {
+		time.Sleep(time.Until(start.Add(ns.deduplicationWindow)))
+		msg.RxMetadata = append(msg.RxMetadata, acc.Accumulated()...)
+
+		if err = dev.Update("Session", "SessionFallback", "RecentUplinks"); err != nil {
 			logger.WithError(err).Error("Failed to update device")
 		}
 		return nil
@@ -382,24 +476,13 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, uplink *ttnpb.UplinkMes
 	return errors.NewWithCause(errs[0], "Failed to perform join procedure")
 }
 
-func (ns *NetworkServer) handleRejoin(ctx context.Context, uplink *ttnpb.UplinkMessage) error {
+func (ns *NetworkServer) handleRejoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator, start time.Time) error {
 	return status.Errorf(codes.Unimplemented, "not implemented")
-}
-
-func (ns *NetworkServer) sum(b []byte) []byte {
-	h := ns.hashPool.Get().(hash.Hash)
-	h.Write(b)
-
-	s := h.Sum(nil)
-
-	h.Reset()
-	ns.hashPool.Put(h)
-
-	return s
 }
 
 // HandleUplink is called by the gateway server when an uplink message arrives.
 func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*pbtypes.Empty, error) {
+	start := time.Now()
 	logger := ns.Logger()
 
 	b := msg.GetRawPayload()
@@ -421,26 +504,22 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		})
 	}
 
-	dups, ok := ns.uplinkDeduplicator.Deduplicate(string(ns.sum(b)), msg.RxMetadata)
+	acc, ok := ns.deduplicateUplink(msg)
 	if ok {
 		logger.Debug("Dropping duplicate uplink")
 		return &pbtypes.Empty{}, nil
 	}
 
-	for _, v := range dups[1:] {
-		msg.RxMetadata = append(msg.RxMetadata, v.([]ttnpb.RxMetadata)...)
-	}
-
-	switch t := pld.GetMType(); t {
+	switch pld.GetMType() {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
-		return &pbtypes.Empty{}, ns.handleUplink(ctx, msg)
+		return &pbtypes.Empty{}, ns.handleUplink(ctx, msg, acc, start)
 	case ttnpb.MType_JOIN_REQUEST:
-		return &pbtypes.Empty{}, ns.handleJoin(ctx, msg)
+		return &pbtypes.Empty{}, ns.handleJoin(ctx, msg, acc, start)
 	case ttnpb.MType_REJOIN_REQUEST:
-		return &pbtypes.Empty{}, ns.handleRejoin(ctx, msg)
+		return &pbtypes.Empty{}, ns.handleRejoin(ctx, msg, acc, start)
 	default:
 		return nil, ErrWrongPayloadType.New(errors.Attributes{
-			"type": t,
+			"type": pld.GetMType(),
 		})
 	}
 }
