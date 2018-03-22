@@ -16,6 +16,7 @@ func init() {
 		{Frequency: 923200000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
 		{Frequency: 923400000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
 	}
+	asBeaconChannel := uint32(923400000)
 	as_923 = Band{
 		ID: AS_923,
 
@@ -30,7 +31,7 @@ func init() {
 			},
 		},
 
-		DataRates: []DataRate{
+		DataRates: [16]DataRate{
 			{Rate: types.DataRate{LoRa: "SF12BW125"}, DefaultMaxSize: dwellTimePayloadSize{59, 0}, NoRepeaterMaxSize: dwellTimePayloadSize{59, 0}},
 			{Rate: types.DataRate{LoRa: "SF11BW125"}, DefaultMaxSize: dwellTimePayloadSize{59, 0}, NoRepeaterMaxSize: dwellTimePayloadSize{59, 0}},
 			{Rate: types.DataRate{LoRa: "SF10BW125"}, DefaultMaxSize: dwellTimePayloadSize{59, 19}, NoRepeaterMaxSize: dwellTimePayloadSize{59, 19}},
@@ -39,9 +40,9 @@ func init() {
 			{Rate: types.DataRate{LoRa: "SF7BW125"}, DefaultMaxSize: dwellTimePayloadSize{230, 250}, NoRepeaterMaxSize: dwellTimePayloadSize{250, 250}},
 			{Rate: types.DataRate{LoRa: "SF7BW250"}, DefaultMaxSize: dwellTimePayloadSize{230, 250}, NoRepeaterMaxSize: dwellTimePayloadSize{250, 250}},
 			{Rate: types.DataRate{FSK: 50000}, DefaultMaxSize: dwellTimePayloadSize{230, 250}, NoRepeaterMaxSize: dwellTimePayloadSize{250, 250}},
+			{}, {}, {}, {}, {}, {}, {}, // RFU
+			{}, // Used by LinkADRReq starting from LoRaWAN 1.1, RFU before
 		},
-
-		ImplementsCFList: true,
 
 		ReceiveDelay1:    defaultReceiveDelay1,
 		ReceiveDelay2:    defaultReceiveDelay2,
@@ -54,7 +55,10 @@ func init() {
 		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
 
 		DefaultMaxEIRP: 16,
-		TxOffset:       []float32{0, -2, -4, -6, -8, -10, -12, -14},
+		TxOffset: [16]float32{0, -2, -4, -6, -8, -10, -12, -14,
+			0, 0, 0, 0, 0, 0, 0, // RFU
+			0, // Used by LinkADRReq starting from LoRaWAN 1.1, RFU before
+		},
 
 		Rx1Parameters: func(frequency uint64, dataRateIndex, rx1DROffset int, dwellTime bool) (int, uint64) {
 			minDR := 0
@@ -79,6 +83,20 @@ func init() {
 		},
 
 		DefaultRx2Parameters: Rx2Parameters{2, 923200000},
+
+		Beacon: Beacon{
+			DataRateIndex:    3,
+			CodingRate:       "4/5",
+			PingSlotChannels: []uint32{asBeaconChannel},
+			BroadcastChannel: func(_ float64) uint32 { return asBeaconChannel },
+		},
+
+		TxParamSetupReqSupport: true,
+
+		// No LoRaWAN 1.0
+		// No LoRaWAN 1.0.1
+		regionalParameters1_0_2: self,
+		regionalParameters1_1A:  self,
 	}
 	All = append(All, as_923)
 }

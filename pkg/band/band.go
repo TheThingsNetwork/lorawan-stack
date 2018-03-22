@@ -4,22 +4,21 @@
 package band
 
 import (
+	"math"
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 )
 
-var (
-	// ErrBandNotFound describes the errors returned when looking for an unknown band
-	ErrBandNotFound = &errors.ErrDescriptor{
-		MessageFormat: "Band `{band}` not found",
-		Type:          errors.NotFound,
-		Code:          1,
-		SafeAttributes: []string{
-			"band",
-		},
-	}
+type RegionalParametersVersion int
+
+const (
+	RegionalParameters1_0 RegionalParametersVersion = iota
+	RegionalParameters1_0_1
+	RegionalParameters1_0_2
+	RegionalParameters1_1A
+	RegionalParameters1_1B
 )
 
 // PayloadSize abstracts the acceptable payload size depending on contextual parameters
@@ -78,9 +77,27 @@ type Rx2Parameters struct {
 // ID is the ID of band
 type ID = string
 
+type versionSwap = func(b Band) Band
+
+func self(b Band) Band { return b }
+
+// Beacon parameters of a specific band.
+type Beacon struct {
+	DataRateIndex    int
+	CodingRate       string
+	InvertedPolarity bool
+	// Channel returns in Hz on which beaconing is performed.
+	//
+	// beaconTime is the integer value, converted in float64, of the 4 bytes “Time” field of the beacon frame.
+	BroadcastChannel func(beaconTime float64) uint32
+	PingSlotChannels []uint32
+}
+
 // Band contains a band's properties
 type Band struct {
 	ID ID
+
+	Beacon Beacon
 
 	// UplinkChannels by default
 	UplinkChannels []Channel
@@ -89,9 +106,9 @@ type Band struct {
 
 	BandDutyCycles []DutyCycle
 
-	DataRates []DataRate
+	DataRates [16]DataRate
 
-	ImplementsCFList bool
+	NoCFList bool
 
 	// ReceiveDelay1 is the default Rx1 window timing in seconds
 	ReceiveDelay1 time.Duration
@@ -112,7 +129,9 @@ type Band struct {
 	MaxAckTimeout time.Duration
 
 	// TxOffset in dB: A Tx's power is computed by taking the MaxEIRP (default: +16dBm) and subtracting the offset
-	TxOffset []float32
+	TxOffset [16]float32
+
+	TxParamSetupReqSupport bool
 
 	// DefaultMaxEIRP in dBm
 	DefaultMaxEIRP float32
@@ -121,6 +140,11 @@ type Band struct {
 	Rx1Parameters Rx1Emission
 	// DefaultRx2Parameters are the default parameters that determine the settings for a Tx sent during Rx2
 	DefaultRx2Parameters Rx2Parameters
+
+	regionalParameters1_0   versionSwap
+	regionalParameters1_0_1 versionSwap
+	regionalParameters1_0_2 versionSwap
+	regionalParameters1_1A  versionSwap
 }
 
 // DutyCycle for the [MinFrequency;MaxFrequency[ sub-band
@@ -155,6 +179,60 @@ func GetByID(id ID) (Band, error) {
 	})
 }
 
-func init() {
-	ErrBandNotFound.Register()
+type swap struct {
+	version   RegionalParametersVersion
+	downgrade versionSwap
 }
+
+func (b Band) downgrades() []swap {
+	return []swap{
+		{version: RegionalParameters1_1B, downgrade: self},
+		{version: RegionalParameters1_1A, downgrade: b.regionalParameters1_1A},
+		{version: RegionalParameters1_0_2, downgrade: b.regionalParameters1_0_2},
+		{version: RegionalParameters1_0_1, downgrade: b.regionalParameters1_0_1},
+		{version: RegionalParameters1_0, downgrade: b.regionalParameters1_0},
+	}
+}
+
+// Version returns the band parameters for a given version.
+func (b Band) Version(wantedVersion RegionalParametersVersion) (Band, error) {
+	for _, swap := range b.downgrades() {
+		if swap.downgrade == nil {
+			return b, ErrUnsupportedLoRaWANVersion.New(nil)
+		}
+		b = swap.downgrade(b)
+		if swap.version == wantedVersion {
+			return b, nil
+		}
+	}
+
+	return b, ErrUnknownLoRaWANVersion.New(nil)
+}
+
+// Versions supported for this band.
+func (b Band) Versions() []RegionalParametersVersion {
+	versions := []RegionalParametersVersion{RegionalParameters1_1B}
+	for _, swap := range b.downgrades() {
+		if swap.downgrade != nil {
+			versions = append(versions, swap.version)
+		} else {
+			break
+		}
+	}
+	return versions
+}
+
+func beaconChannelFromFrequencies(frequencies [8]uint32) func(float64) uint32 {
+	return func(beaconTime float64) uint32 {
+		floor := math.Floor(beaconTime / float64(128))
+		return frequencies[int32(floor)%8]
+	}
+}
+
+var us_auBeaconFrequencies = func() [8]uint32 {
+	freqs := [8]uint32{}
+	for i := 0; i < 8; i++ {
+		freqs[i] = 923300000 + uint32(i*600000)
+	}
+	return freqs
+}()

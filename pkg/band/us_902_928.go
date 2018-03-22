@@ -48,24 +48,21 @@ func init() {
 			},
 		},
 
-		DataRates: []DataRate{
+		DataRates: [16]DataRate{
 			{Rate: types.DataRate{LoRa: "SF10BW125"}, DefaultMaxSize: maxPayloadSize{19, 11}, NoRepeaterMaxSize: maxPayloadSize{19, 11}},
 			{Rate: types.DataRate{LoRa: "SF9BW125"}, DefaultMaxSize: maxPayloadSize{61, 53}, NoRepeaterMaxSize: maxPayloadSize{61, 53}},
 			{Rate: types.DataRate{LoRa: "SF8BW125"}, DefaultMaxSize: maxPayloadSize{133, 125}, NoRepeaterMaxSize: maxPayloadSize{133, 125}},
 			{Rate: types.DataRate{LoRa: "SF7BW125"}, DefaultMaxSize: maxPayloadSize{250, 242}, NoRepeaterMaxSize: maxPayloadSize{250, 242}},
 			{Rate: types.DataRate{LoRa: "SF8BW500"}, DefaultMaxSize: maxPayloadSize{250, 242}, NoRepeaterMaxSize: maxPayloadSize{250, 242}},
-			{}, // Reserved for future use
-			{}, // Reserved for future use
-			{}, // Reserved for future use
+			{}, {}, {}, // RFU
 			{Rate: types.DataRate{LoRa: "SF12BW500"}, DefaultMaxSize: maxPayloadSize{41, 33}, NoRepeaterMaxSize: maxPayloadSize{61, 53}},
 			{Rate: types.DataRate{LoRa: "SF11BW500"}, DefaultMaxSize: maxPayloadSize{117, 109}, NoRepeaterMaxSize: maxPayloadSize{137, 129}},
 			{Rate: types.DataRate{LoRa: "SF10BW500"}, DefaultMaxSize: maxPayloadSize{230, 222}, NoRepeaterMaxSize: maxPayloadSize{250, 242}},
 			{Rate: types.DataRate{LoRa: "SF9BW500"}, DefaultMaxSize: maxPayloadSize{230, 222}, NoRepeaterMaxSize: maxPayloadSize{250, 242}},
 			{Rate: types.DataRate{LoRa: "SF8BW500"}, DefaultMaxSize: maxPayloadSize{230, 222}, NoRepeaterMaxSize: maxPayloadSize{250, 242}},
 			{Rate: types.DataRate{LoRa: "SF7BW500"}, DefaultMaxSize: maxPayloadSize{230, 222}, NoRepeaterMaxSize: maxPayloadSize{250, 242}},
+			{}, // Used by LinkADRReq starting from LoRaWAN 1.1, RFU before
 		},
-
-		ImplementsCFList: false,
 
 		ReceiveDelay1:    defaultReceiveDelay1,
 		ReceiveDelay2:    defaultReceiveDelay2,
@@ -78,10 +75,10 @@ func init() {
 		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
 
 		DefaultMaxEIRP: 30,
-		TxOffset: func() []float32 {
-			offset := []float32{}
-			for i := 0; i < 11; i++ {
-				offset = append(offset, float32(0-2*i))
+		TxOffset: func() [16]float32 {
+			offset := [16]float32{}
+			for i := 0; i < 15; i++ {
+				offset[i] = float32(0 - 2*i)
 			}
 			return offset
 		}(),
@@ -106,6 +103,18 @@ func init() {
 		},
 
 		DefaultRx2Parameters: Rx2Parameters{8, 923300000},
+
+		Beacon: Beacon{
+			DataRateIndex:    8,
+			CodingRate:       "4/5",
+			BroadcastChannel: beaconChannelFromFrequencies(us_auBeaconFrequencies),
+			PingSlotChannels: us_auBeaconFrequencies[:],
+		},
+
+		regionalParameters1_0:   self,
+		regionalParameters1_0_1: usBeacon_1_0_1,
+		regionalParameters1_0_2: disableCFList_1_0_2,
+		regionalParameters1_1A:  self,
 	}
 	All = append(All, us_902_928)
 }

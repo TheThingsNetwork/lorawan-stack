@@ -17,6 +17,7 @@ func init() {
 		{Frequency: 865402500, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
 		{Frequency: 865985000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
 	}
+	inBeaconChannel := uint32(866500000)
 	in_865_867 = Band{
 		ID: IN_865_867,
 
@@ -31,7 +32,7 @@ func init() {
 			},
 		},
 
-		DataRates: []DataRate{
+		DataRates: [16]DataRate{
 			{Rate: types.DataRate{LoRa: "SF12BW125"}, DefaultMaxSize: maxPayloadSize{59, 51}, NoRepeaterMaxSize: maxPayloadSize{59, 51}},
 			{Rate: types.DataRate{LoRa: "SF11BW125"}, DefaultMaxSize: maxPayloadSize{59, 51}, NoRepeaterMaxSize: maxPayloadSize{59, 51}},
 			{Rate: types.DataRate{LoRa: "SF10BW125"}, DefaultMaxSize: maxPayloadSize{59, 51}, NoRepeaterMaxSize: maxPayloadSize{59, 51}},
@@ -40,9 +41,9 @@ func init() {
 			{Rate: types.DataRate{LoRa: "SF7BW125"}, DefaultMaxSize: maxPayloadSize{230, 222}, NoRepeaterMaxSize: maxPayloadSize{250, 242}},
 			{}, // RFU
 			{Rate: types.DataRate{FSK: 50000}, DefaultMaxSize: maxPayloadSize{230, 222}, NoRepeaterMaxSize: maxPayloadSize{250, 242}},
+			{}, {}, {}, {}, {}, {}, {}, // RFU
+			{}, // Used by LinkADRReq starting from LoRaWAN 1.1, RFU before
 		},
-
-		ImplementsCFList: true,
 
 		ReceiveDelay1:    defaultReceiveDelay1,
 		ReceiveDelay2:    defaultReceiveDelay2,
@@ -55,10 +56,10 @@ func init() {
 		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
 
 		DefaultMaxEIRP: 30,
-		TxOffset: func() []float32 {
-			offset := []float32{}
+		TxOffset: func() [16]float32 {
+			offset := [16]float32{}
 			for i := 0; i < 11; i++ {
-				offset = append(offset, float32(0-2*i))
+				offset[i] = float32(0 - 2*i)
 			}
 			return offset
 		}(),
@@ -77,6 +78,18 @@ func init() {
 		},
 
 		DefaultRx2Parameters: Rx2Parameters{2, 866550000},
+
+		Beacon: Beacon{
+			DataRateIndex:    4,
+			CodingRate:       "4/5",
+			BroadcastChannel: func(_ float64) uint32 { return inBeaconChannel },
+			PingSlotChannels: []uint32{inBeaconChannel},
+		},
+
+		// No LoRaWAN 1.0
+		// No LoRaWAN 1.0.1
+		regionalParameters1_0_2: self,
+		regionalParameters1_1A:  self,
 	}
 	All = append(All, in_865_867)
 }
