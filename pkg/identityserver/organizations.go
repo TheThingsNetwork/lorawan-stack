@@ -7,7 +7,6 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
@@ -39,7 +38,7 @@ func (s *organizationService) CreateOrganization(ctx context.Context, req *ttnpb
 		}
 
 		err = tx.Organizations.Create(&ttnpb.Organization{
-			OrganizationIdentifier: req.Organization.OrganizationIdentifier,
+			OrganizationIdentifiers: req.Organization.OrganizationIdentifiers,
 			Name:        req.Organization.Name,
 			Description: req.Organization.Description,
 			URL:         req.Organization.URL,
@@ -50,10 +49,10 @@ func (s *organizationService) CreateOrganization(ctx context.Context, req *ttnpb
 			return err
 		}
 
-		return tx.Organizations.SetMember(&ttnpb.OrganizationMember{
-			OrganizationIdentifier: req.Organization.OrganizationIdentifier,
-			UserIdentifier:         ttnpb.UserIdentifier{UserID: claims.FromContext(ctx).UserID()},
-			Rights:                 ttnpb.AllOrganizationRights(),
+		return tx.Organizations.SetMember(ttnpb.OrganizationMember{
+			OrganizationIdentifiers: req.Organization.OrganizationIdentifiers,
+			UserIdentifiers:         claimsFromContext(ctx).UserIdentifiers(),
+			Rights:                  ttnpb.AllOrganizationRights(),
 		})
 	})
 
@@ -61,13 +60,13 @@ func (s *organizationService) CreateOrganization(ctx context.Context, req *ttnpb
 }
 
 // GetOrganization returns the organization that matches the identifier.
-func (s *organizationService) GetOrganization(ctx context.Context, req *ttnpb.OrganizationIdentifier) (*ttnpb.Organization, error) {
-	err := s.enforceOrganizationRights(ctx, req.OrganizationID, ttnpb.RIGHT_ORGANIZATION_INFO)
+func (s *organizationService) GetOrganization(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*ttnpb.Organization, error) {
+	err := s.enforceOrganizationRights(ctx, *req, ttnpb.RIGHT_ORGANIZATION_INFO)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := s.store.Organizations.GetByID(req.OrganizationID, s.config.Specializers.Organization)
+	found, err := s.store.Organizations.GetByID(*req, s.config.Specializers.Organization)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +81,7 @@ func (s *organizationService) ListOrganizations(ctx context.Context, _ *pbtypes.
 		return nil, err
 	}
 
-	found, err := s.store.Organizations.ListByUser(claims.FromContext(ctx).UserID(), s.config.Specializers.Organization)
+	found, err := s.store.Organizations.ListByUser(claimsFromContext(ctx).UserIdentifiers(), s.config.Specializers.Organization)
 	if err != nil {
 		return nil, err
 	}
@@ -100,13 +99,13 @@ func (s *organizationService) ListOrganizations(ctx context.Context, _ *pbtypes.
 
 // UpdateOrganization updates an organization.
 func (s *organizationService) UpdateOrganization(ctx context.Context, req *ttnpb.UpdateOrganizationRequest) (*pbtypes.Empty, error) {
-	err := s.enforceOrganizationRights(ctx, req.Organization.OrganizationID, ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC)
+	err := s.enforceOrganizationRights(ctx, req.Organization.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC)
 	if err != nil {
 		return nil, err
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Organizations.GetByID(req.Organization.OrganizationID, s.config.Specializers.Organization)
+		found, err := tx.Organizations.GetByID(req.Organization.OrganizationIdentifiers, s.config.Specializers.Organization)
 		if err != nil {
 			return err
 		}
@@ -138,18 +137,18 @@ func (s *organizationService) UpdateOrganization(ctx context.Context, req *ttnpb
 }
 
 // DeleteOrganization deletes an organization.
-func (s *organizationService) DeleteOrganization(ctx context.Context, req *ttnpb.OrganizationIdentifier) (*pbtypes.Empty, error) {
-	err := s.enforceOrganizationRights(ctx, req.OrganizationID, ttnpb.RIGHT_ORGANIZATION_DELETE)
+func (s *organizationService) DeleteOrganization(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
+	err := s.enforceOrganizationRights(ctx, *req, ttnpb.RIGHT_ORGANIZATION_DELETE)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, s.store.Organizations.Delete(req.OrganizationID)
+	return nil, s.store.Organizations.Delete(*req)
 }
 
 // GenerateOrganizationAPIKey generates an organization API key and returns it.
 func (s *organizationService) GenerateOrganizationAPIKey(ctx context.Context, req *ttnpb.GenerateOrganizationAPIKeyRequest) (*ttnpb.APIKey, error) {
-	err := s.enforceOrganizationRights(ctx, req.OrganizationID, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
+	err := s.enforceOrganizationRights(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -159,55 +158,60 @@ func (s *organizationService) GenerateOrganizationAPIKey(ctx context.Context, re
 		return nil, err
 	}
 
-	key := &ttnpb.APIKey{
+	key := ttnpb.APIKey{
 		Key:    k,
 		Name:   req.Name,
 		Rights: req.Rights,
 	}
 
-	err = s.store.Organizations.SaveAPIKey(req.OrganizationID, key)
+	err = s.store.Organizations.SaveAPIKey(req.OrganizationIdentifiers, key)
 	if err != nil {
 		return nil, err
 	}
 
-	return key, nil
+	return &key, nil
 }
 
 // ListOrganizationAPIKeys list all the API keys of an organization.
-func (s *organizationService) ListOrganizationAPIKeys(ctx context.Context, req *ttnpb.OrganizationIdentifier) (*ttnpb.ListOrganizationAPIKeysResponse, error) {
-	err := s.enforceOrganizationRights(ctx, req.OrganizationID, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
+func (s *organizationService) ListOrganizationAPIKeys(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*ttnpb.ListOrganizationAPIKeysResponse, error) {
+	err := s.enforceOrganizationRights(ctx, *req, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := s.store.Organizations.ListAPIKeys(req.OrganizationID)
+	found, err := s.store.Organizations.ListAPIKeys(*req)
 	if err != nil {
 		return nil, err
+	}
+
+	keys := make([]*ttnpb.APIKey, 0, len(found))
+	for i := range found {
+		keys = append(keys, &found[i])
 	}
 
 	return &ttnpb.ListOrganizationAPIKeysResponse{
-		APIKeys: found,
+		APIKeys: keys,
 	}, nil
 }
 
 // UpdateOrganizationAPIKey updates the rights of an organization API key.
 func (s *organizationService) UpdateOrganizationAPIKey(ctx context.Context, req *ttnpb.UpdateOrganizationAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := s.enforceOrganizationRights(ctx, req.OrganizationID, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
+	err := s.enforceOrganizationRights(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, s.store.Organizations.UpdateAPIKeyRights(req.OrganizationID, req.Name, req.Rights)
+	return nil, s.store.Organizations.UpdateAPIKeyRights(req.OrganizationIdentifiers, req.Name, req.Rights)
 }
 
 // RemoveOrganizationAPIKey removes an organization API key.
 func (s *organizationService) RemoveOrganizationAPIKey(ctx context.Context, req *ttnpb.RemoveOrganizationAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := s.enforceOrganizationRights(ctx, req.OrganizationID, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
+	err := s.enforceOrganizationRights(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, s.store.Organizations.DeleteAPIKey(req.OrganizationID, req.Name)
+	return nil, s.store.Organizations.DeleteAPIKey(req.OrganizationIdentifiers, req.Name)
 }
 
 // SetOrganizationMember sets a membership between an user and an organization
@@ -217,7 +221,7 @@ func (s *organizationService) RemoveOrganizationAPIKey(ctx context.Context, req 
 // that all members with `RIGHT_ORGANIZATION_SETTINGS_COLLABORATORS` right
 // is not equal to entire set of available `RIGHT_ORGANIZATION_XXXXXX` rights.
 func (s *organizationService) SetOrganizationMember(ctx context.Context, req *ttnpb.OrganizationMember) (*pbtypes.Empty, error) {
-	err := s.enforceOrganizationRights(ctx, req.OrganizationID, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS)
+	err := s.enforceOrganizationRights(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS)
 	if err != nil {
 		return nil, err
 	}
@@ -232,20 +236,20 @@ func (s *organizationService) SetOrganizationMember(ctx context.Context, req *tt
 	//		intersection between `2.` and the rights of the request
 	// 5. The final set of rights is given by the sum of `2.` plus `4.`
 
-	rights, err := s.store.Organizations.ListUserRights(req.OrganizationID, req.UserID)
+	rights, err := s.store.Organizations.ListMemberRights(req.OrganizationIdentifiers, req.UserIdentifiers)
 	if err != nil {
 		return nil, err
 	}
 
-	claims := claims.FromContext(ctx)
+	claims := claimsFromContext(ctx)
 
 	// modifiable is the set of rights the caller can modify
 	var modifiable []ttnpb.Right
-	switch claims.Source() {
+	switch claims.Source {
 	case auth.Key:
-		modifiable = claims.Rights()
+		modifiable = claims.Rights
 	case auth.Token:
-		modifiable, err = s.store.Organizations.ListUserRights(req.OrganizationID, claims.UserID())
+		modifiable, err = s.store.Organizations.ListMemberRights(req.OrganizationIdentifiers, claims.UserIdentifiers())
 		if err != nil {
 			return nil, err
 		}
@@ -254,14 +258,14 @@ func (s *organizationService) SetOrganizationMember(ctx context.Context, req *tt
 	req.Rights = append(ttnpb.DifferenceRights(rights, modifiable), ttnpb.IntersectRights(req.Rights, modifiable)...)
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		err := tx.Organizations.SetMember(req)
+		err := tx.Organizations.SetMember(*req)
 		if err != nil {
 			return err
 		}
 
 		// Check if the sum of rights that members with `SETTINGS_MEMBER` right is
 		// equal to the entire set of defined organization rights.
-		members, err := tx.Organizations.ListMembers(req.OrganizationID, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS)
+		members, err := tx.Organizations.ListMembers(req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS)
 		if err != nil {
 			return err
 		}
@@ -285,46 +289,49 @@ func (s *organizationService) SetOrganizationMember(ctx context.Context, req *tt
 
 // ListOrganizationMembers returns all members from the organization that
 // matches the identifier.
-func (s *organizationService) ListOrganizationMembers(ctx context.Context, req *ttnpb.OrganizationIdentifier) (*ttnpb.ListOrganizationMembersResponse, error) {
-	err := s.enforceOrganizationRights(ctx, req.OrganizationID, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS)
+func (s *organizationService) ListOrganizationMembers(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*ttnpb.ListOrganizationMembersResponse, error) {
+	err := s.enforceOrganizationRights(ctx, *req, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := s.store.Organizations.ListMembers(req.OrganizationID)
+	found, err := s.store.Organizations.ListMembers(*req)
 	if err != nil {
 		return nil, err
+	}
+
+	members := make([]*ttnpb.OrganizationMember, 0, len(found))
+	for i := range found {
+		members = append(members, &found[i])
 	}
 
 	return &ttnpb.ListOrganizationMembersResponse{
-		Members: found,
+		Members: members,
 	}, nil
 }
 
 // ListOrganizationRights returns the rights the caller user has to an organization.
-func (s *organizationService) ListOrganizationRights(ctx context.Context, req *ttnpb.OrganizationIdentifier) (*ttnpb.ListOrganizationRightsResponse, error) {
-	claims := claims.FromContext(ctx)
+func (s *organizationService) ListOrganizationRights(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*ttnpb.ListOrganizationRightsResponse, error) {
+	claims := claimsFromContext(ctx)
 
 	resp := new(ttnpb.ListOrganizationRightsResponse)
 
-	switch claims.Source() {
+	switch claims.Source {
 	case auth.Token:
-		userID := claims.UserID()
-
-		rights, err := s.store.Organizations.ListUserRights(req.OrganizationID, userID)
+		rights, err := s.store.Organizations.ListMemberRights(*req, claims.UserIdentifiers())
 		if err != nil {
 			return nil, err
 		}
 
 		// Result rights are the intersection between the scope of the Client
 		// and the rights that the user has to the organization.
-		resp.Rights = ttnpb.IntersectRights(claims.Rights(), rights)
+		resp.Rights = ttnpb.IntersectRights(claims.Rights, rights)
 	case auth.Key:
-		if claims.OrganizationID() != req.OrganizationID {
+		if !claims.OrganizationIdentifiers().Contains(*req) {
 			return nil, ErrNotAuthorized.New(nil)
 		}
 
-		resp.Rights = claims.Rights()
+		resp.Rights = claims.Rights
 	}
 
 	return resp, nil

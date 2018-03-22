@@ -7,7 +7,6 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/mock"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/sendgrid"
@@ -37,7 +36,7 @@ type Config struct {
 	Sendgrid *sendgrid.Config `name:"sendgrid"`
 
 	// defaultSettings are the default settings within the tenant loaded in the storewhen it first-time initialized.
-	DefaultSettings *ttnpb.IdentityServerSettings `name:"default-settings" description:"Default settings that are loaded when the is first starts"`
+	DefaultSettings ttnpb.IdentityServerSettings `name:"default-settings" description:"Default settings that are loaded when the is first starts"`
 
 	// Specializers are the specializers used in the Identity Server.
 	Specializers Specializers `name:"-"`
@@ -106,17 +105,17 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 		is.email = mock.New()
 	}
 
-	hooks.RegisterUnaryHook("/ttn.v3.IsUser", "claims-builder", claims.UnaryHook(store))
-	hooks.RegisterUnaryHook("/ttn.v3.IsApplication", "claims-builder", claims.UnaryHook(store))
-	hooks.RegisterUnaryHook("/ttn.v3.IsGateway", "claims-builder", claims.UnaryHook(store))
-	hooks.RegisterUnaryHook("/ttn.v3.IsClient", "claims-builder", claims.UnaryHook(store))
-	hooks.RegisterUnaryHook("/ttn.v3.IsOrganization", "claims-builder", claims.UnaryHook(store))
+	hooks.RegisterUnaryHook("/ttn.v3.IsUser", "claims-builder", claimsUnaryHook(store))
+	hooks.RegisterUnaryHook("/ttn.v3.IsApplication", "claims-builder", claimsUnaryHook(store))
+	hooks.RegisterUnaryHook("/ttn.v3.IsGateway", "claims-builder", claimsUnaryHook(store))
+	hooks.RegisterUnaryHook("/ttn.v3.IsClient", "claims-builder", claimsUnaryHook(store))
+	hooks.RegisterUnaryHook("/ttn.v3.IsOrganization", "claims-builder", claimsUnaryHook(store))
 
-	hooks.RegisterStreamHook("/ttn.v3.IsUser", "claims-builder", claims.StreamHook(store))
-	hooks.RegisterStreamHook("/ttn.v3.IsApplication", "claims-builder", claims.StreamHook(store))
-	hooks.RegisterStreamHook("/ttn.v3.IsGateway", "claims-builder", claims.StreamHook(store))
-	hooks.RegisterStreamHook("/ttn.v3.IsClient", "claims-builder", claims.StreamHook(store))
-	hooks.RegisterStreamHook("/ttn.v3.IsOrganization", "claims-builder", claims.StreamHook(store))
+	hooks.RegisterStreamHook("/ttn.v3.IsUser", "claims-builder", claimsStreamHook(store))
+	hooks.RegisterStreamHook("/ttn.v3.IsApplication", "claims-builder", claimsStreamHook(store))
+	hooks.RegisterStreamHook("/ttn.v3.IsGateway", "claims-builder", claimsStreamHook(store))
+	hooks.RegisterStreamHook("/ttn.v3.IsClient", "claims-builder", claimsStreamHook(store))
+	hooks.RegisterStreamHook("/ttn.v3.IsOrganization", "claims-builder", claimsStreamHook(store))
 
 	c.RegisterGRPC(is)
 

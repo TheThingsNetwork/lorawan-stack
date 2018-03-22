@@ -1,6 +1,6 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package claims
+package identityserver
 
 import (
 	"context"
@@ -16,9 +16,9 @@ import (
 	"google.golang.org/grpc"
 )
 
-// UnaryHook is a hook specific for unary calls in the Identity Server that
-// preloads in the context the claims information.
-func UnaryHook(store *sql.Store) hooks.UnaryHandlerMiddleware {
+// claimsUnaryHook is a hook specific for unary calls in the Identity Server
+// that preloads in the context the claims information.
+func claimsUnaryHook(store *sql.Store) hooks.UnaryHandlerMiddleware {
 	return func(next grpc.UnaryHandler) grpc.UnaryHandler {
 		return func(ctx context.Context, req interface{}) (interface{}, error) {
 			c, err := buildClaims(ctx, store)
@@ -26,14 +26,14 @@ func UnaryHook(store *sql.Store) hooks.UnaryHandlerMiddleware {
 				return nil, err
 			}
 
-			return next(NewContext(ctx, c), req)
+			return next(newContextWithClaims(ctx, c), req)
 		}
 	}
 }
 
-// StreamHook is a hook specific for stream calls in the Identity Server that
-// preloads in the context the claims information.
-func StreamHook(store *sql.Store) hooks.StreamHandlerMiddleware {
+// claimsStreamHook is a hook specific for stream calls in the Identity Server
+// that preloads in the context the claims information.
+func claimsStreamHook(store *sql.Store) hooks.StreamHandlerMiddleware {
 	return func(next grpc.StreamHandler) grpc.StreamHandler {
 		return func(srv interface{}, stream grpc.ServerStream) error {
 			ctx := stream.Context()
@@ -44,7 +44,7 @@ func StreamHook(store *sql.Store) hooks.StreamHandlerMiddleware {
 			}
 
 			wrapped := grpc_middleware.WrapServerStream(stream)
-			wrapped.WrappedContext = NewContext(ctx, c)
+			wrapped.WrappedContext = newContextWithClaims(ctx, c)
 
 			return next(srv, wrapped)
 		}
@@ -53,11 +53,11 @@ func StreamHook(store *sql.Store) hooks.StreamHandlerMiddleware {
 
 // buildClaims returns the claims based on the authentication metadata contained
 // in the request. Returns empty claims if no authentication metadata is found.
-func buildClaims(ctx context.Context, store *sql.Store) (*Claims, error) {
+func buildClaims(ctx context.Context, store *sql.Store) (*claims, error) {
 	md := rpcmetadata.FromIncomingContext(ctx)
 
 	if md.AuthType == "" && md.AuthValue == "" {
-		return new(Claims), nil
+		return new(claims), nil
 	}
 
 	if md.AuthType != "Bearer" {
@@ -69,7 +69,7 @@ func buildClaims(ctx context.Context, store *sql.Store) (*Claims, error) {
 		return nil, err
 	}
 
-	var res *Claims
+	var res *claims
 	switch header.Type {
 	case auth.Token:
 		data, err := store.OAuth.GetAccessToken(md.AuthValue)
@@ -87,34 +87,28 @@ func buildClaims(ctx context.Context, store *sql.Store) (*Claims, error) {
 			return nil, err
 		}
 
-		res = &Claims{
-			entityID:   data.UserID,
-			entityType: User,
-			source:     auth.Token,
-			rights:     rights,
+		res = &claims{
+			EntityIdentifiers: ttnpb.UserIdentifiers{UserID: data.UserID},
+			Source:            auth.Token,
+			Rights:            rights,
 		}
 	case auth.Key:
-		var entityID string
-		var key *ttnpb.APIKey
+		var key ttnpb.APIKey
 		var err error
 
-		res := &Claims{
-			source: auth.Key,
+		res := &claims{
+			Source: auth.Key,
 		}
 
 		switch payload.Type {
-		case auth.ApplicationKey:
-			entityID, key, err = store.Applications.GetAPIKey(md.AuthValue)
-
-			res.entityType = Application
-		case auth.GatewayKey:
-			entityID, key, err = store.Gateways.GetAPIKey(md.AuthValue)
-
-			res.entityType = Gateway
 		case auth.UserKey:
-			entityID, key, err = store.Users.GetAPIKey(md.AuthValue)
-
-			res.entityType = User
+			res.EntityIdentifiers, key, err = store.Users.GetAPIKey(md.AuthValue)
+		case auth.ApplicationKey:
+			res.EntityIdentifiers, key, err = store.Applications.GetAPIKey(md.AuthValue)
+		case auth.GatewayKey:
+			res.EntityIdentifiers, key, err = store.Gateways.GetAPIKey(md.AuthValue)
+		case auth.OrganizationKey:
+			res.EntityIdentifiers, key, err = store.Organizations.GetAPIKey(md.AuthValue)
 		default:
 			return nil, errors.Errorf("Invalid API key type `%s`", payload.Type)
 		}
@@ -123,8 +117,7 @@ func buildClaims(ctx context.Context, store *sql.Store) (*Claims, error) {
 			return nil, err
 		}
 
-		res.entityID = entityID
-		res.rights = key.Rights
+		res.Rights = key.Rights
 	default:
 		return nil, errors.New("Invalid authentication value")
 	}

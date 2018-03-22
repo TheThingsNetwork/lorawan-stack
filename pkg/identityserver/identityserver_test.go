@@ -9,7 +9,6 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 )
@@ -76,11 +75,15 @@ func init() {
 func allRights() []ttnpb.Right { return rights }
 
 func testCtx(userID string) context.Context {
-	return claims.NewContext(context.Background(), claims.New(userID, claims.User, auth.Token, rights))
+	return newContextWithClaims(context.Background(), &claims{
+		EntityIdentifiers: ttnpb.UserIdentifiers{UserID: userID},
+		Source:            auth.Token,
+		Rights:            rights,
+	})
 }
 
-func testSettings() *ttnpb.IdentityServerSettings {
-	return &ttnpb.IdentityServerSettings{
+func testSettings() ttnpb.IdentityServerSettings {
+	return ttnpb.IdentityServerSettings{
 		BlacklistedIDs:     []string{"blacklisted-id", "admin"},
 		AllowedEmails:      []string{"*@bar.com"},
 		ValidationTokenTTL: time.Duration(time.Hour),
@@ -90,13 +93,13 @@ func testSettings() *ttnpb.IdentityServerSettings {
 
 func testClient() *ttnpb.Client {
 	cli := &ttnpb.Client{
-		ClientIdentifier: ttnpb.ClientIdentifier{ClientID: "test-client"},
-		Description:      "foo description",
-		Creator:          testUsers()["alice"].UserIdentifier,
-		Secret:           "secret",
-		RedirectURI:      "localhost",
-		Rights:           make([]ttnpb.Right, 0, 50),
-		State:            ttnpb.STATE_APPROVED,
+		ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "test-client"},
+		Description:       "foo description",
+		Creator:           testUsers()["alice"].UserIdentifiers,
+		Secret:            "secret",
+		RedirectURI:       "localhost",
+		Rights:            make([]ttnpb.Right, 0, 50),
+		State:             ttnpb.STATE_APPROVED,
 	}
 
 	cli.Rights = append(cli.Rights, ttnpb.AllUserRights()...)
@@ -110,22 +113,22 @@ func testClient() *ttnpb.Client {
 func testUsers() map[string]*ttnpb.User {
 	return map[string]*ttnpb.User{
 		"alice": {
-			UserIdentifier: ttnpb.UserIdentifier{UserID: "alice"},
-			Password:       "123456",
-			Admin:          true,
-			Email:          "alice@alice.com",
-			State:          ttnpb.STATE_APPROVED,
+			UserIdentifiers: ttnpb.UserIdentifiers{UserID: "alice"},
+			Password:        "123456",
+			Admin:           true,
+			Email:           "alice@alice.com",
+			State:           ttnpb.STATE_APPROVED,
 		},
 		"bob": {
-			UserIdentifier: ttnpb.UserIdentifier{UserID: "bob"},
-			Password:       "1234567",
-			Email:          "bob@bob.com",
-			Admin:          true,
+			UserIdentifiers: ttnpb.UserIdentifiers{UserID: "bob"},
+			Password:        "1234567",
+			Email:           "bob@bob.com",
+			Admin:           true,
 		},
 		"john-doe": {
-			UserIdentifier: ttnpb.UserIdentifier{UserID: "john-doe"},
-			Password:       "123456",
-			Email:          "john@doe.com",
+			UserIdentifiers: ttnpb.UserIdentifiers{UserID: "john-doe"},
+			Password:        "123456",
+			Email:           "john@doe.com",
 		},
 	}
 }

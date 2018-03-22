@@ -6,7 +6,6 @@ import (
 	"context"
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
@@ -14,9 +13,9 @@ import (
 // credentials are allowed to perform an action given the set of passed rights and
 // returns the User ID attached to the credentials.
 func (is *IdentityServer) enforceUserRights(ctx context.Context, rights ...ttnpb.Right) error {
-	claims := claims.FromContext(ctx)
+	claims := claimsFromContext(ctx)
 
-	if claims.UserID() == "" {
+	if claims.UserIdentifiers().IsZero() {
 		return ErrNotAuthorized.New(nil)
 	}
 
@@ -34,7 +33,7 @@ func (is *IdentityServer) enforceAdmin(ctx context.Context) error {
 		return err
 	}
 
-	found, err := is.store.Users.GetByID(claims.FromContext(ctx).UserID(), is.config.Specializers.User)
+	found, err := is.store.Users.GetByID(claimsFromContext(ctx).UserIdentifiers(), is.config.Specializers.User)
 	if err != nil {
 		return err
 	}
@@ -48,25 +47,30 @@ func (is *IdentityServer) enforceAdmin(ctx context.Context) error {
 
 // enforceApplicationRights is a hook that checks whether if the given authorization
 // credentials are allowed to access the application with the given rights.
-func (is *IdentityServer) enforceApplicationRights(ctx context.Context, appID string, rights ...ttnpb.Right) error {
-	claims := claims.FromContext(ctx)
+func (is *IdentityServer) enforceApplicationRights(ctx context.Context, ids ttnpb.ApplicationIdentifiers, rights ...ttnpb.Right) error {
+	claims := claimsFromContext(ctx)
 
 	if !claims.HasRights(rights...) {
 		return ErrNotAuthorized.New(nil)
 	}
 
 	var authorized bool
-	switch claims.Source() {
+	switch claims.Source {
 	case auth.Key:
-		authorized = claims.ApplicationID() == appID
+		kids := claims.ApplicationIdentifiers()
+		if kids.IsZero() {
+			break
+		}
+
+		authorized = kids.Contains(ids)
 	case auth.Token:
-		userID := claims.UserID()
-		if len(userID) == 0 {
-			return ErrNotAuthorized.New(nil)
+		uids := claims.UserIdentifiers()
+		if uids.IsZero() {
+			break
 		}
 
 		var err error
-		authorized, err = is.store.Applications.HasCollaboratorRights(appID, userID, rights...)
+		authorized, err = is.store.Applications.HasCollaboratorRights(ids, organizationOrUserID_UserID(uids), rights...)
 		if err != nil {
 			return err
 		}
@@ -81,25 +85,30 @@ func (is *IdentityServer) enforceApplicationRights(ctx context.Context, appID st
 
 // enforceGatewayRights is a hook that checks whether if the given authorization
 // credentials are allowed to access the gateway with the given rights.
-func (is *IdentityServer) enforceGatewayRights(ctx context.Context, gtwID string, rights ...ttnpb.Right) error {
-	claims := claims.FromContext(ctx)
+func (is *IdentityServer) enforceGatewayRights(ctx context.Context, ids ttnpb.GatewayIdentifiers, rights ...ttnpb.Right) error {
+	claims := claimsFromContext(ctx)
 
 	if !claims.HasRights(rights...) {
 		return ErrNotAuthorized.New(nil)
 	}
 
 	var authorized bool
-	switch claims.Source() {
+	switch claims.Source {
 	case auth.Key:
-		authorized = claims.GatewayID() == gtwID
+		kids := claims.GatewayIdentifiers()
+		if kids.IsZero() {
+			break
+		}
+
+		authorized = kids.Contains(ids)
 	case auth.Token:
-		userID := claims.UserID()
-		if len(userID) == 0 {
-			return ErrNotAuthorized.New(nil)
+		uids := claims.UserIdentifiers()
+		if uids.IsZero() {
+			break
 		}
 
 		var err error
-		authorized, err = is.store.Gateways.HasCollaboratorRights(gtwID, userID, rights...)
+		authorized, err = is.store.Gateways.HasCollaboratorRights(ids, organizationOrUserID_UserID(uids), rights...)
 		if err != nil {
 			return err
 		}
@@ -114,25 +123,30 @@ func (is *IdentityServer) enforceGatewayRights(ctx context.Context, gtwID string
 
 // enforceOrganizationRights is a hook that checks whether if the given authorization
 // credentials are allowed to access the organization with the given rights.
-func (is *IdentityServer) enforceOrganizationRights(ctx context.Context, organizationID string, rights ...ttnpb.Right) error {
-	claims := claims.FromContext(ctx)
+func (is *IdentityServer) enforceOrganizationRights(ctx context.Context, ids ttnpb.OrganizationIdentifiers, rights ...ttnpb.Right) error {
+	claims := claimsFromContext(ctx)
 
 	if !claims.HasRights(rights...) {
 		return ErrNotAuthorized.New(nil)
 	}
 
 	var authorized bool
-	switch claims.Source() {
+	switch claims.Source {
 	case auth.Key:
-		authorized = claims.OrganizationID() == organizationID
+		kids := claims.OrganizationIdentifiers()
+		if kids.IsZero() {
+			break
+		}
+
+		authorized = kids.Contains(ids)
 	case auth.Token:
-		userID := claims.UserID()
-		if len(userID) == 0 {
-			return ErrNotAuthorized.New(nil)
+		uids := claims.UserIdentifiers()
+		if uids.IsZero() {
+			break
 		}
 
 		var err error
-		authorized, err = is.store.Organizations.HasMemberRights(organizationID, userID, rights...)
+		authorized, err = is.store.Organizations.HasMemberRights(ids, uids, rights...)
 		if err != nil {
 			return err
 		}

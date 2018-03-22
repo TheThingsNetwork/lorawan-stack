@@ -11,7 +11,7 @@ import (
 
 // DefaultSettings are the default settings loaded in the Identity Server
 // when the database is created for the first time.
-var DefaultSettings = &ttnpb.IdentityServerSettings{
+var DefaultSettings = ttnpb.IdentityServerSettings{
 	BlacklistedIDs: []string{
 		"admin",
 		"administrator",

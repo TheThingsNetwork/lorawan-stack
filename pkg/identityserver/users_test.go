@@ -50,10 +50,10 @@ func TestUser(t *testing.T) {
 	is := getIS(t)
 
 	user := ttnpb.User{
-		UserIdentifier: ttnpb.UserIdentifier{UserID: "daniel"},
-		Password:       "12345",
-		Email:          "foo@bar.com",
-		Name:           "hi",
+		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "daniel"},
+		Password:        "12345",
+		Email:           "foo@bar.com",
+		Name:            "hi",
 	}
 
 	ctx := testCtx(user.UserID)
@@ -93,7 +93,7 @@ func TestUser(t *testing.T) {
 	// check that response doesnt include password within
 	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
-	a.So(found.UserIdentifier.UserID, should.Equal, user.UserID)
+	a.So(found.UserIdentifiers.UserID, should.Equal, user.UserID)
 	a.So(found.Name, should.Equal, user.Name)
 	a.So(found.Password, should.HaveLength, 0)
 	a.So(found.Email, should.Equal, user.Email)
@@ -188,7 +188,7 @@ func TestUser(t *testing.T) {
 	// check that the field validated_at has been reset
 	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
-	a.So(found.UserIdentifier.UserID, should.Equal, user.UserID)
+	a.So(found.UserIdentifiers.UserID, should.Equal, user.UserID)
 	a.So(found.ValidatedAt.IsZero(), should.BeTrue)
 
 	token := ""
@@ -214,7 +214,7 @@ func TestUser(t *testing.T) {
 	// and therefore the email isn't validated yet
 	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
-	a.So(found.UserIdentifier.UserID, should.Equal, user.UserID)
+	a.So(found.UserIdentifiers.UserID, should.Equal, user.UserID)
 	a.So(found.ValidatedAt.IsZero(), should.BeTrue)
 
 	// get the latest sent validation token
@@ -232,22 +232,22 @@ func TestUser(t *testing.T) {
 
 	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
-	a.So(found.UserIdentifier.UserID, should.Equal, user.UserID)
+	a.So(found.UserIdentifiers.UserID, should.Equal, user.UserID)
 	a.So(found.ValidatedAt.IsZero(), should.BeFalse)
 
-	_, err = is.userService.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifier{ClientID: "non-existent-client"})
+	_, err = is.userService.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifiers{ClientID: "non-existent-client"})
 	a.So(err, should.NotBeNil)
-	a.So(sql.ErrAuthorizedClientNotFound.Describes(err), should.BeTrue)
+	a.So(sql.ErrClientNotFound.Describes(err), should.BeTrue)
 
 	// create a fake authorized client to the user
 	client := &ttnpb.Client{
-		ClientIdentifier: ttnpb.ClientIdentifier{ClientID: "bar-client"},
-		Description:      "description",
-		Secret:           "secret",
-		Grants:           []ttnpb.GrantType{ttnpb.GRANT_PASSWORD},
-		Rights:           []ttnpb.Right{},
-		RedirectURI:      "foo.ttn.dev/oauth",
-		Creator:          testUsers()["john-doe"].UserIdentifier,
+		ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "bar-client"},
+		Description:       "description",
+		Secret:            "secret",
+		Grants:            []ttnpb.GrantType{ttnpb.GRANT_PASSWORD},
+		Rights:            []ttnpb.Right{},
+		RedirectURI:       "foo.ttn.dev/oauth",
+		Creator:           testUsers()["john-doe"].UserIdentifiers,
 	}
 	client.Rights = append(client.Rights, ttnpb.AllUserRights()...)
 	err = is.store.Clients.Create(client)
@@ -256,7 +256,7 @@ func TestUser(t *testing.T) {
 	accessToken, err := auth.GenerateAccessToken("")
 	a.So(err, should.BeNil)
 
-	accessData := &store.AccessData{
+	accessData := store.AccessData{
 		AccessToken: accessToken,
 		UserID:      user.UserID,
 		ClientID:    client.ClientID,
@@ -267,7 +267,7 @@ func TestUser(t *testing.T) {
 	err = is.store.OAuth.SaveAccessToken(accessData)
 	a.So(err, should.BeNil)
 
-	refreshData := &store.RefreshData{
+	refreshData := store.RefreshData{
 		RefreshToken: "123",
 		UserID:       user.UserID,
 		ClientID:     client.ClientID,

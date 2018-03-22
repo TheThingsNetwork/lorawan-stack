@@ -6,7 +6,6 @@ import (
 	"context"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/random"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -40,15 +39,15 @@ func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClien
 		}
 
 		return tx.Clients.Create(&ttnpb.Client{
-			ClientIdentifier: req.Client.ClientIdentifier,
-			Description:      req.Client.Description,
-			RedirectURI:      req.Client.RedirectURI,
-			Creator:          ttnpb.UserIdentifier{UserID: claims.FromContext(ctx).UserID()},
-			Secret:           random.String(64),
-			State:            ttnpb.STATE_PENDING,
-			OfficialLabeled:  false,
-			Grants:           []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
-			Rights:           req.Client.Rights,
+			ClientIdentifiers: req.Client.ClientIdentifiers,
+			Description:       req.Client.Description,
+			RedirectURI:       req.Client.RedirectURI,
+			Creator:           claimsFromContext(ctx).UserIdentifiers(),
+			Secret:            random.String(64),
+			State:             ttnpb.STATE_PENDING,
+			OfficialLabeled:   false,
+			Grants:            []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
+			Rights:            req.Client.Rights,
 		})
 	})
 
@@ -58,8 +57,8 @@ func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClien
 // GetClient returns the client that matches the identifier.
 // It allows to be called without authorization credentials, in this case it
 // will only return the publicly information available about the client.
-func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*ttnpb.Client, error) {
-	found, err := s.store.Clients.GetByID(req.ClientID, s.config.Specializers.Client)
+func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifiers) (*ttnpb.Client, error) {
+	found, err := s.store.Clients.GetByID(*req, s.config.Specializers.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -68,11 +67,11 @@ func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifi
 	err = s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
 	if err != nil && ErrNotAuthorized.Describes(err) {
 		return &ttnpb.Client{
-			ClientIdentifier: client.ClientIdentifier,
-			Description:      client.Description,
-			RedirectURI:      client.RedirectURI,
-			OfficialLabeled:  client.OfficialLabeled,
-			Rights:           client.Rights,
+			ClientIdentifiers: client.ClientIdentifiers,
+			Description:       client.Description,
+			RedirectURI:       client.RedirectURI,
+			OfficialLabeled:   client.OfficialLabeled,
+			Rights:            client.Rights,
 		}, nil
 	}
 	if err != nil {
@@ -80,7 +79,7 @@ func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifi
 	}
 
 	// ensure the user is the client's creator
-	if client.Creator.UserID != claims.FromContext(ctx).UserID() {
+	if !client.Creator.Equals(claimsFromContext(ctx).UserIdentifiers()) {
 		return nil, ErrNotAuthorized.New(nil)
 	}
 
@@ -94,7 +93,7 @@ func (s *clientService) ListClients(ctx context.Context, _ *pbtypes.Empty) (*ttn
 		return nil, err
 	}
 
-	found, err := s.store.Clients.ListByUser(claims.FromContext(ctx).UserID(), s.config.Specializers.Client)
+	found, err := s.store.Clients.ListByUser(claimsFromContext(ctx).UserIdentifiers(), s.config.Specializers.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -119,14 +118,14 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Clients.GetByID(req.Client.ClientID, s.config.Specializers.Client)
+		found, err := tx.Clients.GetByID(req.Client.ClientIdentifiers, s.config.Specializers.Client)
 		if err != nil {
 			return err
 		}
 		client := found.GetClient()
 
 		// ensure the user is the client's creator
-		if client.Creator.UserID != claims.FromContext(ctx).UserID() {
+		if !client.Creator.Equals(claimsFromContext(ctx).UserIdentifiers()) {
 			return ErrNotAuthorized.New(nil)
 		}
 
@@ -149,24 +148,24 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 
 // DeleteClient deletes the client that matches the identifier and revokes all
 // user authorizations.
-func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*pbtypes.Empty, error) {
+func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdentifiers) (*pbtypes.Empty, error) {
 	err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
 	if err != nil {
 		return nil, err
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Clients.GetByID(req.ClientID, s.config.Specializers.Client)
+		found, err := tx.Clients.GetByID(*req, s.config.Specializers.Client)
 		if err != nil {
 			return err
 		}
 
 		// ensure the user is the client's creator
-		if found.GetClient().Creator.UserID != claims.FromContext(ctx).UserID() {
+		if !found.GetClient().Creator.Equals(claimsFromContext(ctx).UserIdentifiers()) {
 			return ErrNotAuthorized.New(nil)
 		}
 
-		return tx.Clients.Delete(req.ClientID)
+		return tx.Clients.Delete(*req)
 	})
 
 	return nil, err

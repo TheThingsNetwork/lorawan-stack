@@ -9,7 +9,6 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/claims"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/random"
@@ -69,11 +68,11 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		}
 
 		user := &ttnpb.User{
-			UserIdentifier: req.User.UserIdentifier,
-			Name:           req.User.Name,
-			Email:          req.User.Email,
-			Password:       string(password),
-			State:          ttnpb.STATE_PENDING,
+			UserIdentifiers: req.User.UserIdentifiers,
+			Name:            req.User.Name,
+			Email:           req.User.Email,
+			Password:        string(password),
+			State:           ttnpb.STATE_PENDING,
 		}
 
 		if settings.SkipValidation {
@@ -105,13 +104,13 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		}
 
 		if !settings.SkipValidation {
-			token := &store.ValidationToken{
+			token := store.ValidationToken{
 				ValidationToken: random.String(64),
 				CreatedAt:       time.Now().UTC(),
 				ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 			}
 
-			err = tx.Users.SaveValidationToken(user.UserID, token)
+			err = tx.Users.SaveValidationToken(user.UserIdentifiers, token)
 			if err != nil {
 				return err
 			}
@@ -136,7 +135,7 @@ func (s *userService) GetUser(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Use
 		return nil, err
 	}
 
-	found, err := s.store.Users.GetByID(claims.FromContext(ctx).UserID(), s.config.Specializers.User)
+	found, err := s.store.Users.GetByID(claimsFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +156,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(claims.FromContext(ctx).UserID(), s.config.Specializers.User)
+		found, err := tx.Users.GetByID(claimsFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
 		if err != nil {
 			return err
 		}
@@ -206,13 +205,13 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 			return nil
 		}
 
-		token := &store.ValidationToken{
+		token := store.ValidationToken{
 			ValidationToken: random.String(64),
 			CreatedAt:       time.Now().UTC(),
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 
-		err = tx.Users.SaveValidationToken(claims.FromContext(ctx).UserID(), token)
+		err = tx.Users.SaveValidationToken(claimsFromContext(ctx).UserIdentifiers(), token)
 		if err != nil {
 			return err
 		}
@@ -235,7 +234,7 @@ func (s *userService) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateU
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(claims.FromContext(ctx).UserID(), s.config.Specializers.User)
+		found, err := tx.Users.GetByID(claimsFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
 		if err != nil {
 			return err
 		}
@@ -271,18 +270,23 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		err := tx.Users.Delete(claims.FromContext(ctx).UserID())
+		apps, err := tx.Applications.ListByOrganizationOrUser(organizationOrUserID_UserID(claimsFromContext(ctx).UserIdentifiers()), s.config.Specializers.Application)
 		if err != nil {
 			return err
 		}
 
-		apps, err := tx.Applications.ListByOrganizationOrUser(claims.FromContext(ctx).UserID(), s.config.Specializers.Application)
+		gtws, err := tx.Gateways.ListByOrganizationOrUser(organizationOrUserID_UserID(claimsFromContext(ctx).UserIdentifiers()), s.config.Specializers.Gateway)
+		if err != nil {
+			return err
+		}
+
+		err = tx.Users.Delete(claimsFromContext(ctx).UserIdentifiers())
 		if err != nil {
 			return err
 		}
 
 		for _, app := range apps {
-			appID := app.GetApplication().ApplicationID
+			appID := app.GetApplication().ApplicationIdentifiers
 
 			c, err := tx.Applications.ListCollaborators(appID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
 			if err != nil {
@@ -290,17 +294,12 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 			}
 
 			if len(c) == 0 {
-				return errors.Errorf("Failed to delete user `%s`: cannot leave application `%s` without at least one collaborator with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right", claims.FromContext(ctx).UserID(), appID)
+				return errors.Errorf("Failed to delete user `%s`: cannot leave application `%s` without at least one collaborator with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right", claimsFromContext(ctx).UserIdentifiers(), appID)
 			}
 		}
 
-		gtws, err := tx.Gateways.ListByOrganizationOrUser(claims.FromContext(ctx).UserID(), s.config.Specializers.Gateway)
-		if err != nil {
-			return err
-		}
-
 		for _, gtw := range gtws {
-			gtwID := gtw.GetGateway().GatewayID
+			gtwID := gtw.GetGateway().GatewayIdentifiers
 
 			c, err := tx.Gateways.ListCollaborators(gtwID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
 			if err != nil {
@@ -308,7 +307,7 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 			}
 
 			if len(c) == 0 {
-				return errors.Errorf("Failed to delete user `%s`: cannot leave gateway `%s` without at least one collaborator with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` right", claims.FromContext(ctx).UserID(), gtwID)
+				return errors.Errorf("Failed to delete user `%s`: cannot leave gateway `%s` without at least one collaborator with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` right", claimsFromContext(ctx).UserIdentifiers(), gtwID)
 			}
 		}
 
@@ -330,18 +329,18 @@ func (s *userService) GenerateUserAPIKey(ctx context.Context, req *ttnpb.Generat
 		return nil, err
 	}
 
-	key := &ttnpb.APIKey{
+	key := ttnpb.APIKey{
 		Key:    k,
 		Name:   req.Name,
 		Rights: req.Rights,
 	}
 
-	err = s.store.Users.SaveAPIKey(claims.FromContext(ctx).UserID(), key)
+	err = s.store.Users.SaveAPIKey(claimsFromContext(ctx).UserIdentifiers(), key)
 	if err != nil {
 		return nil, err
 	}
 
-	return key, nil
+	return &key, nil
 }
 
 // ListUserAPIKeys returns all the API keys from the current user.
@@ -351,13 +350,18 @@ func (s *userService) ListUserAPIKeys(ctx context.Context, _ *pbtypes.Empty) (*t
 		return nil, err
 	}
 
-	found, err := s.store.Users.ListAPIKeys(claims.FromContext(ctx).UserID())
+	found, err := s.store.Users.ListAPIKeys(claimsFromContext(ctx).UserIdentifiers())
 	if err != nil {
 		return nil, err
 	}
 
+	keys := make([]*ttnpb.APIKey, 0, len(found))
+	for i := range found {
+		keys = append(keys, &found[i])
+	}
+
 	return &ttnpb.ListUserAPIKeysResponse{
-		APIKeys: found,
+		APIKeys: keys,
 	}, nil
 }
 
@@ -368,7 +372,7 @@ func (s *userService) UpdateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUse
 		return nil, err
 	}
 
-	return nil, s.store.Users.UpdateAPIKeyRights(claims.FromContext(ctx).UserID(), req.Name, req.Rights)
+	return nil, s.store.Users.UpdateAPIKeyRights(claimsFromContext(ctx).UserIdentifiers(), req.Name, req.Rights)
 }
 
 // RemoveUserAPIKey removes an API key from the current user.
@@ -378,7 +382,7 @@ func (s *userService) RemoveUserAPIKey(ctx context.Context, req *ttnpb.RemoveUse
 		return nil, err
 	}
 
-	return nil, s.store.Users.DeleteAPIKey(claims.FromContext(ctx).UserID(), req.Name)
+	return nil, s.store.Users.DeleteAPIKey(claimsFromContext(ctx).UserIdentifiers(), req.Name)
 }
 
 // ValidateUserEmail validates the user's email with the token sent to the email.
@@ -420,7 +424,7 @@ func (s *userService) RequestUserEmailValidation(ctx context.Context, _ *pbtypes
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(claims.FromContext(ctx).UserID(), s.config.Specializers.User)
+		found, err := tx.Users.GetByID(claimsFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
 		if err != nil {
 			return err
 		}
@@ -435,13 +439,13 @@ func (s *userService) RequestUserEmailValidation(ctx context.Context, _ *pbtypes
 			return err
 		}
 
-		token := &store.ValidationToken{
+		token := store.ValidationToken{
 			ValidationToken: random.String(64),
 			CreatedAt:       time.Now().UTC(),
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 
-		err = tx.Users.SaveValidationToken(claims.FromContext(ctx).UserID(), token)
+		err = tx.Users.SaveValidationToken(claimsFromContext(ctx).UserIdentifiers(), token)
 		if err != nil {
 			return err
 		}
@@ -464,7 +468,7 @@ func (s *userService) ListAuthorizedClients(ctx context.Context, _ *pbtypes.Empt
 		return nil, err
 	}
 
-	found, err := s.store.OAuth.ListAuthorizedClients(claims.FromContext(ctx).UserID(), s.config.Specializers.Client)
+	found, err := s.store.OAuth.ListAuthorizedClients(claimsFromContext(ctx).UserIdentifiers(), s.config.Specializers.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -485,11 +489,11 @@ func (s *userService) ListAuthorizedClients(ctx context.Context, _ *pbtypes.Empt
 }
 
 // RevokeAuthorizedClient revokes an authorized third-party client.
-func (s *userService) RevokeAuthorizedClient(ctx context.Context, req *ttnpb.ClientIdentifier) (*pbtypes.Empty, error) {
+func (s *userService) RevokeAuthorizedClient(ctx context.Context, req *ttnpb.ClientIdentifiers) (*pbtypes.Empty, error) {
 	err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_AUTHORIZEDCLIENTS)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, s.store.OAuth.RevokeAuthorizedClient(claims.FromContext(ctx).UserID(), req.ClientID)
+	return nil, s.store.OAuth.RevokeAuthorizedClient(claimsFromContext(ctx).UserIdentifiers(), *req)
 }

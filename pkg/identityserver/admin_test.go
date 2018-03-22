@@ -81,18 +81,18 @@ func TestAdminInvitations(t *testing.T) {
 	a.So(err, should.BeNil)
 	defer func() {
 		settings.IdentityServerSettings_UserRegistrationFlow.InvitationOnly = false
-		is.store.Settings.Set(settings)
+		is.store.Settings.Set(*settings)
 	}()
 
 	settings.IdentityServerSettings_UserRegistrationFlow.InvitationOnly = true
-	err = is.store.Settings.Set(settings)
+	err = is.store.Settings.Set(*settings)
 	a.So(err, should.BeNil)
 
 	user := ttnpb.User{
-		UserIdentifier: ttnpb.UserIdentifier{UserID: "invitation-user"},
-		Password:       "lol",
-		Email:          email,
-		Name:           "HI",
+		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "invitation-user"},
+		Password:        "lol",
+		Email:           email,
+		Name:            "HI",
 	}
 
 	_, err = is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{User: user})
@@ -104,10 +104,10 @@ func TestAdminInvitations(t *testing.T) {
 		InvitationToken: token,
 	})
 	a.So(err, should.BeNil)
-	defer is.store.Users.Delete(user.UserID)
+	defer is.store.Users.Delete(user.UserIdentifiers)
 
 	// check user was created
-	found, err := is.adminService.GetUser(ctx, &ttnpb.UserIdentifier{UserID: user.UserID})
+	found, err := is.adminService.GetUser(ctx, &ttnpb.UserIdentifiers{UserID: user.UserID})
 	a.So(err, should.BeNil)
 	a.So(found.UserID, should.Equal, user.UserID)
 	a.So(found.Password, should.BeEmpty)
@@ -152,13 +152,13 @@ func TestAdminUsers(t *testing.T) {
 	user := testUsers()["bob"]
 
 	// reset password
-	found, err := is.store.Users.GetByID(user.UserID, is.config.Specializers.User)
+	found, err := is.store.Users.GetByID(user.UserIdentifiers, is.config.Specializers.User)
 	a.So(err, should.BeNil)
 
 	old := found.GetUser().Password
 
 	{
-		resp, err := is.adminService.ResetUserPassword(ctx, &ttnpb.UserIdentifier{UserID: user.UserID})
+		resp, err := is.adminService.ResetUserPassword(ctx, &ttnpb.UserIdentifiers{UserID: user.UserID})
 		a.So(err, should.BeNil)
 		a.So(resp.Password, should.NotBeEmpty)
 
@@ -168,7 +168,7 @@ func TestAdminUsers(t *testing.T) {
 			a.So(data.Password, should.Equal, resp.Password)
 		}
 
-		found, err = is.store.Users.GetByID(user.UserID, is.config.Specializers.User)
+		found, err = is.store.Users.GetByID(user.UserIdentifiers, is.config.Specializers.User)
 		a.So(err, should.BeNil)
 		a.So(old, should.NotEqual, found.GetUser().Password)
 	}
@@ -176,8 +176,8 @@ func TestAdminUsers(t *testing.T) {
 	// make user admin
 	_, err = is.adminService.UpdateUser(ctx, &ttnpb.UpdateUserRequest{
 		User: ttnpb.User{
-			UserIdentifier: ttnpb.UserIdentifier{UserID: user.UserID},
-			Admin:          true,
+			UserIdentifiers: ttnpb.UserIdentifiers{UserID: user.UserID},
+			Admin:           true,
 		},
 		UpdateMask: pbtypes.FieldMask{
 			Paths: []string{"admin"},
@@ -185,7 +185,7 @@ func TestAdminUsers(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	found, err = is.store.Users.GetByID(user.UserID, is.config.Specializers.User)
+	found, err = is.store.Users.GetByID(user.UserIdentifiers, is.config.Specializers.User)
 	a.So(err, should.BeNil)
 	a.So(found.GetUser().Admin, should.BeTrue)
 
@@ -195,7 +195,7 @@ func TestAdminUsers(t *testing.T) {
 	err = is.store.Users.Create(user)
 	a.So(err, should.BeNil)
 
-	_, err = is.adminService.DeleteUser(ctx, &ttnpb.UserIdentifier{UserID: user.UserID})
+	_, err = is.adminService.DeleteUser(ctx, &ttnpb.UserIdentifiers{UserID: user.UserID})
 	a.So(err, should.BeNil)
 
 	ddata, ok := mock.Data().(*templates.AccountDeleted)
@@ -203,7 +203,7 @@ func TestAdminUsers(t *testing.T) {
 		a.So(ddata.UserID, should.Equal, user.UserID)
 	}
 
-	_, err = is.store.Users.GetByID(user.UserID, is.config.Specializers.User)
+	_, err = is.store.Users.GetByID(user.UserIdentifiers, is.config.Specializers.User)
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrUserNotFound.Describes(err), should.BeTrue)
 
@@ -224,7 +224,7 @@ func TestAdminClients(t *testing.T) {
 	ctx := testCtx(testUsers()["alice"].UserID)
 	client := testClient()
 
-	found, err := is.adminService.GetClient(ctx, &ttnpb.ClientIdentifier{ClientID: client.ClientID})
+	found, err := is.adminService.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientID: client.ClientID})
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeClientIgnoringAutoFields, client)
 
@@ -239,7 +239,7 @@ func TestAdminClients(t *testing.T) {
 	err = is.store.Clients.Create(client)
 	a.So(err, should.BeNil)
 
-	_, err = is.adminService.DeleteClient(ctx, &ttnpb.ClientIdentifier{ClientID: client.ClientID})
+	_, err = is.adminService.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientID: client.ClientID})
 	a.So(err, should.BeNil)
 
 	data, ok := mock.Data().(*templates.ClientDeleted)
