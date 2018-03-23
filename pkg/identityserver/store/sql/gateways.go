@@ -52,7 +52,8 @@ func (s *GatewayStore) getGatewayIdentifiersFromID(q db.QueryContext, id uuid.UU
 	err = q.SelectOne(
 		&res,
 		`SELECT
-				gateway_id
+				gateway_id,
+				eui
 			FROM gateways
 			WHERE id = $1`,
 		id)
@@ -61,13 +62,23 @@ func (s *GatewayStore) getGatewayIdentifiersFromID(q db.QueryContext, id uuid.UU
 
 // getGatewayID returns the UUID of the gateway that matches the identifier.
 func (s *GatewayStore) getGatewayID(q db.QueryContext, ids ttnpb.GatewayIdentifiers) (res uuid.UUID, err error) {
-	err = q.SelectOne(
+	clauses := make([]string, 0)
+	if ids.GatewayID != "" {
+		clauses = append(clauses, "gateway_id = :gateway_id")
+	}
+
+	if ids.EUI != nil {
+		clauses = append(clauses, "eui = :eui")
+	}
+
+	err = q.NamedSelectOne(
 		&res,
-		`SELECT
+		fmt.Sprintf(
+			`SELECT
 				id
 			FROM gateways
-			WHERE gateway_id = $1`,
-		ids.GatewayID)
+			WHERE %s`, strings.Join(clauses, " AND ")),
+		ids)
 	if db.IsNoRows(err) {
 		err = ErrGatewayNotFound.New(nil)
 	}
@@ -113,6 +124,7 @@ func (s *GatewayStore) create(q db.QueryContext, gateway *ttnpb.Gateway) (id uui
 		`INSERT
 			INTO gateways (
 					gateway_id,
+					eui,
 					description,
 					frequency_plan_id,
 					activated_at,
@@ -122,6 +134,7 @@ func (s *GatewayStore) create(q db.QueryContext, gateway *ttnpb.Gateway) (id uui
 					cluster_address)
 			VALUES (
 					:gateway_id,
+					:eui,
 					:description,
 					:frequency_plan_id,
 					:activated_at,
@@ -235,7 +248,7 @@ func (s *GatewayStore) GetByID(ids ttnpb.GatewayIdentifiers, specializer store.G
 			return err
 		}
 
-		result = specializer(*gateway)
+		result = specializer(gateway.Gateway)
 
 		attributes, err := s.listAttributes(tx, gtwID)
 		if err != nil {
@@ -263,29 +276,18 @@ func (s *GatewayStore) GetByID(ids ttnpb.GatewayIdentifiers, specializer store.G
 
 // gateway fetchs a gateway from the database without antennas and attributes and
 // saves it into result.
-func (s *GatewayStore) getByID(q db.QueryContext, gtwID uuid.UUID) (*ttnpb.Gateway, error) {
-	result := new(ttnpb.Gateway)
-	err := q.SelectOne(
-		result,
+func (s *GatewayStore) getByID(q db.QueryContext, gtwID uuid.UUID) (result gateway, err error) {
+	err = q.SelectOne(
+		&result,
 		`SELECT
-					gateway_id,
-					description,
-					frequency_plan_id,
-					activated_at,
-					privacy_settings,
-					auto_update,
-					platform,
-					cluster_address
-				FROM gateways
-				WHERE id = $1`,
+				*
+			FROM gateways
+			WHERE id = $1`,
 		gtwID)
 	if db.IsNoRows(err) {
-		return nil, ErrGatewayNotFound.New(nil)
+		err = ErrGatewayNotFound.New(nil)
 	}
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+	return
 }
 
 // Update updates the gateway.

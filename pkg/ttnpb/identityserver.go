@@ -232,7 +232,8 @@ func (req *ApplicationCollaborator) Validate() error {
 func (req *CreateGatewayRequest) Validate() error {
 	validations := make([]error, 0, 4)
 	validations = append(validations,
-		req.Gateway.GatewayIdentifiers.Validate(),
+		validate.Field(req.Gateway.GatewayIdentifiers.GatewayID, validate.ID).DescribeFieldName("Gateway ID"),
+		validate.Field(req.Gateway.GatewayIdentifiers.EUI, validate.NotRequired).DescribeFieldName("EUI"),
 		validate.Field(req.Gateway.FrequencyPlanID, validate.Required).DescribeFieldName("Frequency plan ID"),
 		validate.Field(req.Gateway.ClusterAddress, validate.Required).DescribeFieldName("Cluster Address"),
 		validate.Field(req.OrganizationID, validate.NotRequired, validate.ID).DescribeFieldName("Organization ID"),
@@ -261,7 +262,7 @@ func (req *UpdateGatewayRequest) Validate() error {
 
 	validations := make([]error, 0)
 
-	if err := validate.Field(req.Gateway.GatewayID, validate.ID).DescribeFieldName("Gateway ID"); err != nil {
+	if err := req.Gateway.GatewayIdentifiers.Validate(); err != nil {
 		validations = append(validations, err)
 	}
 
@@ -310,7 +311,7 @@ func (req *ListGatewaysRequest) Validate() error {
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *GenerateGatewayAPIKeyRequest) Validate() error {
 	return validate.All(
-		validate.Field(req.GatewayID, validate.ID).DescribeFieldName("Gateway ID"),
+		req.GatewayIdentifiers.Validate(),
 		validate.Field(req.Name, validate.Required).DescribeFieldName("Key name"),
 		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllGatewayRights())).DescribeFieldName("Rights"),
 	)
@@ -319,7 +320,7 @@ func (req *GenerateGatewayAPIKeyRequest) Validate() error {
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *UpdateGatewayAPIKeyRequest) Validate() error {
 	return validate.All(
-		validate.Field(req.GatewayID, validate.ID).DescribeFieldName("Gateway ID"),
+		req.GatewayIdentifiers.Validate(),
 		validate.Field(req.Name, validate.Required).DescribeFieldName("Key name"),
 		validate.Field(req.Rights, validate.MinLength(1), validate.In(AllGatewayRights())).DescribeFieldName("Rights"),
 	)
@@ -328,7 +329,7 @@ func (req *UpdateGatewayAPIKeyRequest) Validate() error {
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *RemoveGatewayAPIKeyRequest) Validate() error {
 	return validate.All(
-		validate.Field(req.GatewayID, validate.ID).DescribeFieldName("Gateway ID"),
+		req.GatewayIdentifiers.Validate(),
 		validate.Field(req.Name, validate.Required).DescribeFieldName("Key name"),
 	)
 }

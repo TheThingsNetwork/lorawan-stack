@@ -21,6 +21,7 @@ import (
 	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -30,11 +31,42 @@ var gatewaySpecializer = func(base ttnpb.Gateway) store.Gateway {
 }
 
 func TestGateways(t *testing.T) {
+	for _, tc := range []struct {
+		tcname string
+		ids    ttnpb.GatewayIdentifiers
+	}{
+		{
+			"UsingGatewayID",
+			ttnpb.GatewayIdentifiers{
+				GatewayID: "test-gateway",
+			},
+		},
+		{
+			"UsingEUI",
+			ttnpb.GatewayIdentifiers{
+				EUI: &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+			},
+		},
+		{
+			"UsingAllIdentifiers",
+			ttnpb.GatewayIdentifiers{
+				GatewayID: "test-gateway",
+				EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+			},
+		},
+	} {
+		t.Run(tc.tcname, func(t *testing.T) {
+			testGateways(t, tc.ids)
+		})
+	}
+}
+
+func testGateways(t *testing.T, ids ttnpb.GatewayIdentifiers) {
 	a := assertions.New(t)
 	s := testStore(t, database)
 
 	gateway := &ttnpb.Gateway{
-		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
+		GatewayIdentifiers: ids,
 		Description:        "My description",
 		Platform:           "Kerklink",
 		Attributes: map[string]string{
@@ -178,7 +210,7 @@ func TestGateways(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(keys, should.HaveLength, 0)
 
-	// save it again. Call to `Delete` will handle it
+	// Save the API Key again. Calling `Delete` afterwards will handle it.
 	err = s.Gateways.SaveAPIKey(gateway.GatewayIdentifiers, key)
 	a.So(err, should.BeNil)
 

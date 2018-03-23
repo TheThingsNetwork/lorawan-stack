@@ -19,15 +19,19 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
 func gateway() *ttnpb.Gateway {
 	return &ttnpb.Gateway{
-		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
-		Description:        "My description",
-		Platform:           "Kerklink",
+		GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+			GatewayID: "test-gateway",
+			EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+		},
+		Description: "My description",
+		Platform:    "Kerklink",
 		Attributes: map[string]string{
 			"foo": "bar",
 		},

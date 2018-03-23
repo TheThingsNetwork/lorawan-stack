@@ -1027,6 +1027,10 @@ func request_IsGateway_CreateGateway_1(ctx context.Context, marshaler runtime.Ma
 
 }
 
+var (
+	filter_IsGateway_GetGateway_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+)
+
 func request_IsGateway_GetGateway_0(ctx context.Context, marshaler runtime.Marshaler, client IsGatewayClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GatewayIdentifiers
 	var metadata runtime.ServerMetadata
@@ -1047,6 +1051,10 @@ func request_IsGateway_GetGateway_0(ctx context.Context, marshaler runtime.Marsh
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id", err)
+	}
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_IsGateway_GetGateway_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.GetGateway(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1137,6 +1145,10 @@ func request_IsGateway_UpdateGateway_0(ctx context.Context, marshaler runtime.Ma
 
 }
 
+var (
+	filter_IsGateway_DeleteGateway_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+)
+
 func request_IsGateway_DeleteGateway_0(ctx context.Context, marshaler runtime.Marshaler, client IsGatewayClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GatewayIdentifiers
 	var metadata runtime.ServerMetadata
@@ -1157,6 +1169,10 @@ func request_IsGateway_DeleteGateway_0(ctx context.Context, marshaler runtime.Ma
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id", err)
+	}
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_IsGateway_DeleteGateway_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.DeleteGateway(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1195,6 +1211,10 @@ func request_IsGateway_GenerateGatewayAPIKey_0(ctx context.Context, marshaler ru
 
 }
 
+var (
+	filter_IsGateway_ListGatewayAPIKeys_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+)
+
 func request_IsGateway_ListGatewayAPIKeys_0(ctx context.Context, marshaler runtime.Marshaler, client IsGatewayClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GatewayIdentifiers
 	var metadata runtime.ServerMetadata
@@ -1215,6 +1235,10 @@ func request_IsGateway_ListGatewayAPIKeys_0(ctx context.Context, marshaler runti
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id", err)
+	}
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_IsGateway_ListGatewayAPIKeys_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.ListGatewayAPIKeys(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1341,6 +1365,10 @@ func request_IsGateway_SetGatewayCollaborator_0(ctx context.Context, marshaler r
 
 }
 
+var (
+	filter_IsGateway_ListGatewayCollaborators_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+)
+
 func request_IsGateway_ListGatewayCollaborators_0(ctx context.Context, marshaler runtime.Marshaler, client IsGatewayClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GatewayIdentifiers
 	var metadata runtime.ServerMetadata
@@ -1363,10 +1391,18 @@ func request_IsGateway_ListGatewayCollaborators_0(ctx context.Context, marshaler
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id", err)
 	}
 
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_IsGateway_ListGatewayCollaborators_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
 	msg, err := client.ListGatewayCollaborators(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
+
+var (
+	filter_IsGateway_ListGatewayRights_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+)
 
 func request_IsGateway_ListGatewayRights_0(ctx context.Context, marshaler runtime.Marshaler, client IsGatewayClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GatewayIdentifiers
@@ -1388,6 +1424,10 @@ func request_IsGateway_ListGatewayRights_0(ctx context.Context, marshaler runtim
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id", err)
+	}
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_IsGateway_ListGatewayRights_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.ListGatewayRights(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))

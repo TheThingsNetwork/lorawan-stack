@@ -21,6 +21,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/TheThingsNetwork/ttn/pkg/types"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -28,14 +29,76 @@ import (
 
 var _ ttnpb.IsGatewayServer = new(gatewayService)
 
-func TestGateway(t *testing.T) {
+func TestGatewaysBlacklistedIDs(t *testing.T) {
+	a := assertions.New(t)
+	is := getIS(t)
+
+	ctx := testCtx(testUsers()["bob"].UserIdentifiers.UserID)
+
+	// Can not create gateways with blacklisted IDs.
+	for _, id := range testSettings().BlacklistedIDs {
+		_, err := is.gatewayService.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{
+			Gateway: ttnpb.Gateway{
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: id},
+			},
+		})
+		a.So(err, should.NotBeNil)
+		a.So(ErrBlacklistedID.Describes(err), should.BeTrue)
+	}
+}
+
+func TestGateways(t *testing.T) {
+	for _, tc := range []struct {
+		tcname string
+		gids   ttnpb.GatewayIdentifiers
+		sids   ttnpb.GatewayIdentifiers
+	}{
+		{
+			"SearchByGatewayID",
+			ttnpb.GatewayIdentifiers{
+				GatewayID: "foo-gtw",
+				EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+			},
+			ttnpb.GatewayIdentifiers{
+				GatewayID: "foo-gtw",
+			},
+		},
+		{
+			"SearchByEUI",
+			ttnpb.GatewayIdentifiers{
+				GatewayID: "foo-gtw",
+				EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+			},
+			ttnpb.GatewayIdentifiers{
+				EUI: &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+			},
+		},
+		{
+			"SearchByAllIdentifiers",
+			ttnpb.GatewayIdentifiers{
+				GatewayID: "foo-gtw",
+				EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+			},
+			ttnpb.GatewayIdentifiers{
+				GatewayID: "foo-gtw",
+				EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+			},
+		},
+	} {
+		t.Run(tc.tcname, func(t *testing.T) {
+			testGateways(t, tc.gids, tc.sids)
+		})
+	}
+}
+
+func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 	a := assertions.New(t)
 	is := getIS(t)
 
 	user := testUsers()["bob"]
 
 	gtw := ttnpb.Gateway{
-		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gtw"},
+		GatewayIdentifiers: gids,
 		ClusterAddress:     "localhost:1234",
 		FrequencyPlanID:    "868.8",
 		Attributes: map[string]string{
@@ -74,18 +137,7 @@ func TestGateway(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	// can't create gateways with blacklisted ids
-	for _, id := range testSettings().BlacklistedIDs {
-		_, err = is.gatewayService.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{
-			Gateway: ttnpb.Gateway{
-				GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: id},
-			},
-		})
-		a.So(err, should.NotBeNil)
-		a.So(ErrBlacklistedID.Describes(err), should.BeTrue)
-	}
-
-	found, err := is.gatewayService.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: gtw.GatewayID})
+	found, err := is.gatewayService.GetGateway(ctx, &sids)
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 
@@ -104,13 +156,13 @@ func TestGateway(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	found, err = is.gatewayService.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: gtw.GatewayID})
+	found, err = is.gatewayService.GetGateway(ctx, &sids)
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
 
-	// generate a new API key
+	// Generate a new API key.
 	key, err := is.gatewayService.GenerateGatewayAPIKey(ctx, &ttnpb.GenerateGatewayAPIKeyRequest{
-		GatewayIdentifiers: gtw.GatewayIdentifiers,
+		GatewayIdentifiers: sids,
 		Name:               "foo",
 		Rights:             ttnpb.AllGatewayRights(),
 	})
@@ -122,22 +174,22 @@ func TestGateway(t *testing.T) {
 	// update api key
 	key.Rights = []ttnpb.Right{ttnpb.Right(10)}
 	_, err = is.gatewayService.UpdateGatewayAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
-		GatewayIdentifiers: gtw.GatewayIdentifiers,
+		GatewayIdentifiers: sids,
 		Name:               key.Name,
 		Rights:             key.Rights,
 	})
 	a.So(err, should.BeNil)
 
-	// can't generate another API Key with the same name
+	// Can not generate another API Key with the same name.
 	_, err = is.gatewayService.GenerateGatewayAPIKey(ctx, &ttnpb.GenerateGatewayAPIKeyRequest{
-		GatewayIdentifiers: gtw.GatewayIdentifiers,
+		GatewayIdentifiers: sids,
 		Name:               key.Name,
 		Rights:             []ttnpb.Right{ttnpb.Right(1)},
 	})
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
-	keys, err := is.gatewayService.ListGatewayAPIKeys(ctx, &ttnpb.GatewayIdentifiers{GatewayID: gtw.GatewayID})
+	keys, err := is.gatewayService.ListGatewayAPIKeys(ctx, &sids)
 	a.So(err, should.BeNil)
 	if a.So(keys.APIKeys, should.HaveLength, 1) {
 		sort.Slice(keys.APIKeys[0].Rights, func(i, j int) bool { return keys.APIKeys[0].Rights[i] < keys.APIKeys[0].Rights[j] })
@@ -145,41 +197,41 @@ func TestGateway(t *testing.T) {
 	}
 
 	_, err = is.gatewayService.RemoveGatewayAPIKey(ctx, &ttnpb.RemoveGatewayAPIKeyRequest{
-		GatewayIdentifiers: gtw.GatewayIdentifiers,
+		GatewayIdentifiers: sids,
 		Name:               key.Name,
 	})
 	a.So(err, should.BeNil)
 
-	keys, err = is.gatewayService.ListGatewayAPIKeys(ctx, &ttnpb.GatewayIdentifiers{GatewayID: gtw.GatewayID})
+	keys, err = is.gatewayService.ListGatewayAPIKeys(ctx, &sids)
 	a.So(err, should.BeNil)
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
-	// set a new collaborator with SETTINGS_COLLABORATOR and INFO rights
+	// Set a new collaborator with SETTINGS_COLLABORATOR and INFO rights.
 	alice := testUsers()["alice"]
 	collab := &ttnpb.GatewayCollaborator{
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &alice.UserIdentifiers}},
-		GatewayIdentifiers:            gtw.GatewayIdentifiers,
+		GatewayIdentifiers:            sids,
 		Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS},
 	}
 
 	_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
 	a.So(err, should.BeNil)
 
-	rights, err := is.gatewayService.ListGatewayRights(ctx, &ttnpb.GatewayIdentifiers{GatewayID: gtw.GatewayID})
+	rights, err := is.gatewayService.ListGatewayRights(ctx, &sids)
 	a.So(err, should.BeNil)
 	a.So(rights.Rights, should.Resemble, ttnpb.AllGatewayRights())
 
-	collabs, err := is.gatewayService.ListGatewayCollaborators(ctx, &ttnpb.GatewayIdentifiers{GatewayID: gtw.GatewayID})
+	collabs, err := is.gatewayService.ListGatewayCollaborators(ctx, &sids)
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 2)
 	a.So(collabs.Collaborators, should.Contain, collab)
 	a.So(collabs.Collaborators, should.Contain, &ttnpb.GatewayCollaborator{
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &user.UserIdentifiers}},
-		GatewayIdentifiers:            gtw.GatewayIdentifiers,
+		GatewayIdentifiers:            sids,
 		Rights:                        ttnpb.AllGatewayRights(),
 	})
 
-	// the new collaborator can't grant himself more rights
+	// The new collaborator can not grant himself more rights.
 	{
 		collab.Rights = append(collab.Rights, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
 
@@ -188,56 +240,52 @@ func TestGateway(t *testing.T) {
 		_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
 		a.So(err, should.BeNil)
 
-		rights, err := is.gatewayService.ListGatewayRights(ctx, &ttnpb.GatewayIdentifiers{GatewayID: gtw.GatewayID})
+		rights, err := is.gatewayService.ListGatewayRights(ctx, &sids)
 		a.So(err, should.BeNil)
 		a.So(rights.Rights, should.HaveLength, 2)
 		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
 
-		// but it can't revoke itself the INFO right
+		// But can revoke himself the INFO right.
 		collab.Rights = []ttnpb.Right{ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS}
 		_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
 		a.So(err, should.BeNil)
 
-		rights, err = is.gatewayService.ListGatewayRights(ctx, &ttnpb.GatewayIdentifiers{GatewayID: gtw.GatewayID})
+		rights, err = is.gatewayService.ListGatewayRights(ctx, &sids)
 		a.So(err, should.BeNil)
 		a.So(rights.Rights, should.HaveLength, 1)
 		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_GATEWAY_INFO)
-
-		collab.Rights = []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS}
-		_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
-		a.So(err, should.BeNil)
 	}
 
-	// try to unset the main collaborator will result in error as the gateway
-	// will become unmanageable
+	// Try to unset the main collaborator will result in error as the gateway
+	// will become unmanageable.
 	_, err = is.gatewayService.SetGatewayCollaborator(ctx, &ttnpb.GatewayCollaborator{
-		GatewayIdentifiers:            gtw.GatewayIdentifiers,
+		GatewayIdentifiers:            sids,
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &user.UserIdentifiers}},
 	})
 	a.So(err, should.NotBeNil)
 	a.So(ErrSetGatewayCollaboratorFailed.Describes(err), should.BeTrue)
 
-	// but we can revoke a shared right between the two collaborators
+	// But we can revoke a shared right between the two collaborators.
 	_, err = is.gatewayService.SetGatewayCollaborator(ctx, &ttnpb.GatewayCollaborator{
-		GatewayIdentifiers:            gtw.GatewayIdentifiers,
+		GatewayIdentifiers:            sids,
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &user.UserIdentifiers}},
 		Rights: ttnpb.DifferenceRights(ttnpb.AllGatewayRights(), []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO}),
 	})
 	a.So(err, should.NotBeNil)
 
-	collabs, err = is.gatewayService.ListGatewayCollaborators(ctx, &ttnpb.GatewayIdentifiers{GatewayID: gtw.GatewayID})
+	collabs, err = is.gatewayService.ListGatewayCollaborators(ctx, &sids)
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 2)
 
-	// unset the last added collaborator
+	// Unset the last added collaborator.
 	collab.Rights = []ttnpb.Right{}
 	_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
 	a.So(err, should.BeNil)
 
-	collabs, err = is.gatewayService.ListGatewayCollaborators(ctx, &ttnpb.GatewayIdentifiers{GatewayID: gtw.GatewayID})
+	collabs, err = is.gatewayService.ListGatewayCollaborators(ctx, &sids)
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 1)
 
-	_, err = is.gatewayService.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: gtw.GatewayID})
+	_, err = is.gatewayService.DeleteGateway(ctx, &sids)
 	a.So(err, should.BeNil)
 }

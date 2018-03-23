@@ -53,17 +53,29 @@ func (i ApplicationIdentifiers) IsZero() bool {
 
 // Validate is used as validator function by the GRPC validator interceptor.
 func (i GatewayIdentifiers) Validate() error {
-	return validate.Field(i.GatewayID, validate.ID).DescribeFieldName("Gateway ID")
+	if i.IsZero() {
+		return ErrEmptyIdentifiers.New(nil)
+	}
+
+	return validate.All(
+		validate.Field(i.GatewayID, validate.NotRequired, validate.ID).DescribeFieldName("Gateway ID"),
+		validate.Field(i.EUI, validate.NotRequired).DescribeFieldName("EUI"),
+	)
 }
 
 // IsZero returns true if all identifiers have zero-values.
 func (i GatewayIdentifiers) IsZero() bool {
-	return i.GatewayID == ""
+	return i.GatewayID == "" && i.EUI == nil
 }
 
 // Contains returns true if other is contained in the receiver.
 func (i GatewayIdentifiers) Contains(other GatewayIdentifiers) bool {
-	return i.GatewayID == other.GatewayID
+	if other.IsZero() {
+		return i.IsZero()
+	}
+
+	return (other.GatewayID == "" || (other.GatewayID != "" && i.GatewayID == other.GatewayID)) &&
+		((i.EUI == nil && other.EUI == nil) || (i.EUI != nil && other.EUI == nil) || i.EUI.Equal(*other.EUI))
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.

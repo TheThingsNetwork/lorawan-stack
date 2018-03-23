@@ -532,7 +532,7 @@ func TestGatewayValidations(t *testing.T) {
 
 		// request with application rights (bad)
 		req = &GatewayCollaborator{
-			GatewayIdentifiers:            GatewayIdentifiers{"foo-gtw"},
+			GatewayIdentifiers:            GatewayIdentifiers{GatewayID: "foo-gtw"},
 			OrganizationOrUserIdentifiers: OrganizationOrUserIdentifiers{ID: &OrganizationOrUserIdentifiers_UserID{UserID: &UserIdentifiers{UserID: "alice"}}},
 			Rights: []Right{RIGHT_APPLICATION_DELETE},
 		}
@@ -540,7 +540,7 @@ func TestGatewayValidations(t *testing.T) {
 
 		// good request
 		req = &GatewayCollaborator{
-			GatewayIdentifiers:            GatewayIdentifiers{"foo-gtw"},
+			GatewayIdentifiers:            GatewayIdentifiers{GatewayID: "foo-gtw"},
 			OrganizationOrUserIdentifiers: OrganizationOrUserIdentifiers{ID: &OrganizationOrUserIdentifiers_UserID{UserID: &UserIdentifiers{UserID: "alice"}}},
 		}
 		a.So(req.Validate(), should.BeNil)

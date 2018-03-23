@@ -36,6 +36,8 @@ message ApplicationIdentifiers {
 message GatewayIdentifiers {
   // TTN Gateway ID.
   string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
+  // Gateway's unique and immutable EUI.
+  bytes eui = 2 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "EUI"];
 }
 
 // End device identifiers are carried with uplink and downlink messages.

@@ -80,7 +80,8 @@ func ShouldBeGatewayIgnoringAutoFields(actual interface{}, expected ...interface
 	}
 
 	return all(
-		assertions.ShouldEqual(a.GatewayID, b.GatewayID),
+		assertions.ShouldEqual(a.GatewayIdentifiers.GatewayID, b.GatewayIdentifiers.GatewayID),
+		assertions.ShouldResemble(a.GatewayIdentifiers.EUI, b.GatewayIdentifiers.EUI),
 		assertions.ShouldEqual(a.Description, b.Description),
 		assertions.ShouldEqual(a.FrequencyPlanID, b.FrequencyPlanID),
 		assertions.ShouldEqual(a.ClusterAddress, b.ClusterAddress),

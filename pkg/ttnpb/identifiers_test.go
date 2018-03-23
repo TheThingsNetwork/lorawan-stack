@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	. "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -30,4 +31,96 @@ func TestNewPopulatedEndDeviceIdentifiers(t *testing.T) {
 	id := NewPopulatedEndDeviceIdentifiers(test.Randy, false)
 	assertions.New(t).So(id.DeviceID == "" || idRegexp.MatchString(id.DeviceID), should.BeTrue)
 	assertions.New(t).So(id.ApplicationID == "" || idRegexp.MatchString(id.ApplicationID), should.BeTrue)
+}
+
+func TestGatewayIdentifiersValidate(t *testing.T) {
+	a := assertions.New(t)
+
+	ids := GatewayIdentifiers{
+		GatewayID: "foo-gtw",
+		EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+	}
+	a.So(ids.Validate(), should.BeNil)
+
+	ids = GatewayIdentifiers{
+		GatewayID: "foo-gtw",
+	}
+	a.So(ids.Validate(), should.BeNil)
+
+	ids = GatewayIdentifiers{
+		EUI: &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+	}
+	a.So(ids.Validate(), should.BeNil)
+
+	ids = GatewayIdentifiers{}
+	a.So(ids.Validate(), should.NotBeNil)
+	a.So(ErrEmptyIdentifiers.Describes(ids.Validate()), should.BeTrue)
+
+	ids = GatewayIdentifiers{
+		GatewayID: "_foo-gtw",
+		EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+	}
+	a.So(ids.Validate(), should.NotBeNil)
+
+	ids = GatewayIdentifiers{
+		GatewayID: "foo-gtw",
+		EUI:       &types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+	}
+	a.So(ids.Validate(), should.BeNil)
+
+	ids = GatewayIdentifiers{
+		EUI: new(types.EUI64),
+	}
+	a.So(ids.Validate(), should.BeNil)
+}
+
+func TestGatewayIdentifiersIsZero(t *testing.T) {
+	a := assertions.New(t)
+
+	ids := GatewayIdentifiers{
+		GatewayID: "foo-gtw",
+		EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+	}
+	a.So(ids.IsZero(), should.BeFalse)
+
+	ids = GatewayIdentifiers{
+		GatewayID: "foo-gtw",
+	}
+	a.So(ids.IsZero(), should.BeFalse)
+
+	ids = GatewayIdentifiers{
+		EUI: &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+	}
+	a.So(ids.IsZero(), should.BeFalse)
+
+	ids = GatewayIdentifiers{
+		EUI: &types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+	}
+	a.So(ids.IsZero(), should.BeFalse)
+
+	ids = GatewayIdentifiers{}
+	a.So(ids.IsZero(), should.BeTrue)
+}
+
+func TestGatewayIdentifiersContains(t *testing.T) {
+	a := assertions.New(t)
+
+	ids := GatewayIdentifiers{
+		GatewayID: "foo-gtw",
+		EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+	}
+	a.So(ids.Contains(GatewayIdentifiers{}), should.BeFalse)
+	a.So(ids.Contains(GatewayIdentifiers{GatewayID: "foo-gtw"}), should.BeTrue)
+	a.So(ids.Contains(GatewayIdentifiers{EUI: &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42}}), should.BeTrue)
+	a.So(ids.Contains(ids), should.BeTrue)
+	a.So(ids.Contains(GatewayIdentifiers{GatewayID: "bar"}), should.BeFalse)
+
+	ids = GatewayIdentifiers{
+		EUI: &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+	}
+	a.So(ids.Contains(GatewayIdentifiers{}), should.BeFalse)
+	a.So(ids.Contains(GatewayIdentifiers{EUI: &types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}}), should.BeFalse)
+	a.So(ids.Contains(GatewayIdentifiers{GatewayID: "bar"}), should.BeFalse)
+	a.So(ids.Contains(GatewayIdentifiers{EUI: &types.EUI64{0x99, 0x99, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42}}), should.BeFalse)
+	a.So(ids.Contains(ids), should.BeTrue)
 }
