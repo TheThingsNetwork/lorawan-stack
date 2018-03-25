@@ -9,24 +9,7 @@ import (
 
 var errZeroValue = errors.New("variable is empty")
 
-// NotRequired checks whether the input value is an empty value upon its type.
-// It does not support functions as input value.
-func NotRequired(v interface{}) error {
-	if isZero(v) {
-		return errZeroValue
-	}
-	return nil
-}
-
-// Required returns error if the input value is empty. It does not support functions
-// as input value.
-func Required(v interface{}) error {
-	if isZero(v) {
-		return errors.New("Field cannot be empty")
-	}
-	return nil
-}
-
+// IsZeroer is an interface, which reports whether it represents a zero value.
 type IsZeroer interface {
 	IsZero() bool
 }
@@ -76,10 +59,40 @@ func isZeroValue(v reflect.Value) bool {
 		}
 		return true
 	}
-	panic("unknown type in isZero " + v.Type().String())
+	return v.Interface() == reflect.Zero(v.Type()).Interface()
 }
 
 // isZero reports whether the value is the zero of its type.
 func isZero(v interface{}) bool {
 	return isZeroValue(reflect.ValueOf(v))
+}
+
+// Empty returns error if v is set.
+// It is meant to be used as the first validator function passed as argument to Field.
+// It uses IsZero, if v implements IsZeroer interface.
+func Empty(v interface{}) error {
+	if !isZero(v) {
+		return errors.New("Field must not be set")
+	}
+	return nil
+}
+
+// NotRequired returns an error, used internally in Field, if v is zero.
+// It is meant to be used as the first validator function passed as argument to Field.
+// It uses IsZero, if v implements IsZeroer interface.
+func NotRequired(v interface{}) error {
+	if isZero(v) {
+		return errZeroValue
+	}
+	return nil
+}
+
+// Required returns error if v is empty.
+// It is meant to be used as the first validator function passed as argument to Field.
+// It uses IsZero, if v implements IsZeroer interface.
+func Required(v interface{}) error {
+	if isZero(v) {
+		return errors.New("Field must not be empty")
+	}
+	return nil
 }
