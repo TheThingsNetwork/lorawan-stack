@@ -15,6 +15,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
+	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -52,7 +53,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		!a.So(dev.EndDevice, should.NotBeNil) {
 		return
 	}
-	a.So(dev.EndDevice.GetQueuedApplicationDownlinks(), should.Resemble, req.GetDownlinks())
+	a.So(pretty.Diff(dev.EndDevice.GetQueuedApplicationDownlinks(), req.GetDownlinks()), should.BeEmpty)
 
 	req = ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false)
 	for len(req.GetDownlinks()) == 0 {
@@ -69,7 +70,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		!a.So(dev.EndDevice, should.NotBeNil) {
 		return
 	}
-	a.So(dev.EndDevice.GetQueuedApplicationDownlinks(), should.Resemble, req.GetDownlinks())
+	a.So(pretty.Diff(dev.EndDevice.GetQueuedApplicationDownlinks(), req.GetDownlinks()), should.BeEmpty)
 }
 
 func TestDownlinkQueuePush(t *testing.T) {
@@ -110,7 +111,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 		!a.So(dev.EndDevice, should.NotBeNil) {
 		return
 	}
-	a.So(dev.EndDevice.GetQueuedApplicationDownlinks(), should.Resemble, downlinks)
+	a.So(pretty.Diff(dev.EndDevice.GetQueuedApplicationDownlinks(), downlinks), should.BeEmpty)
 
 	req = ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false)
 	req.EndDeviceIdentifiers = ed.EndDeviceIdentifiers
@@ -125,7 +126,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 		!a.So(dev.EndDevice, should.NotBeNil) {
 		return
 	}
-	a.So(dev.EndDevice.GetQueuedApplicationDownlinks(), should.Resemble, downlinks)
+	a.So(pretty.Diff(dev.EndDevice.GetQueuedApplicationDownlinks(), downlinks), should.BeEmpty)
 }
 
 func TestDownlinkQueueList(t *testing.T) {
@@ -151,7 +152,7 @@ func TestDownlinkQueueList(t *testing.T) {
 
 	downlinks, err := ns.DownlinkQueueList(context.Background(), &dev.EndDevice.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
-	a.So(downlinks, should.Resemble, &ttnpb.ApplicationDownlinks{ed.QueuedApplicationDownlinks})
+	a.So(pretty.Diff(downlinks, &ttnpb.ApplicationDownlinks{ed.QueuedApplicationDownlinks}), should.BeEmpty)
 
 	ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	for len(ed.QueuedApplicationDownlinks) == 0 {
@@ -167,7 +168,7 @@ func TestDownlinkQueueList(t *testing.T) {
 
 	downlinks, err = ns.DownlinkQueueList(context.Background(), &dev.EndDevice.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
-	a.So(downlinks, should.Resemble, &ttnpb.ApplicationDownlinks{ed.QueuedApplicationDownlinks})
+	a.So(pretty.Diff(downlinks, &ttnpb.ApplicationDownlinks{ed.QueuedApplicationDownlinks}), should.BeEmpty)
 }
 
 func TestDownlinkQueueClear(t *testing.T) {
