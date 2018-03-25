@@ -41,17 +41,15 @@ func TestRegistry(t *testing.T) {
 		return
 	}
 	if a.So(dev, should.NotBeNil) {
-		a.So(dev.EndDevice, should.Resemble, ed)
+		a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
 	}
 
-	found, err := r.FindBy(ed)
+	found, err := FindOneDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
 	if !a.So(err, should.BeNil) {
 		return
 	}
-	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		if !a.So(found[0].EndDevice, should.Resemble, ed) {
-			pretty.Ldiff(t, ed, found[0].EndDevice)
-		}
+	if a.So(found, should.NotBeNil) {
+		a.So(pretty.Diff(found.EndDevice, ed), should.BeEmpty)
 	}
 
 	updated := ttnpb.NewPopulatedEndDevice(test.Randy, false)
@@ -64,28 +62,19 @@ func TestRegistry(t *testing.T) {
 		return
 	}
 
-	found, err = r.FindBy(ed)
+	_, err = FindOneDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
+	a.So(err, should.NotBeNil)
+
+	found, err = FindOneDeviceByIdentifiers(r, &updated.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) {
-		a.So(found, should.HaveLength, 0)
-	}
-
-	found, err = r.FindBy(updated)
-	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		if !a.So(found[0].EndDevice, should.Resemble, updated) {
-			pretty.Ldiff(t, updated, found[0].EndDevice)
-			return
-		}
+		a.So(pretty.Diff(found.EndDevice, updated), should.BeEmpty)
 	}
 
 	a.So(dev.Delete(), should.BeNil)
 
-	found, err = r.FindBy(updated)
-	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) {
-		a.So(found, should.HaveLength, 0)
-	}
+	found, err = FindOneDeviceByIdentifiers(r, &updated.EndDeviceIdentifiers)
+	a.So(err, should.NotBeNil)
 }
 
 func TestFindDeviceByIdentifiers(t *testing.T) {
@@ -115,7 +104,7 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 		return
 	}
 	if a.So(dev, should.NotBeNil) {
-		a.So(dev.EndDevice, should.Resemble, ed)
+		a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
 	}
 
 	found, err := FindDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
@@ -127,9 +116,7 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		if len(pretty.Diff(found[0].EndDevice, ed)) != 0 && !a.So(found[0].EndDevice, should.Resemble, ed) {
-			pretty.Ldiff(t, found[0].EndDevice, ed)
-		}
+		a.So(pretty.Diff(found[0].EndDevice, ed), should.BeEmpty)
 	}
 
 	updated := ttnpb.NewPopulatedEndDevice(test.Randy, false)
@@ -203,9 +190,7 @@ func TestFindOneDeviceByIdentifiers(t *testing.T) {
 		return
 	}
 	if a.So(dev, should.NotBeNil) {
-		if !a.So(dev.EndDevice, should.Resemble, ed) {
-			pretty.Ldiff(t, dev.EndDevice, ed)
-		}
+		a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
 	}
 
 	found, err = FindOneDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
@@ -225,7 +210,7 @@ func TestFindOneDeviceByIdentifiers(t *testing.T) {
 		return
 	}
 	if a.So(dev, should.NotBeNil) {
-		a.So(dev.EndDevice, should.Resemble, ed)
+		a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
 	}
 
 	found, err = FindOneDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{

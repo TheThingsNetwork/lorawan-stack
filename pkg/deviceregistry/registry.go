@@ -47,7 +47,8 @@ func (r *Registry) Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error
 	return newDevice(ed, r.store, id), nil
 }
 
-// FindBy searches for devices matching specified device fields in underlying store.Interface. The returned slice contains unique devices, matching at least one of values in eds.
+// FindBy searches for devices matching specified device fields in underlying store.Interface.
+// The returned slice contains unique devices, matching at least one of values in eds.
 func (r *Registry) FindBy(ed *ttnpb.EndDevice, fields ...string) ([]*Device, error) {
 	if ed == nil {
 		return nil, errors.New("Device specified is nil")
