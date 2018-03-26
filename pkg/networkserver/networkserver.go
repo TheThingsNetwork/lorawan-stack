@@ -333,6 +333,11 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	time.Sleep(time.Until(start.Add(ns.deduplicationWindow)))
 	msg.RxMetadata = append(msg.RxMetadata, acc.Accumulated()...)
 
+	dev.RecentUplinks = append(dev.RecentUplinks, msg)
+	if len(dev.RecentUplinks) > recentUplinkCount {
+		dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
+	}
+
 	if err := dev.Update("Session", "SessionFallback", "RecentUplinks"); err != nil {
 		logger.WithError(err).Error("Failed to update device")
 		return err
