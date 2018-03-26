@@ -348,7 +348,7 @@ func TestByteSetStore(t testingT, newStore func() store.ByteSetStore) {
 
 			found, err := s.FindSet(id)
 			a.So(err, should.BeNil)
-			a.So(test.SameElements(found, tc.AfterCreate), should.BeTrue)
+			a.So(test.SameElementsDeep(found, tc.AfterCreate), should.BeTrue)
 
 			for _, b := range tc.Create {
 				v, err := s.Contains(id, b)
@@ -363,11 +363,11 @@ func TestByteSetStore(t testingT, newStore func() store.ByteSetStore) {
 			a.So(err, should.BeNil)
 			found, err = s.FindSet(id)
 			a.So(err, should.BeNil)
-			a.So(test.SameElements(found, tc.AfterPut), should.BeTrue)
+			a.So(test.SameElementsDeep(found, tc.AfterPut), should.BeTrue)
 
 			found, err = s.FindSet(id)
 			a.So(err, should.BeNil)
-			a.So(test.SameElements(found, tc.AfterPut), should.BeTrue)
+			a.So(test.SameElementsDeep(found, tc.AfterPut), should.BeTrue)
 
 			for _, b := range tc.AfterPut {
 				v, err := s.Contains(id, b)
@@ -382,11 +382,11 @@ func TestByteSetStore(t testingT, newStore func() store.ByteSetStore) {
 			a.So(err, should.BeNil)
 			found, err = s.FindSet(id)
 			a.So(err, should.BeNil)
-			a.So(test.SameElements(found, tc.AfterRemove), should.BeTrue)
+			a.So(test.SameElementsDeep(found, tc.AfterRemove), should.BeTrue)
 
 			found, err = s.FindSet(id)
 			a.So(err, should.BeNil)
-			a.So(test.SameElements(found, tc.AfterRemove), should.BeTrue)
+			a.So(test.SameElementsDeep(found, tc.AfterRemove), should.BeTrue)
 
 			for _, b := range tc.AfterRemove {
 				v, err := s.Contains(id, b)
