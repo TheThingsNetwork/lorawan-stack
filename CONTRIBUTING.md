@@ -131,7 +131,7 @@ RemoveTypeAttribute
 
 Variable names should be short and concise.
 
-We follow the [official go guidelines](https://github.com/golang/go/wiki/CodeReviewComments#variable-names) and try to be consistent with Go standard library as much as possible, everything not defined in the tables below should follow Go standard library naming scheme.
+We follow the [official go guidelines](https://github.com/golang/go/wiki/CodeReviewComments#variable-names) and try to be consistent with Go standard library as much as possible, everything not defined in the tables below should follow Go standard library naming scheme. In general, variable names are English and descriptive, omitting abbreviations as much as possible (except for the tables below), as well as putting adjectives and adverbs before the noun and verb respectively.
 
 #### Single-word entities
 
