@@ -5,6 +5,9 @@ package validate
 import (
 	"errors"
 	"reflect"
+	"time"
+
+	"github.com/TheThingsNetwork/ttn/pkg/types"
 )
 
 var errZeroValue = errors.New("variable is empty")
@@ -18,14 +21,19 @@ var isZeroerType = reflect.TypeOf((*IsZeroer)(nil)).Elem()
 
 // isZeroValue is like isZero, but acts on values of reflect.Value type.
 func isZeroValue(v reflect.Value) bool {
-	v = reflect.Indirect(v)
-	if !v.IsValid() {
+	iv := reflect.Indirect(v)
+	if !iv.IsValid() {
 		return true
 	}
 
 	if v.Type().Implements(isZeroerType) {
 		return v.Interface().(IsZeroer).IsZero()
 	}
+	if iv.Type().Implements(isZeroerType) {
+		return iv.Interface().(IsZeroer).IsZero()
+	}
+
+	v = iv
 
 	switch v.Kind() {
 	case reflect.Array:
@@ -64,6 +72,102 @@ func isZeroValue(v reflect.Value) bool {
 
 // isZero reports whether the value is the zero of its type.
 func isZero(v interface{}) bool {
+	if v == nil {
+		return true
+	}
+
+	switch v := v.(type) {
+	case nil:
+		return true
+	case bool:
+		return !v
+	case int:
+		return v == 0
+	case int64:
+		return v == 0
+	case int32:
+		return v == 0
+	case int16:
+		return v == 0
+	case int8:
+		return v == 0
+	case uint:
+		return v == 0
+	case uint64:
+		return v == 0
+	case uint32:
+		return v == 0
+	case uint16:
+		return v == 0
+	case uint8:
+		return v == 0
+	case float64:
+		return v == 0
+	case float32:
+		return v == 0
+	case string:
+		return v == ""
+	case []bool:
+		return len(v) == 0
+	case []string:
+		return len(v) == 0
+	case []uint:
+		return len(v) == 0
+	case []uint64:
+		return len(v) == 0
+	case []uint32:
+		return len(v) == 0
+	case []uint16:
+		return len(v) == 0
+	case []uint8:
+		return len(v) == 0
+	case []int:
+		return len(v) == 0
+	case []int64:
+		return len(v) == 0
+	case []int32:
+		return len(v) == 0
+	case []int16:
+		return len(v) == 0
+	case []int8:
+		return len(v) == 0
+	case []float64:
+		return len(v) == 0
+	case []float32:
+		return len(v) == 0
+	case map[string]interface{}:
+		return len(v) == 0
+	case map[string]string:
+		return len(v) == 0
+	case *time.Time:
+		return v == nil || v.IsZero()
+	case time.Time:
+		return v.IsZero()
+	case *types.AES128Key:
+		return v == nil || v.IsZero()
+	case types.AES128Key:
+		return v.IsZero()
+	case *types.EUI64:
+		return v == nil || v.IsZero()
+	case types.EUI64:
+		return v.IsZero()
+	case *types.NetID:
+		return v == nil || v.IsZero()
+	case types.NetID:
+		return v.IsZero()
+	case *types.DevAddr:
+		return v == nil || v.IsZero()
+	case types.DevAddr:
+		return v.IsZero()
+	case *types.DevNonce:
+		return v == nil || v.IsZero()
+	case types.DevNonce:
+		return v.IsZero()
+	case *types.JoinNonce:
+		return v == nil || v.IsZero()
+	case types.JoinNonce:
+		return v.IsZero()
+	}
 	return isZeroValue(reflect.ValueOf(v))
 }
 
