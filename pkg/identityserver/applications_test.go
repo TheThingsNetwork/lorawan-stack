@@ -38,7 +38,7 @@ func TestApplication(t *testing.T) {
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"},
 	}
 
-	ctx := testCtx(user.UserID)
+	ctx := testCtx(user.UserIdentifiers)
 
 	_, err := is.applicationService.CreateApplication(ctx, &ttnpb.CreateApplicationRequest{
 		Application: app,
@@ -154,7 +154,7 @@ func TestApplication(t *testing.T) {
 	{
 		collab.Rights = append(collab.Rights, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
 
-		ctx := testCtx(alice.UserID)
+		ctx := testCtx(alice.UserIdentifiers)
 
 		_, err = is.applicationService.SetApplicationCollaborator(ctx, collab)
 		a.So(err, should.BeNil)

@@ -84,13 +84,13 @@ func (s *accountStore) registerUserID(q db.QueryContext, userID string) (id uuid
 }
 
 // deleteID deletes the given ID.
-func (s *accountStore) deleteID(q db.QueryContext, id string) (err error) {
+func (s *accountStore) deleteID(q db.QueryContext, id uuid.UUID) (err error) {
 	var i string
 	err = q.SelectOne(
 		&i,
 		`DELETE
 			FROM accounts
-			WHERE account_id = $1
+			WHERE id = $1
 			RETURNING account_id`,
 		id)
 	if db.IsNoRows(err) {

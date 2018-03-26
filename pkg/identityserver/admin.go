@@ -146,7 +146,7 @@ func (s *adminService) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequ
 		return nil, err
 	}
 
-	return nil, s.email.Send(req.User.Email, &templates.AccountCreation{
+	return nil, s.email.Send(req.User.UserIdentifiers.Email, &templates.AccountCreation{
 		OrganizationName: s.config.OrganizationName,
 		PublicURL:        s.config.PublicURL,
 		Name:             req.User.Name,
@@ -218,6 +218,9 @@ func (s *adminService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequ
 		}
 		user := found.GetUser()
 
+		// Save the current user identifiers before applying the mask.
+		oids := found.GetUser().UserIdentifiers
+
 		settings, err := tx.Settings.Get()
 		if err != nil {
 			return err
@@ -229,9 +232,9 @@ func (s *adminService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequ
 			case ttnpb.FieldPathUserName.MatchString(path):
 				user.Name = req.User.Name
 			case ttnpb.FieldPathUserEmail.MatchString(path):
-				user.Email = req.User.Email
+				user.UserIdentifiers.Email = req.User.UserIdentifiers.Email
 
-				newEmail = strings.ToLower(user.Email) != strings.ToLower(req.User.Email)
+				newEmail = strings.ToLower(user.UserIdentifiers.Email) != strings.ToLower(req.User.UserIdentifiers.Email)
 				if newEmail {
 					if settings.SkipValidation {
 						user.ValidatedAt = timeValue(time.Now())
@@ -250,7 +253,7 @@ func (s *adminService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequ
 			}
 		}
 
-		err = tx.Users.Update(user)
+		err = tx.Users.Update(oids, user)
 		if err != nil {
 			return err
 		}
@@ -265,12 +268,12 @@ func (s *adminService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequ
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 
-		err = tx.Users.SaveValidationToken(req.User.UserIdentifiers, token)
+		err = tx.Users.SaveValidationToken(user.UserIdentifiers, token)
 		if err != nil {
 			return err
 		}
 
-		return s.email.Send(user.Email, &templates.EmailValidation{
+		return s.email.Send(user.UserIdentifiers.Email, &templates.EmailValidation{
 			OrganizationName: s.config.OrganizationName,
 			PublicURL:        s.config.PublicURL,
 			Token:            token.ValidationToken,
@@ -300,12 +303,12 @@ func (s *adminService) ResetUserPassword(ctx context.Context, req *ttnpb.UserIde
 		user := found.GetUser()
 		user.Password = password
 
-		err = tx.Users.Update(user)
+		err = tx.Users.Update(user.UserIdentifiers, user)
 		if err != nil {
 			return err
 		}
 
-		return s.email.Send(user.Email, &templates.PasswordReset{
+		return s.email.Send(user.UserIdentifiers.Email, &templates.PasswordReset{
 			OrganizationName: s.config.OrganizationName,
 			PublicURL:        s.config.PublicURL,
 			Password:         user.Password,
@@ -341,7 +344,7 @@ func (s *adminService) DeleteUser(ctx context.Context, req *ttnpb.UserIdentifier
 			return err
 		}
 
-		return s.email.Send(found.GetUser().Email, &templates.AccountDeleted{
+		return s.email.Send(found.GetUser().UserIdentifiers.Email, &templates.AccountDeleted{
 			UserID:           req.UserID,
 			OrganizationName: s.config.OrganizationName,
 			PublicURL:        s.config.PublicURL,
@@ -361,7 +364,7 @@ func (s *adminService) SendInvitation(ctx context.Context, req *ttnpb.SendInvita
 
 	err = s.store.Transact(func(tx *store.Store) (err error) {
 		// check whether email is already registered or not
-		found, err := tx.Users.GetByEmail(req.Email, s.config.Specializers.User)
+		found, err := tx.Users.GetByID(ttnpb.UserIdentifiers{Email: req.Email}, s.config.Specializers.User)
 		if err != nil && !sql.ErrUserNotFound.Describes(err) {
 			return err
 		}
@@ -555,7 +558,7 @@ func (s *adminService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdenti
 			return err
 		}
 
-		return s.email.Send(user.GetUser().Email, &templates.ClientDeleted{
+		return s.email.Send(user.GetUser().UserIdentifiers.Email, &templates.ClientDeleted{
 			ClientID:         req.ClientID,
 			OrganizationName: s.config.OrganizationName,
 			PublicURL:        s.config.PublicURL,

@@ -32,55 +32,98 @@ var userSpecializer = func(base ttnpb.User) store.User {
 }
 
 var alice = &ttnpb.User{
-	UserIdentifiers: ttnpb.UserIdentifiers{UserID: "alice"},
-	Password:        "123456",
-	Email:           "alice@alice.com",
-	ValidatedAt:     timeValue(time.Now()),
+	UserIdentifiers: ttnpb.UserIdentifiers{
+		UserID: "alice",
+		Email:  "alice@alice.com",
+	},
+	Password:    "123456",
+	ValidatedAt: timeValue(time.Now()),
 }
 
 var bob = &ttnpb.User{
-	UserIdentifiers: ttnpb.UserIdentifiers{UserID: "bob"},
-	Password:        "123456",
-	Email:           "bob@bob.com",
+	UserIdentifiers: ttnpb.UserIdentifiers{
+		UserID: "bob",
+		Email:  "bob@bob.com",
+	},
+	Password: "123456",
 }
 
 func TestUsers(t *testing.T) {
+	uids := ttnpb.UserIdentifiers{
+		UserID: "test-user",
+		Email:  "test@email.com",
+	}
+
+	for _, tc := range []struct {
+		tcName string
+		uids   ttnpb.UserIdentifiers
+		sids   ttnpb.UserIdentifiers
+	}{
+		{
+			"SearchByUserID",
+			uids,
+			ttnpb.UserIdentifiers{
+				UserID: uids.UserID,
+			},
+		},
+		{
+			"SearchByEmail",
+			uids,
+			ttnpb.UserIdentifiers{
+				Email: uids.Email,
+			},
+		},
+		{
+			"SearchByAllIdentifiers",
+			uids,
+			uids,
+		},
+	} {
+		t.Run(tc.tcName, func(t *testing.T) {
+			testUserStore(t, tc.uids, tc.sids)
+		})
+	}
+}
+
+func testUserStore(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	a := assertions.New(t)
 	s := testStore(t, database)
 
-	// Users are already created on cleanStore so creation is skipped here.
-
-	for _, user := range []*ttnpb.User{alice, bob} {
-		err := s.Users.Create(user)
-		a.So(err, should.NotBeNil)
-		a.So(ErrUserIDTaken.Describes(err), should.BeTrue)
+	user := &ttnpb.User{
+		UserIdentifiers: uids,
+		Name:            "Foo",
+		Password:        "Bar",
+		Admin:           true,
+		ValidatedAt:     timeValue(time.Now()),
 	}
 
 	users, err := s.Users.List(userSpecializer)
 	a.So(err, should.BeNil)
 	a.So(users, should.HaveLength, 2)
 
-	found, err := s.Users.GetByEmail(alice.Email, userSpecializer)
-	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeUserIgnoringAutoFields, alice)
-
-	found, err = s.Users.GetByID(bob.UserIdentifiers, userSpecializer)
-	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeUserIgnoringAutoFields, bob)
-
-	alice.Password = "qwerty"
-	err = s.Users.Update(alice)
+	err = s.Users.Create(user)
 	a.So(err, should.BeNil)
 
-	updated, err := s.Users.GetByID(alice.UserIdentifiers, userSpecializer)
+	users, err = s.Users.List(userSpecializer)
 	a.So(err, should.BeNil)
-	a.So(updated, test.ShouldBeUserIgnoringAutoFields, alice)
+	// It has length 3 because: alice + bob + this user's test.
+	a.So(users, should.HaveLength, 3)
 
-	alice.Email = bob.Email
+	found, err := s.Users.GetByID(sids, userSpecializer)
+	a.So(err, should.BeNil)
+	a.So(found, test.ShouldBeUserIgnoringAutoFields, user)
 
-	err = s.Users.Update(alice)
-	a.So(err, should.NotBeNil)
-	a.So(ErrUserEmailTaken.Describes(err), should.BeTrue)
+	user.UserIdentifiers.Email = "new@email.com"
+	user.Password = "new_password"
+	err = s.Users.Update(sids, user)
+	a.So(err, should.BeNil)
+	if sids.Email != "" {
+		sids.Email = user.UserIdentifiers.Email
+	}
+
+	updated, err := s.Users.GetByID(sids, userSpecializer)
+	a.So(err, should.BeNil)
+	a.So(updated, test.ShouldBeUserIgnoringAutoFields, user)
 
 	key := ttnpb.APIKey{
 		Key:    "abcabcabc",
@@ -88,11 +131,11 @@ func TestUsers(t *testing.T) {
 		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
 	}
 
-	list, err := s.Users.ListAPIKeys(alice.UserIdentifiers)
+	list, err := s.Users.ListAPIKeys(sids)
 	a.So(err, should.BeNil)
 	a.So(list, should.HaveLength, 0)
 
-	err = s.Users.SaveAPIKey(alice.UserIdentifiers, key)
+	err = s.Users.SaveAPIKey(sids, key)
 	a.So(err, should.BeNil)
 
 	key2 := ttnpb.APIKey{
@@ -100,40 +143,40 @@ func TestUsers(t *testing.T) {
 		Name:   "foo",
 		Rights: []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
 	}
-	err = s.Users.SaveAPIKey(alice.UserIdentifiers, key2)
+	err = s.Users.SaveAPIKey(sids, key2)
 	a.So(err, should.NotBeNil)
 	a.So(ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
 	ids, foundKey, err := s.Users.GetAPIKey(key.Key)
 	a.So(err, should.BeNil)
-	a.So(ids, should.Resemble, alice.UserIdentifiers)
+	a.So(ids, should.Resemble, user.UserIdentifiers)
 	a.So(foundKey, should.Resemble, key)
 
-	foundKey, err = s.Users.GetAPIKeyByName(alice.UserIdentifiers, key.Name)
+	foundKey, err = s.Users.GetAPIKeyByName(sids, key.Name)
 	a.So(err, should.BeNil)
 	a.So(foundKey, should.Resemble, key)
 
 	key.Rights = append(key.Rights, ttnpb.Right(5))
-	err = s.Users.UpdateAPIKeyRights(alice.UserIdentifiers, key.Name, key.Rights)
+	err = s.Users.UpdateAPIKeyRights(user.UserIdentifiers, key.Name, key.Rights)
 	a.So(err, should.BeNil)
 
-	list, err = s.Users.ListAPIKeys(alice.UserIdentifiers)
+	list, err = s.Users.ListAPIKeys(sids)
 	a.So(err, should.BeNil)
 	if a.So(list, should.HaveLength, 1) {
 		a.So(list[0], should.Resemble, key)
 	}
 
-	err = s.Users.DeleteAPIKey(alice.UserIdentifiers, key.Name)
+	err = s.Users.DeleteAPIKey(sids, key.Name)
 	a.So(err, should.BeNil)
 
-	_, err = s.Users.GetAPIKeyByName(alice.UserIdentifiers, key.Name)
+	_, err = s.Users.GetAPIKeyByName(sids, key.Name)
 	a.So(err, should.NotBeNil)
 	a.So(ErrAPIKeyNotFound.Describes(err), should.BeTrue)
 
-	err = s.Users.Delete(bob.UserIdentifiers)
+	err = s.Users.Delete(sids)
 	a.So(err, should.BeNil)
 
-	found, err = s.Users.GetByID(bob.UserIdentifiers, userSpecializer)
+	found, err = s.Users.GetByID(sids, userSpecializer)
 	a.So(err, should.NotBeNil)
 	a.So(ErrUserNotFound.Describes(err), should.BeTrue)
 	a.So(found, should.BeNil)
@@ -144,9 +187,11 @@ func TestUserTx(t *testing.T) {
 	s := testStore(t, database)
 
 	user := &ttnpb.User{
-		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "tx-test"},
-		Password:        "123456",
-		Email:           "tx@tx.com",
+		UserIdentifiers: ttnpb.UserIdentifiers{
+			UserID: "tx-test",
+			Email:  "tx@tx.com",
+		},
+		Password: "123456",
 	}
 
 	err := s.Transact(func(s *store.Store) error {
@@ -155,7 +200,7 @@ func TestUserTx(t *testing.T) {
 		}
 
 		user.Name = "PEPE"
-		return s.Users.Update(user)
+		return s.Users.Update(user.UserIdentifiers, user)
 	})
 	a.So(err, should.BeNil)
 
@@ -163,7 +208,6 @@ func TestUserTx(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeUserIgnoringAutoFields, user)
 
-	// delete user
 	err = s.Users.Delete(user.UserIdentifiers)
 	a.So(err, should.BeNil)
 
@@ -209,7 +253,7 @@ func TestUserValidationToken(t *testing.T) {
 		ExpiresIn:       3600,
 	}
 
-	// previous token will be erased
+	// Previous token will be erased.
 	err = s.Users.SaveValidationToken(userID, newToken)
 	a.So(err, should.BeNil)
 
@@ -229,9 +273,11 @@ func BenchmarkUserCreate(b *testing.B) {
 
 	for n := 0; n < b.N; n++ {
 		s.Users.Create(&ttnpb.User{
-			UserIdentifiers: ttnpb.UserIdentifiers{UserID: string(n)},
-			Email:           fmt.Sprintf("%v@gmail.com", n),
-			Password:        "secret",
+			UserIdentifiers: ttnpb.UserIdentifiers{
+				UserID: string(n),
+				Email:  fmt.Sprintf("%v@gmail.com", n),
+			},
+			Password: "secret",
 		})
 	}
 }

@@ -95,9 +95,11 @@ func TestUserAttributer(t *testing.T) {
 	}
 
 	user := &ttnpb.User{
-		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "attributer-user"},
-		Password:        "secret",
-		Email:           "john@example.net",
+		UserIdentifiers: ttnpb.UserIdentifiers{
+			UserID: "attributer-user",
+			Email:  "john@example.net",
+		},
+		Password: "secret",
 	}
 
 	withFoo := &userWithFoo{

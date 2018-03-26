@@ -33,6 +33,92 @@ func TestNewPopulatedEndDeviceIdentifiers(t *testing.T) {
 	assertions.New(t).So(id.ApplicationID == "" || idRegexp.MatchString(id.ApplicationID), should.BeTrue)
 }
 
+func TestUserIdentifiersValidate(t *testing.T) {
+	a := assertions.New(t)
+
+	ids := UserIdentifiers{
+		UserID: "foo",
+		Email:  "foo@bar.com",
+	}
+	a.So(ids.Validate(), should.BeNil)
+
+	ids = UserIdentifiers{
+		UserID: "foo",
+	}
+	a.So(ids.Validate(), should.BeNil)
+
+	ids = UserIdentifiers{
+		Email: "foo@bar.com",
+	}
+	a.So(ids.Validate(), should.BeNil)
+
+	ids = UserIdentifiers{}
+	a.So(ids.Validate(), should.NotBeNil)
+	a.So(ErrEmptyIdentifiers.Describes(ids.Validate()), should.BeTrue)
+
+	ids = UserIdentifiers{
+		UserID: "foo",
+		Email:  "foobar.com",
+	}
+	a.So(ids.Validate(), should.NotBeNil)
+
+	ids = UserIdentifiers{
+		UserID: "_foo",
+		Email:  "foo@bar.com",
+	}
+	a.So(ids.Validate(), should.NotBeNil)
+}
+
+func TestUserIdentifiersIsZero(t *testing.T) {
+	a := assertions.New(t)
+
+	ids := UserIdentifiers{
+		UserID: "foo",
+		Email:  "foo@bar.com",
+	}
+	a.So(ids.IsZero(), should.BeFalse)
+
+	ids = UserIdentifiers{
+		UserID: "foo",
+	}
+	a.So(ids.IsZero(), should.BeFalse)
+
+	ids = UserIdentifiers{
+		Email: "foo@bar.com",
+	}
+	a.So(ids.IsZero(), should.BeFalse)
+
+	ids = UserIdentifiers{
+		UserID: "",
+	}
+	a.So(ids.IsZero(), should.BeTrue)
+
+	ids = UserIdentifiers{}
+	a.So(ids.IsZero(), should.BeTrue)
+}
+
+func TestUserIdentifiersContains(t *testing.T) {
+	a := assertions.New(t)
+
+	ids := UserIdentifiers{
+		UserID: "foo",
+		Email:  "foo@bar.com",
+	}
+	a.So(ids.Contains(UserIdentifiers{}), should.BeFalse)
+	a.So(ids.Contains(UserIdentifiers{UserID: "foo"}), should.BeTrue)
+	a.So(ids.Contains(UserIdentifiers{Email: "foo@bar.com"}), should.BeTrue)
+	a.So(ids.Contains(ids), should.BeTrue)
+	a.So(ids.Contains(UserIdentifiers{UserID: "bar"}), should.BeFalse)
+
+	ids = UserIdentifiers{
+		Email: "foo@bar.com",
+	}
+	a.So(ids.Contains(UserIdentifiers{}), should.BeFalse)
+	a.So(ids.Contains(UserIdentifiers{Email: "foo@barbaz.com"}), should.BeFalse)
+	a.So(ids.Contains(UserIdentifiers{UserID: "bar"}), should.BeFalse)
+	a.So(ids.Contains(ids), should.BeTrue)
+}
+
 func TestGatewayIdentifiersValidate(t *testing.T) {
 	a := assertions.New(t)
 

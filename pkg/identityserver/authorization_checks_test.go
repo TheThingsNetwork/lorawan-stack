@@ -158,7 +158,7 @@ func TestEnforceApplicationRights(t *testing.T) {
 		ApplicationID: "alice-test-app",
 	}
 
-	ctx := testCtx(alice.UserIdentifiers.UserID)
+	ctx := testCtx(alice.UserIdentifiers)
 
 	// Create an application under `alice` user.
 	_, err := is.applicationService.CreateApplication(ctx, &ttnpb.CreateApplicationRequest{
@@ -298,7 +298,7 @@ func TestEnforceGatewayRights(t *testing.T) {
 		GatewayID: "alice-test-gtw",
 	}
 
-	ctx := testCtx(alice.UserIdentifiers.UserID)
+	ctx := testCtx(alice.UserIdentifiers)
 
 	// Create a gateway under `alice` user.
 	_, err := is.gatewayService.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{
@@ -438,7 +438,7 @@ func TestEnforceOrganizationRights(t *testing.T) {
 		OrganizationID: "alice-test-org",
 	}
 
-	ctx := testCtx(alice.UserIdentifiers.UserID)
+	ctx := testCtx(alice.UserIdentifiers)
 
 	// Create an organization under `alice` user.
 	_, err := is.organizationService.CreateOrganization(ctx, &ttnpb.CreateOrganizationRequest{

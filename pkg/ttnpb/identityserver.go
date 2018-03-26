@@ -79,9 +79,9 @@ func (req *UpdateSettingsRequest) Validate() error {
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *CreateUserRequest) Validate() error {
 	return validate.All(
-		validate.Field(req.User.UserID, validate.ID).DescribeFieldName("User ID"),
+		validate.Field(req.User.UserIdentifiers.UserID, validate.ID).DescribeFieldName("User ID"),
+		validate.Field(req.User.UserIdentifiers.Email, validate.Email).DescribeFieldName("Email"),
 		validate.Field(req.User.Password, validate.Password).DescribeFieldName("Password"),
-		validate.Field(req.User.Email, validate.Email).DescribeFieldName("Email"),
 	)
 }
 
@@ -96,16 +96,12 @@ func (req *UpdateUserRequest) Validate() error {
 
 	validations := make([]error, 0)
 
-	if err := validate.Field(req.User.UserID, validate.ID).DescribeFieldName("User ID"); err != nil {
-		validations = append(validations, err)
-	}
-
 	var err error
 	for _, path := range paths {
 		switch true {
 		case FieldPathUserName.MatchString(path):
 		case FieldPathUserEmail.MatchString(path):
-			err = validate.Field(req.User.Email, validate.Email).DescribeFieldName("Email")
+			err = validate.Field(req.User.UserIdentifiers.Email, validate.Email).DescribeFieldName("Email")
 		default:
 			return ErrInvalidPathUpdateMask.New(errors.Attributes{
 				"path": path,

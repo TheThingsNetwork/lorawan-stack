@@ -233,7 +233,7 @@ func (s *OrganizationStore) Delete(ids ttnpb.OrganizationIdentifiers) error {
 			return err
 		}
 
-		return s.accountStore.deleteID(tx, ids.OrganizationID)
+		return s.accountStore.deleteID(tx, orgID)
 	})
 
 	return err

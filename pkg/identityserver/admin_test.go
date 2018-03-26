@@ -35,7 +35,7 @@ func TestAdminSettings(t *testing.T) {
 	is := getIS(t)
 	defer is.store.Settings.Set(testSettings())
 
-	ctx := testCtx(testUsers()["alice"].UserID)
+	ctx := testCtx(testUsers()["alice"].UserIdentifiers)
 
 	resp, err := is.adminService.GetSettings(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
@@ -64,7 +64,7 @@ func TestAdminInvitations(t *testing.T) {
 	a := assertions.New(t)
 	is := getIS(t)
 
-	ctx := testCtx(testUsers()["alice"].UserID)
+	ctx := testCtx(testUsers()["alice"].UserIdentifiers)
 	email := "bar@baz.com"
 
 	_, err := is.adminService.SendInvitation(ctx, &ttnpb.SendInvitationRequest{Email: email})
@@ -101,10 +101,12 @@ func TestAdminInvitations(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	user := ttnpb.User{
-		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "invitation-user"},
-		Password:        "lol",
-		Email:           email,
-		Name:            "HI",
+		UserIdentifiers: ttnpb.UserIdentifiers{
+			UserID: "invitation-user",
+			Email:  email,
+		},
+		Password: "lol",
+		Name:     "HI",
 	}
 
 	_, err = is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{User: user})
@@ -160,7 +162,7 @@ func TestAdminUsers(t *testing.T) {
 	a := assertions.New(t)
 	is := getIS(t)
 
-	ctx := testCtx(testUsers()["alice"].UserID)
+	ctx := testCtx(testUsers()["alice"].UserIdentifiers)
 	user := testUsers()["bob"]
 
 	// reset password
@@ -233,7 +235,7 @@ func TestAdminClients(t *testing.T) {
 	a := assertions.New(t)
 	is := getIS(t)
 
-	ctx := testCtx(testUsers()["alice"].UserID)
+	ctx := testCtx(testUsers()["alice"].UserIdentifiers)
 	client := testClient()
 
 	found, err := is.adminService.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientID: client.ClientID})

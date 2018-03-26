@@ -52,18 +52,14 @@ type UserStore interface {
 	// Create creates an user.
 	Create(User) error
 
-	// GetByID finds the user by ID and retrieves it.
+	// GetByID finds the user by the given identifiers and retrieves it.
 	GetByID(ttnpb.UserIdentifiers, UserSpecializer) (User, error)
-
-	// GetByEmail finds the user by email address and retrieves it.
-	// TODO(gomezjdaniel): include email field as part of `UserIdentifiers`.
-	GetByEmail(string, UserSpecializer) (User, error)
 
 	// List returns all the users.
 	List(UserSpecializer) ([]User, error)
 
 	// Update updates an user.
-	Update(User) error
+	Update(ttnpb.UserIdentifiers, User) error
 
 	// TODO(gomezjdaniel#274): use sql 'ON DELETE CASCADE' when CockroachDB implements it.
 	// Delete deletes an user.

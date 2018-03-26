@@ -21,22 +21,34 @@ import (
 
 // Validate is used as validator function by the GRPC validator interceptor.
 func (i UserIdentifiers) Validate() error {
-	return validate.Field(i.UserID, validate.ID).DescribeFieldName("User ID")
+	if i.IsZero() {
+		return ErrEmptyIdentifiers.New(nil)
+	}
+
+	return validate.All(
+		validate.Field(i.UserID, validate.NotRequired, validate.ID).DescribeFieldName("User ID"),
+		validate.Field(i.Email, validate.NotRequired, validate.Email).DescribeFieldName("Email"),
+	)
 }
 
 // IsZero returns true if all identifiers have zero-values.
 func (i UserIdentifiers) IsZero() bool {
-	return i.UserID == ""
+	return i.UserID == "" && i.Email == ""
 }
 
 // Equals returns true if the receiver identifiers matches to other identifiers.
 func (i UserIdentifiers) Equals(other UserIdentifiers) bool {
-	return i.UserID == other.UserID
+	return i.UserID == other.UserID && i.Email == other.Email
 }
 
 // Contains returns true if other is contained in the receiver.
 func (i UserIdentifiers) Contains(other UserIdentifiers) bool {
-	return i.UserID == other.UserID
+	if other.IsZero() {
+		return i.IsZero()
+	}
+
+	return (other.UserID == "" || i.UserID == other.UserID) &&
+		(other.Email == "" || i.Email == other.Email)
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.

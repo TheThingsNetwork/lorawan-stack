@@ -25,11 +25,13 @@ import (
 
 func user() *ttnpb.User {
 	return &ttnpb.User{
-		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "alice"},
-		Name:            "Ali Ce",
-		Password:        "123456",
-		Email:           "alice@alice.com",
-		ValidatedAt:     timeValue(time.Now()),
+		UserIdentifiers: ttnpb.UserIdentifiers{
+			UserID: "alice",
+			Email:  "alice@alice.com",
+		},
+		Name:        "Ali Ce",
+		Password:    "123456",
+		ValidatedAt: timeValue(time.Now()),
 	}
 }
 

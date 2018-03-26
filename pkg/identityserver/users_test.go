@@ -32,22 +32,24 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
+var _ ttnpb.IsUserServer = new(userService)
+
 func TestIsEmailAllowed(t *testing.T) {
 	a := assertions.New(t)
 
 	var allowedEmails []string
 
-	// all emails are allowed
+	// All emails are allowed.
 	allowedEmails = []string{}
 	a.So(isEmailAllowed("foo@foo.com", allowedEmails), should.BeTrue)
 	a.So(isEmailAllowed("foo@foofofofo.com", allowedEmails), should.BeTrue)
 
-	// all emails are allowed
+	// All emails are allowed.
 	allowedEmails = []string{"*"}
 	a.So(isEmailAllowed("foo@foo.com", allowedEmails), should.BeTrue)
 	a.So(isEmailAllowed("foo@foofofofo.com", allowedEmails), should.BeTrue)
 
-	// only emails ended in @ttn.org
+	// Only emails ended in `@ttn.org` are allowed.
 	allowedEmails = []string{"*@ttn.org"}
 	a.So(isEmailAllowed("foo@foo.com", allowedEmails), should.BeFalse)
 	a.So(isEmailAllowed("foo@foofofofo.com", allowedEmails), should.BeFalse)
@@ -55,57 +57,154 @@ func TestIsEmailAllowed(t *testing.T) {
 	a.So(isEmailAllowed("foo@TTN.org", allowedEmails), should.BeTrue)
 }
 
-var _ ttnpb.IsUserServer = new(userService)
-
-func TestUser(t *testing.T) {
+func TestUsersBlacklistedIDs(t *testing.T) {
 	a := assertions.New(t)
 	is := getIS(t)
 
-	user := ttnpb.User{
-		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "daniel"},
-		Password:        "12345",
-		Email:           "foo@bar.com",
-		Name:            "hi",
-	}
-
-	ctx := testCtx(user.UserID)
-
-	// can't create an account using a not allowed email
-	user.Email = "foo@foo.com"
-	_, err := is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
-		User: user,
-	})
-	a.So(err, should.NotBeNil)
-	a.So(ErrEmailAddressNotAllowed.Describes(err), should.BeTrue)
-	user.Email = "foo@bar.com"
-
-	// can't create account using a blacklisted id
+	// Can not create users using the blacklisted IDs.
 	for _, id := range testSettings().BlacklistedIDs {
-		user.UserID = id
-		_, err = is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
-			User: user,
+		_, err := is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
+			User: ttnpb.User{UserIdentifiers: ttnpb.UserIdentifiers{UserID: id}},
 		})
 		a.So(err, should.NotBeNil)
 		a.So(ErrBlacklistedID.Describes(err), should.BeTrue)
 	}
-	user.UserID = "daniel"
+}
 
-	// create the account
+func TestUsersEmailWhitelisting(t *testing.T) {
+	a := assertions.New(t)
+	is := getIS(t)
+
+	settings, err := is.store.Settings.Get()
+	a.So(err, should.BeNil)
+	defer func(emails []string) {
+		settings.AllowedEmails = emails
+		is.store.Settings.Set(*settings)
+	}(settings.AllowedEmails)
+
+	// Only emails that ends in `@foo.bar` are allowed to be used.
+	settings.AllowedEmails = []string{"*@foo.bar"}
+	err = is.store.Settings.Set(*settings)
+	a.So(err, should.BeNil)
+
+	user := ttnpb.User{
+		UserIdentifiers: ttnpb.UserIdentifiers{
+			UserID: "antonio",
+		},
+	}
+
+	// Can not create an account using an email that is not whitelisted.
+	user.UserIdentifiers.Email = "antonio@antonio.com"
+	_, err = is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
+		User: user,
+	})
+	a.So(err, should.NotBeNil)
+	a.So(ErrEmailAddressNotAllowed.Describes(err), should.BeTrue)
+
+	// But it does with a whitelisted email domain.
+	user.UserIdentifiers.Email = "antonio@foo.bar"
 	_, err = is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
 		User: user,
 	})
 	a.So(err, should.BeNil)
 
-	// can't retrieve profile without proper claims
+	ctx := testCtx(user.UserIdentifiers)
+
+	// Can not update the email afterwards to a one that is not whitelisted.
+	_, err = is.userService.UpdateUser(ctx, &ttnpb.UpdateUserRequest{
+		User: ttnpb.User{
+			UserIdentifiers: ttnpb.UserIdentifiers{
+				Email: "an@tonio.com",
+			},
+		},
+		UpdateMask: pbtypes.FieldMask{
+			Paths: []string{"ids.email"},
+		},
+	})
+	a.So(err, should.NotBeNil)
+	a.So(ErrEmailAddressNotAllowed.Describes(err), should.BeTrue)
+
+	// But yes to another that is whitelisted.
+	_, err = is.userService.UpdateUser(ctx, &ttnpb.UpdateUserRequest{
+		User: ttnpb.User{
+			UserIdentifiers: ttnpb.UserIdentifiers{
+				Email: "tt@foo.bar",
+			},
+		},
+		UpdateMask: pbtypes.FieldMask{
+			Paths: []string{"ids.email"},
+		},
+	})
+	a.So(err, should.BeNil)
+
+	err = is.store.Users.Delete(ttnpb.UserIdentifiers{UserID: user.UserID})
+	a.So(err, should.BeNil)
+}
+
+func TestUsers(t *testing.T) {
+	uids := ttnpb.UserIdentifiers{
+		UserID: "foo",
+		Email:  "foo@bar.com",
+	}
+
+	for _, tc := range []struct {
+		tcName string
+		uids   ttnpb.UserIdentifiers
+		sids   ttnpb.UserIdentifiers
+	}{
+		{
+			"SearchByID",
+			uids,
+			ttnpb.UserIdentifiers{
+				UserID: uids.UserID,
+			},
+		},
+		{
+			"SearchByEmail",
+			uids,
+			ttnpb.UserIdentifiers{
+				Email: uids.Email,
+			},
+		},
+		{
+			"SearchByAllIdentifiers",
+			uids,
+			uids,
+		},
+	} {
+		t.Run(tc.tcName, func(t *testing.T) {
+			testIsUser(t, tc.uids, tc.sids)
+		})
+	}
+}
+
+func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
+	a := assertions.New(t)
+	is := getIS(t)
+
+	user := ttnpb.User{
+		UserIdentifiers: uids,
+		Password:        "12345678",
+		Name:            "Baz",
+	}
+
+	ctx := testCtx(sids)
+
+	_, err := is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
+		User: user,
+	})
+	a.So(err, should.BeNil)
+
+	// Can not retrieve profile without proper claims.
 	found, err := is.userService.GetUser(context.Background(), &pbtypes.Empty{})
 	a.So(found, should.BeNil)
 	a.So(err, should.NotBeNil)
 	a.So(ErrNotAuthorized.Describes(err), should.BeTrue)
 
-	// check that response doesnt include password within
+	// Check that response does not include password within.
 	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
-	a.So(found.UserIdentifiers.UserID, should.Equal, user.UserID)
+	a.So(found.UserIdentifiers, should.Resemble, user.UserIdentifiers)
 	a.So(found.Name, should.Equal, user.Name)
 	a.So(found.Password, should.HaveLength, 0)
 	a.So(found.Email, should.Equal, user.Email)
@@ -120,7 +219,7 @@ func TestUser(t *testing.T) {
 		a.So(found.State, should.Equal, ttnpb.STATE_APPROVED)
 	}
 
-	// extract the validation token from the email and validate the user account
+	// Extract the validation token from the email and validate the user account.
 	data, ok := mock.Data().(*templates.EmailValidation)
 	if a.So(ok, should.BeTrue) && a.So(data.Token, should.NotBeEmpty) {
 		token := data.Token
@@ -135,7 +234,7 @@ func TestUser(t *testing.T) {
 		a.So(found.ValidatedAt.IsZero(), should.BeFalse)
 	}
 
-	// try to update the user password providing a wrong old password
+	// Try to update the user password providing a wrong old password.
 	_, err = is.userService.UpdateUserPassword(ctx, &ttnpb.UpdateUserPasswordRequest{
 		New: "heheh",
 	})
@@ -148,7 +247,7 @@ func TestUser(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	// generate a new API key
+	// Generate a new API key.
 	key, err := is.userService.GenerateUserAPIKey(ctx, &ttnpb.GenerateUserAPIKeyRequest{
 		Name:   "foo",
 		Rights: ttnpb.AllUserRights(),
@@ -158,7 +257,7 @@ func TestUser(t *testing.T) {
 	a.So(key.Name, should.Equal, key.Name)
 	a.So(key.Rights, should.Resemble, ttnpb.AllUserRights())
 
-	// update api key
+	// Update API key.
 	key.Rights = []ttnpb.Right{ttnpb.Right(10)}
 	_, err = is.userService.UpdateUserAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 		Name:   key.Name,
@@ -166,7 +265,7 @@ func TestUser(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	// can't generate another API Key with the same name
+	// Can not generate another API Key with the same name.
 	_, err = is.userService.GenerateUserAPIKey(ctx, &ttnpb.GenerateUserAPIKeyRequest{
 		Name:   key.Name,
 		Rights: []ttnpb.Right{ttnpb.Right(1)},
@@ -190,57 +289,67 @@ func TestUser(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
-	// update the user's email
+	// Update the user's email.
+	nemail := "newfoo@bar.com"
+
 	_, err = is.userService.UpdateUser(ctx, &ttnpb.UpdateUserRequest{
 		User: ttnpb.User{
-			Email: "newfoo@bar.com",
+			UserIdentifiers: ttnpb.UserIdentifiers{
+				Email: "newfoo@bar.com",
+			},
 		},
 		UpdateMask: pbtypes.FieldMask{
-			Paths: []string{"email"},
+			Paths: []string{"ids.email"},
 		},
 	})
 	a.So(err, should.BeNil)
 
-	// check that the field validated_at has been reset
+	user.UserIdentifiers.Email = nemail
+	if sids.Email != "" {
+		sids.Email = nemail
+	}
+	ctx = testCtx(sids)
+
+	// Check that user's ValidatedAt has been resetted.
 	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
-	a.So(found.UserIdentifiers.UserID, should.Equal, user.UserID)
+	a.So(found.UserIdentifiers, should.Resemble, user.UserIdentifiers)
 	a.So(found.ValidatedAt.IsZero(), should.BeTrue)
 
 	token := ""
 
-	// extract the token from mail
+	// Extract the token from mail.
 	data, ok = mock.Data().(*templates.EmailValidation)
 	if a.So(ok, should.BeTrue) && a.So(data.Token, should.NotBeEmpty) {
 		token = data.Token
 	}
 	a.So(token, should.NotBeEmpty)
 
-	// request a new validation token
+	// Request a new validation token.
 	_, err = is.RequestUserEmailValidation(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 
-	// check that the old validation token doesnt work because we requested a new one
+	// Check that the old validation token doesnt work because we requested a new one.
 	_, err = is.userService.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
 		Token: token,
 	})
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrValidationTokenNotFound.Describes(err), should.BeTrue)
 
-	// and therefore the email isn't validated yet
+	// And therefore the email is not validated yet.
 	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
-	a.So(found.UserIdentifiers.UserID, should.Equal, user.UserID)
+	a.So(found.UserIdentifiers, should.Resemble, user.UserIdentifiers)
 	a.So(found.ValidatedAt.IsZero(), should.BeTrue)
 
-	// get the latest sent validation token
+	// Get the latest sent validation token.
 	data, ok = mock.Data().(*templates.EmailValidation)
 	if a.So(ok, should.BeTrue) {
 		token = data.Token
 	}
 	a.So(token, should.NotBeEmpty)
 
-	// validate the email
+	// Validate the email.
 	_, err = is.userService.ValidateUserEmail(context.Background(), &ttnpb.ValidateUserEmailRequest{
 		Token: token,
 	})
@@ -248,14 +357,14 @@ func TestUser(t *testing.T) {
 
 	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
-	a.So(found.UserIdentifiers.UserID, should.Equal, user.UserID)
+	a.So(found.UserIdentifiers, should.Resemble, user.UserIdentifiers)
 	a.So(found.ValidatedAt.IsZero(), should.BeFalse)
 
 	_, err = is.userService.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifiers{ClientID: "non-existent-client"})
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrClientNotFound.Describes(err), should.BeTrue)
 
-	// create a fake authorized client to the user
+	// Create a fake authorized client to the user.
 	client := &ttnpb.Client{
 		ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "bar-client"},
 		Description:       "description",
@@ -263,7 +372,7 @@ func TestUser(t *testing.T) {
 		Grants:            []ttnpb.GrantType{ttnpb.GRANT_PASSWORD},
 		Rights:            []ttnpb.Right{},
 		RedirectURI:       "foo.ttn.dev/oauth",
-		CreatorIDs:        testUsers()["john-doe"].UserIdentifiers,
+		CreatorIDs:        user.UserIdentifiers,
 	}
 	client.Rights = append(client.Rights, ttnpb.AllUserRights()...)
 	err = is.store.Clients.Create(client)

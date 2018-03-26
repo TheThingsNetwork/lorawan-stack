@@ -39,7 +39,7 @@ func TestOrganization(t *testing.T) {
 		OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "foo-org"},
 	}
 
-	ctx := testCtx(user.UserID)
+	ctx := testCtx(user.UserIdentifiers)
 
 	_, err := is.organizationService.CreateOrganization(ctx, &ttnpb.CreateOrganizationRequest{
 		Organization: org,
@@ -129,7 +129,7 @@ func TestOrganization(t *testing.T) {
 	// Set a new member with SETTINGS_MEMBER and INFO rights.
 	member := &ttnpb.OrganizationMember{
 		OrganizationIdentifiers: org.OrganizationIdentifiers,
-		UserIdentifiers:         ttnpb.UserIdentifiers{UserID: alice.UserID},
+		UserIdentifiers:         alice.UserIdentifiers,
 		Rights:                  []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_INFO, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS},
 	}
 
@@ -146,7 +146,7 @@ func TestOrganization(t *testing.T) {
 	a.So(members.Members, should.Contain, member)
 	a.So(members.Members, should.Contain, &ttnpb.OrganizationMember{
 		OrganizationIdentifiers: org.OrganizationIdentifiers,
-		UserIdentifiers:         ttnpb.UserIdentifiers{UserID: user.UserID},
+		UserIdentifiers:         user.UserIdentifiers,
 		Rights:                  ttnpb.AllOrganizationRights(),
 	})
 
@@ -154,7 +154,7 @@ func TestOrganization(t *testing.T) {
 	{
 		member.Rights = append(member.Rights, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
 
-		ctx := testCtx(alice.UserID)
+		ctx := testCtx(alice.UserIdentifiers)
 
 		_, err = is.organizationService.SetOrganizationMember(ctx, member)
 		a.So(err, should.BeNil)
@@ -179,7 +179,7 @@ func TestOrganization(t *testing.T) {
 
 		// Grant back the right.
 		member.Rights = []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_INFO, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS}
-		_, err = is.organizationService.SetOrganizationMember(testCtx(user.UserID), member)
+		_, err = is.organizationService.SetOrganizationMember(testCtx(user.UserIdentifiers), member)
 		a.So(err, should.BeNil)
 	}
 

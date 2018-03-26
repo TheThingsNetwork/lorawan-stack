@@ -87,10 +87,12 @@ func TestUserValidations(t *testing.T) {
 		// request with an invalid email (bad)
 		req = &CreateUserRequest{
 			User: User{
-				UserIdentifiers: UserIdentifiers{UserID: "alice"},
-				Name:            "Ali Ce",
-				Password:        "12345678abC",
-				Email:           "alice@alice.",
+				UserIdentifiers: UserIdentifiers{
+					UserID: "alice",
+					Email:  "alice@alice.",
+				},
+				Name:     "Ali Ce",
+				Password: "12345678abC",
 			},
 		}
 		a.So(req.Validate(), should.NotBeNil)
@@ -98,10 +100,12 @@ func TestUserValidations(t *testing.T) {
 		// good request
 		req = &CreateUserRequest{
 			User: User{
-				UserIdentifiers: UserIdentifiers{UserID: "alice"},
-				Name:            "Ali Ce",
-				Password:        "12345678abC",
-				Email:           "alice@alice.com",
+				UserIdentifiers: UserIdentifiers{
+					UserID: "alice",
+					Email:  "alice@alice.com",
+				},
+				Name:     "Ali Ce",
+				Password: "12345678abC",
 			},
 		}
 		a.So(req.Validate(), should.BeNil)
@@ -127,11 +131,13 @@ func TestUserValidations(t *testing.T) {
 		// good request
 		req = &UpdateUserRequest{
 			User: User{
-				UserIdentifiers: UserIdentifiers{UserID: "alice"},
-				Email:           "alice@ttn.com",
+				UserIdentifiers: UserIdentifiers{
+					UserID: "alice",
+					Email:  "alice@ttn.com",
+				},
 			},
 			UpdateMask: pbtypes.FieldMask{
-				Paths: []string{"name", "email"},
+				Paths: []string{"name", "ids.email"},
 			},
 		}
 		a.So(req.Validate(), should.BeNil)

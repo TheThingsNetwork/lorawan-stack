@@ -33,7 +33,7 @@ func TestGatewaysBlacklistedIDs(t *testing.T) {
 	a := assertions.New(t)
 	is := getIS(t)
 
-	ctx := testCtx(testUsers()["bob"].UserIdentifiers.UserID)
+	ctx := testCtx(testUsers()["bob"].UserIdentifiers)
 
 	// Can not create gateways with blacklisted IDs.
 	for _, id := range testSettings().BlacklistedIDs {
@@ -130,7 +130,7 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 		Radios: []ttnpb.GatewayRadio{},
 	}
 
-	ctx := testCtx(user.UserID)
+	ctx := testCtx(user.UserIdentifiers)
 
 	_, err := is.gatewayService.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{
 		Gateway: gtw,
@@ -235,7 +235,7 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 	{
 		collab.Rights = append(collab.Rights, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
 
-		ctx := testCtx(alice.UserID)
+		ctx := testCtx(alice.UserIdentifiers)
 
 		_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
 		a.So(err, should.BeNil)

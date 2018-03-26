@@ -22,8 +22,11 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // UserIdentifiers is the message that is used to identify an user.
 message UserIdentifiers {
-  // user_id is the ID of the user.
+  // The unique and immutable user's ID.
+  // This ID shares namespace with organization's IDs.
   string user_id = 1 [(gogoproto.customname) = "UserID"];
+  // Unique and mutable user's email address.
+  string email = 2;
 }
 
 // ApplicationIdentifiers is the message that is used to identify an application.

@@ -15,6 +15,9 @@
 package sql
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
@@ -50,20 +53,31 @@ func (s *UserStore) getUserIdentifiersFromID(q db.QueryContext, id uuid.UUID) (r
 	err = q.SelectOne(
 		&res,
 		`SELECT
-				user_id
+				user_id,
+				email
 			FROM users
 			WHERE id = $1`,
 		id)
 	return
 }
 
-func (s *UserStore) getUserID(q db.QueryContext, ids ttnpb.UserIdentifiers) (id uuid.UUID, err error) {
+func (s *UserStore) getUserID(q db.QueryContext, ids ttnpb.UserIdentifiers) (res uuid.UUID, err error) {
+	clauses := make([]string, 0)
+	if ids.UserID != "" {
+		clauses = append(clauses, "user_id = :user_id")
+	}
+
+	if ids.Email != "" {
+		clauses = append(clauses, "email = :email")
+	}
+
 	err = q.NamedSelectOne(
-		&id,
-		`SELECT
-			id
-		FROM users
-		WHERE user_id = :user_id`,
+		&res,
+		fmt.Sprintf(
+			`SELECT
+				id
+			FROM users
+			WHERE %s`, strings.Join(clauses, " AND ")),
 		ids)
 	if db.IsNoRows(err) {
 		err = ErrUserNotFound.New(nil)
@@ -129,7 +143,7 @@ func (s *UserStore) create(q db.QueryContext, data user) (err error) {
 	return
 }
 
-// GetByID finds the user by ID and returns it.
+// GetByID finds the user by the given identifiers and retrieves it.
 func (s *UserStore) GetByID(ids ttnpb.UserIdentifiers, specializer store.UserSpecializer) (result store.User, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		userID, err := s.getUserID(tx, ids)
@@ -142,7 +156,7 @@ func (s *UserStore) GetByID(ids ttnpb.UserIdentifiers, specializer store.UserSpe
 			return err
 		}
 
-		result = specializer(user)
+		result = specializer(user.User)
 
 		return s.loadAttributes(tx, userID, result)
 	})
@@ -150,51 +164,14 @@ func (s *UserStore) GetByID(ids ttnpb.UserIdentifiers, specializer store.UserSpe
 	return
 }
 
-func (s *UserStore) getByID(q db.QueryContext, userID uuid.UUID) (result ttnpb.User, err error) {
+func (s *UserStore) getByID(q db.QueryContext, userID uuid.UUID) (result user, err error) {
 	err = q.SelectOne(
 		&result,
 		`SELECT
-				user_id,
-				name,
-				email,
-				password,
-				validated_at,
-				state,
-				admin,
-				created_at,
-				updated_at
+				*
 			FROM users
 			WHERE id = $1`,
 		userID)
-	if db.IsNoRows(err) {
-		err = ErrUserNotFound.New(nil)
-	}
-	return
-}
-
-// GetByEmail finds the user by email address and returns it.
-func (s *UserStore) GetByEmail(email string, specializer store.UserSpecializer) (result store.User, err error) {
-	err = s.transact(func(tx *db.Tx) error {
-		user, err := s.getByEmail(tx, email)
-		if err != nil {
-			return err
-		}
-
-		result = specializer(user.User)
-
-		return s.loadAttributes(tx, user.ID, result)
-	})
-
-	return
-}
-
-func (s *UserStore) getByEmail(q db.QueryContext, email string) (result user, err error) {
-	err = q.SelectOne(
-		&result,
-		`SELECT *
-			FROM users
-			WHERE email = lower($1)`,
-		email)
 	if db.IsNoRows(err) {
 		err = ErrUserNotFound.New(nil)
 	}
@@ -231,11 +208,11 @@ func (s *UserStore) list(q db.QueryContext) (result []user, err error) {
 }
 
 // Update updates an user.
-func (s *UserStore) Update(user store.User) error {
+func (s *UserStore) Update(ids ttnpb.UserIdentifiers, user store.User) error {
 	err := s.transact(func(tx *db.Tx) error {
 		u := user.GetUser()
 
-		userID, err := s.getUserID(tx, u.UserIdentifiers)
+		userID, err := s.getUserID(tx, ids)
 		if err != nil {
 			return err
 		}
@@ -343,7 +320,7 @@ func (s *UserStore) Delete(ids ttnpb.UserIdentifiers) error {
 			return err
 		}
 
-		return s.accountStore.deleteID(tx, ids.UserID)
+		return s.accountStore.deleteID(tx, userID)
 	})
 
 	return err

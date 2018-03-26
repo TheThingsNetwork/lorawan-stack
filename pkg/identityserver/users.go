@@ -82,7 +82,6 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		user := &ttnpb.User{
 			UserIdentifiers: req.User.UserIdentifiers,
 			Name:            req.User.Name,
-			Email:           req.User.Email,
 			Password:        string(password),
 			State:           ttnpb.STATE_PENDING,
 		}
@@ -103,13 +102,13 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		// check whether the provided email is allowed or not when an invitation token
 		// wasn't provided
 		if req.InvitationToken == "" {
-			if !isEmailAllowed(req.User.Email, settings.AllowedEmails) {
+			if !isEmailAllowed(req.User.UserIdentifiers.Email, settings.AllowedEmails) {
 				return ErrEmailAddressNotAllowed.New(errors.Attributes{
 					"allowed_emails": settings.AllowedEmails,
 				})
 			}
 		} else {
-			err = tx.Invitations.Use(req.User.Email, req.InvitationToken)
+			err = tx.Invitations.Use(req.User.UserIdentifiers.Email, req.InvitationToken)
 			if err != nil {
 				return err
 			}
@@ -127,7 +126,7 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 				return err
 			}
 
-			return s.email.Send(user.Email, &templates.EmailValidation{
+			return s.email.Send(user.UserIdentifiers.Email, &templates.EmailValidation{
 				OrganizationName: s.config.OrganizationName,
 				PublicURL:        s.config.PublicURL,
 				Token:            token.ValidationToken,
@@ -185,13 +184,13 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 			case ttnpb.FieldPathUserName.MatchString(path):
 				user.Name = req.User.Name
 			case ttnpb.FieldPathUserEmail.MatchString(path):
-				if !isEmailAllowed(req.User.Email, settings.AllowedEmails) {
+				if !isEmailAllowed(req.User.UserIdentifiers.Email, settings.AllowedEmails) {
 					return ErrEmailAddressNotAllowed.New(errors.Attributes{
 						"allowed_emails": settings.AllowedEmails,
 					})
 				}
 
-				newEmail = strings.ToLower(user.Email) != strings.ToLower(req.User.Email)
+				newEmail = strings.ToLower(user.UserIdentifiers.Email) != strings.ToLower(req.User.UserIdentifiers.Email)
 				if newEmail {
 					if settings.SkipValidation {
 						user.ValidatedAt = timeValue(time.Now())
@@ -200,7 +199,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 					}
 				}
 
-				user.Email = req.User.Email
+				user.UserIdentifiers.Email = req.User.UserIdentifiers.Email
 			default:
 				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
 					"path": path,
@@ -208,7 +207,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 			}
 		}
 
-		err = tx.Users.Update(user)
+		err = tx.Users.Update(claimsFromContext(ctx).UserIdentifiers(), user)
 		if err != nil {
 			return err
 		}
@@ -223,12 +222,12 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 
-		err = tx.Users.SaveValidationToken(claimsFromContext(ctx).UserIdentifiers(), token)
+		err = tx.Users.SaveValidationToken(user.UserIdentifiers, token)
 		if err != nil {
 			return err
 		}
 
-		return s.email.Send(user.Email, &templates.EmailValidation{
+		return s.email.Send(user.UserIdentifiers.Email, &templates.EmailValidation{
 			OrganizationName: s.config.OrganizationName,
 			PublicURL:        s.config.PublicURL,
 			Token:            token.ValidationToken,
@@ -268,7 +267,7 @@ func (s *userService) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateU
 
 		user.Password = string(hashed)
 
-		return tx.Users.Update(user)
+		return tx.Users.Update(user.UserIdentifiers, user)
 	})
 
 	return nil, err
@@ -416,7 +415,7 @@ func (s *userService) ValidateUserEmail(ctx context.Context, req *ttnpb.Validate
 
 		user.GetUser().ValidatedAt = timeValue(time.Now())
 
-		err = tx.Users.Update(user)
+		err = tx.Users.Update(user.GetUser().UserIdentifiers, user)
 		if err != nil {
 			return err
 		}
@@ -462,7 +461,7 @@ func (s *userService) RequestUserEmailValidation(ctx context.Context, _ *pbtypes
 			return err
 		}
 
-		return s.email.Send(user.Email, &templates.EmailValidation{
+		return s.email.Send(user.UserIdentifiers.Email, &templates.EmailValidation{
 			OrganizationName: s.config.OrganizationName,
 			PublicURL:        s.config.PublicURL,
 			Token:            token.ValidationToken,

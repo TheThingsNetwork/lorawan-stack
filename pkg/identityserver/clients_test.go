@@ -43,10 +43,10 @@ func TestClient(t *testing.T) {
 		Rights:            []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
 		State:             ttnpb.STATE_PENDING,
 		OfficialLabeled:   false,
-		CreatorIDs:        ttnpb.UserIdentifiers{UserID: user.UserID},
+		CreatorIDs:        user.UserIdentifiers,
 	}
 
-	ctx := testCtx(user.UserID)
+	ctx := testCtx(user.UserIdentifiers)
 
 	_, err := is.clientService.CreateClient(ctx, &ttnpb.CreateClientRequest{
 		Client: cli,

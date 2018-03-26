@@ -76,9 +76,9 @@ func getIS(t testing.TB) *IdentityServer {
 	return testIS
 }
 
-func testCtx(userID string) context.Context {
+func testCtx(ids ttnpb.UserIdentifiers) context.Context {
 	return newContextWithClaims(context.Background(), &claims{
-		EntityIdentifiers: ttnpb.UserIdentifiers{UserID: userID},
+		EntityIdentifiers: ids,
 		Source:            auth.Token,
 		Rights:            ttnpb.AllRights(),
 	})
@@ -115,22 +115,28 @@ func testClient() *ttnpb.Client {
 func testUsers() map[string]*ttnpb.User {
 	return map[string]*ttnpb.User{
 		"alice": {
-			UserIdentifiers: ttnpb.UserIdentifiers{UserID: "alice"},
-			Password:        "123456",
-			Admin:           true,
-			Email:           "alice@alice.com",
-			State:           ttnpb.STATE_APPROVED,
+			UserIdentifiers: ttnpb.UserIdentifiers{
+				UserID: "alice",
+				Email:  "alice@alice.com",
+			},
+			Password: "123456",
+			Admin:    true,
+			State:    ttnpb.STATE_APPROVED,
 		},
 		"bob": {
-			UserIdentifiers: ttnpb.UserIdentifiers{UserID: "bob"},
-			Password:        "1234567",
-			Email:           "bob@bob.com",
-			Admin:           true,
+			UserIdentifiers: ttnpb.UserIdentifiers{
+				UserID: "bob",
+				Email:  "bob@bob.com",
+			},
+			Password: "1234567",
+			Admin:    true,
 		},
 		"john-doe": {
-			UserIdentifiers: ttnpb.UserIdentifiers{UserID: "john-doe"},
-			Password:        "123456",
-			Email:           "john@doe.com",
+			UserIdentifiers: ttnpb.UserIdentifiers{
+				UserID: "john-doe",
+				Email:  "john@doe.com",
+			},
+			Password: "123456",
 		},
 	}
 }
