@@ -41,7 +41,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const recentUplinkCount = 20
+// Recent uplink count is the maximium amount of recent uplinks stored per device.
+const RecentUplinkCount = 20
+
 const maxFCntGap = 16384
 const accumulationCapacity = 20
 
@@ -195,11 +197,13 @@ func (ns *NetworkServer) deduplicateUplink(msg *ttnpb.UplinkMessage) (*metadataA
 // matchDevice tries to match the uplink message with a device.
 // If the uplink message matches a fallback session, that fallback session is recovered.
 // If successful, the FCnt in the uplink message is set to the full FCnt. The NextFCntUp in the session is updated accordingly.
-func (ns *NetworkServer) matchDevice(devAddr types.DevAddr, txDRIdx, txChIdx uint8, fCnt uint32, ack bool, mic []byte, pld []byte) (*deviceregistry.Device, error) {
+func (ns *NetworkServer) matchDevice(msg *ttnpb.UplinkMessage) (*deviceregistry.Device, error) {
+	mac := msg.Payload.GetMACPayload()
+
 	devs, err := ns.registry.FindBy(
 		&ttnpb.EndDevice{
 			Session: &ttnpb.Session{
-				DevAddr: devAddr,
+				DevAddr: mac.DevAddr,
 			},
 		},
 		"Session.DevAddr",
@@ -211,7 +215,7 @@ func (ns *NetworkServer) matchDevice(devAddr types.DevAddr, txDRIdx, txChIdx uin
 	fb, err := ns.registry.FindBy(
 		&ttnpb.EndDevice{
 			SessionFallback: &ttnpb.Session{
-				DevAddr: devAddr,
+				DevAddr: mac.DevAddr,
 			},
 		},
 		"SessionFallback.DevAddr",
@@ -237,6 +241,7 @@ func (ns *NetworkServer) matchDevice(devAddr types.DevAddr, txDRIdx, txChIdx uin
 	for _, dev := range devs {
 		dev.EndDevice.SessionFallback = nil
 
+		fCnt := mac.GetFCnt()
 		next := dev.EndDevice.GetSession().GetNextFCntUp()
 
 		if !dev.FCntIs16Bit &&
@@ -266,6 +271,11 @@ func (ns *NetworkServer) matchDevice(devAddr types.DevAddr, txDRIdx, txChIdx uin
 		return matching[i].gap < matching[j].gap
 	})
 
+	if len(msg.RawPayload) < 4 {
+		return nil, errors.New("Length of RawPayload must not be less than 4")
+	}
+	pld := msg.RawPayload[:len(msg.RawPayload)-4]
+
 	for _, dev := range matching {
 		ses := dev.GetSession()
 
@@ -276,14 +286,13 @@ func (ns *NetworkServer) matchDevice(devAddr types.DevAddr, txDRIdx, txChIdx uin
 		fNwkSIntKey := *ke.Key
 
 		var confFCnt uint32
-		if ack {
+		if mac.GetAck() {
 			if len(dev.RecentDownlinks) == 0 {
 				// Uplink acknowledges a downlink, but no downlink was sent by the device,
 				// hence it must be the wrong device.
 				continue
 			}
-			pld := dev.GetRecentDownlinks()[len(dev.RecentDownlinks)-1].GetPayload()
-			confFCnt = pld.GetMACPayload().GetFCnt()
+			confFCnt = dev.GetRecentDownlinks()[len(dev.RecentDownlinks)-1].Payload.GetMACPayload().GetFCnt()
 		}
 
 		var computedMIC [4]byte
@@ -295,16 +304,17 @@ func (ns *NetworkServer) matchDevice(devAddr types.DevAddr, txDRIdx, txChIdx uin
 			}
 			sNwkSIntKey := *ke.Key
 
-			computedMIC, err = crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey, confFCnt, txDRIdx, txChIdx, devAddr, dev.fCnt, pld)
+			set := msg.GetSettings()
+			computedMIC, err = crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey, confFCnt, uint8(set.GetDataRateIndex()), uint8(set.GetChannelIndex()), mac.DevAddr, dev.fCnt, pld)
 		case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-			computedMIC, err = crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, devAddr, dev.fCnt, pld)
+			computedMIC, err = crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, mac.DevAddr, dev.fCnt, pld)
 		default:
 			return nil, ErrCorruptRegistry.NewWithCause(nil, errors.New("Unmatched LoRaWAN version"))
 		}
 		if err != nil {
 			return nil, ErrMICComputeFailed.NewWithCause(nil, err)
 		}
-		if !bytes.Equal(mic, computedMIC[:]) {
+		if !bytes.Equal(msg.Payload.GetMIC(), computedMIC[:]) {
 			continue
 		}
 		if dev.fCnt == math.MaxUint32 {
@@ -319,13 +329,7 @@ func (ns *NetworkServer) matchDevice(devAddr types.DevAddr, txDRIdx, txChIdx uin
 func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator, start time.Time) error {
 	logger := ns.Logger()
 
-	pld := msg.Payload.GetMACPayload()
-	set := msg.GetSettings()
-
-	dev, err := ns.matchDevice(pld.DevAddr,
-		uint8(set.GetDataRateIndex()), uint8(set.GetChannelIndex()),
-		pld.GetFCnt(), pld.GetAck(),
-		msg.Payload.GetMIC(), pld.GetFRMPayload())
+	dev, err := ns.matchDevice(msg)
 	if err != nil {
 		return errors.NewWithCause(err, "Failed to match device")
 	}
@@ -334,8 +338,8 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	msg.RxMetadata = append(msg.RxMetadata, acc.Accumulated()...)
 
 	dev.RecentUplinks = append(dev.RecentUplinks, msg)
-	if len(dev.RecentUplinks) > recentUplinkCount {
-		dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
+	if len(dev.RecentUplinks) > RecentUplinkCount {
+		dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-RecentUplinkCount:]...)
 	}
 
 	if err := dev.Update("Session", "SessionFallback", "RecentUplinks"); err != nil {
@@ -343,14 +347,15 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		return err
 	}
 
+	mac := msg.Payload.GetMACPayload()
 	go func() {
 		ns.applicationServersMu.RLock()
 		cl, ok := ns.applicationServers[dev.ApplicationID]
 		if ok {
 			up := &ttnpb.ApplicationUp{&ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
-				FPort:      pld.FPort,
 				FCnt:       dev.Session.NextFCntUp - 1,
-				FRMPayload: pld.FRMPayload,
+				FPort:      mac.FPort,
+				FRMPayload: mac.FRMPayload,
 				RxMetadata: msg.RxMetadata,
 			}}}
 			if err := cl.Send(up); err != nil {
