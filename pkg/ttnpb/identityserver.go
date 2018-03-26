@@ -51,7 +51,7 @@ func (req *UpdateSettingsRequest) Validate() error {
 				}
 			}
 		case FieldPathSettingsUserRegistrationSkipValidation.MatchString(path),
-			FieldPathSettingsUserRegistrationSelfRegistration.MatchString(path),
+			FieldPathSettingsUserRegistrationInvitationOnly.MatchString(path),
 			FieldPathSettingsUserRegistrationAdminApproval.MatchString(path),
 			FieldPathSettingsValidationTokenTTL.MatchString(path),
 			FieldPathSettingsAllowedEmails.MatchString(path),

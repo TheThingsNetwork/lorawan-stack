@@ -51,8 +51,8 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 			return err
 		}
 
-		// if self-registration is disabled check that an invitation token is provided
-		if !settings.SelfRegistration && req.InvitationToken == "" {
+		// If invitation-only mode is enabled check that an invitation token is provided.
+		if settings.InvitationOnly && req.InvitationToken == "" {
 			return ErrInvitationTokenMissing.New(nil)
 		}
 

@@ -52,9 +52,9 @@ message IdentityServerSettings {
     // account after registration or this step is skipped.
     bool skip_validation = 1;
 
-    // self_registration denotes whether people can register themselves an user
+    // invitation_only denotes whether people can register themselves an user
     // account or they need to be granted an invitation to do so.
-    bool self_registration = 2;
+    bool invitation_only = 2;
 
     // admin_approval denotes whether or not admins need to validate user accounts
     // after they are registered.

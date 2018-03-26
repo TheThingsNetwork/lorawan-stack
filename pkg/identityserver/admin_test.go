@@ -33,12 +33,11 @@ func TestAdminSettings(t *testing.T) {
 	_, err = is.adminService.UpdateSettings(ctx, &ttnpb.UpdateSettingsRequest{
 		Settings: ttnpb.IdentityServerSettings{
 			IdentityServerSettings_UserRegistrationFlow: ttnpb.IdentityServerSettings_UserRegistrationFlow{
-				SelfRegistration: true,
-				SkipValidation:   true,
+				SkipValidation: true,
 			},
 		},
 		UpdateMask: pbtypes.FieldMask{
-			Paths: []string{"allowed_emails", "user_registration.self_registration"},
+			Paths: []string{"allowed_emails", "user_registration.skip_validation"},
 		},
 	})
 	a.So(err, should.BeNil)
@@ -46,8 +45,7 @@ func TestAdminSettings(t *testing.T) {
 	resp, err = is.GetSettings(ctx, &pbtypes.Empty{})
 	a.So(err, should.BeNil)
 	a.So(resp.AllowedEmails, should.HaveLength, 0)
-	a.So(resp.IdentityServerSettings_UserRegistrationFlow.SelfRegistration, should.BeTrue)
-	a.So(resp.IdentityServerSettings_UserRegistrationFlow.SkipValidation, should.BeFalse)
+	a.So(resp.IdentityServerSettings_UserRegistrationFlow.SkipValidation, should.BeTrue)
 }
 
 func TestAdminInvitations(t *testing.T) {
@@ -82,11 +80,11 @@ func TestAdminInvitations(t *testing.T) {
 	settings, err := is.store.Settings.Get()
 	a.So(err, should.BeNil)
 	defer func() {
-		settings.IdentityServerSettings_UserRegistrationFlow.SelfRegistration = true
+		settings.IdentityServerSettings_UserRegistrationFlow.InvitationOnly = false
 		is.store.Settings.Set(settings)
 	}()
 
-	settings.IdentityServerSettings_UserRegistrationFlow.SelfRegistration = false
+	settings.IdentityServerSettings_UserRegistrationFlow.InvitationOnly = true
 	err = is.store.Settings.Set(settings)
 	a.So(err, should.BeNil)
 

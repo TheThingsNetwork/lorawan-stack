@@ -11,7 +11,7 @@ func init() {
 			updated_at             TIMESTAMP NOT NULL DEFAULT current_timestamp(),
 			blacklisted_ids        STRING NOT NULL DEFAULT '[]',
 			skip_validation        BOOL NOT NULL DEFAULT false,
-			self_registration      BOOL NOT NULL DEFAULT true,
+			invitation_only        BOOL NOT NULL DEFAULT false,
 			admin_approval         BOOL NOT NULL DEFAULT false,
 			validation_token_ttl   INT NOT NULL,
 			allowed_emails         STRING NOT NULL DEFAULT '[]',

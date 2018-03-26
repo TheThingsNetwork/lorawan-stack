@@ -12,9 +12,9 @@ var (
 	// user registration flow skip validation field.
 	FieldPathSettingsUserRegistrationSkipValidation = regexp.MustCompile(`^user_registration.skip_validation$`)
 
-	// FieldPathSettingsUserRegistrationSelfRegistration is the field path for the
-	// user registration flow self registration field.
-	FieldPathSettingsUserRegistrationSelfRegistration = regexp.MustCompile(`^user_registration.self_registration$`)
+	// FieldPathSettingsUserRegistrationInvitationOnly is the field path for the
+	// user registration flow invitation only field.
+	FieldPathSettingsUserRegistrationInvitationOnly = regexp.MustCompile(`^user_registration.invitation_only$`)
 
 	// FieldPathSettingsUserRegistrationAdminApproval is the field path for the
 	// user registration flow admin approval field.

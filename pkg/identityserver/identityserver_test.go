@@ -81,10 +81,7 @@ func testCtx(userID string) context.Context {
 
 func testSettings() *ttnpb.IdentityServerSettings {
 	return &ttnpb.IdentityServerSettings{
-		BlacklistedIDs: []string{"blacklisted-id", "admin"},
-		IdentityServerSettings_UserRegistrationFlow: ttnpb.IdentityServerSettings_UserRegistrationFlow{
-			SelfRegistration: true,
-		},
+		BlacklistedIDs:     []string{"blacklisted-id", "admin"},
 		AllowedEmails:      []string{"*@bar.com"},
 		ValidationTokenTTL: time.Duration(time.Hour),
 		InvitationTokenTTL: time.Duration(time.Hour),

@@ -65,7 +65,7 @@ func ShouldBeSettingsIgnoringAutoFields(actual interface{}, expected ...interfac
 	return all(
 		assertions.ShouldResemble(a.BlacklistedIDs, b.BlacklistedIDs),
 		assertions.ShouldEqual(a.SkipValidation, b.SkipValidation),
-		assertions.ShouldEqual(a.SelfRegistration, b.SelfRegistration),
+		assertions.ShouldEqual(a.InvitationOnly, b.InvitationOnly),
 		assertions.ShouldEqual(a.AdminApproval, b.AdminApproval),
 		assertions.ShouldEqual(a.ValidationTokenTTL, b.ValidationTokenTTL),
 		assertions.ShouldResemble(a.AllowedEmails, b.AllowedEmails),

@@ -52,8 +52,8 @@ func (s *adminService) UpdateSettings(ctx context.Context, req *ttnpb.UpdateSett
 				settings.BlacklistedIDs = req.Settings.BlacklistedIDs
 			case ttnpb.FieldPathSettingsUserRegistrationSkipValidation.MatchString(path):
 				settings.SkipValidation = req.Settings.SkipValidation
-			case ttnpb.FieldPathSettingsUserRegistrationSelfRegistration.MatchString(path):
-				settings.SelfRegistration = req.Settings.SelfRegistration
+			case ttnpb.FieldPathSettingsUserRegistrationInvitationOnly.MatchString(path):
+				settings.InvitationOnly = req.Settings.InvitationOnly
 			case ttnpb.FieldPathSettingsUserRegistrationAdminApproval.MatchString(path):
 				settings.AdminApproval = req.Settings.AdminApproval
 			case ttnpb.FieldPathSettingsValidationTokenTTL.MatchString(path):

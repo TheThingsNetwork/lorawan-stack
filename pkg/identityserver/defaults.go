@@ -45,9 +45,9 @@ var DefaultSettings = &ttnpb.IdentityServerSettings{
 		"webui",
 	},
 	IdentityServerSettings_UserRegistrationFlow: ttnpb.IdentityServerSettings_UserRegistrationFlow{
-		SelfRegistration: true,
-		SkipValidation:   false,
-		AdminApproval:    false,
+		InvitationOnly: false,
+		SkipValidation: false,
+		AdminApproval:  false,
 	},
 	AllowedEmails:      []string{"*"},
 	ValidationTokenTTL: time.Hour,

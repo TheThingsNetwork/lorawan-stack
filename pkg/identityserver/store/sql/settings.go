@@ -38,7 +38,7 @@ func (s *SettingStore) get(q db.QueryContext) (*ttnpb.IdentityServerSettings, er
 				validation_token_ttl,
 				invitation_token_ttl,
 				skip_validation,
-				self_registration,
+				invitation_only,
 				admin_approval,
 				updated_at
 			FROM settings
@@ -77,7 +77,7 @@ func (s *SettingStore) set(q db.QueryContext, settings *ttnpb.IdentityServerSett
 				updated_at,
 				blacklisted_ids,
 				skip_validation,
-				self_registration,
+				invitation_only,
 				admin_approval,
 				validation_token_ttl,
 				invitation_token_ttl,
@@ -87,7 +87,7 @@ func (s *SettingStore) set(q db.QueryContext, settings *ttnpb.IdentityServerSett
 				current_timestamp(),
 				:blacklisted_ids_converted,
 				:skip_validation,
-				:self_registration,
+				:invitation_only,
 				:admin_approval,
 				:validation_token_ttl,
 				:invitation_token_ttl,
