@@ -5,8 +5,14 @@ package test
 import (
 	"reflect"
 
+	"github.com/kr/pretty"
 	"github.com/pkg/errors"
 )
+
+// DiffEqual reports if pretty.Diff of x and y is empty.
+func DiffEqual(x, y interface{}) bool {
+	return len(pretty.Diff(x, y)) == 0
+}
 
 // SameElementsFunc is like SameElementsFunc, but uses reflect.DeepEqual as eq.
 func SameElements(xs, ys interface{}) bool {

@@ -219,8 +219,6 @@ func (ns *NetworkServer) matchDevice(msg *ttnpb.UplinkMessage) (*deviceregistry.
 	for _, dev := range fb {
 		dev.EndDevice.Session = dev.EndDevice.SessionFallback
 	}
-	// Given that DevAddr never repeat in sequential sessions,
-	// we can assume that devs does not contain duplicates.
 	devs = append(devs, fb...)
 
 	type device struct {
@@ -292,14 +290,12 @@ outer:
 		}
 		fNwkSIntKey := *ke.Key
 
-		var confFCnt uint32
 		if mac.GetAck() {
 			if len(dev.RecentDownlinks) == 0 {
 				// Uplink acknowledges a downlink, but no downlink was sent by the device,
 				// hence it must be the wrong device.
 				continue
 			}
-			confFCnt = dev.GetRecentDownlinks()[len(dev.RecentDownlinks)-1].Payload.GetMACPayload().GetFCnt()
 		}
 
 		var computedMIC [4]byte
@@ -311,8 +307,14 @@ outer:
 			}
 			sNwkSIntKey := *ke.Key
 
+			var confFCnt uint32
+			if mac.GetAck() {
+				confFCnt = dev.GetRecentDownlinks()[len(dev.RecentDownlinks)-1].Payload.GetMACPayload().GetFCnt()
+			}
 			set := msg.GetSettings()
-			computedMIC, err = crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey, confFCnt, uint8(set.GetDataRateIndex()), uint8(set.GetChannelIndex()), mac.DevAddr, dev.fCnt, pld)
+			computedMIC, err = crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey,
+				confFCnt, uint8(set.GetDataRateIndex()), uint8(set.GetChannelIndex()),
+				mac.DevAddr, dev.fCnt, pld)
 		case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
 			computedMIC, err = crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, mac.DevAddr, dev.fCnt, pld)
 		default:

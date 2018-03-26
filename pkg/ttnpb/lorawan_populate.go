@@ -182,6 +182,8 @@ func NewPopulatedMessageUplink(r randyLorawan, sNwkSIntKey, fNwkSIntKey types.AE
 	}
 	pld := NewPopulatedMessage_MACPayload(r)
 	pld.MACPayload.FHDR.FPending = false
+	pld.MACPayload.Ack = confirmed
+
 	b, err := macMICPayload(out.MHDR, pld.MACPayload.FHDR, uint8(pld.MACPayload.FPort), pld.MACPayload.FRMPayload, true)
 	if err != nil {
 		panic(errors.NewWithCause(err, "failed to compute payload for MIC computation"))
