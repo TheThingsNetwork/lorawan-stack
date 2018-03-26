@@ -185,6 +185,8 @@ enum Class {
 // TxSettings contains the LoRaWAN settings for a transmission.
 // This message is used in both uplink and downlink
 message TxSettings {
+  option (gogoproto.populate) = false;
+
   Modulation modulation = 1;
 
   // LoRaWAN data rate index

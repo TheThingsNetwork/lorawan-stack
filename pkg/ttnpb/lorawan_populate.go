@@ -47,6 +47,29 @@ func NewPopulatedMACPayload(r randyLorawan, easy bool) *MACPayload {
 	return out
 }
 
+func NewPopulatedTxSettings(r randyLorawan, easy bool) *TxSettings {
+	out := &TxSettings{}
+	switch r.Intn(2) {
+	case 0:
+		out.Modulation = Modulation_FSK
+	case 1:
+		out.Modulation = Modulation_LORA
+	}
+	out.Bandwidth = r.Uint32()
+	out.SpreadingFactor = r.Uint32()
+	out.BitRate = r.Uint32()
+	out.CodingRate = randStringLorawan(r)
+	out.Frequency = uint64(r.Uint32())
+	out.TxPower = r.Int31()
+	if r.Intn(2) == 0 {
+		out.TxPower *= -1
+	}
+	out.PolarizationInversion = r.Intn(2) == 0
+	out.ChannelIndex = uint32(r.Intn(255))
+	out.DataRateIndex = uint32(r.Intn(255))
+	return out
+}
+
 func NewPopulatedMessage_MACPayload(r randyLorawan) *Message_MACPayload {
 	return &Message_MACPayload{NewPopulatedMACPayload(r, false)}
 }
