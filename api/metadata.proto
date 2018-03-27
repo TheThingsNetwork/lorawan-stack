@@ -41,7 +41,7 @@ message RxMetadata {
   float rssi = 8 [(gogoproto.customname) = "RSSI"];
 
   // Received channel power in dBm
-  float  channel_rssi = 9 [(gogoproto.customname) = "ChannelRSSI"];
+  float channel_rssi = 9 [(gogoproto.customname) = "ChannelRSSI"];
 
   // Standard deviation of the RSSI
   float rssi_standard_deviation = 10 [(gogoproto.customname) = "RSSIStandardDeviation"];
@@ -76,6 +76,12 @@ message TxMetadata {
 
   // Real time
   google.protobuf.Timestamp time = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
+  // Send a CRC in the packet. This should only be used for testing purposes, as downlinks with CRCs are not LoRaWAN compliant.
+  bool enable_crc = 4 [(gogoproto.customname) = "EnableCRC"];
+
+  // Invert polarity for this downlink. This field should be true for LoRaWAN downlinks.
+  bool invert_polarity = 5;
 
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API
