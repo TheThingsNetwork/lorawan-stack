@@ -18,7 +18,7 @@ const (
 	RegionalParameters1_0_1
 	RegionalParameters1_0_2
 	RegionalParameters1_1A
-	RegionalParameters1_1B
+	CurrentVersion
 )
 
 // PayloadSize abstracts the acceptable payload size depending on contextual parameters
@@ -108,7 +108,7 @@ type Band struct {
 
 	DataRates [16]DataRate
 
-	NoCFList bool
+	ImplementsCFList bool
 
 	// ReceiveDelay1 is the default Rx1 window timing in seconds
 	ReceiveDelay1 time.Duration
@@ -186,7 +186,7 @@ type swap struct {
 
 func (b Band) downgrades() []swap {
 	return []swap{
-		{version: RegionalParameters1_1B, downgrade: self},
+		{version: CurrentVersion, downgrade: self},
 		{version: RegionalParameters1_1A, downgrade: b.regionalParameters1_1A},
 		{version: RegionalParameters1_0_2, downgrade: b.regionalParameters1_0_2},
 		{version: RegionalParameters1_0_1, downgrade: b.regionalParameters1_0_1},
@@ -198,7 +198,7 @@ func (b Band) downgrades() []swap {
 func (b Band) Version(wantedVersion RegionalParametersVersion) (Band, error) {
 	for _, swap := range b.downgrades() {
 		if swap.downgrade == nil {
-			return b, ErrUnsupportedLoRaWANVersion.New(nil)
+			return b, ErrUnsupportedLoRaWANRegionalParameters.New(nil)
 		}
 		b = swap.downgrade(b)
 		if swap.version == wantedVersion {
@@ -206,12 +206,12 @@ func (b Band) Version(wantedVersion RegionalParametersVersion) (Band, error) {
 		}
 	}
 
-	return b, ErrUnknownLoRaWANVersion.New(nil)
+	return b, ErrUnknownLoRaWANRegionalParameters.New(nil)
 }
 
 // Versions supported for this band.
 func (b Band) Versions() []RegionalParametersVersion {
-	versions := []RegionalParametersVersion{RegionalParameters1_1B}
+	versions := []RegionalParametersVersion{CurrentVersion}
 	for _, swap := range b.downgrades() {
 		if swap.downgrade != nil {
 			versions = append(versions, swap.version)

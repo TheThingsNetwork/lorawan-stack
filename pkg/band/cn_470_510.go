@@ -50,7 +50,7 @@ func init() {
 			{Rate: types.DataRate{LoRa: "SF8BW125"}, DefaultMaxSize: maxPayloadSize{230, 222}, NoRepeaterMaxSize: maxPayloadSize{250, 242}},
 			{Rate: types.DataRate{LoRa: "SF7BW125"}, DefaultMaxSize: maxPayloadSize{230, 222}, NoRepeaterMaxSize: maxPayloadSize{250, 242}},
 			{}, {}, {}, {}, {}, {}, {}, {}, {}, // RFU
-			{}, // Used by LinkADRReq starting from LoRaWAN 1.1, RFU before
+			{}, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},
 
 		ReceiveDelay1:    defaultReceiveDelay1,
@@ -66,7 +66,7 @@ func init() {
 		DefaultMaxEIRP: 19.15,
 		TxOffset: [16]float32{0, -2, -4, -6, -8, -10, -12, -14,
 			0, 0, 0, 0, 0, 0, 0, // RFU
-			0, // Used by LinkADRReq starting from LoRaWAN 1.1, RFU before
+			0, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},
 
 		Rx1Parameters: func(frequency uint64, dataRateIndex, rx1DROffset int, _ bool) (int, uint64) {
@@ -95,7 +95,9 @@ func init() {
 			PingSlotChannels: cn470BeaconFrequencies[:],
 		},
 
-		// No LoRaWAN 1.0
+		ImplementsCFList: true,
+
+		// No LoRaWAN Regional Parameters 1.0
 		regionalParameters1_0_1: self,
 		regionalParameters1_0_2: disableCFList_1_0_2,
 		regionalParameters1_1A:  self,

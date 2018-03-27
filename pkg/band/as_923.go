@@ -41,7 +41,7 @@ func init() {
 			{Rate: types.DataRate{LoRa: "SF7BW250"}, DefaultMaxSize: dwellTimePayloadSize{230, 250}, NoRepeaterMaxSize: dwellTimePayloadSize{250, 250}},
 			{Rate: types.DataRate{FSK: 50000}, DefaultMaxSize: dwellTimePayloadSize{230, 250}, NoRepeaterMaxSize: dwellTimePayloadSize{250, 250}},
 			{}, {}, {}, {}, {}, {}, {}, // RFU
-			{}, // Used by LinkADRReq starting from LoRaWAN 1.1, RFU before
+			{}, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},
 
 		ReceiveDelay1:    defaultReceiveDelay1,
@@ -57,8 +57,10 @@ func init() {
 		DefaultMaxEIRP: 16,
 		TxOffset: [16]float32{0, -2, -4, -6, -8, -10, -12, -14,
 			0, 0, 0, 0, 0, 0, 0, // RFU
-			0, // Used by LinkADRReq starting from LoRaWAN 1.1, RFU before
+			0, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},
+
+		ImplementsCFList: true,
 
 		Rx1Parameters: func(frequency uint64, dataRateIndex, rx1DROffset int, dwellTime bool) (int, uint64) {
 			minDR := 0
@@ -93,8 +95,8 @@ func init() {
 
 		TxParamSetupReqSupport: true,
 
-		// No LoRaWAN 1.0
-		// No LoRaWAN 1.0.1
+		// No LoRaWAN Regional Parameters 1.0
+		// No LoRaWAN Regional Parameters 1.0.1
 		regionalParameters1_0_2: self,
 		regionalParameters1_1A:  self,
 	}

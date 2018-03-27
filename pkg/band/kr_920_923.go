@@ -40,7 +40,7 @@ func init() {
 			{Rate: types.DataRate{LoRa: "SF8BW125"}, DefaultMaxSize: maxPayloadSize{230, 222}, NoRepeaterMaxSize: maxPayloadSize{250, 242}},
 			{Rate: types.DataRate{LoRa: "SF7BW125"}, DefaultMaxSize: maxPayloadSize{230, 222}, NoRepeaterMaxSize: maxPayloadSize{250, 242}},
 			{}, {}, {}, {}, {}, {}, {}, {}, {},
-			{}, // Used by LinkADRReq starting from LoRaWAN 1.1, RFU before
+			{}, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},
 
 		ReceiveDelay1:    defaultReceiveDelay1,
@@ -56,7 +56,7 @@ func init() {
 		DefaultMaxEIRP: 14,
 		TxOffset: [16]float32{0, -2, -4, -6, -8, -10, -12, -14,
 			0, 0, 0, 0, 0, 0, 0, // RFU
-			0, // Used by LinkADRReq starting from LoRaWAN 1.1, RFU before
+			0, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},
 
 		Rx1Parameters: func(frequency uint64, dataRateIndex, rx1DROffset int, _ bool) (int, uint64) {
@@ -66,6 +66,8 @@ func init() {
 			}
 			return outDataRateIndex, frequency
 		},
+
+		ImplementsCFList: true,
 
 		DefaultRx2Parameters: Rx2Parameters{0, 921900000},
 

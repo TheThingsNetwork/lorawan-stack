@@ -12,14 +12,14 @@ var (
 		Code:           1,
 		SafeAttributes: []string{"band"},
 	}
-	// ErrUnsupportedLoRaWANVersion is returned if an operation could not be completed because of an invalid LoRaWAN version.
-	ErrUnsupportedLoRaWANVersion = &errors.ErrDescriptor{
+	// ErrUnsupportedLoRaWANRegionalParameters is returned if an operation could not be completed because of an unsupported LoRaWAN regional parameters version.
+	ErrUnsupportedLoRaWANRegionalParameters = &errors.ErrDescriptor{
 		MessageFormat: "LoRaWAN version not supported",
 		Code:          2,
 		Type:          errors.InvalidArgument,
 	}
-	// ErrUnknownLoRaWANVersion is returned if the LoRaWAN version is not recognized.
-	ErrUnknownLoRaWANVersion = &errors.ErrDescriptor{
+	// ErrUnknownLoRaWANRegionalParameters is returned if the LoRaWAN regional parameters version is not recognized.
+	ErrUnknownLoRaWANRegionalParameters = &errors.ErrDescriptor{
 		MessageFormat: "Unknown LoRaWAN version",
 		Code:          3,
 		Type:          errors.Unknown,
@@ -28,6 +28,6 @@ var (
 
 func init() {
 	ErrBandNotFound.Register()
-	ErrUnsupportedLoRaWANVersion.Register()
-	ErrUnknownLoRaWANVersion.Register()
+	ErrUnsupportedLoRaWANRegionalParameters.Register()
+	ErrUnknownLoRaWANRegionalParameters.Register()
 }

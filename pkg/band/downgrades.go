@@ -5,7 +5,7 @@ package band
 // LoRaWAN 1.1 -> 1.0.2 downgrades
 
 func disableCFList_1_0_2(b Band) Band {
-	b.NoCFList = true
+	b.ImplementsCFList = false
 	return b
 }
 

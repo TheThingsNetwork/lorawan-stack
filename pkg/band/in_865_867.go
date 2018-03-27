@@ -42,7 +42,7 @@ func init() {
 			{}, // RFU
 			{Rate: types.DataRate{FSK: 50000}, DefaultMaxSize: maxPayloadSize{230, 222}, NoRepeaterMaxSize: maxPayloadSize{250, 242}},
 			{}, {}, {}, {}, {}, {}, {}, // RFU
-			{}, // Used by LinkADRReq starting from LoRaWAN 1.1, RFU before
+			{}, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},
 
 		ReceiveDelay1:    defaultReceiveDelay1,
@@ -76,6 +76,8 @@ func init() {
 			}
 			return outDataRateIndex, frequency
 		},
+
+		ImplementsCFList: true,
 
 		DefaultRx2Parameters: Rx2Parameters{2, 866550000},
 
