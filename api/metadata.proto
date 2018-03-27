@@ -27,12 +27,11 @@ message RxMetadata {
   // NOTE: most gateways use microsecond timestamps, so conversion may be needed
   uint64 timestamp = 4;
 
-  oneof fine_timestamp {
-    // Gateway's internal fine timestamp when the Rx finished (nanoseconds), encrypted with an AES key
-    string encrypted_fine_timestamp = 5;
-    // Gateway's internal fine timestamp when the Rx finished (nanoseconds), decrypted
-    uint64 fine_timestamp_value = 6;
-  }
+  // Gateway's internal fine timestamp when the Rx finished (nanoseconds), encrypted with an AES key.
+  string encrypted_fine_timestamp = 5;
+
+  // Gateway's internal fine timestamp when the Rx finished (nanoseconds), decrypted.
+  uint64 fine_timestamp_value = 6;
 
   // Real time
   google.protobuf.Timestamp time = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
