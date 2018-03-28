@@ -20,7 +20,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-func TestisEmailAllowed(t *testing.T) {
+func TestIsEmailAllowed(t *testing.T) {
 	a := assertions.New(t)
 
 	var allowedEmails []string
