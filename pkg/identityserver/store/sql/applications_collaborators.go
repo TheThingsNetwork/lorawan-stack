@@ -164,6 +164,8 @@ func (s *ApplicationStore) HasCollaboratorRights(id ttnpb.ApplicationIdentifiers
 }
 
 func (s *ApplicationStore) hasCollaboratorRights(q db.QueryContext, appID, accountID uuid.UUID, rights ...ttnpb.Right) (bool, error) {
+	// TODO(gomezjdaniel#544): Ensure consistency along the store when building
+	// programatically clauses for SQL queries.
 	clauses := make([]string, 0, len(rights))
 	args := make([]interface{}, 0, len(rights)+1)
 	args = append(args, appID, accountID)

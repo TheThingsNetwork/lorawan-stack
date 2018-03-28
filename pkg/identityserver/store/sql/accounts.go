@@ -30,6 +30,7 @@ func newAccountStore(store storer) *accountStore {
 }
 
 func (s *accountStore) getAccountID(q db.QueryContext, ids ttnpb.OrganizationOrUserIdentifiers) (uuid.UUID, error) {
+	// TODO(gomezjdaniel#543): avoid dynamic type checking to access other stores.
 	if id := ids.GetUserID(); id != nil {
 		return s.store().Users.(*UserStore).getUserID(q, *id)
 	}
