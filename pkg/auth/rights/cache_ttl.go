@@ -1,25 +1,31 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package identityserver
+package rights
 
 import (
-	"fmt"
+	"context"
 	"sync"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 // ttlCache is a cache where all entries have a TTL and are garbage collected.
 type ttlCache struct {
+	ctx     context.Context
+	logger  log.Interface
 	ttl     time.Duration
 	mu      sync.RWMutex
 	entries map[string]*entry
 }
 
-// newTTLCache creates a new instance of ttlCache.
-func newTTLCache(ttl time.Duration) *ttlCache {
+// newTTLCache creates a new instance of ttlCache and starts a goroutine for
+// the garbage collector.
+func newTTLCache(ctx context.Context, ttl time.Duration) *ttlCache {
 	c := &ttlCache{
+		ctx:     ctx,
+		logger:  log.FromContext(ctx),
 		ttl:     ttl,
 		entries: make(map[string]*entry),
 	}
@@ -27,11 +33,9 @@ func newTTLCache(ttl time.Duration) *ttlCache {
 	return c
 }
 
-// GetOrFetch returns the rights of the given key or uses the given `fetch` function
-// to loads them in the cache and returns it if the key is expired or not found.
-func (c *ttlCache) GetOrFetch(auth, entityID string, fetch func() ([]ttnpb.Right, error)) ([]ttnpb.Right, error) {
-	key := fmt.Sprintf("%s:%s", auth, entityID)
-
+// GetOrFetch returns the cached rights of the given key or calls `fetch` to load
+// them if they cache entry is expired or not found.
+func (c *ttlCache) GetOrFetch(key string, fetch func() ([]ttnpb.Right, error)) ([]ttnpb.Right, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -40,7 +44,7 @@ func (c *ttlCache) GetOrFetch(auth, entityID string, fetch func() ([]ttnpb.Right
 		return e.value, nil
 	}
 
-	// otherwise fetch
+	// Otherwise fetch.
 	rights, err := fetch()
 	if err != nil {
 		return nil, err
@@ -58,14 +62,19 @@ func (c *ttlCache) garbageCollector() {
 	ticker := time.NewTicker(c.ttl)
 	defer ticker.Stop()
 	for {
-		<-ticker.C
-		c.mu.Lock()
-		for key, e := range c.entries {
-			if e.IsExpired(c.ttl) {
-				delete(c.entries, key)
+		select {
+		case <-c.ctx.Done():
+			c.logger.WithError(c.ctx.Err()).Info("TTL cache garbage collector has been stopped")
+			return
+		case <-ticker.C:
+			c.mu.Lock()
+			for key, e := range c.entries {
+				if e.IsExpired(c.ttl) {
+					delete(c.entries, key)
+				}
 			}
+			c.mu.Unlock()
 		}
-		c.mu.Unlock()
 	}
 }
 

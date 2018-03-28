@@ -1,6 +1,6 @@
 // Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
 
-package identityserver
+package rights
 
 import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 
@@ -11,5 +11,5 @@ import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 type cache interface {
 	// GetOrFetch gets the entry with the given key and loads it in the cache using
 	// the given `fetch` method if it is not found.
-	GetOrFetch(auth, entityID string, fetch func() ([]ttnpb.Right, error)) ([]ttnpb.Right, error)
+	GetOrFetch(key string, fetch func() ([]ttnpb.Right, error)) ([]ttnpb.Right, error)
 }
