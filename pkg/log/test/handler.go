@@ -4,6 +4,7 @@ package test
 
 import (
 	"bytes"
+	"sync"
 
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 )
@@ -18,6 +19,7 @@ type Logger interface {
 type TestingHandler struct {
 	logger     Logger
 	cliHandler *log.CLIHandler
+	bufferMu   sync.Mutex
 	buffer     *bytes.Buffer
 }
 
@@ -34,6 +36,9 @@ func NewTestingHandler(l Logger) *TestingHandler {
 
 // HandleLog implements Handler.
 func (h *TestingHandler) HandleLog(e log.Entry) error {
+	h.bufferMu.Lock()
+	defer h.bufferMu.Unlock()
+
 	defer h.buffer.Reset()
 	if err := h.cliHandler.HandleLog(e); err != nil {
 		return err
