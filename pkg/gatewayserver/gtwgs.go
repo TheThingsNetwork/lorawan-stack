@@ -108,7 +108,7 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 		cancel()
 	}()
 
-	ctx = log.WithLogger(ctx, logger)
+	ctx = log.NewContext(ctx, logger)
 	for {
 		select {
 		case <-ctx.Done():

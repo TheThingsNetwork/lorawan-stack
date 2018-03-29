@@ -27,7 +27,7 @@ func init() {
 		log.WithLevel(log.DebugLevel),
 		log.WithHandler(log.NewCLI(os.Stdout)),
 	)
-	ctx = log.WithLogger(context.Background(), logger.WithField("namespace", "cluster"))
+	ctx = log.NewContext(context.Background(), logger.WithField("namespace", "cluster"))
 	rpclog.ReplaceGrpcLogger(logger.WithField("namespace", "grpc"))
 }
 

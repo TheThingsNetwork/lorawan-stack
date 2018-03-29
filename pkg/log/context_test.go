@@ -21,7 +21,7 @@ func TestContext(t *testing.T) {
 	a.So(FromContext(ctx), should.Equal, Noop)
 	a.So(func() { Must(FromContext(ctx)) }, should.NotPanic)
 
-	ctx = WithLogger(ctx, logger)
+	ctx = NewContext(ctx, logger)
 
 	a.So(FromContext(ctx), should.Equal, logger)
 	a.So(func() { Must(FromContext(ctx)) }, should.NotPanic)

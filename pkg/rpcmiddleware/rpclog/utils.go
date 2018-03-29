@@ -3,10 +3,10 @@
 package rpclog
 
 import (
+	"context"
 	"fmt"
 	"path"
 
-	"context"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
 )
@@ -25,7 +25,7 @@ func newLoggerForCall(ctx context.Context, logger log.Interface, fullMethodStrin
 	if tags := grpc_ctxtags.Extract(ctx).Values(); len(tags) > 0 {
 		logger = logger.WithFields(&fielder{values: tags})
 	}
-	return log.WithLogger(ctx, logger.WithFields(log.Fields(
+	return log.NewContext(ctx, logger.WithFields(log.Fields(
 		"grpc_service", service,
 		"grpc_method", method,
 	)))

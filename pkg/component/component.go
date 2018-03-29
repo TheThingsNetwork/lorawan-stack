@@ -60,7 +60,7 @@ func MustNew(logger log.Stack, config *Config) *Component {
 // New returns a new component
 func New(logger log.Stack, config *Config) (*Component, error) {
 	ctx, cancel := context.WithCancel(context.Background())
-	ctx = log.WithLogger(ctx, logger)
+	ctx = log.NewContext(ctx, logger)
 
 	c := &Component{
 		ctx:       ctx,

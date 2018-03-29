@@ -4,19 +4,18 @@ package log
 
 import "context"
 
-// Key is the key where the logger will live in the context.
-var Key = &key{}
+type loggerKeyType struct{}
 
-type key struct{}
+var loggerKey = &loggerKeyType{}
 
-// WithLogger sets the logger in the context.
-func WithLogger(ctx context.Context, logger Interface) context.Context {
-	return context.WithValue(ctx, Key, logger)
+// NewContext returns a derived context with the logger set.
+func NewContext(ctx context.Context, logger Interface) context.Context {
+	return context.WithValue(ctx, loggerKey, logger)
 }
 
 // FromContext returns the logger that is attached to the context or returns the Noop logger if it does not exist
 func FromContext(ctx context.Context) Interface {
-	if v := ctx.Value(Key); v != nil {
+	if v := ctx.Value(loggerKey); v != nil {
 		if logger, ok := v.(Interface); ok {
 			return logger
 		}
