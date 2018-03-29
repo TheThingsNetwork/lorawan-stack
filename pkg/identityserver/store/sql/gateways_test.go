@@ -34,7 +34,7 @@ func TestGateways(t *testing.T) {
 				Frequency: 10,
 			},
 		},
-		ContactAccount: &ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &alice.UserIdentifiers}},
+		ContactAccountIDs: &ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &alice.UserIdentifiers}},
 		Antennas: []ttnpb.GatewayAntenna{
 			{
 				Location: ttnpb.Location{

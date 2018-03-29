@@ -95,7 +95,7 @@ func testClient() *ttnpb.Client {
 	cli := &ttnpb.Client{
 		ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "test-client"},
 		Description:       "foo description",
-		Creator:           testUsers()["alice"].UserIdentifiers,
+		CreatorIDs:        testUsers()["alice"].UserIdentifiers,
 		Secret:            "secret",
 		RedirectURI:       "localhost",
 		Rights:            make([]ttnpb.Right, 0, 50),

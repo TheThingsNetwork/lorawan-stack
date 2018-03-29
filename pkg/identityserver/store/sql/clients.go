@@ -58,7 +58,7 @@ func (s *ClientStore) Create(client store.Client) error {
 	err := s.transact(func(tx *db.Tx) error {
 		cli := client.GetClient()
 
-		userID, err := s.store().Users.(*UserStore).getUserID(tx, cli.Creator)
+		userID, err := s.store().Users.(*UserStore).getUserID(tx, cli.CreatorIDs)
 		if err != nil {
 			return err
 		}
@@ -182,7 +182,7 @@ func (s *ClientStore) getByID(q db.QueryContext, id uuid.UUID) (client ttnpb.Cli
 
 	res.RightsConverted.SetInto(&res.Client.Rights)
 	res.GrantsConverted.SetInto(&res.Client.Grants)
-	res.Client.Creator, err = s.store().Users.(*UserStore).getUserIdentifiersFromID(q, res.CreatorID)
+	res.Client.CreatorIDs, err = s.store().Users.(*UserStore).getUserIdentifiersFromID(q, res.CreatorID)
 	client = res.Client
 
 	return
@@ -253,7 +253,7 @@ func (s *ClientStore) list(q db.QueryContext) ([]client, error) {
 		if err != nil {
 			return nil, err
 		}
-		client.client.Client.Creator = userID
+		client.client.Client.CreatorIDs = userID
 
 		clients = append(clients, client.client)
 	}
@@ -327,7 +327,7 @@ func (s *ClientStore) userClients(q db.QueryContext, userID uuid.UUID) ([]client
 		if err != nil {
 			return nil, err
 		}
-		client.client.Client.Creator = userID
+		client.client.Client.CreatorIDs = userID
 
 		clients = append(clients, client.client)
 	}
@@ -367,7 +367,7 @@ func (s *ClientStore) update(q db.QueryContext, clientID uuid.UUID, data *ttnpb.
 		Client: *data,
 	}
 
-	input.CreatorID, err = s.store().Users.(*UserStore).getUserID(q, input.Creator)
+	input.CreatorID, err = s.store().Users.(*UserStore).getUserID(q, input.CreatorIDs)
 	if err != nil {
 		return err
 	}

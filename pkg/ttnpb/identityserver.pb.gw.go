@@ -123,15 +123,15 @@ func request_IsAdmin_UpdateUser_0(ctx context.Context, marshaler runtime.Marshal
 		_   = err
 	)
 
-	val, ok = pathParams["user.id.user_id"]
+	val, ok = pathParams["user.ids.user_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user.id.user_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user.ids.user_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "user.id.user_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "user.ids.user_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user.id.user_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user.ids.user_id", err)
 	}
 
 	msg, err := client.UpdateUser(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -301,15 +301,15 @@ func request_IsAdmin_UpdateClient_0(ctx context.Context, marshaler runtime.Marsh
 		_   = err
 	)
 
-	val, ok = pathParams["client.id.client_id"]
+	val, ok = pathParams["client.ids.client_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "client.id.client_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "client.ids.client_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "client.id.client_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "client.ids.client_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client.id.client_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client.ids.client_id", err)
 	}
 
 	msg, err := client.UpdateClient(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -561,7 +561,7 @@ func request_IsApplication_CreateApplication_0(ctx context.Context, marshaler ru
 }
 
 var (
-	filter_IsApplication_CreateApplication_1 = &utilities.DoubleArray{Encoding: map[string]int{"application": 0, "organization_id": 1}, Base: []int{1, 1, 3, 0, 3, 0}, Check: []int{0, 1, 1, 2, 3, 5}}
+	filter_IsApplication_CreateApplication_1 = &utilities.DoubleArray{Encoding: map[string]int{"application": 0, "organization_ids": 1, "organization_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 3, 2, 4}}
 )
 
 func request_IsApplication_CreateApplication_1(ctx context.Context, marshaler runtime.Marshaler, client IsApplicationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -579,15 +579,15 @@ func request_IsApplication_CreateApplication_1(ctx context.Context, marshaler ru
 		_   = err
 	)
 
-	val, ok = pathParams["organization_id.organization_id"]
+	val, ok = pathParams["organization_ids.organization_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id.organization_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_ids.organization_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "organization_id.organization_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "organization_ids.organization_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id.organization_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_ids.organization_id", err)
 	}
 
 	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_IsApplication_CreateApplication_1); err != nil {
@@ -644,7 +644,7 @@ func request_IsApplication_ListApplications_0(ctx context.Context, marshaler run
 }
 
 var (
-	filter_IsApplication_ListApplications_1 = &utilities.DoubleArray{Encoding: map[string]int{"organization_id": 0}, Base: []int{1, 2, 2, 0}, Check: []int{0, 1, 2, 3}}
+	filter_IsApplication_ListApplications_1 = &utilities.DoubleArray{Encoding: map[string]int{"organization_ids": 0, "organization_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
 func request_IsApplication_ListApplications_1(ctx context.Context, marshaler runtime.Marshaler, client IsApplicationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -658,15 +658,15 @@ func request_IsApplication_ListApplications_1(ctx context.Context, marshaler run
 		_   = err
 	)
 
-	val, ok = pathParams["organization_id.organization_id"]
+	val, ok = pathParams["organization_ids.organization_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id.organization_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_ids.organization_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "organization_id.organization_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "organization_ids.organization_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id.organization_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_ids.organization_id", err)
 	}
 
 	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_IsApplication_ListApplications_1); err != nil {
@@ -693,15 +693,15 @@ func request_IsApplication_UpdateApplication_0(ctx context.Context, marshaler ru
 		_   = err
 	)
 
-	val, ok = pathParams["application.id.application_id"]
+	val, ok = pathParams["application.ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application.id.application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application.ids.application_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "application.id.application_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application.ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application.id.application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application.ids.application_id", err)
 	}
 
 	msg, err := client.UpdateApplication(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -751,15 +751,15 @@ func request_IsApplication_GenerateApplicationAPIKey_0(ctx context.Context, mars
 		_   = err
 	)
 
-	val, ok = pathParams["application_id.application_id"]
+	val, ok = pathParams["application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id.application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "application_id.application_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id.application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
 	msg, err := client.GenerateApplicationAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -809,15 +809,15 @@ func request_IsApplication_UpdateApplicationAPIKey_0(ctx context.Context, marsha
 		_   = err
 	)
 
-	val, ok = pathParams["application_id.application_id"]
+	val, ok = pathParams["application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id.application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "application_id.application_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id.application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
 	val, ok = pathParams["name"]
@@ -837,7 +837,7 @@ func request_IsApplication_UpdateApplicationAPIKey_0(ctx context.Context, marsha
 }
 
 var (
-	filter_IsApplication_RemoveApplicationAPIKey_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_id": 0, "name": 1}, Base: []int{1, 3, 3, 2, 0, 0}, Check: []int{0, 1, 1, 2, 4, 3}}
+	filter_IsApplication_RemoveApplicationAPIKey_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "name": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_IsApplication_RemoveApplicationAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client IsApplicationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -851,15 +851,15 @@ func request_IsApplication_RemoveApplicationAPIKey_0(ctx context.Context, marsha
 		_   = err
 	)
 
-	val, ok = pathParams["application_id.application_id"]
+	val, ok = pathParams["application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id.application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "application_id.application_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id.application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
 	val, ok = pathParams["name"]
@@ -897,15 +897,15 @@ func request_IsApplication_SetApplicationCollaborator_0(ctx context.Context, mar
 		_   = err
 	)
 
-	val, ok = pathParams["application_id.application_id"]
+	val, ok = pathParams["application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id.application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "application_id.application_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id.application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
 	msg, err := client.SetApplicationCollaborator(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -989,7 +989,7 @@ func request_IsGateway_CreateGateway_0(ctx context.Context, marshaler runtime.Ma
 }
 
 var (
-	filter_IsGateway_CreateGateway_1 = &utilities.DoubleArray{Encoding: map[string]int{"gateway": 0, "organization_id": 1}, Base: []int{1, 1, 3, 0, 3, 0}, Check: []int{0, 1, 1, 2, 3, 5}}
+	filter_IsGateway_CreateGateway_1 = &utilities.DoubleArray{Encoding: map[string]int{"gateway": 0, "organization_ids": 1, "organization_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 3, 2, 4}}
 )
 
 func request_IsGateway_CreateGateway_1(ctx context.Context, marshaler runtime.Marshaler, client IsGatewayClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1007,15 +1007,15 @@ func request_IsGateway_CreateGateway_1(ctx context.Context, marshaler runtime.Ma
 		_   = err
 	)
 
-	val, ok = pathParams["organization_id.organization_id"]
+	val, ok = pathParams["organization_ids.organization_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id.organization_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_ids.organization_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "organization_id.organization_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "organization_ids.organization_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id.organization_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_ids.organization_id", err)
 	}
 
 	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_IsGateway_CreateGateway_1); err != nil {
@@ -1072,7 +1072,7 @@ func request_IsGateway_ListGateways_0(ctx context.Context, marshaler runtime.Mar
 }
 
 var (
-	filter_IsGateway_ListGateways_1 = &utilities.DoubleArray{Encoding: map[string]int{"organization_id": 0}, Base: []int{1, 2, 2, 0}, Check: []int{0, 1, 2, 3}}
+	filter_IsGateway_ListGateways_1 = &utilities.DoubleArray{Encoding: map[string]int{"organization_ids": 0, "organization_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
 func request_IsGateway_ListGateways_1(ctx context.Context, marshaler runtime.Marshaler, client IsGatewayClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1086,15 +1086,15 @@ func request_IsGateway_ListGateways_1(ctx context.Context, marshaler runtime.Mar
 		_   = err
 	)
 
-	val, ok = pathParams["organization_id.organization_id"]
+	val, ok = pathParams["organization_ids.organization_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id.organization_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_ids.organization_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "organization_id.organization_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "organization_ids.organization_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id.organization_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_ids.organization_id", err)
 	}
 
 	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_IsGateway_ListGateways_1); err != nil {
@@ -1121,15 +1121,15 @@ func request_IsGateway_UpdateGateway_0(ctx context.Context, marshaler runtime.Ma
 		_   = err
 	)
 
-	val, ok = pathParams["gateway.id.gateway_id"]
+	val, ok = pathParams["gateway.ids.gateway_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway.id.gateway_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway.ids.gateway_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "gateway.id.gateway_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "gateway.ids.gateway_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway.id.gateway_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway.ids.gateway_id", err)
 	}
 
 	msg, err := client.UpdateGateway(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1179,15 +1179,15 @@ func request_IsGateway_GenerateGatewayAPIKey_0(ctx context.Context, marshaler ru
 		_   = err
 	)
 
-	val, ok = pathParams["gateway_id.gateway_id"]
+	val, ok = pathParams["gateway_ids.gateway_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_id.gateway_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_ids.gateway_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "gateway_id.gateway_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "gateway_ids.gateway_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id.gateway_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_ids.gateway_id", err)
 	}
 
 	msg, err := client.GenerateGatewayAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1237,15 +1237,15 @@ func request_IsGateway_UpdateGatewayAPIKey_0(ctx context.Context, marshaler runt
 		_   = err
 	)
 
-	val, ok = pathParams["gateway_id.gateway_id"]
+	val, ok = pathParams["gateway_ids.gateway_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_id.gateway_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_ids.gateway_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "gateway_id.gateway_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "gateway_ids.gateway_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id.gateway_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_ids.gateway_id", err)
 	}
 
 	val, ok = pathParams["name"]
@@ -1265,7 +1265,7 @@ func request_IsGateway_UpdateGatewayAPIKey_0(ctx context.Context, marshaler runt
 }
 
 var (
-	filter_IsGateway_RemoveGatewayAPIKey_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0, "name": 1}, Base: []int{1, 3, 3, 2, 0, 0}, Check: []int{0, 1, 1, 2, 4, 3}}
+	filter_IsGateway_RemoveGatewayAPIKey_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_ids": 0, "gateway_id": 1, "name": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_IsGateway_RemoveGatewayAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client IsGatewayClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1279,15 +1279,15 @@ func request_IsGateway_RemoveGatewayAPIKey_0(ctx context.Context, marshaler runt
 		_   = err
 	)
 
-	val, ok = pathParams["gateway_id.gateway_id"]
+	val, ok = pathParams["gateway_ids.gateway_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_id.gateway_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_ids.gateway_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "gateway_id.gateway_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "gateway_ids.gateway_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id.gateway_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_ids.gateway_id", err)
 	}
 
 	val, ok = pathParams["name"]
@@ -1325,15 +1325,15 @@ func request_IsGateway_SetGatewayCollaborator_0(ctx context.Context, marshaler r
 		_   = err
 	)
 
-	val, ok = pathParams["gateway_id.gateway_id"]
+	val, ok = pathParams["gateway_ids.gateway_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_id.gateway_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_ids.gateway_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "gateway_id.gateway_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "gateway_ids.gateway_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id.gateway_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_ids.gateway_id", err)
 	}
 
 	msg, err := client.SetGatewayCollaborator(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1459,15 +1459,15 @@ func request_IsClient_UpdateClient_0(ctx context.Context, marshaler runtime.Mars
 		_   = err
 	)
 
-	val, ok = pathParams["client.id.client_id"]
+	val, ok = pathParams["client.ids.client_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "client.id.client_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "client.ids.client_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "client.id.client_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "client.ids.client_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client.id.client_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client.ids.client_id", err)
 	}
 
 	msg, err := client.UpdateClient(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1566,15 +1566,15 @@ func request_IsOrganization_UpdateOrganization_0(ctx context.Context, marshaler 
 		_   = err
 	)
 
-	val, ok = pathParams["organization.id.organization_id"]
+	val, ok = pathParams["organization.ids.organization_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization.id.organization_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization.ids.organization_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "organization.id.organization_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "organization.ids.organization_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization.id.organization_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization.ids.organization_id", err)
 	}
 
 	msg, err := client.UpdateOrganization(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1624,15 +1624,15 @@ func request_IsOrganization_GenerateOrganizationAPIKey_0(ctx context.Context, ma
 		_   = err
 	)
 
-	val, ok = pathParams["organization_id.organization_id"]
+	val, ok = pathParams["organization_ids.organization_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id.organization_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_ids.organization_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "organization_id.organization_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "organization_ids.organization_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id.organization_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_ids.organization_id", err)
 	}
 
 	msg, err := client.GenerateOrganizationAPIKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1682,15 +1682,15 @@ func request_IsOrganization_UpdateOrganizationAPIKey_0(ctx context.Context, mars
 		_   = err
 	)
 
-	val, ok = pathParams["organization_id.organization_id"]
+	val, ok = pathParams["organization_ids.organization_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id.organization_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_ids.organization_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "organization_id.organization_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "organization_ids.organization_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id.organization_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_ids.organization_id", err)
 	}
 
 	val, ok = pathParams["name"]
@@ -1710,7 +1710,7 @@ func request_IsOrganization_UpdateOrganizationAPIKey_0(ctx context.Context, mars
 }
 
 var (
-	filter_IsOrganization_RemoveOrganizationAPIKey_0 = &utilities.DoubleArray{Encoding: map[string]int{"organization_id": 0, "name": 1}, Base: []int{1, 3, 3, 2, 0, 0}, Check: []int{0, 1, 1, 2, 4, 3}}
+	filter_IsOrganization_RemoveOrganizationAPIKey_0 = &utilities.DoubleArray{Encoding: map[string]int{"organization_ids": 0, "organization_id": 1, "name": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_IsOrganization_RemoveOrganizationAPIKey_0(ctx context.Context, marshaler runtime.Marshaler, client IsOrganizationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -1724,15 +1724,15 @@ func request_IsOrganization_RemoveOrganizationAPIKey_0(ctx context.Context, mars
 		_   = err
 	)
 
-	val, ok = pathParams["organization_id.organization_id"]
+	val, ok = pathParams["organization_ids.organization_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id.organization_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_ids.organization_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "organization_id.organization_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "organization_ids.organization_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id.organization_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_ids.organization_id", err)
 	}
 
 	val, ok = pathParams["name"]
@@ -1770,15 +1770,15 @@ func request_IsOrganization_SetOrganizationMember_0(ctx context.Context, marshal
 		_   = err
 	)
 
-	val, ok = pathParams["organization_id.organization_id"]
+	val, ok = pathParams["organization_ids.organization_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id.organization_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_ids.organization_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "organization_id.organization_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "organization_ids.organization_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id.organization_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_ids.organization_id", err)
 	}
 
 	msg, err := client.SetOrganizationMember(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -2327,7 +2327,7 @@ var (
 
 	pattern_IsAdmin_ListUsers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"admin", "users"}, ""))
 
-	pattern_IsAdmin_UpdateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"admin", "users", "user.id.user_id"}, ""))
+	pattern_IsAdmin_UpdateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"admin", "users", "user.ids.user_id"}, ""))
 
 	pattern_IsAdmin_ResetUserPassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"admin", "users", "user_id", "reset-password"}, ""))
 
@@ -2343,7 +2343,7 @@ var (
 
 	pattern_IsAdmin_ListClients_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"admin", "clients"}, ""))
 
-	pattern_IsAdmin_UpdateClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"admin", "clients", "client.id.client_id"}, ""))
+	pattern_IsAdmin_UpdateClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"admin", "clients", "client.ids.client_id"}, ""))
 
 	pattern_IsAdmin_DeleteClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"admin", "clients", "client_id"}, ""))
 )
@@ -3304,27 +3304,27 @@ func RegisterIsApplicationHandlerClient(ctx context.Context, mux *runtime.ServeM
 var (
 	pattern_IsApplication_CreateApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"applications"}, ""))
 
-	pattern_IsApplication_CreateApplication_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id.organization_id", "applications"}, ""))
+	pattern_IsApplication_CreateApplication_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "applications"}, ""))
 
 	pattern_IsApplication_GetApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application_id"}, ""))
 
 	pattern_IsApplication_ListApplications_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"applications"}, ""))
 
-	pattern_IsApplication_ListApplications_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id.organization_id", "applications"}, ""))
+	pattern_IsApplication_ListApplications_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "applications"}, ""))
 
-	pattern_IsApplication_UpdateApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application.id.application_id"}, ""))
+	pattern_IsApplication_UpdateApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application.ids.application_id"}, ""))
 
 	pattern_IsApplication_DeleteApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application_id"}, ""))
 
-	pattern_IsApplication_GenerateApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id.application_id", "api-keys"}, ""))
+	pattern_IsApplication_GenerateApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "api-keys"}, ""))
 
 	pattern_IsApplication_ListApplicationAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id", "api-keys"}, ""))
 
-	pattern_IsApplication_UpdateApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "application_id.application_id", "api-keys", "name"}, ""))
+	pattern_IsApplication_UpdateApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "application_ids.application_id", "api-keys", "name"}, ""))
 
-	pattern_IsApplication_RemoveApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "application_id.application_id", "api-keys", "name"}, ""))
+	pattern_IsApplication_RemoveApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "application_ids.application_id", "api-keys", "name"}, ""))
 
-	pattern_IsApplication_SetApplicationCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id.application_id", "collaborators"}, ""))
+	pattern_IsApplication_SetApplicationCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "collaborators"}, ""))
 
 	pattern_IsApplication_ListApplicationCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id", "collaborators"}, ""))
 
@@ -3811,27 +3811,27 @@ func RegisterIsGatewayHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 var (
 	pattern_IsGateway_CreateGateway_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"gateways"}, ""))
 
-	pattern_IsGateway_CreateGateway_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id.organization_id", "gateways"}, ""))
+	pattern_IsGateway_CreateGateway_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "gateways"}, ""))
 
 	pattern_IsGateway_GetGateway_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"gateways", "gateway_id"}, ""))
 
 	pattern_IsGateway_ListGateways_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"gateways"}, ""))
 
-	pattern_IsGateway_ListGateways_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id.organization_id", "gateways"}, ""))
+	pattern_IsGateway_ListGateways_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "gateways"}, ""))
 
-	pattern_IsGateway_UpdateGateway_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"gateways", "gateway.id.gateway_id"}, ""))
+	pattern_IsGateway_UpdateGateway_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"gateways", "gateway.ids.gateway_id"}, ""))
 
 	pattern_IsGateway_DeleteGateway_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"gateways", "gateway_id"}, ""))
 
-	pattern_IsGateway_GenerateGatewayAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_id.gateway_id", "api-keys"}, ""))
+	pattern_IsGateway_GenerateGatewayAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_ids.gateway_id", "api-keys"}, ""))
 
 	pattern_IsGateway_ListGatewayAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_id", "api-keys"}, ""))
 
-	pattern_IsGateway_UpdateGatewayAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"gateways", "gateway_id.gateway_id", "api-keys", "name"}, ""))
+	pattern_IsGateway_UpdateGatewayAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"gateways", "gateway_ids.gateway_id", "api-keys", "name"}, ""))
 
-	pattern_IsGateway_RemoveGatewayAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"gateways", "gateway_id.gateway_id", "api-keys", "name"}, ""))
+	pattern_IsGateway_RemoveGatewayAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"gateways", "gateway_ids.gateway_id", "api-keys", "name"}, ""))
 
-	pattern_IsGateway_SetGatewayCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_id.gateway_id", "collaborators"}, ""))
+	pattern_IsGateway_SetGatewayCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_ids.gateway_id", "collaborators"}, ""))
 
 	pattern_IsGateway_ListGatewayCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_id", "collaborators"}, ""))
 
@@ -4061,7 +4061,7 @@ var (
 
 	pattern_IsClient_ListClients_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"clients"}, ""))
 
-	pattern_IsClient_UpdateClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"clients", "client.id.client_id"}, ""))
+	pattern_IsClient_UpdateClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"clients", "client.ids.client_id"}, ""))
 
 	pattern_IsClient_DeleteClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"clients", "client_id"}, ""))
 )
@@ -4474,19 +4474,19 @@ var (
 
 	pattern_IsOrganization_ListOrganizations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"organizations"}, ""))
 
-	pattern_IsOrganization_UpdateOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization.id.organization_id"}, ""))
+	pattern_IsOrganization_UpdateOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization.ids.organization_id"}, ""))
 
 	pattern_IsOrganization_DeleteOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization_id"}, ""))
 
-	pattern_IsOrganization_GenerateOrganizationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id.organization_id", "api-keys"}, ""))
+	pattern_IsOrganization_GenerateOrganizationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "api-keys"}, ""))
 
 	pattern_IsOrganization_ListOrganizationAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id", "api-keys"}, ""))
 
-	pattern_IsOrganization_UpdateOrganizationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"organizations", "organization_id.organization_id", "api-keys", "name"}, ""))
+	pattern_IsOrganization_UpdateOrganizationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"organizations", "organization_ids.organization_id", "api-keys", "name"}, ""))
 
-	pattern_IsOrganization_RemoveOrganizationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"organizations", "organization_id.organization_id", "api-keys", "name"}, ""))
+	pattern_IsOrganization_RemoveOrganizationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"organizations", "organization_ids.organization_id", "api-keys", "name"}, ""))
 
-	pattern_IsOrganization_SetOrganizationMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id.organization_id", "members"}, ""))
+	pattern_IsOrganization_SetOrganizationMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "members"}, ""))
 
 	pattern_IsOrganization_ListOrganizationMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id", "members"}, ""))
 

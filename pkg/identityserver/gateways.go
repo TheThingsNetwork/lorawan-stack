@@ -60,7 +60,7 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 			Antennas:           req.Gateway.Antennas,
 			Attributes:         req.Gateway.Attributes,
 			ClusterAddress:     req.Gateway.ClusterAddress,
-			ContactAccount:     req.Gateway.ContactAccount,
+			ContactAccountIDs:  req.Gateway.ContactAccountIDs,
 		})
 		if err != nil {
 			return err
@@ -171,8 +171,8 @@ func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGat
 				}
 			case ttnpb.FieldPathGatewayClusterAddress.MatchString(path):
 				gtw.ClusterAddress = req.Gateway.ClusterAddress
-			case ttnpb.FieldPathGatewayContactAccountUserID.MatchString(path):
-				gtw.ContactAccount = &ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: req.Gateway.ContactAccount.GetUserID()}}
+			case ttnpb.FieldPathGatewayContactAccountIDs.MatchString(path):
+				gtw.ContactAccountIDs = &ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: req.Gateway.ContactAccountIDs.GetUserID()}}
 			default:
 				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
 					"path": path,

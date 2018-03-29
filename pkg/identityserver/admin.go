@@ -533,7 +533,7 @@ func (s *adminService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdenti
 			return err
 		}
 
-		user, err := tx.Users.GetByID(found.GetClient().Creator, s.config.Specializers.User)
+		user, err := tx.Users.GetByID(found.GetClient().CreatorIDs, s.config.Specializers.User)
 		if err != nil {
 			return err
 		}

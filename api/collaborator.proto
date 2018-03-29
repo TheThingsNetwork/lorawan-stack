@@ -11,22 +11,22 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 message ApplicationCollaborator {
-  // application_id is the application's ID.
-  ApplicationIdentifiers application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
+  // application_ids are the application identifiers.
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // collaborator_id is either an organization's ID or user's ID.
-  OrganizationOrUserIdentifiers collaborator_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
+  // collaborator_ids is either an organization's ID or user's ID.
+  OrganizationOrUserIdentifiers collaborator_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // rights is the list of rights the user bears to the application.
   repeated Right rights = 3;
 }
 
 message GatewayCollaborator {
-  // gateway_id is the gateway's ID.
-  GatewayIdentifiers gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
+  // gateway_ids are the gateway identifiers.
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // collaborator_id is either an organization's ID or user's ID.
-  OrganizationOrUserIdentifiers collaborator_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
+  // collaborator_ids is either an organization's ID or user's ID.
+  OrganizationOrUserIdentifiers collaborator_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // rights is the list of rights the user bears to the application.
   repeated Right rights = 3;

@@ -31,7 +31,7 @@ func TestClient(t *testing.T) {
 		Rights:            []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
 		State:             ttnpb.STATE_PENDING,
 		OfficialLabeled:   false,
-		Creator:           ttnpb.UserIdentifiers{UserID: user.UserID},
+		CreatorIDs:        ttnpb.UserIdentifiers{UserID: user.UserID},
 	}
 
 	ctx := testCtx(user.UserID)
@@ -63,7 +63,7 @@ func TestClient(t *testing.T) {
 	a.So(found.Description, should.Equal, cli.Description)
 	a.So(found.Secret, should.BeEmpty)
 	a.So(found.RedirectURI, should.Equal, cli.RedirectURI)
-	a.So(found.Creator.UserID, should.BeEmpty)
+	a.So(found.CreatorIDs.UserID, should.BeEmpty)
 	a.So(found.Rights, should.Resemble, cli.Rights)
 
 	clients, err := is.clientService.ListClients(ctx, &pbtypes.Empty{})

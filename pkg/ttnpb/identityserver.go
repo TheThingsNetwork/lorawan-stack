@@ -226,8 +226,8 @@ func (req *CreateGatewayRequest) Validate() error {
 		validate.Field(req.OrganizationID, validate.NotRequired, validate.ID).DescribeFieldName("Organization ID"),
 	)
 
-	if req.Gateway.ContactAccount != nil {
-		validations = append(validations, req.Gateway.ContactAccount.Validate())
+	if req.Gateway.ContactAccountIDs != nil {
+		validations = append(validations, req.Gateway.ContactAccountIDs.Validate())
 	}
 
 	// if radios are set check for each one that frequency is present.
@@ -272,12 +272,12 @@ func (req *UpdateGatewayRequest) Validate() error {
 			for _, radio := range req.Gateway.Radios {
 				validations = append(validations, validate.Field(radio.Frequency, validate.Required).DescribeFieldName("Radio Frequency"))
 			}
-		case FieldPathGatewayContactAccountUserID.MatchString(path):
-			if req.Gateway.ContactAccount == nil {
+		case FieldPathGatewayContactAccountIDs.MatchString(path):
+			if req.Gateway.ContactAccountIDs == nil {
 				continue
 			}
 
-			err = req.Gateway.ContactAccount.Validate()
+			err = req.Gateway.ContactAccountIDs.Validate()
 		default:
 			return ErrInvalidPathUpdateMask.New(errors.Attributes{
 				"path": path,

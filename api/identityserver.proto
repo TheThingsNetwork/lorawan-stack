@@ -24,8 +24,8 @@ package ttn.v3;
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 message PullConfigurationRequest {
-  // gateway_id is the gateway's ID to be fetched in the stream.
-  GatewayIdentifiers gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // gateway_ids are the identifiers of the gateway to be fetched in the stream.
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // projection_mask is the symbolic set of fields that will be filtered in the
   // response. If empty all fields will be returned.
@@ -181,7 +181,7 @@ service IsAdmin {
   // the `SkipValidation` setting is disabled.
   rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/admin/users/{user.id.user_id}"
+      patch: "/admin/users/{user.ids.user_id}"
       body: "*"
     };
   };
@@ -242,7 +242,7 @@ service IsAdmin {
   // UpdateClient updates a third-party client.
   rpc UpdateClient(UpdateClientRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/admin/clients/{client.id.client_id}"
+      patch: "/admin/clients/{client.ids.client_id}"
       body: "*"
     };
   };
@@ -432,14 +432,14 @@ message CreateApplicationRequest {
   // application is the application to be created.
   Application application = 1 [(gogoproto.nullable) = false];
 
-  // organization_id is the optional organization's ID that creates the application.
-  OrganizationIdentifiers organization_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // organization_ids is the optional organization's ID that creates the application.
+  OrganizationIdentifiers organization_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message ListApplicationsRequest {
-  // organization_id is the optional organization's ID whose applications will be
+  // organization_ids is the optional organization's ID whose applications will be
   // listed of.
-  OrganizationIdentifiers organization_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message ListApplicationsResponse {
@@ -458,8 +458,8 @@ message UpdateApplicationRequest {
 }
 
 message GenerateApplicationAPIKeyRequest {
-  // application_id is the application's ID which API key will be added to.
-  ApplicationIdentifiers application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
+  // application_ids is the application's ID which API key will be added to.
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
 
   // name is the name of the API key to be generated.
   string name = 2;
@@ -474,8 +474,8 @@ message ListApplicationAPIKeysResponse {
 }
 
 message UpdateApplicationAPIKeyRequest {
-  // application_id is the application's ID which an API key will be modified.
-  ApplicationIdentifiers application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
+  // application_ids is the application's ID which an API key will be modified.
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
 
   // name is the name of the application API key to be updated.
   string name = 2;
@@ -485,8 +485,8 @@ message UpdateApplicationAPIKeyRequest {
 }
 
 message RemoveApplicationAPIKeyRequest {
-  // application_id is the application's ID which the API key will be removed from.
-  ApplicationIdentifiers application_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
+  // application_ids is the application's ID which the API key will be removed from.
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
 
   // name is the name of the application API key to be removed.
   string name = 2;
@@ -516,7 +516,7 @@ service IsApplication {
       post: "/applications"
       body: "application"
       additional_bindings {
-        post: "/organizations/{organization_id.organization_id}/applications"
+        post: "/organizations/{organization_ids.organization_id}/applications"
         body: "application"
       }
     };
@@ -537,7 +537,7 @@ service IsApplication {
     option (google.api.http) = {
       get: "/applications"
       additional_bindings {
-        get: "/organizations/{organization_id.organization_id}/applications"
+        get: "/organizations/{organization_ids.organization_id}/applications"
       }
     };
   };
@@ -545,7 +545,7 @@ service IsApplication {
   // UpdateApplication edits an application.
   rpc UpdateApplication(UpdateApplicationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/applications/{application.id.application_id}"
+      patch: "/applications/{application.ids.application_id}"
       body: "*"
     };
   };
@@ -561,7 +561,7 @@ service IsApplication {
   // and returns it.
   rpc GenerateApplicationAPIKey(GenerateApplicationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
-      post: "/applications/{application_id.application_id}/api-keys"
+      post: "/applications/{application_ids.application_id}/api-keys"
       body: "*"
     };
   };
@@ -577,7 +577,7 @@ service IsApplication {
   // UpdateApplicationAPIKey updates the rights of a given application API key.
   rpc UpdateApplicationAPIKey(UpdateApplicationAPIKeyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/applications/{application_id.application_id}/api-keys/{name}"
+      patch: "/applications/{application_ids.application_id}/api-keys/{name}"
       body: "*"
     };
   };
@@ -585,7 +585,7 @@ service IsApplication {
   // RemoveApplicationAPIKey removes a given API key from an application.
   rpc RemoveApplicationAPIKey(RemoveApplicationAPIKeyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/applications/{application_id.application_id}/api-keys/{name}"
+      delete: "/applications/{application_ids.application_id}/api-keys/{name}"
     };
   };
 
@@ -597,7 +597,7 @@ service IsApplication {
   // is not equal to entire set of available `RIGHT_APPLICATION_XXXXXX` rights.
   rpc SetApplicationCollaborator(ApplicationCollaborator) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/applications/{application_id.application_id}/collaborators"
+      post: "/applications/{application_ids.application_id}/collaborators"
       body: "*"
     };
   };
@@ -621,13 +621,13 @@ message CreateGatewayRequest {
   // gateway is the gateway to be created.
   Gateway gateway = 1 [(gogoproto.nullable) = false];
 
-  // organization_id is the optional organization's ID that creates the gateway.
-  OrganizationIdentifiers organization_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // organization_ids is the optional organization's ID that creates the gateway.
+  OrganizationIdentifiers organization_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message ListGatewaysRequest {
-  // organization_id is the optional organization's ID whose gateways will be listed of.
-  OrganizationIdentifiers organization_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // organization_ids is the optional organization's ID whose gateways will be listed of.
+  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
 message ListGatewaysResponse {
@@ -646,8 +646,8 @@ message UpdateGatewayRequest {
 }
 
 message GenerateGatewayAPIKeyRequest {
-  // gateway_id is the gateway's ID which API key will be added to.
-  GatewayIdentifiers gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
+  // gateway_ids is the gateway's ID which API key will be added to.
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
 
   // name is the name of the API key to be generated.
   string name = 2;
@@ -662,8 +662,8 @@ message ListGatewayAPIKeysResponse {
 }
 
 message UpdateGatewayAPIKeyRequest {
-  // gateway_id is the gateway's ID which an API key will be modified.
-  GatewayIdentifiers gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
+  // gateway_ids is the gateway's ID which an API key will be modified.
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
 
   // name is the name of the gateway API key to be updated.
   string name = 2;
@@ -673,8 +673,8 @@ message UpdateGatewayAPIKeyRequest {
 }
 
 message RemoveGatewayAPIKeyRequest {
-  // gateway_id is the gateway's ID which API key will be removed from.
-  GatewayIdentifiers gateway_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
+  // gateway_ids is the gateway's ID which API key will be removed from.
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
 
   // name is the name of the gateway API key to be removed.
   string name = 2;
@@ -703,7 +703,7 @@ service IsGateway {
       post: "/gateways"
       body: "gateway"
       additional_bindings {
-        post: "/organizations/{organization_id.organization_id}/gateways"
+        post: "/organizations/{organization_ids.organization_id}/gateways"
         body: "gateway"
       }
     };
@@ -723,7 +723,7 @@ service IsGateway {
     option (google.api.http) = {
       get: "/gateways"
       additional_bindings {
-        get: "/organizations/{organization_id.organization_id}/gateways"
+        get: "/organizations/{organization_ids.organization_id}/gateways"
       }
     };
   };
@@ -731,7 +731,7 @@ service IsGateway {
   // UpdateGateway edits a gateway and retrieves the updated version.
   rpc UpdateGateway(UpdateGatewayRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/gateways/{gateway.id.gateway_id}"
+      patch: "/gateways/{gateway.ids.gateway_id}"
       body: "*"
     };
   };
@@ -747,7 +747,7 @@ service IsGateway {
   // returns it.
   rpc GenerateGatewayAPIKey(GenerateGatewayAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
-      post: "/gateways/{gateway_id.gateway_id}/api-keys"
+      post: "/gateways/{gateway_ids.gateway_id}/api-keys"
       body: "*"
     };
   };
@@ -762,7 +762,7 @@ service IsGateway {
   // UpdateGatewayAPIKey updates the rights of a gateway API key.
   rpc UpdateGatewayAPIKey(UpdateGatewayAPIKeyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/gateways/{gateway_id.gateway_id}/api-keys/{name}"
+      patch: "/gateways/{gateway_ids.gateway_id}/api-keys/{name}"
       body: "*"
     };
   };
@@ -770,7 +770,7 @@ service IsGateway {
   // RemoveGatewayAPIKey removes a given API key from a gateway.
   rpc RemoveGatewayAPIKey(RemoveGatewayAPIKeyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/gateways/{gateway_id.gateway_id}/api-keys/{name}"
+      delete: "/gateways/{gateway_ids.gateway_id}/api-keys/{name}"
     };
   };
 
@@ -782,7 +782,7 @@ service IsGateway {
   // is not equal to entire set of available `RIGHT_GATEWAY_XXXXXX` rights.
   rpc SetGatewayCollaborator(GatewayCollaborator) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/gateways/{gateway_id.gateway_id}/collaborators"
+      post: "/gateways/{gateway_ids.gateway_id}/collaborators"
       body: "*"
     };
   };
@@ -853,7 +853,7 @@ service IsClient {
   // UpdateClient sends a request to update a client.
   rpc UpdateClient(UpdateClientRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/clients/{client.id.client_id}"
+      patch: "/clients/{client.ids.client_id}"
       body: "*"
     };
   };
@@ -885,8 +885,8 @@ message UpdateOrganizationRequest {
 }
 
 message GenerateOrganizationAPIKeyRequest {
-  // organization_id is the organization's ID which API key will be added to.
-  OrganizationIdentifiers organization_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // organization_ids is the organization's ID which API key will be added to.
+  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // name is the name of the API key to be generated.
   string name = 2;
@@ -901,8 +901,8 @@ message ListOrganizationAPIKeysResponse {
 }
 
 message UpdateOrganizationAPIKeyRequest {
-  // organization_id is the organization's ID which API key will be added to.
-  OrganizationIdentifiers organization_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // organization_ids is the organization's ID which API key will be added to.
+  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // name is the name of the gateway API key to be updated.
   string name = 2;
@@ -912,8 +912,8 @@ message UpdateOrganizationAPIKeyRequest {
 }
 
 message RemoveOrganizationAPIKeyRequest {
-  // organization_id is the organization's ID which API key will be removed from.
-  OrganizationIdentifiers organization_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // organization_ids is the organization's ID which API key will be removed from.
+  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // name is the name of the organization API key to be removed.
   string name = 2;
@@ -955,7 +955,7 @@ service IsOrganization {
   // UpdateOrganization updates an organization.
   rpc UpdateOrganization(UpdateOrganizationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/organizations/{organization.id.organization_id}"
+      patch: "/organizations/{organization.ids.organization_id}"
       body: "*"
     };
   };
@@ -970,7 +970,7 @@ service IsOrganization {
   // GenerateOrganizationAPIKey generates an API key and returns it.
   rpc GenerateOrganizationAPIKey(GenerateOrganizationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
-      post: "/organizations/{organization_id.organization_id}/api-keys"
+      post: "/organizations/{organization_ids.organization_id}/api-keys"
       body: "*"
     };
   };
@@ -985,7 +985,7 @@ service IsOrganization {
   // UpdateOrganizationAPIKey updates an organization's API key.
   rpc UpdateOrganizationAPIKey(UpdateOrganizationAPIKeyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/organizations/{organization_id.organization_id}/api-keys/{name}"
+      patch: "/organizations/{organization_ids.organization_id}/api-keys/{name}"
       body: "*"
     };
   };
@@ -993,7 +993,7 @@ service IsOrganization {
   // RemoveOrganizationAPIKey removes an organization's API key.
   rpc RemoveOrganizationAPIKey(RemoveOrganizationAPIKeyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/organizations/{organization_id.organization_id}/api-keys/{name}"
+      delete: "/organizations/{organization_ids.organization_id}/api-keys/{name}"
     };
   };
 
@@ -1005,7 +1005,7 @@ service IsOrganization {
   // is not equal to entire set of available `RIGHT_ORGANIZATION_XXXXXX` rights.
   rpc SetOrganizationMember(OrganizationMember) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/organizations/{organization_id.organization_id}/members"
+      post: "/organizations/{organization_ids.organization_id}/members"
       body: "*"
     };
   };

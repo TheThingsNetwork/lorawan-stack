@@ -17,7 +17,7 @@ func client() *ttnpb.Client {
 		Secret:            "123456",
 		RedirectURI:       "/oauth/callback",
 		Grants:            []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE},
-		Creator:           ttnpb.UserIdentifiers{UserID: "bob"},
+		CreatorIDs:        ttnpb.UserIdentifiers{UserID: "bob"},
 	}
 }
 

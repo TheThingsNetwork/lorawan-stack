@@ -65,8 +65,8 @@ var (
 	// FieldPathGatewayAttributes is the field path for an attribute in the attributes map.
 	FieldPathGatewayAttributes = regexp.MustCompile(`^attributes\.(.+)$`)
 
-	// FieldPathGatewayContactAccountUserID is the field path for the gateway contact account user ID field.
-	FieldPathGatewayContactAccountUserID = regexp.MustCompile(`^contact_account.user_id$`)
+	// FieldPathGatewayContactAccount is the field path for the gateway contact account identifiers field.
+	FieldPathGatewayContactAccountIDs = regexp.MustCompile(`^contact_account_ids$`)
 )
 
 // gatewayPrivacySetting is an enum that defines the different gateway privacy settings.

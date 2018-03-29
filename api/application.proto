@@ -15,8 +15,8 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // Application is the message that defines an application in the network.
 message Application {
-  // id is the application's unique and immutable ID.
-  ApplicationIdentifiers id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
+  // Application identifiers.
+  ApplicationIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the application.
   string description = 2;

@@ -247,7 +247,7 @@ func TestUser(t *testing.T) {
 		Grants:            []ttnpb.GrantType{ttnpb.GRANT_PASSWORD},
 		Rights:            []ttnpb.Right{},
 		RedirectURI:       "foo.ttn.dev/oauth",
-		Creator:           testUsers()["john-doe"].UserIdentifiers,
+		CreatorIDs:        testUsers()["john-doe"].UserIdentifiers,
 	}
 	client.Rights = append(client.Rights, ttnpb.AllUserRights()...)
 	err = is.store.Clients.Create(client)

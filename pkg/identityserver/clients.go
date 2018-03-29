@@ -42,7 +42,7 @@ func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClien
 			ClientIdentifiers: req.Client.ClientIdentifiers,
 			Description:       req.Client.Description,
 			RedirectURI:       req.Client.RedirectURI,
-			Creator:           claimsFromContext(ctx).UserIdentifiers(),
+			CreatorIDs:        claimsFromContext(ctx).UserIdentifiers(),
 			Secret:            random.String(64),
 			State:             ttnpb.STATE_PENDING,
 			OfficialLabeled:   false,
@@ -79,7 +79,7 @@ func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifi
 	}
 
 	// ensure the user is the client's creator
-	if !client.Creator.Equals(claimsFromContext(ctx).UserIdentifiers()) {
+	if !client.CreatorIDs.Equals(claimsFromContext(ctx).UserIdentifiers()) {
 		return nil, ErrNotAuthorized.New(nil)
 	}
 
@@ -125,7 +125,7 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 		client := found.GetClient()
 
 		// ensure the user is the client's creator
-		if !client.Creator.Equals(claimsFromContext(ctx).UserIdentifiers()) {
+		if !client.CreatorIDs.Equals(claimsFromContext(ctx).UserIdentifiers()) {
 			return ErrNotAuthorized.New(nil)
 		}
 
@@ -163,7 +163,7 @@ func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdent
 		}
 
 		// ensure the user is the client's creator
-		if !found.GetClient().Creator.Equals(claimsFromContext(ctx).UserIdentifiers()) {
+		if !found.GetClient().CreatorIDs.Equals(claimsFromContext(ctx).UserIdentifiers()) {
 			return ErrNotAuthorized.New(nil)
 		}
 

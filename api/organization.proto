@@ -14,9 +14,8 @@ package ttn.v3;
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 message Organization {
-  // id is the unique and immutable Organization's ID.
-  // This ID shares namespace with the users' IDs.
-  OrganizationIdentifiers id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // Identifiers of the organization.
+  OrganizationIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // name is the organization's name.
   string name = 2;
@@ -43,11 +42,11 @@ message Organization {
 }
 
 message OrganizationMember {
-  // organization_id is the organization's ID.
-  OrganizationIdentifiers organization_id = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // organization_ids are the organization's identifiers.
+  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // user_id is the user's ID.
-  UserIdentifiers user_id = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  // user_ids are the user's identifiers.
+  UserIdentifiers user_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // rights is the list of rights the user bears to the organization.
   repeated Right rights = 3;

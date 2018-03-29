@@ -19,7 +19,7 @@ var client = &ttnpb.Client{
 	RedirectURI:       "/oauth/callback",
 	Grants:            []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_PASSWORD},
 	Rights:            []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
-	Creator:           bob.UserIdentifiers,
+	CreatorIDs:        bob.UserIdentifiers,
 }
 
 var clientSpecializer = func(base ttnpb.Client) store.Client {
