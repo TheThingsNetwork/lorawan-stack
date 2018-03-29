@@ -134,6 +134,8 @@ message EndDeviceVersion {
 }
 
 message EndDevice {
+  option (gogoproto.populate) = false;
+
   EndDeviceIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // Root keys of the device.
