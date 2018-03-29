@@ -24,7 +24,7 @@ import (
 type AES128Key [16]byte
 
 // IsZero returns true iff the type is zero.
-func (key AES128Key) IsZero() bool { return key == [16]byte{} }
+func (key *AES128Key) IsZero() bool { return key == nil || *key == [16]byte{} }
 
 // String implements the Stringer interface.
 func (key AES128Key) String() string { return strings.ToUpper(hex.EncodeToString(key[:])) }
