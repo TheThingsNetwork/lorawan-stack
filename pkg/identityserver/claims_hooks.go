@@ -12,7 +12,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/hooks"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 )
 
@@ -27,26 +26,6 @@ func claimsUnaryHook(store *sql.Store) hooks.UnaryHandlerMiddleware {
 			}
 
 			return next(newContextWithClaims(ctx, c), req)
-		}
-	}
-}
-
-// claimsStreamHook is a hook specific for stream calls in the Identity Server
-// that preloads in the context the claims information.
-func claimsStreamHook(store *sql.Store) hooks.StreamHandlerMiddleware {
-	return func(next grpc.StreamHandler) grpc.StreamHandler {
-		return func(srv interface{}, stream grpc.ServerStream) error {
-			ctx := stream.Context()
-
-			c, err := buildClaims(ctx, store)
-			if err != nil {
-				return err
-			}
-
-			wrapped := grpc_middleware.WrapServerStream(stream)
-			wrapped.WrappedContext = newContextWithClaims(ctx, c)
-
-			return next(srv, wrapped)
 		}
 	}
 }

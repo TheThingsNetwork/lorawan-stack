@@ -111,12 +111,6 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 	hooks.RegisterUnaryHook("/ttn.v3.IsClient", "claims-builder", claimsUnaryHook(store))
 	hooks.RegisterUnaryHook("/ttn.v3.IsOrganization", "claims-builder", claimsUnaryHook(store))
 
-	hooks.RegisterStreamHook("/ttn.v3.IsUser", "claims-builder", claimsStreamHook(store))
-	hooks.RegisterStreamHook("/ttn.v3.IsApplication", "claims-builder", claimsStreamHook(store))
-	hooks.RegisterStreamHook("/ttn.v3.IsGateway", "claims-builder", claimsStreamHook(store))
-	hooks.RegisterStreamHook("/ttn.v3.IsClient", "claims-builder", claimsStreamHook(store))
-	hooks.RegisterStreamHook("/ttn.v3.IsOrganization", "claims-builder", claimsStreamHook(store))
-
 	c.RegisterGRPC(is)
 
 	return is, nil
