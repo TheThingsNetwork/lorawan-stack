@@ -38,9 +38,9 @@ func (e nsErrors) Error() string {
 }
 
 func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *ttnpb.GatewayIdentifiers) (ttnpb.FrequencyPlan, error) {
-	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, g.nsTags, nil)
+	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, g.NSTags, nil)
 	if isInfo == nil {
-		return ttnpb.FrequencyPlan{}, errors.New("No identity server to connect to")
+		return ttnpb.FrequencyPlan{}, ErrNoIdentityServerFound.New(nil)
 	}
 
 	is := ttnpb.NewIsGatewayClient(isInfo.Conn())
@@ -59,7 +59,7 @@ func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *
 
 func (g *GatewayServer) forAllNS(f func(ttnpb.GsNsClient) error) error {
 	errors := nsErrors{}
-	for _, ns := range g.GetPeers(ttnpb.PeerInfo_NETWORK_SERVER, g.nsTags) {
+	for _, ns := range g.GetPeers(ttnpb.PeerInfo_NETWORK_SERVER, g.NSTags) {
 		nsClient := ttnpb.NewGsNsClient(ns.Conn())
 		err := f(nsClient)
 		if err != nil {
@@ -79,17 +79,33 @@ func (g *GatewayServer) forAllNS(f func(ttnpb.GsNsClient) error) error {
 // this gateway may not be used for downlink.
 func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	ctx := link.Context()
-	md := rpcmetadata.FromIncomingContext(ctx)
 	id := ttnpb.GatewayIdentifiers{
-		GatewayID: md.ID,
+		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
 
 	logger := log.FromContext(ctx).WithField("gateway_id", id.GatewayID)
 	defer logger.WithError(err).Debug("Link with gateway closed")
 
-	fp, err := g.getGatewayFrequencyPlan(ctx, &id)
+	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, g.NSTags, nil)
+	if isInfo == nil {
+		return ErrNoIdentityServerFound.New(nil)
+	}
+	is := ttnpb.NewIsGatewayClient(isInfo.Conn())
+
+	if !g.DisableAuth {
+		if err := checkAuthorization(ctx, is, ttnpb.RIGHT_GATEWAY_TRAFFIC_LINK); err != nil {
+			return err
+		}
+	}
+
+	gw, err := is.GetGateway(ctx, &id)
 	if err != nil {
-		return errors.NewWithCause(err, "Could not get frequency plan for this gateway")
+		return errors.NewWithCause(err, "Could not get gateway information from identity server")
+	}
+
+	fp, err := g.frequencyPlans.GetByID(gw.FrequencyPlanID)
+	if err != nil {
+		return errors.NewWithCausef(err, "Could not retrieve frequency plan %s", gw.FrequencyPlanID)
 	}
 
 	result, err := g.gateways.Subscribe(id, link, fp)
@@ -173,7 +189,7 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 		if err != nil {
 			return
 		}
-		ns = g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, g.nsTags, devAddrBytes)
+		ns = g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, g.NSTags, devAddrBytes)
 	case ttnpb.MType_JOIN_ACCEPT, ttnpb.MType_REJOIN_REQUEST:
 		if uplink.DevEUI == nil {
 			err = errors.New("No DevEUI specified")
@@ -185,7 +201,7 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 		if err != nil {
 			return
 		}
-		ns = g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, g.nsTags, devEUIBytes)
+		ns = g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, g.NSTags, devEUIBytes)
 	}
 
 	if ns == nil {
@@ -203,7 +219,7 @@ func (g *GatewayServer) handleStatus(ctx context.Context, status *ttnpb.GatewayS
 	return nil
 }
 
-// GetFrequencyPlan associated to the gateway. The gateway is ID'd by its authentication token.
+// GetFrequencyPlan associated to the gateway.
 func (g *GatewayServer) GetFrequencyPlan(ctx context.Context, r *ttnpb.GetFrequencyPlanRequest) (*ttnpb.FrequencyPlan, error) {
 	fp, err := g.frequencyPlans.GetByID(r.GetFrequencyPlanID())
 	if err != nil {

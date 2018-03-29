@@ -19,8 +19,10 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/pool"
+	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
@@ -34,21 +36,21 @@ const sendUplinkTimeout = 5 * time.Minute
 type GatewayServer struct {
 	*component.Component
 
+	Config
+
 	gateways       pool.Pool
 	frequencyPlans frequencyplans.Store
-
-	nsTags []string
 }
 
 // New returns new *GatewayServer.
-func New(c *component.Component, conf *Config) *GatewayServer {
+func New(c *component.Component, conf Config) *GatewayServer {
 	gs := &GatewayServer{
 		Component: c,
 
 		gateways:       pool.NewPool(c.Logger(), sendUplinkTimeout),
 		frequencyPlans: conf.store(),
 
-		nsTags: conf.NSTags,
+		Config: conf,
 	}
 	c.RegisterGRPC(gs)
 	return gs
@@ -71,5 +73,44 @@ func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
 
 // GetGatewayObservations returns gateway information as observed by the gateway server.
 func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
+	if !gs.DisableAuth {
+		if err := gs.checkAuthorization(ctx, ttnpb.RIGHT_GATEWAY_STATUS); err != nil {
+			return nil, err
+		}
+	}
+
 	return gs.gateways.GetGatewayObservations(id)
+}
+
+func checkAuthorization(ctx context.Context, is ttnpb.IsGatewayClient, right ttnpb.Right) error {
+	md := rpcmetadata.FromIncomingContext(ctx)
+
+	if md.AuthType == "" || md.AuthValue == "" {
+		return ErrUnauthorized.New(nil)
+	}
+
+	if md.AuthType != "Bearer" {
+		return errors.Errorf("Expected authentication type to be `Bearer` but got `%s` instead", md.AuthType)
+	}
+
+	res, err := is.ListGatewayRights(ctx, &ttnpb.GatewayIdentifiers{GatewayID: md.ID}, grpc.PerRPCCredentials(&md))
+	if err != nil {
+		return errors.NewWithCause(err, "Could not fetch gateway rights for the credentials passed")
+	}
+
+	if !ttnpb.IncludesRights(res.Rights, right) {
+		return ErrPermissionDenied.New(nil)
+	}
+
+	return nil
+}
+
+func (gs *GatewayServer) checkAuthorization(ctx context.Context, right ttnpb.Right) error {
+	peer := gs.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, nil, nil)
+	conn := peer.Conn()
+	if conn == nil {
+		return ErrNoIdentityServerFound.New(nil)
+	}
+
+	return checkAuthorization(ctx, ttnpb.NewIsGatewayClient(conn), right)
 }

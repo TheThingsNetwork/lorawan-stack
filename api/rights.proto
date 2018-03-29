@@ -124,14 +124,20 @@ enum Right {
   // RIGHT_GATEWAY_DELETE is the right to delete the gateway.
   RIGHT_GATEWAY_DELETE = 55;
 
-  // RIGHT_GATEWAY_TRAFFIC is the right to view traffic of the gateway.
-  RIGHT_GATEWAY_TRAFFIC = 56;
+  // RIGHT_GATEWAY_TRAFFIC_READ is the right to read traffic coming from the gateway.
+  RIGHT_GATEWAY_TRAFFIC_READ = 56;
+
+  // RIGHT_GATEWAY_TRAFFIC_WRITE is the right to write traffic to a gateway.
+  RIGHT_GATEWAY_TRAFFIC_WRITE = 57;
+
+  // RIGHT_GATEWAY_TRAFFIC_LINK is the right for a gateway to exchange traffic with the gateway server.
+  RIGHT_GATEWAY_TRAFFIC_LINK = 58;
 
   // RIGHT_GATEWAY_STATUS is the right to view the status of the gateway.
-  RIGHT_GATEWAY_STATUS = 57;
+  RIGHT_GATEWAY_STATUS = 59;
 
   // RIGHT_GATEWAY_LOCATION is the right to view the location of the gateway.
-  RIGHT_GATEWAY_LOCATION = 58;
+  RIGHT_GATEWAY_LOCATION = 60;
 
 
   // RIGHT_ORGANIZATION_INFO is the right to view the basic information about an

@@ -39,7 +39,7 @@ func Example() {
 
 	c := component.MustNew(logger, &component.Config{ServiceBase: config.ServiceBase{}})
 
-	gs := gatewayserver.New(c, &gatewayserver.Config{})
+	gs := gatewayserver.New(c, gatewayserver.Config{})
 	gs.Run()
 }
 
@@ -50,7 +50,7 @@ func TestGatewayServer(t *testing.T) {
 	defer removeFPStore(a, dir)
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{})
-	gs := gatewayserver.New(c, &gatewayserver.Config{
+	gs := gatewayserver.New(c, gatewayserver.Config{
 		FileFrequencyPlansStore: dir,
 	})
 
@@ -92,8 +92,10 @@ func TestLink(t *testing.T) {
 
 	var client ttnpb.GtwGsClient
 	srv := grpc.NewServer()
-
-	gs := gatewayserver.New(c, &gatewayserver.Config{FileFrequencyPlansStore: dir})
+	gs := gatewayserver.New(c, gatewayserver.Config{
+		DisableAuth:             true,
+		FileFrequencyPlansStore: dir,
+	})
 
 	// Initializing server and client
 	{

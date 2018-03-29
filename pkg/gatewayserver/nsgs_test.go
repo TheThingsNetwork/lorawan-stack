@@ -34,7 +34,7 @@ func TestScheduleDownlinkUnregisteredGateway(t *testing.T) {
 	defer removeFPStore(a, dir)
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{})
-	gs := gatewayserver.New(c, &gatewayserver.Config{
+	gs := gatewayserver.New(c, gatewayserver.Config{
 		FileFrequencyPlansStore: dir,
 	})
 

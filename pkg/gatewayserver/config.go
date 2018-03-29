@@ -25,6 +25,8 @@ type Config struct {
 	HTTPFrequencyPlansStore string `name:"frequency-plans-uri" description:"URI from where the frequency plans will be fetched, if no directory is specified"`
 
 	NSTags []string `name:"network-servers.tags" description:"Network server tags to accept to connect to"`
+
+	DisableAuth bool `name:"disable-auth" description:"Disable gateway authentication, e.g. for debugging and testing purposes"`
 }
 
 func (conf Config) store() frequencyplans.Store {
