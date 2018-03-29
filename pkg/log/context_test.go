@@ -25,4 +25,21 @@ func TestContext(t *testing.T) {
 
 	a.So(FromContext(ctx), should.Equal, logger)
 	a.So(func() { Must(FromContext(ctx)) }, should.NotPanic)
+
+	t.Run("NewContextWithField", func(t *testing.T) {
+		a := assertions.New(t)
+		withKV := FromContext(NewContextWithField(ctx, "key", "value")).(*entry)
+		v, ok := withKV.fields.Get("key")
+		a.So(ok, should.BeTrue)
+		a.So(v, should.Equal, "value")
+	})
+
+	t.Run("NewContextWithFields", func(t *testing.T) {
+		a := assertions.New(t)
+		withKV := FromContext(NewContextWithFields(ctx, Fields("key", "value"))).(*entry)
+		v, ok := withKV.fields.Get("key")
+		a.So(ok, should.BeTrue)
+		a.So(v, should.Equal, "value")
+	})
+
 }
