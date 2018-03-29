@@ -41,8 +41,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// Recent uplink count is the maximium amount of recent uplinks stored per device.
-const RecentUplinkCount = 20
+// recentUplinkCount is the maximium amount of recent uplinks stored per device.
+const recentUplinkCount = 20
 
 const maxFCntGap = 16384
 const accumulationCapacity = 20
@@ -238,26 +238,34 @@ func (ns *NetworkServer) matchDevice(msg *ttnpb.UplinkMessage) (*deviceregistry.
 	}
 	matching := make([]device, 0, len(devs))
 
+outer:
 	for _, dev := range devs {
 		dev.EndDevice.SessionFallback = nil
 
 		fCnt := mac.GetFCnt()
 		next := dev.EndDevice.GetSession().GetNextFCntUp()
 
-		if !dev.FCntIs16Bit &&
-			next&0xffff > fCnt &&
-			next < 0xffff<<16 {
-			fCnt |= (next + 1<<16) &^ 0xffff
-		} else {
+		switch {
+		case dev.FCntIs16Bit, fCnt >= next:
+		case fCnt > next&0xffff:
 			fCnt |= next &^ 0xffff
+		case next < 0xffff<<16:
+			fCnt |= (next + 1<<16) &^ 0xffff
+		case !dev.FCntResets:
+			continue outer
 		}
 
-		gap := fCnt - next
+		var gap uint32
+		if dev.FCntResets {
+			gap = math.MaxUint32
+		} else {
+			gap = fCnt - next
 
-		switch dev.EndDevice.GetLoRaWANVersion() {
-		case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-			if !dev.FCntResets && gap > maxFCntGap {
-				continue
+			switch dev.EndDevice.GetLoRaWANVersion() {
+			case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
+				if gap > maxFCntGap {
+					continue outer
+				}
 			}
 		}
 
@@ -266,6 +274,13 @@ func (ns *NetworkServer) matchDevice(msg *ttnpb.UplinkMessage) (*deviceregistry.
 			fCnt:   fCnt,
 			gap:    gap,
 		})
+		if dev.FCntResets && fCnt != mac.GetFCnt() {
+			matching = append(matching, device{
+				Device: dev,
+				fCnt:   mac.GetFCnt(),
+				gap:    gap,
+			})
+		}
 	}
 	sort.Slice(matching, func(i, j int) bool {
 		return matching[i].gap < matching[j].gap
@@ -338,8 +353,8 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	msg.RxMetadata = append(msg.RxMetadata, acc.Accumulated()...)
 
 	dev.RecentUplinks = append(dev.RecentUplinks, msg)
-	if len(dev.RecentUplinks) > RecentUplinkCount {
-		dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-RecentUplinkCount:]...)
+	if len(dev.RecentUplinks) > recentUplinkCount {
+		dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
 	}
 
 	if err := dev.Update("Session", "SessionFallback", "RecentUplinks"); err != nil {
