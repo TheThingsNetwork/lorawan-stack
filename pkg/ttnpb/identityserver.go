@@ -12,10 +12,6 @@ import (
 // IsIDAllowed checks whether an ID is allowed to be used or not given the list
 // of blacklisted IDs of the receiver.
 func (s *IdentityServerSettings) IsIDAllowed(id string) bool {
-	if s.BlacklistedIDs == nil {
-		return true
-	}
-
 	for _, blacklistedID := range s.BlacklistedIDs {
 		if blacklistedID == id {
 			return false
@@ -34,7 +30,7 @@ func (req *UpdateSettingsRequest) Validate() error {
 	mask := req.GetUpdateMask()
 	paths := mask.GetPaths()
 
-	if paths == nil || len(paths) == 0 {
+	if len(paths) == 0 {
 		return ErrEmptyUpdateMask.New(nil)
 	}
 
@@ -82,7 +78,7 @@ func (req *UpdateUserRequest) Validate() error {
 	mask := req.GetUpdateMask()
 	paths := mask.GetPaths()
 
-	if paths == nil || len(paths) == 0 {
+	if len(paths) == 0 {
 		return ErrEmptyUpdateMask.New(nil)
 	}
 
@@ -157,7 +153,7 @@ func (req *UpdateApplicationRequest) Validate() error {
 	mask := req.GetUpdateMask()
 	paths := mask.GetPaths()
 
-	if paths == nil || len(paths) == 0 {
+	if len(paths) == 0 {
 		return ErrEmptyUpdateMask.New(nil)
 	}
 
@@ -247,7 +243,7 @@ func (req *UpdateGatewayRequest) Validate() error {
 	mask := req.GetUpdateMask()
 	paths := mask.GetPaths()
 
-	if paths == nil || len(paths) == 0 {
+	if len(paths) == 0 {
 		return ErrEmptyUpdateMask.New(nil)
 	}
 
@@ -374,7 +370,7 @@ func (req *UpdateClientRequest) Validate() error {
 	mask := req.GetUpdateMask()
 	paths := mask.GetPaths()
 
-	if paths == nil || len(paths) == 0 {
+	if len(paths) == 0 {
 		return ErrEmptyUpdateMask.New(nil)
 	}
 
@@ -410,7 +406,7 @@ func (req *UpdateOrganizationRequest) Validate() error {
 	mask := req.GetUpdateMask()
 	paths := mask.GetPaths()
 
-	if paths == nil || len(paths) == 0 {
+	if len(paths) == 0 {
 		return ErrEmptyUpdateMask.New(nil)
 	}
 

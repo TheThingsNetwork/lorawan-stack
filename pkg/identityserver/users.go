@@ -23,7 +23,7 @@ import (
 // Note this method was not placed on ttnpb as part of the IdentityServerSettings
 // type as it makes use of an external package.
 func isEmailAllowed(email string, allowedEmails []string) bool {
-	if allowedEmails == nil || len(allowedEmails) == 0 {
+	if len(allowedEmails) == 0 {
 		return true
 	}
 
