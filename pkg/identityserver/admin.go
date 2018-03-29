@@ -317,12 +317,14 @@ func (s *adminService) DeleteUser(ctx context.Context, req *ttnpb.UserIdentifier
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(*req, s.config.Specializers.User)
+		ids := *req
+
+		found, err := tx.Users.GetByID(ids, s.config.Specializers.User)
 		if err != nil {
 			return err
 		}
 
-		err = tx.Users.Delete(*req)
+		err = tx.Users.Delete(ids)
 		if err != nil {
 			return err
 		}
@@ -524,7 +526,9 @@ func (s *adminService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdenti
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Clients.GetByID(*req, s.config.Specializers.Client)
+		ids := *req
+
+		found, err := tx.Clients.GetByID(ids, s.config.Specializers.Client)
 		if err != nil {
 			return err
 		}
@@ -534,7 +538,7 @@ func (s *adminService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdenti
 			return err
 		}
 
-		err = tx.Clients.Delete(*req)
+		err = tx.Clients.Delete(ids)
 		if err != nil {
 			return err
 		}

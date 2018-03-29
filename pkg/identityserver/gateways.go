@@ -78,12 +78,14 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 
 // GetGateway returns a gateway information.
 func (s *gatewayService) GetGateway(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*ttnpb.Gateway, error) {
-	err := s.enforceGatewayRights(ctx, *req, ttnpb.RIGHT_GATEWAY_INFO)
+	ids := *req
+
+	err := s.enforceGatewayRights(ctx, ids, ttnpb.RIGHT_GATEWAY_INFO)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := s.store.Gateways.GetByID(*req, s.config.Specializers.Gateway)
+	found, err := s.store.Gateways.GetByID(ids, s.config.Specializers.Gateway)
 	if err != nil {
 		return nil, err
 	}
@@ -186,12 +188,14 @@ func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGat
 
 // DeleteGateway deletes a gateway.
 func (s *gatewayService) DeleteGateway(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
-	err := s.enforceGatewayRights(ctx, *req, ttnpb.RIGHT_GATEWAY_DELETE)
+	ids := *req
+
+	err := s.enforceGatewayRights(ctx, ids, ttnpb.RIGHT_GATEWAY_DELETE)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, s.store.Gateways.Delete(*req)
+	return nil, s.store.Gateways.Delete(ids)
 }
 
 // GenerateGatewayAPIKey generates a gateway API key and returns it.
@@ -222,12 +226,14 @@ func (s *gatewayService) GenerateGatewayAPIKey(ctx context.Context, req *ttnpb.G
 
 // ListGatewayAPIKeys list all the API keys from a gateway.
 func (s *gatewayService) ListGatewayAPIKeys(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*ttnpb.ListGatewayAPIKeysResponse, error) {
-	err := s.enforceGatewayRights(ctx, *req, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+	ids := *req
+
+	err := s.enforceGatewayRights(ctx, ids, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := s.store.Gateways.ListAPIKeys(*req)
+	found, err := s.store.Gateways.ListAPIKeys(ids)
 	if err != nil {
 		return nil, err
 	}
@@ -337,12 +343,14 @@ func (s *gatewayService) SetGatewayCollaborator(ctx context.Context, req *ttnpb.
 
 // ListGatewayCollaborators returns all the collaborators that a gateway has.
 func (s *gatewayService) ListGatewayCollaborators(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*ttnpb.ListGatewayCollaboratorsResponse, error) {
-	err := s.enforceGatewayRights(ctx, *req, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
+	ids := *req
+
+	err := s.enforceGatewayRights(ctx, ids, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := s.store.Gateways.ListCollaborators(*req)
+	found, err := s.store.Gateways.ListCollaborators(ids)
 	if err != nil {
 		return nil, err
 	}

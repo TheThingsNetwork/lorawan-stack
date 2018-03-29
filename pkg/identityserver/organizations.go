@@ -61,12 +61,14 @@ func (s *organizationService) CreateOrganization(ctx context.Context, req *ttnpb
 
 // GetOrganization returns the organization that matches the identifier.
 func (s *organizationService) GetOrganization(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*ttnpb.Organization, error) {
-	err := s.enforceOrganizationRights(ctx, *req, ttnpb.RIGHT_ORGANIZATION_INFO)
+	ids := *req
+
+	err := s.enforceOrganizationRights(ctx, ids, ttnpb.RIGHT_ORGANIZATION_INFO)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := s.store.Organizations.GetByID(*req, s.config.Specializers.Organization)
+	found, err := s.store.Organizations.GetByID(ids, s.config.Specializers.Organization)
 	if err != nil {
 		return nil, err
 	}
@@ -138,12 +140,14 @@ func (s *organizationService) UpdateOrganization(ctx context.Context, req *ttnpb
 
 // DeleteOrganization deletes an organization.
 func (s *organizationService) DeleteOrganization(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
-	err := s.enforceOrganizationRights(ctx, *req, ttnpb.RIGHT_ORGANIZATION_DELETE)
+	ids := *req
+
+	err := s.enforceOrganizationRights(ctx, ids, ttnpb.RIGHT_ORGANIZATION_DELETE)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, s.store.Organizations.Delete(*req)
+	return nil, s.store.Organizations.Delete(ids)
 }
 
 // GenerateOrganizationAPIKey generates an organization API key and returns it.
@@ -174,12 +178,14 @@ func (s *organizationService) GenerateOrganizationAPIKey(ctx context.Context, re
 
 // ListOrganizationAPIKeys list all the API keys of an organization.
 func (s *organizationService) ListOrganizationAPIKeys(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*ttnpb.ListOrganizationAPIKeysResponse, error) {
-	err := s.enforceOrganizationRights(ctx, *req, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
+	ids := *req
+
+	err := s.enforceOrganizationRights(ctx, ids, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := s.store.Organizations.ListAPIKeys(*req)
+	found, err := s.store.Organizations.ListAPIKeys(ids)
 	if err != nil {
 		return nil, err
 	}
@@ -290,12 +296,14 @@ func (s *organizationService) SetOrganizationMember(ctx context.Context, req *tt
 // ListOrganizationMembers returns all members from the organization that
 // matches the identifier.
 func (s *organizationService) ListOrganizationMembers(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*ttnpb.ListOrganizationMembersResponse, error) {
-	err := s.enforceOrganizationRights(ctx, *req, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS)
+	ids := *req
+
+	err := s.enforceOrganizationRights(ctx, ids, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := s.store.Organizations.ListMembers(*req)
+	found, err := s.store.Organizations.ListMembers(ids)
 	if err != nil {
 		return nil, err
 	}

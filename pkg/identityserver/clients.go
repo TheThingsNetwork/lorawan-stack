@@ -155,7 +155,9 @@ func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdent
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Clients.GetByID(*req, s.config.Specializers.Client)
+		ids := *req
+
+		found, err := tx.Clients.GetByID(ids, s.config.Specializers.Client)
 		if err != nil {
 			return err
 		}
@@ -165,7 +167,7 @@ func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdent
 			return ErrNotAuthorized.New(nil)
 		}
 
-		return tx.Clients.Delete(*req)
+		return tx.Clients.Delete(ids)
 	})
 
 	return nil, err

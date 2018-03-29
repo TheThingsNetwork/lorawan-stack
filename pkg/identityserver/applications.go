@@ -74,12 +74,14 @@ func (s *applicationService) CreateApplication(ctx context.Context, req *ttnpb.C
 
 // GetApplication returns an application.
 func (s *applicationService) GetApplication(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*ttnpb.Application, error) {
-	err := s.enforceApplicationRights(ctx, *req, ttnpb.RIGHT_APPLICATION_INFO)
+	ids := *req
+
+	err := s.enforceApplicationRights(ctx, ids, ttnpb.RIGHT_APPLICATION_INFO)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := s.store.Applications.GetByID(*req, s.config.Specializers.Application)
+	found, err := s.store.Applications.GetByID(ids, s.config.Specializers.Application)
 	if err != nil {
 		return nil, err
 	}
@@ -153,12 +155,14 @@ func (s *applicationService) UpdateApplication(ctx context.Context, req *ttnpb.U
 
 // DeleteApplication deletes an application.
 func (s *applicationService) DeleteApplication(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
-	err := s.enforceApplicationRights(ctx, *req, ttnpb.RIGHT_APPLICATION_DELETE)
+	ids := *req
+
+	err := s.enforceApplicationRights(ctx, ids, ttnpb.RIGHT_APPLICATION_DELETE)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, s.store.Applications.Delete(*req)
+	return nil, s.store.Applications.Delete(ids)
 }
 
 // GenerateApplicationAPIKey generates an application API key and returns it.
@@ -189,12 +193,14 @@ func (s *applicationService) GenerateApplicationAPIKey(ctx context.Context, req 
 
 // ListApplicationAPIKeys list all the API keys of an application.
 func (s *applicationService) ListApplicationAPIKeys(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*ttnpb.ListApplicationAPIKeysResponse, error) {
-	err := s.enforceApplicationRights(ctx, *req, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+	ids := *req
+
+	err := s.enforceApplicationRights(ctx, ids, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := s.store.Applications.ListAPIKeys(*req)
+	found, err := s.store.Applications.ListAPIKeys(ids)
 	if err != nil {
 		return nil, err
 	}
@@ -304,12 +310,14 @@ func (s *applicationService) SetApplicationCollaborator(ctx context.Context, req
 
 // ListApplicationCollaborators returns all the collaborators from an application.
 func (s *applicationService) ListApplicationCollaborators(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*ttnpb.ListApplicationCollaboratorsResponse, error) {
-	err := s.enforceApplicationRights(ctx, *req, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
+	ids := *req
+
+	err := s.enforceApplicationRights(ctx, ids, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
 	if err != nil {
 		return nil, err
 	}
 
-	found, err := s.store.Applications.ListCollaborators(*req)
+	found, err := s.store.Applications.ListCollaborators(ids)
 	if err != nil {
 		return nil, err
 	}
