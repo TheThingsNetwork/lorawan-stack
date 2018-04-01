@@ -74,8 +74,7 @@ func (s *mapStore) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]m
 outer:
 	for id, fields := range s.data {
 		for k, fv := range filter {
-			dv, ok := fields[k]
-			if !ok || !reflect.DeepEqual(dv, fv) {
+			if !reflect.DeepEqual(fields[k], fv) {
 				continue outer
 			}
 		}
