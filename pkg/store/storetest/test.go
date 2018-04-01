@@ -26,6 +26,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/store"
+	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -41,6 +42,21 @@ var IndexedFields = []string{
 type testingT interface {
 	Error(args ...interface{})
 	Run(string, func(t *testing.T)) bool
+}
+
+func randBytes(n int, exclude ...[]byte) []byte {
+	rb := make([]byte, n)
+	rand.Read(rb)
+outer:
+	for {
+		for _, eb := range exclude {
+			if bytes.Equal(rb, eb) {
+				rand.Read(rb)
+				continue outer
+			}
+		}
+		return rb
+	}
 }
 
 // TestTypedStore executes a black-box test for the given typed store
@@ -166,7 +182,8 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 				"nil.nil": nil,
 			},
 			map[string]interface{}{
-				"empty": "",
+				"empty":        "",
+				"non-existent": nil,
 			},
 		},
 		{
@@ -183,6 +200,7 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 			},
 			map[string]interface{}{
 				"empty": "",
+				"foo":   nil,
 			},
 		},
 	} {
@@ -262,43 +280,6 @@ func TestTypedStore(t testingT, newStore func() store.TypedStore) {
 	}
 }
 
-func sameElements(a, b [][]byte) bool {
-	bm := make([]bool, len(b))
-outer:
-	for i := range a {
-		for j := range b {
-			if !bm[j] && bytes.Equal(a[i], b[j]) {
-				bm[j] = true
-				continue outer
-			}
-		}
-		return false
-	}
-
-	// Check if all values in b have been marked
-	for _, v := range bm {
-		if !v {
-			return false
-		}
-	}
-	return true
-}
-
-func randBytes(n int, exclude ...[]byte) []byte {
-	rb := make([]byte, n)
-	rand.Read(rb)
-outer:
-	for {
-		for _, eb := range exclude {
-			if bytes.Equal(rb, eb) {
-				rand.Read(rb)
-				continue outer
-			}
-		}
-		return rb
-	}
-}
-
 // TestByteSetStore executes a black-box test for the given byte set store
 func TestByteSetStore(t testingT, newStore func() store.ByteSetStore) {
 	a := assertions.New(t)
@@ -367,7 +348,7 @@ func TestByteSetStore(t testingT, newStore func() store.ByteSetStore) {
 
 			found, err := s.FindSet(id)
 			a.So(err, should.BeNil)
-			a.So(sameElements(found, tc.AfterCreate), should.BeTrue)
+			a.So(test.SameElements(found, tc.AfterCreate), should.BeTrue)
 
 			for _, b := range tc.Create {
 				v, err := s.Contains(id, b)
@@ -382,11 +363,11 @@ func TestByteSetStore(t testingT, newStore func() store.ByteSetStore) {
 			a.So(err, should.BeNil)
 			found, err = s.FindSet(id)
 			a.So(err, should.BeNil)
-			a.So(sameElements(found, tc.AfterPut), should.BeTrue)
+			a.So(test.SameElements(found, tc.AfterPut), should.BeTrue)
 
 			found, err = s.FindSet(id)
 			a.So(err, should.BeNil)
-			a.So(sameElements(found, tc.AfterPut), should.BeTrue)
+			a.So(test.SameElements(found, tc.AfterPut), should.BeTrue)
 
 			for _, b := range tc.AfterPut {
 				v, err := s.Contains(id, b)
@@ -401,11 +382,11 @@ func TestByteSetStore(t testingT, newStore func() store.ByteSetStore) {
 			a.So(err, should.BeNil)
 			found, err = s.FindSet(id)
 			a.So(err, should.BeNil)
-			a.So(sameElements(found, tc.AfterRemove), should.BeTrue)
+			a.So(test.SameElements(found, tc.AfterRemove), should.BeTrue)
 
 			found, err = s.FindSet(id)
 			a.So(err, should.BeNil)
-			a.So(sameElements(found, tc.AfterRemove), should.BeTrue)
+			a.So(test.SameElements(found, tc.AfterRemove), should.BeTrue)
 
 			for _, b := range tc.AfterRemove {
 				v, err := s.Contains(id, b)
