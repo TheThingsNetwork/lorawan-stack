@@ -333,7 +333,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		DevAddr:     &devAddr,
 		SessionKeys: resp.SessionKeys,
 	}
-	if err := dev.Update(); err != nil {
+	if err := dev.Store(); err != nil {
 		js.Component.Logger().WithField("device", dev).WithError(err).Error("Failed to update device")
 	}
 	return resp, nil

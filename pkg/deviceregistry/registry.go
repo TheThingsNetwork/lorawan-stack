@@ -70,7 +70,21 @@ func FindDeviceByIdentifiers(r Interface, id *ttnpb.EndDeviceIdentifiers) ([]*De
 	if id == nil {
 		return nil, errors.New("Identifiers specified are nil")
 	}
-	return r.FindBy(&ttnpb.EndDevice{EndDeviceIdentifiers: *id}, "EndDeviceIdentifiers")
+
+	fields := make([]string, 0, 5)
+	switch {
+	case id.DeviceID != "":
+		fields = append(fields, "EndDeviceIdentifiers.DeviceID")
+	case id.ApplicationID != "":
+		fields = append(fields, "EndDeviceIdentifiers.ApplicationID")
+	case id.DevEUI != nil && !id.DevEUI.IsZero():
+		fields = append(fields, "EndDeviceIdentifiers.DevEUI")
+	case id.JoinEUI != nil && !id.JoinEUI.IsZero():
+		fields = append(fields, "EndDeviceIdentifiers.JoinEUI")
+	case id.DevAddr != nil && !id.DevAddr.IsZero():
+		fields = append(fields, "EndDeviceIdentifiers.DevAddr")
+	}
+	return r.FindBy(&ttnpb.EndDevice{EndDeviceIdentifiers: *id}, fields...)
 }
 
 // FindOneDeviceByIdentifiers searches for exactly one device matching specified device identifiers in r.

@@ -186,7 +186,7 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 	case 1:
 		dev := devs[0]
 		dev.EndDevice = &req.Device
-		return &pbtypes.Empty{}, dev.Update(fields...)
+		return &pbtypes.Empty{}, dev.Store(fields...)
 	default:
 		return nil, ErrTooManyDevices.New(nil)
 	}

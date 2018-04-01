@@ -34,9 +34,18 @@ func newDevice(ed *ttnpb.EndDevice, s store.Client, k store.PrimaryKey) *Device 
 	}
 }
 
-// Update updates devices data in the underlying store.Interface.
-func (d *Device) Update(fields ...string) error {
+// Store updates devices data in the underlying store.Interface.
+func (d *Device) Store(fields ...string) error {
 	return d.store.Update(d.key, d.EndDevice, fields...)
+}
+
+// Load returns a snapshot of current device data in underlying store.Interface.
+func (d *Device) Load() (*ttnpb.EndDevice, error) {
+	ed := &ttnpb.EndDevice{}
+	if err := d.store.Find(d.key, ed); err != nil {
+		return nil, err
+	}
+	return ed, nil
 }
 
 // Delete removes device from the underlying store.Interface.

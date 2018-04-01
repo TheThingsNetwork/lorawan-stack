@@ -60,7 +60,7 @@ func TestRegistry(t *testing.T) {
 	}
 	dev.EndDevice = updated
 
-	if !a.So(dev.Update(), should.BeNil) {
+	if !a.So(dev.Store(), should.BeNil) {
 		return
 	}
 
@@ -138,7 +138,7 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 	}
 	dev.EndDevice = updated
 
-	if !a.So(dev.Update(), should.BeNil) {
+	if !a.So(dev.Store(), should.BeNil) {
 		return
 	}
 
@@ -267,7 +267,7 @@ func ExampleRegistry() {
 	dev.DeviceID = "differentID"
 	devAddr = types.DevAddr([4]byte{4, 3, 2, 1})
 	dev.DevAddr = &devAddr
-	err = dev.Update()
+	err = dev.Store()
 	if err != nil {
 		panic(fmt.Errorf("Failed to update device %s", err))
 	}
