@@ -75,6 +75,13 @@ var (
 		Type:          errors.NotFound,
 		Code:          10,
 	}
+
+	// ErrNewSubscription represents error ocurring when a new subscription is opened.
+	ErrNewSubscription = &errors.ErrDescriptor{
+		MessageFormat: "Another subscription started",
+		Type:          errors.Conflict,
+		Code:          11,
+	}
 )
 
 func init() {
@@ -87,4 +94,5 @@ func init() {
 	ErrNotFound.Register()
 	ErrMissingFNwkSIntKey.Register()
 	ErrMissingSNwkSIntKey.Register()
+	ErrNewSubscription.Register()
 }

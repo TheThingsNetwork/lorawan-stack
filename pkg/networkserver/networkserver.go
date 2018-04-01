@@ -65,7 +65,6 @@ type NetworkServer struct {
 	metadataAccumulators *sync.Map
 
 	metadataAccumulatorPool *sync.Pool
-	timerPool               *sync.Pool
 	hashPool                *sync.Pool
 
 	deduplicationWindow time.Duration
@@ -91,21 +90,14 @@ func New(c *component.Component, conf *Config) *NetworkServer {
 		gateways:                &sync.Map{},
 		metadataAccumulators:    &sync.Map{},
 		metadataAccumulatorPool: &sync.Pool{},
-		timerPool:               &sync.Pool{},
 		hashPool:                &sync.Pool{},
 		deduplicationWindow:     conf.DeduplicationWindow,
 		cooldownWindow:          conf.CooldownWindow,
+		joinServers:             conf.JoinServers,
 	}
 	ns.hashPool.New = func() interface{} { return fnv.New64a() }
 	ns.metadataAccumulatorPool.New = func() interface{} {
 		return &metadataAccumulator{newAccumulator()}
-	}
-	ns.timerPool.New = func() interface{} {
-		t := time.NewTimer(time.Duration(0))
-		if !t.Stop() {
-			<-t.C
-		}
-		return t
 	}
 	c.RegisterGRPC(ns)
 	return ns
@@ -350,9 +342,9 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	}
 
 	time.Sleep(time.Until(start.Add(ns.deduplicationWindow)))
-	msg.RxMetadata = append(msg.RxMetadata, acc.Accumulated()...)
+	msg.RxMetadata = acc.Accumulated()
 
-	dev.RecentUplinks = append(dev.RecentUplinks, msg)
+	dev.RecentUplinks = append(dev.GetRecentUplinks(), msg)
 	if len(dev.RecentUplinks) > recentUplinkCount {
 		dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
 	}
@@ -365,17 +357,17 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	mac := msg.Payload.GetMACPayload()
 	go func() {
 		ns.applicationServersMu.RLock()
-		cl, ok := ns.applicationServers[dev.ApplicationID]
+		cl, ok := ns.applicationServers[dev.EndDeviceIdentifiers.GetApplicationID()]
 		if ok {
 			up := &ttnpb.ApplicationUp{&ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
-				FCnt:       dev.Session.NextFCntUp - 1,
-				FPort:      mac.FPort,
-				FRMPayload: mac.FRMPayload,
-				RxMetadata: msg.RxMetadata,
+				FCnt:       dev.GetSession().GetNextFCntUp() - 1,
+				FPort:      mac.GetFPort(),
+				FRMPayload: mac.GetFRMPayload(),
+				RxMetadata: msg.GetRxMetadata(),
 			}}}
 			if err := cl.Send(up); err != nil {
 				logger.WithFields(log.Fields(
-					"application_id", dev.ApplicationID,
+					"application_id", dev.EndDeviceIdentifiers.GetApplicationID(),
 					"f_cnt", up.GetUplinkMessage().GetFCnt(),
 				)).WithError(err).Warn("Failed to send uplink to application server")
 			}
@@ -415,7 +407,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 	}
 
 	devAddr := ns.newDevAddr(dev.EndDevice)
-	for devAddr.Equal(dev.GetSession().DevAddr) {
+	for s := dev.GetSession(); s != nil && devAddr.Equal(s.DevAddr); {
 		devAddr = ns.newDevAddr(dev.EndDevice)
 	}
 
@@ -455,10 +447,16 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		}
 
 		time.Sleep(time.Until(start.Add(ns.deduplicationWindow)))
-		msg.RxMetadata = append(msg.RxMetadata, acc.Accumulated()...)
+		msg.RxMetadata = acc.Accumulated()
+
+		dev.RecentUplinks = append(dev.RecentUplinks, msg)
+		if len(dev.RecentUplinks) > recentUplinkCount {
+			dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
+		}
 
 		if err = dev.Store("Session", "SessionFallback", "RecentUplinks"); err != nil {
 			logger.WithError(err).Error("Failed to update device")
+			return err
 		}
 		return nil
 	}
@@ -467,7 +465,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		logger = logger.WithField(fmt.Sprintf("error_%d", i), err)
 	}
 	logger.Warn("Join failed")
-	return errors.NewWithCause(errs[0], "Failed to perform join procedure")
+	return errors.NewWithCause(errors.New("No join server could handle join request"), "Failed to perform join procedure")
 }
 
 func (ns *NetworkServer) handleRejoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator, start time.Time) error {
@@ -554,44 +552,35 @@ func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifier, stream
 		ns.applicationServersMu.Unlock()
 		return err
 	case <-ws.closeCh:
-		return errors.New("Another uplink subscription started for application")
+		return ErrNewSubscription.New(nil)
 	}
 }
 
 // DownlinkQueueReplace is called by the application server to completely replace the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
 	// TODO: authentication
-	if req.EndDeviceIdentifiers.IsZero() {
-		return nil, errors.New("Empty identifiers specified")
-	}
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, &req.EndDeviceIdentifiers)
 	if err != nil {
 		return nil, err
 	}
 	dev.EndDevice.QueuedApplicationDownlinks = req.Downlinks
-	return &pbtypes.Empty{}, dev.Update("QueuedApplicationDownlinks")
+	return &pbtypes.Empty{}, dev.Store("QueuedApplicationDownlinks")
 }
 
 // DownlinkQueuePush is called by the application server to push a downlink to queue for a device.
 func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
 	// TODO: authentication
-	if req.EndDeviceIdentifiers.IsZero() {
-		return nil, errors.New("Empty identifiers specified")
-	}
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, &req.EndDeviceIdentifiers)
 	if err != nil {
 		return nil, err
 	}
 	dev.EndDevice.QueuedApplicationDownlinks = append(dev.EndDevice.QueuedApplicationDownlinks, req.Downlinks...)
-	return &pbtypes.Empty{}, dev.Update("QueuedApplicationDownlinks")
+	return &pbtypes.Empty{}, dev.Store("QueuedApplicationDownlinks")
 }
 
 // DownlinkQueueList is called by the application server to get the current state of the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
 	// TODO: authentication
-	if id.IsZero() {
-		return nil, errors.New("Empty identifiers specified")
-	}
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, id)
 	if err != nil {
 		return nil, err
@@ -602,15 +591,12 @@ func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, id *ttnpb.EndDev
 // DownlinkQueueClear is called by the application server to clear the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueClear(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
 	// TODO: authentication
-	if id.IsZero() {
-		return nil, errors.New("Empty identifiers specified")
-	}
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, id)
 	if err != nil {
 		return nil, err
 	}
 	dev.EndDevice.QueuedApplicationDownlinks = nil
-	return &pbtypes.Empty{}, dev.Update("QueuedApplicationDownlinks")
+	return &pbtypes.Empty{}, dev.Store("QueuedApplicationDownlinks")
 }
 
 // RegisterServices registers services provided by ns at s.
