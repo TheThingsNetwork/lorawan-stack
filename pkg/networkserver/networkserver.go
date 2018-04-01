@@ -357,7 +357,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
 	}
 
-	if err := dev.Update("Session", "SessionFallback", "RecentUplinks"); err != nil {
+	if err := dev.Store("Session", "SessionFallback", "RecentUplinks"); err != nil {
 		logger.WithError(err).Error("Failed to update device")
 		return err
 	}
@@ -457,7 +457,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		time.Sleep(time.Until(start.Add(ns.deduplicationWindow)))
 		msg.RxMetadata = append(msg.RxMetadata, acc.Accumulated()...)
 
-		if err = dev.Update("Session", "SessionFallback", "RecentUplinks"); err != nil {
+		if err = dev.Store("Session", "SessionFallback", "RecentUplinks"); err != nil {
 			logger.WithError(err).Error("Failed to update device")
 		}
 		return nil
