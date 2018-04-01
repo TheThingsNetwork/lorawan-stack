@@ -37,8 +37,8 @@ var (
 	ApplicationID       = "test"
 	DuplicateCount      = 2
 	Delay               = 20 * time.Millisecond
-	DeduplicationWindow = 100 * time.Millisecond
-	CooldownWindow      = 300 * time.Millisecond
+	DeduplicationWindow = 200 * time.Millisecond
+	CooldownWindow      = 400 * time.Millisecond
 )
 
 func TestDownlinkQueueReplace(t *testing.T) {
@@ -1138,7 +1138,7 @@ func HandleJoinTest() func(t *testing.T) {
 
 func HandleRejoinTest() func(t *testing.T) {
 	return func(t *testing.T) {
-		// TODO: implement
+		// TODO: Implement https://github.com/TheThingsIndustries/ttn/issues/557
 	}
 }
 

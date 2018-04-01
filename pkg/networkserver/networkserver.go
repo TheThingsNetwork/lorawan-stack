@@ -83,7 +83,7 @@ type Config struct {
 func New(c *component.Component, conf *Config) *NetworkServer {
 	ns := &NetworkServer{
 		Component:               c,
-		RegistryRPC:             deviceregistry.NewRPC(c, conf.Registry), // TODO: Add checks
+		RegistryRPC:             deviceregistry.NewRPC(c, conf.Registry), // TODO: Add checks https://github.com/TheThingsIndustries/ttn/issues/558
 		registry:                conf.Registry,
 		applicationServersMu:    &sync.RWMutex{},
 		applicationServers:      make(map[string]*applicationUplinkStream),
@@ -426,7 +426,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		NetID:              ns.NetID,
 		SelectedMacVersion: dev.GetLoRaWANVersion(),
 		RxDelay:            stDes.GetRxDelay(),
-		CFList:             nil, // TODO: Add if required
+		CFList:             nil, // TODO: Add if required https://github.com/TheThingsIndustries/ttn/issues/559
 		DownlinkSettings: ttnpb.DLSettings{
 			Rx1DROffset: stDes.GetRx1DataRateOffset(),
 			Rx2DR:       stDes.GetRx2DataRateIndex(),
@@ -471,6 +471,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 }
 
 func (ns *NetworkServer) handleRejoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator, start time.Time) error {
+	// TODO: Implement https://github.com/TheThingsIndustries/ttn/issues/557
 	return status.Errorf(codes.Unimplemented, "not implemented")
 }
 
@@ -560,7 +561,7 @@ func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifier, stream
 
 // DownlinkQueueReplace is called by the application server to completely replace the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
-	// TODO: authentication
+	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, &req.EndDeviceIdentifiers)
 	if err != nil {
 		return nil, err
@@ -571,7 +572,7 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 
 // DownlinkQueuePush is called by the application server to push a downlink to queue for a device.
 func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
-	// TODO: authentication
+	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, &req.EndDeviceIdentifiers)
 	if err != nil {
 		return nil, err
@@ -582,7 +583,7 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 
 // DownlinkQueueList is called by the application server to get the current state of the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
-	// TODO: authentication
+	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, id)
 	if err != nil {
 		return nil, err
@@ -592,7 +593,7 @@ func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, id *ttnpb.EndDev
 
 // DownlinkQueueClear is called by the application server to clear the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueClear(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
-	// TODO: authentication
+	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, id)
 	if err != nil {
 		return nil, err
