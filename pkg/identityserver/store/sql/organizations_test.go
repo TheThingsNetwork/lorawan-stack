@@ -15,7 +15,7 @@ import (
 
 func TestOrganizations(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	userID := alice.UserIdentifiers
 	org := &ttnpb.Organization{
@@ -81,6 +81,20 @@ func TestOrganizations(t *testing.T) {
 	if a.So(members, should.HaveLength, 1) {
 		a.So(members[0], should.Resemble, member)
 	}
+
+	members, err = s.Organizations.ListMembers(org.OrganizationIdentifiers, ttnpb.Right(0))
+	a.So(err, should.BeNil)
+	a.So(members, should.HaveLength, 0)
+
+	members, err = s.Organizations.ListMembers(org.OrganizationIdentifiers, member.Rights[0])
+	a.So(err, should.BeNil)
+	if a.So(members, should.HaveLength, 1) {
+		a.So(members[0], should.Resemble, member)
+	}
+
+	members, err = s.Organizations.ListMembers(org.OrganizationIdentifiers, append(member.Rights, ttnpb.Right(0))...)
+	a.So(err, should.BeNil)
+	a.So(members, should.HaveLength, 0)
 
 	yes, err := s.Organizations.HasMemberRights(org.OrganizationIdentifiers, userID, ttnpb.Right(1))
 	a.So(err, should.BeNil)
@@ -211,6 +225,10 @@ func TestOrganizations(t *testing.T) {
 	if a.So(keys, should.HaveLength, 1) {
 		a.So(keys, should.Contain, key)
 	}
+
+	key.Rights = []ttnpb.Right{ttnpb.Right(1)}
+	err = s.Organizations.UpdateAPIKeyRights(org.OrganizationIdentifiers, key.Name, key.Rights)
+	a.So(err, should.BeNil)
 
 	ids, foundKey, err := s.Organizations.GetAPIKey(key.Key)
 	a.So(err, should.BeNil)

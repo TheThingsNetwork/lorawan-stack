@@ -3,70 +3,62 @@
 package sql_test
 
 import (
-	"context"
 	"fmt"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
+	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 )
 
 const (
-	address  = "postgres://root@localhost:26257/%s?sslmode=disable"
-	database = "is_store_tests"
+	address            = "postgres://root@localhost:26257/%s?sslmode=disable"
+	database           = "is_store_tests"
+	attributesDatabase = "is_store_attributes_test"
 )
 
-// Single store instance shared across all tests.
-var testingStore *Store
+// Store instances shared across different tests.
+// The key of the map is the database name.
+var testingStore map[string]*Store = make(map[string]*Store)
 
-// testStore returns a single and shared store instance everytime the method is
-// called. The first time that is called it creates  a new store instance in a
-// newly created database.
-func testStore(t testing.TB) *Store {
-	if testingStore == nil {
-		testingStore = cleanStore(t, database)
+// testStore returns a store instance of the given database. The store is
+// initialized only the first time is called on a specific database as it is
+// indexed on a map that will be used for the subsequent times this method
+// is called.
+func testStore(t testing.TB, database string) *Store {
+	if _, exists := testingStore[database]; !exists {
+		testingStore[database] = cleanStore(t, database)
 	}
 
-	return testingStore
+	return testingStore[database]
 }
 
-// cleanStore returns a new store instance attached to a newly created database
-// where all migrations has been applied and also has been feed with some users.
+// cleanStore returns a clean store instance. The database will be dropped
+// and recreated again, migrations will be applied and finally will be feed
+// with some test users.
 func cleanStore(t testing.TB, database string) *Store {
-	logger := test.GetLogger(t).WithField("tag", "Identity Server")
+	uri := fmt.Sprintf(address, database)
+	logger := test.GetLogger(t).WithFields(log.Fields(
+		"namespace", "Identity Server",
+		"connection_uri", uri,
+	))
 
-	// open database connection
-	db, err := db.Open(context.Background(), fmt.Sprintf(address, database), migrations.Registry)
+	s, err := Open(uri)
 	if err != nil {
-		logger.WithError(err).Fatal("Failed to establish a connection with the CockroachDB instance")
-		return nil
+		logger.WithError(err).Fatal("Failed to open a store with the CockroachDB instance")
 	}
 
-	// drop database
-	_, err = db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE", database))
+	err = s.DropDatabase()
 	if err != nil {
-		logger.WithError(err).Fatalf("Failed to delete database `%s`", database)
-		return nil
+		logger.WithError(err).Fatal("Failed to drop database")
 	}
 
-	// create it again
-	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s", database))
+	err = s.Init()
 	if err != nil {
-		logger.WithError(err).Fatalf("Failed to create database `%s`", database)
+		logger.WithError(err).Fatalf("Failed to initialize store")
 		return nil
 	}
-
-	// apply all migrations
-	err = db.MigrateAll()
-	if err != nil {
-		logger.WithError(err).Fatal("Failed to apply the migrations from the registry")
-		return nil
-	}
-
-	s := FromDB(db)
 
 	for _, user := range []*ttnpb.User{alice, bob} {
 		err := s.Users.Create(user)

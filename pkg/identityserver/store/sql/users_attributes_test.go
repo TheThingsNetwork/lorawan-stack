@@ -8,7 +8,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
-
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
@@ -67,7 +66,6 @@ func (u *userWithFoo) Fill(namespace string, attributes map[string]interface{}) 
 func TestUserAttributer(t *testing.T) {
 	a := assertions.New(t)
 
-	database := "is_store_attributer_test"
 	schema := `
 		CREATE TABLE IF NOT EXISTS foo_users (
 			id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -76,15 +74,16 @@ func TestUserAttributer(t *testing.T) {
 		);
 	`
 
-	migrations.Registry.Register(migrations.Registry.Count()+1, "test_attributer_schema", schema, "")
-	s := cleanStore(t, database)
+	migrations.Registry.Register(migrations.Registry.Count()+1, "test_users_attributer_schema", schema, "")
+	s := testStore(t, attributesDatabase)
+	s.MigrateAll()
 
 	specializer := func(base ttnpb.User) store.User {
 		return &userWithFoo{User: &base}
 	}
 
 	user := &ttnpb.User{
-		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "attributer"},
+		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "attributer-user"},
 		Password:        "secret",
 		Email:           "john@example.net",
 	}
@@ -100,4 +99,5 @@ func TestUserAttributer(t *testing.T) {
 	found, err := s.Users.GetByID(withFoo.GetUser().UserIdentifiers, specializer)
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeUserIgnoringAutoFields, withFoo)
+	a.So(found.(*userWithFoo).Foo, should.Equal, withFoo.Foo)
 }

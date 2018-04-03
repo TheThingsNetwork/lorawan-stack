@@ -19,7 +19,7 @@ var applicationSpecializer = func(base ttnpb.Application) store.Application {
 
 func TestApplications(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	application := &ttnpb.Application{
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "demo-app"},
@@ -141,6 +141,10 @@ func TestApplications(t *testing.T) {
 	if a.So(keys, should.HaveLength, 1) {
 		a.So(keys, should.Contain, key)
 	}
+
+	key.Rights = []ttnpb.Right{ttnpb.Right(1)}
+	err = s.Applications.UpdateAPIKeyRights(application.ApplicationIdentifiers, key.Name, key.Rights)
+	a.So(err, should.BeNil)
 
 	ids, foundKey, err := s.Applications.GetAPIKey(key.Key)
 	a.So(err, should.BeNil)

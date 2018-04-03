@@ -14,7 +14,7 @@ import (
 
 func TestInvitations(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	invitation := store.InvitationData{
 		Token:     "123",

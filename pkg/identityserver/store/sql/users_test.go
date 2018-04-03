@@ -33,7 +33,7 @@ var bob = &ttnpb.User{
 
 func TestUsers(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	// Users are already created on cleanStore so creation is skipped here.
 
@@ -128,7 +128,7 @@ func TestUsers(t *testing.T) {
 
 func TestUserTx(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	user := &ttnpb.User{
 		UserIdentifiers: ttnpb.UserIdentifiers{UserID: "tx-test"},
@@ -162,7 +162,7 @@ func TestUserTx(t *testing.T) {
 
 func TestUserValidationToken(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	userID := alice.UserIdentifiers
 	token := store.ValidationToken{
@@ -212,7 +212,7 @@ func TestUserValidationToken(t *testing.T) {
 }
 
 func BenchmarkUserCreate(b *testing.B) {
-	s := testStore(b)
+	s := testStore(b, database)
 
 	for n := 0; n < b.N; n++ {
 		s.Users.Create(&ttnpb.User{

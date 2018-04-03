@@ -163,13 +163,19 @@ func (s *apiKeysStore) deleteAPIKey(q db.QueryContext, entityID uuid.UUID, keyNa
 }
 
 func (s *apiKeysStore) deleteAPIKeyRights(q db.QueryContext, entityID uuid.UUID, keyName string) error {
-	_, err := q.Exec(
+	var n string
+	err := q.SelectOne(
+		&n,
 		fmt.Sprintf(`
 			DELETE
 				FROM %ss_api_keys_rights
-				WHERE %s = $1 AND key_name = $2`, s.entity, s.foreignKey),
+				WHERE %s = $1 AND key_name = $2
+				RETURNING key_name`, s.entity, s.foreignKey),
 		entityID,
 		keyName)
+	if db.IsNoRows(err) {
+		return ErrAPIKeyNotFound.New(nil)
+	}
 	return err
 }
 

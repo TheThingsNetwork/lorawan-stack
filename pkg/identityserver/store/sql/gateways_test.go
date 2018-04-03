@@ -19,7 +19,7 @@ var gatewaySpecializer = func(base ttnpb.Gateway) store.Gateway {
 
 func TestGateways(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	gateway := &ttnpb.Gateway{
 		GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
@@ -145,6 +145,10 @@ func TestGateways(t *testing.T) {
 	if a.So(keys, should.HaveLength, 1) {
 		a.So(keys, should.Contain, key)
 	}
+
+	key.Rights = []ttnpb.Right{ttnpb.Right(1)}
+	err = s.Gateways.UpdateAPIKeyRights(gateway.GatewayIdentifiers, key.Name, key.Rights)
+	a.So(err, should.BeNil)
 
 	ids, foundKey, err := s.Gateways.GetAPIKey(key.Key)
 	a.So(err, should.BeNil)

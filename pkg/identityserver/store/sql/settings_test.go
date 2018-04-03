@@ -13,7 +13,7 @@ import (
 
 func TestSettings(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	settings := ttnpb.IdentityServerSettings{
 		BlacklistedIDs: []string{"a"},

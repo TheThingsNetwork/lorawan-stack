@@ -28,7 +28,7 @@ var clientSpecializer = func(base ttnpb.Client) store.Client {
 
 func TestClients(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	err := s.Clients.Create(client)
 	a.So(err, should.BeNil)

@@ -16,7 +16,7 @@ import (
 
 func TestOAuthAuthorizationCode(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	err := s.Clients.Create(client)
 	a.So(err, should.BeNil)
@@ -60,7 +60,7 @@ func TestOAuthAuthorizationCode(t *testing.T) {
 
 func TestOAuthAccessToken(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	data := store.AccessData{
 		AccessToken: "123456",
@@ -99,7 +99,7 @@ func TestOAuthAccessToken(t *testing.T) {
 
 func TestOAuthRefreshToken(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	data := store.RefreshData{
 		RefreshToken: "123456",
@@ -136,7 +136,7 @@ func TestOAuthRefreshToken(t *testing.T) {
 
 func TestOAuthAuthorizedClients(t *testing.T) {
 	a := assertions.New(t)
-	s := testStore(t)
+	s := testStore(t, database)
 
 	accessData := store.AccessData{
 		AccessToken: "123456",
