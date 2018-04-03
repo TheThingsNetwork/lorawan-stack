@@ -73,7 +73,10 @@ func TestPeers(t *testing.T) {
 			}
 		}
 
-		a.So(peer, should.NotBeNil)
+		if !a.So(peer, should.NotBeNil) {
+			t.FailNow()
+		}
+
 		conn := peer.Conn()
 		a.So(conn, should.NotBeNil)
 

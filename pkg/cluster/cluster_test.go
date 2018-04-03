@@ -68,7 +68,9 @@ func TestCluster(t *testing.T) {
 			break
 		}
 	}
-	a.So(is, should.NotBeNil)
+	if !a.So(is, should.NotBeNil) {
+		t.FailNow()
+	}
 
 	// The others should also be there
 	gs := c.GetPeer(ttnpb.PeerInfo_GATEWAY_SERVER, nil, nil)
