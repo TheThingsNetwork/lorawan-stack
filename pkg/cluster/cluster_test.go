@@ -57,14 +57,20 @@ func TestCluster(t *testing.T) {
 
 	a.So(c.Join(), should.BeNil)
 
-	{
-		grpc.Dial(lis.Addr().String(), grpc.WithInsecure(), grpc.WithBlock())
-		time.Sleep(100 * time.Millisecond)
-		// By now we expect that the others will be ready as well
-	}
+	grpc.Dial(lis.Addr().String(), grpc.WithInsecure(), grpc.WithBlock())
 
-	is := c.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, nil, nil)
+	// The IS should be there within reasonable time
+	var is Peer
+	for i := 0; i < 20; i++ {
+		time.Sleep(20 * time.Millisecond) // Wait for peers to join cluster
+		is = c.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, nil, nil)
+		if is != nil {
+			break
+		}
+	}
 	a.So(is, should.NotBeNil)
+
+	// The others should also be there
 	gs := c.GetPeer(ttnpb.PeerInfo_GATEWAY_SERVER, nil, nil)
 	a.So(gs, should.NotBeNil)
 	ns := c.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, nil, nil)

@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/cluster"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
@@ -54,8 +55,6 @@ func TestPeers(t *testing.T) {
 		a.So(err, should.BeNil)
 	}
 
-	time.Sleep(5 * time.Millisecond) // Wait for peers to join cluster
-
 	unusedRoles := []ttnpb.PeerInfo_Role{
 		ttnpb.PeerInfo_APPLICATION_SERVER,
 		ttnpb.PeerInfo_GATEWAY_SERVER,
@@ -65,7 +64,15 @@ func TestPeers(t *testing.T) {
 
 	// GetPeer
 	{
-		peer := c.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, nil, nil)
+		var peer cluster.Peer
+		for i := 0; i < 20; i++ {
+			time.Sleep(20 * time.Millisecond) // Wait for peers to join cluster
+			peer = c.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, nil, nil)
+			if peer != nil {
+				break
+			}
+		}
+
 		a.So(peer, should.NotBeNil)
 		conn := peer.Conn()
 		a.So(conn, should.NotBeNil)
