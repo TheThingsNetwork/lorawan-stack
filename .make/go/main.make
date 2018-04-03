@@ -30,9 +30,11 @@ GO_TAGS ?= -X github.com/TheThingsNetwork/ttn/pkg/version.GitCommit=$(GIT_COMMIT
 
 # coverage
 GO_COVER_FILE = coverage.out
+GO_FILTERED_COVER_FILE = coverage.filtered.out
 
 # go test flags
-GO_TEST_FLAGS ?= $(if $(CI),-cover -covermode=set -coverprofile=$(GO_COVER_FILE),-cover)
+GO_COVERALLS_FLAGS = -cover -covermode=atomic -coverprofile=$(GO_COVER_FILE)
+GO_TEST_FLAGS ?= $(if $(CI),$(GO_COVERALLS_FLAGS),-cover)
 
 # select only go files
 only_go = grep '\.go$$'

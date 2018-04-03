@@ -33,4 +33,4 @@ script:
 - make js.test
 - make js.vulnerabilities
 after_success:
-- goveralls -coverprofile=coverage.out -service=${COVERALLS_SERVICE:-travis-ci} -repotoken ${COVERALLS_TOKEN:-""}
+- make go.coveralls
