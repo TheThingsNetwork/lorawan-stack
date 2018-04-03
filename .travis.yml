@@ -11,6 +11,7 @@ cache:
   - $GOPATH/pkg
   - $GOPATH/src/github.com/golang # dep
   - $GOPATH/src/github.com/alecthomas # gometalinter
+  - $GOPATH/src/github.com/mattn # goveralls
 install:
 - make dev-deps
 - make deps
@@ -31,3 +32,5 @@ script:
 - make js.lint
 - make js.test
 - make js.vulnerabilities
+after_success:
+- goveralls -coverprofile=coverage.out -service=${COVERALLS_SERVICE:-travis-ci} -repotoken ${COVERALLS_TOKEN:-""}

@@ -28,12 +28,11 @@ GO_ENV = CGO_ENABLED=0
 LD_FLAGS = -ldflags "-w $(GO_TAGS)"
 GO_TAGS ?= -X github.com/TheThingsNetwork/ttn/pkg/version.GitCommit=$(GIT_COMMIT) -X github.com/TheThingsNetwork/ttn/pkg/version.BuildDate=$(BUILD_DATE) -X github.com/TheThingsNetwork/ttn/pkg/version.TTN=$(GIT_TAG) -X github.com/TheThingsNetwork/ttn/pkg/version.GitBranch=$(GIT_BRANCH)
 
-# go test flags
-GO_TEST_FLAGS = -cover
-
 # coverage
 GO_COVER_FILE = coverage.out
-GO_COVER_DIR  = .coverage
+
+# go test flags
+GO_TEST_FLAGS ?= $(if $(CI),-cover -covermode=set -coverprofile=$(GO_COVER_FILE),-cover)
 
 # select only go files
 only_go = grep '\.go$$'
@@ -91,6 +90,7 @@ TEST_PACKAGES = $(GO_FILES) | $(no_vendor) | $(only_test) | $(to_packages)
 go.dev-deps:
 	@$(log) "Installing go dev dependencies"
 	@$(log) "Getting dep" && $(GO) get -u github.com/golang/dep/cmd/dep
+	@if [[ ! -z "$(CI)" ]]; then $(log) "Getting goveralls" && $(GO) get -u github.com/mattn/goveralls; fi
 	@$(log) "Getting gometalinter" && $(GO) get -u github.com/alecthomas/gometalinter
 	@$(log) "Getting gometalinter linters" && $(GO_METALINTER) -i
 
