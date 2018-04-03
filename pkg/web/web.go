@@ -61,6 +61,11 @@ type Server struct {
 	server *echo.Echo
 }
 
+// RootGroup creates a new Echo router group with prefix and optional group-level middleware on the root Server.
+func (s *Server) RootGroup(prefix string, middleware ...echo.MiddlewareFunc) *echo.Group {
+	return s.server.Group(prefix, middleware...)
+}
+
 // Option is an option for Server.
 type Option func(*config)
 
@@ -96,11 +101,10 @@ func New(logger log.Interface, opts ...Option) *Server {
 	server.Use(
 		middleware.Log(logger.WithField("namespace", "web")),
 		middleware.ID(cfg.Prefix),
-		middleware.Normalize(cfg.NormalizationMode),
 		cookie.Cookies(cfg.Root, cfg.BlockKey, cfg.HashKey),
 	)
 
-	group := server.Group(strings.TrimSuffix(cfg.Root, "/"))
+	group := server.Group(strings.TrimSuffix(cfg.Root, "/"), middleware.Normalize(cfg.NormalizationMode))
 
 	return &Server{
 		Group:  group,
