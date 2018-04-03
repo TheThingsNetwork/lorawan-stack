@@ -25,7 +25,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -151,11 +150,11 @@ func TestLink(t *testing.T) {
 	// Sending uplink with content
 	{
 		ns.Add(1)
-		err = link.Send(&ttnpb.GatewayUp{
-			UplinkMessages: []*ttnpb.UplinkMessage{
-				{RawPayload: []byte{}, EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{DevAddr: &types.DevAddr{}}},
-			},
-		})
+		uplink := ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
+		for uplink.Payload.MType != ttnpb.MType_CONFIRMED_UP && uplink.Payload.MType != ttnpb.MType_UNCONFIRMED_UP {
+			uplink = ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
+		}
+		err = link.Send(&ttnpb.GatewayUp{UplinkMessages: []*ttnpb.UplinkMessage{uplink}})
 		a.So(err, should.BeNil)
 		ns.Wait()
 	}

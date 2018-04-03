@@ -18,10 +18,9 @@ import "github.com/TheThingsNetwork/ttn/pkg/errors"
 
 // ErrNoNetworkServerFound is returned if no network server was found for a passed DevAddr.
 var ErrNoNetworkServerFound = &errors.ErrDescriptor{
-	MessageFormat:  "No network server found for DevAddr `{dev_addr}`",
-	SafeAttributes: []string{"dev_addr"},
-	Code:           1,
-	Type:           errors.NotFound,
+	MessageFormat: "No network server found for this message",
+	Code:          1,
+	Type:          errors.NotFound,
 }
 
 func init() {

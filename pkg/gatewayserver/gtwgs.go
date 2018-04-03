@@ -20,6 +20,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/cluster"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
@@ -153,22 +154,42 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 		}
 	}()
 
-	if uplink.DevAddr == nil {
-		err = errors.New("No DevAddr specified")
-		return
-	}
-	logger = logger.WithField("devaddr", *uplink.DevAddr)
-	devAddr := *uplink.DevAddr
-	devAddrBytes, err := devAddr.Marshal()
-	if err != nil {
+	pld := uplink.GetPayload()
+	if pld.Payload == nil {
+		err = errors.New("Failed to unmarshal payload")
 		return
 	}
 
-	ns := g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, g.nsTags, devAddrBytes)
+	var ns cluster.Peer
+	switch pld.GetMType() {
+	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
+		if uplink.DevAddr == nil {
+			err = errors.New("No DevAddr specified")
+			return
+		}
+		logger = logger.WithField("devaddr", *uplink.DevAddr)
+		var devAddrBytes []byte
+		devAddrBytes, err = uplink.DevAddr.Marshal()
+		if err != nil {
+			return
+		}
+		ns = g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, g.nsTags, devAddrBytes)
+	case ttnpb.MType_JOIN_ACCEPT, ttnpb.MType_REJOIN_REQUEST:
+		if uplink.DevEUI == nil {
+			err = errors.New("No DevEUI specified")
+			return
+		}
+		logger = logger.WithField("deveui", uplink.DevEUI.String())
+		var devEUIBytes []byte
+		devEUIBytes, err = uplink.DevEUI.Marshal()
+		if err != nil {
+			return
+		}
+		ns = g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, g.nsTags, devEUIBytes)
+	}
+
 	if ns == nil {
-		err = ErrNoNetworkServerFound.New(errors.Attributes{
-			"devaddr": uplink.DevAddr.String(),
-		})
+		err = ErrNoNetworkServerFound.New(nil)
 		return
 	}
 
