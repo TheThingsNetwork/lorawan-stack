@@ -11,9 +11,8 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
-	"github.com/TheThingsNetwork/ttn/pkg/crypto/cryptotest"
+	"github.com/TheThingsNetwork/ttn/pkg/crypto"
 	"github.com/TheThingsNetwork/ttn/pkg/deviceregistry"
-	"github.com/TheThingsNetwork/ttn/pkg/encoding/lorawan"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	. "github.com/TheThingsNetwork/ttn/pkg/networkserver"
 	"github.com/TheThingsNetwork/ttn/pkg/store"
@@ -404,9 +403,9 @@ func HandleUplinkTest() func(t *testing.T) {
 					mac.FCnt = 0x42
 
 					msg.Payload.MIC = nil
-					mic := cryptotest.MustComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, lorawan.MustMarshal(msg.Payload))
+					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
-					msg.RawPayload = lorawan.MustMarshal(msg.Payload)
+					msg.RawPayload = test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
 
 					return msg
 				}(),
@@ -438,9 +437,9 @@ func HandleUplinkTest() func(t *testing.T) {
 					mac.FCnt = 0x42
 
 					msg.Payload.MIC = nil
-					mic := cryptotest.MustComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, lorawan.MustMarshal(msg.Payload))
+					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
-					msg.RawPayload = lorawan.MustMarshal(msg.Payload)
+					msg.RawPayload = test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
 
 					return msg
 				}(),
@@ -476,9 +475,9 @@ func HandleUplinkTest() func(t *testing.T) {
 					mac.FCnt = 0x42
 
 					msg.Payload.MIC = nil
-					mic := cryptotest.MustComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, lorawan.MustMarshal(msg.Payload))
+					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
-					msg.RawPayload = lorawan.MustMarshal(msg.Payload)
+					msg.RawPayload = test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
 
 					return msg
 				}(),
@@ -515,9 +514,9 @@ func HandleUplinkTest() func(t *testing.T) {
 					mac.FCnt = 0x42
 
 					msg.Payload.MIC = nil
-					mic := cryptotest.MustComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, lorawan.MustMarshal(msg.Payload))
+					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
-					msg.RawPayload = lorawan.MustMarshal(msg.Payload)
+					msg.RawPayload = test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
 
 					return msg
 				}(),
@@ -551,11 +550,11 @@ func HandleUplinkTest() func(t *testing.T) {
 					mac.FCnt = 0x42
 
 					msg.Payload.MIC = nil
-					mic := cryptotest.MustComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0,
+					mic := test.Must(crypto.ComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0,
 						uint8(msg.Settings.GetDataRateIndex()), uint8(msg.Settings.GetChannelIndex()),
-						DevAddr, 0x42, lorawan.MustMarshal(msg.Payload))
+						DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
-					msg.RawPayload = lorawan.MustMarshal(msg.Payload)
+					msg.RawPayload = test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
 
 					return msg
 				}(),
@@ -598,11 +597,11 @@ func HandleUplinkTest() func(t *testing.T) {
 					mac.FCnt = 0x42
 
 					msg.Payload.MIC = nil
-					mic := cryptotest.MustComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0x24,
+					mic := test.Must(crypto.ComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0x24,
 						uint8(msg.Settings.GetDataRateIndex()), uint8(msg.Settings.GetChannelIndex()),
-						DevAddr, 0x42, lorawan.MustMarshal(msg.Payload))
+						DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
-					msg.RawPayload = lorawan.MustMarshal(msg.Payload)
+					msg.RawPayload = test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
 
 					return msg
 				}(),
@@ -637,11 +636,11 @@ func HandleUplinkTest() func(t *testing.T) {
 					mac.FCnt = 0x42
 
 					msg.Payload.MIC = nil
-					mic := cryptotest.MustComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0,
+					mic := test.Must(crypto.ComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0,
 						uint8(msg.Settings.GetDataRateIndex()), uint8(msg.Settings.GetChannelIndex()),
-						DevAddr, 0x42, lorawan.MustMarshal(msg.Payload))
+						DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
-					msg.RawPayload = lorawan.MustMarshal(msg.Payload)
+					msg.RawPayload = test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
 
 					return msg
 				}(),
@@ -685,11 +684,11 @@ func HandleUplinkTest() func(t *testing.T) {
 					mac.FCnt = 0x42
 
 					msg.Payload.MIC = nil
-					mic := cryptotest.MustComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0x24,
+					mic := test.Must(crypto.ComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0x24,
 						uint8(msg.Settings.GetDataRateIndex()), uint8(msg.Settings.GetChannelIndex()),
-						DevAddr, 0x42, lorawan.MustMarshal(msg.Payload))
+						DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
-					msg.RawPayload = lorawan.MustMarshal(msg.Payload)
+					msg.RawPayload = test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
 
 					return msg
 				}(),
@@ -768,7 +767,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						t.Run("application uplink", func(t *testing.T) {
 							a := assertions.New(t)
 
-							a.So(test.SameElementsFunc(test.DiffEqual, <-mdCh, up.GetUplinkMessage().GetRxMetadata()), should.BeTrue)
+							a.So(test.SameElementsDiff(<-mdCh, up.GetUplinkMessage().GetRxMetadata()), should.BeTrue)
 
 							upc := deepcopy.Copy(up).(*ttnpb.ApplicationUp)
 							upc.GetUplinkMessage().RxMetadata = nil
@@ -844,7 +843,14 @@ func HandleUplinkTest() func(t *testing.T) {
 						return
 					}
 
-					a.So(test.SameElementsFunc(test.DiffEqual, ed.RecentUplinks, dev.EndDevice.RecentUplinks), should.BeTrue)
+					if !a.So(test.SameElementsDiff(ed.RecentUplinks, dev.EndDevice.RecentUplinks), should.BeTrue) {
+						for _, x := range ed.RecentUplinks[len(ed.RecentUplinks)-1].GetRxMetadata() {
+							for _, y := range dev.EndDevice.RecentUplinks[len(dev.EndDevice.RecentUplinks)-1].GetRxMetadata() {
+								if test.DiffEqual(x, y) {
+								}
+							}
+						}
+					}
 
 					ed.RecentUplinks = nil
 					dev.EndDevice.RecentUplinks = nil
