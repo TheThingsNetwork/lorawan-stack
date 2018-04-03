@@ -169,7 +169,7 @@ func TestGateways(t *testing.T) {
 	err = s.Gateways.Delete(gateway.GatewayIdentifiers)
 	a.So(err, should.BeNil)
 
-	found, err = s.Gateways.GetByID(gateway.GatewayIdentifiers, gatewaySpecializer)
+	_, err = s.Gateways.GetByID(gateway.GatewayIdentifiers, gatewaySpecializer)
 	a.So(err, should.NotBeNil)
 	a.So(ErrGatewayNotFound.Describes(err), should.BeTrue)
 }

@@ -4,7 +4,7 @@ package identityserver
 
 import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 
-func organizationOrUserID_UserID(ids ttnpb.UserIdentifiers) ttnpb.OrganizationOrUserIdentifiers {
+func organizationOrUserIDsUserIDs(ids ttnpb.UserIdentifiers) ttnpb.OrganizationOrUserIdentifiers {
 	return ttnpb.OrganizationOrUserIdentifiers{
 		ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{
 			UserID: &ids,
@@ -12,7 +12,7 @@ func organizationOrUserID_UserID(ids ttnpb.UserIdentifiers) ttnpb.OrganizationOr
 	}
 }
 
-func organizationOrUserID_OrganizationID(ids ttnpb.OrganizationIdentifiers) ttnpb.OrganizationOrUserIdentifiers {
+func organizationOrUserIDsOrganizationIDs(ids ttnpb.OrganizationIdentifiers) ttnpb.OrganizationOrUserIdentifiers {
 	return ttnpb.OrganizationOrUserIdentifiers{
 		ID: &ttnpb.OrganizationOrUserIdentifiers_OrganizationID{
 			OrganizationID: &ids,

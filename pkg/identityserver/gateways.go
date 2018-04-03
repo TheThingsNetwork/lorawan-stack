@@ -27,14 +27,14 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 			return nil, err
 		}
 
-		ids = organizationOrUserID_OrganizationID(req.OrganizationIdentifiers)
+		ids = organizationOrUserIDsOrganizationIDs(req.OrganizationIdentifiers)
 	} else {
 		err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_GATEWAYS_CREATE)
 		if err != nil {
 			return nil, err
 		}
 
-		ids = organizationOrUserID_UserID(claimsFromContext(ctx).UserIdentifiers())
+		ids = organizationOrUserIDsUserIDs(claimsFromContext(ctx).UserIdentifiers())
 	}
 
 	err := s.store.Transact(func(tx *store.Store) error {
@@ -100,10 +100,10 @@ func (s *gatewayService) ListGateways(ctx context.Context, req *ttnpb.ListGatewa
 
 	if !req.OrganizationIdentifiers.IsZero() {
 		err = s.enforceOrganizationRights(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_GATEWAYS_LIST)
-		ids = organizationOrUserID_OrganizationID(req.OrganizationIdentifiers)
+		ids = organizationOrUserIDsOrganizationIDs(req.OrganizationIdentifiers)
 	} else {
 		err = s.enforceUserRights(ctx, ttnpb.RIGHT_USER_GATEWAYS_LIST)
-		ids = organizationOrUserID_UserID(claimsFromContext(ctx).UserIdentifiers())
+		ids = organizationOrUserIDsUserIDs(claimsFromContext(ctx).UserIdentifiers())
 	}
 
 	if err != nil {
@@ -303,7 +303,7 @@ func (s *gatewayService) SetGatewayCollaborator(ctx context.Context, req *ttnpb.
 	case auth.Key:
 		modifiable = claims.Rights
 	case auth.Token:
-		modifiable, err = s.store.Gateways.ListCollaboratorRights(req.GatewayIdentifiers, organizationOrUserID_UserID(claims.UserIdentifiers()))
+		modifiable, err = s.store.Gateways.ListCollaboratorRights(req.GatewayIdentifiers, organizationOrUserIDsUserIDs(claims.UserIdentifiers()))
 		if err != nil {
 			return nil, err
 		}
@@ -373,7 +373,7 @@ func (s *gatewayService) ListGatewayRights(ctx context.Context, req *ttnpb.Gatew
 
 	switch claims.Source {
 	case auth.Token:
-		rights, err := s.store.Gateways.ListCollaboratorRights(*req, organizationOrUserID_UserID(claims.UserIdentifiers()))
+		rights, err := s.store.Gateways.ListCollaboratorRights(*req, organizationOrUserIDsUserIDs(claims.UserIdentifiers()))
 		if err != nil {
 			return nil, err
 		}

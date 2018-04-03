@@ -38,7 +38,7 @@ type ApplicationStore interface {
 	// SaveAPIKey stores an API Key attached to an application.
 	SaveAPIKey(ttnpb.ApplicationIdentifiers, ttnpb.APIKey) error
 
-	// GetAPIKey retrieves an API key by value and the appplication ID.
+	// GetAPIKey retrieves an API key by value and the appplication identifiers.
 	GetAPIKey(string) (ttnpb.ApplicationIdentifiers, ttnpb.APIKey, error)
 
 	// GetAPIKeyByName retrieves an API key from an application.
@@ -48,7 +48,7 @@ type ApplicationStore interface {
 	// TODO(gomezjdaniel): merge with SaveAPIKey and rename it to `Set`?
 	UpdateAPIKeyRights(ttnpb.ApplicationIdentifiers, string, []ttnpb.Right) error
 
-	// ListAPIKey list all the API keys that an application has.
+	// ListAPIKeys list all the API keys that an application has.
 	ListAPIKeys(ttnpb.ApplicationIdentifiers) ([]ttnpb.APIKey, error)
 
 	// DeleteAPIKey deletes a given API key from an application.

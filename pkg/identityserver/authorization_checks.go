@@ -70,7 +70,7 @@ func (is *IdentityServer) enforceApplicationRights(ctx context.Context, ids ttnp
 		}
 
 		var err error
-		authorized, err = is.store.Applications.HasCollaboratorRights(ids, organizationOrUserID_UserID(uids), rights...)
+		authorized, err = is.store.Applications.HasCollaboratorRights(ids, organizationOrUserIDsUserIDs(uids), rights...)
 		if err != nil {
 			return err
 		}
@@ -108,7 +108,7 @@ func (is *IdentityServer) enforceGatewayRights(ctx context.Context, ids ttnpb.Ga
 		}
 
 		var err error
-		authorized, err = is.store.Gateways.HasCollaboratorRights(ids, organizationOrUserID_UserID(uids), rights...)
+		authorized, err = is.store.Gateways.HasCollaboratorRights(ids, organizationOrUserIDsUserIDs(uids), rights...)
 		if err != nil {
 			return err
 		}

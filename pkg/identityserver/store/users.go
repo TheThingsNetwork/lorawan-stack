@@ -69,7 +69,7 @@ type UserStore interface {
 	// SaveAPIKey stores an API Key attached to an user.
 	SaveAPIKey(ttnpb.UserIdentifiers, ttnpb.APIKey) error
 
-	// GetAPIKey retrieves an API key by value and the user ID.
+	// GetAPIKey retrieves an API key by value and the user identifiers.
 	GetAPIKey(string) (ttnpb.UserIdentifiers, ttnpb.APIKey, error)
 
 	// GetAPIKeyByName retrieves an API key from an user.
@@ -78,7 +78,7 @@ type UserStore interface {
 	// UpdateAPIKeyRights updates the right of an API key.
 	UpdateAPIKeyRights(ttnpb.UserIdentifiers, string, []ttnpb.Right) error
 
-	// ListAPIKey list all the API keys that an user has.
+	// ListAPIKeys list all the API keys that an user has.
 	ListAPIKeys(ttnpb.UserIdentifiers) ([]ttnpb.APIKey, error)
 
 	// DeleteAPIKey deletes a given API key from an user.

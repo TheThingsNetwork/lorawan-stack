@@ -8,6 +8,7 @@ import (
 	"github.com/satori/go.uuid"
 )
 
+// SaveAPIKey stores an API Key attached to an application.
 func (s *ApplicationStore) SaveAPIKey(ids ttnpb.ApplicationIdentifiers, key ttnpb.APIKey) error {
 	err := s.transact(func(tx *db.Tx) error {
 		applicationID, err := s.getApplicationID(tx, ids)
@@ -25,6 +26,7 @@ func (s *ApplicationStore) SaveAPIKey(ids ttnpb.ApplicationIdentifiers, key ttnp
 	return err
 }
 
+// GetAPIKey retrieves an API key by value and the appplication identifiers.
 func (s *ApplicationStore) GetAPIKey(value string) (ids ttnpb.ApplicationIdentifiers, key ttnpb.APIKey, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		var appID uuid.UUID
@@ -48,6 +50,7 @@ func (s *ApplicationStore) GetAPIKey(value string) (ids ttnpb.ApplicationIdentif
 	return
 }
 
+// GetAPIKeyByName retrieves an API key from an application.
 func (s *ApplicationStore) GetAPIKeyByName(ids ttnpb.ApplicationIdentifiers, keyName string) (key ttnpb.APIKey, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		applicationID, err := s.getApplicationID(tx, ids)
@@ -67,6 +70,7 @@ func (s *ApplicationStore) GetAPIKeyByName(ids ttnpb.ApplicationIdentifiers, key
 	return
 }
 
+// ListAPIKeys list all the API keys that an application has.
 func (s *ApplicationStore) ListAPIKeys(ids ttnpb.ApplicationIdentifiers) (keys []ttnpb.APIKey, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		applicationID, err := s.getApplicationID(tx, ids)
@@ -91,6 +95,7 @@ func (s *ApplicationStore) ListAPIKeys(ids ttnpb.ApplicationIdentifiers) (keys [
 	return
 }
 
+// UpdateAPIKeyRights updates the right of an API key.
 func (s *ApplicationStore) UpdateAPIKeyRights(ids ttnpb.ApplicationIdentifiers, keyName string, rights []ttnpb.Right) error {
 	err := s.transact(func(tx *db.Tx) error {
 		applicationID, err := s.getApplicationID(tx, ids)
@@ -108,6 +113,7 @@ func (s *ApplicationStore) UpdateAPIKeyRights(ids ttnpb.ApplicationIdentifiers, 
 	return err
 }
 
+// DeleteAPIKey deletes a given API key from an application.
 func (s *ApplicationStore) DeleteAPIKey(ids ttnpb.ApplicationIdentifiers, keyName string) error {
 	err := s.transact(func(tx *db.Tx) error {
 		applicationID, err := s.getApplicationID(tx, ids)

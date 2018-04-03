@@ -31,14 +31,14 @@ func (s *applicationService) CreateApplication(ctx context.Context, req *ttnpb.C
 			return nil, err
 		}
 
-		id = organizationOrUserID_OrganizationID(req.OrganizationIdentifiers)
+		id = organizationOrUserIDsOrganizationIDs(req.OrganizationIdentifiers)
 	} else {
 		err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_APPLICATIONS_CREATE)
 		if err != nil {
 			return nil, err
 		}
 
-		id = organizationOrUserID_UserID(claimsFromContext(ctx).UserIdentifiers())
+		id = organizationOrUserIDsUserIDs(claimsFromContext(ctx).UserIdentifiers())
 	}
 
 	err := s.store.Transact(func(tx *store.Store) error {
@@ -95,10 +95,10 @@ func (s *applicationService) ListApplications(ctx context.Context, req *ttnpb.Li
 	var err error
 
 	if oids := req.OrganizationIdentifiers; !oids.IsZero() {
-		ids = organizationOrUserID_OrganizationID(oids)
+		ids = organizationOrUserIDsOrganizationIDs(oids)
 		err = s.enforceOrganizationRights(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_APPLICATIONS_LIST)
 	} else {
-		ids = organizationOrUserID_UserID(claimsFromContext(ctx).UserIdentifiers())
+		ids = organizationOrUserIDsUserIDs(claimsFromContext(ctx).UserIdentifiers())
 		err = s.enforceUserRights(ctx, ttnpb.RIGHT_USER_APPLICATIONS_LIST)
 	}
 
@@ -270,7 +270,7 @@ func (s *applicationService) SetApplicationCollaborator(ctx context.Context, req
 	case auth.Key:
 		modifiable = claims.Rights
 	case auth.Token:
-		modifiable, err = s.store.Applications.ListCollaboratorRights(req.ApplicationIdentifiers, organizationOrUserID_UserID(claims.UserIdentifiers()))
+		modifiable, err = s.store.Applications.ListCollaboratorRights(req.ApplicationIdentifiers, organizationOrUserIDsUserIDs(claims.UserIdentifiers()))
 		if err != nil {
 			return nil, err
 		}
@@ -340,7 +340,7 @@ func (s *applicationService) ListApplicationRights(ctx context.Context, req *ttn
 
 	switch claims.Source {
 	case auth.Token:
-		rights, err := s.store.Applications.ListCollaboratorRights(*req, organizationOrUserID_UserID(claims.UserIdentifiers()))
+		rights, err := s.store.Applications.ListCollaboratorRights(*req, organizationOrUserIDsUserIDs(claims.UserIdentifiers()))
 		if err != nil {
 			return nil, err
 		}

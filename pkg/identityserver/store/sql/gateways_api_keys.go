@@ -8,6 +8,7 @@ import (
 	"github.com/satori/go.uuid"
 )
 
+// SaveAPIKey stores an API Key attached to a gateway.
 func (s *GatewayStore) SaveAPIKey(ids ttnpb.GatewayIdentifiers, key ttnpb.APIKey) error {
 	err := s.transact(func(tx *db.Tx) error {
 		gatewayID, err := s.getGatewayID(tx, ids)
@@ -25,6 +26,7 @@ func (s *GatewayStore) SaveAPIKey(ids ttnpb.GatewayIdentifiers, key ttnpb.APIKey
 	return err
 }
 
+// GetAPIKey retrieves an API key by value and the gateway identifiers.
 func (s *GatewayStore) GetAPIKey(value string) (ids ttnpb.GatewayIdentifiers, key ttnpb.APIKey, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		var gtwID uuid.UUID
@@ -48,6 +50,7 @@ func (s *GatewayStore) GetAPIKey(value string) (ids ttnpb.GatewayIdentifiers, ke
 	return
 }
 
+// GetAPIKeyByName retrieves an API key from a gateway.
 func (s *GatewayStore) GetAPIKeyByName(ids ttnpb.GatewayIdentifiers, keyName string) (key ttnpb.APIKey, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		gatewayID, err := s.getGatewayID(tx, ids)
@@ -67,6 +70,7 @@ func (s *GatewayStore) GetAPIKeyByName(ids ttnpb.GatewayIdentifiers, keyName str
 	return
 }
 
+// ListAPIKeys list all the API keys that a gateway has.
 func (s *GatewayStore) ListAPIKeys(ids ttnpb.GatewayIdentifiers) (keys []ttnpb.APIKey, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		gatewayID, err := s.getGatewayID(tx, ids)
@@ -91,6 +95,7 @@ func (s *GatewayStore) ListAPIKeys(ids ttnpb.GatewayIdentifiers) (keys []ttnpb.A
 	return
 }
 
+// UpdateAPIKeyRights updates the right of an API key.
 func (s *GatewayStore) UpdateAPIKeyRights(ids ttnpb.GatewayIdentifiers, keyName string, rights []ttnpb.Right) error {
 	err := s.transact(func(tx *db.Tx) error {
 		gatewayID, err := s.getGatewayID(tx, ids)
@@ -108,6 +113,7 @@ func (s *GatewayStore) UpdateAPIKeyRights(ids ttnpb.GatewayIdentifiers, keyName 
 	return err
 }
 
+// DeleteAPIKey deletes a given API key from a gateway.
 func (s *GatewayStore) DeleteAPIKey(ids ttnpb.GatewayIdentifiers, keyName string) error {
 	err := s.transact(func(tx *db.Tx) error {
 		gatewayID, err := s.getGatewayID(tx, ids)

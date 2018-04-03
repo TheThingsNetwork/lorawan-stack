@@ -165,7 +165,7 @@ func TestApplications(t *testing.T) {
 	err = s.Applications.Delete(application.ApplicationIdentifiers)
 	a.So(err, should.BeNil)
 
-	found, err = s.Applications.GetByID(application.ApplicationIdentifiers, applicationSpecializer)
+	_, err = s.Applications.GetByID(application.ApplicationIdentifiers, applicationSpecializer)
 	a.So(err, should.NotBeNil)
 	a.So(ErrApplicationNotFound.Describes(err), should.BeTrue)
 }

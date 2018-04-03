@@ -8,6 +8,7 @@ import (
 	"github.com/satori/go.uuid"
 )
 
+// SaveAPIKey stores an API Key attached to an user.
 func (s *UserStore) SaveAPIKey(ids ttnpb.UserIdentifiers, key ttnpb.APIKey) error {
 	err := s.transact(func(tx *db.Tx) error {
 		userID, err := s.getUserID(tx, ids)
@@ -25,6 +26,7 @@ func (s *UserStore) SaveAPIKey(ids ttnpb.UserIdentifiers, key ttnpb.APIKey) erro
 	return err
 }
 
+// GetAPIKey retrieves an API key by value and the user identifiers.
 func (s *UserStore) GetAPIKey(value string) (ids ttnpb.UserIdentifiers, key ttnpb.APIKey, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		var userID uuid.UUID
@@ -48,6 +50,7 @@ func (s *UserStore) GetAPIKey(value string) (ids ttnpb.UserIdentifiers, key ttnp
 	return
 }
 
+// GetAPIKeyByName retrieves an API key from an user.
 func (s *UserStore) GetAPIKeyByName(ids ttnpb.UserIdentifiers, keyName string) (key ttnpb.APIKey, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		userID, err := s.getUserID(tx, ids)
@@ -67,6 +70,25 @@ func (s *UserStore) GetAPIKeyByName(ids ttnpb.UserIdentifiers, keyName string) (
 	return
 }
 
+// UpdateAPIKeyRights updates the right of an API key.
+func (s *UserStore) UpdateAPIKeyRights(ids ttnpb.UserIdentifiers, keyName string, rights []ttnpb.Right) error {
+	err := s.transact(func(tx *db.Tx) error {
+		userID, err := s.getUserID(tx, ids)
+		if err != nil {
+			return err
+		}
+
+		err = s.deleteAPIKeyRights(tx, userID, keyName)
+		if err != nil {
+			return err
+		}
+
+		return s.saveAPIKeyRights(tx, userID, keyName, rights)
+	})
+	return err
+}
+
+// ListAPIKeys list all the API keys that an user has.
 func (s *UserStore) ListAPIKeys(ids ttnpb.UserIdentifiers) (keys []ttnpb.APIKey, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		userID, err := s.getUserID(tx, ids)
@@ -91,23 +113,7 @@ func (s *UserStore) ListAPIKeys(ids ttnpb.UserIdentifiers) (keys []ttnpb.APIKey,
 	return
 }
 
-func (s *UserStore) UpdateAPIKeyRights(ids ttnpb.UserIdentifiers, keyName string, rights []ttnpb.Right) error {
-	err := s.transact(func(tx *db.Tx) error {
-		userID, err := s.getUserID(tx, ids)
-		if err != nil {
-			return err
-		}
-
-		err = s.deleteAPIKeyRights(tx, userID, keyName)
-		if err != nil {
-			return err
-		}
-
-		return s.saveAPIKeyRights(tx, userID, keyName, rights)
-	})
-	return err
-}
-
+// DeleteAPIKey deletes a given API key from an user.
 func (s *UserStore) DeleteAPIKey(ids ttnpb.UserIdentifiers, keyName string) error {
 	err := s.transact(func(tx *db.Tx) error {
 		userID, err := s.getUserID(tx, ids)

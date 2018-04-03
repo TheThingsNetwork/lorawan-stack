@@ -8,6 +8,7 @@ import (
 	"github.com/satori/go.uuid"
 )
 
+// SaveAPIKey stores an API Key attached to an organization.
 func (s *OrganizationStore) SaveAPIKey(ids ttnpb.OrganizationIdentifiers, key ttnpb.APIKey) error {
 	err := s.transact(func(tx *db.Tx) error {
 		orgID, err := s.getOrganizationID(tx, ids)
@@ -25,6 +26,7 @@ func (s *OrganizationStore) SaveAPIKey(ids ttnpb.OrganizationIdentifiers, key tt
 	return err
 }
 
+// GetAPIKey retrieves an API key by value and the organization identifiers.
 func (s *OrganizationStore) GetAPIKey(value string) (ids ttnpb.OrganizationIdentifiers, key ttnpb.APIKey, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		var orgID uuid.UUID
@@ -48,6 +50,7 @@ func (s *OrganizationStore) GetAPIKey(value string) (ids ttnpb.OrganizationIdent
 	return
 }
 
+// GetAPIKeyByName retrieves an API key from an organization.
 func (s *OrganizationStore) GetAPIKeyByName(ids ttnpb.OrganizationIdentifiers, keyName string) (key ttnpb.APIKey, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		orgID, err := s.getOrganizationID(tx, ids)
@@ -67,6 +70,7 @@ func (s *OrganizationStore) GetAPIKeyByName(ids ttnpb.OrganizationIdentifiers, k
 	return
 }
 
+// ListAPIKeys list all the API keys that an organization has.
 func (s *OrganizationStore) ListAPIKeys(ids ttnpb.OrganizationIdentifiers) (keys []ttnpb.APIKey, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		orgID, err := s.getOrganizationID(tx, ids)
@@ -91,6 +95,7 @@ func (s *OrganizationStore) ListAPIKeys(ids ttnpb.OrganizationIdentifiers) (keys
 	return
 }
 
+// UpdateAPIKeyRights updates the right of an API key.
 func (s *OrganizationStore) UpdateAPIKeyRights(ids ttnpb.OrganizationIdentifiers, keyName string, rights []ttnpb.Right) error {
 	err := s.transact(func(tx *db.Tx) error {
 		orgID, err := s.getOrganizationID(tx, ids)
@@ -108,6 +113,7 @@ func (s *OrganizationStore) UpdateAPIKeyRights(ids ttnpb.OrganizationIdentifiers
 	return err
 }
 
+// DeleteAPIKey deletes a given API key from an organization.
 func (s *OrganizationStore) DeleteAPIKey(ids ttnpb.OrganizationIdentifiers, keyName string) error {
 	err := s.transact(func(tx *db.Tx) error {
 		orgID, err := s.getOrganizationID(tx, ids)

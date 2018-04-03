@@ -36,7 +36,7 @@ type OrganizationStore interface {
 	// SaveAPIKey stores an API Key attached to an organization.
 	SaveAPIKey(ttnpb.OrganizationIdentifiers, ttnpb.APIKey) error
 
-	// GetAPIKey retrieves an API key by value and the organization ID.
+	// GetAPIKey retrieves an API key by value and the organization identifiers.
 	GetAPIKey(string) (ttnpb.OrganizationIdentifiers, ttnpb.APIKey, error)
 
 	// GetAPIKeyByName retrieves an API key from an organization.
@@ -45,7 +45,7 @@ type OrganizationStore interface {
 	// UpdateAPIKeyRights updates the right of an API key.
 	UpdateAPIKeyRights(ttnpb.OrganizationIdentifiers, string, []ttnpb.Right) error
 
-	// ListAPIKey list all the API keys that an organization has.
+	// ListAPIKeys list all the API keys that an organization has.
 	ListAPIKeys(ttnpb.OrganizationIdentifiers) ([]ttnpb.APIKey, error)
 
 	// DeleteAPIKey deletes a given API key from an organization.

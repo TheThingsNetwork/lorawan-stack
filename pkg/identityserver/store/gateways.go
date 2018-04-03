@@ -45,7 +45,7 @@ type GatewayStore interface {
 	// SaveAPIKey stores an API Key attached to a gateway.
 	SaveAPIKey(ttnpb.GatewayIdentifiers, ttnpb.APIKey) error
 
-	// GetAPIKey retrieves an API key by value and the gateway ID.
+	// GetAPIKey retrieves an API key by value and the gateway identifiers.
 	GetAPIKey(string) (ttnpb.GatewayIdentifiers, ttnpb.APIKey, error)
 
 	// GetAPIKeyByName retrieves an API key from a gateway.
@@ -54,7 +54,7 @@ type GatewayStore interface {
 	// UpdateAPIKeyRights updates the right of an API key.
 	UpdateAPIKeyRights(ttnpb.GatewayIdentifiers, string, []ttnpb.Right) error
 
-	// ListAPIKey list all the API keys that a gateway has.
+	// ListAPIKeys list all the API keys that a gateway has.
 	ListAPIKeys(ttnpb.GatewayIdentifiers) ([]ttnpb.APIKey, error)
 
 	// DeleteAPIKey deletes a given API key from a gateway.

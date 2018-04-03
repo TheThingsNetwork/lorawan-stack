@@ -113,7 +113,7 @@ func TestUsers(t *testing.T) {
 	err = s.Users.DeleteAPIKey(alice.UserIdentifiers, key.Name)
 	a.So(err, should.BeNil)
 
-	foundKey, err = s.Users.GetAPIKeyByName(alice.UserIdentifiers, key.Name)
+	_, err = s.Users.GetAPIKeyByName(alice.UserIdentifiers, key.Name)
 	a.So(err, should.NotBeNil)
 	a.So(ErrAPIKeyNotFound.Describes(err), should.BeTrue)
 

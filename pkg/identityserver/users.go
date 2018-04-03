@@ -270,12 +270,12 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		apps, err := tx.Applications.ListByOrganizationOrUser(organizationOrUserID_UserID(claimsFromContext(ctx).UserIdentifiers()), s.config.Specializers.Application)
+		apps, err := tx.Applications.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(claimsFromContext(ctx).UserIdentifiers()), s.config.Specializers.Application)
 		if err != nil {
 			return err
 		}
 
-		gtws, err := tx.Gateways.ListByOrganizationOrUser(organizationOrUserID_UserID(claimsFromContext(ctx).UserIdentifiers()), s.config.Specializers.Gateway)
+		gtws, err := tx.Gateways.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(claimsFromContext(ctx).UserIdentifiers()), s.config.Specializers.Gateway)
 		if err != nil {
 			return err
 		}
