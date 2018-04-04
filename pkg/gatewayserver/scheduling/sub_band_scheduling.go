@@ -187,9 +187,3 @@ func firstMomentConsideringDutyCycle(spans []Span, dutyCycle float32, minimum Ti
 	margin := maxAirtime - (precedingWindowsAirtime - duration)
 	return lastWindow.Start.Add(-1 * margin).Add(dutyCycleWindow)
 }
-
-func createPacketWindow(start Timestamp, duration time.Duration, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) packetWindow {
-	window := Span{Start: start, Duration: duration}
-	finalEmissionWindow := packetWindow{window: window, timeOffAir: window.timeOffAir(timeOffAir)}
-	return finalEmissionWindow
-}

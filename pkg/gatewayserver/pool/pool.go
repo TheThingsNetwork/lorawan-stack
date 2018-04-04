@@ -77,10 +77,10 @@ func (s *gatewayStore) Remove(gatewayID ttnpb.GatewayIdentifiers) {
 	s.mu.Unlock()
 }
 
-// PoolSubscription is implemented by ttnpb.GtwGs_LinkServer.
+// Subscription is implemented by ttnpb.GtwGs_LinkServer.
 //
 // Using this interface and not ttnpb.GtwGs_LinkServer allows for better testing.
-type PoolSubscription interface {
+type Subscription interface {
 	Send(*ttnpb.GatewayDown) error
 	Recv() (*ttnpb.GatewayUp, error)
 	Context() context.Context
@@ -92,7 +92,7 @@ type PoolSubscription interface {
 //
 // - Scheduling of downlinks
 type Pool interface {
-	Subscribe(gatewayInfo ttnpb.GatewayIdentifiers, link PoolSubscription, fp ttnpb.FrequencyPlan) (chan *ttnpb.GatewayUp, error)
+	Subscribe(gatewayInfo ttnpb.GatewayIdentifiers, link Subscription, fp ttnpb.FrequencyPlan) (chan *ttnpb.GatewayUp, error)
 	Send(gatewayInfo ttnpb.GatewayIdentifiers, downstream *ttnpb.GatewayDown) error
 
 	GetGatewayObservations(gatewayInfo *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error)

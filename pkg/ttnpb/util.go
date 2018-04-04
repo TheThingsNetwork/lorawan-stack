@@ -16,18 +16,6 @@ package ttnpb
 
 const maxUint24 = 1<<24 - 1
 
-func parseUint16(b []byte) uint16 {
-	switch len(b) {
-	case 0:
-		return 0
-	case 1:
-		_ = b[0]
-		return uint16(b[0])
-	default:
-		_ = b[1]
-		return uint16(b[0]) | uint16(b[1])<<8
-	}
-}
 func parseUint32(b []byte) uint32 {
 	switch len(b) {
 	case 0:

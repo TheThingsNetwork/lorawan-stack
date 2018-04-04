@@ -24,22 +24,26 @@ import (
 )
 
 var (
+	// ErrInvalidCodingRate is returned if the passed coding rate is invalid
 	ErrInvalidCodingRate = &errors.ErrDescriptor{
-		MessageFormat: "Invalid coding rate: cannot be different from 4/{5,6,7,8}",
+		MessageFormat: "Invalid coding rate: cannot be different from 4/[5..8]",
 		Code:          1,
 		Type:          errors.InvalidArgument,
 	}
-	ErrUnknownModulation = &errors.ErrDescriptor{
-		MessageFormat: "Unknown modulation",
+	// ErrInvalidModulation is returned if the passed modulation is invalid
+	ErrInvalidModulation = &errors.ErrDescriptor{
+		MessageFormat: "Invalid modulation",
 		Code:          2,
-		Type:          errors.Unknown,
+		Type:          errors.InvalidArgument,
 	}
+	// ErrInvalidBandwidth is returned if the passed bandwidth is invalid
 	ErrInvalidBandwidth = &errors.ErrDescriptor{
-		MessageFormat:  "Invalid coding rate: cannot be {bandwidth}",
+		MessageFormat:  "Invalid bandwidth: cannot be {bandwidth}",
 		Code:           3,
 		Type:           errors.InvalidArgument,
 		SafeAttributes: []string{"bandwidth"},
 	}
+	// ErrInvalidSpreadingFactor is returned if the passed spready factor is invalid
 	ErrInvalidSpreadingFactor = &errors.ErrDescriptor{
 		MessageFormat:  "Invalid spreading factor: cannot be {spreading_factor}",
 		Code:           4,
@@ -50,7 +54,7 @@ var (
 
 func init() {
 	ErrInvalidCodingRate.Register()
-	ErrUnknownModulation.Register()
+	ErrInvalidModulation.Register()
 	ErrInvalidBandwidth.Register()
 	ErrInvalidSpreadingFactor.Register()
 }
@@ -66,7 +70,7 @@ func Compute(rawPayload []byte, settings ttnpb.TxSettings) (time.Duration, error
 	case ttnpb.Modulation_FSK:
 		return computeFSK(rawPayload, settings), nil
 	default:
-		return 0, ErrUnknownModulation.New(nil)
+		return 0, ErrInvalidModulation.New(nil)
 	}
 }
 

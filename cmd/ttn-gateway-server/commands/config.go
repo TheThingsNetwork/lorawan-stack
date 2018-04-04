@@ -21,11 +21,13 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
 )
 
+// Config of the gateway server to start.
 type Config struct {
 	conf.ServiceBase `name:",squash"`
 	GS               gatewayserver.Config `name:"gs"`
 }
 
+// DefaultConfig of the gateway server.
 var DefaultConfig = Config{
 	ServiceBase: shared.DefaultServiceBase,
 	GS:          shared_gatewayserver.DefaultGatewayServerConfig,

@@ -121,13 +121,13 @@ func init() {
 		Beacon: Beacon{
 			DataRateIndex:    8,
 			CodingRate:       "4/5",
-			BroadcastChannel: beaconChannelFromFrequencies(us_auBeaconFrequencies),
-			PingSlotChannels: us_auBeaconFrequencies[:],
+			BroadcastChannel: beaconChannelFromFrequencies(usAuBeaconFrequencies),
+			PingSlotChannels: usAuBeaconFrequencies[:],
 		},
 
 		regionalParameters1_0:   self,
-		regionalParameters1_0_1: usBeacon_1_0_1,
-		regionalParameters1_0_2: disableCFList_1_0_2,
+		regionalParameters1_0_1: usBeacon1_0_1,
+		regionalParameters1_0_2: disableCFList1_0_2,
 		regionalParameters1_1A:  self,
 	}
 	All = append(All, us_902_928)

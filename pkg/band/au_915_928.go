@@ -123,12 +123,12 @@ func init() {
 		Beacon: Beacon{
 			DataRateIndex:    8,
 			CodingRate:       "4/5",
-			BroadcastChannel: beaconChannelFromFrequencies(us_auBeaconFrequencies),
-			PingSlotChannels: us_auBeaconFrequencies[:],
+			BroadcastChannel: beaconChannelFromFrequencies(usAuBeaconFrequencies),
+			PingSlotChannels: usAuBeaconFrequencies[:],
 		},
 
 		// No LoRaWAN Regional Parameters 1.0
-		regionalParameters1_0_1: auDataRates_1_0_1,
+		regionalParameters1_0_1: auDataRates1_0_1,
 		regionalParameters1_0_2: self,
 		regionalParameters1_1A:  self,
 	}

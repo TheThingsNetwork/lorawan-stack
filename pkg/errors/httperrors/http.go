@@ -149,8 +149,8 @@ func FromHTTP(resp *http.Response) errors.Error {
 		return nil
 	}
 	defer resp.Body.Close()
-	bytes, _ := ioutil.ReadAll(resp.Body)
-	if len(bytes) > 0 {
+	bytes, err := ioutil.ReadAll(resp.Body)
+	if err == nil && len(bytes) > 0 {
 		out := new(errors.Impl)
 		err := out.UnmarshalJSON(bytes)
 		if err == nil {

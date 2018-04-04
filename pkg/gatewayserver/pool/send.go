@@ -23,6 +23,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
+// ErrGatewayNotConnected is returned when a send operation failed because a gateway is not connected.
 var ErrGatewayNotConnected = &errors.ErrDescriptor{
 	MessageFormat:  "Gateway `{gateway_id}` not connected",
 	Code:           1,

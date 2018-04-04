@@ -111,7 +111,7 @@ func init() {
 
 		// No LoRaWAN Regional Parameters 1.0
 		regionalParameters1_0_1: self,
-		regionalParameters1_0_2: disableCFList_1_0_2,
+		regionalParameters1_0_2: disableCFList1_0_2,
 		regionalParameters1_1A:  self,
 	}
 	All = append(All, cn_470_510)

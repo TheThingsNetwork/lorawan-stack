@@ -23,13 +23,19 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 )
 
+// RegionalParametersVersion of a band.
 type RegionalParametersVersion int
 
 const (
+	// RegionalParameters1_0 is LoRaWAN 1.0 physical layers parameters.
 	RegionalParameters1_0 RegionalParametersVersion = iota
+	// RegionalParameters1_0_1 is LoRaWAN 1.0.1 physical layers parameters.
 	RegionalParameters1_0_1
+	// RegionalParameters1_0_2 is the LoRaWAN 1.0.2 Regional Parameters.
 	RegionalParameters1_0_2
+	// RegionalParameters1_1A is the LoRaWAN 1.1 Regional Parameters Revision A.
 	RegionalParameters1_1A
+	// CurrentVersion is the LoRaWAN 1.1 Regional Parameters Revision B.
 	CurrentVersion
 )
 
@@ -241,7 +247,7 @@ func beaconChannelFromFrequencies(frequencies [8]uint32) func(float64) uint32 {
 	}
 }
 
-var us_auBeaconFrequencies = func() [8]uint32 {
+var usAuBeaconFrequencies = func() [8]uint32 {
 	freqs := [8]uint32{}
 	for i := 0; i < 8; i++ {
 		freqs[i] = 923300000 + uint32(i*600000)
