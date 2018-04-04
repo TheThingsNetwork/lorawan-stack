@@ -183,6 +183,16 @@ meaning is obvious from the context.
 | device id                       | devID   |
 | user id                         | userID  |
 
+### Comments
+
+Code should be as self-explanatory as possible. However, comments should be used to respect Go formatting guidelines, to generate insightful documentation with [Godoc](https://godoc.org/github.com/TheThingsNetwork/ttn), and to explain what can not be expressed by pure code. Comments should be English sentences, and documentation-generating comments should be closed by a period. Comments can also be used to indicate steps to take in the future (*TODOs*), if they reference the GitHub issue to track this *TODO*.
+
++ In **Go files**, comments should be added according to `golint` requirements and [Effective Go guidelines](https://golang.org/doc/effective_go.html#commentary), especially in regards to commenting exported packages, types and variables.
+
++ In **protocol buffer files**, fields should be concisely commented.
+
++ **Protobuf-generated files**, including Go files, are not tracked by `golint`. These do not need to respect the same comments guidelines as Go files, especially in regards to exported values.
+
 ## <a name="security-issues"></a>Security Issues
 
 We do our utmost best to build secure systems, but we're human too, so we sometimes make mistakes. If you find any vulnerability in our systems, please contact us directly. We can be reached on Slack, by email and a number of other communication platforms.
