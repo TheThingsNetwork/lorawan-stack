@@ -28,16 +28,22 @@ import (
 )
 
 var (
-	FNwkSIntKey         = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	SNwkSIntKey         = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	DevAddr             = types.DevAddr{0x42, 0x42, 0xff, 0xff}
-	DevEUI              = types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	JoinEUI             = types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	ApplicationID       = "test"
-	DuplicateCount      = 2
-	Delay               = 20 * time.Millisecond
-	DeduplicationWindow = 200 * time.Millisecond
-	CooldownWindow      = 400 * time.Millisecond
+	// Slowdown slows down the test in a linear fashion(the higher the value - the slower the test),
+	// which may be required on slower systems
+	Slowdown = 0
+
+	DuplicateCount = 5
+
+	FNwkSIntKey   = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	SNwkSIntKey   = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	DevAddr       = types.DevAddr{0x42, 0x42, 0xff, 0xff}
+	DevEUI        = types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	JoinEUI       = types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	ApplicationID = "test"
+
+	Delay               = 20 * time.Millisecond * time.Duration(1+Slowdown)
+	DeduplicationWindow = 4 * Delay
+	CooldownWindow      = 8 * Delay
 )
 
 func TestDownlinkQueueReplace(t *testing.T) {
@@ -805,17 +811,17 @@ func HandleUplinkTest() func(t *testing.T) {
 					deduplicationEnd = time.Now().Add(DeduplicationWindow)
 					cooldownEnd = deduplicationEnd.Add(CooldownWindow)
 
-					var deduplicated int64 = 1
+					var deduplicated uint64 = 1
 					for ; time.Now().Before(cooldownEnd); time.Sleep(sleepInterval) {
 						go func() {
 							_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
 							if a.So(err, should.BeNil) && time.Now().Before(deduplicationEnd) {
-								atomic.AddInt64(&deduplicated, 1)
+								atomic.AddUint64(&deduplicated, 1)
 							}
 						}()
 					}
 
-					for i := int64(0); i < deduplicated; i++ {
+					for i := uint64(0); i < deduplicated; i++ {
 						md = append(md, tc.UplinkMessage.GetRxMetadata()...)
 					}
 					mdCh <- md
@@ -843,17 +849,16 @@ func HandleUplinkTest() func(t *testing.T) {
 						return
 					}
 
-					if !a.So(test.SameElementsDiff(ed.RecentUplinks, dev.EndDevice.RecentUplinks), should.BeTrue) {
-						for _, x := range ed.RecentUplinks[len(ed.RecentUplinks)-1].GetRxMetadata() {
-							for _, y := range dev.EndDevice.RecentUplinks[len(dev.EndDevice.RecentUplinks)-1].GetRxMetadata() {
-								if test.DiffEqual(x, y) {
-								}
-							}
-						}
+					if !a.So(dev.EndDevice.GetRecentUplinks(), should.NotBeEmpty) {
+						return
 					}
+					dUp := dev.EndDevice.GetRecentUplinks()[len(dev.EndDevice.RecentUplinks)-1]
+					eUp := ed.GetRecentUplinks()[len(ed.RecentUplinks)-1]
 
-					ed.RecentUplinks = nil
-					dev.EndDevice.RecentUplinks = nil
+					a.So(test.SameElementsDiff(dUp.GetRxMetadata(), eUp.GetRxMetadata()), should.BeTrue)
+
+					dUp.RxMetadata = nil
+					eUp.RxMetadata = nil
 
 					a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
 				})
@@ -876,22 +881,29 @@ func HandleUplinkTest() func(t *testing.T) {
 
 					cooldownEnd := deduplicationEnd.Add(CooldownWindow)
 
-					var deduplicated int64 = 1
+					var deduplicated uint64 = 1
 					for ; time.Now().Before(cooldownEnd); time.Sleep(sleepInterval) {
 						go func() {
 							_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
 							if a.So(err, should.BeNil) && time.Now().Before(deduplicationEnd) {
-								atomic.AddInt64(&deduplicated, 1)
+								atomic.AddUint64(&deduplicated, 1)
 							}
 						}()
 					}
 
-					for i := int64(0); i < deduplicated; i++ {
+					for i := uint64(0); i < deduplicated; i++ {
 						md = append(md, tc.UplinkMessage.GetRxMetadata()...)
 					}
 					mdCh <- md
 				})
+
+				after := time.AfterFunc(Delay+CooldownWindow+DeduplicationWindow, func() {
+					t.Error("Second uplink did not get sent")
+					wg.Done()
+				})
+
 				wg.Wait()
+				after.Stop()
 			})
 		}
 	}
@@ -1087,56 +1099,103 @@ func HandleJoinTest() func(t *testing.T) {
 					return
 				}
 
-				// HandleUplink may modify contents of passed message, hence we make a deep copy.
-				msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
+				md := make([]*ttnpb.RxMetadata, 0, DuplicateCount+1)
 
-				start := time.Now()
-				cooldownEnd := time.Now().Add(DeduplicationWindow + CooldownWindow)
+				sleepInterval := (DeduplicationWindow + CooldownWindow) / time.Duration(DuplicateCount)
+
+				var start time.Time
+				var deduplicationEnd time.Time
+				var cooldownEnd time.Time
 
 				if !t.Run("handle join", func(t *testing.T) {
 					a := assertions.New(t)
 
-					_, err = ns.HandleUplink(context.Background(), msg)
-					a.So(err, should.BeNil)
+					start := time.Now()
+					deduplicationEnd = start.Add(DeduplicationWindow)
+					cooldownEnd = deduplicationEnd.Add(CooldownWindow)
+
+					var deduplicated uint64 = 1
+					for ; time.Now().Before(cooldownEnd); time.Sleep(sleepInterval) {
+						go func() {
+							_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
+							if a.So(err, should.BeNil) && time.Now().Before(deduplicationEnd) {
+								atomic.AddUint64(&deduplicated, 1)
+							}
+						}()
+					}
+
+					for i := uint64(0); i < deduplicated; i++ {
+						md = append(md, tc.UplinkMessage.GetRxMetadata()...)
+					}
 				}) {
 					return
 				}
 
-				t.Run("duplicates before cooldown window end", func(t *testing.T) {
+				t.Run("updated Session and RecentUplinks", func(t *testing.T) {
 					a := assertions.New(t)
 
-					for ; time.Now().Before(cooldownEnd); time.Sleep((DeduplicationWindow + CooldownWindow) / 20) {
-						_, err = ns.HandleUplink(context.Background(), msg)
-						a.So(err, should.BeNil)
+					msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
+					msg.RxMetadata = md
+
+					ed := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+
+					ed.RecentUplinks = append(tc.Device.GetRecentUplinks(), msg)
+					if len(ed.RecentUplinks) > RecentUplinkCount {
+						ed.RecentUplinks = ed.RecentUplinks[len(ed.RecentUplinks)-RecentUplinkCount:]
 					}
+
+					dev.EndDevice, err = dev.Load()
+					if !a.So(err, should.BeNil) ||
+						!a.So(dev.EndDevice, should.NotBeNil) {
+						return
+					}
+
+					if !a.So(dev.EndDevice.GetRecentUplinks(), should.NotBeEmpty) {
+						return
+					}
+					dUp := dev.EndDevice.GetRecentUplinks()[len(dev.EndDevice.RecentUplinks)-1]
+					eUp := ed.GetRecentUplinks()[len(ed.RecentUplinks)-1]
+
+					a.So(test.SameElementsDiff(dUp.GetRxMetadata(), eUp.GetRxMetadata()), should.BeTrue)
+
+					dUp.RxMetadata = nil
+					eUp.RxMetadata = nil
+
+					a.So(dev.EndDevice.SessionFallback, should.BeNil)
+					if a.So(dev.EndDevice.GetSession(), should.NotBeNil) {
+						a.So(dev.EndDevice.Session.SessionKeys, should.Resemble, *keys)
+						a.So([]time.Time{start, dev.EndDevice.Session.StartedAt, time.Now()}, should.BeChronological)
+						if ed.Session != nil {
+							a.So(dev.EndDevice.Session.DevAddr, should.NotResemble, ed.Session.DevAddr)
+						}
+					}
+
+					ed.Session = nil
+					dev.EndDevice.Session = nil
+
+					a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
 				})
 
-				ed := deepcopy.Copy(dev.EndDevice).(*ttnpb.EndDevice)
+				t.Run("duplicates after cooldown window end", func(t *testing.T) {
+					a := assertions.New(t)
 
-				md := msg.GetRxMetadata()
-				msg = deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
-				msg.RxMetadata = md
+					deduplicationEnd := time.Now().Add(DeduplicationWindow)
 
-				ed.RecentUplinks = append(tc.Device.GetRecentUplinks(), msg)
-				if len(ed.RecentUplinks) > RecentUplinkCount {
-					ed.RecentUplinks = ed.RecentUplinks[len(ed.RecentUplinks)-RecentUplinkCount:]
-				}
+					_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
+					a.So(err, should.BeNil)
 
-				dev.EndDevice, err = dev.Load()
-				a.So(err, should.BeNil)
+					cooldownEnd := deduplicationEnd.Add(CooldownWindow)
 
-				a.So(dev.EndDevice.SessionFallback, should.BeNil)
-				if a.So(dev.EndDevice.GetSession(), should.NotBeNil) {
-					a.So(dev.EndDevice.Session.SessionKeys, should.Resemble, *keys)
-					a.So([]time.Time{start, dev.EndDevice.Session.StartedAt, time.Now()}, should.BeChronological)
-					if ed.Session != nil {
-						a.So(dev.EndDevice.Session.DevAddr, should.NotResemble, ed.Session.DevAddr)
+					var deduplicated uint64 = 1
+					for ; time.Now().Before(cooldownEnd); time.Sleep(sleepInterval) {
+						go func() {
+							_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
+							if a.So(err, should.BeNil) && time.Now().Before(deduplicationEnd) {
+								atomic.AddUint64(&deduplicated, 1)
+							}
+						}()
 					}
-				}
-
-				ed.Session = nil
-				dev.EndDevice.Session = nil
-				a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
+				})
 			})
 		}
 	}
