@@ -28,12 +28,6 @@ import (
 )
 
 var (
-	// Slowdown slows down the test in a linear fashion(the higher the value - the slower the test),
-	// which may be required on slower systems
-	Slowdown = 0
-
-	DuplicateCount = 5
-
 	FNwkSIntKey   = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	SNwkSIntKey   = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	DevAddr       = types.DevAddr{0x42, 0x42, 0xff, 0xff}
@@ -41,10 +35,55 @@ var (
 	JoinEUI       = types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	ApplicationID = "test"
 
-	Delay               = 20 * time.Millisecond * time.Duration(1+Slowdown)
-	DeduplicationWindow = 4 * Delay
-	CooldownWindow      = 8 * Delay
+	DuplicateCount = 6
+
+	DeduplicationWindow = (2 << 2) * test.Delay
+	CooldownWindow      = (2 << 4) * test.Delay
 )
+
+type Waiter interface {
+	Wait()
+}
+
+func waitTimeout(d time.Duration, w Waiter) (ok bool) {
+	done := make(chan struct{})
+
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+
+	go func() {
+		wg.Done()
+
+		w.Wait()
+		close(done)
+	}()
+	wg.Wait()
+
+	select {
+	case <-time.After(d):
+		return false
+	case <-done:
+		return true
+	}
+}
+
+func metadataLdiff(l pretty.Logfer, xs, ys []*ttnpb.RxMetadata) {
+	if len(xs) != len(ys) {
+		l.Logf("Length mismatch: %d != %d", len(xs), len(ys))
+		return
+	}
+
+	xm := make(map[*ttnpb.RxMetadata]struct{})
+	for _, x := range xs {
+		xm[x] = struct{}{}
+	}
+
+	ym := make(map[*ttnpb.RxMetadata]struct{})
+	for _, y := range ys {
+		ym[y] = struct{}{}
+	}
+	pretty.Ldiff(l, xm, ym)
+}
 
 func TestDownlinkQueueReplace(t *testing.T) {
 	a := assertions.New(t)
@@ -288,10 +327,10 @@ func TestLinkApplication(t *testing.T) {
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
-	time.AfterFunc(Delay, func() {
+	time.AfterFunc(test.Delay, func() {
 		stream.ContextFunc = func() context.Context {
 			ctx, cancel := context.WithCancel(context.Background())
-			time.AfterFunc(Delay, cancel)
+			time.AfterFunc(test.Delay, cancel)
 			return ctx
 		}
 
@@ -389,6 +428,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_0,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationID: ApplicationID,
+						DevAddr:       &DevAddr,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
@@ -422,6 +462,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_0,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationID: ApplicationID,
+						DevAddr:       &DevAddr,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
@@ -456,6 +497,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_0,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationID: ApplicationID,
+						DevAddr:       &DevAddr,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
@@ -494,6 +536,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_0,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationID: ApplicationID,
+						DevAddr:       &DevAddr,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
@@ -533,6 +576,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationID: ApplicationID,
+						DevAddr:       &DevAddr,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
@@ -571,6 +615,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationID: ApplicationID,
+						DevAddr:       &DevAddr,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
@@ -618,6 +663,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationID: ApplicationID,
+						DevAddr:       &DevAddr,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
@@ -657,6 +703,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationID: ApplicationID,
+						DevAddr:       &DevAddr,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
@@ -758,8 +805,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					return
 				}
 
-				wg := &sync.WaitGroup{}
-				wg.Add(1)
+				upWg := &sync.WaitGroup{}
 
 				mdCh := make(chan []*ttnpb.RxMetadata, 2)
 
@@ -771,9 +817,14 @@ func HandleUplinkTest() func(t *testing.T) {
 					},
 					send: func(up *ttnpb.ApplicationUp) error {
 						t.Run("application uplink", func(t *testing.T) {
+							defer upWg.Done()
+
 							a := assertions.New(t)
 
-							a.So(test.SameElementsDiff(<-mdCh, up.GetUplinkMessage().GetRxMetadata()), should.BeTrue)
+							md := <-mdCh
+							if !a.So(test.SameElementsDeep(md, up.GetUplinkMessage().GetRxMetadata()), should.BeTrue) {
+								metadataLdiff(t, up.GetUplinkMessage().GetRxMetadata(), md)
+							}
 
 							upc := deepcopy.Copy(up).(*ttnpb.ApplicationUp)
 							upc.GetUplinkMessage().RxMetadata = nil
@@ -783,7 +834,6 @@ func HandleUplinkTest() func(t *testing.T) {
 								FPort:      tc.UplinkMessage.Payload.GetMACPayload().GetFPort(),
 								FRMPayload: tc.UplinkMessage.Payload.GetMACPayload().GetFRMPayload(),
 							}}})
-							wg.Done()
 						})
 						return nil
 					},
@@ -800,26 +850,37 @@ func HandleUplinkTest() func(t *testing.T) {
 
 				md := make([]*ttnpb.RxMetadata, 0, DuplicateCount+1)
 
-				sleepInterval := (DeduplicationWindow + CooldownWindow) / time.Duration(DuplicateCount)
-
 				var deduplicationEnd time.Time
 				var cooldownEnd time.Time
 
 				if !t.Run("handle uplink", func(t *testing.T) {
 					a := assertions.New(t)
 
-					deduplicationEnd = time.Now().Add(DeduplicationWindow)
-					cooldownEnd = deduplicationEnd.Add(CooldownWindow)
+					upWg.Add(1)
 
-					var deduplicated uint64 = 1
-					for ; time.Now().Before(cooldownEnd); time.Sleep(sleepInterval) {
+					wg := &sync.WaitGroup{}
+					wg.Add(DuplicateCount)
+
+					deduplicationEnd = time.Now().Add(DeduplicationWindow + test.Delay)
+					cooldownEnd = deduplicationEnd.Add(CooldownWindow + test.Delay)
+
+					var deduplicated uint64
+					for i := 0; i < DuplicateCount; i++ {
 						go func() {
+							defer wg.Done()
+
+							now := time.Now()
+							if now.After(cooldownEnd) {
+								return
+							}
+
 							_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
-							if a.So(err, should.BeNil) && time.Now().Before(deduplicationEnd) {
+							if a.So(err, should.BeNil) && now.Before(deduplicationEnd) {
 								atomic.AddUint64(&deduplicated, 1)
 							}
 						}()
 					}
+					wg.Wait()
 
 					for i := uint64(0); i < deduplicated; i++ {
 						md = append(md, tc.UplinkMessage.GetRxMetadata()...)
@@ -838,10 +899,12 @@ func HandleUplinkTest() func(t *testing.T) {
 					ed := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 					ed.GetSession().NextFCntUp = tc.NextNextFCntUp
 
-					ed.RecentUplinks = append(tc.Device.GetRecentUplinks(), msg)
+					ed.RecentUplinks = append(ed.GetRecentUplinks(), msg)
 					if len(ed.RecentUplinks) > RecentUplinkCount {
 						ed.RecentUplinks = ed.RecentUplinks[len(ed.RecentUplinks)-RecentUplinkCount:]
 					}
+
+					time.Sleep(time.Until(deduplicationEnd) + test.Delay)
 
 					dev.EndDevice, err = dev.Load()
 					if !a.So(err, should.BeNil) ||
@@ -852,58 +915,87 @@ func HandleUplinkTest() func(t *testing.T) {
 					if !a.So(dev.EndDevice.GetRecentUplinks(), should.NotBeEmpty) {
 						return
 					}
-					dUp := dev.EndDevice.GetRecentUplinks()[len(dev.EndDevice.RecentUplinks)-1]
-					eUp := ed.GetRecentUplinks()[len(ed.RecentUplinks)-1]
 
-					a.So(test.SameElementsDiff(dUp.GetRxMetadata(), eUp.GetRxMetadata()), should.BeTrue)
+					storedUp := dev.EndDevice.GetRecentUplinks()[len(dev.EndDevice.RecentUplinks)-1]
+					expectedUp := ed.GetRecentUplinks()[len(ed.RecentUplinks)-1]
 
-					dUp.RxMetadata = nil
-					eUp.RxMetadata = nil
+					storedMD := storedUp.GetRxMetadata()
+					expectedMD := expectedUp.GetRxMetadata()
+
+					if !a.So(test.SameElementsDiff(storedMD, expectedMD), should.BeTrue) {
+						metadataLdiff(t, storedMD, expectedMD)
+					}
+
+					storedUp.RxMetadata = nil
+					expectedUp.RxMetadata = nil
 
 					a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
 				})
+
+				// Uplink must be sent to AS at this point
+				a.So(waitTimeout(10*test.Delay, upWg), should.BeTrue)
 
 				t.Run("duplicates after cooldown window end", func(t *testing.T) {
 					a := assertions.New(t)
 
 					md := make([]*ttnpb.RxMetadata, 0, DuplicateCount+1)
 
-					deduplicationEnd := time.Now().Add(DeduplicationWindow)
+					upWg.Add(1)
 
-					_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
-					if dev.FCntResets {
-						// Replay attack is possible if FCnt resets
-						wg.Add(1)
-						a.So(err, should.BeNil)
-					} else {
-						a.So(err, should.BeError)
-					}
+					wg := &sync.WaitGroup{}
+					wg.Add(1)
 
-					cooldownEnd := deduplicationEnd.Add(CooldownWindow)
+					time.Sleep(time.Until(cooldownEnd))
+
+					deduplicationEnd = time.Now().Add(DeduplicationWindow + test.Delay)
+
+					go func() {
+						defer wg.Done()
+
+						_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
+						if dev.FCntResets {
+							// Replay attack is possible if FCnt resets
+							a.So(err, should.BeNil)
+						} else {
+							a.So(err, should.BeError)
+						}
+					}()
+
+					cooldownEnd = deduplicationEnd.Add(CooldownWindow)
+
+					wg.Wait()
+					wg.Add(DuplicateCount - 1)
 
 					var deduplicated uint64 = 1
-					for ; time.Now().Before(cooldownEnd); time.Sleep(sleepInterval) {
+					for i := 0; i < DuplicateCount-1; i++ {
 						go func() {
+							defer wg.Done()
+
+							now := time.Now()
+							if now.After(cooldownEnd) {
+								return
+							}
+
 							_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
-							if a.So(err, should.BeNil) && time.Now().Before(deduplicationEnd) {
+							if a.So(err, should.BeNil) && now.Before(deduplicationEnd) {
 								atomic.AddUint64(&deduplicated, 1)
 							}
 						}()
+					}
+					wg.Wait()
+
+					if !dev.FCntResets {
+						return
 					}
 
 					for i := uint64(0); i < deduplicated; i++ {
 						md = append(md, tc.UplinkMessage.GetRxMetadata()...)
 					}
 					mdCh <- md
-				})
 
-				after := time.AfterFunc(Delay+CooldownWindow+DeduplicationWindow, func() {
-					t.Error("Second uplink did not get sent")
-					wg.Done()
+					// Uplink must be sent to AS at this point
+					a.So(waitTimeout(10*test.Delay, upWg), should.BeTrue)
 				})
-
-				wg.Wait()
-				after.Stop()
 			})
 		}
 	}
@@ -1053,6 +1145,13 @@ func HandleJoinTest() func(t *testing.T) {
 
 				reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 
+				reqWg := &sync.WaitGroup{}
+
+				dev, err := reg.Create(tc.Device)
+				if !a.So(err, should.BeNil) {
+					return
+				}
+
 				ns := New(
 					component.MustNew(test.GetLogger(t), &component.Config{}),
 					&Config{
@@ -1067,13 +1166,15 @@ func HandleJoinTest() func(t *testing.T) {
 						},
 							&mockNsJsClient{
 								handleJoin: func(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
+									defer reqWg.Done()
+
 									a := assertions.New(t)
 
 									resp := ttnpb.NewPopulatedJoinResponse(test.Randy, false)
 									resp.SessionKeys = *keys
 
-									if tc.Device.GetSession() != nil {
-										a.So(req.EndDeviceIdentifiers.DevAddr, should.NotResemble, tc.Device.Session.DevAddr)
+									if ses := test.Must(dev.Load()).(*ttnpb.EndDevice).GetSession(); ses != nil {
+										a.So(req.EndDeviceIdentifiers.DevAddr, should.NotResemble, ses.DevAddr)
 									}
 									req.EndDeviceIdentifiers.DevAddr = nil
 
@@ -1094,14 +1195,7 @@ func HandleJoinTest() func(t *testing.T) {
 					}
 				}
 
-				dev, err := reg.Create(tc.Device)
-				if !a.So(err, should.BeNil) {
-					return
-				}
-
 				md := make([]*ttnpb.RxMetadata, 0, DuplicateCount+1)
-
-				sleepInterval := (DeduplicationWindow + CooldownWindow) / time.Duration(DuplicateCount)
 
 				var start time.Time
 				var deduplicationEnd time.Time
@@ -1110,19 +1204,32 @@ func HandleJoinTest() func(t *testing.T) {
 				if !t.Run("handle join", func(t *testing.T) {
 					a := assertions.New(t)
 
-					start := time.Now()
-					deduplicationEnd = start.Add(DeduplicationWindow)
+					reqWg.Add(1)
+
+					wg := &sync.WaitGroup{}
+					wg.Add(DuplicateCount)
+
+					start = time.Now()
+					deduplicationEnd = start.Add(DeduplicationWindow + test.Delay)
 					cooldownEnd = deduplicationEnd.Add(CooldownWindow)
 
-					var deduplicated uint64 = 1
-					for ; time.Now().Before(cooldownEnd); time.Sleep(sleepInterval) {
+					var deduplicated uint64
+					for i := 0; i < DuplicateCount; i++ {
 						go func() {
+							defer wg.Done()
+
+							now := time.Now()
+							if now.After(cooldownEnd) {
+								return
+							}
+
 							_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
-							if a.So(err, should.BeNil) && time.Now().Before(deduplicationEnd) {
+							if a.So(err, should.BeNil) && now.Before(deduplicationEnd) {
 								atomic.AddUint64(&deduplicated, 1)
 							}
 						}()
 					}
+					wg.Wait()
 
 					for i := uint64(0); i < deduplicated; i++ {
 						md = append(md, tc.UplinkMessage.GetRxMetadata()...)
@@ -1139,10 +1246,14 @@ func HandleJoinTest() func(t *testing.T) {
 
 					ed := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-					ed.RecentUplinks = append(tc.Device.GetRecentUplinks(), msg)
+					ed.RecentUplinks = append(ed.GetRecentUplinks(), msg)
 					if len(ed.RecentUplinks) > RecentUplinkCount {
 						ed.RecentUplinks = ed.RecentUplinks[len(ed.RecentUplinks)-RecentUplinkCount:]
 					}
+
+					waitTimeout(10*test.Delay, reqWg)
+
+					time.Sleep(time.Until(deduplicationEnd) + test.Delay)
 
 					dev.EndDevice, err = dev.Load()
 					if !a.So(err, should.BeNil) ||
@@ -1153,18 +1264,25 @@ func HandleJoinTest() func(t *testing.T) {
 					if !a.So(dev.EndDevice.GetRecentUplinks(), should.NotBeEmpty) {
 						return
 					}
-					dUp := dev.EndDevice.GetRecentUplinks()[len(dev.EndDevice.RecentUplinks)-1]
-					eUp := ed.GetRecentUplinks()[len(ed.RecentUplinks)-1]
 
-					a.So(test.SameElementsDiff(dUp.GetRxMetadata(), eUp.GetRxMetadata()), should.BeTrue)
+					storedUp := dev.EndDevice.GetRecentUplinks()[len(dev.EndDevice.RecentUplinks)-1]
+					expectedUp := ed.GetRecentUplinks()[len(ed.RecentUplinks)-1]
 
-					dUp.RxMetadata = nil
-					eUp.RxMetadata = nil
+					storedMD := storedUp.GetRxMetadata()
+					expectedMD := expectedUp.GetRxMetadata()
+
+					if !a.So(test.SameElementsDiff(storedMD, expectedMD), should.BeTrue) {
+						metadataLdiff(t, storedMD, expectedMD)
+					}
+
+					storedUp.RxMetadata = nil
+					expectedUp.RxMetadata = nil
 
 					a.So(dev.EndDevice.SessionFallback, should.BeNil)
 					if a.So(dev.EndDevice.GetSession(), should.NotBeNil) {
 						a.So(dev.EndDevice.Session.SessionKeys, should.Resemble, *keys)
 						a.So([]time.Time{start, dev.EndDevice.Session.StartedAt, time.Now()}, should.BeChronological)
+						a.So(dev.EndDevice.EndDeviceIdentifiers.DevAddr, should.Resemble, &dev.EndDevice.Session.DevAddr)
 						if ed.Session != nil {
 							a.So(dev.EndDevice.Session.DevAddr, should.NotResemble, ed.Session.DevAddr)
 						}
@@ -1172,6 +1290,7 @@ func HandleJoinTest() func(t *testing.T) {
 
 					ed.Session = nil
 					dev.EndDevice.Session = nil
+					dev.EndDevice.EndDeviceIdentifiers.DevAddr = nil
 
 					a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
 				})
@@ -1179,22 +1298,36 @@ func HandleJoinTest() func(t *testing.T) {
 				t.Run("duplicates after cooldown window end", func(t *testing.T) {
 					a := assertions.New(t)
 
-					deduplicationEnd := time.Now().Add(DeduplicationWindow)
+					reqWg.Add(1)
 
-					_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
-					a.So(err, should.BeNil)
+					wg := &sync.WaitGroup{}
+					wg.Add(DuplicateCount)
 
-					cooldownEnd := deduplicationEnd.Add(CooldownWindow)
+					time.Sleep(time.Until(cooldownEnd))
 
-					var deduplicated uint64 = 1
-					for ; time.Now().Before(cooldownEnd); time.Sleep(sleepInterval) {
+					start = time.Now()
+					deduplicationEnd = start.Add(DeduplicationWindow + test.Delay)
+					cooldownEnd = deduplicationEnd.Add(CooldownWindow)
+
+					var deduplicated uint64
+					for i := 0; i < DuplicateCount; i++ {
 						go func() {
+							defer wg.Done()
+
+							now := time.Now()
+							if now.After(cooldownEnd) {
+								return
+							}
+
 							_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
-							if a.So(err, should.BeNil) && time.Now().Before(deduplicationEnd) {
+							if a.So(err, should.BeNil) && now.Before(deduplicationEnd) {
 								atomic.AddUint64(&deduplicated, 1)
 							}
 						}()
 					}
+					wg.Wait()
+
+					waitTimeout(10*test.Delay, reqWg)
 				})
 			})
 		}
