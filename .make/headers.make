@@ -1,4 +1,16 @@
-# Copyright © 2018 The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+# Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 # This makefile contains rules to check and fix headers in files. This can be
 # used to automatically check for copyright headers and fix them easily.
@@ -8,10 +20,7 @@
 # HEADER_FILES: The command to invoke to determine which file to check
 # HEADER_EXTRA_FILES: Use this to add a hardcoded list of files
 
-YEAR ?= $(shell date +%Y)
-COMMENT ?= \\(\#\\|//\\)
-HEADER_PREFIX = $(COMMENT) Copyright © $(YEAR)
-HEADER = $(HEADER_PREFIX) The Things Network Foundation, distributed under the MIT license (see LICENSE file)
+HEADER_FILE = ./.make/header.txt
 
 empty = echo ""
 no_blanks = sed '/^$$/d'
@@ -23,10 +32,13 @@ JS_LINT_FILES ?= $(empty)
 only_make = grep '\.make$$'
 MAKE_LINT_FILES = $(ALL_FILES) | $(only_make)
 
+only_proto = grep '\.proto$$'
+PROTO_FILES = $(ALL_FILES) | $(only_proto)
+
 ls:
 	@$(MAKE_LINT_FILES)
 
-HEADER_FILES ?= $(GO_LINT_FILES) && $(JS_LINT_FILES) && $(MAKE_LINT_FILES)
+HEADER_FILES ?= $(GO_LINT_FILES) && $(JS_LINT_FILES) && $(MAKE_LINT_FILES) && $(PROTO_FILES)
 HEADER_EXTRA_FILES ?=
 
 # the files to check for a header
@@ -38,7 +50,7 @@ headers.check:
 	@$(log) "Checking headers in `echo $$($(__HEADER_FILES)) | $(count)` files"
 	@CODE=0; \
 	for file in `$(__HEADER_FILES)`; do \
-		"$(MAKE_DIR)/headers.sh" check "$(HEADER_PREFIX)" "$$file" || { $(err) "Incorrect or missing header in $$file"; CODE=1; }; \
+		"$(MAKE_DIR)/headers.sh" check "$(HEADER_FILE)" "$$file" || { $(err) "Incorrect or missing header in $$file"; CODE=1; }; \
 	done; \
 	exit $$CODE
 
@@ -46,7 +58,7 @@ headers.check:
 headers.fix:
 	@$(log) "Fixing headers in `echo $$($(__HEADER_FILES)) | $(count)` files"
 	@for file in `$(__HEADER_FILES)`; do \
-		"$(MAKE_DIR)/headers.sh" fix "$(HEADER)" "$$file" "$(COMMENT)"; \
+		"$(MAKE_DIR)/headers.sh" fix "$(HEADER_FILE)" "$$file" "$(COMMENT)"; \
 		code=$$?; \
 		if [[ $$code -eq 2 ]]; then \
 			$(log) "Fixed header in \`$$file\`"; \

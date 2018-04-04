@@ -1,18 +1,18 @@
+#!/bin/bash
+
 CMD="$1"
-HEADER="$2"
+HEADER_FILE="$2"
 FILE="$3"
 COMMENT="$4"
 
-LINES=`echo -e ${HEADER} | wc -l`
+HEADER=`cat "$HEADER_FILE"`
 
-function check () {
-  exit 1
-}
+LINES=`echo -e "${HEADER}" | wc -l`
 
 function fix () {
   file="$1"
   extension="${file##*.}"
-  comment=//
+  comment=\\\/\\\/
 
   case "$file" in
       *.make)
@@ -26,7 +26,7 @@ function fix () {
         ;;
   esac
 
-  echo -e ${HEADER} | sed 's:^\\(.*) :'"${comment} :g" > file.new && echo >> file.new && cat "$file" >> file.new && mv file.new "$file"
+  echo -e "${HEADER}" | sed "s/^/${comment} /g" | sed "s/^${comment} $/${comment}/g" > file.new && echo >> file.new && cat "$file" >> file.new && mv file.new "$file"
   exit 2
 }
 
@@ -43,18 +43,16 @@ if head -n 3 "$FILE" | grep -q "generated"; then
   exit 0
 fi
 
-
 ok=1
-
 for i in `seq 1 ${LINES}`; do
-  hline=`echo -e ${HEADER} | sed $i'q;d'`
-  sed $i'q;d' "$FILE" | grep -q "^$hline" || ok=0
+  hline=`echo -e "${HEADER}" | sed $i'q;d'`
+  sed $i'q;d' "$FILE" | grep -q "$hline" || ok=0
 done
 
 if [[ $ok -ne 1 ]]; then
   case "$CMD" in
     check)
-      check "$FILE"
+      exit 1
       ;;
     fix)
       fix "$FILE"
@@ -62,6 +60,9 @@ if [[ $ok -ne 1 ]]; then
   esac
 else
   case "$CMD" in
+    check)
+      exit 0
+      ;;
     remove)
       remove "$FILE"
       ;;
