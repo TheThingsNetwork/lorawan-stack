@@ -14,27 +14,30 @@ func ParseScope(scope string) ([]ttnpb.Right, error) {
 	split := strings.Fields(scope)
 	res := make([]ttnpb.Right, 0, len(split))
 	for _, str := range split {
-		var right ttnpb.Right
-		err := right.UnmarshalText([]byte(str))
+		right, err := ttnpb.ParseRight(str)
 		if err != nil {
 			return nil, fmt.Errorf("Invalid right: %s", str)
 		}
-
 		res = append(res, right)
 	}
-
 	return res, nil
 }
 
 // Scope takes a list of rights and returns a string representing the
 // scope that contains those rights.
 func Scope(rights []ttnpb.Right) string {
-	res := ""
-	for _, right := range rights {
-		res = res + right.String() + " "
+	switch len(rights) {
+	case 0:
+		return ""
+	case 1:
+		return rights[0].String()
+	default:
+		rightStrings := make([]string, len(rights))
+		for i, right := range rights {
+			rightStrings[i] = right.String()
+		}
+		return strings.Join(rightStrings, " ")
 	}
-
-	return res[:len(res)-1]
 }
 
 // Subtract subtracts the rights in set from the rights in from, returning only the rights in
