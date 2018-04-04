@@ -14,7 +14,10 @@
 
 package ttnpb
 
-import "github.com/TheThingsNetwork/ttn/pkg/validate"
+import (
+	"github.com/TheThingsNetwork/ttn/pkg/types"
+	"github.com/TheThingsNetwork/ttn/pkg/validate"
+)
 
 // Validate is used as validator function by the GRPC validator interceptor.
 func (i UserIdentifiers) Validate() error {
@@ -49,6 +52,14 @@ func (i ApplicationIdentifiers) Contains(other ApplicationIdentifiers) bool {
 // IsZero returns true if all identifiers have zero-values.
 func (i ApplicationIdentifiers) IsZero() bool {
 	return i.ApplicationID == ""
+}
+
+// GetEUI returns if set the EUI otherwise a zero-valued EUI.
+func (i GatewayIdentifiers) GetEUI() *types.EUI64 {
+	if i.EUI != nil {
+		return i.EUI
+	}
+	return new(types.EUI64)
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.

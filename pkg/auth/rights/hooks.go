@@ -24,6 +24,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/hooks"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"google.golang.org/grpc"
 )
 
@@ -33,6 +34,7 @@ type applicationIdentifiersGetters interface {
 
 type gatewayIdentifiersGetters interface {
 	GetGatewayID() string
+	GetEUI() *types.EUI64
 }
 
 // HookName denotes the unique name that components should use to register this hook.
@@ -134,9 +136,16 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 			if m, ok := req.(gatewayIdentifiersGetters); ok {
 				gtwIDs := new(ttnpb.GatewayIdentifiers)
 				gtwIDs.GatewayID = m.GetGatewayID()
+				gtwIDs.EUI = m.GetEUI()
 
 				if !gtwIDs.IsZero() {
-					key := fmt.Sprintf("%s:%s", md.AuthValue, gtwIDs.GatewayID)
+					// TODO: Optimize this key?. (https://github.com/TheThingsIndustries/ttn/issues/624)
+					// Since a ttnpb.GatewayIdentifiers can be either be composed of one
+					// of the sub-fields or both fields, this could be optimized so that if
+					// there is in the cache a key that contains both sub-fields, any new
+					// identifier that is only composed of one sub-field should be understood
+					// as it refers to the same previous cache entry that has both sub-fields.
+					key := fmt.Sprintf("%s:%s:%s", md.AuthValue, gtwIDs.GatewayID, gtwIDs.EUI.String())
 
 					rights, err := h.gatewaysCache.GetOrFetch(key, func() (rights []ttnpb.Right, err error) {
 						resp, err := ttnpb.NewIsGatewayClient(conn).ListGatewayRights(ctx, gtwIDs, grpc.PerRPCCredentials(md))

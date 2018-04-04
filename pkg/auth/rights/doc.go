@@ -25,6 +25,7 @@ In order to preload the rights the following steps are taken:
 
 	type gatewayIdentifiersGetters interface {
 		GetGatewayID() string
+		GetEUI() *types.EUI64
 	}
 
 If the message implements both interfaces only applicationIdentifiers is taken
