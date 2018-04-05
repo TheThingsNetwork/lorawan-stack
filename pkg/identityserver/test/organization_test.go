@@ -24,6 +24,8 @@ import (
 )
 
 func organization() *ttnpb.Organization {
+	now := time.Now()
+
 	return &ttnpb.Organization{
 		OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "foo"},
 		Name:        "Foo Bar",
@@ -31,8 +33,8 @@ func organization() *ttnpb.Organization {
 		URL:         "http://foo.bar",
 		Location:    "Baz",
 		Email:       "foo@bar.baz",
-		CreatedAt:   time.Now().UTC(),
-		UpdatedAt:   time.Now().UTC().Add(time.Hour),
+		CreatedAt:   now,
+		UpdatedAt:   now.Add(time.Hour),
 	}
 }
 
@@ -42,7 +44,7 @@ func TestShouldBeOrganization(t *testing.T) {
 	a.So(ShouldBeOrganization(organization(), organization()), should.Equal, success)
 
 	modified := organization()
-	modified.CreatedAt = time.Now().UTC().Add(time.Minute)
+	modified.CreatedAt = time.Now().Add(time.Minute)
 
 	a.So(ShouldBeOrganization(modified, organization()), should.NotEqual, success)
 }

@@ -83,7 +83,7 @@ func New(logger log.Interface, iss string, store *sql.Store, authorizer Authoriz
 	s.oauth.AuthorizeTokenGen = s
 	s.oauth.AccessTokenGen = s
 	s.oauth.Now = func() time.Time {
-		return time.Now().UTC()
+		return time.Now()
 	}
 
 	return s

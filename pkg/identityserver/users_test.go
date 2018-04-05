@@ -109,7 +109,11 @@ func TestUser(t *testing.T) {
 	a.So(found.Name, should.Equal, user.Name)
 	a.So(found.Password, should.HaveLength, 0)
 	a.So(found.Email, should.Equal, user.Email)
-	a.So(found.ValidatedAt.IsZero(), should.BeTrue)
+	if testSettings().IdentityServerSettings_UserRegistrationFlow.SkipValidation {
+		a.So(found.ValidatedAt.IsZero(), should.BeFalse)
+	} else {
+		a.So(found.ValidatedAt, should.BeNil)
+	}
 	if testSettings().IdentityServerSettings_UserRegistrationFlow.AdminApproval {
 		a.So(found.State, should.Equal, ttnpb.STATE_PENDING)
 	} else {
@@ -272,7 +276,7 @@ func TestUser(t *testing.T) {
 		AccessToken: accessToken,
 		UserID:      user.UserID,
 		ClientID:    client.ClientID,
-		CreatedAt:   time.Now().UTC(),
+		CreatedAt:   time.Now(),
 		ExpiresIn:   time.Duration(time.Hour),
 		Scope:       oauth.Scope(client.Rights),
 	}

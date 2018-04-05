@@ -17,6 +17,7 @@ package sql_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
@@ -29,6 +30,10 @@ const (
 	database           = "is_store_tests"
 	attributesDatabase = "is_store_attributes_test"
 )
+
+func timeValue(t time.Time) *time.Time {
+	return &t
+}
 
 // Store instances shared across different tests.
 // The key of the map is the database name.

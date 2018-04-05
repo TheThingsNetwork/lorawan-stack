@@ -119,7 +119,7 @@ func (s *adminService) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequ
 		}
 
 		if settings.SkipValidation {
-			req.User.ValidatedAt = time.Now().UTC()
+			req.User.ValidatedAt = timeValue(time.Now())
 		}
 
 		err = tx.Users.Create(&req.User)
@@ -137,7 +137,7 @@ func (s *adminService) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequ
 
 		return tx.Users.SaveValidationToken(req.User.UserIdentifiers, store.ValidationToken{
 			ValidationToken: token,
-			CreatedAt:       time.Now().UTC(),
+			CreatedAt:       time.Now(),
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		})
 	})
@@ -234,9 +234,9 @@ func (s *adminService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequ
 				newEmail = strings.ToLower(user.Email) != strings.ToLower(req.User.Email)
 				if newEmail {
 					if settings.SkipValidation {
-						user.ValidatedAt = time.Now().UTC()
+						user.ValidatedAt = timeValue(time.Now())
 					} else {
-						user.ValidatedAt = time.Time{}
+						user.ValidatedAt = timeValue(time.Time{})
 					}
 				}
 			case ttnpb.FieldPathUserAdmin.MatchString(path):
@@ -261,7 +261,7 @@ func (s *adminService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequ
 
 		token := store.ValidationToken{
 			ValidationToken: random.String(64),
-			CreatedAt:       time.Now().UTC(),
+			CreatedAt:       time.Now(),
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 
@@ -377,7 +377,7 @@ func (s *adminService) SendInvitation(ctx context.Context, req *ttnpb.SendInvita
 			return err
 		}
 
-		now := time.Now().UTC()
+		now := time.Now()
 		invitation := store.InvitationData{
 			Token:     random.String(64),
 			Email:     req.Email,

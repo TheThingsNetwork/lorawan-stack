@@ -14,7 +14,11 @@
 
 package identityserver
 
-import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+import (
+	"time"
+
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+)
 
 func organizationOrUserIDsUserIDs(ids ttnpb.UserIdentifiers) ttnpb.OrganizationOrUserIdentifiers {
 	return ttnpb.OrganizationOrUserIdentifiers{
@@ -30,4 +34,8 @@ func organizationOrUserIDsOrganizationIDs(ids ttnpb.OrganizationIdentifiers) ttn
 			OrganizationID: &ids,
 		},
 	}
+}
+
+func timeValue(t time.Time) *time.Time {
+	return &t
 }

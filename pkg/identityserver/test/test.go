@@ -14,6 +14,13 @@
 
 package test
 
+import (
+	"fmt"
+	"time"
+
+	"github.com/smartystreets/assertions"
+)
+
 const success = ""
 
 func all(results ...string) string {
@@ -24,4 +31,20 @@ func all(results ...string) string {
 	}
 
 	return success
+}
+
+func timeValue(t time.Time) *time.Time {
+	return &t
+}
+
+func assertTime(actual, expected *time.Time) string {
+	if actual == nil && expected == nil {
+		return success
+	}
+
+	if actual != nil && expected != nil {
+		return assertions.ShouldHappenWithin(*actual, time.Millisecond, *expected)
+	}
+
+	return fmt.Sprintf("Actual: %v\nExpected: %v\n", actual, expected)
 }

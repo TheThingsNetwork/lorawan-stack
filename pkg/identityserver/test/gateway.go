@@ -86,7 +86,7 @@ func ShouldBeGatewayIgnoringAutoFields(actual interface{}, expected ...interface
 		assertions.ShouldEqual(a.ClusterAddress, b.ClusterAddress),
 		assertions.ShouldResemble(a.Antennas, b.Antennas),
 		assertions.ShouldResemble(a.Radios, b.Radios),
-		assertions.ShouldBeTrue(a.ActivatedAt.Equal(b.ActivatedAt)),
+		assertTime(a.ActivatedAt, b.ActivatedAt),
 		assertions.ShouldResemble(a.PrivacySettings, b.PrivacySettings),
 		assertions.ShouldEqual(a.AutoUpdate, b.AutoUpdate),
 		assertions.ShouldResemble(a.Platform, b.Platform),

@@ -28,11 +28,13 @@ func TestInvitations(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore(t, database)
 
+	now := time.Now()
+
 	invitation := store.InvitationData{
 		Token:     "123",
 		Email:     "foo@bar.com",
-		IssuedAt:  time.Now().UTC(),
-		ExpiresAt: time.Now().UTC().Add(time.Duration(24) * time.Hour),
+		IssuedAt:  now,
+		ExpiresAt: now.Add(time.Duration(24) * time.Hour),
 	}
 
 	err := s.Invitations.Save(invitation)

@@ -34,7 +34,7 @@ func (s *IdentityServerSettings) IsIDAllowed(id string) bool {
 
 // IsExpired checks whether or not the invitation is expired.
 func (i *ListInvitationsResponse_Invitation) IsExpired() bool {
-	return i.ExpiresAt.Before(time.Now().UTC())
+	return i.ExpiresAt.Before(time.Now())
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.

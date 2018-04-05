@@ -48,7 +48,7 @@ message Gateway {
 
   // activated_at denotes when the gateway was activated.
   // This a read-only field.
-  google.protobuf.Timestamp activated_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp activated_at = 7 [(gogoproto.stdtime) = true];
 
   // privacy_settings defines the different privacy settings for this gateway.
   GatewayPrivacySettings privacy_settings = 8 [(gogoproto.nullable) = false];

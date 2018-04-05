@@ -88,7 +88,7 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		}
 
 		if settings.SkipValidation {
-			user.ValidatedAt = time.Now().UTC()
+			user.ValidatedAt = timeValue(time.Now())
 		}
 
 		if !settings.AdminApproval {
@@ -118,7 +118,7 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		if !settings.SkipValidation {
 			token := store.ValidationToken{
 				ValidationToken: random.String(64),
-				CreatedAt:       time.Now().UTC(),
+				CreatedAt:       time.Now(),
 				ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 			}
 
@@ -194,9 +194,9 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 				newEmail = strings.ToLower(user.Email) != strings.ToLower(req.User.Email)
 				if newEmail {
 					if settings.SkipValidation {
-						user.ValidatedAt = time.Now().UTC()
+						user.ValidatedAt = timeValue(time.Now())
 					} else {
-						user.ValidatedAt = time.Time{}
+						user.ValidatedAt = timeValue(time.Time{})
 					}
 				}
 
@@ -219,7 +219,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 
 		token := store.ValidationToken{
 			ValidationToken: random.String(64),
-			CreatedAt:       time.Now().UTC(),
+			CreatedAt:       time.Now(),
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 
@@ -414,7 +414,7 @@ func (s *userService) ValidateUserEmail(ctx context.Context, req *ttnpb.Validate
 			return err
 		}
 
-		user.GetUser().ValidatedAt = time.Now().UTC()
+		user.GetUser().ValidatedAt = timeValue(time.Now())
 
 		err = tx.Users.Update(user)
 		if err != nil {
@@ -453,7 +453,7 @@ func (s *userService) RequestUserEmailValidation(ctx context.Context, _ *pbtypes
 
 		token := store.ValidationToken{
 			ValidationToken: random.String(64),
-			CreatedAt:       time.Now().UTC(),
+			CreatedAt:       time.Now(),
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 

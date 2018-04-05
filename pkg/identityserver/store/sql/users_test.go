@@ -35,6 +35,7 @@ var alice = &ttnpb.User{
 	UserIdentifiers: ttnpb.UserIdentifiers{UserID: "alice"},
 	Password:        "123456",
 	Email:           "alice@alice.com",
+	ValidatedAt:     timeValue(time.Now()),
 }
 
 var bob = &ttnpb.User{

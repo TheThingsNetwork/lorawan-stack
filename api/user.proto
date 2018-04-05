@@ -41,7 +41,7 @@ message User {
 
   // validated_at denotes the time the email was validated at.
   // This is a read-only field.
-  google.protobuf.Timestamp validated_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp validated_at = 5 [(gogoproto.stdtime) = true];
 
   // admin denotes whether or not the user has administrative rights within the tenancy.
   // This field can only be modified by admins.
