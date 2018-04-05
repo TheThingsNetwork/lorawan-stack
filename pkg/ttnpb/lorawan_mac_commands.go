@@ -38,9 +38,9 @@ func (m *MACCommand) CID() MACCommandIdentifier {
 		return CID_RESET
 	case *MACCommand_LinkCheckAns_:
 		return CID_LINK_CHECK
-	case *MACCommand_LinkAdrReq:
+	case *MACCommand_LinkADRReq_:
 		return CID_LINK_ADR
-	case *MACCommand_LinkAdrAns:
+	case *MACCommand_LinkADRAns_:
 		return CID_LINK_ADR
 	case *MACCommand_DutyCycleReq_:
 		return CID_DUTY_CYCLE
@@ -66,7 +66,7 @@ func (m *MACCommand) CID() MACCommandIdentifier {
 		return CID_REKEY
 	case *MACCommand_RekeyConf_:
 		return CID_REKEY
-	case *MACCommand_AdrParamSetupReq:
+	case *MACCommand_ADRParamSetupReq_:
 		return CID_ADR_PARAM_SETUP
 	case *MACCommand_DeviceTimeAns_:
 		return CID_DEVICE_TIME
@@ -109,10 +109,10 @@ func (m *MACCommand) GetActualPayload() MACCommandPayload {
 		return x.ResetConf
 	case *MACCommand_LinkCheckAns_:
 		return x.LinkCheckAns
-	case *MACCommand_LinkAdrReq:
-		return x.LinkAdrReq
-	case *MACCommand_LinkAdrAns:
-		return x.LinkAdrAns
+	case *MACCommand_LinkADRReq_:
+		return x.LinkADRReq
+	case *MACCommand_LinkADRAns_:
+		return x.LinkADRAns
 	case *MACCommand_DutyCycleReq_:
 		return x.DutyCycleReq
 	case *MACCommand_RxParamSetupReq_:
@@ -137,8 +137,8 @@ func (m *MACCommand) GetActualPayload() MACCommandPayload {
 		return x.RekeyInd
 	case *MACCommand_RekeyConf_:
 		return x.RekeyConf
-	case *MACCommand_AdrParamSetupReq:
-		return x.AdrParamSetupReq
+	case *MACCommand_ADRParamSetupReq_:
+		return x.ADRParamSetupReq
 	case *MACCommand_DeviceTimeAns_:
 		return x.DeviceTimeAns
 	case *MACCommand_ForceRejoinReq_:
@@ -194,12 +194,12 @@ func (m *MACCommand_LinkCheckAns) MACCommand() *MACCommand {
 
 // MACCommand returns the LinkADRReq MAC command as a *MACCommand
 func (m *MACCommand_LinkADRReq) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_LinkAdrReq{LinkAdrReq: m}}
+	return &MACCommand{Payload: &MACCommand_LinkADRReq_{LinkADRReq: m}}
 }
 
 // MACCommand returns the LinkADRAns MAC command as a *MACCommand
 func (m *MACCommand_LinkADRAns) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_LinkAdrAns{LinkAdrAns: m}}
+	return &MACCommand{Payload: &MACCommand_LinkADRAns_{LinkADRAns: m}}
 }
 
 // MACCommand returns the DutyCycleReq MAC command as a *MACCommand
@@ -264,7 +264,7 @@ func (m *MACCommand_RekeyConf) MACCommand() *MACCommand {
 
 // MACCommand returns the ADRParamSetupReq MAC command as a *MACCommand
 func (m *MACCommand_ADRParamSetupReq) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_AdrParamSetupReq{AdrParamSetupReq: m}}
+	return &MACCommand{Payload: &MACCommand_ADRParamSetupReq_{ADRParamSetupReq: m}}
 }
 
 // MACCommand returns the DeviceTimeAns MAC command as a *MACCommand

@@ -133,10 +133,10 @@ type Band struct {
 	JoinAcceptDelay2 time.Duration
 	// MaxFCntGap
 	MaxFCntGap uint
-	// AdrAckLimit
-	AdrAckLimit uint8
-	// AdrAckDelay
-	AdrAckDelay   uint8
+	// ADRAckLimit
+	ADRAckLimit uint8
+	// ADRAckDelay
+	ADRAckDelay   uint8
 	MinAckTimeout time.Duration
 	MaxAckTimeout time.Duration
 

@@ -61,8 +61,8 @@ func init() {
 		JoinAcceptDelay1: defaultJoinAcceptDelay2,
 		JoinAcceptDelay2: defaultJoinAcceptDelay2,
 		MaxFCntGap:       defaultMaxFCntGap,
-		AdrAckLimit:      defaultAdrAckLimit,
-		AdrAckDelay:      defaultAdrAckDelay,
+		ADRAckLimit:      defaultADRAckLimit,
+		ADRAckDelay:      defaultADRAckDelay,
 		MinAckTimeout:    defaultAckTimeout - defaultAckTimeoutMargin,
 		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
 

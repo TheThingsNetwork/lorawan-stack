@@ -25,8 +25,8 @@ const (
 
 	defaultMaxFCntGap uint = 16384
 
-	defaultAdrAckLimit uint8 = 64
-	defaultAdrAckDelay uint8 = 32
+	defaultADRAckLimit uint8 = 64
+	defaultADRAckDelay uint8 = 32
 
 	// Random delay between 1 and 3 seconds
 	defaultAckTimeout       time.Duration = 2 * time.Second

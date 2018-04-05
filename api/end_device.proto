@@ -228,9 +228,9 @@ message EndDevices {
 
 message MACSettings {
   // Use ADR
-  bool adr = 1;
+  bool adr = 1 [(gogoproto.customname) = "ADR"];
   // The ADR margin
-  uint32 adr_margin = 2;
+  uint32 adr_margin = 2 [(gogoproto.customname) = "ADRMargin"];
 }
 
 // MAC State of the device (active or desired)
@@ -243,15 +243,15 @@ message MACState {
   // Downlink dwell time is set (400ms)
   bool downlink_dwell_time = 4;
   // ADR: data rate index to use
-  uint32 adr_data_rate_index = 5;
+  uint32 adr_data_rate_index = 5 [(gogoproto.customname) = "ADRDataRateIndex"];
   // ADR: transmission power index to use
-  uint32 adr_tx_power_index = 6;
+  uint32 adr_tx_power_index = 6 [(gogoproto.customname) = "ADRTXPowerIndex"];
   // ADR: number of retransmissions
-  uint32 adr_nb_trans = 7;
+  uint32 adr_nb_trans = 7 [(gogoproto.customname) = "ADRNbTrans"];
   // ADR: number of messages to wait before setting ADRAckReq
-  uint32 adr_ack_limit = 8;
+  uint32 adr_ack_limit = 8 [(gogoproto.customname) = "ADRAckLimit"];
   // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate
-  uint32 adr_ack_delay = 9;
+  uint32 adr_ack_delay = 9 [(gogoproto.customname) = "ADRAckDelay"];
   // Aggregated duty cycle of the device
   AggregatedDutyCycle duty_cycle = 10;
   // Rx1 delay (Rx2 delay is Rx1 delay + 1 second)

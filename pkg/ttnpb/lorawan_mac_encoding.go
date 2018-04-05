@@ -112,7 +112,7 @@ func (m *MACCommands) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 			case CID_LINK_ADR:
 				pld := &MACCommand_LinkADRAns{}
 				macPayload = pld
-				cmd.Payload = &MACCommand_LinkAdrAns{LinkAdrAns: pld}
+				cmd.Payload = &MACCommand_LinkADRAns_{LinkADRAns: pld}
 			case CID_RX_PARAM_SETUP:
 				pld := &MACCommand_RxParamSetupAns{}
 				macPayload = pld
@@ -181,7 +181,7 @@ func (m *MACCommands) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 			case CID_LINK_ADR:
 				pld := &MACCommand_LinkADRReq{}
 				macPayload = pld
-				cmd.Payload = &MACCommand_LinkAdrReq{LinkAdrReq: pld}
+				cmd.Payload = &MACCommand_LinkADRReq_{LinkADRReq: pld}
 			case CID_DUTY_CYCLE:
 				pld := &MACCommand_DutyCycleReq{}
 				macPayload = pld
@@ -213,7 +213,7 @@ func (m *MACCommands) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 			case CID_ADR_PARAM_SETUP:
 				pld := &MACCommand_ADRParamSetupReq{}
 				macPayload = pld
-				cmd.Payload = &MACCommand_AdrParamSetupReq{AdrParamSetupReq: pld}
+				cmd.Payload = &MACCommand_ADRParamSetupReq_{ADRParamSetupReq: pld}
 			case CID_DEVICE_TIME:
 				pld := &MACCommand_DeviceTimeAns{}
 				macPayload = pld
@@ -269,10 +269,10 @@ func (m *MACCommands) AppendLoRaWAN(dst []byte) ([]byte, error) {
 			dst, err = x.ResetConf.AppendLoRaWAN(dst)
 		case *MACCommand_LinkCheckAns_:
 			dst, err = x.LinkCheckAns.AppendLoRaWAN(dst)
-		case *MACCommand_LinkAdrReq:
-			dst, err = x.LinkAdrReq.AppendLoRaWAN(dst)
-		case *MACCommand_LinkAdrAns:
-			dst, err = x.LinkAdrAns.AppendLoRaWAN(dst)
+		case *MACCommand_LinkADRReq_:
+			dst, err = x.LinkADRReq.AppendLoRaWAN(dst)
+		case *MACCommand_LinkADRAns_:
+			dst, err = x.LinkADRAns.AppendLoRaWAN(dst)
 		case *MACCommand_DutyCycleReq_:
 			dst, err = x.DutyCycleReq.AppendLoRaWAN(dst)
 		case *MACCommand_RxParamSetupReq_:
@@ -297,8 +297,8 @@ func (m *MACCommands) AppendLoRaWAN(dst []byte) ([]byte, error) {
 			dst, err = x.RekeyInd.AppendLoRaWAN(dst)
 		case *MACCommand_RekeyConf_:
 			dst, err = x.RekeyConf.AppendLoRaWAN(dst)
-		case *MACCommand_AdrParamSetupReq:
-			dst, err = x.AdrParamSetupReq.AppendLoRaWAN(dst)
+		case *MACCommand_ADRParamSetupReq_:
+			dst, err = x.ADRParamSetupReq.AppendLoRaWAN(dst)
 		case *MACCommand_DeviceTimeAns_:
 			dst, err = x.DeviceTimeAns.AppendLoRaWAN(dst)
 		case *MACCommand_ForceRejoinReq_:
