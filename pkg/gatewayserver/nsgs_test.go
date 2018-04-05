@@ -21,6 +21,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/pool"
+	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/smartystreets/assertions"
@@ -33,12 +34,16 @@ func TestScheduleDownlinkUnregisteredGateway(t *testing.T) {
 	dir := createFPStore(a)
 	defer removeFPStore(a, dir)
 
-	c := component.MustNew(test.GetLogger(t), &component.Config{})
-	gs := gatewayserver.New(c, gatewayserver.Config{
+	logger := test.GetLogger(t)
+	c := component.MustNew(logger, &component.Config{})
+	gs, err := gatewayserver.New(c, gatewayserver.Config{
 		FileFrequencyPlansStore: dir,
 	})
+	if !a.So(err, should.BeNil) {
+		logger.Fatal("Gateway server could not start")
+	}
 
-	_, err := gs.ScheduleDownlink(context.Background(), &ttnpb.DownlinkMessage{
+	_, err = gs.ScheduleDownlink(log.NewContext(context.Background(), logger), &ttnpb.DownlinkMessage{
 		TxMetadata: ttnpb.TxMetadata{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 				GatewayID: "unknown-downlink",

@@ -22,6 +22,7 @@ import (
 	"github.com/gogo/protobuf/types"
 )
 
+// ScheduleDownlink on a gateway connected to this gateway server.
 func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*types.Empty, error) {
 	err := g.gateways.Send(down.TxMetadata.GatewayIdentifiers, &ttnpb.GatewayDown{DownlinkMessage: down})
 	if err != nil {

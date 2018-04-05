@@ -18,17 +18,22 @@ import (
 	"context"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/pool"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
+	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/hooks"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
 )
 
-const sendUplinkTimeout = 5 * time.Minute
+const (
+	sendUplinkTimeout   = 5 * time.Minute
+	rightsCacheDuration = time.Hour
+)
 
 // GatewayServer implements the gateway server component.
 //
@@ -42,8 +47,21 @@ type GatewayServer struct {
 	frequencyPlans frequencyplans.Store
 }
 
+type isConnector struct {
+	*component.Component
+}
+
+func (c isConnector) Get(ctx context.Context) *grpc.ClientConn {
+	peer := c.Component.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, nil, nil)
+	if peer == nil {
+		return nil
+	}
+
+	return peer.Conn()
+}
+
 // New returns new *GatewayServer.
-func New(c *component.Component, conf Config) *GatewayServer {
+func New(c *component.Component, conf Config) (*GatewayServer, error) {
 	gs := &GatewayServer{
 		Component: c,
 
@@ -52,8 +70,15 @@ func New(c *component.Component, conf Config) *GatewayServer {
 
 		Config: conf,
 	}
+
+	hook, err := rights.New(c.Context(), isConnector{Component: c}, rights.Config{TTL: rightsCacheDuration})
+	if err != nil {
+		return nil, err
+	}
+	hooks.RegisterUnaryHook("/ttn.v3.Gs/GetGatewayObservations", "claims-builder", hook.UnaryHook())
+
 	c.RegisterGRPC(gs)
-	return gs
+	return gs, nil
 }
 
 // RegisterServices registers services provided by gs at s.
@@ -73,10 +98,8 @@ func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
 
 // GetGatewayObservations returns gateway information as observed by the gateway server.
 func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
-	if !gs.DisableAuth {
-		if err := gs.checkAuthorization(ctx, ttnpb.RIGHT_GATEWAY_STATUS); err != nil {
-			return nil, err
-		}
+	if !gs.DisableAuth && !ttnpb.IncludesRights(rights.FromContext(ctx), ttnpb.RIGHT_GATEWAY_STATUS) {
+		return nil, ErrPermissionDenied.New(nil)
 	}
 
 	return gs.gateways.GetGatewayObservations(id)
@@ -103,14 +126,4 @@ func checkAuthorization(ctx context.Context, is ttnpb.IsGatewayClient, right ttn
 	}
 
 	return nil
-}
-
-func (gs *GatewayServer) checkAuthorization(ctx context.Context, right ttnpb.Right) error {
-	peer := gs.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, nil, nil)
-	conn := peer.Conn()
-	if conn == nil {
-		return ErrNoIdentityServerFound.New(nil)
-	}
-
-	return checkAuthorization(ctx, ttnpb.NewIsGatewayClient(conn), right)
 }

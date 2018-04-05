@@ -32,10 +32,14 @@ func TestGetFrequencyPlan(t *testing.T) {
 	dir := createFPStore(a)
 	defer removeFPStore(a, dir)
 
-	c := component.MustNew(test.GetLogger(t), &component.Config{})
-	gs := gatewayserver.New(c, gatewayserver.Config{
+	logger := test.GetLogger(t)
+	c := component.MustNew(logger, &component.Config{})
+	gs, err := gatewayserver.New(c, gatewayserver.Config{
 		FileFrequencyPlansStore: dir,
 	})
+	if !a.So(err, should.BeNil) {
+		logger.Fatal("Gateway server could not start")
+	}
 
 	fp, err := gs.GetFrequencyPlan(context.Background(), &ttnpb.GetFrequencyPlanRequest{FrequencyPlanID: "EU_863_870"})
 	a.So(err, should.BeNil)

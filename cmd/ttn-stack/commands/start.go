@@ -54,7 +54,10 @@ var (
 				return errors.NewWithCause(err, "Could not initialize identity server")
 			}
 
-			gs := gatewayserver.New(c, &config.GS)
+			gs, err := gatewayserver.New(c, config.GS)
+			if err != nil {
+				return errors.NewWithCause(err, "Could not create gateway server")
+			}
 			_ = gs
 
 			ns := networkserver.New(c, &config.NS)

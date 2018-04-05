@@ -31,7 +31,10 @@ var (
 				return errors.NewWithCause(err, "Could not initialize base component")
 			}
 
-			gs := gatewayserver.New(c, config.GS)
+			gs, err := gatewayserver.New(c, config.GS)
+			if err != nil {
+				return errors.NewWithCause(err, "Could not create gateway server")
+			}
 			_ = gs
 
 			logger.Info("Starting gateway server...")

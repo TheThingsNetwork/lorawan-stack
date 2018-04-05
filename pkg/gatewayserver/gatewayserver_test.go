@@ -39,7 +39,10 @@ func Example() {
 
 	c := component.MustNew(logger, &component.Config{ServiceBase: config.ServiceBase{}})
 
-	gs := gatewayserver.New(c, gatewayserver.Config{})
+	gs, err := gatewayserver.New(c, gatewayserver.Config{})
+	if err != nil {
+		panic(err)
+	}
 	gs.Run()
 }
 
@@ -49,10 +52,14 @@ func TestGatewayServer(t *testing.T) {
 	dir := createFPStore(a)
 	defer removeFPStore(a, dir)
 
-	c := component.MustNew(test.GetLogger(t), &component.Config{})
-	gs := gatewayserver.New(c, gatewayserver.Config{
+	logger := test.GetLogger(t)
+	c := component.MustNew(logger, &component.Config{})
+	gs, err := gatewayserver.New(c, gatewayserver.Config{
 		FileFrequencyPlansStore: dir,
 	})
+	if !a.So(err, should.BeNil) {
+		logger.Fatal("Gateway server could not start")
+	}
 
 	roles := gs.Roles()
 	a.So(len(roles), should.Equal, 1)
@@ -78,7 +85,8 @@ func TestLink(t *testing.T) {
 	_, isAddr := StartMockIsGatewayServer(ctx, registeredGateways)
 	ns, nsAddr := StartMockGsNsServer(ctx)
 
-	c := component.MustNew(test.GetLogger(t), &component.Config{
+	logger := test.GetLogger(t)
+	c := component.MustNew(logger, &component.Config{
 		ServiceBase: config.ServiceBase{
 			Cluster: config.Cluster{
 				Name:           "test-gateway-server",
@@ -92,10 +100,13 @@ func TestLink(t *testing.T) {
 
 	var client ttnpb.GtwGsClient
 	srv := grpc.NewServer()
-	gs := gatewayserver.New(c, gatewayserver.Config{
+	gs, err := gatewayserver.New(c, gatewayserver.Config{
 		DisableAuth:             true,
 		FileFrequencyPlansStore: dir,
 	})
+	if !a.So(err, should.BeNil) {
+		logger.Fatal("Gateway server could not start")
+	}
 
 	// Initializing server and client
 	{
