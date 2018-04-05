@@ -218,6 +218,7 @@ func (ns *NetworkServer) matchDevice(msg *ttnpb.UplinkMessage) (*deviceregistry.
 
 	for _, dev := range fb {
 		dev.EndDevice.Session = dev.EndDevice.SessionFallback
+		dev.EndDevice.EndDeviceIdentifiers.DevAddr = &dev.EndDevice.Session.DevAddr
 	}
 	devs = append(devs, fb...)
 
@@ -351,7 +352,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
 	}
 
-	if err := dev.Store("Session", "SessionFallback", "RecentUplinks"); err != nil {
+	if err := dev.Store("EndDeviceIdentifiers.DevAddr", "Session", "SessionFallback", "RecentUplinks"); err != nil {
 		logger.WithError(err).Error("Failed to update device")
 		return err
 	}
@@ -447,6 +448,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 			SessionKeys: resp.SessionKeys,
 			StartedAt:   time.Now(),
 		}
+		dev.EndDeviceIdentifiers.DevAddr = &devAddr
 
 		time.Sleep(time.Until(start.Add(ns.deduplicationWindow)))
 		msg.RxMetadata = acc.Accumulated()
@@ -456,7 +458,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 			dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
 		}
 
-		if err = dev.Store("Session", "SessionFallback", "RecentUplinks"); err != nil {
+		if err = dev.Store("EndDeviceIdentifiers.DevAddr", "Session", "SessionFallback", "RecentUplinks"); err != nil {
 			logger.WithError(err).Error("Failed to update device")
 			return err
 		}
