@@ -41,7 +41,7 @@ const (
 type GatewayServer struct {
 	*component.Component
 
-	Config
+	config Config
 
 	gateways       pool.Pool
 	frequencyPlans frequencyplans.Store
@@ -68,7 +68,7 @@ func New(c *component.Component, conf Config) (*GatewayServer, error) {
 		gateways:       pool.NewPool(c.Logger(), sendUplinkTimeout),
 		frequencyPlans: conf.store(),
 
-		Config: conf,
+		config: conf,
 	}
 
 	hook, err := rights.New(c.Context(), isConnector{Component: c}, rights.Config{TTL: rightsCacheDuration})
@@ -98,7 +98,7 @@ func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
 
 // GetGatewayObservations returns gateway information as observed by the gateway server.
 func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
-	if !gs.DisableAuth && !ttnpb.IncludesRights(rights.FromContext(ctx), ttnpb.RIGHT_GATEWAY_STATUS) {
+	if !gs.config.DisableAuth && !ttnpb.IncludesRights(rights.FromContext(ctx), ttnpb.RIGHT_GATEWAY_STATUS) {
 		return nil, ErrPermissionDenied.New(nil)
 	}
 

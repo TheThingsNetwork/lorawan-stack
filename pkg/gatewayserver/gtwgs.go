@@ -38,7 +38,7 @@ func (e nsErrors) Error() string {
 }
 
 func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *ttnpb.GatewayIdentifiers) (ttnpb.FrequencyPlan, error) {
-	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, g.NSTags, nil)
+	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, g.config.NSTags, nil)
 	if isInfo == nil {
 		return ttnpb.FrequencyPlan{}, ErrNoIdentityServerFound.New(nil)
 	}
@@ -59,7 +59,7 @@ func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *
 
 func (g *GatewayServer) forAllNS(f func(ttnpb.GsNsClient) error) error {
 	errors := nsErrors{}
-	for _, ns := range g.GetPeers(ttnpb.PeerInfo_NETWORK_SERVER, g.NSTags) {
+	for _, ns := range g.GetPeers(ttnpb.PeerInfo_NETWORK_SERVER, g.config.NSTags) {
 		nsClient := ttnpb.NewGsNsClient(ns.Conn())
 		err := f(nsClient)
 		if err != nil {
@@ -86,13 +86,13 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	logger := log.FromContext(ctx).WithField("gateway_id", id.GatewayID)
 	defer logger.WithError(err).Debug("Link with gateway closed")
 
-	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, g.NSTags, nil)
+	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, g.config.NSTags, nil)
 	if isInfo == nil {
 		return ErrNoIdentityServerFound.New(nil)
 	}
 	is := ttnpb.NewIsGatewayClient(isInfo.Conn())
 
-	if !g.DisableAuth {
+	if !g.config.DisableAuth {
 		if err := checkAuthorization(ctx, is, ttnpb.RIGHT_GATEWAY_TRAFFIC_LINK); err != nil {
 			return err
 		}
@@ -189,7 +189,7 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 		if err != nil {
 			return
 		}
-		ns = g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, g.NSTags, devAddrBytes)
+		ns = g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, g.config.NSTags, devAddrBytes)
 	case ttnpb.MType_JOIN_ACCEPT, ttnpb.MType_REJOIN_REQUEST:
 		if uplink.DevEUI == nil {
 			err = errors.New("No DevEUI specified")
@@ -201,7 +201,7 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 		if err != nil {
 			return
 		}
-		ns = g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, g.NSTags, devEUIBytes)
+		ns = g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, g.config.NSTags, devEUIBytes)
 	}
 
 	if ns == nil {
