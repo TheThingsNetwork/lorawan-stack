@@ -38,9 +38,9 @@ Each gateway server has a list of network servers to connect to.
 
 ## Downlink Scheduling
 
-The gateway server keeps track of all downlinks emitted and to be emitted by gateways connected. The network server can request the scheduling of a downlink with the [`ScheduleDownlink` method](../api/gatewayserver.proto#L89), by attaching the **timestamp** at which a downlink should be sent.
+The gateway server keeps track of all downlinks emitted and to be emitted by gateways connected. The network server can request the scheduling of a downlink with the [`ScheduleDownlink` method](../api/gatewayserver.proto#L89), by attaching the **timestamp** at which a downlink should be sent. The gateway server does not decide which gateway sends a downlink, as this is decided by the network server.
 
-The following checks are being done to schedule a downlink:
+The following checks are being done by the gateway server before scheduling a downlink:
 
 + **Downlink overlap**: If the emission of a downlink overlaps the emission of another downlink, the downlink is dropped.
 
