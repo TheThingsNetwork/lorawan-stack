@@ -35,7 +35,7 @@ type gatewayIdentifiersGetters interface {
 	GetGatewayID() string
 }
 
-// HookName denotes uniquely name that components should use to register this hook.
+// HookName denotes the unique name that components should use to register this hook.
 const HookName = "rights-fetcher"
 
 // IdentityServerConnector is the interface that provides a method to get a
