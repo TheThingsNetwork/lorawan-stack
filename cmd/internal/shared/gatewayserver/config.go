@@ -23,5 +23,5 @@ import (
 
 // DefaultGatewayServerConfig is the default configuration for the GatewayServer.
 var DefaultGatewayServerConfig = gatewayserver.Config{
-	Rights: rights.Config{TTL: time.Hour},
+	Rights: rights.Config{TTL: 2 * time.Minute},
 }
