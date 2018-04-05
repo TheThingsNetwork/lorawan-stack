@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 go get -d -u github.com/grpc-ecosystem/grpc-gateway/...
 
