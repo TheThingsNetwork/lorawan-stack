@@ -246,7 +246,7 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) 
 			_, err = tx.Pipelined(func(p *redis.Pipeline) error {
 				for i, k := range idxDel {
 					if curr := idxCurrent[i]; curr != nil {
-						p.SRem(s.key(k, curr.(string)), idStr)
+						p.SRem(s.key(k, hex.EncodeToString([]byte(curr.(string)))), idStr)
 					}
 				}
 				for _, k := range idxAdd {
