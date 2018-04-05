@@ -30,10 +30,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
-	sendUplinkTimeout   = 5 * time.Minute
-	rightsCacheDuration = time.Hour
-)
+const sendUplinkTimeout = 5 * time.Minute
 
 // GatewayServer implements the gateway server component.
 //
@@ -71,11 +68,11 @@ func New(c *component.Component, conf Config) (*GatewayServer, error) {
 		config: conf,
 	}
 
-	hook, err := rights.New(c.Context(), isConnector{Component: c}, rights.Config{TTL: rightsCacheDuration})
+	hook, err := rights.New(c.Context(), isConnector{Component: c}, conf.Rights)
 	if err != nil {
 		return nil, err
 	}
-	hooks.RegisterUnaryHook("/ttn.v3.Gs/GetGatewayObservations", "claims-builder", hook.UnaryHook())
+	hooks.RegisterUnaryHook("/ttn.v3.Gs/GetGatewayObservations", rights.HookName, hook.UnaryHook())
 
 	c.RegisterGRPC(gs)
 	return gs, nil
