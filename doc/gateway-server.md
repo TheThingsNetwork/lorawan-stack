@@ -4,13 +4,23 @@ The **Gateway Server** component of The Things Network Stack is responsible for 
 
 ## Connectivity to Gateways
 
-Gateways can connect to Gateway Servers over multiple protocols:
+Gateways can connect to Gateway Servers over multiple protocols.
 
-+ **UDP**: Gateways can connect to a Gateway Server over [the UDP protocol](https://github.com/Lora-net/packet_forwarder/blob/master/PROTOCOL.TXT).
+#### UDP protocol
 
-+ **gRPC**: Gateways can connect to a Gateway Server using [The Things Network's gRPC protocol](../api/gatewayserver.proto#L79).
+Gateways can connect to a Gateway Server over [the UDP protocol](https://github.com/Lora-net/packet_forwarder/blob/master/PROTOCOL.TXT). The EUI that is sent with every message is used to identify the gateway.
 
-+ **MQTT**: Though it is not yet implemented, gateways will be able to connect to a Gateway Server using authenticated MQTT.
+If a gateway is found in the Identity Server with this EUI, messages are correlated to this gateway. Otherwise, uplinks are still routed. However, the gateway will not send downlinks to this gateway, given that its regional parameters cannot be identified.
+
+Many packet forwarders implementing this protocol do not implement any queuing system for downlinks, resulting in packet loss since SX1301 concentrators cannot buffer multiple downlinks. The Things Network thus implements, for the UDP protocol, a delay to sent downlinks to gateway just before they're meant to be emitted by the concentrator. You can disable this feature individually per gateway, for example if the RTT between your gateway and the gateway server is too high.
+
+#### gRPC protocol
+
+Gateways can connect to a Gateway Server using [The Things Network's gRPC protocol](../api/gatewayserver.proto#L79).
+
+#### MQTT protocol
+
+Though it is not yet implemented, gateways will be able to connect to a Gateway Server using authenticated MQTT.
 
 ## Public Gateway Information
 
