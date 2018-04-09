@@ -159,8 +159,13 @@ enum CFListType {
 message CFList {
   option (gogoproto.populate) = false;
 
-  CFListType        type = 1;
-  repeated uint32   freq = 2;
+  CFListType type = 1;
+  // Frequencies to be broadcasted, in hecto-Hz.
+  // These values are broadcasted as 24 bits unsigned integers.
+  // If this value is used, there should be 5 values.
+  repeated uint32 freq = 2;
+  // ChMasks controlling the channels to be used.
+  // If this value is used, there should be 80 values.
   repeated bool ch_masks = 3;
 }
 
