@@ -25,6 +25,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/errors/grpcerrors"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/fillcontext"
+	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/hooks"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/rpclog"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/sentry"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver/internal/jsonpb"
@@ -145,6 +146,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		sentry.StreamServerInterceptor(options.sentry),
 		rpclog.StreamServerInterceptor(ctx), // Gets logger from global context
 		grpc_validator.StreamServerInterceptor(),
+		hooks.StreamServerInterceptor(),
 	}
 
 	unaryInterceptors := []grpc.UnaryServerInterceptor{
@@ -155,6 +157,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		sentry.UnaryServerInterceptor(options.sentry),
 		rpclog.UnaryServerInterceptor(ctx), // Gets logger from global context
 		grpc_validator.UnaryServerInterceptor(),
+		hooks.UnaryServerInterceptor(),
 	}
 
 	baseOptions := []grpc.ServerOption{
