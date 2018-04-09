@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
+	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/pool"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
@@ -35,10 +36,10 @@ func TestScheduleDownlinkUnregisteredGateway(t *testing.T) {
 	defer removeFPStore(a, dir)
 
 	logger := test.GetLogger(t)
-	c := component.MustNew(logger, &component.Config{})
-	gs, err := gatewayserver.New(c, gatewayserver.Config{
-		FileFrequencyPlansStore: dir,
-	})
+	c := component.MustNew(test.GetLogger(t), &component.Config{ServiceBase: config.ServiceBase{
+		FrequencyPlans: config.FrequencyPlans{StoreDirectory: dir},
+	}})
+	gs, err := gatewayserver.New(c, gatewayserver.Config{})
 	if !a.So(err, should.BeNil) {
 		logger.Fatal("Gateway server could not start")
 	}

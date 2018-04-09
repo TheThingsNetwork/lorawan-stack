@@ -29,7 +29,7 @@ import (
 )
 
 func Example() {
-	store := frequencyplans.NewStore(fetch.FromGitHubRepository("TheThingsNetwork/gateway-conf", "yaml-master", "", true))
+	store := frequencyplans.NewStore(fetch.FromHTTP("https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/yaml-master", true))
 
 	ids, err := store.GetAllIDs()
 	if err != nil {

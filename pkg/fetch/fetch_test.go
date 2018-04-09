@@ -17,12 +17,12 @@ package fetch
 import "fmt"
 
 func Example() {
-	fetcher := FromGitHubRepository("TheThingsNetwork/info", "master", "", true)
+	fetcher := FromHTTP("http://webserver.thethings.network/repository", true)
 	content, err := fetcher.File("README.md")
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("Content of the README.md in TheThingsNetwork/info:")
+	fmt.Println("Content of http://webserver.thethings.network/repository/README.md:")
 	fmt.Println(string(content))
 }

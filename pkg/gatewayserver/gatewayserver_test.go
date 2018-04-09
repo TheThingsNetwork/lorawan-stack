@@ -49,10 +49,10 @@ func TestGatewayServer(t *testing.T) {
 	defer removeFPStore(a, dir)
 
 	logger := test.GetLogger(t)
-	c := component.MustNew(logger, &component.Config{})
-	gs, err := gatewayserver.New(c, gatewayserver.Config{
-		FileFrequencyPlansStore: dir,
-	})
+	c := component.MustNew(logger, &component.Config{ServiceBase: config.ServiceBase{FrequencyPlans: config.FrequencyPlans{
+		StoreDirectory: dir,
+	}}})
+	gs, err := gatewayserver.New(c, gatewayserver.Config{})
 	if !a.So(err, should.BeNil) {
 		logger.Fatal("Gateway server could not start")
 	}

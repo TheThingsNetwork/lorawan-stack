@@ -87,11 +87,13 @@ func TestLink(t *testing.T) {
 				IdentityServer: isAddr,
 				NetworkServer:  nsAddr,
 			},
+			FrequencyPlans: config.FrequencyPlans{
+				StoreDirectory: dir,
+			},
 		},
 	})
 	gs, err := gatewayserver.New(c, gatewayserver.Config{
-		FileFrequencyPlansStore: dir,
-		DisableAuth:             true,
+		DisableAuth: true,
 	})
 	if !a.So(err, should.BeNil) {
 		t.Fatal("Gateway server could not be initialized:", err)
@@ -229,10 +231,10 @@ func TestGetFrequencyPlan(t *testing.T) {
 	defer removeFPStore(a, dir)
 
 	logger := test.GetLogger(t)
-	c := component.MustNew(logger, &component.Config{})
-	gs, err := gatewayserver.New(c, gatewayserver.Config{
-		FileFrequencyPlansStore: dir,
-	})
+	c := component.MustNew(test.GetLogger(t), &component.Config{ServiceBase: config.ServiceBase{
+		FrequencyPlans: config.FrequencyPlans{StoreDirectory: dir},
+	}})
+	gs, err := gatewayserver.New(c, gatewayserver.Config{})
 	if !a.So(err, should.BeNil) {
 		logger.Fatal("Gateway server could not start")
 	}
@@ -241,9 +243,6 @@ func TestGetFrequencyPlan(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(fp.BandID, should.Equal, "EU_863_870")
 	a.So(len(fp.Channels), should.Equal, 8)
-
-	_, err = gs.GetFrequencyPlan(context.Background(), &ttnpb.GetFrequencyPlanRequest{FrequencyPlanID: "FP_THAT_DOES_NOT_EXIST"})
-	a.So(err, should.NotBeNil)
 
 	defer gs.Close()
 }

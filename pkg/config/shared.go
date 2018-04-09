@@ -18,6 +18,8 @@ import (
 	"encoding/hex"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/fetch"
+	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 )
 
@@ -132,18 +134,43 @@ type RemoteProviderConfig struct {
 
 // ServiceBase represents base service configuration.
 type ServiceBase struct {
-	Base         `name:",squash"`
-	Cluster      Cluster               `name:"cluster"`
-	Redis        Redis                 `name:"redis"`
-	GRPC         GRPC                  `name:"grpc"`
-	HTTP         HTTP                  `name:"http"`
-	TLS          TLS                   `name:"tls"`
-	Identity     Identity              `name:"identity"`
-	RemoteConfig *RemoteProviderConfig `name:"remote-config"`
-	Sentry       Sentry                `name:"sentry"`
+	Base           `name:",squash"`
+	Cluster        Cluster               `name:"cluster"`
+	Redis          Redis                 `name:"redis"`
+	GRPC           GRPC                  `name:"grpc"`
+	HTTP           HTTP                  `name:"http"`
+	TLS            TLS                   `name:"tls"`
+	Identity       Identity              `name:"identity"`
+	RemoteConfig   *RemoteProviderConfig `name:"remote-config"`
+	Sentry         Sentry                `name:"sentry"`
+	FrequencyPlans FrequencyPlans        `name:"frequency-plans"`
 }
 
 // IsValid returns wether or not the remote config is valid or not.
 func (c RemoteProviderConfig) IsValid() bool {
 	return c.Provider != "" && c.Endpoint != "" && c.Path != ""
+}
+
+// FrequencyPlans represents frequency plans fetching configuration.
+type FrequencyPlans struct {
+	StoreDirectory string `name:"directory" description:"Retrieve the frequency plans from the filesystem"`
+	StoreURL       string `name:"url" description:"Retrieve the frequency plans from a web server"`
+}
+
+type unconfiguredFetcher struct{}
+
+func (u unconfiguredFetcher) File(path ...string) ([]byte, error) {
+	return nil, errors.New("Fetcher not configured")
+}
+
+// Store returns the abstraction to retrieve frequency plans from the given configuration.
+func (f FrequencyPlans) Store() *frequencyplans.Store {
+	switch {
+	case f.StoreDirectory != "":
+		return frequencyplans.NewStore(fetch.FromFilesystem(f.StoreDirectory))
+	case f.StoreURL != "":
+		return frequencyplans.NewStore(fetch.FromHTTP(f.StoreURL, true))
+	}
+
+	return frequencyplans.NewStore(unconfiguredFetcher{})
 }

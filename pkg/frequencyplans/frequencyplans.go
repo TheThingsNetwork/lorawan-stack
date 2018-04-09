@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package frequencyplans contains abstractions to fetch and manipulate frequency plans
+// Package frequencyplans contains abstractions to fetch and manipulate frequency plans.
 package frequencyplans
 
 import (
@@ -50,16 +50,16 @@ func init() {
 
 // FrequencyPlanDescription describes a frequency plan in the YAML format.
 type FrequencyPlanDescription struct {
-	// ID to identify the frequency plan
+	// ID to identify the frequency plan.
 	ID string `yaml:"id"`
-	// Description of the frequency plan
+	// Description of the frequency plan.
 	Description string `yaml:"description"`
-	// BaseFrequency in Mhz
+	// BaseFrequency in Mhz.
 	BaseFrequency uint16 `yaml:"base_freq"`
-	// Filename of the frequency plan within the repo
+	// Filename of the frequency plan within the repo.
 	Filename string `yaml:"file"`
 
-	// BaseID is the ID of the frequency plan that's the basis for this extended frequency plan
+	// BaseID is the ID of the frequency plan that's the basis for this extended frequency plan.
 	BaseID string `yaml:"base,omitempty"`
 }
 
@@ -100,27 +100,26 @@ type queryResult struct {
 	time time.Time
 }
 
-// Store of frequency plans
+// Store of frequency plans.
 type Store struct {
 	// Fetcher is the fetch.Interface used to retrieve data.
 	Fetcher fetch.Interface
 
-	descriptionsMu             *sync.Mutex
+	descriptionsMu             sync.Mutex
 	descriptionsCache          frequencyPlanList
 	descriptionsFetchErrorTime time.Time
 	descriptionsFetchError     error
 
 	frequencyPlansCache map[string]queryResult
-	frequencyPlansMu    *sync.Mutex
+	frequencyPlansMu    sync.Mutex
 }
 
-// NewStore returns a new frequency plans store.
-func NewStore(fetcher fetch.Interface) Store {
-	return Store{
-		Fetcher:             fetcher,
+// NewStore of frequency plans.
+func NewStore(fetcher fetch.Interface) *Store {
+	return &Store{
+		Fetcher: fetcher,
+
 		frequencyPlansCache: map[string]queryResult{},
-		frequencyPlansMu:    &sync.Mutex{},
-		descriptionsMu:      &sync.Mutex{},
 	}
 }
 
@@ -160,15 +159,6 @@ func (s *Store) descriptions() (frequencyPlanList, error) {
 	s.descriptionsFetchError = nil
 	s.descriptionsCache = descriptions
 	return descriptions, nil
-}
-
-func (s *Store) loadFPFromCache(id string) (queryResult, bool) {
-	val, ok := s.frequencyPlansCache[id]
-	return val, ok
-}
-
-func (s *Store) storeFPInCache(id string, result queryResult) {
-	s.frequencyPlansCache[id] = result
 }
 
 // getByID returns the frequency plan associated to that ID.
@@ -214,15 +204,15 @@ func (s *Store) getByID(id string) (proto ttnpb.FrequencyPlan, err error) {
 func (s *Store) GetByID(id string) (ttnpb.FrequencyPlan, error) {
 	s.frequencyPlansMu.Lock()
 	defer s.frequencyPlansMu.Unlock()
-	if cached, ok := s.loadFPFromCache(id); ok && cached.err == nil || time.Since(cached.time) < yamlFetchErrorCache {
+	if cached, ok := s.frequencyPlansCache[id]; ok && cached.err == nil || time.Since(cached.time) < yamlFetchErrorCache {
 		return cached.fp, cached.err
 	}
 	proto, err := s.getByID(id)
-	s.storeFPInCache(id, queryResult{
+	s.frequencyPlansCache[id] = queryResult{
 		time: time.Now(),
 		fp:   proto,
 		err:  err,
-	})
+	}
 
 	return proto, err
 }

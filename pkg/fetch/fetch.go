@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package fetch offers abstractions to fetch a file from a location (filesystem, git, HTTP...)
+// Package fetch offers abstractions to fetch a file with the same method,
+// regardless of a location (filesystem, HTTP...).
 package fetch
 
 // Interface is an abstraction for file retrieval.

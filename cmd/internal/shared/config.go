@@ -71,13 +71,19 @@ var DefaultRedisConfig = config.Redis{
 
 // DefaultServiceBase is the default base config for a service.
 var DefaultServiceBase = config.ServiceBase{
-	Base:     DefaultBaseConfig,
-	Cluster:  DefaultClusterConfig,
-	Redis:    DefaultRedisConfig,
-	GRPC:     DefaultGRPCConfig,
-	HTTP:     DefaultHTTPConfig,
-	TLS:      DefaultTLSConfig,
-	Identity: DefaultIdentityConfig,
+	Base:           DefaultBaseConfig,
+	Cluster:        DefaultClusterConfig,
+	Redis:          DefaultRedisConfig,
+	GRPC:           DefaultGRPCConfig,
+	HTTP:           DefaultHTTPConfig,
+	TLS:            DefaultTLSConfig,
+	Identity:       DefaultIdentityConfig,
+	FrequencyPlans: DefaultFrequencyPlansConfig,
+}
+
+// DefaultFrequencyPlansConfig is the default config to retrieve frequency plans.
+var DefaultFrequencyPlansConfig = config.FrequencyPlans{
+	StoreDirectory: "https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/yaml-master",
 }
 
 // DefaultISRightsFetchingConfig is the default config to fetch rights from the Identity Server.

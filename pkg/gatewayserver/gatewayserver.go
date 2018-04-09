@@ -22,7 +22,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/pool"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/hooks"
@@ -41,8 +40,7 @@ type GatewayServer struct {
 
 	config Config
 
-	gateways       pool.Pool
-	frequencyPlans frequencyplans.Store
+	gateways pool.Pool
 }
 
 type isConnector struct {
@@ -63,8 +61,7 @@ func New(c *component.Component, conf Config) (*GatewayServer, error) {
 	gs := &GatewayServer{
 		Component: c,
 
-		gateways:       pool.NewPool(c.Logger(), sendUplinkTimeout),
-		frequencyPlans: conf.store(),
+		gateways: pool.NewPool(c.Logger(), sendUplinkTimeout),
 
 		config: conf,
 	}

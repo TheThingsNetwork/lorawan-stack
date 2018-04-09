@@ -255,7 +255,7 @@ func TestProtos(t *testing.T) {
 
 func Example() {
 	repository := devicerepository.Client{
-		Fetcher: fetch.FromGitHubRepository("TheThingsNetwork/devices", "master", "", true),
+		Fetcher: fetch.FromHTTP("https://raw.githubusercontent.com/TheThingsNetwork/devices/master", true),
 	}
 
 	brands, err := repository.Brands()

@@ -25,6 +25,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/cluster"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
+	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/log/middleware/sentry"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
@@ -58,6 +59,8 @@ type Component struct {
 	loopback *grpc.ClientConn
 
 	listeners map[string]*listener
+
+	FrequencyPlans *frequencyplans.Store
 }
 
 // MustNew calls New and returns a new component or panics on an error.
@@ -83,6 +86,8 @@ func New(logger log.Stack, config *Config) (*Component, error) {
 		logger: logger,
 
 		listeners: make(map[string]*listener),
+
+		FrequencyPlans: config.FrequencyPlans.Store(),
 	}
 
 	if config.Sentry.DSN != "" {
