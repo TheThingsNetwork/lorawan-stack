@@ -15,13 +15,11 @@
 package shared
 
 import (
-	"time"
-
-	"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
+	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
 )
 
 // DefaultGatewayServerConfig is the default configuration for the GatewayServer.
 var DefaultGatewayServerConfig = gatewayserver.Config{
-	Rights: rights.Config{TTL: 2 * time.Minute},
+	Rights: shared.DefaultISRightsFetchingConfig,
 }

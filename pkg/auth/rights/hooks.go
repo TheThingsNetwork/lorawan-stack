@@ -50,7 +50,7 @@ type IdentityServerConnector interface {
 type Config struct {
 	// TTL is the duration that entries will remain in the cache before being
 	// garbage collected. If the value is not set (i.e. 0) caching will be disabled.
-	TTL time.Duration `name:"ttl" description:"Duration for which rights fetched from the Identity Server will be cached. Valid example values: 30s, 5m or 1h."`
+	TTL time.Duration `name:"ttl" description:"How long to cache client authorizations before re-validating with the identity server. Valid example values: 30s, 5m or 1h."`
 }
 
 // Hook implements a gRPC unary hook that preloads in the context the rights

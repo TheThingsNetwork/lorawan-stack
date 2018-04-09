@@ -15,6 +15,9 @@
 package shared
 
 import (
+	"time"
+
+	"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/log/middleware/sentry"
@@ -75,6 +78,11 @@ var DefaultServiceBase = config.ServiceBase{
 	HTTP:     DefaultHTTPConfig,
 	TLS:      DefaultTLSConfig,
 	Identity: DefaultIdentityConfig,
+}
+
+// DefaultISRightsFetchingConfig is the default config to fetch rights from the Identity Server.
+var DefaultISRightsFetchingConfig = rights.Config{
+	TTL: 2 * time.Minute,
 }
 
 // SentryMiddleware generates a log.Middleware sending errors logs to Sentry from a config.
