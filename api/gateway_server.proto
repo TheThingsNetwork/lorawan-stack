@@ -29,29 +29,36 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
 // GatewayUp may contain zero or more uplink messages and/or a status message for the gateway.
 message GatewayUp {
+  // UplinkMessages received by the gateway.
   repeated UplinkMessage uplink_messages = 1;
   GatewayStatus gateway_status = 2;
 }
 
-// GatewayDown contains downlink messages for the gateway
+// GatewayDown contains downlink messages for the gateway.
 message GatewayDown {
+  // DownlinkMessage for the gateway.
   DownlinkMessage downlink_message = 1;
 }
 
-// FrequencyPlan contains the frequency plan for the gateway
+// FrequencyPlan contains the frequency plan for the gateway.
 message FrequencyPlan {
+  // BandID of the band to support.
   string band_id = 1 [(gogoproto.customname) = "BandID",  (gogoproto.moretags) = "yaml:\"band-id\""];
 
   message Channel {
+    // Frequency of the channel.
     uint32 frequency = 1 [(gogoproto.moretags) = "yaml:\"frequency\""];
 
     message ForceDataRate {
-      uint32 index = 1 [(gogoproto.moretags) = "yaml:\"index,omitempty\""];
+      // Index of the data rate to use.
+      uint32 index = 1 [(gogoproto.moretags) = "yaml:\"index\""];
     }
 
+    // DataRate that should be used on this channel.
     ForceDataRate data_rate = 2 [(gogoproto.moretags) = "yaml:\"data-rate,omitempty\""];
   }
 
+  // Channels to support.
   repeated Channel channels = 2 [(gogoproto.moretags) = "yaml:\"channels\""];
 
   Channel lora_standard_channel = 3 [(gogoproto.moretags) = "yaml:\"lora-std-channel,omitempty\""];
@@ -64,22 +71,25 @@ message FrequencyPlan {
     int32 scan_time = 3 [(gogoproto.moretags) = "yaml:\"scan-time\""];
   }
 
+  // LBT configuration.
   LBTConfiguration lbt = 5 [(gogoproto.customname) = "LBT",  (gogoproto.moretags) = "yaml:\"lbt,omitempty\""];
 
   // DwellTime indicates the maximum duration of a transmission.
   google.protobuf.Duration dwell_time = 6 [(gogoproto.moretags) = "yaml:\"dwell-time,omitempty\"", (gogoproto.stdduration) = true];
 
   message TimeOffAir {
-    // Fraction of the time on air of a Tx emission to account as cooloff after emission
+    // Fraction of the time on air of a Tx emission to account as cooloff after emission.
     float fraction = 1 [(gogoproto.moretags) = "yaml:\"fraction,omitempty\""];
-    // Cooloff after a Tx emission
+    // Cooloff after a Tx emission.
     google.protobuf.Duration duration = 2 [(gogoproto.moretags) = "yaml:\"duration,omitempty\"", (gogoproto.stdduration) = true];
   }
 
+  // TimeOffAir to abide to after transmission.
   TimeOffAir time_off_air = 7 [(gogoproto.moretags) = "yaml:\"tx-timeoff-air,omitempty\""];
 }
 
 message GetFrequencyPlanRequest {
+  // ID of the frequency plan to fetch.
   string frequency_plan_id = 1 [(gogoproto.customname) = "FrequencyPlanID"];
 }
 
@@ -103,5 +113,6 @@ service NsGs {
 
 // Service Gs allows clients to retrieve the status of their gateways
 service Gs {
+  // GetGatewayObservations for a gateway.
   rpc GetGatewayObservations(GatewayIdentifiers) returns (GatewayObservations);
 }
