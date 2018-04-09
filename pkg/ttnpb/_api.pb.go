@@ -67,7 +67,7 @@ It has these top-level messages:
 	GatewayUp
 	GatewayDown
 	FrequencyPlan
-	FrequencyPlanRequest
+	GetFrequencyPlanRequest
 	UserIdentifiers
 	ApplicationIdentifiers
 	GatewayIdentifiers

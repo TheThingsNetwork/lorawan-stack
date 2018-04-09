@@ -204,7 +204,7 @@ func (g *GatewayServer) handleStatus(ctx context.Context, status *ttnpb.GatewayS
 }
 
 // GetFrequencyPlan associated to the gateway. The gateway is ID'd by its authentication token.
-func (g *GatewayServer) GetFrequencyPlan(ctx context.Context, r *ttnpb.FrequencyPlanRequest) (*ttnpb.FrequencyPlan, error) {
+func (g *GatewayServer) GetFrequencyPlan(ctx context.Context, r *ttnpb.GetFrequencyPlanRequest) (*ttnpb.FrequencyPlan, error) {
 	fp, err := g.frequencyPlans.GetByID(r.GetFrequencyPlanID())
 	if err != nil {
 		return nil, errors.NewWithCause(err, "Could not retrieve frequency plan from storage")

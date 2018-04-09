@@ -735,15 +735,15 @@ func BenchmarkFrequencyPlan_TimeOffAirProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestFrequencyPlanRequestProto(t *testing.T) {
+func TestGetFrequencyPlanRequestProto(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedFrequencyPlanRequest(popr, false)
+	p := NewPopulatedGetFrequencyPlanRequest(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &FrequencyPlanRequest{}
+	msg := &GetFrequencyPlanRequest{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -769,10 +769,10 @@ func TestFrequencyPlanRequestProto(t *testing.T) {
 	}
 }
 
-func TestFrequencyPlanRequestMarshalTo(t *testing.T) {
+func TestGetFrequencyPlanRequestMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedFrequencyPlanRequest(popr, false)
+	p := NewPopulatedGetFrequencyPlanRequest(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
 	for i := range dAtA {
@@ -782,7 +782,7 @@ func TestFrequencyPlanRequestMarshalTo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &FrequencyPlanRequest{}
+	msg := &GetFrequencyPlanRequest{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -797,12 +797,12 @@ func TestFrequencyPlanRequestMarshalTo(t *testing.T) {
 	}
 }
 
-func BenchmarkFrequencyPlanRequestProtoMarshal(b *testing.B) {
+func BenchmarkGetFrequencyPlanRequestProtoMarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*FrequencyPlanRequest, 10000)
+	pops := make([]*GetFrequencyPlanRequest, 10000)
 	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedFrequencyPlanRequest(popr, false)
+		pops[i] = NewPopulatedGetFrequencyPlanRequest(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -815,18 +815,18 @@ func BenchmarkFrequencyPlanRequestProtoMarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func BenchmarkFrequencyPlanRequestProtoUnmarshal(b *testing.B) {
+func BenchmarkGetFrequencyPlanRequestProtoUnmarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := proto.Marshal(NewPopulatedFrequencyPlanRequest(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedGetFrequencyPlanRequest(popr, false))
 		if err != nil {
 			panic(err)
 		}
 		datas[i] = dAtA
 	}
-	msg := &FrequencyPlanRequest{}
+	msg := &GetFrequencyPlanRequest{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
@@ -984,16 +984,16 @@ func TestFrequencyPlan_TimeOffAirJSON(t *testing.T) {
 		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
 	}
 }
-func TestFrequencyPlanRequestJSON(t *testing.T) {
+func TestGetFrequencyPlanRequestJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedFrequencyPlanRequest(popr, true)
+	p := NewPopulatedGetFrequencyPlanRequest(popr, true)
 	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &FrequencyPlanRequest{}
+	msg := &GetFrequencyPlanRequest{}
 	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
@@ -1243,12 +1243,12 @@ func TestFrequencyPlan_TimeOffAirProtoCompactText(t *testing.T) {
 	}
 }
 
-func TestFrequencyPlanRequestProtoText(t *testing.T) {
+func TestGetFrequencyPlanRequestProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedFrequencyPlanRequest(popr, true)
+	p := NewPopulatedGetFrequencyPlanRequest(popr, true)
 	dAtA := proto.MarshalTextString(p)
-	msg := &FrequencyPlanRequest{}
+	msg := &GetFrequencyPlanRequest{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1260,12 +1260,12 @@ func TestFrequencyPlanRequestProtoText(t *testing.T) {
 	}
 }
 
-func TestFrequencyPlanRequestProtoCompactText(t *testing.T) {
+func TestGetFrequencyPlanRequestProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedFrequencyPlanRequest(popr, true)
+	p := NewPopulatedGetFrequencyPlanRequest(popr, true)
 	dAtA := proto.CompactTextString(p)
-	msg := &FrequencyPlanRequest{}
+	msg := &GetFrequencyPlanRequest{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1382,14 +1382,14 @@ func TestFrequencyPlan_TimeOffAirVerboseEqual(t *testing.T) {
 		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
 	}
 }
-func TestFrequencyPlanRequestVerboseEqual(t *testing.T) {
+func TestGetFrequencyPlanRequestVerboseEqual(t *testing.T) {
 	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedFrequencyPlanRequest(popr, false)
+	p := NewPopulatedGetFrequencyPlanRequest(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
-	msg := &FrequencyPlanRequest{}
+	msg := &GetFrequencyPlanRequest{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
@@ -1649,10 +1649,10 @@ func BenchmarkFrequencyPlan_TimeOffAirSize(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestFrequencyPlanRequestSize(t *testing.T) {
+func TestGetFrequencyPlanRequestSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedFrequencyPlanRequest(popr, true)
+	p := NewPopulatedGetFrequencyPlanRequest(popr, true)
 	size2 := proto.Size(p)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
@@ -1671,12 +1671,12 @@ func TestFrequencyPlanRequestSize(t *testing.T) {
 	}
 }
 
-func BenchmarkFrequencyPlanRequestSize(b *testing.B) {
+func BenchmarkGetFrequencyPlanRequestSize(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*FrequencyPlanRequest, 1000)
+	pops := make([]*GetFrequencyPlanRequest, 1000)
 	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedFrequencyPlanRequest(popr, false)
+		pops[i] = NewPopulatedGetFrequencyPlanRequest(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

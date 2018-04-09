@@ -79,7 +79,7 @@ message FrequencyPlan {
   TimeOffAir time_off_air = 7 [(gogoproto.moretags) = "yaml:\"tx-timeoff-air,omitempty\""];
 }
 
-message FrequencyPlanRequest {
+message GetFrequencyPlanRequest {
   string frequency_plan_id = 1 [(gogoproto.customname) = "FrequencyPlanID"];
 }
 
@@ -90,7 +90,7 @@ service GtwGs {
   // this gateway may not be used for downlink.
   rpc Link(stream GatewayUp) returns (stream GatewayDown);
   // GetFrequencyPlan associated to the gateway. The gateway is ID'd by its authentication token.
-  rpc GetFrequencyPlan(FrequencyPlanRequest) returns (FrequencyPlan);
+  rpc GetFrequencyPlan(GetFrequencyPlanRequest) returns (FrequencyPlan);
 }
 
 // The NsGs service connects a network server to a gateway server.

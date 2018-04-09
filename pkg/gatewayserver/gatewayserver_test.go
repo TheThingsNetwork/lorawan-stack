@@ -113,7 +113,7 @@ func TestLink(t *testing.T) {
 
 	// Frequency plan
 	{
-		fp, err := client.GetFrequencyPlan(log.NewContext(ctx, log.FromContext(ctx).WithField("situation", "client_request")), &ttnpb.FrequencyPlanRequest{FrequencyPlanID: "EU_863_870"})
+		fp, err := client.GetFrequencyPlan(log.NewContext(ctx, log.FromContext(ctx).WithField("situation", "client_request")), &ttnpb.GetFrequencyPlanRequest{FrequencyPlanID: "EU_863_870"})
 		a.So(err, should.BeNil)
 		a.So(fp.BandID, should.Equal, registeredGatewayFP)
 	}
