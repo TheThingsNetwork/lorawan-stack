@@ -17,7 +17,7 @@ It is generated from these files:
 	github.com/TheThingsNetwork/ttn/api/end_device.proto
 	github.com/TheThingsNetwork/ttn/api/end_device_services.proto
 	github.com/TheThingsNetwork/ttn/api/gateway.proto
-	github.com/TheThingsNetwork/ttn/api/gatewayserver.proto
+	github.com/TheThingsNetwork/ttn/api/gateway_server.proto
 	github.com/TheThingsNetwork/ttn/api/identifiers.proto
 	github.com/TheThingsNetwork/ttn/api/identityserver.proto
 	github.com/TheThingsNetwork/ttn/api/join.proto
