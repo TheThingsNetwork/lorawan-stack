@@ -142,10 +142,11 @@ func (r *respError) ID() string {
 	return ""
 }
 
-// FromHTTP parses the http.Response and returns the corresponding
-// If the response is not an error (eg. 200 OK), it returns nil
+// FromHTTP parses the http.Response and returns the corresponding error.
+// If the response is successful (code in [200..299]), it returns nil.
+// Otherwise, it returns a describing error.
 func FromHTTP(resp *http.Response) errors.Error {
-	if resp.StatusCode < 399 {
+	if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
 		return nil
 	}
 	defer resp.Body.Close()
