@@ -848,7 +848,7 @@ type CFList struct {
 	Type CFListType `protobuf:"varint,1,opt,name=type,proto3,enum=ttn.v3.CFListType" json:"type,omitempty"`
 	// Frequencies to be broadcasted, in hecto-Hz.
 	// These values are broadcasted as 24 bits unsigned integers.
-	// If this value is used, there should be 5 values.
+	// This field should not contain default values.
 	Freq []uint32 `protobuf:"varint,2,rep,packed,name=freq" json:"freq,omitempty"`
 	// ChMasks controlling the channels to be used.
 	// If this value is used, there should be 80 values.
