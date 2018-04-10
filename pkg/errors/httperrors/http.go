@@ -150,16 +150,17 @@ func FromHTTP(resp *http.Response) errors.Error {
 		return nil
 	}
 	defer resp.Body.Close()
-	bytes, err := ioutil.ReadAll(resp.Body)
-	if err == nil && len(bytes) > 0 {
-		out := new(errors.Impl)
-		err := out.UnmarshalJSON(bytes)
-		if err == nil {
-			return out
-		}
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil || len(b) == 0 {
+		return errors.ToImpl((*respError)(resp))
 	}
 
-	return errors.ToImpl((*respError)(resp))
+	out := &errors.Impl{}
+	if err = out.UnmarshalJSON(b); err != nil {
+		return errors.ToImpl((*respError)(resp))
+	}
+	return out
 }
 
 // ToHTTP writes the error to the http response
