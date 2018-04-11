@@ -55,21 +55,21 @@ dev.redis.start: dev.docker.installed
 
 dev.databases.start: dev.cockroach.start dev.redis.start
 
-dev.cockroach.drop: dev.docker.installed
+dev.cockroach.erase: dev.docker.installed
 	@if [[ "$$($(DOCKER_BINARY) ps)" =~ "$(cockroach_docker_name)" ]]; then \
-		$(err) "Cockroach container is still running, aborted drop operation."; \
+		$(err) "Cockroach container is still running, aborted erase operation."; \
 	else \
 		rm -rf "$(DEV_COCKROACH_DATA_PATH)"; \
 	fi
 
-dev.redis.drop: dev.docker.installed
+dev.redis.erase: dev.docker.installed
 	@if [[ "$$($(DOCKER_BINARY) ps)" =~ "$(redis_docker_name)" ]]; then \
-		$(err) "Redis container is still running, aborted drop operation."; \
+		$(err) "Redis container is still running, aborted erase operation."; \
 	else \
 		rm -rf "$(DEV_REDIS_DATA_PATH)"; \
 	fi
 
-dev.databases.drop: dev.cockroach.drop dev.redis.drop
+dev.databases.erase: dev.cockroach.erase dev.redis.erase
 
 dev.cockroach.stop: dev.docker.installed
 	@$(log) "Stop Cockroach container"

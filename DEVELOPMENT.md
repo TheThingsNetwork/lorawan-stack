@@ -56,21 +56,21 @@ make dev.databases.start # Starts all databases in a Docker container
 make dev.databases.stop # Stops all databases
 
 # The content of the databases will be by default saved in dev/databases.
-# If you want to drop the databases' content:
-make dev.databases.drop
+# If you want to erase the databases' content:
+make dev.databases.erase
 ```
 
 #### CockroachDB
 
 CockroachDB is a distributed SQL database that we use in the identity server.
 
-You can use it using the `make dev.databases.{start,stop,drop}` method, or use `make dev.cockroach.{start,stop,drop}` to only manipulate Cockroach.
+You can use it using the `make dev.databases.{start,stop,erase}` method, or use `make dev.cockroach.{start,stop,erase}` to only manipulate Cockroach.
 
 #### Redis
 
 Redis is an in-memory data store that we use as a database for "hot" data.
 
-You can use it using the `make dev.databases.{start,stop,drop}` method, or use `make dev.redis.{start,stop,drop}` to only manipulate Redis.
+You can use it using the `make dev.databases.{start,stop,erase}` method, or use `make dev.redis.{start,stop,erase}` to only manipulate Redis.
 
 ### Getting started with development of The Things Network Stack
 
