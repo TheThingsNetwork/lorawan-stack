@@ -21,11 +21,13 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/networkserver"
 )
 
+// Config for the ttn-network-server binary.
 type Config struct {
 	conf.ServiceBase `name:",squash"`
 	NS               networkserver.Config `name:"ns"`
 }
 
+// DefaultConfig contains the default config for the ttn-network-server binary.
 var DefaultConfig = Config{
 	ServiceBase: shared.DefaultServiceBase,
 	NS:          shared_networkserver.DefaultNetworkServerConfig,

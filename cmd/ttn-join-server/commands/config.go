@@ -21,11 +21,13 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/joinserver"
 )
 
+// Config for the ttn-join-server binary.
 type Config struct {
 	conf.ServiceBase `name:",squash"`
 	JS               joinserver.Config `name:"js"`
 }
 
+// DefaultConfig contains the default config for the ttn-join-server binary.
 var DefaultConfig = Config{
 	ServiceBase: shared.DefaultServiceBase,
 	JS:          shared_joinserver.DefaultJoinServerConfig,

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// ttn-gateway-server is the binary that runs the gateway server of The Things Network Stack.
 package main
 
 import (

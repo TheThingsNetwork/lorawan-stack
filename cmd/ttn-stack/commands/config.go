@@ -29,6 +29,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/networkserver"
 )
 
+// Config for the ttn-stack binary.
 type Config struct {
 	conf.ServiceBase `name:",squash"`
 	IS               identityserver.Config    `name:"is"`
@@ -38,6 +39,7 @@ type Config struct {
 	JS               joinserver.Config        `name:"js"`
 }
 
+// DefaultConfig contains the default config for the ttn-stack binary.
 var DefaultConfig = Config{
 	ServiceBase: shared.DefaultServiceBase,
 	IS:          shared_identityserver.DefaultIdentityServerConfig,

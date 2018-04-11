@@ -21,11 +21,13 @@ import (
 	conf "github.com/TheThingsNetwork/ttn/pkg/config"
 )
 
+// Config for the ttn-application-server binary.
 type Config struct {
 	conf.ServiceBase `name:",squash"`
 	AS               applicationserver.Config `name:"as"`
 }
 
+// DefaultConfig contains the default config for the ttn-application-server binary.
 var DefaultConfig = Config{
 	ServiceBase: shared.DefaultServiceBase,
 	AS:          shared_applicationserver.DefaultApplicationServerConfig,
