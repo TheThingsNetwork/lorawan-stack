@@ -72,8 +72,8 @@ dev.cockroach.erase: dev.docker.installed
 		rm -rf "$(DEV_COCKROACH_DATA_PATH)"; \
 	fi
 
-dev.cockroach.sql: dev.docker.installed # Takes a QUERY parameter
-	@$(log) "Executing '$(QUERY)' on Cockroach"
+dev.cockroach.sql: dev.docker.installed
+	@$(log) "Opening a Cockroach shell"
 	@$(DOCKER_BINARY) exec -it $(cockroach_docker_name) ./cockroach sql --insecure
 
 dev.cockroach.drop: dev.docker.installed
