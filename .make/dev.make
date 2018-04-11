@@ -22,7 +22,7 @@ DEV_REDIS_DATA_PATH ?= $(DEV_DB_DATA_PATH)/redis
 DOCKER_BINARY ?= docker
 
 DEV_COCKROACH_IMAGE = cockroachdb/cockroach:v2.0.0
-DEV_REDIS_IMAGE = thethingsnetwork/redis
+DEV_REDIS_IMAGE = redis:4.0-alpine
 
 db_docker_prefix = ttn-devdb
 cockroach_docker_name = $(db_docker_prefix)-cockroach
@@ -34,6 +34,7 @@ ifdef DEV_COCKROACH_DATA_PATH
 endif
 ifdef DEV_REDIS_DATA_PATH
 	redis_docker_volumes = -v "$(DEV_REDIS_DATA_PATH):/data"
+	redis_command = redis-server --appendonly yes
 endif
 
 dev.docker.installed:
@@ -45,12 +46,12 @@ dev.docker.installed:
 dev.cockroach.start: dev.docker.installed
 	@$(log) "Start Cockroach container as $(cockroach_docker_name)"
 	@if [[ ! -z "$(DEV_COCKROACH_DATA_PATH)" ]]; then mkdir -p $(DEV_COCKROACH_DATA_PATH); fi
-	$(DOCKER_BINARY) run -d -p 127.0.0.1:26257:26257 --name $(cockroach_docker_name) $(cockroach_docker_volumes) $(DEV_COCKROACH_IMAGE) start --insecure
+	@$(DOCKER_BINARY) run -d -p 127.0.0.1:26257:26257 --name $(cockroach_docker_name) $(cockroach_docker_volumes) $(DEV_COCKROACH_IMAGE) start --insecure
 
 dev.redis.start: dev.docker.installed
 	@$(log) "Start Redis container as $(redis_docker_name)"
 	@if [[ ! -z "$(DEV_REDIS_DATA_PATH)" ]]; then mkdir -p $(DEV_REDIS_DATA_PATH); fi
-	$(DOCKER_BINARY) run -d -p 127.0.0.1:6379:6379 --name $(redis_docker_name) $(redis_docker_volumes) $(DEV_REDIS_IMAGE)
+	@$(DOCKER_BINARY) run -d -p 127.0.0.1:6379:6379 --name $(redis_docker_name) $(redis_docker_volumes) $(DEV_REDIS_IMAGE) $(redis_command)
 
 dev.databases.start: dev.cockroach.start dev.redis.start
 
