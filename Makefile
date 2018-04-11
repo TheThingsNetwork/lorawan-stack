@@ -30,7 +30,7 @@ include .make/js/main.make
 include .make/dev.make
 
 ci.encrypt-variables:
-	keybase encrypt -b -i ci/variables.yml -o ci/variables.yml.encrypted johanstokking htdvisser romeovs ericgo
+	keybase encrypt -b -i ci/variables.yml -o ci/variables.yml.encrypted johanstokking htdvisser ericgo
 
 ci.decrypt-variables:
 	keybase decrypt -i ci/variables.yml.encrypted -o ci/variables.yml

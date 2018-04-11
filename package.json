@@ -4,7 +4,6 @@
   "description": "The Thing Network Stack",
   "main": "index.js",
   "repository": "https://github.com/TheThingsNetwork/ttn.git",
-  "author": "romeo@thethingsindustries.com",
   "license": "MIT",
   "devDependencies": {
     "add-asset-html-webpack-plugin": "^2.1.2",
