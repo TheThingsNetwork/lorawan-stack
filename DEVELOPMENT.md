@@ -64,7 +64,13 @@ make dev.databases.erase
 
 CockroachDB is a distributed SQL database that we use in the identity server.
 
-You can use it using the `make dev.databases.{start,stop,erase}` method, or use `make dev.cockroach.{start,stop,erase}` to only manipulate Cockroach.
+You can use it using the `make dev.databases.{start,stop,erase}` method, or use `make dev.cockroach.{start,stop,erase}` to only manipulate Cockroach. You can also use `make dev.cockroach.sql` to enter a SQL shell, and `make dev.cockroach.drop NAME=<dbname>` to drop a database:
+
+```
+$ make dev.cockroach.drop NAME=test-db
+ttn  Dropping test-db Cockroach database
+DROP DATABASE
+```
 
 #### Redis
 
