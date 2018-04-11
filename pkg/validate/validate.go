@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package validate implements validation functions, usually used RPC message validation.
 package validate
 
 type validateFn func(v interface{}) error

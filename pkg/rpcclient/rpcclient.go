@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package rpcclient contains the default options for TTN gRPC clients.
 package rpcclient
 
 import (

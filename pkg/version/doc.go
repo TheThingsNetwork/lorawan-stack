@@ -12,14 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package crypto implements LoRaWAN crypto.
-package crypto
-
-func reverse(in []byte) []byte {
-	l := len(in)
-	out := make([]byte, l)
-	for i := 0; i < l; i++ {
-		out[l-i-1] = in[i]
-	}
-	return out
-}
+// Package version contains version and build variables set by the CI process.
+package version

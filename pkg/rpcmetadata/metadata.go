@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package rpcmetadata contains utilities for transporting common request metadata over gRPC.
 package rpcmetadata
 
 import (

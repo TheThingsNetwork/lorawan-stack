@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package httperrors dictates how rich errors are transported over HTTP.
 package httperrors
 
 import (
