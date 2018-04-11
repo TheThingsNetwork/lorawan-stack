@@ -82,3 +82,15 @@ dev.redis.stop: dev.docker.installed
 	@$(DOCKER_BINARY) rm $(redis_docker_name)
 
 dev.databases.stop: dev.cockroach.stop dev.redis.stop
+
+dev.cockroach.sql: dev.docker.installed # Takes a QUERY parameter
+	@$(log) "Executing '$(QUERY)' on Cockroach"
+	@$(DOCKER_BINARY) exec -it $(cockroach_docker_name) ./cockroach sql --insecure
+
+dev.cockroach.drop: dev.docker.installed
+	@if [[ -z "$(NAME)" ]]; then \
+		$(err) "No NAME specified for the database to drop."; \
+		exit 1; \
+	fi
+	@$(log) "Dropping $(NAME) Cockroach database"
+	@$(DOCKER_BINARY) exec $(cockroach_docker_name) ./cockroach sql --insecure --execute="DROP DATABASE $(NAME) CASCADE;"
