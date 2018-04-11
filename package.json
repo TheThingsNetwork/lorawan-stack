@@ -4,7 +4,7 @@
   "description": "The Thing Network Stack",
   "main": "index.js",
   "repository": "https://github.com/TheThingsNetwork/ttn.git",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "devDependencies": {
     "add-asset-html-webpack-plugin": "^2.1.2",
     "babel-cli": "^6.26.0",
