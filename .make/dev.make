@@ -39,8 +39,8 @@ endif
 
 dev.docker.installed:
 	@if [[ -z "$$(which $(DOCKER_BINARY))" ]]; then \
-		@$(error) "Could not find Docker binary. Please install Docker or specify the location of the Docker binary with DOCKER_BINARY."; \
-		@exit 1; \
+		$(err) "Could not find Docker binary. Please install Docker or specify the location of the Docker binary with DOCKER_BINARY."; \
+		exit 1; \
 	fi
 
 dev.cockroach.start: dev.docker.installed
