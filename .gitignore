@@ -96,3 +96,6 @@ $RECYCLE.BIN/
 # Keypair
 cert.pem
 key.pem
+
+# Dev directory
+dev/

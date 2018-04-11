@@ -2,6 +2,9 @@ language: go
 go:
 - "1.10"
 go_import_path: github.com/TheThingsNetwork/ttn
+env:
+- DEV_REDIS_DATA_PATH=
+- DEV_COCKROACH_DATA_PATH=
 sudo: required
 services:
 - docker
@@ -16,8 +19,7 @@ install:
 - make dev-deps
 - make deps
 before_script:
-- docker run -d -p 127.0.0.1:6379:6379 redis
-- docker run -d -p 127.0.0.1:26257:26257 cockroachdb/cockroach:v2.0.0 start --insecure
+- make dev.databases.start
 script:
 - if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make go.protos.clean go.protos; fi # only on pull requests
 - make go.misspell
