@@ -109,10 +109,10 @@ func valueFromReflect(rv reflect.Value) (*types.Value, error) {
 		}
 		return valueFromReflect(rv.Elem())
 	case reflect.String:
-		return &types.Value{Kind: &types.Value_StringValue{rv.String()}}, nil
+		return &types.Value{Kind: &types.Value_StringValue{StringValue: rv.String()}}, nil
 
 	case reflect.Bool:
-		return &types.Value{Kind: &types.Value_BoolValue{rv.Bool()}}, nil
+		return &types.Value{Kind: &types.Value_BoolValue{BoolValue: rv.Bool()}}, nil
 
 	case reflect.Slice, reflect.Array:
 		if k == reflect.Slice && rv.IsNil() {
@@ -126,7 +126,7 @@ func valueFromReflect(rv reflect.Value) (*types.Value, error) {
 		if err != nil {
 			return nil, err
 		}
-		return &types.Value{Kind: &types.Value_ListValue{pv}}, nil
+		return &types.Value{Kind: &types.Value_ListValue{ListValue: pv}}, nil
 
 	case reflect.Map:
 		if rv.IsNil() {
@@ -140,7 +140,7 @@ func valueFromReflect(rv reflect.Value) (*types.Value, error) {
 		if err != nil {
 			return nil, err
 		}
-		return &types.Value{Kind: &types.Value_StructValue{pv}}, nil
+		return &types.Value{Kind: &types.Value_StructValue{StructValue: pv}}, nil
 
 	case reflect.Struct:
 		n := rv.NumField()
@@ -157,19 +157,19 @@ func valueFromReflect(rv reflect.Value) (*types.Value, error) {
 			}
 			fields[ft.Name()] = pv
 		}
-		return &types.Value{Kind: &types.Value_StructValue{&types.Struct{fields}}}, nil
+		return &types.Value{Kind: &types.Value_StructValue{StructValue: &types.Struct{Fields: fields}}}, nil
 
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return &types.Value{Kind: &types.Value_NumberValue{float64(rv.Int())}}, nil
+		return &types.Value{Kind: &types.Value_NumberValue{NumberValue: float64(rv.Int())}}, nil
 
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return &types.Value{Kind: &types.Value_NumberValue{float64(rv.Uint())}}, nil
+		return &types.Value{Kind: &types.Value_NumberValue{NumberValue: float64(rv.Uint())}}, nil
 
 	case reflect.Float32, reflect.Float64:
-		return &types.Value{Kind: &types.Value_NumberValue{rv.Float()}}, nil
+		return &types.Value{Kind: &types.Value_NumberValue{NumberValue: rv.Float()}}, nil
 
 	case reflect.Complex64, reflect.Complex128:
-		return &types.Value{Kind: &types.Value_StringValue{fmt.Sprint(rv.Complex())}}, nil
+		return &types.Value{Kind: &types.Value_StringValue{StringValue: fmt.Sprint(rv.Complex())}}, nil
 
 	default:
 		// either Invalid, Chan. Func, Interface or UnsafePointer.
