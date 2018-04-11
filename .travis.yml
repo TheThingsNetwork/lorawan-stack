@@ -17,7 +17,7 @@ install:
 - make deps
 before_script:
 - docker run -d -p 127.0.0.1:6379:6379 redis
-- docker run -d -p 127.0.0.1:26257:26257 cockroachdb/cockroach:v1.1.3 start --insecure
+- docker run -d -p 127.0.0.1:26257:26257 cockroachdb/cockroach:v2.0.0 start --insecure
 script:
 - if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make go.protos.clean go.protos; fi # only on pull requests
 - make go.misspell
