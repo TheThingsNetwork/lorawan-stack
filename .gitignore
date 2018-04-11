@@ -97,5 +97,5 @@ $RECYCLE.BIN/
 cert.pem
 key.pem
 
-# Dev directory
-dev/
+# Development data directory
+.dev/

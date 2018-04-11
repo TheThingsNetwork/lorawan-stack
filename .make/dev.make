@@ -14,7 +14,7 @@
 
 # This makefile contains utilities for development purposes.
 
-DEV_DB_DATA_PATH ?= $(PWD)/dev/databases
+DEV_DB_DATA_PATH ?= $(PWD)/.dev/databases
 DEV_COCKROACH_DATA_PATH ?= $(DEV_DB_DATA_PATH)/cockroach
 DEV_REDIS_DATA_PATH ?= $(DEV_DB_DATA_PATH)/redis
 
