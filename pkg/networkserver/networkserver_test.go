@@ -311,7 +311,7 @@ func TestLinkApplication(t *testing.T) {
 			JoinServers: nil,
 		})
 
-	id := ttnpb.NewPopulatedApplicationIdentifier(test.Randy, false)
+	id := ttnpb.NewPopulatedApplicationIdentifiers(test.Randy, false)
 
 	stream := &mockAsNsLinkApplicationStream{
 		MockServerStream: &test.MockServerStream{
@@ -839,7 +839,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					},
 				}
 
-				id := ttnpb.NewPopulatedApplicationIdentifier(test.Randy, false)
+				id := ttnpb.NewPopulatedApplicationIdentifiers(test.Randy, false)
 				id.ApplicationID = ApplicationID
 
 				go func() {

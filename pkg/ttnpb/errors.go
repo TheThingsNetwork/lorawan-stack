@@ -142,7 +142,6 @@ func init() {
 	ErrFPortTooHigh.Register()
 	ErrTxChIdxTooHigh.Register()
 	ErrTxDRIdxTooHigh.Register()
-	ErrWrongPayloadType.Register()
 	ErrEmptyDeviceIdentifiers.Register()
 	ErrMissingApplicationID.Register()
 	ErrEmptyIdentifiers.Register()

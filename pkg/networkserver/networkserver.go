@@ -105,14 +105,11 @@ func New(c *component.Component, conf *Config) *NetworkServer {
 
 // StartServingGateway is called by the gateway server to indicate that it is serving a gateway.
 func (ns *NetworkServer) StartServingGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
-	// A GatewayServer (or proxy) links to ALL NetworkServers, so this better be efficient
-	// TODO: Announce to cluster
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
 // StopServingGateway is called by the gateway server to indicate that it is no longer serving a gateway.
 func (ns *NetworkServer) StopServingGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
-	// TODO: Announce to cluster
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
@@ -527,7 +524,7 @@ func (s applicationUplinkStream) Close() error {
 }
 
 // LinkApplication is called by the application server to subscribe to application events.
-func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifier, stream ttnpb.AsNs_LinkApplicationServer) error {
+func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, stream ttnpb.AsNs_LinkApplicationServer) error {
 	ws := &applicationUplinkStream{
 		AsNs_LinkApplicationServer: stream,
 		closeCh:                    make(chan struct{}),
