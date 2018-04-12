@@ -27,6 +27,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+const claimsHookName = "claims-builder"
+
 // claimsUnaryHook is a hook specific for unary calls in the Identity Server
 // that preloads in the context the claims information.
 func claimsUnaryHook(store *sql.Store) hooks.UnaryHandlerMiddleware {

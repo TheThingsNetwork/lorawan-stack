@@ -117,11 +117,11 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 		is.email = mock.New()
 	}
 
-	hooks.RegisterUnaryHook("/ttn.v3.IsUser", "claims-builder", claimsUnaryHook(store))
-	hooks.RegisterUnaryHook("/ttn.v3.IsApplication", "claims-builder", claimsUnaryHook(store))
-	hooks.RegisterUnaryHook("/ttn.v3.IsGateway", "claims-builder", claimsUnaryHook(store))
-	hooks.RegisterUnaryHook("/ttn.v3.IsClient", "claims-builder", claimsUnaryHook(store))
-	hooks.RegisterUnaryHook("/ttn.v3.IsOrganization", "claims-builder", claimsUnaryHook(store))
+	hooks.RegisterUnaryHook("/ttn.v3.IsUser", claimsHookName, claimsUnaryHook(store))
+	hooks.RegisterUnaryHook("/ttn.v3.IsApplication", claimsHookName, claimsUnaryHook(store))
+	hooks.RegisterUnaryHook("/ttn.v3.IsGateway", claimsHookName, claimsUnaryHook(store))
+	hooks.RegisterUnaryHook("/ttn.v3.IsClient", claimsHookName, claimsUnaryHook(store))
+	hooks.RegisterUnaryHook("/ttn.v3.IsOrganization", claimsHookName, claimsUnaryHook(store))
 
 	c.RegisterGRPC(is)
 
