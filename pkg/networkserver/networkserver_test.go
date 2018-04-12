@@ -53,32 +53,6 @@ var (
 	CooldownWindow      = (2 << 4) * test.Delay
 )
 
-type Waiter interface {
-	Wait()
-}
-
-func waitTimeout(d time.Duration, w Waiter) (ok bool) {
-	done := make(chan struct{})
-
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-
-	go func() {
-		wg.Done()
-
-		w.Wait()
-		close(done)
-	}()
-	wg.Wait()
-
-	select {
-	case <-time.After(d):
-		return false
-	case <-done:
-		return true
-	}
-}
-
 func metadataLdiff(l pretty.Logfer, xs, ys []*ttnpb.RxMetadata) {
 	if len(xs) != len(ys) {
 		l.Logf("Length mismatch: %d != %d", len(xs), len(ys))
@@ -945,7 +919,7 @@ func HandleUplinkTest() func(t *testing.T) {
 				})
 
 				// Uplink must be sent to AS at this point
-				a.So(waitTimeout(10*test.Delay, upWg), should.BeTrue)
+				a.So(test.WaitTimeout(10*test.Delay, upWg.Wait), should.BeTrue)
 
 				t.Run("duplicates after cooldown window end", func(t *testing.T) {
 					a := assertions.New(t)
@@ -1006,7 +980,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					mdCh <- md
 
 					// Uplink must be sent to AS at this point
-					a.So(waitTimeout(10*test.Delay, upWg), should.BeTrue)
+					a.So(test.WaitTimeout(10*test.Delay, upWg.Wait), should.BeTrue)
 				})
 			})
 		}
@@ -1263,7 +1237,7 @@ func HandleJoinTest() func(t *testing.T) {
 						ed.RecentUplinks = ed.RecentUplinks[len(ed.RecentUplinks)-RecentUplinkCount:]
 					}
 
-					waitTimeout(10*test.Delay, reqWg)
+					a.So(test.WaitTimeout(10*test.Delay, reqWg.Wait), should.BeTrue)
 
 					time.Sleep(time.Until(deduplicationEnd) + test.Delay)
 
@@ -1339,7 +1313,7 @@ func HandleJoinTest() func(t *testing.T) {
 					}
 					wg.Wait()
 
-					waitTimeout(10*test.Delay, reqWg)
+					a.So(test.WaitTimeout(10*test.Delay, reqWg.Wait), should.BeTrue)
 				})
 			})
 		}
