@@ -27,7 +27,7 @@ option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 // Client is the message that defines a third-party client on the network.
 message Client {
   // Client identifiers.
-  ClientIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.jsontag) = ""];
+  ClientIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // description is the description of the client.
   string description = 2;
