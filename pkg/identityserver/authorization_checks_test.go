@@ -26,7 +26,6 @@ import (
 )
 
 func TestEnforceUserRights(t *testing.T) {
-	a := assertions.New(t)
 	is := getIS(t)
 
 	for i, tc := range []struct {
@@ -71,6 +70,8 @@ func TestEnforceUserRights(t *testing.T) {
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+
 			err := is.enforceUserRights(newContextWithClaims(context.Background(), tc.claims), tc.rights...)
 			if tc.sucesss {
 				a.So(err, should.BeNil)
@@ -83,7 +84,6 @@ func TestEnforceUserRights(t *testing.T) {
 }
 
 func TestEnforceAdmin(t *testing.T) {
-	a := assertions.New(t)
 	is := getIS(t)
 
 	// `alice` is an admin user.
@@ -135,6 +135,8 @@ func TestEnforceAdmin(t *testing.T) {
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+
 			err := is.enforceAdmin(newContextWithClaims(context.Background(), tc.claims))
 			if tc.sucesss {
 				a.So(err, should.BeNil)
@@ -164,6 +166,7 @@ func TestEnforceApplicationRights(t *testing.T) {
 			ApplicationIdentifiers: appIDs,
 		},
 	})
+	a.So(err, should.BeNil)
 	defer func(err error) {
 		if err != nil {
 			is.store.Applications.Delete(appIDs)
@@ -272,6 +275,8 @@ func TestEnforceApplicationRights(t *testing.T) {
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+
 			err := is.enforceApplicationRights(newContextWithClaims(context.Background(), tc.claims), tc.appIDs, tc.rights...)
 			if tc.sucesss {
 				a.So(err, should.BeNil)
@@ -301,6 +306,7 @@ func TestEnforceGatewayRights(t *testing.T) {
 			GatewayIdentifiers: gtwIDs,
 		},
 	})
+	a.So(err, should.BeNil)
 	defer func(err error) {
 		if err != nil {
 			is.store.Gateways.Delete(gtwIDs)
@@ -409,6 +415,8 @@ func TestEnforceGatewayRights(t *testing.T) {
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+
 			err := is.enforceGatewayRights(newContextWithClaims(context.Background(), tc.claims), tc.gtwIDs, tc.rights...)
 			if tc.sucesss {
 				a.So(err, should.BeNil)
@@ -438,6 +446,7 @@ func TestEnforceOrganizationRights(t *testing.T) {
 			OrganizationIdentifiers: orgIDs,
 		},
 	})
+	a.So(err, should.BeNil)
 	defer func(err error) {
 		if err != nil {
 			is.store.Organizations.Delete(orgIDs)
@@ -546,6 +555,8 @@ func TestEnforceOrganizationRights(t *testing.T) {
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+
 			err := is.enforceOrganizationRights(newContextWithClaims(context.Background(), tc.claims), tc.orgIDs, tc.rights...)
 			if tc.sucesss {
 				a.So(err, should.BeNil)
