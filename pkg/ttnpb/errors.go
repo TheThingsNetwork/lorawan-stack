@@ -107,24 +107,10 @@ var (
 		Code:          12,
 	}
 
-	// ErrEmptyDeviceIdentifiers represents error ocurring when EndDeviceIdentifiers provided are empty.
-	ErrEmptyDeviceIdentifiers = &errors.ErrDescriptor{
-		MessageFormat: "EndDeviceIdentifiers must be non-empty",
-		Type:          errors.InvalidArgument,
-		Code:          13,
-	}
-
-	// ErrMissingApplicationID represents error ocurring when ApplicationID is missing.
-	ErrMissingApplicationID = &errors.ErrDescriptor{
-		MessageFormat: "ApplicationID is missing",
-		Type:          errors.InvalidArgument,
-		Code:          14,
-	}
-
 	// ErrEmptyIdentifiers is returned when the XXXIdentifiers are empty.
 	ErrEmptyIdentifiers = &errors.ErrDescriptor{
-		MessageFormat: "Identifiers must be non-empty",
-		Code:          15,
+		MessageFormat: "Identifiers must not be empty",
+		Code:          13,
 		Type:          errors.InvalidArgument,
 	}
 )
@@ -142,7 +128,5 @@ func init() {
 	ErrFPortTooHigh.Register()
 	ErrTxChIdxTooHigh.Register()
 	ErrTxDRIdxTooHigh.Register()
-	ErrEmptyDeviceIdentifiers.Register()
-	ErrMissingApplicationID.Register()
 	ErrEmptyIdentifiers.Register()
 }
