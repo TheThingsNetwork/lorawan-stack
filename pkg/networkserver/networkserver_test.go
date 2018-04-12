@@ -933,10 +933,11 @@ func HandleUplinkTest() func(t *testing.T) {
 
 					time.Sleep(time.Until(cooldownEnd))
 
-					deduplicationEnd = time.Now().Add(DeduplicationWindow + test.Delay)
-
 					go func() {
-						defer wg.Done()
+						deduplicationEnd = time.Now().Add(DeduplicationWindow + test.Delay)
+						cooldownEnd = deduplicationEnd.Add(CooldownWindow)
+
+						wg.Done()
 
 						_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
 						if dev.FCntResets {
@@ -945,12 +946,13 @@ func HandleUplinkTest() func(t *testing.T) {
 						} else {
 							a.So(err, should.BeError)
 						}
+						wg.Done()
 					}()
 
-					cooldownEnd = deduplicationEnd.Add(CooldownWindow)
-
 					wg.Wait()
-					wg.Add(DuplicateCount - 1)
+					time.Sleep(test.Delay) // Ensure initial uplink gets sent
+
+					wg.Add(DuplicateCount)
 
 					var deduplicated uint64 = 1
 					for i := 0; i < DuplicateCount-1; i++ {
