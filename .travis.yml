@@ -2,9 +2,6 @@ language: go
 go:
 - "1.10"
 go_import_path: github.com/TheThingsNetwork/ttn
-env:
-- DEV_REDIS_DATA_PATH=
-- DEV_COCKROACH_DATA_PATH=
 sudo: required
 services:
 - docker
