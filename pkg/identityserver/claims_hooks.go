@@ -20,7 +20,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/auth/oauth"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/hooks"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -31,10 +30,10 @@ const claimsHookName = "claims-builder"
 
 // claimsUnaryHook is a hook specific for unary calls in the Identity Server
 // that preloads in the context the claims information.
-func claimsUnaryHook(store *sql.Store) hooks.UnaryHandlerMiddleware {
+func (is *IdentityServer) claimsUnaryHook() hooks.UnaryHandlerMiddleware {
 	return func(next grpc.UnaryHandler) grpc.UnaryHandler {
 		return func(ctx context.Context, req interface{}) (interface{}, error) {
-			c, err := buildClaims(ctx, store)
+			c, err := is.buildClaims(ctx)
 			if err != nil {
 				return nil, err
 			}
@@ -46,7 +45,7 @@ func claimsUnaryHook(store *sql.Store) hooks.UnaryHandlerMiddleware {
 
 // buildClaims returns the claims based on the authentication metadata contained
 // in the request. Returns empty claims if no authentication metadata is found.
-func buildClaims(ctx context.Context, store *sql.Store) (*claims, error) {
+func (is *IdentityServer) buildClaims(ctx context.Context) (*claims, error) {
 	md := rpcmetadata.FromIncomingContext(ctx)
 
 	if md.AuthType == "" && md.AuthValue == "" {
@@ -65,7 +64,7 @@ func buildClaims(ctx context.Context, store *sql.Store) (*claims, error) {
 	var res *claims
 	switch header.Type {
 	case auth.Token:
-		data, err := store.OAuth.GetAccessToken(md.AuthValue)
+		data, err := is.store.OAuth.GetAccessToken(md.AuthValue)
 		if err != nil {
 			return nil, err
 		}
@@ -95,13 +94,13 @@ func buildClaims(ctx context.Context, store *sql.Store) (*claims, error) {
 
 		switch payload.Type {
 		case auth.UserKey:
-			res.EntityIdentifiers, key, err = store.Users.GetAPIKey(md.AuthValue)
+			res.EntityIdentifiers, key, err = is.store.Users.GetAPIKey(md.AuthValue)
 		case auth.ApplicationKey:
-			res.EntityIdentifiers, key, err = store.Applications.GetAPIKey(md.AuthValue)
+			res.EntityIdentifiers, key, err = is.store.Applications.GetAPIKey(md.AuthValue)
 		case auth.GatewayKey:
-			res.EntityIdentifiers, key, err = store.Gateways.GetAPIKey(md.AuthValue)
+			res.EntityIdentifiers, key, err = is.store.Gateways.GetAPIKey(md.AuthValue)
 		case auth.OrganizationKey:
-			res.EntityIdentifiers, key, err = store.Organizations.GetAPIKey(md.AuthValue)
+			res.EntityIdentifiers, key, err = is.store.Organizations.GetAPIKey(md.AuthValue)
 		default:
 			return nil, errors.Errorf("Invalid API key type `%s`", payload.Type)
 		}

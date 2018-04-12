@@ -308,7 +308,7 @@ func TestBuildClaims(t *testing.T) {
 				metadata.Pairs("authorization", fmt.Sprintf("%s %s", tc.authType, tc.authValue)),
 			)
 
-			claims, err := buildClaims(ctx, is.store)
+			claims, err := is.buildClaims(ctx)
 			if tc.success {
 				a.So(err, should.BeNil)
 				a.So(claims, should.Resemble, tc.res)
