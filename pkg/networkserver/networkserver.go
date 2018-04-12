@@ -358,6 +358,8 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	go func() {
 		ns.applicationServersMu.RLock()
 		cl, ok := ns.applicationServers[dev.EndDeviceIdentifiers.GetApplicationID()]
+		ns.applicationServersMu.RUnlock()
+
 		if ok {
 			up := &ttnpb.ApplicationUp{&ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
 				FCnt:       dev.GetSession().GetNextFCntUp() - 1,
@@ -372,7 +374,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 				)).WithError(err).Warn("Failed to send uplink to application server")
 			}
 		}
-		ns.applicationServersMu.RUnlock()
 	}()
 	return nil
 }
