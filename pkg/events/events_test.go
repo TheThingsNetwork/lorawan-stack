@@ -16,9 +16,12 @@ package events_test
 
 import (
 	"context"
+	"fmt"
+	"sync"
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/events"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -81,4 +84,41 @@ func TestEvents(t *testing.T) {
 	pubsub.Publish(events.New(ctx, "test.evt2", nil, nil))
 	a.So(<-newTotal, should.Equal, 3)
 	a.So(eventCh, should.HaveLength, 0)
+}
+
+func Example() {
+	// This is only for the test
+	var wg sync.WaitGroup
+	wg.Add(1)
+	events.Subscribe("ns.**", events.HandlerFunc(func(e events.Event) {
+		fmt.Printf("Received event %s\n", e.Name())
+		wg.Done()
+	}))
+
+	// You can send any arbitrary event; you don't have to pass any identifiers or data.
+	events.PublishEvent(context.Background(), "test.hello_world", nil, nil)
+
+	// Defining the event is not mandatory, but will be needed in order to translate the descriptions.
+	// Event names are lowercase snake_case and can be dot-separated as component.subsystem.subsystem.event
+	// Event descriptions are short descriptions of what the event means.
+	var adrSendEvent = events.Define("ns.mac.adr.send_req", "Send ADR Request")
+
+	// These variables come from the request or you got them from the db or something.
+	var (
+		ctx      = context.Background()
+		dev      ttnpb.EndDevice
+		requests []ttnpb.MACCommand_LinkADRReq
+	)
+
+	// It's nice to be able to correlate events; we use a Correlation ID for that.
+	// In most cases, there will already be a correlation ID in the context; this func will add one if there isn't.
+	ctx = events.ContextWithEnsuredCorrelationID(ctx)
+
+	// Publishing an event to the events package will dispatch it on the "global" event pubsub.
+	events.Publish(adrSendEvent(ctx, dev, requests))
+
+	wg.Wait() // only for the test
+
+	// Output:
+	// Received event ns.mac.adr.send_req
 }
