@@ -103,6 +103,94 @@ func New(c *component.Component, conf *Config) *NetworkServer {
 	return ns
 }
 
+type applicationUplinkStream struct {
+	ttnpb.AsNs_LinkApplicationServer
+	closeCh chan struct{}
+}
+
+func (s applicationUplinkStream) Close() error {
+	close(s.closeCh)
+	return nil
+}
+
+// LinkApplication is called by the application server to subscribe to application events.
+func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, stream ttnpb.AsNs_LinkApplicationServer) error {
+	ws := &applicationUplinkStream{
+		AsNs_LinkApplicationServer: stream,
+		closeCh:                    make(chan struct{}),
+	}
+	appID := id.GetApplicationID()
+
+	ns.applicationServersMu.Lock()
+	cl, ok := ns.applicationServers[appID]
+	ns.applicationServers[appID] = ws
+	if ok {
+		if err := cl.Close(); err != nil {
+			ns.applicationServersMu.Unlock()
+			return err
+		}
+	}
+	ns.applicationServersMu.Unlock()
+
+	ctx := stream.Context()
+	select {
+	case <-ctx.Done():
+		err := ctx.Err()
+		ns.applicationServersMu.Lock()
+		cl, ok := ns.applicationServers[appID]
+		if ok && cl == ws {
+			delete(ns.applicationServers, appID)
+		}
+		ns.applicationServersMu.Unlock()
+		return err
+	case <-ws.closeCh:
+		return ErrNewSubscription.New(nil)
+	}
+}
+
+// DownlinkQueueReplace is called by the application server to completely replace the downlink queue for a device.
+func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
+	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
+	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, &req.EndDeviceIdentifiers)
+	if err != nil {
+		return nil, err
+	}
+	dev.EndDevice.QueuedApplicationDownlinks = req.Downlinks
+	return &pbtypes.Empty{}, dev.Store("QueuedApplicationDownlinks")
+}
+
+// DownlinkQueuePush is called by the application server to push a downlink to queue for a device.
+func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
+	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
+	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, &req.EndDeviceIdentifiers)
+	if err != nil {
+		return nil, err
+	}
+	dev.EndDevice.QueuedApplicationDownlinks = append(dev.EndDevice.QueuedApplicationDownlinks, req.Downlinks...)
+	return &pbtypes.Empty{}, dev.Store("QueuedApplicationDownlinks")
+}
+
+// DownlinkQueueList is called by the application server to get the current state of the downlink queue for a device.
+func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
+	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
+	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, id)
+	if err != nil {
+		return nil, err
+	}
+	return &ttnpb.ApplicationDownlinks{Downlinks: dev.EndDevice.QueuedApplicationDownlinks}, nil
+}
+
+// DownlinkQueueClear is called by the application server to clear the downlink queue for a device.
+func (ns *NetworkServer) DownlinkQueueClear(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
+	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, id)
+	if err != nil {
+		return nil, err
+	}
+	dev.EndDevice.QueuedApplicationDownlinks = nil
+	return &pbtypes.Empty{}, dev.Store("QueuedApplicationDownlinks")
+}
+
 // StartServingGateway is called by the gateway server to indicate that it is serving a gateway.
 func (ns *NetworkServer) StartServingGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
@@ -512,94 +600,6 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		logger.Error("Unmatched MType")
 		return &pbtypes.Empty{}, nil
 	}
-}
-
-type applicationUplinkStream struct {
-	ttnpb.AsNs_LinkApplicationServer
-	closeCh chan struct{}
-}
-
-func (s applicationUplinkStream) Close() error {
-	close(s.closeCh)
-	return nil
-}
-
-// LinkApplication is called by the application server to subscribe to application events.
-func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, stream ttnpb.AsNs_LinkApplicationServer) error {
-	ws := &applicationUplinkStream{
-		AsNs_LinkApplicationServer: stream,
-		closeCh:                    make(chan struct{}),
-	}
-	appID := id.GetApplicationID()
-
-	ns.applicationServersMu.Lock()
-	cl, ok := ns.applicationServers[appID]
-	ns.applicationServers[appID] = ws
-	if ok {
-		if err := cl.Close(); err != nil {
-			ns.applicationServersMu.Unlock()
-			return err
-		}
-	}
-	ns.applicationServersMu.Unlock()
-
-	ctx := stream.Context()
-	select {
-	case <-ctx.Done():
-		err := ctx.Err()
-		ns.applicationServersMu.Lock()
-		cl, ok := ns.applicationServers[appID]
-		if ok && cl == ws {
-			delete(ns.applicationServers, appID)
-		}
-		ns.applicationServersMu.Unlock()
-		return err
-	case <-ws.closeCh:
-		return ErrNewSubscription.New(nil)
-	}
-}
-
-// DownlinkQueueReplace is called by the application server to completely replace the downlink queue for a device.
-func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
-	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
-	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, &req.EndDeviceIdentifiers)
-	if err != nil {
-		return nil, err
-	}
-	dev.EndDevice.QueuedApplicationDownlinks = req.Downlinks
-	return &pbtypes.Empty{}, dev.Store("QueuedApplicationDownlinks")
-}
-
-// DownlinkQueuePush is called by the application server to push a downlink to queue for a device.
-func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
-	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
-	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, &req.EndDeviceIdentifiers)
-	if err != nil {
-		return nil, err
-	}
-	dev.EndDevice.QueuedApplicationDownlinks = append(dev.EndDevice.QueuedApplicationDownlinks, req.Downlinks...)
-	return &pbtypes.Empty{}, dev.Store("QueuedApplicationDownlinks")
-}
-
-// DownlinkQueueList is called by the application server to get the current state of the downlink queue for a device.
-func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
-	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
-	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, id)
-	if err != nil {
-		return nil, err
-	}
-	return &ttnpb.ApplicationDownlinks{Downlinks: dev.EndDevice.QueuedApplicationDownlinks}, nil
-}
-
-// DownlinkQueueClear is called by the application server to clear the downlink queue for a device.
-func (ns *NetworkServer) DownlinkQueueClear(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
-	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
-	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, id)
-	if err != nil {
-		return nil, err
-	}
-	dev.EndDevice.QueuedApplicationDownlinks = nil
-	return &pbtypes.Empty{}, dev.Store("QueuedApplicationDownlinks")
 }
 
 // RegisterServices registers services provided by ns at s.
