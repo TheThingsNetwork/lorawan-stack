@@ -87,7 +87,7 @@ func buildClaims(ctx context.Context, store *sql.Store) (*claims, error) {
 		var key ttnpb.APIKey
 		var err error
 
-		res := &claims{
+		res = &claims{
 			Source: auth.Key,
 		}
 
