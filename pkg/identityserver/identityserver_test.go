@@ -35,7 +35,6 @@ var (
 		Specializers:     DefaultSpecializers,
 	}
 	testIS *IdentityServer
-	rights []ttnpb.Right
 )
 
 func getIS(t testing.TB) *IdentityServer {
@@ -77,20 +76,11 @@ func getIS(t testing.TB) *IdentityServer {
 	return testIS
 }
 
-func init() {
-	rights = append(rights, ttnpb.AllUserRights()...)
-	rights = append(rights, ttnpb.AllApplicationRights()...)
-	rights = append(rights, ttnpb.AllGatewayRights()...)
-	rights = append(rights, ttnpb.AllOrganizationRights()...)
-}
-
-func allRights() []ttnpb.Right { return rights }
-
 func testCtx(userID string) context.Context {
 	return newContextWithClaims(context.Background(), &claims{
 		EntityIdentifiers: ttnpb.UserIdentifiers{UserID: userID},
 		Source:            auth.Token,
-		Rights:            rights,
+		Rights:            ttnpb.AllRights(),
 	})
 }
 

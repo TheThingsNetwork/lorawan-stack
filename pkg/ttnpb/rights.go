@@ -24,6 +24,7 @@ import (
 )
 
 var (
+	allRights          []Right = make([]Right, 0, len(Right_name)-1)
 	userRights         []Right
 	applicationRights  []Right
 	gatewayRights      []Right
@@ -48,7 +49,15 @@ func init() {
 	sort.Slice(applicationRights, func(i, j int) bool { return applicationRights[i] < applicationRights[j] })
 	sort.Slice(gatewayRights, func(i, j int) bool { return gatewayRights[i] < gatewayRights[j] })
 	sort.Slice(organizationRights, func(i, j int) bool { return organizationRights[i] < organizationRights[j] })
+
+	allRights = append(allRights, userRights...)
+	allRights = append(allRights, applicationRights...)
+	allRights = append(allRights, gatewayRights...)
+	allRights = append(allRights, organizationRights...)
 }
+
+// AllRights is the set that contains all the defined rights.
+func AllRights() []Right { return allRights }
 
 // AllUserRights is the set thart contains all the rights that are to users.
 func AllUserRights() []Right { return userRights }
