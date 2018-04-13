@@ -24,10 +24,8 @@ TRANSLATIONS = .cache/make
 
 NODE_ENV ?= production
 
-ESLINT_CONFIG = config/eslintrc.yaml
-
 YARN_FLAGS ?= --no-emoji --no-progress
-ESLINT_FLAGS ?= --no-ignore --color --config $(ESLINT_CONFIG)
+ESLINT_FLAGS ?= --no-ignore --color
 BABEL_FLAGS ?= -D --ignore '*.test.js'
 
 CACHE_DIR ?= .cache

@@ -27,6 +27,10 @@ js.lint:
 		[ -n "$${files}" ] && echo $${files} | xargs $(ESLINT) $(ESLINT_FLAGS) | sed 's:$(PWD)/::'\
 		|| exit 0
 
+js.lintfix: ESLINT_FLAGS += --fix
+js.lintfix: js.lint
+
+
 # lint staged js files
 js.lint-staged: JS_LINT_FILES = $(JS_LINT_STAGED_FILES)
 js.lint-staged: js.lint
