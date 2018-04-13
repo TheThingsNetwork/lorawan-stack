@@ -418,7 +418,7 @@ outer:
 		ses.NextFCntUp = dev.fCnt + 1
 		return dev.Device, nil
 	}
-	return nil, ErrNotFound.New(nil)
+	return nil, ErrDeviceNotFound.New(nil)
 }
 
 func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator, start time.Time) error {

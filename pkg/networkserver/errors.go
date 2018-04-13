@@ -67,8 +67,8 @@ var (
 		Code:          7,
 	}
 
-	// ErrNotFound represents error ocurring when device is not found.
-	ErrNotFound = &errors.ErrDescriptor{
+	// ErrDeviceNotFound represents error ocurring when device is not found.
+	ErrDeviceNotFound = &errors.ErrDescriptor{
 		MessageFormat: "Device not found",
 		Type:          errors.NotFound,
 		Code:          8,
@@ -103,7 +103,7 @@ func init() {
 	ErrFCntTooHigh.Register()
 	ErrCorruptRegistry.Register()
 	ErrMICComputeFailed.Register()
-	ErrNotFound.Register()
+	ErrDeviceNotFound.Register()
 	ErrMissingFNwkSIntKey.Register()
 	ErrMissingSNwkSIntKey.Register()
 	ErrNewSubscription.Register()
