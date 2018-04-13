@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package mapstore provides an example implementation of store.TypedStore, which is used for testing.
 package mapstore
 
 import (

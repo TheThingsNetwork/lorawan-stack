@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package joinserver provides a LoRaWAN 1.1-compliant join server implementation.
 package joinserver
 
 import (
