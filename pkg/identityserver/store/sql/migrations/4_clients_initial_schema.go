@@ -26,7 +26,7 @@ func init() {
 			official_labeled   BOOL NOT NULL DEFAULT false,
 			grants             STRING NOT NULL,
 			rights             STRING NOT NULL,
-			creator_id         UUID NOT NULL REFERENCES users(id),
+			creator_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 			created_at         TIMESTAMP NOT NULL DEFAULT current_timestamp(),
 			updated_at         TIMESTAMP NOT NULL DEFAULT current_timestamp()
 		);

@@ -19,20 +19,20 @@ func init() {
 		CREATE TABLE IF NOT EXISTS authorization_codes (
 			id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			authorization_code   STRING(64) UNIQUE NOT NULL,
-			client_id            UUID NOT NULL REFERENCES clients(id),
+			client_id            UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
 			created_at           TIMESTAMP NOT NULL DEFAULT current_timestamp(),
 			expires_in           INTEGER NOT NULL,
 			scope                STRING NOT NULL,
 			redirect_uri         STRING NOT NULL,
 			state                STRING NOT NULL,
-			user_id              UUID NOT NULL REFERENCES users(id)
+			user_id              UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
 		);
 
 		CREATE TABLE IF NOT EXISTS access_tokens (
 			id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			access_token    STRING UNIQUE NOT NULL,
-			client_id       UUID NOT NULL REFERENCES clients(id),
-			user_id         UUID NOT NULL REFERENCES users(id),
+			client_id       UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+			user_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 			created_at      TIMESTAMP NOT NULL DEFAULT current_timestamp(),
 			expires_in      INTEGER NOT NULL,
 			scope           STRING NOT NULL,
@@ -42,8 +42,8 @@ func init() {
 		CREATE TABLE IF NOT EXISTS refresh_tokens (
 			id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			refresh_token   STRING(64) UNIQUE NOT NULL,
-			client_id       UUID NOT NULL REFERENCES clients(id),
-			user_id         UUID NOT NULL REFERENCES users(id),
+			client_id       UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+			user_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 			created_at      TIMESTAMP NOT NULL DEFAULT current_timestamp(),
 			scope           STRING NOT NULL,
 			redirect_uri    STRING NOT NULL

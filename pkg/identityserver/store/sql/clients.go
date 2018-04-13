@@ -426,21 +426,6 @@ func (s *ClientStore) Delete(ids ttnpb.ClientIdentifiers) error {
 			return err
 		}
 
-		err = s.store().OAuth.(*OAuthStore).deleteAuthorizationCodesByClient(tx, clientID)
-		if err != nil {
-			return err
-		}
-
-		err = s.store().OAuth.(*OAuthStore).deleteAccessTokensByClient(tx, clientID)
-		if err != nil {
-			return err
-		}
-
-		err = s.store().OAuth.(*OAuthStore).deleteRefreshTokensByClient(tx, clientID)
-		if err != nil {
-			return err
-		}
-
 		return s.delete(tx, clientID)
 	})
 

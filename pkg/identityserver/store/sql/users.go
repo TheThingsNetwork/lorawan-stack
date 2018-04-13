@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -257,69 +256,13 @@ func (s *UserStore) Delete(ids ttnpb.UserIdentifiers) error {
 			return err
 		}
 
-		err = s.leaveAllApplications(tx, userID)
-		if err != nil {
-			return err
-		}
-
-		err = s.leaveAllGateways(tx, userID)
-		if err != nil {
-			return err
-		}
-
-		// revoke all authorized clients
-		oauth, ok := s.store().OAuth.(*OAuthStore)
-		if !ok {
-			return errors.Errorf("Expected ptr to OAuthStore but got %T", s.store().OAuth)
-		}
-
-		err = oauth.deleteAuthorizationCodesByUser(tx, userID)
-		if err != nil {
-			return err
-		}
-
-		clientIDs, err := oauth.listAuthorizedClients(tx, userID)
-		if err != nil {
-			return err
-		}
-
-		for _, clientID := range clientIDs {
-			_, err = oauth.deleteAccessTokensByUserAndClient(tx, userID, clientID)
-			if err != nil {
-				return err
-			}
-
-			_, err = oauth.deleteRefreshTokenByUserAndClient(tx, userID, clientID)
-			if err != nil {
-				return err
-			}
-		}
-
-		err = s.deleteCreatedClients(tx, userID)
-		if err != nil {
-			return err
-		}
-
-		// delete api keys
-		err = s.deleteAPIKeys(tx, userID)
-		if err != nil {
-			return err
-		}
-
-		// delete validation tokens
-		err = s.deleteValidationTokens(tx, userID)
-		if err != nil {
-			return err
-		}
-
-		// TODO(gomezjdaniel): delete attributers.
-
-		// delete user itself
+		// Delete user itself.
 		err = s.delete(tx, userID)
 		if err != nil {
 			return err
 		}
 
+		// Delete its ID from the shared namespace with organizations.
 		return s.accountStore.deleteID(tx, userID)
 	})
 
@@ -338,32 +281,5 @@ func (s *UserStore) delete(q db.QueryContext, userID uuid.UUID) (err error) {
 	if db.IsNoRows(err) {
 		err = ErrUserNotFound.New(nil)
 	}
-	return
-}
-
-func (s *UserStore) leaveAllApplications(q db.QueryContext, userID uuid.UUID) (err error) {
-	_, err = q.Exec(
-		`DELETE
-			FROM applications_collaborators
-			WHERE account_id = $1`,
-		userID)
-	return
-}
-
-func (s *UserStore) leaveAllGateways(q db.QueryContext, userID uuid.UUID) (err error) {
-	_, err = q.Exec(
-		`DELETE
-			FROM gateways_collaborators
-			WHERE account_id = $1`,
-		userID)
-	return
-}
-
-func (s *UserStore) deleteCreatedClients(q db.QueryContext, userID uuid.UUID) (err error) {
-	_, err = q.Exec(
-		`DELETE
-			FROM clients
-			WHERE creator_id = $1`,
-		userID)
 	return
 }

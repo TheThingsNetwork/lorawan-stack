@@ -24,16 +24,6 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-// deleteCollaborators deletes all the collaborators from one application.
-func (s *ApplicationStore) deleteCollaborators(q db.QueryContext, appID uuid.UUID) error {
-	_, err := q.Exec(
-		`DELETE
-			FROM applications_collaborators
-			WHERE application_id = $1`,
-		appID)
-	return err
-}
-
 // ListByOrganizationOrUser returns the applications to which an organization or
 // user if collaborator of.
 func (s *ApplicationStore) ListByOrganizationOrUser(ids ttnpb.OrganizationOrUserIdentifiers, specializer store.ApplicationSpecializer) (result []store.Application, err error) {

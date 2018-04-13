@@ -43,7 +43,6 @@ type ApplicationStore interface {
 	// Update updates the application.
 	Update(Application) error
 
-	// TODO(gomezjdaniel#274): use sql 'ON DELETE CASCADE' when CockroachDB implements it.
 	// Delete deletes an application.
 	Delete(ttnpb.ApplicationIdentifiers) error
 

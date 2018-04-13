@@ -37,18 +37,18 @@ func init() {
 		CREATE TABLE IF NOT EXISTS validation_tokens (
 			id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			validation_token   STRING UNIQUE NOT NULL,
-			user_id            UUID UNIQUE NOT NULL REFERENCES users(id),
+			user_id            UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 			created_at         TIMESTAMP NOT NULL DEFAULT current_timestamp(),
 			expires_in         INTEGER NOT NULL
 		);
 		CREATE TABLE IF NOT EXISTS users_api_keys (
-			user_id    UUID NOT NULL REFERENCES users(id),
+			user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 			key_name   STRING(36) NOT NULL,
 			key        STRING NOT NULL UNIQUE,
 			PRIMARY KEY(user_id, key_name)
 		);
 		CREATE TABLE IF NOT EXISTS users_api_keys_rights (
-			user_id    UUID NOT NULL REFERENCES users(id),
+			user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 			key_name   STRING(36) NOT NULL,
 			"right"    STRING NOT NULL,
 			PRIMARY KEY(user_id, key_name, "right")

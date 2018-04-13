@@ -19,6 +19,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -81,7 +82,7 @@ func TestApplicationAttributer(t *testing.T) {
 	schema := `
 		CREATE TABLE IF NOT EXISTS foo_applications (
 			id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			application_id   UUID NOT NULL REFERENCES applications(id),
+			application_id   UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
 			foo              STRING
 		);
 	`
@@ -111,4 +112,12 @@ func TestApplicationAttributer(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeApplicationIgnoringAutoFields, withFoo)
 	a.So(found.(*applicationWithFoo).Foo, should.Equal, withFoo.Foo)
+
+	err = s.Applications.Delete(withFoo.GetApplication().ApplicationIdentifiers)
+	a.So(err, should.BeNil)
+
+	found, err = s.Applications.GetByID(withFoo.GetApplication().ApplicationIdentifiers, specializer)
+	a.So(err, should.NotBeNil)
+	a.So(ErrApplicationNotFound.Describes(err), should.BeTrue)
+	a.So(found, should.BeNil)
 }

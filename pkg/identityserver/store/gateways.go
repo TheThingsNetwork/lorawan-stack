@@ -50,7 +50,6 @@ type GatewayStore interface {
 	// Update updates the gateway.
 	Update(Gateway) error
 
-	// TODO(gomezjdaniel#274): use sql 'ON DELETE CASCADE' when CockroachDB implements it.
 	// Delete deletes a gateway.
 	Delete(ttnpb.GatewayIdentifiers) error
 

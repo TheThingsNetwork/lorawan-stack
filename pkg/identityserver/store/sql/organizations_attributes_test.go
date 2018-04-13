@@ -19,6 +19,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -80,9 +81,9 @@ func TestOrganizationAttributer(t *testing.T) {
 
 	schema := `
 		CREATE TABLE IF NOT EXISTS foo_organizations (
-			id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			organization_id   UUID NOT NULL REFERENCES organizations(id),
-			foo              STRING
+			id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+			organization_id   UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+			foo               STRING
 		);
 	`
 
@@ -111,4 +112,12 @@ func TestOrganizationAttributer(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeOrganizationIgnoringAutoFields, withFoo)
 	a.So(found.(*organizationWithFoo).Foo, should.Equal, withFoo.Foo)
+
+	err = s.Organizations.Delete(withFoo.GetOrganization().OrganizationIdentifiers)
+	a.So(err, should.BeNil)
+
+	found, err = s.Organizations.GetByID(withFoo.GetOrganization().OrganizationIdentifiers, specializer)
+	a.So(err, should.NotBeNil)
+	a.So(ErrOrganizationNotFound.Describes(err), should.BeTrue)
+	a.So(found, should.BeNil)
 }

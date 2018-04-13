@@ -61,7 +61,6 @@ type UserStore interface {
 	// Update updates an user.
 	Update(ttnpb.UserIdentifiers, User) error
 
-	// TODO(gomezjdaniel#274): use sql 'ON DELETE CASCADE' when CockroachDB implements it.
 	// Delete deletes an user.
 	Delete(ttnpb.UserIdentifiers) error
 

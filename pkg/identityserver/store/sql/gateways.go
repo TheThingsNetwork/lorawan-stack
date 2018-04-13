@@ -544,31 +544,6 @@ func (s *GatewayStore) Delete(ids ttnpb.GatewayIdentifiers) error {
 			return err
 		}
 
-		err = s.deleteCollaborators(tx, gtwID)
-		if err != nil {
-			return err
-		}
-
-		err = s.deleteAPIKeys(tx, gtwID)
-		if err != nil {
-			return err
-		}
-
-		err = s.removeAntennas(tx, gtwID)
-		if err != nil {
-			return err
-		}
-
-		err = s.removeRadios(tx, gtwID)
-		if err != nil {
-			return err
-		}
-
-		err = s.removeAttributes(tx, gtwID)
-		if err != nil {
-			return err
-		}
-
 		return s.delete(tx, gtwID)
 	})
 
@@ -589,23 +564,5 @@ func (s *GatewayStore) delete(q db.QueryContext, gtwID uuid.UUID) error {
 	if db.IsNoRows(err) {
 		return ErrGatewayNotFound.New(nil)
 	}
-	return err
-}
-
-// removeAntennas removes all the antennas from a gateway.
-func (s *GatewayStore) removeAntennas(q db.QueryContext, gtwID uuid.UUID) error {
-	_, err := q.Exec("DELETE FROM gateways_antennas WHERE gateway_id = $1", gtwID)
-	return err
-}
-
-// removeRadios removes all the radios from a gateway.
-func (s *GatewayStore) removeRadios(q db.QueryContext, gtwID uuid.UUID) error {
-	_, err := q.Exec("DELETE FROM gateways_radios WHERE gateway_id = $1", gtwID)
-	return err
-}
-
-// removeAttributes removes all the attributes from a gateway.
-func (s *GatewayStore) removeAttributes(q db.QueryContext, gtwID uuid.UUID) error {
-	_, err := q.Exec("DELETE FROM gateways_attributes WHERE gateway_id = $1", gtwID)
 	return err
 }

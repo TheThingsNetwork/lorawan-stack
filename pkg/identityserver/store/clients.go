@@ -49,7 +49,6 @@ type ClientStore interface {
 	// Update updates the client.
 	Update(Client) error
 
-	// TODO(gomezjdaniel#274): use sql 'ON DELETE CASCADE' when CockroachDB implements it.
 	// Delete deletes a client.
 	Delete(ttnpb.ClientIdentifiers) error
 

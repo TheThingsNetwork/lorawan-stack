@@ -21,11 +21,6 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-func (s *UserStore) deleteValidationTokens(q db.QueryContext, userID uuid.UUID) error {
-	_, err := q.Exec(`DELETE FROM validation_tokens WHERE user_id = $1`, userID)
-	return err
-}
-
 // SaveValidationToken saves the validation token.
 func (s *UserStore) SaveValidationToken(ids ttnpb.UserIdentifiers, token store.ValidationToken) (err error) {
 	err = s.transact(func(tx *db.Tx) error {

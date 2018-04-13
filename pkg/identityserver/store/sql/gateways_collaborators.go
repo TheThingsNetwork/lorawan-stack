@@ -24,16 +24,6 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-// deleteCollaborators deletes all the collaborators from one gateway.
-func (s *GatewayStore) deleteCollaborators(q db.QueryContext, gtwID uuid.UUID) error {
-	_, err := q.Exec(
-		`DELETE
-			FROM gateways_collaborators
-			WHERE gateway_id = $1`,
-		gtwID)
-	return err
-}
-
 // ListByOrganizationOrUser returns all the gateways to which an organization
 // or user is collaborator of.
 func (s *GatewayStore) ListByOrganizationOrUser(ids ttnpb.OrganizationOrUserIdentifiers, specializer store.GatewaySpecializer) (result []store.Gateway, err error) {

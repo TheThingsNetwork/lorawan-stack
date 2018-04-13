@@ -41,7 +41,6 @@ type OrganizationStore interface {
 	// Update updates an organization.
 	Update(Organization) error
 
-	// TODO(gomezjdaniel#274): use sql 'ON DELETE CASCADE' when CockroachDB implements it.
 	// Delete deletes an organization.
 	Delete(ttnpb.OrganizationIdentifiers) error
 

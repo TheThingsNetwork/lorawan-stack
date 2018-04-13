@@ -19,6 +19,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -81,7 +82,7 @@ func TestGatewayAttributer(t *testing.T) {
 	schema := `
 		CREATE TABLE IF NOT EXISTS foo_gateways (
 			id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			gateway_id   UUID NOT NULL REFERENCES gateways(id),
+			gateway_id   UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,
 			foo          STRING
 		);
 	`
@@ -114,4 +115,12 @@ func TestGatewayAttributer(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, withFoo)
 	a.So(found.(*gatewayWithFoo).Foo, should.Equal, withFoo.Foo)
+
+	err = s.Gateways.Delete(withFoo.GetGateway().GatewayIdentifiers)
+	a.So(err, should.BeNil)
+
+	found, err = s.Gateways.GetByID(withFoo.GetGateway().GatewayIdentifiers, specializer)
+	a.So(err, should.NotBeNil)
+	a.So(ErrGatewayNotFound.Describes(err), should.BeTrue)
+	a.So(found, should.BeNil)
 }

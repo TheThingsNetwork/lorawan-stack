@@ -29,21 +29,21 @@ func init() {
 		);
 		CREATE UNIQUE INDEX IF NOT EXISTS organizations_organization_id ON organizations (organization_id);
 		CREATE TABLE IF NOT EXISTS organizations_members (
-			organization_id   UUID NOT NULL REFERENCES organizations(id),
-			user_id           UUID NOT NULL REFERENCES users(id),
+			organization_id   UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+			user_id           UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 			"right"           STRING NOT NULL,
 			PRIMARY KEY(organization_id, user_id, "right")
 		);
 		CREATE TABLE IF NOT EXISTS organizations_api_keys (
-			organization_id   UUID NOT NULL REFERENCES organizations(id),
+			organization_id   UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
 			key_name          STRING(36) NOT NULL,
 			key               STRING NOT NULL UNIQUE,
 			PRIMARY KEY(organization_id, key_name)
 		);
 		CREATE TABLE IF NOT EXISTS organizations_api_keys_rights (
-			organization_id    UUID NOT NULL REFERENCES organizations(id),
-			key_name           STRING(36) NOT NULL,
-			"right"             STRING NOT NULL,
+			organization_id   UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+			key_name          STRING(36) NOT NULL,
+			"right"           STRING NOT NULL,
 			PRIMARY KEY(organization_id, key_name, "right")
 		);
 	`

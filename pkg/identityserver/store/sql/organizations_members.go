@@ -24,15 +24,6 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-func (s *OrganizationStore) deleteMembers(q db.QueryContext, orgID uuid.UUID) error {
-	_, err := q.Exec(
-		`DELETE
-				FROM organizations_members
-				WHERE organization_id = $1`,
-		orgID)
-	return err
-}
-
 // ListByUser returns the organizations to which an user is a member of.
 func (s *OrganizationStore) ListByUser(ids ttnpb.UserIdentifiers, specializer store.OrganizationSpecializer) (result []store.Organization, err error) {
 	err = s.transact(func(tx *db.Tx) error {

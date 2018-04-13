@@ -184,16 +184,6 @@ func (s *ApplicationStore) Delete(id ttnpb.ApplicationIdentifiers) (err error) {
 			return err
 		}
 
-		err = s.deleteCollaborators(tx, appID)
-		if err != nil {
-			return err
-		}
-
-		err = s.deleteAPIKeys(tx, appID)
-		if err != nil {
-			return err
-		}
-
 		return s.delete(tx, appID)
 	})
 	return

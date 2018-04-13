@@ -31,14 +31,14 @@ func init() {
 			updated_at          TIMESTAMP NOT NULL DEFAULT current_timestamp()
 		);
 		CREATE TABLE IF NOT EXISTS gateways_attributes (
-			gateway_id   UUID NOT NULL REFERENCES gateways(id),
+			gateway_id   UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,
 			attribute    STRING NOT NULL,
 			value        STRING NOT NULL,
 			PRIMARY KEY(gateway_id, attribute)
 		);
 		CREATE TABLE IF NOT EXISTS gateways_antennas (
 			antenna_id   STRING DEFAULT to_hex(unique_rowid()) PRIMARY KEY,
-			gateway_id   UUID NOT NULL REFERENCES gateways(id),
+			gateway_id   UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,
 			gain         FLOAT NOT NULL DEFAULT 0.0,
 			type         STRING NOT NULL DEFAULT '',
 			model        STRING NOT NULL DEFAULT '',
@@ -50,25 +50,25 @@ func init() {
 		);
 		CREATE TABLE IF NOT EXISTS gateways_radios (
 			radio_id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			gateway_id         UUID NOT NULL REFERENCES gateways(id),
+			gateway_id         UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,
 			frequency          INT NOT NULL CHECK (frequency > 0),
 			tx_configuration   STRING DEFAULT NULL,
 			created_at         TIMESTAMP NOT NULL DEFAULT current_timestamp()
 		);
 		CREATE TABLE IF NOT EXISTS gateways_collaborators (
-			gateway_id   UUID NOT NULL REFERENCES gateways(id),
-			account_id   UUID NOT NULL REFERENCES accounts(id),
+			gateway_id   UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,
+			account_id   UUID NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
 			"right"      STRING NOT NULL,
 			PRIMARY KEY(gateway_id, account_id, "right")
 		);
 		CREATE TABLE IF NOT EXISTS gateways_api_keys (
-			gateway_id   UUID NOT NULL REFERENCES gateways(id),
+			gateway_id   UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,
 			key_name     STRING(36) NOT NULL,
 			key          STRING UNIQUE NOT NULL,
 			PRIMARY KEY(gateway_id, key_name)
 		);
 		CREATE TABLE IF NOT EXISTS gateways_api_keys_rights (
-			gateway_id   UUID NOT NULL REFERENCES gateways(id),
+			gateway_id   UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,
 			key_name     STRING(36) NOT NULL,
 			"right"      STRING NOT NULL,
 			PRIMARY KEY(gateway_id, key_name, "right")

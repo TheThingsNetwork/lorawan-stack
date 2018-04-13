@@ -172,11 +172,6 @@ func (s *OAuthStore) deleteAuthorizationCodesByUser(q db.QueryContext, userID uu
 	return err
 }
 
-func (s *OAuthStore) deleteAuthorizationCodesByClient(q db.QueryContext, clientID uuid.UUID) error {
-	_, err := q.Exec(`DELETE FROM authorization_codes WHERE client_id = $1`, clientID)
-	return err
-}
-
 type accessData struct {
 	ClientUUID uuid.UUID
 	UserUUID   uuid.UUID
@@ -306,11 +301,6 @@ func (s *OAuthStore) deleteAccessToken(q db.QueryContext, accessToken string) er
 	return err
 }
 
-func (s *OAuthStore) deleteAccessTokensByClient(q db.QueryContext, clientID uuid.UUID) error {
-	_, err := q.Exec(`DELETE FROM access_tokens WHERE client_id = $1`, clientID)
-	return err
-}
-
 type refreshData struct {
 	ClientUUID uuid.UUID
 	UserUUID   uuid.UUID
@@ -434,11 +424,6 @@ func (s *OAuthStore) deleteRefreshToken(q db.QueryContext, refreshToken string) 
 		return ErrRefreshTokenNotFound.New(nil)
 	}
 
-	return err
-}
-
-func (s *OAuthStore) deleteRefreshTokensByClient(q db.QueryContext, clientID uuid.UUID) error {
-	_, err := q.Exec(`DELETE FROM refresh_tokens WHERE client_id = $1`, clientID)
 	return err
 }
 

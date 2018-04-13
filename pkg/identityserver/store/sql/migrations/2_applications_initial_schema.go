@@ -24,20 +24,20 @@ func init() {
 			updated_at       TIMESTAMP NOT NULL DEFAULT current_timestamp()
 		);
 		CREATE TABLE IF NOT EXISTS applications_api_keys (
-			application_id   UUID NOT NULL REFERENCES applications(id),
+			application_id   UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
 			key_name         STRING(36) NOT NULL,
 			key              STRING UNIQUE NOT NULL,
 			PRIMARY KEY(application_id, key_name)
 		);
 		CREATE TABLE IF NOT EXISTS applications_api_keys_rights (
-			application_id   UUID NOT NULL REFERENCES applications(id),
+			application_id   UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
 			key_name         STRING(36) NOT NULL,
 			"right"          STRING NOT NULL,
 			PRIMARY KEY(application_id, key_name, "right")
 		);
 		CREATE TABLE IF NOT EXISTS applications_collaborators (
-			application_id   UUID NOT NULL REFERENCES applications(id),
-			account_id       UUID NOT NULL REFERENCES accounts(id),
+			application_id   UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
+			account_id       UUID NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
 			"right"          STRING NOT NULL,
 			PRIMARY KEY(application_id, account_id, "right")
 		);

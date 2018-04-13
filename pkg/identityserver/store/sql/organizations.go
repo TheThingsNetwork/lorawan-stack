@@ -213,21 +213,6 @@ func (s *OrganizationStore) Delete(ids ttnpb.OrganizationIdentifiers) error {
 			return err
 		}
 
-		err = s.deleteCollaborations(tx, orgID)
-		if err != nil {
-			return err
-		}
-
-		err = s.deleteMembers(tx, orgID)
-		if err != nil {
-			return err
-		}
-
-		err = s.deleteAPIKeys(tx, orgID)
-		if err != nil {
-			return err
-		}
-
 		err = s.delete(tx, orgID)
 		if err != nil {
 			return err
@@ -236,24 +221,6 @@ func (s *OrganizationStore) Delete(ids ttnpb.OrganizationIdentifiers) error {
 		return s.accountStore.deleteID(tx, orgID)
 	})
 
-	return err
-}
-
-func (s *OrganizationStore) deleteCollaborations(q db.QueryContext, orgID uuid.UUID) error {
-	_, err := q.Exec(
-		`DELETE
-				FROM applications_collaborators
-				WHERE account_id = $1`,
-		orgID)
-	if err != nil {
-		return err
-	}
-
-	_, err = q.Exec(
-		`DELETE
-				FROM gateways_collaborators
-				WHERE account_id = $1`,
-		orgID)
 	return err
 }
 

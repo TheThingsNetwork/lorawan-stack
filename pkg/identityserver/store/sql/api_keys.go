@@ -190,24 +190,3 @@ func (s *apiKeysStore) deleteAPIKeyRights(q db.QueryContext, entityID uuid.UUID,
 	}
 	return err
 }
-
-func (s *apiKeysStore) deleteAPIKeys(q db.QueryContext, entityID uuid.UUID) error {
-	_, err := q.Exec(
-		fmt.Sprintf(`
-			DELETE
-				FROM %ss_api_keys_rights
-				WHERE %s = $1`, s.entity, s.foreignKey),
-		entityID)
-	if err != nil {
-		return err
-	}
-
-	_, err = q.Exec(
-		fmt.Sprintf(`
-			DELETE
-				FROM %ss_api_keys
-				WHERE %s = $1`, s.entity, s.foreignKey),
-		entityID)
-
-	return err
-}

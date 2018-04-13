@@ -19,6 +19,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -81,7 +82,7 @@ func TestUserAttributer(t *testing.T) {
 	schema := `
 		CREATE TABLE IF NOT EXISTS foo_users (
 			id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			user_id   UUID NOT NULL REFERENCES users(id),
+			user_id   UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 			foo		    STRING
 		);
 	`
@@ -114,4 +115,12 @@ func TestUserAttributer(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeUserIgnoringAutoFields, withFoo)
 	a.So(found.(*userWithFoo).Foo, should.Equal, withFoo.Foo)
+
+	err = s.Users.Delete(withFoo.GetUser().UserIdentifiers)
+	a.So(err, should.BeNil)
+
+	found, err = s.Users.GetByID(withFoo.GetUser().UserIdentifiers, specializer)
+	a.So(err, should.NotBeNil)
+	a.So(ErrUserNotFound.Describes(err), should.BeTrue)
+	a.So(found, should.BeNil)
 }

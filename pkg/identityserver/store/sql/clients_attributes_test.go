@@ -19,6 +19,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
+	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -81,7 +82,7 @@ func TestClientAttributer(t *testing.T) {
 	schema := `
 		CREATE TABLE IF NOT EXISTS foo_clients (
 			id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			client_id   UUID NOT NULL REFERENCES clients(id),
+			client_id   UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
 			foo         STRING
 		);
 	`
@@ -109,4 +110,12 @@ func TestClientAttributer(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeClientIgnoringAutoFields, withFoo)
 	a.So(found.(*clientWithFoo).Foo, should.Equal, withFoo.Foo)
+
+	err = s.Clients.Delete(withFoo.GetClient().ClientIdentifiers)
+	a.So(err, should.BeNil)
+
+	found, err = s.Clients.GetByID(withFoo.GetClient().ClientIdentifiers, specializer)
+	a.So(err, should.NotBeNil)
+	a.So(ErrClientNotFound.Describes(err), should.BeTrue)
+	a.So(found, should.BeNil)
 }
