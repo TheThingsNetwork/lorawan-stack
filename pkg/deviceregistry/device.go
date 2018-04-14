@@ -15,6 +15,8 @@
 package deviceregistry
 
 import (
+	"time"
+
 	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
@@ -35,7 +37,13 @@ func newDevice(ed *ttnpb.EndDevice, s store.Client, k store.PrimaryKey) *Device 
 }
 
 // Store updates devices data in the underlying store.Interface.
+// It modifies the UpdatedAt field of d.EndDevice.
 func (d *Device) Store(fields ...string) error {
+	d.EndDevice.UpdatedAt = time.Now().UTC()
+
+	if len(fields) != 0 {
+		fields = append(fields, "UpdatedAt")
+	}
 	return d.store.Update(d.key, d.EndDevice, fields...)
 }
 

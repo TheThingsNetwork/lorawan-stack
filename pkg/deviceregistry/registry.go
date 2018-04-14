@@ -15,6 +15,8 @@
 package deviceregistry
 
 import (
+	"time"
+
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -39,7 +41,16 @@ func New(s store.Client) *Registry {
 }
 
 // Create stores devices data in underlying store.Interface and returns a new *Device.
+// It modifies CreatedAt and UpdatedAt fields of ed and returns error if either of them is non-zero on ed.
 func (r *Registry) Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error) {
+	now := time.Now().UTC()
+	ed.CreatedAt = now
+	ed.UpdatedAt = now
+
+	if len(fields) != 0 {
+		fields = append(fields, "CreatedAt", "UpdatedAt")
+	}
+
 	id, err := r.store.Create(ed, fields...)
 	if err != nil {
 		return nil, err
