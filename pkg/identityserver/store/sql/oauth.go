@@ -558,3 +558,44 @@ func (s *oauthStore) deleteRefreshTokenByUserAndClient(q db.QueryContext, userID
 	}
 	return int(rows), nil
 }
+
+// IsClientAuthorized checks whether a client is currently authorized by an user.
+func (s *oauthStore) IsClientAuthorized(user ttnpb.UserIdentifiers, client ttnpb.ClientIdentifiers) (res bool, err error) {
+	err = s.transact(func(tx *db.Tx) error {
+		st := s.store()
+
+		userID, err := st.Users.getUserID(tx, user)
+		if err != nil {
+			return err
+		}
+
+		clientID, err := st.Clients.getClientID(tx, client)
+		if err != nil {
+			return err
+		}
+
+		res, err = s.isClientAuthorized(tx, userID, clientID)
+		return err
+	})
+	return
+}
+
+func (s *oauthStore) isClientAuthorized(q db.QueryContext, userID, clientID uuid.UUID) (bool, error) {
+	t := new(string)
+	err := q.SelectOne(
+		t,
+		`SELECT
+				refresh_token
+			FROM refresh_tokens
+			WHERE user_id = $1 AND client_id = $2
+			LIMIT 1`,
+		userID,
+		clientID)
+	if db.IsNoRows(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}

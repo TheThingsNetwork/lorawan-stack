@@ -139,6 +139,9 @@ type OAuthStore interface {
 	// DeleteRefreshToken deletes the refresh token from the database.
 	DeleteRefreshToken(string) error
 
+	// IsClientAuthorized checks whether a client is currently authorized by an user.
+	IsClientAuthorized(ttnpb.UserIdentifiers, ttnpb.ClientIdentifiers) (bool, error)
+
 	// ListAuthorizedClients returns a list of clients authorized by a given user.
 	ListAuthorizedClients(ttnpb.UserIdentifiers, ClientSpecializer) ([]Client, error)
 

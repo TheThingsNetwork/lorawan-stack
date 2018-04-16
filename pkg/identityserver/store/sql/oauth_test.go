@@ -149,6 +149,10 @@ func TestOAuthAuthorizedClients(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore(t, database)
 
+	authorized, err := s.OAuth.IsClientAuthorized(alice.UserIdentifiers, client.ClientIdentifiers)
+	a.So(err, should.BeNil)
+	a.So(authorized, should.BeFalse)
+
 	accessData := store.AccessData{
 		AccessToken: "123456",
 		ClientID:    client.ClientIdentifiers.ClientID,
@@ -159,7 +163,7 @@ func TestOAuthAuthorizedClients(t *testing.T) {
 		RedirectURI: "https://example.com/oauth/callback",
 	}
 
-	err := s.OAuth.SaveAccessToken(accessData)
+	err = s.OAuth.SaveAccessToken(accessData)
 	a.So(err, should.BeNil)
 
 	refreshData := store.RefreshData{
@@ -174,6 +178,10 @@ func TestOAuthAuthorizedClients(t *testing.T) {
 	err = s.OAuth.SaveRefreshToken(refreshData)
 	a.So(err, should.BeNil)
 
+	authorized, err = s.OAuth.IsClientAuthorized(alice.UserIdentifiers, client.ClientIdentifiers)
+	a.So(err, should.BeNil)
+	a.So(authorized, should.BeTrue)
+
 	found, err := s.OAuth.ListAuthorizedClients(alice.UserIdentifiers, clientSpecializer)
 	a.So(err, should.BeNil)
 	if a.So(found, should.HaveLength, 1) {
@@ -182,6 +190,10 @@ func TestOAuthAuthorizedClients(t *testing.T) {
 
 	err = s.OAuth.RevokeAuthorizedClient(alice.UserIdentifiers, client.ClientIdentifiers)
 	a.So(err, should.BeNil)
+
+	authorized, err = s.OAuth.IsClientAuthorized(alice.UserIdentifiers, client.ClientIdentifiers)
+	a.So(err, should.BeNil)
+	a.So(authorized, should.BeFalse)
 
 	err = s.OAuth.RevokeAuthorizedClient(alice.UserIdentifiers, client.ClientIdentifiers)
 	a.So(err, should.NotBeNil)
