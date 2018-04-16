@@ -29,12 +29,17 @@ var now = time.Now
 
 // ID adds a request id to the request.
 func ID(prefix string) echo.MiddlewareFunc {
-	id := newID(prefix)
+	gen := newID(prefix)
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			id, err := id.generate()
-			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Failed to generate request ID: %s", err))
+			id := c.Request().Header.Get("X-Request-ID")
+
+			if id == "" {
+				var err error
+				id, err = gen.generate()
+				if err != nil {
+					return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Failed to generate request ID: %s", err))
+				}
 			}
 
 			c.Response().Header().Set("X-Request-ID", id)

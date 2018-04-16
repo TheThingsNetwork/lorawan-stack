@@ -106,3 +106,28 @@ func TestID(t *testing.T) {
 
 	a.So(id1, should.NotEqual, id2)
 }
+
+func TestIDFromRequest(t *testing.T) {
+	a := assertions.New(t)
+
+	e := echo.New()
+
+	prefix := "prefix"
+	handler := ID(prefix)(handler)
+
+	custom := "custom-id"
+
+	req := httptest.NewRequest("GET", "/", nil)
+	req.Header.Set("X-Request-ID", custom)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+	err := handler(c)
+	a.So(err, should.BeNil)
+	a.So(rec.Code, should.Equal, http.StatusOK)
+
+	id := rec.Header().Get("X-Request-Id")
+
+	a.So(id, should.NotBeEmpty)
+	a.So(id, should.Equal, custom)
+}
