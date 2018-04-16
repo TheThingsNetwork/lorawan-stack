@@ -17,8 +17,6 @@ package cookie
 import (
 	"fmt"
 	"net/http"
-	"path"
-	"strings"
 	"time"
 
 	"github.com/gorilla/securecookie"
@@ -26,122 +24,111 @@ import (
 )
 
 const (
-	rootKey    = "root"
+	// encoderKey is the key where the encoder will be stored on the request.
 	encoderKey = "cookie.encoder"
-	tombstone  = "deleted"
+
+	// tombstone is the cookie tombstone value.
+	tombstone = "<deleted>"
 )
 
-// Cookie is the type of cookies with arbitrary values.
+// Cookie is a description of a cookie used for consistent cookie setting and deleting.
 type Cookie struct {
-	Value    interface{}
-	Path     string
-	Expires  time.Time
-	MaxAge   int
+	// Name is the name of the cookie.
+	Name string
+
+	// Path is path of the cookie.
+	Path string
+
+	// MaxAge is the max age of the cookie.
+	MaxAge time.Duration
+
+	// HTTPOnly restricts the cookie to HTTP (no javascript access).
 	HTTPOnly bool
 }
 
 // Cookies is a middleware function that makes the handlers capable of handling cookies via
 // methods of this package.
-func Cookies(root string, block, hash []byte) echo.MiddlewareFunc {
+func Cookies(block, hash []byte) echo.MiddlewareFunc {
 	s := securecookie.New(hash, block)
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			c.Set(rootKey, root)
 			c.Set(encoderKey, s)
 			return next(c)
 		}
 	}
 }
 
-func getConfig(c echo.Context) (string, *securecookie.SecureCookie, error) {
-	root, ok := c.Get(rootKey).(string)
-	if !ok || root == "" {
-		root = "/"
-	}
-
+func getConfig(c echo.Context) (*securecookie.SecureCookie, error) {
 	encoder, _ := c.Get(encoderKey).(*securecookie.SecureCookie)
 	if encoder == nil {
-		return "", nil, fmt.Errorf("No cookie.encoder set")
+		return nil, fmt.Errorf("No cookie.encoder set")
 	}
 
-	return root, encoder, nil
+	return encoder, nil
 }
 
-// Get the cookie with the specified name.
-func Get(c echo.Context, name string) (*Cookie, error) {
-	root, s, err := getConfig(c)
+// Get decodes the cookie into the value. Returns false if the cookie is not there.
+func (d *Cookie) Get(c echo.Context, v interface{}) (bool, error) {
+	s, err := getConfig(c)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
-	cookie, err := c.Request().Cookie(name)
+	cookie, err := c.Request().Cookie(d.Name)
 	if err != nil || cookie.Value == tombstone {
-		return nil, nil
+		return false, nil
 	}
 
-	res := &Cookie{
-		Path:     strings.TrimPrefix(cookie.Path, root),
-		Expires:  cookie.Expires,
-		MaxAge:   cookie.MaxAge,
-		HTTPOnly: cookie.HttpOnly,
-	}
-
-	err = s.Decode(name, cookie.Value, &res.Value)
+	err = s.Decode(d.Name, cookie.Value, v)
 	if err != nil {
-		return nil, err
+		d.Remove(c)
+		return false, nil
 	}
 
-	return res, nil
+	return true, nil
 }
 
-// Set the cookie with the specified name.
-func Set(c echo.Context, name string, cookie *Cookie) error {
-	root, s, err := getConfig(c)
+// Set the value of the cookie.
+func (d *Cookie) Set(c echo.Context, v interface{}) error {
+	s, err := getConfig(c)
 	if err != nil {
 		return err
 	}
 
-	str, err := s.Encode(name, &cookie.Value)
+	str, err := s.Encode(d.Name, v)
 	if err != nil {
 		return err
 	}
 
 	http.SetCookie(c.Response().Writer, &http.Cookie{
-		Name:     name,
+		Name:     d.Name,
+		Path:     d.Path,
+		MaxAge:   int(d.MaxAge.Nanoseconds() / 1000),
+		HttpOnly: d.HTTPOnly,
 		Value:    str,
-		Path:     path.Join(root, cookie.Path),
-		Expires:  cookie.Expires,
-		MaxAge:   cookie.MaxAge,
-		HttpOnly: cookie.HTTPOnly,
 	})
 
 	return nil
+}
+
+// Exists checks if the cookies exists.
+func (d *Cookie) Exists(c echo.Context) bool {
+	cookie, err := c.Request().Cookie(d.Name)
+	return err == nil && cookie.Value != tombstone
 }
 
 // Remove the cookie with the specified name (if it exists).
-func Remove(c echo.Context, name string) error {
-	root, _, err := getConfig(c)
-	if err != nil {
-		return err
-	}
-
-	cookie, err := Get(c, name)
-	if err != nil {
-		return err
-	}
-
-	if cookie == nil {
-		return nil
+func (d *Cookie) Remove(c echo.Context) {
+	if !d.Exists(c) {
+		return
 	}
 
 	http.SetCookie(c.Response().Writer, &http.Cookie{
-		Name:     name,
+		Name:     d.Name,
+		Path:     d.Path,
+		HttpOnly: d.HTTPOnly,
 		Value:    tombstone,
-		Path:     path.Join(root, cookie.Path),
 		Expires:  time.Unix(1, 0),
 		MaxAge:   0,
-		HttpOnly: cookie.HTTPOnly,
 	})
-
-	return nil
 }
