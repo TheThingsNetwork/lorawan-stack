@@ -44,7 +44,7 @@ func (a *Assets) Errors(name string, env interface{}) echo.MiddlewareFunc {
 
 			e := from(err)
 			status := httperrors.HTTPStatusCode(e)
-			httperrors.SetHeaders(e, c.Response().Header())
+			httperrors.SetErrorHeaders(e, c.Response().Header())
 
 			switch httputil.NegotiateContentType(c.Request(), offers, defaultType) {
 			case "text/html":

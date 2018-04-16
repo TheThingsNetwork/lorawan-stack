@@ -24,11 +24,19 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
-// CodeHeader is the header where the error code will be stored
-const CodeHeader = "X-TTN-Error-Code"
+const (
+	// CodeHeader is the HTTP header that contains the error Code.
+	CodeHeader = "X-TTN-Error-Code"
 
-// IDHeader is the http header where the error ID will be put
-const IDHeader = "X-TTN-Error-ID"
+	// IDHeader is the HTTP header that contains the error ID.
+	IDHeader = "X-TTN-Error-ID"
+
+	// TypeHeader is the HTTP header that contains the error Type.
+	TypeHeader = "X-TTN-Error-Type"
+
+	// NamespaceHeader is the HTTP header that contains the error namespace.
+	NamespaceHeader = "X-TTN-Error-Namespace"
+)
 
 // TypeToHTTPStatusCode returns the corresponding http status code from an error type
 func TypeToHTTPStatusCode(t errors.Type) int {
@@ -164,14 +172,27 @@ func FromHTTP(resp *http.Response) errors.Error {
 	return out
 }
 
-// ToHTTP writes the error to the http response
+// ToHTTP writes the error to the http response.
 func ToHTTP(in error, w http.ResponseWriter) error {
 	err := errors.From(in)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set(CodeHeader, err.Code().String())
-	w.Header().Set(IDHeader, err.ID())
+	SetErrorHeaders(err, w.Header())
 	w.WriteHeader(TypeToHTTPStatusCode(err.Type()))
 
 	return json.NewEncoder(w).Encode(errors.ToImpl(errors.Safe(err)))
+}
+
+// SetErrorHeaders sets headers pertaining to an error.
+func SetErrorHeaders(err errors.Error, headers http.Header) {
+	headers.Set(IDHeader, err.ID())
+	headers.Set(TypeHeader, err.Type().String())
+
+	if err.Code() != errors.NoCode {
+		headers.Set(CodeHeader, err.Code().String())
+	}
+
+	if err.Namespace() != "" {
+		headers.Set(NamespaceHeader, err.Namespace())
+	}
 }
