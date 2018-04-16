@@ -27,10 +27,13 @@
 package errors
 
 import (
+	"crypto/rand"
 	"fmt"
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/oklog/ulid"
 )
 
 // Error is the interface of portable errors.
@@ -94,6 +97,11 @@ func NewWithCausef(cause error, text string, a ...interface{}) Error {
 // Errorf returns an "unknown" error with the text fomatted accoding to format.
 func Errorf(format string, a ...interface{}) error {
 	return New(fmt.Sprintf(format, a...))
+}
+
+// NewID returns a new error ID.
+func NewID() string {
+	return ulid.MustNew(ulid.Now(), rand.Reader).String()
 }
 
 // pkg returns the package the caller was called from.
