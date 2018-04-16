@@ -104,7 +104,13 @@ func New(logger log.Stack, config *Config) (*Component, error) {
 		return nil, err
 	}
 
-	c.web = web.New(c.logger, web.WithCookieSecrets(hash, block))
+	c.web, err = web.New(c.ctx, web.Config{
+		HashKey:  hash,
+		BlockKey: block,
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	return c, nil
 }
