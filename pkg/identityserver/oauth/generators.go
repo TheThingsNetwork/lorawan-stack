@@ -20,14 +20,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/random"
 )
 
-// GenerateAuthorizeToken generates a 64-length authorization code based on the ttn random generator.
+// GenerateAuthorizeToken generates a 64-char authorization code.
 func (s *Server) GenerateAuthorizeToken(data *osin.AuthorizeData) (string, error) {
 	return random.String(64), nil
 }
 
-// GenerateAccessToken generates 64-length access and refresh tokens based on the ttn random generator.
+// GenerateAccessToken generates 64-char access and refresh tokens.
 func (s *Server) GenerateAccessToken(data *osin.AccessData, generateRefresh bool) (accessToken string, refreshToken string, err error) {
-	accessToken, err = auth.GenerateAccessToken(s.iss)
+	accessToken, err = auth.GenerateAccessToken(s.config.hostname)
 	if err != nil {
 		return
 	}

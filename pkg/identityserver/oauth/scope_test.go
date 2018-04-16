@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package oauth
+package oauth_test
 
 import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	. "go.thethings.network/lorawan-stack/pkg/identityserver/oauth"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 func TestParseScope(t *testing.T) {
 	a := assertions.New(t)
 
-	// valid
+	// Valid.
 	{
 		rights, err := ParseScope("RIGHT_APPLICATION_INFO RIGHT_APPLICATION_TRAFFIC_READ")
 		a.So(err, should.BeNil)
@@ -35,27 +36,12 @@ func TestParseScope(t *testing.T) {
 		})
 	}
 
-	// invalid
+	// Invalid.
 	{
 		rights, err := ParseScope("RIGHT_APPLICATION_TRAFFIC_READ RIGHT_WEIRD")
 		a.So(err, should.NotBeNil)
 		a.So(rights, should.BeNil)
 	}
-}
-
-func TestSubtract(t *testing.T) {
-	a := assertions.New(t)
-
-	a.So(Subtract([]ttnpb.Right{
-		ttnpb.RIGHT_APPLICATION_INFO,
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
-		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
-	}, []ttnpb.Right{
-		ttnpb.RIGHT_APPLICATION_INFO,
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
-	}), should.Resemble, []ttnpb.Right{
-		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
-	})
 }
 
 func TestStringScope(t *testing.T) {

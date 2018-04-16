@@ -22,13 +22,10 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-var clientSpecializer = func(base ttnpb.Client) store.Client {
-	return &base
-}
-
 // storage implements osin.Storage.
 type storage struct {
 	*store.Store
+	clientSpecializer store.ClientSpecializer
 }
 
 // UserData is the userdata that gets carried around with authorization requests.
@@ -36,7 +33,8 @@ type UserData struct {
 	UserID string
 }
 
-// getUserID returns the UserID of the input if it a ptr to an UserData, otherwise empty string.
+// getUserID returns the UserID of the input if it a ptr to an UserData,
+// otherwise empty string.
 func getUserID(data interface{}) string {
 	userID := ""
 	udata, ok := data.(*UserData)
@@ -54,9 +52,10 @@ func (s *storage) Clone() osin.Storage {
 // Close the store, releasing resources it might be holding.
 func (s *storage) Close() {}
 
-// GetClient loads the OAuth Client by client_id.
+// GetClient loads the OAuth client by `client_id`.
+// If the OAuth client is not approved it returns nil.
 func (s *storage) GetClient(clientID string) (osin.Client, error) {
-	client, err := s.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: clientID}, clientSpecializer)
+	client, err := s.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: clientID}, s.clientSpecializer)
 	if err != nil {
 		return nil, err
 	}
@@ -89,13 +88,13 @@ func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 		return nil, err
 	}
 
-	// ensure the expiration
+	// Ensure the expiration.
 	err = data.IsExpired()
 	if err != nil {
 		return nil, err
 	}
 
-	client, err := s.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: data.ClientID}, clientSpecializer)
+	client, err := s.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: data.ClientID}, s.clientSpecializer)
 	if err != nil {
 		return nil, err
 	}
@@ -159,13 +158,13 @@ func (s *storage) LoadAccess(accessToken string) (*osin.AccessData, error) {
 		return nil, err
 	}
 
-	// ensure the expiration
+	// Ensure the expiration.
 	err = data.IsExpired()
 	if err != nil {
 		return nil, err
 	}
 
-	client, err := s.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: data.ClientID}, clientSpecializer)
+	client, err := s.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: data.ClientID}, s.clientSpecializer)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +194,7 @@ func (s *storage) LoadRefresh(refreshToken string) (*osin.AccessData, error) {
 		return nil, err
 	}
 
-	client, err := s.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: data.ClientID}, clientSpecializer)
+	client, err := s.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: data.ClientID}, s.clientSpecializer)
 	if err != nil {
 		return nil, err
 	}

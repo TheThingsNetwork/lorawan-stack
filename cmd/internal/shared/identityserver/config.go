@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"fmt"
+	"time"
 
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
@@ -26,6 +27,11 @@ var DefaultIdentityServerConfig = identityserver.Config{
 	DatabaseURI:      "postgres://root@localhost:26257/is_development?sslmode=disable",
 	PublicURL:        fmt.Sprintf("http://localhost:%s", shared.DefaultServiceBase.HTTP.Listen),
 	OrganizationName: "The Things Network",
+	OAuth: oauth.Config{
+		AuthorizationCodeTTL: time.Minute * 5,
+		AccessTokenTTL:       time.Hour,
+		PublicURL:            fmt.Sprintf("http://localhost%s/id", shared.DefaultServiceBase.HTTP.Listen),
+	},
 }
 
 // DefaultIdentityServerInitialData is the default initial data when running the `init` command.

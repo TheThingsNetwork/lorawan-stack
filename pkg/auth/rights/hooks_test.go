@@ -22,6 +22,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-identity-server/commands"
+	"go.thethings.network/lorawan-stack/pkg/assets"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	. "go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -69,8 +70,14 @@ func TestUnaryHook(t *testing.T) {
 	defer s.Close()
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{})
+
+	assets := assets.New(c, assets.Config{
+		Directory: "../../webui",
+	})
+
 	isConfig := commands.DefaultConfig.IS
 	isConfig.DatabaseURI = databaseURI
+	isConfig.OAuth.Assets = assets
 	is, err := identityserver.New(c, isConfig)
 	if !a.So(err, should.BeNil) {
 		t.Fatal("Failed to create an Identity Server instance")
