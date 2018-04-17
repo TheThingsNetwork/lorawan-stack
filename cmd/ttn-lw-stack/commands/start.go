@@ -17,7 +17,9 @@ package commands
 import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
+	"go.thethings.network/lorawan-stack/pkg/assets"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/console"
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
@@ -46,6 +48,9 @@ var (
 
 			jsRedis := redis.New(&redis.Config{Redis: config.Redis, Namespace: []string{"js", "devices"}})
 			config.JS.Registry = deviceregistry.New(store.NewByteMapStoreClient(jsRedis))
+
+			assets := assets.New(c, config.Assets)
+			config.IS.OAuth.Assets = assets
 
 			_, err = identityserver.New(c, config.IS)
 			if err != nil {
@@ -76,7 +81,11 @@ var (
 			}
 			_ = js
 
-			// TODO: Web UI
+			console, err := console.New(c, assets, config.Console)
+			if err != nil {
+				return errors.NewWithCause(err, "Failed to initialize console")
+			}
+			_ = console
 
 			logger.Info("Starting stack...")
 			return c.Run()
