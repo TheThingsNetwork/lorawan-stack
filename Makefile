@@ -38,7 +38,7 @@ ci.decrypt-variables:
 	keybase decrypt -i ci/variables.yml.encrypted -o ci/variables.yml
 
 messages:
-	@$(GO) run ./pkg/errors/generate_messages.go --filename config/messages.json
+	@$(GO) run ./cmd/internal/generate_i18n.go
 
 dev-deps: go.dev-deps js.dev-deps
 
