@@ -18,8 +18,11 @@ import (
 	"context"
 	"fmt"
 
+	"go.thethings.network/lorawan-stack/pkg/i18n"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
+
+const i18nPrefix = "event"
 
 // Definition of a registered event.
 type Definition func(ctx context.Context, identifiers ttnpb.Identifiers, data interface{}) Event
@@ -33,6 +36,7 @@ func Define(name, description string) Definition {
 	if Definitions[name] != "" {
 		panic(fmt.Errorf("Event %s already defined", name))
 	}
+	i18n.Define(fmt.Sprintf("%s:%s", i18nPrefix, name), description).SetSource(2)
 	Definitions[name] = description
 	return func(ctx context.Context, identifiers ttnpb.Identifiers, data interface{}) Event {
 		return New(ctx, name, identifiers, data)

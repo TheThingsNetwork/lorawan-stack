@@ -1,1 +1,585 @@
-{}
+{
+  "event:application.create": {
+    "id": "event:application.create",
+    "defaultMessage": "Create Application",
+    "translations": {
+      "en": "Create Application"
+    },
+    "description": {
+      "package": "pkg/applicationregistry",
+      "file": "observability.go"
+    }
+  },
+  "event:application.delete": {
+    "id": "event:application.delete",
+    "defaultMessage": "Delete Application",
+    "translations": {
+      "en": "Delete Application"
+    },
+    "description": {
+      "package": "pkg/applicationregistry",
+      "file": "observability.go"
+    }
+  },
+  "event:application.update": {
+    "id": "event:application.update",
+    "defaultMessage": "Update Application",
+    "translations": {
+      "en": "Update Application"
+    },
+    "description": {
+      "package": "pkg/applicationregistry",
+      "file": "observability.go"
+    }
+  },
+  "event:device.create": {
+    "id": "event:device.create",
+    "defaultMessage": "Create Device",
+    "translations": {
+      "en": "Create Device"
+    },
+    "description": {
+      "package": "pkg/deviceregistry",
+      "file": "observability.go"
+    }
+  },
+  "event:device.delete": {
+    "id": "event:device.delete",
+    "defaultMessage": "Delete Device",
+    "translations": {
+      "en": "Delete Device"
+    },
+    "description": {
+      "package": "pkg/deviceregistry",
+      "file": "observability.go"
+    }
+  },
+  "event:device.update": {
+    "id": "event:device.update",
+    "defaultMessage": "Update Device",
+    "translations": {
+      "en": "Update Device"
+    },
+    "description": {
+      "package": "pkg/deviceregistry",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.down.send": {
+    "id": "event:gs.down.send",
+    "defaultMessage": "send downlink message",
+    "translations": {
+      "en": "send downlink message"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.gateway.end_link": {
+    "id": "event:gs.gateway.end_link",
+    "defaultMessage": "end gateway link",
+    "translations": {
+      "en": "end gateway link"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.gateway.start_link": {
+    "id": "event:gs.gateway.start_link",
+    "defaultMessage": "start gateway link",
+    "translations": {
+      "en": "start gateway link"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.status.receive": {
+    "id": "event:gs.status.receive",
+    "defaultMessage": "receive status message",
+    "translations": {
+      "en": "receive status message"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.up.receive": {
+    "id": "event:gs.up.receive",
+    "defaultMessage": "receive uplink message",
+    "translations": {
+      "en": "receive uplink message"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:is.application.api_key.delete": {
+    "id": "event:is.application.api_key.delete",
+    "defaultMessage": "delete application API key",
+    "translations": {
+      "en": "delete application API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.application.api_key.generate": {
+    "id": "event:is.application.api_key.generate",
+    "defaultMessage": "generate application API key",
+    "translations": {
+      "en": "generate application API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.application.api_key.update": {
+    "id": "event:is.application.api_key.update",
+    "defaultMessage": "update application API key",
+    "translations": {
+      "en": "update application API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.application.create": {
+    "id": "event:is.application.create",
+    "defaultMessage": "create application",
+    "translations": {
+      "en": "create application"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.application.delete": {
+    "id": "event:is.application.delete",
+    "defaultMessage": "delete application",
+    "translations": {
+      "en": "delete application"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.application.update": {
+    "id": "event:is.application.update",
+    "defaultMessage": "update application",
+    "translations": {
+      "en": "update application"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.client.create": {
+    "id": "event:is.client.create",
+    "defaultMessage": "create OAuth client",
+    "translations": {
+      "en": "create OAuth client"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.client.delete": {
+    "id": "event:is.client.delete",
+    "defaultMessage": "delete OAuth client",
+    "translations": {
+      "en": "delete OAuth client"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.client.update": {
+    "id": "event:is.client.update",
+    "defaultMessage": "update OAuth client",
+    "translations": {
+      "en": "update OAuth client"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.gateway.api_key.delete": {
+    "id": "event:is.gateway.api_key.delete",
+    "defaultMessage": "delete gateway API key",
+    "translations": {
+      "en": "delete gateway API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.gateway.api_key.generate": {
+    "id": "event:is.gateway.api_key.generate",
+    "defaultMessage": "generate gateway API key",
+    "translations": {
+      "en": "generate gateway API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.gateway.api_key.update": {
+    "id": "event:is.gateway.api_key.update",
+    "defaultMessage": "update gateway API key",
+    "translations": {
+      "en": "update gateway API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.gateway.create": {
+    "id": "event:is.gateway.create",
+    "defaultMessage": "create gateway",
+    "translations": {
+      "en": "create gateway"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.gateway.delete": {
+    "id": "event:is.gateway.delete",
+    "defaultMessage": "delete gateway",
+    "translations": {
+      "en": "delete gateway"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.gateway.update": {
+    "id": "event:is.gateway.update",
+    "defaultMessage": "update gateway",
+    "translations": {
+      "en": "update gateway"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.oauth.user.login": {
+    "id": "event:is.oauth.user.login",
+    "defaultMessage": "successful user login",
+    "translations": {
+      "en": "successful user login"
+    },
+    "description": {
+      "package": "pkg/identityserver/oauth",
+      "file": "events.go"
+    }
+  },
+  "event:is.oauth.user.login_failed": {
+    "id": "event:is.oauth.user.login_failed",
+    "defaultMessage": "failed user login",
+    "translations": {
+      "en": "failed user login"
+    },
+    "description": {
+      "package": "pkg/identityserver/oauth",
+      "file": "events.go"
+    }
+  },
+  "event:is.organization.api_key.delete": {
+    "id": "event:is.organization.api_key.delete",
+    "defaultMessage": "delete organization API key",
+    "translations": {
+      "en": "delete organization API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.organization.api_key.generate": {
+    "id": "event:is.organization.api_key.generate",
+    "defaultMessage": "generate organization API key",
+    "translations": {
+      "en": "generate organization API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.organization.api_key.update": {
+    "id": "event:is.organization.api_key.update",
+    "defaultMessage": "update organization API key",
+    "translations": {
+      "en": "update organization API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.organization.create": {
+    "id": "event:is.organization.create",
+    "defaultMessage": "create organization",
+    "translations": {
+      "en": "create organization"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.organization.delete": {
+    "id": "event:is.organization.delete",
+    "defaultMessage": "delete organization",
+    "translations": {
+      "en": "delete organization"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.organization.update": {
+    "id": "event:is.organization.update",
+    "defaultMessage": "update organization",
+    "translations": {
+      "en": "update organization"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.user.api_key.delete": {
+    "id": "event:is.user.api_key.delete",
+    "defaultMessage": "delete user API key",
+    "translations": {
+      "en": "delete user API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.user.api_key.generate": {
+    "id": "event:is.user.api_key.generate",
+    "defaultMessage": "generate user API key",
+    "translations": {
+      "en": "generate user API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.user.api_key.update": {
+    "id": "event:is.user.api_key.update",
+    "defaultMessage": "update user API key",
+    "translations": {
+      "en": "update user API key"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.user.create": {
+    "id": "event:is.user.create",
+    "defaultMessage": "create user",
+    "translations": {
+      "en": "create user"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.user.delete": {
+    "id": "event:is.user.delete",
+    "defaultMessage": "delete user",
+    "translations": {
+      "en": "delete user"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:is.user.update": {
+    "id": "event:is.user.update",
+    "defaultMessage": "update user",
+    "translations": {
+      "en": "update user"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "events.go"
+    }
+  },
+  "event:js.join.accept": {
+    "id": "event:js.join.accept",
+    "defaultMessage": "accept join-request",
+    "translations": {
+      "en": "accept join-request"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "observability.go"
+    }
+  },
+  "event:js.join.reject": {
+    "id": "event:js.join.reject",
+    "defaultMessage": "reject join-request",
+    "translations": {
+      "en": "reject join-request"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.application.end_link": {
+    "id": "event:ns.application.end_link",
+    "defaultMessage": "end application link",
+    "translations": {
+      "en": "end application link"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.application.start_link": {
+    "id": "event:ns.application.start_link",
+    "defaultMessage": "start application link",
+    "translations": {
+      "en": "start application link"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.data.drop": {
+    "id": "event:ns.up.data.drop",
+    "defaultMessage": "drop data message",
+    "translations": {
+      "en": "drop data message"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.data.forward": {
+    "id": "event:ns.up.data.forward",
+    "defaultMessage": "forward data message",
+    "translations": {
+      "en": "forward data message"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.join.drop": {
+    "id": "event:ns.up.join.drop",
+    "defaultMessage": "drop join-request",
+    "translations": {
+      "en": "drop join-request"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.join.forward": {
+    "id": "event:ns.up.join.forward",
+    "defaultMessage": "forward join-request",
+    "translations": {
+      "en": "forward join-request"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.merge_metadata": {
+    "id": "event:ns.up.merge_metadata",
+    "defaultMessage": "merge uplink message metadata",
+    "translations": {
+      "en": "merge uplink message metadata"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.receive": {
+    "id": "event:ns.up.receive",
+    "defaultMessage": "receive uplink message",
+    "translations": {
+      "en": "receive uplink message"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.receive_duplicate": {
+    "id": "event:ns.up.receive_duplicate",
+    "defaultMessage": "receive duplicate uplink message",
+    "translations": {
+      "en": "receive duplicate uplink message"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.rejoin.drop": {
+    "id": "event:ns.up.rejoin.drop",
+    "defaultMessage": "drop rejoin-request",
+    "translations": {
+      "en": "drop rejoin-request"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.rejoin.forward": {
+    "id": "event:ns.up.rejoin.forward",
+    "defaultMessage": "forward rejoin-request",
+    "translations": {
+      "en": "forward rejoin-request"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  }
+}
