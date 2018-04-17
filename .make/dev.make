@@ -24,7 +24,7 @@ DOCKER_BINARY ?= docker
 DEV_COCKROACH_IMAGE = cockroachdb/cockroach:v2.0.1
 DEV_REDIS_IMAGE = redis:4.0-alpine
 
-db_docker_prefix = ttn-devdb
+db_docker_prefix = ttn-lw-devdb
 cockroach_docker_name = $(db_docker_prefix)-cockroach
 redis_docker_name = $(db_docker_prefix)-redis
 
@@ -128,5 +128,28 @@ dev.git-diff:
 		git diff; \
 		exit 1; \
 	fi
+
+# Binaries
+
+dev.ttn-lw-stack.start: ttn-lw-stack
+	./release/ttn-lw-stack-$(GOOS)-$(GOARCH) start --log.level=debug --assets.dir=public
+
+dev.ttn-lw-identity-server.start: ttn-lw-identity-server
+	./release/ttn-lw-identity-server-$(GOOS)-$(GOARCH) start --log.level=debug --assets.dir=public
+
+dev.ttn-lw-gateway-server.start: ttn-lw-gateway-server
+	./release/ttn-lw-gateway-server-$(GOOS)-$(GOARCH) start --log.level=debug
+
+dev.ttn-lw-network-server.start: ttn-lw-network-server
+	./release/ttn-lw-network-server-$(GOOS)-$(GOARCH) start --log.level=debug
+
+dev.ttn-lw-application-server.start: ttn-lw-application-server
+	./release/ttn-lw-application-server-$(GOOS)-$(GOARCH) start --log.level=debug
+
+dev.ttn-lw-join-server.start: ttn-lw-join-server
+	./release/ttn-lw-join-server-$(GOOS)-$(GOARCH) start --log.level=debug
+
+dev.ttn-lw-console.start: ttn-lw-console
+	./release/ttn-lw-console-$(GOOS)-$(GOARCH) start --assets.dir=public --log.level=debug
 
 # vim: ft=make
