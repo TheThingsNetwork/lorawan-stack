@@ -92,3 +92,7 @@ build-all-platforms:
 	GOOS=darwin GOARCH=amd64 make build-all
 	GOOS=windows GOARCH=amd64 make build-all
 	GOOS=windows GOARCH=386 make build-all
+
+UPDATES_FILES = $(GO_MESSAGES_FILE),messages.xlsx
+
+translations: go.translations js.translations
