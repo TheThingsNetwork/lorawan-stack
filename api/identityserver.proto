@@ -153,14 +153,14 @@ service IsAdmin {
   // GetSettings returns the values of the editable settings.
   rpc GetSettings(google.protobuf.Empty) returns (IdentityServerSettings) {
     option (google.api.http) = {
-      get: "/admin/settings"
+      get: "/is/admin/settings"
     };
   };
 
   // UpdateSettings updates the editable settings.
   rpc UpdateSettings(UpdateSettingsRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/admin/settings"
+      patch: "/is/admin/settings"
       body: "*"
     };
   };
@@ -169,7 +169,7 @@ service IsAdmin {
   // A password is generated and sent to the user's email.
   rpc CreateUser(CreateUserRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/admin/users"
+      post: "/is/admin/users"
       body: "*"
     };
   };
@@ -177,14 +177,14 @@ service IsAdmin {
   // GetUser returns the user account that matches the identifier.
   rpc GetUser(UserIdentifiers) returns (User) {
     option (google.api.http) = {
-      get: "/admin/users/{user_id}"
+      get: "/is/admin/users/{user_id}"
     };
   };
 
   // ListUsers returns a list of users with optional filtering.
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
     option (google.api.http) = {
-      get: "/admin/users"
+      get: "/is/admin/users"
     };
   };
 
@@ -193,7 +193,7 @@ service IsAdmin {
   // the `SkipValidation` setting is disabled.
   rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/admin/users/{user.ids.user_id}"
+      patch: "/is/admin/users/{user.ids.user_id}"
       body: "*"
     };
   };
@@ -203,14 +203,14 @@ service IsAdmin {
   // by email to the user.
   rpc ResetUserPassword(UserIdentifiers) returns (ResetUserPasswordResponse) {
     option (google.api.http) = {
-      post: "/admin/users/{user_id}/reset-password"
+      post: "/is/admin/users/{user_id}/reset-password"
     };
   };
 
   // DeleteUser deletes an user.
   rpc DeleteUser(UserIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/admin/users/{user_id}"
+      delete: "/is/admin/users/{user_id}"
     };
   };
 
@@ -218,7 +218,7 @@ service IsAdmin {
   // All invitations are expirable and the TTL is defined on a setitngs variable.
   rpc SendInvitation(SendInvitationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/admin/invitations"
+      post: "/is/admin/invitations"
       body: "*"
     };
   };
@@ -226,35 +226,35 @@ service IsAdmin {
   // ListInvitations lists all the sent invitations.
   rpc ListInvitations(google.protobuf.Empty) returns (ListInvitationsResponse) {
     option (google.api.http) = {
-      get: "/admin/invitations"
+      get: "/is/admin/invitations"
     };
   };
 
   // DeleteInvitation revokes an unused invitation or deletes an expired one.
   rpc DeleteInvitation(DeleteInvitationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/admin/invitations/{email}"
+      delete: "/is/admin/invitations/{email}"
     };
   };
 
   // GetClient returns the client that matches the identifier.
   rpc GetClient(ClientIdentifiers) returns (Client) {
     option (google.api.http) = {
-      get: "/admin/clients/{client_id}"
+      get: "/is/admin/clients/{client_id}"
     };
   };
 
   // ListClients returns a list of third-party clients with optional filtering.
   rpc ListClients(ListClientsRequest) returns (ListClientsResponse) {
     option (google.api.http) = {
-      get: "/admin/clients"
+      get: "/is/admin/clients"
     };
   };
 
   // UpdateClient updates a third-party client.
   rpc UpdateClient(UpdateClientRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/admin/clients/{client.ids.client_id}"
+      patch: "/is/admin/clients/{client.ids.client_id}"
       body: "*"
     };
   };
@@ -263,7 +263,7 @@ service IsAdmin {
   // user authorizations.
   rpc DeleteClient(ClientIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/admin/clients/{client_id}"
+      delete: "/is/admin/clients/{client_id}"
     };
   };
 }
@@ -338,7 +338,7 @@ service IsUser {
   // CreateUser creates a new user on the network.
   rpc CreateUser(CreateUserRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/users"
+      post: "/is/users"
       body: "*"
     };
   };
@@ -346,7 +346,7 @@ service IsUser {
   // GetUser returns the current user.
   rpc GetUser(google.protobuf.Empty) returns (User) {
     option (google.api.http) = {
-      get: "/users/me"
+      get: "/is/users/me"
     };
   };
 
@@ -355,7 +355,7 @@ service IsUser {
   // the `SkipValidation` setting is disabled.
   rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/users/me"
+      patch: "/is/users/me"
       body: "*"
     };
   };
@@ -363,7 +363,7 @@ service IsUser {
   // UpdateUserPassword sets a new password for the authenticated user account.
   rpc UpdateUserPassword(UpdateUserPasswordRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      put: "/users/me/password"
+      put: "/is/users/me/password"
       body: "*"
     };
   };
@@ -371,14 +371,14 @@ service IsUser {
   // DeleteUser permantly deletes the user account of the authenticated user.
   rpc DeleteUser(google.protobuf.Empty) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/users/me"
+      delete: "/is/users/me"
     };
   };
 
   // GenerateUserAPIKey generates a new API key for the authenticated user and returns it.
   rpc GenerateUserAPIKey(GenerateUserAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
-      post: "/users/me/api-keys"
+      post: "/is/users/me/api-keys"
       body: "*"
     };
   };
@@ -386,14 +386,14 @@ service IsUser {
   // ListUserAPIKeys returns all the user API keys that the authenticated user has.
   rpc ListUserAPIKeys(google.protobuf.Empty) returns (ListUserAPIKeysResponse) {
     option (google.api.http) = {
-      get: "/users/me/api-keys"
+      get: "/is/users/me/api-keys"
     };
   };
 
   // UpdateUserAPIKey updates the rights of an API key of the authenticated user.
   rpc UpdateUserAPIKey(UpdateUserAPIKeyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/users/me/api-keys/{name}"
+      patch: "/is/users/me/api-keys/{name}"
       body: "*"
     };
   };
@@ -401,7 +401,7 @@ service IsUser {
   // RemoveUserAPIKey removes an API key from the authenticated user.
   rpc RemoveUserAPIKey(RemoveUserAPIKeyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/users/me/api-keys/{name}"
+      delete: "/is/users/me/api-keys/{name}"
     };
   };
 
@@ -409,7 +409,7 @@ service IsUser {
   // user by using the token sent to the user's email address.
   rpc ValidateUserEmail(ValidateUserEmailRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/users/me/validate-email"
+      post: "/is/users/me/validate-email"
       body: "*"
     };
   };
@@ -419,7 +419,7 @@ service IsUser {
   // token that has not been used will be revoked.
   rpc RequestUserEmailValidation(google.protobuf.Empty) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/users/me/validate-email/challenge"
+      post: "/is/users/me/validate-email/challenge"
     };
   };
 
@@ -427,7 +427,7 @@ service IsUser {
   // has currently authorized to access its account.
   rpc ListAuthorizedClients(google.protobuf.Empty) returns (ListAuthorizedClientsResponse) {
     option (google.api.http) = {
-      get: "/users/me/authorized-clients"
+      get: "/is/users/me/authorized-clients"
     };
   };
 
@@ -435,7 +435,7 @@ service IsUser {
   // user's account.
   rpc RevokeAuthorizedClient(ClientIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/users/me/authorized-clients/{client_id}"
+      delete: "/is/users/me/authorized-clients/{client_id}"
     };
   };
 }
@@ -525,10 +525,10 @@ service IsApplication {
   // with enough rights.
   rpc CreateApplication(CreateApplicationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/applications"
+      post: "/is/applications"
       body: "application"
       additional_bindings {
-        post: "/organizations/{organization_ids.organization_id}/applications"
+        post: "/is/organizations/{organization_ids.organization_id}/applications"
         body: "application"
       }
     };
@@ -537,7 +537,7 @@ service IsApplication {
   // GetApplication returns the application that matches the identifier.
   rpc GetApplication(ApplicationIdentifiers) returns (Application) {
     option (google.api.http) = {
-      get: "/applications/{application_id}"
+      get: "/is/applications/{application_id}"
     };
   };
 
@@ -547,9 +547,9 @@ service IsApplication {
   // rights.
   rpc ListApplications(ListApplicationsRequest) returns (ListApplicationsResponse) {
     option (google.api.http) = {
-      get: "/applications"
+      get: "/is/applications"
       additional_bindings {
-        get: "/organizations/{organization_ids.organization_id}/applications"
+        get: "/is/organizations/{organization_ids.organization_id}/applications"
       }
     };
   };
@@ -557,7 +557,7 @@ service IsApplication {
   // UpdateApplication edits an application.
   rpc UpdateApplication(UpdateApplicationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/applications/{application.ids.application_id}"
+      patch: "/is/applications/{application.ids.application_id}"
       body: "*"
     };
   };
@@ -565,7 +565,7 @@ service IsApplication {
   // DeleteApplication permantly deletes an application.
   rpc DeleteApplication(ApplicationIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/applications/{application_id}"
+      delete: "/is/applications/{application_id}"
     };
   };
 
@@ -573,7 +573,7 @@ service IsApplication {
   // and returns it.
   rpc GenerateApplicationAPIKey(GenerateApplicationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
-      post: "/applications/{application_ids.application_id}/api-keys"
+      post: "/is/applications/{application_ids.application_id}/api-keys"
       body: "*"
     };
   };
@@ -582,14 +582,14 @@ service IsApplication {
   // application has.
   rpc ListApplicationAPIKeys(ApplicationIdentifiers) returns (ListApplicationAPIKeysResponse) {
     option (google.api.http) = {
-      get: "/applications/{application_id}/api-keys"
+      get: "/is/applications/{application_id}/api-keys"
     };
   };
 
   // UpdateApplicationAPIKey updates the rights of a given application API key.
   rpc UpdateApplicationAPIKey(UpdateApplicationAPIKeyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/applications/{application_ids.application_id}/api-keys/{name}"
+      patch: "/is/applications/{application_ids.application_id}/api-keys/{name}"
       body: "*"
     };
   };
@@ -597,7 +597,7 @@ service IsApplication {
   // RemoveApplicationAPIKey removes a given API key from an application.
   rpc RemoveApplicationAPIKey(RemoveApplicationAPIKeyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/applications/{application_ids.application_id}/api-keys/{name}"
+      delete: "/is/applications/{application_ids.application_id}/api-keys/{name}"
     };
   };
 
@@ -609,7 +609,7 @@ service IsApplication {
   // is not equal to entire set of available `RIGHT_APPLICATION_XXXXXX` rights.
   rpc SetApplicationCollaborator(ApplicationCollaborator) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/applications/{application_ids.application_id}/collaborators"
+      post: "/is/applications/{application_ids.application_id}/collaborators"
       body: "*"
     };
   };
@@ -617,14 +617,14 @@ service IsApplication {
   // ListApplicationCollaborators returns all the collaborators for a given application.
   rpc ListApplicationCollaborators(ApplicationIdentifiers) returns (ListApplicationCollaboratorsResponse) {
     option (google.api.http) = {
-      get: "/applications/{application_id}/collaborators"
+      get: "/is/applications/{application_id}/collaborators"
     };
   };
 
   // ListApplicationRights returns all the rights that the caller has to the specified application.
   rpc ListApplicationRights(ApplicationIdentifiers) returns (ListApplicationRightsResponse) {
     option (google.api.http) = {
-      get: "/applications/{application_id}/rights"
+      get: "/is/applications/{application_id}/rights"
     };
   };
 }
@@ -712,10 +712,10 @@ service IsGateway {
   // the authenticated user is member of the organization with enough rights.
   rpc CreateGateway(CreateGatewayRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/gateways"
+      post: "/is/gateways"
       body: "gateway"
       additional_bindings {
-        post: "/organizations/{organization_ids.organization_id}/gateways"
+        post: "/is/organizations/{organization_ids.organization_id}/gateways"
         body: "gateway"
       }
     };
@@ -724,7 +724,7 @@ service IsGateway {
   // GetGateway returns the gateway that matches the identifier.
   rpc GetGateway(GatewayIdentifiers) returns (Gateway) {
     option (google.api.http) = {
-      get: "/gateways/{gateway_id}"
+      get: "/is/gateways/{gateway_id}"
     };
   };
 
@@ -733,9 +733,9 @@ service IsGateway {
   // is collaborator if and only if the authenticated user has enough rights.
   rpc ListGateways(ListGatewaysRequest) returns (ListGatewaysResponse) {
     option (google.api.http) = {
-      get: "/gateways"
+      get: "/is/gateways"
       additional_bindings {
-        get: "/organizations/{organization_ids.organization_id}/gateways"
+        get: "/is/organizations/{organization_ids.organization_id}/gateways"
       }
     };
   };
@@ -743,7 +743,7 @@ service IsGateway {
   // UpdateGateway edits a gateway and retrieves the updated version.
   rpc UpdateGateway(UpdateGatewayRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/gateways/{gateway.ids.gateway_id}"
+      patch: "/is/gateways/{gateway.ids.gateway_id}"
       body: "*"
     };
   };
@@ -751,7 +751,7 @@ service IsGateway {
   // DeleteGateway permantly deletes a gateway.
   rpc DeleteGateway(GatewayIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/gateways/{gateway_id}"
+      delete: "/is/gateways/{gateway_id}"
     };
   };
 
@@ -759,7 +759,7 @@ service IsGateway {
   // returns it.
   rpc GenerateGatewayAPIKey(GenerateGatewayAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
-      post: "/gateways/{gateway_ids.gateway_id}/api-keys"
+      post: "/is/gateways/{gateway_ids.gateway_id}/api-keys"
       body: "*"
     };
   };
@@ -767,14 +767,14 @@ service IsGateway {
   // ListGatewayAPIKeys returns all the gateway API keys that a given gateway has.
   rpc ListGatewayAPIKeys(GatewayIdentifiers) returns (ListGatewayAPIKeysResponse) {
     option (google.api.http) = {
-      get: "/gateways/{gateway_id}/api-keys"
+      get: "/is/gateways/{gateway_id}/api-keys"
     };
   };
 
   // UpdateGatewayAPIKey updates the rights of a gateway API key.
   rpc UpdateGatewayAPIKey(UpdateGatewayAPIKeyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/gateways/{gateway_ids.gateway_id}/api-keys/{name}"
+      patch: "/is/gateways/{gateway_ids.gateway_id}/api-keys/{name}"
       body: "*"
     };
   };
@@ -782,7 +782,7 @@ service IsGateway {
   // RemoveGatewayAPIKey removes a given API key from a gateway.
   rpc RemoveGatewayAPIKey(RemoveGatewayAPIKeyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/gateways/{gateway_ids.gateway_id}/api-keys/{name}"
+      delete: "/is/gateways/{gateway_ids.gateway_id}/api-keys/{name}"
     };
   };
 
@@ -794,7 +794,7 @@ service IsGateway {
   // is not equal to entire set of available `RIGHT_GATEWAY_XXXXXX` rights.
   rpc SetGatewayCollaborator(GatewayCollaborator) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/gateways/{gateway_ids.gateway_id}/collaborators"
+      post: "/is/gateways/{gateway_ids.gateway_id}/collaborators"
       body: "*"
     };
   };
@@ -802,14 +802,14 @@ service IsGateway {
   // ListGatewayCollaborators returns all the collaborators for a given gateway.
   rpc ListGatewayCollaborators(GatewayIdentifiers) returns (ListGatewayCollaboratorsResponse) {
     option (google.api.http) = {
-      get: "/gateways/{gateway_id}/collaborators"
+      get: "/is/gateways/{gateway_id}/collaborators"
     };
   };
 
   // ListGatewayRights returns all the rights that the caller has to the specified gateway.
   rpc ListGatewayRights(GatewayIdentifiers) returns (ListGatewayRightsResponse) {
     option (google.api.http) = {
-      get: "/gateways/{gateway_id}/rights"
+      get: "/is/gateways/{gateway_id}/rights"
     };
   };
 }
@@ -841,7 +841,7 @@ service IsClient {
   // has to be approved by the admins.
   rpc CreateClient(CreateClientRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/clients"
+      post: "/is/clients"
       body: "*"
     };
   };
@@ -851,21 +851,21 @@ service IsClient {
   // will only return the publicly information available about the client.
   rpc GetClient(ClientIdentifiers) returns (Client) {
     option (google.api.http) = {
-      get: "/clients/{client_id}"
+      get: "/is/clients/{client_id}"
     };
   };
 
   // ListClients returns all the clients the authenticated user has created.
   rpc ListClients(google.protobuf.Empty) returns (ListClientsResponse) {
     option (google.api.http) = {
-      get: "/clients"
+      get: "/is/clients"
     };
   };
 
   // UpdateClient sends a request to update a client.
   rpc UpdateClient(UpdateClientRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/clients/{client.ids.client_id}"
+      patch: "/is/clients/{client.ids.client_id}"
       body: "*"
     };
   };
@@ -874,7 +874,7 @@ service IsClient {
   // user authorizations.
   rpc DeleteClient(ClientIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/clients/{client_id}"
+      delete: "/is/clients/{client_id}"
     };
   };
 }
@@ -945,7 +945,7 @@ service IsOrganization {
   // CreateOrganization creates an organization.
   rpc CreateOrganization(CreateOrganizationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/organizations"
+      post: "/is/organizations"
       body: "*"
     };
   };
@@ -953,21 +953,21 @@ service IsOrganization {
   // GetOrganization returns an organization.
   rpc GetOrganization(OrganizationIdentifiers) returns (Organization) {
     option (google.api.http) = {
-      get: "/organizations/{organization_id}"
+      get: "/is/organizations/{organization_id}"
     };
   };
 
   // ListOrganizations returns the list of organizations the caller is member of.
   rpc ListOrganizations(google.protobuf.Empty) returns (ListOrganizationsResponse) {
     option (google.api.http) = {
-      get: "/organizations"
+      get: "/is/organizations"
     };
   };
 
   // UpdateOrganization updates an organization.
   rpc UpdateOrganization(UpdateOrganizationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/organizations/{organization.ids.organization_id}"
+      patch: "/is/organizations/{organization.ids.organization_id}"
       body: "*"
     };
   };
@@ -975,14 +975,14 @@ service IsOrganization {
   // DeleteOrganization deletes an organization.
   rpc DeleteOrganization(OrganizationIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/organizations/{organization_id}"
+      delete: "/is/organizations/{organization_id}"
     };
   };
 
   // GenerateOrganizationAPIKey generates an API key and returns it.
   rpc GenerateOrganizationAPIKey(GenerateOrganizationAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
-      post: "/organizations/{organization_ids.organization_id}/api-keys"
+      post: "/is/organizations/{organization_ids.organization_id}/api-keys"
       body: "*"
     };
   };
@@ -990,14 +990,14 @@ service IsOrganization {
   // ListOrganizationAPIKeys list the API keys the organization has.
   rpc ListOrganizationAPIKeys(OrganizationIdentifiers) returns (ListOrganizationAPIKeysResponse) {
     option (google.api.http) = {
-      get: "/organizations/{organization_id}/api-keys"
+      get: "/is/organizations/{organization_id}/api-keys"
     };
   };
 
   // UpdateOrganizationAPIKey updates an organization's API key.
   rpc UpdateOrganizationAPIKey(UpdateOrganizationAPIKeyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/organizations/{organization_ids.organization_id}/api-keys/{name}"
+      patch: "/is/organizations/{organization_ids.organization_id}/api-keys/{name}"
       body: "*"
     };
   };
@@ -1005,7 +1005,7 @@ service IsOrganization {
   // RemoveOrganizationAPIKey removes an organization's API key.
   rpc RemoveOrganizationAPIKey(RemoveOrganizationAPIKeyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/organizations/{organization_ids.organization_id}/api-keys/{name}"
+      delete: "/is/organizations/{organization_ids.organization_id}/api-keys/{name}"
     };
   };
 
@@ -1017,7 +1017,7 @@ service IsOrganization {
   // is not equal to entire set of available `RIGHT_ORGANIZATION_XXXXXX` rights.
   rpc SetOrganizationMember(OrganizationMember) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/organizations/{organization_ids.organization_id}/members"
+      post: "/is/organizations/{organization_ids.organization_id}/members"
       body: "*"
     };
   };
@@ -1025,14 +1025,14 @@ service IsOrganization {
   // ListOrganizationMembers returns a list of all the members that belong to an organization.
   rpc ListOrganizationMembers(OrganizationIdentifiers) returns (ListOrganizationMembersResponse) {
     option (google.api.http) = {
-      get: "/organizations/{organization_id}/members"
+      get: "/is/organizations/{organization_id}/members"
     };
   };
 
   // ListOrganizationRights returns the rights the caller has to an organization.
   rpc ListOrganizationRights(OrganizationIdentifiers) returns (ListOrganizationRightsResponse) {
     option (google.api.http) = {
-      get: "/organizations/{organization_id}/rights"
+      get: "/is/organizations/{organization_id}/rights"
     };
   };
 }

@@ -2381,35 +2381,35 @@ func RegisterIsAdminHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 }
 
 var (
-	pattern_IsAdmin_GetSettings_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"admin", "settings"}, ""))
+	pattern_IsAdmin_GetSettings_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"is", "admin", "settings"}, ""))
 
-	pattern_IsAdmin_UpdateSettings_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"admin", "settings"}, ""))
+	pattern_IsAdmin_UpdateSettings_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"is", "admin", "settings"}, ""))
 
-	pattern_IsAdmin_CreateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"admin", "users"}, ""))
+	pattern_IsAdmin_CreateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"is", "admin", "users"}, ""))
 
-	pattern_IsAdmin_GetUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"admin", "users", "user_id"}, ""))
+	pattern_IsAdmin_GetUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"is", "admin", "users", "user_id"}, ""))
 
-	pattern_IsAdmin_ListUsers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"admin", "users"}, ""))
+	pattern_IsAdmin_ListUsers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"is", "admin", "users"}, ""))
 
-	pattern_IsAdmin_UpdateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"admin", "users", "user.ids.user_id"}, ""))
+	pattern_IsAdmin_UpdateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"is", "admin", "users", "user.ids.user_id"}, ""))
 
-	pattern_IsAdmin_ResetUserPassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"admin", "users", "user_id", "reset-password"}, ""))
+	pattern_IsAdmin_ResetUserPassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"is", "admin", "users", "user_id", "reset-password"}, ""))
 
-	pattern_IsAdmin_DeleteUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"admin", "users", "user_id"}, ""))
+	pattern_IsAdmin_DeleteUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"is", "admin", "users", "user_id"}, ""))
 
-	pattern_IsAdmin_SendInvitation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"admin", "invitations"}, ""))
+	pattern_IsAdmin_SendInvitation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"is", "admin", "invitations"}, ""))
 
-	pattern_IsAdmin_ListInvitations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"admin", "invitations"}, ""))
+	pattern_IsAdmin_ListInvitations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"is", "admin", "invitations"}, ""))
 
-	pattern_IsAdmin_DeleteInvitation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"admin", "invitations", "email"}, ""))
+	pattern_IsAdmin_DeleteInvitation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"is", "admin", "invitations", "email"}, ""))
 
-	pattern_IsAdmin_GetClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"admin", "clients", "client_id"}, ""))
+	pattern_IsAdmin_GetClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"is", "admin", "clients", "client_id"}, ""))
 
-	pattern_IsAdmin_ListClients_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"admin", "clients"}, ""))
+	pattern_IsAdmin_ListClients_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"is", "admin", "clients"}, ""))
 
-	pattern_IsAdmin_UpdateClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"admin", "clients", "client.ids.client_id"}, ""))
+	pattern_IsAdmin_UpdateClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"is", "admin", "clients", "client.ids.client_id"}, ""))
 
-	pattern_IsAdmin_DeleteClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"admin", "clients", "client_id"}, ""))
+	pattern_IsAdmin_DeleteClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"is", "admin", "clients", "client_id"}, ""))
 )
 
 var (
@@ -2863,31 +2863,31 @@ func RegisterIsUserHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 }
 
 var (
-	pattern_IsUser_CreateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"users"}, ""))
+	pattern_IsUser_CreateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"is", "users"}, ""))
 
-	pattern_IsUser_GetUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"users", "me"}, ""))
+	pattern_IsUser_GetUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"is", "users", "me"}, ""))
 
-	pattern_IsUser_UpdateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"users", "me"}, ""))
+	pattern_IsUser_UpdateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"is", "users", "me"}, ""))
 
-	pattern_IsUser_UpdateUserPassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "password"}, ""))
+	pattern_IsUser_UpdateUserPassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"is", "users", "me", "password"}, ""))
 
-	pattern_IsUser_DeleteUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"users", "me"}, ""))
+	pattern_IsUser_DeleteUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"is", "users", "me"}, ""))
 
-	pattern_IsUser_GenerateUserAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "api-keys"}, ""))
+	pattern_IsUser_GenerateUserAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"is", "users", "me", "api-keys"}, ""))
 
-	pattern_IsUser_ListUserAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "api-keys"}, ""))
+	pattern_IsUser_ListUserAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"is", "users", "me", "api-keys"}, ""))
 
-	pattern_IsUser_UpdateUserAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "me", "api-keys", "name"}, ""))
+	pattern_IsUser_UpdateUserAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"is", "users", "me", "api-keys", "name"}, ""))
 
-	pattern_IsUser_RemoveUserAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "me", "api-keys", "name"}, ""))
+	pattern_IsUser_RemoveUserAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"is", "users", "me", "api-keys", "name"}, ""))
 
-	pattern_IsUser_ValidateUserEmail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "validate-email"}, ""))
+	pattern_IsUser_ValidateUserEmail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"is", "users", "me", "validate-email"}, ""))
 
-	pattern_IsUser_RequestUserEmailValidation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"users", "me", "validate-email", "challenge"}, ""))
+	pattern_IsUser_RequestUserEmailValidation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"is", "users", "me", "validate-email", "challenge"}, ""))
 
-	pattern_IsUser_ListAuthorizedClients_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "me", "authorized-clients"}, ""))
+	pattern_IsUser_ListAuthorizedClients_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"is", "users", "me", "authorized-clients"}, ""))
 
-	pattern_IsUser_RevokeAuthorizedClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "me", "authorized-clients", "client_id"}, ""))
+	pattern_IsUser_RevokeAuthorizedClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"is", "users", "me", "authorized-clients", "client_id"}, ""))
 )
 
 var (
@@ -3366,33 +3366,33 @@ func RegisterIsApplicationHandlerClient(ctx context.Context, mux *runtime.ServeM
 }
 
 var (
-	pattern_IsApplication_CreateApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"applications"}, ""))
+	pattern_IsApplication_CreateApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"is", "applications"}, ""))
 
-	pattern_IsApplication_CreateApplication_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "applications"}, ""))
+	pattern_IsApplication_CreateApplication_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "organizations", "organization_ids.organization_id", "applications"}, ""))
 
-	pattern_IsApplication_GetApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application_id"}, ""))
+	pattern_IsApplication_GetApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"is", "applications", "application_id"}, ""))
 
-	pattern_IsApplication_ListApplications_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"applications"}, ""))
+	pattern_IsApplication_ListApplications_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"is", "applications"}, ""))
 
-	pattern_IsApplication_ListApplications_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "applications"}, ""))
+	pattern_IsApplication_ListApplications_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "organizations", "organization_ids.organization_id", "applications"}, ""))
 
-	pattern_IsApplication_UpdateApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application.ids.application_id"}, ""))
+	pattern_IsApplication_UpdateApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"is", "applications", "application.ids.application_id"}, ""))
 
-	pattern_IsApplication_DeleteApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application_id"}, ""))
+	pattern_IsApplication_DeleteApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"is", "applications", "application_id"}, ""))
 
-	pattern_IsApplication_GenerateApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "api-keys"}, ""))
+	pattern_IsApplication_GenerateApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "applications", "application_ids.application_id", "api-keys"}, ""))
 
-	pattern_IsApplication_ListApplicationAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id", "api-keys"}, ""))
+	pattern_IsApplication_ListApplicationAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "applications", "application_id", "api-keys"}, ""))
 
-	pattern_IsApplication_UpdateApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "application_ids.application_id", "api-keys", "name"}, ""))
+	pattern_IsApplication_UpdateApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"is", "applications", "application_ids.application_id", "api-keys", "name"}, ""))
 
-	pattern_IsApplication_RemoveApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "application_ids.application_id", "api-keys", "name"}, ""))
+	pattern_IsApplication_RemoveApplicationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"is", "applications", "application_ids.application_id", "api-keys", "name"}, ""))
 
-	pattern_IsApplication_SetApplicationCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "collaborators"}, ""))
+	pattern_IsApplication_SetApplicationCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "applications", "application_ids.application_id", "collaborators"}, ""))
 
-	pattern_IsApplication_ListApplicationCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id", "collaborators"}, ""))
+	pattern_IsApplication_ListApplicationCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "applications", "application_id", "collaborators"}, ""))
 
-	pattern_IsApplication_ListApplicationRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id", "rights"}, ""))
+	pattern_IsApplication_ListApplicationRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "applications", "application_id", "rights"}, ""))
 )
 
 var (
@@ -3873,33 +3873,33 @@ func RegisterIsGatewayHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 }
 
 var (
-	pattern_IsGateway_CreateGateway_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"gateways"}, ""))
+	pattern_IsGateway_CreateGateway_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"is", "gateways"}, ""))
 
-	pattern_IsGateway_CreateGateway_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "gateways"}, ""))
+	pattern_IsGateway_CreateGateway_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "organizations", "organization_ids.organization_id", "gateways"}, ""))
 
-	pattern_IsGateway_GetGateway_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"gateways", "gateway_id"}, ""))
+	pattern_IsGateway_GetGateway_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"is", "gateways", "gateway_id"}, ""))
 
-	pattern_IsGateway_ListGateways_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"gateways"}, ""))
+	pattern_IsGateway_ListGateways_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"is", "gateways"}, ""))
 
-	pattern_IsGateway_ListGateways_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "gateways"}, ""))
+	pattern_IsGateway_ListGateways_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "organizations", "organization_ids.organization_id", "gateways"}, ""))
 
-	pattern_IsGateway_UpdateGateway_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"gateways", "gateway.ids.gateway_id"}, ""))
+	pattern_IsGateway_UpdateGateway_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"is", "gateways", "gateway.ids.gateway_id"}, ""))
 
-	pattern_IsGateway_DeleteGateway_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"gateways", "gateway_id"}, ""))
+	pattern_IsGateway_DeleteGateway_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"is", "gateways", "gateway_id"}, ""))
 
-	pattern_IsGateway_GenerateGatewayAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_ids.gateway_id", "api-keys"}, ""))
+	pattern_IsGateway_GenerateGatewayAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "gateways", "gateway_ids.gateway_id", "api-keys"}, ""))
 
-	pattern_IsGateway_ListGatewayAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_id", "api-keys"}, ""))
+	pattern_IsGateway_ListGatewayAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "gateways", "gateway_id", "api-keys"}, ""))
 
-	pattern_IsGateway_UpdateGatewayAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"gateways", "gateway_ids.gateway_id", "api-keys", "name"}, ""))
+	pattern_IsGateway_UpdateGatewayAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"is", "gateways", "gateway_ids.gateway_id", "api-keys", "name"}, ""))
 
-	pattern_IsGateway_RemoveGatewayAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"gateways", "gateway_ids.gateway_id", "api-keys", "name"}, ""))
+	pattern_IsGateway_RemoveGatewayAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"is", "gateways", "gateway_ids.gateway_id", "api-keys", "name"}, ""))
 
-	pattern_IsGateway_SetGatewayCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_ids.gateway_id", "collaborators"}, ""))
+	pattern_IsGateway_SetGatewayCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "gateways", "gateway_ids.gateway_id", "collaborators"}, ""))
 
-	pattern_IsGateway_ListGatewayCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_id", "collaborators"}, ""))
+	pattern_IsGateway_ListGatewayCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "gateways", "gateway_id", "collaborators"}, ""))
 
-	pattern_IsGateway_ListGatewayRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_id", "rights"}, ""))
+	pattern_IsGateway_ListGatewayRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "gateways", "gateway_id", "rights"}, ""))
 )
 
 var (
@@ -4119,15 +4119,15 @@ func RegisterIsClientHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 }
 
 var (
-	pattern_IsClient_CreateClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"clients"}, ""))
+	pattern_IsClient_CreateClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"is", "clients"}, ""))
 
-	pattern_IsClient_GetClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"clients", "client_id"}, ""))
+	pattern_IsClient_GetClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"is", "clients", "client_id"}, ""))
 
-	pattern_IsClient_ListClients_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"clients"}, ""))
+	pattern_IsClient_ListClients_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"is", "clients"}, ""))
 
-	pattern_IsClient_UpdateClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"clients", "client.ids.client_id"}, ""))
+	pattern_IsClient_UpdateClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"is", "clients", "client.ids.client_id"}, ""))
 
-	pattern_IsClient_DeleteClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"clients", "client_id"}, ""))
+	pattern_IsClient_DeleteClient_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"is", "clients", "client_id"}, ""))
 )
 
 var (
@@ -4532,29 +4532,29 @@ func RegisterIsOrganizationHandlerClient(ctx context.Context, mux *runtime.Serve
 }
 
 var (
-	pattern_IsOrganization_CreateOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"organizations"}, ""))
+	pattern_IsOrganization_CreateOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"is", "organizations"}, ""))
 
-	pattern_IsOrganization_GetOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization_id"}, ""))
+	pattern_IsOrganization_GetOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"is", "organizations", "organization_id"}, ""))
 
-	pattern_IsOrganization_ListOrganizations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"organizations"}, ""))
+	pattern_IsOrganization_ListOrganizations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"is", "organizations"}, ""))
 
-	pattern_IsOrganization_UpdateOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization.ids.organization_id"}, ""))
+	pattern_IsOrganization_UpdateOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"is", "organizations", "organization.ids.organization_id"}, ""))
 
-	pattern_IsOrganization_DeleteOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization_id"}, ""))
+	pattern_IsOrganization_DeleteOrganization_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"is", "organizations", "organization_id"}, ""))
 
-	pattern_IsOrganization_GenerateOrganizationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "api-keys"}, ""))
+	pattern_IsOrganization_GenerateOrganizationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "organizations", "organization_ids.organization_id", "api-keys"}, ""))
 
-	pattern_IsOrganization_ListOrganizationAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id", "api-keys"}, ""))
+	pattern_IsOrganization_ListOrganizationAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "organizations", "organization_id", "api-keys"}, ""))
 
-	pattern_IsOrganization_UpdateOrganizationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"organizations", "organization_ids.organization_id", "api-keys", "name"}, ""))
+	pattern_IsOrganization_UpdateOrganizationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"is", "organizations", "organization_ids.organization_id", "api-keys", "name"}, ""))
 
-	pattern_IsOrganization_RemoveOrganizationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"organizations", "organization_ids.organization_id", "api-keys", "name"}, ""))
+	pattern_IsOrganization_RemoveOrganizationAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"is", "organizations", "organization_ids.organization_id", "api-keys", "name"}, ""))
 
-	pattern_IsOrganization_SetOrganizationMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "members"}, ""))
+	pattern_IsOrganization_SetOrganizationMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "organizations", "organization_ids.organization_id", "members"}, ""))
 
-	pattern_IsOrganization_ListOrganizationMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id", "members"}, ""))
+	pattern_IsOrganization_ListOrganizationMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "organizations", "organization_id", "members"}, ""))
 
-	pattern_IsOrganization_ListOrganizationRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id", "rights"}, ""))
+	pattern_IsOrganization_ListOrganizationRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"is", "organizations", "organization_id", "rights"}, ""))
 )
 
 var (
