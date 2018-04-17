@@ -14,22 +14,7 @@
 
 package ttnpb
 
-import (
-	"github.com/TheThingsNetwork/ttn/pkg/types"
-	"github.com/TheThingsNetwork/ttn/pkg/validate"
-)
-
-// Validate is used as validator function by the GRPC validator interceptor.
-func (i UserIdentifiers) Validate() error {
-	if i.IsZero() {
-		return ErrEmptyIdentifiers.New(nil)
-	}
-
-	return validate.All(
-		validate.Field(i.UserID, validate.NotRequired, validate.ID).DescribeFieldName("User ID"),
-		validate.Field(i.Email, validate.NotRequired, validate.Email).DescribeFieldName("Email"),
-	)
-}
+import "github.com/TheThingsNetwork/ttn/pkg/types"
 
 // IsZero returns true if all identifiers have zero-values.
 func (i UserIdentifiers) IsZero() bool {
@@ -51,11 +36,6 @@ func (i UserIdentifiers) Contains(other UserIdentifiers) bool {
 		(other.Email == "" || i.Email == other.Email)
 }
 
-// Validate is used as validator function by the GRPC validator interceptor.
-func (i ApplicationIdentifiers) Validate() error {
-	return validate.Field(i.ApplicationID, validate.ID).DescribeFieldName("Application ID")
-}
-
 // Contains returns true if other is contained in the receiver.
 func (i ApplicationIdentifiers) Contains(other ApplicationIdentifiers) bool {
 	return i.ApplicationID == other.ApplicationID
@@ -74,18 +54,6 @@ func (i GatewayIdentifiers) GetEUI() *types.EUI64 {
 	return new(types.EUI64)
 }
 
-// Validate is used as validator function by the GRPC validator interceptor.
-func (i GatewayIdentifiers) Validate() error {
-	if i.IsZero() {
-		return ErrEmptyIdentifiers.New(nil)
-	}
-
-	return validate.All(
-		validate.Field(i.GatewayID, validate.NotRequired, validate.ID).DescribeFieldName("Gateway ID"),
-		validate.Field(i.EUI, validate.NotRequired).DescribeFieldName("EUI"),
-	)
-}
-
 // IsZero returns true if all identifiers have zero-values.
 func (i GatewayIdentifiers) IsZero() bool {
 	return i.GatewayID == "" && i.EUI == nil
@@ -101,19 +69,9 @@ func (i GatewayIdentifiers) Contains(other GatewayIdentifiers) bool {
 		((i.EUI == nil && other.EUI == nil) || (i.EUI != nil && other.EUI == nil) || i.EUI.Equal(*other.EUI))
 }
 
-// Validate is used as validator function by the GRPC validator interceptor.
-func (i ClientIdentifiers) Validate() error {
-	return validate.Field(i.ClientID, validate.ID).DescribeFieldName("Client ID")
-}
-
 // IsZero returns true if all identifiers have zero-values.
 func (i ClientIdentifiers) IsZero() bool {
 	return i.ClientID == ""
-}
-
-// Validate is used as validator function by the GRPC validator interceptor.
-func (i OrganizationIdentifiers) Validate() error {
-	return validate.Field(i.OrganizationID, validate.ID).DescribeFieldName("Organization ID")
 }
 
 // IsZero returns true if all identifiers have zero-values.
@@ -124,17 +82,4 @@ func (i OrganizationIdentifiers) IsZero() bool {
 // Contains returns true if other is contained in the receiver.
 func (i OrganizationIdentifiers) Contains(other OrganizationIdentifiers) bool {
 	return i.OrganizationID == other.OrganizationID
-}
-
-// Validate is used as validator function by the GRPC validator interceptor.
-func (i OrganizationOrUserIdentifiers) Validate() error {
-	if id := i.GetUserID(); id != nil {
-		return id.Validate()
-	}
-
-	if id := i.GetOrganizationID(); id != nil {
-		return id.Validate()
-	}
-
-	return ErrEmptyIdentifiers.New(nil)
 }
