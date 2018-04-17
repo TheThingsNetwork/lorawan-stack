@@ -27,10 +27,12 @@ func init() {
 	gob.Register(authCookie{})
 }
 
+const authCookieName = "_console_auth"
+
 // AuthCookie returns a new authCookie.
 func (console *Console) AuthCookie() *cookie.Cookie {
 	return &cookie.Cookie{
-		Name:     "auth",
+		Name:     authCookieName,
 		HTTPOnly: true,
 		Path:     console.config.mount,
 	}

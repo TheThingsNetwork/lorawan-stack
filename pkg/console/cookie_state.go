@@ -28,9 +28,11 @@ func init() {
 	gob.Register(state{})
 }
 
+const stateCookieName = "_console_state"
+
 func (console *Console) StateCookie() *cookie.Cookie {
 	return &cookie.Cookie{
-		Name:     "state",
+		Name:     stateCookieName,
 		Path:     console.config.mount,
 		MaxAge:   10 * time.Minute,
 		HTTPOnly: true,

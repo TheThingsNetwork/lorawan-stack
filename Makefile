@@ -70,8 +70,13 @@ ttn-lw-application-server: $(RELEASE_DIR)/ttn-lw-application-server-$(GOOS)-$(GO
 ttn-lw-join-server: MAIN=./cmd/ttn-lw-join-server/main.go
 ttn-lw-join-server: $(RELEASE_DIR)/ttn-lw-join-server-$(GOOS)-$(GOARCH)
 
+# console binary
+ttn-lw-console: MAIN=./cmd/ttn-lw-console/main.go
+ttn-lw-console: js.build
+ttn-lw-console: $(RELEASE_DIR)/ttn-lw-console-$(GOOS)-$(GOARCH)
+
 # All binaries
-build-all: ttn-lw-stack ttn-lw-identity-server ttn-lw-gateway-server ttn-lw-network-server ttn-lw-application-server ttn-lw-join-server
+build-all: ttn-lw-stack ttn-lw-identity-server ttn-lw-gateway-server ttn-lw-network-server ttn-lw-application-server ttn-lw-join-server ttn-lw-console
 
 # All supported platforms
 build-all-platforms:
