@@ -30,6 +30,10 @@ include .make/js/main.make
 include .make/dev.make
 include .make/styl/main.make
 
+assets: js.build
+	@$(log) "building assets package"
+	@go-bindata-assetfs -pkg assets -o "./pkg/assets/bindata.go" -ignore libs.bundle.js $(PUBLIC_DIR)
+
 ci.encrypt-variables:
 	keybase encrypt -b -i ci/variables.yml -o ci/variables.yml.encrypted johanstokking htdvisser ericgo
 
