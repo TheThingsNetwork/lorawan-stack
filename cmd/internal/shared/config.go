@@ -17,9 +17,11 @@ package shared
 import (
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/assets"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/web"
 )
 
 // DefaultBaseConfig is the default base component configuration.
@@ -74,6 +76,14 @@ var DefaultEventsConfig = config.Events{
 	Backend: "internal",
 }
 
+// DefaultAssetsConfig is the default config for the assets server.
+var DefaultAssetsConfig = assets.Config{
+	Mount: "/assets",
+}
+
+// DefaultWebConfig is the default config for the web server.
+var DefaultWebConfig = web.Config{}
+
 // DefaultServiceBase is the default base config for a service.
 var DefaultServiceBase = config.ServiceBase{
 	Base:           DefaultBaseConfig,
@@ -84,6 +94,7 @@ var DefaultServiceBase = config.ServiceBase{
 	HTTP:           DefaultHTTPConfig,
 	TLS:            DefaultTLSConfig,
 	Identity:       DefaultIdentityConfig,
+	Web:            DefaultWebConfig,
 	FrequencyPlans: DefaultFrequencyPlansConfig,
 }
 

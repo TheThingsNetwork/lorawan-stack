@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/web"
 )
 
 // Base represents base component configuration.
@@ -154,6 +155,7 @@ type ServiceBase struct {
 	Identity       Identity              `name:"identity"`
 	RemoteConfig   *RemoteProviderConfig `name:"remote-config"`
 	Sentry         Sentry                `name:"sentry"`
+	Web            web.Config            `name:"web"`
 	FrequencyPlans FrequencyPlans        `name:"frequency-plans"`
 	RightsFetching rights.Config         `name:"rights-fetching"`
 }
