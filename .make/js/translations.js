@@ -80,7 +80,7 @@ Options:
 /**
  * Find a list of files based on a glob pattern.
  *
- * @param {string} pat - THe glob pattern, eg. "./foo/*.js"
+ * @param {string} pat - The glob pattern, eg. "./foo/*.js"
  * @returns {Promise<Array<string>>} - A promise that resolves to an array of
  *   filenames that match the pattern.
  */

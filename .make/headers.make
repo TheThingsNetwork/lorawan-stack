@@ -28,6 +28,7 @@ no_blanks = sed '/^$$/d'
 # fallbacks for
 GO_LINT_FILES ?= $(empty)
 JS_LINT_FILES ?= $(empty)
+STYL_LINT_FILES ?= $(empty)
 
 only_make = grep '\.make$$'
 MAKE_LINT_FILES = $(ALL_FILES) | $(only_make)
@@ -38,7 +39,7 @@ PROTO_FILES = $(ALL_FILES) | $(only_proto)
 ls:
 	@$(MAKE_LINT_FILES)
 
-HEADER_FILES ?= $(GO_LINT_FILES) && $(JS_LINT_FILES) && $(MAKE_LINT_FILES) && $(PROTO_FILES)
+HEADER_FILES ?= $(GO_LINT_FILES) && $(JS_LINT_FILES) && $(MAKE_LINT_FILES) && $(PROTO_FILES) && $(STYL_LINT_FILES)
 HEADER_EXTRA_FILES ?=
 
 # the files to check for a header

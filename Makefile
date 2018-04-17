@@ -28,6 +28,7 @@ include .make/go/main.make
 include .make/protos/main.make
 include .make/js/main.make
 include .make/dev.make
+include .make/styl/main.make
 
 ci.encrypt-variables:
 	keybase encrypt -b -i ci/variables.yml -o ci/variables.yml.encrypted johanstokking htdvisser ericgo
