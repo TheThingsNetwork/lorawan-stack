@@ -38,7 +38,10 @@ var (
 			reg := deviceregistry.New(store.NewByteStoreClient(redis))
 			config.NS.Registry = reg
 
-			ns := networkserver.New(c, &config.NS)
+			ns, err := networkserver.New(c, &config.NS)
+			if err != nil {
+				return errors.NewWithCause(err, "Could not create network server")
+			}
 			_ = ns
 
 			logger.Info("Starting network server...")

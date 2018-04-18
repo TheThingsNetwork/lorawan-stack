@@ -60,7 +60,10 @@ var (
 			}
 			_ = gs
 
-			ns := networkserver.New(c, &config.NS)
+			ns, err := networkserver.New(c, &config.NS)
+			if err != nil {
+				return errors.NewWithCause(err, "Could not create network server")
+			}
 			_ = ns
 
 			as := applicationserver.New(c, &config.AS)

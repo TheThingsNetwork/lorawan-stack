@@ -36,16 +36,25 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/mohae/deepcopy"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-// recentUplinkCount is the maximium amount of recent uplinks stored per device.
-const recentUplinkCount = 20
+const (
+	// recentUplinkCount is the maximium amount of recent uplinks stored per device.
+	recentUplinkCount = 20
 
-const maxFCntGap = 16384
-const accumulationCapacity = 20
+	// maxFCntGap is the maximum FCnt gap as per LoRaWAN1.0 spec.
+	maxFCntGap = 16384
+
+	// accumulationCapacity is the initial capacity of the accumulator
+	accumulationCapacity = 20
+)
+
+// WindowEndFunc is a function, which is used by network server to determine the end of deduplication and cooldown windows.
+type WindowEndFunc func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time
 
 // NetworkServer implements the network server component.
 //
@@ -67,8 +76,8 @@ type NetworkServer struct {
 	metadataAccumulatorPool *sync.Pool
 	hashPool                *sync.Pool
 
-	deduplicationWindow time.Duration
-	cooldownWindow      time.Duration
+	deduplicationDone WindowEndFunc
+	collectionDone    WindowEndFunc
 }
 
 // Config represents the NetworkServer configuration.
@@ -79,8 +88,52 @@ type Config struct {
 	CooldownWindow      time.Duration            `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
 }
 
+// NewWindowEndAfterFunc returns a WindowEndFunc, which closes
+// the returned channel after at least duration d after msg.ServerTime or if the context is done.
+func NewWindowEndAfterFunc(d time.Duration) WindowEndFunc {
+	return func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time {
+		ch := make(chan time.Time, 1)
+
+		start := msg.GetReceivedAt()
+		if start.IsZero() {
+			start = time.Now()
+		}
+
+		end := start.Add(d)
+		if end.Before(time.Now()) {
+			ch <- end
+			return ch
+		}
+
+		go func() {
+			time.Sleep(time.Until(start.Add(d)))
+			ch <- end
+		}()
+		return ch
+	}
+}
+
+// Option configures the NetworkServer.
+type Option func(ns *NetworkServer)
+
+// WithCollectionDoneFunc overrides the default WindowEndFunc, which
+// is used to determine the end of uplink metadata deduplication.
+func WithDeduplicationDoneFunc(fn WindowEndFunc) Option {
+	return func(ns *NetworkServer) {
+		ns.deduplicationDone = fn
+	}
+}
+
+// WithCollectionDoneFunc overrides the default WindowEndFunc, which
+// is used to determine the end of uplink duplicate collection.
+func WithCollectionDoneFunc(fn WindowEndFunc) Option {
+	return func(ns *NetworkServer) {
+		ns.collectionDone = fn
+	}
+}
+
 // New returns new *NetworkServer.
-func New(c *component.Component, conf *Config) *NetworkServer {
+func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, error) {
 	ns := &NetworkServer{
 		Component:               c,
 		RegistryRPC:             deviceregistry.NewRPC(c, conf.Registry), // TODO: Add checks https://github.com/TheThingsIndustries/ttn/issues/558
@@ -91,16 +144,37 @@ func New(c *component.Component, conf *Config) *NetworkServer {
 		metadataAccumulators:    &sync.Map{},
 		metadataAccumulatorPool: &sync.Pool{},
 		hashPool:                &sync.Pool{},
-		deduplicationWindow:     conf.DeduplicationWindow,
-		cooldownWindow:          conf.CooldownWindow,
 		joinServers:             conf.JoinServers,
 	}
 	ns.hashPool.New = func() interface{} { return fnv.New64a() }
 	ns.metadataAccumulatorPool.New = func() interface{} {
 		return &metadataAccumulator{newAccumulator()}
 	}
+
+	for _, opt := range opts {
+		opt(ns)
+	}
+
+	switch {
+	case ns.deduplicationDone == nil && conf.DeduplicationWindow == 0:
+		return nil, ErrInvalidConfiguration.NewWithCause(nil, errors.New("DeduplicationWindow is zero and WithDeduplicationDoneFunc not specified"))
+
+	case ns.collectionDone == nil && conf.DeduplicationWindow == 0:
+		return nil, ErrInvalidConfiguration.NewWithCause(nil, errors.New("DeduplicationWindow is zero and WithCollectionDoneFunc not specified"))
+
+	case ns.collectionDone == nil && conf.CooldownWindow == 0:
+		return nil, ErrInvalidConfiguration.NewWithCause(nil, errors.New("CooldownWindow is zero and WithCollectionDoneFunc not specified"))
+	}
+
+	if ns.deduplicationDone == nil {
+		ns.deduplicationDone = NewWindowEndAfterFunc(conf.DeduplicationWindow)
+	}
+	if ns.collectionDone == nil {
+		ns.collectionDone = NewWindowEndAfterFunc(conf.DeduplicationWindow + conf.CooldownWindow)
+	}
+
 	c.RegisterGRPC(ns)
-	return ns
+	return ns, nil
 }
 
 type applicationUplinkStream struct {
@@ -244,9 +318,7 @@ func (a *metadataAccumulator) Add(mds ...*ttnpb.RxMetadata) {
 	}
 }
 
-func (ns *NetworkServer) deduplicateUplink(msg *ttnpb.UplinkMessage) (*metadataAccumulator, bool) {
-	start := time.Now()
-
+func (ns *NetworkServer) deduplicateUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*metadataAccumulator, bool) {
 	h := ns.hashPool.Get().(hash.Hash)
 	h.Write(msg.GetRawPayload())
 
@@ -265,7 +337,7 @@ func (ns *NetworkServer) deduplicateUplink(msg *ttnpb.UplinkMessage) (*metadataA
 	}
 
 	go func() {
-		time.Sleep(time.Until(start.Add(ns.deduplicationWindow + ns.cooldownWindow)))
+		<-ns.collectionDone(ctx, deepcopy.Copy(msg).(*ttnpb.UplinkMessage))
 		ns.metadataAccumulators.Delete(k)
 	}()
 	return a, false
@@ -421,7 +493,7 @@ outer:
 	return nil, ErrDeviceNotFound.New(nil)
 }
 
-func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator, start time.Time) error {
+func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator) error {
 	logger := ns.Logger()
 
 	dev, err := ns.matchDevice(msg)
@@ -429,7 +501,12 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		return errors.NewWithCause(err, "Failed to match device")
 	}
 
-	time.Sleep(time.Until(start.Add(ns.deduplicationWindow)))
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-ns.deduplicationDone(ctx, msg):
+	}
+
 	msg.RxMetadata = acc.Accumulated()
 
 	dev.RecentUplinks = append(dev.GetRecentUplinks(), msg)
@@ -442,28 +519,23 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		return err
 	}
 
-	mac := msg.Payload.GetMACPayload()
-	go func() {
-		ns.applicationServersMu.RLock()
-		cl, ok := ns.applicationServers[dev.EndDeviceIdentifiers.GetApplicationID()]
-		ns.applicationServersMu.RUnlock()
+	ns.applicationServersMu.RLock()
+	cl, ok := ns.applicationServers[dev.EndDeviceIdentifiers.GetApplicationID()]
+	ns.applicationServersMu.RUnlock()
 
-		if ok {
-			up := &ttnpb.ApplicationUp{&ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
-				FCnt:       dev.GetSession().GetNextFCntUp() - 1,
-				FPort:      mac.GetFPort(),
-				FRMPayload: mac.GetFRMPayload(),
-				RxMetadata: msg.GetRxMetadata(),
-			}}}
-			if err := cl.Send(up); err != nil {
-				logger.WithFields(log.Fields(
-					"application_id", dev.EndDeviceIdentifiers.GetApplicationID(),
-					"f_cnt", up.GetUplinkMessage().GetFCnt(),
-				)).WithError(err).Warn("Failed to send uplink to application server")
-			}
-		}
-	}()
-	return nil
+	if !ok {
+		return nil
+	}
+
+	mac := msg.Payload.GetMACPayload()
+	return cl.Send(&ttnpb.ApplicationUp{
+		Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
+			FCnt:       dev.GetSession().GetNextFCntUp() - 1,
+			FPort:      mac.GetFPort(),
+			FRMPayload: mac.GetFRMPayload(),
+			RxMetadata: msg.GetRxMetadata(),
+		}},
+	})
 }
 
 // newDevAddr generates a DevAddr for specified EndDevice.
@@ -478,7 +550,7 @@ func (ns *NetworkServer) newDevAddr(*ttnpb.EndDevice) types.DevAddr {
 	return devAddr
 }
 
-func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator, start time.Time) error {
+func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator) error {
 	pld := msg.Payload.GetJoinRequestPayload()
 
 	logger := ns.Logger().WithFields(log.Fields(
@@ -536,7 +608,12 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		}
 		dev.EndDeviceIdentifiers.DevAddr = &devAddr
 
-		time.Sleep(time.Until(start.Add(ns.deduplicationWindow)))
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-ns.deduplicationDone(ctx, msg):
+		}
+
 		msg.RxMetadata = acc.Accumulated()
 
 		dev.RecentUplinks = append(dev.RecentUplinks, msg)
@@ -558,14 +635,14 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 	return errors.NewWithCause(errors.New("No join server could handle join request"), "Failed to perform join procedure")
 }
 
-func (ns *NetworkServer) handleRejoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator, start time.Time) error {
+func (ns *NetworkServer) handleRejoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator) error {
 	// TODO: Implement https://github.com/TheThingsIndustries/ttn/issues/557
 	return status.Errorf(codes.Unimplemented, "not implemented")
 }
 
 // HandleUplink is called by the gateway server when an uplink message arrives.
 func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*pbtypes.Empty, error) {
-	start := time.Now()
+	msg.ReceivedAt = time.Now()
 	logger := ns.Logger()
 
 	b := msg.GetRawPayload()
@@ -583,7 +660,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		})
 	}
 
-	acc, ok := ns.deduplicateUplink(msg)
+	acc, ok := ns.deduplicateUplink(ctx, msg)
 	if ok {
 		logger.Debug("Dropping duplicate uplink")
 		return &pbtypes.Empty{}, nil
@@ -591,11 +668,11 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 
 	switch pld.GetMType() {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
-		return &pbtypes.Empty{}, ns.handleUplink(ctx, msg, acc, start)
+		return &pbtypes.Empty{}, ns.handleUplink(ctx, msg, acc)
 	case ttnpb.MType_JOIN_REQUEST:
-		return &pbtypes.Empty{}, ns.handleJoin(ctx, msg, acc, start)
+		return &pbtypes.Empty{}, ns.handleJoin(ctx, msg, acc)
 	case ttnpb.MType_REJOIN_REQUEST:
-		return &pbtypes.Empty{}, ns.handleRejoin(ctx, msg, acc, start)
+		return &pbtypes.Empty{}, ns.handleRejoin(ctx, msg, acc)
 	default:
 		logger.Error("Unmatched MType")
 		return &pbtypes.Empty{}, nil

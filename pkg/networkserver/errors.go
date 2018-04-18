@@ -94,6 +94,13 @@ var (
 		Type:          errors.Conflict,
 		Code:          11,
 	}
+
+	// ErrInvalidConfiguration represents error ocurring when the configuration is invalid.
+	ErrInvalidConfiguration = &errors.ErrDescriptor{
+		MessageFormat: "Invalid configuration",
+		Type:          errors.InvalidArgument,
+		Code:          12,
+	}
 )
 
 func init() {
@@ -107,4 +114,5 @@ func init() {
 	ErrMissingFNwkSIntKey.Register()
 	ErrMissingSNwkSIntKey.Register()
 	ErrNewSubscription.Register()
+	ErrInvalidConfiguration.Register()
 }

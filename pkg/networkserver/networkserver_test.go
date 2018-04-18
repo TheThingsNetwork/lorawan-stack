@@ -17,8 +17,8 @@ package networkserver_test
 import (
 	"context"
 	"math"
+	"math/rand"
 	"sync"
-	"sync/atomic"
 	"testing"
 	"time"
 
@@ -32,6 +32,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
@@ -48,9 +49,8 @@ var (
 	ApplicationID = "test"
 
 	DuplicateCount = 6
-
-	DeduplicationWindow = (2 << 2) * test.Delay
-	CooldownWindow      = (2 << 4) * test.Delay
+	DeviceCount    = 100
+	Timeout        = (2 << 10) * test.Delay
 )
 
 func metadataLdiff(l pretty.Logfer, xs, ys []*ttnpb.RxMetadata) {
@@ -74,12 +74,14 @@ func metadataLdiff(l pretty.Logfer, xs, ys []*ttnpb.RxMetadata) {
 func TestDownlinkQueueReplace(t *testing.T) {
 	a := assertions.New(t)
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
-	ns := New(
+	ns := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
-			Registry:    reg,
-			JoinServers: nil,
-		})
+			Registry:            reg,
+			JoinServers:         nil,
+			DeduplicationWindow: 42,
+			CooldownWindow:      42,
+		})).(*NetworkServer)
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	ed.QueuedApplicationDownlinks = nil
@@ -127,12 +129,14 @@ func TestDownlinkQueueReplace(t *testing.T) {
 func TestDownlinkQueuePush(t *testing.T) {
 	a := assertions.New(t)
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
-	ns := New(
+	ns := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
-			Registry:    reg,
-			JoinServers: nil,
-		})
+			Registry:            reg,
+			JoinServers:         nil,
+			DeduplicationWindow: 42,
+			CooldownWindow:      42,
+		})).(*NetworkServer)
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	ed.QueuedApplicationDownlinks = nil
@@ -182,12 +186,14 @@ func TestDownlinkQueuePush(t *testing.T) {
 func TestDownlinkQueueList(t *testing.T) {
 	a := assertions.New(t)
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
-	ns := New(
+	ns := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
-			Registry:    reg,
-			JoinServers: nil,
-		})
+			Registry:            reg,
+			JoinServers:         nil,
+			DeduplicationWindow: 42,
+			CooldownWindow:      42,
+		})).(*NetworkServer)
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	ed.QueuedApplicationDownlinks = nil
@@ -224,12 +230,14 @@ func TestDownlinkQueueList(t *testing.T) {
 func TestDownlinkQueueClear(t *testing.T) {
 	a := assertions.New(t)
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
-	ns := New(
+	ns := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
-			Registry:    reg,
-			JoinServers: nil,
-		})
+			Registry:            reg,
+			JoinServers:         nil,
+			DeduplicationWindow: 42,
+			CooldownWindow:      42,
+		})).(*NetworkServer)
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	ed.QueuedApplicationDownlinks = nil
@@ -278,6 +286,86 @@ func TestDownlinkQueueClear(t *testing.T) {
 	a.So(dev.EndDevice.GetQueuedApplicationDownlinks(), should.BeEmpty)
 }
 
+type UplinkHandler interface {
+	HandleUplink(context.Context, *ttnpb.UplinkMessage) (*pbtypes.Empty, error)
+}
+
+func sendUplinkDuplicates(t *testing.T, h UplinkHandler, windowEndCh chan windowEnd, ctx context.Context, msg *ttnpb.UplinkMessage, n int, waitForFirst bool) ([]*ttnpb.RxMetadata, <-chan error) {
+	a := assertions.New(t)
+	msg = deepcopy.Copy(msg).(*ttnpb.UplinkMessage)
+
+	errch := make(chan error, 1)
+	go func() {
+		_, err := h.HandleUplink(ctx, deepcopy.Copy(msg).(*ttnpb.UplinkMessage))
+		errch <- err
+	}()
+
+	var weCh chan<- time.Time
+	select {
+	case we := <-windowEndCh:
+		a.So(we.msg.GetReceivedAt(), should.HappenBefore, time.Now())
+		msg.ReceivedAt = we.msg.GetReceivedAt()
+		a.So(we.msg, should.Resemble, msg)
+		a.So(we.ctx, should.Resemble, ctx)
+		weCh = we.ch
+
+	case <-time.After(Timeout):
+		t.Fatal("Timeout")
+	}
+
+	mdCh := make(chan *ttnpb.RxMetadata)
+
+	wg := &sync.WaitGroup{}
+	wg.Add(n)
+
+	for i := 0; i < n; i++ {
+		go func() {
+			defer wg.Done()
+
+			msg := deepcopy.Copy(msg).(*ttnpb.UplinkMessage)
+
+			msg.RxMetadata = nil
+			n := rand.Intn(10)
+			for i := 0; i < n; i++ {
+				md := ttnpb.NewPopulatedRxMetadata(test.Randy, false)
+				msg.RxMetadata = append(msg.RxMetadata, md)
+				mdCh <- md
+			}
+
+			_, err := h.HandleUplink(ctx, msg)
+			a.So(err, should.BeNil)
+		}()
+	}
+
+	go func() {
+		wg.Wait()
+
+		if waitForFirst {
+			select {
+			case errch <- <-errch:
+
+			case <-time.After(Timeout):
+				t.Fatal("Timeout")
+			}
+		}
+
+		select {
+		case weCh <- time.Now():
+
+		case <-time.After(Timeout):
+			t.Fatal("Timeout")
+		}
+
+		close(mdCh)
+	}()
+
+	mds := append([]*ttnpb.RxMetadata{}, msg.GetRxMetadata()...)
+	for md := range mdCh {
+		mds = append(mds, md)
+	}
+	return mds, errch
+}
+
 type mockAsNsLinkApplicationStream struct {
 	*test.MockServerStream
 	send func(*ttnpb.ApplicationUp) error
@@ -290,12 +378,14 @@ func (s *mockAsNsLinkApplicationStream) Send(msg *ttnpb.ApplicationUp) error {
 func TestLinkApplication(t *testing.T) {
 	a := assertions.New(t)
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
-	ns := New(
+	ns := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
-			Registry:    reg,
-			JoinServers: nil,
-		})
+			Registry:            reg,
+			JoinServers:         nil,
+			DeduplicationWindow: 42,
+			CooldownWindow:      42,
+		})).(*NetworkServer)
 
 	id := ttnpb.NewPopulatedApplicationIdentifiers(test.Randy, false)
 
@@ -331,18 +421,25 @@ func TestLinkApplication(t *testing.T) {
 	wg.Wait()
 }
 
+type windowEnd struct {
+	ctx context.Context
+	msg *ttnpb.UplinkMessage
+	ch  chan<- time.Time
+}
+
 func HandleUplinkTest() func(t *testing.T) {
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
 		reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
-		ns := New(
+		ns := test.Must(New(
 			component.MustNew(test.GetLogger(t), &component.Config{}),
 			&Config{
-				Registry:    reg,
-				JoinServers: nil,
-			},
-		)
+				Registry:            reg,
+				JoinServers:         nil,
+				DeduplicationWindow: 42,
+				CooldownWindow:      42,
+			})).(*NetworkServer)
 
 		_, err := reg.Create(&ttnpb.EndDevice{
 			LoRaWANVersion: ttnpb.MAC_V1_1,
@@ -753,14 +850,6 @@ func HandleUplinkTest() func(t *testing.T) {
 				a := assertions.New(t)
 
 				reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
-				ns := New(
-					component.MustNew(test.GetLogger(t), &component.Config{}),
-					&Config{
-						Registry:            reg,
-						DeduplicationWindow: DeduplicationWindow,
-						CooldownWindow:      CooldownWindow,
-					},
-				)
 
 				populateSessionKeys := func(s *ttnpb.Session) {
 					for s.SessionKeys.FNwkSIntKey == nil ||
@@ -778,229 +867,244 @@ func HandleUplinkTest() func(t *testing.T) {
 					}
 				}
 
-				for i := 0; i < 100; i++ {
+				// Fill Registry with devices
+				for i := 0; i < DeviceCount; i++ {
 					ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+					for ed.Equal(tc.Device) {
+						ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
+					}
 
 					if s := ed.Session; s != nil {
 						populateSessionKeys(s)
 
 						s.DevAddr = DevAddr
-						for ed.SessionFallback != nil && ed.SessionFallback.DevAddr.Equal(DevAddr) {
+						for ed.SessionFallback != nil && ed.SessionFallback.DevAddr.Equal(s.DevAddr) {
 							ed.SessionFallback.DevAddr = *types.NewPopulatedDevAddr(test.Randy)
 						}
 					} else if s := ed.SessionFallback; s != nil {
 						populateSessionKeys(s)
 
 						s.DevAddr = DevAddr
-						for ed.Session != nil && ed.Session.DevAddr.Equal(DevAddr) {
+						for ed.Session != nil && ed.Session.DevAddr.Equal(s.DevAddr) {
 							ed.Session.DevAddr = *types.NewPopulatedDevAddr(test.Randy)
 						}
 					}
+
 					_, err := reg.Create(ed)
 					if !a.So(err, should.BeNil) {
 						return
 					}
 				}
 
+				deduplicationDoneCh := make(chan windowEnd, 1)
+				collectionDoneCh := make(chan windowEnd, 1)
+
+				ns := test.Must(New(
+					component.MustNew(test.GetLogger(t), &component.Config{}),
+					&Config{
+						Registry:            reg,
+						DeduplicationWindow: 42,
+						CooldownWindow:      42,
+					},
+					WithDeduplicationDoneFunc(func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time {
+						ch := make(chan time.Time, 1)
+						deduplicationDoneCh <- windowEnd{ctx, msg, ch}
+						return ch
+					}),
+					WithCollectionDoneFunc(func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time {
+						ch := make(chan time.Time, 1)
+						collectionDoneCh <- windowEnd{ctx, msg, ch}
+						return ch
+					}),
+				)).(*NetworkServer)
+
+				sendCh := make(chan *ttnpb.ApplicationUp)
+
+				go func() {
+					id := ttnpb.NewPopulatedApplicationIdentifiers(test.Randy, false)
+					id.ApplicationID = ApplicationID
+
+					err := ns.LinkApplication(id, &mockAsNsLinkApplicationStream{
+						MockServerStream: &test.MockServerStream{
+							MockStream: &test.MockStream{
+								ContextFunc: context.Background,
+							},
+						},
+						send: func(up *ttnpb.ApplicationUp) error {
+							sendCh <- up
+							return nil
+						},
+					})
+					// LinkApplication should not return
+					t.Errorf("LinkApplication should not return, returned with error: %s", err)
+				}()
+
 				dev, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
 				if !a.So(err, should.BeNil) {
 					return
 				}
 
-				upWg := &sync.WaitGroup{}
+				ctx := context.WithValue(context.Background(), "answer", 42)
 
-				mdCh := make(chan []*ttnpb.RxMetadata, 2)
+				start := time.Now()
+				if !t.Run("deduplication window", func(t *testing.T) {
+					var md []*ttnpb.RxMetadata
 
-				stream := &mockAsNsLinkApplicationStream{
-					MockServerStream: &test.MockServerStream{
-						MockStream: &test.MockStream{
-							ContextFunc: context.Background,
-						},
-					},
-					send: func(up *ttnpb.ApplicationUp) error {
-						t.Run("application uplink", func(t *testing.T) {
-							defer upWg.Done()
+					t.Run("message send", func(t *testing.T) {
+						a := assertions.New(t)
 
-							a := assertions.New(t)
+						var errch <-chan error
+						md, errch = sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount, false)
 
-							md := <-mdCh
+						select {
+						case up := <-sendCh:
 							if !a.So(test.SameElementsDeep(md, up.GetUplinkMessage().GetRxMetadata()), should.BeTrue) {
 								metadataLdiff(t, up.GetUplinkMessage().GetRxMetadata(), md)
 							}
 
-							upc := deepcopy.Copy(up).(*ttnpb.ApplicationUp)
-							upc.GetUplinkMessage().RxMetadata = nil
-
-							a.So(upc, should.Resemble, &ttnpb.ApplicationUp{&ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
+							a.So(up, should.Resemble, &ttnpb.ApplicationUp{&ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
 								FCnt:       tc.NextNextFCntUp - 1,
 								FPort:      tc.UplinkMessage.Payload.GetMACPayload().GetFPort(),
 								FRMPayload: tc.UplinkMessage.Payload.GetMACPayload().GetFRMPayload(),
+								RxMetadata: up.GetUplinkMessage().GetRxMetadata(),
 							}}})
-						})
-						return nil
-					},
-				}
 
-				id := ttnpb.NewPopulatedApplicationIdentifiers(test.Randy, false)
-				id.ApplicationID = ApplicationID
+						case err := <-errch:
+							a.So(err, should.BeNil)
+							t.Fatal("Uplink not sent to AS")
 
-				go func() {
-					err := ns.LinkApplication(id, stream)
-					// LinkApplication should not return
-					t.Errorf("LinkApplication should not return, returned with error: %s", err)
-				}()
+						case <-time.After(Timeout):
+							t.Fatal("Timeout")
+						}
 
-				md := make([]*ttnpb.RxMetadata, 0, DuplicateCount+1)
+						select {
+						case err := <-errch:
+							a.So(err, should.BeNil)
 
-				var deduplicationEnd time.Time
-				var cooldownEnd time.Time
+						case <-time.After(Timeout):
+							t.Fatal("Timeout")
+						}
+					})
 
-				if !t.Run("handle uplink", func(t *testing.T) {
-					a := assertions.New(t)
+					t.Run("device update", func(t *testing.T) {
+						a := assertions.New(t)
 
-					upWg.Add(1)
+						msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
+						msg.RxMetadata = md
 
-					wg := &sync.WaitGroup{}
-					wg.Add(DuplicateCount)
+						ed := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+						ed.GetSession().NextFCntUp = tc.NextNextFCntUp
 
-					deduplicationEnd = time.Now().Add(DeduplicationWindow + test.Delay)
-					cooldownEnd = deduplicationEnd.Add(CooldownWindow + test.Delay)
+						ed.RecentUplinks = append(ed.GetRecentUplinks(), msg)
+						if len(ed.RecentUplinks) > RecentUplinkCount {
+							ed.RecentUplinks = ed.RecentUplinks[len(ed.RecentUplinks)-RecentUplinkCount:]
+						}
 
-					var deduplicated uint64
-					for i := 0; i < DuplicateCount; i++ {
-						go func() {
-							defer wg.Done()
+						dev.EndDevice, err = dev.Load()
+						if !a.So(err, should.BeNil) ||
+							!a.So(dev.EndDevice, should.NotBeNil) {
+							return
+						}
 
-							now := time.Now()
-							if now.After(cooldownEnd) {
-								return
-							}
+						if !a.So(dev.EndDevice.GetRecentUplinks(), should.NotBeEmpty) {
+							return
+						}
 
-							_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
-							if a.So(err, should.BeNil) && now.Before(deduplicationEnd) {
-								atomic.AddUint64(&deduplicated, 1)
-							}
-						}()
-					}
-					wg.Wait()
+						storedUp := dev.EndDevice.GetRecentUplinks()[len(dev.EndDevice.RecentUplinks)-1]
+						expectedUp := ed.GetRecentUplinks()[len(ed.RecentUplinks)-1]
 
-					for i := uint64(0); i < deduplicated; i++ {
-						md = append(md, tc.UplinkMessage.GetRxMetadata()...)
-					}
-					mdCh <- md
+						a.So(storedUp.GetReceivedAt(), should.HappenBetween, start, time.Now())
+						expectedUp.ReceivedAt = storedUp.GetReceivedAt()
+
+						storedMD := storedUp.GetRxMetadata()
+						expectedMD := expectedUp.GetRxMetadata()
+
+						if !a.So(test.SameElementsDiff(storedMD, expectedMD), should.BeTrue) {
+							metadataLdiff(t, storedMD, expectedMD)
+						}
+
+						copy(expectedMD, storedMD)
+
+						ed.CreatedAt = dev.GetCreatedAt()
+						ed.UpdatedAt = dev.GetUpdatedAt()
+						a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
+					})
 				}) {
 					return
 				}
 
-				t.Run("updated NextFCntUp and RecentUplinks", func(t *testing.T) {
+				t.Run("cooldown window", func(t *testing.T) {
+					a := assertions.New(t)
+
+					_, errch := sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount, true)
+
+					select {
+					case err := <-errch:
+						a.So(err, should.BeNil)
+
+					case <-time.After(Timeout):
+						t.Fatal("Timeout")
+					}
+				})
+
+				time.Sleep(test.Delay) // Ensure the message hash is removed from deduplication table
+
+				t.Run("after cooldown window", func(t *testing.T) {
 					a := assertions.New(t)
 
 					msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
-					msg.RxMetadata = md
-
-					ed := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-					ed.GetSession().NextFCntUp = tc.NextNextFCntUp
-
-					ed.RecentUplinks = append(ed.GetRecentUplinks(), msg)
-					if len(ed.RecentUplinks) > RecentUplinkCount {
-						ed.RecentUplinks = ed.RecentUplinks[len(ed.RecentUplinks)-RecentUplinkCount:]
+					if len(msg.GetRxMetadata()) > 1 {
+						// Deduplication may change the order of metadata in the slice
+						msg.RxMetadata = []*ttnpb.RxMetadata{msg.GetRxMetadata()[0]}
 					}
 
-					time.Sleep(time.Until(deduplicationEnd) + test.Delay)
-
-					dev.EndDevice, err = dev.Load()
-					if !a.So(err, should.BeNil) ||
-						!a.So(dev.EndDevice, should.NotBeNil) {
-						return
-					}
-
-					if !a.So(dev.EndDevice.GetRecentUplinks(), should.NotBeEmpty) {
-						return
-					}
-
-					storedUp := dev.EndDevice.GetRecentUplinks()[len(dev.EndDevice.RecentUplinks)-1]
-					expectedUp := ed.GetRecentUplinks()[len(ed.RecentUplinks)-1]
-
-					storedMD := storedUp.GetRxMetadata()
-					expectedMD := expectedUp.GetRxMetadata()
-
-					if !a.So(test.SameElementsDiff(storedMD, expectedMD), should.BeTrue) {
-						metadataLdiff(t, storedMD, expectedMD)
-					}
-
-					storedUp.RxMetadata = nil
-					expectedUp.RxMetadata = nil
-
-					ed.CreatedAt = dev.GetCreatedAt()
-					ed.UpdatedAt = dev.GetUpdatedAt()
-					a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
-				})
-
-				// Uplink must be sent to AS at this point
-				a.So(test.WaitTimeout(10*test.Delay, upWg.Wait), should.BeTrue)
-
-				t.Run("duplicates after cooldown window end", func(t *testing.T) {
-					a := assertions.New(t)
-
-					md := make([]*ttnpb.RxMetadata, 0, DuplicateCount+1)
-
-					upWg.Add(1)
-
-					wg := &sync.WaitGroup{}
-					wg.Add(1)
-
-					time.Sleep(time.Until(cooldownEnd))
-
+					errch := make(chan error, 1)
 					go func() {
-						deduplicationEnd = time.Now().Add(DeduplicationWindow + test.Delay)
-						cooldownEnd = deduplicationEnd.Add(CooldownWindow)
-
-						wg.Done()
-
-						_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
-						if dev.FCntResets {
-							// Replay attack is possible if FCnt resets
-							a.So(err, should.BeNil)
-						} else {
-							a.So(err, should.BeError)
-						}
-						wg.Done()
+						_, err = ns.HandleUplink(ctx, deepcopy.Copy(msg).(*ttnpb.UplinkMessage))
+						errch <- err
 					}()
 
-					wg.Wait()
-					time.Sleep(test.Delay) // Ensure initial uplink gets sent
+					select {
+					case err := <-errch:
+						if !dev.GetFCntResets() {
+							a.So(err, should.BeError)
+							return
+						}
 
-					wg.Add(DuplicateCount)
+						a.So(err, should.BeNil)
+						t.Fatal("Uplink not sent to AS")
 
-					var deduplicated uint64 = 1
-					for i := 0; i < DuplicateCount-1; i++ {
-						go func() {
-							defer wg.Done()
+					case de := <-deduplicationDoneCh:
+						a.So(de.msg.GetReceivedAt(), should.HappenBetween, start, time.Now())
+						msg.ReceivedAt = de.msg.GetReceivedAt()
+						a.So(de.msg, should.Resemble, msg)
+						a.So(de.ctx, should.Resemble, ctx)
+						de.ch <- time.Now()
 
-							now := time.Now()
-							if now.After(cooldownEnd) {
-								return
-							}
-
-							_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
-							if a.So(err, should.BeNil) && now.Before(deduplicationEnd) {
-								atomic.AddUint64(&deduplicated, 1)
-							}
-						}()
-					}
-					wg.Wait()
-
-					if !dev.FCntResets {
-						return
+					case <-time.After(Timeout):
+						t.Fatal("Timeout")
 					}
 
-					for i := uint64(0); i < deduplicated; i++ {
-						md = append(md, tc.UplinkMessage.GetRxMetadata()...)
-					}
-					mdCh <- md
+					select {
+					case up := <-sendCh:
+						a.So(up, should.Resemble, &ttnpb.ApplicationUp{&ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
+							FCnt:       tc.NextNextFCntUp - 1,
+							FPort:      msg.Payload.GetMACPayload().GetFPort(),
+							FRMPayload: msg.Payload.GetMACPayload().GetFRMPayload(),
+							RxMetadata: msg.GetRxMetadata(),
+						}}})
 
-					// Uplink must be sent to AS at this point
-					a.So(test.WaitTimeout(10*test.Delay, upWg.Wait), should.BeTrue)
+					case <-time.After(Timeout):
+						t.Fatal("Timeout")
+					}
+
+					select {
+					case err := <-errch:
+						a.So(err, should.BeNil)
+
+					case <-time.After(Timeout):
+						t.Fatal("Timeout")
+					}
 				})
 			})
 		}
@@ -1027,12 +1131,14 @@ func HandleJoinTest() func(t *testing.T) {
 		a := assertions.New(t)
 
 		reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
-		ns := New(
+		ns := test.Must(New(
 			component.MustNew(test.GetLogger(t), &component.Config{}),
 			&Config{
-				Registry: reg,
+				Registry:            reg,
+				DeduplicationWindow: 42,
+				CooldownWindow:      42,
 			},
-		)
+		)).(*NetworkServer)
 
 		_, err := ns.HandleUplink(context.Background(), ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy))
 		a.So(err, should.NotBeNil)
@@ -1124,13 +1230,80 @@ func HandleJoinTest() func(t *testing.T) {
 			t.Run(tc.Name, func(t *testing.T) {
 				a := assertions.New(t)
 
+				reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+
+				// Fill Registry with devices
+				for i := 0; i < DeviceCount; i++ {
+					ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+					for ed.Equal(tc.Device) {
+						ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
+					}
+
+					_, err := reg.Create(ed)
+					if !a.So(err, should.BeNil) {
+						return
+					}
+				}
+
+				keys := ttnpb.NewPopulatedSessionKeys(test.Randy, false)
+
 				getNwkSKeys := func(ctx context.Context, req *ttnpb.SessionKeyRequest, opts ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error) {
 					err := errors.New("GetNwkSKeys should not be called")
-					t.Error(err)
+					t.Fatal(err)
 					return nil, err
 				}
 
-				reqExpected := &ttnpb.JoinRequest{
+				type handleJoinRequest struct {
+					ctx   context.Context
+					req   *ttnpb.JoinRequest
+					opts  []grpc.CallOption
+					ch    chan<- *ttnpb.JoinResponse
+					errch chan<- error
+				}
+
+				deduplicationDoneCh := make(chan windowEnd, 1)
+				collectionDoneCh := make(chan windowEnd, 1)
+				joinCh := make(chan handleJoinRequest, 1)
+
+				ns := test.Must(New(
+					component.MustNew(test.GetLogger(t), &component.Config{}),
+					&Config{
+						Registry: reg,
+						JoinServers: []ttnpb.NsJsClient{&mockNsJsClient{
+							handleJoin: func(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
+								return nil, errors.New("test")
+							},
+							getNwkSKeys: getNwkSKeys,
+						},
+							&mockNsJsClient{
+								handleJoin: func(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
+									ch := make(chan *ttnpb.JoinResponse, 1)
+									errch := make(chan error, 1)
+									joinCh <- handleJoinRequest{ctx, req, opts, ch, errch}
+									return <-ch, <-errch
+								},
+								getNwkSKeys: getNwkSKeys,
+							},
+						},
+					},
+					WithDeduplicationDoneFunc(func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time {
+						ch := make(chan time.Time, 1)
+						deduplicationDoneCh <- windowEnd{ctx, msg, ch}
+						return ch
+					}),
+					WithCollectionDoneFunc(func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time {
+						ch := make(chan time.Time, 1)
+						collectionDoneCh <- windowEnd{ctx, msg, ch}
+						return ch
+					}),
+				)).(*NetworkServer)
+
+				dev, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
+				if !a.So(err, should.BeNil) {
+					return
+				}
+
+				expectedRequest := &ttnpb.JoinRequest{
 					RawPayload: tc.UplinkMessage.GetRawPayload(),
 					Payload:    tc.UplinkMessage.GetPayload(),
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1147,192 +1320,184 @@ func HandleJoinTest() func(t *testing.T) {
 					},
 				}
 
-				keys := ttnpb.NewPopulatedSessionKeys(test.Randy, false)
+				ctx := context.WithValue(context.Background(), "answer", 42)
 
-				reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+				start := time.Now()
+				if !t.Run("deduplication window", func(t *testing.T) {
+					var md []*ttnpb.RxMetadata
 
-				reqWg := &sync.WaitGroup{}
+					t.Run("message send", func(t *testing.T) {
+						a := assertions.New(t)
 
-				dev, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
-				if !a.So(err, should.BeNil) {
-					return
-				}
-
-				ns := New(
-					component.MustNew(test.GetLogger(t), &component.Config{}),
-					&Config{
-						Registry:            reg,
-						DeduplicationWindow: DeduplicationWindow,
-						CooldownWindow:      CooldownWindow,
-						JoinServers: []ttnpb.NsJsClient{&mockNsJsClient{
-							handleJoin: func(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
-								return nil, errors.New("test")
-							},
-							getNwkSKeys: getNwkSKeys,
-						},
-							&mockNsJsClient{
-								handleJoin: func(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
-									defer reqWg.Done()
-
-									a := assertions.New(t)
-
-									resp := ttnpb.NewPopulatedJoinResponse(test.Randy, false)
-									resp.SessionKeys = *keys
-
-									if ses := test.Must(dev.Load()).(*ttnpb.EndDevice).GetSession(); ses != nil {
-										a.So(req.EndDeviceIdentifiers.DevAddr, should.NotResemble, ses.DevAddr)
-									}
-									req.EndDeviceIdentifiers.DevAddr = nil
-
-									a.So(pretty.Diff(req, reqExpected), should.BeEmpty)
-
-									return resp, nil
-								},
-								getNwkSKeys: getNwkSKeys,
-							},
-						},
-					},
-				)
-
-				for i := 0; i < 100; i++ {
-					_, err := reg.Create(ttnpb.NewPopulatedEndDevice(test.Randy, false))
-					if !a.So(err, should.BeNil) {
-						return
-					}
-				}
-
-				md := make([]*ttnpb.RxMetadata, 0, DuplicateCount+1)
-
-				var start time.Time
-				var deduplicationEnd time.Time
-				var cooldownEnd time.Time
-
-				if !t.Run("handle join", func(t *testing.T) {
-					a := assertions.New(t)
-
-					reqWg.Add(1)
-
-					wg := &sync.WaitGroup{}
-					wg.Add(DuplicateCount)
-
-					start = time.Now()
-					deduplicationEnd = start.Add(DeduplicationWindow + test.Delay)
-					cooldownEnd = deduplicationEnd.Add(CooldownWindow)
-
-					var deduplicated uint64
-					for i := 0; i < DuplicateCount; i++ {
+						wg := &sync.WaitGroup{}
+						wg.Add(1)
 						go func() {
 							defer wg.Done()
 
-							now := time.Now()
-							if now.After(cooldownEnd) {
-								return
-							}
+							select {
+							case req := <-joinCh:
+								if ses := tc.Device.GetSession(); ses != nil {
+									a.So(req.req.EndDeviceIdentifiers.DevAddr, should.NotResemble, ses.DevAddr)
+								}
 
-							_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
-							if a.So(err, should.BeNil) && now.Before(deduplicationEnd) {
-								atomic.AddUint64(&deduplicated, 1)
+								expectedRequest.EndDeviceIdentifiers.DevAddr = req.req.EndDeviceIdentifiers.DevAddr
+								a.So(req.req, should.Resemble, expectedRequest)
+
+								resp := ttnpb.NewPopulatedJoinResponse(test.Randy, false)
+								resp.SessionKeys = *keys
+
+								req.ch <- resp
+								req.errch <- nil
+
+							case <-time.After(Timeout):
+								t.Fatal("Timeout")
 							}
 						}()
-					}
-					wg.Wait()
 
-					for i := uint64(0); i < deduplicated; i++ {
-						md = append(md, tc.UplinkMessage.GetRxMetadata()...)
-					}
+						var errch <-chan error
+						md, errch = sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount, false)
+
+						select {
+						case err := <-errch:
+							a.So(err, should.BeNil)
+
+						case <-time.After(Timeout):
+							t.Fatal("Timeout")
+						}
+
+						wg.Wait()
+					})
+
+					t.Run("device update", func(t *testing.T) {
+						a := assertions.New(t)
+
+						msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
+						msg.RxMetadata = md
+
+						ed := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+
+						ed.RecentUplinks = append(ed.GetRecentUplinks(), msg)
+						if len(ed.RecentUplinks) > RecentUplinkCount {
+							ed.RecentUplinks = ed.RecentUplinks[len(ed.RecentUplinks)-RecentUplinkCount:]
+						}
+
+						dev.EndDevice, err = dev.Load()
+						if !a.So(err, should.BeNil) ||
+							!a.So(dev.EndDevice, should.NotBeNil) {
+							return
+						}
+
+						if !a.So(dev.EndDevice.GetRecentUplinks(), should.NotBeEmpty) {
+							return
+						}
+
+						storedUp := dev.EndDevice.GetRecentUplinks()[len(dev.EndDevice.RecentUplinks)-1]
+						expectedUp := ed.GetRecentUplinks()[len(ed.RecentUplinks)-1]
+
+						a.So(storedUp.GetReceivedAt(), should.HappenBetween, start, time.Now())
+						a.So(dev.EndDevice.Session.StartedAt, should.HappenBetween, start, time.Now())
+						expectedUp.ReceivedAt = storedUp.GetReceivedAt()
+
+						storedMD := storedUp.GetRxMetadata()
+						expectedMD := expectedUp.GetRxMetadata()
+
+						if !a.So(test.SameElementsDiff(storedMD, expectedMD), should.BeTrue) {
+							metadataLdiff(t, storedMD, expectedMD)
+						}
+
+						storedUp.RxMetadata = expectedUp.RxMetadata
+
+						a.So(dev.EndDevice.SessionFallback, should.BeNil)
+						if a.So(dev.EndDevice.GetSession(), should.NotBeNil) {
+							a.So(dev.EndDevice.Session.SessionKeys, should.Resemble, *keys)
+							a.So(dev.EndDevice.Session.StartedAt, should.HappenBetween, start, time.Now())
+							a.So(dev.EndDevice.EndDeviceIdentifiers.DevAddr, should.Resemble, &dev.EndDevice.Session.DevAddr)
+							if ed.Session != nil {
+								a.So(dev.EndDevice.Session.DevAddr, should.NotResemble, ed.Session.DevAddr)
+							}
+						}
+
+						ed.EndDeviceIdentifiers.DevAddr = dev.EndDevice.EndDeviceIdentifiers.DevAddr
+						ed.Session = dev.EndDevice.GetSession()
+						ed.CreatedAt = dev.GetCreatedAt()
+						ed.UpdatedAt = dev.GetUpdatedAt()
+						a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
+					})
 				}) {
 					return
 				}
 
-				t.Run("updated Session and RecentUplinks", func(t *testing.T) {
+				t.Run("cooldown window", func(t *testing.T) {
 					a := assertions.New(t)
 
-					msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
-					msg.RxMetadata = md
+					_, errch := sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount, true)
 
-					ed := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+					select {
+					case err := <-errch:
+						a.So(err, should.BeNil)
 
-					ed.RecentUplinks = append(ed.GetRecentUplinks(), msg)
-					if len(ed.RecentUplinks) > RecentUplinkCount {
-						ed.RecentUplinks = ed.RecentUplinks[len(ed.RecentUplinks)-RecentUplinkCount:]
+					case <-time.After(Timeout):
+						t.Fatal("Timeout")
 					}
-
-					a.So(test.WaitTimeout(10*test.Delay, reqWg.Wait), should.BeTrue)
-
-					time.Sleep(time.Until(deduplicationEnd) + test.Delay)
-
-					dev.EndDevice, err = dev.Load()
-					if !a.So(err, should.BeNil) ||
-						!a.So(dev.EndDevice, should.NotBeNil) {
-						return
-					}
-
-					if !a.So(dev.EndDevice.GetRecentUplinks(), should.NotBeEmpty) {
-						return
-					}
-
-					storedUp := dev.EndDevice.GetRecentUplinks()[len(dev.EndDevice.RecentUplinks)-1]
-					expectedUp := ed.GetRecentUplinks()[len(ed.RecentUplinks)-1]
-
-					storedMD := storedUp.GetRxMetadata()
-					expectedMD := expectedUp.GetRxMetadata()
-
-					if !a.So(test.SameElementsDiff(storedMD, expectedMD), should.BeTrue) {
-						metadataLdiff(t, storedMD, expectedMD)
-					}
-
-					storedUp.RxMetadata = expectedUp.RxMetadata
-
-					a.So(dev.EndDevice.SessionFallback, should.BeNil)
-					if a.So(dev.EndDevice.GetSession(), should.NotBeNil) {
-						a.So(dev.EndDevice.Session.SessionKeys, should.Resemble, *keys)
-						a.So([]time.Time{start, dev.EndDevice.Session.StartedAt, time.Now()}, should.BeChronological)
-						a.So(dev.EndDevice.EndDeviceIdentifiers.DevAddr, should.Resemble, &dev.EndDevice.Session.DevAddr)
-						if ed.Session != nil {
-							a.So(dev.EndDevice.Session.DevAddr, should.NotResemble, ed.Session.DevAddr)
-						}
-					}
-
-					ed.EndDeviceIdentifiers.DevAddr = dev.EndDevice.EndDeviceIdentifiers.DevAddr
-					ed.Session = dev.EndDevice.GetSession()
-					ed.CreatedAt = dev.GetCreatedAt()
-					ed.UpdatedAt = dev.GetUpdatedAt()
-					a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
 				})
 
-				t.Run("duplicates after cooldown window end", func(t *testing.T) {
+				time.Sleep(test.Delay) // Ensure the message hash is removed from deduplication table
+
+				t.Run("after cooldown window", func(t *testing.T) {
 					a := assertions.New(t)
 
-					reqWg.Add(1)
-
 					wg := &sync.WaitGroup{}
-					wg.Add(DuplicateCount)
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
 
-					time.Sleep(time.Until(cooldownEnd))
+						select {
+						case req := <-joinCh:
+							a.So(req.req.EndDeviceIdentifiers.DevAddr, should.NotResemble, dev.EndDevice.GetSession().DevAddr)
 
-					start = time.Now()
-					deduplicationEnd = start.Add(DeduplicationWindow + test.Delay)
-					cooldownEnd = deduplicationEnd.Add(CooldownWindow)
+							expectedRequest.EndDeviceIdentifiers.DevAddr = req.req.EndDeviceIdentifiers.DevAddr
+							a.So(req.req, should.Resemble, expectedRequest)
 
-					var deduplicated uint64
-					for i := 0; i < DuplicateCount; i++ {
-						go func() {
-							defer wg.Done()
+							resp := ttnpb.NewPopulatedJoinResponse(test.Randy, false)
+							resp.SessionKeys = *keys
 
-							now := time.Now()
-							if now.After(cooldownEnd) {
-								return
-							}
+							req.ch <- resp
+							req.errch <- nil
 
-							_, err = ns.HandleUplink(context.Background(), deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
-							if a.So(err, should.BeNil) && now.Before(deduplicationEnd) {
-								atomic.AddUint64(&deduplicated, 1)
-							}
-						}()
+						case <-time.After(Timeout):
+							t.Error("Timeout")
+						}
+					}()
+
+					msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
+
+					errch := make(chan error, 1)
+					go func() {
+						_, err = ns.HandleUplink(ctx, deepcopy.Copy(msg).(*ttnpb.UplinkMessage))
+						errch <- err
+					}()
+
+					select {
+					case de := <-deduplicationDoneCh:
+						a.So(de.msg.GetReceivedAt(), should.HappenBetween, start, time.Now())
+						msg.ReceivedAt = de.msg.GetReceivedAt()
+						a.So(de.msg, should.Resemble, msg)
+						a.So(de.ctx, should.Resemble, ctx)
+						de.ch <- time.Now()
+
+					case <-time.After(Timeout):
+						t.Fatal("Timeout")
 					}
-					wg.Wait()
 
-					a.So(test.WaitTimeout(10*test.Delay, reqWg.Wait), should.BeTrue)
+					select {
+					case err := <-errch:
+						a.So(err, should.BeNil)
+
+					case <-time.After(Timeout):
+						t.Fatal("Timeout")
+					}
+
+					wg.Wait()
 				})
 			})
 		}
@@ -1349,13 +1514,15 @@ func TestHandleUplink(t *testing.T) {
 	a := assertions.New(t)
 
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
-	ns := New(
+	ns := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
-			Registry:    reg,
-			JoinServers: nil,
+			Registry:            reg,
+			JoinServers:         nil,
+			DeduplicationWindow: 42,
+			CooldownWindow:      42,
 		},
-	)
+	)).(*NetworkServer)
 
 	msg := ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
 	msg.Payload.Payload = nil
