@@ -79,6 +79,9 @@ var (
 
 	// FieldPathGatewayContactAccount is the field path for the gateway contact account identifiers field.
 	FieldPathGatewayContactAccountIDs = regexp.MustCompile(`^contact_account_ids$`)
+
+	// FieldPathGatewayDisableTxDelay is the field path for the gateway disable Tx delay field.
+	FieldPathGatewayDisableTxDelay = regexp.MustCompile(`^disable_tx_delay$`)
 )
 
 // gatewayPrivacySetting is an enum that defines the different gateway privacy settings.

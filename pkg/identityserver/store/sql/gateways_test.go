@@ -69,6 +69,7 @@ func testGateways(t *testing.T, ids ttnpb.GatewayIdentifiers) {
 		GatewayIdentifiers: ids,
 		Description:        "My description",
 		Platform:           "Kerklink",
+		DisableTxDelay:     true,
 		Attributes: map[string]string{
 			"foo": "bar",
 		},

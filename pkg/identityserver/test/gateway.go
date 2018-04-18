@@ -92,6 +92,7 @@ func ShouldBeGatewayIgnoringAutoFields(actual interface{}, expected ...interface
 		assertions.ShouldEqual(a.AutoUpdate, b.AutoUpdate),
 		assertions.ShouldResemble(a.Platform, b.Platform),
 		assertions.ShouldResemble(a.Attributes, b.Attributes),
+		assertions.ShouldEqual(a.DisableTxDelay, b.DisableTxDelay),
 	)
 }
 

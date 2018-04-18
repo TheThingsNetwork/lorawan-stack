@@ -131,7 +131,8 @@ func (s *GatewayStore) create(q db.QueryContext, gateway *ttnpb.Gateway) (id uui
 					privacy_settings,
 					auto_update,
 					platform,
-					cluster_address)
+					cluster_address,
+					disable_tx_delay)
 			VALUES (
 					:gateway_id,
 					:eui,
@@ -141,7 +142,8 @@ func (s *GatewayStore) create(q db.QueryContext, gateway *ttnpb.Gateway) (id uui
 					:privacy_settings,
 					:auto_update,
 					:platform,
-					:cluster_address)
+					:cluster_address,
+					:disable_tx_delay)
 			RETURNING id`,
 		gateway)
 	if _, yes := db.IsDuplicate(err); yes {
@@ -338,6 +340,7 @@ func (s *GatewayStore) update(q db.QueryContext, gtwID uuid.UUID, data *ttnpb.Ga
 				auto_update = :auto_update,
 				platform = :platform,
 				cluster_address = :cluster_address,
+				disable_tx_delay = :disable_tx_delay,
 				updated_at = current_timestamp()
 			WHERE id = :id
 			RETURNING gateway_id`,

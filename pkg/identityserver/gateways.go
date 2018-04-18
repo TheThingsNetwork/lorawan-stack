@@ -73,6 +73,7 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 			Attributes:         req.Gateway.Attributes,
 			ClusterAddress:     req.Gateway.ClusterAddress,
 			ContactAccountIDs:  req.Gateway.ContactAccountIDs,
+			DisableTxDelay:     req.Gateway.DisableTxDelay,
 		})
 		if err != nil {
 			return err
@@ -185,6 +186,8 @@ func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGat
 				gtw.ClusterAddress = req.Gateway.ClusterAddress
 			case ttnpb.FieldPathGatewayContactAccountIDs.MatchString(path):
 				gtw.ContactAccountIDs = &ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: req.Gateway.ContactAccountIDs.GetUserID()}}
+			case ttnpb.FieldPathGatewayDisableTxDelay.MatchString(path):
+				gtw.DisableTxDelay = req.Gateway.DisableTxDelay
 			default:
 				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
 					"path": path,

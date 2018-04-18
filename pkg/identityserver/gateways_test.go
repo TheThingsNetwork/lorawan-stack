@@ -127,7 +127,8 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 				},
 			},
 		},
-		Radios: []ttnpb.GatewayRadio{},
+		Radios:         []ttnpb.GatewayRadio{},
+		DisableTxDelay: true,
 	}
 
 	ctx := testCtx(user.UserIdentifiers)

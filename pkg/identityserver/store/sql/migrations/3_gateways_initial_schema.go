@@ -27,6 +27,7 @@ func init() {
 			auto_update         BOOL DEFAULT TRUE,
 			platform            STRING NOT NULL DEFAULT '',
 			cluster_address     STRING NOT NULL,
+			disable_tx_delay    BOOL NOT NULL DEFAULT FALSE,
 			created_at          TIMESTAMP NOT NULL DEFAULT current_timestamp(),
 			updated_at          TIMESTAMP NOT NULL DEFAULT current_timestamp()
 		);

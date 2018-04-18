@@ -254,7 +254,8 @@ func (req *UpdateGatewayRequest) Validate() error {
 			FieldPathGatewayAutoUpdate.MatchString(path),
 			FieldPathGatewayPlatform.MatchString(path),
 			FieldPathGatewayAntennas.MatchString(path),
-			FieldPathGatewayAttributes.MatchString(path):
+			FieldPathGatewayAttributes.MatchString(path),
+			FieldPathGatewayDisableTxDelay.MatchString(path):
 		case FieldPathGatewayClusterAddress.MatchString(path):
 			err = validate.Field(req.Gateway.ClusterAddress, validate.Required).DescribeFieldName("Cluster Address")
 		case FieldPathGatewayFrequencyPlanID.MatchString(path):

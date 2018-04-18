@@ -75,6 +75,10 @@ message Gateway {
   // updated_at is the last time the gateway was updated.
   // This a read-only field.
   google.protobuf.Timestamp updated_at = 14 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
+  // By default, the Gateway Server only sends downlinks to gateways right before
+  // emission time. You can opt a gateway out by setting this field to `true`.
+  bool disable_tx_delay = 15;
 }
 
 // GatewayPrivacySettings is the message that defines the different privacy settings
