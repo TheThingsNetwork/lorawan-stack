@@ -54,36 +54,36 @@ service GtwGr {
 message IdentityServerSettings {
   // updated_at is the last time the settings were updated.
   // This is a read-only field.
-  google.protobuf.Timestamp updated_at = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (gogoproto.moretags) = "name:\"-\""];
 
   // blacklisted_ids is the list of IDs that are not allowed to use in the network.
-  repeated string blacklisted_ids = 2 [(gogoproto.customname) = "BlacklistedIDs"];
+  repeated string blacklisted_ids = 2 [(gogoproto.customname) = "BlacklistedIDs", (gogoproto.moretags) = "name:\"blacklisted-ids\" description:\"IDs that can not be registered in the network.\""];
 
   message UserRegistrationFlow {
     // skip_validation denotes whether if users need to validate their email
     // account after registration or this step is skipped.
-    bool skip_validation = 1;
+    bool skip_validation = 1 [(gogoproto.moretags) = "name:\"skip-validation\" description:\"Do not require email validation for new users or modified emails.\""];
 
     // invitation_only denotes whether people can register themselves an user
     // account or they need to be granted an invitation to do so.
-    bool invitation_only = 2;
+    bool invitation_only = 2 [(gogoproto.moretags) = "name:\"invitation-only\" description:\"Require an invitation for new users.\""];
 
     // admin_approval denotes whether or not admins need to validate user accounts
     // after they are registered.
-    bool admin_approval = 3;
+    bool admin_approval = 3 [(gogoproto.moretags) = "name:\"admin-approval\" description:\"Require admin confirmation for new users.\""];
   }
   // user_registration are the settings used to configure the user registration flow.
-  UserRegistrationFlow user_registration = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserRegistrationFlow user_registration = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (gogoproto.moretags) = "name:\"user-registration\""];
 
   // validation_token_ttl denotes the time an account validation token is valid
   // after being issued.
-  google.protobuf.Duration validation_token_ttl = 4 [(gogoproto.customname) = "ValidationTokenTTL", (gogoproto.nullable) = false, (gogoproto.stdduration) = true];
+  google.protobuf.Duration validation_token_ttl = 4 [(gogoproto.customname) = "ValidationTokenTTL", (gogoproto.nullable) = false, (gogoproto.stdduration) = true, (gogoproto.moretags) = "name:\"validation-token-ttl\" description:\"Validity of confirmation emails.\""];
 
   // allowed_emails is a list of globs to restrict emails to. If empty all emails are valid.
-  repeated string allowed_emails = 5;
+  repeated string allowed_emails = 5 [(gogoproto.moretags) = "name:\"allowed-emails\" description:\"Allowed email address globs, if any.\""];
 
   // invitation_token_ttl denotes the time an invitation token is valid after being issued.
-  google.protobuf.Duration invitation_token_ttl = 6 [(gogoproto.customname) = "InvitationTokenTTL", (gogoproto.nullable) = false, (gogoproto.stdduration) = true];
+  google.protobuf.Duration invitation_token_ttl = 6 [(gogoproto.customname) = "InvitationTokenTTL", (gogoproto.nullable) = false, (gogoproto.stdduration) = true, (gogoproto.moretags) = "name:\"invitation-token-ttl\" description:\"Validity of invitation emails.\""];
 }
 
 message UpdateSettingsRequest {
