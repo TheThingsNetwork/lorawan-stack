@@ -56,6 +56,9 @@ type userService struct {
 
 // CreateUser creates an user in the network.
 func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequest) (*pbtypes.Empty, error) {
+	var user *ttnpb.User
+	var token *store.ValidationToken
+
 	err := s.store.Transact(func(tx *store.Store) error {
 		settings, err := tx.Settings.Get()
 		if err != nil {
@@ -79,7 +82,7 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 			return err
 		}
 
-		user := &ttnpb.User{
+		user = &ttnpb.User{
 			UserIdentifiers: req.User.UserIdentifiers,
 			Name:            req.User.Name,
 			Password:        string(password),
@@ -115,28 +118,32 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		}
 
 		if !settings.SkipValidation {
-			token := store.ValidationToken{
+			token = &store.ValidationToken{
 				ValidationToken: random.String(64),
 				CreatedAt:       time.Now(),
 				ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 			}
 
-			err = tx.Users.SaveValidationToken(user.UserIdentifiers, token)
-			if err != nil {
-				return err
-			}
-
-			return s.email.Send(user.UserIdentifiers.Email, &templates.EmailValidation{
-				OrganizationName: s.config.OrganizationName,
-				PublicURL:        s.config.PublicURL,
-				Token:            token.ValidationToken,
-			})
+			return tx.Users.SaveValidationToken(user.UserIdentifiers, *token)
 		}
 
 		return nil
 	})
 
-	return ttnpb.Empty, err
+	if err != nil {
+		return nil, err
+	}
+
+	// No email needs to be sent.
+	if token == nil {
+		return ttnpb.Empty, nil
+	}
+
+	return ttnpb.Empty, s.email.Send(user.UserIdentifiers.Email, &templates.EmailValidation{
+		OrganizationName: s.config.OrganizationName,
+		PublicURL:        s.config.PublicURL,
+		Token:            token.ValidationToken,
+	})
 }
 
 // GetUser returns the account of the current user.
@@ -166,12 +173,15 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 		return nil, err
 	}
 
+	var user *ttnpb.User
+	var token *store.ValidationToken
+
 	err = s.store.Transact(func(tx *store.Store) error {
 		found, err := tx.Users.GetByID(claimsFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
 		if err != nil {
 			return err
 		}
-		user := found.GetUser()
+		user = found.GetUser()
 
 		settings, err := tx.Settings.Get()
 		if err != nil {
@@ -216,25 +226,29 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 			return nil
 		}
 
-		token := store.ValidationToken{
+		token = &store.ValidationToken{
 			ValidationToken: random.String(64),
 			CreatedAt:       time.Now(),
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 
-		err = tx.Users.SaveValidationToken(user.UserIdentifiers, token)
-		if err != nil {
-			return err
-		}
-
-		return s.email.Send(user.UserIdentifiers.Email, &templates.EmailValidation{
-			OrganizationName: s.config.OrganizationName,
-			PublicURL:        s.config.PublicURL,
-			Token:            token.ValidationToken,
-		})
+		return tx.Users.SaveValidationToken(user.UserIdentifiers, *token)
 	})
 
-	return ttnpb.Empty, err
+	if err != nil {
+		return nil, err
+	}
+
+	// No email needs to be send.
+	if token == nil {
+		return ttnpb.Empty, nil
+	}
+
+	return ttnpb.Empty, s.email.Send(user.UserIdentifiers.Email, &templates.EmailValidation{
+		OrganizationName: s.config.OrganizationName,
+		PublicURL:        s.config.PublicURL,
+		Token:            token.ValidationToken,
+	})
 }
 
 // UpdateUserPassword updates the password of the current user.
@@ -434,12 +448,15 @@ func (s *userService) RequestUserEmailValidation(ctx context.Context, _ *pbtypes
 		return nil, err
 	}
 
+	var user *ttnpb.User
+	var token store.ValidationToken
+
 	err = s.store.Transact(func(tx *store.Store) error {
 		found, err := tx.Users.GetByID(claimsFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
 		if err != nil {
 			return err
 		}
-		user := found.GetUser()
+		user = found.GetUser()
 
 		if !user.ValidatedAt.IsZero() {
 			return ErrEmailAlreadyValidated.New(nil)
@@ -450,25 +467,24 @@ func (s *userService) RequestUserEmailValidation(ctx context.Context, _ *pbtypes
 			return err
 		}
 
-		token := store.ValidationToken{
+		token = store.ValidationToken{
 			ValidationToken: random.String(64),
 			CreatedAt:       time.Now(),
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 
-		err = tx.Users.SaveValidationToken(claimsFromContext(ctx).UserIdentifiers(), token)
-		if err != nil {
-			return err
-		}
-
-		return s.email.Send(user.UserIdentifiers.Email, &templates.EmailValidation{
-			OrganizationName: s.config.OrganizationName,
-			PublicURL:        s.config.PublicURL,
-			Token:            token.ValidationToken,
-		})
+		return tx.Users.SaveValidationToken(claimsFromContext(ctx).UserIdentifiers(), token)
 	})
 
-	return ttnpb.Empty, err
+	if err != nil {
+		return nil, err
+	}
+
+	return ttnpb.Empty, s.email.Send(user.UserIdentifiers.Email, &templates.EmailValidation{
+		OrganizationName: s.config.OrganizationName,
+		PublicURL:        s.config.PublicURL,
+		Token:            token.ValidationToken,
+	})
 }
 
 // ListAuthorizedClients returns all the authorized third-party clients that
