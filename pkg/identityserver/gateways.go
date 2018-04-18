@@ -85,7 +85,7 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 		})
 	})
 
-	return new(pbtypes.Empty), err
+	return ttnpb.Empty, err
 }
 
 // GetGateway returns a gateway information.
@@ -195,7 +195,7 @@ func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGat
 		return tx.Gateways.Update(gtw)
 	})
 
-	return new(pbtypes.Empty), err
+	return ttnpb.Empty, err
 }
 
 // DeleteGateway deletes a gateway.
@@ -207,7 +207,7 @@ func (s *gatewayService) DeleteGateway(ctx context.Context, req *ttnpb.GatewayId
 		return nil, err
 	}
 
-	return new(pbtypes.Empty), s.store.Gateways.Delete(ids)
+	return ttnpb.Empty, s.store.Gateways.Delete(ids)
 }
 
 // GenerateGatewayAPIKey generates a gateway API key and returns it.
@@ -267,7 +267,7 @@ func (s *gatewayService) UpdateGatewayAPIKey(ctx context.Context, req *ttnpb.Upd
 		return nil, err
 	}
 
-	return new(pbtypes.Empty), s.store.Gateways.UpdateAPIKeyRights(req.GatewayIdentifiers, req.Name, req.Rights)
+	return ttnpb.Empty, s.store.Gateways.UpdateAPIKeyRights(req.GatewayIdentifiers, req.Name, req.Rights)
 }
 
 // RemoveGatewayAPIKey removes a gateway API key.
@@ -277,7 +277,7 @@ func (s *gatewayService) RemoveGatewayAPIKey(ctx context.Context, req *ttnpb.Rem
 		return nil, err
 	}
 
-	return new(pbtypes.Empty), s.store.Gateways.DeleteAPIKey(req.GatewayIdentifiers, req.Name)
+	return ttnpb.Empty, s.store.Gateways.DeleteAPIKey(req.GatewayIdentifiers, req.Name)
 }
 
 // SetGatewayCollaborator sets a collaborationship between an user and an
@@ -350,7 +350,7 @@ func (s *gatewayService) SetGatewayCollaborator(ctx context.Context, req *ttnpb.
 		})
 	})
 
-	return new(pbtypes.Empty), err
+	return ttnpb.Empty, err
 }
 
 // ListGatewayCollaborators returns all the collaborators that a gateway has.

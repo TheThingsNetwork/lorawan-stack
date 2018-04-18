@@ -182,11 +182,11 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 		if err != nil {
 			return nil, err
 		}
-		return &pbtypes.Empty{}, nil
+		return ttnpb.Empty, nil
 	case 1:
 		dev := devs[0]
 		dev.EndDevice = &req.Device
-		return &pbtypes.Empty{}, dev.Store(fields...)
+		return ttnpb.Empty, dev.Store(fields...)
 	default:
 		return nil, ErrTooManyDevices.New(nil)
 	}
@@ -211,7 +211,7 @@ func (r *RegistryRPC) DeleteDevice(ctx context.Context, id *ttnpb.EndDeviceIdent
 	case 0:
 		return nil, ErrDeviceNotFound.New(nil)
 	case 1:
-		return &pbtypes.Empty{}, devs[0].Delete()
+		return ttnpb.Empty, devs[0].Delete()
 	default:
 		return nil, ErrTooManyDevices.New(nil)
 	}

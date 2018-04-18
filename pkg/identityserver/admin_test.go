@@ -37,7 +37,7 @@ func TestAdminSettings(t *testing.T) {
 
 	ctx := testCtx(testUsers()["alice"].UserIdentifiers)
 
-	resp, err := is.adminService.GetSettings(ctx, &pbtypes.Empty{})
+	resp, err := is.adminService.GetSettings(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	a.So(resp, test.ShouldBeSettingsIgnoringAutoFields, testSettings())
 
@@ -54,7 +54,7 @@ func TestAdminSettings(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	resp, err = is.GetSettings(ctx, &pbtypes.Empty{})
+	resp, err = is.GetSettings(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	a.So(resp.AllowedEmails, should.HaveLength, 0)
 	a.So(resp.IdentityServerSettings_UserRegistrationFlow.SkipValidation, should.BeTrue)
@@ -79,7 +79,7 @@ func TestAdminInvitations(t *testing.T) {
 		a.So(invitation.Token, should.NotBeEmpty)
 	}
 
-	invitations, err := is.adminService.ListInvitations(ctx, &pbtypes.Empty{})
+	invitations, err := is.adminService.ListInvitations(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	if a.So(invitations.Invitations, should.HaveLength, 1) {
 		i := invitations.Invitations[0]
@@ -127,7 +127,7 @@ func TestAdminInvitations(t *testing.T) {
 	a.So(found.Password, should.BeEmpty)
 
 	// check invitation was used
-	invitations, err = is.adminService.ListInvitations(ctx, &pbtypes.Empty{})
+	invitations, err = is.adminService.ListInvitations(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	a.So(invitations.Invitations, should.HaveLength, 0)
 
@@ -141,7 +141,7 @@ func TestAdminInvitations(t *testing.T) {
 	_, err = is.adminService.SendInvitation(ctx, &ttnpb.SendInvitationRequest{Email: email})
 	a.So(err, should.BeNil)
 
-	invitations, err = is.adminService.ListInvitations(ctx, &pbtypes.Empty{})
+	invitations, err = is.adminService.ListInvitations(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	if a.So(invitations.Invitations, should.HaveLength, 1) {
 		i := invitations.Invitations[0]
@@ -153,7 +153,7 @@ func TestAdminInvitations(t *testing.T) {
 	_, err = is.adminService.DeleteInvitation(ctx, &ttnpb.DeleteInvitationRequest{Email: email})
 	a.So(err, should.BeNil)
 
-	invitations, err = is.adminService.ListInvitations(ctx, &pbtypes.Empty{})
+	invitations, err = is.adminService.ListInvitations(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	a.So(invitations.Invitations, should.HaveLength, 0)
 }

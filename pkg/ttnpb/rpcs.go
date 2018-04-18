@@ -12,22 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package gatewayserver
+package ttnpb
 
-import (
-	"context"
+import "github.com/gogo/protobuf/types"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/gogo/protobuf/types"
-)
-
-// ScheduleDownlink on a gateway connected to this gateway server.
-func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*types.Empty, error) {
-	err := g.gateways.Send(down.TxMetadata.GatewayIdentifiers, &ttnpb.GatewayDown{DownlinkMessage: down})
-	if err != nil {
-		return nil, errors.NewWithCause(err, "Could not send downlink to gateway")
-	}
-
-	return ttnpb.Empty, nil
-}
+// Empty message in an RPC call.
+var Empty = new(types.Empty)

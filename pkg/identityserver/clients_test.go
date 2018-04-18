@@ -78,7 +78,7 @@ func TestClient(t *testing.T) {
 	a.So(found.CreatorIDs.UserID, should.BeEmpty)
 	a.So(found.Rights, should.Resemble, cli.Rights)
 
-	clients, err := is.clientService.ListClients(ctx, &pbtypes.Empty{})
+	clients, err := is.clientService.ListClients(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	if a.So(clients.Clients, should.HaveLength, 1) {
 		a.So(clients.Clients[0], test.ShouldBeClientIgnoringAutoFields, cli)

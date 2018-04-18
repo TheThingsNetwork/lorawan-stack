@@ -61,7 +61,7 @@ func TestOrganization(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeOrganizationIgnoringAutoFields, org)
 
-	orgs, err := is.organizationService.ListOrganizations(ctx, &pbtypes.Empty{})
+	orgs, err := is.organizationService.ListOrganizations(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	if a.So(orgs.Organizations, should.HaveLength, 1) {
 		a.So(orgs.Organizations[0], test.ShouldBeOrganizationIgnoringAutoFields, org)

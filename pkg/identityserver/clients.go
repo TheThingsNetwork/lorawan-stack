@@ -63,7 +63,7 @@ func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClien
 		})
 	})
 
-	return new(pbtypes.Empty), err
+	return ttnpb.Empty, err
 }
 
 // GetClient returns the client that matches the identifier.
@@ -155,7 +155,7 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 		return tx.Clients.Update(client)
 	})
 
-	return new(pbtypes.Empty), err
+	return ttnpb.Empty, err
 }
 
 // DeleteClient deletes the client that matches the identifier and revokes all
@@ -182,5 +182,5 @@ func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdent
 		return tx.Clients.Delete(ids)
 	})
 
-	return new(pbtypes.Empty), err
+	return ttnpb.Empty, err
 }

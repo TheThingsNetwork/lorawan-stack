@@ -196,13 +196,13 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	a.So(err, should.BeNil)
 
 	// Can not retrieve profile without proper claims.
-	found, err := is.userService.GetUser(context.Background(), &pbtypes.Empty{})
+	found, err := is.userService.GetUser(context.Background(), ttnpb.Empty)
 	a.So(found, should.BeNil)
 	a.So(err, should.NotBeNil)
 	a.So(ErrNotAuthorized.Describes(err), should.BeTrue)
 
 	// Check that response does not include password within.
-	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
+	found, err = is.userService.GetUser(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	a.So(found.UserIdentifiers, should.Resemble, user.UserIdentifiers)
 	a.So(found.Name, should.Equal, user.Name)
@@ -229,7 +229,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 		})
 		a.So(err, should.BeNil)
 
-		found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
+		found, err = is.userService.GetUser(ctx, ttnpb.Empty)
 		a.So(err, should.BeNil)
 		a.So(found.ValidatedAt.IsZero(), should.BeFalse)
 	}
@@ -273,7 +273,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
-	keys, err := is.userService.ListUserAPIKeys(ctx, &pbtypes.Empty{})
+	keys, err := is.userService.ListUserAPIKeys(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	if a.So(keys.APIKeys, should.HaveLength, 1) {
 		sort.Slice(keys.APIKeys[0].Rights, func(i, j int) bool { return keys.APIKeys[0].Rights[i] < keys.APIKeys[0].Rights[j] })
@@ -285,7 +285,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	})
 	a.So(err, should.BeNil)
 
-	keys, err = is.userService.ListUserAPIKeys(ctx, &pbtypes.Empty{})
+	keys, err = is.userService.ListUserAPIKeys(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
@@ -311,7 +311,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	ctx = testCtx(sids)
 
 	// Check that user's ValidatedAt has been resetted.
-	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
+	found, err = is.userService.GetUser(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	a.So(found.UserIdentifiers, should.Resemble, user.UserIdentifiers)
 	a.So(found.ValidatedAt.IsZero(), should.BeTrue)
@@ -326,7 +326,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	a.So(token, should.NotBeEmpty)
 
 	// Request a new validation token.
-	_, err = is.RequestUserEmailValidation(ctx, &pbtypes.Empty{})
+	_, err = is.RequestUserEmailValidation(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 
 	// Check that the old validation token doesnt work because we requested a new one.
@@ -337,7 +337,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	a.So(sql.ErrValidationTokenNotFound.Describes(err), should.BeTrue)
 
 	// And therefore the email is not validated yet.
-	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
+	found, err = is.userService.GetUser(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	a.So(found.UserIdentifiers, should.Resemble, user.UserIdentifiers)
 	a.So(found.ValidatedAt.IsZero(), should.BeTrue)
@@ -355,7 +355,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	})
 	a.So(err, should.BeNil)
 
-	found, err = is.userService.GetUser(ctx, &pbtypes.Empty{})
+	found, err = is.userService.GetUser(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	a.So(found.UserIdentifiers, should.Resemble, user.UserIdentifiers)
 	a.So(found.ValidatedAt.IsZero(), should.BeFalse)
@@ -402,6 +402,6 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	err = is.store.OAuth.SaveRefreshToken(refreshData)
 	a.So(err, should.BeNil)
 
-	_, err = is.userService.DeleteUser(ctx, &pbtypes.Empty{})
+	_, err = is.userService.DeleteUser(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 }

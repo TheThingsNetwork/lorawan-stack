@@ -31,17 +31,17 @@ type GsNsServer struct {
 
 func (s GsNsServer) StartServingGateway(_ context.Context, id *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
 	s.Done()
-	return &types.Empty{}, nil
+	return ttnpb.Empty, nil
 }
 
 func (s GsNsServer) StopServingGateway(_ context.Context, id *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
 	s.Done()
-	return &types.Empty{}, nil
+	return ttnpb.Empty, nil
 }
 
 func (s GsNsServer) HandleUplink(_ context.Context, up *ttnpb.UplinkMessage) (*types.Empty, error) {
 	s.Done()
-	return &types.Empty{}, nil
+	return ttnpb.Empty, nil
 }
 
 func StartMockGsNsServer(ctx context.Context) (GsNsServer, string) {
