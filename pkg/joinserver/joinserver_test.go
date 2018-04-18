@@ -31,6 +31,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/kr/pretty"
+	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"golang.org/x/net/context"
@@ -899,15 +900,9 @@ func TestHandleJoin(t *testing.T) {
 				},
 			)
 
-			_, err := reg.Create(tc.Device)
+			dev, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
 			if !a.So(err, should.BeNil) {
 				return
-			}
-
-			dev, err := deviceregistry.FindDeviceByIdentifiers(reg, &tc.Device.EndDeviceIdentifiers)
-			a.So(err, should.BeNil)
-			if a.So(dev, should.NotBeNil) && a.So(dev, should.HaveLength, 1) {
-				a.So(pretty.Diff(dev[0].EndDevice, tc.Device), should.BeEmpty)
 			}
 
 			ctx := (rpcmetadata.MD{
@@ -930,20 +925,29 @@ func TestHandleJoin(t *testing.T) {
 			}
 
 			// ensure the stored device nonces are updated
-			time.Sleep(time.Millisecond)
+			time.Sleep(test.Delay)
 
-			dev, err = deviceregistry.FindDeviceByIdentifiers(reg, &tc.Device.EndDeviceIdentifiers)
-			a.So(err, should.BeNil)
-			if a.So(dev, should.NotBeNil) && a.So(dev, should.HaveLength, 1) {
-				a.So(dev[0].GetNextDevNonce(), should.Equal, tc.NextNextDevNonce)
-				a.So(dev[0].GetNextJoinNonce(), should.Equal, tc.NextNextJoinNonce)
-				a.So(pretty.Diff(dev[0].GetUsedDevNonces(), tc.NextUsedDevNonces), should.BeEmpty)
-				if s := dev[0].GetSession(); tc.Error == nil && a.So(s, should.NotBeNil) {
-					a.So(s.DevAddr, should.Resemble, *tc.JoinRequest.EndDeviceIdentifiers.DevAddr)
-					a.So(s.SessionKeys, should.Resemble, resp.SessionKeys)
-					a.So([]time.Time{start, s.StartedAt, time.Now()}, should.BeChronological)
+			dev.EndDevice, err = dev.Load()
+			if !a.So(err, should.BeNil) {
+				return
+			}
+
+			ed := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+			ed.CreatedAt = dev.EndDevice.GetCreatedAt()
+			ed.UpdatedAt = dev.EndDevice.GetUpdatedAt()
+			ed.NextDevNonce = tc.NextNextDevNonce
+			ed.NextJoinNonce = tc.NextNextJoinNonce
+			ed.UsedDevNonces = tc.NextUsedDevNonces
+			if tc.Error == nil {
+				a.So([]time.Time{start, dev.GetSession().GetStartedAt(), time.Now()}, should.BeChronological)
+				ed.Session = &ttnpb.Session{
+					DevAddr:     *tc.JoinRequest.EndDeviceIdentifiers.DevAddr,
+					SessionKeys: resp.SessionKeys,
+					StartedAt:   dev.GetSession().GetStartedAt(),
 				}
 			}
+
+			a.So(pretty.Diff(ed, dev.EndDevice), should.BeEmpty)
 
 			resp, err = js.HandleJoin(context.Background(), tc.JoinRequest)
 			a.So(err, should.BeError)
@@ -1139,15 +1143,9 @@ func TestGetAppSKey(t *testing.T) {
 				},
 			)
 
-			_, err := reg.Create(tc.Device)
+			_, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
 			if !a.So(err, should.BeNil) {
 				return
-			}
-
-			dev, err := deviceregistry.FindDeviceByIdentifiers(reg, &tc.Device.EndDeviceIdentifiers)
-			a.So(err, should.BeNil)
-			if a.So(dev, should.NotBeNil) && a.So(dev, should.HaveLength, 1) {
-				a.So(pretty.Diff(dev[0].EndDevice, tc.Device), should.BeEmpty)
 			}
 
 			ctx := (rpcmetadata.MD{
@@ -1389,15 +1387,9 @@ func TestGetNwkSKeys(t *testing.T) {
 				},
 			)
 
-			_, err := reg.Create(tc.Device)
+			_, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
 			if !a.So(err, should.BeNil) {
 				return
-			}
-
-			dev, err := deviceregistry.FindDeviceByIdentifiers(reg, &tc.Device.EndDeviceIdentifiers)
-			a.So(err, should.BeNil)
-			if a.So(dev, should.NotBeNil) && a.So(dev, should.HaveLength, 1) {
-				a.So(pretty.Diff(dev[0].EndDevice, tc.Device), should.BeEmpty)
 			}
 
 			ctx := (rpcmetadata.MD{

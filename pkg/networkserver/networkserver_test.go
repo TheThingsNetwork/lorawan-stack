@@ -786,7 +786,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					}
 				}
 
-				dev, err := reg.Create(tc.Device)
+				dev, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
 				if !a.So(err, should.BeNil) {
 					return
 				}
@@ -915,6 +915,8 @@ func HandleUplinkTest() func(t *testing.T) {
 					storedUp.RxMetadata = nil
 					expectedUp.RxMetadata = nil
 
+					ed.CreatedAt = dev.GetCreatedAt()
+					ed.UpdatedAt = dev.GetUpdatedAt()
 					a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
 				})
 
@@ -1135,7 +1137,7 @@ func HandleJoinTest() func(t *testing.T) {
 
 				reqWg := &sync.WaitGroup{}
 
-				dev, err := reg.Create(tc.Device)
+				dev, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
 				if !a.So(err, should.BeNil) {
 					return
 				}
@@ -1263,8 +1265,7 @@ func HandleJoinTest() func(t *testing.T) {
 						metadataLdiff(t, storedMD, expectedMD)
 					}
 
-					storedUp.RxMetadata = nil
-					expectedUp.RxMetadata = nil
+					storedUp.RxMetadata = expectedUp.RxMetadata
 
 					a.So(dev.EndDevice.SessionFallback, should.BeNil)
 					if a.So(dev.EndDevice.GetSession(), should.NotBeNil) {
@@ -1276,10 +1277,10 @@ func HandleJoinTest() func(t *testing.T) {
 						}
 					}
 
-					ed.Session = nil
-					dev.EndDevice.Session = nil
-					dev.EndDevice.EndDeviceIdentifiers.DevAddr = nil
-
+					ed.EndDeviceIdentifiers.DevAddr = dev.EndDevice.EndDeviceIdentifiers.DevAddr
+					ed.Session = dev.EndDevice.GetSession()
+					ed.CreatedAt = dev.GetCreatedAt()
+					ed.UpdatedAt = dev.GetUpdatedAt()
 					a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
 				})
 

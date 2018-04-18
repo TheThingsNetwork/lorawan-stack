@@ -26,6 +26,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/kr/pretty"
+	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
@@ -36,45 +37,61 @@ func TestRegistry(t *testing.T) {
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	dev, err := r.Create(ed)
+	dev, err := r.Create(deepcopy.Copy(ed).(*ttnpb.EndDevice))
 	if !a.So(err, should.BeNil) {
 		return
 	}
 	if a.So(dev, should.NotBeNil) {
-		a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
+		ed.CreatedAt = dev.EndDevice.GetCreatedAt()
+		ed.UpdatedAt = dev.EndDevice.GetUpdatedAt()
+		a.So(dev.EndDevice, should.Resemble, ed)
 	}
 
-	found, err := FindOneDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
+	found, err := r.FindBy(ed, "EndDeviceIdentifiers")
 	if !a.So(err, should.BeNil) {
 		return
 	}
-	if a.So(found, should.NotBeNil) {
-		a.So(pretty.Diff(found.EndDevice, ed), should.BeEmpty)
+	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
+		found[0].CreatedAt = dev.EndDevice.GetCreatedAt()
+		found[0].UpdatedAt = dev.EndDevice.GetUpdatedAt()
+		a.So(pretty.Diff(found[0].EndDevice, ed), should.BeEmpty)
 	}
 
 	updated := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-	for dev.EndDeviceIdentifiers == updated.EndDeviceIdentifiers {
+	for dev.EndDevice.EndDeviceIdentifiers.Equal(updated.EndDeviceIdentifiers) {
 		updated = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	}
+	updated.CreatedAt = dev.EndDevice.GetCreatedAt()
+	updated.UpdatedAt = dev.EndDevice.GetUpdatedAt()
 	dev.EndDevice = updated
 
 	if !a.So(dev.Store(), should.BeNil) {
 		return
 	}
 
-	_, err = FindOneDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
-	a.So(err, should.NotBeNil)
-
-	found, err = FindOneDeviceByIdentifiers(r, &updated.EndDeviceIdentifiers)
+	found, err = r.FindBy(ed, "EndDeviceIdentifiers")
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) {
-		a.So(pretty.Diff(found.EndDevice, updated), should.BeEmpty)
+		a.So(found, should.BeEmpty)
+	}
+
+	ed = updated
+
+	found, err = r.FindBy(ed, "EndDeviceIdentifiers")
+	a.So(err, should.BeNil)
+	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
+		found[0].CreatedAt = ed.GetCreatedAt()
+		found[0].UpdatedAt = ed.GetUpdatedAt()
+		a.So(pretty.Diff(found[0].EndDevice, ed), should.BeEmpty)
 	}
 
 	a.So(dev.Delete(), should.BeNil)
 
-	found, err = FindOneDeviceByIdentifiers(r, &updated.EndDeviceIdentifiers)
-	a.So(err, should.NotBeNil)
+	found, err = r.FindBy(ed, "EndDeviceIdentifiers")
+	a.So(err, should.BeNil)
+	if a.So(found, should.NotBeNil) {
+		a.So(found, should.BeEmpty)
+	}
 }
 
 func TestFindDeviceByIdentifiers(t *testing.T) {
@@ -99,72 +116,56 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 		},
 	}
 
-	dev, err := r.Create(ed)
+	dev, err := r.Create(deepcopy.Copy(ed).(*ttnpb.EndDevice))
 	if !a.So(err, should.BeNil) {
 		return
 	}
 	if a.So(dev, should.NotBeNil) {
-		a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
+		ed.CreatedAt = dev.EndDevice.GetCreatedAt()
+		ed.UpdatedAt = dev.EndDevice.GetUpdatedAt()
+		a.So(dev.EndDevice, should.Resemble, ed)
 	}
 
-	found, err := FindDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
-		DevEUI:        ed.DevEUI,
-		JoinEUI:       ed.JoinEUI,
-		DevAddr:       ed.DevAddr,
-		DeviceID:      ed.DeviceID,
-		ApplicationID: ed.ApplicationID,
-	})
+	found, err := FindDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
 		a.So(pretty.Diff(found[0].EndDevice, ed), should.BeEmpty)
 	}
 
 	updated := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-	for dev.EndDeviceIdentifiers == updated.EndDeviceIdentifiers {
+	for dev.EndDevice.EndDeviceIdentifiers.Equal(updated.EndDeviceIdentifiers) {
 		updated = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	}
+	updated.CreatedAt = ed.GetCreatedAt()
+	updated.UpdatedAt = ed.GetUpdatedAt()
 	dev.EndDevice = updated
 
 	if !a.So(dev.Store(), should.BeNil) {
 		return
 	}
 
-	found, err = FindDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
-		DevEUI:        ed.DevEUI,
-		JoinEUI:       ed.JoinEUI,
-		DevAddr:       ed.DevAddr,
-		DeviceID:      ed.DeviceID,
-		ApplicationID: ed.ApplicationID,
-	})
+	found, err = FindDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) {
-		a.So(found, should.HaveLength, 0)
+		a.So(found, should.BeEmpty)
 	}
 
-	found, err = FindDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
-		DevEUI:        updated.DevEUI,
-		JoinEUI:       updated.JoinEUI,
-		DevAddr:       updated.DevAddr,
-		DeviceID:      updated.DeviceID,
-		ApplicationID: updated.ApplicationID,
-	})
+	ed = updated
+
+	found, err = FindDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		a.So(pretty.Diff(found[0].EndDevice, updated), should.BeEmpty)
+		ed.CreatedAt = found[0].EndDevice.GetCreatedAt()
+		ed.UpdatedAt = found[0].EndDevice.GetUpdatedAt()
+		a.So(pretty.Diff(found[0].EndDevice, ed), should.BeEmpty)
 	}
 
 	a.So(dev.Delete(), should.BeNil)
 
-	found, err = FindDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
-		DevEUI:        updated.DevEUI,
-		JoinEUI:       updated.JoinEUI,
-		DevAddr:       updated.DevAddr,
-		DeviceID:      updated.DeviceID,
-		ApplicationID: updated.ApplicationID,
-	})
+	found, err = FindDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) {
-		a.So(found, should.HaveLength, 0)
+		a.So(found, should.BeEmpty)
 	}
 }
 
@@ -173,53 +174,38 @@ func TestFindOneDeviceByIdentifiers(t *testing.T) {
 	r := New(store.NewTypedStoreClient(mapstore.New()))
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-	ed.Attributes = nil
 
-	found, err := FindOneDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
-		DevEUI:        ed.DevEUI,
-		JoinEUI:       ed.JoinEUI,
-		DevAddr:       ed.DevAddr,
-		DeviceID:      ed.DeviceID,
-		ApplicationID: ed.ApplicationID,
-	})
+	found, err := FindOneDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
 	a.So(err, should.NotBeNil)
 	a.So(found, should.BeNil)
 
-	dev, err := r.Create(ed)
+	dev, err := r.Create(deepcopy.Copy(ed).(*ttnpb.EndDevice))
 	if !a.So(err, should.BeNil) {
 		return
 	}
 	if a.So(dev, should.NotBeNil) {
-		a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
+		ed.CreatedAt = dev.EndDevice.GetCreatedAt()
+		ed.UpdatedAt = dev.EndDevice.GetUpdatedAt()
+		a.So(dev.EndDevice, should.Resemble, ed)
 	}
 
-	found, err = FindOneDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
-		DevEUI:        ed.DevEUI,
-		JoinEUI:       ed.JoinEUI,
-		DevAddr:       ed.DevAddr,
-		DeviceID:      ed.DeviceID,
-		ApplicationID: ed.ApplicationID,
-	})
-	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) {
-		a.So(pretty.Diff(found.EndDevice, dev.EndDevice), should.BeEmpty)
+	found, err = FindOneDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
+	if !a.So(err, should.BeNil) {
+		return
 	}
+	a.So(pretty.Diff(found.EndDevice, ed), should.BeEmpty)
 
-	dev, err = r.Create(ed)
+	dev, err = r.Create(deepcopy.Copy(ed).(*ttnpb.EndDevice))
 	if !a.So(err, should.BeNil) {
 		return
 	}
 	if a.So(dev, should.NotBeNil) {
-		a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
+		ed.CreatedAt = dev.EndDevice.GetCreatedAt()
+		ed.UpdatedAt = dev.EndDevice.GetUpdatedAt()
+		a.So(dev.EndDevice, should.Resemble, ed)
 	}
 
-	found, err = FindOneDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
-		DevEUI:        ed.DevEUI,
-		JoinEUI:       ed.JoinEUI,
-		DevAddr:       ed.DevAddr,
-		DeviceID:      ed.DeviceID,
-		ApplicationID: ed.ApplicationID,
-	})
+	found, err = FindOneDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
 	a.So(err, should.NotBeNil)
 	a.So(found, should.BeNil)
 }
@@ -257,16 +243,12 @@ func ExampleRegistry() {
 		panic(fmt.Errorf("Failed to update device %s", err))
 	}
 
-	devs, err := FindDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
+	dev, err = FindOneDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
 		ApplicationID: "test",
 	})
 	if err != nil {
 		panic(fmt.Errorf("Failed to find device by identifiers %s", err))
 	}
-	if len(devs) != 1 {
-		panic(fmt.Errorf("Expected to find 1 device, got %d", len(devs)))
-	}
-	dev = devs[0]
 
 	err = dev.Delete()
 	if err != nil {
