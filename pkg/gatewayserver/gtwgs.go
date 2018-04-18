@@ -172,10 +172,6 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 	}()
 
 	pld := uplink.GetPayload()
-	if pld.Payload == nil {
-		err = errors.New("Failed to unmarshal payload")
-		return
-	}
 
 	var ns cluster.Peer
 	switch pld.GetMType() {
@@ -191,7 +187,7 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 			return
 		}
 		ns = g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, g.config.NSTags, devAddrBytes)
-	case ttnpb.MType_JOIN_ACCEPT, ttnpb.MType_REJOIN_REQUEST:
+	case ttnpb.MType_JOIN_REQUEST, ttnpb.MType_REJOIN_REQUEST:
 		if uplink.DevEUI == nil {
 			err = errors.New("No DevEUI specified")
 			return

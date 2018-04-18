@@ -17,7 +17,6 @@ package gatewayserver_test
 import (
 	"context"
 	"net"
-	"sync"
 
 	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -26,26 +25,32 @@ import (
 
 // GsNsServer implements ttnpb.GsNsServer
 type GsNsServer struct {
-	*sync.WaitGroup
+	messageReceived chan string
 }
 
 func (s GsNsServer) StartServingGateway(_ context.Context, id *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
-	s.Done()
+	go func() {
+		s.messageReceived <- "StartServingGateway"
+	}()
 	return ttnpb.Empty, nil
 }
 
 func (s GsNsServer) StopServingGateway(_ context.Context, id *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
-	s.Done()
+	go func() {
+		s.messageReceived <- "StopServingGateway"
+	}()
 	return ttnpb.Empty, nil
 }
 
 func (s GsNsServer) HandleUplink(_ context.Context, up *ttnpb.UplinkMessage) (*types.Empty, error) {
-	s.Done()
+	go func() {
+		s.messageReceived <- "HandleUplink"
+	}()
 	return ttnpb.Empty, nil
 }
 
 func StartMockGsNsServer(ctx context.Context) (GsNsServer, string) {
-	ns := GsNsServer{WaitGroup: &sync.WaitGroup{}}
+	ns := GsNsServer{messageReceived: make(chan string)}
 
 	serve := func(ctx context.Context, addr string) string {
 		srv := rpcserver.New(ctx)

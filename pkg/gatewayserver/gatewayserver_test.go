@@ -15,20 +15,16 @@
 package gatewayserver_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
-	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
-	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
-	"google.golang.org/grpc"
 )
 
 func Example() {
@@ -66,150 +62,4 @@ func TestGatewayServer(t *testing.T) {
 	a.So(roles[0], should.Equal, ttnpb.PeerInfo_GATEWAY_SERVER)
 
 	defer gs.Close()
-}
-
-func TestLink(t *testing.T) {
-	a := assertions.New(t)
-
-	ctx := log.NewContext(context.Background(), test.GetLogger(t))
-
-	dir := createFPStore(a)
-	defer removeFPStore(a, dir)
-
-	registeredGatewayID, registeredGatewayUnknownFPID := "registered-gateway", "registered-gw-unknown-fp"
-	registeredGatewayFP, registeredGatewayUnknownFP := "EU_863_870", "UNKNOWN_FP"
-	registeredGateways := map[ttnpb.GatewayIdentifiers]ttnpb.Gateway{
-		{GatewayID: registeredGatewayID}:          {FrequencyPlanID: registeredGatewayFP},
-		{GatewayID: registeredGatewayUnknownFPID}: {FrequencyPlanID: registeredGatewayUnknownFP},
-	}
-	_, isAddr := StartMockIsGatewayServer(ctx, registeredGateways)
-	ns, nsAddr := StartMockGsNsServer(ctx)
-
-	logger := test.GetLogger(t)
-	c := component.MustNew(logger, &component.Config{
-		ServiceBase: config.ServiceBase{
-			Cluster: config.Cluster{
-				Name:           "test-gateway-server",
-				IdentityServer: isAddr,
-				NetworkServer:  nsAddr,
-			},
-			GRPC: config.GRPC{Listen: ":8088"},
-			HTTP: config.HTTP{Listen: ":8080", PProf: true},
-		},
-	})
-
-	var client ttnpb.GtwGsClient
-	srv := grpc.NewServer()
-	gs, err := gatewayserver.New(c, gatewayserver.Config{
-		DisableAuth:             true,
-		FileFrequencyPlansStore: dir,
-	})
-	if !a.So(err, should.BeNil) {
-		logger.Fatal("Gateway server could not start")
-	}
-
-	// Initializing server and client
-	{
-		gs.RegisterServices(srv)
-		err := gs.Start()
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
-		}
-		defer gs.Close()
-
-		md := rpcmetadata.MD{ID: registeredGatewayID}
-		ctx = md.ToOutgoingContext(ctx)
-		conn, err := rpcserver.StartLoopback(ctx, srv, grpc.WithPerRPCCredentials(md))
-		a.So(err, should.BeNil)
-		client = ttnpb.NewGtwGsClient(conn)
-	}
-
-	// Frequency plan
-	{
-		fp, err := client.GetFrequencyPlan(log.NewContext(ctx, log.FromContext(ctx).WithField("situation", "client_request")), &ttnpb.GetFrequencyPlanRequest{FrequencyPlanID: "EU_863_870"})
-		a.So(err, should.BeNil)
-		a.So(fp.BandID, should.Equal, registeredGatewayFP)
-	}
-
-	// Failing link
-	{
-		failedLinkMd := rpcmetadata.MD{ID: registeredGatewayUnknownFPID}
-		failedLinkCtx := failedLinkMd.ToOutgoingContext(ctx)
-		failedLinkConn, err := rpcserver.StartLoopback(failedLinkCtx, srv)
-		a.So(err, should.BeNil)
-		failedLinkClient := ttnpb.NewGtwGsClient(failedLinkConn)
-
-		failedLink, err := failedLinkClient.Link(failedLinkCtx)
-		a.So(err, should.BeNil)
-		_, err = failedLink.Recv()
-		a.So(err, should.NotBeNil)
-	}
-
-	linkCtx, linkCancel := context.WithCancel(ctx)
-	defer linkCancel()
-	ns.Add(1)
-	link, err := client.Link(linkCtx, grpc.FailFast(true))
-	a.So(err, should.BeNil)
-	ns.Wait()
-
-	// Sending empty uplink
-	{
-		err = link.Send(&ttnpb.GatewayUp{
-			UplinkMessages: []*ttnpb.UplinkMessage{{RawPayload: []byte{}}},
-		})
-		a.So(err, should.BeNil)
-	}
-
-	// Sending uplink with content
-	{
-		ns.Add(1)
-		uplink := ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
-		for uplink.Payload.MType != ttnpb.MType_CONFIRMED_UP && uplink.Payload.MType != ttnpb.MType_UNCONFIRMED_UP {
-			uplink = ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
-		}
-		err = link.Send(&ttnpb.GatewayUp{UplinkMessages: []*ttnpb.UplinkMessage{uplink}})
-		a.So(err, should.BeNil)
-		ns.Wait()
-	}
-
-	downlinkContent := []byte{1, 2, 3}
-
-	// Scheduling a downlink
-	{
-		_, err = gs.ScheduleDownlink(ctx, &ttnpb.DownlinkMessage{
-			Settings: ttnpb.TxSettings{
-				Bandwidth:       125000,
-				CodingRate:      "4/5",
-				Frequency:       866000000,
-				Modulation:      ttnpb.Modulation_LORA,
-				SpreadingFactor: 7,
-			},
-			RawPayload: downlinkContent,
-			TxMetadata: ttnpb.TxMetadata{
-				GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayID},
-			},
-		})
-		a.So(err, should.BeNil)
-	}
-
-	// Verifying the downlink has been received
-	{
-		down, err := link.Recv()
-		a.So(err, should.BeNil)
-		a.So(down.DownlinkMessage.Settings.Bandwidth, should.Equal, 125000)
-		a.So(len(down.DownlinkMessage.RawPayload), should.Equal, len(downlinkContent))
-	}
-
-	// Gateway information
-	{
-		obs, err := gs.GetGatewayObservations(ctx, &ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayID})
-		a.So(err, should.BeNil)
-		a.So(obs, should.NotBeNil)
-	}
-
-	ns.Add(1)
-	linkCancel()
-	ns.Done()
-
-	gs.Close()
 }
