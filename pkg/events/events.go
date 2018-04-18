@@ -17,6 +17,7 @@ package events
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"runtime"
@@ -118,4 +119,15 @@ func New(ctx context.Context, name string, identifiers, data interface{}) Event 
 			CorrelationIDs: CorrelationIDsFromContext(ctx),
 		},
 	}
+}
+
+// UnmarshalJSON unmarshals an event as JSON.
+func UnmarshalJSON(data []byte) (Event, error) {
+	e := new(event)
+	err := json.Unmarshal(data, &e)
+	if err != nil {
+		return nil, err
+	}
+	e.ctx = context.Background()
+	return e, nil
 }

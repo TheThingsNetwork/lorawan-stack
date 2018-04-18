@@ -16,6 +16,7 @@ package events_test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"sync"
 	"testing"
@@ -84,6 +85,16 @@ func TestEvents(t *testing.T) {
 	pubsub.Publish(events.New(ctx, "test.evt2", nil, nil))
 	a.So(<-newTotal, should.Equal, 3)
 	a.So(eventCh, should.HaveLength, 0)
+}
+
+func TestUnmarshalJSON(t *testing.T) {
+	a := assertions.New(t)
+	evt := events.New(context.Background(), "name", "identifiers", "data")
+	json, err := json.Marshal(evt)
+	a.So(err, should.BeNil)
+	evt2, err := events.UnmarshalJSON(json)
+	a.So(err, should.BeNil)
+	a.So(evt2, should.Resemble, evt)
 }
 
 func Example() {
