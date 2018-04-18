@@ -68,7 +68,7 @@ func (s *organizationService) CreateOrganization(ctx context.Context, req *ttnpb
 		})
 	})
 
-	return nil, err
+	return new(pbtypes.Empty), err
 }
 
 // GetOrganization returns the organization that matches the identifier.
@@ -147,7 +147,7 @@ func (s *organizationService) UpdateOrganization(ctx context.Context, req *ttnpb
 		return tx.Organizations.Update(organization)
 	})
 
-	return nil, err
+	return new(pbtypes.Empty), err
 }
 
 // DeleteOrganization deletes an organization.
@@ -159,7 +159,7 @@ func (s *organizationService) DeleteOrganization(ctx context.Context, req *ttnpb
 		return nil, err
 	}
 
-	return nil, s.store.Organizations.Delete(ids)
+	return new(pbtypes.Empty), s.store.Organizations.Delete(ids)
 }
 
 // GenerateOrganizationAPIKey generates an organization API key and returns it.
@@ -219,7 +219,7 @@ func (s *organizationService) UpdateOrganizationAPIKey(ctx context.Context, req 
 		return nil, err
 	}
 
-	return nil, s.store.Organizations.UpdateAPIKeyRights(req.OrganizationIdentifiers, req.Name, req.Rights)
+	return new(pbtypes.Empty), s.store.Organizations.UpdateAPIKeyRights(req.OrganizationIdentifiers, req.Name, req.Rights)
 }
 
 // RemoveOrganizationAPIKey removes an organization API key.
@@ -229,7 +229,7 @@ func (s *organizationService) RemoveOrganizationAPIKey(ctx context.Context, req 
 		return nil, err
 	}
 
-	return nil, s.store.Organizations.DeleteAPIKey(req.OrganizationIdentifiers, req.Name)
+	return new(pbtypes.Empty), s.store.Organizations.DeleteAPIKey(req.OrganizationIdentifiers, req.Name)
 }
 
 // SetOrganizationMember sets a membership between an user and an organization
@@ -302,7 +302,7 @@ func (s *organizationService) SetOrganizationMember(ctx context.Context, req *tt
 		})
 	})
 
-	return nil, err
+	return new(pbtypes.Empty), err
 }
 
 // ListOrganizationMembers returns all members from the organization that

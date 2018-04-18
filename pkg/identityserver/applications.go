@@ -81,7 +81,7 @@ func (s *applicationService) CreateApplication(ctx context.Context, req *ttnpb.C
 		})
 	})
 
-	return nil, err
+	return new(pbtypes.Empty), err
 }
 
 // GetApplication returns an application.
@@ -162,7 +162,7 @@ func (s *applicationService) UpdateApplication(ctx context.Context, req *ttnpb.U
 		return tx.Applications.Update(application)
 	})
 
-	return nil, err
+	return new(pbtypes.Empty), err
 }
 
 // DeleteApplication deletes an application.
@@ -174,7 +174,7 @@ func (s *applicationService) DeleteApplication(ctx context.Context, req *ttnpb.A
 		return nil, err
 	}
 
-	return nil, s.store.Applications.Delete(ids)
+	return new(pbtypes.Empty), s.store.Applications.Delete(ids)
 }
 
 // GenerateApplicationAPIKey generates an application API key and returns it.
@@ -234,7 +234,7 @@ func (s *applicationService) UpdateApplicationAPIKey(ctx context.Context, req *t
 		return nil, err
 	}
 
-	return nil, s.store.Applications.UpdateAPIKeyRights(req.ApplicationIdentifiers, req.Name, req.Rights)
+	return new(pbtypes.Empty), s.store.Applications.UpdateAPIKeyRights(req.ApplicationIdentifiers, req.Name, req.Rights)
 }
 
 // RemoveApplicationAPIKey removes an application API key.
@@ -244,7 +244,7 @@ func (s *applicationService) RemoveApplicationAPIKey(ctx context.Context, req *t
 		return nil, err
 	}
 
-	return nil, s.store.Applications.DeleteAPIKey(req.ApplicationIdentifiers, req.Name)
+	return new(pbtypes.Empty), s.store.Applications.DeleteAPIKey(req.ApplicationIdentifiers, req.Name)
 }
 
 // SetApplicationCollaborator sets a collaborationship between an user and an
@@ -317,7 +317,7 @@ func (s *applicationService) SetApplicationCollaborator(ctx context.Context, req
 		})
 	})
 
-	return nil, err
+	return new(pbtypes.Empty), err
 }
 
 // ListApplicationCollaborators returns all the collaborators from an application.

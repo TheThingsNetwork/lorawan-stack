@@ -136,7 +136,7 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		return nil
 	})
 
-	return nil, err
+	return new(pbtypes.Empty), err
 }
 
 // GetUser returns the account of the current user.
@@ -234,7 +234,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 		})
 	})
 
-	return nil, err
+	return new(pbtypes.Empty), err
 }
 
 // UpdateUserPassword updates the password of the current user.
@@ -270,7 +270,7 @@ func (s *userService) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateU
 		return tx.Users.Update(user.UserIdentifiers, user)
 	})
 
-	return nil, err
+	return new(pbtypes.Empty), err
 }
 
 // DeleteUser deletes the account of the current user.
@@ -325,7 +325,7 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 		return nil
 	})
 
-	return nil, err
+	return new(pbtypes.Empty), err
 }
 
 // GenerateUserAPIKey generates an user API key and returns it.
@@ -383,7 +383,7 @@ func (s *userService) UpdateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUse
 		return nil, err
 	}
 
-	return nil, s.store.Users.UpdateAPIKeyRights(claimsFromContext(ctx).UserIdentifiers(), req.Name, req.Rights)
+	return new(pbtypes.Empty), s.store.Users.UpdateAPIKeyRights(claimsFromContext(ctx).UserIdentifiers(), req.Name, req.Rights)
 }
 
 // RemoveUserAPIKey removes an API key from the current user.
@@ -393,7 +393,7 @@ func (s *userService) RemoveUserAPIKey(ctx context.Context, req *ttnpb.RemoveUse
 		return nil, err
 	}
 
-	return nil, s.store.Users.DeleteAPIKey(claimsFromContext(ctx).UserIdentifiers(), req.Name)
+	return new(pbtypes.Empty), s.store.Users.DeleteAPIKey(claimsFromContext(ctx).UserIdentifiers(), req.Name)
 }
 
 // ValidateUserEmail validates the user's email with the token sent to the email.
@@ -423,7 +423,7 @@ func (s *userService) ValidateUserEmail(ctx context.Context, req *ttnpb.Validate
 		return tx.Users.DeleteValidationToken(req.Token)
 	})
 
-	return nil, err
+	return new(pbtypes.Empty), err
 }
 
 // RequestUserEmailValidation requests a new validation email if the user's email
@@ -468,7 +468,7 @@ func (s *userService) RequestUserEmailValidation(ctx context.Context, _ *pbtypes
 		})
 	})
 
-	return nil, err
+	return new(pbtypes.Empty), err
 }
 
 // ListAuthorizedClients returns all the authorized third-party clients that
@@ -506,5 +506,5 @@ func (s *userService) RevokeAuthorizedClient(ctx context.Context, req *ttnpb.Cli
 		return nil, err
 	}
 
-	return nil, s.store.OAuth.RevokeAuthorizedClient(claimsFromContext(ctx).UserIdentifiers(), *req)
+	return new(pbtypes.Empty), s.store.OAuth.RevokeAuthorizedClient(claimsFromContext(ctx).UserIdentifiers(), *req)
 }
