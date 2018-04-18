@@ -19,6 +19,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
@@ -294,6 +295,11 @@ func (s *adminService) ResetUserPassword(ctx context.Context, req *ttnpb.UserIde
 
 	password := random.String(8)
 
+	hashed, err := auth.Hash(password)
+	if err != nil {
+		return nil, err
+	}
+
 	err = s.store.Transact(func(tx *store.Store) error {
 		found, err := tx.Users.GetByID(*req, s.config.Specializers.User)
 		if err != nil {
@@ -301,7 +307,7 @@ func (s *adminService) ResetUserPassword(ctx context.Context, req *ttnpb.UserIde
 		}
 
 		user := found.GetUser()
-		user.Password = password
+		user.Password = string(hashed)
 
 		err = tx.Users.Update(user.UserIdentifiers, user)
 		if err != nil {
@@ -311,7 +317,7 @@ func (s *adminService) ResetUserPassword(ctx context.Context, req *ttnpb.UserIde
 		return s.email.Send(user.UserIdentifiers.Email, &templates.PasswordReset{
 			OrganizationName: s.config.OrganizationName,
 			PublicURL:        s.config.PublicURL,
-			Password:         user.Password,
+			Password:         password,
 		})
 	})
 
