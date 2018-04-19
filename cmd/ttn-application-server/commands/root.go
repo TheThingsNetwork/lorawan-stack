@@ -57,6 +57,11 @@ var (
 				logger.Use(sentry)
 			}
 
+			// initialize shared packages
+			if err := shared.Initialize(config.ServiceBase); err != nil {
+				return err
+			}
+
 			return err
 		},
 	}

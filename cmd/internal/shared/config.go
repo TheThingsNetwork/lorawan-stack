@@ -20,8 +20,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
-	"github.com/TheThingsNetwork/ttn/pkg/log/middleware/sentry"
-	raven "github.com/getsentry/raven-go"
 )
 
 // DefaultBaseConfig is the default base component configuration.
@@ -71,11 +69,17 @@ var DefaultRedisConfig = config.Redis{
 	Namespace: []string{"ttn", "v3"},
 }
 
+// DefaultEventsConfig is the default config for Events.
+var DefaultEventsConfig = config.Events{
+	Backend: "internal",
+}
+
 // DefaultServiceBase is the default base config for a service.
 var DefaultServiceBase = config.ServiceBase{
 	Base:           DefaultBaseConfig,
 	Cluster:        DefaultClusterConfig,
 	Redis:          DefaultRedisConfig,
+	Events:         DefaultEventsConfig,
 	GRPC:           DefaultGRPCConfig,
 	HTTP:           DefaultHTTPConfig,
 	TLS:            DefaultTLSConfig,
@@ -91,20 +95,4 @@ var DefaultFrequencyPlansConfig = config.FrequencyPlans{
 // DefaultISRightsFetchingConfig is the default config to fetch rights from the Identity Server.
 var DefaultISRightsFetchingConfig = rights.Config{
 	TTL: 2 * time.Minute,
-}
-
-// SentryMiddleware generates a log.Middleware sending errors logs to Sentry from a config.
-//
-// If no Sentry config was found, the function returns nil.
-func SentryMiddleware(c config.ServiceBase) (log.Middleware, error) {
-	if c.Sentry.DSN == "" {
-		return nil, nil
-	}
-
-	s, err := raven.New(c.Sentry.DSN)
-	if err != nil {
-		return nil, err
-	}
-
-	return sentry.New(s), nil
 }

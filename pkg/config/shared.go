@@ -124,6 +124,15 @@ type Redis struct {
 	Namespace []string `name:"namespace" description:"Namespace for Redis keys"`
 }
 
+// IsZero returns whether the Redis configuration is empty.
+func (r Redis) IsZero() bool { return r.Address == "" && r.Database == 0 && len(r.Namespace) == 0 }
+
+// Events represents configuration for the events system.
+type Events struct {
+	Backend string `name:"backend" description:"Backend to use for events (internal, redis)"`
+	Redis   Redis  `name:"redis"`
+}
+
 // RemoteProviderConfig represents remote config provider configuration(see Viper documentation).
 type RemoteProviderConfig struct {
 	Name     string `name:"name" description:"Name of the config on the remote without the extension"`
@@ -138,6 +147,7 @@ type ServiceBase struct {
 	Base           `name:",squash"`
 	Cluster        Cluster               `name:"cluster"`
 	Redis          Redis                 `name:"redis"`
+	Events         Events                `name:"events"`
 	GRPC           GRPC                  `name:"grpc"`
 	HTTP           HTTP                  `name:"http"`
 	TLS            TLS                   `name:"tls"`
