@@ -18,6 +18,7 @@ import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/lorawan.proto";
 import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
 
 package ttn.v3;
 
@@ -83,6 +84,9 @@ message UplinkMessage {
 
   // Locations from various sources
   map<string, LocationSource> locations = 6;
+
+  // ReceivedAt represents the time instant when the Gateway Server received the message.
+  google.protobuf.Timestamp received_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 // Downlink message from the network to the end device
