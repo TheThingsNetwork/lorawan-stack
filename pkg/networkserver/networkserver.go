@@ -530,12 +530,15 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	}
 
 	mac := msg.Payload.GetMACPayload()
+	ses := dev.GetSession()
 	return cl.Send(&ttnpb.ApplicationUp{
-		Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-			FCnt:       dev.GetSession().GetNextFCntUp() - 1,
-			FPort:      mac.GetFPort(),
-			FRMPayload: mac.GetFRMPayload(),
-			RxMetadata: msg.GetRxMetadata(),
+		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+		Up: &ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
+			FCnt:         ses.GetNextFCntUp() - 1,
+			FPort:        mac.GetFPort(),
+			FRMPayload:   mac.GetFRMPayload(),
+			RxMetadata:   msg.GetRxMetadata(),
+			SessionKeyID: ses.GetSessionKeyID(),
 		}},
 	})
 }
