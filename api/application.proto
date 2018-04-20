@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
+import "github.com/TheThingsNetwork/ttn/api/keys.proto";
 import "github.com/TheThingsNetwork/ttn/api/messages.proto";
 import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
 import "github.com/TheThingsNetwork/ttn/api/payload_formatter.proto";
@@ -51,9 +52,11 @@ message Application {
 
 // ApplicationUp wraps multiple application-layer uplink types
 message ApplicationUp {
+  EndDeviceIdentifiers end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
   oneof up {
-    ApplicationUplink uplink_message = 1;
-    // Join accepted
+    ApplicationUplink uplink_message = 2;
+    ApplicationJoinAccept join_accept = 3;
     // Downlink queued
     // Downlink sent
     // Downlink acked

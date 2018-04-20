@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/TheThingsNetwork/ttn/api/end_device.proto";
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
+import "github.com/TheThingsNetwork/ttn/api/keys.proto";
 import "github.com/TheThingsNetwork/ttn/api/lorawan.proto";
 import "github.com/TheThingsNetwork/ttn/api/messages.proto";
 import "github.com/TheThingsNetwork/ttn/api/metadata.proto";

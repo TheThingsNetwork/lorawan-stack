@@ -972,12 +972,13 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 								metadataLdiff(t, up.GetUplinkMessage().GetRxMetadata(), md)
 							}
 
-							a.So(up, should.Resemble, &ttnpb.ApplicationUp{&ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
-								FCnt:       tc.NextNextFCntUp - 1,
-								FPort:      tc.UplinkMessage.Payload.GetMACPayload().GetFPort(),
-								FRMPayload: tc.UplinkMessage.Payload.GetMACPayload().GetFRMPayload(),
-								RxMetadata: up.GetUplinkMessage().GetRxMetadata(),
-							}}})
+							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+								Up: &ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
+									FCnt:       tc.NextNextFCntUp - 1,
+									FPort:      tc.UplinkMessage.Payload.GetMACPayload().GetFPort(),
+									FRMPayload: tc.UplinkMessage.Payload.GetMACPayload().GetFRMPayload(),
+									RxMetadata: up.GetUplinkMessage().GetRxMetadata(),
+								}}})
 
 						case err := <-errch:
 							a.So(err, should.BeNil)
@@ -1097,12 +1098,13 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 
 					select {
 					case up := <-sendCh:
-						a.So(up, should.Resemble, &ttnpb.ApplicationUp{&ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
-							FCnt:       tc.NextNextFCntUp - 1,
-							FPort:      msg.Payload.GetMACPayload().GetFPort(),
-							FRMPayload: msg.Payload.GetMACPayload().GetFRMPayload(),
-							RxMetadata: msg.GetRxMetadata(),
-						}}})
+						a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+							Up: &ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
+								FCnt:       tc.NextNextFCntUp - 1,
+								FPort:      msg.Payload.GetMACPayload().GetFPort(),
+								FRMPayload: msg.Payload.GetMACPayload().GetFRMPayload(),
+								RxMetadata: msg.GetRxMetadata(),
+							}}})
 
 					case <-time.After(Timeout):
 						t.Fatal("Timeout")
