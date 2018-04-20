@@ -928,7 +928,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					}),
 				)).(*NetworkServer)
 
-				sendCh := make(chan *ttnpb.ApplicationUp)
+				asSendCh := make(chan *ttnpb.ApplicationUp)
 
 				go func() {
 					id := ttnpb.NewPopulatedApplicationIdentifiers(test.Randy, false)
@@ -941,13 +941,15 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							},
 						},
 						send: func(up *ttnpb.ApplicationUp) error {
-							sendCh <- up
+							asSendCh <- up
 							return nil
 						},
 					})
 					// LinkApplication should not return
 					t.Errorf("LinkApplication should not return, returned with error: %s", err)
 				}()
+
+				time.Sleep(test.Delay)
 
 				dev, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
 				if !a.So(err, should.BeNil) {
@@ -967,7 +969,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						md, errch = sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount, false)
 
 						select {
-						case up := <-sendCh:
+						case up := <-asSendCh:
 							if !a.So(test.SameElementsDeep(md, up.GetUplinkMessage().GetRxMetadata()), should.BeTrue) {
 								metadataLdiff(t, up.GetUplinkMessage().GetRxMetadata(), md)
 							}
@@ -979,7 +981,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 									FPort:        tc.UplinkMessage.Payload.GetMACPayload().GetFPort(),
 									FRMPayload:   tc.UplinkMessage.Payload.GetMACPayload().GetFRMPayload(),
 									RxMetadata:   up.GetUplinkMessage().GetRxMetadata(),
-									SessionKeyID: dev.GetSession().GetSessionKeyID(),
+									SessionKeyID: dev.GetSession().SessionKeys.GetSessionKeyID(),
 								}},
 							})
 
@@ -1100,7 +1102,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					}
 
 					select {
-					case up := <-sendCh:
+					case up := <-asSendCh:
 						a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 							Up: &ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
@@ -1108,7 +1110,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 								FPort:        msg.Payload.GetMACPayload().GetFPort(),
 								FRMPayload:   msg.Payload.GetMACPayload().GetFRMPayload(),
 								RxMetadata:   msg.GetRxMetadata(),
-								SessionKeyID: dev.GetSession().GetSessionKeyID(),
+								SessionKeyID: dev.GetSession().SessionKeys.GetSessionKeyID(),
 							}},
 						})
 
@@ -1186,8 +1188,9 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				&ttnpb.EndDevice{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DevEUI:  &DevEUI,
-						JoinEUI: &JoinEUI,
+						DevEUI:                 &DevEUI,
+						JoinEUI:                &JoinEUI,
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         nil,
@@ -1208,8 +1211,9 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				&ttnpb.EndDevice{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DevEUI:  &DevEUI,
-						JoinEUI: &JoinEUI,
+						DevEUI:                 &DevEUI,
+						JoinEUI:                &JoinEUI,
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
@@ -1230,8 +1234,9 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				&ttnpb.EndDevice{
 					LoRaWANVersion: ttnpb.MAC_V1_0,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DevEUI:  &DevEUI,
-						JoinEUI: &JoinEUI,
+						DevEUI:                 &DevEUI,
+						JoinEUI:                &JoinEUI,
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
@@ -1284,7 +1289,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 
 				deduplicationDoneCh := make(chan windowEnd, 1)
 				collectionDoneCh := make(chan windowEnd, 1)
-				joinCh := make(chan handleJoinRequest, 1)
+				handleJoinCh := make(chan handleJoinRequest, 1)
 
 				ns := test.Must(New(
 					component.MustNew(test.GetLogger(t), conf),
@@ -1300,7 +1305,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 								handleJoin: func(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
 									ch := make(chan *ttnpb.JoinResponse, 1)
 									errch := make(chan error, 1)
-									joinCh <- handleJoinRequest{ctx, req, opts, ch, errch}
+									handleJoinCh <- handleJoinRequest{ctx, req, opts, ch, errch}
 									return <-ch, <-errch
 								},
 								getNwkSKeys: getNwkSKeys,
@@ -1318,6 +1323,29 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						return ch
 					}),
 				)).(*NetworkServer)
+
+				asSendCh := make(chan *ttnpb.ApplicationUp)
+
+				go func() {
+					id := ttnpb.NewPopulatedApplicationIdentifiers(test.Randy, false)
+					id.ApplicationID = ApplicationID
+
+					err := ns.LinkApplication(id, &mockAsNsLinkApplicationStream{
+						MockServerStream: &test.MockServerStream{
+							MockStream: &test.MockStream{
+								ContextFunc: context.Background,
+							},
+						},
+						send: func(up *ttnpb.ApplicationUp) error {
+							asSendCh <- up
+							return nil
+						},
+					})
+					// LinkApplication should not return
+					t.Errorf("LinkApplication should not return, returned with error: %s", err)
+				}()
+
+				time.Sleep(test.Delay)
 
 				dev, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
 				if !a.So(err, should.BeNil) {
@@ -1350,22 +1378,22 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					t.Run("message send", func(t *testing.T) {
 						a := assertions.New(t)
 
+						resp := ttnpb.NewPopulatedJoinResponse(test.Randy, false)
+						resp.SessionKeys = *keys
+
 						wg := &sync.WaitGroup{}
 						wg.Add(1)
 						go func() {
 							defer wg.Done()
 
 							select {
-							case req := <-joinCh:
+							case req := <-handleJoinCh:
 								if ses := tc.Device.GetSession(); ses != nil {
 									a.So(req.req.EndDeviceIdentifiers.DevAddr, should.NotResemble, ses.DevAddr)
 								}
 
 								expectedRequest.EndDeviceIdentifiers.DevAddr = req.req.EndDeviceIdentifiers.DevAddr
 								a.So(req.req, should.Resemble, expectedRequest)
-
-								resp := ttnpb.NewPopulatedJoinResponse(test.Randy, false)
-								resp.SessionKeys = *keys
 
 								req.ch <- resp
 								req.errch <- nil
@@ -1381,6 +1409,26 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						select {
 						case err := <-errch:
 							a.So(err, should.BeNil)
+
+						case <-time.After(Timeout):
+							t.Fatal("Timeout")
+						}
+
+						select {
+						case up := <-asSendCh:
+							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+								EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+									DevAddr:                expectedRequest.EndDeviceIdentifiers.DevAddr,
+									DevEUI:                 tc.Device.EndDeviceIdentifiers.DevEUI,
+									DeviceID:               tc.Device.EndDeviceIdentifiers.GetDeviceID(),
+									JoinEUI:                tc.Device.EndDeviceIdentifiers.JoinEUI,
+									ApplicationIdentifiers: tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers,
+								},
+								Up: &ttnpb.ApplicationUp_JoinAccept{&ttnpb.ApplicationJoinAccept{
+									SessionKeyID: test.Must(dev.Load()).(*ttnpb.EndDevice).GetSession().SessionKeys.GetSessionKeyID(),
+									AppSKey:      resp.SessionKeys.GetAppSKey(),
+								}},
+							})
 
 						case <-time.After(Timeout):
 							t.Fatal("Timeout")
@@ -1473,7 +1521,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						defer wg.Done()
 
 						select {
-						case req := <-joinCh:
+						case req := <-handleJoinCh:
 							a.So(req.req.EndDeviceIdentifiers.DevAddr, should.NotResemble, dev.EndDevice.GetSession().DevAddr)
 
 							expectedRequest.EndDeviceIdentifiers.DevAddr = req.req.EndDeviceIdentifiers.DevAddr

@@ -88,18 +88,25 @@ var (
 		Code:          10,
 	}
 
+	// ErrMissingApplicationID represents error ocurring when ApplicationID is missing.
+	ErrMissingApplicationID = &errors.ErrDescriptor{
+		MessageFormat: "ApplicationID is unknown",
+		Type:          errors.NotFound,
+		Code:          11,
+	}
+
 	// ErrNewSubscription represents error ocurring when a new subscription is opened.
 	ErrNewSubscription = &errors.ErrDescriptor{
 		MessageFormat: "Another subscription started",
 		Type:          errors.Conflict,
-		Code:          11,
+		Code:          12,
 	}
 
 	// ErrInvalidConfiguration represents error ocurring when the configuration is invalid.
 	ErrInvalidConfiguration = &errors.ErrDescriptor{
 		MessageFormat: "Invalid configuration",
 		Type:          errors.InvalidArgument,
-		Code:          12,
+		Code:          13,
 	}
 )
 
@@ -113,6 +120,7 @@ func init() {
 	ErrDeviceNotFound.Register()
 	ErrMissingFNwkSIntKey.Register()
 	ErrMissingSNwkSIntKey.Register()
+	ErrMissingApplicationID.Register()
 	ErrNewSubscription.Register()
 	ErrInvalidConfiguration.Register()
 }

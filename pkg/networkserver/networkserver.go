@@ -520,9 +520,13 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		logger.WithError(err).Error("Failed to update device")
 		return err
 	}
+	appID := dev.EndDeviceIdentifiers.ApplicationIdentifiers.UniqueID(ctx)
+	if appID == "" {
+		return ErrCorruptRegistry.NewWithCause(nil, ErrMissingApplicationID.New(nil))
+	}
 
 	ns.applicationServersMu.RLock()
-	cl, ok := ns.applicationServers[dev.EndDeviceIdentifiers.GetApplicationID()]
+	cl, ok := ns.applicationServers[appID]
 	ns.applicationServersMu.RUnlock()
 
 	if !ok {
@@ -636,6 +640,32 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 			logger.WithError(err).Error("Failed to update device")
 			return err
 		}
+
+		appID := dev.EndDeviceIdentifiers.ApplicationIdentifiers.UniqueID(ctx)
+		if appID == "" {
+			return ErrCorruptRegistry.NewWithCause(nil, ErrMissingApplicationID.New(nil))
+		}
+
+		go func() {
+			ns.applicationServersMu.RLock()
+			cl, ok := ns.applicationServers[appID]
+			ns.applicationServersMu.RUnlock()
+
+			if !ok {
+				return
+			}
+
+			err := cl.Send(&ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+				Up: &ttnpb.ApplicationUp_JoinAccept{&ttnpb.ApplicationJoinAccept{
+					SessionKeyID: dev.GetSession().GetSessionKeyID(),
+					AppSKey:      resp.SessionKeys.GetAppSKey(),
+				}},
+			})
+			if err != nil {
+				logger.WithField("application_id", appID).WithError(err).Errorf("Failed to send Join Accept to AS")
+			}
+		}()
 		return nil
 	}
 
