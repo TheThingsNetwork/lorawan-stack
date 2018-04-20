@@ -27,9 +27,6 @@ WEBPACK_FLAGS ?= --colors $(if $(CI),,--progress)
 # The config file to use for client
 WEBPACK_CONFIG ?= $(CONFIG_DIR)/webpack.config.js
 
-# The config file for DLL builds
-DLL_CONFIG ?= $(CONFIG_DIR)/webpack.dll.js
-
 # Pre-build config files for quicker builds
 $(CACHE_DIR)/config/%.js: $(CONFIG_DIR)/%.js
 	@$(log) pre-building config files [babel $<]
@@ -47,28 +44,13 @@ $(PUBLIC_DIR)/console.html: $(WEBPACK_CONFIG_BUILT) $(shell $(JS_SRC_FILES)) $(J
 
 # build in dev mode
 js.build-dev: NODE_ENV =
-js.build-dev: js.dll js.build
+js.build-dev: js.build
 
 # watch files
 .PHONY: js.watch
 js.watch: NODE_ENV = development
-js.watch: js.dll js.watch_
-
-js.watch_: WEBPACK_FLAGS += -w
-js.watch_: js.build
-
-## the location of the dll output
-DLL_OUTPUT ?= $(PUBLIC_DIR)/libs.bundle.js
-
-DLL_CONFIG_BUILT = $(subst $(CONFIG_DIR),$(CACHE_DIR)/config,$(DLL_CONFIG))
-
-# DLL for faster dev builds
-$(DLL_OUTPUT): $(DLL_CONFIG_BUILT) package.json yarn.lock
-	@$(log) "building dll file"
-	@GIT_TAG=$(GIT_TAG) DLL_FILE=$(DLL_OUTPUT) NODE_ENV=$(NODE_ENV) CACHE_DIR=$(CACHE_DIR) $(WEBPACK) --config $(DLL_CONFIG_BUILT) $(WEBPACK_FLAGS)
-
-# build dll for faster rebuilds
-js.dll: $(DLL_OUTPUT)
+js.watch: WEBPACK_FLAGS += -w
+js.watch: js.build
 
 $(CACHE_DIR)/make/%.js: .make/js/%.js
 	@$(log) "pre-building translation scrips [babel $<]"

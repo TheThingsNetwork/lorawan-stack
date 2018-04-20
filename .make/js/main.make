@@ -86,10 +86,15 @@ js.deps:
 	@$(log) "fetching js dependencies"
 	@$(YARN) install $(YARN_FLAGS)
 
-# clean build files
+# clean build files and cache
 js.clean:
 	@$(log) "cleaning js public dir" [rm -rf $(PUBLIC_DIR)]
 	@rm -rf $(PUBLIC_DIR)
+js.clean: js.flush-cache
+
+js.flush-cache:
+	@$(log) "cleaning cache dir" [rm -rf $(CACHE_DIR)]
+	@rm -rf $(CACHE_DIR)
 
 # list js files
 js.list:
