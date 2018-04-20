@@ -14,9 +14,7 @@
 
 package ttnpb
 
-import (
-	"github.com/TheThingsNetwork/ttn/pkg/types"
-)
+import "github.com/TheThingsNetwork/ttn/pkg/types"
 
 const validIDChars = "abcdefghijklmnopqrstuvwxyz1234567890"
 
@@ -39,8 +37,8 @@ func NewPopulatedEndDeviceIdentifiers(r randyIdentifiers, easy bool) *EndDeviceI
 	if r.Intn(10) == 0 {
 		out.DeviceID = NewPopulatedID(r)
 	}
-	if r.Intn(10) == 0 {
-		out.ApplicationID = NewPopulatedID(r)
+	out.ApplicationIdentifiers = ApplicationIdentifiers{
+		ApplicationID: NewPopulatedID(r),
 	}
 	out.DevEUI = types.NewPopulatedEUI64(r)
 	out.JoinEUI = types.NewPopulatedEUI64(r)

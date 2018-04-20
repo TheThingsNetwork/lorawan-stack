@@ -137,7 +137,6 @@ func WithCollectionDoneFunc(fn WindowEndFunc) Option {
 func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, error) {
 	ns := &NetworkServer{
 		Component:               c,
-		RegistryRPC:             deviceregistry.NewRPC(c, conf.Registry), // TODO: Add checks https://github.com/TheThingsIndustries/ttn/issues/558
 		registry:                conf.Registry,
 		applicationServersMu:    &sync.RWMutex{},
 		applicationServers:      make(map[string]*applicationUpStream),
@@ -155,6 +154,12 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	for _, opt := range opts {
 		opt(ns)
 	}
+
+	registryRPC, err := deviceregistry.NewRPC(c, conf.Registry) // TODO: Add checks https://github.com/TheThingsIndustries/ttn/issues/558
+	if err != nil {
+		return nil, errors.NewWithCausef(err, "Could not initialize the network server's device registry RPC")
+	}
+	ns.RegistryRPC = registryRPC
 
 	switch {
 	case ns.deduplicationDone == nil && conf.DeduplicationWindow == 0:

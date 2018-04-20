@@ -63,13 +63,13 @@ func TestHandleJoin(t *testing.T) {
 	a := assertions.New(t)
 
 	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
-	js := New(
+	js := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
 			Registry:        reg,
 			JoinEUIPrefixes: joinEUIPrefixes,
 		},
-	)
+	)).(*JoinServer)
 
 	req := ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload = *ttnpb.NewPopulatedMessageDownlink(test.Randy, *types.NewPopulatedAES128Key(test.Randy), false)
@@ -892,13 +892,13 @@ func TestHandleJoin(t *testing.T) {
 			a := assertions.New(t)
 
 			reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
-			js := New(
+			js := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Registry:        reg,
 					JoinEUIPrefixes: joinEUIPrefixes,
 				},
-			)
+			)).(*JoinServer)
 
 			dev, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
 			if !a.So(err, should.BeNil) {
@@ -960,13 +960,13 @@ func TestGetAppSKey(t *testing.T) {
 	a := assertions.New(t)
 
 	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
-	js := New(
+	js := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
 			Registry:        reg,
 			JoinEUIPrefixes: joinEUIPrefixes,
 		},
-	)
+	)).(*JoinServer)
 
 	req := ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
 	req.DevEUI = types.EUI64{}
@@ -1135,13 +1135,13 @@ func TestGetAppSKey(t *testing.T) {
 			a := assertions.New(t)
 
 			reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
-			js := New(
+			js := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Registry:        reg,
 					JoinEUIPrefixes: joinEUIPrefixes,
 				},
-			)
+			)).(*JoinServer)
 
 			_, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
 			if !a.So(err, should.BeNil) {
@@ -1172,13 +1172,13 @@ func TestGetNwkSKeys(t *testing.T) {
 	a := assertions.New(t)
 
 	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
-	js := New(
+	js := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
 			Registry:        reg,
 			JoinEUIPrefixes: joinEUIPrefixes,
 		},
-	)
+	)).(*JoinServer)
 
 	req := ttnpb.NewPopulatedSessionKeyRequest(test.Randy, false)
 	req.DevEUI = types.EUI64{}
@@ -1379,13 +1379,13 @@ func TestGetNwkSKeys(t *testing.T) {
 			a := assertions.New(t)
 
 			reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
-			js := New(
+			js := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Registry:        reg,
 					JoinEUIPrefixes: joinEUIPrefixes,
 				},
-			)
+			)).(*JoinServer)
 
 			_, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
 			if !a.So(err, should.BeNil) {

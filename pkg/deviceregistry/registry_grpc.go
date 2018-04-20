@@ -17,8 +17,10 @@ package deviceregistry
 import (
 	"context"
 
+	"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/hooks"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	pbtypes "github.com/gogo/protobuf/types"
 )
@@ -47,10 +49,28 @@ var ErrCheckFailed = &errors.ErrDescriptor{
 	Code:          3,
 }
 
+// ErrPermissionDenied is returned if the rights were insufficient to perform
+// this operation.
+var ErrPermissionDenied = &errors.ErrDescriptor{
+	MessageFormat: "Permission denied to perform this operation",
+	Type:          errors.PermissionDenied,
+	Code:          4,
+}
+
+// ErrNoApplicationID is returned if no application ID was passed to an
+// operation that requires it.
+var ErrNoApplicationID = &errors.ErrDescriptor{
+	MessageFormat: "No application ID given",
+	Type:          errors.InvalidArgument,
+	Code:          5,
+}
+
 func init() {
 	ErrDeviceNotFound.Register()
 	ErrTooManyDevices.Register()
 	ErrCheckFailed.Register()
+	ErrPermissionDenied.Register()
+	ErrNoApplicationID.Register()
 }
 
 // RegistryRPC implements the device registry gRPC service.
@@ -98,19 +118,49 @@ func WithDeleteDeviceCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers)
 }
 
 // NewRPC returns a new instance of RegistryRPC
-func NewRPC(c *component.Component, r Interface, opts ...RPCOption) *RegistryRPC {
+func NewRPC(c *component.Component, r Interface, opts ...RPCOption) (*RegistryRPC, error) {
 	rpc := &RegistryRPC{
 		Component: c,
 		Interface: r,
 	}
+
 	for _, opt := range opts {
 		opt(rpc)
 	}
-	return rpc
+
+	hook, err := c.RightsHook()
+	if err != nil {
+		return nil, err
+	}
+	hooks.RegisterUnaryHook("/ttn.v3.Rpc", rights.HookName, hook.UnaryHook())
+
+	return rpc, nil
+}
+
+type applicationIDGetter interface {
+	GetApplicationID() string
+}
+
+func (r *RegistryRPC) checkAuth(ctx context.Context, appID applicationIDGetter, rightsToCheck ...ttnpb.Right) error {
+	// TODO: Accept administrator authorization even if not tied to the application
+	// https://github.com/TheThingsIndustries/ttn/issues/731
+	if appID == nil || appID.GetApplicationID() == "" {
+		return ErrNoApplicationID.New(nil)
+	}
+
+	if ad := rights.FromContext(ctx); !ttnpb.IncludesRights(ad, rightsToCheck...) {
+		return ErrPermissionDenied.New(nil)
+	}
+
+	return nil
 }
 
 // ListDevices lists devices matching filter in underlying registry.
 func (r *RegistryRPC) ListDevices(ctx context.Context, filter *ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevices, error) {
+	if err := r.checkAuth(ctx, filter, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
+		return nil, err
+	}
+
 	if r.checks.ListDevices != nil {
 		if err := r.checks.ListDevices(ctx, filter); err != nil {
 			if errors.GetType(err) != errors.Unknown {
@@ -134,6 +184,10 @@ func (r *RegistryRPC) ListDevices(ctx context.Context, filter *ttnpb.EndDeviceId
 
 // GetDevice returns the device associated with id in underlying registry, if found.
 func (r *RegistryRPC) GetDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevice, error) {
+	if err := r.checkAuth(ctx, id, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
+		return nil, err
+	}
+
 	if r.checks.GetDevice != nil {
 		if err := r.checks.GetDevice(ctx, id); err != nil {
 			if errors.GetType(err) != errors.Unknown {
@@ -159,6 +213,10 @@ func (r *RegistryRPC) GetDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifi
 
 // SetDevice sets the device fields to match those of dev in underlying registry.
 func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest) (*pbtypes.Empty, error) {
+	if err := r.checkAuth(ctx, req, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+		return nil, err
+	}
+
 	var fields []string
 	if req.FieldMask != nil {
 		fields = req.FieldMask.Paths
@@ -194,6 +252,10 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 
 // DeleteDevice deletes the device associated with id from underlying registry.
 func (r *RegistryRPC) DeleteDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+	if err := r.checkAuth(ctx, id, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+		return nil, err
+	}
+
 	if r.checks.DeleteDevice != nil {
 		if err := r.checks.DeleteDevice(ctx, id); err != nil {
 			if errors.GetType(err) != errors.Unknown {

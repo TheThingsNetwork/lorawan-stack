@@ -19,6 +19,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	. "github.com/TheThingsNetwork/ttn/pkg/deviceregistry"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
@@ -33,45 +34,64 @@ import (
 
 func TestRegistryRPC(t *testing.T) {
 	a := assertions.New(t)
-	dr := NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))
+	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	v, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *ed})
+	ctx := rights.NewContext(context.Background(), []ttnpb.Right{
+		ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+	})
+
+	_, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *ed})
+	a.So(err, should.NotBeNil)
+
+	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *ed})
 	if !a.So(err, should.BeNil) {
 		return
 	}
 	a.So(v, should.NotBeNil)
 
 	devs, err := dr.ListDevices(context.Background(), &ed.EndDeviceIdentifiers)
+	a.So(err, should.NotBeNil)
+
+	devs, err = dr.ListDevices(ctx, &ed.EndDeviceIdentifiers)
 	if a.So(err, should.BeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
 		devs.EndDevices[0].CreatedAt = ed.GetCreatedAt()
 		devs.EndDevices[0].UpdatedAt = ed.GetUpdatedAt()
 		a.So(pretty.Diff(devs.EndDevices[0], ed), should.BeEmpty)
 	}
 
-	v, err = dr.DeleteDevice(context.Background(), &ed.EndDeviceIdentifiers)
+	_, err = dr.DeleteDevice(context.Background(), &ed.EndDeviceIdentifiers)
+	a.So(err, should.NotBeNil)
+
+	v, err = dr.DeleteDevice(ctx, &ed.EndDeviceIdentifiers)
 	if !a.So(err, should.BeNil) {
 		return
 	}
 	a.So(v, should.NotBeNil)
 
-	devs, err = dr.ListDevices(context.Background(), &ed.EndDeviceIdentifiers)
+	_, err = dr.ListDevices(context.Background(), &ed.EndDeviceIdentifiers)
+	a.So(err, should.NotBeNil)
+
+	devs, err = dr.ListDevices(ctx, &ed.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(devs.EndDevices, should.BeEmpty)
 }
 
 func TestSetDeviceNoCheck(t *testing.T) {
 	a := assertions.New(t)
-	dr := NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))
+	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
+
+	ctx := rights.NewContext(context.Background(), []ttnpb.Right{
+		ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+	})
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	v, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *ed})
-	a.So(err, should.BeNil)
-	a.So(v, should.NotBeNil)
+	_, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *ed})
+	a.So(err, should.NotBeNil)
 
-	v, err = dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *ed})
+	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *ed})
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 
@@ -80,16 +100,20 @@ func TestSetDeviceNoCheck(t *testing.T) {
 		return
 	}
 
-	v, err = dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *ed})
+	v, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *ed})
 	a.So(err, should.NotBeNil)
 	a.So(v, should.BeNil)
 }
 
 func TestListDevicesNoCheck(t *testing.T) {
 	a := assertions.New(t)
-	dr := NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))
+	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
-	devs, err := dr.ListDevices(context.Background(), nil)
+	ctx := rights.NewContext(context.Background(), []ttnpb.Right{
+		ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+	})
+
+	devs, err := dr.ListDevices(ctx, &ttnpb.EndDeviceIdentifiers{})
 	a.So(err, should.NotBeNil)
 	a.So(devs, should.BeNil)
 
@@ -103,14 +127,14 @@ func TestListDevicesNoCheck(t *testing.T) {
 		return
 	}
 
-	devs, err = dr.ListDevices(context.Background(), &dev1.EndDeviceIdentifiers)
+	devs, err = dr.ListDevices(ctx, &dev1.EndDeviceIdentifiers)
 	if a.So(err, should.BeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
 		devs.EndDevices[0].CreatedAt = dev1.EndDevice.GetCreatedAt()
 		devs.EndDevices[0].UpdatedAt = dev1.EndDevice.GetUpdatedAt()
 		a.So(pretty.Diff(devs.EndDevices[0], dev1.EndDevice), should.BeEmpty)
 	}
 
-	devs, err = dr.ListDevices(context.Background(), &dev2.EndDeviceIdentifiers)
+	devs, err = dr.ListDevices(ctx, &dev2.EndDeviceIdentifiers)
 	if a.So(err, should.BeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
 		devs.EndDevices[0].CreatedAt = dev2.EndDevice.GetCreatedAt()
 		devs.EndDevices[0].UpdatedAt = dev2.EndDevice.GetUpdatedAt()
@@ -120,11 +144,15 @@ func TestListDevicesNoCheck(t *testing.T) {
 
 func TestGetDeviceNoCheck(t *testing.T) {
 	a := assertions.New(t)
-	dr := NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))
+	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
+
+	ctx := rights.NewContext(context.Background(), []ttnpb.Right{
+		ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+	})
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	v, err := dr.GetDevice(context.Background(), &ed.EndDeviceIdentifiers)
+	v, err := dr.GetDevice(ctx, &ed.EndDeviceIdentifiers)
 	a.So(err, should.NotBeNil)
 	a.So(v, should.BeNil)
 
@@ -133,7 +161,7 @@ func TestGetDeviceNoCheck(t *testing.T) {
 		return
 	}
 
-	v, err = dr.GetDevice(context.Background(), &ed.EndDeviceIdentifiers)
+	v, err = dr.GetDevice(ctx, &ed.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 
@@ -144,18 +172,22 @@ func TestGetDeviceNoCheck(t *testing.T) {
 		return
 	}
 
-	v, err = dr.GetDevice(context.Background(), &ed.EndDeviceIdentifiers)
+	v, err = dr.GetDevice(ctx, &ed.EndDeviceIdentifiers)
 	a.So(err, should.NotBeNil)
 	a.So(v, should.BeNil)
 }
 
 func TestDeleteDeviceNoCheck(t *testing.T) {
 	a := assertions.New(t)
-	dr := NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))
+	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
+
+	ctx := rights.NewContext(context.Background(), []ttnpb.Right{
+		ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+	})
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	v, err := dr.DeleteDevice(context.Background(), &ed.EndDeviceIdentifiers)
+	v, err := dr.DeleteDevice(ctx, &ed.EndDeviceIdentifiers)
 	a.So(err, should.NotBeNil)
 	a.So(v, should.BeNil)
 
@@ -164,7 +196,7 @@ func TestDeleteDeviceNoCheck(t *testing.T) {
 		return
 	}
 
-	v, err = dr.DeleteDevice(context.Background(), &ed.EndDeviceIdentifiers)
+	v, err = dr.DeleteDevice(ctx, &ed.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 
@@ -182,7 +214,7 @@ func TestDeleteDeviceNoCheck(t *testing.T) {
 		return
 	}
 
-	v, err = dr.DeleteDevice(context.Background(), &ed.EndDeviceIdentifiers)
+	v, err = dr.DeleteDevice(ctx, &ed.EndDeviceIdentifiers)
 	a.So(err, should.NotBeNil)
 	a.So(v, should.BeNil)
 }
@@ -197,12 +229,16 @@ func TestCheck(t *testing.T) {
 
 	var checkErr error
 
-	dr := NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())),
+	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())),
 		WithListDevicesCheck(func(context.Context, *ttnpb.EndDeviceIdentifiers) error { return checkErr }),
 		WithGetDeviceCheck(func(context.Context, *ttnpb.EndDeviceIdentifiers) error { return checkErr }),
 		WithSetDeviceCheck(func(context.Context, *ttnpb.EndDevice, ...string) error { return checkErr }),
 		WithDeleteDeviceCheck(func(context.Context, *ttnpb.EndDeviceIdentifiers) error { return checkErr }),
-	)
+	)).(*RegistryRPC)
+
+	ctx := rights.NewContext(context.Background(), []ttnpb.Right{
+		ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+	})
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
@@ -210,18 +246,18 @@ func TestCheck(t *testing.T) {
 		a := assertions.New(t)
 
 		checkErr = errors.New("err")
-		v, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *ed})
+		v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *ed})
 		a.So(errors.From(err).Code(), should.Equal, ErrCheckFailed.Code)
 		a.So(errors.From(err).Type(), should.Equal, ErrCheckFailed.Type)
 		a.So(v, should.BeNil)
 
 		checkErr = errTest.New(nil)
-		v, err = dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *ed})
+		v, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *ed})
 		a.So(err, should.Equal, checkErr)
 		a.So(v, should.BeNil)
 
 		checkErr = nil
-		v, err = dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *ed})
+		v, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *ed})
 		a.So(err, should.BeNil)
 		a.So(v, should.NotBeNil)
 	})
@@ -230,18 +266,18 @@ func TestCheck(t *testing.T) {
 		a := assertions.New(t)
 
 		checkErr = errors.New("err")
-		ret, err := dr.GetDevice(context.Background(), &ed.EndDeviceIdentifiers)
+		ret, err := dr.GetDevice(ctx, &ed.EndDeviceIdentifiers)
 		a.So(errors.From(err).Code(), should.Equal, ErrCheckFailed.Code)
 		a.So(errors.From(err).Type(), should.Equal, ErrCheckFailed.Type)
 		a.So(ret, should.BeNil)
 
 		checkErr = errTest.New(nil)
-		ret, err = dr.GetDevice(context.Background(), &ed.EndDeviceIdentifiers)
+		ret, err = dr.GetDevice(ctx, &ed.EndDeviceIdentifiers)
 		a.So(err, should.Equal, checkErr)
 		a.So(ret, should.BeNil)
 
 		checkErr = nil
-		ret, err = dr.GetDevice(context.Background(), &ed.EndDeviceIdentifiers)
+		ret, err = dr.GetDevice(ctx, &ed.EndDeviceIdentifiers)
 		if !a.So(err, should.BeNil) {
 			return
 		}
@@ -256,18 +292,18 @@ func TestCheck(t *testing.T) {
 		a := assertions.New(t)
 
 		checkErr = errors.New("err")
-		devs, err := dr.ListDevices(context.Background(), &ed.EndDeviceIdentifiers)
+		devs, err := dr.ListDevices(ctx, &ed.EndDeviceIdentifiers)
 		a.So(errors.From(err).Code(), should.Equal, ErrCheckFailed.Code)
 		a.So(errors.From(err).Type(), should.Equal, ErrCheckFailed.Type)
 		a.So(devs, should.BeNil)
 
 		checkErr = errTest.New(nil)
-		devs, err = dr.ListDevices(context.Background(), &ed.EndDeviceIdentifiers)
+		devs, err = dr.ListDevices(ctx, &ed.EndDeviceIdentifiers)
 		a.So(err, should.Equal, checkErr)
 		a.So(devs, should.BeNil)
 
 		checkErr = nil
-		devs, err = dr.ListDevices(context.Background(), &ed.EndDeviceIdentifiers)
+		devs, err = dr.ListDevices(ctx, &ed.EndDeviceIdentifiers)
 		a.So(err, should.BeNil)
 		if a.So(devs, should.NotBeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
 			devs.EndDevices[0].CreatedAt = ed.GetCreatedAt()
@@ -280,19 +316,19 @@ func TestCheck(t *testing.T) {
 		a := assertions.New(t)
 
 		checkErr = errors.New("err")
-		_, err := dr.DeleteDevice(context.Background(), &ed.EndDeviceIdentifiers)
+		_, err := dr.DeleteDevice(ctx, &ed.EndDeviceIdentifiers)
 		a.So(errors.From(err).Code(), should.Equal, ErrCheckFailed.Code)
 		a.So(errors.From(err).Type(), should.Equal, ErrCheckFailed.Type)
 
 		checkErr = errTest.New(nil)
-		_, err = dr.DeleteDevice(context.Background(), &ed.EndDeviceIdentifiers)
+		_, err = dr.DeleteDevice(ctx, &ed.EndDeviceIdentifiers)
 		a.So(err, should.Equal, checkErr)
 
 		checkErr = nil
-		_, err = dr.DeleteDevice(context.Background(), &ed.EndDeviceIdentifiers)
+		_, err = dr.DeleteDevice(ctx, &ed.EndDeviceIdentifiers)
 		a.So(err, should.BeNil)
 
-		devs, err := dr.ListDevices(context.Background(), &ed.EndDeviceIdentifiers)
+		devs, err := dr.ListDevices(ctx, &ed.EndDeviceIdentifiers)
 		a.So(err, should.BeNil)
 		if a.So(devs, should.NotBeNil) {
 			a.So(devs.EndDevices, should.BeEmpty)

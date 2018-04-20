@@ -57,15 +57,20 @@ type Config struct {
 }
 
 // New returns new *JoinServer.
-func New(c *component.Component, conf *Config) *JoinServer {
+func New(c *component.Component, conf *Config, rpcOptions ...deviceregistry.RPCOption) (*JoinServer, error) {
+	registryRPC, err := deviceregistry.NewRPC(c, conf.Registry, rpcOptions...)
+	if err != nil {
+		return nil, err
+	}
+
 	js := &JoinServer{
 		Component:   c,
-		RegistryRPC: deviceregistry.NewRPC(c, conf.Registry),
+		RegistryRPC: registryRPC,
 		registry:    conf.Registry,
 		euiPrefixes: conf.JoinEUIPrefixes,
 	}
 	c.RegisterGRPC(js)
-	return js
+	return js, nil
 }
 
 func keyPointer(key types.AES128Key) *types.AES128Key {
