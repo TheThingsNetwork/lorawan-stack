@@ -22,3 +22,7 @@ import (
 
 // Randy is global rand safe for concurrent use
 var Randy = rand.New(randutil.NewLockedSource(rand.NewSource(42)))
+
+func init() {
+	rand.Seed(42)
+}
