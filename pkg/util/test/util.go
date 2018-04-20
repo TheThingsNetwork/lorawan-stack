@@ -137,12 +137,6 @@ func SameElementsDiff(xs, ys interface{}) bool {
 	return SameElements(DiffEqual, xs, ys)
 }
 
-// Waiter is the interface that wraps Wait method.
-// An example implementation is sync.WaitGroup.
-type Waiter interface {
-	Wait()
-}
-
 // WaitTimeout returns true if fn returns after at most d or false otherwise.
 // An example of a fn, for which this is useful would be Wait method of sync.WaitGroup.
 // Note, this function leaks a goroutine if fn never returns.
