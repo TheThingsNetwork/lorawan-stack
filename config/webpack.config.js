@@ -17,11 +17,9 @@
 import path from "path"
 import webpack from "webpack"
 
-import HTMLPlugin from "html-webpack-plugin"
-import SRIPlugin from "webpack-subresource-integrity"
-import AddAssetHtmlPlugin from "add-asset-html-webpack-plugin"
-import ExtractTextPlugin from "extract-text-webpack-plugin"
-import CleanPlugin from "clean-webpack-plugin"
+import HtmlWebpackPlugin from "html-webpack-plugin"
+import MiniCssExtractPlugin from "mini-css-extract-plugin"
+import LiveReloadPlugin from "webpack-livereload-plugin"
 
 const {
   CONTEXT = ".",
@@ -36,35 +34,17 @@ const {
 
 const context = path.resolve(CONTEXT)
 const production = NODE_ENV === "production"
-const src = path.resolve(context, "pkg/webui")
+const src = path.resolve(".", "pkg/webui")
 const include = [ src ]
 const modules = [ path.resolve(context, "node_modules") ]
 
-const extractCSS = new ExtractTextPlugin({
-  filename: "[name].[contenthash].css",
-  disable: STORYBOOK === "1",
-})
-
 const r = SUPPORT_LOCALES.split(",").map(l => new RegExp(l.trim()))
-const filterLocales = function (context, request, callback) {
-  if (context.endsWith("node_modules/intl/locale-data/jsonp")) {
-    const supported = r.reduce(function (acc, locale) {
-      return acc || locale.test(request)
-    }, false)
 
-    if (!supported) {
-      return callback(null, `commonjs ${request}`)
-    }
-  }
-  callback()
-}
-
-export default {
+module.exports = {
   context,
-  target: "web",
+  mode: production ? 'production' : 'development',
   externals: [ filterLocales ],
-  cache: !production,
-  recordsPath: path.resolve(context, ".cache", "_records"),
+  stats: "minimal",
   entry: {
     console: [
       "./config/root.js",
@@ -82,11 +62,18 @@ export default {
     publicPath: "{{.Root}}/",
     crossOriginLoading: "anonymous",
   },
-  stats: {
-    version: false,
-    chunks: false,
-    modules: false,
-    children: false,
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        styles: {
+          name: 'styles',
+          test: /\.css$/,
+          chunks: 'all',
+          enforce: true,
+        }
+      }
+    },
+    removeAvailableModules: false,
   },
   module: {
     rules: [
@@ -101,60 +88,51 @@ export default {
         },
       },
       {
-        test: /\.(css|styl)$/,
-        loader: extractCSS.extract({
-          fallback: "style-loader",
-          use: [
-            {
-              loader: "css-loader",
-              options: {
-                modules: true,
-                minimize: production,
-                localIdentName: env({
-                  production: "[hash:base64:10]",
-                  development: "[path][local]-[hash:base64:10]",
-                }),
-              },
-            },
-            {
-              loader: "stylus-loader",
-              options: {
-                "import": [
-                  path.resolve(context, "pkg/webui/include.styl"),
-                ],
-              },
-            },
-          ],
-        }),
-        include,
-      },
-      {
-        test: /\.css$/,
-        loader: extractCSS.extract({
-          fallback: "style-loader",
-          use: [
-            {
-              loader: "css-loader",
-              options: {
-                modules: false,
-                minimize: production,
-              },
-            },
-          ],
-        }),
-        include: modules,
-      },
-      {
-        test: /\.json$/,
-        loader: "json-loader",
-        include,
-      },
-      {
         test: /\.(woff|woff2|ttf|eot|jpg|jpeg|png|svg)$/i,
         loader: "file-loader",
         options: {
           name: "[name].[hash].[ext]",
         },
+      },
+      {
+        test: /\.(styl|css)$/,
+        include,
+        use: [
+         MiniCssExtractPlugin.loader,
+         {
+           loader: "css-loader",
+           options: {
+             modules: true,
+             minimize: production,
+             localIdentName: env({
+               production: "[hash:base64:10]",
+               development: "[path][local]-[hash:base64:10]",
+             }),
+           },
+         },
+         {
+           loader: "stylus-loader",
+           options: {
+             "import": [
+               path.resolve(context, "pkg/webui/include.styl"),
+             ],
+           },
+         },
+        ],
+      },
+      {
+        test: /\.css$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: "css-loader",
+            options: {
+              modules: false,
+              minimize: production,
+            },
+          }
+        ],
+        include: modules,
       },
     ],
   },
@@ -166,30 +144,7 @@ export default {
         NODE_ENV,
         VERSION: VERSION || GIT_TAG || "unknown",
       }),
-      new webpack.LoaderOptionsPlugin({
-        context,
-        minimize: production,
-        debug: !production,
-      }),
-      new webpack.SourceMapDevToolPlugin({
-        module: production,
-        columns: production,
-        filename: "[file].map",
-        exclude: [
-          /locale\..+\./,
-          /lang\..+-json/,
-          /vendor\..+\.js/,
-          /runtime\..+\.js/,
-        ],
-      }),
-      extractCSS,
-      new SRIPlugin({
-        enabled: production,
-        hashFuncNames: [
-          "sha512",
-        ],
-      }),
-      new HTMLPlugin({
+      new HtmlWebpackPlugin({
         chunks: [ "vendor", "console" ],
         filename: path.resolve(PUBLIC_DIR, "console.html"),
         showErrors: false,
@@ -199,7 +154,7 @@ export default {
           collapseWhitespace: true,
         },
       }),
-      new HTMLPlugin({
+      new HtmlWebpackPlugin({
         chunks: [ "vendor", "oauth" ],
         filename: path.resolve(PUBLIC_DIR, "oauth.html"),
         showErrors: false,
@@ -209,54 +164,31 @@ export default {
           collapseWhitespace: true,
         },
       }),
-      new CleanPlugin([
-        path.resolve(CONTEXT, PUBLIC_DIR),
-      ], {
-        root: context,
-        verbose: false,
-        exclude: env({
-          production: [],
-          development: [
-            "libs.bundle.js",
-            "libs.bundle.js.map",
-          ],
-        }),
-      }),
-    ],
-    production: [
-      new webpack.optimize.OccurrenceOrderPlugin(true),
-      new webpack.optimize.UglifyJsPlugin({
-        minimize: true,
-        parallel: true,
-        sourceMap: true,
-        compress: {
-          warnings: false,
-        },
-      }),
-      new webpack.optimize.CommonsChunkPlugin({
-        name: "vendor",
-        minChunks (module) {
-          return module.resource && /node_modules/.test(module.resource) && !/node_modules\/ui/.test(module.resource)
-        },
-      }),
-      new webpack.optimize.CommonsChunkPlugin({
-        name: "runtime",
-      }),
+      new MiniCssExtractPlugin({
+        filename: "[name].[contenthash].css"
+      })
     ],
     development: [
-      new webpack.DllReferencePlugin({
-        context,
-        manifest: require(path.resolve(context, CACHE_DIR, "dll.json")),
-      }),
       new webpack.WatchIgnorePlugin([
         /node_modules/,
         new RegExp(path.resolve(context, PUBLIC_DIR)),
       ]),
-      new AddAssetHtmlPlugin({
-        filepath: path.resolve(context, PUBLIC_DIR, "libs.bundle.js"),
-      }),
+      new LiveReloadPlugin(),
     ],
   }),
+};
+
+function filterLocales (context, request, callback) {
+  if (context.endsWith("node_modules/intl/locale-data/jsonp")) {
+    const supported = r.reduce(function (acc, locale) {
+      return acc || locale.test(request)
+    }, false)
+
+    if (!supported) {
+      return callback(null, `commonjs ${request}`)
+    }
+  }
+  callback()
 }
 
 // env selects and merges the environments for the passed object based on NODE_ENV, which
