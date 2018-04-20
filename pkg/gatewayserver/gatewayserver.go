@@ -44,19 +44,6 @@ type GatewayServer struct {
 	gateways *pool.Pool
 }
 
-type isConnector struct {
-	*component.Component
-}
-
-func (c isConnector) Get(ctx context.Context) *grpc.ClientConn {
-	peer := c.Component.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, nil, nil)
-	if peer == nil {
-		return nil
-	}
-
-	return peer.Conn()
-}
-
 // New returns new *GatewayServer.
 func New(c *component.Component, conf Config) (*GatewayServer, error) {
 	gs := &GatewayServer{
@@ -67,7 +54,7 @@ func New(c *component.Component, conf Config) (*GatewayServer, error) {
 		config: conf,
 	}
 
-	hook, err := rights.New(c.Context(), isConnector{Component: c}, conf.Rights)
+	hook, err := rights.New(c.Context(), rights.ConnectorFromComponent(c, nil, nil), conf.Rights)
 	if err != nil {
 		return nil, err
 	}

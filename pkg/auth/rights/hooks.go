@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
@@ -44,6 +45,32 @@ type IdentityServerConnector interface {
 	// Get retrieves a gRPC connection to an Identity Server.
 	// The context of the current request is passed by argument.
 	Get(context.Context) *grpc.ClientConn
+}
+
+type componentConnector struct {
+	*component.Component
+
+	tags     []string
+	shardKey []byte
+}
+
+func (c componentConnector) Get(context.Context) *grpc.ClientConn {
+	peer := c.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, c.tags, c.shardKey)
+	if peer == nil {
+		return nil
+	}
+
+	return peer.Conn()
+}
+
+// ConnectorFromComponent returns an IdentityServerConnector tied to a component.
+// The tags and shard key are then used to select the identity server to use.
+func ConnectorFromComponent(c *component.Component, tags []string, shardKey []byte) IdentityServerConnector {
+	return componentConnector{
+		Component: c,
+		tags:      tags,
+		shardKey:  shardKey,
+	}
 }
 
 // Config is the type that configures the rights hook.
