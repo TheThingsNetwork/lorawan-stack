@@ -30,6 +30,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/mohae/deepcopy"
+	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
@@ -47,9 +48,6 @@ import (
 const (
 	// recentUplinkCount is the maximium amount of recent uplinks stored per device.
 	recentUplinkCount = 20
-
-	// maxFCntGap is the maximum FCnt gap as per LoRaWAN1.0 spec.
-	maxFCntGap = 16384
 
 	// accumulationCapacity is the initial capacity of the accumulator
 	accumulationCapacity = 20
@@ -113,6 +111,38 @@ func NewWindowEndAfterFunc(d time.Duration) WindowEndFunc {
 		}()
 		return ch
 	}
+}
+
+// Config represents the NetworkServer configuration.
+type Config struct {
+	Registry            deviceregistry.Interface `name:"-"`
+	JoinServers         []ttnpb.NsJsClient       `name:"-"`
+	DeduplicationWindow time.Duration            `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
+	CooldownWindow      time.Duration            `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
+}
+
+// NetworkServer implements the network server component.
+//
+// The network server exposes the GsNs, AsNs, DeviceRegistry and ApplicationDownlinkQueue services.
+type NetworkServer struct {
+	*component.Component
+	*deviceregistry.RegistryRPC
+	registry deviceregistry.Interface
+
+	NetID types.NetID
+
+	joinServers          []ttnpb.NsJsClient
+	gateways             *sync.Map // gtwID -> ttnpb.NsGsClient
+	applicationServersMu *sync.RWMutex
+	applicationServers   map[string]*applicationUpStream
+
+	metadataAccumulators *sync.Map
+
+	metadataAccumulatorPool *sync.Pool
+	hashPool                *sync.Pool
+
+	deduplicationDone WindowEndFunc
+	collectionDone    WindowEndFunc
 }
 
 // Option configures the NetworkServer.
@@ -238,6 +268,7 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 		return nil, err
 	}
 	dev.EndDevice.QueuedApplicationDownlinks = req.Downlinks
+	// TODO: trigger downlink check if class C
 	return &pbtypes.Empty{}, dev.Store("QueuedApplicationDownlinks")
 }
 
@@ -357,6 +388,8 @@ func (ns *NetworkServer) deduplicateUplink(ctx context.Context, msg *ttnpb.Uplin
 func (ns *NetworkServer) matchDevice(msg *ttnpb.UplinkMessage) (*deviceregistry.Device, error) {
 	mac := msg.Payload.GetMACPayload()
 
+	logger := ns.Logger().WithField("dev_addr", mac.DevAddr)
+
 	devs, err := ns.registry.FindBy(
 		&ttnpb.EndDevice{
 			Session: &ttnpb.Session{
@@ -366,6 +399,7 @@ func (ns *NetworkServer) matchDevice(msg *ttnpb.UplinkMessage) (*deviceregistry.
 		"Session.DevAddr",
 	)
 	if err != nil {
+		logger.WithError(err).Warn("Failed to search for device in registry by active DevAddr")
 		return nil, err
 	}
 
@@ -378,6 +412,7 @@ func (ns *NetworkServer) matchDevice(msg *ttnpb.UplinkMessage) (*deviceregistry.
 		"SessionFallback.DevAddr",
 	)
 	if err != nil {
+		logger.WithError(err).Warn("Failed to search for device in registry by fallback DevAddr")
 		return nil, err
 	}
 
@@ -411,6 +446,16 @@ outer:
 			continue outer
 		}
 
+		fp, err := band.GetByID(dev.GetFrequencyPlanID())
+		if err != nil {
+			logger.WithFields(log.Fields(
+				"app_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.GetApplicationID(),
+				"dev_id", dev.EndDeviceIdentifiers.GetDeviceID(),
+				"frequency_plan_id", dev.GetFrequencyPlanID(),
+			)).WithError(err).Warn("Failed to parse stored frequency plan")
+			return nil, ErrCorruptRegistry.NewWithCause(nil, err)
+		}
+
 		var gap uint32
 		if dev.FCntResets {
 			gap = math.MaxUint32
@@ -419,7 +464,7 @@ outer:
 
 			switch dev.EndDevice.GetLoRaWANVersion() {
 			case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-				if gap > maxFCntGap {
+				if gap > uint32(fp.MaxFCntGap) {
 					continue outer
 				}
 			}
@@ -443,9 +488,10 @@ outer:
 	})
 
 	if len(msg.RawPayload) < 4 {
+		logger.Debug("Payload specified is too short")
 		return nil, errors.New("Length of RawPayload must not be less than 4")
 	}
-	pld := msg.RawPayload[:len(msg.RawPayload)-4]
+	b := msg.RawPayload[:len(msg.RawPayload)-4]
 
 	for _, dev := range matching {
 		ses := dev.GetSession()
@@ -480,9 +526,9 @@ outer:
 			set := msg.GetSettings()
 			computedMIC, err = crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey,
 				confFCnt, uint8(set.GetDataRateIndex()), uint8(set.GetChannelIndex()),
-				mac.DevAddr, dev.fCnt, pld)
+				mac.DevAddr, dev.fCnt, b)
 		case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-			computedMIC, err = crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, mac.DevAddr, dev.fCnt, pld)
+			computedMIC, err = crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, mac.DevAddr, dev.fCnt, b)
 		default:
 			return nil, common.ErrCorruptRegistry.NewWithCause(nil, errors.New("Unmatched LoRaWAN version"))
 		}
@@ -517,10 +563,11 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 
 	msg.RxMetadata = acc.Accumulated()
 
-	dev.RecentUplinks = append(dev.GetRecentUplinks(), msg)
-	if len(dev.RecentUplinks) > recentUplinkCount {
-		dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
+	ups := dev.GetRecentUplinks()
+	if len(ups) >= recentUplinkCount {
+		ups = ups[len(dev.RecentUplinks)-recentUplinkCount+1:]
 	}
+	dev.RecentUplinks = append(ups, msg)
 
 	if err := dev.Store("EndDeviceIdentifiers.DevAddr", "Session", "SessionFallback", "RecentUplinks"); err != nil {
 		logger.WithError(err).Error("Failed to update device")

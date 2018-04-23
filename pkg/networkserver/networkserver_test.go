@@ -980,7 +980,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 								metadataLdiff(t, up.GetUplinkMessage().GetRxMetadata(), md)
 							}
 
-							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+							expected := &ttnpb.ApplicationUp{
 								EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 								SessionKeyID:         dev.GetSession().SessionKeys.GetSessionKeyID(),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
@@ -989,7 +989,10 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 									FRMPayload: tc.UplinkMessage.Payload.GetMACPayload().GetFRMPayload(),
 									RxMetadata: up.GetUplinkMessage().GetRxMetadata(),
 								}},
-							})
+							}
+							if !a.So(up, should.Resemble, expected) {
+								pretty.Ldiff(t, up, expected)
+							}
 
 						case err := <-errch:
 							a.So(err, should.BeNil)
@@ -1422,7 +1425,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 
 						select {
 						case up := <-asSendCh:
-							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+							expected := &ttnpb.ApplicationUp{
 								EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 									DevAddr:                expectedRequest.EndDeviceIdentifiers.DevAddr,
 									DevEUI:                 tc.Device.EndDeviceIdentifiers.DevEUI,
@@ -1434,7 +1437,9 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 								Up: &ttnpb.ApplicationUp_JoinAccept{&ttnpb.ApplicationJoinAccept{
 									AppSKey: resp.SessionKeys.GetAppSKey(),
 								}},
-							})
+							}
+							expected.DevAddr = expectedRequest.EndDeviceIdentifiers.DevAddr
+							a.So(up, should.Resemble, expected)
 
 						case <-time.After(Timeout):
 							t.Fatal("Timeout")

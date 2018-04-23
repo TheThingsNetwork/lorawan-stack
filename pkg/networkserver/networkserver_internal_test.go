@@ -25,7 +25,6 @@ import (
 
 const (
 	RecentUplinkCount    = recentUplinkCount
-	MaxFCntGap           = maxFCntGap
 	AccumulationCapacity = accumulationCapacity
 )
 
