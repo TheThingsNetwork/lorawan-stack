@@ -69,7 +69,7 @@ type NetworkServer struct {
 	joinServers          []ttnpb.NsJsClient
 	gateways             *sync.Map // gtwID -> ttnpb.NsGsClient
 	applicationServersMu *sync.RWMutex
-	applicationServers   map[string]*applicationUplinkStream
+	applicationServers   map[string]*applicationUpStream
 
 	metadataAccumulators *sync.Map
 
@@ -139,7 +139,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		RegistryRPC:             deviceregistry.NewRPC(c, conf.Registry), // TODO: Add checks https://github.com/TheThingsIndustries/ttn/issues/558
 		registry:                conf.Registry,
 		applicationServersMu:    &sync.RWMutex{},
-		applicationServers:      make(map[string]*applicationUplinkStream),
+		applicationServers:      make(map[string]*applicationUpStream),
 		gateways:                &sync.Map{},
 		metadataAccumulators:    &sync.Map{},
 		metadataAccumulatorPool: &sync.Pool{},
@@ -177,19 +177,19 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	return ns, nil
 }
 
-type applicationUplinkStream struct {
+type applicationUpStream struct {
 	ttnpb.AsNs_LinkApplicationServer
 	closeCh chan struct{}
 }
 
-func (s applicationUplinkStream) Close() error {
+func (s applicationUpStream) Close() error {
 	close(s.closeCh)
 	return nil
 }
 
 // LinkApplication is called by the application server to subscribe to application events.
 func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, stream ttnpb.AsNs_LinkApplicationServer) error {
-	ws := &applicationUplinkStream{
+	ws := &applicationUpStream{
 		AsNs_LinkApplicationServer: stream,
 		closeCh:                    make(chan struct{}),
 	}
