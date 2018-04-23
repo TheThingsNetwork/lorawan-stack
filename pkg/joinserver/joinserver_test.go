@@ -927,7 +927,7 @@ func TestHandleJoin(t *testing.T) {
 			// ensure the stored device nonces are updated
 			time.Sleep(test.Delay)
 
-			dev.EndDevice, err = dev.Load()
+			dev, err = dev.Load()
 			if !a.So(err, should.BeNil) {
 				return
 			}

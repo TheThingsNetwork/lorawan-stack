@@ -101,7 +101,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 	_, err = ns.DownlinkQueueReplace(context.Background(), req)
 	a.So(err, should.BeNil)
 
-	dev.EndDevice, err = dev.Load()
+	dev, err = dev.Load()
 	if !a.So(err, should.BeNil) ||
 		!a.So(dev.EndDevice, should.NotBeNil) {
 		return
@@ -118,7 +118,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 	_, err = ns.DownlinkQueueReplace(context.Background(), req)
 	a.So(err, should.BeNil)
 
-	dev.EndDevice, err = dev.Load()
+	dev, err = dev.Load()
 	if !a.So(err, should.BeNil) ||
 		!a.So(dev.EndDevice, should.NotBeNil) {
 		return
@@ -161,7 +161,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 	_, err = ns.DownlinkQueuePush(context.Background(), req)
 	a.So(err, should.BeNil)
 
-	dev.EndDevice, err = dev.Load()
+	dev, err = dev.Load()
 	if !a.So(err, should.BeNil) ||
 		!a.So(dev.EndDevice, should.NotBeNil) {
 		return
@@ -176,7 +176,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 	_, err = ns.DownlinkQueuePush(context.Background(), req)
 	a.So(err, should.BeNil)
 
-	dev.EndDevice, err = dev.Load()
+	dev, err = dev.Load()
 	if !a.So(err, should.BeNil) ||
 		!a.So(dev.EndDevice, should.NotBeNil) {
 		return
@@ -256,7 +256,7 @@ func TestDownlinkQueueClear(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(e, should.NotBeNil)
 
-	dev.EndDevice, err = dev.Load()
+	dev, err = dev.Load()
 	if !a.So(err, should.BeNil) ||
 		!a.So(dev.EndDevice, should.NotBeNil) {
 		return
@@ -279,7 +279,7 @@ func TestDownlinkQueueClear(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(e, should.NotBeNil)
 
-	dev.EndDevice, err = dev.Load()
+	dev, err = dev.Load()
 	if !a.So(err, should.BeNil) ||
 		!a.So(dev.EndDevice, should.NotBeNil) {
 		return
@@ -1025,7 +1025,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							ed.RecentUplinks = ed.RecentUplinks[len(ed.RecentUplinks)-RecentUplinkCount:]
 						}
 
-						dev.EndDevice, err = dev.Load()
+						dev, err = dev.Load()
 						if !a.So(err, should.BeNil) ||
 							!a.So(dev.EndDevice, should.NotBeNil) {
 							return
@@ -1461,7 +1461,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 							ed.RecentUplinks = ed.RecentUplinks[len(ed.RecentUplinks)-RecentUplinkCount:]
 						}
 
-						dev.EndDevice, err = dev.Load()
+						dev, err = dev.Load()
 						if !a.So(err, should.BeNil) ||
 							!a.So(dev.EndDevice, should.NotBeNil) {
 							return

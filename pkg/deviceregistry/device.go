@@ -48,12 +48,12 @@ func (d *Device) Store(fields ...string) error {
 }
 
 // Load returns a snapshot of current device data in underlying store.Interface.
-func (d *Device) Load() (*ttnpb.EndDevice, error) {
+func (d *Device) Load() (*Device, error) {
 	ed := &ttnpb.EndDevice{}
 	if err := d.store.Find(d.key, ed); err != nil {
 		return nil, err
 	}
-	return ed, nil
+	return newDevice(ed, d.store, d.key), nil
 }
 
 // Delete removes device from the underlying store.Interface.
