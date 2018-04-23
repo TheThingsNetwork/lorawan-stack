@@ -24,16 +24,27 @@ import (
 )
 
 // ScheduleDownlink on a gateway connected to this gateway server.
+//
+// This request requires the GatewayIdentifier to have a GatewayID.
 func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*types.Empty, error) {
-	gtwID := down.TxMetadata.GatewayIdentifiers.GetGatewayID()
-	if err := validate.ID(gtwID); err != nil {
+	id := down.TxMetadata.GatewayIdentifiers
+	if err := validate.ID(id.GetGatewayID()); err != nil {
 		return nil, err
 	}
 
-	err := g.gateways.Send(gtwID, &ttnpb.GatewayDown{DownlinkMessage: down})
+	g.connectionsMu.Lock()
+	connection, ok := g.connections[id.UniqueID(ctx)]
+	g.connectionsMu.Unlock()
+
+	if !ok {
+		return nil, ErrGatewayNotConnected.New(errors.Attributes{"gateway_id": id.GetGatewayID()})
+	}
+	downMessage := &ttnpb.GatewayDown{DownlinkMessage: down}
+	err := connection.Send(downMessage)
 	if err != nil {
 		return nil, errors.NewWithCause(err, "Could not send downlink to gateway")
 	}
 
+	connection.addDownstreamObservations(downMessage)
 	return ttnpb.Empty, nil
 }

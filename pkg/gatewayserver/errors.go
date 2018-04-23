@@ -41,6 +41,13 @@ var (
 		Code:          4,
 		Type:          errors.PermissionDenied,
 	}
+	// ErrGatewayNotConnected is returned when a send operation failed because a gateway is not connected.
+	ErrGatewayNotConnected = &errors.ErrDescriptor{
+		MessageFormat:  "Gateway `{gateway_id}` not connected",
+		Code:           5,
+		Type:           errors.NotFound,
+		SafeAttributes: []string{"gateway_id"},
+	}
 )
 
 func init() {
@@ -48,4 +55,5 @@ func init() {
 	ErrNoIdentityServerFound.Register()
 	ErrPermissionDenied.Register()
 	ErrUnauthorized.Register()
+	ErrGatewayNotConnected.Register()
 }

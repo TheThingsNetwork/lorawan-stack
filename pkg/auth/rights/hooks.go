@@ -140,7 +140,7 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 				appIDs.ApplicationID = m.GetApplicationID()
 
 				if !appIDs.IsZero() {
-					key := fmt.Sprintf("%s:%s", md.AuthValue, appIDs.ApplicationID)
+					key := fmt.Sprintf("%s:%s", md.AuthValue, appIDs.UniqueID(ctx))
 
 					rights, err := h.applicationsCache.GetOrFetch(key, func() (rights []ttnpb.Right, err error) {
 						resp, err := ttnpb.NewIsApplicationClient(conn).ListApplicationRights(ctx, appIDs, grpc.PerRPCCredentials(md))
@@ -163,7 +163,7 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 				gtwIDs.GatewayID = m.GetGatewayID()
 
 				if !gtwIDs.IsZero() {
-					key := fmt.Sprintf("%s:%s", md.AuthValue, gtwIDs.GatewayID)
+					key := fmt.Sprintf("%s:%s", md.AuthValue, gtwIDs.UniqueID(ctx))
 
 					rights, err := h.gatewaysCache.GetOrFetch(key, func() (rights []ttnpb.Right, err error) {
 						resp, err := ttnpb.NewIsGatewayClient(conn).ListGatewayRights(ctx, gtwIDs, grpc.PerRPCCredentials(md))

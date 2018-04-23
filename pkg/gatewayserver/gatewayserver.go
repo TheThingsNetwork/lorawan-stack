@@ -17,21 +17,53 @@ package gatewayserver
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/pool"
+	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/scheduling"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/hooks"
+	"github.com/TheThingsNetwork/ttn/pkg/toa"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/validate"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
 )
 
-const sendUplinkTimeout = 5 * time.Minute
+type connection struct {
+	observations   ttnpb.GatewayObservations
+	observationsMu sync.RWMutex
+
+	scheduler scheduling.Scheduler
+
+	cancel   context.CancelFunc
+	linkSend func(*ttnpb.GatewayDown) error
+}
+
+func (c *connection) Send(down *ttnpb.GatewayDown) (err error) {
+	span := scheduling.Span{
+		Start: scheduling.ConcentratorTime(down.DownlinkMessage.TxMetadata.Timestamp),
+	}
+	span.Duration, err = toa.Compute(down.DownlinkMessage.RawPayload, down.DownlinkMessage.Settings)
+	if err != nil {
+		return errors.NewWithCause(err, "Could not compute time-on-air of the downlink")
+	}
+
+	err = c.scheduler.ScheduleAt(span, down.DownlinkMessage.Settings.Frequency)
+	if err != nil {
+		return errors.NewWithCause(err, "Could not schedule downlink")
+	}
+
+	err = c.linkSend(down)
+	if err != nil {
+		return errors.NewWithCause(err, "Could not send downlink")
+	}
+
+	return nil
+}
 
 // GatewayServer implements the gateway server component.
 //
@@ -41,7 +73,8 @@ type GatewayServer struct {
 
 	config Config
 
-	gateways *pool.Pool
+	connections   map[string]*connection
+	connectionsMu sync.Mutex
 }
 
 // New returns new *GatewayServer.
@@ -49,9 +82,9 @@ func New(c *component.Component, conf Config) (*GatewayServer, error) {
 	gs := &GatewayServer{
 		Component: c,
 
-		gateways: pool.NewPool(c.Logger(), sendUplinkTimeout),
-
 		config: conf,
+
+		connections: map[string]*connection{},
 	}
 
 	hook, err := rights.New(c.Context(), rights.ConnectorFromComponent(c, nil, nil), conf.Rights)
@@ -79,6 +112,31 @@ func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_GATEWAY_SERVER}
 }
 
+func (conn *connection) addUpstreamObservations(up *ttnpb.GatewayUp) {
+	now := time.Now().UTC()
+
+	conn.observationsMu.Lock()
+
+	if up.GatewayStatus != nil {
+		conn.observations.LastStatus = up.GatewayStatus
+		conn.observations.LastStatusReceivedAt = &now
+	}
+
+	if nbUplinks := len(up.UplinkMessages); nbUplinks > 0 {
+		conn.observations.LastUplinkReceivedAt = &now
+	}
+
+	conn.observationsMu.Unlock()
+}
+
+func (conn *connection) addDownstreamObservations(down *ttnpb.GatewayDown) {
+	now := time.Now().UTC()
+
+	conn.observationsMu.Lock()
+	conn.observations.LastDownlinkReceivedAt = &now
+	conn.observationsMu.Unlock()
+}
+
 // GetGatewayObservations returns gateway information as observed by the gateway server.
 func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
 	if !gs.config.DisableAuth && !ttnpb.IncludesRights(rights.FromContext(ctx), ttnpb.RIGHT_GATEWAY_STATUS) {
@@ -90,7 +148,19 @@ func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.G
 		return nil, err
 	}
 
-	return gs.gateways.GetGatewayObservations(id.GatewayID)
+	gs.connectionsMu.Lock()
+	connection, ok := gs.connections[id.UniqueID(ctx)]
+	gs.connectionsMu.Unlock()
+
+	if !ok {
+		return nil, ErrGatewayNotConnected.New(errors.Attributes{"gateway_id": id.GatewayID})
+	}
+
+	connection.observationsMu.RLock()
+	observations := connection.observations
+	connection.observationsMu.RUnlock()
+
+	return &observations, nil
 }
 
 func checkAuthorization(ctx context.Context, is ttnpb.IsGatewayClient, right ttnpb.Right) error {

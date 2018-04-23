@@ -22,6 +22,7 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/cluster"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/scheduling"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -87,6 +88,8 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	}
 
 	logger := log.FromContext(ctx).WithField("gateway_id", gtwID)
+	ctx = log.NewContext(ctx, logger)
+	logger.Info("Link with gateway opened")
 	defer logger.WithError(err).Debug("Link with gateway closed")
 
 	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, g.config.NSTags, nil)
@@ -115,10 +118,28 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 		return errors.NewWithCausef(err, "Could not retrieve frequency plan %s", gw.FrequencyPlanID)
 	}
 
-	result, err := g.gateways.Subscribe(gtwID, link, fp)
+	scheduler, err := scheduling.FrequencyPlanScheduler(ctx, fp)
 	if err != nil {
 		return err
 	}
+
+	connectionInfo := &connection{
+		linkSend:  link.Send,
+		scheduler: scheduler,
+	}
+
+	ctx, connectionInfo.cancel = context.WithCancel(ctx)
+	defer connectionInfo.cancel()
+
+	uid := id.UniqueID(ctx)
+
+	g.connectionsMu.Lock()
+	if conn, ok := g.connections[uid]; ok {
+		conn.cancel()
+		delete(g.connections, uid)
+	}
+	g.connections[uid] = connectionInfo
+	g.connectionsMu.Unlock()
 
 	go func() {
 		startServingGatewayFn := func(nsClient ttnpb.GsNsClient) error {
@@ -142,27 +163,35 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 			logger.WithError(err).Errorf("Could not signal NS when gateway disconnected")
 		}
 		cancel()
+
+		g.connectionsMu.Lock()
+		if oldConnection := g.connections[uid]; oldConnection == connectionInfo {
+			delete(g.connections, uid)
+		}
+		g.connectionsMu.Unlock()
 	}()
 
-	ctx = log.NewContext(ctx, logger)
+	logger.Info("Uplink subscription was opened")
+	// Uplink receiving routine
 	for {
-		select {
-		case <-ctx.Done():
-			logger.WithError(ctx.Err()).Warn("Stopped serving Rx packets")
+		upstreamMessage, err := link.Recv()
+		if err != nil {
+			return err
+		}
+		logger.Debug("Received message from gateway")
+
+		connectionInfo.addUpstreamObservations(upstreamMessage)
+
+		if ctx.Err() != nil {
+			logger.Debug("Uplink subscription was closed")
 			return ctx.Err()
-		case upstream, ok := <-result:
-			if !ok {
-				logger.Debug("Uplink subscription was closed")
-				return nil
-			}
-			if upstream != nil {
-				if upstream.GatewayStatus != nil {
-					g.handleStatus(ctx, upstream.GatewayStatus)
-				}
-				for _, uplink := range upstream.UplinkMessages {
-					g.handleUplink(ctx, uplink, gw)
-				}
-			}
+		}
+
+		if upstreamMessage.GatewayStatus != nil {
+			g.handleStatus(ctx, upstreamMessage.GatewayStatus)
+		}
+		for _, uplink := range upstreamMessage.UplinkMessages {
+			g.handleUplink(ctx, uplink, gw)
 		}
 	}
 }

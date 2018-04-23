@@ -21,7 +21,6 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/pool"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
@@ -55,7 +54,7 @@ func TestScheduleDownlinkUnregisteredGateway(t *testing.T) {
 		},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(pool.ErrGatewayNotConnected.Caused(err), should.BeTrue)
+	a.So(gatewayserver.ErrGatewayNotConnected.Caused(err), should.BeTrue)
 
 	defer gs.Close()
 }
