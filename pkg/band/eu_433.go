@@ -109,7 +109,6 @@ func init() {
 		regionalParameters1_0:   bandIdentity,
 		regionalParameters1_0_1: bandIdentity,
 		regionalParameters1_0_2: bandIdentity,
-		regionalParameters1_1A:  bandIdentity,
 	}
 	All = append(All, eu_433)
 }

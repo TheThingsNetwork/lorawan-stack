@@ -17,13 +17,15 @@ package band_test
 import (
 	"testing"
 
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+
 	"github.com/TheThingsNetwork/ttn/pkg/band"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
-func compatibleVerifier(t *testing.T) func(version band.RegionalParametersVersion, versionName string, bandIDs ...string) {
-	return func(version band.RegionalParametersVersion, versionName string, bandIDs ...string) {
+func compatibleVerifier(t *testing.T) func(version ttnpb.PHYVersion, versionName string, bandIDs ...string) {
+	return func(version ttnpb.PHYVersion, versionName string, bandIDs ...string) {
 		for _, id := range bandIDs {
 			b, err := band.GetByID(id)
 			if err != nil {
@@ -41,17 +43,16 @@ func TestBands(t *testing.T) {
 	verifyCompatibility := compatibleVerifier(t)
 
 	bands := []band.ID{band.EU_863_870, band.US_902_928, band.CN_779_787, band.EU_433}
-	verifyCompatibility(band.RegionalParameters1_0, "1.0", bands...)
+	verifyCompatibility(ttnpb.PHY_V1_0, "1.0", bands...)
 
 	bands = append(bands, band.AU_915_928, band.CN_470_510)
-	verifyCompatibility(band.RegionalParameters1_0_1, "1.0.1", bands...)
+	verifyCompatibility(ttnpb.PHY_V1_0_1, "1.0.1", bands...)
 
 	bands = append(bands, band.AS_923, band.KR_920_923, band.IN_865_867)
-	verifyCompatibility(band.RegionalParameters1_0_2, "1.0.2", bands...)
-	verifyCompatibility(band.RegionalParameters1_1A, "1.1A", bands...)
+	verifyCompatibility(ttnpb.PHY_V1_0_2, "1.0.2", bands...)
 
 	bands = append(bands, band.RU_864_870)
-	verifyCompatibility(band.CurrentVersion, "1.1B", bands...)
+	verifyCompatibility(ttnpb.PHY_V1_1, "1.1", bands...)
 }
 
 func TestUnsupportedBand(t *testing.T) {
@@ -60,7 +61,7 @@ func TestUnsupportedBand(t *testing.T) {
 	b, err := band.GetByID(band.IN_865_867)
 	a.So(err, should.BeNil)
 
-	_, err = b.Version(band.RegionalParameters1_0)
+	_, err = b.Version(ttnpb.PHY_V1_0)
 	if !a.So(err, should.NotBeNil) {
 		t.Log("LoRaWAN Regional Parameters 1.0 is not supported for the Indian band")
 	}

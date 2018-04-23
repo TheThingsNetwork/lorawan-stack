@@ -20,23 +20,8 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
-)
-
-// RegionalParametersVersion of a band.
-type RegionalParametersVersion int
-
-const (
-	// RegionalParameters1_0 is LoRaWAN 1.0 physical layers parameters.
-	RegionalParameters1_0 RegionalParametersVersion = iota
-	// RegionalParameters1_0_1 is LoRaWAN 1.0.1 physical layers parameters.
-	RegionalParameters1_0_1
-	// RegionalParameters1_0_2 is the LoRaWAN 1.0.2 Regional Parameters.
-	RegionalParameters1_0_2
-	// RegionalParameters1_1A is the LoRaWAN 1.1 Regional Parameters Revision A.
-	RegionalParameters1_1A
-	// CurrentVersion is the LoRaWAN 1.1 Regional Parameters Revision B.
-	CurrentVersion
 )
 
 // PayloadSizer abstracts the acceptable payload size depending on contextual parameters
@@ -168,7 +153,6 @@ type Band struct {
 	regionalParameters1_0   versionSwap
 	regionalParameters1_0_1 versionSwap
 	regionalParameters1_0_2 versionSwap
-	regionalParameters1_1A  versionSwap
 }
 
 // DutyCycle for the [MinFrequency;MaxFrequency[ sub-band
@@ -204,22 +188,21 @@ func GetByID(id ID) (Band, error) {
 }
 
 type swap struct {
-	version   RegionalParametersVersion
+	version   ttnpb.PHYVersion
 	downgrade versionSwap
 }
 
 func (b Band) downgrades() []swap {
 	return []swap{
-		{version: CurrentVersion, downgrade: bandIdentity},
-		{version: RegionalParameters1_1A, downgrade: b.regionalParameters1_1A},
-		{version: RegionalParameters1_0_2, downgrade: b.regionalParameters1_0_2},
-		{version: RegionalParameters1_0_1, downgrade: b.regionalParameters1_0_1},
-		{version: RegionalParameters1_0, downgrade: b.regionalParameters1_0},
+		{version: ttnpb.PHY_V1_1, downgrade: bandIdentity},
+		{version: ttnpb.PHY_V1_0_2, downgrade: b.regionalParameters1_0_2},
+		{version: ttnpb.PHY_V1_0_1, downgrade: b.regionalParameters1_0_1},
+		{version: ttnpb.PHY_V1_0, downgrade: b.regionalParameters1_0},
 	}
 }
 
 // Version returns the band parameters for a given version.
-func (b Band) Version(wantedVersion RegionalParametersVersion) (Band, error) {
+func (b Band) Version(wantedVersion ttnpb.PHYVersion) (Band, error) {
 	for _, swap := range b.downgrades() {
 		if swap.downgrade == nil {
 			return b, ErrUnsupportedLoRaWANRegionalParameters.New(nil)
@@ -234,8 +217,8 @@ func (b Band) Version(wantedVersion RegionalParametersVersion) (Band, error) {
 }
 
 // Versions supported for this band.
-func (b Band) Versions() []RegionalParametersVersion {
-	versions := []RegionalParametersVersion{CurrentVersion}
+func (b Band) Versions() []ttnpb.PHYVersion {
+	versions := []ttnpb.PHYVersion{ttnpb.PHY_V1_1}
 	for _, swap := range b.downgrades() {
 		if swap.downgrade != nil {
 			versions = append(versions, swap.version)
