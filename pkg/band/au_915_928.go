@@ -16,6 +16,7 @@ package band
 
 import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 )
 
@@ -101,6 +102,7 @@ func init() {
 		}(),
 
 		ImplementsCFList: true,
+		CFListType:       ttnpb.CFListType_FREQUENCIES,
 
 		Rx1Channel: func(idx uint32) (uint32, error) {
 			return idx % 8, nil

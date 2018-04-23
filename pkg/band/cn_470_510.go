@@ -16,6 +16,7 @@ package band
 
 import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 )
 
@@ -115,6 +116,7 @@ func init() {
 		},
 
 		ImplementsCFList: true,
+		CFListType:       ttnpb.CFListType_CHANNEL_MASKS,
 
 		// No LoRaWAN Regional Parameters 1.0
 		regionalParameters1_0_1: bandIdentity,

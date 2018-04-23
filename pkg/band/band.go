@@ -116,6 +116,7 @@ type Band struct {
 	DataRates [16]DataRate
 
 	ImplementsCFList bool
+	CFListType       ttnpb.CFListType
 
 	// ReceiveDelay1 is the default Rx1 window timing in seconds
 	ReceiveDelay1 time.Duration

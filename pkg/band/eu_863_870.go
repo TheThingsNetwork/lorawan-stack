@@ -16,6 +16,7 @@ package band
 
 import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
 )
 
@@ -101,8 +102,6 @@ func init() {
 			0, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},
 
-		ImplementsCFList: true,
-
 		Rx1Channel: rx1ChannelIdentity,
 		Rx1DataRate: func(idx, offset uint32, _ bool) (uint32, error) {
 			if idx > 7 {
@@ -121,6 +120,8 @@ func init() {
 			}
 			return uint32(si), nil
 		},
+		ImplementsCFList: true,
+		CFListType:       ttnpb.CFListType_FREQUENCIES,
 
 		DefaultRx2Parameters: Rx2Parameters{0, 869525000},
 
