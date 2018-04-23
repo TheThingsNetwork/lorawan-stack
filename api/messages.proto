@@ -161,7 +161,7 @@ message ApplicationJoinAccept {
 message ApplicationDownlink {
   uint32 f_port = 1;
   uint32 f_cnt = 2;
-  bytes frm_payload = 3;
+  bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
   // TODO: Add "hints" for NS
 }
 
