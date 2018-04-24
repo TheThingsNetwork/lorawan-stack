@@ -31,6 +31,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/crypto"
 	"github.com/TheThingsNetwork/ttn/pkg/deviceregistry"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/types"
@@ -585,11 +586,16 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		NetID:              ns.NetID,
 		SelectedMacVersion: dev.GetLoRaWANVersion(),
 		RxDelay:            stDes.GetRxDelay(),
-		CFList:             nil, // TODO: Add if required https://github.com/TheThingsIndustries/ttn/issues/559
 		DownlinkSettings: ttnpb.DLSettings{
 			Rx1DROffset: stDes.GetRx1DataRateOffset(),
 			Rx2DR:       stDes.GetRx2DataRateIndex(),
 		},
+	}
+
+	if fpID := dev.GetFrequencyPlanID(); fpID != "" {
+		if fp, err := ns.FrequencyPlans.GetByID(fpID); err == nil {
+			req.CFList = frequencyplans.CFList(fp, dev.GetLoRaWANPHYVersion())
+		}
 	}
 
 	var errs []error
