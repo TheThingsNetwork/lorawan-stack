@@ -202,6 +202,10 @@ func (s *Store) getByID(id string) (proto ttnpb.FrequencyPlan, err error) {
 
 // GetByID tries to retrieve the frequency plan that has the given ID, and returns an error otherwise.
 func (s *Store) GetByID(id string) (ttnpb.FrequencyPlan, error) {
+	if id == "" {
+		return ttnpb.FrequencyPlan{}, ErrFrequencyPlanNotFound.New(errors.Attributes{"frequency_plan_id": id})
+	}
+
 	s.frequencyPlansMu.Lock()
 	defer s.frequencyPlansMu.Unlock()
 	if cached, ok := s.frequencyPlansCache[id]; ok && cached.err == nil || time.Since(cached.time) < yamlFetchErrorCache {
