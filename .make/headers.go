@@ -184,7 +184,7 @@ func check(licenseContent []byte, files []string) bool {
 	allFilesValid := true
 	for _, file := range files {
 		if valid, generated, err := hasHeaders(licenseContent, file); err != nil {
-			log.Printf("Error when reading %s: %s\n", file, err)
+			log.Printf("Could not check headers in %s: %s\n", file, err)
 			allFilesValid = false
 		} else if !valid && !generated {
 			log.Printf("Invalid headers in %s.\n", file)
@@ -198,14 +198,14 @@ func remove(licenseContent []byte, files []string) bool {
 	var wasError error
 	for _, file := range files {
 		if valid, generated, err := hasHeaders(licenseContent, file); err != nil {
-			log.Printf("Error when reading %s: %s\n", file, err)
+			log.Printf("Could not check headers in %s: %s\n", file, err)
 			wasError = err
 		} else if !generated {
 			if !valid {
 				log.Printf("No headers in %s.\n", file)
 			} else {
 				if err := removeHeaders(nbLines(licenseContent), file); err != nil {
-					log.Printf("Error when removing headers in %s: %s\n", file, err)
+					log.Printf("Could not remove headers in %s: %s\n", file, err)
 					wasError = err
 				}
 			}
@@ -218,11 +218,11 @@ func fix(licenseContent []byte, files []string) bool {
 	var wasError error
 	for _, file := range files {
 		if valid, generated, err := hasHeaders(licenseContent, file); err != nil {
-			log.Printf("Error when reading %s: %s\n", file, err)
+			log.Printf("Could not remove headers in %s: %s\n", file, err)
 			wasError = err
 		} else if !valid && !generated {
 			if err := addHeader(licenseContent, file); err != nil {
-				log.Printf("Error when fixing %s: %s\n", file, err)
+				log.Printf("Could not fix %s: %s\n", file, err)
 			} else {
 				log.Printf("Fixed headers in %s.\n", file)
 			}
