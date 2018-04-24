@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # run tests
-go.test: key.pem cert.pem
+go.test: go.min-version key.pem cert.pem
 	@$(log) "Testing `$(TEST_PACKAGES) | $(count)` go packages"
 	@$(GO) test $(GO_TEST_FLAGS) `$(TEST_PACKAGES)`
 

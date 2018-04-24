@@ -28,7 +28,7 @@ LAZY_GOARCH = `echo $@ | sed 's:$(RELEASE_DIR)/.*-\(.*\)-\(.*\):\2:'`
 LAZY_GOEXE = $$(GOOS=$(LAZY_GOOS) go env GOEXE)
 
 # Build the executable
-$(RELEASE_DIR)/%: $(shell $(GO_FILES)) $(GO_VENDOR_FILE)
+$(RELEASE_DIR)/%: go.min-version $(shell $(GO_FILES)) $(GO_VENDOR_FILE)
 	@$(log) "Building" [$(GO_ENV) GOOS=$(LAZY_GOOS) GOARCH=$(LAZY_GOARCH) $(GO) build $(GO_FLAGS) ...] to "$@$(LAZY_GOEXE)"
 	@$(GO_ENV) GOOS=$(LAZY_GOOS) GOARCH=$(LAZY_GOARCH) $(GO) build -gcflags="all=-trimpath=$(GO_PATH)" -asmflags="all=-trimpath=$(GO_PATH)" -o "$@$(LAZY_GOEXE)" -v $(GO_FLAGS) $(LD_FLAGS) $(MAIN)
 

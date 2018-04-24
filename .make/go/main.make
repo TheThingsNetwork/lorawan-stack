@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+.PHONY: go.min-version
+
 # default release dir
 RELEASE_DIR ?= release#
 
@@ -34,6 +36,12 @@ GO_MISSPELL= misspell
 GO_UNCONVERT= unconvert
 GO_METALINTER = gometalinter
 GO_LINT_FILES = $(ALL_FILES) | $(only_go_lintable)
+GO_MINIMUM_VERSION = 1.10
+GO_VERSION := $(shell go version | cut -d' ' -f3 | cut -c 3-6)
+
+# Get the minor Go version
+get_go_major = cut -d'.' -f1
+get_go_minor = cut -d'.' -f2
 
 # go flags
 GO_ENV = CGO_ENABLED=0
@@ -108,6 +116,14 @@ go.dev-deps:
 	@$(log) "Getting gometalinter" && $(GO) get -u github.com/alecthomas/gometalinter
 	@$(log) "Getting gometalinter linters" && $(GO_METALINTER) -i
 
+# testing minimum version
+go.min-version:
+	@if [[ `echo $(GO_VERSION) | $(get_go_major)` -lt `echo $(GO_MINIMUM_VERSION) | $(get_go_major)` ]] || \
+	 [[ `echo $(GO_VERSION) | $(get_go_major)` -eq `echo $(GO_MINIMUM_VERSION) | $(get_go_major)` && `echo $(GO_VERSION) | $(get_go_minor)` -lt `echo $(GO_MINIMUM_VERSION) | $(get_go_minor)` ]]; then \
+		$(err) "Go is not up to date. Go $(GO_MINIMUM_VERSION) at least is required."; \
+		exit 1; \
+	fi
+
 DEP_FLAGS ?= $(if $(CI),-vendor-only,)
 
 # install dependencies
@@ -129,7 +145,7 @@ go.list-staged: GO_FILES = $(STAGED_FILES) | $(only_go)
 go.list-staged: go.list
 
 # init initializes go
-go.init:
+go.init: go.min-version
 	@$(log) "Initializing go"
 	@make go.dev-deps
 	@make go.deps
