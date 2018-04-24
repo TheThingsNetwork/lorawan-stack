@@ -218,11 +218,13 @@ func ExampleRegistry() {
 	devAddr := types.DevAddr([4]byte{0, 1, 2, 3})
 	ed := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			ApplicationID: "test",
-			DeviceID:      "test",
-			DevEUI:        &devEUI,
-			JoinEUI:       &joinEUI,
-			DevAddr:       &devAddr,
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+				ApplicationID: "test",
+			},
+			DeviceID: "test",
+			DevEUI:   &devEUI,
+			JoinEUI:  &joinEUI,
+			DevAddr:  &devAddr,
 		},
 	}
 
@@ -244,7 +246,7 @@ func ExampleRegistry() {
 	}
 
 	dev, err = FindOneDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
-		ApplicationID: "test",
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test"},
 	})
 	if err != nil {
 		panic(fmt.Errorf("Failed to find device by identifiers %s", err))

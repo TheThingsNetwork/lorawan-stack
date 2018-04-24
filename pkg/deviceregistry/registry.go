@@ -88,7 +88,7 @@ func FindDeviceByIdentifiers(r Interface, id *ttnpb.EndDeviceIdentifiers) ([]*De
 	case id.DeviceID != "":
 		fields = append(fields, "EndDeviceIdentifiers.DeviceID")
 	case id.ApplicationID != "":
-		fields = append(fields, "EndDeviceIdentifiers.ApplicationID")
+		fields = append(fields, "EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID")
 	case id.DevEUI != nil && !id.DevEUI.IsZero():
 		fields = append(fields, "EndDeviceIdentifiers.DevEUI")
 	case id.JoinEUI != nil && !id.JoinEUI.IsZero():

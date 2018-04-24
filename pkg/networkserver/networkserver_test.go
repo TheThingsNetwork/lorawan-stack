@@ -413,8 +413,10 @@ func HandleUplinkTest() func(t *testing.T) {
 				&ttnpb.EndDevice{
 					LoRaWANVersion: ttnpb.MAC_V1_0,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationID: ApplicationID,
-						DevAddr:       &DevAddr,
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: ApplicationID,
+						},
+						DevAddr: &DevAddr,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
@@ -447,8 +449,10 @@ func HandleUplinkTest() func(t *testing.T) {
 				&ttnpb.EndDevice{
 					LoRaWANVersion: ttnpb.MAC_V1_0,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationID: ApplicationID,
-						DevAddr:       &DevAddr,
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: ApplicationID,
+						},
+						DevAddr: &DevAddr,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
@@ -482,8 +486,10 @@ func HandleUplinkTest() func(t *testing.T) {
 				&ttnpb.EndDevice{
 					LoRaWANVersion: ttnpb.MAC_V1_0,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationID: ApplicationID,
-						DevAddr:       &DevAddr,
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: ApplicationID,
+						},
+						DevAddr: &DevAddr,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
@@ -521,8 +527,10 @@ func HandleUplinkTest() func(t *testing.T) {
 				&ttnpb.EndDevice{
 					LoRaWANVersion: ttnpb.MAC_V1_0,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationID: ApplicationID,
-						DevAddr:       &DevAddr,
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: ApplicationID,
+						},
+						DevAddr: &DevAddr,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
@@ -561,8 +569,10 @@ func HandleUplinkTest() func(t *testing.T) {
 				&ttnpb.EndDevice{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationID: ApplicationID,
-						DevAddr:       &DevAddr,
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: ApplicationID,
+						},
+						DevAddr: &DevAddr,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
@@ -600,8 +610,10 @@ func HandleUplinkTest() func(t *testing.T) {
 				&ttnpb.EndDevice{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationID: ApplicationID,
-						DevAddr:       &DevAddr,
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: ApplicationID,
+						},
+						DevAddr: &DevAddr,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
@@ -648,8 +660,10 @@ func HandleUplinkTest() func(t *testing.T) {
 				&ttnpb.EndDevice{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationID: ApplicationID,
-						DevAddr:       &DevAddr,
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: ApplicationID,
+						},
+						DevAddr: &DevAddr,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
@@ -688,8 +702,10 @@ func HandleUplinkTest() func(t *testing.T) {
 				&ttnpb.EndDevice{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationID: ApplicationID,
-						DevAddr:       &DevAddr,
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: ApplicationID,
+						},
+						DevAddr: &DevAddr,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,

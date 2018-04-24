@@ -38,7 +38,7 @@ service NsDeviceRegistry {
   // ListDevices returns the devices that match the given identifiers
   rpc ListDevices(EndDeviceIdentifiers) returns (EndDevices) {
     option (google.api.http) = {
-      get: "/ns/applications/{application_id}/devices"
+      get: "/ns/applications/{application_ids.application_id}/devices"
     };
   };
 
@@ -46,17 +46,17 @@ service NsDeviceRegistry {
   // If there are multiple matches, an error will be returned.
   rpc GetDevice(EndDeviceIdentifiers) returns (EndDevice) {
     option (google.api.http) = {
-      get: "/ns/applications/{application_id}/devices/{device_id}"
+      get: "/ns/applications/{application_ids.application_id}/devices/{device_id}"
     };
   };
 
   // SetDevice creates or updates the device
   rpc SetDevice(SetDeviceRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/ns/applications/{device.ids.application_id}/devices/{device.ids.device_id}"
+      post: "/ns/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}"
       body: "*"
       additional_bindings {
-        post: "/ns/applications/{device.ids.application_id}/devices"
+        post: "/ns/applications/{device.ids.application_ids.application_id}/devices"
         body: "*"
       };
     };
@@ -66,7 +66,7 @@ service NsDeviceRegistry {
   // If there are multiple matches, an error will be returned.
   rpc DeleteDevice(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/ns/applications/{application_id}/devices/{device_id}"
+      delete: "/ns/applications/{application_ids.application_id}/devices/{device_id}"
     };
   };
 }
@@ -76,7 +76,7 @@ service AsDeviceRegistry {
   // ListDevices returns the devices that match the given identifiers
   rpc ListDevices(EndDeviceIdentifiers) returns (EndDevices) {
     option (google.api.http) = {
-      get: "/as/applications/{application_id}/devices"
+      get: "/as/applications/{application_ids.application_id}/devices"
     };
   };
 
@@ -84,17 +84,17 @@ service AsDeviceRegistry {
   // If there are multiple matches, an error will be returned.
   rpc GetDevice(EndDeviceIdentifiers) returns (EndDevice) {
     option (google.api.http) = {
-      get: "/as/applications/{application_id}/devices/{device_id}"
+      get: "/as/applications/{application_ids.application_id}/devices/{device_id}"
     };
   };
 
   // SetDevice creates or updates the device
   rpc SetDevice(SetDeviceRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/as/applications/{device.ids.application_id}/devices/{device.ids.device_id}"
+      post: "/as/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}"
       body: "*"
       additional_bindings {
-        post: "/as/applications/{device.ids.application_id}/devices"
+        post: "/as/applications/{device.ids.application_ids.application_id}/devices"
         body: "*"
       };
     };
@@ -104,7 +104,7 @@ service AsDeviceRegistry {
   // If there are multiple matches, an error will be returned.
   rpc DeleteDevice(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/as/applications/{application_id}/devices/{device_id}"
+      delete: "/as/applications/{application_ids.application_id}/devices/{device_id}"
     };
   };
 }
@@ -114,7 +114,7 @@ service JsDeviceRegistry {
   // ListDevices returns the devices that match the given identifiers
   rpc ListDevices(EndDeviceIdentifiers) returns (EndDevices) {
     option (google.api.http) = {
-      get: "/js/applications/{application_id}/devices"
+      get: "/js/applications/{application_ids.application_id}/devices"
     };
   };
 
@@ -122,17 +122,17 @@ service JsDeviceRegistry {
   // If there are multiple matches, an error will be returned.
   rpc GetDevice(EndDeviceIdentifiers) returns (EndDevice) {
     option (google.api.http) = {
-      get: "/js/applications/{application_id}/devices/{device_id}"
+      get: "/js/applications/{application_ids.application_id}/devices/{device_id}"
     };
   };
 
   // SetDevice creates or updates the device
   rpc SetDevice(SetDeviceRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/js/applications/{device.ids.application_id}/devices/{device.ids.device_id}"
+      post: "/js/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}"
       body: "*"
       additional_bindings {
-        post: "/js/applications/{device.ids.application_id}/devices"
+        post: "/js/applications/{device.ids.application_ids.application_id}/devices"
         body: "*"
       };
     };
@@ -142,7 +142,7 @@ service JsDeviceRegistry {
   // If there are multiple matches, an error will be returned.
   rpc DeleteDevice(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/js/applications/{application_id}/devices/{device_id}"
+      delete: "/js/applications/{application_ids.application_id}/devices/{device_id}"
     };
   };
 }

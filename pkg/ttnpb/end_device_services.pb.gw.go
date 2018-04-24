@@ -29,7 +29,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
 var (
-	filter_NsDeviceRegistry_ListDevices_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_NsDeviceRegistry_ListDevices_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
 func request_NsDeviceRegistry_ListDevices_0(ctx context.Context, marshaler runtime.Marshaler, client NsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -43,15 +43,15 @@ func request_NsDeviceRegistry_ListDevices_0(ctx context.Context, marshaler runti
 		_   = err
 	)
 
-	val, ok = pathParams["application_id"]
+	val, ok = pathParams["application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
 	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_NsDeviceRegistry_ListDevices_0); err != nil {
@@ -64,7 +64,7 @@ func request_NsDeviceRegistry_ListDevices_0(ctx context.Context, marshaler runti
 }
 
 var (
-	filter_NsDeviceRegistry_GetDevice_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_id": 0, "device_id": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_NsDeviceRegistry_GetDevice_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_NsDeviceRegistry_GetDevice_0(ctx context.Context, marshaler runtime.Marshaler, client NsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -78,15 +78,15 @@ func request_NsDeviceRegistry_GetDevice_0(ctx context.Context, marshaler runtime
 		_   = err
 	)
 
-	val, ok = pathParams["application_id"]
+	val, ok = pathParams["application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
 	val, ok = pathParams["device_id"]
@@ -124,15 +124,15 @@ func request_NsDeviceRegistry_SetDevice_0(ctx context.Context, marshaler runtime
 		_   = err
 	)
 
-	val, ok = pathParams["device.ids.application_id"]
+	val, ok = pathParams["device.ids.application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device.ids.application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device.ids.application_ids.application_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "device.ids.application_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "device.ids.application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device.ids.application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device.ids.application_ids.application_id", err)
 	}
 
 	val, ok = pathParams["device.ids.device_id"]
@@ -166,15 +166,15 @@ func request_NsDeviceRegistry_SetDevice_1(ctx context.Context, marshaler runtime
 		_   = err
 	)
 
-	val, ok = pathParams["device.ids.application_id"]
+	val, ok = pathParams["device.ids.application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device.ids.application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device.ids.application_ids.application_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "device.ids.application_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "device.ids.application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device.ids.application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device.ids.application_ids.application_id", err)
 	}
 
 	msg, err := client.SetDevice(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -183,7 +183,7 @@ func request_NsDeviceRegistry_SetDevice_1(ctx context.Context, marshaler runtime
 }
 
 var (
-	filter_NsDeviceRegistry_DeleteDevice_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_id": 0, "device_id": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_NsDeviceRegistry_DeleteDevice_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_NsDeviceRegistry_DeleteDevice_0(ctx context.Context, marshaler runtime.Marshaler, client NsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -197,15 +197,15 @@ func request_NsDeviceRegistry_DeleteDevice_0(ctx context.Context, marshaler runt
 		_   = err
 	)
 
-	val, ok = pathParams["application_id"]
+	val, ok = pathParams["application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
 	val, ok = pathParams["device_id"]
@@ -229,7 +229,7 @@ func request_NsDeviceRegistry_DeleteDevice_0(ctx context.Context, marshaler runt
 }
 
 var (
-	filter_AsDeviceRegistry_ListDevices_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_AsDeviceRegistry_ListDevices_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
 func request_AsDeviceRegistry_ListDevices_0(ctx context.Context, marshaler runtime.Marshaler, client AsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -243,15 +243,15 @@ func request_AsDeviceRegistry_ListDevices_0(ctx context.Context, marshaler runti
 		_   = err
 	)
 
-	val, ok = pathParams["application_id"]
+	val, ok = pathParams["application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
 	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_AsDeviceRegistry_ListDevices_0); err != nil {
@@ -264,7 +264,7 @@ func request_AsDeviceRegistry_ListDevices_0(ctx context.Context, marshaler runti
 }
 
 var (
-	filter_AsDeviceRegistry_GetDevice_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_id": 0, "device_id": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_AsDeviceRegistry_GetDevice_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_AsDeviceRegistry_GetDevice_0(ctx context.Context, marshaler runtime.Marshaler, client AsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -278,15 +278,15 @@ func request_AsDeviceRegistry_GetDevice_0(ctx context.Context, marshaler runtime
 		_   = err
 	)
 
-	val, ok = pathParams["application_id"]
+	val, ok = pathParams["application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
 	val, ok = pathParams["device_id"]
@@ -324,15 +324,15 @@ func request_AsDeviceRegistry_SetDevice_0(ctx context.Context, marshaler runtime
 		_   = err
 	)
 
-	val, ok = pathParams["device.ids.application_id"]
+	val, ok = pathParams["device.ids.application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device.ids.application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device.ids.application_ids.application_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "device.ids.application_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "device.ids.application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device.ids.application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device.ids.application_ids.application_id", err)
 	}
 
 	val, ok = pathParams["device.ids.device_id"]
@@ -366,15 +366,15 @@ func request_AsDeviceRegistry_SetDevice_1(ctx context.Context, marshaler runtime
 		_   = err
 	)
 
-	val, ok = pathParams["device.ids.application_id"]
+	val, ok = pathParams["device.ids.application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device.ids.application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device.ids.application_ids.application_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "device.ids.application_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "device.ids.application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device.ids.application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device.ids.application_ids.application_id", err)
 	}
 
 	msg, err := client.SetDevice(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -383,7 +383,7 @@ func request_AsDeviceRegistry_SetDevice_1(ctx context.Context, marshaler runtime
 }
 
 var (
-	filter_AsDeviceRegistry_DeleteDevice_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_id": 0, "device_id": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_AsDeviceRegistry_DeleteDevice_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_AsDeviceRegistry_DeleteDevice_0(ctx context.Context, marshaler runtime.Marshaler, client AsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -397,15 +397,15 @@ func request_AsDeviceRegistry_DeleteDevice_0(ctx context.Context, marshaler runt
 		_   = err
 	)
 
-	val, ok = pathParams["application_id"]
+	val, ok = pathParams["application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
 	val, ok = pathParams["device_id"]
@@ -429,7 +429,7 @@ func request_AsDeviceRegistry_DeleteDevice_0(ctx context.Context, marshaler runt
 }
 
 var (
-	filter_JsDeviceRegistry_ListDevices_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_JsDeviceRegistry_ListDevices_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
 func request_JsDeviceRegistry_ListDevices_0(ctx context.Context, marshaler runtime.Marshaler, client JsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -443,15 +443,15 @@ func request_JsDeviceRegistry_ListDevices_0(ctx context.Context, marshaler runti
 		_   = err
 	)
 
-	val, ok = pathParams["application_id"]
+	val, ok = pathParams["application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
 	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_JsDeviceRegistry_ListDevices_0); err != nil {
@@ -464,7 +464,7 @@ func request_JsDeviceRegistry_ListDevices_0(ctx context.Context, marshaler runti
 }
 
 var (
-	filter_JsDeviceRegistry_GetDevice_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_id": 0, "device_id": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_JsDeviceRegistry_GetDevice_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_JsDeviceRegistry_GetDevice_0(ctx context.Context, marshaler runtime.Marshaler, client JsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -478,15 +478,15 @@ func request_JsDeviceRegistry_GetDevice_0(ctx context.Context, marshaler runtime
 		_   = err
 	)
 
-	val, ok = pathParams["application_id"]
+	val, ok = pathParams["application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
 	val, ok = pathParams["device_id"]
@@ -524,15 +524,15 @@ func request_JsDeviceRegistry_SetDevice_0(ctx context.Context, marshaler runtime
 		_   = err
 	)
 
-	val, ok = pathParams["device.ids.application_id"]
+	val, ok = pathParams["device.ids.application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device.ids.application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device.ids.application_ids.application_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "device.ids.application_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "device.ids.application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device.ids.application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device.ids.application_ids.application_id", err)
 	}
 
 	val, ok = pathParams["device.ids.device_id"]
@@ -566,15 +566,15 @@ func request_JsDeviceRegistry_SetDevice_1(ctx context.Context, marshaler runtime
 		_   = err
 	)
 
-	val, ok = pathParams["device.ids.application_id"]
+	val, ok = pathParams["device.ids.application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device.ids.application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device.ids.application_ids.application_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "device.ids.application_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "device.ids.application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device.ids.application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device.ids.application_ids.application_id", err)
 	}
 
 	msg, err := client.SetDevice(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -583,7 +583,7 @@ func request_JsDeviceRegistry_SetDevice_1(ctx context.Context, marshaler runtime
 }
 
 var (
-	filter_JsDeviceRegistry_DeleteDevice_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_id": 0, "device_id": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_JsDeviceRegistry_DeleteDevice_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_JsDeviceRegistry_DeleteDevice_0(ctx context.Context, marshaler runtime.Marshaler, client JsDeviceRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -597,15 +597,15 @@ func request_JsDeviceRegistry_DeleteDevice_0(ctx context.Context, marshaler runt
 		_   = err
 	)
 
-	val, ok = pathParams["application_id"]
+	val, ok = pathParams["application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
 	val, ok = pathParams["device_id"]
@@ -815,15 +815,15 @@ func RegisterNsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 }
 
 var (
-	pattern_NsDeviceRegistry_ListDevices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"ns", "applications", "application_id", "devices"}, ""))
+	pattern_NsDeviceRegistry_ListDevices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"ns", "applications", "application_ids.application_id", "devices"}, ""))
 
-	pattern_NsDeviceRegistry_GetDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"ns", "applications", "application_id", "devices", "device_id"}, ""))
+	pattern_NsDeviceRegistry_GetDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"ns", "applications", "application_ids.application_id", "devices", "device_id"}, ""))
 
-	pattern_NsDeviceRegistry_SetDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"ns", "applications", "device.ids.application_id", "devices", "device.ids.device_id"}, ""))
+	pattern_NsDeviceRegistry_SetDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"ns", "applications", "device.ids.application_ids.application_id", "devices", "device.ids.device_id"}, ""))
 
-	pattern_NsDeviceRegistry_SetDevice_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"ns", "applications", "device.ids.application_id", "devices"}, ""))
+	pattern_NsDeviceRegistry_SetDevice_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"ns", "applications", "device.ids.application_ids.application_id", "devices"}, ""))
 
-	pattern_NsDeviceRegistry_DeleteDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"ns", "applications", "application_id", "devices", "device_id"}, ""))
+	pattern_NsDeviceRegistry_DeleteDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"ns", "applications", "application_ids.application_id", "devices", "device_id"}, ""))
 )
 
 var (
@@ -1025,15 +1025,15 @@ func RegisterAsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 }
 
 var (
-	pattern_AsDeviceRegistry_ListDevices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"as", "applications", "application_id", "devices"}, ""))
+	pattern_AsDeviceRegistry_ListDevices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"as", "applications", "application_ids.application_id", "devices"}, ""))
 
-	pattern_AsDeviceRegistry_GetDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"as", "applications", "application_id", "devices", "device_id"}, ""))
+	pattern_AsDeviceRegistry_GetDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"as", "applications", "application_ids.application_id", "devices", "device_id"}, ""))
 
-	pattern_AsDeviceRegistry_SetDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"as", "applications", "device.ids.application_id", "devices", "device.ids.device_id"}, ""))
+	pattern_AsDeviceRegistry_SetDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"as", "applications", "device.ids.application_ids.application_id", "devices", "device.ids.device_id"}, ""))
 
-	pattern_AsDeviceRegistry_SetDevice_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"as", "applications", "device.ids.application_id", "devices"}, ""))
+	pattern_AsDeviceRegistry_SetDevice_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"as", "applications", "device.ids.application_ids.application_id", "devices"}, ""))
 
-	pattern_AsDeviceRegistry_DeleteDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"as", "applications", "application_id", "devices", "device_id"}, ""))
+	pattern_AsDeviceRegistry_DeleteDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"as", "applications", "application_ids.application_id", "devices", "device_id"}, ""))
 )
 
 var (
@@ -1235,15 +1235,15 @@ func RegisterJsDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 }
 
 var (
-	pattern_JsDeviceRegistry_ListDevices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"js", "applications", "application_id", "devices"}, ""))
+	pattern_JsDeviceRegistry_ListDevices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"js", "applications", "application_ids.application_id", "devices"}, ""))
 
-	pattern_JsDeviceRegistry_GetDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "application_id", "devices", "device_id"}, ""))
+	pattern_JsDeviceRegistry_GetDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "application_ids.application_id", "devices", "device_id"}, ""))
 
-	pattern_JsDeviceRegistry_SetDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "device.ids.application_id", "devices", "device.ids.device_id"}, ""))
+	pattern_JsDeviceRegistry_SetDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "device.ids.application_ids.application_id", "devices", "device.ids.device_id"}, ""))
 
-	pattern_JsDeviceRegistry_SetDevice_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"js", "applications", "device.ids.application_id", "devices"}, ""))
+	pattern_JsDeviceRegistry_SetDevice_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"js", "applications", "device.ids.application_ids.application_id", "devices"}, ""))
 
-	pattern_JsDeviceRegistry_DeleteDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "application_id", "devices", "device_id"}, ""))
+	pattern_JsDeviceRegistry_DeleteDevice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "application_ids.application_id", "devices", "device_id"}, ""))
 )
 
 var (

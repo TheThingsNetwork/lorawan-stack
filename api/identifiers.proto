@@ -50,7 +50,7 @@ message EndDeviceIdentifiers {
   // TTN Device ID.
   string device_id = 1 [(gogoproto.customname) = "DeviceID"];
   // TTN Application ID.
-  string application_id = 2 [(gogoproto.customname) = "ApplicationID"];
+  ApplicationIdentifiers application_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // LoRaWAN DevEUI.
   bytes dev_eui = 4 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];

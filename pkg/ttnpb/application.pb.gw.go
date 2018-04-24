@@ -29,7 +29,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
 var (
-	filter_AsApplicationDownlinkQueue_DownlinkQueueReplace_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 2, 3, 4}}
+	filter_AsApplicationDownlinkQueue_DownlinkQueueReplace_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device": 0, "application_ids": 1, "application_id": 2, "device_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
 )
 
 func request_AsApplicationDownlinkQueue_DownlinkQueueReplace_0(ctx context.Context, marshaler runtime.Marshaler, client AsApplicationDownlinkQueueClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -43,15 +43,15 @@ func request_AsApplicationDownlinkQueue_DownlinkQueueReplace_0(ctx context.Conte
 		_   = err
 	)
 
-	val, ok = pathParams["end_device.application_id"]
+	val, ok = pathParams["end_device.application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "end_device.application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "end_device.application_ids.application_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "end_device.application_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "end_device.application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device.application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device.application_ids.application_id", err)
 	}
 
 	val, ok = pathParams["end_device.device_id"]
@@ -75,7 +75,7 @@ func request_AsApplicationDownlinkQueue_DownlinkQueueReplace_0(ctx context.Conte
 }
 
 var (
-	filter_AsApplicationDownlinkQueue_DownlinkQueuePush_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 2, 3, 4}}
+	filter_AsApplicationDownlinkQueue_DownlinkQueuePush_0 = &utilities.DoubleArray{Encoding: map[string]int{"end_device": 0, "application_ids": 1, "application_id": 2, "device_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
 )
 
 func request_AsApplicationDownlinkQueue_DownlinkQueuePush_0(ctx context.Context, marshaler runtime.Marshaler, client AsApplicationDownlinkQueueClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -89,15 +89,15 @@ func request_AsApplicationDownlinkQueue_DownlinkQueuePush_0(ctx context.Context,
 		_   = err
 	)
 
-	val, ok = pathParams["end_device.application_id"]
+	val, ok = pathParams["end_device.application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "end_device.application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "end_device.application_ids.application_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "end_device.application_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "end_device.application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device.application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device.application_ids.application_id", err)
 	}
 
 	val, ok = pathParams["end_device.device_id"]
@@ -121,7 +121,7 @@ func request_AsApplicationDownlinkQueue_DownlinkQueuePush_0(ctx context.Context,
 }
 
 var (
-	filter_AsApplicationDownlinkQueue_DownlinkQueueList_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_id": 0, "device_id": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_AsApplicationDownlinkQueue_DownlinkQueueList_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_AsApplicationDownlinkQueue_DownlinkQueueList_0(ctx context.Context, marshaler runtime.Marshaler, client AsApplicationDownlinkQueueClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -135,15 +135,15 @@ func request_AsApplicationDownlinkQueue_DownlinkQueueList_0(ctx context.Context,
 		_   = err
 	)
 
-	val, ok = pathParams["application_id"]
+	val, ok = pathParams["application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
 	val, ok = pathParams["device_id"]
@@ -167,7 +167,7 @@ func request_AsApplicationDownlinkQueue_DownlinkQueueList_0(ctx context.Context,
 }
 
 var (
-	filter_AsApplicationDownlinkQueue_DownlinkQueueClear_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_id": 0, "device_id": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_AsApplicationDownlinkQueue_DownlinkQueueClear_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "device_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_AsApplicationDownlinkQueue_DownlinkQueueClear_0(ctx context.Context, marshaler runtime.Marshaler, client AsApplicationDownlinkQueueClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -181,15 +181,15 @@ func request_AsApplicationDownlinkQueue_DownlinkQueueClear_0(ctx context.Context
 		_   = err
 	)
 
-	val, ok = pathParams["application_id"]
+	val, ok = pathParams["application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
 	}
 
-	protoReq.ApplicationID, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
 	val, ok = pathParams["device_id"]
@@ -370,13 +370,13 @@ func RegisterAsApplicationDownlinkQueueHandlerClient(ctx context.Context, mux *r
 }
 
 var (
-	pattern_AsApplicationDownlinkQueue_DownlinkQueueReplace_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"as", "applications", "end_device.application_id", "devices", "end_device.device_id", "downlink-queue"}, ""))
+	pattern_AsApplicationDownlinkQueue_DownlinkQueueReplace_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"as", "applications", "end_device.application_ids.application_id", "devices", "end_device.device_id", "downlink-queue"}, ""))
 
-	pattern_AsApplicationDownlinkQueue_DownlinkQueuePush_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"as", "applications", "end_device.application_id", "devices", "end_device.device_id", "downlink-queue"}, ""))
+	pattern_AsApplicationDownlinkQueue_DownlinkQueuePush_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"as", "applications", "end_device.application_ids.application_id", "devices", "end_device.device_id", "downlink-queue"}, ""))
 
-	pattern_AsApplicationDownlinkQueue_DownlinkQueueList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"as", "applications", "application_id", "devices", "device_id", "downlink-queue"}, ""))
+	pattern_AsApplicationDownlinkQueue_DownlinkQueueList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"as", "applications", "application_ids.application_id", "devices", "device_id", "downlink-queue"}, ""))
 
-	pattern_AsApplicationDownlinkQueue_DownlinkQueueClear_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"as", "applications", "application_id", "devices", "device_id", "downlink-queue"}, ""))
+	pattern_AsApplicationDownlinkQueue_DownlinkQueueClear_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"as", "applications", "application_ids.application_id", "devices", "device_id", "downlink-queue"}, ""))
 )
 
 var (
