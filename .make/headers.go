@@ -186,13 +186,9 @@ func check(licenseContent []byte, files []string) bool {
 		if valid, generated, err := hasHeaders(licenseContent, file); err != nil {
 			log.Printf("Error when reading %s: %s\n", file, err)
 			allFilesValid = false
-		} else if generated {
-			log.Printf("Generated file %s, ignoring.\n", file)
-		} else if !valid {
+		} else if !valid && !generated {
 			log.Printf("Invalid headers in %s.\n", file)
 			allFilesValid = false
-		} else {
-			log.Printf("Valid headers in %s.\n", file)
 		}
 	}
 	return allFilesValid
@@ -204,16 +200,14 @@ func remove(licenseContent []byte, files []string) bool {
 		if valid, generated, err := hasHeaders(licenseContent, file); err != nil {
 			log.Printf("Error when reading %s: %s\n", file, err)
 			wasError = err
-		} else if generated {
-			log.Printf("Generated file %s, ignoring.\n", file)
-		} else if !valid {
-			log.Printf("No headers in %s.\n", file)
-		} else {
-			if err := removeHeaders(nbLines(licenseContent), file); err != nil {
-				log.Printf("Error when removing headers in %s: %s\n", file, err)
-				wasError = err
+		} else if !generated {
+			if !valid {
+				log.Printf("No headers in %s.\n", file)
 			} else {
-				log.Printf("Headers removed in %s.\n", file)
+				if err := removeHeaders(nbLines(licenseContent), file); err != nil {
+					log.Printf("Error when removing headers in %s: %s\n", file, err)
+					wasError = err
+				}
 			}
 		}
 	}
@@ -226,16 +220,12 @@ func fix(licenseContent []byte, files []string) bool {
 		if valid, generated, err := hasHeaders(licenseContent, file); err != nil {
 			log.Printf("Error when reading %s: %s\n", file, err)
 			wasError = err
-		} else if generated {
-			log.Printf("Generated file %s, ignoring.\n", file)
-		} else if !valid {
+		} else if !valid && !generated {
 			if err := addHeader(licenseContent, file); err != nil {
 				log.Printf("Error when fixing %s: %s\n", file, err)
 			} else {
 				log.Printf("Fixed headers in %s.\n", file)
 			}
-		} else {
-			log.Printf("Valid headers in %s.\n", file)
 		}
 	}
 	return wasError == nil
