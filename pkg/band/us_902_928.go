@@ -130,10 +130,10 @@ func init() {
 			PingSlotChannels: usAuBeaconFrequencies[:],
 		},
 
-		regionalParameters1_0:   self,
+		regionalParameters1_0:   bandIdentity,
 		regionalParameters1_0_1: usBeacon1_0_1,
 		regionalParameters1_0_2: disableCFList1_0_2,
-		regionalParameters1_1A:  self,
+		regionalParameters1_1A:  bandIdentity,
 	}
 	All = append(All, us_902_928)
 }

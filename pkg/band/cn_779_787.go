@@ -109,10 +109,10 @@ func init() {
 			BroadcastChannel: func(_ float64) uint32 { return cnBeaconChannel },
 		},
 
-		regionalParameters1_0:   self,
-		regionalParameters1_0_1: self,
-		regionalParameters1_0_2: self,
-		regionalParameters1_1A:  self,
+		regionalParameters1_0:   bandIdentity,
+		regionalParameters1_0_1: bandIdentity,
+		regionalParameters1_0_2: bandIdentity,
+		regionalParameters1_1A:  bandIdentity,
 	}
 	All = append(All, cn_779_787)
 }

@@ -100,9 +100,8 @@ type ID = string
 
 type versionSwap = func(b Band) Band
 
-func self(b Band) Band { return b }
-func rx1ChannelIdentity(idx uint32) (uint32, error)             { return idx, nil }
-func rx1DataRateIdentity(idx, _ uint32, _ bool) (uint32, error) { return idx, nil }
+func bandIdentity(b Band) Band                      { return b }
+func rx1ChannelIdentity(idx uint32) (uint32, error) { return idx, nil }
 
 // Beacon parameters of a specific band.
 type Beacon struct {
@@ -211,7 +210,7 @@ type swap struct {
 
 func (b Band) downgrades() []swap {
 	return []swap{
-		{version: CurrentVersion, downgrade: self},
+		{version: CurrentVersion, downgrade: bandIdentity},
 		{version: RegionalParameters1_1A, downgrade: b.regionalParameters1_1A},
 		{version: RegionalParameters1_0_2, downgrade: b.regionalParameters1_0_2},
 		{version: RegionalParameters1_0_1, downgrade: b.regionalParameters1_0_1},

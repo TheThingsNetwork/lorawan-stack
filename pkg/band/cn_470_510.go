@@ -117,9 +117,9 @@ func init() {
 		ImplementsCFList: true,
 
 		// No LoRaWAN Regional Parameters 1.0
-		regionalParameters1_0_1: self,
+		regionalParameters1_0_1: bandIdentity,
 		regionalParameters1_0_2: disableCFList1_0_2,
-		regionalParameters1_1A:  self,
+		regionalParameters1_1A:  bandIdentity,
 	}
 	All = append(All, cn_470_510)
 }
