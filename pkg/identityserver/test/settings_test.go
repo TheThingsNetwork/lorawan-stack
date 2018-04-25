@@ -23,8 +23,6 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-var now = time.Now()
-
 func testSettings() *ttnpb.IdentityServerSettings {
 	return &ttnpb.IdentityServerSettings{
 		BlacklistedIDs:     []string{"admin"},

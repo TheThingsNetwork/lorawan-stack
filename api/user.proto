@@ -55,4 +55,10 @@ message User {
   // updated_at is the last time the user was updated.
   // This is a read-only field.
   google.protobuf.Timestamp updated_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
+  // The last time the password was updated (read-only field).
+  google.protobuf.Timestamp password_updated_at = 9 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
+  // Require the user to update its password (modifiable only by admins).
+  bool require_password_update = 10;
 }

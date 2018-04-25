@@ -185,6 +185,7 @@ func TestAdminUsers(t *testing.T) {
 		found, err = is.store.Users.GetByID(user.UserIdentifiers, is.config.Specializers.User)
 		a.So(err, should.BeNil)
 		a.So(old, should.NotEqual, found.GetUser().Password)
+		a.So(found.GetUser().RequirePasswordUpdate, should.BeTrue)
 	}
 
 	// make user admin

@@ -118,7 +118,11 @@ func (s *UserStore) create(q db.QueryContext, data user) (err error) {
 				admin,
 				state,
 				password,
-				validated_at)
+				password_updated_at,
+				require_password_update,
+				validated_at,
+				created_at,
+				updated_at)
 			VALUES (
 				:id,
 				lower(:user_id),
@@ -127,7 +131,11 @@ func (s *UserStore) create(q db.QueryContext, data user) (err error) {
 				:admin,
 				:state,
 				:password,
-				:validated_at)`,
+				:password_updated_at,
+				:require_password_update,
+				:validated_at,
+				:created_at,
+				:updated_at)`,
 		data)
 
 	if duplicates, yes := db.IsDuplicate(err); yes {
@@ -236,7 +244,9 @@ func (s *UserStore) update(q db.QueryContext, userID uuid.UUID, data *ttnpb.User
 				password = :password,
 				admin = :admin,
 				state = :state,
-				updated_at = current_timestamp()
+				updated_at = current_timestamp(),
+				password_updated_at = :password_updated_at,
+				require_password_update = :require_password_update
 			WHERE id = :id`,
 		user{
 			ID:   userID,

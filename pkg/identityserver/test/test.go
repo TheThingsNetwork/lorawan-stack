@@ -21,6 +21,8 @@ import (
 	"github.com/smartystreets/assertions"
 )
 
+var now = time.Now().UTC()
+
 const success = ""
 
 func all(results ...string) string {

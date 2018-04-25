@@ -241,11 +241,20 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	a.So(err, should.NotBeNil)
 	a.So(ErrInvalidPassword.Describes(err), should.BeTrue)
 
+	sfound, err := is.store.Users.GetByID(user.UserIdentifiers, is.config.Specializers.User)
+	a.So(err, should.BeNil)
+	oldPassword := sfound.GetUser().Password
+
 	_, err = is.userService.UpdateUserPassword(ctx, &ttnpb.UpdateUserPasswordRequest{
 		Old: user.Password,
 		New: "heheh",
 	})
 	a.So(err, should.BeNil)
+
+	sfound, err = is.store.Users.GetByID(user.UserIdentifiers, is.config.Specializers.User)
+	a.So(err, should.BeNil)
+	a.So(sfound.GetUser().RequirePasswordUpdate, should.BeFalse)
+	a.So(oldPassword, should.NotEqual, sfound.GetUser().Password)
 
 	// Generate a new API key.
 	key, err := is.userService.GenerateUserAPIKey(ctx, &ttnpb.GenerateUserAPIKeyRequest{

@@ -107,6 +107,8 @@ func (s *adminService) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequ
 
 	var token string
 	err = s.store.Transact(func(tx *store.Store) (err error) {
+		now := time.Now().UTC()
+
 		settings, err := tx.Settings.Get()
 		if err != nil {
 			return err
@@ -120,8 +122,14 @@ func (s *adminService) CreateUser(ctx context.Context, req *ttnpb.CreateUserRequ
 		}
 
 		if settings.SkipValidation {
-			req.User.ValidatedAt = timeValue(time.Now())
+			req.User.ValidatedAt = timeValue(now)
 		}
+
+		req.User.CreatedAt = now
+		req.User.UpdatedAt = now
+		req.User.PasswordUpdatedAt = now
+
+		req.User.RequirePasswordUpdate = true
 
 		err = tx.Users.Create(&req.User)
 		if err != nil {
@@ -250,6 +258,8 @@ func (s *adminService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequ
 				user.Admin = req.User.Admin
 			case ttnpb.FieldPathUserState.MatchString(path):
 				user.State = req.User.State
+			case ttnpb.FieldPathUserRequirePasswordUpdate.MatchString(path):
+				user.RequirePasswordUpdate = req.User.RequirePasswordUpdate
 			default:
 				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
 					"path": path,
@@ -317,6 +327,8 @@ func (s *adminService) ResetUserPassword(ctx context.Context, req *ttnpb.UserIde
 
 		user = found.GetUser()
 		user.Password = string(hashed)
+		user.PasswordUpdatedAt = time.Now().UTC()
+		user.RequirePasswordUpdate = true
 
 		return tx.Users.Update(user.UserIdentifiers, user)
 	})

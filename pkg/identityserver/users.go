@@ -82,15 +82,19 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 			return err
 		}
 
+		now := time.Now().UTC()
 		user = &ttnpb.User{
-			UserIdentifiers: req.User.UserIdentifiers,
-			Name:            req.User.Name,
-			Password:        string(password),
-			State:           ttnpb.STATE_PENDING,
+			UserIdentifiers:   req.User.UserIdentifiers,
+			Name:              req.User.Name,
+			Password:          string(password),
+			State:             ttnpb.STATE_PENDING,
+			PasswordUpdatedAt: now,
+			CreatedAt:         now,
+			UpdatedAt:         now,
 		}
 
 		if settings.SkipValidation {
-			user.ValidatedAt = timeValue(time.Now())
+			user.ValidatedAt = timeValue(now)
 		}
 
 		if !settings.AdminApproval {
@@ -120,7 +124,7 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 		if !settings.SkipValidation {
 			token = &store.ValidationToken{
 				ValidationToken: random.String(64),
-				CreatedAt:       time.Now(),
+				CreatedAt:       now,
 				ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 			}
 
@@ -280,6 +284,8 @@ func (s *userService) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateU
 		}
 
 		user.Password = string(hashed)
+		user.PasswordUpdatedAt = time.Now().UTC()
+		user.RequirePasswordUpdate = false
 
 		return tx.Users.Update(user.UserIdentifiers, user)
 	})

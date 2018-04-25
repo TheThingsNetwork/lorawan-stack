@@ -31,6 +31,8 @@ const (
 	attributesDatabase = "is_store_attributes_test"
 )
 
+var now = time.Now().UTC()
+
 func timeValue(t time.Time) *time.Time {
 	return &t
 }

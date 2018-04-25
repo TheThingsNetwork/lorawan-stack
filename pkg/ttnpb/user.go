@@ -33,4 +33,7 @@ var (
 
 	// FieldPathUserAdmin is the field path for the user admin field.
 	FieldPathUserAdmin = regexp.MustCompile(`^admin$`)
+
+	// FieldPathUserRequirePasswordUpdate is the field path for the user require password update field.
+	FieldPathUserRequirePasswordUpdate = regexp.MustCompile(`^require_password_update$`)
 )

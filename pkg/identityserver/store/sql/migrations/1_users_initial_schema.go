@@ -22,16 +22,18 @@ func init() {
 			type         INT NOT NULL
 		);
 		CREATE TABLE IF NOT EXISTS users (
-			id             UUID PRIMARY KEY REFERENCES accounts(id),
-			user_id        STRING(36) UNIQUE NOT NULL REFERENCES accounts(account_id),
-			name           STRING NOT NULL DEFAULT '',
-			email          STRING UNIQUE NOT NULL,
-			password       STRING NOT NULL,
-			validated_at   TIMESTAMP DEFAULT NULL,
-			state          INT NOT NULL DEFAULT 0,
-			admin          BOOL NOT NULL DEFAULT false,
-			created_at     TIMESTAMP NOT NULL DEFAULT current_timestamp(),
-			updated_at     TIMESTAMP NOT NULL DEFAULT current_timestamp()
+			id                        UUID PRIMARY KEY REFERENCES accounts(id),
+			user_id                   STRING(36) UNIQUE NOT NULL REFERENCES accounts(account_id),
+			name                      STRING NOT NULL DEFAULT '',
+			email                     STRING UNIQUE NOT NULL,
+			password                  STRING NOT NULL,
+			password_updated_at       TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+			require_password_update   BOOL NOT NULL DEFAULT FALSE,
+			validated_at              TIMESTAMP DEFAULT NULL,
+			state                     INT NOT NULL DEFAULT 0,
+			admin                     BOOL NOT NULL DEFAULT false,
+			created_at                TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+			updated_at                TIMESTAMP NOT NULL DEFAULT current_timestamp()
 		);
 		CREATE UNIQUE INDEX IF NOT EXISTS users_email ON users (email);
 		CREATE TABLE IF NOT EXISTS validation_tokens (

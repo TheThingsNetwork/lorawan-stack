@@ -36,8 +36,11 @@ var alice = &ttnpb.User{
 		UserID: "alice",
 		Email:  "alice@alice.com",
 	},
-	Password:    "123456",
-	ValidatedAt: timeValue(time.Now()),
+	Password:          "123456",
+	ValidatedAt:       timeValue(now),
+	CreatedAt:         now,
+	UpdatedAt:         now,
+	PasswordUpdatedAt: now,
 }
 
 var bob = &ttnpb.User{
@@ -45,7 +48,10 @@ var bob = &ttnpb.User{
 		UserID: "bob",
 		Email:  "bob@bob.com",
 	},
-	Password: "123456",
+	Password:          "123456",
+	CreatedAt:         now,
+	UpdatedAt:         now,
+	PasswordUpdatedAt: now,
 }
 
 func TestUsers(t *testing.T) {
@@ -90,11 +96,14 @@ func testUserStore(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	s := testStore(t, database)
 
 	user := &ttnpb.User{
-		UserIdentifiers: uids,
-		Name:            "Foo",
-		Password:        "Bar",
-		Admin:           true,
-		ValidatedAt:     timeValue(time.Now()),
+		UserIdentifiers:   uids,
+		Name:              "Foo",
+		Password:          "Bar",
+		Admin:             true,
+		ValidatedAt:       timeValue(now),
+		CreatedAt:         now,
+		UpdatedAt:         now,
+		PasswordUpdatedAt: now,
 	}
 
 	users, err := s.Users.List(userSpecializer)
@@ -224,7 +233,7 @@ func TestUserValidationToken(t *testing.T) {
 	userID := alice.UserIdentifiers
 	token := store.ValidationToken{
 		ValidationToken: "foo-token",
-		CreatedAt:       time.Now(),
+		CreatedAt:       now,
 		ExpiresIn:       3600,
 	}
 
@@ -249,7 +258,7 @@ func TestUserValidationToken(t *testing.T) {
 
 	newToken := store.ValidationToken{
 		ValidationToken: "bar-token",
-		CreatedAt:       time.Now(),
+		CreatedAt:       now,
 		ExpiresIn:       3600,
 	}
 

@@ -29,9 +29,10 @@ func user() *ttnpb.User {
 			UserID: "alice",
 			Email:  "alice@alice.com",
 		},
-		Name:        "Ali Ce",
-		Password:    "123456",
-		ValidatedAt: timeValue(time.Now()),
+		Name:              "Ali Ce",
+		Password:          "123456",
+		ValidatedAt:       timeValue(now),
+		PasswordUpdatedAt: now,
 	}
 }
 
