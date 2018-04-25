@@ -44,7 +44,7 @@ var (
 	// ErrIDNotSpecified is returned when the ID of a frequency plan to return was not specified.
 	ErrIDNotSpecified = &errors.ErrDescriptor{
 		MessageFormat: "ID of the frequency plan to return not specified",
-		Code:          2,
+		Code:          3,
 		Type:          errors.InvalidArgument,
 	}
 )
