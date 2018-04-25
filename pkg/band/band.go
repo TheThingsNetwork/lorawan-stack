@@ -39,8 +39,8 @@ const (
 	CurrentVersion
 )
 
-// PayloadSize abstracts the acceptable payload size depending on contextual parameters
-type PayloadSize interface {
+// PayloadSizer abstracts the acceptable payload size depending on contextual parameters
+type PayloadSizer interface {
 	PayloadSize(emptyFOpt, dwellTime bool) uint16
 }
 
@@ -71,8 +71,8 @@ func (p dwellTimePayloadSize) PayloadSize(_, dwellTime bool) uint16 {
 // DataRate indicates the properties of a band's data rate
 type DataRate struct {
 	Rate              types.DataRate
-	DefaultMaxSize    PayloadSize
-	NoRepeaterMaxSize PayloadSize
+	DefaultMaxSize    PayloadSizer
+	NoRepeaterMaxSize PayloadSizer
 }
 
 // Channel abstracts a band's channel properties
