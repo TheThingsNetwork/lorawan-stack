@@ -83,6 +83,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			DeduplicationWindow: 42,
 			CooldownWindow:      42,
 		})).(*NetworkServer)
+	test.Must(nil, ns.Start())
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	ed.QueuedApplicationDownlinks = nil
@@ -138,6 +139,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 			DeduplicationWindow: 42,
 			CooldownWindow:      42,
 		})).(*NetworkServer)
+	test.Must(nil, ns.Start())
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	ed.QueuedApplicationDownlinks = nil
@@ -195,6 +197,7 @@ func TestDownlinkQueueList(t *testing.T) {
 			DeduplicationWindow: 42,
 			CooldownWindow:      42,
 		})).(*NetworkServer)
+	test.Must(nil, ns.Start())
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	ed.QueuedApplicationDownlinks = nil
@@ -209,7 +212,7 @@ func TestDownlinkQueueList(t *testing.T) {
 
 	downlinks, err := ns.DownlinkQueueList(context.Background(), &dev.EndDevice.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
-	a.So(pretty.Diff(downlinks, &ttnpb.ApplicationDownlinks{ed.QueuedApplicationDownlinks}), should.BeEmpty)
+	a.So(pretty.Diff(downlinks, &ttnpb.ApplicationDownlinks{Downlinks: ed.QueuedApplicationDownlinks}), should.BeEmpty)
 
 	ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	for len(ed.QueuedApplicationDownlinks) == 0 {
@@ -225,7 +228,7 @@ func TestDownlinkQueueList(t *testing.T) {
 
 	downlinks, err = ns.DownlinkQueueList(context.Background(), &dev.EndDevice.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
-	a.So(pretty.Diff(downlinks, &ttnpb.ApplicationDownlinks{ed.QueuedApplicationDownlinks}), should.BeEmpty)
+	a.So(pretty.Diff(downlinks, &ttnpb.ApplicationDownlinks{Downlinks: ed.QueuedApplicationDownlinks}), should.BeEmpty)
 }
 
 func TestDownlinkQueueClear(t *testing.T) {
@@ -239,6 +242,7 @@ func TestDownlinkQueueClear(t *testing.T) {
 			DeduplicationWindow: 42,
 			CooldownWindow:      42,
 		})).(*NetworkServer)
+	test.Must(nil, ns.Start())
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	ed.QueuedApplicationDownlinks = nil
@@ -387,6 +391,7 @@ func TestLinkApplication(t *testing.T) {
 			DeduplicationWindow: 42,
 			CooldownWindow:      42,
 		})).(*NetworkServer)
+	test.Must(nil, ns.Start())
 
 	id := ttnpb.NewPopulatedApplicationIdentifiers(test.Randy, false)
 
@@ -447,6 +452,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				DeduplicationWindow: 42,
 				CooldownWindow:      42,
 			})).(*NetworkServer)
+		test.Must(nil, ns.Start())
 
 		_, err := reg.Create(&ttnpb.EndDevice{
 			LoRaWANVersion: ttnpb.MAC_V1_1,
@@ -538,9 +544,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 
-					mac := msg.Payload.GetMACPayload()
-					mac.DevAddr = DevAddr
-					mac.FCnt = 0x42
+					pld := msg.Payload.GetMACPayload()
+					pld.DevAddr = DevAddr
+					pld.FCnt = 0x42
 
 					msg.Payload.MIC = nil
 					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
@@ -576,9 +582,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 
-					mac := msg.Payload.GetMACPayload()
-					mac.DevAddr = DevAddr
-					mac.FCnt = 0x42
+					pld := msg.Payload.GetMACPayload()
+					pld.DevAddr = DevAddr
+					pld.FCnt = 0x42
 
 					msg.Payload.MIC = nil
 					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
@@ -618,9 +624,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 
-					mac := msg.Payload.GetMACPayload()
-					mac.DevAddr = DevAddr
-					mac.FCnt = 0x42
+					pld := msg.Payload.GetMACPayload()
+					pld.DevAddr = DevAddr
+					pld.FCnt = 0x42
 
 					msg.Payload.MIC = nil
 					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
@@ -661,9 +667,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 
-					mac := msg.Payload.GetMACPayload()
-					mac.DevAddr = DevAddr
-					mac.FCnt = 0x42
+					pld := msg.Payload.GetMACPayload()
+					pld.DevAddr = DevAddr
+					pld.FCnt = 0x42
 
 					msg.Payload.MIC = nil
 					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(msg.Payload.MarshalLoRaWAN()).([]byte))).([4]byte)
@@ -701,9 +707,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 
-					mac := msg.Payload.GetMACPayload()
-					mac.DevAddr = DevAddr
-					mac.FCnt = 0x42
+					pld := msg.Payload.GetMACPayload()
+					pld.DevAddr = DevAddr
+					pld.FCnt = 0x42
 
 					msg.Payload.MIC = nil
 					mic := test.Must(crypto.ComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0,
@@ -752,9 +758,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 
-					mac := msg.Payload.GetMACPayload()
-					mac.DevAddr = DevAddr
-					mac.FCnt = 0x42
+					pld := msg.Payload.GetMACPayload()
+					pld.DevAddr = DevAddr
+					pld.FCnt = 0x42
 
 					msg.Payload.MIC = nil
 					mic := test.Must(crypto.ComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0x24,
@@ -795,9 +801,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
 
-					mac := msg.Payload.GetMACPayload()
-					mac.DevAddr = DevAddr
-					mac.FCnt = 0x42
+					pld := msg.Payload.GetMACPayload()
+					pld.DevAddr = DevAddr
+					pld.FCnt = 0x42
 
 					msg.Payload.MIC = nil
 					mic := test.Must(crypto.ComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0,
@@ -847,9 +853,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
 
-					mac := msg.Payload.GetMACPayload()
-					mac.DevAddr = DevAddr
-					mac.FCnt = 0x42
+					pld := msg.Payload.GetMACPayload()
+					pld.DevAddr = DevAddr
+					pld.FCnt = 0x42
 
 					msg.Payload.MIC = nil
 					mic := test.Must(crypto.ComputeUplinkMIC(SNwkSIntKey, FNwkSIntKey, 0x24,
@@ -983,7 +989,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							expected := &ttnpb.ApplicationUp{
 								EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 								SessionKeyID:         dev.GetSession().SessionKeys.GetSessionKeyID(),
-								Up: &ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
+								Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
 									FCnt:       tc.NextNextFCntUp - 1,
 									FPort:      tc.UplinkMessage.Payload.GetMACPayload().GetFPort(),
 									FRMPayload: tc.UplinkMessage.Payload.GetMACPayload().GetFRMPayload(),
@@ -1084,10 +1090,10 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					}
 
 					errch := make(chan error, 1)
-					go func(msg *ttnpb.UplinkMessage) {
+					go func(ctx context.Context, msg *ttnpb.UplinkMessage) {
 						_, err = ns.HandleUplink(ctx, msg)
 						errch <- err
-					}(deepcopy.Copy(msg).(*ttnpb.UplinkMessage))
+					}(ctx, deepcopy.Copy(msg).(*ttnpb.UplinkMessage))
 
 					select {
 					case err := <-errch:
@@ -1115,7 +1121,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 							SessionKeyID:         dev.GetSession().SessionKeys.GetSessionKeyID(),
-							Up: &ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
+							Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
 								FCnt:       tc.NextNextFCntUp - 1,
 								FPort:      msg.Payload.GetMACPayload().GetFPort(),
 								FRMPayload: msg.Payload.GetMACPayload().GetFRMPayload(),
@@ -1168,6 +1174,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				CooldownWindow:      42,
 			},
 		)).(*NetworkServer)
+		test.Must(nil, ns.Start())
 
 		_, err := ns.HandleUplink(context.Background(), ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy))
 		a.So(err, should.NotBeNil)
@@ -1433,8 +1440,8 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 									JoinEUI:                tc.Device.EndDeviceIdentifiers.JoinEUI,
 									ApplicationIdentifiers: tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers,
 								},
-								SessionKeyID: test.Must(dev.Load()).(*ttnpb.EndDevice).GetSession().SessionKeys.GetSessionKeyID(),
-								Up: &ttnpb.ApplicationUp_JoinAccept{&ttnpb.ApplicationJoinAccept{
+								SessionKeyID: test.Must(dev.Load()).(*deviceregistry.Device).GetSession().SessionKeys.GetSessionKeyID(),
+								Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 									AppSKey: resp.SessionKeys.GetAppSKey(),
 								}},
 							}
@@ -1619,22 +1626,19 @@ func TestHandleUplink(t *testing.T) {
 	msg := ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
 	msg.Payload.Payload = nil
 	msg.RawPayload = nil
-	e, err := ns.HandleUplink(context.Background(), msg)
+	_, err = ns.HandleUplink(context.Background(), msg)
 	a.So(err, should.NotBeNil)
-	a.So(e, should.BeNil)
 
 	msg = ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
 	msg.Payload.Payload = nil
 	msg.RawPayload = []byte{}
-	e, err = ns.HandleUplink(context.Background(), msg)
+	_, err = ns.HandleUplink(context.Background(), msg)
 	a.So(err, should.NotBeNil)
-	a.So(e, should.BeNil)
 
 	msg = ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
 	msg.Payload.Major = 1
-	e, err = ns.HandleUplink(context.Background(), msg)
+	_, err = ns.HandleUplink(context.Background(), msg)
 	a.So(err, should.NotBeNil)
-	a.So(e, should.BeNil)
 
 	t.Run("Uplink", HandleUplinkTest(conf))
 	t.Run("Join", HandleJoinTest(conf))

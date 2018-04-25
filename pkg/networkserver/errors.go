@@ -40,23 +40,51 @@ var (
 
 	// ErrMissingApplicationID represents error ocurring when ApplicationID is missing.
 	ErrMissingApplicationID = &errors.ErrDescriptor{
-		MessageFormat: "ApplicationID is unknown",
+		MessageFormat: "Application ID is unknown",
 		Type:          errors.NotFound,
 		Code:          4,
+	}
+
+	// ErrMissingGatewayID represents error ocurring when GatewayID is missing.
+	ErrMissingGatewayID = &errors.ErrDescriptor{
+		MessageFormat: "Gateway ID is unknown",
+		Type:          errors.NotFound,
+		Code:          5,
 	}
 
 	// ErrNewSubscription represents error ocurring when a new subscription is opened.
 	ErrNewSubscription = &errors.ErrDescriptor{
 		MessageFormat: "Another subscription started",
 		Type:          errors.Conflict,
-		Code:          5,
+		Code:          6,
 	}
 
 	// ErrInvalidConfiguration represents error ocurring when the configuration is invalid.
 	ErrInvalidConfiguration = &errors.ErrDescriptor{
 		MessageFormat: "Invalid configuration",
 		Type:          errors.InvalidArgument,
-		Code:          6,
+		Code:          7,
+	}
+
+	// ErrUplinkNotFound represents error ocurring when there were no uplinks found.
+	ErrUplinkNotFound = &errors.ErrDescriptor{
+		MessageFormat: "Uplink not found",
+		Type:          errors.NotFound,
+		Code:          8,
+	}
+
+	// ErrGatewayServerNotFound represents error ocurring when there were no uplinks found.
+	ErrGatewayServerNotFound = &errors.ErrDescriptor{
+		MessageFormat: "Gateway server not found",
+		Type:          errors.NotFound,
+		Code:          9,
+	}
+
+	// ErrChannelIndexTooHigh represents error ocurring when the channel index is too high.
+	ErrChannelIndexTooHigh = &errors.ErrDescriptor{
+		MessageFormat: "Channel index is too high",
+		Type:          errors.InvalidArgument,
+		Code:          10,
 	}
 )
 
@@ -65,6 +93,10 @@ func init() {
 	ErrMissingFNwkSIntKey.Register()
 	ErrMissingSNwkSIntKey.Register()
 	ErrMissingApplicationID.Register()
+	ErrMissingGatewayID.Register()
 	ErrNewSubscription.Register()
 	ErrInvalidConfiguration.Register()
+	ErrUplinkNotFound.Register()
+	ErrGatewayServerNotFound.Register()
+	ErrChannelIndexTooHigh.Register()
 }
