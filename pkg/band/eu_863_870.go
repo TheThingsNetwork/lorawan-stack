@@ -14,7 +14,10 @@
 
 package band
 
-import "github.com/TheThingsNetwork/ttn/pkg/types"
+import (
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/types"
+)
 
 var eu_863_870 Band
 
@@ -98,15 +101,26 @@ func init() {
 			0, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},
 
-		Rx1Parameters: func(frequency uint64, dataRateIndex, rx1DROffset int, _ bool) (int, uint64) {
-			outDataRateIndex := dataRateIndex - rx1DROffset
-			if outDataRateIndex < 0 {
-				outDataRateIndex = 0
-			}
-			return outDataRateIndex, frequency
-		},
-
 		ImplementsCFList: true,
+
+		Rx1Channel: rx1ChannelIdentity,
+		Rx1DataRate: func(idx, offset uint32, _ bool) (uint32, error) {
+			if idx > 7 {
+				return 0, ErrLoRaWANParametersInvalid.NewWithCause(nil, errors.New("Data rate index must be lower or equal to 7"))
+			}
+			if offset > 5 {
+				return 0, ErrLoRaWANParametersInvalid.NewWithCause(nil, errors.New("Offset must be lower or equal to 5"))
+			}
+
+			si := int(idx - offset)
+			switch {
+			case si <= 0:
+				return 0, nil
+			case si >= 7:
+				return 7, nil
+			}
+			return uint32(si), nil
+		},
 
 		DefaultRx2Parameters: Rx2Parameters{0, 869525000},
 

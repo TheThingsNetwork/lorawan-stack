@@ -14,13 +14,16 @@
 
 package band
 
-import "github.com/TheThingsNetwork/ttn/pkg/types"
+import (
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/types"
+)
 
-var eu_443 Band
+var eu_433 Band
 
 const (
-	// EU_443 is the ID of the European 443Mhz band
-	EU_443 ID = "EU_443"
+	// EU_433 is the ID of the European 433Mhz band
+	EU_433 string = "EU_433"
 )
 
 func init() {
@@ -29,9 +32,9 @@ func init() {
 		{Frequency: 433375000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
 		{Frequency: 433575000, DataRateIndexes: []int{0, 1, 2, 3, 4, 5}},
 	}
-	eu443BeaconChannel := uint32(434655000)
-	eu_443 = Band{
-		ID: EU_443,
+	eu433BeaconChannel := uint32(434655000)
+	eu_433 = Band{
+		ID: EU_433,
 
 		UplinkChannels:   defaultChannels,
 		DownlinkChannels: defaultChannels,
@@ -73,12 +76,23 @@ func init() {
 			0, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},
 
-		Rx1Parameters: func(frequency uint64, dataRateIndex, rx1DROffset int, _ bool) (int, uint64) {
-			outDataRateIndex := dataRateIndex - rx1DROffset
-			if outDataRateIndex < 0 {
-				outDataRateIndex = 0
+		Rx1Channel: rx1ChannelIdentity,
+		Rx1DataRate: func(idx, offset uint32, _ bool) (uint32, error) {
+			if idx > 7 {
+				return 0, ErrLoRaWANParametersInvalid.NewWithCause(nil, errors.New("Data rate index must be lower or equal to 7"))
 			}
-			return outDataRateIndex, frequency
+			if offset > 5 {
+				return 0, ErrLoRaWANParametersInvalid.NewWithCause(nil, errors.New("Offset must be lower or equal to 5"))
+			}
+
+			si := int(idx - offset)
+			switch {
+			case si <= 0:
+				return 0, nil
+			case si >= 7:
+				return 7, nil
+			}
+			return uint32(si), nil
 		},
 
 		ImplementsCFList: true,
@@ -88,8 +102,8 @@ func init() {
 		Beacon: Beacon{
 			DataRateIndex:    3,
 			CodingRate:       "4/5",
-			BroadcastChannel: func(_ float64) uint32 { return eu443BeaconChannel },
-			PingSlotChannels: []uint32{eu443BeaconChannel},
+			BroadcastChannel: func(_ float64) uint32 { return eu433BeaconChannel },
+			PingSlotChannels: []uint32{eu433BeaconChannel},
 		},
 
 		regionalParameters1_0:   self,
@@ -97,5 +111,5 @@ func init() {
 		regionalParameters1_0_2: self,
 		regionalParameters1_1A:  self,
 	}
-	All = append(All, eu_443)
+	All = append(All, eu_433)
 }

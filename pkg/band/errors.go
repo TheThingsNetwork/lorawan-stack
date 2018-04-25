@@ -36,6 +36,13 @@ var (
 		Code:          3,
 		Type:          errors.Unknown,
 	}
+
+	// ErrLoRaWANParametersInvalid is returned if the LoRaWAN parameters specified are not valid or are not compatible with the band.
+	ErrLoRaWANParametersInvalid = &errors.ErrDescriptor{
+		MessageFormat: "Invalid LoRaWAN parameters",
+		Code:          4,
+		Type:          errors.InvalidArgument,
+	}
 )
 
 func init() {

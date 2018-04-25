@@ -14,7 +14,10 @@
 
 package band
 
-import "github.com/TheThingsNetwork/ttn/pkg/types"
+import (
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/types"
+)
 
 var in_865_867 Band
 
@@ -76,17 +79,25 @@ func init() {
 			return offset
 		}(),
 
-		Rx1Parameters: func(frequency uint64, dataRateIndex, rx1DROffset int, _ bool) (int, uint64) {
-			effectiveRx1DROffset := rx1DROffset
-			if effectiveRx1DROffset > 5 {
-				effectiveRx1DROffset = 5 - rx1DROffset
+		Rx1Channel: rx1ChannelIdentity,
+		Rx1DataRate: func(idx, offset uint32, _ bool) (uint32, error) {
+			if offset > 5 {
+				return 0, ErrLoRaWANParametersInvalid.NewWithCause(nil, errors.New("Offset must be lower or equal to 5"))
 			}
 
-			outDataRateIndex := dataRateIndex - effectiveRx1DROffset
-			if outDataRateIndex < 5 {
-				outDataRateIndex = 5
+			so := int(offset)
+			if so > 5 {
+				so = 5 - so
 			}
-			return outDataRateIndex, frequency
+			si := int(idx) - so
+
+			switch {
+			case si <= 0:
+				return 0, nil
+			case si >= 5:
+				return 5, nil
+			}
+			return uint32(si), nil
 		},
 
 		ImplementsCFList: true,

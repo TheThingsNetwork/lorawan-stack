@@ -14,7 +14,10 @@
 
 package band
 
-import "github.com/TheThingsNetwork/ttn/pkg/types"
+import (
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/types"
+)
 
 var as_923 Band
 
@@ -74,26 +77,30 @@ func init() {
 
 		ImplementsCFList: true,
 
-		Rx1Parameters: func(frequency uint64, dataRateIndex, rx1DROffset int, dwellTime bool) (int, uint64) {
-			minDR := 0
-			effectiveRx1DROffset := rx1DROffset
-			if effectiveRx1DROffset > 5 {
-				effectiveRx1DROffset = 5 - rx1DROffset
+		Rx1Channel: rx1ChannelIdentity,
+		Rx1DataRate: func(idx, offset uint32, dwell bool) (uint32, error) {
+			if offset > 7 {
+				return 0, ErrLoRaWANParametersInvalid.NewWithCause(nil, errors.New("Offset must be lower or equal to 7"))
 			}
-			if dwellTime {
+
+			so := int(offset)
+			if so > 5 {
+				so = 5 - so
+			}
+			si := int(idx) - so
+
+			minDR := uint32(0)
+			if dwell {
 				minDR = 2
 			}
 
-			// Downstream data rate in Rx1 slot = MIN (5, MAX (MinDR, Upstream data rate – Effective_Rx1DROffset))
-			outDataRateIndex := dataRateIndex - effectiveRx1DROffset
-			if outDataRateIndex > minDR {
-				outDataRateIndex = minDR
+			switch {
+			case si <= int(minDR):
+				return minDR, nil
+			case si >= 5:
+				return 5, nil
 			}
-
-			if outDataRateIndex < 5 {
-				outDataRateIndex = 5
-			}
-			return outDataRateIndex, frequency
+			return uint32(si), nil
 		},
 
 		DefaultRx2Parameters: Rx2Parameters{2, 923200000},

@@ -29,27 +29,37 @@ func ParseModulation(types.DataRate) ttnpb.Modulation  { return ttnpb.Modulation
 func GetReceptionTimestamp(ttnpb.UplinkMessage) uint64 { return 0 }
 
 func Example() {
-	euBand, err := band.GetByID(band.EU_863_870)
+	fp, err := band.GetByID(band.EU_863_870)
 	if err != nil {
 		panic(err)
 	}
 
-	uplink := GetUplink()
-	uplinkTxSettings := uplink.Settings
-	downlinkDatarateIndex, downlinkFrequency := euBand.Rx1Parameters(uint64(uplinkTxSettings.DataRateIndex), int(uplinkTxSettings.Frequency), 0, false)
-	downlinkDatarate := euBand.DataRates[downlinkDatarateIndex]
+	up := GetUplink()
+	sets := up.GetSettings()
+	drIdx, err := fp.Rx1DataRate(sets.GetDataRateIndex(), 0, false)
+	if err != nil {
+		panic(err)
+	}
+
+	chIdx, err := fp.Rx1Channel(sets.GetChannelIndex())
+	if err != nil {
+		panic(err)
+	}
+
+	dr := fp.DataRates[drIdx]
 
 	downlink := ttnpb.DownlinkMessage{
 		Settings: ttnpb.TxSettings{
-			DataRateIndex:   uint32(downlinkDatarateIndex),
-			Frequency:       uint64(downlinkFrequency),
-			Modulation:      ParseModulation(downlinkDatarate.Rate),
-			SpreadingFactor: ParseSpreadingFactor(downlinkDatarate.Rate),
-			BitRate:         ParseBitRate(downlinkDatarate.Rate),
-			Bandwidth:       ParseBandwidth(downlinkDatarate.Rate),
+			DataRateIndex:   uint32(drIdx),
+			Frequency:       fp.DownlinkChannels[chIdx].Frequency,
+			ChannelIndex:    chIdx,
+			Modulation:      ParseModulation(dr.Rate),
+			SpreadingFactor: ParseSpreadingFactor(dr.Rate),
+			BitRate:         ParseBitRate(dr.Rate),
+			Bandwidth:       ParseBandwidth(dr.Rate),
 		},
 		TxMetadata: ttnpb.TxMetadata{
-			Timestamp: GetReceptionTimestamp(uplink) + 1000000000*uint64(euBand.ReceiveDelay1),
+			Timestamp: GetReceptionTimestamp(up) + 1000000000*uint64(fp.ReceiveDelay1),
 		},
 	}
 	SendDownlink(downlink)

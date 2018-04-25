@@ -83,8 +83,11 @@ type Channel struct {
 	DataRateIndexes []int
 }
 
-// Rx1Emission takes the uplink's emission parameters, and returns downlink datarate index and channel
-type Rx1Emission func(frequency uint64, dataRateIndex, rx1DROffset int, dwellTime bool) (int, uint64)
+// Rx1DataRateFunc computes the RX1 data rate index.
+type Rx1DataRateFunc func(idx, offset uint32, dwell bool) (uint32, error)
+
+// Rx1ChannelFunc computes the RX1 channel index.
+type Rx1ChannelFunc func(idx uint32) (uint32, error)
 
 // Rx2Parameters contains downlink datarate index and channel
 type Rx2Parameters struct {
@@ -98,6 +101,8 @@ type ID = string
 type versionSwap = func(b Band) Band
 
 func self(b Band) Band { return b }
+func rx1ChannelIdentity(idx uint32) (uint32, error)             { return idx, nil }
+func rx1DataRateIdentity(idx, _ uint32, _ bool) (uint32, error) { return idx, nil }
 
 // Beacon parameters of a specific band.
 type Beacon struct {
@@ -155,7 +160,9 @@ type Band struct {
 	DefaultMaxEIRP float32
 
 	// Rx1Parameters is the default function that determines the settings for a Tx sent during Rx1
-	Rx1Parameters Rx1Emission
+	Rx1Channel  Rx1ChannelFunc
+	Rx1DataRate Rx1DataRateFunc
+
 	// DefaultRx2Parameters are the default parameters that determine the settings for a Tx sent during Rx2
 	DefaultRx2Parameters Rx2Parameters
 

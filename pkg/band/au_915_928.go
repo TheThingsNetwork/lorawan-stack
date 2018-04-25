@@ -14,7 +14,10 @@
 
 package band
 
-import "github.com/TheThingsNetwork/ttn/pkg/types"
+import (
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"github.com/TheThingsNetwork/ttn/pkg/types"
+)
 
 var au_915_928 Band
 
@@ -99,23 +102,25 @@ func init() {
 
 		ImplementsCFList: true,
 
-		Rx1Parameters: func(frequency uint64, dataRateIndex, rx1DROffset int, _ bool) (int, uint64) {
-			outDataRateIndex := dataRateIndex + 8 - rx1DROffset
-			if outDataRateIndex < 8 {
-				outDataRateIndex = 8
-			} else if outDataRateIndex > 13 {
-				outDataRateIndex = 13
+		Rx1Channel: func(idx uint32) (uint32, error) {
+			return idx % 8, nil
+		},
+		Rx1DataRate: func(idx, offset uint32, _ bool) (uint32, error) {
+			if idx > 6 {
+				return 0, ErrLoRaWANParametersInvalid.NewWithCause(nil, errors.New("Data rate index must be lower or equal to 6"))
+			}
+			if offset > 5 {
+				return 0, ErrLoRaWANParametersInvalid.NewWithCause(nil, errors.New("Offset must be lower or equal to 5"))
 			}
 
-			frequencyIndex := 0
-			for channelIndex, uplinkChannel := range uplinkChannels {
-				if frequency == uplinkChannel.Frequency {
-					frequencyIndex = channelIndex
-				}
+			si := int(idx + 8 - offset)
+			switch {
+			case si <= 8:
+				return 8, nil
+			case si >= 13:
+				return 13, nil
 			}
-			frequencyIndex = frequencyIndex % 8
-
-			return outDataRateIndex, downlinkChannels[frequencyIndex].Frequency
+			return uint32(si), nil
 		},
 
 		DefaultRx2Parameters: Rx2Parameters{8, 923300000},
