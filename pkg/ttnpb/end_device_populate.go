@@ -14,7 +14,12 @@
 
 package ttnpb
 
-import pbtypes "github.com/gogo/protobuf/types"
+import (
+	"math/rand"
+
+	"github.com/TheThingsNetwork/ttn/pkg/band"
+	pbtypes "github.com/gogo/protobuf/types"
+)
 
 func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	out := &EndDevice{}
@@ -56,7 +61,7 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 		out.LoRaWANVersion = MAC_V1_1
 		out.LoRaWANPHYVersion = PHY_V1_1
 	}
-	out.FrequencyPlanID = randStringEndDevice(r)
+	out.FrequencyPlanID = band.All[rand.Intn(len(band.All))].ID
 	out.MinFrequency = uint64(r.Uint32())
 	out.MaxFrequency = uint64(r.Uint32())
 	out.MaxTxPower = uint64(r.Uint32())
