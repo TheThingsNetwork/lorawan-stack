@@ -41,11 +41,18 @@ var (
 		Code:          2,
 		Type:          errors.External,
 	}
+	// ErrIDNotSpecified is returned when the ID of a frequency plan to return was not specified.
+	ErrIDNotSpecified = &errors.ErrDescriptor{
+		MessageFormat: "ID of the frequency plan to return not specified",
+		Code:          2,
+		Type:          errors.InvalidArgument,
+	}
 )
 
 func init() {
 	ErrFrequencyPlanNotFound.Register()
 	ErrFetchFailed.Register()
+	ErrIDNotSpecified.Register()
 }
 
 // FrequencyPlanDescription describes a frequency plan in the YAML format.
@@ -203,7 +210,7 @@ func (s *Store) getByID(id string) (proto ttnpb.FrequencyPlan, err error) {
 // GetByID tries to retrieve the frequency plan that has the given ID, and returns an error otherwise.
 func (s *Store) GetByID(id string) (ttnpb.FrequencyPlan, error) {
 	if id == "" {
-		return ttnpb.FrequencyPlan{}, ErrFrequencyPlanNotFound.New(errors.Attributes{"frequency_plan_id": id})
+		return ttnpb.FrequencyPlan{}, ErrIDNotSpecified.New(nil)
 	}
 
 	s.frequencyPlansMu.Lock()
