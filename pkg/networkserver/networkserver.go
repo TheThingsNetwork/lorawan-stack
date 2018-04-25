@@ -592,7 +592,8 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		},
 	}
 
-	if fp, err := ns.FrequencyPlans.GetByID(dev.GetFrequencyPlanID()); err == nil {
+	fp, err := ns.FrequencyPlans.GetByID(dev.GetFrequencyPlanID())
+	if err == nil {
 		req.CFList = frequencyplans.CFList(fp, dev.GetLoRaWANPHYVersion())
 	}
 
