@@ -77,7 +77,7 @@ func getIS(t testing.TB) *IdentityServer {
 }
 
 func testCtx(ids ttnpb.UserIdentifiers) context.Context {
-	return newContextWithClaims(context.Background(), &claims{
+	return newContextWithAuthorizationData(context.Background(), &authorizationData{
 		EntityIdentifiers: ids,
 		Source:            auth.Token,
 		Rights:            ttnpb.AllRights(),

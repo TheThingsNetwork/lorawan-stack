@@ -26,30 +26,31 @@ import (
 	"google.golang.org/grpc"
 )
 
-const claimsHookName = "claims-builder"
+const authorizationDataHookName = "authorization-data-fetcher"
 
-// claimsUnaryHook is a hook specific for unary calls in the Identity Server
-// that preloads in the context the claims information.
-func (is *IdentityServer) claimsUnaryHook() hooks.UnaryHandlerMiddleware {
+// authorizationDataUnaryHook is a hook specific for unary calls that preloads
+// in the context the authorization data information based on the provided authorization
+// value in the request.
+func (is *IdentityServer) authorizationDataUnaryHook() hooks.UnaryHandlerMiddleware {
 	return func(next grpc.UnaryHandler) grpc.UnaryHandler {
 		return func(ctx context.Context, req interface{}) (interface{}, error) {
-			c, err := is.buildClaims(ctx)
+			ad, err := is.buildAuthorizationData(ctx)
 			if err != nil {
 				return nil, err
 			}
 
-			return next(newContextWithClaims(ctx, c), req)
+			return next(newContextWithAuthorizationData(ctx, ad), req)
 		}
 	}
 }
 
-// buildClaims returns the claims based on the authentication metadata contained
-// in the request. Returns empty claims if no authentication metadata is found.
-func (is *IdentityServer) buildClaims(ctx context.Context) (*claims, error) {
+// buildAuthorizationData builds an `authorizationData` based on the authorization
+// value found in the context, if any. Otherwise returns an empty `authorizationData`.
+func (is *IdentityServer) buildAuthorizationData(ctx context.Context) (*authorizationData, error) {
 	md := rpcmetadata.FromIncomingContext(ctx)
 
 	if md.AuthType == "" && md.AuthValue == "" {
-		return new(claims), nil
+		return new(authorizationData), nil
 	}
 
 	if md.AuthType != "Bearer" {
@@ -61,7 +62,7 @@ func (is *IdentityServer) buildClaims(ctx context.Context) (*claims, error) {
 		return nil, err
 	}
 
-	var res *claims
+	var res *authorizationData
 	switch header.Type {
 	case auth.Token:
 		data, err := is.store.OAuth.GetAccessToken(md.AuthValue)
@@ -79,7 +80,7 @@ func (is *IdentityServer) buildClaims(ctx context.Context) (*claims, error) {
 			return nil, err
 		}
 
-		res = &claims{
+		res = &authorizationData{
 			EntityIdentifiers: ttnpb.UserIdentifiers{UserID: data.UserID},
 			Source:            auth.Token,
 			Rights:            rights,
@@ -88,7 +89,7 @@ func (is *IdentityServer) buildClaims(ctx context.Context) (*claims, error) {
 		var key ttnpb.APIKey
 		var err error
 
-		res = &claims{
+		res = &authorizationData{
 			Source: auth.Key,
 		}
 

@@ -153,7 +153,7 @@ func (s *userService) GetUser(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Use
 		return nil, err
 	}
 
-	found, err := s.store.Users.GetByID(claimsFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
+	found, err := s.store.Users.GetByID(authorizationDataFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +177,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 	var token *store.ValidationToken
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(claimsFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
+		found, err := tx.Users.GetByID(authorizationDataFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
 		if err != nil {
 			return err
 		}
@@ -217,7 +217,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 			}
 		}
 
-		err = tx.Users.Update(claimsFromContext(ctx).UserIdentifiers(), user)
+		err = tx.Users.Update(authorizationDataFromContext(ctx).UserIdentifiers(), user)
 		if err != nil {
 			return err
 		}
@@ -259,7 +259,7 @@ func (s *userService) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateU
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(claimsFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
+		found, err := tx.Users.GetByID(authorizationDataFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
 		if err != nil {
 			return err
 		}
@@ -295,17 +295,17 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		apps, err := tx.Applications.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(claimsFromContext(ctx).UserIdentifiers()), s.config.Specializers.Application)
+		apps, err := tx.Applications.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(authorizationDataFromContext(ctx).UserIdentifiers()), s.config.Specializers.Application)
 		if err != nil {
 			return err
 		}
 
-		gtws, err := tx.Gateways.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(claimsFromContext(ctx).UserIdentifiers()), s.config.Specializers.Gateway)
+		gtws, err := tx.Gateways.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(authorizationDataFromContext(ctx).UserIdentifiers()), s.config.Specializers.Gateway)
 		if err != nil {
 			return err
 		}
 
-		err = tx.Users.Delete(claimsFromContext(ctx).UserIdentifiers())
+		err = tx.Users.Delete(authorizationDataFromContext(ctx).UserIdentifiers())
 		if err != nil {
 			return err
 		}
@@ -319,7 +319,7 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 			}
 
 			if len(c) == 0 {
-				return errors.Errorf("Failed to delete user `%s`: cannot leave application `%s` without at least one collaborator with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right", claimsFromContext(ctx).UserIdentifiers(), appID)
+				return errors.Errorf("Failed to delete user `%s`: cannot leave application `%s` without at least one collaborator with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right", authorizationDataFromContext(ctx).UserIdentifiers(), appID)
 			}
 		}
 
@@ -332,7 +332,7 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 			}
 
 			if len(c) == 0 {
-				return errors.Errorf("Failed to delete user `%s`: cannot leave gateway `%s` without at least one collaborator with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` right", claimsFromContext(ctx).UserIdentifiers(), gtwID)
+				return errors.Errorf("Failed to delete user `%s`: cannot leave gateway `%s` without at least one collaborator with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` right", authorizationDataFromContext(ctx).UserIdentifiers(), gtwID)
 			}
 		}
 
@@ -360,7 +360,7 @@ func (s *userService) GenerateUserAPIKey(ctx context.Context, req *ttnpb.Generat
 		Rights: req.Rights,
 	}
 
-	err = s.store.Users.SaveAPIKey(claimsFromContext(ctx).UserIdentifiers(), key)
+	err = s.store.Users.SaveAPIKey(authorizationDataFromContext(ctx).UserIdentifiers(), key)
 	if err != nil {
 		return nil, err
 	}
@@ -375,7 +375,7 @@ func (s *userService) ListUserAPIKeys(ctx context.Context, _ *pbtypes.Empty) (*t
 		return nil, err
 	}
 
-	found, err := s.store.Users.ListAPIKeys(claimsFromContext(ctx).UserIdentifiers())
+	found, err := s.store.Users.ListAPIKeys(authorizationDataFromContext(ctx).UserIdentifiers())
 	if err != nil {
 		return nil, err
 	}
@@ -397,7 +397,7 @@ func (s *userService) UpdateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUse
 		return nil, err
 	}
 
-	return ttnpb.Empty, s.store.Users.UpdateAPIKeyRights(claimsFromContext(ctx).UserIdentifiers(), req.Name, req.Rights)
+	return ttnpb.Empty, s.store.Users.UpdateAPIKeyRights(authorizationDataFromContext(ctx).UserIdentifiers(), req.Name, req.Rights)
 }
 
 // RemoveUserAPIKey removes an API key from the current user.
@@ -407,7 +407,7 @@ func (s *userService) RemoveUserAPIKey(ctx context.Context, req *ttnpb.RemoveUse
 		return nil, err
 	}
 
-	return ttnpb.Empty, s.store.Users.DeleteAPIKey(claimsFromContext(ctx).UserIdentifiers(), req.Name)
+	return ttnpb.Empty, s.store.Users.DeleteAPIKey(authorizationDataFromContext(ctx).UserIdentifiers(), req.Name)
 }
 
 // ValidateUserEmail validates the user's email with the token sent to the email.
@@ -452,7 +452,7 @@ func (s *userService) RequestUserEmailValidation(ctx context.Context, _ *pbtypes
 	var token store.ValidationToken
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(claimsFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
+		found, err := tx.Users.GetByID(authorizationDataFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
 		if err != nil {
 			return err
 		}
@@ -473,7 +473,7 @@ func (s *userService) RequestUserEmailValidation(ctx context.Context, _ *pbtypes
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 
-		return tx.Users.SaveValidationToken(claimsFromContext(ctx).UserIdentifiers(), token)
+		return tx.Users.SaveValidationToken(authorizationDataFromContext(ctx).UserIdentifiers(), token)
 	})
 
 	if err != nil {
@@ -495,7 +495,7 @@ func (s *userService) ListAuthorizedClients(ctx context.Context, _ *pbtypes.Empt
 		return nil, err
 	}
 
-	found, err := s.store.OAuth.ListAuthorizedClients(claimsFromContext(ctx).UserIdentifiers(), s.config.Specializers.Client)
+	found, err := s.store.OAuth.ListAuthorizedClients(authorizationDataFromContext(ctx).UserIdentifiers(), s.config.Specializers.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -522,5 +522,5 @@ func (s *userService) RevokeAuthorizedClient(ctx context.Context, req *ttnpb.Cli
 		return nil, err
 	}
 
-	return ttnpb.Empty, s.store.OAuth.RevokeAuthorizedClient(claimsFromContext(ctx).UserIdentifiers(), *req)
+	return ttnpb.Empty, s.store.OAuth.RevokeAuthorizedClient(authorizationDataFromContext(ctx).UserIdentifiers(), *req)
 }

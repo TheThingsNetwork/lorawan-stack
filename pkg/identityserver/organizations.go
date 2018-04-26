@@ -63,7 +63,7 @@ func (s *organizationService) CreateOrganization(ctx context.Context, req *ttnpb
 
 		return tx.Organizations.SetMember(ttnpb.OrganizationMember{
 			OrganizationIdentifiers: req.Organization.OrganizationIdentifiers,
-			UserIdentifiers:         claimsFromContext(ctx).UserIdentifiers(),
+			UserIdentifiers:         authorizationDataFromContext(ctx).UserIdentifiers(),
 			Rights:                  ttnpb.AllOrganizationRights(),
 		})
 	})
@@ -95,7 +95,7 @@ func (s *organizationService) ListOrganizations(ctx context.Context, _ *pbtypes.
 		return nil, err
 	}
 
-	found, err := s.store.Organizations.ListByUser(claimsFromContext(ctx).UserIdentifiers(), s.config.Specializers.Organization)
+	found, err := s.store.Organizations.ListByUser(authorizationDataFromContext(ctx).UserIdentifiers(), s.config.Specializers.Organization)
 	if err != nil {
 		return nil, err
 	}
@@ -259,15 +259,15 @@ func (s *organizationService) SetOrganizationMember(ctx context.Context, req *tt
 		return nil, err
 	}
 
-	claims := claimsFromContext(ctx)
+	ad := authorizationDataFromContext(ctx)
 
 	// modifiable is the set of rights the caller can modify
 	var modifiable []ttnpb.Right
-	switch claims.Source {
+	switch ad.Source {
 	case auth.Key:
-		modifiable = claims.Rights
+		modifiable = ad.Rights
 	case auth.Token:
-		modifiable, err = s.store.Organizations.ListMemberRights(req.OrganizationIdentifiers, claims.UserIdentifiers())
+		modifiable, err = s.store.Organizations.ListMemberRights(req.OrganizationIdentifiers, ad.UserIdentifiers())
 		if err != nil {
 			return nil, err
 		}
@@ -332,26 +332,26 @@ func (s *organizationService) ListOrganizationMembers(ctx context.Context, req *
 
 // ListOrganizationRights returns the rights the caller user has to an organization.
 func (s *organizationService) ListOrganizationRights(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*ttnpb.ListOrganizationRightsResponse, error) {
-	claims := claimsFromContext(ctx)
+	ad := authorizationDataFromContext(ctx)
 
 	resp := new(ttnpb.ListOrganizationRightsResponse)
 
-	switch claims.Source {
+	switch ad.Source {
 	case auth.Token:
-		rights, err := s.store.Organizations.ListMemberRights(*req, claims.UserIdentifiers())
+		rights, err := s.store.Organizations.ListMemberRights(*req, ad.UserIdentifiers())
 		if err != nil {
 			return nil, err
 		}
 
 		// Result rights are the intersection between the scope of the Client
 		// and the rights that the user has to the organization.
-		resp.Rights = ttnpb.IntersectRights(claims.Rights, rights)
+		resp.Rights = ttnpb.IntersectRights(ad.Rights, rights)
 	case auth.Key:
-		if !claims.OrganizationIdentifiers().Contains(*req) {
+		if !ad.OrganizationIdentifiers().Contains(*req) {
 			return nil, ErrNotAuthorized.New(nil)
 		}
 
-		resp.Rights = claims.Rights
+		resp.Rights = ad.Rights
 	}
 
 	return resp, nil

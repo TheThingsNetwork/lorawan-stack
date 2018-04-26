@@ -46,7 +46,7 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 			return nil, err
 		}
 
-		ids = organizationOrUserIDsUserIDs(claimsFromContext(ctx).UserIdentifiers())
+		ids = organizationOrUserIDsUserIDs(authorizationDataFromContext(ctx).UserIdentifiers())
 	}
 
 	err := s.store.Transact(func(tx *store.Store) error {
@@ -116,7 +116,7 @@ func (s *gatewayService) ListGateways(ctx context.Context, req *ttnpb.ListGatewa
 		ids = organizationOrUserIDsOrganizationIDs(req.OrganizationIdentifiers)
 	} else {
 		err = s.enforceUserRights(ctx, ttnpb.RIGHT_USER_GATEWAYS_LIST)
-		ids = organizationOrUserIDsUserIDs(claimsFromContext(ctx).UserIdentifiers())
+		ids = organizationOrUserIDsUserIDs(authorizationDataFromContext(ctx).UserIdentifiers())
 	}
 
 	if err != nil {
@@ -310,15 +310,15 @@ func (s *gatewayService) SetGatewayCollaborator(ctx context.Context, req *ttnpb.
 		return nil, err
 	}
 
-	claims := claimsFromContext(ctx)
+	ad := authorizationDataFromContext(ctx)
 
 	// modifiable is the set of rights the caller can modify
 	var modifiable []ttnpb.Right
-	switch claims.Source {
+	switch ad.Source {
 	case auth.Key:
-		modifiable = claims.Rights
+		modifiable = ad.Rights
 	case auth.Token:
-		modifiable, err = s.store.Gateways.ListCollaboratorRights(req.GatewayIdentifiers, organizationOrUserIDsUserIDs(claims.UserIdentifiers()))
+		modifiable, err = s.store.Gateways.ListCollaboratorRights(req.GatewayIdentifiers, organizationOrUserIDsUserIDs(ad.UserIdentifiers()))
 		if err != nil {
 			return nil, err
 		}
@@ -382,26 +382,26 @@ func (s *gatewayService) ListGatewayCollaborators(ctx context.Context, req *ttnp
 
 // ListGatewayRights returns the rights the caller user has to a gateway.
 func (s *gatewayService) ListGatewayRights(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*ttnpb.ListGatewayRightsResponse, error) {
-	claims := claimsFromContext(ctx)
+	ad := authorizationDataFromContext(ctx)
 
 	resp := new(ttnpb.ListGatewayRightsResponse)
 
-	switch claims.Source {
+	switch ad.Source {
 	case auth.Token:
-		rights, err := s.store.Gateways.ListCollaboratorRights(*req, organizationOrUserIDsUserIDs(claims.UserIdentifiers()))
+		rights, err := s.store.Gateways.ListCollaboratorRights(*req, organizationOrUserIDsUserIDs(ad.UserIdentifiers()))
 		if err != nil {
 			return nil, err
 		}
 
 		// result rights are the intersection between the scope of the Client
 		// and the rights that the user has to the gateway.
-		resp.Rights = ttnpb.IntersectRights(claims.Rights, rights)
+		resp.Rights = ttnpb.IntersectRights(ad.Rights, rights)
 	case auth.Key:
-		if !claims.GatewayIdentifiers().Contains(*req) {
+		if !ad.GatewayIdentifiers().Contains(*req) {
 			return nil, ErrNotAuthorized.New(nil)
 		}
 
-		resp.Rights = claims.Rights
+		resp.Rights = ad.Rights
 	}
 
 	return resp, nil

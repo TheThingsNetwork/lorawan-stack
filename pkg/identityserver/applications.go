@@ -50,7 +50,7 @@ func (s *applicationService) CreateApplication(ctx context.Context, req *ttnpb.C
 			return nil, err
 		}
 
-		id = organizationOrUserIDsUserIDs(claimsFromContext(ctx).UserIdentifiers())
+		id = organizationOrUserIDsUserIDs(authorizationDataFromContext(ctx).UserIdentifiers())
 	}
 
 	err := s.store.Transact(func(tx *store.Store) error {
@@ -110,7 +110,7 @@ func (s *applicationService) ListApplications(ctx context.Context, req *ttnpb.Li
 		ids = organizationOrUserIDsOrganizationIDs(oids)
 		err = s.enforceOrganizationRights(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_APPLICATIONS_LIST)
 	} else {
-		ids = organizationOrUserIDsUserIDs(claimsFromContext(ctx).UserIdentifiers())
+		ids = organizationOrUserIDsUserIDs(authorizationDataFromContext(ctx).UserIdentifiers())
 		err = s.enforceUserRights(ctx, ttnpb.RIGHT_USER_APPLICATIONS_LIST)
 	}
 
@@ -274,15 +274,15 @@ func (s *applicationService) SetApplicationCollaborator(ctx context.Context, req
 		return nil, err
 	}
 
-	claims := claimsFromContext(ctx)
+	ad := authorizationDataFromContext(ctx)
 
 	// modifiable is the set of rights the caller can modify
 	var modifiable []ttnpb.Right
-	switch claims.Source {
+	switch ad.Source {
 	case auth.Key:
-		modifiable = claims.Rights
+		modifiable = ad.Rights
 	case auth.Token:
-		modifiable, err = s.store.Applications.ListCollaboratorRights(req.ApplicationIdentifiers, organizationOrUserIDsUserIDs(claims.UserIdentifiers()))
+		modifiable, err = s.store.Applications.ListCollaboratorRights(req.ApplicationIdentifiers, organizationOrUserIDsUserIDs(ad.UserIdentifiers()))
 		if err != nil {
 			return nil, err
 		}
@@ -346,26 +346,26 @@ func (s *applicationService) ListApplicationCollaborators(ctx context.Context, r
 
 // ListApplicationRights returns the rights the caller user has to an application.
 func (s *applicationService) ListApplicationRights(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*ttnpb.ListApplicationRightsResponse, error) {
-	claims := claimsFromContext(ctx)
+	ad := authorizationDataFromContext(ctx)
 
 	resp := new(ttnpb.ListApplicationRightsResponse)
 
-	switch claims.Source {
+	switch ad.Source {
 	case auth.Token:
-		rights, err := s.store.Applications.ListCollaboratorRights(*req, organizationOrUserIDsUserIDs(claims.UserIdentifiers()))
+		rights, err := s.store.Applications.ListCollaboratorRights(*req, organizationOrUserIDsUserIDs(ad.UserIdentifiers()))
 		if err != nil {
 			return nil, err
 		}
 
 		// result rights are the intersection between the scope of the Client
 		// and the rights that the user has to the application.
-		resp.Rights = ttnpb.IntersectRights(claims.Rights, rights)
+		resp.Rights = ttnpb.IntersectRights(ad.Rights, rights)
 	case auth.Key:
-		if !claims.ApplicationIdentifiers().Contains(*req) {
+		if !ad.ApplicationIdentifiers().Contains(*req) {
 			return nil, ErrNotAuthorized.New(nil)
 		}
 
-		resp.Rights = claims.Rights
+		resp.Rights = ad.Rights
 	}
 
 	return resp, nil

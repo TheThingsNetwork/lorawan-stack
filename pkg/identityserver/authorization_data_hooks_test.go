@@ -30,7 +30,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-func TestBuildClaims(t *testing.T) {
+func TestBuildauthorizationData(t *testing.T) {
 	a := assertions.New(t)
 	is := getIS(t)
 
@@ -181,14 +181,14 @@ func TestBuildClaims(t *testing.T) {
 	for i, tc := range []struct {
 		authType  string
 		authValue string
-		res       *claims
+		res       *authorizationData
 		success   bool
 	}{
 		{
-			// Returns empty claims as no authorization credentials were found.
+			// Returns empty authorization data as no authorization credentials were found.
 			"",
 			"",
-			new(claims),
+			new(authorizationData),
 			true,
 		},
 		{
@@ -222,7 +222,7 @@ func TestBuildClaims(t *testing.T) {
 		{
 			"Bearer",
 			token,
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: ttnpb.UserIdentifiers{
 					UserID: alice.UserID,
 				},
@@ -241,7 +241,7 @@ func TestBuildClaims(t *testing.T) {
 		{
 			"Bearer",
 			ukey,
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: alice.UserIdentifiers,
 				Source:            auth.Key,
 				Rights:            []ttnpb.Right{ttnpb.Right(0)},
@@ -258,7 +258,7 @@ func TestBuildClaims(t *testing.T) {
 		{
 			"Bearer",
 			akey,
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: app.ApplicationIdentifiers,
 				Source:            auth.Key,
 				Rights:            []ttnpb.Right{ttnpb.Right(0)},
@@ -275,7 +275,7 @@ func TestBuildClaims(t *testing.T) {
 		{
 			"Bearer",
 			gkey,
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: gtw.GatewayIdentifiers,
 				Source:            auth.Key,
 				Rights:            []ttnpb.Right{ttnpb.Right(0)},
@@ -292,7 +292,7 @@ func TestBuildClaims(t *testing.T) {
 		{
 			"Bearer",
 			okey,
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: org.OrganizationIdentifiers,
 				Source:            auth.Key,
 				Rights:            []ttnpb.Right{ttnpb.Right(0)},
@@ -308,13 +308,13 @@ func TestBuildClaims(t *testing.T) {
 				metadata.Pairs("authorization", fmt.Sprintf("%s %s", tc.authType, tc.authValue)),
 			)
 
-			claims, err := is.buildClaims(ctx)
+			authorizationData, err := is.buildAuthorizationData(ctx)
 			if tc.success {
 				a.So(err, should.BeNil)
-				a.So(claims, should.Resemble, tc.res)
+				a.So(authorizationData, should.Resemble, tc.res)
 			} else {
 				a.So(err, should.NotBeNil)
-				a.So(claims, should.BeNil)
+				a.So(authorizationData, should.BeNil)
 			}
 		})
 	}

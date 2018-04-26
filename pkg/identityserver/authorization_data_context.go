@@ -16,19 +16,20 @@ package identityserver
 
 import "context"
 
-type claimsKey struct{}
+type authorizationDataKey struct{}
 
-// newContextWithClaims returns a new context but with the provided claims.
-func newContextWithClaims(ctx context.Context, c *claims) context.Context {
-	return context.WithValue(ctx, claimsKey{}, c)
+// newContextWithAuthorizationData returns a new context but with the provided
+// authorization data.
+func newContextWithAuthorizationData(ctx context.Context, ad *authorizationData) context.Context {
+	return context.WithValue(ctx, authorizationDataKey{}, ad)
 }
 
-// claimsFromContext returns the claims from the context.
-// If not found it returns empty claims.
-func claimsFromContext(ctx context.Context) *claims {
-	c, ok := ctx.Value(claimsKey{}).(*claims)
+// authorizationDataFromContext returns the authorization data from the context.
+// If not found, it returns an empty `authorizationData`.
+func authorizationDataFromContext(ctx context.Context) *authorizationData {
+	ad, ok := ctx.Value(authorizationDataKey{}).(*authorizationData)
 	if !ok {
-		return new(claims)
+		return new(authorizationData)
 	}
-	return c
+	return ad
 }

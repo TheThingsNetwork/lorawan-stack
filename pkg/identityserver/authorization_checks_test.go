@@ -29,13 +29,13 @@ func TestEnforceUserRights(t *testing.T) {
 	is := getIS(t)
 
 	for i, tc := range []struct {
-		claims  *claims
-		rights  []ttnpb.Right
-		sucesss bool
+		authorizationData *authorizationData
+		rights            []ttnpb.Right
+		sucesss           bool
 	}{
 		{
-			// Fails because the claims identifiers are not UserIdentifiers.
-			&claims{
+			// Fails because the authorization data identifiers are not UserIdentifiers.
+			&authorizationData{
 				EntityIdentifiers: ttnpb.ApplicationIdentifiers{
 					ApplicationID: "foo-app",
 				},
@@ -46,8 +46,8 @@ func TestEnforceUserRights(t *testing.T) {
 			false,
 		},
 		{
-			// Fails because the claims does not include the requested right.
-			&claims{
+			// Fails because the authorization data does not include the requested right.
+			&authorizationData{
 				EntityIdentifiers: ttnpb.UserIdentifiers{
 					UserID: "alice",
 				},
@@ -58,7 +58,7 @@ func TestEnforceUserRights(t *testing.T) {
 			false,
 		},
 		{
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: ttnpb.UserIdentifiers{
 					UserID: "alice",
 				},
@@ -72,7 +72,7 @@ func TestEnforceUserRights(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			err := is.enforceUserRights(newContextWithClaims(context.Background(), tc.claims), tc.rights...)
+			err := is.enforceUserRights(newContextWithAuthorizationData(context.Background(), tc.authorizationData), tc.rights...)
 			if tc.sucesss {
 				a.So(err, should.BeNil)
 			} else {
@@ -93,12 +93,12 @@ func TestEnforceAdmin(t *testing.T) {
 	john := testUsers()["john-doe"]
 
 	for i, tc := range []struct {
-		claims  *claims
-		sucesss bool
+		authorizationData *authorizationData
+		sucesss           bool
 	}{
 		{
-			// Fails because the claims identifiers are not UserIdentifiers.
-			&claims{
+			// Fails because the authorization data identifiers are not UserIdentifiers.
+			&authorizationData{
 				EntityIdentifiers: ttnpb.ApplicationIdentifiers{
 					ApplicationID: "foo-app",
 				},
@@ -109,7 +109,7 @@ func TestEnforceAdmin(t *testing.T) {
 		},
 		{
 			// Fails because john is not an admin.
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: john.UserIdentifiers,
 				Source:            auth.Token,
 				Rights:            []ttnpb.Right{ttnpb.RIGHT_USER_ADMIN},
@@ -117,8 +117,8 @@ func TestEnforceAdmin(t *testing.T) {
 			false,
 		},
 		{
-			// Fails because the claims does not include `RIGHT_USER_ADMIN` right.
-			&claims{
+			// Fails because the authorization data does not include `RIGHT_USER_ADMIN` right.
+			&authorizationData{
 				EntityIdentifiers: alice.UserIdentifiers,
 				Source:            auth.Token,
 				Rights:            []ttnpb.Right{ttnpb.RIGHT_USER_APPLICATIONS_LIST},
@@ -126,7 +126,7 @@ func TestEnforceAdmin(t *testing.T) {
 			false,
 		},
 		{
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: alice.UserIdentifiers,
 				Source:            auth.Token,
 				Rights:            []ttnpb.Right{ttnpb.RIGHT_USER_ADMIN},
@@ -137,7 +137,7 @@ func TestEnforceAdmin(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			err := is.enforceAdmin(newContextWithClaims(context.Background(), tc.claims))
+			err := is.enforceAdmin(newContextWithAuthorizationData(context.Background(), tc.authorizationData))
 			if tc.sucesss {
 				a.So(err, should.BeNil)
 			} else {
@@ -174,14 +174,15 @@ func TestEnforceApplicationRights(t *testing.T) {
 	}(err)
 
 	for i, tc := range []struct {
-		claims  *claims
-		appIDs  ttnpb.ApplicationIdentifiers
-		rights  []ttnpb.Right
-		sucesss bool
+		authorizationData *authorizationData
+		appIDs            ttnpb.ApplicationIdentifiers
+		rights            []ttnpb.Right
+		sucesss           bool
 	}{
 		{
-			// (API key) Fails because requested rights are not contained in the claims.
-			&claims{
+			// (API key) Fails because requested rights are not contained in
+			// the authorization data.
+			&authorizationData{
 				EntityIdentifiers: appIDs,
 				Source:            auth.Key,
 				Rights:            ttnpb.AllApplicationRights(),
@@ -191,8 +192,8 @@ func TestEnforceApplicationRights(t *testing.T) {
 			false,
 		},
 		{
-			// (API key) Fails because claims identifiers are UserIdentifiers.
-			&claims{
+			// (API key) Fails because authorization data identifiers are UserIdentifiers.
+			&authorizationData{
 				EntityIdentifiers: ttnpb.UserIdentifiers{
 					UserID: "foo-user",
 				},
@@ -204,8 +205,9 @@ func TestEnforceApplicationRights(t *testing.T) {
 			false,
 		},
 		{
-			// (API key) Fails because the claims are for a different application than the requested one.
-			&claims{
+			// (API key) Fails because the authorization data are for a different
+			// application than the requested one.
+			&authorizationData{
 				EntityIdentifiers: ttnpb.ApplicationIdentifiers{
 					ApplicationID: "another-app",
 				},
@@ -218,7 +220,7 @@ func TestEnforceApplicationRights(t *testing.T) {
 		},
 		{
 			// (API key).
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: appIDs,
 				Source:            auth.Key,
 				Rights:            ttnpb.AllApplicationRights(),
@@ -228,8 +230,8 @@ func TestEnforceApplicationRights(t *testing.T) {
 			true,
 		},
 		{
-			// (Token) Fails because the claims identifiers are not UserIdentifiers.
-			&claims{
+			// (Token) Fails because the authorization data identifiers are not UserIdentifiers.
+			&authorizationData{
 				EntityIdentifiers: ttnpb.ApplicationIdentifiers{
 					ApplicationID: "another-app",
 				},
@@ -242,7 +244,7 @@ func TestEnforceApplicationRights(t *testing.T) {
 		},
 		{
 			// (Token) Fails because `bob` is not a collaborator.
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: bob.UserIdentifiers,
 				Source:            auth.Token,
 				Rights:            ttnpb.AllRights(),
@@ -253,7 +255,7 @@ func TestEnforceApplicationRights(t *testing.T) {
 		},
 		{
 			// (Token) Fails because `alice` does not have all the requested rights.
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: alice.UserIdentifiers,
 				Source:            auth.Token,
 				Rights:            ttnpb.AllRights(),
@@ -264,7 +266,7 @@ func TestEnforceApplicationRights(t *testing.T) {
 		},
 		{
 			// (Token).
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: alice.UserIdentifiers,
 				Source:            auth.Token,
 				Rights:            ttnpb.AllRights(),
@@ -277,7 +279,7 @@ func TestEnforceApplicationRights(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			err := is.enforceApplicationRights(newContextWithClaims(context.Background(), tc.claims), tc.appIDs, tc.rights...)
+			err := is.enforceApplicationRights(newContextWithAuthorizationData(context.Background(), tc.authorizationData), tc.appIDs, tc.rights...)
 			if tc.sucesss {
 				a.So(err, should.BeNil)
 			} else {
@@ -314,14 +316,15 @@ func TestEnforceGatewayRights(t *testing.T) {
 	}(err)
 
 	for i, tc := range []struct {
-		claims  *claims
-		gtwIDs  ttnpb.GatewayIdentifiers
-		rights  []ttnpb.Right
-		sucesss bool
+		authorizationData *authorizationData
+		gtwIDs            ttnpb.GatewayIdentifiers
+		rights            []ttnpb.Right
+		sucesss           bool
 	}{
 		{
-			// (API key) Fails because requested rights are not contained in the claims.
-			&claims{
+			// (API key) Fails because requested rights are not contained in
+			// the authorization data.
+			&authorizationData{
 				EntityIdentifiers: gtwIDs,
 				Source:            auth.Key,
 				Rights:            ttnpb.AllGatewayRights(),
@@ -331,8 +334,8 @@ func TestEnforceGatewayRights(t *testing.T) {
 			false,
 		},
 		{
-			// (API key) Fails because claims identifiers are UserIdentifiers.
-			&claims{
+			// (API key) Fails because authorization data identifiers are UserIdentifiers.
+			&authorizationData{
 				EntityIdentifiers: ttnpb.UserIdentifiers{
 					UserID: "foo-user",
 				},
@@ -344,8 +347,9 @@ func TestEnforceGatewayRights(t *testing.T) {
 			false,
 		},
 		{
-			// (API key) Fails because the claims are for a different gateway than the requested one.
-			&claims{
+			// (API key) Fails because the authorization data are for a different
+			// gateway than the requested one.
+			&authorizationData{
 				EntityIdentifiers: ttnpb.GatewayIdentifiers{
 					GatewayID: "another-gtw",
 				},
@@ -358,7 +362,7 @@ func TestEnforceGatewayRights(t *testing.T) {
 		},
 		{
 			// (API key).
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: gtwIDs,
 				Source:            auth.Key,
 				Rights:            ttnpb.AllGatewayRights(),
@@ -368,8 +372,8 @@ func TestEnforceGatewayRights(t *testing.T) {
 			true,
 		},
 		{
-			// (Token) Fails because the claims identifiers are not UserIdentifiers.
-			&claims{
+			// (Token) Fails because the authorization data identifiers are not UserIdentifiers.
+			&authorizationData{
 				EntityIdentifiers: ttnpb.GatewayIdentifiers{
 					GatewayID: "another-gtw",
 				},
@@ -382,7 +386,7 @@ func TestEnforceGatewayRights(t *testing.T) {
 		},
 		{
 			// (Token) Fails because `bob` is not a collaborator.
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: bob.UserIdentifiers,
 				Source:            auth.Token,
 				Rights:            ttnpb.AllRights(),
@@ -393,7 +397,7 @@ func TestEnforceGatewayRights(t *testing.T) {
 		},
 		{
 			// (Token) Fails because `alice` does not have all the requested rights.
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: alice.UserIdentifiers,
 				Source:            auth.Token,
 				Rights:            ttnpb.AllRights(),
@@ -404,7 +408,7 @@ func TestEnforceGatewayRights(t *testing.T) {
 		},
 		{
 			// (Token).
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: alice.UserIdentifiers,
 				Source:            auth.Token,
 				Rights:            ttnpb.AllRights(),
@@ -417,7 +421,7 @@ func TestEnforceGatewayRights(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			err := is.enforceGatewayRights(newContextWithClaims(context.Background(), tc.claims), tc.gtwIDs, tc.rights...)
+			err := is.enforceGatewayRights(newContextWithAuthorizationData(context.Background(), tc.authorizationData), tc.gtwIDs, tc.rights...)
 			if tc.sucesss {
 				a.So(err, should.BeNil)
 			} else {
@@ -454,14 +458,15 @@ func TestEnforceOrganizationRights(t *testing.T) {
 	}(err)
 
 	for i, tc := range []struct {
-		claims  *claims
-		orgIDs  ttnpb.OrganizationIdentifiers
-		rights  []ttnpb.Right
-		sucesss bool
+		authorizationData *authorizationData
+		orgIDs            ttnpb.OrganizationIdentifiers
+		rights            []ttnpb.Right
+		sucesss           bool
 	}{
 		{
-			// (API key) Fails because requested rights are not contained in the claims.
-			&claims{
+			// (API key) Fails because requested rights are not contained in
+			// the authorization data.
+			&authorizationData{
 				EntityIdentifiers: orgIDs,
 				Source:            auth.Key,
 				Rights:            ttnpb.AllOrganizationRights(),
@@ -471,8 +476,8 @@ func TestEnforceOrganizationRights(t *testing.T) {
 			false,
 		},
 		{
-			// (API key) Fails because claims identifiers are UserIdentifiers.
-			&claims{
+			// (API key) Fails because authorization data identifiers are UserIdentifiers.
+			&authorizationData{
 				EntityIdentifiers: ttnpb.UserIdentifiers{
 					UserID: "foo-user",
 				},
@@ -484,8 +489,9 @@ func TestEnforceOrganizationRights(t *testing.T) {
 			false,
 		},
 		{
-			// (API key) Fails because the claims are for a different organization than the requested one.
-			&claims{
+			// (API key) Fails because the authorization data are for a different
+			// organization than the requested one.
+			&authorizationData{
 				EntityIdentifiers: ttnpb.OrganizationIdentifiers{
 					OrganizationID: "another-org",
 				},
@@ -498,7 +504,7 @@ func TestEnforceOrganizationRights(t *testing.T) {
 		},
 		{
 			// (API key).
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: orgIDs,
 				Source:            auth.Key,
 				Rights:            ttnpb.AllOrganizationRights(),
@@ -508,8 +514,8 @@ func TestEnforceOrganizationRights(t *testing.T) {
 			true,
 		},
 		{
-			// (Token) Fails because the claims identifiers are not UserIdentifiers.
-			&claims{
+			// (Token) Fails because the authorization data identifiers are not UserIdentifiers.
+			&authorizationData{
 				EntityIdentifiers: ttnpb.OrganizationIdentifiers{
 					OrganizationID: "another-org",
 				},
@@ -522,7 +528,7 @@ func TestEnforceOrganizationRights(t *testing.T) {
 		},
 		{
 			// (Token) Fails because `bob` is not a member.
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: bob.UserIdentifiers,
 				Source:            auth.Token,
 				Rights:            ttnpb.AllRights(),
@@ -533,7 +539,7 @@ func TestEnforceOrganizationRights(t *testing.T) {
 		},
 		{
 			// (Token) Fails because `alice` does not have all the requested rights.
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: alice.UserIdentifiers,
 				Source:            auth.Token,
 				Rights:            ttnpb.AllRights(),
@@ -544,7 +550,7 @@ func TestEnforceOrganizationRights(t *testing.T) {
 		},
 		{
 			// (Token).
-			&claims{
+			&authorizationData{
 				EntityIdentifiers: alice.UserIdentifiers,
 				Source:            auth.Token,
 				Rights:            ttnpb.AllRights(),
@@ -557,7 +563,7 @@ func TestEnforceOrganizationRights(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			err := is.enforceOrganizationRights(newContextWithClaims(context.Background(), tc.claims), tc.orgIDs, tc.rights...)
+			err := is.enforceOrganizationRights(newContextWithAuthorizationData(context.Background(), tc.authorizationData), tc.orgIDs, tc.rights...)
 			if tc.sucesss {
 				a.So(err, should.BeNil)
 			} else {
