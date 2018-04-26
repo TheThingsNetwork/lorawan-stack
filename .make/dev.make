@@ -58,12 +58,11 @@ dev.databases.erase: dev.cockroach.erase dev.redis.erase
 dev.cockroach.start: dev.docker.installed
 	@$(log) "Start Cockroach container as $(cockroach_docker_name)"
 	@if [[ ! -z "$(DEV_COCKROACH_DATA_PATH)" ]]; then mkdir -p $(DEV_COCKROACH_DATA_PATH); fi
-	@$(DOCKER_BINARY) run -d -p 127.0.0.1:26257:26257 --name $(cockroach_docker_name) $(cockroach_docker_volumes) $(DEV_COCKROACH_IMAGE) start --insecure
+	@$(DOCKER_BINARY) run -d -p 127.0.0.1:26257:26257 --name $(cockroach_docker_name) $(cockroach_docker_volumes) $(DEV_COCKROACH_IMAGE) start --insecure > /dev/null
 
 dev.cockroach.stop: dev.docker.installed
-	@$(log) "Stop Cockroach container"
-	@$(DOCKER_BINARY) kill $(cockroach_docker_name)
-	@$(DOCKER_BINARY) rm $(cockroach_docker_name)
+	@$(DOCKER_BINARY) kill $(cockroach_docker_name) > /dev/null 2> /dev/null && $(log) "Cockroach container killed" || $(warn) "Cockroach container was not killed"
+	@$(DOCKER_BINARY) rm $(cockroach_docker_name) > /dev/null && $(log) "Cockroach container removed" || $(warn) "Cockroach container was not removed"
 
 dev.cockroach.erase: dev.docker.installed
 	@if [[ "$$($(DOCKER_BINARY) ps)" =~ "$(cockroach_docker_name)" ]]; then \
@@ -89,12 +88,11 @@ dev.cockroach.drop: dev.docker.installed
 dev.redis.start: dev.docker.installed
 	@$(log) "Start Redis container as $(redis_docker_name)"
 	@if [[ ! -z "$(DEV_REDIS_DATA_PATH)" ]]; then mkdir -p $(DEV_REDIS_DATA_PATH); fi
-	@$(DOCKER_BINARY) run -d -p 127.0.0.1:6379:6379 --name $(redis_docker_name) $(redis_docker_volumes) $(DEV_REDIS_IMAGE) $(redis_command)
+	@$(DOCKER_BINARY) run -d -p 127.0.0.1:6379:6379 --name $(redis_docker_name) $(redis_docker_volumes) $(DEV_REDIS_IMAGE) $(redis_command) > /dev/null
 
 dev.redis.stop: dev.docker.installed
-	@$(log) "Stop Redis container"
-	@$(DOCKER_BINARY) kill $(redis_docker_name)
-	@$(DOCKER_BINARY) rm $(redis_docker_name)
+	@$(DOCKER_BINARY) kill $(redis_docker_name) > /dev/null 2> /dev/null && $(log) "Redis container killed" || $(warn) "Redis container was not killed"
+	@$(DOCKER_BINARY) rm $(redis_docker_name) > /dev/null && $(log) "Redis container removed" || $(warn) "Redis container was not removed"
 
 dev.redis.erase: dev.docker.installed
 	@if [[ "$$($(DOCKER_BINARY) ps)" =~ "$(redis_docker_name)" ]]; then \
