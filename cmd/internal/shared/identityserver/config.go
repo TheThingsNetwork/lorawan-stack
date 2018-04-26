@@ -27,5 +27,4 @@ var DefaultIdentityServerConfig = identityserver.Config{
 	PublicURL:        fmt.Sprintf("http://localhost:%s", shared.DefaultServiceBase.HTTP.Listen),
 	OrganizationName: "The Things Network",
 	DefaultSettings:  identityserver.DefaultSettings,
-	Specializers:     identityserver.DefaultSpecializers,
 }

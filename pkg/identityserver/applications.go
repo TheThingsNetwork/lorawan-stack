@@ -93,7 +93,7 @@ func (s *applicationService) GetApplication(ctx context.Context, req *ttnpb.Appl
 		return nil, err
 	}
 
-	found, err := s.store.Applications.GetByID(ids, s.config.Specializers.Application)
+	found, err := s.store.Applications.GetByID(ids, s.specializers.Application)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (s *applicationService) ListApplications(ctx context.Context, req *ttnpb.Li
 		return nil, err
 	}
 
-	found, err := s.store.Applications.ListByOrganizationOrUser(ids, s.config.Specializers.Application)
+	found, err := s.store.Applications.ListByOrganizationOrUser(ids, s.specializers.Application)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func (s *applicationService) UpdateApplication(ctx context.Context, req *ttnpb.U
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Applications.GetByID(req.Application.ApplicationIdentifiers, s.config.Specializers.Application)
+		found, err := tx.Applications.GetByID(req.Application.ApplicationIdentifiers, s.specializers.Application)
 		if err != nil {
 			return err
 		}

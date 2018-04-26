@@ -51,11 +51,23 @@ type Config struct {
 	DefaultSettings ttnpb.IdentityServerSettings `name:"default-settings" description:"Default settings that are loaded when the is first starts"`
 
 	// Specializers are the specializers used in the Identity Server.
-	Specializers Specializers `name:"-"`
+	Specializers Specializers `name:"specializers" description:"IDs of used specializers for read-operations in the store."`
 
 	// Hostname denotes the Identity Server hostname. It is used as issuer when
 	// generating access tokens and API keys.
 	Hostname string `name:"-"`
+}
+
+// Specializers contains the IDs of the specializers that will be used in
+// read-operations in the store.
+//
+// If an empty value is provided it means no specializer will be used.
+type Specializers struct {
+	User         string `name:"user" description:"ID of the user specializer."`
+	Application  string `name:"application" description:"ID of the application specializer."`
+	Gateway      string `name:"gateway" description:"ID of the gateway specializer."`
+	Client       string `name:"client" description:"ID of the client specializer."`
+	Organization string `name:"organization" description:"ID of the organization specializer."`
 }
 
 // IdentityServer implements the Identity Server component behaviour.
@@ -67,21 +79,20 @@ type IdentityServer struct {
 	store *sql.Store
 	email email.Provider
 
+	specializers struct {
+		User         store.UserSpecializer
+		Application  store.ApplicationSpecializer
+		Gateway      store.GatewaySpecializer
+		Client       store.ClientSpecializer
+		Organization store.OrganizationSpecializer
+	}
+
 	*userService
 	*applicationService
 	*gatewayService
 	*clientService
 	*adminService
 	*organizationService
-}
-
-// Specializers are the specializers to be used in the Identity Server.
-type Specializers struct {
-	User         store.UserSpecializer
-	Application  store.ApplicationSpecializer
-	Gateway      store.GatewaySpecializer
-	Client       store.ClientSpecializer
-	Organization store.OrganizationSpecializer
 }
 
 // New returns a new IdentityServer.
@@ -115,6 +126,31 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 	} else {
 		log.Warn("No sendgrid API key configured, not sending emails")
 		is.email = mock.New()
+	}
+
+	is.specializers.User, err = specializers.GetUser(config.Specializers.User)
+	if err != nil {
+		return nil, err
+	}
+
+	is.specializers.Application, err = specializers.GetApplication(config.Specializers.Application)
+	if err != nil {
+		return nil, err
+	}
+
+	is.specializers.Gateway, err = specializers.GetGateway(config.Specializers.Gateway)
+	if err != nil {
+		return nil, err
+	}
+
+	is.specializers.Client, err = specializers.GetClient(config.Specializers.Client)
+	if err != nil {
+		return nil, err
+	}
+
+	is.specializers.Organization, err = specializers.GetOrganization(config.Specializers.Organization)
+	if err != nil {
+		return nil, err
 	}
 
 	hooks.RegisterUnaryHook("/ttn.v3.IsUser", authorizationDataHookName, is.authorizationDataUnaryHook())

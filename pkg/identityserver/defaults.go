@@ -17,7 +17,6 @@ package identityserver
 import (
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
@@ -64,13 +63,4 @@ var DefaultSettings = ttnpb.IdentityServerSettings{
 	AllowedEmails:      []string{"*"},
 	ValidationTokenTTL: time.Hour,
 	InvitationTokenTTL: time.Hour * time.Duration(24*7),
-}
-
-// DefaultSpecializers contains the specializers used in the store by default.
-var DefaultSpecializers = Specializers{
-	User:         func(base ttnpb.User) store.User { return &base },
-	Application:  func(base ttnpb.Application) store.Application { return &base },
-	Gateway:      func(base ttnpb.Gateway) store.Gateway { return &base },
-	Client:       func(base ttnpb.Client) store.Client { return &base },
-	Organization: func(base ttnpb.Organization) store.Organization { return &base },
 }

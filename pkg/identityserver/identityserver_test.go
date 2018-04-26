@@ -32,7 +32,6 @@ var (
 		OrganizationName: "The Things Network",
 		PublicURL:        "https://www.thethingsnetwork.org",
 		DefaultSettings:  testSettings(),
-		Specializers:     DefaultSpecializers,
 	}
 	testIS *IdentityServer
 )

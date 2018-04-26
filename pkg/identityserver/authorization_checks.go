@@ -45,7 +45,7 @@ func (is *IdentityServer) enforceAdmin(ctx context.Context) error {
 		return err
 	}
 
-	found, err := is.store.Users.GetByID(authorizationDataFromContext(ctx).UserIdentifiers(), is.config.Specializers.User)
+	found, err := is.store.Users.GetByID(authorizationDataFromContext(ctx).UserIdentifiers(), is.specializers.User)
 	if err != nil {
 		return err
 	}

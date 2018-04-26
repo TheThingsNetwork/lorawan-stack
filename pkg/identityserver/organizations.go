@@ -80,7 +80,7 @@ func (s *organizationService) GetOrganization(ctx context.Context, req *ttnpb.Or
 		return nil, err
 	}
 
-	found, err := s.store.Organizations.GetByID(ids, s.config.Specializers.Organization)
+	found, err := s.store.Organizations.GetByID(ids, s.specializers.Organization)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (s *organizationService) ListOrganizations(ctx context.Context, _ *pbtypes.
 		return nil, err
 	}
 
-	found, err := s.store.Organizations.ListByUser(authorizationDataFromContext(ctx).UserIdentifiers(), s.config.Specializers.Organization)
+	found, err := s.store.Organizations.ListByUser(authorizationDataFromContext(ctx).UserIdentifiers(), s.specializers.Organization)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (s *organizationService) UpdateOrganization(ctx context.Context, req *ttnpb
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Organizations.GetByID(req.Organization.OrganizationIdentifiers, s.config.Specializers.Organization)
+		found, err := tx.Organizations.GetByID(req.Organization.OrganizationIdentifiers, s.specializers.Organization)
 		if err != nil {
 			return err
 		}

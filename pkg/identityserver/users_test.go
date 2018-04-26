@@ -241,7 +241,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	a.So(err, should.NotBeNil)
 	a.So(ErrInvalidPassword.Describes(err), should.BeTrue)
 
-	sfound, err := is.store.Users.GetByID(user.UserIdentifiers, is.config.Specializers.User)
+	sfound, err := is.store.Users.GetByID(user.UserIdentifiers, is.specializers.User)
 	a.So(err, should.BeNil)
 	oldPassword := sfound.GetUser().Password
 
@@ -251,7 +251,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	})
 	a.So(err, should.BeNil)
 
-	sfound, err = is.store.Users.GetByID(user.UserIdentifiers, is.config.Specializers.User)
+	sfound, err = is.store.Users.GetByID(user.UserIdentifiers, is.specializers.User)
 	a.So(err, should.BeNil)
 	a.So(sfound.GetUser().RequirePasswordUpdate, should.BeFalse)
 	a.So(oldPassword, should.NotEqual, sfound.GetUser().Password)

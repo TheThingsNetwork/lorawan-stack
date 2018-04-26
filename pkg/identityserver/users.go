@@ -157,7 +157,7 @@ func (s *userService) GetUser(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Use
 		return nil, err
 	}
 
-	found, err := s.store.Users.GetByID(authorizationDataFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
+	found, err := s.store.Users.GetByID(authorizationDataFromContext(ctx).UserIdentifiers(), s.specializers.User)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +181,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 	var token *store.ValidationToken
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(authorizationDataFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
+		found, err := tx.Users.GetByID(authorizationDataFromContext(ctx).UserIdentifiers(), s.specializers.User)
 		if err != nil {
 			return err
 		}
@@ -263,7 +263,7 @@ func (s *userService) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateU
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(authorizationDataFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
+		found, err := tx.Users.GetByID(authorizationDataFromContext(ctx).UserIdentifiers(), s.specializers.User)
 		if err != nil {
 			return err
 		}
@@ -301,12 +301,12 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		apps, err := tx.Applications.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(authorizationDataFromContext(ctx).UserIdentifiers()), s.config.Specializers.Application)
+		apps, err := tx.Applications.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(authorizationDataFromContext(ctx).UserIdentifiers()), s.specializers.Application)
 		if err != nil {
 			return err
 		}
 
-		gtws, err := tx.Gateways.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(authorizationDataFromContext(ctx).UserIdentifiers()), s.config.Specializers.Gateway)
+		gtws, err := tx.Gateways.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(authorizationDataFromContext(ctx).UserIdentifiers()), s.specializers.Gateway)
 		if err != nil {
 			return err
 		}
@@ -428,7 +428,7 @@ func (s *userService) ValidateUserEmail(ctx context.Context, req *ttnpb.Validate
 			return ErrValidationTokenExpired.New(nil)
 		}
 
-		user, err := tx.Users.GetByID(userID, s.config.Specializers.User)
+		user, err := tx.Users.GetByID(userID, s.specializers.User)
 		if err != nil {
 			return err
 		}
@@ -458,7 +458,7 @@ func (s *userService) RequestUserEmailValidation(ctx context.Context, _ *pbtypes
 	var token store.ValidationToken
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(authorizationDataFromContext(ctx).UserIdentifiers(), s.config.Specializers.User)
+		found, err := tx.Users.GetByID(authorizationDataFromContext(ctx).UserIdentifiers(), s.specializers.User)
 		if err != nil {
 			return err
 		}
@@ -501,7 +501,7 @@ func (s *userService) ListAuthorizedClients(ctx context.Context, _ *pbtypes.Empt
 		return nil, err
 	}
 
-	found, err := s.store.OAuth.ListAuthorizedClients(authorizationDataFromContext(ctx).UserIdentifiers(), s.config.Specializers.Client)
+	found, err := s.store.OAuth.ListAuthorizedClients(authorizationDataFromContext(ctx).UserIdentifiers(), s.specializers.Client)
 	if err != nil {
 		return nil, err
 	}

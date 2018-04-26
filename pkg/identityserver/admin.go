@@ -172,7 +172,7 @@ func (s *adminService) GetUser(ctx context.Context, req *ttnpb.UserIdentifiers) 
 		return nil, err
 	}
 
-	found, err := s.store.Users.GetByID(*req, s.config.Specializers.User)
+	found, err := s.store.Users.GetByID(*req, s.specializers.User)
 	if err != nil {
 		return nil, err
 	}
@@ -188,7 +188,7 @@ func (s *adminService) ListUsers(ctx context.Context, req *ttnpb.ListUsersReques
 		return nil, err
 	}
 
-	users, err := s.store.Users.List(s.config.Specializers.User)
+	users, err := s.store.Users.List(s.specializers.User)
 	if err != nil {
 		return nil, err
 	}
@@ -224,7 +224,7 @@ func (s *adminService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserRequ
 	var token *store.ValidationToken
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(req.User.UserIdentifiers, s.config.Specializers.User)
+		found, err := tx.Users.GetByID(req.User.UserIdentifiers, s.specializers.User)
 		if err != nil {
 			return err
 		}
@@ -320,7 +320,7 @@ func (s *adminService) ResetUserPassword(ctx context.Context, req *ttnpb.UserIde
 	var user *ttnpb.User
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(*req, s.config.Specializers.User)
+		found, err := tx.Users.GetByID(*req, s.specializers.User)
 		if err != nil {
 			return err
 		}
@@ -360,7 +360,7 @@ func (s *adminService) DeleteUser(ctx context.Context, req *ttnpb.UserIdentifier
 	err = s.store.Transact(func(tx *store.Store) error {
 		ids := *req
 
-		found, err := tx.Users.GetByID(ids, s.config.Specializers.User)
+		found, err := tx.Users.GetByID(ids, s.specializers.User)
 		if err != nil {
 			return err
 		}
@@ -392,7 +392,7 @@ func (s *adminService) SendInvitation(ctx context.Context, req *ttnpb.SendInvita
 
 	err = s.store.Transact(func(tx *store.Store) (err error) {
 		// check whether email is already registered or not
-		found, err := tx.Users.GetByID(ttnpb.UserIdentifiers{Email: req.Email}, s.config.Specializers.User)
+		found, err := tx.Users.GetByID(ttnpb.UserIdentifiers{Email: req.Email}, s.specializers.User)
 		if err != nil && !sql.ErrUserNotFound.Describes(err) {
 			return err
 		}
@@ -474,7 +474,7 @@ func (s *adminService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifie
 		return nil, err
 	}
 
-	found, err := s.store.Clients.GetByID(*req, s.config.Specializers.Client)
+	found, err := s.store.Clients.GetByID(*req, s.specializers.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -489,7 +489,7 @@ func (s *adminService) ListClients(ctx context.Context, req *ttnpb.ListClientsRe
 		return nil, err
 	}
 
-	found, err := s.store.Clients.List(s.config.Specializers.Client)
+	found, err := s.store.Clients.List(s.specializers.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -520,7 +520,7 @@ func (s *adminService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClient
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Clients.GetByID(req.Client.ClientIdentifiers, s.config.Specializers.Client)
+		found, err := tx.Clients.GetByID(req.Client.ClientIdentifiers, s.specializers.Client)
 		if err != nil {
 			return err
 		}
@@ -572,12 +572,12 @@ func (s *adminService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdenti
 	err = s.store.Transact(func(tx *store.Store) error {
 		ids := *req
 
-		found, err := tx.Clients.GetByID(ids, s.config.Specializers.Client)
+		found, err := tx.Clients.GetByID(ids, s.specializers.Client)
 		if err != nil {
 			return err
 		}
 
-		user, err = tx.Users.GetByID(found.GetClient().CreatorIDs, s.config.Specializers.User)
+		user, err = tx.Users.GetByID(found.GetClient().CreatorIDs, s.specializers.User)
 		if err != nil {
 			return err
 		}

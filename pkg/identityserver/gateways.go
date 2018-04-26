@@ -98,7 +98,7 @@ func (s *gatewayService) GetGateway(ctx context.Context, req *ttnpb.GatewayIdent
 		return nil, err
 	}
 
-	found, err := s.store.Gateways.GetByID(ids, s.config.Specializers.Gateway)
+	found, err := s.store.Gateways.GetByID(ids, s.specializers.Gateway)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ func (s *gatewayService) ListGateways(ctx context.Context, req *ttnpb.ListGatewa
 		return nil, err
 	}
 
-	found, err := s.store.Gateways.ListByOrganizationOrUser(ids, s.config.Specializers.Gateway)
+	found, err := s.store.Gateways.ListByOrganizationOrUser(ids, s.specializers.Gateway)
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGat
 	}
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Gateways.GetByID(req.Gateway.GatewayIdentifiers, s.config.Specializers.Gateway)
+		found, err := tx.Gateways.GetByID(req.Gateway.GatewayIdentifiers, s.specializers.Gateway)
 		if err != nil {
 			return err
 		}
