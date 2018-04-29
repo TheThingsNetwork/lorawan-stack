@@ -78,7 +78,7 @@ func init() {
 		ImplementsCFList: true,
 
 		Rx1Channel: rx1ChannelIdentity,
-		Rx1DataRate: func(idx, offset uint32, dwell bool) (uint32, error) {
+		Rx1DataRate: func(idx, offset uint32, dwellTime bool) (uint32, error) {
 			if offset > 7 {
 				return 0, ErrLoRaWANParametersInvalid.NewWithCause(nil, errors.New("Offset must be lower or equal to 7"))
 			}
@@ -90,7 +90,7 @@ func init() {
 			si := int(idx) - so
 
 			minDR := uint32(0)
-			if dwell {
+			if dwellTime {
 				minDR = 2
 			}
 
