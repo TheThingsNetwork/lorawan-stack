@@ -29,29 +29,29 @@ func ParseModulation(types.DataRate) ttnpb.Modulation  { return ttnpb.Modulation
 func GetReceptionTimestamp(ttnpb.UplinkMessage) uint64 { return 0 }
 
 func Example() {
-	fp, err := band.GetByID(band.EU_863_870)
+	euBand, err := band.GetByID(band.EU_863_870)
 	if err != nil {
 		panic(err)
 	}
 
 	up := GetUplink()
 	sets := up.GetSettings()
-	drIdx, err := fp.Rx1DataRate(sets.GetDataRateIndex(), 0, false)
+	drIdx, err := euBand.Rx1DataRate(sets.GetDataRateIndex(), 0, false)
 	if err != nil {
 		panic(err)
 	}
 
-	chIdx, err := fp.Rx1Channel(sets.GetChannelIndex())
+	chIdx, err := euBand.Rx1Channel(sets.GetChannelIndex())
 	if err != nil {
 		panic(err)
 	}
 
-	dr := fp.DataRates[drIdx]
+	dr := euBand.DataRates[drIdx]
 
 	downlink := ttnpb.DownlinkMessage{
 		Settings: ttnpb.TxSettings{
 			DataRateIndex:   uint32(drIdx),
-			Frequency:       fp.DownlinkChannels[chIdx].Frequency,
+			Frequency:       euBand.DownlinkChannels[chIdx].Frequency,
 			ChannelIndex:    chIdx,
 			Modulation:      ParseModulation(dr.Rate),
 			SpreadingFactor: ParseSpreadingFactor(dr.Rate),
@@ -59,7 +59,7 @@ func Example() {
 			Bandwidth:       ParseBandwidth(dr.Rate),
 		},
 		TxMetadata: ttnpb.TxMetadata{
-			Timestamp: GetReceptionTimestamp(up) + 1000000000*uint64(fp.ReceiveDelay1),
+			Timestamp: GetReceptionTimestamp(up) + 1000000000*uint64(euBand.ReceiveDelay1),
 		},
 	}
 	SendDownlink(downlink)
