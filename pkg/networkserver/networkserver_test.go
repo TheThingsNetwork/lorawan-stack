@@ -428,13 +428,13 @@ type windowEnd struct {
 	ch  chan<- time.Time
 }
 
-func HandleUplinkTest(componentCfg *component.Config) func(t *testing.T) {
+func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
 		reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 		ns := test.Must(New(
-			component.MustNew(test.GetLogger(t), componentCfg),
+			component.MustNew(test.GetLogger(t), conf),
 			&Config{
 				Registry:            reg,
 				JoinServers:         nil,
@@ -910,7 +910,7 @@ func HandleUplinkTest(componentCfg *component.Config) func(t *testing.T) {
 				collectionDoneCh := make(chan windowEnd, 1)
 
 				ns := test.Must(New(
-					component.MustNew(test.GetLogger(t), componentCfg),
+					component.MustNew(test.GetLogger(t), conf),
 					&Config{
 						Registry:            reg,
 						DeduplicationWindow: 42,
@@ -1136,13 +1136,13 @@ func (c *mockNsJsClient) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyR
 	return c.getNwkSKeys(ctx, req, opts...)
 }
 
-func HandleJoinTest(componentCfg *component.Config) func(t *testing.T) {
+func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
 		reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 		ns := test.Must(New(
-			component.MustNew(test.GetLogger(t), componentCfg),
+			component.MustNew(test.GetLogger(t), conf),
 			&Config{
 				Registry:            reg,
 				DeduplicationWindow: 42,
@@ -1279,7 +1279,7 @@ func HandleJoinTest(componentCfg *component.Config) func(t *testing.T) {
 				joinCh := make(chan handleJoinRequest, 1)
 
 				ns := test.Must(New(
-					component.MustNew(test.GetLogger(t), componentCfg),
+					component.MustNew(test.GetLogger(t), conf),
 					&Config{
 						Registry: reg,
 						JoinServers: []ttnpb.NsJsClient{&mockNsJsClient{
@@ -1517,7 +1517,7 @@ func HandleJoinTest(componentCfg *component.Config) func(t *testing.T) {
 	}
 }
 
-func HandleRejoinTest(componentCfg *component.Config) func(t *testing.T) {
+func HandleRejoinTest(conf *component.Config) func(t *testing.T) {
 	return func(t *testing.T) {
 		// TODO: Implement https://github.com/TheThingsIndustries/ttn/issues/557
 	}
@@ -1532,7 +1532,7 @@ func TestHandleUplink(t *testing.T) {
 	}
 	defer fpStore.Destroy()
 
-	componentCfg := &component.Config{ServiceBase: config.ServiceBase{
+	conf := &component.Config{ServiceBase: config.ServiceBase{
 		FrequencyPlans: config.FrequencyPlans{
 			StoreDirectory: fpStore.Directory(),
 		},
@@ -1540,7 +1540,7 @@ func TestHandleUplink(t *testing.T) {
 
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 	ns := test.Must(New(
-		component.MustNew(test.GetLogger(t), componentCfg),
+		component.MustNew(test.GetLogger(t), conf),
 		&Config{
 			Registry:            reg,
 			JoinServers:         nil,
@@ -1569,7 +1569,7 @@ func TestHandleUplink(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(e, should.BeNil)
 
-	t.Run("Uplink", HandleUplinkTest(componentCfg))
-	t.Run("Join", HandleJoinTest(componentCfg))
-	t.Run("Rejoin", HandleRejoinTest(componentCfg))
+	t.Run("Uplink", HandleUplinkTest(conf))
+	t.Run("Join", HandleJoinTest(conf))
+	t.Run("Rejoin", HandleRejoinTest(conf))
 }
