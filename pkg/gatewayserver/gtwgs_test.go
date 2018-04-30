@@ -71,8 +71,11 @@ func TestLink(t *testing.T) {
 	ctx := log.NewContext(context.Background(), logger)
 	ctx, cancel := context.WithCancel(ctx)
 
-	dir := createFPStore(a)
-	defer removeFPStore(a, dir)
+	store, err := test.NewFrequencyPlansStore()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	defer store.Destroy()
 
 	registeredGatewayID := "registered-gateway"
 	_, isAddr := StartMockIsGatewayServer(ctx, map[ttnpb.GatewayIdentifiers]ttnpb.Gateway{
@@ -88,7 +91,7 @@ func TestLink(t *testing.T) {
 				NetworkServer:  nsAddr,
 			},
 			FrequencyPlans: config.FrequencyPlans{
-				StoreDirectory: dir,
+				StoreDirectory: store.Directory(),
 			},
 		},
 	})
@@ -227,12 +230,15 @@ func TestLink(t *testing.T) {
 func TestGetFrequencyPlan(t *testing.T) {
 	a := assertions.New(t)
 
-	dir := createFPStore(a)
-	defer removeFPStore(a, dir)
+	store, err := test.NewFrequencyPlansStore()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	defer store.Destroy()
 
 	logger := test.GetLogger(t)
 	c := component.MustNew(test.GetLogger(t), &component.Config{ServiceBase: config.ServiceBase{
-		FrequencyPlans: config.FrequencyPlans{StoreDirectory: dir},
+		FrequencyPlans: config.FrequencyPlans{StoreDirectory: store.Directory()},
 	}})
 	gs, err := gatewayserver.New(c, gatewayserver.Config{})
 	if !a.So(err, should.BeNil) {

@@ -45,12 +45,15 @@ func Example() {
 func TestGatewayServer(t *testing.T) {
 	a := assertions.New(t)
 
-	dir := createFPStore(a)
-	defer removeFPStore(a, dir)
+	store, err := test.NewFrequencyPlansStore()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	defer store.Destroy()
 
 	logger := test.GetLogger(t)
 	c := component.MustNew(logger, &component.Config{ServiceBase: config.ServiceBase{FrequencyPlans: config.FrequencyPlans{
-		StoreDirectory: dir,
+		StoreDirectory: store.Directory(),
 	}}})
 	gs, err := gatewayserver.New(c, gatewayserver.Config{})
 	if !a.So(err, should.BeNil) {

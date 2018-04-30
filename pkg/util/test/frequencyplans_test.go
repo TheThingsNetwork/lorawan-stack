@@ -12,50 +12,66 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package gatewayserver_test
+package test_test
 
 import (
-	"context"
 	"testing"
+
+	"github.com/TheThingsNetwork/ttn/pkg/fetch"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
+	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/pool"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
-func TestScheduleDownlinkUnregisteredGateway(t *testing.T) {
-	a := assertions.New(t)
-
+func ExampleFrequencyPlansStore() {
 	store, err := test.NewFrequencyPlansStore()
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
+	if err != nil {
+		panic(err)
 	}
+
 	defer store.Destroy()
 
-	logger := test.GetLogger(t)
-	c := component.MustNew(test.GetLogger(t), &component.Config{ServiceBase: config.ServiceBase{
-		FrequencyPlans: config.FrequencyPlans{StoreDirectory: store.Directory()},
-	}})
-	gs, err := gatewayserver.New(c, gatewayserver.Config{})
-	if !a.So(err, should.BeNil) {
-		logger.Fatal("Gateway server could not start")
+	config := config.ServiceBase{
+		FrequencyPlans: config.FrequencyPlans{
+			StoreDirectory: store.Directory(),
+		},
 	}
 
-	_, err = gs.ScheduleDownlink(log.NewContext(context.Background(), logger), &ttnpb.DownlinkMessage{
-		TxMetadata: ttnpb.TxMetadata{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-				GatewayID: "unknown-downlink",
-			},
-		},
+	component, err := component.New(log.Default, &component.Config{
+		ServiceBase: config,
 	})
-	a.So(err, should.NotBeNil)
-	a.So(pool.ErrGatewayNotConnected.Caused(err), should.BeTrue)
+	if err != nil {
+		panic(err)
+	}
 
-	defer gs.Close()
+	gs, err := gatewayserver.New(component, gatewayserver.Config{})
+	if err != nil {
+		panic(err)
+	}
+
+	gs.Start()
+}
+
+func TestFrequencyPlans(t *testing.T) {
+	a := assertions.New(t)
+
+	s, err := test.NewFrequencyPlansStore()
+	a.So(err, should.BeNil)
+
+	a.So(s.Directory(), should.NotEqual, "")
+
+	fp := frequencyplans.NewStore(fetch.FromFilesystem(s.Directory()))
+
+	euFP, err := fp.GetByID(test.EUFrequencyPlanID)
+	a.So(err, should.BeNil)
+	a.So(euFP.BandID, should.Equal, "EU_863_870")
+
+	err = s.Destroy()
+	a.So(err, should.BeNil)
 }
