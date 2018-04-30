@@ -55,7 +55,7 @@ dev.databases.erase: dev.cockroach.erase dev.redis.erase
 
 # Cockroach
 
-dev.cockroach.start: dev.docker.installed
+dev.cockroach.start: dev.docker.installed dev.cockroach.remove-container
 	@$(log) "Start Cockroach container as $(cockroach_docker_name)"
 	@if [[ ! -z "$(DEV_COCKROACH_DATA_PATH)" ]]; then mkdir -p $(DEV_COCKROACH_DATA_PATH); fi
 	@$(DOCKER_BINARY) run -d -p 127.0.0.1:26257:26257 --name $(cockroach_docker_name) $(cockroach_docker_volumes) $(DEV_COCKROACH_IMAGE) start --insecure > /dev/null
@@ -83,9 +83,15 @@ dev.cockroach.drop: dev.docker.installed
 	@$(log) "Dropping $(NAME) Cockroach database"
 	@$(DOCKER_BINARY) exec $(cockroach_docker_name) ./cockroach sql --insecure --execute="DROP DATABASE $(NAME) CASCADE;"
 
+dev.cockroach.remove-container:
+	@if [[ `$(DOCKER_BINARY) container ls -a` =~ $(cockroach_docker_name) ]]; then \
+		$(info) "Removing old Cockroach container $(cockroach_docker_name)"; \
+		$(DOCKER_BINARY) rm $(cockroach_docker_name) > /dev/null; \
+	fi
+
 # Redis
 
-dev.redis.start: dev.docker.installed
+dev.redis.start: dev.docker.installed dev.redis.remove-container
 	@$(log) "Start Redis container as $(redis_docker_name)"
 	@if [[ ! -z "$(DEV_REDIS_DATA_PATH)" ]]; then mkdir -p $(DEV_REDIS_DATA_PATH); fi
 	@$(DOCKER_BINARY) run -d -p 127.0.0.1:6379:6379 --name $(redis_docker_name) $(redis_docker_volumes) $(DEV_REDIS_IMAGE) $(redis_command) > /dev/null
@@ -99,4 +105,10 @@ dev.redis.erase: dev.docker.installed
 		$(err) "Redis container is still running, aborted erase operation."; \
 	else \
 		rm -rf "$(DEV_REDIS_DATA_PATH)"; \
+	fi
+
+dev.redis.remove-container:
+	@if [[ `$(DOCKER_BINARY) container ls -a` =~ $(redis_docker_name) ]]; then \
+		$(info) "Removing old Redis container $(redis_docker_name)"; \
+		$(DOCKER_BINARY) rm $(redis_docker_name); \
 	fi
