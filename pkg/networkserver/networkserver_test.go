@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/component"
+	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/crypto"
 	"github.com/TheThingsNetwork/ttn/pkg/deviceregistry"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
@@ -427,13 +428,13 @@ type windowEnd struct {
 	ch  chan<- time.Time
 }
 
-func HandleUplinkTest() func(t *testing.T) {
+func HandleUplinkTest(componentCfg *component.Config) func(t *testing.T) {
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
 		reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 		ns := test.Must(New(
-			component.MustNew(test.GetLogger(t), &component.Config{}),
+			component.MustNew(test.GetLogger(t), componentCfg),
 			&Config{
 				Registry:            reg,
 				JoinServers:         nil,
@@ -454,6 +455,7 @@ func HandleUplinkTest() func(t *testing.T) {
 					},
 				},
 			},
+			FrequencyPlanID: test.EUFrequencyPlanID,
 		})
 		if !a.So(err, should.BeNil) {
 			return
@@ -515,6 +517,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 						DevAddr: &DevAddr,
 					},
+					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
 						NextFCntUp: 0x42,
@@ -551,6 +554,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 						DevAddr: &DevAddr,
 					},
+					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
 						NextFCntUp: 0x42424249,
@@ -588,6 +592,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 						DevAddr: &DevAddr,
 					},
+					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
 						NextFCntUp: 0x42,
@@ -629,6 +634,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 						DevAddr: &DevAddr,
 					},
+					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
 						NextFCntUp: 0x42424249,
@@ -671,6 +677,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 						DevAddr: &DevAddr,
 					},
+					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
 						NextFCntUp: 0x42,
@@ -712,6 +719,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 						DevAddr: &DevAddr,
 					},
+					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
 						NextFCntUp: 0x42,
@@ -762,6 +770,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 						DevAddr: &DevAddr,
 					},
+					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
 						NextFCntUp: 0x42424249,
@@ -804,6 +813,7 @@ func HandleUplinkTest() func(t *testing.T) {
 						},
 						DevAddr: &DevAddr,
 					},
+					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
 						DevAddr:    DevAddr,
 						NextFCntUp: 0x42424249,
@@ -900,7 +910,7 @@ func HandleUplinkTest() func(t *testing.T) {
 				collectionDoneCh := make(chan windowEnd, 1)
 
 				ns := test.Must(New(
-					component.MustNew(test.GetLogger(t), &component.Config{}),
+					component.MustNew(test.GetLogger(t), componentCfg),
 					&Config{
 						Registry:            reg,
 						DeduplicationWindow: 42,
@@ -1126,13 +1136,13 @@ func (c *mockNsJsClient) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyR
 	return c.getNwkSKeys(ctx, req, opts...)
 }
 
-func HandleJoinTest() func(t *testing.T) {
+func HandleJoinTest(componentCfg *component.Config) func(t *testing.T) {
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
 		reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 		ns := test.Must(New(
-			component.MustNew(test.GetLogger(t), &component.Config{}),
+			component.MustNew(test.GetLogger(t), componentCfg),
 			&Config{
 				Registry:            reg,
 				DeduplicationWindow: 42,
@@ -1171,6 +1181,7 @@ func HandleJoinTest() func(t *testing.T) {
 						DevEUI:  &DevEUI,
 						JoinEUI: &JoinEUI,
 					},
+					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         nil,
 					MACStateDesired: ttnpb.NewPopulatedMACState(test.Randy, false),
 				},
@@ -1192,6 +1203,7 @@ func HandleJoinTest() func(t *testing.T) {
 						DevEUI:  &DevEUI,
 						JoinEUI: &JoinEUI,
 					},
+					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
 					MACStateDesired: ttnpb.NewPopulatedMACState(test.Randy, false),
 				},
@@ -1213,6 +1225,7 @@ func HandleJoinTest() func(t *testing.T) {
 						DevEUI:  &DevEUI,
 						JoinEUI: &JoinEUI,
 					},
+					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
 					MACStateDesired: ttnpb.NewPopulatedMACState(test.Randy, false),
 				},
@@ -1266,7 +1279,7 @@ func HandleJoinTest() func(t *testing.T) {
 				joinCh := make(chan handleJoinRequest, 1)
 
 				ns := test.Must(New(
-					component.MustNew(test.GetLogger(t), &component.Config{}),
+					component.MustNew(test.GetLogger(t), componentCfg),
 					&Config{
 						Registry: reg,
 						JoinServers: []ttnpb.NsJsClient{&mockNsJsClient{
@@ -1504,7 +1517,7 @@ func HandleJoinTest() func(t *testing.T) {
 	}
 }
 
-func HandleRejoinTest() func(t *testing.T) {
+func HandleRejoinTest(componentCfg *component.Config) func(t *testing.T) {
 	return func(t *testing.T) {
 		// TODO: Implement https://github.com/TheThingsIndustries/ttn/issues/557
 	}
@@ -1513,9 +1526,21 @@ func HandleRejoinTest() func(t *testing.T) {
 func TestHandleUplink(t *testing.T) {
 	a := assertions.New(t)
 
+	fpStore, err := test.NewFrequencyPlansStore()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	defer fpStore.Destroy()
+
+	componentCfg := &component.Config{ServiceBase: config.ServiceBase{
+		FrequencyPlans: config.FrequencyPlans{
+			StoreDirectory: fpStore.Directory(),
+		},
+	}}
+
 	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
 	ns := test.Must(New(
-		component.MustNew(test.GetLogger(t), &component.Config{}),
+		component.MustNew(test.GetLogger(t), componentCfg),
 		&Config{
 			Registry:            reg,
 			JoinServers:         nil,
@@ -1544,7 +1569,7 @@ func TestHandleUplink(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(e, should.BeNil)
 
-	t.Run("Uplink", HandleUplinkTest())
-	t.Run("Join", HandleJoinTest())
-	t.Run("Rejoin", HandleRejoinTest())
+	t.Run("Uplink", HandleUplinkTest(componentCfg))
+	t.Run("Join", HandleJoinTest(componentCfg))
+	t.Run("Rejoin", HandleRejoinTest(componentCfg))
 }
