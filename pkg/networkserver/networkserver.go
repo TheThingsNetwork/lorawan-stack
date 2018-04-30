@@ -568,6 +568,11 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		return err
 	}
 
+	fp, err := ns.FrequencyPlans.GetByID(dev.GetFrequencyPlanID())
+	if err != nil {
+		return ErrCorruptRegistry.NewWithCause(nil, err)
+	}
+
 	devAddr := ns.newDevAddr(dev.EndDevice)
 	for s := dev.GetSession(); s != nil && devAddr.Equal(s.DevAddr); {
 		devAddr = ns.newDevAddr(dev.EndDevice)
@@ -592,10 +597,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		},
 	}
 
-	fp, err := ns.FrequencyPlans.GetByID(dev.GetFrequencyPlanID())
-	if err == nil {
-		req.CFList = frequencyplans.CFList(fp, dev.GetLoRaWANPHYVersion())
-	}
+	req.CFList = frequencyplans.CFList(fp, dev.GetLoRaWANPHYVersion())
 
 	var errs []error
 	for _, js := range ns.joinServers {
