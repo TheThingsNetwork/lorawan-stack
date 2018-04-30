@@ -53,6 +53,7 @@ quality: go.quality js.quality
 
 # stack binary
 ttn-lw-stack: MAIN=./cmd/ttn-lw-stack/main.go
+ttn-lw-stack: js.dll js.build
 ttn-lw-stack: $(RELEASE_DIR)/ttn-lw-stack-$(GOOS)-$(GOARCH)
 
 # identity-server binary

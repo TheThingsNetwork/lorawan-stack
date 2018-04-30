@@ -53,7 +53,7 @@ func TestShouldBeUserIgnoringAutoFields(t *testing.T) {
 	a.So(ShouldBeUserIgnoringAutoFields(user(), user()), should.Equal, success)
 
 	modified := user()
-	modified.Password = "foo"
+	modified.Name = "foo"
 
 	a.So(ShouldBeUserIgnoringAutoFields(modified, user()), should.NotEqual, success)
 }

@@ -58,6 +58,8 @@ func ShouldBeUser(actual interface{}, expected ...interface{}) string {
 	return all(
 		ShouldBeUserIgnoringAutoFields(a, b),
 		assertions.ShouldHappenWithin(a.CreatedAt, time.Millisecond, b.CreatedAt),
+		assertTime(a.ValidatedAt, b.ValidatedAt),
+		assertions.ShouldEqual(a.Password, b.Password),
 	)
 }
 
@@ -82,7 +84,6 @@ func ShouldBeUserIgnoringAutoFields(actual interface{}, expected ...interface{})
 		assertions.ShouldEqual(a.UserIdentifiers.UserID, b.UserIdentifiers.UserID),
 		assertions.ShouldEqual(a.UserIdentifiers.Email, b.UserIdentifiers.Email),
 		assertions.ShouldEqual(a.Name, b.Name),
-		assertions.ShouldEqual(a.Password, b.Password),
 		assertTime(a.ValidatedAt, b.ValidatedAt),
 		assertTime(&a.PasswordUpdatedAt, &b.PasswordUpdatedAt),
 		assertions.ShouldEqual(a.Admin, b.Admin),
