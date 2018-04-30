@@ -25,6 +25,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/TheThingsNetwork/ttn/pkg/validate"
 )
 
 type nsErrors map[string]error
@@ -79,11 +80,13 @@ func (g *GatewayServer) forAllNS(f func(ttnpb.GsNsClient) error) error {
 // this gateway may not be used for downlink.
 func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	ctx := link.Context()
-	id := ttnpb.GatewayIdentifiers{
-		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
+	gtwID := rpcmetadata.FromIncomingContext(ctx).ID
+
+	if err := validate.ID(gtwID); err != nil {
+		return err
 	}
 
-	logger := log.FromContext(ctx).WithField("gateway_id", id.GatewayID)
+	logger := log.FromContext(ctx).WithField("gateway_id", gtwID)
 	defer logger.WithError(err).Debug("Link with gateway closed")
 
 	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, g.config.NSTags, nil)
@@ -99,6 +102,9 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 		}
 	}
 
+	id := ttnpb.GatewayIdentifiers{
+		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
+	}
 	gw, err := is.GetGateway(ctx, &id)
 	if err != nil {
 		return errors.NewWithCause(err, "Could not get gateway information from identity server")
@@ -109,7 +115,7 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 		return errors.NewWithCausef(err, "Could not retrieve frequency plan %s", gw.FrequencyPlanID)
 	}
 
-	result, err := g.gateways.Subscribe(id, link, fp)
+	result, err := g.gateways.Subscribe(gtwID, link, fp)
 	if err != nil {
 		return err
 	}

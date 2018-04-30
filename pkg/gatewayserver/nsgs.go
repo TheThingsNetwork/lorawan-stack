@@ -19,12 +19,18 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/TheThingsNetwork/ttn/pkg/validate"
 	"github.com/gogo/protobuf/types"
 )
 
 // ScheduleDownlink on a gateway connected to this gateway server.
 func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*types.Empty, error) {
-	err := g.gateways.Send(down.TxMetadata.GatewayIdentifiers, &ttnpb.GatewayDown{DownlinkMessage: down})
+	gtwID := down.TxMetadata.GatewayIdentifiers.GetGatewayID()
+	if err := validate.ID(gtwID); err != nil {
+		return nil, err
+	}
+
+	err := g.gateways.Send(gtwID, &ttnpb.GatewayDown{DownlinkMessage: down})
 	if err != nil {
 		return nil, errors.NewWithCause(err, "Could not send downlink to gateway")
 	}

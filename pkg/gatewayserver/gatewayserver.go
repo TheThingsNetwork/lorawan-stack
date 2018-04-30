@@ -26,6 +26,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmetadata"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/hooks"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/TheThingsNetwork/ttn/pkg/validate"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
 )
@@ -40,7 +41,7 @@ type GatewayServer struct {
 
 	config Config
 
-	gateways pool.Pool
+	gateways *pool.Pool
 }
 
 type isConnector struct {
@@ -97,7 +98,12 @@ func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.G
 		return nil, ErrPermissionDenied.New(nil)
 	}
 
-	return gs.gateways.GetGatewayObservations(id)
+	gtwID := id.GetGatewayID()
+	if err := validate.ID(gtwID); err != nil {
+		return nil, err
+	}
+
+	return gs.gateways.GetGatewayObservations(id.GatewayID)
 }
 
 func checkAuthorization(ctx context.Context, is ttnpb.IsGatewayClient, right ttnpb.Right) error {

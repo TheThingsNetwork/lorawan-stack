@@ -23,26 +23,35 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-// ErrGatewayNotConnected is returned when a send operation failed because a gateway is not connected.
-var ErrGatewayNotConnected = &errors.ErrDescriptor{
-	MessageFormat:  "Gateway `{gateway_id}` not connected",
-	Code:           1,
-	Type:           errors.NotFound,
-	SafeAttributes: []string{"gateway_id"},
-}
+var (
+	// ErrGatewayNotConnected is returned when a send operation failed because a gateway is not connected.
+	ErrGatewayNotConnected = &errors.ErrDescriptor{
+		MessageFormat:  "Gateway `{gateway_id}` not connected",
+		Code:           1,
+		Type:           errors.NotFound,
+		SafeAttributes: []string{"gateway_id"},
+	}
+	// ErrGatewayIDNotSpecified is returned when a send operation failed because no gateway ID was specified.
+	ErrGatewayIDNotSpecified = &errors.ErrDescriptor{
+		MessageFormat: "No Gateway ID specified",
+		Code:          2,
+		Type:          errors.InvalidArgument,
+	}
+)
 
 func init() {
 	ErrGatewayNotConnected.Register()
+	ErrGatewayIDNotSpecified.Register()
 }
 
-func (p *pool) Send(gatewayInfo ttnpb.GatewayIdentifiers, downstream *ttnpb.GatewayDown) (err error) {
+func (p *Pool) Send(gatewayID string, downstream *ttnpb.GatewayDown) (err error) {
 	if downstream == nil || downstream.DownlinkMessage == nil {
 		return errors.New("No downlink")
 	}
 
-	gateway := p.store.Fetch(gatewayInfo)
+	gateway := p.store.Fetch(gatewayID)
 	if gateway == nil {
-		return ErrGatewayNotConnected.New(errors.Attributes{"gateway_id": gatewayInfo.GatewayID})
+		return ErrGatewayNotConnected.New(errors.Attributes{"gateway_id": gatewayID})
 	}
 
 	span := scheduling.Span{
@@ -67,7 +76,7 @@ func (p *pool) Send(gatewayInfo ttnpb.GatewayIdentifiers, downstream *ttnpb.Gate
 	}
 }
 
-func (p *pool) addDownstreamObservations(entry *gatewayStoreEntry, down *ttnpb.GatewayDown) {
+func (p *Pool) addDownstreamObservations(entry *gatewayStoreEntry, down *ttnpb.GatewayDown) {
 	entry.observationsLock.Lock()
 
 	currentTime := time.Now()

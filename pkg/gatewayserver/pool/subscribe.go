@@ -25,11 +25,11 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
-func (p *pool) Subscribe(gatewayInfo ttnpb.GatewayIdentifiers, link Subscription, fp ttnpb.FrequencyPlan) (chan *ttnpb.GatewayUp, error) {
+func (p *Pool) Subscribe(gatewayID string, link Subscription, fp ttnpb.FrequencyPlan) (chan *ttnpb.GatewayUp, error) {
 	c := connection{
-		Logger: p.logger.WithField("gateway_id", gatewayInfo.GatewayID),
+		Logger: p.logger.WithField("gateway_id", gatewayID),
 
-		GatewayInfo: gatewayInfo,
+		GatewayID: gatewayID,
 
 		Link:      link,
 		StreamErr: &atomicError{},
@@ -50,7 +50,7 @@ func (p *pool) Subscribe(gatewayInfo ttnpb.GatewayIdentifiers, link Subscription
 		observations:     ttnpb.GatewayObservations{},
 		observationsLock: sync.RWMutex{},
 	}
-	p.store.Store(gatewayInfo, entry)
+	p.store.Store(gatewayID, entry)
 
 	wg := &sync.WaitGroup{}
 	// Receiving on the stream
@@ -68,7 +68,7 @@ func (p *pool) Subscribe(gatewayInfo ttnpb.GatewayIdentifiers, link Subscription
 type connection struct {
 	Logger log.Interface
 
-	GatewayInfo ttnpb.GatewayIdentifiers
+	GatewayID string
 
 	Link      Subscription
 	StreamErr *atomicError
@@ -93,7 +93,7 @@ func (aerr *atomicError) Load() error {
 	return nil
 }
 
-func (p *pool) sendingRoutine(c connection, downstreamChannel chan *ttnpb.GatewayDown, wg *sync.WaitGroup) {
+func (p *Pool) sendingRoutine(c connection, downstreamChannel chan *ttnpb.GatewayDown, wg *sync.WaitGroup) {
 	wg.Done()
 
 	ctx := c.Link.Context()
@@ -108,7 +108,7 @@ func (p *pool) sendingRoutine(c connection, downstreamChannel chan *ttnpb.Gatewa
 			err := ctx.Err()
 			c.Logger.WithError(err).Warn("Link context done, closing sending routine")
 			c.StreamErr.Store(err)
-			p.store.Remove(c.GatewayInfo)
+			p.store.Remove(c.GatewayID)
 			return
 		case outgoingMessage, ok := <-downstreamChannel:
 			if !ok {
@@ -118,7 +118,7 @@ func (p *pool) sendingRoutine(c connection, downstreamChannel chan *ttnpb.Gatewa
 			err := c.Link.Send(outgoingMessage)
 			if err != nil {
 				c.StreamErr.Store(err)
-				p.store.Remove(c.GatewayInfo)
+				p.store.Remove(c.GatewayID)
 				return
 			}
 			c.Logger.Debug("Sent downlink message to the gateway")
@@ -126,7 +126,7 @@ func (p *pool) sendingRoutine(c connection, downstreamChannel chan *ttnpb.Gatewa
 	}
 }
 
-func (p *pool) receivingRoutine(c connection, entry *gatewayStoreEntry, upstreamChannel chan *ttnpb.GatewayUp, wg *sync.WaitGroup) {
+func (p *Pool) receivingRoutine(c connection, entry *gatewayStoreEntry, upstreamChannel chan *ttnpb.GatewayUp, wg *sync.WaitGroup) {
 	defer close(upstreamChannel)
 	wg.Done()
 
@@ -147,7 +147,7 @@ func (p *pool) receivingRoutine(c connection, entry *gatewayStoreEntry, upstream
 
 		select {
 		case <-ctx.Done():
-			p.store.Remove(c.GatewayInfo)
+			p.store.Remove(c.GatewayID)
 			err := ctx.Err()
 			c.Logger.WithError(err).Warn("Link context done, closing receiving routine")
 			c.StreamErr.Store(err)
@@ -157,7 +157,7 @@ func (p *pool) receivingRoutine(c connection, entry *gatewayStoreEntry, upstream
 	}
 }
 
-func (p *pool) addUpstreamObservations(entry *gatewayStoreEntry, up *ttnpb.GatewayUp) {
+func (p *Pool) addUpstreamObservations(entry *gatewayStoreEntry, up *ttnpb.GatewayUp) {
 	entry.observationsLock.Lock()
 	currentTime := time.Now()
 

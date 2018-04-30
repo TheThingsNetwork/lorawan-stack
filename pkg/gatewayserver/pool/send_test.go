@@ -32,30 +32,29 @@ func TestPoolDownlinks(t *testing.T) {
 	p := pool.NewPool(test.GetLogger(t), time.Millisecond)
 
 	gatewayID := "gateway"
-	gatewayIdentifiers := ttnpb.GatewayIdentifiers{GatewayID: gatewayID}
 	link := &dummyLink{
 		AcceptDownlink: true,
 
 		NextUplink: make(chan *ttnpb.GatewayUp),
 	}
-	_, err := p.Subscribe(gatewayIdentifiers, link, ttnpb.FrequencyPlan{BandID: band.EU_863_870})
+	_, err := p.Subscribe(gatewayID, link, ttnpb.FrequencyPlan{BandID: band.EU_863_870})
 	a.So(err, should.BeNil)
 
-	obs, err := p.GetGatewayObservations(&gatewayIdentifiers)
-	a.So(err, should.BeNil)
-	a.So(obs.DownlinkCount, should.Equal, 0)
-	a.So(obs.LastDownlinkReceivedAt, should.BeNil)
-
-	err = p.Send(ttnpb.GatewayIdentifiers{GatewayID: "gateway-nonexistant"}, &ttnpb.GatewayDown{DownlinkMessage: &ttnpb.DownlinkMessage{}})
-	a.So(err, should.NotBeNil)
-	obs, err = p.GetGatewayObservations(&gatewayIdentifiers)
+	obs, err := p.GetGatewayObservations(gatewayID)
 	a.So(err, should.BeNil)
 	a.So(obs.DownlinkCount, should.Equal, 0)
 	a.So(obs.LastDownlinkReceivedAt, should.BeNil)
 
-	err = p.Send(gatewayIdentifiers, &ttnpb.GatewayDown{})
+	err = p.Send("gateway-nonexistant", &ttnpb.GatewayDown{DownlinkMessage: &ttnpb.DownlinkMessage{}})
 	a.So(err, should.NotBeNil)
-	err = p.Send(gatewayIdentifiers, &ttnpb.GatewayDown{
+	obs, err = p.GetGatewayObservations(gatewayID)
+	a.So(err, should.BeNil)
+	a.So(obs.DownlinkCount, should.Equal, 0)
+	a.So(obs.LastDownlinkReceivedAt, should.BeNil)
+
+	err = p.Send(gatewayID, &ttnpb.GatewayDown{})
+	a.So(err, should.NotBeNil)
+	err = p.Send(gatewayID, &ttnpb.GatewayDown{
 		DownlinkMessage: &ttnpb.DownlinkMessage{
 			Settings: ttnpb.TxSettings{
 				Bandwidth:       125000,
@@ -68,7 +67,7 @@ func TestPoolDownlinks(t *testing.T) {
 		},
 	})
 	a.So(err, should.BeNil)
-	obs, err = p.GetGatewayObservations(&gatewayIdentifiers)
+	obs, err = p.GetGatewayObservations(gatewayID)
 	a.So(err, should.BeNil)
 	a.So(obs.DownlinkCount, should.Equal, 1)
 	a.So(obs.LastDownlinkReceivedAt.Unix(), should.AlmostEqual, time.Now().Unix(), 3)

@@ -70,7 +70,7 @@ func ExamplePool() {
 	p := pool.NewPool(log.Noop, time.Millisecond)
 
 	gatewayInfo := ttnpb.GatewayIdentifiers{GatewayID: "my-kerlink"}
-	upMessages, err := p.Subscribe(gatewayInfo, newPoolConnection(), ttnpb.FrequencyPlan{BandID: band.EU_863_870})
+	upMessages, err := p.Subscribe(gatewayInfo.GatewayID, newPoolConnection(), ttnpb.FrequencyPlan{BandID: band.EU_863_870})
 	if err != nil {
 		panic(err)
 	}
@@ -88,7 +88,7 @@ func ExamplePool() {
 
 	go func() {
 		time.Sleep(5 * time.Second)
-		p.Send(gatewayInfo, &ttnpb.GatewayDown{DownlinkMessage: downlink()})
+		p.Send(gatewayInfo.GatewayID, &ttnpb.GatewayDown{DownlinkMessage: downlink()})
 		fmt.Println("Downlink sent to gateway!")
 	}()
 }
