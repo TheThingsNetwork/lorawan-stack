@@ -44,15 +44,15 @@ type Config struct {
 // directly read from the file system.
 type Assets struct {
 	*component.Component
-	assetsFS http.FileSystem
-	config   Config
+	bundledFS http.FileSystem
+	config    Config
 }
 
 // New creates a new assets instance.
 func New(c *component.Component, config Config) *Assets {
 	assets := &Assets{
 		Component: c,
-		assetsFS:  assetFS(),
+		bundledFS: assetFS(),
 		config:    config,
 	}
 
@@ -85,7 +85,7 @@ func (a *Assets) FileSystem() http.FileSystem {
 		return http.Dir(a.config.Directory)
 	}
 
-	return a.assetsFS
+	return a.bundledFS
 }
 
 type data struct {
@@ -102,10 +102,20 @@ type data struct {
 // Render creates an echo.HandlerFunc that renders the selected template html file
 // from the assets filesystem.
 func (a *Assets) Render(name string, env interface{}) echo.HandlerFunc {
-	template := a.template(name)
+	// The template is loaded outside the handler.
+	template, err := a.template(name)
 
 	return func(c echo.Context) error {
-		t := a.fresh(name, template)
+		// Handle template error inside handler for method signature simplicity.
+		if err != nil {
+			return err
+		}
+
+		// So that is only reloaded if FS is reading from a directory.
+		t, err := a.fresh(name, template)
+		if err != nil {
+			return err
+		}
 
 		data := data{
 			Root:  a.config.CDN,
@@ -119,29 +129,29 @@ func (a *Assets) Render(name string, env interface{}) echo.HandlerFunc {
 }
 
 // template reads the template file from the filesystem and parses it.
-// Panics if anything goes wrong.
-func (a *Assets) template(name string) *template.Template {
+func (a *Assets) template(name string) (*template.Template, error) {
 	index, err := a.FileSystem().Open(name)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	html, err := ioutil.ReadAll(index)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	t, err := template.New(name).Parse(string(html))
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return t
+	return t, nil
 }
 
-func (a *Assets) fresh(name string, t *template.Template) *template.Template {
+// fresh reloads the template if the Assets filesystem is reading from a directory.
+func (a *Assets) fresh(name string, t *template.Template) (*template.Template, error) {
 	if a.config.Directory == "" {
-		return t
+		return t, nil
 	}
 
 	return a.template(name)

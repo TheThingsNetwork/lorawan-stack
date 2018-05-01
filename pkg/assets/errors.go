@@ -28,10 +28,16 @@ var (
 
 // Errors renders the errors with the specified template.
 func (a *Assets) Errors(name string, env interface{}) echo.MiddlewareFunc {
-	template := a.template(name)
+	// Template is loaded outside the handler method.
+	template, err := a.template(name)
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
+			// And error is handled inside for the sake of method signature simplicity.
+			if err != nil {
+				return err
+			}
+
 			err := next(c)
 
 			if err == nil {
@@ -48,7 +54,11 @@ func (a *Assets) Errors(name string, env interface{}) echo.MiddlewareFunc {
 
 			switch httputil.NegotiateContentType(c.Request(), offers, defaultType) {
 			case "text/html":
-				t := a.fresh(name, template)
+				t, err := a.fresh(name, template)
+				if err != nil {
+					return err
+				}
+
 				data := data{
 					Root:  a.config.CDN,
 					Env:   env,
