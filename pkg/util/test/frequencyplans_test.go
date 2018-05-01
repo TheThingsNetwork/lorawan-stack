@@ -17,10 +17,9 @@ package test_test
 import (
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/fetch"
-
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
+	"github.com/TheThingsNetwork/ttn/pkg/fetch"
 	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
 	"github.com/TheThingsNetwork/ttn/pkg/log"

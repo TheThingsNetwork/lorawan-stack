@@ -17,9 +17,8 @@ package band_test
 import (
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-
 	"github.com/TheThingsNetwork/ttn/pkg/band"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
