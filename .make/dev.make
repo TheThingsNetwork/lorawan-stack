@@ -85,7 +85,7 @@ dev.cockroach.drop: dev.docker.installed
 
 dev.cockroach.remove-container:
 	@if [[ `$(DOCKER_BINARY) container ls -a` =~ $(cockroach_docker_name) ]]; then \
-		$(info) "Removing old Cockroach container $(cockroach_docker_name)"; \
+		$(log) "Removing old Cockroach container $(cockroach_docker_name)"; \
 		$(DOCKER_BINARY) rm $(cockroach_docker_name) > /dev/null; \
 	fi
 
@@ -109,6 +109,6 @@ dev.redis.erase: dev.docker.installed
 
 dev.redis.remove-container:
 	@if [[ `$(DOCKER_BINARY) container ls -a` =~ $(redis_docker_name) ]]; then \
-		$(info) "Removing old Redis container $(redis_docker_name)"; \
+		$(log) "Removing old Redis container $(redis_docker_name)"; \
 		$(DOCKER_BINARY) rm $(redis_docker_name); \
 	fi
