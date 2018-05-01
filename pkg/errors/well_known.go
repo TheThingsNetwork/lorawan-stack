@@ -17,6 +17,7 @@ package errors
 import (
 	"context"
 	"io"
+	"os"
 )
 
 // ErrEOF is the descriptor for the io.EOF error.
@@ -43,10 +44,19 @@ var ErrContextDeadlineExceeded = &ErrDescriptor{
 	Type:          Timeout,
 }
 
+// ErrOsNotExist is the descriptor for the os.ErrNotExist error.
+var ErrOsNotExist = &ErrDescriptor{
+	MessageFormat: os.ErrNotExist.Error(),
+	Code:          Code(1),
+	Namespace:     "os",
+	Type:          NotFound,
+}
+
 func init() {
 	ErrContextCanceled.Register()
 	ErrContextDeadlineExceeded.Register()
 	ErrEOF.Register()
+	ErrOsNotExist.Register()
 }
 
 // From lifts an error to be an Error.
@@ -65,6 +75,8 @@ func From(in error) Error {
 		return ErrContextCanceled.New(nil)
 	case context.DeadlineExceeded:
 		return ErrContextDeadlineExceeded.New(nil)
+	case os.ErrNotExist:
+		return ErrOsNotExist.New(nil)
 	}
 
 	return normalize(&Impl{
