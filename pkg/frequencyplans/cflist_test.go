@@ -19,10 +19,9 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/band"
 	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
+	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
-
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
 func TestFrequenciesCFList(t *testing.T) {
