@@ -192,6 +192,8 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 			return err
 		}
 
+		now := time.Now().UTC()
+
 		newEmail := false
 		for _, path := range req.UpdateMask.Paths {
 			switch {
@@ -207,7 +209,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 				newEmail = strings.ToLower(user.UserIdentifiers.Email) != strings.ToLower(req.User.UserIdentifiers.Email)
 				if newEmail {
 					if settings.SkipValidation {
-						user.ValidatedAt = timeValue(time.Now())
+						user.ValidatedAt = timeValue(now)
 					} else {
 						user.ValidatedAt = timeValue(time.Time{})
 					}
@@ -221,6 +223,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 			}
 		}
 
+		user.UpdatedAt = now
 		err = tx.Users.Update(authorizationDataFromContext(ctx).UserIdentifiers(), user)
 		if err != nil {
 			return err
@@ -232,7 +235,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 
 		token = &store.ValidationToken{
 			ValidationToken: random.String(64),
-			CreatedAt:       time.Now(),
+			CreatedAt:       now,
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 
@@ -433,7 +436,9 @@ func (s *userService) ValidateUserEmail(ctx context.Context, req *ttnpb.Validate
 			return err
 		}
 
-		user.GetUser().ValidatedAt = timeValue(time.Now())
+		now := time.Now().UTC()
+		user.GetUser().ValidatedAt = timeValue(now)
+		user.GetUser().UpdatedAt = now
 
 		err = tx.Users.Update(user.GetUser().UserIdentifiers, user)
 		if err != nil {
@@ -475,7 +480,7 @@ func (s *userService) RequestUserEmailValidation(ctx context.Context, _ *pbtypes
 
 		token = store.ValidationToken{
 			ValidationToken: random.String(64),
-			CreatedAt:       time.Now(),
+			CreatedAt:       time.Now().UTC(),
 			ExpiresIn:       int32(settings.ValidationTokenTTL.Seconds()),
 		}
 

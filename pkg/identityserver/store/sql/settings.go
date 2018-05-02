@@ -96,7 +96,7 @@ func (s *SettingStore) set(q db.QueryContext, settings ttnpb.IdentityServerSetti
 				allowed_emails)
 			VALUES (
 				1,
-				current_timestamp(),
+				:updated_at,
 				:blacklisted_ids_converted,
 				:skip_validation,
 				:invitation_only,

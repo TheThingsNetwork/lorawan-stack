@@ -90,10 +90,14 @@ func (s *ApplicationStore) create(q db.QueryContext, application *ttnpb.Applicat
 		`INSERT
 			INTO applications (
 				application_id,
-				description)
+				description,
+				created_at,
+				updated_at)
 			VALUES (
 				:application_id,
-				:description)
+				:description,
+				:created_at,
+				:updated_at)
 			RETURNING id`,
 		application)
 
@@ -163,7 +167,7 @@ func (s *ApplicationStore) update(q db.QueryContext, appID uuid.UUID, app *ttnpb
 		`UPDATE applications
 			SET
 				description = :description,
-				updated_at = current_timestamp()
+				updated_at = :updated_at
 			WHERE id = :id
 			RETURNING application_id`,
 		application{

@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
@@ -66,9 +67,13 @@ func (s *applicationService) CreateApplication(ctx context.Context, req *ttnpb.C
 			})
 		}
 
+		now := time.Now().UTC()
+
 		err = tx.Applications.Create(&ttnpb.Application{
 			ApplicationIdentifiers: req.Application.ApplicationIdentifiers,
 			Description:            req.Application.Description,
+			CreatedAt:              now,
+			UpdatedAt:              now,
 		})
 		if err != nil {
 			return err
@@ -158,6 +163,8 @@ func (s *applicationService) UpdateApplication(ctx context.Context, req *ttnpb.U
 				})
 			}
 		}
+
+		application.UpdatedAt = time.Now().UTC()
 
 		return tx.Applications.Update(application)
 	})

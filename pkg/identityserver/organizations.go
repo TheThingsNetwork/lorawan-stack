@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
@@ -49,6 +50,8 @@ func (s *organizationService) CreateOrganization(ctx context.Context, req *ttnpb
 			})
 		}
 
+		now := time.Now().UTC()
+
 		err = tx.Organizations.Create(&ttnpb.Organization{
 			OrganizationIdentifiers: req.Organization.OrganizationIdentifiers,
 			Name:        req.Organization.Name,
@@ -56,6 +59,8 @@ func (s *organizationService) CreateOrganization(ctx context.Context, req *ttnpb
 			URL:         req.Organization.URL,
 			Location:    req.Organization.Location,
 			Email:       req.Organization.Email,
+			CreatedAt:   now,
+			UpdatedAt:   now,
 		})
 		if err != nil {
 			return err
@@ -143,6 +148,8 @@ func (s *organizationService) UpdateOrganization(ctx context.Context, req *ttnpb
 				})
 			}
 		}
+
+		organization.UpdatedAt = time.Now().UTC()
 
 		return tx.Organizations.Update(organization)
 	})

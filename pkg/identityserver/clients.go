@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
@@ -50,6 +51,8 @@ func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClien
 			})
 		}
 
+		now := time.Now().UTC()
+
 		return tx.Clients.Create(&ttnpb.Client{
 			ClientIdentifiers: req.Client.ClientIdentifiers,
 			Description:       req.Client.Description,
@@ -60,6 +63,8 @@ func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClien
 			OfficialLabeled:   false,
 			Grants:            []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
 			Rights:            req.Client.Rights,
+			CreatedAt:         now,
+			UpdatedAt:         now,
 		})
 	})
 
@@ -151,6 +156,8 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 				})
 			}
 		}
+
+		client.UpdatedAt = time.Now().UTC()
 
 		return tx.Clients.Update(client)
 	})

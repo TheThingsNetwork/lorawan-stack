@@ -104,7 +104,9 @@ func (s *OrganizationStore) create(q db.QueryContext, data organization) (err er
 				description,
 				url,
 				location,
-				email
+				email,
+				created_at,
+				updated_at
 			)
 			VALUES (
 				:id,
@@ -113,7 +115,9 @@ func (s *OrganizationStore) create(q db.QueryContext, data organization) (err er
 				:description,
 				:url,
 				:location,
-				lower(:email))
+				lower(:email),
+				:created_at,
+				:updated_at)
 			RETURNING id`,
 		data)
 	return
@@ -190,7 +194,7 @@ func (s *OrganizationStore) update(q db.QueryContext, orgID uuid.UUID, data *ttn
 				url = :url,
 				location = :location,
 				email = lower(:email),
-				updated_at = current_timestamp()
+				updated_at = :updated_at
 			WHERE id = :id
 			RETURNING organization_id`,
 		organization{

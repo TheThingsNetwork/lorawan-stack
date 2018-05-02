@@ -117,7 +117,9 @@ func (s *ClientStore) create(q db.QueryContext, userID uuid.UUID, data *ttnpb.Cl
 				state,
 				rights,
 				creator_id,
-				official_labeled)
+				official_labeled,
+				created_at,
+				updated_at)
 			VALUES (
 				:client_id,
 				:description,
@@ -127,7 +129,9 @@ func (s *ClientStore) create(q db.QueryContext, userID uuid.UUID, data *ttnpb.Cl
 				:state,
 				:rights_converted,
 				:creator_id,
-				:official_labeled)
+				:official_labeled,
+				:created_at,
+				:updated_at)
 			RETURNING id`,
 		cli)
 
@@ -407,7 +411,7 @@ func (s *ClientStore) update(q db.QueryContext, clientID uuid.UUID, data *ttnpb.
 				official_labeled = :official_labeled,
 				rights = :rights_converted,
 				creator_id = :creator_id,
-				updated_at = current_timestamp()
+				updated_at = :updated_at
 			WHERE id = :id`,
 		input)
 

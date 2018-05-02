@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
@@ -62,6 +63,8 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 			})
 		}
 
+		now := time.Now().UTC()
+
 		err = tx.Gateways.Create(&ttnpb.Gateway{
 			GatewayIdentifiers: req.Gateway.GatewayIdentifiers,
 			Description:        req.Gateway.Description,
@@ -74,6 +77,8 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 			ClusterAddress:     req.Gateway.ClusterAddress,
 			ContactAccountIDs:  req.Gateway.ContactAccountIDs,
 			DisableTxDelay:     req.Gateway.DisableTxDelay,
+			CreatedAt:          now,
+			UpdatedAt:          now,
 		})
 		if err != nil {
 			return err
@@ -194,6 +199,8 @@ func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGat
 				})
 			}
 		}
+
+		gtw.UpdatedAt = time.Now().UTC()
 
 		return tx.Gateways.Update(gtw)
 	})

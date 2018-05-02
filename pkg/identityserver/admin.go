@@ -85,6 +85,8 @@ func (s *adminService) UpdateSettings(ctx context.Context, req *ttnpb.UpdateSett
 			}
 		}
 
+		settings.UpdatedAt = time.Now().UTC()
+
 		return tx.Settings.Set(*settings)
 	})
 

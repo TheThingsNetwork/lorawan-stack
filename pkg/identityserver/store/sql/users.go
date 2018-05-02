@@ -244,7 +244,7 @@ func (s *UserStore) update(q db.QueryContext, userID uuid.UUID, data *ttnpb.User
 				password = :password,
 				admin = :admin,
 				state = :state,
-				updated_at = current_timestamp(),
+				updated_at = :updated_at,
 				password_updated_at = :password_updated_at,
 				require_password_update = :require_password_update
 			WHERE id = :id`,

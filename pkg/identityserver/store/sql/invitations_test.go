@@ -28,7 +28,7 @@ func TestInvitations(t *testing.T) {
 	a := assertions.New(t)
 	s := testStore(t, database)
 
-	now := time.Now()
+	now := time.Now().UTC()
 
 	invitation := store.InvitationData{
 		Token:     "123",
