@@ -90,16 +90,18 @@ func checkMIC(key types.AES128Key, rawPayload []byte) error {
 
 // HandleJoin is called by the network server to join a device
 func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (resp *ttnpb.JoinResponse, err error) {
+	ver := req.GetSelectedMacVersion()
+
 	supported := false
 	for _, v := range supportedMACVersions {
-		supported = v == req.SelectedMacVersion
-		if supported {
+		if v == ver {
+			supported = true
 			break
 		}
 	}
 	if !supported {
 		return nil, ErrUnsupportedLoRaWANMACVersion.New(errors.Attributes{
-			"version": req.SelectedMacVersion,
+			"version": ver,
 		})
 	}
 
@@ -109,7 +111,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	devAddr := *req.EndDeviceIdentifiers.DevAddr
 
 	rawPayload := req.GetRawPayload()
-	if req.Payload.Payload == nil {
+	if req.Payload.GetPayload() == nil {
 		if rawPayload == nil {
 			return nil, ErrMissingPayload.New(nil)
 		}
@@ -157,31 +159,33 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		return nil, err
 	}
 
-	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.NetworkServerAddress {
+	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.GetNetworkServerAddress() {
 		return nil, ErrAddressMismatch.New(errors.Attributes{
 			"component": "network server",
 		})
 	}
 
-	if dev.LoRaWANVersion != ttnpb.MAC_V1_0 {
-		match := false
-		for _, px := range js.euiPrefixes {
-			if px.Matches(pld.JoinEUI) {
-				match = true
-			}
+	match := false
+	for _, p := range js.euiPrefixes {
+		if p.Matches(pld.JoinEUI) {
+			match = true
+			break
 		}
-		if !match {
-			// TODO determine the cluster containing the device
-			// https://github.com/TheThingsIndustries/ttn/issues/244
-			return nil, ErrForwardJoinRequest.NewWithCause(nil, deviceregistry.ErrDeviceNotFound.New(nil))
-		}
+	}
+	switch {
+	case !match && dev.GetLoRaWANVersion() == ttnpb.MAC_V1_0:
+		return nil, ErrUnknownAppEUI.New(nil)
+	case !match:
+		// TODO determine the cluster containing the device
+		// https://github.com/TheThingsIndustries/ttn/issues/244
+		return nil, ErrForwardJoinRequest.NewWithCause(nil, deviceregistry.ErrDeviceNotFound.New(nil))
 	}
 
 	// Registered version is lower than selected.
-	if dev.LoRaWANVersion.Compare(req.SelectedMacVersion) == -1 {
+	if dev.LoRaWANVersion.Compare(ver) == -1 {
 		return nil, ErrMACVersionMismatch.New(errors.Attributes{
-			"registered": dev.LoRaWANVersion,
-			"selected":   req.SelectedMacVersion,
+			"registered": dev.GetLoRaWANVersion(),
+			"selected":   ver,
 		})
 	}
 
@@ -195,7 +199,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	appKey := *ke.Key
 
 	var b []byte
-	if req.CFList == nil {
+	if req.GetCFList() == nil {
 		b = make([]byte, 0, 17)
 	} else {
 		b = make([]byte, 0, 33)
@@ -210,17 +214,17 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 
 	var jn types.JoinNonce
-	bb := make([]byte, 4)
-	binary.LittleEndian.PutUint32(bb, dev.NextJoinNonce)
-	copy(jn[:], bb)
+	nb := make([]byte, 4)
+	binary.LittleEndian.PutUint32(nb, dev.NextJoinNonce)
+	copy(jn[:], nb)
 
 	b, err = (&ttnpb.JoinAcceptPayload{
 		NetID:      req.NetID,
 		JoinNonce:  jn,
-		CFList:     req.CFList,
+		CFList:     req.GetCFList(),
 		DevAddr:    devAddr,
-		DLSettings: req.DownlinkSettings,
-		RxDelay:    req.RxDelay,
+		DLSettings: req.GetDownlinkSettings(),
+		RxDelay:    req.GetRxDelay(),
 	}).AppendLoRaWAN(b)
 	if err != nil {
 		panic(errors.NewWithCause(err, "Failed to encode join accept MAC payload"))
@@ -228,7 +232,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 	dn := binary.LittleEndian.Uint16(pld.DevNonce[:])
 	if !dev.GetDisableJoinNonceCheck() {
-		switch req.SelectedMacVersion {
+		switch ver {
 		case ttnpb.MAC_V1_1:
 			if uint32(dn) < dev.NextDevNonce {
 				return nil, ErrDevNonceTooSmall.New(nil)
@@ -248,7 +252,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		}
 	}
 
-	switch req.SelectedMacVersion {
+	switch ver {
 	case ttnpb.MAC_V1_1:
 		ke := dev.GetRootKeys().GetNwkKey()
 		if ke == nil {
@@ -345,7 +349,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 	if req.DevEUI.IsZero() {
 		return nil, ErrMissingDevEUI.New(nil)
 	}
-	if req.SessionKeyID == "" {
+	if req.GetSessionKeyID() == "" {
 		return nil, ErrMissingSessionKeyID.New(nil)
 	}
 
@@ -388,7 +392,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 	if req.DevEUI.IsZero() {
 		return nil, ErrMissingDevEUI.New(nil)
 	}
-	if req.SessionKeyID == "" {
+	if req.GetSessionKeyID() == "" {
 		return nil, ErrMissingSessionKeyID.New(nil)
 	}
 
