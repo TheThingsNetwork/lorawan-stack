@@ -16,6 +16,7 @@ package commands
 
 import (
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/pkg/assets"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
@@ -30,6 +31,8 @@ var (
 			if err != nil {
 				return errors.NewWithCause(err, "Could not initialize base component")
 			}
+
+			config.IS.OAuth.Assets = assets.New(c, config.Assets)
 
 			is, err := identityserver.New(c, config.IS)
 			if err != nil {

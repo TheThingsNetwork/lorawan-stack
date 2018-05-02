@@ -19,6 +19,7 @@ import (
 	"testing"
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/assets"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -52,10 +53,16 @@ var (
 	testIS *IdentityServer
 )
 
+// NOTE: Identity Server tests must run in this same directory as it is relying
+// on the relative path to access the webui folder to create the assets instance.
 func getIS(t testing.TB) *IdentityServer {
 	if testIS == nil {
 		logger := test.GetLogger(t)
 		comp := component.MustNew(logger, &component.Config{})
+
+		testConfig.OAuth.Assets = assets.New(comp, assets.Config{
+			Directory: "../webui",
+		})
 
 		is, err := New(comp, testConfig)
 		if err != nil {

@@ -20,6 +20,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/oauth"
 )
 
 // DefaultIdentityServerConfig is the default configuration for the IdentityServer.

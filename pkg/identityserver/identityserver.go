@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email/mock"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email/sendgrid"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/oauth"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -58,6 +59,9 @@ type Config struct {
 	// Hostname denotes the Identity Server hostname. It is used as issuer when
 	// generating access tokens and API keys.
 	Hostname string `name:"-"`
+
+	// OAuth is the config for the oauth provider.
+	OAuth oauth.Config `name:"oauth"`
 }
 
 // Specializers contains the IDs of the specializers that will be used in
@@ -102,6 +106,8 @@ type IdentityServer struct {
 	*clientService
 	*adminService
 	*organizationService
+
+	oauth *oauth.Server
 }
 
 // New returns a new IdentityServer.
@@ -168,6 +174,17 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.IsGateway", authorizationDataHookName, is.authorizationDataUnaryHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.IsClient", authorizationDataHookName, is.authorizationDataUnaryHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.IsOrganization", authorizationDataHookName, is.authorizationDataUnaryHook())
+
+	config.OAuth.Store = store
+	config.OAuth.Specializers = oauth.SpecializersConfig{
+		User:   is.specializers.User,
+		Client: is.specializers.Client,
+	}
+
+	is.oauth, err = oauth.New(c, config.OAuth)
+	if err != nil {
+		return nil, errors.NewWithCause(err, "Could not create the OAuth server")
+	}
 
 	c.RegisterGRPC(is)
 
