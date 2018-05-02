@@ -151,17 +151,11 @@ message ApplicationUplink {
   uint32 f_cnt = 2;
   bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
   repeated RxMetadata rx_metadata = 4;
-
-  // Join Server issued identifier for the session keys.
-  string session_key_id = 5 [(gogoproto.customname) = "SessionKeyID"];
 }
 
 message ApplicationJoinAccept {
   // The (encrypted) Application Session Key.
   KeyEnvelope app_s_key = 1;
-
-  // Join Server issued identifier for the session keys.
-  string session_key_id = 2 [(gogoproto.customname) = "SessionKeyID"];
 }
 
 message ApplicationDownlink {

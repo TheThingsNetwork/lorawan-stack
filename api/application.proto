@@ -54,9 +54,12 @@ message Application {
 message ApplicationUp {
   EndDeviceIdentifiers end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
+  // Join Server issued identifier for the session keys.
+  string session_key_id = 2 [(gogoproto.customname) = "SessionKeyID"];
+
   oneof up {
-    ApplicationUplink uplink_message = 2;
-    ApplicationJoinAccept join_accept = 3;
+    ApplicationUplink uplink_message = 3;
+    ApplicationJoinAccept join_accept = 4;
     // Downlink queued
     // Downlink sent
     // Downlink acked

@@ -537,12 +537,12 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	ses := dev.GetSession()
 	return cl.Send(&ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+		SessionKeyID:         ses.GetSessionKeyID(),
 		Up: &ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
-			FCnt:         ses.GetNextFCntUp() - 1,
-			FPort:        mac.GetFPort(),
-			FRMPayload:   mac.GetFRMPayload(),
-			RxMetadata:   msg.GetRxMetadata(),
-			SessionKeyID: ses.GetSessionKeyID(),
+			FCnt:       ses.GetNextFCntUp() - 1,
+			FPort:      mac.GetFPort(),
+			FRMPayload: mac.GetFRMPayload(),
+			RxMetadata: msg.GetRxMetadata(),
 		}},
 	})
 }
@@ -657,9 +657,9 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 
 			err := cl.Send(&ttnpb.ApplicationUp{
 				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+				SessionKeyID:         dev.GetSession().GetSessionKeyID(),
 				Up: &ttnpb.ApplicationUp_JoinAccept{&ttnpb.ApplicationJoinAccept{
-					SessionKeyID: dev.GetSession().GetSessionKeyID(),
-					AppSKey:      resp.SessionKeys.GetAppSKey(),
+					AppSKey: resp.SessionKeys.GetAppSKey(),
 				}},
 			})
 			if err != nil {

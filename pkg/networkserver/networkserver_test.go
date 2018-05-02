@@ -976,12 +976,12 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 								EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+								SessionKeyID:         dev.GetSession().SessionKeys.GetSessionKeyID(),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
-									FCnt:         tc.NextNextFCntUp - 1,
-									FPort:        tc.UplinkMessage.Payload.GetMACPayload().GetFPort(),
-									FRMPayload:   tc.UplinkMessage.Payload.GetMACPayload().GetFRMPayload(),
-									RxMetadata:   up.GetUplinkMessage().GetRxMetadata(),
-									SessionKeyID: dev.GetSession().SessionKeys.GetSessionKeyID(),
+									FCnt:       tc.NextNextFCntUp - 1,
+									FPort:      tc.UplinkMessage.Payload.GetMACPayload().GetFPort(),
+									FRMPayload: tc.UplinkMessage.Payload.GetMACPayload().GetFRMPayload(),
+									RxMetadata: up.GetUplinkMessage().GetRxMetadata(),
 								}},
 							})
 
@@ -1105,12 +1105,12 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					case up := <-asSendCh:
 						a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+							SessionKeyID:         dev.GetSession().SessionKeys.GetSessionKeyID(),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{&ttnpb.ApplicationUplink{
-								FCnt:         tc.NextNextFCntUp - 1,
-								FPort:        msg.Payload.GetMACPayload().GetFPort(),
-								FRMPayload:   msg.Payload.GetMACPayload().GetFRMPayload(),
-								RxMetadata:   msg.GetRxMetadata(),
-								SessionKeyID: dev.GetSession().SessionKeys.GetSessionKeyID(),
+								FCnt:       tc.NextNextFCntUp - 1,
+								FPort:      msg.Payload.GetMACPayload().GetFPort(),
+								FRMPayload: msg.Payload.GetMACPayload().GetFRMPayload(),
+								RxMetadata: msg.GetRxMetadata(),
 							}},
 						})
 
@@ -1424,9 +1424,9 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 									JoinEUI:                tc.Device.EndDeviceIdentifiers.JoinEUI,
 									ApplicationIdentifiers: tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers,
 								},
+								SessionKeyID: test.Must(dev.Load()).(*ttnpb.EndDevice).GetSession().SessionKeys.GetSessionKeyID(),
 								Up: &ttnpb.ApplicationUp_JoinAccept{&ttnpb.ApplicationJoinAccept{
-									SessionKeyID: test.Must(dev.Load()).(*ttnpb.EndDevice).GetSession().SessionKeys.GetSessionKeyID(),
-									AppSKey:      resp.SessionKeys.GetAppSKey(),
+									AppSKey: resp.SessionKeys.GetAppSKey(),
 								}},
 							})
 
