@@ -104,9 +104,7 @@ func init() {
 		ImplementsCFList: true,
 		CFListType:       ttnpb.CFListType_FREQUENCIES,
 
-		Rx1Channel: func(idx uint32) (uint32, error) {
-			return idx % 8, nil
-		},
+		Rx1Channel: channelIndexModulo(8),
 		Rx1DataRate: func(idx, offset uint32, _ bool) (uint32, error) {
 			if idx > 6 {
 				return 0, ErrLoRaWANParametersInvalid.NewWithCause(nil, errors.New("Data rate index must be lower or equal to 6"))

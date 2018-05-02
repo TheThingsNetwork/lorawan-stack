@@ -49,4 +49,5 @@ func init() {
 	ErrBandNotFound.Register()
 	ErrUnsupportedLoRaWANRegionalParameters.Register()
 	ErrUnknownLoRaWANRegionalParameters.Register()
+	ErrLoRaWANParametersInvalid.Register()
 }

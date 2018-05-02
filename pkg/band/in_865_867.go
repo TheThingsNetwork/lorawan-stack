@@ -80,7 +80,7 @@ func init() {
 			return offset
 		}(),
 
-		Rx1Channel: rx1ChannelIdentity,
+		Rx1Channel: channelIndexIdentity,
 		Rx1DataRate: func(idx, offset uint32, _ bool) (uint32, error) {
 			if offset > 5 {
 				return 0, ErrLoRaWANParametersInvalid.NewWithCause(nil, errors.New("Offset must be lower or equal to 5"))

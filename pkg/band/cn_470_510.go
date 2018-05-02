@@ -85,9 +85,7 @@ func init() {
 			0, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},
 
-		Rx1Channel: func(idx uint32) (uint32, error) {
-			return idx % 48, nil
-		},
+		Rx1Channel: channelIndexModulo(48),
 		Rx1DataRate: func(idx, offset uint32, _ bool) (uint32, error) {
 			if idx > 5 {
 				return 0, ErrLoRaWANParametersInvalid.NewWithCause(nil, errors.New("Data rate index must be lower or equal to 5"))

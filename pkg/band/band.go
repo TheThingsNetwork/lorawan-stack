@@ -85,8 +85,19 @@ type ID = string
 
 type versionSwap = func(b Band) Band
 
-func bandIdentity(b Band) Band                      { return b }
-func rx1ChannelIdentity(idx uint32) (uint32, error) { return idx, nil }
+func bandIdentity(b Band) Band {
+	return b
+}
+
+func channelIndexIdentity(idx uint32) (uint32, error) {
+	return idx, nil
+}
+
+func channelIndexModulo(n uint32) func(uint32) (uint32, error) {
+	return func(idx uint32) (uint32, error) {
+		return idx % n, nil
+	}
+}
 
 // Beacon parameters of a specific band.
 type Beacon struct {
