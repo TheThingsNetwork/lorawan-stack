@@ -17,6 +17,7 @@ package redis_test
 import (
 	"os"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/TheThingsNetwork/ttn/pkg/config"
@@ -35,9 +36,9 @@ var (
 func redisConfig() config.Redis {
 	var err error
 	config := config.Redis{
-		Address:  "localhost:6379",
-		Database: 1,
-		Prefix:   "test",
+		Address:   "localhost:6379",
+		Database:  1,
+		Namespace: []string{"test"},
 	}
 	if address := os.Getenv("REDIS_ADDRESS"); address != "" {
 		config.Address = address
@@ -49,7 +50,7 @@ func redisConfig() config.Redis {
 		}
 	}
 	if prefix := os.Getenv("REDIS_PREFIX"); prefix != "" {
-		config.Prefix = prefix
+		config.Namespace = []string{prefix}
 	}
 	return config
 }
@@ -58,10 +59,11 @@ func newStore() *Store {
 	conf := &Config{
 		Redis:     redisConfig(),
 		IndexKeys: storetest.IndexedFields,
+		Namespace: []string{"test"},
 	}
 
 	s := New(conf)
-	keys, err := s.Redis.Keys(conf.Prefix + Separator + "*").Result()
+	keys, err := s.Redis.Keys(strings.Join(append(conf.Redis.Namespace, conf.Namespace...), Separator) + Separator + "*").Result()
 	if err != nil {
 		panic(err)
 	}

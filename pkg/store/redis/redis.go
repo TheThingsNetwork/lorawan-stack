@@ -45,12 +45,14 @@ type Store struct {
 	Redis     *redis.Client
 	config    *Config
 	entropy   io.Reader
+	namespace string
 	indexKeys map[string]struct{}
 }
 
 // Config represents Redis configuration.
 type Config struct {
 	config.Redis
+	Namespace []string
 	IndexKeys []string
 }
 
@@ -67,12 +69,13 @@ func New(conf *Config) *Store {
 		}),
 		config:    conf,
 		entropy:   rand.Reader,
+		namespace: strings.Join(append(conf.Redis.Namespace, conf.Namespace...), Separator),
 		indexKeys: indexKeys,
 	}
 }
 
 func (s *Store) key(str ...string) string {
-	return s.config.Prefix + Separator + strings.Join(str, Separator)
+	return s.namespace + Separator + strings.Join(str, Separator)
 }
 
 func (s *Store) newID() fmt.Stringer {

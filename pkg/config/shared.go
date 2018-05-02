@@ -119,9 +119,9 @@ type Identity struct {
 
 // Redis represents Redis configuration.
 type Redis struct {
-	Address  string `name:"address" description:"Address of the Redis server"`
-	Database int    `name:"database" description:"Redis database to use"`
-	Prefix   string `name:"prefix" description:"Prefix for Redis keys"`
+	Address   string   `name:"address" description:"Address of the Redis server"`
+	Database  int      `name:"database" description:"Redis database to use"`
+	Namespace []string `name:"namespace" description:"Namespace for Redis keys"`
 }
 
 // RemoteProviderConfig represents remote config provider configuration(see Viper documentation).
