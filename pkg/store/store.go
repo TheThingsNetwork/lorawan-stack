@@ -100,10 +100,14 @@ type ByteMapStore interface {
 // CreateList creates a new list, containing bs.
 // FindList returns list identified by id.
 // Append appends bs to list identified by id.
+// Pop returns the value stored at last index of list identified by id and removes it from the list.
+// Len returns the length of the list identified by id.
 type ByteListStore interface {
 	CreateList(bs ...[]byte) (PrimaryKey, error)
 	FindList(id PrimaryKey) ([][]byte, error)
 	Append(id PrimaryKey, bs ...[]byte) error
+	Pop(id PrimaryKey) ([]byte, error)
+	Len(id PrimaryKey) (int64, error)
 	Deleter
 }
 

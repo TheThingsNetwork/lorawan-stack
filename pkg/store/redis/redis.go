@@ -32,13 +32,21 @@ import (
 	redis "gopkg.in/redis.v5"
 )
 
-const recursionLimit = 10
+const (
+	recursionLimit = 10
 
-// SeparatorByte is character used to separate the keys.
-const SeparatorByte = ':'
+	// SeparatorByte is character used to separate the keys.
+	SeparatorByte = ':'
 
-// Separator is SeparatorByte converted to a string.
-const Separator = string(SeparatorByte)
+	// Separator is SeparatorByte converted to a string.
+	Separator = string(SeparatorByte)
+)
+
+var (
+	_ store.ByteMapStore  = &Store{}
+	_ store.ByteListStore = &Store{}
+	_ store.ByteSetStore  = &Store{}
+)
 
 // Store represents a Redis store.Interface implemntation
 type Store struct {
@@ -496,5 +504,21 @@ func (s *Store) FindList(id store.PrimaryKey) (bs [][]byte, err error) {
 	if id == nil {
 		return nil, store.ErrNilKey.New(nil)
 	}
-	return bs, s.Redis.LRange(s.key(id.String()), 0, -1).ScanSlice(bs)
+	return bs, s.Redis.LRange(s.key(id.String()), 0, -1).ScanSlice(&bs)
+}
+
+// Len returns length of the list identified by id.
+func (s *Store) Len(id store.PrimaryKey) (int64, error) {
+	if id == nil {
+		return 0, store.ErrNilKey.New(nil)
+	}
+	return s.Redis.LLen(s.key(id.String())).Result()
+}
+
+// Pop returns the value stored at last index of list identified by id and removes it from the list.
+func (s *Store) Pop(id store.PrimaryKey) (bs []byte, err error) {
+	if id == nil {
+		return nil, store.ErrNilKey.New(nil)
+	}
+	return s.Redis.LPop(s.key(id.String())).Bytes()
 }
