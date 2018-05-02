@@ -15,8 +15,8 @@
 package ttnpb
 
 import (
-	context "context"
-	fmt "fmt"
+	"context"
+	"fmt"
 )
 
 // UniqueIdentifier provides functionality to get the unique identifier.

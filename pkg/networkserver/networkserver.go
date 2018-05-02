@@ -194,7 +194,9 @@ func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, strea
 		AsNs_LinkApplicationServer: stream,
 		closeCh:                    make(chan struct{}),
 	}
-	appID := id.GetApplicationID()
+
+	ctx := stream.Context()
+	appID := id.UniqueID(ctx)
 
 	ns.applicationServersMu.Lock()
 	cl, ok := ns.applicationServers[appID]
@@ -207,7 +209,6 @@ func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, strea
 	}
 	ns.applicationServersMu.Unlock()
 
-	ctx := stream.Context()
 	select {
 	case <-ctx.Done():
 		err := ctx.Err()
