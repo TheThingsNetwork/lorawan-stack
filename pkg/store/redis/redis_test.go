@@ -23,6 +23,12 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 )
 
+var (
+	_ store.ByteMapStore  = &Store{}
+	_ store.ByteListStore = &Store{}
+	_ store.ByteSetStore  = &Store{}
+)
+
 func newStore() *Store {
 	conf := &Config{
 		Redis:     test.RedisConfig(),

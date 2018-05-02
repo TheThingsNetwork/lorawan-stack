@@ -42,12 +42,6 @@ const (
 	Separator = string(SeparatorByte)
 )
 
-var (
-	_ store.ByteMapStore  = &Store{}
-	_ store.ByteListStore = &Store{}
-	_ store.ByteSetStore  = &Store{}
-)
-
 // Store represents a Redis store.Interface implemntation
 type Store struct {
 	Redis     *redis.Client

@@ -29,8 +29,6 @@ import (
 	"github.com/oklog/ulid"
 )
 
-var _ store.TypedMapStore = &MapStore{}
-
 type MapStore struct {
 	mu      sync.RWMutex
 	data    map[store.PrimaryKey]map[string]interface{}

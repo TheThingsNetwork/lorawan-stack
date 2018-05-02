@@ -21,6 +21,8 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/store/storetest"
 )
 
+var _ store.TypedMapStore = &MapStore{}
+
 func TestMapStore(t *testing.T) {
 	storetest.TestTypedMapStore(t, func() store.TypedMapStore {
 		return New()
