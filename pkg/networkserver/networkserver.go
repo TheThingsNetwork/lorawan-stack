@@ -196,11 +196,11 @@ func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, strea
 	}
 
 	ctx := stream.Context()
-	appID := id.UniqueID(ctx)
+	uid := id.UniqueID(ctx)
 
 	ns.applicationServersMu.Lock()
-	cl, ok := ns.applicationServers[appID]
-	ns.applicationServers[appID] = ws
+	cl, ok := ns.applicationServers[uid]
+	ns.applicationServers[uid] = ws
 	if ok {
 		if err := cl.Close(); err != nil {
 			ns.applicationServersMu.Unlock()
@@ -213,9 +213,9 @@ func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, strea
 	case <-ctx.Done():
 		err := ctx.Err()
 		ns.applicationServersMu.Lock()
-		cl, ok := ns.applicationServers[appID]
+		cl, ok := ns.applicationServers[uid]
 		if ok && cl == ws {
-			delete(ns.applicationServers, appID)
+			delete(ns.applicationServers, uid)
 		}
 		ns.applicationServersMu.Unlock()
 		return err
@@ -520,13 +520,13 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		logger.WithError(err).Error("Failed to update device")
 		return err
 	}
-	appID := dev.EndDeviceIdentifiers.ApplicationIdentifiers.UniqueID(ctx)
-	if appID == "" {
+	uid := dev.EndDeviceIdentifiers.ApplicationIdentifiers.UniqueID(ctx)
+	if uid == "" {
 		return ErrCorruptRegistry.NewWithCause(nil, ErrMissingApplicationID.New(nil))
 	}
 
 	ns.applicationServersMu.RLock()
-	cl, ok := ns.applicationServers[appID]
+	cl, ok := ns.applicationServers[uid]
 	ns.applicationServersMu.RUnlock()
 
 	if !ok {
@@ -641,14 +641,14 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 			return err
 		}
 
-		appID := dev.EndDeviceIdentifiers.ApplicationIdentifiers.UniqueID(ctx)
-		if appID == "" {
+		uid := dev.EndDeviceIdentifiers.ApplicationIdentifiers.UniqueID(ctx)
+		if uid == "" {
 			return ErrCorruptRegistry.NewWithCause(nil, ErrMissingApplicationID.New(nil))
 		}
 
 		go func() {
 			ns.applicationServersMu.RLock()
-			cl, ok := ns.applicationServers[appID]
+			cl, ok := ns.applicationServers[uid]
 			ns.applicationServersMu.RUnlock()
 
 			if !ok {
@@ -663,7 +663,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 				}},
 			})
 			if err != nil {
-				logger.WithField("application_id", appID).WithError(err).Errorf("Failed to send Join Accept to AS")
+				logger.WithField("application_id", dev.EndDeviceIdentifiers.GetApplicationID()).WithError(err).Errorf("Failed to send Join Accept to AS")
 			}
 		}()
 		return nil

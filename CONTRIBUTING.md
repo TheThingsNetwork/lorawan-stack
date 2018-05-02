@@ -146,6 +146,7 @@ We follow the [official go guidelines](https://github.com/golang/go/wiki/CodeRev
 | server               | srv     | github.com/TheThingsNetwork/ttn/pkg/network-server.Server     |
 | EUI                  | eui     | github.com/TheThingsNetwork/ttn/pkg/types.DevEUI              |
 | ID                   | id      | string                                                        |
+| unique ID            | uid     | string                                                        |
 | counter              | cnt     | int                                                           |
 | gateway              | gtw     |                                                               |
 | application          | app     |                                                               |
