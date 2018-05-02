@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package mapstore provides an example implementation of store.TypedStore, which is used for testing.
+// Package mapstore provides an example implementation of store.TypedMapStore, which is used for testing.
 package mapstore
 
 import (
@@ -29,7 +29,7 @@ import (
 )
 
 // New returns a new MapStore
-func New() store.TypedStore {
+func New() store.TypedMapStore {
 	return &mapStore{
 		entropy: rand.New(rand.NewSource(time.Now().UnixNano())),
 		data:    make(map[store.PrimaryKey]map[string]interface{}),

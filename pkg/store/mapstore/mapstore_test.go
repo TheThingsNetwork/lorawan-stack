@@ -22,7 +22,7 @@ import (
 )
 
 func TestMapStore(t *testing.T) {
-	storetest.TestTypedStore(t, func() store.TypedStore {
+	storetest.TestTypedMapStore(t, func() store.TypedMapStore {
 		return New()
 	})
 }

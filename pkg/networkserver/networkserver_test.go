@@ -74,7 +74,7 @@ func metadataLdiff(l pretty.Logfer, xs, ys []*ttnpb.RxMetadata) {
 
 func TestDownlinkQueueReplace(t *testing.T) {
 	a := assertions.New(t)
-	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 	ns := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
@@ -129,7 +129,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 func TestDownlinkQueuePush(t *testing.T) {
 	a := assertions.New(t)
-	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 	ns := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
@@ -186,7 +186,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 func TestDownlinkQueueList(t *testing.T) {
 	a := assertions.New(t)
-	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 	ns := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
@@ -230,7 +230,7 @@ func TestDownlinkQueueList(t *testing.T) {
 
 func TestDownlinkQueueClear(t *testing.T) {
 	a := assertions.New(t)
-	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 	ns := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
@@ -378,7 +378,7 @@ func (s *mockAsNsLinkApplicationStream) Send(msg *ttnpb.ApplicationUp) error {
 
 func TestLinkApplication(t *testing.T) {
 	a := assertions.New(t)
-	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 	ns := test.Must(New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
@@ -432,7 +432,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
-		reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+		reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 		ns := test.Must(New(
 			component.MustNew(test.GetLogger(t), conf),
 			&Config{
@@ -859,7 +859,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			t.Run(tc.Name, func(t *testing.T) {
 				a := assertions.New(t)
 
-				reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+				reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 
 				populateSessionKeys := func(s *ttnpb.Session) {
 					for s.SessionKeys.FNwkSIntKey == nil ||
@@ -1140,7 +1140,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
-		reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+		reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 		ns := test.Must(New(
 			component.MustNew(test.GetLogger(t), conf),
 			&Config{
@@ -1243,7 +1243,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 			t.Run(tc.Name, func(t *testing.T) {
 				a := assertions.New(t)
 
-				reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+				reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 
 				// Fill Registry with devices
 				for i := 0; i < DeviceCount; i++ {
@@ -1538,7 +1538,7 @@ func TestHandleUplink(t *testing.T) {
 		},
 	}}
 
-	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 	ns := test.Must(New(
 		component.MustNew(test.GetLogger(t), conf),
 		&Config{

@@ -62,7 +62,7 @@ func mustEncryptJoinAccept(key types.AES128Key, pld []byte) []byte {
 func TestHandleJoin(t *testing.T) {
 	a := assertions.New(t)
 
-	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 	js := New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
@@ -891,7 +891,7 @@ func TestHandleJoin(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+			reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 			js := New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
@@ -959,7 +959,7 @@ func TestHandleJoin(t *testing.T) {
 func TestGetAppSKey(t *testing.T) {
 	a := assertions.New(t)
 
-	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 	js := New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
@@ -1134,7 +1134,7 @@ func TestGetAppSKey(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+			reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 			js := New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
@@ -1171,7 +1171,7 @@ func TestGetAppSKey(t *testing.T) {
 func TestGetNwkSKeys(t *testing.T) {
 	a := assertions.New(t)
 
-	reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 	js := New(
 		component.MustNew(test.GetLogger(t), &component.Config{}),
 		&Config{
@@ -1378,7 +1378,7 @@ func TestGetNwkSKeys(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			reg := deviceregistry.New(store.NewTypedStoreClient(mapstore.New()))
+			reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 			js := New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{

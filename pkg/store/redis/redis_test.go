@@ -43,8 +43,8 @@ func newStore() *Store {
 	return s
 }
 
-func TestByteStore(t *testing.T) {
-	storetest.TestByteStore(t, func() store.ByteStore { return newStore() })
+func TestByteMapStore(t *testing.T) {
+	storetest.TestByteMapStore(t, func() store.ByteMapStore { return newStore() })
 }
 
 func TestByteSetStore(t *testing.T) {

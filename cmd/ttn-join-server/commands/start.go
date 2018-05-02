@@ -35,7 +35,7 @@ var (
 			}
 
 			redis := redis.New(&redis.Config{Redis: config.Redis})
-			reg := deviceregistry.New(store.NewByteStoreClient(redis))
+			reg := deviceregistry.New(store.NewByteMapStoreClient(redis))
 			config.JS.Registry = reg
 
 			js := joinserver.New(c, &config.JS)

@@ -49,13 +49,13 @@ type Client interface {
 	Delete(id PrimaryKey) error
 }
 
-type typedStoreClient struct {
-	TypedStore
+type typedMapStoreClient struct {
+	TypedMapStore
 }
 
-// NewTypedStoreClient returns a new instance of the Client, which uses TypedStore as the storing backend.
-func NewTypedStoreClient(s TypedStore) Client {
-	return &typedStoreClient{s}
+// NewTypedMapStoreClient returns a new instance of the Client, which uses TypedMapStore as the storing backend.
+func NewTypedMapStoreClient(s TypedMapStore) Client {
+	return &typedMapStoreClient{s}
 }
 
 // filterFields returns a map, containing only values in m, which correspond to fieldpaths specified
@@ -78,29 +78,29 @@ func filterFields(m map[string]interface{}, fields ...string) map[string]interfa
 	return out
 }
 
-func (cl *typedStoreClient) Create(v interface{}, fields ...string) (PrimaryKey, error) {
+func (cl *typedMapStoreClient) Create(v interface{}, fields ...string) (PrimaryKey, error) {
 	m, err := MarshalMap(v)
 	if err != nil {
 		return nil, err
 	}
-	return cl.TypedStore.Create(filterFields(m, fields...))
+	return cl.TypedMapStore.Create(filterFields(m, fields...))
 }
 
-func (cl *typedStoreClient) Find(id PrimaryKey, v interface{}) error {
-	m, err := cl.TypedStore.Find(id)
+func (cl *typedMapStoreClient) Find(id PrimaryKey, v interface{}) error {
+	m, err := cl.TypedMapStore.Find(id)
 	if err != nil {
 		return err
 	}
 	return UnmarshalMap(m, v)
 }
 
-func (cl *typedStoreClient) FindBy(filter interface{}, newResult NewResultFunc, fields ...string) (map[PrimaryKey]interface{}, error) {
+func (cl *typedMapStoreClient) FindBy(filter interface{}, newResult NewResultFunc, fields ...string) (map[PrimaryKey]interface{}, error) {
 	fm, err := MarshalMap(filter)
 	if err != nil {
 		return nil, err
 	}
 
-	m, err := cl.TypedStore.FindBy(filterFields(fm, fields...))
+	m, err := cl.TypedMapStore.FindBy(filterFields(fm, fields...))
 	if err != nil {
 		return nil, err
 	}
@@ -116,13 +116,13 @@ func (cl *typedStoreClient) FindBy(filter interface{}, newResult NewResultFunc, 
 	return filtered, nil
 }
 
-func (cl *typedStoreClient) Update(id PrimaryKey, v interface{}, fields ...string) error {
+func (cl *typedMapStoreClient) Update(id PrimaryKey, v interface{}, fields ...string) error {
 	m, err := MarshalMap(v)
 	if err != nil {
 		return err
 	}
 	if len(fields) == 0 {
-		return cl.TypedStore.Update(id, m)
+		return cl.TypedMapStore.Update(id, m)
 	}
 
 	// Some values, i.e. empty slices/maps do not end up in the map returned by MarshalMap,
@@ -146,16 +146,16 @@ func (cl *typedStoreClient) Update(id PrimaryKey, v interface{}, fields ...strin
 	for k := range toDel {
 		fm[k] = nil
 	}
-	return cl.TypedStore.Update(id, fm)
+	return cl.TypedMapStore.Update(id, fm)
 }
 
-type byteStoreClient struct {
-	ByteStore
+type byteMapStoreClient struct {
+	ByteMapStore
 }
 
-// NewByteStoreClient returns a new instance of the Client, which uses ByteStore as the storing backend.
-func NewByteStoreClient(s ByteStore) Client {
-	return &byteStoreClient{s}
+// NewByteMapStoreClient returns a new instance of the Client, which uses ByteMapStore as the storing backend.
+func NewByteMapStoreClient(s ByteMapStore) Client {
+	return &byteMapStoreClient{s}
 }
 
 // filterByteFields returns a map, containing only values in m, which correspond to fieldpaths specified
@@ -178,29 +178,29 @@ func filterByteFields(m map[string][]byte, fields ...string) map[string][]byte {
 	return out
 }
 
-func (cl *byteStoreClient) Create(v interface{}, fields ...string) (PrimaryKey, error) {
+func (cl *byteMapStoreClient) Create(v interface{}, fields ...string) (PrimaryKey, error) {
 	m, err := MarshalByteMap(v)
 	if err != nil {
 		return nil, err
 	}
-	return cl.ByteStore.Create(filterByteFields(m, fields...))
+	return cl.ByteMapStore.Create(filterByteFields(m, fields...))
 }
 
-func (cl *byteStoreClient) Find(id PrimaryKey, v interface{}) error {
-	m, err := cl.ByteStore.Find(id)
+func (cl *byteMapStoreClient) Find(id PrimaryKey, v interface{}) error {
+	m, err := cl.ByteMapStore.Find(id)
 	if err != nil {
 		return err
 	}
 	return UnmarshalByteMap(m, v)
 }
 
-func (cl *byteStoreClient) FindBy(filter interface{}, newResult NewResultFunc, fields ...string) (map[PrimaryKey]interface{}, error) {
+func (cl *byteMapStoreClient) FindBy(filter interface{}, newResult NewResultFunc, fields ...string) (map[PrimaryKey]interface{}, error) {
 	fm, err := MarshalByteMap(filter)
 	if err != nil {
 		return nil, err
 	}
 
-	m, err := cl.ByteStore.FindBy(filterByteFields(fm, fields...))
+	m, err := cl.ByteMapStore.FindBy(filterByteFields(fm, fields...))
 	if err != nil {
 		return nil, err
 	}
@@ -215,13 +215,13 @@ func (cl *byteStoreClient) FindBy(filter interface{}, newResult NewResultFunc, f
 	return filtered, nil
 }
 
-func (cl *byteStoreClient) Update(id PrimaryKey, v interface{}, fields ...string) error {
+func (cl *byteMapStoreClient) Update(id PrimaryKey, v interface{}, fields ...string) error {
 	m, err := MarshalByteMap(v)
 	if err != nil {
 		return err
 	}
 	if len(fields) == 0 {
-		return cl.ByteStore.Update(id, m)
+		return cl.ByteMapStore.Update(id, m)
 	}
 
 	// Some values, i.e. empty slices/maps do not end up in the map returned by MarshalByteMap,
@@ -245,5 +245,5 @@ func (cl *byteStoreClient) Update(id PrimaryKey, v interface{}, fields ...string
 	for k := range toDel {
 		fm[k] = nil
 	}
-	return cl.ByteStore.Update(id, fm)
+	return cl.ByteMapStore.Update(id, fm)
 }

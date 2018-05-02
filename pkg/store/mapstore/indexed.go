@@ -23,7 +23,7 @@ import (
 )
 
 // NewIndexed returns a new MapStore that keeps indexes for the given fields
-func NewIndexed(indexed ...string) store.TypedStore {
+func NewIndexed(indexed ...string) store.TypedMapStore {
 	internal := New().(*mapStore)
 	s := &indexedStore{
 		mapStore: internal,

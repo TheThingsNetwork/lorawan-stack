@@ -163,7 +163,7 @@ func TestTypedClient(t *testing.T) {
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
-			cl := NewTypedStoreClient(mapstore.New())
+			cl := NewTypedMapStoreClient(mapstore.New())
 			if !a.So(cl, should.NotBeNil) {
 				return
 			}

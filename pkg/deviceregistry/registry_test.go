@@ -33,7 +33,7 @@ import (
 
 func TestRegistry(t *testing.T) {
 	a := assertions.New(t)
-	r := New(store.NewTypedStoreClient(mapstore.New()))
+	r := New(store.NewTypedMapStoreClient(mapstore.New()))
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
@@ -96,7 +96,7 @@ func TestRegistry(t *testing.T) {
 
 func TestFindDeviceByIdentifiers(t *testing.T) {
 	a := assertions.New(t)
-	r := New(store.NewTypedStoreClient(mapstore.New()))
+	r := New(store.NewTypedMapStoreClient(mapstore.New()))
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	ed.Attributes = &pbtypes.Struct{
@@ -171,7 +171,7 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 
 func TestFindOneDeviceByIdentifiers(t *testing.T) {
 	a := assertions.New(t)
-	r := New(store.NewTypedStoreClient(mapstore.New()))
+	r := New(store.NewTypedMapStoreClient(mapstore.New()))
 
 	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
@@ -211,7 +211,7 @@ func TestFindOneDeviceByIdentifiers(t *testing.T) {
 }
 
 func ExampleRegistry() {
-	r := New(store.NewTypedStoreClient(mapstore.New()))
+	r := New(store.NewTypedMapStoreClient(mapstore.New()))
 
 	devEUI := types.EUI64([8]byte{0, 1, 2, 3, 4, 5, 6, 7})
 	joinEUI := types.EUI64([8]byte{0, 1, 2, 3, 4, 5, 6, 7})

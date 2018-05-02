@@ -65,14 +65,14 @@ type Trimmer interface {
 	Trim(id PrimaryKey, n int) error
 }
 
-// TypedStore represents a store, modeled after CRUD, which stores typed data.
+// TypedMapStore represents a store, modeled after CRUD, which stores typed data.
 //
 // Create creates a new PrimaryKey, stores fields under that key and returns it.
 // Find returns the fields stored under PrimaryKey specified. It returns a nil map, if key is not found.
 // FindBy returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
 // meaning that only entries matching all the fields in filter should be returned. It returns a nil map, if no value matching filter is found.
 // Update overwrites field values stored under PrimaryKey specified with values in diff.
-type TypedStore interface {
+type TypedMapStore interface {
 	Create(fields map[string]interface{}) (PrimaryKey, error)
 	Find(id PrimaryKey) (map[string]interface{}, error)
 	FindBy(filter map[string]interface{}) (map[PrimaryKey]map[string]interface{}, error)
@@ -80,7 +80,7 @@ type TypedStore interface {
 	Deleter
 }
 
-// ByteStore represents a store modeled after CRUD, which stores data as bytes.
+// ByteMapStore represents a store modeled after CRUD, which stores data as bytes.
 //
 // Create creates a new PrimaryKey, stores fields under that key and returns it.
 // Find returns the fields stored under PrimaryKey specified. It returns a nil map, if key is not found.
@@ -88,7 +88,7 @@ type TypedStore interface {
 // meaning that only entries matching all the fields in filter should be returned. It returns a nil map, if key is not found.
 // Update overwrites field values stored under PrimaryKey specified with values in diff.
 // Delete deletes the fields stored under PrimaryKey specified.
-type ByteStore interface {
+type ByteMapStore interface {
 	Create(fields map[string][]byte) (PrimaryKey, error)
 	Find(id PrimaryKey) (map[string][]byte, error)
 	FindBy(filter map[string][]byte) (map[PrimaryKey]map[string][]byte, error)

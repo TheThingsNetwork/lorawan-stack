@@ -59,8 +59,8 @@ outer:
 	}
 }
 
-// TestTypedStore executes a black-box test for the given typed store
-func TestTypedStore(t testingT, newStore func() store.TypedStore) {
+// TestTypedMapStore executes a black-box test for the given typed store
+func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 	a := assertions.New(t)
 
 	s := newStore()
@@ -507,9 +507,9 @@ func TestByteListStore(t testingT, newStore func() store.ByteListStore) {
 	}
 }
 
-// GenericStore is a TypedStore adapter for an arbitrary store, which executes methods using reflection
+// GenericMapStore is a TypedMapStore adapter for an arbitrary store, which executes methods using reflection
 // and converts the supplied/returned values to match function signatures.
-type GenericStore struct {
+type GenericMapStore struct {
 	store reflect.Value
 
 	fromIfaceMap func(map[string]interface{}) interface{}
@@ -528,7 +528,7 @@ func reflectValueToError(v reflect.Value) error {
 }
 
 // Create is a generic Create.
-func (gs GenericStore) Create(fields map[string]interface{}) (store.PrimaryKey, error) {
+func (gs GenericMapStore) Create(fields map[string]interface{}) (store.PrimaryKey, error) {
 	ret := gs.store.MethodByName("Create").Call([]reflect.Value{
 		reflect.ValueOf(gs.fromIfaceMap(fields)),
 	})
@@ -539,7 +539,7 @@ func (gs GenericStore) Create(fields map[string]interface{}) (store.PrimaryKey, 
 }
 
 // Find is a generic Find.
-func (gs GenericStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
+func (gs GenericMapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	rv := reflect.Zero(reflect.TypeOf((*store.PrimaryKey)(nil)).Elem())
 	if id != nil {
 		rv = reflect.ValueOf(id)
@@ -557,7 +557,7 @@ func (gs GenericStore) Find(id store.PrimaryKey) (map[string]interface{}, error)
 }
 
 // FindBy is a generic FindBy.
-func (gs GenericStore) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
+func (gs GenericMapStore) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
 	ret := gs.store.MethodByName("FindBy").Call([]reflect.Value{
 		reflect.ValueOf(gs.fromIfaceMap(filter)),
 	})
@@ -576,7 +576,7 @@ func (gs GenericStore) FindBy(filter map[string]interface{}) (map[store.PrimaryK
 }
 
 // Update is a generic Update.
-func (gs GenericStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
+func (gs GenericMapStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
 	rv := reflect.Zero(reflect.TypeOf((*store.PrimaryKey)(nil)).Elem())
 	if id != nil {
 		rv = reflect.ValueOf(id)
@@ -588,7 +588,7 @@ func (gs GenericStore) Update(id store.PrimaryKey, diff map[string]interface{}) 
 }
 
 // Delete is a generic Delete.
-func (gs GenericStore) Delete(id store.PrimaryKey) error {
+func (gs GenericMapStore) Delete(id store.PrimaryKey) error {
 	rv := reflect.Zero(reflect.TypeOf((*store.PrimaryKey)(nil)).Elem())
 	if id != nil {
 		rv = reflect.ValueOf(id)
@@ -598,21 +598,21 @@ func (gs GenericStore) Delete(id store.PrimaryKey) error {
 	})[0])
 }
 
-// NewGenericStore returns a new generic store given a store implementation s (e.g. a ByteStore),
+// NewGenericMapStore returns a new generic store given a store implementation s (e.g. a ByteMapStore),
 // fromIfaceMap and toIfaceMap convertors.
 // The methods of s are executed using reflection and values are converted if necessary.
-func NewGenericStore(s interface{}, fromIfaceMap func(map[string]interface{}) interface{}, toIfaceMap func(interface{}) map[string]interface{}) *GenericStore {
-	return &GenericStore{
+func NewGenericMapStore(s interface{}, fromIfaceMap func(map[string]interface{}) interface{}, toIfaceMap func(interface{}) map[string]interface{}) *GenericMapStore {
+	return &GenericMapStore{
 		store:        reflect.ValueOf(s),
 		fromIfaceMap: fromIfaceMap,
 		toIfaceMap:   toIfaceMap,
 	}
 }
 
-// TestByteStore executes a black-box test for the given byte store.
-func TestByteStore(t testingT, newStore func() store.ByteStore) {
-	TestTypedStore(t, func() store.TypedStore {
-		return NewGenericStore(newStore(),
+// TestByteMapStore executes a black-box test for the given byte store.
+func TestByteMapStore(t testingT, newStore func() store.ByteMapStore) {
+	TestTypedMapStore(t, func() store.TypedMapStore {
+		return NewGenericMapStore(newStore(),
 			func(m map[string]interface{}) interface{} {
 				if m == nil {
 					return (map[string][]byte)(nil)
