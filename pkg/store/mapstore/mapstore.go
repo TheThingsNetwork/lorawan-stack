@@ -28,25 +28,27 @@ import (
 	"github.com/oklog/ulid"
 )
 
-// New returns a new MapStore
-func New() store.TypedMapStore {
-	return &mapStore{
-		entropy: rand.New(rand.NewSource(time.Now().UnixNano())),
+var _ store.TypedMapStore = &MapStore{}
+
+type MapStore struct {
+	mu      sync.RWMutex
+	data    map[store.PrimaryKey]map[string]interface{}
+	entropy io.Reader
+}
+
+// New returns a new MapStore.
+func New() *MapStore {
+	return &MapStore{
 		data:    make(map[store.PrimaryKey]map[string]interface{}),
+		entropy: rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 }
 
-type mapStore struct {
-	entropy io.Reader
-	mu      sync.RWMutex
-	data    map[store.PrimaryKey]map[string]interface{}
-}
-
-func (s *mapStore) newULID() store.PrimaryKey {
+func (s *MapStore) newULID() store.PrimaryKey {
 	return ulid.MustNew(ulid.Now(), s.entropy)
 }
 
-func (s *mapStore) Create(fields map[string]interface{}) (store.PrimaryKey, error) {
+func (s *MapStore) Create(fields map[string]interface{}) (store.PrimaryKey, error) {
 	id := s.newULID()
 	if len(fields) == 0 {
 		return id, nil
@@ -54,7 +56,7 @@ func (s *mapStore) Create(fields map[string]interface{}) (store.PrimaryKey, erro
 	return id, s.Update(id, fields)
 }
 
-func (s *mapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
+func (s *MapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	if id == nil {
 		return nil, store.ErrNilKey.New(nil)
 	}
@@ -65,7 +67,7 @@ func (s *mapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	return deepcopy.Copy(fields).(map[string]interface{}), nil
 }
 
-func (s *mapStore) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
+func (s *MapStore) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
 	if len(filter) == 0 {
 		return nil, store.ErrEmptyFilter.New(nil)
 	}
@@ -88,7 +90,7 @@ outer:
 	return matches, nil
 }
 
-func (s *mapStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
+func (s *MapStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
 	if id == nil {
 		return store.ErrNilKey.New(nil)
 	}
@@ -120,7 +122,7 @@ func (s *mapStore) Update(id store.PrimaryKey, diff map[string]interface{}) erro
 	return nil
 }
 
-func (s *mapStore) Delete(id store.PrimaryKey) error {
+func (s *MapStore) Delete(id store.PrimaryKey) error {
 	if id == nil {
 		return store.ErrNilKey.New(nil)
 	}

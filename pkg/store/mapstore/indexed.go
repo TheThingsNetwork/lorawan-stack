@@ -22,11 +22,16 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/store"
 )
 
-// NewIndexed returns a new MapStore that keeps indexes for the given fields
-func NewIndexed(indexed ...string) store.TypedMapStore {
-	internal := New().(*mapStore)
-	s := &indexedStore{
-		mapStore: internal,
+type IndexedStore struct {
+	*MapStore
+	mu      sync.RWMutex
+	indexes map[string]map[string]store.KeySet
+}
+
+// NewIndexed returns a new MapStore that keeps indexes for the given fields.
+func NewIndexed(indexed ...string) *IndexedStore {
+	s := &IndexedStore{
+		MapStore: New(),
 		indexes:  make(map[string]map[string]store.KeySet),
 	}
 	for _, field := range indexed {
@@ -35,17 +40,11 @@ func NewIndexed(indexed ...string) store.TypedMapStore {
 	return s
 }
 
-type indexedStore struct {
-	*mapStore
-	mu      sync.RWMutex
-	indexes map[string]map[string]store.KeySet
-}
-
-func (s *indexedStore) transform(i interface{}) string {
+func (s *IndexedStore) transform(i interface{}) string {
 	return fmt.Sprint(i)
 }
 
-func (s *indexedStore) index(field string, val interface{}, id store.PrimaryKey) {
+func (s *IndexedStore) index(field string, val interface{}, id store.PrimaryKey) {
 	index := s.indexes[field]
 	ik := s.transform(val)
 	if _, ok := index[ik]; !ok {
@@ -54,7 +53,7 @@ func (s *indexedStore) index(field string, val interface{}, id store.PrimaryKey)
 	index[ik].Add(id)
 }
 
-func (s *indexedStore) deindex(field string, val interface{}, id store.PrimaryKey) {
+func (s *IndexedStore) deindex(field string, val interface{}, id store.PrimaryKey) {
 	index := s.indexes[field]
 	ik := s.transform(val)
 	if idx, ok := index[ik]; ok {
@@ -65,7 +64,7 @@ func (s *indexedStore) deindex(field string, val interface{}, id store.PrimaryKe
 	}
 }
 
-func (s *indexedStore) filterIndex(filter map[string]interface{}) ([]store.KeySet, error) {
+func (s *IndexedStore) filterIndex(filter map[string]interface{}) ([]store.KeySet, error) {
 	filtered := make([]store.KeySet, 0, len(filter))
 	for k, v := range filter {
 		index, ok := s.indexes[k]
@@ -83,10 +82,10 @@ func (s *indexedStore) filterIndex(filter map[string]interface{}) ([]store.KeySe
 	return filtered, nil
 }
 
-func (s *indexedStore) Create(fields map[string]interface{}) (store.PrimaryKey, error) {
+func (s *IndexedStore) Create(fields map[string]interface{}) (store.PrimaryKey, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	id, err := s.mapStore.Create(fields)
+	id, err := s.MapStore.Create(fields)
 	if err != nil {
 		return id, err
 	}
@@ -102,7 +101,7 @@ func (s *indexedStore) Create(fields map[string]interface{}) (store.PrimaryKey, 
 	return id, nil
 }
 
-func (s *indexedStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
+func (s *IndexedStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
 	if id == nil {
 		return store.ErrNilKey.New(nil)
 	}
@@ -112,12 +111,12 @@ func (s *indexedStore) Update(id store.PrimaryKey, diff map[string]interface{}) 
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	old, err := s.mapStore.Find(id)
+	old, err := s.MapStore.Find(id)
 	if err != nil {
 		return err
 	}
 
-	err = s.mapStore.Update(id, diff)
+	err = s.MapStore.Update(id, diff)
 	if err != nil {
 		return err
 	}
@@ -135,7 +134,7 @@ func (s *indexedStore) Update(id store.PrimaryKey, diff map[string]interface{}) 
 	return nil
 }
 
-func (s *indexedStore) FindBy(filter map[string]interface{}) (matches map[store.PrimaryKey]map[string]interface{}, err error) {
+func (s *IndexedStore) FindBy(filter map[string]interface{}) (matches map[store.PrimaryKey]map[string]interface{}, err error) {
 	if len(filter) == 0 {
 		return nil, store.ErrEmptyFilter.New(nil)
 	}
@@ -155,7 +154,7 @@ func (s *indexedStore) FindBy(filter map[string]interface{}) (matches map[store.
 
 	var byFields map[store.PrimaryKey]map[string]interface{}
 	if len(fields) > 0 {
-		byFields, err = s.mapStore.FindBy(fields)
+		byFields, err = s.MapStore.FindBy(fields)
 		if err != nil {
 			return nil, err
 		}
@@ -200,18 +199,18 @@ func (s *indexedStore) FindBy(filter map[string]interface{}) (matches map[store.
 	return matches, nil
 }
 
-func (s *indexedStore) Delete(id store.PrimaryKey) error {
+func (s *IndexedStore) Delete(id store.PrimaryKey) error {
 	if id == nil {
 		return store.ErrNilKey.New(nil)
 	}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	old, err := s.mapStore.Find(id)
+	old, err := s.MapStore.Find(id)
 	if err != nil {
 		return err
 	}
-	err = s.mapStore.Delete(id)
+	err = s.MapStore.Delete(id)
 	if err != nil {
 		return err
 	}
