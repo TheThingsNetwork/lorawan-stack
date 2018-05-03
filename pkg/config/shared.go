@@ -17,6 +17,7 @@ package config
 import (
 	"encoding/hex"
 
+	"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/fetch"
 	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
@@ -144,6 +145,7 @@ type ServiceBase struct {
 	RemoteConfig   *RemoteProviderConfig `name:"remote-config"`
 	Sentry         Sentry                `name:"sentry"`
 	FrequencyPlans FrequencyPlans        `name:"frequency-plans"`
+	RightsFetching rights.Config         `name:"rights-fetching"`
 }
 
 // IsValid returns wether or not the remote config is valid or not.

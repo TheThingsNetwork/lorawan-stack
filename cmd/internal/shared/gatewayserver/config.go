@@ -15,11 +15,8 @@
 package shared
 
 import (
-	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
 	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
 )
 
 // DefaultGatewayServerConfig is the default configuration for the GatewayServer.
-var DefaultGatewayServerConfig = gatewayserver.Config{
-	Rights: shared.DefaultISRightsFetchingConfig,
-}
+var DefaultGatewayServerConfig = gatewayserver.Config{}

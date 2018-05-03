@@ -23,6 +23,8 @@ import (
 	"sort"
 	"syscall"
 
+	"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
+	"github.com/TheThingsNetwork/ttn/pkg/auth/rights/connector"
 	"github.com/TheThingsNetwork/ttn/pkg/cluster"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
@@ -61,6 +63,8 @@ type Component struct {
 	tcpListeners map[string]*listener
 
 	FrequencyPlans *frequencyplans.Store
+
+	RightsHook *rights.Hook
 }
 
 // MustNew calls New and returns a new component or panics on an error.
@@ -96,6 +100,11 @@ func New(logger log.Stack, config *Config) (*Component, error) {
 	}
 
 	hash, block, err := config.HTTP.Cookie.Keys()
+	if err != nil {
+		return nil, err
+	}
+
+	c.RightsHook, err = rights.New(c.ctx, connector.FromComponent(c), config.RightsFetching)
 	if err != nil {
 		return nil, err
 	}

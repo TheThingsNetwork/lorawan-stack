@@ -14,12 +14,8 @@
 
 package gatewayserver
 
-import "github.com/TheThingsNetwork/ttn/pkg/auth/rights"
-
 // Config represents the GatewayServer configuration.
 type Config struct {
-	Rights rights.Config `name:"rights-fetcher" description:"Parameters to configure rights retrieval from the Identity Server"`
-
 	NSTags []string `name:"network-servers.tags" description:"Network server tags to accept to connect to"`
 
 	DisableAuth bool `name:"disable-auth" description:"Disable gateway authentication, e.g. for debugging and testing purposes"`
