@@ -15,7 +15,7 @@
 # This makefile contains utilities for development purposes.
 
 DEV_DB_DATA_PATH ?= $(PWD)/.dev/databases
-DEV_COCKROACH_DATA_PATH ?= $(DEV_DB_DATA_PATH)/cockroach
+DEV_COCKROACH_DATA_PATH ?= $(DEV_DB_DATA_PATH)/cockroach-data
 DEV_REDIS_DATA_PATH ?= $(DEV_DB_DATA_PATH)/redis
 
 # Path to the Docker binary to be used
@@ -57,8 +57,9 @@ dev.databases.erase: dev.cockroach.erase dev.redis.erase
 
 dev.cockroach.start: dev.docker.installed dev.cockroach.remove-container
 	@$(log) "Start Cockroach container as $(cockroach_docker_name)"
+	@$(log) "WebUI exposed on http://localhost:26256"
 	@if [[ ! -z "$(DEV_COCKROACH_DATA_PATH)" ]]; then mkdir -p $(DEV_COCKROACH_DATA_PATH); fi
-	@$(DOCKER_BINARY) run -d -p 127.0.0.1:26257:26257 --name $(cockroach_docker_name) $(cockroach_docker_volumes) $(DEV_COCKROACH_IMAGE) start --insecure > /dev/null
+	@$(DOCKER_BINARY) run -d -p 127.0.0.1:26257:26257 -p 127.0.0.1:26256:26256 --name $(cockroach_docker_name) $(cockroach_docker_volumes) $(DEV_COCKROACH_IMAGE) start --http-port 26256 --insecure > /dev/null
 
 dev.cockroach.stop: dev.docker.installed
 	@$(DOCKER_BINARY) kill $(cockroach_docker_name) > /dev/null 2> /dev/null && $(log) "Cockroach container killed" || $(warn) "Cockroach container was not killed"
