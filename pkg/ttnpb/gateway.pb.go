@@ -202,7 +202,8 @@ func (m *Gateway) GetDisableTxDelay() bool {
 type GatewayPrivacySettings struct {
 	// status_public denotes whether or not the gateway's status is public or not.
 	StatusPublic bool `protobuf:"varint,1,opt,name=status_public,json=statusPublic,proto3" json:"status_public,omitempty"`
-	// location_public denotes whether or not the gateway's location is public.
+	// location_public denotes whether or not the gateway's location is public and
+	// should be attached to messages.
 	LocationPublic bool `protobuf:"varint,2,opt,name=location_public,json=locationPublic,proto3" json:"location_public,omitempty"`
 	// contactable denotes whether the user ID thas has been set as contact person
 	// is private or public.

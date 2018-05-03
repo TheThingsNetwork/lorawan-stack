@@ -87,7 +87,8 @@ message GatewayPrivacySettings {
   // status_public denotes whether or not the gateway's status is public or not.
   bool status_public = 1;
 
-  // location_public denotes whether or not the gateway's location is public.
+  // location_public denotes whether or not the gateway's location is public and
+  // should be attached to messages.
   bool location_public = 2;
 
   // contactable denotes whether the user ID thas has been set as contact person

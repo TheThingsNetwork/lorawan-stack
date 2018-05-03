@@ -160,14 +160,14 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 					g.handleStatus(ctx, upstream.GatewayStatus)
 				}
 				for _, uplink := range upstream.UplinkMessages {
-					g.handleUplink(ctx, uplink)
+					g.handleUplink(ctx, uplink, gw)
 				}
 			}
 		}
 	}
 }
 
-func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMessage) (err error) {
+func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMessage, gwMetadata *ttnpb.Gateway) (err error) {
 	logger := log.FromContext(ctx)
 	defer func() {
 		if err != nil {
@@ -176,6 +176,25 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 			logger.Debug("Handled uplink")
 		}
 	}()
+
+	useLocationFromMetadata := len(gwMetadata.GetAntennas()) == 0
+	for _, antenna := range uplink.RxMetadata {
+		index := int(antenna.GetAntennaIndex())
+		if !gwMetadata.GetPrivacySettings().LocationPublic {
+			antenna.Location = nil
+			continue
+		}
+
+		if useLocationFromMetadata {
+			continue
+		}
+
+		if len(gwMetadata.GetAntennas()) >= index {
+			antenna.Location = &gwMetadata.GetAntennas()[index].Location
+		} else {
+			antenna.Location = nil
+		}
+	}
 
 	pld := uplink.GetPayload()
 
