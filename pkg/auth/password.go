@@ -87,3 +87,8 @@ func (p Password) Validate(plain string) (bool, error) {
 func (p Password) Equals(other Password) bool {
 	return subtle.ConstantTimeEq(int32(len(other)), int32(len(p))) == 1 && subtle.ConstantTimeCompare([]byte(p), []byte(other)) == 1
 }
+
+// String implements fmt.Stringer and returns the string representation of the password.
+func (p Password) String() string {
+	return string(p)
+}
