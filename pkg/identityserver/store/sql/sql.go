@@ -153,6 +153,12 @@ func (s *Store) Init() error {
 	return s.MigrateAll()
 }
 
+// CreateDatabase creates the database.
+func (s *Store) CreateDatabase() error {
+	_, err := s.db.Exec(fmt.Sprintf("CREATE DATABASE %s", s.db.Database()))
+	return err
+}
+
 // DropDatabase deletes the database.
 func (s *Store) DropDatabase() error {
 	_, err := s.db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE", s.db.Database()))

@@ -31,7 +31,18 @@ var (
 		Hostname:         "localhost",
 		OrganizationName: "The Things Network",
 		PublicURL:        "https://www.thethingsnetwork.org",
-		DefaultSettings:  testSettings(),
+	}
+	initialData = InitialData{
+		Settings: testSettings(),
+		Admin: InitialAdminData{
+			UserID:   "admin",
+			Email:    "admin@localhost",
+			Password: "12345678",
+		},
+		Console: InitialConsoleData{
+			ClientSecret: "secret",
+			RedirectURI:  "http://localhost/oauth/callback",
+		},
 	}
 	testIS *IdentityServer
 )
@@ -52,7 +63,7 @@ func getIS(t testing.TB) *IdentityServer {
 			logger.WithError(err).Fatal("Failed to drop database")
 		}
 
-		err = is.Init()
+		err = is.Init(initialData)
 		if err != nil {
 			logger.WithError(err).Fatal("Failed to initialize the Identity Server instance")
 		}

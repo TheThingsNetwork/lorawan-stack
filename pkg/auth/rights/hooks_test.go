@@ -76,7 +76,18 @@ func TestUnaryHook(t *testing.T) {
 		t.Fatal("Failed to create an identity server instance")
 	}
 
-	err = is.Init()
+	err = is.Init(identityserver.InitialData{
+		Settings: identityserver.DefaultSettings,
+		Admin: identityserver.InitialAdminData{
+			UserID:   "admin",
+			Email:    "admin@localhost",
+			Password: "admin",
+		},
+		Console: identityserver.InitialConsoleData{
+			ClientSecret: "console",
+			RedirectURI:  "http://foo.bar",
+		},
+	})
 	if !a.So(err, should.BeNil) {
 		t.Fatal("Failed to initialize identity server")
 	}

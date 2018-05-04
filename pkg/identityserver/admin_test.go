@@ -227,8 +227,12 @@ func TestAdminUsers(t *testing.T) {
 		ListUsersRequest_FilterState: &ttnpb.ListUsersRequest_FilterState{State: ttnpb.STATE_APPROVED},
 	})
 	a.So(err, should.BeNil)
-	if a.So(resp.Users, should.HaveLength, 1) {
-		a.So(resp.Users[0], test.ShouldBeUserIgnoringAutoFields, testUsers()["alice"])
+	if a.So(resp.Users, should.HaveLength, 2) { // Second user is the admin default user.
+		for _, user := range resp.Users {
+			if user.UserIdentifiers.UserID == testUsers()["alice"].UserIdentifiers.UserID {
+				a.So(user, test.ShouldBeUserIgnoringAutoFields, testUsers()["alice"])
+			}
+		}
 	}
 }
 

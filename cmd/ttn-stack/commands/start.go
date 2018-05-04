@@ -47,14 +47,9 @@ var (
 			jsRedis := redis.New(&redis.Config{Redis: config.Redis, Namespace: []string{"js", "devices"}})
 			config.JS.Registry = deviceregistry.New(store.NewByteMapStoreClient(jsRedis))
 
-			is, err := identityserver.New(c, config.IS)
+			_, err = identityserver.New(c, config.IS)
 			if err != nil {
 				return errors.NewWithCause(err, "Could not create identity server")
-			}
-
-			err = is.Init()
-			if err != nil {
-				return errors.NewWithCause(err, "Could not initialize identity server")
 			}
 
 			gs, err := gatewayserver.New(c, config.GS)

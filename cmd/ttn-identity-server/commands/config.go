@@ -32,3 +32,17 @@ var DefaultConfig = Config{
 	ServiceBase: shared.DefaultServiceBase,
 	IS:          shared_identityserver.DefaultIdentityServerConfig,
 }
+
+// InitConfig for the `init` command.
+type InitConfig struct {
+	conf.ServiceBase `name:",squash"`
+	IS               identityserver.Config      `name:"is"`
+	InitialData      identityserver.InitialData `name:"initial-data"`
+}
+
+// DefaultInitConfig contains the default config for the ttn-identity-server binary.
+var DefaultInitConfig = InitConfig{
+	ServiceBase: shared.DefaultServiceBase,
+	IS:          shared_identityserver.DefaultIdentityServerConfig,
+	InitialData: shared_identityserver.DefaultIdentityServerInitialData,
+}

@@ -26,5 +26,18 @@ var DefaultIdentityServerConfig = identityserver.Config{
 	DatabaseURI:      "postgres://root@localhost:26257/is_development?sslmode=disable",
 	PublicURL:        fmt.Sprintf("http://localhost:%s", shared.DefaultServiceBase.HTTP.Listen),
 	OrganizationName: "The Things Network",
-	DefaultSettings:  identityserver.DefaultSettings,
+}
+
+// DefaultIdentityServerInitialData is the default initial data when running the `init` command.
+var DefaultIdentityServerInitialData = identityserver.InitialData{
+	Settings: identityserver.DefaultSettings,
+	Admin: identityserver.InitialAdminData{
+		UserID:   "admin",
+		Email:    "admin@localhost",
+		Password: "admin",
+	},
+	Console: identityserver.InitialConsoleData{
+		ClientSecret: "console",
+		RedirectURI:  "http://todo.todo", // TODO: https://github.com/TheThingsIndustries/ttn/pull/640
+	},
 }

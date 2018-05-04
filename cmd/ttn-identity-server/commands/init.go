@@ -16,32 +16,55 @@ package commands
 
 import (
 	"github.com/TheThingsNetwork/ttn/pkg/component"
+	conf "github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver"
 	"github.com/spf13/cobra"
 )
 
 var (
-	startCommand = &cobra.Command{
-		Use:   "start",
-		Short: "Start the Identity Server",
+	initConfigName = "ttn-identity-server"
+	initMgr        = conf.InitializeWithDefaults(initConfigName, DefaultInitConfig)
+	initConfig     = new(InitConfig)
+
+	initCommand = &cobra.Command{
+		Use:   "init",
+		Short: "Initializes the Identity Server",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
+			err := initMgr.ReadInConfig()
+			if err != nil {
+				return err
+			}
+
+			if err = initMgr.Unmarshal(initConfig); err != nil {
+				return err
+			}
+
+			c, err := component.New(logger, &component.Config{ServiceBase: initConfig.ServiceBase})
 			if err != nil {
 				return errors.NewWithCause(err, "Could not initialize base component")
 			}
 
-			is, err := identityserver.New(c, config.IS)
+			is, err := identityserver.New(c, initConfig.IS)
 			if err != nil {
 				return errors.NewWithCause(err, "Could not create identity server")
 			}
 
-			logger.Info("Starting identity server...")
-			return is.Run()
+			logger.Info("Initializing Identity Server...")
+
+			err = is.Init(initConfig.InitialData)
+			if err != nil {
+				return errors.NewWithCause(err, "Could not initialize identity server")
+			}
+
+			logger.Info("Identity Server initialized")
+
+			return nil
 		},
 	}
 )
 
 func init() {
-	Root.AddCommand(startCommand)
+	initCommand.PersistentFlags().AddFlagSet(initMgr.Flags())
+	Root.AddCommand(initCommand)
 }

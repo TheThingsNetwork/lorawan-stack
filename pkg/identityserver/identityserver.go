@@ -16,7 +16,9 @@ package identityserver
 
 import (
 	"net/url"
+	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email"
@@ -27,6 +29,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/hooks"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/TheThingsNetwork/ttn/pkg/validate"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
 )
@@ -46,9 +49,6 @@ type Config struct {
 
 	// Sendgrid is the sendgrid config.
 	Sendgrid *sendgrid.Config `name:"sendgrid"`
-
-	// defaultSettings are the default settings within the tenant loaded in the storewhen it first-time initialized.
-	DefaultSettings ttnpb.IdentityServerSettings `name:"default-settings" description:"Default settings that are loaded when the is first starts"`
 
 	// Specializers are the specializers used in the Identity Server.
 	Specializers Specializers `name:"specializers" description:"IDs of used specializers for read-operations in the store."`
@@ -79,6 +79,8 @@ type IdentityServer struct {
 	store *sql.Store
 	email email.Provider
 
+	logger log.Interface
+
 	specializers struct {
 		User         store.UserSpecializer
 		Application  store.ApplicationSpecializer
@@ -107,6 +109,7 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 		Component: c,
 		store:     store,
 		config:    config,
+		logger:    log,
 	}
 
 	config.Hostname, err = hostname(config.PublicURL)
@@ -173,25 +176,112 @@ func hostname(u string) (string, error) {
 	return p.Hostname(), nil
 }
 
-// Init initializes the store and sets the default settings in case they aren't.
-func (is *IdentityServer) Init() error {
-	err := is.store.Init()
+type InitialData struct {
+	Settings ttnpb.IdentityServerSettings `name:"settings"`
+	Admin    InitialAdminData             `name:"admin"`
+	Console  InitialConsoleData           `name:"console"`
+}
+
+type InitialAdminData struct {
+	UserID   string `name:"user-id" description:"User ID of the admin."`
+	Email    string `name:"email" description:"Email of the admin."`
+	Password string `name:"password" description:"Password of the admin."`
+}
+
+type InitialConsoleData struct {
+	ClientSecret string `name:"client-secret" description:"console OAuth client secret"`
+	RedirectURI  string `name:"redirect-uri" description:"console OAuth client redirect URI"`
+}
+
+// Validate returns error if InitialData is not valid.
+func (d InitialData) Validate() error {
+	return validate.All(
+		validate.Field(d.Admin.UserID, validate.ID).DescribeFieldName("Admin User ID"),
+		validate.Field(d.Admin.Password, validate.Required).DescribeFieldName("Admin password"),
+		validate.Field(d.Admin.Email, validate.Email).DescribeFieldName("Admin email"),
+		validate.Field(d.Console.ClientSecret, validate.Required).DescribeFieldName("Console client secret"),
+		validate.Field(d.Console.RedirectURI, validate.Required).DescribeFieldName("Console redirect URI"),
+	)
+}
+
+// Init initializes the Identity Server creating the database, applying the migrations to create
+// the schema and inserting the initial given data. It fails if the database already exists.
+func (is *IdentityServer) Init(data InitialData) error {
+	err := data.Validate()
 	if err != nil {
 		return err
 	}
 
-	// set default settings if these are not set yet
-	_, err = is.store.Settings.Get()
-	if sql.ErrSettingsNotFound.Describes(err) {
-		if err = is.store.Settings.Set(is.config.DefaultSettings); err != nil {
-			return err
-		}
-	}
-	if !sql.ErrSettingsNotFound.Describes(err) && err != nil {
+	password, err := auth.Hash(data.Admin.Password)
+	if err != nil {
 		return err
 	}
 
-	return nil
+	// Returns error if database already exists.
+	err = is.store.CreateDatabase()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			is.store.DropDatabase()
+		}
+	}()
+
+	// TODO: migrations should be executed within the transaction.
+	// Relates to https://github.com/TheThingsIndustries/ttn/issues/495.
+	err = is.store.MigrateAll()
+	if err != nil {
+		return err
+	}
+
+	err = is.store.Transact(func(tx *store.Store) error {
+		now := time.Now().UTC()
+
+		err := tx.Users.Create(&ttnpb.User{
+			UserIdentifiers: ttnpb.UserIdentifiers{
+				UserID: data.Admin.UserID,
+				Email:  data.Admin.Email,
+			},
+			Name:              "Admin",
+			Password:          password.String(),
+			State:             ttnpb.STATE_APPROVED,
+			Admin:             true,
+			ValidatedAt:       timeValue(now),
+			CreatedAt:         now,
+			UpdatedAt:         now,
+			PasswordUpdatedAt: now,
+		})
+		if err != nil {
+			return err
+		}
+		is.logger.Infof("Created admin user with User ID `%s` and password `%s`", data.Admin.UserID, data.Admin.Password)
+
+		err = tx.Clients.Create(&ttnpb.Client{
+			ClientIdentifiers: ttnpb.ClientIdentifiers{
+				ClientID: "console",
+			},
+			Description:       "The console is the official The Things Network web application.",
+			Secret:            data.Console.ClientSecret,
+			RedirectURI:       data.Console.RedirectURI,
+			SkipAuthorization: true,
+			State:             ttnpb.STATE_APPROVED,
+			CreatorIDs: ttnpb.UserIdentifiers{
+				UserID: data.Admin.UserID,
+			},
+			Grants:    []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
+			Rights:    ttnpb.AllRights(),
+			CreatedAt: now,
+			UpdatedAt: now,
+		})
+		if err != nil {
+			return err
+		}
+
+		return tx.Settings.Set(data.Settings)
+	})
+
+	return err
 }
 
 // RegisterServices registers services provided by is at s.
