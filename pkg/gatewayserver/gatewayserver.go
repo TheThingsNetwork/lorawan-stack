@@ -87,7 +87,11 @@ func New(c *component.Component, conf Config) (*GatewayServer, error) {
 		connections: map[string]*connection{},
 	}
 
-	hooks.RegisterUnaryHook("/ttn.v3.Gs/GetGatewayObservations", rights.HookName, c.RightsHook.UnaryHook())
+	rightsHook, err := c.RightsHook()
+	if err != nil {
+		return nil, err
+	}
+	hooks.RegisterUnaryHook("/ttn.v3.Gs/GetGatewayObservations", rights.HookName, rightsHook.UnaryHook())
 
 	c.RegisterGRPC(gs)
 	return gs, nil

@@ -24,9 +24,9 @@ import (
 	"syscall"
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
-	"github.com/TheThingsNetwork/ttn/pkg/auth/rights/connector"
 	"github.com/TheThingsNetwork/ttn/pkg/cluster"
 	"github.com/TheThingsNetwork/ttn/pkg/config"
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/log/middleware/sentry"
@@ -64,7 +64,7 @@ type Component struct {
 
 	FrequencyPlans *frequencyplans.Store
 
-	RightsHook *rights.Hook
+	rightsHook *rights.Hook
 }
 
 // MustNew calls New and returns a new component or panics on an error.
@@ -100,11 +100,6 @@ func New(logger log.Stack, config *Config) (*Component, error) {
 	}
 
 	hash, block, err := config.HTTP.Cookie.Keys()
-	if err != nil {
-		return nil, err
-	}
-
-	c.RightsHook, err = rights.New(c.ctx, connector.FromComponent(c), config.RightsFetching)
 	if err != nil {
 		return nil, err
 	}
@@ -228,4 +223,17 @@ func (c *Component) Close() {
 		c.grpc.Stop()
 		c.logger.Debug("Stopped gRPC server")
 	}
+}
+
+// RightsHook returns the hook that preload rights in the context based an authorization value.
+func (c *Component) RightsHook() (*rights.Hook, error) {
+	if c.rightsHook == nil {
+		hook, err := rights.New(c.ctx, rightsFetchingConnector{Component: c}, c.config.RightsFetching)
+		if err != nil {
+			return nil, errors.NewWithCause(err, "Could not initialize rights hook")
+		}
+		c.rightsHook = hook
+	}
+
+	return c.rightsHook, nil
 }

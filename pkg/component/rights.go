@@ -12,39 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package connector
+package component
 
 import (
 	"context"
 
-	"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
-	"github.com/TheThingsNetwork/ttn/pkg/cluster"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
 
-// Component that can retrieve a peer given its role.
-type Component interface {
-	GetPeer(peerInfo ttnpb.PeerInfo_Role, tags []string, shardKey []byte) cluster.Peer
+// Implements pkg/auth/rights.IdentityServerConnector,
+// and is used by the rights fetcher hook.
+type rightsFetchingConnector struct {
+	*Component
 }
 
-type componentConnector struct {
-	Component
-}
-
-func (c componentConnector) Get(context.Context) *grpc.ClientConn {
+func (c rightsFetchingConnector) Get(context.Context) *grpc.ClientConn {
 	peer := c.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, nil, nil)
 	if peer == nil {
 		return nil
 	}
 
 	return peer.Conn()
-}
-
-// FromComponent returns an IdentityServerConnector tied to a component.
-// The tags and shard key are then used to select the identity server to use.
-func FromComponent(c Component) rights.IdentityServerConnector {
-	return componentConnector{
-		Component: c,
-	}
 }
