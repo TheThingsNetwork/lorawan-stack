@@ -25,19 +25,21 @@ type correlationKeyType struct{}
 
 var correlationKey = &correlationKeyType{}
 
-// ContextWithCorrelationID returns a derived context with the correlation ID if it wasn't already in there.
-func ContextWithCorrelationID(ctx context.Context, cid string) context.Context {
+// ContextWithCorrelationID returns a derived context with the correlation IDs if they were't already in there.
+func ContextWithCorrelationID(ctx context.Context, cid ...string) context.Context {
 	if v := ctx.Value(correlationKey); v != nil {
-		if cids, ok := v.([]string); ok {
-			for _, existing := range cids {
-				if cid == existing {
-					return ctx // Correlation ID already in context, just return the original context.
+		if existing, ok := v.([]string); ok {
+			for _, cid := range cid {
+				for _, existing := range existing {
+					if cid == existing {
+						return ctx // Correlation ID already in context, just return the original context.
+					}
 				}
+				return context.WithValue(ctx, correlationKey, append(existing, cid)) // Correlation ID was not yet in the context; add cid.
 			}
-			return context.WithValue(ctx, correlationKey, append(cids, cid)) // Correlation ID was not yet in the context; add cid.
 		}
 	}
-	return context.WithValue(ctx, correlationKey, []string{cid}) // Empty (or invalid) context; add cid.
+	return context.WithValue(ctx, correlationKey, cid) // Empty (or invalid) context; add cid.
 }
 
 // CorrelationIDsFromContext returns the correlation IDs that are attached to the context.
