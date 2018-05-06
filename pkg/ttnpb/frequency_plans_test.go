@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
-	time "time"
+	"time"
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"

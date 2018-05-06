@@ -15,6 +15,8 @@
 package ttnpb
 
 import (
+	"math"
+
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -133,5 +135,16 @@ func NewPopulatedDownlinkMessage(r randyMessages, easy bool) *DownlinkMessage {
 	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, false)
 	devAddr := msg.GetMACPayload().DevAddr
 	out.EndDeviceIdentifiers.DevAddr = &devAddr
+	return out
+}
+
+func NewPopulatedApplicationDownlink(r randyMessages, _ bool) *ApplicationDownlink {
+	out := &ApplicationDownlink{}
+	out.FPort = r.Uint32() % math.MaxUint8
+	out.FCnt = r.Uint32() % math.MaxUint16
+	out.FRMPayload = make([]byte, r.Intn(255))
+	for i := 0; i < len(out.FRMPayload); i++ {
+		out.FRMPayload[i] = byte(r.Intn(256))
+	}
 	return out
 }

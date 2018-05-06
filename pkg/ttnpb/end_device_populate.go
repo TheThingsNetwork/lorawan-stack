@@ -15,9 +15,6 @@
 package ttnpb
 
 import (
-	"math/rand"
-
-	"github.com/TheThingsNetwork/ttn/pkg/band"
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
@@ -61,7 +58,7 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 		out.LoRaWANVersion = MAC_V1_1
 		out.LoRaWANPHYVersion = PHY_V1_1
 	}
-	out.FrequencyPlanID = band.All[rand.Intn(len(band.All))].ID
+	out.FrequencyPlanID = "EU_863_870"
 	out.MinFrequency = uint64(r.Uint32())
 	out.MaxFrequency = uint64(r.Uint32())
 	out.MaxTxPower = uint64(r.Uint32())
@@ -118,5 +115,27 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 		}
 	}
 	out.DeviceFormatters = *NewPopulatedDeviceFormatters(r, easy)
+	return out
+}
+
+func NewPopulatedMACState(r randyEndDevice, _ bool) *MACState {
+	out := &MACState{}
+	out.MaxTxPower = r.Uint32()
+	out.UplinkDwellTime = r.Intn(2) == 0
+	out.DownlinkDwellTime = r.Intn(2) == 0
+	out.ADRDataRateIndex = r.Uint32()
+	out.ADRTXPowerIndex = r.Uint32()
+	out.ADRNbTrans = r.Uint32()
+	out.ADRAckLimit = r.Uint32()
+	out.ADRAckDelay = r.Uint32()
+	out.DutyCycle = AggregatedDutyCycle([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}[r.Intn(16)])
+	out.RxDelay = r.Uint32()
+	out.Rx1DataRateOffset = r.Uint32() % 6
+	out.Rx2DataRateIndex = r.Uint32() % 16
+	out.Rx2Frequency = 868300000
+	out.RejoinTimer = r.Uint32()
+	out.RejoinCounter = r.Uint32()
+	out.PingSlotFrequency = uint64(r.Uint32())
+	out.PingSlotDataRateIndex = r.Uint32()
 	return out
 }

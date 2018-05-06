@@ -216,6 +216,8 @@ message MACSettings {
 // MAC State of the device (active or desired)
 // This is used internally by the Network Server and is read only
 message MACState {
+  option (gogoproto.populate) = false;
+
   // Currently used maximum transmission power
   uint32 max_tx_power = 2;
   // Uplink dwell time is set (400ms)

@@ -159,6 +159,8 @@ message ApplicationJoinAccept {
 }
 
 message ApplicationDownlink {
+  option (gogoproto.populate) = false;
+
   uint32 f_port = 1;
   uint32 f_cnt = 2;
   bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
