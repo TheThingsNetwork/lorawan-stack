@@ -15,6 +15,7 @@
 package errors
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -127,7 +128,7 @@ func ToImpl(err Error) *Impl {
 // normalize normalizes the error
 func normalize(i *Impl) *Impl {
 	if i.info.ID == "" {
-		i.info.ID = ulid.MustNew(ulid.Now(), source).String()
+		i.info.ID = ulid.MustNew(ulid.Now(), rand.Reader).String()
 	}
 
 	if i.descriptor == nil {

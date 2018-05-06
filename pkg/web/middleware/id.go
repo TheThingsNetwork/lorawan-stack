@@ -15,14 +15,11 @@
 package middleware
 
 import (
+	"crypto/rand"
 	"fmt"
-	"math"
-	"math/rand"
 	"net/http"
-	"sync"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/pseudorandom"
 	"github.com/labstack/echo"
 	"github.com/oklog/ulid"
 )
@@ -46,33 +43,21 @@ func ID(prefix string) echo.MiddlewareFunc {
 	}
 }
 
-// id a generator of new ids. It uses ULID and a pool of entropy sources under the hood.
+// id a generator of new ids, which uses ULID under the hood.
 type id struct {
 	prefixer func(ulid.ULID) string
-	pool     sync.Pool
 }
 
 // newID creates a new id.
 func newID(prefix string) *id {
 	return &id{
 		prefixer: prefixer(prefix),
-		pool: sync.Pool{
-			New: func() interface{} {
-				return rand.New(rand.NewSource(int64(pseudorandom.Intn(int(math.MaxInt32)))))
-			},
-		},
 	}
 }
 
 // generate generates a new ULID.
 func (i *id) generate() (string, error) {
-	entropy, ok := i.pool.Get().(*rand.Rand)
-	defer i.pool.Put(entropy)
-	if !ok {
-		return "", fmt.Errorf("Failed to get an entropy source")
-	}
-
-	id, err := ulid.New(ulid.Timestamp(now()), entropy)
+	id, err := ulid.New(ulid.Timestamp(now()), rand.Reader)
 	if err != nil {
 		return "", fmt.Errorf("Failed to generate a new ULID")
 	}

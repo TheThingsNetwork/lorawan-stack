@@ -17,17 +17,15 @@ package redis
 
 import (
 	"bytes"
+	"crypto/rand"
 	"encoding/hex"
 	"fmt"
 	"io"
-	"math/rand"
 	"strings"
-	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/store"
-	"github.com/TheThingsNetwork/ttn/pkg/util/randutil"
 	"github.com/oklog/ulid"
 	redis "gopkg.in/redis.v5"
 )
@@ -68,7 +66,7 @@ func New(conf *Config) *Store {
 			DB:   conf.Database,
 		}),
 		config:    conf,
-		entropy:   rand.New(randutil.NewLockedSource(rand.NewSource(time.Now().UnixNano()))),
+		entropy:   rand.Reader,
 		indexKeys: indexKeys,
 	}
 }

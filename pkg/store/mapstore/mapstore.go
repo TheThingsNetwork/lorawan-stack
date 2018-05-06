@@ -16,15 +16,13 @@
 package mapstore
 
 import (
+	"crypto/rand"
 	"io"
-	"math/rand"
 	"reflect"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/store"
-	"github.com/TheThingsNetwork/ttn/pkg/util/randutil"
 	"github.com/mohae/deepcopy"
 	"github.com/oklog/ulid"
 )
@@ -39,7 +37,7 @@ type MapStore struct {
 func New() *MapStore {
 	return &MapStore{
 		data:    make(map[store.PrimaryKey]map[string]interface{}),
-		entropy: rand.New(randutil.NewLockedSource(rand.NewSource(time.Now().UnixNano()))),
+		entropy: rand.Reader,
 	}
 }
 

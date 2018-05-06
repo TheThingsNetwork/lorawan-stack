@@ -20,7 +20,8 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/util/randutil"
 )
 
-// Randy is global rand safe for concurrent use
+// Randy is global rand, which is (mostly) safe for concurrent use.
+// Read and Seed should not be called concurrently.
 var Randy = rand.New(randutil.NewLockedSource(rand.NewSource(42)))
 
 func init() {

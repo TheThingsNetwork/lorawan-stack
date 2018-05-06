@@ -15,9 +15,7 @@
 package joinserver
 
 import (
-	"math/rand"
 	"testing"
-	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/crypto"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -34,7 +32,7 @@ func TestMICCheck(t *testing.T) {
 
 	pld := ttnpb.NewPopulatedJoinRequest(test.Randy, false).GetRawPayload()[:19]
 
-	k := types.NewPopulatedAES128Key(rand.New(rand.NewSource(time.Now().UnixNano())))
+	k := types.NewPopulatedAES128Key(test.Randy)
 	computed, err := crypto.ComputeJoinRequestMIC(*k, pld)
 	if err != nil {
 		panic(err)

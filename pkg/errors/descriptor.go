@@ -16,14 +16,7 @@ package errors
 
 import (
 	"fmt"
-	"math/rand"
-	"time"
-
-	"github.com/TheThingsNetwork/ttn/pkg/util/randutil"
 )
-
-// source is the random source for errors
-var source = rand.New(randutil.NewLockedSource(rand.NewSource(time.Now().UnixNano())))
 
 // ErrDescriptor is a helper struct to easily build new Errors from and to be
 // the authoritive information about error codes.

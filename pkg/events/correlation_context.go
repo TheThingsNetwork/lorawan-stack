@@ -16,10 +16,8 @@ package events
 
 import (
 	"context"
-	"math/rand"
-	"time"
+	"crypto/rand"
 
-	"github.com/TheThingsNetwork/ttn/pkg/util/randutil"
 	"github.com/oklog/ulid"
 )
 
@@ -64,9 +62,7 @@ func ContextWithEnsuredCorrelationID(ctx context.Context) context.Context {
 	return ContextWithCorrelationID(ctx, NewCorrelationID())
 }
 
-var source = rand.New(randutil.NewLockedSource(rand.NewSource(time.Now().UnixNano())))
-
 // NewCorrelationID returns a new random correlation ID.
 func NewCorrelationID() string {
-	return ulid.MustNew(ulid.Now(), source).String()
+	return ulid.MustNew(ulid.Now(), rand.Reader).String()
 }
