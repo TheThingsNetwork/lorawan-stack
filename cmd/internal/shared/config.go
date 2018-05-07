@@ -36,8 +36,8 @@ var DefaultLogConfig = config.Log{
 
 // DefaultTLSConfig is the default TLS config.
 var DefaultTLSConfig = config.TLS{
-	Certificate: "",
-	Key:         "",
+	Certificate: "cert.pem",
+	Key:         "key.pem",
 }
 
 // DefaultClusterConfig is the default cluster configuration.
@@ -45,8 +45,9 @@ var DefaultClusterConfig = config.Cluster{}
 
 // DefaultHTTPConfig is the default HTTP config.
 var DefaultHTTPConfig = config.HTTP{
-	Listen: ":8080",
-	PProf:  true,
+	Listen:    ":1885",
+	ListenTLS: ":8885",
+	PProf:     true,
 }
 
 // DefaultIdentityConfig is the default Identity config.
@@ -59,7 +60,8 @@ var DefaultIdentityConfig = config.Identity{
 
 // DefaultGRPCConfig is the default config for GRPC.
 var DefaultGRPCConfig = config.GRPC{
-	Listen: ":8088",
+	Listen:    ":1884",
+	ListenTLS: ":8884",
 }
 
 // DefaultRedisConfig is the default config for Redis.
