@@ -303,28 +303,43 @@ func (s *applicationService) SetApplicationCollaborator(ctx context.Context, req
 			return err
 		}
 
-		// Check if the sum of rights that collaborators with `SETTINGS_COLLABORATOR`
-		// right is equal to the entire set of defined application rights.
-		collaborators, err := tx.Applications.ListCollaborators(req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
+		rights, err = missingApplicationRights(tx, req.ApplicationIdentifiers)
 		if err != nil {
 			return err
 		}
 
-		rights = ttnpb.AllApplicationRights()
-		for _, collaborator := range collaborators {
-			rights = ttnpb.DifferenceRights(rights, collaborator.Rights)
-
-			if len(rights) == 0 {
-				return nil
-			}
+		if len(rights) != 0 {
+			return ErrUnmanageableApplication.New(errors.Attributes{
+				"application_id": req.ApplicationIdentifiers.ApplicationID,
+				"missing_rights": rights,
+			})
 		}
 
-		return ErrSetApplicationCollaboratorFailed.New(errors.Attributes{
-			"missing_rights": rights,
-		})
+		return nil
 	})
 
 	return ttnpb.Empty, err
+}
+
+// Checks if the sum of rights that collaborators with `SETTINGS_COLLABORATOR`
+// right is equal to the entire set of defined application rights. Otherwise
+// returns the list of missing rights.
+func missingApplicationRights(tx *store.Store, ids ttnpb.ApplicationIdentifiers) ([]ttnpb.Right, error) {
+	collaborators, err := tx.Applications.ListCollaborators(ids, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
+	if err != nil {
+		return nil, err
+	}
+
+	rights := ttnpb.AllApplicationRights()
+	for _, collaborator := range collaborators {
+		rights = ttnpb.DifferenceRights(rights, collaborator.Rights)
+
+		if len(rights) == 0 {
+			return nil, nil
+		}
+	}
+
+	return rights, nil
 }
 
 // ListApplicationCollaborators returns all the collaborators from an application.

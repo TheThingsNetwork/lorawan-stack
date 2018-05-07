@@ -21,13 +21,13 @@ func init() {
 	ErrEmailAddressNotAllowed.Register()
 	ErrInvalidPassword.Register()
 	ErrNotAuthorized.Register()
-	ErrSetApplicationCollaboratorFailed.Register()
-	ErrSetGatewayCollaboratorFailed.Register()
 	ErrEmailAlreadyValidated.Register()
 	ErrValidationTokenExpired.Register()
 	ErrInvitationTokenMissing.Register()
 	ErrEmailAddressAlreadyUsed.Register()
-	ErrSetOrganizationMemberFailed.Register()
+	ErrUnmanageableApplication.Register()
+	ErrUnmanageableGateway.Register()
+	ErrUnmanageableOrganization.Register()
 }
 
 // ErrBlacklistedID is returned when trying to register an entity using a
@@ -64,33 +64,11 @@ var ErrNotAuthorized = &errors.ErrDescriptor{
 	Type:          errors.Unauthorized,
 }
 
-// ErrSetApplicationCollaboratorFailed is returned when after modifying an
-// application's collaborators the application reaches an unmanageable state
-// as the sum of rights that all collaborators with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS`
-// right is not equal to the entire set of available `RIGHT_APPLICATION_XXXXXX` rights.
-var ErrSetApplicationCollaboratorFailed = &errors.ErrDescriptor{
-	MessageFormat:  "Failed to set collaborator: application becomes unmanageable as no collaborator with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` has the following rights: {missing_rights}",
-	Code:           5,
-	Type:           errors.InvalidArgument,
-	SafeAttributes: []string{"missing_rights"},
-}
-
-// ErrSetGatewayCollaboratorFailed is returned when after modifying a gateway's
-// collaborators the gateway reaches an unmanageable state as the sum of
-// rights that all collaborators with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS`
-// right is not equal to the entire set of available `RIGHT_GATEWAY_XXXXXX` rights.
-var ErrSetGatewayCollaboratorFailed = &errors.ErrDescriptor{
-	MessageFormat:  "Failed to set collaborator: gateway becomes unmanageable as no collaborator with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` has the following rights: {missing_rights}",
-	Code:           6,
-	Type:           errors.InvalidArgument,
-	SafeAttributes: []string{"missing_rights"},
-}
-
 // ErrEmailAlreadyValidated is returned when calling 'RequestUserEmailValidation'
 // when the email is already validated.
 var ErrEmailAlreadyValidated = &errors.ErrDescriptor{
 	MessageFormat: "Email address is already validated",
-	Code:          7,
+	Code:          5,
 	Type:          errors.InvalidArgument,
 }
 
@@ -98,7 +76,7 @@ var ErrEmailAlreadyValidated = &errors.ErrDescriptor{
 // using an expired token.
 var ErrValidationTokenExpired = &errors.ErrDescriptor{
 	MessageFormat: "Token is expired",
-	Code:          8,
+	Code:          6,
 	Type:          errors.PermissionDenied,
 }
 
@@ -106,7 +84,7 @@ var ErrValidationTokenExpired = &errors.ErrDescriptor{
 // an empty invitation token and the self user registration is disabled.
 var ErrInvitationTokenMissing = &errors.ErrDescriptor{
 	MessageFormat: "Self account registration is disabled: a valid invitation token must be provided",
-	Code:          9,
+	Code:          7,
 	Type:          errors.InvalidArgument,
 }
 
@@ -114,17 +92,36 @@ var ErrInvitationTokenMissing = &errors.ErrDescriptor{
 // invitation to an email that is already being used by an user.
 var ErrEmailAddressAlreadyUsed = &errors.ErrDescriptor{
 	MessageFormat: "Failed to issue invitation: the email address is already in use",
-	Code:          10,
+	Code:          8,
 	Type:          errors.InvalidArgument,
 }
 
-// ErrSetOrganizationMemberFailed is returned when after modifying an organization's
-// members the organization reaches an unmanageable state as the sum of rights
-// that all members with `RIGHT_ORGANIZATION_SETTINGS_MEMBERS` right is not equal
-// to the entire set of available `RIGHT_ORGANIZATION_XXXXXX` rights.
-var ErrSetOrganizationMemberFailed = &errors.ErrDescriptor{
-	MessageFormat:  "Failed to set member: organization becomes unmanageable as no member with `RIGHT_ORGANIZATION_SETTINGS_MEMBERS` has the following rights: {missing_rights}",
+// ErrUnmanageableApplication is returned when the sum of rights of collaborators
+// with `SETTINGS_COLLABORATORS` right is not equal to the entire set of defined
+// application rights.
+var ErrUnmanageableApplication = &errors.ErrDescriptor{
+	MessageFormat:  "Application `{application_id}` becomes unmanageable a no collaborator with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` has the following rights: {missing_rights}",
+	Code:           9,
+	Type:           errors.InvalidArgument,
+	SafeAttributes: []string{"application_id", "missing_rights"},
+}
+
+// ErrUnmanageableGateway is returned when the sum of rights of collaborators
+// with `SETTINGS_COLLABORATORS` right is not equal to the entire set of defined
+// gateway rights.
+var ErrUnmanageableGateway = &errors.ErrDescriptor{
+	MessageFormat:  "Gateway `{gateway_id}` becomes unmanageable a no collaborator with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` has the following rights: {missing_rights}",
+	Code:           10,
+	Type:           errors.InvalidArgument,
+	SafeAttributes: []string{"gateway_id", "missing_rights"},
+}
+
+// ErrUnmanageableOrganization is returned when the sum of rights of collaborators
+// with `SETTINGS_MEMBERS` right is not equal to the entire set of defined
+// organization rights.
+var ErrUnmanageableOrganization = &errors.ErrDescriptor{
+	MessageFormat:  "Organization `{organization_id}` becomes unmanageable a no member with `RIGHT_ORGANIZATION_SETTINGS_MEMBERS` has the following rights: {missing_rights}",
 	Code:           11,
 	Type:           errors.InvalidArgument,
-	SafeAttributes: []string{"missing_rights"},
+	SafeAttributes: []string{"organization_id", "missing_rights"},
 }

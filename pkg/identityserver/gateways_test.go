@@ -264,7 +264,7 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &user.UserIdentifiers}},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(ErrSetGatewayCollaboratorFailed.Describes(err), should.BeTrue)
+	a.So(ErrUnmanageableGateway.Describes(err), should.BeTrue)
 
 	// But we can revoke a shared right between the two collaborators.
 	_, err = is.gatewayService.SetGatewayCollaborator(ctx, &ttnpb.GatewayCollaborator{

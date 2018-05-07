@@ -186,7 +186,7 @@ func TestApplication(t *testing.T) {
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &user.UserIdentifiers}},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(ErrSetApplicationCollaboratorFailed.Describes(err), should.BeTrue)
+	a.So(ErrUnmanageableApplication.Describes(err), should.BeTrue)
 
 	// but we can revoke a shared right between the two collaborators
 	_, err = is.applicationService.SetApplicationCollaborator(ctx, &ttnpb.ApplicationCollaborator{

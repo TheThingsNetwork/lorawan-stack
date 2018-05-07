@@ -189,7 +189,7 @@ func TestOrganization(t *testing.T) {
 		UserIdentifiers:         ttnpb.UserIdentifiers{UserID: user.UserID},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(ErrSetOrganizationMemberFailed.Describes(err), should.BeTrue)
+	a.So(ErrUnmanageableOrganization.Describes(err), should.BeTrue)
 
 	members, err = is.organizationService.ListOrganizationMembers(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: org.OrganizationID})
 	a.So(err, should.BeNil)

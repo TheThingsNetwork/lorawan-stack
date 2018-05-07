@@ -362,13 +362,82 @@ func (s *adminService) DeleteUser(ctx context.Context, req *ttnpb.UserIdentifier
 	err = s.store.Transact(func(tx *store.Store) error {
 		ids := *req
 
+		// Fetch the user beforehand to save its email address for later notification.
 		found, err := tx.Users.GetByID(ids, s.specializers.User)
 		if err != nil {
 			return err
 		}
 		user = found.GetUser()
 
-		return tx.Users.Delete(ids)
+		apps, err := tx.Applications.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(ids), s.specializers.Application)
+		if err != nil {
+			return err
+		}
+
+		gtws, err := tx.Gateways.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(ids), s.specializers.Gateway)
+		if err != nil {
+			return err
+		}
+
+		orgs, err := tx.Organizations.ListByUser(ids, s.specializers.Organization)
+		if err != nil {
+			return err
+		}
+
+		err = tx.Users.Delete(ids)
+		if err != nil {
+			return err
+		}
+
+		for _, app := range apps {
+			appIDs := app.GetApplication().ApplicationIdentifiers
+
+			rights, err := missingApplicationRights(tx, appIDs)
+			if err != nil {
+				return err
+			}
+
+			if len(rights) != 0 {
+				return ErrUnmanageableApplication.New(errors.Attributes{
+					"application_id": appIDs.ApplicationID,
+					"missing_rights": rights,
+				})
+			}
+		}
+
+		for _, gtw := range gtws {
+			gtwIDs := gtw.GetGateway().GatewayIdentifiers
+
+			rights, err := missingGatewayRights(tx, gtwIDs)
+			if err != nil {
+				return err
+			}
+
+			if len(rights) != 0 {
+				return ErrUnmanageableGateway.New(errors.Attributes{
+					"gateway_id":     gtwIDs.GatewayID,
+					"missing_rights": rights,
+				})
+			}
+		}
+
+		for _, org := range orgs {
+			orgIDs := org.GetOrganization().OrganizationIdentifiers
+
+			rights, err := missingOrganizationRights(tx, orgIDs)
+			if err != nil {
+				return err
+			}
+
+			if len(rights) != 0 {
+				return ErrUnmanageableOrganization.New(errors.Attributes{
+					"organization_id": orgIDs.OrganizationID,
+					"missing_rights":  rights,
+				})
+			}
+		}
+
+		return nil
 	})
 
 	if err != nil {

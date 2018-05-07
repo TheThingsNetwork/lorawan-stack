@@ -166,7 +166,62 @@ func (s *organizationService) DeleteOrganization(ctx context.Context, req *ttnpb
 		return nil, err
 	}
 
-	return ttnpb.Empty, s.store.Organizations.Delete(ids)
+	err = s.store.Transact(func(tx *store.Store) error {
+		// We need to make sure that after deleting the organization nor an application
+		// nor a gateway reaches an unmanageable state. So first in the transaction
+		// before actually deleting the organization we gather the applications and
+		// gateways is collaborator of so afterwards we can check for invalid states.
+		apps, err := tx.Applications.ListByOrganizationOrUser(organizationOrUserIDsOrganizationIDs(ids), s.specializers.Application)
+		if err != nil {
+			return err
+		}
+
+		gtws, err := tx.Gateways.ListByOrganizationOrUser(organizationOrUserIDsOrganizationIDs(ids), s.specializers.Gateway)
+		if err != nil {
+			return err
+		}
+
+		err = tx.Organizations.Delete(ids)
+		if err != nil {
+			return err
+		}
+
+		for _, app := range apps {
+			appIDs := app.GetApplication().ApplicationIdentifiers
+
+			rights, err := missingApplicationRights(tx, appIDs)
+			if err != nil {
+				return err
+			}
+
+			if len(rights) != 0 {
+				return ErrUnmanageableApplication.New(errors.Attributes{
+					"application_id": appIDs.ApplicationID,
+					"missing_rights": rights,
+				})
+			}
+		}
+
+		for _, gtw := range gtws {
+			gtwIDs := gtw.GetGateway().GatewayIdentifiers
+
+			rights, err := missingGatewayRights(tx, gtwIDs)
+			if err != nil {
+				return err
+			}
+
+			if len(rights) != 0 {
+				return ErrUnmanageableGateway.New(errors.Attributes{
+					"gateway_id":     gtwIDs.GatewayID,
+					"missing_rights": rights,
+				})
+			}
+		}
+
+		return nil
+	})
+
+	return ttnpb.Empty, err
 }
 
 // GenerateOrganizationAPIKey generates an organization API key and returns it.
@@ -288,28 +343,43 @@ func (s *organizationService) SetOrganizationMember(ctx context.Context, req *tt
 			return err
 		}
 
-		// Check if the sum of rights that members with `SETTINGS_MEMBER` right is
-		// equal to the entire set of defined organization rights.
-		members, err := tx.Organizations.ListMembers(req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS)
+		rights, err := missingOrganizationRights(tx, req.OrganizationIdentifiers)
 		if err != nil {
 			return err
 		}
 
-		rights = ttnpb.AllOrganizationRights()
-		for _, member := range members {
-			rights = ttnpb.DifferenceRights(rights, member.Rights)
-
-			if len(rights) == 0 {
-				return nil
-			}
+		if len(rights) != 0 {
+			return ErrUnmanageableOrganization.New(errors.Attributes{
+				"organization_id": req.OrganizationIdentifiers.OrganizationID,
+				"missing_rights":  rights,
+			})
 		}
 
-		return ErrSetOrganizationMemberFailed.New(errors.Attributes{
-			"missing_rights": rights,
-		})
+		return nil
 	})
 
 	return ttnpb.Empty, err
+}
+
+// Checks if the sum of rights that members with `SETTINGS_MEMBER` right is
+// equal to the entire set of defined organization rights. Otherwise returns
+// the list of missing rights.
+func missingOrganizationRights(tx *store.Store, ids ttnpb.OrganizationIdentifiers) ([]ttnpb.Right, error) {
+	members, err := tx.Organizations.ListMembers(ids, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS)
+	if err != nil {
+		return nil, err
+	}
+
+	rights := ttnpb.AllOrganizationRights()
+	for _, member := range members {
+		rights = ttnpb.DifferenceRights(rights, member.Rights)
+
+		if len(rights) == 0 {
+			return nil, nil
+		}
+	}
+
+	return rights, nil
 }
 
 // ListOrganizationMembers returns all members from the organization that

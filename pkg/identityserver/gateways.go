@@ -339,28 +339,43 @@ func (s *gatewayService) SetGatewayCollaborator(ctx context.Context, req *ttnpb.
 			return err
 		}
 
-		// Check if the sum of rights that collaborators with `SETTINGS_COLLABORATOR`
-		// right is equal to the entire set of defined gateway rights.
-		collaborators, err := tx.Gateways.ListCollaborators(req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
+		rights, err := missingGatewayRights(tx, req.GatewayIdentifiers)
 		if err != nil {
 			return err
 		}
 
-		rights = ttnpb.AllGatewayRights()
-		for _, collaborator := range collaborators {
-			rights = ttnpb.DifferenceRights(rights, collaborator.Rights)
-
-			if len(rights) == 0 {
-				return nil
-			}
+		if len(rights) != 0 {
+			return ErrUnmanageableGateway.New(errors.Attributes{
+				"gateway_id":     req.GatewayIdentifiers.GatewayID,
+				"missing_rights": rights,
+			})
 		}
 
-		return ErrSetGatewayCollaboratorFailed.New(errors.Attributes{
-			"missing_rights": rights,
-		})
+		return nil
 	})
 
 	return ttnpb.Empty, err
+}
+
+// Checks if the sum of rights that collaborators with `SETTINGS_COLLABORATOR`
+// right is equal to the entire set of defined gateway rights. Otherwise returns
+// the list of missing rights.
+func missingGatewayRights(tx *store.Store, ids ttnpb.GatewayIdentifiers) ([]ttnpb.Right, error) {
+	collaborators, err := tx.Gateways.ListCollaborators(ids, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
+	if err != nil {
+		return nil, err
+	}
+
+	rights := ttnpb.AllGatewayRights()
+	for _, collaborator := range collaborators {
+		rights = ttnpb.DifferenceRights(rights, collaborator.Rights)
+
+		if len(rights) == 0 {
+			return nil, nil
+		}
+	}
+
+	return rights, nil
 }
 
 // ListGatewayCollaborators returns all the collaborators that a gateway has.

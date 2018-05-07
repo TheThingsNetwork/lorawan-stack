@@ -303,45 +303,74 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 		return nil, err
 	}
 
+	uIDs := authorizationDataFromContext(ctx).UserIdentifiers()
+
 	err = s.store.Transact(func(tx *store.Store) error {
-		apps, err := tx.Applications.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(authorizationDataFromContext(ctx).UserIdentifiers()), s.specializers.Application)
+		apps, err := tx.Applications.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(uIDs), s.specializers.Application)
 		if err != nil {
 			return err
 		}
 
-		gtws, err := tx.Gateways.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(authorizationDataFromContext(ctx).UserIdentifiers()), s.specializers.Gateway)
+		gtws, err := tx.Gateways.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(uIDs), s.specializers.Gateway)
 		if err != nil {
 			return err
 		}
 
-		err = tx.Users.Delete(authorizationDataFromContext(ctx).UserIdentifiers())
+		orgs, err := tx.Organizations.ListByUser(uIDs, s.specializers.Organization)
+		if err != nil {
+			return err
+		}
+
+		err = tx.Users.Delete(uIDs)
 		if err != nil {
 			return err
 		}
 
 		for _, app := range apps {
-			appID := app.GetApplication().ApplicationIdentifiers
+			appIDs := app.GetApplication().ApplicationIdentifiers
 
-			c, err := tx.Applications.ListCollaborators(appID, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS)
+			rights, err := missingApplicationRights(tx, appIDs)
 			if err != nil {
 				return err
 			}
 
-			if len(c) == 0 {
-				return errors.Errorf("Failed to delete user `%s`: cannot leave application `%s` without at least one collaborator with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` right", authorizationDataFromContext(ctx).UserIdentifiers(), appID)
+			if len(rights) != 0 {
+				return ErrUnmanageableApplication.New(errors.Attributes{
+					"application_id": appIDs.ApplicationID,
+					"missing_rights": rights,
+				})
 			}
 		}
 
 		for _, gtw := range gtws {
-			gtwID := gtw.GetGateway().GatewayIdentifiers
+			gtwIDs := gtw.GetGateway().GatewayIdentifiers
 
-			c, err := tx.Gateways.ListCollaborators(gtwID, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS)
+			rights, err := missingGatewayRights(tx, gtwIDs)
 			if err != nil {
 				return err
 			}
 
-			if len(c) == 0 {
-				return errors.Errorf("Failed to delete user `%s`: cannot leave gateway `%s` without at least one collaborator with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` right", authorizationDataFromContext(ctx).UserIdentifiers(), gtwID)
+			if len(rights) != 0 {
+				return ErrUnmanageableGateway.New(errors.Attributes{
+					"gateway_id":     gtwIDs.GatewayID,
+					"missing_rights": rights,
+				})
+			}
+		}
+
+		for _, org := range orgs {
+			orgIDs := org.GetOrganization().OrganizationIdentifiers
+
+			rights, err := missingOrganizationRights(tx, orgIDs)
+			if err != nil {
+				return err
+			}
+
+			if len(rights) != 0 {
+				return ErrUnmanageableOrganization.New(errors.Attributes{
+					"organization_id": orgIDs.OrganizationID,
+					"missing_rights":  rights,
+				})
 			}
 		}
 
