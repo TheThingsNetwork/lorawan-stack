@@ -30,8 +30,7 @@ type clientService struct {
 }
 
 // CreateClient creates a client.
-// The created client has a random secret and has set by default as false the
-// official labeled flag and has the refresh_token and authorization_code grants.
+// The created client has a random secret and the refresh_token and authorization_code grants.
 func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClientRequest) (*pbtypes.Empty, error) {
 	err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
 	if err != nil {
@@ -60,7 +59,7 @@ func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClien
 			CreatorIDs:        authorizationDataFromContext(ctx).UserIdentifiers(),
 			Secret:            random.String(64),
 			State:             ttnpb.STATE_PENDING,
-			OfficialLabeled:   false,
+			SkipAuthorization: false,
 			Grants:            []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
 			Rights:            req.Client.Rights,
 			CreatedAt:         now,
@@ -87,7 +86,7 @@ func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifi
 			ClientIdentifiers: client.ClientIdentifiers,
 			Description:       client.Description,
 			RedirectURI:       client.RedirectURI,
-			OfficialLabeled:   client.OfficialLabeled,
+			SkipAuthorization: client.SkipAuthorization,
 			Rights:            client.Rights,
 		}, nil
 	}

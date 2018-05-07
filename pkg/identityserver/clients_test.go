@@ -42,7 +42,7 @@ func TestClient(t *testing.T) {
 		Grants:            []ttnpb.GrantType{ttnpb.GRANT_REFRESH_TOKEN},
 		Rights:            []ttnpb.Right{ttnpb.Right(1), ttnpb.Right(2)},
 		State:             ttnpb.STATE_PENDING,
-		OfficialLabeled:   false,
+		SkipAuthorization: false,
 		CreatorIDs:        user.UserIdentifiers,
 	}
 

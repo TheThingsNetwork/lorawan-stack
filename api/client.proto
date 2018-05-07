@@ -43,10 +43,8 @@ message Client {
   // This field can only be modified by admins.
   ReviewingState state = 5;
 
-  // official_labeled denotes if a client has been labeled as an official
-  // third-party client by the tenant admin.
-  // This field can only be modified by admins.
-  bool official_labeled = 6;
+  // If set, the authorization page will be skipped (modifiable only by admins).
+  bool skip_authorization = 6;
 
   // grants denotes which OAuth2 flows can the client use to get a token.
   // This field can only be modified by admins.

@@ -608,8 +608,8 @@ func (s *adminService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClient
 					req.Client.Rights = []ttnpb.Right{}
 				}
 				client.Rights = req.Client.Rights
-			case ttnpb.FieldPathClientOfficialLabeled.MatchString(path):
-				client.OfficialLabeled = req.Client.OfficialLabeled
+			case ttnpb.FieldPathClientSkipAuthorization.MatchString(path):
+				client.SkipAuthorization = req.Client.SkipAuthorization
 			case ttnpb.FieldPathClientState.MatchString(path):
 				client.State = req.Client.State
 			case ttnpb.FieldPathClientGrants.MatchString(path):

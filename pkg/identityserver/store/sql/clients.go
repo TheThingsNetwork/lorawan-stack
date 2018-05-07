@@ -117,7 +117,7 @@ func (s *ClientStore) create(q db.QueryContext, userID uuid.UUID, data *ttnpb.Cl
 				state,
 				rights,
 				creator_id,
-				official_labeled,
+				skip_authorization,
 				created_at,
 				updated_at)
 			VALUES (
@@ -129,7 +129,7 @@ func (s *ClientStore) create(q db.QueryContext, userID uuid.UUID, data *ttnpb.Cl
 				:state,
 				:rights_converted,
 				:creator_id,
-				:official_labeled,
+				:skip_authorization,
 				:created_at,
 				:updated_at)
 			RETURNING id`,
@@ -181,7 +181,7 @@ func (s *ClientStore) getByID(q db.QueryContext, id uuid.UUID) (client ttnpb.Cli
 				grants AS grants_converted,
 				state,
 				rights AS rights_converted,
-				official_labeled,
+				skip_authorization,
 				creator_id,
 				created_at,
 				updated_at
@@ -251,7 +251,7 @@ func (s *ClientStore) list(q db.QueryContext) ([]client, error) {
 				grants AS grants_converted,
 				state,
 				rights AS rights_converted,
-				official_labeled,
+				skip_authorization,
 				creator_id,
 				created_at,
 				updated_at
@@ -324,7 +324,7 @@ func (s *ClientStore) userClients(q db.QueryContext, userID uuid.UUID) ([]client
 				grants AS grants_converted,
 				state,
 				rights AS rights_converted,
-				official_labeled,
+				skip_authorization,
 				creator_id,
 				created_at,
 				updated_at
@@ -408,7 +408,7 @@ func (s *ClientStore) update(q db.QueryContext, clientID uuid.UUID, data *ttnpb.
 				redirect_uri = :redirect_uri,
 				grants = :grants_converted,
 				state = :state,
-				official_labeled = :official_labeled,
+				skip_authorization = :skip_authorization,
 				rights = :rights_converted,
 				creator_id = :creator_id,
 				updated_at = :updated_at

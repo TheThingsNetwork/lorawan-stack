@@ -67,8 +67,8 @@ var (
 	// FieldPathClientRights is the field path for the client rights field.
 	FieldPathClientRights = regexp.MustCompile(`^rights$`)
 
-	// FieldPathClientOfficialLabeled is the field path for the client official labeled field.
-	FieldPathClientOfficialLabeled = regexp.MustCompile(`^official_labeled$`)
+	// FieldPathClientSkipAuthorization is the field path for the client skip authorization field.
+	FieldPathClientSkipAuthorization = regexp.MustCompile(`^skip_authorization$`)
 
 	// FieldPathClientState is the field path for the client state field.
 	FieldPathClientState = regexp.MustCompile(`^state$`)
