@@ -338,10 +338,10 @@ func (ns *NetworkServer) deduplicateUplink(ctx context.Context, msg *ttnpb.Uplin
 		return nil, true
 	}
 
-	go func() {
-		<-ns.collectionDone(ctx, deepcopy.Copy(msg).(*ttnpb.UplinkMessage))
+	go func(msg *ttnpb.UplinkMessage) {
+		<-ns.collectionDone(ctx, msg)
 		ns.metadataAccumulators.Delete(k)
-	}()
+	}(deepcopy.Copy(msg).(*ttnpb.UplinkMessage))
 	return a, false
 }
 

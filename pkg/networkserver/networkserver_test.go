@@ -296,10 +296,10 @@ func sendUplinkDuplicates(t *testing.T, h UplinkHandler, windowEndCh chan window
 	msg = deepcopy.Copy(msg).(*ttnpb.UplinkMessage)
 
 	errch := make(chan error, 1)
-	go func() {
-		_, err := h.HandleUplink(ctx, deepcopy.Copy(msg).(*ttnpb.UplinkMessage))
+	go func(msg *ttnpb.UplinkMessage) {
+		_, err := h.HandleUplink(ctx, msg)
 		errch <- err
-	}()
+	}(deepcopy.Copy(msg).(*ttnpb.UplinkMessage))
 
 	var weCh chan<- time.Time
 	select {
@@ -390,33 +390,39 @@ func TestLinkApplication(t *testing.T) {
 
 	id := ttnpb.NewPopulatedApplicationIdentifiers(test.Randy, false)
 
-	stream := &mockAsNsLinkApplicationStream{
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+
+	sendFunc := func(*ttnpb.ApplicationUp) error {
+		t.Error("Send should not be called")
+		return nil
+	}
+
+	time.AfterFunc(test.Delay, func() {
+		err := ns.LinkApplication(id, &mockAsNsLinkApplicationStream{
+			MockServerStream: &test.MockServerStream{
+				MockStream: &test.MockStream{
+					ContextFunc: func() context.Context {
+						ctx, cancel := context.WithCancel(context.Background())
+						time.AfterFunc(test.Delay, cancel)
+						return ctx
+					},
+				},
+			},
+			send: sendFunc,
+		})
+		a.So(err, should.Resemble, context.Canceled)
+		wg.Done()
+	})
+
+	err := ns.LinkApplication(id, &mockAsNsLinkApplicationStream{
 		MockServerStream: &test.MockServerStream{
 			MockStream: &test.MockStream{
 				ContextFunc: context.Background,
 			},
 		},
-		send: func(*ttnpb.ApplicationUp) error {
-			t.Error("Send should not be called")
-			return nil
-		},
-	}
-
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	time.AfterFunc(test.Delay, func() {
-		stream.ContextFunc = func() context.Context {
-			ctx, cancel := context.WithCancel(context.Background())
-			time.AfterFunc(test.Delay, cancel)
-			return ctx
-		}
-
-		err := ns.LinkApplication(id, stream)
-		a.So(err, should.Resemble, context.Canceled)
-		wg.Done()
+		send: sendFunc,
 	})
-
-	err := ns.LinkApplication(id, stream)
 	a.So(err, should.NotBeNil)
 
 	wg.Wait()
@@ -1075,10 +1081,10 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					}
 
 					errch := make(chan error, 1)
-					go func() {
-						_, err = ns.HandleUplink(ctx, deepcopy.Copy(msg).(*ttnpb.UplinkMessage))
+					go func(msg *ttnpb.UplinkMessage) {
+						_, err = ns.HandleUplink(ctx, msg)
 						errch <- err
-					}()
+					}(deepcopy.Copy(msg).(*ttnpb.UplinkMessage))
 
 					select {
 					case err := <-errch:
