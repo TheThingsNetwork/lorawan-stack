@@ -83,7 +83,7 @@ var DefaultServiceBase = config.ServiceBase{
 
 // DefaultFrequencyPlansConfig is the default config to retrieve frequency plans.
 var DefaultFrequencyPlansConfig = config.FrequencyPlans{
-	StoreDirectory: "https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/yaml-master",
+	StoreURL: "https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/yaml-master",
 }
 
 // DefaultISRightsFetchingConfig is the default config to fetch rights from the Identity Server.
