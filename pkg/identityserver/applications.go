@@ -186,7 +186,7 @@ func (s *applicationService) DeleteApplication(ctx context.Context, req *ttnpb.A
 
 // GenerateApplicationAPIKey generates an application API key and returns it.
 func (s *applicationService) GenerateApplicationAPIKey(ctx context.Context, req *ttnpb.GenerateApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
-	err := s.enforceApplicationRights(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+	err := s.enforceApplicationRights(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +214,7 @@ func (s *applicationService) GenerateApplicationAPIKey(ctx context.Context, req 
 func (s *applicationService) ListApplicationAPIKeys(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*ttnpb.ListApplicationAPIKeysResponse, error) {
 	ids := *req
 
-	err := s.enforceApplicationRights(ctx, ids, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+	err := s.enforceApplicationRights(ctx, ids, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -236,7 +236,7 @@ func (s *applicationService) ListApplicationAPIKeys(ctx context.Context, req *tt
 
 // UpdateApplicationAPIKey updates the rights of an application API key.
 func (s *applicationService) UpdateApplicationAPIKey(ctx context.Context, req *ttnpb.UpdateApplicationAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := s.enforceApplicationRights(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+	err := s.enforceApplicationRights(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -246,7 +246,7 @@ func (s *applicationService) UpdateApplicationAPIKey(ctx context.Context, req *t
 
 // RemoveApplicationAPIKey removes an application API key.
 func (s *applicationService) RemoveApplicationAPIKey(ctx context.Context, req *ttnpb.RemoveApplicationAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := s.enforceApplicationRights(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+	err := s.enforceApplicationRights(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS)
 	if err != nil {
 		return nil, err
 	}

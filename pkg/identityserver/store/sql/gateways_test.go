@@ -153,7 +153,7 @@ func testGateways(t *testing.T, ids ttnpb.GatewayIdentifiers) {
 	a.So(err, should.BeNil)
 	a.So(has, should.BeFalse)
 
-	collaborator.Rights = []ttnpb.Right{ttnpb.RIGHT_GATEWAY_LOCATION}
+	collaborator.Rights = []ttnpb.Right{ttnpb.RIGHT_GATEWAY_LOCATION_READ}
 
 	err = s.Gateways.SetCollaborator(collaborator)
 	a.So(err, should.BeNil)

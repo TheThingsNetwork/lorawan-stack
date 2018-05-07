@@ -20,158 +20,106 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 
-// Right is the enum that defines all the different rights to do something in
-// the network.
+// Right is the enum that defines all the different rights to do something in the network.
 enum Right {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  // RIGHT_INVALID is the invalid right and should not be used.
-  // It can denote a parsing error.
+  // This is the invalid right and should not be used. It can denote a parsing error.
   RIGHT_INVALID = 0;
 
-  // RIGHT_USER_PROFILE_READ is the right to read the user's profile.
-  RIGHT_USER_PROFILE_READ = 1;
-
-  // RIGHT_USER_PROFILE_WRITE is the right to edit the user's profile.
-  RIGHT_USER_PROFILE_WRITE = 2;
-
-  // RIGHT_USER_DELETE is the right to delete the user's account.
+ 
+  // The right to view information about the user.
+  RIGHT_USER_INFO = 1;
+  // The right to write the basic settings of the user.
+  RIGHT_USER_SETTINGS_BASIC = 2;
+  // The right to delete the account of the user.
   RIGHT_USER_DELETE = 3;
-
-  // RIGHT_USER_AUTHORIZEDCLIENTS is the right to view and manage the authorized
-  // clients of the user: list, authorize and de-authorize clients.
-  RIGHT_USER_AUTHORIZEDCLIENTS = 4;
-
-  // RIGHT_USER_APPLICATIONS_LIST is the right to list all of the applications
-  // the user is a collaborator of.
+  // The right to view authorized, authorize and de-authorize OAuth clients of the user.
+  RIGHT_USER_AUTHORIZED_CLIENTS = 4;
+  // The right to list all of the applications the user is a collaborator of.
   RIGHT_USER_APPLICATIONS_LIST = 5;
-
-  // RIGHT_USER_APPLICATIONS_CREATE is the right to create an application in
-  // the users account.
+  // The right to create an application under the account of the user.
   RIGHT_USER_APPLICATIONS_CREATE = 6;
-
-  // RIGHT_USER_GATEWAYS_LIST is the right to list gateways the user is collaborator of.
+  // The right to list gateways the user is collaborator of.
   RIGHT_USER_GATEWAYS_LIST = 7;
-
-  // RIGHT_USER_GATEWAYS_CREATE is the right to register a gateway in the users account.
+  // The right to register a gateway under the account of the user.
   RIGHT_USER_GATEWAYS_CREATE = 8;
-
-  // RIGHT_USER_CLIENTS is the right to create, list, view, update and delete
-  // OAuth clients in the user's account.
+  // The right to create, list, view, update and delete OAuth clients under the account of the user.
   RIGHT_USER_CLIENTS = 9;
-
-  // RIGHT_USER_ADMIN is the right to performs actions that requires the user to be an admin.
+  // The right to performs actions that requires the user to be an admin.
   RIGHT_USER_ADMIN = 10;
-
-  // RIGHT_USER_KEYS is the right to view and manage user API keys.
-  RIGHT_USER_KEYS = 11;
-
-  // RIGHT_USER_ORGANIZATIONS_CREATE is the right to create a new organization.
-  RIGHT_USER_ORGANIZATIONS_CREATE = 17;
-
-  // RIGHT_USER_ORGANIZATIONS_LIST is the right to list all of the organizations
-  // the user is a member of.
-  RIGHT_USER_ORGANIZATIONS_LIST = 18;
+  // The right to view and write the API keys of the user.
+  RIGHT_USER_SETTINGS_API_KEYS = 11;
+  // The right to create a new organization under the account of the user.
+  RIGHT_USER_ORGANIZATIONS_CREATE = 12;
+  // The right to list all of the organizations the user is a member of.
+  RIGHT_USER_ORGANIZATIONS_LIST = 13;
 
 
-  // RIGHT_APPLICATION_INFO is the right to see basic information about the application.
-  // This does not include API keys.
-  RIGHT_APPLICATION_INFO = 31;
-
-  // RIGHT_APPLICATION_SETTINGS_BASIC is the right to edit basic settings of the application.
-  RIGHT_APPLICATION_SETTINGS_BASIC = 32;
-
-  // RIGHT_APPLICATION_SETTINGS_KEYS is the right to view and edit application
-  // API keys.
-  RIGHT_APPLICATION_SETTINGS_KEYS = 33;
-
-  // RIGHT_APPLICATION_SETTINGS_COLLABORATORS is the right to manage the
-  // collaborators of the application.
-  RIGHT_APPLICATION_SETTINGS_COLLABORATORS = 34;
-
-  // RIGHT_APPLICATION_DELETE is the right to delete the application.
-  RIGHT_APPLICATION_DELETE = 35;
-
-  // RIGHT_APPLICATION_DEVICES_READ is the right to see the devices of an application.
-  RIGHT_APPLICATION_DEVICES_READ = 36;
-
-  // RIGHT_APPLICATION_DEVICES_WRITE is the right to register devices to an application.
-  RIGHT_APPLICATION_DEVICES_WRITE = 37;
-
-  // RIGHT_APPLICATION_TRAFFIC_READ is the right to read traffic of the
-  // application (uplink and downlink).
-  RIGHT_APPLICATION_TRAFFIC_READ = 38;
-
-  // RIGHT_APPLICATION_TRAFFIC_WRITE is the right to write traffic of the
-  // application (uplink and downlink).
-  RIGHT_APPLICATION_TRAFFIC_WRITE = 39;
+  // The right to view information about the application.
+  RIGHT_APPLICATION_INFO = 14;
+  // The right to write the basic settings of the application.
+  RIGHT_APPLICATION_SETTINGS_BASIC = 15;
+  // The right to view and write the API keys of the application.
+  RIGHT_APPLICATION_SETTINGS_API_KEYS = 16;
+  // The right to view and edit the collaborators of the application.
+  RIGHT_APPLICATION_SETTINGS_COLLABORATORS = 17;
+  // The right to delete the application.
+  RIGHT_APPLICATION_DELETE = 18;
+  // The right to view the devices of an application.
+  RIGHT_APPLICATION_DEVICES_READ = 19;
+  // The right to register devices to an application.
+  RIGHT_APPLICATION_DEVICES_WRITE = 20;
+  // The right to read traffic of the application (uplink and downlink).
+  RIGHT_APPLICATION_TRAFFIC_READ = 21;
+  // The right to write uplink traffic of the application.
+  RIGHT_APPLICATION_TRAFFIC_UP_WRITE = 22;
+  // The right to write downlink traffic of the application.
+  RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE = 23;
+  // The right to link to a Network Server for traffic exchange, i.e. write uplink 
+  // and read downlink (API keys only).
+  RIGHT_APPLICATION_LINK = 24;
 
 
-  // RIGHT_GATEWAY_INFO is the right to see basic information about the gateway.
-  // This does not include API keys.
-  RIGHT_GATEWAY_INFO = 51;
-
-  // RIGHT_GATEWAY_SETTINGS_BASIC is the right to manage basic settings of the gateway.
-  RIGHT_GATEWAY_SETTINGS_BASIC = 52;
-
-  // RIGHT_GATEWAY_SETTINGS_KEYS is the right to view and edit API keys of the gateway.
-  RIGHT_GATEWAY_SETTINGS_KEYS = 53;
-
-  // RIGHT_GATEWAY_SETTINGS_COLLABORATORS is the right to manage collaborators
-  // of the gateway.
-  RIGHT_GATEWAY_SETTINGS_COLLABORATORS = 54;
-
-  // RIGHT_GATEWAY_DELETE is the right to delete the gateway.
-  RIGHT_GATEWAY_DELETE = 55;
-
-  // RIGHT_GATEWAY_TRAFFIC_READ is the right to read traffic coming from the gateway.
-  RIGHT_GATEWAY_TRAFFIC_READ = 56;
-
-  // RIGHT_GATEWAY_TRAFFIC_WRITE is the right to write traffic to a gateway.
-  RIGHT_GATEWAY_TRAFFIC_WRITE = 57;
-
-  // RIGHT_GATEWAY_TRAFFIC_LINK is the right for a gateway to exchange traffic with the gateway server.
-  RIGHT_GATEWAY_TRAFFIC_LINK = 58;
-
-  // RIGHT_GATEWAY_STATUS is the right to view the status of the gateway.
-  RIGHT_GATEWAY_STATUS = 59;
-
-  // RIGHT_GATEWAY_LOCATION is the right to view the location of the gateway.
-  RIGHT_GATEWAY_LOCATION = 60;
+  // The right to view information about the gateway.
+  RIGHT_GATEWAY_INFO = 25;
+  // The right to write the basic settings of the gateway.
+  RIGHT_GATEWAY_SETTINGS_BASIC = 26;
+  // The right to view and write the API keys of the gateway.
+  RIGHT_GATEWAY_SETTINGS_API_KEYS = 27;
+  // The right to view and edit collaborators of the gateway.
+  RIGHT_GATEWAY_SETTINGS_COLLABORATORS = 28;
+  // The right to delete the gateway.
+  RIGHT_GATEWAY_DELETE = 29;
+  // The right to read traffic coming from the gateway.
+  RIGHT_GATEWAY_TRAFFIC_READ = 30;
+  // The right to write downlink traffic to a gateway.
+  RIGHT_GATEWAY_TRAFFIC_DOWN_WRITE = 31;
+  // The right to link to a Gateway Server for traffic exchange, i.e. write uplink 
+  // and read downlink (API keys only).
+  RIGHT_GATEWAY_LINK = 32;
+  // The right to view the status of the gateway.
+  RIGHT_GATEWAY_STATUS_READ = 33;
+  // The right to view the location of the gateway.
+  RIGHT_GATEWAY_LOCATION_READ = 34;
 
 
-  // RIGHT_ORGANIZATION_INFO is the right to view the basic information about an
-  // organization.
-  RIGHT_ORGANIZATION_INFO = 71;
-
-  // RIGHT_ORGANIZATION_SETTINGS_BASIC is the right to manage basic settings of
-  // the organization.
-  RIGHT_ORGANIZATION_SETTINGS_BASIC = 72;
-
-  // RIGHT_ORGANIZATION_SETTINGS_KEYS is the right to view and edit API keys of
-  // the organization.
-  RIGHT_ORGANIZATION_SETTINGS_KEYS = 73;
-
-  // RIGHT_ORGANIZATION_SETTINGS_COLLABORATORS is the right to manage members
-  // of the organization.
-  RIGHT_ORGANIZATION_SETTINGS_MEMBERS = 74;
-
-  // RIGHT_ORGANIZATION_DELETE is the right to delete the organization.
-  RIGHT_ORGANIZATION_DELETE = 75;
-
-  // RIGHT_ORGANIZATION_GATEWAYS_CREATE is the right to create an application
-  // from an organization.
-  RIGHT_ORGANIZATION_APPLICATIONS_CREATE = 76;
-
-  // RIGHT_ORGANIZATION_APPLICATIONS_LIST is the right to list the applications
-  // the organization is collaborator of.
-  RIGHT_ORGANIZATION_APPLICATIONS_LIST = 77;
-
-  // RIGHT_ORGANIZATION_GATEWAYS_CREATE is the right to create a gateway from
-  // an organization.
-  RIGHT_ORGANIZATION_GATEWAYS_CREATE = 78;
-
-  // RIGHT_ORGANIZATION_GATEWAYS_LIST is the right to list the gateways the
-  // organization is collaborator of.
-  RIGHT_ORGANIZATION_GATEWAYS_LIST = 79;
+  // The right to view information about the organization.
+  RIGHT_ORGANIZATION_INFO = 35;
+  // The right to write the basic settings of the organization.
+  RIGHT_ORGANIZATION_SETTINGS_BASIC = 36;
+  // The right to view and write the API keys of the organization.
+  RIGHT_ORGANIZATION_SETTINGS_API_KEYS = 37;
+  // The right to view and edit members of the organization.
+  RIGHT_ORGANIZATION_SETTINGS_MEMBERS = 38;
+  // The right to delete the organization.
+  RIGHT_ORGANIZATION_DELETE = 39;
+  // The right to create an application under an organization.
+  RIGHT_ORGANIZATION_APPLICATIONS_CREATE = 40;
+  // The right to list the applications the organization is collaborator of.
+  RIGHT_ORGANIZATION_APPLICATIONS_LIST = 41;
+  // The right to create a gateway under an organization.
+  RIGHT_ORGANIZATION_GATEWAYS_CREATE = 42;
+  // The right to list the gateways the organization is collaborator of.
+  RIGHT_ORGANIZATION_GATEWAYS_LIST = 43;
 }

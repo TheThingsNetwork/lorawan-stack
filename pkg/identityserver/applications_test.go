@@ -152,7 +152,7 @@ func TestApplication(t *testing.T) {
 
 	// the new collaborator can't grant himself more rights
 	{
-		collab.Rights = append(collab.Rights, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+		collab.Rights = append(collab.Rights, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS)
 
 		ctx := testCtx(alice.UserIdentifiers)
 
@@ -162,7 +162,7 @@ func TestApplication(t *testing.T) {
 		rights, err := is.applicationService.ListApplicationRights(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: app.ApplicationID})
 		a.So(err, should.BeNil)
 		a.So(rights.Rights, should.HaveLength, 2)
-		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_APPLICATION_SETTINGS_KEYS)
+		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS)
 
 		// but it can't revoke itself the INFO right
 		collab.Rights = []ttnpb.Right{ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS}

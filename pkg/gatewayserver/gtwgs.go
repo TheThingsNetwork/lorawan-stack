@@ -100,7 +100,7 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 
 	if !g.config.DisableAuth {
 		// TODO: Add rights caching: https://github.com/TheThingsIndustries/ttn/issues/594
-		if err := checkAuthorization(ctx, is, ttnpb.RIGHT_GATEWAY_TRAFFIC_LINK); err != nil {
+		if err := checkAuthorization(ctx, is, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 			return err
 		}
 	}

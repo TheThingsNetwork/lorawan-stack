@@ -152,7 +152,7 @@ func TestOrganization(t *testing.T) {
 
 	// The new member can't grant himself more rights.
 	{
-		member.Rights = append(member.Rights, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
+		member.Rights = append(member.Rights, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS)
 
 		ctx := testCtx(alice.UserIdentifiers)
 
@@ -162,7 +162,7 @@ func TestOrganization(t *testing.T) {
 		rights, err := is.organizationService.ListOrganizationRights(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: org.OrganizationID})
 		a.So(err, should.BeNil)
 		a.So(rights.Rights, should.HaveLength, 2)
-		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
+		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS)
 
 		members, err = is.organizationService.ListOrganizationMembers(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: org.OrganizationID})
 		a.So(err, should.BeNil)

@@ -192,7 +192,7 @@ func TestUserValidations(t *testing.T) {
 		// good request
 		req = &UpdateUserAPIKeyRequest{
 			Name:   "Foo-key",
-			Rights: []Right{RIGHT_USER_AUTHORIZEDCLIENTS},
+			Rights: []Right{RIGHT_USER_AUTHORIZED_CLIENTS},
 		}
 		a.So(req.Validate(), should.BeNil)
 	}

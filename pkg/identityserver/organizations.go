@@ -171,7 +171,7 @@ func (s *organizationService) DeleteOrganization(ctx context.Context, req *ttnpb
 
 // GenerateOrganizationAPIKey generates an organization API key and returns it.
 func (s *organizationService) GenerateOrganizationAPIKey(ctx context.Context, req *ttnpb.GenerateOrganizationAPIKeyRequest) (*ttnpb.APIKey, error) {
-	err := s.enforceOrganizationRights(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
+	err := s.enforceOrganizationRights(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -199,7 +199,7 @@ func (s *organizationService) GenerateOrganizationAPIKey(ctx context.Context, re
 func (s *organizationService) ListOrganizationAPIKeys(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*ttnpb.ListOrganizationAPIKeysResponse, error) {
 	ids := *req
 
-	err := s.enforceOrganizationRights(ctx, ids, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
+	err := s.enforceOrganizationRights(ctx, ids, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -221,7 +221,7 @@ func (s *organizationService) ListOrganizationAPIKeys(ctx context.Context, req *
 
 // UpdateOrganizationAPIKey updates the rights of an organization API key.
 func (s *organizationService) UpdateOrganizationAPIKey(ctx context.Context, req *ttnpb.UpdateOrganizationAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := s.enforceOrganizationRights(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
+	err := s.enforceOrganizationRights(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -231,7 +231,7 @@ func (s *organizationService) UpdateOrganizationAPIKey(ctx context.Context, req 
 
 // RemoveOrganizationAPIKey removes an organization API key.
 func (s *organizationService) RemoveOrganizationAPIKey(ctx context.Context, req *ttnpb.RemoveOrganizationAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := s.enforceOrganizationRights(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_KEYS)
+	err := s.enforceOrganizationRights(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS)
 	if err != nil {
 		return nil, err
 	}

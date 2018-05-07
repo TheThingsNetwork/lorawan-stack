@@ -139,7 +139,7 @@ func (conn *connection) addDownstreamObservations(down *ttnpb.GatewayDown) {
 
 // GetGatewayObservations returns gateway information as observed by the gateway server.
 func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
-	if !gs.config.DisableAuth && !ttnpb.IncludesRights(rights.FromContext(ctx), ttnpb.RIGHT_GATEWAY_STATUS) {
+	if !gs.config.DisableAuth && !ttnpb.IncludesRights(rights.FromContext(ctx), ttnpb.RIGHT_GATEWAY_STATUS_READ) {
 		return nil, ErrPermissionDenied.New(nil)
 	}
 

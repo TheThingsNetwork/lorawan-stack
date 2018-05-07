@@ -222,7 +222,7 @@ func (s *gatewayService) DeleteGateway(ctx context.Context, req *ttnpb.GatewayId
 
 // GenerateGatewayAPIKey generates a gateway API key and returns it.
 func (s *gatewayService) GenerateGatewayAPIKey(ctx context.Context, req *ttnpb.GenerateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
-	err := s.enforceGatewayRights(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+	err := s.enforceGatewayRights(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -250,7 +250,7 @@ func (s *gatewayService) GenerateGatewayAPIKey(ctx context.Context, req *ttnpb.G
 func (s *gatewayService) ListGatewayAPIKeys(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*ttnpb.ListGatewayAPIKeysResponse, error) {
 	ids := *req
 
-	err := s.enforceGatewayRights(ctx, ids, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+	err := s.enforceGatewayRights(ctx, ids, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -272,7 +272,7 @@ func (s *gatewayService) ListGatewayAPIKeys(ctx context.Context, req *ttnpb.Gate
 
 // UpdateGatewayAPIKey updates an API key rights.
 func (s *gatewayService) UpdateGatewayAPIKey(ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := s.enforceGatewayRights(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+	err := s.enforceGatewayRights(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS)
 	if err != nil {
 		return nil, err
 	}
@@ -282,7 +282,7 @@ func (s *gatewayService) UpdateGatewayAPIKey(ctx context.Context, req *ttnpb.Upd
 
 // RemoveGatewayAPIKey removes a gateway API key.
 func (s *gatewayService) RemoveGatewayAPIKey(ctx context.Context, req *ttnpb.RemoveGatewayAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := s.enforceGatewayRights(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+	err := s.enforceGatewayRights(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS)
 	if err != nil {
 		return nil, err
 	}

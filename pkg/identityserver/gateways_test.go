@@ -234,7 +234,7 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 
 	// The new collaborator can not grant himself more rights.
 	{
-		collab.Rights = append(collab.Rights, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+		collab.Rights = append(collab.Rights, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS)
 
 		ctx := testCtx(alice.UserIdentifiers)
 
@@ -244,7 +244,7 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 		rights, err := is.gatewayService.ListGatewayRights(ctx, &sids)
 		a.So(err, should.BeNil)
 		a.So(rights.Rights, should.HaveLength, 2)
-		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_GATEWAY_SETTINGS_KEYS)
+		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS)
 
 		// But can revoke himself the INFO right.
 		collab.Rights = []ttnpb.Right{ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS}

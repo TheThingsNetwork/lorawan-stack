@@ -70,7 +70,7 @@ func TestBuildauthorizationData(t *testing.T) {
 		ClientID:    client.ClientID,
 		CreatedAt:   time.Now().UTC().Truncate(time.Duration(time.Hour * 999)),
 		ExpiresIn:   time.Duration(time.Minute * 10),
-		Scope:       oauth.Scope([]ttnpb.Right{ttnpb.RIGHT_USER_AUTHORIZEDCLIENTS}),
+		Scope:       oauth.Scope([]ttnpb.Right{ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS}),
 		RedirectURI: "http://localhost/auth/callback",
 	}
 	err = is.store.OAuth.SaveAccessToken(tdata)

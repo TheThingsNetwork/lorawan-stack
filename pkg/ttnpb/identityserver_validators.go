@@ -199,12 +199,16 @@ func (req *RemoveApplicationAPIKeyRequest) Validate() error {
 	)
 }
 
+// List of valid rights for an application collaborator.
+// `RIGHT_APPLICATION_LINK` is excluded.
+var validApplicationCollaboratorRights = DifferenceRights(AllApplicationRights(), []Right{RIGHT_APPLICATION_LINK})
+
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *ApplicationCollaborator) Validate() error {
 	return validate.All(
 		req.OrganizationOrUserIdentifiers.Validate(),
 		req.ApplicationIdentifiers.Validate(),
-		validate.Field(req.Rights, validate.NotRequired, validate.In(AllApplicationRights())).DescribeFieldName("Rights"),
+		validate.Field(req.Rights, validate.NotRequired, validate.In(validApplicationCollaboratorRights)).DescribeFieldName("Rights"),
 	)
 }
 
@@ -315,23 +319,31 @@ func (req *RemoveGatewayAPIKeyRequest) Validate() error {
 	)
 }
 
+// List of valid rights for a gateway collaborator.
+// `RIGHT_GATEWAY_LINK` is excluded.
+var validGatewayCollaboratorRights = DifferenceRights(AllGatewayRights(), []Right{RIGHT_GATEWAY_LINK})
+
 // Validate is used as validator function by the GRPC validator interceptor.
 func (req *GatewayCollaborator) Validate() error {
 	return validate.All(
 		req.OrganizationOrUserIdentifiers.Validate(),
 		req.GatewayIdentifiers.Validate(),
-		validate.Field(req.Rights, validate.NotRequired, validate.In(AllGatewayRights())).DescribeFieldName("Rights"),
+		validate.Field(req.Rights, validate.NotRequired, validate.In(validGatewayCollaboratorRights)).DescribeFieldName("Rights"),
 	)
 }
 
 // validClientRights is the list of valid rights for a third-party client scope.
+// Rights related to API keys, third party clients and self-user account deletion
+// are excluded.
 var validClientRights = []Right{
-	RIGHT_USER_PROFILE_READ,
-	RIGHT_USER_PROFILE_WRITE,
+	RIGHT_USER_INFO,
+	RIGHT_USER_SETTINGS_BASIC,
 	RIGHT_USER_APPLICATIONS_LIST,
 	RIGHT_USER_APPLICATIONS_CREATE,
 	RIGHT_USER_GATEWAYS_LIST,
 	RIGHT_USER_GATEWAYS_CREATE,
+	RIGHT_USER_ORGANIZATIONS_LIST,
+	RIGHT_USER_ORGANIZATIONS_CREATE,
 	RIGHT_APPLICATION_INFO,
 	RIGHT_APPLICATION_SETTINGS_BASIC,
 	RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
@@ -339,15 +351,24 @@ var validClientRights = []Right{
 	RIGHT_APPLICATION_DEVICES_READ,
 	RIGHT_APPLICATION_DEVICES_WRITE,
 	RIGHT_APPLICATION_TRAFFIC_READ,
-	RIGHT_APPLICATION_TRAFFIC_WRITE,
+	RIGHT_APPLICATION_TRAFFIC_UP_WRITE,
+	RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 	RIGHT_GATEWAY_INFO,
 	RIGHT_GATEWAY_SETTINGS_BASIC,
 	RIGHT_GATEWAY_SETTINGS_COLLABORATORS,
 	RIGHT_GATEWAY_DELETE,
 	RIGHT_GATEWAY_TRAFFIC_READ,
-	RIGHT_GATEWAY_TRAFFIC_WRITE,
-	RIGHT_GATEWAY_STATUS,
-	RIGHT_GATEWAY_LOCATION,
+	RIGHT_GATEWAY_TRAFFIC_DOWN_WRITE,
+	RIGHT_GATEWAY_STATUS_READ,
+	RIGHT_GATEWAY_LOCATION_READ,
+	RIGHT_ORGANIZATION_INFO,
+	RIGHT_ORGANIZATION_SETTINGS_BASIC,
+	RIGHT_ORGANIZATION_SETTINGS_MEMBERS,
+	RIGHT_ORGANIZATION_DELETE,
+	RIGHT_ORGANIZATION_APPLICATIONS_CREATE,
+	RIGHT_ORGANIZATION_APPLICATIONS_LIST,
+	RIGHT_ORGANIZATION_GATEWAYS_CREATE,
+	RIGHT_ORGANIZATION_GATEWAYS_LIST,
 }
 
 // Validate is used as validator function by the GRPC validator interceptor.
