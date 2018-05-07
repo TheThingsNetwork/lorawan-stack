@@ -24,6 +24,6 @@ func ExampleNewWithCause() {
 	fmt.Println(err)
 	err = NewWithCausef(cause, "Something went wrong for the %s time!", "second")
 	fmt.Println(err)
-	// Output: errors: Something went wrong! (Underlying cause)
-	// errors: Something went wrong for the second time! (Underlying cause)
+	// Output: pkg/errors: Something went wrong! (Underlying cause)
+	// pkg/errors: Something went wrong for the second time! (Underlying cause)
 }

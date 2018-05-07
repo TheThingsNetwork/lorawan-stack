@@ -28,6 +28,7 @@ package errors
 
 import (
 	"fmt"
+	"path/filepath"
 	"runtime"
 	"strings"
 )
@@ -97,22 +98,15 @@ func Errorf(format string, a ...interface{}) error {
 
 // pkg returns the package the caller was called from.
 func pkg() string {
-	fns := make([]uintptr, 1)
-
-	n := runtime.Callers(3, fns)
-	if n == 0 {
-		return ""
+	pc, _, _, ok := runtime.Caller(2)
+	if !ok {
+		panic("could not determine source of error")
 	}
-
-	fun := runtime.FuncForPC(fns[0] - 1)
-	if fun == nil {
-		return ""
+	fun := runtime.FuncForPC(pc).Name()
+	pkg := filepath.Join(filepath.Dir(fun), strings.Split(filepath.Base(fun), ".")[0])
+	if strings.Contains(pkg, "github.com/TheThingsNetwork/ttn/") {
+		split := strings.Split(pkg, "github.com/TheThingsNetwork/ttn/")
+		pkg = split[len(split)-1]
 	}
-
-	name := fun.Name()
-
-	split := strings.Split(name, "github.com/TheThingsNetwork/ttn/pkg/")
-	pkg := split[len(split)-1]
-
-	return strings.Split(pkg, ".")[0]
+	return pkg
 }

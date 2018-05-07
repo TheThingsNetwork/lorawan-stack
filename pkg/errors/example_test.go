@@ -51,7 +51,7 @@ func Example() {
 	fmt.Println("namespace:", err.Namespace())
 	fmt.Println("code:", err.Code())
 	// Output:
-	// errors[391]: You made a mistake cost us 7 dollars
-	// namespace: errors
+	// pkg/errors[391]: You made a mistake cost us 7 dollars
+	// namespace: pkg/errors
 	// code: 391
 }

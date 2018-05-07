@@ -27,7 +27,7 @@ func TestNew(t *testing.T) {
 
 	err := New("Something went wrong")
 
-	a.So(err.Namespace(), should.Equal, "errors")
+	a.So(err.Namespace(), should.Equal, "pkg/errors")
 }
 
 func TestRegistry(t *testing.T) {
