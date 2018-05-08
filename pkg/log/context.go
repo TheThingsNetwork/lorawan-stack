@@ -37,11 +37,14 @@ func NewContextWithFields(ctx context.Context, f Fielder) context.Context {
 
 // FromContext returns the logger that is attached to the context or returns the Noop logger if it does not exist
 func FromContext(ctx context.Context) Interface {
-	if v := ctx.Value(loggerKey); v != nil {
-		if logger, ok := v.(Interface); ok {
-			return logger
-		}
+	v := ctx.Value(loggerKey)
+	if v == nil {
+		return Noop
 	}
 
-	return Noop
+	logger, ok := v.(Interface)
+	if !ok {
+		return Noop
+	}
+	return logger
 }
