@@ -26,11 +26,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-// Make sure in compile time that noopCache and ttlCache implements cache.
-var (
-	_ cache = new(noopCache)
-	_ cache = new(ttlCache)
-)
+var _ cache = new(ttlCache)
 
 func TestCacheTTL(t *testing.T) {
 	a := assertions.New(t)
