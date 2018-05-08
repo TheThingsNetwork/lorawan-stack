@@ -50,7 +50,7 @@ type IdentityServerConnector interface {
 type Config struct {
 	// TTL is the duration that entries will remain in the cache before being
 	// garbage collected. If the value is not set (i.e. 0) caching will be disabled.
-	TTL time.Duration `name:"ttl" description:"How long to cache client authorizations before re-validating with the identity server. Valid example values: 30s, 5m or 1h."`
+	TTL time.Duration `name:"ttl" description:"Validity of Identity Server responses"`
 }
 
 // Hook implements a gRPC unary hook that preloads in the context the rights
@@ -59,21 +59,23 @@ type Config struct {
 type Hook struct {
 	ctx               context.Context
 	logger            log.Interface
-	conn              IdentityServerConnector
+	config            Config
+	connector         IdentityServerConnector
 	applicationsCache cache
 	gatewaysCache     cache
 }
 
 // New returns a new hook instance. ctx is a cancelable context
 // used to stop the garbage collector of the TTL cache if it has been set.
-func New(ctx context.Context, conn IdentityServerConnector, config Config) (*Hook, error) {
-	if conn == nil {
+func New(ctx context.Context, connector IdentityServerConnector, config Config) (*Hook, error) {
+	if connector == nil {
 		return nil, errors.New("An Identity Server connection provider must be given")
 	}
 
 	h := &Hook{
-		ctx:  log.NewContextWithField(ctx, "hook", "rights"),
-		conn: conn,
+		ctx:       log.NewContextWithField(ctx, "hook", "rights"),
+		config:    config,
+		connector: connector,
 	}
 	h.logger = log.FromContext(ctx)
 
@@ -103,7 +105,7 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 				return next(ctx, req)
 			}
 
-			conn := h.conn.Get(ctx)
+			conn := h.connector.Get(ctx)
 			if conn == nil {
 				return nil, errors.New("No Identity Server to connect to")
 			}
