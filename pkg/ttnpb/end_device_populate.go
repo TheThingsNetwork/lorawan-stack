@@ -62,18 +62,10 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	out.MinFrequency = uint64(r.Uint32())
 	out.MaxFrequency = uint64(r.Uint32())
 	out.MaxTxPower = uint64(r.Uint32())
-	if r.Intn(10) != 0 {
-		out.MACSettings = NewPopulatedMACSettings(r, easy)
-	}
-	if r.Intn(10) != 0 {
-		out.MACInfo = NewPopulatedMACInfo(r, easy)
-	}
-	if r.Intn(10) != 0 {
-		out.MACState = NewPopulatedMACState(r, easy)
-	}
-	if r.Intn(10) != 0 {
-		out.MACStateDesired = NewPopulatedMACState(r, easy)
-	}
+	out.MACSettings = NewPopulatedMACSettings(r, easy)
+	out.MACInfo = NewPopulatedMACInfo(r, easy)
+	out.MACState = NewPopulatedMACState(r, easy)
+	out.MACStateDesired = NewPopulatedMACState(r, easy)
 	if r.Intn(10) != 0 {
 		out.Location = NewPopulatedLocation(r, easy)
 	}
