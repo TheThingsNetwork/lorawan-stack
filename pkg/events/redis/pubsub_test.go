@@ -16,16 +16,40 @@ package redis_test
 
 import (
 	"context"
+	"os"
+	"strconv"
 	"testing"
 	"time"
 
 	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/TheThingsNetwork/ttn/pkg/events"
 	"github.com/TheThingsNetwork/ttn/pkg/events/redis"
-	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
+
+// redisConfig returns a new redis config for testing
+func redisConfig() config.Redis {
+	var err error
+	config := config.Redis{
+		Address:   "localhost:6379",
+		Database:  1,
+		Namespace: []string{"test"},
+	}
+	if address := os.Getenv("REDIS_ADDRESS"); address != "" {
+		config.Address = address
+	}
+	if db := os.Getenv("REDIS_DB"); db != "" {
+		config.Database, err = strconv.Atoi(db)
+		if err != nil {
+			panic(err)
+		}
+	}
+	if prefix := os.Getenv("REDIS_PREFIX"); prefix != "" {
+		config.Namespace = []string{prefix}
+	}
+	return config
+}
 
 func Example() {
 	// This sends all events received from Redis to the default pubsub.
@@ -52,7 +76,7 @@ func TestRedisPubSub(t *testing.T) {
 		eventCh <- e
 	})
 
-	pubsub, err := redis.NewPubSub(test.RedisConfig())
+	pubsub, err := redis.NewPubSub(redisConfig())
 	a.So(err, should.BeNil)
 	defer pubsub.Close()
 
