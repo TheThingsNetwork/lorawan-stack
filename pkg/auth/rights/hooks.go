@@ -51,6 +51,10 @@ type Config struct {
 	// TTL is the duration that entries will remain in the cache before being
 	// garbage collected. If the value is not set (i.e. 0) caching will be disabled.
 	TTL time.Duration `name:"ttl" description:"Validity of Identity Server responses"`
+
+	// AllowInsecure makes the hook not to use a transport security to send
+	// the credentials in gRPC calls to the Identity Server.
+	AllowInsecure bool `name:"allow-insecure" description:"Allow sending credentials over insecure transport"`
 }
 
 // Hook implements a gRPC unary hook that preloads in the context the rights
@@ -118,6 +122,7 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 					key := fmt.Sprintf("%s:%s", md.AuthValue, appIDs.UniqueID(ctx))
 
 					rights, err := h.applicationsCache.GetOrFetch(key, func() (rights []ttnpb.Right, err error) {
+						md.AllowInsecure = h.config.AllowInsecure
 						resp, err := ttnpb.NewIsApplicationClient(conn).ListApplicationRights(ctx, appIDs, grpc.PerRPCCredentials(md))
 						if err != nil {
 							return nil, errors.NewWithCause(err, "Failed to fetch application rights")
@@ -141,6 +146,7 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 					key := fmt.Sprintf("%s:%s", md.AuthValue, gtwIDs.UniqueID(ctx))
 
 					rights, err := h.gatewaysCache.GetOrFetch(key, func() (rights []ttnpb.Right, err error) {
+						md.AllowInsecure = h.config.AllowInsecure
 						resp, err := ttnpb.NewIsGatewayClient(conn).ListGatewayRights(ctx, gtwIDs, grpc.PerRPCCredentials(md))
 						if err != nil {
 							return nil, errors.NewWithCause(err, "Failed to fetch gateway rights")

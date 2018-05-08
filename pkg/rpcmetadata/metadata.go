@@ -33,6 +33,7 @@ type MD struct {
 	NetAddress     string
 	Limit          uint64
 	Offset         uint64
+	AllowInsecure  bool
 }
 
 // GetRequestMetadata returns the request metadata with per-rpc credentials
@@ -50,7 +51,7 @@ func (m MD) RequireTransportSecurity() bool {
 	if m.AuthType == "" || m.AuthValue == "" {
 		return false
 	}
-	return true
+	return !m.AllowInsecure
 }
 
 // ToMetadata puts the TTN metadata fields in a metadata.MD
