@@ -15,8 +15,13 @@
 package networkserver
 
 import (
+	"time"
+
 	"github.com/TheThingsNetwork/ttn/pkg/networkserver"
 )
 
 // DefaultNetworkServerConfig is the default configuration for the NetworkServer
-var DefaultNetworkServerConfig = networkserver.Config{}
+var DefaultNetworkServerConfig = networkserver.Config{
+	DeduplicationWindow: 200 * time.Millisecond,
+	CooldownWindow:      time.Second,
+}
