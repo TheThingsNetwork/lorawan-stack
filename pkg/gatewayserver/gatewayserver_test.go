@@ -63,6 +63,4 @@ func TestGatewayServer(t *testing.T) {
 	roles := gs.Roles()
 	a.So(len(roles), should.Equal, 1)
 	a.So(roles[0], should.Equal, ttnpb.PeerInfo_GATEWAY_SERVER)
-
-	defer gs.Close()
 }

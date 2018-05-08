@@ -17,53 +17,19 @@ package gatewayserver
 
 import (
 	"context"
+	"net"
 	"sync"
-	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
-	"go.thethings.network/lorawan-stack/pkg/toa"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/validate"
 	"google.golang.org/grpc"
 )
-
-type connection struct {
-	observations   ttnpb.GatewayObservations
-	observationsMu sync.RWMutex
-
-	scheduler scheduling.Scheduler
-
-	cancel   context.CancelFunc
-	linkSend func(*ttnpb.GatewayDown) error
-}
-
-func (c *connection) Send(down *ttnpb.GatewayDown) (err error) {
-	span := scheduling.Span{
-		Start: scheduling.ConcentratorTime(down.DownlinkMessage.TxMetadata.Timestamp),
-	}
-	span.Duration, err = toa.Compute(down.DownlinkMessage.RawPayload, down.DownlinkMessage.Settings)
-	if err != nil {
-		return errors.NewWithCause(err, "Could not compute time-on-air of the downlink")
-	}
-
-	err = c.scheduler.ScheduleAt(span, down.DownlinkMessage.Settings.Frequency)
-	if err != nil {
-		return errors.NewWithCause(err, "Could not schedule downlink")
-	}
-
-	err = c.linkSend(down)
-	if err != nil {
-		return errors.NewWithCause(err, "Could not send downlink")
-	}
-
-	return nil
-}
 
 // GatewayServer implements the Gateway Server component.
 //
@@ -73,18 +39,34 @@ type GatewayServer struct {
 
 	config Config
 
-	connections   map[string]*connection
+	connections   map[string]connection
 	connectionsMu sync.Mutex
 }
 
 // New returns new *GatewayServer.
-func New(c *component.Component, conf Config) (*GatewayServer, error) {
-	gs := &GatewayServer{
+func New(c *component.Component, conf Config) (gs *GatewayServer, err error) {
+	gs = &GatewayServer{
 		Component: c,
 
 		config: conf,
 
-		connections: map[string]*connection{},
+		connections: map[string]connection{},
+	}
+
+	if conf.UDPAddress != "" {
+		var conn *net.UDPConn
+		conn, err = gs.ListenUDP(conf.UDPAddress)
+		if err != nil {
+			return nil, errors.NewWithCause(err, "Could not open UDP socket")
+		}
+
+		ctx, cancel := context.WithCancel(c.Context())
+		go gs.runUDPBridge(ctx, conn)
+		defer func() {
+			if err != nil {
+				cancel()
+			}
+		}()
 	}
 
 	rightsHook, err := c.RightsHook()
@@ -112,31 +94,6 @@ func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_GATEWAY_SERVER}
 }
 
-func (conn *connection) addUpstreamObservations(up *ttnpb.GatewayUp) {
-	now := time.Now().UTC()
-
-	conn.observationsMu.Lock()
-
-	if up.GatewayStatus != nil {
-		conn.observations.LastStatus = up.GatewayStatus
-		conn.observations.LastStatusReceivedAt = &now
-	}
-
-	if nbUplinks := len(up.UplinkMessages); nbUplinks > 0 {
-		conn.observations.LastUplinkReceivedAt = &now
-	}
-
-	conn.observationsMu.Unlock()
-}
-
-func (conn *connection) addDownstreamObservations(down *ttnpb.GatewayDown) {
-	now := time.Now().UTC()
-
-	conn.observationsMu.Lock()
-	conn.observations.LastDownlinkReceivedAt = &now
-	conn.observationsMu.Unlock()
-}
-
 // GetGatewayObservations returns gateway information as observed by the Gateway Server.
 func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
 	if !gs.config.DisableAuth && !ttnpb.IncludesRights(rights.FromContext(ctx), ttnpb.RIGHT_GATEWAY_STATUS_READ) {
@@ -156,9 +113,7 @@ func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.G
 		return nil, ErrGatewayNotConnected.New(errors.Attributes{"gateway_id": id.GatewayID})
 	}
 
-	connection.observationsMu.RLock()
-	observations := connection.observations
-	connection.observationsMu.RUnlock()
+	observations := connection.getObservations()
 
 	return &observations, nil
 }

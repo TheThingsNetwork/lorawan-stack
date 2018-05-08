@@ -19,4 +19,6 @@ type Config struct {
 	NSTags []string `name:"network-servers.tags" description:"Network Server tags to accept to connect to"`
 
 	DisableAuth bool `name:"disable-auth" description:"Disable gateway authentication, e.g. for debugging and testing purposes"`
+
+	UDPAddress string `name:"udp-address" description:"Address for the UDP server to listen on"`
 }

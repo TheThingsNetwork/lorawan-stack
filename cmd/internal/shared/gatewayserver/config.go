@@ -19,4 +19,6 @@ import (
 )
 
 // DefaultGatewayServerConfig is the default configuration for the GatewayServer.
-var DefaultGatewayServerConfig = gatewayserver.Config{}
+var DefaultGatewayServerConfig = gatewayserver.Config{
+	UDPAddress: ":1700",
+}

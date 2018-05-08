@@ -12,57 +12,65 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package translator
+package udp
 
 import (
 	"encoding/base64"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/udp"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/version"
 )
 
-const upstreamBufferSize = 32 * 1024
+const upstreamBufferSize = 32 * 1024 // Size of the uplink buffer
 
-var upstreamBuffer = make([]byte, upstreamBufferSize)
+var (
+	upstreamBuffer = make([]byte, upstreamBufferSize)
+	ttnVersions    = map[string]string{
+		"ttn-gateway-server": version.TTN,
+	}
+)
 
-func (t *translator) Upstream(data udp.Data, md Metadata) (up *ttnpb.GatewayUp, err error) {
-	up = &ttnpb.GatewayUp{}
+// UpstreamMetadata related to an uplink.
+type UpstreamMetadata struct {
+	ID ttnpb.GatewayIdentifiers
+	IP string
+}
+
+// TranslateUpstream message from the UDP format to the protobuf format.
+func TranslateUpstream(data Data, md UpstreamMetadata) (*ttnpb.GatewayUp, error) {
+	up := &ttnpb.GatewayUp{}
 	up.UplinkMessages = make([]*ttnpb.UplinkMessage, 0)
 	for rxIndex, rx := range data.RxPacket {
 		if rx == nil {
 			continue
 		}
-		convertedRx, err := t.convertUplink(data, rxIndex, md.ID)
+		convertedRx, err := convertUplink(data, rxIndex, md)
 		if err != nil {
-			t.Logger.WithError(err).Warn("Could not convert uplink to TTN format, ignoring")
 			continue
 		}
 		up.UplinkMessages = append(up.UplinkMessages, &convertedRx)
 	}
 
 	if data.Stat != nil {
-		up.GatewayStatus = t.convertStatus(*data.Stat, md)
-		if up.GatewayStatus.AntennasLocation != nil && len(up.GatewayStatus.AntennasLocation) > 0 {
-			t.Location = up.GatewayStatus.AntennasLocation[0]
-		}
+		up.GatewayStatus = convertStatus(*data.Stat, md)
 	}
 
 	if len(up.UplinkMessages) == 0 && up.GatewayStatus == nil {
-		return up, errors.New("Message could not be converted to TTN format")
+		return nil, errors.New("Message could not be converted to TTN format")
 	}
 
-	return
+	return up, nil
 }
 
-func (t translator) metadata(rx udp.RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetadata {
+func metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetadata {
 	return []*ttnpb.RxMetadata{
 		{
 			GatewayIdentifiers: gatewayID,
-			Location:           t.Location,
 
 			AntennaIndex: 0,
 
@@ -74,12 +82,11 @@ func (t translator) metadata(rx udp.RxPacket, gatewayID ttnpb.GatewayIdentifiers
 	}
 }
 
-func (t translator) fineTimestampMetadata(rx udp.RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetadata {
+func fineTimestampMetadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetadata {
 	md := make([]*ttnpb.RxMetadata, 0)
 	for _, signal := range rx.RSig {
 		signalMetadata := &ttnpb.RxMetadata{
 			GatewayIdentifiers: gatewayID,
-			Location:           t.Location,
 
 			AntennaIndex: uint32(signal.Ant),
 
@@ -101,22 +108,35 @@ func (t translator) fineTimestampMetadata(rx udp.RxPacket, gatewayID ttnpb.Gatew
 	return md
 }
 
-func (t translator) convertUplink(data udp.Data, rxIndex int, gatewayID ttnpb.GatewayIdentifiers) (up ttnpb.UplinkMessage, err error) {
+func convertUplink(data Data, rxIndex int, md UpstreamMetadata) (ttnpb.UplinkMessage, error) {
+	up := ttnpb.UplinkMessage{}
 	rx := *data.RxPacket[rxIndex]
 	up.Settings = ttnpb.TxSettings{
 		CodingRate: rx.CodR,
 		Frequency:  uint64(rx.Freq * 1000000),
 	}
 
-	up.RawPayload, err = base64.RawStdEncoding.DecodeString(strings.TrimRight(rx.Data, "="))
+	rawPayload, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(rx.Data, "="))
 	if err != nil {
 		return up, errors.NewWithCause(err, "Could not decode RX packet payload from base64 format")
 	}
 
+	up.RawPayload = rawPayload
+	if err := up.Payload.UnmarshalLoRaWAN(rawPayload); err != nil {
+		return up, err
+	}
+	if macPayload := up.Payload.GetMACPayload(); macPayload != nil {
+		up.DevAddr = &macPayload.FHDR.DevAddr
+	}
+	if jrPayload := up.Payload.GetJoinRequestPayload(); jrPayload != nil {
+		up.DevEUI = &jrPayload.DevEUI
+		up.JoinEUI = &jrPayload.JoinEUI
+	}
+
 	if rx.RSig != nil && len(rx.RSig) > 0 {
-		up.RxMetadata = t.fineTimestampMetadata(rx, gatewayID)
+		up.RxMetadata = fineTimestampMetadata(rx, md.ID)
 	} else {
-		up.RxMetadata = t.metadata(rx, gatewayID)
+		up.RxMetadata = metadata(rx, md.ID)
 	}
 
 	if rx.Time != nil {
@@ -146,10 +166,10 @@ func (t translator) convertUplink(data udp.Data, rxIndex int, gatewayID ttnpb.Ga
 		return up, errors.New("Unknown modulation")
 	}
 
-	return
+	return up, nil
 }
 
-func addVersions(status *ttnpb.GatewayStatus, stat udp.Stat) {
+func addVersions(status *ttnpb.GatewayStatus, stat Stat) {
 	if stat.FPGA != nil {
 		status.Versions["fpga"] = strconv.Itoa(int(*stat.FPGA))
 	}
@@ -161,7 +181,7 @@ func addVersions(status *ttnpb.GatewayStatus, stat udp.Stat) {
 	}
 }
 
-func addMetrics(status *ttnpb.GatewayStatus, stat udp.Stat) {
+func addMetrics(status *ttnpb.GatewayStatus, stat Stat) {
 	status.Metrics["rxnb"] = float32(stat.RXNb)
 	status.Metrics["rxok"] = float32(stat.RXOK)
 	status.Metrics["rxfw"] = float32(stat.RXFW)
@@ -185,19 +205,14 @@ func addMetrics(status *ttnpb.GatewayStatus, stat udp.Stat) {
 	}
 }
 
-func (t translator) convertStatus(stat udp.Stat, md Metadata) *ttnpb.GatewayStatus {
+func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 	status := &ttnpb.GatewayStatus{
 		Metrics:  map[string]float32{},
 		Versions: map[string]string{},
+		IP:       []string{md.IP},
 	}
 
-	if md.IP != "" {
-		status.IP = []string{md.IP}
-	}
-
-	if t.locationFromAS {
-		status.AntennasLocation = []*ttnpb.Location{t.Location}
-	} else if stat.Lati != nil && stat.Long != nil {
+	if stat.Lati != nil && stat.Long != nil {
 		status.AntennasLocation = []*ttnpb.Location{
 			{Latitude: float32(*stat.Lati), Longitude: float32(*stat.Long)},
 		}
@@ -214,9 +229,59 @@ func (t translator) convertStatus(stat udp.Stat, md Metadata) *ttnpb.GatewayStat
 	}
 
 	addVersions(status, stat)
-	for versionName, version := range md.Versions {
+	for versionName, version := range ttnVersions {
 		status.Versions[versionName] = version
 	}
 	addMetrics(status, stat)
 	return status
+}
+
+// TranslateDownstream message from the protobuf format to the UDP format.
+func TranslateDownstream(d *ttnpb.GatewayDown) (Data, error) {
+	data := Data{}
+
+	if d != nil && d.DownlinkMessage != nil {
+		if err := insertDownlink(&data, *d.DownlinkMessage); err != nil {
+			return data, errors.NewWithCause(err, "Could not process received downlink")
+		}
+	}
+
+	return data, nil
+}
+
+func insertDownlink(data *Data, downlink ttnpb.DownlinkMessage) (err error) {
+	payload := downlink.GetRawPayload()
+	if payload == nil {
+		var err error
+		if payload, err = downlink.GetPayload().MarshalLoRaWAN(); err != nil {
+			return err
+		}
+	}
+
+	data.TxPacket = &TxPacket{
+		CodR: downlink.Settings.CodingRate,
+		Freq: float64(downlink.Settings.Frequency) / 1000000,
+		Imme: downlink.TxMetadata.Timestamp == 0,
+		IPol: downlink.Settings.PolarizationInversion,
+		Powe: uint8(downlink.Settings.TxPower),
+		Size: uint16(len(payload)),
+		Tmst: uint32(downlink.TxMetadata.Timestamp / 1000), // nano->microseconds conversion
+		Data: base64.StdEncoding.EncodeToString(payload),
+	}
+	gpsTime := CompactTime(downlink.TxMetadata.Time)
+	data.TxPacket.Time = &gpsTime
+
+	switch downlink.Settings.Modulation {
+	case ttnpb.Modulation_LORA:
+		data.TxPacket.Modu = "LORA"
+		data.TxPacket.NCRC = true
+		data.TxPacket.DatR.LoRa = fmt.Sprintf("SF%dBW%d", downlink.Settings.SpreadingFactor, downlink.Settings.Bandwidth/1000)
+	case ttnpb.Modulation_FSK:
+		data.TxPacket.Modu = "FSK"
+		data.TxPacket.DatR.FSK = downlink.Settings.BitRate
+	default:
+		return errors.New("Unknown modulation")
+	}
+
+	return nil
 }

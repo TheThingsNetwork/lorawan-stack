@@ -37,11 +37,14 @@ func (m *IsGatewayServer) CreateGateway(context.Context, *ttnpb.CreateGatewayReq
 }
 
 func (m *IsGatewayServer) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.Gateway, error) {
-	gateway, ok := m.gateways[*id]
-	if !ok {
-		return nil, errors.New("Gateway not found")
+	for storedID, storedGateway := range m.gateways {
+		if id.GetGatewayID() == storedID.GetGatewayID() ||
+			(id.GetEUI() != nil && storedID.GetEUI() != nil && *id.GetEUI() == *storedID.GetEUI()) {
+			return &storedGateway, nil
+		}
 	}
-	return &gateway, nil
+
+	return nil, errors.New("Gateway not found")
 }
 
 func (m *IsGatewayServer) ListGateways(context.Context, *ttnpb.ListGatewaysRequest) (*ttnpb.ListGatewaysResponse, error) {

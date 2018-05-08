@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package translator_test
+package udp_test
 
 import (
 	"encoding/base64"
@@ -20,34 +20,52 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/udp"
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/udp-translator"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/TheThingsNetwork/ttn/pkg/util/test"
-	"github.com/TheThingsNetwork/ttn/pkg/version"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/udp"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/version"
 )
 
-func TestStatusGrLocation(t *testing.T) {
+var ids = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
+
+func TestDownlinks(t *testing.T) {
+	a := assertions.New(t)
+	var err error
+
+	downlink := ttnpb.DownlinkMessage{
+		TxMetadata: ttnpb.TxMetadata{
+			Timestamp: 1886440700000,
+		},
+		Settings: ttnpb.TxSettings{
+			Frequency:             925700000,
+			Modulation:            ttnpb.Modulation_LORA,
+			TxPower:               20,
+			SpreadingFactor:       10,
+			Bandwidth:             500000,
+			PolarizationInversion: true,
+		},
+	}
+	downlink.RawPayload, err = base64.StdEncoding.DecodeString("ffOO")
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	data, err := udp.TranslateDownstream(&ttnpb.GatewayDown{DownlinkMessage: &downlink})
+	a.So(err, should.BeNil)
+
+	a.So(data.TxPacket.DatR.LoRa, should.Equal, "SF10BW500")
+	a.So(data.TxPacket.Tmst, should.Equal, 1886440700)
+	a.So(data.TxPacket.NCRC, should.Equal, true)
+	a.So(data.TxPacket.Data, should.Equal, "ffOO")
+}
+
+func TestDummyDownlink(t *testing.T) {
 	a := assertions.New(t)
 
-	status := []byte(`{"stat":{"rxfw":0,"hal":"5.1.0","fpga":2,"dsp":31,"lpps":2,"lmnw":3,"lmst":1,"lmok":3,"temp":30,"lati":52.34223,"long":5.29685,"txnb":0,"dwnb":0,"alti":66,"rxok":0,"boot":"2017-06-07 09:40:42 GMT","time":"2017-06-08 09:40:42 GMT","rxnb":0,"ackr":0.0}}`)
-	var statusData udp.Data
-	err := json.Unmarshal(status, &statusData)
-	a.So(err, should.BeNil)
-
-	location := ttnpb.Location{Longitude: 15.56, Latitude: 3.0}
-
-	translate := translator.NewWithLocation(test.GetLogger(t), location)
-	upstream, err := translate.Upstream(statusData, translator.Metadata{IP: "127.0.0.1", ID: ids})
-	a.So(err, should.BeNil)
-
-	a.So(upstream.GatewayStatus, should.NotBeNil)
-	a.So(upstream.GatewayStatus.AntennasLocation, should.NotBeNil)
-	a.So(len(upstream.GatewayStatus.AntennasLocation), should.Equal, 1)
-	a.So(upstream.GatewayStatus.AntennasLocation[0].Latitude, should.Equal, 3.0)
-	a.So(upstream.GatewayStatus.AntennasLocation[0].Longitude, should.Equal, 15.56)
+	downlink := ttnpb.DownlinkMessage{Settings: ttnpb.TxSettings{Modulation: 3939}} // Dummy modulation set
+	_, err := udp.TranslateDownstream(&ttnpb.GatewayDown{DownlinkMessage: &downlink})
+	a.So(err, should.NotBeNil)
 }
 
 func TestStatus(t *testing.T) {
@@ -58,11 +76,9 @@ func TestStatus(t *testing.T) {
 	err := json.Unmarshal(status, &statusData)
 	a.So(err, should.BeNil)
 
-	translate := translator.New(test.GetLogger(t))
-	upstream, err := translate.Upstream(statusData, translator.Metadata{
-		IP:       "127.0.0.1",
-		ID:       ids,
-		Versions: map[string]string{"bridge": version.TTN},
+	upstream, err := udp.TranslateUpstream(statusData, udp.UpstreamMetadata{
+		IP: "127.0.0.1",
+		ID: ids,
 	})
 	a.So(err, should.BeNil)
 
@@ -77,7 +93,7 @@ func TestStatus(t *testing.T) {
 	a.So(upstream.GatewayStatus.Versions, should.NotBeNil)
 	a.So(upstream.GatewayStatus.Metrics, should.NotBeNil)
 
-	a.So(upstream.GatewayStatus.Versions["bridge"], should.Equal, version.TTN)
+	a.So(upstream.GatewayStatus.Versions["ttn-gateway-server"], should.Equal, version.TTN)
 	a.So(upstream.GatewayStatus.Versions["hal"], should.Equal, "5.1.0")
 	a.So(upstream.GatewayStatus.Versions["fpga"], should.Equal, "2")
 	a.So(upstream.GatewayStatus.Versions["dsp"], should.Equal, "31")
@@ -110,8 +126,7 @@ func TestUplink(t *testing.T) {
 	err := json.Unmarshal(rx, &rxData)
 	a.So(err, should.BeNil)
 
-	translate := translator.New(test.GetLogger(t))
-	upstream, err := translate.Upstream(rxData, translator.Metadata{ID: ids})
+	upstream, err := udp.TranslateUpstream(rxData, udp.UpstreamMetadata{ID: ids})
 	a.So(err, should.BeNil)
 
 	a.So(len(upstream.UplinkMessages), should.Equal, 1)
@@ -124,6 +139,42 @@ func TestUplink(t *testing.T) {
 
 	a.So(upstream.UplinkMessages[0].RxMetadata[0].Timestamp, should.Equal, uint64(368384825000))
 	a.So(len(upstream.UplinkMessages[0].RawPayload), should.Equal, base64.StdEncoding.DecodedLen(len("Wqish6GVYpKy6o9WFHingeTJ1oh+ABc8iALBvwz44yxZP+BKDocaC5VQT5Y6dDdUaBILVjRMz0Ynzow1U/Kkts9AoZh3Ja3DX+DyY27exB+BKpSx2rXJ2vs9svm/EKYIsPF0RG1E+7lBYaD9")))
+}
+
+func TestUplink2(t *testing.T) {
+	a := assertions.New(t)
+
+	p := udp.Packet{
+		GatewayEUI:      &types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		ProtocolVersion: udp.Version1,
+		Token:           [2]byte{0x11, 0x00},
+		Data: &udp.Data{
+			RxPacket: []*udp.RxPacket{
+				{
+					Freq: 868.0,
+					Chan: 2,
+					Modu: "LORA",
+					DatR: udp.DataRate{DataRate: types.DataRate{LoRa: "SF10BW125"}},
+					CodR: "4/7",
+					Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
+					Tmst: 1000,
+				},
+			},
+		},
+		PacketType: udp.PushData,
+	}
+	p.Data.RxPacket[0].Size = uint16(base64.StdEncoding.DecodedLen(len(p.Data.RxPacket[0].Data)))
+
+	upstream, err := udp.TranslateUpstream(*p.Data, udp.UpstreamMetadata{ID: ids})
+	a.So(err, should.BeNil)
+
+	a.So(upstream.UplinkMessages[0].Settings.CodingRate, should.Equal, "4/7")
+	a.So(upstream.UplinkMessages[0].Settings.SpreadingFactor, should.Equal, 10)
+	a.So(upstream.UplinkMessages[0].Settings.Bandwidth, should.Equal, 125000)
+	a.So(upstream.UplinkMessages[0].Settings.Frequency, should.Equal, 868000000)
+	a.So(upstream.UplinkMessages[0].Settings.Modulation, should.Equal, ttnpb.Modulation_LORA)
+
+	a.So(upstream.UplinkMessages[0].RxMetadata[0].Timestamp, should.Equal, 1000000)
 }
 
 func TestMultiAntennaUplink(t *testing.T) {
@@ -174,7 +225,6 @@ func TestMultiAntennaUplink(t *testing.T) {
 	err := json.Unmarshal(rx, &rxData)
 	a.So(err, should.BeNil)
 
-	translate := translator.New(test.GetLogger(t))
-	_, err = translate.Upstream(rxData, translator.Metadata{ID: ids})
+	_, err = udp.TranslateUpstream(rxData, udp.UpstreamMetadata{ID: ids})
 	a.So(err, should.BeNil)
 }

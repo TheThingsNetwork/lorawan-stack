@@ -48,6 +48,13 @@ var (
 		Type:           errors.NotFound,
 		SafeAttributes: []string{"gateway_id"},
 	}
+	// ErrTranslationFromProtobuf is returned when the translation of a
+	// message between the proto format and the UDP format fails.
+	ErrTranslationFromProtobuf = &errors.ErrDescriptor{
+		MessageFormat: "Could not translate from the protobuf format to UDP",
+		Code:          6,
+		Type:          errors.Internal,
+	}
 )
 
 func init() {
@@ -56,4 +63,5 @@ func init() {
 	ErrPermissionDenied.Register()
 	ErrUnauthorized.Register()
 	ErrGatewayNotConnected.Register()
+	ErrTranslationFromProtobuf.Register()
 }

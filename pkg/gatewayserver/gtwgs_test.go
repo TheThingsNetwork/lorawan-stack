@@ -32,7 +32,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-const timeout = 5 * time.Second
+const nsReceptionTimeout = 2 * time.Second
 
 type mockLink struct {
 	*test.MockServerStream
@@ -135,7 +135,7 @@ func TestLink(t *testing.T) {
 
 	gsStart := time.Now()
 	for gs.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, []string{}, nil) == nil {
-		if time.Since(gsStart) > timeout {
+		if time.Since(gsStart) > nsReceptionTimeout {
 			t.Fatal("Identity Server was not initialized in time by the Gateway Server - timeout")
 		}
 		time.Sleep(2 * time.Millisecond)
@@ -160,13 +160,13 @@ func TestLink(t *testing.T) {
 			if msg != "StartServingGateway" {
 				t.Fatal("Expected GS to call HandleUplink on the NS, instead received", msg)
 			}
-		case <-time.After(timeout):
+		case <-time.After(nsReceptionTimeout):
 			t.Fatal("The Gateway Server never called the Network Server's StartServingGateway method. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
 
 		select {
 		case up <- &ttnpb.GatewayUp{GatewayStatus: ttnpb.NewPopulatedGatewayStatus(test.Randy, false)}:
-		case <-time.After(timeout):
+		case <-time.After(nsReceptionTimeout):
 			t.Fatal("The Gateway Server never called Link.Recv() to receive the status message. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
 	}
@@ -176,7 +176,7 @@ func TestLink(t *testing.T) {
 		join := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
 		select {
 		case up <- &ttnpb.GatewayUp{UplinkMessages: []*ttnpb.UplinkMessage{join}}:
-		case <-time.After(timeout):
+		case <-time.After(nsReceptionTimeout):
 			t.Fatal("The Gateway Server never called Link.Recv() to receive the join request. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
 
@@ -185,7 +185,7 @@ func TestLink(t *testing.T) {
 			if msg != "HandleUplink" {
 				t.Fatal("Expected GS to call HandleUplink on the NS, instead received", msg)
 			}
-		case <-time.After(timeout):
+		case <-time.After(nsReceptionTimeout):
 			t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the join request. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
 	}
@@ -198,7 +198,7 @@ func TestLink(t *testing.T) {
 			genericAESKey, genericAESKey, false)
 		select {
 		case up <- &ttnpb.GatewayUp{UplinkMessages: []*ttnpb.UplinkMessage{uplink}}:
-		case <-time.After(timeout):
+		case <-time.After(nsReceptionTimeout):
 			t.Fatal("The Gateway Server never called Link.Recv() to receive the uplink. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
 
@@ -207,7 +207,7 @@ func TestLink(t *testing.T) {
 			if msg != "HandleUplink" {
 				t.Fatal("Expected GS to call HandleUplink on the NS, instead received", msg)
 			}
-		case <-time.After(timeout):
+		case <-time.After(nsReceptionTimeout):
 			t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the uplink. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
 	}
@@ -220,7 +220,7 @@ func TestLink(t *testing.T) {
 		if msg != "StopServingGateway" {
 			t.Fatal("Expected GS to call StopServingGateway on the NS, instead received", msg)
 		}
-	case <-time.After(timeout):
+	case <-time.After(nsReceptionTimeout):
 		t.Fatal("The Gateway Server never called the Network Server's StopServingGateway method. This might be due to an unexpected error in the GatewayServer.Link() function.")
 	}
 

@@ -76,7 +76,37 @@ func (g *GatewayServer) forAllNS(f func(ttnpb.GsNsClient) error) error {
 	return errors
 }
 
-// Link the gateway to the Gateway Server. The authentication information will
+func (g *GatewayServer) signalStartServingGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) {
+	startServingGatewayFn := func(nsClient ttnpb.GsNsClient) error {
+		_, err := nsClient.StartServingGateway(ctx, id)
+		return err
+	}
+	if err := g.forAllNS(startServingGatewayFn); err != nil {
+		log.FromContext(ctx).WithError(err).Error("Could not signal NS when gateway connected")
+	}
+}
+
+func (g *GatewayServer) signalStopServingGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) {
+	stopServingGatewayFn := func(nsClient ttnpb.GsNsClient) error {
+		_, err := nsClient.StopServingGateway(ctx, id)
+		return err
+	}
+	if err := g.forAllNS(stopServingGatewayFn); err != nil {
+		log.FromContext(ctx).WithError(err).Error("Could not signal NS when gateway disconnected")
+	}
+}
+
+func (g *GatewayServer) setupConnection(uid string, connectionInfo connection) {
+	g.connectionsMu.Lock()
+	if conn, ok := g.connections[uid]; ok {
+		conn.Close()
+		delete(g.connections, uid)
+	}
+	g.connections[uid] = connectionInfo
+	g.connectionsMu.Unlock()
+}
+
+// Link the gateway to the gateway server. The authentication information will
 // be used to determine the gateway ID. If no authentication information is present,
 // this gateway may not be used for downlink.
 func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
@@ -108,14 +138,14 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	id := ttnpb.GatewayIdentifiers{
 		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
-	gw, err := is.GetGateway(ctx, &id)
+	gtw, err := is.GetGateway(ctx, &id)
 	if err != nil {
 		return errors.NewWithCause(err, "Could not get gateway information from Identity Server")
 	}
 
-	fp, err := g.FrequencyPlans.GetByID(gw.FrequencyPlanID)
+	fp, err := g.FrequencyPlans.GetByID(gtw.FrequencyPlanID)
 	if err != nil {
-		return errors.NewWithCausef(err, "Could not retrieve frequency plan %s", gw.FrequencyPlanID)
+		return errors.NewWithCausef(err, "Could not retrieve frequency plan %s", gtw.FrequencyPlanID)
 	}
 
 	scheduler, err := scheduling.FrequencyPlanScheduler(ctx, fp)
@@ -123,45 +153,27 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 		return err
 	}
 
-	connectionInfo := &connection{
-		linkSend:  link.Send,
-		scheduler: scheduler,
+	connectionInfo := &gRPCConnection{
+		link: link,
+		gtw:  gtw,
+		connectionData: connectionData{
+			scheduler: scheduler,
+		},
 	}
 
 	ctx, connectionInfo.cancel = context.WithCancel(ctx)
 	defer connectionInfo.cancel()
 
 	uid := id.UniqueID(ctx)
+	g.setupConnection(uid, connectionInfo)
 
-	g.connectionsMu.Lock()
-	if conn, ok := g.connections[uid]; ok {
-		conn.cancel()
-		delete(g.connections, uid)
-	}
-	g.connections[uid] = connectionInfo
-	g.connectionsMu.Unlock()
-
-	go func() {
-		startServingGatewayFn := func(nsClient ttnpb.GsNsClient) error {
-			_, err := nsClient.StartServingGateway(ctx, &id)
-			return err
-		}
-		if err := g.forAllNS(startServingGatewayFn); err != nil {
-			logger.WithError(err).Error("Could not signal NS when gateway connected")
-		}
-	}()
+	go g.signalStartServingGateway(ctx, &id)
 
 	go func() {
 		<-ctx.Done()
 		// TODO: Add tenant extraction when #433 is merged
 		stopCtx, cancel := context.WithTimeout(g.Context(), time.Minute)
-		stopServingGatewayFn := func(nsClient ttnpb.GsNsClient) error {
-			_, err := nsClient.StopServingGateway(stopCtx, &id)
-			return err
-		}
-		if err := g.forAllNS(stopServingGatewayFn); err != nil {
-			logger.WithError(err).Errorf("Could not signal NS when gateway disconnected")
-		}
+		g.signalStopServingGateway(stopCtx, &id)
 		cancel()
 
 		g.connectionsMu.Lock()
@@ -180,20 +192,30 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 		}
 		logger.Debug("Received message from gateway")
 
-		connectionInfo.addUpstreamObservations(upstreamMessage)
-
-		if ctx.Err() != nil {
-			logger.Debug("Uplink subscription was closed")
-			return ctx.Err()
-		}
-
-		if upstreamMessage.GatewayStatus != nil {
-			g.handleStatus(ctx, upstreamMessage.GatewayStatus)
-		}
-		for _, uplink := range upstreamMessage.UplinkMessages {
-			g.handleUplink(ctx, uplink, gw)
+		if err := g.handleUpstreamMessage(ctx, connectionInfo, upstreamMessage); err != nil {
+			return err
 		}
 	}
+}
+
+// handleUpstreamMessage handles a *GatewayUp message. It returns an error if
+// fatal circumstances that will prevent further message handling occur.
+func (g *GatewayServer) handleUpstreamMessage(ctx context.Context, connectionInfo connection, upstreamMessage *ttnpb.GatewayUp) error {
+	connectionInfo.addUpstreamObservations(upstreamMessage)
+
+	if ctx.Err() != nil {
+		log.FromContext(ctx).Debug("Uplink subscription was closed")
+		return ctx.Err()
+	}
+
+	if upstreamMessage.GatewayStatus != nil {
+		g.handleStatus(ctx, upstreamMessage.GatewayStatus)
+	}
+	for _, uplink := range upstreamMessage.UplinkMessages {
+		g.handleUplink(ctx, uplink, connectionInfo.gateway())
+	}
+
+	return nil
 }
 
 func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMessage, gwMetadata *ttnpb.Gateway) (err error) {
@@ -206,7 +228,7 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 		}
 	}()
 
-	useLocationFromMetadata := len(gwMetadata.GetAntennas()) == 0
+	useLocationFromMetadata := gwMetadata != nil && len(gwMetadata.GetAntennas()) == 0
 	for _, antenna := range uplink.RxMetadata {
 		index := int(antenna.GetAntennaIndex())
 		if !gwMetadata.GetPrivacySettings().LocationPublic {
@@ -218,7 +240,7 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 			continue
 		}
 
-		if len(gwMetadata.GetAntennas()) >= index {
+		if gwMetadata != nil && len(gwMetadata.GetAntennas()) >= index {
 			antenna.Location = &gwMetadata.GetAntennas()[index].Location
 		} else {
 			antenna.Location = nil
