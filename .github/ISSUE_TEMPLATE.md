@@ -12,17 +12,21 @@
 
 <!-- Please attach (or link to) configuration files if applicable -->
 
-**What did you expect to see?** 
-
-...
-
-**What did you see instead?** 
-
-...
-
+**What do you see now?**
 <!-- Please attach (or link to) screenshots and logs if applicable -->
+
+...
+
+**What do you want to see instead?**
+<!-- Please add some examples or mock-ups if applicable -->
+
+...
 
 **Environment:**
 <!-- Your environment: OS/Browser/Gateway/Device/...? Versions? IDs/EUIs? -->
+
+...
+
+**What can you do yourself and what do you need help with?**
 
 ...
