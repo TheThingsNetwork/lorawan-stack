@@ -15,6 +15,8 @@
 package ttnpb
 
 import (
+	"fmt"
+
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -58,7 +60,7 @@ func NewPopulatedTxSettings(r randyLorawan, easy bool) *TxSettings {
 	out.Bandwidth = r.Uint32()
 	out.SpreadingFactor = r.Uint32()
 	out.BitRate = r.Uint32()
-	out.CodingRate = randStringLorawan(r)
+	out.CodingRate = fmt.Sprintf("4/%d", r.Intn(3)+5)
 	out.Frequency = uint64(r.Uint32())
 	out.TxPower = r.Int31()
 	if r.Intn(2) == 0 {
