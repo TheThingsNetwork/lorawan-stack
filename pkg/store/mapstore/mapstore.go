@@ -59,8 +59,9 @@ func (s *MapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	}
 
 	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	fields := s.data[id]
-	s.mu.RUnlock()
 	return deepcopy.Copy(fields).(map[string]interface{}), nil
 }
 
@@ -70,7 +71,10 @@ func (s *MapStore) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]m
 	}
 
 	matches := make(map[store.PrimaryKey]map[string]interface{})
+
 	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 outer:
 	for id, fields := range s.data {
 		for k, fv := range filter {
@@ -80,11 +84,10 @@ outer:
 		}
 		matches[id] = fields
 	}
-	s.mu.RUnlock()
 	if len(matches) == 0 {
 		return nil, nil
 	}
-	return matches, nil
+	return deepcopy.Copy(matches).(map[store.PrimaryKey]map[string]interface{}), nil
 }
 
 func (s *MapStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {
@@ -97,6 +100,7 @@ func (s *MapStore) Update(id store.PrimaryKey, diff map[string]interface{}) erro
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
+
 	fields, ok := s.data[id]
 	if !ok {
 		s.data[id] = diff
@@ -125,7 +129,8 @@ func (s *MapStore) Delete(id store.PrimaryKey) error {
 	}
 
 	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	delete(s.data, id)
-	s.mu.Unlock()
 	return nil
 }
