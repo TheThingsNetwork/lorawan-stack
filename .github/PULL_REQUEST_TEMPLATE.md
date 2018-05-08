@@ -1,5 +1,8 @@
 **Summary:**
-<!-- A one-line summary to add to the release notes: -->
+<!--
+A summary, possibly referencing related issues:
+Closes #0000, References #00000, etc.
+-->
 
 ...
 
@@ -9,11 +12,15 @@
 - ...
 - ...
 
+**Release Notes:**
+<!-- A single line to add to the release notes -->
+
+...
+
 **Motivation:**
 <!--
 Why do we need this pull request?
 What is the current situation? What does this pull request improve?
-Make sure to reference related issues: Closes #0000, References #0000, etc.
 -->
 
 ...
