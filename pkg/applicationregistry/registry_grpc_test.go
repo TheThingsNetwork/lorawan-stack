@@ -46,7 +46,7 @@ func TestRegistryRPC(t *testing.T) {
 	})
 
 	_, err := dr.SetApplication(context.Background(), &ttnpb.SetApplicationRequest{Application: *pb})
-	a.So(err, errshould.Describe, ErrPermissionDenied)
+	a.So(err, errshould.Describe, rights.ErrPermissionDenied)
 
 	v, err := dr.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
 	if !a.So(err, should.BeNil) {
@@ -55,7 +55,7 @@ func TestRegistryRPC(t *testing.T) {
 	a.So(v, should.Equal, ttnpb.Empty)
 
 	app, err := dr.GetApplication(context.Background(), &pb.ApplicationIdentifiers)
-	a.So(err, errshould.Describe, ErrPermissionDenied)
+	a.So(err, errshould.Describe, rights.ErrPermissionDenied)
 
 	app, err = dr.GetApplication(ctx, &pb.ApplicationIdentifiers)
 	if a.So(err, should.BeNil) {
@@ -65,7 +65,7 @@ func TestRegistryRPC(t *testing.T) {
 	}
 
 	_, err = dr.DeleteApplication(context.Background(), &pb.ApplicationIdentifiers)
-	a.So(err, errshould.Describe, ErrPermissionDenied)
+	a.So(err, errshould.Describe, rights.ErrPermissionDenied)
 
 	v, err = dr.DeleteApplication(ctx, &pb.ApplicationIdentifiers)
 	if !a.So(err, should.BeNil) {
@@ -74,7 +74,7 @@ func TestRegistryRPC(t *testing.T) {
 	a.So(v, should.Equal, ttnpb.Empty)
 
 	_, err = dr.GetApplication(context.Background(), &pb.ApplicationIdentifiers)
-	a.So(err, errshould.Describe, ErrPermissionDenied)
+	a.So(err, errshould.Describe, rights.ErrPermissionDenied)
 
 	_, err = dr.GetApplication(ctx, &pb.ApplicationIdentifiers)
 	a.So(err, errshould.Describe, ErrApplicationNotFound)
@@ -91,7 +91,7 @@ func TestSetApplicationNoCheck(t *testing.T) {
 	pb := ttnpb.NewPopulatedApplication(test.Randy, false)
 
 	_, err := dr.SetApplication(context.Background(), &ttnpb.SetApplicationRequest{Application: *pb})
-	a.So(err, errshould.Describe, ErrPermissionDenied)
+	a.So(err, errshould.Describe, rights.ErrPermissionDenied)
 
 	v, err := dr.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(err, should.BeNil)

@@ -81,27 +81,9 @@ func NewRPC(c *component.Component, r Interface, opts ...RPCOption) (*RegistryRP
 	return rpc, nil
 }
 
-type applicationIDGetter interface {
-	GetApplicationID() string
-}
-
-func (r *RegistryRPC) checkAuth(ctx context.Context, appID applicationIDGetter, rightsToCheck ...ttnpb.Right) error {
-	// TODO: Accept administrator authorization even if not tied to the application
-	// https://github.com/TheThingsIndustries/ttn/issues/731
-	if appID == nil || appID.GetApplicationID() == "" {
-		return ErrNoApplicationID.New(nil)
-	}
-
-	if ad := rights.FromContext(ctx); !ttnpb.IncludesRights(ad, rightsToCheck...) {
-		return ErrPermissionDenied.New(nil)
-	}
-
-	return nil
-}
-
 // GetApplication returns the application associated with id in underlying registry, if found.
 func (r *RegistryRPC) GetApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) (*ttnpb.Application, error) {
-	if err := r.checkAuth(ctx, id, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
+	if err := rights.CheckApplicationAuth(ctx, id, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 
@@ -130,7 +112,7 @@ func (r *RegistryRPC) GetApplication(ctx context.Context, id *ttnpb.ApplicationI
 
 // SetApplication sets the application fields to match those of app in underlying registry.
 func (r *RegistryRPC) SetApplication(ctx context.Context, req *ttnpb.SetApplicationRequest) (*pbtypes.Empty, error) {
-	if err := r.checkAuth(ctx, req, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
+	if err := rights.CheckApplicationAuth(ctx, req, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 
@@ -169,7 +151,7 @@ func (r *RegistryRPC) SetApplication(ctx context.Context, req *ttnpb.SetApplicat
 
 // DeleteApplication deletes the application associated with id from underlying registry.
 func (r *RegistryRPC) DeleteApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
-	if err := r.checkAuth(ctx, id, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
+	if err := rights.CheckApplicationAuth(ctx, id, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 

@@ -31,7 +31,7 @@ type organizationIDGetter interface {
 	GetOrganizationID() string
 }
 
-type applicationIDGetter interface {
+type ApplicationIDGetter interface {
 	GetApplicationID() string
 }
 
@@ -146,7 +146,7 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 				}
 			}
 
-			if m, ok := req.(applicationIDGetter); ok {
+			if m, ok := req.(ApplicationIDGetter); ok {
 				appIDs := &ttnpb.ApplicationIdentifiers{
 					ApplicationID: m.GetApplicationID(),
 				}

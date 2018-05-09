@@ -44,7 +44,7 @@ func TestRegistryRPC(t *testing.T) {
 	})
 
 	_, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *pb})
-	a.So(err, errshould.Describe, ErrPermissionDenied)
+	a.So(err, errshould.Describe, rights.ErrPermissionDenied)
 
 	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	if !a.So(err, should.BeNil) {
@@ -53,7 +53,7 @@ func TestRegistryRPC(t *testing.T) {
 	a.So(v, should.Equal, ttnpb.Empty)
 
 	devs, err := dr.ListDevices(context.Background(), &pb.EndDeviceIdentifiers)
-	a.So(err, errshould.Describe, ErrPermissionDenied)
+	a.So(err, errshould.Describe, rights.ErrPermissionDenied)
 
 	devs, err = dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
 	if a.So(err, should.BeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
@@ -63,7 +63,7 @@ func TestRegistryRPC(t *testing.T) {
 	}
 
 	_, err = dr.DeleteDevice(context.Background(), &pb.EndDeviceIdentifiers)
-	a.So(err, errshould.Describe, ErrPermissionDenied)
+	a.So(err, errshould.Describe, rights.ErrPermissionDenied)
 
 	v, err = dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
 	if !a.So(err, should.BeNil) {
@@ -72,7 +72,7 @@ func TestRegistryRPC(t *testing.T) {
 	a.So(v, should.Equal, ttnpb.Empty)
 
 	_, err = dr.ListDevices(context.Background(), &pb.EndDeviceIdentifiers)
-	a.So(err, errshould.Describe, ErrPermissionDenied)
+	a.So(err, errshould.Describe, rights.ErrPermissionDenied)
 
 	devs, err = dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
@@ -90,7 +90,7 @@ func TestSetDeviceNoCheck(t *testing.T) {
 	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
 	_, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *pb})
-	a.So(err, errshould.Describe, ErrPermissionDenied)
+	a.So(err, errshould.Describe, rights.ErrPermissionDenied)
 
 	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(err, should.BeNil)
@@ -115,7 +115,7 @@ func TestListDevicesNoCheck(t *testing.T) {
 	})
 
 	devs, err := dr.ListDevices(ctx, &ttnpb.EndDeviceIdentifiers{})
-	a.So(err, errshould.Describe, ErrNoApplicationID)
+	a.So(err, errshould.Describe, rights.ErrNoApplicationID)
 	a.So(devs, should.BeNil)
 
 	dev1, err := dr.Interface.Create(ttnpb.NewPopulatedEndDevice(test.Randy, false))
