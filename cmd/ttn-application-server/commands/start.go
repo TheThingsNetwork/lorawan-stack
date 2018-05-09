@@ -38,7 +38,10 @@ var (
 			reg := deviceregistry.New(store.NewByteMapStoreClient(redis))
 			config.AS.Registry = reg
 
-			as := applicationserver.New(c, &config.AS)
+			as, err := applicationserver.New(c, &config.AS)
+			if err != nil {
+				return errors.NewWithCause(err, "Could not start application server")
+			}
 			_ = as
 
 			logger.Info("Starting application server...")

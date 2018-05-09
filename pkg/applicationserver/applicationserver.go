@@ -42,14 +42,20 @@ type Config struct {
 }
 
 // New returns new *ApplicationServer.
-func New(c *component.Component, conf *Config) *ApplicationServer {
+func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 	as := &ApplicationServer{
-		Component:   c,
-		RegistryRPC: deviceregistry.NewRPC(c, conf.Registry), // TODO: Add checks
-		registry:    conf.Registry,
+		Component: c,
+		registry:  conf.Registry,
 	}
+
+	registryRPC, err := deviceregistry.NewRPC(c, conf.Registry)
+	if err != nil {
+		return nil, err
+	}
+	as.RegistryRPC = registryRPC
+
 	c.RegisterGRPC(as)
-	return as
+	return as, nil
 }
 
 // Subscribe subscribes to application uplink messages for an EndDevice filter.
