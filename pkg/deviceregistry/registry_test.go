@@ -35,26 +35,26 @@ func TestRegistry(t *testing.T) {
 	a := assertions.New(t)
 	r := New(store.NewTypedMapStoreClient(mapstore.New()))
 
-	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	dev, err := r.Create(deepcopy.Copy(ed).(*ttnpb.EndDevice))
+	dev, err := r.Create(deepcopy.Copy(pb).(*ttnpb.EndDevice))
 	if !a.So(err, should.BeNil) {
 		return
 	}
 	if a.So(dev, should.NotBeNil) {
-		ed.CreatedAt = dev.EndDevice.GetCreatedAt()
-		ed.UpdatedAt = dev.EndDevice.GetUpdatedAt()
-		a.So(dev.EndDevice, should.Resemble, ed)
+		pb.CreatedAt = dev.EndDevice.GetCreatedAt()
+		pb.UpdatedAt = dev.EndDevice.GetUpdatedAt()
+		a.So(dev.EndDevice, should.Resemble, pb)
 	}
 
-	found, err := r.FindBy(ed, "EndDeviceIdentifiers")
+	found, err := r.FindBy(pb, "EndDeviceIdentifiers")
 	if !a.So(err, should.BeNil) {
 		return
 	}
 	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
 		found[0].CreatedAt = dev.EndDevice.GetCreatedAt()
 		found[0].UpdatedAt = dev.EndDevice.GetUpdatedAt()
-		a.So(pretty.Diff(found[0].EndDevice, ed), should.BeEmpty)
+		a.So(pretty.Diff(found[0].EndDevice, pb), should.BeEmpty)
 	}
 
 	updated := ttnpb.NewPopulatedEndDevice(test.Randy, false)
@@ -69,25 +69,25 @@ func TestRegistry(t *testing.T) {
 		return
 	}
 
-	found, err = r.FindBy(ed, "EndDeviceIdentifiers")
+	found, err = r.FindBy(pb, "EndDeviceIdentifiers")
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) {
 		a.So(found, should.BeEmpty)
 	}
 
-	ed = updated
+	pb = updated
 
-	found, err = r.FindBy(ed, "EndDeviceIdentifiers")
+	found, err = r.FindBy(pb, "EndDeviceIdentifiers")
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		found[0].CreatedAt = ed.GetCreatedAt()
-		found[0].UpdatedAt = ed.GetUpdatedAt()
-		a.So(pretty.Diff(found[0].EndDevice, ed), should.BeEmpty)
+		found[0].CreatedAt = pb.GetCreatedAt()
+		found[0].UpdatedAt = pb.GetUpdatedAt()
+		a.So(pretty.Diff(found[0].EndDevice, pb), should.BeEmpty)
 	}
 
 	a.So(dev.Delete(), should.BeNil)
 
-	found, err = r.FindBy(ed, "EndDeviceIdentifiers")
+	found, err = r.FindBy(pb, "EndDeviceIdentifiers")
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) {
 		a.So(found, should.BeEmpty)
@@ -98,8 +98,8 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 	a := assertions.New(t)
 	r := New(store.NewTypedMapStoreClient(mapstore.New()))
 
-	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-	ed.Attributes = &pbtypes.Struct{
+	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+	pb.Attributes = &pbtypes.Struct{
 		Fields: map[string]*pbtypes.Value{
 			"null":   {Kind: &pbtypes.Value_NullValue{}},
 			"bool":   {Kind: &pbtypes.Value_BoolValue{BoolValue: true}},
@@ -116,53 +116,53 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 		},
 	}
 
-	dev, err := r.Create(deepcopy.Copy(ed).(*ttnpb.EndDevice))
+	dev, err := r.Create(deepcopy.Copy(pb).(*ttnpb.EndDevice))
 	if !a.So(err, should.BeNil) {
 		return
 	}
 	if a.So(dev, should.NotBeNil) {
-		ed.CreatedAt = dev.EndDevice.GetCreatedAt()
-		ed.UpdatedAt = dev.EndDevice.GetUpdatedAt()
-		a.So(dev.EndDevice, should.Resemble, ed)
+		pb.CreatedAt = dev.EndDevice.GetCreatedAt()
+		pb.UpdatedAt = dev.EndDevice.GetUpdatedAt()
+		a.So(dev.EndDevice, should.Resemble, pb)
 	}
 
-	found, err := FindDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
+	found, err := FindDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		a.So(pretty.Diff(found[0].EndDevice, ed), should.BeEmpty)
+		a.So(pretty.Diff(found[0].EndDevice, pb), should.BeEmpty)
 	}
 
 	updated := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	for dev.EndDevice.EndDeviceIdentifiers.Equal(updated.EndDeviceIdentifiers) {
 		updated = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	}
-	updated.CreatedAt = ed.GetCreatedAt()
-	updated.UpdatedAt = ed.GetUpdatedAt()
+	updated.CreatedAt = pb.GetCreatedAt()
+	updated.UpdatedAt = pb.GetUpdatedAt()
 	dev.EndDevice = updated
 
 	if !a.So(dev.Store(), should.BeNil) {
 		return
 	}
 
-	found, err = FindDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
+	found, err = FindDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) {
 		a.So(found, should.BeEmpty)
 	}
 
-	ed = updated
+	pb = updated
 
-	found, err = FindDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
+	found, err = FindDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		ed.CreatedAt = found[0].EndDevice.GetCreatedAt()
-		ed.UpdatedAt = found[0].EndDevice.GetUpdatedAt()
-		a.So(pretty.Diff(found[0].EndDevice, ed), should.BeEmpty)
+		pb.CreatedAt = found[0].EndDevice.GetCreatedAt()
+		pb.UpdatedAt = found[0].EndDevice.GetUpdatedAt()
+		a.So(pretty.Diff(found[0].EndDevice, pb), should.BeEmpty)
 	}
 
 	a.So(dev.Delete(), should.BeNil)
 
-	found, err = FindDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
+	found, err = FindDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	if a.So(found, should.NotBeNil) {
 		a.So(found, should.BeEmpty)
@@ -173,39 +173,39 @@ func TestFindOneDeviceByIdentifiers(t *testing.T) {
 	a := assertions.New(t)
 	r := New(store.NewTypedMapStoreClient(mapstore.New()))
 
-	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	found, err := FindOneDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
+	found, err := FindOneDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers)
 	a.So(err, should.NotBeNil)
 	a.So(found, should.BeNil)
 
-	dev, err := r.Create(deepcopy.Copy(ed).(*ttnpb.EndDevice))
+	dev, err := r.Create(deepcopy.Copy(pb).(*ttnpb.EndDevice))
 	if !a.So(err, should.BeNil) {
 		return
 	}
 	if a.So(dev, should.NotBeNil) {
-		ed.CreatedAt = dev.EndDevice.GetCreatedAt()
-		ed.UpdatedAt = dev.EndDevice.GetUpdatedAt()
-		a.So(dev.EndDevice, should.Resemble, ed)
+		pb.CreatedAt = dev.EndDevice.GetCreatedAt()
+		pb.UpdatedAt = dev.EndDevice.GetUpdatedAt()
+		a.So(dev.EndDevice, should.Resemble, pb)
 	}
 
-	found, err = FindOneDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
+	found, err = FindOneDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers)
 	if !a.So(err, should.BeNil) {
 		return
 	}
-	a.So(pretty.Diff(found.EndDevice, ed), should.BeEmpty)
+	a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
 
-	dev, err = r.Create(deepcopy.Copy(ed).(*ttnpb.EndDevice))
+	dev, err = r.Create(deepcopy.Copy(pb).(*ttnpb.EndDevice))
 	if !a.So(err, should.BeNil) {
 		return
 	}
 	if a.So(dev, should.NotBeNil) {
-		ed.CreatedAt = dev.EndDevice.GetCreatedAt()
-		ed.UpdatedAt = dev.EndDevice.GetUpdatedAt()
-		a.So(dev.EndDevice, should.Resemble, ed)
+		pb.CreatedAt = dev.EndDevice.GetCreatedAt()
+		pb.UpdatedAt = dev.EndDevice.GetUpdatedAt()
+		a.So(dev.EndDevice, should.Resemble, pb)
 	}
 
-	found, err = FindOneDeviceByIdentifiers(r, &ed.EndDeviceIdentifiers)
+	found, err = FindOneDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers)
 	a.So(err, should.NotBeNil)
 	a.So(found, should.BeNil)
 }
@@ -216,7 +216,7 @@ func ExampleRegistry() {
 	devEUI := types.EUI64([8]byte{0, 1, 2, 3, 4, 5, 6, 7})
 	joinEUI := types.EUI64([8]byte{0, 1, 2, 3, 4, 5, 6, 7})
 	devAddr := types.DevAddr([4]byte{0, 1, 2, 3})
-	ed := &ttnpb.EndDevice{
+	pb := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationID: "test",
@@ -228,7 +228,7 @@ func ExampleRegistry() {
 		},
 	}
 
-	dev, err := r.Create(ed)
+	dev, err := r.Create(pb)
 	if err != nil {
 		panic(fmt.Errorf("Failed to create device %s", err))
 	}
