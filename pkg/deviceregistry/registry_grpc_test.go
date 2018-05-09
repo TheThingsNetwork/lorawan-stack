@@ -19,6 +19,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gogo/protobuf/types"
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -95,6 +96,30 @@ func TestSetDeviceNoCheck(t *testing.T) {
 	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(err, should.BeNil)
 	a.So(v, should.Equal, ttnpb.Empty)
+
+	oldPb := *pb
+
+	for pb.GetLocation().GetLatitude() == oldPb.GetLocation().GetLatitude() {
+		pb.Location = ttnpb.NewPopulatedLocation(test.Randy, false)
+	}
+	for pb.GetSession().GetStartedAt() == oldPb.GetSession().GetStartedAt() {
+		pb.Session = ttnpb.NewPopulatedSession(test.Randy, false)
+	}
+
+	v, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{
+		Device: *pb,
+		FieldMask: &types.FieldMask{
+			Paths: []string{"location.latitude"},
+		},
+	})
+	a.So(err, should.BeNil)
+	a.So(v, should.NotBeNil)
+
+	fetchedPb, err := dr.GetDevice(ctx, &pb.EndDeviceIdentifiers)
+	a.So(err, should.BeNil)
+	a.So(fetchedPb.GetLocation().GetLatitude(), should.Equal, pb.GetLocation().GetLatitude())
+	a.So(fetchedPb.GetSession().GetStartedAt(), should.Equal, oldPb.GetSession().GetStartedAt())
+	a.So(fetchedPb.GetSession().GetStartedAt(), should.NotEqual, pb.GetSession().GetStartedAt())
 
 	_, err = dr.Interface.Create(pb)
 	if !a.So(err, should.BeNil) {

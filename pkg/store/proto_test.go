@@ -19,8 +19,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/store"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/store"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 type cityDetails struct {
