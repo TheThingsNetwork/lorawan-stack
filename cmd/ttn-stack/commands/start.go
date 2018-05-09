@@ -64,7 +64,10 @@ var (
 			}
 			_ = ns
 
-			as := applicationserver.New(c, &config.AS)
+			as, err := applicationserver.New(c, &config.AS)
+			if err != nil {
+				return errors.NewWithCause(err, "Coult not create application server")
+			}
 			_ = as
 
 			js := joinserver.New(c, &config.JS)
