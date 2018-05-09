@@ -16,6 +16,7 @@ package deviceregistry
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
@@ -65,6 +66,12 @@ var ErrNoApplicationID = &errors.ErrDescriptor{
 	Code:          5,
 }
 
+var componentsDiminutives = map[ttnpb.PeerInfo_Role]string{
+	ttnpb.PeerInfo_APPLICATION_SERVER: "As",
+	ttnpb.PeerInfo_NETWORK_SERVER:     "Ns",
+	ttnpb.PeerInfo_JOIN_SERVER:        "Js",
+}
+
 func init() {
 	ErrDeviceNotFound.Register()
 	ErrTooManyDevices.Register()
@@ -84,6 +91,8 @@ type RegistryRPC struct {
 		SetDevice    func(ctx context.Context, dev *ttnpb.EndDevice, fields ...string) error
 		DeleteDevice func(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) error
 	}
+
+	servedComponents []ttnpb.PeerInfo_Role
 }
 
 // RPCOption represents RegistryRPC option
@@ -117,6 +126,11 @@ func WithDeleteDeviceCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers)
 	return func(r *RegistryRPC) { r.checks.DeleteDevice = fn }
 }
 
+// ForComponents takes in parameter the components that this device registry RPC will serve for.
+func ForComponents(components ...ttnpb.PeerInfo_Role) RPCOption {
+	return func(r *RegistryRPC) { r.servedComponents = append(r.servedComponents, components...) }
+}
+
 // NewRPC returns a new instance of RegistryRPC
 func NewRPC(c *component.Component, r Interface, opts ...RPCOption) (*RegistryRPC, error) {
 	rpc := &RegistryRPC{
@@ -132,7 +146,13 @@ func NewRPC(c *component.Component, r Interface, opts ...RPCOption) (*RegistryRP
 	if err != nil {
 		return nil, err
 	}
-	hooks.RegisterUnaryHook("/ttn.v3.Rpc", rights.HookName, hook.UnaryHook())
+	for _, servedComponent := range rpc.servedComponents {
+		diminutive, ok := componentsDiminutives[servedComponent]
+		if ok {
+			rpcPrefix := fmt.Sprintf("/ttn.v3.%sDeviceRegistry", diminutive)
+			hooks.RegisterUnaryHook(rpcPrefix, rights.HookName, hook.UnaryHook())
+		}
+	}
 
 	return rpc, nil
 }

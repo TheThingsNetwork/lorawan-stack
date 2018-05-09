@@ -48,7 +48,7 @@ func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 		registry:  conf.Registry,
 	}
 
-	registryRPC, err := deviceregistry.NewRPC(c, conf.Registry)
+	registryRPC, err := deviceregistry.NewRPC(c, conf.Registry, deviceregistry.ForComponents(ttnpb.PeerInfo_APPLICATION_SERVER))
 	if err != nil {
 		return nil, err
 	}

@@ -58,6 +58,7 @@ type Config struct {
 
 // New returns new *JoinServer.
 func New(c *component.Component, conf *Config, rpcOptions ...deviceregistry.RPCOption) (*JoinServer, error) {
+	rpcOptions = append(rpcOptions, deviceregistry.ForComponents(ttnpb.PeerInfo_JOIN_SERVER))
 	registryRPC, err := deviceregistry.NewRPC(c, conf.Registry, rpcOptions...)
 	if err != nil {
 		return nil, err

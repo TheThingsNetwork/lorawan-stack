@@ -155,7 +155,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		opt(ns)
 	}
 
-	registryRPC, err := deviceregistry.NewRPC(c, conf.Registry) // TODO: Add checks https://github.com/TheThingsIndustries/ttn/issues/558
+	registryRPC, err := deviceregistry.NewRPC(c, conf.Registry, deviceregistry.ForComponents(ttnpb.PeerInfo_NETWORK_SERVER)) // TODO: Add checks https://github.com/TheThingsIndustries/ttn/issues/558
 	if err != nil {
 		return nil, errors.NewWithCausef(err, "Could not initialize the network server's device registry RPC")
 	}
