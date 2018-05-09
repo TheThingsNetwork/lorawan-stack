@@ -70,7 +70,10 @@ var (
 			}
 			_ = as
 
-			js := joinserver.New(c, &config.JS)
+			js, err := joinserver.New(c, &config.JS)
+			if err != nil {
+				return errors.NewWithCause(err, "Coult not create join server")
+			}
 			_ = js
 
 			// TODO: Web UI

@@ -38,7 +38,10 @@ var (
 			reg := deviceregistry.New(store.NewByteMapStoreClient(redis))
 			config.JS.Registry = reg
 
-			js := joinserver.New(c, &config.JS)
+			js, err := joinserver.New(c, &config.JS)
+			if err != nil {
+				return errors.NewWithCause(err, "Coult not create join server")
+			}
 			_ = js
 
 			logger.Info("Starting join server...")
