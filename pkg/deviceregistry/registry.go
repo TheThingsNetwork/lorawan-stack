@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package deviceregistry contains the implementation of a device registry service.
 package deviceregistry
 
 import (
