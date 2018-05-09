@@ -240,7 +240,7 @@ func ExampleRegistry() {
 	dev.DeviceID = "differentID"
 	devAddr = types.DevAddr([4]byte{4, 3, 2, 1})
 	dev.DevAddr = &devAddr
-	err = dev.Store()
+	err = dev.Store("NextDevNonce", "NextJoinNonce", "NextRJCount0", "NextRJCount1", "DeviceIdentifiers.DeviceID", "DevAddr")
 	if err != nil {
 		panic(fmt.Errorf("Failed to update device %s", err))
 	}
