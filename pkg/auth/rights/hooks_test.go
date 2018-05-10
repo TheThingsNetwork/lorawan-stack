@@ -90,6 +90,25 @@ func TestUnaryHook(t *testing.T) {
 	}
 	defer srv.Stop()
 
+	// Feed database with an organization plus an organization API key.
+	org := &ttnpb.Organization{
+		OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{
+			OrganizationID: "org",
+		},
+	}
+	err = s.Organizations.Create(org)
+	a.So(err, should.BeNil)
+
+	orgKeyStr, err := auth.GenerateOrganizationAPIKey("issuer")
+	a.So(err, should.BeNil)
+	orgKey := ttnpb.APIKey{
+		Key:    orgKeyStr,
+		Name:   "Key",
+		Rights: []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS},
+	}
+	err = s.Organizations.SaveAPIKey(org.OrganizationIdentifiers, orgKey)
+	a.So(err, should.BeNil)
+
 	// Feed database with an application plus an application API key.
 	app := &ttnpb.Application{
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
@@ -152,21 +171,83 @@ func TestUnaryHook(t *testing.T) {
 	}{
 		{
 			// Skips the hook because there is no auth value.
-			"NoAuthValue",
+			"NoOrganizationAuthValue",
+			"",
+			&org.OrganizationIdentifiers,
+			[]ttnpb.Right{},
+			false,
+		},
+		{
+			// Skips the hook because there is no auth value.
+			"NoApplicationAuthValue",
 			"",
 			&app.ApplicationIdentifiers,
 			[]ttnpb.Right{},
 			false,
 		},
 		{
+			// Skips the hook because there is no auth value.
+			"NoGatewayAuthValue",
+			"",
+			&gtw.GatewayIdentifiers,
+			[]ttnpb.Right{},
+			false,
+		},
+		{
 			// It fails because the auth value have wrong format and can not be decoded.
-			"InvalidAuthValue",
+			"InvalidOrganizationAuthValue",
+			"---",
+			&ttnpb.OrganizationIdentifiers{
+				OrganizationID: "non-existent",
+			},
+			[]ttnpb.Right{},
+			true,
+		},
+		{
+			// It fails because the auth value have wrong format and can not be decoded.
+			"InvalidApplicationAuthValue",
 			"---",
 			&ttnpb.ApplicationIdentifiers{
 				ApplicationID: "non-existent",
 			},
 			[]ttnpb.Right{},
 			true,
+		},
+		{
+			// It fails because the auth value have wrong format and can not be decoded.
+			"InvalidGatewayAuthValue",
+			"---",
+			&ttnpb.GatewayIdentifiers{
+				GatewayID: "non-existent",
+			},
+			[]ttnpb.Right{},
+			true,
+		},
+		{
+			// The hook does not make any call because the request message does not implement any interface.
+			"NoImplementedInterface",
+			appKeyStr,
+			nil,
+			[]ttnpb.Right{},
+			false,
+		},
+		{
+			// Returns not authorized because the API key does not have rights for this application.
+			"NotAuthorizedForOrganizationAPIKey",
+			orgKeyStr,
+			&ttnpb.OrganizationIdentifiers{
+				OrganizationID: "random-application",
+			},
+			[]ttnpb.Right{},
+			true,
+		},
+		{
+			// It returns the rights of the application API key.
+			"AuthorizedForOrganizationAPIKey",
+			orgKeyStr,
+			&org.OrganizationIdentifiers,
+			orgKey.Rights,
+			false,
 		},
 		{
 			// Returns not authorized because the API key does not have rights for this application.
@@ -184,14 +265,6 @@ func TestUnaryHook(t *testing.T) {
 			appKeyStr,
 			&app.ApplicationIdentifiers,
 			appKey.Rights,
-			false,
-		},
-		{
-			// The hook does not make any call because the request message does not implement any interface.
-			"NoImplementedInterface",
-			appKeyStr,
-			nil,
-			[]ttnpb.Right{},
 			false,
 		},
 		{
