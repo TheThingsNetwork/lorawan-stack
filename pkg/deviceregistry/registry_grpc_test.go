@@ -23,6 +23,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/component"
 	. "github.com/TheThingsNetwork/ttn/pkg/deviceregistry"
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	errshould "github.com/TheThingsNetwork/ttn/pkg/errors/should"
 	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/TheThingsNetwork/ttn/pkg/store/mapstore"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -36,44 +37,44 @@ func TestRegistryRPC(t *testing.T) {
 	a := assertions.New(t)
 	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
-	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
 	ctx := rights.NewContext(context.Background(), []ttnpb.Right{
 		ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 	})
 
-	_, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *ed})
-	a.So(err, should.NotBeNil)
+	_, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *pb})
+	a.So(err, errshould.Describe, ErrPermissionDenied)
 
-	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *ed})
+	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
-	a.So(v, should.NotBeNil)
+	a.So(v, should.Equal, ttnpb.Empty)
 
-	devs, err := dr.ListDevices(context.Background(), &ed.EndDeviceIdentifiers)
-	a.So(err, should.NotBeNil)
+	devs, err := dr.ListDevices(context.Background(), &pb.EndDeviceIdentifiers)
+	a.So(err, errshould.Describe, ErrPermissionDenied)
 
-	devs, err = dr.ListDevices(ctx, &ed.EndDeviceIdentifiers)
+	devs, err = dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
 	if a.So(err, should.BeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
-		devs.EndDevices[0].CreatedAt = ed.GetCreatedAt()
-		devs.EndDevices[0].UpdatedAt = ed.GetUpdatedAt()
-		a.So(pretty.Diff(devs.EndDevices[0], ed), should.BeEmpty)
+		devs.EndDevices[0].CreatedAt = pb.GetCreatedAt()
+		devs.EndDevices[0].UpdatedAt = pb.GetUpdatedAt()
+		a.So(pretty.Diff(devs.EndDevices[0], pb), should.BeEmpty)
 	}
 
-	_, err = dr.DeleteDevice(context.Background(), &ed.EndDeviceIdentifiers)
-	a.So(err, should.NotBeNil)
+	_, err = dr.DeleteDevice(context.Background(), &pb.EndDeviceIdentifiers)
+	a.So(err, errshould.Describe, ErrPermissionDenied)
 
-	v, err = dr.DeleteDevice(ctx, &ed.EndDeviceIdentifiers)
+	v, err = dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
-	a.So(v, should.NotBeNil)
+	a.So(v, should.Equal, ttnpb.Empty)
 
-	_, err = dr.ListDevices(context.Background(), &ed.EndDeviceIdentifiers)
-	a.So(err, should.NotBeNil)
+	_, err = dr.ListDevices(context.Background(), &pb.EndDeviceIdentifiers)
+	a.So(err, errshould.Describe, ErrPermissionDenied)
 
-	devs, err = dr.ListDevices(ctx, &ed.EndDeviceIdentifiers)
+	devs, err = dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(devs.EndDevices, should.BeEmpty)
 }
@@ -86,22 +87,22 @@ func TestSetDeviceNoCheck(t *testing.T) {
 		ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 	})
 
-	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	_, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *ed})
-	a.So(err, should.NotBeNil)
+	_, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *pb})
+	a.So(err, errshould.Describe, ErrPermissionDenied)
 
-	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *ed})
+	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(err, should.BeNil)
-	a.So(v, should.NotBeNil)
+	a.So(v, should.Equal, ttnpb.Empty)
 
-	_, err = dr.Interface.Create(ed)
+	_, err = dr.Interface.Create(pb)
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
 
-	v, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *ed})
-	a.So(err, should.NotBeNil)
+	v, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
+	a.So(err, errshould.Describe, ErrTooManyDevices)
 	a.So(v, should.BeNil)
 }
 
@@ -114,17 +115,17 @@ func TestListDevicesNoCheck(t *testing.T) {
 	})
 
 	devs, err := dr.ListDevices(ctx, &ttnpb.EndDeviceIdentifiers{})
-	a.So(err, should.NotBeNil)
+	a.So(err, errshould.Describe, ErrNoApplicationID)
 	a.So(devs, should.BeNil)
 
 	dev1, err := dr.Interface.Create(ttnpb.NewPopulatedEndDevice(test.Randy, false))
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
 
 	dev2, err := dr.Interface.Create(ttnpb.NewPopulatedEndDevice(test.Randy, false))
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
 
 	devs, err = dr.ListDevices(ctx, &dev1.EndDeviceIdentifiers)
@@ -150,30 +151,30 @@ func TestGetDeviceNoCheck(t *testing.T) {
 		ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 	})
 
-	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	v, err := dr.GetDevice(ctx, &ed.EndDeviceIdentifiers)
-	a.So(err, should.NotBeNil)
+	v, err := dr.GetDevice(ctx, &pb.EndDeviceIdentifiers)
+	a.So(err, errshould.Describe, ErrDeviceNotFound)
 	a.So(v, should.BeNil)
 
-	_, err = dr.Interface.Create(ed)
+	_, err = dr.Interface.Create(pb)
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
 
-	v, err = dr.GetDevice(ctx, &ed.EndDeviceIdentifiers)
+	v, err = dr.GetDevice(ctx, &pb.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 
-	ed.CreatedAt = time.Time{}
-	ed.UpdatedAt = time.Time{}
-	_, err = dr.Interface.Create(ed)
+	pb.CreatedAt = time.Time{}
+	pb.UpdatedAt = time.Time{}
+	_, err = dr.Interface.Create(pb)
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
 
-	v, err = dr.GetDevice(ctx, &ed.EndDeviceIdentifiers)
-	a.So(err, should.NotBeNil)
+	v, err = dr.GetDevice(ctx, &pb.EndDeviceIdentifiers)
+	a.So(err, errshould.Describe, ErrTooManyDevices)
 	a.So(v, should.BeNil)
 }
 
@@ -185,37 +186,37 @@ func TestDeleteDeviceNoCheck(t *testing.T) {
 		ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 	})
 
-	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	v, err := dr.DeleteDevice(ctx, &ed.EndDeviceIdentifiers)
-	a.So(err, should.NotBeNil)
+	v, err := dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
+	a.So(err, errshould.Describe, ErrDeviceNotFound)
 	a.So(v, should.BeNil)
 
-	_, err = dr.Interface.Create(ed)
+	_, err = dr.Interface.Create(pb)
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
 
-	v, err = dr.DeleteDevice(ctx, &ed.EndDeviceIdentifiers)
+	v, err = dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 
-	ed.CreatedAt = time.Time{}
-	ed.UpdatedAt = time.Time{}
-	_, err = dr.Interface.Create(ed)
+	pb.CreatedAt = time.Time{}
+	pb.UpdatedAt = time.Time{}
+	_, err = dr.Interface.Create(pb)
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
 
-	ed.CreatedAt = time.Time{}
-	ed.UpdatedAt = time.Time{}
-	_, err = dr.Interface.Create(ed)
+	pb.CreatedAt = time.Time{}
+	pb.UpdatedAt = time.Time{}
+	_, err = dr.Interface.Create(pb)
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
 
-	v, err = dr.DeleteDevice(ctx, &ed.EndDeviceIdentifiers)
-	a.So(err, should.NotBeNil)
+	v, err = dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
+	a.So(err, errshould.Describe, ErrTooManyDevices)
 	a.So(v, should.BeNil)
 }
 
@@ -240,24 +241,23 @@ func TestCheck(t *testing.T) {
 		ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 	})
 
-	ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
+	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
 	t.Run("SetDevice", func(t *testing.T) {
 		a := assertions.New(t)
 
 		checkErr = errors.New("err")
-		v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *ed})
-		a.So(errors.From(err).Code(), should.Equal, ErrCheckFailed.Code)
-		a.So(errors.From(err).Type(), should.Equal, ErrCheckFailed.Type)
+		v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
+		a.So(err, errshould.Describe, ErrCheckFailed)
 		a.So(v, should.BeNil)
 
 		checkErr = errTest.New(nil)
-		v, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *ed})
+		v, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 		a.So(err, should.Equal, checkErr)
 		a.So(v, should.BeNil)
 
 		checkErr = nil
-		v, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *ed})
+		v, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 		a.So(err, should.BeNil)
 		a.So(v, should.NotBeNil)
 	})
@@ -266,49 +266,47 @@ func TestCheck(t *testing.T) {
 		a := assertions.New(t)
 
 		checkErr = errors.New("err")
-		ret, err := dr.GetDevice(ctx, &ed.EndDeviceIdentifiers)
-		a.So(errors.From(err).Code(), should.Equal, ErrCheckFailed.Code)
-		a.So(errors.From(err).Type(), should.Equal, ErrCheckFailed.Type)
+		ret, err := dr.GetDevice(ctx, &pb.EndDeviceIdentifiers)
+		a.So(err, errshould.Describe, ErrCheckFailed)
 		a.So(ret, should.BeNil)
 
 		checkErr = errTest.New(nil)
-		ret, err = dr.GetDevice(ctx, &ed.EndDeviceIdentifiers)
+		ret, err = dr.GetDevice(ctx, &pb.EndDeviceIdentifiers)
 		a.So(err, should.Equal, checkErr)
 		a.So(ret, should.BeNil)
 
 		checkErr = nil
-		ret, err = dr.GetDevice(ctx, &ed.EndDeviceIdentifiers)
+		ret, err = dr.GetDevice(ctx, &pb.EndDeviceIdentifiers)
 		if !a.So(err, should.BeNil) {
-			return
+			t.FailNow()
 		}
-		ret.CreatedAt = ed.GetCreatedAt()
-		ret.UpdatedAt = ed.GetUpdatedAt()
-		a.So(pretty.Diff(ret, ed), should.BeEmpty)
+		ret.CreatedAt = pb.GetCreatedAt()
+		ret.UpdatedAt = pb.GetUpdatedAt()
+		a.So(pretty.Diff(ret, pb), should.BeEmpty)
 	}) {
-		return
+		t.FailNow()
 	}
 
 	t.Run("ListDevices", func(t *testing.T) {
 		a := assertions.New(t)
 
 		checkErr = errors.New("err")
-		devs, err := dr.ListDevices(ctx, &ed.EndDeviceIdentifiers)
-		a.So(errors.From(err).Code(), should.Equal, ErrCheckFailed.Code)
-		a.So(errors.From(err).Type(), should.Equal, ErrCheckFailed.Type)
+		devs, err := dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
+		a.So(err, errshould.Describe, ErrCheckFailed)
 		a.So(devs, should.BeNil)
 
 		checkErr = errTest.New(nil)
-		devs, err = dr.ListDevices(ctx, &ed.EndDeviceIdentifiers)
+		devs, err = dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
 		a.So(err, should.Equal, checkErr)
 		a.So(devs, should.BeNil)
 
 		checkErr = nil
-		devs, err = dr.ListDevices(ctx, &ed.EndDeviceIdentifiers)
+		devs, err = dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
 		a.So(err, should.BeNil)
 		if a.So(devs, should.NotBeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
-			devs.EndDevices[0].CreatedAt = ed.GetCreatedAt()
-			devs.EndDevices[0].UpdatedAt = ed.GetUpdatedAt()
-			a.So(pretty.Diff(devs.EndDevices[0], ed), should.BeEmpty)
+			devs.EndDevices[0].CreatedAt = pb.GetCreatedAt()
+			devs.EndDevices[0].UpdatedAt = pb.GetUpdatedAt()
+			a.So(pretty.Diff(devs.EndDevices[0], pb), should.BeEmpty)
 		}
 	})
 
@@ -316,19 +314,18 @@ func TestCheck(t *testing.T) {
 		a := assertions.New(t)
 
 		checkErr = errors.New("err")
-		_, err := dr.DeleteDevice(ctx, &ed.EndDeviceIdentifiers)
-		a.So(errors.From(err).Code(), should.Equal, ErrCheckFailed.Code)
-		a.So(errors.From(err).Type(), should.Equal, ErrCheckFailed.Type)
+		_, err := dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
+		a.So(err, errshould.Describe, ErrCheckFailed)
 
 		checkErr = errTest.New(nil)
-		_, err = dr.DeleteDevice(ctx, &ed.EndDeviceIdentifiers)
+		_, err = dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
 		a.So(err, should.Equal, checkErr)
 
 		checkErr = nil
-		_, err = dr.DeleteDevice(ctx, &ed.EndDeviceIdentifiers)
+		_, err = dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
 		a.So(err, should.BeNil)
 
-		devs, err := dr.ListDevices(ctx, &ed.EndDeviceIdentifiers)
+		devs, err := dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
 		a.So(err, should.BeNil)
 		if a.So(devs, should.NotBeNil) {
 			a.So(devs.EndDevices, should.BeEmpty)
