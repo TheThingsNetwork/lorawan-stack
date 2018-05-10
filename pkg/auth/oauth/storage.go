@@ -19,7 +19,6 @@ import (
 
 	"github.com/RangelReale/osin"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 )
 
@@ -29,7 +28,7 @@ var clientSpecializer = func(base ttnpb.Client) store.Client {
 
 // storage implements osin.Storage.
 type storage struct {
-	store *sql.Store
+	*store.Store
 }
 
 // UserData is the userdata that gets carried around with authorization requests.
@@ -57,7 +56,7 @@ func (s *storage) Close() {}
 
 // GetClient loads the OAuth Client by client_id.
 func (s *storage) GetClient(clientID string) (osin.Client, error) {
-	client, err := s.store.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: clientID}, clientSpecializer)
+	client, err := s.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: clientID}, clientSpecializer)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +70,7 @@ func (s *storage) GetClient(clientID string) (osin.Client, error) {
 
 // SaveAuthorize saves authorization data.
 func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
-	return s.store.OAuth.SaveAuthorizationCode(store.AuthorizationData{
+	return s.OAuth.SaveAuthorizationCode(store.AuthorizationData{
 		AuthorizationCode: data.Code,
 		ClientID:          data.Client.GetId(),
 		CreatedAt:         data.CreatedAt,
@@ -85,7 +84,7 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 
 // LoadAuthorize loads the client and authorization data for the authorization code.
 func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
-	data, err := s.store.OAuth.GetAuthorizationCode(code)
+	data, err := s.OAuth.GetAuthorizationCode(code)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +95,7 @@ func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 		return nil, err
 	}
 
-	client, err := s.store.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: data.ClientID}, clientSpecializer)
+	client, err := s.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: data.ClientID}, clientSpecializer)
 	if err != nil {
 		return nil, err
 	}
@@ -117,12 +116,12 @@ func (s *storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 
 // RemoveAuthorize deletes the authorization code.
 func (s *storage) RemoveAuthorize(code string) error {
-	return s.store.OAuth.DeleteAuthorizationCode(code)
+	return s.OAuth.DeleteAuthorizationCode(code)
 }
 
 // SaveAccess saves the access data for later use.
 func (s *storage) SaveAccess(data *osin.AccessData) error {
-	err := s.store.Transact(func(s *store.Store) error {
+	err := s.Transact(func(s *store.Store) error {
 		err := s.OAuth.SaveAccessToken(store.AccessData{
 			AccessToken: data.AccessToken,
 			ClientID:    data.Client.GetId(),
@@ -155,7 +154,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 
 // LoadAccess loads the access data based on the access token.
 func (s *storage) LoadAccess(accessToken string) (*osin.AccessData, error) {
-	data, err := s.store.OAuth.GetAccessToken(accessToken)
+	data, err := s.OAuth.GetAccessToken(accessToken)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +165,7 @@ func (s *storage) LoadAccess(accessToken string) (*osin.AccessData, error) {
 		return nil, err
 	}
 
-	client, err := s.store.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: data.ClientID}, clientSpecializer)
+	client, err := s.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: data.ClientID}, clientSpecializer)
 	if err != nil {
 		return nil, err
 	}
@@ -186,17 +185,17 @@ func (s *storage) LoadAccess(accessToken string) (*osin.AccessData, error) {
 
 // RemoveAccess revokes access data.
 func (s *storage) RemoveAccess(accessToken string) error {
-	return s.store.OAuth.DeleteAccessToken(accessToken)
+	return s.OAuth.DeleteAccessToken(accessToken)
 }
 
 // LoadRefresh loads the access data based on the refresh token.
 func (s *storage) LoadRefresh(refreshToken string) (*osin.AccessData, error) {
-	data, err := s.store.OAuth.GetRefreshToken(refreshToken)
+	data, err := s.OAuth.GetRefreshToken(refreshToken)
 	if err != nil {
 		return nil, err
 	}
 
-	client, err := s.store.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: data.ClientID}, clientSpecializer)
+	client, err := s.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: data.ClientID}, clientSpecializer)
 	if err != nil {
 		return nil, err
 	}
@@ -215,5 +214,5 @@ func (s *storage) LoadRefresh(refreshToken string) (*osin.AccessData, error) {
 
 // RemoveRefresh deletes the refresh token.
 func (s *storage) RemoveRefresh(refreshToken string) error {
-	return s.store.OAuth.DeleteRefreshToken(refreshToken)
+	return s.OAuth.DeleteRefreshToken(refreshToken)
 }

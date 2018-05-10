@@ -89,7 +89,7 @@ func TestApplicationAttributer(t *testing.T) {
 
 	migrations.Registry.Register(migrations.Registry.Count()+1, "test_applications_attributer_schema", schema, "")
 	s := testStore(t, attributesDatabase)
-	s.MigrateAll()
+	s.Init() // to apply the migration
 
 	specializer := func(base ttnpb.Application) store.Application {
 		return &applicationWithFoo{Application: &base}

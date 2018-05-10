@@ -89,7 +89,7 @@ func TestClientAttributer(t *testing.T) {
 
 	migrations.Registry.Register(migrations.Registry.Count()+1, "test_clients_attributer_schema", schema, "")
 	s := testStore(t, attributesDatabase)
-	s.MigrateAll()
+	s.Init() // to apply the migration
 
 	specializer := func(base ttnpb.Client) store.Client {
 		return &clientWithFoo{Client: &base}

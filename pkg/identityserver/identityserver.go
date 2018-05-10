@@ -78,7 +78,7 @@ type IdentityServer struct {
 
 	config Config
 
-	store *sql.Store
+	store *store.Store
 	email email.Provider
 
 	logger log.Interface
@@ -220,22 +220,15 @@ func (is *IdentityServer) Init(data InitialData) error {
 	}
 
 	// Returns error if database already exists.
-	err = is.store.CreateDatabase()
+	err = is.store.Init()
 	if err != nil {
 		return err
 	}
 	defer func() {
 		if err != nil {
-			is.store.DropDatabase()
+			is.store.Clean()
 		}
 	}()
-
-	// TODO: migrations should be executed within the transaction.
-	// Relates to https://github.com/TheThingsIndustries/ttn/issues/495.
-	err = is.store.MigrateAll()
-	if err != nil {
-		return err
-	}
 
 	err = is.store.Transact(func(tx *store.Store) error {
 		now := time.Now().UTC()

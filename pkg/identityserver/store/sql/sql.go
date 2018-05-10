@@ -23,7 +23,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
 )
 
-// storer is the interface all stores have to adhere to.
+// storer is the interface all store implementations have to adhere to.
 type storer interface {
 	// queryer returns the storers query context.
 	queryer() db.QueryContext
@@ -35,14 +35,14 @@ type storer interface {
 	store() *store.Store
 }
 
-// Store is a SQL data store.
-type Store struct {
+// Implementation of the SQL store. It implements storer.
+type impl struct {
 	db *db.DB
 	store.Store
 }
 
 // Open opens a new database connection and attachs it to a new store.
-func Open(connectionURI string) (*Store, error) {
+func Open(connectionURI string) (*store.Store, error) {
 	db, err := db.Open(context.Background(), connectionURI, migrations.Registry)
 	if err != nil {
 		return nil, err
@@ -52,34 +52,37 @@ func Open(connectionURI string) (*Store, error) {
 }
 
 // FromDB creates a new store from a datababase connection.
-func FromDB(db *db.DB) *Store {
-	s := &Store{
+func FromDB(db *db.DB) *store.Store {
+	s := &impl{
 		db: db,
 	}
+	s.Store.Behaviour = s
 
 	initSubStores(s)
-	return s
+
+	return s.store()
 }
 
 // WithContext creates a reference to a new Store that will use the
 // provided context for every request. This Store will share its database
 // connection with the original store so don't close it if you want to keep
 // using the parent database.
-func (s *Store) WithContext(context context.Context) *Store {
-	store := &Store{
+func (s *impl) WithContext(context context.Context) *store.Store {
+	store := &impl{
 		db: s.db.WithContext(context),
 	}
+	store.Store.Behaviour = store
 
 	initSubStores(store)
 
-	return store
+	return store.store()
 }
 
 // Transact executes fn inside a transaction and retries it or rollbacks it as
 // needed. It returns the error fn returns.
-func (s *Store) Transact(fn func(*store.Store) error) error {
+func (s *impl) Transact(fn func(*store.Store) error) error {
 	return s.transact(func(tx *db.Tx) error {
-		store := &txStore{
+		store := &txImpl{
 			tx: tx,
 		}
 
@@ -89,48 +92,64 @@ func (s *Store) Transact(fn func(*store.Store) error) error {
 	})
 }
 
+// Init creates the database if it does not exist yet and applies the unapplied migrations.
+func (s *impl) Init() error {
+	_, err := s.db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", s.db.Database()))
+	if err != nil {
+		return err
+	}
+
+	return s.db.MigrateAll()
+}
+
+// Clean deletes the database.
+func (s *impl) Clean() error {
+	_, err := s.db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE", s.db.Database()))
+	return err
+}
+
 // Close closes the connection to the database.
-func (s *Store) Close() error {
+func (s *impl) Close() error {
 	return s.db.Close()
 }
 
 // queryer returns the global database context.
-func (s *Store) queryer() db.QueryContext {
+func (s *impl) queryer() db.QueryContext {
 	return s.db
 }
 
 // transact starts a new transaction.
-func (s *Store) transact(fn func(*db.Tx) error, opts ...db.TxOption) error {
+func (s *impl) transact(fn func(*db.Tx) error, opts ...db.TxOption) error {
 	return s.db.Transact(fn, opts...)
 }
 
 // store returns the store.Store.
-func (s *Store) store() *store.Store {
+func (s *impl) store() *store.Store {
 	return &s.Store
 }
 
-// txStore is a store that keeps a transaction that is being executed.
-type txStore struct {
+// txImpl is a store that keeps a transaction that is being executed. It implements storer.
+type txImpl struct {
 	tx *db.Tx
 	store.Store
 }
 
 // queryer returns the transaction that is already happening.
-func (s *txStore) queryer() db.QueryContext {
+func (s *txImpl) queryer() db.QueryContext {
 	return s.tx
 }
 
 // transact works in the same transaction that is already happening.
-func (s *txStore) transact(fn func(*db.Tx) error, opts ...db.TxOption) error {
+func (s *txImpl) transact(fn func(*db.Tx) error, opts ...db.TxOption) error {
 	return fn(s.tx)
 }
 
 // store returns the store.Store.
-func (s *txStore) store() *store.Store {
+func (s *txImpl) store() *store.Store {
 	return &s.Store
 }
 
-// initSubStores initializes the sub stores of the store.
+// initSubStores initializes the sub-stores of the store.Store.
 func initSubStores(s storer) {
 	store := s.store()
 	store.Users = NewUserStore(s)
@@ -141,31 +160,4 @@ func initSubStores(s storer) {
 	store.Settings = NewSettingStore(s)
 	store.Invitations = NewInvitationStore(s)
 	store.Organizations = NewOrganizationStore(s)
-}
-
-// Init creates the database if it does not exist yet and applies the unapplied migrations.
-func (s *Store) Init() error {
-	_, err := s.db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", s.db.Database()))
-	if err != nil {
-		return err
-	}
-
-	return s.MigrateAll()
-}
-
-// CreateDatabase creates the database.
-func (s *Store) CreateDatabase() error {
-	_, err := s.db.Exec(fmt.Sprintf("CREATE DATABASE %s", s.db.Database()))
-	return err
-}
-
-// DropDatabase deletes the database.
-func (s *Store) DropDatabase() error {
-	_, err := s.db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE", s.db.Database()))
-	return err
-}
-
-// MigrateAll applies all unapplied migrations.
-func (s *Store) MigrateAll() error {
-	return s.db.MigrateAll()
 }

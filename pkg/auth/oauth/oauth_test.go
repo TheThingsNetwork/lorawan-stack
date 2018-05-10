@@ -64,12 +64,12 @@ var (
 	authorizer = &TestAuthorizer{
 		Body: "<html />",
 	}
-	s *sql.Store
+	s *store.Store
 )
 
 // cleanStore returns a new store instance attached to a newly created database
 // where all migrations has been applied and also has been feed with some users.
-func cleanStore(logger log.Interface, database string) *sql.Store {
+func cleanStore(logger log.Interface, database string) *store.Store {
 	// open database connection
 	db, err := db.Open(context.Background(), fmt.Sprintf(address, database), migrations.Registry)
 	if err != nil {

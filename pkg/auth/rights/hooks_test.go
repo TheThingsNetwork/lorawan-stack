@@ -62,9 +62,9 @@ func TestUnaryHook(t *testing.T) {
 		t.Fatal("Failed to create a store instance")
 	}
 
-	err = s.DropDatabase()
+	err = s.Clean()
 	if !a.So(err, should.BeNil) {
-		t.Fatal("Failed to drop database")
+		t.Fatal("Failed to clean store")
 	}
 	defer s.Close()
 

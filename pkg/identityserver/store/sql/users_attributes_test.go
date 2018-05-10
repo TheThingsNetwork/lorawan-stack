@@ -89,7 +89,7 @@ func TestUserAttributer(t *testing.T) {
 
 	migrations.Registry.Register(migrations.Registry.Count()+1, "test_users_attributer_schema", schema, "")
 	s := testStore(t, attributesDatabase)
-	s.MigrateAll()
+	s.Init() // to apply the migration
 
 	specializer := func(base ttnpb.User) store.User {
 		return &userWithFoo{User: &base}

@@ -19,6 +19,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
@@ -39,13 +40,13 @@ func timeValue(t time.Time) *time.Time {
 
 // Store instances shared across different tests.
 // The key of the map is the database name.
-var testingStore map[string]*Store = make(map[string]*Store)
+var testingStore map[string]*store.Store = make(map[string]*store.Store)
 
 // testStore returns a store instance of the given database. The store is
 // initialized only the first time is called on a specific database as it is
 // indexed on a map that will be used for the subsequent times this method
 // is called.
-func testStore(t testing.TB, database string) *Store {
+func testStore(t testing.TB, database string) *store.Store {
 	if _, exists := testingStore[database]; !exists {
 		testingStore[database] = cleanStore(t, database)
 	}
@@ -56,10 +57,10 @@ func testStore(t testing.TB, database string) *Store {
 // cleanStore returns a clean store instance. The database will be dropped
 // and recreated again, migrations will be applied and finally will be feed
 // with some test users.
-func cleanStore(t testing.TB, database string) *Store {
+func cleanStore(t testing.TB, database string) *store.Store {
 	uri := fmt.Sprintf(address, database)
 	logger := test.GetLogger(t).WithFields(log.Fields(
-		"namespace", "Identity Server",
+		"namespace", "identity server",
 		"connection_uri", uri,
 	))
 
@@ -68,9 +69,9 @@ func cleanStore(t testing.TB, database string) *Store {
 		logger.WithError(err).Fatal("Failed to open a store with the CockroachDB instance")
 	}
 
-	err = s.DropDatabase()
+	err = s.Clean()
 	if err != nil {
-		logger.WithError(err).Fatal("Failed to drop database")
+		logger.WithError(err).Fatal("Failed to clean database")
 	}
 
 	err = s.Init()

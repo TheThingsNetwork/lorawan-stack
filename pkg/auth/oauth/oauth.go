@@ -22,7 +22,6 @@ import (
 
 	"github.com/RangelReale/osin"
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/web"
@@ -49,7 +48,7 @@ type Server struct {
 }
 
 // New returns a new *Server that is ready to use.
-func New(logger log.Interface, iss string, store *sql.Store, authorizer Authorizer) *Server {
+func New(logger log.Interface, iss string, store *store.Store, authorizer Authorizer) *Server {
 	config := &osin.ServerConfig{
 		AuthorizationExpiration:     AuthorizationExpiration,
 		AccessExpiration:            AccessExpiration,
@@ -70,7 +69,7 @@ func New(logger log.Interface, iss string, store *sql.Store, authorizer Authoriz
 	}
 
 	storage := &storage{
-		store: store,
+		Store: store,
 	}
 
 	s := &Server{

@@ -14,6 +14,8 @@
 
 package store
 
+import "context"
+
 // Store is a store that holds all different sub-stores.
 type Store struct {
 	// Users is the users store.
@@ -39,6 +41,22 @@ type Store struct {
 
 	// Organizations is the organizations store.
 	Organizations OrganizationStore
+
+	Behaviour
+}
+
+// Behaviour is the behaviour the Store must implement.
+type Behaviour interface {
+	// Close closes any resource that the store may be holding.
+	Close() error
+	// WithContext returns a new store with the provided context.
+	WithContext(context.Context) *Store
+	// Transact executes the function inside a transaction.
+	Transact(func(*Store) error) error
+	// Init initializes the store.
+	Init() error
+	// Clean completely drops all the store data.
+	Clean() error
 }
 
 // Attributer is the interface providing methods to extend basic IS data types.

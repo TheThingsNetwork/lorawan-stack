@@ -89,7 +89,7 @@ func TestGatewayAttributer(t *testing.T) {
 
 	migrations.Registry.Register(migrations.Registry.Count()+1, "test_gateways_attributer_schema", schema, "")
 	s := testStore(t, attributesDatabase)
-	s.MigrateAll()
+	s.Init() // to apply the migration
 
 	specializer := func(base ttnpb.Gateway) store.Gateway {
 		return &gatewayWithFoo{Gateway: &base}

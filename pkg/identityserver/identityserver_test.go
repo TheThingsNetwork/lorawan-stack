@@ -58,7 +58,7 @@ func getIS(t testing.TB) *IdentityServer {
 		}
 
 		// drop the database before initializing the IS
-		err = is.store.DropDatabase()
+		err = is.store.Clean()
 		if err != nil {
 			logger.WithError(err).Fatal("Failed to drop database")
 		}
