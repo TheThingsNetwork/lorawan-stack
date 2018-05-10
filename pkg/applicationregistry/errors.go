@@ -42,10 +42,28 @@ var (
 		Type:          errors.InvalidArgument,
 		Code:          3,
 	}
+
+	// ErrPermissionDenied is returned if the rights were insufficient to perform
+	// this operation.
+	ErrPermissionDenied = &errors.ErrDescriptor{
+		MessageFormat: "Permission denied to perform this operation",
+		Type:          errors.PermissionDenied,
+		Code:          4,
+	}
+
+	// ErrNoApplicationID is returned if no application ID was passed to an
+	// operation that requires it.
+	ErrNoApplicationID = &errors.ErrDescriptor{
+		MessageFormat: "No application ID given",
+		Type:          errors.InvalidArgument,
+		Code:          5,
+	}
 )
 
 func init() {
 	ErrApplicationNotFound.Register()
 	ErrTooManyApplications.Register()
 	ErrCheckFailed.Register()
+	ErrPermissionDenied.Register()
+	ErrNoApplicationID.Register()
 }
