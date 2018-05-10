@@ -35,9 +35,11 @@ It is generated from these files:
 
 It has these top-level messages:
 	Application
+	Applications
 	ApplicationUp
 	ApplicationDownlinks
 	DownlinkQueueRequest
+	SetApplicationRequest
 	APIKey
 	Client
 	PeerInfo
