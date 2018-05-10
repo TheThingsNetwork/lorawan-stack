@@ -18,29 +18,31 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 )
 
-// ErrApplicationNotFound represents the ErrDescriptor of the error returned
-// when the application is not found.
-var ErrApplicationNotFound = &errors.ErrDescriptor{
-	MessageFormat: "Application not found",
-	Type:          errors.NotFound,
-	Code:          1,
-}
+var (
+	// ErrApplicationNotFound represents the ErrDescriptor of the error returned
+	// when the application is not found.
+	ErrApplicationNotFound = &errors.ErrDescriptor{
+		MessageFormat: "Application not found",
+		Type:          errors.NotFound,
+		Code:          1,
+	}
 
-// ErrTooManyApplications represents the ErrDescriptor of the error returned
-// when there are too many applications associated with the identifiers specified.
-var ErrTooManyApplications = &errors.ErrDescriptor{
-	MessageFormat: "Too many applications found",
-	Type:          errors.Conflict,
-	Code:          2,
-}
+	// ErrTooManyApplications represents the ErrDescriptor of the error returned
+	// when there are too many applications associated with the identifiers specified.
+	ErrTooManyApplications = &errors.ErrDescriptor{
+		MessageFormat: "Too many applications found",
+		Type:          errors.Conflict,
+		Code:          2,
+	}
 
-// ErrCheckFailed represents the ErrDescriptor of the error returned
-// when the check failed.
-var ErrCheckFailed = &errors.ErrDescriptor{
-	MessageFormat: "Argument check failed",
-	Type:          errors.InvalidArgument,
-	Code:          3,
-}
+	// ErrCheckFailed represents the ErrDescriptor of the error returned
+	// when the check failed.
+	ErrCheckFailed = &errors.ErrDescriptor{
+		MessageFormat: "Argument check failed",
+		Type:          errors.InvalidArgument,
+		Code:          3,
+	}
+)
 
 func init() {
 	ErrApplicationNotFound.Register()
