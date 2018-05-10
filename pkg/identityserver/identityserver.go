@@ -72,6 +72,8 @@ type Specializers struct {
 
 // IdentityServer implements the Identity Server component behaviour.
 type IdentityServer struct {
+	// TODO: document things that need to be taken into account or to be done when updating the
+	// rights list. See https://github.com/TheThingsIndustries/ttn/issues/724.
 	*component.Component
 
 	config Config
