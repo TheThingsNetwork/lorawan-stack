@@ -83,7 +83,7 @@ func NewRPC(c *component.Component, r Interface, opts ...RPCOption) (*RegistryRP
 
 // GetApplication returns the application associated with id in underlying registry, if found.
 func (r *RegistryRPC) GetApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) (*ttnpb.Application, error) {
-	if err := rights.CheckApplicationAuth(ctx, id, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
+	if err := rights.RequireApplication(ctx, id, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 
@@ -112,7 +112,7 @@ func (r *RegistryRPC) GetApplication(ctx context.Context, id *ttnpb.ApplicationI
 
 // SetApplication sets the application fields to match those of app in underlying registry.
 func (r *RegistryRPC) SetApplication(ctx context.Context, req *ttnpb.SetApplicationRequest) (*pbtypes.Empty, error) {
-	if err := rights.CheckApplicationAuth(ctx, req, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
+	if err := rights.RequireApplication(ctx, req, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 
@@ -151,7 +151,7 @@ func (r *RegistryRPC) SetApplication(ctx context.Context, req *ttnpb.SetApplicat
 
 // DeleteApplication deletes the application associated with id from underlying registry.
 func (r *RegistryRPC) DeleteApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.CheckApplicationAuth(ctx, id, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
+	if err := rights.RequireApplication(ctx, id, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 

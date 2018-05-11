@@ -45,9 +45,9 @@ func init() {
 	ErrInvalidApplicationID.Register()
 }
 
-// CheckApplicationAuth within a context that has already had rights filled by
-// the hook.
-func CheckApplicationAuth(ctx context.Context, appIdentifiers ApplicationIDGetter, rights ...ttnpb.Right) error {
+// RequireApplication checks, based on the context, that the clients has the
+// specified rights for this application.
+func RequireApplication(ctx context.Context, appIdentifiers ApplicationIDGetter, rights ...ttnpb.Right) error {
 	// TODO: Accept administrator authorization even if not tied to the application
 	// https://github.com/TheThingsIndustries/ttn/issues/731
 	if err := validate.ID(appIdentifiers.GetApplicationID()); err != nil {
