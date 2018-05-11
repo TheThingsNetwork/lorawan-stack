@@ -291,7 +291,7 @@ func insertDownlink(data *Data, downlink ttnpb.DownlinkMessage) (err error) {
 	switch downlink.Settings.Modulation {
 	case ttnpb.Modulation_LORA:
 		data.TxPacket.Modu = "LORA"
-		data.TxPacket.NCRC = true
+		data.TxPacket.NCRC = !downlink.TxMetadata.EnableCRC
 		data.TxPacket.DatR.LoRa = fmt.Sprintf("SF%dBW%d", downlink.Settings.SpreadingFactor, downlink.Settings.Bandwidth/1000)
 	case ttnpb.Modulation_FSK:
 		data.TxPacket.Modu = "FSK"
