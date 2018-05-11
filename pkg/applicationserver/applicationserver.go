@@ -59,7 +59,7 @@ func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 }
 
 // Subscribe subscribes to application uplink messages for an EndDevice filter.
-func (as *ApplicationServer) Subscribe(req *ttnpb.EndDeviceIdentifiers, stream ttnpb.As_SubscribeServer) error {
+func (as *ApplicationServer) Subscribe(req *ttnpb.ApplicationIdentifiers, stream ttnpb.As_SubscribeServer) error {
 	return status.Errorf(codes.Unimplemented, "not implemented")
 }
 
