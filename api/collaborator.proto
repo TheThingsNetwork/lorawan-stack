@@ -14,7 +14,7 @@
 
 syntax = "proto3";
 
-package ttn.v3;
+package ttn.lorawan.v3;
 
 import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
 import "github.com/TheThingsNetwork/ttn/api/rights.proto";

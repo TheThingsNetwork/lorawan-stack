@@ -158,11 +158,11 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 		return nil, err
 	}
 
-	hooks.RegisterUnaryHook("/ttn.v3.IsUser", authorizationDataHookName, is.authorizationDataUnaryHook())
-	hooks.RegisterUnaryHook("/ttn.v3.IsApplication", authorizationDataHookName, is.authorizationDataUnaryHook())
-	hooks.RegisterUnaryHook("/ttn.v3.IsGateway", authorizationDataHookName, is.authorizationDataUnaryHook())
-	hooks.RegisterUnaryHook("/ttn.v3.IsClient", authorizationDataHookName, is.authorizationDataUnaryHook())
-	hooks.RegisterUnaryHook("/ttn.v3.IsOrganization", authorizationDataHookName, is.authorizationDataUnaryHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.IsUser", authorizationDataHookName, is.authorizationDataUnaryHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.IsApplication", authorizationDataHookName, is.authorizationDataUnaryHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.IsGateway", authorizationDataHookName, is.authorizationDataUnaryHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.IsClient", authorizationDataHookName, is.authorizationDataUnaryHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.IsOrganization", authorizationDataHookName, is.authorizationDataUnaryHook())
 
 	c.RegisterGRPC(is)
 

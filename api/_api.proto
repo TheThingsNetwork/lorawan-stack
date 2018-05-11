@@ -17,6 +17,6 @@ syntax = "proto3";
 // Package documentation should be added in the comment block below:
 
 // The Things Network v3 API
-package ttn.v3;
+package ttn.lorawan.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";

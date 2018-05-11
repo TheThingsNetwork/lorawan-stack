@@ -21,7 +21,7 @@ import "github.com/TheThingsNetwork/ttn/api/messages.proto";
 import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
-package ttn.v3;
+package ttn.lorawan.v3;
 
 option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
 

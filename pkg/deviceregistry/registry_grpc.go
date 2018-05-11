@@ -95,7 +95,7 @@ func NewRPC(c *component.Component, r Interface, opts ...RPCOption) (*RegistryRP
 	for _, servedComponent := range rpc.servedComponents {
 		diminutive, ok := componentsDiminutives[servedComponent]
 		if ok {
-			rpcPrefix := fmt.Sprintf("/ttn.v3.%sDeviceRegistry", diminutive)
+			rpcPrefix := fmt.Sprintf("/ttn.lorawan.v3.%sDeviceRegistry", diminutive)
 			hooks.RegisterUnaryHook(rpcPrefix, rights.HookName, hook.UnaryHook())
 		}
 	}

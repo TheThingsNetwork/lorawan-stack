@@ -76,7 +76,7 @@ func NewRPC(c *component.Component, r Interface, opts ...RPCOption) (*RegistryRP
 	if err != nil {
 		return nil, err
 	}
-	hooks.RegisterUnaryHook("/ttn.v3.AsApplicationRegistry", rights.HookName, hook.UnaryHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsApplicationRegistry", rights.HookName, hook.UnaryHook())
 
 	return rpc, nil
 }
