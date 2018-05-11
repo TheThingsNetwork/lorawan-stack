@@ -16,19 +16,19 @@ package commands
 
 import (
 	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
-	shared_applicationserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/applicationserver"
-	"github.com/TheThingsNetwork/ttn/pkg/applicationserver"
+	shared_gatewayserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/gatewayserver"
 	conf "github.com/TheThingsNetwork/ttn/pkg/config"
+	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
 )
 
-// Config for the ttn-application-server binary.
+// Config for the ttn-lw-gateway-server binary.
 type Config struct {
 	conf.ServiceBase `name:",squash"`
-	AS               applicationserver.Config `name:"as"`
+	GS               gatewayserver.Config `name:"gs"`
 }
 
-// DefaultConfig contains the default config for the ttn-application-server binary.
+// DefaultConfig contains the default config for the ttn-lw-gateway-server binary.
 var DefaultConfig = Config{
 	ServiceBase: shared.DefaultServiceBase,
-	AS:          shared_applicationserver.DefaultApplicationServerConfig,
+	GS:          shared_gatewayserver.DefaultGatewayServerConfig,
 }

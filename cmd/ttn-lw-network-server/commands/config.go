@@ -12,19 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// ttn-network-server is the binary that runs the network server of The Things Network Stack.
-package main
+package commands
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/TheThingsNetwork/ttn/cmd/ttn-network-server/commands"
+	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
+	shared_networkserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/networkserver"
+	conf "github.com/TheThingsNetwork/ttn/pkg/config"
+	"github.com/TheThingsNetwork/ttn/pkg/networkserver"
 )
 
-func main() {
-	if err := commands.Root.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
-	}
+// Config for the ttn-lw-network-server binary.
+type Config struct {
+	conf.ServiceBase `name:",squash"`
+	NS               networkserver.Config `name:"ns"`
+}
+
+// DefaultConfig contains the default config for the ttn-lw-network-server binary.
+var DefaultConfig = Config{
+	ServiceBase: shared.DefaultServiceBase,
+	NS:          shared_networkserver.DefaultNetworkServerConfig,
 }

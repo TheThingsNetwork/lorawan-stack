@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// ttn-identity-server is the binary that runs the identity server of The Things Network Stack.
+// ttn-lw-join-server is the binary that runs the join server of The Things Network Stack for LoRaWAN.
 package main
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/TheThingsNetwork/ttn/cmd/ttn-identity-server/commands"
+	"github.com/TheThingsNetwork/ttn/cmd/ttn-lw-join-server/commands"
 )
 
 func main() {

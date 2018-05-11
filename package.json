@@ -1,5 +1,5 @@
 {
-  "name": "ttn-stack",
+  "name": "ttn-lw-stack",
   "version": "3.0.0-pre",
   "description": "The Thing Network Stack",
   "main": "index.js",

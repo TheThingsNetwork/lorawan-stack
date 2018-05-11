@@ -54,31 +54,31 @@ ttn-example: MAIN=./cmd/ttn-example/main.go
 ttn-example: $(RELEASE_DIR)/ttn-example-$(GOOS)-$(GOARCH)
 
 # stack binary
-ttn-stack: MAIN=./cmd/ttn-stack/main.go
-ttn-stack: $(RELEASE_DIR)/ttn-stack-$(GOOS)-$(GOARCH)
+ttn-lw-stack: MAIN=./cmd/ttn-lw-stack/main.go
+ttn-lw-stack: $(RELEASE_DIR)/ttn-lw-stack-$(GOOS)-$(GOARCH)
 
 # identity-server binary
-ttn-identity-server: MAIN=./cmd/ttn-identity-server/main.go
-ttn-identity-server: $(RELEASE_DIR)/ttn-identity-server-$(GOOS)-$(GOARCH)
+ttn-lw-identity-server: MAIN=./cmd/ttn-lw-identity-server/main.go
+ttn-lw-identity-server: $(RELEASE_DIR)/ttn-lw-identity-server-$(GOOS)-$(GOARCH)
 
 # gateway-server binary
-ttn-gateway-server: MAIN=./cmd/ttn-gateway-server/main.go
-ttn-gateway-server: $(RELEASE_DIR)/ttn-gateway-server-$(GOOS)-$(GOARCH)
+ttn-lw-gateway-server: MAIN=./cmd/ttn-lw-gateway-server/main.go
+ttn-lw-gateway-server: $(RELEASE_DIR)/ttn-lw-gateway-server-$(GOOS)-$(GOARCH)
 
 # network-server binary
-ttn-network-server: MAIN=./cmd/ttn-network-server/main.go
-ttn-network-server: $(RELEASE_DIR)/ttn-network-server-$(GOOS)-$(GOARCH)
+ttn-lw-network-server: MAIN=./cmd/ttn-lw-network-server/main.go
+ttn-lw-network-server: $(RELEASE_DIR)/ttn-lw-network-server-$(GOOS)-$(GOARCH)
 
 # application-server binary
-ttn-application-server: MAIN=./cmd/ttn-application-server/main.go
-ttn-application-server: $(RELEASE_DIR)/ttn-application-server-$(GOOS)-$(GOARCH)
+ttn-lw-application-server: MAIN=./cmd/ttn-lw-application-server/main.go
+ttn-lw-application-server: $(RELEASE_DIR)/ttn-lw-application-server-$(GOOS)-$(GOARCH)
 
 # join-server binary
-ttn-join-server: MAIN=./cmd/ttn-join-server/main.go
-ttn-join-server: $(RELEASE_DIR)/ttn-join-server-$(GOOS)-$(GOARCH)
+ttn-lw-join-server: MAIN=./cmd/ttn-lw-join-server/main.go
+ttn-lw-join-server: $(RELEASE_DIR)/ttn-lw-join-server-$(GOOS)-$(GOARCH)
 
 # All binaries
-build-all: ttn-stack ttn-identity-server ttn-gateway-server ttn-network-server ttn-application-server ttn-join-server
+build-all: ttn-lw-stack ttn-lw-identity-server ttn-lw-gateway-server ttn-lw-network-server ttn-lw-application-server ttn-lw-join-server
 
 # All supported platforms
 build-all-platforms:

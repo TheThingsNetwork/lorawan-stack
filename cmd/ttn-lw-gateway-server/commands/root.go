@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package commands implements the commands for the ttn-application-server binary.
+// Package commands implements the commands for the ttn-lw-gateway-server binary.
 package commands
 
 import (
@@ -26,7 +26,7 @@ import (
 
 var (
 	logger *log.Logger
-	name   = "ttn-application-server"
+	name   = "ttn-lw-gateway-server"
 	mgr    = conf.InitializeWithDefaults(name, DefaultConfig)
 	config = new(Config)
 
@@ -35,7 +35,7 @@ var (
 		Use:           name,
 		SilenceErrors: true,
 		SilenceUsage:  true,
-		Short:         "The Things Network Application Server",
+		Short:         "The Things Network Gateway Server",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			// read in config from file
 			err := mgr.ReadInConfig()

@@ -23,7 +23,7 @@ import (
 )
 
 var (
-	initConfigName = "ttn-identity-server"
+	initConfigName = "ttn-lw-identity-server"
 	initMgr        = conf.InitializeWithDefaults(initConfigName, DefaultInitConfig)
 	initConfig     = new(InitConfig)
 

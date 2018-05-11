@@ -12,23 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package commands
+// ttn-lw-stack is the binary that runs the entire The Things Network Stack for LoRaWAN.
+package main
 
 import (
-	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
-	shared_joinserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/joinserver"
-	conf "github.com/TheThingsNetwork/ttn/pkg/config"
-	"github.com/TheThingsNetwork/ttn/pkg/joinserver"
+	"fmt"
+	"os"
+
+	"github.com/TheThingsNetwork/ttn/cmd/ttn-lw-stack/commands"
 )
 
-// Config for the ttn-join-server binary.
-type Config struct {
-	conf.ServiceBase `name:",squash"`
-	JS               joinserver.Config `name:"js"`
-}
-
-// DefaultConfig contains the default config for the ttn-join-server binary.
-var DefaultConfig = Config{
-	ServiceBase: shared.DefaultServiceBase,
-	JS:          shared_joinserver.DefaultJoinServerConfig,
+func main() {
+	if err := commands.Root.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(-1)
+	}
 }

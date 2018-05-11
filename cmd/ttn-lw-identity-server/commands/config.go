@@ -21,13 +21,13 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/identityserver"
 )
 
-// Config for the ttn-identity-server binary.
+// Config for the ttn-lw-identity-server binary.
 type Config struct {
 	conf.ServiceBase `name:",squash"`
 	IS               identityserver.Config `name:"is"`
 }
 
-// DefaultConfig contains the default config for the ttn-identity-server binary.
+// DefaultConfig contains the default config for the ttn-lw-identity-server binary.
 var DefaultConfig = Config{
 	ServiceBase: shared.DefaultServiceBase,
 	IS:          shared_identityserver.DefaultIdentityServerConfig,
@@ -40,7 +40,7 @@ type InitConfig struct {
 	InitialData      identityserver.InitialData `name:"initial-data"`
 }
 
-// DefaultInitConfig contains the default config for the ttn-identity-server binary.
+// DefaultInitConfig contains the default config for the ttn-lw-identity-server binary.
 var DefaultInitConfig = InitConfig{
 	ServiceBase: shared.DefaultServiceBase,
 	IS:          shared_identityserver.DefaultIdentityServerConfig,

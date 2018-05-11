@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package commands implements the commands for the ttn-join-server binary.
+// Package commands implements the commands for the ttn-lw-stack binary.
 package commands
 
 import (
@@ -26,7 +26,7 @@ import (
 
 var (
 	logger *log.Logger
-	name   = "ttn-join-server"
+	name   = "ttn-lw-stack"
 	mgr    = conf.InitializeWithDefaults(name, DefaultConfig)
 	config = new(Config)
 
@@ -35,7 +35,7 @@ var (
 		Use:           name,
 		SilenceErrors: true,
 		SilenceUsage:  true,
-		Short:         "The Things Network Join Server",
+		Short:         "The Things Network Stack for LoRaWAN",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			// read in config from file
 			err := mgr.ReadInConfig()
@@ -50,7 +50,7 @@ var (
 
 			// create logger
 			logger, err = log.NewLogger(
-				log.WithLevel(config.Log.Level),
+				log.WithLevel(config.Base.Log.Level),
 				log.WithHandler(log.NewCLI(os.Stdout)),
 			)
 			if sentry, err := shared.SentryMiddleware(config.ServiceBase); err == nil && sentry != nil {

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package commands implements the commands for the ttn-network-server binary.
+// Package commands implements the commands for the ttn-lw-network-server binary.
 package commands
 
 import (
@@ -26,7 +26,7 @@ import (
 
 var (
 	logger *log.Logger
-	name   = "ttn-network-server"
+	name   = "ttn-lw-network-server"
 	mgr    = conf.InitializeWithDefaults(name, DefaultConfig)
 	config = new(Config)
 

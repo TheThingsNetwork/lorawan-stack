@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// ttn-application-server is the binary that runs the application server of The Things Network Stack.
+// ttn-lw-gateway-server is the binary that runs the gateway server of The Things Network Stack for LoRaWAN.
 package main
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/TheThingsNetwork/ttn/cmd/ttn-application-server/commands"
+	"github.com/TheThingsNetwork/ttn/cmd/ttn-lw-gateway-server/commands"
 )
 
 func main() {

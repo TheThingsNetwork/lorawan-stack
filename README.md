@@ -44,12 +44,12 @@ For the latest **master**, you can download pre-compiled binaries:
 
 | **File Name** | **Operating System** | **Architecture** |
 | ------------- | -------------------- | ---------------- |
-| [ttn-darwin-amd64.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-darwin-amd64.zip) | macOS | amd64 |
-| [ttn-linux-amd64.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-linux-amd64.zip) | linux | amd64 |
-| [ttn-linux-386.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-linux-386.zip) | linux | 386 |
-| [ttn-linux-arm.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-linux-arm.zip) | linux | arm |
-| [ttn-windows-amd64.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-windows-amd64.zip) | windows | amd64 |
-| [ttn-windows-386.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-windows-386.zip) | windows | 386 |
+| [ttn-lw-darwin-amd64.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-lw-darwin-amd64.zip) | macOS | amd64 |
+| [ttn-lw-linux-amd64.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-lw-linux-amd64.zip) | linux | amd64 |
+| [ttn-lw-linux-386.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-lw-linux-386.zip) | linux | 386 |
+| [ttn-lw-linux-arm.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-lw-linux-arm.zip) | linux | arm |
+| [ttn-lw-windows-amd64.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-lw-windows-amd64.zip) | windows | amd64 |
+| [ttn-lw-windows-386.zip](https://ttnreleases.blob.core.windows.net/release/master/ttn-lw-windows-386.zip) | windows | 386 |
 
 ## Documentation
 

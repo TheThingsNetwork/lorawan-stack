@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/cmd/ttn-identity-server/commands"
+	"github.com/TheThingsNetwork/ttn/cmd/ttn-lw-identity-server/commands"
 	"github.com/TheThingsNetwork/ttn/pkg/auth"
 	. "github.com/TheThingsNetwork/ttn/pkg/auth/rights"
 	"github.com/TheThingsNetwork/ttn/pkg/component"
