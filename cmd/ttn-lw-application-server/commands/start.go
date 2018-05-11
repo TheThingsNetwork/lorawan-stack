@@ -17,6 +17,7 @@ package commands
 import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
+	"go.thethings.network/lorawan-stack/pkg/applicationregistry"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
@@ -33,6 +34,14 @@ var (
 			if err != nil {
 				return shared.ErrBaseComponentInitialize.WithCause(err)
 			}
+
+			appsRedis := redis.New(&redis.Config{
+				Redis:     config.Redis,
+				Namespace: []string{"as", "applications"},
+				IndexKeys: applicationregistry.Identifiers,
+			})
+			appsReg := applicationregistry.New(store.NewByteMapStoreClient(appsRedis))
+			config.AS.ApplicationRegistry = appsReg
 
 			devsRedis := redis.New(&redis.Config{
 				Redis:     config.Redis,

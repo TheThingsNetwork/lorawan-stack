@@ -19,6 +19,7 @@ import (
 
 	ptypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"go.thethings.network/lorawan-stack/pkg/applicationregistry"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -32,21 +33,31 @@ import (
 // The Application Server exposes the As, DeviceRegistry and ApplicationDownlinkQueue services.
 type ApplicationServer struct {
 	*component.Component
-	DeviceRegistryRPC *deviceregistry.RegistryRPC
-	deviceRegistry    deviceregistry.Interface
+	ApplicationRegistryRPC *applicationregistry.RegistryRPC
+	applicationRegistry    applicationregistry.Interface
+	DeviceRegistryRPC      *deviceregistry.RegistryRPC
+	deviceRegistry         deviceregistry.Interface
 }
 
 // Config represents the ApplicationServer configuration.
 type Config struct {
-	DeviceRegistry deviceregistry.Interface
+	ApplicationRegistry applicationregistry.Interface
+	DeviceRegistry      deviceregistry.Interface
 }
 
 // New returns new *ApplicationServer.
 func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 	as := &ApplicationServer{
-		Component:      c,
-		deviceRegistry: conf.DeviceRegistry,
+		Component:           c,
+		applicationRegistry: conf.ApplicationRegistry,
+		deviceRegistry:      conf.DeviceRegistry,
 	}
+
+	applicationRegistryRPC, err := applicationregistry.NewRPC(c, conf.ApplicationRegistry)
+	if err != nil {
+		return nil, err
+	}
+	as.ApplicationRegistryRPC = applicationRegistryRPC
 
 	deviceRegistryRPC, err := deviceregistry.NewRPC(c, conf.DeviceRegistry, deviceregistry.ForComponents(ttnpb.PeerInfo_APPLICATION_SERVER))
 	if err != nil {
@@ -87,12 +98,14 @@ func (as *ApplicationServer) DownlinkQueueClear(ctx context.Context, id *ttnpb.E
 func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterAsServer(s, as)
 	ttnpb.RegisterAsApplicationDownlinkQueueServer(s, as)
+	ttnpb.RegisterAsApplicationRegistryServer(s, as.ApplicationRegistryRPC)
 	ttnpb.RegisterAsDeviceRegistryServer(s, as.DeviceRegistryRPC)
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterAsApplicationDownlinkQueueHandler(as.Context(), s, conn)
+	ttnpb.RegisterAsApplicationRegistryHandler(as.Context(), s, conn)
 	ttnpb.RegisterAsDeviceRegistryHandler(as.Context(), s, conn)
 }
 
