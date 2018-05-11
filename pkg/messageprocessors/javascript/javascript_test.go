@@ -18,12 +18,12 @@ import (
 	"context"
 	"testing"
 
-	errshould "github.com/TheThingsNetwork/ttn/pkg/errors/should"
 	"github.com/TheThingsNetwork/ttn/pkg/gogoproto"
 	"github.com/TheThingsNetwork/ttn/pkg/messageprocessors"
 	"github.com/TheThingsNetwork/ttn/pkg/messageprocessors/javascript"
 	"github.com/TheThingsNetwork/ttn/pkg/scripting"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	errshould "github.com/TheThingsNetwork/ttn/pkg/util/test/assertions/should"
 	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"

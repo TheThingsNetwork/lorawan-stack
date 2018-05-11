@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package errors
+package assertions
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/smartystreets/assertions"
+	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	ssassertions "github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 )
 
-var testDescriptor = &ErrDescriptor{
+var testDescriptor = &errors.ErrDescriptor{
 	MessageFormat: "Test error",
 	Code:          42,
 }
@@ -32,7 +33,7 @@ func init() {
 }
 
 func TestShouldDescribe(t *testing.T) {
-	a := assertions.New(t)
+	a := ssassertions.New(t)
 
 	// Happy flow.
 	a.So(ShouldDescribe(testDescriptor.New(nil), testDescriptor), should.BeEmpty)
@@ -43,6 +44,6 @@ func TestShouldDescribe(t *testing.T) {
 	a.So(ShouldNotDescribe(fmt.Errorf("unknown error"), testDescriptor), should.BeEmpty)
 
 	// Wrong namespace or code.
-	a.So(ShouldDescribe(New("test"), testDescriptor), should.NotBeEmpty)
-	a.So(ShouldNotDescribe(New("test"), testDescriptor), should.BeEmpty)
+	a.So(ShouldDescribe(errors.New("test"), testDescriptor), should.NotBeEmpty)
+	a.So(ShouldNotDescribe(errors.New("test"), testDescriptor), should.BeEmpty)
 }
