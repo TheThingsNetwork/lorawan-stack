@@ -192,21 +192,12 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 		}
 		logger.Debug("Received message from gateway")
 
-		if err := g.handleUpstreamMessage(ctx, connectionInfo, upstreamMessage); err != nil {
-			return err
-		}
+		g.handleUpstreamMessage(ctx, connectionInfo, upstreamMessage)
 	}
 }
 
-// handleUpstreamMessage handles a *GatewayUp message. It returns an error if
-// fatal circumstances that will prevent further message handling occur.
-func (g *GatewayServer) handleUpstreamMessage(ctx context.Context, connectionInfo connection, upstreamMessage *ttnpb.GatewayUp) error {
+func (g *GatewayServer) handleUpstreamMessage(ctx context.Context, connectionInfo connection, upstreamMessage *ttnpb.GatewayUp) {
 	connectionInfo.addUpstreamObservations(upstreamMessage)
-
-	if ctx.Err() != nil {
-		log.FromContext(ctx).Debug("Uplink subscription was closed")
-		return ctx.Err()
-	}
 
 	if upstreamMessage.GatewayStatus != nil {
 		g.handleStatus(ctx, upstreamMessage.GatewayStatus)
@@ -215,7 +206,7 @@ func (g *GatewayServer) handleUpstreamMessage(ctx context.Context, connectionInf
 		g.handleUplink(ctx, uplink, connectionInfo.gateway())
 	}
 
-	return nil
+	return
 }
 
 func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMessage, gwMetadata *ttnpb.Gateway) (err error) {

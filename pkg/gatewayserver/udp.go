@@ -106,9 +106,7 @@ func (g *GatewayServer) runUDPBridge(ctx context.Context, udpConn *net.UDPConn) 
 				continue
 			}
 
-			if err := g.handleUpstreamMessage(ctx, gatewayConnection, upstream); err != nil {
-				logger.WithError(err).Error("Could not handle incoming packet")
-			}
+			g.handleUpstreamMessage(ctx, gatewayConnection, upstream)
 		case udp.TxAck:
 			logger.Debug("Received downlink reception confirmation")
 		}
