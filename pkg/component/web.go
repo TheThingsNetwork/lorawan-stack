@@ -63,8 +63,8 @@ func (c *Component) listenWeb() (err error) {
 	}
 
 	if c.config.HTTP.PProf {
-		g := c.web.Group("/debug/pprof") // TODO(#565): Add auth to pprof endpoints.
-		g.GET("", echo.WrapHandler(http.HandlerFunc(pprof.Index)))
+		g := c.web.RootGroup("/debug/pprof") // TODO(#565): Add auth to pprof endpoints.
+		g.GET("", func(c echo.Context) error { return c.Redirect(http.StatusFound, c.Path()+"/") })
 		g.GET("/*", echo.WrapHandler(http.HandlerFunc(pprof.Index)))
 		g.GET("/profile", echo.WrapHandler(http.HandlerFunc(pprof.Profile)))
 		g.GET("/trace", echo.WrapHandler(http.HandlerFunc(pprof.Trace)))

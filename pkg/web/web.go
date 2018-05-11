@@ -105,11 +105,10 @@ func New(ctx context.Context, config Config) (*Server, error) {
 	server.Use(
 		middleware.Log(logger.WithField("namespace", "web")),
 		middleware.ID(config.IDPrefix),
-		middleware.Normalize(config.NormalizationMode),
 		cookie.Cookies(config.BlockKey, config.HashKey),
 	)
 
-	group := server.Group("")
+	group := server.Group("", middleware.Normalize(config.NormalizationMode))
 
 	return &Server{
 		RouterGroup: &Group{
@@ -139,6 +138,16 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // Group creates a sub group.
 func (s *Server) Group(prefix string, middleware ...echo.MiddlewareFunc) *Group {
 	return newGroup(s.RouterGroup.echoGroup, s.RouterGroup.prefix, prefix, middleware...)
+}
+
+// RootGroup creates a new Echo router group with prefix and optional group-level middleware on the root Server.
+func (s *Server) RootGroup(prefix string, middleware ...echo.MiddlewareFunc) *Group {
+	t := strings.TrimSuffix(prefix, "/")
+
+	return &Group{
+		echoGroup: s.server.Group(t, middleware...),
+		prefix:    strings.TrimPrefix(t, "/"),
+	}
 }
 
 // Static adds the http.FileSystem under the defined prefix.
