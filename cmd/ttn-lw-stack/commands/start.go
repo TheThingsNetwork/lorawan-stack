@@ -47,12 +47,12 @@ var (
 			})
 			config.NS.Registry = deviceregistry.New(store.NewByteMapStoreClient(nsRedis))
 
-			asRedis := redis.New(&redis.Config{
+			asDevsRedis := redis.New(&redis.Config{
 				Redis:     config.Redis,
 				Namespace: []string{"as", "devices"},
 				IndexKeys: deviceregistry.Identifiers,
 			})
-			config.AS.Registry = deviceregistry.New(store.NewByteMapStoreClient(asRedis))
+			config.AS.DeviceRegistry = deviceregistry.New(store.NewByteMapStoreClient(asDevsRedis))
 
 			jsRedis := redis.New(&redis.Config{
 				Redis:     config.Redis,

@@ -32,27 +32,27 @@ import (
 // The Application Server exposes the As, DeviceRegistry and ApplicationDownlinkQueue services.
 type ApplicationServer struct {
 	*component.Component
-	*deviceregistry.RegistryRPC
-	registry deviceregistry.Interface
+	DeviceRegistryRPC *deviceregistry.RegistryRPC
+	deviceRegistry    deviceregistry.Interface
 }
 
 // Config represents the ApplicationServer configuration.
 type Config struct {
-	Registry deviceregistry.Interface
+	DeviceRegistry deviceregistry.Interface
 }
 
 // New returns new *ApplicationServer.
 func New(c *component.Component, conf *Config) (*ApplicationServer, error) {
 	as := &ApplicationServer{
-		Component: c,
-		registry:  conf.Registry,
+		Component:      c,
+		deviceRegistry: conf.DeviceRegistry,
 	}
 
-	registryRPC, err := deviceregistry.NewRPC(c, conf.Registry, deviceregistry.ForComponents(ttnpb.PeerInfo_APPLICATION_SERVER))
+	deviceRegistryRPC, err := deviceregistry.NewRPC(c, conf.DeviceRegistry, deviceregistry.ForComponents(ttnpb.PeerInfo_APPLICATION_SERVER))
 	if err != nil {
 		return nil, err
 	}
-	as.RegistryRPC = registryRPC
+	as.DeviceRegistryRPC = deviceRegistryRPC
 
 	c.RegisterGRPC(as)
 	return as, nil
@@ -87,7 +87,7 @@ func (as *ApplicationServer) DownlinkQueueClear(ctx context.Context, id *ttnpb.E
 func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterAsServer(s, as)
 	ttnpb.RegisterAsApplicationDownlinkQueueServer(s, as)
-	ttnpb.RegisterAsDeviceRegistryServer(s, as)
+	ttnpb.RegisterAsDeviceRegistryServer(s, as.DeviceRegistryRPC)
 }
 
 // RegisterHandlers registers gRPC handlers.

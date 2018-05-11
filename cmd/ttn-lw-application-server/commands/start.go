@@ -34,13 +34,13 @@ var (
 				return shared.ErrBaseComponentInitialize.WithCause(err)
 			}
 
-			redis := redis.New(&redis.Config{
+			devsRedis := redis.New(&redis.Config{
 				Redis:     config.Redis,
 				Namespace: []string{"as", "devices"},
 				IndexKeys: deviceregistry.Identifiers,
 			})
-			reg := deviceregistry.New(store.NewByteMapStoreClient(redis))
-			config.AS.Registry = reg
+			devsReg := deviceregistry.New(store.NewByteMapStoreClient(devsRedis))
+			config.AS.DeviceRegistry = devsReg
 
 			as, err := applicationserver.New(c, &config.AS)
 			if err != nil {
