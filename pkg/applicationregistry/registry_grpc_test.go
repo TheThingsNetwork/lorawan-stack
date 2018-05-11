@@ -28,6 +28,7 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	errshould "github.com/TheThingsNetwork/ttn/pkg/util/test/assertions/should"
+	"github.com/TheThingsNetwork/ttn/pkg/validate"
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
@@ -89,6 +90,7 @@ func TestSetApplicationNoCheck(t *testing.T) {
 	})
 
 	pb := ttnpb.NewPopulatedApplication(test.Randy, false)
+	a.So(validate.ID(pb.GetApplicationID()), should.BeNil)
 
 	_, err := dr.SetApplication(context.Background(), &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(err, errshould.Describe, rights.ErrPermissionDenied)
@@ -210,8 +212,12 @@ func TestCheck(t *testing.T) {
 		a := assertions.New(t)
 
 		checkErr = errors.New("err")
-		v, err := dr.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
-		a.So(err, errshould.Describe, ErrCheckFailed)
+		v, err := dr.SetApplication(context.Background(), &ttnpb.SetApplicationRequest{Application: *pb})
+		a.So(err, errshould.Describe, rights.ErrPermissionDenied)
+		a.So(v, should.BeNil)
+
+		v, err = dr.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: ttnpb.Application{}})
+		a.So(err, errshould.Describe, rights.ErrInvalidApplicationID)
 		a.So(v, should.BeNil)
 
 		checkErr = errTest.New(nil)

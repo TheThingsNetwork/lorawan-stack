@@ -115,7 +115,7 @@ func TestListDevicesNoCheck(t *testing.T) {
 	})
 
 	devs, err := dr.ListDevices(ctx, &ttnpb.EndDeviceIdentifiers{})
-	a.So(err, errshould.Describe, rights.ErrNoApplicationID)
+	a.So(err, errshould.Describe, rights.ErrInvalidApplicationID)
 	a.So(devs, should.BeNil)
 
 	dev1, err := dr.Interface.Create(ttnpb.NewPopulatedEndDevice(test.Randy, false))
