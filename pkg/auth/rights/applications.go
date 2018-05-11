@@ -22,21 +22,23 @@ import (
 	"github.com/TheThingsNetwork/ttn/pkg/validate"
 )
 
-// ErrPermissionDenied is returned if the rights were insufficient to perform
-// this operation.
-var ErrPermissionDenied = &errors.ErrDescriptor{
-	MessageFormat: "Permission denied to perform this operation",
-	Type:          errors.PermissionDenied,
-	Code:          1,
-}
+var (
+	// ErrPermissionDenied is returned if the rights were insufficient to perform
+	// this operation.
+	ErrPermissionDenied = &errors.ErrDescriptor{
+		MessageFormat: "Permission denied to perform this operation",
+		Type:          errors.PermissionDenied,
+		Code:          1,
+	}
 
-// ErrInvalidApplicationID is returned if an invalid application ID was passed to an
-// operation that requires it.
-var ErrInvalidApplicationID = &errors.ErrDescriptor{
-	MessageFormat: "Invalid application ID given",
-	Type:          errors.InvalidArgument,
-	Code:          2,
-}
+	// ErrInvalidApplicationID is returned if an invalid application ID was passed to an
+	// operation that requires it.
+	ErrInvalidApplicationID = &errors.ErrDescriptor{
+		MessageFormat: "Invalid application ID given",
+		Type:          errors.InvalidArgument,
+		Code:          2,
+	}
+)
 
 func init() {
 	ErrPermissionDenied.Register()
