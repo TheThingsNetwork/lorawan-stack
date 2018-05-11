@@ -1,8 +1,8 @@
-# The Things Network Stack
+# The Things Network Stack for LoRaWAN
 
 [![Build Status](https://travis-ci.org/TheThingsNetwork/ttn.svg?branch=master)](https://travis-ci.org/TheThingsNetwork/ttn) [![Coverage Status](https://coveralls.io/repos/github/TheThingsNetwork/ttn/badge.svg?branch=master)](https://coveralls.io/github/TheThingsNetwork/ttn?branch=master) [![GoDoc](https://godoc.org/github.com/TheThingsNetwork/ttn?status.svg)](https://godoc.org/github.com/TheThingsNetwork/ttn)
 
-The Things Network Stack is an open-source LoRaWAN network server suitable for large, global public networks as well as smaller private networks.
+The Things Network Stack for LoRaWAN is an open-source LoRaWAN network server suitable for large, global public networks as well as smaller private networks.
 
 LoRaWAN is a protocol for low-power wide area networks. It allows for large scale Internet of Things deployments where low-powered devices efficiently communicate with Internet-connected applications over long range wireless connections. 
 
@@ -34,7 +34,7 @@ LoRaWAN is a protocol for low-power wide area networks. It allows for large scal
 
 ## Installation
 
-Version 3 of The Things Network Stack is still under heavy development. We currently recommend to use version 2 instead.
+Version 3 of The Things Network Stack for LoRaWAN is still under heavy development. We currently recommend to use version 2 instead.
 
 ## Downloads
 

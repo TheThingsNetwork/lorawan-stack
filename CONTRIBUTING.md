@@ -1,6 +1,6 @@
-# Contributing to The Things Network Stack
+# Contributing to The Things Network Stack for LoRaWAN
 
-Thank you for your interest in building this thing together with us. We're really happy with our active community and are glad that you're a part of it. There are many ways to contribute to our project, but given the fact that you're on Github looking at the code for The Things Network Stack, you're probably here for one of the following reasons:
+Thank you for your interest in building this thing together with us. We're really happy with our active community and are glad that you're a part of it. There are many ways to contribute to our project, but given the fact that you're on Github looking at the code for The Things Network Stack for LoRaWAN, you're probably here for one of the following reasons:
 
 * **Requesting a new feature**: If you have a great idea or think some functionality is missing, we want to know! The only thing you have to do for that is to [create an issue](https://github.com/TheThingsNetwork/ttn/issues) if it doesn't exist yet. Please give a detailed description of the functionality you would want, and why it would be nice to have it. Also let us know if you can help us build it.
 * **Reporting an issue**: If you notice that a component of the Things Network Stack is not behaving as it should, there may be a bug in our systems. In this case you should [create an issue](https://github.com/TheThingsNetwork/ttn/issues) if it doesn't exist yet. For really sensitive issues, you can [contact us directly](#security-issues).

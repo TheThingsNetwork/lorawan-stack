@@ -1,4 +1,4 @@
-# The Things Network Stack Development
+# The Things Network Stack for LoRaWAN Development
 
 ## Development Environment
 
@@ -78,7 +78,7 @@ Redis is an in-memory data store that we use as a database for "hot" data.
 
 You can use it using the `make dev.databases.{start,stop,erase}` method, or use `make dev.redis.{start,stop,erase}` to only manipulate Redis.
 
-### Getting started with development of The Things Network Stack
+### Getting started with development of The Things Network Stack for LoRaWAN
 
 Since version 3 of our network stack, we use a single repository for our open source network components. The repository should be cloned inside your Go workspace:
 
@@ -112,13 +112,13 @@ make init
 ├── README.md           general information about this project
 │   ...
 ├── api                 contains the protocol buffer definitions for our API
-├── cmd                 contains the different binaries that form the TTN stack
+├── cmd                 contains the different binaries that form the TTN stack for LoRaWAN
 │   ├── shared          contains configuration that is shared between the different binaries
 │   │   ...
-│   └── ttn-stack       bundles the binaries that form the TTN stack
+│   └── ttn-lw-stack    bundles the binaries that form the TTN stack for LoRaWAN
 ├── config
 ├── doc
-├── pkg                 contains all libraries used in the TTN stack
+├── pkg                 contains all libraries used in the TTN stack for LoRaWAN
 │   ├── component       contains the base component; all other components extend this component
 │   ├── config          package for configuration using config files, environment and CLI flags
 │   ├── errors          package for rich errors that include metadata and cross API boundaries
