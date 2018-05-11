@@ -26,12 +26,12 @@ import (
 // DefaultIdentityServerConfig is the default configuration for the IdentityServer.
 var DefaultIdentityServerConfig = identityserver.Config{
 	DatabaseURI:      "postgres://root@localhost:26257/is_development?sslmode=disable",
-	PublicURL:        fmt.Sprintf("http://localhost:%s", shared.DefaultServiceBase.HTTP.Listen),
+	PublicURL:        "http://localhost:1885",
 	OrganizationName: "The Things Network",
 	OAuth: oauth.Config{
 		AuthorizationCodeTTL: time.Minute * 5,
 		AccessTokenTTL:       time.Hour,
-		PublicURL:            fmt.Sprintf("http://localhost%s/id", shared.DefaultServiceBase.HTTP.Listen),
+		PublicURL:            shared.DefaultOAuthPublicURL,
 	},
 }
 
@@ -45,6 +45,6 @@ var DefaultIdentityServerInitialData = identityserver.InitialData{
 	},
 	Console: identityserver.InitialConsoleData{
 		ClientSecret: "console",
-		RedirectURI:  "http://todo.todo", // TODO: https://github.com/TheThingsIndustries/ttn/pull/640
+		RedirectURI:  fmt.Sprintf("%s/oauth/callback", shared.DefaultConsolePublicURL),
 	},
 }

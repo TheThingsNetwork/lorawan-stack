@@ -107,3 +107,9 @@ var DefaultFrequencyPlansConfig = config.FrequencyPlans{
 var DefaultISRightsFetchingConfig = rights.Config{
 	TTL: 2 * time.Minute,
 }
+
+// DefaultOAuthPublicURL is the default public URL where OAuth is served.
+var DefaultOAuthPublicURL = "http://localhost:1885/oauth"
+
+// DefaultConsolePublicURL is the default public URL where the Console is served.
+var DefaultConsolePublicURL = "http://localhost:1885/console"

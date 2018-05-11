@@ -15,8 +15,6 @@
 package console
 
 import (
-	"fmt"
-
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/console"
 )
@@ -24,10 +22,10 @@ import (
 // DefaultConsoleConfig is the default configuration for the Console.
 var DefaultConsoleConfig = console.Config{
 	DefaultLanguage:   "en",
-	IdentityServerURL: fmt.Sprintf("http://localhost%s/id", shared.DefaultServiceBase.HTTP.Listen),
-	PublicURL:         fmt.Sprintf("http://localhost%s", shared.DefaultServiceBase.HTTP.Listen),
+	IdentityServerURL: shared.DefaultOAuthPublicURL,
+	PublicURL:         shared.DefaultConsolePublicURL,
 	OAuth: console.OAuth{
-		ID:     "ttn-console",
-		Secret: "ttn-console",
+		ID:     "console",
+		Secret: "console",
 	},
 }
