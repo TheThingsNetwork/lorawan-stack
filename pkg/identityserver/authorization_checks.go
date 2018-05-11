@@ -17,8 +17,8 @@ package identityserver
 import (
 	"context"
 
-	"github.com/TheThingsNetwork/ttn/pkg/auth"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // enforceUserRights is a hook that checks whether if the given authorization

@@ -19,12 +19,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/encoding/lorawan"
-	. "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/TheThingsNetwork/ttn/pkg/types"
-	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
+	. "go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 func lorawanEncodingTestName(v interface{}) string {

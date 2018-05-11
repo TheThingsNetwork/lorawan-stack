@@ -18,8 +18,8 @@ import (
 	"crypto/tls"
 	"net"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/soheilhy/cmux"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 func (c *Component) tlsConfig() (*tls.Config, error) {

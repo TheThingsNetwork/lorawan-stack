@@ -1,7 +1,7 @@
 language: go
 go:
 - "1.10"
-go_import_path: github.com/TheThingsNetwork/ttn
+go_import_path: go.thethings.network/lorawan-stack
 sudo: required
 services:
 - docker

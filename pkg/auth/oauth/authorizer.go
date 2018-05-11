@@ -15,8 +15,8 @@
 package oauth
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
 	"github.com/labstack/echo"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 )
 
 // Authorizer is the interface of authorizers. It is responsible for deciding what to

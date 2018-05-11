@@ -17,7 +17,7 @@ package networkserver
 import (
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/networkserver"
+	"go.thethings.network/lorawan-stack/pkg/networkserver"
 )
 
 // DefaultNetworkServerConfig is the default configuration for the NetworkServer

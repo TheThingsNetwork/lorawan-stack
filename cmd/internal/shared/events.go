@@ -17,9 +17,9 @@ package shared
 import (
 	"fmt"
 
-	"github.com/TheThingsNetwork/ttn/pkg/config"
-	"github.com/TheThingsNetwork/ttn/pkg/events"
-	"github.com/TheThingsNetwork/ttn/pkg/events/redis"
+	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/events/redis"
 )
 
 // InitializeEvents initializes the event system.

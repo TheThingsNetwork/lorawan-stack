@@ -104,8 +104,8 @@ func pkg() string {
 	}
 	fun := runtime.FuncForPC(pc).Name()
 	pkg := filepath.Join(filepath.Dir(fun), strings.Split(filepath.Base(fun), ".")[0])
-	if strings.Contains(pkg, "github.com/TheThingsNetwork/ttn/") {
-		split := strings.Split(pkg, "github.com/TheThingsNetwork/ttn/")
+	if strings.Contains(pkg, "go.thethings.network/lorawan-stack/") {
+		split := strings.Split(pkg, "go.thethings.network/lorawan-stack/")
 		pkg = split[len(split)-1]
 	}
 	return pkg

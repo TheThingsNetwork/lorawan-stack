@@ -18,8 +18,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
 func TestTestingHandler(t *testing.T) {

@@ -17,11 +17,11 @@ package frequencyplans_test
 import (
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/band"
-	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/band"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 func TestFrequenciesCFList(t *testing.T) {

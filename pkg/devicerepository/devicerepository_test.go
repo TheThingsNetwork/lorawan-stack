@@ -20,10 +20,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/devicerepository"
-	"github.com/TheThingsNetwork/ttn/pkg/fetch"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/devicerepository"
+	"go.thethings.network/lorawan-stack/pkg/fetch"
 )
 
 type testFetcher map[string][]byte

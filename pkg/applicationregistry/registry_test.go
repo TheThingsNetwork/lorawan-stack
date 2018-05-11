@@ -18,15 +18,15 @@ import (
 	"fmt"
 	"testing"
 
-	. "github.com/TheThingsNetwork/ttn/pkg/applicationregistry"
-	"github.com/TheThingsNetwork/ttn/pkg/store"
-	"github.com/TheThingsNetwork/ttn/pkg/store/mapstore"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	. "go.thethings.network/lorawan-stack/pkg/applicationregistry"
+	"go.thethings.network/lorawan-stack/pkg/store"
+	"go.thethings.network/lorawan-stack/pkg/store/mapstore"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 func TestRegistry(t *testing.T) {

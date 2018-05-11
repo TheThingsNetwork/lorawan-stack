@@ -17,7 +17,7 @@ package assertions
 import (
 	"fmt"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 const (

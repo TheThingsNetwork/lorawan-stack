@@ -17,7 +17,7 @@ package ttnpb
 import (
 	"math"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // AppendLoRaWAN implements the encoding.LoRaWANAppender interface.

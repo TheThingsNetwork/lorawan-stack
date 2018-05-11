@@ -14,8 +14,8 @@
 
 syntax = "proto3";
 
-import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
-import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
+import "go.thethings.network/lorawan-stack/api/identifiers.proto";
+import "go.thethings.network/lorawan-stack/api/metadata.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
@@ -23,7 +23,7 @@ import "google/protobuf/timestamp.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 // Gateway is the message that defines a gateway on the network.
 message Gateway {

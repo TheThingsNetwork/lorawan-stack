@@ -14,7 +14,7 @@
 
 package ttnpb
 
-import "github.com/TheThingsNetwork/ttn/pkg/types"
+import "go.thethings.network/lorawan-stack/pkg/types"
 
 const validIDChars = "abcdefghijklmnopqrstuvwxyz1234567890"
 

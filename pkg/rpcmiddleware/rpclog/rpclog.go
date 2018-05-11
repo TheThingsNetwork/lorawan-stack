@@ -18,7 +18,7 @@ package rpclog
 import (
 	"fmt"
 
-	"github.com/TheThingsNetwork/ttn/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"google.golang.org/grpc/grpclog"
 )
 

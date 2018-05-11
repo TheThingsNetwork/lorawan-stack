@@ -15,10 +15,10 @@
 package commands
 
 import (
-	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
-	shared_identityserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/identityserver"
-	conf "github.com/TheThingsNetwork/ttn/pkg/config"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver"
+	"go.thethings.network/lorawan-stack/cmd/internal/shared"
+	shared_identityserver "go.thethings.network/lorawan-stack/cmd/internal/shared/identityserver"
+	conf "go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/identityserver"
 )
 
 // Config for the ttn-lw-identity-server binary.

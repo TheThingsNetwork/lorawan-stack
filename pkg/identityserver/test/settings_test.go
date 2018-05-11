@@ -18,9 +18,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 func testSettings() *ttnpb.IdentityServerSettings {

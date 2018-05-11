@@ -19,8 +19,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/udp"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/udp"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 var (

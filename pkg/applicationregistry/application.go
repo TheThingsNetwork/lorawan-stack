@@ -17,8 +17,8 @@ package applicationregistry
 import (
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/store"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/store"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // Application represents the application stored in the registry.

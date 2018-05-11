@@ -17,7 +17,7 @@ package udp
 import (
 	"net"
 
-	"github.com/TheThingsNetwork/ttn/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 // AddressStore exposes methods to set and get network addresses.

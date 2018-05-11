@@ -19,18 +19,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
-	"github.com/TheThingsNetwork/ttn/pkg/component"
-	. "github.com/TheThingsNetwork/ttn/pkg/deviceregistry"
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/store"
-	"github.com/TheThingsNetwork/ttn/pkg/store/mapstore"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/TheThingsNetwork/ttn/pkg/util/test"
-	errshould "github.com/TheThingsNetwork/ttn/pkg/util/test/assertions/should"
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/component"
+	. "go.thethings.network/lorawan-stack/pkg/deviceregistry"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/store"
+	"go.thethings.network/lorawan-stack/pkg/store/mapstore"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
+	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestRegistryRPC(t *testing.T) {

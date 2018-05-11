@@ -20,10 +20,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/config"
-	"github.com/TheThingsNetwork/ttn/pkg/store"
-	. "github.com/TheThingsNetwork/ttn/pkg/store/redis"
-	"github.com/TheThingsNetwork/ttn/pkg/store/storetest"
+	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/store"
+	. "go.thethings.network/lorawan-stack/pkg/store/redis"
+	"go.thethings.network/lorawan-stack/pkg/store/storetest"
 )
 
 var (

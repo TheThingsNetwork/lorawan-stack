@@ -19,8 +19,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors/httperrors"
 	"github.com/gregjones/httpcache"
+	"go.thethings.network/lorawan-stack/pkg/errors/httperrors"
 )
 
 type httpFetcher struct {

@@ -18,11 +18,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email"
-	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/email"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 var _ email.Provider = new(SendGrid)

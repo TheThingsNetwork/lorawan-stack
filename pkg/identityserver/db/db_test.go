@@ -20,10 +20,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db/migrations"
-	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/db/migrations"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 const (

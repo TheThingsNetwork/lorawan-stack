@@ -14,7 +14,7 @@
 
 package fetch
 
-import "github.com/TheThingsNetwork/ttn/pkg/errors"
+import "go.thethings.network/lorawan-stack/pkg/errors"
 
 var (
 	// ErrFileFailedToOpen indicates the file could not be opened.

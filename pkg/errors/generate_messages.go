@@ -23,9 +23,9 @@ import (
 	"os"
 	"sort"
 
-	"github.com/TheThingsNetwork/ttn/pkg/config"
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
 const defaultLanguage = "en"

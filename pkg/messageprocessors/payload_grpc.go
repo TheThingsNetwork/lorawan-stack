@@ -17,7 +17,7 @@ package messageprocessors
 import (
 	"context"
 
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // PayloadDecoderRPC implements the UplinkMessageProcessorServer using a payload decoder.

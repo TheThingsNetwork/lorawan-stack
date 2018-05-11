@@ -15,8 +15,8 @@
 package sql
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/db"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // SettingStore implements store.SettingStore.

@@ -19,12 +19,12 @@ import (
 	"testing"
 
 	lpp "github.com/TheThingsNetwork/go-cayenne-lib/cayennelpp"
-	"github.com/TheThingsNetwork/ttn/pkg/gogoproto"
-	"github.com/TheThingsNetwork/ttn/pkg/messageprocessors/cayennelpp"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/pkg/messageprocessors/cayennelpp"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 func TestEncode(t *testing.T) {

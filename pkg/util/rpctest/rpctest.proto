@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package rpctest;
 
-option go_package = "github.com/TheThingsNetwork/ttn/pkg/util/rpctest";
+option go_package = "go.thethings.network/lorawan-stack/pkg/util/rpctest";
 
 service FooBar {
   rpc Unary (Foo) returns (Bar) {}

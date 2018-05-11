@@ -20,9 +20,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/fetch"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/fetch"
 )
 
 type frequencyPlansFileSystem string

@@ -14,7 +14,7 @@
 
 package gatewayserver
 
-import "github.com/TheThingsNetwork/ttn/pkg/errors"
+import "go.thethings.network/lorawan-stack/pkg/errors"
 
 var (
 	// ErrNoNetworkServerFound is returned if no network server was found for a passed DevAddr.

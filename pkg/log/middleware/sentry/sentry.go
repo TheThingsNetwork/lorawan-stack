@@ -19,8 +19,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/TheThingsNetwork/ttn/pkg/log"
 	raven "github.com/getsentry/raven-go"
+	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
 // Sentry is a log.Handler that sends errors to Sentry.

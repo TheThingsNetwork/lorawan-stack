@@ -15,12 +15,12 @@
 package sendgrid
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
-	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/jaytaylor/html2text"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/email/templates"
+	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
 // Config is the type that configures the SendGrid email provider.

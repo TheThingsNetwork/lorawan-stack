@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/jmoiron/sqlx"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // selectOne selects one item from the database and writes it to dest, which can

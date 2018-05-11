@@ -15,10 +15,10 @@
 package shared
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/config"
-	"github.com/TheThingsNetwork/ttn/pkg/log"
-	"github.com/TheThingsNetwork/ttn/pkg/log/middleware/sentry"
 	raven "github.com/getsentry/raven-go"
+	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/log/middleware/sentry"
 )
 
 // SentryMiddleware generates a log.Middleware sending errors logs to Sentry from a config.

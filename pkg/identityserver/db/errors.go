@@ -19,8 +19,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/lib/pq"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 var re = regexp.MustCompile("duplicate key value \\((.+)\\)=\\((.+)\\)")

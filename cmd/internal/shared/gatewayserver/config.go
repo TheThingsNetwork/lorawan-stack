@@ -15,7 +15,7 @@
 package shared
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 )
 
 // DefaultGatewayServerConfig is the default configuration for the GatewayServer.

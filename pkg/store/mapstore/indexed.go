@@ -19,7 +19,7 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/TheThingsNetwork/ttn/pkg/store"
+	"go.thethings.network/lorawan-stack/pkg/store"
 )
 
 type IndexedStore struct {

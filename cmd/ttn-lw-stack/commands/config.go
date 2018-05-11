@@ -15,18 +15,18 @@
 package commands
 
 import (
-	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
-	shared_applicationserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/applicationserver"
-	shared_gatewayserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/gatewayserver"
-	shared_identityserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/identityserver"
-	shared_joinserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/joinserver"
-	shared_networkserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/networkserver"
-	"github.com/TheThingsNetwork/ttn/pkg/applicationserver"
-	conf "github.com/TheThingsNetwork/ttn/pkg/config"
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver"
-	"github.com/TheThingsNetwork/ttn/pkg/joinserver"
-	"github.com/TheThingsNetwork/ttn/pkg/networkserver"
+	"go.thethings.network/lorawan-stack/cmd/internal/shared"
+	shared_applicationserver "go.thethings.network/lorawan-stack/cmd/internal/shared/applicationserver"
+	shared_gatewayserver "go.thethings.network/lorawan-stack/cmd/internal/shared/gatewayserver"
+	shared_identityserver "go.thethings.network/lorawan-stack/cmd/internal/shared/identityserver"
+	shared_joinserver "go.thethings.network/lorawan-stack/cmd/internal/shared/joinserver"
+	shared_networkserver "go.thethings.network/lorawan-stack/cmd/internal/shared/networkserver"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver"
+	conf "go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
+	"go.thethings.network/lorawan-stack/pkg/identityserver"
+	"go.thethings.network/lorawan-stack/pkg/joinserver"
+	"go.thethings.network/lorawan-stack/pkg/networkserver"
 )
 
 // Config for the ttn-lw-stack binary.

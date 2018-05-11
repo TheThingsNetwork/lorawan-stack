@@ -19,8 +19,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/log"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // ttlCache is a cache where all entries have a TTL and are garbage collected.

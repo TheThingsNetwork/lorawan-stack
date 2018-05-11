@@ -15,10 +15,10 @@
 package commands
 
 import (
-	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
-	shared_applicationserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/applicationserver"
-	"github.com/TheThingsNetwork/ttn/pkg/applicationserver"
-	conf "github.com/TheThingsNetwork/ttn/pkg/config"
+	"go.thethings.network/lorawan-stack/cmd/internal/shared"
+	shared_applicationserver "go.thethings.network/lorawan-stack/cmd/internal/shared/applicationserver"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver"
+	conf "go.thethings.network/lorawan-stack/pkg/config"
 )
 
 // Config for the ttn-lw-application-server binary.

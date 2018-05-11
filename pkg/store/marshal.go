@@ -20,8 +20,8 @@ import (
 	"encoding/json"
 	"reflect"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/gogo/protobuf/proto"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 var (

@@ -15,7 +15,7 @@
 package shared
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/applicationserver"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver"
 )
 
 // DefaultApplicationServerConfig is the default configuration for the ApplicationServer

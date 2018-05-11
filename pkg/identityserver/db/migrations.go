@@ -15,8 +15,8 @@
 package db
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db/migrations"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/db/migrations"
 )
 
 const migrationHistorySchema = `

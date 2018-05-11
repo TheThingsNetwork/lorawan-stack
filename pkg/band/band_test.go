@@ -15,9 +15,9 @@
 package band_test
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/band"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/TheThingsNetwork/ttn/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/band"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 func GetUplink() ttnpb.UplinkMessage                   { return ttnpb.UplinkMessage{} }

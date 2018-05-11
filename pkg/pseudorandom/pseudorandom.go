@@ -20,7 +20,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/random"
+	"go.thethings.network/lorawan-stack/pkg/random"
 )
 
 // TTNRandom is used as a wrapper around math/rand.

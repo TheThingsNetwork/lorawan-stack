@@ -18,9 +18,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 func settings(in interface{}) (*ttnpb.IdentityServerSettings, error) {

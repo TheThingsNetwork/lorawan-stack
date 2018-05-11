@@ -17,8 +17,8 @@ package middleware
 import (
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/labstack/echo"
+	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
 // Log is middleware that logs the request.

@@ -17,7 +17,7 @@ package store
 import (
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // ValidationToken is an expirable token.

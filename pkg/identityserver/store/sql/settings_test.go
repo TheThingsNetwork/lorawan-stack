@@ -17,10 +17,10 @@ package sql_test
 import (
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 func TestSettings(t *testing.T) {

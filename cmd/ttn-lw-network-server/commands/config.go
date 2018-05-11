@@ -15,10 +15,10 @@
 package commands
 
 import (
-	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
-	shared_networkserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/networkserver"
-	conf "github.com/TheThingsNetwork/ttn/pkg/config"
-	"github.com/TheThingsNetwork/ttn/pkg/networkserver"
+	"go.thethings.network/lorawan-stack/cmd/internal/shared"
+	shared_networkserver "go.thethings.network/lorawan-stack/cmd/internal/shared/networkserver"
+	conf "go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/networkserver"
 )
 
 // Config for the ttn-lw-network-server binary.

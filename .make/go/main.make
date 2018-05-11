@@ -46,7 +46,7 @@ get_go_minor = cut -d'.' -f2
 # go flags
 GO_ENV = CGO_ENABLED=0
 LD_FLAGS = -ldflags "-w $(GO_TAGS)"
-GO_TAGS ?= -X github.com/TheThingsNetwork/ttn/pkg/version.GitCommit=$(GIT_COMMIT) -X github.com/TheThingsNetwork/ttn/pkg/version.BuildDate=$(BUILD_DATE) -X github.com/TheThingsNetwork/ttn/pkg/version.TTN=$(GIT_TAG) -X github.com/TheThingsNetwork/ttn/pkg/version.GitBranch=$(GIT_BRANCH)
+GO_TAGS ?= -X go.thethings.network/lorawan-stack/pkg/version.GitCommit=$(GIT_COMMIT) -X go.thethings.network/lorawan-stack/pkg/version.BuildDate=$(BUILD_DATE) -X go.thethings.network/lorawan-stack/pkg/version.TTN=$(GIT_TAG) -X go.thethings.network/lorawan-stack/pkg/version.GitBranch=$(GIT_BRANCH)
 
 # coverage
 GO_COVER_FILE = coverage.out

@@ -14,7 +14,7 @@
 
 package identityserver
 
-import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
 // authorizationData is the type that abstracts the authorization data contained in a request.
 type authorizationData struct {

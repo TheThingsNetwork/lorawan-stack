@@ -15,9 +15,9 @@
 package ttnpb
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/crypto"
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 func NewPopulatedFHDR(r randyLorawan, easy bool) *FHDR {

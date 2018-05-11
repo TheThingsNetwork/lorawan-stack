@@ -18,10 +18,10 @@ package commands
 import (
 	"os"
 
-	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
-	conf "github.com/TheThingsNetwork/ttn/pkg/config"
-	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/cmd/internal/shared"
+	conf "go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
 var (

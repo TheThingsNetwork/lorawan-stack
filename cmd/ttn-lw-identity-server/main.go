@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/TheThingsNetwork/ttn/cmd/ttn-lw-identity-server/commands"
+	"go.thethings.network/lorawan-stack/cmd/ttn-lw-identity-server/commands"
 )
 
 func main() {

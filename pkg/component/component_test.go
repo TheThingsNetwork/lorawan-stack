@@ -25,22 +25,22 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/component"
-	"github.com/TheThingsNetwork/ttn/pkg/config"
-	"github.com/TheThingsNetwork/ttn/pkg/errors/httperrors"
-	"github.com/TheThingsNetwork/ttn/pkg/log"
-	"github.com/TheThingsNetwork/ttn/pkg/log/handler/memory"
-	"github.com/TheThingsNetwork/ttn/pkg/util/test"
-	"github.com/TheThingsNetwork/ttn/pkg/web"
 	"github.com/labstack/echo"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/errors/httperrors"
+	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/log/handler/memory"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
+	"go.thethings.network/lorawan-stack/pkg/web"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
 
 var (
-	pemDir = filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "TheThingsNetwork", "ttn")
+	pemDir = filepath.Join(os.Getenv("GOPATH"), "src", "go.thethings.network", "lorawan-stack")
 
 	certPem = filepath.Join(pemDir, "cert.pem")
 	keyPem  = filepath.Join(pemDir, "key.pem")

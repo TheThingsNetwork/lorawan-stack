@@ -22,9 +22,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/mohae/deepcopy"
 	"github.com/oklog/ulid"
+	"go.thethings.network/lorawan-stack/pkg/store"
 )
 
 type MapStore struct {

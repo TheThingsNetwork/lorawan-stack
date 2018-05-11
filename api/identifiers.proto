@@ -18,7 +18,7 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 // UserIdentifiers is the message that is used to identify an user.
 message UserIdentifiers {
@@ -42,7 +42,7 @@ message GatewayIdentifiers {
   // TTN Gateway ID.
   string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
   // Gateway's unique and immutable EUI.
-  bytes eui = 2 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "EUI"];
+  bytes eui = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "EUI"];
 }
 
 // End device identifiers are carried with uplink and downlink messages.
@@ -55,11 +55,11 @@ message EndDeviceIdentifiers {
   ApplicationIdentifiers application_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // LoRaWAN DevEUI.
-  bytes dev_eui = 4 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
+  bytes dev_eui = 4 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
   // LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).
-  bytes join_eui = 5 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+  bytes join_eui = 5 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
   // LoRaWAN DevAddr.
-  bytes dev_addr = 6 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
+  bytes dev_addr = 6 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
 }
 
 // ClientIdentifiers is the message that is used to identify a client.

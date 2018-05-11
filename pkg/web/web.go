@@ -19,11 +19,11 @@ import (
 	"path"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/log"
-	"github.com/TheThingsNetwork/ttn/pkg/random"
-	"github.com/TheThingsNetwork/ttn/pkg/web/cookie"
-	"github.com/TheThingsNetwork/ttn/pkg/web/middleware"
 	"github.com/labstack/echo"
+	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/random"
+	"go.thethings.network/lorawan-stack/pkg/web/cookie"
+	"go.thethings.network/lorawan-stack/pkg/web/middleware"
 )
 
 // Registerer allows components to register their services to the web server

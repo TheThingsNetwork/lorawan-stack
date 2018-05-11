@@ -17,7 +17,7 @@ package udp
 import (
 	"strconv"
 
-	"github.com/TheThingsNetwork/ttn/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 // DataRate encodes a LoRa data rate as a string or an FSK bit rate as an uint, and implements marshalling and unmarshalling between JSON

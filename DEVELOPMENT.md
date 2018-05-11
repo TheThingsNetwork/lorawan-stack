@@ -83,13 +83,13 @@ You can use it using the `make dev.databases.{start,stop,erase}` method, or use 
 Since version 3 of our network stack, we use a single repository for our open source network components. The repository should be cloned inside your Go workspace:
 
 ```sh
-git clone https://github.com/TheThingsNetwork/ttn.git $GOPATH/src/github.com/TheThingsNetwork/ttn
+git clone https://github.com/TheThingsNetwork/lorawan-stack.git $GOPATH/src/go.thethings.network/lorawan-stack
 ```
 
 All development is done in this directory.
 
 ```sh
-cd $GOPATH/src/github.com/TheThingsNetwork/ttn
+cd $GOPATH/src/go.thethings.network/lorawan-stack
 ```
 
 As most of the tasks will be managed by `make` we will first initialize the tooling. You might want to run this command from time to time:

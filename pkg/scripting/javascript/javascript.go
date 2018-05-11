@@ -18,9 +18,9 @@ package javascript
 import (
 	"context"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/scripting"
 	"github.com/robertkrimen/otto"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/scripting"
 )
 
 type js struct {

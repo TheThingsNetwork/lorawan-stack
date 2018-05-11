@@ -14,7 +14,7 @@
 
 package messageprocessors
 
-import "github.com/TheThingsNetwork/ttn/pkg/errors"
+import "go.thethings.network/lorawan-stack/pkg/errors"
 
 // ErrNoMACPayload represents the ErrDescriptor of the error returned when the message does not
 // contain MACPayload.

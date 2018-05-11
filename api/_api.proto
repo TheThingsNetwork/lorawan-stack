@@ -19,4 +19,4 @@ syntax = "proto3";
 // The Things Network v3 API
 package ttn.lorawan.v3;
 
-option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";

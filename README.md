@@ -1,6 +1,6 @@
 # The Things Network Stack for LoRaWAN
 
-[![Build Status](https://travis-ci.org/TheThingsNetwork/ttn.svg?branch=master)](https://travis-ci.org/TheThingsNetwork/ttn) [![Coverage Status](https://coveralls.io/repos/github/TheThingsNetwork/ttn/badge.svg?branch=master)](https://coveralls.io/github/TheThingsNetwork/ttn?branch=master) [![GoDoc](https://godoc.org/github.com/TheThingsNetwork/ttn?status.svg)](https://godoc.org/github.com/TheThingsNetwork/ttn)
+[![Build Status](https://travis-ci.org/TheThingsNetwork/ttn.svg?branch=master)](https://travis-ci.org/TheThingsNetwork/ttn) [![Coverage Status](https://coveralls.io/repos/github/TheThingsNetwork/ttn/badge.svg?branch=master)](https://coveralls.io/github/TheThingsNetwork/ttn?branch=master) [![GoDoc](https://godoc.org/go.thethings.network/lorawan-stack?status.svg)](https://godoc.org/go.thethings.network/lorawan-stack)
 
 The Things Network Stack for LoRaWAN is an open-source LoRaWAN network server suitable for large, global public networks as well as smaller private networks.
 
@@ -38,7 +38,7 @@ Version 3 of The Things Network Stack for LoRaWAN is still under heavy developme
 
 ## Downloads
 
-For **stable** versions, see the [Releases](https://github.com/TheThingsNetwork/ttn/releases) page on Github.
+For **stable** versions, see the [Releases](https://github.com/TheThingsNetwork/lorawan-stack/releases) page on Github.
 
 For the latest **master**, you can download pre-compiled binaries:
 
@@ -56,7 +56,7 @@ For the latest **master**, you can download pre-compiled binaries:
 - General documentation can be found on [thethingsnetwork.org/docs](https://www.thethingsnetwork.org/docs/)
 - Learn how to contribute in [CONTRIBUTING.md](CONTRIBUTING.md)
 - Setting up a development environment is documented in [DEVELOPMENT.md](DEVELOPMENT.md)
-- Documentation for our Go code can be found on [godoc.org](https://godoc.org/github.com/TheThingsNetwork/ttn)
+- Documentation for our Go code can be found on [godoc.org](https://godoc.org/go.thethings.network/lorawan-stack)
 
 ## Support
 

@@ -14,7 +14,7 @@
 
 package mock
 
-import "github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
+import "go.thethings.network/lorawan-stack/pkg/identityserver/email/templates"
 
 var last interface{}
 

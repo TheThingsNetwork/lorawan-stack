@@ -14,7 +14,7 @@
 
 package store
 
-import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
 // SettingStore is the settings store.
 type SettingStore interface {

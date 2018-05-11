@@ -19,9 +19,9 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db/migrations"
 	"github.com/cockroachdb/cockroach-go/crdb"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/db/migrations"
 
 	"github.com/jmoiron/sqlx"
 

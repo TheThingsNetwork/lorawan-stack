@@ -18,9 +18,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	ssassertions "github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 var testDescriptor = &errors.ErrDescriptor{

@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/TheThingsNetwork/ttn/pkg/config"
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	yaml "gopkg.in/yaml.v2"
 )
 

@@ -17,8 +17,8 @@ package deviceregistry
 import (
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/store"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/store"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // Device represents the device stored in the registry.

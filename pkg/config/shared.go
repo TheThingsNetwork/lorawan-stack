@@ -17,11 +17,11 @@ package config
 import (
 	"encoding/hex"
 
-	"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/fetch"
-	"github.com/TheThingsNetwork/ttn/pkg/frequencyplans"
-	"github.com/TheThingsNetwork/ttn/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/fetch"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
 // Base represents base component configuration.

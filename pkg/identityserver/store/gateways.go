@@ -14,7 +14,7 @@
 
 package store
 
-import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
 // Gateway is the interface of all things that can be a gateway.
 type Gateway interface {

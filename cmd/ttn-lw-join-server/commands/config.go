@@ -15,10 +15,10 @@
 package commands
 
 import (
-	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
-	shared_joinserver "github.com/TheThingsNetwork/ttn/cmd/internal/shared/joinserver"
-	conf "github.com/TheThingsNetwork/ttn/pkg/config"
-	"github.com/TheThingsNetwork/ttn/pkg/joinserver"
+	"go.thethings.network/lorawan-stack/cmd/internal/shared"
+	shared_joinserver "go.thethings.network/lorawan-stack/cmd/internal/shared/joinserver"
+	conf "go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/joinserver"
 )
 
 // Config for the ttn-lw-join-server binary.

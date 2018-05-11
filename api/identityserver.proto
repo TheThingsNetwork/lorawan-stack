@@ -14,16 +14,16 @@
 
 syntax = "proto3";
 
-import "github.com/TheThingsNetwork/ttn/api/application.proto";
-import "github.com/TheThingsNetwork/ttn/api/auth.proto";
-import "github.com/TheThingsNetwork/ttn/api/client.proto";
-import "github.com/TheThingsNetwork/ttn/api/collaborator.proto";
-import "github.com/TheThingsNetwork/ttn/api/gateway.proto";
-import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
-import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
-import "github.com/TheThingsNetwork/ttn/api/organization.proto";
-import "github.com/TheThingsNetwork/ttn/api/rights.proto";
-import "github.com/TheThingsNetwork/ttn/api/user.proto";
+import "go.thethings.network/lorawan-stack/api/application.proto";
+import "go.thethings.network/lorawan-stack/api/auth.proto";
+import "go.thethings.network/lorawan-stack/api/client.proto";
+import "go.thethings.network/lorawan-stack/api/collaborator.proto";
+import "go.thethings.network/lorawan-stack/api/gateway.proto";
+import "go.thethings.network/lorawan-stack/api/identifiers.proto";
+import "go.thethings.network/lorawan-stack/api/metadata.proto";
+import "go.thethings.network/lorawan-stack/api/organization.proto";
+import "go.thethings.network/lorawan-stack/api/rights.proto";
+import "go.thethings.network/lorawan-stack/api/user.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
@@ -33,7 +33,7 @@ import "google/protobuf/timestamp.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message PullConfigurationRequest {
   // gateway_ids are the identifiers of the gateway to be fetched in the stream.

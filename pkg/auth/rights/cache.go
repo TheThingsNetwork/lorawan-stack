@@ -14,7 +14,7 @@
 
 package rights
 
-import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
 // cache is the interface that describes a cache to store gRPC responses of the
 // Identity Server `ListApplicationRights` and `ListGatewayRights` calls.

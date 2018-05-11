@@ -21,8 +21,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/random"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/random"
 	"golang.org/x/crypto/pbkdf2"
 )
 

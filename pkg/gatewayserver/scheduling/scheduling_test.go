@@ -19,11 +19,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/band"
-	"github.com/TheThingsNetwork/ttn/pkg/gatewayserver/scheduling"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/band"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 func emptyEUFrequencyPlan() ttnpb.FrequencyPlan {

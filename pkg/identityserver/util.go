@@ -17,7 +17,7 @@ package identityserver
 import (
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 func organizationOrUserIDsUserIDs(ids ttnpb.UserIdentifiers) ttnpb.OrganizationOrUserIdentifiers {

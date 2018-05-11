@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
+	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
 type fielder struct {

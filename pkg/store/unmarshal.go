@@ -21,11 +21,11 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/gogo/protobuf/proto"
 	"github.com/mitchellh/mapstructure"
 	"github.com/tinylib/msgp/msgp"
 	"github.com/vmihailenco/msgpack"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 var (

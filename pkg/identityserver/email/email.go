@@ -14,7 +14,7 @@
 
 package email
 
-import "github.com/TheThingsNetwork/ttn/pkg/identityserver/email/templates"
+import "go.thethings.network/lorawan-stack/pkg/identityserver/email/templates"
 
 // Provider is the interface that describes all the email providers that can
 // be used by the Identity Server.

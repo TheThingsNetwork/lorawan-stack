@@ -20,7 +20,7 @@ import "google/protobuf/timestamp.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message Message {
   option (gogoproto.populate) = false;
@@ -93,7 +93,7 @@ message MACPayload {
 message FHDR {
   option (gogoproto.populate) = false;
 
-  bytes dev_addr  = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
+  bytes dev_addr  = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
   FCtrl f_ctrl    = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   uint32 f_cnt    = 3;
   bytes f_opts    = 4;
@@ -110,9 +110,9 @@ message FCtrl {
 message JoinRequestPayload {
   option (gogoproto.populate) = false;
 
-  bytes join_eui  = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "JoinEUI", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
-  bytes dev_eui   = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "DevEUI", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
-  bytes dev_nonce = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevNonce"];
+  bytes join_eui  = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "JoinEUI", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64"];
+  bytes dev_eui   = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "DevEUI", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64"];
+  bytes dev_nonce = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevNonce"];
 }
 
 enum RejoinType {
@@ -125,9 +125,9 @@ message RejoinRequestPayload {
   option (gogoproto.populate) = false;
 
   RejoinType  rejoin_type = 1;
-  bytes       net_id      = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.NetID"];
-  bytes       join_eui    = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "JoinEUI", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
-  bytes       dev_eui     = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "DevEUI", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.EUI64"];
+  bytes       net_id      = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID"];
+  bytes       join_eui    = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "JoinEUI", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64"];
+  bytes       dev_eui     = 4 [(gogoproto.nullable) = false, (gogoproto.customname) = "DevEUI", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64"];
   uint32      rejoin_cnt  = 5; // contains RJCount0 or RJCount1 depending on rejoin_type
 }
 
@@ -135,9 +135,9 @@ message JoinAcceptPayload {
   option (gogoproto.populate) = false;
 
   bytes       encrypted   = 1;
-  bytes       join_nonce  = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.JoinNonce"];
-  bytes       net_id      = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.NetID"];
-  bytes       dev_addr    = 4 [(gogoproto.nullable) = false, (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr"];
+  bytes       join_nonce  = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.JoinNonce"];
+  bytes       net_id      = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID"];
+  bytes       dev_addr    = 4 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
   DLSettings  dl_settings = 5 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   uint32      rx_delay    = 6;
   CFList      cf_list     = 7 [(gogoproto.customname) = "CFList"];

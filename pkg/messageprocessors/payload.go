@@ -17,7 +17,7 @@ package messageprocessors
 import (
 	"context"
 
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // PayloadEncoder represents a payload encoder message processor.

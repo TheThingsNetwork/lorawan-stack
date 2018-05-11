@@ -18,8 +18,8 @@ import (
 	"crypto/subtle"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/auth/pbkdf2"
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/auth/pbkdf2"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // hashingMethod is a method to hash a password.

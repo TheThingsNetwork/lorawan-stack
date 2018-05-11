@@ -19,8 +19,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/gogo/protobuf/jsonpb"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 var (

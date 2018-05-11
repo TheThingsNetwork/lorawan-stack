@@ -16,8 +16,8 @@ package oauth
 
 import (
 	"github.com/RangelReale/osin"
-	"github.com/TheThingsNetwork/ttn/pkg/auth"
-	"github.com/TheThingsNetwork/ttn/pkg/random"
+	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/random"
 )
 
 // GenerateAuthorizeToken generates a 64-length authorization code based on the ttn random generator.

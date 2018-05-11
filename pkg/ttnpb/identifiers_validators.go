@@ -14,7 +14,7 @@
 
 package ttnpb
 
-import "github.com/TheThingsNetwork/ttn/pkg/validate"
+import "go.thethings.network/lorawan-stack/pkg/validate"
 
 // Validate is used as validator function by the GRPC validator interceptor.
 func (ids UserIdentifiers) Validate() error {

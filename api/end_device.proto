@@ -14,12 +14,12 @@
 
 syntax = "proto3";
 
-import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
-import "github.com/TheThingsNetwork/ttn/api/keys.proto";
-import "github.com/TheThingsNetwork/ttn/api/lorawan.proto";
-import "github.com/TheThingsNetwork/ttn/api/messages.proto";
-import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
-import "github.com/TheThingsNetwork/ttn/api/payload_formatter.proto";
+import "go.thethings.network/lorawan-stack/api/identifiers.proto";
+import "go.thethings.network/lorawan-stack/api/keys.proto";
+import "go.thethings.network/lorawan-stack/api/lorawan.proto";
+import "go.thethings.network/lorawan-stack/api/messages.proto";
+import "go.thethings.network/lorawan-stack/api/metadata.proto";
+import "go.thethings.network/lorawan-stack/api/payload_formatter.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
@@ -27,11 +27,11 @@ import "google/protobuf/timestamp.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message Session {
   reserved 1; // RFU: Session ID
-  bytes dev_addr = 2 [(gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.DevAddr", (gogoproto.nullable) = false];
+  bytes dev_addr = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr", (gogoproto.nullable) = false];
   SessionKeys keys = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   uint32 next_f_cnt_up = 4;
   uint32 next_n_f_cnt_down = 5;

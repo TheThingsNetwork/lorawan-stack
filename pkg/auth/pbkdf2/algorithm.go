@@ -19,7 +19,7 @@ import (
 	"crypto/sha512"
 	"hash"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // Algorithm is the type of the accepted algorithms.

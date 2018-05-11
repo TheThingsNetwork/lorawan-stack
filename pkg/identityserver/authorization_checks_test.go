@@ -19,10 +19,10 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/auth"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 func TestEnforceUserRights(t *testing.T) {

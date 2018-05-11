@@ -15,7 +15,7 @@
 package applicationregistry
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 var (

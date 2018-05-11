@@ -18,10 +18,10 @@ import (
 	"context"
 	"net"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/rpcserver"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

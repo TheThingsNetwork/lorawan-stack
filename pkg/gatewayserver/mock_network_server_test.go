@@ -18,9 +18,9 @@ import (
 	"context"
 	"net"
 
-	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/pkg/rpcserver"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // GsNsServer implements ttnpb.GsNsServer

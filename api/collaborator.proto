@@ -16,11 +16,11 @@ syntax = "proto3";
 
 package ttn.lorawan.v3;
 
-import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
-import "github.com/TheThingsNetwork/ttn/api/rights.proto";
+import "go.thethings.network/lorawan-stack/api/identifiers.proto";
+import "go.thethings.network/lorawan-stack/api/rights.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
-option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message ApplicationCollaborator {
   // application_ids are the application identifiers.

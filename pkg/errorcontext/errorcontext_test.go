@@ -19,9 +19,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errorcontext"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 )
 
 var err error

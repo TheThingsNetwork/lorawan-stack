@@ -18,9 +18,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/db"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/db"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql/migrations"
 )
 
 // storer is the interface all store implementations have to adhere to.

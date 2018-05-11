@@ -20,12 +20,12 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/gogoproto"
-	"github.com/TheThingsNetwork/ttn/pkg/messageprocessors"
-	"github.com/TheThingsNetwork/ttn/pkg/scripting"
-	js "github.com/TheThingsNetwork/ttn/pkg/scripting/javascript"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/pkg/messageprocessors"
+	"go.thethings.network/lorawan-stack/pkg/scripting"
+	js "go.thethings.network/lorawan-stack/pkg/scripting/javascript"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 type host struct {

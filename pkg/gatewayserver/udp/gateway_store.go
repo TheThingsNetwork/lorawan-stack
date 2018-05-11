@@ -19,7 +19,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 // DefaultWaitDuration is the recommended duration to block the IP of the gateway.

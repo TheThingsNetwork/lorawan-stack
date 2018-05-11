@@ -14,8 +14,8 @@
 
 syntax = "proto3";
 
-import "github.com/TheThingsNetwork/ttn/api/application.proto";
-import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
+import "go.thethings.network/lorawan-stack/api/application.proto";
+import "go.thethings.network/lorawan-stack/api/identifiers.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
@@ -23,7 +23,7 @@ import "google/protobuf/field_mask.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message SetApplicationRequest{
   Application application = 1 [(gogoproto.nullable) = false];

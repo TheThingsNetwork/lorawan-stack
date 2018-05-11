@@ -17,9 +17,9 @@ package crypto
 import (
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 func TestKeyDerivation(t *testing.T) {

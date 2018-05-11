@@ -18,8 +18,8 @@ import (
 	"crypto/aes"
 	"encoding/binary"
 
-	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/jacobsa/crypto/cmac"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 func encrypt(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uint32, payload []byte) (encrypted []byte, err error) {

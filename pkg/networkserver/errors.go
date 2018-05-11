@@ -14,7 +14,7 @@
 
 package networkserver
 
-import "github.com/TheThingsNetwork/ttn/pkg/errors"
+import "go.thethings.network/lorawan-stack/pkg/errors"
 
 var (
 	// ErrUnsupportedLoRaWANMajorVersion represents error ocurring when unsupported LoRaWAN MAC version is specified.

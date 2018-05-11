@@ -18,7 +18,7 @@ package memory
 import (
 	"sync"
 
-	"github.com/TheThingsNetwork/ttn/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
 // Handler implements log.Handler by storing entries in memory.

@@ -18,15 +18,15 @@ import (
 	"context"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/gogoproto"
-	"github.com/TheThingsNetwork/ttn/pkg/messageprocessors"
-	"github.com/TheThingsNetwork/ttn/pkg/messageprocessors/javascript"
-	"github.com/TheThingsNetwork/ttn/pkg/scripting"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	errshould "github.com/TheThingsNetwork/ttn/pkg/util/test/assertions/should"
 	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/pkg/messageprocessors"
+	"go.thethings.network/lorawan-stack/pkg/messageprocessors/javascript"
+	"go.thethings.network/lorawan-stack/pkg/scripting"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestEncode(t *testing.T) {

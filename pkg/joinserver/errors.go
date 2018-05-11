@@ -14,7 +14,7 @@
 
 package joinserver
 
-import "github.com/TheThingsNetwork/ttn/pkg/errors"
+import "go.thethings.network/lorawan-stack/pkg/errors"
 
 var (
 	// ErrMICComputeFailed represents error occurring when MIC computation fails.

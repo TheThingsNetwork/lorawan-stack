@@ -17,10 +17,10 @@ package gatewayserver
 import (
 	"context"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/TheThingsNetwork/ttn/pkg/validate"
 	"github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/validate"
 )
 
 // ScheduleDownlink on a gateway connected to this gateway server.

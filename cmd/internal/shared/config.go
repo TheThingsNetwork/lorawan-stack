@@ -17,9 +17,9 @@ package shared
 import (
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
-	"github.com/TheThingsNetwork/ttn/pkg/config"
-	"github.com/TheThingsNetwork/ttn/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
 // DefaultBaseConfig is the default base component configuration.

@@ -17,8 +17,8 @@ package mapstore
 import (
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/store"
-	"github.com/TheThingsNetwork/ttn/pkg/store/storetest"
+	"go.thethings.network/lorawan-stack/pkg/store"
+	"go.thethings.network/lorawan-stack/pkg/store/storetest"
 )
 
 var _ store.TypedMapStore = &MapStore{}

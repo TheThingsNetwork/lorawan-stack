@@ -22,11 +22,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	. "github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	. "go.thethings.network/lorawan-stack/pkg/store"
 )
 
 func TestBytesToType(t *testing.T) {

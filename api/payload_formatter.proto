@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package ttn.lorawan.v3;
 
-option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 enum PayloadFormatter {
   FORMATTER_NONE = 0;

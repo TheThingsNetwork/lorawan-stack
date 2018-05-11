@@ -18,10 +18,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
+	. "go.thethings.network/lorawan-stack/pkg/identityserver/store/sql"
 )
 
 func TestInvitations(t *testing.T) {

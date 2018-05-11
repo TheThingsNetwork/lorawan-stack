@@ -18,9 +18,9 @@ import (
 	"crypto/aes"
 	"fmt"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/jacobsa/crypto/cmac"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 // EncryptJoinAccept uses AES Decrypt to encrypt a JoinAccept message

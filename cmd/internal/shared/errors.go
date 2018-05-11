@@ -14,4 +14,4 @@
 
 package shared
 
-import _ "github.com/TheThingsNetwork/ttn/pkg/errors/format" // Init redirection of MessageFormat errors to default logger
+import _ "go.thethings.network/lorawan-stack/pkg/errors/format" // Init redirection of MessageFormat errors to default logger

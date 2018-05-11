@@ -18,10 +18,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/errors/grpcerrors"
-	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/grpc-ecosystem/go-grpc-middleware"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/grpcerrors"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"google.golang.org/grpc"
 )
 

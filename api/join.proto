@@ -14,16 +14,16 @@
 
 syntax = "proto3";
 
-import "github.com/TheThingsNetwork/ttn/api/end_device.proto";
-import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
-import "github.com/TheThingsNetwork/ttn/api/keys.proto";
-import "github.com/TheThingsNetwork/ttn/api/lorawan.proto";
+import "go.thethings.network/lorawan-stack/api/end_device.proto";
+import "go.thethings.network/lorawan-stack/api/identifiers.proto";
+import "go.thethings.network/lorawan-stack/api/keys.proto";
+import "go.thethings.network/lorawan-stack/api/lorawan.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 // Join Request
 message JoinRequest {
@@ -43,7 +43,7 @@ message JoinRequest {
   MACVersion selected_mac_version = 4;
 
   // NetID of the accepting network server
-  bytes net_id = 5 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "github.com/TheThingsNetwork/ttn/pkg/types.NetID"];
+  bytes net_id = 5 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID"];
 
   // Downlink Settings
   DLSettings downlink_settings = 6 [(gogoproto.nullable) = false];

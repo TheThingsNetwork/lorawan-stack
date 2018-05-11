@@ -20,7 +20,7 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 type fsFetcher struct {

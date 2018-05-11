@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // ParseScope parses a scope string to a list of rights.

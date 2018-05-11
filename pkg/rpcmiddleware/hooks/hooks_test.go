@@ -19,9 +19,9 @@ import (
 	"errors"
 	"testing"
 
-	. "github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/hooks"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	. "go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )

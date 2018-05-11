@@ -19,11 +19,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/types"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"github.com/spf13/cast"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 type jsonMarshaler struct {

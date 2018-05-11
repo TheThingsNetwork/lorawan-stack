@@ -19,11 +19,11 @@ import (
 	"strconv"
 	"testing"
 
-	. "github.com/TheThingsNetwork/ttn/pkg/store"
-	"github.com/TheThingsNetwork/ttn/pkg/store/mapstore"
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	. "go.thethings.network/lorawan-stack/pkg/store"
+	"go.thethings.network/lorawan-stack/pkg/store/mapstore"
 )
 
 type First struct {

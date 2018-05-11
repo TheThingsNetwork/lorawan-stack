@@ -20,9 +20,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/band"
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/band"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 var (

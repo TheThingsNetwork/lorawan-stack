@@ -18,7 +18,7 @@ import (
 	"bytes"
 	"sync"
 
-	"github.com/TheThingsNetwork/ttn/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
 // Logger represents the logging interface implemented by i.e. testing.T

@@ -19,10 +19,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/rpclog"
-	"github.com/TheThingsNetwork/ttn/pkg/rpcserver"
 	"github.com/labstack/echo"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 )
 
 func (c *Component) initGRPC() {

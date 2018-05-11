@@ -17,9 +17,9 @@ package types_test
 import (
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 func TestValidSpreadingFactors(t *testing.T) {

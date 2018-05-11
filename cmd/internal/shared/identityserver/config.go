@@ -17,8 +17,8 @@ package identityserver
 import (
 	"fmt"
 
-	"github.com/TheThingsNetwork/ttn/cmd/internal/shared"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver"
+	"go.thethings.network/lorawan-stack/cmd/internal/shared"
+	"go.thethings.network/lorawan-stack/pkg/identityserver"
 )
 
 // DefaultIdentityServerConfig is the default configuration for the IdentityServer.

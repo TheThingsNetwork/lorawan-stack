@@ -15,8 +15,8 @@
 package component
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/cluster"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 func (c *Component) initCluster() (err error) {

@@ -15,8 +15,8 @@
 package test
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/log"
-	"github.com/TheThingsNetwork/ttn/pkg/log/test"
+	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/log/test"
 )
 
 // GetLogger returns a logger for tests.

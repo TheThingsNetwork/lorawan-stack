@@ -18,7 +18,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/rpcclient"
+	"go.thethings.network/lorawan-stack/pkg/rpcclient"
 )
 
 func TestOptions(t *testing.T) {

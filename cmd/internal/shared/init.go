@@ -14,7 +14,7 @@
 
 package shared
 
-import "github.com/TheThingsNetwork/ttn/pkg/config"
+import "go.thethings.network/lorawan-stack/pkg/config"
 
 // Initialize global packages.
 func Initialize(config config.ServiceBase) error {

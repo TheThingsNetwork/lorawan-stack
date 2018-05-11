@@ -44,9 +44,9 @@ different to its zero value.
 Lastly, the way to check the rights in the protected Unary method is a matter of:
 
 	import (
-		"github.com/TheThingsNetwork/ttn/pkg/auth"
-		"github.com/TheThingsNetwork/ttn/pkg/auth/rights"
-		"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+		"go.thethings.network/lorawan-stack/pkg/auth"
+		"go.thethings.network/lorawan-stack/pkg/auth/rights"
+		"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	)
 
 	func (a *ApplicationServer) MyMethod(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {

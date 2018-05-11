@@ -16,7 +16,7 @@ package store
 
 import (
 	"github.com/RangelReale/osin"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // Client is the interface of all things that can be a third-party client.

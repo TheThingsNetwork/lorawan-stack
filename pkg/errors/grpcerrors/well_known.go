@@ -15,7 +15,7 @@
 package grpcerrors
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/transport"
 )

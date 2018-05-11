@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/goproto"
-	"github.com/TheThingsNetwork/ttn/pkg/log"
 	"github.com/golang/protobuf/ptypes/struct"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/goproto"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

@@ -23,10 +23,10 @@ import (
 	"io"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/config"
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/oklog/ulid"
+	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/store"
 	redis "gopkg.in/redis.v5"
 )
 

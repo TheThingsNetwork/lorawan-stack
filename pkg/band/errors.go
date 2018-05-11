@@ -14,7 +14,7 @@
 
 package band
 
-import "github.com/TheThingsNetwork/ttn/pkg/errors"
+import "go.thethings.network/lorawan-stack/pkg/errors"
 
 var (
 	// ErrBandNotFound describes the errors returned when looking for an unknown band.

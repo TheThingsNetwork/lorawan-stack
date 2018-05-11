@@ -14,7 +14,7 @@
 
 package store
 
-import "github.com/TheThingsNetwork/ttn/pkg/errors"
+import "go.thethings.network/lorawan-stack/pkg/errors"
 
 func init() {
 	ErrInvalidData.Register()

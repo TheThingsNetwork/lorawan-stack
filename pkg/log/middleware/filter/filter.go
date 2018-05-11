@@ -18,7 +18,7 @@ package filter
 import (
 	"fmt"
 
-	"github.com/TheThingsNetwork/ttn/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
 // Filtered is a log.Handler that only logs fields that match the

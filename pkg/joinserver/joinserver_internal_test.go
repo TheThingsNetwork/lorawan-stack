@@ -17,12 +17,12 @@ package joinserver
 import (
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/crypto"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
-	"github.com/TheThingsNetwork/ttn/pkg/types"
-	"github.com/TheThingsNetwork/ttn/pkg/util/test"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 func KeyPointer(key types.AES128Key) *types.AES128Key { return keyPointer(key) }

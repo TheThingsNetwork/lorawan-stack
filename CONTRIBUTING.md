@@ -2,9 +2,9 @@
 
 Thank you for your interest in building this thing together with us. We're really happy with our active community and are glad that you're a part of it. There are many ways to contribute to our project, but given the fact that you're on Github looking at the code for The Things Network Stack for LoRaWAN, you're probably here for one of the following reasons:
 
-* **Requesting a new feature**: If you have a great idea or think some functionality is missing, we want to know! The only thing you have to do for that is to [create an issue](https://github.com/TheThingsNetwork/ttn/issues) if it doesn't exist yet. Please give a detailed description of the functionality you would want, and why it would be nice to have it. Also let us know if you can help us build it.
-* **Reporting an issue**: If you notice that a component of the Things Network Stack is not behaving as it should, there may be a bug in our systems. In this case you should [create an issue](https://github.com/TheThingsNetwork/ttn/issues) if it doesn't exist yet. For really sensitive issues, you can [contact us directly](#security-issues).
-* **Implementing a new feature or fixing a bug**: If you see an [open issue](https://github.com/TheThingsNetwork/ttn/issues) that you would like to work on, let us know by commenting in the issue. 
+* **Requesting a new feature**: If you have a great idea or think some functionality is missing, we want to know! The only thing you have to do for that is to [create an issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) if it doesn't exist yet. Please give a detailed description of the functionality you would want, and why it would be nice to have it. Also let us know if you can help us build it.
+* **Reporting an issue**: If you notice that a component of the Things Network Stack is not behaving as it should, there may be a bug in our systems. In this case you should [create an issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) if it doesn't exist yet. For really sensitive issues, you can [contact us directly](#security-issues).
+* **Implementing a new feature or fixing a bug**: If you see an [open issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) that you would like to work on, let us know by commenting in the issue. 
 * **Writing documentation**: If you see that our documentation is lacking or incorrect, it would be great if you could help us improve it. This will help users and fellow contributors understand better how to work with our stack, and will prevent making mistakes and introducing bugs. Our documentation is spread across a number of places. Code documentation obviously lives together with the code, and is therefore probably in this repository. More general documentation lives in [our `docs` repo](https://github.com/TheThingsNetwork/docs), that is published to our [official documentation pages](https://www.thethingsnetwork.org/docs).
 
 If you'd like to contribute by writing code, you'll find [here](DEVELOPMENT.md) how to set up your development environment. We also have some guidelines that describe how to make contributions that are consistent our way of working.
@@ -139,12 +139,12 @@ We follow the [official go guidelines](https://github.com/golang/go/wiki/CodeRev
 | :------------------: | :-----: | :-----------------------------------------------------------: |
 | context              | ctx     | context.Context                                               |
 | mutex                | mu      | sync.Mutex                                                    |
-| configuration        | conf    | github.com/TheThingsNetwork/ttn/pkg/config.Config             |
-| logger               | logger  | github.com/TheThingsNetwork/ttn/pkg/log.Logger                |
-| message              | msg     | github.com/TheThingsNetwork/ttn/api/gateway.UplinkMessage     |
-| status               | st      | github.com/TheThingsNetwork/ttn/api/gateway.Status            |
-| server               | srv     | github.com/TheThingsNetwork/ttn/pkg/network-server.Server     |
-| EUI                  | eui     | github.com/TheThingsNetwork/ttn/pkg/types.DevEUI              |
+| configuration        | conf    | go.thethings.network/lorawan-stack/pkg/config.Config             |
+| logger               | logger  | go.thethings.network/lorawan-stack/pkg/log.Logger                |
+| message              | msg     | go.thethings.network/lorawan-stack/api/gateway.UplinkMessage     |
+| status               | st      | go.thethings.network/lorawan-stack/api/gateway.Status            |
+| server               | srv     | go.thethings.network/lorawan-stack/pkg/network-server.Server     |
+| EUI                  | eui     | go.thethings.network/lorawan-stack/pkg/types.DevEUI              |
 | ID                   | id      | string                                                        |
 | unique ID            | uid     | string                                                        |
 | counter              | cnt     | int                                                           |
@@ -186,7 +186,7 @@ meaning is obvious from the context.
 
 ### Comments
 
-Code should be as self-explanatory as possible. However, comments should be used to respect Go formatting guidelines, to generate insightful documentation with [Godoc](https://godoc.org/github.com/TheThingsNetwork/ttn), and to explain what can not be expressed by pure code. Comments should be English sentences, and documentation-generating comments should be closed by a period. Comments can also be used to indicate steps to take in the future (*TODOs*), if they reference the GitHub issue to track this *TODO*.
+Code should be as self-explanatory as possible. However, comments should be used to respect Go formatting guidelines, to generate insightful documentation with [Godoc](https://godoc.org/go.thethings.network/lorawan-stack), and to explain what can not be expressed by pure code. Comments should be English sentences, and documentation-generating comments should be closed by a period. Comments can also be used to indicate steps to take in the future (*TODOs*), if they reference the GitHub issue to track this *TODO*.
 
 + In **Go files**, comments should be added according to `golint` requirements and [Effective Go guidelines](https://golang.org/doc/effective_go.html#commentary), especially in regards to commenting exported packages, types and variables.
 

@@ -18,9 +18,9 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/TheThingsNetwork/ttn/pkg/gpstime"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	. "go.thethings.network/lorawan-stack/pkg/gpstime"
 )
 
 var (

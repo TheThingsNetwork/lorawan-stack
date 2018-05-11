@@ -17,7 +17,7 @@ package test
 import (
 	"math/rand"
 
-	"github.com/TheThingsNetwork/ttn/pkg/util/randutil"
+	"go.thethings.network/lorawan-stack/pkg/util/randutil"
 )
 
 // Randy is global rand, which is (mostly) safe for concurrent use.

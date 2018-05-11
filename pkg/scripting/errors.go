@@ -14,7 +14,7 @@
 
 package scripting
 
-import "github.com/TheThingsNetwork/ttn/pkg/errors"
+import "go.thethings.network/lorawan-stack/pkg/errors"
 
 // ErrRuntime represents the ErrDescriptor of the error returned when
 // there is a runtime error.

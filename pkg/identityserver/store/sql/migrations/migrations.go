@@ -14,7 +14,7 @@
 
 package migrations
 
-import "github.com/TheThingsNetwork/ttn/pkg/identityserver/db/migrations"
+import "go.thethings.network/lorawan-stack/pkg/identityserver/db/migrations"
 
 // Registry is the registry that contains all migrations
 var Registry = migrations.NewRegistry()

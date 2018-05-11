@@ -15,7 +15,7 @@
 package ttnpb
 
 import (
-	"github.com/TheThingsNetwork/ttn/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 // IsZero returns true if all identifiers have zero-values.

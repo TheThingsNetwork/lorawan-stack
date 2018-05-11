@@ -20,9 +20,9 @@ import (
 	"context"
 
 	lpp "github.com/TheThingsNetwork/go-cayenne-lib/cayennelpp"
-	"github.com/TheThingsNetwork/ttn/pkg/gogoproto"
-	"github.com/TheThingsNetwork/ttn/pkg/messageprocessors"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/gogoproto"
+	"go.thethings.network/lorawan-stack/pkg/messageprocessors"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 type host struct {

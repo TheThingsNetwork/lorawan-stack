@@ -21,8 +21,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/kr/pretty"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // Delay is the value, which can be used to slowdown the execution of time-dependent tests.

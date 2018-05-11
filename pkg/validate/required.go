@@ -19,7 +19,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 var errZeroValue = errors.New("variable is empty")

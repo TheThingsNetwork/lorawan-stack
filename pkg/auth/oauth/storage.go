@@ -18,8 +18,8 @@ import (
 	"time"
 
 	"github.com/RangelReale/osin"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 var clientSpecializer = func(base ttnpb.Client) store.Client {

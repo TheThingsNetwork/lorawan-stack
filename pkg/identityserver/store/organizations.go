@@ -14,7 +14,7 @@
 
 package store
 
-import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
 // Organization is the interface of all things that can be an organization. This
 // can be used to build richer organization types that can still be read and written

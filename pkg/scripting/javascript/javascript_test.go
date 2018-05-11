@@ -18,11 +18,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/scripting"
-	. "github.com/TheThingsNetwork/ttn/pkg/scripting/javascript"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/scripting"
+	. "go.thethings.network/lorawan-stack/pkg/scripting/javascript"
 )
 
 func TestRun(t *testing.T) {

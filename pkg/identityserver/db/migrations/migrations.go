@@ -14,7 +14,7 @@
 
 package migrations
 
-import "github.com/TheThingsNetwork/ttn/pkg/errors"
+import "go.thethings.network/lorawan-stack/pkg/errors"
 
 // Direction represents whether a migration is forwards or backwards.
 type Direction string

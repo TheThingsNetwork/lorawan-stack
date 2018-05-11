@@ -18,8 +18,8 @@ import (
 	"math"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/gpstime"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/gpstime"
 )
 
 // MACCommandIdentifier_uplinkLength gives the payload length of a MAC command in the uplink direction.

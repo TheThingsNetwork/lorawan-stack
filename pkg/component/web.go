@@ -19,9 +19,9 @@ import (
 	"net/http/pprof"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/web"
 	"github.com/labstack/echo"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/web"
 )
 
 // RegisterWeb registers a web subsystem to the component

@@ -20,11 +20,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errorcontext"
-	"github.com/TheThingsNetwork/ttn/pkg/util/rpctest"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/errorcontext"
+	"go.thethings.network/lorawan-stack/pkg/util/rpctest"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

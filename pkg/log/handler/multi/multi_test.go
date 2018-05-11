@@ -18,9 +18,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/log"
-	"github.com/TheThingsNetwork/ttn/pkg/log/handler/memory"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/log/handler/memory"
 )
 
 type Entry struct {

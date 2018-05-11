@@ -14,18 +14,18 @@
 
 syntax = "proto3";
 
-import "github.com/TheThingsNetwork/ttn/api/gateway.proto";
-import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
-import "github.com/TheThingsNetwork/ttn/api/lorawan.proto";
-import "github.com/TheThingsNetwork/ttn/api/messages.proto";
-import "github.com/TheThingsNetwork/ttn/api/metadata.proto";
+import "go.thethings.network/lorawan-stack/api/gateway.proto";
+import "go.thethings.network/lorawan-stack/api/identifiers.proto";
+import "go.thethings.network/lorawan-stack/api/lorawan.proto";
+import "go.thethings.network/lorawan-stack/api/messages.proto";
+import "go.thethings.network/lorawan-stack/api/metadata.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 // GatewayUp may contain zero or more uplink messages and/or a status message for the gateway.
 message GatewayUp {

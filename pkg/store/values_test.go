@@ -20,11 +20,11 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	. "github.com/TheThingsNetwork/ttn/pkg/store"
 	"github.com/gogo/protobuf/proto"
 	"github.com/tinylib/msgp/msgp"
 	"github.com/vmihailenco/msgpack"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	. "go.thethings.network/lorawan-stack/pkg/store"
 )
 
 type InterfaceStructA struct {

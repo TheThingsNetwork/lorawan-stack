@@ -23,11 +23,11 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors/grpcerrors"
-	"github.com/TheThingsNetwork/ttn/pkg/rpcmiddleware/rpclog"
-	"github.com/TheThingsNetwork/ttn/pkg/version"
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	"go.thethings.network/lorawan-stack/pkg/errors/grpcerrors"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/pkg/version"
 	"google.golang.org/grpc"
 )
 

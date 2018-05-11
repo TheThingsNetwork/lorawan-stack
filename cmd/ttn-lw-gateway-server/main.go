@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/TheThingsNetwork/ttn/cmd/ttn-lw-gateway-server/commands"
+	"go.thethings.network/lorawan-stack/cmd/ttn-lw-gateway-server/commands"
 )
 
 func main() {

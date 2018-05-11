@@ -19,8 +19,8 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/random"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/random"
 )
 
 const (

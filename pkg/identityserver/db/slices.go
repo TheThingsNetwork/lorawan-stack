@@ -19,7 +19,7 @@ import (
 	"encoding/json"
 	"reflect"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // Int32Slice is a type that wraps a int32 slice and implements sql.Scanner

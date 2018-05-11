@@ -17,14 +17,14 @@ package sql_test
 import (
 	"testing"
 
-	"github.com/TheThingsNetwork/ttn/pkg/errors"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store"
-	. "github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/store/sql/migrations"
-	"github.com/TheThingsNetwork/ttn/pkg/identityserver/test"
-	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
+	. "go.thethings.network/lorawan-stack/pkg/identityserver/store/sql"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql/migrations"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // userWithFoo implements both store.User and store.Attributer interfaces.

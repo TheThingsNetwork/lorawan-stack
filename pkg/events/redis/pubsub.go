@@ -19,8 +19,8 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/TheThingsNetwork/ttn/pkg/config"
-	"github.com/TheThingsNetwork/ttn/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"gopkg.in/redis.v5"
 )
 

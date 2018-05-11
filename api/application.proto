@@ -14,9 +14,9 @@
 
 syntax = "proto3";
 
-import "github.com/TheThingsNetwork/ttn/api/identifiers.proto";
-import "github.com/TheThingsNetwork/ttn/api/messages.proto";
-import "github.com/TheThingsNetwork/ttn/api/payload_formatter.proto";
+import "go.thethings.network/lorawan-stack/api/identifiers.proto";
+import "go.thethings.network/lorawan-stack/api/messages.proto";
+import "go.thethings.network/lorawan-stack/api/payload_formatter.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
@@ -24,7 +24,7 @@ import "google/protobuf/timestamp.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "github.com/TheThingsNetwork/ttn/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 // Application is the message that defines an application in the network.
 message Application {
