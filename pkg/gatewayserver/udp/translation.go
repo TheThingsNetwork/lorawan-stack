@@ -127,6 +127,10 @@ func convertUplink(data Data, rxIndex int, md UpstreamMetadata) (ttnpb.UplinkMes
 		up.DevEUI = &jrPayload.DevEUI
 		up.JoinEUI = &jrPayload.JoinEUI
 	}
+	if rrPayload := up.Payload.GetRejoinRequestPayload(); rrPayload != nil {
+		up.DevEUI = &rrPayload.DevEUI
+		up.JoinEUI = &rrPayload.JoinEUI
+	}
 
 	if rx.RSig != nil && len(rx.RSig) > 0 {
 		up.RxMetadata = fineTimestampMetadata(rx, md.ID)
