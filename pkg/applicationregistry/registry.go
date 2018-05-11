@@ -84,7 +84,7 @@ func FindApplicationByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers)
 		return nil, errors.New("Identifiers specified are nil")
 	}
 
-	fields := make([]string, 0, 5)
+	fields := []string{}
 	switch {
 	case id.ApplicationID != "":
 		fields = append(fields, "ApplicationIdentifiers.ApplicationID")
