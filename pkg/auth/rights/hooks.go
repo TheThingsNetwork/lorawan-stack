@@ -27,7 +27,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-type organizationIDGetter interface {
+type OrganizationIDGetter interface {
 	GetOrganizationID() string
 }
 
@@ -35,7 +35,7 @@ type ApplicationIDGetter interface {
 	GetApplicationID() string
 }
 
-type gatewayIDGetter interface {
+type GatewayIDGetter interface {
 	GetGatewayID() string
 }
 
@@ -121,7 +121,7 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 				return nil, errors.New("No Identity Server to connect to")
 			}
 
-			if m, ok := req.(organizationIDGetter); ok {
+			if m, ok := req.(OrganizationIDGetter); ok {
 				orgIDs := &ttnpb.OrganizationIdentifiers{
 					OrganizationID: m.GetOrganizationID(),
 				}
@@ -171,7 +171,7 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 				}
 			}
 
-			if m, ok := req.(gatewayIDGetter); ok {
+			if m, ok := req.(GatewayIDGetter); ok {
 				gtwIDs := &ttnpb.GatewayIdentifiers{
 					GatewayID: m.GetGatewayID(),
 				}

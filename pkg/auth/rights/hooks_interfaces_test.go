@@ -17,8 +17,8 @@ package rights
 import "github.com/TheThingsNetwork/ttn/pkg/ttnpb"
 
 var (
-	_ organizationIDGetter = new(ttnpb.OrganizationIdentifiers)
+	_ OrganizationIDGetter = new(ttnpb.OrganizationIdentifiers)
 	_ ApplicationIDGetter  = new(ttnpb.ApplicationIdentifiers)
 	_ ApplicationIDGetter  = new(ttnpb.EndDeviceIdentifiers)
-	_ gatewayIDGetter      = new(ttnpb.GatewayIdentifiers)
+	_ GatewayIDGetter      = new(ttnpb.GatewayIdentifiers)
 )
