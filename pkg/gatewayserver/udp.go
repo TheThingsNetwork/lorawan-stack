@@ -74,42 +74,47 @@ func (g *GatewayServer) runUDPBridge(ctx context.Context, udpConn *net.UDPConn) 
 			logger.WithError(err).Error("Could not acknowledge incoming packet")
 		}
 
-		gtwIDs := ttnpb.GatewayIdentifiers{EUI: packet.GatewayEUI}
-
-		gatewayConnection, ok := udpGateways[*gtwIDs.EUI]
+		gatewayConnection, ok := udpGateways[*packet.GatewayEUI]
 		if !ok {
 			gatewayConnection = &udpConnection{}
-			udpGateways[*gtwIDs.EUI] = gatewayConnection
+			udpGateways[*packet.GatewayEUI] = gatewayConnection
 		}
 
-		logger.WithField("packet_type", packet.PacketType.String()).Debug("Received packet")
+		go g.handleUpstreamUDPMessage(ctx, packet, gatewayConnection)
+	}
+}
 
-		switch packet.PacketType {
-		case udp.PullData:
-			go g.processPullData(ctx, packet, gatewayConnection)
-		case udp.PushData:
-			if packet.Data == nil {
-				continue
-			}
+func (g *GatewayServer) handleUpstreamUDPMessage(ctx context.Context, packet *udp.Packet, gateway *udpConnection) {
+	logger := log.FromContext(ctx)
+	logger.WithField("packet_type", packet.PacketType.String()).Debug("Received packet")
 
-			gtw := gatewayConnection.gateway()
-			if gtw != nil {
-				gtwIDs.GatewayID = gtw.GetGatewayID()
-			}
+	gtwIDs := ttnpb.GatewayIdentifiers{EUI: packet.GatewayEUI}
 
-			upstream, err := udp.TranslateUpstream(*packet.Data, udp.UpstreamMetadata{
-				ID: gtwIDs,
-				IP: packet.GatewayAddr.IP.String(),
-			})
-			if err != nil {
-				logger.WithError(err).Error("Could not translate incoming packet")
-				continue
-			}
-
-			g.handleUpstreamMessage(ctx, gatewayConnection, upstream)
-		case udp.TxAck:
-			logger.Debug("Received downlink reception confirmation")
+	switch packet.PacketType {
+	case udp.PullData:
+		g.processPullData(ctx, packet, gateway)
+	case udp.PushData:
+		if packet.Data == nil {
+			return
 		}
+
+		gtw := gateway.gateway()
+		if gtw != nil {
+			gtwIDs.GatewayID = gtw.GetGatewayID()
+		}
+
+		upstream, err := udp.TranslateUpstream(*packet.Data, udp.UpstreamMetadata{
+			ID: gtwIDs,
+			IP: packet.GatewayAddr.IP.String(),
+		})
+		if err != nil {
+			logger.WithError(err).Error("Could not translate incoming packet")
+			return
+		}
+
+		g.handleUpstreamMessage(ctx, gateway, upstream)
+	case udp.TxAck:
+		logger.Debug("Received downlink reception confirmation")
 	}
 }
 
