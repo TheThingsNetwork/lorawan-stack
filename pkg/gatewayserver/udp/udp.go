@@ -91,7 +91,7 @@ func (c *Conn) Read() (*Packet, error) {
 func (c *Conn) Write(packet *Packet) error {
 	buf, err := packet.MarshalBinary()
 	if err != nil {
-		return err
+		return ErrMarshalFailed.New(nil)
 	}
 
 	addr, hasAddr := c.addrStore.GetDownlinkAddress(*packet.GatewayEUI)
@@ -119,7 +119,7 @@ func (p *Packet) Ack() error {
 
 	binaryAckPacket, err := ackPacket.MarshalBinary()
 	if err != nil {
-		return errors.NewWithCause(err, "failed to convert ack packet to binary format")
+		return ErrMarshalFailed.NewWithCause(nil, err)
 	}
 
 	_, err = p.GatewayConn.WriteToUDP(binaryAckPacket, p.GatewayAddr)

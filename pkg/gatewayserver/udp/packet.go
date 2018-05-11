@@ -19,7 +19,6 @@ import (
 	"io"
 	"net"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
@@ -126,13 +125,13 @@ func (p *Packet) UnmarshalBinary(b []byte) (err error) {
 
 	if p.PacketType.HasGatewayEUI() {
 		if len(b) < i+8 {
-			return errors.New("Packet is not long enough to contain the gateway EUI")
+			return ErrUnmarshalFailed.NewWithCause(nil, ErrTooSmallToHaveGatewayEUI.New(nil))
 		}
 
 		p.GatewayEUI = new(types.EUI64)
 		err = p.GatewayEUI.UnmarshalBinary(b[i : i+8])
 		if err != nil {
-			return errors.NewWithCause(err, "failed to unmarshal gateway EUI")
+			return ErrUnmarshalFailed.NewWithCause(nil, err)
 		}
 		i += 8
 	}

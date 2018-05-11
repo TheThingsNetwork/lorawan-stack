@@ -26,14 +26,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/version"
 )
 
-const upstreamBufferSize = 32 * 1024 // Size of the uplink buffer
-
-var (
-	upstreamBuffer = make([]byte, upstreamBufferSize)
-	ttnVersions    = map[string]string{
-		"ttn-gateway-server": version.TTN,
-	}
-)
+var ttnVersions = map[string]string{
+	"ttn-gateway-server": version.TTN,
+}
 
 // UpstreamMetadata related to an uplink.
 type UpstreamMetadata struct {
@@ -118,12 +113,12 @@ func convertUplink(data Data, rxIndex int, md UpstreamMetadata) (ttnpb.UplinkMes
 
 	rawPayload, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(rx.Data, "="))
 	if err != nil {
-		return up, errors.NewWithCause(err, "Could not decode RX packet payload from base64 format")
+		return up, ErrDecodingPayloadFromBase64.NewWithCause(nil, err)
 	}
 
 	up.RawPayload = rawPayload
 	if err := up.Payload.UnmarshalLoRaWAN(rawPayload); err != nil {
-		return up, err
+		return up, ErrUnmarshalFailed.NewWithCause(nil, err)
 	}
 	if macPayload := up.Payload.GetMACPayload(); macPayload != nil {
 		up.DevAddr = &macPayload.FHDR.DevAddr
@@ -153,17 +148,17 @@ func convertUplink(data Data, rxIndex int, md UpstreamMetadata) (ttnpb.UplinkMes
 
 		sf, err := rx.DatR.SpreadingFactor()
 		if err != nil {
-			return up, errors.NewWithCause(err, "Could not parse spreading factor")
+			return up, ErrParsingSpreadingFactor.NewWithCause(nil, err)
 		}
 		up.Settings.SpreadingFactor = uint32(sf)
 		if up.Settings.Bandwidth, err = rx.DatR.Bandwidth(); err != nil {
-			return up, errors.NewWithCause(err, "Could not parse bandwidth")
+			return up, ErrParsingBandwidth.NewWithCause(nil, err)
 		}
 	case "FSK":
 		up.Settings.Modulation = ttnpb.Modulation_FSK
 		up.Settings.BitRate = rx.DatR.FSK
 	default:
-		return up, errors.New("Unknown modulation")
+		return up, ErrUnknownModulation.New(nil)
 	}
 
 	return up, nil
@@ -254,7 +249,7 @@ func insertDownlink(data *Data, downlink ttnpb.DownlinkMessage) (err error) {
 	if payload == nil {
 		var err error
 		if payload, err = downlink.GetPayload().MarshalLoRaWAN(); err != nil {
-			return err
+			return ErrMarshalFailed.NewWithCause(nil, err)
 		}
 	}
 
@@ -280,7 +275,7 @@ func insertDownlink(data *Data, downlink ttnpb.DownlinkMessage) (err error) {
 		data.TxPacket.Modu = "FSK"
 		data.TxPacket.DatR.FSK = downlink.Settings.BitRate
 	default:
-		return errors.New("Unknown modulation")
+		return ErrUnknownModulation.New(nil)
 	}
 
 	return nil
