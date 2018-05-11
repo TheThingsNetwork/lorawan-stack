@@ -26,8 +26,25 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/version"
 )
 
-var ttnVersions = map[string]string{
-	"ttn-gateway-server": version.TTN,
+var (
+	ttnVersions = map[string]string{
+		"ttn-gateway-server": version.TTN,
+	}
+	invalidLocations = []ttnpb.Location{
+		{Latitude: 0.0, Longitude: 0.0},
+		{Latitude: 10.0, Longitude: 20.0},
+	}
+)
+
+func validLocation(loc ttnpb.Location) bool {
+	for _, invalidLoc := range invalidLocations {
+		if (loc.Latitude > invalidLoc.Latitude-0.5 && loc.Latitude < invalidLoc.Latitude+0.5) &&
+			(loc.Longitude > invalidLoc.Longitude-0.5 && loc.Longitude < invalidLoc.Longitude+0.5) {
+			return false
+		}
+	}
+
+	return true
 }
 
 // UpstreamMetadata related to an uplink.
@@ -212,11 +229,12 @@ func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 	}
 
 	if stat.Lati != nil && stat.Long != nil {
-		status.AntennasLocation = []*ttnpb.Location{
-			{Latitude: float32(*stat.Lati), Longitude: float32(*stat.Long)},
-		}
+		loc := &ttnpb.Location{Latitude: float32(*stat.Lati), Longitude: float32(*stat.Long)}
 		if stat.Alti != nil {
-			status.AntennasLocation[0].Altitude = *stat.Alti
+			loc.Altitude = *stat.Alti
+		}
+		if validLocation(*loc) {
+			status.AntennasLocation = []*ttnpb.Location{loc}
 		}
 	}
 
