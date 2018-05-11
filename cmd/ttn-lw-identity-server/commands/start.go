@@ -33,10 +33,10 @@ var (
 
 			is, err := identityserver.New(c, config.IS)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not create identity server")
+				return errors.NewWithCause(err, "Could not create Identity Server")
 			}
 
-			logger.Info("Starting identity server...")
+			logger.Info("Starting Identity Server...")
 			return is.Run()
 		},
 	}

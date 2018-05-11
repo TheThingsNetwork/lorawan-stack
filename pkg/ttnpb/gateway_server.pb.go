@@ -843,7 +843,7 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for GtwGs service
 
 type GtwGsClient interface {
-	// Link the gateway to the gateway server. The authentication information will
+	// Link the gateway to the Gateway Server. The authentication information will
 	// be used to determine the gateway ID. If no authentication information is present,
 	// this gateway may not be used for downlink.
 	Link(ctx context.Context, opts ...grpc.CallOption) (GtwGs_LinkClient, error)
@@ -902,7 +902,7 @@ func (c *gtwGsClient) GetFrequencyPlan(ctx context.Context, in *GetFrequencyPlan
 // Server API for GtwGs service
 
 type GtwGsServer interface {
-	// Link the gateway to the gateway server. The authentication information will
+	// Link the gateway to the Gateway Server. The authentication information will
 	// be used to determine the gateway ID. If no authentication information is present,
 	// this gateway may not be used for downlink.
 	Link(GtwGs_LinkServer) error
@@ -981,8 +981,8 @@ var _GtwGs_serviceDesc = grpc.ServiceDesc{
 // Client API for NsGs service
 
 type NsGsClient interface {
-	// ScheduleDownlink instructs the gateway server to schedule a downlink message.
-	// The gateway server may refuse if there are any conflicts in the schedule or
+	// ScheduleDownlink instructs the Gateway Server to schedule a downlink message.
+	// The Gateway Server may refuse if there are any conflicts in the schedule or
 	// if a duty cycle prevents the gateway from transmitting.
 	ScheduleDownlink(ctx context.Context, in *DownlinkMessage, opts ...grpc.CallOption) (*google_protobuf3.Empty, error)
 }
@@ -1007,8 +1007,8 @@ func (c *nsGsClient) ScheduleDownlink(ctx context.Context, in *DownlinkMessage, 
 // Server API for NsGs service
 
 type NsGsServer interface {
-	// ScheduleDownlink instructs the gateway server to schedule a downlink message.
-	// The gateway server may refuse if there are any conflicts in the schedule or
+	// ScheduleDownlink instructs the Gateway Server to schedule a downlink message.
+	// The Gateway Server may refuse if there are any conflicts in the schedule or
 	// if a duty cycle prevents the gateway from transmitting.
 	ScheduleDownlink(context.Context, *DownlinkMessage) (*google_protobuf3.Empty, error)
 }

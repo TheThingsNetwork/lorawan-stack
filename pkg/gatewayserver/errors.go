@@ -17,15 +17,15 @@ package gatewayserver
 import "go.thethings.network/lorawan-stack/pkg/errors"
 
 var (
-	// ErrNoNetworkServerFound is returned if no network server was found for a passed DevAddr.
+	// ErrNoNetworkServerFound is returned if no Network Server was found for a passed DevAddr.
 	ErrNoNetworkServerFound = &errors.ErrDescriptor{
-		MessageFormat: "No network server found for this message",
+		MessageFormat: "No Network Server found for this message",
 		Code:          1,
 		Type:          errors.NotFound,
 	}
-	// ErrNoIdentityServerFound is returned if no identity server was found.
+	// ErrNoIdentityServerFound is returned if no Identity Server was found.
 	ErrNoIdentityServerFound = &errors.ErrDescriptor{
-		MessageFormat: "No identity server found",
+		MessageFormat: "No Identity Server found",
 		Code:          2,
 		Type:          errors.NotFound,
 	}

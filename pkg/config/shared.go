@@ -52,11 +52,11 @@ type Cluster struct {
 	Join              []string `name:"join" description:"Addresses of cluster peers to join"`
 	Name              string   `name:"name" description:"Name of the current cluster peer (default: $HOSTNAME)"`
 	Address           string   `name:"address" description:"Address to use for cluster communication"`
-	IdentityServer    string   `name:"identity-server" description:"Address for the identity server"`
-	GatewayServer     string   `name:"gateway-server" description:"Address for the gateway server"`
-	NetworkServer     string   `name:"network-server" description:"Address for the network server"`
-	ApplicationServer string   `name:"application-server" description:"Address for the application server"`
-	JoinServer        string   `name:"join-server" description:"Address for the join server"`
+	IdentityServer    string   `name:"identity-server" description:"Address for the Identity Server"`
+	GatewayServer     string   `name:"gateway-server" description:"Address for the Gateway Server"`
+	NetworkServer     string   `name:"network-server" description:"Address for the Network Server"`
+	ApplicationServer string   `name:"application-server" description:"Address for the Application Server"`
+	JoinServer        string   `name:"join-server" description:"Address for the Join Server"`
 	TLS               bool     `name:"tls" description:"Do cluster gRPC over TLS"`
 }
 

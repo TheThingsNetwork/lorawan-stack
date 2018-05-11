@@ -47,14 +47,14 @@ var (
 
 			is, err := identityserver.New(c, initConfig.IS)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not create identity server")
+				return errors.NewWithCause(err, "Could not create Identity Server")
 			}
 
 			logger.Info("Initializing Identity Server...")
 
 			err = is.Init(initConfig.InitialData)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not initialize identity server")
+				return errors.NewWithCause(err, "Could not initialize Identity Server")
 			}
 
 			logger.Info("Identity Server initialized")

@@ -79,7 +79,7 @@ message DownlinkQueueRequest {
   EndDeviceIdentifiers end_device = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 }
 
-// The NsApplicationDownlinkQueue service allows management of the application-layer downlink queue on the network server.
+// The NsApplicationDownlinkQueue service allows management of the application-layer downlink queue on the Network Server.
 service NsApplicationDownlinkQueue {
   rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty);
   rpc DownlinkQueuePush(DownlinkQueueRequest) returns (google.protobuf.Empty);
@@ -87,7 +87,7 @@ service NsApplicationDownlinkQueue {
   rpc DownlinkQueueClear(EndDeviceIdentifiers) returns (google.protobuf.Empty);
 }
 
-// The AsApplicationDownlinkQueue service allows management of the application-layer downlink queue on the application server.
+// The AsApplicationDownlinkQueue service allows management of the application-layer downlink queue on the Application Server.
 service AsApplicationDownlinkQueue {
   rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {

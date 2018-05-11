@@ -34,7 +34,7 @@ message SetDeviceRequest{
   google.protobuf.FieldMask field_mask = 2;
 }
 
-// The NsDeviceRegistry service allows clients to manage their end devices on the network server
+// The NsDeviceRegistry service allows clients to manage their end devices on the Network Server
 service NsDeviceRegistry {
   // ListDevices returns the devices that match the given identifiers
   rpc ListDevices(EndDeviceIdentifiers) returns (EndDevices) {
@@ -72,7 +72,7 @@ service NsDeviceRegistry {
   };
 }
 
-// The AsDeviceRegistry service allows clients to manage their end devices on the application server
+// The AsDeviceRegistry service allows clients to manage their end devices on the Application Server
 service AsDeviceRegistry {
   // ListDevices returns the devices that match the given identifiers
   rpc ListDevices(EndDeviceIdentifiers) returns (EndDevices) {
@@ -110,7 +110,7 @@ service AsDeviceRegistry {
   };
 }
 
-// The JsDeviceRegistry service allows clients to manage their end devices on the join server
+// The JsDeviceRegistry service allows clients to manage their end devices on the Join Server
 service JsDeviceRegistry {
   // ListDevices returns the devices that match the given identifiers
   rpc ListDevices(EndDeviceIdentifiers) returns (EndDevices) {

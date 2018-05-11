@@ -29,11 +29,11 @@ type JoinRequest struct {
 	// LoRaWAN Payload
 	Payload Message `protobuf:"bytes,2,opt,name=payload" json:"payload"`
 	// End device identifiers
-	// - this includes the DevAddr assigned by the network server
+	// - this includes the DevAddr assigned by the Network Server
 	EndDeviceIdentifiers `protobuf:"bytes,3,opt,name=end_device,json=endDevice,embedded=end_device" json:"end_device"`
-	// MAC version selected by the network server
+	// MAC version selected by the Network Server
 	SelectedMacVersion MACVersion `protobuf:"varint,4,opt,name=selected_mac_version,json=selectedMacVersion,proto3,enum=ttn.lorawan.v3.MACVersion" json:"selected_mac_version,omitempty"`
-	// NetID of the accepting network server
+	// NetID of the accepting Network Server
 	NetID go_thethings_network_lorawan_stack_pkg_types.NetID `protobuf:"bytes,5,opt,name=net_id,json=netId,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.NetID" json:"net_id"`
 	// Downlink Settings
 	DownlinkSettings DLSettings `protobuf:"bytes,6,opt,name=downlink_settings,json=downlinkSettings" json:"downlink_settings"`

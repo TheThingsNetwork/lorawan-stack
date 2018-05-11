@@ -57,7 +57,7 @@ func TestGatewayServer(t *testing.T) {
 	}}})
 	gs, err := gatewayserver.New(c, gatewayserver.Config{})
 	if !a.So(err, should.BeNil) {
-		logger.Fatal("Gateway server could not start")
+		logger.Fatal("Gateway Server could not start")
 	}
 
 	roles := gs.Roles()

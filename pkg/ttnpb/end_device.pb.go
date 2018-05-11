@@ -580,7 +580,7 @@ func (m *MACSettings) GetADRMargin() uint32 {
 }
 
 // MAC State of the device (active or desired)
-// This is used internally by the network server and is read only
+// This is used internally by the Network Server and is read only
 type MACState struct {
 	// Currently used maximum transmission power
 	MaxTxPower uint32 `protobuf:"varint,2,opt,name=max_tx_power,json=maxTxPower,proto3" json:"max_tx_power,omitempty"`

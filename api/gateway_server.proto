@@ -93,9 +93,9 @@ message GetFrequencyPlanRequest {
   string frequency_plan_id = 1 [(gogoproto.customname) = "FrequencyPlanID"];
 }
 
-// The GtwGs service connects a gateway to a gateway server.
+// The GtwGs service connects a gateway to a Gateway Server.
 service GtwGs {
-  // Link the gateway to the gateway server. The authentication information will
+  // Link the gateway to the Gateway Server. The authentication information will
   // be used to determine the gateway ID. If no authentication information is present,
   // this gateway may not be used for downlink.
   rpc Link(stream GatewayUp) returns (stream GatewayDown);
@@ -103,10 +103,10 @@ service GtwGs {
   rpc GetFrequencyPlan(GetFrequencyPlanRequest) returns (FrequencyPlan);
 }
 
-// The NsGs service connects a network server to a gateway server.
+// The NsGs service connects a Network Server to a Gateway Server.
 service NsGs {
-  // ScheduleDownlink instructs the gateway server to schedule a downlink message.
-  // The gateway server may refuse if there are any conflicts in the schedule or
+  // ScheduleDownlink instructs the Gateway Server to schedule a downlink message.
+  // The Gateway Server may refuse if there are any conflicts in the schedule or
   // if a duty cycle prevents the gateway from transmitting.
   rpc ScheduleDownlink(DownlinkMessage) returns (google.protobuf.Empty);
 }

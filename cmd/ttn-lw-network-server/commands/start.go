@@ -40,11 +40,11 @@ var (
 
 			ns, err := networkserver.New(c, &config.NS)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not create network server")
+				return errors.NewWithCause(err, "Could not create Network Server")
 			}
 			_ = ns
 
-			logger.Info("Starting network server...")
+			logger.Info("Starting Network Server...")
 			return c.Run()
 		},
 	}

@@ -49,30 +49,30 @@ var (
 
 			_, err = identityserver.New(c, config.IS)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not create identity server")
+				return errors.NewWithCause(err, "Could not create Identity Server")
 			}
 
 			gs, err := gatewayserver.New(c, config.GS)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not create gateway server")
+				return errors.NewWithCause(err, "Could not create Gateway Server")
 			}
 			_ = gs
 
 			ns, err := networkserver.New(c, &config.NS)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not create network server")
+				return errors.NewWithCause(err, "Could not create Network Server")
 			}
 			_ = ns
 
 			as, err := applicationserver.New(c, &config.AS)
 			if err != nil {
-				return errors.NewWithCause(err, "Coult not create application server")
+				return errors.NewWithCause(err, "Could not create Application Server")
 			}
 			_ = as
 
 			js, err := joinserver.New(c, &config.JS)
 			if err != nil {
-				return errors.NewWithCause(err, "Coult not create join server")
+				return errors.NewWithCause(err, "Could not create Join Server")
 			}
 			_ = js
 

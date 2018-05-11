@@ -60,7 +60,7 @@ type Gateway struct {
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	// frequency_plan_id indicates the ID of the frequency plan.
 	FrequencyPlanID string `protobuf:"bytes,3,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
-	// cluster_address indicates the URI of the gateway server cluster to connect to,
+	// cluster_address indicates the URI of the Gateway Server cluster to connect to,
 	// in a "<ip>:<port>" format.
 	ClusterAddress string `protobuf:"bytes,4,opt,name=cluster_address,json=clusterAddress,proto3" json:"cluster_address,omitempty"`
 	// antennas contains the information for every antenna of the gateway.
@@ -460,7 +460,7 @@ func (m *GatewayStatus) GetAdvanced() *google_protobuf1.Struct {
 	return nil
 }
 
-// GatewayObservations as observed by the gateway server
+// GatewayObservations as observed by the Gateway Server
 type GatewayObservations struct {
 	// Time when the last uplink message was received
 	LastUplinkReceivedAt *time.Time `protobuf:"bytes,1,opt,name=last_uplink_received_at,json=lastUplinkReceivedAt,stdtime" json:"last_uplink_received_at,omitempty"`

@@ -165,14 +165,14 @@ var (
 		Code:          21,
 	}
 
-	// ErrCorruptRegistry represents error ocurring when join server registry is corrupted.
+	// ErrCorruptRegistry represents error ocurring when Join Server registry is corrupted.
 	ErrCorruptRegistry = &errors.ErrDescriptor{
 		MessageFormat: "Registry is corrupt",
 		Type:          errors.Internal,
 		Code:          22,
 	}
 
-	// ErrMACVersionMismatch represents error ocurring when selected MAC version does not match version stored in join server registry.
+	// ErrMACVersionMismatch represents error ocurring when selected MAC version does not match version stored in Join Server registry.
 	ErrMACVersionMismatch = &errors.ErrDescriptor{
 		MessageFormat: "Device MAC version mismatch, in registry: {registered}, selected: {selected}",
 		Type:          errors.Internal,

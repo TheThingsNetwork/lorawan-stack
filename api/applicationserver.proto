@@ -60,7 +60,7 @@ service AsApplicationRegistry {
   };
 }
 
-// The As service connects an application or integration to an application server.
+// The As service connects an application or integration to an Application Server.
 service As {
   rpc Subscribe(ApplicationIdentifiers) returns (stream ApplicationUp);
 }

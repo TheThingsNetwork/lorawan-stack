@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// ttn-lw-identity-server is the binary that runs the identity server of The Things Network Stack for LoRaWAN.
+// ttn-lw-identity-server is the binary that runs the Identity Server of The Things Network Stack for LoRaWAN.
 package main
 
 import (

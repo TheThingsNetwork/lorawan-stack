@@ -53,7 +53,7 @@ var (
 		Code:          5,
 	}
 
-	// ErrCorruptRegistry represents error ocurring when network server registry is corrupt.
+	// ErrCorruptRegistry represents error ocurring when Network Server registry is corrupt.
 	ErrCorruptRegistry = &errors.ErrDescriptor{
 		MessageFormat: "Registry is corrupt",
 		Type:          errors.Internal,

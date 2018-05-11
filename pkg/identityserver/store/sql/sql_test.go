@@ -60,7 +60,7 @@ func testStore(t testing.TB, database string) *store.Store {
 func cleanStore(t testing.TB, database string) *store.Store {
 	uri := fmt.Sprintf(address, database)
 	logger := test.GetLogger(t).WithFields(log.Fields(
-		"namespace", "identity server",
+		"namespace", "Identity Server",
 		"connection_uri", uri,
 	))
 

@@ -33,11 +33,11 @@ var (
 
 			gs, err := gatewayserver.New(c, config.GS)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not create gateway server")
+				return errors.NewWithCause(err, "Could not create Gateway Server")
 			}
 			_ = gs
 
-			logger.Info("Starting gateway server...")
+			logger.Info("Starting Gateway Server...")
 			return c.Run()
 		},
 	}

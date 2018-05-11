@@ -299,7 +299,7 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 	ttnpb.RegisterIsOrganizationHandler(is.Context(), s, conn)
 }
 
-// Roles returns the roles that the identity server fulfils
+// Roles returns the roles that the Identity Server fulfils
 func (is *IdentityServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_IDENTITY_SERVER}
 }

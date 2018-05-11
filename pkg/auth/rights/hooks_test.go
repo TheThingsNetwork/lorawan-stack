@@ -73,7 +73,7 @@ func TestUnaryHook(t *testing.T) {
 	isConfig.DatabaseURI = databaseURI
 	is, err := identityserver.New(c, isConfig)
 	if !a.So(err, should.BeNil) {
-		t.Fatal("Failed to create an identity server instance")
+		t.Fatal("Failed to create an Identity Server instance")
 	}
 
 	err = is.Init(identityserver.InitialData{
@@ -89,7 +89,7 @@ func TestUnaryHook(t *testing.T) {
 		},
 	})
 	if !a.So(err, should.BeNil) {
-		t.Fatal("Failed to initialize identity server")
+		t.Fatal("Failed to initialize Identity Server")
 	}
 
 	srv := rpcserver.New(context.Background())
@@ -97,7 +97,7 @@ func TestUnaryHook(t *testing.T) {
 
 	conn, err := rpcserver.StartLoopback(context.Background(), srv.Server)
 	if !a.So(err, should.BeNil) {
-		t.Fatal("Failed to start gRPC services of the identity server")
+		t.Fatal("Failed to start gRPC services of the Identity Server")
 	}
 	defer srv.Stop()
 

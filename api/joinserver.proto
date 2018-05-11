@@ -41,7 +41,7 @@ message NwkSKeysResponse {
   KeyEnvelope nwk_s_enc_key = 3 [(gogoproto.nullable) = false];
 }
 
-// The NsJs service connects a network server to a join server.
+// The NsJs service connects a Network Server to a Join Server.
 service NsJs {
   rpc HandleJoin(JoinRequest) returns (JoinResponse);
   rpc GetNwkSKeys(SessionKeyRequest) returns (NwkSKeysResponse);
@@ -52,7 +52,7 @@ message AppSKeyResponse {
   KeyEnvelope app_s_key = 1 [(gogoproto.nullable) = false];
 }
 
-// The AsJs service connects an application server to a join server.
+// The AsJs service connects an Application Server to a Join Server.
 service AsJs {
   rpc GetAppSKey(SessionKeyRequest) returns (AppSKeyResponse);
 }

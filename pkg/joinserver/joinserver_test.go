@@ -462,7 +462,7 @@ func TestHandleJoin(t *testing.T) {
 			},
 			nil,
 			ErrAddressMismatch.New(errors.Attributes{
-				"component": "network server",
+				"component": "Network Server",
 			}),
 		},
 		{
@@ -1127,7 +1127,7 @@ func TestGetAppSKey(t *testing.T) {
 			},
 			nil,
 			ErrAddressMismatch.New(errors.Attributes{
-				"component": "application server",
+				"component": "Application Server",
 			}),
 		},
 	} {
@@ -1371,7 +1371,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			},
 			nil,
 			ErrAddressMismatch.New(errors.Attributes{
-				"component": "network server",
+				"component": "Network Server",
 			}),
 		},
 	} {

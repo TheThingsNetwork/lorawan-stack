@@ -40,11 +40,11 @@ var (
 
 			as, err := applicationserver.New(c, &config.AS)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not start application server")
+				return errors.NewWithCause(err, "Could not start Application Server")
 			}
 			_ = as
 
-			logger.Info("Starting application server...")
+			logger.Info("Starting Application Server...")
 			return c.Run()
 		},
 	}

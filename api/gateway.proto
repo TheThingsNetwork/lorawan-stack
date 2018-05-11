@@ -36,7 +36,7 @@ message Gateway {
   // frequency_plan_id indicates the ID of the frequency plan.
   string frequency_plan_id = 3 [(gogoproto.customname) = "FrequencyPlanID"];
 
-  // cluster_address indicates the URI of the gateway server cluster to connect to,
+  // cluster_address indicates the URI of the Gateway Server cluster to connect to,
   // in a "<ip>:<port>" format.
   string cluster_address = 4;
 
@@ -191,7 +191,7 @@ message GatewayStatus {
   google.protobuf.Struct advanced = 99;
 }
 
-// GatewayObservations as observed by the gateway server
+// GatewayObservations as observed by the Gateway Server
 message GatewayObservations {
   // Time when the last uplink message was received
   google.protobuf.Timestamp last_uplink_received_at = 1 [(gogoproto.stdtime) = true];

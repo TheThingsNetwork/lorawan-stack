@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// ttn-lw-gateway-server is the binary that runs the gateway server of The Things Network Stack for LoRaWAN.
+// ttn-lw-gateway-server is the binary that runs the Gateway Server of The Things Network Stack for LoRaWAN.
 package main
 
 import (

@@ -23,7 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/validate"
 )
 
-// ScheduleDownlink on a gateway connected to this gateway server.
+// ScheduleDownlink on a gateway connected to this Gateway Server.
 //
 // This request requires the GatewayIdentifier to have a GatewayID.
 func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*types.Empty, error) {

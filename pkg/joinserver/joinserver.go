@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package joinserver provides a LoRaWAN 1.1-compliant join server implementation.
+// Package joinserver provides a LoRaWAN 1.1-compliant Join Server implementation.
 package joinserver
 
 import (
@@ -39,9 +39,9 @@ var supportedMACVersions = [...]ttnpb.MACVersion{
 	ttnpb.MAC_V1_1,
 }
 
-// JoinServer implements the join server component.
+// JoinServer implements the Join Server component.
 //
-// The join server exposes the NsJs and DeviceRegistry services.
+// The Join Server exposes the NsJs and DeviceRegistry services.
 type JoinServer struct {
 	*component.Component
 	*deviceregistry.RegistryRPC
@@ -94,7 +94,7 @@ func checkMIC(key types.AES128Key, rawPayload []byte) error {
 	return nil
 }
 
-// HandleJoin is called by the network server to join a device
+// HandleJoin is called by the Network Server to join a device
 func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (resp *ttnpb.JoinResponse, err error) {
 	ver := req.GetSelectedMacVersion()
 
@@ -167,7 +167,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.GetNetworkServerAddress() {
 		return nil, ErrAddressMismatch.New(errors.Attributes{
-			"component": "network server",
+			"component": "Network Server",
 		})
 	}
 
@@ -368,7 +368,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 
 	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.ApplicationServerAddress {
 		return nil, ErrAddressMismatch.New(errors.Attributes{
-			"component": "application server",
+			"component": "Application Server",
 		})
 	}
 
@@ -411,7 +411,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 
 	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.NetworkServerAddress {
 		return nil, ErrAddressMismatch.New(errors.Attributes{
-			"component": "network server",
+			"component": "Network Server",
 		})
 	}
 

@@ -65,9 +65,9 @@ func (c *connection) Send(down *ttnpb.GatewayDown) (err error) {
 	return nil
 }
 
-// GatewayServer implements the gateway server component.
+// GatewayServer implements the Gateway Server component.
 //
-// The gateway server exposes the Gs, GtwGs and NsGs services.
+// The Gateway Server exposes the Gs, GtwGs and NsGs services.
 type GatewayServer struct {
 	*component.Component
 
@@ -107,7 +107,7 @@ func (gs *GatewayServer) RegisterServices(s *grpc.Server) {
 // RegisterHandlers registers gRPC handlers.
 func (gs *GatewayServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {}
 
-// Roles returns the roles that the gateway server fulfils
+// Roles returns the roles that the Gateway Server fulfils
 func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_GATEWAY_SERVER}
 }
@@ -137,7 +137,7 @@ func (conn *connection) addDownstreamObservations(down *ttnpb.GatewayDown) {
 	conn.observationsMu.Unlock()
 }
 
-// GetGatewayObservations returns gateway information as observed by the gateway server.
+// GetGatewayObservations returns gateway information as observed by the Gateway Server.
 func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
 	if !gs.config.DisableAuth && !ttnpb.IncludesRights(rights.FromContext(ctx), ttnpb.RIGHT_GATEWAY_STATUS_READ) {
 		return nil, ErrPermissionDenied.New(nil)

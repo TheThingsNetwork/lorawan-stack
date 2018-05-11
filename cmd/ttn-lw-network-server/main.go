@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// ttn-lw-network-server is the binary that runs the network server of The Things Network Stack for LoRaWAN.
+// ttn-lw-network-server is the binary that runs the Network Server of The Things Network Stack for LoRaWAN.
 package main
 
 import (

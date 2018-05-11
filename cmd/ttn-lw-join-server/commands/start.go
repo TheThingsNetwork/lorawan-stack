@@ -40,11 +40,11 @@ var (
 
 			js, err := joinserver.New(c, &config.JS)
 			if err != nil {
-				return errors.NewWithCause(err, "Coult not create join server")
+				return errors.NewWithCause(err, "Coult not create Join Server")
 			}
 			_ = js
 
-			logger.Info("Starting join server...")
+			logger.Info("Starting Join Server...")
 			return c.Run()
 		},
 	}

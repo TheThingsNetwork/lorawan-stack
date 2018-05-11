@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package networkserver provides a LoRaWAN 1.1-compliant network server implementation.
+// Package networkserver provides a LoRaWAN 1.1-compliant Network Server implementation.
 package networkserver
 
 import (
@@ -54,12 +54,12 @@ const (
 	accumulationCapacity = 20
 )
 
-// WindowEndFunc is a function, which is used by network server to determine the end of deduplication and cooldown windows.
+// WindowEndFunc is a function, which is used by Network Server to determine the end of deduplication and cooldown windows.
 type WindowEndFunc func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time
 
-// NetworkServer implements the network server component.
+// NetworkServer implements the Network Server component.
 //
-// The network server exposes the GsNs, AsNs, DeviceRegistry and ApplicationDownlinkQueue services.
+// The Network Server exposes the GsNs, AsNs, DeviceRegistry and ApplicationDownlinkQueue services.
 type NetworkServer struct {
 	*component.Component
 	*deviceregistry.RegistryRPC
@@ -157,7 +157,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 
 	registryRPC, err := deviceregistry.NewRPC(c, conf.Registry, deviceregistry.ForComponents(ttnpb.PeerInfo_NETWORK_SERVER)) // TODO: Add checks https://github.com/TheThingsIndustries/ttn/issues/558
 	if err != nil {
-		return nil, errors.NewWithCausef(err, "Could not initialize the network server's device registry RPC")
+		return nil, errors.NewWithCausef(err, "Could not initialize the Network Server's device registry RPC")
 	}
 	ns.RegistryRPC = registryRPC
 
@@ -193,7 +193,7 @@ func (s applicationUpStream) Close() error {
 	return nil
 }
 
-// LinkApplication is called by the application server to subscribe to application events.
+// LinkApplication is called by the Application Server to subscribe to application events.
 func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, stream ttnpb.AsNs_LinkApplicationServer) error {
 	ws := &applicationUpStream{
 		AsNs_LinkApplicationServer: stream,
@@ -229,7 +229,7 @@ func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, strea
 	}
 }
 
-// DownlinkQueueReplace is called by the application server to completely replace the downlink queue for a device.
+// DownlinkQueueReplace is called by the Application Server to completely replace the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
 	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, &req.EndDeviceIdentifiers)
@@ -240,7 +240,7 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 	return &pbtypes.Empty{}, dev.Store("QueuedApplicationDownlinks")
 }
 
-// DownlinkQueuePush is called by the application server to push a downlink to queue for a device.
+// DownlinkQueuePush is called by the Application Server to push a downlink to queue for a device.
 func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
 	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, &req.EndDeviceIdentifiers)
@@ -251,7 +251,7 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 	return &pbtypes.Empty{}, dev.Store("QueuedApplicationDownlinks")
 }
 
-// DownlinkQueueList is called by the application server to get the current state of the downlink queue for a device.
+// DownlinkQueueList is called by the Application Server to get the current state of the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
 	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, id)
@@ -261,7 +261,7 @@ func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, id *ttnpb.EndDev
 	return &ttnpb.ApplicationDownlinks{Downlinks: dev.EndDevice.QueuedApplicationDownlinks}, nil
 }
 
-// DownlinkQueueClear is called by the application server to clear the downlink queue for a device.
+// DownlinkQueueClear is called by the Application Server to clear the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueClear(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
 	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
 	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, id)
@@ -272,12 +272,12 @@ func (ns *NetworkServer) DownlinkQueueClear(ctx context.Context, id *ttnpb.EndDe
 	return &pbtypes.Empty{}, dev.Store("QueuedApplicationDownlinks")
 }
 
-// StartServingGateway is called by the gateway server to indicate that it is serving a gateway.
+// StartServingGateway is called by the Gateway Server to indicate that it is serving a gateway.
 func (ns *NetworkServer) StartServingGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-// StopServingGateway is called by the gateway server to indicate that it is no longer serving a gateway.
+// StopServingGateway is called by the Gateway Server to indicate that it is no longer serving a gateway.
 func (ns *NetworkServer) StopServingGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
@@ -678,7 +678,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		logger = logger.WithField(fmt.Sprintf("error_%d", i), err)
 	}
 	logger.Warn("Join failed")
-	return errors.NewWithCause(errors.New("No join server could handle join request"), "Failed to perform join procedure")
+	return errors.NewWithCause(errors.New("No Join Server could handle join request"), "Failed to perform join procedure")
 }
 
 func (ns *NetworkServer) handleRejoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator) error {
@@ -686,7 +686,7 @@ func (ns *NetworkServer) handleRejoin(ctx context.Context, msg *ttnpb.UplinkMess
 	return status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-// HandleUplink is called by the gateway server when an uplink message arrives.
+// HandleUplink is called by the Gateway Server when an uplink message arrives.
 func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*pbtypes.Empty, error) {
 	msg.ReceivedAt = time.Now()
 	logger := ns.Logger()
@@ -738,7 +738,7 @@ func (ns *NetworkServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Client
 	ttnpb.RegisterNsDeviceRegistryHandler(ns.Context(), s, conn)
 }
 
-// Roles returns the roles that the network server fulfils
+// Roles returns the roles that the Network Server fulfils
 func (ns *NetworkServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_NETWORK_SERVER}
 }

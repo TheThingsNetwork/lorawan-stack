@@ -99,12 +99,12 @@ func TestLink(t *testing.T) {
 		DisableAuth: true,
 	})
 	if !a.So(err, should.BeNil) {
-		t.Fatal("Gateway server could not be initialized:", err)
+		t.Fatal("Gateway Server could not be initialized:", err)
 	}
 
 	err = gs.Start()
 	if !a.So(err, should.BeNil) {
-		t.Fatal("Gateway server could not start:", err)
+		t.Fatal("Gateway Server could not start:", err)
 	}
 
 	up := make(chan *ttnpb.GatewayUp)
@@ -136,7 +136,7 @@ func TestLink(t *testing.T) {
 	gsStart := time.Now()
 	for gs.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, []string{}, nil) == nil {
 		if time.Since(gsStart) > timeout {
-			t.Fatal("Identity server was not initialized in time by the gateway server - timeout")
+			t.Fatal("Identity Server was not initialized in time by the Gateway Server - timeout")
 		}
 		time.Sleep(2 * time.Millisecond)
 	}
@@ -161,13 +161,13 @@ func TestLink(t *testing.T) {
 				t.Fatal("Expected GS to call HandleUplink on the NS, instead received", msg)
 			}
 		case <-time.After(timeout):
-			t.Fatal("The gateway server never called the network server's StartServingGateway method. This might be due to an unexpected error in the GatewayServer.Link() function.")
+			t.Fatal("The Gateway Server never called the Network Server's StartServingGateway method. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
 
 		select {
 		case up <- &ttnpb.GatewayUp{GatewayStatus: ttnpb.NewPopulatedGatewayStatus(test.Randy, false)}:
 		case <-time.After(timeout):
-			t.Fatal("The gateway server never called Link.Recv() to receive the status message. This might be due to an unexpected error in the GatewayServer.Link() function.")
+			t.Fatal("The Gateway Server never called Link.Recv() to receive the status message. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
 	}
 
@@ -177,7 +177,7 @@ func TestLink(t *testing.T) {
 		select {
 		case up <- &ttnpb.GatewayUp{UplinkMessages: []*ttnpb.UplinkMessage{join}}:
 		case <-time.After(timeout):
-			t.Fatal("The gateway server never called Link.Recv() to receive the join request. This might be due to an unexpected error in the GatewayServer.Link() function.")
+			t.Fatal("The Gateway Server never called Link.Recv() to receive the join request. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
 
 		select {
@@ -186,7 +186,7 @@ func TestLink(t *testing.T) {
 				t.Fatal("Expected GS to call HandleUplink on the NS, instead received", msg)
 			}
 		case <-time.After(timeout):
-			t.Fatal("The gateway server never called the network server's HandleUplink to handle the join request. This might be due to an unexpected error in the GatewayServer.Link() function.")
+			t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the join request. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
 	}
 
@@ -199,7 +199,7 @@ func TestLink(t *testing.T) {
 		select {
 		case up <- &ttnpb.GatewayUp{UplinkMessages: []*ttnpb.UplinkMessage{uplink}}:
 		case <-time.After(timeout):
-			t.Fatal("The gateway server never called Link.Recv() to receive the uplink. This might be due to an unexpected error in the GatewayServer.Link() function.")
+			t.Fatal("The Gateway Server never called Link.Recv() to receive the uplink. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
 
 		select {
@@ -208,7 +208,7 @@ func TestLink(t *testing.T) {
 				t.Fatal("Expected GS to call HandleUplink on the NS, instead received", msg)
 			}
 		case <-time.After(timeout):
-			t.Fatal("The gateway server never called the network server's HandleUplink to handle the uplink. This might be due to an unexpected error in the GatewayServer.Link() function.")
+			t.Fatal("The Gateway Server never called the Network Server's HandleUplink to handle the uplink. This might be due to an unexpected error in the GatewayServer.Link() function.")
 		}
 	}
 
@@ -221,7 +221,7 @@ func TestLink(t *testing.T) {
 			t.Fatal("Expected GS to call StopServingGateway on the NS, instead received", msg)
 		}
 	case <-time.After(timeout):
-		t.Fatal("The gateway server never called the network server's StopServingGateway method. This might be due to an unexpected error in the GatewayServer.Link() function.")
+		t.Fatal("The Gateway Server never called the Network Server's StopServingGateway method. This might be due to an unexpected error in the GatewayServer.Link() function.")
 	}
 
 	gs.Close()
@@ -242,7 +242,7 @@ func TestGetFrequencyPlan(t *testing.T) {
 	}})
 	gs, err := gatewayserver.New(c, gatewayserver.Config{})
 	if !a.So(err, should.BeNil) {
-		logger.Fatal("Gateway server could not start")
+		logger.Fatal("Gateway Server could not start")
 	}
 
 	fp, err := gs.GetFrequencyPlan(context.Background(), &ttnpb.GetFrequencyPlanRequest{FrequencyPlanID: "EU_863_870"})

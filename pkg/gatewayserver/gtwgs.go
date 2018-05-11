@@ -48,7 +48,7 @@ func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *
 	is := ttnpb.NewIsGatewayClient(isInfo.Conn())
 	gw, err := is.GetGateway(ctx, gatewayID)
 	if err != nil {
-		return ttnpb.FrequencyPlan{}, errors.NewWithCause(err, "Could not get gateway information from identity server")
+		return ttnpb.FrequencyPlan{}, errors.NewWithCause(err, "Could not get gateway information from Identity Server")
 	}
 
 	fp, err := g.FrequencyPlans.GetByID(gw.FrequencyPlanID)
@@ -76,7 +76,7 @@ func (g *GatewayServer) forAllNS(f func(ttnpb.GsNsClient) error) error {
 	return errors
 }
 
-// Link the gateway to the gateway server. The authentication information will
+// Link the gateway to the Gateway Server. The authentication information will
 // be used to determine the gateway ID. If no authentication information is present,
 // this gateway may not be used for downlink.
 func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
@@ -110,7 +110,7 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	}
 	gw, err := is.GetGateway(ctx, &id)
 	if err != nil {
-		return errors.NewWithCause(err, "Could not get gateway information from identity server")
+		return errors.NewWithCause(err, "Could not get gateway information from Identity Server")
 	}
 
 	fp, err := g.FrequencyPlans.GetByID(gw.FrequencyPlanID)

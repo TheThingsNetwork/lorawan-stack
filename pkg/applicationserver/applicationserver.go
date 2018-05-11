@@ -27,9 +27,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// ApplicationServer implements the application server component.
+// ApplicationServer implements the Application Server component.
 //
-// The application server exposes the As, DeviceRegistry and ApplicationDownlinkQueue services.
+// The Application Server exposes the As, DeviceRegistry and ApplicationDownlinkQueue services.
 type ApplicationServer struct {
 	*component.Component
 	*deviceregistry.RegistryRPC
@@ -63,22 +63,22 @@ func (as *ApplicationServer) Subscribe(req *ttnpb.ApplicationIdentifiers, stream
 	return status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-// DownlinkQueueReplace is called by the application server to completely replace the downlink queue for a device.
+// DownlinkQueueReplace is called by the Application Server to completely replace the downlink queue for a device.
 func (as *ApplicationServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*ptypes.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-// DownlinkQueuePush is called by the application server to push a downlink to queue for a device.
+// DownlinkQueuePush is called by the Application Server to push a downlink to queue for a device.
 func (as *ApplicationServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*ptypes.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-// DownlinkQueueList is called by the application server to get the current state of the downlink queue for a device.
+// DownlinkQueueList is called by the Application Server to get the current state of the downlink queue for a device.
 func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-// DownlinkQueueClear is called by the application server to clear the downlink queue for a device.
+// DownlinkQueueClear is called by the Application Server to clear the downlink queue for a device.
 func (as *ApplicationServer) DownlinkQueueClear(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*ptypes.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
@@ -96,7 +96,7 @@ func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Cl
 	ttnpb.RegisterAsDeviceRegistryHandler(as.Context(), s, conn)
 }
 
-// Roles returns the roles that the application server fulfils
+// Roles returns the roles that the Application Server fulfils
 func (as *ApplicationServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_APPLICATION_SERVER}
 }

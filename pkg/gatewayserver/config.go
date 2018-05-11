@@ -16,7 +16,7 @@ package gatewayserver
 
 // Config represents the GatewayServer configuration.
 type Config struct {
-	NSTags []string `name:"network-servers.tags" description:"Network server tags to accept to connect to"`
+	NSTags []string `name:"network-servers.tags" description:"Network Server tags to accept to connect to"`
 
 	DisableAuth bool `name:"disable-auth" description:"Disable gateway authentication, e.g. for debugging and testing purposes"`
 }
