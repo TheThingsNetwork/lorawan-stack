@@ -1360,15 +1360,15 @@ func NewPopulatedApplication(r randyApplication, easy bool) *Application {
 	this := &Application{}
 	v1 := NewPopulatedApplicationIdentifiers(r, easy)
 	this.ApplicationIdentifiers = *v1
-	this.Description = randStringApplication(r)
+	this.Description = string(randStringApplication(r))
 	v2 := types.NewPopulatedStdTime(r, easy)
 	this.CreatedAt = *v2
 	v3 := types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v3
 	this.UpFormatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.UpFormatterParameter = randStringApplication(r)
+	this.UpFormatterParameter = string(randStringApplication(r))
 	this.DownFormatter = PayloadFormatter([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.DownFormatterParameter = randStringApplication(r)
+	this.DownFormatterParameter = string(randStringApplication(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1392,7 +1392,7 @@ func NewPopulatedApplicationUp(r randyApplication, easy bool) *ApplicationUp {
 	this := &ApplicationUp{}
 	v5 := NewPopulatedEndDeviceIdentifiers(r, easy)
 	this.EndDeviceIdentifiers = *v5
-	this.SessionKeyID = randStringApplication(r)
+	this.SessionKeyID = string(randStringApplication(r))
 	oneofNumber_Up := []int32{3, 4}[r.Intn(2)]
 	switch oneofNumber_Up {
 	case 3:
@@ -1511,7 +1511,7 @@ func randFieldApplication(dAtA []byte, r randyApplication, fieldNumber int, wire
 }
 func encodeVarintPopulateApplication(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -1629,7 +1629,7 @@ func sovApplication(x uint64) (n int) {
 	return n
 }
 func sozApplication(x uint64) (n int) {
-	return sovApplication((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovApplication(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (m *Application) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

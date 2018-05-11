@@ -1371,7 +1371,7 @@ func (m *Gateway) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], m.Platform)
 	}
 	if len(m.Attributes) > 0 {
-		for k := range m.Attributes {
+		for k, _ := range m.Attributes {
 			dAtA[i] = 0x5a
 			i++
 			v := m.Attributes[k]
@@ -1492,7 +1492,7 @@ func (m *GatewayAntenna) MarshalTo(dAtA []byte) (int, error) {
 	if m.Gain != 0 {
 		dAtA[i] = 0xd
 		i++
-		binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(m.Gain))
+		binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.Gain))))
 		i += 4
 	}
 	dAtA[i] = 0x12
@@ -1627,7 +1627,7 @@ func (m *GatewayStatus) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], m.Platform)
 	}
 	if len(m.Versions) > 0 {
-		for k := range m.Versions {
+		for k, _ := range m.Versions {
 			dAtA[i] = 0x22
 			i++
 			v := m.Versions[k]
@@ -1681,7 +1681,7 @@ func (m *GatewayStatus) MarshalTo(dAtA []byte) (int, error) {
 		i += n11
 	}
 	if len(m.Metrics) > 0 {
-		for k := range m.Metrics {
+		for k, _ := range m.Metrics {
 			dAtA[i] = 0x42
 			i++
 			v := m.Metrics[k]
@@ -1693,7 +1693,7 @@ func (m *GatewayStatus) MarshalTo(dAtA []byte) (int, error) {
 			i += copy(dAtA[i:], k)
 			dAtA[i] = 0x15
 			i++
-			binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(v))
+			binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(v))))
 			i += 4
 		}
 	}
@@ -1740,7 +1740,7 @@ func (m *GatewayObservations) MarshalTo(dAtA []byte) (int, error) {
 	if m.UplinkCount != 0 {
 		dAtA[i] = 0x10
 		i++
-		i = encodeVarintGateway(dAtA, i, m.UplinkCount)
+		i = encodeVarintGateway(dAtA, i, uint64(m.UplinkCount))
 	}
 	if m.LastDownlinkReceivedAt != nil {
 		dAtA[i] = 0x1a
@@ -1755,7 +1755,7 @@ func (m *GatewayObservations) MarshalTo(dAtA []byte) (int, error) {
 	if m.DownlinkCount != 0 {
 		dAtA[i] = 0x20
 		i++
-		i = encodeVarintGateway(dAtA, i, m.DownlinkCount)
+		i = encodeVarintGateway(dAtA, i, uint64(m.DownlinkCount))
 	}
 	if m.LastStatusReceivedAt != nil {
 		dAtA[i] = 0x2a
@@ -1770,7 +1770,7 @@ func (m *GatewayObservations) MarshalTo(dAtA []byte) (int, error) {
 	if m.StatusCount != 0 {
 		dAtA[i] = 0x30
 		i++
-		i = encodeVarintGateway(dAtA, i, m.StatusCount)
+		i = encodeVarintGateway(dAtA, i, uint64(m.StatusCount))
 	}
 	if m.LastStatus != nil {
 		dAtA[i] = 0x3a
@@ -1798,9 +1798,9 @@ func NewPopulatedGateway(r randyGateway, easy bool) *Gateway {
 	this := &Gateway{}
 	v1 := NewPopulatedGatewayIdentifiers(r, easy)
 	this.GatewayIdentifiers = *v1
-	this.Description = randStringGateway(r)
-	this.FrequencyPlanID = randStringGateway(r)
-	this.ClusterAddress = randStringGateway(r)
+	this.Description = string(randStringGateway(r))
+	this.FrequencyPlanID = string(randStringGateway(r))
+	this.ClusterAddress = string(randStringGateway(r))
 	if r.Intn(10) != 0 {
 		v2 := r.Intn(5)
 		this.Antennas = make([]GatewayAntenna, v2)
@@ -1822,8 +1822,8 @@ func NewPopulatedGateway(r randyGateway, easy bool) *Gateway {
 	}
 	v6 := NewPopulatedGatewayPrivacySettings(r, easy)
 	this.PrivacySettings = *v6
-	this.AutoUpdate = bool(r.Intn(2) == 0)
-	this.Platform = randStringGateway(r)
+	this.AutoUpdate = bool(bool(r.Intn(2) == 0))
+	this.Platform = string(randStringGateway(r))
 	if r.Intn(10) != 0 {
 		v7 := r.Intn(10)
 		this.Attributes = make(map[string]string)
@@ -1838,7 +1838,7 @@ func NewPopulatedGateway(r randyGateway, easy bool) *Gateway {
 	this.CreatedAt = *v8
 	v9 := types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v9
-	this.DisableTxDelay = bool(r.Intn(2) == 0)
+	this.DisableTxDelay = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1846,9 +1846,9 @@ func NewPopulatedGateway(r randyGateway, easy bool) *Gateway {
 
 func NewPopulatedGatewayPrivacySettings(r randyGateway, easy bool) *GatewayPrivacySettings {
 	this := &GatewayPrivacySettings{}
-	this.StatusPublic = bool(r.Intn(2) == 0)
-	this.LocationPublic = bool(r.Intn(2) == 0)
-	this.Contactable = bool(r.Intn(2) == 0)
+	this.StatusPublic = bool(bool(r.Intn(2) == 0))
+	this.LocationPublic = bool(bool(r.Intn(2) == 0))
+	this.Contactable = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1856,14 +1856,14 @@ func NewPopulatedGatewayPrivacySettings(r randyGateway, easy bool) *GatewayPriva
 
 func NewPopulatedGatewayAntenna(r randyGateway, easy bool) *GatewayAntenna {
 	this := &GatewayAntenna{}
-	this.Gain = r.Float32()
+	this.Gain = float32(r.Float32())
 	if r.Intn(2) == 0 {
 		this.Gain *= -1
 	}
 	v10 := NewPopulatedLocation(r, easy)
 	this.Location = *v10
-	this.Type = randStringGateway(r)
-	this.Model = randStringGateway(r)
+	this.Type = string(randStringGateway(r))
+	this.Model = string(randStringGateway(r))
 	this.Placement = GatewayAntennaPlacement([]int32{0, 1}[r.Intn(2)])
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -1872,7 +1872,7 @@ func NewPopulatedGatewayAntenna(r randyGateway, easy bool) *GatewayAntenna {
 
 func NewPopulatedGatewayRadio(r randyGateway, easy bool) *GatewayRadio {
 	this := &GatewayRadio{}
-	this.Frequency = r.Uint32()
+	this.Frequency = uint32(r.Uint32())
 	if r.Intn(10) != 0 {
 		this.TxConfiguration = NewPopulatedGatewayRadio_TxConfiguration(r, easy)
 	}
@@ -1883,9 +1883,9 @@ func NewPopulatedGatewayRadio(r randyGateway, easy bool) *GatewayRadio {
 
 func NewPopulatedGatewayRadio_TxConfiguration(r randyGateway, easy bool) *GatewayRadio_TxConfiguration {
 	this := &GatewayRadio_TxConfiguration{}
-	this.MinFrequency = r.Uint32()
-	this.MaxFrequency = r.Uint32()
-	this.NotchFrequency = r.Uint32()
+	this.MinFrequency = uint32(r.Uint32())
+	this.MaxFrequency = uint32(r.Uint32())
+	this.NotchFrequency = uint32(r.Uint32())
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1897,7 +1897,7 @@ func NewPopulatedGatewayStatus(r randyGateway, easy bool) *GatewayStatus {
 	this.Time = *v11
 	v12 := types.NewPopulatedStdTime(r, easy)
 	this.BootTime = *v12
-	this.Platform = randStringGateway(r)
+	this.Platform = string(randStringGateway(r))
 	if r.Intn(10) != 0 {
 		v13 := r.Intn(10)
 		this.Versions = make(map[string]string)
@@ -1915,7 +1915,7 @@ func NewPopulatedGatewayStatus(r randyGateway, easy bool) *GatewayStatus {
 	v15 := r.Intn(10)
 	this.IP = make([]string, v15)
 	for i := 0; i < v15; i++ {
-		this.IP[i] = randStringGateway(r)
+		this.IP[i] = string(randStringGateway(r))
 	}
 	if r.Intn(10) != 0 {
 		this.RTT = types.NewPopulatedStdDuration(r, easy)
@@ -1925,7 +1925,7 @@ func NewPopulatedGatewayStatus(r randyGateway, easy bool) *GatewayStatus {
 		this.Metrics = make(map[string]float32)
 		for i := 0; i < v16; i++ {
 			v17 := randStringGateway(r)
-			this.Metrics[v17] = r.Float32()
+			this.Metrics[v17] = float32(r.Float32())
 			if r.Intn(2) == 0 {
 				this.Metrics[v17] *= -1
 			}
@@ -1944,15 +1944,15 @@ func NewPopulatedGatewayObservations(r randyGateway, easy bool) *GatewayObservat
 	if r.Intn(10) != 0 {
 		this.LastUplinkReceivedAt = types.NewPopulatedStdTime(r, easy)
 	}
-	this.UplinkCount = uint64(r.Uint32())
+	this.UplinkCount = uint64(uint64(r.Uint32()))
 	if r.Intn(10) != 0 {
 		this.LastDownlinkReceivedAt = types.NewPopulatedStdTime(r, easy)
 	}
-	this.DownlinkCount = uint64(r.Uint32())
+	this.DownlinkCount = uint64(uint64(r.Uint32()))
 	if r.Intn(10) != 0 {
 		this.LastStatusReceivedAt = types.NewPopulatedStdTime(r, easy)
 	}
-	this.StatusCount = uint64(r.Uint32())
+	this.StatusCount = uint64(uint64(r.Uint32()))
 	if r.Intn(10) != 0 {
 		this.LastStatus = NewPopulatedGatewayStatus(r, easy)
 	}
@@ -2027,7 +2027,7 @@ func randFieldGateway(dAtA []byte, r randyGateway, fieldNumber int, wire int) []
 }
 func encodeVarintPopulateGateway(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -2220,21 +2220,21 @@ func (m *GatewayObservations) Size() (n int) {
 		n += 1 + l + sovGateway(uint64(l))
 	}
 	if m.UplinkCount != 0 {
-		n += 1 + sovGateway(m.UplinkCount)
+		n += 1 + sovGateway(uint64(m.UplinkCount))
 	}
 	if m.LastDownlinkReceivedAt != nil {
 		l = types.SizeOfStdTime(*m.LastDownlinkReceivedAt)
 		n += 1 + l + sovGateway(uint64(l))
 	}
 	if m.DownlinkCount != 0 {
-		n += 1 + sovGateway(m.DownlinkCount)
+		n += 1 + sovGateway(uint64(m.DownlinkCount))
 	}
 	if m.LastStatusReceivedAt != nil {
 		l = types.SizeOfStdTime(*m.LastStatusReceivedAt)
 		n += 1 + l + sovGateway(uint64(l))
 	}
 	if m.StatusCount != 0 {
-		n += 1 + sovGateway(m.StatusCount)
+		n += 1 + sovGateway(uint64(m.StatusCount))
 	}
 	if m.LastStatus != nil {
 		l = m.LastStatus.Size()
@@ -2254,7 +2254,7 @@ func sovGateway(x uint64) (n int) {
 	return n
 }
 func sozGateway(x uint64) (n int) {
-	return sovGateway((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovGateway(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (m *Gateway) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -2975,9 +2975,9 @@ func (m *GatewayAntenna) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 4) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = binary.LittleEndian.Uint32(dAtA[iNdEx:])
+			v = uint32(binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 			iNdEx += 4
-			m.Gain = math.Float32frombits(v)
+			m.Gain = float32(math.Float32frombits(v))
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Location", wireType)
@@ -3724,7 +3724,7 @@ func (m *GatewayStatus) Unmarshal(dAtA []byte) error {
 					if (iNdEx + 4) > l {
 						return io.ErrUnexpectedEOF
 					}
-					mapvaluetemp = binary.LittleEndian.Uint32(dAtA[iNdEx:])
+					mapvaluetemp = uint32(binary.LittleEndian.Uint32(dAtA[iNdEx:]))
 					iNdEx += 4
 					mapvalue = math.Float32frombits(mapvaluetemp)
 				} else {

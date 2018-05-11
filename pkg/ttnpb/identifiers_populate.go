@@ -37,11 +37,22 @@ func NewPopulatedEndDeviceIdentifiers(r randyIdentifiers, easy bool) *EndDeviceI
 	if r.Intn(10) == 0 {
 		out.DeviceID = NewPopulatedID(r)
 	}
-	out.ApplicationIdentifiers = ApplicationIdentifiers{
-		ApplicationID: NewPopulatedID(r),
-	}
+	out.ApplicationIdentifiers = *NewPopulatedApplicationIdentifiers(r, easy)
 	out.DevEUI = types.NewPopulatedEUI64(r)
 	out.JoinEUI = types.NewPopulatedEUI64(r)
 	out.DevAddr = types.NewPopulatedDevAddr(r)
 	return out
+}
+
+func NewPopulatedApplicationIdentifiers(r randyIdentifiers, _ bool) *ApplicationIdentifiers {
+	return &ApplicationIdentifiers{
+		ApplicationID: NewPopulatedID(r),
+	}
+}
+
+func NewPopulatedGatewayIdentifiers(r randyIdentifiers, _ bool) *GatewayIdentifiers {
+	return &GatewayIdentifiers{
+		GatewayID: NewPopulatedID(r),
+		EUI:       types.NewPopulatedEUI64(r),
+	}
 }

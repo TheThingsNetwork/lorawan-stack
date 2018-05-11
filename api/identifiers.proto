@@ -31,12 +31,14 @@ message UserIdentifiers {
 
 // ApplicationIdentifiers is the message that is used to identify an application.
 message ApplicationIdentifiers {
+  option (gogoproto.populate) = false;
   // TTN Application ID.
   string application_id = 1 [(gogoproto.customname) = "ApplicationID"];
 }
 
 // GatewayIdentifiers is the message that is used to identify a gateway.
 message GatewayIdentifiers {
+  option (gogoproto.populate) = false;
   // TTN Gateway ID.
   string gateway_id = 1 [(gogoproto.customname) = "GatewayID"];
   // Gateway's unique and immutable EUI.
