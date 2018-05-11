@@ -19,12 +19,8 @@ import (
 
 	"github.com/TheThingsNetwork/ttn/pkg/errors"
 	"github.com/TheThingsNetwork/ttn/pkg/ttnpb"
+	"github.com/TheThingsNetwork/ttn/pkg/validate"
 )
-
-func init() {
-	ErrPermissionDenied.Register()
-	ErrNoApplicationID.Register()
-}
 
 // ErrPermissionDenied is returned if the rights were insufficient to perform
 // this operation.
@@ -34,12 +30,17 @@ var ErrPermissionDenied = &errors.ErrDescriptor{
 	Code:          1,
 }
 
-// ErrNoApplicationID is returned if no application ID was passed to an
+// ErrInvalidApplicationID is returned if an invalid application ID was passed to an
 // operation that requires it.
-var ErrNoApplicationID = &errors.ErrDescriptor{
-	MessageFormat: "No application ID given",
+var ErrInvalidApplicationID = &errors.ErrDescriptor{
+	MessageFormat: "Invalid application ID given",
 	Type:          errors.InvalidArgument,
 	Code:          2,
+}
+
+func init() {
+	ErrPermissionDenied.Register()
+	ErrInvalidApplicationID.Register()
 }
 
 // CheckApplicationAuth within a context that has already had rights filled by
@@ -47,8 +48,8 @@ var ErrNoApplicationID = &errors.ErrDescriptor{
 func CheckApplicationAuth(ctx context.Context, appIdentifiers ApplicationIDGetter, rights ...ttnpb.Right) error {
 	// TODO: Accept administrator authorization even if not tied to the application
 	// https://github.com/TheThingsIndustries/ttn/issues/731
-	if appIdentifiers == nil || appIdentifiers.GetApplicationID() == "" {
-		return ErrNoApplicationID.New(nil)
+	if err := validate.ID(appIdentifiers.GetApplicationID()); err != nil {
+		return ErrInvalidApplicationID.NewWithCause(nil, err)
 	}
 
 	if ad := FromContext(ctx); !ttnpb.IncludesRights(ad, rights...) {
