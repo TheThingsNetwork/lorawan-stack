@@ -49,10 +49,6 @@ test: go.test js.test
 
 quality: go.quality js.quality
 
-# example binary
-ttn-example: MAIN=./cmd/ttn-example/main.go
-ttn-example: $(RELEASE_DIR)/ttn-example-$(GOOS)-$(GOARCH)
-
 # stack binary
 ttn-lw-stack: MAIN=./cmd/ttn-lw-stack/main.go
 ttn-lw-stack: $(RELEASE_DIR)/ttn-lw-stack-$(GOOS)-$(GOARCH)
