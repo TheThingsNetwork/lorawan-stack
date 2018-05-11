@@ -476,7 +476,7 @@ func randFieldApplicationserver(dAtA []byte, r randyApplicationserver, fieldNumb
 }
 func encodeVarintPopulateApplicationserver(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -505,7 +505,7 @@ func sovApplicationserver(x uint64) (n int) {
 	return n
 }
 func sozApplicationserver(x uint64) (n int) {
-	return sovApplicationserver(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovApplicationserver((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (m *SetApplicationRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

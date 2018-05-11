@@ -275,8 +275,8 @@ func encodeVarintCluster(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedPeerInfo(r randyCluster, easy bool) *PeerInfo {
 	this := &PeerInfo{}
-	this.GRPCPort = uint32(r.Uint32())
-	this.TLS = bool(bool(r.Intn(2) == 0))
+	this.GRPCPort = r.Uint32()
+	this.TLS = bool(r.Intn(2) == 0)
 	v1 := r.Intn(10)
 	this.Roles = make([]PeerInfo_Role, v1)
 	for i := 0; i < v1; i++ {
@@ -285,7 +285,7 @@ func NewPopulatedPeerInfo(r randyCluster, easy bool) *PeerInfo {
 	v2 := r.Intn(10)
 	this.Tags = make([]string, v2)
 	for i := 0; i < v2; i++ {
-		this.Tags[i] = string(randStringCluster(r))
+		this.Tags[i] = randStringCluster(r)
 	}
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -358,7 +358,7 @@ func randFieldCluster(dAtA []byte, r randyCluster, fieldNumber int, wire int) []
 }
 func encodeVarintPopulateCluster(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -400,7 +400,7 @@ func sovCluster(x uint64) (n int) {
 	return n
 }
 func sozCluster(x uint64) (n int) {
-	return sovCluster(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovCluster((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (m *PeerInfo) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
