@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
@@ -101,8 +102,13 @@ func checkMIC(key types.AES128Key, rawPayload []byte) error {
 }
 
 // HandleJoin is called by the Network Server to join a device
-func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (resp *ttnpb.JoinResponse, err error) {
 	logger := log.FromContext(ctx)
+	defer func() {
+		if err != nil {
+			events.Publish(evtRejectJoin(ctx, req, err))
+		}
+	}()
 
 	ver := req.GetSelectedMacVersion()
 
@@ -123,8 +129,6 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 		return nil, common.ErrMissingDevAddr.New(nil)
 	}
 	devAddr := *req.EndDeviceIdentifiers.DevAddr
-
-	var err error
 
 	rawPayload := req.GetRawPayload()
 	if req.Payload.GetPayload() == nil {
@@ -268,7 +272,6 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 		}
 	}
 
-	var resp *ttnpb.JoinResponse
 	switch ver {
 	case ttnpb.MAC_V1_1:
 		ke := dev.GetRootKeys().GetNwkKey()
@@ -363,6 +366,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*
 			"device_id", dev.EndDeviceIdentifiers.GetDeviceID(),
 		)).WithError(err).Error("Failed to update device")
 	}
+	events.Publish(evtAcceptJoin(ctx, dev.EndDeviceIdentifiers, nil))
 	return resp, nil
 }
 
