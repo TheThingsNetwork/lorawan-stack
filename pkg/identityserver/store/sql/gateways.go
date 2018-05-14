@@ -34,7 +34,6 @@ type GatewayStore struct {
 	storer
 	*extraAttributesStore
 	*apiKeysStore
-
 	*accountStore
 }
 

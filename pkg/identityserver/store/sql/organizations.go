@@ -32,7 +32,6 @@ type OrganizationStore struct {
 	*extraAttributesStore
 	*apiKeysStore
 	*accountStore
-	*UserStore
 }
 
 // NewOrganizationStore returns an organization store.
@@ -42,7 +41,6 @@ func NewOrganizationStore(store storer) *OrganizationStore {
 		extraAttributesStore: newExtraAttributesStore(store, "organization"),
 		apiKeysStore:         newAPIKeysStore(store, "organization"),
 		accountStore:         newAccountStore(store),
-		UserStore:            store.store().Users.(*UserStore),
 	}
 }
 

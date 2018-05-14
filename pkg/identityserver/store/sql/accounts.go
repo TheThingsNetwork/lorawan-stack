@@ -43,11 +43,10 @@ func newAccountStore(store storer) *accountStore {
 }
 
 func (s *accountStore) getAccountID(q db.QueryContext, ids ttnpb.OrganizationOrUserIdentifiers) (uuid.UUID, error) {
-	// TODO(gomezjdaniel#543): avoid dynamic type checking to access other stores.
 	if id := ids.GetUserID(); id != nil {
-		return s.store().Users.(*UserStore).getUserID(q, *id)
+		return s.store().Users.getUserID(q, *id)
 	}
-	return s.store().Organizations.(*OrganizationStore).getOrganizationID(q, *ids.GetOrganizationID())
+	return s.store().Organizations.getOrganizationID(q, *ids.GetOrganizationID())
 }
 
 // registerOrganizationID registers the given ID that belongs to an organization.

@@ -70,7 +70,7 @@ func (s *ClientStore) Create(client store.Client) error {
 	err := s.transact(func(tx *db.Tx) error {
 		cli := client.GetClient()
 
-		userID, err := s.store().Users.(*UserStore).getUserID(tx, cli.CreatorIDs)
+		userID, err := s.store().Users.getUserID(tx, cli.CreatorIDs)
 		if err != nil {
 			return err
 		}
@@ -198,7 +198,7 @@ func (s *ClientStore) getByID(q db.QueryContext, id uuid.UUID) (client ttnpb.Cli
 
 	res.RightsConverted.SetInto(&res.Client.Rights)
 	res.GrantsConverted.SetInto(&res.Client.Grants)
-	res.Client.CreatorIDs, err = s.store().Users.(*UserStore).getUserIdentifiersFromID(q, res.CreatorID)
+	res.Client.CreatorIDs, err = s.store().Users.getUserIdentifiersFromID(q, res.CreatorID)
 	client = res.Client
 
 	return
@@ -265,7 +265,7 @@ func (s *ClientStore) list(q db.QueryContext) ([]client, error) {
 		client.RightsConverted.SetInto(&client.client.Client.Rights)
 		client.GrantsConverted.SetInto(&client.client.Client.Grants)
 
-		userID, err := s.store().Users.(*UserStore).getUserIdentifiersFromID(q, client.CreatorID)
+		userID, err := s.store().Users.getUserIdentifiersFromID(q, client.CreatorID)
 		if err != nil {
 			return nil, err
 		}
@@ -280,7 +280,7 @@ func (s *ClientStore) list(q db.QueryContext) ([]client, error) {
 // ListByUser returns all the clients created by the client.
 func (s *ClientStore) ListByUser(ids ttnpb.UserIdentifiers, specializer store.ClientSpecializer) (result []store.Client, err error) {
 	err = s.transact(func(tx *db.Tx) error {
-		userID, err := s.store().Users.(*UserStore).getUserID(tx, ids)
+		userID, err := s.store().Users.getUserID(tx, ids)
 		if err != nil {
 			return err
 		}
@@ -339,7 +339,7 @@ func (s *ClientStore) userClients(q db.QueryContext, userID uuid.UUID) ([]client
 	for _, client := range res {
 		client.RightsConverted.SetInto(&client.client.Client.Rights)
 		client.GrantsConverted.SetInto(&client.client.Client.Grants)
-		userID, err := s.store().Users.(*UserStore).getUserIdentifiersFromID(q, client.CreatorID)
+		userID, err := s.store().Users.getUserIdentifiersFromID(q, client.CreatorID)
 		if err != nil {
 			return nil, err
 		}
@@ -383,7 +383,7 @@ func (s *ClientStore) update(q db.QueryContext, clientID uuid.UUID, data *ttnpb.
 		Client: *data,
 	}
 
-	input.CreatorID, err = s.store().Users.(*UserStore).getUserID(q, input.CreatorIDs)
+	input.CreatorID, err = s.store().Users.getUserID(q, input.CreatorIDs)
 	if err != nil {
 		return err
 	}

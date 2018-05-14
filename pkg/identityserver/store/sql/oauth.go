@@ -24,29 +24,26 @@ import (
 // OAuthStore implements store.OAuthStore.
 type OAuthStore struct {
 	storer
-
-	*UserStore
-	*ClientStore
 }
 
 // NewOAuthStore creates a new OAuth store.
 func NewOAuthStore(store storer) *OAuthStore {
 	return &OAuthStore{
-		storer:      store,
-		UserStore:   store.store().Users.(*UserStore),
-		ClientStore: store.store().Clients.(*ClientStore),
+		storer: store,
 	}
 }
 
 // SaveAuthorizationCode saves the authorization code.
 func (s *OAuthStore) SaveAuthorizationCode(data store.AuthorizationData) error {
 	err := s.transact(func(tx *db.Tx) error {
-		userID, err := s.getUserID(tx, ttnpb.UserIdentifiers{UserID: data.UserID})
+		st := s.store()
+
+		userID, err := st.Users.getUserID(tx, ttnpb.UserIdentifiers{UserID: data.UserID})
 		if err != nil {
 			return err
 		}
 
-		clientID, err := s.getClientID(tx, ttnpb.ClientIdentifiers{ClientID: data.ClientID})
+		clientID, err := st.Clients.getClientID(tx, ttnpb.ClientIdentifiers{ClientID: data.ClientID})
 		if err != nil {
 			return err
 		}
@@ -102,13 +99,15 @@ func (s *OAuthStore) GetAuthorizationCode(authorizationCode string) (result stor
 			return err
 		}
 
-		user, err := s.getUserIdentifiersFromID(tx, data.UserUUID)
+		st := s.store()
+
+		user, err := st.Users.getUserIdentifiersFromID(tx, data.UserUUID)
 		if err != nil {
 			return err
 		}
 		data.AuthorizationData.UserID = user.UserID
 
-		client, err := s.getClientIdentifiersFromID(tx, data.ClientUUID)
+		client, err := st.Clients.getClientIdentifiersFromID(tx, data.ClientUUID)
 		if err != nil {
 			return err
 		}
@@ -181,12 +180,14 @@ type accessData struct {
 // SaveAccessToken saves the access data.
 func (s *OAuthStore) SaveAccessToken(data store.AccessData) error {
 	err := s.transact(func(tx *db.Tx) error {
-		userID, err := s.getUserID(tx, ttnpb.UserIdentifiers{UserID: data.UserID})
+		st := s.store()
+
+		userID, err := st.Users.getUserID(tx, ttnpb.UserIdentifiers{UserID: data.UserID})
 		if err != nil {
 			return err
 		}
 
-		clientID, err := s.getClientID(tx, ttnpb.ClientIdentifiers{ClientID: data.ClientID})
+		clientID, err := st.Clients.getClientID(tx, ttnpb.ClientIdentifiers{ClientID: data.ClientID})
 		if err != nil {
 			return err
 		}
@@ -236,13 +237,15 @@ func (s *OAuthStore) GetAccessToken(accessToken string) (result store.AccessData
 			return err
 		}
 
-		user, err := s.getUserIdentifiersFromID(tx, data.UserUUID)
+		st := s.store()
+
+		user, err := st.Users.getUserIdentifiersFromID(tx, data.UserUUID)
 		if err != nil {
 			return err
 		}
 		data.AccessData.UserID = user.UserID
 
-		client, err := s.getClientIdentifiersFromID(tx, data.ClientUUID)
+		client, err := st.Clients.getClientIdentifiersFromID(tx, data.ClientUUID)
 		if err != nil {
 			return err
 		}
@@ -310,12 +313,14 @@ type refreshData struct {
 // SaveRefreshToken saves the refresh token.
 func (s *OAuthStore) SaveRefreshToken(data store.RefreshData) error {
 	err := s.transact(func(tx *db.Tx) error {
-		userID, err := s.getUserID(tx, ttnpb.UserIdentifiers{UserID: data.UserID})
+		st := s.store()
+
+		userID, err := st.Users.getUserID(tx, ttnpb.UserIdentifiers{UserID: data.UserID})
 		if err != nil {
 			return err
 		}
 
-		clientID, err := s.getClientID(tx, ttnpb.ClientIdentifiers{ClientID: data.ClientID})
+		clientID, err := st.Clients.getClientID(tx, ttnpb.ClientIdentifiers{ClientID: data.ClientID})
 		if err != nil {
 			return err
 		}
@@ -363,13 +368,15 @@ func (s *OAuthStore) GetRefreshToken(refreshToken string) (result store.RefreshD
 			return err
 		}
 
-		user, err := s.getUserIdentifiersFromID(tx, data.UserUUID)
+		st := s.store()
+
+		user, err := st.Users.getUserIdentifiersFromID(tx, data.UserUUID)
 		if err != nil {
 			return err
 		}
 		data.RefreshData.UserID = user.UserID
 
-		client, err := s.getClientIdentifiersFromID(tx, data.ClientUUID)
+		client, err := st.Clients.getClientIdentifiersFromID(tx, data.ClientUUID)
 		if err != nil {
 			return err
 		}
@@ -430,7 +437,9 @@ func (s *OAuthStore) deleteRefreshToken(q db.QueryContext, refreshToken string) 
 // ListAuthorizedClients returns a list of clients authorized by a given user.
 func (s *OAuthStore) ListAuthorizedClients(ids ttnpb.UserIdentifiers, specializer store.ClientSpecializer) (result []store.Client, err error) {
 	err = s.transact(func(tx *db.Tx) error {
-		userID, err := s.getUserID(tx, ids)
+		st := s.store()
+
+		userID, err := st.Users.getUserID(tx, ids)
 		if err != nil {
 			return err
 		}
@@ -441,14 +450,14 @@ func (s *OAuthStore) ListAuthorizedClients(ids ttnpb.UserIdentifiers, specialize
 		}
 
 		for _, clientID := range clientIDs {
-			client, err := s.ClientStore.getByID(tx, clientID)
+			client, err := st.Clients.getByID(tx, clientID)
 			if err != nil {
 				return err
 			}
 
 			specialized := specializer(client)
 
-			err = s.ClientStore.loadAttributes(tx, clientID, specialized)
+			err = st.Clients.loadAttributes(tx, clientID, specialized)
 			if err != nil {
 				return err
 			}
@@ -483,12 +492,14 @@ func (s *OAuthStore) listAuthorizedClients(q db.QueryContext, userID uuid.UUID) 
 func (s *OAuthStore) RevokeAuthorizedClient(userIDs ttnpb.UserIdentifiers, clientIDs ttnpb.ClientIdentifiers) error {
 	rows := 0
 	err := s.transact(func(tx *db.Tx) error {
-		userID, err := s.getUserID(tx, userIDs)
+		st := s.store()
+
+		userID, err := st.Users.getUserID(tx, userIDs)
 		if err != nil {
 			return err
 		}
 
-		clientID, err := s.getClientID(tx, clientIDs)
+		clientID, err := st.Clients.getClientID(tx, clientIDs)
 		if err != nil {
 			return err
 		}

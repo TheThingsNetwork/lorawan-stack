@@ -298,14 +298,14 @@ func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID uuid.UUID, rig
 		if _, exists := byUser[collaborator.AccountID.String()]; !exists {
 			var identifier ttnpb.OrganizationOrUserIdentifiers
 			if collaborator.Type == organizationIDType {
-				id, err := s.store().Organizations.(*OrganizationStore).getOrganizationIdentifiersFromID(q, collaborator.AccountID)
+				id, err := s.store().Organizations.getOrganizationIdentifiersFromID(q, collaborator.AccountID)
 				if err != nil {
 					return nil, err
 				}
 
 				identifier = ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_OrganizationID{OrganizationID: &id}}
 			} else {
-				id, err := s.store().Users.(*UserStore).getUserIdentifiersFromID(q, collaborator.AccountID)
+				id, err := s.store().Users.getUserIdentifiersFromID(q, collaborator.AccountID)
 				if err != nil {
 					return nil, err
 				}

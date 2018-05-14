@@ -27,7 +27,9 @@ import (
 // ListByUser returns the organizations to which an user is a member of.
 func (s *OrganizationStore) ListByUser(ids ttnpb.UserIdentifiers, specializer store.OrganizationSpecializer) (result []store.Organization, err error) {
 	err = s.transact(func(tx *db.Tx) error {
-		userID, err := s.getUserID(tx, ids)
+		st := s.store()
+
+		userID, err := st.Users.getUserID(tx, ids)
 		if err != nil {
 			return err
 		}
@@ -78,7 +80,7 @@ func (s *OrganizationStore) HasMemberRights(ids ttnpb.OrganizationIdentifiers, t
 			return err
 		}
 
-		userID, err := s.getUserID(tx, target)
+		userID, err := s.store().Users.getUserID(tx, target)
 		if err != nil {
 			return err
 		}
@@ -204,7 +206,7 @@ func (s *OrganizationStore) listMembers(q db.QueryContext, orgID uuid.UUID, righ
 	for _, row := range rows {
 		key := row.UserID.String()
 		if _, ok := byUser[key]; !ok {
-			identifier, err := s.UserStore.getUserIdentifiersFromID(q, row.UserID)
+			identifier, err := s.store().Users.getUserIdentifiersFromID(q, row.UserID)
 			if err != nil {
 				return nil, err
 			}
@@ -235,7 +237,7 @@ func (s *OrganizationStore) SetMember(member ttnpb.OrganizationMember) (err erro
 			return err
 		}
 
-		userID, err := s.UserStore.getUserID(tx, member.UserIdentifiers)
+		userID, err := s.store().Users.getUserID(tx, member.UserIdentifiers)
 		if err != nil {
 			return err
 		}
@@ -296,7 +298,7 @@ func (s *OrganizationStore) ListMemberRights(ids ttnpb.OrganizationIdentifiers, 
 			return err
 		}
 
-		userID, err := s.getUserID(tx, target)
+		userID, err := s.store().Users.getUserID(tx, target)
 		if err != nil {
 			return err
 		}

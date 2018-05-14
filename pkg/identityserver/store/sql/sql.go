@@ -33,13 +33,38 @@ type storer interface {
 	transact(fn func(*db.Tx) error, opts ...db.TxOption) error
 
 	// store returns the underlying store.
-	store() *store.Store
+	store() *sqlStore
+}
+
+type sqlStore struct {
+	Users         *UserStore
+	Applications  *ApplicationStore
+	Gateways      *GatewayStore
+	Clients       *ClientStore
+	Settings      *SettingStore
+	Organizations *OrganizationStore
+	OAuth         *OAuthStore
+	Invitations   *InvitationStore
+}
+
+func (s *sqlStore) store(behaviour store.Behaviour) *store.Store {
+	return &store.Store{
+		Users:         s.Users,
+		Applications:  s.Applications,
+		Gateways:      s.Gateways,
+		Clients:       s.Clients,
+		OAuth:         s.OAuth,
+		Settings:      s.Settings,
+		Invitations:   s.Invitations,
+		Organizations: s.Organizations,
+		Behaviour:     behaviour,
+	}
 }
 
 // Implementation of the SQL store. It implements storer.
 type impl struct {
 	db *db.DB
-	store.Store
+	sqlStore
 }
 
 // Open opens a new database connection and attachs it to a new store.
@@ -57,11 +82,9 @@ func FromDB(db *db.DB) *store.Store {
 	s := &impl{
 		db: db,
 	}
-	s.Store.Behaviour = s
-
 	initSubStores(s)
 
-	return s.store()
+	return s.store().store(s)
 }
 
 // WithContext creates a reference to a new Store that will use the
@@ -72,11 +95,9 @@ func (s *impl) WithContext(context context.Context) *store.Store {
 	store := &impl{
 		db: s.db.WithContext(context),
 	}
-	store.Store.Behaviour = store
-
 	initSubStores(store)
 
-	return store.store()
+	return store.store().store(store)
 }
 
 // Transact executes fn inside a transaction and retries it or rollbacks it as
@@ -86,10 +107,9 @@ func (s *impl) Transact(fn func(*store.Store) error) error {
 		store := &txImpl{
 			tx: tx,
 		}
-
 		initSubStores(store)
 
-		return fn(store.store())
+		return fn(store.store().store(nil))
 	})
 }
 
@@ -124,15 +144,15 @@ func (s *impl) transact(fn func(*db.Tx) error, opts ...db.TxOption) error {
 	return s.db.Transact(fn, opts...)
 }
 
-// store returns the store.Store.
-func (s *impl) store() *store.Store {
-	return &s.Store
+// store returns the store.
+func (s *impl) store() *sqlStore {
+	return &s.sqlStore
 }
 
 // txImpl is a store that keeps a transaction that is being executed. It implements storer.
 type txImpl struct {
 	tx *db.Tx
-	store.Store
+	sqlStore
 }
 
 // queryer returns the transaction that is already happening.
@@ -145,9 +165,9 @@ func (s *txImpl) transact(fn func(*db.Tx) error, opts ...db.TxOption) error {
 	return fn(s.tx)
 }
 
-// store returns the store.Store.
-func (s *txImpl) store() *store.Store {
-	return &s.Store
+// store returns the store.
+func (s *txImpl) store() *sqlStore {
+	return &s.sqlStore
 }
 
 // initSubStores initializes the sub-stores of the store.Store.
