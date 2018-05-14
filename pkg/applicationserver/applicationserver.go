@@ -96,7 +96,7 @@ func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Cl
 	ttnpb.RegisterAsDeviceRegistryHandler(as.Context(), s, conn)
 }
 
-// Roles returns the roles that the Application Server fulfils
+// Roles returns the roles that the Application Server fulfills.
 func (as *ApplicationServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_APPLICATION_SERVER}
 }

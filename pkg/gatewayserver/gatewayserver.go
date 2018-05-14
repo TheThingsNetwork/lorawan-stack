@@ -107,7 +107,7 @@ func (gs *GatewayServer) RegisterServices(s *grpc.Server) {
 // RegisterHandlers registers gRPC handlers.
 func (gs *GatewayServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {}
 
-// Roles returns the roles that the Gateway Server fulfils
+// Roles returns the roles that the Gateway Server fulfills.
 func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_GATEWAY_SERVER}
 }
