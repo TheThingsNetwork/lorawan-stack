@@ -88,6 +88,8 @@ message UplinkMessage {
 
   // ReceivedAt represents the time instant when the Gateway Server received the message.
   google.protobuf.Timestamp received_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+
+  repeated string correlation_ids = 8 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
 // Downlink message from the network to the end device
@@ -144,6 +146,8 @@ message DownlinkMessage {
 
   // Tx metadata for the gateway
   TxMetadata tx_metadata = 5 [(gogoproto.nullable) = false];
+
+  repeated string correlation_ids = 6 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
 message ApplicationUplink {
@@ -151,11 +155,13 @@ message ApplicationUplink {
   uint32 f_cnt = 2;
   bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
   repeated RxMetadata rx_metadata = 4;
+  repeated string correlation_ids = 5 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
 message ApplicationJoinAccept {
   // The (encrypted) Application Session Key.
   KeyEnvelope app_s_key = 1;
+  repeated string correlation_ids = 2 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
 message ApplicationDownlink {
@@ -165,5 +171,6 @@ message ApplicationDownlink {
   uint32 f_cnt = 2;
   bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
   // TODO: Add "hints" for NS
+  repeated string correlation_ids = 4 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
