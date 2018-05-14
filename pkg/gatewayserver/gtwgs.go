@@ -77,21 +77,19 @@ func (g *GatewayServer) forAllNS(f func(ttnpb.GsNsClient) error) error {
 }
 
 func (g *GatewayServer) signalStartServingGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) {
-	startServingGatewayFn := func(nsClient ttnpb.GsNsClient) error {
+	if err := g.forAllNS(func(nsClient ttnpb.GsNsClient) error {
 		_, err := nsClient.StartServingGateway(ctx, id)
 		return err
-	}
-	if err := g.forAllNS(startServingGatewayFn); err != nil {
+	}); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Could not signal NS when gateway connected")
 	}
 }
 
 func (g *GatewayServer) signalStopServingGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) {
-	stopServingGatewayFn := func(nsClient ttnpb.GsNsClient) error {
+	if err := g.forAllNS(func(nsClient ttnpb.GsNsClient) error {
 		_, err := nsClient.StopServingGateway(ctx, id)
 		return err
-	}
-	if err := g.forAllNS(stopServingGatewayFn); err != nil {
+	}); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Could not signal NS when gateway disconnected")
 	}
 }

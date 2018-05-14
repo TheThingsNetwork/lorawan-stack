@@ -79,8 +79,7 @@ func (c *connectionData) addUpstreamObservations(up *ttnpb.GatewayUp) {
 		c.observations.LastStatus = up.GatewayStatus
 		c.observations.LastStatusReceivedAt = &now
 	}
-
-	if nbUplinks := len(up.UplinkMessages); nbUplinks > 0 {
+	if len(up.UplinkMessages) != 0 {
 		c.observations.LastUplinkReceivedAt = &now
 	}
 
@@ -89,7 +88,6 @@ func (c *connectionData) addUpstreamObservations(up *ttnpb.GatewayUp) {
 
 func (c *connectionData) addDownstreamObservations(down *ttnpb.GatewayDown) {
 	now := time.Now().UTC()
-
 	c.observationsMu.Lock()
 	c.observations.LastDownlinkReceivedAt = &now
 	c.observationsMu.Unlock()
@@ -100,15 +98,13 @@ type gRPCConnection struct {
 
 	link   ttnpb.GtwGs_LinkServer
 	cancel context.CancelFunc
-
-	gtw *ttnpb.Gateway
+	gtw    *ttnpb.Gateway
 }
 
 func (c *gRPCConnection) send(down *ttnpb.GatewayDown) error {
 	if err := c.schedule(down); err != nil {
 		return err
 	}
-
 	return c.link.Send(down)
 }
 
@@ -124,15 +120,14 @@ func (c *gRPCConnection) Close() error {
 type udpConnection struct {
 	connectionData
 
-	gtw atomic.Value
-
+	gtw                 atomic.Value
 	lastPullDataStorage atomic.Value
 	lastPullDataTime    atomic.Value
 }
 
 func (c *udpConnection) lastPullData() *udp.Packet {
-	packet, _ := c.lastPullDataStorage.Load().(*udp.Packet)
-	return packet
+	pkt, _ := c.lastPullDataStorage.Load().(*udp.Packet)
+	return pkt
 }
 
 func (c *udpConnection) pullDataExpired() bool {
@@ -154,17 +149,15 @@ func (c *udpConnection) send(down *ttnpb.GatewayDown) error {
 	if err != nil {
 		return ErrTranslationFromProtobuf.New(nil)
 	}
-
 	if err := c.schedule(down); err != nil {
 		return err
 	}
 
-	packet := *c.lastPullData()
-	packet.PacketType = udp.PullResp
-	packet.Data = &downstream
-
+	pkt := *c.lastPullData()
+	pkt.PacketType = udp.PullResp
+	pkt.Data = &downstream
 	// TODO: Add a delay before the packet is sent: https://github.com/TheThingsIndustries/ttn/issues/726
-	return packet.GatewayConn.Write(&packet)
+	return pkt.GatewayConn.Write(&pkt)
 }
 
 func (c *udpConnection) gateway() *ttnpb.Gateway {

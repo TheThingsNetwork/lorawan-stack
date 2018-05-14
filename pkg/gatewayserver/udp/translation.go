@@ -26,6 +26,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/version"
 )
 
+const delta = 0.001 // For GPS comparisons
+
 var (
 	ttnVersions = map[string]string{
 		"ttn-gateway-server": version.TTN,
@@ -38,8 +40,8 @@ var (
 
 func validLocation(loc ttnpb.Location) bool {
 	for _, invalidLoc := range invalidLocations {
-		if (loc.Latitude > invalidLoc.Latitude-0.5 && loc.Latitude < invalidLoc.Latitude+0.5) &&
-			(loc.Longitude > invalidLoc.Longitude-0.5 && loc.Longitude < invalidLoc.Longitude+0.5) {
+		if (loc.Latitude > invalidLoc.Latitude-delta && loc.Latitude < invalidLoc.Latitude+delta) &&
+			(loc.Longitude > invalidLoc.Longitude-delta && loc.Longitude < invalidLoc.Longitude+delta) {
 			return false
 		}
 	}
@@ -85,11 +87,9 @@ func metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetada
 			GatewayIdentifiers: gatewayID,
 
 			AntennaIndex: 0,
-
-			Timestamp: uint64(rx.Tmst) * 1000,
-
-			RSSI: float32(rx.RSSI),
-			SNR:  float32(rx.LSNR),
+			Timestamp:    uint64(rx.Tmst) * 1000,
+			RSSI:         float32(rx.RSSI),
+			SNR:          float32(rx.LSNR),
 		},
 	}
 }

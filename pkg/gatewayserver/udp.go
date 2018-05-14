@@ -66,10 +66,8 @@ func (g *GatewayServer) runUDPBridge(ctx context.Context, udpConn *net.UDPConn) 
 			logger.Error("No gateway EUI in the packet, dropping the packet")
 			continue
 		}
-
 		logger := logger.WithField("gateway_eui", packet.GatewayEUI.String())
 		ctx := log.NewContext(ctx, logger)
-
 		if err := packet.Ack(); err != nil {
 			logger.WithError(err).Error("Could not acknowledge incoming packet")
 		}
@@ -135,7 +133,6 @@ func (g *GatewayServer) processPullData(ctx context.Context, firstPacket *udp.Pa
 		logger.Error("No identity server to connect to found")
 		return
 	}
-
 	isConn := isPeer.Conn()
 	if isConn == nil {
 		logger.Error("No ready connection to the identity server")
@@ -143,7 +140,6 @@ func (g *GatewayServer) processPullData(ctx context.Context, firstPacket *udp.Pa
 	}
 
 	is := ttnpb.NewIsGatewayClient(isConn)
-
 	gtw, err := is.GetGateway(ctx, &ttnpb.GatewayIdentifiers{EUI: firstPacket.GatewayEUI})
 	if err != nil {
 		logger.WithError(err).Error("Could not retrieve gateway information from the gateway server")
@@ -171,7 +167,6 @@ func (g *GatewayServer) processPullData(ctx context.Context, firstPacket *udp.Pa
 	logger.Info("Gateway information and frequency plan fetched")
 
 	g.setupConnection(gtw.GatewayIdentifiers.UniqueID(ctx), connection)
-
 	ctx, cancel := context.WithTimeout(g.Context(), time.Minute)
 	g.signalStartServingGateway(ctx, &gtw.GatewayIdentifiers)
 	cancel()
