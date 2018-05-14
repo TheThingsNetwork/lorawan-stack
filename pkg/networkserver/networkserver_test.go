@@ -40,6 +40,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	ttnshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -321,8 +322,12 @@ func sendUplinkDuplicates(t *testing.T, h UplinkHandler, windowEndCh chan window
 	case we := <-windowEndCh:
 		a.So(we.msg.GetReceivedAt(), should.HappenBefore, time.Now())
 		msg.ReceivedAt = we.msg.GetReceivedAt()
+
+		a.So(we.msg.GetCorrelationIDs(), should.NotBeEmpty)
+		msg.CorrelationIDs = we.msg.GetCorrelationIDs()
+
 		a.So(we.msg, should.Resemble, msg)
-		a.So(we.ctx, should.Resemble, ctx)
+		a.So(we.ctx, ttnshould.HaveParentContext, ctx)
 		weCh = we.ch
 
 	case <-time.After(Timeout):
@@ -1002,15 +1007,17 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							if !a.So(md, should.HaveSameElementsDeep, up.GetUplinkMessage().GetRxMetadata()) {
 								metadataLdiff(t, up.GetUplinkMessage().GetRxMetadata(), md)
 							}
+							a.So(up.GetUplinkMessage().GetCorrelationIDs(), should.NotBeEmpty)
 
 							expected := &ttnpb.ApplicationUp{
 								EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 								SessionKeyID:         dev.GetSession().SessionKeys.GetSessionKeyID(),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-									FCnt:       tc.NextNextFCntUp - 1,
-									FPort:      tc.UplinkMessage.Payload.GetMACPayload().GetFPort(),
-									FRMPayload: tc.UplinkMessage.Payload.GetMACPayload().GetFRMPayload(),
-									RxMetadata: up.GetUplinkMessage().GetRxMetadata(),
+									FCnt:           tc.NextNextFCntUp - 1,
+									FPort:          tc.UplinkMessage.Payload.GetMACPayload().GetFPort(),
+									FRMPayload:     tc.UplinkMessage.Payload.GetMACPayload().GetFRMPayload(),
+									RxMetadata:     up.GetUplinkMessage().GetRxMetadata(),
+									CorrelationIDs: up.GetUplinkMessage().GetCorrelationIDs(),
 								}},
 							}
 							if !a.So(up, should.Resemble, expected) {
@@ -1037,17 +1044,6 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					t.Run("device update", func(t *testing.T) {
 						a := assertions.New(t)
 
-						msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
-						msg.RxMetadata = md
-
-						ed := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-						ed.GetSession().NextFCntUp = tc.NextNextFCntUp
-
-						ed.RecentUplinks = append(ed.GetRecentUplinks(), msg)
-						if len(ed.RecentUplinks) > RecentUplinkCount {
-							ed.RecentUplinks = ed.RecentUplinks[len(ed.RecentUplinks)-RecentUplinkCount:]
-						}
-
 						dev, err = dev.Load()
 						if !a.So(err, should.BeNil) ||
 							!a.So(dev.EndDevice, should.NotBeNil) {
@@ -1058,24 +1054,35 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							t.FailNow()
 						}
 
-						storedUp := dev.GetRecentUplinks()[len(dev.RecentUplinks)-1]
-						expectedUp := ed.GetRecentUplinks()[len(ed.RecentUplinks)-1]
+						msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
+						msg.RxMetadata = md
+
+						expected := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+						expected.Session.NextFCntUp = tc.NextNextFCntUp
+						expected.SessionFallback = nil
+						expected.CreatedAt = dev.GetCreatedAt()
+						expected.UpdatedAt = dev.GetUpdatedAt()
+
+						expected.RecentUplinks = append(expected.GetRecentUplinks(), msg)
+						if len(expected.RecentUplinks) > RecentUplinkCount {
+							expected.RecentUplinks = expected.RecentUplinks[len(expected.RecentUplinks)-RecentUplinkCount:]
+						}
+
+						storedUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
+						expectedUp := expected.RecentUplinks[len(expected.RecentUplinks)-1]
 
 						a.So(storedUp.GetReceivedAt(), should.HappenBetween, start, time.Now())
 						expectedUp.ReceivedAt = storedUp.GetReceivedAt()
 
-						storedMD := storedUp.GetRxMetadata()
-						expectedMD := expectedUp.GetRxMetadata()
+						a.So(storedUp.GetCorrelationIDs(), should.NotBeEmpty)
+						expectedUp.CorrelationIDs = storedUp.GetCorrelationIDs()
 
-						if !a.So(storedMD, should.HaveSameElementsDiff, expectedMD) {
-							metadataLdiff(t, storedMD, expectedMD)
+						if !a.So(storedUp.GetRxMetadata(), should.HaveSameElementsDiff, expectedUp.GetRxMetadata()) {
+							metadataLdiff(t, storedUp.GetRxMetadata(), expectedUp.GetRxMetadata())
 						}
+						expectedUp.RxMetadata = storedUp.GetRxMetadata()
 
-						copy(expectedMD, storedMD)
-
-						ed.CreatedAt = dev.GetCreatedAt()
-						ed.UpdatedAt = dev.GetUpdatedAt()
-						a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
+						a.So(pretty.Diff(dev.EndDevice, expected), should.BeEmpty)
 					})
 				}) {
 					t.FailNow()
@@ -1125,8 +1132,13 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					case de := <-deduplicationDoneCh:
 						a.So(de.msg.GetReceivedAt(), should.HappenBetween, start, time.Now())
 						msg.ReceivedAt = de.msg.GetReceivedAt()
+
+						a.So(de.msg.GetCorrelationIDs(), should.NotBeEmpty)
+						msg.CorrelationIDs = de.msg.GetCorrelationIDs()
+
 						a.So(de.msg, should.Resemble, msg)
-						a.So(de.ctx, should.Resemble, ctx)
+						a.So(de.ctx, ttnshould.HaveParentContext, ctx)
+
 						de.ch <- time.Now()
 
 					case <-time.After(Timeout):
@@ -1139,10 +1151,11 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 							SessionKeyID:         dev.GetSession().SessionKeys.GetSessionKeyID(),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-								FCnt:       tc.NextNextFCntUp - 1,
-								FPort:      msg.Payload.GetMACPayload().GetFPort(),
-								FRMPayload: msg.Payload.GetMACPayload().GetFRMPayload(),
-								RxMetadata: msg.GetRxMetadata(),
+								FCnt:           tc.NextNextFCntUp - 1,
+								FPort:          msg.Payload.GetMACPayload().GetFPort(),
+								FRMPayload:     msg.Payload.GetMACPayload().GetFRMPayload(),
+								RxMetadata:     msg.GetRxMetadata(),
+								CorrelationIDs: msg.GetCorrelationIDs(),
 							}},
 						})
 
@@ -1509,15 +1522,11 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 
 						expected := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-						expected.RecentUplinks = append(expected.GetRecentUplinks(), msg)
-						if len(expected.RecentUplinks) > RecentUplinkCount {
-							expected.RecentUplinks = expected.RecentUplinks[len(expected.RecentUplinks)-RecentUplinkCount:]
-						}
-
 						fp := test.Must(ns.Component.FrequencyPlans.GetByID(expected.GetFrequencyPlanID())).(ttnpb.FrequencyPlan)
 						band := test.Must(band.GetByID(fp.BandID)).(band.Band)
 
 						stDes := expected.GetMACStateDesired()
+
 						expected.MACState = &ttnpb.MACState{
 							MaxTxPower:        uint32(expected.MaxTxPower),
 							UplinkDwellTime:   fp.DwellTime != nil,
@@ -1543,16 +1552,24 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						expected.UpdatedAt = dev.GetUpdatedAt()
 						expected.RecentDownlinks = dev.GetRecentDownlinks()
 
+						expected.RecentUplinks = append(expected.GetRecentUplinks(), msg)
+						if len(expected.RecentUplinks) > RecentUplinkCount {
+							expected.RecentUplinks = expected.RecentUplinks[len(expected.RecentUplinks)-RecentUplinkCount:]
+						}
+
 						storedUp := dev.GetRecentUplinks()[len(dev.RecentUplinks)-1]
 						expectedUp := expected.GetRecentUplinks()[len(expected.RecentUplinks)-1]
 
 						a.So(storedUp.GetReceivedAt(), should.HappenBetween, start, time.Now())
 						expectedUp.ReceivedAt = storedUp.GetReceivedAt()
 
+						a.So(storedUp.GetCorrelationIDs(), should.NotBeEmpty)
+						expectedUp.CorrelationIDs = storedUp.GetCorrelationIDs()
+
 						if !a.So(storedUp.GetRxMetadata(), should.HaveSameElementsDiff, expectedUp.GetRxMetadata()) {
 							metadataLdiff(t, storedUp.GetRxMetadata(), expectedUp.GetRxMetadata())
 						}
-						expectedUp.RxMetadata = storedUp.RxMetadata
+						expectedUp.RxMetadata = storedUp.GetRxMetadata()
 
 						a.So(pretty.Diff(dev.EndDevice, expected), should.BeEmpty)
 					})
@@ -1614,8 +1631,13 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					case de := <-deduplicationDoneCh:
 						a.So(de.msg.GetReceivedAt(), should.HappenBetween, start, time.Now())
 						msg.ReceivedAt = de.msg.GetReceivedAt()
+
+						a.So(de.msg.GetCorrelationIDs(), should.NotBeEmpty)
+						msg.CorrelationIDs = de.msg.GetCorrelationIDs()
+
 						a.So(de.msg, should.Resemble, msg)
-						a.So(de.ctx, should.Resemble, ctx)
+						a.So(de.ctx, ttnshould.HaveParentContext, ctx)
+
 						de.ch <- time.Now()
 
 					case <-time.After(Timeout):

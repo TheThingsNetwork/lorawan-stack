@@ -36,6 +36,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/random"
@@ -235,7 +236,7 @@ func (s applicationUpStream) Close() error {
 }
 
 // LinkApplication is called by the Application Server to subscribe to application events.
-func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, stream ttnpb.AsNs_LinkApplicationServer) error {
+func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, stream ttnpb.AsNs_LinkApplicationServer) (err error) {
 	ws := &applicationUpStream{
 		AsNs_LinkApplicationServer: stream,
 		closeCh:                    make(chan struct{}),
@@ -243,6 +244,9 @@ func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, strea
 
 	ctx := stream.Context()
 	uid := id.UniqueID(ctx)
+
+	events.Publish(evtStartApplicationLink(ctx, id, nil))
+	defer events.Publish(evtEndApplicationLink(ctx, id, err))
 
 	ns.applicationServersMu.Lock()
 	cl, ok := ns.applicationServers[uid]
@@ -863,7 +867,13 @@ outer:
 	return nil, ErrDeviceNotFound.New(nil)
 }
 
-func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator) error {
+func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
+	defer func() {
+		if err != nil {
+			events.Publish(evtDropData(ctx, msg.EndDeviceIdentifiers, err))
+		}
+	}()
+
 	dev, err := ns.matchDevice(ctx, msg)
 	if err != nil {
 		return errors.NewWithCause(err, "Failed to match device")
@@ -883,6 +893,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	}
 
 	msg.RxMetadata = acc.Accumulated()
+	events.Publish(evtMergeMetadata(ctx, dev.EndDeviceIdentifiers, len(msg.RxMetadata)))
 
 	ups := dev.GetRecentUplinks()
 	if len(ups) >= recentUplinkCount {
@@ -907,16 +918,19 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		return nil
 	}
 
+	events.Publish(evtForwardData(ctx, dev.EndDeviceIdentifiers, nil))
+
 	pld := msg.Payload.GetMACPayload()
 	ses := dev.GetSession()
 	return cl.Send(&ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		SessionKeyID:         ses.GetSessionKeyID(),
 		Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-			FCnt:       ses.GetNextFCntUp() - 1,
-			FPort:      pld.GetFPort(),
-			FRMPayload: pld.GetFRMPayload(),
-			RxMetadata: msg.GetRxMetadata(),
+			FCnt:           ses.GetNextFCntUp() - 1,
+			FPort:          pld.GetFPort(),
+			FRMPayload:     pld.GetFRMPayload(),
+			RxMetadata:     msg.GetRxMetadata(),
+			CorrelationIDs: msg.GetCorrelationIDs(),
 		}},
 	})
 }
@@ -933,7 +947,13 @@ func (ns *NetworkServer) newDevAddr(*ttnpb.EndDevice) types.DevAddr {
 	return devAddr
 }
 
-func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator) error {
+func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
+	defer func() {
+		if err != nil {
+			events.Publish(evtDropJoin(ctx, msg.EndDeviceIdentifiers, err))
+		}
+	}()
+
 	pld := msg.Payload.GetJoinRequestPayload()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
@@ -982,6 +1002,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 
 	var errs []error
 	for _, js := range ns.joinServers {
+		events.Publish(evtForwardJoin(ctx, dev.EndDeviceIdentifiers, nil))
 		resp, err := js.HandleJoin(ctx, req, ns.ClusterAuth())
 		if err != nil {
 			errs = append(errs, err)
@@ -1003,6 +1024,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		}
 
 		msg.RxMetadata = acc.Accumulated()
+		events.Publish(evtMergeMetadata(ctx, dev.EndDeviceIdentifiers, len(msg.RxMetadata)))
 
 		dev.RecentUplinks = append(dev.GetRecentUplinks(), msg)
 		if len(dev.RecentUplinks) > recentUplinkCount {
@@ -1076,13 +1098,24 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 	return errors.NewWithCause(errors.New("No Join Server could handle join request"), "Failed to perform join procedure")
 }
 
-func (ns *NetworkServer) handleRejoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator) error {
-	// TODO: Implement (https://github.com/TheThingsIndustries/ttn/issues/557)
+func (ns *NetworkServer) handleRejoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
+	defer func() {
+		if err != nil {
+			events.Publish(evtDropRejoin(ctx, msg.EndDeviceIdentifiers, err))
+		}
+	}()
+	// TODO: Implement https://github.com/TheThingsIndustries/ttn/issues/557
 	return status.Errorf(codes.Unimplemented, "not implemented")
 }
 
 // HandleUplink is called by the Gateway Server when an uplink message arrives.
 func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*pbtypes.Empty, error) {
+	ctx = events.ContextWithCorrelationID(ctx, append(
+		msg.GetCorrelationIDs(),
+		fmt.Sprintf("ns:uplink:%s", events.NewCorrelationID()),
+	)...)
+	msg.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
+
 	msg.ReceivedAt = time.Now()
 
 	logger := log.FromContext(ctx)
@@ -1105,8 +1138,10 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	acc, ok := ns.deduplicateUplink(ctx, msg)
 	if ok {
 		logger.Debug("Dropping duplicate uplink")
+		events.Publish(evtReceiveUpDuplicate(ctx, msg.EndDeviceIdentifiers, nil))
 		return ttnpb.Empty, nil
 	}
+	events.Publish(evtReceiveUp(ctx, msg.EndDeviceIdentifiers, nil))
 
 	switch pld.GetMType() {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
