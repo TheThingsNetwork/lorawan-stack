@@ -37,14 +37,14 @@ type storer interface {
 }
 
 type sqlStore struct {
-	Users         *UserStore
-	Applications  *ApplicationStore
-	Gateways      *GatewayStore
-	Clients       *ClientStore
-	Settings      *SettingStore
-	Organizations *OrganizationStore
-	OAuth         *OAuthStore
-	Invitations   *InvitationStore
+	Users         *userStore
+	Applications  *applicationStore
+	Gateways      *gatewayStore
+	Clients       *clientStore
+	Settings      *settingStore
+	Organizations *organizationStore
+	OAuth         *oauthStore
+	Invitations   *invitationStore
 }
 
 func (s *sqlStore) store(behaviour store.Behaviour) *store.Store {
@@ -193,12 +193,12 @@ func (s *txImpl) store() *sqlStore {
 // initSubStores initializes the sub-stores of the store.Store.
 func initSubStores(s storer) {
 	store := s.store()
-	store.Users = NewUserStore(s)
-	store.Applications = NewApplicationStore(s)
-	store.Gateways = NewGatewayStore(s)
-	store.Clients = NewClientStore(s)
-	store.OAuth = NewOAuthStore(s)
-	store.Settings = NewSettingStore(s)
-	store.Invitations = NewInvitationStore(s)
-	store.Organizations = NewOrganizationStore(s)
+	store.Users = newUserStore(s)
+	store.Applications = newApplicationStore(s)
+	store.Gateways = newGatewayStore(s)
+	store.Clients = newClientStore(s)
+	store.OAuth = newOAuthStore(s)
+	store.Settings = newSettingStore(s)
+	store.Invitations = newInvitationStore(s)
+	store.Organizations = newOrganizationStore(s)
 }

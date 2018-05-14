@@ -22,7 +22,7 @@ import (
 )
 
 // SaveValidationToken saves the validation token.
-func (s *UserStore) SaveValidationToken(ids ttnpb.UserIdentifiers, token store.ValidationToken) (err error) {
+func (s *userStore) SaveValidationToken(ids ttnpb.UserIdentifiers, token store.ValidationToken) (err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		userID, err := s.getUserID(tx, ids)
 		if err != nil {
@@ -34,7 +34,7 @@ func (s *UserStore) SaveValidationToken(ids ttnpb.UserIdentifiers, token store.V
 	return
 }
 
-func (s *UserStore) saveValidationToken(q db.QueryContext, userID uuid.UUID, token store.ValidationToken) (err error) {
+func (s *userStore) saveValidationToken(q db.QueryContext, userID uuid.UUID, token store.ValidationToken) (err error) {
 	_, err = q.Exec(
 		`INSERT
 			INTO validation_tokens (
@@ -57,7 +57,7 @@ func (s *UserStore) saveValidationToken(q db.QueryContext, userID uuid.UUID, tok
 }
 
 // GetValidationToken retrieves the validation token.
-func (s *UserStore) GetValidationToken(token string) (identifier ttnpb.UserIdentifiers, data *store.ValidationToken, err error) {
+func (s *userStore) GetValidationToken(token string) (identifier ttnpb.UserIdentifiers, data *store.ValidationToken, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		var userID uuid.UUID
 		userID, data, err = s.getValidationToken(tx, token)
@@ -71,7 +71,7 @@ func (s *UserStore) GetValidationToken(token string) (identifier ttnpb.UserIdent
 	return
 }
 
-func (s *UserStore) getValidationToken(q db.QueryContext, token string) (id uuid.UUID, data *store.ValidationToken, err error) {
+func (s *userStore) getValidationToken(q db.QueryContext, token string) (id uuid.UUID, data *store.ValidationToken, err error) {
 	var res struct {
 		UserID uuid.UUID
 		*store.ValidationToken
@@ -95,11 +95,11 @@ func (s *UserStore) getValidationToken(q db.QueryContext, token string) (id uuid
 }
 
 // DeleteValidationToken deletes the validation token.
-func (s *UserStore) DeleteValidationToken(token string) error {
+func (s *userStore) DeleteValidationToken(token string) error {
 	return s.deleteValidationToken(s.queryer(), token)
 }
 
-func (s *UserStore) deleteValidationToken(q db.QueryContext, token string) (err error) {
+func (s *userStore) deleteValidationToken(q db.QueryContext, token string) (err error) {
 	t := new(string)
 	err = q.SelectOne(
 		t,

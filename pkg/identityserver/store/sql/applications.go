@@ -27,17 +27,15 @@ type application struct {
 	ttnpb.Application
 }
 
-// ApplicationStore implements store.ApplicationStore.
-type ApplicationStore struct {
+type applicationStore struct {
 	storer
 	*accountStore
 	*extraAttributesStore
 	*apiKeysStore
 }
 
-// NewApplicationStore returns an ApplicationStore.
-func NewApplicationStore(store storer) *ApplicationStore {
-	return &ApplicationStore{
+func newApplicationStore(store storer) *applicationStore {
+	return &applicationStore{
 		storer:               store,
 		accountStore:         newAccountStore(store),
 		extraAttributesStore: newExtraAttributesStore(store, "application"),
@@ -45,7 +43,7 @@ func NewApplicationStore(store storer) *ApplicationStore {
 	}
 }
 
-func (s *ApplicationStore) getApplicationIdentifiersFromID(q db.QueryContext, id uuid.UUID) (res ttnpb.ApplicationIdentifiers, err error) {
+func (s *applicationStore) getApplicationIdentifiersFromID(q db.QueryContext, id uuid.UUID) (res ttnpb.ApplicationIdentifiers, err error) {
 	err = q.SelectOne(
 		&res,
 		`SELECT
@@ -57,7 +55,7 @@ func (s *ApplicationStore) getApplicationIdentifiersFromID(q db.QueryContext, id
 }
 
 // getApplicationID returns the UUID of the application that matches the identifier.
-func (s *ApplicationStore) getApplicationID(q db.QueryContext, ids ttnpb.ApplicationIdentifiers) (id uuid.UUID, err error) {
+func (s *applicationStore) getApplicationID(q db.QueryContext, ids ttnpb.ApplicationIdentifiers) (id uuid.UUID, err error) {
 	err = q.SelectOne(
 		&id,
 		`SELECT
@@ -72,7 +70,7 @@ func (s *ApplicationStore) getApplicationID(q db.QueryContext, ids ttnpb.Applica
 }
 
 // Create creates a new application.
-func (s *ApplicationStore) Create(application store.Application) error {
+func (s *applicationStore) Create(application store.Application) error {
 	err := s.transact(func(tx *db.Tx) error {
 		appID, err := s.create(tx, application.GetApplication())
 		if err != nil {
@@ -84,7 +82,7 @@ func (s *ApplicationStore) Create(application store.Application) error {
 	return err
 }
 
-func (s *ApplicationStore) create(q db.QueryContext, application *ttnpb.Application) (id uuid.UUID, err error) {
+func (s *applicationStore) create(q db.QueryContext, application *ttnpb.Application) (id uuid.UUID, err error) {
 	err = q.NamedSelectOne(
 		&id,
 		`INSERT
@@ -109,7 +107,7 @@ func (s *ApplicationStore) create(q db.QueryContext, application *ttnpb.Applicat
 }
 
 // GetByID finds the application that matches the identifier and retrieves it.
-func (s *ApplicationStore) GetByID(id ttnpb.ApplicationIdentifiers, specializer store.ApplicationSpecializer) (result store.Application, err error) {
+func (s *applicationStore) GetByID(id ttnpb.ApplicationIdentifiers, specializer store.ApplicationSpecializer) (result store.Application, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		application, err := s.getByID(tx, id)
 		if err != nil {
@@ -124,7 +122,7 @@ func (s *ApplicationStore) GetByID(id ttnpb.ApplicationIdentifiers, specializer 
 	return
 }
 
-func (s *ApplicationStore) getByID(q db.QueryContext, id ttnpb.ApplicationIdentifiers) (result application, err error) {
+func (s *applicationStore) getByID(q db.QueryContext, id ttnpb.ApplicationIdentifiers) (result application, err error) {
 	err = q.NamedSelectOne(
 		&result,
 		`SELECT
@@ -141,7 +139,7 @@ func (s *ApplicationStore) getByID(q db.QueryContext, id ttnpb.ApplicationIdenti
 }
 
 // Update updates the Application.
-func (s *ApplicationStore) Update(application store.Application) error {
+func (s *applicationStore) Update(application store.Application) error {
 	app := application.GetApplication()
 
 	err := s.transact(func(tx *db.Tx) error {
@@ -160,7 +158,7 @@ func (s *ApplicationStore) Update(application store.Application) error {
 	return err
 }
 
-func (s *ApplicationStore) update(q db.QueryContext, appID uuid.UUID, app *ttnpb.Application) (err error) {
+func (s *applicationStore) update(q db.QueryContext, appID uuid.UUID, app *ttnpb.Application) (err error) {
 	var id string
 	err = q.NamedSelectOne(
 		&id,
@@ -181,7 +179,7 @@ func (s *ApplicationStore) update(q db.QueryContext, appID uuid.UUID, app *ttnpb
 }
 
 // Delete deletes the application that matches the identifier.
-func (s *ApplicationStore) Delete(id ttnpb.ApplicationIdentifiers) (err error) {
+func (s *applicationStore) Delete(id ttnpb.ApplicationIdentifiers) (err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		appID, err := s.getApplicationID(tx, id)
 		if err != nil {
@@ -195,7 +193,7 @@ func (s *ApplicationStore) Delete(id ttnpb.ApplicationIdentifiers) (err error) {
 
 // delete deletes the application itself. All rows in other tables that references
 // this entity must be deleted before this one gets deleted.
-func (s *ApplicationStore) delete(q db.QueryContext, appID uuid.UUID) (err error) {
+func (s *applicationStore) delete(q db.QueryContext, appID uuid.UUID) (err error) {
 	var res string
 	err = q.SelectOne(
 		&res,

@@ -26,7 +26,7 @@ import (
 
 // ListByOrganizationOrUser returns all the gateways to which an organization
 // or user is collaborator of.
-func (s *GatewayStore) ListByOrganizationOrUser(ids ttnpb.OrganizationOrUserIdentifiers, specializer store.GatewaySpecializer) (result []store.Gateway, err error) {
+func (s *gatewayStore) ListByOrganizationOrUser(ids ttnpb.OrganizationOrUserIdentifiers, specializer store.GatewaySpecializer) (result []store.Gateway, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		accountID, err := s.getAccountID(tx, ids)
 		if err != nil {
@@ -72,7 +72,7 @@ func (s *GatewayStore) ListByOrganizationOrUser(ids ttnpb.OrganizationOrUserIden
 	return
 }
 
-func (s *GatewayStore) listOrganizationOrUserGateways(q db.QueryContext, accountID uuid.UUID) (gateways []gateway, err error) {
+func (s *gatewayStore) listOrganizationOrUserGateways(q db.QueryContext, accountID uuid.UUID) (gateways []gateway, err error) {
 	err = q.Select(
 		&gateways,
 		`SELECT DISTINCT gateways.*
@@ -98,7 +98,7 @@ func (s *GatewayStore) listOrganizationOrUserGateways(q db.QueryContext, account
 
 // SetCollaborator inserts or modifies a collaborator within an entity.
 // If the provided list of rights is empty the collaborator will be unset.
-func (s *GatewayStore) SetCollaborator(collaborator ttnpb.GatewayCollaborator) error {
+func (s *gatewayStore) SetCollaborator(collaborator ttnpb.GatewayCollaborator) error {
 	err := s.transact(func(tx *db.Tx) error {
 		gtwID, err := s.getGatewayID(tx, collaborator.GatewayIdentifiers)
 		if err != nil {
@@ -124,7 +124,7 @@ func (s *GatewayStore) SetCollaborator(collaborator ttnpb.GatewayCollaborator) e
 	return err
 }
 
-func (s *GatewayStore) unsetCollaborator(q db.QueryContext, gtwID, accountID uuid.UUID) error {
+func (s *gatewayStore) unsetCollaborator(q db.QueryContext, gtwID, accountID uuid.UUID) error {
 	_, err := q.Exec(
 		`DELETE
 			FROM gateways_collaborators
@@ -132,7 +132,7 @@ func (s *GatewayStore) unsetCollaborator(q db.QueryContext, gtwID, accountID uui
 	return err
 }
 
-func (s *GatewayStore) setCollaborator(q db.QueryContext, gtwID, accountID uuid.UUID, rights []ttnpb.Right) (err error) {
+func (s *gatewayStore) setCollaborator(q db.QueryContext, gtwID, accountID uuid.UUID, rights []ttnpb.Right) (err error) {
 	args := make([]interface{}, 2+len(rights))
 	args[0] = gtwID
 	args[1] = accountID
@@ -159,7 +159,7 @@ func (s *GatewayStore) setCollaborator(q db.QueryContext, gtwID, accountID uuid.
 
 // HasCollaboratorRights checks whether a collaborator has a given set of rights
 // to a gateway. It returns false if the collaborationship does not exist.
-func (s *GatewayStore) HasCollaboratorRights(ids ttnpb.GatewayIdentifiers, target ttnpb.OrganizationOrUserIdentifiers, rights ...ttnpb.Right) (result bool, err error) {
+func (s *gatewayStore) HasCollaboratorRights(ids ttnpb.GatewayIdentifiers, target ttnpb.OrganizationOrUserIdentifiers, rights ...ttnpb.Right) (result bool, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		gtwID, err := s.getGatewayID(tx, ids)
 		if err != nil {
@@ -181,7 +181,7 @@ func (s *GatewayStore) HasCollaboratorRights(ids ttnpb.GatewayIdentifiers, targe
 	return
 }
 
-func (s *GatewayStore) hasCollaboratorRights(q db.QueryContext, gtwID, accountID uuid.UUID, rights ...ttnpb.Right) (bool, error) {
+func (s *gatewayStore) hasCollaboratorRights(q db.QueryContext, gtwID, accountID uuid.UUID, rights ...ttnpb.Right) (bool, error) {
 	clauses := make([]string, 0, len(rights))
 	args := make([]interface{}, 0, len(rights)+1)
 	args = append(args, gtwID, accountID)
@@ -215,7 +215,7 @@ func (s *GatewayStore) hasCollaboratorRights(q db.QueryContext, gtwID, accountID
 }
 
 // ListCollaborators retrieves all the collaborators from an entity.
-func (s *GatewayStore) ListCollaborators(ids ttnpb.GatewayIdentifiers, rights ...ttnpb.Right) (collaborators []ttnpb.GatewayCollaborator, err error) {
+func (s *gatewayStore) ListCollaborators(ids ttnpb.GatewayIdentifiers, rights ...ttnpb.Right) (collaborators []ttnpb.GatewayCollaborator, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		gtwID, err := s.getGatewayID(tx, ids)
 		if err != nil {
@@ -237,7 +237,7 @@ func (s *GatewayStore) ListCollaborators(ids ttnpb.GatewayIdentifiers, rights ..
 }
 
 // nolint: dupl
-func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID uuid.UUID, rights ...ttnpb.Right) ([]ttnpb.GatewayCollaborator, error) {
+func (s *gatewayStore) listCollaborators(q db.QueryContext, gtwID uuid.UUID, rights ...ttnpb.Right) ([]ttnpb.GatewayCollaborator, error) {
 	args := make([]interface{}, 1)
 	args[0] = gtwID
 
@@ -333,7 +333,7 @@ func (s *GatewayStore) listCollaborators(q db.QueryContext, gtwID uuid.UUID, rig
 
 // ListCollaboratorRights returns the rights a given collaborator has for an
 // Gateway. Returns empty list if the collaborationship does not exist.
-func (s *GatewayStore) ListCollaboratorRights(ids ttnpb.GatewayIdentifiers, target ttnpb.OrganizationOrUserIdentifiers) (rights []ttnpb.Right, err error) {
+func (s *gatewayStore) ListCollaboratorRights(ids ttnpb.GatewayIdentifiers, target ttnpb.OrganizationOrUserIdentifiers) (rights []ttnpb.Right, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		gtwID, err := s.getGatewayID(tx, ids)
 		if err != nil {
@@ -350,7 +350,7 @@ func (s *GatewayStore) ListCollaboratorRights(ids ttnpb.GatewayIdentifiers, targ
 	return
 }
 
-func (s *GatewayStore) listCollaboratorRights(q db.QueryContext, gtwID, accountID uuid.UUID, result *[]ttnpb.Right) error {
+func (s *gatewayStore) listCollaboratorRights(q db.QueryContext, gtwID, accountID uuid.UUID, result *[]ttnpb.Right) error {
 	err := q.Select(
 		result, `
 		SELECT

@@ -22,7 +22,7 @@ import (
 )
 
 // LoadAttributes loads the extra attributes in app if it is a store.Attributer.
-func (s *GatewayStore) LoadAttributes(ids ttnpb.GatewayIdentifiers, app store.Gateway) error {
+func (s *gatewayStore) LoadAttributes(ids ttnpb.GatewayIdentifiers, app store.Gateway) error {
 	attr, ok := app.(store.Attributer)
 	if !ok {
 		return nil
@@ -40,7 +40,7 @@ func (s *GatewayStore) LoadAttributes(ids ttnpb.GatewayIdentifiers, app store.Ga
 	return err
 }
 
-func (s *GatewayStore) loadAttributes(q db.QueryContext, gtwID uuid.UUID, gateway store.Gateway) error {
+func (s *gatewayStore) loadAttributes(q db.QueryContext, gtwID uuid.UUID, gateway store.Gateway) error {
 	attr, ok := gateway.(store.Attributer)
 	if !ok {
 		return nil
@@ -51,7 +51,7 @@ func (s *GatewayStore) loadAttributes(q db.QueryContext, gtwID uuid.UUID, gatewa
 
 // StoreAttributes store the extra attributes of app if it is a store.Attributer
 // and writes the resulting gateway in result.
-func (s *GatewayStore) StoreAttributes(ids ttnpb.GatewayIdentifiers, gateway store.Gateway) (err error) {
+func (s *gatewayStore) StoreAttributes(ids ttnpb.GatewayIdentifiers, gateway store.Gateway) (err error) {
 	_, ok := gateway.(store.Attributer)
 	if !ok {
 		return nil
@@ -69,7 +69,7 @@ func (s *GatewayStore) StoreAttributes(ids ttnpb.GatewayIdentifiers, gateway sto
 	return
 }
 
-func (s *GatewayStore) storeAttributes(q db.QueryContext, gtwID uuid.UUID, gateway store.Gateway) error {
+func (s *gatewayStore) storeAttributes(q db.QueryContext, gtwID uuid.UUID, gateway store.Gateway) error {
 	attr, ok := gateway.(store.Attributer)
 	if !ok {
 		return nil

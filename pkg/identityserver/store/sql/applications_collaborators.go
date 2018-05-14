@@ -26,7 +26,7 @@ import (
 
 // ListByOrganizationOrUser returns the applications to which an organization or
 // user if collaborator of.
-func (s *ApplicationStore) ListByOrganizationOrUser(ids ttnpb.OrganizationOrUserIdentifiers, specializer store.ApplicationSpecializer) (result []store.Application, err error) {
+func (s *applicationStore) ListByOrganizationOrUser(ids ttnpb.OrganizationOrUserIdentifiers, specializer store.ApplicationSpecializer) (result []store.Application, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		accountID, err := s.getAccountID(tx, ids)
 		if err != nil {
@@ -54,7 +54,7 @@ func (s *ApplicationStore) ListByOrganizationOrUser(ids ttnpb.OrganizationOrUser
 	return
 }
 
-func (s *ApplicationStore) listOrganizationOrUserApplications(q db.QueryContext, accountID uuid.UUID) (applications []application, err error) {
+func (s *applicationStore) listOrganizationOrUserApplications(q db.QueryContext, accountID uuid.UUID) (applications []application, err error) {
 	err = q.Select(
 		&applications,
 		`SELECT DISTINCT applications.*
@@ -80,7 +80,7 @@ func (s *ApplicationStore) listOrganizationOrUserApplications(q db.QueryContext,
 
 // SetCollaborator sets a collaborator into an application.
 // If the provided list of rights is empty the collaborator will be unset.
-func (s *ApplicationStore) SetCollaborator(collaborator ttnpb.ApplicationCollaborator) error {
+func (s *applicationStore) SetCollaborator(collaborator ttnpb.ApplicationCollaborator) error {
 	err := s.transact(func(tx *db.Tx) error {
 		appID, err := s.getApplicationID(tx, collaborator.ApplicationIdentifiers)
 		if err != nil {
@@ -106,7 +106,7 @@ func (s *ApplicationStore) SetCollaborator(collaborator ttnpb.ApplicationCollabo
 	return err
 }
 
-func (s *ApplicationStore) unsetCollaborator(q db.QueryContext, appID, accountID uuid.UUID) error {
+func (s *applicationStore) unsetCollaborator(q db.QueryContext, appID, accountID uuid.UUID) error {
 	_, err := q.Exec(
 		`DELETE
 			FROM applications_collaborators
@@ -116,7 +116,7 @@ func (s *ApplicationStore) unsetCollaborator(q db.QueryContext, appID, accountID
 	return err
 }
 
-func (s *ApplicationStore) setCollaborator(q db.QueryContext, appID, accountID uuid.UUID, rights []ttnpb.Right) (err error) {
+func (s *applicationStore) setCollaborator(q db.QueryContext, appID, accountID uuid.UUID, rights []ttnpb.Right) (err error) {
 	args := make([]interface{}, 2+len(rights))
 	args[0] = appID
 	args[1] = accountID
@@ -143,7 +143,7 @@ func (s *ApplicationStore) setCollaborator(q db.QueryContext, appID, accountID u
 
 // HasCollaboratorRights checks whether a collaborator has a given set of rights
 // to an application. It returns false if the collaborationship does not exist.
-func (s *ApplicationStore) HasCollaboratorRights(id ttnpb.ApplicationIdentifiers, target ttnpb.OrganizationOrUserIdentifiers, rights ...ttnpb.Right) (result bool, err error) {
+func (s *applicationStore) HasCollaboratorRights(id ttnpb.ApplicationIdentifiers, target ttnpb.OrganizationOrUserIdentifiers, rights ...ttnpb.Right) (result bool, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		appID, err := s.getApplicationID(tx, id)
 		if err != nil {
@@ -165,7 +165,7 @@ func (s *ApplicationStore) HasCollaboratorRights(id ttnpb.ApplicationIdentifiers
 	return
 }
 
-func (s *ApplicationStore) hasCollaboratorRights(q db.QueryContext, appID, accountID uuid.UUID, rights ...ttnpb.Right) (bool, error) {
+func (s *applicationStore) hasCollaboratorRights(q db.QueryContext, appID, accountID uuid.UUID, rights ...ttnpb.Right) (bool, error) {
 	// TODO(gomezjdaniel#544): Ensure consistency along the store when building
 	// programatically clauses for SQL queries.
 	clauses := make([]string, 0, len(rights))
@@ -202,7 +202,7 @@ func (s *ApplicationStore) hasCollaboratorRights(q db.QueryContext, appID, accou
 
 // ListCollaborators retrieves all the collaborators from an application.
 // Optionally a list of rights can be passed as argument to filter them.
-func (s *ApplicationStore) ListCollaborators(ids ttnpb.ApplicationIdentifiers, rights ...ttnpb.Right) (collaborators []ttnpb.ApplicationCollaborator, err error) {
+func (s *applicationStore) ListCollaborators(ids ttnpb.ApplicationIdentifiers, rights ...ttnpb.Right) (collaborators []ttnpb.ApplicationCollaborator, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		appID, err := s.getApplicationID(tx, ids)
 		if err != nil {
@@ -224,7 +224,7 @@ func (s *ApplicationStore) ListCollaborators(ids ttnpb.ApplicationIdentifiers, r
 }
 
 // nolint: dupl
-func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID uuid.UUID, rights ...ttnpb.Right) ([]ttnpb.ApplicationCollaborator, error) {
+func (s *applicationStore) listCollaborators(q db.QueryContext, appID uuid.UUID, rights ...ttnpb.Right) ([]ttnpb.ApplicationCollaborator, error) {
 	args := make([]interface{}, 1)
 	args[0] = appID
 
@@ -321,7 +321,7 @@ func (s *ApplicationStore) listCollaborators(q db.QueryContext, appID uuid.UUID,
 
 // ListCollaboratorRights returns the rights a given collaborator has for an
 // Application. Returns empty list if the collaborationship does not exist.
-func (s *ApplicationStore) ListCollaboratorRights(ids ttnpb.ApplicationIdentifiers, target ttnpb.OrganizationOrUserIdentifiers) (rights []ttnpb.Right, err error) {
+func (s *applicationStore) ListCollaboratorRights(ids ttnpb.ApplicationIdentifiers, target ttnpb.OrganizationOrUserIdentifiers) (rights []ttnpb.Right, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		appID, err := s.getApplicationID(tx, ids)
 		if err != nil {
@@ -338,7 +338,7 @@ func (s *ApplicationStore) ListCollaboratorRights(ids ttnpb.ApplicationIdentifie
 	return
 }
 
-func (s *ApplicationStore) listCollaboratorRights(q db.QueryContext, appID, accountID uuid.UUID, result *[]ttnpb.Right) error {
+func (s *applicationStore) listCollaboratorRights(q db.QueryContext, appID, accountID uuid.UUID, result *[]ttnpb.Right) error {
 	err := q.Select(
 		result, `
 		SELECT

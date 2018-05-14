@@ -26,17 +26,15 @@ type organization struct {
 	ttnpb.Organization
 }
 
-// OrganizationStore implements store.OrganizationStore.
-type OrganizationStore struct {
+type organizationStore struct {
 	storer
 	*extraAttributesStore
 	*apiKeysStore
 	*accountStore
 }
 
-// NewOrganizationStore returns an organization store.
-func NewOrganizationStore(store storer) *OrganizationStore {
-	return &OrganizationStore{
+func newOrganizationStore(store storer) *organizationStore {
+	return &organizationStore{
 		storer:               store,
 		extraAttributesStore: newExtraAttributesStore(store, "organization"),
 		apiKeysStore:         newAPIKeysStore(store, "organization"),
@@ -44,7 +42,7 @@ func NewOrganizationStore(store storer) *OrganizationStore {
 	}
 }
 
-func (s *OrganizationStore) getOrganizationIdentifiersFromID(q db.QueryContext, id uuid.UUID) (res ttnpb.OrganizationIdentifiers, err error) {
+func (s *organizationStore) getOrganizationIdentifiersFromID(q db.QueryContext, id uuid.UUID) (res ttnpb.OrganizationIdentifiers, err error) {
 	err = q.SelectOne(
 		&res,
 		`SELECT
@@ -55,7 +53,7 @@ func (s *OrganizationStore) getOrganizationIdentifiersFromID(q db.QueryContext, 
 	return
 }
 
-func (s *OrganizationStore) getOrganizationID(q db.QueryContext, ids ttnpb.OrganizationIdentifiers) (id uuid.UUID, err error) {
+func (s *organizationStore) getOrganizationID(q db.QueryContext, ids ttnpb.OrganizationIdentifiers) (id uuid.UUID, err error) {
 	err = q.SelectOne(
 		&id,
 		`SELECT
@@ -70,7 +68,7 @@ func (s *OrganizationStore) getOrganizationID(q db.QueryContext, ids ttnpb.Organ
 }
 
 // Create creates an organization.
-func (s *OrganizationStore) Create(org store.Organization) error {
+func (s *organizationStore) Create(org store.Organization) error {
 	err := s.transact(func(tx *db.Tx) error {
 		o := org.GetOrganization()
 
@@ -92,7 +90,7 @@ func (s *OrganizationStore) Create(org store.Organization) error {
 	return err
 }
 
-func (s *OrganizationStore) create(q db.QueryContext, data organization) (err error) {
+func (s *organizationStore) create(q db.QueryContext, data organization) (err error) {
 	_, err = q.NamedExec(
 		`INSERT
 			INTO organizations (
@@ -122,7 +120,7 @@ func (s *OrganizationStore) create(q db.QueryContext, data organization) (err er
 }
 
 // GetByID finds the organization by ID and retrieves it.
-func (s *OrganizationStore) GetByID(ids ttnpb.OrganizationIdentifiers, specializer store.OrganizationSpecializer) (result store.Organization, err error) {
+func (s *organizationStore) GetByID(ids ttnpb.OrganizationIdentifiers, specializer store.OrganizationSpecializer) (result store.Organization, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		orgID, err := s.getOrganizationID(tx, ids)
 		if err != nil {
@@ -141,7 +139,7 @@ func (s *OrganizationStore) GetByID(ids ttnpb.OrganizationIdentifiers, specializ
 	return
 }
 
-func (s *OrganizationStore) getByID(q db.QueryContext, orgID uuid.UUID) (result ttnpb.Organization, err error) {
+func (s *organizationStore) getByID(q db.QueryContext, orgID uuid.UUID) (result ttnpb.Organization, err error) {
 	err = q.SelectOne(
 		&result,
 		`SELECT
@@ -161,7 +159,7 @@ func (s *OrganizationStore) getByID(q db.QueryContext, orgID uuid.UUID) (result 
 }
 
 // Update updates an organization.
-func (s *OrganizationStore) Update(organization store.Organization) error {
+func (s *organizationStore) Update(organization store.Organization) error {
 	err := s.transact(func(tx *db.Tx) error {
 		org := organization.GetOrganization()
 
@@ -181,7 +179,7 @@ func (s *OrganizationStore) Update(organization store.Organization) error {
 	return err
 }
 
-func (s *OrganizationStore) update(q db.QueryContext, orgID uuid.UUID, data *ttnpb.Organization) error {
+func (s *organizationStore) update(q db.QueryContext, orgID uuid.UUID, data *ttnpb.Organization) error {
 	var id string
 	err := q.NamedSelectOne(
 		&id,
@@ -208,7 +206,7 @@ func (s *OrganizationStore) update(q db.QueryContext, orgID uuid.UUID, data *ttn
 }
 
 // Delete deletes an organization.
-func (s *OrganizationStore) Delete(ids ttnpb.OrganizationIdentifiers) error {
+func (s *organizationStore) Delete(ids ttnpb.OrganizationIdentifiers) error {
 	err := s.transact(func(tx *db.Tx) error {
 		orgID, err := s.getOrganizationID(tx, ids)
 		if err != nil {
@@ -226,7 +224,7 @@ func (s *OrganizationStore) Delete(ids ttnpb.OrganizationIdentifiers) error {
 	return err
 }
 
-func (s *OrganizationStore) delete(q db.QueryContext, orgID uuid.UUID) (err error) {
+func (s *organizationStore) delete(q db.QueryContext, orgID uuid.UUID) (err error) {
 	var id string
 	err = q.SelectOne(
 		&id,

@@ -26,21 +26,19 @@ type client struct {
 	ttnpb.Client
 }
 
-// ClientStore implements store.ClientStore.
-type ClientStore struct {
+type clientStore struct {
 	storer
 	*extraAttributesStore
 }
 
-// NewClientStore retuens a ClientStore.
-func NewClientStore(store storer) *ClientStore {
-	return &ClientStore{
+func newClientStore(store storer) *clientStore {
+	return &clientStore{
 		storer:               store,
 		extraAttributesStore: newExtraAttributesStore(store, "client"),
 	}
 }
 
-func (s *ClientStore) getClientIdentifiersFromID(q db.QueryContext, id uuid.UUID) (res ttnpb.ClientIdentifiers, err error) {
+func (s *clientStore) getClientIdentifiersFromID(q db.QueryContext, id uuid.UUID) (res ttnpb.ClientIdentifiers, err error) {
 	err = q.SelectOne(
 		&res,
 		`SELECT
@@ -51,7 +49,7 @@ func (s *ClientStore) getClientIdentifiersFromID(q db.QueryContext, id uuid.UUID
 	return
 }
 
-func (s *ClientStore) getClientID(q db.QueryContext, ids ttnpb.ClientIdentifiers) (res uuid.UUID, err error) {
+func (s *clientStore) getClientID(q db.QueryContext, ids ttnpb.ClientIdentifiers) (res uuid.UUID, err error) {
 	err = q.SelectOne(
 		&res,
 		`SELECT
@@ -66,7 +64,7 @@ func (s *ClientStore) getClientID(q db.QueryContext, ids ttnpb.ClientIdentifiers
 }
 
 // Create creates a client.
-func (s *ClientStore) Create(client store.Client) error {
+func (s *clientStore) Create(client store.Client) error {
 	err := s.transact(func(tx *db.Tx) error {
 		cli := client.GetClient()
 
@@ -85,7 +83,7 @@ func (s *ClientStore) Create(client store.Client) error {
 	return err
 }
 
-func (s *ClientStore) create(q db.QueryContext, userID uuid.UUID, data *ttnpb.Client) (id uuid.UUID, err error) {
+func (s *clientStore) create(q db.QueryContext, userID uuid.UUID, data *ttnpb.Client) (id uuid.UUID, err error) {
 	var cli struct {
 		*ttnpb.Client
 		CreatorID       uuid.UUID
@@ -143,7 +141,7 @@ func (s *ClientStore) create(q db.QueryContext, userID uuid.UUID, data *ttnpb.Cl
 }
 
 // GetByID finds a client by ID and retrieves it.
-func (s *ClientStore) GetByID(ids ttnpb.ClientIdentifiers, specializer store.ClientSpecializer) (result store.Client, err error) {
+func (s *clientStore) GetByID(ids ttnpb.ClientIdentifiers, specializer store.ClientSpecializer) (result store.Client, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		clientID, err := s.getClientID(tx, ids)
 		if err != nil {
@@ -163,7 +161,7 @@ func (s *ClientStore) GetByID(ids ttnpb.ClientIdentifiers, specializer store.Cli
 	return
 }
 
-func (s *ClientStore) getByID(q db.QueryContext, id uuid.UUID) (client ttnpb.Client, err error) {
+func (s *clientStore) getByID(q db.QueryContext, id uuid.UUID) (client ttnpb.Client, err error) {
 	var res struct {
 		ttnpb.Client
 		CreatorID       uuid.UUID
@@ -205,7 +203,7 @@ func (s *ClientStore) getByID(q db.QueryContext, id uuid.UUID) (client ttnpb.Cli
 }
 
 // List returns all the clients.
-func (s *ClientStore) List(specializer store.ClientSpecializer) ([]store.Client, error) {
+func (s *clientStore) List(specializer store.ClientSpecializer) ([]store.Client, error) {
 	var res []store.Client
 	err := s.transact(func(tx *db.Tx) error {
 		found, err := s.list(tx)
@@ -234,7 +232,7 @@ func (s *ClientStore) List(specializer store.ClientSpecializer) ([]store.Client,
 	return res, nil
 }
 
-func (s *ClientStore) list(q db.QueryContext) ([]client, error) {
+func (s *clientStore) list(q db.QueryContext) ([]client, error) {
 	var res []struct {
 		client
 		CreatorID       uuid.UUID
@@ -278,7 +276,7 @@ func (s *ClientStore) list(q db.QueryContext) ([]client, error) {
 }
 
 // ListByUser returns all the clients created by the client.
-func (s *ClientStore) ListByUser(ids ttnpb.UserIdentifiers, specializer store.ClientSpecializer) (result []store.Client, err error) {
+func (s *clientStore) ListByUser(ids ttnpb.UserIdentifiers, specializer store.ClientSpecializer) (result []store.Client, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		userID, err := s.store().Users.getUserID(tx, ids)
 		if err != nil {
@@ -306,7 +304,7 @@ func (s *ClientStore) ListByUser(ids ttnpb.UserIdentifiers, specializer store.Cl
 	return
 }
 
-func (s *ClientStore) userClients(q db.QueryContext, userID uuid.UUID) ([]client, error) {
+func (s *clientStore) userClients(q db.QueryContext, userID uuid.UUID) ([]client, error) {
 	var res []struct {
 		client
 		CreatorID       uuid.UUID
@@ -352,7 +350,7 @@ func (s *ClientStore) userClients(q db.QueryContext, userID uuid.UUID) ([]client
 }
 
 // Update updates the client.
-func (s *ClientStore) Update(client store.Client) error {
+func (s *clientStore) Update(client store.Client) error {
 	err := s.transact(func(tx *db.Tx) error {
 		cli := client.GetClient()
 
@@ -371,7 +369,7 @@ func (s *ClientStore) Update(client store.Client) error {
 	return err
 }
 
-func (s *ClientStore) update(q db.QueryContext, clientID uuid.UUID, data *ttnpb.Client) (err error) {
+func (s *clientStore) update(q db.QueryContext, clientID uuid.UUID, data *ttnpb.Client) (err error) {
 	var input struct {
 		client
 		CreatorID       uuid.UUID
@@ -423,7 +421,7 @@ func (s *ClientStore) update(q db.QueryContext, clientID uuid.UUID, data *ttnpb.
 }
 
 // Delete deletes a client.
-func (s *ClientStore) Delete(ids ttnpb.ClientIdentifiers) error {
+func (s *clientStore) Delete(ids ttnpb.ClientIdentifiers) error {
 	err := s.transact(func(tx *db.Tx) error {
 		clientID, err := s.getClientID(tx, ids)
 		if err != nil {
@@ -438,7 +436,7 @@ func (s *ClientStore) Delete(ids ttnpb.ClientIdentifiers) error {
 
 // delete deletes the client itself. All rows in other tables that references
 // this entity must be deleted before this one gets deleted.
-func (s *ClientStore) delete(q db.QueryContext, clientID uuid.UUID) (err error) {
+func (s *clientStore) delete(q db.QueryContext, clientID uuid.UUID) (err error) {
 	id := new(string)
 	err = q.SelectOne(
 		id,

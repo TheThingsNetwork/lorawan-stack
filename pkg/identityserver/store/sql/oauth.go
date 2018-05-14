@@ -21,20 +21,18 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-// OAuthStore implements store.OAuthStore.
-type OAuthStore struct {
+type oauthStore struct {
 	storer
 }
 
-// NewOAuthStore creates a new OAuth store.
-func NewOAuthStore(store storer) *OAuthStore {
-	return &OAuthStore{
+func newOAuthStore(store storer) *oauthStore {
+	return &oauthStore{
 		storer: store,
 	}
 }
 
 // SaveAuthorizationCode saves the authorization code.
-func (s *OAuthStore) SaveAuthorizationCode(data store.AuthorizationData) error {
+func (s *oauthStore) SaveAuthorizationCode(data store.AuthorizationData) error {
 	err := s.transact(func(tx *db.Tx) error {
 		st := s.store()
 
@@ -53,7 +51,7 @@ func (s *OAuthStore) SaveAuthorizationCode(data store.AuthorizationData) error {
 	return err
 }
 
-func (s *OAuthStore) saveAuthorizationCode(q db.QueryContext, userID, clientID uuid.UUID, data store.AuthorizationData) error {
+func (s *oauthStore) saveAuthorizationCode(q db.QueryContext, userID, clientID uuid.UUID, data store.AuthorizationData) error {
 	_, err := q.Exec(
 		`INSERT
 			INTO authorization_codes (
@@ -92,7 +90,7 @@ type authorizationData struct {
 }
 
 // GetAuthorizationCode finds the authorization code.
-func (s *OAuthStore) GetAuthorizationCode(authorizationCode string) (result store.AuthorizationData, err error) {
+func (s *oauthStore) GetAuthorizationCode(authorizationCode string) (result store.AuthorizationData, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		data, err := s.getAuthorizationCode(tx, authorizationCode)
 		if err != nil {
@@ -120,7 +118,7 @@ func (s *OAuthStore) GetAuthorizationCode(authorizationCode string) (result stor
 	return
 }
 
-func (s *OAuthStore) getAuthorizationCode(q db.QueryContext, authorizationCode string) (data authorizationData, err error) {
+func (s *oauthStore) getAuthorizationCode(q db.QueryContext, authorizationCode string) (data authorizationData, err error) {
 	err = q.SelectOne(
 		&data,
 		`SELECT
@@ -144,11 +142,11 @@ func (s *OAuthStore) getAuthorizationCode(q db.QueryContext, authorizationCode s
 }
 
 // DeleteAuthorizationCode deletes the authorization code.
-func (s *OAuthStore) DeleteAuthorizationCode(authorizationCode string) error {
+func (s *oauthStore) DeleteAuthorizationCode(authorizationCode string) error {
 	return s.deleteAuthorizationCode(s.queryer(), authorizationCode)
 }
 
-func (s *OAuthStore) deleteAuthorizationCode(q db.QueryContext, authorizationCode string) error {
+func (s *oauthStore) deleteAuthorizationCode(q db.QueryContext, authorizationCode string) error {
 	code := new(string)
 	err := q.SelectOne(
 		code,
@@ -166,7 +164,7 @@ func (s *OAuthStore) deleteAuthorizationCode(q db.QueryContext, authorizationCod
 	return err
 }
 
-func (s *OAuthStore) deleteAuthorizationCodesByUser(q db.QueryContext, userID uuid.UUID) error {
+func (s *oauthStore) deleteAuthorizationCodesByUser(q db.QueryContext, userID uuid.UUID) error {
 	_, err := q.Exec(`DELETE FROM authorization_codes WHERE user_id = $1`, userID)
 	return err
 }
@@ -178,7 +176,7 @@ type accessData struct {
 }
 
 // SaveAccessToken saves the access data.
-func (s *OAuthStore) SaveAccessToken(data store.AccessData) error {
+func (s *oauthStore) SaveAccessToken(data store.AccessData) error {
 	err := s.transact(func(tx *db.Tx) error {
 		st := s.store()
 
@@ -197,7 +195,7 @@ func (s *OAuthStore) SaveAccessToken(data store.AccessData) error {
 	return err
 }
 
-func (s *OAuthStore) saveAccessToken(q db.QueryContext, userID, clientID uuid.UUID, access store.AccessData) error {
+func (s *oauthStore) saveAccessToken(q db.QueryContext, userID, clientID uuid.UUID, access store.AccessData) error {
 	result := new(string)
 	err := q.SelectOne(
 		result,
@@ -230,7 +228,7 @@ func (s *OAuthStore) saveAccessToken(q db.QueryContext, userID, clientID uuid.UU
 }
 
 // GetAccessToken finds the access token.
-func (s *OAuthStore) GetAccessToken(accessToken string) (result store.AccessData, err error) {
+func (s *oauthStore) GetAccessToken(accessToken string) (result store.AccessData, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		data, err := s.getAccessToken(tx, accessToken)
 		if err != nil {
@@ -258,7 +256,7 @@ func (s *OAuthStore) GetAccessToken(accessToken string) (result store.AccessData
 	return
 }
 
-func (s *OAuthStore) getAccessToken(q db.QueryContext, accessToken string) (result accessData, err error) {
+func (s *oauthStore) getAccessToken(q db.QueryContext, accessToken string) (result accessData, err error) {
 	err = q.SelectOne(
 		&result,
 		`SELECT
@@ -282,11 +280,11 @@ func (s *OAuthStore) getAccessToken(q db.QueryContext, accessToken string) (resu
 }
 
 // DeleteAccessToken deletes the access token from the database.
-func (s *OAuthStore) DeleteAccessToken(accessToken string) error {
+func (s *oauthStore) DeleteAccessToken(accessToken string) error {
 	return s.deleteAccessToken(s.queryer(), accessToken)
 }
 
-func (s *OAuthStore) deleteAccessToken(q db.QueryContext, accessToken string) error {
+func (s *oauthStore) deleteAccessToken(q db.QueryContext, accessToken string) error {
 	token := new(string)
 	err := q.SelectOne(
 		token,
@@ -311,7 +309,7 @@ type refreshData struct {
 }
 
 // SaveRefreshToken saves the refresh token.
-func (s *OAuthStore) SaveRefreshToken(data store.RefreshData) error {
+func (s *oauthStore) SaveRefreshToken(data store.RefreshData) error {
 	err := s.transact(func(tx *db.Tx) error {
 		st := s.store()
 
@@ -330,7 +328,7 @@ func (s *OAuthStore) SaveRefreshToken(data store.RefreshData) error {
 	return err
 }
 
-func (s *OAuthStore) saveRefreshToken(q db.QueryContext, userID, clientID uuid.UUID, data store.RefreshData) error {
+func (s *oauthStore) saveRefreshToken(q db.QueryContext, userID, clientID uuid.UUID, data store.RefreshData) error {
 	result := new(string)
 	err := q.SelectOne(
 		result,
@@ -361,7 +359,7 @@ func (s *OAuthStore) saveRefreshToken(q db.QueryContext, userID, clientID uuid.U
 }
 
 // GetRefreshToken finds the refresh token.
-func (s *OAuthStore) GetRefreshToken(refreshToken string) (result store.RefreshData, err error) {
+func (s *oauthStore) GetRefreshToken(refreshToken string) (result store.RefreshData, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		data, err := s.getRefreshToken(tx, refreshToken)
 		if err != nil {
@@ -389,7 +387,7 @@ func (s *OAuthStore) GetRefreshToken(refreshToken string) (result store.RefreshD
 	return
 }
 
-func (s *OAuthStore) getRefreshToken(q db.QueryContext, refreshToken string) (result refreshData, err error) {
+func (s *oauthStore) getRefreshToken(q db.QueryContext, refreshToken string) (result refreshData, err error) {
 	err = q.SelectOne(
 		&result,
 		`SELECT
@@ -412,11 +410,11 @@ func (s *OAuthStore) getRefreshToken(q db.QueryContext, refreshToken string) (re
 }
 
 // DeleteRefreshToken deletes the refresh token from the database.
-func (s *OAuthStore) DeleteRefreshToken(refreshToken string) error {
+func (s *oauthStore) DeleteRefreshToken(refreshToken string) error {
 	return s.deleteRefreshToken(s.queryer(), refreshToken)
 }
 
-func (s *OAuthStore) deleteRefreshToken(q db.QueryContext, refreshToken string) error {
+func (s *oauthStore) deleteRefreshToken(q db.QueryContext, refreshToken string) error {
 	token := new(string)
 	err := q.SelectOne(
 		token,
@@ -435,7 +433,7 @@ func (s *OAuthStore) deleteRefreshToken(q db.QueryContext, refreshToken string) 
 }
 
 // ListAuthorizedClients returns a list of clients authorized by a given user.
-func (s *OAuthStore) ListAuthorizedClients(ids ttnpb.UserIdentifiers, specializer store.ClientSpecializer) (result []store.Client, err error) {
+func (s *oauthStore) ListAuthorizedClients(ids ttnpb.UserIdentifiers, specializer store.ClientSpecializer) (result []store.Client, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		st := s.store()
 
@@ -470,7 +468,7 @@ func (s *OAuthStore) ListAuthorizedClients(ids ttnpb.UserIdentifiers, specialize
 	return
 }
 
-func (s *OAuthStore) listAuthorizedClients(q db.QueryContext, userID uuid.UUID) (ids []uuid.UUID, err error) {
+func (s *oauthStore) listAuthorizedClients(q db.QueryContext, userID uuid.UUID) (ids []uuid.UUID, err error) {
 	err = q.Select(
 		&ids,
 		`SELECT DISTINCT clients.id
@@ -489,7 +487,7 @@ func (s *OAuthStore) listAuthorizedClients(q db.QueryContext, userID uuid.UUID) 
 
 // RevokeAuthorizedClient deletes the access tokens and refresh token
 // granted to a client by a given user.
-func (s *OAuthStore) RevokeAuthorizedClient(userIDs ttnpb.UserIdentifiers, clientIDs ttnpb.ClientIdentifiers) error {
+func (s *oauthStore) RevokeAuthorizedClient(userIDs ttnpb.UserIdentifiers, clientIDs ttnpb.ClientIdentifiers) error {
 	rows := 0
 	err := s.transact(func(tx *db.Tx) error {
 		st := s.store()
@@ -527,7 +525,7 @@ func (s *OAuthStore) RevokeAuthorizedClient(userIDs ttnpb.UserIdentifiers, clien
 	return nil
 }
 
-func (s *OAuthStore) deleteAccessTokensByUserAndClient(q db.QueryContext, userID, clientID uuid.UUID) (int, error) {
+func (s *oauthStore) deleteAccessTokensByUserAndClient(q db.QueryContext, userID, clientID uuid.UUID) (int, error) {
 	res, err := q.Exec(
 		`DELETE
 			FROM access_tokens
@@ -544,7 +542,7 @@ func (s *OAuthStore) deleteAccessTokensByUserAndClient(q db.QueryContext, userID
 	return int(rows), nil
 }
 
-func (s *OAuthStore) deleteRefreshTokenByUserAndClient(q db.QueryContext, userID, clientID uuid.UUID) (int, error) {
+func (s *oauthStore) deleteRefreshTokenByUserAndClient(q db.QueryContext, userID, clientID uuid.UUID) (int, error) {
 	res, err := q.Exec(
 		`DELETE
 			FROM refresh_tokens

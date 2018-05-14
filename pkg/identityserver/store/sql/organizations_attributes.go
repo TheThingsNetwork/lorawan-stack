@@ -22,7 +22,7 @@ import (
 )
 
 // LoadAttributes loads the extra attributes in app if it is a store.Attributer.
-func (s *OrganizationStore) LoadAttributes(ids ttnpb.OrganizationIdentifiers, app store.Organization) error {
+func (s *organizationStore) LoadAttributes(ids ttnpb.OrganizationIdentifiers, app store.Organization) error {
 	attr, ok := app.(store.Attributer)
 	if !ok {
 		return nil
@@ -40,7 +40,7 @@ func (s *OrganizationStore) LoadAttributes(ids ttnpb.OrganizationIdentifiers, ap
 	return err
 }
 
-func (s *OrganizationStore) loadAttributes(q db.QueryContext, orgID uuid.UUID, organization store.Organization) error {
+func (s *organizationStore) loadAttributes(q db.QueryContext, orgID uuid.UUID, organization store.Organization) error {
 	attr, ok := organization.(store.Attributer)
 	if !ok {
 		return nil
@@ -51,7 +51,7 @@ func (s *OrganizationStore) loadAttributes(q db.QueryContext, orgID uuid.UUID, o
 
 // StoreAttributes store the extra attributes of app if it is a store.Attributer
 // and writes the resulting organization in result.
-func (s *OrganizationStore) StoreAttributes(ids ttnpb.OrganizationIdentifiers, organization store.Organization) (err error) {
+func (s *organizationStore) StoreAttributes(ids ttnpb.OrganizationIdentifiers, organization store.Organization) (err error) {
 	_, ok := organization.(store.Attributer)
 	if !ok {
 		return nil
@@ -69,7 +69,7 @@ func (s *OrganizationStore) StoreAttributes(ids ttnpb.OrganizationIdentifiers, o
 	return
 }
 
-func (s *OrganizationStore) storeAttributes(q db.QueryContext, orgID uuid.UUID, organization store.Organization) error {
+func (s *organizationStore) storeAttributes(q db.QueryContext, orgID uuid.UUID, organization store.Organization) error {
 	attr, ok := organization.(store.Attributer)
 	if !ok {
 		return nil

@@ -21,7 +21,7 @@ import (
 )
 
 // SaveAPIKey stores an API Key attached to an organization.
-func (s *OrganizationStore) SaveAPIKey(ids ttnpb.OrganizationIdentifiers, key ttnpb.APIKey) error {
+func (s *organizationStore) SaveAPIKey(ids ttnpb.OrganizationIdentifiers, key ttnpb.APIKey) error {
 	err := s.transact(func(tx *db.Tx) error {
 		orgID, err := s.getOrganizationID(tx, ids)
 		if err != nil {
@@ -39,7 +39,7 @@ func (s *OrganizationStore) SaveAPIKey(ids ttnpb.OrganizationIdentifiers, key tt
 }
 
 // GetAPIKey retrieves an API key by value and the organization identifiers.
-func (s *OrganizationStore) GetAPIKey(value string) (ids ttnpb.OrganizationIdentifiers, key ttnpb.APIKey, err error) {
+func (s *organizationStore) GetAPIKey(value string) (ids ttnpb.OrganizationIdentifiers, key ttnpb.APIKey, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		var orgID uuid.UUID
 		orgID, key, err = s.getAPIKey(tx, value)
@@ -63,7 +63,7 @@ func (s *OrganizationStore) GetAPIKey(value string) (ids ttnpb.OrganizationIdent
 }
 
 // GetAPIKeyByName retrieves an API key from an organization.
-func (s *OrganizationStore) GetAPIKeyByName(ids ttnpb.OrganizationIdentifiers, keyName string) (key ttnpb.APIKey, err error) {
+func (s *organizationStore) GetAPIKeyByName(ids ttnpb.OrganizationIdentifiers, keyName string) (key ttnpb.APIKey, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		orgID, err := s.getOrganizationID(tx, ids)
 		if err != nil {
@@ -83,7 +83,7 @@ func (s *OrganizationStore) GetAPIKeyByName(ids ttnpb.OrganizationIdentifiers, k
 }
 
 // ListAPIKeys list all the API keys that an organization has.
-func (s *OrganizationStore) ListAPIKeys(ids ttnpb.OrganizationIdentifiers) (keys []ttnpb.APIKey, err error) {
+func (s *organizationStore) ListAPIKeys(ids ttnpb.OrganizationIdentifiers) (keys []ttnpb.APIKey, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		orgID, err := s.getOrganizationID(tx, ids)
 		if err != nil {
@@ -108,7 +108,7 @@ func (s *OrganizationStore) ListAPIKeys(ids ttnpb.OrganizationIdentifiers) (keys
 }
 
 // UpdateAPIKeyRights updates the right of an API key.
-func (s *OrganizationStore) UpdateAPIKeyRights(ids ttnpb.OrganizationIdentifiers, keyName string, rights []ttnpb.Right) error {
+func (s *organizationStore) UpdateAPIKeyRights(ids ttnpb.OrganizationIdentifiers, keyName string, rights []ttnpb.Right) error {
 	err := s.transact(func(tx *db.Tx) error {
 		orgID, err := s.getOrganizationID(tx, ids)
 		if err != nil {
@@ -126,7 +126,7 @@ func (s *OrganizationStore) UpdateAPIKeyRights(ids ttnpb.OrganizationIdentifiers
 }
 
 // DeleteAPIKey deletes a given API key from an organization.
-func (s *OrganizationStore) DeleteAPIKey(ids ttnpb.OrganizationIdentifiers, keyName string) error {
+func (s *organizationStore) DeleteAPIKey(ids ttnpb.OrganizationIdentifiers, keyName string) error {
 	err := s.transact(func(tx *db.Tx) error {
 		orgID, err := s.getOrganizationID(tx, ids)
 		if err != nil {

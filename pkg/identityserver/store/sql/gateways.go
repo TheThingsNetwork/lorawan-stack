@@ -29,17 +29,15 @@ type gateway struct {
 	ttnpb.Gateway
 }
 
-// GatewayStore implements store.GatewayStore.
-type GatewayStore struct {
+type gatewayStore struct {
 	storer
 	*extraAttributesStore
 	*apiKeysStore
 	*accountStore
 }
 
-// NewGatewayStore returns a GatewayStore.
-func NewGatewayStore(store storer) *GatewayStore {
-	return &GatewayStore{
+func newGatewayStore(store storer) *gatewayStore {
+	return &gatewayStore{
 		storer:               store,
 		extraAttributesStore: newExtraAttributesStore(store, "gateway"),
 		apiKeysStore:         newAPIKeysStore(store, "gateway"),
@@ -47,7 +45,7 @@ func NewGatewayStore(store storer) *GatewayStore {
 	}
 }
 
-func (s *GatewayStore) getGatewayIdentifiersFromID(q db.QueryContext, id uuid.UUID) (res ttnpb.GatewayIdentifiers, err error) {
+func (s *gatewayStore) getGatewayIdentifiersFromID(q db.QueryContext, id uuid.UUID) (res ttnpb.GatewayIdentifiers, err error) {
 	err = q.SelectOne(
 		&res,
 		`SELECT
@@ -60,7 +58,7 @@ func (s *GatewayStore) getGatewayIdentifiersFromID(q db.QueryContext, id uuid.UU
 }
 
 // getGatewayID returns the UUID of the gateway that matches the identifier.
-func (s *GatewayStore) getGatewayID(q db.QueryContext, ids ttnpb.GatewayIdentifiers) (res uuid.UUID, err error) {
+func (s *gatewayStore) getGatewayID(q db.QueryContext, ids ttnpb.GatewayIdentifiers) (res uuid.UUID, err error) {
 	clauses := make([]string, 0)
 	if ids.GatewayID != "" {
 		clauses = append(clauses, "gateway_id = :gateway_id")
@@ -85,7 +83,7 @@ func (s *GatewayStore) getGatewayID(q db.QueryContext, ids ttnpb.GatewayIdentifi
 }
 
 // Create creates a new gateway.
-func (s *GatewayStore) Create(gateway store.Gateway) error {
+func (s *gatewayStore) Create(gateway store.Gateway) error {
 	err := s.transact(func(tx *db.Tx) error {
 		gtw := gateway.GetGateway()
 
@@ -117,7 +115,7 @@ func (s *GatewayStore) Create(gateway store.Gateway) error {
 	return err
 }
 
-func (s *GatewayStore) create(q db.QueryContext, gateway *ttnpb.Gateway) (id uuid.UUID, err error) {
+func (s *gatewayStore) create(q db.QueryContext, gateway *ttnpb.Gateway) (id uuid.UUID, err error) {
 	err = q.NamedSelectOne(
 		&id,
 		`INSERT
@@ -155,7 +153,7 @@ func (s *GatewayStore) create(q db.QueryContext, gateway *ttnpb.Gateway) (id uui
 	return
 }
 
-func (s *GatewayStore) addAntennas(q db.QueryContext, gtwID uuid.UUID, antennas []ttnpb.GatewayAntenna) error {
+func (s *gatewayStore) addAntennas(q db.QueryContext, gtwID uuid.UUID, antennas []ttnpb.GatewayAntenna) error {
 	if len(antennas) == 0 {
 		return nil
 	}
@@ -164,7 +162,7 @@ func (s *GatewayStore) addAntennas(q db.QueryContext, gtwID uuid.UUID, antennas 
 	return err
 }
 
-func (s *GatewayStore) addAntennasQuery(gtwID uuid.UUID, antennas []ttnpb.GatewayAntenna) (string, []interface{}) {
+func (s *gatewayStore) addAntennasQuery(gtwID uuid.UUID, antennas []ttnpb.GatewayAntenna) (string, []interface{}) {
 	args := make([]interface{}, 1+7*len(antennas))
 	args[0] = gtwID
 
@@ -203,7 +201,7 @@ func (s *GatewayStore) addAntennasQuery(gtwID uuid.UUID, antennas []ttnpb.Gatewa
 	return query, args
 }
 
-func (s *GatewayStore) addRadios(q db.QueryContext, gtwID uuid.UUID, radios []ttnpb.GatewayRadio) error {
+func (s *gatewayStore) addRadios(q db.QueryContext, gtwID uuid.UUID, radios []ttnpb.GatewayRadio) error {
 	if len(radios) == 0 {
 		return nil
 	}
@@ -212,7 +210,7 @@ func (s *GatewayStore) addRadios(q db.QueryContext, gtwID uuid.UUID, radios []tt
 	return err
 }
 
-func (s *GatewayStore) addRadiosQuery(gtwID uuid.UUID, radios []ttnpb.GatewayRadio) (string, []interface{}) {
+func (s *gatewayStore) addRadiosQuery(gtwID uuid.UUID, radios []ttnpb.GatewayRadio) (string, []interface{}) {
 	args := make([]interface{}, 1+2*len(radios))
 	args[0] = gtwID
 
@@ -241,7 +239,7 @@ func (s *GatewayStore) addRadiosQuery(gtwID uuid.UUID, radios []ttnpb.GatewayRad
 }
 
 // GetByID finds a gateway by ID and retrieves it.
-func (s *GatewayStore) GetByID(ids ttnpb.GatewayIdentifiers, specializer store.GatewaySpecializer) (result store.Gateway, err error) {
+func (s *gatewayStore) GetByID(ids ttnpb.GatewayIdentifiers, specializer store.GatewaySpecializer) (result store.Gateway, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		gtwID, err := s.getGatewayID(tx, ids)
 		if err != nil {
@@ -281,7 +279,7 @@ func (s *GatewayStore) GetByID(ids ttnpb.GatewayIdentifiers, specializer store.G
 
 // gateway fetchs a gateway from the database without antennas and attributes and
 // saves it into result.
-func (s *GatewayStore) getByID(q db.QueryContext, gtwID uuid.UUID) (result gateway, err error) {
+func (s *gatewayStore) getByID(q db.QueryContext, gtwID uuid.UUID) (result gateway, err error) {
 	err = q.SelectOne(
 		&result,
 		`SELECT
@@ -296,7 +294,7 @@ func (s *GatewayStore) getByID(q db.QueryContext, gtwID uuid.UUID) (result gatew
 }
 
 // Update updates the gateway.
-func (s *GatewayStore) Update(gateway store.Gateway) error {
+func (s *gatewayStore) Update(gateway store.Gateway) error {
 	err := s.transact(func(tx *db.Tx) error {
 		gtw := gateway.GetGateway()
 
@@ -330,7 +328,7 @@ func (s *GatewayStore) Update(gateway store.Gateway) error {
 	return err
 }
 
-func (s *GatewayStore) update(q db.QueryContext, gtwID uuid.UUID, data *ttnpb.Gateway) (err error) {
+func (s *gatewayStore) update(q db.QueryContext, gtwID uuid.UUID, data *ttnpb.Gateway) (err error) {
 	var id string
 	err = q.NamedSelectOne(
 		&id,
@@ -359,7 +357,7 @@ func (s *GatewayStore) update(q db.QueryContext, gtwID uuid.UUID, data *ttnpb.Ga
 	return
 }
 
-func (s *GatewayStore) updateAntennas(q db.QueryContext, gtwID uuid.UUID, antennas []ttnpb.GatewayAntenna) error {
+func (s *gatewayStore) updateAntennas(q db.QueryContext, gtwID uuid.UUID, antennas []ttnpb.GatewayAntenna) error {
 	_, err := q.Exec("DELETE FROM gateways_antennas WHERE gateway_id = $1", gtwID)
 	if err != nil {
 		return err
@@ -368,7 +366,7 @@ func (s *GatewayStore) updateAntennas(q db.QueryContext, gtwID uuid.UUID, antenn
 	return s.addAntennas(q, gtwID, antennas)
 }
 
-func (s *GatewayStore) updateRadios(q db.QueryContext, gtwID uuid.UUID, radios []ttnpb.GatewayRadio) error {
+func (s *gatewayStore) updateRadios(q db.QueryContext, gtwID uuid.UUID, radios []ttnpb.GatewayRadio) error {
 	_, err := q.Exec("DELETE FROM gateways_radios WHERE gateway_id = $1", gtwID)
 	if err != nil {
 		return err
@@ -379,7 +377,7 @@ func (s *GatewayStore) updateRadios(q db.QueryContext, gtwID uuid.UUID, radios [
 
 // updateAttributes removes the attributes that no longer exists for the gateway
 // given its ID and sets the rest of attributes.
-func (s *GatewayStore) updateAttributes(q db.QueryContext, gtwID uuid.UUID, attributes map[string]string) error {
+func (s *gatewayStore) updateAttributes(q db.QueryContext, gtwID uuid.UUID, attributes map[string]string) error {
 	query, args := s.removeAttributeDiffQuery(gtwID, attributes)
 	_, err := q.Exec(query, args...)
 	if err != nil {
@@ -392,7 +390,7 @@ func (s *GatewayStore) updateAttributes(q db.QueryContext, gtwID uuid.UUID, attr
 // removeAttributeDiffQuery is the helper that construct the query to remove
 // those gateway attributes that no longer exists. It returns the query together
 // with the arguments list.
-func (s *GatewayStore) removeAttributeDiffQuery(gtwID uuid.UUID, attributes map[string]string) (string, []interface{}) {
+func (s *gatewayStore) removeAttributeDiffQuery(gtwID uuid.UUID, attributes map[string]string) (string, []interface{}) {
 	args := make([]interface{}, 1+len(attributes))
 	args[0] = gtwID
 
@@ -415,7 +413,7 @@ func (s *GatewayStore) removeAttributeDiffQuery(gtwID uuid.UUID, attributes map[
 }
 
 // setAttributes inserts or modifies the attributes.
-func (s *GatewayStore) setAttributes(q db.QueryContext, gtwID uuid.UUID, attributes map[string]string) error {
+func (s *gatewayStore) setAttributes(q db.QueryContext, gtwID uuid.UUID, attributes map[string]string) error {
 	if attributes == nil || len(attributes) == 0 {
 		return nil
 	}
@@ -427,7 +425,7 @@ func (s *GatewayStore) setAttributes(q db.QueryContext, gtwID uuid.UUID, attribu
 
 // setAttributesQuery is a helper that constructs the upsert query for the
 // setAttributes method and returns it together with the list of arguments.
-func (s *GatewayStore) setAttributesQuery(gtwID uuid.UUID, attributes map[string]string) (string, []interface{}) {
+func (s *gatewayStore) setAttributesQuery(gtwID uuid.UUID, attributes map[string]string) (string, []interface{}) {
 	args := make([]interface{}, 1+2*len(attributes))
 	args[0] = gtwID
 
@@ -453,7 +451,7 @@ func (s *GatewayStore) setAttributesQuery(gtwID uuid.UUID, attributes map[string
 	return query, args
 }
 
-func (s *GatewayStore) listAttributes(q db.QueryContext, gtwID uuid.UUID) (map[string]string, error) {
+func (s *gatewayStore) listAttributes(q db.QueryContext, gtwID uuid.UUID) (map[string]string, error) {
 	var attrs []struct {
 		Attribute string
 		Value     string
@@ -479,7 +477,7 @@ func (s *GatewayStore) listAttributes(q db.QueryContext, gtwID uuid.UUID) (map[s
 	return result, nil
 }
 
-func (s *GatewayStore) listAntennas(q db.QueryContext, gtwID uuid.UUID) ([]ttnpb.GatewayAntenna, error) {
+func (s *gatewayStore) listAntennas(q db.QueryContext, gtwID uuid.UUID) ([]ttnpb.GatewayAntenna, error) {
 	var antnns []struct {
 		Longitude float32
 		Latitude  float32
@@ -522,7 +520,7 @@ func (s *GatewayStore) listAntennas(q db.QueryContext, gtwID uuid.UUID) ([]ttnpb
 	return result, nil
 }
 
-func (s *GatewayStore) listRadios(q db.QueryContext, gtwID uuid.UUID) ([]ttnpb.GatewayRadio, error) {
+func (s *gatewayStore) listRadios(q db.QueryContext, gtwID uuid.UUID) ([]ttnpb.GatewayRadio, error) {
 	var radios []ttnpb.GatewayRadio
 	err := q.Select(
 		&radios,
@@ -543,7 +541,7 @@ func (s *GatewayStore) listRadios(q db.QueryContext, gtwID uuid.UUID) ([]ttnpb.G
 }
 
 // Delete deletes a gateway.
-func (s *GatewayStore) Delete(ids ttnpb.GatewayIdentifiers) error {
+func (s *gatewayStore) Delete(ids ttnpb.GatewayIdentifiers) error {
 	err := s.transact(func(tx *db.Tx) error {
 		gtwID, err := s.getGatewayID(tx, ids)
 		if err != nil {
@@ -558,7 +556,7 @@ func (s *GatewayStore) Delete(ids ttnpb.GatewayIdentifiers) error {
 
 // delete deletes the gateway itself. All rows in other tables that references
 // this entity must be delete before this one gets deleted.
-func (s *GatewayStore) delete(q db.QueryContext, gtwID uuid.UUID) error {
+func (s *gatewayStore) delete(q db.QueryContext, gtwID uuid.UUID) error {
 	id := new(string)
 	err := q.SelectOne(
 		id,

@@ -22,7 +22,7 @@ import (
 )
 
 // LoadAttributes loads the extra attributes in app if it is a store.Attributer.
-func (s *UserStore) LoadAttributes(ids ttnpb.UserIdentifiers, app store.User) error {
+func (s *userStore) LoadAttributes(ids ttnpb.UserIdentifiers, app store.User) error {
 	attr, ok := app.(store.Attributer)
 	if !ok {
 		return nil
@@ -40,7 +40,7 @@ func (s *UserStore) LoadAttributes(ids ttnpb.UserIdentifiers, app store.User) er
 	return err
 }
 
-func (s *UserStore) loadAttributes(q db.QueryContext, userID uuid.UUID, user store.User) error {
+func (s *userStore) loadAttributes(q db.QueryContext, userID uuid.UUID, user store.User) error {
 	attr, ok := user.(store.Attributer)
 	if !ok {
 		return nil
@@ -51,7 +51,7 @@ func (s *UserStore) loadAttributes(q db.QueryContext, userID uuid.UUID, user sto
 
 // StoreAttributes store the extra attributes of app if it is a store.Attributer
 // and writes the resulting user in result.
-func (s *UserStore) StoreAttributes(ids ttnpb.UserIdentifiers, user store.User) (err error) {
+func (s *userStore) StoreAttributes(ids ttnpb.UserIdentifiers, user store.User) (err error) {
 	_, ok := user.(store.Attributer)
 	if !ok {
 		return nil
@@ -69,7 +69,7 @@ func (s *UserStore) StoreAttributes(ids ttnpb.UserIdentifiers, user store.User) 
 	return
 }
 
-func (s *UserStore) storeAttributes(q db.QueryContext, userID uuid.UUID, user store.User) error {
+func (s *userStore) storeAttributes(q db.QueryContext, userID uuid.UUID, user store.User) error {
 	attr, ok := user.(store.Attributer)
 	if !ok {
 		return nil

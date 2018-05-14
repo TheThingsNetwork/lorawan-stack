@@ -22,7 +22,7 @@ import (
 )
 
 // LoadAttributes loads the extra attributes in app if it is a store.Attributer.
-func (s *ApplicationStore) LoadAttributes(id ttnpb.ApplicationIdentifiers, app store.Application) error {
+func (s *applicationStore) LoadAttributes(id ttnpb.ApplicationIdentifiers, app store.Application) error {
 	attr, ok := app.(store.Attributer)
 	if !ok {
 		return nil
@@ -40,7 +40,7 @@ func (s *ApplicationStore) LoadAttributes(id ttnpb.ApplicationIdentifiers, app s
 	return err
 }
 
-func (s *ApplicationStore) loadAttributes(q db.QueryContext, appID uuid.UUID, application store.Application) error {
+func (s *applicationStore) loadAttributes(q db.QueryContext, appID uuid.UUID, application store.Application) error {
 	attr, ok := application.(store.Attributer)
 	if !ok {
 		return nil
@@ -51,7 +51,7 @@ func (s *ApplicationStore) loadAttributes(q db.QueryContext, appID uuid.UUID, ap
 
 // StoreAttributes store the extra attributes of app if it is a store.Attributer
 // and writes the resulting application in result.
-func (s *ApplicationStore) StoreAttributes(id ttnpb.ApplicationIdentifiers, application store.Application) (err error) {
+func (s *applicationStore) StoreAttributes(id ttnpb.ApplicationIdentifiers, application store.Application) (err error) {
 	_, ok := application.(store.Attributer)
 	if !ok {
 		return nil
@@ -69,7 +69,7 @@ func (s *ApplicationStore) StoreAttributes(id ttnpb.ApplicationIdentifiers, appl
 	return
 }
 
-func (s *ApplicationStore) storeAttributes(q db.QueryContext, appID uuid.UUID, application store.Application) error {
+func (s *applicationStore) storeAttributes(q db.QueryContext, appID uuid.UUID, application store.Application) error {
 	attr, ok := application.(store.Attributer)
 	if !ok {
 		return nil

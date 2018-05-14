@@ -25,7 +25,7 @@ import (
 )
 
 // ListByUser returns the organizations to which an user is a member of.
-func (s *OrganizationStore) ListByUser(ids ttnpb.UserIdentifiers, specializer store.OrganizationSpecializer) (result []store.Organization, err error) {
+func (s *organizationStore) ListByUser(ids ttnpb.UserIdentifiers, specializer store.OrganizationSpecializer) (result []store.Organization, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		st := s.store()
 
@@ -55,7 +55,7 @@ func (s *OrganizationStore) ListByUser(ids ttnpb.UserIdentifiers, specializer st
 	return
 }
 
-func (s *OrganizationStore) listUserOrganizations(q db.QueryContext, userID uuid.UUID) (organizations []organization, err error) {
+func (s *organizationStore) listUserOrganizations(q db.QueryContext, userID uuid.UUID) (organizations []organization, err error) {
 	err = q.Select(
 		&organizations,
 		`SELECT DISTINCT
@@ -73,7 +73,7 @@ func (s *OrganizationStore) listUserOrganizations(q db.QueryContext, userID uuid
 
 // HasMemberRights checks whether an user has or not a set of given rights to
 // an organization. Returns false if the user is not part of the organization.
-func (s *OrganizationStore) HasMemberRights(ids ttnpb.OrganizationIdentifiers, target ttnpb.UserIdentifiers, rights ...ttnpb.Right) (result bool, err error) {
+func (s *organizationStore) HasMemberRights(ids ttnpb.OrganizationIdentifiers, target ttnpb.UserIdentifiers, rights ...ttnpb.Right) (result bool, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		orgID, err := s.getOrganizationID(tx, ids)
 		if err != nil {
@@ -95,7 +95,7 @@ func (s *OrganizationStore) HasMemberRights(ids ttnpb.OrganizationIdentifiers, t
 	return
 }
 
-func (s *OrganizationStore) hasMemberRights(q db.QueryContext, orgID, userID uuid.UUID, rights ...ttnpb.Right) (bool, error) {
+func (s *organizationStore) hasMemberRights(q db.QueryContext, orgID, userID uuid.UUID, rights ...ttnpb.Right) (bool, error) {
 	clauses := make([]string, 0, len(rights))
 	args := make([]interface{}, 0, len(rights)+2)
 	args = append(args, orgID, userID)
@@ -125,7 +125,7 @@ func (s *OrganizationStore) hasMemberRights(q db.QueryContext, orgID, userID uui
 
 // ListMembers retrieves all the members from an organization. Optionally a list
 // of rights can be passed to filter them.
-func (s *OrganizationStore) ListMembers(ids ttnpb.OrganizationIdentifiers, rights ...ttnpb.Right) (members []ttnpb.OrganizationMember, err error) {
+func (s *organizationStore) ListMembers(ids ttnpb.OrganizationIdentifiers, rights ...ttnpb.Right) (members []ttnpb.OrganizationMember, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		orgID, err := s.getOrganizationID(tx, ids)
 		if err != nil {
@@ -146,7 +146,7 @@ func (s *OrganizationStore) ListMembers(ids ttnpb.OrganizationIdentifiers, right
 	return
 }
 
-func (s *OrganizationStore) listMembers(q db.QueryContext, orgID uuid.UUID, rights ...ttnpb.Right) ([]ttnpb.OrganizationMember, error) {
+func (s *organizationStore) listMembers(q db.QueryContext, orgID uuid.UUID, rights ...ttnpb.Right) ([]ttnpb.OrganizationMember, error) {
 	args := make([]interface{}, 0, 2+len(rights))
 	args = append(args, orgID)
 
@@ -230,7 +230,7 @@ func (s *OrganizationStore) listMembers(q db.QueryContext, orgID uuid.UUID, righ
 
 // SetMember inserts or updates a member within an organization.
 // If the list of rights is empty the member will be unset.
-func (s *OrganizationStore) SetMember(member ttnpb.OrganizationMember) (err error) {
+func (s *organizationStore) SetMember(member ttnpb.OrganizationMember) (err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		orgID, err := s.getOrganizationID(tx, member.OrganizationIdentifiers)
 		if err != nil {
@@ -256,7 +256,7 @@ func (s *OrganizationStore) SetMember(member ttnpb.OrganizationMember) (err erro
 	return
 }
 
-func (s *OrganizationStore) removeMember(q db.QueryContext, orgID, userID uuid.UUID) error {
+func (s *organizationStore) removeMember(q db.QueryContext, orgID, userID uuid.UUID) error {
 	_, err := q.Exec(
 		`DELETE FROM
 			organizations_members
@@ -266,7 +266,7 @@ func (s *OrganizationStore) removeMember(q db.QueryContext, orgID, userID uuid.U
 	return err
 }
 
-func (s *OrganizationStore) setMember(q db.QueryContext, orgID, userID uuid.UUID, rights []ttnpb.Right) error {
+func (s *organizationStore) setMember(q db.QueryContext, orgID, userID uuid.UUID, rights []ttnpb.Right) error {
 	// add rights
 	values := make([]string, len(rights))
 	args := make([]interface{}, len(rights)+2)
@@ -291,7 +291,7 @@ func (s *OrganizationStore) setMember(q db.QueryContext, orgID, userID uuid.UUID
 }
 
 // ListMemberRights returns the rights a given user has for an entity.
-func (s *OrganizationStore) ListMemberRights(ids ttnpb.OrganizationIdentifiers, target ttnpb.UserIdentifiers) (rights []ttnpb.Right, err error) {
+func (s *organizationStore) ListMemberRights(ids ttnpb.OrganizationIdentifiers, target ttnpb.UserIdentifiers) (rights []ttnpb.Right, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		orgID, err := s.getOrganizationID(tx, ids)
 		if err != nil {
@@ -308,7 +308,7 @@ func (s *OrganizationStore) ListMemberRights(ids ttnpb.OrganizationIdentifiers, 
 	return
 }
 
-func (s *OrganizationStore) listMemberRights(q db.QueryContext, orgID, userID uuid.UUID, result *[]ttnpb.Right) (err error) {
+func (s *organizationStore) listMemberRights(q db.QueryContext, orgID, userID uuid.UUID, result *[]ttnpb.Right) (err error) {
 	err = q.Select(
 		result,
 		`SELECT

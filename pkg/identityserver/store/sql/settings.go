@@ -20,24 +20,22 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-// SettingStore implements store.SettingStore.
-type SettingStore struct {
+type settingStore struct {
 	storer
 }
 
-// NewSettingStore returns a settings store.
-func NewSettingStore(store storer) *SettingStore {
-	return &SettingStore{
+func newSettingStore(store storer) *settingStore {
+	return &settingStore{
 		storer: store,
 	}
 }
 
 // Get returns the settings.
-func (s *SettingStore) Get() (*ttnpb.IdentityServerSettings, error) {
+func (s *settingStore) Get() (*ttnpb.IdentityServerSettings, error) {
 	return s.get(s.queryer())
 }
 
-func (s *SettingStore) get(q db.QueryContext) (*ttnpb.IdentityServerSettings, error) {
+func (s *settingStore) get(q db.QueryContext) (*ttnpb.IdentityServerSettings, error) {
 	var res struct {
 		*ttnpb.IdentityServerSettings
 		AllowedEmailsConverted  db.StringSlice
@@ -70,11 +68,11 @@ func (s *SettingStore) get(q db.QueryContext) (*ttnpb.IdentityServerSettings, er
 }
 
 // Set sets the settings.
-func (s *SettingStore) Set(settings ttnpb.IdentityServerSettings) error {
+func (s *settingStore) Set(settings ttnpb.IdentityServerSettings) error {
 	return s.set(s.queryer(), settings)
 }
 
-func (s *SettingStore) set(q db.QueryContext, settings ttnpb.IdentityServerSettings) error {
+func (s *settingStore) set(q db.QueryContext, settings ttnpb.IdentityServerSettings) error {
 	var input struct {
 		*ttnpb.IdentityServerSettings
 		BlacklistedIDsConverted db.StringSlice

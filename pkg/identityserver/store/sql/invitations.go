@@ -19,24 +19,23 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 )
 
-// InvitationStore implements store.InvitationStore.
-type InvitationStore struct {
+// invitationStore implements store.invitationStore.
+type invitationStore struct {
 	storer
 }
 
-// NewInvitationStore creates a new invitation store.
-func NewInvitationStore(store storer) *InvitationStore {
-	return &InvitationStore{
+func newInvitationStore(store storer) *invitationStore {
+	return &invitationStore{
 		storer: store,
 	}
 }
 
 // Save saves the invitation.
-func (s *InvitationStore) Save(data store.InvitationData) error {
+func (s *invitationStore) Save(data store.InvitationData) error {
 	return s.save(s.queryer(), data)
 }
 
-func (s *InvitationStore) save(q db.QueryContext, data store.InvitationData) error {
+func (s *invitationStore) save(q db.QueryContext, data store.InvitationData) error {
 	_, err := q.NamedExec(
 		`INSERT
 			INTO invitations (
@@ -61,11 +60,11 @@ func (s *InvitationStore) save(q db.QueryContext, data store.InvitationData) err
 }
 
 // List lists all the saved invitations.
-func (s *InvitationStore) List() ([]*store.InvitationData, error) {
+func (s *invitationStore) List() ([]*store.InvitationData, error) {
 	return s.list(s.queryer())
 }
 
-func (s *InvitationStore) list(q db.QueryContext) ([]*store.InvitationData, error) {
+func (s *invitationStore) list(q db.QueryContext) ([]*store.InvitationData, error) {
 	var invitations []*store.InvitationData
 	err := q.Select(
 		&invitations,
@@ -87,11 +86,11 @@ func (s *InvitationStore) list(q db.QueryContext) ([]*store.InvitationData, erro
 }
 
 // Use deletes an invitation but also takes into account the token binded to it.
-func (s *InvitationStore) Use(email, token string) error {
+func (s *invitationStore) Use(email, token string) error {
 	return s.use(s.queryer(), email, token)
 }
 
-func (s *InvitationStore) use(q db.QueryContext, email, token string) error {
+func (s *invitationStore) use(q db.QueryContext, email, token string) error {
 	id := ""
 	err := q.SelectOne(
 		&id,
@@ -108,11 +107,11 @@ func (s *InvitationStore) use(q db.QueryContext, email, token string) error {
 }
 
 // Delete deletes an invitation by its ID.
-func (s *InvitationStore) Delete(email string) error {
+func (s *invitationStore) Delete(email string) error {
 	return s.delete(s.queryer(), email)
 }
 
-func (s *InvitationStore) delete(q db.QueryContext, email string) error {
+func (s *invitationStore) delete(q db.QueryContext, email string) error {
 	_, err := q.Exec(`DELETE FROM invitations WHERE email = $1`, email)
 	return err
 }

@@ -22,7 +22,7 @@ import (
 )
 
 // LoadAttributes loads the extra attributes in app if it is a store.Attributer.
-func (s *ClientStore) LoadAttributes(ids ttnpb.ClientIdentifiers, app store.Client) error {
+func (s *clientStore) LoadAttributes(ids ttnpb.ClientIdentifiers, app store.Client) error {
 	attr, ok := app.(store.Attributer)
 	if !ok {
 		return nil
@@ -40,7 +40,7 @@ func (s *ClientStore) LoadAttributes(ids ttnpb.ClientIdentifiers, app store.Clie
 	return err
 }
 
-func (s *ClientStore) loadAttributes(q db.QueryContext, clientID uuid.UUID, client store.Client) error {
+func (s *clientStore) loadAttributes(q db.QueryContext, clientID uuid.UUID, client store.Client) error {
 	attr, ok := client.(store.Attributer)
 	if !ok {
 		return nil
@@ -51,7 +51,7 @@ func (s *ClientStore) loadAttributes(q db.QueryContext, clientID uuid.UUID, clie
 
 // StoreAttributes store the extra attributes of app if it is a store.Attributer
 // and writes the resulting client in result.
-func (s *ClientStore) StoreAttributes(ids ttnpb.ClientIdentifiers, client store.Client) (err error) {
+func (s *clientStore) StoreAttributes(ids ttnpb.ClientIdentifiers, client store.Client) (err error) {
 	_, ok := client.(store.Attributer)
 	if !ok {
 		return nil
@@ -69,7 +69,7 @@ func (s *ClientStore) StoreAttributes(ids ttnpb.ClientIdentifiers, client store.
 	return
 }
 
-func (s *ClientStore) storeAttributes(q db.QueryContext, clientID uuid.UUID, client store.Client) error {
+func (s *clientStore) storeAttributes(q db.QueryContext, clientID uuid.UUID, client store.Client) error {
 	attr, ok := client.(store.Attributer)
 	if !ok {
 		return nil

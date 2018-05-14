@@ -30,17 +30,15 @@ type user struct {
 	ttnpb.User
 }
 
-// UserStore implements store.UserStore.
-type UserStore struct {
+type userStore struct {
 	storer
 	*extraAttributesStore
 	*apiKeysStore
 	*accountStore
 }
 
-// NewUserStore returns an UserStore.
-func NewUserStore(store storer) *UserStore {
-	return &UserStore{
+func newUserStore(store storer) *userStore {
+	return &userStore{
 		storer:               store,
 		extraAttributesStore: newExtraAttributesStore(store, "user"),
 		apiKeysStore:         newAPIKeysStore(store, "user"),
@@ -48,7 +46,7 @@ func NewUserStore(store storer) *UserStore {
 	}
 }
 
-func (s *UserStore) getUserIdentifiersFromID(q db.QueryContext, id uuid.UUID) (res ttnpb.UserIdentifiers, err error) {
+func (s *userStore) getUserIdentifiersFromID(q db.QueryContext, id uuid.UUID) (res ttnpb.UserIdentifiers, err error) {
 	err = q.SelectOne(
 		&res,
 		`SELECT
@@ -60,7 +58,7 @@ func (s *UserStore) getUserIdentifiersFromID(q db.QueryContext, id uuid.UUID) (r
 	return
 }
 
-func (s *UserStore) getUserID(q db.QueryContext, ids ttnpb.UserIdentifiers) (res uuid.UUID, err error) {
+func (s *userStore) getUserID(q db.QueryContext, ids ttnpb.UserIdentifiers) (res uuid.UUID, err error) {
 	clauses := make([]string, 0)
 	if ids.UserID != "" {
 		clauses = append(clauses, "user_id = :user_id")
@@ -85,7 +83,7 @@ func (s *UserStore) getUserID(q db.QueryContext, ids ttnpb.UserIdentifiers) (res
 }
 
 // Create creates an user.
-func (s *UserStore) Create(usr store.User) error {
+func (s *userStore) Create(usr store.User) error {
 	err := s.transact(func(tx *db.Tx) error {
 		u := usr.GetUser()
 
@@ -107,7 +105,7 @@ func (s *UserStore) Create(usr store.User) error {
 	return err
 }
 
-func (s *UserStore) create(q db.QueryContext, data user) (err error) {
+func (s *userStore) create(q db.QueryContext, data user) (err error) {
 	_, err = q.NamedExec(
 		`INSERT
 			INTO users (
@@ -151,7 +149,7 @@ func (s *UserStore) create(q db.QueryContext, data user) (err error) {
 }
 
 // GetByID finds the user by the given identifiers and retrieves it.
-func (s *UserStore) GetByID(ids ttnpb.UserIdentifiers, specializer store.UserSpecializer) (result store.User, err error) {
+func (s *userStore) GetByID(ids ttnpb.UserIdentifiers, specializer store.UserSpecializer) (result store.User, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		userID, err := s.getUserID(tx, ids)
 		if err != nil {
@@ -171,7 +169,7 @@ func (s *UserStore) GetByID(ids ttnpb.UserIdentifiers, specializer store.UserSpe
 	return
 }
 
-func (s *UserStore) getByID(q db.QueryContext, userID uuid.UUID) (result user, err error) {
+func (s *userStore) getByID(q db.QueryContext, userID uuid.UUID) (result user, err error) {
 	err = q.SelectOne(
 		&result,
 		`SELECT
@@ -186,7 +184,7 @@ func (s *UserStore) getByID(q db.QueryContext, userID uuid.UUID) (result user, e
 }
 
 // List returns all the users.
-func (s *UserStore) List(specializer store.UserSpecializer) (result []store.User, err error) {
+func (s *userStore) List(specializer store.UserSpecializer) (result []store.User, err error) {
 	err = s.transact(func(tx *db.Tx) error {
 		users, err := s.list(tx)
 		if err != nil {
@@ -209,13 +207,13 @@ func (s *UserStore) List(specializer store.UserSpecializer) (result []store.User
 	return
 }
 
-func (s *UserStore) list(q db.QueryContext) (result []user, err error) {
+func (s *userStore) list(q db.QueryContext) (result []user, err error) {
 	err = q.Select(&result, `SELECT * FROM users`)
 	return
 }
 
 // Update updates an user.
-func (s *UserStore) Update(ids ttnpb.UserIdentifiers, user store.User) error {
+func (s *userStore) Update(ids ttnpb.UserIdentifiers, user store.User) error {
 	err := s.transact(func(tx *db.Tx) error {
 		u := user.GetUser()
 
@@ -234,7 +232,7 @@ func (s *UserStore) Update(ids ttnpb.UserIdentifiers, user store.User) error {
 	return err
 }
 
-func (s *UserStore) update(q db.QueryContext, userID uuid.UUID, data *ttnpb.User) (err error) {
+func (s *userStore) update(q db.QueryContext, userID uuid.UUID, data *ttnpb.User) (err error) {
 	_, err = q.NamedExec(
 		`UPDATE users
 			SET
@@ -259,7 +257,7 @@ func (s *UserStore) update(q db.QueryContext, userID uuid.UUID, data *ttnpb.User
 }
 
 // Delete deletes an user.
-func (s *UserStore) Delete(ids ttnpb.UserIdentifiers) error {
+func (s *userStore) Delete(ids ttnpb.UserIdentifiers) error {
 	err := s.transact(func(tx *db.Tx) error {
 		userID, err := s.getUserID(tx, ids)
 		if err != nil {
@@ -279,7 +277,7 @@ func (s *UserStore) Delete(ids ttnpb.UserIdentifiers) error {
 	return err
 }
 
-func (s *UserStore) delete(q db.QueryContext, userID uuid.UUID) (err error) {
+func (s *userStore) delete(q db.QueryContext, userID uuid.UUID) (err error) {
 	id := new(string)
 	err = q.SelectOne(
 		id,
