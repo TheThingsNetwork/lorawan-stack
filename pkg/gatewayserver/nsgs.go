@@ -19,6 +19,7 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/validate"
 )
@@ -45,5 +46,10 @@ func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downli
 	}
 
 	connection.addDownstreamObservations(&ttnpb.GatewayDown{DownlinkMessage: down})
+
+	msgCtx := events.ContextWithCorrelationID(ctx, down.CorrelationIDs...)
+	// TODO: merge identifiers instead of putting EndDeviceIdentifiers in event payload:
+	events.Publish(evtSendDown(msgCtx, connection.gateway().GatewayIdentifiers, down.EndDeviceIdentifiers))
+
 	return ttnpb.Empty, nil
 }

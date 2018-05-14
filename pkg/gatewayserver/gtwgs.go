@@ -22,6 +22,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -115,6 +116,9 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 		return err
 	}
 
+	events.Publish(evtStartGatewayLink(ctx, gtwID, nil))
+	defer events.Publish(evtEndGatewayLink(ctx, gtwID, err))
+
 	logger := log.FromContext(ctx).WithField("gateway_id", gtwID)
 	ctx = log.NewContext(ctx, logger)
 	logger.Info("Link with gateway opened")
@@ -198,16 +202,25 @@ func (g *GatewayServer) handleUpstreamMessage(ctx context.Context, connectionInf
 	connectionInfo.addUpstreamObservations(upstreamMessage)
 
 	if upstreamMessage.GatewayStatus != nil {
+		events.Publish(evtReceiveStatus(ctx, connectionInfo.gateway().GatewayIdentifiers, nil))
 		g.handleStatus(ctx, upstreamMessage.GatewayStatus)
 	}
 	for _, uplink := range upstreamMessage.UplinkMessages {
-		g.handleUplink(ctx, uplink, connectionInfo.gateway())
+		msgCtx := events.ContextWithCorrelationID(ctx, append(
+			uplink.CorrelationIDs,
+			fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()),
+		)...)
+		uplink.CorrelationIDs = events.CorrelationIDsFromContext(msgCtx)
+		// TODO: merge identifiers instead of putting EndDeviceIdentifiers in event payload:
+		events.Publish(evtReceiveUp(msgCtx, connectionInfo.gatewayIdentifiers(), uplink.EndDeviceIdentifiers))
+
+		g.handleUplink(msgCtx, uplink, connectionInfo)
 	}
 
 	return
 }
 
-func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMessage, gwMetadata *ttnpb.Gateway) (err error) {
+func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMessage, gwConnection connection) (err error) {
 	logger := log.FromContext(ctx)
 	defer func() {
 		if err != nil {
@@ -217,8 +230,12 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 		}
 	}()
 
+	gwMetadata := gwConnection.gateway()
 	useLocationFromMetadata := gwMetadata != nil && len(gwMetadata.GetAntennas()) == 0
+
 	for _, antenna := range uplink.RxMetadata {
+		antenna.GatewayIdentifiers = gwConnection.gatewayIdentifiers()
+
 		index := int(antenna.GetAntennaIndex())
 		if !gwMetadata.GetPrivacySettings().LocationPublic {
 			antenna.Location = nil

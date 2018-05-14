@@ -71,7 +71,7 @@ func (g *GatewayServer) runUDPBridge(ctx context.Context, udpConn *net.UDPConn) 
 
 		gatewayConnection, ok := udpGateways[*packet.GatewayEUI]
 		if !ok {
-			gatewayConnection = &udpConnection{}
+			gatewayConnection = &udpConnection{eui: packet.GatewayEUI}
 			udpGateways[*packet.GatewayEUI] = gatewayConnection
 		}
 

@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/udp"
 	"go.thethings.network/lorawan-stack/pkg/toa"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 const (
@@ -40,6 +41,7 @@ type connection interface {
 	getObservations() ttnpb.GatewayObservations
 
 	gateway() *ttnpb.Gateway
+	gatewayIdentifiers() ttnpb.GatewayIdentifiers
 	send(*ttnpb.DownlinkMessage) error
 	Close() error
 }
@@ -117,6 +119,10 @@ func (c *gRPCConnection) gateway() *ttnpb.Gateway {
 	return c.gtw
 }
 
+func (c *gRPCConnection) gatewayIdentifiers() ttnpb.GatewayIdentifiers {
+	return c.gateway().GatewayIdentifiers
+}
+
 func (c *gRPCConnection) Close() error {
 	c.cancel()
 	return nil
@@ -131,6 +137,8 @@ type udpConnection struct {
 
 	concentratorStart atomic.Value
 	hasSentTxAck      atomic.Value
+
+	eui *types.EUI64
 }
 
 func (c *udpConnection) hasJITQueue() bool {
@@ -209,6 +217,17 @@ func (c *udpConnection) send(down *ttnpb.DownlinkMessage) error {
 func (c *udpConnection) gateway() *ttnpb.Gateway {
 	gtw, _ := c.gtw.Load().(*ttnpb.Gateway)
 	return gtw
+}
+
+func (c *udpConnection) gatewayIdentifiers() ttnpb.GatewayIdentifiers {
+	gtw := c.gateway()
+	if gtw != nil {
+		return gtw.GatewayIdentifiers
+	}
+
+	return ttnpb.GatewayIdentifiers{
+		EUI: c.eui,
+	}
 }
 
 func (c *udpConnection) Close() error { return nil }
