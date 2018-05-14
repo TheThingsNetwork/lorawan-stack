@@ -41,7 +41,7 @@ func TestAdminSettings(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(resp, test.ShouldBeSettingsIgnoringAutoFields, testSettings())
 
-	// modify settings
+	// Modify settings.
 	_, err = is.adminService.UpdateSettings(ctx, &ttnpb.UpdateSettingsRequest{
 		Settings: ttnpb.IdentityServerSettings{
 			IdentityServerSettings_UserRegistrationFlow: ttnpb.IdentityServerSettings_UserRegistrationFlow{
@@ -70,7 +70,7 @@ func TestAdminInvitations(t *testing.T) {
 	_, err := is.adminService.SendInvitation(ctx, &ttnpb.SendInvitationRequest{Email: email})
 	a.So(err, should.BeNil)
 
-	// gather the token to register an account
+	// Gather the token to register an account.
 	token := ""
 
 	invitation, ok := mock.Data().(*templates.Invitation)
@@ -88,7 +88,7 @@ func TestAdminInvitations(t *testing.T) {
 		a.So(i.ExpiresAt.IsZero(), should.BeFalse)
 	}
 
-	// use invitation
+	// Use invitation.
 	settings, err := is.store.Settings.Get()
 	a.So(err, should.BeNil)
 	defer func() {
@@ -120,23 +120,23 @@ func TestAdminInvitations(t *testing.T) {
 	a.So(err, should.BeNil)
 	defer is.store.Users.Delete(user.UserIdentifiers)
 
-	// check user was created
+	// Check user was created.
 	found, err := is.adminService.GetUser(ctx, &ttnpb.UserIdentifiers{UserID: user.UserID})
 	a.So(err, should.BeNil)
 	a.So(found.UserID, should.Equal, user.UserID)
 	a.So(found.Password, should.BeEmpty)
 
-	// check invitation was used
+	// Check invitation was used.
 	invitations, err = is.adminService.ListInvitations(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	a.So(invitations.Invitations, should.HaveLength, 0)
 
-	// can't send invitation to an already used email address
+	// Can't send invitation to an already used email address.
 	_, err = is.adminService.SendInvitation(ctx, &ttnpb.SendInvitationRequest{Email: email})
 	a.So(err, should.NotBeNil)
 	a.So(ErrEmailAddressAlreadyUsed.Describes(err), should.BeTrue)
 
-	// send a new invitation but revoke it later
+	// Send a new invitation but revoke it later.
 	email = "bar@bazqux.com"
 	_, err = is.adminService.SendInvitation(ctx, &ttnpb.SendInvitationRequest{Email: email})
 	a.So(err, should.BeNil)
@@ -165,7 +165,7 @@ func TestAdminUsers(t *testing.T) {
 	ctx := testCtx(testUsers()["alice"].UserIdentifiers)
 	user := testUsers()["bob"]
 
-	// reset password
+	// Reset password.
 	found, err := is.store.Users.GetByID(user.UserIdentifiers, is.specializers.User)
 	a.So(err, should.BeNil)
 
@@ -188,7 +188,7 @@ func TestAdminUsers(t *testing.T) {
 		a.So(found.GetUser().RequirePasswordUpdate, should.BeTrue)
 	}
 
-	// make user admin
+	// Make user admin.
 	_, err = is.adminService.UpdateUser(ctx, &ttnpb.UpdateUserRequest{
 		User: ttnpb.User{
 			UserIdentifiers: ttnpb.UserIdentifiers{UserID: user.UserID},
@@ -204,7 +204,7 @@ func TestAdminUsers(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(found.GetUser().Admin, should.BeTrue)
 
-	// delete user
+	// Delete user.
 	user.UserID = "tmp-user"
 	user.Email = "fofofo@bar.com"
 	err = is.store.Users.Create(user)
@@ -222,7 +222,7 @@ func TestAdminUsers(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(sql.ErrUserNotFound.Describes(err), should.BeTrue)
 
-	// list approved users
+	// List approved users.
 	resp, err := is.adminService.ListUsers(ctx, &ttnpb.ListUsersRequest{
 		ListUsersRequest_FilterState: &ttnpb.ListUsersRequest_FilterState{State: ttnpb.STATE_APPROVED},
 	})

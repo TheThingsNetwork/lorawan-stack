@@ -51,7 +51,7 @@ func TestInvitations(t *testing.T) {
 		a.So(i.ExpiresAt.IsZero(), should.BeFalse)
 	}
 
-	// reissue invitation
+	// Re-issue invitation.
 	invitation.Token = "123456"
 	invitation.ExpiresAt = invitation.ExpiresAt.Add(time.Hour)
 	err = s.Invitations.Save(invitation)

@@ -172,7 +172,7 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 	a.So(key.Name, should.Equal, key.Name)
 	a.So(key.Rights, should.Resemble, ttnpb.AllGatewayRights())
 
-	// update api key
+	// Update API key.
 	key.Rights = []ttnpb.Right{ttnpb.Right(10)}
 	_, err = is.gatewayService.UpdateGatewayAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 		GatewayIdentifiers: sids,
@@ -207,7 +207,7 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 	a.So(err, should.BeNil)
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
-	// Set a new collaborator with SETTINGS_COLLABORATOR and INFO rights.
+	// Set a new collaborator with SETTINGS_COLLABORATORS and INFO rights.
 	alice := testUsers()["alice"]
 	collab := &ttnpb.GatewayCollaborator{
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &alice.UserIdentifiers}},
@@ -246,7 +246,7 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 		a.So(rights.Rights, should.HaveLength, 2)
 		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS)
 
-		// But can revoke himself the INFO right.
+		// But they can revoke themselves the INFO right.
 		collab.Rights = []ttnpb.Right{ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS}
 		_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
 		a.So(err, should.BeNil)
@@ -257,7 +257,7 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_GATEWAY_INFO)
 	}
 
-	// Try to unset the main collaborator will result in error as the gateway
+	// Trying to unset the main collaborator will result in an error as the gateway
 	// will become unmanageable.
 	_, err = is.gatewayService.SetGatewayCollaborator(ctx, &ttnpb.GatewayCollaborator{
 		GatewayIdentifiers:            sids,

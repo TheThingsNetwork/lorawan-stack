@@ -258,7 +258,7 @@ func TestOrganizations(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(keys, should.HaveLength, 0)
 
-	// save it again. Call to `Delete` will handle it
+	// Save it again. Call to `Delete` will handle it.
 	err = s.Organizations.SaveAPIKey(org.OrganizationIdentifiers, key)
 	a.So(err, should.BeNil)
 

@@ -307,14 +307,14 @@ func (s *organizationService) SetOrganizationMember(ctx context.Context, req *tt
 	}
 
 	// The resulting set of rights is determined by the following steps:
-	// 1. Get rights of target user/organization to the organization
+	// 1. Get rights of target user within the organization.
 	// 2. The set of rights the caller can modify are the rights the caller has
-	//		to the organization. We refer them as modifiable rights
-	// 3. The rights the caller cannot modify is the difference of the target
-	//		user/organization rights minus the modifiable rights.
-	// 4. The modifiable rights the target user/organization will have is the
-	//		intersection between `2.` and the rights of the request
-	// 5. The final set of rights is given by the sum of `2.` plus `4.`
+	//		within the organization. We refer to them as modifiable rights.
+	// 3. The rights the caller cannot modify are the difference of the target
+	//		user rights minus the modifiable rights.
+	// 4. The modifiable rights the target user/organization will have are the
+	//		intersection between `2.` and the rights of the request.
+	// 5. The final set of rights is given by the sum of `2.` plus `4.`.
 
 	rights, err := s.store.Organizations.ListMemberRights(req.OrganizationIdentifiers, req.UserIdentifiers)
 	if err != nil {
@@ -323,7 +323,7 @@ func (s *organizationService) SetOrganizationMember(ctx context.Context, req *tt
 
 	ad := authorizationDataFromContext(ctx)
 
-	// modifiable is the set of rights the caller can modify
+	// Modifiable is the set of rights the caller can modify.
 	var modifiable []ttnpb.Right
 	switch ad.Source {
 	case auth.Key:

@@ -30,7 +30,7 @@ func TestErrorDuplicate(t *testing.T) {
 	err := db.SelectOne(&id, `INSERT INTO foo (bar) VALUES ($1) RETURNING id`, "bar")
 	a.So(err, should.BeNil)
 
-	// try to reinsert a record with a duplicated primary key
+	// Try to reinsert a record with a duplicated primary key.
 	_, err = db.Exec(`INSERT INTO foo (id) VALUES ($1)`, id)
 	a.So(err, should.NotBeNil)
 	duplicates, ok := IsDuplicate(err)
@@ -38,7 +38,7 @@ func TestErrorDuplicate(t *testing.T) {
 	a.So(duplicates, should.HaveLength, 1)
 	a.So(duplicates["id"], should.Equal, strconv.FormatInt(id, 10))
 
-	// delete record
+	// Delete record.
 	_, err = db.Exec(`DELETE FROM foo WHERE id = $1`, id)
 	a.So(err, should.BeNil)
 }

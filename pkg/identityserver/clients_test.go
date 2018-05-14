@@ -53,7 +53,7 @@ func TestClient(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	// can't create clients with blacklisted ids
+	// Can't create clients with blacklisted IDs.
 	for _, id := range testSettings().BlacklistedIDs {
 		_, err = is.clientService.CreateClient(ctx, &ttnpb.CreateClientRequest{
 			Client: ttnpb.Client{
@@ -68,7 +68,7 @@ func TestClient(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeClientIgnoringAutoFields, cli)
 
-	// fetch client without authorization credentisla
+	// Fetch client without authorization credentials.
 	found, err = is.clientService.GetClient(context.Background(), &ttnpb.ClientIdentifiers{ClientID: cli.ClientID})
 	a.So(err, should.BeNil)
 	a.So(found.ClientIdentifiers.ClientID, should.Equal, cli.ClientIdentifiers.ClientID)

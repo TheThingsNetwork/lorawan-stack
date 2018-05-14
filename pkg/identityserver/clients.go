@@ -29,8 +29,8 @@ type clientService struct {
 	*IdentityServer
 }
 
-// CreateClient creates a client.
-// The created client has a random secret and the refresh_token and authorization_code grants.
+// CreateClient creates a client. The created client has a random secret and the
+// refresh_token and authorization_code grants.
 func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClientRequest) (*pbtypes.Empty, error) {
 	err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
 	if err != nil {
@@ -43,7 +43,7 @@ func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClien
 			return err
 		}
 
-		// check for blacklisted ids
+		// Check for blacklisted IDs.
 		if !settings.IsIDAllowed(req.Client.ClientID) {
 			return ErrBlacklistedID.New(errors.Attributes{
 				"id": req.Client.ClientID,
@@ -94,7 +94,7 @@ func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifi
 		return nil, err
 	}
 
-	// ensure the user is the client's creator
+	// Ensure the user is the client's creator.
 	if !client.CreatorIDs.Equals(authorizationDataFromContext(ctx).UserIdentifiers()) {
 		return nil, ErrNotAuthorized.New(nil)
 	}
@@ -140,7 +140,7 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 		}
 		client := found.GetClient()
 
-		// ensure the user is the client's creator
+		// Ensure the user is the client's creator.
 		if !client.CreatorIDs.Equals(authorizationDataFromContext(ctx).UserIdentifiers()) {
 			return ErrNotAuthorized.New(nil)
 		}
@@ -180,7 +180,7 @@ func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdent
 			return err
 		}
 
-		// ensure the user is the client's creator
+		// Ensure the user is the client's creator.
 		if !found.GetClient().CreatorIDs.Equals(authorizationDataFromContext(ctx).UserIdentifiers()) {
 			return ErrNotAuthorized.New(nil)
 		}

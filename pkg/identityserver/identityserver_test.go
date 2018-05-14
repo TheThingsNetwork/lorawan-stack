@@ -57,7 +57,6 @@ func getIS(t testing.TB) *IdentityServer {
 			logger.WithError(err).Fatal("Failed to create an Identity Server instance")
 		}
 
-		// drop the database before initializing the IS
 		err = is.store.Clean()
 		if err != nil {
 			logger.WithError(err).Fatal("Failed to drop database")

@@ -95,19 +95,19 @@ func (s *GatewayStore) Create(gateway store.Gateway) error {
 			return err
 		}
 
-		// store attributes
+		// Store attributes.
 		err = s.setAttributes(tx, gtwID, gtw.Attributes)
 		if err != nil {
 			return err
 		}
 
-		// store antennas
+		// Store antennas.
 		err = s.addAntennas(tx, gtwID, gtw.Antennas)
 		if err != nil {
 			return err
 		}
 
-		// store radios
+		// Store radios.
 		err = s.addRadios(tx, gtwID, gtw.Radios)
 		if err != nil {
 			return err

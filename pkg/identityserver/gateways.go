@@ -56,7 +56,7 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 			return err
 		}
 
-		// check for blacklisted ids
+		// Check for blacklisted IDs.
 		if !settings.IsIDAllowed(req.Gateway.GatewayID) {
 			return ErrBlacklistedID.New(errors.Attributes{
 				"id": req.Gateway.GatewayID,
@@ -303,14 +303,14 @@ func (s *gatewayService) SetGatewayCollaborator(ctx context.Context, req *ttnpb.
 	}
 
 	// The resulting set of rights is determined by the following steps:
-	// 1. Get rights of target user/organization to the gateway
+	// 1. Get rights of target user/organization within the gateway.
 	// 2. The set of rights the caller can modify are the rights the caller has
-	//		to the gateway. We refer them as modifiable rights
-	// 3. The rights the caller cannot modify is the difference of the target
+	//		within the gateway. We refer to them as modifiable rights.
+	// 3. The rights the caller cannot modify are the difference of the target
 	//		user/organization rights minus the modifiable rights.
-	// 4. The modifiable rights the target user/organization will have is the
-	//		intersection between `2.` and the rights of the request
-	// 5. The final set of rights is given by the sum of `2.` plus `4.`
+	// 4. The modifiable rights the target user/organization will have are the
+	//		intersection between `2.` and the rights of the request.
+	// 5. The final set of rights is given by the sum of `2.` plus `4.`.
 
 	rights, err := s.store.Gateways.ListCollaboratorRights(req.GatewayIdentifiers, req.OrganizationOrUserIdentifiers)
 	if err != nil {
@@ -319,7 +319,7 @@ func (s *gatewayService) SetGatewayCollaborator(ctx context.Context, req *ttnpb.
 
 	ad := authorizationDataFromContext(ctx)
 
-	// modifiable is the set of rights the caller can modify
+	// `modifiable` is the set of rights the caller can modify.
 	var modifiable []ttnpb.Right
 	switch ad.Source {
 	case auth.Key:
@@ -415,7 +415,7 @@ func (s *gatewayService) ListGatewayRights(ctx context.Context, req *ttnpb.Gatew
 			return nil, err
 		}
 
-		// result rights are the intersection between the scope of the Client
+		// Result rights are the intersection between the scope of the Client
 		// and the rights that the user has to the gateway.
 		resp.Rights = ttnpb.IntersectRights(ad.Rights, rights)
 	case auth.Key:

@@ -25,12 +25,9 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	// include pq for the postgres driver
+	// Include pq for the postgres driver.
 	_ "github.com/lib/pq"
 )
-
-// make sure DB implements Database.
-var _ Database = &DB{}
 
 // QueryContext is the interface of contexts where a query can be run.
 // Typically this means either the global database scope, or a transaction.
@@ -113,7 +110,7 @@ func Open(context context.Context, connectionURI string, migrations migrations.R
 		migrations: migrations,
 	}
 
-	// get current database
+	// Get current database.
 	err = res.SelectOne(&(res.database), `SELECT current_database()`)
 	if IsNoRows(err) {
 		return nil, errors.New("No database specified")

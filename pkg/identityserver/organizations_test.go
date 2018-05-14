@@ -126,7 +126,7 @@ func TestOrganization(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
-	// Set a new member with SETTINGS_MEMBER and INFO rights.
+	// Set a new member with SETTINGS_MEMBERS and INFO rights.
 	member := &ttnpb.OrganizationMember{
 		OrganizationIdentifiers: org.OrganizationIdentifiers,
 		UserIdentifiers:         alice.UserIdentifiers,
@@ -167,7 +167,7 @@ func TestOrganization(t *testing.T) {
 		members, err = is.organizationService.ListOrganizationMembers(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: org.OrganizationID})
 		a.So(err, should.BeNil)
 
-		// But it can revoke itself the INFO right.
+		// But they can revoke themselves the INFO right.
 		member.Rights = []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS}
 		_, err = is.organizationService.SetOrganizationMember(ctx, member)
 		a.So(err, should.BeNil)

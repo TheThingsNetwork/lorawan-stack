@@ -49,7 +49,7 @@ func wrap(err error) error {
 	if pq, ok := err.(*pq.Error); ok {
 		switch pq.Code {
 		case "23505":
-			// Unique violation
+			// Unique violation.
 			m := re.FindStringSubmatch(err.Error())
 			if len(m) > 1 {
 				names := strings.Split(m[1], ",")

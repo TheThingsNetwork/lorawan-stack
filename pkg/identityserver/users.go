@@ -70,7 +70,7 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 			return ErrInvitationTokenMissing.New(nil)
 		}
 
-		// check for blacklisted ids
+		// Check for blacklisted IDs.
 		if !settings.IsIDAllowed(req.User.UserID) {
 			return ErrBlacklistedID.New(errors.Attributes{
 				"id": req.User.UserID,
@@ -106,8 +106,7 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 			return err
 		}
 
-		// check whether the provided email is allowed or not when an invitation token
-		// wasn't provided
+		// Check whether the provided email is allowed when an invitation token wasn't provided.
 		if req.InvitationToken == "" {
 			if !isEmailAllowed(req.User.UserIdentifiers.Email, settings.AllowedEmails) {
 				return ErrEmailAddressNotAllowed.New(errors.Attributes{

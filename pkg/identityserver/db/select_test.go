@@ -31,7 +31,7 @@ func testSelect(t *testing.T, q QueryContext) {
 		a.So(res, should.HaveLength, len(data))
 	}
 
-	// into a slice of struct ptr
+	// Into a slice of struct ptr.
 	{
 		res := make([]*foo, 0)
 		err := q.Select(&res, `SELECT * FROM foo WHERE bar = $1`, "bar-2")
@@ -39,7 +39,7 @@ func testSelect(t *testing.T, q QueryContext) {
 		a.So(res, should.HaveLength, 1)
 	}
 
-	// into a slice of struct
+	// Into a slice of struct.
 	{
 		res := make([]foo, 0)
 		err := q.Select(&res, `SELECT * FROM foo WHERE bar = $1`, "bar-2")
@@ -47,7 +47,7 @@ func testSelect(t *testing.T, q QueryContext) {
 		a.So(res, should.HaveLength, 1)
 	}
 
-	// into a slice of values
+	// Into a slice of values.
 	{
 		res := make([]string, 0)
 		err := q.Select(&res, `SELECT bar FROM foo WHERE bar = $1`, "bar-2")
@@ -56,14 +56,14 @@ func testSelect(t *testing.T, q QueryContext) {
 		a.So(res[0], should.Equal, data[1].Bar)
 	}
 
-	// cannot use struct directly
+	// Cannot use struct directly.
 	{
 		res := foo{}
 		err := q.Select(res, `SELECT * FROM foo WHERE bar = $1`, "bar-2")
 		a.So(err, should.NotBeNil)
 	}
 
-	// cannot use slice directly
+	// Cannot use slice directly.
 	{
 		res := make([]string, 0)
 		err := q.Select(res, `SELECT * FROM foo WHERE bar = $1`, "bar-2")
@@ -74,7 +74,7 @@ func testSelect(t *testing.T, q QueryContext) {
 func testSelectOne(t *testing.T, q QueryContext) {
 	a := assertions.New(t)
 
-	// into struct ptr
+	// Into struct ptr.
 	{
 		res := new(foo)
 		err := q.SelectOne(res, `SELECT * FROM foo WHERE bar = $1`, "bar-2")
@@ -87,7 +87,7 @@ func testSelectOne(t *testing.T, q QueryContext) {
 		a.So(res.Quu, should.Equal, data[1].Quu)
 	}
 
-	// into map
+	// Into map.
 	{
 		res := make(map[string]interface{})
 		err := q.SelectOne(res, `SELECT * FROM foo WHERE bar = $1`, "bar-2")
@@ -100,7 +100,7 @@ func testSelectOne(t *testing.T, q QueryContext) {
 		a.So(res["quu"], should.Equal, data[1].Quu)
 	}
 
-	// into ptr to map
+	// Into ptr to map.
 	{
 		res := make(map[string]interface{})
 		err := q.SelectOne(&res, `SELECT * FROM foo WHERE bar = $1`, "bar-2")
@@ -113,7 +113,7 @@ func testSelectOne(t *testing.T, q QueryContext) {
 		a.So(res["quu"], should.Equal, data[1].Quu)
 	}
 
-	// into value
+	// Into value.
 	{
 		res := ""
 		err := q.SelectOne(&res, `SELECT bar FROM foo WHERE bar = $1`, "bar-2")
@@ -121,7 +121,7 @@ func testSelectOne(t *testing.T, q QueryContext) {
 		a.So(res, should.Equal, data[1].Bar)
 	}
 
-	// into ptr to value
+	// Into ptr to value.
 	{
 		res := new(string)
 		err := q.SelectOne(&res, `SELECT bar FROM foo WHERE bar = $1`, "bar-2")
@@ -129,14 +129,14 @@ func testSelectOne(t *testing.T, q QueryContext) {
 		a.So(*res, should.Equal, data[1].Bar)
 	}
 
-	// cannot use struct directly
+	// Cannot use struct directly.
 	{
 		res := foo{}
 		err := q.SelectOne(res, `SELECT * FROM foo WHERE bar = $1`, "bar-2")
 		a.So(err, should.NotBeNil)
 	}
 
-	// cannot use value directly
+	// Cannot use value directly.
 	{
 		res := ""
 		err := q.SelectOne(res, `SELECT bar FROM foo WHERE bar = $1`, "bar-2")

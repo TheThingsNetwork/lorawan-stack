@@ -77,7 +77,7 @@ var (
 	// FieldPathGatewayAttributes is the field path for an attribute in the attributes map.
 	FieldPathGatewayAttributes = regexp.MustCompile(`^attributes\.(.+)$`)
 
-	// FieldPathGatewayContactAccount is the field path for the gateway contact account identifiers field.
+	// FieldPathGatewayContactAccountIDs is the field path for the gateway contact account identifiers field.
 	FieldPathGatewayContactAccountIDs = regexp.MustCompile(`^contact_account_ids$`)
 
 	// FieldPathGatewayDisableTxDelay is the field path for the gateway disable Tx delay field.

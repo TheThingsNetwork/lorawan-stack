@@ -26,6 +26,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
+var _ Database = new(DB)
+
 const (
 	address  = "postgres://root@localhost:26257/%s?sslmode=disable"
 	database = "is_db_tests"
@@ -77,28 +79,24 @@ func clean(t testing.TB) Database {
 	registry := migrations.NewRegistry()
 	registry.Register(1, "1_foo_schema", schema, "DROP TABLE IF EXISTS foo")
 
-	// open database connection
 	db, err := Open(context.Background(), fmt.Sprintf(address, database), registry)
 	if err != nil {
 		logger.WithError(err).Fatal("Failed to establish a connection with the CockroachDB instance")
 		return nil
 	}
 
-	// drop database
 	_, err = db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE", database))
 	if err != nil {
 		logger.WithError(err).Fatalf("Failed to delete database `%s`", database)
 		return nil
 	}
 
-	// create it again
 	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s", database))
 	if err != nil {
 		logger.WithError(err).Fatalf("Failed to create database `%s`", database)
 		return nil
 	}
 
-	// apply all migrations
 	err = db.MigrateAll()
 	if err != nil {
 		logger.WithError(err).Fatal("Failed to apply migrations from the registry")

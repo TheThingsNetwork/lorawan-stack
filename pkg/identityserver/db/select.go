@@ -47,7 +47,7 @@ func selectOne(context context.Context, q sqlx.QueryerContext, dest interface{},
 		return err
 	}
 
-	// try map
+	// Try map.
 	if typ.Kind() == reflect.Map {
 		m, ok := value.Interface().(map[string]interface{})
 		if !ok {
@@ -56,7 +56,7 @@ func selectOne(context context.Context, q sqlx.QueryerContext, dest interface{},
 		return row.MapScan(m)
 	}
 
-	// try struct
+	// Try struct.
 	if typ.Kind() == reflect.Struct {
 		return row.StructScan(dest)
 	}
@@ -100,7 +100,7 @@ func selectAll(context context.Context, q sqlx.QueryerContext, dest interface{},
 		base = base.Elem()
 	}
 
-	// try map
+	// Try map.
 	if base.Kind() == reflect.Map {
 		_, ok := reflect.New(base).Elem().Interface().(map[string]interface{})
 		if !ok {
@@ -124,7 +124,7 @@ func selectAll(context context.Context, q sqlx.QueryerContext, dest interface{},
 		return nil
 	}
 
-	// try struct
+	// Try struct.
 	if base.Kind() == reflect.Struct {
 		for rows.Next() {
 			vp := reflect.New(base)
@@ -142,7 +142,7 @@ func selectAll(context context.Context, q sqlx.QueryerContext, dest interface{},
 		return nil
 	}
 
-	// try scannable
+	// Try scannable.
 	for rows.Next() {
 		vp := reflect.New(base)
 		res := vp.Interface()

@@ -24,7 +24,7 @@ import (
 func TestSliceOfInt32s(t *testing.T) {
 	a := assertions.New(t)
 
-	// empty int32 slice
+	// Empty int32 slice.
 	{
 		s := Int32Slice{}
 		value, err := s.Value()
@@ -35,7 +35,7 @@ func TestSliceOfInt32s(t *testing.T) {
 
 	}
 
-	// filled int32 slice
+	// Filled int32 slice.
 	{
 		s := Int32Slice{3, 3, 3}
 		value, err := s.Value()
@@ -47,7 +47,7 @@ func TestSliceOfInt32s(t *testing.T) {
 
 	type Foo int32
 
-	// filled int32-like slice
+	// Filled int32-like slice.
 	{
 		s, err := NewInt32Slice([]Foo{1, 2, 3})
 		a.So(err, should.BeNil)
@@ -66,7 +66,7 @@ func TestSliceOfInt32s(t *testing.T) {
 func TestSliceOfStrings(t *testing.T) {
 	a := assertions.New(t)
 
-	// empty string slice
+	// Empty string slice.
 	{
 		s := StringSlice{}
 		value, err := s.Value()
@@ -77,7 +77,7 @@ func TestSliceOfStrings(t *testing.T) {
 
 	}
 
-	// filled string slice
+	// Filled string slice.
 	{
 		s := StringSlice{"a", "b", "c"}
 		value, err := s.Value()
@@ -89,7 +89,7 @@ func TestSliceOfStrings(t *testing.T) {
 
 	type FooStr string
 
-	// filled string-like slice
+	// Filled string-like slice.
 	{
 		s, err := NewStringSlice([]FooStr{"bar"})
 		a.So(err, should.BeNil)

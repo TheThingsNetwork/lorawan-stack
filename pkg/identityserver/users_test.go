@@ -61,7 +61,7 @@ func TestUsersBlacklistedIDs(t *testing.T) {
 	a := assertions.New(t)
 	is := getIS(t)
 
-	// Can not create users using the blacklisted IDs.
+	// Can't create users using the blacklisted IDs.
 	for _, id := range testSettings().BlacklistedIDs {
 		_, err := is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
 			User: ttnpb.User{UserIdentifiers: ttnpb.UserIdentifiers{UserID: id}},
@@ -93,7 +93,7 @@ func TestUsersEmailWhitelisting(t *testing.T) {
 		},
 	}
 
-	// Can not create an account using an email that is not whitelisted.
+	// Can't create an account using an email that is not whitelisted.
 	user.UserIdentifiers.Email = "antonio@antonio.com"
 	_, err = is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
 		User: user,
@@ -110,7 +110,7 @@ func TestUsersEmailWhitelisting(t *testing.T) {
 
 	ctx := testCtx(user.UserIdentifiers)
 
-	// Can not update the email afterwards to a one that is not whitelisted.
+	// Can't update the email afterwards to a one that is not whitelisted.
 	_, err = is.userService.UpdateUser(ctx, &ttnpb.UpdateUserRequest{
 		User: ttnpb.User{
 			UserIdentifiers: ttnpb.UserIdentifiers{
@@ -195,7 +195,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	})
 	a.So(err, should.BeNil)
 
-	// Can not retrieve profile without proper claims.
+	// Can't retrieve profile with empty authorization credentials.
 	found, err := is.userService.GetUser(context.Background(), ttnpb.Empty)
 	a.So(found, should.BeNil)
 	a.So(err, should.NotBeNil)
@@ -274,7 +274,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	})
 	a.So(err, should.BeNil)
 
-	// Can not generate another API Key with the same name.
+	// Can't generate another API Key with the same name.
 	_, err = is.userService.GenerateUserAPIKey(ctx, &ttnpb.GenerateUserAPIKeyRequest{
 		Name:   key.Name,
 		Rights: []ttnpb.Right{ttnpb.Right(1)},

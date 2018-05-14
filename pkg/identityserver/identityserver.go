@@ -178,18 +178,23 @@ func hostname(u string) (string, error) {
 	return p.Hostname(), nil
 }
 
+// InitialData is the data that is used to feed the Identity Server when it is freshly installed.
 type InitialData struct {
 	Settings ttnpb.IdentityServerSettings `name:"settings"`
 	Admin    InitialAdminData             `name:"admin"`
 	Console  InitialConsoleData           `name:"console"`
 }
 
+// InitialAdminData is the data regarding the first (admin) user that will be created when
+// the Identity Server is freshly installed.
 type InitialAdminData struct {
 	UserID   string `name:"user-id" description:"User ID of the admin."`
 	Email    string `name:"email" description:"Email of the admin."`
 	Password string `name:"password" description:"Password of the admin."`
 }
 
+// InitialConsoleData is the data that will be used to create the Console OAuth client when
+// the Identity Server is freshly installed.
 type InitialConsoleData struct {
 	ClientSecret string `name:"client-secret" description:"console OAuth client secret"`
 	RedirectURI  string `name:"redirect-uri" description:"console OAuth client redirect URI"`
@@ -299,7 +304,7 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 	ttnpb.RegisterIsOrganizationHandler(is.Context(), s, conn)
 }
 
-// Roles returns the roles that the Identity Server fulfils
+// Roles returns the roles that the Identity Server fulfills.
 func (is *IdentityServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_IDENTITY_SERVER}
 }

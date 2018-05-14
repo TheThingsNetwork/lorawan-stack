@@ -36,7 +36,7 @@ func init() {
 //    ArchivedAt  -> archived_at
 //    UserID      -> user_id
 func nameMapper(fieldName string) string {
-	// at least the output string will have the same length as the input string
+	// The output string will at least have the same length as the input string.
 	res := make([]byte, 0, len(fieldName))
 
 	for i, char := range fieldName {

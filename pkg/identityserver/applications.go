@@ -60,7 +60,7 @@ func (s *applicationService) CreateApplication(ctx context.Context, req *ttnpb.C
 			return err
 		}
 
-		// check for blacklisted ids
+		// Check for blacklisted IDs.
 		if !settings.IsIDAllowed(req.Application.ApplicationID) {
 			return ErrBlacklistedID.New(errors.Attributes{
 				"id": req.Application.ApplicationID,
@@ -267,14 +267,14 @@ func (s *applicationService) SetApplicationCollaborator(ctx context.Context, req
 	}
 
 	// The resulting set of rights is determined by the following steps:
-	// 1. Get rights of target user/organization to the application
+	// 1. Get rights of target user/organization within the application.
 	// 2. The set of rights the caller can modify are the rights the caller has
-	//		to the application. We refer them as modifiable rights
-	// 3. The rights the caller cannot modify is the difference of the targer
+	//		within the application. We refer to them as modifiable rights.
+	// 3. The rights the caller cannot modify are the difference of the target
 	//		user/organization rights minus the modifiable rights.
-	// 4. The modifiable rights the target user/organization will have is the
-	//		intersection between `2.` and the rights of the request
-	// 5. The final set of rights is given by the sum of `2.` plus `4.`
+	// 4. The modifiable rights the target user/organization will have are the
+	//		intersection between `2.` and the rights of the request.
+	// 5. The final set of rights is given by the sum of `2.` plus `4.`.
 
 	rights, err := s.store.Applications.ListCollaboratorRights(req.ApplicationIdentifiers, req.OrganizationOrUserIdentifiers)
 	if err != nil {
@@ -283,7 +283,7 @@ func (s *applicationService) SetApplicationCollaborator(ctx context.Context, req
 
 	ad := authorizationDataFromContext(ctx)
 
-	// modifiable is the set of rights the caller can modify
+	// `modifiable` is the set of rights the caller can modify.
 	var modifiable []ttnpb.Right
 	switch ad.Source {
 	case auth.Key:
@@ -379,7 +379,7 @@ func (s *applicationService) ListApplicationRights(ctx context.Context, req *ttn
 			return nil, err
 		}
 
-		// result rights are the intersection between the scope of the Client
+		// Result rights are the intersection between the scope of the Client
 		// and the rights that the user has to the application.
 		resp.Rights = ttnpb.IntersectRights(ad.Rights, rights)
 	case auth.Key:

@@ -15,8 +15,7 @@
 package migrations
 
 func init() {
-	// The check constraint in the column `id` enforces the table to have only
-	// one row at most.
+	// By using the `CHECK` constraint in the column `id` we ensure that there is only a single row.
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS settings (
 			id                     INT PRIMARY KEY DEFAULT 1 CHECK (id = 1),

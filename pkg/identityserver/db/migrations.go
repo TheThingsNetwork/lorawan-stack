@@ -45,14 +45,14 @@ func (db *DB) currentState() (int, error) {
 			FROM migration_history
 			ORDER BY ran_at DESC
 			LIMIT 1`)
-	// no migration has been applied yet
+	// No migration has been applied yet.
 	if IsNoRows(err) {
 		return 0, nil
 	}
 	if err != nil {
 		return 0, err
 	}
-	// if last applied migration was backwards current state is: order - 1
+	// If last applied migration was backwards, current state is: order - 1.
 	if last.Direction == migrations.DirectionBackwards {
 		return last.Order - 1, nil
 	}
@@ -88,8 +88,7 @@ func (db *DB) Migrate(target int) error {
 		direction = migrations.DirectionBackwards
 	}
 	for i := current; i != target; i += incr {
-		// if direction is ascendent current migration
-		// to perform is actually: i + incr
+		// If direction is ascendent, current migration to perform is actually: i + incr.
 		n := i + incr
 		if incr == -1 {
 			n = i

@@ -45,7 +45,7 @@ func TestApplication(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	// can't create applications with blacklisted ids
+	// Can't create applications with blacklisted IDs.
 	for _, id := range testSettings().BlacklistedIDs {
 		_, err = is.applicationService.CreateApplication(ctx, &ttnpb.CreateApplicationRequest{
 			Application: ttnpb.Application{
@@ -79,7 +79,7 @@ func TestApplication(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(found, test.ShouldBeApplicationIgnoringAutoFields, app)
 
-	// generate a new API key
+	// Generate a new API key.
 	key, err := is.applicationService.GenerateApplicationAPIKey(ctx, &ttnpb.GenerateApplicationAPIKeyRequest{
 		ApplicationIdentifiers: app.ApplicationIdentifiers,
 		Name:   "foo",
@@ -90,7 +90,7 @@ func TestApplication(t *testing.T) {
 	a.So(key.Name, should.Equal, key.Name)
 	a.So(key.Rights, should.Resemble, ttnpb.AllApplicationRights())
 
-	// update api key
+	// Update API key.
 	key.Rights = []ttnpb.Right{ttnpb.Right(10)}
 	_, err = is.applicationService.UpdateApplicationAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 		ApplicationIdentifiers: app.ApplicationIdentifiers,
@@ -99,7 +99,7 @@ func TestApplication(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	// can't generate another API Key with the same name
+	// Can't generate another API key with the same name.
 	_, err = is.applicationService.GenerateApplicationAPIKey(ctx, &ttnpb.GenerateApplicationAPIKeyRequest{
 		ApplicationIdentifiers: app.ApplicationIdentifiers,
 		Name:   key.Name,
@@ -125,7 +125,7 @@ func TestApplication(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
-	// set a new collaborator with SETTINGS_COLLABORATOR and INFO rights
+	// Set a new collaborator with SETTINGS_COLLABORATORS and INFO rights.
 	alice := testUsers()["alice"]
 	collab := &ttnpb.ApplicationCollaborator{
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &alice.UserIdentifiers}},
@@ -150,7 +150,7 @@ func TestApplication(t *testing.T) {
 		Rights:                        ttnpb.AllApplicationRights(),
 	})
 
-	// the new collaborator can't grant himself more rights
+	// The new collaborator can't grant himself more rights.
 	{
 		collab.Rights = append(collab.Rights, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS)
 
@@ -164,7 +164,7 @@ func TestApplication(t *testing.T) {
 		a.So(rights.Rights, should.HaveLength, 2)
 		a.So(rights.Rights, should.NotContain, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS)
 
-		// but it can't revoke itself the INFO right
+		// But they can revoke themselves the INFO right.
 		collab.Rights = []ttnpb.Right{ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS}
 		_, err = is.applicationService.SetApplicationCollaborator(ctx, collab)
 		a.So(err, should.BeNil)
@@ -179,8 +179,8 @@ func TestApplication(t *testing.T) {
 		a.So(err, should.BeNil)
 	}
 
-	// try to unset the main collaborator will result in error as the application
-	// will become unmanageable
+	// Trying to unset the main collaborator will result in an error as the application
+	// will become unmanageable.
 	_, err = is.applicationService.SetApplicationCollaborator(ctx, &ttnpb.ApplicationCollaborator{
 		ApplicationIdentifiers:        app.ApplicationIdentifiers,
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &user.UserIdentifiers}},
@@ -188,7 +188,7 @@ func TestApplication(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(ErrUnmanageableApplication.Describes(err), should.BeTrue)
 
-	// but we can revoke a shared right between the two collaborators
+	// But we can revoke a shared right between the two collaborators.
 	_, err = is.applicationService.SetApplicationCollaborator(ctx, &ttnpb.ApplicationCollaborator{
 		ApplicationIdentifiers:        app.ApplicationIdentifiers,
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &user.UserIdentifiers}},
@@ -200,7 +200,7 @@ func TestApplication(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(collabs.Collaborators, should.HaveLength, 2)
 
-	// unset the last added collaborator
+	// Unset the last added collaborator.
 	collab.Rights = []ttnpb.Right{}
 	_, err = is.applicationService.SetApplicationCollaborator(ctx, collab)
 	a.So(err, should.BeNil)
