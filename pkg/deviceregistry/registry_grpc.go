@@ -17,14 +17,13 @@ package deviceregistry
 import (
 	"context"
 	"fmt"
-	"reflect"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/goproto"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
-	"go.thethings.network/lorawan-stack/pkg/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -169,7 +168,7 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 
 	var fields []string
 	if req.FieldMask != nil {
-		fields = store.ConvertProtoFields(req.FieldMask.Paths, reflect.ValueOf(req.GetDevice()))
+		fields = goproto.GoFieldsPaths(req.FieldMask, req.GetDevice())
 	}
 	if r.checks.SetDevice != nil {
 		if err := r.checks.SetDevice(ctx, &req.Device, fields...); err != nil {

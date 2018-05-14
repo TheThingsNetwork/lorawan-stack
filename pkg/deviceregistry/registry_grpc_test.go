@@ -19,8 +19,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/kr/pretty"
+	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
@@ -97,29 +98,36 @@ func TestSetDeviceNoCheck(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(v, should.Equal, ttnpb.Empty)
 
-	oldPb := *pb
+	old := deepcopy.Copy(pb).(*ttnpb.EndDevice)
 
-	for pb.GetLocation().GetLatitude() == oldPb.GetLocation().GetLatitude() {
+	for pb.GetLocation().GetLatitude() == old.GetLocation().GetLatitude() {
 		pb.Location = ttnpb.NewPopulatedLocation(test.Randy, false)
-	}
-	for pb.GetSession().GetStartedAt() == oldPb.GetSession().GetStartedAt() {
-		pb.Session = ttnpb.NewPopulatedSession(test.Randy, false)
 	}
 
 	v, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{
 		Device: *pb,
-		FieldMask: &types.FieldMask{
+		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{"location.latitude"},
 		},
 	})
 	a.So(err, should.BeNil)
-	a.So(v, should.NotBeNil)
+	a.So(v, should.Equal, ttnpb.Empty)
 
-	fetchedPb, err := dr.GetDevice(ctx, &pb.EndDeviceIdentifiers)
-	a.So(err, should.BeNil)
-	a.So(fetchedPb.GetLocation().GetLatitude(), should.Equal, pb.GetLocation().GetLatitude())
-	a.So(fetchedPb.GetSession().GetStartedAt(), should.Equal, oldPb.GetSession().GetStartedAt())
-	a.So(fetchedPb.GetSession().GetStartedAt(), should.NotEqual, pb.GetSession().GetStartedAt())
+	if old.Location == nil {
+		old.Location = &ttnpb.Location{}
+	}
+	old.Location.Latitude = pb.GetLocation().GetLatitude()
+	pb = old
+
+	got, err := FindOneDeviceByIdentifiers(dr.Interface, &pb.EndDeviceIdentifiers)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	pb.CreatedAt = got.GetCreatedAt()
+	pb.UpdatedAt = got.GetUpdatedAt()
+	if !a.So(got.EndDevice, should.Resemble, pb) {
+		pretty.Ldiff(t, got.EndDevice, pb)
+	}
 
 	_, err = dr.Interface.Create(pb)
 	if !a.So(err, should.BeNil) {
