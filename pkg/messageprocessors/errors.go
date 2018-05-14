@@ -16,20 +16,12 @@ package messageprocessors
 
 import "go.thethings.network/lorawan-stack/pkg/errors"
 
-// ErrNoMACPayload represents the ErrDescriptor of the error returned when the message does not
-// contain MACPayload.
-var ErrNoMACPayload = &errors.ErrDescriptor{
-	MessageFormat: "Message does not contain MAC payload",
-	Type:          errors.InvalidArgument,
-	Code:          1,
-}
-
 // ErrInvalidInput represents the ErrDescriptor of the error returned when
 // the input is not valid.
 var ErrInvalidInput = &errors.ErrDescriptor{
 	MessageFormat: "Invalid input",
 	Type:          errors.InvalidArgument,
-	Code:          2,
+	Code:          1,
 }
 
 // ErrInvalidOutput represents the ErrDescriptor of the error returned when
@@ -37,7 +29,7 @@ var ErrInvalidInput = &errors.ErrDescriptor{
 var ErrInvalidOutput = &errors.ErrDescriptor{
 	MessageFormat: "Invalid output",
 	Type:          errors.External,
-	Code:          3,
+	Code:          2,
 }
 
 // ErrInvalidOutputType represents the ErrDescriptor of the error returned when
@@ -45,7 +37,7 @@ var ErrInvalidOutput = &errors.ErrDescriptor{
 var ErrInvalidOutputType = &errors.ErrDescriptor{
 	MessageFormat:  "Invalid output of type `{type}`",
 	Type:           errors.External,
-	Code:           4,
+	Code:           3,
 	SafeAttributes: []string{"type"},
 }
 
@@ -54,12 +46,11 @@ var ErrInvalidOutputType = &errors.ErrDescriptor{
 var ErrInvalidOutputRange = &errors.ErrDescriptor{
 	MessageFormat:  "Value `{value}` does not fall in range of `{low}` to `{high}`",
 	Type:           errors.External,
-	Code:           5,
+	Code:           4,
 	SafeAttributes: []string{"low", "high", "value"},
 }
 
 func init() {
-	ErrNoMACPayload.Register()
 	ErrInvalidInput.Register()
 	ErrInvalidOutput.Register()
 	ErrInvalidOutputType.Register()

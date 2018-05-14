@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/goproto"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -115,7 +116,7 @@ func (r *RegistryRPC) ListDevices(ctx context.Context, filter *ttnpb.EndDeviceId
 			if errors.GetType(err) != errors.Unknown {
 				return nil, err
 			}
-			return nil, ErrCheckFailed.NewWithCause(nil, err)
+			return nil, common.ErrCheckFailed.NewWithCause(nil, err)
 		}
 	}
 
@@ -142,7 +143,7 @@ func (r *RegistryRPC) GetDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifi
 			if errors.GetType(err) != errors.Unknown {
 				return nil, err
 			}
-			return nil, ErrCheckFailed.NewWithCause(nil, err)
+			return nil, common.ErrCheckFailed.NewWithCause(nil, err)
 		}
 	}
 
@@ -175,7 +176,7 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 			if errors.GetType(err) != errors.Unknown {
 				return nil, err
 			}
-			return nil, ErrCheckFailed.NewWithCause(nil, err)
+			return nil, common.ErrCheckFailed.NewWithCause(nil, err)
 		}
 	}
 
@@ -210,7 +211,7 @@ func (r *RegistryRPC) DeleteDevice(ctx context.Context, id *ttnpb.EndDeviceIdent
 			if errors.GetType(err) != errors.Unknown {
 				return nil, err
 			}
-			return nil, ErrCheckFailed.NewWithCause(nil, err)
+			return nil, common.ErrCheckFailed.NewWithCause(nil, err)
 		}
 	}
 

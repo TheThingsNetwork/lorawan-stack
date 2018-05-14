@@ -20,7 +20,6 @@ func init() {
 	ErrBlacklistedID.Register()
 	ErrEmailAddressNotAllowed.Register()
 	ErrInvalidPassword.Register()
-	ErrNotAuthorized.Register()
 	ErrEmailAlreadyValidated.Register()
 	ErrValidationTokenExpired.Register()
 	ErrInvitationTokenMissing.Register()
@@ -56,19 +55,11 @@ var ErrInvalidPassword = &errors.ErrDescriptor{
 	Type:          errors.InvalidArgument,
 }
 
-// ErrNotAuthorized is returned when trying to access a protected resource without
-// authorization.
-var ErrNotAuthorized = &errors.ErrDescriptor{
-	MessageFormat: "Not authorized",
-	Code:          4,
-	Type:          errors.Unauthorized,
-}
-
 // ErrEmailAlreadyValidated is returned when calling 'RequestUserEmailValidation'
 // when the email is already validated.
 var ErrEmailAlreadyValidated = &errors.ErrDescriptor{
 	MessageFormat: "Email address is already validated",
-	Code:          5,
+	Code:          4,
 	Type:          errors.InvalidArgument,
 }
 
@@ -76,7 +67,7 @@ var ErrEmailAlreadyValidated = &errors.ErrDescriptor{
 // using an expired token.
 var ErrValidationTokenExpired = &errors.ErrDescriptor{
 	MessageFormat: "Token is expired",
-	Code:          6,
+	Code:          5,
 	Type:          errors.PermissionDenied,
 }
 
@@ -84,7 +75,7 @@ var ErrValidationTokenExpired = &errors.ErrDescriptor{
 // an empty invitation token and the self user registration is disabled.
 var ErrInvitationTokenMissing = &errors.ErrDescriptor{
 	MessageFormat: "Self account registration is disabled: a valid invitation token must be provided",
-	Code:          7,
+	Code:          6,
 	Type:          errors.InvalidArgument,
 }
 
@@ -92,7 +83,7 @@ var ErrInvitationTokenMissing = &errors.ErrDescriptor{
 // invitation to an email that is already being used by an user.
 var ErrEmailAddressAlreadyUsed = &errors.ErrDescriptor{
 	MessageFormat: "Failed to issue invitation: the email address is already in use",
-	Code:          8,
+	Code:          7,
 	Type:          errors.InvalidArgument,
 }
 
@@ -101,7 +92,7 @@ var ErrEmailAddressAlreadyUsed = &errors.ErrDescriptor{
 // application rights.
 var ErrUnmanageableApplication = &errors.ErrDescriptor{
 	MessageFormat:  "Application `{application_id}` becomes unmanageable as no collaborator with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` has the following rights: {missing_rights}",
-	Code:           9,
+	Code:           8,
 	Type:           errors.InvalidArgument,
 	SafeAttributes: []string{"application_id", "missing_rights"},
 }
@@ -111,7 +102,7 @@ var ErrUnmanageableApplication = &errors.ErrDescriptor{
 // gateway rights.
 var ErrUnmanageableGateway = &errors.ErrDescriptor{
 	MessageFormat:  "Gateway `{gateway_id}` becomes unmanageable as no collaborator with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` has the following rights: {missing_rights}",
-	Code:           10,
+	Code:           9,
 	Type:           errors.InvalidArgument,
 	SafeAttributes: []string{"gateway_id", "missing_rights"},
 }
@@ -121,7 +112,7 @@ var ErrUnmanageableGateway = &errors.ErrDescriptor{
 // organization rights.
 var ErrUnmanageableOrganization = &errors.ErrDescriptor{
 	MessageFormat:  "Organization `{organization_id}` becomes unmanageable as no member with `RIGHT_ORGANIZATION_SETTINGS_MEMBERS` has the following rights: {missing_rights}",
-	Code:           11,
+	Code:           10,
 	Type:           errors.InvalidArgument,
 	SafeAttributes: []string{"organization_id", "missing_rights"},
 }

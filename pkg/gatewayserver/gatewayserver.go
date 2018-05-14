@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -97,7 +98,7 @@ func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
 // GetGatewayObservations returns gateway information as observed by the Gateway Server.
 func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
 	if !gs.config.DisableAuth && !ttnpb.IncludesRights(rights.FromContext(ctx), ttnpb.RIGHT_GATEWAY_STATUS_READ) {
-		return nil, ErrPermissionDenied.New(nil)
+		return nil, common.ErrPermissionDenied.New(nil)
 	}
 
 	gtwID := id.GetGatewayID()
@@ -135,7 +136,7 @@ func checkAuthorization(ctx context.Context, is ttnpb.IsGatewayClient, right ttn
 	}
 
 	if !ttnpb.IncludesRights(res.Rights, right) {
-		return ErrPermissionDenied.New(nil)
+		return common.ErrPermissionDenied.New(nil)
 	}
 
 	return nil

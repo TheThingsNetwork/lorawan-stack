@@ -18,30 +18,20 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/validate"
 )
 
-var (
-	// ErrPermissionDenied is returned if the rights were insufficient to perform
-	// this operation.
-	ErrPermissionDenied = &errors.ErrDescriptor{
-		MessageFormat: "Permission denied to perform this operation",
-		Type:          errors.PermissionDenied,
-		Code:          1,
-	}
-
-	// ErrInvalidApplicationID is returned if an invalid application ID was passed to an
-	// operation that requires it.
-	ErrInvalidApplicationID = &errors.ErrDescriptor{
-		MessageFormat: "Invalid application ID given",
-		Type:          errors.InvalidArgument,
-		Code:          2,
-	}
-)
+// ErrInvalidApplicationID is returned if an invalid application ID was passed to an
+// operation that requires it.
+var ErrInvalidApplicationID = &errors.ErrDescriptor{
+	MessageFormat: "Invalid application ID given",
+	Type:          errors.InvalidArgument,
+	Code:          1,
+}
 
 func init() {
-	ErrPermissionDenied.Register()
 	ErrInvalidApplicationID.Register()
 }
 
@@ -55,7 +45,7 @@ func RequireApplication(ctx context.Context, appIdentifiers ApplicationIDGetter,
 	}
 
 	if ad := FromContext(ctx); !ttnpb.IncludesRights(ad, rights...) {
-		return ErrPermissionDenied.New(nil)
+		return common.ErrPermissionDenied.New(nil)
 	}
 
 	return nil

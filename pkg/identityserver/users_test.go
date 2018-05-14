@@ -25,6 +25,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/auth/oauth"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email/mock"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email/templates"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
@@ -198,7 +199,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	found, err := is.userService.GetUser(context.Background(), ttnpb.Empty)
 	a.So(found, should.BeNil)
 	a.So(err, should.NotBeNil)
-	a.So(ErrNotAuthorized.Describes(err), should.BeTrue)
+	a.So(common.ErrPermissionDenied.Describes(err), should.BeTrue)
 
 	// Check that response does not include password within.
 	found, err = is.userService.GetUser(ctx, ttnpb.Empty)

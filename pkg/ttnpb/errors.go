@@ -36,81 +36,46 @@ var (
 		Type:          errors.InvalidArgument,
 	}
 
-	// ErrMissingPayload represents error ocurring when message payload is missing.
-	ErrMissingPayload = &errors.ErrDescriptor{
-		MessageFormat: "Message payload is missing",
-		Type:          errors.InvalidArgument,
-		Code:          3,
-	}
-
 	// ErrMissingRawPayload represents error ocurring when raw message payload is missing.
 	ErrMissingRawPayload = &errors.ErrDescriptor{
 		MessageFormat: "Raw Message payload is missing",
 		Type:          errors.InvalidArgument,
-		Code:          4,
-	}
-
-	// ErrMissingDevAddr represents error ocurring when DevAddr is missing.
-	ErrMissingDevAddr = &errors.ErrDescriptor{
-		MessageFormat: "DevAddr is missing",
-		Type:          errors.InvalidArgument,
-		Code:          5,
+		Code:          3,
 	}
 
 	// ErrWrongPayloadType represents error ocurring when wrong payload type is received.
 	ErrWrongPayloadType = &errors.ErrDescriptor{
 		MessageFormat:  "Wrong payload type: `{type}`",
 		Type:           errors.InvalidArgument,
-		Code:           6,
+		Code:           4,
 		SafeAttributes: []string{"type"},
-	}
-
-	// ErrMissingDevEUI represents error ocurring when DevEUI is missing.
-	ErrMissingDevEUI = &errors.ErrDescriptor{
-		MessageFormat: "DevEUI is missing",
-		Type:          errors.InvalidArgument,
-		Code:          7,
-	}
-
-	// ErrMissingJoinEUI represents error ocurring when JoinEUI is missing.
-	ErrMissingJoinEUI = &errors.ErrDescriptor{
-		MessageFormat: "JoinEUI is missing",
-		Type:          errors.InvalidArgument,
-		Code:          8,
-	}
-
-	// ErrFCntTooHigh represents error ocurring when FCnt provided is too high.
-	ErrFCntTooHigh = &errors.ErrDescriptor{
-		MessageFormat: fmt.Sprintf("FCnt must be lower or equal to %d", math.MaxUint16),
-		Type:          errors.InvalidArgument,
-		Code:          9,
 	}
 
 	// ErrFPortTooHigh represents error ocurring when FPort provided is too high.
 	ErrFPortTooHigh = &errors.ErrDescriptor{
 		MessageFormat: fmt.Sprintf("FPort must be lower or equal to %d", math.MaxUint8),
 		Type:          errors.InvalidArgument,
-		Code:          10,
+		Code:          5,
 	}
 
 	// ErrTxChIdxTooHigh represents error ocurring when TxChIdx provided is too high.
 	ErrTxChIdxTooHigh = &errors.ErrDescriptor{
 		MessageFormat: fmt.Sprintf("TxChIdx must be lower or equal to %d", math.MaxUint8),
 		Type:          errors.InvalidArgument,
-		Code:          11,
+		Code:          6,
 	}
 
 	// ErrTxDRIdxTooHigh represents error ocurring when TxDRIdx provided is too high.
 	ErrTxDRIdxTooHigh = &errors.ErrDescriptor{
 		MessageFormat: fmt.Sprintf("TxDRIdx must be lower or equal to %d", math.MaxUint8),
 		Type:          errors.InvalidArgument,
-		Code:          12,
+		Code:          7,
 	}
 
 	// ErrEmptyIdentifiers is returned when the XXXIdentifiers are empty.
 	ErrEmptyIdentifiers = &errors.ErrDescriptor{
 		MessageFormat: "Identifiers must not be empty",
-		Code:          13,
+		Code:          8,
 		Type:          errors.InvalidArgument,
 	}
 )
@@ -118,13 +83,8 @@ var (
 func init() {
 	ErrEmptyUpdateMask.Register()
 	ErrInvalidPathUpdateMask.Register()
-	ErrMissingPayload.Register()
 	ErrMissingRawPayload.Register()
-	ErrMissingDevAddr.Register()
 	ErrWrongPayloadType.Register()
-	ErrMissingDevEUI.Register()
-	ErrMissingJoinEUI.Register()
-	ErrFCntTooHigh.Register()
 	ErrFPortTooHigh.Register()
 	ErrTxChIdxTooHigh.Register()
 	ErrTxDRIdxTooHigh.Register()

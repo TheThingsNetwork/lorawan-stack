@@ -22,6 +22,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -77,7 +78,7 @@ func TestEnforceUserRights(t *testing.T) {
 				a.So(err, should.BeNil)
 			} else {
 				a.So(err, should.NotBeNil)
-				a.So(ErrNotAuthorized.Describes(err), should.BeTrue)
+				a.So(common.ErrPermissionDenied.Describes(err), should.BeTrue)
 			}
 		})
 	}
@@ -142,7 +143,7 @@ func TestEnforceAdmin(t *testing.T) {
 				a.So(err, should.BeNil)
 			} else {
 				a.So(err, should.NotBeNil)
-				a.So(ErrNotAuthorized.Describes(err), should.BeTrue)
+				a.So(common.ErrPermissionDenied.Describes(err), should.BeTrue)
 			}
 		})
 	}
@@ -284,7 +285,7 @@ func TestEnforceApplicationRights(t *testing.T) {
 				a.So(err, should.BeNil)
 			} else {
 				a.So(err, should.NotBeNil)
-				a.So(ErrNotAuthorized.Describes(err), should.BeTrue)
+				a.So(common.ErrPermissionDenied.Describes(err), should.BeTrue)
 			}
 		})
 	}
@@ -426,7 +427,7 @@ func TestEnforceGatewayRights(t *testing.T) {
 				a.So(err, should.BeNil)
 			} else {
 				a.So(err, should.NotBeNil)
-				a.So(ErrNotAuthorized.Describes(err), should.BeTrue)
+				a.So(common.ErrPermissionDenied.Describes(err), should.BeTrue)
 			}
 		})
 	}
@@ -568,7 +569,7 @@ func TestEnforceOrganizationRights(t *testing.T) {
 				a.So(err, should.BeNil)
 			} else {
 				a.So(err, should.NotBeNil)
-				a.So(ErrNotAuthorized.Describes(err), should.BeTrue)
+				a.So(common.ErrPermissionDenied.Describes(err), should.BeTrue)
 			}
 		})
 	}

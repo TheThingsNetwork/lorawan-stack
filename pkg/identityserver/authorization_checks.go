@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -28,11 +29,11 @@ func (is *IdentityServer) enforceUserRights(ctx context.Context, rights ...ttnpb
 	ad := authorizationDataFromContext(ctx)
 
 	if ad.UserIdentifiers().IsZero() {
-		return ErrNotAuthorized.New(nil)
+		return common.ErrPermissionDenied.New(nil)
 	}
 
 	if !ad.HasRights(rights...) {
-		return ErrNotAuthorized.New(nil)
+		return common.ErrPermissionDenied.New(nil)
 	}
 
 	return nil
@@ -51,7 +52,7 @@ func (is *IdentityServer) enforceAdmin(ctx context.Context) error {
 	}
 
 	if !found.GetUser().Admin {
-		return ErrNotAuthorized.New(nil)
+		return common.ErrPermissionDenied.New(nil)
 	}
 
 	return nil
@@ -63,7 +64,7 @@ func (is *IdentityServer) enforceApplicationRights(ctx context.Context, ids ttnp
 	ad := authorizationDataFromContext(ctx)
 
 	if !ad.HasRights(rights...) {
-		return ErrNotAuthorized.New(nil)
+		return common.ErrPermissionDenied.New(nil)
 	}
 
 	var authorized bool
@@ -89,7 +90,7 @@ func (is *IdentityServer) enforceApplicationRights(ctx context.Context, ids ttnp
 	}
 
 	if !authorized {
-		return ErrNotAuthorized.New(nil)
+		return common.ErrPermissionDenied.New(nil)
 	}
 
 	return nil
@@ -101,7 +102,7 @@ func (is *IdentityServer) enforceGatewayRights(ctx context.Context, ids ttnpb.Ga
 	ad := authorizationDataFromContext(ctx)
 
 	if !ad.HasRights(rights...) {
-		return ErrNotAuthorized.New(nil)
+		return common.ErrPermissionDenied.New(nil)
 	}
 
 	var authorized bool
@@ -127,7 +128,7 @@ func (is *IdentityServer) enforceGatewayRights(ctx context.Context, ids ttnpb.Ga
 	}
 
 	if !authorized {
-		return ErrNotAuthorized.New(nil)
+		return common.ErrPermissionDenied.New(nil)
 	}
 
 	return nil
@@ -139,7 +140,7 @@ func (is *IdentityServer) enforceOrganizationRights(ctx context.Context, ids ttn
 	ad := authorizationDataFromContext(ctx)
 
 	if !ad.HasRights(rights...) {
-		return ErrNotAuthorized.New(nil)
+		return common.ErrPermissionDenied.New(nil)
 	}
 
 	var authorized bool
@@ -165,7 +166,7 @@ func (is *IdentityServer) enforceOrganizationRights(ctx context.Context, ids ttn
 	}
 
 	if !authorized {
-		return ErrNotAuthorized.New(nil)
+		return common.ErrPermissionDenied.New(nil)
 	}
 
 	return nil

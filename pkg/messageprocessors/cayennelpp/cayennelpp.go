@@ -20,6 +20,7 @@ import (
 	"context"
 
 	lpp "github.com/TheThingsNetwork/go-cayenne-lib/cayennelpp"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -39,7 +40,7 @@ func New() messageprocessors.PayloadEncodeDecoder {
 func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *ttnpb.EndDeviceVersion, script string) (*ttnpb.DownlinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
-		return nil, messageprocessors.ErrNoMACPayload.New(nil)
+		return nil, common.ErrMissingPayload.New(nil)
 	}
 
 	decoded := payload.DecodedPayload
@@ -73,7 +74,7 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, model *ttnpb.EndDeviceVersion, script string) (*ttnpb.UplinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
-		return nil, messageprocessors.ErrNoMACPayload.New(nil)
+		return nil, common.ErrMissingPayload.New(nil)
 	}
 
 	decoder := lpp.NewDecoder(bytes.NewBuffer(payload.FRMPayload))

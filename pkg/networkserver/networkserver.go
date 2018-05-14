@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -451,7 +452,7 @@ outer:
 
 		ke := ses.GetFNwkSIntKey()
 		if ke == nil || ke.Key.IsZero() {
-			return nil, ErrCorruptRegistry.NewWithCause(nil, ErrMissingFNwkSIntKey.New(nil))
+			return nil, common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingFNwkSIntKey.New(nil))
 		}
 		fNwkSIntKey := *ke.Key
 
@@ -468,7 +469,7 @@ outer:
 		case ttnpb.MAC_V1_1:
 			ke := ses.GetSNwkSIntKey()
 			if ke == nil || ke.Key.IsZero() {
-				return nil, ErrCorruptRegistry.NewWithCause(nil, ErrMissingSNwkSIntKey.New(nil))
+				return nil, common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingSNwkSIntKey.New(nil))
 			}
 			sNwkSIntKey := *ke.Key
 
@@ -483,16 +484,16 @@ outer:
 		case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
 			computedMIC, err = crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, mac.DevAddr, dev.fCnt, pld)
 		default:
-			return nil, ErrCorruptRegistry.NewWithCause(nil, errors.New("Unmatched LoRaWAN version"))
+			return nil, common.ErrCorruptRegistry.NewWithCause(nil, errors.New("Unmatched LoRaWAN version"))
 		}
 		if err != nil {
-			return nil, ErrMICComputeFailed.NewWithCause(nil, err)
+			return nil, common.ErrComputeMIC.NewWithCause(nil, err)
 		}
 		if !bytes.Equal(msg.Payload.GetMIC(), computedMIC[:]) {
 			continue
 		}
 		if dev.fCnt == math.MaxUint32 {
-			return nil, ErrFCntTooHigh.New(nil)
+			return nil, common.ErrFCntTooHigh.New(nil)
 		}
 		ses.NextFCntUp = dev.fCnt + 1
 		return dev.Device, nil
@@ -527,7 +528,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	}
 	uid := dev.EndDeviceIdentifiers.ApplicationIdentifiers.UniqueID(ctx)
 	if uid == "" {
-		return ErrCorruptRegistry.NewWithCause(nil, ErrMissingApplicationID.New(nil))
+		return common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingApplicationID.New(nil))
 	}
 
 	ns.applicationServersMu.RLock()
@@ -583,7 +584,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 
 	fp, err := ns.FrequencyPlans.GetByID(dev.GetFrequencyPlanID())
 	if err != nil {
-		return ErrCorruptRegistry.NewWithCause(nil, err)
+		return common.ErrCorruptRegistry.NewWithCause(nil, err)
 	}
 
 	devAddr := ns.newDevAddr(dev.EndDevice)
@@ -648,7 +649,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 
 		uid := dev.EndDeviceIdentifiers.ApplicationIdentifiers.UniqueID(ctx)
 		if uid == "" {
-			return ErrCorruptRegistry.NewWithCause(nil, ErrMissingApplicationID.New(nil))
+			return common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingApplicationID.New(nil))
 		}
 
 		go func() {
@@ -696,13 +697,13 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	pld := msg.GetPayload()
 	if pld.Payload == nil {
 		if err := msg.Payload.UnmarshalLoRaWAN(b); err != nil {
-			return nil, ErrUnmarshalFailed.NewWithCause(nil, err)
+			return nil, common.ErrUnmarshalPayloadFailed.NewWithCause(nil, err)
 		}
 	}
 
 	if pld.GetMajor() != ttnpb.Major_LORAWAN_R1 {
-		return nil, ErrUnsupportedLoRaWANMajorVersion.New(errors.Attributes{
-			"major": pld.GetMajor(),
+		return nil, common.ErrUnsupportedLoRaWANVersion.New(errors.Attributes{
+			"version": pld.GetMajor(),
 		})
 	}
 

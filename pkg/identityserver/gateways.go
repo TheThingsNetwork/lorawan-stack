@@ -21,6 +21,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -420,7 +421,7 @@ func (s *gatewayService) ListGatewayRights(ctx context.Context, req *ttnpb.Gatew
 		resp.Rights = ttnpb.IntersectRights(ad.Rights, rights)
 	case auth.Key:
 		if !ad.GatewayIdentifiers().Contains(*req) {
-			return nil, ErrNotAuthorized.New(nil)
+			return nil, common.ErrPermissionDenied.New(nil)
 		}
 
 		resp.Rights = ad.Rights

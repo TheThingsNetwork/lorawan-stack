@@ -34,18 +34,9 @@ var (
 		Type:          errors.Conflict,
 		Code:          2,
 	}
-
-	// ErrCheckFailed represents the ErrDescriptor of the error returned
-	// when the check failed.
-	ErrCheckFailed = &errors.ErrDescriptor{
-		MessageFormat: "Argument check failed",
-		Type:          errors.InvalidArgument,
-		Code:          3,
-	}
 )
 
 func init() {
 	ErrApplicationNotFound.Register()
 	ErrTooManyApplications.Register()
-	ErrCheckFailed.Register()
 }

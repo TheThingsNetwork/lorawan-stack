@@ -21,6 +21,7 @@ import (
 	"reflect"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/pkg/scripting"
@@ -52,7 +53,7 @@ func (h *host) createEnvironment(model *ttnpb.EndDeviceVersion) map[string]inter
 func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *ttnpb.EndDeviceVersion, script string) (*ttnpb.DownlinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
-		return nil, messageprocessors.ErrNoMACPayload.New(nil)
+		return nil, common.ErrMissingPayload.New(nil)
 	}
 
 	decoded := payload.DecodedPayload
@@ -132,7 +133,7 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, model *ttnpb.EndDeviceVersion, script string) (*ttnpb.UplinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
-		return nil, messageprocessors.ErrNoMACPayload.New(nil)
+		return nil, common.ErrMissingPayload.New(nil)
 	}
 
 	env := h.createEnvironment(model)

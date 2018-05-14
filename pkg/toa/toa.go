@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -30,23 +31,17 @@ var (
 		Code:          1,
 		Type:          errors.InvalidArgument,
 	}
-	// ErrInvalidModulation is returned if the passed modulation is invalid
-	ErrInvalidModulation = &errors.ErrDescriptor{
-		MessageFormat: "Invalid modulation",
-		Code:          2,
-		Type:          errors.InvalidArgument,
-	}
 	// ErrInvalidBandwidth is returned if the passed bandwidth is invalid
 	ErrInvalidBandwidth = &errors.ErrDescriptor{
 		MessageFormat:  "Invalid bandwidth: cannot be {bandwidth}",
-		Code:           3,
+		Code:           2,
 		Type:           errors.InvalidArgument,
 		SafeAttributes: []string{"bandwidth"},
 	}
 	// ErrInvalidSpreadingFactor is returned if the passed spready factor is invalid
 	ErrInvalidSpreadingFactor = &errors.ErrDescriptor{
 		MessageFormat:  "Invalid spreading factor: cannot be {spreading_factor}",
-		Code:           4,
+		Code:           3,
 		Type:           errors.InvalidArgument,
 		SafeAttributes: []string{"spreading_factor"},
 	}
@@ -54,7 +49,6 @@ var (
 
 func init() {
 	ErrInvalidCodingRate.Register()
-	ErrInvalidModulation.Register()
 	ErrInvalidBandwidth.Register()
 	ErrInvalidSpreadingFactor.Register()
 }
@@ -70,7 +64,7 @@ func Compute(rawPayload []byte, settings ttnpb.TxSettings) (time.Duration, error
 	case ttnpb.Modulation_FSK:
 		return computeFSK(rawPayload, settings), nil
 	default:
-		return 0, ErrInvalidModulation.New(nil)
+		return 0, common.ErrInvalidModulation.New(nil)
 	}
 }
 

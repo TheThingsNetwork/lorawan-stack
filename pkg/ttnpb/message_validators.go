@@ -18,6 +18,7 @@ import (
 	"math"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 )
 
 // Validate is used as validator function by the GRPC validator interceptor.
@@ -35,11 +36,11 @@ func (s TxSettings) Validate() error {
 // Validate is used as validator function by the GRPC validator interceptor.
 func (p MACPayload) Validate() error {
 	if p.DevAddr.IsZero() {
-		return ErrMissingDevAddr.New(nil)
+		return common.ErrMissingDevAddr.New(nil)
 	}
 
 	if p.GetFCnt() > math.MaxUint16 {
-		return ErrFCntTooHigh.New(nil)
+		return common.ErrFCntTooHigh.New(nil)
 	}
 
 	if p.FPort > math.MaxUint8 {
@@ -52,10 +53,10 @@ func (p MACPayload) Validate() error {
 // Validate is used as validator function by the GRPC validator interceptor.
 func (p JoinRequestPayload) Validate() error {
 	if p.DevEUI.IsZero() {
-		return ErrMissingDevEUI.New(nil)
+		return common.ErrMissingDevEUI.New(nil)
 	}
 	if p.JoinEUI.IsZero() {
-		return ErrMissingJoinEUI.New(nil)
+		return common.ErrMissingJoinEUI.New(nil)
 	}
 
 	return nil
@@ -82,19 +83,19 @@ func (m UplinkMessage) Validate() error {
 	case MType_CONFIRMED_UP, MType_UNCONFIRMED_UP:
 		mp := p.GetMACPayload()
 		if mp == nil {
-			return ErrMissingPayload.New(nil)
+			return common.ErrMissingPayload.New(nil)
 		}
 		return mp.Validate()
 	case MType_JOIN_REQUEST:
 		jp := p.GetJoinRequestPayload()
 		if jp == nil {
-			return ErrMissingPayload.New(nil)
+			return common.ErrMissingPayload.New(nil)
 		}
 		return jp.Validate()
 	case MType_REJOIN_REQUEST:
 		rp := p.GetRejoinRequestPayload()
 		if rp == nil {
-			return ErrMissingPayload.New(nil)
+			return common.ErrMissingPayload.New(nil)
 		}
 		return rp.Validate()
 	default:

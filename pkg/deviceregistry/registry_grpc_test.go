@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	. "go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/store"
 	"go.thethings.network/lorawan-stack/pkg/store/mapstore"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -46,7 +47,7 @@ func TestRegistryRPC(t *testing.T) {
 	})
 
 	_, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *pb})
-	a.So(err, errshould.Describe, rights.ErrPermissionDenied)
+	a.So(err, errshould.Describe, common.ErrPermissionDenied)
 
 	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	if !a.So(err, should.BeNil) {
@@ -55,7 +56,7 @@ func TestRegistryRPC(t *testing.T) {
 	a.So(v, should.Equal, ttnpb.Empty)
 
 	devs, err := dr.ListDevices(context.Background(), &pb.EndDeviceIdentifiers)
-	a.So(err, errshould.Describe, rights.ErrPermissionDenied)
+	a.So(err, errshould.Describe, common.ErrPermissionDenied)
 
 	devs, err = dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
 	if a.So(err, should.BeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
@@ -65,7 +66,7 @@ func TestRegistryRPC(t *testing.T) {
 	}
 
 	_, err = dr.DeleteDevice(context.Background(), &pb.EndDeviceIdentifiers)
-	a.So(err, errshould.Describe, rights.ErrPermissionDenied)
+	a.So(err, errshould.Describe, common.ErrPermissionDenied)
 
 	v, err = dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
 	if !a.So(err, should.BeNil) {
@@ -74,7 +75,7 @@ func TestRegistryRPC(t *testing.T) {
 	a.So(v, should.Equal, ttnpb.Empty)
 
 	_, err = dr.ListDevices(context.Background(), &pb.EndDeviceIdentifiers)
-	a.So(err, errshould.Describe, rights.ErrPermissionDenied)
+	a.So(err, errshould.Describe, common.ErrPermissionDenied)
 
 	devs, err = dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
@@ -92,7 +93,7 @@ func TestSetDeviceNoCheck(t *testing.T) {
 	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
 	_, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *pb})
-	a.So(err, errshould.Describe, rights.ErrPermissionDenied)
+	a.So(err, errshould.Describe, common.ErrPermissionDenied)
 
 	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(err, should.BeNil)
@@ -281,7 +282,7 @@ func TestCheck(t *testing.T) {
 
 		checkErr = errors.New("err")
 		v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
-		a.So(err, errshould.Describe, ErrCheckFailed)
+		a.So(err, errshould.Describe, common.ErrCheckFailed)
 		a.So(v, should.BeNil)
 
 		checkErr = errTest.New(nil)
@@ -300,7 +301,7 @@ func TestCheck(t *testing.T) {
 
 		checkErr = errors.New("err")
 		ret, err := dr.GetDevice(ctx, &pb.EndDeviceIdentifiers)
-		a.So(err, errshould.Describe, ErrCheckFailed)
+		a.So(err, errshould.Describe, common.ErrCheckFailed)
 		a.So(ret, should.BeNil)
 
 		checkErr = errTest.New(nil)
@@ -325,7 +326,7 @@ func TestCheck(t *testing.T) {
 
 		checkErr = errors.New("err")
 		devs, err := dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
-		a.So(err, errshould.Describe, ErrCheckFailed)
+		a.So(err, errshould.Describe, common.ErrCheckFailed)
 		a.So(devs, should.BeNil)
 
 		checkErr = errTest.New(nil)
@@ -348,7 +349,7 @@ func TestCheck(t *testing.T) {
 
 		checkErr = errors.New("err")
 		_, err := dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
-		a.So(err, errshould.Describe, ErrCheckFailed)
+		a.So(err, errshould.Describe, common.ErrCheckFailed)
 
 		checkErr = errTest.New(nil)
 		_, err = dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)

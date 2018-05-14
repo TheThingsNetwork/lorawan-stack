@@ -20,6 +20,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -81,7 +82,7 @@ func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifi
 	client := found.GetClient()
 
 	err = s.enforceUserRights(ctx, ttnpb.RIGHT_USER_CLIENTS)
-	if err != nil && ErrNotAuthorized.Describes(err) {
+	if err != nil && common.ErrPermissionDenied.Describes(err) {
 		return &ttnpb.Client{
 			ClientIdentifiers: client.ClientIdentifiers,
 			Description:       client.Description,
@@ -96,7 +97,7 @@ func (s *clientService) GetClient(ctx context.Context, req *ttnpb.ClientIdentifi
 
 	// Ensure the user is the client's creator.
 	if !client.CreatorIDs.Equals(authorizationDataFromContext(ctx).UserIdentifiers()) {
-		return nil, ErrNotAuthorized.New(nil)
+		return nil, common.ErrPermissionDenied.New(nil)
 	}
 
 	return client, err
@@ -142,7 +143,7 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 
 		// Ensure the user is the client's creator.
 		if !client.CreatorIDs.Equals(authorizationDataFromContext(ctx).UserIdentifiers()) {
-			return ErrNotAuthorized.New(nil)
+			return common.ErrPermissionDenied.New(nil)
 		}
 
 		for _, path := range req.UpdateMask.Paths {
@@ -182,7 +183,7 @@ func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdent
 
 		// Ensure the user is the client's creator.
 		if !found.GetClient().CreatorIDs.Equals(authorizationDataFromContext(ctx).UserIdentifiers()) {
-			return ErrNotAuthorized.New(nil)
+			return common.ErrPermissionDenied.New(nil)
 		}
 
 		return tx.Clients.Delete(ids)

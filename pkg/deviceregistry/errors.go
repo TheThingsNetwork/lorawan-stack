@@ -35,14 +35,6 @@ var (
 		Type:          errors.Conflict,
 		Code:          2,
 	}
-
-	// ErrCheckFailed represents the ErrDescriptor of the error returned
-	// when the check failed.
-	ErrCheckFailed = &errors.ErrDescriptor{
-		MessageFormat: "Argument check failed",
-		Type:          errors.InvalidArgument,
-		Code:          3,
-	}
 )
 
 var componentsDiminutives = map[ttnpb.PeerInfo_Role]string{
@@ -54,5 +46,4 @@ var componentsDiminutives = map[ttnpb.PeerInfo_Role]string{
 func init() {
 	ErrDeviceNotFound.Register()
 	ErrTooManyDevices.Register()
-	ErrCheckFailed.Register()
 }

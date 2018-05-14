@@ -21,6 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -92,7 +93,7 @@ func (r *RegistryRPC) GetApplication(ctx context.Context, id *ttnpb.ApplicationI
 			if errors.GetType(err) != errors.Unknown {
 				return nil, err
 			}
-			return nil, ErrCheckFailed.NewWithCause(nil, err)
+			return nil, common.ErrCheckFailed.NewWithCause(nil, err)
 		}
 	}
 
@@ -125,7 +126,7 @@ func (r *RegistryRPC) SetApplication(ctx context.Context, req *ttnpb.SetApplicat
 			if errors.GetType(err) != errors.Unknown {
 				return nil, err
 			}
-			return nil, ErrCheckFailed.NewWithCause(nil, err)
+			return nil, common.ErrCheckFailed.NewWithCause(nil, err)
 		}
 	}
 
@@ -160,7 +161,7 @@ func (r *RegistryRPC) DeleteApplication(ctx context.Context, id *ttnpb.Applicati
 			if errors.GetType(err) != errors.Unknown {
 				return nil, err
 			}
-			return nil, ErrCheckFailed.NewWithCause(nil, err)
+			return nil, common.ErrCheckFailed.NewWithCause(nil, err)
 		}
 	}
 

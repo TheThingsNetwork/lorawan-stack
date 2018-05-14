@@ -35,16 +35,10 @@ var (
 		Code:          3,
 		Type:          errors.Unauthorized,
 	}
-	// ErrPermissionDenied is returned if the credentials passed do not have enough rights to exchange gateway traffic.
-	ErrPermissionDenied = &errors.ErrDescriptor{
-		MessageFormat: "Not have enough rights to exchange gateway traffic",
-		Code:          4,
-		Type:          errors.PermissionDenied,
-	}
 	// ErrGatewayNotConnected is returned when a send operation failed because a gateway is not connected.
 	ErrGatewayNotConnected = &errors.ErrDescriptor{
 		MessageFormat:  "Gateway `{gateway_id}` not connected",
-		Code:           5,
+		Code:           4,
 		Type:           errors.NotFound,
 		SafeAttributes: []string{"gateway_id"},
 	}
@@ -60,7 +54,6 @@ var (
 func init() {
 	ErrNoNetworkServerFound.Register()
 	ErrNoIdentityServerFound.Register()
-	ErrPermissionDenied.Register()
 	ErrUnauthorized.Register()
 	ErrGatewayNotConnected.Register()
 	ErrTranslationFromProtobuf.Register()

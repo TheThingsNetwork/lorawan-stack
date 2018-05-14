@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -106,30 +107,30 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		}
 	}
 	if !supported {
-		return nil, ErrUnsupportedLoRaWANMACVersion.New(errors.Attributes{
+		return nil, common.ErrUnsupportedLoRaWANMACVersion.New(errors.Attributes{
 			"version": ver,
 		})
 	}
 
 	if req.EndDeviceIdentifiers.DevAddr == nil {
-		return nil, ErrMissingDevAddr.New(nil)
+		return nil, common.ErrMissingDevAddr.New(nil)
 	}
 	devAddr := *req.EndDeviceIdentifiers.DevAddr
 
 	rawPayload := req.GetRawPayload()
 	if req.Payload.GetPayload() == nil {
 		if rawPayload == nil {
-			return nil, ErrMissingPayload.New(nil)
+			return nil, common.ErrMissingPayload.New(nil)
 		}
 		if err = req.Payload.UnmarshalLoRaWAN(rawPayload); err != nil {
-			return nil, ErrUnmarshalFailed.NewWithCause(nil, err)
+			return nil, common.ErrUnmarshalPayloadFailed.NewWithCause(nil, err)
 		}
 	}
 
 	msg := req.GetPayload()
 	if msg.GetMajor() != ttnpb.Major_LORAWAN_R1 {
-		return nil, ErrUnsupportedLoRaWANMajorVersion.New(errors.Attributes{
-			"major": msg.GetMajor(),
+		return nil, common.ErrUnsupportedLoRaWANVersion.New(errors.Attributes{
+			"version": msg.GetMajor(),
 		})
 	}
 	if msg.GetMType() != ttnpb.MType_JOIN_REQUEST {
@@ -144,10 +145,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 
 	if pld.DevEUI.IsZero() {
-		return nil, ErrMissingDevEUI.New(nil)
+		return nil, common.ErrMissingDevEUI.New(nil)
 	}
 	if pld.JoinEUI.IsZero() {
-		return nil, ErrMissingJoinEUI.New(nil)
+		return nil, common.ErrMissingJoinEUI.New(nil)
 	}
 
 	if rawPayload == nil {
@@ -197,10 +198,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 	ke := dev.GetRootKeys().GetAppKey()
 	if ke == nil {
-		return nil, ErrCorruptRegistry.NewWithCause(nil, ErrAppKeyEnvelopeNotFound.New(nil))
+		return nil, common.ErrCorruptRegistry.NewWithCause(nil, ErrAppKeyEnvelopeNotFound.New(nil))
 	}
 	if ke.Key == nil || ke.Key.IsZero() {
-		return nil, ErrCorruptRegistry.NewWithCause(nil, ErrAppKeyNotFound.New(nil))
+		return nil, common.ErrCorruptRegistry.NewWithCause(nil, ErrAppKeyNotFound.New(nil))
 	}
 	appKey := *ke.Key
 
@@ -262,10 +263,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	case ttnpb.MAC_V1_1:
 		ke := dev.GetRootKeys().GetNwkKey()
 		if ke == nil {
-			return nil, ErrCorruptRegistry.NewWithCause(nil, ErrNwkKeyEnvelopeNotFound.New(nil))
+			return nil, common.ErrCorruptRegistry.NewWithCause(nil, ErrNwkKeyEnvelopeNotFound.New(nil))
 		}
 		if ke.Key == nil || ke.Key.IsZero() {
-			return nil, ErrCorruptRegistry.NewWithCause(nil, ErrNwkKeyNotFound.New(nil))
+			return nil, common.ErrCorruptRegistry.NewWithCause(nil, ErrNwkKeyNotFound.New(nil))
 		}
 		nwkKey := *ke.Key
 
@@ -275,7 +276,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 		mic, err := crypto.ComputeJoinAcceptMIC(crypto.DeriveJSIntKey(nwkKey, pld.DevEUI), 0xff, pld.JoinEUI, pld.DevNonce, b)
 		if err != nil {
-			return nil, ErrComputeJoinAcceptMIC.NewWithCause(nil, err)
+			return nil, common.ErrComputeMIC.NewWithCause(nil, err)
 		}
 
 		enc, err := crypto.EncryptJoinAccept(nwkKey, append(b[1:], mic[:]...))
@@ -312,7 +313,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 		mic, err := crypto.ComputeLegacyJoinAcceptMIC(appKey, b)
 		if err != nil {
-			return nil, ErrComputeJoinAcceptMIC.NewWithCause(nil, err)
+			return nil, common.ErrComputeMIC.NewWithCause(nil, err)
 		}
 
 		enc, err := crypto.EncryptJoinAccept(appKey, append(b[1:], mic[:]...))
@@ -353,7 +354,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 // GetAppSKey returns the AppSKey associated with device specified by the supplied request.
 func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
 	if req.DevEUI.IsZero() {
-		return nil, ErrMissingDevEUI.New(nil)
+		return nil, common.ErrMissingDevEUI.New(nil)
 	}
 	if req.GetSessionKeyID() == "" {
 		return nil, ErrMissingSessionKeyID.New(nil)
@@ -396,7 +397,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 // GetNwkSKeys returns the NwkSKeys associated with device specified by the supplied request.
 func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
 	if req.DevEUI.IsZero() {
-		return nil, ErrMissingDevEUI.New(nil)
+		return nil, common.ErrMissingDevEUI.New(nil)
 	}
 	if req.GetSessionKeyID() == "" {
 		return nil, ErrMissingSessionKeyID.New(nil)
