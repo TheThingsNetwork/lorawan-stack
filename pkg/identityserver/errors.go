@@ -100,7 +100,7 @@ var ErrEmailAddressAlreadyUsed = &errors.ErrDescriptor{
 // with `SETTINGS_COLLABORATORS` right is not equal to the entire set of defined
 // application rights.
 var ErrUnmanageableApplication = &errors.ErrDescriptor{
-	MessageFormat:  "Application `{application_id}` becomes unmanageable a no collaborator with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` has the following rights: {missing_rights}",
+	MessageFormat:  "Application `{application_id}` becomes unmanageable as no collaborator with `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` has the following rights: {missing_rights}",
 	Code:           9,
 	Type:           errors.InvalidArgument,
 	SafeAttributes: []string{"application_id", "missing_rights"},
@@ -110,7 +110,7 @@ var ErrUnmanageableApplication = &errors.ErrDescriptor{
 // with `SETTINGS_COLLABORATORS` right is not equal to the entire set of defined
 // gateway rights.
 var ErrUnmanageableGateway = &errors.ErrDescriptor{
-	MessageFormat:  "Gateway `{gateway_id}` becomes unmanageable a no collaborator with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` has the following rights: {missing_rights}",
+	MessageFormat:  "Gateway `{gateway_id}` becomes unmanageable as no collaborator with `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` has the following rights: {missing_rights}",
 	Code:           10,
 	Type:           errors.InvalidArgument,
 	SafeAttributes: []string{"gateway_id", "missing_rights"},
@@ -120,7 +120,7 @@ var ErrUnmanageableGateway = &errors.ErrDescriptor{
 // with `SETTINGS_MEMBERS` right is not equal to the entire set of defined
 // organization rights.
 var ErrUnmanageableOrganization = &errors.ErrDescriptor{
-	MessageFormat:  "Organization `{organization_id}` becomes unmanageable a no member with `RIGHT_ORGANIZATION_SETTINGS_MEMBERS` has the following rights: {missing_rights}",
+	MessageFormat:  "Organization `{organization_id}` becomes unmanageable as no member with `RIGHT_ORGANIZATION_SETTINGS_MEMBERS` has the following rights: {missing_rights}",
 	Code:           11,
 	Type:           errors.InvalidArgument,
 	SafeAttributes: []string{"organization_id", "missing_rights"},
