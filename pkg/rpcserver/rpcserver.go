@@ -31,6 +31,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/grpcerrors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/fillcontext"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
@@ -141,6 +142,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	streamInterceptors := []grpc.StreamServerInterceptor{
 		fillcontext.StreamServerInterceptor(options.contextFillers...),
 		grpc_ctxtags.StreamServerInterceptor(ctxtagsOpts...),
+		events.StreamServerInterceptor,
 		grpc_prometheus.StreamServerInterceptor,
 		grpcerrors.StreamServerInterceptor(), // above works with gRPC errors, below works with TTN errors
 		sentry.StreamServerInterceptor(options.sentry),
@@ -152,6 +154,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	unaryInterceptors := []grpc.UnaryServerInterceptor{
 		fillcontext.UnaryServerInterceptor(options.contextFillers...),
 		grpc_ctxtags.UnaryServerInterceptor(ctxtagsOpts...),
+		events.UnaryServerInterceptor,
 		grpc_prometheus.UnaryServerInterceptor,
 		grpcerrors.UnaryServerInterceptor(), // above works with gRPC errors, below works with TTN errors
 		sentry.UnaryServerInterceptor(options.sentry),
