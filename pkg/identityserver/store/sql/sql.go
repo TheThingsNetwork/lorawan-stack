@@ -109,7 +109,7 @@ func (s *impl) Transact(fn func(*store.Store) error) error {
 		}
 		initSubStores(store)
 
-		return fn(store.store().store(nil))
+		return fn(store.store().store(store))
 	})
 }
 
@@ -153,6 +153,26 @@ func (s *impl) store() *sqlStore {
 type txImpl struct {
 	tx *db.Tx
 	sqlStore
+}
+
+func (s *txImpl) WithContext(context context.Context) *store.Store {
+	panic("Can't execute WithContext() inside a transaction")
+}
+
+func (s *txImpl) Transact(fn func(*store.Store) error) error {
+	panic("Can't execute Transact() inside a transaction")
+}
+
+func (s *txImpl) Init() error {
+	panic("Can't execute Init() inside a transaction")
+}
+
+func (s *txImpl) Clean() error {
+	panic("Can't execute Clean() inside a transaction")
+}
+
+func (s *txImpl) Close() error {
+	panic("Can't execute Close() inside a transaction")
 }
 
 // queryer returns the transaction that is already happening.
