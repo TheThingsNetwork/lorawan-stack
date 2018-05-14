@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -181,6 +182,9 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 
 	if notFound {
 		_, err := r.Interface.Create(&req.Device, fields...)
+		if err == nil {
+			events.Publish(evtCreateDevice(ctx, &req.Device.EndDeviceIdentifiers, nil))
+		}
 		return ttnpb.Empty, err
 	}
 	dev.EndDevice = &req.Device
@@ -206,5 +210,9 @@ func (r *RegistryRPC) DeleteDevice(ctx context.Context, id *ttnpb.EndDeviceIdent
 	if err != nil {
 		return nil, err
 	}
-	return ttnpb.Empty, dev.Delete()
+	if err = dev.Delete(); err != nil {
+		return nil, err
+	}
+	events.Publish(evtDeleteDevice(ctx, id, nil))
+	return ttnpb.Empty, nil
 }
