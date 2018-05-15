@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package sendgrid provides the implementation of an email sender using SendGrid.
 package sendgrid
 
 import (

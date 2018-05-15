@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package migrations provides an implementation of a reusable migrations registry.
 package migrations
 
 import "go.thethings.network/lorawan-stack/pkg/errors"

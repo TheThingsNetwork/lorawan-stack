@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package migrations contains an initialized registry with the SQL schema migrations.
-package migrations
-
-import "go.thethings.network/lorawan-stack/pkg/identityserver/db/migrations"
-
-// Registry is the registry that contains all migrations.
-var Registry = migrations.NewRegistry()
+// Package auth provides methods to generate valid authorization values and
+// to also decode them.
+//
+// It also provides methods to validate passwords.
+package auth

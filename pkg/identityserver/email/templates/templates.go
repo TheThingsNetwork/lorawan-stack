@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package templates provides a generic interface that templates used in emails
+// must implements.
+//
+// Templates used by the email provider are defined here.
 package templates
 
 import (

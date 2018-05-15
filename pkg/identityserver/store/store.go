@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package store provides generic interfaces to work with entities in databases.
 package store
 
 import "context"

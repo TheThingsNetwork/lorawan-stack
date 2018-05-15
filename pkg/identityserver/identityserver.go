@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package identityserver provides the implementation of the Identity Server
+// network component.
 package identityserver
 
 import (
@@ -71,6 +73,9 @@ type Specializers struct {
 }
 
 // IdentityServer implements the Identity Server component behaviour.
+//
+// The first time this component is used, the `Ìnit` method should be called
+// in order to feed the Identity Server with the initial data.
 type IdentityServer struct {
 	// TODO: document things that need to be taken into account or to be done when updating the
 	// rights list. See https://github.com/TheThingsIndustries/ttn/issues/724.

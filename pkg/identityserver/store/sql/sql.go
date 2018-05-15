@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package sql provides an implementation of the store using SQL databases.
 package sql
 
 import (

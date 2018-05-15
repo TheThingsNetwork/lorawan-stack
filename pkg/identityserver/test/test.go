@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package test provides test helpers to assert that entities equals each other.
 package test
 
 import (

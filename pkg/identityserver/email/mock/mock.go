@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package mock provides a test email provider that is used in tests.
 package mock
 
 import "go.thethings.network/lorawan-stack/pkg/identityserver/email/templates"
