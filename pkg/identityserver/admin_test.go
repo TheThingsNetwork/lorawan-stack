@@ -23,7 +23,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email/mock"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email/templates"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -220,7 +220,7 @@ func TestAdminUsers(t *testing.T) {
 
 	_, err = is.store.Users.GetByID(user.UserIdentifiers, is.specializers.User)
 	a.So(err, should.NotBeNil)
-	a.So(sql.ErrUserNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrUserNotFound.Describes(err), should.BeTrue)
 
 	// List approved users.
 	resp, err := is.adminService.ListUsers(ctx, &ttnpb.ListUsersRequest{

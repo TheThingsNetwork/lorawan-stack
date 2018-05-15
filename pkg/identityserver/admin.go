@@ -24,7 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email/templates"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql"
 	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -463,7 +462,7 @@ func (s *adminService) SendInvitation(ctx context.Context, req *ttnpb.SendInvita
 	err = s.store.Transact(func(tx *store.Store) (err error) {
 		// Check whether email is already registered or not.
 		found, err := tx.Users.GetByID(ttnpb.UserIdentifiers{Email: req.Email}, s.specializers.User)
-		if err != nil && !sql.ErrUserNotFound.Describes(err) {
+		if err != nil && !store.ErrUserNotFound.Describes(err) {
 			return err
 		}
 

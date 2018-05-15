@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package sql
+package store
 
 import "go.thethings.network/lorawan-stack/pkg/errors"
 
@@ -48,8 +48,6 @@ func init() {
 
 	ErrOrganizationIDTaken.Register()
 	ErrOrganizationNotFound.Register()
-
-	ErrAccountIDNotFound.Register()
 }
 
 // ErrApplicationNotFound is returned when trying to fetch an application that
@@ -71,22 +69,22 @@ var ErrApplicationIDTaken = &errors.ErrDescriptor{
 // ErrClientNotFound is returned when trying to fetch a client that does not exists.
 var ErrClientNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Client does not exist",
-	Code:          20,
+	Code:          3,
 	Type:          errors.NotFound,
 }
 
-// ErrClientIDTaken is returned when trying to create a new client with an ID.
+// ErrClientIDTaken is returned when trying to create a new client with an ID
 // that already exists
 var ErrClientIDTaken = &errors.ErrDescriptor{
 	MessageFormat: "Client id is already taken",
-	Code:          21,
+	Code:          4,
 	Type:          errors.AlreadyExists,
 }
 
 // ErrGatewayNotFound is returned when trying to fetch a gateway that does not exist.
 var ErrGatewayNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Gateway does not exist",
-	Code:          300,
+	Code:          5,
 	Type:          errors.NotFound,
 }
 
@@ -94,7 +92,7 @@ var ErrGatewayNotFound = &errors.ErrDescriptor{
 // that already exists.
 var ErrGatewayIDTaken = &errors.ErrDescriptor{
 	MessageFormat: "Gateway id is already taken",
-	Code:          301,
+	Code:          6,
 	Type:          errors.AlreadyExists,
 }
 
@@ -102,29 +100,31 @@ var ErrGatewayIDTaken = &errors.ErrDescriptor{
 // authorization code that does not exist.
 var ErrAuthorizationCodeNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Authorization code does not exist",
-	Code:          501,
+	Code:          7,
 	Type:          errors.NotFound,
 }
 
-// ErrAuthorizationCodeConflict is returned when trying to create an authorization code that already exists.
+// ErrAuthorizationCodeConflict is returned when trying to create an authorization
+// code that already exists.
 var ErrAuthorizationCodeConflict = &errors.ErrDescriptor{
 	MessageFormat: "Authorization code already exists",
-	Code:          502,
+	Code:          8,
 	Type:          errors.AlreadyExists,
 }
 
-// ErrRefreshTokenNotFound is returned when trying to fetch or delete a refresh token that
-// does not exist.
+// ErrRefreshTokenNotFound is returned when trying to fetch or delete a refresh token
+// that does not exist.
 var ErrRefreshTokenNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Refresh token does not exist",
-	Code:          503,
+	Code:          9,
 	Type:          errors.NotFound,
 }
 
-// ErrRefreshTokenConflict is returned when trying to create a refresh token that already exists.
+// ErrRefreshTokenConflict is returned when trying to create a refresh token
+// that already exists.
 var ErrRefreshTokenConflict = &errors.ErrDescriptor{
 	MessageFormat: "Refresh token already exists",
-	Code:          504,
+	Code:          10,
 	Type:          errors.AlreadyExists,
 }
 
@@ -132,7 +132,7 @@ var ErrRefreshTokenConflict = &errors.ErrDescriptor{
 // token that does not exist.
 var ErrAccessTokenNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Access token does not exist",
-	Code:          505,
+	Code:          11,
 	Type:          errors.NotFound,
 }
 
@@ -140,7 +140,7 @@ var ErrAccessTokenNotFound = &errors.ErrDescriptor{
 // already exists.
 var ErrAccessTokenConflict = &errors.ErrDescriptor{
 	MessageFormat: "Access token already exists",
-	Code:          506,
+	Code:          12,
 	Type:          errors.AlreadyExists,
 }
 
@@ -148,14 +148,14 @@ var ErrAccessTokenConflict = &errors.ErrDescriptor{
 // non-existent authorized client.
 var ErrAuthorizedClientNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Client is not authorized",
-	Code:          507,
+	Code:          13,
 	Type:          errors.NotFound,
 }
 
 // ErrUserNotFound is returned when trying to fetch an user that does not exist.
 var ErrUserNotFound = &errors.ErrDescriptor{
 	MessageFormat: "User does not exist",
-	Code:          400,
+	Code:          14,
 	Type:          errors.NotFound,
 }
 
@@ -163,7 +163,7 @@ var ErrUserNotFound = &errors.ErrDescriptor{
 // is already taken.
 var ErrUserIDTaken = &errors.ErrDescriptor{
 	MessageFormat: "User id is already taken",
-	Code:          402,
+	Code:          15,
 	Type:          errors.AlreadyExists,
 }
 
@@ -171,21 +171,21 @@ var ErrUserIDTaken = &errors.ErrDescriptor{
 // email that is already taken.
 var ErrUserEmailTaken = &errors.ErrDescriptor{
 	MessageFormat: "Email address is already taken by another account",
-	Code:          403,
-	Type:          errors.AlreadyExists,
+	Code:          16,
+	Type:          errors.Conflict,
 }
 
 // ErrValidationTokenNotFound is returned when trying to get a token that does not exist.
 var ErrValidationTokenNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Validation token not found",
-	Code:          404,
+	Code:          17,
 	Type:          errors.NotFound,
 }
 
 // ErrAPIKeyNotFound is returned when trying to fetch an API key that does not exist.
 var ErrAPIKeyNotFound = &errors.ErrDescriptor{
 	MessageFormat: "API key does not exist",
-	Code:          405,
+	Code:          18,
 	Type:          errors.NotFound,
 }
 
@@ -193,30 +193,30 @@ var ErrAPIKeyNotFound = &errors.ErrDescriptor{
 // that already exists in the namespace.
 var ErrAPIKeyNameConflict = &errors.ErrDescriptor{
 	MessageFormat: "API key name is already taken",
-	Code:          406,
-	Type:          errors.AlreadyExists,
+	Code:          19,
+	Type:          errors.Conflict,
 }
 
 // ErrSettingsNotFound is returned when trying to fetch the Identity Server
 // settings from the database but these are not set.
 var ErrSettingsNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Settings not found",
-	Code:          407,
+	Code:          20,
 	Type:          errors.NotFound,
 }
 
 // ErrInvitationNotFound is returned when trying to use an invitation that does not exist.
 var ErrInvitationNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Invitation not found",
-	Code:          408,
+	Code:          21,
 	Type:          errors.NotFound,
 }
 
-// ErrOrganizationIDTaken is returned when trying to create an organization using
-// an ID that is already in use by an user or organization.
+// ErrOrganizationIDTaken is returned when trying to create an organization
+// using an ID that is already in use by an user or organization.
 var ErrOrganizationIDTaken = &errors.ErrDescriptor{
 	MessageFormat: "Organization id is already taken",
-	Code:          409,
+	Code:          22,
 	Type:          errors.AlreadyExists,
 }
 
@@ -224,14 +224,6 @@ var ErrOrganizationIDTaken = &errors.ErrDescriptor{
 // does not exists.
 var ErrOrganizationNotFound = &errors.ErrDescriptor{
 	MessageFormat: "Organization does not exist",
-	Code:          410,
-	Type:          errors.NotFound,
-}
-
-// ErrAccountIDNotFound is returned when trying to delete either an user or
-// organization that does not exist.
-var ErrAccountIDNotFound = &errors.ErrDescriptor{
-	MessageFormat: "Account does not exist",
-	Code:          411,
+	Code:          23,
 	Type:          errors.NotFound,
 }

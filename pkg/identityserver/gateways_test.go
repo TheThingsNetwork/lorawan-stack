@@ -21,7 +21,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -188,7 +188,7 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 		Rights:             []ttnpb.Right{ttnpb.Right(1)},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(sql.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
+	a.So(store.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
 	keys, err := is.gatewayService.ListGatewayAPIKeys(ctx, &sids)
 	a.So(err, should.BeNil)

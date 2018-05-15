@@ -87,7 +87,7 @@ func (s *UserStore) getValidationToken(q db.QueryContext, token string) (id uuid
 			WHERE validation_token = $1`,
 		token)
 	if db.IsNoRows(err) {
-		err = ErrValidationTokenNotFound.New(nil)
+		err = store.ErrValidationTokenNotFound.New(nil)
 	}
 	id = res.UserID
 	data = res.ValidationToken
@@ -109,7 +109,7 @@ func (s *UserStore) deleteValidationToken(q db.QueryContext, token string) (err 
 			RETURNING validation_token`,
 		token)
 	if db.IsNoRows(err) {
-		err = ErrValidationTokenNotFound.New(nil)
+		err = store.ErrValidationTokenNotFound.New(nil)
 	}
 	return
 }

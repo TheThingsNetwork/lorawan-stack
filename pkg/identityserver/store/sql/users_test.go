@@ -22,7 +22,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	. "go.thethings.network/lorawan-stack/pkg/identityserver/store/sql"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -154,7 +153,7 @@ func testUserStore(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	}
 	err = s.Users.SaveAPIKey(sids, key2)
 	a.So(err, should.NotBeNil)
-	a.So(ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
+	a.So(store.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
 	ids, foundKey, err := s.Users.GetAPIKey(key.Key)
 	a.So(err, should.BeNil)
@@ -180,14 +179,14 @@ func testUserStore(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 
 	_, err = s.Users.GetAPIKeyByName(sids, key.Name)
 	a.So(err, should.NotBeNil)
-	a.So(ErrAPIKeyNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrAPIKeyNotFound.Describes(err), should.BeTrue)
 
 	err = s.Users.Delete(sids)
 	a.So(err, should.BeNil)
 
 	found, err = s.Users.GetByID(sids, userSpecializer)
 	a.So(err, should.NotBeNil)
-	a.So(ErrUserNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrUserNotFound.Describes(err), should.BeTrue)
 	a.So(found, should.BeNil)
 }
 
@@ -222,7 +221,7 @@ func TestUserTx(t *testing.T) {
 
 	found, err = s.Users.GetByID(user.UserIdentifiers, userSpecializer)
 	a.So(err, should.NotBeNil)
-	a.So(ErrUserNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrUserNotFound.Describes(err), should.BeTrue)
 	a.So(found, should.BeNil)
 }
 
@@ -251,7 +250,7 @@ func TestUserValidationToken(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	_, _, err = s.Users.GetValidationToken(token.ValidationToken)
-	a.So(ErrValidationTokenNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrValidationTokenNotFound.Describes(err), should.BeTrue)
 
 	err = s.Users.SaveValidationToken(userID, token)
 	a.So(err, should.BeNil)
@@ -267,7 +266,7 @@ func TestUserValidationToken(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	_, _, err = s.Users.GetValidationToken(token.ValidationToken)
-	a.So(ErrValidationTokenNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrValidationTokenNotFound.Describes(err), should.BeTrue)
 
 	uID, found, err = s.Users.GetValidationToken(newToken.ValidationToken)
 	a.So(err, should.BeNil)

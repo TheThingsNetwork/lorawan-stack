@@ -17,6 +17,7 @@ package sql
 import (
 	"github.com/satori/go.uuid"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/db"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -61,7 +62,23 @@ func (s *accountStore) registerOrganizationID(q db.QueryContext, organizationID 
 		organizationID,
 		organizationIDType)
 	if _, yes := db.IsDuplicate(err); yes {
-		err = ErrOrganizationIDTaken.New(nil)
+		err = store.ErrOrganizationIDTaken.New(nil)
+	}
+	return
+}
+
+func (s *accountStore) deleteOrganizationID(q db.QueryContext, id uuid.UUID) (err error) {
+	var i string
+	err = q.SelectOne(
+		&i,
+		`DELETE
+			FROM accounts
+			WHERE id = $1 AND type = $2
+			RETURNING account_id`,
+		id,
+		organizationIDType)
+	if db.IsNoRows(err) {
+		err = store.ErrOrganizationNotFound.New(nil)
 	}
 	return
 }
@@ -78,23 +95,23 @@ func (s *accountStore) registerUserID(q db.QueryContext, userID string) (id uuid
 		userID,
 		userIDType)
 	if _, yes := db.IsDuplicate(err); yes {
-		err = ErrUserIDTaken.New(nil)
+		err = store.ErrUserIDTaken.New(nil)
 	}
 	return
 }
 
-// deleteID deletes the given ID.
-func (s *accountStore) deleteID(q db.QueryContext, id uuid.UUID) (err error) {
+func (s *accountStore) deleteUserID(q db.QueryContext, id uuid.UUID) (err error) {
 	var i string
 	err = q.SelectOne(
 		&i,
 		`DELETE
 			FROM accounts
-			WHERE id = $1
+			WHERE id = $1 AND type = $2
 			RETURNING account_id`,
-		id)
+		id,
+		userIDType)
 	if db.IsNoRows(err) {
-		err = ErrAccountIDNotFound.New(nil)
+		err = store.ErrUserNotFound.New(nil)
 	}
 	return
 }

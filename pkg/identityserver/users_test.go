@@ -28,7 +28,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email/mock"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email/templates"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -280,7 +279,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 		Rights: []ttnpb.Right{ttnpb.Right(1)},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(sql.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
+	a.So(store.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
 
 	keys, err := is.userService.ListUserAPIKeys(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
@@ -343,7 +342,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 		Token: token,
 	})
 	a.So(err, should.NotBeNil)
-	a.So(sql.ErrValidationTokenNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrValidationTokenNotFound.Describes(err), should.BeTrue)
 
 	// And therefore the email is not validated yet.
 	found, err = is.userService.GetUser(ctx, ttnpb.Empty)
@@ -371,7 +370,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 
 	_, err = is.userService.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifiers{ClientID: "non-existent-client"})
 	a.So(err, should.NotBeNil)
-	a.So(sql.ErrClientNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrClientNotFound.Describes(err), should.BeTrue)
 
 	// Create a fake authorized client to the user.
 	client := &ttnpb.Client{

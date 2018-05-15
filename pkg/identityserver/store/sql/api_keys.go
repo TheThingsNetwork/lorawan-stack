@@ -21,6 +21,7 @@ import (
 	"github.com/satori/go.uuid"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/db"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -48,7 +49,7 @@ func (s *apiKeysStore) saveAPIKey(q db.QueryContext, entityID uuid.UUID, key ttn
 		key.Key,
 		key.Name)
 	if _, yes := db.IsDuplicate(err); yes {
-		return ErrAPIKeyNameConflict.New(errors.Attributes{
+		return store.ErrAPIKeyNameConflict.New(errors.Attributes{
 			"name": key.Name,
 		})
 	}
@@ -103,7 +104,7 @@ func (s *apiKeysStore) getAPIKey(q db.QueryContext, value string) (id uuid.UUID,
 			WHERE key = $1`, s.foreignKey, s.entity),
 		value)
 	if db.IsNoRows(err) {
-		err = ErrAPIKeyNotFound.New(nil)
+		err = store.ErrAPIKeyNotFound.New(nil)
 	}
 	id = res.EntityID
 	key = res.APIKey
@@ -122,7 +123,7 @@ func (s *apiKeysStore) getAPIKeyByName(q db.QueryContext, entityID uuid.UUID, ke
 		entityID,
 		keyName)
 	if db.IsNoRows(err) {
-		err = ErrAPIKeyNotFound.New(nil)
+		err = store.ErrAPIKeyNotFound.New(nil)
 	}
 	return
 }
@@ -169,7 +170,7 @@ func (s *apiKeysStore) deleteAPIKey(q db.QueryContext, entityID uuid.UUID, keyNa
 		entityID,
 		keyName)
 	if db.IsNoRows(err) {
-		return ErrAPIKeyNotFound.New(nil)
+		return store.ErrAPIKeyNotFound.New(nil)
 	}
 	return err
 }
@@ -186,7 +187,7 @@ func (s *apiKeysStore) deleteAPIKeyRights(q db.QueryContext, entityID uuid.UUID,
 		entityID,
 		keyName)
 	if db.IsNoRows(err) {
-		return ErrAPIKeyNotFound.New(nil)
+		return store.ErrAPIKeyNotFound.New(nil)
 	}
 	return err
 }

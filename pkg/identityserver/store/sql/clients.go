@@ -60,7 +60,7 @@ func (s *ClientStore) getClientID(q db.QueryContext, ids ttnpb.ClientIdentifiers
 			WHERE client_id = $1`,
 		ids.ClientID)
 	if db.IsNoRows(err) {
-		err = ErrClientNotFound.New(nil)
+		err = store.ErrClientNotFound.New(nil)
 	}
 	return
 }
@@ -136,7 +136,7 @@ func (s *ClientStore) create(q db.QueryContext, userID uuid.UUID, data *ttnpb.Cl
 		cli)
 
 	if _, yes := db.IsDuplicate(err); yes {
-		err = ErrClientIDTaken.New(nil)
+		err = store.ErrClientIDTaken.New(nil)
 	}
 
 	return
@@ -190,7 +190,7 @@ func (s *ClientStore) getByID(q db.QueryContext, id uuid.UUID) (client ttnpb.Cli
 		id)
 
 	if db.IsNoRows(err) {
-		err = ErrClientNotFound.New(nil)
+		err = store.ErrClientNotFound.New(nil)
 	}
 	if err != nil {
 		return
@@ -416,7 +416,7 @@ func (s *ClientStore) update(q db.QueryContext, clientID uuid.UUID, data *ttnpb.
 		input)
 
 	if db.IsNoRows(err) {
-		err = ErrClientNotFound.New(nil)
+		err = store.ErrClientNotFound.New(nil)
 	}
 
 	return
@@ -448,7 +448,7 @@ func (s *ClientStore) delete(q db.QueryContext, clientID uuid.UUID) (err error) 
 			RETURNING client_id`,
 		clientID)
 	if db.IsNoRows(err) {
-		err = ErrClientNotFound.New(nil)
+		err = store.ErrClientNotFound.New(nil)
 	}
 	return
 }

@@ -80,7 +80,7 @@ func (s *GatewayStore) getGatewayID(q db.QueryContext, ids ttnpb.GatewayIdentifi
 			WHERE %s`, strings.Join(clauses, " AND ")),
 		ids)
 	if db.IsNoRows(err) {
-		err = ErrGatewayNotFound.New(nil)
+		err = store.ErrGatewayNotFound.New(nil)
 	}
 	return
 }
@@ -151,7 +151,7 @@ func (s *GatewayStore) create(q db.QueryContext, gateway *ttnpb.Gateway) (id uui
 			RETURNING id`,
 		gateway)
 	if _, yes := db.IsDuplicate(err); yes {
-		err = ErrGatewayIDTaken.New(nil)
+		err = store.ErrGatewayIDTaken.New(nil)
 	}
 	return
 }
@@ -291,7 +291,7 @@ func (s *GatewayStore) getByID(q db.QueryContext, gtwID uuid.UUID) (result gatew
 			WHERE id = $1`,
 		gtwID)
 	if db.IsNoRows(err) {
-		err = ErrGatewayNotFound.New(nil)
+		err = store.ErrGatewayNotFound.New(nil)
 	}
 	return
 }
@@ -354,7 +354,7 @@ func (s *GatewayStore) update(q db.QueryContext, gtwID uuid.UUID, data *ttnpb.Ga
 		})
 
 	if db.IsNoRows(err) {
-		err = ErrGatewayNotFound.New(nil)
+		err = store.ErrGatewayNotFound.New(nil)
 	}
 
 	return
@@ -569,7 +569,7 @@ func (s *GatewayStore) delete(q db.QueryContext, gtwID uuid.UUID) error {
 			RETURNING gateway_id`,
 		gtwID)
 	if db.IsNoRows(err) {
-		return ErrGatewayNotFound.New(nil)
+		return store.ErrGatewayNotFound.New(nil)
 	}
 	return err
 }

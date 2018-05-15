@@ -102,7 +102,7 @@ func (s *InvitationStore) use(q db.QueryContext, email, token string) error {
 		email,
 		token)
 	if db.IsNoRows(err) {
-		return ErrInvitationNotFound.New(nil)
+		return store.ErrInvitationNotFound.New(nil)
 	}
 	return err
 }

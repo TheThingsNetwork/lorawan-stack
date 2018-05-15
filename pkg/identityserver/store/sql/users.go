@@ -79,7 +79,7 @@ func (s *UserStore) getUserID(q db.QueryContext, ids ttnpb.UserIdentifiers) (res
 			WHERE %s`, strings.Join(clauses, " AND ")),
 		ids)
 	if db.IsNoRows(err) {
-		err = ErrUserNotFound.New(nil)
+		err = store.ErrUserNotFound.New(nil)
 	}
 	return
 }
@@ -140,10 +140,10 @@ func (s *UserStore) create(q db.QueryContext, data user) (err error) {
 
 	if duplicates, yes := db.IsDuplicate(err); yes {
 		if _, duplicated := duplicates["email"]; duplicated {
-			return ErrUserEmailTaken.New(nil)
+			return store.ErrUserEmailTaken.New(nil)
 		}
 		if _, duplicated := duplicates["user_id"]; duplicated {
-			return ErrUserIDTaken.New(nil)
+			return store.ErrUserIDTaken.New(nil)
 		}
 	}
 
@@ -180,7 +180,7 @@ func (s *UserStore) getByID(q db.QueryContext, userID uuid.UUID) (result user, e
 			WHERE id = $1`,
 		userID)
 	if db.IsNoRows(err) {
-		err = ErrUserNotFound.New(nil)
+		err = store.ErrUserNotFound.New(nil)
 	}
 	return
 }
@@ -253,7 +253,7 @@ func (s *UserStore) update(q db.QueryContext, userID uuid.UUID, data *ttnpb.User
 			User: *data,
 		})
 	if _, yes := db.IsDuplicate(err); yes {
-		err = ErrUserEmailTaken.New(nil)
+		err = store.ErrUserEmailTaken.New(nil)
 	}
 	return
 }
@@ -273,7 +273,7 @@ func (s *UserStore) Delete(ids ttnpb.UserIdentifiers) error {
 		}
 
 		// Delete its ID from the shared namespace with organizations.
-		return s.accountStore.deleteID(tx, userID)
+		return s.accountStore.deleteUserID(tx, userID)
 	})
 
 	return err
@@ -289,7 +289,7 @@ func (s *UserStore) delete(q db.QueryContext, userID uuid.UUID) (err error) {
 			RETURNING user_id`,
 		userID)
 	if db.IsNoRows(err) {
-		err = ErrUserNotFound.New(nil)
+		err = store.ErrUserNotFound.New(nil)
 	}
 	return
 }

@@ -21,7 +21,6 @@ import (
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	. "go.thethings.network/lorawan-stack/pkg/identityserver/store/sql"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql/migrations"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -116,6 +115,6 @@ func TestClientAttributer(t *testing.T) {
 
 	found, err = s.Clients.GetByID(withFoo.GetClient().ClientIdentifiers, specializer)
 	a.So(err, should.NotBeNil)
-	a.So(ErrClientNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrClientNotFound.Describes(err), should.BeTrue)
 	a.So(found, should.BeNil)
 }

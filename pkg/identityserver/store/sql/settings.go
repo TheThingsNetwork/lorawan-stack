@@ -16,6 +16,7 @@ package sql
 
 import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/db"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -56,7 +57,7 @@ func (s *SettingStore) get(q db.QueryContext) (*ttnpb.IdentityServerSettings, er
 			FROM settings
 			WHERE id = 1`)
 	if db.IsNoRows(err) {
-		return nil, ErrSettingsNotFound.New(nil)
+		return nil, store.ErrSettingsNotFound.New(nil)
 	}
 	if err != nil {
 		return nil, err

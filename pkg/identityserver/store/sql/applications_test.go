@@ -20,7 +20,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	. "go.thethings.network/lorawan-stack/pkg/identityserver/store/sql"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -43,7 +42,7 @@ func TestApplications(t *testing.T) {
 
 	err = s.Applications.Create(application)
 	a.So(err, should.NotBeNil)
-	a.So(ErrApplicationIDTaken.Describes(err), should.BeTrue)
+	a.So(store.ErrApplicationIDTaken.Describes(err), should.BeTrue)
 
 	found, err := s.Applications.GetByID(application.ApplicationIdentifiers, applicationSpecializer)
 	a.So(err, should.BeNil)
@@ -183,5 +182,5 @@ func TestApplications(t *testing.T) {
 
 	_, err = s.Applications.GetByID(application.ApplicationIdentifiers, applicationSpecializer)
 	a.So(err, should.NotBeNil)
-	a.So(ErrApplicationNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrApplicationNotFound.Describes(err), should.BeTrue)
 }

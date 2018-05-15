@@ -66,7 +66,7 @@ func (s *OrganizationStore) getOrganizationID(q db.QueryContext, ids ttnpb.Organ
 			WHERE organization_id = $1`,
 		ids.OrganizationID)
 	if db.IsNoRows(err) {
-		err = ErrOrganizationNotFound.New(nil)
+		err = store.ErrOrganizationNotFound.New(nil)
 	}
 	return
 }
@@ -157,7 +157,7 @@ func (s *OrganizationStore) getByID(q db.QueryContext, orgID uuid.UUID) (result 
 			WHERE id = $1`,
 		orgID)
 	if db.IsNoRows(err) {
-		err = ErrOrganizationNotFound.New(nil)
+		err = store.ErrOrganizationNotFound.New(nil)
 	}
 	return
 }
@@ -203,7 +203,7 @@ func (s *OrganizationStore) update(q db.QueryContext, orgID uuid.UUID, data *ttn
 		})
 
 	if db.IsNoRows(err) {
-		return ErrOrganizationNotFound.New(nil)
+		return store.ErrOrganizationNotFound.New(nil)
 	}
 
 	return err
@@ -222,7 +222,7 @@ func (s *OrganizationStore) Delete(ids ttnpb.OrganizationIdentifiers) error {
 			return err
 		}
 
-		return s.accountStore.deleteID(tx, orgID)
+		return s.accountStore.deleteOrganizationID(tx, orgID)
 	})
 
 	return err
@@ -238,7 +238,7 @@ func (s *OrganizationStore) delete(q db.QueryContext, orgID uuid.UUID) (err erro
 			RETURNING organization_id`,
 		orgID)
 	if db.IsNoRows(err) {
-		err = ErrOrganizationNotFound.New(nil)
+		err = store.ErrOrganizationNotFound.New(nil)
 	}
 	return
 }

@@ -21,7 +21,6 @@ import (
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	. "go.thethings.network/lorawan-stack/pkg/identityserver/store/sql"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql/migrations"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -118,6 +117,6 @@ func TestOrganizationAttributer(t *testing.T) {
 
 	found, err = s.Organizations.GetByID(withFoo.GetOrganization().OrganizationIdentifiers, specializer)
 	a.So(err, should.NotBeNil)
-	a.So(ErrOrganizationNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrOrganizationNotFound.Describes(err), should.BeTrue)
 	a.So(found, should.BeNil)
 }

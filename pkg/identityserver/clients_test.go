@@ -21,7 +21,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -103,5 +103,5 @@ func TestClient(t *testing.T) {
 	found, err = is.clientService.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientID: cli.ClientID})
 	a.So(found, should.BeNil)
 	a.So(err, should.NotBeNil)
-	a.So(sql.ErrClientNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrClientNotFound.Describes(err), should.BeTrue)
 }

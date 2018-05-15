@@ -66,7 +66,7 @@ func (s *ApplicationStore) getApplicationID(q db.QueryContext, ids ttnpb.Applica
 			WHERE application_id = $1`,
 		ids.ApplicationID)
 	if db.IsNoRows(err) {
-		err = ErrApplicationNotFound.New(nil)
+		err = store.ErrApplicationNotFound.New(nil)
 	}
 	return
 }
@@ -102,7 +102,7 @@ func (s *ApplicationStore) create(q db.QueryContext, application *ttnpb.Applicat
 		application)
 
 	if _, yes := db.IsDuplicate(err); yes {
-		err = ErrApplicationIDTaken.New(nil)
+		err = store.ErrApplicationIDTaken.New(nil)
 	}
 
 	return
@@ -135,7 +135,7 @@ func (s *ApplicationStore) getByID(q db.QueryContext, id ttnpb.ApplicationIdenti
 			WHERE application_id = :application_id`,
 		id)
 	if db.IsNoRows(err) {
-		err = ErrApplicationNotFound.New(nil)
+		err = store.ErrApplicationNotFound.New(nil)
 	}
 	return
 }
@@ -175,7 +175,7 @@ func (s *ApplicationStore) update(q db.QueryContext, appID uuid.UUID, app *ttnpb
 			Application: *app,
 		})
 	if db.IsNoRows(err) {
-		err = ErrApplicationNotFound.New(nil)
+		err = store.ErrApplicationNotFound.New(nil)
 	}
 	return
 }
@@ -205,7 +205,7 @@ func (s *ApplicationStore) delete(q db.QueryContext, appID uuid.UUID) (err error
 			RETURNING application_id`,
 		appID)
 	if db.IsNoRows(err) {
-		err = ErrApplicationNotFound.New(nil)
+		err = store.ErrApplicationNotFound.New(nil)
 	}
 	return
 }

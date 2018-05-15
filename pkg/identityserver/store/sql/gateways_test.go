@@ -20,7 +20,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	. "go.thethings.network/lorawan-stack/pkg/identityserver/store/sql"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -96,7 +95,7 @@ func testGateways(t *testing.T, ids ttnpb.GatewayIdentifiers) {
 
 	err = s.Gateways.Create(gateway)
 	a.So(err, should.NotBeNil)
-	a.So(ErrGatewayIDTaken.Describes(err), should.BeTrue)
+	a.So(store.ErrGatewayIDTaken.Describes(err), should.BeTrue)
 
 	found, err := s.Gateways.GetByID(gateway.GatewayIdentifiers, gatewaySpecializer)
 	a.So(err, should.BeNil)
@@ -220,5 +219,5 @@ func testGateways(t *testing.T, ids ttnpb.GatewayIdentifiers) {
 
 	_, err = s.Gateways.GetByID(gateway.GatewayIdentifiers, gatewaySpecializer)
 	a.So(err, should.NotBeNil)
-	a.So(ErrGatewayNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrGatewayNotFound.Describes(err), should.BeTrue)
 }

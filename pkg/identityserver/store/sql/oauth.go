@@ -82,7 +82,7 @@ func (s *OAuthStore) saveAuthorizationCode(q db.QueryContext, userID, clientID u
 	)
 
 	if _, dup := db.IsDuplicate(err); dup {
-		return ErrAuthorizationCodeConflict.New(nil)
+		return store.ErrAuthorizationCodeConflict.New(nil)
 	}
 
 	return err
@@ -138,7 +138,7 @@ func (s *OAuthStore) getAuthorizationCode(q db.QueryContext, authorizationCode s
 		authorizationCode)
 
 	if db.IsNoRows(err) {
-		err = ErrAuthorizationCodeNotFound.New(nil)
+		err = store.ErrAuthorizationCodeNotFound.New(nil)
 	}
 
 	return
@@ -161,7 +161,7 @@ func (s *OAuthStore) deleteAuthorizationCode(q db.QueryContext, authorizationCod
 	)
 
 	if db.IsNoRows(err) {
-		return ErrAuthorizationCodeNotFound.New(nil)
+		return store.ErrAuthorizationCodeNotFound.New(nil)
 	}
 
 	return err
@@ -222,7 +222,7 @@ func (s *OAuthStore) saveAccessToken(q db.QueryContext, userID, clientID uuid.UU
 	)
 
 	if _, dup := db.IsDuplicate(err); dup {
-		return ErrAccessTokenConflict.New(nil)
+		return store.ErrAccessTokenConflict.New(nil)
 	}
 
 	return err
@@ -272,7 +272,7 @@ func (s *OAuthStore) getAccessToken(q db.QueryContext, accessToken string) (resu
 	)
 
 	if db.IsNoRows(err) {
-		err = ErrAccessTokenNotFound.New(nil)
+		err = store.ErrAccessTokenNotFound.New(nil)
 	}
 
 	return
@@ -295,7 +295,7 @@ func (s *OAuthStore) deleteAccessToken(q db.QueryContext, accessToken string) er
 	)
 
 	if db.IsNoRows(err) {
-		return ErrAccessTokenNotFound.New(nil)
+		return store.ErrAccessTokenNotFound.New(nil)
 	}
 
 	return err
@@ -349,7 +349,7 @@ func (s *OAuthStore) saveRefreshToken(q db.QueryContext, userID, clientID uuid.U
 	)
 
 	if _, dup := db.IsDuplicate(err); dup {
-		return ErrRefreshTokenConflict.New(nil)
+		return store.ErrRefreshTokenConflict.New(nil)
 	}
 
 	return err
@@ -398,7 +398,7 @@ func (s *OAuthStore) getRefreshToken(q db.QueryContext, refreshToken string) (re
 	)
 
 	if db.IsNoRows(err) {
-		err = ErrRefreshTokenNotFound.New(nil)
+		err = store.ErrRefreshTokenNotFound.New(nil)
 	}
 
 	return
@@ -421,7 +421,7 @@ func (s *OAuthStore) deleteRefreshToken(q db.QueryContext, refreshToken string) 
 	)
 
 	if db.IsNoRows(err) {
-		return ErrRefreshTokenNotFound.New(nil)
+		return store.ErrRefreshTokenNotFound.New(nil)
 	}
 
 	return err
@@ -511,7 +511,7 @@ func (s *OAuthStore) RevokeAuthorizedClient(userIDs ttnpb.UserIdentifiers, clien
 		return err
 	}
 	if rows == 0 {
-		return ErrAuthorizedClientNotFound.New(nil)
+		return store.ErrAuthorizedClientNotFound.New(nil)
 	}
 	return nil
 }

@@ -21,7 +21,6 @@ import (
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	. "go.thethings.network/lorawan-stack/pkg/identityserver/store/sql"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql/migrations"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -121,6 +120,6 @@ func TestUserAttributer(t *testing.T) {
 
 	found, err = s.Users.GetByID(withFoo.GetUser().UserIdentifiers, specializer)
 	a.So(err, should.NotBeNil)
-	a.So(ErrUserNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrUserNotFound.Describes(err), should.BeTrue)
 	a.So(found, should.BeNil)
 }

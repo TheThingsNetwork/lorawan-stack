@@ -21,7 +21,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	. "go.thethings.network/lorawan-stack/pkg/identityserver/store/sql"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -67,7 +66,7 @@ func TestOAuthAuthorizationCode(t *testing.T) {
 
 	_, err = s.OAuth.GetAuthorizationCode(data.AuthorizationCode)
 	a.So(err, should.NotBeNil)
-	a.So(ErrAuthorizationCodeNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrAuthorizationCodeNotFound.Describes(err), should.BeTrue)
 }
 
 func TestOAuthAccessToken(t *testing.T) {
@@ -106,7 +105,7 @@ func TestOAuthAccessToken(t *testing.T) {
 
 	_, err = s.OAuth.GetAccessToken(data.AccessToken)
 	a.So(err, should.NotBeNil)
-	a.So(ErrAccessTokenNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrAccessTokenNotFound.Describes(err), should.BeTrue)
 }
 
 func TestOAuthRefreshToken(t *testing.T) {
@@ -143,7 +142,7 @@ func TestOAuthRefreshToken(t *testing.T) {
 
 	_, err = s.OAuth.GetRefreshToken(data.RefreshToken)
 	a.So(err, should.NotBeNil)
-	a.So(ErrRefreshTokenNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrRefreshTokenNotFound.Describes(err), should.BeTrue)
 }
 
 func TestOAuthAuthorizedClients(t *testing.T) {
@@ -186,5 +185,5 @@ func TestOAuthAuthorizedClients(t *testing.T) {
 
 	err = s.OAuth.RevokeAuthorizedClient(alice.UserIdentifiers, client.ClientIdentifiers)
 	a.So(err, should.NotBeNil)
-	a.So(ErrAuthorizedClientNotFound.Describes(err), should.BeTrue)
+	a.So(store.ErrAuthorizedClientNotFound.Describes(err), should.BeTrue)
 }
