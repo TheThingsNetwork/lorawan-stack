@@ -24,6 +24,9 @@ import (
 
 // Map returns the Struct proto as a map[string]interface{}.
 func Map(p *types.Struct) (map[string]interface{}, error) {
+	if p == nil || len(p.Fields) == 0 {
+		return nil, nil
+	}
 	m := make(map[string]interface{}, len(p.Fields))
 	for k, v := range p.Fields {
 		if v == nil {
@@ -40,6 +43,9 @@ func Map(p *types.Struct) (map[string]interface{}, error) {
 
 // Slice returns the ListValue proto as a []interface{}.
 func Slice(l *types.ListValue) ([]interface{}, error) {
+	if l == nil || len(l.Values) == 0 {
+		return nil, nil
+	}
 	s := make([]interface{}, len(l.Values))
 	for i, v := range l.Values {
 		gv, err := Interface(v)
