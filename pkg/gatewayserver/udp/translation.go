@@ -17,6 +17,7 @@ package udp
 import (
 	"encoding/base64"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -275,6 +276,7 @@ func insertDownlink(data *Data, downlink ttnpb.DownlinkMessage) (err error) {
 		}
 	}
 
+	tmst := downlink.TxMetadata.Timestamp / 1000 // nano->microseconds conversion
 	data.TxPacket = &TxPacket{
 		CodR: downlink.Settings.CodingRate,
 		Freq: float64(downlink.Settings.Frequency) / 1000000,
@@ -282,7 +284,7 @@ func insertDownlink(data *Data, downlink ttnpb.DownlinkMessage) (err error) {
 		IPol: downlink.Settings.PolarizationInversion,
 		Powe: uint8(downlink.Settings.TxPower),
 		Size: uint16(len(payload)),
-		Tmst: uint32(downlink.TxMetadata.Timestamp / 1000), // nano->microseconds conversion
+		Tmst: uint32(tmst % math.MaxUint32),
 		Data: base64.StdEncoding.EncodeToString(payload),
 	}
 	gpsTime := CompactTime(downlink.TxMetadata.Time)
