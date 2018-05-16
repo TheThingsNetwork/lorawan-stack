@@ -267,15 +267,13 @@ func (s *organizationStore) removeMember(q db.QueryContext, orgID, userID uuid.U
 }
 
 func (s *organizationStore) setMember(q db.QueryContext, orgID, userID uuid.UUID, rights []ttnpb.Right) error {
-	// add rights
-	values := make([]string, len(rights))
-	args := make([]interface{}, len(rights)+2)
-	args[0] = orgID
-	args[1] = userID
+	args := make([]interface{}, 0, len(rights)+2)
+	args = append(args, orgID, userID)
 
+	values := make([]string, 0, len(rights))
 	for i, right := range rights {
-		values[i] = fmt.Sprintf("($1, $2, $%d)", i+3)
-		args[i+2] = right
+		args = append(args, right)
+		values = append(values, fmt.Sprintf("($1, $2, $%d)", i+3))
 	}
 
 	query := fmt.Sprintf(

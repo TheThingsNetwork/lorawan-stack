@@ -133,15 +133,13 @@ func (s *gatewayStore) unsetCollaborator(q db.QueryContext, gtwID, accountID uui
 }
 
 func (s *gatewayStore) setCollaborator(q db.QueryContext, gtwID, accountID uuid.UUID, rights []ttnpb.Right) (err error) {
-	args := make([]interface{}, 2+len(rights))
-	args[0] = gtwID
-	args[1] = accountID
+	args := make([]interface{}, 0, 2+len(rights))
+	args = append(args, gtwID, accountID)
 
-	boundValues := make([]string, len(rights))
-
+	boundValues := make([]string, 0, len(rights))
 	for i, right := range rights {
-		args[i+2] = right
-		boundValues[i] = fmt.Sprintf("($1, $2, $%d)", i+3)
+		args = append(args, right)
+		boundValues = append(boundValues, fmt.Sprintf("($1, $2, $%d)", i+3))
 	}
 
 	query := fmt.Sprintf(

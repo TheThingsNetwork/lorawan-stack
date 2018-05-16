@@ -63,15 +63,13 @@ func (s *apiKeysStore) saveAPIKeyRights(q db.QueryContext, entityID uuid.UUID, k
 }
 
 func (s *apiKeysStore) saveAPIKeyRightsQuery(entityID uuid.UUID, keyName string, rights []ttnpb.Right) (string, []interface{}) {
-	args := make([]interface{}, 2+len(rights))
-	args[0] = entityID
-	args[1] = keyName
+	args := make([]interface{}, 0, 2+len(rights))
+	args = append(args, entityID, keyName)
 
-	boundValues := make([]string, len(rights))
-
+	boundValues := make([]string, 0, len(rights))
 	for i, right := range rights {
-		args[i+2] = right
-		boundValues[i] = fmt.Sprintf("($1, $2, $%d)", i+3)
+		args = append(args, right)
+		boundValues = append(boundValues, fmt.Sprintf("($1, $2, $%d)", i+3))
 	}
 
 	query := fmt.Sprintf(`

@@ -117,15 +117,13 @@ func (s *applicationStore) unsetCollaborator(q db.QueryContext, appID, accountID
 }
 
 func (s *applicationStore) setCollaborator(q db.QueryContext, appID, accountID uuid.UUID, rights []ttnpb.Right) (err error) {
-	args := make([]interface{}, 2+len(rights))
-	args[0] = appID
-	args[1] = accountID
+	args := make([]interface{}, 0, 2+len(rights))
+	args = append(args, appID, accountID)
 
-	boundValues := make([]string, len(rights))
-
+	boundValues := make([]string, 0, len(rights))
 	for i, right := range rights {
-		args[i+2] = right
-		boundValues[i] = fmt.Sprintf("($1, $2, $%d)", i+3)
+		args = append(args, right)
+		boundValues = append(boundValues, fmt.Sprintf("($1, $2, $%d)", i+3))
 	}
 
 	query := fmt.Sprintf(
@@ -166,8 +164,6 @@ func (s *applicationStore) HasCollaboratorRights(id ttnpb.ApplicationIdentifiers
 }
 
 func (s *applicationStore) hasCollaboratorRights(q db.QueryContext, appID, accountID uuid.UUID, rights ...ttnpb.Right) (bool, error) {
-	// TODO(gomezjdaniel#544): Ensure consistency along the store when building
-	// programatically clauses for SQL queries.
 	clauses := make([]string, 0, len(rights))
 	args := make([]interface{}, 0, len(rights)+1)
 	args = append(args, appID, accountID)
