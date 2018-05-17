@@ -29,19 +29,11 @@ import (
 )
 
 var (
-	licenseFilePath = os.Getenv("HEADER_FILE")
-
 	makeRegex      = regexp.MustCompile(".*\\.make$")
 	makefileRegex  = regexp.MustCompile(".*Makefile$")
 	shRegex        = regexp.MustCompile(".*\\.sh$")
 	generatedRegex = regexp.MustCompile("generated")
 )
-
-func init() {
-	if licenseFilePath == "" {
-		licenseFilePath = ".make/header.txt"
-	}
-}
 
 func prefixFunction(filename string) func(string) string {
 	byteFilename := []byte(filename)
@@ -238,6 +230,30 @@ func (o headersOperation) fix() bool {
 	return wasError == nil
 }
 
+func executeOperation(command, licenseFilePath string, files []string) (success bool) {
+	licenseContent, err := ioutil.ReadFile(licenseFilePath)
+	if err != nil {
+		log.Fatalf("Could not read license content in %s: %s\n", licenseFilePath, err)
+	}
+
+	operation := headersOperation{
+		filenames:      files,
+		licenseContent: licenseContent,
+	}
+
+	switch command {
+	case "remove":
+		success = operation.remove()
+	case "fix":
+		success = operation.fix()
+	case "check":
+		success = operation.check()
+	default:
+		log.Printf("Unknown command %s.\n", command)
+	}
+	return
+}
+
 func main() {
 	files := []string{}
 	if filenames := os.Getenv("FILES"); filenames != "" {
@@ -253,35 +269,12 @@ func main() {
 		files = os.Args[2:]
 	}
 
-	licenseFile, err := os.Open(licenseFilePath)
-	if err != nil {
-		log.Fatalf("Could not open %s: %s\n", licenseFilePath, err)
+	licenseFilePath := os.Getenv("HEADER_FILE")
+	if licenseFilePath == "" {
+		licenseFilePath = ".make/header.txt"
 	}
 
-	licenseContent, err := ioutil.ReadAll(licenseFile)
-	if err != nil {
-		log.Fatalf("Could not read license content in %s: %s\n", licenseFilePath, err)
-	}
-
-	licenseFile.Close()
-
-	operation := headersOperation{
-		filenames:      files,
-		licenseContent: licenseContent,
-	}
-
-	var successful bool
-	switch command {
-	case "remove":
-		successful = operation.remove()
-	case "fix":
-		successful = operation.fix()
-	case "check":
-		successful = operation.check()
-	default:
-		log.Fatalf("Unknown command %s.\n", command)
-	}
-
+	successful := executeOperation(command, licenseFilePath, files)
 	if !successful {
 		os.Exit(1)
 	}
