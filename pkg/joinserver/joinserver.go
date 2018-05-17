@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -97,6 +98,8 @@ func checkMIC(key types.AES128Key, rawPayload []byte) error {
 
 // HandleJoin is called by the Network Server to join a device
 func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (resp *ttnpb.JoinResponse, err error) {
+	logger := log.FromContext(ctx)
+
 	ver := req.GetSelectedMacVersion()
 
 	supported := false
@@ -346,7 +349,12 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		SessionKeys: resp.SessionKeys,
 	}
 	if err := dev.Store(); err != nil {
-		js.Component.Logger().WithField("device", dev).WithError(err).Error("Failed to update device")
+		logger.WithFields(log.Fields(
+			"dev_eui", dev.EndDeviceIdentifiers.DevEUI,
+			"join_eui", dev.EndDeviceIdentifiers.JoinEUI,
+			"application_id", dev.EndDeviceIdentifiers.GetApplicationID(),
+			"device_id", dev.EndDeviceIdentifiers.GetDeviceID(),
+		)).WithError(err).Error("Failed to update device")
 	}
 	return resp, nil
 }
