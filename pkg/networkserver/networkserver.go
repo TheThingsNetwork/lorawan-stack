@@ -729,11 +729,6 @@ outer:
 			continue outer
 		}
 
-		band, err := band.GetByID(dev.GetFrequencyPlanID())
-		if err != nil {
-			return nil, common.ErrCorruptRegistry.NewWithCause(nil, err)
-		}
-
 		var gap uint32
 		if dev.FCntResets {
 			gap = math.MaxUint32
@@ -742,6 +737,16 @@ outer:
 
 			switch dev.EndDevice.GetLoRaWANVersion() {
 			case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
+				fp, err := ns.Component.FrequencyPlans.GetByID(dev.GetFrequencyPlanID())
+				if err != nil {
+					return nil, common.ErrCorruptRegistry.NewWithCause(nil, err)
+				}
+
+				band, err := band.GetByID(fp.GetBandID())
+				if err != nil {
+					return nil, common.ErrCorruptRegistry.NewWithCause(nil, err)
+				}
+
 				if gap > uint32(band.MaxFCntGap) {
 					continue outer
 				}
