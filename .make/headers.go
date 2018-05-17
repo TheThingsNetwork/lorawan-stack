@@ -182,10 +182,15 @@ func removeHeaders(nbLines int, filename string) error {
 	return os.Rename(tempFilename, filename)
 }
 
-func check(licenseContent []byte, files []string) bool {
+type headersOperation struct {
+	licenseContent []byte
+	filenames      []string
+}
+
+func (o headersOperation) check() bool {
 	allFilesValid := true
-	for _, file := range files {
-		if valid, generated, err := hasHeaders(licenseContent, file); err != nil {
+	for _, file := range o.filenames {
+		if valid, generated, err := hasHeaders(o.licenseContent, file); err != nil {
 			log.Printf("Could not check headers in %s: %s\n", file, err)
 			allFilesValid = false
 		} else if !valid && !generated {
@@ -196,17 +201,17 @@ func check(licenseContent []byte, files []string) bool {
 	return allFilesValid
 }
 
-func remove(licenseContent []byte, files []string) bool {
+func (o headersOperation) remove() bool {
 	var wasError error
-	for _, file := range files {
-		if valid, generated, err := hasHeaders(licenseContent, file); err != nil {
+	for _, file := range o.filenames {
+		if valid, generated, err := hasHeaders(o.licenseContent, file); err != nil {
 			log.Printf("Could not check headers in %s: %s\n", file, err)
 			wasError = err
 		} else if !generated {
 			if !valid {
 				log.Printf("No headers in %s.\n", file)
 			} else {
-				if err := removeHeaders(nbLines(licenseContent), file); err != nil {
+				if err := removeHeaders(nbLines(o.licenseContent), file); err != nil {
 					log.Printf("Could not remove headers in %s: %s\n", file, err)
 					wasError = err
 				}
@@ -216,14 +221,14 @@ func remove(licenseContent []byte, files []string) bool {
 	return wasError == nil
 }
 
-func fix(licenseContent []byte, files []string) bool {
+func (o headersOperation) fix() bool {
 	var wasError error
-	for _, file := range files {
-		if valid, generated, err := hasHeaders(licenseContent, file); err != nil {
+	for _, file := range o.filenames {
+		if valid, generated, err := hasHeaders(o.licenseContent, file); err != nil {
 			log.Printf("Could not remove headers in %s: %s\n", file, err)
 			wasError = err
 		} else if !valid && !generated {
-			if err := addHeader(licenseContent, file); err != nil {
+			if err := addHeader(o.licenseContent, file); err != nil {
 				log.Printf("Could not fix %s: %s\n", file, err)
 			} else {
 				log.Printf("Fixed headers in %s.\n", file)
@@ -260,14 +265,19 @@ func main() {
 
 	licenseFile.Close()
 
+	operation := headersOperation{
+		filenames:      files,
+		licenseContent: licenseContent,
+	}
+
 	var successful bool
 	switch command {
 	case "remove":
-		successful = remove(licenseContent, files)
+		successful = operation.remove()
 	case "fix":
-		successful = fix(licenseContent, files)
+		successful = operation.fix()
 	case "check":
-		successful = check(licenseContent, files)
+		successful = operation.check()
 	default:
 		log.Fatalf("Unknown command %s.\n", command)
 	}
