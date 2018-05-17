@@ -30,6 +30,31 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+var help = `headers.go can be used to control, fix or remove header comments in source code files.
+
+Possibles usages:
+
+1. Using command-line arguments:
+
+    $ go run headers.go {check,fix,remove} file1.go file2.go Makefile .make/build.make [...]
+
+2. Using environment variables:
+
+    $ FILES="file1.go file2.go Makefile" go run headers.go {check,fix,remove}
+
+Optional environment variables:
+
+- HEADER_FILE: File to read the license from. Default: .make/header.txt.
+- RULES_FILE: Override the license file to use for files matching a certain regular expression.
+  RULES_FILE must point to a YAML file, that matches the following format:
+
+  - match: ".*ttn.*" # Regular expression
+    headers-file: .make/APACHE_2_LICENSE # Path to the license to use
+  - match: "^api"
+    headers-file: .make/MIT_LICENSE
+
+  Files that do not match any of the regular expressions will use the HEADER_FILE license.`
+
 var (
 	makeRegex      = regexp.MustCompile(".*\\.make$")
 	makefileRegex  = regexp.MustCompile(".*Makefile$")
@@ -305,7 +330,7 @@ func main() {
 		files = strings.Split(filenames, "\n")
 	}
 	if len(os.Args) <= 1 {
-		fmt.Println("Usage: headers.go {check,remove,fix} [... files to process] [LICENSE_HEADER_PATH=<path to the file containing the header>]")
+		fmt.Println(help)
 		os.Exit(1)
 	}
 
