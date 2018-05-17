@@ -36,6 +36,9 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// NOTE: these tests need to run in this directory as `TestUnaryHook` is creating
+// an assets.Assets instance with the relative path of the webui folder.
+
 const databaseURI = "postgres://root@localhost:26257/is_rightshook_test?sslmode=disable"
 
 var testHandler = func(t *testing.T, expected []ttnpb.Right) grpc.UnaryHandler {

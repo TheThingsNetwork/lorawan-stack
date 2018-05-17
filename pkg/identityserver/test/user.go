@@ -58,6 +58,7 @@ func ShouldBeUser(actual interface{}, expected ...interface{}) string {
 	return all(
 		ShouldBeUserIgnoringAutoFields(a, b),
 		assertions.ShouldHappenWithin(a.CreatedAt, time.Millisecond, b.CreatedAt),
+		// TODO: rename assertTime to ShouldNotBeNilAndHappenWithin. See https://github.com/TheThingsIndustries/ttn/issues/786.
 		assertTime(&a.PasswordUpdatedAt, &b.PasswordUpdatedAt),
 		assertTime(a.ValidatedAt, b.ValidatedAt),
 		assertions.ShouldEqual(a.Password, b.Password),
