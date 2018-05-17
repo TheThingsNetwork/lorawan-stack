@@ -26,6 +26,8 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
+	yaml "gopkg.in/yaml.v2"
 )
 
 var (
@@ -254,6 +256,49 @@ func executeOperation(command, licenseFilePath string, files []string) (success 
 	return
 }
 
+type ruleParameters struct {
+	Match       string `yaml:"match"`
+	HeadersFile string `yaml:"headers-file"`
+
+	matchedFiles []string `yaml:",omitempty"`
+}
+
+func processRulesList(rulesFilePath, defaultLicenseFilePath string, files []string) ([]*ruleParameters, error) {
+	rulesBytes, err := ioutil.ReadFile(rulesFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("Could not read rules file specified in $RULES_FILE: %s", err)
+	}
+
+	rules := []*ruleParameters{}
+	if err := yaml.Unmarshal(rulesBytes, &rules); err != nil {
+		log.Fatalf("Could not unmarshal %s: %s\n", rulesFilePath, err)
+	}
+
+	for _, rule := range rules {
+		if rule.Match == "" {
+			return nil, fmt.Errorf("One of the rules has no `match` regular expression")
+		}
+		regex, err := regexp.Compile(rule.Match)
+		if err != nil {
+			return nil, fmt.Errorf("Could not compile %s to regular expression: %s", rule.Match, err)
+		}
+		var unprocessedFiles []string
+		for _, file := range files {
+			if regex.MatchString(file) {
+				rule.matchedFiles = append(rule.matchedFiles, file)
+			} else {
+				unprocessedFiles = append(unprocessedFiles, file)
+			}
+		}
+		files = unprocessedFiles
+	}
+
+	// Add rule for default license
+	rules = append(rules, &ruleParameters{HeadersFile: defaultLicenseFilePath, matchedFiles: files})
+
+	return rules, nil
+}
+
 func main() {
 	files := []string{}
 	if filenames := os.Getenv("FILES"); filenames != "" {
@@ -274,7 +319,26 @@ func main() {
 		licenseFilePath = ".make/header.txt"
 	}
 
-	successful := executeOperation(command, licenseFilePath, files)
+	successful := true
+	var rules []*ruleParameters
+
+	rulesFilePath := os.Getenv("RULES_FILE")
+	if rulesFilePath != "" {
+		var err error
+		rules, err = processRulesList(rulesFilePath, licenseFilePath, files)
+		if err != nil {
+			log.Fatalf("Could not process rules file: %s\n", err)
+		}
+	} else {
+		rules = []*ruleParameters{{
+			HeadersFile:  licenseFilePath,
+			matchedFiles: files,
+		}}
+	}
+
+	for _, rule := range rules {
+		successful = successful && executeOperation(command, rule.HeadersFile, rule.matchedFiles)
+	}
 	if !successful {
 		os.Exit(1)
 	}
