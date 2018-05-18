@@ -188,13 +188,13 @@ func GetByID(id ID) (Band, error) {
 	})
 }
 
-type swap struct {
+type swapParameters struct {
 	version   ttnpb.PHYVersion
 	downgrade versionSwap
 }
 
-func (b Band) downgrades() []swap {
-	return []swap{
+func (b Band) downgrades() []swapParameters {
+	return []swapParameters{
 		{version: ttnpb.PHY_V1_1, downgrade: bandIdentity},
 		{version: ttnpb.PHY_V1_0_2, downgrade: b.regionalParameters1_0_2},
 		{version: ttnpb.PHY_V1_0_1, downgrade: b.regionalParameters1_0_1},
@@ -204,12 +204,12 @@ func (b Band) downgrades() []swap {
 
 // Version returns the band parameters for a given version.
 func (b Band) Version(wantedVersion ttnpb.PHYVersion) (Band, error) {
-	for _, swap := range b.downgrades() {
-		if swap.downgrade == nil {
+	for _, swapParameter := range b.downgrades() {
+		if swapParameter.downgrade == nil {
 			return b, ErrUnsupportedLoRaWANRegionalParameters.New(nil)
 		}
-		b = swap.downgrade(b)
-		if swap.version == wantedVersion {
+		b = swapParameter.downgrade(b)
+		if swapParameter.version == wantedVersion {
 			return b, nil
 		}
 	}
@@ -220,9 +220,9 @@ func (b Band) Version(wantedVersion ttnpb.PHYVersion) (Band, error) {
 // Versions supported for this band.
 func (b Band) Versions() []ttnpb.PHYVersion {
 	versions := []ttnpb.PHYVersion{ttnpb.PHY_V1_1}
-	for _, swap := range b.downgrades() {
-		if swap.downgrade != nil {
-			versions = append(versions, swap.version)
+	for _, swapParameter := range b.downgrades() {
+		if swapParameter.downgrade != nil {
+			versions = append(versions, swapParameter.version)
 		} else {
 			break
 		}
