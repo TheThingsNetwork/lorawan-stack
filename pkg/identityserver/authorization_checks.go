@@ -22,12 +22,18 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+//
+// NOTE: `enforce{Application,Gateway,Organization}Rights` methods works almost
+// identically, so only the first one is documented to avoid redundant documentation.
+//
+
 // enforceUserRights is a hook that checks whether if the given authorization
 // credentials are allowed to perform an action given the set of passed rights and
 // returns the User ID attached to the credentials.
 func (is *IdentityServer) enforceUserRights(ctx context.Context, rights ...ttnpb.Right) error {
 	ad := authorizationDataFromContext(ctx)
 
+	// If the authorization data are not tied to an User we just can return error.
 	if ad.UserIdentifiers().IsZero() {
 		return common.ErrPermissionDenied.New(nil)
 	}
@@ -63,6 +69,8 @@ func (is *IdentityServer) enforceAdmin(ctx context.Context) error {
 func (is *IdentityServer) enforceApplicationRights(ctx context.Context, ids ttnpb.ApplicationIdentifiers, rights ...ttnpb.Right) error {
 	ad := authorizationDataFromContext(ctx)
 
+	// If the authorization data (either from an API key or an access token)
+	// does not have the required rights we can return error already.
 	if !ad.HasRights(rights...) {
 		return common.ErrPermissionDenied.New(nil)
 	}
@@ -72,16 +80,23 @@ func (is *IdentityServer) enforceApplicationRights(ctx context.Context, ids ttnp
 	case auth.Key:
 		kids := ad.ApplicationIdentifiers()
 		if kids.IsZero() {
+			// If we reach this, it means the API key was not an application API key.
 			break
 		}
 
+		// If the ApplicationIdentifiers of the request (ids) are contained in the
+		// authorization data ApplicationIdentifiers (kids) the request is authorized.
 		authorized = kids.Contains(ids)
 	case auth.Token:
 		uids := ad.UserIdentifiers()
 		if uids.IsZero() {
+			// We should not reach this as technically an access token will always
+			// have an UserIdentifiers, but we make sure of so.
 			break
 		}
 
+		// Check if the access token user has the requested rights within the
+		// application that is trying to access to.
 		var err error
 		authorized, err = is.store.Applications.HasCollaboratorRights(ids, organizationOrUserIDsUserIDs(uids), rights...)
 		if err != nil {
