@@ -20,10 +20,15 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
+
+func init() {
+	pbkdf2.SetDefaultIterations(100)
+}
 
 var (
 	testConfig = Config{

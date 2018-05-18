@@ -19,7 +19,12 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/auth/pbkdf2"
 )
+
+func init() {
+	pbkdf2.SetDefaultIterations(100)
+}
 
 func TestHash(t *testing.T) {
 	a := assertions.New(t)

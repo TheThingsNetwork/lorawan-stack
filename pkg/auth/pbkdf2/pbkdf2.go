@@ -27,29 +27,35 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 )
 
-// Default returns the default PBKDF2 instance.
-func Default() *PBKDF2 {
-	return &PBKDF2{
-		Iterations: 20000,
-		KeyLength:  512,
-		Algorithm:  Sha512,
-		SaltLength: 64,
-	}
+var defaultInstance = &PBKDF2{
+	iterations: 20000,
+	keyLength:  512,
+	algorithm:  Sha512,
+	saltLength: 64,
 }
+
+// SetDefaultIterations sets the number of iterations for the default PBKDF2 instance.
+// This should typically only be changed for testing purposes.
+func SetDefaultIterations(iterations int) {
+	defaultInstance.iterations = iterations
+}
+
+// Default returns a the default PBKDF2 instance.
+func Default() *PBKDF2 { return defaultInstance }
 
 // PBKDF2 is a password derivation method.
 type PBKDF2 struct {
 	// Iterations is the number of iterations to use in the PBKDF2 algorithm.
-	Iterations int `json:"iterations"`
+	iterations int
 
 	// Algorithm is the hashing algorithm used.
-	Algorithm Algorithm `json:"algorithm"`
+	algorithm Algorithm
 
 	// SaltLength is the length of the salt used.
-	SaltLength int `json:"-"`
+	saltLength int
 
 	// KeyLength is the length of the desired key.
-	KeyLength int `json:"key_length"`
+	keyLength int
 }
 
 // Name returns the name of the PBKDF2 hashing method.
@@ -59,13 +65,13 @@ func (*PBKDF2) Name() string {
 
 // Hash hashes a plain text password.
 func (p *PBKDF2) Hash(plain string) (string, error) {
-	if p.SaltLength == 0 {
+	if p.saltLength == 0 {
 		return "", errors.Errorf("Salts can not have zero length")
 	}
 
-	salt := random.String(p.SaltLength)
-	hash := hash64([]byte(plain), []byte(salt), p.Iterations, p.KeyLength, p.Algorithm)
-	pass := fmt.Sprintf("%s$%s$%v$%s$%s", p.Name(), p.Algorithm, p.Iterations, salt, string(hash))
+	salt := random.String(p.saltLength)
+	hash := hash64([]byte(plain), []byte(salt), p.iterations, p.keyLength, p.algorithm)
+	pass := fmt.Sprintf("%s$%s$%v$%s$%s", p.Name(), p.algorithm, p.iterations, salt, string(hash))
 
 	return pass, nil
 }
