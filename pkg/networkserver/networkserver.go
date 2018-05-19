@@ -450,7 +450,7 @@ func setDownlinkModulation(s *ttnpb.TxSettings, dr band.DataRate) (err error) {
 	return nil
 }
 
-func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb.UplinkMessage, acc *metadataAccumulator) error {
+func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb.UplinkMessage, acc *metadataAccumulator, b []byte, isJoinAccept bool) error {
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"application_id", dev.EndDevice.EndDeviceIdentifiers.ApplicationIdentifiers.GetApplicationID(),
 		"device_id", dev.EndDevice.EndDeviceIdentifiers.GetDeviceID(),
@@ -472,8 +472,8 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 	fCnt := down.GetFCnt()
 	devAddr := *dev.EndDevice.EndDeviceIdentifiers.DevAddr
 
-	msg := &ttnpb.DownlinkMessage{
-		Payload: ttnpb.Message{
+	if len(b) == 0 {
+		b, err = (ttnpb.Message{
 			MHDR: ttnpb.MHDR{
 				MType: ttnpb.MType_UNCONFIRMED_DOWN, // TODO: Support confirmed downlinks (https://github.com/TheThingsIndustries/ttn/issues/730)
 			},
@@ -490,34 +490,37 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 				},
 				FPort:      down.GetFPort(),
 				FRMPayload: down.GetFRMPayload(),
-			}}},
+			}},
+		}).AppendLoRaWAN(b)
+		if err != nil {
+			logger.WithError(err).Error("Failed to marshal payload")
+			return err
+		}
+		// NOTE: It is assumed, that b does not contain MIC.
+
+		ses := dev.EndDevice.GetSession()
+		if ses == nil {
+			logger.Debug("No active session found for device")
+			return nil
+		}
+
+		ke := ses.SessionKeys.GetSNwkSIntKey()
+		if ke == nil || ke.Key.IsZero() {
+			return common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingSNwkSIntKey.New(nil))
+		}
+
+		mic, err := crypto.ComputeDownlinkMIC(*ke.Key, devAddr, fCnt, b)
+		if err != nil {
+			logger.WithError(err).Error("Failed to compute downlink MIC")
+			return err
+		}
+		b = append(b, mic[:]...)
+	}
+
+	msg := &ttnpb.DownlinkMessage{
+		RawPayload:           b,
 		EndDeviceIdentifiers: dev.EndDevice.EndDeviceIdentifiers,
 	}
-
-	b, err := msg.Payload.MarshalLoRaWAN()
-	if err != nil {
-		logger.WithError(err).Error("Failed to marshal downlink")
-		return err
-	}
-	// NOTE: It is assumed, that b does not contain MIC.
-
-	ses := dev.EndDevice.GetSession()
-	if ses == nil {
-		logger.Debug("No active session found for device")
-		return nil
-	}
-
-	ke := ses.SessionKeys.GetSNwkSIntKey()
-	if ke == nil || ke.Key.IsZero() {
-		return common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingSNwkSIntKey.New(nil))
-	}
-
-	mic, err := crypto.ComputeDownlinkMIC(*ke.Key, devAddr, fCnt, b)
-	if err != nil {
-		logger.WithError(err).Error("Failed to compute downlink MIC")
-		return err
-	}
-	msg.RawPayload = append(b, mic[:]...)
 
 	type tx struct {
 		ttnpb.TxSettings
@@ -570,7 +573,11 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 				Frequency:             uint64(fp.Channels[chIdx].Frequency),
 				TxPower:               int32(band.DefaultMaxEIRP),
 			},
-			Delay: st.GetRxDelay(),
+		}
+		if isJoinAccept {
+			rx1.Delay = uint32(band.JoinAcceptDelay1.Nanoseconds())
+		} else {
+			rx1.Delay = uint32(st.GetRxDelay())
 		}
 
 		if err = setDownlinkModulation(&rx1.TxSettings, band.DataRates[drIdx]); err != nil {
@@ -594,7 +601,11 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 			Frequency:             st.GetRx2Frequency(),
 			TxPower:               int32(band.DefaultMaxEIRP),
 		},
-		Delay: st.GetRxDelay() + uint32(time.Second.Nanoseconds()),
+	}
+	if isJoinAccept {
+		rx2.Delay = uint32(band.JoinAcceptDelay2.Nanoseconds())
+	} else {
+		rx2.Delay = st.GetRxDelay() + uint32(time.Second.Nanoseconds())
 	}
 
 	if err = setDownlinkModulation(&rx2.TxSettings, band.DataRates[drIdx]); err != nil {
@@ -847,7 +858,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		"device_id", dev.EndDeviceIdentifiers.GetDeviceID(),
 	))
 
-	go ns.scheduleDownlink(ctx, dev, msg, acc)
+	go ns.scheduleDownlink(ctx, dev, msg, acc, nil, false)
 
 	select {
 	case <-ctx.Done():
@@ -984,6 +995,11 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 
 		if err = dev.Store("EndDeviceIdentifiers.DevAddr", "Session", "SessionFallback", "RecentUplinks"); err != nil {
 			logger.WithError(err).Error("Failed to update device")
+			return err
+		}
+
+		if err := ns.scheduleDownlink(ctx, dev, msg, nil, resp.RawPayload, true); err != nil {
+			logger.WithError(err).Debug("Failed to schedule join accept")
 			return err
 		}
 

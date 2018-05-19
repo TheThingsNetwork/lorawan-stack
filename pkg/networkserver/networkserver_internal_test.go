@@ -93,11 +93,19 @@ func (cl *mockNsGsClient) ScheduleDownlink(ctx context.Context, in *ttnpb.Downli
 func TestScheduleDownlink(t *testing.T) {
 	newRX2 := func(down *ttnpb.ApplicationDownlink, fp ttnpb.FrequencyPlan, dev *ttnpb.EndDevice) *ttnpb.DownlinkMessage {
 		band := test.Must(band.GetByID(fp.BandID)).(band.Band)
-		mac := dev.GetMACState()
-		drIdx := mac.GetRx2DataRateIndex()
+		st := dev.GetMACState()
+		drIdx := st.GetRx2DataRateIndex()
 
 		msg := &ttnpb.DownlinkMessage{
-			Payload: ttnpb.Message{
+			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+			Settings: ttnpb.TxSettings{
+				DataRateIndex:         drIdx,
+				CodingRate:            "4/5",
+				PolarizationInversion: true,
+				Frequency:             st.GetRx2Frequency(),
+				TxPower:               int32(band.DefaultMaxEIRP),
+			},
+			RawPayload: test.Must((ttnpb.Message{
 				MHDR: ttnpb.MHDR{
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 				},
@@ -114,25 +122,17 @@ func TestScheduleDownlink(t *testing.T) {
 					},
 					FPort:      down.GetFPort(),
 					FRMPayload: down.GetFRMPayload(),
-				}}},
-			Settings: ttnpb.TxSettings{
-				DataRateIndex:         drIdx,
-				CodingRate:            "4/5",
-				PolarizationInversion: true,
-				Frequency:             mac.GetRx2Frequency(),
-				TxPower:               int32(band.DefaultMaxEIRP),
-			},
-			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+				}},
+			}).MarshalLoRaWAN()).([]byte),
 		}
 
-		b := test.Must(msg.Payload.MarshalLoRaWAN()).([]byte)
 		mic := test.Must(crypto.ComputeDownlinkMIC(
 			*dev.GetSession().SessionKeys.GetSNwkSIntKey().Key,
 			*dev.EndDeviceIdentifiers.DevAddr,
 			down.GetFCnt(),
-			b,
+			msg.RawPayload,
 		)).([4]byte)
-		msg.RawPayload = append(b, mic[:]...)
+		msg.RawPayload = append(msg.RawPayload, mic[:]...)
 
 		test.Must(nil, setDownlinkModulation(&msg.Settings, band.DataRates[drIdx]))
 		return msg
@@ -175,7 +175,7 @@ func TestScheduleDownlink(t *testing.T) {
 		ed.QueuedApplicationDownlinks = nil
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
-		err := ns.scheduleDownlink(context.Background(), dev, nil, nil)
+		err := ns.scheduleDownlink(context.Background(), dev, nil, nil, nil, false)
 		a.So(err, should.BeNil)
 	})
 
@@ -200,7 +200,7 @@ func TestScheduleDownlink(t *testing.T) {
 		ed.RecentUplinks = nil
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
-		err := ns.scheduleDownlink(context.Background(), dev, nil, nil)
+		err := ns.scheduleDownlink(context.Background(), dev, nil, nil, nil, false)
 		a.So(err, should.BeError)
 	})
 
@@ -233,7 +233,7 @@ func TestScheduleDownlink(t *testing.T) {
 		}
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
-		err := ns.scheduleDownlink(context.Background(), dev, nil, nil)
+		err := ns.scheduleDownlink(context.Background(), dev, nil, nil, nil, false)
 		a.So(err, should.BeError)
 	})
 
@@ -344,7 +344,7 @@ func TestScheduleDownlink(t *testing.T) {
 			}
 		}
 
-		err = ns.scheduleDownlink(context.Background(), dev, up, nil)
+		err = ns.scheduleDownlink(context.Background(), dev, up, nil, nil, false)
 		a.So(err, should.BeNil)
 		a.So(cnt, should.Equal, len(mds)*len(slots))
 		a.So(test.WaitTimeout(20*test.Delay, wg.Wait), should.BeTrue)
@@ -465,7 +465,7 @@ func TestScheduleDownlink(t *testing.T) {
 			}
 		}
 
-		err = ns.scheduleDownlink(context.Background(), dev, up, nil)
+		err = ns.scheduleDownlink(context.Background(), dev, up, nil, nil, false)
 		a.So(err, should.BeNil)
 		a.So(cnt, should.Equal, len(mds)*len(slots))
 		a.So(test.WaitTimeout(20*test.Delay, wg.Wait), should.BeTrue)
