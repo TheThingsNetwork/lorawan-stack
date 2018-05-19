@@ -19,22 +19,22 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/go-redis/redis"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/events"
-	"gopkg.in/redis.v5"
 )
 
 // WrapPubSub wraps an existing PubSub and publishes all events received from Redis to that PubSub.
-func WrapPubSub(wrapped events.PubSub, conf config.Redis) (ps *PubSub, err error) {
+func WrapPubSub(wrapped events.PubSub, conf config.Redis) (ps *PubSub) {
 	ps = &PubSub{
-		PubSub:       wrapped,
-		eventChannel: strings.Join(append(conf.Namespace, "events"), ":"),
+		PubSub: wrapped,
 		client: redis.NewClient(&redis.Options{
 			Addr: conf.Address,
 			DB:   conf.Database,
 		}),
+		eventChannel: strings.Join(append(conf.Namespace, "events"), ":"),
 	}
-	ps.sub, err = ps.client.Subscribe(ps.eventChannel)
+	ps.sub = ps.client.Subscribe(ps.eventChannel)
 	go func() {
 		for {
 			msg, err := ps.sub.ReceiveMessage()
@@ -50,7 +50,7 @@ func WrapPubSub(wrapped events.PubSub, conf config.Redis) (ps *PubSub, err error
 }
 
 // NewPubSub creates a new PubSub that publishes and subscribes to Redis.
-func NewPubSub(conf config.Redis) (*PubSub, error) {
+func NewPubSub(conf config.Redis) *PubSub {
 	return WrapPubSub(events.NewPubSub(), conf)
 }
 

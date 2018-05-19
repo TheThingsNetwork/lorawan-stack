@@ -23,11 +23,11 @@ import (
 	"io"
 	"strings"
 
+	"github.com/go-redis/redis"
 	"github.com/oklog/ulid"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/store"
-	redis "gopkg.in/redis.v5"
 )
 
 const (
@@ -84,10 +84,10 @@ func (s *Store) newID() fmt.Stringer {
 
 // Create stores generates an ULID and stores fields under a key associated with it.
 func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
-	fieldsSet := make(map[string]string, len(fields))
+	fieldsSet := make(map[string]interface{}, len(fields))
 	idxAdd := make([]string, 0, len(fields))
 	for k, v := range fields {
-		fieldsSet[k] = string(v)
+		fieldsSet[k] = v
 		if _, ok := s.indexKeys[k]; ok {
 			idxAdd = append(idxAdd, s.key(k, hex.EncodeToString(v)))
 		}
@@ -106,14 +106,14 @@ func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 	var create func() error
 	create = func() error {
 		err := s.Redis.Watch(func(tx *redis.Tx) error {
-			ok, err := tx.Exists(key).Result()
+			i, err := tx.Exists(key).Result()
 			if err != nil {
 				return err
 			}
-			if ok {
+			if i == 1 {
 				return errors.Errorf("A key %s already exists", key)
 			}
-			_, err = tx.Pipelined(func(p *redis.Pipeline) error {
+			_, err = tx.Pipelined(func(p redis.Pipeliner) error {
 				for _, k := range idxAdd {
 					p.SAdd(k, idStr)
 				}
@@ -159,7 +159,7 @@ func (s *Store) Delete(id store.PrimaryKey) (err error) {
 					}
 				}
 			}
-			_, err = tx.Pipelined(func(p *redis.Pipeline) error {
+			_, err = tx.Pipelined(func(p redis.Pipeliner) error {
 				for i, curr := range idxCurrent {
 					if curr != nil {
 						p.SRem(s.key(s.config.IndexKeys[i], curr.(string)), idStr)
@@ -190,7 +190,7 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) 
 	idxDel := make([]string, 0, len(diff))
 	idxAdd := make([]string, 0, len(diff))
 	fieldsDel := make([]string, 0, len(diff))
-	fieldsSet := make(map[string]string, len(diff))
+	fieldsSet := make(map[string]interface{}, len(diff))
 
 	for k, v := range diff {
 		_, isIndex := s.indexKeys[k]
@@ -199,7 +199,7 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) 
 		}
 		fieldsDel = append(fieldsDel, k)
 
-		fieldsSet[k] = string(v)
+		fieldsSet[k] = v
 		if isIndex {
 			idxAdd = append(idxAdd, s.key(k, hex.EncodeToString(v)))
 		}
@@ -247,7 +247,7 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) 
 				}
 			}
 
-			_, err = tx.Pipelined(func(p *redis.Pipeline) error {
+			_, err = tx.Pipelined(func(p redis.Pipeliner) error {
 				for i, k := range idxDel {
 					if curr := idxCurrent[i]; curr != nil {
 						p.SRem(s.key(k, hex.EncodeToString([]byte(curr.(string)))), idStr)
@@ -347,7 +347,7 @@ func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[s
 			}
 
 			cmds := make(map[ulid.ULID]*stringBytesMapCmd, len(ids))
-			_, err = tx.Pipelined(func(p *redis.Pipeline) error {
+			_, err = tx.Pipelined(func(p redis.Pipeliner) error {
 				for _, str := range ids {
 					id, err := ulid.Parse(str)
 					if err != nil {
@@ -394,7 +394,7 @@ func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[s
 
 func (s *Store) put(id store.PrimaryKey, bs ...[]byte) error {
 	k := s.key(id.String())
-	_, err := s.Redis.Pipelined(func(p *redis.Pipeline) error {
+	_, err := s.Redis.Pipelined(func(p redis.Pipeliner) error {
 		for _, b := range bs {
 			p.SAdd(k, b)
 		}
@@ -453,7 +453,7 @@ func (s *Store) Remove(id store.PrimaryKey, bs ...[]byte) error {
 	}
 
 	k := s.key(id.String())
-	_, err := s.Redis.Pipelined(func(p *redis.Pipeline) error {
+	_, err := s.Redis.Pipelined(func(p redis.Pipeliner) error {
 		for _, b := range bs {
 			p.SRem(k, b)
 		}

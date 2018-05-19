@@ -56,6 +56,21 @@
   revision = "ed7bcb39ff10f39ab08e317ce16df282845852fa"
 
 [[projects]]
+  name = "github.com/go-redis/redis"
+  packages = [
+    ".",
+    "internal",
+    "internal/consistenthash",
+    "internal/hashtag",
+    "internal/pool",
+    "internal/proto",
+    "internal/singleflight",
+    "internal/util"
+  ]
+  revision = "877867d2845fbaf86798befe410b6ceb6f5c29a3"
+  version = "v6.10.2"
+
+[[projects]]
   name = "github.com/gobwas/glob"
   packages = [
     ".",
@@ -133,6 +148,7 @@
   revision = "9cad4c3443a7200dd6400aef47183728de563a38"
 
 [[projects]]
+  branch = "master"
   name = "github.com/grpc-ecosystem/go-grpc-middleware"
   packages = [
     ".",
@@ -141,8 +157,7 @@
     "tags",
     "validator"
   ]
-  revision = "c250d6563d4d4c20252cd865923440e829844f4e"
-  version = "v1.0.0"
+  revision = "8b8e7d525c4b2f81cc1288bdb06910edae18549b"
 
 [[projects]]
   branch = "master"
@@ -608,19 +623,6 @@
   revision = "eb84b840d3d6889d2458ceed28e3c6f0d109f6c8"
 
 [[projects]]
-  name = "gopkg.in/redis.v5"
-  packages = [
-    ".",
-    "internal",
-    "internal/consistenthash",
-    "internal/hashtag",
-    "internal/pool",
-    "internal/proto"
-  ]
-  revision = "a16aeec10ff407b1e7be6dd35797ccf5426ef0f0"
-  version = "v5.2.9"
-
-[[projects]]
   name = "gopkg.in/sourcemap.v1"
   packages = [
     ".",
@@ -638,6 +640,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2338cc1d4ca896e4bc1faebeca8087713e6fb2ff5acd570e0e3f1dfb59f174f9"
+  inputs-digest = "c2ab98910d25fa785133d227aa1c5979215eabcae3ab1330d7e8c5725b97b59c"
   solver-name = "gps-cdcl"
   solver-version = 1

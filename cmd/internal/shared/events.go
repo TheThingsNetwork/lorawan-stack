@@ -23,17 +23,17 @@ import (
 )
 
 // InitializeEvents initializes the event system.
-func InitializeEvents(config config.ServiceBase) (err error) {
+func InitializeEvents(config config.ServiceBase) error {
 	switch config.Events.Backend {
 	case "internal":
 		return nil // this is the default.
 	case "redis":
 		if !config.Events.Redis.IsZero() {
-			events.DefaultPubSub, err = redis.NewPubSub(config.Events.Redis)
+			events.DefaultPubSub = redis.NewPubSub(config.Events.Redis)
 		} else {
-			events.DefaultPubSub, err = redis.NewPubSub(config.Redis)
+			events.DefaultPubSub = redis.NewPubSub(config.Redis)
 		}
-		return err
+		return nil
 	default:
 		return fmt.Errorf("unknown events backend: %s", config.Events.Backend)
 	}
