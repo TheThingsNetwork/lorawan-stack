@@ -113,3 +113,5 @@ dev.redis.remove-container:
 		$(log) "Removing old Redis container $(redis_docker_name)"; \
 		$(DOCKER_BINARY) rm $(redis_docker_name); \
 	fi
+
+# vim: ft=make
