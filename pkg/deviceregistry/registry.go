@@ -66,7 +66,11 @@ func (r *Registry) FindBy(ed *ttnpb.EndDevice, fields ...string) ([]*Device, err
 		return nil, errors.New("Device specified is nil")
 	}
 
-	found, err := r.store.FindBy(ed, func() interface{} { return &ttnpb.EndDevice{} }, fields...)
+	found, err := r.store.FindBy(
+		ed,
+		func() interface{} { return &ttnpb.EndDevice{} },
+		200,
+		fields...)
 	if err != nil {
 		return nil, err
 	}

@@ -21,6 +21,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"math"
 	"strings"
 
 	"github.com/go-redis/redis"
@@ -31,8 +32,6 @@ import (
 )
 
 const (
-	recursionLimit = 10
-
 	// SeparatorByte is character used to separate the keys.
 	SeparatorByte = ':'
 
@@ -97,39 +96,27 @@ func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 	if len(fields) == 0 {
 		return id, nil
 	}
+	key := s.key(id.String())
 
-	idStr := id.String()
-	key := s.key(idStr)
-
-	// recursion levels
-	var n int
-	var create func() error
-	create = func() error {
-		err := s.Redis.Watch(func(tx *redis.Tx) error {
-			i, err := tx.Exists(key).Result()
-			if err != nil {
-				return err
-			}
-			if i == 1 {
-				return errors.Errorf("A key %s already exists", key)
-			}
-			_, err = tx.Pipelined(func(p redis.Pipeliner) error {
-				for _, k := range idxAdd {
-					p.SAdd(k, idStr)
-				}
-				if len(fieldsSet) != 0 {
-					p.HMSet(key, fieldsSet)
-				}
-				return nil
-			})
+	return id, s.Redis.Watch(func(tx *redis.Tx) error {
+		i, err := tx.Exists(key).Result()
+		if err != nil {
 			return err
-		}, key)
-		if n != recursionLimit && err == redis.TxFailedErr {
-			return create()
 		}
+		if i != 0 {
+			return errors.Errorf("A key %s already exists", key)
+		}
+		_, err = tx.Pipelined(func(p redis.Pipeliner) error {
+			for _, k := range idxAdd {
+				p.SAdd(k, id.String())
+			}
+			if len(fieldsSet) != 0 {
+				p.HMSet(key, fieldsSet)
+			}
+			return nil
+		})
 		return err
-	}
-	return id, create()
+	}, key)
 }
 
 // Delete deletes the fields stored under the key associated with id.
@@ -137,49 +124,36 @@ func (s *Store) Delete(id store.PrimaryKey) (err error) {
 	if id == nil {
 		return store.ErrNilKey.New(nil)
 	}
-
-	idStr := id.String()
-	key := s.key(idStr)
-
-	// recursion levels
-	var n int
-	var del func() error
-	del = func() error {
-		err = s.Redis.Watch(func(tx *redis.Tx) error {
-			var idxCurrent []interface{}
-			if len(s.config.IndexKeys) != 0 {
-				typ, err := tx.Type(key).Result()
+	key := s.key(id.String())
+	return s.Redis.Watch(func(tx *redis.Tx) error {
+		var idxCurrent []interface{}
+		if len(s.config.IndexKeys) != 0 {
+			typ, err := tx.Type(key).Result()
+			if err != nil {
+				return err
+			}
+			if typ == "hash" {
+				idxCurrent, err = tx.HMGet(key, s.config.IndexKeys...).Result()
 				if err != nil {
 					return err
 				}
-				if typ == "hash" {
-					idxCurrent, err = tx.HMGet(key, s.config.IndexKeys...).Result()
-					if err != nil {
-						return err
-					}
+			}
+		}
+		_, err = tx.Pipelined(func(p redis.Pipeliner) error {
+			for i, curr := range idxCurrent {
+				if curr != nil {
+					p.SRem(s.key(s.config.IndexKeys[i], curr.(string)), id.String())
 				}
 			}
-			_, err = tx.Pipelined(func(p redis.Pipeliner) error {
-				for i, curr := range idxCurrent {
-					if curr != nil {
-						p.SRem(s.key(s.config.IndexKeys[i], curr.(string)), idStr)
-					}
-				}
-				p.Del(key)
-				return nil
-			})
-			return err
-		}, key)
-		if n != recursionLimit && err == redis.TxFailedErr {
-			return del()
-		}
+			p.Del(key)
+			return nil
+		})
 		return err
-	}
-	return del()
+	}, key)
 }
 
 // Update overwrites field values stored under PrimaryKey specified with values in diff and rebinds indexed keys present in diff.
-func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) {
+func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) error {
 	if id == nil {
 		return store.ErrNilKey.New(nil)
 	}
@@ -205,73 +179,62 @@ func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) (err error) 
 		}
 	}
 
-	idStr := id.String()
-	key := s.key(idStr)
-
-	// recursion levels
-	var n int
-	var update func() error
-	update = func() error {
-		err = s.Redis.Watch(func(tx *redis.Tx) error {
-			var idxCurrent []interface{}
-			if len(idxDel) != 0 {
-				idxCurrent, err = tx.HMGet(key, idxDel...).Result()
-				if err != nil {
-					return err
-				}
-			}
-
-			fieldsCurrent, err := tx.HKeys(key).Result()
+	key := s.key(id.String())
+	return s.Redis.Watch(func(tx *redis.Tx) error {
+		var idxCurrent []interface{}
+		var err error
+		if len(idxDel) != 0 {
+			idxCurrent, err = tx.HMGet(key, idxDel...).Result()
 			if err != nil {
 				return err
 			}
-
-			curr := make(map[string]struct{}, len(fieldsCurrent))
-			for _, k := range fieldsCurrent {
-				curr[k] = struct{}{}
-			}
-
-			for _, dk := range fieldsDel {
-				pre := dk + store.Separator
-				for ck := range curr {
-					if strings.HasPrefix(ck, pre) {
-						fieldsDel = append(fieldsDel, ck)
-						delete(curr, ck)
-					}
-				}
-				if i := strings.LastIndexByte(dk, store.SeparatorByte); i != -1 {
-					k := dk[:i]
-					if _, ok := curr[k]; ok {
-						fieldsDel = append(fieldsDel, k)
-					}
-				}
-			}
-
-			_, err = tx.Pipelined(func(p redis.Pipeliner) error {
-				for i, k := range idxDel {
-					if curr := idxCurrent[i]; curr != nil {
-						p.SRem(s.key(k, hex.EncodeToString([]byte(curr.(string)))), idStr)
-					}
-				}
-				for _, k := range idxAdd {
-					p.SAdd(k, idStr)
-				}
-				if len(fieldsDel) != 0 {
-					p.HDel(key, fieldsDel...)
-				}
-				if len(fieldsSet) != 0 {
-					p.HMSet(key, fieldsSet)
-				}
-				return nil
-			})
-			return err
-		}, key)
-		if n != recursionLimit && err == redis.TxFailedErr {
-			return update()
 		}
+
+		fieldsCurrent, err := tx.HKeys(key).Result()
+		if err != nil {
+			return err
+		}
+
+		curr := make(map[string]struct{}, len(fieldsCurrent))
+		for _, k := range fieldsCurrent {
+			curr[k] = struct{}{}
+		}
+
+		for _, dk := range fieldsDel {
+			pre := dk + store.Separator
+			for ck := range curr {
+				if strings.HasPrefix(ck, pre) {
+					fieldsDel = append(fieldsDel, ck)
+					delete(curr, ck)
+				}
+			}
+			if i := strings.LastIndexByte(dk, store.SeparatorByte); i != -1 {
+				k := dk[:i]
+				if _, ok := curr[k]; ok {
+					fieldsDel = append(fieldsDel, k)
+				}
+			}
+		}
+
+		_, err = tx.Pipelined(func(p redis.Pipeliner) error {
+			for i, k := range idxDel {
+				if curr := idxCurrent[i]; curr != nil {
+					p.SRem(s.key(k, hex.EncodeToString([]byte(curr.(string)))), id.String())
+				}
+			}
+			for _, k := range idxAdd {
+				p.SAdd(k, id.String())
+			}
+			if len(fieldsDel) != 0 {
+				p.HDel(key, fieldsDel...)
+			}
+			if len(fieldsSet) != 0 {
+				p.HMSet(key, fieldsSet)
+			}
+			return nil
+		})
 		return err
-	}
-	return update()
+	}, key)
 }
 
 type stringBytesMapCmd struct {
@@ -313,9 +276,9 @@ func (s *Store) Find(id store.PrimaryKey) (map[string][]byte, error) {
 
 // FindBy returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
 // meaning that only entries matching all the fields in filter should be returned.
-func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[string][]byte, err error) {
+func (s *Store) FindBy(filter map[string][]byte, count uint64, f func(store.PrimaryKey, map[string][]byte) bool) error {
 	if len(filter) == 0 {
-		return nil, store.ErrEmptyFilter.New(nil)
+		return store.ErrEmptyFilter.New(nil)
 	}
 
 	idxKeys := make([]string, 0, len(filter))
@@ -327,23 +290,32 @@ func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[s
 			fieldFilter = append(fieldFilter, k)
 		}
 	}
+	if len(idxKeys) == 0 {
+		return errors.New("At least one index key must be specified")
+	}
 
-	// recursion levels
-	var n int
-	var find func() error
-	find = func() error {
-		err := s.Redis.Watch(func(tx *redis.Tx) error {
-			var ids []string
-			if len(idxKeys) != 0 {
-				ids, err = tx.SInter(idxKeys...).Result()
-			} else {
-				return errors.New("At least one index key must be specified")
-			}
+	return s.Redis.Watch(func(tx *redis.Tx) error {
+		key := s.key(s.newID().String())
+
+		n, err := tx.SInterStore(key, idxKeys...).Result()
+		if err != nil {
+			return err
+		}
+		defer tx.Del(key)
+		if n == 0 {
+			return nil
+		}
+
+		if count > math.MaxInt64 {
+			count = math.MaxInt64
+		}
+
+		var ids []string
+		var c uint64
+		for {
+			ids, c, err = tx.SScan(key, c, "", int64(count)).Result()
 			if err != nil {
 				return err
-			}
-			if len(ids) == 0 {
-				return nil
 			}
 
 			cmds := make(map[ulid.ULID]*stringBytesMapCmd, len(ids))
@@ -361,8 +333,6 @@ func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[s
 				return err
 			}
 
-			out = make(map[store.PrimaryKey]map[string][]byte, len(cmds))
-
 		outer:
 			for id, cmd := range cmds {
 				m, err := cmd.Result()
@@ -377,26 +347,24 @@ func (s *Store) FindBy(filter map[string][]byte) (out map[store.PrimaryKey]map[s
 						continue outer
 					}
 				}
-				out[id] = m
+				if !f(id, m) {
+					return nil
+				}
 			}
-			if len(out) == 0 {
-				out = nil
+
+			if c == 0 {
+				break
 			}
-			return nil
-		}, idxKeys...)
-		if n != recursionLimit && err == redis.TxFailedErr {
-			return find()
 		}
-		return err
-	}
-	return out, find()
+		return nil
+	}, idxKeys...)
 }
 
 func (s *Store) put(id store.PrimaryKey, bs ...[]byte) error {
-	k := s.key(id.String())
+	key := s.key(id.String())
 	_, err := s.Redis.Pipelined(func(p redis.Pipeliner) error {
 		for _, b := range bs {
-			p.SAdd(k, b)
+			p.SAdd(key, b)
 		}
 		return nil
 	})
@@ -452,10 +420,10 @@ func (s *Store) Remove(id store.PrimaryKey, bs ...[]byte) error {
 		return nil
 	}
 
-	k := s.key(id.String())
 	_, err := s.Redis.Pipelined(func(p redis.Pipeliner) error {
+		key := s.key(id.String())
 		for _, b := range bs {
-			p.SRem(k, b)
+			p.SRem(key, b)
 		}
 		return nil
 	})

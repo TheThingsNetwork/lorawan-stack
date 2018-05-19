@@ -75,7 +75,7 @@ type Trimmer interface {
 type TypedMapStore interface {
 	Create(fields map[string]interface{}) (PrimaryKey, error)
 	Find(id PrimaryKey) (map[string]interface{}, error)
-	FindBy(filter map[string]interface{}) (map[PrimaryKey]map[string]interface{}, error)
+	FindBy(filter map[string]interface{}, count uint64, f func(PrimaryKey, map[string]interface{}) bool) error
 	Update(id PrimaryKey, diff map[string]interface{}) error
 	Deleter
 }
@@ -91,7 +91,7 @@ type TypedMapStore interface {
 type ByteMapStore interface {
 	Create(fields map[string][]byte) (PrimaryKey, error)
 	Find(id PrimaryKey) (map[string][]byte, error)
-	FindBy(filter map[string][]byte) (map[PrimaryKey]map[string][]byte, error)
+	FindBy(filter map[string][]byte, count uint64, f func(PrimaryKey, map[string][]byte) bool) error
 	Update(id PrimaryKey, diff map[string][]byte) error
 	Deleter
 }

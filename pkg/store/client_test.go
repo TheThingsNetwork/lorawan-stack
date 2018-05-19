@@ -172,59 +172,60 @@ func TestTypedClient(t *testing.T) {
 				return reflect.New(reflect.Indirect(reflect.ValueOf(tc.Stored)).Type()).Interface()
 			}
 
-			k, err := cl.Create(tc.Stored)
-			if !a.So(err, should.BeNil) || !a.So(k, should.NotBeNil) {
+			key, err := cl.Create(tc.Stored)
+			if !a.So(err, should.BeNil) || !a.So(key, should.NotBeNil) {
 				return
 			}
 
 			v := newResult()
-			err = cl.Find(k, v)
+			err = cl.Find(key, v)
 			a.So(err, should.BeNil)
-			if !a.So(v, should.Resemble, v) {
-				pretty.Ldiff(t, v, tc.Stored)
-				return
+			if !a.So(pretty.Diff(v, tc.Stored), should.BeEmpty) {
+				t.FailNow()
 			}
 
-			m, err := cl.FindBy(v, newResult)
-			if a.So(err, should.BeNil) && a.So(m, should.HaveLength, 1) {
-				for mk, mv := range m {
-					a.So(mk, should.Resemble, k)
-					a.So(pretty.Diff(mv, tc.Stored), should.BeEmpty)
-				}
-			}
+			i := 0
+			err = cl.FindBy(v, newResult, 1, func(k PrimaryKey, v interface{}) bool {
+				i++
+				a.So(k, should.Resemble, key)
+				a.So(pretty.Diff(v, tc.Stored), should.BeEmpty)
+				return true
+			})
+			a.So(err, should.BeNil)
+			a.So(i, should.Equal, 1)
 
-			err = cl.Update(k, tc.Updated, tc.Fields...)
+			err = cl.Update(key, tc.Updated, tc.Fields...)
 			a.So(err, should.BeNil)
 
 			v = newResult()
-			err = cl.Find(k, v)
+			err = cl.Find(key, v)
 			a.So(err, should.BeNil)
 			if !a.So(v, should.Resemble, tc.AfterUpdate) {
 				pretty.Ldiff(t, v, tc.AfterUpdate)
 				return
 			}
 
-			m, err = cl.FindBy(v, newResult)
-			if a.So(err, should.BeNil) {
-				for mk, mv := range m {
-					a.So(mk, should.Resemble, k)
-					if !a.So(mv, should.Resemble, tc.AfterUpdate) {
-						pretty.Ldiff(t, mv, tc.AfterUpdate)
-						return
-					}
-				}
-			}
+			i = 0
+			err = cl.FindBy(v, newResult, 1, func(k PrimaryKey, v interface{}) bool {
+				i++
+				a.So(k, should.Resemble, key)
+				a.So(pretty.Diff(v, tc.AfterUpdate), should.BeEmpty)
+				return true
+			})
+			a.So(err, should.BeNil)
+			a.So(i, should.Equal, 1)
 
-			err = cl.Delete(k)
+			err = cl.Delete(key)
 			a.So(err, should.BeNil)
 
 			v = newResult()
-			err = cl.Find(k, v)
+			err = cl.Find(key, v)
 			a.So(err, should.BeNil)
 
-			m, err = cl.FindBy(tc.AfterUpdate, newResult)
+			i = 0
+			err = cl.FindBy(v, newResult, 1, func(k PrimaryKey, v interface{}) bool { i++; return true })
 			a.So(err, should.BeNil)
-			a.So(m, should.HaveLength, 0)
+			a.So(i, should.Equal, 0)
 		})
 	}
 }

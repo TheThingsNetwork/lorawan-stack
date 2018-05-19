@@ -73,13 +73,15 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 	a.So(err, should.BeNil)
 	a.So(m, should.BeNil)
 
-	filtered, err := s.FindBy(nil)
+	i := 0
+	err = s.FindBy(nil, 100, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
 	a.So(err, should.NotBeNil)
-	a.So(filtered, should.BeNil)
+	a.So(i, should.Equal, 0)
 
-	filtered, err = s.FindBy(make(map[string]interface{}))
+	i = 0
+	err = s.FindBy(make(map[string]interface{}), 100, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
 	a.So(err, should.NotBeNil)
-	a.So(filtered, should.BeNil)
+	a.So(i, should.Equal, 0)
 
 	err = s.Update(nil, nil)
 	a.So(err, should.NotBeNil)
@@ -219,21 +221,35 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 			a.So(err, should.BeNil)
 			a.So(found, should.Resemble, tc.Stored)
 
-			matches, err := s.FindBy(tc.Stored)
+			i := 0
+			err = s.FindBy(tc.Stored, 10, func(k store.PrimaryKey, v map[string]interface{}) bool {
+				i++
+				a.So(k, should.Resemble, id)
+				a.So(v, should.Resemble, tc.Stored)
+				return true
+			})
 			a.So(err, should.BeNil)
-			if a.So(matches, should.HaveLength, 1) {
-				for _, v := range matches {
-					a.So(v, should.Resemble, tc.Stored)
-				}
-			}
+			a.So(i, should.Equal, 1)
 
-			matches, err = s.FindBy(tc.FindBy)
+			i = 0
+			err = s.FindBy(tc.FindBy, 1, func(k store.PrimaryKey, v map[string]interface{}) bool {
+				i++
+				a.So(k, should.Resemble, id)
+				a.So(v, should.Resemble, tc.Stored)
+				return true
+			})
 			a.So(err, should.BeNil)
-			if a.So(matches, should.HaveLength, 1) {
-				for _, v := range matches {
-					a.So(v, should.Resemble, tc.Stored)
-				}
-			}
+			a.So(i, should.Equal, 1)
+
+			i = 0
+			err = s.FindBy(tc.FindBy, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
+				i++
+				a.So(k, should.Resemble, id)
+				a.So(v, should.Resemble, tc.Stored)
+				return true
+			})
+			a.So(err, should.BeNil)
+			a.So(i, should.Equal, 1)
 
 			err = s.Update(id, tc.Updated)
 			if !a.So(err, should.BeNil) {
@@ -244,21 +260,25 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 			a.So(err, should.BeNil)
 			a.So(found, should.Resemble, tc.AfterUpdate)
 
-			matches, err = s.FindBy(tc.AfterUpdate)
+			i = 0
+			err = s.FindBy(tc.AfterUpdate, 1, func(k store.PrimaryKey, v map[string]interface{}) bool {
+				i++
+				a.So(k, should.Resemble, id)
+				a.So(v, should.Resemble, tc.AfterUpdate)
+				return true
+			})
 			a.So(err, should.BeNil)
-			if a.So(matches, should.HaveLength, 1) {
-				for _, v := range matches {
-					a.So(v, should.Resemble, tc.AfterUpdate)
-				}
-			}
+			a.So(i, should.Equal, 1)
 
-			matches, err = s.FindBy(tc.FindBy)
+			i = 0
+			err = s.FindBy(tc.FindBy, 1, func(k store.PrimaryKey, v map[string]interface{}) bool {
+				i++
+				a.So(k, should.Resemble, id)
+				a.So(v, should.Resemble, tc.AfterUpdate)
+				return true
+			})
 			a.So(err, should.BeNil)
-			if a.So(matches, should.HaveLength, 1) {
-				for _, v := range matches {
-					a.So(v, should.Resemble, tc.AfterUpdate)
-				}
-			}
+			a.So(i, should.Equal, 1)
 
 			err = s.Delete(id)
 			if !a.So(err, should.BeNil) {
@@ -269,13 +289,15 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 			a.So(err, should.BeNil)
 			a.So(found, should.Equal, nil)
 
-			matches, err = s.FindBy(tc.AfterUpdate)
+			i = 0
+			err = s.FindBy(tc.AfterUpdate, 1, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
 			a.So(err, should.BeNil)
-			a.So(matches, should.HaveLength, 0)
+			a.So(i, should.Equal, 0)
 
-			matches, err = s.FindBy(tc.FindBy)
+			i = 0
+			err = s.FindBy(tc.FindBy, 1, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
 			a.So(err, should.BeNil)
-			a.So(matches, should.HaveLength, 0)
+			a.So(i, should.Equal, 0)
 		})
 	}
 }
@@ -557,22 +579,22 @@ func (gs GenericMapStore) Find(id store.PrimaryKey) (map[string]interface{}, err
 }
 
 // FindBy is a generic FindBy.
-func (gs GenericMapStore) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
-	ret := gs.store.MethodByName("FindBy").Call([]reflect.Value{
+func (gs GenericMapStore) FindBy(filter map[string]interface{}, n uint64, f func(store.PrimaryKey, map[string]interface{}) bool) error {
+	return reflectValueToError(gs.store.MethodByName("FindBy").Call([]reflect.Value{
 		reflect.ValueOf(gs.fromIfaceMap(filter)),
-	})
-	if err := reflectValueToError(ret[1]); err != nil {
-		return nil, err
-	}
-	if store.IsNillableKind(ret[0].Kind()) && ret[0].IsNil() {
-		return nil, nil
-	}
-
-	m := make(map[store.PrimaryKey]map[string]interface{}, ret[0].Len())
-	for _, k := range ret[0].MapKeys() {
-		m[k.Interface().(store.PrimaryKey)] = gs.toIfaceMap(ret[0].MapIndex(k).Interface())
-	}
-	return m, nil
+		reflect.ValueOf(n),
+		reflect.MakeFunc(reflect.FuncOf(
+			[]reflect.Type{reflect.TypeOf((*store.PrimaryKey)(nil)).Elem(), reflect.TypeOf(gs.fromIfaceMap(map[string]interface{}{}))},
+			[]reflect.Type{reflect.TypeOf(false)},
+			false,
+		),
+			func(args []reflect.Value) []reflect.Value {
+				return reflect.ValueOf(f).Call([]reflect.Value{
+					args[0], reflect.ValueOf(gs.toIfaceMap(args[1].Interface())),
+				})
+			},
+		),
+	})[0])
 }
 
 // Update is a generic Update.

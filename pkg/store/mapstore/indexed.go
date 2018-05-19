@@ -22,6 +22,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/store"
 )
 
+var _ store.TypedMapStore = &IndexedStore{}
+
 type IndexedStore struct {
 	*MapStore
 	mu      sync.RWMutex
@@ -134,9 +136,9 @@ func (s *IndexedStore) Update(id store.PrimaryKey, diff map[string]interface{}) 
 	return nil
 }
 
-func (s *IndexedStore) FindBy(filter map[string]interface{}) (matches map[store.PrimaryKey]map[string]interface{}, err error) {
+func (s *IndexedStore) FindBy(filter map[string]interface{}, count uint64, f func(store.PrimaryKey, map[string]interface{}) bool) error {
 	if len(filter) == 0 {
-		return nil, store.ErrEmptyFilter.New(nil)
+		return store.ErrEmptyFilter.New(nil)
 	}
 
 	s.mu.RLock()
@@ -152,17 +154,19 @@ func (s *IndexedStore) FindBy(filter map[string]interface{}) (matches map[store.
 		}
 	}
 
-	var byFields map[store.PrimaryKey]map[string]interface{}
+	byFields := make(map[store.PrimaryKey]map[string]interface{})
 	if len(fields) > 0 {
-		byFields, err = s.MapStore.FindBy(fields)
-		if err != nil {
-			return nil, err
+		if err := s.MapStore.FindBy(fields, count, func(k store.PrimaryKey, v map[string]interface{}) bool {
+			byFields[k] = v
+			return true
+		}); err != nil {
+			return err
 		}
 	}
 
 	idxKeys, err := s.filterIndex(idxs)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	sort.Slice(idxKeys, func(i, j int) bool { // Optimization: start with the smallest set
 		return idxKeys[i].Size() < idxKeys[j].Size()
@@ -176,27 +180,36 @@ func (s *IndexedStore) FindBy(filter map[string]interface{}) (matches map[store.
 		filterSet.Intersect(set)
 	}
 
-	matches = make(map[store.PrimaryKey]map[string]interface{})
 	switch {
 	case len(idxs) != 0 && len(fields) != 0:
 		for k, v := range byFields {
-			if filterSet.Contains(k) {
-				matches[k] = v
+			if !filterSet.Contains(k) {
+				continue
+			}
+
+			if !f(k, v) {
+				return nil
 			}
 		}
 	case len(idxs) != 0:
 		for k := range filterSet {
-			if v, err := s.Find(k); err == nil {
-				matches[k] = v
+			v, err := s.Find(k)
+			if err != nil {
+				continue
+			}
+
+			if !f(k, v) {
+				return nil
 			}
 		}
 	default:
-		matches = byFields
+		for k, v := range byFields {
+			if !f(k, v) {
+				return nil
+			}
+		}
 	}
-	if len(matches) == 0 {
-		return nil, nil
-	}
-	return matches, nil
+	return nil
 }
 
 func (s *IndexedStore) Delete(id store.PrimaryKey) error {

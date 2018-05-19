@@ -27,6 +27,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/store"
 )
 
+var _ store.TypedMapStore = &MapStore{}
+
 type MapStore struct {
 	mu      sync.RWMutex
 	data    map[store.PrimaryKey]map[string]interface{}
@@ -65,12 +67,10 @@ func (s *MapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	return deepcopy.Copy(fields).(map[string]interface{}), nil
 }
 
-func (s *MapStore) FindBy(filter map[string]interface{}) (map[store.PrimaryKey]map[string]interface{}, error) {
+func (s *MapStore) FindBy(filter map[string]interface{}, _ uint64, f func(store.PrimaryKey, map[string]interface{}) bool) error {
 	if len(filter) == 0 {
-		return nil, store.ErrEmptyFilter.New(nil)
+		return store.ErrEmptyFilter.New(nil)
 	}
-
-	matches := make(map[store.PrimaryKey]map[string]interface{})
 
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -82,12 +82,11 @@ outer:
 				continue outer
 			}
 		}
-		matches[id] = fields
+		if !f(id, fields) {
+			return nil
+		}
 	}
-	if len(matches) == 0 {
-		return nil, nil
-	}
-	return deepcopy.Copy(matches).(map[store.PrimaryKey]map[string]interface{}), nil
+	return nil
 }
 
 func (s *MapStore) Update(id store.PrimaryKey, diff map[string]interface{}) error {

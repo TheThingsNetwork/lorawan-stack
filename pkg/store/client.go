@@ -44,7 +44,7 @@ type NewResultFunc func() interface{}
 type Client interface {
 	Create(v interface{}, fields ...string) (PrimaryKey, error)
 	Find(id PrimaryKey, v interface{}) error
-	FindBy(filter interface{}, newResult NewResultFunc, fields ...string) (map[PrimaryKey]interface{}, error)
+	FindBy(filter interface{}, newResult NewResultFunc, count uint64, f func(PrimaryKey, interface{}) bool, fields ...string) error
 	Update(id PrimaryKey, v interface{}, fields ...string) error
 	Delete(id PrimaryKey) error
 }
@@ -94,26 +94,25 @@ func (cl *typedMapStoreClient) Find(id PrimaryKey, v interface{}) error {
 	return UnmarshalMap(m, v)
 }
 
-func (cl *typedMapStoreClient) FindBy(filter interface{}, newResult NewResultFunc, fields ...string) (map[PrimaryKey]interface{}, error) {
+func (cl *typedMapStoreClient) FindBy(filter interface{}, newResult NewResultFunc, n uint64, f func(PrimaryKey, interface{}) bool, fields ...string) error {
 	fm, err := MarshalMap(filter)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	m, err := cl.TypedMapStore.FindBy(filterFields(fm, fields...))
-	if err != nil {
-		return nil, err
-	}
-
-	filtered := make(map[PrimaryKey]interface{}, len(m))
-	for k, v := range m {
+	var ierr error
+	err = cl.TypedMapStore.FindBy(filterFields(fm, fields...), n, func(k PrimaryKey, v map[string]interface{}) bool {
 		iface := newResult()
-		if err = UnmarshalMap(v, iface); err != nil {
-			return nil, err
+		if ierr = UnmarshalMap(v, iface); ierr != nil {
+			return false
 		}
-		filtered[k] = iface
+		return f(k, iface)
+	})
+
+	if err != nil {
+		return err
 	}
-	return filtered, nil
+	return ierr
 }
 
 func (cl *typedMapStoreClient) Update(id PrimaryKey, v interface{}, fields ...string) error {
@@ -194,25 +193,25 @@ func (cl *byteMapStoreClient) Find(id PrimaryKey, v interface{}) error {
 	return UnmarshalByteMap(m, v)
 }
 
-func (cl *byteMapStoreClient) FindBy(filter interface{}, newResult NewResultFunc, fields ...string) (map[PrimaryKey]interface{}, error) {
+func (cl *byteMapStoreClient) FindBy(filter interface{}, newResult NewResultFunc, n uint64, f func(PrimaryKey, interface{}) bool, fields ...string) error {
 	fm, err := MarshalByteMap(filter)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	m, err := cl.ByteMapStore.FindBy(filterByteFields(fm, fields...))
-	if err != nil {
-		return nil, err
-	}
-	filtered := make(map[PrimaryKey]interface{}, len(m))
-	for k, v := range m {
+	var ierr error
+	err = cl.ByteMapStore.FindBy(filterByteFields(fm, fields...), n, func(k PrimaryKey, v map[string][]byte) bool {
 		iface := newResult()
-		if err = UnmarshalByteMap(v, iface); err != nil {
-			return nil, err
+		if ierr = UnmarshalByteMap(v, iface); ierr != nil {
+			return false
 		}
-		filtered[k] = iface
+		return f(k, iface)
+	})
+
+	if err != nil {
+		return err
 	}
-	return filtered, nil
+	return ierr
 }
 
 func (cl *byteMapStoreClient) Update(id PrimaryKey, v interface{}, fields ...string) error {
