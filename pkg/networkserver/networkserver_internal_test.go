@@ -83,11 +83,11 @@ var _ ttnpb.NsGsClient = &mockNsGsClient{}
 
 type mockNsGsClient struct {
 	*test.MockClientStream
-	scheduleDownlinkFunc func(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error)
+	scheduleApplicationDownlinkFunc func(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error)
 }
 
 func (cl *mockNsGsClient) ScheduleDownlink(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
-	return cl.scheduleDownlinkFunc(ctx, in, opts...)
+	return cl.scheduleApplicationDownlinkFunc(ctx, in, opts...)
 }
 
 func TestScheduleDownlink(t *testing.T) {
@@ -167,6 +167,7 @@ func TestScheduleDownlink(t *testing.T) {
 				CooldownWindow:      42,
 			},
 		)).(*NetworkServer)
+		test.Must(nil, ns.Start())
 
 		ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		for ed.GetSession() == nil || len(ed.GetRecentUplinks()) == 0 {
@@ -175,7 +176,7 @@ func TestScheduleDownlink(t *testing.T) {
 		ed.QueuedApplicationDownlinks = nil
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
-		err := ns.scheduleDownlink(context.Background(), dev, nil, nil, nil, false)
+		err := ns.scheduleApplicationDownlink(context.Background(), dev, nil, nil)
 		a.So(err, should.BeNil)
 	})
 
@@ -192,6 +193,7 @@ func TestScheduleDownlink(t *testing.T) {
 				CooldownWindow:      42,
 			},
 		)).(*NetworkServer)
+		test.Must(nil, ns.Start())
 
 		ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		for ed.GetSession() == nil || len(ed.GetQueuedApplicationDownlinks()) == 0 {
@@ -200,7 +202,7 @@ func TestScheduleDownlink(t *testing.T) {
 		ed.RecentUplinks = nil
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
-		err := ns.scheduleDownlink(context.Background(), dev, nil, nil, nil, false)
+		err := ns.scheduleApplicationDownlink(context.Background(), dev, nil, nil)
 		a.So(err, should.BeError)
 	})
 
@@ -223,6 +225,7 @@ func TestScheduleDownlink(t *testing.T) {
 				return nil, errors.New("Test")
 			}),
 		)).(*NetworkServer)
+		test.Must(nil, ns.Start())
 
 		ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		for ed.GetSession() == nil || len(ed.GetRecentUplinks()) == 0 {
@@ -233,7 +236,7 @@ func TestScheduleDownlink(t *testing.T) {
 		}
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
-		err := ns.scheduleDownlink(context.Background(), dev, nil, nil, nil, false)
+		err := ns.scheduleApplicationDownlink(context.Background(), dev, nil, nil)
 		a.So(err, should.BeError)
 	})
 
@@ -323,7 +326,7 @@ func TestScheduleDownlink(t *testing.T) {
 			var n uint32
 			gateways[md.GatewayIdentifiers.UniqueID(scheduleCtx)] = &mockNsGsClient{
 				MockClientStream: &test.MockClientStream{},
-				scheduleDownlinkFunc: func(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
+				scheduleApplicationDownlinkFunc: func(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
 					defer atomic.AddUint32(&cnt, 1)
 					defer atomic.AddUint32(&n, 1)
 
@@ -344,7 +347,7 @@ func TestScheduleDownlink(t *testing.T) {
 			}
 		}
 
-		err = ns.scheduleDownlink(context.Background(), dev, up, nil, nil, false)
+		err = ns.scheduleApplicationDownlink(context.Background(), dev, up, nil)
 		a.So(err, should.BeNil)
 		a.So(cnt, should.Equal, len(mds)*len(slots))
 		a.So(test.WaitTimeout(20*test.Delay, wg.Wait), should.BeTrue)
@@ -444,7 +447,7 @@ func TestScheduleDownlink(t *testing.T) {
 			var n uint32
 			gateways[md.GatewayIdentifiers.UniqueID(scheduleCtx)] = &mockNsGsClient{
 				MockClientStream: &test.MockClientStream{},
-				scheduleDownlinkFunc: func(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
+				scheduleApplicationDownlinkFunc: func(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
 					defer atomic.AddUint32(&cnt, 1)
 					defer atomic.AddUint32(&n, 1)
 
@@ -465,7 +468,7 @@ func TestScheduleDownlink(t *testing.T) {
 			}
 		}
 
-		err = ns.scheduleDownlink(context.Background(), dev, up, nil, nil, false)
+		err = ns.scheduleApplicationDownlink(context.Background(), dev, up, nil)
 		a.So(err, should.BeNil)
 		a.So(cnt, should.Equal, len(mds)*len(slots))
 		a.So(test.WaitTimeout(20*test.Delay, wg.Wait), should.BeTrue)

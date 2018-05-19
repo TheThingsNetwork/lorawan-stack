@@ -456,67 +456,6 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 		"device_id", dev.EndDevice.EndDeviceIdentifiers.GetDeviceID(),
 	))
 
-	dev, err := dev.Load()
-	if err != nil {
-		logger.WithError(err).Error("Failed to load device")
-		return err
-	}
-
-	queue := dev.EndDevice.GetQueuedApplicationDownlinks()
-	if len(queue) == 0 {
-		logger.Debug("Downlink queue empty")
-		return nil
-	}
-	down, queue := queue[0], queue[1:]
-
-	fCnt := down.GetFCnt()
-	devAddr := *dev.EndDevice.EndDeviceIdentifiers.DevAddr
-
-	if len(b) == 0 {
-		b, err = (ttnpb.Message{
-			MHDR: ttnpb.MHDR{
-				MType: ttnpb.MType_UNCONFIRMED_DOWN, // TODO: Support confirmed downlinks (https://github.com/TheThingsIndustries/ttn/issues/730)
-			},
-			Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
-				FHDR: ttnpb.FHDR{
-					DevAddr: devAddr,
-					FCtrl: ttnpb.FCtrl{
-						ADR:      false,
-						Ack:      up != nil && up.Payload.GetMType() == ttnpb.MType_CONFIRMED_UP,
-						FPending: len(queue) > 0,
-					},
-					FCnt:  fCnt,
-					FOpts: nil, // TODO: MAC handling (https://github.com/TheThingsIndustries/ttn/issues/292)
-				},
-				FPort:      down.GetFPort(),
-				FRMPayload: down.GetFRMPayload(),
-			}},
-		}).AppendLoRaWAN(b)
-		if err != nil {
-			logger.WithError(err).Error("Failed to marshal payload")
-			return err
-		}
-		// NOTE: It is assumed, that b does not contain MIC.
-
-		ses := dev.EndDevice.GetSession()
-		if ses == nil {
-			logger.Debug("No active session found for device")
-			return nil
-		}
-
-		ke := ses.SessionKeys.GetSNwkSIntKey()
-		if ke == nil || ke.Key.IsZero() {
-			return common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingSNwkSIntKey.New(nil))
-		}
-
-		mic, err := crypto.ComputeDownlinkMIC(*ke.Key, devAddr, fCnt, b)
-		if err != nil {
-			logger.WithError(err).Error("Failed to compute downlink MIC")
-			return err
-		}
-		b = append(b, mic[:]...)
-	}
-
 	msg := &ttnpb.DownlinkMessage{
 		RawPayload:           b,
 		EndDeviceIdentifiers: dev.EndDevice.EndDeviceIdentifiers,
@@ -577,7 +516,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 		if isJoinAccept {
 			rx1.Delay = uint32(band.JoinAcceptDelay1.Nanoseconds())
 		} else {
-			rx1.Delay = uint32(st.GetRxDelay())
+			rx1.Delay = st.GetRxDelay()
 		}
 
 		if err = setDownlinkModulation(&rx1.TxSettings, band.DataRates[drIdx]); err != nil {
@@ -655,15 +594,10 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 				continue
 			}
 
-			dev.RecentDownlinks = append(dev.GetRecentDownlinks(), msg)
-			dev.QueuedApplicationDownlinks = queue
-			if err = dev.Store("RecentDownlinks", "QueuedApplicationDownlinks"); err != nil {
+			dev.EndDevice.RecentDownlinks = append(dev.EndDevice.GetRecentDownlinks(), msg)
+			if err = dev.Store("RecentDownlinks"); err != nil {
 				logger.WithError(err).Error("Failed to store device")
 				return err
-			}
-
-			if len(queue) > 0 && dev.EndDevice.GetMACInfo().GetDeviceClass() == ttnpb.CLASS_C {
-				// TODO: Schedule the next downlink (https://github.com/TheThingsIndustries/ttn/issues/728)
 			}
 			return nil
 		}
@@ -674,6 +608,88 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 	}
 	logger.Debug("Failed to schedule downlink")
 	return errors.New("Failed to schedule downlink")
+}
+
+func (ns *NetworkServer) scheduleApplicationDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb.UplinkMessage, acc *metadataAccumulator) error {
+	logger := log.FromContext(ctx).WithFields(log.Fields(
+		"application_id", dev.EndDevice.EndDeviceIdentifiers.ApplicationIdentifiers.GetApplicationID(),
+		"device_id", dev.EndDevice.EndDeviceIdentifiers.GetDeviceID(),
+	))
+
+	dev, err := dev.Load()
+	if err != nil {
+		logger.WithError(err).Error("Failed to load device")
+		return err
+	}
+
+	devAddr := *dev.EndDevice.EndDeviceIdentifiers.DevAddr
+
+	queue := dev.EndDevice.GetQueuedApplicationDownlinks()
+	if len(queue) == 0 {
+		logger.Debug("Downlink queue empty")
+		return nil
+	}
+	down, queue := queue[0], queue[1:]
+
+	fCnt := down.GetFCnt()
+
+	b, err := (ttnpb.Message{
+		MHDR: ttnpb.MHDR{
+			MType: ttnpb.MType_UNCONFIRMED_DOWN, // TODO: Support confirmed downlinks (https://github.com/TheThingsIndustries/ttn/issues/730)
+		},
+		Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
+			FHDR: ttnpb.FHDR{
+				DevAddr: devAddr,
+				FCtrl: ttnpb.FCtrl{
+					ADR:      false,
+					Ack:      up != nil && up.Payload.GetMType() == ttnpb.MType_CONFIRMED_UP,
+					FPending: len(queue) > 0,
+				},
+				FCnt:  fCnt,
+				FOpts: nil, // TODO: MAC handling (https://github.com/TheThingsIndustries/ttn/issues/292)
+			},
+			FPort:      down.GetFPort(),
+			FRMPayload: down.GetFRMPayload(),
+		}},
+	}).MarshalLoRaWAN()
+	if err != nil {
+		logger.WithError(err).Error("Failed to marshal payload")
+		return err
+	}
+	// NOTE: It is assumed, that b does not contain MIC.
+
+	ses := dev.EndDevice.GetSession()
+	if ses == nil {
+		logger.Debug("No active session found for device")
+		return nil
+	}
+
+	ke := ses.SessionKeys.GetSNwkSIntKey()
+	if ke == nil || ke.Key.IsZero() {
+		return common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingSNwkSIntKey.New(nil))
+	}
+
+	mic, err := crypto.ComputeDownlinkMIC(*ke.Key, devAddr, fCnt, b)
+	if err != nil {
+		logger.WithError(err).Error("Failed to compute downlink MIC")
+		return err
+	}
+
+	if err := ns.scheduleDownlink(ctx, dev, up, acc, append(b, mic[:]...), false); err != nil {
+		return err
+	}
+
+	dev.EndDevice.Session.NextAFCntDown++
+	dev.EndDevice.QueuedApplicationDownlinks = queue
+	if err = dev.Store("QueuedApplicationDownlinks", "Session.NextAFCntDown"); err != nil {
+		logger.WithError(err).Error("Failed to store device")
+		return err
+	}
+
+	if len(queue) > 0 && dev.EndDevice.GetMACInfo().GetDeviceClass() == ttnpb.CLASS_C {
+		// TODO: Schedule the next downlink (https://github.com/TheThingsIndustries/ttn/issues/728)
+	}
+	return nil
 }
 
 // matchDevice tries to match the uplink message with a device.
@@ -858,7 +874,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		"device_id", dev.EndDeviceIdentifiers.GetDeviceID(),
 	))
 
-	go ns.scheduleDownlink(ctx, dev, msg, acc, nil, false)
+	go ns.scheduleApplicationDownlink(ctx, dev, msg, acc)
 
 	select {
 	case <-ctx.Done():
@@ -993,13 +1009,33 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 			dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
 		}
 
-		if err = dev.Store("EndDeviceIdentifiers.DevAddr", "Session", "SessionFallback", "RecentUplinks"); err != nil {
-			logger.WithError(err).Error("Failed to update device")
+		if err := ns.scheduleDownlink(ctx, dev, msg, nil, resp.GetRawPayload(), true); err != nil {
+			logger.WithError(err).Debug("Failed to schedule join accept")
 			return err
 		}
 
-		if err := ns.scheduleDownlink(ctx, dev, msg, nil, resp.RawPayload, true); err != nil {
-			logger.WithError(err).Debug("Failed to schedule join accept")
+		band, err := band.GetByID(fp.GetBandID())
+		if err != nil {
+			return common.ErrCorruptRegistry.NewWithCause(nil, err)
+		}
+
+		dev.EndDevice.MACState = &ttnpb.MACState{
+			MaxTxPower:        uint32(dev.EndDevice.MaxTxPower),
+			UplinkDwellTime:   fp.DwellTime != nil,
+			DownlinkDwellTime: false, // TODO: Get this from band (https://github.com/TheThingsIndustries/ttn/issues/774)
+			ADRNbTrans:        1,
+			ADRAckLimit:       uint32(band.ADRAckLimit),
+			ADRAckDelay:       uint32(band.ADRAckDelay),
+			DutyCycle:         ttnpb.DUTY_CYCLE_1,
+			RxDelay:           req.GetRxDelay(),
+			Rx1DataRateOffset: req.DownlinkSettings.GetRx1DROffset(),
+			Rx2DataRateIndex:  req.DownlinkSettings.GetRx2DR(),
+			Rx2Frequency:      uint64(band.DefaultRx2Parameters.Frequency),
+		}
+		dev.EndDevice.MACStateDesired = dev.EndDevice.MACState
+
+		if err = dev.Store("EndDeviceIdentifiers.DevAddr", "Session", "SessionFallback", "RecentUplinks", "MACState", "MACStateDesired"); err != nil {
+			logger.WithError(err).Error("Failed to update device")
 			return err
 		}
 

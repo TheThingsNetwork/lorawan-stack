@@ -27,6 +27,7 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
@@ -939,6 +940,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						return ch
 					}),
 				)).(*NetworkServer)
+				test.Must(nil, ns.Start())
 
 				asSendCh := make(chan *ttnpb.ApplicationUp)
 
@@ -1339,6 +1341,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						return ch
 					}),
 				)).(*NetworkServer)
+				test.Must(nil, ns.Start())
 
 				asSendCh := make(chan *ttnpb.ApplicationUp)
 
@@ -1466,6 +1469,24 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						ed.RecentUplinks = append(ed.GetRecentUplinks(), msg)
 						if len(ed.RecentUplinks) > RecentUplinkCount {
 							ed.RecentUplinks = ed.RecentUplinks[len(ed.RecentUplinks)-RecentUplinkCount:]
+						}
+
+						fp := test.Must(ns.Component.FrequencyPlans.GetByID(ed.GetFrequencyPlanID())).(ttnpb.FrequencyPlan)
+						band := test.Must(band.GetByID(fp.BandID)).(band.Band)
+
+						stDes := ed.GetMACStateDesired()
+						ed.MACState = &ttnpb.MACState{
+							MaxTxPower:        uint32(ed.MaxTxPower),
+							UplinkDwellTime:   fp.DwellTime != nil,
+							DownlinkDwellTime: false, // TODO: Get this from band (https://github.com/TheThingsIndustries/ttn/issues/774)
+							ADRNbTrans:        1,
+							ADRAckLimit:       uint32(band.ADRAckLimit),
+							ADRAckDelay:       uint32(band.ADRAckDelay),
+							DutyCycle:         ttnpb.DUTY_CYCLE_1,
+							RxDelay:           stDes.GetRxDelay(),
+							Rx1DataRateOffset: stDes.GetRx1DataRateOffset(),
+							Rx2DataRateIndex:  stDes.GetRx2DataRateIndex(),
+							Rx2Frequency:      uint64(band.DefaultRx2Parameters.Frequency),
 						}
 
 						dev, err = dev.Load()
@@ -1622,6 +1643,7 @@ func TestHandleUplink(t *testing.T) {
 			CooldownWindow:      42,
 		},
 	)).(*NetworkServer)
+	test.Must(nil, ns.Start())
 
 	msg := ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
 	msg.Payload.Payload = nil
