@@ -97,17 +97,20 @@ func Get(namespace string, code Code) *ErrDescriptor {
 
 // Descriptor returns the error descriptor from any error
 func Descriptor(in error) (desc *ErrDescriptor) {
-	err := From(in)
-	descriptor := Get(err.Namespace(), err.Code())
-	if descriptor != nil {
-		return descriptor
+	if in == nil {
+		return nil
 	}
 
+	err := From(in)
+	code := err.Code()
+	if desc := Get(err.Namespace(), code); desc != nil {
+		return desc
+	}
 	// return a new error descriptor with sane defaults
 	return &ErrDescriptor{
 		MessageFormat: err.Error(),
 		Type:          err.Type(),
-		Code:          err.Code(),
+		Code:          code,
 	}
 }
 
