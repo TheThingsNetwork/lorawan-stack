@@ -45,51 +45,52 @@ func TestRegistry(t *testing.T) {
 		a.So(app.Application, should.Resemble, pb)
 	}
 
-	found, err := r.FindBy(pb, "ApplicationIdentifiers")
+	i := 0
+	err = r.FindBy(pb, 1, func(found *Application) bool {
+		i++
+		a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
+		return true
+	}, "ApplicationIdentifiers")
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
-	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		found[0].CreatedAt = app.Application.GetCreatedAt()
-		found[0].UpdatedAt = app.Application.GetUpdatedAt()
-		a.So(pretty.Diff(found[0].Application, pb), should.BeEmpty)
-	}
+	a.So(i, should.Equal, 1)
 
 	updated := ttnpb.NewPopulatedApplication(test.Randy, false)
 	for app.Application.ApplicationIdentifiers.Equal(updated.ApplicationIdentifiers) {
 		updated = ttnpb.NewPopulatedApplication(test.Randy, false)
 	}
-	updated.CreatedAt = app.Application.GetCreatedAt()
-	updated.UpdatedAt = app.Application.GetUpdatedAt()
 	app.Application = updated
 
 	if !a.So(app.Store(), should.BeNil) {
 		return
 	}
 
-	found, err = r.FindBy(pb, "ApplicationIdentifiers")
+	i = 0
+	err = r.FindBy(pb, 1, func(*Application) bool { i++; return true }, "ApplicationIdentifiers")
 	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) {
-		a.So(found, should.BeEmpty)
-	}
+	a.So(i, should.Equal, 0)
 
 	pb = updated
 
-	found, err = r.FindBy(pb, "ApplicationIdentifiers")
-	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		found[0].CreatedAt = pb.GetCreatedAt()
-		found[0].UpdatedAt = pb.GetUpdatedAt()
-		a.So(pretty.Diff(found[0].Application, pb), should.BeEmpty)
+	i = 0
+	err = r.FindBy(pb, 1, func(found *Application) bool {
+		i++
+		pb.UpdatedAt = found.Application.GetUpdatedAt()
+		a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
+		return true
+	}, "ApplicationIdentifiers")
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
 	}
+	a.So(i, should.Equal, 1)
 
 	a.So(app.Delete(), should.BeNil)
 
-	found, err = r.FindBy(pb, "ApplicationIdentifiers")
+	i = 0
+	err = r.FindBy(pb, 1, func(*Application) bool { i++; return true }, "ApplicationIdentifiers")
 	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) {
-		a.So(found, should.BeEmpty)
-	}
+	a.So(i, should.Equal, 0)
 }
 
 func TestFindApplicationByIdentifiers(t *testing.T) {
@@ -108,47 +109,52 @@ func TestFindApplicationByIdentifiers(t *testing.T) {
 		a.So(app.Application, should.Resemble, pb)
 	}
 
-	found, err := FindApplicationByIdentifiers(r, &pb.ApplicationIdentifiers)
-	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		a.So(pretty.Diff(found[0].Application, pb), should.BeEmpty)
+	i := 0
+	err = FindApplicationByIdentifiers(r, &pb.ApplicationIdentifiers, 1, func(found *Application) bool {
+		i++
+		a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
+		return true
+	})
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
 	}
+	a.So(i, should.Equal, 1)
 
 	updated := ttnpb.NewPopulatedApplication(test.Randy, false)
 	for app.Application.ApplicationIdentifiers.Equal(updated.ApplicationIdentifiers) {
 		updated = ttnpb.NewPopulatedApplication(test.Randy, false)
 	}
-	updated.CreatedAt = pb.GetCreatedAt()
-	updated.UpdatedAt = pb.GetUpdatedAt()
 	app.Application = updated
 
 	if !a.So(app.Store(), should.BeNil) {
 		return
 	}
 
-	found, err = FindApplicationByIdentifiers(r, &pb.ApplicationIdentifiers)
+	i = 0
+	err = FindApplicationByIdentifiers(r, &pb.ApplicationIdentifiers, 1, func(*Application) bool { i++; return true })
 	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) {
-		a.So(found, should.BeEmpty)
-	}
+	a.So(i, should.Equal, 0)
 
 	pb = updated
 
-	found, err = FindApplicationByIdentifiers(r, &pb.ApplicationIdentifiers)
-	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		pb.CreatedAt = found[0].Application.GetCreatedAt()
-		pb.UpdatedAt = found[0].Application.GetUpdatedAt()
-		a.So(pretty.Diff(found[0].Application, pb), should.BeEmpty)
+	i = 0
+	err = FindApplicationByIdentifiers(r, &pb.ApplicationIdentifiers, 1, func(found *Application) bool {
+		i++
+		pb.UpdatedAt = found.Application.GetUpdatedAt()
+		a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
+		return true
+	})
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
 	}
+	a.So(i, should.Equal, 1)
 
 	a.So(app.Delete(), should.BeNil)
 
-	found, err = FindApplicationByIdentifiers(r, &pb.ApplicationIdentifiers)
+	i = 0
+	err = FindApplicationByIdentifiers(r, &pb.ApplicationIdentifiers, 1, func(*Application) bool { i++; return true })
 	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) {
-		a.So(found, should.BeEmpty)
-	}
+	a.So(i, should.Equal, 0)
 }
 
 func TestFindOneApplicationByIdentifiers(t *testing.T) {

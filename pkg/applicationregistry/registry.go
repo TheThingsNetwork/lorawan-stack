@@ -26,8 +26,10 @@ import (
 // Interface represents the interface exposed by the *Registry.
 type Interface interface {
 	Create(a *ttnpb.Application, fields ...string) (*Application, error)
-	FindBy(a *ttnpb.Application, fields ...string) ([]*Application, error)
+	FindBy(a *ttnpb.Application, count uint64, f func(*Application) bool, fields ...string) error
 }
+
+var _ Interface = &Registry{}
 
 // Registry is responsible for mapping applications to their identities.
 type Registry struct {
@@ -61,27 +63,25 @@ func (r *Registry) Create(a *ttnpb.Application, fields ...string) (*Application,
 
 // FindBy searches for applications matching specified application fields in underlying store.Interface.
 // The returned slice contains unique applications, matching at least one of values in a.
-func (r *Registry) FindBy(a *ttnpb.Application, fields ...string) ([]*Application, error) {
+func (r *Registry) FindBy(a *ttnpb.Application, count uint64, f func(*Application) bool, fields ...string) error {
 	if a == nil {
-		return nil, errors.New("Application specified is nil")
+		return errors.New("Application specified is nil")
 	}
-
-	found, err := r.store.FindBy(a, func() interface{} { return &ttnpb.Application{} }, fields...)
-	if err != nil {
-		return nil, err
-	}
-
-	applications := make([]*Application, 0, len(found))
-	for id, a := range found {
-		applications = append(applications, newApplication(a.(*ttnpb.Application), r.store, id))
-	}
-	return applications, nil
+	return r.store.FindBy(
+		a,
+		func() interface{} { return &ttnpb.Application{} },
+		count,
+		func(k store.PrimaryKey, v interface{}) bool {
+			return f(newApplication(v.(*ttnpb.Application), r.store, k))
+		},
+		fields...,
+	)
 }
 
 // FindApplicationByIdentifiers searches for applications matching specified application identifiers in r.
-func FindApplicationByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers) ([]*Application, error) {
+func FindApplicationByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers, count uint64, f func(*Application) bool) error {
 	if id == nil {
-		return nil, errors.New("Identifiers specified are nil")
+		return errors.New("Identifiers specified are nil")
 	}
 
 	fields := []string{}
@@ -89,20 +89,29 @@ func FindApplicationByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers)
 	case id.ApplicationID != "":
 		fields = append(fields, "ApplicationIdentifiers.ApplicationID")
 	}
-	return r.FindBy(&ttnpb.Application{ApplicationIdentifiers: *id}, fields...)
+	return r.FindBy(&ttnpb.Application{ApplicationIdentifiers: *id}, count, f, fields...)
 }
 
 // FindOneApplicationByIdentifiers searches for exactly one application matching specified application identifiers in r.
 func FindOneApplicationByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers) (*Application, error) {
-	apps, err := FindApplicationByIdentifiers(r, id)
+	var app *Application
+	var i uint64
+	err := FindApplicationByIdentifiers(r, id, 1, func(a *Application) bool {
+		i++
+		if i > 1 {
+			return false
+		}
+		app = a
+		return true
+	})
 	if err != nil {
 		return nil, err
 	}
-	switch len(apps) {
+	switch i {
 	case 0:
 		return nil, ErrApplicationNotFound.New(nil)
 	case 1:
-		return apps[0], nil
+		return app, nil
 	default:
 		return nil, ErrTooManyApplications.New(nil)
 	}

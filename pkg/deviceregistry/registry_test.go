@@ -47,51 +47,52 @@ func TestRegistry(t *testing.T) {
 		a.So(dev.EndDevice, should.Resemble, pb)
 	}
 
-	found, err := r.FindBy(pb, "EndDeviceIdentifiers")
+	i := 0
+	err = r.FindBy(pb, 1, func(found *Device) bool {
+		i++
+		a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
+		return true
+	}, "EndDeviceIdentifiers")
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
-	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		found[0].CreatedAt = dev.EndDevice.GetCreatedAt()
-		found[0].UpdatedAt = dev.EndDevice.GetUpdatedAt()
-		a.So(pretty.Diff(found[0].EndDevice, pb), should.BeEmpty)
-	}
+	a.So(i, should.Equal, 1)
 
 	updated := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	for dev.EndDevice.EndDeviceIdentifiers.Equal(updated.EndDeviceIdentifiers) {
 		updated = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	}
-	updated.CreatedAt = dev.EndDevice.GetCreatedAt()
-	updated.UpdatedAt = dev.EndDevice.GetUpdatedAt()
 	dev.EndDevice = updated
 
 	if !a.So(dev.Store(), should.BeNil) {
 		return
 	}
 
-	found, err = r.FindBy(pb, "EndDeviceIdentifiers")
+	i = 0
+	err = r.FindBy(pb, 1, func(*Device) bool { i++; return true }, "EndDeviceIdentifiers")
 	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) {
-		a.So(found, should.BeEmpty)
-	}
+	a.So(i, should.Equal, 0)
 
 	pb = updated
 
-	found, err = r.FindBy(pb, "EndDeviceIdentifiers")
-	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		found[0].CreatedAt = pb.GetCreatedAt()
-		found[0].UpdatedAt = pb.GetUpdatedAt()
-		a.So(pretty.Diff(found[0].EndDevice, pb), should.BeEmpty)
+	i = 0
+	err = r.FindBy(pb, 1, func(found *Device) bool {
+		i++
+		pb.UpdatedAt = found.EndDevice.GetUpdatedAt()
+		a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
+		return true
+	}, "EndDeviceIdentifiers")
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
 	}
+	a.So(i, should.Equal, 1)
 
 	a.So(dev.Delete(), should.BeNil)
 
-	found, err = r.FindBy(pb, "EndDeviceIdentifiers")
+	i = 0
+	err = r.FindBy(pb, 1, func(*Device) bool { i++; return true }, "EndDeviceIdentifiers")
 	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) {
-		a.So(found, should.BeEmpty)
-	}
+	a.So(i, should.Equal, 0)
 }
 
 func TestFindDeviceByIdentifiers(t *testing.T) {
@@ -126,47 +127,48 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 		a.So(dev.EndDevice, should.Resemble, pb)
 	}
 
-	found, err := FindDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers)
+	i := 0
+	err = FindDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers, 1, func(found *Device) bool {
+		i++
+		a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
+		return true
+	})
 	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		a.So(pretty.Diff(found[0].EndDevice, pb), should.BeEmpty)
-	}
+	a.So(i, should.Equal, 1)
 
 	updated := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	for dev.EndDevice.EndDeviceIdentifiers.Equal(updated.EndDeviceIdentifiers) {
 		updated = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	}
-	updated.CreatedAt = pb.GetCreatedAt()
-	updated.UpdatedAt = pb.GetUpdatedAt()
 	dev.EndDevice = updated
 
 	if !a.So(dev.Store(), should.BeNil) {
 		return
 	}
 
-	found, err = FindDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers)
+	i = 0
+	err = FindDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers, 1, func(*Device) bool { i++; return true })
 	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) {
-		a.So(found, should.BeEmpty)
-	}
+	a.So(i, should.Equal, 0)
 
 	pb = updated
 
-	found, err = FindDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers)
+	i = 0
+	err = FindDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers, 1, func(found *Device) bool {
+		i++
+		pb.UpdatedAt = found.EndDevice.GetUpdatedAt()
+		a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
+		return true
+	})
 	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) && a.So(found, should.HaveLength, 1) {
-		pb.CreatedAt = found[0].EndDevice.GetCreatedAt()
-		pb.UpdatedAt = found[0].EndDevice.GetUpdatedAt()
-		a.So(pretty.Diff(found[0].EndDevice, pb), should.BeEmpty)
-	}
+	a.So(i, should.Equal, 1)
 
 	a.So(dev.Delete(), should.BeNil)
 
-	found, err = FindDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers)
+	i = 0
+	err = FindDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers, 1, func(*Device) bool { i++; return true })
 	a.So(err, should.BeNil)
-	if a.So(found, should.NotBeNil) {
-		a.So(found, should.BeEmpty)
-	}
+	a.So(i, should.Equal, 0)
 }
 
 func TestFindOneDeviceByIdentifiers(t *testing.T) {

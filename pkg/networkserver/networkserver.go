@@ -673,37 +673,42 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, msg *ttnpb.UplinkMessa
 
 	logger := log.FromContext(ctx).WithField("dev_addr", pld.DevAddr)
 
-	devs, err := ns.registry.FindBy(
+	var devs []*deviceregistry.Device
+	if err := ns.registry.FindBy(
 		&ttnpb.EndDevice{
 			Session: &ttnpb.Session{
 				DevAddr: pld.DevAddr,
 			},
 		},
+		0,
+		func(d *deviceregistry.Device) bool {
+			devs = append(devs, d)
+			return true
+		},
 		"Session.DevAddr",
-	)
-	if err != nil {
+	); err != nil {
 		logger.WithError(err).Warn("Failed to search for device in registry by active DevAddr")
 		return nil, err
 	}
 
-	fb, err := ns.registry.FindBy(
+	if err := ns.registry.FindBy(
 		&ttnpb.EndDevice{
 			SessionFallback: &ttnpb.Session{
 				DevAddr: pld.DevAddr,
 			},
 		},
+		0,
+		func(d *deviceregistry.Device) bool {
+			d.EndDevice.Session = d.EndDevice.SessionFallback
+			d.EndDevice.EndDeviceIdentifiers.DevAddr = &d.EndDevice.Session.DevAddr
+			devs = append(devs, d)
+			return true
+		},
 		"SessionFallback.DevAddr",
-	)
-	if err != nil {
+	); err != nil {
 		logger.WithError(err).Warn("Failed to search for device in registry by fallback DevAddr")
 		return nil, err
 	}
-
-	for _, dev := range fb {
-		dev.EndDevice.Session = dev.EndDevice.SessionFallback
-		dev.EndDevice.EndDeviceIdentifiers.DevAddr = &dev.EndDevice.Session.DevAddr
-	}
-	devs = append(devs, fb...)
 
 	type device struct {
 		*deviceregistry.Device
@@ -794,6 +799,7 @@ outer:
 		}
 
 		var computedMIC [4]byte
+		var err error
 		switch dev.LoRaWANVersion {
 		case ttnpb.MAC_V1_1:
 			ke := ses.GetSNwkSIntKey()

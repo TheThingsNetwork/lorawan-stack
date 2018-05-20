@@ -97,18 +97,11 @@ func (r *RegistryRPC) GetApplication(ctx context.Context, id *ttnpb.ApplicationI
 		}
 	}
 
-	apps, err := FindApplicationByIdentifiers(r.Interface, id)
+	app, err := FindOneApplicationByIdentifiers(r.Interface, id)
 	if err != nil {
 		return nil, err
 	}
-	switch len(apps) {
-	case 0:
-		return nil, ErrApplicationNotFound.New(nil)
-	case 1:
-		return apps[0].Application, nil
-	default:
-		return nil, ErrTooManyApplications.New(nil)
-	}
+	return app.Application, nil
 }
 
 // SetApplication sets the application fields to match those of app in underlying registry.
@@ -130,24 +123,18 @@ func (r *RegistryRPC) SetApplication(ctx context.Context, req *ttnpb.SetApplicat
 		}
 	}
 
-	apps, err := FindApplicationByIdentifiers(r.Interface, &req.Application.ApplicationIdentifiers)
-	if err != nil {
+	app, err := FindOneApplicationByIdentifiers(r.Interface, &req.Application.ApplicationIdentifiers)
+	notFound := errors.Descriptor(err) == ErrApplicationNotFound
+	if err != nil && !notFound {
 		return nil, err
 	}
-	switch len(apps) {
-	case 0:
+
+	if notFound {
 		_, err := r.Interface.Create(&req.Application, fields...)
-		if err != nil {
-			return nil, err
-		}
-		return ttnpb.Empty, nil
-	case 1:
-		app := apps[0]
-		app.Application = &req.Application
-		return ttnpb.Empty, app.Store(fields...)
-	default:
-		return nil, ErrTooManyApplications.New(nil)
+		return ttnpb.Empty, err
 	}
+	app.Application = &req.Application
+	return ttnpb.Empty, app.Store(fields...)
 }
 
 // DeleteApplication deletes the application associated with id from underlying registry.
@@ -165,16 +152,9 @@ func (r *RegistryRPC) DeleteApplication(ctx context.Context, id *ttnpb.Applicati
 		}
 	}
 
-	apps, err := FindApplicationByIdentifiers(r.Interface, id)
+	app, err := FindOneApplicationByIdentifiers(r.Interface, id)
 	if err != nil {
 		return nil, err
 	}
-	switch len(apps) {
-	case 0:
-		return nil, ErrApplicationNotFound.New(nil)
-	case 1:
-		return ttnpb.Empty, apps[0].Delete()
-	default:
-		return nil, ErrTooManyApplications.New(nil)
-	}
+	return ttnpb.Empty, app.Delete()
 }

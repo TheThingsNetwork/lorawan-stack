@@ -28,6 +28,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+const defaultListCount = 100
+
 // RegistryRPC implements the device registry gRPC service.
 type RegistryRPC struct {
 	Interface
@@ -120,14 +122,12 @@ func (r *RegistryRPC) ListDevices(ctx context.Context, filter *ttnpb.EndDeviceId
 		}
 	}
 
-	devs, err := FindDeviceByIdentifiers(r.Interface, filter)
-	if err != nil {
+	eds := make([]*ttnpb.EndDevice, 0, defaultListCount)
+	if err := FindDeviceByIdentifiers(r.Interface, filter, defaultListCount, func(dev *Device) bool {
+		eds = append(eds, dev.EndDevice)
+		return true
+	}); err != nil {
 		return nil, err
-	}
-
-	eds := make([]*ttnpb.EndDevice, len(devs))
-	for i, dev := range devs {
-		eds[i] = dev.EndDevice
 	}
 	return &ttnpb.EndDevices{EndDevices: eds}, nil
 }
@@ -147,18 +147,11 @@ func (r *RegistryRPC) GetDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifi
 		}
 	}
 
-	devs, err := FindDeviceByIdentifiers(r.Interface, id)
+	dev, err := FindOneDeviceByIdentifiers(r.Interface, id)
 	if err != nil {
 		return nil, err
 	}
-	switch len(devs) {
-	case 0:
-		return nil, ErrDeviceNotFound.New(nil)
-	case 1:
-		return devs[0].EndDevice, nil
-	default:
-		return nil, ErrTooManyDevices.New(nil)
-	}
+	return dev.EndDevice, nil
 }
 
 // SetDevice sets the device fields to match those of dev in underlying registry.
@@ -180,24 +173,18 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 		}
 	}
 
-	devs, err := FindDeviceByIdentifiers(r.Interface, &req.Device.EndDeviceIdentifiers)
-	if err != nil {
+	dev, err := FindOneDeviceByIdentifiers(r.Interface, &req.Device.EndDeviceIdentifiers)
+	notFound := errors.Descriptor(err) == ErrDeviceNotFound
+	if err != nil && !notFound {
 		return nil, err
 	}
-	switch len(devs) {
-	case 0:
+
+	if notFound {
 		_, err := r.Interface.Create(&req.Device, fields...)
-		if err != nil {
-			return nil, err
-		}
-		return ttnpb.Empty, nil
-	case 1:
-		dev := devs[0]
-		dev.EndDevice = &req.Device
-		return ttnpb.Empty, dev.Store(fields...)
-	default:
-		return nil, ErrTooManyDevices.New(nil)
+		return ttnpb.Empty, err
 	}
+	dev.EndDevice = &req.Device
+	return ttnpb.Empty, dev.Store(fields...)
 }
 
 // DeleteDevice deletes the device associated with id from underlying registry.
@@ -215,16 +202,9 @@ func (r *RegistryRPC) DeleteDevice(ctx context.Context, id *ttnpb.EndDeviceIdent
 		}
 	}
 
-	devs, err := FindDeviceByIdentifiers(r.Interface, id)
+	dev, err := FindOneDeviceByIdentifiers(r.Interface, id)
 	if err != nil {
 		return nil, err
 	}
-	switch len(devs) {
-	case 0:
-		return nil, ErrDeviceNotFound.New(nil)
-	case 1:
-		return ttnpb.Empty, devs[0].Delete()
-	default:
-		return nil, ErrTooManyDevices.New(nil)
-	}
+	return ttnpb.Empty, dev.Delete()
 }
