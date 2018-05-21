@@ -110,7 +110,7 @@ func TestFindApplicationByIdentifiers(t *testing.T) {
 	}
 
 	i := 0
-	err = FindApplicationByIdentifiers(r, &pb.ApplicationIdentifiers, 1, func(found *Application) bool {
+	err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, 1, func(found *Application) bool {
 		i++
 		a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
 		return true
@@ -131,14 +131,14 @@ func TestFindApplicationByIdentifiers(t *testing.T) {
 	}
 
 	i = 0
-	err = FindApplicationByIdentifiers(r, &pb.ApplicationIdentifiers, 1, func(*Application) bool { i++; return true })
+	err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, 1, func(*Application) bool { i++; return true })
 	a.So(err, should.BeNil)
 	a.So(i, should.Equal, 0)
 
 	pb = updated
 
 	i = 0
-	err = FindApplicationByIdentifiers(r, &pb.ApplicationIdentifiers, 1, func(found *Application) bool {
+	err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, 1, func(found *Application) bool {
 		i++
 		pb.UpdatedAt = found.Application.GetUpdatedAt()
 		a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
@@ -152,7 +152,7 @@ func TestFindApplicationByIdentifiers(t *testing.T) {
 	a.So(app.Delete(), should.BeNil)
 
 	i = 0
-	err = FindApplicationByIdentifiers(r, &pb.ApplicationIdentifiers, 1, func(*Application) bool { i++; return true })
+	err = RangeByIdentifiers(r, &pb.ApplicationIdentifiers, 1, func(*Application) bool { i++; return true })
 	a.So(err, should.BeNil)
 	a.So(i, should.Equal, 0)
 }
@@ -163,7 +163,7 @@ func TestFindOneApplicationByIdentifiers(t *testing.T) {
 
 	pb := ttnpb.NewPopulatedApplication(test.Randy, false)
 
-	found, err := FindOneApplicationByIdentifiers(r, &pb.ApplicationIdentifiers)
+	found, err := FindByIdentifiers(r, &pb.ApplicationIdentifiers)
 	a.So(err, should.NotBeNil)
 	a.So(found, should.BeNil)
 
@@ -177,7 +177,7 @@ func TestFindOneApplicationByIdentifiers(t *testing.T) {
 		a.So(app.Application, should.Resemble, pb)
 	}
 
-	found, err = FindOneApplicationByIdentifiers(r, &pb.ApplicationIdentifiers)
+	found, err = FindByIdentifiers(r, &pb.ApplicationIdentifiers)
 	if !a.So(err, should.BeNil) {
 		return
 	}
@@ -193,7 +193,7 @@ func TestFindOneApplicationByIdentifiers(t *testing.T) {
 		a.So(app.Application, should.Resemble, pb)
 	}
 
-	found, err = FindOneApplicationByIdentifiers(r, &pb.ApplicationIdentifiers)
+	found, err = FindByIdentifiers(r, &pb.ApplicationIdentifiers)
 	a.So(err, should.NotBeNil)
 	a.So(found, should.BeNil)
 }
@@ -221,7 +221,7 @@ func ExampleRegistry() {
 		panic(fmt.Errorf("Failed to update application %s", err))
 	}
 
-	app, err = FindOneApplicationByIdentifiers(r, &ttnpb.ApplicationIdentifiers{ApplicationID: "test"})
+	app, err = FindByIdentifiers(r, &ttnpb.ApplicationIdentifiers{ApplicationID: "test"})
 	if err != nil {
 		panic(fmt.Errorf("Failed to find application by identifiers %s", err))
 	}

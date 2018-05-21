@@ -123,7 +123,7 @@ func (r *RegistryRPC) ListDevices(ctx context.Context, filter *ttnpb.EndDeviceId
 	}
 
 	eds := make([]*ttnpb.EndDevice, 0, defaultListCount)
-	if err := FindDeviceByIdentifiers(r.Interface, filter, defaultListCount, func(dev *Device) bool {
+	if err := RangeByIdentifiers(r.Interface, filter, defaultListCount, func(dev *Device) bool {
 		eds = append(eds, dev.EndDevice)
 		return true
 	}); err != nil {
@@ -147,7 +147,7 @@ func (r *RegistryRPC) GetDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifi
 		}
 	}
 
-	dev, err := FindOneDeviceByIdentifiers(r.Interface, id)
+	dev, err := FindByIdentifiers(r.Interface, id)
 	if err != nil {
 		return nil, err
 	}
@@ -173,7 +173,7 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 		}
 	}
 
-	dev, err := FindOneDeviceByIdentifiers(r.Interface, &req.Device.EndDeviceIdentifiers)
+	dev, err := FindByIdentifiers(r.Interface, &req.Device.EndDeviceIdentifiers)
 	notFound := errors.Descriptor(err) == ErrDeviceNotFound
 	if err != nil && !notFound {
 		return nil, err
@@ -202,7 +202,7 @@ func (r *RegistryRPC) DeleteDevice(ctx context.Context, id *ttnpb.EndDeviceIdent
 		}
 	}
 
-	dev, err := FindOneDeviceByIdentifiers(r.Interface, id)
+	dev, err := FindByIdentifiers(r.Interface, id)
 	if err != nil {
 		return nil, err
 	}

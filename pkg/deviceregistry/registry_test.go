@@ -128,7 +128,7 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 	}
 
 	i := 0
-	err = FindDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers, 1, func(found *Device) bool {
+	err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, 1, func(found *Device) bool {
 		i++
 		a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
 		return true
@@ -147,14 +147,14 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 	}
 
 	i = 0
-	err = FindDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers, 1, func(*Device) bool { i++; return true })
+	err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, 1, func(*Device) bool { i++; return true })
 	a.So(err, should.BeNil)
 	a.So(i, should.Equal, 0)
 
 	pb = updated
 
 	i = 0
-	err = FindDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers, 1, func(found *Device) bool {
+	err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, 1, func(found *Device) bool {
 		i++
 		pb.UpdatedAt = found.EndDevice.GetUpdatedAt()
 		a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
@@ -166,7 +166,7 @@ func TestFindDeviceByIdentifiers(t *testing.T) {
 	a.So(dev.Delete(), should.BeNil)
 
 	i = 0
-	err = FindDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers, 1, func(*Device) bool { i++; return true })
+	err = RangeByIdentifiers(r, &pb.EndDeviceIdentifiers, 1, func(*Device) bool { i++; return true })
 	a.So(err, should.BeNil)
 	a.So(i, should.Equal, 0)
 }
@@ -177,7 +177,7 @@ func TestFindOneDeviceByIdentifiers(t *testing.T) {
 
 	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	found, err := FindOneDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers)
+	found, err := FindByIdentifiers(r, &pb.EndDeviceIdentifiers)
 	a.So(err, should.NotBeNil)
 	a.So(found, should.BeNil)
 
@@ -191,7 +191,7 @@ func TestFindOneDeviceByIdentifiers(t *testing.T) {
 		a.So(dev.EndDevice, should.Resemble, pb)
 	}
 
-	found, err = FindOneDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers)
+	found, err = FindByIdentifiers(r, &pb.EndDeviceIdentifiers)
 	if !a.So(err, should.BeNil) {
 		return
 	}
@@ -207,7 +207,7 @@ func TestFindOneDeviceByIdentifiers(t *testing.T) {
 		a.So(dev.EndDevice, should.Resemble, pb)
 	}
 
-	found, err = FindOneDeviceByIdentifiers(r, &pb.EndDeviceIdentifiers)
+	found, err = FindByIdentifiers(r, &pb.EndDeviceIdentifiers)
 	a.So(err, should.NotBeNil)
 	a.So(found, should.BeNil)
 }
@@ -247,7 +247,7 @@ func ExampleRegistry() {
 		panic(fmt.Errorf("Failed to update device %s", err))
 	}
 
-	dev, err = FindOneDeviceByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
+	dev, err = FindByIdentifiers(r, &ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test"},
 	})
 	if err != nil {

@@ -161,7 +161,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		}
 	}
 
-	dev, err := deviceregistry.FindOneDeviceByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
+	dev, err := deviceregistry.FindByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
 		DevEUI:  &pld.DevEUI,
 		JoinEUI: &pld.JoinEUI,
 	})
@@ -368,7 +368,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		return nil, ErrMissingSessionKeyID.New(nil)
 	}
 
-	dev, err := deviceregistry.FindOneDeviceByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
+	dev, err := deviceregistry.FindByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
 		DevEUI: &req.DevEUI,
 	})
 	if err != nil {
@@ -411,7 +411,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 		return nil, ErrMissingSessionKeyID.New(nil)
 	}
 
-	dev, err := deviceregistry.FindOneDeviceByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
+	dev, err := deviceregistry.FindByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
 		DevEUI: &req.DevEUI,
 	})
 	if err != nil {

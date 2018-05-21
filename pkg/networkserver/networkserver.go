@@ -268,7 +268,7 @@ func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, strea
 // DownlinkQueueReplace is called by the Application Server to completely replace the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
 	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
-	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, &req.EndDeviceIdentifiers)
+	dev, err := deviceregistry.FindByIdentifiers(ns.registry, &req.EndDeviceIdentifiers)
 	if err != nil {
 		return nil, err
 	}
@@ -287,7 +287,7 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 // DownlinkQueuePush is called by the Application Server to push a downlink to queue for a device.
 func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
 	// TODO: Authentication https://github.com/TheThingsIndustries/ttn/issues/558
-	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, &req.EndDeviceIdentifiers)
+	dev, err := deviceregistry.FindByIdentifiers(ns.registry, &req.EndDeviceIdentifiers)
 	if err != nil {
 		return nil, err
 	}
@@ -306,7 +306,7 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 // DownlinkQueueList is called by the Application Server to get the current state of the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
 	// TODO: Authentication https://github.com/TheThingsIndustries/ttn/issues/558
-	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, devID)
+	dev, err := deviceregistry.FindByIdentifiers(ns.registry, devID)
 	if err != nil {
 		return nil, err
 	}
@@ -316,7 +316,7 @@ func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, devID *ttnpb.End
 // DownlinkQueueClear is called by the Application Server to clear the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueClear(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
 	// TODO: Authentication https://github.com/TheThingsIndustries/ttn/issues/558
-	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, devID)
+	dev, err := deviceregistry.FindByIdentifiers(ns.registry, devID)
 	if err != nil {
 		return nil, err
 	}
@@ -914,7 +914,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		"join_eui", pld.JoinEUI,
 	))
 
-	dev, err := deviceregistry.FindOneDeviceByIdentifiers(ns.registry, &ttnpb.EndDeviceIdentifiers{
+	dev, err := deviceregistry.FindByIdentifiers(ns.registry, &ttnpb.EndDeviceIdentifiers{
 		DevEUI:  &pld.DevEUI,
 		JoinEUI: &pld.JoinEUI,
 	})

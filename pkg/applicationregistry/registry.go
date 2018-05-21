@@ -61,8 +61,7 @@ func (r *Registry) Create(a *ttnpb.Application, fields ...string) (*Application,
 	return newApplication(a, r.store, id), nil
 }
 
-// Range searches for applications matching specified application fields in underlying store.Interface.
-// The returned slice contains unique applications, matching at least one of values in a.
+// Range ranges over applications matching specifided application in underlying store.Interface.
 func (r *Registry) Range(a *ttnpb.Application, count uint64, f func(*Application) bool, fields ...string) error {
 	if a == nil {
 		return errors.New("Application specified is nil")
@@ -78,8 +77,8 @@ func (r *Registry) Range(a *ttnpb.Application, count uint64, f func(*Application
 	)
 }
 
-// FindApplicationByIdentifiers searches for applications matching specified application identifiers in r.
-func FindApplicationByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers, count uint64, f func(*Application) bool) error {
+// RangeByIdentifiers ranges over applications matching specified application identifiers in r.
+func RangeByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers, count uint64, f func(*Application) bool) error {
 	if id == nil {
 		return errors.New("Identifiers specified are nil")
 	}
@@ -92,11 +91,11 @@ func FindApplicationByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers,
 	return r.Range(&ttnpb.Application{ApplicationIdentifiers: *id}, count, f, fields...)
 }
 
-// FindOneApplicationByIdentifiers searches for exactly one application matching specified application identifiers in r.
-func FindOneApplicationByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers) (*Application, error) {
+// FindByIdentifiers searches for exactly one application matching specified application identifiers in r.
+func FindByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers) (*Application, error) {
 	var app *Application
 	var i uint64
-	err := FindApplicationByIdentifiers(r, id, 1, func(a *Application) bool {
+	err := RangeByIdentifiers(r, id, 1, func(a *Application) bool {
 		i++
 		if i > 1 {
 			return false

@@ -61,8 +61,7 @@ func (r *Registry) Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error
 	return newDevice(ed, r.store, id), nil
 }
 
-// Range searches for devices matching specified device fields in underlying store.Interface.
-// The returned slice contains unique devices, matching at least one of values in ed.
+// Range ranges over devices matching specified device in underlying store.Interface.
 func (r *Registry) Range(ed *ttnpb.EndDevice, count uint64, f func(*Device) bool, fields ...string) error {
 	if ed == nil {
 		return errors.New("Device specified is nil")
@@ -78,8 +77,8 @@ func (r *Registry) Range(ed *ttnpb.EndDevice, count uint64, f func(*Device) bool
 	)
 }
 
-// FindDeviceByIdentifiers searches for devices matching specified device identifiers in r.
-func FindDeviceByIdentifiers(r Interface, id *ttnpb.EndDeviceIdentifiers, count uint64, f func(*Device) bool) error {
+// RangeByIdentifiers ranges over devices matching specified device identifiers in r.
+func RangeByIdentifiers(r Interface, id *ttnpb.EndDeviceIdentifiers, count uint64, f func(*Device) bool) error {
 	if id == nil {
 		return errors.New("Identifiers specified are nil")
 	}
@@ -100,11 +99,11 @@ func FindDeviceByIdentifiers(r Interface, id *ttnpb.EndDeviceIdentifiers, count 
 	return r.Range(&ttnpb.EndDevice{EndDeviceIdentifiers: *id}, count, f, fields...)
 }
 
-// FindOneDeviceByIdentifiers searches for exactly one device matching specified device identifiers in r.
-func FindOneDeviceByIdentifiers(r Interface, id *ttnpb.EndDeviceIdentifiers) (*Device, error) {
+// FindByIdentifiers searches for exactly one device matching specified device identifiers in r.
+func FindByIdentifiers(r Interface, id *ttnpb.EndDeviceIdentifiers) (*Device, error) {
 	var dev *Device
 	var i uint64
-	err := FindDeviceByIdentifiers(r, id, 1, func(d *Device) bool {
+	err := RangeByIdentifiers(r, id, 1, func(d *Device) bool {
 		i++
 		if i > 1 {
 			return false

@@ -120,7 +120,7 @@ func TestSetDeviceNoCheck(t *testing.T) {
 	old.Location.Latitude = pb.GetLocation().GetLatitude()
 	pb = old
 
-	got, err := FindOneDeviceByIdentifiers(dr.Interface, &pb.EndDeviceIdentifiers)
+	got, err := FindByIdentifiers(dr.Interface, &pb.EndDeviceIdentifiers)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}

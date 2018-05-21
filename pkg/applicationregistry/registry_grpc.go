@@ -97,7 +97,7 @@ func (r *RegistryRPC) GetApplication(ctx context.Context, id *ttnpb.ApplicationI
 		}
 	}
 
-	app, err := FindOneApplicationByIdentifiers(r.Interface, id)
+	app, err := FindByIdentifiers(r.Interface, id)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ func (r *RegistryRPC) SetApplication(ctx context.Context, req *ttnpb.SetApplicat
 		}
 	}
 
-	app, err := FindOneApplicationByIdentifiers(r.Interface, &req.Application.ApplicationIdentifiers)
+	app, err := FindByIdentifiers(r.Interface, &req.Application.ApplicationIdentifiers)
 	notFound := errors.Descriptor(err) == ErrApplicationNotFound
 	if err != nil && !notFound {
 		return nil, err
@@ -152,7 +152,7 @@ func (r *RegistryRPC) DeleteApplication(ctx context.Context, id *ttnpb.Applicati
 		}
 	}
 
-	app, err := FindOneApplicationByIdentifiers(r.Interface, id)
+	app, err := FindByIdentifiers(r.Interface, id)
 	if err != nil {
 		return nil, err
 	}
