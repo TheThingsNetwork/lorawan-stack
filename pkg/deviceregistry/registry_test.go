@@ -48,7 +48,7 @@ func TestRegistry(t *testing.T) {
 	}
 
 	i := 0
-	err = r.FindBy(pb, 1, func(found *Device) bool {
+	err = r.Range(pb, 1, func(found *Device) bool {
 		i++
 		a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
 		return true
@@ -69,14 +69,14 @@ func TestRegistry(t *testing.T) {
 	}
 
 	i = 0
-	err = r.FindBy(pb, 1, func(*Device) bool { i++; return true }, "EndDeviceIdentifiers")
+	err = r.Range(pb, 1, func(*Device) bool { i++; return true }, "EndDeviceIdentifiers")
 	a.So(err, should.BeNil)
 	a.So(i, should.Equal, 0)
 
 	pb = updated
 
 	i = 0
-	err = r.FindBy(pb, 1, func(found *Device) bool {
+	err = r.Range(pb, 1, func(found *Device) bool {
 		i++
 		pb.UpdatedAt = found.EndDevice.GetUpdatedAt()
 		a.So(pretty.Diff(found.EndDevice, pb), should.BeEmpty)
@@ -90,7 +90,7 @@ func TestRegistry(t *testing.T) {
 	a.So(dev.Delete(), should.BeNil)
 
 	i = 0
-	err = r.FindBy(pb, 1, func(*Device) bool { i++; return true }, "EndDeviceIdentifiers")
+	err = r.Range(pb, 1, func(*Device) bool { i++; return true }, "EndDeviceIdentifiers")
 	a.So(err, should.BeNil)
 	a.So(i, should.Equal, 0)
 }

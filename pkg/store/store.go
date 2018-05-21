@@ -69,13 +69,13 @@ type Trimmer interface {
 //
 // Create creates a new PrimaryKey, stores fields under that key and returns it.
 // Find returns the fields stored under PrimaryKey specified. It returns a nil map, if key is not found.
-// FindBy returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
+// Range returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
 // meaning that only entries matching all the fields in filter should be returned. It returns a nil map, if no value matching filter is found.
 // Update overwrites field values stored under PrimaryKey specified with values in diff.
 type TypedMapStore interface {
 	Create(fields map[string]interface{}) (PrimaryKey, error)
 	Find(id PrimaryKey) (map[string]interface{}, error)
-	FindBy(filter map[string]interface{}, count uint64, f func(PrimaryKey, map[string]interface{}) bool) error
+	Range(filter map[string]interface{}, count uint64, f func(PrimaryKey, map[string]interface{}) bool) error
 	Update(id PrimaryKey, diff map[string]interface{}) error
 	Deleter
 }
@@ -84,14 +84,13 @@ type TypedMapStore interface {
 //
 // Create creates a new PrimaryKey, stores fields under that key and returns it.
 // Find returns the fields stored under PrimaryKey specified. It returns a nil map, if key is not found.
-// FindBy returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
+// Range returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
 // meaning that only entries matching all the fields in filter should be returned. It returns a nil map, if key is not found.
 // Update overwrites field values stored under PrimaryKey specified with values in diff.
-// Delete deletes the fields stored under PrimaryKey specified.
 type ByteMapStore interface {
 	Create(fields map[string][]byte) (PrimaryKey, error)
 	Find(id PrimaryKey) (map[string][]byte, error)
-	FindBy(filter map[string][]byte, count uint64, f func(PrimaryKey, map[string][]byte) bool) error
+	Range(filter map[string][]byte, count uint64, f func(PrimaryKey, map[string][]byte) bool) error
 	Update(id PrimaryKey, diff map[string][]byte) error
 	Deleter
 }

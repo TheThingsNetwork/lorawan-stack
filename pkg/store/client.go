@@ -27,7 +27,7 @@ type NewResultFunc func() interface{}
 //
 // Find searches for the value associated with PrimaryKey specified and stores it in v. v must be a pointer type.
 //
-// FindBy returns mapping of PrimaryKey -> value, which match field values specified in filter.
+// Range returns mapping of PrimaryKey -> value, which match field values specified in filter.
 // Filter represents an AND relation, meaning that only entries matching all the fields in filter should be returned.
 // newResultFunc is the constructor of a single value expected to be returned.
 // Optional fields parameter is a list of fieldpaths separated by '.',
@@ -44,7 +44,7 @@ type NewResultFunc func() interface{}
 type Client interface {
 	Create(v interface{}, fields ...string) (PrimaryKey, error)
 	Find(id PrimaryKey, v interface{}) error
-	FindBy(filter interface{}, newResult NewResultFunc, count uint64, f func(PrimaryKey, interface{}) bool, fields ...string) error
+	Range(filter interface{}, newResult NewResultFunc, count uint64, f func(PrimaryKey, interface{}) bool, fields ...string) error
 	Update(id PrimaryKey, v interface{}, fields ...string) error
 	Delete(id PrimaryKey) error
 }
@@ -94,14 +94,14 @@ func (cl *typedMapStoreClient) Find(id PrimaryKey, v interface{}) error {
 	return UnmarshalMap(m, v)
 }
 
-func (cl *typedMapStoreClient) FindBy(filter interface{}, newResult NewResultFunc, n uint64, f func(PrimaryKey, interface{}) bool, fields ...string) error {
+func (cl *typedMapStoreClient) Range(filter interface{}, newResult NewResultFunc, n uint64, f func(PrimaryKey, interface{}) bool, fields ...string) error {
 	fm, err := MarshalMap(filter)
 	if err != nil {
 		return err
 	}
 
 	var ierr error
-	err = cl.TypedMapStore.FindBy(filterFields(fm, fields...), n, func(k PrimaryKey, v map[string]interface{}) bool {
+	err = cl.TypedMapStore.Range(filterFields(fm, fields...), n, func(k PrimaryKey, v map[string]interface{}) bool {
 		iface := newResult()
 		if ierr = UnmarshalMap(v, iface); ierr != nil {
 			return false
@@ -193,14 +193,14 @@ func (cl *byteMapStoreClient) Find(id PrimaryKey, v interface{}) error {
 	return UnmarshalByteMap(m, v)
 }
 
-func (cl *byteMapStoreClient) FindBy(filter interface{}, newResult NewResultFunc, n uint64, f func(PrimaryKey, interface{}) bool, fields ...string) error {
+func (cl *byteMapStoreClient) Range(filter interface{}, newResult NewResultFunc, n uint64, f func(PrimaryKey, interface{}) bool, fields ...string) error {
 	fm, err := MarshalByteMap(filter)
 	if err != nil {
 		return err
 	}
 
 	var ierr error
-	err = cl.ByteMapStore.FindBy(filterByteFields(fm, fields...), n, func(k PrimaryKey, v map[string][]byte) bool {
+	err = cl.ByteMapStore.Range(filterByteFields(fm, fields...), n, func(k PrimaryKey, v map[string][]byte) bool {
 		iface := newResult()
 		if ierr = UnmarshalByteMap(v, iface); ierr != nil {
 			return false

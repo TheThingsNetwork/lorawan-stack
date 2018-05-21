@@ -185,7 +185,7 @@ func TestTypedClient(t *testing.T) {
 			}
 
 			i := 0
-			err = cl.FindBy(v, newResult, 1, func(k PrimaryKey, v interface{}) bool {
+			err = cl.Range(v, newResult, 1, func(k PrimaryKey, v interface{}) bool {
 				i++
 				a.So(k, should.Resemble, key)
 				a.So(pretty.Diff(v, tc.Stored), should.BeEmpty)
@@ -206,7 +206,7 @@ func TestTypedClient(t *testing.T) {
 			}
 
 			i = 0
-			err = cl.FindBy(v, newResult, 1, func(k PrimaryKey, v interface{}) bool {
+			err = cl.Range(v, newResult, 1, func(k PrimaryKey, v interface{}) bool {
 				i++
 				a.So(k, should.Resemble, key)
 				a.So(pretty.Diff(v, tc.AfterUpdate), should.BeEmpty)
@@ -223,7 +223,7 @@ func TestTypedClient(t *testing.T) {
 			a.So(err, should.BeNil)
 
 			i = 0
-			err = cl.FindBy(v, newResult, 1, func(k PrimaryKey, v interface{}) bool { i++; return true })
+			err = cl.Range(v, newResult, 1, func(k PrimaryKey, v interface{}) bool { i++; return true })
 			a.So(err, should.BeNil)
 			a.So(i, should.Equal, 0)
 		})

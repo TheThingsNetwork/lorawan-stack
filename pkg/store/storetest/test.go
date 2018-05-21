@@ -74,12 +74,12 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 	a.So(m, should.BeNil)
 
 	i := 0
-	err = s.FindBy(nil, 100, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
+	err = s.Range(nil, 100, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
 	a.So(err, should.NotBeNil)
 	a.So(i, should.Equal, 0)
 
 	i = 0
-	err = s.FindBy(make(map[string]interface{}), 100, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
+	err = s.Range(make(map[string]interface{}), 100, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
 	a.So(err, should.NotBeNil)
 	a.So(i, should.Equal, 0)
 
@@ -120,7 +120,7 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 		Stored      map[string]interface{}
 		Updated     map[string]interface{}
 		AfterUpdate map[string]interface{}
-		FindBy      map[string]interface{}
+		Filter      map[string]interface{}
 	}{
 		{
 			map[string]interface{}{
@@ -222,7 +222,7 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 			a.So(found, should.Resemble, tc.Stored)
 
 			i := 0
-			err = s.FindBy(tc.Stored, 10, func(k store.PrimaryKey, v map[string]interface{}) bool {
+			err = s.Range(tc.Stored, 10, func(k store.PrimaryKey, v map[string]interface{}) bool {
 				i++
 				a.So(k, should.Resemble, id)
 				a.So(v, should.Resemble, tc.Stored)
@@ -232,7 +232,7 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 			a.So(i, should.Equal, 1)
 
 			i = 0
-			err = s.FindBy(tc.FindBy, 1, func(k store.PrimaryKey, v map[string]interface{}) bool {
+			err = s.Range(tc.Filter, 1, func(k store.PrimaryKey, v map[string]interface{}) bool {
 				i++
 				a.So(k, should.Resemble, id)
 				a.So(v, should.Resemble, tc.Stored)
@@ -242,7 +242,7 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 			a.So(i, should.Equal, 1)
 
 			i = 0
-			err = s.FindBy(tc.FindBy, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
+			err = s.Range(tc.Filter, 0, func(k store.PrimaryKey, v map[string]interface{}) bool {
 				i++
 				a.So(k, should.Resemble, id)
 				a.So(v, should.Resemble, tc.Stored)
@@ -261,7 +261,7 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 			a.So(found, should.Resemble, tc.AfterUpdate)
 
 			i = 0
-			err = s.FindBy(tc.AfterUpdate, 1, func(k store.PrimaryKey, v map[string]interface{}) bool {
+			err = s.Range(tc.AfterUpdate, 1, func(k store.PrimaryKey, v map[string]interface{}) bool {
 				i++
 				a.So(k, should.Resemble, id)
 				a.So(v, should.Resemble, tc.AfterUpdate)
@@ -271,7 +271,7 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 			a.So(i, should.Equal, 1)
 
 			i = 0
-			err = s.FindBy(tc.FindBy, 1, func(k store.PrimaryKey, v map[string]interface{}) bool {
+			err = s.Range(tc.Filter, 1, func(k store.PrimaryKey, v map[string]interface{}) bool {
 				i++
 				a.So(k, should.Resemble, id)
 				a.So(v, should.Resemble, tc.AfterUpdate)
@@ -290,12 +290,12 @@ func TestTypedMapStore(t testingT, newStore func() store.TypedMapStore) {
 			a.So(found, should.Equal, nil)
 
 			i = 0
-			err = s.FindBy(tc.AfterUpdate, 1, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
+			err = s.Range(tc.AfterUpdate, 1, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
 			a.So(err, should.BeNil)
 			a.So(i, should.Equal, 0)
 
 			i = 0
-			err = s.FindBy(tc.FindBy, 1, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
+			err = s.Range(tc.Filter, 1, func(store.PrimaryKey, map[string]interface{}) bool { i++; return true })
 			a.So(err, should.BeNil)
 			a.So(i, should.Equal, 0)
 		})
@@ -578,9 +578,9 @@ func (gs GenericMapStore) Find(id store.PrimaryKey) (map[string]interface{}, err
 	return gs.toIfaceMap(ret[0].Interface()), nil
 }
 
-// FindBy is a generic FindBy.
-func (gs GenericMapStore) FindBy(filter map[string]interface{}, n uint64, f func(store.PrimaryKey, map[string]interface{}) bool) error {
-	return reflectValueToError(gs.store.MethodByName("FindBy").Call([]reflect.Value{
+// Range is a generic Range.
+func (gs GenericMapStore) Range(filter map[string]interface{}, n uint64, f func(store.PrimaryKey, map[string]interface{}) bool) error {
+	return reflectValueToError(gs.store.MethodByName("Range").Call([]reflect.Value{
 		reflect.ValueOf(gs.fromIfaceMap(filter)),
 		reflect.ValueOf(n),
 		reflect.MakeFunc(reflect.FuncOf(

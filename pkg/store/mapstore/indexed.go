@@ -136,7 +136,7 @@ func (s *IndexedStore) Update(id store.PrimaryKey, diff map[string]interface{}) 
 	return nil
 }
 
-func (s *IndexedStore) FindBy(filter map[string]interface{}, count uint64, f func(store.PrimaryKey, map[string]interface{}) bool) error {
+func (s *IndexedStore) Range(filter map[string]interface{}, count uint64, f func(store.PrimaryKey, map[string]interface{}) bool) error {
 	if len(filter) == 0 {
 		return store.ErrEmptyFilter.New(nil)
 	}
@@ -156,7 +156,7 @@ func (s *IndexedStore) FindBy(filter map[string]interface{}, count uint64, f fun
 
 	byFields := make(map[store.PrimaryKey]map[string]interface{})
 	if len(fields) > 0 {
-		if err := s.MapStore.FindBy(fields, count, func(k store.PrimaryKey, v map[string]interface{}) bool {
+		if err := s.MapStore.Range(fields, count, func(k store.PrimaryKey, v map[string]interface{}) bool {
 			byFields[k] = v
 			return true
 		}); err != nil {

@@ -67,7 +67,7 @@ func (s *MapStore) Find(id store.PrimaryKey) (map[string]interface{}, error) {
 	return deepcopy.Copy(fields).(map[string]interface{}), nil
 }
 
-func (s *MapStore) FindBy(filter map[string]interface{}, _ uint64, f func(store.PrimaryKey, map[string]interface{}) bool) error {
+func (s *MapStore) Range(filter map[string]interface{}, _ uint64, f func(store.PrimaryKey, map[string]interface{}) bool) error {
 	if len(filter) == 0 {
 		return store.ErrEmptyFilter.New(nil)
 	}

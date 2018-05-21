@@ -274,9 +274,9 @@ func (s *Store) Find(id store.PrimaryKey) (map[string][]byte, error) {
 	return m, nil
 }
 
-// FindBy returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
+// Range returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
 // meaning that only entries matching all the fields in filter should be returned.
-func (s *Store) FindBy(filter map[string][]byte, count uint64, f func(store.PrimaryKey, map[string][]byte) bool) error {
+func (s *Store) Range(filter map[string][]byte, count uint64, f func(store.PrimaryKey, map[string][]byte) bool) error {
 	if len(filter) == 0 {
 		return store.ErrEmptyFilter.New(nil)
 	}

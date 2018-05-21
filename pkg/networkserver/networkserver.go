@@ -674,7 +674,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, msg *ttnpb.UplinkMessa
 	logger := log.FromContext(ctx).WithField("dev_addr", pld.DevAddr)
 
 	var devs []*deviceregistry.Device
-	if err := ns.registry.FindBy(
+	if err := ns.registry.Range(
 		&ttnpb.EndDevice{
 			Session: &ttnpb.Session{
 				DevAddr: pld.DevAddr,
@@ -691,7 +691,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, msg *ttnpb.UplinkMessa
 		return nil, err
 	}
 
-	if err := ns.registry.FindBy(
+	if err := ns.registry.Range(
 		&ttnpb.EndDevice{
 			SessionFallback: &ttnpb.Session{
 				DevAddr: pld.DevAddr,

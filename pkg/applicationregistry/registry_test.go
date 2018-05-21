@@ -46,7 +46,7 @@ func TestRegistry(t *testing.T) {
 	}
 
 	i := 0
-	err = r.FindBy(pb, 1, func(found *Application) bool {
+	err = r.Range(pb, 1, func(found *Application) bool {
 		i++
 		a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
 		return true
@@ -67,14 +67,14 @@ func TestRegistry(t *testing.T) {
 	}
 
 	i = 0
-	err = r.FindBy(pb, 1, func(*Application) bool { i++; return true }, "ApplicationIdentifiers")
+	err = r.Range(pb, 1, func(*Application) bool { i++; return true }, "ApplicationIdentifiers")
 	a.So(err, should.BeNil)
 	a.So(i, should.Equal, 0)
 
 	pb = updated
 
 	i = 0
-	err = r.FindBy(pb, 1, func(found *Application) bool {
+	err = r.Range(pb, 1, func(found *Application) bool {
 		i++
 		pb.UpdatedAt = found.Application.GetUpdatedAt()
 		a.So(pretty.Diff(found.Application, pb), should.BeEmpty)
@@ -88,7 +88,7 @@ func TestRegistry(t *testing.T) {
 	a.So(app.Delete(), should.BeNil)
 
 	i = 0
-	err = r.FindBy(pb, 1, func(*Application) bool { i++; return true }, "ApplicationIdentifiers")
+	err = r.Range(pb, 1, func(*Application) bool { i++; return true }, "ApplicationIdentifiers")
 	a.So(err, should.BeNil)
 	a.So(i, should.Equal, 0)
 }

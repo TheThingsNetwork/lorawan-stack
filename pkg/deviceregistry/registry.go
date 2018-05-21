@@ -26,7 +26,7 @@ import (
 // Interface represents the interface exposed by the *Registry.
 type Interface interface {
 	Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error)
-	FindBy(ed *ttnpb.EndDevice, count uint64, f func(*Device) bool, fields ...string) error
+	Range(ed *ttnpb.EndDevice, count uint64, f func(*Device) bool, fields ...string) error
 }
 
 var _ Interface = &Registry{}
@@ -61,13 +61,13 @@ func (r *Registry) Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error
 	return newDevice(ed, r.store, id), nil
 }
 
-// FindBy searches for devices matching specified device fields in underlying store.Interface.
+// Range searches for devices matching specified device fields in underlying store.Interface.
 // The returned slice contains unique devices, matching at least one of values in ed.
-func (r *Registry) FindBy(ed *ttnpb.EndDevice, count uint64, f func(*Device) bool, fields ...string) error {
+func (r *Registry) Range(ed *ttnpb.EndDevice, count uint64, f func(*Device) bool, fields ...string) error {
 	if ed == nil {
 		return errors.New("Device specified is nil")
 	}
-	return r.store.FindBy(
+	return r.store.Range(
 		ed,
 		func() interface{} { return &ttnpb.EndDevice{} },
 		count,
@@ -97,7 +97,7 @@ func FindDeviceByIdentifiers(r Interface, id *ttnpb.EndDeviceIdentifiers, count 
 	case id.DevAddr != nil && !id.DevAddr.IsZero():
 		fields = append(fields, "EndDeviceIdentifiers.DevAddr")
 	}
-	return r.FindBy(&ttnpb.EndDevice{EndDeviceIdentifiers: *id}, count, f, fields...)
+	return r.Range(&ttnpb.EndDevice{EndDeviceIdentifiers: *id}, count, f, fields...)
 }
 
 // FindOneDeviceByIdentifiers searches for exactly one device matching specified device identifiers in r.

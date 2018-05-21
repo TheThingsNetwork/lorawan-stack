@@ -26,7 +26,7 @@ import (
 // Interface represents the interface exposed by the *Registry.
 type Interface interface {
 	Create(a *ttnpb.Application, fields ...string) (*Application, error)
-	FindBy(a *ttnpb.Application, count uint64, f func(*Application) bool, fields ...string) error
+	Range(a *ttnpb.Application, count uint64, f func(*Application) bool, fields ...string) error
 }
 
 var _ Interface = &Registry{}
@@ -61,13 +61,13 @@ func (r *Registry) Create(a *ttnpb.Application, fields ...string) (*Application,
 	return newApplication(a, r.store, id), nil
 }
 
-// FindBy searches for applications matching specified application fields in underlying store.Interface.
+// Range searches for applications matching specified application fields in underlying store.Interface.
 // The returned slice contains unique applications, matching at least one of values in a.
-func (r *Registry) FindBy(a *ttnpb.Application, count uint64, f func(*Application) bool, fields ...string) error {
+func (r *Registry) Range(a *ttnpb.Application, count uint64, f func(*Application) bool, fields ...string) error {
 	if a == nil {
 		return errors.New("Application specified is nil")
 	}
-	return r.store.FindBy(
+	return r.store.Range(
 		a,
 		func() interface{} { return &ttnpb.Application{} },
 		count,
@@ -89,7 +89,7 @@ func FindApplicationByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers,
 	case id.ApplicationID != "":
 		fields = append(fields, "ApplicationIdentifiers.ApplicationID")
 	}
-	return r.FindBy(&ttnpb.Application{ApplicationIdentifiers: *id}, count, f, fields...)
+	return r.Range(&ttnpb.Application{ApplicationIdentifiers: *id}, count, f, fields...)
 }
 
 // FindOneApplicationByIdentifiers searches for exactly one application matching specified application identifiers in r.
