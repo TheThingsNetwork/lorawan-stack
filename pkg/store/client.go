@@ -27,7 +27,17 @@ type NewResultFunc func() interface{}
 //
 // Find searches for the value associated with PrimaryKey specified and stores it in v. v must be a pointer type.
 //
-// Range returns mapping of PrimaryKey -> value, which match field values specified in filter.
+// Range calls f sequentially for each key and value present in the store.
+// If f returns false, range stops the iteration.
+//
+// Range does not necessarily correspond to any consistent snapshot of the underlying store's
+// contents: no key will be visited more than once, but if the value for any key
+// is stored or deleted concurrently, Range may reflect any mapping for that key
+// from any point during the Range call.
+
+// If batchSize argument is non-zero, Range will retrieve elements
+// from the underlying store in chunks of (approximately) batchSize elements.
+//
 // Filter represents an AND relation, meaning that only entries matching all the fields in filter should be returned.
 // newResultFunc is the constructor of a single value expected to be returned.
 // Optional fields parameter is a list of fieldpaths separated by '.',
@@ -44,7 +54,7 @@ type NewResultFunc func() interface{}
 type Client interface {
 	Create(v interface{}, fields ...string) (PrimaryKey, error)
 	Find(id PrimaryKey, v interface{}) error
-	Range(filter interface{}, newResult NewResultFunc, count uint64, f func(PrimaryKey, interface{}) bool, fields ...string) error
+	Range(filter interface{}, newResult NewResultFunc, batchSize uint64, f func(PrimaryKey, interface{}) bool, fields ...string) error
 	Update(id PrimaryKey, v interface{}, fields ...string) error
 	Delete(id PrimaryKey) error
 }

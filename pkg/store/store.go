@@ -65,41 +65,70 @@ type Trimmer interface {
 	Trim(id PrimaryKey, n int) error
 }
 
-// TypedMapStore represents a store, modeled after CRUD, which stores typed data.
+// TypedMapStore represents a store, which stores typed data.
 //
 // Create creates a new PrimaryKey, stores fields under that key and returns it.
-// Find returns the fields stored under PrimaryKey specified. It returns a nil map, if key is not found.
-// Range returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
-// meaning that only entries matching all the fields in filter should be returned. It returns a nil map, if no value matching filter is found.
+//
+// Find returns the fields stored under PrimaryKey specified.
+// It returns a nil map, if key is not found.
+//
+// Range calls f sequentially for each key and value present in the store.
+// If f returns false, range stops the iteration.
+//
+// Range does not necessarily correspond to any consistent snapshot of the TypedMapStore's
+// contents: no key will be visited more than once, but if the value for any key
+// is stored or deleted concurrently, Range may reflect any mapping for that key
+// from any point during the Range call.
+
+// If batchSize argument is non-zero, Range will retrieve elements
+// from the underlying store in chunks of (approximately) batchSize elements.
+//
 // Update overwrites field values stored under PrimaryKey specified with values in diff.
 type TypedMapStore interface {
 	Create(fields map[string]interface{}) (PrimaryKey, error)
 	Find(id PrimaryKey) (map[string]interface{}, error)
-	Range(filter map[string]interface{}, count uint64, f func(PrimaryKey, map[string]interface{}) bool) error
+	Range(filter map[string]interface{}, batchSize uint64, f func(PrimaryKey, map[string]interface{}) bool) error
 	Update(id PrimaryKey, diff map[string]interface{}) error
 	Deleter
 }
 
-// ByteMapStore represents a store modeled after CRUD, which stores data as bytes.
+// TypedMapStore represents a store, which stores data as []byte.
 //
 // Create creates a new PrimaryKey, stores fields under that key and returns it.
-// Find returns the fields stored under PrimaryKey specified. It returns a nil map, if key is not found.
-// Range returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
-// meaning that only entries matching all the fields in filter should be returned. It returns a nil map, if key is not found.
+//
+// Find returns the fields stored under PrimaryKey specified.
+// It returns a nil map, if key is not found.
+//
+// Range calls f sequentially for each key and value present in the store.
+// If f returns false, range stops the iteration.
+//
+// Range does not necessarily correspond to any consistent snapshot of the ByteMapStore's
+// contents: no key will be visited more than once, but if the value for any key
+// is stored or deleted concurrently, Range may reflect any mapping for that key
+// from any point during the Range call.
+
+// If batchSize argument is non-zero, Range will retrieve elements
+// from the underlying store in chunks of (approximately) batchSize elements.
+//
 // Update overwrites field values stored under PrimaryKey specified with values in diff.
 type ByteMapStore interface {
 	Create(fields map[string][]byte) (PrimaryKey, error)
 	Find(id PrimaryKey) (map[string][]byte, error)
-	Range(filter map[string][]byte, count uint64, f func(PrimaryKey, map[string][]byte) bool) error
+	Range(filter map[string][]byte, batchSize uint64, f func(PrimaryKey, map[string][]byte) bool) error
 	Update(id PrimaryKey, diff map[string][]byte) error
 	Deleter
 }
 
 // ByteListStore represents a store, which stores lists of []byte values.
+//
 // CreateList creates a new list, containing bs.
+//
 // FindList returns list identified by id.
+//
 // Append appends bs to list identified by id.
+//
 // Pop returns the value stored at last index of list identified by id and removes it from the list.
+//
 // Len returns the length of the list identified by id.
 type ByteListStore interface {
 	CreateList(bs ...[]byte) (PrimaryKey, error)
@@ -111,10 +140,15 @@ type ByteListStore interface {
 }
 
 // ByteSetStore represents a store, which stores sets of []byte values.
+//
 // CreateSet creates a new set, containing bs.
+//
 // FindSet returns set identified by id.
+//
 // Put adds bs to set identified by id.
+//
 // Contains reports whether b is contained in set identified by id.
+//
 // Remove removes bs from set identified by id.
 type ByteSetStore interface {
 	CreateSet(bs ...[]byte) (PrimaryKey, error)

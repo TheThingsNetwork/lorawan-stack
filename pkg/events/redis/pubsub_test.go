@@ -54,7 +54,7 @@ func redisConfig() config.Redis {
 func Example() {
 	// This sends all events received from Redis to the default pubsub.
 	redisPubSub := redis.WrapPubSub(events.DefaultPubSub, config.Redis{
-	// Config here...
+		// Config here...
 	})
 	// Replace the default pubsub so that we will now publish to Redis.
 	events.DefaultPubSub = redisPubSub

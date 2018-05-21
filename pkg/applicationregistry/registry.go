@@ -26,7 +26,7 @@ import (
 // Interface represents the interface exposed by the *Registry.
 type Interface interface {
 	Create(a *ttnpb.Application, fields ...string) (*Application, error)
-	Range(a *ttnpb.Application, count uint64, f func(*Application) bool, fields ...string) error
+	Range(a *ttnpb.Application, batchSize uint64, f func(*Application) bool, fields ...string) error
 }
 
 var _ Interface = &Registry{}
@@ -61,15 +61,25 @@ func (r *Registry) Create(a *ttnpb.Application, fields ...string) (*Application,
 	return newApplication(a, r.store, id), nil
 }
 
-// Range ranges over applications matching specifided application in underlying store.Interface.
-func (r *Registry) Range(a *ttnpb.Application, count uint64, f func(*Application) bool, fields ...string) error {
+// Range calls f sequentially for each application stored, matching specified application fields.
+// If f returns false, range stops the iteration.
+//
+// Range does not necessarily correspond to any consistent snapshot of the Registry's
+// contents: no application will be visited more than once, but if the device is
+// created or deleted concurrently, Range may or may not call f on that device.
+//
+// If batchSize argument is non-zero, Range will retrieve applications
+// from the underlying store in chunks of (approximately) batchSize applications.
+//
+// If len(fields) == 0, then Range uses all fields in a to match applications.
+func (r *Registry) Range(a *ttnpb.Application, batchSize uint64, f func(*Application) bool, fields ...string) error {
 	if a == nil {
 		return errors.New("Application specified is nil")
 	}
 	return r.store.Range(
 		a,
 		func() interface{} { return &ttnpb.Application{} },
-		count,
+		batchSize,
 		func(k store.PrimaryKey, v interface{}) bool {
 			return f(newApplication(v.(*ttnpb.Application), r.store, k))
 		},
@@ -77,8 +87,16 @@ func (r *Registry) Range(a *ttnpb.Application, count uint64, f func(*Application
 	)
 }
 
-// RangeByIdentifiers ranges over applications matching specified application identifiers in r.
-func RangeByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers, count uint64, f func(*Application) bool) error {
+// Range calls f sequentially for each application stored in r, matching specified application identifiers.
+// If f returns false, range stops the iteration.
+//
+// Range does not necessarily correspond to any consistent snapshot of the Intefaces's
+// contents: no application will be visited more than once, but if the device is
+// created or deleted concurrently, Range may or may not call f on that device.
+//
+// If batchSize argument is non-zero, Range will retrieve applications
+// from the underlying store in chunks of (approximately) batchSize applications.
+func RangeByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers, batchSize uint64, f func(*Application) bool) error {
 	if id == nil {
 		return errors.New("Identifiers specified are nil")
 	}
@@ -88,7 +106,7 @@ func RangeByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers, count uin
 	case id.ApplicationID != "":
 		fields = append(fields, "ApplicationIdentifiers.ApplicationID")
 	}
-	return r.Range(&ttnpb.Application{ApplicationIdentifiers: *id}, count, f, fields...)
+	return r.Range(&ttnpb.Application{ApplicationIdentifiers: *id}, batchSize, f, fields...)
 }
 
 // FindByIdentifiers searches for exactly one application matching specified application identifiers in r.

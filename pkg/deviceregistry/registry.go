@@ -26,7 +26,7 @@ import (
 // Interface represents the interface exposed by the *Registry.
 type Interface interface {
 	Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error)
-	Range(ed *ttnpb.EndDevice, count uint64, f func(*Device) bool, fields ...string) error
+	Range(ed *ttnpb.EndDevice, batchSize uint64, f func(*Device) bool, fields ...string) error
 }
 
 var _ Interface = &Registry{}
@@ -61,15 +61,25 @@ func (r *Registry) Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error
 	return newDevice(ed, r.store, id), nil
 }
 
-// Range ranges over devices matching specified device in underlying store.Interface.
-func (r *Registry) Range(ed *ttnpb.EndDevice, count uint64, f func(*Device) bool, fields ...string) error {
+// Range calls f sequentially for each device stored, matching specified device fields.
+// If f returns false, range stops the iteration.
+//
+// Range does not necessarily correspond to any consistent snapshot of the Registry's
+// contents: no device will be visited more than once, but if the device is
+// created or deleted concurrently, Range may or may not call f on that device.
+//
+// If batchSize argument is non-zero, Range will retrieve devices
+// from the underlying store in chunks of (approximately) batchSize devices.
+//
+// If len(fields) == 0, then Range uses all fields in ed to match devices.
+func (r *Registry) Range(ed *ttnpb.EndDevice, batchSize uint64, f func(*Device) bool, fields ...string) error {
 	if ed == nil {
 		return errors.New("Device specified is nil")
 	}
 	return r.store.Range(
 		ed,
 		func() interface{} { return &ttnpb.EndDevice{} },
-		count,
+		batchSize,
 		func(k store.PrimaryKey, v interface{}) bool {
 			return f(newDevice(v.(*ttnpb.EndDevice), r.store, k))
 		},
@@ -77,8 +87,16 @@ func (r *Registry) Range(ed *ttnpb.EndDevice, count uint64, f func(*Device) bool
 	)
 }
 
-// RangeByIdentifiers ranges over devices matching specified device identifiers in r.
-func RangeByIdentifiers(r Interface, id *ttnpb.EndDeviceIdentifiers, count uint64, f func(*Device) bool) error {
+// Range calls f sequentially for each device stored in r, matching specified device identifiers.
+// If f returns false, range stops the iteration.
+//
+// Range does not necessarily correspond to any consistent snapshot of the Intefaces's
+// contents: no device will be visited more than once, but if the device is
+// created or deleted concurrently, Range may or may not call f on that device.
+//
+// If batchSize argument is non-zero, Range will retrieve devices
+// from the underlying store in chunks of (approximately) batchSize devices.
+func RangeByIdentifiers(r Interface, id *ttnpb.EndDeviceIdentifiers, batchSize uint64, f func(*Device) bool) error {
 	if id == nil {
 		return errors.New("Identifiers specified are nil")
 	}
@@ -96,7 +114,7 @@ func RangeByIdentifiers(r Interface, id *ttnpb.EndDeviceIdentifiers, count uint6
 	case id.DevAddr != nil && !id.DevAddr.IsZero():
 		fields = append(fields, "EndDeviceIdentifiers.DevAddr")
 	}
-	return r.Range(&ttnpb.EndDevice{EndDeviceIdentifiers: *id}, count, f, fields...)
+	return r.Range(&ttnpb.EndDevice{EndDeviceIdentifiers: *id}, batchSize, f, fields...)
 }
 
 // FindByIdentifiers searches for exactly one device matching specified device identifiers in r.

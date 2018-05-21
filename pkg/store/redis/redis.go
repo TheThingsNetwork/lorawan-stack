@@ -39,7 +39,7 @@ const (
 	Separator = string(SeparatorByte)
 )
 
-// Store represents a Redis store.Interface implemntation
+// Store represents a Redis store.ByteMapStore, store.ByteListStore and store.ByteListStore implementation.
 type Store struct {
 	Redis     *redis.Client
 	config    *Config
@@ -81,7 +81,7 @@ func (s *Store) newID() fmt.Stringer {
 	return ulid.MustNew(ulid.Now(), s.entropy)
 }
 
-// Create stores generates an ULID and stores fields under a key associated with it.
+// Create implements store.ByteMapStore.
 func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 	fieldsSet := make(map[string]interface{}, len(fields))
 	idxAdd := make([]string, 0, len(fields))
@@ -119,7 +119,7 @@ func (s *Store) Create(fields map[string][]byte) (store.PrimaryKey, error) {
 	}, key)
 }
 
-// Delete deletes the fields stored under the key associated with id.
+// Delete implements store.Deleter.
 func (s *Store) Delete(id store.PrimaryKey) (err error) {
 	if id == nil {
 		return store.ErrNilKey.New(nil)
@@ -152,7 +152,7 @@ func (s *Store) Delete(id store.PrimaryKey) (err error) {
 	}, key)
 }
 
-// Update overwrites field values stored under PrimaryKey specified with values in diff and rebinds indexed keys present in diff.
+// Update implements store.ByteMapStore.
 func (s *Store) Update(id store.PrimaryKey, diff map[string][]byte) error {
 	if id == nil {
 		return store.ErrNilKey.New(nil)
@@ -261,7 +261,7 @@ func newStringBytesMapCmd(c *redis.StringStringMapCmd) *stringBytesMapCmd {
 	return &stringBytesMapCmd{c}
 }
 
-// Find returns the fields stored under PrimaryKey specified.
+// Find implements store.ByteMapStore.
 func (s *Store) Find(id store.PrimaryKey) (map[string][]byte, error) {
 	if id == nil {
 		return nil, store.ErrNilKey.New(nil)
@@ -274,9 +274,8 @@ func (s *Store) Find(id store.PrimaryKey) (map[string][]byte, error) {
 	return m, nil
 }
 
-// Range returns mapping of PrimaryKey -> fields, which match field values specified in filter. Filter represents an AND relation,
-// meaning that only entries matching all the fields in filter should be returned.
-func (s *Store) Range(filter map[string][]byte, count uint64, f func(store.PrimaryKey, map[string][]byte) bool) error {
+// Range implements store.ByteMapStore.
+func (s *Store) Range(filter map[string][]byte, batchSize uint64, f func(store.PrimaryKey, map[string][]byte) bool) error {
 	if len(filter) == 0 {
 		return store.ErrEmptyFilter.New(nil)
 	}
@@ -306,14 +305,14 @@ func (s *Store) Range(filter map[string][]byte, count uint64, f func(store.Prima
 			return nil
 		}
 
-		if count > math.MaxInt64 {
-			count = math.MaxInt64
+		if batchSize > math.MaxInt64 {
+			batchSize = math.MaxInt64
 		}
 
 		var ids []string
 		var c uint64
 		for {
-			ids, c, err = tx.SScan(key, c, "", int64(count)).Result()
+			ids, c, err = tx.SScan(key, c, "", int64(batchSize)).Result()
 			if err != nil {
 				return err
 			}
@@ -371,7 +370,7 @@ func (s *Store) put(id store.PrimaryKey, bs ...[]byte) error {
 	return err
 }
 
-// Put adds bs to set identified by id.
+// Find implements store.ByteSetStore.
 func (s *Store) Put(id store.PrimaryKey, bs ...[]byte) error {
 	if id == nil {
 		return store.ErrNilKey.New(nil)
@@ -382,7 +381,7 @@ func (s *Store) Put(id store.PrimaryKey, bs ...[]byte) error {
 	return s.put(id, bs...)
 }
 
-// CreateSet creates a new set, containing bs.
+// CreateSet implements store.ByteSetStore.
 func (s *Store) CreateSet(bs ...[]byte) (store.PrimaryKey, error) {
 	id := s.newID()
 	if len(bs) == 0 {
@@ -395,7 +394,7 @@ func (s *Store) CreateSet(bs ...[]byte) (store.PrimaryKey, error) {
 	return id, nil
 }
 
-// FindSet returns set identified by id.
+// FindSet implements store.ByteSetStore.
 func (s *Store) FindSet(id store.PrimaryKey) (bs [][]byte, err error) {
 	if id == nil {
 		return nil, store.ErrNilKey.New(nil)
@@ -403,7 +402,7 @@ func (s *Store) FindSet(id store.PrimaryKey) (bs [][]byte, err error) {
 	return bs, s.Redis.SMembers(s.key(id.String())).ScanSlice(&bs)
 }
 
-// Contains reports whether b is contained in set identified by id.
+// Contains implements store.ByteSetStore.
 func (s *Store) Contains(id store.PrimaryKey, b []byte) (bool, error) {
 	if id == nil {
 		return false, store.ErrNilKey.New(nil)
@@ -411,7 +410,7 @@ func (s *Store) Contains(id store.PrimaryKey, b []byte) (bool, error) {
 	return s.Redis.SIsMember(s.key(id.String()), b).Result()
 }
 
-// Remove removes bs from set identified by id.
+// Remove implements store.ByteSetStore.
 func (s *Store) Remove(id store.PrimaryKey, bs ...[]byte) error {
 	if id == nil {
 		return store.ErrNilKey.New(nil)
@@ -430,7 +429,7 @@ func (s *Store) Remove(id store.PrimaryKey, bs ...[]byte) error {
 	return err
 }
 
-// Append appends bs to list identified by id.
+// Append implements store.ByteListStore.
 func (s *Store) Append(id store.PrimaryKey, bs ...[]byte) error {
 	if id == nil {
 		return store.ErrNilKey.New(nil)
@@ -449,7 +448,7 @@ func (s *Store) Append(id store.PrimaryKey, bs ...[]byte) error {
 	return nil
 }
 
-// CreateList creates a new list, containing bs.
+// CreateList implements store.ByteListStore.
 func (s *Store) CreateList(bs ...[]byte) (store.PrimaryKey, error) {
 	id := s.newID()
 	if len(bs) == 0 {
@@ -462,7 +461,7 @@ func (s *Store) CreateList(bs ...[]byte) (store.PrimaryKey, error) {
 	return id, nil
 }
 
-// FindList returns list identified by id.
+// FindList implements store.ByteListStore.
 func (s *Store) FindList(id store.PrimaryKey) (bs [][]byte, err error) {
 	if id == nil {
 		return nil, store.ErrNilKey.New(nil)
@@ -470,7 +469,7 @@ func (s *Store) FindList(id store.PrimaryKey) (bs [][]byte, err error) {
 	return bs, s.Redis.LRange(s.key(id.String()), 0, -1).ScanSlice(&bs)
 }
 
-// Len returns length of the list identified by id.
+// Len implements store.ByteListStore.
 func (s *Store) Len(id store.PrimaryKey) (int64, error) {
 	if id == nil {
 		return 0, store.ErrNilKey.New(nil)
@@ -478,7 +477,7 @@ func (s *Store) Len(id store.PrimaryKey) (int64, error) {
 	return s.Redis.LLen(s.key(id.String())).Result()
 }
 
-// Pop returns the value stored at last index of list identified by id and removes it from the list.
+// Pop implements store.ByteListStore.
 func (s *Store) Pop(id store.PrimaryKey) (bs []byte, err error) {
 	if id == nil {
 		return nil, store.ErrNilKey.New(nil)
