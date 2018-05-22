@@ -29,10 +29,10 @@ import (
 // Config is the configuration for the console.
 type Config struct {
 	// PublicURL is the public URL of the console.
-	PublicURL string `name:"public-url" description:"The public URL of the console"`
+	PublicURL string `name:"public-url" description:"The public URL of the Console"`
 
 	// DefaultLanguage is the default language of the web console.
-	DefaultLanguage string `name:"language" description:"The default language of the console"`
+	DefaultLanguage string `name:"language" description:"The default language of the Console"`
 
 	// IdentityServerURL is the location of the Identity Server.
 	IdentityServerURL string `name:"identity-server-url" description:"The URL of the Identity Server"`
@@ -47,10 +47,10 @@ type Config struct {
 // OAuth is the OAuth config for the console.
 type OAuth struct {
 	// ID is the client ID for the console.
-	ID string `name:"client-id" description:"The OAuth client ID for the console"`
+	ID string `name:"client-id" description:"The OAuth client ID for the Console"`
 
 	// Secret is the client secret for the console.
-	Secret string `name:"client-secret" description:"The OAuth client secret for the console" json:"-"`
+	Secret string `name:"client-secret" description:"The OAuth client secret for the Console" json:"-"`
 }
 
 func (o OAuth) isZero() bool {
