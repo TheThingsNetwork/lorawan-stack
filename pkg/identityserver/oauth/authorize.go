@@ -49,15 +49,19 @@ func (s *Server) authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 			return s.output(c, resp)
 		}
 
+		ar.Authorized = client.SkipAuthorization
+
 		user, err := s.getUser(c)
 		if err != nil {
 			return err
 		}
 		uids := user.GetUser().UserIdentifiers
 
-		ar.Authorized, err = s.config.Store.OAuth.IsClientAuthorized(uids, client.ClientIdentifiers)
-		if err != nil {
-			return err
+		if !ar.Authorized {
+			ar.Authorized, err = s.config.Store.OAuth.IsClientAuthorized(uids, client.ClientIdentifiers)
+			if err != nil {
+				return err
+			}
 		}
 
 		if !ar.Authorized {
