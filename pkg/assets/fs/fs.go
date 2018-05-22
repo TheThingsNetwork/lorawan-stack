@@ -38,9 +38,9 @@ func (c *CombinedFileSystem) Open(name string) (http.File, error) {
 	return c.secondary.Open(name)
 }
 
-// Combine returns a new http.FileSystem that will first try the first filesystem
-// to read a file and then try the second one if the file did not exist in the
-// first FileSystem.
+// Combine returns a new http.FileSystem that will first try the primary filesystem
+// to read a file, otherwise then try the secondary filesystem if the file did not
+// exist in the primary FileSystem.
 func Combine(primary, secondary http.FileSystem) *CombinedFileSystem {
 	return &CombinedFileSystem{
 		primary:   primary,
