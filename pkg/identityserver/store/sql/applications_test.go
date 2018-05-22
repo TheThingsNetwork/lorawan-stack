@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 var applicationSpecializer = func(base ttnpb.Application) store.Application {
@@ -42,7 +43,7 @@ func TestApplications(t *testing.T) {
 
 	err = s.Applications.Create(application)
 	a.So(err, should.NotBeNil)
-	a.So(store.ErrApplicationIDTaken.Describes(err), should.BeTrue)
+	a.So(err, errshould.Describe, store.ErrApplicationIDTaken)
 
 	found, err := s.Applications.GetByID(application.ApplicationIdentifiers, applicationSpecializer)
 	a.So(err, should.BeNil)

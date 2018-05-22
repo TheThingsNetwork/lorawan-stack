@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 var _ ttnpb.IsApplicationServer = new(applicationService)
@@ -53,7 +54,7 @@ func TestApplication(t *testing.T) {
 			},
 		})
 		a.So(err, should.NotBeNil)
-		a.So(ErrBlacklistedID.Describes(err), should.BeTrue)
+		a.So(err, errshould.Describe, ErrBlacklistedID)
 	}
 
 	found, err := is.applicationService.GetApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: app.ApplicationID})
@@ -106,7 +107,7 @@ func TestApplication(t *testing.T) {
 		Rights: []ttnpb.Right{ttnpb.Right(1)},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(store.ErrAPIKeyNameConflict.Describes(err), should.BeTrue)
+	a.So(err, errshould.Describe, store.ErrAPIKeyNameConflict)
 
 	keys, err := is.applicationService.ListApplicationAPIKeys(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: app.ApplicationID})
 	a.So(err, should.BeNil)
@@ -186,7 +187,7 @@ func TestApplication(t *testing.T) {
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &user.UserIdentifiers}},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(ErrUnmanageableApplication.Describes(err), should.BeTrue)
+	a.So(err, errshould.Describe, ErrUnmanageableApplication)
 
 	// But we can revoke a shared right between the two collaborators.
 	_, err = is.applicationService.SetApplicationCollaborator(ctx, &ttnpb.ApplicationCollaborator{

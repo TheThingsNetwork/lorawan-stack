@@ -21,6 +21,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
+	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestInvitations(t *testing.T) {
@@ -72,7 +73,7 @@ func TestInvitations(t *testing.T) {
 
 	err = s.Invitations.Use(invitation.Email, invitation.Token)
 	a.So(err, should.NotBeNil)
-	a.So(store.ErrInvitationNotFound.Describes(err), should.BeTrue)
+	a.So(err, errshould.Describe, store.ErrInvitationNotFound)
 
 	found, err = s.Invitations.List()
 	a.So(err, should.BeNil)

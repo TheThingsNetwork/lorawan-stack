@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 var _ ttnpb.IsOrganizationServer = new(organizationService)
@@ -54,7 +55,7 @@ func TestOrganization(t *testing.T) {
 			},
 		})
 		a.So(err, should.NotBeNil)
-		a.So(ErrBlacklistedID.Describes(err), should.BeTrue)
+		a.So(err, errshould.Describe, ErrBlacklistedID)
 	}
 
 	found, err := is.organizationService.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: org.OrganizationID})

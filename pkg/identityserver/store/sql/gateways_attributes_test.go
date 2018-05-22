@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql/migrations"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 // gatewayWithFoo implements both store.Gateway and store.Attributer interfaces.
@@ -120,6 +121,6 @@ func TestGatewayAttributer(t *testing.T) {
 
 	found, err = s.Gateways.GetByID(withFoo.GetGateway().GatewayIdentifiers, specializer)
 	a.So(err, should.NotBeNil)
-	a.So(store.ErrGatewayNotFound.Describes(err), should.BeTrue)
+	a.So(err, errshould.Describe, store.ErrGatewayNotFound)
 	a.So(found, should.BeNil)
 }

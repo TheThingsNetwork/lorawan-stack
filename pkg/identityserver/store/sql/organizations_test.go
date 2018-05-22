@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestOrganizations(t *testing.T) {
@@ -266,6 +267,6 @@ func TestOrganizations(t *testing.T) {
 
 	found, err = s.Organizations.GetByID(org.OrganizationIdentifiers, specializer)
 	a.So(err, should.NotBeNil)
-	a.So(store.ErrOrganizationNotFound.Describes(err), should.BeTrue)
+	a.So(err, errshould.Describe, store.ErrOrganizationNotFound)
 	a.So(found, should.BeNil)
 }

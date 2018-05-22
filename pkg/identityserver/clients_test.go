@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 var _ ttnpb.IsClientServer = new(clientService)
@@ -61,7 +62,7 @@ func TestClient(t *testing.T) {
 			},
 		})
 		a.So(err, should.NotBeNil)
-		a.So(ErrBlacklistedID.Describes(err), should.BeTrue)
+		a.So(err, errshould.Describe, ErrBlacklistedID)
 	}
 
 	found, err := is.clientService.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientID: cli.ClientID})
@@ -103,5 +104,5 @@ func TestClient(t *testing.T) {
 	found, err = is.clientService.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientID: cli.ClientID})
 	a.So(found, should.BeNil)
 	a.So(err, should.NotBeNil)
-	a.So(store.ErrClientNotFound.Describes(err), should.BeTrue)
+	a.So(err, errshould.Describe, store.ErrClientNotFound)
 }

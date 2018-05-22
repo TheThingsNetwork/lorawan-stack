@@ -23,6 +23,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 )
@@ -88,17 +89,17 @@ func TestFromUnspecifiedGRPC(t *testing.T) {
 func TestWellKnown(t *testing.T) {
 	a := assertions.New(t)
 
-	a.So(errors.ErrEOF.Describes(FromGRPC(ToGRPC(io.EOF))), should.BeTrue)
-	a.So(errors.ErrContextCanceled.Describes(FromGRPC(ToGRPC(context.Canceled))), should.BeTrue)
-	a.So(errors.ErrContextDeadlineExceeded.Describes(FromGRPC(ToGRPC(context.DeadlineExceeded))), should.BeTrue)
-	a.So(ErrClientConnClosing.Describes(FromGRPC(ToGRPC(grpc.ErrClientConnClosing))), should.BeTrue)
-	a.So(ErrClientConnTimeout.Describes(FromGRPC(ToGRPC(grpc.ErrClientConnTimeout))), should.BeTrue)
-	a.So(ErrServerStopped.Describes(FromGRPC(ToGRPC(grpc.ErrServerStopped))), should.BeTrue)
+	a.So(FromGRPC(ToGRPC(io.EOF)), errshould.Describe, errors.ErrEOF)
+	a.So(FromGRPC(ToGRPC(context.Canceled)), errshould.Describe, errors.ErrContextCanceled)
+	a.So(FromGRPC(ToGRPC(context.DeadlineExceeded)), errshould.Describe, errors.ErrContextDeadlineExceeded)
+	a.So(FromGRPC(ToGRPC(grpc.ErrClientConnClosing)), errshould.Describe, ErrClientConnClosing)
+	a.So(FromGRPC(ToGRPC(grpc.ErrClientConnTimeout)), errshould.Describe, ErrClientConnTimeout)
+	a.So(FromGRPC(ToGRPC(grpc.ErrServerStopped)), errshould.Describe, ErrServerStopped)
 
-	a.So(errors.ErrEOF.Describes(FromGRPC(io.EOF)), should.BeTrue)
-	a.So(errors.ErrContextCanceled.Describes(FromGRPC(context.Canceled)), should.BeTrue)
-	a.So(errors.ErrContextDeadlineExceeded.Describes(FromGRPC(context.DeadlineExceeded)), should.BeTrue)
-	a.So(ErrClientConnClosing.Describes(FromGRPC(grpc.ErrClientConnClosing)), should.BeTrue)
-	a.So(ErrClientConnTimeout.Describes(FromGRPC(grpc.ErrClientConnTimeout)), should.BeTrue)
-	a.So(ErrServerStopped.Describes(FromGRPC(grpc.ErrServerStopped)), should.BeTrue)
+	a.So(FromGRPC(io.EOF), errshould.Describe, errors.ErrEOF)
+	a.So(FromGRPC(context.Canceled), errshould.Describe, errors.ErrContextCanceled)
+	a.So(FromGRPC(context.DeadlineExceeded), errshould.Describe, errors.ErrContextDeadlineExceeded)
+	a.So(FromGRPC(grpc.ErrClientConnClosing), errshould.Describe, ErrClientConnClosing)
+	a.So(FromGRPC(grpc.ErrClientConnTimeout), errshould.Describe, ErrClientConnTimeout)
+	a.So(FromGRPC(grpc.ErrServerStopped), errshould.Describe, ErrServerStopped)
 }
