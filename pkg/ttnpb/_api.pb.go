@@ -16,6 +16,7 @@ It is generated from these files:
 	go.thethings.network/lorawan-stack/api/collaborator.proto
 	go.thethings.network/lorawan-stack/api/end_device.proto
 	go.thethings.network/lorawan-stack/api/end_device_services.proto
+	go.thethings.network/lorawan-stack/api/error.proto
 	go.thethings.network/lorawan-stack/api/gateway.proto
 	go.thethings.network/lorawan-stack/api/gateway_server.proto
 	go.thethings.network/lorawan-stack/api/identifiers.proto
@@ -56,6 +57,7 @@ It has these top-level messages:
 	MACState
 	MACInfo
 	SetDeviceRequest
+	ErrorDetails
 	Gateway
 	GatewayPrivacySettings
 	GatewayAntenna
