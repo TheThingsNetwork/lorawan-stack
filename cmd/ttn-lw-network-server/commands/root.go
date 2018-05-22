@@ -35,7 +35,7 @@ var (
 		Use:           name,
 		SilenceErrors: true,
 		SilenceUsage:  true,
-		Short:         "The Things Network Network Server",
+		Short:         "The Things Network Network Server for LoRaWAN",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			// read in config from file
 			err := mgr.ReadInConfig()
