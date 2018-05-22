@@ -14,22 +14,10 @@
 
 package templates
 
-// EmailValidation is the email template used to validate an email address.
-type EmailValidation struct {
-	PublicURL        string
-	OrganizationName string
-	Token            string
-}
-
-// GetName implements Template.
-func (t *EmailValidation) GetName() string {
-	return "Email Validation"
-}
-
-// Render implements Template.
-func (t *EmailValidation) Render() (string, string, error) {
+func init() {
+	templateName := new(EmailValidation).GetName()
 	subject := "Your email needs to be validated"
-	message := `<h1>Email verification</h1>
+	body := `<h1>Email verification</h1>
 
 <p>
 	You recently registered an account at
@@ -50,5 +38,22 @@ func (t *EmailValidation) Render() (string, string, error) {
 	If you did not register an account, you can ignore this e-mail.
 </p>`
 
-	return render(subject, message, t)
+	templates.Register(templateName, subject, body)
+}
+
+// EmailValidation is the email template used to validate an email address.
+type EmailValidation struct {
+	PublicURL        string
+	OrganizationName string
+	Token            string
+}
+
+// GetName implements Template.
+func (t *EmailValidation) GetName() string {
+	return "Email Validation"
+}
+
+// Render implements Template.
+func (t *EmailValidation) Render() (string, string, error) {
+	return render(t.GetName(), t)
 }

@@ -14,6 +14,23 @@
 
 package templates
 
+func init() {
+	templateName := new(PasswordReset).GetName()
+	subject := "Your password has been reset"
+	body := `<h1>Password reset</h1>
+
+<p>
+	Your password has been reset by a
+	<a href='{{.PublicURL}}'>{{.OrganizationName}}</a> admin.
+</p>
+
+<p>
+	Your new account's password is <b>{{.Password}}</b>
+</p>`
+
+	templates.Register(templateName, subject, body)
+}
+
 // PasswordReset is the email template used to inform an user that an admin has
 // reset his account password.
 type PasswordReset struct {
@@ -29,17 +46,5 @@ func (t *PasswordReset) GetName() string {
 
 // Render implements Template.
 func (t *PasswordReset) Render() (string, string, error) {
-	subject := "Your password has been reset"
-	message := `<h1>Password reset</h1>
-
-<p>
-	Your password has been reset by a
-	<a href='{{.PublicURL}}'>{{.OrganizationName}}</a> admin.
-</p>
-
-<p>
-	Your new account's password is <b>{{.Password}}</b>
-</p>`
-
-	return render(subject, message, t)
+	return render(t.GetName(), t)
 }

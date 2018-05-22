@@ -14,23 +14,10 @@
 
 package templates
 
-// AccountDeleted is the email template used when an account has been deleted.
-type AccountDeleted struct {
-	PublicURL        string
-	OrganizationName string
-	UserID           string
-	Message          string
-}
-
-// GetName implements Template.
-func (t *AccountDeleted) GetName() string {
-	return "Account deleted"
-}
-
-// Render implements Template.
-func (t *AccountDeleted) Render() (string, string, error) {
+func init() {
+	templateName := new(AccountDeleted).GetName()
 	subject := "Your account has been deleted"
-	message := `<h1>Account deleted</h1>
+	body := `<h1>Account deleted</h1>
 
 <p>
 	Your account with ID {{.UserID}} at
@@ -46,5 +33,23 @@ func (t *AccountDeleted) Render() (string, string, error) {
 	</p>
 {{end}}`
 
-	return render(subject, message, t)
+	templates.Register(templateName, subject, body)
+}
+
+// AccountDeleted is the email template used when an account has been deleted.
+type AccountDeleted struct {
+	PublicURL        string
+	OrganizationName string
+	UserID           string
+	Message          string
+}
+
+// GetName implements Template.
+func (t *AccountDeleted) GetName() string {
+	return "Account deleted"
+}
+
+// Render implements Template.
+func (t *AccountDeleted) Render() (string, string, error) {
+	return render(t.GetName(), t)
 }

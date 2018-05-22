@@ -14,6 +14,28 @@
 
 package templates
 
+func init() {
+	templateName := new(Invitation).GetName()
+	subject := "You had been invited to join {{.OrganizationName}}!"
+	body := `<h1>Invitation</h1>
+
+<p>
+	You just got invited to create an account
+	at <a href='{{.PublicURL}}'>{{.OrganizationName}}</a>.
+</p>
+
+<p>
+	You can create your account by
+	clicking the button below.
+</p>
+
+<p>
+	<a class='button' href='{{.WebUIURL}}/register?token={{.Token}}'>Create account</a>
+</p>`
+
+	templates.Register(templateName, subject, body)
+}
+
 // Invitation is the email template used to notify a person that has been invited
 // to register an account.
 type Invitation struct {
@@ -30,22 +52,5 @@ func (t *Invitation) GetName() string {
 
 // Render implements Template.
 func (t *Invitation) Render() (string, string, error) {
-	subject := "You had been invited to join {{.OrganizationName}}!"
-	message := `<h1>Invitation</h1>
-
-<p>
-	You just got invited to create an account
-	at <a href='{{.PublicURL}}'>{{.OrganizationName}}</a>.
-</p>
-
-<p>
-	You can create your account by
-	clicking the button below.
-</p>
-
-<p>
-	<a class='button' href='{{.WebUIURL}}/register?token={{.Token}}'>Create account</a>
-</p>`
-
-	return render(subject, message, t)
+	return render(t.GetName(), t)
 }

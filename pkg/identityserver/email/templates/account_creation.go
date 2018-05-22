@@ -14,26 +14,10 @@
 
 package templates
 
-// AccountCreation is the template used when an admin creates an account in
-// behalf of an user.
-type AccountCreation struct {
-	PublicURL        string
-	OrganizationName string
-	Name             string
-	UserID           string
-	Password         string
-	ValidationToken  string
-}
-
-// GetName implements Template.
-func (t *AccountCreation) GetName() string {
-	return "Account creation on behalf of the user"
-}
-
-// Render implements Template.
-func (t *AccountCreation) Render() (string, string, error) {
+func init() {
+	templateName := new(AccountCreation).GetName()
 	subject := "You had been created an account in {{.OrganizationName}}"
-	message := `<h1>Welcome{{if .ActivationToken}} {{.Name}}{{end}}</h1>
+	body := `<h1>Welcome{{if .ActivationToken}} {{.Name}}{{end}}</h1>
 
 <p>
 	You just got created an account at
@@ -57,5 +41,26 @@ func (t *AccountCreation) Render() (string, string, error) {
 	</p>
 {{end}}`
 
-	return render(subject, message, t)
+	templates.Register(templateName, subject, body)
+}
+
+// AccountCreation is the template used when an admin creates an account in
+// behalf of an user.
+type AccountCreation struct {
+	PublicURL        string
+	OrganizationName string
+	Name             string
+	UserID           string
+	Password         string
+	ValidationToken  string
+}
+
+// GetName implements Template.
+func (t *AccountCreation) GetName() string {
+	return "Account creation on behalf of the user"
+}
+
+// Render implements Template.
+func (t *AccountCreation) Render() (string, string, error) {
+	return render(t.GetName(), t)
 }

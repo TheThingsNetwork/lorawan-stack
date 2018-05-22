@@ -14,23 +14,10 @@
 
 package templates
 
-// ClientDeleted is the email template used when an account has been deleted.
-type ClientDeleted struct {
-	PublicURL        string
-	OrganizationName string
-	ClientID         string
-	Message          string
-}
-
-// GetName implements Template.
-func (t *ClientDeleted) GetName() string {
-	return "Client deleted"
-}
-
-// Render implements Template.
-func (t *ClientDeleted) Render() (string, string, error) {
+func init() {
+	templateName := new(ClientDeleted).GetName()
 	subject := "Your third-party client was deleted"
-	message := `<h1>Client deleted</h1>
+	body := `<h1>Client deleted</h1>
 
 <p>
 	Your third-party client with ID {{.ClientID}} at
@@ -46,5 +33,23 @@ func (t *ClientDeleted) Render() (string, string, error) {
 	</p>
 {{end}}`
 
-	return render(subject, message, t)
+	templates.Register(templateName, subject, body)
+}
+
+// ClientDeleted is the email template used when an account has been deleted.
+type ClientDeleted struct {
+	PublicURL        string
+	OrganizationName string
+	ClientID         string
+	Message          string
+}
+
+// GetName implements Template.
+func (t *ClientDeleted) GetName() string {
+	return "Client deleted"
+}
+
+// Render implements Template.
+func (t *ClientDeleted) Render() (string, string, error) {
+	return render(t.GetName(), t)
 }

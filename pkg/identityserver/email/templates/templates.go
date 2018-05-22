@@ -20,8 +20,35 @@ package templates
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 )
+
+var templates = make(templatesRegistry)
+
+type templatesRegistry map[string]*template.Template
+
+func (r templatesRegistry) Register(templateName, subject, body string) {
+	t, err := template.New("").Parse(subject)
+	if err != nil {
+		panic(err)
+	}
+	r[fmt.Sprintf("subject:%s", templateName)] = t
+
+	t, err = template.New("").Parse(body)
+	if err != nil {
+		panic(err)
+	}
+	r[fmt.Sprintf("body:%s", templateName)] = t
+}
+
+func (r templatesRegistry) Subject(templateName string) *template.Template {
+	return r[fmt.Sprintf("subject:%s", templateName)]
+}
+
+func (r templatesRegistry) Body(templateName string) *template.Template {
+	return r[fmt.Sprintf("body:%s", templateName)]
+}
 
 // Template is the interface of email templates.
 type Template interface {
@@ -33,27 +60,17 @@ type Template interface {
 }
 
 // render renders subject and message using the given data.
-func render(subject, message string, data interface{}) (string, string, error) {
+func render(templateName string, data interface{}) (string, string, error) {
 	// TODO(gomezjdaniel): add styles to the HTML version.
-	t, err := template.New("").Parse(subject)
-	if err != nil {
-		return "", "", err
-	}
-
 	buf := new(bytes.Buffer)
-	if err = t.Execute(buf, data); err != nil {
+	if err := templates.Subject(templateName).Execute(buf, data); err != nil {
 		return "", "", err
 	}
-	subject = buf.String()
+	subject := buf.String()
 
 	buf.Reset()
 
-	t, err = template.New("").Parse(message)
-	if err != nil {
-		return "", "", err
-	}
-
-	if err := t.Execute(buf, data); err != nil {
+	if err := templates.Body(templateName).Execute(buf, data); err != nil {
 		return "", "", err
 	}
 

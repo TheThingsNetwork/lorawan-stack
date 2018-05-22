@@ -24,7 +24,9 @@ import (
 func TestRender(t *testing.T) {
 	a := assertions.New(t)
 
-	subject, message, err := render("Hello {{.Name}}", "<b>{{.Name}}!</b>", struct {
+	templates.Register("foo", "Hello {{.Name}}", "<b>{{.Name}}!</b>")
+
+	subject, message, err := render("foo", struct {
 		Name string
 	}{"john"})
 	a.So(err, should.BeNil)
