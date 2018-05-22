@@ -29,9 +29,8 @@ func init() {
 	<p>
 		The admin has left the following message:
 		<br>
-		{{.Reason}}
-	</p>
-{{end}}`
+		{{.Message}}
+	</p>{{end}}`
 
 	templates.Register(templateName, subject, body)
 }

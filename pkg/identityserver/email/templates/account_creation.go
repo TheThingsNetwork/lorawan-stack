@@ -17,7 +17,7 @@ package templates
 func init() {
 	templateName := new(AccountCreation).GetName()
 	subject := "You had been created an account in {{.OrganizationName}}"
-	body := `<h1>Welcome{{if .ActivationToken}} {{.Name}}{{end}}</h1>
+	body := `<h1>Welcome{{if .Name}} {{.Name}}{{end}}</h1>
 
 <p>
 	You just got created an account at
@@ -30,16 +30,15 @@ func init() {
 	as <b>{{.UserID}}</b> / <b>{{.Password}}</b>.
 </p>
 
-{{if .ActivationToken}}
+{{if .ValidationToken}}
 	<p>
 		Also please activate
 		your account by clicking the button below.
 	</p>
 
 	<p>
-		<a class='button' href='{{.PublicURL}}/api/v3/validate/{{.ActivationToken}}'>Activate account</a>
-	</p>
-{{end}}`
+		<a class='button' href='{{.PublicURL}}/api/v3/validate/{{.ValidationToken}}'>Activate account</a>
+	</p>{{end}}`
 
 	templates.Register(templateName, subject, body)
 }
