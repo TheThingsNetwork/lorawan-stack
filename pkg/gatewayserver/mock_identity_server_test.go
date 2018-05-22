@@ -29,7 +29,7 @@ import (
 
 // IsGatewayServer implements ttnpb.IsGatewayServer
 type IsGatewayServer struct {
-	gateways map[ttnpb.GatewayIdentifiers]ttnpb.Gateway
+	gateways []ttnpb.Gateway
 }
 
 func (m *IsGatewayServer) CreateGateway(context.Context, *ttnpb.CreateGatewayRequest) (*types.Empty, error) {
@@ -37,9 +37,8 @@ func (m *IsGatewayServer) CreateGateway(context.Context, *ttnpb.CreateGatewayReq
 }
 
 func (m *IsGatewayServer) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.Gateway, error) {
-	for storedID, storedGateway := range m.gateways {
-		if id.GetGatewayID() == storedID.GetGatewayID() ||
-			(id.GetEUI() != nil && storedID.GetEUI() != nil && *id.GetEUI() == *storedID.GetEUI()) {
+	for _, storedGateway := range m.gateways {
+		if storedGateway.GatewayIdentifiers.Contains(*id) {
 			return &storedGateway, nil
 		}
 	}
@@ -87,7 +86,7 @@ func (m *IsGatewayServer) ListGatewayRights(context.Context, *ttnpb.GatewayIdent
 	return nil, status.Error(codes.Unimplemented, "not implemented")
 }
 
-func StartMockIsGatewayServer(ctx context.Context, gateways map[ttnpb.GatewayIdentifiers]ttnpb.Gateway) (*grpc.Server, string) {
+func StartMockIsGatewayServer(ctx context.Context, gateways []ttnpb.Gateway) (*grpc.Server, string) {
 	is := &IsGatewayServer{gateways: gateways}
 
 	serve := func(addr string) (*grpc.Server, string) {

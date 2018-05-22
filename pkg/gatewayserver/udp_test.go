@@ -36,12 +36,12 @@ import (
 
 const testUDPAddress = "127.0.0.1:8332"
 
-func testPushData(ns *GsNsServer) func(t *testing.T) {
+func testPushData(eui types.EUI64, ns *GsNsServer) func(t *testing.T) {
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
 		p := udp.Packet{
-			GatewayEUI:      &types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			GatewayEUI:      &eui,
 			ProtocolVersion: udp.Version1,
 			Token:           [2]byte{0x11, 0x00},
 			Data: &udp.Data{
@@ -53,7 +53,7 @@ func testPushData(ns *GsNsServer) func(t *testing.T) {
 						DatR: udp.DataRate{DataRate: types.DataRate{LoRa: "SF10BW125"}},
 						CodR: "4/7",
 						Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
-						Tmst: 3503,
+						Tmst: 1003503,
 					},
 				},
 			},
@@ -90,12 +90,12 @@ func testPushData(ns *GsNsServer) func(t *testing.T) {
 	}
 }
 
-func testPullData(registeredGatewayEUI types.EUI64, ns *GsNsServer, conn net.Conn) func(t *testing.T) {
+func testPullData(gatewayEUI types.EUI64, ns *GsNsServer, conn net.Conn) func(t *testing.T) {
 	return func(t *testing.T) {
 		a := assertions.New(t)
 
 		p := udp.Packet{
-			GatewayEUI:      &registeredGatewayEUI,
+			GatewayEUI:      &gatewayEUI,
 			ProtocolVersion: udp.Version1,
 			Token:           [2]byte{0x11, 0x00},
 			PacketType:      udp.PullData,
@@ -126,6 +126,7 @@ func testPullData(registeredGatewayEUI types.EUI64, ns *GsNsServer, conn net.Con
 func testDownlink(registeredGatewayID string, gs *gatewayserver.GatewayServer, conn net.Conn) func(t *testing.T) {
 	downlink := ttnpb.NewPopulatedDownlinkMessage(test.Randy, false)
 	downlink.TxMetadata.GatewayIdentifiers = ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayID}
+	downlink.TxMetadata.Timestamp = 3003503000
 	downlink.Settings.Frequency = 868300000
 
 	base64payloadRegexp := regexp.MustCompile(regexp.QuoteMeta(base64.StdEncoding.EncodeToString(downlink.RawPayload)))
@@ -165,12 +166,13 @@ func TestUDP(t *testing.T) {
 	defer store.Destroy()
 
 	registeredGatewayID := "registered-gateway"
-	registeredGatewayEUI := types.EUI64{0xaa, 0xbb, 0xae, 0x34, 0x00, 0x2e, 0x81, 0x11}
+	registeredGatewayEUI := types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 	registeredGatewayIdentifiers := ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayID, EUI: &registeredGatewayEUI}
-	_, isAddr := StartMockIsGatewayServer(ctx, map[ttnpb.GatewayIdentifiers]ttnpb.Gateway{
-		registeredGatewayIdentifiers: {
+	_, isAddr := StartMockIsGatewayServer(ctx, []ttnpb.Gateway{
+		{
 			GatewayIdentifiers: registeredGatewayIdentifiers,
 			FrequencyPlanID:    "EU_863_870",
+			DisableTxDelay:     true,
 		},
 	})
 
@@ -214,7 +216,7 @@ func TestUDP(t *testing.T) {
 	}
 	defer conn.Close()
 
-	t.Run("PushData", testPushData(&ns))
+	t.Run("PushData", testPushData(registeredGatewayEUI, &ns))
 	t.Run("PullData", testPullData(registeredGatewayEUI, &ns, conn))
 	t.Run("Downlink", testDownlink(registeredGatewayID, gs, conn))
 }

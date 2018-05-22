@@ -78,8 +78,11 @@ func TestLink(t *testing.T) {
 	defer store.Destroy()
 
 	registeredGatewayID := "registered-gateway"
-	_, isAddr := StartMockIsGatewayServer(ctx, map[ttnpb.GatewayIdentifiers]ttnpb.Gateway{
-		{GatewayID: registeredGatewayID}: {FrequencyPlanID: "EU_863_870"},
+	_, isAddr := StartMockIsGatewayServer(ctx, []ttnpb.Gateway{
+		{
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayID},
+			FrequencyPlanID:    "EU_863_870",
+		},
 	})
 	ns, nsAddr := StartMockGsNsServer(ctx)
 

@@ -25,15 +25,12 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
-	"go.thethings.network/lorawan-stack/pkg/version"
 )
 
 const (
 	gatewayInMemory = time.Hour
 	ttnGSIndex      = "ttn-gateway-server"
 )
-
-var ttnVersions = map[string]string{ttnGSIndex: version.TTN}
 
 func (g *GatewayServer) runUDPBridge(ctx context.Context, udpConn *net.UDPConn) {
 	gwStore := udp.NewGatewayStore(gatewayInMemory)
@@ -110,9 +107,19 @@ func (g *GatewayServer) handleUpstreamUDPMessage(ctx context.Context, packet *ud
 			return
 		}
 
+		if len(packet.Data.RxPacket) > 0 {
+			var maxTmst uint32
+			for _, rxMetadata := range packet.Data.RxPacket {
+				if rxMetadata.Tmst > maxTmst {
+					maxTmst = rxMetadata.Tmst
+				}
+			}
+			gateway.syncClock(maxTmst)
+		}
 		g.handleUpstreamMessage(ctx, gateway, upstream)
 	case udp.TxAck:
 		logger.Debug("Received downlink reception confirmation")
+		gateway.hasSentTxAck.Store(true)
 	}
 }
 

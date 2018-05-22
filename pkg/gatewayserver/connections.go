@@ -27,7 +27,12 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-const pullDataExpiration = 1 * time.Minute
+const (
+	pullDataExpiration = 1 * time.Minute
+	// DownlinkTiming before sending to a gateway connected over UDP,
+	// and that does not have a JIT queue.
+	DownlinkTiming = -1 * 1000 * time.Millisecond
+)
 
 type connection interface {
 	addUpstreamObservations(*ttnpb.GatewayUp)
@@ -123,6 +128,34 @@ type udpConnection struct {
 	gtw                 atomic.Value
 	lastPullDataStorage atomic.Value
 	lastPullDataTime    atomic.Value
+
+	concentratorStart atomic.Value
+	hasSentTxAck      atomic.Value
+}
+
+func (c *udpConnection) hasJITQueue() bool {
+	hasSentTxAck, ok := c.hasSentTxAck.Load().(bool)
+	return ok && hasSentTxAck
+}
+
+// Takes a timestamp in microseconds
+func (c *udpConnection) syncClock(timestamp uint32) {
+	start := time.Now().Add(-1 * time.Microsecond * time.Duration(timestamp))
+	c.concentratorStart.Store(start)
+}
+
+// Takes a timestamp in microseconds
+func (c *udpConnection) realTime(timestamp uint32) (time.Time, bool) {
+	concentratorStart, ok := c.concentratorStart.Load().(time.Time)
+	if !ok {
+		return time.Now(), false
+	}
+
+	t := concentratorStart.Add(time.Microsecond * time.Duration(timestamp))
+	if t.Before(time.Now()) {
+		t = t.Add(time.Duration(int64(1<<32) * 1000))
+	}
+	return t, true
 }
 
 func (c *udpConnection) lastPullData() *udp.Packet {
@@ -139,9 +172,10 @@ func (c *udpConnection) pullDataExpired() bool {
 }
 
 func (c *udpConnection) send(down *ttnpb.GatewayDown) error {
+	gtw := c.gateway()
 	if c.pullDataExpired() {
 		return errors.NewWithCausef(ErrGatewayNotConnected.New(errors.Attributes{
-			"gateway_id": c.gateway().GetGatewayID(),
+			"gateway_id": gtw.GetGatewayID(),
 		}), "No PULL_DATA received in the last %s", pullDataExpiration.String())
 	}
 
@@ -156,8 +190,20 @@ func (c *udpConnection) send(down *ttnpb.GatewayDown) error {
 	pkt := *c.lastPullData()
 	pkt.PacketType = udp.PullResp
 	pkt.Data = &downstream
-	// TODO: Add a delay before the packet is sent: https://github.com/TheThingsIndustries/ttn/issues/726
-	return pkt.GatewayConn.Write(&pkt)
+
+	writePacket := func() error { return pkt.GatewayConn.Write(&pkt) }
+
+	if pkt.Data.TxPacket == nil || gtw.DisableTxDelay || c.hasJITQueue() {
+		return writePacket()
+	}
+
+	realTime, ok := c.realTime(pkt.Data.TxPacket.Tmst)
+	if !ok {
+		return writePacket()
+	}
+
+	<-time.After(time.Until(realTime.Add(DownlinkTiming)))
+	return writePacket()
 }
 
 func (c *udpConnection) gateway() *ttnpb.Gateway {
