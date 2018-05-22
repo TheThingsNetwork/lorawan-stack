@@ -20,7 +20,6 @@ func init() {
 	ErrInvalidPassword.Register()
 	ErrNotAuthenticated.Register()
 	ErrInternal.Register()
-	ErrInsufficientRights.Register()
 }
 
 // ErrInvalidPassword is returned by the login handler when providing a wrong
@@ -45,13 +44,4 @@ var ErrInternal = &errors.ErrDescriptor{
 	MessageFormat: "Internal error",
 	Code:          3,
 	Type:          errors.Internal,
-}
-
-// ErrInsufficientRights is returned by the authorize handler when an authorization
-// request contains rights that are not contained in the client's scope.
-var ErrInsufficientRights = &errors.ErrDescriptor{
-	MessageFormat:  "Client `{client_id}` does not have access to rights: {rights}",
-	Code:           4,
-	Type:           errors.InvalidArgument,
-	SafeAttributes: []string{"client_id", "rights"},
 }

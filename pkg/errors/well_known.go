@@ -44,8 +44,8 @@ var ErrContextDeadlineExceeded = &ErrDescriptor{
 	Type:          Timeout,
 }
 
-// ErrOsNotExist is the descriptor for the os.ErrNotExist error.
-var ErrOsNotExist = &ErrDescriptor{
+// ErrOSNotExist is the descriptor for the os.ErrNotExist error.
+var ErrOSNotExist = &ErrDescriptor{
 	MessageFormat: os.ErrNotExist.Error(),
 	Code:          Code(1),
 	Namespace:     "os",
@@ -56,7 +56,7 @@ func init() {
 	ErrContextCanceled.Register()
 	ErrContextDeadlineExceeded.Register()
 	ErrEOF.Register()
-	ErrOsNotExist.Register()
+	ErrOSNotExist.Register()
 }
 
 // From lifts an error to be an Error.
@@ -76,7 +76,7 @@ func From(in error) Error {
 	case context.DeadlineExceeded:
 		return ErrContextDeadlineExceeded.New(nil)
 	case os.ErrNotExist:
-		return ErrOsNotExist.New(nil)
+		return ErrOSNotExist.New(nil)
 	}
 
 	return normalize(&Impl{
