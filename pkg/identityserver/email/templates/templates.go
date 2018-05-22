@@ -61,7 +61,7 @@ type Template interface {
 
 // render renders subject and message using the given data.
 func render(templateName string, data interface{}) (string, string, error) {
-	// TODO(gomezjdaniel): add styles to the HTML version.
+	// TODO(gomezjdaniel): add styles to the HTML version. https://github.com/TheThingsIndustries/ttn/issues/778.
 	buf := new(bytes.Buffer)
 	if err := templates.Subject(templateName).Execute(buf, data); err != nil {
 		return "", "", err
