@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/web/cookie"
 )
 
@@ -52,7 +53,7 @@ func (s *Server) getCookie(c echo.Context) (authCookie, error) {
 	value := authCookie{}
 	ok, err := s.AuthCookie().Get(c, &value)
 	if err != nil {
-		return value, err
+		return value, errors.NewWithCause(err, "Failed to get auth cookie")
 	}
 
 	if !ok {
@@ -75,7 +76,7 @@ func (s *Server) updateCookie(c echo.Context, fn func(value *authCookie) error) 
 	value := new(authCookie)
 	ok, err := d.Get(c, value)
 	if err != nil {
-		return err
+		return errors.NewWithCause(err, "Failed to get auth cookie")
 	}
 
 	if !ok {

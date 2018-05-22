@@ -20,6 +20,7 @@ import (
 
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/validate"
 )
@@ -52,7 +53,7 @@ func (s *Server) login(c echo.Context) error {
 
 	ok, err := auth.Password(user.GetUser().Password).Validate(req.Password)
 	if err != nil {
-		return err
+		return errors.NewWithCause(err, "Failed to validate password")
 	}
 
 	if !ok {
@@ -67,7 +68,7 @@ func (s *Server) login(c echo.Context) error {
 		return nil
 	})
 	if err != nil {
-		return err
+		return errors.NewWithCause(err, "Failed to update cookie")
 	}
 
 	return c.NoContent(http.StatusOK)
