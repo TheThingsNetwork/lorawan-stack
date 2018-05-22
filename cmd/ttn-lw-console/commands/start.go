@@ -36,10 +36,10 @@ var (
 
 			_, err = console.New(c, assets.New(c, config.Assets), config.Console)
 			if err != nil {
-				return errors.NewWithCause(err, "Failed to initialize console")
+				return errors.NewWithCause(err, "Failed to initialize Console")
 			}
 
-			logger.Info("Starting console...")
+			logger.Info("Starting Console...")
 			return c.Run()
 		},
 	}
