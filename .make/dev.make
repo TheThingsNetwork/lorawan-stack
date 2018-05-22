@@ -37,6 +37,14 @@ ifdef DEV_REDIS_DATA_PATH
 	redis_command = redis-server --appendonly yes
 endif
 
+# Certificates
+
+dev.certs:
+	@$(log) "Generating certificates"
+	@go run $(shell go env GOROOT)/src/crypto/tls/generate_cert.go -ca -host localhost
+
+INIT_RULES += dev.certs
+
 # Docker
 
 dev.docker.installed:

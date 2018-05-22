@@ -150,10 +150,6 @@ go.init: go.min-version
 	@make go.dev-deps
 	@make go.deps
 
-# certificates
-key.pem: dev-cert
-cert.pem: dev-cert
-
 INIT_RULES += go.init
 
 include .make/go/build.make

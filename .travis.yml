@@ -15,6 +15,7 @@ cache:
 install:
 - make dev-deps
 - make deps
+- make dev.certs
 before_script:
 - make dev.databases.start
 script:
