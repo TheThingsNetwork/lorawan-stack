@@ -21,7 +21,7 @@ import (
 	"sync"
 )
 
-// registry represents an error type registry
+// registry represents an error type registry.
 type registry struct {
 	sync.RWMutex
 	byNamespaceAndCode map[string]map[Code]*ErrDescriptor
@@ -78,24 +78,24 @@ func (r *registry) GetAll() []*ErrDescriptor {
 	return res
 }
 
-// reg is a global registry to be shared by packages
+// reg is a global registry to be shared by packages.
 var reg = &registry{
 	byNamespaceAndCode: make(map[string]map[Code]*ErrDescriptor),
 }
 
-// Register registers the provided error descriptors under the provided namespace
+// Register registers the provided error descriptors under the provided namespace.
 func Register(namespace string, descriptors ...*ErrDescriptor) {
 	for _, d := range descriptors {
 		reg.Register(namespace, d)
 	}
 }
 
-// Get returns an error descriptor based on an error code
+// Get returns an error descriptor based on an error code.
 func Get(namespace string, code Code) *ErrDescriptor {
 	return reg.Get(namespace, code)
 }
 
-// Descriptor returns the error descriptor from any error
+// Descriptor returns the error descriptor from any error.
 func Descriptor(in error) (desc *ErrDescriptor) {
 	if in == nil {
 		return nil
@@ -114,25 +114,25 @@ func Descriptor(in error) (desc *ErrDescriptor) {
 	}
 }
 
-// GetCode infers the error code from the error
+// GetCode infers the error code from the error.
 func GetCode(err error) Code {
 	return Descriptor(err).Code
 }
 
 // GetMessageFormat infers the message format from the error
-// or falls back to the error message
+// or falls back to the error message.
 func GetMessageFormat(err error) string {
 	return Descriptor(err).MessageFormat
 }
 
 // GetType infers the error type from the error
-// or falls back to Unknown
+// or falls back to Unknown.
 func GetType(err error) Type {
 	return Descriptor(err).Type
 }
 
 // GetAttributes returns the error attributes or falls back
-// to empty attributes
+// to empty attributes.
 func GetAttributes(err error) Attributes {
 	e, ok := err.(Error)
 	if ok {
@@ -142,7 +142,7 @@ func GetAttributes(err error) Attributes {
 	return Attributes{}
 }
 
-// GetAll returns all registered error descriptors
+// GetAll returns all registered error descriptors.
 func GetAll() []*ErrDescriptor {
 	return reg.GetAll()
 }
