@@ -91,7 +91,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 	dev, err := reg.Create(ed)
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
 
 	_, err = ns.DownlinkQueueReplace(context.Background(), &ttnpb.DownlinkQueueRequest{})
@@ -106,7 +106,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 	dev, err = dev.Load()
 	if !a.So(err, should.BeNil) ||
 		!a.So(dev.EndDevice, should.NotBeNil) {
-		return
+		t.FailNow()
 	}
 
 	a.So(pretty.Diff(dev.EndDevice.GetQueuedApplicationDownlinks(), req.GetDownlinks()), should.BeEmpty)
@@ -123,7 +123,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 	dev, err = dev.Load()
 	if !a.So(err, should.BeNil) ||
 		!a.So(dev.EndDevice, should.NotBeNil) {
-		return
+		t.FailNow()
 	}
 
 	a.So(pretty.Diff(dev.EndDevice.GetQueuedApplicationDownlinks(), req.GetDownlinks()), should.BeEmpty)
@@ -147,7 +147,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 	dev, err := reg.Create(ed)
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
 
 	_, err = ns.DownlinkQueuePush(context.Background(), &ttnpb.DownlinkQueueRequest{})
@@ -167,7 +167,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 	dev, err = dev.Load()
 	if !a.So(err, should.BeNil) ||
 		!a.So(dev.EndDevice, should.NotBeNil) {
-		return
+		t.FailNow()
 	}
 
 	a.So(pretty.Diff(dev.EndDevice.GetQueuedApplicationDownlinks(), downlinks), should.BeEmpty)
@@ -182,7 +182,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 	dev, err = dev.Load()
 	if !a.So(err, should.BeNil) ||
 		!a.So(dev.EndDevice, should.NotBeNil) {
-		return
+		t.FailNow()
 	}
 	a.So(pretty.Diff(dev.EndDevice.GetQueuedApplicationDownlinks(), downlinks), should.BeEmpty)
 }
@@ -205,7 +205,7 @@ func TestDownlinkQueueList(t *testing.T) {
 
 	dev, err := reg.Create(ed)
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
 
 	_, err = ns.DownlinkQueueList(context.Background(), &ttnpb.EndDeviceIdentifiers{})
@@ -224,7 +224,7 @@ func TestDownlinkQueueList(t *testing.T) {
 
 	err = dev.Store()
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
 
 	downlinks, err = ns.DownlinkQueueList(context.Background(), &dev.EndDevice.EndDeviceIdentifiers)
@@ -250,7 +250,7 @@ func TestDownlinkQueueClear(t *testing.T) {
 
 	dev, err := reg.Create(ed)
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
 
 	e, err := ns.DownlinkQueueClear(context.Background(), &ttnpb.EndDeviceIdentifiers{})
@@ -264,7 +264,7 @@ func TestDownlinkQueueClear(t *testing.T) {
 	dev, err = dev.Load()
 	if !a.So(err, should.BeNil) ||
 		!a.So(dev.EndDevice, should.NotBeNil) {
-		return
+		t.FailNow()
 	}
 	a.So(dev.EndDevice.GetQueuedApplicationDownlinks(), should.BeEmpty)
 
@@ -277,7 +277,7 @@ func TestDownlinkQueueClear(t *testing.T) {
 
 	err = dev.Store()
 	if !a.So(err, should.BeNil) {
-		return
+		t.FailNow()
 	}
 
 	e, err = ns.DownlinkQueueClear(context.Background(), &dev.EndDevice.EndDeviceIdentifiers)
@@ -287,7 +287,7 @@ func TestDownlinkQueueClear(t *testing.T) {
 	dev, err = dev.Load()
 	if !a.So(err, should.BeNil) ||
 		!a.So(dev.EndDevice, should.NotBeNil) {
-		return
+		t.FailNow()
 	}
 	a.So(dev.EndDevice.GetQueuedApplicationDownlinks(), should.BeEmpty)
 }
@@ -372,13 +372,16 @@ func sendUplinkDuplicates(t *testing.T, h UplinkHandler, windowEndCh chan window
 	return mds, errch
 }
 
-type mockAsNsLinkApplicationStream struct {
+type MockAsNsLinkApplicationStream struct {
 	*test.MockServerStream
-	send func(*ttnpb.ApplicationUp) error
+	SendFunc func(*ttnpb.ApplicationUp) error
 }
 
-func (s *mockAsNsLinkApplicationStream) Send(msg *ttnpb.ApplicationUp) error {
-	return s.send(msg)
+func (s *MockAsNsLinkApplicationStream) Send(msg *ttnpb.ApplicationUp) error {
+	if s.SendFunc == nil {
+		return nil
+	}
+	return s.SendFunc(msg)
 }
 
 func TestLinkApplication(t *testing.T) {
@@ -405,7 +408,7 @@ func TestLinkApplication(t *testing.T) {
 	}
 
 	time.AfterFunc(test.Delay, func() {
-		err := ns.LinkApplication(id, &mockAsNsLinkApplicationStream{
+		err := ns.LinkApplication(id, &MockAsNsLinkApplicationStream{
 			MockServerStream: &test.MockServerStream{
 				MockStream: &test.MockStream{
 					ContextFunc: func() context.Context {
@@ -415,19 +418,19 @@ func TestLinkApplication(t *testing.T) {
 					},
 				},
 			},
-			send: sendFunc,
+			SendFunc: sendFunc,
 		})
 		a.So(err, should.Resemble, context.Canceled)
 		wg.Done()
 	})
 
-	err := ns.LinkApplication(id, &mockAsNsLinkApplicationStream{
+	err := ns.LinkApplication(id, &MockAsNsLinkApplicationStream{
 		MockServerStream: &test.MockServerStream{
 			MockStream: &test.MockStream{
 				ContextFunc: context.Background,
 			},
 		},
-		send: sendFunc,
+		SendFunc: sendFunc,
 	})
 	a.So(err, should.NotBeNil)
 
@@ -471,7 +474,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			FrequencyPlanID: test.EUFrequencyPlanID,
 		})
 		if !a.So(err, should.BeNil) {
-			return
+			t.FailNow()
 		}
 
 		t.Run("Empty DevAddr", func(t *testing.T) {
@@ -915,7 +918,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 
 					_, err := reg.Create(ed)
 					if !a.So(err, should.BeNil) {
-						return
+						t.FailNow()
 					}
 				}
 
@@ -948,13 +951,13 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					id := ttnpb.NewPopulatedApplicationIdentifiers(test.Randy, false)
 					id.ApplicationID = ApplicationID
 
-					err := ns.LinkApplication(id, &mockAsNsLinkApplicationStream{
+					err := ns.LinkApplication(id, &MockAsNsLinkApplicationStream{
 						MockServerStream: &test.MockServerStream{
 							MockStream: &test.MockStream{
 								ContextFunc: context.Background,
 							},
 						},
-						send: func(up *ttnpb.ApplicationUp) error {
+						SendFunc: func(up *ttnpb.ApplicationUp) error {
 							asSendCh <- up
 							return nil
 						},
@@ -967,7 +970,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 
 				dev, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
 				if !a.So(err, should.BeNil) {
-					return
+					t.FailNow()
 				}
 
 				ctx := context.WithValue(context.Background(), "answer", 42)
@@ -1036,11 +1039,11 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						dev, err = dev.Load()
 						if !a.So(err, should.BeNil) ||
 							!a.So(dev.EndDevice, should.NotBeNil) {
-							return
+							t.FailNow()
 						}
 
 						if !a.So(dev.EndDevice.GetRecentUplinks(), should.NotBeEmpty) {
-							return
+							t.FailNow()
 						}
 
 						storedUp := dev.EndDevice.GetRecentUplinks()[len(dev.EndDevice.RecentUplinks)-1]
@@ -1063,7 +1066,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
 					})
 				}) {
-					return
+					t.FailNow()
 				}
 
 				t.Run("cooldown window", func(t *testing.T) {
@@ -1148,19 +1151,19 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 	}
 }
 
-var _ ttnpb.NsJsClient = &mockNsJsClient{}
+var _ ttnpb.NsJsClient = &MockNsJsClient{}
 
-type mockNsJsClient struct {
-	handleJoin  func(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error)
-	getNwkSKeys func(ctx context.Context, req *ttnpb.SessionKeyRequest, opts ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error)
+type MockNsJsClient struct {
+	HandleJoinFunc  func(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error)
+	GetNwkSKeysFunc func(ctx context.Context, req *ttnpb.SessionKeyRequest, opts ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error)
 }
 
-func (c *mockNsJsClient) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
-	return c.handleJoin(ctx, req, opts...)
+func (c *MockNsJsClient) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
+	return c.HandleJoinFunc(ctx, req, opts...)
 }
 
-func (c *mockNsJsClient) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest, opts ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error) {
-	return c.getNwkSKeys(ctx, req, opts...)
+func (c *MockNsJsClient) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest, opts ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error) {
+	return c.GetNwkSKeysFunc(ctx, req, opts...)
 }
 
 func HandleJoinTest(conf *component.Config) func(t *testing.T) {
@@ -1189,7 +1192,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 
 		_, err = reg.Create(ed)
 		if !a.So(err, should.BeNil) {
-			return
+			t.FailNow()
 		}
 
 		_, err = ns.HandleUplink(context.Background(), req)
@@ -1285,13 +1288,13 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 
 					_, err := reg.Create(ed)
 					if !a.So(err, should.BeNil) {
-						return
+						t.FailNow()
 					}
 				}
 
 				keys := ttnpb.NewPopulatedSessionKeys(test.Randy, false)
 
-				getNwkSKeys := func(ctx context.Context, req *ttnpb.SessionKeyRequest, opts ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error) {
+				getNwkSKeysFunc := func(ctx context.Context, req *ttnpb.SessionKeyRequest, opts ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error) {
 					err := errors.New("GetNwkSKeys should not be called")
 					t.Fatal(err)
 					return nil, err
@@ -1313,20 +1316,20 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					component.MustNew(test.GetLogger(t), conf),
 					&Config{
 						Registry: reg,
-						JoinServers: []ttnpb.NsJsClient{&mockNsJsClient{
-							handleJoin: func(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
+						JoinServers: []ttnpb.NsJsClient{&MockNsJsClient{
+							HandleJoinFunc: func(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
 								return nil, errors.New("test")
 							},
-							getNwkSKeys: getNwkSKeys,
+							GetNwkSKeysFunc: getNwkSKeysFunc,
 						},
-							&mockNsJsClient{
-								handleJoin: func(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
+							&MockNsJsClient{
+								HandleJoinFunc: func(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
 									ch := make(chan *ttnpb.JoinResponse, 1)
 									errch := make(chan error, 1)
 									handleJoinCh <- handleJoinRequest{ctx, req, opts, ch, errch}
 									return <-ch, <-errch
 								},
-								getNwkSKeys: getNwkSKeys,
+								GetNwkSKeysFunc: getNwkSKeysFunc,
 							},
 						},
 					},
@@ -1340,7 +1343,11 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						collectionDoneCh <- windowEnd{ctx, msg, ch}
 						return ch
 					}),
+					WithNsGsClientFunc(func(ctx context.Context, id ttnpb.GatewayIdentifiers) (ttnpb.NsGsClient, error) {
+						return &MockNsGsClient{}, nil
+					}),
 				)).(*NetworkServer)
+
 				test.Must(nil, ns.Start())
 
 				asSendCh := make(chan *ttnpb.ApplicationUp)
@@ -1349,13 +1356,13 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					id := ttnpb.NewPopulatedApplicationIdentifiers(test.Randy, false)
 					id.ApplicationID = ApplicationID
 
-					err := ns.LinkApplication(id, &mockAsNsLinkApplicationStream{
+					err := ns.LinkApplication(id, &MockAsNsLinkApplicationStream{
 						MockServerStream: &test.MockServerStream{
 							MockStream: &test.MockStream{
 								ContextFunc: context.Background,
 							},
 						},
-						send: func(up *ttnpb.ApplicationUp) error {
+						SendFunc: func(up *ttnpb.ApplicationUp) error {
 							asSendCh <- up
 							return nil
 						},
@@ -1368,7 +1375,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 
 				dev, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
 				if !a.So(err, should.BeNil) {
-					return
+					t.FailNow()
 				}
 
 				expectedRequest := &ttnpb.JoinRequest{
@@ -1394,11 +1401,11 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				if !t.Run("deduplication window", func(t *testing.T) {
 					var md []*ttnpb.RxMetadata
 
+					resp := ttnpb.NewPopulatedJoinResponse(test.Randy, false)
+					resp.SessionKeys = *keys
+
 					t.Run("message send", func(t *testing.T) {
 						a := assertions.New(t)
-
-						resp := ttnpb.NewPopulatedJoinResponse(test.Randy, false)
-						resp.SessionKeys = *keys
 
 						wg := &sync.WaitGroup{}
 						wg.Add(1)
@@ -1461,22 +1468,46 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					t.Run("device update", func(t *testing.T) {
 						a := assertions.New(t)
 
+						dev, err = dev.Load()
+						if !a.So(err, should.BeNil) ||
+							!a.So(dev.EndDevice, should.NotBeNil) {
+							t.FailNow()
+						}
+						if a.So(dev.EndDevice.GetSession(), should.NotBeNil) {
+							ses := dev.EndDevice.GetSession()
+							a.So(ses.StartedAt, should.HappenBetween, start, time.Now())
+							a.So(dev.EndDevice.EndDeviceIdentifiers.DevAddr, should.Resemble, &ses.DevAddr)
+							if tc.Device.Session != nil {
+								a.So(ses.DevAddr, should.NotResemble, tc.Device.Session.DevAddr)
+							}
+						}
+
+						if !a.So(dev.EndDevice.GetRecentUplinks(), should.NotBeEmpty) {
+							t.FailNow()
+						}
+
+						if !a.So(dev.EndDevice.GetRecentDownlinks(), should.NotBeEmpty) {
+							t.FailNow()
+						}
+
+						a.So(dev.EndDevice.GetRecentDownlinks()[len(dev.EndDevice.GetRecentDownlinks())-1].GetRawPayload(), should.Resemble, resp.GetRawPayload())
+
 						msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
 						msg.RxMetadata = md
 
-						ed := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+						expected := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-						ed.RecentUplinks = append(ed.GetRecentUplinks(), msg)
-						if len(ed.RecentUplinks) > RecentUplinkCount {
-							ed.RecentUplinks = ed.RecentUplinks[len(ed.RecentUplinks)-RecentUplinkCount:]
+						expected.RecentUplinks = append(expected.GetRecentUplinks(), msg)
+						if len(expected.RecentUplinks) > RecentUplinkCount {
+							expected.RecentUplinks = expected.RecentUplinks[len(expected.RecentUplinks)-RecentUplinkCount:]
 						}
 
-						fp := test.Must(ns.Component.FrequencyPlans.GetByID(ed.GetFrequencyPlanID())).(ttnpb.FrequencyPlan)
+						fp := test.Must(ns.Component.FrequencyPlans.GetByID(expected.GetFrequencyPlanID())).(ttnpb.FrequencyPlan)
 						band := test.Must(band.GetByID(fp.BandID)).(band.Band)
 
-						stDes := ed.GetMACStateDesired()
-						ed.MACState = &ttnpb.MACState{
-							MaxTxPower:        uint32(ed.MaxTxPower),
+						stDes := expected.GetMACStateDesired()
+						expected.MACState = &ttnpb.MACState{
+							MaxTxPower:        uint32(expected.MaxTxPower),
 							UplinkDwellTime:   fp.DwellTime != nil,
 							DownlinkDwellTime: false, // TODO: Get this from band (https://github.com/TheThingsIndustries/ttn/issues/774)
 							ADRNbTrans:        1,
@@ -1488,51 +1519,33 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 							Rx2DataRateIndex:  stDes.GetRx2DataRateIndex(),
 							Rx2Frequency:      uint64(band.DefaultRx2Parameters.Frequency),
 						}
-
-						dev, err = dev.Load()
-						if !a.So(err, should.BeNil) ||
-							!a.So(dev.EndDevice, should.NotBeNil) {
-							return
+						expected.MACStateDesired = expected.GetMACState()
+						expected.EndDeviceIdentifiers.DevAddr = dev.EndDevice.EndDeviceIdentifiers.DevAddr
+						expected.Session = &ttnpb.Session{
+							SessionKeys: *keys,
+							StartedAt:   dev.EndDevice.GetSession().GetStartedAt(),
+							DevAddr:     *dev.EndDevice.EndDeviceIdentifiers.DevAddr,
 						}
-
-						if !a.So(dev.EndDevice.GetRecentUplinks(), should.NotBeEmpty) {
-							return
-						}
+						expected.SessionFallback = nil
+						expected.CreatedAt = dev.EndDevice.GetCreatedAt()
+						expected.UpdatedAt = dev.EndDevice.GetUpdatedAt()
+						expected.RecentDownlinks = dev.EndDevice.GetRecentDownlinks()
 
 						storedUp := dev.EndDevice.GetRecentUplinks()[len(dev.EndDevice.RecentUplinks)-1]
-						expectedUp := ed.GetRecentUplinks()[len(ed.RecentUplinks)-1]
+						expectedUp := expected.GetRecentUplinks()[len(expected.RecentUplinks)-1]
 
 						a.So(storedUp.GetReceivedAt(), should.HappenBetween, start, time.Now())
-						a.So(dev.EndDevice.Session.StartedAt, should.HappenBetween, start, time.Now())
 						expectedUp.ReceivedAt = storedUp.GetReceivedAt()
 
-						storedMD := storedUp.GetRxMetadata()
-						expectedMD := expectedUp.GetRxMetadata()
-
-						if !a.So(test.SameElementsDiff(storedMD, expectedMD), should.BeTrue) {
-							metadataLdiff(t, storedMD, expectedMD)
+						if !a.So(test.SameElementsDiff(storedUp.GetRxMetadata(), expectedUp.GetRxMetadata()), should.BeTrue) {
+							metadataLdiff(t, storedUp.GetRxMetadata(), expectedUp.GetRxMetadata())
 						}
+						expectedUp.RxMetadata = storedUp.RxMetadata
 
-						storedUp.RxMetadata = expectedUp.RxMetadata
-
-						a.So(dev.EndDevice.SessionFallback, should.BeNil)
-						if a.So(dev.EndDevice.GetSession(), should.NotBeNil) {
-							a.So(dev.EndDevice.Session.SessionKeys, should.Resemble, *keys)
-							a.So(dev.EndDevice.Session.StartedAt, should.HappenBetween, start, time.Now())
-							a.So(dev.EndDevice.EndDeviceIdentifiers.DevAddr, should.Resemble, &dev.EndDevice.Session.DevAddr)
-							if ed.Session != nil {
-								a.So(dev.EndDevice.Session.DevAddr, should.NotResemble, ed.Session.DevAddr)
-							}
-						}
-
-						ed.EndDeviceIdentifiers.DevAddr = dev.EndDevice.EndDeviceIdentifiers.DevAddr
-						ed.Session = dev.EndDevice.GetSession()
-						ed.CreatedAt = dev.GetCreatedAt()
-						ed.UpdatedAt = dev.GetUpdatedAt()
-						a.So(pretty.Diff(dev.EndDevice, ed), should.BeEmpty)
+						a.So(pretty.Diff(dev.EndDevice, expected), should.BeEmpty)
 					})
 				}) {
-					return
+					t.FailNow()
 				}
 
 				t.Run("cooldown window", func(t *testing.T) {

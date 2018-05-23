@@ -79,15 +79,18 @@ func TestAccumulator(t *testing.T) {
 	a.So(acc.Accumulated(), should.BeEmpty)
 }
 
-var _ ttnpb.NsGsClient = &mockNsGsClient{}
+var _ ttnpb.NsGsClient = &MockNsGsClient{}
 
-type mockNsGsClient struct {
+type MockNsGsClient struct {
 	*test.MockClientStream
-	scheduleApplicationDownlinkFunc func(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error)
+	ScheduleDownlinkFunc func(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error)
 }
 
-func (cl *mockNsGsClient) ScheduleDownlink(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
-	return cl.scheduleApplicationDownlinkFunc(ctx, in, opts...)
+func (cl *MockNsGsClient) ScheduleDownlink(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
+	if cl.ScheduleDownlinkFunc == nil {
+		return nil, nil
+	}
+	return cl.ScheduleDownlinkFunc(ctx, in, opts...)
 }
 
 func TestScheduleDownlink(t *testing.T) {
@@ -324,9 +327,9 @@ func TestScheduleDownlink(t *testing.T) {
 			}
 
 			var n uint32
-			gateways[md.GatewayIdentifiers.UniqueID(scheduleCtx)] = &mockNsGsClient{
+			gateways[md.GatewayIdentifiers.UniqueID(scheduleCtx)] = &MockNsGsClient{
 				MockClientStream: &test.MockClientStream{},
-				scheduleApplicationDownlinkFunc: func(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
+				ScheduleDownlinkFunc: func(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
 					defer atomic.AddUint32(&cnt, 1)
 					defer atomic.AddUint32(&n, 1)
 
@@ -445,9 +448,9 @@ func TestScheduleDownlink(t *testing.T) {
 			slots[1].TxMetadata.Timestamp += uint64(time.Second.Nanoseconds())
 
 			var n uint32
-			gateways[md.GatewayIdentifiers.UniqueID(scheduleCtx)] = &mockNsGsClient{
+			gateways[md.GatewayIdentifiers.UniqueID(scheduleCtx)] = &MockNsGsClient{
 				MockClientStream: &test.MockClientStream{},
-				scheduleApplicationDownlinkFunc: func(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
+				ScheduleDownlinkFunc: func(ctx context.Context, in *ttnpb.DownlinkMessage, opts ...grpc.CallOption) (*pbtypes.Empty, error) {
 					defer atomic.AddUint32(&cnt, 1)
 					defer atomic.AddUint32(&n, 1)
 
