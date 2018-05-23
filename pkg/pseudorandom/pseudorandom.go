@@ -33,7 +33,7 @@ type TTNRandom struct {
 func New(seed int64) random.Interface {
 	return &TTNRandom{
 		Interface: &random.TTNRandom{
-			Source: rand.New(rand.NewSource(seed)),
+			Reader: rand.New(rand.NewSource(seed)),
 		},
 	}
 }
@@ -70,12 +70,12 @@ func (r *TTNRandom) Bytes(n int) []byte {
 	return r.Interface.Bytes(n)
 }
 
-// FillBytes fills the byte slice with random bytes. This func uses the global TTNRandom.
-func FillBytes(p []byte) { global.FillBytes(p) }
+// Read fills the byte slice with random bytes. This func uses the global TTNRandom.
+func Read(b []byte) (int, error) { return global.Read(b) }
 
-// FillBytes fills the byte slice with random bytes.
-func (r *TTNRandom) FillBytes(p []byte) {
+// Read fills the byte slice with random bytes.
+func (r *TTNRandom) Read(b []byte) (int, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.Interface.FillBytes(p)
+	return r.Interface.Read(b)
 }

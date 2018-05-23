@@ -36,11 +36,11 @@ func TestPseudoRandom(t *testing.T) {
 	a.So(r.String(10), assertions.ShouldHaveLength, 10)
 
 	p := make([]byte, 100)
-	FillBytes(p)
+	Read(p)
 	a.So(p, assertions.ShouldNotResemble, make([]byte, 100))
 
 	q := make([]byte, 100)
-	r.FillBytes(q)
+	r.Read(q)
 	a.So(q, assertions.ShouldNotResemble, make([]byte, 100))
 }
 
@@ -62,9 +62,9 @@ func BenchmarkString(b *testing.B) {
 	}
 }
 
-func BenchmarkFillBytes(b *testing.B) {
+func BenchmarkRead(b *testing.B) {
 	p := make([]byte, 100)
 	for i := 0; i < b.N; i++ {
-		FillBytes(p)
+		Read(p)
 	}
 }
