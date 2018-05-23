@@ -29,16 +29,25 @@ type MockStream struct {
 
 // Context calls s.ContextFunc.
 func (s *MockStream) Context() context.Context {
+	if s.ContextFunc == nil {
+		return nil
+	}
 	return s.ContextFunc()
 }
 
 // SendMsg calls s.SendMsgFunc.
 func (s *MockStream) SendMsg(m interface{}) error {
+	if s.SendMsgFunc == nil {
+		return nil
+	}
 	return s.SendMsgFunc(m)
 }
 
 // RecvMsg calls s.RecvMsgFunc.
 func (s *MockStream) RecvMsg(m interface{}) error {
+	if s.RecvMsgFunc == nil {
+		return nil
+	}
 	return s.RecvMsgFunc(m)
 }
 
@@ -52,16 +61,25 @@ type MockServerStream struct {
 
 // SetHeader calls s.SetHeaderFunc.
 func (s *MockServerStream) SetHeader(md metadata.MD) error {
+	if s.SetHeaderFunc == nil {
+		return nil
+	}
 	return s.SetHeaderFunc(md)
 }
 
 // SendHeader calls s.SendHeaderFunc.
 func (s *MockServerStream) SendHeader(md metadata.MD) error {
+	if s.SendHeaderFunc == nil {
+		return nil
+	}
 	return s.SendHeaderFunc(md)
 }
 
 // SetTrailer calls s.SetTrailerFunc.
 func (s *MockServerStream) SetTrailer(md metadata.MD) {
+	if s.SetTrailerFunc == nil {
+		return
+	}
 	s.SetTrailerFunc(md)
 }
 
@@ -75,15 +93,24 @@ type MockClientStream struct {
 
 // Header calls s.HeaderFunc.
 func (s *MockClientStream) Header() (metadata.MD, error) {
+	if s.HeaderFunc == nil {
+		return metadata.MD{}, nil
+	}
 	return s.HeaderFunc()
 }
 
 // Trailer calls s.TrailerFunc.
 func (s *MockClientStream) Trailer() metadata.MD {
+	if s.TrailerFunc == nil {
+		return metadata.MD{}
+	}
 	return s.TrailerFunc()
 }
 
 // CloseSend calls s.CloseSendFunc.
 func (s *MockClientStream) CloseSend() error {
+	if s.CloseSendFunc == nil {
+		return nil
+	}
 	return s.CloseSendFunc()
 }
