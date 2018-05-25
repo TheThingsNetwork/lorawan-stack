@@ -109,7 +109,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		t.FailNow()
 	}
 
-	a.So(pretty.Diff(dev.EndDevice.GetQueuedApplicationDownlinks(), req.GetDownlinks()), should.BeEmpty)
+	a.So(pretty.Diff(dev.GetQueuedApplicationDownlinks(), req.GetDownlinks()), should.BeEmpty)
 
 	req = ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false)
 	for len(req.GetDownlinks()) == 0 {
@@ -126,7 +126,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		t.FailNow()
 	}
 
-	a.So(pretty.Diff(dev.EndDevice.GetQueuedApplicationDownlinks(), req.GetDownlinks()), should.BeEmpty)
+	a.So(pretty.Diff(dev.GetQueuedApplicationDownlinks(), req.GetDownlinks()), should.BeEmpty)
 }
 
 func TestDownlinkQueuePush(t *testing.T) {
@@ -170,7 +170,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 		t.FailNow()
 	}
 
-	a.So(pretty.Diff(dev.EndDevice.GetQueuedApplicationDownlinks(), downlinks), should.BeEmpty)
+	a.So(pretty.Diff(dev.GetQueuedApplicationDownlinks(), downlinks), should.BeEmpty)
 
 	req = ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false)
 	req.EndDeviceIdentifiers = ed.EndDeviceIdentifiers
@@ -184,7 +184,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 		!a.So(dev.EndDevice, should.NotBeNil) {
 		t.FailNow()
 	}
-	a.So(pretty.Diff(dev.EndDevice.GetQueuedApplicationDownlinks(), downlinks), should.BeEmpty)
+	a.So(pretty.Diff(dev.GetQueuedApplicationDownlinks(), downlinks), should.BeEmpty)
 }
 
 func TestDownlinkQueueList(t *testing.T) {
@@ -211,7 +211,7 @@ func TestDownlinkQueueList(t *testing.T) {
 	_, err = ns.DownlinkQueueList(context.Background(), &ttnpb.EndDeviceIdentifiers{})
 	a.So(err, should.NotBeNil)
 
-	downlinks, err := ns.DownlinkQueueList(context.Background(), &dev.EndDevice.EndDeviceIdentifiers)
+	downlinks, err := ns.DownlinkQueueList(context.Background(), &dev.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(pretty.Diff(downlinks, &ttnpb.ApplicationDownlinks{Downlinks: ed.QueuedApplicationDownlinks}), should.BeEmpty)
 
@@ -219,7 +219,7 @@ func TestDownlinkQueueList(t *testing.T) {
 	for len(ed.QueuedApplicationDownlinks) == 0 {
 		ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	}
-	ed.EndDeviceIdentifiers = dev.EndDevice.EndDeviceIdentifiers
+	ed.EndDeviceIdentifiers = dev.EndDeviceIdentifiers
 	dev.EndDevice = ed
 
 	err = dev.Store()
@@ -227,7 +227,7 @@ func TestDownlinkQueueList(t *testing.T) {
 		t.FailNow()
 	}
 
-	downlinks, err = ns.DownlinkQueueList(context.Background(), &dev.EndDevice.EndDeviceIdentifiers)
+	downlinks, err = ns.DownlinkQueueList(context.Background(), &dev.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(pretty.Diff(downlinks, &ttnpb.ApplicationDownlinks{Downlinks: ed.QueuedApplicationDownlinks}), should.BeEmpty)
 }
@@ -257,7 +257,7 @@ func TestDownlinkQueueClear(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(e, should.BeNil)
 
-	e, err = ns.DownlinkQueueClear(context.Background(), &dev.EndDevice.EndDeviceIdentifiers)
+	e, err = ns.DownlinkQueueClear(context.Background(), &dev.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(e, should.NotBeNil)
 
@@ -266,13 +266,13 @@ func TestDownlinkQueueClear(t *testing.T) {
 		!a.So(dev.EndDevice, should.NotBeNil) {
 		t.FailNow()
 	}
-	a.So(dev.EndDevice.GetQueuedApplicationDownlinks(), should.BeEmpty)
+	a.So(dev.GetQueuedApplicationDownlinks(), should.BeEmpty)
 
 	ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	for len(ed.QueuedApplicationDownlinks) == 0 {
 		ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 	}
-	ed.EndDeviceIdentifiers = dev.EndDevice.EndDeviceIdentifiers
+	ed.EndDeviceIdentifiers = dev.EndDeviceIdentifiers
 	dev.EndDevice = ed
 
 	err = dev.Store()
@@ -280,7 +280,7 @@ func TestDownlinkQueueClear(t *testing.T) {
 		t.FailNow()
 	}
 
-	e, err = ns.DownlinkQueueClear(context.Background(), &dev.EndDevice.EndDeviceIdentifiers)
+	e, err = ns.DownlinkQueueClear(context.Background(), &dev.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(e, should.NotBeNil)
 
@@ -289,7 +289,7 @@ func TestDownlinkQueueClear(t *testing.T) {
 		!a.So(dev.EndDevice, should.NotBeNil) {
 		t.FailNow()
 	}
-	a.So(dev.EndDevice.GetQueuedApplicationDownlinks(), should.BeEmpty)
+	a.So(dev.GetQueuedApplicationDownlinks(), should.BeEmpty)
 }
 
 type UplinkHandler interface {
@@ -1042,11 +1042,11 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							t.FailNow()
 						}
 
-						if !a.So(dev.EndDevice.GetRecentUplinks(), should.NotBeEmpty) {
+						if !a.So(dev.GetRecentUplinks(), should.NotBeEmpty) {
 							t.FailNow()
 						}
 
-						storedUp := dev.EndDevice.GetRecentUplinks()[len(dev.EndDevice.RecentUplinks)-1]
+						storedUp := dev.GetRecentUplinks()[len(dev.RecentUplinks)-1]
 						expectedUp := ed.GetRecentUplinks()[len(ed.RecentUplinks)-1]
 
 						a.So(storedUp.GetReceivedAt(), should.HappenBetween, start, time.Now())
@@ -1473,24 +1473,24 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 							!a.So(dev.EndDevice, should.NotBeNil) {
 							t.FailNow()
 						}
-						if a.So(dev.EndDevice.GetSession(), should.NotBeNil) {
-							ses := dev.EndDevice.GetSession()
+						if a.So(dev.GetSession(), should.NotBeNil) {
+							ses := dev.GetSession()
 							a.So(ses.StartedAt, should.HappenBetween, start, time.Now())
-							a.So(dev.EndDevice.EndDeviceIdentifiers.DevAddr, should.Resemble, &ses.DevAddr)
+							a.So(dev.EndDeviceIdentifiers.DevAddr, should.Resemble, &ses.DevAddr)
 							if tc.Device.Session != nil {
 								a.So(ses.DevAddr, should.NotResemble, tc.Device.Session.DevAddr)
 							}
 						}
 
-						if !a.So(dev.EndDevice.GetRecentUplinks(), should.NotBeEmpty) {
+						if !a.So(dev.GetRecentUplinks(), should.NotBeEmpty) {
 							t.FailNow()
 						}
 
-						if !a.So(dev.EndDevice.GetRecentDownlinks(), should.NotBeEmpty) {
+						if !a.So(dev.GetRecentDownlinks(), should.NotBeEmpty) {
 							t.FailNow()
 						}
 
-						a.So(dev.EndDevice.GetRecentDownlinks()[len(dev.EndDevice.GetRecentDownlinks())-1].GetRawPayload(), should.Resemble, resp.GetRawPayload())
+						a.So(pretty.Diff(dev.GetRecentDownlinks()[len(dev.GetRecentDownlinks())-1].GetRawPayload(), resp.GetRawPayload()), should.BeEmpty)
 
 						msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
 						msg.RxMetadata = md
@@ -1520,18 +1520,18 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 							Rx2Frequency:      uint64(band.DefaultRx2Parameters.Frequency),
 						}
 						expected.MACStateDesired = expected.GetMACState()
-						expected.EndDeviceIdentifiers.DevAddr = dev.EndDevice.EndDeviceIdentifiers.DevAddr
+						expected.EndDeviceIdentifiers.DevAddr = dev.EndDeviceIdentifiers.DevAddr
 						expected.Session = &ttnpb.Session{
 							SessionKeys: *keys,
-							StartedAt:   dev.EndDevice.GetSession().GetStartedAt(),
-							DevAddr:     *dev.EndDevice.EndDeviceIdentifiers.DevAddr,
+							StartedAt:   dev.GetSession().GetStartedAt(),
+							DevAddr:     *dev.EndDeviceIdentifiers.DevAddr,
 						}
 						expected.SessionFallback = nil
-						expected.CreatedAt = dev.EndDevice.GetCreatedAt()
-						expected.UpdatedAt = dev.EndDevice.GetUpdatedAt()
-						expected.RecentDownlinks = dev.EndDevice.GetRecentDownlinks()
+						expected.CreatedAt = dev.GetCreatedAt()
+						expected.UpdatedAt = dev.GetUpdatedAt()
+						expected.RecentDownlinks = dev.GetRecentDownlinks()
 
-						storedUp := dev.EndDevice.GetRecentUplinks()[len(dev.EndDevice.RecentUplinks)-1]
+						storedUp := dev.GetRecentUplinks()[len(dev.RecentUplinks)-1]
 						expectedUp := expected.GetRecentUplinks()[len(expected.RecentUplinks)-1]
 
 						a.So(storedUp.GetReceivedAt(), should.HappenBetween, start, time.Now())
@@ -1574,7 +1574,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 
 						select {
 						case req := <-handleJoinCh:
-							a.So(req.req.EndDeviceIdentifiers.DevAddr, should.NotResemble, dev.EndDevice.GetSession().DevAddr)
+							a.So(req.req.EndDeviceIdentifiers.DevAddr, should.NotResemble, dev.GetSession().DevAddr)
 
 							expectedRequest.EndDeviceIdentifiers.DevAddr = req.req.EndDeviceIdentifiers.DevAddr
 							a.So(req.req, should.Resemble, expectedRequest)
