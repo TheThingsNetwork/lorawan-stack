@@ -51,20 +51,20 @@ func TestDownlinks(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	data, err := udp.TranslateDownstream(&ttnpb.GatewayDown{DownlinkMessage: &downlink})
+	tx, err := udp.TranslateDownstream(&downlink)
 	a.So(err, should.BeNil)
 
-	a.So(data.TxPacket.DatR.LoRa, should.Equal, "SF10BW500")
-	a.So(data.TxPacket.Tmst, should.Equal, 1886440700)
-	a.So(data.TxPacket.NCRC, should.Equal, true)
-	a.So(data.TxPacket.Data, should.Equal, "ffOO")
+	a.So(tx.DatR.LoRa, should.Equal, "SF10BW500")
+	a.So(tx.Tmst, should.Equal, 1886440700)
+	a.So(tx.NCRC, should.Equal, true)
+	a.So(tx.Data, should.Equal, "ffOO")
 }
 
 func TestDummyDownlink(t *testing.T) {
 	a := assertions.New(t)
 
 	downlink := ttnpb.DownlinkMessage{Settings: ttnpb.TxSettings{Modulation: 3939}} // Dummy modulation set
-	_, err := udp.TranslateDownstream(&ttnpb.GatewayDown{DownlinkMessage: &downlink})
+	_, err := udp.TranslateDownstream(&downlink)
 	a.So(err, should.NotBeNil)
 }
 

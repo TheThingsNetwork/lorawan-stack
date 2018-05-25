@@ -39,12 +39,11 @@ func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downli
 	if !ok {
 		return nil, ErrGatewayNotConnected.New(errors.Attributes{"gateway_id": id.GetGatewayID()})
 	}
-	downMessage := &ttnpb.GatewayDown{DownlinkMessage: down}
-	err := connection.send(downMessage)
+	err := connection.send(down)
 	if err != nil {
 		return nil, errors.NewWithCause(err, "Could not send downlink to gateway")
 	}
 
-	connection.addDownstreamObservations(downMessage)
+	connection.addDownstreamObservations(&ttnpb.GatewayDown{DownlinkMessage: down})
 	return ttnpb.Empty, nil
 }

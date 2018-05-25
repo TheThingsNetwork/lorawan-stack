@@ -40,7 +40,7 @@ type connection interface {
 	getObservations() ttnpb.GatewayObservations
 
 	gateway() *ttnpb.Gateway
-	send(*ttnpb.GatewayDown) error
+	send(*ttnpb.DownlinkMessage) error
 	Close() error
 }
 
@@ -51,16 +51,16 @@ type connectionData struct {
 	scheduler scheduling.Scheduler
 }
 
-func (c *connectionData) schedule(down *ttnpb.GatewayDown) (err error) {
+func (c *connectionData) schedule(down *ttnpb.DownlinkMessage) (err error) {
 	span := scheduling.Span{
-		Start: scheduling.ConcentratorTime(down.DownlinkMessage.TxMetadata.Timestamp),
+		Start: scheduling.ConcentratorTime(down.TxMetadata.Timestamp),
 	}
-	span.Duration, err = toa.Compute(down.DownlinkMessage.RawPayload, down.DownlinkMessage.Settings)
+	span.Duration, err = toa.Compute(down.RawPayload, down.Settings)
 	if err != nil {
 		return errors.NewWithCause(err, "Could not compute time-on-air of the downlink")
 	}
 
-	err = c.scheduler.ScheduleAt(span, down.DownlinkMessage.Settings.Frequency)
+	err = c.scheduler.ScheduleAt(span, down.Settings.Frequency)
 	if err != nil {
 		return errors.NewWithCause(err, "Could not schedule downlink")
 	}
@@ -106,11 +106,11 @@ type gRPCConnection struct {
 	gtw    *ttnpb.Gateway
 }
 
-func (c *gRPCConnection) send(down *ttnpb.GatewayDown) error {
+func (c *gRPCConnection) send(down *ttnpb.DownlinkMessage) error {
 	if err := c.schedule(down); err != nil {
 		return err
 	}
-	return c.link.Send(down)
+	return c.link.Send(&ttnpb.GatewayDown{DownlinkMessage: down})
 }
 
 func (c *gRPCConnection) gateway() *ttnpb.Gateway {
@@ -171,7 +171,7 @@ func (c *udpConnection) pullDataExpired() bool {
 	return time.Since(lastReceived) > pullDataExpiration
 }
 
-func (c *udpConnection) send(down *ttnpb.GatewayDown) error {
+func (c *udpConnection) send(down *ttnpb.DownlinkMessage) error {
 	gtw := c.gateway()
 	if c.pullDataExpired() {
 		return errors.NewWithCausef(ErrGatewayNotConnected.New(errors.Attributes{
@@ -179,7 +179,7 @@ func (c *udpConnection) send(down *ttnpb.GatewayDown) error {
 		}), "No PULL_DATA received in the last %s", pullDataExpiration.String())
 	}
 
-	downstream, err := udp.TranslateDownstream(down)
+	tx, err := udp.TranslateDownstream(down)
 	if err != nil {
 		return ErrTranslationFromProtobuf.New(nil)
 	}
@@ -189,11 +189,11 @@ func (c *udpConnection) send(down *ttnpb.GatewayDown) error {
 
 	pkt := *c.lastPullData()
 	pkt.PacketType = udp.PullResp
-	pkt.Data = &downstream
+	pkt.Data = &udp.Data{TxPacket: &tx}
 
 	writePacket := func() error { return pkt.GatewayConn.Write(&pkt) }
 
-	if pkt.Data.TxPacket == nil || gtw.DisableTxDelay || c.hasJITQueue() {
+	if gtw.DisableTxDelay || c.hasJITQueue() {
 		return writePacket()
 	}
 

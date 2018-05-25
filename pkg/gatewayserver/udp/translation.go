@@ -255,29 +255,19 @@ func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 }
 
 // TranslateDownstream message from the protobuf format to the UDP format.
-func TranslateDownstream(d *ttnpb.GatewayDown) (Data, error) {
-	data := Data{}
+func TranslateDownstream(downlink *ttnpb.DownlinkMessage) (TxPacket, error) {
+	tx := TxPacket{}
 
-	if d != nil && d.DownlinkMessage != nil {
-		if err := insertDownlink(&data, *d.DownlinkMessage); err != nil {
-			return data, errors.NewWithCause(err, "Could not process received downlink")
-		}
-	}
-
-	return data, nil
-}
-
-func insertDownlink(data *Data, downlink ttnpb.DownlinkMessage) (err error) {
 	payload := downlink.GetRawPayload()
 	if payload == nil {
 		var err error
 		if payload, err = downlink.GetPayload().MarshalLoRaWAN(); err != nil {
-			return ErrMarshalFailed.NewWithCause(nil, err)
+			return tx, ErrMarshalFailed.NewWithCause(nil, err)
 		}
 	}
 
 	tmst := downlink.TxMetadata.Timestamp / 1000 // nano->microseconds conversion
-	data.TxPacket = &TxPacket{
+	tx = TxPacket{
 		CodR: downlink.Settings.CodingRate,
 		Freq: float64(downlink.Settings.Frequency) / 1000000,
 		Imme: downlink.TxMetadata.Timestamp == 0,
@@ -288,19 +278,19 @@ func insertDownlink(data *Data, downlink ttnpb.DownlinkMessage) (err error) {
 		Data: base64.StdEncoding.EncodeToString(payload),
 	}
 	gpsTime := CompactTime(downlink.TxMetadata.Time)
-	data.TxPacket.Time = &gpsTime
+	tx.Time = &gpsTime
 
 	switch downlink.Settings.Modulation {
 	case ttnpb.Modulation_LORA:
-		data.TxPacket.Modu = "LORA"
-		data.TxPacket.NCRC = !downlink.TxMetadata.EnableCRC
-		data.TxPacket.DatR.LoRa = fmt.Sprintf("SF%dBW%d", downlink.Settings.SpreadingFactor, downlink.Settings.Bandwidth/1000)
+		tx.Modu = "LORA"
+		tx.NCRC = !downlink.TxMetadata.EnableCRC
+		tx.DatR.LoRa = fmt.Sprintf("SF%dBW%d", downlink.Settings.SpreadingFactor, downlink.Settings.Bandwidth/1000)
 	case ttnpb.Modulation_FSK:
-		data.TxPacket.Modu = "FSK"
-		data.TxPacket.DatR.FSK = downlink.Settings.BitRate
+		tx.Modu = "FSK"
+		tx.DatR.FSK = downlink.Settings.BitRate
 	default:
-		return ErrUnknownModulation.New(nil)
+		return tx, ErrUnknownModulation.New(nil)
 	}
 
-	return nil
+	return tx, nil
 }
