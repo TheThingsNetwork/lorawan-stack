@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package goproto_test
+package gogoproto_test
 
 import (
 	"fmt"
 	"testing"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
-	"go.thethings.network/lorawan-stack/pkg/goproto"
+	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
-	"google.golang.org/genproto/protobuf/field_mask"
 )
 
 func ExampleGoFieldsPaths() {
@@ -44,12 +44,12 @@ func ExampleGoFieldsPaths() {
 		NameOfTheRegion: "Holland",
 	}
 
-	fields := goproto.GoFieldsPaths(&field_mask.FieldMask{
+	fields := gogoproto.GoFieldsPaths(&pbtypes.FieldMask{
 		Paths: []string{"city.name_city"},
 	}, london)
 	fmt.Println(fields)
 
-	fields = goproto.GoFieldsPaths(&field_mask.FieldMask{
+	fields = gogoproto.GoFieldsPaths(&pbtypes.FieldMask{
 		Paths: []string{"name_region"},
 	}, holland)
 	fmt.Println(fields)
@@ -87,7 +87,7 @@ func TestGoFieldsPaths(t *testing.T) {
 			expected: []string{"CityDetails.Name"},
 		},
 	} {
-		goFields := goproto.GoFieldsPaths(&field_mask.FieldMask{Paths: tc.fields}, hasProtoRenaming{
+		goFields := gogoproto.GoFieldsPaths(&pbtypes.FieldMask{Paths: tc.fields}, hasProtoRenaming{
 			NameOfTheRegion: "england",
 			CityDetails: cityDetails{
 				Name: "london",
@@ -113,7 +113,7 @@ func TestGoFieldsPathsEndDevice(t *testing.T) {
 			expected: []string{"Location.Latitude"},
 		},
 	} {
-		goFields := goproto.GoFieldsPaths(&field_mask.FieldMask{Paths: tc.fields}, ttnpb.EndDevice{
+		goFields := gogoproto.GoFieldsPaths(&pbtypes.FieldMask{Paths: tc.fields}, ttnpb.EndDevice{
 			Location: &ttnpb.Location{
 				Latitude: 5,
 			},
