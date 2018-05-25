@@ -28,23 +28,16 @@ var (
 
 // Errors renders the errors with the specified template.
 func (a *Assets) Errors(name string, env interface{}) echo.MiddlewareFunc {
-	// Template is loaded outside the handler method.
 	template, err := a.template(name)
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			// And error is handled inside for the sake of method signature simplicity.
 			if err != nil {
 				return err
 			}
 
 			err := next(c)
-
-			if err == nil {
-				return nil
-			}
-
-			if c.Response().Committed {
+			if err == nil || c.Response().Committed {
 				return nil
 			}
 
@@ -117,19 +110,19 @@ func (e httpError) ID() string {
 	return e.id
 }
 
-func from(e error) errors.Error {
-	if httpe, ok := e.(*echo.HTTPError); ok {
-		msg, ok := httpe.Message.(string)
+func from(err error) errors.Error {
+	if echoErr, ok := err.(*echo.HTTPError); ok {
+		msg, ok := echoErr.Message.(string)
 		if !ok {
-			msg = httpe.Error()
+			msg = echoErr.Error()
 		}
 
 		return errors.ToImpl(httpError{
 			id:      errors.NewID(),
 			message: msg,
-			typ:     httperrors.HTTPStatusToType(httpe.Code),
+			typ:     httperrors.HTTPStatusToType(echoErr.Code),
 		})
 	}
 
-	return errors.From(e)
+	return errors.From(err)
 }
