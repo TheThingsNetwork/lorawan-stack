@@ -19,7 +19,6 @@ import (
 	"reflect"
 
 	"github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // Map returns the Struct proto as a map[string]interface{}.
@@ -73,7 +72,7 @@ func Interface(v *types.Value) (interface{}, error) {
 	case *types.Value_ListValue:
 		return Slice(v.ListValue)
 	default:
-		return nil, errors.Errorf("unmatched types type: %T", v)
+		return nil, fmt.Errorf("unmatched types type: %T", v)
 	}
 }
 
@@ -179,7 +178,7 @@ func valueFromReflect(rv reflect.Value) (*types.Value, error) {
 
 	default:
 		// either Invalid, Chan. Func, Interface or UnsafePointer.
-		return nil, errors.Errorf("Can not map a value of kind %s to a *types.Value", k)
+		return nil, fmt.Errorf("can not map a value of kind %s to a *types.Value", k)
 	}
 }
 
