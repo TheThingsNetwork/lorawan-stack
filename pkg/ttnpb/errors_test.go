@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package errors_test
+package ttnpb
 
 import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
-	_ "go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 func TestGRPCConversion(t *testing.T) {

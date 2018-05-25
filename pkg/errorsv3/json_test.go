@@ -15,19 +15,35 @@
 package errors_test
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
-	_ "go.thethings.network/lorawan-stack/pkg/ttnpb"
+	_ "go.thethings.network/lorawan-stack/pkg/jsonpb"
 )
 
-func TestGRPCConversion(t *testing.T) {
+func TestJSONConversion(t *testing.T) {
 	a := assertions.New(t)
 
-	errDef := errors.Define("test_grpc_conversion_err_def", "gRPC Conversion Error")
-	a.So(errors.FromGRPCStatus(errDef.GRPCStatus()).Definition, errors.ShouldEqual, errDef)
+	errDef := errors.Define("test_json_conversion_err_def", "JSON Conversion Error", "foo")
 
-	errHello := errors.New("hello world").WithAttributes("foo", "bar")
-	a.So(errors.FromGRPCStatus(errHello.GRPCStatus()), errors.ShouldEqual, errHello)
+	b, err := json.Marshal(errDef)
+	a.So(err, should.BeNil)
+
+	var unmarshaledDef errors.Definition
+	err = json.Unmarshal(b, &unmarshaledDef)
+	a.So(err, should.BeNil)
+	a.So(unmarshaledDef, errors.ShouldEqual, errDef)
+
+	errHello := errDef.WithAttributes("foo", "bar", "baz", "qux")
+
+	b, err = json.Marshal(errHello)
+	a.So(err, should.BeNil)
+
+	var unmarshaled errors.Error
+	err = json.Unmarshal(b, &unmarshaled)
+	a.So(err, should.BeNil)
+	a.So(unmarshaled, errors.ShouldEqual, errHello)
 }

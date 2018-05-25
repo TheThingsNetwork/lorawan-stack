@@ -12,22 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package errors_test
+package errors
 
-import (
-	"testing"
+// CorrelationID of the error.
+func (e Error) CorrelationID() string { return e.correlationID }
 
-	"github.com/smartystreets/assertions"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
-	_ "go.thethings.network/lorawan-stack/pkg/ttnpb"
-)
-
-func TestGRPCConversion(t *testing.T) {
-	a := assertions.New(t)
-
-	errDef := errors.Define("test_grpc_conversion_err_def", "gRPC Conversion Error")
-	a.So(errors.FromGRPCStatus(errDef.GRPCStatus()).Definition, errors.ShouldEqual, errDef)
-
-	errHello := errors.New("hello world").WithAttributes("foo", "bar")
-	a.So(errors.FromGRPCStatus(errHello.GRPCStatus()), errors.ShouldEqual, errHello)
-}
+// CorrelationID is not present in the error definition, so this just returns an empty string.
+func (d Definition) CorrelationID() string { return "" }

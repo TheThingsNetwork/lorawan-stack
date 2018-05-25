@@ -16,13 +16,18 @@ package errors
 
 import (
 	"github.com/golang/protobuf/proto"
-	"go.thethings.network/lorawan-stack/pkg/gogoproto"
-	"go.thethings.network/lorawan-stack/pkg/jsonpb"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	spb "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+// ErrorDetails that can be carried over API.
+type ErrorDetails interface {
+	Namespace() string
+	Name() string
+	MessageFormat() string
+	Attributes() map[string]interface{}
+	CorrelationID() string
+}
 
 // FromGRPCStatus converts the gRPC status message into an Error.
 func FromGRPCStatus(status *status.Status) Error {
@@ -30,36 +35,60 @@ func FromGRPCStatus(status *status.Status) Error {
 		code:          int32(status.Code()),
 		messageFormat: status.Message(),
 	}, 0)
-	for _, details := range status.Details() {
-		switch details := details.(type) {
-		case *ttnpb.ErrorDetails:
-			err.namespace = details.Namespace
-			err.name = details.Name
-			err.messageFormat = details.MessageFormat
-			err.correlationID = details.CorrelationID
-			attributes, aErr := gogoproto.Map(details.Attributes)
-			if aErr != nil {
-				// TODO: this should probably panic
-			} else {
+	if ErrorDetailsFromProto != nil {
+		detailMsgs := status.Details()
+		detailProtos := make([]proto.Message, 0, len(detailMsgs))
+		for _, msg := range detailMsgs { // convert to []proto.Message
+			if msg, ok := msg.(proto.Message); ok {
+				detailProtos = append(detailProtos, msg)
+			}
+		}
+		details, rest := ErrorDetailsFromProto(detailProtos...)
+		if len(rest) != 0 {
+			detailIfaces := make([]interface{}, len(rest))
+			for i, iface := range rest { // convert to []interface{}
+				detailIfaces[i] = iface
+			}
+			err.details = detailIfaces
+		}
+		if details != nil {
+			if namespace := details.Namespace(); namespace != "" {
+				err.namespace = namespace
+			}
+			if name := details.Name(); name != "" {
+				err.name = name
+			}
+			if messageFormat := details.MessageFormat(); messageFormat != "" {
+				err.messageFormat = messageFormat
+			}
+			if attributes := details.Attributes(); len(attributes) != 0 {
 				err.attributes = attributes
 			}
-		default:
-			err.details = append(err.details, details)
+			if correlationID := details.CorrelationID(); correlationID != "" {
+				err.correlationID = correlationID
+			}
 		}
 	}
 	return err
 }
 
+// ErrorDetailsToProto converts the given ErrorDetails into a protobuf-encoded message.
+var ErrorDetailsToProto func(e ErrorDetails) (msg proto.Message)
+
+// ErrorDetailsFromProto ranges over the given protobuf-encoded messages to extract the ErrorDetails. It returns any
+var ErrorDetailsFromProto func(msg ...proto.Message) (details ErrorDetails, rest []proto.Message)
+
 // GRPCStatus converts the Definition into a gRPC status message.
 func (d Definition) GRPCStatus() *status.Status {
 	s := status.New(codes.Code(d.Code()), d.String())
-	s, err := s.WithDetails(&ttnpb.ErrorDetails{
-		Namespace:     d.namespace,
-		Name:          d.name,
-		MessageFormat: d.messageFormat,
-	})
-	if err != nil {
-		// TODO: this should probably panic
+	if ErrorDetailsToProto != nil {
+		if proto := ErrorDetailsToProto(d); proto != nil {
+			var err error
+			s, err = s.WithDetails(proto)
+			if err != nil {
+				// TODO: this should probably panic
+			}
+		}
 	}
 	return s
 }
@@ -73,35 +102,17 @@ func (e Error) GRPCStatus() *status.Status {
 			protoDetails = append(protoDetails, details)
 		}
 	}
-	attributes, err := gogoproto.Struct(e.attributes)
-	if err != nil {
-		// TODO: this should probably panic
+	if ErrorDetailsToProto != nil {
+		if proto := ErrorDetailsToProto(e); proto != nil {
+			protoDetails = append(protoDetails, proto)
+		}
 	}
-	protoDetails = append(protoDetails, &ttnpb.ErrorDetails{
-		Namespace:     e.namespace,
-		Name:          e.name,
-		MessageFormat: e.messageFormat,
-		Attributes:    attributes,
-		CorrelationID: e.correlationID,
-	})
-	s, err = s.WithDetails(protoDetails...)
-	if err != nil {
-		// TODO: this should probably panic
+	if len(protoDetails) != 0 {
+		var err error
+		s, err = s.WithDetails(protoDetails...)
+		if err != nil {
+			// TODO: this should probably panic
+		}
 	}
 	return s
-}
-
-// MarshalJSON implements json.Marshaler.
-func (e Error) MarshalJSON() ([]byte, error) {
-	return jsonpb.TTN().Marshal(e.GRPCStatus().Proto())
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (e *Error) UnmarshalJSON(data []byte) error {
-	s := new(spb.Status)
-	if err := jsonpb.TTN().Unmarshal(data, s); err != nil {
-		return err
-	}
-	*e = FromGRPCStatus(status.FromProto(s))
-	return nil
 }
