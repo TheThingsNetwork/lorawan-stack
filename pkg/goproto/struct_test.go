@@ -21,9 +21,9 @@ import (
 
 	"github.com/golang/protobuf/ptypes/struct"
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"github.com/spf13/cast"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 type jsonMarshaler struct {

@@ -20,8 +20,8 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func newUDPAddress(ip string, port int) *net.UDPAddr {

@@ -20,9 +20,9 @@ import (
 	"time"
 
 	assertions "github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func buildLoRaDownlinkFromParameters(payloadSize int, dataRate types.DataRate, codingRate string) (downlink ttnpb.DownlinkMessage, err error) {

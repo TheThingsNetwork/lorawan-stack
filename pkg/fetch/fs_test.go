@@ -21,8 +21,8 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 type frequencyPlansFileSystem string

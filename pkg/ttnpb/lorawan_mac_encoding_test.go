@@ -22,9 +22,9 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/gpstime"
 	. "go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestLoRaWANEncodingMAC(t *testing.T) {

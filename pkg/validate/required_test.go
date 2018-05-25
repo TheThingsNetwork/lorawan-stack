@@ -23,8 +23,8 @@ import (
 	"unsafe"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 type isZeroer struct {

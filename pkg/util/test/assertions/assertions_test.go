@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"testing"
 
-	ssassertions "github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
@@ -33,7 +33,7 @@ func init() {
 }
 
 func TestShouldDescribe(t *testing.T) {
-	a := ssassertions.New(t)
+	a := assertions.New(t)
 
 	// Happy flow.
 	a.So(ShouldDescribe(testDescriptor.New(nil), testDescriptor), should.BeEmpty)

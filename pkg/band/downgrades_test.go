@@ -18,9 +18,9 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func compatibleVerifier(t *testing.T) func(version ttnpb.PHYVersion, versionName string, bandIDs ...string) {

@@ -22,10 +22,10 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/events/redis"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 // redisConfig returns a new redis config for testing
