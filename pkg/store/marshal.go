@@ -221,7 +221,7 @@ func ToBytesValue(v reflect.Value) (b []byte, err error) {
 		enc = JSONEncoding
 		ptr := reflect.New(t)
 		ptr.Elem().Set(v)
-		return proto.Marshal(ptr.Interface().(proto.Message))
+		return json.Marshal(ptr.Interface().(proto.Message))
 
 	case t.Implements(protoMessageType):
 		enc = ProtoEncoding
