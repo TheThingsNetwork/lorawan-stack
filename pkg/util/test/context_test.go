@@ -16,24 +16,27 @@ package test_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/errorcontext"
+	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	. "go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 func TestContextParent(t *testing.T) {
 	for _, tc := range []struct {
 		Name       string
-		Parent     context.Context
 		NewContext func(context.Context) context.Context
 		OK         bool
 	}{
 		{
-			Name:   "context.WithCancel",
-			Parent: &MockContext{},
+			Name: "context.WithCancel",
 			NewContext: func(ctx context.Context) context.Context {
 				ctx, _ = context.WithCancel(ctx)
 				return ctx
@@ -41,16 +44,14 @@ func TestContextParent(t *testing.T) {
 			OK: true,
 		},
 		{
-			Name:   "context.WithValue",
-			Parent: &MockContext{},
+			Name: "context.WithValue",
 			NewContext: func(ctx context.Context) context.Context {
 				return context.WithValue(ctx, struct{}{}, nil)
 			},
 			OK: true,
 		},
 		{
-			Name:   "context.WithDeadline",
-			Parent: &MockContext{},
+			Name: "context.WithDeadline",
 			NewContext: func(ctx context.Context) context.Context {
 				ctx, _ = context.WithDeadline(ctx, time.Now().Add(200*Delay))
 				return ctx
@@ -58,8 +59,7 @@ func TestContextParent(t *testing.T) {
 			OK: true,
 		},
 		{
-			Name:   "context.WithTimeout",
-			Parent: &MockContext{},
+			Name: "context.WithTimeout",
 			NewContext: func(ctx context.Context) context.Context {
 				ctx, _ = context.WithTimeout(ctx, 200*Delay)
 				return ctx
@@ -67,24 +67,43 @@ func TestContextParent(t *testing.T) {
 			OK: true,
 		},
 		{
-			Name:   "context.Background",
-			Parent: nil,
+			Name: "log.NewContext",
+			NewContext: func(ctx context.Context) context.Context {
+				return log.NewContext(ctx, log.Noop)
+			},
+			OK: true,
+		},
+		{
+			Name: "rights.NewContext",
+			NewContext: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, []ttnpb.Right{ttnpb.RIGHT_APPLICATION_DEVICES_WRITE})
+			},
+			OK: true,
+		},
+		{
+			Name: "errorcontext.New",
+			NewContext: func(ctx context.Context) context.Context {
+				ctx, _ = errorcontext.New(ctx)
+				return ctx
+			},
+			OK: true,
+		},
+		{
+			Name: "context.Background",
 			NewContext: func(ctx context.Context) context.Context {
 				return context.Background()
 			},
 			OK: false,
 		},
 		{
-			Name:   "context.TODO",
-			Parent: nil,
+			Name: "context.TODO",
 			NewContext: func(ctx context.Context) context.Context {
 				return context.TODO()
 			},
 			OK: false,
 		},
 		{
-			Name:   "nil",
-			Parent: nil,
+			Name: "nil",
 			NewContext: func(context.Context) context.Context {
 				return nil
 			},
@@ -92,24 +111,31 @@ func TestContextParent(t *testing.T) {
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
-			a := assertions.New(t)
+			for _, parent := range []context.Context{
+				nil, &MockContext{}, context.Background(),
+			} {
+				t.Run(fmt.Sprintf("%T", parent), func(t *testing.T) {
+					a := assertions.New(t)
 
-			var ctx context.Context
-			var ok bool
-			if !a.So(func() {
-				ctx, ok = ContextParent(tc.NewContext(tc.Parent))
-			}, should.NotPanic) {
-				t.FailNow()
+					defer func() {
+						if r := recover(); r != nil {
+							// Some functions in stdlib panic on nil context.Context passed.
+							t.Skip("Skipping test case because of NewContext panic:", r)
+						}
+					}()
+					ctx := tc.NewContext(parent)
+
+					ctx, ok := ContextParent(ctx)
+					if !tc.OK {
+						a.So(ok, should.BeFalse)
+						a.So(ctx, should.BeNil)
+						return
+					}
+
+					a.So(ok, should.BeTrue)
+					a.So(ctx, should.Equal, parent)
+				})
 			}
-
-			if !tc.OK {
-				a.So(ok, should.BeFalse)
-				a.So(ctx, should.BeNil)
-				return
-			}
-
-			a.So(ok, should.BeTrue)
-			a.So(ctx, should.Equal, tc.Parent)
 		})
 	}
 }
@@ -130,6 +156,24 @@ func TestContextRoot(t *testing.T) {
 						"B", nil),
 					struct{}{}, nil),
 				struct{}{}, nil),
+			Root: Context(),
+		},
+		{
+			Name: "log.NewContext",
+			Context: log.NewContext(
+				log.NewContext(
+					Context(), log.Noop),
+				log.Noop,
+			),
+			Root: Context(),
+		},
+		{
+			Name: "errorcontext.New",
+			Context: log.NewContext(
+				log.NewContext(
+					Context(), log.Noop),
+				log.Noop,
+			),
 			Root: Context(),
 		},
 		{
@@ -169,6 +213,29 @@ func TestContextHasParent(t *testing.T) {
 				struct{ A int }{}, nil),
 			Parent:    sharedCtx,
 			HasParent: true,
+		},
+		{
+			Name: "log.NewContext",
+			Context: log.NewContext(
+				log.NewContext(
+					sharedCtx, log.Noop),
+				log.Noop,
+			),
+			Parent:    sharedCtx,
+			HasParent: true,
+		},
+		{
+			Name: "not a parent",
+			Context: context.WithValue(
+				context.WithValue(
+					context.WithValue(
+						context.WithValue(
+							Context(), "A", nil),
+						"B", nil),
+					struct{}{}, nil),
+				struct{}{}, nil),
+			Parent:    context.WithValue(context.Background(), struct{}{}, "asd"),
+			HasParent: false,
 		},
 		{
 			Name:      "0",

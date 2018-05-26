@@ -18,6 +18,8 @@ import (
 	"context"
 	"reflect"
 	"time"
+
+	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 )
 
 // MockContext is a mock context.Context.
@@ -71,6 +73,7 @@ func Context() context.Context {
 var contextType = reflect.TypeOf((*context.Context)(nil)).Elem()
 
 // ContextParent returns the parent context of ctx and true if one is found, nil and false otherwise.
+// ContextParent assumes that ctx has a parent iff it's located at field named Context.
 func ContextParent(ctx context.Context) (context.Context, bool) {
 	rv := reflect.ValueOf(ctx)
 	for rv.Kind() == reflect.Ptr {
@@ -78,6 +81,12 @@ func ContextParent(ctx context.Context) (context.Context, bool) {
 	}
 	if !rv.IsValid() {
 		return nil, false
+	}
+
+	switch ctx := rv.Interface().(type) {
+	case errorcontext.ErrorContext:
+		// ErrorContext wraps the context twice
+		return ContextParent(ctx.Context)
 	}
 
 	rt := rv.Type()
@@ -93,12 +102,17 @@ func ContextParent(ctx context.Context) (context.Context, bool) {
 		return nil, false
 	}
 
-	return rv.FieldByName("Context").Interface().(context.Context), true
+	fv := rv.FieldByName("Context")
+	if (fv.Kind() == reflect.Ptr || fv.Kind() == reflect.Interface) && fv.IsNil() {
+		return nil, true
+	}
+	return fv.Interface().(context.Context), true
 }
 
 // ContextHasParent reports whether parent is one of ctx's parents.
+// ContextHasParent assumes that ctx has a parent iff it's located at field named Context.
 func ContextHasParent(ctx context.Context, parent context.Context) bool {
-	for ok := true; ok; {
+	for {
 		p, ok := ContextParent(ctx)
 		if !ok {
 			return false
@@ -108,17 +122,16 @@ func ContextHasParent(ctx context.Context, parent context.Context) bool {
 		}
 		ctx = p
 	}
-	panic("Unreachable")
 }
 
 // ContextRoot returns the root context of ctx.
+// ContextRoot assumes that ctx has a parent iff it's located at field named Context.
 func ContextRoot(ctx context.Context) context.Context {
-	for ok := true; ok; {
+	for {
 		p, ok := ContextParent(ctx)
 		if !ok {
 			return ctx
 		}
 		ctx = p
 	}
-	panic("Unreachable")
 }

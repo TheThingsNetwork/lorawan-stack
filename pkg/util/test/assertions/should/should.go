@@ -163,4 +163,6 @@ var (
 	EqualFieldsWithIgnores = testassertions.ShouldEqualFieldsWithIgnores
 	// NotEqualFieldsWithIgnores asserts that the actual A and expected B fields are not equal, ignoring fields.
 	NotEqualFieldsWithIgnores = testassertions.ShouldNotEqualFieldsWithIgnores
+	// HaveParentContext asserts that the context.Context is a child of context.Context.
+	HaveParentContext = testassertions.ShouldHaveParentContext
 )
