@@ -20,6 +20,7 @@ import (
 	"time"
 )
 
+// MockContext is a mock context.Context.
 type MockContext struct {
 	DeadlineFunc func() (deadline time.Time, ok bool)
 	DoneFunc     func() <-chan struct{}
@@ -27,6 +28,7 @@ type MockContext struct {
 	ValueFunc    func(interface{}) interface{}
 }
 
+// Deadline calls DeadlineFunc.
 func (ctx *MockContext) Deadline() (deadline time.Time, ok bool) {
 	if ctx.DeadlineFunc == nil {
 		return time.Time{}, false
@@ -34,18 +36,23 @@ func (ctx *MockContext) Deadline() (deadline time.Time, ok bool) {
 	return ctx.DeadlineFunc()
 }
 
+// Done calls DoneFunc.
 func (ctx *MockContext) Done() <-chan struct{} {
 	if ctx.DoneFunc == nil {
 		return nil
 	}
 	return ctx.DoneFunc()
 }
+
+// Err calls ErrFunc.
 func (ctx *MockContext) Err() error {
 	if ctx.ErrFunc == nil {
 		return nil
 	}
 	return ctx.ErrFunc()
 }
+
+// Value calls ValueFunc.
 func (ctx *MockContext) Value(key interface{}) interface{} {
 	if ctx.ValueFunc == nil {
 		return nil
@@ -53,10 +60,12 @@ func (ctx *MockContext) Value(key interface{}) interface{} {
 	return ctx.ValueFunc(key)
 }
 
-var globalContext = &MockContext{}
+// DefaultContext is the default context.
+var DefaultContext = &MockContext{}
 
+// Context returns DefaultContext.
 func Context() context.Context {
-	return globalContext
+	return DefaultContext
 }
 
 var contextType = reflect.TypeOf((*context.Context)(nil)).Elem()
@@ -85,6 +94,21 @@ func ContextParent(ctx context.Context) (context.Context, bool) {
 	}
 
 	return rv.FieldByName("Context").Interface().(context.Context), true
+}
+
+// ContextHasParent reports whether parent is one of ctx's parents.
+func ContextHasParent(ctx context.Context, parent context.Context) bool {
+	for ok := true; ok; {
+		p, ok := ContextParent(ctx)
+		if !ok {
+			return false
+		}
+		if p == parent {
+			return true
+		}
+		ctx = p
+	}
+	panic("Unreachable")
 }
 
 // ContextRoot returns the root context of ctx.

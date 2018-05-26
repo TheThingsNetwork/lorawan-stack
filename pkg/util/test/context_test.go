@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package test
+package test_test
 
 import (
 	"context"
@@ -21,6 +21,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	. "go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 func TestContextParent(t *testing.T) {
@@ -125,8 +126,7 @@ func TestContextRoot(t *testing.T) {
 				context.WithValue(
 					context.WithValue(
 						context.WithValue(
-							Context(),
-							"A", nil),
+							Context(), "A", nil),
 						"B", nil),
 					struct{}{}, nil),
 				struct{}{}, nil),
@@ -152,6 +152,46 @@ func TestContextRoot(t *testing.T) {
 	}
 }
 
+func TestContextHasParent(t *testing.T) {
+	sharedCtx, _ := context.WithCancel(context.WithValue(Context(), struct{}{}, struct{}{}))
+
+	for _, tc := range []struct {
+		Name      string
+		Context   context.Context
+		Parent    context.Context
+		HasParent bool
+	}{
+		{
+			Name: "2",
+			Context: context.WithValue(
+				context.WithValue(
+					sharedCtx, "A", nil),
+				struct{ A int }{}, nil),
+			Parent:    sharedCtx,
+			HasParent: true,
+		},
+		{
+			Name:      "0",
+			Context:   sharedCtx,
+			Parent:    sharedCtx,
+			HasParent: false,
+		},
+		{
+			Name:      "nil",
+			Context:   nil,
+			Parent:    nil,
+			HasParent: false,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+			a.So(func() {
+				a.So(ContextHasParent(tc.Context, tc.Parent), should.Equal, tc.HasParent)
+			}, should.NotPanic)
+		})
+	}
+}
+
 func TestContext(t *testing.T) {
-	assertions.New(t).So(Context(), should.Equal, globalContext)
+	assertions.New(t).So(Context(), should.Equal, DefaultContext)
 }
