@@ -61,7 +61,8 @@ func Context() context.Context {
 
 var contextType = reflect.TypeOf((*context.Context)(nil)).Elem()
 
-func ParentContext(ctx context.Context) (context.Context, bool) {
+// ContextParent returns the parent context of ctx and true if one is found, nil and false otherwise.
+func ContextParent(ctx context.Context) (context.Context, bool) {
 	rv := reflect.ValueOf(ctx)
 	for rv.Kind() == reflect.Ptr {
 		rv = rv.Elem()
@@ -84,4 +85,16 @@ func ParentContext(ctx context.Context) (context.Context, bool) {
 	}
 
 	return rv.FieldByName("Context").Interface().(context.Context), true
+}
+
+// ContextRoot returns the root context of ctx.
+func ContextRoot(ctx context.Context) context.Context {
+	for ok := true; ok; {
+		p, ok := ContextParent(ctx)
+		if !ok {
+			return ctx
+		}
+		ctx = p
+	}
+	panic("Unreachable")
 }

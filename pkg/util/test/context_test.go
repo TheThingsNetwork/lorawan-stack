@@ -23,7 +23,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-func TestParentContext(t *testing.T) {
+func TestContextParent(t *testing.T) {
 	for _, tc := range []struct {
 		Name       string
 		Parent     context.Context
@@ -96,7 +96,7 @@ func TestParentContext(t *testing.T) {
 			var ctx context.Context
 			var ok bool
 			if !a.So(func() {
-				ctx, ok = ParentContext(tc.NewContext(tc.Parent))
+				ctx, ok = ContextParent(tc.NewContext(tc.Parent))
 			}, should.NotPanic) {
 				t.FailNow()
 			}
@@ -109,6 +109,45 @@ func TestParentContext(t *testing.T) {
 
 			a.So(ok, should.BeTrue)
 			a.So(ctx, should.Equal, tc.Parent)
+		})
+	}
+}
+
+func TestContextRoot(t *testing.T) {
+	for _, tc := range []struct {
+		Name    string
+		Context context.Context
+		Root    context.Context
+	}{
+		{
+			Name: "4",
+			Context: context.WithValue(
+				context.WithValue(
+					context.WithValue(
+						context.WithValue(
+							Context(),
+							"A", nil),
+						"B", nil),
+					struct{}{}, nil),
+				struct{}{}, nil),
+			Root: Context(),
+		},
+		{
+			Name:    "0",
+			Context: Context(),
+			Root:    Context(),
+		},
+		{
+			Name:    "nil",
+			Context: nil,
+			Root:    nil,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+			a.So(func() {
+				a.So(ContextRoot(tc.Context), should.Resemble, tc.Root)
+			}, should.NotPanic)
 		})
 	}
 }
