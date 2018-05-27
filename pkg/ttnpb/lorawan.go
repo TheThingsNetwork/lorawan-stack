@@ -14,7 +14,11 @@
 
 package ttnpb
 
-import "encoding/gob"
+import (
+	"encoding/gob"
+
+	"go.thethings.network/lorawan-stack/pkg/errors"
+)
 
 func init() {
 	gob.Register(&Message_MACPayload{})
@@ -61,17 +65,22 @@ func init() {
 	gob.Register(&MACCommand_DeviceModeConf_{})
 }
 
-// Compare returns 1 if v represents a newer MACVersion than other,
-// 0 if they are equal and -1 otherwise.
-func (v MACVersion) Compare(other MACVersion) int {
-	vStr := v.String()
-	oStr := other.String()
-	switch {
-	case MACVersion_value[vStr] > MACVersion_value[oStr]:
-		return 1
-	case MACVersion_value[vStr] == MACVersion_value[oStr]:
-		return 0
-	default:
-		return -1
+// IsValid reports whether v represents a valid MACVersion.
+func (v MACVersion) Validate() error {
+	if v < 0 || v >= MACVersion(len(MACVersion_name)) {
+		return errors.Errorf("expected MACVersion to be between %d and %d, got %d", 0, len(MACVersion_name)-1, v)
 	}
+	return nil
+}
+
+// EncryptFOpts reports whether v requires MAC commands in FOpts to be encrypted.
+// EncryptFOpts panics, if v.Validate() returns non-nil error.
+func (v MACVersion) EncryptFOpts() bool {
+	switch v {
+	case MAC_V1_0, MAC_V1_0_1, MAC_V1_0_2:
+		return false
+	case MAC_V1_1:
+		return true
+	}
+	panic(errors.Errorf("Unknown MACVersion: %v", v))
 }

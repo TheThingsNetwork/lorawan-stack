@@ -18,6 +18,7 @@ import (
 	"math"
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gpstime"
 )
@@ -79,9 +80,7 @@ func (m *MACCommands) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 		cid := MACCommandIdentifier(b[0])
 		var rawPayload []byte
 		cmd := &MACCommand{}
-		var macPayload interface {
-			UnmarshalLoRaWAN(b []byte) error
-		}
+		var macPayload lorawan.Unmarshaler
 		if cid >= 0x80 {
 			cmd.Payload = &MACCommand_Proprietary_{Proprietary: &MACCommand_Proprietary{
 				CID:        cid,
