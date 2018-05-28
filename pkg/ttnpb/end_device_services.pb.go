@@ -770,7 +770,7 @@ func randFieldEndDeviceServices(dAtA []byte, r randyEndDeviceServices, fieldNumb
 }
 func encodeVarintPopulateEndDeviceServices(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
+		dAtA = append(dAtA, uint8(v&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -799,7 +799,7 @@ func sovEndDeviceServices(x uint64) (n int) {
 	return n
 }
 func sozEndDeviceServices(x uint64) (n int) {
-	return sovEndDeviceServices(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+	return sovEndDeviceServices((x << 1) ^ uint64((int64(x) >> 63)))
 }
 func (m *SetDeviceRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
