@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -112,7 +113,7 @@ func (r *RegistryRPC) SetApplication(ctx context.Context, req *ttnpb.SetApplicat
 
 	var fields []string
 	if req.FieldMask != nil {
-		fields = req.FieldMask.Paths
+		fields = gogoproto.GoFieldsPaths(req.FieldMask, req.GetApplication())
 	}
 	if r.checks.SetApplication != nil {
 		if err := r.checks.SetApplication(ctx, &req.Application, fields...); err != nil {
