@@ -14,22 +14,25 @@
 
 package band
 
-// LoRaWAN 1.1 -> 1.0.2 downgrades
+// LoRaWAN 1.1 -> 1.0.2rB downgrades
 
 func disableCFList1_0_2(b Band) Band {
 	b.ImplementsCFList = false
 	return b
 }
 
-// LoRaWAN 1.0.2 -> 1.0.1 downgrades
+// LoRaWAN 1.0.2rB -> 1.0.2rA downgrades
 
-func usBeacon1_0_1(b Band) Band {
-	b.Beacon.DataRateIndex = 3
+func auDataRates1_0_2(b Band) Band {
+	for i := 0; i < 4; i++ {
+		b.DataRates[i] = b.DataRates[i+2]
+	}
+	b.DataRates[5] = DataRate{}
+	b.DataRates[6] = DataRate{}
 	return b
 }
 
-func auDataRates1_0_1(b Band) Band {
-	b.DataRates[5] = DataRate{}
-	b.DataRates[6] = DataRate{}
+func usBeacon1_0_2(b Band) Band {
+	b.Beacon.DataRateIndex = 3
 	return b
 }

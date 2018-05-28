@@ -162,9 +162,11 @@ type Band struct {
 	// DefaultRx2Parameters are the default parameters that determine the settings for a Tx sent during Rx2
 	DefaultRx2Parameters Rx2Parameters
 
-	regionalParameters1_0   versionSwap
-	regionalParameters1_0_1 versionSwap
-	regionalParameters1_0_2 versionSwap
+	regionalParameters1_0         versionSwap
+	regionalParameters1_0_1       versionSwap
+	regionalParameters1_0_2_rev_A versionSwap
+	regionalParameters1_0_2_rev_B versionSwap
+	regionalParameters1_1_rev_A   versionSwap
 }
 
 // DutyCycle for the [MinFrequency;MaxFrequency[ sub-band
@@ -206,8 +208,10 @@ type swapParameters struct {
 
 func (b Band) downgrades() []swapParameters {
 	return []swapParameters{
-		{version: ttnpb.PHY_V1_1, downgrade: bandIdentity},
-		{version: ttnpb.PHY_V1_0_2, downgrade: b.regionalParameters1_0_2},
+		{version: ttnpb.PHY_V1_1_REV_B, downgrade: bandIdentity},
+		{version: ttnpb.PHY_V1_1_REV_A, downgrade: b.regionalParameters1_1_rev_A},
+		{version: ttnpb.PHY_V1_0_2_REV_B, downgrade: b.regionalParameters1_0_2_rev_B},
+		{version: ttnpb.PHY_V1_0_2_REV_A, downgrade: b.regionalParameters1_0_2_rev_A},
 		{version: ttnpb.PHY_V1_0_1, downgrade: b.regionalParameters1_0_1},
 		{version: ttnpb.PHY_V1_0, downgrade: b.regionalParameters1_0},
 	}
@@ -230,7 +234,7 @@ func (b Band) Version(wantedVersion ttnpb.PHYVersion) (Band, error) {
 
 // Versions supported for this band.
 func (b Band) Versions() []ttnpb.PHYVersion {
-	versions := []ttnpb.PHYVersion{ttnpb.PHY_V1_1}
+	versions := []ttnpb.PHYVersion{ttnpb.PHY_V1_1_REV_B}
 	for _, swapParameter := range b.downgrades() {
 		if swapParameter.downgrade != nil {
 			versions = append(versions, swapParameter.version)

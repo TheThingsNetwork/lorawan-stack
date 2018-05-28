@@ -117,8 +117,10 @@ func init() {
 		CFListType:       ttnpb.CFListType_CHANNEL_MASKS,
 
 		// No LoRaWAN Regional Parameters 1.0
-		regionalParameters1_0_1: bandIdentity,
-		regionalParameters1_0_2: disableCFList1_0_2,
+		regionalParameters1_0_1:       bandIdentity,
+		regionalParameters1_0_2_rev_A: bandIdentity,
+		regionalParameters1_0_2_rev_B: disableCFList1_0_2,
+		regionalParameters1_1_rev_A:   bandIdentity,
 	}
 	All = append(All, cn_470_510)
 }

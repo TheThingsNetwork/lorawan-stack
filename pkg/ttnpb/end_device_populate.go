@@ -53,10 +53,16 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 		out.LoRaWANPHYVersion = PHY_V1_0_1
 	case 2:
 		out.LoRaWANVersion = MAC_V1_0_2
-		out.LoRaWANPHYVersion = PHY_V1_0_2
+		out.LoRaWANPHYVersion = PHY_V1_0_2_REV_A
 	case 3:
+		out.LoRaWANVersion = MAC_V1_0_2
+		out.LoRaWANPHYVersion = PHY_V1_0_2_REV_B
+	case 4:
 		out.LoRaWANVersion = MAC_V1_1
-		out.LoRaWANPHYVersion = PHY_V1_1
+		out.LoRaWANPHYVersion = PHY_V1_1_REV_A
+	case 5:
+		out.LoRaWANVersion = MAC_V1_1
+		out.LoRaWANPHYVersion = PHY_V1_1_REV_B
 	}
 	out.FrequencyPlanID = "EU_863_870"
 	out.MinFrequency = uint64(r.Uint32())

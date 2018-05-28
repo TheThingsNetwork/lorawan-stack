@@ -686,7 +686,7 @@ func (m *UplinkMessage) MarshalTo(dAtA []byte) (int, error) {
 		}
 	}
 	if len(m.Locations) > 0 {
-		for k := range m.Locations {
+		for k, _ := range m.Locations {
 			dAtA[i] = 0x32
 			i++
 			v := m.Locations[k]
@@ -887,8 +887,8 @@ func encodeVarintMessages(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedApplicationUplink(r randyMessages, easy bool) *ApplicationUplink {
 	this := &ApplicationUplink{}
-	this.FPort = r.Uint32()
-	this.FCnt = r.Uint32()
+	this.FPort = uint32(r.Uint32())
+	this.FCnt = uint32(r.Uint32())
 	v1 := r.Intn(100)
 	this.FRMPayload = make([]byte, v1)
 	for i := 0; i < v1; i++ {
@@ -982,7 +982,7 @@ func randFieldMessages(dAtA []byte, r randyMessages, fieldNumber int, wire int) 
 }
 func encodeVarintPopulateMessages(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -1097,7 +1097,7 @@ func sovMessages(x uint64) (n int) {
 	return n
 }
 func sozMessages(x uint64) (n int) {
-	return sovMessages((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovMessages(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (m *UplinkMessage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

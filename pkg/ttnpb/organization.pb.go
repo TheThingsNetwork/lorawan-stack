@@ -434,11 +434,11 @@ func NewPopulatedOrganization(r randyOrganization, easy bool) *Organization {
 	this := &Organization{}
 	v1 := NewPopulatedOrganizationIdentifiers(r, easy)
 	this.OrganizationIdentifiers = *v1
-	this.Name = randStringOrganization(r)
-	this.Description = randStringOrganization(r)
-	this.URL = randStringOrganization(r)
-	this.Location = randStringOrganization(r)
-	this.Email = randStringOrganization(r)
+	this.Name = string(randStringOrganization(r))
+	this.Description = string(randStringOrganization(r))
+	this.URL = string(randStringOrganization(r))
+	this.Location = string(randStringOrganization(r))
+	this.Email = string(randStringOrganization(r))
 	v2 := types.NewPopulatedStdTime(r, easy)
 	this.CreatedAt = *v2
 	v3 := types.NewPopulatedStdTime(r, easy)
@@ -530,7 +530,7 @@ func randFieldOrganization(dAtA []byte, r randyOrganization, fieldNumber int, wi
 }
 func encodeVarintPopulateOrganization(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -596,7 +596,7 @@ func sovOrganization(x uint64) (n int) {
 	return n
 }
 func sozOrganization(x uint64) (n int) {
-	return sovOrganization((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovOrganization(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (m *Organization) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

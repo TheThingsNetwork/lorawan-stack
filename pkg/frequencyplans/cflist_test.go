@@ -41,7 +41,7 @@ func TestFrequenciesCFList(t *testing.T) {
 		},
 	}
 
-	cfList := frequencyplans.CFList(euFP, ttnpb.PHY_V1_1)
+	cfList := frequencyplans.CFList(euFP, ttnpb.PHY_V1_1_REV_B)
 
 	a.So(cfList.Type, should.Equal, ttnpb.CFListType_FREQUENCIES)
 
@@ -83,7 +83,7 @@ func TestChannelMasksCFList(t *testing.T) {
 		},
 	}
 
-	cfList := frequencyplans.CFList(usFP, ttnpb.PHY_V1_1)
+	cfList := frequencyplans.CFList(usFP, ttnpb.PHY_V1_1_REV_B)
 
 	enabledChannels := []int{8, 9, 10, 11, 12, 13, 14, 15}
 chMaskLoop:

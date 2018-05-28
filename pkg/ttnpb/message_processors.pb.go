@@ -458,7 +458,7 @@ func NewPopulatedProcessUplinkMessageRequest(r randyMessageProcessors, easy bool
 	this.DeviceVersion = *v1
 	v2 := NewPopulatedUplinkMessage(r, easy)
 	this.Message = *v2
-	this.Parameter = randStringMessageProcessors(r)
+	this.Parameter = string(randStringMessageProcessors(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -470,7 +470,7 @@ func NewPopulatedProcessDownlinkMessageRequest(r randyMessageProcessors, easy bo
 	this.DeviceVersion = *v3
 	v4 := NewPopulatedDownlinkMessage(r, easy)
 	this.Message = *v4
-	this.Parameter = randStringMessageProcessors(r)
+	this.Parameter = string(randStringMessageProcessors(r))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -542,7 +542,7 @@ func randFieldMessageProcessors(dAtA []byte, r randyMessageProcessors, fieldNumb
 }
 func encodeVarintPopulateMessageProcessors(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -587,7 +587,7 @@ func sovMessageProcessors(x uint64) (n int) {
 	return n
 }
 func sozMessageProcessors(x uint64) (n int) {
-	return sovMessageProcessors((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovMessageProcessors(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (m *ProcessUplinkMessageRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

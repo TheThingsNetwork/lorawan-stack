@@ -108,9 +108,11 @@ func init() {
 			PingSlotChannels: []uint32{eu433BeaconChannel},
 		},
 
-		regionalParameters1_0:   bandIdentity,
-		regionalParameters1_0_1: bandIdentity,
-		regionalParameters1_0_2: bandIdentity,
+		regionalParameters1_0:         bandIdentity,
+		regionalParameters1_0_1:       bandIdentity,
+		regionalParameters1_0_2_rev_A: bandIdentity,
+		regionalParameters1_0_2_rev_B: bandIdentity,
+		regionalParameters1_1_rev_A:   bandIdentity,
 	}
 	All = append(All, eu_433)
 }

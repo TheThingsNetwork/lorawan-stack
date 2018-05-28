@@ -99,7 +99,9 @@ func init() {
 			return offset
 		}(),
 
-		Rx1Channel: channelIndexModulo(8),
+		Rx1Channel: func(idx uint32) (uint32, error) {
+			return idx % 8, nil
+		},
 		Rx1DataRate: func(idx, offset uint32, _ bool) (uint32, error) {
 			if idx > 4 {
 				return 0, ErrLoRaWANParametersInvalid.NewWithCause(nil, errors.New("Data rate index must be lower or equal to 4"))
@@ -130,9 +132,11 @@ func init() {
 			PingSlotChannels: usAuBeaconFrequencies[:],
 		},
 
-		regionalParameters1_0:   bandIdentity,
-		regionalParameters1_0_1: usBeacon1_0_1,
-		regionalParameters1_0_2: disableCFList1_0_2,
+		regionalParameters1_0:         bandIdentity,
+		regionalParameters1_0_1:       bandIdentity,
+		regionalParameters1_0_2_rev_A: usBeacon1_0_2,
+		regionalParameters1_0_2_rev_B: disableCFList1_0_2,
+		regionalParameters1_1_rev_A:   bandIdentity,
 	}
 	All = append(All, us_902_928)
 }

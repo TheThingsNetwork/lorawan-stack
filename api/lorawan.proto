@@ -72,8 +72,10 @@ enum PHYVersion {
   PHY_UNKNOWN = 0;
   PHY_V1_0 = 1;
   PHY_V1_0_1 = 2;
-  PHY_V1_0_2 = 3;
-  PHY_V1_1 = 4;
+  PHY_V1_0_2_REV_A = 3;
+  PHY_V1_0_2_REV_B = 4;
+  PHY_V1_1_REV_A = 5;
+  PHY_V1_1_REV_B = 6;
 }
 
 message MHDR {

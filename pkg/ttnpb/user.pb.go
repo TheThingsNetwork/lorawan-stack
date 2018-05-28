@@ -351,12 +351,12 @@ func NewPopulatedUser(r randyUser, easy bool) *User {
 	this := &User{}
 	v1 := NewPopulatedUserIdentifiers(r, easy)
 	this.UserIdentifiers = *v1
-	this.Password = randStringUser(r)
-	this.Name = randStringUser(r)
+	this.Password = string(randStringUser(r))
+	this.Name = string(randStringUser(r))
 	if r.Intn(10) != 0 {
 		this.ValidatedAt = types.NewPopulatedStdTime(r, easy)
 	}
-	this.Admin = bool(r.Intn(2) == 0)
+	this.Admin = bool(bool(r.Intn(2) == 0))
 	this.State = ReviewingState([]int32{0, 1, 2}[r.Intn(3)])
 	v2 := types.NewPopulatedStdTime(r, easy)
 	this.CreatedAt = *v2
@@ -364,7 +364,7 @@ func NewPopulatedUser(r randyUser, easy bool) *User {
 	this.UpdatedAt = *v3
 	v4 := types.NewPopulatedStdTime(r, easy)
 	this.PasswordUpdatedAt = *v4
-	this.RequirePasswordUpdate = bool(r.Intn(2) == 0)
+	this.RequirePasswordUpdate = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -436,7 +436,7 @@ func randFieldUser(dAtA []byte, r randyUser, fieldNumber int, wire int) []byte {
 }
 func encodeVarintPopulateUser(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -488,7 +488,7 @@ func sovUser(x uint64) (n int) {
 	return n
 }
 func sozUser(x uint64) (n int) {
-	return sovUser((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovUser(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (m *User) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

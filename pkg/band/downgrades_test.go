@@ -48,10 +48,10 @@ func TestBands(t *testing.T) {
 	verifyCompatibility(ttnpb.PHY_V1_0_1, "1.0.1", bands...)
 
 	bands = append(bands, band.AS_923, band.KR_920_923, band.IN_865_867)
-	verifyCompatibility(ttnpb.PHY_V1_0_2, "1.0.2", bands...)
+	verifyCompatibility(ttnpb.PHY_V1_0_2_REV_B, "1.0.2", bands...)
 
 	bands = append(bands, band.RU_864_870)
-	verifyCompatibility(ttnpb.PHY_V1_1, "1.1", bands...)
+	verifyCompatibility(ttnpb.PHY_V1_1_REV_A, "1.1", bands...)
 }
 
 func TestUnsupportedBand(t *testing.T) {

@@ -562,7 +562,7 @@ func encodeVarintJoinserver(dAtA []byte, offset int, v uint64) int {
 }
 func NewPopulatedSessionKeyRequest(r randyJoinserver, easy bool) *SessionKeyRequest {
 	this := &SessionKeyRequest{}
-	this.SessionKeyID = randStringJoinserver(r)
+	this.SessionKeyID = string(randStringJoinserver(r))
 	v1 := go_thethings_network_lorawan_stack_pkg_types.NewPopulatedEUI64(r)
 	this.DevEUI = *v1
 	if !easy && r.Intn(10) != 0 {
@@ -658,7 +658,7 @@ func randFieldJoinserver(dAtA []byte, r randyJoinserver, fieldNumber int, wire i
 }
 func encodeVarintPopulateJoinserver(dAtA []byte, v uint64) []byte {
 	for v >= 1<<7 {
-		dAtA = append(dAtA, uint8(v&0x7f|0x80))
+		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
 	}
 	dAtA = append(dAtA, uint8(v))
@@ -707,7 +707,7 @@ func sovJoinserver(x uint64) (n int) {
 	return n
 }
 func sozJoinserver(x uint64) (n int) {
-	return sovJoinserver((x << 1) ^ uint64((int64(x) >> 63)))
+	return sovJoinserver(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
 func (m *SessionKeyRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
