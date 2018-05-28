@@ -18,6 +18,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+
+	"google.golang.org/grpc/status"
 )
 
 type info struct {
@@ -90,7 +92,7 @@ func (i *Impl) Type() Type {
 }
 
 // Attributes returns the error attributes
-func (i *Impl) Attributes() Attributes {
+func (i *Impl) Attributes() map[string]interface{} {
 	return i.info.Attributes
 }
 
@@ -99,9 +101,19 @@ func (i *Impl) Namespace() string {
 	return i.info.Namespace
 }
 
+// Name returns the name of the error.
+func (i *Impl) Name() string {
+	return fmt.Sprintf("#%d", i.Code())
+}
+
 // ID returns the unique identifier of this error.
 func (i *Impl) ID() string {
 	return i.info.ID
+}
+
+// GRPCStatus returns a *status.Status from the error.
+func (i *Impl) GRPCStatus() *status.Status {
+	return CompatStatus(i)
 }
 
 // ToImpl creates an equivalent Impl for any Error
@@ -158,7 +170,7 @@ type SafeImpl struct {
 }
 
 // Attributes returns the safe attributes.
-func (i *SafeImpl) Attributes() Attributes {
+func (i *SafeImpl) Attributes() map[string]interface{} {
 	if i.descriptor == nil {
 		return i.Impl.Attributes()
 	}

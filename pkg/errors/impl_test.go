@@ -42,14 +42,14 @@ func TestSafeImpl(t *testing.T) {
 		"quu": "qux",
 	})
 
-	a.So(i.Attributes(), should.Resemble, Attributes{
+	a.So(i.Attributes(), should.Resemble, map[string]interface{}{
 		"foo": "bar",
 		"quu": "qux",
 	})
 
 	safe := Safe(i)
 
-	a.So(safe.Attributes(), should.Resemble, Attributes{
+	a.So(safe.Attributes(), should.Resemble, map[string]interface{}{
 		"foo": "bar",
 	})
 

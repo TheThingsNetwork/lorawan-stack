@@ -42,7 +42,7 @@ func TestDescriptor(t *testing.T) {
 	a.So(err.Error(), should.Equal, "[77]: You do not have access to application `foo`")
 	a.So(err.Code(), should.Equal, d.Code)
 	a.So(err.Type(), should.Equal, d.Type)
-	a.So(err.Attributes(), should.Resemble, attributes)
+	a.So(err.Attributes(), should.Resemble, map[string]interface{}(attributes))
 
 	a.So(d.Describes(err), should.BeTrue)
 	a.So(d.Describes(errors.New("Something else")), should.BeFalse)

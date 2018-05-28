@@ -132,14 +132,20 @@ func (i impl) Code() errors.Code {
 func (i impl) Type() errors.Type {
 	return GRPCCodeToType(i.Status.Code())
 }
-func (i impl) Attributes() errors.Attributes {
+func (i impl) Attributes() map[string]interface{} {
 	return i.attrs
 }
 func (i impl) Namespace() string {
 	return i.namespace
 }
+func (i impl) Name() string {
+	return fmt.Sprintf("#%d", i.Code())
+}
 func (i impl) ID() string {
 	return i.id
+}
+func (i impl) GRPCStatus() *status.Status {
+	return errors.CompatStatus(i)
 }
 
 func fromWellKnown(in error) (errors.Error, bool) {

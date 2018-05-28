@@ -17,11 +17,13 @@ package httperrors
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"google.golang.org/grpc/status"
 )
 
 const (
@@ -139,7 +141,7 @@ func (r *respError) Type() errors.Type {
 	return HTTPStatusToType(r.StatusCode)
 }
 
-func (r *respError) Attributes() errors.Attributes {
+func (r *respError) Attributes() map[string]interface{} {
 	return nil
 }
 
@@ -147,8 +149,16 @@ func (r *respError) Namespace() string {
 	return ""
 }
 
+func (r *respError) Name() string {
+	return fmt.Sprintf("#%d", r.Code())
+}
+
 func (r *respError) ID() string {
 	return ""
+}
+
+func (r *respError) GRPCStatus() *status.Status {
+	return errors.CompatStatus(r)
 }
 
 // FromHTTP parses the http.Response and returns the corresponding error.

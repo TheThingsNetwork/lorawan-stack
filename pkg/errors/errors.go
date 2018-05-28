@@ -52,8 +52,11 @@ type Error interface {
 	// Namespace returns the namespace of the error, usually the package from which it originates.
 	Namespace() string
 
+	// Name returns the name of the error. This is used for compatibility with the new errors package.
+	Name() string
+
 	// Attributes returns the error attributes.
-	Attributes() Attributes
+	Attributes() map[string]interface{}
 
 	// ID is the unique identifier of the error.
 	ID() string
