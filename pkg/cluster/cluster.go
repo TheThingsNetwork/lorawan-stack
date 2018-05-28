@@ -17,12 +17,16 @@ package cluster
 
 import (
 	"context"
+	"encoding/hex"
+	"fmt"
 	"os"
 
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/rpcclient"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
@@ -46,6 +50,10 @@ type Cluster interface {
 	// a single peer. The shardKey is usually the DevAddr or DevEUI to make sure duplicate messages arrive at the same NS,
 	// or any other identifier (such as an AppID) that helps achieve external consistency for API calls.
 	GetPeer(role ttnpb.PeerInfo_Role, tags []string, shardKey []byte) Peer
+	// Auth returns a gRPC CallOption that can be used to identify the component within the cluster.
+	Auth() grpc.CallOption
+	// Hook returns a hook that stores in RPC contexts whether the call was made from an identified component of the cluster.
+	Hook() hooks.UnaryHandlerMiddleware
 }
 
 // CustomNew allows you to replace the clustering implementation. New will call CustomNew if not nil.
@@ -66,30 +74,47 @@ func New(ctx context.Context, config *config.ServiceBase, services ...rpcserver.
 		peers: make(map[string]*peer),
 	}
 
-	self := &peer{
+	for i, key := range config.Cluster.Keys {
+		decodedKey, err := hex.DecodeString(key)
+		if err != nil {
+			return nil, errors.NewWithCause(err, "Could not decode cluster key")
+		}
+		switch len(decodedKey) {
+		case 16, 24, 32:
+		default:
+			return nil, fmt.Errorf("Invalid length for cluster key number %d: must be 16, 24 or 32 bytes", i)
+		}
+		c.keys = append(c.keys, decodedKey)
+	}
+	if c.keys == nil {
+		c.keys = [][]byte{random.Bytes(32)}
+		log.FromContext(ctx).WithField("key", hex.EncodeToString(c.keys[0])).Warn("Generated a random cluster key")
+	}
+
+	c.self = &peer{
 		name:   config.Cluster.Name,
 		target: config.Cluster.Address,
 	}
-	if self.name == "" {
-		self.name, _ = os.Hostname()
+	if c.self.name == "" {
+		c.self.name, _ = os.Hostname()
 	}
-	if self.target == "" {
+	if c.self.target == "" {
 		if c.tls {
-			self.target = config.GRPC.ListenTLS
+			c.self.target = config.GRPC.ListenTLS
 		} else {
-			self.target = config.GRPC.Listen
+			c.self.target = config.GRPC.Listen
 		}
 	}
 	for _, service := range services {
 		if roles := service.Roles(); len(roles) > 0 {
-			self.roles = append(self.roles, roles...)
+			c.self.roles = append(c.self.roles, roles...)
 		}
 	}
 
-	c.peers[self.name] = self
+	c.peers[c.self.name] = c.self
 
 	tryAddPeer := func(name string, target string, role ttnpb.PeerInfo_Role) {
-		if !self.HasRole(role) && target != "" {
+		if !c.self.HasRole(role) && target != "" {
 			c.peers[name] = &peer{
 				name:   name,
 				target: target,
@@ -118,6 +143,9 @@ type cluster struct {
 	ctx   context.Context
 	tls   bool
 	peers map[string]*peer
+	self  *peer
+
+	keys [][]byte
 }
 
 func (c *cluster) Join() (err error) {

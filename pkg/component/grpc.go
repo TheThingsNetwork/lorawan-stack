@@ -21,8 +21,10 @@ import (
 
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
+	"google.golang.org/grpc"
 )
 
 func (c *Component) initGRPC() {
@@ -96,4 +98,14 @@ func (c *Component) RegisterGRPC(s rpcserver.Registerer) {
 		c.initGRPC()
 	}
 	c.grpcSubsystems = append(c.grpcSubsystems, s)
+}
+
+// ClusterAuth that can be used to identify a component within a cluster.
+func (c *Component) ClusterAuth() grpc.CallOption {
+	return c.cluster.Auth()
+}
+
+// ClusterHook returns the hook that loads in the context whether the caller of an RPC is part of the cluster.
+func (c *Component) ClusterHook() hooks.UnaryHandlerMiddleware {
+	return c.cluster.Hook()
 }
