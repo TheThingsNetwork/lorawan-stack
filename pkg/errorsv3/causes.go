@@ -14,8 +14,6 @@
 
 package errors
 
-import "google.golang.org/grpc/status"
-
 type causer interface {
 	Cause() error
 }
@@ -27,17 +25,10 @@ func (e *Error) setCause(cause error) {
 	if e.cause != nil {
 		panic("Error cause may not be overwritten, you're probably doing the a.WithCause(b) the wrong way around")
 	}
-	switch cause := cause.(type) {
-	case Error:
-		e.cause = &cause
-	case *Error:
+	if convertedCause, ok := From(cause); ok {
+		e.cause = convertedCause
+	} else {
 		e.cause = cause
-	default:
-		if se, ok := cause.(interface{ GRPCStatus() *status.Status }); ok {
-			e.cause = FromGRPCStatus(se.GRPCStatus())
-		} else {
-			e.cause = cause
-		}
 	}
 	e.stack = callers(4)
 }

@@ -18,7 +18,6 @@ import (
 	"net/http"
 
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // Code of the error.
@@ -40,8 +39,8 @@ func code(err error) int32 {
 	if c, ok := err.(interface{ Code() int32 }); ok {
 		return c.Code()
 	}
-	if se, ok := err.(interface{ GRPCStatus() *status.Status }); ok {
-		return int32(se.GRPCStatus().Code())
+	if err, ok := From(err); ok {
+		return err.Code()
 	}
 	return 0
 }

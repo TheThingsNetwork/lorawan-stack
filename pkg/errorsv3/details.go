@@ -14,8 +14,6 @@
 
 package errors
 
-import "google.golang.org/grpc/status"
-
 func (e *Error) addDetails(details ...interface{}) {
 	if e.details != nil {
 		e.details = details
@@ -58,8 +56,8 @@ func Details(err error) []interface{} {
 	if c, ok := err.(interface{ Details() []interface{} }); ok {
 		return c.Details()
 	}
-	if se, ok := err.(interface{ GRPCStatus() *status.Status }); ok {
-		return FromGRPCStatus(se.GRPCStatus()).Details()
+	if err, ok := From(err); ok {
+		return err.Details()
 	}
 	return nil
 }
