@@ -135,19 +135,7 @@ func (g *GatewayServer) processPullData(ctx context.Context, firstPacket *udp.Pa
 	logger := log.FromContext(ctx)
 	logger.Info("Fetching gateway information and frequency plan...")
 
-	isPeer := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, nil, nil)
-	if isPeer == nil {
-		logger.Error("No identity server to connect to found")
-		return
-	}
-	isConn := isPeer.Conn()
-	if isConn == nil {
-		logger.Error("No ready connection to the identity server")
-		return
-	}
-
-	is := ttnpb.NewIsGatewayClient(isConn)
-	gtw, err := is.GetGateway(ctx, &ttnpb.GatewayIdentifiers{EUI: firstPacket.GatewayEUI})
+	gtw, err := g.getGateway(ctx, &ttnpb.GatewayIdentifiers{EUI: firstPacket.GatewayEUI})
 	if err != nil {
 		logger.WithError(err).Error("Could not retrieve gateway information from the gateway server")
 		return

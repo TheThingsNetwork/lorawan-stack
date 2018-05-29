@@ -12,15 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package shared
-
-import "go.thethings.network/lorawan-stack/pkg/gatewayserver"
-
-// DefaultGatewayServerConfig is the default configuration for the GatewayServer.
-var DefaultGatewayServerConfig = gatewayserver.Config{
-	UDPAddress: ":1700",
-	MQTT: gatewayserver.MQTTConfig{
-		Listen:    ":1882",
-		ListenTLS: ":8882",
-	},
-}
+// Package mqtt contains MQTT-related utilities.
+package mqtt

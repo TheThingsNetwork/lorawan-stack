@@ -20,6 +20,7 @@ import (
 	"net"
 	"sync"
 
+	mqttnet "github.com/TheThingsIndustries/mystique/pkg/net"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
@@ -72,6 +73,36 @@ func New(c *component.Component, conf Config) (gs *GatewayServer, err error) {
 		}()
 	}
 
+	for _, mqttEndpoint := range []struct {
+		address, protocol string
+		create            func(component.Listener) (net.Listener, error)
+	}{
+		{
+			address:  conf.MQTT.Listen,
+			protocol: "tcp",
+			create:   component.Listener.TCP,
+		},
+		{
+			address:  conf.MQTT.ListenTLS,
+			protocol: "tls",
+			create:   component.Listener.TLS,
+		},
+	} {
+		if mqttEndpoint.address == "" {
+			continue
+		}
+		componentLis, err := c.ListenTCP(mqttEndpoint.address)
+		if err != nil {
+			return nil, err
+		}
+		lis, err := mqttEndpoint.create(componentLis)
+		if err != nil {
+			return nil, err
+		}
+		mqttLis := mqttnet.NewListener(lis, mqttEndpoint.protocol)
+		go gs.runMQTTEndpoint(mqttLis)
+	}
+
 	rightsHook, err := c.RightsHook()
 	if err != nil {
 		return nil, err
@@ -120,6 +151,27 @@ func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.G
 	observations := connection.getObservations()
 
 	return &observations, nil
+}
+
+func (gs *GatewayServer) getIdentityServer() (ttnpb.IsGatewayClient, error) {
+	peer := gs.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, nil, nil)
+	if peer == nil {
+		return nil, ErrNoIdentityServerFound.New(nil)
+	}
+	isConn := peer.Conn()
+	if isConn == nil {
+		return nil, ErrNoReadyConnectionToIdentityServer.New(nil)
+	}
+
+	return ttnpb.NewIsGatewayClient(isConn), nil
+}
+
+func (gs *GatewayServer) getGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.Gateway, error) {
+	is, err := gs.getIdentityServer()
+	if err != nil {
+		return nil, err
+	}
+	return is.GetGateway(ctx, id)
 }
 
 func checkAuthorization(ctx context.Context, is ttnpb.IsGatewayClient, right ttnpb.Right) error {

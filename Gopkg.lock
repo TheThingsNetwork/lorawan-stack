@@ -20,6 +20,21 @@
   version = "v1.0.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/TheThingsIndustries/mystique"
+  packages = [
+    "pkg/auth",
+    "pkg/log",
+    "pkg/net",
+    "pkg/packet",
+    "pkg/pending",
+    "pkg/session",
+    "pkg/subscription",
+    "pkg/topic"
+  ]
+  revision = "b925d3b3a4093dd678574d3a8e88c01219bbd7d6"
+
+[[projects]]
   name = "github.com/TheThingsNetwork/go-cayenne-lib"
   packages = ["cayennelpp"]
   revision = "ba5c7ac69c198562633ee3ad4c90e16b4b12b88d"
@@ -48,6 +63,15 @@
   name = "github.com/cockroachdb/cockroach-go"
   packages = ["crdb"]
   revision = "59c0560478b705bf9bd12f9252224a0fad7c87df"
+
+[[projects]]
+  name = "github.com/eclipse/paho.mqtt.golang"
+  packages = [
+    ".",
+    "packets"
+  ]
+  revision = "36d01c2b4cbeb3d2a12063e4880ce30800af9560"
+  version = "v1.1.1"
 
 [[projects]]
   name = "github.com/elazarl/go-bindata-assetfs"
@@ -528,8 +552,11 @@
     "http2",
     "http2/hpack",
     "idna",
+    "internal/socks",
     "internal/timeseries",
-    "trace"
+    "proxy",
+    "trace",
+    "websocket"
   ]
   revision = "db08ff08e8622530d9ed3a0e8ac279f6d4c02196"
 
@@ -653,6 +680,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "31f8b58c694faa5ed5ba18faf5e03ce7a6b61af2b7484795efbb85daefc21dd0"
+  inputs-digest = "b11bd1bb61dae57107348ffa45a81d95937957f32750b13f923c0402fd774d5a"
   solver-name = "gps-cdcl"
   solver-version = 1

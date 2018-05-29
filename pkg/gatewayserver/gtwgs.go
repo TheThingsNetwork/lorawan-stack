@@ -22,6 +22,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -110,19 +111,19 @@ func (g *GatewayServer) setupConnection(uid string, connectionInfo connection) {
 // this gateway may not be used for downlink.
 func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	ctx := link.Context()
-	gtwID := ttnpb.GatewayIdentifiers{
+	id := ttnpb.GatewayIdentifiers{
 		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
-	if err := validate.ID(gtwID.GatewayID); err != nil {
+	if err := validate.ID(id.GetGatewayID()); err != nil {
 		return err
 	}
-	uid := gtwID.UniqueID(ctx)
-
-	events.Publish(evtStartGatewayLink(ctx, gtwID, nil))
-	defer events.Publish(evtEndGatewayLink(ctx, gtwID, err))
-
+	uid := id.UniqueID(ctx)
 	logger := log.FromContext(ctx).WithField("gateway_uid", uid)
 	ctx = log.NewContext(ctx, logger)
+
+	events.Publish(evtStartGatewayLink(ctx, id, nil))
+	defer events.Publish(evtEndGatewayLink(ctx, id, err))
+
 	logger.Info("Link with gateway opened")
 	defer logger.WithError(err).Debug("Link with gateway closed")
 
@@ -139,14 +140,16 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 		}
 	}
 
-	gtw, err := is.GetGateway(ctx, &gtwID)
+	gtw, err := is.GetGateway(ctx, &id)
 	if err != nil {
 		return errors.NewWithCause(err, "Could not get gateway information from Identity Server")
 	}
 
-	fp, err := g.FrequencyPlans.GetByID(gtw.FrequencyPlanID)
+	fp, err := g.FrequencyPlans.GetByID(gtw.GetFrequencyPlanID())
 	if err != nil {
-		return errors.NewWithCausef(err, "Could not retrieve frequency plan %s", gtw.FrequencyPlanID)
+		return common.ErrCouldNotRetrieveFrequencyPlan.NewWithCause(errors.Attributes{
+			"frequency_plan_id": gtw.GetFrequencyPlanID(),
+		}, err)
 	}
 
 	scheduler, err := scheduling.FrequencyPlanScheduler(ctx, fp)
@@ -167,13 +170,13 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 
 	g.setupConnection(uid, connectionInfo)
 
-	go g.signalStartServingGateway(ctx, &gtwID)
+	go g.signalStartServingGateway(ctx, &id)
 
 	go func() {
 		<-ctx.Done()
 		// TODO: Add tenant extraction when #433 is merged
 		stopCtx, cancel := context.WithTimeout(g.Context(), time.Minute)
-		g.signalStopServingGateway(stopCtx, &gtwID)
+		g.signalStopServingGateway(stopCtx, &id)
 		cancel()
 
 		g.connectionsMu.Lock()

@@ -36,6 +36,12 @@ var (
 		Type:          errors.InvalidArgument,
 		Code:          3,
 	}
+	// ErrMarshalPayloadFailed is returned when a payload couldn't be marshalled.
+	ErrMarshalPayloadFailed = &errors.ErrDescriptor{
+		MessageFormat: "Failed to marshal payload",
+		Type:          errors.InvalidArgument,
+		Code:          17,
+	}
 	// ErrCorruptRegistry represents error occurring when the registry of a component is corrupted.
 	ErrCorruptRegistry = &errors.ErrDescriptor{
 		MessageFormat: "Registry is corrupt",
@@ -60,7 +66,8 @@ func init() {
 	ErrInvalidArgument.Register()
 	ErrCheckFailed.Register()
 	ErrUnmarshalPayloadFailed.Register()
+	ErrMarshalPayloadFailed.Register()
 	ErrCorruptRegistry.Register()
-	ErrPermissionDenied.Register()
 	ErrUnauthorized.Register()
+	ErrPermissionDenied.Register()
 }

@@ -43,3 +43,10 @@ func (ids ClientIdentifiers) UniqueID(_ context.Context) string { return ids.Cli
 
 // UniqueID returns the unique identifier.
 func (ids OrganizationIdentifiers) UniqueID(_ context.Context) string { return ids.OrganizationID }
+
+// GatewayIdentifiersFromUniqueID returns the gateway identifiers that could be extracted from the unique ID.
+func GatewayIdentifiersFromUniqueID(uniqueID string) (*GatewayIdentifiers, error) {
+	return &GatewayIdentifiers{
+		GatewayID: uniqueID,
+	}, nil
+}

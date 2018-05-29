@@ -14,11 +14,19 @@
 
 package gatewayserver
 
-// Config represents the GatewayServer configuration.
+// MQTTConfig of the Gateway Server.
+type MQTTConfig struct {
+	Listen    string `name:"listen" description:"Address for the MQTT endpoint to listen on"`
+	ListenTLS string `name:"listen-tls" description:"Address for the MQTTS endpoint to listen on"`
+}
+
+// Config represents the Gateway Server configuration.
 type Config struct {
 	NSTags []string `name:"network-servers.tags" description:"Network Server tags to accept to connect to"`
 
 	DisableAuth bool `name:"disable-auth" description:"Disable gateway authentication, e.g. for debugging and testing purposes"`
 
-	UDPAddress string `name:"udp-address" description:"Address for the UDP server to listen on"`
+	UDPAddress string `name:"udp.listen" description:"Address for the UDP endpoint to listen on"`
+
+	MQTT MQTTConfig `name:"mqtt"`
 }

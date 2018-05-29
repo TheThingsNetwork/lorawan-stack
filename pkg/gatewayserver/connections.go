@@ -20,7 +20,11 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/TheThingsIndustries/mystique/pkg/packet"
+	"github.com/TheThingsIndustries/mystique/pkg/session"
+	"github.com/TheThingsIndustries/mystique/pkg/topic"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/udp"
 	"go.thethings.network/lorawan-stack/pkg/toa"
@@ -33,6 +37,8 @@ const (
 	// DownlinkTiming before sending to a gateway connected over UDP,
 	// and that does not have a JIT queue.
 	DownlinkTiming = -1 * 1000 * time.Millisecond
+	// MQTTDownlinkQoS indicates the MQTT Quality of Service level of downlinks sent by the Gateway Server.
+	MQTTDownlinkQoS byte = 0x00
 )
 
 type connection interface {
@@ -231,3 +237,41 @@ func (c *udpConnection) gatewayIdentifiers() ttnpb.GatewayIdentifiers {
 }
 
 func (c *udpConnection) Close() error { return nil }
+
+type mqttConnection struct {
+	connectionData
+
+	gtw  *ttnpb.Gateway
+	sess session.Session
+}
+
+func (c *mqttConnection) gateway() *ttnpb.Gateway {
+	return c.gtw
+}
+
+func (c *mqttConnection) gatewayIdentifiers() ttnpb.GatewayIdentifiers {
+	return c.gateway().GatewayIdentifiers
+}
+
+func (c *mqttConnection) send(down *ttnpb.DownlinkMessage) error {
+	// TODO: Support v2 MQTT format https://github.com/TheThingsIndustries/ttn/issues/828
+	data, err := down.Marshal()
+	if err != nil {
+		return common.ErrMarshalPayloadFailed.NewWithCause(nil, err)
+	}
+	uid := c.gateway().GatewayIdentifiers.UniqueID(c.sess.Context())
+	topicParts := []string{V3TopicPrefix, uid, DownlinkTopicSuffix}
+	pkt := &packet.PublishPacket{
+		TopicName:  topic.Join(topicParts),
+		TopicParts: topicParts,
+		QoS:        MQTTDownlinkQoS,
+		Message:    data,
+	}
+	c.sess.Publish(pkt)
+	return nil
+}
+
+func (c *mqttConnection) Close() error {
+	c.sess.Close()
+	return nil
+}

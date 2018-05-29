@@ -42,12 +42,32 @@ var (
 		Type:           errors.NotFound,
 		SafeAttributes: []string{"gateway_id"},
 	}
+	// ErrNoReadyConnectionToIdentityServer is returned when the connection to the identity server is not ready yet.
+	ErrNoReadyConnectionToIdentityServer = &errors.ErrDescriptor{
+		MessageFormat: "No ready connection to the identity server",
+		Code:          5,
+		Type:          errors.Internal,
+	}
 	// ErrTranslationFromProtobuf is returned when the translation of a
 	// message between the proto format and the UDP format fails.
 	ErrTranslationFromProtobuf = &errors.ErrDescriptor{
 		MessageFormat: "Could not translate from the protobuf format to UDP",
 		Code:          6,
 		Type:          errors.Internal,
+	}
+	// ErrUnsupportedTopicFormat is returned if a topic is unsupported.
+	ErrUnsupportedTopicFormat = &errors.ErrDescriptor{
+		MessageFormat:  "Unsupported topic format `{topic}`",
+		Code:           7,
+		Type:           errors.InvalidArgument,
+		SafeAttributes: []string{"topic"},
+	}
+	// ErrInvalidAPIVersion is returned when an invalid API version is passed.
+	ErrInvalidAPIVersion = &errors.ErrDescriptor{
+		MessageFormat:  "Invalid API version tag `{version}`",
+		Code:           8,
+		Type:           errors.InvalidArgument,
+		SafeAttributes: []string{"version"},
 	}
 )
 
@@ -56,5 +76,8 @@ func init() {
 	ErrNoIdentityServerFound.Register()
 	ErrUnauthorized.Register()
 	ErrGatewayNotConnected.Register()
+	ErrNoReadyConnectionToIdentityServer.Register()
 	ErrTranslationFromProtobuf.Register()
+	ErrUnsupportedTopicFormat.Register()
+	ErrInvalidAPIVersion.Register()
 }

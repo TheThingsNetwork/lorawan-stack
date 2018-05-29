@@ -78,6 +78,12 @@ var (
 		Type:          errors.InvalidArgument,
 		Code:          15,
 	}
+	// ErrCouldNotRetrieveFrequencyPlan represents an error occurring when a frequency plan could not be retrieved.
+	ErrCouldNotRetrieveFrequencyPlan = &errors.ErrDescriptor{
+		MessageFormat: "Could not retrieve frequency plan `{frequency_plan_id}`",
+		Code:          18,
+		Type:          errors.Internal,
+	}
 )
 
 func init() {
@@ -91,4 +97,5 @@ func init() {
 	ErrMissingDevAddr.Register()
 	ErrFCntTooLow.Register()
 	ErrFCntTooHigh.Register()
+	ErrCouldNotRetrieveFrequencyPlan.Register()
 }

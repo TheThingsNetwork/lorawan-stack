@@ -30,6 +30,7 @@ import (
 // IsGatewayServer implements ttnpb.IsGatewayServer
 type IsGatewayServer struct {
 	gateways []ttnpb.Gateway
+	rights   []ttnpb.Right
 }
 
 func (m *IsGatewayServer) CreateGateway(context.Context, *ttnpb.CreateGatewayRequest) (*types.Empty, error) {
@@ -83,10 +84,12 @@ func (m *IsGatewayServer) ListGatewayCollaborators(context.Context, *ttnpb.Gatew
 }
 
 func (m *IsGatewayServer) ListGatewayRights(context.Context, *ttnpb.GatewayIdentifiers) (*ttnpb.ListGatewayRightsResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "not implemented")
+	return &ttnpb.ListGatewayRightsResponse{
+		Rights: m.rights,
+	}, nil
 }
 
-func StartMockIsGatewayServer(ctx context.Context, gateways []ttnpb.Gateway) (*grpc.Server, string) {
+func StartMockIsGatewayServer(ctx context.Context, gateways []ttnpb.Gateway) (*IsGatewayServer, string) {
 	is := &IsGatewayServer{gateways: gateways}
 
 	serve := func(addr string) (*grpc.Server, string) {
@@ -102,6 +105,6 @@ func StartMockIsGatewayServer(ctx context.Context, gateways []ttnpb.Gateway) (*g
 		}
 	}
 
-	srv, addr := serve("127.0.0.1:0")
-	return srv, addr
+	_, addr := serve("127.0.0.1:0")
+	return is, addr
 }
