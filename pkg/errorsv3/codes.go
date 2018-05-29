@@ -16,7 +16,6 @@ package errors
 
 import (
 	"context"
-	"net/http"
 
 	"google.golang.org/grpc/codes"
 )
@@ -106,33 +105,3 @@ func IsDataLoss(err error) bool { return HasCode(err, int32(codes.DataLoss)) }
 
 // IsUnauthenticated returns whether the given error is of type Unauthenticated.
 func IsUnauthenticated(err error) bool { return HasCode(err, int32(codes.Unauthenticated)) }
-
-// httpStatuscodes maps status codes to HTTP codes.
-// See package google.golang.org/genproto/googleapis/rpc/code and google.golang.org/grpc/codes for details.
-var httpStatuscodes = map[int32]int{
-	int32(codes.OK):                 http.StatusOK,
-	int32(codes.Canceled):           499, // Client Closed Request
-	int32(codes.Unknown):            http.StatusInternalServerError,
-	int32(codes.InvalidArgument):    http.StatusBadRequest,
-	int32(codes.DeadlineExceeded):   http.StatusGatewayTimeout,
-	int32(codes.NotFound):           http.StatusNotFound,
-	int32(codes.AlreadyExists):      http.StatusConflict,
-	int32(codes.PermissionDenied):   http.StatusForbidden,
-	int32(codes.Unauthenticated):    http.StatusUnauthorized,
-	int32(codes.ResourceExhausted):  http.StatusTooManyRequests,
-	int32(codes.FailedPrecondition): http.StatusBadRequest,
-	int32(codes.Aborted):            http.StatusConflict,
-	int32(codes.OutOfRange):         http.StatusBadRequest,
-	int32(codes.Unimplemented):      http.StatusNotImplemented,
-	int32(codes.Internal):           http.StatusInternalServerError,
-	int32(codes.Unavailable):        http.StatusServiceUnavailable,
-	int32(codes.DataLoss):           http.StatusInternalServerError,
-}
-
-// HTTPStatusCode maps an error to HTTP response codes.
-func HTTPStatusCode(err error) int {
-	if status, ok := httpStatuscodes[Code(err)]; ok {
-		return status
-	}
-	return http.StatusInternalServerError
-}
