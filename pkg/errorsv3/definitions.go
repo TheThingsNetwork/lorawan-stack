@@ -19,6 +19,7 @@ import (
 	"regexp"
 
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // Definition of a registered error.
@@ -29,6 +30,7 @@ type Definition struct {
 	messageFormatArguments []string
 	publicAttributes       []string
 	code                   int32 // 0 is invalid; so implies Unknown (code 2)
+	grpcStatus             *status.Status
 }
 
 // Namespace of the error.
@@ -100,6 +102,8 @@ nextArg:
 		}
 		def.publicAttributes = append(def.publicAttributes, arg)
 	}
+
+	_ = def.GRPCStatus() // stores the status in def.grpcStatus
 
 	Definitions[fullName] = &def
 	return def

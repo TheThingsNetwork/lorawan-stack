@@ -15,7 +15,10 @@
 package errors
 
 import (
+	"context"
+
 	"github.com/golang/protobuf/proto"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -80,6 +83,9 @@ var ErrorDetailsFromProto func(msg ...proto.Message) (details ErrorDetails, rest
 
 // GRPCStatus converts the Definition into a gRPC status message.
 func (d Definition) GRPCStatus() *status.Status {
+	if d.grpcStatus != nil {
+		return d.grpcStatus
+	}
 	s := status.New(codes.Code(d.Code()), d.String())
 	if ErrorDetailsToProto != nil {
 		if proto := ErrorDetailsToProto(d); proto != nil {
@@ -90,11 +96,19 @@ func (d Definition) GRPCStatus() *status.Status {
 			}
 		}
 	}
+	d.grpcStatus = s
 	return s
 }
 
+func (e *Error) clearGRPCStatus() {
+	e.grpcStatus.Store((*status.Status)(nil))
+}
+
 // GRPCStatus converts the Error into a gRPC status message.
-func (e Error) GRPCStatus() *status.Status {
+func (e *Error) GRPCStatus() *status.Status {
+	if s, ok := e.grpcStatus.Load().(*status.Status); ok && s != nil {
+		return s
+	}
 	s := status.New(codes.Code(e.Code()), e.String())
 	protoDetails := make([]proto.Message, 0, len(e.Details())+1)
 	for _, details := range e.Details() {
@@ -114,5 +128,64 @@ func (e Error) GRPCStatus() *status.Status {
 			// TODO: this should probably panic
 		}
 	}
+	e.grpcStatus.Store(s)
 	return s
+}
+
+// UnaryServerInterceptor converts errors to gRPC errors.
+func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		return handler(ctx, req)
+	}
+}
+
+// StreamServerInterceptor converts errors to gRPC errors.
+func StreamServerInterceptor() grpc.StreamServerInterceptor {
+	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+		return handler(srv, stream)
+	}
+}
+
+// UnaryClientInterceptor converts gRPC errors to regular errors.
+func UnaryClientInterceptor() grpc.UnaryClientInterceptor {
+	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+		err := invoker(ctx, method, req, reply, cc, opts...)
+		if err, ok := From(err); ok && err != nil {
+			return err
+		}
+		return err
+	}
+}
+
+type wrappedStream struct {
+	grpc.ClientStream
+}
+
+func (w wrappedStream) SendMsg(m interface{}) error {
+	err := w.ClientStream.SendMsg(m)
+	if err, ok := From(err); ok && err != nil {
+		return err
+	}
+	return err
+}
+func (w wrappedStream) RecvMsg(m interface{}) error {
+	err := w.ClientStream.RecvMsg(m)
+	if err, ok := From(err); ok && err != nil {
+		return err
+	}
+	return err
+}
+
+// StreamClientInterceptor converts gRPC errors to regular errors.
+func StreamClientInterceptor() grpc.StreamClientInterceptor {
+	return func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
+		s, err := streamer(ctx, desc, cc, method, opts...)
+		if err, ok := From(err); ok && err != nil {
+			return nil, err
+		}
+		if err != nil {
+			return nil, err
+		}
+		return wrappedStream{s}, nil
+	}
 }

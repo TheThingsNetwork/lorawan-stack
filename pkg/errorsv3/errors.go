@@ -15,7 +15,11 @@
 // Package errors implements rich errors that carry contextual information such as stack traces, causality and attributes.
 package errors
 
-import "google.golang.org/grpc/codes"
+import (
+	"sync/atomic"
+
+	"google.golang.org/grpc/codes"
+)
 
 // New returns an error that formats as the given text.
 // This way of creating errors should be avoided if possible.
@@ -35,10 +39,11 @@ type Error struct {
 	cause         error
 	details       []interface{}
 	attributes    map[string]interface{}
+	grpcStatus    *atomic.Value
 }
 
 func build(d Definition, skip int) Error {
-	e := Error{Definition: d}
+	e := Error{Definition: d, grpcStatus: new(atomic.Value)}
 	if skip > 0 {
 		e.stack = callers(skip)
 	}

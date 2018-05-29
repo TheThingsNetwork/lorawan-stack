@@ -23,6 +23,7 @@ func (e *Error) addDetails(details ...interface{}) {
 	if e.stack == nil {
 		e.stack = callers(4)
 	}
+	e.clearGRPCStatus()
 }
 
 // WithDetails returns the error with the given details set. This appends to any existing details in the Error.

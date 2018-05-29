@@ -31,6 +31,7 @@ func (e *Error) setCause(cause error) {
 		e.cause = cause
 	}
 	e.stack = callers(4)
+	e.clearGRPCStatus()
 }
 
 // WithCause returns the error with the given cause set. Overwriting an existing cause in the Error will cause a panic.

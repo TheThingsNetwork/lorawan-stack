@@ -114,6 +114,8 @@ func (e *Error) mergeAttributes(kv ...interface{}) {
 	if e.stack == nil {
 		e.stack = callers(4)
 	}
+
+	e.clearGRPCStatus()
 }
 
 // WithAttributes returns the error with the given attributes set. Any conflicting attributes in the Error will be overwritten.
