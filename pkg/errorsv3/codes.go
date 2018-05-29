@@ -15,6 +15,7 @@
 package errors
 
 import (
+	"context"
 	"net/http"
 
 	"google.golang.org/grpc/codes"
@@ -60,11 +61,21 @@ func HasCode(err error, c int32) bool {
 	return code(err) == c
 }
 
+// IsCanceled returns whether the givenerror is context.Canceled or of type Canceled.
+func IsCanceled(err error) bool {
+	return err == context.Canceled || HasCode(err, int32(codes.Canceled))
+}
+
 // IsUnknown returns whether the given error is of type Unknown.
 func IsUnknown(err error) bool { return HasCode(err, int32(codes.Unknown)) }
 
 // IsInvalidArgument returns whether the given error is of type InvalidArgument.
 func IsInvalidArgument(err error) bool { return HasCode(err, int32(codes.InvalidArgument)) }
+
+// IsDeadlineExceeded returns whether the givenerror is context.DeadlineExceeded or of type DeadlineExceeded.
+func IsDeadlineExceeded(err error) bool {
+	return err == context.DeadlineExceeded || HasCode(err, int32(codes.DeadlineExceeded))
+}
 
 // IsNotFound returns whether the given error is of type NotFound.
 func IsNotFound(err error) bool { return HasCode(err, int32(codes.NotFound)) }

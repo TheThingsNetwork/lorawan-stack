@@ -15,6 +15,7 @@
 package errors
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"testing"
@@ -32,8 +33,10 @@ func TestCodes(t *testing.T) {
 	a.So(IsUnknown(errUnknown), should.BeTrue)
 	a.So(IsUnknown(errUnknown.GRPCStatus().Err()), should.BeTrue)
 	a.So(IsUnknown(errStdLib), should.BeFalse)
-
 	a.So(IsUnknown(DefineInternal("test_codes_not_unknown", "")), should.BeFalse)
+
+	a.So(IsCanceled(context.Canceled), should.BeTrue)
+	a.So(IsDeadlineExceeded(context.DeadlineExceeded), should.BeTrue)
 	a.So(IsInvalidArgument(DefineInvalidArgument("test_codes_invalid_argument", "")), should.BeTrue)
 	a.So(IsNotFound(DefineNotFound("test_codes_not_found", "")), should.BeTrue)
 	a.So(IsAlreadyExists(DefineAlreadyExists("test_codes_already_exists", "")), should.BeTrue)
