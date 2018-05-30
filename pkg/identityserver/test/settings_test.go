@@ -23,7 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func testSettings() *ttnpb.IdentityServerSettings {
+func newTestSettings() *ttnpb.IdentityServerSettings {
 	return &ttnpb.IdentityServerSettings{
 		BlacklistedIDs:     []string{"admin"},
 		AllowedEmails:      []string{},
@@ -35,21 +35,21 @@ func testSettings() *ttnpb.IdentityServerSettings {
 func TestShouldBeSettings(t *testing.T) {
 	a := assertions.New(t)
 
-	a.So(ShouldBeSettings(testSettings(), testSettings()), should.Equal, success)
+	a.So(ShouldBeSettings(newTestSettings(), newTestSettings()), should.Equal, success)
 
-	modified := testSettings()
+	modified := newTestSettings()
 	modified.ValidationTokenTTL = time.Duration(time.Hour * 2)
 
-	a.So(ShouldBeSettings(modified, testSettings()), should.NotEqual, success)
+	a.So(ShouldBeSettings(modified, newTestSettings()), should.NotEqual, success)
 }
 
 func TestShouldBeSettingsIgnoringAutoFields(t *testing.T) {
 	a := assertions.New(t)
 
-	a.So(ShouldBeSettingsIgnoringAutoFields(testSettings(), testSettings()), should.Equal, success)
+	a.So(ShouldBeSettingsIgnoringAutoFields(newTestSettings(), newTestSettings()), should.Equal, success)
 
-	modified := testSettings()
+	modified := newTestSettings()
 	modified.AllowedEmails = nil
 
-	a.So(ShouldBeSettingsIgnoringAutoFields(modified, testSettings()), should.NotEqual, success)
+	a.So(ShouldBeSettingsIgnoringAutoFields(modified, newTestSettings()), should.NotEqual, success)
 }

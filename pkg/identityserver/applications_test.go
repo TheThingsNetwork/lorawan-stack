@@ -31,15 +31,15 @@ var _ ttnpb.IsApplicationServer = new(applicationService)
 
 func TestApplication(t *testing.T) {
 	a := assertions.New(t)
-	is := getIS(t)
+	is := newTestIS(t)
 
-	user := testUsers()["bob"]
+	user := newTestUsers()["bob"]
 
 	app := ttnpb.Application{
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"},
 	}
 
-	ctx := testCtx(user.UserIdentifiers)
+	ctx := newTestCtx(user.UserIdentifiers)
 
 	_, err := is.applicationService.CreateApplication(ctx, &ttnpb.CreateApplicationRequest{
 		Application: app,
@@ -47,7 +47,7 @@ func TestApplication(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	// Can't create applications with blacklisted IDs.
-	for _, id := range testSettings().BlacklistedIDs {
+	for _, id := range newTestSettings().BlacklistedIDs {
 		_, err = is.applicationService.CreateApplication(ctx, &ttnpb.CreateApplicationRequest{
 			Application: ttnpb.Application{
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: id},
@@ -127,7 +127,7 @@ func TestApplication(t *testing.T) {
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
 	// Set a new collaborator with SETTINGS_COLLABORATORS and INFO rights.
-	alice := testUsers()["alice"]
+	alice := newTestUsers()["alice"]
 	collab := &ttnpb.ApplicationCollaborator{
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &alice.UserIdentifiers}},
 		ApplicationIdentifiers:        app.ApplicationIdentifiers,
@@ -155,7 +155,7 @@ func TestApplication(t *testing.T) {
 	{
 		collab.Rights = append(collab.Rights, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS)
 
-		ctx := testCtx(alice.UserIdentifiers)
+		ctx := newTestCtx(alice.UserIdentifiers)
 
 		_, err = is.applicationService.SetApplicationCollaborator(ctx, collab)
 		a.So(err, should.BeNil)

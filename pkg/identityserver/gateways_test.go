@@ -32,12 +32,12 @@ var _ ttnpb.IsGatewayServer = new(gatewayService)
 
 func TestGatewaysBlacklistedIDs(t *testing.T) {
 	a := assertions.New(t)
-	is := getIS(t)
+	is := newTestIS(t)
 
-	ctx := testCtx(testUsers()["bob"].UserIdentifiers)
+	ctx := newTestCtx(newTestUsers()["bob"].UserIdentifiers)
 
 	// Can not create gateways with blacklisted IDs.
-	for _, id := range testSettings().BlacklistedIDs {
+	for _, id := range newTestSettings().BlacklistedIDs {
 		_, err := is.gatewayService.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: id},
@@ -94,9 +94,9 @@ func TestGateways(t *testing.T) {
 
 func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 	a := assertions.New(t)
-	is := getIS(t)
+	is := newTestIS(t)
 
-	user := testUsers()["bob"]
+	user := newTestUsers()["bob"]
 
 	gtw := ttnpb.Gateway{
 		GatewayIdentifiers: gids,
@@ -132,7 +132,7 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 		DisableTxDelay: true,
 	}
 
-	ctx := testCtx(user.UserIdentifiers)
+	ctx := newTestCtx(user.UserIdentifiers)
 
 	_, err := is.gatewayService.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{
 		Gateway: gtw,
@@ -209,7 +209,7 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 	a.So(keys.APIKeys, should.HaveLength, 0)
 
 	// Set a new collaborator with SETTINGS_COLLABORATORS and INFO rights.
-	alice := testUsers()["alice"]
+	alice := newTestUsers()["alice"]
 	collab := &ttnpb.GatewayCollaborator{
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &alice.UserIdentifiers}},
 		GatewayIdentifiers:            sids,
@@ -237,7 +237,7 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 	{
 		collab.Rights = append(collab.Rights, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS)
 
-		ctx := testCtx(alice.UserIdentifiers)
+		ctx := newTestCtx(alice.UserIdentifiers)
 
 		_, err = is.gatewayService.SetGatewayCollaborator(ctx, collab)
 		a.So(err, should.BeNil)

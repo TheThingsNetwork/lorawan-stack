@@ -38,8 +38,9 @@ var (
 		OrganizationName: "The Things Network",
 		PublicURL:        "https://www.thethingsnetwork.org",
 	}
-	initialData = InitialData{
-		Settings: testSettings(),
+	testInstance *IdentityServer
+	initialData  = InitialData{
+		Settings: newTestSettings(),
 		Admin: InitialAdminData{
 			UserID:   "admin",
 			Email:    "admin@localhost",
@@ -50,54 +51,9 @@ var (
 			RedirectURI:  "http://localhost/oauth/callback",
 		},
 	}
-	testIS *IdentityServer
 )
 
-// NOTE: Identity Server tests must run in this same directory as it is relying
-// on the relative path to access the webui folder to create the assets instance.
-func getIS(t testing.TB) *IdentityServer {
-	if testIS == nil {
-		logger := test.GetLogger(t)
-		comp := component.MustNew(logger, &component.Config{})
-
-		testConfig.OAuth.Assets = assets.New(comp, assets.Config{
-			Directory: "../webui",
-		})
-
-		is, err := New(comp, testConfig)
-		if err != nil {
-			logger.WithError(err).Fatal("Failed to create an Identity Server instance")
-		}
-
-		err = is.store.Clean()
-		if err != nil {
-			logger.WithError(err).Fatal("Failed to drop database")
-		}
-
-		err = is.Init(initialData)
-		if err != nil {
-			logger.WithError(err).Fatal("Failed to initialize the Identity Server instance")
-		}
-
-		for _, user := range testUsers() {
-			err = is.store.Users.Create(user)
-			if err != nil {
-				logger.WithError(err).Fatal("Failed to feed the database with test users")
-			}
-		}
-
-		err = is.store.Clients.Create(testClient())
-		if err != nil {
-			logger.WithError(err).Fatal("Failed to create test client")
-		}
-
-		testIS = is
-	}
-
-	return testIS
-}
-
-func testCtx(ids ttnpb.UserIdentifiers) context.Context {
+func newTestCtx(ids ttnpb.UserIdentifiers) context.Context {
 	return newContextWithAuthorizationData(context.Background(), &authorizationData{
 		EntityIdentifiers: ids,
 		Source:            auth.Token,
@@ -105,7 +61,7 @@ func testCtx(ids ttnpb.UserIdentifiers) context.Context {
 	})
 }
 
-func testSettings() ttnpb.IdentityServerSettings {
+func newTestSettings() ttnpb.IdentityServerSettings {
 	return ttnpb.IdentityServerSettings{
 		BlacklistedIDs:     []string{"blacklisted-id", "admin"},
 		AllowedEmails:      []string{"*@bar.com"},
@@ -114,11 +70,11 @@ func testSettings() ttnpb.IdentityServerSettings {
 	}
 }
 
-func testClient() *ttnpb.Client {
+func newTestClient() *ttnpb.Client {
 	cli := &ttnpb.Client{
 		ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "test-client"},
 		Description:       "foo description",
-		CreatorIDs:        testUsers()["alice"].UserIdentifiers,
+		CreatorIDs:        newTestUsers()["alice"].UserIdentifiers,
 		Secret:            "secret",
 		RedirectURI:       "localhost",
 		Rights:            make([]ttnpb.Right, 0, 50),
@@ -133,7 +89,7 @@ func testClient() *ttnpb.Client {
 	return cli
 }
 
-func testUsers() map[string]*ttnpb.User {
+func newTestUsers() map[string]*ttnpb.User {
 	return map[string]*ttnpb.User{
 		"alice": {
 			UserIdentifiers: ttnpb.UserIdentifiers{
@@ -160,4 +116,49 @@ func testUsers() map[string]*ttnpb.User {
 			Password: "123456",
 		},
 	}
+}
+
+// NOTE: Identity Server tests must run in this same directory as it is relying
+// on the relative path to access the webui folder to create the assets instance.
+func newTestIS(t testing.TB) *IdentityServer {
+	if testInstance != nil {
+		return testInstance
+	}
+
+	logger := test.GetLogger(t)
+	comp := component.MustNew(logger, &component.Config{})
+
+	testConfig.OAuth.Assets = assets.New(comp, assets.Config{
+		Directory: "../webui",
+	})
+
+	is, err := New(comp, testConfig)
+	if err != nil {
+		logger.WithError(err).Fatal("Failed to create an Identity Server instance")
+	}
+
+	err = is.store.Clean()
+	if err != nil {
+		logger.WithError(err).Fatal("Failed to drop database")
+	}
+
+	err = is.Init(initialData)
+	if err != nil {
+		logger.WithError(err).Fatal("Failed to initialize the Identity Server instance")
+	}
+
+	for _, user := range newTestUsers() {
+		err = is.store.Users.Create(user)
+		if err != nil {
+			logger.WithError(err).Fatal("Failed to feed the database with test users")
+		}
+	}
+
+	err = is.store.Clients.Create(newTestClient())
+	if err != nil {
+		logger.WithError(err).Fatal("Failed to create test client")
+	}
+
+	testInstance = is
+	return is
 }

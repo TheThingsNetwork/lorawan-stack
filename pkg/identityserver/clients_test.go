@@ -31,9 +31,9 @@ var _ ttnpb.IsClientServer = new(clientService)
 
 func TestClient(t *testing.T) {
 	a := assertions.New(t)
-	is := getIS(t)
+	is := newTestIS(t)
 
-	user := testUsers()["bob"]
+	user := newTestUsers()["bob"]
 
 	cli := ttnpb.Client{
 		ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: "foo-client"},
@@ -47,7 +47,7 @@ func TestClient(t *testing.T) {
 		CreatorIDs:        user.UserIdentifiers,
 	}
 
-	ctx := testCtx(user.UserIdentifiers)
+	ctx := newTestCtx(user.UserIdentifiers)
 
 	_, err := is.clientService.CreateClient(ctx, &ttnpb.CreateClientRequest{
 		Client: cli,
@@ -55,7 +55,7 @@ func TestClient(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	// Can't create clients with blacklisted IDs.
-	for _, id := range testSettings().BlacklistedIDs {
+	for _, id := range newTestSettings().BlacklistedIDs {
 		_, err = is.clientService.CreateClient(ctx, &ttnpb.CreateClientRequest{
 			Client: ttnpb.Client{
 				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: id},

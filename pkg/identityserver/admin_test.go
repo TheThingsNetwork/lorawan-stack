@@ -33,14 +33,14 @@ var _ ttnpb.IsAdminServer = new(adminService)
 
 func TestAdminSettings(t *testing.T) {
 	a := assertions.New(t)
-	is := getIS(t)
-	defer is.store.Settings.Set(testSettings())
+	is := newTestIS(t)
+	defer is.store.Settings.Set(newTestSettings())
 
-	ctx := testCtx(testUsers()["alice"].UserIdentifiers)
+	ctx := newTestCtx(newTestUsers()["alice"].UserIdentifiers)
 
 	resp, err := is.adminService.GetSettings(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
-	a.So(resp, test.ShouldBeSettingsIgnoringAutoFields, testSettings())
+	a.So(resp, test.ShouldBeSettingsIgnoringAutoFields, newTestSettings())
 
 	// Modify settings.
 	_, err = is.adminService.UpdateSettings(ctx, &ttnpb.UpdateSettingsRequest{
@@ -63,9 +63,9 @@ func TestAdminSettings(t *testing.T) {
 
 func TestAdminInvitations(t *testing.T) {
 	a := assertions.New(t)
-	is := getIS(t)
+	is := newTestIS(t)
 
-	ctx := testCtx(testUsers()["alice"].UserIdentifiers)
+	ctx := newTestCtx(newTestUsers()["alice"].UserIdentifiers)
 	email := "bar@baz.com"
 
 	_, err := is.adminService.SendInvitation(ctx, &ttnpb.SendInvitationRequest{Email: email})
@@ -161,10 +161,10 @@ func TestAdminInvitations(t *testing.T) {
 
 func TestAdminUsers(t *testing.T) {
 	a := assertions.New(t)
-	is := getIS(t)
+	is := newTestIS(t)
 
-	ctx := testCtx(testUsers()["alice"].UserIdentifiers)
-	user := testUsers()["bob"]
+	ctx := newTestCtx(newTestUsers()["alice"].UserIdentifiers)
+	user := newTestUsers()["bob"]
 
 	// Reset password.
 	found, err := is.store.Users.GetByID(user.UserIdentifiers, is.specializers.User)
@@ -230,8 +230,8 @@ func TestAdminUsers(t *testing.T) {
 	a.So(err, should.BeNil)
 	if a.So(resp.Users, should.HaveLength, 2) { // Second user is the admin default user.
 		for _, user := range resp.Users {
-			if user.UserIdentifiers.UserID == testUsers()["alice"].UserIdentifiers.UserID {
-				a.So(user, test.ShouldBeUserIgnoringAutoFields, testUsers()["alice"])
+			if user.UserIdentifiers.UserID == newTestUsers()["alice"].UserIdentifiers.UserID {
+				a.So(user, test.ShouldBeUserIgnoringAutoFields, newTestUsers()["alice"])
 			}
 		}
 	}
@@ -239,10 +239,10 @@ func TestAdminUsers(t *testing.T) {
 
 func TestAdminClients(t *testing.T) {
 	a := assertions.New(t)
-	is := getIS(t)
+	is := newTestIS(t)
 
-	ctx := testCtx(testUsers()["alice"].UserIdentifiers)
-	client := testClient()
+	ctx := newTestCtx(newTestUsers()["alice"].UserIdentifiers)
+	client := newTestClient()
 
 	found, err := is.adminService.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientID: client.ClientID})
 	a.So(err, should.BeNil)

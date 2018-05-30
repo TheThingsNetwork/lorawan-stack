@@ -28,7 +28,7 @@ import (
 )
 
 func TestEnforceUserRights(t *testing.T) {
-	is := getIS(t)
+	is := newTestIS(t)
 
 	for i, tc := range []struct {
 		authorizationData *authorizationData
@@ -86,13 +86,13 @@ func TestEnforceUserRights(t *testing.T) {
 }
 
 func TestEnforceAdmin(t *testing.T) {
-	is := getIS(t)
+	is := newTestIS(t)
 
 	// `alice` is an admin user.
-	alice := testUsers()["alice"]
+	alice := newTestUsers()["alice"]
 
 	// `john-doe` is not an admin user.
-	john := testUsers()["john-doe"]
+	john := newTestUsers()["john-doe"]
 
 	for i, tc := range []struct {
 		authorizationData *authorizationData
@@ -152,15 +152,15 @@ func TestEnforceAdmin(t *testing.T) {
 
 func TestEnforceApplicationRights(t *testing.T) {
 	a := assertions.New(t)
-	is := getIS(t)
+	is := newTestIS(t)
 
-	alice := testUsers()["alice"]
-	bob := testUsers()["bob"]
+	alice := newTestUsers()["alice"]
+	bob := newTestUsers()["bob"]
 	appIDs := ttnpb.ApplicationIdentifiers{
 		ApplicationID: "alice-test-app",
 	}
 
-	ctx := testCtx(alice.UserIdentifiers)
+	ctx := newTestCtx(alice.UserIdentifiers)
 
 	// Create an application under `alice` user.
 	_, err := is.applicationService.CreateApplication(ctx, &ttnpb.CreateApplicationRequest{
@@ -294,15 +294,15 @@ func TestEnforceApplicationRights(t *testing.T) {
 
 func TestEnforceGatewayRights(t *testing.T) {
 	a := assertions.New(t)
-	is := getIS(t)
+	is := newTestIS(t)
 
-	alice := testUsers()["alice"]
-	bob := testUsers()["bob"]
+	alice := newTestUsers()["alice"]
+	bob := newTestUsers()["bob"]
 	gtwIDs := ttnpb.GatewayIdentifiers{
 		GatewayID: "alice-test-gtw",
 	}
 
-	ctx := testCtx(alice.UserIdentifiers)
+	ctx := newTestCtx(alice.UserIdentifiers)
 
 	// Create a gateway under `alice` user.
 	_, err := is.gatewayService.CreateGateway(ctx, &ttnpb.CreateGatewayRequest{
@@ -436,15 +436,15 @@ func TestEnforceGatewayRights(t *testing.T) {
 
 func TestEnforceOrganizationRights(t *testing.T) {
 	a := assertions.New(t)
-	is := getIS(t)
+	is := newTestIS(t)
 
-	alice := testUsers()["alice"]
-	bob := testUsers()["bob"]
+	alice := newTestUsers()["alice"]
+	bob := newTestUsers()["bob"]
 	orgIDs := ttnpb.OrganizationIdentifiers{
 		OrganizationID: "alice-test-org",
 	}
 
-	ctx := testCtx(alice.UserIdentifiers)
+	ctx := newTestCtx(alice.UserIdentifiers)
 
 	// Create an organization under `alice` user.
 	_, err := is.organizationService.CreateOrganization(ctx, &ttnpb.CreateOrganizationRequest{

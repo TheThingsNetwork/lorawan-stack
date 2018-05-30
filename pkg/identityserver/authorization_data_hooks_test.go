@@ -32,10 +32,10 @@ import (
 
 func TestBuildauthorizationData(t *testing.T) {
 	a := assertions.New(t)
-	is := getIS(t)
+	is := newTestIS(t)
 
-	alice := testUsers()["alice"]
-	client := testClient()
+	alice := newTestUsers()["alice"]
+	client := newTestClient()
 
 	// Generate access token and save it in the store.
 	token, err := auth.GenerateAccessToken("issuer")

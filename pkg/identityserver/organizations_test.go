@@ -31,16 +31,16 @@ var _ ttnpb.IsOrganizationServer = new(organizationService)
 
 func TestOrganization(t *testing.T) {
 	a := assertions.New(t)
-	is := getIS(t)
+	is := newTestIS(t)
 
-	user := testUsers()["bob"]
-	alice := testUsers()["alice"]
+	user := newTestUsers()["bob"]
+	alice := newTestUsers()["alice"]
 
 	org := ttnpb.Organization{
 		OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "foo-org"},
 	}
 
-	ctx := testCtx(user.UserIdentifiers)
+	ctx := newTestCtx(user.UserIdentifiers)
 
 	_, err := is.organizationService.CreateOrganization(ctx, &ttnpb.CreateOrganizationRequest{
 		Organization: org,
@@ -48,7 +48,7 @@ func TestOrganization(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	// Can't create organizations with blacklisted IDs.
-	for _, id := range testSettings().BlacklistedIDs {
+	for _, id := range newTestSettings().BlacklistedIDs {
 		_, err := is.organizationService.CreateOrganization(ctx, &ttnpb.CreateOrganizationRequest{
 			Organization: ttnpb.Organization{
 				OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: id},
@@ -155,7 +155,7 @@ func TestOrganization(t *testing.T) {
 	{
 		member.Rights = append(member.Rights, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS)
 
-		ctx := testCtx(alice.UserIdentifiers)
+		ctx := newTestCtx(alice.UserIdentifiers)
 
 		_, err = is.organizationService.SetOrganizationMember(ctx, member)
 		a.So(err, should.BeNil)
@@ -180,7 +180,7 @@ func TestOrganization(t *testing.T) {
 
 		// Grant back the right.
 		member.Rights = []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_INFO, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS}
-		_, err = is.organizationService.SetOrganizationMember(testCtx(user.UserIdentifiers), member)
+		_, err = is.organizationService.SetOrganizationMember(newTestCtx(user.UserIdentifiers), member)
 		a.So(err, should.BeNil)
 	}
 

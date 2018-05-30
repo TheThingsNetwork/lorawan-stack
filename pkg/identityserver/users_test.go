@@ -60,10 +60,10 @@ func TestIsEmailAllowed(t *testing.T) {
 
 func TestUsersBlacklistedIDs(t *testing.T) {
 	a := assertions.New(t)
-	is := getIS(t)
+	is := newTestIS(t)
 
 	// Can't create users using the blacklisted IDs.
-	for _, id := range testSettings().BlacklistedIDs {
+	for _, id := range newTestSettings().BlacklistedIDs {
 		_, err := is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
 			User: ttnpb.User{UserIdentifiers: ttnpb.UserIdentifiers{UserID: id}},
 		})
@@ -74,7 +74,7 @@ func TestUsersBlacklistedIDs(t *testing.T) {
 
 func TestUsersEmailWhitelisting(t *testing.T) {
 	a := assertions.New(t)
-	is := getIS(t)
+	is := newTestIS(t)
 
 	settings, err := is.store.Settings.Get()
 	a.So(err, should.BeNil)
@@ -109,7 +109,7 @@ func TestUsersEmailWhitelisting(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	ctx := testCtx(user.UserIdentifiers)
+	ctx := newTestCtx(user.UserIdentifiers)
 
 	// Can't update the email afterwards to a one that is not whitelisted.
 	_, err = is.userService.UpdateUser(ctx, &ttnpb.UpdateUserRequest{
@@ -181,7 +181,7 @@ func TestUsers(t *testing.T) {
 
 func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	a := assertions.New(t)
-	is := getIS(t)
+	is := newTestIS(t)
 
 	user := ttnpb.User{
 		UserIdentifiers: uids,
@@ -189,7 +189,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 		Name:            "Baz",
 	}
 
-	ctx := testCtx(sids)
+	ctx := newTestCtx(sids)
 
 	_, err := is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
 		User: user,
@@ -209,12 +209,12 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	a.So(found.Name, should.Equal, user.Name)
 	a.So(found.Password, should.HaveLength, 0)
 	a.So(found.Email, should.Equal, user.Email)
-	if testSettings().IdentityServerSettings_UserRegistrationFlow.SkipValidation {
+	if newTestSettings().IdentityServerSettings_UserRegistrationFlow.SkipValidation {
 		a.So(found.ValidatedAt.IsZero(), should.BeFalse)
 	} else {
 		a.So(found.ValidatedAt, should.BeNil)
 	}
-	if testSettings().IdentityServerSettings_UserRegistrationFlow.AdminApproval {
+	if newTestSettings().IdentityServerSettings_UserRegistrationFlow.AdminApproval {
 		a.So(found.State, should.Equal, ttnpb.STATE_PENDING)
 	} else {
 		a.So(found.State, should.Equal, ttnpb.STATE_APPROVED)
@@ -318,7 +318,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	if sids.Email != "" {
 		sids.Email = nemail
 	}
-	ctx = testCtx(sids)
+	ctx = newTestCtx(sids)
 
 	// Check that user's ValidatedAt has been resetted.
 	found, err = is.userService.GetUser(ctx, ttnpb.Empty)
