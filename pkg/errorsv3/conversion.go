@@ -17,9 +17,10 @@ package errors
 import "google.golang.org/grpc/status"
 
 // From returns an *Error if it can be derived from the given input.
+// For a nil error, false will be returned.
 func From(err error) (out *Error, ok bool) {
 	if err == nil {
-		return nil, true
+		return nil, false
 	}
 	defer func() {
 		if out != nil {
