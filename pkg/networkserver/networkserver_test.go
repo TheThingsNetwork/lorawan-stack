@@ -987,7 +987,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 
 						select {
 						case up := <-asSendCh:
-							if !a.So(test.SameElementsDeep(md, up.GetUplinkMessage().GetRxMetadata()), should.BeTrue) {
+							if !a.So(md, should.HaveSameElementsDeep, up.GetUplinkMessage().GetRxMetadata()) {
 								metadataLdiff(t, up.GetUplinkMessage().GetRxMetadata(), md)
 							}
 
@@ -1055,7 +1055,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						storedMD := storedUp.GetRxMetadata()
 						expectedMD := expectedUp.GetRxMetadata()
 
-						if !a.So(test.SameElementsDiff(storedMD, expectedMD), should.BeTrue) {
+						if !a.So(storedMD, should.HaveSameElementsDiff, expectedMD) {
 							metadataLdiff(t, storedMD, expectedMD)
 						}
 
@@ -1537,7 +1537,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						a.So(storedUp.GetReceivedAt(), should.HappenBetween, start, time.Now())
 						expectedUp.ReceivedAt = storedUp.GetReceivedAt()
 
-						if !a.So(test.SameElementsDiff(storedUp.GetRxMetadata(), expectedUp.GetRxMetadata()), should.BeTrue) {
+						if !a.So(storedUp.GetRxMetadata(), should.HaveSameElementsDiff, expectedUp.GetRxMetadata()) {
 							metadataLdiff(t, storedUp.GetRxMetadata(), expectedUp.GetRxMetadata())
 						}
 						expectedUp.RxMetadata = storedUp.RxMetadata

@@ -22,7 +22,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -94,7 +93,7 @@ func TestGoFieldsPaths(t *testing.T) {
 			},
 		})
 
-		a.So(test.SameElementsDeep(goFields, tc.expected), should.BeTrue)
+		a.So(goFields, should.HaveSameElementsDeep, tc.expected)
 	}
 }
 
@@ -119,6 +118,6 @@ func TestGoFieldsPathsEndDevice(t *testing.T) {
 			},
 		})
 
-		a.So(test.SameElementsDeep(goFields, tc.expected), should.BeTrue)
+		a.So(goFields, should.HaveSameElementsDeep, tc.expected)
 	}
 }

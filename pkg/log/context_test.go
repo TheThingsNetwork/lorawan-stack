@@ -19,7 +19,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"github.com/smartystreets/assertions/should"
 )
 
 func TestContext(t *testing.T) {

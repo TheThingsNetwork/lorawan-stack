@@ -36,7 +36,7 @@ const (
 func ShouldHaveSameElements(actual interface{}, expected ...interface{}) (message string) {
 	defer func() {
 		if r := recover(); r != nil {
-			message = fmt.Sprintf(shouldHaveBeenEqualErr, expected, actual, r)
+			message = fmt.Sprintf(shouldHaveBeenEqualErr, expected[0], actual, r)
 		}
 	}()
 
@@ -45,12 +45,10 @@ func ShouldHaveSameElements(actual interface{}, expected ...interface{}) (messag
 	}
 
 	if !test.SameElements(expected[1], actual, expected[0]) {
-		message = fmt.Sprintf(shouldHaveBeenEqual, expected[0], actual)
-		return
+		return fmt.Sprintf(shouldHaveBeenEqual, expected[0], actual)
 	}
 
-	message = success
-	return
+	return success
 }
 
 // ShouldNotHaveSameElements takes as arguments the actual value, the expected value and
@@ -61,7 +59,7 @@ func ShouldHaveSameElements(actual interface{}, expected ...interface{}) (messag
 func ShouldNotHaveSameElements(actual interface{}, expected ...interface{}) (message string) {
 	defer func() {
 		if r := recover(); r != nil {
-			message = fmt.Sprintf(shouldNotHaveBeenEqualErr, expected, actual, r)
+			message = fmt.Sprintf(shouldNotHaveBeenEqualErr, expected[0], actual, r)
 		}
 	}()
 
@@ -70,12 +68,10 @@ func ShouldNotHaveSameElements(actual interface{}, expected ...interface{}) (mes
 	}
 
 	if test.SameElements(expected[1], actual, expected[0]) {
-		message = fmt.Sprintf(shouldNotHaveBeenEqual, expected[0], actual)
-		return
+		return fmt.Sprintf(shouldNotHaveBeenEqual, expected[0], actual)
 	}
 
-	message = success
-	return
+	return success
 }
 
 // ShouldHaveSameElementsDeep takes as arguments the actual value and the expected value.
@@ -84,7 +80,7 @@ func ShouldNotHaveSameElements(actual interface{}, expected ...interface{}) (mes
 func ShouldHaveSameElementsDeep(actual interface{}, expected ...interface{}) (message string) {
 	defer func() {
 		if r := recover(); r != nil {
-			message = fmt.Sprintf(shouldHaveBeenEqualErr, expected, actual, r)
+			message = fmt.Sprintf(shouldHaveBeenEqualErr, expected[0], actual, r)
 		}
 	}()
 
@@ -93,12 +89,10 @@ func ShouldHaveSameElementsDeep(actual interface{}, expected ...interface{}) (me
 	}
 
 	if !test.SameElementsDeep(actual, expected[0]) {
-		message = fmt.Sprintf(shouldHaveBeenEqual, expected, actual)
-		return
+		return fmt.Sprintf(shouldHaveBeenEqual, expected[0], actual)
 	}
 
-	message = success
-	return
+	return success
 }
 
 // ShouldNotHaveSameElementsDeep takes as arguments the actual value and the expected
@@ -108,7 +102,7 @@ func ShouldHaveSameElementsDeep(actual interface{}, expected ...interface{}) (me
 func ShouldNotHaveSameElementsDeep(actual interface{}, expected ...interface{}) (message string) {
 	defer func() {
 		if r := recover(); r != nil {
-			message = fmt.Sprintf(shouldNotHaveBeenEqualErr, expected, actual, r)
+			message = fmt.Sprintf(shouldNotHaveBeenEqualErr, expected[0], actual, r)
 		}
 	}()
 
@@ -117,12 +111,10 @@ func ShouldNotHaveSameElementsDeep(actual interface{}, expected ...interface{}) 
 	}
 
 	if test.SameElementsDeep(actual, expected[0]) {
-		message = fmt.Sprintf(shouldNotHaveBeenEqual, expected, actual)
-		return
+		return fmt.Sprintf(shouldNotHaveBeenEqual, expected[0], actual)
 	}
 
-	message = success
-	return
+	return success
 }
 
 // ShouldHaveSameElementsDiff takes as arguments the actual value and the expected value.
@@ -131,7 +123,7 @@ func ShouldNotHaveSameElementsDeep(actual interface{}, expected ...interface{}) 
 func ShouldHaveSameElementsDiff(actual interface{}, expected ...interface{}) (message string) {
 	defer func() {
 		if r := recover(); r != nil {
-			message = fmt.Sprintf(shouldHaveBeenEqualErr, expected, actual, r)
+			message = fmt.Sprintf(shouldHaveBeenEqualErr, expected[0], actual, r)
 		}
 	}()
 
@@ -140,12 +132,10 @@ func ShouldHaveSameElementsDiff(actual interface{}, expected ...interface{}) (me
 	}
 
 	if !test.SameElementsDiff(actual, expected[0]) {
-		message = fmt.Sprintf(shouldHaveBeenEqualDiff, expected, actual, pretty.Diff(actual, expected[0]))
-		return
+		return fmt.Sprintf(shouldHaveBeenEqualDiff, expected[0], actual, pretty.Diff(actual, expected[0]))
 	}
 
-	message = success
-	return
+	return success
 }
 
 // ShouldNotHaveSameElementsDiff takes as arguments the actual value and the expected
@@ -155,7 +145,7 @@ func ShouldHaveSameElementsDiff(actual interface{}, expected ...interface{}) (me
 func ShouldNotHaveSameElementsDiff(actual interface{}, expected ...interface{}) (message string) {
 	defer func() {
 		if r := recover(); r != nil {
-			message = fmt.Sprintf(shouldNotHaveBeenEqualErr, expected, actual, r)
+			message = fmt.Sprintf(shouldNotHaveBeenEqualErr, expected[0], actual, r)
 		}
 	}()
 
@@ -164,10 +154,8 @@ func ShouldNotHaveSameElementsDiff(actual interface{}, expected ...interface{}) 
 	}
 
 	if test.SameElementsDiff(actual, expected[0]) {
-		message = fmt.Sprintf(shouldNotHaveBeenEqual, expected, actual)
-		return
+		return fmt.Sprintf(shouldNotHaveBeenEqual, expected[0], actual)
 	}
 
-	message = success
-	return
+	return success
 }

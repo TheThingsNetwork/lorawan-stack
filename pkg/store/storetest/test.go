@@ -27,7 +27,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/store"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -370,7 +369,7 @@ func TestByteSetStore(t testingT, newStore func() store.ByteSetStore) {
 
 			found, err := s.FindSet(id)
 			a.So(err, should.BeNil)
-			a.So(test.SameElementsDeep(found, tc.AfterCreate), should.BeTrue)
+			a.So(found, should.HaveSameElementsDeep, tc.AfterCreate)
 
 			for _, b := range tc.Create {
 				v, err := s.Contains(id, b)
@@ -385,11 +384,11 @@ func TestByteSetStore(t testingT, newStore func() store.ByteSetStore) {
 			a.So(err, should.BeNil)
 			found, err = s.FindSet(id)
 			a.So(err, should.BeNil)
-			a.So(test.SameElementsDeep(found, tc.AfterPut), should.BeTrue)
+			a.So(found, should.HaveSameElementsDeep, tc.AfterPut)
 
 			found, err = s.FindSet(id)
 			a.So(err, should.BeNil)
-			a.So(test.SameElementsDeep(found, tc.AfterPut), should.BeTrue)
+			a.So(found, should.HaveSameElementsDeep, tc.AfterPut)
 
 			for _, b := range tc.AfterPut {
 				v, err := s.Contains(id, b)
@@ -404,11 +403,11 @@ func TestByteSetStore(t testingT, newStore func() store.ByteSetStore) {
 			a.So(err, should.BeNil)
 			found, err = s.FindSet(id)
 			a.So(err, should.BeNil)
-			a.So(test.SameElementsDeep(found, tc.AfterRemove), should.BeTrue)
+			a.So(found, should.HaveSameElementsDeep, tc.AfterRemove)
 
 			found, err = s.FindSet(id)
 			a.So(err, should.BeNil)
-			a.So(test.SameElementsDeep(found, tc.AfterRemove), should.BeTrue)
+			a.So(found, should.HaveSameElementsDeep, tc.AfterRemove)
 
 			for _, b := range tc.AfterRemove {
 				v, err := s.Contains(id, b)
