@@ -26,6 +26,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+// OrganizationGeneratedFields are the fields that are automatically generated.
+var OrganizationGeneratedFields = []string{"CreatedAt", "UpdatedAt"}
+
 type organizationService struct {
 	*IdentityServer
 }

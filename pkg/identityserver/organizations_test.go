@@ -21,7 +21,6 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -60,12 +59,12 @@ func TestOrganization(t *testing.T) {
 
 	found, err := is.organizationService.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: org.OrganizationID})
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeOrganizationIgnoringAutoFields, org)
+	a.So(found, should.EqualFieldsWithIgnores(OrganizationGeneratedFields...), org)
 
 	orgs, err := is.organizationService.ListOrganizations(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	if a.So(orgs.Organizations, should.HaveLength, 1) {
-		a.So(orgs.Organizations[0], test.ShouldBeOrganizationIgnoringAutoFields, org)
+		a.So(orgs.Organizations[0], should.EqualFieldsWithIgnores(OrganizationGeneratedFields...), org)
 	}
 
 	org.Description = "foo"
@@ -79,7 +78,7 @@ func TestOrganization(t *testing.T) {
 
 	found, err = is.organizationService.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationID: org.OrganizationID})
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeOrganizationIgnoringAutoFields, org)
+	a.So(found, should.EqualFieldsWithIgnores(OrganizationGeneratedFields...), org)
 
 	// Generate a new API key.
 	key, err := is.organizationService.GenerateOrganizationAPIKey(ctx, &ttnpb.GenerateOrganizationAPIKeyRequest{

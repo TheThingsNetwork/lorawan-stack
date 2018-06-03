@@ -20,7 +20,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -46,7 +45,7 @@ func TestOrganizations(t *testing.T) {
 
 	found, err := s.Organizations.GetByID(org.OrganizationIdentifiers, specializer)
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeOrganizationIgnoringAutoFields, org)
+	a.So(found, should.EqualFieldsWithIgnores(identityserver.OrganizationGeneratedFields...), org)
 
 	org.Description = "New description"
 	err = s.Organizations.Update(org)
@@ -54,7 +53,7 @@ func TestOrganizations(t *testing.T) {
 
 	found, err = s.Organizations.GetByID(org.OrganizationIdentifiers, specializer)
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeOrganizationIgnoringAutoFields, org)
+	a.So(found, should.EqualFieldsWithIgnores(identityserver.OrganizationGeneratedFields...), org)
 
 	member := ttnpb.OrganizationMember{
 		OrganizationIdentifiers: org.OrganizationIdentifiers,
@@ -120,7 +119,7 @@ func TestOrganizations(t *testing.T) {
 	organizations, err := s.Organizations.ListByUser(userID, specializer)
 	a.So(err, should.BeNil)
 	if a.So(organizations, should.HaveLength, 1) {
-		a.So(organizations[0], test.ShouldBeOrganizationIgnoringAutoFields, org)
+		a.So(organizations[0], should.EqualFieldsWithIgnores(identityserver.OrganizationGeneratedFields...), org)
 	}
 
 	// Test applications rights inheritance.
