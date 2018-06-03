@@ -277,7 +277,7 @@ func (s *gatewayStore) GetByID(ids ttnpb.GatewayIdentifiers, specializer store.G
 	return
 }
 
-// gateway fetchs a gateway from the database without antennas and attributes and
+// getByID fetches a gateway from the database without antennas and attributes and
 // saves it into result.
 func (s *gatewayStore) getByID(q db.QueryContext, gtwID uuid.UUID) (result gateway, err error) {
 	err = q.SelectOne(
