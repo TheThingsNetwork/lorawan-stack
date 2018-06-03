@@ -26,6 +26,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/marshaling"
 	"go.thethings.network/lorawan-stack/pkg/store"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -571,7 +572,7 @@ func (gs GenericMapStore) Find(id store.PrimaryKey) (map[string]interface{}, err
 	if err := reflectValueToError(ret[1]); err != nil {
 		return nil, err
 	}
-	if store.IsNillableKind(ret[0].Kind()) && ret[0].IsNil() {
+	if marshaling.IsNillableKind(ret[0].Kind()) && ret[0].IsNil() {
 		return nil, nil
 	}
 	return gs.toIfaceMap(ret[0].Interface()), nil

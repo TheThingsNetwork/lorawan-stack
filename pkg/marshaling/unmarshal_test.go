@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package store_test
+package marshaling_test
 
 import (
 	"fmt"
@@ -24,9 +24,9 @@ import (
 
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	. "go.thethings.network/lorawan-stack/pkg/store"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	. "go.thethings.network/lorawan-stack/pkg/marshaling"
 )
 
 func TestBytesToType(t *testing.T) {

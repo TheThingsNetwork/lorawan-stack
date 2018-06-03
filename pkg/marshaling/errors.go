@@ -12,31 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package store
+package marshaling
 
-import (
-	"testing"
+import "go.thethings.network/lorawan-stack/pkg/errors"
 
-	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-)
+// ErrInvalidData represents an error returned, when data specified is not valid.
+var ErrInvalidData = &errors.ErrDescriptor{
+	MessageFormat: "Invalid data",
+	Type:          errors.InvalidArgument,
+	Code:          1,
+}
 
-func TestDiff(t *testing.T) {
-	a := assertions.New(t)
-	old := map[string]interface{}{
-		"foo": "foo",
-		"bar": "bar",
-		"baz": "baz",
-	}
-	new := map[string]interface{}{
-		"foo": "baz",
-		"bar": "bar",
-		"qux": "qux",
-	}
-	a.So(Diff(new, old), should.Resemble, map[string]interface{}{
-		"foo": "baz", // new value updated
-		"qux": "qux", // new value added
-		// bar unchanged
-		"baz": nil, // old value removed
-	})
+func init() {
+	ErrInvalidData.Register()
 }

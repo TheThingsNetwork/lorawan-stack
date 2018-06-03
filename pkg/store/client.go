@@ -16,6 +16,8 @@ package store
 
 import (
 	"strings"
+
+	"go.thethings.network/lorawan-stack/pkg/marshaling"
 )
 
 // NewResultFunc represents a constructor of some arbitrary type.
@@ -89,7 +91,7 @@ func filterFields(m map[string]interface{}, fields ...string) map[string]interfa
 }
 
 func (cl *typedMapStoreClient) Create(v interface{}, fields ...string) (PrimaryKey, error) {
-	m, err := MarshalMap(v)
+	m, err := marshaling.MarshalMap(v)
 	if err != nil {
 		return nil, err
 	}
@@ -101,11 +103,11 @@ func (cl *typedMapStoreClient) Find(id PrimaryKey, v interface{}) error {
 	if err != nil {
 		return err
 	}
-	return UnmarshalMap(m, v)
+	return marshaling.UnmarshalMap(m, v)
 }
 
 func (cl *typedMapStoreClient) Range(filter interface{}, newResult NewResultFunc, n uint64, f func(PrimaryKey, interface{}) bool, fields ...string) error {
-	fm, err := MarshalMap(filter)
+	fm, err := marshaling.MarshalMap(filter)
 	if err != nil {
 		return err
 	}
@@ -113,7 +115,7 @@ func (cl *typedMapStoreClient) Range(filter interface{}, newResult NewResultFunc
 	var ierr error
 	err = cl.TypedMapStore.Range(filterFields(fm, fields...), n, func(k PrimaryKey, v map[string]interface{}) bool {
 		iface := newResult()
-		if ierr = UnmarshalMap(v, iface); ierr != nil {
+		if ierr = marshaling.UnmarshalMap(v, iface); ierr != nil {
 			return false
 		}
 		return f(k, iface)
@@ -126,7 +128,7 @@ func (cl *typedMapStoreClient) Range(filter interface{}, newResult NewResultFunc
 }
 
 func (cl *typedMapStoreClient) Update(id PrimaryKey, v interface{}, fields ...string) error {
-	m, err := MarshalMap(v)
+	m, err := marshaling.MarshalMap(v)
 	if err != nil {
 		return err
 	}
@@ -188,7 +190,7 @@ func filterByteFields(m map[string][]byte, fields ...string) map[string][]byte {
 }
 
 func (cl *byteMapStoreClient) Create(v interface{}, fields ...string) (PrimaryKey, error) {
-	m, err := MarshalByteMap(v)
+	m, err := marshaling.MarshalByteMap(v)
 	if err != nil {
 		return nil, err
 	}
@@ -200,11 +202,11 @@ func (cl *byteMapStoreClient) Find(id PrimaryKey, v interface{}) error {
 	if err != nil {
 		return err
 	}
-	return UnmarshalByteMap(m, v)
+	return marshaling.UnmarshalByteMap(m, v)
 }
 
 func (cl *byteMapStoreClient) Range(filter interface{}, newResult NewResultFunc, n uint64, f func(PrimaryKey, interface{}) bool, fields ...string) error {
-	fm, err := MarshalByteMap(filter)
+	fm, err := marshaling.MarshalByteMap(filter)
 	if err != nil {
 		return err
 	}
@@ -212,7 +214,7 @@ func (cl *byteMapStoreClient) Range(filter interface{}, newResult NewResultFunc,
 	var ierr error
 	err = cl.ByteMapStore.Range(filterByteFields(fm, fields...), n, func(k PrimaryKey, v map[string][]byte) bool {
 		iface := newResult()
-		if ierr = UnmarshalByteMap(v, iface); ierr != nil {
+		if ierr = marshaling.UnmarshalByteMap(v, iface); ierr != nil {
 			return false
 		}
 		return f(k, iface)
@@ -225,7 +227,7 @@ func (cl *byteMapStoreClient) Range(filter interface{}, newResult NewResultFunc,
 }
 
 func (cl *byteMapStoreClient) Update(id PrimaryKey, v interface{}, fields ...string) error {
-	m, err := MarshalByteMap(v)
+	m, err := marshaling.MarshalByteMap(v)
 	if err != nil {
 		return err
 	}

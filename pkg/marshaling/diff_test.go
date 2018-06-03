@@ -12,25 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package store
+package marshaling
 
-import "go.thethings.network/lorawan-stack/pkg/errors"
+import (
+	"testing"
 
-// ErrEmptyFilter represents an error returned, when filter specified is empty.
-var ErrEmptyFilter = &errors.ErrDescriptor{
-	MessageFormat: "Filter is empty",
-	Type:          errors.InvalidArgument,
-	Code:          1,
-}
+	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
+)
 
-// ErrNilKey represents an error returned, when key specified is nil.
-var ErrNilKey = &errors.ErrDescriptor{
-	MessageFormat: "Nil key specified",
-	Type:          errors.InvalidArgument,
-	Code:          2,
-}
-
-func init() {
-	ErrEmptyFilter.Register()
-	ErrNilKey.Register()
+func TestDiff(t *testing.T) {
+	a := assertions.New(t)
+	old := map[string]interface{}{
+		"foo": "foo",
+		"bar": "bar",
+		"baz": "baz",
+	}
+	new := map[string]interface{}{
+		"foo": "baz",
+		"bar": "bar",
+		"qux": "qux",
+	}
+	a.So(Diff(new, old), should.Resemble, map[string]interface{}{
+		"foo": "baz", // new value updated
+		"qux": "qux", // new value added
+		// bar unchanged
+		"baz": nil, // old value removed
+	})
 }

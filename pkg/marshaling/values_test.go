@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package store_test
+package marshaling_test
 
 import (
 	"bytes"
@@ -24,7 +24,7 @@ import (
 	"github.com/tinylib/msgp/msgp"
 	"github.com/vmihailenco/msgpack"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	. "go.thethings.network/lorawan-stack/pkg/store"
+	. "go.thethings.network/lorawan-stack/pkg/marshaling"
 )
 
 type InterfaceStructA struct {
