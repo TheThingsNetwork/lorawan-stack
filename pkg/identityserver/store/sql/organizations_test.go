@@ -208,7 +208,7 @@ func TestOrganizations(t *testing.T) {
 		gateways, err := s.Gateways.ListByOrganizationOrUser(uid, gatewaySpecializer)
 		a.So(err, should.BeNil)
 		if a.So(gateways, should.HaveLength, 1) {
-			a.So(gateways[0], test.ShouldBeGatewayIgnoringAutoFields, gateway)
+			a.So(gateways[0], should.EqualFieldsWithIgnores(identityserver.GatewayGeneratedFields...), gateway)
 		}
 	}
 

@@ -26,6 +26,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+// GatewayGeneratedFields are the fields that are automatically generated.
+var GatewayGeneratedFields = []string{"CreatedAt", "UpdatedAt"}
+
 type gatewayService struct {
 	*IdentityServer
 }

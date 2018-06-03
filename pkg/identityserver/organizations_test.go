@@ -283,7 +283,7 @@ func TestOrganization(t *testing.T) {
 		gtws, err = is.gatewayService.ListGateways(ctx, &ttnpb.ListGatewaysRequest{OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: org.OrganizationID}})
 		a.So(err, should.BeNil)
 		if a.So(gtws.Gateways, should.HaveLength, 1) {
-			a.So(gtws.Gateways[0], test.ShouldBeGatewayIgnoringAutoFields, gtw)
+			a.So(gtws.Gateways[0], should.EqualFieldsWithIgnores(GatewayGeneratedFields...), gtw)
 		}
 
 		_, err = is.gatewayService.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayID: gtw.GatewayID})

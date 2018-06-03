@@ -19,9 +19,9 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql/migrations"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -113,7 +113,7 @@ func TestGatewayAttributer(t *testing.T) {
 
 	found, err := s.Gateways.GetByID(withFoo.GetGateway().GatewayIdentifiers, specializer)
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, withFoo)
+	a.So(found, should.EqualFieldsWithIgnores(identityserver.GatewayGeneratedFields...), withFoo)
 	a.So(found.(*gatewayWithFoo).Foo, should.Equal, withFoo.Foo)
 
 	err = s.Gateways.Delete(withFoo.GetGateway().GatewayIdentifiers)

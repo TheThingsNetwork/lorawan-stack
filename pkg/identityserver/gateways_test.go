@@ -21,7 +21,6 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -141,12 +140,12 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 
 	found, err := is.gatewayService.GetGateway(ctx, &sids)
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
+	a.So(found, should.EqualFieldsWithIgnores(GatewayGeneratedFields...), gtw)
 
 	gtws, err := is.gatewayService.ListGateways(ctx, &ttnpb.ListGatewaysRequest{})
 	a.So(err, should.BeNil)
 	if a.So(gtws.Gateways, should.HaveLength, 1) {
-		a.So(gtws.Gateways[0], test.ShouldBeGatewayIgnoringAutoFields, gtw)
+		a.So(gtws.Gateways[0], should.EqualFieldsWithIgnores(GatewayGeneratedFields...), gtw)
 	}
 
 	gtw.Description = "foo"
@@ -160,7 +159,7 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 
 	found, err = is.gatewayService.GetGateway(ctx, &sids)
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeGatewayIgnoringAutoFields, gtw)
+	a.So(found, should.EqualFieldsWithIgnores(GatewayGeneratedFields...), gtw)
 
 	// Generate a new API key.
 	key, err := is.gatewayService.GenerateGatewayAPIKey(ctx, &ttnpb.GenerateGatewayAPIKeyRequest{

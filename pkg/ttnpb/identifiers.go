@@ -15,8 +15,15 @@
 package ttnpb
 
 import (
+	"encoding/gob"
+
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
+
+func init() {
+	gob.Register(&OrganizationOrUserIdentifiers_UserID{})
+	gob.Register(&OrganizationOrUserIdentifiers_OrganizationID{})
+}
 
 // IsZero returns true if all identifiers have zero-values.
 func (ids UserIdentifiers) IsZero() bool {
