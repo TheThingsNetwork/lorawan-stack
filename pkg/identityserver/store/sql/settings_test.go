@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
+	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -35,5 +35,5 @@ func TestSettings(t *testing.T) {
 
 	found, err := s.Settings.Get()
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeSettingsIgnoringAutoFields, settings)
+	a.So(found, should.EqualFieldsWithIgnores(identityserver.SettingsGeneratedFields...), settings)
 }

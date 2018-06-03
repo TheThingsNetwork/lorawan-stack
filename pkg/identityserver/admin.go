@@ -28,6 +28,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+// SettingsGeneratedFields are the fields that are automatically generated.
+var SettingsGeneratedFields = []string{"UpdatedAt"}
+
 type adminService struct {
 	*IdentityServer
 }

@@ -40,7 +40,7 @@ func TestAdminSettings(t *testing.T) {
 
 	resp, err := is.adminService.GetSettings(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
-	a.So(resp, test.ShouldBeSettingsIgnoringAutoFields, newTestSettings())
+	a.So(resp, should.EqualFieldsWithIgnores(SettingsGeneratedFields...), newTestSettings())
 
 	// Modify settings.
 	_, err = is.adminService.UpdateSettings(ctx, &ttnpb.UpdateSettingsRequest{
