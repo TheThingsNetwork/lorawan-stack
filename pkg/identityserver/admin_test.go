@@ -23,7 +23,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email/mock"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email/templates"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -231,7 +230,7 @@ func TestAdminUsers(t *testing.T) {
 	if a.So(resp.Users, should.HaveLength, 2) { // Second user is the admin default user.
 		for _, user := range resp.Users {
 			if user.UserIdentifiers.UserID == newTestUsers()["alice"].UserIdentifiers.UserID {
-				a.So(user, test.ShouldBeUserIgnoringAutoFields, newTestUsers()["alice"])
+				a.So(user, should.EqualFieldsWithIgnores(UserGeneratedFields...), newTestUsers()["alice"])
 			}
 		}
 	}

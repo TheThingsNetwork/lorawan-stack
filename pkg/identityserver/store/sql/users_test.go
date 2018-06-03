@@ -20,8 +20,8 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -119,7 +119,7 @@ func testUserStore(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 
 	found, err := s.Users.GetByID(sids, userSpecializer)
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeUserIgnoringAutoFields, user)
+	a.So(found, should.EqualFieldsWithIgnores(identityserver.UserGeneratedFields...), user)
 
 	user.UserIdentifiers.Email = "new@email.com"
 	user.Password = "new_password"
@@ -131,7 +131,7 @@ func testUserStore(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 
 	updated, err := s.Users.GetByID(sids, userSpecializer)
 	a.So(err, should.BeNil)
-	a.So(updated, test.ShouldBeUserIgnoringAutoFields, user)
+	a.So(updated, should.EqualFieldsWithIgnores(identityserver.UserGeneratedFields...), user)
 
 	key := ttnpb.APIKey{
 		Key:    "abcabcabc",
@@ -214,7 +214,7 @@ func TestUserTx(t *testing.T) {
 
 	found, err := s.Users.GetByID(user.UserIdentifiers, userSpecializer)
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeUserIgnoringAutoFields, user)
+	a.So(found, should.EqualFieldsWithIgnores(identityserver.UserGeneratedFields...), user)
 
 	err = s.Users.Delete(user.UserIdentifiers)
 	a.So(err, should.BeNil)
