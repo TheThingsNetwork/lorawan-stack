@@ -128,7 +128,9 @@ func (s *applicationStore) getByID(q db.QueryContext, id ttnpb.ApplicationIdenti
 		`SELECT
 				id,
 				application_id,
-				description
+				description,
+				created_at,
+				updated_at
 			FROM applications
 			WHERE application_id = :application_id`,
 		id)
