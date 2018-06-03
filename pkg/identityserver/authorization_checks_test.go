@@ -24,7 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestEnforceUserRights(t *testing.T) {
@@ -79,7 +78,7 @@ func TestEnforceUserRights(t *testing.T) {
 				a.So(err, should.BeNil)
 			} else {
 				a.So(err, should.NotBeNil)
-				a.So(err, errshould.Describe, common.ErrPermissionDenied)
+				a.So(err, should.DescribeError, common.ErrPermissionDenied)
 			}
 		})
 	}
@@ -144,7 +143,7 @@ func TestEnforceAdmin(t *testing.T) {
 				a.So(err, should.BeNil)
 			} else {
 				a.So(err, should.NotBeNil)
-				a.So(err, errshould.Describe, common.ErrPermissionDenied)
+				a.So(err, should.DescribeError, common.ErrPermissionDenied)
 			}
 		})
 	}
@@ -286,7 +285,7 @@ func TestEnforceApplicationRights(t *testing.T) {
 				a.So(err, should.BeNil)
 			} else {
 				a.So(err, should.NotBeNil)
-				a.So(err, errshould.Describe, common.ErrPermissionDenied)
+				a.So(err, should.DescribeError, common.ErrPermissionDenied)
 			}
 		})
 	}
@@ -428,7 +427,7 @@ func TestEnforceGatewayRights(t *testing.T) {
 				a.So(err, should.BeNil)
 			} else {
 				a.So(err, should.NotBeNil)
-				a.So(err, errshould.Describe, common.ErrPermissionDenied)
+				a.So(err, should.DescribeError, common.ErrPermissionDenied)
 			}
 		})
 	}
@@ -570,7 +569,7 @@ func TestEnforceOrganizationRights(t *testing.T) {
 				a.So(err, should.BeNil)
 			} else {
 				a.So(err, should.NotBeNil)
-				a.So(err, errshould.Describe, common.ErrPermissionDenied)
+				a.So(err, should.DescribeError, common.ErrPermissionDenied)
 			}
 		})
 	}

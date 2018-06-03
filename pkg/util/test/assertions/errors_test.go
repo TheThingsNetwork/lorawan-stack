@@ -32,18 +32,18 @@ func init() {
 	testDescriptor.Register()
 }
 
-func TestShouldDescribe(t *testing.T) {
+func TestShouldDescribeError(t *testing.T) {
 	a := assertions.New(t)
 
 	// Happy flow.
-	a.So(ShouldDescribe(testDescriptor.New(nil), testDescriptor), should.BeEmpty)
-	a.So(ShouldNotDescribe(testDescriptor.New(nil), testDescriptor), should.NotBeEmpty)
+	a.So(ShouldDescribeError(testDescriptor.New(nil), testDescriptor), should.BeEmpty)
+	a.So(ShouldNotDescribeError(testDescriptor.New(nil), testDescriptor), should.NotBeEmpty)
 
 	// Unknown error.
-	a.So(ShouldDescribe(fmt.Errorf("unknown error"), testDescriptor), should.NotBeEmpty)
-	a.So(ShouldNotDescribe(fmt.Errorf("unknown error"), testDescriptor), should.BeEmpty)
+	a.So(ShouldDescribeError(fmt.Errorf("unknown error"), testDescriptor), should.NotBeEmpty)
+	a.So(ShouldNotDescribeError(fmt.Errorf("unknown error"), testDescriptor), should.BeEmpty)
 
 	// Wrong namespace or code.
-	a.So(ShouldDescribe(errors.New("test"), testDescriptor), should.NotBeEmpty)
-	a.So(ShouldNotDescribe(errors.New("test"), testDescriptor), should.BeEmpty)
+	a.So(ShouldDescribeError(errors.New("test"), testDescriptor), should.NotBeEmpty)
+	a.So(ShouldNotDescribeError(errors.New("test"), testDescriptor), should.BeEmpty)
 }

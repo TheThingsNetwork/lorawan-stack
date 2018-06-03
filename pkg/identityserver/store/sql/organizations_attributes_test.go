@@ -24,7 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql/migrations"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 // organizationWithFoo implements both store.Organization and store.Attributer interfaces.
@@ -118,6 +117,6 @@ func TestOrganizationAttributer(t *testing.T) {
 
 	found, err = s.Organizations.GetByID(withFoo.GetOrganization().OrganizationIdentifiers, specializer)
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, store.ErrOrganizationNotFound)
+	a.So(err, should.DescribeError, store.ErrOrganizationNotFound)
 	a.So(found, should.BeNil)
 }

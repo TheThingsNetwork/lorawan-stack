@@ -24,7 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql/migrations"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 // clientWithFoo implements both store.Client and store.Attributer interfaces.
@@ -116,6 +115,6 @@ func TestClientAttributer(t *testing.T) {
 
 	found, err = s.Clients.GetByID(withFoo.GetClient().ClientIdentifiers, specializer)
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, store.ErrClientNotFound)
+	a.So(err, should.DescribeError, store.ErrClientNotFound)
 	a.So(found, should.BeNil)
 }

@@ -27,7 +27,7 @@ import (
 func TestWellKnown(t *testing.T) {
 	a := assertions.New(t)
 
-	a.So(io.EOF, should.Describe, errors.ErrEOF)
-	a.So(context.Canceled, should.Describe, errors.ErrContextCanceled)
-	a.So(context.DeadlineExceeded, should.Describe, errors.ErrContextDeadlineExceeded)
+	a.So(io.EOF, should.DescribeError, errors.ErrEOF)
+	a.So(context.Canceled, should.DescribeError, errors.ErrContextCanceled)
+	a.So(context.DeadlineExceeded, should.DescribeError, errors.ErrContextDeadlineExceeded)
 }

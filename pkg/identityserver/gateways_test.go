@@ -24,7 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 var _ ttnpb.IsGatewayServer = new(gatewayService)
@@ -43,7 +42,7 @@ func TestGatewaysBlacklistedIDs(t *testing.T) {
 			},
 		})
 		a.So(err, should.NotBeNil)
-		a.So(err, errshould.Describe, ErrBlacklistedID)
+		a.So(err, should.DescribeError, ErrBlacklistedID)
 	}
 }
 
@@ -188,7 +187,7 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 		Rights:             []ttnpb.Right{ttnpb.Right(1)},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, store.ErrAPIKeyNameConflict)
+	a.So(err, should.DescribeError, store.ErrAPIKeyNameConflict)
 
 	keys, err := is.gatewayService.ListGatewayAPIKeys(ctx, &sids)
 	a.So(err, should.BeNil)
@@ -264,7 +263,7 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &user.UserIdentifiers}},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, ErrUnmanageableGateway)
+	a.So(err, should.DescribeError, ErrUnmanageableGateway)
 
 	// But we can revoke a shared right between the two collaborators.
 	_, err = is.gatewayService.SetGatewayCollaborator(ctx, &ttnpb.GatewayCollaborator{

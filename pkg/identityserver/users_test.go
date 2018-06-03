@@ -30,7 +30,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 var _ ttnpb.IsUserServer = new(userService)
@@ -68,7 +67,7 @@ func TestUsersBlacklistedIDs(t *testing.T) {
 			User: ttnpb.User{UserIdentifiers: ttnpb.UserIdentifiers{UserID: id}},
 		})
 		a.So(err, should.NotBeNil)
-		a.So(err, errshould.Describe, ErrBlacklistedID)
+		a.So(err, should.DescribeError, ErrBlacklistedID)
 	}
 }
 
@@ -100,7 +99,7 @@ func TestUsersEmailWhitelisting(t *testing.T) {
 		User: user,
 	})
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, ErrEmailAddressNotAllowed)
+	a.So(err, should.DescribeError, ErrEmailAddressNotAllowed)
 
 	// But it does with a whitelisted email domain.
 	user.UserIdentifiers.Email = "antonio@foo.bar"
@@ -123,7 +122,7 @@ func TestUsersEmailWhitelisting(t *testing.T) {
 		},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, ErrEmailAddressNotAllowed)
+	a.So(err, should.DescribeError, ErrEmailAddressNotAllowed)
 
 	// But yes to another that is whitelisted.
 	_, err = is.userService.UpdateUser(ctx, &ttnpb.UpdateUserRequest{
@@ -200,7 +199,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 	found, err := is.userService.GetUser(context.Background(), ttnpb.Empty)
 	a.So(found, should.BeNil)
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, common.ErrPermissionDenied)
+	a.So(err, should.DescribeError, common.ErrPermissionDenied)
 
 	// Check that response does not include password within.
 	found, err = is.userService.GetUser(ctx, ttnpb.Empty)
@@ -240,7 +239,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 		New: "heheh",
 	})
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, ErrInvalidPassword)
+	a.So(err, should.DescribeError, ErrInvalidPassword)
 
 	sfound, err := is.store.Users.GetByID(user.UserIdentifiers, is.specializers.User)
 	a.So(err, should.BeNil)
@@ -281,7 +280,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 		Rights: []ttnpb.Right{ttnpb.Right(1)},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, store.ErrAPIKeyNameConflict)
+	a.So(err, should.DescribeError, store.ErrAPIKeyNameConflict)
 
 	keys, err := is.userService.ListUserAPIKeys(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
@@ -344,7 +343,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 		Token: token,
 	})
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, store.ErrValidationTokenNotFound)
+	a.So(err, should.DescribeError, store.ErrValidationTokenNotFound)
 
 	// And therefore the email is not validated yet.
 	found, err = is.userService.GetUser(ctx, ttnpb.Empty)
@@ -372,7 +371,7 @@ func testIsUser(t *testing.T, uids, sids ttnpb.UserIdentifiers) {
 
 	_, err = is.userService.RevokeAuthorizedClient(ctx, &ttnpb.ClientIdentifiers{ClientID: "non-existent-client"})
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, store.ErrClientNotFound)
+	a.So(err, should.DescribeError, store.ErrClientNotFound)
 
 	// Create a fake authorized client to the user.
 	client := &ttnpb.Client{

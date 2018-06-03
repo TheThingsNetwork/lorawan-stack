@@ -24,7 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql/migrations"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 // applicationWithFoo implements both store.Application and store.Attributer interfaces.
@@ -118,6 +117,6 @@ func TestApplicationAttributer(t *testing.T) {
 
 	found, err = s.Applications.GetByID(withFoo.GetApplication().ApplicationIdentifiers, specializer)
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, store.ErrApplicationNotFound)
+	a.So(err, should.DescribeError, store.ErrApplicationNotFound)
 	a.So(found, should.BeNil)
 }

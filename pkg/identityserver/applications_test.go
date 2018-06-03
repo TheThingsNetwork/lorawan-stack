@@ -52,7 +52,7 @@ func TestApplication(t *testing.T) {
 			},
 		})
 		a.So(err, should.NotBeNil)
-		a.So(err, should.Describe, ErrBlacklistedID)
+		a.So(err, should.DescribeError, ErrBlacklistedID)
 	}
 
 	found, err := is.applicationService.GetApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: app.ApplicationID})
@@ -105,7 +105,7 @@ func TestApplication(t *testing.T) {
 		Rights: []ttnpb.Right{ttnpb.Right(1)},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(err, should.Describe, store.ErrAPIKeyNameConflict)
+	a.So(err, should.DescribeError, store.ErrAPIKeyNameConflict)
 
 	keys, err := is.applicationService.ListApplicationAPIKeys(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: app.ApplicationID})
 	a.So(err, should.BeNil)
@@ -185,7 +185,7 @@ func TestApplication(t *testing.T) {
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &user.UserIdentifiers}},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(err, should.Describe, ErrUnmanageableApplication)
+	a.So(err, should.DescribeError, ErrUnmanageableApplication)
 
 	// But we can revoke a shared right between the two collaborators.
 	_, err = is.applicationService.SetApplicationCollaborator(ctx, &ttnpb.ApplicationCollaborator{

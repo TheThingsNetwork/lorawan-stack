@@ -26,7 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/scripting"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestEncode(t *testing.T) {
@@ -112,7 +111,7 @@ func TestEncode(t *testing.T) {
 
 		model.EndDeviceModel.ModelID = "L-Tek FF1705"
 		_, err = host.Encode(ctx, message, model, script)
-		a.So(err, errshould.Describe, scripting.ErrRuntime)
+		a.So(err, should.DescribeError, scripting.ErrRuntime)
 	}
 
 	// Return out of range values.
@@ -123,7 +122,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, model, script)
-		a.So(err, errshould.Describe, messageprocessors.ErrInvalidOutputRange)
+		a.So(err, should.DescribeError, messageprocessors.ErrInvalidOutputRange)
 	}
 
 	// Return invalid type.
@@ -134,7 +133,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, model, script)
-		a.So(err, errshould.Describe, messageprocessors.ErrInvalidOutput)
+		a.So(err, should.DescribeError, messageprocessors.ErrInvalidOutput)
 	}
 
 	// Return nothing.
@@ -145,7 +144,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, model, script)
-		a.So(err, errshould.Describe, messageprocessors.ErrInvalidOutputType)
+		a.So(err, should.DescribeError, messageprocessors.ErrInvalidOutputType)
 	}
 
 	// Return an object.
@@ -158,7 +157,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, model, script)
-		a.So(err, errshould.Describe, messageprocessors.ErrInvalidOutputType)
+		a.So(err, should.DescribeError, messageprocessors.ErrInvalidOutputType)
 	}
 }
 

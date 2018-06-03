@@ -25,7 +25,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 var _ ttnpb.IsAdminServer = new(adminService)
@@ -111,7 +110,7 @@ func TestAdminInvitations(t *testing.T) {
 
 	_, err = is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{User: user})
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, ErrInvitationTokenMissing)
+	a.So(err, should.DescribeError, ErrInvitationTokenMissing)
 
 	_, err = is.userService.CreateUser(context.Background(), &ttnpb.CreateUserRequest{
 		User:            user,
@@ -134,7 +133,7 @@ func TestAdminInvitations(t *testing.T) {
 	// Can't send invitation to an already used email address.
 	_, err = is.adminService.SendInvitation(ctx, &ttnpb.SendInvitationRequest{Email: email})
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, ErrEmailAddressAlreadyUsed)
+	a.So(err, should.DescribeError, ErrEmailAddressAlreadyUsed)
 
 	// Send a new invitation but revoke it later.
 	email = "bar@bazqux.com"
@@ -220,7 +219,7 @@ func TestAdminUsers(t *testing.T) {
 
 	_, err = is.store.Users.GetByID(user.UserIdentifiers, is.specializers.User)
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, store.ErrUserNotFound)
+	a.So(err, should.DescribeError, store.ErrUserNotFound)
 
 	// List approved users.
 	resp, err := is.adminService.ListUsers(ctx, &ttnpb.ListUsersRequest{
