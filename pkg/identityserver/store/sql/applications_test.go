@@ -18,8 +18,8 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -47,7 +47,7 @@ func TestApplications(t *testing.T) {
 
 	found, err := s.Applications.GetByID(application.ApplicationIdentifiers, applicationSpecializer)
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeApplicationIgnoringAutoFields, application)
+	a.So(found, should.EqualFieldsWithIgnores(identityserver.ApplicationGeneratedFields...), application)
 
 	application.Description = ""
 	err = s.Applications.Update(application)
@@ -55,7 +55,7 @@ func TestApplications(t *testing.T) {
 
 	found, err = s.Applications.GetByID(application.ApplicationIdentifiers, applicationSpecializer)
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeApplicationIgnoringAutoFields, application)
+	a.So(found, should.EqualFieldsWithIgnores(identityserver.ApplicationGeneratedFields...), application)
 
 	collaborator := ttnpb.ApplicationCollaborator{
 		ApplicationIdentifiers:        application.ApplicationIdentifiers,

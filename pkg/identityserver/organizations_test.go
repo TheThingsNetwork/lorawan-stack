@@ -224,7 +224,7 @@ func TestOrganization(t *testing.T) {
 		apps, err = is.applicationService.ListApplications(ctx, &ttnpb.ListApplicationsRequest{OrganizationIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: org.OrganizationID}})
 		a.So(err, should.BeNil)
 		if a.So(apps.Applications, should.HaveLength, 1) {
-			a.So(apps.Applications[0], test.ShouldBeApplicationIgnoringAutoFields, app)
+			a.So(apps.Applications[0], should.EqualFieldsWithIgnores(ApplicationGeneratedFields...), app)
 		}
 
 		_, err = is.applicationService.DeleteApplication(ctx, &app.ApplicationIdentifiers)

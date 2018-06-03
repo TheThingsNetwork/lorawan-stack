@@ -26,6 +26,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+// ApplicationGeneratedFields are the fields that are automatically generated.
+var ApplicationGeneratedFields = []string{"CreatedAt", "UpdatedAt"}
+
 type applicationService struct {
 	*IdentityServer
 }
@@ -284,7 +287,7 @@ func (s *applicationService) SetApplicationCollaborator(ctx context.Context, req
 
 	ad := authorizationDataFromContext(ctx)
 
-	// `modifiable` is the set of rights the caller can modify.
+	// modifiable is the set of rights the caller can modify.
 	var modifiable []ttnpb.Right
 	switch ad.Source {
 	case auth.Key:

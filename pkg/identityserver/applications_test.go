@@ -21,10 +21,8 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 var _ ttnpb.IsApplicationServer = new(applicationService)
@@ -54,17 +52,17 @@ func TestApplication(t *testing.T) {
 			},
 		})
 		a.So(err, should.NotBeNil)
-		a.So(err, errshould.Describe, ErrBlacklistedID)
+		a.So(err, should.Describe, ErrBlacklistedID)
 	}
 
 	found, err := is.applicationService.GetApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: app.ApplicationID})
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeApplicationIgnoringAutoFields, app)
+	a.So(found, should.EqualFieldsWithIgnores(ApplicationGeneratedFields...), app)
 
 	apps, err := is.applicationService.ListApplications(ctx, &ttnpb.ListApplicationsRequest{})
 	a.So(err, should.BeNil)
 	if a.So(apps.Applications, should.HaveLength, 1) {
-		a.So(apps.Applications[0], test.ShouldBeApplicationIgnoringAutoFields, app)
+		a.So(apps.Applications[0], should.EqualFieldsWithIgnores(ApplicationGeneratedFields...), app)
 	}
 
 	app.Description = "foo"
@@ -78,7 +76,7 @@ func TestApplication(t *testing.T) {
 
 	found, err = is.applicationService.GetApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: app.ApplicationID})
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeApplicationIgnoringAutoFields, app)
+	a.So(found, should.EqualFieldsWithIgnores(ApplicationGeneratedFields...), app)
 
 	// Generate a new API key.
 	key, err := is.applicationService.GenerateApplicationAPIKey(ctx, &ttnpb.GenerateApplicationAPIKeyRequest{
@@ -107,7 +105,7 @@ func TestApplication(t *testing.T) {
 		Rights: []ttnpb.Right{ttnpb.Right(1)},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, store.ErrAPIKeyNameConflict)
+	a.So(err, should.Describe, store.ErrAPIKeyNameConflict)
 
 	keys, err := is.applicationService.ListApplicationAPIKeys(ctx, &ttnpb.ApplicationIdentifiers{ApplicationID: app.ApplicationID})
 	a.So(err, should.BeNil)
@@ -187,7 +185,7 @@ func TestApplication(t *testing.T) {
 		OrganizationOrUserIdentifiers: ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &user.UserIdentifiers}},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(err, errshould.Describe, ErrUnmanageableApplication)
+	a.So(err, should.Describe, ErrUnmanageableApplication)
 
 	// But we can revoke a shared right between the two collaborators.
 	_, err = is.applicationService.SetApplicationCollaborator(ctx, &ttnpb.ApplicationCollaborator{

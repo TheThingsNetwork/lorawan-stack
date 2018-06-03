@@ -19,9 +19,9 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql/migrations"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -110,7 +110,7 @@ func TestApplicationAttributer(t *testing.T) {
 
 	found, err := s.Applications.GetByID(withFoo.GetApplication().ApplicationIdentifiers, specializer)
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeApplicationIgnoringAutoFields, withFoo)
+	a.So(found, should.EqualFieldsWithIgnores(identityserver.ApplicationGeneratedFields...), withFoo)
 	a.So(found.(*applicationWithFoo).Foo, should.Equal, withFoo.Foo)
 
 	err = s.Applications.Delete(withFoo.GetApplication().ApplicationIdentifiers)

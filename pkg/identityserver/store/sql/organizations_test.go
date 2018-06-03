@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -160,7 +161,7 @@ func TestOrganizations(t *testing.T) {
 		applications, err := s.Applications.ListByOrganizationOrUser(uid, applicationSpecializer)
 		a.So(err, should.BeNil)
 		if a.So(applications, should.HaveLength, 1) {
-			a.So(applications[0], test.ShouldBeApplicationIgnoringAutoFields, application)
+			a.So(applications[0], should.EqualFieldsWithIgnores(identityserver.ApplicationGeneratedFields...), application)
 		}
 	}
 
