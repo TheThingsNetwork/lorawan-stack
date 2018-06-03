@@ -16,6 +16,9 @@ package identityserver
 
 import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
+// AuthorizationDataGeneratedFields are the fields that are automatically generated.
+var AuthorizationDataGeneratedFields = []string{"CreatedAt"}
+
 // authorizationData is the type that abstracts the authorization data contained in a request.
 type authorizationData struct {
 	// EntityIdentifiers contains the ttnpb.XXXIdentifiers of the entity that the

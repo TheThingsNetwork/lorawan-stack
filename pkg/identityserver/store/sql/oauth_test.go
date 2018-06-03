@@ -19,8 +19,8 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -48,18 +48,11 @@ func TestOAuthAuthorizationCode(t *testing.T) {
 
 	found, err := s.OAuth.GetAuthorizationCode(data.AuthorizationCode)
 	a.So(err, should.BeNil)
-
-	a.So(found.AuthorizationCode, should.Equal, data.AuthorizationCode)
-	a.So(found.ClientID, should.Equal, data.ClientID)
-	a.So(found.UserID, should.Equal, data.UserID)
-	a.So(found.ExpiresIn, should.Equal, data.ExpiresIn)
-	a.So(found.Scope, should.Equal, data.Scope)
-	a.So(found.RedirectURI, should.Equal, data.RedirectURI)
-	a.So(found.State, should.Equal, data.State)
+	a.So(found, should.EqualFieldsWithIgnores(identityserver.AuthorizationDataGeneratedFields...), data)
 
 	c, err := s.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: found.ClientID}, clientSpecializer)
 	a.So(err, should.BeNil)
-	a.So(c, test.ShouldBeClientIgnoringAutoFields, client)
+	a.So(c, should.EqualFieldsWithIgnores(identityserver.ClientGeneratedFields...), client)
 
 	err = s.OAuth.DeleteAuthorizationCode(data.AuthorizationCode)
 	a.So(err, should.BeNil)
@@ -98,7 +91,7 @@ func TestOAuthAccessToken(t *testing.T) {
 
 	c, err := s.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: found.ClientID}, clientSpecializer)
 	a.So(err, should.BeNil)
-	a.So(c, test.ShouldBeClientIgnoringAutoFields, client)
+	a.So(c, should.EqualFieldsWithIgnores(identityserver.ClientGeneratedFields...), client)
 
 	err = s.OAuth.DeleteAccessToken(data.AccessToken)
 	a.So(err, should.BeNil)
@@ -135,7 +128,7 @@ func TestOAuthRefreshToken(t *testing.T) {
 
 	c, err := s.Clients.GetByID(ttnpb.ClientIdentifiers{ClientID: found.ClientID}, clientSpecializer)
 	a.So(err, should.BeNil)
-	a.So(c, test.ShouldBeClientIgnoringAutoFields, client)
+	a.So(c, should.EqualFieldsWithIgnores(identityserver.ClientGeneratedFields...), client)
 
 	err = s.OAuth.DeleteRefreshToken(data.RefreshToken)
 	a.So(err, should.BeNil)
@@ -185,7 +178,7 @@ func TestOAuthAuthorizedClients(t *testing.T) {
 	found, err := s.OAuth.ListAuthorizedClients(alice.UserIdentifiers, clientSpecializer)
 	a.So(err, should.BeNil)
 	if a.So(found, should.HaveLength, 1) {
-		a.So(found[0], test.ShouldBeClientIgnoringAutoFields, client)
+		a.So(found[0], should.EqualFieldsWithIgnores(identityserver.ClientGeneratedFields...), client)
 	}
 
 	err = s.OAuth.RevokeAuthorizedClient(alice.UserIdentifiers, client.ClientIdentifiers)

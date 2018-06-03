@@ -21,7 +21,6 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	errshould "go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -67,7 +66,7 @@ func TestClient(t *testing.T) {
 
 	found, err := is.clientService.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientID: cli.ClientID})
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeClientIgnoringAutoFields, cli)
+	a.So(found, should.EqualFieldsWithIgnores(ClientGeneratedFields...), cli)
 
 	// Fetch client without authorization credentials.
 	found, err = is.clientService.GetClient(context.Background(), &ttnpb.ClientIdentifiers{ClientID: cli.ClientID})
@@ -82,7 +81,7 @@ func TestClient(t *testing.T) {
 	clients, err := is.clientService.ListClients(ctx, ttnpb.Empty)
 	a.So(err, should.BeNil)
 	if a.So(clients.Clients, should.HaveLength, 1) {
-		a.So(clients.Clients[0], test.ShouldBeClientIgnoringAutoFields, cli)
+		a.So(clients.Clients[0], should.EqualFieldsWithIgnores(ClientGeneratedFields...), cli)
 	}
 
 	cli.Description = "foo"
@@ -96,7 +95,7 @@ func TestClient(t *testing.T) {
 
 	found, err = is.clientService.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientID: cli.ClientID})
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeClientIgnoringAutoFields, cli)
+	a.So(found, should.EqualFieldsWithIgnores(ClientGeneratedFields...), cli)
 
 	_, err = is.clientService.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientID: cli.ClientID})
 	a.So(err, should.BeNil)

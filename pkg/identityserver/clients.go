@@ -26,6 +26,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+// ClientGeneratedFields are the fields that are automatically generated.
+var ClientGeneratedFields = []string{"CreatedAt", "UpdatedAt", "Grants", "Secret"}
+
 type clientService struct {
 	*IdentityServer
 }

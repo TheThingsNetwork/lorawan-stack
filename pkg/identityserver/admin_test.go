@@ -246,7 +246,7 @@ func TestAdminClients(t *testing.T) {
 
 	found, err := is.adminService.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientID: client.ClientID})
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeClientIgnoringAutoFields, client)
+	a.So(found, should.EqualFieldsWithIgnores(ClientGeneratedFields...), client)
 
 	clients, err := is.adminService.ListClients(ctx, &ttnpb.ListClientsRequest{
 		ListClientsRequest_FilterState: &ttnpb.ListClientsRequest_FilterState{State: ttnpb.STATE_PENDING},

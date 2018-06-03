@@ -18,8 +18,8 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -50,18 +50,18 @@ func TestClients(t *testing.T) {
 
 	found, err := s.Clients.GetByID(client.ClientIdentifiers, clientSpecializer)
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeClientIgnoringAutoFields, client)
+	a.So(found, should.EqualFieldsWithIgnores(identityserver.ClientGeneratedFields...), client)
 
 	clients, err := s.Clients.List(clientSpecializer)
 	a.So(err, should.BeNil)
 	if a.So(clients, should.HaveLength, 1) {
-		a.So(clients[0], test.ShouldBeClientIgnoringAutoFields, client)
+		a.So(clients[0], should.EqualFieldsWithIgnores(identityserver.ClientGeneratedFields...), client)
 	}
 
 	clients, err = s.Clients.ListByUser(bob.UserIdentifiers, clientSpecializer)
 	a.So(err, should.BeNil)
 	if a.So(clients, should.HaveLength, 1) {
-		a.So(clients[0], test.ShouldBeClientIgnoringAutoFields, client)
+		a.So(clients[0], should.EqualFieldsWithIgnores(identityserver.ClientGeneratedFields...), client)
 	}
 
 	client.Description = "Fancy Description"
@@ -70,7 +70,7 @@ func TestClients(t *testing.T) {
 
 	found, err = s.Clients.GetByID(client.ClientIdentifiers, clientSpecializer)
 	a.So(err, should.BeNil)
-	a.So(found, test.ShouldBeClientIgnoringAutoFields, client)
+	a.So(found, should.EqualFieldsWithIgnores(identityserver.ClientGeneratedFields...), client)
 
 	err = s.Clients.Delete(client.ClientIdentifiers)
 	a.So(err, should.BeNil)
