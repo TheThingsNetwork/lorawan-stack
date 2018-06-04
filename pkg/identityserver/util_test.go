@@ -33,7 +33,7 @@ func init() {
 
 var (
 	testConfig = Config{
-		DatabaseURI:      "postgres://root@localhost:26257/is_development_tests?sslmode=disable",
+		DatabaseURI:      "postgres://root@localhost:26257/is_test?sslmode=disable",
 		Hostname:         "localhost",
 		OrganizationName: "The Things Network",
 		PublicURL:        "https://www.thethingsnetwork.org",

@@ -28,8 +28,8 @@ import (
 
 const (
 	address            = "postgres://root@localhost:26257/%s?sslmode=disable"
-	database           = "is_store_tests"
-	attributesDatabase = "is_store_attributes_test"
+	database           = "is_test_store"
+	attributesDatabase = "is_test_store_attributes"
 )
 
 var now = time.Now().UTC()

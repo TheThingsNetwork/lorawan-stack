@@ -33,7 +33,7 @@ import (
 
 const (
 	address  = "postgres://root@localhost:26257/%s?sslmode=disable"
-	database = "is_oauth_tests"
+	database = "is_test_oauth"
 	issuer   = "issuer.test.local"
 	userID   = "john-doe"
 	password = "123456"

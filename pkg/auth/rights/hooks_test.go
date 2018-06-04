@@ -39,7 +39,7 @@ import (
 // NOTE: these tests need to run in this directory as `TestUnaryHook` is creating
 // an assets.Assets instance with the relative path of the webui folder.
 
-const databaseURI = "postgres://root@localhost:26257/is_rightshook_test?sslmode=disable"
+const databaseURI = "postgres://root@localhost:26257/is_test_hooks?sslmode=disable"
 
 var testHandler = func(t *testing.T, expected []ttnpb.Right) grpc.UnaryHandler {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {

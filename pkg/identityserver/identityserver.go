@@ -39,7 +39,7 @@ import (
 
 // Config defines the needed parameters to start the Identity Server.
 type Config struct {
-	// DatabaseURI is the database connection URI; e.g. "postgres://root@localhost:26257/is_development?sslmode=disable"
+	// DatabaseURI is the database connection URI.
 	DatabaseURI string `name:"database-uri" description:"URI of the database to connect at"`
 
 	// OrganizationName is the display name of the organization that runs the network.

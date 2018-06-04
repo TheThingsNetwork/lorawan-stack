@@ -30,7 +30,7 @@ var _ Database = new(DB)
 
 const (
 	address  = "postgres://root@localhost:26257/%s?sslmode=disable"
-	database = "is_db_tests"
+	database = "is_test_db"
 	schema   = `
 	CREATE TABLE IF NOT EXISTS foo (
 		id       SERIAL PRIMARY KEY,
