@@ -45,6 +45,10 @@ const (
 	RecentUplinkCount = recentUplinkCount
 )
 
+var (
+	NewMACState = newMACState
+)
+
 func TestAccumulator(t *testing.T) {
 	a := assertions.New(t)
 
@@ -96,8 +100,8 @@ func (cl *MockNsGsClient) ScheduleDownlink(ctx context.Context, in *ttnpb.Downli
 func TestScheduleDownlink(t *testing.T) {
 	newRX2 := func(down *ttnpb.ApplicationDownlink, fp ttnpb.FrequencyPlan, dev *ttnpb.EndDevice) *ttnpb.DownlinkMessage {
 		band := test.Must(band.GetByID(fp.BandID)).(band.Band)
-		st := dev.GetMACState()
-		drIdx := st.GetRx2DataRateIndex()
+		st := dev.MACState
+		drIdx := st.Rx2DataRateIndex
 
 		msg := &ttnpb.DownlinkMessage{
 			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
@@ -105,7 +109,7 @@ func TestScheduleDownlink(t *testing.T) {
 				DataRateIndex:         drIdx,
 				CodingRate:            "4/5",
 				PolarizationInversion: true,
-				Frequency:             st.GetRx2Frequency(),
+				Frequency:             st.Rx2Frequency,
 				TxPower:               int32(band.DefaultMaxEIRP),
 			},
 			RawPayload: test.Must((ttnpb.Message{
@@ -120,19 +124,19 @@ func TestScheduleDownlink(t *testing.T) {
 							Ack:      false,
 							FPending: false,
 						},
-						FCnt:  down.GetFCnt(),
+						FCnt:  down.FCnt,
 						FOpts: nil,
 					},
-					FPort:      down.GetFPort(),
-					FRMPayload: down.GetFRMPayload(),
+					FPort:      down.FPort,
+					FRMPayload: down.FRMPayload,
 				}},
 			}).MarshalLoRaWAN()).([]byte),
 		}
 
 		mic := test.Must(crypto.ComputeDownlinkMIC(
-			*dev.GetSession().SessionKeys.GetSNwkSIntKey().Key,
+			*dev.Session.SessionKeys.SNwkSIntKey.Key,
 			*dev.EndDeviceIdentifiers.DevAddr,
-			down.GetFCnt(),
+			down.FCnt,
 			msg.RawPayload,
 		)).([4]byte)
 		msg.RawPayload = append(msg.RawPayload, mic[:]...)
@@ -144,12 +148,12 @@ func TestScheduleDownlink(t *testing.T) {
 	newRX1 := func(down *ttnpb.ApplicationDownlink, fp ttnpb.FrequencyPlan, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage) *ttnpb.DownlinkMessage {
 		msg := newRX2(down, fp, dev)
 
-		sets := up.GetSettings()
-		st := dev.GetMACState()
+		sets := up.Settings
+		st := dev.MACState
 		band := test.Must(band.GetByID(fp.BandID)).(band.Band)
-		drIdx := test.Must(band.Rx1DataRate(sets.GetDataRateIndex(), st.GetRx1DataRateOffset(), st.GetDownlinkDwellTime())).(uint32)
+		drIdx := test.Must(band.Rx1DataRate(sets.DataRateIndex, st.Rx1DataRateOffset, st.DownlinkDwellTime)).(uint32)
 
-		msg.Settings.ChannelIndex = test.Must(band.Rx1Channel(sets.GetChannelIndex())).(uint32)
+		msg.Settings.ChannelIndex = test.Must(band.Rx1Channel(sets.ChannelIndex)).(uint32)
 		msg.Settings.Frequency = uint64(fp.Channels[msg.Settings.ChannelIndex].Frequency)
 		msg.Settings.DataRateIndex = drIdx
 
@@ -173,7 +177,7 @@ func TestScheduleDownlink(t *testing.T) {
 		test.Must(nil, ns.Start())
 
 		ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-		for ed.GetSession() == nil || len(ed.GetRecentUplinks()) == 0 {
+		for ed.Session == nil || len(ed.RecentUplinks) == 0 {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
 		ed.QueuedApplicationDownlinks = nil
@@ -199,7 +203,7 @@ func TestScheduleDownlink(t *testing.T) {
 		test.Must(nil, ns.Start())
 
 		ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-		for ed.GetSession() == nil || len(ed.GetQueuedApplicationDownlinks()) == 0 {
+		for ed.Session == nil || len(ed.QueuedApplicationDownlinks) == 0 {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
 		ed.RecentUplinks = nil
@@ -231,7 +235,7 @@ func TestScheduleDownlink(t *testing.T) {
 		test.Must(nil, ns.Start())
 
 		ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-		for ed.GetSession() == nil || len(ed.GetRecentUplinks()) == 0 {
+		for ed.Session == nil || len(ed.RecentUplinks) == 0 {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
 		ed.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
@@ -285,7 +289,7 @@ func TestScheduleDownlink(t *testing.T) {
 		down := ttnpb.NewPopulatedApplicationDownlink(test.Randy, false)
 
 		ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-		for ed.GetSession() == nil {
+		for ed.Session == nil {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
 		ed.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
@@ -300,9 +304,9 @@ func TestScheduleDownlink(t *testing.T) {
 			false,
 		)
 
-		mds := append(make([]*ttnpb.RxMetadata, 0), up.GetRxMetadata()...)
+		mds := append(make([]*ttnpb.RxMetadata, 0), up.RxMetadata...)
 		sort.SliceStable(mds, func(i, j int) bool {
-			return mds[i].GetSNR() > mds[j].GetSNR()
+			return mds[i].SNR > mds[j].SNR
 		})
 
 		wg.Add(len(mds))
@@ -310,7 +314,7 @@ func TestScheduleDownlink(t *testing.T) {
 		slots := []*ttnpb.DownlinkMessage{
 			newRX1(
 				down,
-				test.Must(ns.Component.FrequencyPlans.GetByID(dev.GetFrequencyPlanID())).(ttnpb.FrequencyPlan),
+				test.Must(ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)).(ttnpb.FrequencyPlan),
 				dev.EndDevice,
 				up,
 			),
@@ -323,7 +327,7 @@ func TestScheduleDownlink(t *testing.T) {
 			slots := deepcopy.Copy(slots).([]*ttnpb.DownlinkMessage)
 			slots[0].TxMetadata = ttnpb.TxMetadata{
 				GatewayIdentifiers: md.GatewayIdentifiers,
-				Timestamp:          md.GetTimestamp() + uint64(dev.GetMACState().GetRxDelay()),
+				Timestamp:          md.Timestamp + uint64(time.Duration(dev.MACState.RxDelay)*time.Second),
 			}
 
 			var n uint32
@@ -398,7 +402,7 @@ func TestScheduleDownlink(t *testing.T) {
 		down := ttnpb.NewPopulatedApplicationDownlink(test.Randy, false)
 
 		ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-		for ed.GetSession() == nil {
+		for ed.Session == nil {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
 		ed.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
@@ -413,9 +417,9 @@ func TestScheduleDownlink(t *testing.T) {
 			false,
 		)
 
-		mds := append(make([]*ttnpb.RxMetadata, 0), up.GetRxMetadata()...)
+		mds := append(make([]*ttnpb.RxMetadata, 0), up.RxMetadata...)
 		sort.SliceStable(mds, func(i, j int) bool {
-			return mds[i].GetSNR() > mds[j].GetSNR()
+			return mds[i].SNR > mds[j].SNR
 		})
 
 		wg.Add(len(mds) * 2)
@@ -423,13 +427,13 @@ func TestScheduleDownlink(t *testing.T) {
 		slots := []*ttnpb.DownlinkMessage{
 			newRX1(
 				down,
-				test.Must(ns.Component.FrequencyPlans.GetByID(dev.GetFrequencyPlanID())).(ttnpb.FrequencyPlan),
+				test.Must(ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)).(ttnpb.FrequencyPlan),
 				dev.EndDevice,
 				up,
 			),
 			newRX2(
 				down,
-				test.Must(ns.Component.FrequencyPlans.GetByID(dev.GetFrequencyPlanID())).(ttnpb.FrequencyPlan),
+				test.Must(ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)).(ttnpb.FrequencyPlan),
 				dev.EndDevice,
 			),
 		}
@@ -441,7 +445,7 @@ func TestScheduleDownlink(t *testing.T) {
 			slots := deepcopy.Copy(slots).([]*ttnpb.DownlinkMessage)
 			slots[0].TxMetadata = ttnpb.TxMetadata{
 				GatewayIdentifiers: md.GatewayIdentifiers,
-				Timestamp:          md.GetTimestamp() + uint64(dev.GetMACState().GetRxDelay()),
+				Timestamp:          md.Timestamp + uint64(time.Duration(dev.MACState.RxDelay)*time.Second),
 			}
 
 			slots[1].TxMetadata = slots[0].TxMetadata

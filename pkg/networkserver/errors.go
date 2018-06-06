@@ -38,53 +38,82 @@ var (
 		Code:          3,
 	}
 
+	// ErrMissingNwkSEncKey represents error ocurring when NwkSEncKey is missing.
+	ErrMissingNwkSEncKey = &errors.ErrDescriptor{
+		MessageFormat: "NwkSEncKey is unknown",
+		Type:          errors.NotFound,
+		Code:          4,
+	}
+
 	// ErrMissingApplicationID represents error ocurring when ApplicationID is missing.
 	ErrMissingApplicationID = &errors.ErrDescriptor{
 		MessageFormat: "Application ID is unknown",
 		Type:          errors.NotFound,
-		Code:          4,
+		Code:          5,
 	}
 
 	// ErrMissingGatewayID represents error ocurring when GatewayID is missing.
 	ErrMissingGatewayID = &errors.ErrDescriptor{
 		MessageFormat: "Gateway ID is unknown",
 		Type:          errors.NotFound,
-		Code:          5,
+		Code:          6,
 	}
 
 	// ErrNewSubscription represents error ocurring when a new subscription is opened.
 	ErrNewSubscription = &errors.ErrDescriptor{
 		MessageFormat: "Another subscription started",
 		Type:          errors.Conflict,
-		Code:          6,
+		Code:          7,
 	}
 
 	// ErrInvalidConfiguration represents error ocurring when the configuration is invalid.
 	ErrInvalidConfiguration = &errors.ErrDescriptor{
 		MessageFormat: "Invalid configuration",
 		Type:          errors.InvalidArgument,
-		Code:          7,
+		Code:          8,
 	}
 
 	// ErrUplinkNotFound represents error ocurring when there were no uplinks found.
 	ErrUplinkNotFound = &errors.ErrDescriptor{
 		MessageFormat: "Uplink not found",
 		Type:          errors.NotFound,
-		Code:          8,
+		Code:          9,
 	}
 
 	// ErrGatewayServerNotFound represents error ocurring when there were no uplinks found.
 	ErrGatewayServerNotFound = &errors.ErrDescriptor{
 		MessageFormat: "Gateway server not found",
 		Type:          errors.NotFound,
-		Code:          9,
+		Code:          10,
 	}
 
 	// ErrChannelIndexTooHigh represents error ocurring when the channel index is too high.
 	ErrChannelIndexTooHigh = &errors.ErrDescriptor{
 		MessageFormat: "Channel index is too high",
 		Type:          errors.InvalidArgument,
-		Code:          10,
+		Code:          11,
+	}
+
+	// ErrDecryptionFailed represents error ocurring when the decryption fails.
+	ErrDecryptionFailed = &errors.ErrDescriptor{
+		MessageFormat: "Decryption failed",
+		Type:          errors.InvalidArgument,
+		Code:          12,
+	}
+
+	// ErrMACRequestNotFound represents error ocurring when the a response to a MAC response
+	// is received, but a corresponding request is not found.
+	ErrMACRequestNotFound = &errors.ErrDescriptor{
+		MessageFormat: "MAC response received, but corresponding request not found",
+		Type:          errors.InvalidArgument,
+		Code:          13,
+	}
+
+	// ErrInvalidDataRate represents error ocurring when the data rate is invalid.
+	ErrInvalidDataRate = &errors.ErrDescriptor{
+		MessageFormat: "Invalid data rate",
+		Type:          errors.InvalidArgument,
+		Code:          14,
 	}
 )
 
@@ -92,6 +121,7 @@ func init() {
 	ErrDeviceNotFound.Register()
 	ErrMissingFNwkSIntKey.Register()
 	ErrMissingSNwkSIntKey.Register()
+	ErrMissingNwkSEncKey.Register()
 	ErrMissingApplicationID.Register()
 	ErrMissingGatewayID.Register()
 	ErrNewSubscription.Register()
@@ -99,4 +129,7 @@ func init() {
 	ErrUplinkNotFound.Register()
 	ErrGatewayServerNotFound.Register()
 	ErrChannelIndexTooHigh.Register()
+	ErrDecryptionFailed.Register()
+	ErrMACRequestNotFound.Register()
+	ErrInvalidDataRate.Register()
 }

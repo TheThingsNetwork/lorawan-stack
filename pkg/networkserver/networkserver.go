@@ -57,6 +57,23 @@ const (
 	accumulationCapacity = 20
 )
 
+// newMACState returns new MACState.
+func newMACState(band *band.Band, dwellTime bool) *ttnpb.MACState {
+	return &ttnpb.MACState{
+		MaxTxPower:        uint32(band.DefaultMaxEIRP), // TODO: @egourlao ??
+		UplinkDwellTime:   dwellTime,
+		DownlinkDwellTime: dwellTime,
+		ADRNbTrans:        1,
+		ADRAckLimit:       uint32(band.ADRAckLimit),
+		ADRAckDelay:       uint32(band.ADRAckDelay),
+		DutyCycle:         ttnpb.DUTY_CYCLE_1,
+		RxDelay:           uint32(band.ReceiveDelay1),
+		Rx1DataRateOffset: 0,
+		Rx2DataRateIndex:  uint32(band.DefaultRx2Parameters.DataRateIndex),
+		Rx2Frequency:      uint64(band.DefaultRx2Parameters.Frequency),
+	}
+}
+
 // WindowEndFunc is a function, which is used by Network Server to determine the end of deduplication and cooldown windows.
 type WindowEndFunc func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time
 
@@ -66,19 +83,18 @@ func NewWindowEndAfterFunc(d time.Duration) WindowEndFunc {
 	return func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time {
 		ch := make(chan time.Time, 1)
 
-		start := msg.GetReceivedAt()
-		if start.IsZero() {
-			start = time.Now()
+		if msg.ReceivedAt.IsZero() {
+			msg.ReceivedAt = time.Now()
 		}
 
-		end := start.Add(d)
+		end := msg.ReceivedAt.Add(d)
 		if end.Before(time.Now()) {
 			ch <- end
 			return ch
 		}
 
 		go func() {
-			time.Sleep(time.Until(start.Add(d)))
+			time.Sleep(time.Until(msg.ReceivedAt.Add(d)))
 			ch <- end
 		}()
 		return ch
@@ -131,7 +147,7 @@ type NetworkServer struct {
 	applicationServersMu *sync.RWMutex
 	applicationServers   map[string]*applicationUpStream
 
-	metadataAccumulators *sync.Map
+	metadataAccumulators *sync.Map // string -> *metadataAccumulator
 
 	metadataAccumulatorPool *sync.Pool
 	hashPool                *sync.Pool
@@ -181,7 +197,9 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		metadataAccumulatorPool: &sync.Pool{},
 		hashPool:                &sync.Pool{},
 	}
-	ns.hashPool.New = func() interface{} { return fnv.New64a() }
+	ns.hashPool.New = func() interface{} {
+		return fnv.New64a()
+	}
 	ns.metadataAccumulatorPool.New = func() interface{} {
 		return &metadataAccumulator{newAccumulator()}
 	}
@@ -281,12 +299,12 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 		return nil, err
 	}
 
-	dev.QueuedApplicationDownlinks = req.GetDownlinks()
+	dev.QueuedApplicationDownlinks = req.Downlinks
 	if err = dev.Store("QueuedApplicationDownlinks"); err != nil {
 		return nil, err
 	}
 
-	if dev.GetMACInfo().GetDeviceClass() == ttnpb.CLASS_C {
+	if dev.MACInfo != nil && dev.MACInfo.DeviceClass == ttnpb.CLASS_C {
 		// TODO: Schedule the next downlink (https://github.com/TheThingsIndustries/ttn/issues/728)
 	}
 	return ttnpb.Empty, nil
@@ -304,7 +322,7 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 		return nil, err
 	}
 
-	if dev.GetMACInfo().GetDeviceClass() == ttnpb.CLASS_C {
+	if dev.MACInfo != nil && dev.MACInfo.DeviceClass == ttnpb.CLASS_C {
 		// TODO: Schedule the next downlink (https://github.com/TheThingsIndustries/ttn/issues/728)
 	}
 	return ttnpb.Empty, nil
@@ -457,9 +475,12 @@ func setDownlinkModulation(s *ttnpb.TxSettings, dr band.DataRate) (err error) {
 
 func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb.UplinkMessage, acc *metadataAccumulator, b []byte, isJoinAccept bool) error {
 	logger := log.FromContext(ctx).WithFields(log.Fields(
-		"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.GetApplicationID(),
-		"device_id", dev.EndDeviceIdentifiers.GetDeviceID(),
+		"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
+		"device_id", dev.EndDeviceIdentifiers.DeviceID,
 	))
+
+	// TODO: Don't schedule a new downlink if a confirmed downlink/MAC was scheduled recently and answer has not been received yet.
+	// https://github.com/TheThingsIndustries/ttn/issues/730
 
 	msg := &ttnpb.DownlinkMessage{
 		RawPayload:           b,
@@ -468,34 +489,29 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 
 	type tx struct {
 		ttnpb.TxSettings
-		Delay uint32
+		Delay time.Duration
 	}
 	slots := make([]tx, 0, 2)
 
-	fp, err := ns.Component.FrequencyPlans.GetByID(dev.GetFrequencyPlanID())
+	fp, err := ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)
 	if err != nil {
 		return common.ErrCorruptRegistry.NewWithCause(nil, err)
 	}
 
-	band, err := band.GetByID(fp.GetBandID())
+	band, err := band.GetByID(fp.BandID)
 	if err != nil {
 		return common.ErrCorruptRegistry.NewWithCause(nil, err)
 	}
-
-	st := dev.GetMACState()
 
 	var mds []*ttnpb.RxMetadata
 	if up == nil {
 		// Class C
-		ups := dev.GetRecentUplinks()
-		if len(ups) == 0 {
+		if len(dev.RecentUplinks) == 0 {
 			return ErrUplinkNotFound.New(nil)
 		}
-		mds = ups[len(ups)-1].GetRxMetadata()
+		mds = dev.RecentUplinks[len(dev.RecentUplinks)-1].RxMetadata
 	} else {
-		sets := up.GetSettings()
-
-		chIdx, err := band.Rx1Channel(sets.GetChannelIndex())
+		chIdx, err := band.Rx1Channel(up.Settings.ChannelIndex)
 		if err != nil {
 			return err
 		}
@@ -503,7 +519,11 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 			return ErrChannelIndexTooHigh.New(nil)
 		}
 
-		drIdx, err := band.Rx1DataRate(sets.GetDataRateIndex(), st.GetRx1DataRateOffset(), st.GetDownlinkDwellTime())
+		if dev.MACState == nil {
+			return common.ErrCorruptRegistry.NewWithCause(nil, errors.New("empty MACState"))
+		}
+
+		drIdx, err := band.Rx1DataRate(up.Settings.DataRateIndex, dev.MACState.Rx1DataRateOffset, dev.MACState.DownlinkDwellTime)
 		if err != nil {
 			return err
 		}
@@ -519,40 +539,39 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 			},
 		}
 		if isJoinAccept {
-			rx1.Delay = uint32(band.JoinAcceptDelay1.Nanoseconds())
+			rx1.Delay = band.JoinAcceptDelay1
 		} else {
-			rx1.Delay = st.GetRxDelay()
+			rx1.Delay = time.Second * time.Duration(dev.MACState.RxDelay)
 		}
 
 		if err = setDownlinkModulation(&rx1.TxSettings, band.DataRates[drIdx]); err != nil {
 			return err
 		}
 
-		mds = up.GetRxMetadata()
+		mds = up.RxMetadata
 		slots = append(slots, rx1)
 	}
 
-	drIdx := st.GetRx2DataRateIndex()
-	if uint(drIdx) > uint(len(band.DataRates)) {
+	if uint(dev.MACState.Rx2DataRateIndex) > uint(len(band.DataRates)) {
 		return common.ErrCorruptRegistry.NewWithCause(nil, errors.Errorf("RX2 data rate index must be lower or equal to %d", len(band.DataRates)-1))
 	}
 
 	rx2 := tx{
 		TxSettings: ttnpb.TxSettings{
-			DataRateIndex:         drIdx,
+			DataRateIndex:         dev.MACState.Rx2DataRateIndex,
 			CodingRate:            "4/5",
 			PolarizationInversion: true,
-			Frequency:             st.GetRx2Frequency(),
+			Frequency:             dev.MACState.Rx2Frequency,
 			TxPower:               int32(band.DefaultMaxEIRP),
 		},
 	}
 	if isJoinAccept {
-		rx2.Delay = uint32(band.JoinAcceptDelay2.Nanoseconds())
+		rx2.Delay = band.JoinAcceptDelay2
 	} else {
-		rx2.Delay = st.GetRxDelay() + uint32(time.Second.Nanoseconds())
+		rx2.Delay = time.Second * time.Duration(1+dev.MACState.RxDelay)
 	}
 
-	if err = setDownlinkModulation(&rx2.TxSettings, band.DataRates[drIdx]); err != nil {
+	if err = setDownlinkModulation(&rx2.TxSettings, band.DataRates[dev.MACState.Rx2DataRateIndex]); err != nil {
 		return err
 	}
 
@@ -570,7 +589,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 
 	sort.SliceStable(mds, func(i, j int) bool {
 		// TODO: Improve the sorting algorithm (https://github.com/TheThingsIndustries/ttn/issues/729)
-		return mds[i].GetSNR() > mds[j].GetSNR()
+		return mds[i].SNR > mds[j].SNR
 	})
 
 	var errs []error
@@ -579,7 +598,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 
 		for _, md := range mds {
 			logger := logger.WithField(
-				"gateway_id", md.GatewayIdentifiers.GetGatewayID(),
+				"gateway_id", md.GatewayIdentifiers.GatewayID,
 			)
 
 			cl, err := ns.gsClient(ctx, md.GatewayIdentifiers)
@@ -590,7 +609,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 
 			msg.TxMetadata = ttnpb.TxMetadata{
 				GatewayIdentifiers: md.GatewayIdentifiers,
-				Timestamp:          md.GetTimestamp() + uint64(s.Delay),
+				Timestamp:          md.Timestamp + uint64(s.Delay.Nanoseconds()),
 			}
 
 			_, err = cl.ScheduleDownlink(ctx, msg, ns.ClusterAuth())
@@ -599,7 +618,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 				continue
 			}
 
-			dev.RecentDownlinks = append(dev.GetRecentDownlinks(), msg)
+			dev.RecentDownlinks = append(dev.RecentDownlinks, msg)
 			if err = dev.Store("RecentDownlinks"); err != nil {
 				logger.WithError(err).Error("Failed to store device")
 				return err
@@ -617,8 +636,8 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 
 func (ns *NetworkServer) scheduleApplicationDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb.UplinkMessage, acc *metadataAccumulator) error {
 	logger := log.FromContext(ctx).WithFields(log.Fields(
-		"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.GetApplicationID(),
-		"device_id", dev.EndDeviceIdentifiers.GetDeviceID(),
+		"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
+		"device_id", dev.EndDeviceIdentifiers.DeviceID,
 	))
 
 	dev, err := dev.Load()
@@ -627,16 +646,13 @@ func (ns *NetworkServer) scheduleApplicationDownlink(ctx context.Context, dev *d
 		return err
 	}
 
-	devAddr := *dev.EndDeviceIdentifiers.DevAddr
-
-	queue := dev.GetQueuedApplicationDownlinks()
-	if len(queue) == 0 {
+	if len(dev.QueuedApplicationDownlinks) == 0 {
 		logger.Debug("Downlink queue empty")
 		return nil
 	}
-	down, queue := queue[0], queue[1:]
 
-	fCnt := down.GetFCnt()
+	var down *ttnpb.ApplicationDownlink
+	down, dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[0], dev.QueuedApplicationDownlinks[1:]
 
 	b, err := (ttnpb.Message{
 		MHDR: ttnpb.MHDR{
@@ -644,17 +660,17 @@ func (ns *NetworkServer) scheduleApplicationDownlink(ctx context.Context, dev *d
 		},
 		Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
 			FHDR: ttnpb.FHDR{
-				DevAddr: devAddr,
+				DevAddr: *dev.EndDeviceIdentifiers.DevAddr,
 				FCtrl: ttnpb.FCtrl{
 					ADR:      false,
-					Ack:      up != nil && up.Payload.GetMType() == ttnpb.MType_CONFIRMED_UP,
-					FPending: len(queue) > 0,
+					Ack:      up != nil && up.Payload.MType == ttnpb.MType_CONFIRMED_UP,
+					FPending: len(dev.QueuedApplicationDownlinks) > 0,
 				},
-				FCnt:  fCnt,
+				FCnt:  down.FCnt,
 				FOpts: nil, // TODO: MAC handling (https://github.com/TheThingsIndustries/ttn/issues/292)
 			},
-			FPort:      down.GetFPort(),
-			FRMPayload: down.GetFRMPayload(),
+			FPort:      down.FPort,
+			FRMPayload: down.FRMPayload,
 		}},
 	}).MarshalLoRaWAN()
 	if err != nil {
@@ -663,18 +679,17 @@ func (ns *NetworkServer) scheduleApplicationDownlink(ctx context.Context, dev *d
 	}
 	// NOTE: It is assumed, that b does not contain MIC.
 
-	ses := dev.GetSession()
-	if ses == nil {
+	if dev.Session == nil {
 		logger.Debug("No active session found for device")
 		return nil
 	}
 
-	ke := ses.SessionKeys.GetSNwkSIntKey()
-	if ke == nil || ke.Key.IsZero() {
+	if dev.Session.SessionKeys.SNwkSIntKey == nil ||
+		dev.Session.SessionKeys.SNwkSIntKey.Key.IsZero() {
 		return common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingSNwkSIntKey.New(nil))
 	}
 
-	mic, err := crypto.ComputeDownlinkMIC(*ke.Key, devAddr, fCnt, b)
+	mic, err := crypto.ComputeDownlinkMIC(*dev.Session.SessionKeys.SNwkSIntKey.Key, *dev.EndDeviceIdentifiers.DevAddr, down.FCnt, b)
 	if err != nil {
 		logger.WithError(err).Error("Failed to compute downlink MIC")
 		return err
@@ -684,13 +699,12 @@ func (ns *NetworkServer) scheduleApplicationDownlink(ctx context.Context, dev *d
 		return err
 	}
 
-	dev.QueuedApplicationDownlinks = queue
 	if err = dev.Store("QueuedApplicationDownlinks"); err != nil {
 		logger.WithError(err).Error("Failed to store device")
 		return err
 	}
 
-	if len(queue) > 0 && dev.GetMACInfo().GetDeviceClass() == ttnpb.CLASS_C {
+	if len(dev.QueuedApplicationDownlinks) > 0 && dev.MACInfo.DeviceClass == ttnpb.CLASS_C {
 		// TODO: Schedule the next downlink (https://github.com/TheThingsIndustries/ttn/issues/728)
 	}
 	return nil
@@ -705,6 +719,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, msg *ttnpb.UplinkMessa
 	logger := log.FromContext(ctx).WithField("dev_addr", pld.DevAddr)
 
 	var devs []*deviceregistry.Device
+
 	if err := ns.registry.Range(
 		&ttnpb.EndDevice{
 			Session: &ttnpb.Session{
@@ -730,8 +745,9 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, msg *ttnpb.UplinkMessa
 		},
 		0,
 		func(d *deviceregistry.Device) bool {
-			d.Session = d.GetSessionFallback()
-			d.EndDeviceIdentifiers.DevAddr = &d.Session.DevAddr
+			d.EndDeviceIdentifiers.DevAddr = &d.SessionFallback.DevAddr
+			d.Session = d.SessionFallback
+			d.SessionFallback = nil
 			devs = append(devs, d)
 			return true
 		},
@@ -743,6 +759,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, msg *ttnpb.UplinkMessa
 
 	type device struct {
 		*deviceregistry.Device
+
 		fCnt uint32
 		gap  uint32
 	}
@@ -750,35 +767,32 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, msg *ttnpb.UplinkMessa
 
 outer:
 	for _, dev := range devs {
-		dev.SessionFallback = nil
-
-		fCnt := pld.GetFCnt()
-		next := dev.GetSession().GetNextFCntUp()
+		fCnt := pld.FCnt
 
 		switch {
-		case dev.FCntIs16Bit, fCnt >= next:
-		case fCnt > next&0xffff:
-			fCnt |= next &^ 0xffff
-		case next < 0xffff<<16:
-			fCnt |= (next + 1<<16) &^ 0xffff
-		case !dev.FCntResets:
-			continue outer
+		case dev.FCntIs16Bit, fCnt >= dev.Session.NextFCntUp:
+		case fCnt > dev.Session.NextFCntUp&0xffff:
+			fCnt |= dev.Session.NextFCntUp &^ 0xffff
+		case dev.Session.NextFCntUp < 0xffff<<16:
+			fCnt |= (dev.Session.NextFCntUp + 1<<16) &^ 0xffff
 		}
 
-		var gap uint32
-		if dev.FCntResets {
-			gap = math.MaxUint32
-		} else {
-			gap = fCnt - next
+		gap := uint32(math.MaxUint32)
+		if !dev.FCntResets {
+			if dev.Session.NextFCntUp > fCnt {
+				continue outer
+			}
 
-			switch dev.GetLoRaWANVersion() {
+			gap = fCnt - dev.Session.NextFCntUp
+
+			switch dev.LoRaWANVersion {
 			case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-				fp, err := ns.Component.FrequencyPlans.GetByID(dev.GetFrequencyPlanID())
+				fp, err := ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)
 				if err != nil {
 					return nil, common.ErrCorruptRegistry.NewWithCause(nil, err)
 				}
 
-				band, err := band.GetByID(fp.GetBandID())
+				band, err := band.GetByID(fp.BandID)
 				if err != nil {
 					return nil, common.ErrCorruptRegistry.NewWithCause(nil, err)
 				}
@@ -791,37 +805,34 @@ outer:
 
 		matching = append(matching, device{
 			Device: dev,
-			fCnt:   fCnt,
 			gap:    gap,
+			fCnt:   fCnt,
 		})
-		if dev.FCntResets && fCnt != pld.GetFCnt() {
+		if dev.FCntResets && fCnt != pld.FCnt {
 			matching = append(matching, device{
 				Device: dev,
-				fCnt:   pld.GetFCnt(),
 				gap:    gap,
+				fCnt:   pld.FCnt,
 			})
 		}
 	}
+
 	sort.Slice(matching, func(i, j int) bool {
 		return matching[i].gap < matching[j].gap
 	})
 
 	if len(msg.RawPayload) < 4 {
-		logger.Debug("Payload specified is too short")
 		return nil, errors.New("Length of RawPayload must not be less than 4")
 	}
 	b := msg.RawPayload[:len(msg.RawPayload)-4]
 
 	for _, dev := range matching {
-		ses := dev.GetSession()
-
-		ke := ses.GetFNwkSIntKey()
-		if ke == nil || ke.Key.IsZero() {
+		if dev.Session.FNwkSIntKey == nil || dev.Session.FNwkSIntKey.Key.IsZero() {
 			return nil, common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingFNwkSIntKey.New(nil))
 		}
-		fNwkSIntKey := *ke.Key
+		fNwkSIntKey := *dev.Session.FNwkSIntKey.Key
 
-		if pld.GetAck() {
+		if pld.Ack {
 			if len(dev.RecentDownlinks) == 0 {
 				// Uplink acknowledges a downlink, but no downlink was sent by the device,
 				// hence it must be the wrong device.
@@ -833,19 +844,23 @@ outer:
 		var err error
 		switch dev.LoRaWANVersion {
 		case ttnpb.MAC_V1_1:
-			ke := ses.GetSNwkSIntKey()
-			if ke == nil || ke.Key.IsZero() {
+			if dev.Session.SNwkSIntKey == nil || dev.Session.SNwkSIntKey.Key.IsZero() {
 				return nil, common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingSNwkSIntKey.New(nil))
 			}
-			sNwkSIntKey := *ke.Key
+			sNwkSIntKey := *dev.Session.SNwkSIntKey.Key
 
 			var confFCnt uint32
-			if pld.GetAck() {
-				confFCnt = dev.GetRecentDownlinks()[len(dev.RecentDownlinks)-1].Payload.GetMACPayload().GetFCnt()
+			if pld.Ack {
+				for i := len(dev.RecentDownlinks) - 1; i > 0; i-- {
+					if ackPld := dev.RecentDownlinks[i].Payload.GetMACPayload(); ackPld != nil {
+						confFCnt = ackPld.FCnt
+						break
+					}
+				}
 			}
-			set := msg.GetSettings()
+			set := msg.Settings
 			computedMIC, err = crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey,
-				confFCnt, uint8(set.GetDataRateIndex()), uint8(set.GetChannelIndex()),
+				confFCnt, uint8(set.DataRateIndex), uint8(set.ChannelIndex),
 				pld.DevAddr, dev.fCnt, b)
 		case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
 			computedMIC, err = crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, pld.DevAddr, dev.fCnt, b)
@@ -855,17 +870,20 @@ outer:
 		if err != nil {
 			return nil, common.ErrComputeMIC.NewWithCause(nil, err)
 		}
-		if !bytes.Equal(msg.Payload.GetMIC(), computedMIC[:]) {
+		if !bytes.Equal(msg.Payload.MIC, computedMIC[:]) {
 			continue
 		}
+
 		if dev.fCnt == math.MaxUint32 {
 			return nil, common.ErrFCntTooHigh.New(nil)
 		}
-		ses.NextFCntUp = dev.fCnt + 1
+		dev.Session.NextFCntUp = dev.fCnt + 1
 		return dev.Device, nil
 	}
 	return nil, ErrDeviceNotFound.New(nil)
 }
+
+type MACHandler func(ctx context.Context, dev *ttnpb.EndDevice, pld []byte, msg *ttnpb.UplinkMessage) error
 
 func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
 	defer func() {
@@ -876,15 +894,66 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 
 	dev, err := ns.matchDevice(ctx, msg)
 	if err != nil {
-		return errors.NewWithCause(err, "Failed to match device")
+		return errors.NewWithCause(err, "failed to match device")
+	}
+	if dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		dev.SessionFallback = nil
 	}
 
+	go ns.scheduleApplicationDownlink(ctx, dev, msg, acc)
+
 	logger := log.FromContext(ctx).WithFields(log.Fields(
-		"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.GetApplicationID(),
-		"device_id", dev.EndDeviceIdentifiers.GetDeviceID(),
+		"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
+		"device_id", dev.EndDeviceIdentifiers.DeviceID,
 	))
 
-	go ns.scheduleApplicationDownlink(ctx, dev, msg, acc)
+	pld := msg.Payload.GetMACPayload()
+	if pld == nil {
+		return common.ErrInvalidArgument.NewWithCause(nil, errors.New("empty payload"))
+	}
+
+	mac := pld.FOpts
+	if len(mac) == 0 && pld.FPort == 0 {
+		mac = pld.FRMPayload
+	}
+
+	if len(mac) > 0 && (len(pld.FOpts) == 0 || dev.LoRaWANVersion.EncryptFOpts()) {
+		if dev.Session.NwkSEncKey == nil || dev.Session.NwkSEncKey.Key.IsZero() {
+			return common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingNwkSEncKey.New(nil))
+		}
+
+		mac, err = crypto.DecryptUplink(*dev.Session.NwkSEncKey.Key, *dev.EndDeviceIdentifiers.DevAddr, pld.FCnt, mac)
+		if err != nil {
+			return ErrDecryptionFailed.NewWithCause(nil, err)
+		}
+	}
+
+	var cmds ttnpb.MACCommands
+	if err := cmds.UnmarshalLoRaWAN(mac, true); err != nil {
+		return common.ErrUnmarshalPayloadFailed.NewWithCause(nil, err)
+	}
+
+	if dev.MACInfo == nil {
+		dev.MACInfo = &ttnpb.MACInfo{}
+	}
+	if dev.MACSettings == nil {
+		dev.MACSettings = &ttnpb.MACSettings{}
+	}
+	if dev.MACState == nil {
+		fp, err := ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)
+		if err != nil {
+			return err
+		}
+		band, err := band.GetByID(fp.BandID)
+		if err != nil {
+			return err
+		}
+
+		dev.MACState = newMACState(&band, fp.DwellTime != nil)
+		dev.MACState.MaxTxPower = uint32(dev.MaxTxPower)
+		dev.MACStateDesired = dev.MACState
+	}
+	dev.MACState.ADRDataRateIndex = msg.Settings.DataRateIndex
 
 	select {
 	case <-ctx.Done():
@@ -895,13 +964,13 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	msg.RxMetadata = acc.Accumulated()
 	events.Publish(evtMergeMetadata(ctx, dev.EndDeviceIdentifiers, len(msg.RxMetadata)))
 
-	ups := dev.GetRecentUplinks()
+	ups := dev.RecentUplinks
 	if len(ups) >= recentUplinkCount {
 		ups = ups[len(dev.RecentUplinks)-recentUplinkCount+1:]
 	}
 	dev.RecentUplinks = append(ups, msg)
 
-	if err := dev.Store("EndDeviceIdentifiers.DevAddr", "Session", "SessionFallback", "RecentUplinks"); err != nil {
+	if err := dev.Store("Session", "SessionFallback", "RecentUplinks", "MACInfo", "MACState", "MACStateDesired", "QueuedMACCommands"); err != nil {
 		logger.WithError(err).Error("Failed to update device")
 		return err
 	}
@@ -920,17 +989,16 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 
 	events.Publish(evtForwardData(ctx, dev.EndDeviceIdentifiers, nil))
 
-	pld := msg.Payload.GetMACPayload()
-	ses := dev.GetSession()
+	ses := dev.Session
 	return cl.Send(&ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-		SessionKeyID:         ses.GetSessionKeyID(),
+		SessionKeyID:         ses.SessionKeyID,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-			FCnt:           ses.GetNextFCntUp() - 1,
-			FPort:          pld.GetFPort(),
-			FRMPayload:     pld.GetFRMPayload(),
-			RxMetadata:     msg.GetRxMetadata(),
-			CorrelationIDs: msg.GetCorrelationIDs(),
+			FCnt:           ses.NextFCntUp - 1,
+			FPort:          pld.FPort,
+			FRMPayload:     pld.FRMPayload,
+			RxMetadata:     msg.RxMetadata,
+			CorrelationIDs: msg.CorrelationIDs,
 		}},
 	})
 }
@@ -971,32 +1039,30 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 	}
 
 	devAddr := ns.newDevAddr(dev.EndDevice)
-	for s := dev.GetSession(); s != nil && devAddr.Equal(s.DevAddr); {
+	for dev.Session != nil && devAddr.Equal(dev.Session.DevAddr) {
 		devAddr = ns.newDevAddr(dev.EndDevice)
 	}
 
-	fp, err := ns.FrequencyPlans.GetByID(dev.GetFrequencyPlanID())
+	fp, err := ns.FrequencyPlans.GetByID(dev.FrequencyPlanID)
 	if err != nil {
 		return common.ErrCorruptRegistry.NewWithCause(nil, err)
 	}
 
-	stDes := dev.GetMACStateDesired()
-
 	req := &ttnpb.JoinRequest{
-		RawPayload: msg.GetRawPayload(),
-		Payload:    msg.GetPayload(),
+		RawPayload: msg.RawPayload,
+		Payload:    msg.Payload,
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			DevEUI:  &pld.DevEUI,
 			JoinEUI: &pld.JoinEUI,
 			DevAddr: &devAddr,
 		},
 		NetID:              ns.NetID,
-		SelectedMacVersion: dev.GetLoRaWANVersion(),
-		RxDelay:            stDes.GetRxDelay(),
-		CFList:             frequencyplans.CFList(fp, dev.GetLoRaWANPHYVersion()),
+		SelectedMacVersion: dev.LoRaWANVersion,
+		RxDelay:            dev.MACStateDesired.RxDelay,
+		CFList:             frequencyplans.CFList(fp, dev.LoRaWANPHYVersion),
 		DownlinkSettings: ttnpb.DLSettings{
-			Rx1DROffset: stDes.GetRx1DataRateOffset(),
-			Rx2DR:       stDes.GetRx2DataRateIndex(),
+			Rx1DROffset: dev.MACStateDesired.Rx1DataRateOffset,
+			Rx2DR:       dev.MACStateDesired.Rx2DataRateIndex,
 		},
 	}
 
@@ -1009,7 +1075,9 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 			continue
 		}
 
-		dev.SessionFallback = nil
+		if dev.SessionFallback == nil {
+			dev.SessionFallback = dev.Session
+		}
 		dev.Session = &ttnpb.Session{
 			DevAddr:     devAddr,
 			SessionKeys: resp.SessionKeys,
@@ -1026,37 +1094,37 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		msg.RxMetadata = acc.Accumulated()
 		events.Publish(evtMergeMetadata(ctx, dev.EndDeviceIdentifiers, len(msg.RxMetadata)))
 
-		dev.RecentUplinks = append(dev.GetRecentUplinks(), msg)
+		dev.RecentUplinks = append(dev.RecentUplinks, msg)
 		if len(dev.RecentUplinks) > recentUplinkCount {
 			dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
 		}
 
-		band, err := band.GetByID(fp.GetBandID())
+		band, err := band.GetByID(fp.BandID)
 		if err != nil {
 			return common.ErrCorruptRegistry.NewWithCause(nil, err)
 		}
 
-		dev.MACState = &ttnpb.MACState{
-			MaxTxPower:        uint32(dev.MaxTxPower),
-			UplinkDwellTime:   fp.DwellTime != nil,
-			DownlinkDwellTime: false, // TODO: Get this from band (https://github.com/TheThingsIndustries/ttn/issues/774)
-			ADRNbTrans:        1,
-			ADRAckLimit:       uint32(band.ADRAckLimit),
-			ADRAckDelay:       uint32(band.ADRAckDelay),
-			DutyCycle:         ttnpb.DUTY_CYCLE_1,
-			RxDelay:           req.GetRxDelay(),
-			Rx1DataRateOffset: req.DownlinkSettings.GetRx1DROffset(),
-			Rx2DataRateIndex:  req.DownlinkSettings.GetRx2DR(),
-			Rx2Frequency:      uint64(band.DefaultRx2Parameters.Frequency),
-		}
+		dev.MACState = newMACState(&band, fp.DwellTime != nil)
+		dev.MACState.MaxTxPower = uint32(dev.MaxTxPower)
+		dev.MACState.RxDelay = req.RxDelay
+		dev.MACState.Rx1DataRateOffset = req.DownlinkSettings.Rx1DROffset
+		dev.MACState.Rx2DataRateIndex = req.DownlinkSettings.Rx2DR
+
 		dev.MACStateDesired = dev.MACState
 
-		if err := ns.scheduleDownlink(ctx, dev, msg, nil, resp.GetRawPayload(), true); err != nil {
+		if err := ns.scheduleDownlink(ctx, dev, msg, nil, resp.RawPayload, true); err != nil {
 			logger.WithError(err).Debug("Failed to schedule join accept")
 			return err
 		}
 
-		if err = dev.Store("EndDeviceIdentifiers.DevAddr", "Session", "SessionFallback", "RecentUplinks", "MACState", "MACStateDesired"); err != nil {
+		if err = dev.Store(
+			"EndDeviceIdentifiers.DevAddr",
+			"MACState",
+			"MACStateDesired",
+			"RecentUplinks",
+			"Session",
+			"SessionFallback",
+		); err != nil {
 			logger.WithError(err).Error("Failed to update device")
 			return err
 		}
@@ -1077,14 +1145,14 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 
 			err := cl.Send(&ttnpb.ApplicationUp{
 				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-				SessionKeyID:         dev.GetSession().GetSessionKeyID(),
+				SessionKeyID:         dev.Session.SessionKeyID,
 				Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-					AppSKey: resp.SessionKeys.GetAppSKey(),
+					AppSKey: resp.SessionKeys.AppSKey,
 				}},
 			})
 			if err != nil {
 				logger.WithField(
-					"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.GetApplicationID(),
+					"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
 				).WithError(err).Errorf("Failed to send Join Accept to AS")
 			}
 		}()
@@ -1111,7 +1179,7 @@ func (ns *NetworkServer) handleRejoin(ctx context.Context, msg *ttnpb.UplinkMess
 // HandleUplink is called by the Gateway Server when an uplink message arrives.
 func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*pbtypes.Empty, error) {
 	ctx = events.ContextWithCorrelationID(ctx, append(
-		msg.GetCorrelationIDs(),
+		msg.CorrelationIDs,
 		fmt.Sprintf("ns:uplink:%s", events.NewCorrelationID()),
 	)...)
 	msg.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
@@ -1120,18 +1188,15 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 
 	logger := log.FromContext(ctx)
 
-	b := msg.GetRawPayload()
-
-	pld := msg.GetPayload()
-	if pld.Payload == nil {
-		if err := msg.Payload.UnmarshalLoRaWAN(b); err != nil {
+	if msg.Payload.Payload == nil {
+		if err := msg.Payload.UnmarshalLoRaWAN(msg.RawPayload); err != nil {
 			return nil, common.ErrUnmarshalPayloadFailed.NewWithCause(nil, err)
 		}
 	}
 
-	if pld.GetMajor() != ttnpb.Major_LORAWAN_R1 {
+	if msg.Payload.Major != ttnpb.Major_LORAWAN_R1 {
 		return nil, common.ErrUnsupportedLoRaWANVersion.New(errors.Attributes{
-			"version": pld.GetMajor(),
+			"version": msg.Payload.Major,
 		})
 	}
 
@@ -1143,7 +1208,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	}
 	events.Publish(evtReceiveUp(ctx, msg.EndDeviceIdentifiers, nil))
 
-	switch pld.GetMType() {
+	switch msg.Payload.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		return ttnpb.Empty, ns.handleUplink(ctx, msg, acc)
 	case ttnpb.MType_JOIN_REQUEST:
