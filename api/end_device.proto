@@ -252,6 +252,8 @@ message MACState {
   uint64 ping_slot_frequency = 21;
   // Data rate index of the class B ping slot
   uint32 ping_slot_data_rate_index = 22;
+  // Time when the last confirmed downlink message or MAC command was scheduled
+  google.protobuf.Timestamp last_confirmed_downlink = 23 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
 }
 
 // MAC information sent by the device
