@@ -132,5 +132,29 @@ func (d Definition) WithAttributes(kv ...interface{}) Error {
 // Attributes of the error.
 func (e Error) Attributes() map[string]interface{} { return e.attributes }
 
+// PublicAttributes of the error.
+func (e Error) PublicAttributes() map[string]interface{} {
+	if len(e.attributes) == 0 {
+		return nil
+	}
+	publicAttributes := make(map[string]interface{}, len(e.attributes))
+nextAttr:
+	for k, v := range e.attributes {
+		for _, public := range e.publicAttributes {
+			if k == public {
+				publicAttributes[k] = v
+				continue nextAttr
+			}
+		}
+	}
+	if len(publicAttributes) == 0 {
+		return nil
+	}
+	return publicAttributes
+}
+
 // Attributes are not present in the error definition, so this just returns nil.
 func (d Definition) Attributes() map[string]interface{} { return nil }
+
+// PublicAttributes are not present in the error definition, so this just returns nil.
+func (d Definition) PublicAttributes() map[string]interface{} { return nil }

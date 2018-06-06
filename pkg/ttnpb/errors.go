@@ -31,7 +31,7 @@ type errorDetails struct {
 func (e errorDetails) Namespace() string     { return e.GetNamespace() }
 func (e errorDetails) Name() string          { return e.GetName() }
 func (e errorDetails) MessageFormat() string { return e.GetMessageFormat() }
-func (e errorDetails) Attributes() map[string]interface{} {
+func (e errorDetails) PublicAttributes() map[string]interface{} {
 	attributes, aErr := gogoproto.Map(e.GetAttributes())
 	if aErr != nil {
 		// TODO: this should probably panic
@@ -44,7 +44,7 @@ func (e errorDetails) CorrelationID() string { return e.GetCorrelationID() }
 
 func init() {
 	errorsv3.ErrorDetailsToProto = func(e errorsv3.ErrorDetails) proto.Message {
-		attributes, err := gogoproto.Struct(e.Attributes())
+		attributes, err := gogoproto.Struct(e.PublicAttributes())
 		if err != nil {
 			// TODO: this should probably panic
 		}

@@ -25,9 +25,10 @@ import (
 func TestGRPCConversion(t *testing.T) {
 	a := assertions.New(t)
 
-	errDef := errors.Define("test_grpc_conversion_err_def", "gRPC Conversion Error")
+	errDef := errors.Define("test_grpc_conversion_err_def", "gRPC Conversion Error", "foo")
 	a.So(errors.FromGRPCStatus(errDef.GRPCStatus()).Definition, errors.ShouldEqual, errDef)
 
-	errHello := errors.New("hello world").WithAttributes("foo", "bar")
-	a.So(errors.FromGRPCStatus(errHello.GRPCStatus()), errors.ShouldEqual, errHello)
+	errHello := errDef.WithAttributes("foo", "bar", "baz", "qux")
+	errHelloExpected := errDef.WithAttributes("foo", "bar")
+	a.So(errors.FromGRPCStatus(errHello.GRPCStatus()), errors.ShouldEqual, errHelloExpected)
 }

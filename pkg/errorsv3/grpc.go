@@ -25,7 +25,7 @@ type ErrorDetails interface {
 	Namespace() string
 	Name() string
 	MessageFormat() string
-	Attributes() map[string]interface{}
+	PublicAttributes() map[string]interface{}
 	CorrelationID() string
 }
 
@@ -61,7 +61,7 @@ func FromGRPCStatus(status *status.Status) Error {
 			if messageFormat := details.MessageFormat(); messageFormat != "" {
 				err.messageFormat = messageFormat
 			}
-			if attributes := details.Attributes(); len(attributes) != 0 {
+			if attributes := details.PublicAttributes(); len(attributes) != 0 {
 				err.attributes = attributes
 			}
 			if correlationID := details.CorrelationID(); correlationID != "" {
