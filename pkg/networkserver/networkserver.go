@@ -182,6 +182,8 @@ type NetworkServer struct {
 	collectionDone    WindowEndFunc
 
 	gsClient NsGsClientFunc
+
+	macHandlers *sync.Map // ttnpb.MACCommandIdentifier -> MACHandler
 }
 
 // Option configures the NetworkServer.
@@ -211,6 +213,22 @@ func WithNsGsClientFunc(fn NsGsClientFunc) Option {
 	}
 }
 
+// WithMACHandler registers a MACHandler for specified CID in 0x80-0xFF range.
+// WithMACHandler panics if a MACHandler for the CID is already registered, or if
+// the CID is out of range.
+func WithMACHandler(cid ttnpb.MACCommandIdentifier, fn MACHandler) Option {
+	return func(ns *NetworkServer) {
+		if cid < 0x80 || cid > 0xFF {
+			panic(errors.Errorf("CID must be in range from 0x80 to 0xFF, got %X", cid))
+		}
+
+		_, ok := ns.macHandlers.LoadOrStore(cid, fn)
+		if ok {
+			panic(errors.Errorf("A handler for CID %X is already registered", cid))
+		}
+	}
+}
+
 // New returns new NetworkServer.
 func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, error) {
 	ns := &NetworkServer{
@@ -222,6 +240,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		metadataAccumulators:    &sync.Map{},
 		metadataAccumulatorPool: &sync.Pool{},
 		hashPool:                &sync.Pool{},
+		macHandlers:             &sync.Map{},
 	}
 	ns.hashPool.New = func() interface{} {
 		return fnv.New64a()
@@ -989,11 +1008,70 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	msg.RxMetadata = acc.Accumulated()
 	events.Publish(evtMergeMetadata(ctx, dev.EndDeviceIdentifiers, len(msg.RxMetadata)))
 
-	ups := dev.RecentUplinks
-	if len(ups) >= recentUplinkCount {
-		ups = ups[len(dev.RecentUplinks)-recentUplinkCount+1:]
+outer:
+	for _, cmd := range cmds {
+		switch cid := cmd.CID(); cid {
+		case ttnpb.CID_RESET:
+			fp, err := ns.Component.FrequencyPlans.GetByID(dev.GetFrequencyPlanID())
+			if err != nil {
+				return common.ErrCorruptRegistry.NewWithCause(nil, err)
+			}
+			err = handleResetInd(ctx, dev.EndDevice, cmd.GetResetInd(), &fp)
+		case ttnpb.CID_LINK_CHECK:
+			err = handleLinkCheckReq(ctx, dev.EndDevice, msg)
+		case ttnpb.CID_LINK_ADR:
+			err = handleLinkADRAns(ctx, dev.EndDevice, cmd.GetLinkADRAns())
+		case ttnpb.CID_DUTY_CYCLE:
+			err = handleDutyCycleAns(ctx, dev.EndDevice)
+		case ttnpb.CID_RX_PARAM_SETUP:
+			err = handleRxParamSetupAns(ctx, dev.EndDevice, cmd.GetRxParamSetupAns())
+		case ttnpb.CID_DEV_STATUS:
+			err = handleDevStatusAns(ctx, dev.EndDevice, cmd.GetDevStatusAns())
+		case ttnpb.CID_NEW_CHANNEL:
+			err = handleNewChannelAns(ctx, dev.EndDevice, cmd.GetNewChannelAns())
+		case ttnpb.CID_RX_TIMING_SETUP:
+			err = handleRxTimingSetupAns(ctx, dev.EndDevice)
+		case ttnpb.CID_TX_PARAM_SETUP:
+			err = handleTxParamSetupAns(ctx, dev.EndDevice)
+		case ttnpb.CID_DL_CHANNEL:
+			err = handleDLChannelAns(ctx, dev.EndDevice, cmd.GetDlChannelAns())
+		case ttnpb.CID_REKEY:
+			err = handleRekeyInd(ctx, dev.EndDevice, cmd.GetRekeyInd())
+		case ttnpb.CID_ADR_PARAM_SETUP:
+			err = handleADRParamSetupAns(ctx, dev.EndDevice)
+		case ttnpb.CID_DEVICE_TIME:
+			err = handleDeviceTimeReq(ctx, dev.EndDevice, msg)
+		case ttnpb.CID_FORCE_REJOIN:
+			// TODO: Implement (https://github.com/TheThingsIndustries/ttn/issues/292)
+		case ttnpb.CID_REJOIN_PARAM_SETUP:
+			// TODO: Implement (https://github.com/TheThingsIndustries/ttn/issues/292)
+		case ttnpb.CID_PING_SLOT_INFO:
+			// TODO: Implement (https://github.com/TheThingsIndustries/ttn/issues/292)
+		case ttnpb.CID_PING_SLOT_CHANNEL:
+			// TODO: Implement (https://github.com/TheThingsIndustries/ttn/issues/292)
+		case ttnpb.CID_BEACON_TIMING:
+			// TODO: Implement (https://github.com/TheThingsIndustries/ttn/issues/292)
+		case ttnpb.CID_BEACON_FREQ:
+			// TODO: Implement (https://github.com/TheThingsIndustries/ttn/issues/292)
+		case ttnpb.CID_DEVICE_MODE:
+			// TODO: Implement (https://github.com/TheThingsIndustries/ttn/issues/292)
+		default:
+			h, ok := ns.macHandlers.Load(cid)
+			if !ok {
+				logger.WithField("cid", cmd.CID()).Warn("Unknown MAC command received, skipping the rest...")
+				break outer
+			}
+			err = h.(MACHandler)(ctx, dev.EndDevice, cmd.GetProprietary().GetRawPayload(), msg)
+		}
+		if err != nil {
+			logger.WithField("cid", cmd.CID()).WithError(err).Warn("Failed to process MAC command")
+		}
 	}
-	dev.RecentUplinks = append(ups, msg)
+
+	if len(dev.RecentUplinks) >= recentUplinkCount {
+		dev.RecentUplinks = dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount+1:]
+	}
+	dev.RecentUplinks = append(dev.RecentUplinks, msg)
 
 	if err := dev.Store(
 		"MACInfo",
