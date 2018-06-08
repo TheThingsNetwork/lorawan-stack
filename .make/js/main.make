@@ -103,5 +103,6 @@ js.list-staged:
 
 include .make/js/build.make
 include .make/js/quality.make
+include .make/js/storybook.make
 
 # vim: ft=make
