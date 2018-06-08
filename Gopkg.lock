@@ -32,6 +32,12 @@
   revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
 
 [[projects]]
+  name = "github.com/blang/semver"
+  packages = ["."]
+  revision = "2ee87856327ba09384cabd113bc6b5d174e9ec0f"
+  version = "v3.5.1"
+
+[[projects]]
   name = "github.com/certifi/gocertifi"
   packages = ["."]
   revision = "deb3ae2ef2610fde3330947281941c562861188b"
@@ -412,6 +418,7 @@
   version = "v3.4.1"
 
 [[projects]]
+  branch = "master"
   name = "github.com/smartystreets/assertions"
   packages = [
     ".",
@@ -419,8 +426,7 @@
     "internal/oglematchers",
     "should"
   ]
-  revision = "7678a5452ebea5b7090a6b163f844c133f523da2"
-  version = "1.8.3"
+  revision = "eb5b59917fa21f01252cee37e84631c7fb502d82"
 
 [[projects]]
   name = "github.com/soheilhy/cmux"
@@ -444,10 +450,10 @@
   version = "v1.2.0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/spf13/cobra"
   packages = ["."]
-  revision = "ef82de70bb3f60c65fb8eebacbb2d122ef517385"
-  version = "v0.0.3"
+  revision = "1e58aa3361fd650121dceeedc399e7189c05674a"
 
 [[projects]]
   branch = "master"
@@ -456,10 +462,10 @@
   revision = "7c0cea34c8ece3fbeb2b27ab9b59511d360fb394"
 
 [[projects]]
+  branch = "master"
   name = "github.com/spf13/pflag"
   packages = ["."]
-  revision = "583c0c0531f06d5278b7d917446061adc344b5cd"
-  version = "v1.0.1"
+  revision = "3ebe029320b2676d667ae88da602a5f854788a8a"
 
 [[projects]]
   branch = "master"
@@ -587,7 +593,8 @@
   name = "google.golang.org/genproto"
   packages = [
     "googleapis/api/annotations",
-    "googleapis/rpc/status"
+    "googleapis/rpc/status",
+    "protobuf/field_mask"
   ]
   revision = "7bb2a897381c9c5ab2aeb8614f758d7766af68ff"
 
@@ -646,6 +653,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "fb9b4dbad0c6adc7cefbaba13a5ed488d6b75995dbb7c053bb0719957a9d8fc2"
+  inputs-digest = "f7975ba3201ad2f70c5cfe1c839c26e5937dcc42fdfd9cce1d8a81b67658d8a5"
   solver-name = "gps-cdcl"
   solver-version = 1

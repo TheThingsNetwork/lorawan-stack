@@ -97,14 +97,14 @@ func checkMIC(key types.AES128Key, rawPayload []byte) error {
 }
 
 // HandleJoin is called by the Network Server to join a device
-func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (resp *ttnpb.JoinResponse, err error) {
+func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
 	logger := log.FromContext(ctx)
 
 	ver := req.GetSelectedMacVersion()
 
 	supported := false
 	for _, v := range supportedMACVersions {
-		if v == ver {
+		if ver == v {
 			supported = true
 			break
 		}
@@ -119,6 +119,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		return nil, common.ErrMissingDevAddr.New(nil)
 	}
 	devAddr := *req.EndDeviceIdentifiers.DevAddr
+
+	var err error
 
 	rawPayload := req.GetRawPayload()
 	if req.Payload.GetPayload() == nil {
@@ -192,7 +194,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 
 	// Registered version is lower than selected.
-	if dev.LoRaWANVersion.Compare(ver) == -1 {
+	if dev.GetLoRaWANVersion().Compare(ver) == -1 {
 		return nil, ErrMACVersionMismatch.New(errors.Attributes{
 			"registered": dev.GetLoRaWANVersion(),
 			"selected":   ver,
@@ -262,6 +264,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		}
 	}
 
+	var resp *ttnpb.JoinResponse
 	switch ver {
 	case ttnpb.MAC_V1_1:
 		ke := dev.GetRootKeys().GetNwkKey()
