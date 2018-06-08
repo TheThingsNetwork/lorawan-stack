@@ -40,6 +40,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"google.golang.org/grpc"
@@ -215,6 +216,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		ns.gsClient = NewGatewayServerPeerGetterFunc(ns.Component)
 	}
 
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GsNs", cluster.HookName, c.UnaryHook())
+	hooks.RegisterStreamHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.StreamHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsApplicationDownlinkQueue", cluster.HookName, c.UnaryHook())
+
 	c.RegisterGRPC(ns)
 	return ns, nil
 }
@@ -267,7 +272,6 @@ func (ns *NetworkServer) LinkApplication(id *ttnpb.ApplicationIdentifiers, strea
 
 // DownlinkQueueReplace is called by the Application Server to completely replace the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
-	// TODO: authentication https://github.com/TheThingsIndustries/ttn/issues/558
 	dev, err := deviceregistry.FindByIdentifiers(ns.registry, &req.EndDeviceIdentifiers)
 	if err != nil {
 		return nil, err
@@ -286,7 +290,6 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 
 // DownlinkQueuePush is called by the Application Server to push a downlink to queue for a device.
 func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
-	// TODO: Authentication https://github.com/TheThingsIndustries/ttn/issues/558
 	dev, err := deviceregistry.FindByIdentifiers(ns.registry, &req.EndDeviceIdentifiers)
 	if err != nil {
 		return nil, err
@@ -305,7 +308,6 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 
 // DownlinkQueueList is called by the Application Server to get the current state of the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
-	// TODO: Authentication https://github.com/TheThingsIndustries/ttn/issues/558
 	dev, err := deviceregistry.FindByIdentifiers(ns.registry, devID)
 	if err != nil {
 		return nil, err
@@ -315,7 +317,6 @@ func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, devID *ttnpb.End
 
 // DownlinkQueueClear is called by the Application Server to clear the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueClear(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
-	// TODO: Authentication https://github.com/TheThingsIndustries/ttn/issues/558
 	dev, err := deviceregistry.FindByIdentifiers(ns.registry, devID)
 	if err != nil {
 		return nil, err
@@ -588,7 +589,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 				Timestamp:          md.GetTimestamp() + uint64(s.Delay),
 			}
 
-			_, err = cl.ScheduleDownlink(ctx, msg)
+			_, err = cl.ScheduleDownlink(ctx, msg, ns.ClusterAuth())
 			if err != nil {
 				errs = append(errs, err)
 				continue
@@ -981,7 +982,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 
 	var errs []error
 	for _, js := range ns.joinServers {
-		resp, err := js.HandleJoin(ctx, req)
+		resp, err := js.HandleJoin(ctx, req, ns.ClusterAuth())
 		if err != nil {
 			errs = append(errs, err)
 			continue

@@ -16,6 +16,7 @@ package networkserver_test
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"math/rand"
 	"sync"
@@ -40,6 +41,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 var (
@@ -53,7 +55,15 @@ var (
 	DuplicateCount = 6
 	DeviceCount    = 100
 	Timeout        = (2 << 10) * test.Delay
+
+	Keys = []string{"AEAEAEAEAEAEAEAEAEAEAEAEAEAEAEAE"}
 )
+
+func contextWithKey() context.Context {
+	return metadata.NewIncomingContext(context.Background(), metadata.MD{
+		"authorization": []string{fmt.Sprintf("Basic %s", Keys[0])},
+	})
+}
 
 func metadataLdiff(l pretty.Logfer, xs, ys []*ttnpb.RxMetadata) {
 	if len(xs) != len(ys) {
@@ -388,7 +398,9 @@ func TestLinkApplication(t *testing.T) {
 	a := assertions.New(t)
 	reg := deviceregistry.New(store.NewTypedMapStoreClient(mapstore.New()))
 	ns := test.Must(New(
-		component.MustNew(test.GetLogger(t), &component.Config{}),
+		component.MustNew(test.GetLogger(t), &component.Config{
+			ServiceBase: config.ServiceBase{Cluster: config.Cluster{Keys: Keys}},
+		}),
 		&Config{
 			Registry:            reg,
 			JoinServers:         nil,
@@ -412,7 +424,7 @@ func TestLinkApplication(t *testing.T) {
 			MockServerStream: &test.MockServerStream{
 				MockStream: &test.MockStream{
 					ContextFunc: func() context.Context {
-						ctx, cancel := context.WithCancel(context.Background())
+						ctx, cancel := context.WithCancel(contextWithKey())
 						time.AfterFunc(test.Delay, cancel)
 						return ctx
 					},
@@ -427,7 +439,7 @@ func TestLinkApplication(t *testing.T) {
 	err := ns.LinkApplication(id, &MockAsNsLinkApplicationStream{
 		MockServerStream: &test.MockServerStream{
 			MockStream: &test.MockStream{
-				ContextFunc: context.Background,
+				ContextFunc: contextWithKey,
 			},
 		},
 		SendFunc: sendFunc,
