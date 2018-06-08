@@ -1,11 +1,16 @@
+
 {
-  "name": "ttn-lw-stack",
+  "name": "ttn-stack",
   "version": "3.0.0-pre",
   "description": "The Thing Network Stack",
   "main": "index.js",
-  "repository": "https://github.com/TheThingsNetwork/lorawan-stack.git",
+  "repository": "https://github.com/TheThingsNetwork/ttn.git",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@storybook/addon-actions": "^3.2.12",
+    "@storybook/addon-console": "^1.0.0",
+    "@storybook/addon-links": "^3.2.10",
+    "@storybook/react": "^3.2.16",
     "add-asset-html-webpack-plugin": "^2.1.2",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
@@ -34,16 +39,17 @@
     "file-loader": "^0.11.2",
     "html-webpack-plugin": "^2.30.1",
     "jest": "^21.2.1",
+    "js-yaml": "^3.10.0",
     "json": "^9.0.6",
     "json-loader": "^0.5.7",
     "messageformat-parser": "^2.0.0",
     "node-localstorage": "^1.3.0",
     "nsp": "^3.1.0",
-    "react-redux": "^5.0.6",
     "react-test-renderer": "^16.0.0",
     "style-loader": "^0.18.2",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
+    "tcomb": "^3.2.24",
     "webpack": "^3.6.0",
     "webpack-subresource-integrity": "^1.0.1",
     "xlsx-style": "^0.8.13"
@@ -80,13 +86,34 @@
   },
   "dependencies": {
     "autobind-decorator": "^2.1.0",
+    "babel-polyfill": "^6.26.0",
+    "cancelable-promise": "^2.4.0",
+    "classnames": "^2.2.5",
+    "event-emitter": "^0.3.5",
+    "history": "^4.7.2",
     "immutable": "^3.8.2",
+    "intl": "^1.2.5",
+    "prop-types": "^15.6.0",
+    "query-string": "^5.0.1",
     "react": "^16.2.0",
-    "react-router-redux": "^4.0.8",
+    "react-display-name": "^0.2.3",
+    "react-dom": "^16.0.0",
+    "react-intl": "^2.4.0",
+    "react-redux": "^5.0.6",
+    "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2",
+    "react-router-redux": "5.0.0-alpha.6",
+    "react-select": "^1.0.0-rc.10",
+    "react-side-effect": "^1.1.3",
+    "react-text-mask": "^5.0.2",
+    "react-transition-group": "^2.2.1",
     "redux": "^3.7.2",
+    "redux-create-reducer": "^1.1.1",
     "redux-form": "^7.2.1",
     "redux-saga": "^0.16.0",
-    "ulid": "^2.3.0"
+    "sockjs-client": "^1.1.4",
+    "ulid": "^2.3.0",
+    "whatwg-fetch": "^2.0.3"
   },
   "jest": {
     "testMatch": [
@@ -97,5 +124,8 @@
       "\\.(css|styl|less|sass)$": "<rootDir>/config/jest/styles.transform.js",
       "\\.(jpg|jpeg|svg|png|woff|woff2|ttf|eot|gif|webp)$": "<rootDir>/config/jest/files.transform.js"
     }
+  },
+  "eslintConfig": {
+    "extends": "ttn"
   }
 }
