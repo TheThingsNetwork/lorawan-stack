@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+JSON=./node_modules/.bin/json
 CURRENT_VERSION ?= $(GIT_TAG)
 
 pkg/version/ttn.go: VERSION ?= $(CURRENT_VERSION)
@@ -44,7 +45,8 @@ version.bump: version._override pkg/version/ttn.go
 		$(err) "Working tree not clean"; \
 		exit 1; \
 	fi
-	git add pkg/version/ttn.go
+	$(JSON) -f package.json -I -e "this.version=\"$(VERSION)\""
+	git add pkg/version/ttn.go package.json
 	git commit -m "all: Bump version to $(VERSION)"
 	git tag -a -s -f -m "Version $(VERSION)" "v$(VERSION)"
 	@$(log) "Bumped to v$(VERSION)"

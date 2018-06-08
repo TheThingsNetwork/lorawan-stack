@@ -17,7 +17,9 @@ HEADER_EXTRA_FILES = Makefile
 PRE_COMMIT = headers.check-staged js.lint-staged
 COMMIT_MSG = git.commit-msg-log git.commit-msg-length git.commit-msg-empty git.commit-msg-prefix git.commit-msg-phrase git.commit-msg-casing
 
-SUPPORT_LOCALES = en
+PORT ?= 1900
+
+SUPPORT_LOCALES = en,ja,ru,nl
 
 include .make/log.make
 include .make/general.make
@@ -29,10 +31,6 @@ include .make/protos/main.make
 include .make/js/main.make
 include .make/dev.make
 include .make/styl/main.make
-
-assets: js.build
-	@$(log) "building assets package"
-	@go-bindata-assetfs -pkg assets -o "./pkg/assets/bindata.go" -ignore libs.bundle.js $(PUBLIC_DIR)
 
 ci.encrypt-variables:
 	keybase encrypt -b -i ci/variables.yml -o ci/variables.yml.encrypted johanstokking htdvisser ericgo
@@ -93,6 +91,23 @@ build-all-platforms:
 	GOOS=darwin GOARCH=amd64 make build-all
 	GOOS=windows GOARCH=amd64 make build-all
 	GOOS=windows GOARCH=386 make build-all
+
+assets: js.build
+	@$(log) "building assets package"
+	@mkdir -p pkg/assets
+	@go-bindata-assetfs -pkg assets -ignore libs.bundle.js $(PUBLIC_DIR)
+	@mv bindata_assetfs.go pkg/webui/assets
+
+webui: MAIN=./cmd/webui/main.go
+webui: NAME=ttn-webui
+webui: js.build
+webui: $(RELEASE_DIR)/ttn-webui-$(GOOS)-$(GOARCH)
+webui: go.link
+
+webui.dev: go.dev webui
+
+webui.start: webui.dev
+	./release/ttn-webui --http.listen=:$(PORT) --assets.dir=public --webui.path=/webui --log.level=debug
 
 UPDATES_FILES = $(GO_MESSAGES_FILE),messages.xlsx
 
