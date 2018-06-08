@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
@@ -28,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"golang.org/x/net/context"
@@ -72,6 +74,8 @@ func New(c *component.Component, conf *Config, rpcOptions ...deviceregistry.RPCO
 		registry:    conf.Registry,
 		euiPrefixes: conf.JoinEUIPrefixes,
 	}
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", cluster.HookName, c.UnaryHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", cluster.HookName, c.UnaryHook())
 	c.RegisterGRPC(js)
 	return js, nil
 }
