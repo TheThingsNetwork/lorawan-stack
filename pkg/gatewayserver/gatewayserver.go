@@ -22,6 +22,7 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
@@ -75,6 +76,7 @@ func New(c *component.Component, conf Config) (gs *GatewayServer, err error) {
 		return nil, err
 	}
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Gs/GetGatewayObservations", rights.HookName, rightsHook.UnaryHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.UnaryHook())
 
 	c.RegisterGRPC(gs)
 	return gs, nil
