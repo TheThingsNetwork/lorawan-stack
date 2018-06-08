@@ -40,18 +40,18 @@ func TestVerifySource(t *testing.T) {
 	t.Run("empty secret", func(t *testing.T) {
 		a := assertions.New(t)
 
-		ctx := c.verifySource(ctx)
-		a.So(Identified(ctx), should.BeFalse)
+		validAuth := c.VerifySource(ctx)
+		a.So(validAuth, should.BeFalse)
 	})
 
 	t.Run("valid secret", func(t *testing.T) {
 		a := assertions.New(t)
 
-		md := metadata.Pairs("authorization", fmt.Sprintf("Basic %s", hex.EncodeToString(key)))
+		md := metadata.Pairs("authorization", fmt.Sprintf("ClusterKey %s", hex.EncodeToString(key)))
 		ctx := metadata.NewIncomingContext(ctx, md)
 
-		ctx = c.verifySource(ctx)
-		a.So(Identified(ctx), should.BeTrue)
+		validAuth := c.VerifySource(ctx)
+		a.So(validAuth, should.BeTrue)
 	})
 
 	t.Run("invalid secret", func(t *testing.T) {
@@ -60,7 +60,7 @@ func TestVerifySource(t *testing.T) {
 		md := metadata.Pairs("authorization", "Basic invalid-secret")
 		ctx := metadata.NewIncomingContext(ctx, md)
 
-		ctx = c.verifySource(ctx)
-		a.So(Identified(ctx), should.BeFalse)
+		validAuth := c.VerifySource(ctx)
+		a.So(validAuth, should.BeFalse)
 	})
 }

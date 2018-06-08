@@ -21,6 +21,7 @@ import (
 
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
@@ -105,7 +106,29 @@ func (c *Component) ClusterAuth() grpc.CallOption {
 	return c.cluster.Auth()
 }
 
-// ClusterHook returns the hook that loads in the context whether the caller of an RPC is part of the cluster.
-func (c *Component) ClusterHook() hooks.UnaryHandlerMiddleware {
-	return c.cluster.Hook()
+// UnaryHook ensuring the caller of an RPC is part of the cluster.
+// If a call can't be identified as coming from the cluster, it will be discarded.
+func (c *Component) UnaryHook() hooks.UnaryHandlerMiddleware {
+	return func(next grpc.UnaryHandler) grpc.UnaryHandler {
+		return func(ctx context.Context, req interface{}) (interface{}, error) {
+			validAuth := c.cluster.VerifySource(ctx)
+			if !validAuth {
+				return nil, common.ErrUnauthorized.New(nil)
+			}
+			return next(ctx, req)
+		}
+	}
+}
+
+// StreamHook ensuring the caller of an RPC is part of the cluster.
+// If a call can't be identified as coming from the cluster, it will be discarded.
+func (c *Component) StreamHook() hooks.StreamHandlerMiddleware {
+	return func(hdl grpc.StreamHandler) grpc.StreamHandler {
+		return func(srv interface{}, stream grpc.ServerStream) error {
+			if validAuth := c.cluster.VerifySource(stream.Context()); !validAuth {
+				return common.ErrUnauthorized.New(nil)
+			}
+			return hdl(srv, stream)
+		}
+	}
 }

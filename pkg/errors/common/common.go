@@ -48,6 +48,12 @@ var (
 		Type:          errors.PermissionDenied,
 		Code:          5,
 	}
+	// ErrUnauthorized is returned when a request has not been authorized to access a protected resource.
+	ErrUnauthorized = &errors.ErrDescriptor{
+		MessageFormat: "Unauthorized to perform this operation",
+		Type:          errors.Unauthorized,
+		Code:          16,
+	}
 )
 
 func init() {
@@ -56,4 +62,5 @@ func init() {
 	ErrUnmarshalPayloadFailed.Register()
 	ErrCorruptRegistry.Register()
 	ErrPermissionDenied.Register()
+	ErrUnauthorized.Register()
 }

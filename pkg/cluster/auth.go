@@ -20,56 +20,39 @@ import (
 	"encoding/hex"
 
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
-	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"google.golang.org/grpc"
 )
 
-type clusterPresence struct{}
-
 var (
-	clusterPresenceKey = clusterPresence{}
 	// HookName is the name of the hook used to verify the identity of incoming calls within a cluster.
 	HookName = "cluster-hook"
+	// AuthType used to identify components.
+	AuthType = "ClusterKey"
 )
 
-func (c *cluster) verifySource(ctx context.Context) context.Context {
+func (c *cluster) VerifySource(ctx context.Context) bool {
 	md := rpcmetadata.FromIncomingContext(ctx)
-	if md.AuthType != "Basic" {
-		return context.WithValue(ctx, clusterPresenceKey, false)
+	if md.AuthType != AuthType {
+		return false
 	}
 	key, err := hex.DecodeString(md.AuthValue)
 	if err != nil {
-		return context.WithValue(ctx, clusterPresenceKey, false)
+		return false
 	}
 	for _, acceptedKey := range c.keys {
 		if subtle.ConstantTimeCompare(acceptedKey, key) == 1 {
-			return context.WithValue(ctx, clusterPresenceKey, true)
+			return true
 		}
 	}
-	return context.WithValue(ctx, clusterPresenceKey, false)
-}
-
-func (c *cluster) Hook() hooks.UnaryHandlerMiddleware {
-	return func(next grpc.UnaryHandler) grpc.UnaryHandler {
-		return func(ctx context.Context, req interface{}) (interface{}, error) {
-			return next(c.verifySource(ctx), req)
-		}
-	}
-}
-
-// Identified returns true if the caller has been identified as a component from the cluster.
-//
-// Using Identified requires the hook of the cluster to have been registered.
-func Identified(ctx context.Context) bool {
-	ok, _ := ctx.Value(clusterPresenceKey).(bool)
-	return ok
+	return false
 }
 
 func (c *cluster) Auth() grpc.CallOption {
 	md := rpcmetadata.MD{
-		ID:        c.self.name,
-		AuthType:  "Basic",
-		AuthValue: hex.EncodeToString(c.keys[0]),
+		ID:            c.self.name,
+		AuthType:      AuthType,
+		AuthValue:     hex.EncodeToString(c.keys[0]),
+		AllowInsecure: !c.tls,
 	}
 	return grpc.PerRPCCredentials(md)
 }

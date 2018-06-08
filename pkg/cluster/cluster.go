@@ -26,7 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/rpcclient"
-	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
@@ -52,8 +51,8 @@ type Cluster interface {
 	GetPeer(role ttnpb.PeerInfo_Role, tags []string, shardKey []byte) Peer
 	// Auth returns a gRPC CallOption that can be used to identify the component within the cluster.
 	Auth() grpc.CallOption
-	// Hook returns a hook that stores in RPC contexts whether the call was made from an identified component of the cluster.
-	Hook() hooks.UnaryHandlerMiddleware
+	// VerifySource verifies if the caller providing this context is a component from the cluster.
+	VerifySource(context.Context) bool
 }
 
 // CustomNew allows you to replace the clustering implementation. New will call CustomNew if not nil.
