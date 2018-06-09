@@ -21,17 +21,15 @@ import (
 func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	out := &EndDevice{}
 	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, easy)
-	if r.Intn(10) != 0 {
-		out.RootKeys = NewPopulatedRootKeys(r, easy)
-	}
+	out.RootKeys = NewPopulatedRootKeys(r, easy)
 	out.NextDevNonce = r.Uint32()
-	out.UsedDevNonces = make([]uint32, 1+r.Intn(10))
-	for i := 0; i < len(out.UsedDevNonces); i++ {
+	out.UsedDevNonces = make([]uint32, r.Intn(10))
+	for i := range out.UsedDevNonces {
 		out.UsedDevNonces[i] = r.Uint32()
 	}
 	out.NextJoinNonce = r.Uint32()
-	out.UsedJoinNonces = make([]uint32, 1+r.Intn(10))
-	for i := 0; i < len(out.UsedJoinNonces); i++ {
+	out.UsedJoinNonces = make([]uint32, r.Intn(10))
+	for i := range out.UsedJoinNonces {
 		out.UsedJoinNonces[i] = r.Uint32()
 	}
 	out.NextRJCount0 = r.Uint32()
@@ -44,7 +42,7 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	if r.Intn(10) != 0 {
 		out.SessionFallback = NewPopulatedSession(r, easy)
 	}
-	switch r.Intn(4) {
+	switch r.Intn(6) {
 	case 0:
 		out.LoRaWANVersion = MAC_V1_0
 		out.LoRaWANPHYVersion = PHY_V1_0
@@ -81,34 +79,28 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	out.DisableJoinNonceCheck = r.Intn(2) == 0
 	out.NetworkServerAddress = randStringEndDevice(r)
 	out.ApplicationServerAddress = randStringEndDevice(r)
+	out.EndDeviceVersion = NewPopulatedEndDeviceVersion(r, easy)
 	if r.Intn(10) != 0 {
-		out.EndDeviceVersion = NewPopulatedEndDeviceVersion(r, easy)
-	}
-	if r.Intn(10) != 0 {
-		v10 := r.Intn(5)
-		out.RecentUplinks = make([]*UplinkMessage, v10)
-		for i := 0; i < v10; i++ {
+		out.RecentUplinks = make([]*UplinkMessage, r.Intn(5))
+		for i := range out.RecentUplinks {
 			out.RecentUplinks[i] = NewPopulatedUplinkMessage(r, easy)
 		}
 	}
 	if r.Intn(10) != 0 {
-		v11 := r.Intn(5)
-		out.RecentDownlinks = make([]*DownlinkMessage, v11)
-		for i := 0; i < v11; i++ {
+		out.RecentDownlinks = make([]*DownlinkMessage, r.Intn(5))
+		for i := range out.RecentDownlinks {
 			out.RecentDownlinks[i] = NewPopulatedDownlinkMessage(r, easy)
 		}
 	}
 	if r.Intn(10) != 0 {
-		v12 := r.Intn(5)
-		out.QueuedMACCommands = make([]*MACCommand, v12)
-		for i := 0; i < v12; i++ {
+		out.QueuedMACCommands = make([]*MACCommand, r.Intn(5))
+		for i := range out.QueuedMACCommands {
 			out.QueuedMACCommands[i] = NewPopulatedMACCommand(r, easy)
 		}
 	}
 	if r.Intn(10) != 0 {
-		v13 := r.Intn(5)
-		out.QueuedApplicationDownlinks = make([]*ApplicationDownlink, v13)
-		for i := 0; i < v13; i++ {
+		out.QueuedApplicationDownlinks = make([]*ApplicationDownlink, r.Intn(5))
+		for i := range out.QueuedApplicationDownlinks {
 			out.QueuedApplicationDownlinks[i] = NewPopulatedApplicationDownlink(r, easy)
 		}
 	}

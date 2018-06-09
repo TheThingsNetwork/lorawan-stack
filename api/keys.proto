@@ -44,6 +44,8 @@ message RootKeys {
 // Session keys for a LoRaWAN session.
 // Only the components for which the keys were meant, will have the key-encryption-key (KEK) to decrypt the individual keys.
 message SessionKeys {
+  option (gogoproto.populate) = false;
+
   // Join Server issued identifier for the session keys.
   string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
 
