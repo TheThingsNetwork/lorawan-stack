@@ -42,6 +42,8 @@ message GatewayDown {
 
 // FrequencyPlan contains the frequency plan for the gateway.
 message FrequencyPlan {
+  option (gogoproto.populate) = false;
+
   // BandID of the band to support.
   string band_id = 1 [(gogoproto.customname) = "BandID",  (gogoproto.moretags) = "yaml:\"band-id\""];
 
