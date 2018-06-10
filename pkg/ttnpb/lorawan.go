@@ -172,6 +172,18 @@ func (v MACVersion) EncryptFOpts() bool {
 	panic(errors.Errorf("Unknown MACVersion: %v", v))
 }
 
+// HasMaxFCntGap reports whether v requires MAC commands in FOpts to be encrypted.
+// HasMaxFCntGap panics, if v.Validate() returns non-nil error.
+func (v MACVersion) HasMaxFCntGap() bool {
+	switch v {
+	case MAC_V1_0, MAC_V1_0_1, MAC_V1_0_2:
+		return true
+	case MAC_V1_1:
+		return false
+	}
+	panic(errors.Errorf("Unknown MACVersion: %v", v))
+}
+
 // String implements fmt.Stringer.
 func (v PHYVersion) String() string {
 	switch v {

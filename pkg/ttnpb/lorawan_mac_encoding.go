@@ -256,9 +256,9 @@ func (m *MACCommands) UnmarshalLoRaWAN(b []byte, isUplink bool) error {
 }
 
 // AppendLoRaWAN appends the LoRaWAN representation of the MAC commands to dst and returns the extended buffer.
-func (m *MACCommands) AppendLoRaWAN(dst []byte) ([]byte, error) {
+func (m MACCommands) AppendLoRaWAN(dst []byte) ([]byte, error) {
 	var err error
-	for _, cmd := range *m {
+	for _, cmd := range m {
 		switch x := cmd.Payload.(type) {
 		case *MACCommand_Proprietary_:
 			dst, err = x.Proprietary.AppendLoRaWAN(dst)
@@ -334,9 +334,9 @@ func (m *MACCommands) AppendLoRaWAN(dst []byte) ([]byte, error) {
 }
 
 // MarshalLoRaWAN marshals the LoRaWAN representation of the MAC commands
-func (m *MACCommands) MarshalLoRaWAN() ([]byte, error) {
-	if len(*m) == 0 {
-		return []byte{}, nil // avoid allocation as most messages don't have MAC commands
+func (m MACCommands) MarshalLoRaWAN() ([]byte, error) {
+	if len(m) == 0 {
+		return nil, nil // avoid allocation as most messages don't have MAC commands
 	}
 	return m.AppendLoRaWAN(make([]byte, 0, 15)) // most messages have MAC commands in the header, then 15 is enough
 }

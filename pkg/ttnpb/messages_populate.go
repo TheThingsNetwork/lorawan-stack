@@ -140,10 +140,10 @@ func NewPopulatedDownlinkMessage(r randyMessages, easy bool) *DownlinkMessage {
 
 func NewPopulatedApplicationDownlink(r randyMessages, _ bool) *ApplicationDownlink {
 	out := &ApplicationDownlink{}
-	out.FPort = r.Uint32() % math.MaxUint8
+	out.FPort = 1 + uint32(r.Intn(254))
 	out.FCnt = r.Uint32() % math.MaxUint16
 	out.FRMPayload = make([]byte, r.Intn(255))
-	for i := 0; i < len(out.FRMPayload); i++ {
+	for i := range out.FRMPayload {
 		out.FRMPayload[i] = byte(r.Intn(256))
 	}
 	return out
