@@ -29,7 +29,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	first := -1
 	last := -1
 
-	cmds := dev.GetQueuedMACCommands()
+	cmds := dev.GetPendingMACCommands()
 outer:
 	for i, cmd := range cmds {
 		last = i
@@ -59,6 +59,6 @@ outer:
 		return ErrMACRequestNotFound.New(nil)
 	}
 
-	dev.QueuedMACCommands = append(dev.QueuedMACCommands[:first], dev.QueuedMACCommands[last+1:]...)
+	dev.PendingMACCommands = append(dev.PendingMACCommands[:first], dev.PendingMACCommands[last+1:]...)
 	return nil
 }

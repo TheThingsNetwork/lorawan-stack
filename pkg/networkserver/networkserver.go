@@ -1010,7 +1010,8 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 
 outer:
 	for _, cmd := range cmds {
-		switch cid := cmd.CID(); cid {
+		cid := cmd.CID()
+		switch cid {
 		case ttnpb.CID_RESET:
 			fp, err := ns.Component.FrequencyPlans.GetByID(dev.GetFrequencyPlanID())
 			if err != nil {
@@ -1058,13 +1059,13 @@ outer:
 		default:
 			h, ok := ns.macHandlers.Load(cid)
 			if !ok {
-				logger.WithField("cid", cmd.CID()).Warn("Unknown MAC command received, skipping the rest...")
+				logger.WithField("cid", cid).Warn("Unknown MAC command received, skipping the rest...")
 				break outer
 			}
 			err = h.(MACHandler)(ctx, dev.EndDevice, cmd.GetProprietary().GetRawPayload(), msg)
 		}
 		if err != nil {
-			logger.WithField("cid", cmd.CID()).WithError(err).Warn("Failed to process MAC command")
+			logger.WithField("cid", cid).WithError(err).Warn("Failed to process MAC command")
 		}
 	}
 

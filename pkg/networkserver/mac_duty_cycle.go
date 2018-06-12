@@ -21,7 +21,7 @@ import (
 )
 
 func handleDutyCycleAns(ctx context.Context, dev *ttnpb.EndDevice) error {
-	cmds := dev.GetQueuedMACCommands()
+	cmds := dev.GetPendingMACCommands()
 	for i, cmd := range cmds {
 		if cmd.CID() != ttnpb.CID_DUTY_CYCLE {
 			continue
@@ -31,7 +31,7 @@ func handleDutyCycleAns(ctx context.Context, dev *ttnpb.EndDevice) error {
 		_ = req
 		// TODO: Handle duty cycle (https://github.com/TheThingsIndustries/ttn/issues/292)
 
-		dev.QueuedMACCommands = append(cmds[:i], cmds[i+1:]...)
+		dev.PendingMACCommands = append(cmds[:i], cmds[i+1:]...)
 		return nil
 	}
 	return ErrMACRequestNotFound.New(nil)

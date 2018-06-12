@@ -26,7 +26,7 @@ func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 		return common.ErrMissingPayload.New(nil)
 	}
 
-	cmds := dev.GetQueuedMACCommands()
+	cmds := dev.GetPendingMACCommands()
 	for i, cmd := range cmds {
 		if cmd.CID() != ttnpb.CID_RX_PARAM_SETUP {
 			continue
@@ -43,7 +43,7 @@ func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 			dev.MACState.Rx2Frequency = req.GetRx2Frequency()
 		}
 
-		dev.QueuedMACCommands = append(cmds[:i], cmds[i+1:]...)
+		dev.PendingMACCommands = append(cmds[:i], cmds[i+1:]...)
 		return nil
 	}
 	return ErrMACRequestNotFound.New(nil)

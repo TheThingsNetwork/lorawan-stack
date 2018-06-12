@@ -26,7 +26,7 @@ func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		return common.ErrMissingPayload.New(nil)
 	}
 
-	cmds := dev.GetQueuedMACCommands()
+	cmds := dev.GetPendingMACCommands()
 	for i, cmd := range cmds {
 		if cmd.CID() != ttnpb.CID_DL_CHANNEL {
 			continue
@@ -34,7 +34,7 @@ func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 
 		// TODO: Modify channels in MACState (https://github.com/TheThingsIndustries/ttn/issues/292)
 
-		dev.QueuedMACCommands = append(cmds[:i], cmds[i+1:]...)
+		dev.PendingMACCommands = append(cmds[:i], cmds[i+1:]...)
 		return nil
 	}
 	return ErrMACRequestNotFound.New(nil)

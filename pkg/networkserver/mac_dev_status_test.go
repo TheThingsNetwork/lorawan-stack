@@ -50,7 +50,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 			Name: "battery 42, margin 4",
 			Device: &ttnpb.EndDevice{
 				MACInfo: &ttnpb.MACInfo{},
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				PendingMACCommands: []*ttnpb.MACCommand{
 					ttnpb.CID_DEV_STATUS.MACCommand(),
 				},
 			},
@@ -58,7 +58,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 				MACInfo: &ttnpb.MACInfo{
 					// TODO: https://github.com/TheThingsIndustries/ttn/issues/292
 				},
-				QueuedMACCommands: []*ttnpb.MACCommand{},
+				PendingMACCommands: []*ttnpb.MACCommand{},
 			},
 			Payload: &ttnpb.MACCommand_DevStatusAns{
 				Battery: 42,

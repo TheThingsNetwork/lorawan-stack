@@ -53,7 +53,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 					Rx1DataRateOffset: 99,
 					Rx2Frequency:      99,
 				},
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				PendingMACCommands: []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_RxParamSetupReq{
 						Rx1DataRateOffset: 42,
 						Rx2DataRateIndex:  43,
@@ -67,7 +67,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 					Rx2DataRateIndex:  43,
 					Rx2Frequency:      44,
 				},
-				QueuedMACCommands: []*ttnpb.MACCommand{},
+				PendingMACCommands: []*ttnpb.MACCommand{},
 			},
 			Payload: &ttnpb.MACCommand_RxParamSetupAns{
 				Rx1DataRateOffsetAck: true,
@@ -82,7 +82,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 					Rx1DataRateOffset: 99,
 					Rx2Frequency:      99,
 				},
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				PendingMACCommands: []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_RxParamSetupReq{
 						Rx1DataRateOffset: 42,
 						Rx2DataRateIndex:  43,
@@ -96,7 +96,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 					Rx2DataRateIndex:  43,
 					Rx2Frequency:      99,
 				},
-				QueuedMACCommands: []*ttnpb.MACCommand{},
+				PendingMACCommands: []*ttnpb.MACCommand{},
 			},
 			Payload: &ttnpb.MACCommand_RxParamSetupAns{
 				Rx1DataRateOffsetAck: true,

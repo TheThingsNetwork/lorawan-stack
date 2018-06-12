@@ -21,7 +21,7 @@ import (
 )
 
 func handleRxTimingSetupAns(ctx context.Context, dev *ttnpb.EndDevice) error {
-	cmds := dev.GetQueuedMACCommands()
+	cmds := dev.GetPendingMACCommands()
 	for i, cmd := range cmds {
 		if cmd.CID() != ttnpb.CID_RX_TIMING_SETUP {
 			continue
@@ -30,7 +30,7 @@ func handleRxTimingSetupAns(ctx context.Context, dev *ttnpb.EndDevice) error {
 		req := cmd.GetRxTimingSetupReq()
 		dev.MACState.RxDelay = req.GetDelay()
 
-		dev.QueuedMACCommands = append(cmds[:i], cmds[i+1:]...)
+		dev.PendingMACCommands = append(cmds[:i], cmds[i+1:]...)
 		return nil
 	}
 	return ErrMACRequestNotFound.New(nil)

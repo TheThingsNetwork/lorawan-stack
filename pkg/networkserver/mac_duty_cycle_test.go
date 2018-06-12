@@ -39,14 +39,14 @@ func TestHandleDutyCycleAns(t *testing.T) {
 		{
 			Name: "2048",
 			Device: &ttnpb.EndDevice{
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				PendingMACCommands: []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_DutyCycleReq{
 						MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,
 					}).MACCommand(),
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				QueuedMACCommands: []*ttnpb.MACCommand{},
+				PendingMACCommands: []*ttnpb.MACCommand{},
 			},
 		},
 	} {

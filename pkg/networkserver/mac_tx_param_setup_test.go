@@ -40,7 +40,7 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 			Name: "EIRP 42, dwell time both",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				PendingMACCommands: []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_TxParamSetupReq{
 						MaxEIRPIndex:      42,
 						DownlinkDwellTime: true,
@@ -53,7 +53,7 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 					DownlinkDwellTime: true,
 					UplinkDwellTime:   true,
 				},
-				QueuedMACCommands: []*ttnpb.MACCommand{},
+				PendingMACCommands: []*ttnpb.MACCommand{},
 			},
 		},
 	} {

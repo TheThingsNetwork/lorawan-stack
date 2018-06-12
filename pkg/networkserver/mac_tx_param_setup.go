@@ -21,7 +21,7 @@ import (
 )
 
 func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) error {
-	cmds := dev.GetQueuedMACCommands()
+	cmds := dev.GetPendingMACCommands()
 	for i, cmd := range cmds {
 		if cmd.CID() != ttnpb.CID_TX_PARAM_SETUP {
 			continue
@@ -33,7 +33,7 @@ func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) error {
 
 		// TODO: Handle EIRP (https://github.com/TheThingsIndustries/ttn/issues/292)
 
-		dev.QueuedMACCommands = append(cmds[:i], cmds[i+1:]...)
+		dev.PendingMACCommands = append(cmds[:i], cmds[i+1:]...)
 		return nil
 	}
 	return ErrMACRequestNotFound.New(nil)
