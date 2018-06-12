@@ -19,7 +19,7 @@ func init() {
 		CREATE TABLE IF NOT EXISTS gateways (
 			id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			gateway_id          STRING(36) UNIQUE NOT NULL,
-			eui                 BYTES UNIQUE,
+			eui                 BYTEA UNIQUE,
 			description         STRING NOT NULL DEFAULT '',
 			frequency_plan_id   STRING(36) NOT NULL,
 			activated_at        TIMESTAMP DEFAULT NULL,
