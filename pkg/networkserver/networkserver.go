@@ -970,7 +970,17 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	}
 	dev.RecentUplinks = append(ups, msg)
 
-	if err := dev.Store("Session", "SessionFallback", "RecentUplinks", "MACInfo", "MACState", "MACStateDesired", "QueuedMACCommands"); err != nil {
+	if err := dev.Store(
+		"MACInfo",
+		"MACSettings",
+		"MACState",
+		"MACStateDesired",
+		"PendingMACCommands",
+		"QueuedMACCommands",
+		"RecentUplinks",
+		"Session",
+		"SessionFallback",
+	); err != nil {
 		logger.WithError(err).Error("Failed to update device")
 		return err
 	}

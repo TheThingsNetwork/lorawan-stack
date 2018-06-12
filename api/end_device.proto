@@ -181,20 +181,23 @@ message EndDevice {
 
   EndDeviceVersion version = 28 [(gogoproto.embed) = true];
 
-  // Recent uplink messages sorted by time
+  // Recent uplink messages sorted by time.
   repeated UplinkMessage recent_uplinks = 29;
 
-  // Recent downlink messages sorted by time
+  // Recent downlink messages sorted by time.
   repeated DownlinkMessage recent_downlinks = 30;
 
-  // Queued MAC commands
+  // Queued MAC commands.
   repeated MACCommand queued_mac_commands = 31 [(gogoproto.customname) = "QueuedMACCommands"];
 
-  // Queued Application downlink messages
-  repeated ApplicationDownlink queued_application_downlinks = 32;
+  // Pending MAC commands(i.e. sent requests, for which no response has been received yet).
+  repeated MACCommand pending_mac_commands = 32 [(gogoproto.customname) = "PendingMACCommands"];
+
+  // Queued Application downlink messages.
+  repeated ApplicationDownlink queued_application_downlinks = 33;
 
   // Formatters defining the payload formats.
-  DeviceFormatters formatters = 33 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  DeviceFormatters formatters = 34 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   google.protobuf.Timestamp created_at = 97 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 98 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
