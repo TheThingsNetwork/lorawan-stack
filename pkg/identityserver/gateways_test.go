@@ -15,15 +15,21 @@
 package identityserver
 
 import (
+	"context"
+	"fmt"
 	"sort"
+	"sync"
 	"testing"
+	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"google.golang.org/grpc/metadata"
 )
 
 var _ ttnpb.IsGatewayServer = new(gatewayService)
@@ -88,6 +94,112 @@ func TestGateways(t *testing.T) {
 			testGateways(t, tc.gids, tc.sids)
 		})
 	}
+}
+
+type pullConfigurationServer struct {
+	test.MockServerStream
+
+	gtwConfigs chan *ttnpb.Gateway
+	ctx        context.Context
+}
+
+func (s *pullConfigurationServer) Send(gtw *ttnpb.Gateway) error {
+	s.gtwConfigs <- gtw
+	return nil
+}
+
+func newPullConfigurationServer() *pullConfigurationServer {
+	srv := &pullConfigurationServer{
+		gtwConfigs: make(chan *ttnpb.Gateway),
+	}
+	srv.MockServerStream = test.MockServerStream{
+		MockStream: &test.MockStream{
+			ContextFunc: func() context.Context {
+				return srv.ctx
+			},
+		},
+	}
+
+	return srv
+}
+
+func TestPullConfiguration(t *testing.T) {
+	a := assertions.New(t)
+	is := newTestIS(t)
+
+	user := newTestUsers()["bob"]
+	userCtx := newTestCtx(user.UserIdentifiers)
+
+	gtw := *ttnpb.NewPopulatedGateway(test.Randy, false)
+	gtw.Platform = "Kerlink iBTS"
+
+	_, err := is.gatewayService.CreateGateway(userCtx, &ttnpb.CreateGatewayRequest{
+		Gateway: gtw,
+	})
+	a.So(err, should.BeNil)
+
+	apiKeyRequest := ttnpb.NewPopulatedGenerateGatewayAPIKeyRequest(test.Randy, false)
+	apiKeyRequest.GatewayIdentifiers = gtw.GatewayIdentifiers
+	apiKeyRequest.Rights = []ttnpb.Right{
+		ttnpb.RIGHT_GATEWAY_INFO,
+		ttnpb.RIGHT_GATEWAY_LINK,
+	}
+	key, err := is.userService.GenerateGatewayAPIKey(userCtx, apiKeyRequest)
+	a.So(err, should.BeNil)
+
+	authString := fmt.Sprintf("Bearer %s", key.GetKey())
+	gtwCtx := metadata.NewIncomingContext(userCtx, metadata.MD{
+		"id":            []string{gtw.GatewayIdentifiers.UniqueID(userCtx)},
+		"authorization": []string{authString},
+	})
+
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+
+	stream := newPullConfigurationServer()
+	pullConfigCtx, cancel := context.WithCancel(gtwCtx)
+	stream.ctx = pullConfigCtx
+
+	go func() {
+		err := is.gatewayService.PullConfiguration(&ttnpb.PullConfigurationRequest{
+			GatewayIdentifiers: gtw.GatewayIdentifiers,
+		}, stream)
+		a.So(err, should.Equal, context.Canceled)
+		wg.Done()
+	}()
+
+	select {
+	case cfg := <-stream.gtwConfigs:
+		a.So(cfg.GetAntennas(), should.HaveLength, len(gtw.GetAntennas()))
+		a.So(cfg.GetDisableTxDelay(), should.Equal, gtw.GetDisableTxDelay())
+		a.So(cfg.GetPlatform(), should.Equal, "Kerlink iBTS")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Did not receive initial config after 5 seconds")
+	}
+
+	_, err = is.gatewayService.UpdateGateway(userCtx, &ttnpb.UpdateGatewayRequest{
+		Gateway: ttnpb.Gateway{
+			GatewayIdentifiers: gtw.GatewayIdentifiers,
+			Platform:           "Kerlink Wirnet Station",
+		},
+		UpdateMask: pbtypes.FieldMask{
+			Paths: []string{"platform"},
+		},
+	})
+	a.So(err, should.BeNil)
+
+	select {
+	case cfg := <-stream.gtwConfigs:
+		a.So(cfg.GetAntennas(), should.HaveLength, len(gtw.GetAntennas()))
+		a.So(cfg.GetDisableTxDelay(), should.Equal, gtw.GetDisableTxDelay())
+		a.So(cfg.GetPlatform(), should.Equal, "Kerlink Wirnet Station")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Did not receive updated config after 5 seconds")
+	}
+
+	cancel()
+
+	wg.Wait()
 }
 
 func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {

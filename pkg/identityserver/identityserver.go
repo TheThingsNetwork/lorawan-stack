@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email/mock"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email/sendgrid"
@@ -132,7 +133,7 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 
 	is.userService = &userService{is}
 	is.applicationService = &applicationService{is}
-	is.gatewayService = &gatewayService{is}
+	is.gatewayService = &gatewayService{IdentityServer: is}
 	is.clientService = &clientService{is}
 	is.adminService = &adminService{is}
 	is.organizationService = &organizationService{is}
@@ -187,6 +188,18 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 	}
 
 	c.RegisterGRPC(is)
+
+	is.gatewayService.gtwConfigPusher = &gtwConfigPusher{
+		gatewayService: is.gatewayService,
+		subscriptions:  make(map[string]chan struct{}),
+	}
+	if err := events.Subscribe("gateway.update", is.gatewayService.gtwConfigPusher); err != nil {
+		return nil, errors.NewWithCause(err, "Could not subscribe to gateway configuration updates")
+	}
+	go func() {
+		<-c.Context().Done()
+		events.Unsubscribe("gateway.update", is.gatewayService.gtwConfigPusher)
+	}()
 
 	return is, nil
 }
@@ -314,6 +327,7 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterIsClientServer(s, is.clientService)
 	ttnpb.RegisterIsAdminServer(s, is.adminService)
 	ttnpb.RegisterIsOrganizationServer(s, is.organizationService)
+	ttnpb.RegisterGtwGrServer(s, is.gatewayService)
 }
 
 // RegisterHandlers registers gRPC handlers.

@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -24,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -37,6 +39,8 @@ var GatewayGeneratedFields = []string{
 
 type gatewayService struct {
 	*IdentityServer
+
+	*gtwConfigPusher
 }
 
 // CreateGateway creates a gateway in the network, sets the user as collaborator
@@ -160,6 +164,52 @@ func (s *gatewayService) ListGateways(ctx context.Context, req *ttnpb.ListGatewa
 	return resp, nil
 }
 
+func copyGatewayFields(origin, recipient *ttnpb.Gateway, paths []string) error {
+	for _, path := range paths {
+		switch {
+		case ttnpb.FieldPathGatewayDescription.MatchString(path):
+			recipient.Description = origin.Description
+		case ttnpb.FieldPathGatewayFrequencyPlanID.MatchString(path):
+			recipient.FrequencyPlanID = origin.FrequencyPlanID
+		case ttnpb.FieldPathGatewayPrivacySettingsStatusPublic.MatchString(path):
+			recipient.PrivacySettings.StatusPublic = origin.PrivacySettings.StatusPublic
+		case ttnpb.FieldPathGatewayPrivacySettingsLocationPublic.MatchString(path):
+			recipient.PrivacySettings.LocationPublic = origin.PrivacySettings.LocationPublic
+		case ttnpb.FieldPathGatewayPrivacySettingsContactable.MatchString(path):
+			recipient.PrivacySettings.Contactable = origin.PrivacySettings.Contactable
+		case ttnpb.FieldPathGatewayAutoUpdate.MatchString(path):
+			recipient.AutoUpdate = origin.AutoUpdate
+		case ttnpb.FieldPathGatewayPlatform.MatchString(path):
+			recipient.Platform = origin.Platform
+		case ttnpb.FieldPathGatewayAntennas.MatchString(path):
+			if origin.Antennas == nil {
+				origin.Antennas = []ttnpb.GatewayAntenna{}
+			}
+			recipient.Antennas = origin.Antennas
+		case ttnpb.FieldPathGatewayAttributes.MatchString(path):
+			attr := ttnpb.FieldPathGatewayAttributes.FindStringSubmatch(path)[1]
+
+			if value, ok := origin.Attributes[attr]; ok && len(value) > 0 {
+				recipient.Attributes[attr] = value
+			} else {
+				delete(recipient.Attributes, attr)
+			}
+		case ttnpb.FieldPathGatewayClusterAddress.MatchString(path):
+			recipient.ClusterAddress = origin.ClusterAddress
+		case ttnpb.FieldPathGatewayContactAccountIDs.MatchString(path):
+			recipient.ContactAccountIDs = &ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: origin.ContactAccountIDs.GetUserID()}}
+		case ttnpb.FieldPathGatewayDisableTxDelay.MatchString(path):
+			recipient.DisableTxDelay = origin.DisableTxDelay
+		default:
+			return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
+				"path": path,
+			})
+		}
+	}
+
+	return nil
+}
+
 // UpdateGateway updates a gateway.
 func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (*pbtypes.Empty, error) {
 	err := s.enforceGatewayRights(ctx, req.Gateway.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC)
@@ -175,46 +225,10 @@ func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGat
 		}
 		gtw = found.GetGateway()
 
-		for _, path := range req.UpdateMask.Paths {
-			switch {
-			case ttnpb.FieldPathGatewayDescription.MatchString(path):
-				gtw.Description = req.Gateway.Description
-			case ttnpb.FieldPathGatewayFrequencyPlanID.MatchString(path):
-				gtw.FrequencyPlanID = req.Gateway.FrequencyPlanID
-			case ttnpb.FieldPathGatewayPrivacySettingsStatusPublic.MatchString(path):
-				gtw.PrivacySettings.StatusPublic = req.Gateway.PrivacySettings.StatusPublic
-			case ttnpb.FieldPathGatewayPrivacySettingsLocationPublic.MatchString(path):
-				gtw.PrivacySettings.LocationPublic = req.Gateway.PrivacySettings.LocationPublic
-			case ttnpb.FieldPathGatewayPrivacySettingsContactable.MatchString(path):
-				gtw.PrivacySettings.Contactable = req.Gateway.PrivacySettings.Contactable
-			case ttnpb.FieldPathGatewayAutoUpdate.MatchString(path):
-				gtw.AutoUpdate = req.Gateway.AutoUpdate
-			case ttnpb.FieldPathGatewayPlatform.MatchString(path):
-				gtw.Platform = req.Gateway.Platform
-			case ttnpb.FieldPathGatewayAntennas.MatchString(path):
-				if req.Gateway.Antennas == nil {
-					req.Gateway.Antennas = []ttnpb.GatewayAntenna{}
-				}
-				gtw.Antennas = req.Gateway.Antennas
-			case ttnpb.FieldPathGatewayAttributes.MatchString(path):
-				attr := ttnpb.FieldPathGatewayAttributes.FindStringSubmatch(path)[1]
-
-				if value, ok := req.Gateway.Attributes[attr]; ok && len(value) > 0 {
-					gtw.Attributes[attr] = value
-				} else {
-					delete(gtw.Attributes, attr)
-				}
-			case ttnpb.FieldPathGatewayClusterAddress.MatchString(path):
-				gtw.ClusterAddress = req.Gateway.ClusterAddress
-			case ttnpb.FieldPathGatewayContactAccountIDs.MatchString(path):
-				gtw.ContactAccountIDs = &ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: req.Gateway.ContactAccountIDs.GetUserID()}}
-			case ttnpb.FieldPathGatewayDisableTxDelay.MatchString(path):
-				gtw.DisableTxDelay = req.Gateway.DisableTxDelay
-			default:
-				return ttnpb.ErrInvalidPathUpdateMask.New(errors.Attributes{
-					"path": path,
-				})
-			}
+		fieldsMask := req.GetUpdateMask()
+		paths := fieldsMask.GetPaths()
+		if err := copyGatewayFields(&req.Gateway, gtw, paths); err != nil {
+			return err
 		}
 
 		gtw.UpdatedAt = time.Now().UTC()
@@ -472,4 +486,101 @@ func (s *gatewayService) ListGatewayRights(ctx context.Context, req *ttnpb.Gatew
 	}
 
 	return resp, nil
+}
+
+func (s *gatewayService) getGatewayWithFields(ids ttnpb.GatewayIdentifiers, fieldMask *pbtypes.FieldMask) (*ttnpb.Gateway, error) {
+	found, err := s.store.Gateways.GetByID(ids, s.specializers.Gateway)
+	if err != nil {
+		return nil, err
+	}
+	gtw := found.GetGateway()
+	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
+		return gtw, nil
+	}
+
+	toSend := &ttnpb.Gateway{}
+	if err = copyGatewayFields(gtw, toSend, fieldMask.GetPaths()); err != nil {
+		return nil, err
+	}
+	return toSend, nil
+}
+
+func (s *gatewayService) PullConfiguration(req *ttnpb.PullConfigurationRequest, stream ttnpb.GtwGr_PullConfigurationServer) error {
+	ctx := stream.Context()
+	ad, err := s.buildAuthorizationData(ctx)
+	if err != nil {
+		return err
+	}
+
+	if !ad.HasRights(ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_LINK) {
+		return common.ErrPermissionDenied.New(nil)
+	}
+
+	uid := ad.GatewayIdentifiers().UniqueID(ctx)
+
+	gtw, err := s.getGatewayWithFields(ad.GatewayIdentifiers(), req.GetProjectionMask())
+	if err != nil {
+		return err
+	}
+
+	if err := stream.Send(gtw); err != nil {
+		return err
+	}
+
+	gtwConfigs := s.gtwConfigPusher.subscribe(ctx, uid)
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case _, ok := <-gtwConfigs:
+			if !ok {
+				return ErrOtherPullConfigurationStreamOpened.New(nil)
+			}
+			newConfig, err := s.getGatewayWithFields(ad.GatewayIdentifiers(), req.GetProjectionMask())
+			if err != nil {
+				continue
+			}
+			if err := stream.Send(newConfig); err != nil {
+				return err
+			}
+		}
+	}
+}
+
+type gtwConfigPusher struct {
+	*gatewayService
+
+	subscriptionsMu sync.RWMutex
+	subscriptions   map[string]chan struct{}
+}
+
+func (c *gtwConfigPusher) subscribe(ctx context.Context, gatewayUID string) chan struct{} {
+	newSubscription := make(chan struct{})
+	c.subscriptionsMu.Lock()
+	if oldSubscription, ok := c.subscriptions[gatewayUID]; ok {
+		close(oldSubscription)
+	}
+	c.subscriptions[gatewayUID] = newSubscription
+	c.subscriptionsMu.Unlock()
+
+	return newSubscription
+}
+
+func (c *gtwConfigPusher) Notify(evt events.Event) {
+	ctx := evt.Context()
+	gtwIDs, ok := evt.Identifiers().(ttnpb.GatewayIdentifiers)
+	if !ok {
+		log.FromContext(ctx).Error("No gateway identifiers found with gateway update event")
+		return
+	}
+
+	uid := gtwIDs.UniqueID(ctx)
+	c.subscriptionsMu.RLock()
+	subscription := c.subscriptions[uid]
+	c.subscriptionsMu.RUnlock()
+	select {
+	case subscription <- struct{}{}:
+	default:
+		log.FromContext(evt.Context()).WithField("gateway_uid", uid).Error("Gateway update signal was not received by PullConfiguration subscription")
+	}
 }

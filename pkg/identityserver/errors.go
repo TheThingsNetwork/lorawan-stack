@@ -116,3 +116,10 @@ var ErrUnmanageableOrganization = &errors.ErrDescriptor{
 	Type:           errors.InvalidArgument,
 	SafeAttributes: []string{"organization_id", "missing_rights"},
 }
+
+// ErrOtherPullConfigurationStreamOpened is returned when another PullConfiguration stream was opened.
+var ErrOtherPullConfigurationStreamOpened = &errors.ErrDescriptor{
+	MessageFormat: "Another `PullConfiguration` stream opened",
+	Code:          11,
+	Type:          errors.Conflict,
+}
