@@ -20,7 +20,7 @@ func init() {
 			id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			authorization_code   STRING(64) UNIQUE NOT NULL,
 			client_id            UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
-			created_at           TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+			created_at           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			expires_in           INTEGER NOT NULL,
 			scope                STRING NOT NULL,
 			redirect_uri         STRING NOT NULL,
@@ -33,7 +33,7 @@ func init() {
 			access_token    STRING UNIQUE NOT NULL,
 			client_id       UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
 			user_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-			created_at      TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+			created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			expires_in      INTEGER NOT NULL,
 			scope           STRING NOT NULL,
 			redirect_uri    STRING NOT NULL
@@ -44,7 +44,7 @@ func init() {
 			refresh_token   STRING(64) UNIQUE NOT NULL,
 			client_id       UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
 			user_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-			created_at      TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+			created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			scope           STRING NOT NULL,
 			redirect_uri    STRING NOT NULL
 		);

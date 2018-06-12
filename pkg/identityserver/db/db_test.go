@@ -34,7 +34,7 @@ const (
 	schema   = `
 	CREATE TABLE IF NOT EXISTS foo (
 		id       SERIAL PRIMARY KEY,
-		created  TIMESTAMP DEFAULT current_timestamp(),
+		created  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		bar      TEXT,
 		baz      BOOL,
 		quu      INTEGER

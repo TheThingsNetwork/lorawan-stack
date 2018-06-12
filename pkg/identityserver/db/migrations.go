@@ -25,7 +25,7 @@ const migrationHistorySchema = `
 		"order"     INTEGER NOT NULL,
 		name        STRING NOT NULL,
 		direction   STRING NOT NULL,
-		ran_at      TIMESTAMP NOT NULL DEFAULT current_timestamp()
+		ran_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 	);
 `
 

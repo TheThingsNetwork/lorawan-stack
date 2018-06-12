@@ -28,8 +28,8 @@ func init() {
 			platform            STRING NOT NULL DEFAULT '',
 			cluster_address     STRING NOT NULL,
 			disable_tx_delay    BOOL NOT NULL DEFAULT FALSE,
-			created_at          TIMESTAMP NOT NULL DEFAULT current_timestamp(),
-			updated_at          TIMESTAMP NOT NULL DEFAULT current_timestamp()
+			created_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			updated_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);
 		CREATE TABLE IF NOT EXISTS gateways_attributes (
 			gateway_id   UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,
@@ -47,14 +47,14 @@ func init() {
 			longitude    FLOAT NOT NULL DEFAULT 0,
 			latitude     FLOAT NOT NULL DEFAULT 0,
 			altitude     INT NOT NULL DEFAULT 0,
-			created_at   TIMESTAMP NOT NULL DEFAULT current_timestamp()
+			created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);
 		CREATE TABLE IF NOT EXISTS gateways_radios (
 			radio_id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			gateway_id         UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,
 			frequency          INT NOT NULL CHECK (frequency > 0),
 			tx_configuration   STRING DEFAULT NULL,
-			created_at         TIMESTAMP NOT NULL DEFAULT current_timestamp()
+			created_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);
 		CREATE TABLE IF NOT EXISTS gateways_collaborators (
 			gateway_id   UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,

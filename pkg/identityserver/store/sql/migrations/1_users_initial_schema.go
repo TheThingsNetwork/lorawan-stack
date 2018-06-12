@@ -27,20 +27,20 @@ func init() {
 			name                      STRING NOT NULL DEFAULT '',
 			email                     STRING UNIQUE NOT NULL,
 			password                  STRING NOT NULL,
-			password_updated_at       TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+			password_updated_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			require_password_update   BOOL NOT NULL DEFAULT FALSE,
 			validated_at              TIMESTAMP DEFAULT NULL,
 			state                     INT NOT NULL DEFAULT 0,
 			admin                     BOOL NOT NULL DEFAULT false,
-			created_at                TIMESTAMP NOT NULL DEFAULT current_timestamp(),
-			updated_at                TIMESTAMP NOT NULL DEFAULT current_timestamp()
+			created_at                TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			updated_at                TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);
 		CREATE UNIQUE INDEX IF NOT EXISTS users_email ON users (email);
 		CREATE TABLE IF NOT EXISTS validation_tokens (
 			id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			validation_token   STRING UNIQUE NOT NULL,
 			user_id            UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-			created_at         TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+			created_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			expires_in         INTEGER NOT NULL
 		);
 		CREATE TABLE IF NOT EXISTS users_api_keys (

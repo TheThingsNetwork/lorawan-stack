@@ -20,7 +20,7 @@ func init() {
 			id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			token        STRING NOT NULL,
 			email        STRING UNIQUE NOT NULL,
-			issued_at    TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+			issued_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			expires_at   TIMESTAMP NOT NULL
 		);
 	`

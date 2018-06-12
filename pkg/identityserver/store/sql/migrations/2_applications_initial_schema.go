@@ -20,8 +20,8 @@ func init() {
 			id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			application_id   STRING(36) UNIQUE NOT NULL,
 			description      STRING NOT NULL DEFAULT '',
-			created_at       TIMESTAMP NOT NULL DEFAULT current_timestamp(),
-			updated_at       TIMESTAMP NOT NULL DEFAULT current_timestamp()
+			created_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			updated_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);
 		CREATE TABLE IF NOT EXISTS applications_api_keys (
 			application_id   UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,

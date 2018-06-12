@@ -24,8 +24,8 @@ func init() {
 			url               STRING NOT NULL DEFAULT '',
 			location          STRING NOT NULL DEFAULT '',
 			email             STRING NOT NULL,
-			created_at        TIMESTAMP NOT NULL DEFAULT current_timestamp(),
-			updated_at        TIMESTAMP NOT NULL DEFAULT current_timestamp()
+			created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			updated_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);
 		CREATE UNIQUE INDEX IF NOT EXISTS organizations_organization_id ON organizations (organization_id);
 		CREATE TABLE IF NOT EXISTS organizations_members (

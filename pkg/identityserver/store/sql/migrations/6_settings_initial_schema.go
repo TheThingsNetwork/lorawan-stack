@@ -19,7 +19,7 @@ func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS settings (
 			id                     INT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
-			updated_at             TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+			updated_at             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			blacklisted_ids        STRING NOT NULL DEFAULT '[]',
 			skip_validation        BOOL NOT NULL DEFAULT false,
 			invitation_only        BOOL NOT NULL DEFAULT false,

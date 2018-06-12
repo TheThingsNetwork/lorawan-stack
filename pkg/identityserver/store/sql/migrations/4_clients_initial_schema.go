@@ -27,8 +27,8 @@ func init() {
 			grants               STRING NOT NULL,
 			rights               STRING NOT NULL,
 			creator_id           UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-			created_at           TIMESTAMP NOT NULL DEFAULT current_timestamp(),
-			updated_at           TIMESTAMP NOT NULL DEFAULT current_timestamp()
+			created_at           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			updated_at           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);
 	`
 
