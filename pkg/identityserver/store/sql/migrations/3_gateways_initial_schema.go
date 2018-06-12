@@ -18,32 +18,32 @@ func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS gateways (
 			id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			gateway_id          STRING(36) UNIQUE NOT NULL,
+			gateway_id          VARCHAR(36) UNIQUE NOT NULL,
 			eui                 BYTEA UNIQUE,
-			description         STRING NOT NULL DEFAULT '',
-			frequency_plan_id   STRING(36) NOT NULL,
+			description         VARCHAR NOT NULL DEFAULT '',
+			frequency_plan_id   VARCHAR(36) NOT NULL,
 			activated_at        TIMESTAMP DEFAULT NULL,
-			privacy_settings    STRING NOT NULL DEFAULT '',
+			privacy_settings    VARCHAR NOT NULL DEFAULT '',
 			auto_update         BOOL DEFAULT TRUE,
-			platform            STRING NOT NULL DEFAULT '',
-			cluster_address     STRING NOT NULL,
+			platform            VARCHAR NOT NULL DEFAULT '',
+			cluster_address     VARCHAR NOT NULL,
 			disable_tx_delay    BOOL NOT NULL DEFAULT FALSE,
 			created_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			updated_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);
 		CREATE TABLE IF NOT EXISTS gateways_attributes (
 			gateway_id   UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,
-			attribute    STRING NOT NULL,
-			value        STRING NOT NULL,
+			attribute    VARCHAR NOT NULL,
+			value        VARCHAR NOT NULL,
 			PRIMARY KEY(gateway_id, attribute)
 		);
 		CREATE TABLE IF NOT EXISTS gateways_antennas (
-			antenna_id   STRING DEFAULT to_hex(unique_rowid()) PRIMARY KEY,
+			antenna_id   VARCHAR DEFAULT to_hex(unique_rowid()) PRIMARY KEY,
 			gateway_id   UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,
 			gain         FLOAT NOT NULL DEFAULT 0.0,
-			type         STRING NOT NULL DEFAULT '',
-			model        STRING NOT NULL DEFAULT '',
-			placement    STRING NOT NULL DEFAULT '',
+			type         VARCHAR NOT NULL DEFAULT '',
+			model        VARCHAR NOT NULL DEFAULT '',
+			placement    VARCHAR NOT NULL DEFAULT '',
 			longitude    FLOAT NOT NULL DEFAULT 0,
 			latitude     FLOAT NOT NULL DEFAULT 0,
 			altitude     INT NOT NULL DEFAULT 0,
@@ -53,25 +53,25 @@ func init() {
 			radio_id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			gateway_id         UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,
 			frequency          INT NOT NULL CHECK (frequency > 0),
-			tx_configuration   STRING DEFAULT NULL,
+			tx_configuration   VARCHAR DEFAULT NULL,
 			created_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);
 		CREATE TABLE IF NOT EXISTS gateways_collaborators (
 			gateway_id   UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,
 			account_id   UUID NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
-			"right"      STRING NOT NULL,
+			"right"      VARCHAR NOT NULL,
 			PRIMARY KEY(gateway_id, account_id, "right")
 		);
 		CREATE TABLE IF NOT EXISTS gateways_api_keys (
 			gateway_id   UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,
-			key_name     STRING(36) NOT NULL,
-			key          STRING UNIQUE NOT NULL,
+			key_name     VARCHAR(36) NOT NULL,
+			key          VARCHAR UNIQUE NOT NULL,
 			PRIMARY KEY(gateway_id, key_name)
 		);
 		CREATE TABLE IF NOT EXISTS gateways_api_keys_rights (
 			gateway_id   UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,
-			key_name     STRING(36) NOT NULL,
-			"right"      STRING NOT NULL,
+			key_name     VARCHAR(36) NOT NULL,
+			"right"      VARCHAR NOT NULL,
 			PRIMARY KEY(gateway_id, key_name, "right")
 		);
 	`

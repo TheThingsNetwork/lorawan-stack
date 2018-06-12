@@ -18,27 +18,27 @@ func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS applications (
 			id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			application_id   STRING(36) UNIQUE NOT NULL,
-			description      STRING NOT NULL DEFAULT '',
+			application_id   VARCHAR(36) UNIQUE NOT NULL,
+			description      VARCHAR NOT NULL DEFAULT '',
 			created_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			updated_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);
 		CREATE TABLE IF NOT EXISTS applications_api_keys (
 			application_id   UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
-			key_name         STRING(36) NOT NULL,
-			key              STRING UNIQUE NOT NULL,
+			key_name         VARCHAR(36) NOT NULL,
+			key              VARCHAR UNIQUE NOT NULL,
 			PRIMARY KEY(application_id, key_name)
 		);
 		CREATE TABLE IF NOT EXISTS applications_api_keys_rights (
 			application_id   UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
-			key_name         STRING(36) NOT NULL,
-			"right"          STRING NOT NULL,
+			key_name         VARCHAR(36) NOT NULL,
+			"right"          VARCHAR NOT NULL,
 			PRIMARY KEY(application_id, key_name, "right")
 		);
 		CREATE TABLE IF NOT EXISTS applications_collaborators (
 			application_id   UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
 			account_id       UUID NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
-			"right"          STRING NOT NULL,
+			"right"          VARCHAR NOT NULL,
 			PRIMARY KEY(application_id, account_id, "right")
 		);
 	`

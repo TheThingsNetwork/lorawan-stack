@@ -20,12 +20,12 @@ func init() {
 		CREATE TABLE IF NOT EXISTS settings (
 			id                     INT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
 			updated_at             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-			blacklisted_ids        STRING NOT NULL DEFAULT '[]',
+			blacklisted_ids        VARCHAR NOT NULL DEFAULT '[]',
 			skip_validation        BOOL NOT NULL DEFAULT false,
 			invitation_only        BOOL NOT NULL DEFAULT false,
 			admin_approval         BOOL NOT NULL DEFAULT false,
 			validation_token_ttl   INT NOT NULL,
-			allowed_emails         STRING NOT NULL DEFAULT '[]',
+			allowed_emails         VARCHAR NOT NULL DEFAULT '[]',
 			invitation_token_ttl   INT NOT NULL
 		);
 	`

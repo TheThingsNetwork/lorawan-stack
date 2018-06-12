@@ -18,14 +18,14 @@ func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS clients (
 			id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			client_id            STRING(36) UNIQUE NOT NULL,
-			description          STRING NOT NULL DEFAULT '',
-			secret               STRING NOT NULL,
-			redirect_uri         STRING NOT NULL,
+			client_id            VARCHAR(36) UNIQUE NOT NULL,
+			description          VARCHAR NOT NULL DEFAULT '',
+			secret               VARCHAR NOT NULL,
+			redirect_uri         VARCHAR NOT NULL,
 			state                INT NOT NULL DEFAULT 0,
 			skip_authorization   BOOL NOT NULL DEFAULT false,
-			grants               STRING NOT NULL,
-			rights               STRING NOT NULL,
+			grants               VARCHAR NOT NULL,
+			rights               VARCHAR NOT NULL,
 			creator_id           UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 			created_at           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			updated_at           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP

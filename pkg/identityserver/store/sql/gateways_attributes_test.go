@@ -82,7 +82,7 @@ func TestGatewayAttributer(t *testing.T) {
 		CREATE TABLE IF NOT EXISTS foo_gateways (
 			id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			gateway_id   UUID NOT NULL REFERENCES gateways(id) ON DELETE CASCADE,
-			foo          STRING
+			foo          VARCHAR
 		);
 	`
 

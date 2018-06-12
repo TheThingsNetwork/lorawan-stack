@@ -18,12 +18,12 @@ func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS organizations (
 			id                UUID PRIMARY KEY REFERENCES accounts(id),
-			organization_id   STRING(36) UNIQUE NOT NULL REFERENCES accounts(account_id),
-			name              STRING NOT NULL,
-			description       STRING NOT NULL DEFAULT '',
-			url               STRING NOT NULL DEFAULT '',
-			location          STRING NOT NULL DEFAULT '',
-			email             STRING NOT NULL,
+			organization_id   VARCHAR(36) UNIQUE NOT NULL REFERENCES accounts(account_id),
+			name              VARCHAR NOT NULL,
+			description       VARCHAR NOT NULL DEFAULT '',
+			url               VARCHAR NOT NULL DEFAULT '',
+			location          VARCHAR NOT NULL DEFAULT '',
+			email             VARCHAR NOT NULL,
 			created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			updated_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);
@@ -31,19 +31,19 @@ func init() {
 		CREATE TABLE IF NOT EXISTS organizations_members (
 			organization_id   UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
 			user_id           UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-			"right"           STRING NOT NULL,
+			"right"           VARCHAR NOT NULL,
 			PRIMARY KEY(organization_id, user_id, "right")
 		);
 		CREATE TABLE IF NOT EXISTS organizations_api_keys (
 			organization_id   UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
-			key_name          STRING(36) NOT NULL,
-			key               STRING NOT NULL UNIQUE,
+			key_name          VARCHAR(36) NOT NULL,
+			key               VARCHAR NOT NULL UNIQUE,
 			PRIMARY KEY(organization_id, key_name)
 		);
 		CREATE TABLE IF NOT EXISTS organizations_api_keys_rights (
 			organization_id   UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
-			key_name          STRING(36) NOT NULL,
-			"right"           STRING NOT NULL,
+			key_name          VARCHAR(36) NOT NULL,
+			"right"           VARCHAR NOT NULL,
 			PRIMARY KEY(organization_id, key_name, "right")
 		);
 	`

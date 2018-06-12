@@ -82,7 +82,7 @@ func TestApplicationAttributer(t *testing.T) {
 		CREATE TABLE IF NOT EXISTS foo_applications (
 			id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			application_id   UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
-			foo              STRING
+			foo              VARCHAR
 		);
 	`
 

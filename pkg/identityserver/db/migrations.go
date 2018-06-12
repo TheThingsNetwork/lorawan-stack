@@ -23,8 +23,8 @@ const migrationHistorySchema = `
 	CREATE TABLE IF NOT EXISTS migration_history (
 		id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 		"order"     INTEGER NOT NULL,
-		name        STRING NOT NULL,
-		direction   STRING NOT NULL,
+		name        VARCHAR NOT NULL,
+		direction   VARCHAR NOT NULL,
 		ran_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 	);
 `

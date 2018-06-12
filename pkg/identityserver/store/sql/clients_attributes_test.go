@@ -82,7 +82,7 @@ func TestClientAttributer(t *testing.T) {
 		CREATE TABLE IF NOT EXISTS foo_clients (
 			id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			client_id   UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
-			foo         STRING
+			foo         VARCHAR
 		);
 	`
 

@@ -18,8 +18,8 @@ func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS invitations (
 			id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			token        STRING NOT NULL,
-			email        STRING UNIQUE NOT NULL,
+			token        VARCHAR NOT NULL,
+			email        VARCHAR UNIQUE NOT NULL,
 			issued_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			expires_at   TIMESTAMP NOT NULL
 		);

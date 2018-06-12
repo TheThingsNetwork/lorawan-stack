@@ -18,15 +18,15 @@ func init() {
 	const forwards = `
 		CREATE TABLE IF NOT EXISTS accounts (
 			id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			account_id   STRING(36) UNIQUE NOT NULL,
+			account_id   VARCHAR(36) UNIQUE NOT NULL,
 			type         INT NOT NULL
 		);
 		CREATE TABLE IF NOT EXISTS users (
 			id                        UUID PRIMARY KEY REFERENCES accounts(id),
-			user_id                   STRING(36) UNIQUE NOT NULL REFERENCES accounts(account_id),
-			name                      STRING NOT NULL DEFAULT '',
-			email                     STRING UNIQUE NOT NULL,
-			password                  STRING NOT NULL,
+			user_id                   VARCHAR(36) UNIQUE NOT NULL REFERENCES accounts(account_id),
+			name                      VARCHAR NOT NULL DEFAULT '',
+			email                     VARCHAR UNIQUE NOT NULL,
+			password                  VARCHAR NOT NULL,
 			password_updated_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			require_password_update   BOOL NOT NULL DEFAULT FALSE,
 			validated_at              TIMESTAMP DEFAULT NULL,
@@ -38,21 +38,21 @@ func init() {
 		CREATE UNIQUE INDEX IF NOT EXISTS users_email ON users (email);
 		CREATE TABLE IF NOT EXISTS validation_tokens (
 			id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			validation_token   STRING UNIQUE NOT NULL,
+			validation_token   VARCHAR UNIQUE NOT NULL,
 			user_id            UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 			created_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			expires_in         INTEGER NOT NULL
 		);
 		CREATE TABLE IF NOT EXISTS users_api_keys (
 			user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-			key_name   STRING(36) NOT NULL,
-			key        STRING NOT NULL UNIQUE,
+			key_name   VARCHAR(36) NOT NULL,
+			key        VARCHAR NOT NULL UNIQUE,
 			PRIMARY KEY(user_id, key_name)
 		);
 		CREATE TABLE IF NOT EXISTS users_api_keys_rights (
 			user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-			key_name   STRING(36) NOT NULL,
-			"right"    STRING NOT NULL,
+			key_name   VARCHAR(36) NOT NULL,
+			"right"    VARCHAR NOT NULL,
 			PRIMARY KEY(user_id, key_name, "right")
 		);
 	`
