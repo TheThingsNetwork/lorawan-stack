@@ -68,7 +68,7 @@ func init() {
 	gob.Register(&MACCommand_DeviceModeConf_{})
 }
 
-// IsValid reports whether v represents a valid MACVersion.
+// Validate reports whether v represents a valid MACVersion.
 func (v MACVersion) Validate() error {
 	if v < 1 || v >= MACVersion(len(MACVersion_name)) {
 		return errors.Errorf("expected MACVersion to be between %d and %d, got %d", 1, len(MACVersion_name)-1, v)

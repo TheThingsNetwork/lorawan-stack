@@ -14,7 +14,52 @@
 
 package ttnpb
 
-import proto "github.com/gogo/protobuf/proto"
+import (
+	"github.com/gogo/protobuf/proto"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
+)
+
+// Validate reports whether cid represents a valid MACCommandIdentifier.
+func (cid MACCommandIdentifier) Validate() error {
+	_, ok := MACCommandIdentifier_name[int32(cid)]
+	if !ok || cid == CID_RFU_0 {
+		return errors.Errorf("Unknown CID: %x", cid)
+	}
+	return nil
+}
+
+// InitiatedByDevice reports whether CID is initiated by device.
+func (cid MACCommandIdentifier) InitiatedByDevice() bool {
+	switch cid {
+	case CID_LINK_ADR,
+		CID_DUTY_CYCLE,
+		CID_RX_PARAM_SETUP,
+		CID_DEV_STATUS,
+		CID_NEW_CHANNEL,
+		CID_RX_TIMING_SETUP,
+		CID_TX_PARAM_SETUP,
+		CID_DL_CHANNEL,
+		CID_ADR_PARAM_SETUP,
+		CID_FORCE_REJOIN,
+		CID_REJOIN_PARAM_SETUP,
+		CID_PING_SLOT_INFO,
+		CID_PING_SLOT_CHANNEL,
+		CID_BEACON_TIMING,
+		CID_BEACON_FREQ,
+		CID_DEVICE_MODE:
+		return false
+
+	case CID_RESET,
+		CID_LINK_CHECK,
+		CID_REKEY,
+		CID_DEVICE_TIME:
+		return true
+
+	default:
+		panic(errors.Errorf("unknown CID: %s", cid))
+	}
+}
 
 // MACCommandPayload interface is implemented by all MAC commands.
 type MACCommandPayload interface {
@@ -25,9 +70,17 @@ type MACCommandPayload interface {
 	UnmarshalLoRaWAN(b []byte) error
 }
 
+// Validate reports whether cmd represents a valid MACCommandIdentifier.
+func (cmd *MACCommand) Validate() error {
+	if cmd.Payload == nil {
+		return common.ErrMissingPayload.New(nil)
+	}
+	return cmd.CID().Validate()
+}
+
 // CID returns the CID of the embedded MAC command.
-func (m *MACCommand) CID() MACCommandIdentifier {
-	switch x := m.Payload.(type) {
+func (cmd *MACCommand) CID() MACCommandIdentifier {
+	switch x := cmd.Payload.(type) {
 	case *MACCommand_CID:
 		return x.CID
 	case *MACCommand_Proprietary_:
@@ -92,237 +145,167 @@ func (m *MACCommand) CID() MACCommandIdentifier {
 		return CID_DEVICE_MODE
 	case *MACCommand_DeviceModeConf_:
 		return CID_DEVICE_MODE
+	default:
+		panic(errors.Errorf("unmatched payload type: %T", x))
 	}
-	return 0
-}
-
-// GetActualPayload returns the actual payload of the embedded MAC command.
-func (m *MACCommand) GetActualPayload() MACCommandPayload {
-	switch x := m.Payload.(type) {
-	case *MACCommand_CID:
-		return nil
-	case *MACCommand_Proprietary_:
-		return x.Proprietary
-	case *MACCommand_ResetInd_:
-		return x.ResetInd
-	case *MACCommand_ResetConf_:
-		return x.ResetConf
-	case *MACCommand_LinkCheckAns_:
-		return x.LinkCheckAns
-	case *MACCommand_LinkADRReq_:
-		return x.LinkADRReq
-	case *MACCommand_LinkADRAns_:
-		return x.LinkADRAns
-	case *MACCommand_DutyCycleReq_:
-		return x.DutyCycleReq
-	case *MACCommand_RxParamSetupReq_:
-		return x.RxParamSetupReq
-	case *MACCommand_RxParamSetupAns_:
-		return x.RxParamSetupAns
-	case *MACCommand_DevStatusAns_:
-		return x.DevStatusAns
-	case *MACCommand_NewChannelReq_:
-		return x.NewChannelReq
-	case *MACCommand_NewChannelAns_:
-		return x.NewChannelAns
-	case *MACCommand_DlChannelReq:
-		return x.DlChannelReq
-	case *MACCommand_DlChannelAns:
-		return x.DlChannelAns
-	case *MACCommand_RxTimingSetupReq_:
-		return x.RxTimingSetupReq
-	case *MACCommand_TxParamSetupReq_:
-		return x.TxParamSetupReq
-	case *MACCommand_RekeyInd_:
-		return x.RekeyInd
-	case *MACCommand_RekeyConf_:
-		return x.RekeyConf
-	case *MACCommand_ADRParamSetupReq_:
-		return x.ADRParamSetupReq
-	case *MACCommand_DeviceTimeAns_:
-		return x.DeviceTimeAns
-	case *MACCommand_ForceRejoinReq_:
-		return x.ForceRejoinReq
-	case *MACCommand_RejoinParamSetupReq_:
-		return x.RejoinParamSetupReq
-	case *MACCommand_RejoinParamSetupAns_:
-		return x.RejoinParamSetupAns
-	case *MACCommand_PingSlotInfoReq_:
-		return x.PingSlotInfoReq
-	case *MACCommand_PingSlotChannelReq_:
-		return x.PingSlotChannelReq
-	case *MACCommand_PingSlotChannelAns_:
-		return x.PingSlotChannelAns
-	case *MACCommand_BeaconTimingAns_:
-		return x.BeaconTimingAns
-	case *MACCommand_BeaconFreqReq_:
-		return x.BeaconFreqReq
-	case *MACCommand_BeaconFreqAns_:
-		return x.BeaconFreqAns
-	case *MACCommand_DeviceModeInd_:
-		return x.DeviceModeInd
-	case *MACCommand_DeviceModeConf_:
-		return x.DeviceModeConf
-	}
-	return nil
 }
 
 // MACCommand returns a payload-less MAC command with this CID.
-func (m MACCommandIdentifier) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_CID{CID: m}}
+func (cid MACCommandIdentifier) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_CID{CID: cid}}
 }
 
 // MACCommand returns the Proprietary MAC command as a *MACCommand.
-func (m *MACCommand_Proprietary) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_Proprietary_{Proprietary: m}}
+func (cmd *MACCommand_Proprietary) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_Proprietary_{Proprietary: cmd}}
 }
 
 // MACCommand returns the ResetInd MAC command as a *MACCommand.
-func (m *MACCommand_ResetInd) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_ResetInd_{ResetInd: m}}
+func (cmd *MACCommand_ResetInd) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_ResetInd_{ResetInd: cmd}}
 }
 
 // MACCommand returns the ResetConf MAC command as a *MACCommand.
-func (m *MACCommand_ResetConf) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_ResetConf_{ResetConf: m}}
+func (cmd *MACCommand_ResetConf) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_ResetConf_{ResetConf: cmd}}
 }
 
 // MACCommand returns the LinkCheckAns MAC command as a *MACCommand.
-func (m *MACCommand_LinkCheckAns) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_LinkCheckAns_{LinkCheckAns: m}}
+func (cmd *MACCommand_LinkCheckAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_LinkCheckAns_{LinkCheckAns: cmd}}
 }
 
 // MACCommand returns the LinkADRReq MAC command as a *MACCommand.
-func (m *MACCommand_LinkADRReq) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_LinkADRReq_{LinkADRReq: m}}
+func (cmd *MACCommand_LinkADRReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_LinkADRReq_{LinkADRReq: cmd}}
 }
 
 // MACCommand returns the LinkADRAns MAC command as a *MACCommand.
-func (m *MACCommand_LinkADRAns) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_LinkADRAns_{LinkADRAns: m}}
+func (cmd *MACCommand_LinkADRAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_LinkADRAns_{LinkADRAns: cmd}}
 }
 
 // MACCommand returns the DutyCycleReq MAC command as a *MACCommand.
-func (m *MACCommand_DutyCycleReq) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_DutyCycleReq_{DutyCycleReq: m}}
+func (cmd *MACCommand_DutyCycleReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_DutyCycleReq_{DutyCycleReq: cmd}}
 }
 
 // MACCommand returns the RxParamSetupReq MAC command as a *MACCommand.
-func (m *MACCommand_RxParamSetupReq) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_RxParamSetupReq_{RxParamSetupReq: m}}
+func (cmd *MACCommand_RxParamSetupReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_RxParamSetupReq_{RxParamSetupReq: cmd}}
 }
 
 // MACCommand returns the RxParamSetupAns MAC command as a *MACCommand.
-func (m *MACCommand_RxParamSetupAns) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_RxParamSetupAns_{RxParamSetupAns: m}}
+func (cmd *MACCommand_RxParamSetupAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_RxParamSetupAns_{RxParamSetupAns: cmd}}
 }
 
 // MACCommand returns the DevStatusAns MAC command as a *MACCommand.
-func (m *MACCommand_DevStatusAns) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_DevStatusAns_{DevStatusAns: m}}
+func (cmd *MACCommand_DevStatusAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_DevStatusAns_{DevStatusAns: cmd}}
 }
 
 // MACCommand returns the NewChannelReq MAC command as a *MACCommand.
-func (m *MACCommand_NewChannelReq) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_NewChannelReq_{NewChannelReq: m}}
+func (cmd *MACCommand_NewChannelReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_NewChannelReq_{NewChannelReq: cmd}}
 }
 
 // MACCommand returns the NewChannelAns MAC command as a *MACCommand.
-func (m *MACCommand_NewChannelAns) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_NewChannelAns_{NewChannelAns: m}}
+func (cmd *MACCommand_NewChannelAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_NewChannelAns_{NewChannelAns: cmd}}
 }
 
 // MACCommand returns the DLChannelReq MAC command as a *MACCommand.
-func (m *MACCommand_DLChannelReq) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_DlChannelReq{DlChannelReq: m}}
+func (cmd *MACCommand_DLChannelReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_DlChannelReq{DlChannelReq: cmd}}
 }
 
 // MACCommand returns the DLChannelAns MAC command as a *MACCommand.
-func (m *MACCommand_DLChannelAns) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_DlChannelAns{DlChannelAns: m}}
+func (cmd *MACCommand_DLChannelAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_DlChannelAns{DlChannelAns: cmd}}
 }
 
 // MACCommand returns the RxTimingSetupReq MAC command as a *MACCommand.
-func (m *MACCommand_RxTimingSetupReq) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_RxTimingSetupReq_{RxTimingSetupReq: m}}
+func (cmd *MACCommand_RxTimingSetupReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_RxTimingSetupReq_{RxTimingSetupReq: cmd}}
 }
 
 // MACCommand returns the TxParamSetupReq MAC command as a *MACCommand.
-func (m *MACCommand_TxParamSetupReq) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_TxParamSetupReq_{TxParamSetupReq: m}}
+func (cmd *MACCommand_TxParamSetupReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_TxParamSetupReq_{TxParamSetupReq: cmd}}
 }
 
 // MACCommand returns the RekeyInd MAC command as a *MACCommand.
-func (m *MACCommand_RekeyInd) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_RekeyInd_{RekeyInd: m}}
+func (cmd *MACCommand_RekeyInd) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_RekeyInd_{RekeyInd: cmd}}
 }
 
 // MACCommand returns the RekeyConf MAC command as a *MACCommand.
-func (m *MACCommand_RekeyConf) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_RekeyConf_{RekeyConf: m}}
+func (cmd *MACCommand_RekeyConf) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_RekeyConf_{RekeyConf: cmd}}
 }
 
 // MACCommand returns the ADRParamSetupReq MAC command as a *MACCommand.
-func (m *MACCommand_ADRParamSetupReq) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_ADRParamSetupReq_{ADRParamSetupReq: m}}
+func (cmd *MACCommand_ADRParamSetupReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_ADRParamSetupReq_{ADRParamSetupReq: cmd}}
 }
 
 // MACCommand returns the DeviceTimeAns MAC command as a *MACCommand.
-func (m *MACCommand_DeviceTimeAns) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_DeviceTimeAns_{DeviceTimeAns: m}}
+func (cmd *MACCommand_DeviceTimeAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_DeviceTimeAns_{DeviceTimeAns: cmd}}
 }
 
 // MACCommand returns the ForceRejoinReq MAC command as a *MACCommand.
-func (m *MACCommand_ForceRejoinReq) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_ForceRejoinReq_{ForceRejoinReq: m}}
+func (cmd *MACCommand_ForceRejoinReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_ForceRejoinReq_{ForceRejoinReq: cmd}}
 }
 
 // MACCommand returns the RejoinParamSetupReq MAC command as a *MACCommand.
-func (m *MACCommand_RejoinParamSetupReq) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_RejoinParamSetupReq_{RejoinParamSetupReq: m}}
+func (cmd *MACCommand_RejoinParamSetupReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_RejoinParamSetupReq_{RejoinParamSetupReq: cmd}}
 }
 
 // MACCommand returns the RejoinParamSetupAns MAC command as a *MACCommand.
-func (m *MACCommand_RejoinParamSetupAns) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_RejoinParamSetupAns_{RejoinParamSetupAns: m}}
+func (cmd *MACCommand_RejoinParamSetupAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_RejoinParamSetupAns_{RejoinParamSetupAns: cmd}}
 }
 
 // MACCommand returns the PingSlotInfoReq MAC command as a *MACCommand.
-func (m *MACCommand_PingSlotInfoReq) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_PingSlotInfoReq_{PingSlotInfoReq: m}}
+func (cmd *MACCommand_PingSlotInfoReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_PingSlotInfoReq_{PingSlotInfoReq: cmd}}
 }
 
 // MACCommand returns the PingSlotChannelReq MAC command as a *MACCommand.
-func (m *MACCommand_PingSlotChannelReq) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_PingSlotChannelReq_{PingSlotChannelReq: m}}
+func (cmd *MACCommand_PingSlotChannelReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_PingSlotChannelReq_{PingSlotChannelReq: cmd}}
 }
 
 // MACCommand returns the PingSlotChannelAns MAC command as a *MACCommand.
-func (m *MACCommand_PingSlotChannelAns) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_PingSlotChannelAns_{PingSlotChannelAns: m}}
+func (cmd *MACCommand_PingSlotChannelAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_PingSlotChannelAns_{PingSlotChannelAns: cmd}}
 }
 
 // MACCommand returns the BeaconTimingAns MAC command as a *MACCommand.
-func (m *MACCommand_BeaconTimingAns) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_BeaconTimingAns_{BeaconTimingAns: m}}
+func (cmd *MACCommand_BeaconTimingAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_BeaconTimingAns_{BeaconTimingAns: cmd}}
 }
 
 // MACCommand returns the BeaconFreqReq MAC command as a *MACCommand.
-func (m *MACCommand_BeaconFreqReq) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_BeaconFreqReq_{BeaconFreqReq: m}}
+func (cmd *MACCommand_BeaconFreqReq) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_BeaconFreqReq_{BeaconFreqReq: cmd}}
 }
 
 // MACCommand returns the BeaconFreqAns MAC command as a *MACCommand.
-func (m *MACCommand_BeaconFreqAns) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_BeaconFreqAns_{BeaconFreqAns: m}}
+func (cmd *MACCommand_BeaconFreqAns) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_BeaconFreqAns_{BeaconFreqAns: cmd}}
 }
 
 // MACCommand returns the DeviceModeInd MAC command as a *MACCommand.
-func (m *MACCommand_DeviceModeInd) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_DeviceModeInd_{DeviceModeInd: m}}
+func (cmd *MACCommand_DeviceModeInd) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_DeviceModeInd_{DeviceModeInd: cmd}}
 }
 
 // MACCommand returns the DeviceModeConf MAC command as a *MACCommand.
-func (m *MACCommand_DeviceModeConf) MACCommand() *MACCommand {
-	return &MACCommand{Payload: &MACCommand_DeviceModeConf_{DeviceModeConf: m}}
+func (cmd *MACCommand_DeviceModeConf) MACCommand() *MACCommand {
+	return &MACCommand{Payload: &MACCommand_DeviceModeConf_{DeviceModeConf: cmd}}
 }
