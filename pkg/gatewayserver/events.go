@@ -22,7 +22,7 @@ var (
 	evtStartGatewayLink = events.Define("gateway.start_link", "start gateway link")
 	evtEndGatewayLink   = events.Define("gateway.end_link", "end gateway link")
 
-	evtReceiveUp     = events.Define("up.receive", "receive uplink message")
+	evtReceiveUp     = events.Define("gs.up.receive", "receive uplink message")
 	evtReceiveStatus = events.Define("status.receive", "receive status message")
-	evtSendDown      = events.Define("down.send", "send downlink message")
+	evtSendDown      = events.Define("gs.down.send", "send downlink message")
 )

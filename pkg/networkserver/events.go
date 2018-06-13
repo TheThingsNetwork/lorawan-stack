@@ -20,7 +20,7 @@ var (
 	evtStartApplicationLink = events.Define("application.start_link", "start application link")
 	evtEndApplicationLink   = events.Define("application.end_link", "end application link")
 
-	evtReceiveUp          = events.Define("up.receive", "receive uplink message")
+	evtReceiveUp          = events.Define("ns.up.receive", "receive uplink message")
 	evtReceiveUpDuplicate = events.Define("up.receive_duplicate", "receive duplicate uplink message")
 	evtMergeMetadata      = events.Define("up.merge_metadata", "merge uplink message metadata")
 
