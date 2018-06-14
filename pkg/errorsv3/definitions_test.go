@@ -12,33 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package errors
+package errors_test
 
 import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestDefinitions(t *testing.T) {
 	a := assertions.New(t)
 
-	Define("test_definitions_unknown", "")
+	errors.Define("test_definitions_unknown", "")
 	a.So(func() {
-		Define("test_definitions_unknown", "")
+		errors.Define("test_definitions_unknown", "")
 	}, should.Panic)
-}
-
-func TestMessageFormat(t *testing.T) {
-	a := assertions.New(t)
-
-	args := messageFormatArguments("Application with ID {app_id} could not be found in namespace { ns } or namespace {   ns } does not exist")
-	a.So(args, should.HaveLength, 2) // no duplicates
-	a.So(args, should.Contain, "app_id")
-	a.So(args, should.Contain, "ns")
-
-	err := Define("test_message_format", "MessageFormat {foo}, {bar}")
-	a.So(err.publicAttributes, should.Contain, "foo")
-	a.So(err.publicAttributes, should.Contain, "bar")
 }

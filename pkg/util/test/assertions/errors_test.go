@@ -21,6 +21,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	errorsv3 "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 var testDescriptor = &errors.ErrDescriptor{
@@ -46,4 +47,24 @@ func TestShouldDescribeError(t *testing.T) {
 	// Wrong namespace or code.
 	a.So(ShouldDescribeError(errors.New("test"), testDescriptor), should.NotBeEmpty)
 	a.So(ShouldNotDescribeError(errors.New("test"), testDescriptor), should.BeEmpty)
+}
+
+func TestShouldHaveSameErrorDefinition(t *testing.T) {
+	a := assertions.New(t)
+
+	errDef := errorsv3.Define("test_error_assertions", "Error Assertions Test")
+	errOtherDef := errorsv3.Define("test_error_assertions_other", "Other Error Assertions Test")
+
+	// Happy flow.
+	a.So(ShouldHaveSameErrorDefinitionAs(errDef.WithAttributes("k", "v"), errDef.WithAttributes("foo", "bar")), should.BeEmpty)
+	a.So(ShouldEqualErrorOrDefinition(errDef.WithAttributes("k", "v"), errDef.WithAttributes("k", "v")), should.BeEmpty)
+	a.So(ShouldEqualErrorOrDefinition(errDef, errDef), should.BeEmpty)
+
+	// Not same.
+	a.So(ShouldHaveSameErrorDefinitionAs(errDef.WithAttributes("k", "v"), errOtherDef.WithAttributes("k", "v")), should.NotBeEmpty)
+	a.So(ShouldEqualErrorOrDefinition(errDef.WithAttributes("k", "v"), errOtherDef.WithAttributes("k", "v")), should.NotBeEmpty)
+	a.So(ShouldEqualErrorOrDefinition(errDef, errDef.WithAttributes("k", "v")), should.NotBeEmpty)
+	a.So(ShouldEqualErrorOrDefinition(errDef.WithAttributes("k", "v"), errDef), should.NotBeEmpty)
+	a.So(ShouldEqualErrorOrDefinition(errDef, errOtherDef), should.NotBeEmpty)
+	a.So(ShouldEqualErrorOrDefinition(errDef, errors.New("hello")), should.NotBeEmpty)
 }

@@ -12,24 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package errors
+package errors_test
 
 import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestCause(t *testing.T) {
 	a := assertions.New(t)
 
-	var cause = New("cause")
+	var cause = errors.New("cause")
 
-	var errInvalidFoo = DefineInvalidArgument("test_cause_invalid_foo", "Invalid Foo: {foo}", "foo")
+	var errInvalidFoo = errors.DefineInvalidArgument("test_cause_invalid_foo", "Invalid Foo: {foo}", "foo")
 
-	a.So(errInvalidFoo.Cause(), ShouldEqual, nil)
-	a.So(RootCause(errInvalidFoo), ShouldEqual, errInvalidFoo)
+	a.So(errInvalidFoo.Cause(), should.EqualErrorOrDefinition, nil)
+	a.So(errors.RootCause(errInvalidFoo), should.EqualErrorOrDefinition, errInvalidFoo)
 
 	err1 := errInvalidFoo.WithCause(cause)
 
@@ -37,16 +38,16 @@ func TestCause(t *testing.T) {
 		err1.WithCause(cause)
 	}, should.Panic)
 
-	a.So(err1, ShouldHaveSameDefinitionAs, errInvalidFoo)
-	a.So(err1.Cause(), ShouldEqual, &cause)
-	a.So(RootCause(err1), ShouldEqual, &cause)
-	a.So(Stack(err1), should.Resemble, []error{err1, &cause})
+	a.So(err1, should.HaveSameErrorDefinitionAs, errInvalidFoo)
+	a.So(err1.Cause(), should.EqualErrorOrDefinition, &cause)
+	a.So(errors.RootCause(err1), should.EqualErrorOrDefinition, &cause)
+	a.So(errors.Stack(err1), should.Resemble, []error{err1, &cause})
 
-	var errInvalidBar = DefineInvalidArgument("test_cause_invalid_bar", "Invalid Bar")
+	var errInvalidBar = errors.DefineInvalidArgument("test_cause_invalid_bar", "Invalid Bar")
 	err2 := errInvalidBar.WithCause(&err1)
 
-	a.So(err2, ShouldHaveSameDefinitionAs, errInvalidBar)
-	a.So(err2.Cause(), ShouldEqual, &err1)
-	a.So(RootCause(err2), ShouldEqual, &cause)
-	a.So(Stack(err2), should.Resemble, []error{err2, &err1, &cause})
+	a.So(err2, should.HaveSameErrorDefinitionAs, errInvalidBar)
+	a.So(err2.Cause(), should.EqualErrorOrDefinition, &err1)
+	a.So(errors.RootCause(err2), should.EqualErrorOrDefinition, &cause)
+	a.So(errors.Stack(err2), should.Resemble, []error{err2, &err1, &cause})
 }

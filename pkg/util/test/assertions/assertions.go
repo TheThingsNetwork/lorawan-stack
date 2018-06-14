@@ -15,5 +15,6 @@
 package assertions
 
 const (
-	success = ""
+	success         = ""
+	needExactValues = "This assertion requires exactly %d comparison values (you provided %d)."
 )

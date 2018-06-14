@@ -12,34 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package errors
+package errors_test
 
 import (
-	"errors"
+	gerrors "errors"
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestDetails(t *testing.T) {
 	a := assertions.New(t)
 
-	var errInvalidFoo = DefineInvalidArgument("test_details_invalid_foo", "Invalid Foo")
+	var errInvalidFoo = errors.DefineInvalidArgument("test_details_invalid_foo", "Invalid Foo")
 
 	a.So(errInvalidFoo.Details(), should.BeEmpty)
 
-	a.So(Details(errInvalidFoo), should.BeEmpty)
-	a.So(Details(errInvalidFoo.GRPCStatus().Err()), should.BeEmpty)
-	a.So(Details(errors.New("go stdlib error")), should.BeEmpty)
+	a.So(errors.Details(errInvalidFoo), should.BeEmpty)
+	a.So(errors.Details(errInvalidFoo.GRPCStatus().Err()), should.BeEmpty)
+	a.So(errors.Details(gerrors.New("go stdlib error")), should.BeEmpty)
 
 	err1 := errInvalidFoo.WithDetails("foo", "bar")
 	err2 := err1.WithDetails("bar", "baz")
 
-	a.So(err1, ShouldHaveSameDefinitionAs, errInvalidFoo)
+	a.So(err1, should.HaveSameErrorDefinitionAs, errInvalidFoo)
 	a.So(err1.Details(), should.Resemble, []interface{}{"foo", "bar"})
 
-	a.So(err2, ShouldHaveSameDefinitionAs, err1)
-	a.So(err2, ShouldHaveSameDefinitionAs, errInvalidFoo)
+	a.So(err2, should.HaveSameErrorDefinitionAs, err1)
+	a.So(err2, should.HaveSameErrorDefinitionAs, errInvalidFoo)
 	a.So(err2.Details(), should.Resemble, []interface{}{"bar", "baz"})
 }

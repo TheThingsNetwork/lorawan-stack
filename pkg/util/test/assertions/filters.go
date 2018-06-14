@@ -17,7 +17,6 @@ package assertions
 import "fmt"
 
 const (
-	needExactValues        = "This assertion requires exactly %d comparison values (you provided %d)."
 	needNonEmptyCollection = "This assertion requires at least 1 comparison value (you provided 0)."
 	needFewerValues        = "This assertion allows %d or fewer comparison values (you provided %d)."
 )

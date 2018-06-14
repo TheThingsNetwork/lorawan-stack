@@ -165,4 +165,9 @@ var (
 	NotEqualFieldsWithIgnores = testassertions.ShouldNotEqualFieldsWithIgnores
 	// HaveParentContext asserts that the context.Context is a child of context.Context.
 	HaveParentContext = testassertions.ShouldHaveParentContext
+	// HaveSameErrorDefinitionAs asserts that the error definitions of the actual and expected arguments are the same.
+	HaveSameErrorDefinitionAs = testassertions.ShouldHaveSameErrorDefinitionAs
+	// EqualErrorOrDefinition asserts that the actual and expected arguments are of the same type (error or definition),
+	// and that they have the same underlying definition, as well as arguments if they are both errors.
+	EqualErrorOrDefinition = testassertions.ShouldEqualErrorOrDefinition
 )

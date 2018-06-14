@@ -12,24 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package errors_test
+package errors
 
 import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
-	_ "go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"github.com/smartystreets/assertions/should"
 )
 
-func TestGRPCConversion(t *testing.T) {
+func TestMessageFormat(t *testing.T) {
 	a := assertions.New(t)
 
-	errDef := errors.Define("test_grpc_conversion_err_def", "gRPC Conversion Error", "foo")
-	a.So(errors.FromGRPCStatus(errDef.GRPCStatus()).Definition, should.EqualErrorOrDefinition, errDef)
+	args := messageFormatArguments("Application with ID {app_id} could not be found in namespace { ns } or namespace {   ns } does not exist")
+	a.So(args, should.HaveLength, 2) // no duplicates
+	a.So(args, should.Contain, "app_id")
+	a.So(args, should.Contain, "ns")
 
-	errHello := errDef.WithAttributes("foo", "bar", "baz", "qux")
-	errHelloExpected := errDef.WithAttributes("foo", "bar")
-	a.So(errors.FromGRPCStatus(errHello.GRPCStatus()), should.EqualErrorOrDefinition, errHelloExpected)
+	err := Define("test_message_format", "MessageFormat {foo}, {bar}")
+	a.So(err.publicAttributes, should.Contain, "foo")
+	a.So(err.publicAttributes, should.Contain, "bar")
 }

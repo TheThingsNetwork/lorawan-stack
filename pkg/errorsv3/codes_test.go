@@ -12,48 +12,49 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package errors
+package errors_test
 
 import (
 	"context"
-	"errors"
+	gerrors "errors"
 	"net/http"
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestCodes(t *testing.T) {
 	a := assertions.New(t)
 
-	errStdLib := errors.New("go stdlib error")
-	errUnknown := Define("test_codes_unknown", "")
+	errStdLib := gerrors.New("go stdlib error")
+	errUnknown := errors.Define("test_codes_unknown", "")
 
-	a.So(IsUnknown(errUnknown), should.BeTrue)
-	a.So(IsUnknown(errUnknown.GRPCStatus().Err()), should.BeTrue)
-	a.So(IsUnknown(errStdLib), should.BeFalse)
-	a.So(IsUnknown(DefineInternal("test_codes_not_unknown", "")), should.BeFalse)
+	a.So(errors.IsUnknown(errUnknown), should.BeTrue)
+	a.So(errors.IsUnknown(errUnknown.GRPCStatus().Err()), should.BeTrue)
+	a.So(errors.IsUnknown(errStdLib), should.BeFalse)
+	a.So(errors.IsUnknown(errors.DefineInternal("test_codes_not_unknown", "")), should.BeFalse)
 
-	a.So(IsCanceled(context.Canceled), should.BeTrue)
-	a.So(IsDeadlineExceeded(context.DeadlineExceeded), should.BeTrue)
-	a.So(IsInvalidArgument(DefineInvalidArgument("test_codes_invalid_argument", "")), should.BeTrue)
-	a.So(IsNotFound(DefineNotFound("test_codes_not_found", "")), should.BeTrue)
-	a.So(IsAlreadyExists(DefineAlreadyExists("test_codes_already_exists", "")), should.BeTrue)
-	a.So(IsPermissionDenied(DefinePermissionDenied("test_codes_permission_denied", "")), should.BeTrue)
-	a.So(IsResourceExhausted(DefineResourceExhausted("test_codes_resource_exhausted", "")), should.BeTrue)
-	a.So(IsFailedPrecondition(DefineFailedPrecondition("test_codes_failed_precondition", "")), should.BeTrue)
-	a.So(IsAborted(DefineAborted("test_codes_aborted", "")), should.BeTrue)
-	errInternal := DefineInternal("test_codes_internal", "")
-	a.So(IsInternal(errInternal), should.BeTrue)
-	a.So(IsUnavailable(DefineUnavailable("test_codes_unavailable", "")), should.BeTrue)
-	a.So(IsDataLoss(DefineDataLoss("test_codes_data_loss", "")), should.BeTrue)
-	a.So(IsDataLoss(DefineCorruption("test_codes_corruption", "")), should.BeTrue)
-	a.So(IsUnauthenticated(DefineUnauthenticated("test_codes_unauthenticated", "")), should.BeTrue)
+	a.So(errors.IsCanceled(context.Canceled), should.BeTrue)
+	a.So(errors.IsDeadlineExceeded(context.DeadlineExceeded), should.BeTrue)
+	a.So(errors.IsInvalidArgument(errors.DefineInvalidArgument("test_codes_invalid_argument", "")), should.BeTrue)
+	a.So(errors.IsNotFound(errors.DefineNotFound("test_codes_not_found", "")), should.BeTrue)
+	a.So(errors.IsAlreadyExists(errors.DefineAlreadyExists("test_codes_already_exists", "")), should.BeTrue)
+	a.So(errors.IsPermissionDenied(errors.DefinePermissionDenied("test_codes_permission_denied", "")), should.BeTrue)
+	a.So(errors.IsResourceExhausted(errors.DefineResourceExhausted("test_codes_resource_exhausted", "")), should.BeTrue)
+	a.So(errors.IsFailedPrecondition(errors.DefineFailedPrecondition("test_codes_failed_precondition", "")), should.BeTrue)
+	a.So(errors.IsAborted(errors.DefineAborted("test_codes_aborted", "")), should.BeTrue)
+	errInternal := errors.DefineInternal("test_codes_internal", "")
+	a.So(errors.IsInternal(errInternal), should.BeTrue)
+	a.So(errors.IsUnavailable(errors.DefineUnavailable("test_codes_unavailable", "")), should.BeTrue)
+	a.So(errors.IsDataLoss(errors.DefineDataLoss("test_codes_data_loss", "")), should.BeTrue)
+	a.So(errors.IsDataLoss(errors.DefineCorruption("test_codes_corruption", "")), should.BeTrue)
+	a.So(errors.IsUnauthenticated(errors.DefineUnauthenticated("test_codes_unauthenticated", "")), should.BeTrue)
 
 	// Unknown errors with a non-unknown cause take the cause's code
-	a.So(IsInternal(errUnknown.WithCause(errInternal)), should.BeTrue)
+	a.So(errors.IsInternal(errUnknown.WithCause(errInternal)), should.BeTrue)
 
-	a.So(HTTPStatusCode(errInternal), should.Equal, http.StatusInternalServerError)
-	a.So(HTTPStatusCode(errStdLib), should.Equal, http.StatusInternalServerError)
+	a.So(errors.HTTPStatusCode(errInternal), should.Equal, http.StatusInternalServerError)
+	a.So(errors.HTTPStatusCode(errStdLib), should.Equal, http.StatusInternalServerError)
 }

@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package errors
+package errors_test
 
 import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestStackTrace(t *testing.T) {
 	a := assertions.New(t)
 
-	err := New("err")
+	err := errors.New("err")
 	a.So(err.StackTrace(), should.HaveLength, 3)
 }

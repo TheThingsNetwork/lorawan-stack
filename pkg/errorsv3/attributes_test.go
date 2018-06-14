@@ -12,19 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package errors
+package errors_test
 
 import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestAttributes(t *testing.T) {
 	a := assertions.New(t)
 
-	var errInvalidFoo = DefineInvalidArgument("test_attributes_invalid_foo", "Invalid Foo: {foo}", "foo")
+	var errInvalidFoo = errors.DefineInvalidArgument("test_attributes_invalid_foo", "Invalid Foo: {foo}", "foo")
 
 	a.So(errInvalidFoo.Attributes(), should.BeEmpty)
 
@@ -33,12 +34,12 @@ func TestAttributes(t *testing.T) {
 	err1 := errInvalidFoo.WithAttributes("foo", "bar")
 	err2 := err1.WithAttributes("bar", "baz")
 
-	a.So(err1, ShouldHaveSameDefinitionAs, errInvalidFoo)
-	a.So(Attributes(err1), should.Resemble, map[string]interface{}{"foo": "bar"})
-	a.So(PublicAttributes(err1), should.Resemble, map[string]interface{}{"foo": "bar"})
+	a.So(err1, should.HaveSameErrorDefinitionAs, errInvalidFoo)
+	a.So(errors.Attributes(err1), should.Resemble, map[string]interface{}{"foo": "bar"})
+	a.So(errors.PublicAttributes(err1), should.Resemble, map[string]interface{}{"foo": "bar"})
 
-	a.So(err2, ShouldHaveSameDefinitionAs, err1)
-	a.So(err2, ShouldHaveSameDefinitionAs, errInvalidFoo)
-	a.So(Attributes(err2), should.Resemble, map[string]interface{}{"foo": "bar", "bar": "baz"})
-	a.So(PublicAttributes(err2), should.Resemble, map[string]interface{}{"foo": "bar"})
+	a.So(err2, should.HaveSameErrorDefinitionAs, err1)
+	a.So(err2, should.HaveSameErrorDefinitionAs, errInvalidFoo)
+	a.So(errors.Attributes(err2), should.Resemble, map[string]interface{}{"foo": "bar", "bar": "baz"})
+	a.So(errors.PublicAttributes(err2), should.Resemble, map[string]interface{}{"foo": "bar"})
 }

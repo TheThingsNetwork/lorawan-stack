@@ -20,16 +20,16 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	_ "go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestHTTP(t *testing.T) {
 	a := assertions.New(t)
 
 	errDef := errors.DefineInvalidArgument("test_http_conversion_err_def", "HTTP Conversion Error", "foo")
-	a.So(errors.FromGRPCStatus(errDef.GRPCStatus()).Definition, errors.ShouldEqual, errDef)
+	a.So(errors.FromGRPCStatus(errDef.GRPCStatus()).Definition, should.EqualErrorOrDefinition, errDef)
 
 	errHello := errDef.WithAttributes("foo", "bar", "baz", "qux")
 	errHelloExpected := errDef.WithAttributes("foo", "bar")
@@ -44,5 +44,5 @@ func TestHTTP(t *testing.T) {
 
 	resp := w.Result()
 	a.So(w.Result().StatusCode, should.Equal, http.StatusBadRequest)
-	a.So(errors.FromHTTP(resp), errors.ShouldEqual, errHelloExpected)
+	a.So(errors.FromHTTP(resp), should.EqualErrorOrDefinition, errHelloExpected)
 }

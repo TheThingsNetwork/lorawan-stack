@@ -19,9 +19,9 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"github.com/smartystreets/assertions/should"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	_ "go.thethings.network/lorawan-stack/pkg/jsonpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestJSONConversion(t *testing.T) {
@@ -35,7 +35,7 @@ func TestJSONConversion(t *testing.T) {
 	var unmarshaledDef errors.Definition
 	err = json.Unmarshal(b, &unmarshaledDef)
 	a.So(err, should.BeNil)
-	a.So(unmarshaledDef, errors.ShouldEqual, errDef)
+	a.So(unmarshaledDef, should.EqualErrorOrDefinition, errDef)
 
 	errHello := errDef.WithAttributes("foo", "bar", "baz", "qux")
 	errHelloExpected := errDef.WithAttributes("foo", "bar")
@@ -46,5 +46,5 @@ func TestJSONConversion(t *testing.T) {
 	var unmarshaled errors.Error
 	err = json.Unmarshal(b, &unmarshaled)
 	a.So(err, should.BeNil)
-	a.So(unmarshaled, errors.ShouldEqual, errHelloExpected)
+	a.So(unmarshaled, should.EqualErrorOrDefinition, errHelloExpected)
 }
