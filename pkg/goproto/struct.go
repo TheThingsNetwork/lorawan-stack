@@ -177,7 +177,7 @@ func valueFromReflect(rv reflect.Value) (*structpb.Value, error) {
 		return &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: fmt.Sprint(rv.Complex())}}, nil
 
 	default:
-		// either Invalid, Chan. Func, Interface or UnsafePointer.
+		// either Invalid, Chan, Func, Interface or UnsafePointer.
 		return nil, fmt.Errorf("can not map a value of kind %s to a *structpb.Value", k)
 	}
 }

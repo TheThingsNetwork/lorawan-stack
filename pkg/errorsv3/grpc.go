@@ -40,47 +40,54 @@ func FromGRPCStatus(status *status.Status) Error {
 		code:          int32(status.Code()),
 		messageFormat: status.Message(),
 	}, 0)
-	if ErrorDetailsFromProto != nil {
-		detailMsgs := status.Details()
-		detailProtos := make([]proto.Message, 0, len(detailMsgs))
-		for _, msg := range detailMsgs { // convert to []proto.Message
-			if msg, ok := msg.(proto.Message); ok {
-				detailProtos = append(detailProtos, msg)
-			}
+	if ErrorDetailsFromProto == nil {
+		return err
+	}
+	detailMsgs := status.Details()
+	detailProtos := make([]proto.Message, 0, len(detailMsgs))
+	for _, msg := range detailMsgs { // convert to []proto.Message
+		if msg, ok := msg.(proto.Message); ok {
+			detailProtos = append(detailProtos, msg)
 		}
-		details, rest := ErrorDetailsFromProto(detailProtos...)
-		if len(rest) != 0 {
-			detailIfaces := make([]interface{}, len(rest))
-			for i, iface := range rest { // convert to []interface{}
-				detailIfaces[i] = iface
-			}
-			err.details = detailIfaces
+	}
+	details, rest := ErrorDetailsFromProto(detailProtos...)
+	if len(rest) != 0 {
+		detailIfaces := make([]interface{}, len(rest))
+		for i, iface := range rest { // convert to []interface{}
+			detailIfaces[i] = iface
 		}
-		if details != nil {
-			if namespace := details.Namespace(); namespace != "" {
-				err.namespace = namespace
-			}
-			if name := details.Name(); name != "" {
-				err.name = name
-			}
-			if messageFormat := details.MessageFormat(); messageFormat != "" {
-				err.messageFormat = messageFormat
-			}
-			if attributes := details.PublicAttributes(); len(attributes) != 0 {
-				err.attributes = attributes
-			}
-			if correlationID := details.CorrelationID(); correlationID != "" {
-				err.correlationID = correlationID
-			}
+		err.details = detailIfaces
+	}
+	if details != nil {
+		if namespace := details.Namespace(); namespace != "" {
+			err.namespace = namespace
+		}
+		if name := details.Name(); name != "" {
+			err.name = name
+		}
+		if messageFormat := details.MessageFormat(); messageFormat != "" {
+			err.messageFormat = messageFormat
+		}
+		if attributes := details.PublicAttributes(); len(attributes) != 0 {
+			err.attributes = attributes
+		}
+		if correlationID := details.CorrelationID(); correlationID != "" {
+			err.correlationID = correlationID
 		}
 	}
 	return err
 }
 
 // ErrorDetailsToProto converts the given ErrorDetails into a protobuf-encoded message.
+//
+// This variable is set by pkg/ttnpb.
 var ErrorDetailsToProto func(e ErrorDetails) (msg proto.Message)
 
-// ErrorDetailsFromProto ranges over the given protobuf-encoded messages to extract the ErrorDetails. It returns any
+// ErrorDetailsFromProto ranges over the given protobuf-encoded messages
+// to extract the ErrorDetails. It returns details if present, as well as the
+// rest of the details.
+//
+// This variable is set by pkg/ttnpb.
 var ErrorDetailsFromProto func(msg ...proto.Message) (details ErrorDetails, rest []proto.Message)
 
 // GRPCStatus converts the Definition into a gRPC status message.
@@ -94,7 +101,7 @@ func (d Definition) GRPCStatus() *status.Status {
 			var err error
 			s, err = s.WithDetails(proto)
 			if err != nil {
-				// TODO: this should probably panic
+				panic(err) // ErrorDetailsToProto generated an invalid proto.
 			}
 		}
 	}
@@ -127,7 +134,7 @@ func (e *Error) GRPCStatus() *status.Status {
 		var err error
 		s, err = s.WithDetails(protoDetails...)
 		if err != nil {
-			// TODO: this should probably panic
+			panic(err) // invalid details in the error or ErrorDetailsToProto generated an invalid proto.
 		}
 	}
 	e.grpcStatus.Store(s)

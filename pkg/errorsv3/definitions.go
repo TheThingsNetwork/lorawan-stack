@@ -76,7 +76,7 @@ func messageFormatArguments(messageFormat string) (args []string) {
 }
 
 func define(name, messageFormat string, publicAttributes ...string) Definition {
-	ns := pkg(3)
+	ns := namespace(3)
 	fullName := fmt.Sprintf("%s:%s", ns, name)
 
 	if Definitions[fullName] != nil {
@@ -144,8 +144,11 @@ func DefineAlreadyExists(name, messageFormat string, publicAttributes ...string)
 }
 
 // DefinePermissionDenied defines a registered error of type PermissionDenied.
-// It should be used when a client attempts to perform an authorized action using incorrect credentials or credentials with insufficient rights.
-// If the client attempts to perform the action without providing any form of authentication, Unauthenticated should be used instead.
+//
+// It should be used when a client attempts to perform an authorized action
+// using incorrect credentials or credentials with insufficient rights.
+// If the client attempts to perform the action without providing any form
+// of authentication, Unauthenticated should be used instead.
 func DefinePermissionDenied(name, messageFormat string, publicAttributes ...string) Definition {
 	def := define(name, messageFormat, publicAttributes...)
 	def.code = int32(codes.PermissionDenied)
@@ -208,9 +211,10 @@ func DefineCorruption(name, messageFormat string, publicAttributes ...string) De
 }
 
 // DefineUnauthenticated defines a registered error of type Unauthenticated.
-// It should be used when a client attempts to perform an authenticated action without providing any form of authentication.
-// If the client attempts to perform the action using incorrect credentials or credentials with insufficient rights,
-// PermissionDenied should be used instead.
+// It should be used when a client attempts to perform an authenticated action
+// without providing any form of authentication.
+// If the client attempts to perform the action using incorrect credentials
+// or credentials with insufficient rights, PermissionDenied should be used instead.
 func DefineUnauthenticated(name, messageFormat string, publicAttributes ...string) Definition {
 	def := define(name, messageFormat, publicAttributes...)
 	def.code = int32(codes.Unauthenticated)

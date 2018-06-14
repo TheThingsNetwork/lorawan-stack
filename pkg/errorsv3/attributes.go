@@ -126,7 +126,8 @@ func (e *Error) mergeAttributes(kv ...interface{}) {
 	e.clearGRPCStatus()
 }
 
-// WithAttributes returns the error with the given attributes set. Any conflicting attributes in the Error will be overwritten.
+// WithAttributes returns the error with the given attributes set.
+// Any conflicting attributes in the Error will be overwritten.
 func (e Error) WithAttributes(kv ...interface{}) Error {
 	e.mergeAttributes(kv...)
 	return e
@@ -134,7 +135,7 @@ func (e Error) WithAttributes(kv ...interface{}) Error {
 
 // WithAttributes returns a new error from the definition, and sets the given attributes.
 func (d Definition) WithAttributes(kv ...interface{}) Error {
-	e := build(d, 0)
+	e := build(d, 0) // Don't refactor this to build(...).WithAttributes(...)
 	e.mergeAttributes(kv...)
 	return e
 }

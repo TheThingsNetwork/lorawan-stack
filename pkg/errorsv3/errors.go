@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package errors implements rich errors that carry contextual information such as stack traces, causality and attributes.
+// Package errors implements rich errors that carry contextual information
+// such as stack traces, causality and attributes.
 package errors
 
 import (
@@ -25,7 +26,7 @@ import (
 // This way of creating errors should be avoided if possible.
 func New(text string) Error {
 	return build(Definition{
-		namespace:     pkg(2),
+		namespace:     namespace(2),
 		messageFormat: text,
 		code:          int32(codes.Unknown),
 	}, 4)
@@ -42,6 +43,7 @@ type Error struct {
 	grpcStatus    *atomic.Value
 }
 
+// build an error from the definition, skipping the first frames of the call stack.
 func build(d Definition, skip int) Error {
 	e := Error{Definition: d, grpcStatus: new(atomic.Value)}
 	if skip > 0 {

@@ -14,8 +14,12 @@
 
 package errors
 
+type detailer interface {
+	Details() []interface{}
+}
+
 func (e *Error) addDetails(details ...interface{}) {
-	if e.details != nil {
+	if e.details == nil {
 		e.details = details
 	} else {
 		e.details = append(e.details, details...)
@@ -26,7 +30,8 @@ func (e *Error) addDetails(details ...interface{}) {
 	e.clearGRPCStatus()
 }
 
-// WithDetails returns the error with the given details set. This appends to any existing details in the Error.
+// WithDetails returns the error with the given details set.
+// This appends to any existing details in the Error.
 func (e Error) WithDetails(details ...interface{}) Error {
 	e.addDetails(details...)
 	return e
@@ -34,7 +39,7 @@ func (e Error) WithDetails(details ...interface{}) Error {
 
 // WithDetails returns a new error from the definition, and sets the given details.
 func (d Definition) WithDetails(details ...interface{}) Error {
-	e := build(d, 0)
+	e := build(d, 0) // Don't refactor this to build(...).WithDetails(...)
 	e.addDetails(details...)
 	return e
 }
@@ -42,9 +47,7 @@ func (d Definition) WithDetails(details ...interface{}) Error {
 // Details of the error. Usually structs from ttnpb or google.golang.org/genproto/googleapis/rpc/errdetails.
 func (e Error) Details() (details []interface{}) {
 	if e.cause != nil {
-		if c, ok := e.cause.(interface{ Details() []interface{} }); ok {
-			details = append(details, c.Details()...)
-		}
+		details = append(details, Details(e.cause))
 	}
 	return append(details, e.details...)
 }
@@ -54,7 +57,7 @@ func (d Definition) Details() []interface{} { return nil }
 
 // Details gets the details of the error.
 func Details(err error) []interface{} {
-	if c, ok := err.(interface{ Details() []interface{} }); ok {
+	if c, ok := err.(detailer); ok {
 		return c.Details()
 	}
 	if err, ok := From(err); ok {

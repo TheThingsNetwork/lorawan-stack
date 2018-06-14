@@ -71,15 +71,24 @@ func CompatStatus(err Error) *status.Status {
 	case ResourceExhausted:
 		code = codes.ResourceExhausted
 	}
+
+	// Build a gRPC status:
 	s := status.New(code, err.Message())
-	if errors.ErrorDetailsToProto != nil {
-		if proto := errors.ErrorDetailsToProto(v3Compat{err}); proto != nil {
-			var err error
-			s, err = s.WithDetails(proto)
-			if err != nil {
-				// TODO: this should probably panic
-			}
-		}
+
+	// Convert error details to proto if possible:
+	if errors.ErrorDetailsToProto == nil {
+		return s
 	}
+	proto := errors.ErrorDetailsToProto(v3Compat{err})
+	if proto == nil {
+		return s
+	}
+
+	// Set the details on the gRPC status:
+	s, sErr := s.WithDetails(proto)
+	if sErr != nil {
+		panic(sErr)
+	}
+
 	return s
 }

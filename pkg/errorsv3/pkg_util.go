@@ -32,7 +32,10 @@ func setRootPath() {
 	rootPath = filepath.Dir(filepath.Dir(filepath.Join(filepath.Dir(fun), strings.Split(filepath.Base(fun), ".")[0]))) + "/"
 }
 
-func pkg(skip int) string {
+// namespace is called when errors are defined.
+// It returns the package path of the caller (skipping the first frames of the call stack)
+// and makes it relative to rootPath (so for example: pkg/errors).
+func namespace(skip int) string {
 	pc, _, _, ok := runtime.Caller(skip)
 	if !ok {
 		panic("could not determine source of error")

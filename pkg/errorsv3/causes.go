@@ -20,10 +20,10 @@ type causer interface {
 
 func (e *Error) setCause(cause error) {
 	if cause == nil {
-		return
+		panic("Error cause should not be set if nil")
 	}
 	if e.cause != nil {
-		panic("Error cause may not be overwritten, you're probably doing the a.WithCause(b) the wrong way around")
+		panic("Error cause should not be overwritten, you're probably doing the a.WithCause(b) the wrong way around")
 	}
 	if convertedCause, ok := From(cause); ok {
 		e.cause = convertedCause
@@ -34,7 +34,8 @@ func (e *Error) setCause(cause error) {
 	e.clearGRPCStatus()
 }
 
-// WithCause returns the error with the given cause set. Overwriting an existing cause in the Error will cause a panic.
+// WithCause returns the error with the given cause set.
+// Overwriting an existing cause in the Error will cause a panic.
 func (e Error) WithCause(cause error) Error {
 	e.setCause(cause)
 	return e
@@ -42,7 +43,7 @@ func (e Error) WithCause(cause error) Error {
 
 // WithCause returns a new error from the definition, and sets the cause of the error.
 func (d Definition) WithCause(cause error) Error {
-	e := build(d, 0)
+	e := build(d, 0) // Don't refactor this to build(...).WithCause(...)
 	e.setCause(cause)
 	return e
 }
@@ -67,7 +68,7 @@ func RootCause(err error) error {
 	for err != nil {
 		cause := Cause(err)
 		if cause == nil {
-			break
+			return err
 		}
 		err = cause
 	}
@@ -76,17 +77,8 @@ func RootCause(err error) error {
 
 // Stack returns the entire error stack, including the given error.
 func Stack(err error) (stack []error) {
-	for err != nil {
+	for ; err != nil; err = Cause(err) {
 		stack = append(stack, err)
-		c, ok := err.(causer)
-		if !ok {
-			break
-		}
-		cause := c.Cause()
-		if cause == nil {
-			break
-		}
-		err = cause
 	}
 	return
 }

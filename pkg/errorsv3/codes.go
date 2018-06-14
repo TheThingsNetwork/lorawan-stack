@@ -20,6 +20,10 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
+type coder interface {
+	Code() int32
+}
+
 // Code of the error.
 // If the code is invalid or unknown, this tries to get the code from the cause of this error.
 // This code is consistent with google.golang.org/genproto/googleapis/rpc/code and google.golang.org/grpc/codes.
@@ -28,15 +32,13 @@ func (e Error) Code() int32 {
 		return e.code
 	}
 	if e.cause != nil {
-		if c, ok := e.cause.(interface{ Code() int32 }); ok {
-			return c.Code()
-		}
+		return Code(e.cause)
 	}
 	return int32(codes.Unknown)
 }
 
 func code(err error) int32 {
-	if c, ok := err.(interface{ Code() int32 }); ok {
+	if c, ok := err.(coder); ok {
 		return c.Code()
 	}
 	if err, ok := From(err); ok {

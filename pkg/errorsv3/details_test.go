@@ -35,12 +35,12 @@ func TestDetails(t *testing.T) {
 	a.So(errors.Details(gerrors.New("go stdlib error")), should.BeEmpty)
 
 	err1 := errInvalidFoo.WithDetails("foo", "bar")
-	err2 := err1.WithDetails("bar", "baz")
+	err2 := err1.WithDetails("baz")
 
 	a.So(err1, should.HaveSameErrorDefinitionAs, errInvalidFoo)
 	a.So(err1.Details(), should.Resemble, []interface{}{"foo", "bar"})
 
 	a.So(err2, should.HaveSameErrorDefinitionAs, err1)
 	a.So(err2, should.HaveSameErrorDefinitionAs, errInvalidFoo)
-	a.So(err2.Details(), should.Resemble, []interface{}{"bar", "baz"})
+	a.So(err2.Details(), should.Resemble, []interface{}{"foo", "bar", "baz"})
 }

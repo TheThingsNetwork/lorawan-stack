@@ -22,6 +22,7 @@ import (
 
 type stack []uintptr
 
+// callers returns the call stack, skipping the first frames.
 func callers(skip int) *stack {
 	const depth = 32
 	var pcs [depth]uintptr
