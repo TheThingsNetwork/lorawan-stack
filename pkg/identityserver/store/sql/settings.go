@@ -82,8 +82,8 @@ func (s *settingStore) set(q db.QueryContext, settings ttnpb.IdentityServerSetti
 	input.BlacklistedIDsConverted = db.StringSlice(settings.BlacklistedIDs)
 	input.AllowedEmailsConverted = db.StringSlice(settings.AllowedEmails)
 	_, err := q.NamedExec(
-		`UPSERT
-			INTO settings (
+		`INSERT INTO 
+			settings (
 				id,
 				updated_at,
 				blacklisted_ids,
@@ -103,6 +103,25 @@ func (s *settingStore) set(q db.QueryContext, settings ttnpb.IdentityServerSetti
 				:validation_token_ttl,
 				:invitation_token_ttl,
 				:allowed_emails_converted)
+			ON CONFLICT (id) 
+			DO UPDATE SET 				
+				(updated_at,
+				blacklisted_ids,
+				skip_validation,
+				invitation_only,
+				admin_approval,
+				validation_token_ttl,
+				invitation_token_ttl,
+				allowed_emails) 
+			= (
+				:updated_at,
+				:blacklisted_ids_converted,
+				:skip_validation,
+				:invitation_only,
+				:admin_approval,
+				:validation_token_ttl,
+				:invitation_token_ttl,
+				:allowed_emails_converted);
 		`,
 		input)
 	return err
