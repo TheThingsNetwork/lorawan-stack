@@ -39,3 +39,9 @@ type Appender interface {
 type Unmarshaler interface {
 	UnmarshalLoRaWAN(data []byte) error
 }
+
+// AppendUnmarshaler represents an interface, which is both Appender and Unmarshaler.
+type AppendUnmarshaler interface {
+	Appender
+	Unmarshaler
+}

@@ -24,48 +24,52 @@ import (
 )
 
 func init() {
-	gob.Register(&Message_MACPayload{})
-	gob.Register(&Message_JoinRequestPayload{})
-	gob.Register(&Message_JoinAcceptPayload{})
-	gob.Register(&MACCommand_CID{})
-	gob.Register(&MACCommand_Proprietary{})
-	gob.Register(&MACCommand_Proprietary_{})
-	gob.Register(&MACCommand_ResetInd{})
-	gob.Register(&MACCommand_ResetInd_{})
-	gob.Register(&MACCommand_ResetConf{})
-	gob.Register(&MACCommand_ResetConf_{})
-	gob.Register(&MACCommand_LinkCheckAns{})
-	gob.Register(&MACCommand_LinkCheckAns_{})
-	gob.Register(&MACCommand_LinkADRReq{})
-	gob.Register(&MACCommand_LinkADRReq_{})
-	gob.Register(&MACCommand_LinkADRAns{})
-	gob.Register(&MACCommand_LinkADRAns_{})
-	gob.Register(&MACCommand_DutyCycleReq_{})
-	gob.Register(&MACCommand_RxParamSetupReq_{})
-	gob.Register(&MACCommand_RxParamSetupAns_{})
-	gob.Register(&MACCommand_DevStatusAns_{})
-	gob.Register(&MACCommand_NewChannelReq_{})
-	gob.Register(&MACCommand_NewChannelAns_{})
-	gob.Register(&MACCommand_DlChannelReq{})
-	gob.Register(&MACCommand_DlChannelAns{})
-	gob.Register(&MACCommand_RxTimingSetupReq_{})
-	gob.Register(&MACCommand_TxParamSetupReq_{})
-	gob.Register(&MACCommand_RekeyInd_{})
-	gob.Register(&MACCommand_RekeyConf_{})
-	gob.Register(&MACCommand_ADRParamSetupReq{})
-	gob.Register(&MACCommand_ADRParamSetupReq_{})
-	gob.Register(&MACCommand_DeviceTimeAns_{})
-	gob.Register(&MACCommand_ForceRejoinReq_{})
-	gob.Register(&MACCommand_RejoinParamSetupReq_{})
-	gob.Register(&MACCommand_RejoinParamSetupAns_{})
-	gob.Register(&MACCommand_PingSlotInfoReq_{})
-	gob.Register(&MACCommand_PingSlotChannelReq_{})
-	gob.Register(&MACCommand_PingSlotChannelAns_{})
-	gob.Register(&MACCommand_BeaconTimingAns_{})
-	gob.Register(&MACCommand_BeaconFreqReq_{})
-	gob.Register(&MACCommand_BeaconFreqAns_{})
-	gob.Register(&MACCommand_DeviceModeInd_{})
-	gob.Register(&MACCommand_DeviceModeConf_{})
+	for _, v := range []interface{}{
+		&Message_MACPayload{},
+		&Message_JoinRequestPayload{},
+		&Message_RejoinRequestPayload{},
+		&Message_JoinAcceptPayload{},
+		&MACCommand{},
+		&MACCommand_RawPayload{},
+		&MACCommand_ResetInd{},
+		&MACCommand_ResetInd_{},
+		&MACCommand_ResetConf{},
+		&MACCommand_ResetConf_{},
+		&MACCommand_LinkCheckAns{},
+		&MACCommand_LinkCheckAns_{},
+		&MACCommand_LinkADRReq{},
+		&MACCommand_LinkADRReq_{},
+		&MACCommand_LinkADRAns{},
+		&MACCommand_LinkADRAns_{},
+		&MACCommand_DutyCycleReq_{},
+		&MACCommand_RxParamSetupReq_{},
+		&MACCommand_RxParamSetupAns_{},
+		&MACCommand_DevStatusAns_{},
+		&MACCommand_NewChannelReq_{},
+		&MACCommand_NewChannelAns_{},
+		&MACCommand_DlChannelReq{},
+		&MACCommand_DlChannelAns{},
+		&MACCommand_RxTimingSetupReq_{},
+		&MACCommand_TxParamSetupReq_{},
+		&MACCommand_RekeyInd_{},
+		&MACCommand_RekeyConf_{},
+		&MACCommand_ADRParamSetupReq{},
+		&MACCommand_ADRParamSetupReq_{},
+		&MACCommand_DeviceTimeAns_{},
+		&MACCommand_ForceRejoinReq_{},
+		&MACCommand_RejoinParamSetupReq_{},
+		&MACCommand_RejoinParamSetupAns_{},
+		&MACCommand_PingSlotInfoReq_{},
+		&MACCommand_PingSlotChannelReq_{},
+		&MACCommand_PingSlotChannelAns_{},
+		&MACCommand_BeaconTimingAns_{},
+		&MACCommand_BeaconFreqReq_{},
+		&MACCommand_BeaconFreqAns_{},
+		&MACCommand_DeviceModeInd_{},
+		&MACCommand_DeviceModeConf_{},
+	} {
+		gob.Register(v)
+	}
 }
 
 // Validate reports whether v represents a valid MACVersion.
@@ -169,10 +173,10 @@ func (v MACVersion) EncryptFOpts() bool {
 	case MAC_V1_1:
 		return true
 	}
-	panic(errors.Errorf("Unknown MACVersion: %v", v))
+	panic(v.Validate())
 }
 
-// HasMaxFCntGap reports whether v requires MAC commands in FOpts to be encrypted.
+// HasMaxFCntGap reports whether v defines a MaxFCntGap.
 // HasMaxFCntGap panics, if v.Validate() returns non-nil error.
 func (v MACVersion) HasMaxFCntGap() bool {
 	switch v {
@@ -181,7 +185,7 @@ func (v MACVersion) HasMaxFCntGap() bool {
 	case MAC_V1_1:
 		return false
 	}
-	panic(errors.Errorf("Unknown MACVersion: %v", v))
+	panic(v.Validate())
 }
 
 // String implements fmt.Stringer.
