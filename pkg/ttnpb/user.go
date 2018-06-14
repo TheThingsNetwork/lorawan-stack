@@ -21,6 +21,13 @@ func (u *User) GetUser() *User {
 	return u
 }
 
+// Safe copy of the User struct.
+func (u *User) Safe() *User {
+	copy := *u
+	copy.Password = ""
+	return &copy
+}
+
 var (
 	// FieldPathUserName is the field path for the user name field.
 	FieldPathUserName = regexp.MustCompile(`^name$`)

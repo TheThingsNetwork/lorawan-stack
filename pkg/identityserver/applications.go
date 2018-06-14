@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -90,7 +91,11 @@ func (s *applicationService) CreateApplication(ctx context.Context, req *ttnpb.C
 		})
 	})
 
-	return ttnpb.Empty, err
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtApplicationCreated(ctx, req.GetApplication().ApplicationIdentifiers, req.GetApplication()))
+	return ttnpb.Empty, nil
 }
 
 // GetApplication returns an application.
@@ -150,12 +155,13 @@ func (s *applicationService) UpdateApplication(ctx context.Context, req *ttnpb.U
 		return nil, err
 	}
 
+	var application *ttnpb.Application
 	err = s.store.Transact(func(tx *store.Store) error {
 		found, err := tx.Applications.GetByID(req.Application.ApplicationIdentifiers, s.specializers.Application)
 		if err != nil {
 			return err
 		}
-		application := found.GetApplication()
+		application = found.GetApplication()
 
 		for _, path := range req.UpdateMask.Paths {
 			switch {
@@ -173,7 +179,11 @@ func (s *applicationService) UpdateApplication(ctx context.Context, req *ttnpb.U
 		return tx.Applications.Update(application)
 	})
 
-	return ttnpb.Empty, err
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtApplicationUpdated(ctx, req.GetApplication().ApplicationIdentifiers, application))
+	return ttnpb.Empty, nil
 }
 
 // DeleteApplication deletes an application.
@@ -185,7 +195,11 @@ func (s *applicationService) DeleteApplication(ctx context.Context, req *ttnpb.A
 		return nil, err
 	}
 
-	return ttnpb.Empty, s.store.Applications.Delete(ids)
+	if err := s.store.Applications.Delete(ids); err != nil {
+		return nil, err
+	}
+	events.Publish(evtApplicationDeleted(ctx, ids, nil))
+	return ttnpb.Empty, nil
 }
 
 // GenerateApplicationAPIKey generates an application API key and returns it.

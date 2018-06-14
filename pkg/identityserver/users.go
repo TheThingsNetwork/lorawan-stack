@@ -23,6 +23,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/email/templates"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/random"
@@ -139,6 +140,7 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(evtUserCreated(ctx, req.GetUser().UserIdentifiers, req.GetUser()))
 
 	// No email needs to be sent.
 	if token == nil {
@@ -165,9 +167,7 @@ func (s *userService) GetUser(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Use
 	}
 
 	user := found.GetUser()
-	user.Password = ""
-
-	return user, nil
+	return user.Safe(), nil
 }
 
 // UpdateUser updates the account of the current user.
@@ -247,6 +247,7 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 	if err != nil {
 		return nil, err
 	}
+	events.Publish(evtUserUpdated(ctx, req.GetUser().UserIdentifiers, user.Safe()))
 
 	// No email needs to be send.
 	if token == nil {
@@ -305,25 +306,25 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 		return nil, err
 	}
 
-	uIDs := authorizationDataFromContext(ctx).UserIdentifiers()
+	ids := authorizationDataFromContext(ctx).UserIdentifiers()
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		apps, err := tx.Applications.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(uIDs), s.specializers.Application)
+		apps, err := tx.Applications.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(ids), s.specializers.Application)
 		if err != nil {
 			return err
 		}
 
-		gtws, err := tx.Gateways.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(uIDs), s.specializers.Gateway)
+		gtws, err := tx.Gateways.ListByOrganizationOrUser(organizationOrUserIDsUserIDs(ids), s.specializers.Gateway)
 		if err != nil {
 			return err
 		}
 
-		orgs, err := tx.Organizations.ListByUser(uIDs, s.specializers.Organization)
+		orgs, err := tx.Organizations.ListByUser(ids, s.specializers.Organization)
 		if err != nil {
 			return err
 		}
 
-		err = tx.Users.Delete(uIDs)
+		err = tx.Users.Delete(ids)
 		if err != nil {
 			return err
 		}
@@ -379,7 +380,11 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 		return nil
 	})
 
-	return ttnpb.Empty, err
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtUserDeleted(ctx, ids, nil))
+	return ttnpb.Empty, nil
 }
 
 // GenerateUserAPIKey generates an user API key and returns it.

@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -95,7 +96,11 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 		})
 	})
 
-	return ttnpb.Empty, err
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtGatewayCreated(ctx, req.Gateway.GatewayIdentifiers, req.Gateway))
+	return ttnpb.Empty, nil
 }
 
 // GetGateway returns a gateway information.
@@ -155,12 +160,13 @@ func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGat
 		return nil, err
 	}
 
+	var gtw *ttnpb.Gateway
 	err = s.store.Transact(func(tx *store.Store) error {
 		found, err := tx.Gateways.GetByID(req.Gateway.GatewayIdentifiers, s.specializers.Gateway)
 		if err != nil {
 			return err
 		}
-		gtw := found.GetGateway()
+		gtw = found.GetGateway()
 
 		for _, path := range req.UpdateMask.Paths {
 			switch {
@@ -209,7 +215,11 @@ func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGat
 		return tx.Gateways.Update(gtw)
 	})
 
-	return ttnpb.Empty, err
+	if err != nil {
+		return nil, err
+	}
+	events.Publish(evtGatewayUpdated(ctx, req.Gateway.GatewayIdentifiers, gtw))
+	return ttnpb.Empty, nil
 }
 
 // DeleteGateway deletes a gateway.
@@ -221,7 +231,11 @@ func (s *gatewayService) DeleteGateway(ctx context.Context, req *ttnpb.GatewayId
 		return nil, err
 	}
 
-	return ttnpb.Empty, s.store.Gateways.Delete(ids)
+	if err = s.store.Gateways.Delete(ids); err != nil {
+		return nil, err
+	}
+	events.Publish(evtGatewayDeleted(ctx, req, nil))
+	return ttnpb.Empty, nil
 }
 
 // GenerateGatewayAPIKey generates a gateway API key and returns it.
