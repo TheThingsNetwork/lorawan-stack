@@ -20,19 +20,12 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func handleDutyCycleAns(ctx context.Context, dev *ttnpb.EndDevice) error {
-	cmds := dev.GetPendingMACCommands()
-	for i, cmd := range cmds {
-		if cmd.CID() != ttnpb.CID_DUTY_CYCLE {
-			continue
-		}
-
+func handleDutyCycleAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
+	dev.PendingMACCommands, err = handleMACResponse(ttnpb.CID_DUTY_CYCLE, func(cmd *ttnpb.MACCommand) {
 		req := cmd.GetDutyCycleReq()
-		_ = req
-		// TODO: Handle duty cycle (https://github.com/TheThingsIndustries/ttn/issues/292)
 
-		dev.PendingMACCommands = append(cmds[:i], cmds[i+1:]...)
-		return nil
-	}
-	return ErrMACRequestNotFound.New(nil)
+		dev.MACState.DutyCycle = req.MaxDutyCycle
+
+	}, dev.PendingMACCommands...)
+	return
 }

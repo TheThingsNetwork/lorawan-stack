@@ -173,7 +173,7 @@ type NetworkServer struct {
 	applicationServersMu *sync.RWMutex
 	applicationServers   map[string]*applicationUpStream
 
-	metadataAccumulators *sync.Map // string -> *metadataAccumulator
+	metadataAccumulators *sync.Map // uint64 -> *metadataAccumulator
 
 	metadataAccumulatorPool *sync.Pool
 	hashPool                *sync.Pool
@@ -217,14 +217,14 @@ func WithNsGsClientFunc(fn NsGsClientFunc) Option {
 // WithMACHandler panics if a MACHandler for the CID is already registered, or if
 // the CID is out of range.
 func WithMACHandler(cid ttnpb.MACCommandIdentifier, fn MACHandler) Option {
-	return func(ns *NetworkServer) {
-		if cid < 0x80 || cid > 0xFF {
-			panic(errors.Errorf("CID must be in range from 0x80 to 0xFF, got %X", cid))
-		}
+	if cid < 0x80 || cid > 0xFF {
+		panic(errors.Errorf("CID must be in range from 0x80 to 0xFF, got 0x%X", int32(cid)))
+	}
 
+	return func(ns *NetworkServer) {
 		_, ok := ns.macHandlers.LoadOrStore(cid, fn)
 		if ok {
-			panic(errors.Errorf("A handler for CID %X is already registered", cid))
+			panic(errors.Errorf("A handler for CID 0x%X is already registered", int32(cid)))
 		}
 	}
 }
@@ -1042,20 +1042,18 @@ outer:
 			err = handleADRParamSetupAns(ctx, dev.EndDevice)
 		case ttnpb.CID_DEVICE_TIME:
 			err = handleDeviceTimeReq(ctx, dev.EndDevice, msg)
-		case ttnpb.CID_FORCE_REJOIN:
-			// TODO: Implement (https://github.com/TheThingsIndustries/ttn/issues/292)
 		case ttnpb.CID_REJOIN_PARAM_SETUP:
-			// TODO: Implement (https://github.com/TheThingsIndustries/ttn/issues/292)
+			err = handleRejoinParamSetupAns(ctx, dev.EndDevice, cmd.GetRejoinParamSetupAns())
 		case ttnpb.CID_PING_SLOT_INFO:
-			// TODO: Implement (https://github.com/TheThingsIndustries/ttn/issues/292)
+			err = handlePingSlotInfoReq(ctx, dev.EndDevice, cmd.GetPingSlotInfoReq())
 		case ttnpb.CID_PING_SLOT_CHANNEL:
-			// TODO: Implement (https://github.com/TheThingsIndustries/ttn/issues/292)
+			err = handlePingSlotChannelAns(ctx, dev.EndDevice, cmd.GetPingSlotChannelAns())
 		case ttnpb.CID_BEACON_TIMING:
-			// TODO: Implement (https://github.com/TheThingsIndustries/ttn/issues/292)
+			err = handleBeaconTimingReq(ctx, dev.EndDevice)
 		case ttnpb.CID_BEACON_FREQ:
-			// TODO: Implement (https://github.com/TheThingsIndustries/ttn/issues/292)
+			err = handleBeaconFreqAns(ctx, dev.EndDevice, cmd.GetBeaconFreqAns())
 		case ttnpb.CID_DEVICE_MODE:
-			// TODO: Implement (https://github.com/TheThingsIndustries/ttn/issues/292)
+			err = handleDeviceModeInd(ctx, dev.EndDevice, cmd.GetDeviceModeInd())
 		default:
 			h, ok := ns.macHandlers.Load(cid)
 			if !ok {

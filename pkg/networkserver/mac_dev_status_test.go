@@ -17,8 +17,10 @@ package networkserver
 import (
 	"testing"
 
+	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -56,7 +58,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MACInfo: &ttnpb.MACInfo{
-					// TODO: https://github.com/TheThingsIndustries/ttn/issues/292
+					// TODO: Modify status variables in MACInfo (https://github.com/TheThingsIndustries/ttn/issues/834)
 				},
 				PendingMACCommands: []*ttnpb.MACCommand{},
 			},
@@ -73,12 +75,14 @@ func TestHandleDevStatusAns(t *testing.T) {
 
 			err := handleDevStatusAns(test.Context(), dev, tc.Payload)
 			if tc.Error != nil {
-				a.So(err, should.BeError)
-				return
+				a.So(err, should.DescribeError, errors.Descriptor(tc.Error))
+			} else {
+				a.So(err, should.BeNil)
 			}
 
-			a.So(err, should.BeNil)
-			a.So(dev, should.Resemble, tc.Expected)
+			if !a.So(dev, should.Resemble, tc.Expected) {
+				pretty.Ldiff(t, dev, tc.Expected)
+			}
 		})
 	}
 }

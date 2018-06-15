@@ -27,11 +27,11 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestHandleRekeyInd(t *testing.T) {
+func TestHandlePingSlotInfoReq(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
-		Payload          *ttnpb.MACCommand_RekeyInd
+		Payload          *ttnpb.MACCommand_PingSlotInfoReq
 		Error            error
 	}{
 		{
@@ -44,25 +44,20 @@ func TestHandleRekeyInd(t *testing.T) {
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				SessionFallback:   ttnpb.NewPopulatedSession(test.Randy, false),
 				QueuedMACCommands: []*ttnpb.MACCommand{},
 			},
 			Expected: &ttnpb.EndDevice{
-				SessionFallback: nil,
 				QueuedMACCommands: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_RekeyConf{
-						MinorVersion: 1,
-					}).MACCommand(),
+					// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
 				},
 			},
-			Payload: &ttnpb.MACCommand_RekeyInd{
-				MinorVersion: 1,
+			Payload: &ttnpb.MACCommand_PingSlotInfoReq{
+				Period: 42,
 			},
 		},
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				SessionFallback: ttnpb.NewPopulatedSession(test.Randy, false),
 				QueuedMACCommands: []*ttnpb.MACCommand{
 					{},
 					{},
@@ -70,18 +65,15 @@ func TestHandleRekeyInd(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				SessionFallback: nil,
 				QueuedMACCommands: []*ttnpb.MACCommand{
 					{},
 					{},
 					{},
-					(&ttnpb.MACCommand_RekeyConf{
-						MinorVersion: 1,
-					}).MACCommand(),
+					// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
 				},
 			},
-			Payload: &ttnpb.MACCommand_RekeyInd{
-				MinorVersion: 1,
+			Payload: &ttnpb.MACCommand_PingSlotInfoReq{
+				Period: 42,
 			},
 		},
 	} {
@@ -90,7 +82,7 @@ func TestHandleRekeyInd(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleRekeyInd(test.Context(), dev, tc.Payload)
+			err := handlePingSlotInfoReq(test.Context(), dev, tc.Payload)
 			if tc.Error != nil {
 				a.So(err, should.DescribeError, errors.Descriptor(tc.Error))
 			} else {

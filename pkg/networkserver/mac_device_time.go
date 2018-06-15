@@ -16,15 +16,33 @@ package networkserver
 
 import (
 	"context"
+	"sort"
+	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 func handleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) error {
+	ts := make([]time.Time, 0, len(msg.RxMetadata))
+	for _, md := range msg.RxMetadata {
+		ts = append(ts, md.Time)
+	}
+	sort.Slice(ts, func(i, j int) bool {
+		return ts[i].Before(ts[j])
+	})
+
+	var t time.Time
+	if n := len(ts); n%2 == 1 {
+		t = ts[n/2]
+	} else {
+		i := (n - 1) / 2
+		t = time.Unix(0, (ts[i].UnixNano()+ts[i+1].UnixNano())/2)
+	}
+
 	dev.QueuedMACCommands = append(
-		dev.GetQueuedMACCommands(),
+		dev.QueuedMACCommands,
 		(&ttnpb.MACCommand_DeviceTimeAns{
-			Time: msg.GetReceivedAt(),
+			Time: t,
 		}).MACCommand(),
 	)
 	return nil

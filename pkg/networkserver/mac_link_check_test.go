@@ -17,8 +17,10 @@ package networkserver
 import (
 	"testing"
 
+	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -32,11 +34,9 @@ func TestHandleLinkCheckReq(t *testing.T) {
 		Error            error
 	}{
 		{
-			Name:   "SF13BW250",
-			Device: &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{
-				QueuedMACCommands: []*ttnpb.MACCommand{},
-			},
+			Name:     "SF13BW250",
+			Device:   &ttnpb.EndDevice{},
+			Expected: &ttnpb.EndDevice{},
 			Message: &ttnpb.UplinkMessage{
 				Settings: ttnpb.TxSettings{
 					SpreadingFactor: 13,
@@ -76,18 +76,16 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			Name: "SF12BW250/1 gateway/non-empty queue",
 			Device: &ttnpb.EndDevice{
 				QueuedMACCommands: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_LinkCheckAns{
-						Margin:       1,
-						GatewayCount: 42,
-					}).MACCommand(),
+					{},
+					{},
+					{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				QueuedMACCommands: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_LinkCheckAns{
-						Margin:       1,
-						GatewayCount: 42,
-					}).MACCommand(),
+					{},
+					{},
+					{},
 					(&ttnpb.MACCommand_LinkCheckAns{
 						Margin:       42, // 25-(-17)
 						GatewayCount: 1,
@@ -114,18 +112,16 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			Name: "SF12BW250/3 gateways/non-empty queue",
 			Device: &ttnpb.EndDevice{
 				QueuedMACCommands: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_LinkCheckAns{
-						Margin:       1,
-						GatewayCount: 42,
-					}).MACCommand(),
+					{},
+					{},
+					{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				QueuedMACCommands: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_LinkCheckAns{
-						Margin:       1,
-						GatewayCount: 42,
-					}).MACCommand(),
+					{},
+					{},
+					{},
 					(&ttnpb.MACCommand_LinkCheckAns{
 						Margin:       42, // 25-(-17)
 						GatewayCount: 3,
@@ -168,12 +164,14 @@ func TestHandleLinkCheckReq(t *testing.T) {
 
 			err := handleLinkCheckReq(test.Context(), dev, tc.Message)
 			if tc.Error != nil {
-				a.So(err, should.BeError)
-				return
+				a.So(err, should.DescribeError, errors.Descriptor(tc.Error))
+			} else {
+				a.So(err, should.BeNil)
 			}
 
-			a.So(err, should.BeNil)
-			a.So(dev, should.Resemble, tc.Expected)
+			if !a.So(dev, should.Resemble, tc.Expected) {
+				pretty.Ldiff(t, dev, tc.Expected)
+			}
 		})
 	}
 }

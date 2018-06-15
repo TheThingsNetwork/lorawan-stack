@@ -21,48 +21,31 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestHandleRekeyInd(t *testing.T) {
+func TestHandleBeaconTimingReq(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
-		Payload          *ttnpb.MACCommand_RekeyInd
 		Error            error
 	}{
 		{
-			Name:     "nil payload",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Payload:  nil,
-			Error:    common.ErrMissingPayload.New(nil),
-		},
-		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				SessionFallback:   ttnpb.NewPopulatedSession(test.Randy, false),
 				QueuedMACCommands: []*ttnpb.MACCommand{},
 			},
 			Expected: &ttnpb.EndDevice{
-				SessionFallback: nil,
 				QueuedMACCommands: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_RekeyConf{
-						MinorVersion: 1,
-					}).MACCommand(),
+					// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
 				},
-			},
-			Payload: &ttnpb.MACCommand_RekeyInd{
-				MinorVersion: 1,
 			},
 		},
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				SessionFallback: ttnpb.NewPopulatedSession(test.Randy, false),
 				QueuedMACCommands: []*ttnpb.MACCommand{
 					{},
 					{},
@@ -70,18 +53,12 @@ func TestHandleRekeyInd(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				SessionFallback: nil,
 				QueuedMACCommands: []*ttnpb.MACCommand{
 					{},
 					{},
 					{},
-					(&ttnpb.MACCommand_RekeyConf{
-						MinorVersion: 1,
-					}).MACCommand(),
+					// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
 				},
-			},
-			Payload: &ttnpb.MACCommand_RekeyInd{
-				MinorVersion: 1,
 			},
 		},
 	} {
@@ -90,7 +67,7 @@ func TestHandleRekeyInd(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleRekeyInd(test.Context(), dev, tc.Payload)
+			err := handleBeaconTimingReq(test.Context(), dev)
 			if tc.Error != nil {
 				a.So(err, should.DescribeError, errors.Descriptor(tc.Error))
 			} else {

@@ -21,44 +21,30 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns) error {
+func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns) (err error) {
 	if pld == nil {
 		return common.ErrMissingPayload.New(nil)
 	}
 
-	first := -1
-	last := -1
-
-	cmds := dev.GetPendingMACCommands()
-outer:
-	for i, cmd := range cmds {
-		last = i
-
-		switch {
-		case first >= 0 && cmd.CID() != ttnpb.CID_LINK_ADR:
-			break outer
-		case first < 0 && cmd.CID() != ttnpb.CID_LINK_ADR:
-			continue
-		case first < 0:
-			first = i
+	dev.PendingMACCommands, err = handleMACResponseBlock(ttnpb.CID_LINK_ADR, func(cmd *ttnpb.MACCommand) {
+		if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
+			// TODO: Handle NACK, modify desired state
+			// (https://github.com/TheThingsIndustries/ttn/issues/834)
+			return
 		}
 
 		req := cmd.GetLinkADRReq()
-		if pld.GetChannelMaskAck() {
-			// TODO: Modify channels in MACState (https://github.com/TheThingsIndustries/ttn/issues/292)
-		}
-		if pld.GetDataRateIndexAck() {
-			dev.MACState.ADRDataRateIndex = req.GetDataRateIndex()
-		}
-		if pld.GetTxPowerIndexAck() {
-			dev.MACState.ADRTXPowerIndex = req.GetTxPowerIndex()
-		}
-	}
 
-	if first < 0 {
-		return ErrMACRequestNotFound.New(nil)
-	}
+		// TODO: Ensure LoRaWAN1.0* compatibility (https://github.com/TheThingsIndustries/ttn/issues/870)
 
-	dev.PendingMACCommands = append(dev.PendingMACCommands[:first], dev.PendingMACCommands[last+1:]...)
-	return nil
+		// TODO: Modify channels in MACState (https://github.com/TheThingsIndustries/ttn/issues/292)
+		_ = req.NbTrans
+		_ = req.ChannelMask
+		_ = req.ChannelMaskControl
+
+		dev.MACState.ADRDataRateIndex = req.DataRateIndex
+		dev.MACState.ADRTXPowerIndex = req.TxPowerIndex
+
+	}, dev.PendingMACCommands...)
+	return
 }

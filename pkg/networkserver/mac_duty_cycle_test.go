@@ -17,8 +17,10 @@ package networkserver
 import (
 	"testing"
 
+	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -39,6 +41,7 @@ func TestHandleDutyCycleAns(t *testing.T) {
 		{
 			Name: "2048",
 			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
 				PendingMACCommands: []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_DutyCycleReq{
 						MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,
@@ -46,6 +49,9 @@ func TestHandleDutyCycleAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					DutyCycle: ttnpb.DUTY_CYCLE_2048,
+				},
 				PendingMACCommands: []*ttnpb.MACCommand{},
 			},
 		},
@@ -57,12 +63,14 @@ func TestHandleDutyCycleAns(t *testing.T) {
 
 			err := handleDutyCycleAns(test.Context(), dev)
 			if tc.Error != nil {
-				a.So(err, should.BeError)
-				return
+				a.So(err, should.DescribeError, errors.Descriptor(tc.Error))
+			} else {
+				a.So(err, should.BeNil)
 			}
 
-			a.So(err, should.BeNil)
-			a.So(dev, should.Resemble, tc.Expected)
+			if !a.So(dev, should.Resemble, tc.Expected) {
+				pretty.Ldiff(t, dev, tc.Expected)
+			}
 		})
 	}
 }

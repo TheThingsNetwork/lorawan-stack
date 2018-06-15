@@ -17,8 +17,10 @@ package networkserver
 import (
 	"testing"
 
+	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -92,8 +94,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					Rx1DataRateOffset: 42,
-					Rx2DataRateIndex:  43,
+					Rx1DataRateOffset: 99,
 					Rx2Frequency:      99,
 				},
 				PendingMACCommands: []*ttnpb.MACCommand{},
@@ -112,12 +113,14 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 
 			err := handleRxParamSetupAns(test.Context(), dev, tc.Payload)
 			if tc.Error != nil {
-				a.So(err, should.BeError)
-				return
+				a.So(err, should.DescribeError, errors.Descriptor(tc.Error))
+			} else {
+				a.So(err, should.BeNil)
 			}
 
-			a.So(err, should.BeNil)
-			a.So(dev, should.Resemble, tc.Expected)
+			if !a.So(dev, should.Resemble, tc.Expected) {
+				pretty.Ldiff(t, dev, tc.Expected)
+			}
 		})
 	}
 }

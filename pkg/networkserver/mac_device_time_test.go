@@ -18,8 +18,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -43,31 +45,82 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				ReceivedAt: time.Unix(42, 42),
+				RxMetadata: []*ttnpb.RxMetadata{
+					{
+						Time: time.Unix(42, 42),
+					},
+				},
 			},
 			Error: nil,
 		},
 		{
-			Name: "non-empty queue",
+			Name: "non-empty queue/odd",
 			Device: &ttnpb.EndDevice{
 				QueuedMACCommands: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_DeviceTimeAns{
-						Time: time.Unix(42, 0),
-					}).MACCommand(),
+					{},
+					{},
+					{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				QueuedMACCommands: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_DeviceTimeAns{
-						Time: time.Unix(42, 0),
-					}).MACCommand(),
+					{},
+					{},
+					{},
 					(&ttnpb.MACCommand_DeviceTimeAns{
 						Time: time.Unix(42, 42),
 					}).MACCommand(),
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				ReceivedAt: time.Unix(42, 42),
+				RxMetadata: []*ttnpb.RxMetadata{
+					{
+						Time: time.Unix(42, 41),
+					},
+					{
+						Time: time.Unix(42, 42),
+					},
+					{
+						Time: time.Unix(420, 435353),
+					},
+				},
+			},
+			Error: nil,
+		},
+		{
+			Name: "non-empty queue/even",
+			Device: &ttnpb.EndDevice{
+				QueuedMACCommands: []*ttnpb.MACCommand{
+					{},
+					{},
+					{},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				QueuedMACCommands: []*ttnpb.MACCommand{
+					{},
+					{},
+					{},
+					(&ttnpb.MACCommand_DeviceTimeAns{
+						Time: time.Unix(42, 45),
+					}).MACCommand(),
+				},
+			},
+			Message: &ttnpb.UplinkMessage{
+				RxMetadata: []*ttnpb.RxMetadata{
+					{
+						Time: time.Unix(42, 44),
+					},
+					{
+						Time: time.Unix(42, 44),
+					},
+					{
+						Time: time.Unix(42, 46),
+					},
+					{
+						Time: time.Unix(42, 47),
+					},
+				},
 			},
 			Error: nil,
 		},
@@ -79,12 +132,14 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 
 			err := handleDeviceTimeReq(test.Context(), dev, tc.Message)
 			if tc.Error != nil {
-				a.So(err, should.BeError)
-				return
+				a.So(err, should.DescribeError, errors.Descriptor(tc.Error))
+			} else {
+				a.So(err, should.BeNil)
 			}
 
-			a.So(err, should.BeNil)
-			a.So(dev, should.Resemble, tc.Expected)
+			if !a.So(dev, should.Resemble, tc.Expected) {
+				pretty.Ldiff(t, dev, tc.Expected)
+			}
 		})
 	}
 }

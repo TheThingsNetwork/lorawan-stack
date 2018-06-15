@@ -20,21 +20,15 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) error {
-	cmds := dev.GetPendingMACCommands()
-	for i, cmd := range cmds {
-		if cmd.CID() != ttnpb.CID_TX_PARAM_SETUP {
-			continue
-		}
-
+func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
+	dev.PendingMACCommands, err = handleMACResponse(ttnpb.CID_TX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
 		req := cmd.GetTxParamSetupReq()
-		dev.MACState.DownlinkDwellTime = req.GetDownlinkDwellTime()
-		dev.MACState.UplinkDwellTime = req.GetUplinkDwellTime()
+		dev.MACState.DownlinkDwellTime = req.DownlinkDwellTime
+		dev.MACState.UplinkDwellTime = req.UplinkDwellTime
 
-		// TODO: Handle EIRP (https://github.com/TheThingsIndustries/ttn/issues/292)
+		// TODO: Handle EIRP (https://github.com/TheThingsIndustries/ttn/issues/760)
+		_ = req.MaxEIRPIndex
 
-		dev.PendingMACCommands = append(cmds[:i], cmds[i+1:]...)
-		return nil
-	}
-	return ErrMACRequestNotFound.New(nil)
+	}, dev.PendingMACCommands...)
+	return
 }

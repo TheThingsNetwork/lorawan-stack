@@ -21,21 +21,26 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_NewChannelAns) error {
+func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_NewChannelAns) (err error) {
 	if pld == nil {
 		return common.ErrMissingPayload.New(nil)
 	}
 
-	cmds := dev.GetPendingMACCommands()
-	for i, cmd := range cmds {
-		if cmd.CID() != ttnpb.CID_NEW_CHANNEL {
-			continue
+	dev.PendingMACCommands, err = handleMACResponse(ttnpb.CID_NEW_CHANNEL, func(cmd *ttnpb.MACCommand) {
+		if !pld.DataRateAck || !pld.FrequencyAck {
+			// TODO: Handle NACK, modify desired state
+			// (https://github.com/TheThingsIndustries/ttn/issues/834)
+			return
 		}
 
-		// TODO: Modify channels in MACState (https://github.com/TheThingsIndustries/ttn/issues/292)
+		req := cmd.GetNewChannelReq()
 
-		dev.PendingMACCommands = append(cmds[:i], cmds[i+1:]...)
-		return nil
-	}
-	return ErrMACRequestNotFound.New(nil)
+		// TODO: Modify channels in MACState (https://github.com/TheThingsIndustries/ttn/issues/292)
+		_ = req.MinDataRateIndex
+		_ = req.MaxDataRateIndex
+		_ = req.ChannelIndex
+		_ = req.Frequency
+
+	}, dev.PendingMACCommands...)
+	return
 }

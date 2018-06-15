@@ -17,17 +17,15 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
-	dev.PendingMACCommands, err = handleMACResponse(ttnpb.CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
-		req := cmd.GetADRParamSetupReq()
-
-		// TODO: Handle ADR parameters (https://github.com/TheThingsIndustries/ttn/issues/834)
-		_ = req.ADRAckDelayExponent
-		_ = req.ADRAckLimitExponent
-
-	}, dev.PendingMACCommands...)
-	return
+func handlePingSlotInfoReq(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_PingSlotInfoReq) error {
+	if pld == nil {
+		return common.ErrMissingPayload.New(nil)
+	}
+	// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
+	_ = pld.Period
+	return nil
 }

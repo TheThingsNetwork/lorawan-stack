@@ -21,30 +21,24 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RxParamSetupAns) error {
+func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RxParamSetupAns) (err error) {
 	if pld == nil {
 		return common.ErrMissingPayload.New(nil)
 	}
 
-	cmds := dev.GetPendingMACCommands()
-	for i, cmd := range cmds {
-		if cmd.CID() != ttnpb.CID_RX_PARAM_SETUP {
-			continue
+	dev.PendingMACCommands, err = handleMACResponse(ttnpb.CID_RX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
+		if !pld.Rx1DataRateOffsetAck || !pld.Rx2DataRateIndexAck || !pld.Rx2FrequencyAck {
+			// TODO: Handle NACK, modify desired state
+			// (https://github.com/TheThingsIndustries/ttn/issues/834)
+			return
 		}
 
 		req := cmd.GetRxParamSetupReq()
-		if pld.GetRx1DataRateOffsetAck() {
-			dev.MACState.Rx1DataRateOffset = req.GetRx1DataRateOffset()
-		}
-		if pld.GetRx2DataRateIndexAck() {
-			dev.MACState.Rx2DataRateIndex = req.GetRx2DataRateIndex()
-		}
-		if pld.GetRx2FrequencyAck() {
-			dev.MACState.Rx2Frequency = req.GetRx2Frequency()
-		}
 
-		dev.PendingMACCommands = append(cmds[:i], cmds[i+1:]...)
-		return nil
-	}
-	return ErrMACRequestNotFound.New(nil)
+		dev.MACState.Rx1DataRateOffset = req.Rx1DataRateOffset
+		dev.MACState.Rx2DataRateIndex = req.Rx2DataRateIndex
+		dev.MACState.Rx2Frequency = req.Rx2Frequency
+
+	}, dev.PendingMACCommands...)
+	return
 }

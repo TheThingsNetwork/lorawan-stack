@@ -27,11 +27,11 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestHandleRekeyInd(t *testing.T) {
+func TestHandleDeviceModeInd(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
-		Payload          *ttnpb.MACCommand_RekeyInd
+		Payload          *ttnpb.MACCommand_DeviceModeInd
 		Error            error
 	}{
 		{
@@ -44,25 +44,31 @@ func TestHandleRekeyInd(t *testing.T) {
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				SessionFallback:   ttnpb.NewPopulatedSession(test.Randy, false),
+				MACInfo: &ttnpb.MACInfo{
+					DeviceClass: ttnpb.CLASS_A,
+				},
 				QueuedMACCommands: []*ttnpb.MACCommand{},
 			},
 			Expected: &ttnpb.EndDevice{
-				SessionFallback: nil,
+				MACInfo: &ttnpb.MACInfo{
+					DeviceClass: ttnpb.CLASS_C,
+				},
 				QueuedMACCommands: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_RekeyConf{
-						MinorVersion: 1,
+					(&ttnpb.MACCommand_DeviceModeConf{
+						Class: ttnpb.CLASS_C,
 					}).MACCommand(),
 				},
 			},
-			Payload: &ttnpb.MACCommand_RekeyInd{
-				MinorVersion: 1,
+			Payload: &ttnpb.MACCommand_DeviceModeInd{
+				Class: ttnpb.CLASS_C,
 			},
 		},
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				SessionFallback: ttnpb.NewPopulatedSession(test.Randy, false),
+				MACInfo: &ttnpb.MACInfo{
+					DeviceClass: ttnpb.CLASS_C,
+				},
 				QueuedMACCommands: []*ttnpb.MACCommand{
 					{},
 					{},
@@ -70,18 +76,20 @@ func TestHandleRekeyInd(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				SessionFallback: nil,
+				MACInfo: &ttnpb.MACInfo{
+					DeviceClass: ttnpb.CLASS_A,
+				},
 				QueuedMACCommands: []*ttnpb.MACCommand{
 					{},
 					{},
 					{},
-					(&ttnpb.MACCommand_RekeyConf{
-						MinorVersion: 1,
+					(&ttnpb.MACCommand_DeviceModeConf{
+						Class: ttnpb.CLASS_A,
 					}).MACCommand(),
 				},
 			},
-			Payload: &ttnpb.MACCommand_RekeyInd{
-				MinorVersion: 1,
+			Payload: &ttnpb.MACCommand_DeviceModeInd{
+				Class: ttnpb.CLASS_A,
 			},
 		},
 	} {
@@ -90,7 +98,7 @@ func TestHandleRekeyInd(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleRekeyInd(test.Context(), dev, tc.Payload)
+			err := handleDeviceModeInd(test.Context(), dev, tc.Payload)
 			if tc.Error != nil {
 				a.So(err, should.DescribeError, errors.Descriptor(tc.Error))
 			} else {

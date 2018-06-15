@@ -35,9 +35,9 @@ func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	dev.MACState = newMACState(&band, uint32(dev.GetMaxTxPower()), fp.DwellTime != nil)
 	dev.MACStateDesired = dev.MACState
 	dev.QueuedMACCommands = append(
-		dev.GetQueuedMACCommands(),
+		dev.QueuedMACCommands,
 		(&ttnpb.MACCommand_ResetConf{
-			MinorVersion: pld.GetMinorVersion(),
+			MinorVersion: pld.MinorVersion,
 		}).MACCommand(),
 	)
 	return nil

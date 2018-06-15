@@ -20,18 +20,12 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func handleRxTimingSetupAns(ctx context.Context, dev *ttnpb.EndDevice) error {
-	cmds := dev.GetPendingMACCommands()
-	for i, cmd := range cmds {
-		if cmd.CID() != ttnpb.CID_RX_TIMING_SETUP {
-			continue
-		}
-
+func handleRxTimingSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
+	dev.PendingMACCommands, err = handleMACResponse(ttnpb.CID_RX_TIMING_SETUP, func(cmd *ttnpb.MACCommand) {
 		req := cmd.GetRxTimingSetupReq()
-		dev.MACState.RxDelay = req.GetDelay()
 
-		dev.PendingMACCommands = append(cmds[:i], cmds[i+1:]...)
-		return nil
-	}
-	return ErrMACRequestNotFound.New(nil)
+		dev.MACState.RxDelay = req.Delay
+
+	}, dev.PendingMACCommands...)
+	return
 }

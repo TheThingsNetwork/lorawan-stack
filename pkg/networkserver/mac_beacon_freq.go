@@ -17,16 +17,20 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
-	dev.PendingMACCommands, err = handleMACResponse(ttnpb.CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
-		req := cmd.GetADRParamSetupReq()
+func handleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_BeaconFreqAns) (err error) {
+	if pld == nil {
+		return common.ErrMissingPayload.New(nil)
+	}
 
-		// TODO: Handle ADR parameters (https://github.com/TheThingsIndustries/ttn/issues/834)
-		_ = req.ADRAckDelayExponent
-		_ = req.ADRAckLimitExponent
+	dev.PendingMACCommands, err = handleMACResponse(ttnpb.CID_BEACON_FREQ, func(cmd *ttnpb.MACCommand) {
+		req := cmd.GetBeaconFreqReq()
+
+		// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
+		_ = req.Frequency
 
 	}, dev.PendingMACCommands...)
 	return

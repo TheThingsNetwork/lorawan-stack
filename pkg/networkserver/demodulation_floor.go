@@ -14,20 +14,43 @@
 
 package networkserver
 
-import (
-	"context"
+// TODO: The values for BW250 and BW500 need to be verified
+// (https://github.com/TheThingsIndustries/ttn/issues/876)
 
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-)
-
-func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
-	dev.PendingMACCommands, err = handleMACResponse(ttnpb.CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
-		req := cmd.GetADRParamSetupReq()
-
-		// TODO: Handle ADR parameters (https://github.com/TheThingsIndustries/ttn/issues/834)
-		_ = req.ADRAckDelayExponent
-		_ = req.ADRAckLimitExponent
-
-	}, dev.PendingMACCommands...)
-	return
+var demodulationFloor = map[uint32]map[uint32]float32{
+	6: {
+		125: -5,
+		250: -2,
+		500: 1,
+	},
+	7: {
+		125: -7.5,
+		250: -4.5,
+		500: -1.5,
+	},
+	8: {
+		125: -10,
+		250: -7,
+		500: -4,
+	},
+	9: {
+		125: -12.5,
+		250: -9.5,
+		500: -6.5,
+	},
+	10: {
+		125: -15,
+		250: -12,
+		500: -9,
+	},
+	11: {
+		125: -17.5,
+		250: -14.5,
+		500: -11.5,
+	},
+	12: {
+		125: -20,
+		250: -17,
+		500: -24,
+	},
 }

@@ -21,21 +21,16 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DevStatusAns) error {
+func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DevStatusAns) (err error) {
 	if pld == nil {
 		return common.ErrMissingPayload.New(nil)
 	}
 
-	cmds := dev.GetPendingMACCommands()
-	for i, cmd := range cmds {
-		if cmd.CID() != ttnpb.CID_DEV_STATUS {
-			continue
-		}
+	dev.PendingMACCommands, err = handleMACResponse(ttnpb.CID_DEV_STATUS, func(*ttnpb.MACCommand) {
+		// TODO: Modify status variables in MACInfo (https://github.com/TheThingsIndustries/ttn/issues/834)
+		_ = pld.Battery
+		_ = pld.Margin
 
-		// TODO: Modify status variables in MACInfo (https://github.com/TheThingsIndustries/ttn/issues/292)
-
-		dev.PendingMACCommands = append(cmds[:i], cmds[i+1:]...)
-		return nil
-	}
-	return ErrMACRequestNotFound.New(nil)
+	}, dev.PendingMACCommands...)
+	return
 }

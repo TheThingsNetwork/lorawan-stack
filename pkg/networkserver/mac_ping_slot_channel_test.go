@@ -27,11 +27,11 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestHandleRekeyInd(t *testing.T) {
+func TestHandlePingSlotChannelAns(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
-		Payload          *ttnpb.MACCommand_RekeyInd
+		Payload          *ttnpb.MACCommand_PingSlotChannelAns
 		Error            error
 	}{
 		{
@@ -42,46 +42,32 @@ func TestHandleRekeyInd(t *testing.T) {
 			Error:    common.ErrMissingPayload.New(nil),
 		},
 		{
-			Name: "empty queue",
-			Device: &ttnpb.EndDevice{
-				SessionFallback:   ttnpb.NewPopulatedSession(test.Randy, false),
-				QueuedMACCommands: []*ttnpb.MACCommand{},
-			},
-			Expected: &ttnpb.EndDevice{
-				SessionFallback: nil,
-				QueuedMACCommands: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_RekeyConf{
-						MinorVersion: 1,
-					}).MACCommand(),
-				},
-			},
-			Payload: &ttnpb.MACCommand_RekeyInd{
-				MinorVersion: 1,
-			},
+			Name:     "no request",
+			Device:   &ttnpb.EndDevice{},
+			Expected: &ttnpb.EndDevice{},
+			Payload:  ttnpb.NewPopulatedMACCommand_PingSlotChannelAns(test.Randy, false),
+			Error:    ErrMACRequestNotFound.New(nil),
 		},
 		{
-			Name: "non-empty queue",
+			Name: "both ack",
 			Device: &ttnpb.EndDevice{
-				SessionFallback: ttnpb.NewPopulatedSession(test.Randy, false),
-				QueuedMACCommands: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
-				},
-			},
-			Expected: &ttnpb.EndDevice{
-				SessionFallback: nil,
-				QueuedMACCommands: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
-					(&ttnpb.MACCommand_RekeyConf{
-						MinorVersion: 1,
+				MACState: &ttnpb.MACState{},
+				PendingMACCommands: []*ttnpb.MACCommand{
+					(&ttnpb.MACCommand_PingSlotChannelReq{
+						Frequency:     42,
+						DataRateIndex: 43,
 					}).MACCommand(),
 				},
 			},
-			Payload: &ttnpb.MACCommand_RekeyInd{
-				MinorVersion: 1,
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
+				},
+				PendingMACCommands: []*ttnpb.MACCommand{},
+			},
+			Payload: &ttnpb.MACCommand_PingSlotChannelAns{
+				FrequencyAck:     true,
+				DataRateIndexAck: true,
 			},
 		},
 	} {
@@ -90,7 +76,7 @@ func TestHandleRekeyInd(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleRekeyInd(test.Context(), dev, tc.Payload)
+			err := handlePingSlotChannelAns(test.Context(), dev, tc.Payload)
 			if tc.Error != nil {
 				a.So(err, should.DescribeError, errors.Descriptor(tc.Error))
 			} else {
