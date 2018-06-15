@@ -26,12 +26,12 @@ func handleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		return common.ErrMissingPayload.New(nil)
 	}
 
-	dev.PendingMACCommands, err = handleMACResponse(ttnpb.CID_BEACON_FREQ, func(cmd *ttnpb.MACCommand) {
+	dev.PendingMACRequests, err = handleMACResponse(ttnpb.CID_BEACON_FREQ, func(cmd *ttnpb.MACCommand) {
 		req := cmd.GetBeaconFreqReq()
 
 		// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
 		_ = req.Frequency
 
-	}, dev.PendingMACCommands...)
+	}, dev.PendingMACRequests...)
 	return
 }

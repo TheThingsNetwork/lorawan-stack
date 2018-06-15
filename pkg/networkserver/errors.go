@@ -115,6 +115,13 @@ var (
 		Type:          errors.InvalidArgument,
 		Code:          14,
 	}
+
+	// ErrScheduleTooSoon represents error ocurring when a confirmed downlink is scheduled too soon.
+	ErrScheduleTooSoon = &errors.ErrDescriptor{
+		MessageFormat: "Confirmed downlink is scheduled too soon",
+		Type:          errors.TemporarilyUnavailable,
+		Code:          15,
+	}
 )
 
 func init() {
@@ -132,4 +139,5 @@ func init() {
 	ErrDecryptionFailed.Register()
 	ErrMACRequestNotFound.Register()
 	ErrInvalidDataRate.Register()
+	ErrScheduleTooSoon.Register()
 }

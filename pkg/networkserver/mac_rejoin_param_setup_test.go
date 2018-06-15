@@ -52,7 +52,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 			Name: "all ack",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
-				PendingMACCommands: []*ttnpb.MACCommand{
+				PendingMACRequests: []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_RejoinParamSetupReq{
 						MaxCountExponent: 42,
 						MaxTimeExponent:  43,
@@ -63,7 +63,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					// TODO: Handle (https://github.com/TheThingsIndustries/ttn/issues/834)
 				},
-				PendingMACCommands: []*ttnpb.MACCommand{},
+				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 			Payload: &ttnpb.MACCommand_RejoinParamSetupAns{
 				MaxTimeExponentAck: true,

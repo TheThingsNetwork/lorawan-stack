@@ -42,7 +42,7 @@ func TestHandleDutyCycleAns(t *testing.T) {
 			Name: "2048",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
-				PendingMACCommands: []*ttnpb.MACCommand{
+				PendingMACRequests: []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_DutyCycleReq{
 						MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,
 					}).MACCommand(),
@@ -52,7 +52,7 @@ func TestHandleDutyCycleAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					DutyCycle: ttnpb.DUTY_CYCLE_2048,
 				},
-				PendingMACCommands: []*ttnpb.MACCommand{},
+				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 		},
 	} {

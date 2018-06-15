@@ -53,8 +53,19 @@ const (
 	// recentUplinkCount is the maximium amount of recent uplinks stored per device.
 	recentUplinkCount = 20
 
-	// accumulationCapacity is the initial capacity of the accumulator
+	// accumulationCapacity is the initial capacity of the accumulator.
 	accumulationCapacity = 20
+
+	// fOptsCapacity is the maximum length of FOpts in bytes.
+	fOptsCapacity = 15
+
+	// classCTimeout represents the time interval, within which class C
+	// device should acknowledge the downlink or answer MAC command.
+	classCTimeout = 5 * time.Minute
+
+	// appQueueUpdateTime represents the time interval, within which AS
+	// shall update the application queue after receiving the uplink.
+	appQueueUpdateTime = 200 * time.Millisecond
 )
 
 func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
@@ -76,7 +87,7 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 		ADRAckLimit:       uint32(band.ADRAckLimit),
 		ADRAckDelay:       uint32(band.ADRAckDelay),
 		DutyCycle:         ttnpb.DUTY_CYCLE_1,
-		RxDelay:           uint32(band.ReceiveDelay1),
+		RxDelay:           uint32(band.ReceiveDelay1.Seconds()),
 		Rx1DataRateOffset: 0,
 		Rx2DataRateIndex:  uint32(band.DefaultRx2Parameters.DataRateIndex),
 		Rx2Frequency:      uint64(band.DefaultRx2Parameters.Frequency),
@@ -96,6 +107,16 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 
 	// TODO: Set additional parameters in MACStateDesired from fp,
 	// once https://github.com/TheThingsIndustries/ttn/issues/857 is resolved.
+
+	if dev.MACInfo == nil {
+		dev.MACInfo = &ttnpb.MACInfo{}
+	} else {
+		dev.MACInfo = &ttnpb.MACInfo{
+			LastStatusReceivedAt: dev.MACInfo.LastStatusReceivedAt,
+			BatteryPercentage:    dev.MACInfo.BatteryPercentage,
+			DownlinkMargin:       dev.MACInfo.DownlinkMargin,
+		}
+	}
 
 	return nil
 }
@@ -521,11 +542,8 @@ func setDownlinkModulation(s *ttnpb.TxSettings, dr band.DataRate) (err error) {
 func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb.UplinkMessage, acc *metadataAccumulator, b []byte, isJoinAccept bool) error {
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
-		"device_id", dev.EndDeviceIdentifiers.DeviceID,
+		"device_uid", dev.EndDeviceIdentifiers.UniqueID(ctx),
 	))
-
-	// TODO: Don't schedule a new downlink if a confirmed downlink/MAC was scheduled recently and answer has not been received yet.
-	// https://github.com/TheThingsIndustries/ttn/issues/730
 
 	msg := &ttnpb.DownlinkMessage{
 		RawPayload:           b,
@@ -664,9 +682,15 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 			}
 
 			dev.RecentDownlinks = append(dev.RecentDownlinks, msg)
-			if err = dev.Store("RecentDownlinks"); err != nil {
-				logger.WithError(err).Error("Failed to store device")
-				return err
+			if err = dev.Store(
+				"MACInfo",
+				"PendingMACRequests",
+				"QueuedApplicationDownlinks",
+				"QueuedMACResponses",
+				"RecentDownlinks",
+				"Session",
+			); err != nil {
+				return errors.NewWithCause(err, "failed to store device")
 			}
 			return nil
 		}
@@ -675,84 +699,171 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 	for i, err := range errs {
 		logger = logger.WithField(fmt.Sprintf("error_%d", i), err)
 	}
-	logger.Debug("Failed to schedule downlink")
-	return errors.New("Failed to schedule downlink")
+	return errors.New("failed to schedule downlink")
 }
 
-func (ns *NetworkServer) scheduleApplicationDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb.UplinkMessage, acc *metadataAccumulator) error {
+// generateAndScheduleDownlink loads dev, tries to generate a downlink and schedule it.
+// If no downlink could be generated, nothing is scheduled and nil is returned.
+// If downlink was generated, but could not be scheduled, an error is returned describing why.
+func (ns *NetworkServer) generateAndScheduleDownlink(ctx context.Context, dev *deviceregistry.Device, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
-		"device_id", dev.EndDeviceIdentifiers.DeviceID,
+		"device_uid", dev.EndDeviceIdentifiers.UniqueID(ctx),
 	))
 
-	dev, err := dev.Load()
-	if err != nil {
-		logger.WithError(err).Error("Failed to load device")
-		return err
+	if dev.MACState == nil || dev.MACStateDesired == nil || dev.MACInfo == nil {
+		return common.ErrCorruptRegistry.NewWithCause(nil, errors.New("unknown MAC state"))
 	}
-
-	if len(dev.QueuedApplicationDownlinks) == 0 {
-		logger.Debug("Downlink queue empty")
-		return nil
-	}
-
-	var down *ttnpb.ApplicationDownlink
-	down, dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[0], dev.QueuedApplicationDownlinks[1:]
-
-	b, err := (ttnpb.Message{
-		MHDR: ttnpb.MHDR{
-			MType: ttnpb.MType_UNCONFIRMED_DOWN, // TODO: Support confirmed downlinks (https://github.com/TheThingsIndustries/ttn/issues/730)
-		},
-		Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
-			FHDR: ttnpb.FHDR{
-				DevAddr: *dev.EndDeviceIdentifiers.DevAddr,
-				FCtrl: ttnpb.FCtrl{
-					ADR:      false,
-					Ack:      up != nil && up.Payload.MType == ttnpb.MType_CONFIRMED_UP,
-					FPending: len(dev.QueuedApplicationDownlinks) > 0,
-				},
-				FCnt:  down.FCnt,
-				FOpts: nil, // TODO: MAC handling (https://github.com/TheThingsIndustries/ttn/issues/292)
-			},
-			FPort:      down.FPort,
-			FRMPayload: down.FRMPayload,
-		}},
-	}).MarshalLoRaWAN()
-	if err != nil {
-		logger.WithError(err).Error("Failed to marshal payload")
-		return err
-	}
-	// NOTE: It is assumed, that b does not contain MIC.
 
 	if dev.Session == nil {
 		logger.Debug("No active session found for device")
+		return errors.New("session is empty")
+	}
+
+	dev.PendingMACRequests = dev.PendingMACRequests[:0]
+	if *dev.MACState != *dev.MACStateDesired {
+		// TODO: Diff MACState and MACStateDesired and add commands to dev.PendingMACRequests.
+		// (https://github.com/TheThingsIndustries/ttn/issues/837)
+	}
+
+	if len(dev.PendingMACRequests) == 0 &&
+		len(dev.QueuedMACResponses) == 0 &&
+		len(dev.QueuedApplicationDownlinks) == 0 &&
+		(up == nil || up.Payload.MType != ttnpb.MType_CONFIRMED_UP) {
 		return nil
 	}
 
-	if dev.Session.SessionKeys.SNwkSIntKey == nil ||
-		dev.Session.SessionKeys.SNwkSIntKey.Key.IsZero() {
+	sort.SliceStable(dev.PendingMACRequests, func(i, j int) bool {
+		// NOTE: The ordering of a sequence of commands with identical CIDs shall not be changed.
+
+		ci := dev.PendingMACRequests[i].CID
+		cj := dev.PendingMACRequests[j].CID
+		switch {
+		case ci >= 0x80: // Proprietary
+			return false
+		case cj >= 0x80:
+			return true
+
+		case ci > 0x0F: // >1.1
+			return false
+		case cj > 0x0F:
+			return true
+
+		case ci < 0x02, ci > 0x0A: // >1.0.2
+			return false
+		case cj < 0x02, cj > 0x0A:
+			return true
+
+		case ci > 0x08: // >1.0.1
+			return false
+		case cj > 0x08:
+			return true
+		}
+		return false
+	})
+
+	cmds := append(dev.QueuedMACResponses, dev.PendingMACRequests...)
+
+	// TODO: Ensure cmds can be answered in one frame
+	// (https://github.com/TheThingsIndustries/ttn/issues/836)
+
+	cmdBuf := make([]byte, 0, len(cmds))
+	for _, cmd := range cmds {
+		cmdBuf, err = cmd.AppendLoRaWAN(cmdBuf)
+		if err != nil {
+			return errors.NewWithCausef(err, "failed to encode MAC command with CID 0x%X", cmd.CID)
+		}
+	}
+
+	pld := &ttnpb.MACPayload{
+		FHDR: ttnpb.FHDR{
+			DevAddr: *dev.EndDeviceIdentifiers.DevAddr,
+			FCtrl: ttnpb.FCtrl{
+				Ack: up != nil && up.Payload.MType == ttnpb.MType_CONFIRMED_UP,
+			},
+			FCnt: dev.Session.NextNFCntDown,
+		},
+	}
+
+	mType := ttnpb.MType_UNCONFIRMED_DOWN
+	if len(cmdBuf) <= fOptsCapacity && len(dev.QueuedApplicationDownlinks) > 0 {
+		var down *ttnpb.ApplicationDownlink
+		down, dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[0], dev.QueuedApplicationDownlinks[1:]
+
+		pld.FHDR.FCnt = down.FCnt
+		pld.FPort = down.FPort
+		pld.FRMPayload = down.FRMPayload
+		if down.Confirmed {
+			mType = ttnpb.MType_CONFIRMED_DOWN
+		}
+	}
+
+	if len(cmdBuf) > 0 && (pld.FPort == 0 || dev.EndDevice.LoRaWANVersion.EncryptFOpts()) {
+		if dev.Session.NwkSEncKey == nil || dev.Session.NwkSEncKey.Key.IsZero() {
+			return common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingNwkSEncKey.New(nil))
+		}
+
+		cmdBuf, err = crypto.EncryptDownlink(*dev.Session.NwkSEncKey.Key, *dev.EndDeviceIdentifiers.DevAddr, pld.FHDR.FCnt, cmdBuf)
+		if err != nil {
+			return errors.NewWithCause(err, "failed to encrypt MAC commands")
+		}
+	}
+
+	if pld.FPort == 0 {
+		pld.FRMPayload = cmdBuf
+		dev.Session.NextNFCntDown++
+	} else {
+		pld.FHDR.FOpts = cmdBuf
+	}
+
+	// TODO: Set to true if commands were trimmed.
+	// (https://github.com/TheThingsIndustries/ttn/issues/836)
+	pld.FHDR.FCtrl.FPending = len(dev.QueuedApplicationDownlinks) > 0
+
+	switch {
+	case dev.MACInfo.DeviceClass != ttnpb.CLASS_C,
+		mType != ttnpb.MType_CONFIRMED_DOWN && len(dev.PendingMACRequests) == 0:
+		break
+
+	case dev.MACInfo.NextConfirmedDownlinkAt.After(time.Now()):
+		return ErrScheduleTooSoon.New(nil)
+
+	default:
+		dev.MACInfo.NextConfirmedDownlinkAt = time.Now().Add(classCTimeout).UTC()
+	}
+
+	if mType == ttnpb.MType_CONFIRMED_DOWN {
+		dev.Session.LastConfFCntDown = pld.FCnt
+	}
+
+	b, err := (ttnpb.Message{
+		MHDR: ttnpb.MHDR{
+			MType: mType,
+			Major: ttnpb.Major_LORAWAN_R1,
+		},
+		Payload: &ttnpb.Message_MACPayload{
+			MACPayload: pld,
+		},
+	}).MarshalLoRaWAN()
+	if err != nil {
+		return errors.NewWithCause(err, "failed to marshal payload")
+	}
+	// NOTE: It is assumed, that b does not contain MIC.
+
+	if dev.Session.SNwkSIntKey == nil || dev.Session.SNwkSIntKey.Key.IsZero() {
 		return common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingSNwkSIntKey.New(nil))
 	}
 
-	mic, err := crypto.ComputeDownlinkMIC(*dev.Session.SessionKeys.SNwkSIntKey.Key, *dev.EndDeviceIdentifiers.DevAddr, down.FCnt, b)
+	mic, err := crypto.ComputeDownlinkMIC(
+		*dev.Session.SNwkSIntKey.Key,
+		*dev.EndDeviceIdentifiers.DevAddr,
+		pld.FCnt,
+		b,
+	)
 	if err != nil {
-		logger.WithError(err).Error("Failed to compute downlink MIC")
-		return err
+		return common.ErrComputeMIC.New(nil)
 	}
-
-	if err := ns.scheduleDownlink(ctx, dev, up, acc, append(b, mic[:]...), false); err != nil {
-		return err
-	}
-
-	if err = dev.Store("QueuedApplicationDownlinks"); err != nil {
-		logger.WithError(err).Error("Failed to store device")
-		return err
-	}
-
-	if len(dev.QueuedApplicationDownlinks) > 0 && dev.MACInfo.DeviceClass == ttnpb.CLASS_C {
-		// TODO: Schedule the next downlink (https://github.com/TheThingsIndustries/ttn/issues/728)
-	}
-	return nil
+	return ns.scheduleDownlink(ctx, dev, up, acc, append(b, mic[:]...), false)
 }
 
 // matchDevice tries to match the uplink message with a device.
@@ -830,8 +941,7 @@ outer:
 
 			gap = fCnt - dev.Session.NextFCntUp
 
-			switch dev.LoRaWANVersion {
-			case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
+			if dev.LoRaWANVersion.HasMaxFCntGap() {
 				fp, err := ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)
 				if err != nil {
 					return nil, common.ErrCorruptRegistry.NewWithCause(nil, err)
@@ -872,17 +982,16 @@ outer:
 	b := msg.RawPayload[:len(msg.RawPayload)-4]
 
 	for _, dev := range matching {
-		if dev.Session.FNwkSIntKey == nil || dev.Session.FNwkSIntKey.Key.IsZero() {
-			return nil, common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingFNwkSIntKey.New(nil))
-		}
-		fNwkSIntKey := *dev.Session.FNwkSIntKey.Key
-
 		if pld.Ack {
 			if len(dev.RecentDownlinks) == 0 {
-				// Uplink acknowledges a downlink, but no downlink was sent by the device,
+				// Uplink acknowledges a downlink, but no downlink was sent to the device,
 				// hence it must be the wrong device.
 				continue
 			}
+		}
+
+		if dev.Session.FNwkSIntKey == nil || dev.Session.FNwkSIntKey.Key.IsZero() {
+			return nil, common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingFNwkSIntKey.New(nil))
 		}
 
 		var computedMIC [4]byte
@@ -892,23 +1001,31 @@ outer:
 			if dev.Session.SNwkSIntKey == nil || dev.Session.SNwkSIntKey.Key.IsZero() {
 				return nil, common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingSNwkSIntKey.New(nil))
 			}
-			sNwkSIntKey := *dev.Session.SNwkSIntKey.Key
 
 			var confFCnt uint32
 			if pld.Ack {
-				for i := len(dev.RecentDownlinks) - 1; i > 0; i-- {
-					if ackPld := dev.RecentDownlinks[i].Payload.GetMACPayload(); ackPld != nil {
-						confFCnt = ackPld.FCnt
-						break
-					}
-				}
+				confFCnt = dev.Session.LastConfFCntDown
 			}
-			set := msg.Settings
-			computedMIC, err = crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey,
-				confFCnt, uint8(set.DataRateIndex), uint8(set.ChannelIndex),
-				pld.DevAddr, dev.fCnt, b)
+
+			computedMIC, err = crypto.ComputeUplinkMIC(
+				*dev.Session.SNwkSIntKey.Key,
+				*dev.Session.FNwkSIntKey.Key,
+				confFCnt,
+				uint8(msg.Settings.DataRateIndex),
+				uint8(msg.Settings.ChannelIndex),
+				pld.DevAddr,
+				dev.fCnt,
+				b,
+			)
+
 		case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-			computedMIC, err = crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, pld.DevAddr, dev.fCnt, b)
+			computedMIC, err = crypto.ComputeLegacyUplinkMIC(
+				*dev.Session.FNwkSIntKey.Key,
+				pld.DevAddr,
+				dev.fCnt,
+				b,
+			)
+
 		default:
 			return nil, common.ErrCorruptRegistry.NewWithCause(nil, errors.New("Unmatched LoRaWAN version"))
 		}
@@ -945,12 +1062,25 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		dev.SessionFallback = nil
 	}
 
-	go ns.scheduleApplicationDownlink(ctx, dev, msg, acc)
-
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
-		"device_id", dev.EndDeviceIdentifiers.DeviceID,
+		"device_uid", dev.EndDeviceIdentifiers.UniqueID(ctx),
 	))
+
+	defer time.AfterFunc(appQueueUpdateTime, func() {
+		// TODO: Decouple Class A downlink from uplink.
+		// https://github.com/TheThingsIndustries/lorawan-stack/issues/905
+
+		dev, err := dev.Load()
+		if err != nil {
+			logger.WithError(err).Error("Failed to load device")
+			return
+		}
+
+		if err := ns.generateAndScheduleDownlink(ctx, dev, msg, acc); err != nil {
+			logger.WithError(err).Error("Failed to schedule downlink in reception slot")
+		}
+	})
 
 	pld := msg.Payload.GetMACPayload()
 	if pld == nil {
@@ -986,18 +1116,20 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		cmds = append(cmds, cmd)
 	}
 
-	if dev.MACInfo == nil {
-		dev.MACInfo = &ttnpb.MACInfo{}
-	}
-	if dev.MACSettings == nil {
-		dev.MACSettings = &ttnpb.MACSettings{}
-	}
 	if dev.MACState == nil {
 		if err := resetMACState(ns.Component.FrequencyPlans, dev.EndDevice); err != nil {
 			return err
 		}
 	}
 	dev.MACState.ADRDataRateIndex = msg.Settings.DataRateIndex
+
+	if dev.MACStateDesired == nil {
+		dev.MACStateDesired = dev.MACState
+	}
+
+	if dev.MACInfo == nil {
+		dev.MACInfo = &ttnpb.MACInfo{}
+	}
 
 	select {
 	case <-ctx.Done():
@@ -1008,7 +1140,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	msg.RxMetadata = acc.Accumulated()
 	registerMergeMetadata(ctx, dev.EndDevice, msg)
 
-	dev.QueuedMACCommands = dev.QueuedMACCommands[:0]
+	dev.QueuedMACResponses = dev.QueuedMACResponses[:0]
 
 outer:
 	for _, cmd := range cmds {
@@ -1072,18 +1204,18 @@ outer:
 
 	if err := dev.Store(
 		"MACInfo",
-		"MACSettings",
 		"MACState",
 		"MACStateDesired",
-		"PendingMACCommands",
-		"QueuedMACCommands",
+		"PendingMACRequests",
+		"QueuedMACResponses",
 		"RecentUplinks",
 		"Session",
 		"SessionFallback",
 	); err != nil {
-		logger.WithError(err).Error("Failed to update device")
+		logger.WithError(err).Error("Failed to store device")
 		return err
 	}
+
 	uid := dev.EndDeviceIdentifiers.ApplicationIdentifiers.UniqueID(ctx)
 	if uid == "" {
 		return common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingApplicationID.New(nil))
@@ -1098,13 +1230,11 @@ outer:
 	}
 
 	registerForwardUplink(ctx, dev.EndDevice, msg)
-
-	ses := dev.Session
 	return cl.Send(&ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-		SessionKeyID:         ses.SessionKeyID,
+		SessionKeyID:         dev.Session.SessionKeyID,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-			FCnt:           ses.NextFCntUp - 1,
+			FCnt:           dev.Session.NextFCntUp - 1,
 			FPort:          pld.FPort,
 			FRMPayload:     pld.FRMPayload,
 			RxMetadata:     msg.RxMetadata,

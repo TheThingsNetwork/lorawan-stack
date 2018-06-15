@@ -21,11 +21,11 @@ import (
 )
 
 func handleDutyCycleAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
-	dev.PendingMACCommands, err = handleMACResponse(ttnpb.CID_DUTY_CYCLE, func(cmd *ttnpb.MACCommand) {
+	dev.PendingMACRequests, err = handleMACResponse(ttnpb.CID_DUTY_CYCLE, func(cmd *ttnpb.MACCommand) {
 		req := cmd.GetDutyCycleReq()
 
 		dev.MACState.DutyCycle = req.MaxDutyCycle
 
-	}, dev.PendingMACCommands...)
+	}, dev.PendingMACRequests...)
 	return
 }

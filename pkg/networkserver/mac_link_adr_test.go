@@ -52,7 +52,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name: "1 request/all ack",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
-				PendingMACCommands: []*ttnpb.MACCommand{
+				PendingMACRequests: []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_LinkADRReq{
 						DataRateIndex: 4,
 						TxPowerIndex:  42,
@@ -64,7 +64,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 					ADRDataRateIndex: 4,
 					ADRTXPowerIndex:  42,
 				},
-				PendingMACCommands: []*ttnpb.MACCommand{},
+				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 			Payload: &ttnpb.MACCommand_LinkADRAns{
 				ChannelMaskAck:   true,
@@ -76,7 +76,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Name: "2 requests/all ack",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
-				PendingMACCommands: []*ttnpb.MACCommand{
+				PendingMACRequests: []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_LinkADRReq{
 						DataRateIndex: 4,
 						TxPowerIndex:  42,
@@ -92,7 +92,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 					ADRDataRateIndex: 5,
 					ADRTXPowerIndex:  43,
 				},
-				PendingMACCommands: []*ttnpb.MACCommand{},
+				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 			Payload: &ttnpb.MACCommand_LinkADRAns{
 				ChannelMaskAck:   true,

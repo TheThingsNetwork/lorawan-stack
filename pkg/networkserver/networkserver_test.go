@@ -572,6 +572,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				0x43,
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
+					msg.Payload.GetMACPayload().FHDR.Ack = false
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -610,6 +611,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				0x43,
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
+					msg.Payload.GetMACPayload().FHDR.Ack = false
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -624,7 +626,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				}(),
 			},
 			{
-				"1.0/confirmed",
+				"1.0/confirmed/ack",
 				&ttnpb.EndDevice{
 					LoRaWANVersion: ttnpb.MAC_V1_0,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -652,6 +654,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				0x43,
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
+					msg.Payload.GetMACPayload().FHDR.Ack = true
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -666,7 +669,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				}(),
 			},
 			{
-				"1.0/confirmed/FCnt resets",
+				"1.0/confirmed/ack/FCnt resets",
 				&ttnpb.EndDevice{
 					LoRaWANVersion: ttnpb.MAC_V1_0,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -695,6 +698,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				0x43,
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
+					msg.Payload.GetMACPayload().FHDR.Ack = true
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -738,6 +742,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				0x43,
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
+					msg.Payload.GetMACPayload().FHDR.Ack = false
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -754,7 +759,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				}(),
 			},
 			{
-				"1.1/confirmed",
+				"1.1/confirmed/ack",
 				&ttnpb.EndDevice{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -765,8 +770,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
-						DevAddr:    DevAddr,
-						NextFCntUp: 0x42,
+						DevAddr:          DevAddr,
+						NextFCntUp:       0x42,
+						LastConfFCntDown: 0x24,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								Key: &FNwkSIntKey,
@@ -784,6 +790,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						ttnpb.NewPopulatedDownlinkMessage(test.Randy, false),
 						func() *ttnpb.DownlinkMessage {
 							msg := ttnpb.NewPopulatedDownlinkMessage(test.Randy, false)
+							msg.Payload.MHDR.MType = ttnpb.MType_CONFIRMED_DOWN
 							msg.Payload.GetMACPayload().FCnt = 0x24
 							return msg
 						}(),
@@ -792,6 +799,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				0x43,
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
+					msg.Payload.GetMACPayload().FHDR.Ack = true
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -838,6 +846,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				0x43,
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, false)
+					msg.Payload.GetMACPayload().FHDR.Ack = false
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -854,7 +863,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				}(),
 			},
 			{
-				"1.1/confirmed/FCnt resets",
+				"1.1/confirmed/ack/FCnt resets",
 				&ttnpb.EndDevice{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -865,8 +874,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
-						DevAddr:    DevAddr,
-						NextFCntUp: 0x42424249,
+						DevAddr:          DevAddr,
+						NextFCntUp:       0x42424249,
+						LastConfFCntDown: 0x24,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								Key: &FNwkSIntKey,
@@ -893,6 +903,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				0x43,
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageUplink(test.Randy, SNwkSIntKey, FNwkSIntKey, true)
+					msg.Payload.GetMACPayload().FHDR.Ack = true
 
 					pld := msg.Payload.GetMACPayload()
 					pld.DevAddr = DevAddr
@@ -1093,9 +1104,6 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						if expected.MACInfo == nil {
 							expected.MACInfo = &ttnpb.MACInfo{}
 						}
-						if expected.MACSettings == nil {
-							expected.MACSettings = &ttnpb.MACSettings{}
-						}
 
 						expected.RecentUplinks = append(expected.RecentUplinks, msg)
 						if len(expected.RecentUplinks) > RecentUplinkCount {
@@ -1170,7 +1178,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						a.So(de.msg.CorrelationIDs, should.NotBeEmpty)
 						msg.CorrelationIDs = de.msg.CorrelationIDs
 
-						a.So(de.msg, should.Resemble, msg)
+						if !a.So(de.msg, should.Resemble, msg) {
+							pretty.Ldiff(t, de.msg, msg)
+						}
 						a.So(de.ctx, ttnshould.HaveParentContext, ctx)
 
 						de.ch <- time.Now()

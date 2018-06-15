@@ -41,7 +41,7 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 		{
 			Name: "limit 42, delay 24",
 			Device: &ttnpb.EndDevice{
-				PendingMACCommands: []*ttnpb.MACCommand{
+				PendingMACRequests: []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_ADRParamSetupReq{
 						ADRAckLimitExponent: 42,
 						ADRAckDelayExponent: 24,
@@ -49,7 +49,7 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				PendingMACCommands: []*ttnpb.MACCommand{},
+				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 		},
 	} {

@@ -52,7 +52,7 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 			Name: "ack",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
-				PendingMACCommands: []*ttnpb.MACCommand{
+				PendingMACRequests: []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_BeaconFreqReq{
 						Frequency: 42,
 					}).MACCommand(),
@@ -62,7 +62,7 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
 				},
-				PendingMACCommands: []*ttnpb.MACCommand{},
+				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 			Payload: &ttnpb.MACCommand_BeaconFreqAns{
 				FrequencyAck: true,

@@ -97,7 +97,7 @@ func (cl *MockNsGsClient) ScheduleDownlink(ctx context.Context, in *ttnpb.Downli
 	return cl.ScheduleDownlinkFunc(ctx, in, opts...)
 }
 
-func TestScheduleDownlink(t *testing.T) {
+func TestGenerateAndScheduleDownlink(t *testing.T) {
 	newRX2 := func(down *ttnpb.ApplicationDownlink, fp ttnpb.FrequencyPlan, dev *ttnpb.EndDevice) *ttnpb.DownlinkMessage {
 		band := test.Must(band.GetByID(fp.BandID)).(band.Band)
 		st := dev.MACState
@@ -115,6 +115,7 @@ func TestScheduleDownlink(t *testing.T) {
 			RawPayload: test.Must((ttnpb.Message{
 				MHDR: ttnpb.MHDR{
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
+					Major: ttnpb.Major_LORAWAN_R1,
 				},
 				Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
 					FHDR: ttnpb.FHDR{
@@ -181,9 +182,10 @@ func TestScheduleDownlink(t *testing.T) {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
 		ed.QueuedApplicationDownlinks = nil
+		ed.QueuedMACResponses = nil
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
-		err := ns.scheduleApplicationDownlink(context.Background(), dev, nil, nil)
+		err := ns.generateAndScheduleDownlink(context.Background(), dev, nil, nil)
 		a.So(err, should.BeNil)
 	})
 
@@ -206,10 +208,11 @@ func TestScheduleDownlink(t *testing.T) {
 		for ed.Session == nil || len(ed.QueuedApplicationDownlinks) == 0 {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
+		ed.QueuedMACResponses = nil
 		ed.RecentUplinks = nil
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
-		err := ns.scheduleApplicationDownlink(context.Background(), dev, nil, nil)
+		err := ns.generateAndScheduleDownlink(context.Background(), dev, nil, nil)
 		a.So(err, should.BeError)
 	})
 
@@ -238,12 +241,13 @@ func TestScheduleDownlink(t *testing.T) {
 		for ed.Session == nil || len(ed.RecentUplinks) == 0 {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
+		ed.QueuedMACResponses = nil
 		ed.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
 			ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
 		}
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
-		err := ns.scheduleApplicationDownlink(context.Background(), dev, nil, nil)
+		err := ns.generateAndScheduleDownlink(context.Background(), dev, nil, nil)
 		a.So(err, should.BeError)
 	})
 
@@ -292,6 +296,7 @@ func TestScheduleDownlink(t *testing.T) {
 		for ed.Session == nil {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
+		ed.QueuedMACResponses = nil
 		ed.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
 			down,
 		}
@@ -354,7 +359,7 @@ func TestScheduleDownlink(t *testing.T) {
 			}
 		}
 
-		err = ns.scheduleApplicationDownlink(context.Background(), dev, up, nil)
+		err = ns.generateAndScheduleDownlink(context.Background(), dev, up, nil)
 		a.So(err, should.BeNil)
 		a.So(cnt, should.Equal, len(mds)*len(slots))
 		a.So(test.WaitTimeout(20*test.Delay, wg.Wait), should.BeTrue)
@@ -405,6 +410,7 @@ func TestScheduleDownlink(t *testing.T) {
 		for ed.Session == nil {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
+		ed.QueuedMACResponses = nil
 		ed.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
 			down,
 		}
@@ -475,7 +481,7 @@ func TestScheduleDownlink(t *testing.T) {
 			}
 		}
 
-		err = ns.scheduleApplicationDownlink(context.Background(), dev, up, nil)
+		err = ns.generateAndScheduleDownlink(context.Background(), dev, up, nil)
 		a.So(err, should.BeNil)
 		a.So(cnt, should.Equal, len(mds)*len(slots))
 		a.So(test.WaitTimeout(20*test.Delay, wg.Wait), should.BeTrue)

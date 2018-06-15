@@ -35,10 +35,10 @@ func TestHandleBeaconTimingReq(t *testing.T) {
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				QueuedMACCommands: []*ttnpb.MACCommand{},
+				QueuedMACResponses: []*ttnpb.MACCommand{},
 			},
 			Expected: &ttnpb.EndDevice{
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				QueuedMACResponses: []*ttnpb.MACCommand{
 					// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
 				},
 			},
@@ -46,14 +46,14 @@ func TestHandleBeaconTimingReq(t *testing.T) {
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				QueuedMACResponses: []*ttnpb.MACCommand{
 					{},
 					{},
 					{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				QueuedMACResponses: []*ttnpb.MACCommand{
 					{},
 					{},
 					{},

@@ -35,8 +35,8 @@ func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 		return err
 	}
 
-	dev.QueuedMACCommands = append(
-		dev.QueuedMACCommands,
+	dev.QueuedMACResponses = append(
+		dev.QueuedMACResponses,
 		(&ttnpb.MACCommand_ResetConf{
 			MinorVersion: pld.MinorVersion,
 		}).MACCommand(),

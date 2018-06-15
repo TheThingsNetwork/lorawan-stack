@@ -52,7 +52,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 			Name: "battery 42, margin 4",
 			Device: &ttnpb.EndDevice{
 				MACInfo: &ttnpb.MACInfo{},
-				PendingMACCommands: []*ttnpb.MACCommand{
+				PendingMACRequests: []*ttnpb.MACCommand{
 					ttnpb.CID_DEV_STATUS.MACCommand(),
 				},
 			},
@@ -60,7 +60,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 				MACInfo: &ttnpb.MACInfo{
 					// TODO: Modify status variables in MACInfo (https://github.com/TheThingsIndustries/ttn/issues/834)
 				},
-				PendingMACCommands: []*ttnpb.MACCommand{},
+				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 			Payload: &ttnpb.MACCommand_DevStatusAns{
 				Battery: 42,

@@ -36,7 +36,8 @@ message Session {
   uint32 next_f_cnt_up = 4;
   uint32 next_n_f_cnt_down = 5;
   uint32 next_a_f_cnt_down = 6;
-  google.protobuf.Timestamp started_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  uint32 last_conf_f_cnt_down = 7;
+  google.protobuf.Timestamp started_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
 message DeviceFormatters {
@@ -187,11 +188,13 @@ message EndDevice {
   // Recent downlink messages sorted by time.
   repeated DownlinkMessage recent_downlinks = 30;
 
-  // Queued MAC commands.
-  repeated MACCommand queued_mac_commands = 31 [(gogoproto.customname) = "QueuedMACCommands"];
+  // Queued MAC responses.
+  // Regenerated on each uplink.
+  repeated MACCommand queued_mac_responses = 31 [(gogoproto.customname) = "QueuedMACResponses"];
 
-  // Pending MAC commands(i.e. sent requests, for which no response has been received yet).
-  repeated MACCommand pending_mac_commands = 32 [(gogoproto.customname) = "PendingMACCommands"];
+  // Pending MAC requests(i.e. sent requests, for which no response has been received yet).
+  // Regenerated on each downlink.
+  repeated MACCommand pending_mac_requests = 32 [(gogoproto.customname) = "PendingMACRequests"];
 
   // Queued Application downlink messages.
   repeated ApplicationDownlink queued_application_downlinks = 33;
@@ -257,8 +260,6 @@ message MACState {
   uint64 ping_slot_frequency = 21;
   // Data rate index of the class B ping slot.
   uint32 ping_slot_data_rate_index = 22;
-  // Time when the last confirmed downlink message or MAC command was scheduled.
-  google.protobuf.Timestamp last_confirmed_downlink = 23 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
 }
 
 // MAC information sent by the device
@@ -270,13 +271,15 @@ message MACInfo {
   // - If device sent DeviceModeInd MAC message, this will be set to that value
   Class device_class = 1;
   // Time when the last device status MAC message was received
-  google.protobuf.Timestamp last_status_received_at = 2 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp last_status_received_at = 2 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  // Time when a new confirmed downlink message or MAC command is ready to be scheduled for class C.
+  google.protobuf.Timestamp next_confirmed_downlink_at = 3 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
   // Battery percentage received in last device status message
-  float battery_percentage = 3;
+  float battery_percentage = 4;
   // Downlink margin received in last device status message
-  int32 downlink_margin = 4;
+  int32 downlink_margin = 5;
   // Periodicity of the class B ping slot
-  PingSlotPeriod ping_slot_periodicity = 5;
+  PingSlotPeriod ping_slot_periodicity = 6;
 
   // TODO: Add info about failed MAC requests
 }

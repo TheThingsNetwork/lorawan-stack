@@ -26,7 +26,7 @@ func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		return common.ErrMissingPayload.New(nil)
 	}
 
-	dev.PendingMACCommands, err = handleMACResponse(ttnpb.CID_NEW_CHANNEL, func(cmd *ttnpb.MACCommand) {
+	dev.PendingMACRequests, err = handleMACResponse(ttnpb.CID_NEW_CHANNEL, func(cmd *ttnpb.MACCommand) {
 		if !pld.DataRateAck || !pld.FrequencyAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
@@ -41,6 +41,6 @@ func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		_ = req.ChannelIndex
 		_ = req.Frequency
 
-	}, dev.PendingMACCommands...)
+	}, dev.PendingMACRequests...)
 	return
 }

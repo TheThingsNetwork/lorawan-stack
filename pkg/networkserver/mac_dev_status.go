@@ -26,11 +26,11 @@ func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		return common.ErrMissingPayload.New(nil)
 	}
 
-	dev.PendingMACCommands, err = handleMACResponse(ttnpb.CID_DEV_STATUS, func(*ttnpb.MACCommand) {
+	dev.PendingMACRequests, err = handleMACResponse(ttnpb.CID_DEV_STATUS, func(*ttnpb.MACCommand) {
 		// TODO: Modify status variables in MACInfo (https://github.com/TheThingsIndustries/ttn/issues/834)
 		_ = pld.Battery
 		_ = pld.Margin
 
-	}, dev.PendingMACCommands...)
+	}, dev.PendingMACRequests...)
 	return
 }

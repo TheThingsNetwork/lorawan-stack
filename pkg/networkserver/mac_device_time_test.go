@@ -38,7 +38,7 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 			Name:   "empty queue",
 			Device: &ttnpb.EndDevice{},
 			Expected: &ttnpb.EndDevice{
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				QueuedMACResponses: []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_DeviceTimeAns{
 						Time: time.Unix(42, 42),
 					}).MACCommand(),
@@ -56,14 +56,14 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 		{
 			Name: "non-empty queue/odd",
 			Device: &ttnpb.EndDevice{
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				QueuedMACResponses: []*ttnpb.MACCommand{
 					{},
 					{},
 					{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				QueuedMACResponses: []*ttnpb.MACCommand{
 					{},
 					{},
 					{},
@@ -90,14 +90,14 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 		{
 			Name: "non-empty queue/even",
 			Device: &ttnpb.EndDevice{
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				QueuedMACResponses: []*ttnpb.MACCommand{
 					{},
 					{},
 					{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				QueuedMACResponses: []*ttnpb.MACCommand{
 					{},
 					{},
 					{},

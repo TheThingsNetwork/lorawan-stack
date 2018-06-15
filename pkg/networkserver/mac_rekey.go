@@ -31,8 +31,8 @@ func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	}
 
 	dev.SessionFallback = nil
-	dev.QueuedMACCommands = append(
-		dev.QueuedMACCommands,
+	dev.QueuedMACResponses = append(
+		dev.QueuedMACResponses,
 		(&ttnpb.MACCommand_RekeyConf{
 			MinorVersion: pld.MinorVersion,
 		}).MACCommand(),

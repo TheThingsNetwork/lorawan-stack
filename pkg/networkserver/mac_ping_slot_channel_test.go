@@ -52,7 +52,7 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 			Name: "both ack",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
-				PendingMACCommands: []*ttnpb.MACCommand{
+				PendingMACRequests: []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_PingSlotChannelReq{
 						Frequency:     42,
 						DataRateIndex: 43,
@@ -63,7 +63,7 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
 				},
-				PendingMACCommands: []*ttnpb.MACCommand{},
+				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 			Payload: &ttnpb.MACCommand_PingSlotChannelAns{
 				FrequencyAck:     true,

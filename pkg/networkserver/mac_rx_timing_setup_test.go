@@ -42,7 +42,7 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 			Name: "42",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
-				PendingMACCommands: []*ttnpb.MACCommand{
+				PendingMACRequests: []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_RxTimingSetupReq{
 						Delay: 42,
 					}).MACCommand(),
@@ -52,7 +52,7 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					RxDelay: 42,
 				},
-				PendingMACCommands: []*ttnpb.MACCommand{},
+				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 		},
 	} {

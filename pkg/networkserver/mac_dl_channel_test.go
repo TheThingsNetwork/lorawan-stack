@@ -52,7 +52,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 			Name: "both ack",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
-				PendingMACCommands: []*ttnpb.MACCommand{
+				PendingMACRequests: []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_DLChannelReq{
 						ChannelIndex: 4,
 						Frequency:    42,
@@ -63,7 +63,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					// TODO: Handle (https://github.com/TheThingsIndustries/ttn/issues/834)
 				},
-				PendingMACCommands: []*ttnpb.MACCommand{},
+				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 			Payload: &ttnpb.MACCommand_DLChannelAns{
 				FrequencyAck:    true,

@@ -39,8 +39,8 @@ func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.Up
 		maxSNR = snr
 	}
 
-	dev.QueuedMACCommands = append(
-		dev.QueuedMACCommands,
+	dev.QueuedMACResponses = append(
+		dev.QueuedMACResponses,
 		(&ttnpb.MACCommand_LinkCheckAns{
 			Margin:       uint32(uint8(maxSNR - floor)),
 			GatewayCount: uint32(len(gtws)),

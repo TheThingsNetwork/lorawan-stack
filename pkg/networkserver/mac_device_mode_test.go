@@ -47,13 +47,13 @@ func TestHandleDeviceModeInd(t *testing.T) {
 				MACInfo: &ttnpb.MACInfo{
 					DeviceClass: ttnpb.CLASS_A,
 				},
-				QueuedMACCommands: []*ttnpb.MACCommand{},
+				QueuedMACResponses: []*ttnpb.MACCommand{},
 			},
 			Expected: &ttnpb.EndDevice{
 				MACInfo: &ttnpb.MACInfo{
 					DeviceClass: ttnpb.CLASS_C,
 				},
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				QueuedMACResponses: []*ttnpb.MACCommand{
 					(&ttnpb.MACCommand_DeviceModeConf{
 						Class: ttnpb.CLASS_C,
 					}).MACCommand(),
@@ -69,7 +69,7 @@ func TestHandleDeviceModeInd(t *testing.T) {
 				MACInfo: &ttnpb.MACInfo{
 					DeviceClass: ttnpb.CLASS_C,
 				},
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				QueuedMACResponses: []*ttnpb.MACCommand{
 					{},
 					{},
 					{},
@@ -79,7 +79,7 @@ func TestHandleDeviceModeInd(t *testing.T) {
 				MACInfo: &ttnpb.MACInfo{
 					DeviceClass: ttnpb.CLASS_A,
 				},
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				QueuedMACResponses: []*ttnpb.MACCommand{
 					{},
 					{},
 					{},

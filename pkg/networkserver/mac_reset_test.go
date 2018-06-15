@@ -71,14 +71,14 @@ func TestHandleResetInd(t *testing.T) {
 				MaxEIRP:           42,
 				MACState:          ttnpb.NewPopulatedMACState(test.Randy, false),
 				MACStateDesired:   ttnpb.NewPopulatedMACState(test.Randy, false),
-				QueuedMACCommands: []*ttnpb.MACCommand{},
+				QueuedMACResponses: []*ttnpb.MACCommand{},
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
 					ABP:             true,
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					MaxEIRP:         42,
-					QueuedMACCommands: []*ttnpb.MACCommand{
+					QueuedMACResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_ResetConf{
 							MinorVersion: 1,
 						}).MACCommand(),
@@ -102,7 +102,7 @@ func TestHandleResetInd(t *testing.T) {
 				MaxEIRP:         42,
 				MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
 				MACStateDesired: ttnpb.NewPopulatedMACState(test.Randy, false),
-				QueuedMACCommands: []*ttnpb.MACCommand{
+				QueuedMACResponses: []*ttnpb.MACCommand{
 					{},
 					{},
 					{},
@@ -113,7 +113,7 @@ func TestHandleResetInd(t *testing.T) {
 					ABP:             true,
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					MaxEIRP:         42,
-					QueuedMACCommands: []*ttnpb.MACCommand{
+					QueuedMACResponses: []*ttnpb.MACCommand{
 						{},
 						{},
 						{},

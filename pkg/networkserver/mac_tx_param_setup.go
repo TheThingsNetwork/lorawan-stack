@@ -21,7 +21,7 @@ import (
 )
 
 func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
-	dev.PendingMACCommands, err = handleMACResponse(ttnpb.CID_TX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
+	dev.PendingMACRequests, err = handleMACResponse(ttnpb.CID_TX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
 		req := cmd.GetTxParamSetupReq()
 		dev.MACState.DownlinkDwellTime = req.DownlinkDwellTime
 		dev.MACState.UplinkDwellTime = req.UplinkDwellTime
@@ -29,6 +29,6 @@ func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error
 		// TODO: Handle EIRP (https://github.com/TheThingsIndustries/ttn/issues/760)
 		_ = req.MaxEIRPIndex
 
-	}, dev.PendingMACCommands...)
+	}, dev.PendingMACRequests...)
 	return
 }

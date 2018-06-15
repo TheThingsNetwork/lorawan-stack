@@ -27,8 +27,8 @@ func handleDeviceModeInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 	}
 
 	dev.MACInfo.DeviceClass = pld.Class
-	dev.QueuedMACCommands = append(
-		dev.QueuedMACCommands,
+	dev.QueuedMACResponses = append(
+		dev.QueuedMACResponses,
 		(&ttnpb.MACCommand_DeviceModeConf{
 			Class: pld.Class,
 		}).MACCommand(),

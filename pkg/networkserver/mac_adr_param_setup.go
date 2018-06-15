@@ -21,13 +21,13 @@ import (
 )
 
 func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
-	dev.PendingMACCommands, err = handleMACResponse(ttnpb.CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
+	dev.PendingMACRequests, err = handleMACResponse(ttnpb.CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
 		req := cmd.GetADRParamSetupReq()
 
 		// TODO: Handle ADR parameters (https://github.com/TheThingsIndustries/ttn/issues/834)
 		_ = req.ADRAckDelayExponent
 		_ = req.ADRAckLimitExponent
 
-	}, dev.PendingMACCommands...)
+	}, dev.PendingMACRequests...)
 	return
 }
