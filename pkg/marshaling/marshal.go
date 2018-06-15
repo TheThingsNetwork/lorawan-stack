@@ -16,6 +16,7 @@ package marshaling
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/gob"
 	"encoding/json"
 	"reflect"
@@ -179,13 +180,6 @@ func MarshalMap(v interface{}) (m map[string]interface{}, err error) {
 			reflect.Float32, reflect.Float64, reflect.Bool, reflect.String:
 			m[k] = v.Interface()
 
-		case reflect.Ptr, reflect.Map, reflect.Interface, reflect.Chan, reflect.Func, reflect.Slice:
-			if v.IsNil() {
-				m[k] = nil
-				continue
-			}
-			fallthrough
-
 		default:
 			bv, err := ToBytesValue(v)
 			if err != nil {
@@ -197,21 +191,72 @@ func MarshalMap(v interface{}) (m map[string]interface{}, err error) {
 	return m, nil
 }
 
-// ToBytesValue is like ToBytes, but operates on values of type reflect.Value.
-func ToBytesValue(v reflect.Value) (b []byte, err error) {
-	if !v.IsValid() || (IsNillableKind(v.Kind()) && v.IsNil()) {
-		return nil, nil
+// binaryEncodable returns v as value, which can be encoded using binary package functionality.
+// binaryEncodable returns nil, false if conversion is not possible.
+func binaryEncodable(v reflect.Value) (interface{}, bool) {
+	if !v.IsValid() {
+		return nil, false
 	}
 
+	switch v.Kind() {
+	case reflect.Int:
+		return v.Int(), true
+
+	case reflect.Uint, reflect.Uintptr:
+		return v.Uint(), true
+
+	case reflect.Bool,
+		reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+		reflect.Float32, reflect.Float64, reflect.Complex64, reflect.Complex128:
+		return v.Interface(), true
+
+	case reflect.String:
+		return []byte(v.String()), true
+
+	case reflect.Slice, reflect.Array:
+		switch v.Type().Elem().Kind() {
+		case reflect.Bool,
+			reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+			reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+			reflect.Float32, reflect.Float64, reflect.Complex64, reflect.Complex128:
+			return v.Interface(), true
+		}
+	}
+	return nil, false
+}
+
+// ToBytesValue is like ToBytes, but operates on values of type reflect.Value.
+func ToBytesValue(v reflect.Value) (b []byte, err error) {
 	var enc Encoding
 	defer func() {
 		if err != nil {
 			return
 		}
-		b = append([]byte{byte(enc)}, b...)
+		b = append([]byte{byte(DefaultVersion), byte(enc)}, b...)
 	}()
 
+	if !v.IsValid() ||
+		(IsNillableKind(v.Kind()) && v.IsNil()) ||
+		reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface()) {
+		return nil, nil
+	}
+
 	t := v.Type()
+
+	conv, ok := binaryEncodable(v)
+	if ok {
+		enc = BigEndianEncoding
+
+		if conv == nil {
+			return nil, nil
+		}
+
+		buf := &bytes.Buffer{}
+		err := binary.Write(buf, binary.BigEndian, conv)
+		return buf.Bytes(), err
+	}
+
 	switch {
 	case t.Implements(jsonMarshalerType):
 		enc = JSONEncoding

@@ -579,6 +579,23 @@ var structValues = []struct {
 	},
 }
 
+func bigEndianEncoded(v interface{}) []byte {
+	conv, ok := BinaryEncodable(reflect.ValueOf(v))
+	if !ok {
+		panic(errors.Errorf("can't encode value of type %T as binary", v))
+	}
+
+	if conv == nil {
+		return nil
+	}
+
+	buf := &bytes.Buffer{}
+	if err := binary.Write(buf, binary.BigEndian, conv); err != nil {
+		panic(err)
+	}
+	return buf.Bytes()
+}
+
 func gobEncoded(v interface{}) []byte {
 	buf := &bytes.Buffer{}
 	if err := gob.NewEncoder(buf).Encode(v); err != nil {
@@ -601,101 +618,193 @@ func msgPackEncoded(v interface{}) (b []byte) {
 	return b
 }
 
-var byteValues = []struct {
+var ByteValues = []struct {
 	value interface{}
 	bytes []byte
 }{
 	{
-		int(42),
-		append([]byte{byte(GobEncoding)}, gobEncoded(int(42))...),
+		uint(0),
+		append([]byte{byte(DefaultVersion), byte(ZeroEncoding)}),
+	},
+	{
+		int8(0),
+		append([]byte{byte(DefaultVersion), byte(ZeroEncoding)}),
 	},
 	{
 		int8(42),
-		append([]byte{byte(GobEncoding)}, gobEncoded(int8(42))...),
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded(int8(42))...),
 	},
 	{
 		int16(42),
-		append([]byte{byte(GobEncoding)}, gobEncoded(int16(42))...),
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded(int16(42))...),
 	},
 	{
 		int32(42),
-		append([]byte{byte(GobEncoding)}, gobEncoded(int32(42))...),
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded(int32(42))...),
 	},
 	{
 		int64(42),
-		append([]byte{byte(GobEncoding)}, gobEncoded(int64(42))...),
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded(int64(42))...),
 	},
 	{
-		uint(42),
-		append([]byte{byte(GobEncoding)}, gobEncoded(uint(42))...),
+		int(42),
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded(int64(42))...),
 	},
 	{
 		uint8(42),
-		append([]byte{byte(GobEncoding)}, gobEncoded(uint8(42))...),
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded(uint8(42))...),
 	},
 	{
 		uint16(42),
-		append([]byte{byte(GobEncoding)}, gobEncoded(uint16(42))...),
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded(uint16(42))...),
 	},
 	{
 		uint32(42),
-		append([]byte{byte(GobEncoding)}, gobEncoded(uint32(42))...),
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded(uint32(42))...),
 	},
 	{
 		uint64(42),
-		append([]byte{byte(GobEncoding)}, gobEncoded(uint64(42))...),
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded(uint64(42))...),
+	},
+	{
+		uint(42),
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded(uint64(42))...),
+	},
+	{
+		uintptr(42),
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded(uint64(42))...),
 	},
 	{
 		float32(42),
-		append([]byte{byte(GobEncoding)}, gobEncoded(float32(42))...),
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded(float32(42))...),
 	},
 	{
 		float64(42),
-		append([]byte{byte(GobEncoding)}, gobEncoded(float64(42))...),
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded(float64(42))...),
 	},
 	{
-		[]byte("42"),
-		append([]byte{byte(GobEncoding)}, gobEncoded([]byte("42"))...),
+		complex(42, 43),
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded(complex(42, 43))...),
 	},
 	{
-		make([]byte, 0),
-		append([]byte{byte(GobEncoding)}, gobEncoded(make([]byte, 0))...),
+		complex64(42),
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded(complex64(42))...),
 	},
 	{
-		make([]int, 0),
-		append([]byte{byte(GobEncoding)}, gobEncoded(make([]int, 0))...),
+		complex128(42),
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded(complex128(42))...),
 	},
 	{
-		make(map[string]interface{}),
-		append([]byte{byte(GobEncoding)}, gobEncoded(make(map[string]interface{}))...),
-	},
-	{
-		map[string]interface{}{"1": 42, "2": uint8(32), "3": int64(44), "hey": "foo", "bar": []byte("baz")},
-		append([]byte{byte(GobEncoding)}, gobEncoded(map[string]interface{}{"1": 42, "2": uint8(32), "3": int64(44), "hey": "foo", "bar": []byte("baz")})...),
+		"",
+		[]byte{byte(DefaultVersion), byte(ZeroEncoding)},
 	},
 	{
 		"42",
-		append([]byte{byte(GobEncoding)}, gobEncoded("42")...),
+		[]byte{byte(DefaultVersion), byte(BigEndianEncoding), '4', '2'},
+	},
+	{
+		[]byte("42"),
+		[]byte{byte(DefaultVersion), byte(BigEndianEncoding), '4', '2'},
+	},
+	{
+		[2]byte{'4', '2'},
+		[]byte{byte(DefaultVersion), byte(BigEndianEncoding), '4', '2'},
+	},
+	{
+		[]byte{},
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded([]byte{})...),
+	},
+	{
+		[]uint16{16, 43, 42},
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded([]uint16{16, 43, 42})...),
+	},
+	{
+		[]int64{42, 53},
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded([]int64{42, 53})...),
+	},
+	{
+		[]int64{},
+		append([]byte{byte(DefaultVersion), byte(BigEndianEncoding)}, bigEndianEncoded([]int64{})...),
+	},
+	{
+		[][]float32{
+			{
+				42.0,
+				43.323132,
+			},
+			{
+				32.1,
+				53.323130,
+			},
+			nil,
+		},
+		append([]byte{byte(DefaultVersion), byte(GobEncoding)}, gobEncoded([][]float32{
+			{
+				42.0,
+				43.323132,
+			},
+			{
+				32.1,
+				53.323130,
+			},
+			nil,
+		})...),
+	},
+	{
+		[][]string{
+			nil,
+			{
+				"hello",
+				"world",
+			},
+			{
+				"foo",
+				"bar",
+			},
+		},
+		append([]byte{byte(DefaultVersion), byte(GobEncoding)}, gobEncoded([][]string{
+			nil,
+			{
+				"hello",
+				"world",
+			},
+			{
+				"foo",
+				"bar",
+			},
+		})...),
+	},
+	{
+		make(map[string]interface{}),
+		append([]byte{byte(DefaultVersion), byte(GobEncoding)}, gobEncoded(make(map[string]interface{}))...),
+	},
+	{
+		map[string]interface{}{"1": 42, "2": uint8(32), "3": int64(44), "hey": "foo", "bar": []byte("baz")},
+		append([]byte{byte(DefaultVersion), byte(GobEncoding)}, gobEncoded(map[string]interface{}{"1": 42, "2": uint8(32), "3": int64(44), "hey": "foo", "bar": []byte("baz")})...),
+	},
+	{
+		[][]int{},
+		append([]byte{byte(DefaultVersion), byte(GobEncoding)}, gobEncoded([][]int{})...),
 	},
 	{
 		[]interface{}{1, 2},
-		append([]byte{byte(GobEncoding)}, gobEncoded([]interface{}{1, 2})...),
+		append([]byte{byte(DefaultVersion), byte(GobEncoding)}, gobEncoded([]interface{}{1, 2})...),
 	},
 	{
 		&map[string]interface{}{"asd": uint32(42)},
-		append([]byte{byte(GobEncoding)}, gobEncoded(&map[string]interface{}{"asd": uint32(42)})...),
+		append([]byte{byte(DefaultVersion), byte(GobEncoding)}, gobEncoded(&map[string]interface{}{"asd": uint32(42)})...),
 	},
 	{
 		struct{ A int }{42},
-		append([]byte{byte(GobEncoding)}, gobEncoded(struct{ A int }{42})...),
+		append([]byte{byte(DefaultVersion), byte(GobEncoding)}, gobEncoded(struct{ A int }{42})...),
 	},
 	{
 		&struct{ A int }{42},
-		append([]byte{byte(GobEncoding)}, gobEncoded(&struct{ A int }{42})...),
+		append([]byte{byte(DefaultVersion), byte(GobEncoding)}, gobEncoded(&struct{ A int }{42})...),
 	},
 	{
 		struct{ V interface{} }{struct{ A int }{42}},
-		append([]byte{byte(GobEncoding)}, gobEncoded(struct{ V interface{} }{struct{ A int }{42}})...),
+		append([]byte{byte(DefaultVersion), byte(GobEncoding)}, gobEncoded(struct{ V interface{} }{struct{ A int }{42}})...),
 	},
 	{
 		nil,

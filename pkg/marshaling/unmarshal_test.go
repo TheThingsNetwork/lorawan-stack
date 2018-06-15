@@ -30,8 +30,8 @@ import (
 )
 
 func TestBytesToType(t *testing.T) {
-	for i, tc := range byteValues {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
+	for i, tc := range ByteValues {
+		t.Run(fmt.Sprintf("%d/%+v", i, tc.value), func(t *testing.T) {
 			a := assertions.New(t)
 
 			if tc.value == nil {
@@ -88,7 +88,7 @@ func TestBytesToType(t *testing.T) {
 			},
 		}
 
-		v, err := BytesToType(append([]byte{byte(MsgPackEncoding)}, msgPackEncoded(expected)...), reflect.TypeOf(expected))
+		v, err := BytesToType(append([]byte{byte(DefaultVersion), byte(MsgPackEncoding)}, msgPackEncoded(expected)...), reflect.TypeOf(expected))
 		if a.So(err, should.BeNil) && !a.So(v, should.Resemble, expected) {
 			pretty.Ldiff(t, expected, v)
 		}

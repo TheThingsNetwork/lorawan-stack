@@ -27,20 +27,31 @@ var protoMessageType = reflect.TypeOf((*proto.Message)(nil)).Elem()
 // This is used as the first byte in the encoded []byte representation and allows for consistent decoding.
 type Encoding byte
 
+// Version represents the version of the encoding used to encode value into []byte representation.
+// This is used as the second byte in the encoded []byte representation and allows for consistent decoding.
+type Version byte
+
 const (
 	// Separator is used to separate the flattened struct fields.
 	Separator = "."
 
-	// NOTE: The following list MUST NOT be reordered
+	// DefaultVersion is the encoding version used by marshaling package.
+	DefaultVersion Version = 1
 
-	// RawEncoding represents case when value is encoded into "raw" byte value.
-	RawEncoding Encoding = 1
+	// NOTE: The following list MUST NOT be reordered without incrementing DefaultVersion.
+
+	// ZeroEncoding represents case when the encode value is zero value of it's type.
+	ZeroEncoding Encoding = 0
+	// BigEndianEncoding represents case when big endian binary encoding was used to encode value.
+	BigEndianEncoding Encoding = 1
+	// LittleEndianEncoding represents case when little endian binary encoding was used to encode value.
+	LittleEndianEncoding Encoding = 2
 	// JSONEncoding represents case when MarshalJSON() method was used to encode value.
-	JSONEncoding Encoding = 2
+	JSONEncoding Encoding = 3
 	// ProtoEncoding represents case when Proto() method was used to encode value.
-	ProtoEncoding Encoding = 3
+	ProtoEncoding Encoding = 4
 	// GobEncoding represents case when Gob was used to encode value.
-	GobEncoding Encoding = 4
+	GobEncoding Encoding = 5
 	// MsgPackEncoding represents case when MsgPack was used to encode value.
-	MsgPackEncoding Encoding = 5
+	MsgPackEncoding Encoding = 6
 )

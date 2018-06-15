@@ -17,6 +17,7 @@ package marshaling_test
 import (
 	"bytes"
 	"encoding/gob"
+	"fmt"
 	"os"
 	"reflect"
 	"strconv"
@@ -101,8 +102,8 @@ func TestFlattenedValue(t *testing.T) {
 }
 
 func TestToBytes(t *testing.T) {
-	for i, tc := range byteValues {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
+	for i, tc := range ByteValues {
+		t.Run(fmt.Sprintf("%d/%+v", i, tc.value), func(t *testing.T) {
 			a := assertions.New(t)
 
 			b, err := ToBytes(tc.value)
@@ -110,8 +111,8 @@ func TestToBytes(t *testing.T) {
 				return
 			}
 
-			if len(b) > 0 && Encoding(b[0]) == GobEncoding {
-				if !a.So(b[0], should.Resemble, tc.bytes[0]) {
+			if len(b) >= 2 && Encoding(b[1]) == GobEncoding {
+				if !a.So(b[2], should.Resemble, tc.bytes[2]) {
 					t.Log("Encoding type mismatch")
 					return
 				}
@@ -122,12 +123,12 @@ func TestToBytes(t *testing.T) {
 				typ := reflect.TypeOf(tc.value)
 
 				ve := reflect.New(typ)
-				if err := gob.NewDecoder(bytes.NewBuffer(b[1:])).DecodeValue(ve); err != nil {
+				if err := gob.NewDecoder(bytes.NewBuffer(b[2:])).DecodeValue(ve); err != nil {
 					panic("Failed to decode testcase bytes from gob")
 				}
 
 				va := reflect.New(typ)
-				err = gob.NewDecoder(bytes.NewBuffer(tc.bytes[1:])).DecodeValue(va)
+				err = gob.NewDecoder(bytes.NewBuffer(tc.bytes[2:])).DecodeValue(va)
 				a.So(err, should.BeNil)
 				if !a.So(va.Interface(), should.Resemble, ve.Interface()) {
 					t.Log(pretty.Sprint("Value:", tc.value))
