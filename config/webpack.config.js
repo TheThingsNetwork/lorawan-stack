@@ -28,7 +28,6 @@ const {
   NODE_ENV = "development",
   VERSION = "?.?.?",
   GIT_TAG,
-  STORYBOOK = "0",
   SUPPORT_LOCALES = "en",
 } = process.env
 
@@ -40,9 +39,9 @@ const modules = [ path.resolve(context, "node_modules") ]
 
 const r = SUPPORT_LOCALES.split(",").map(l => new RegExp(l.trim()))
 
-module.exports = {
+export default {
   context,
-  mode: production ? 'production' : 'development',
+  mode: production ? "production" : "development",
   externals: [ filterLocales ],
   stats: "minimal",
   entry: {
@@ -66,12 +65,12 @@ module.exports = {
     splitChunks: {
       cacheGroups: {
         styles: {
-          name: 'styles',
+          name: "styles",
           test: /\.css$/,
-          chunks: 'all',
+          chunks: "all",
           enforce: true,
-        }
-      }
+        },
+      },
     },
     removeAvailableModules: false,
   },
@@ -98,26 +97,26 @@ module.exports = {
         test: /\.(styl|css)$/,
         include,
         use: [
-         MiniCssExtractPlugin.loader,
-         {
-           loader: "css-loader",
-           options: {
-             modules: true,
-             minimize: production,
-             localIdentName: env({
-               production: "[hash:base64:10]",
-               development: "[path][local]-[hash:base64:10]",
-             }),
-           },
-         },
-         {
-           loader: "stylus-loader",
-           options: {
-             "import": [
-               path.resolve(context, "pkg/webui/include.styl"),
-             ],
-           },
-         },
+          MiniCssExtractPlugin.loader,
+          {
+            loader: "css-loader",
+            options: {
+              modules: true,
+              minimize: production,
+              localIdentName: env({
+                production: "[hash:base64:10]",
+                development: "[path][local]-[hash:base64:10]",
+              }),
+            },
+          },
+          {
+            loader: "stylus-loader",
+            options: {
+              "import": [
+                path.resolve(context, "pkg/webui/include.styl"),
+              ],
+            },
+          },
         ],
       },
       {
@@ -130,7 +129,7 @@ module.exports = {
               modules: false,
               minimize: production,
             },
-          }
+          },
         ],
         include: modules,
       },
@@ -165,8 +164,8 @@ module.exports = {
         },
       }),
       new MiniCssExtractPlugin({
-        filename: "[name].[contenthash].css"
-      })
+        filename: "[name].[contenthash].css",
+      }),
     ],
     development: [
       new webpack.WatchIgnorePlugin([
@@ -176,7 +175,7 @@ module.exports = {
       new LiveReloadPlugin(),
     ],
   }),
-};
+}
 
 function filterLocales (context, request, callback) {
   if (context.endsWith("node_modules/intl/locale-data/jsonp")) {
