@@ -1,5 +1,7 @@
 extends: ttn
 
+parser: babel-eslint
+
 plugins:
   - flowtype
 
