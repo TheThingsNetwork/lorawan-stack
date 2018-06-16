@@ -27,16 +27,20 @@ func TestDiff(t *testing.T) {
 		"foo": "foo",
 		"bar": "bar",
 		"baz": "baz",
+		"42":  nil,
 	}
 	new := map[string]interface{}{
 		"foo": "baz",
 		"bar": "bar",
 		"qux": "qux",
+		"hey": nil,
 	}
 	a.So(Diff(new, old), should.Resemble, map[string]interface{}{
 		"foo": "baz", // new value updated
 		"qux": "qux", // new value added
 		// bar unchanged
 		"baz": nil, // old value removed
+		"42":  nil,
+		"hey": nil,
 	})
 }

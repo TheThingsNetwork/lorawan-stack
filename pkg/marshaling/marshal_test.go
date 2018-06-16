@@ -179,7 +179,7 @@ func TestOrderPreservation(t *testing.T) {
 			values: []interface{}{byte(0), 0, int8(0), uintptr(0), int8(22), uint8(24), int8(42), byte(43)},
 		},
 		{
-			values: []interface{}{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 40, 66, 120, 1244, 4154, 0x4444},
+			values: []interface{}{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 40, 66, 120, 420, 1244, 4154, 0x4444},
 		},
 		{
 			values: []interface{}{int32(41), uint32(42)},
@@ -189,6 +189,9 @@ func TestOrderPreservation(t *testing.T) {
 		},
 		{
 			values: []interface{}{[3]byte{0, 1, 2}, []byte{0, 1, 3}, [3]byte{0, 1, 4}, [2]byte{0, 2}, []byte{42}},
+		},
+		{
+			values: []interface{}{1.2, 2.454532, 3.14159265358979323, 4.20, 4.5, 4.56},
 		},
 	} {
 		t.Run(fmt.Sprintf("%d/%+v", i, tc.values), func(t *testing.T) {
