@@ -31,7 +31,16 @@ import (
 )
 
 // UserGeneratedFields are the fields that are automatically generated.
-var UserGeneratedFields = []string{"CreatedAt", "UpdatedAt", "ValidatedAt", "PasswordUpdatedAt"}
+var UserGeneratedFields = []string{
+	"CreatedAt",
+	"UpdatedAt",
+	"ValidatedAt",
+	"PasswordUpdatedAt",
+	"User.CreatedAt",
+	"User.UpdatedAt",
+	"User.ValidatedAt",
+	"User.PasswordUpdatedAt",
+}
 
 // isEmailAllowed checks whether an input email is allowed given the glob list
 // of allowed emails in the settings.

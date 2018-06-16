@@ -27,7 +27,16 @@ import (
 )
 
 // ClientGeneratedFields are the fields that are automatically generated.
-var ClientGeneratedFields = []string{"CreatedAt", "UpdatedAt", "Grants", "Secret"}
+var ClientGeneratedFields = []string{
+	"CreatedAt",
+	"UpdatedAt",
+	"Grants",
+	"Secret",
+	"Client.CreatedAt",
+	"Client.UpdatedAt",
+	"Client.Grants",
+	"Client.Secret",
+}
 
 type clientService struct {
 	*IdentityServer

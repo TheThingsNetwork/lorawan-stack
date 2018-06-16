@@ -27,7 +27,12 @@ import (
 )
 
 // OrganizationGeneratedFields are the fields that are automatically generated.
-var OrganizationGeneratedFields = []string{"CreatedAt", "UpdatedAt"}
+var OrganizationGeneratedFields = []string{
+	"CreatedAt",
+	"UpdatedAt",
+	"Organization.CreatedAt",
+	"Organization.UpdatedAt",
+}
 
 type organizationService struct {
 	*IdentityServer

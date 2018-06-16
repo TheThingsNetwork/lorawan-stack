@@ -28,7 +28,12 @@ import (
 )
 
 // ApplicationGeneratedFields are the fields that are automatically generated.
-var ApplicationGeneratedFields = []string{"CreatedAt", "UpdatedAt"}
+var ApplicationGeneratedFields = []string{
+	"CreatedAt",
+	"UpdatedAt",
+	"Application.CreatedAt",
+	"Application.UpdatedAt",
+}
 
 type applicationService struct {
 	*IdentityServer

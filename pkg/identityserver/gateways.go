@@ -28,7 +28,12 @@ import (
 )
 
 // GatewayGeneratedFields are the fields that are automatically generated.
-var GatewayGeneratedFields = []string{"CreatedAt", "UpdatedAt"}
+var GatewayGeneratedFields = []string{
+	"CreatedAt",
+	"UpdatedAt",
+	"Gateway.CreatedAt",
+	"Gateway.UpdatedAt",
+}
 
 type gatewayService struct {
 	*IdentityServer

@@ -17,6 +17,7 @@ package assertions
 import (
 	"fmt"
 
+	"github.com/kr/pretty"
 	"go.thethings.network/lorawan-stack/pkg/marshaling"
 )
 
@@ -66,7 +67,7 @@ func ShouldEqualFieldsWithIgnores(ignores ...string) func(actual interface{}, ex
 			delete(me, ignore)
 		}
 
-		diff := marshaling.Diff(ma, me)
+		diff := pretty.Diff(ma, me)
 		if len(diff) != 0 {
 			return fmt.Sprintf(shouldHaveBeenEqualFieldsDiff, actual, expected[0], diff)
 		}
@@ -100,7 +101,7 @@ func ShouldNotEqualFieldsWithIgnores(ignores ...string) func(actual interface{},
 			delete(me, ignore)
 		}
 
-		diff := marshaling.Diff(ma, me)
+		diff := pretty.Diff(ma, me)
 		if len(diff) == 0 {
 			return fmt.Sprintf(shouldNotHaveBeenEqualFields, actual, expected[0])
 		}
