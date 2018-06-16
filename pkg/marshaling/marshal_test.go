@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"sort"
 	"strconv"
 	"testing"
 
@@ -165,6 +166,46 @@ func TestMarshalByteMap(t *testing.T) {
 			a.So(err, should.BeNil)
 			if !a.So(m, should.Resemble, v.bytes) {
 				pretty.Ldiff(t, m, v.bytes)
+			}
+		})
+	}
+}
+
+func TestOrderPreservation(t *testing.T) {
+	for i, tc := range []struct {
+		values []interface{}
+	}{
+		{
+			values: []interface{}{byte(0), 0, int8(0), uintptr(0), int8(22), uint8(24), int8(42), byte(43)},
+		},
+		{
+			values: []interface{}{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 40, 66, 120, 1244, 4154, 0x4444},
+		},
+		{
+			values: []interface{}{int32(41), uint32(42)},
+		},
+		{
+			values: []interface{}{"apple", "bar", "crowbar", "foo", "foo", "guinness", "la chouffe", "leffe", "nintendo", "vodka", "zelda"},
+		},
+		{
+			values: []interface{}{[3]byte{0, 1, 2}, []byte{0, 1, 3}, [3]byte{0, 1, 4}, [2]byte{0, 2}, []byte{42}},
+		},
+	} {
+		t.Run(fmt.Sprintf("%d/%+v", i, tc.values), func(t *testing.T) {
+			enc := make([]string, 0, len(tc.values))
+			for _, v := range tc.values {
+				b, err := ToBytes(v)
+				if err != nil {
+					t.Skip("ToBytes broken, skipping...")
+				}
+				enc = append(enc, string(b))
+			}
+			if !assertions.New(t).So(sort.StringsAreSorted(enc), should.BeTrue) {
+				for i := 0; i < len(enc)-1; i++ {
+					if si, sj := enc[i], enc[i+1]; si > sj {
+						t.Errorf("mismatch at %d and %d: %+v(%+v) > %+v(%+v)", i, i+1, []byte(si), tc.values[i], []byte(sj), tc.values[i+1])
+					}
+				}
 			}
 		})
 	}
