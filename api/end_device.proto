@@ -221,41 +221,41 @@ message MACSettings {
 message MACState {
   option (gogoproto.populate) = false;
 
-  // Currently used maximum transmission power
+  // Currently used maximum transmission power.
   uint32 max_tx_power = 2;
-  // Uplink dwell time is set (400ms)
+  // Uplink dwell time is set (400ms).
   bool uplink_dwell_time = 3;
-  // Downlink dwell time is set (400ms)
+  // Downlink dwell time is set (400ms).
   bool downlink_dwell_time = 4;
-  // ADR: data rate index to use
+  // ADR: data rate index to use.
   uint32 adr_data_rate_index = 5 [(gogoproto.customname) = "ADRDataRateIndex"];
-  // ADR: transmission power index to use
+  // ADR: transmission power index to use.
   uint32 adr_tx_power_index = 6 [(gogoproto.customname) = "ADRTXPowerIndex"];
-  // ADR: number of retransmissions
+  // ADR: number of retransmissions.
   uint32 adr_nb_trans = 7 [(gogoproto.customname) = "ADRNbTrans"];
-  // ADR: number of messages to wait before setting ADRAckReq
+  // ADR: number of messages to wait before setting ADRAckReq.
   uint32 adr_ack_limit = 8 [(gogoproto.customname) = "ADRAckLimit"];
-  // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate
+  // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
   uint32 adr_ack_delay = 9 [(gogoproto.customname) = "ADRAckDelay"];
-  // Aggregated duty cycle of the device
+  // Aggregated duty cycle of the device.
   AggregatedDutyCycle duty_cycle = 10;
-  // Rx1 delay (Rx2 delay is Rx1 delay + 1 second)
+  // Rx1 delay in seconds (Rx2 delay is Rx1 delay + 1 second).
   uint32 rx_delay = 11;
-  // Data rate offset for Rx1
+  // Data rate offset for Rx1.
   uint32 rx1_data_rate_offset = 12;
-  // Data rate index for Rx2
+  // Data rate index for Rx2.
   uint32 rx2_data_rate_index = 13;
-  // Frequency for Rx2
+  // Frequency for Rx2.
   uint64 rx2_frequency = 14;
-  // Time after which a rejoin request will be sent
+  // Time after which a rejoin request will be sent.
   uint32 rejoin_timer = 18;
-  // Number of messages after which a rejoin request will be sent
+  // Number of messages after which a rejoin request will be sent.
   uint32 rejoin_counter = 19;
-  // Frequency of the class B ping slot
+  // Frequency of the class B ping slot.
   uint64 ping_slot_frequency = 21;
-  // Data rate index of the class B ping slot
+  // Data rate index of the class B ping slot.
   uint32 ping_slot_data_rate_index = 22;
-  // Time when the last confirmed downlink message or MAC command was scheduled
+  // Time when the last confirmed downlink message or MAC command was scheduled.
   google.protobuf.Timestamp last_confirmed_downlink = 23 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
 }
 

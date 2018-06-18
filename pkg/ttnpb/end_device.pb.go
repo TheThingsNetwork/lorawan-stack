@@ -591,41 +591,41 @@ func (m *MACSettings) GetADRMargin() uint32 {
 // MAC State of the device (active or desired)
 // This is used internally by the Network Server and is read only
 type MACState struct {
-	// Currently used maximum transmission power
+	// Currently used maximum transmission power.
 	MaxTxPower uint32 `protobuf:"varint,2,opt,name=max_tx_power,json=maxTxPower,proto3" json:"max_tx_power,omitempty"`
-	// Uplink dwell time is set (400ms)
+	// Uplink dwell time is set (400ms).
 	UplinkDwellTime bool `protobuf:"varint,3,opt,name=uplink_dwell_time,json=uplinkDwellTime,proto3" json:"uplink_dwell_time,omitempty"`
-	// Downlink dwell time is set (400ms)
+	// Downlink dwell time is set (400ms).
 	DownlinkDwellTime bool `protobuf:"varint,4,opt,name=downlink_dwell_time,json=downlinkDwellTime,proto3" json:"downlink_dwell_time,omitempty"`
-	// ADR: data rate index to use
+	// ADR: data rate index to use.
 	ADRDataRateIndex uint32 `protobuf:"varint,5,opt,name=adr_data_rate_index,json=adrDataRateIndex,proto3" json:"adr_data_rate_index,omitempty"`
-	// ADR: transmission power index to use
+	// ADR: transmission power index to use.
 	ADRTXPowerIndex uint32 `protobuf:"varint,6,opt,name=adr_tx_power_index,json=adrTxPowerIndex,proto3" json:"adr_tx_power_index,omitempty"`
-	// ADR: number of retransmissions
+	// ADR: number of retransmissions.
 	ADRNbTrans uint32 `protobuf:"varint,7,opt,name=adr_nb_trans,json=adrNbTrans,proto3" json:"adr_nb_trans,omitempty"`
-	// ADR: number of messages to wait before setting ADRAckReq
+	// ADR: number of messages to wait before setting ADRAckReq.
 	ADRAckLimit uint32 `protobuf:"varint,8,opt,name=adr_ack_limit,json=adrAckLimit,proto3" json:"adr_ack_limit,omitempty"`
-	// ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate
+	// ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
 	ADRAckDelay uint32 `protobuf:"varint,9,opt,name=adr_ack_delay,json=adrAckDelay,proto3" json:"adr_ack_delay,omitempty"`
-	// Aggregated duty cycle of the device
+	// Aggregated duty cycle of the device.
 	DutyCycle AggregatedDutyCycle `protobuf:"varint,10,opt,name=duty_cycle,json=dutyCycle,proto3,enum=ttn.lorawan.v3.AggregatedDutyCycle" json:"duty_cycle,omitempty"`
-	// Rx1 delay (Rx2 delay is Rx1 delay + 1 second)
+	// Rx1 delay in seconds (Rx2 delay is Rx1 delay + 1 second).
 	RxDelay uint32 `protobuf:"varint,11,opt,name=rx_delay,json=rxDelay,proto3" json:"rx_delay,omitempty"`
-	// Data rate offset for Rx1
+	// Data rate offset for Rx1.
 	Rx1DataRateOffset uint32 `protobuf:"varint,12,opt,name=rx1_data_rate_offset,json=rx1DataRateOffset,proto3" json:"rx1_data_rate_offset,omitempty"`
-	// Data rate index for Rx2
+	// Data rate index for Rx2.
 	Rx2DataRateIndex uint32 `protobuf:"varint,13,opt,name=rx2_data_rate_index,json=rx2DataRateIndex,proto3" json:"rx2_data_rate_index,omitempty"`
-	// Frequency for Rx2
+	// Frequency for Rx2.
 	Rx2Frequency uint64 `protobuf:"varint,14,opt,name=rx2_frequency,json=rx2Frequency,proto3" json:"rx2_frequency,omitempty"`
-	// Time after which a rejoin request will be sent
+	// Time after which a rejoin request will be sent.
 	RejoinTimer uint32 `protobuf:"varint,18,opt,name=rejoin_timer,json=rejoinTimer,proto3" json:"rejoin_timer,omitempty"`
-	// Number of messages after which a rejoin request will be sent
+	// Number of messages after which a rejoin request will be sent.
 	RejoinCounter uint32 `protobuf:"varint,19,opt,name=rejoin_counter,json=rejoinCounter,proto3" json:"rejoin_counter,omitempty"`
-	// Frequency of the class B ping slot
+	// Frequency of the class B ping slot.
 	PingSlotFrequency uint64 `protobuf:"varint,21,opt,name=ping_slot_frequency,json=pingSlotFrequency,proto3" json:"ping_slot_frequency,omitempty"`
-	// Data rate index of the class B ping slot
+	// Data rate index of the class B ping slot.
 	PingSlotDataRateIndex uint32 `protobuf:"varint,22,opt,name=ping_slot_data_rate_index,json=pingSlotDataRateIndex,proto3" json:"ping_slot_data_rate_index,omitempty"`
-	// Time when the last confirmed downlink message or MAC command was scheduled
+	// Time when the last confirmed downlink message or MAC command was scheduled.
 	LastConfirmedDownlink time.Time `protobuf:"bytes,23,opt,name=last_confirmed_downlink,json=lastConfirmedDownlink,stdtime" json:"last_confirmed_downlink"`
 }
 
