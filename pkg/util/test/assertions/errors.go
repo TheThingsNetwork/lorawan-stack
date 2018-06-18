@@ -86,7 +86,7 @@ type assertDefinitionCompatible interface {
 	Namespace() string
 	Name() string
 	MessageFormat() string
-	Code() int32
+	Code() uint32
 }
 
 type assertErrorCompatible interface {

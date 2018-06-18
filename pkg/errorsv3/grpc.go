@@ -37,7 +37,7 @@ type ErrorDetails interface {
 // FromGRPCStatus converts the gRPC status message into an Error.
 func FromGRPCStatus(status *status.Status) Error {
 	err := build(Definition{
-		code:          int32(status.Code()),
+		code:          uint32(status.Code()),
 		messageFormat: status.Message(),
 	}, 0)
 	if ErrorDetailsFromProto == nil {

@@ -28,7 +28,7 @@ func New(text string) Error {
 	return build(Definition{
 		namespace:     namespace(2),
 		messageFormat: text,
-		code:          int32(codes.Unknown),
+		code:          uint32(codes.Unknown),
 	}, 4)
 }
 
