@@ -90,11 +90,11 @@ var ErrorDetailsToProto func(e ErrorDetails) (msg proto.Message)
 // This variable is set by pkg/ttnpb.
 var ErrorDetailsFromProto func(msg ...proto.Message) (details ErrorDetails, rest []proto.Message)
 
-// GRPCStatus converts the Definition into a gRPC status message.
-func (d Definition) GRPCStatus() *status.Status {
-	if d.grpcStatus != nil {
-		return d.grpcStatus
-	}
+// setGRPCStatus sets a (marshaled) gRPC status in the error definition.
+//
+// This func should be called when the error definition is created. Doing that
+// makes that we have to convert to a gRPC status only once instead of on every call.
+func (d *Definition) setGRPCStatus() {
 	s := status.New(codes.Code(d.Code()), d.String())
 	if ErrorDetailsToProto != nil {
 		if proto := ErrorDetailsToProto(d); proto != nil {
@@ -106,7 +106,11 @@ func (d Definition) GRPCStatus() *status.Status {
 		}
 	}
 	d.grpcStatus = s
-	return s
+}
+
+// GRPCStatus returns the Definition as a gRPC status message.
+func (d Definition) GRPCStatus() *status.Status {
+	return d.grpcStatus // initialized when defined (with setGRPCStatus).
 }
 
 func (e *Error) clearGRPCStatus() {

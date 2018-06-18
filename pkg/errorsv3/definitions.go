@@ -103,7 +103,7 @@ nextArg:
 		def.publicAttributes = append(def.publicAttributes, arg)
 	}
 
-	_ = def.GRPCStatus() // stores the status in def.grpcStatus
+	def.setGRPCStatus() // store the (marshaled) gRPC status message.
 
 	Definitions[fullName] = &def
 	return def
