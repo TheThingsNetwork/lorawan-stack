@@ -425,7 +425,7 @@ func (s *gatewayStore) setAttributes(q db.QueryContext, gtwID uuid.UUID, attribu
 	return err
 }
 
-// setAttributesQuery is a helper that constructs the "insert into ... on conflict" query for the
+// setAttributesQuery is a helper that constructs the insert query for the
 // setAttributes method and returns it together with the list of arguments.
 func (s *gatewayStore) setAttributesQuery(gtwID uuid.UUID, attributes map[string]string) (string, []interface{}) {
 	args := make([]interface{}, 1+2*len(attributes))
@@ -446,7 +446,7 @@ func (s *gatewayStore) setAttributesQuery(gtwID uuid.UUID, attributes map[string
 
 	query := fmt.Sprintf(
 		`INSERT 
-			INTO gateways_attributes(gateway_id, attribute, value)
+			INTO gateways_attributes (gateway_id, attribute, value)
 			VALUES %s 
 			ON CONFLICT (gateway_id, attribute) 
 			DO UPDATE SET value = excluded.value;`,
