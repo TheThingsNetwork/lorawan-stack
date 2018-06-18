@@ -43,6 +43,14 @@ type Error struct {
 	grpcStatus    *atomic.Value
 }
 
+// Interface is the interface of an error.
+type Interface interface {
+	DefinitionInterface
+	Attributes() map[string]interface{}
+	Cause() error
+	Details() (details []interface{})
+}
+
 // build an error from the definition, skipping the first frames of the call stack.
 func build(d Definition, skip int) Error {
 	e := Error{Definition: d, grpcStatus: new(atomic.Value)}

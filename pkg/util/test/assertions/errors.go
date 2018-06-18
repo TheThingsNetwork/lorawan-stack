@@ -19,6 +19,7 @@ import (
 	"reflect"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	errorsv3 "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 const (
@@ -82,37 +83,23 @@ func ShouldNotDescribeError(actual interface{}, expected ...interface{}) string 
 	return success
 }
 
-type assertDefinitionCompatible interface {
-	Namespace() string
-	Name() string
-	MessageFormat() string
-	Code() uint32
-}
-
-type assertErrorCompatible interface {
-	assertDefinitionCompatible
-	Attributes() map[string]interface{}
-	Cause() error
-	Details() (details []interface{})
-}
-
 // ShouldHaveSameErrorDefinitionAs is used to assert that an error resembles the given Error or Definition.
 func ShouldHaveSameErrorDefinitionAs(actual interface{}, expected ...interface{}) string {
 	if len(expected) != 1 {
 		return fmt.Sprintf(needExactValues, 1, len(expected))
 	}
-	expectedErr, ok := expected[0].(assertDefinitionCompatible)
+	expectedErr, ok := expected[0].(errorsv3.DefinitionInterface)
 	if !ok {
 		return fmt.Sprintf(needDefinitionCompatible, expected[0])
 	}
-	actualErr, ok := actual.(assertDefinitionCompatible)
+	actualErr, ok := actual.(errorsv3.DefinitionInterface)
 	if !ok {
 		return fmt.Sprintf(shouldBeDefinitionCompatible, actual)
 	}
 	return assertDefinitionCompatibleEquals(actualErr, expectedErr)
 }
 
-func assertDefinitionCompatibleEquals(actual, expected assertDefinitionCompatible) string {
+func assertDefinitionCompatibleEquals(actual, expected errorsv3.DefinitionInterface) string {
 	if actual.Namespace() != expected.Namespace() {
 		return fmt.Sprintf(shouldHaveNamespace, expected.Namespace(), actual.Namespace())
 	}
@@ -128,7 +115,7 @@ func assertDefinitionCompatibleEquals(actual, expected assertDefinitionCompatibl
 	return success
 }
 
-func assertErrorCompatibleEquals(actual, expected assertErrorCompatible) string {
+func assertErrorCompatibleEquals(actual, expected errorsv3.Interface) string {
 	if assertDefinition := assertDefinitionCompatibleEquals(actual, expected); assertDefinition != success {
 		return assertDefinition
 	}
@@ -152,14 +139,14 @@ func ShouldEqualErrorOrDefinition(actual interface{}, expected ...interface{}) s
 	if actual == nil && expected[0] == nil {
 		return success
 	}
-	if expected, ok := expected[0].(assertErrorCompatible); ok {
-		if actual, ok := actual.(assertErrorCompatible); ok {
+	if expected, ok := expected[0].(errorsv3.Interface); ok {
+		if actual, ok := actual.(errorsv3.Interface); ok {
 			return assertErrorCompatibleEquals(actual, expected)
 		}
 		return fmt.Sprintf(shouldBeErrorCompatible, actual)
 	}
-	if expected, ok := expected[0].(assertDefinitionCompatible); ok {
-		if actual, ok := actual.(assertDefinitionCompatible); ok {
+	if expected, ok := expected[0].(errorsv3.DefinitionInterface); ok {
+		if actual, ok := actual.(errorsv3.DefinitionInterface); ok {
 			return assertDefinitionCompatibleEquals(actual, expected)
 		}
 		return fmt.Sprintf(shouldBeDefinitionCompatible, actual)

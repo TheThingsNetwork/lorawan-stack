@@ -33,6 +33,16 @@ type Definition struct {
 	grpcStatus             *status.Status
 }
 
+// DefinitionInterface is the interface of an error definition.
+type DefinitionInterface interface {
+	error
+	fmt.Stringer
+	Namespace() string
+	Name() string
+	MessageFormat() string
+	Code() uint32
+}
+
 // Namespace of the error.
 func (d Definition) Namespace() string { return d.namespace }
 
