@@ -75,9 +75,12 @@ func messageFormatArguments(messageFormat string) (args []string) {
 	return
 }
 
-func define(name, messageFormat string, publicAttributes ...string) Definition {
+func define(code int32, name, messageFormat string, publicAttributes ...string) Definition {
 	ns := namespace(3)
 	fullName := fmt.Sprintf("%s:%s", ns, name)
+	if code == 0 {
+		code = int32(codes.Unknown)
+	}
 
 	if Definitions[fullName] != nil {
 		panic(fmt.Errorf("Error %s already defined", fullName))
@@ -89,7 +92,7 @@ func define(name, messageFormat string, publicAttributes ...string) Definition {
 		messageFormat:          messageFormat,
 		messageFormatArguments: messageFormatArguments(messageFormat),
 		publicAttributes:       publicAttributes,
-		code:                   int32(codes.Unknown),
+		code:                   code,
 	}
 
 	// All message format arguments must be public:
@@ -117,13 +120,12 @@ var Definitions = make(map[string]*Definition)
 
 // Define defines a registered error of type Unknown.
 func Define(name, messageFormat string, publicAttributes ...string) Definition {
-	return define(name, messageFormat, publicAttributes...)
+	return define(int32(codes.Unknown), name, messageFormat, publicAttributes...)
 }
 
 // DefineInvalidArgument defines a registered error of type InvalidArgument.
 func DefineInvalidArgument(name, messageFormat string, publicAttributes ...string) Definition {
-	def := define(name, messageFormat, publicAttributes...)
-	def.code = int32(codes.InvalidArgument)
+	def := define(int32(codes.InvalidArgument), name, messageFormat, publicAttributes...)
 	return def
 }
 
@@ -131,15 +133,13 @@ func DefineInvalidArgument(name, messageFormat string, publicAttributes ...strin
 
 // DefineNotFound defines a registered error of type NotFound.
 func DefineNotFound(name, messageFormat string, publicAttributes ...string) Definition {
-	def := define(name, messageFormat, publicAttributes...)
-	def.code = int32(codes.NotFound)
+	def := define(int32(codes.NotFound), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // DefineAlreadyExists defines a registered error of type AlreadyExists.
 func DefineAlreadyExists(name, messageFormat string, publicAttributes ...string) Definition {
-	def := define(name, messageFormat, publicAttributes...)
-	def.code = int32(codes.AlreadyExists)
+	def := define(int32(codes.AlreadyExists), name, messageFormat, publicAttributes...)
 	return def
 }
 
@@ -150,15 +150,13 @@ func DefineAlreadyExists(name, messageFormat string, publicAttributes ...string)
 // If the client attempts to perform the action without providing any form
 // of authentication, Unauthenticated should be used instead.
 func DefinePermissionDenied(name, messageFormat string, publicAttributes ...string) Definition {
-	def := define(name, messageFormat, publicAttributes...)
-	def.code = int32(codes.PermissionDenied)
+	def := define(int32(codes.PermissionDenied), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // DefineResourceExhausted defines a registered error of type ResourceExhausted.
 func DefineResourceExhausted(name, messageFormat string, publicAttributes ...string) Definition {
-	def := define(name, messageFormat, publicAttributes...)
-	def.code = int32(codes.ResourceExhausted)
+	def := define(int32(codes.ResourceExhausted), name, messageFormat, publicAttributes...)
 	return def
 }
 
@@ -166,15 +164,13 @@ func DefineResourceExhausted(name, messageFormat string, publicAttributes ...str
 // Use Unavailable if the client can retry just the failing call.
 // Use Aborted if the client should retry at a higher-level.
 func DefineFailedPrecondition(name, messageFormat string, publicAttributes ...string) Definition {
-	def := define(name, messageFormat, publicAttributes...)
-	def.code = int32(codes.FailedPrecondition)
+	def := define(int32(codes.FailedPrecondition), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // DefineAborted defines a registered error of type Aborted.
 func DefineAborted(name, messageFormat string, publicAttributes ...string) Definition {
-	def := define(name, messageFormat, publicAttributes...)
-	def.code = int32(codes.Aborted)
+	def := define(int32(codes.Aborted), name, messageFormat, publicAttributes...)
 	return def
 }
 
@@ -184,29 +180,25 @@ func DefineAborted(name, messageFormat string, publicAttributes ...string) Defin
 
 // DefineInternal defines a registered error of type Internal.
 func DefineInternal(name, messageFormat string, publicAttributes ...string) Definition {
-	def := define(name, messageFormat, publicAttributes...)
-	def.code = int32(codes.Internal)
+	def := define(int32(codes.Internal), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // DefineUnavailable defines a registered error of type Unavailable.
 func DefineUnavailable(name, messageFormat string, publicAttributes ...string) Definition {
-	def := define(name, messageFormat, publicAttributes...)
-	def.code = int32(codes.Unavailable)
+	def := define(int32(codes.Unavailable), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // DefineDataLoss defines a registered error of type DataLoss.
 func DefineDataLoss(name, messageFormat string, publicAttributes ...string) Definition {
-	def := define(name, messageFormat, publicAttributes...)
-	def.code = int32(codes.DataLoss)
+	def := define(int32(codes.DataLoss), name, messageFormat, publicAttributes...)
 	return def
 }
 
 // DefineCorruption is the same as DefineDataLoss.
 func DefineCorruption(name, messageFormat string, publicAttributes ...string) Definition {
-	def := define(name, messageFormat, publicAttributes...)
-	def.code = int32(codes.DataLoss)
+	def := define(int32(codes.DataLoss), name, messageFormat, publicAttributes...)
 	return def
 }
 
@@ -216,7 +208,6 @@ func DefineCorruption(name, messageFormat string, publicAttributes ...string) De
 // If the client attempts to perform the action using incorrect credentials
 // or credentials with insufficient rights, PermissionDenied should be used instead.
 func DefineUnauthenticated(name, messageFormat string, publicAttributes ...string) Definition {
-	def := define(name, messageFormat, publicAttributes...)
-	def.code = int32(codes.Unauthenticated)
+	def := define(int32(codes.Unauthenticated), name, messageFormat, publicAttributes...)
 	return def
 }
