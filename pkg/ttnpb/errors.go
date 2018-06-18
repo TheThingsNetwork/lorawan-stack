@@ -32,9 +32,9 @@ func (e errorDetails) Namespace() string     { return e.GetNamespace() }
 func (e errorDetails) Name() string          { return e.GetName() }
 func (e errorDetails) MessageFormat() string { return e.GetMessageFormat() }
 func (e errorDetails) PublicAttributes() map[string]interface{} {
-	attributes, aErr := gogoproto.Map(e.GetAttributes())
-	if aErr != nil {
-		// TODO: this should probably panic
+	attributes, err := gogoproto.Map(e.GetAttributes())
+	if err != nil {
+		panic(fmt.Sprintf("Failed to decode error attributes: %s", err)) // Likely a bug in gogoproto.
 	} else {
 		return attributes
 	}
@@ -46,7 +46,7 @@ func init() {
 	errorsv3.ErrorDetailsToProto = func(e errorsv3.ErrorDetails) proto.Message {
 		attributes, err := gogoproto.Struct(e.PublicAttributes())
 		if err != nil {
-			// TODO: this should probably panic
+			panic(fmt.Sprintf("Failed to encode error attributes: %s", err)) // Likely a bug in ttn (invalid attribute type).
 		}
 		return &ErrorDetails{
 			Namespace:     e.Namespace(),
