@@ -45,6 +45,9 @@ export default {
   mode: production ? "production" : "development",
   externals: [ filterLocales ],
   stats: "minimal",
+  devServer: {
+    stats: "minimal",
+  },
   entry: {
     console: [
       "./config/root.js",
