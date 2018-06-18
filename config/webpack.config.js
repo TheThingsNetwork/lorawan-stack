@@ -97,6 +97,7 @@ export default {
         test: /\.(styl|css)$/,
         include,
         use: [
+          "css-hot-loader",
           MiniCssExtractPlugin.loader,
           {
             loader: "css-loader",
@@ -164,7 +165,10 @@ export default {
         },
       }),
       new MiniCssExtractPlugin({
-        filename: "[name].[contenthash].css",
+        filename: env({
+          development: "[name].css",
+          production: "[name].[contenthash].css",
+        }),
       }),
     ],
     development: [

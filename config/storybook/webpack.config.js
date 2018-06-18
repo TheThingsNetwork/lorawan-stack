@@ -15,16 +15,15 @@
 
 /* eslint-env node */
 /* eslint-disable import/no-commonjs */
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 require("babel-register")
-
-const ExtractTextPlugin = require("extract-text-webpack-plugin")
 
 const config = require("../webpack.config.js").default
 const development = process.env.NODE_ENV !== "production"
 
 // list of allowed plugins
 const allow = [
-  ExtractTextPlugin,
+  MiniCssExtractPlugin,
 ]
 
 if (development) {
