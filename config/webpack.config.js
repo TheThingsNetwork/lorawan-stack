@@ -20,6 +20,7 @@ import webpack from "webpack"
 import HtmlWebpackPlugin from "html-webpack-plugin"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import LiveReloadPlugin from "webpack-livereload-plugin"
+import AddAssetHtmlPlugin from "add-asset-html-webpack-plugin"
 
 const {
   CONTEXT = ".",
@@ -172,10 +173,17 @@ export default {
       }),
     ],
     development: [
+      new webpack.DllReferencePlugin({
+        context,
+        manifest: require(path.resolve(context, CACHE_DIR, "dll.json")),
+      }),
       new webpack.WatchIgnorePlugin([
         /node_modules/,
         new RegExp(path.resolve(context, PUBLIC_DIR)),
       ]),
+      new AddAssetHtmlPlugin({
+        filepath: path.resolve(context, PUBLIC_DIR, "libs.bundle.js"),
+      }),
       new LiveReloadPlugin(),
     ],
   }),

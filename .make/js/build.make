@@ -27,6 +27,9 @@ WEBPACK_FLAGS ?= --colors $(if $(CI),,--progress)
 # The config file to use for client
 WEBPACK_CONFIG ?= $(CONFIG_DIR)/webpack.config.js
 
+# The config file for DLL builds
+DLL_CONFIG ?= $(CONFIG_DIR)/webpack.dll.js
+
 # Pre-build config files for quicker builds
 $(CACHE_DIR)/config/%.js: $(CONFIG_DIR)/%.js
 	@$(log) pre-building config files [babel $<]
@@ -36,8 +39,20 @@ $(CACHE_DIR)/config/%.js: $(CONFIG_DIR)/%.js
 # The location of the cached config file
 WEBPACK_CONFIG_BUILT = $(subst $(CONFIG_DIR)/,$(CACHE_DIR)/config/,$(WEBPACK_CONFIG))
 
-js.build: $(PUBLIC_DIR)/console.html
+# Run webpack main bundle (webpack.config.js)
+js.build-main: $(PUBLIC_DIR)/console.html
 
+js.build-watch: NODE_ENV = $(development)
+js.build-watch:	WEBPACK_FLAGS += -w
+js.build-watch: js.build-main
+
+# Run webpack main and dll (if has changed)
+js.build: js.dll js.build-main
+
+js.watch: js.dll js.build-watch
+
+# Make PHONY to force rerun regardless of source file timestamps
+.PHONY: $(PUBLIC_DIR)/console.html
 $(PUBLIC_DIR)/console.html: $(WEBPACK_CONFIG_BUILT) $(shell $(JS_SRC_FILES)) $(JS_SRC_DIR)/index.html package.json yarn.lock
 	@$(log) "building client [webpack -c $(WEBPACK_CONFIG_BUILT) $(WEBPACK_FLAGS)]"
 	@$(JS_ENV) $(WEBPACK) --config $(WEBPACK_CONFIG_BUILT) $(WEBPACK_FLAGS)
@@ -46,11 +61,18 @@ $(PUBLIC_DIR)/console.html: $(WEBPACK_CONFIG_BUILT) $(shell $(JS_SRC_FILES)) $(J
 js.build-dev: NODE_ENV =
 js.build-dev: js.build
 
-# watch files
-.PHONY: js.watch
-js.watch: NODE_ENV = development
-js.watch: WEBPACK_FLAGS += -w
-js.watch: js.build
+## the location of the dll output
+DLL_OUTPUT ?= $(PUBLIC_DIR)/libs.bundle.js
+
+DLL_CONFIG_BUILT = $(subst $(CONFIG_DIR),$(CACHE_DIR)/config,$(DLL_CONFIG))
+
+# DLL for faster dev builds
+$(DLL_OUTPUT): $(DLL_CONFIG_BUILT) package.json yarn.lock
+	@$(log) "building dll file"
+	@GIT_TAG=$(GIT_TAG) DLL_FILE=$(DLL_OUTPUT) NODE_ENV=$(NODE_ENV) CACHE_DIR=$(CACHE_DIR) $(WEBPACK) --config $(DLL_CONFIG_BUILT) $(WEBPACK_FLAGS)
+
+# build dll for faster rebuilds (running webpack -c webpack.dll.js)
+js.dll: $(DLL_OUTPUT)
 
 $(CACHE_DIR)/make/%.js: .make/js/%.js
 	@$(log) "pre-building translation scrips [babel $<]"
