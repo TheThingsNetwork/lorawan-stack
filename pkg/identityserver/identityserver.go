@@ -327,7 +327,7 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterIsClientServer(s, is.clientService)
 	ttnpb.RegisterIsAdminServer(s, is.adminService)
 	ttnpb.RegisterIsOrganizationServer(s, is.organizationService)
-	ttnpb.RegisterGtwGrServer(s, is.gatewayService)
+	ttnpb.RegisterGatewayConfiguratorServer(s, is.gatewayService)
 }
 
 // RegisterHandlers registers gRPC handlers.

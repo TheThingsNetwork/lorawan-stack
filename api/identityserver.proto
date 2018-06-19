@@ -44,8 +44,8 @@ message PullConfigurationRequest {
   google.protobuf.FieldMask projection_mask = 2;
 }
 
-// GtwGr implements a Gateway Registry service.
-service GtwGr {
+// GatewayConfigurator implements a registry service that streams a gateway's configuration.
+service GatewayConfigurator {
   // PullConfiguration sends a new DeviceConfiguration, with all the latest values,
   // at connection and when a gateway's configuration is updated.
   rpc PullConfiguration(PullConfigurationRequest) returns (stream Gateway);

@@ -505,7 +505,7 @@ func (s *gatewayService) getGatewayWithFields(ids ttnpb.GatewayIdentifiers, fiel
 	return toSend, nil
 }
 
-func (s *gatewayService) PullConfiguration(req *ttnpb.PullConfigurationRequest, stream ttnpb.GtwGr_PullConfigurationServer) error {
+func (s *gatewayService) PullConfiguration(req *ttnpb.PullConfigurationRequest, stream ttnpb.GatewayConfigurator_PullConfigurationServer) error {
 	ctx := stream.Context()
 	ad, err := s.buildAuthorizationData(ctx)
 	if err != nil {
