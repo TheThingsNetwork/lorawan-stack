@@ -12,18 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-STYLINT ?= ./node_modules/.bin/stylint
+STYL_LINT_FILES = $(ALL_FILES) | $(only_styl)
+STYL_LINT_STAGED_FILES = $(STYL_STAGED_FILES) | $(no_pb)
 
-STYLINT_FLAGS ?= --config config/stylintrc.json
+styl.lint:
+	@$(log) "linting `$(STYL_LINT_FILES) | $(count)` styl files"
+	@set -o pipefail;\
+		files=`$(STYL_LINT_FILES)`;\
+		[ -n "$${files}" ] && echo $${files} | tr " " "\n" | xargs -L 1 $(STYLINT) $(STYLINT_FLAGS)\
+		|| exit 0
 
-STYL_STAGED_FILES = $(STAGED_FILES) | $(only_styl)
+# lint staged styl files
+styl.lint-staged: STYL_LINT_FILES = $(STYL_LINT_STAGED_FILES)
+styl.lint-staged: styl.lint
 
-# Filters
+# perform all styl quality checks
+styl.quality: styl.lint
 
-# select only styl files
-only_styl = grep '\.styl$$'
-
-styl.list:
-	@$(ALL_FILES) | $(only_styl)
-
-include .make/styl/quality.make
+# perform styl quality checks on staged files
+styl.quality-staged: styl.lint-staged

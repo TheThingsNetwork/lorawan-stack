@@ -45,7 +45,7 @@ deps: go.deps js.deps
 
 test: go.test js.test
 
-quality: go.quality js.quality
+quality: go.quality js.quality styl.quality
 
 # stack binary
 ttn-lw-stack: MAIN=./cmd/ttn-lw-stack/main.go
