@@ -21,6 +21,7 @@ import (
 
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/web"
 )
 
@@ -39,6 +40,7 @@ func (c *Component) listenWeb() (err error) {
 		if err != nil {
 			return errors.NewWithCause(err, "Could not create TCP HTTP listener")
 		}
+		c.logger.WithFields(log.Fields("namespace", "web", "address", c.config.HTTP.Listen)).Info("Listening for HTTP connections")
 		go func() {
 			if err := http.Serve(lis, c); err != nil {
 				c.logger.WithError(err).Errorf("Error serving HTTP on %s", lis.Addr())
@@ -55,6 +57,7 @@ func (c *Component) listenWeb() (err error) {
 		if err != nil {
 			return errors.NewWithCause(err, "Could not create TLS HTTP listener")
 		}
+		c.logger.WithFields(log.Fields("namespace", "web", "address", c.config.HTTP.ListenTLS)).Info("Listening for HTTPS connections")
 		go func() {
 			if err := http.Serve(lis, c); err != nil {
 				c.logger.WithError(err).Errorf("Error serving HTTP on %s", lis.Addr())

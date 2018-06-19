@@ -21,6 +21,7 @@ import (
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
@@ -67,6 +68,7 @@ func (c *Component) listenGRPC() (err error) {
 		if err != nil {
 			return errors.NewWithCause(err, "Could not create TCP gRPC listener")
 		}
+		c.logger.WithFields(log.Fields("namespace", "grpc", "address", c.config.GRPC.Listen)).Info("Listening for TCP gRPC connections")
 		go func() {
 			if err := c.grpc.Serve(lis); err != nil {
 				c.logger.WithError(err).Errorf("Error serving gRPC on %s", lis.Addr())
@@ -82,6 +84,7 @@ func (c *Component) listenGRPC() (err error) {
 		if err != nil {
 			return errors.NewWithCause(err, "Could not create TLS gRPC listener")
 		}
+		c.logger.WithFields(log.Fields("namespace", "grpc", "address", c.config.GRPC.ListenTLS)).Info("Listening for TLS gRPC connections")
 		go func() {
 			if err := c.grpc.Serve(lis); err != nil {
 				c.logger.WithError(err).Errorf("Error serving gRPC/tls on %s", lis.Addr())

@@ -61,6 +61,7 @@ func New(c *component.Component, conf Config) (gs *GatewayServer, err error) {
 		if err != nil {
 			return nil, errors.NewWithCause(err, "Could not open UDP socket")
 		}
+		c.Logger().WithField("address", conf.UDPAddress).Info("Listening for UDP connections")
 
 		ctx, cancel := context.WithCancel(c.Context())
 		go gs.runUDPBridge(ctx, conn)
