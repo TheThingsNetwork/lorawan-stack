@@ -87,7 +87,7 @@ func New(ctx context.Context, config *config.ServiceBase, services ...rpcserver.
 	}
 	if c.keys == nil {
 		c.keys = [][]byte{random.Bytes(32)}
-		log.FromContext(ctx).WithField("key", hex.EncodeToString(c.keys[0])).Warn("Generated a random cluster key")
+		log.FromContext(ctx).WithField("key", hex.EncodeToString(c.keys[0])).Warn("No cluster key configured, generated a random one")
 	}
 
 	c.self = &peer{
