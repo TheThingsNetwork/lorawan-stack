@@ -50,14 +50,6 @@ var DefaultHTTPConfig = config.HTTP{
 	PProf:     true,
 }
 
-// DefaultIdentityConfig is the default Identity config.
-var DefaultIdentityConfig = config.Identity{
-	Servers: map[string]string{
-		"ttn-account-v2":  "https://account.thethingsnetwork.org",
-		"ttn-identity-v3": "https://identity.thethingsnetwork.org",
-	},
-}
-
 // DefaultGRPCConfig is the default config for GRPC.
 var DefaultGRPCConfig = config.GRPC{
 	Listen:    ":1884",
@@ -93,7 +85,6 @@ var DefaultServiceBase = config.ServiceBase{
 	GRPC:           DefaultGRPCConfig,
 	HTTP:           DefaultHTTPConfig,
 	TLS:            DefaultTLSConfig,
-	Identity:       DefaultIdentityConfig,
 	Web:            DefaultWebConfig,
 	FrequencyPlans: DefaultFrequencyPlansConfig,
 }

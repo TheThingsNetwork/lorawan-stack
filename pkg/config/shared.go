@@ -29,7 +29,6 @@ import (
 type Base struct {
 	Config []string `name:"config" shorthand:"c" description:"Location of the config files"`
 	Log    Log      `name:"log"`
-	Silent bool     `name:"silent" shorthand:"s" description:"Suppress all log messages"`
 }
 
 // Log represents configuration for the logger.
@@ -113,12 +112,6 @@ type HTTP struct {
 	PProf     bool   `name:"pprof" description:"Expose pprof over HTTP"`
 }
 
-// Identity represents identity configuration.
-type Identity struct {
-	Servers map[string]string `name:"servers" description:"TTN Identity Servers (id=https://...)"`
-	Keys    map[string]string `name:"keys" description:"TTN Identity Server Public Keys (id=/path/to/...)"`
-}
-
 // Redis represents Redis configuration.
 type Redis struct {
 	Address   string   `name:"address" description:"Address of the Redis server"`
@@ -135,35 +128,19 @@ type Events struct {
 	Redis   Redis  `name:"redis"`
 }
 
-// RemoteProviderConfig represents remote config provider configuration(see Viper documentation).
-type RemoteProviderConfig struct {
-	Name     string `name:"name" description:"Name of the config on the remote without the extension"`
-	Provider string `name:"provider" description:"Remote config provider name"`
-	Endpoint string `name:"endpoint" description:"Endpoint where the remote config provider is accessible"`
-	Path     string `name:"path" description:"Path where to look for the config on the remote"`
-	KeyRing  string `name:"keyring" description:"Optional path to secret keyring for initializing a secure connection to remote config provider"`
-}
-
 // ServiceBase represents base service configuration.
 type ServiceBase struct {
 	Base           `name:",squash"`
-	Cluster        Cluster               `name:"cluster"`
-	Redis          Redis                 `name:"redis"`
-	Events         Events                `name:"events"`
-	GRPC           GRPC                  `name:"grpc"`
-	HTTP           HTTP                  `name:"http"`
-	TLS            TLS                   `name:"tls"`
-	Identity       Identity              `name:"identity"`
-	RemoteConfig   *RemoteProviderConfig `name:"remote-config"`
-	Sentry         Sentry                `name:"sentry"`
-	Web            web.Config            `name:"web"`
-	FrequencyPlans FrequencyPlans        `name:"frequency-plans"`
-	RightsFetching rights.Config         `name:"rights-fetching"`
-}
-
-// IsValid returns wether or not the remote config is valid or not.
-func (c RemoteProviderConfig) IsValid() bool {
-	return c.Provider != "" && c.Endpoint != "" && c.Path != ""
+	Cluster        Cluster        `name:"cluster"`
+	Redis          Redis          `name:"redis"`
+	Events         Events         `name:"events"`
+	GRPC           GRPC           `name:"grpc"`
+	HTTP           HTTP           `name:"http"`
+	TLS            TLS            `name:"tls"`
+	Sentry         Sentry         `name:"sentry"`
+	Web            web.Config     `name:"web"`
+	FrequencyPlans FrequencyPlans `name:"frequency-plans"`
+	RightsFetching rights.Config  `name:"rights-fetching"`
 }
 
 // FrequencyPlans represents frequency plans fetching configuration.
