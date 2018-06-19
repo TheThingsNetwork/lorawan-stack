@@ -22,6 +22,8 @@ import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import LiveReloadPlugin from "webpack-livereload-plugin"
 import AddAssetHtmlPlugin from "add-asset-html-webpack-plugin"
 
+import nib from "nib"
+
 const {
   CONTEXT = ".",
   CACHE_DIR = ".cache",
@@ -120,6 +122,7 @@ export default {
               "import": [
                 path.resolve(context, "pkg/webui/include.styl"),
               ],
+              use: [ nib() ],
             },
           },
         ],

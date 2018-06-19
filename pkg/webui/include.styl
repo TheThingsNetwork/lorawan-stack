@@ -27,6 +27,7 @@ $c-backdrop = #F3F3F3
 
 $c-divider = #EFEFEF
 $c-divider-dark = #DFDFDF
+$c-input-border = #BBB
 
 
 // ## Alerts
@@ -39,18 +40,18 @@ $c-info = $c-active-blue
 // ## Text
 
 $tc-black = #000
-$tc-deep-gray = #323232
+$tc-deep-gray = #363636
 $tc-subtle-gray = #AAA
 $tc-active = $c-active-blue
 
 
 // ## Helper mixins
 
-darker(color, step = 1)
-  darken(color, step * 15)
+darker($color, $step = 1)
+  darken($color, 5 * $step * $step)
 
-lighter(color, step = 1)
-  lighten(color, step * 15)
+lighter($color, $step = 1)
+  lighten($color, 5 * $step * $step)
 
 
 // SCALE
@@ -68,9 +69,6 @@ $cs = {
   'xxl': 4rem
 }
 
-cs(size)
-  $cs[size]
-
 
 // ## Layout Scale
 
@@ -84,23 +82,20 @@ $ls = {
   'xxl': 10rem
 }
 
-ls(size)
-  $ls[size]
-
 
 // TYPOGRAPHY
 // ==========
 
 // ## Typefaces
 
-$font-family = "Source Sans Pro", helvetica, sans-serif, "Apple Color Emoji"
+$font-family = "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"
 $font-family-mono = "IBM Plex Mono", monospace
 
 
 // ## Size and spacing
 
 $font-size-base = 14px
-$line-height = 1.785rem // = 25px
+$line-height = 1.785 // = 25px
 
 
 // ## Font Scale
@@ -113,9 +108,6 @@ $fs = {
   'xxl': 1.857rem // ~26px
 }
 
-fs(size)
-  $fs[size]
-
 
 // BORDERS
 // =======
@@ -123,10 +115,13 @@ fs(size)
 // ## General
 
 border-normal()
-  border 1px solid $c-divider
+  border: 1px solid $c-divider
 
 border-dark()
-  border 1px solid $c-divider-dark
+  border: 1px solid $c-divider-dark
+
+border-input()
+  border: 1px solid $c-input-border
 
 
 // ## Radius
@@ -136,7 +131,3 @@ $br = {
   'm': 6px
   'l': 12px
 }
-
-br(size)
-  $br[size]
-

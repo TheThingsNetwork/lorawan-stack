@@ -12,15 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+@import 'nib'
 
-@require "./reset.styl"
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro')
+@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Mono')
+
+global-reset()
 
 html, body
-  font-size $font-size-base
+  font-size: $font-size-base
 
 body
-  font-family $font-family
-  line-height $line-height
-  -webkit-font-smoothing antialiased
-  -moz-osx-font-smoothing grayscale
-  background white
+  font-family: $font-family
+  line-height: $line-height
+  color: $tc-deep-gray
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+  background: white
