@@ -229,7 +229,7 @@ func (c *Component) Close() {
 // RightsHook returns the hook that preload rights in the context based an authorization value.
 func (c *Component) RightsHook() (*rights.Hook, error) {
 	if c.rightsHook == nil {
-		hook, err := rights.New(c.ctx, rightsFetchingConnector{Component: c}, c.config.RightsFetching)
+		hook, err := rights.New(c.ctx, rightsFetchingConnector{Component: c}, c.config.Rights)
 		if err != nil {
 			return nil, errors.NewWithCause(err, "Could not initialize rights hook")
 		}

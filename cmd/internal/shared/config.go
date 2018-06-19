@@ -89,8 +89,8 @@ var DefaultFrequencyPlansConfig = config.FrequencyPlans{
 	StoreURL: "https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/yaml-master",
 }
 
-// DefaultISRightsFetchingConfig is the default config to fetch rights from the Identity Server.
-var DefaultISRightsFetchingConfig = rights.Config{
+// DefaultISRightsConfig is the default config to fetch rights from the Identity Server.
+var DefaultISRightsConfig = rights.Config{
 	TTL: 2 * time.Minute,
 }
 

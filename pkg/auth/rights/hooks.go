@@ -58,7 +58,7 @@ type Config struct {
 
 	// AllowInsecure makes the hook not to use a transport security to send
 	// the credentials in gRPC calls to the Identity Server.
-	AllowInsecure bool `name:"allow-insecure" description:"Allow sending credentials over insecure transport"`
+	AllowInsecure bool `name:"allow-insecure" description:"Allow rights fetching over insecure transport"`
 }
 
 // Hook implements a gRPC unary hook that preloads in the context the rights
@@ -86,10 +86,10 @@ func New(ctx context.Context, connector IdentityServerConnector, config Config) 
 		config:    config,
 		connector: connector,
 	}
-	h.logger = log.FromContext(ctx)
+	h.logger = log.FromContext(h.ctx)
 
 	if config.TTL == time.Duration(0) {
-		h.logger.Warn("Not setting up the TTL cache as the TTL value was not set in the config")
+		h.logger.Warn("No rights cache TTL configured, not caching rights")
 		h.organizationsCache = new(noopCache)
 		h.applicationsCache = new(noopCache)
 		h.gatewaysCache = new(noopCache)

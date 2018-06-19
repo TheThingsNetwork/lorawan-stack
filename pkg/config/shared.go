@@ -108,7 +108,7 @@ type ServiceBase struct {
 	TLS            TLS            `name:"tls"`
 	Sentry         Sentry         `name:"sentry"`
 	FrequencyPlans FrequencyPlans `name:"frequency-plans"`
-	RightsFetching rights.Config  `name:"rights-fetching"`
+	Rights         rights.Config  `name:"rights"`
 }
 
 // FrequencyPlans represents frequency plans fetching configuration.
