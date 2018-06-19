@@ -21,6 +21,8 @@ import (
 	"sort"
 	"strings"
 	"sync"
+
+	isatty "github.com/mattn/go-isatty"
 )
 
 const (
@@ -80,6 +82,11 @@ var ColorFromTerm = func(handler *CLIHandler) {
 
 	// COLORTERM=0 forces colors off
 	color = color && COLORTERM != "0"
+
+	if out, ok := handler.Writer.(*os.File); ok {
+		// Only use color on terminals
+		color = color && (isatty.IsTerminal(out.Fd()) || isatty.IsCygwinTerminal(out.Fd()))
+	}
 
 	handler.UseColor = color
 }
