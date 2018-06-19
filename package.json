@@ -51,6 +51,7 @@
     "nsp": "^3.1.0",
     "react-test-renderer": "^16.0.0",
     "style-loader": "^0.18.2",
+    "stylint": "^1.5.9",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
     "tcomb": "^3.2.24",
