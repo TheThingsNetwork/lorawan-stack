@@ -255,7 +255,7 @@ message MACCommand {
   MACCommandIdentifier  cid                     = 1 [(gogoproto.customname) = "CID"];
 
   oneof payload {
-    Proprietary           proprietary             = 2;
+    bytes                 raw_payload             = 2;
     ResetInd              reset_ind               = 3;
     ResetConf             reset_conf              = 4;
     LinkCheckAns          link_check_ans          = 5;
@@ -288,9 +288,6 @@ message MACCommand {
     DeviceModeConf        device_mode_conf        = 32;
   }
 
-  message Proprietary {
-    bytes raw_payload = 1;
-  }
   message ResetInd {
     uint32 minor_version = 1;
   }
