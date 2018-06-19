@@ -24,6 +24,14 @@ pkg/version/ttn.go: .FORCE
 	@echo "// TTN Version" >> pkg/version/ttn.go
 	@echo "const TTN = \"v$(VERSION)-dev\"" >> pkg/version/ttn.go
 
+version.bump-package-json: VERSION ?= $(CURRENT_VERSION)
+version.bump-package-json:
+	$(JSON) -f package.json -I -e "this.version=\"$(VERSION)\""
+	git add pkg/version/ttn.go package.json
+	git commit -m "all: Bump version to $(VERSION)"
+	git tag -a -s -f -m "Version $(VERSION)" "v$(VERSION)"
+	@$(log) "Bumped to v$(VERSION)"
+
 version.bump.major: BUMP=major
 version.bump.major: version.bump
 
@@ -40,13 +48,9 @@ version._override:
 	$(eval CURRENT_VERSION := $(VERSION))
 
 version.bump: VERSION = $(shell $(GO) run .make/bump.go "$(CURRENT_VERSION)" "$(BUMP)")
-version.bump: version._override pkg/version/ttn.go
+version.bump: version._override pkg/version/ttn.go version.bump-package-json
 	@if [[ ! -z "`git status -s | grep -v 'pkg/version/ttn.go'`" ]]; then \
 		$(err) "Working tree not clean"; \
 		exit 1; \
 	fi
-	$(JSON) -f package.json -I -e "this.version=\"$(VERSION)\""
-	git add pkg/version/ttn.go package.json
-	git commit -m "all: Bump version to $(VERSION)"
-	git tag -a -s -f -m "Version $(VERSION)" "v$(VERSION)"
-	@$(log) "Bumped to v$(VERSION)"
+

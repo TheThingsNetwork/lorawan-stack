@@ -17,9 +17,7 @@ HEADER_EXTRA_FILES = Makefile
 PRE_COMMIT = headers.check-staged js.lint-staged
 COMMIT_MSG = git.commit-msg-log git.commit-msg-length git.commit-msg-empty git.commit-msg-prefix git.commit-msg-phrase git.commit-msg-casing
 
-PORT ?= 1900
-
-SUPPORT_LOCALES = en,ja,ru,nl
+SUPPORT_LOCALES = en
 
 include .make/log.make
 include .make/general.make
@@ -51,7 +49,7 @@ quality: go.quality js.quality
 
 # stack binary
 ttn-lw-stack: MAIN=./cmd/ttn-lw-stack/main.go
-ttn-lw-stack: js.dll js.build
+ttn-lw-stack: js.build
 ttn-lw-stack: $(RELEASE_DIR)/ttn-lw-stack-$(GOOS)-$(GOARCH)
 
 # identity-server binary
@@ -107,7 +105,7 @@ webui: go.link
 webui.dev: go.dev webui
 
 webui.start: webui.dev
-	./release/ttn-webui --http.listen=:$(PORT) --assets.dir=public --webui.path=/webui --log.level=debug
+	./release/ttn-webui --assets.dir=public --webui.path=/webui --log.level=debug
 
 UPDATES_FILES = $(GO_MESSAGES_FILE),messages.xlsx
 

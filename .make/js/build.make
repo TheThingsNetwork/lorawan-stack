@@ -42,20 +42,20 @@ WEBPACK_CONFIG_BUILT = $(subst $(CONFIG_DIR)/,$(CACHE_DIR)/config/,$(WEBPACK_CON
 # Run webpack main bundle (webpack.config.js)
 js.build-main: $(PUBLIC_DIR)/console.html
 
-js.build-watch: NODE_ENV = $(development)
-js.build-watch:	WEBPACK_FLAGS += -w
-js.build-watch: js.build-main
+js.build-watch: NODE_ENV = development
+js.build-watch: WEBPACK_FLAGS += -w
+js.build-watch: js.webpack-main
 
-# Run webpack main and dll (if has changed)
-js.build: js.dll js.build-main
+js.build: js.build-dll js.build-main
 
-js.watch: js.dll js.build-watch
+js.watch: js.build-dll js.build-watch
 
-# Make PHONY to force rerun regardless of source file timestamps
-.PHONY: $(PUBLIC_DIR)/console.html
-$(PUBLIC_DIR)/console.html: $(WEBPACK_CONFIG_BUILT) $(shell $(JS_SRC_FILES)) $(JS_SRC_DIR)/index.html package.json yarn.lock
+js.webpack-main:
 	@$(log) "building client [webpack -c $(WEBPACK_CONFIG_BUILT) $(WEBPACK_FLAGS)]"
 	@$(JS_ENV) $(WEBPACK) --config $(WEBPACK_CONFIG_BUILT) $(WEBPACK_FLAGS)
+
+$(PUBLIC_DIR)/console.html: $(WEBPACK_CONFIG_BUILT) $(shell $(JS_SRC_FILES)) $(JS_SRC_DIR)/index.html package.json yarn.lock
+	$(MAKE) js.webpack-main
 
 # build in dev mode
 js.build-dev: NODE_ENV =
@@ -68,11 +68,15 @@ DLL_CONFIG_BUILT = $(subst $(CONFIG_DIR),$(CACHE_DIR)/config,$(DLL_CONFIG))
 
 # DLL for faster dev builds
 $(DLL_OUTPUT): $(DLL_CONFIG_BUILT) package.json yarn.lock
+	$(MAKE) js.webpack-dll
+
+js.webpack-dll:
 	@$(log) "building dll file"
 	@GIT_TAG=$(GIT_TAG) DLL_FILE=$(DLL_OUTPUT) NODE_ENV=$(NODE_ENV) CACHE_DIR=$(CACHE_DIR) $(WEBPACK) --config $(DLL_CONFIG_BUILT) $(WEBPACK_FLAGS)
 
-# build dll for faster rebuilds (running webpack -c webpack.dll.js)
-js.dll: $(DLL_OUTPUT)
+
+# build dll for faster rebuilds
+js.build-dll: $(DLL_OUTPUT)
 
 $(CACHE_DIR)/make/%.js: .make/js/%.js
 	@$(log) "pre-building translation scrips [babel $<]"
