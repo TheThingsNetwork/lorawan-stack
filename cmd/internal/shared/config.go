@@ -21,7 +21,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/web"
 )
 
 // DefaultBaseConfig is the default base component configuration.
@@ -73,9 +72,6 @@ var DefaultAssetsConfig = assets.Config{
 	Mount: "/assets",
 }
 
-// DefaultWebConfig is the default config for the web server.
-var DefaultWebConfig = web.Config{}
-
 // DefaultServiceBase is the default base config for a service.
 var DefaultServiceBase = config.ServiceBase{
 	Base:           DefaultBaseConfig,
@@ -85,7 +81,6 @@ var DefaultServiceBase = config.ServiceBase{
 	GRPC:           DefaultGRPCConfig,
 	HTTP:           DefaultHTTPConfig,
 	TLS:            DefaultTLSConfig,
-	Web:            DefaultWebConfig,
 	FrequencyPlans: DefaultFrequencyPlansConfig,
 }
 

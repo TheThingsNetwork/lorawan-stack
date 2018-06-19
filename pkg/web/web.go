@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/random"
@@ -34,28 +35,13 @@ type Registerer interface {
 	RegisterRoutes(s *Server)
 }
 
-// Config is the configuration for the web server.
-type Config struct {
-	// NormalizationMode is the mode to use for request path normalization.
-	NormalizationMode middleware.NormalizationMode `name:"-"`
-
-	// IDPrefix is the prefix for the request id's.
-	IDPrefix string `name:"id-prefix" description:"The prefix for request ID's"`
-
-	// BlockKey is used to encrypt the cookie value.
-	BlockKey []byte `name:"cookie-block" description:"The cookie encryption key (32 bytes)"`
-
-	// HashKey is used to authenticate the cookie value using HMAC.
-	HashKey []byte `name:"cookie-hash" description:"The cookie hash key (12 bytes)"`
-}
-
 type echoGroup = echo.Group
 type RouterGroup = Group
 
 // Server is the server.
 type Server struct {
 	*RouterGroup
-	config Config
+	config config.HTTP
 	server *echo.Echo
 }
 
@@ -76,25 +62,27 @@ func newGroup(parentGroup *echo.Group, parentPrefix, prefix string, middleware .
 }
 
 // New builds a new server.
-func New(ctx context.Context, config Config) (*Server, error) {
-	logger := log.FromContext(ctx)
+func New(ctx context.Context, config config.HTTP) (*Server, error) {
+	logger := log.FromContext(ctx).WithField("namespace", "web")
 
-	if config.HashKey == nil || isZeros(config.HashKey) {
-		config.HashKey = random.Bytes(64)
-		logger.WithField("hash_key", config.HashKey).Warn("Generated a random cookie hash key")
+	hashKey, blockKey := config.Cookie.HashKey, config.Cookie.BlockKey
+
+	if len(hashKey) == 0 || isZeros(hashKey) {
+		hashKey = random.Bytes(64)
+		logger.WithField("hash_key", hashKey).Warn("No cookie hash key configured, generated a random one")
 	}
 
-	if len(config.HashKey) != 32 && len(config.HashKey) != 64 {
-		return nil, errors.New("Expected web.cookie-hash to be 32 or 64 bytes long")
+	if len(hashKey) != 32 && len(hashKey) != 64 {
+		return nil, errors.New("Expected cookie hash key to be 32 or 64 bytes long")
 	}
 
-	if config.BlockKey == nil || isZeros(config.BlockKey) {
-		config.BlockKey = random.Bytes(32)
-		logger.WithField("block_key", config.BlockKey).Warn("Generated a random cookie block key")
+	if len(blockKey) == 0 || isZeros(blockKey) {
+		blockKey = random.Bytes(32)
+		logger.WithField("block_key", blockKey).Warn("No cookie block key configured, generated a random one")
 	}
 
-	if len(config.BlockKey) != 32 {
-		return nil, errors.New("Expected web.cookie-block to be 32 bytes long")
+	if len(blockKey) != 32 {
+		return nil, errors.New("Expected cookie block key to be 32 bytes long")
 	}
 
 	server := echo.New()
@@ -103,14 +91,14 @@ func New(ctx context.Context, config Config) (*Server, error) {
 	server.HTTPErrorHandler = ErrorHandler
 
 	server.Use(
-		middleware.ID(config.IDPrefix),
-		cookie.Cookies(config.BlockKey, config.HashKey),
+		middleware.ID(""),
+		cookie.Cookies(blockKey, hashKey),
 	)
 
 	group := server.Group(
 		"",
-		middleware.Log(logger.WithField("namespace", "web")),
-		middleware.Normalize(config.NormalizationMode),
+		middleware.Log(logger),
+		middleware.Normalize(middleware.RedirectPermanent),
 	)
 
 	return &Server{

@@ -15,14 +15,11 @@
 package config
 
 import (
-	"encoding/hex"
-
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/web"
 )
 
 // Base represents base component configuration.
@@ -72,36 +69,8 @@ type GRPC struct {
 // Make sure that all instances of a cluster use the same keys.
 // Changing these keys will result in all sessions being invalidated.
 type Cookie struct {
-	HashKey  string `name:"hash-key" description:"Key for cookie contents verification"`
-	BlockKey string `name:"block-key" description:"Key for cookie contents encryption"`
-}
-
-// Keys parses the hash and block keys from the Cookie config from Hex to bytes.
-// It returns an error if the keys do not have a valid length.
-func (c Cookie) Keys() (hash []byte, block []byte, err error) {
-	if c.HashKey != "" {
-		hash, err = hex.DecodeString(c.HashKey)
-		if err != nil {
-			return nil, nil, err
-		}
-		switch len(hash) {
-		case 16, 24, 32:
-		default:
-			return nil, nil, errors.New("Invalid length for cookie hash key: must be 16, 24 or 32 bytes")
-		}
-	}
-	if c.BlockKey != "" {
-		block, err = hex.DecodeString(c.BlockKey)
-		if err != nil {
-			return nil, nil, err
-		}
-		switch len(block) {
-		case 16, 24, 32:
-		default:
-			return nil, nil, errors.New("Invalid length for cookie block key: must be 16, 24 or 32 bytes")
-		}
-	}
-	return
+	HashKey  []byte `name:"hash-key" description:"Key for cookie contents verification (32 or 64 bytes)"`
+	BlockKey []byte `name:"block-key" description:"Key for cookie contents encryption (16, 24 or 32 bytes)"`
 }
 
 // HTTP represents the HTTP and HTTPS server configuration.
@@ -138,7 +107,6 @@ type ServiceBase struct {
 	HTTP           HTTP           `name:"http"`
 	TLS            TLS            `name:"tls"`
 	Sentry         Sentry         `name:"sentry"`
-	Web            web.Config     `name:"web"`
 	FrequencyPlans FrequencyPlans `name:"frequency-plans"`
 	RightsFetching rights.Config  `name:"rights-fetching"`
 }

@@ -445,8 +445,11 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				m.viper.SetDefault(name, val)
 
 			case []byte:
-				str := "0x" + strings.ToUpper(hex.EncodeToString(val[:]))
-				m.viper.SetDefault(name, str)
+				var str string
+				if len(val) > 0 {
+					str = "0x" + strings.ToUpper(hex.EncodeToString(val[:]))
+					m.viper.SetDefault(name, str)
+				}
 				flags.StringP(name, shorthand, str, description)
 
 			default:

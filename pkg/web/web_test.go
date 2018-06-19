@@ -20,6 +20,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -29,7 +30,7 @@ func handler(c echo.Context) error {
 
 func TestGroup(t *testing.T) {
 	a := assertions.New(t)
-	s, err := New(context.Background(), Config{})
+	s, err := New(context.Background(), config.HTTP{})
 	if !a.So(err, should.BeNil) {
 		t.Fatal("Could not create a web instance")
 	}

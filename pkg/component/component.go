@@ -79,6 +79,8 @@ func MustNew(logger log.Stack, config *Config) *Component {
 
 // New returns a new component
 func New(logger log.Stack, config *Config) (*Component, error) {
+	var err error
+
 	ctx, cancel := context.WithCancel(context.Background())
 	ctx = log.NewContext(ctx, logger)
 
@@ -100,15 +102,7 @@ func New(logger log.Stack, config *Config) (*Component, error) {
 		c.logger.Use(sentry.New(c.sentry))
 	}
 
-	hash, block, err := config.HTTP.Cookie.Keys()
-	if err != nil {
-		return nil, err
-	}
-
-	c.web, err = web.New(c.ctx, web.Config{
-		HashKey:  hash,
-		BlockKey: block,
-	})
+	c.web, err = web.New(c.ctx, config.HTTP)
 	if err != nil {
 		return nil, err
 	}
