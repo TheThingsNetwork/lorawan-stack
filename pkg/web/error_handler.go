@@ -18,17 +18,16 @@ import (
 	"fmt"
 
 	"github.com/labstack/echo"
-	"go.thethings.network/lorawan-stack/pkg/errors/httperrors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 // ErrorHandler is an echo.HTTPErrorHandler.
 func ErrorHandler(err error, c echo.Context) {
-	status := httperrors.HTTPStatusCode(err)
+	status := errors.HTTPStatusCode(err)
 	msg := err.Error()
 	if h, ok := err.(*echo.HTTPError); ok {
 		status = h.Code
 		msg = fmt.Sprintf("%s", h.Message)
 	}
-
 	c.String(status, msg)
 }

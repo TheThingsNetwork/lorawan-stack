@@ -19,7 +19,6 @@ import (
 	"context"
 	"math"
 	"net/http"
-	"runtime/debug"
 	"time"
 
 	"github.com/getsentry/raven-go"
@@ -29,8 +28,7 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/validator"
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/errors/grpcerrors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/fillcontext"
@@ -103,17 +101,8 @@ func WithSentry(sentry *raven.Client) Option {
 	}
 }
 
-func init() {
-	ErrRPCRecovered.Register()
-}
-
-// ErrRPCRecovered is returned when we recovered from a panic
-var ErrRPCRecovered = &errors.ErrDescriptor{
-	MessageFormat:  "Internal Server Error",
-	Code:           500,
-	Type:           errors.Internal,
-	SafeAttributes: nil, // We don't want to give any information to the clients
-}
+// ErrRPCRecovered is returned when a panic is caught from an RPC.
+var ErrRPCRecovered = errors.DefineInternal("rpc_recovered", "Internal Server Error")
 
 // New returns a new RPC server with a set of middlewares.
 // The given context is used in some of the middlewares, the given server options are passed to gRPC
@@ -131,10 +120,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	}
 	recoveryOpts := []grpc_recovery.Option{
 		grpc_recovery.WithRecoveryHandler(func(p interface{}) (err error) {
-			return ErrRPCRecovered.New(errors.Attributes{
-				"panic": p,
-				"stack": string(debug.Stack()),
-			})
+			return ErrRPCRecovered.WithAttributes("panic", p)
 		}),
 	}
 	grpc_prometheus.EnableHandlingTimeHistogram()
@@ -143,10 +129,10 @@ func New(ctx context.Context, opts ...Option) *Server {
 		fillcontext.StreamServerInterceptor(options.contextFillers...),
 		grpc_ctxtags.StreamServerInterceptor(ctxtagsOpts...),
 		events.StreamServerInterceptor,
+		rpclog.StreamServerInterceptor(ctx),
 		grpc_prometheus.StreamServerInterceptor,
-		grpcerrors.StreamServerInterceptor(), // above works with gRPC errors, below works with TTN errors
 		sentry.StreamServerInterceptor(options.sentry),
-		rpclog.StreamServerInterceptor(ctx), // Gets logger from global context
+		errors.StreamServerInterceptor(),
 		grpc_validator.StreamServerInterceptor(),
 		hooks.StreamServerInterceptor(),
 	}
@@ -155,10 +141,10 @@ func New(ctx context.Context, opts ...Option) *Server {
 		fillcontext.UnaryServerInterceptor(options.contextFillers...),
 		grpc_ctxtags.UnaryServerInterceptor(ctxtagsOpts...),
 		events.UnaryServerInterceptor,
+		rpclog.UnaryServerInterceptor(ctx),
 		grpc_prometheus.UnaryServerInterceptor,
-		grpcerrors.UnaryServerInterceptor(), // above works with gRPC errors, below works with TTN errors
 		sentry.UnaryServerInterceptor(options.sentry),
-		rpclog.UnaryServerInterceptor(ctx), // Gets logger from global context
+		errors.UnaryServerInterceptor(),
 		grpc_validator.UnaryServerInterceptor(),
 		hooks.UnaryServerInterceptor(),
 	}

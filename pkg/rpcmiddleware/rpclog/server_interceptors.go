@@ -19,8 +19,6 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/errors/grpcerrors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"google.golang.org/grpc"
 )
@@ -33,15 +31,14 @@ func UnaryServerInterceptor(ctx context.Context, opts ...Option) grpc.UnaryServe
 		newCtx := newLoggerForCall(ctx, logger, info.FullMethod)
 		startTime := time.Now()
 		resp, err := handler(newCtx, req)
-		code := o.codeFunc(err)
-		if err, ok := err.(errors.Error); ok {
-			code = grpcerrors.TypeToGRPCCode(err.Type())
-		}
-		level := o.levelFunc(code)
-		entry := log.FromContext(newCtx).WithFields(log.Fields(
-			"grpc_code", code.String(),
+		logFields := []interface{}{
 			"duration", time.Since(startTime),
-		))
+		}
+		if err != nil {
+			logFields = append(logFields, logFieldsForError(err)...)
+		}
+		level := o.levelFunc(grpc.Code(err))
+		entry := log.FromContext(newCtx).WithFields(log.Fields(logFields...))
 		if err != nil {
 			entry = entry.WithError(err)
 		}
@@ -60,15 +57,14 @@ func StreamServerInterceptor(ctx context.Context, opts ...Option) grpc.StreamSer
 		wrapped.WrappedContext = newCtx
 		startTime := time.Now()
 		err := handler(srv, wrapped)
-		code := o.codeFunc(err)
-		if err, ok := err.(errors.Error); ok {
-			code = grpcerrors.TypeToGRPCCode(err.Type())
-		}
-		level := o.levelFunc(code)
-		entry := log.FromContext(newCtx).WithFields(log.Fields(
-			"grpc_code", code.String(),
+		logFields := []interface{}{
 			"duration", time.Since(startTime),
-		))
+		}
+		if err != nil {
+			logFields = append(logFields, logFieldsForError(err)...)
+		}
+		level := o.levelFunc(grpc.Code(err))
+		entry := log.FromContext(newCtx).WithFields(log.Fields(logFields...))
 		if err != nil {
 			entry = entry.WithError(err)
 		}

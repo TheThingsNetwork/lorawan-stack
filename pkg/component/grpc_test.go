@@ -25,8 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
-	"go.thethings.network/lorawan-stack/pkg/errors/grpcerrors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -89,8 +88,8 @@ func TestUnaryHook(t *testing.T) {
 		t.FailNow()
 	}
 	s := grpc.NewServer(
-		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(grpcerrors.UnaryServerInterceptor(), hooks.UnaryServerInterceptor())),
-		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(grpcerrors.StreamServerInterceptor(), hooks.StreamServerInterceptor())),
+		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(errors.UnaryServerInterceptor(), hooks.UnaryServerInterceptor())),
+		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(errors.StreamServerInterceptor(), hooks.StreamServerInterceptor())),
 	)
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Gs", cluster.HookName, c.UnaryHook())
@@ -103,7 +102,11 @@ func TestUnaryHook(t *testing.T) {
 	go s.Serve(lis)
 	defer s.Stop()
 
-	grpcClient, err := grpc.Dial(lis.Addr().String(), grpc.WithInsecure())
+	grpcClient, err := grpc.Dial(lis.Addr().String(),
+		grpc.WithInsecure(),
+		grpc.WithUnaryInterceptor(errors.UnaryClientInterceptor()),
+		grpc.WithStreamInterceptor(errors.StreamClientInterceptor()),
+	)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -122,15 +125,17 @@ func TestUnaryHook(t *testing.T) {
 	// Failing calls
 	{
 		_, err = gsClient.GetGatewayObservations(ctx, &ttnpb.GatewayIdentifiers{})
-		a.So(err, should.NotBeNil)
-		ttnErr := grpcerrors.FromGRPC(err)
-		a.So(ttnErr, should.DescribeError, common.ErrUnauthorized)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsUnauthenticated(err), should.BeTrue)
+		}
+
 		sub, err := asClient.Subscribe(ctx, &ttnpb.ApplicationIdentifiers{})
 		a.So(err, should.BeNil)
+
 		_, err = sub.Recv()
-		a.So(err, should.NotBeNil)
-		ttnErr = grpcerrors.FromGRPC(err)
-		a.So(ttnErr, should.DescribeError, common.ErrUnauthorized)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsUnauthenticated(err), should.BeTrue)
+		}
 	}
 
 	// Successful calls

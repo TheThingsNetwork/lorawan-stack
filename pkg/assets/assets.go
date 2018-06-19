@@ -22,7 +22,6 @@ import (
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/assets/fs"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"go.thethings.network/lorawan-stack/pkg/web/middleware"
@@ -96,7 +95,7 @@ type data struct {
 	Env interface{}
 
 	// Error is a possible error that occurred.
-	Error *errors.Error
+	Error error
 }
 
 // Render creates an echo.HandlerFunc that renders the selected template html file

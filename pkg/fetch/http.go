@@ -20,7 +20,7 @@ import (
 	"strings"
 
 	"github.com/gregjones/httpcache"
-	"go.thethings.network/lorawan-stack/pkg/errors/httperrors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 type httpFetcher struct {
@@ -36,7 +36,7 @@ func (f httpFetcher) File(pathElements ...string) ([]byte, error) {
 		return nil, err
 	}
 
-	if err = httperrors.FromHTTP(resp); err != nil {
+	if err = errors.FromHTTP(resp); err != nil {
 		return nil, err
 	}
 

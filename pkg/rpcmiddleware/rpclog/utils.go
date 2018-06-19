@@ -20,8 +20,31 @@ import (
 	"path"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
+
+func logFieldsForError(err error) (fieldsKV []interface{}) {
+	if err, ok := errors.From(err); ok {
+		fieldsKV = append(fieldsKV, "grpc_code", codes.Code(err.Code()))
+		if ns := err.Namespace(); ns != "" {
+			fieldsKV = append(fieldsKV, "error_namespace", ns)
+		}
+		if name := err.Name(); name != "" {
+			fieldsKV = append(fieldsKV, "error_name", name)
+		}
+		if cid := err.CorrelationID(); cid != "" {
+			fieldsKV = append(fieldsKV, "error_correlation_id", cid)
+		}
+	} else if err, ok := status.FromError(err); ok {
+		fieldsKV = append(fieldsKV,
+			"grpc_code", err.Code(),
+		)
+	}
+	return
+}
 
 type fielder struct {
 	values map[string]interface{}

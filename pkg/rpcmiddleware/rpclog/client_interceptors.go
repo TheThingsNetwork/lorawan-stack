@@ -30,12 +30,14 @@ func UnaryClientInterceptor(ctx context.Context, opts ...Option) grpc.UnaryClien
 		newCtx := newLoggerForCall(ctx, logger, method)
 		startTime := time.Now()
 		err := invoker(newCtx, method, req, reply, cc, opts...)
-		code := o.codeFunc(err)
-		level := o.levelFunc(code)
-		entry := log.FromContext(newCtx).WithFields(log.Fields(
-			"grpc_code", code.String(),
+		logFields := []interface{}{
 			"duration", time.Since(startTime),
-		))
+		}
+		if err != nil {
+			logFields = append(logFields, logFieldsForError(err)...)
+		}
+		level := o.levelFunc(grpc.Code(err))
+		entry := log.FromContext(newCtx).WithFields(log.Fields(logFields...))
 		if err != nil {
 			entry = entry.WithError(err)
 		}
@@ -53,21 +55,29 @@ func StreamClientInterceptor(ctx context.Context, opts ...Option) grpc.StreamCli
 		startTime := time.Now()
 		clientStream, err := streamer(newCtx, desc, cc, method, opts...)
 		if err != nil {
-			code := o.codeFunc(err)
-			level := o.levelFunc(code)
-			entry := log.FromContext(newCtx).WithError(err)
+			logFields := []interface{}{
+				"duration", time.Since(startTime),
+			}
+			logFields = append(logFields, logFieldsForError(err)...)
+			level := o.levelFunc(o.codeFunc(err))
+			entry := log.FromContext(newCtx).WithFields(log.Fields(logFields...))
+			if err != nil {
+				entry = entry.WithError(err)
+			}
 			commit(entry, level, "Failed streaming call")
 			return clientStream, err
 		}
 		go func() {
 			<-clientStream.Context().Done()
 			err := clientStream.Context().Err()
-			code := o.codeFunc(err)
-			level := o.levelFunc(code)
-			entry := log.FromContext(ctx).WithFields(log.Fields(
-				"grpc_code", code.String(),
+			logFields := []interface{}{
 				"duration", time.Since(startTime),
-			))
+			}
+			if err != nil {
+				logFields = append(logFields, logFieldsForError(err)...)
+			}
+			level := o.levelFunc(o.codeFunc(err))
+			entry := log.FromContext(newCtx).WithFields(log.Fields(logFields...))
 			if err != nil {
 				entry = entry.WithError(err)
 			}

@@ -29,7 +29,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/errors/httperrors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/log/handler/memory"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -112,12 +111,12 @@ func TestHTTP(t *testing.T) {
 			// Non-registered path
 			resp, err := http.Get(fmt.Sprintf("http://%s/not found", httpAddress))
 			a.So(err, should.BeNil)
-			a.So(httperrors.FromHTTP(resp), should.NotBeNil)
+			a.So(resp.StatusCode, should.Equal, http.StatusNotFound)
 
 			// Registered path
 			resp, err = http.Get(fmt.Sprintf("http://%s%s", httpAddress, workingRoutePath))
 			a.So(err, should.BeNil)
-			a.So(httperrors.FromHTTP(resp), should.BeNil)
+			a.So(resp.StatusCode, should.Equal, http.StatusOK)
 		}
 
 		c.Close()
@@ -163,12 +162,12 @@ func TestHTTP(t *testing.T) {
 			// Non-registered path
 			resp, err := client.Get("https://localhost:9186/not found")
 			a.So(err, should.BeNil)
-			a.So(httperrors.FromHTTP(resp), should.NotBeNil)
+			a.So(resp.StatusCode, should.Equal, http.StatusNotFound)
 
 			// Registered path
 			resp, err = client.Get(fmt.Sprintf("https://localhost:9186%s", workingRoutePath))
 			a.So(err, should.BeNil)
-			a.So(httperrors.FromHTTP(resp), should.BeNil)
+			a.So(resp.StatusCode, should.Equal, http.StatusOK)
 		}
 
 		c.Close()

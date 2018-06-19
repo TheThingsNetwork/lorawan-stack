@@ -15,10 +15,11 @@
 package assets
 
 import (
+	"net/http"
+
 	"github.com/golang/gddo/httputil"
 	"github.com/labstack/echo"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/errors/httperrors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 var (
@@ -26,103 +27,53 @@ var (
 	defaultType = "text/html"
 )
 
+var httpError = errors.Define("http_error", "HTTP Error: {message}")
+
 // Errors renders the errors with the specified template.
 func (a *Assets) Errors(name string, env interface{}) echo.MiddlewareFunc {
-	template, err := a.template(name)
-
+	template, templateErr := a.template(name)
+	if templateErr != nil { // can't offer HTML if we don't have a template where we can render the error.
+		offers = []string{"application/json", "text/event-stream", "text/plain"}
+		defaultType = "application/json"
+	}
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			if err != nil {
-				return err
-			}
-
 			err := next(c)
 			if err == nil || c.Response().Committed {
-				return nil
+				return err
 			}
-
-			e := from(err)
-			status := httperrors.HTTPStatusCode(e)
-			httperrors.SetErrorHeaders(e, c.Response().Header())
-
+			status := http.StatusInternalServerError
+			if echoErr, ok := err.(*echo.HTTPError); ok {
+				status = echoErr.Code
+				if ttnErr, ok := errors.From(echoErr.Internal); ok {
+					if status == http.StatusInternalServerError {
+						status = errors.HTTPStatusCode(ttnErr)
+					}
+					err = ttnErr
+				}
+			} else if ttnErr, ok := errors.From(err); ok {
+				status = errors.HTTPStatusCode(ttnErr)
+				err = ttnErr
+			} else {
+				err = httpError.WithCause(err).WithAttributes("message", err.Error())
+			}
 			switch httputil.NegotiateContentType(c.Request(), offers, defaultType) {
 			case "text/html":
-				t, err := a.fresh(name, template)
-				if err != nil {
-					return err
+				t, templateError := a.fresh(name, template)
+				if templateError != nil {
+					return templateError
 				}
-
-				data := data{
+				c.Response().WriteHeader(status)
+				return t.Execute(c.Response().Writer, data{
 					Root:  a.config.CDN,
 					Env:   env,
-					Error: &e,
-				}
-
-				c.Response().WriteHeader(status)
-				return t.Execute(c.Response().Writer, data)
+					Error: err,
+				})
 			case "application/json", "text/event-stream":
-				return c.JSON(status, e)
+				return c.JSON(status, err)
 			default:
-				return c.String(status, e.Error())
+				return c.String(status, err.Error())
 			}
 		}
 	}
-}
-
-type httpError struct {
-	id      string      `json:"error_id"`
-	message string      `json:"error_message"`
-	typ     errors.Type `json:"error_type"`
-}
-
-// Error implements error.
-func (e httpError) Error() string {
-	return e.message
-}
-
-// Message implements errors.Error.
-func (e httpError) Message() string {
-	return e.message
-}
-
-// Code implements errors.Error.
-func (e httpError) Code() errors.Code {
-	return errors.NoCode
-}
-
-// Type implements errors.Error.
-func (e httpError) Type() errors.Type {
-	return e.typ
-}
-
-// Namespace implements errors.Error.
-func (e httpError) Namespace() string {
-	return ""
-}
-
-// Attributes implements errors.Error.
-func (e httpError) Attributes() errors.Attributes {
-	return nil
-}
-
-// ID implements errors.Error.
-func (e httpError) ID() string {
-	return e.id
-}
-
-func from(err error) errors.Error {
-	if echoErr, ok := err.(*echo.HTTPError); ok {
-		msg, ok := echoErr.Message.(string)
-		if !ok {
-			msg = echoErr.Error()
-		}
-
-		return errors.ToImpl(httpError{
-			id:      errors.NewID(),
-			message: msg,
-			typ:     httperrors.HTTPStatusToType(echoErr.Code),
-		})
-	}
-
-	return errors.From(err)
 }
