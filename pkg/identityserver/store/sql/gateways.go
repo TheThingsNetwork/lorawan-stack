@@ -403,11 +403,13 @@ func (s *gatewayStore) removeAttributeDiffQuery(gtwID uuid.UUID, attributes map[
 		i++
 	}
 
-	query := fmt.Sprintf(
-		`DELETE
-			FROM gateways_attributes
-			WHERE gateway_id = $1 AND attribute NOT IN (%s)`,
-		strings.Join(boundVariables, ", "))
+	clauses := []string{"gateway_id = $1"}
+	if len(boundVariables) > 0 {
+		clauses = append(clauses, fmt.Sprintf("attribute NOT IN (%s)", strings.Join(boundVariables, ", ")))
+	}
+	query := fmt.Sprintf(`DELETE
+				FROM gateways_attributes
+				WHERE %s`, strings.Join(clauses, " AND "))
 
 	return query, args
 }

@@ -69,10 +69,8 @@ func testGateways(t *testing.T, ids ttnpb.GatewayIdentifiers) {
 		Description:        "My description",
 		Platform:           "The Things Gateway",
 		DisableTxDelay:     true,
-		Attributes: map[string]string{
-			"foo": "bar",
-		},
-		FrequencyPlanID: "868_3",
+		Attributes:         map[string]string{},
+		FrequencyPlanID:    "868_3",
 		Radios: []ttnpb.GatewayRadio{
 			{
 				Frequency: 10,
@@ -103,6 +101,10 @@ func testGateways(t *testing.T, ids ttnpb.GatewayIdentifiers) {
 	a.So(found, should.EqualFieldsWithIgnores(identityserver.GatewayGeneratedFields...), gateway)
 
 	gateway.Description = ""
+	err = s.Gateways.Update(gateway)
+	a.So(err, should.BeNil)
+
+	gateway.Attributes = map[string]string{"bar": "foo"}
 	err = s.Gateways.Update(gateway)
 	a.So(err, should.BeNil)
 
