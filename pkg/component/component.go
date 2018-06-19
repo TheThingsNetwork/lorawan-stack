@@ -96,6 +96,7 @@ func New(logger log.Stack, config *Config) (*Component, error) {
 
 	if config.Sentry.DSN != "" {
 		c.sentry, _ = raven.New(config.Sentry.DSN)
+		c.sentry.SetIncludePaths([]string{"go.thethings.network/lorawan-stack"})
 		c.logger.Use(sentry.New(c.sentry))
 	}
 

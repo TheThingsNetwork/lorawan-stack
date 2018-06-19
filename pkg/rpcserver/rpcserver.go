@@ -31,6 +31,7 @@ import (
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/fillcontext"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
@@ -128,6 +129,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	streamInterceptors := []grpc.StreamServerInterceptor{
 		fillcontext.StreamServerInterceptor(options.contextFillers...),
 		grpc_ctxtags.StreamServerInterceptor(ctxtagsOpts...),
+		rpcmiddleware.RequestIDStreamServerInterceptor(),
 		events.StreamServerInterceptor,
 		rpclog.StreamServerInterceptor(ctx),
 		grpc_prometheus.StreamServerInterceptor,
@@ -140,6 +142,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	unaryInterceptors := []grpc.UnaryServerInterceptor{
 		fillcontext.UnaryServerInterceptor(options.contextFillers...),
 		grpc_ctxtags.UnaryServerInterceptor(ctxtagsOpts...),
+		rpcmiddleware.RequestIDUnaryServerInterceptor(),
 		events.UnaryServerInterceptor,
 		rpclog.UnaryServerInterceptor(ctx),
 		grpc_prometheus.UnaryServerInterceptor,

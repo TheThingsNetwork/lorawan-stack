@@ -21,55 +21,78 @@ import (
 
 	raven "github.com/getsentry/raven-go"
 	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/errors/grpcerrors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/errorsv3/sentry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"google.golang.org/grpc/metadata"
 )
 
 type forwarder struct {
 	client *raven.Client
 }
 
-func (f *forwarder) forward(ctx context.Context, method string, err error) {
-	code := codes.Unknown
-	if status, ok := status.FromError(err); ok {
-		code = status.Code()
+func (fw *forwarder) forward(ctx context.Context, method string, err error) {
+	if err == nil {
+		return
 	}
 
-	ttnErr := grpcerrors.FromGRPC(err)
-	ttnErrType := ttnErr.Type()
-
-	switch ttnErrType {
-	case errors.InvalidArgument,
-		errors.OutOfRange,
-		errors.NotFound,
-		errors.Conflict,
-		errors.AlreadyExists,
-		errors.Unauthorized,
-		errors.PermissionDenied,
-		errors.Timeout,
-		errors.Canceled:
+	code := grpc.Code(err)
+	switch code {
+	case codes.Canceled,
+		codes.InvalidArgument,
+		codes.DeadlineExceeded,
+		codes.NotFound,
+		codes.AlreadyExists,
+		codes.PermissionDenied,
+		codes.Unauthenticated:
 		return // ignore
 	}
 
-	var details = make(map[string]string)
-	details["grpc.code"] = code.String()
-	details["grpc.method"] = method
-	if tags := grpc_ctxtags.Extract(ctx); tags != nil {
-		for k, v := range tags.Values() {
-			details[k] = fmt.Sprint(v)
+	// Request Tags
+	var tags = map[string]string{
+		"grpc.method": method,
+		"grpc.code":   code.String(),
+	}
+	if md, ok := metadata.FromOutgoingContext(ctx); ok {
+		if requestID := md["request-id"]; len(requestID) > 0 {
+			tags["grpc.request_id"] = requestID[0]
 		}
 	}
-	details["ttn.error.code"] = ttnErr.Code().String()
-	details["ttn.error.type"] = ttnErrType.String()
-	details["ttn.error.namespace"] = ttnErr.Namespace()
-	for k, v := range ttnErr.Attributes() {
-		details["ttn.error."+k] = fmt.Sprint(v)
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if requestID := md["request-id"]; len(requestID) > 0 {
+			tags["grpc.request_id"] = requestID[0]
+		}
+	}
+	for k, v := range grpc_ctxtags.Extract(ctx).Values() {
+		if val := fmt.Sprint(v); len(val) < 64 {
+			tags["tag."+k] = val
+		}
 	}
 
-	f.client.CaptureError(err, details, nil)
+	// Error Tags
+	var correlationID string
+	if ttnErr, ok := errors.From(err); ok {
+		if ttnErr == nil {
+			return
+		}
+		tags["error.namespace"] = ttnErr.Namespace()
+		tags["error.name"] = ttnErr.Name()
+		correlationID = ttnErr.CorrelationID()
+	}
+
+	// Error Attributes
+	for k, v := range errors.Attributes(err) {
+		if val := fmt.Sprint(v); len(val) < 64 {
+			tags["error.attributes."+k] = val
+		}
+	}
+
+	// Capture the error
+	pkt := raven.NewPacket(err.Error(), sentry.ErrorAsExceptions(err, "go.thethings.network/lorawan-stack"))
+	pkt.Culprit = method
+	pkt.EventID = correlationID
+	fw.client.Capture(pkt, tags)
 }
 
 // UnaryServerInterceptor forwards errors in Unary RPCs to Sentry
@@ -80,9 +103,7 @@ func UnaryServerInterceptor(client *raven.Client) grpc.UnaryServerInterceptor {
 	f := &forwarder{client}
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 		resp, err = handler(ctx, req)
-		if err != nil {
-			f.forward(ctx, info.FullMethod, err)
-		}
+		f.forward(ctx, info.FullMethod, err)
 		return
 	}
 }
@@ -95,9 +116,7 @@ func StreamServerInterceptor(client *raven.Client) grpc.StreamServerInterceptor 
 	f := &forwarder{client}
 	return func(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) (err error) {
 		err = handler(srv, ss)
-		if err != nil {
-			f.forward(ss.Context(), info.FullMethod, err)
-		}
+		f.forward(ss.Context(), info.FullMethod, err)
 		return
 	}
 }

@@ -34,11 +34,11 @@ func TestAttributes(t *testing.T) {
 	err2 := err1.WithAttributes("bar", "baz")
 
 	a.So(err1, ShouldHaveSameDefinitionAs, errInvalidFoo)
-	a.So(err1.Attributes(), should.Resemble, map[string]interface{}{"foo": "bar"})
-	a.So(err1.PublicAttributes(), should.Resemble, map[string]interface{}{"foo": "bar"})
+	a.So(Attributes(err1), should.Resemble, map[string]interface{}{"foo": "bar"})
+	a.So(PublicAttributes(err1), should.Resemble, map[string]interface{}{"foo": "bar"})
 
 	a.So(err2, ShouldHaveSameDefinitionAs, err1)
 	a.So(err2, ShouldHaveSameDefinitionAs, errInvalidFoo)
-	a.So(err2.Attributes(), should.Resemble, map[string]interface{}{"foo": "bar", "bar": "baz"})
-	a.So(err2.PublicAttributes(), should.Resemble, map[string]interface{}{"foo": "bar"})
+	a.So(Attributes(err2), should.Resemble, map[string]interface{}{"foo": "bar", "bar": "baz"})
+	a.So(PublicAttributes(err2), should.Resemble, map[string]interface{}{"foo": "bar"})
 }

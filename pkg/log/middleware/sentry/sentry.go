@@ -36,15 +36,6 @@ func New(client *raven.Client) log.Middleware {
 	return &Sentry{Client: client}
 }
 
-// NewWithDSN returns a new Sentry log middleware that uses the given DSN.
-func NewWithDSN(dsn string) (log.Middleware, error) {
-	client, err := raven.New(dsn)
-	if err != nil {
-		return nil, err
-	}
-	return New(client), nil
-}
-
 // Wrap an existing log handler with Sentry.
 func (s *Sentry) Wrap(next log.Handler) log.Handler {
 	return log.HandlerFunc(func(entry log.Entry) (err error) {

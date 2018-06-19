@@ -50,7 +50,7 @@ func (d Definition) String() string {
 	if d.namespace == "" || d.name == "" {
 		return d.messageFormat
 	}
-	return fmt.Sprintf("error:%s:%s", d.namespace, d.name)
+	return fmt.Sprintf("error:%s:%s (%s)", d.namespace, d.name, d.messageFormat)
 }
 
 // Error implements the error interface.

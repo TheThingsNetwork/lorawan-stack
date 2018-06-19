@@ -16,8 +16,10 @@ package errors
 
 import (
 	"context"
+	"encoding/hex"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/satori/go.uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -132,17 +134,31 @@ func (e *Error) GRPCStatus() *status.Status {
 	return s
 }
 
-// UnaryServerInterceptor converts errors to gRPC errors.
+// UnaryServerInterceptor makes sure that returned TTN errors contain a CorrelationID.
 func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		return handler(ctx, req)
+		res, err := handler(ctx, req)
+		if ttnErr, ok := From(err); ok && ttnErr != nil {
+			if ttnErr.correlationID == "" {
+				ttnErr.correlationID = hex.EncodeToString(uuid.NewV4().Bytes()) // Compliant with Sentry.
+			}
+			err = ttnErr
+		}
+		return res, err
 	}
 }
 
-// StreamServerInterceptor converts errors to gRPC errors.
+// StreamServerInterceptor makes sure that returned TTN errors contain a CorrelationID.
 func StreamServerInterceptor() grpc.StreamServerInterceptor {
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
-		return handler(srv, stream)
+		err := handler(srv, stream)
+		if ttnErr, ok := From(err); ok && ttnErr != nil {
+			if ttnErr.correlationID == "" {
+				ttnErr.correlationID = hex.EncodeToString(uuid.NewV4().Bytes()) // Compliant with Sentry.
+			}
+			err = ttnErr
+		}
+		return err
 	}
 }
 

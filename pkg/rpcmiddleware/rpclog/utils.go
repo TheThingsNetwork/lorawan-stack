@@ -19,10 +19,10 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -57,8 +57,15 @@ func (f fielder) Fields() map[string]interface{} {
 func newLoggerForCall(ctx context.Context, logger log.Interface, fullMethodString string) context.Context {
 	service := path.Dir(fullMethodString)[1:]
 	method := path.Base(fullMethodString)
-	if tags := grpc_ctxtags.Extract(ctx).Values(); len(tags) > 0 {
-		logger = logger.WithFields(&fielder{values: tags})
+	if md, ok := metadata.FromOutgoingContext(ctx); ok {
+		if requestID := md["request-id"]; len(requestID) > 0 {
+			logger = logger.WithField("request_id", requestID[0])
+		}
+	}
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if requestID := md["request-id"]; len(requestID) > 0 {
+			logger = logger.WithField("request_id", requestID[0])
+		}
 	}
 	return log.NewContext(ctx, logger.WithFields(log.Fields(
 		"grpc_service", service,

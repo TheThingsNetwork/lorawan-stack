@@ -45,5 +45,5 @@ func Example() {
 	}
 
 	// Output:
-	// error:pkg/errorsv3_test:could_not_create_device
+	// error:pkg/errorsv3_test:could_not_create_device (Could not create Device)
 }

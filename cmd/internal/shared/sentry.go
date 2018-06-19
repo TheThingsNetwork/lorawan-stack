@@ -33,6 +33,7 @@ func SentryMiddleware(c config.ServiceBase) (log.Middleware, error) {
 	if err != nil {
 		return nil, err
 	}
+	s.SetIncludePaths([]string{"go.thethings.network/lorawan-stack"})
 
 	return sentry.New(s), nil
 }

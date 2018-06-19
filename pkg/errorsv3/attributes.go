@@ -19,6 +19,14 @@ import (
 	"reflect"
 )
 
+type attributer interface {
+	Attributes() map[string]interface{}
+}
+
+type publicAttributer interface {
+	PublicAttributes() map[string]interface{}
+}
+
 var errOddKV = DefineInvalidArgument("odd_kv", "Odd number of key-value elements")
 
 func supported(v interface{}) interface{} {
@@ -160,3 +168,35 @@ func (d Definition) Attributes() map[string]interface{} { return nil }
 
 // PublicAttributes are not present in the error definition, so this just returns nil.
 func (d Definition) PublicAttributes() map[string]interface{} { return nil }
+
+// Attributes returns the attributes of the errors, if they implement Attributes().
+// If more than one error is passed, subsequent error attributes will be added if not set.
+func Attributes(err ...error) map[string]interface{} {
+	attributes := make(map[string]interface{})
+	for _, err := range err {
+		if err, ok := err.(attributer); ok {
+			for k, v := range err.Attributes() {
+				if _, ok := attributes[k]; !ok {
+					attributes[k] = v
+				}
+			}
+		}
+	}
+	return attributes
+}
+
+// PublicAttributes returns the public attributes of the errors, if they implement PublicAttributes().
+// If more than one error is passed, subsequent error attributes will be added if not set.
+func PublicAttributes(err ...error) map[string]interface{} {
+	attributes := make(map[string]interface{})
+	for _, err := range err {
+		if err, ok := err.(publicAttributer); ok {
+			for k, v := range err.PublicAttributes() {
+				if _, ok := attributes[k]; !ok {
+					attributes[k] = v
+				}
+			}
+		}
+	}
+	return attributes
+}

@@ -103,12 +103,15 @@ func New(ctx context.Context, config Config) (*Server, error) {
 	server.HTTPErrorHandler = ErrorHandler
 
 	server.Use(
-		middleware.Log(logger.WithField("namespace", "web")),
 		middleware.ID(config.IDPrefix),
 		cookie.Cookies(config.BlockKey, config.HashKey),
 	)
 
-	group := server.Group("", middleware.Normalize(config.NormalizationMode))
+	group := server.Group(
+		"",
+		middleware.Log(logger.WithField("namespace", "web")),
+		middleware.Normalize(config.NormalizationMode),
+	)
 
 	return &Server{
 		RouterGroup: &Group{

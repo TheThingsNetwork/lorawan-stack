@@ -16,7 +16,6 @@ package component
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -54,7 +53,7 @@ func (c *Component) setupGRPC() (err error) {
 	for _, sub := range c.grpcSubsystems {
 		sub.RegisterHandlers(c.grpc.ServeMux, c.loopback)
 	}
-	c.web.Any(fmt.Sprintf("%s/*", rpcserver.APIPrefix), echo.WrapHandler(http.StripPrefix(rpcserver.APIPrefix, c.grpc)))
+	c.web.RootGroup(rpcserver.APIPrefix).Any("/*", echo.WrapHandler(http.StripPrefix(rpcserver.APIPrefix, c.grpc)))
 	return nil
 }
 

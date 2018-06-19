@@ -41,7 +41,8 @@ func ID(prefix string) echo.MiddlewareFunc {
 					return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Failed to generate request ID: %s", err))
 				}
 			}
-
+			c.Request().Header.Set("X-Request-ID", id)
+			c.Request().Header.Set("Grpc-Metadata-Request-ID", id)
 			c.Response().Header().Set("X-Request-ID", id)
 			return next(c)
 		}
