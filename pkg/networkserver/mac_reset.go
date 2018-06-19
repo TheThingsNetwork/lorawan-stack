@@ -17,23 +17,24 @@ package networkserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_ResetInd, fp *ttnpb.FrequencyPlan) error {
+func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_ResetInd, fps *frequencyplans.Store) error {
+	if !dev.ABP {
+		return nil
+	}
+
 	if pld == nil {
 		return common.ErrMissingPayload.New(nil)
 	}
 
-	band, err := band.GetByID(fp.GetBandID())
-	if err != nil {
+	if err := resetMACState(fps, dev); err != nil {
 		return err
 	}
 
-	dev.MACState = newMACState(&band, uint32(dev.GetMaxTxPower()), fp.DwellTime != nil)
-	dev.MACStateDesired = dev.MACState
 	dev.QueuedMACCommands = append(
 		dev.QueuedMACCommands,
 		(&ttnpb.MACCommand_ResetConf{

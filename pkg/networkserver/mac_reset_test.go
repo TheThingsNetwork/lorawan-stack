@@ -15,24 +15,37 @@
 package networkserver
 
 import (
+	"os"
 	"testing"
 
 	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/band"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+var frequencyPlansStore *frequencyplans.Store
+
+func TestMain(t *testing.M) {
+	testFPS := test.Must(test.NewFrequencyPlansStore()).(test.FrequencyPlansStore)
+
+	frequencyPlansStore = (&config.FrequencyPlans{
+		StoreDirectory: testFPS.Directory(),
+	}).Store()
+
+	ret := t.Run()
+
+	test.Must(nil, testFPS.Destroy())
+	os.Exit(ret)
+}
+
 func TestHandleResetInd(t *testing.T) {
-	frequencyPlan := ttnpb.NewPopulatedFrequencyPlan(test.Randy, false)
-
-	band := test.Must(band.GetByID(frequencyPlan.GetBandID())).(band.Band)
-
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
@@ -40,30 +53,42 @@ func TestHandleResetInd(t *testing.T) {
 		Error            error
 	}{
 		{
-			Name:     "nil payload",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Payload:  nil,
-			Error:    common.ErrMissingPayload.New(nil),
+			Name: "nil payload",
+			Device: &ttnpb.EndDevice{
+				ABP: true,
+			},
+			Expected: &ttnpb.EndDevice{
+				ABP: true,
+			},
+			Payload: nil,
+			Error:   common.ErrMissingPayload.New(nil),
 		},
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				MaxTxPower:        42,
+				ABP:               true,
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				MaxEIRP:           42,
 				MACState:          ttnpb.NewPopulatedMACState(test.Randy, false),
 				MACStateDesired:   ttnpb.NewPopulatedMACState(test.Randy, false),
 				QueuedMACCommands: []*ttnpb.MACCommand{},
 			},
-			Expected: &ttnpb.EndDevice{
-				MaxTxPower:      42,
-				MACState:        NewMACState(&band, 42, frequencyPlan.DwellTime != nil),
-				MACStateDesired: NewMACState(&band, 42, frequencyPlan.DwellTime != nil),
-				QueuedMACCommands: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_ResetConf{
-						MinorVersion: 1,
-					}).MACCommand(),
-				},
-			},
+			Expected: func() *ttnpb.EndDevice {
+				dev := &ttnpb.EndDevice{
+					ABP:             true,
+					FrequencyPlanID: test.EUFrequencyPlanID,
+					MaxEIRP:         42,
+					QueuedMACCommands: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_ResetConf{
+							MinorVersion: 1,
+						}).MACCommand(),
+					},
+				}
+				if err := ResetMACState(frequencyPlansStore, dev); err != nil {
+					panic(errors.NewWithCause(err, "failed to reset MACState"))
+				}
+				return dev
+			}(),
 			Payload: &ttnpb.MACCommand_ResetInd{
 				MinorVersion: 1,
 			},
@@ -72,7 +97,9 @@ func TestHandleResetInd(t *testing.T) {
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				MaxTxPower:      42,
+				ABP:             true,
+				FrequencyPlanID: test.EUFrequencyPlanID,
+				MaxEIRP:         42,
 				MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
 				MACStateDesired: ttnpb.NewPopulatedMACState(test.Randy, false),
 				QueuedMACCommands: []*ttnpb.MACCommand{
@@ -83,6 +110,7 @@ func TestHandleResetInd(t *testing.T) {
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
+					ABP:             true,
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					MaxEIRP:         42,
 					QueuedMACCommands: []*ttnpb.MACCommand{
@@ -110,7 +138,7 @@ func TestHandleResetInd(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleResetInd(test.Context(), dev, tc.Payload, frequencyPlan)
+			err := handleResetInd(test.Context(), dev, tc.Payload, frequencyPlansStore)
 			if tc.Error != nil {
 				a.So(err, should.DescribeError, errors.Descriptor(tc.Error))
 			} else {

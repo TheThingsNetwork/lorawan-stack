@@ -18,7 +18,7 @@ import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
 func handleMACResponse(cid ttnpb.MACCommandIdentifier, f func(*ttnpb.MACCommand), cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, error) {
 	for i, cmd := range cmds {
-		if cmd.CID() != cid {
+		if cmd.CID != cid {
 			continue
 		}
 		f(cmd)
@@ -36,9 +36,9 @@ outer:
 		last = i
 
 		switch {
-		case first >= 0 && cmd.CID() != cid:
+		case first >= 0 && cmd.CID != cid:
 			break outer
-		case first < 0 && cmd.CID() != cid:
+		case first < 0 && cmd.CID != cid:
 			continue
 		case first < 0:
 			first = i

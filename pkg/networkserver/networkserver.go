@@ -1012,14 +1012,10 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 
 outer:
 	for _, cmd := range cmds {
-		cid := cmd.CID()
+		cid := cmd.CID
 		switch cid {
 		case ttnpb.CID_RESET:
-			fp, err := ns.Component.FrequencyPlans.GetByID(dev.GetFrequencyPlanID())
-			if err != nil {
-				return common.ErrCorruptRegistry.NewWithCause(nil, err)
-			}
-			err = handleResetInd(ctx, dev.EndDevice, cmd.GetResetInd(), &fp)
+			err = handleResetInd(ctx, dev.EndDevice, cmd.GetResetInd(), ns.Component.FrequencyPlans)
 		case ttnpb.CID_LINK_CHECK:
 			err = handleLinkCheckReq(ctx, dev.EndDevice, msg)
 		case ttnpb.CID_LINK_ADR:
@@ -1062,7 +1058,7 @@ outer:
 				logger.WithField("cid", cid).Warn("Unknown MAC command received, skipping the rest...")
 				break outer
 			}
-			err = h.(MACHandler)(ctx, dev.EndDevice, cmd.GetProprietary().GetRawPayload(), msg)
+			err = h.(MACHandler)(ctx, dev.EndDevice, cmd.GetRawPayload(), msg)
 		}
 		if err != nil {
 			logger.WithField("cid", cid).WithError(err).Warn("Failed to process MAC command")

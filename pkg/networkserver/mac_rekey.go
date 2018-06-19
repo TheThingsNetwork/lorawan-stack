@@ -22,6 +22,10 @@ import (
 )
 
 func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RekeyInd) error {
+	if dev.ABP {
+		return nil
+	}
+
 	if pld == nil {
 		return common.ErrMissingPayload.New(nil)
 	}
