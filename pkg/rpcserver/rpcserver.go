@@ -32,11 +32,11 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/grpcerrors"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/fillcontext"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/sentry"
-	"go.thethings.network/lorawan-stack/pkg/rpcserver/internal/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
@@ -184,9 +184,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	}
 	server.Server = grpc.NewServer(append(baseOptions, options.serverOptions...)...)
 	server.ServeMux = runtime.NewServeMux(
-		runtime.WithMarshalerOption("*", &jsonpb.GoGoJSONPb{
-			OrigName: true,
-		}),
+		runtime.WithMarshalerOption("*", jsonpb.TTN()),
 		runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
 	)
 	return server
