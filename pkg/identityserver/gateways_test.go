@@ -25,12 +25,15 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc/metadata"
 )
+
+const newConfigurationTimeout = 5 * time.Second
 
 var _ ttnpb.IsGatewayServer = new(gatewayService)
 
@@ -124,82 +127,113 @@ func newPullConfigurationServer() *pullConfigurationServer {
 }
 
 func TestPullConfiguration(t *testing.T) {
-	a := assertions.New(t)
 	is := newTestIS(t)
 
 	user := newTestUsers()["bob"]
 	userCtx := newTestCtx(user.UserIdentifiers)
 
-	gtw := *ttnpb.NewPopulatedGateway(test.Randy, false)
-	gtw.Platform = "Kerlink iBTS"
-
-	_, err := is.gatewayService.CreateGateway(userCtx, &ttnpb.CreateGatewayRequest{
-		Gateway: gtw,
-	})
-	a.So(err, should.BeNil)
-
-	apiKeyRequest := ttnpb.NewPopulatedGenerateGatewayAPIKeyRequest(test.Randy, false)
-	apiKeyRequest.GatewayIdentifiers = gtw.GatewayIdentifiers
-	apiKeyRequest.Rights = []ttnpb.Right{
-		ttnpb.RIGHT_GATEWAY_INFO,
-		ttnpb.RIGHT_GATEWAY_LINK,
-	}
-	key, err := is.userService.GenerateGatewayAPIKey(userCtx, apiKeyRequest)
-	a.So(err, should.BeNil)
-
-	authString := fmt.Sprintf("Bearer %s", key.GetKey())
-	gtwCtx := metadata.NewIncomingContext(userCtx, metadata.MD{
-		"id":            []string{gtw.GatewayIdentifiers.UniqueID(userCtx)},
-		"authorization": []string{authString},
-	})
-
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-
-	stream := newPullConfigurationServer()
-	pullConfigCtx, cancel := context.WithCancel(gtwCtx)
-	stream.ctx = pullConfigCtx
-
-	go func() {
-		err := is.gatewayService.PullConfiguration(&ttnpb.PullConfigurationRequest{
-			GatewayIdentifiers: gtw.GatewayIdentifiers,
-		}, stream)
-		a.So(err, should.Equal, context.Canceled)
-		wg.Done()
+	oldCooldown := updateDebounce
+	updateDebounce = time.Duration(0)
+	defer func() {
+		updateDebounce = oldCooldown
 	}()
 
-	select {
-	case cfg := <-stream.gtwConfigs:
-		a.So(cfg.GetAntennas(), should.HaveLength, len(gtw.GetAntennas()))
-		a.So(cfg.GetDisableTxDelay(), should.Equal, gtw.GetDisableTxDelay())
-		a.So(cfg.GetPlatform(), should.Equal, "Kerlink iBTS")
-	case <-time.After(5 * time.Second):
-		t.Fatal("Did not receive initial config after 5 seconds")
-	}
+	for _, tc := range []struct {
+		name  string
+		paths []string
 
-	_, err = is.gatewayService.UpdateGateway(userCtx, &ttnpb.UpdateGatewayRequest{
-		Gateway: ttnpb.Gateway{
-			GatewayIdentifiers: gtw.GatewayIdentifiers,
-			Platform:           "Kerlink Wirnet Station",
+		afterUpdateReception func(a *assertions.Assertion, sent, received *ttnpb.Gateway)
+	}{
+		{
+			name:  "EmptyFieldPath",
+			paths: []string{},
+			afterUpdateReception: func(a *assertions.Assertion, _, received *ttnpb.Gateway) {
+				a.So(received.GetAntennas(), should.HaveLength, 0)
+				a.So(received.GetDisableTxDelay(), should.Equal, false)
+				a.So(received.GetPlatform(), should.Equal, "")
+				a.So(received.GetFrequencyPlanID(), should.Equal, "")
+			},
 		},
-		UpdateMask: pbtypes.FieldMask{
-			Paths: []string{"platform"},
+		{
+			name:  "PopulatedFieldPath",
+			paths: []string{"platform"},
+			afterUpdateReception: func(a *assertions.Assertion, sent, received *ttnpb.Gateway) {
+				a.So(received.GetDisableTxDelay(), should.BeFalse)
+				a.So(received.GetFrequencyPlanID(), should.Equal, "")
+				a.So(sent.GetPlatform(), should.Equal, received.GetPlatform())
+			},
 		},
-	})
-	a.So(err, should.BeNil)
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			a := assertions.New(t)
 
-	select {
-	case cfg := <-stream.gtwConfigs:
-		a.So(cfg.GetAntennas(), should.HaveLength, len(gtw.GetAntennas()))
-		a.So(cfg.GetDisableTxDelay(), should.Equal, gtw.GetDisableTxDelay())
-		a.So(cfg.GetPlatform(), should.Equal, "Kerlink Wirnet Station")
-	case <-time.After(5 * time.Second):
-		t.Fatal("Did not receive updated config after 5 seconds")
+			gtw := *ttnpb.NewPopulatedGateway(test.Randy, false)
+			_, err := is.gatewayService.CreateGateway(userCtx, &ttnpb.CreateGatewayRequest{
+				Gateway: gtw,
+			})
+			a.So(err, should.BeNil)
+
+			apiKeyRequest := &ttnpb.GenerateGatewayAPIKeyRequest{
+				Name:               tc.name,
+				GatewayIdentifiers: gtw.GatewayIdentifiers,
+				Rights:             []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_LINK},
+			}
+			key, err := is.userService.GenerateGatewayAPIKey(userCtx, apiKeyRequest)
+			a.So(err, should.BeNil)
+
+			authString := fmt.Sprintf("Bearer %s", key.GetKey())
+			gtwCtx := metadata.NewIncomingContext(userCtx, metadata.MD{
+				"id":            []string{gtw.GatewayIdentifiers.UniqueID(userCtx)},
+				"authorization": []string{authString},
+			})
+
+			wg := sync.WaitGroup{}
+			wg.Add(1)
+
+			stream := newPullConfigurationServer()
+			pullConfigCtx, cancel := context.WithCancel(gtwCtx)
+			stream.ctx = pullConfigCtx
+
+			go func() {
+				err := is.gatewayService.PullConfiguration(&ttnpb.PullConfigurationRequest{
+					GatewayIdentifiers: gtw.GatewayIdentifiers,
+					ProjectionMask: &pbtypes.FieldMask{
+						Paths: tc.paths,
+					},
+				}, stream)
+				a.So(err, should.Equal, context.Canceled)
+				wg.Done()
+			}()
+
+			select {
+			case cfg := <-stream.gtwConfigs:
+				tc.afterUpdateReception(a, &gtw, cfg)
+			case <-time.After(5 * time.Second):
+				t.Fatal("Did not receive initial config after 5 seconds")
+			}
+
+			updatedGtw := *ttnpb.NewPopulatedGateway(test.Randy, false)
+			updatedGtw.GatewayIdentifiers = gtw.GatewayIdentifiers
+			_, err = is.gatewayService.UpdateGateway(userCtx, &ttnpb.UpdateGatewayRequest{
+				Gateway: updatedGtw,
+				UpdateMask: pbtypes.FieldMask{
+					Paths: []string{"antennas", "disable_tx_delay", "platform", "frequency_plan_id"},
+				},
+			})
+			a.So(err, should.BeNil)
+
+			select {
+			case received := <-stream.gtwConfigs:
+				tc.afterUpdateReception(a, &updatedGtw, received)
+			case <-time.After(5 * time.Second):
+				t.Fatal("Did not receive updated config after 5 seconds")
+			}
+
+			cancel()
+
+			wg.Wait()
+		})
 	}
-
-	cancel()
-
-	wg.Wait()
 }
 
 func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
@@ -400,4 +434,67 @@ func testGateways(t *testing.T, gids, sids ttnpb.GatewayIdentifiers) {
 
 	_, err = is.gatewayService.DeleteGateway(ctx, &sids)
 	a.So(err, should.BeNil)
+}
+
+type dummyEvent struct {
+	t *testing.T
+
+	name        string
+	data        interface{}
+	identifiers *ttnpb.CombinedIdentifiers
+}
+
+func (d dummyEvent) Context() context.Context {
+	return log.NewContext(context.Background(), test.GetLogger(d.t))
+}
+
+func (d dummyEvent) Name() string {
+	return d.name
+}
+
+func (d dummyEvent) Identifiers() *ttnpb.CombinedIdentifiers {
+	return d.identifiers
+}
+
+func (d dummyEvent) Data() interface{} {
+	return d.data
+}
+
+func (d dummyEvent) Time() time.Time          { panic("not implemented") }
+func (d dummyEvent) CorrelationIDs() []string { panic("not implemented") }
+func (d dummyEvent) Origin() string           { panic("not implemented") }
+func (d dummyEvent) Caller() string           { panic("not implemented") }
+
+func TestUpdateNotification(t *testing.T) {
+	a := assertions.New(t)
+
+	s := &gatewayService{
+		pullConfigChans: make(map[string]chan []string),
+	}
+	gtwIDs := &ttnpb.GatewayIdentifiers{
+		GatewayID: "hello",
+	}
+	subscription := make(chan []string, 1)
+	s.pullConfigChans[gtwIDs.UniqueID(context.Background())] = subscription
+
+	// Sending []string
+	for _, data := range []interface{}{
+		[]string{"platform"},
+		[]interface{}{"platform"},
+	} {
+		go s.Notify(dummyEvent{
+			t:    t,
+			name: "is.gateway.update",
+			data: data,
+			identifiers: &ttnpb.CombinedIdentifiers{
+				GatewayIDs: []*ttnpb.GatewayIdentifiers{gtwIDs},
+			},
+		})
+		select {
+		case updatedFields := <-subscription:
+			a.So(updatedFields, should.Contain, "platform")
+		case <-time.After(newConfigurationTimeout):
+			t.Fatal("No new subscription received")
+		}
+	}
 }

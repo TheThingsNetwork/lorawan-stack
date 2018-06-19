@@ -14,7 +14,10 @@
 
 package identityserver
 
-import "go.thethings.network/lorawan-stack/pkg/errors"
+import (
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	errorsv3 "go.thethings.network/lorawan-stack/pkg/errorsv3"
+)
 
 func init() {
 	ErrBlacklistedID.Register()
@@ -117,9 +120,8 @@ var ErrUnmanageableOrganization = &errors.ErrDescriptor{
 	SafeAttributes: []string{"organization_id", "missing_rights"},
 }
 
-// ErrOtherPullConfigurationStreamOpened is returned when another PullConfiguration stream was opened.
-var ErrOtherPullConfigurationStreamOpened = &errors.ErrDescriptor{
-	MessageFormat: "Another `PullConfiguration` stream opened",
-	Code:          11,
-	Type:          errors.Conflict,
-}
+var (
+	errOtherPullConfigurationStreamOpened = errorsv3.DefineAborted("other_pull_configuration_stream_opened", "another `PullConfiguration` stream opened")
+
+	errWrongGatewayForAPIKey = errorsv3.DefinePermissionDenied("wrong_gateway_for_api_key", "api key has no rights for gateway `{gateway_id}`")
+)

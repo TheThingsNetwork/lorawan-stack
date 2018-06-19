@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"math"
 	"sync"
 	"time"
 
@@ -29,18 +30,24 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-// GatewayGeneratedFields are the fields that are automatically generated.
-var GatewayGeneratedFields = []string{
-	"CreatedAt",
-	"UpdatedAt",
-	"Gateway.CreatedAt",
-	"Gateway.UpdatedAt",
-}
+const forever = time.Duration(math.MaxInt64)
+
+var (
+	updateDebounce = 10 * time.Second
+	// GatewayGeneratedFields are the fields that are automatically generated.
+	GatewayGeneratedFields = []string{
+		"CreatedAt",
+		"UpdatedAt",
+		"Gateway.CreatedAt",
+		"Gateway.UpdatedAt",
+	}
+)
 
 type gatewayService struct {
 	*IdentityServer
 
-	*gtwConfigPusher
+	pullConfigMu    sync.RWMutex
+	pullConfigChans map[string]chan []string
 }
 
 // CreateGateway creates a gateway in the network, sets the user as collaborator
@@ -164,7 +171,8 @@ func (s *gatewayService) ListGateways(ctx context.Context, req *ttnpb.ListGatewa
 	return resp, nil
 }
 
-func copyGatewayFields(origin, recipient *ttnpb.Gateway, paths []string) error {
+func copyGatewayFields(recipient, origin *ttnpb.Gateway, paths []string) error {
+	// TODO: Make this function faster https://github.com/TheThingsIndustries/ttn/pull/851#discussion_r197744927
 	for _, path := range paths {
 		switch {
 		case ttnpb.FieldPathGatewayDescription.MatchString(path):
@@ -227,7 +235,7 @@ func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGat
 
 		fieldsMask := req.GetUpdateMask()
 		paths := fieldsMask.GetPaths()
-		if err := copyGatewayFields(&req.Gateway, gtw, paths); err != nil {
+		if err := copyGatewayFields(gtw, &req.Gateway, paths); err != nil {
 			return err
 		}
 
@@ -488,18 +496,14 @@ func (s *gatewayService) ListGatewayRights(ctx context.Context, req *ttnpb.Gatew
 	return resp, nil
 }
 
-func (s *gatewayService) getGatewayWithFields(ids ttnpb.GatewayIdentifiers, fieldMask *pbtypes.FieldMask) (*ttnpb.Gateway, error) {
+func (s *gatewayService) getGatewayWithFields(ids ttnpb.GatewayIdentifiers, paths []string) (*ttnpb.Gateway, error) {
 	found, err := s.store.Gateways.GetByID(ids, s.specializers.Gateway)
 	if err != nil {
 		return nil, err
 	}
 	gtw := found.GetGateway()
-	if fieldMask == nil || len(fieldMask.GetPaths()) == 0 {
-		return gtw, nil
-	}
-
 	toSend := &ttnpb.Gateway{}
-	if err = copyGatewayFields(gtw, toSend, fieldMask.GetPaths()); err != nil {
+	if err = copyGatewayFields(toSend, gtw, paths); err != nil {
 		return nil, err
 	}
 	return toSend, nil
@@ -511,76 +515,113 @@ func (s *gatewayService) PullConfiguration(req *ttnpb.PullConfigurationRequest, 
 	if err != nil {
 		return err
 	}
-
+	gtwIDs := ad.GatewayIdentifiers()
+	if !gtwIDs.Contains(req.GatewayIdentifiers) {
+		return errWrongGatewayForAPIKey.WithAttributes("gateway_id", gtwIDs.GetGatewayID())
+	}
 	if !ad.HasRights(ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_LINK) {
 		return common.ErrPermissionDenied.New(nil)
 	}
 
-	uid := ad.GatewayIdentifiers().UniqueID(ctx)
-
-	gtw, err := s.getGatewayWithFields(ad.GatewayIdentifiers(), req.GetProjectionMask())
+	gtw, err := s.getGatewayWithFields(gtwIDs, req.GetProjectionMask().GetPaths())
 	if err != nil {
 		return err
 	}
-
 	if err := stream.Send(gtw); err != nil {
 		return err
 	}
 
-	gtwConfigs := s.gtwConfigPusher.subscribe(ctx, uid)
+	updateCh := make(chan []string, 1)
+	uid := gtwIDs.UniqueID(ctx)
+	s.pullConfigMu.Lock()
+	if existing, ok := s.pullConfigChans[uid]; ok {
+		close(existing)
+	}
+	s.pullConfigChans[uid] = updateCh
+	s.pullConfigMu.Unlock()
+
+	defer func() {
+		s.pullConfigMu.Lock()
+		if existing, ok := s.pullConfigChans[uid]; ok && existing == updateCh {
+			// If we did not get kicked by another PullConfiguration:
+			delete(s.pullConfigChans, uid)
+		}
+		s.pullConfigMu.Unlock()
+	}()
+
+	t := time.NewTimer(forever)
+	accumulatedFields := map[string]bool{}
+	var requestedPaths []string
+	if req.GetProjectionMask() != nil {
+		requestedPaths = req.GetProjectionMask().GetPaths()
+	}
+
 	for {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case _, ok := <-gtwConfigs:
-			if !ok {
-				return ErrOtherPullConfigurationStreamOpened.New(nil)
+		case <-t.C:
+			pathsIntersection := []string{}
+			for _, requestedPath := range requestedPaths {
+				if ok := accumulatedFields[requestedPath]; ok {
+					pathsIntersection = append(pathsIntersection, requestedPath)
+				}
 			}
-			newConfig, err := s.getGatewayWithFields(ad.GatewayIdentifiers(), req.GetProjectionMask())
+			newConfig, err := s.getGatewayWithFields(gtwIDs, pathsIntersection)
 			if err != nil {
-				continue
+				return err
 			}
 			if err := stream.Send(newConfig); err != nil {
 				return err
 			}
+			accumulatedFields = map[string]bool{}
+		case updatedFields, ok := <-updateCh:
+			if !ok {
+				return errOtherPullConfigurationStreamOpened
+			}
+			for _, updatedField := range updatedFields {
+				accumulatedFields[updatedField] = true
+			}
+			t.Reset(updateDebounce)
 		}
 	}
 }
 
-type gtwConfigPusher struct {
-	*gatewayService
-
-	subscriptionsMu sync.RWMutex
-	subscriptions   map[string]chan struct{}
-}
-
-func (c *gtwConfigPusher) subscribe(ctx context.Context, gatewayUID string) chan struct{} {
-	newSubscription := make(chan struct{})
-	c.subscriptionsMu.Lock()
-	if oldSubscription, ok := c.subscriptions[gatewayUID]; ok {
-		close(oldSubscription)
-	}
-	c.subscriptions[gatewayUID] = newSubscription
-	c.subscriptionsMu.Unlock()
-
-	return newSubscription
-}
-
-func (c *gtwConfigPusher) Notify(evt events.Event) {
+func (s *gatewayService) Notify(evt events.Event) {
 	ctx := evt.Context()
-	gtwIDs, ok := evt.Identifiers().(ttnpb.GatewayIdentifiers)
-	if !ok {
-		log.FromContext(ctx).Error("No gateway identifiers found with gateway update event")
-		return
-	}
 
-	uid := gtwIDs.UniqueID(ctx)
-	c.subscriptionsMu.RLock()
-	subscription := c.subscriptions[uid]
-	c.subscriptionsMu.RUnlock()
-	select {
-	case subscription <- struct{}{}:
-	default:
-		log.FromContext(evt.Context()).WithField("gateway_uid", uid).Error("Gateway update signal was not received by PullConfiguration subscription")
+	gtwIDs := evt.Identifiers().GetGatewayIDs()
+	switch evt.Name() {
+	case "is.gateway.update":
+		s.pullConfigMu.RLock()
+		for _, gtwID := range gtwIDs {
+			uid := gtwID.UniqueID(ctx)
+
+			updateCh, ok := s.pullConfigChans[uid]
+			if !ok {
+				continue
+			}
+
+			var fields []string
+			switch newData := evt.Data().(type) {
+			case []string:
+				fields = newData
+			case []interface{}:
+				for _, val := range newData {
+					if str, ok := val.(string); ok {
+						fields = append(fields, str)
+					}
+				}
+			}
+			if len(fields) == 0 {
+				continue
+			}
+			select {
+			case updateCh <- fields:
+			default:
+				log.FromContext(ctx).WithField("gateway_uid", uid).Error("Gateway update was not properly propagated to the gateway")
+			}
+		}
+		s.pullConfigMu.RUnlock()
 	}
 }

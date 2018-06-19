@@ -131,12 +131,15 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 		return nil, err
 	}
 
-	is.userService = &userService{is}
-	is.applicationService = &applicationService{is}
-	is.gatewayService = &gatewayService{IdentityServer: is}
-	is.clientService = &clientService{is}
-	is.adminService = &adminService{is}
-	is.organizationService = &organizationService{is}
+	is.userService = &userService{IdentityServer: is}
+	is.applicationService = &applicationService{IdentityServer: is}
+	is.gatewayService = &gatewayService{
+		IdentityServer:  is,
+		pullConfigChans: make(map[string]chan []string),
+	}
+	is.clientService = &clientService{IdentityServer: is}
+	is.adminService = &adminService{IdentityServer: is}
+	is.organizationService = &organizationService{IdentityServer: is}
 
 	if config.Sendgrid != nil && config.Sendgrid.APIKey != "" {
 		is.email = sendgrid.New(log, *config.Sendgrid)
@@ -189,16 +192,12 @@ func New(c *component.Component, config Config) (*IdentityServer, error) {
 
 	c.RegisterGRPC(is)
 
-	is.gatewayService.gtwConfigPusher = &gtwConfigPusher{
-		gatewayService: is.gatewayService,
-		subscriptions:  make(map[string]chan struct{}),
-	}
-	if err := events.Subscribe("gateway.update", is.gatewayService.gtwConfigPusher); err != nil {
+	if err := events.Subscribe("is.gateway.update", is.gatewayService); err != nil {
 		return nil, errors.NewWithCause(err, "Could not subscribe to gateway configuration updates")
 	}
 	go func() {
 		<-c.Context().Done()
-		events.Unsubscribe("gateway.update", is.gatewayService.gtwConfigPusher)
+		events.Unsubscribe("is.gateway.update", is.gatewayService)
 	}()
 
 	return is, nil
