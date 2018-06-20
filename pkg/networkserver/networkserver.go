@@ -60,7 +60,7 @@ const (
 // newMACState returns new MACState.
 func newMACState(band *band.Band, dwellTime bool) *ttnpb.MACState {
 	return &ttnpb.MACState{
-		MaxTxPower:        uint32(band.DefaultMaxEIRP), // TODO: @egourlao ??
+		MaxTxPower:        band.DefaultMaxEIRP,
 		UplinkDwellTime:   dwellTime,
 		DownlinkDwellTime: dwellTime,
 		ADRNbTrans:        1,
@@ -950,7 +950,9 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		}
 
 		dev.MACState = newMACState(&band, fp.DwellTime != nil)
-		dev.MACState.MaxTxPower = uint32(dev.MaxTxPower)
+		if dev.MACState.MaxTxPower > dev.MaxTxPower {
+			dev.MACState.MaxTxPower = dev.MaxTxPower
+		}
 		dev.MACStateDesired = dev.MACState
 	}
 	dev.MACState.ADRDataRateIndex = msg.Settings.DataRateIndex
@@ -1115,7 +1117,9 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		}
 
 		dev.MACState = newMACState(&band, fp.DwellTime != nil)
-		dev.MACState.MaxTxPower = uint32(dev.MaxTxPower)
+		if dev.MACState.MaxTxPower > dev.MaxTxPower {
+			dev.MACState.MaxTxPower = dev.MaxTxPower
+		}
 		dev.MACState.RxDelay = req.RxDelay
 		dev.MACState.Rx1DataRateOffset = req.DownlinkSettings.Rx1DROffset
 		dev.MACState.Rx2DataRateIndex = req.DownlinkSettings.Rx2DR

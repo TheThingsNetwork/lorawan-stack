@@ -1088,7 +1088,10 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							band := test.Must(band.GetByID(fp.BandID)).(band.Band)
 
 							expected.MACState = NewMACState(&band, fp.DwellTime != nil)
-							expected.MACState.MaxTxPower = uint32(dev.MaxTxPower)
+							expected.MACState.MaxTxPower = band.DefaultMaxEIRP
+							if expected.MACState.MaxTxPower > dev.MaxTxPower {
+								expected.MACState.MaxTxPower = dev.MaxTxPower
+							}
 							expected.MACStateDesired = expected.MACState
 						}
 						expected.MACState.ADRDataRateIndex = msg.Settings.DataRateIndex
@@ -1565,7 +1568,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						stDes := expected.MACStateDesired
 
 						expected.MACState = &ttnpb.MACState{
-							MaxTxPower:        uint32(expected.MaxTxPower),
+							MaxTxPower:        expected.MaxTxPower,
 							UplinkDwellTime:   fp.DwellTime != nil,
 							DownlinkDwellTime: false, // TODO: Get this from band (https://github.com/TheThingsIndustries/ttn/issues/774)
 							ADRNbTrans:        1,

@@ -65,7 +65,7 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	out.FrequencyPlanID = "EU_863_870"
 	out.MinFrequency = uint64(r.Uint32())
 	out.MaxFrequency = uint64(r.Uint32())
-	out.MaxTxPower = uint64(r.Uint32())
+	out.MaxEIRP = r.Float32()
 	out.MACSettings = NewPopulatedMACSettings(r, easy)
 	out.MACInfo = NewPopulatedMACInfo(r, easy)
 	out.MACState = NewPopulatedMACState(r, easy)
@@ -110,7 +110,7 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 
 func NewPopulatedMACState(r randyEndDevice, _ bool) *MACState {
 	out := &MACState{}
-	out.MaxTxPower = r.Uint32()
+	out.MaxEIRP = r.Float32()
 	out.UplinkDwellTime = r.Intn(2) == 0
 	out.DownlinkDwellTime = r.Intn(2) == 0
 	out.ADRDataRateIndex = r.Uint32()
