@@ -110,8 +110,10 @@ func UnmarshalMap(m map[string]interface{}, v interface{}, hooks ...mapstructure
 				}
 				fv = fv.Elem()
 			}
+
+			ft := fv.Type()
 			if fv = fv.FieldByName(sk); !fv.IsValid() {
-				return errors.Errorf("field `%s` specified, but does not exist on structs of type `%s`", sk, fv.Type())
+				return errors.Errorf("field `%s` specified, but does not exist on structs of type `%s`", sk, ft)
 			}
 		}
 
