@@ -15,11 +15,17 @@
 NODE = node
 NPM = npm
 YARN = yarn
-ESLINT ?= ./node_modules/.bin/eslint
-BABEL ?= ./node_modules/.bin/babel
-JSON ?= ./node_modules/.bin/json
-JEST ?= ./node_modules/.bin/jest
-NSP ?= ./node_modules/.bin/nsp
+
+CACHE_DIR ?= .cache
+PUBLIC_DIR ?= public
+CONFIG_DIR ?= config
+BINARIES_DIR ?= ./node_modules/.bin
+
+ESLINT ?= $(BINARIES_DIR)/eslint
+BABEL ?= $(BINARIES_DIR)/babel
+JSON ?= $(BINARIES_DIR)/json
+JEST ?= $(BINARIES_DIR)/jest
+NSP ?= $(BINARIES_DIR)/nsp
 TRANSLATIONS = .cache/make
 
 NODE_ENV ?= production
@@ -27,10 +33,6 @@ NODE_ENV ?= production
 YARN_FLAGS ?= --no-emoji --no-progress
 ESLINT_FLAGS ?= --no-ignore --color
 BABEL_FLAGS ?= -D --ignore '*.test.js'
-
-CACHE_DIR ?= .cache
-PUBLIC_DIR ?= public
-CONFIG_DIR ?= config
 
 SUPPORT_LOCALES ?= en
 

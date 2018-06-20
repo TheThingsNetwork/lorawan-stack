@@ -21,7 +21,7 @@ CONFIG_DIR ?= config
 CACHE_DIR ?= .cache
 
 # Webpack
-WEBPACK ?= ./node_modules/.bin/webpack
+WEBPACK ?= $(BINARIES_DIR)/webpack
 WEBPACK_FLAGS ?= --colors $(if $(CI),,--progress)
 
 # The config file to use for client
