@@ -96,17 +96,6 @@ assets: js.build
 	@go-bindata-assetfs -pkg assets -ignore libs.bundle.js $(PUBLIC_DIR)
 	@mv bindata_assetfs.go pkg/webui/assets
 
-webui: MAIN=./cmd/webui/main.go
-webui: NAME=ttn-webui
-webui: js.build
-webui: $(RELEASE_DIR)/ttn-webui-$(GOOS)-$(GOARCH)
-webui: go.link
-
-webui.dev: go.dev webui
-
-webui.start: webui.dev
-	./release/ttn-webui --assets.dir=public --webui.path=/webui --log.level=debug
-
 UPDATES_FILES = $(GO_MESSAGES_FILE),messages.xlsx
 
 translations: go.translations js.translations
