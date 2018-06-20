@@ -10,26 +10,6 @@ settings:
     onlyFilesWithFlowAnnotation: true
 
 rules:
-  # Forbid unused variables
-  no-unused-vars:
-    - error
-    - args: none
-      caughtErrors: none
-      ignoreRestSiblings: true
-
-  # Disallow use of variables before they are defined
-  no-use-before-define:
-    - warn
-    - functions: false
-      variables: false
-
-  # Make react spacing consistent
-  react/jsx-tag-spacing:
-    - error
-    - closingSlash: never
-      beforeSelfClosing: always
-      afterOpening: never
-
   # Warn on missing JsDoc definitions
   valid-jsdoc:
     - warn
