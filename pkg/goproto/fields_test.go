@@ -111,6 +111,10 @@ func TestGoFieldsPathsEndDevice(t *testing.T) {
 			fields:   []string{"location.latitude"},
 			expected: []string{"Location.Latitude"},
 		},
+		{
+			fields:   []string{"ids.application_ids.application_id"},
+			expected: []string{"EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID"},
+		},
 	} {
 		goFields := goproto.GoFieldsPaths(&field_mask.FieldMask{Paths: tc.fields}, ttnpb.EndDevice{
 			Location: &ttnpb.Location{
