@@ -19,7 +19,7 @@ STORYBOOK_BUILD ?= ./node_modules/.bin/build-storybook
 STORYBOOK_CONFIG ?= config/storybook
 
 # Storybook options
-STORYBOOK_PORT ?= 6006
+STORYBOOK_PORT ?= 9001
 STORYBOOK_OUTPUT ?= stories
 
 # Start the storybook and watch for changes
