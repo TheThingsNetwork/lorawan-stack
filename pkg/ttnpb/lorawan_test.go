@@ -15,7 +15,6 @@
 package ttnpb_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -76,55 +75,5 @@ func TestMACVersionCompare(t *testing.T) {
 		if tc.A != tc.B {
 			a.So(tc.B.Compare(tc.A), should.Equal, -tc.Expected)
 		}
-	}
-}
-
-func TestStringers(t *testing.T) {
-	for _, tc := range []struct {
-		Stringer fmt.Stringer
-		String   string
-	}{
-		{
-			Stringer: MAC_V1_0,
-			String:   "1.0.0",
-		},
-		{
-			Stringer: MAC_V1_0_1,
-			String:   "1.0.1",
-		},
-		{
-			Stringer: MAC_V1_0_2,
-			String:   "1.0.2",
-		},
-		{
-			Stringer: MAC_V1_1,
-			String:   "1.1.0",
-		},
-		{
-			Stringer: PHY_V1_0,
-			String:   "1.0.0",
-		},
-		{
-			Stringer: PHY_V1_0_1,
-			String:   "1.0.1",
-		},
-		{
-			Stringer: PHY_V1_0_2_REV_A,
-			String:   "1.0.2-a",
-		},
-		{
-			Stringer: PHY_V1_0_2_REV_B,
-			String:   "1.0.2-b",
-		},
-		{
-			Stringer: PHY_V1_1_REV_A,
-			String:   "1.1.0-a",
-		},
-		{
-			Stringer: PHY_V1_1_REV_B,
-			String:   "1.1.0-b",
-		},
-	} {
-		assertions.New(t).So(tc.Stringer.String(), should.Equal, tc.String)
 	}
 }
