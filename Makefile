@@ -14,7 +14,7 @@
 
 HEADER_EXTRA_FILES = Makefile
 
-PRE_COMMIT = headers.check-staged js.lint-staged
+PRE_COMMIT = headers.check-staged js.lint-staged styl.lint-staged
 COMMIT_MSG = git.commit-msg-log git.commit-msg-length git.commit-msg-empty git.commit-msg-prefix git.commit-msg-phrase git.commit-msg-casing
 
 SUPPORT_LOCALES = en
