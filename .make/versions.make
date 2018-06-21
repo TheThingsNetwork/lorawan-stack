@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-JSON=./node_modules/.bin/json
-CURRENT_VERSION ?= $(GIT_TAG)
+CURRENT_VERSION := $(shell echo $(GIT_TAG) | cut -c2-)
 
 pkg/version/ttn.go: VERSION ?= $(CURRENT_VERSION)
 pkg/version/ttn.go: .FORCE
@@ -24,13 +23,9 @@ pkg/version/ttn.go: .FORCE
 	@echo "// TTN Version" >> pkg/version/ttn.go
 	@echo "const TTN = \"v$(VERSION)-dev\"" >> pkg/version/ttn.go
 
-version.bump-package-json: VERSION ?= $(CURRENT_VERSION)
-version.bump-package-json:
+package.json: VERSION ?= $(CURRENT_VERSION)
+package.json: .FORCE
 	$(JSON) -f package.json -I -e "this.version=\"$(VERSION)\""
-	git add pkg/version/ttn.go package.json
-	git commit -m "all: Bump version to $(VERSION)"
-	git tag -a -s -f -m "Version $(VERSION)" "v$(VERSION)"
-	@$(log) "Bumped to v$(VERSION)"
 
 version.bump.major: BUMP=major
 version.bump.major: version.bump
@@ -48,9 +43,12 @@ version._override:
 	$(eval CURRENT_VERSION := $(VERSION))
 
 version.bump: VERSION = $(shell $(GO) run .make/bump.go "$(CURRENT_VERSION)" "$(BUMP)")
-version.bump: version._override pkg/version/ttn.go version.bump-package-json
-	@if [[ ! -z "`git status -s | grep -v 'pkg/version/ttn.go'`" ]]; then \
+version.bump: version._override pkg/version/ttn.go package.json
+	@if [[ ! -z "`git status -s | grep -v 'pkg/version/ttn.go' | grep -v 'package.json'`" ]]; then \
 		$(err) "Working tree not clean"; \
 		exit 1; \
 	fi
-
+	git add pkg/version/ttn.go package.json
+	git commit -m "all: Bump version to $(VERSION)"
+	git tag -a -s -f -m "Version $(VERSION)" "v$(VERSION)"
+	@$(log) "Bumped to v$(VERSION)"

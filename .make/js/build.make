@@ -54,7 +54,7 @@ js.webpack-main:
 	@$(log) "building client [webpack -c $(WEBPACK_CONFIG_BUILT) $(WEBPACK_FLAGS)]"
 	@$(JS_ENV) $(WEBPACK) --config $(WEBPACK_CONFIG_BUILT) $(WEBPACK_FLAGS)
 
-$(PUBLIC_DIR)/console.html: $(WEBPACK_CONFIG_BUILT) $(shell $(JS_SRC_FILES)) $(JS_SRC_DIR)/index.html package.json yarn.lock
+$(PUBLIC_DIR)/console.html: $(WEBPACK_CONFIG_BUILT) $(shell $(JS_SRC_FILES)) $(JS_SRC_DIR)/index.html yarn.lock
 	$(MAKE) js.webpack-main
 
 # build in dev mode
@@ -67,7 +67,7 @@ DLL_OUTPUT ?= $(PUBLIC_DIR)/libs.bundle.js
 DLL_CONFIG_BUILT = $(subst $(CONFIG_DIR),$(CACHE_DIR)/config,$(DLL_CONFIG))
 
 # DLL for faster dev builds
-$(DLL_OUTPUT): $(DLL_CONFIG_BUILT) package.json yarn.lock
+$(DLL_OUTPUT): $(DLL_CONFIG_BUILT) yarn.lock
 	$(MAKE) js.webpack-dll
 
 js.webpack-dll:
