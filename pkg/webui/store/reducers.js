@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { combineReducers } from "redux"
-import { Map } from "immutable"
-import bind from "autobind-decorator"
+import { combineReducers } from 'redux'
+import { Map } from 'immutable'
+import bind from 'autobind-decorator'
 
 // Reducers is a helper for managing reducers, injecting asynchronously
 // loaded reducers on the fly.

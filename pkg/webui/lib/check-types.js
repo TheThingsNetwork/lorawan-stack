@@ -15,7 +15,7 @@
 // based on https://github.com/facebook/prop-types/blob/master/checkPropTypes.js
 
 // sigh...
-import secret from "prop-types/lib/ReactPropTypesSecret"
+import secret from 'prop-types/lib/ReactPropTypesSecret'
 
 /**
  * Assert that the values match with the type specs.
@@ -31,7 +31,7 @@ export default function (specs, values, location, component) {
     try {
       // This is intentionally an invariant that gets caught. It's the same
       // behavior as without this statement except with a better message.
-      if (typeof specs[key] !== "function") {
+      if (typeof specs[key] !== 'function') {
         throw new TypeError(`${component}: ${location} type \`${key}\` is invalid; it must be a function, usually from the prop-types package, but received \`${typeof specs[key]}\`.'`)
       }
 

@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import XLSX from "xlsx-style"
+import XLSX from 'xlsx-style'
 
-const ID = "ID"
-const Description = "Description"
-const Default = "Default message"
+const ID = 'ID'
+const Description = 'Description'
+const Default = 'Default message'
 
 /**
  * parse an xlsx document into a locales object.
@@ -31,11 +31,11 @@ const unmarshal = function (buf) {
 
   const messages =
     Object.keys(sheet)
-      .filter(key => key[0] !== "!")
+      .filter(key => key[0] !== '!')
       .map(function (addr) {
         const cell = sheet[addr]
-        const colHeaderAddr = addr.replace(/[A-Z]+/, "A")
-        const rowHeaderAddr = addr.replace(/[0-9]+/, "1")
+        const colHeaderAddr = addr.replace(/[A-Z]+/, 'A')
+        const rowHeaderAddr = addr.replace(/[0-9]+/, '1')
 
         const colHeader = sheet[colHeaderAddr]
         const rowHeader = sheet[rowHeaderAddr]
@@ -62,7 +62,7 @@ const unmarshal = function (buf) {
         const merged = acc[message.id] || { id: message.id, locales: {}}
 
         Object.keys(message).forEach(function (key) {
-          if (key === "id" || key === "defaultMessage" || key === "description") {
+          if (key === 'id' || key === 'defaultMessage' || key === 'description') {
             merged[key] = message[key]
             return
           }
@@ -107,17 +107,17 @@ const marshal = function (messages) {
     },
     border: {
       bottom: {
-        style: "medium",
-        color: { auto: "1" },
+        style: 'medium',
+        color: { auto: '1' },
       },
     },
     alignment: {
-      vertical: "center",
-      horizontal: "left",
+      vertical: 'center',
+      horizontal: 'left',
     },
   }
 
-  const emptyStyle = { fill: { fgColor: { rgb: "fec7ce" }}}
+  const emptyStyle = { fill: { fgColor: { rgb: 'fec7ce' }}}
 
   titles.forEach(function (name, i) {
     maxCol = Math.max(maxCol, i)
@@ -126,33 +126,33 @@ const marshal = function (messages) {
       c: i,
     })
     ws[addr] = {
-      t: "s",
+      t: 's',
       v: name,
       s: titleStyle,
     }
   })
 
-  ws["!cols"] = [
+  ws['!cols'] = [
     {
-      width: "25",
-      style: "1",
-      customWidth: "1",
+      width: '25',
+      style: '1',
+      customWidth: '1',
       wpx: 100,
       wch: 24.17,
       MDW: 6,
     },
     {
-      width: "25",
-      style: "1",
-      customWidth: "1",
+      width: '25',
+      style: '1',
+      customWidth: '1',
       wpx: 200,
       wch: 24.17,
       MDW: 6,
     },
     {
-      width: "25",
-      style: "1",
-      customWidth: "1",
+      width: '25',
+      style: '1',
+      customWidth: '1',
       wpx: 200,
       wch: 24.17,
       MDW: 6,
@@ -167,19 +167,19 @@ const marshal = function (messages) {
 
     // set id
     ws[XLSX.utils.encode_cell({ c: 0, r })] = {
-      t: "s",
+      t: 's',
       v: message.id,
     }
 
     // set description
     ws[XLSX.utils.encode_cell({ c: 1, r })] = {
-      t: "s",
+      t: 's',
       v: message.description,
     }
 
     // set default message
     ws[XLSX.utils.encode_cell({ c: 2, r })] = {
-      t: "s",
+      t: 's',
       v: message.defaultMessage,
     }
 
@@ -189,21 +189,21 @@ const marshal = function (messages) {
       // set locale
       const v = message.locales[locale]
       ws[XLSX.utils.encode_cell({ c: k, r })] = {
-        t: "s",
+        t: 's',
         v,
-        s: v === "" ? emptyStyle : {},
+        s: v === '' ? emptyStyle : {},
       }
 
       ws[XLSX.utils.encode_cell({ c: k, r: 0 })] = {
-        t: "s",
+        t: 's',
         v: locale,
         s: titleStyle,
       }
 
-      ws["!cols"][k] = {
-        width: "85",
-        bestFit: "1",
-        customWidth: "1",
+      ws['!cols'][k] = {
+        width: '85',
+        bestFit: '1',
+        customWidth: '1',
         wpx: 300,
         wch: 85,
         MDW: 6,
@@ -211,18 +211,18 @@ const marshal = function (messages) {
     })
   })
 
-  ws["!ref"] = XLSX.utils.encode_range({
+  ws['!ref'] = XLSX.utils.encode_range({
     s: { c: 0, r: 0 },
     e: { c: maxCol, r: maxRow },
   })
 
   wb.Sheets.translations = ws
-  wb.SheetNames = [ "translations" ]
+  wb.SheetNames = [ 'translations' ]
 
   const r = XLSX.write(wb, {
-    bookType: "xlsx",
+    bookType: 'xlsx',
     bookSST: true,
-    type: "buffer",
+    type: 'buffer',
   })
 
   return r

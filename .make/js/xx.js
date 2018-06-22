@@ -12,30 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import icu from "messageformat-parser"
+import icu from 'messageformat-parser'
 
 const stringify = function (token) {
-  if (typeof token === "string") {
-    return token.replace(/[A-Z]/g, "X").replace(/[^X,.~`?:\-_=+!@#$%*(){}[\]"';/ \s]/g, "x")
+  if (typeof token === 'string') {
+    return token.replace(/[A-Z]/g, 'X').replace(/[^X,.~`?:\-_=+!@#$%*(){}[\]"';/ \s]/g, 'x')
   }
 
-  if (token.type === "argument") {
+  if (token.type === 'argument') {
     return `{${token.arg}}`
   }
 
-  if (token.type === "octothorpe") {
-    return "#"
+  if (token.type === 'octothorpe') {
+    return '#'
   }
 
   let res = `{${token.arg}, ${token.type},`
 
   for (const c of token.cases) {
-    const k = c.key === "other" ? c.key : `=${c.key}`
-    const s = c.tokens.map(stringify).join("")
+    const k = c.key === 'other' ? c.key : `=${c.key}`
+    const s = c.tokens.map(stringify).join('')
     res += ` ${k} {${s}}`
   }
 
-  res += "}"
+  res += '}'
 
   return res
 }
@@ -51,5 +51,5 @@ const stringify = function (token) {
  * @returns {string} - The updated format.
  */
 export default function (format) {
-  return icu.parse(format).map(stringify).join("")
+  return icu.parse(format).map(stringify).join('')
 }

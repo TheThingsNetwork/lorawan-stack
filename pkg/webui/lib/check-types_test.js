@@ -15,10 +15,10 @@
 /* eslint-env jest */
 /* eslint-disable arrow-body-style */
 
-import PropTypes from "prop-types"
-import check from "./check-types"
+import PropTypes from 'prop-types'
+import check from './check-types'
 
-test("check-types should throw when a type is wrong", () => {
+test('check-types should throw when a type is wrong', () => {
   const types = {
     foo: PropTypes.string,
   }
@@ -27,43 +27,43 @@ test("check-types should throw when a type is wrong", () => {
     foo: 10,
   }
 
-  expect(() => check(types, val, "test", "lib")).toThrow(/string/)
+  expect(() => check(types, val, 'test', 'lib')).toThrow(/string/)
 })
 
-test("check-types should not throw when a type is not wrong", () => {
+test('check-types should not throw when a type is not wrong', () => {
   const types = {
     foo: PropTypes.string,
   }
 
   const val = {
-    foo: "10",
+    foo: '10',
   }
 
-  expect(() => check(types, val, "test", "lib")).not.toThrow()
+  expect(() => check(types, val, 'test', 'lib')).not.toThrow()
 })
 
-test("check-types should throw when a type definition is wrong", () => {
+test('check-types should throw when a type definition is wrong', () => {
   const types = {
-    foo: "invalid",
+    foo: 'invalid',
   }
 
   const val = {
-    foo: "ok",
+    foo: 'ok',
   }
 
-  expect(() => check(types, val, "test", "lib")).toThrow(/type `foo` is invalid/)
+  expect(() => check(types, val, 'test', 'lib')).toThrow(/type `foo` is invalid/)
 })
 
-test("check-types should throw when a type definition throws", () => {
+test('check-types should throw when a type definition throws', () => {
   const types = {
     foo () {
-      throw new Error("huh?")
+      throw new Error('huh?')
     },
   }
 
   const val = {
-    foo: "ok",
+    foo: 'ok',
   }
 
-  expect(() => check(types, val, "test", "lib")).toThrow(/Failed/)
+  expect(() => check(types, val, 'test', 'lib')).toThrow(/Failed/)
 })

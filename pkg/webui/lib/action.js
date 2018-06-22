@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ulid } from "ulid"
-import check from "./check-types"
+import { ulid } from 'ulid'
+import check from './check-types'
 
 const validator = {
   get (obj, type) {
@@ -38,11 +38,11 @@ const validator = {
  */
 export default function (namespace, def) {
   if (!namespace) {
-    throw new TypeError("actions requires a namespace to be passed")
+    throw new TypeError('actions requires a namespace to be passed')
   }
 
   if (!def) {
-    throw new TypeError("actions requires a definition to be passed")
+    throw new TypeError('actions requires a definition to be passed')
   }
 
   const res =
@@ -98,7 +98,7 @@ const action = function (ns, key, def = {}) {
     const payload = d.transform(...args)
 
     // check if the type is ok
-    check(d.types, payload, "argument", `action ${type}`)
+    check(d.types, payload, 'argument', `action ${type}`)
 
     return {
       type,

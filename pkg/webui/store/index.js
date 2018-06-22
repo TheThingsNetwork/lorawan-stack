@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { applyMiddleware, createStore, compose } from "redux"
-import { routerMiddleware } from "react-router-redux"
+import { applyMiddleware, createStore, compose } from 'redux'
+import { routerMiddleware } from 'react-router-redux'
 
-import initialSagas from "../sagas"
-import initialReducers from "../reducers"
+import initialSagas from '../sagas'
+import initialReducers from '../reducers'
 
-import Reducers from "./reducers"
-import Sagas from "./sagas"
+import Reducers from './reducers'
+import Sagas from './sagas'
 
-import log from "./log"
+import log from './log'
 
 /**
  * Create a redux store.

@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import createSagaMiddleware from "redux-saga"
-import { Set } from "immutable"
-import bind from "autobind-decorator"
-import errors from "../actions/errors"
-import { put } from "redux-saga/effects"
+import createSagaMiddleware from 'redux-saga'
+import { Set } from 'immutable'
+import bind from 'autobind-decorator'
+import errors from '../actions/errors'
+import { put } from 'redux-saga/effects'
 
 const flatten = function (s = []) {
   const res = []

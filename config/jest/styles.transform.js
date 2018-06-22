@@ -16,6 +16,6 @@
 
 module.exports = {
   process () {
-    return "module.exports = {};"
+    return 'module.exports = {};'
   },
 }

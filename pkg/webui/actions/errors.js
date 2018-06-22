@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import PropTypes from "prop-types"
-import actions from "../lib/action"
+import PropTypes from 'prop-types'
+import actions from '../lib/action'
 
-export default actions("errors", {
+export default actions('errors', {
   // fatal is a fatal error in the app
   fatal: {
     error: PropTypes.any,

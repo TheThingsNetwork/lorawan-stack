@@ -14,38 +14,38 @@
 
 /* eslint-env node */
 
-import path from "path"
-import webpack from "webpack"
+import path from 'path'
+import webpack from 'webpack'
 
 const {
-  CONTEXT = ".",
-  CACHE_DIR = ".cache",
-  PUBLIC_DIR = "public",
+  CONTEXT = '.',
+  CACHE_DIR = '.cache',
+  PUBLIC_DIR = 'public',
 } = process.env
 
 const context = path.resolve(CONTEXT)
-const library = "[name]_[hash]"
+const library = '[name]_[hash]'
 
-const pkg = require(path.resolve(context, "package.json"))
+const pkg = require(path.resolve(context, 'package.json'))
 const libs = Object.keys(pkg.dependencies || {})
 
 export default {
   context,
-  mode: "development",
-  target: "web",
-  stats: "minimal",
-  devtool: "module-source-map",
-  recordsPath: path.resolve(context, CACHE_DIR, "_libs_records"),
+  mode: 'development',
+  target: 'web',
+  stats: 'minimal',
+  devtool: 'module-source-map',
+  recordsPath: path.resolve(context, CACHE_DIR, '_libs_records'),
   entry: { libs },
   output: {
-    filename: "[name].bundle.js",
+    filename: '[name].bundle.js',
     path: path.resolve(context, PUBLIC_DIR),
     library,
   },
   plugins: [
     new webpack.DllPlugin({
       name: library,
-      path: path.resolve(context, CACHE_DIR, "dll.json"),
+      path: path.resolve(context, CACHE_DIR, 'dll.json'),
     }),
   ],
   performance: {
@@ -55,9 +55,9 @@ export default {
     rules: [
       {
         test: /\.(woff|woff2|ttf|eot|jpg|jpeg|png|svg)$/i,
-        loader: "file-loader",
+        loader: 'file-loader',
         options: {
-          name: "[name].[hash].[ext]",
+          name: '[name].[hash].[ext]',
         },
       },
     ],

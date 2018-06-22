@@ -13,10 +13,10 @@
 // limitations under the License.
 
 
-import React from "react"
+import React from 'react'
 
 const style = {
-  padding: "1rem",
+  padding: '1rem',
 }
 
 export default function (props) {

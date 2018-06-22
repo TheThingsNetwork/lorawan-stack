@@ -14,66 +14,66 @@
 
 /* eslint-env node */
 
-import path from "path"
-import webpack from "webpack"
+import path from 'path'
+import webpack from 'webpack'
 
-import HtmlWebpackPlugin from "html-webpack-plugin"
-import MiniCssExtractPlugin from "mini-css-extract-plugin"
-import LiveReloadPlugin from "webpack-livereload-plugin"
-import AddAssetHtmlPlugin from "add-asset-html-webpack-plugin"
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import LiveReloadPlugin from 'webpack-livereload-plugin'
+import AddAssetHtmlPlugin from 'add-asset-html-webpack-plugin'
 
-import nib from "nib"
+import nib from 'nib'
 
 const {
-  CONTEXT = ".",
-  CACHE_DIR = ".cache",
-  PUBLIC_DIR = "public",
-  NODE_ENV = "development",
-  VERSION = "?.?.?",
+  CONTEXT = '.',
+  CACHE_DIR = '.cache',
+  PUBLIC_DIR = 'public',
+  NODE_ENV = 'development',
+  VERSION = '?.?.?',
   GIT_TAG,
-  SUPPORT_LOCALES = "en",
+  SUPPORT_LOCALES = 'en',
 } = process.env
 
 const context = path.resolve(CONTEXT)
-const production = NODE_ENV === "production"
-const src = path.resolve(".", "pkg/webui")
+const production = NODE_ENV === 'production'
+const src = path.resolve('.', 'pkg/webui')
 const include = [ src ]
-const modules = [ path.resolve(context, "node_modules") ]
+const modules = [ path.resolve(context, 'node_modules') ]
 
-const r = SUPPORT_LOCALES.split(",").map(l => new RegExp(l.trim()))
+const r = SUPPORT_LOCALES.split(',').map(l => new RegExp(l.trim()))
 
 export default {
   context,
-  mode: production ? "production" : "development",
+  mode: production ? 'production' : 'development',
   externals: [ filterLocales ],
-  stats: "minimal",
+  stats: 'minimal',
   devServer: {
-    stats: "minimal",
+    stats: 'minimal',
   },
   entry: {
     console: [
-      "./config/root.js",
-      "./pkg/webui/console.js",
+      './config/root.js',
+      './pkg/webui/console.js',
     ],
     oauth: [
-      "./config/root.js",
-      "./pkg/webui/oauth.js",
+      './config/root.js',
+      './pkg/webui/oauth.js',
     ],
   },
   output: {
-    filename: "[name].[chunkhash].js",
-    chunkFilename: "[name].[chunkhash].js",
+    filename: '[name].[chunkhash].js',
+    chunkFilename: '[name].[chunkhash].js',
     path: path.resolve(context, PUBLIC_DIR),
-    publicPath: "{{.Root}}/",
-    crossOriginLoading: "anonymous",
+    publicPath: '{{.Root}}/',
+    crossOriginLoading: 'anonymous',
   },
   optimization: {
     splitChunks: {
       cacheGroups: {
         styles: {
-          name: "styles",
+          name: 'styles',
           test: /\.css$/,
-          chunks: "all",
+          chunks: 'all',
           enforce: true,
         },
       },
@@ -84,43 +84,43 @@ export default {
     rules: [
       {
         test: /\.js$/,
-        loader: "babel-loader",
+        loader: 'babel-loader',
         include,
         options: {
-          cacheDirectory: path.resolve(context, CACHE_DIR, "babel"),
+          cacheDirectory: path.resolve(context, CACHE_DIR, 'babel'),
           sourceMap: true,
           babelrc: true,
         },
       },
       {
         test: /\.(woff|woff2|ttf|eot|jpg|jpeg|png|svg)$/i,
-        loader: "file-loader",
+        loader: 'file-loader',
         options: {
-          name: "[name].[hash].[ext]",
+          name: '[name].[hash].[ext]',
         },
       },
       {
         test: /\.(styl|css)$/,
         include,
         use: [
-          "css-hot-loader",
+          'css-hot-loader',
           MiniCssExtractPlugin.loader,
           {
-            loader: "css-loader",
+            loader: 'css-loader',
             options: {
               modules: true,
               minimize: production,
               localIdentName: env({
-                production: "[hash:base64:10]",
-                development: "[path][local]-[hash:base64:10]",
+                production: '[hash:base64:10]',
+                development: '[path][local]-[hash:base64:10]',
               }),
             },
           },
           {
-            loader: "stylus-loader",
+            loader: 'stylus-loader',
             options: {
-              "import": [
-                path.resolve(context, "pkg/webui/include.styl"),
+              'import': [
+                path.resolve(context, 'pkg/webui/include.styl'),
               ],
               use: [ nib() ],
             },
@@ -132,7 +132,7 @@ export default {
         use: [
           MiniCssExtractPlugin.loader,
           {
-            loader: "css-loader",
+            loader: 'css-loader',
             options: {
               modules: false,
               minimize: production,
@@ -149,23 +149,23 @@ export default {
       new webpack.NamedChunksPlugin(),
       new webpack.EnvironmentPlugin({
         NODE_ENV,
-        VERSION: VERSION || GIT_TAG || "unknown",
+        VERSION: VERSION || GIT_TAG || 'unknown',
       }),
       new HtmlWebpackPlugin({
-        chunks: [ "vendor", "console" ],
-        filename: path.resolve(PUBLIC_DIR, "console.html"),
+        chunks: [ 'vendor', 'console' ],
+        filename: path.resolve(PUBLIC_DIR, 'console.html'),
         showErrors: false,
-        template: path.resolve(src, "index.html"),
+        template: path.resolve(src, 'index.html'),
         minify: {
           html5: true,
           collapseWhitespace: true,
         },
       }),
       new HtmlWebpackPlugin({
-        chunks: [ "vendor", "oauth" ],
-        filename: path.resolve(PUBLIC_DIR, "oauth.html"),
+        chunks: [ 'vendor', 'oauth' ],
+        filename: path.resolve(PUBLIC_DIR, 'oauth.html'),
         showErrors: false,
-        template: path.resolve(src, "index.html"),
+        template: path.resolve(src, 'index.html'),
         minify: {
           html5: true,
           collapseWhitespace: true,
@@ -173,22 +173,22 @@ export default {
       }),
       new MiniCssExtractPlugin({
         filename: env({
-          development: "[name].css",
-          production: "[name].[contenthash].css",
+          development: '[name].css',
+          production: '[name].[contenthash].css',
         }),
       }),
     ],
     development: [
       new webpack.DllReferencePlugin({
         context,
-        manifest: require(path.resolve(context, CACHE_DIR, "dll.json")),
+        manifest: require(path.resolve(context, CACHE_DIR, 'dll.json')),
       }),
       new webpack.WatchIgnorePlugin([
         /node_modules/,
         new RegExp(path.resolve(context, PUBLIC_DIR)),
       ]),
       new AddAssetHtmlPlugin({
-        filepath: path.resolve(context, PUBLIC_DIR, "libs.bundle.js"),
+        filepath: path.resolve(context, PUBLIC_DIR, 'libs.bundle.js'),
       }),
       new LiveReloadPlugin(),
     ],
@@ -196,7 +196,7 @@ export default {
 }
 
 function filterLocales (context, request, callback) {
-  if (context.endsWith("node_modules/intl/locale-data/jsonp")) {
+  if (context.endsWith('node_modules/intl/locale-data/jsonp')) {
     const supported = r.reduce(function (acc, locale) {
       return acc || locale.test(request)
     }, false)
@@ -226,7 +226,7 @@ function env (obj = {}) {
     ]
   }
 
-  if (typeof dev !== "object" || typeof prod !== "object") {
+  if (typeof dev !== 'object' || typeof prod !== 'object') {
     return production ? prod : dev
   }
 

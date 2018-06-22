@@ -14,18 +14,18 @@
 
 
 /* global require */
-import React from "react"
-import { configure, addDecorator } from "@storybook/react"
-import { Provider } from "react-redux"
-import { ConnectedRouter } from "react-router-redux"
-import createHistory from "history/createMemoryHistory"
+import React from 'react'
+import { configure, addDecorator } from '@storybook/react'
+import { Provider } from 'react-redux'
+import { ConnectedRouter } from 'react-router-redux'
+import createHistory from 'history/createMemoryHistory'
 
-import "../../pkg/webui/main.styl"
-import Store from "../../pkg/webui/store"
+import '../../pkg/webui/main.styl'
+import Store from '../../pkg/webui/store'
 
-import Center from "./center"
+import Center from './center'
 
-const req = require.context("../../pkg/webui/", true, /story\.js$/)
+const req = require.context('../../pkg/webui/', true, /story\.js$/)
 const load = () => req.keys().forEach(req)
 
 const history = createHistory()

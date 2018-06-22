@@ -14,13 +14,13 @@
 
 // @flow
 
-import delay from "./delay"
-import { cancel, fork, take, cancelled, put } from "redux-saga/effects"
+import delay from './delay'
+import { cancel, fork, take, cancelled, put } from 'redux-saga/effects'
 
 /**
  * Canceled is the error that gets passed to failure if a saga gets canceled.
  */
-export const Canceled = new Error("Canceled")
+export const Canceled = new Error('Canceled')
 
 declare interface typed {
   type : string,
@@ -149,7 +149,7 @@ export type LogicDefinition = {
  */
 export default function (def : LogicDefinition) {
   if (!def) {
-    throw TypeError("logic requires a definition")
+    throw TypeError('logic requires a definition')
   }
 
   const {
@@ -167,23 +167,23 @@ export default function (def : LogicDefinition) {
   } = normalize(def)
 
   if (!type) {
-    throw new TypeError("logic: requires a type")
+    throw new TypeError('logic: requires a type')
   }
 
   if (!process) {
-    throw new TypeError("logic: requires a process function")
+    throw new TypeError('logic: requires a process function')
   }
 
   if (debounce && throttle) {
-    throw new TypeError("logic: cannot debounce and throttle at the same time")
+    throw new TypeError('logic: cannot debounce and throttle at the same time')
   }
 
   if (debounce && latest) {
-    throw new TypeError("logic: debounce and latest cannot be used together")
+    throw new TypeError('logic: debounce and latest cannot be used together')
   }
 
   if (throttle && latest) {
-    throw new TypeError("logic: throttle and latest cannot be used together")
+    throw new TypeError('logic: throttle and latest cannot be used together')
   }
 
   // listen for actions
@@ -257,7 +257,7 @@ export default function (def : LogicDefinition) {
         }
       })
     } catch (err) {
-      console.log("logic error", err)
+      console.log('logic error', err)
       throw err
     } finally {
       if (yield cancelled() && tasks.length > 0) {
@@ -269,7 +269,7 @@ export default function (def : LogicDefinition) {
 
 const getType = function (thing : ?ActionType) : string {
   if (!thing) {
-    throw TypeError("passed invalid type to logic")
+    throw TypeError('passed invalid type to logic')
   }
 
   if (thing instanceof Function && thing.type) {

@@ -14,13 +14,13 @@
 
 /* global process */
 
-import fs from "fs"
-import path from "path"
-import yargs from "yargs"
-import g from "glob"
-import YAML from "js-yaml"
-import xlsx from "./xls"
-import xx from "./xx"
+import fs from 'fs'
+import path from 'path'
+import yargs from 'yargs'
+import g from 'glob'
+import YAML from 'js-yaml'
+import xlsx from './xls'
+import xx from './xx'
 
 const argv = yargs.argv
 const env = process.env
@@ -41,14 +41,14 @@ const flatten = function (s) {
     return s.map(flatten).reduce((a, n) => [ ...a, ...n ], [])
   }
 
-  return s.split(",").map(s => s.trim())
+  return s.split(',').map(s => s.trim())
 }
 
-const localesDir = argv.locales || env.LOCALES_DIR || "pkg/webui/locales"
-const support = flatten(argv.support || env.SUPPORT_LOCALES || "en")
-const messagesDir = argv.messages || env.MESSAGES_DIR || ".cache/messages"
-const defaultLocale = argv.default || env.DEFAULT_LOCALE || "en"
-const output = flatten(argv.output || env.OUTPUT || "messages.yml")
+const localesDir = argv.locales || env.LOCALES_DIR || 'pkg/webui/locales'
+const support = flatten(argv.support || env.SUPPORT_LOCALES || 'en')
+const messagesDir = argv.messages || env.MESSAGES_DIR || '.cache/messages'
+const defaultLocale = argv.default || env.DEFAULT_LOCALE || 'en'
+const output = flatten(argv.output || env.OUTPUT || 'messages.yml')
 const updates = flatten(argv.updates || env.UPDATES)
 
 if (argv.help) {
@@ -123,7 +123,7 @@ const read = function (filename) {
  */
 const write = function (filename, content) {
   return new Promise(function (resolve, reject) {
-    console.log("writing", filename)
+    console.log('writing', filename)
     fs.writeFile(filename, content, function (err, res) {
       if (err) {
         return reject(err)
@@ -176,7 +176,7 @@ const readLocales = async function () {
 const readMessages = async function () {
   const files = await glob(`${path.resolve(messagesDir)}/**/*.json`)
   return files
-    .map(f => fs.readFileSync(f, "utf-8"))
+    .map(f => fs.readFileSync(f, 'utf-8'))
     .map(c => JSON.parse(c))
     .reduce(function (acc, next) {
       return [ ...acc, ...next ]
@@ -291,24 +291,24 @@ const addID = function (messages) {
  */
 const marshaller = function (filename) {
   if (!filename) {
-    throw new Error("Illegal filename")
+    throw new Error('Illegal filename')
   }
 
-  if (filename.endsWith(".json")) {
+  if (filename.endsWith('.json')) {
     return {
       unmarshal: buf => addID(JSON.parse(buf.toString())),
       marshal: o => JSON.stringify(removeID(o), null, 2),
     }
   }
 
-  if (filename.endsWith(".yml") || filename.endsWith(".yaml")) {
+  if (filename.endsWith('.yml') || filename.endsWith('.yaml')) {
     return {
       unmarshal: buf => addID(YAML.safeLoad(buf.toString())),
       marshal: o => YAML.safeDump(removeID(o)),
     }
   }
 
-  if (filename.endsWith("xlsx")) {
+  if (filename.endsWith('xlsx')) {
     return xlsx
   }
 }
@@ -336,7 +336,7 @@ const writeMessages = function (messages) {
 const writeLocales = async function (locales) {
   return Promise.all(Object.keys(locales).map(async function (key) {
     const locale = locales[key]
-    const content = JSON.stringify(locale, null, 2).concat("\n")
+    const content = JSON.stringify(locale, null, 2).concat('\n')
     await write(`${localesDir}/${key}.json`, content)
   }))
 }
@@ -359,9 +359,9 @@ const main = async function () {
     for (const locale of support) {
       updated[locale] = updated[locale] || {}
 
-      let msg = get(updates, id, "locales", locale)
+      let msg = get(updates, id, 'locales', locale)
       if (msg === null) {
-        msg = get(locales, locale, id) || ""
+        msg = get(locales, locale, id) || ''
       }
 
       // force default message on default locale

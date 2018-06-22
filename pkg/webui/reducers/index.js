@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { routerReducer } from "react-router-redux"
-import { reducer as form } from "redux-form"
+import { routerReducer } from 'react-router-redux'
+import { reducer as form } from 'redux-form'
 
 export default {
   router: routerReducer,
