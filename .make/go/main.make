@@ -118,8 +118,6 @@ go.dev-deps:
 	@if [[ ! -z "$(CI)" ]]; then $(log) "Getting goveralls" && $(GO) get -u github.com/mattn/goveralls; fi
 	@$(log) "Getting gometalinter" && $(GO) get -u github.com/alecthomas/gometalinter
 	@$(log) "Getting gometalinter linters" && $(GO_METALINTER) -i
-	@$(log) "Installing go-bindata" && go get -u github.com/jteeuwen/go-bindata/...
-	@$(log) "Installing go-bindata-assetfs" && go get -u github.com/elazarl/go-bindata-assetfs/...
 
 # testing minimum version
 go.min-version:
