@@ -22,6 +22,7 @@ import (
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/metrics"
 	"go.thethings.network/lorawan-stack/pkg/web"
 )
 
@@ -71,6 +72,12 @@ func (c *Component) listenWeb() (err error) {
 		g.GET("/*", echo.WrapHandler(http.HandlerFunc(pprof.Index)))
 		g.GET("/profile", echo.WrapHandler(http.HandlerFunc(pprof.Profile)))
 		g.GET("/trace", echo.WrapHandler(http.HandlerFunc(pprof.Trace)))
+	}
+
+	if c.config.HTTP.Metrics {
+		g := c.web.RootGroup("/metrics") // TODO(#565): Add auth to metrics endpoints.
+		g.GET("/", func(c echo.Context) error { return c.Redirect(http.StatusFound, strings.TrimSuffix(c.Path(), "/")) })
+		g.GET("", echo.WrapHandler(metrics.Exporter))
 	}
 
 	return nil

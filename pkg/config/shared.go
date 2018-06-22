@@ -79,6 +79,7 @@ type HTTP struct {
 	ListenTLS string `name:"listen-tls" description:"Address for the HTTPS server to listen on"`
 	Cookie    Cookie `name:"cookie"`
 	PProf     bool   `name:"pprof" description:"Expose pprof over HTTP"`
+	Metrics   bool   `name:"metrics" description:"Expose metrics over HTTP"`
 }
 
 // Redis represents Redis configuration.

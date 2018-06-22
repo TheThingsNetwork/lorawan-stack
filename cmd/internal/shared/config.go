@@ -47,6 +47,7 @@ var DefaultHTTPConfig = config.HTTP{
 	Listen:    ":1885",
 	ListenTLS: ":8885",
 	PProf:     true,
+	Metrics:   true,
 }
 
 // DefaultGRPCConfig is the default config for GRPC.
