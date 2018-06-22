@@ -24,9 +24,9 @@ import (
 	"strings"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware"
-	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"go.opencensus.io/plugin/ocgrpc"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	"go.thethings.network/lorawan-stack/pkg/metrics"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/version"
 	"google.golang.org/grpc"
@@ -36,13 +36,13 @@ import (
 func DefaultDialOptions(ctx context.Context) []grpc.DialOption {
 	streamInterceptors := []grpc.StreamClientInterceptor{
 		errors.StreamClientInterceptor(),
-		grpc_prometheus.StreamClientInterceptor,
+		metrics.StreamClientInterceptor,
 		rpclog.StreamClientInterceptor(ctx), // Gets logger from global context
 	}
 
 	unaryInterceptors := []grpc.UnaryClientInterceptor{
 		errors.UnaryClientInterceptor(),
-		grpc_prometheus.UnaryClientInterceptor,
+		metrics.UnaryClientInterceptor,
 		rpclog.UnaryClientInterceptor(ctx), // Gets logger from global context
 	}
 

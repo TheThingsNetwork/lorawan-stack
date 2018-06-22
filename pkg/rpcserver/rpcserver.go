@@ -26,12 +26,12 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	"github.com/grpc-ecosystem/go-grpc-middleware/validator"
-	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.opencensus.io/plugin/ocgrpc"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"
+	"go.thethings.network/lorawan-stack/pkg/metrics"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/fillcontext"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
@@ -125,7 +125,6 @@ func New(ctx context.Context, opts ...Option) *Server {
 			return ErrRPCRecovered.WithAttributes("panic", p)
 		}),
 	}
-	grpc_prometheus.EnableHandlingTimeHistogram()
 
 	streamInterceptors := []grpc.StreamServerInterceptor{
 		fillcontext.StreamServerInterceptor(options.contextFillers...),
@@ -133,7 +132,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		rpcmiddleware.RequestIDStreamServerInterceptor(),
 		events.StreamServerInterceptor,
 		rpclog.StreamServerInterceptor(ctx),
-		grpc_prometheus.StreamServerInterceptor,
+		metrics.StreamServerInterceptor,
 		sentry.StreamServerInterceptor(options.sentry),
 		errors.StreamServerInterceptor(),
 		grpc_validator.StreamServerInterceptor(),
@@ -146,7 +145,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		rpcmiddleware.RequestIDUnaryServerInterceptor(),
 		events.UnaryServerInterceptor,
 		rpclog.UnaryServerInterceptor(ctx),
-		grpc_prometheus.UnaryServerInterceptor,
+		metrics.UnaryServerInterceptor,
 		sentry.UnaryServerInterceptor(options.sentry),
 		errors.UnaryServerInterceptor(),
 		grpc_validator.UnaryServerInterceptor(),
