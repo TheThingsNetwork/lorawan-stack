@@ -57,12 +57,21 @@ const (
 	accumulationCapacity = 20
 )
 
-// newMACState returns new MACState.
-func newMACState(band *band.Band, dwellTime bool) *ttnpb.MACState {
-	return &ttnpb.MACState{
-		MaxTxPower:        band.DefaultMaxEIRP,
-		UplinkDwellTime:   dwellTime,
-		DownlinkDwellTime: dwellTime,
+func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
+	fp, err := fps.GetByID(dev.FrequencyPlanID)
+	if err != nil {
+		return err
+	}
+
+	band, err := band.GetByID(fp.BandID)
+	if err != nil {
+		return err
+	}
+
+	dev.MACState = &ttnpb.MACState{
+		MaxEIRP:           band.DefaultMaxEIRP,
+		UplinkDwellTime:   false, // TODO: Use the band parameters (https://github.com/TheThingsIndustries/ttn/issues/774)
+		DownlinkDwellTime: false, // TODO: Use the band parameters (https://github.com/TheThingsIndustries/ttn/issues/774)
 		ADRNbTrans:        1,
 		ADRAckLimit:       uint32(band.ADRAckLimit),
 		ADRAckDelay:       uint32(band.ADRAckDelay),
@@ -72,6 +81,23 @@ func newMACState(band *band.Band, dwellTime bool) *ttnpb.MACState {
 		Rx2DataRateIndex:  uint32(band.DefaultRx2Parameters.DataRateIndex),
 		Rx2Frequency:      uint64(band.DefaultRx2Parameters.Frequency),
 	}
+
+	if dev.MaxEIRP > 0 && dev.MaxEIRP < band.DefaultMaxEIRP {
+		dev.MACState.MaxEIRP = dev.MaxEIRP
+	}
+
+	dev.MACStateDesired = deepcopy.Copy(dev.MACState).(*ttnpb.MACState)
+
+	// TODO: Override parameters in MACState for which a default value is defined
+	// once https://github.com/TheThingsIndustries/ttn/issues/849 is resolved.
+
+	dev.MACStateDesired.UplinkDwellTime = fp.DwellTime != nil
+	dev.MACStateDesired.DownlinkDwellTime = fp.DwellTime != nil
+
+	// TODO: Set additional parameters in MACStateDesired from fp,
+	// once https://github.com/TheThingsIndustries/ttn/issues/857 is resolved.
+
+	return nil
 }
 
 // WindowEndFunc is a function, which is used by Network Server to determine the end of deduplication and cooldown windows.
@@ -928,9 +954,17 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		}
 	}
 
-	var cmds ttnpb.MACCommands
-	if err := cmds.UnmarshalLoRaWAN(mac, true); err != nil {
-		return common.ErrUnmarshalPayloadFailed.NewWithCause(nil, err)
+	var cmds []*ttnpb.MACCommand
+	for r := bytes.NewReader(mac); r.Len() > 0; {
+		cmd := &ttnpb.MACCommand{}
+		if err := ttnpb.ReadMACCommand(r, true, cmd); err != nil {
+			logger.
+				WithField("unmarshaled", len(cmds)).
+				WithError(err).
+				Warn("Failed to unmarshal MAC commands")
+			break
+		}
+		cmds = append(cmds, cmd)
 	}
 
 	if dev.MACInfo == nil {
@@ -940,20 +974,9 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		dev.MACSettings = &ttnpb.MACSettings{}
 	}
 	if dev.MACState == nil {
-		fp, err := ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)
-		if err != nil {
+		if err := resetMACState(ns.Component.FrequencyPlans, dev.EndDevice); err != nil {
 			return err
 		}
-		band, err := band.GetByID(fp.BandID)
-		if err != nil {
-			return err
-		}
-
-		dev.MACState = newMACState(&band, fp.DwellTime != nil)
-		if dev.MACState.MaxTxPower > dev.MaxTxPower {
-			dev.MACState.MaxTxPower = dev.MaxTxPower
-		}
-		dev.MACStateDesired = dev.MACState
 	}
 	dev.MACState.ADRDataRateIndex = msg.Settings.DataRateIndex
 
@@ -1111,20 +1134,16 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 			dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
 		}
 
-		band, err := band.GetByID(fp.BandID)
-		if err != nil {
-			return common.ErrCorruptRegistry.NewWithCause(nil, err)
-		}
-
-		dev.MACState = newMACState(&band, fp.DwellTime != nil)
-		if dev.MACState.MaxTxPower > dev.MaxTxPower {
-			dev.MACState.MaxTxPower = dev.MaxTxPower
+		if err := resetMACState(ns.Component.FrequencyPlans, dev.EndDevice); err != nil {
+			return err
 		}
 		dev.MACState.RxDelay = req.RxDelay
 		dev.MACState.Rx1DataRateOffset = req.DownlinkSettings.Rx1DROffset
 		dev.MACState.Rx2DataRateIndex = req.DownlinkSettings.Rx2DR
 
-		dev.MACStateDesired = dev.MACState
+		dev.MACStateDesired.RxDelay = dev.MACState.RxDelay
+		dev.MACStateDesired.Rx1DataRateOffset = dev.MACState.Rx1DataRateOffset
+		dev.MACStateDesired.Rx2DataRateIndex = dev.MACState.Rx2DataRateIndex
 
 		if err := ns.scheduleDownlink(ctx, dev, msg, nil, resp.RawPayload, true); err != nil {
 			logger.WithError(err).Debug("Failed to schedule join accept")

@@ -46,7 +46,7 @@ const (
 )
 
 var (
-	NewMACState = newMACState
+	ResetMACState = resetMACState
 )
 
 func TestAccumulator(t *testing.T) {

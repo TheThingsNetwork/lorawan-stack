@@ -27,7 +27,6 @@ import (
 	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
@@ -1084,15 +1083,10 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						expected.CreatedAt = dev.CreatedAt
 						expected.UpdatedAt = dev.UpdatedAt
 						if expected.MACState == nil {
-							fp := test.Must(ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)).(ttnpb.FrequencyPlan)
-							band := test.Must(band.GetByID(fp.BandID)).(band.Band)
-
-							expected.MACState = NewMACState(&band, fp.DwellTime != nil)
-							expected.MACState.MaxTxPower = band.DefaultMaxEIRP
-							if expected.MACState.MaxTxPower > dev.MaxTxPower {
-								expected.MACState.MaxTxPower = dev.MaxTxPower
+							err := ResetMACState(ns.Component.FrequencyPlans, expected)
+							if !a.So(err, should.BeNil) {
+								t.FailNow()
 							}
-							expected.MACStateDesired = expected.MACState
 						}
 						expected.MACState.ADRDataRateIndex = msg.Settings.DataRateIndex
 
@@ -1562,25 +1556,19 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 
 						expected := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-						fp := test.Must(ns.Component.FrequencyPlans.GetByID(expected.FrequencyPlanID)).(ttnpb.FrequencyPlan)
-						band := test.Must(band.GetByID(fp.BandID)).(band.Band)
-
-						stDes := expected.MACStateDesired
-
-						expected.MACState = &ttnpb.MACState{
-							MaxTxPower:        expected.MaxTxPower,
-							UplinkDwellTime:   fp.DwellTime != nil,
-							DownlinkDwellTime: false, // TODO: Get this from band (https://github.com/TheThingsIndustries/ttn/issues/774)
-							ADRNbTrans:        1,
-							ADRAckLimit:       uint32(band.ADRAckLimit),
-							ADRAckDelay:       uint32(band.ADRAckDelay),
-							DutyCycle:         ttnpb.DUTY_CYCLE_1,
-							RxDelay:           stDes.RxDelay,
-							Rx1DataRateOffset: stDes.Rx1DataRateOffset,
-							Rx2DataRateIndex:  stDes.Rx2DataRateIndex,
-							Rx2Frequency:      uint64(band.DefaultRx2Parameters.Frequency),
+						err := ResetMACState(ns.Component.FrequencyPlans, expected)
+						if !a.So(err, should.BeNil) {
+							t.FailNow()
 						}
-						expected.MACStateDesired = expected.MACState
+
+						expected.MACState.RxDelay = tc.Device.MACStateDesired.RxDelay
+						expected.MACState.Rx1DataRateOffset = tc.Device.MACStateDesired.Rx1DataRateOffset
+						expected.MACState.Rx2DataRateIndex = tc.Device.MACStateDesired.Rx2DataRateIndex
+
+						expected.MACStateDesired.RxDelay = expected.MACState.RxDelay
+						expected.MACStateDesired.Rx1DataRateOffset = expected.MACState.Rx1DataRateOffset
+						expected.MACStateDesired.Rx2DataRateIndex = expected.MACState.Rx2DataRateIndex
+
 						expected.EndDeviceIdentifiers.DevAddr = dev.EndDeviceIdentifiers.DevAddr
 						expected.Session = &ttnpb.Session{
 							SessionKeys: *keys,
