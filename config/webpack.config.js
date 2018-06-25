@@ -110,6 +110,7 @@ export default {
             options: {
               modules: true,
               minimize: production,
+              camelCase: true,
               localIdentName: env({
                 production: '[hash:base64:10]',
                 development: '[path][local]-[hash:base64:10]',
