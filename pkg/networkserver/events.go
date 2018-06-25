@@ -17,19 +17,19 @@ package networkserver
 import "go.thethings.network/lorawan-stack/pkg/events"
 
 var (
-	evtStartApplicationLink = events.Define("application.start_link", "start application link")
-	evtEndApplicationLink   = events.Define("application.end_link", "end application link")
+	evtStartApplicationLink = events.Define("ns.application.start_link", "start application link")
+	evtEndApplicationLink   = events.Define("ns.application.end_link", "end application link")
 
 	evtReceiveUp          = events.Define("ns.up.receive", "receive uplink message")
-	evtReceiveUpDuplicate = events.Define("up.receive_duplicate", "receive duplicate uplink message")
-	evtMergeMetadata      = events.Define("up.merge_metadata", "merge uplink message metadata")
+	evtReceiveUpDuplicate = events.Define("ns.up.receive_duplicate", "receive duplicate uplink message")
+	evtMergeMetadata      = events.Define("ns.up.merge_metadata", "merge uplink message metadata")
 
-	evtDropData    = events.Define("up.data.drop", "drop data message")
-	evtForwardData = events.Define("up.data.forward", "forward data message")
+	evtDropData    = events.Define("ns.up.data.drop", "drop data message")
+	evtForwardData = events.Define("ns.up.data.forward", "forward data message")
 
-	evtDropJoin    = events.Define("up.join.drop", "drop join request")
-	evtForwardJoin = events.Define("up.join.forward", "forward join request")
+	evtDropJoin    = events.Define("ns.up.join.drop", "drop join request")
+	evtForwardJoin = events.Define("ns.up.join.forward", "forward join request")
 
-	evtDropRejoin    = events.Define("up.rejoin.drop", "drop rejoin request")
-	evtForwardRejoin = events.Define("up.rejoin.forward", "forward rejoin request")
+	evtDropRejoin    = events.Define("ns.up.rejoin.drop", "drop rejoin request")
+	evtForwardRejoin = events.Define("ns.up.rejoin.forward", "forward rejoin request")
 )

@@ -184,6 +184,14 @@ meaning is obvious from the context.
 | device id                       | devID   |
 | user id                         | userID  |
 
+### Events
+
+Events are defined with `events.Define("event_name", "event description")`
+
+The event name is usually of the form `component.entity.action`. Examples are `ns.up.receive_duplicate` and `is.user.update`. We have some exceptions, such as `ns.up.join.forward`, which is specifically used for join messages. The Device Registry (which is used by both the NS, AS and JS) currently publishes events such as `device.create`. In the future we may also add component prefixes there.
+
+The event description describes the event in simple English. The description is capitalized by the frontend, so the message should be lowercase, and typically doesn't end with a period.
+
 ### Comments
 
 Code should be as self-explanatory as possible. However, comments should be used to respect Go formatting guidelines, to generate insightful documentation with [Godoc](https://godoc.org/go.thethings.network/lorawan-stack), and to explain what can not be expressed by pure code. Comments should be English sentences, and documentation-generating comments should be closed by a period. Comments can also be used to indicate steps to take in the future (*TODOs*), if they reference the GitHub issue to track this *TODO*.

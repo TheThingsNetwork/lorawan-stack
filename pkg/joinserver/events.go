@@ -17,6 +17,6 @@ package joinserver
 import "go.thethings.network/lorawan-stack/pkg/events"
 
 var (
-	evtRejectJoin = events.Define("up.join.reject", "accept join request")
-	evtAcceptJoin = events.Define("up.join.accept", "reject join request")
+	evtRejectJoin = events.Define("js.join.reject", "reject join request")
+	evtAcceptJoin = events.Define("js.join.accept", "accept join request")
 )

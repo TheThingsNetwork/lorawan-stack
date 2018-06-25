@@ -17,15 +17,15 @@ package identityserver
 import "go.thethings.network/lorawan-stack/pkg/events"
 
 var (
-	evtGatewayCreated = events.Define("gateway.create", "create gateway")
-	evtGatewayUpdated = events.Define("gateway.update", "update gateway")
-	evtGatewayDeleted = events.Define("gateway.delete", "delete gateway")
+	evtGatewayCreated = events.Define("is.gateway.create", "create gateway")
+	evtGatewayUpdated = events.Define("is.gateway.update", "update gateway")
+	evtGatewayDeleted = events.Define("is.gateway.delete", "delete gateway")
 
-	evtUserCreated = events.Define("user.create", "create user")
-	evtUserUpdated = events.Define("user.update", "update user")
-	evtUserDeleted = events.Define("user.delete", "delete user")
+	evtUserCreated = events.Define("is.user.create", "create user")
+	evtUserUpdated = events.Define("is.user.update", "update user")
+	evtUserDeleted = events.Define("is.user.delete", "delete user")
 
-	evtApplicationCreated = events.Define("application.create", "create application")
-	evtApplicationUpdated = events.Define("application.update", "update application")
-	evtApplicationDeleted = events.Define("application.delete", "delete application")
+	evtApplicationCreated = events.Define("is.application.create", "create application")
+	evtApplicationUpdated = events.Define("is.application.update", "update application")
+	evtApplicationDeleted = events.Define("is.application.delete", "delete application")
 )
