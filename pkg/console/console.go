@@ -26,30 +26,30 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// Config is the configuration for the console.
+// Config is the configuration for the Console.
 type Config struct {
-	// PublicURL is the public URL of the console.
+	// PublicURL is the public URL of the Console.
 	PublicURL string `name:"public-url" description:"The public URL of the Console"`
 
-	// DefaultLanguage is the default language of the web console.
+	// DefaultLanguage is the default language of the Console.
 	DefaultLanguage string `name:"language" description:"The default language of the Console"`
 
 	// IdentityServerURL is the location of the Identity Server.
 	IdentityServerURL string `name:"identity-server-url" description:"The URL of the Identity Server"`
 
-	// OAuth is the OAuth config for the console.
+	// OAuth is the OAuth config for the Console.
 	OAuth OAuth `name:"oauth"`
 
-	// mount is the location where the console is mounted.
+	// mount is the location where the Console is mounted.
 	mount string `name:"-"`
 }
 
-// OAuth is the OAuth config for the console.
+// OAuth is the OAuth config for the Console.
 type OAuth struct {
-	// ID is the client ID for the console.
+	// ID is the client ID for the Console.
 	ID string `name:"client-id" description:"The OAuth client ID for the Console"`
 
-	// Secret is the client secret for the console.
+	// Secret is the client secret for the Console.
 	Secret string `name:"client-secret" description:"The OAuth client secret for the Console" json:"-"`
 }
 
@@ -57,7 +57,7 @@ func (o OAuth) isZero() bool {
 	return o.ID == "" && o.Secret == ""
 }
 
-// Console is the console component.
+// Console is the Console component.
 type Console struct {
 	*component.Component
 	assets *assets.Assets
@@ -98,7 +98,7 @@ func New(c *component.Component, assets *assets.Assets, config Config) (*Console
 	return console, nil
 }
 
-// path extracts the mounted location from the public console URL.
+// path extracts the mounted location from the public Console URL.
 func path(u string) (string, error) {
 	p, err := url.Parse(u)
 	if err != nil {
