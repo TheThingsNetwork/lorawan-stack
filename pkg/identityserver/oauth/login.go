@@ -21,6 +21,7 @@ import (
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/validate"
 )
@@ -57,8 +58,10 @@ func (s *Server) login(c echo.Context) error {
 	}
 
 	if !ok {
+		events.Publish(evtUserLoginFailed(c.Request().Context(), user.GetUser().UserIdentifiers, nil))
 		return ErrInvalidPassword.New(nil)
 	}
+	events.Publish(evtUserLogin(c.Request().Context(), user.GetUser().UserIdentifiers, nil))
 
 	// Credentials are ok. Therefore store the user in the cookie.
 	err = s.updateCookie(c, func(value *authCookie) error {
