@@ -34,7 +34,11 @@ var (
 				return errors.NewWithCause(err, "Could not initialize base component")
 			}
 
-			redis := redis.New(&redis.Config{Redis: config.Redis, Namespace: []string{"js", "devices"}})
+			redis := redis.New(&redis.Config{
+				Redis:     config.Redis,
+				Namespace: []string{"js", "devices"},
+				IndexKeys: deviceregistry.Identifiers,
+			})
 			reg := deviceregistry.New(store.NewByteMapStoreClient(redis))
 			config.JS.Registry = reg
 

@@ -87,7 +87,16 @@ func (r *Registry) Range(ed *ttnpb.EndDevice, batchSize uint64, f func(*Device) 
 	)
 }
 
-// Range calls f sequentially for each device stored in r, matching specified device identifiers.
+// Identifiers supported in RangeByIdentifiers.
+var Identifiers = []string{
+	"EndDeviceIdentifiers.DeviceID",
+	"EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID",
+	"EndDeviceIdentifiers.DevEUI",
+	"EndDeviceIdentifiers.JoinEUI",
+	"EndDeviceIdentifiers.DevAddr",
+}
+
+// RangeByIdentifiers calls f sequentially for each device stored in r, matching specified device identifiers.
 // If f returns false, range stops the iteration.
 //
 // Range does not necessarily correspond to any consistent snapshot of the Intefaces's
@@ -100,18 +109,20 @@ func RangeByIdentifiers(r Interface, id *ttnpb.EndDeviceIdentifiers, batchSize u
 	if id == nil {
 		return errors.New("Identifiers specified are nil")
 	}
-
 	fields := make([]string, 0, 5)
-	switch {
-	case id.DeviceID != "":
+	if id.DeviceID != "" {
 		fields = append(fields, "EndDeviceIdentifiers.DeviceID")
-	case id.ApplicationID != "":
+	}
+	if id.ApplicationID != "" {
 		fields = append(fields, "EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID")
-	case id.DevEUI != nil && !id.DevEUI.IsZero():
+	}
+	if id.DevEUI != nil && !id.DevEUI.IsZero() {
 		fields = append(fields, "EndDeviceIdentifiers.DevEUI")
-	case id.JoinEUI != nil && !id.JoinEUI.IsZero():
+	}
+	if id.JoinEUI != nil && !id.JoinEUI.IsZero() {
 		fields = append(fields, "EndDeviceIdentifiers.JoinEUI")
-	case id.DevAddr != nil && !id.DevAddr.IsZero():
+	}
+	if id.DevAddr != nil && !id.DevAddr.IsZero() {
 		fields = append(fields, "EndDeviceIdentifiers.DevAddr")
 	}
 	return r.Range(&ttnpb.EndDevice{EndDeviceIdentifiers: *id}, batchSize, f, fields...)

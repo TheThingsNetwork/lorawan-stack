@@ -87,7 +87,12 @@ func (r *Registry) Range(a *ttnpb.Application, batchSize uint64, f func(*Applica
 	)
 }
 
-// Range calls f sequentially for each application stored in r, matching specified application identifiers.
+// Identifiers supported in RangeByIdentifiers.
+var Identifiers = []string{
+	"ApplicationIdentifiers.ApplicationID",
+}
+
+// RangeByIdentifiers calls f sequentially for each application stored in r, matching specified application identifiers.
 // If f returns false, range stops the iteration.
 //
 // Range does not necessarily correspond to any consistent snapshot of the Intefaces's
@@ -101,9 +106,8 @@ func RangeByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers, batchSize
 		return errors.New("Identifiers specified are nil")
 	}
 
-	fields := []string{}
-	switch {
-	case id.ApplicationID != "":
+	fields := make([]string, 0, 1)
+	if id.ApplicationID != "" {
 		fields = append(fields, "ApplicationIdentifiers.ApplicationID")
 	}
 	return r.Range(&ttnpb.Application{ApplicationIdentifiers: *id}, batchSize, f, fields...)
