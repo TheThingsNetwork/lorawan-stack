@@ -16,6 +16,7 @@
 package deviceregistry
 
 import (
+	"strings"
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -46,7 +47,9 @@ func New(s store.Client) *Registry {
 // Create stores devices data in underlying store.Interface and returns a new *Device.
 // It modifies CreatedAt and UpdatedAt fields of ed and returns error if either of them is non-zero on ed.
 func (r *Registry) Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error) {
-	now := time.Now().UTC()
+	start := time.Now()
+
+	now := start.UTC()
 	ed.CreatedAt = now
 	ed.UpdatedAt = now
 
@@ -58,7 +61,12 @@ func (r *Registry) Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error
 	if err != nil {
 		return nil, err
 	}
-	return newDevice(ed, r.store, id), nil
+
+	dev := newDevice(ed, r.store, id)
+
+	latency.WithLabelValues("create").Observe(time.Since(start).Seconds())
+
+	return dev, nil
 }
 
 // Range calls f sequentially for each device stored, matching specified device fields.
@@ -76,7 +84,8 @@ func (r *Registry) Range(ed *ttnpb.EndDevice, batchSize uint64, f func(*Device) 
 	if ed == nil {
 		return errors.New("Device specified is nil")
 	}
-	return r.store.Range(
+	start := time.Now()
+	err := r.store.Range(
 		ed,
 		func() interface{} { return &ttnpb.EndDevice{} },
 		batchSize,
@@ -85,6 +94,10 @@ func (r *Registry) Range(ed *ttnpb.EndDevice, batchSize uint64, f func(*Device) 
 		},
 		fields...,
 	)
+	duration := time.Since(start).Seconds()
+	latency.WithLabelValues("range").Observe(duration)
+	rangeLatency.WithLabelValues(strings.Join(fields, ",")).Observe(duration)
+	return err
 }
 
 // Identifiers supported in RangeByIdentifiers.

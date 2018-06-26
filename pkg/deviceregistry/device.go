@@ -39,24 +39,32 @@ func newDevice(ed *ttnpb.EndDevice, s store.Client, k store.PrimaryKey) *Device 
 // Store updates devices data in the underlying store.Interface.
 // It modifies the UpdatedAt field of d.EndDevice.
 func (d *Device) Store(fields ...string) error {
+	start := time.Now()
 	d.EndDevice.UpdatedAt = time.Now().UTC()
-
 	if len(fields) != 0 {
 		fields = append(fields, "UpdatedAt")
 	}
-	return d.store.Update(d.key, d.EndDevice, fields...)
+	err := d.store.Update(d.key, d.EndDevice, fields...)
+	latency.WithLabelValues("update").Observe(time.Since(start).Seconds())
+	return err
 }
 
 // Load returns a snapshot of current device data in underlying store.Interface.
 func (d *Device) Load() (*Device, error) {
+	start := time.Now()
 	ed := &ttnpb.EndDevice{}
 	if err := d.store.Find(d.key, ed); err != nil {
 		return nil, err
 	}
-	return newDevice(ed, d.store, d.key), nil
+	res := newDevice(ed, d.store, d.key)
+	latency.WithLabelValues("load").Observe(time.Since(start).Seconds())
+	return res, nil
 }
 
 // Delete removes device from the underlying store.Interface.
 func (d *Device) Delete() error {
-	return d.store.Delete(d.key)
+	start := time.Now()
+	err := d.store.Delete(d.key)
+	latency.WithLabelValues("delete").Observe(time.Since(start).Seconds())
+	return err
 }

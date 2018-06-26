@@ -14,10 +14,42 @@
 
 package deviceregistry
 
-import "go.thethings.network/lorawan-stack/pkg/events"
+import (
+	"github.com/prometheus/client_golang/prometheus"
+	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/metrics"
+)
 
 var (
 	evtCreateDevice = events.Define("device.create", "Create Device")
 	evtUpdateDevice = events.Define("device.update", "Update Device")
 	evtDeleteDevice = events.Define("device.delete", "Delete Device")
 )
+
+const subsystem = "device_registry"
+
+var latencyBuckets = []float64{}
+
+var latency = metrics.NewHistogramVec(
+	prometheus.HistogramOpts{
+		Subsystem: subsystem,
+		Name:      "call_latency_seconds",
+		Help:      "Histogram of latency (seconds) of device registry calls",
+		Buckets:   latencyBuckets,
+	},
+	[]string{"action"},
+)
+
+var rangeLatency = metrics.NewHistogramVec(
+	prometheus.HistogramOpts{
+		Subsystem: subsystem,
+		Name:      "range_latency_seconds",
+		Help:      "Histogram of latency (seconds) of device registry ranges",
+		Buckets:   latencyBuckets,
+	},
+	[]string{"fields"},
+)
+
+func init() {
+	metrics.MustRegister(latency, rangeLatency)
+}

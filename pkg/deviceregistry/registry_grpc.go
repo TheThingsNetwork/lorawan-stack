@@ -183,12 +183,17 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 	if notFound {
 		_, err := r.Interface.Create(&req.Device, fields...)
 		if err == nil {
-			events.Publish(evtCreateDevice(ctx, &req.Device.EndDeviceIdentifiers, nil))
+			events.Publish(evtCreateDevice(ctx, req.Device.EndDeviceIdentifiers, nil))
 		}
 		return ttnpb.Empty, err
 	}
 	dev.EndDevice = &req.Device
-	return ttnpb.Empty, dev.Store(fields...)
+
+	if err = dev.Store(fields...); err != nil {
+		return nil, err
+	}
+	events.Publish(evtUpdateDevice(ctx, req.Device.EndDeviceIdentifiers, req.FieldMask))
+	return ttnpb.Empty, nil
 }
 
 // DeleteDevice deletes the device associated with id from underlying registry.
