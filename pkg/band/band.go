@@ -167,6 +167,9 @@ type Band struct {
 	regionalParameters1_0_2_rev_A versionSwap
 	regionalParameters1_0_2_rev_B versionSwap
 	regionalParameters1_1_rev_A   versionSwap
+
+	// DwellTime of a transmission.
+	DwellTime time.Duration
 }
 
 // DutyCycle for the [MinFrequency;MaxFrequency[ sub-band

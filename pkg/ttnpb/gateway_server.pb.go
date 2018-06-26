@@ -82,7 +82,7 @@ type FrequencyPlan struct {
 	FSKChannel          *FrequencyPlan_Channel   `protobuf:"bytes,4,opt,name=fsk_channel,json=fskChannel" json:"fsk_channel,omitempty" yaml:"fsk-channel,omitempty"`
 	// LBT configuration.
 	LBT *FrequencyPlan_LBTConfiguration `protobuf:"bytes,5,opt,name=lbt" json:"lbt,omitempty" yaml:"lbt,omitempty"`
-	// DwellTime indicates the maximum duration of a transmission.
+	// DwellTime indicates the maximum duration of a transmission, if it overrides the band's dwell time parameter.
 	DwellTime *time.Duration `protobuf:"bytes,6,opt,name=dwell_time,json=dwellTime,stdduration" json:"dwell_time,omitempty" yaml:"dwell-time,omitempty"`
 	// TimeOffAir to abide to after transmission.
 	TimeOffAir *FrequencyPlan_TimeOffAir `protobuf:"bytes,7,opt,name=time_off_air,json=timeOffAir" json:"time_off_air,omitempty" yaml:"tx-timeoff-air,omitempty"`

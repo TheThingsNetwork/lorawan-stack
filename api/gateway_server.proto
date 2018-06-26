@@ -76,7 +76,7 @@ message FrequencyPlan {
   // LBT configuration.
   LBTConfiguration lbt = 5 [(gogoproto.customname) = "LBT",  (gogoproto.moretags) = "yaml:\"lbt,omitempty\""];
 
-  // DwellTime indicates the maximum duration of a transmission.
+  // DwellTime indicates the maximum duration of a transmission, if it overrides the band's dwell time parameter.
   google.protobuf.Duration dwell_time = 6 [(gogoproto.moretags) = "yaml:\"dwell-time,omitempty\"", (gogoproto.stdduration) = true];
 
   message TimeOffAir {
