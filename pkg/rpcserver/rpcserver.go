@@ -153,7 +153,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	}
 
 	baseOptions := []grpc.ServerOption{
-		grpc.StatsHandler(new(ocgrpc.ServerHandler)),
+		grpc.StatsHandler(rpcmiddleware.StatsHandlers{new(ocgrpc.ServerHandler), metrics.StatsHandler}),
 		grpc.MaxConcurrentStreams(math.MaxUint16),
 		grpc.KeepaliveParams(keepalive.ServerParameters{
 			MaxConnectionIdle: 6 * time.Hour,

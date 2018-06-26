@@ -27,6 +27,7 @@ import (
 	"go.opencensus.io/plugin/ocgrpc"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/metrics"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/version"
 	"google.golang.org/grpc"
@@ -52,7 +53,7 @@ func DefaultDialOptions(ctx context.Context) []grpc.DialOption {
 	}
 
 	return []grpc.DialOption{
-		grpc.WithStatsHandler(new(ocgrpc.ClientHandler)),
+		grpc.WithStatsHandler(rpcmiddleware.StatsHandlers{new(ocgrpc.ClientHandler), metrics.StatsHandler}),
 		grpc.WithUserAgent(fmt.Sprintf(
 			"%s go/%s ttn/%s",
 			filepath.Base(os.Args[0]),

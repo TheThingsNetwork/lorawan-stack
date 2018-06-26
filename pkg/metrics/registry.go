@@ -18,7 +18,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus"
 	ocprom "go.opencensus.io/exporter/prometheus"
 	"go.opencensus.io/stats/view"
@@ -56,24 +55,3 @@ func MustRegister(cs ...prometheus.Collector) {
 func Unregister(c prometheus.Collector) bool {
 	return registry.Unregister(c)
 }
-
-var serverMetrics = grpc_prometheus.NewServerMetrics()
-
-func init() {
-	serverMetrics.EnableHandlingTimeHistogram()
-	MustRegister(serverMetrics)
-}
-
-// Server interceptors
-var (
-	StreamServerInterceptor = serverMetrics.StreamServerInterceptor()
-	UnaryServerInterceptor  = serverMetrics.UnaryServerInterceptor()
-)
-
-var clientMetrics = grpc_prometheus.NewClientMetrics()
-
-// Client interceptors
-var (
-	StreamClientInterceptor = clientMetrics.StreamClientInterceptor()
-	UnaryClientInterceptor  = clientMetrics.UnaryClientInterceptor()
-)
