@@ -16,6 +16,7 @@
 package applicationregistry
 
 import (
+	"strings"
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -46,7 +47,9 @@ func New(s store.Client) *Registry {
 // Create stores applications data in underlying store.Interface and returns a new *Application.
 // It modifies CreatedAt and UpdatedAt fields of a and returns error if either of them is non-zero on a.
 func (r *Registry) Create(a *ttnpb.Application, fields ...string) (*Application, error) {
-	now := time.Now().UTC()
+	start := time.Now()
+
+	now := start.UTC()
 	a.CreatedAt = now
 	a.UpdatedAt = now
 
@@ -58,7 +61,12 @@ func (r *Registry) Create(a *ttnpb.Application, fields ...string) (*Application,
 	if err != nil {
 		return nil, err
 	}
-	return newApplication(a, r.store, id), nil
+
+	app := newApplication(a, r.store, id)
+
+	latency.WithLabelValues("create").Observe(time.Since(start).Seconds())
+
+	return app, nil
 }
 
 // Range calls f sequentially for each application stored, matching specified application fields.
@@ -76,7 +84,8 @@ func (r *Registry) Range(a *ttnpb.Application, batchSize uint64, f func(*Applica
 	if a == nil {
 		return errors.New("Application specified is nil")
 	}
-	return r.store.Range(
+	start := time.Now()
+	err := r.store.Range(
 		a,
 		func() interface{} { return &ttnpb.Application{} },
 		batchSize,
@@ -85,6 +94,10 @@ func (r *Registry) Range(a *ttnpb.Application, batchSize uint64, f func(*Applica
 		},
 		fields...,
 	)
+	duration := time.Since(start).Seconds()
+	latency.WithLabelValues("range").Observe(duration)
+	rangeLatency.WithLabelValues(strings.Join(fields, ",")).Observe(duration)
+	return err
 }
 
 // Identifiers supported in RangeByIdentifiers.

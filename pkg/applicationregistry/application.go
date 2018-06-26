@@ -39,24 +39,32 @@ func newApplication(a *ttnpb.Application, s store.Client, k store.PrimaryKey) *A
 // Store updates applications data in the underlying store.Interface.
 // It modifies the UpdatedAt field of a.Application.
 func (a *Application) Store(fields ...string) error {
+	start := time.Now()
 	a.Application.UpdatedAt = time.Now().UTC()
-
 	if len(fields) != 0 {
 		fields = append(fields, "UpdatedAt")
 	}
-	return a.store.Update(a.key, a.Application, fields...)
+	err := a.store.Update(a.key, a.Application, fields...)
+	latency.WithLabelValues("update").Observe(time.Since(start).Seconds())
+	return err
 }
 
 // Load returns a snapshot of current application data in underlying store.Interface.
-func (a *Application) Load() (*ttnpb.Application, error) {
+func (a *Application) Load() (*Application, error) {
+	start := time.Now()
 	app := &ttnpb.Application{}
 	if err := a.store.Find(a.key, app); err != nil {
 		return nil, err
 	}
-	return app, nil
+	res := newApplication(app, a.store, a.key)
+	latency.WithLabelValues("load").Observe(time.Since(start).Seconds())
+	return res, nil
 }
 
 // Delete removes application from the underlying store.Interface.
 func (a *Application) Delete() error {
-	return a.store.Delete(a.key)
+	start := time.Now()
+	err := a.store.Delete(a.key)
+	latency.WithLabelValues("delete").Observe(time.Since(start).Seconds())
+	return err
 }

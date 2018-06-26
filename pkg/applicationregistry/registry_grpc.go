@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -132,10 +133,18 @@ func (r *RegistryRPC) SetApplication(ctx context.Context, req *ttnpb.SetApplicat
 
 	if notFound {
 		_, err := r.Interface.Create(&req.Application, fields...)
+		if err == nil {
+			events.Publish(evtCreateApplication(ctx, req.Application.ApplicationIdentifiers, nil))
+		}
 		return ttnpb.Empty, err
 	}
 	app.Application = &req.Application
-	return ttnpb.Empty, app.Store(fields...)
+
+	if err = app.Store(fields...); err != nil {
+		return nil, err
+	}
+	events.Publish(evtUpdateApplication(ctx, req.Application.ApplicationIdentifiers, req.FieldMask))
+	return ttnpb.Empty, nil
 }
 
 // DeleteApplication deletes the application associated with id from underlying registry.
@@ -157,5 +166,9 @@ func (r *RegistryRPC) DeleteApplication(ctx context.Context, id *ttnpb.Applicati
 	if err != nil {
 		return nil, err
 	}
-	return ttnpb.Empty, app.Delete()
+	if err = app.Delete(); err != nil {
+		return nil, err
+	}
+	events.Publish(evtDeleteApplication(ctx, id, nil))
+	return ttnpb.Empty, nil
 }
