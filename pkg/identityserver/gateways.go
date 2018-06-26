@@ -104,7 +104,9 @@ func (s *gatewayService) CreateGateway(ctx context.Context, req *ttnpb.CreateGat
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtGatewayCreated(ctx, req.Gateway.GatewayIdentifiers, req.Gateway))
+
+	events.Publish(evtCreateGateway(ctx, req.GetGateway().GatewayIdentifiers, nil))
+
 	return ttnpb.Empty, nil
 }
 
@@ -223,7 +225,9 @@ func (s *gatewayService) UpdateGateway(ctx context.Context, req *ttnpb.UpdateGat
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtGatewayUpdated(ctx, req.Gateway.GatewayIdentifiers, gtw))
+
+	events.Publish(evtUpdateGateway(ctx, req.GetGateway().GatewayIdentifiers, req.UpdateMask.Paths))
+
 	return ttnpb.Empty, nil
 }
 
@@ -239,7 +243,9 @@ func (s *gatewayService) DeleteGateway(ctx context.Context, req *ttnpb.GatewayId
 	if err = s.store.Gateways.Delete(ids); err != nil {
 		return nil, err
 	}
-	events.Publish(evtGatewayDeleted(ctx, req, nil))
+
+	events.Publish(evtDeleteGateway(ctx, req, nil))
+
 	return ttnpb.Empty, nil
 }
 

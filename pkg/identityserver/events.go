@@ -14,18 +14,28 @@
 
 package identityserver
 
-import "go.thethings.network/lorawan-stack/pkg/events"
+import (
+	"go.thethings.network/lorawan-stack/pkg/events"
+)
 
 var (
-	evtGatewayCreated = events.Define("is.gateway.create", "create gateway")
-	evtGatewayUpdated = events.Define("is.gateway.update", "update gateway")
-	evtGatewayDeleted = events.Define("is.gateway.delete", "delete gateway")
+	evtCreateApplication = events.Define("is.application.create", "create application")
+	evtUpdateApplication = events.Define("is.application.update", "update application")
+	evtDeleteApplication = events.Define("is.application.delete", "delete application")
 
-	evtUserCreated = events.Define("is.user.create", "create user")
-	evtUserUpdated = events.Define("is.user.update", "update user")
-	evtUserDeleted = events.Define("is.user.delete", "delete user")
+	evtCreateClient = events.Define("is.client.create", "create OAuth client")
+	evtUpdateClient = events.Define("is.client.update", "update OAuth client")
+	evtDeleteClient = events.Define("is.client.delete", "delete OAuth client")
 
-	evtApplicationCreated = events.Define("is.application.create", "create application")
-	evtApplicationUpdated = events.Define("is.application.update", "update application")
-	evtApplicationDeleted = events.Define("is.application.delete", "delete application")
+	evtCreateGateway = events.Define("is.gateway.create", "create gateway")
+	evtUpdateGateway = events.Define("is.gateway.update", "update gateway")
+	evtDeleteGateway = events.Define("is.gateway.delete", "delete gateway")
+
+	evtCreateOrganization = events.Define("is.organization.create", "create organization")
+	evtUpdateOrganization = events.Define("is.organization.update", "update organization")
+	evtDeleteOrganization = events.Define("is.organization.delete", "delete organization")
+
+	evtCreateUser = events.Define("is.user.create", "create user")
+	evtUpdateUser = events.Define("is.user.update", "update user")
+	evtDeleteUser = events.Define("is.user.delete", "delete user")
 )

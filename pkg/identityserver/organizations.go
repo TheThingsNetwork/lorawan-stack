@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -82,7 +83,13 @@ func (s *organizationService) CreateOrganization(ctx context.Context, req *ttnpb
 		})
 	})
 
-	return ttnpb.Empty, err
+	if err != nil {
+		return nil, err
+	}
+
+	events.Publish(evtCreateOrganization(ctx, req.GetOrganization().OrganizationIdentifiers, nil))
+
+	return ttnpb.Empty, nil
 }
 
 // GetOrganization returns the organization that matches the identifier.
@@ -163,7 +170,13 @@ func (s *organizationService) UpdateOrganization(ctx context.Context, req *ttnpb
 		return tx.Organizations.Update(organization)
 	})
 
-	return ttnpb.Empty, err
+	if err != nil {
+		return nil, err
+	}
+
+	events.Publish(evtUpdateOrganization(ctx, req.GetOrganization().OrganizationIdentifiers, req.UpdateMask.Paths))
+
+	return ttnpb.Empty, nil
 }
 
 // DeleteOrganization deletes an organization.
@@ -230,7 +243,13 @@ func (s *organizationService) DeleteOrganization(ctx context.Context, req *ttnpb
 		return nil
 	})
 
-	return ttnpb.Empty, err
+	if err != nil {
+		return nil, err
+	}
+
+	events.Publish(evtDeleteOrganization(ctx, req, nil))
+
+	return ttnpb.Empty, nil
 }
 
 // GenerateOrganizationAPIKey generates an organization API key and returns it.

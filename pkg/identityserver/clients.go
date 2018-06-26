@@ -21,6 +21,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -80,7 +81,13 @@ func (s *clientService) CreateClient(ctx context.Context, req *ttnpb.CreateClien
 		})
 	})
 
-	return ttnpb.Empty, err
+	if err != nil {
+		return nil, err
+	}
+
+	events.Publish(evtCreateClient(ctx, req.GetClient().ClientIdentifiers, nil))
+
+	return ttnpb.Empty, nil
 }
 
 // GetClient returns the client that matches the identifier.
@@ -174,7 +181,13 @@ func (s *clientService) UpdateClient(ctx context.Context, req *ttnpb.UpdateClien
 		return tx.Clients.Update(client)
 	})
 
-	return ttnpb.Empty, err
+	if err != nil {
+		return nil, err
+	}
+
+	events.Publish(evtUpdateClient(ctx, req.GetClient().ClientIdentifiers, req.UpdateMask.Paths))
+
+	return ttnpb.Empty, nil
 }
 
 // DeleteClient deletes the client that matches the identifier and revokes all
@@ -201,5 +214,11 @@ func (s *clientService) DeleteClient(ctx context.Context, req *ttnpb.ClientIdent
 		return tx.Clients.Delete(ids)
 	})
 
-	return ttnpb.Empty, err
+	if err != nil {
+		return nil, err
+	}
+
+	events.Publish(evtDeleteClient(ctx, req, nil))
+
+	return ttnpb.Empty, nil
 }

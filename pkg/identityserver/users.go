@@ -149,7 +149,8 @@ func (s *userService) CreateUser(ctx context.Context, req *ttnpb.CreateUserReque
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUserCreated(ctx, req.GetUser().UserIdentifiers, req.GetUser()))
+
+	events.Publish(evtCreateUser(ctx, req.GetUser().UserIdentifiers, nil))
 
 	// No email needs to be sent.
 	if token == nil {
@@ -256,7 +257,8 @@ func (s *userService) UpdateUser(ctx context.Context, req *ttnpb.UpdateUserReque
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUserUpdated(ctx, req.GetUser().UserIdentifiers, user.Safe()))
+
+	events.Publish(evtUpdateUser(ctx, req.GetUser().UserIdentifiers, req.UpdateMask.Paths))
 
 	// No email needs to be send.
 	if token == nil {
@@ -277,8 +279,10 @@ func (s *userService) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateU
 		return nil, err
 	}
 
+	uid := authorizationDataFromContext(ctx).UserIdentifiers()
+
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(authorizationDataFromContext(ctx).UserIdentifiers(), s.specializers.User)
+		found, err := tx.Users.GetByID(uid, s.specializers.User)
 		if err != nil {
 			return err
 		}
@@ -305,7 +309,13 @@ func (s *userService) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateU
 		return tx.Users.Update(user.UserIdentifiers, user)
 	})
 
-	return ttnpb.Empty, err
+	if err != nil {
+		return nil, err
+	}
+
+	events.Publish(evtUpdateUser(ctx, uid, []string{"password"}))
+
+	return ttnpb.Empty, nil
 }
 
 // DeleteUser deletes the account of the current user.
@@ -392,7 +402,9 @@ func (s *userService) DeleteUser(ctx context.Context, _ *pbtypes.Empty) (*pbtype
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUserDeleted(ctx, ids, nil))
+
+	events.Publish(evtDeleteUser(ctx, ids, nil))
+
 	return ttnpb.Empty, nil
 }
 

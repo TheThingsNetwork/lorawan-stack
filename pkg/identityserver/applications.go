@@ -99,7 +99,9 @@ func (s *applicationService) CreateApplication(ctx context.Context, req *ttnpb.C
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtApplicationCreated(ctx, req.GetApplication().ApplicationIdentifiers, req.GetApplication()))
+
+	events.Publish(evtCreateApplication(ctx, req.GetApplication().ApplicationIdentifiers, nil))
+
 	return ttnpb.Empty, nil
 }
 
@@ -187,7 +189,9 @@ func (s *applicationService) UpdateApplication(ctx context.Context, req *ttnpb.U
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtApplicationUpdated(ctx, req.GetApplication().ApplicationIdentifiers, application))
+
+	events.Publish(evtUpdateApplication(ctx, req.GetApplication().ApplicationIdentifiers, req.UpdateMask.Paths))
+
 	return ttnpb.Empty, nil
 }
 
@@ -203,7 +207,9 @@ func (s *applicationService) DeleteApplication(ctx context.Context, req *ttnpb.A
 	if err := s.store.Applications.Delete(ids); err != nil {
 		return nil, err
 	}
-	events.Publish(evtApplicationDeleted(ctx, ids, nil))
+
+	events.Publish(evtDeleteApplication(ctx, ids, nil))
+
 	return ttnpb.Empty, nil
 }
 
