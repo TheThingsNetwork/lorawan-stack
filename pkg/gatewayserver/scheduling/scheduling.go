@@ -86,6 +86,9 @@ func FrequencyPlanScheduler(ctx context.Context, fp ttnpb.FrequencyPlan) (Schedu
 	if err != nil {
 		return nil, errors.NewWithCause(err, "Could not find band associated to that frequency plan")
 	}
+	if fp.DwellTime == nil && band.DwellTime > 0 {
+		scheduler.dwellTime = &band.DwellTime
+	}
 
 	for _, subBand := range band.BandDutyCycles {
 		scheduling := &subBandScheduling{
