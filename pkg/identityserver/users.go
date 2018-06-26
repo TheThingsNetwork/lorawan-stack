@@ -426,10 +426,14 @@ func (s *userService) GenerateUserAPIKey(ctx context.Context, req *ttnpb.Generat
 		Rights: req.Rights,
 	}
 
-	err = s.store.Users.SaveAPIKey(authorizationDataFromContext(ctx).UserIdentifiers(), key)
+	uid := authorizationDataFromContext(ctx).UserIdentifiers()
+
+	err = s.store.Users.SaveAPIKey(uid, key)
 	if err != nil {
 		return nil, err
 	}
+
+	events.Publish(evtGenerateUserAPIKey(ctx, uid, ttnpb.APIKey{Name: key.Name, Rights: key.Rights}))
 
 	return &key, nil
 }
@@ -458,12 +462,21 @@ func (s *userService) ListUserAPIKeys(ctx context.Context, _ *pbtypes.Empty) (*t
 
 // UpdateUserAPIKey updates an API key from the current user.
 func (s *userService) UpdateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (*pbtypes.Empty, error) {
-	err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_SETTINGS_BASIC)
+	err := s.enforceUserRights(ctx, ttnpb.RIGHT_USER_SETTINGS_API_KEYS)
 	if err != nil {
 		return nil, err
 	}
 
-	return ttnpb.Empty, s.store.Users.UpdateAPIKeyRights(authorizationDataFromContext(ctx).UserIdentifiers(), req.Name, req.Rights)
+	uid := authorizationDataFromContext(ctx).UserIdentifiers()
+
+	err = s.store.Users.UpdateAPIKeyRights(uid, req.Name, req.Rights)
+	if err != nil {
+		return nil, err
+	}
+
+	events.Publish(evtUpdateUserAPIKey(ctx, uid, ttnpb.APIKey{Name: req.Name, Rights: req.Rights}))
+
+	return ttnpb.Empty, nil
 }
 
 // RemoveUserAPIKey removes an API key from the current user.
@@ -473,7 +486,16 @@ func (s *userService) RemoveUserAPIKey(ctx context.Context, req *ttnpb.RemoveUse
 		return nil, err
 	}
 
-	return ttnpb.Empty, s.store.Users.DeleteAPIKey(authorizationDataFromContext(ctx).UserIdentifiers(), req.Name)
+	uid := authorizationDataFromContext(ctx).UserIdentifiers()
+
+	err = s.store.Users.DeleteAPIKey(uid, req.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	events.Publish(evtDeleteUserAPIKey(ctx, uid, ttnpb.APIKey{Name: req.Name}))
+
+	return ttnpb.Empty, nil
 }
 
 // ValidateUserEmail validates the user's email with the token sent to the email.

@@ -275,6 +275,8 @@ func (s *organizationService) GenerateOrganizationAPIKey(ctx context.Context, re
 		return nil, err
 	}
 
+	events.Publish(evtGenerateOrganizationAPIKey(ctx, req.OrganizationIdentifiers, ttnpb.APIKey{Name: key.Name, Rights: key.Rights}))
+
 	return &key, nil
 }
 
@@ -309,7 +311,14 @@ func (s *organizationService) UpdateOrganizationAPIKey(ctx context.Context, req 
 		return nil, err
 	}
 
-	return ttnpb.Empty, s.store.Organizations.UpdateAPIKeyRights(req.OrganizationIdentifiers, req.Name, req.Rights)
+	err = s.store.Organizations.UpdateAPIKeyRights(req.OrganizationIdentifiers, req.Name, req.Rights)
+	if err != nil {
+		return nil, err
+	}
+
+	events.Publish(evtUpdateOrganizationAPIKey(ctx, req.OrganizationIdentifiers, ttnpb.APIKey{Name: req.Name, Rights: req.Rights}))
+
+	return ttnpb.Empty, nil
 }
 
 // RemoveOrganizationAPIKey removes an organization API key.
@@ -319,7 +328,14 @@ func (s *organizationService) RemoveOrganizationAPIKey(ctx context.Context, req 
 		return nil, err
 	}
 
-	return ttnpb.Empty, s.store.Organizations.DeleteAPIKey(req.OrganizationIdentifiers, req.Name)
+	err = s.store.Organizations.DeleteAPIKey(req.OrganizationIdentifiers, req.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	events.Publish(evtDeleteOrganizationAPIKey(ctx, req.OrganizationIdentifiers, ttnpb.APIKey{Name: req.Name}))
+
+	return ttnpb.Empty, nil
 }
 
 // SetOrganizationMember sets a membership between an user and an organization

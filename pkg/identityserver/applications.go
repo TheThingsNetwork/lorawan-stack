@@ -236,6 +236,8 @@ func (s *applicationService) GenerateApplicationAPIKey(ctx context.Context, req 
 		return nil, err
 	}
 
+	events.Publish(evtGenerateApplicationAPIKey(ctx, req.ApplicationIdentifiers, ttnpb.APIKey{Name: key.Name, Rights: key.Rights}))
+
 	return &key, nil
 }
 
@@ -270,7 +272,14 @@ func (s *applicationService) UpdateApplicationAPIKey(ctx context.Context, req *t
 		return nil, err
 	}
 
-	return ttnpb.Empty, s.store.Applications.UpdateAPIKeyRights(req.ApplicationIdentifiers, req.Name, req.Rights)
+	s.store.Applications.UpdateAPIKeyRights(req.ApplicationIdentifiers, req.Name, req.Rights)
+	if err != nil {
+		return nil, err
+	}
+
+	events.Publish(evtUpdateApplicationAPIKey(ctx, req.ApplicationIdentifiers, ttnpb.APIKey{Name: req.Name, Rights: req.Rights}))
+
+	return ttnpb.Empty, nil
 }
 
 // RemoveApplicationAPIKey removes an application API key.
@@ -280,7 +289,14 @@ func (s *applicationService) RemoveApplicationAPIKey(ctx context.Context, req *t
 		return nil, err
 	}
 
-	return ttnpb.Empty, s.store.Applications.DeleteAPIKey(req.ApplicationIdentifiers, req.Name)
+	s.store.Applications.DeleteAPIKey(req.ApplicationIdentifiers, req.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	events.Publish(evtDeleteApplicationAPIKey(ctx, req.ApplicationIdentifiers, ttnpb.APIKey{Name: req.Name}))
+
+	return ttnpb.Empty, nil
 }
 
 // SetApplicationCollaborator sets a collaborationship between an user and an

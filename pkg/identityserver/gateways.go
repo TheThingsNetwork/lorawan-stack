@@ -272,6 +272,8 @@ func (s *gatewayService) GenerateGatewayAPIKey(ctx context.Context, req *ttnpb.G
 		return nil, err
 	}
 
+	events.Publish(evtGenerateGatewayAPIKey(ctx, req.GatewayIdentifiers, ttnpb.APIKey{Name: key.Name, Rights: key.Rights}))
+
 	return &key, nil
 }
 
@@ -306,7 +308,14 @@ func (s *gatewayService) UpdateGatewayAPIKey(ctx context.Context, req *ttnpb.Upd
 		return nil, err
 	}
 
-	return ttnpb.Empty, s.store.Gateways.UpdateAPIKeyRights(req.GatewayIdentifiers, req.Name, req.Rights)
+	s.store.Gateways.UpdateAPIKeyRights(req.GatewayIdentifiers, req.Name, req.Rights)
+	if err != nil {
+		return nil, err
+	}
+
+	events.Publish(evtUpdateGatewayAPIKey(ctx, req.GatewayIdentifiers, ttnpb.APIKey{Name: req.Name, Rights: req.Rights}))
+
+	return ttnpb.Empty, nil
 }
 
 // RemoveGatewayAPIKey removes a gateway API key.
@@ -316,7 +325,14 @@ func (s *gatewayService) RemoveGatewayAPIKey(ctx context.Context, req *ttnpb.Rem
 		return nil, err
 	}
 
-	return ttnpb.Empty, s.store.Gateways.DeleteAPIKey(req.GatewayIdentifiers, req.Name)
+	err = s.store.Gateways.DeleteAPIKey(req.GatewayIdentifiers, req.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	events.Publish(evtDeleteGatewayAPIKey(ctx, req.GatewayIdentifiers, ttnpb.APIKey{Name: req.Name}))
+
+	return ttnpb.Empty, nil
 }
 
 // SetGatewayCollaborator sets a collaborationship between an user and an
