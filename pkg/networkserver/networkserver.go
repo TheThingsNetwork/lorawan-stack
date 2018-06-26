@@ -933,7 +933,7 @@ type MACHandler func(ctx context.Context, dev *ttnpb.EndDevice, pld []byte, msg 
 func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
 	defer func() {
 		if err != nil {
-			events.Publish(evtDropData(ctx, msg.EndDeviceIdentifiers, err))
+			registerDropUplink(ctx, msg, err)
 		}
 	}()
 
@@ -1006,7 +1006,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	}
 
 	msg.RxMetadata = acc.Accumulated()
-	events.Publish(evtMergeMetadata(ctx, dev.EndDeviceIdentifiers, len(msg.RxMetadata)))
+	registerMergeMetadata(ctx, dev.EndDevice, msg)
 
 	dev.QueuedMACCommands = dev.QueuedMACCommands[:0]
 
@@ -1097,7 +1097,7 @@ outer:
 		return nil
 	}
 
-	events.Publish(evtForwardData(ctx, dev.EndDeviceIdentifiers, nil))
+	registerForwardUplink(ctx, dev.EndDevice, msg)
 
 	ses := dev.Session
 	return cl.Send(&ttnpb.ApplicationUp{
@@ -1128,7 +1128,7 @@ func (ns *NetworkServer) newDevAddr(*ttnpb.EndDevice) types.DevAddr {
 func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
 	defer func() {
 		if err != nil {
-			events.Publish(evtDropJoin(ctx, msg.EndDeviceIdentifiers, err))
+			registerDropUplink(ctx, msg, err)
 		}
 	}()
 
@@ -1178,7 +1178,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 
 	var errs []error
 	for _, js := range ns.joinServers {
-		events.Publish(evtForwardJoin(ctx, dev.EndDeviceIdentifiers, nil))
+		registerForwardUplink(ctx, dev.EndDevice, msg)
 		resp, err := js.HandleJoin(ctx, req, ns.ClusterAuth())
 		if err != nil {
 			errs = append(errs, err)
@@ -1202,7 +1202,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		}
 
 		msg.RxMetadata = acc.Accumulated()
-		events.Publish(evtMergeMetadata(ctx, dev.EndDeviceIdentifiers, len(msg.RxMetadata)))
+		registerMergeMetadata(ctx, dev.EndDevice, msg)
 
 		dev.RecentUplinks = append(dev.RecentUplinks, msg)
 		if len(dev.RecentUplinks) > recentUplinkCount {
@@ -1277,7 +1277,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 func (ns *NetworkServer) handleRejoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
 	defer func() {
 		if err != nil {
-			events.Publish(evtDropRejoin(ctx, msg.EndDeviceIdentifiers, err))
+			registerDropUplink(ctx, msg, err)
 		}
 	}()
 	// TODO: Implement https://github.com/TheThingsIndustries/ttn/issues/557
@@ -1311,10 +1311,10 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	acc, ok := ns.deduplicateUplink(ctx, msg)
 	if ok {
 		logger.Debug("Dropping duplicate uplink")
-		events.Publish(evtReceiveUpDuplicate(ctx, msg.EndDeviceIdentifiers, nil))
+		registerReceiveUplinkDuplicate(ctx, msg)
 		return ttnpb.Empty, nil
 	}
-	events.Publish(evtReceiveUp(ctx, msg.EndDeviceIdentifiers, nil))
+	registerReceiveUplink(ctx, msg)
 
 	switch msg.Payload.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
