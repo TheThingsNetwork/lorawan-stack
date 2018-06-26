@@ -27,7 +27,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
-	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
@@ -106,7 +105,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	logger := log.FromContext(ctx)
 	defer func() {
 		if err != nil {
-			events.Publish(evtRejectJoin(ctx, req.EndDeviceIdentifiers, err))
+			registerRejectJoin(ctx, req, err)
 		}
 	}()
 
@@ -362,7 +361,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			"device_id", dev.EndDeviceIdentifiers.DeviceID,
 		)).WithError(err).Error("Failed to update device")
 	}
-	events.Publish(evtAcceptJoin(ctx, dev.EndDeviceIdentifiers, nil))
+	registerAcceptJoin(ctx, dev.EndDevice, req)
 	return resp, nil
 }
 
