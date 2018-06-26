@@ -401,10 +401,10 @@ func (a *metadataAccumulator) Add(mds ...*ttnpb.RxMetadata) {
 }
 
 func (ns *NetworkServer) deduplicateUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*metadataAccumulator, bool) {
-	h := ns.hashPool.Get().(hash.Hash)
-	_, _ = h.Write(msg.GetRawPayload())
+	h := ns.hashPool.Get().(hash.Hash64)
+	_, _ = h.Write(msg.RawPayload)
 
-	k := string(h.Sum(nil))
+	k := h.Sum64()
 
 	h.Reset()
 	ns.hashPool.Put(h)
