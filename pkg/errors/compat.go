@@ -15,6 +15,8 @@
 package errors
 
 import (
+	"fmt"
+
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -32,7 +34,12 @@ func (c v3Compat) MessageFormat() string {
 }
 
 func (c v3Compat) PublicAttributes() map[string]interface{} {
-	return Safe(c.Error).Attributes()
+	safeAttributes := Safe(c.Error).Attributes()
+	publicAttributes := make(map[string]interface{}, len(safeAttributes))
+	for k, v := range safeAttributes {
+		publicAttributes[k] = fmt.Sprint(v)
+	}
+	return publicAttributes
 }
 
 func (c v3Compat) CorrelationID() string {
