@@ -279,10 +279,10 @@ func (s *userService) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateU
 		return nil, err
 	}
 
-	uid := authorizationDataFromContext(ctx).UserIdentifiers()
+	userID := authorizationDataFromContext(ctx).UserIdentifiers()
 
 	err = s.store.Transact(func(tx *store.Store) error {
-		found, err := tx.Users.GetByID(uid, s.specializers.User)
+		found, err := tx.Users.GetByID(userID, s.specializers.User)
 		if err != nil {
 			return err
 		}
@@ -313,7 +313,7 @@ func (s *userService) UpdateUserPassword(ctx context.Context, req *ttnpb.UpdateU
 		return nil, err
 	}
 
-	events.Publish(evtUpdateUser(ctx, uid, []string{"password"}))
+	events.Publish(evtUpdateUser(ctx, userID, []string{"password"}))
 
 	return ttnpb.Empty, nil
 }
@@ -426,14 +426,14 @@ func (s *userService) GenerateUserAPIKey(ctx context.Context, req *ttnpb.Generat
 		Rights: req.Rights,
 	}
 
-	uid := authorizationDataFromContext(ctx).UserIdentifiers()
+	userID := authorizationDataFromContext(ctx).UserIdentifiers()
 
-	err = s.store.Users.SaveAPIKey(uid, key)
+	err = s.store.Users.SaveAPIKey(userID, key)
 	if err != nil {
 		return nil, err
 	}
 
-	events.Publish(evtGenerateUserAPIKey(ctx, uid, ttnpb.APIKey{Name: key.Name, Rights: key.Rights}))
+	events.Publish(evtGenerateUserAPIKey(ctx, userID, ttnpb.APIKey{Name: key.Name, Rights: key.Rights}))
 
 	return &key, nil
 }
@@ -467,14 +467,14 @@ func (s *userService) UpdateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUse
 		return nil, err
 	}
 
-	uid := authorizationDataFromContext(ctx).UserIdentifiers()
+	userID := authorizationDataFromContext(ctx).UserIdentifiers()
 
-	err = s.store.Users.UpdateAPIKeyRights(uid, req.Name, req.Rights)
+	err = s.store.Users.UpdateAPIKeyRights(userID, req.Name, req.Rights)
 	if err != nil {
 		return nil, err
 	}
 
-	events.Publish(evtUpdateUserAPIKey(ctx, uid, ttnpb.APIKey{Name: req.Name, Rights: req.Rights}))
+	events.Publish(evtUpdateUserAPIKey(ctx, userID, ttnpb.APIKey{Name: req.Name, Rights: req.Rights}))
 
 	return ttnpb.Empty, nil
 }
@@ -486,14 +486,14 @@ func (s *userService) RemoveUserAPIKey(ctx context.Context, req *ttnpb.RemoveUse
 		return nil, err
 	}
 
-	uid := authorizationDataFromContext(ctx).UserIdentifiers()
+	userID := authorizationDataFromContext(ctx).UserIdentifiers()
 
-	err = s.store.Users.DeleteAPIKey(uid, req.Name)
+	err = s.store.Users.DeleteAPIKey(userID, req.Name)
 	if err != nil {
 		return nil, err
 	}
 
-	events.Publish(evtDeleteUserAPIKey(ctx, uid, ttnpb.APIKey{Name: req.Name}))
+	events.Publish(evtDeleteUserAPIKey(ctx, userID, ttnpb.APIKey{Name: req.Name}))
 
 	return ttnpb.Empty, nil
 }
