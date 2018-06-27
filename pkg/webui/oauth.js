@@ -12,4 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-console.log('Welcome to the oauth provider!')
+import React from 'react'
+import DOM from 'react-dom'
+import OAuthApp from './views/oauth/app'
+
+import './styles/main.styl'
+
+const root = document.getElementById('app')
+DOM.render((<OAuthApp />), root)

@@ -12,4 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-console.log('Welcome to the console!')
+import React from 'react'
+import DOM from 'react-dom'
+import ConsoleApp from './views/console/app'
+
+import './styles/main.styl'
+
+const root = document.getElementById('app')
+DOM.render((<ConsoleApp />), root)
+
