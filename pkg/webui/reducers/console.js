@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* global process */
+const c = function (state = [], action) {
+  switch (action.type) {
+  case 'INITIALIZE':
+    return Object.assign({}, state, { initialized: false })
+  case 'INITIALIZE_SUCCESS':
+    return Object.assign({}, state, { initialized: true })
+  case 'INITIALIZE_FAILURE':
+    return Object.assign({}, state, { initialized: false })
+  default:
+    return state
+  }
+}
 
-import { createStore, applyMiddleware, compose } from 'redux'
-import { createLogicMiddleware } from 'redux-logic'
-
-import reducer from '../reducers'
-import logic from '../logic'
-
-const composeEnhancers = (process.env.NODE_ENV === 'development'
-  && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose
-
-const middleware = applyMiddleware(
-  createLogicMiddleware(logic),
-)
-
-export default createStore(reducer, composeEnhancers(middleware))
+export default c

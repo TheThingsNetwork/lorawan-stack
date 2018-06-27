@@ -12,19 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* global process */
+const client = function (state = [], action) {
+  switch (action.type) {
+  case 'GET_CLIENT':
+    return {
+      ...state,
+      [action.clientId]: { fetching: true },
+    }
+  case 'GET_CLIENT_SUCCESS':
+    const clientId = action.clientData.ids.client_id
+    return {
+      ...state,
+      [clientId]: {
+        client: action.clientData,
+        fetching: false,
+      },
+    }
+  case 'GET_CLIENT_FAILURE':
+    return {
+      ...state,
+      [action.clientId]: {
+        client: null,
+        fetching: false,
+      },
+    }
+  default:
+    return state
+  }
+}
 
-import { createStore, applyMiddleware, compose } from 'redux'
-import { createLogicMiddleware } from 'redux-logic'
-
-import reducer from '../reducers'
-import logic from '../logic'
-
-const composeEnhancers = (process.env.NODE_ENV === 'development'
-  && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose
-
-const middleware = applyMiddleware(
-  createLogicMiddleware(logic),
-)
-
-export default createStore(reducer, composeEnhancers(middleware))
+export default client

@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { routerReducer } from 'react-router-redux'
-import { reducer as form } from 'redux-form'
+import { combineReducers } from 'redux'
+import user from './user'
+import client from './client'
+import _console from './console' // conflicting name with window.console
 
-export default {
-  router: routerReducer,
-  form,
-}
+export default combineReducers({
+  user,
+  client,
+  console: _console,
+})
