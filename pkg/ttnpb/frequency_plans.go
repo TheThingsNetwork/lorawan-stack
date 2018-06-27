@@ -14,16 +14,19 @@
 
 package ttnpb
 
-import time "time"
+import "time"
 
 // Extend a frequency plan from a frequency plan blueprint
 func (f FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
 	extended := f
 
 	extended.copyChannels(ext.Channels, ext.FSKChannel, ext.LoraStandardChannel)
-	extended.copyDwellTime(ext.DwellTime)
+	extended.copyDwellTime(ext.UplinkDwellTime, ext.DownlinkDwellTime)
 	extended.copyLBT(ext.LBT)
 	extended.copyTimeOffAir(ext.TimeOffAir)
+	extended.copyPingSlot(ext.PingSlot)
+	extended.copyRX2(ext.RX2)
+	extended.copyMaxEIRP(ext.MaxEIRP)
 
 	return extended
 }
@@ -48,10 +51,14 @@ func (f *FrequencyPlan) copyChannels(channels []*FrequencyPlan_Channel, fskChann
 	}
 }
 
-func (f *FrequencyPlan) copyDwellTime(dwellTime *time.Duration) {
-	if dwellTime != nil {
-		duration := *dwellTime
-		f.DwellTime = &duration
+func (f *FrequencyPlan) copyDwellTime(uplink, downlink *time.Duration) {
+	if uplink != nil {
+		duration := *uplink
+		f.UplinkDwellTime = &duration
+	}
+	if downlink != nil {
+		duration := *downlink
+		f.DownlinkDwellTime = &duration
 	}
 }
 
@@ -71,5 +78,29 @@ func (f *FrequencyPlan) copyLBT(lbt *FrequencyPlan_LBTConfiguration) {
 			RSSITarget: lbt.RSSITarget,
 			ScanTime:   lbt.ScanTime,
 		}
+	}
+}
+
+func (f *FrequencyPlan) copyPingSlot(pingSlot *FrequencyPlan_Channel) {
+	if pingSlot != nil {
+		f.PingSlot = &FrequencyPlan_Channel{
+			Frequency: pingSlot.Frequency,
+			DataRate:  pingSlot.DataRate,
+		}
+	}
+}
+
+func (f *FrequencyPlan) copyRX2(rx2 *FrequencyPlan_Channel) {
+	if rx2 != nil {
+		f.RX2 = &FrequencyPlan_Channel{
+			Frequency: rx2.Frequency,
+			DataRate:  rx2.DataRate,
+		}
+	}
+}
+
+func (f *FrequencyPlan) copyMaxEIRP(maxEIRP float32) {
+	if maxEIRP != 0.0 {
+		f.MaxEIRP = maxEIRP
 	}
 }

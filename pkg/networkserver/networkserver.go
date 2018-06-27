@@ -91,8 +91,8 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	// TODO: Override parameters in MACState for which a default value is defined
 	// once https://github.com/TheThingsIndustries/ttn/issues/849 is resolved.
 
-	dev.MACStateDesired.UplinkDwellTime = fp.DwellTime != nil
-	dev.MACStateDesired.DownlinkDwellTime = fp.DwellTime != nil
+	dev.MACStateDesired.UplinkDwellTime = fp.UplinkDwellTime != nil
+	dev.MACStateDesired.DownlinkDwellTime = fp.DownlinkDwellTime != nil
 
 	// TODO: Set additional parameters in MACStateDesired from fp,
 	// once https://github.com/TheThingsIndustries/ttn/issues/857 is resolved.

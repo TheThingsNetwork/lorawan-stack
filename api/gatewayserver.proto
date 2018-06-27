@@ -76,9 +76,6 @@ message FrequencyPlan {
   // LBT configuration.
   LBTConfiguration lbt = 5 [(gogoproto.customname) = "LBT",  (gogoproto.moretags) = "yaml:\"lbt,omitempty\""];
 
-  // DwellTime indicates the maximum duration of a transmission, if it overrides the band's dwell time parameter.
-  google.protobuf.Duration dwell_time = 6 [(gogoproto.moretags) = "yaml:\"dwell-time,omitempty\"", (gogoproto.stdduration) = true];
-
   message TimeOffAir {
     // Fraction of the time on air of a Tx emission to account as cooloff after emission.
     float fraction = 1 [(gogoproto.moretags) = "yaml:\"fraction,omitempty\""];
@@ -87,7 +84,22 @@ message FrequencyPlan {
   }
 
   // TimeOffAir to abide to after transmission.
-  TimeOffAir time_off_air = 7 [(gogoproto.moretags) = "yaml:\"tx-timeoff-air,omitempty\""];
+  TimeOffAir time_off_air = 6 [(gogoproto.moretags) = "yaml:\"tx-timeoff-air,omitempty\""];
+
+  // Override maximum duration of an uplink transmission.
+  google.protobuf.Duration uplink_dwell_time = 7 [(gogoproto.moretags) = "yaml:\"uplink-dwell-time,omitempty\"", (gogoproto.stdduration) = true];
+
+  // Override maximum duration of a downlink transmission.
+  google.protobuf.Duration downlink_dwell_time = 8 [(gogoproto.moretags) = "yaml:\"downlink-dwell-time,omitempty\"", (gogoproto.stdduration) = true];
+
+  // Override band settings for the class B ping slot.
+  Channel ping_slot = 9 [(gogoproto.moretags) = "yaml:\"ping-slot,omitempty\""];
+
+  // Override band settings for Rx2.
+  Channel rx2 = 10 [(gogoproto.customname) = "RX2", (gogoproto.moretags) = "yaml:\"rx2,omitempty\""];
+
+  // Override MaxEIRP devices should respect (in dBm).
+  float max_eirp = 18 [(gogoproto.customname) = "MaxEIRP", (gogoproto.moretags) = "yaml:\"max-eirp\""];
 }
 
 message GetFrequencyPlanRequest {

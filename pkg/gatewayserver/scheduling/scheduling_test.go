@@ -63,8 +63,8 @@ func TestDwellTimeBlocking(t *testing.T) {
 
 	dwellTime := time.Microsecond
 	s, err := scheduling.FrequencyPlanScheduler(context.Background(), ttnpb.FrequencyPlan{
-		BandID:    string(band.EU_863_870),
-		DwellTime: &dwellTime,
+		BandID:            string(band.EU_863_870),
+		DownlinkDwellTime: &dwellTime,
 	})
 	a.So(err, should.BeNil)
 
