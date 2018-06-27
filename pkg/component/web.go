@@ -78,7 +78,7 @@ func (c *Component) listenWeb() (err error) {
 
 func (c *Component) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
-		c.grpc.ServeHTTP(w, r)
+		c.grpc.Server.ServeHTTP(w, r)
 	} else {
 		c.web.ServeHTTP(w, r)
 	}

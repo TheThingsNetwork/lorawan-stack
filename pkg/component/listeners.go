@@ -30,9 +30,21 @@ func (c *Component) tlsConfig() (*tls.Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	certificates := []tls.Certificate{certificate}
 	return &tls.Config{
-		Certificates:             []tls.Certificate{certificate},
-		PreferServerCipherSuites: true,
+		GetConfigForClient: func(info *tls.ClientHelloInfo) (*tls.Config, error) {
+			tlsConfig := &tls.Config{
+				Certificates:             certificates,
+				PreferServerCipherSuites: true,
+			}
+			for _, proto := range info.SupportedProtos {
+				if proto == "h2" {
+					tlsConfig.NextProtos = []string{"h2"}
+					break
+				}
+			}
+			return tlsConfig, nil
+		},
 	}, nil
 }
 
