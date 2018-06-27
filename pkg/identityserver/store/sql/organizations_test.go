@@ -141,22 +141,22 @@ func TestOrganizations(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(rights, should.Resemble, collaborator.Rights)
 
-		uid := ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &userID}}
+		userIDs := ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &userID}}
 
-		urights, err := s.Applications.ListCollaboratorRights(application.ApplicationIdentifiers, uid)
+		urights, err := s.Applications.ListCollaboratorRights(application.ApplicationIdentifiers, userIDs)
 		a.So(err, should.BeNil)
 		a.So(rights, should.Resemble, collaborator.Rights)
 		a.So(rights, should.Resemble, urights)
 
-		has, err := s.Applications.HasCollaboratorRights(application.ApplicationIdentifiers, uid, append(ttnpb.AllApplicationRights(), ttnpb.Right(0))...)
+		has, err := s.Applications.HasCollaboratorRights(application.ApplicationIdentifiers, userIDs, append(ttnpb.AllApplicationRights(), ttnpb.Right(0))...)
 		a.So(err, should.BeNil)
 		a.So(has, should.BeFalse)
 
-		has, err = s.Applications.HasCollaboratorRights(application.ApplicationIdentifiers, uid, ttnpb.AllApplicationRights()...)
+		has, err = s.Applications.HasCollaboratorRights(application.ApplicationIdentifiers, userIDs, ttnpb.AllApplicationRights()...)
 		a.So(err, should.BeNil)
 		a.So(has, should.BeTrue)
 
-		applications, err := s.Applications.ListByOrganizationOrUser(uid, applicationSpecializer)
+		applications, err := s.Applications.ListByOrganizationOrUser(userIDs, applicationSpecializer)
 		a.So(err, should.BeNil)
 		if a.So(applications, should.HaveLength, 1) {
 			a.So(applications[0], should.EqualFieldsWithIgnores(identityserver.ApplicationGeneratedFields...), application)
@@ -188,22 +188,22 @@ func TestOrganizations(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(rights, should.Resemble, collaborator.Rights)
 
-		uid := ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &userID}}
+		userIDs := ttnpb.OrganizationOrUserIdentifiers{ID: &ttnpb.OrganizationOrUserIdentifiers_UserID{UserID: &userID}}
 
-		urights, err := s.Gateways.ListCollaboratorRights(gateway.GatewayIdentifiers, uid)
+		urights, err := s.Gateways.ListCollaboratorRights(gateway.GatewayIdentifiers, userIDs)
 		a.So(err, should.BeNil)
 		a.So(rights, should.Resemble, collaborator.Rights)
 		a.So(rights, should.Resemble, urights)
 
-		has, err := s.Gateways.HasCollaboratorRights(gateway.GatewayIdentifiers, uid, append(ttnpb.AllGatewayRights(), ttnpb.Right(0))...)
+		has, err := s.Gateways.HasCollaboratorRights(gateway.GatewayIdentifiers, userIDs, append(ttnpb.AllGatewayRights(), ttnpb.Right(0))...)
 		a.So(err, should.BeNil)
 		a.So(has, should.BeFalse)
 
-		has, err = s.Gateways.HasCollaboratorRights(gateway.GatewayIdentifiers, uid, ttnpb.AllGatewayRights()...)
+		has, err = s.Gateways.HasCollaboratorRights(gateway.GatewayIdentifiers, userIDs, ttnpb.AllGatewayRights()...)
 		a.So(err, should.BeNil)
 		a.So(has, should.BeTrue)
 
-		gateways, err := s.Gateways.ListByOrganizationOrUser(uid, gatewaySpecializer)
+		gateways, err := s.Gateways.ListByOrganizationOrUser(userIDs, gatewaySpecializer)
 		a.So(err, should.BeNil)
 		if a.So(gateways, should.HaveLength, 1) {
 			a.So(gateways[0], should.EqualFieldsWithIgnores(identityserver.GatewayGeneratedFields...), gateway)
