@@ -209,8 +209,7 @@ func (g *GatewayServer) handleUpstreamMessage(ctx context.Context, connectionInf
 			fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()),
 		)...)
 		uplink.CorrelationIDs = events.CorrelationIDsFromContext(msgCtx)
-		// TODO: merge identifiers instead of putting EndDeviceIdentifiers in event payload:
-		events.Publish(evtReceiveUp(msgCtx, connectionInfo.gatewayIdentifiers(), uplink.EndDeviceIdentifiers))
+		events.Publish(evtReceiveUp(msgCtx, ttnpb.CombineIdentifiers(connectionInfo.gatewayIdentifiers(), uplink.EndDeviceIdentifiers), nil))
 
 		g.handleUplink(msgCtx, uplink, connectionInfo)
 	}

@@ -48,8 +48,7 @@ func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downli
 	connection.addDownstreamObservations(&ttnpb.GatewayDown{DownlinkMessage: down})
 
 	msgCtx := events.ContextWithCorrelationID(ctx, down.CorrelationIDs...)
-	// TODO: merge identifiers instead of putting EndDeviceIdentifiers in event payload:
-	events.Publish(evtSendDown(msgCtx, connection.gateway().GatewayIdentifiers, down.EndDeviceIdentifiers))
+	events.Publish(evtSendDown(msgCtx, ttnpb.CombineIdentifiers(connection.gateway().GatewayIdentifiers, down.EndDeviceIdentifiers), nil))
 
 	return ttnpb.Empty, nil
 }
