@@ -18,9 +18,10 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/labstack/echo"
-	"go.thethings.network/lorawan-stack/pkg/assets/fs"
+	"go.thethings.network/lorawan-stack/pkg/assets/templates"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/web"
@@ -29,129 +30,122 @@ import (
 
 // Config contains the configuration variables for the assets.
 type Config struct {
-	// Mount is the root path where the assets will be served from.
-	Mount string `name:"mount" description:"The path where the assets will be mounted on the web server"`
+	// Mount is the location where the assets are mounted from.
+	Mount string `name:"mount" description:"Location where assets are mounted from"`
 
-	// CDN is the root public url where the assets will be served from.
-	CDN string `name:"cdn" description:"The URL that will be used to serve the assets, falls back to assets.mount"`
+	// SearchPath is a list of paths for finding the directory to serve from,
+	// falls back to the CDN.
+	SearchPath []string `name:"search-path" description:"List of paths for finding the directory to serve from, falls back to the CDN"`
 
-	// Directory forces the assets to be read from the file system (instead of from the bindata in the binary).
-	Directory string `name:"dir" description:"Force assets to be read from this directory instead of bundled ones."`
+	// CDN is the public URL of a content delivery network to serve assets using Apps.
+	CDN string `name:"url" description:"Public URL of a content delivery network to serve assets"`
+
+	// Apps contains static HTML pages with applications that are loaded from the CDN.
+	Apps map[string]templates.AppData `name:"-"`
 }
 
 // Assets serves through a web server either bundled assets in the binary or
 // directly read from the file system.
 type Assets struct {
 	*component.Component
-	bundledFS http.FileSystem
-	config    Config
+	config Config
+	fs     http.FileSystem
 }
 
 // New creates a new assets instance.
-func New(c *component.Component, config Config) *Assets {
+func New(c *component.Component, config Config) (*Assets, error) {
 	assets := &Assets{
 		Component: c,
-		bundledFS: assetFS(),
 		config:    config,
 	}
+	logger := log.FromContext(assets.Context()).WithFields(log.Fields(
+		"namespace", "assets",
+		"mount", config.Mount,
+	))
 
-	logger := log.FromContext(assets.Context()).WithField("namespace", "assets")
-
-	if assets.config.CDN == "" {
-		assets.config.CDN = assets.config.Mount
+	for _, path := range config.SearchPath {
+		if s, err := os.Stat(path); !os.IsNotExist(err) && s.IsDir() {
+			assets.fs = http.Dir(path)
+			logger = logger.WithField("path", path)
+			break
+		}
+	}
+	if assets.fs == nil {
+		if config.CDN == "" {
+			return nil, ErrInvalidConfiguration
+		}
+		logger = logger.WithField("cdn", config.CDN)
 	}
 
-	logger.WithFields(log.Fields(
-		"mount", assets.config.Mount,
-		"cdn", assets.config.CDN,
-		"directory", assets.config.Directory,
-	)).Debug("Serving assets")
-
+	logger.Debug("Serving assets")
 	c.RegisterWeb(assets)
 
-	return assets
+	return assets, nil
+}
+
+// MustNew calls New and returns new assets or panics on an error.
+// In most cases, you should just use New.
+func MustNew(c *component.Component, config Config) *Assets {
+	as, err := New(c, config)
+	if err != nil {
+		panic(err)
+	}
+	return as
 }
 
 // RegisterRoutes registers the assets to the web server, serving the assets.
 func (a *Assets) RegisterRoutes(server *web.Server) {
-	fs := fs.Hide(a.FileSystem(), "/console.html", "/oauth.html")
-	server.Static(a.config.Mount, fs, middleware.Immutable)
+	if a.fs != nil {
+		server.Static(a.config.Mount, a.fs, middleware.Immutable)
+	}
 }
 
-// FileSystem returns a http.FileSystem that contains the assets.
-func (a *Assets) FileSystem() http.FileSystem {
-	if a.config.Directory != "" {
-		return http.Dir(a.config.Directory)
+// AppHandler returns an echo.HandlerFunc that renders an application.
+func (a *Assets) AppHandler(name string, env interface{}) echo.HandlerFunc {
+	var (
+		t    *template.Template
+		err  error
+		data = templates.Data{
+			Env: env,
+		}
+	)
+	if a.fs != nil {
+		t, err = a.loadTemplate(name)
+		if err == nil {
+			data.Root = a.config.Mount
+		}
+	} else {
+		t = templates.App
+		appData, ok := a.config.Apps[name]
+		if !ok {
+			err = ErrTemplateNotFound
+		} else {
+			data.Data = appData
+			data.Root = a.config.CDN
+		}
 	}
 
-	return a.bundledFS
-}
-
-type data struct {
-	// Root is the root where the assets will be served from.
-	Root string
-
-	// Env is the custom environment.
-	Env interface{}
-
-	// Error is a possible error that occurred.
-	Error error
-}
-
-// Render creates an echo.HandlerFunc that renders the selected template html file
-// from the assets filesystem.
-func (a *Assets) Render(name string, env interface{}) echo.HandlerFunc {
-	// The template is loaded outside the handler.
-	template, err := a.template(name)
-
 	return func(c echo.Context) error {
-		// Handle template error inside handler for method signature simplicity.
 		if err != nil {
 			return err
 		}
-
-		// So that is only reloaded if FS is reading from a directory.
-		t, err := a.fresh(name, template)
-		if err != nil {
-			return err
-		}
-
-		data := data{
-			Root:  a.config.CDN,
-			Env:   env,
-			Error: nil,
-		}
-
 		c.Response().WriteHeader(http.StatusOK)
 		return t.Execute(c.Response().Writer, data)
 	}
 }
 
-// template reads the template file from the filesystem and parses it.
-func (a *Assets) template(name string) (*template.Template, error) {
-	index, err := a.FileSystem().Open(name)
+func (a *Assets) loadTemplate(name string) (*template.Template, error) {
+	f, err := a.fs.Open(name)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, ErrTemplateNotFound.WithCause(err)
+		}
+		return nil, err
+	}
+	defer f.Close()
+	html, err := ioutil.ReadAll(f)
 	if err != nil {
 		return nil, err
 	}
-
-	html, err := ioutil.ReadAll(index)
-	if err != nil {
-		return nil, err
-	}
-
-	t, err := template.New(name).Parse(string(html))
-	if err != nil {
-		return nil, err
-	}
-
-	return t, nil
-}
-
-// fresh reloads the template if the Assets filesystem is reading from a directory.
-func (a *Assets) fresh(name string, t *template.Template) (*template.Template, error) {
-	if a.config.Directory == "" {
-		return t, nil
-	}
-
-	return a.template(name)
+	return template.New(name).Parse(string(html))
 }
