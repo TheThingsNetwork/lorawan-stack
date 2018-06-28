@@ -1008,6 +1008,8 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	msg.RxMetadata = acc.Accumulated()
 	events.Publish(evtMergeMetadata(ctx, dev.EndDeviceIdentifiers, len(msg.RxMetadata)))
 
+	dev.QueuedMACCommands = dev.QueuedMACCommands[:0]
+
 outer:
 	for _, cmd := range cmds {
 		cid := cmd.CID()
