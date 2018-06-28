@@ -29,13 +29,13 @@ import (
 // Config is the configuration for the Console.
 type Config struct {
 	// PublicURL is the public URL of the Console.
-	PublicURL string `name:"public-url" description:"The public URL of the Console"`
+	PublicURL string `name:"public-url" description:"Public URL of the Console"`
 
 	// DefaultLanguage is the default language of the Console.
-	DefaultLanguage string `name:"language" description:"The default language of the Console"`
+	DefaultLanguage string `name:"language" description:"Default language of the Console"`
 
 	// IdentityServerURL is the location of the Identity Server.
-	IdentityServerURL string `name:"identity-server-url" description:"The URL of the Identity Server"`
+	IdentityServerURL string `name:"identity-server-url" description:"URL of the Identity Server"`
 
 	// OAuth is the OAuth config for the Console.
 	OAuth OAuth `name:"oauth"`
@@ -121,7 +121,7 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 	}
 
 	group := server.Group(console.config.mount)
-	group.Use(console.assets.Errors("console.html", env))
+	group.Use(console.assets.Errors("error.html", env))
 
 	group.GET("/oauth/callback", console.Callback)
 
@@ -132,7 +132,7 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 	api.POST("/auth/logout", console.Logout)
 
 	// Set up HTML routes.
-	index := console.assets.Render("console.html", env)
+	index := console.assets.AppHandler("console.html", env)
 	group.GET("/", index)
 	group.GET("/*", index)
 }

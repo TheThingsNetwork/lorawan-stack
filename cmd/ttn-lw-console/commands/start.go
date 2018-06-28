@@ -34,7 +34,12 @@ var (
 				return shared.ErrBaseComponentInitialize.WithCause(err)
 			}
 
-			_, err = console.New(c, assets.New(c, config.Assets), config.Console)
+			assets, err := assets.New(c, config.Assets)
+			if err != nil {
+				return shared.ErrConsoleInitialize.WithCause(err)
+			}
+
+			_, err = console.New(c, assets, config.Console)
 			if err != nil {
 				return shared.ErrConsoleInitialize.WithCause(err)
 			}
