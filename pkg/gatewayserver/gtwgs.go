@@ -110,16 +110,18 @@ func (g *GatewayServer) setupConnection(uid string, connectionInfo connection) {
 // this gateway may not be used for downlink.
 func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	ctx := link.Context()
-	gtwID := rpcmetadata.FromIncomingContext(ctx).ID
-
-	if err := validate.ID(gtwID); err != nil {
+	gtwID := ttnpb.GatewayIdentifiers{
+		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
+	}
+	if err := validate.ID(gtwID.GatewayID); err != nil {
 		return err
 	}
+	uid := gtwID.UniqueID(ctx)
 
 	events.Publish(evtStartGatewayLink(ctx, gtwID, nil))
 	defer events.Publish(evtEndGatewayLink(ctx, gtwID, err))
 
-	logger := log.FromContext(ctx).WithField("gateway_id", gtwID)
+	logger := log.FromContext(ctx).WithField("gateway_uid", uid)
 	ctx = log.NewContext(ctx, logger)
 	logger.Info("Link with gateway opened")
 	defer logger.WithError(err).Debug("Link with gateway closed")
@@ -137,10 +139,7 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 		}
 	}
 
-	id := ttnpb.GatewayIdentifiers{
-		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
-	}
-	gtw, err := is.GetGateway(ctx, &id)
+	gtw, err := is.GetGateway(ctx, &gtwID)
 	if err != nil {
 		return errors.NewWithCause(err, "Could not get gateway information from Identity Server")
 	}
@@ -166,16 +165,15 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	ctx, connectionInfo.cancel = context.WithCancel(ctx)
 	defer connectionInfo.cancel()
 
-	uid := id.UniqueID(ctx)
 	g.setupConnection(uid, connectionInfo)
 
-	go g.signalStartServingGateway(ctx, &id)
+	go g.signalStartServingGateway(ctx, &gtwID)
 
 	go func() {
 		<-ctx.Done()
 		// TODO: Add tenant extraction when #433 is merged
 		stopCtx, cancel := context.WithTimeout(g.Context(), time.Minute)
-		g.signalStopServingGateway(stopCtx, &id)
+		g.signalStopServingGateway(stopCtx, &gtwID)
 		cancel()
 
 		g.connectionsMu.Lock()
