@@ -103,8 +103,8 @@ func testServer(t *testing.T) *Server {
 		comp, err := component.New(logger, &component.Config{})
 		a.So(err, should.BeNil)
 
-		assets := assets.New(comp, assets.Config{
-			Directory: "../../webui",
+		assets := assets.MustNew(comp, assets.Config{
+			SearchPath: []string{"."},
 		})
 
 		config := Config{

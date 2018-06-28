@@ -32,7 +32,11 @@ var (
 				return shared.ErrBaseComponentInitialize.WithCause(err)
 			}
 
-			config.IS.OAuth.Assets = assets.New(c, config.Assets)
+			assets, err := assets.New(c, config.Assets)
+			if err != nil {
+				return shared.ErrIdentityServerInitialize.WithCause(err)
+			}
+			initConfig.IS.OAuth.Assets = assets
 
 			is, err := identityserver.New(c, config.IS)
 			if err != nil {

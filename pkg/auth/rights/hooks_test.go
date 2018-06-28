@@ -74,8 +74,8 @@ func TestUnaryHook(t *testing.T) {
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{})
 
-	assets := assets.New(c, assets.Config{
-		Directory: "../../webui",
+	assets := assets.MustNew(c, assets.Config{
+		SearchPath: []string{"."},
 	})
 
 	isConfig := commands.DefaultConfig.IS

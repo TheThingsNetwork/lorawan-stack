@@ -32,13 +32,13 @@ import (
 // Config is the configuration of the OAuth server.
 type Config struct {
 	// AuthorizationCodeTTL is the duration issued authorization codes are valid.
-	AuthorizationCodeTTL time.Duration `name:"authorization-code-ttl" description:"Validity of issued authorization codes."`
+	AuthorizationCodeTTL time.Duration `name:"authorization-code-ttl" description:"Validity of issued authorization codes"`
 
 	// AccessTokenTTL is the duration issued access tokens are valid.
-	AccessTokenTTL time.Duration `name:"access-token-ttl" description:"Validity of issued access tokens."`
+	AccessTokenTTL time.Duration `name:"access-token-ttl" description:"Validity of issued access tokens"`
 
 	// PublicURL is the public URL of the OAuth server.
-	PublicURL string `name:"public-url" description:"Public URL of the OAuth provider."`
+	PublicURL string `name:"public-url" description:"Public URL of the OAuth provider"`
 
 	// Assets are the assets to be used.
 	Assets *assets.Assets `name:"-"`
@@ -156,10 +156,10 @@ func (s *Server) RegisterRoutes(server *web.Server) {
 	}
 
 	// Handler that serve the HTML page.
-	index := s.config.Assets.Render("oauth.html", env)
+	index := s.config.Assets.AppHandler("oauth.html", env)
 
 	group := server.Group(s.config.mount)
-	group.Use(s.config.Assets.Errors("oauth.html", env))
+	group.Use(s.config.Assets.Errors("error.html", env))
 
 	group.POST("/oauth/token", s.token)
 	group.Any("/oauth/authorize", s.authorize(index), s.RedirectToLogin)

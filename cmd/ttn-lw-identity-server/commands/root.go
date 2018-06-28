@@ -37,18 +37,18 @@ var (
 		SilenceUsage:  true,
 		Short:         "The Things Network Identity Server for LoRaWAN",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			// read in config from file
+			// Read in config from file.
 			err := mgr.ReadInConfig()
 			if err != nil {
 				return err
 			}
 
-			// unmarshal config
+			// Unmarshal config.
 			if err = mgr.Unmarshal(config); err != nil {
 				return err
 			}
 
-			// create logger
+			// Create logger.
 			logger, err = log.NewLogger(
 				log.WithLevel(config.Log.Level),
 				log.WithHandler(log.NewCLI(os.Stdout)),
@@ -57,7 +57,7 @@ var (
 				logger.Use(sentry)
 			}
 
-			// initialize shared packages
+			// Initialize shared packages.
 			if err := shared.Initialize(config.ServiceBase); err != nil {
 				return err
 			}

@@ -118,8 +118,6 @@ func newTestUsers() map[string]*ttnpb.User {
 	}
 }
 
-// NOTE: Identity Server tests must run in this same directory as it is relying
-// on the relative path to access the webui folder to create the assets instance.
 func newTestIS(t testing.TB) *IdentityServer {
 	if testInstance != nil {
 		return testInstance
@@ -128,8 +126,8 @@ func newTestIS(t testing.TB) *IdentityServer {
 	logger := test.GetLogger(t)
 	comp := component.MustNew(logger, &component.Config{})
 
-	testConfig.OAuth.Assets = assets.New(comp, assets.Config{
-		Directory: "../webui",
+	testConfig.OAuth.Assets = assets.MustNew(comp, assets.Config{
+		SearchPath: []string{"."},
 	})
 
 	is, err := New(comp, testConfig)
