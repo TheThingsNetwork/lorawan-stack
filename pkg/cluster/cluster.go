@@ -157,11 +157,16 @@ func (c *cluster) Join() (err error) {
 	}
 	for _, peer := range c.peers {
 		peer.ctx, peer.cancel = context.WithCancel(c.ctx)
-		log.FromContext(c.ctx).WithFields(log.Fields(
+		logger := log.FromContext(c.ctx).WithFields(log.Fields(
 			"target", peer.target,
 			"name", peer.Name(),
 			"roles", peer.Roles(),
-		)).Debug("Connecting to peer...")
+		))
+		if peer.target == "" {
+			logger.Warn("Not connecting to peer, empty address.")
+			continue
+		}
+		logger.Debug("Connecting to peer...")
 		peer.conn, err = grpc.DialContext(peer.ctx, peer.target, options...)
 		if err != nil {
 			return errors.NewWithCause(err, "Could not connect to peer")
