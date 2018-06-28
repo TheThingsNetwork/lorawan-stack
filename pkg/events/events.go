@@ -32,7 +32,7 @@ type Event interface {
 	Context() context.Context
 	Name() string
 	Time() time.Time
-	Identifiers() ttnpb.Identifiers
+	Identifiers() *ttnpb.CombinedIdentifiers
 	Data() interface{}
 	CorrelationIDs() []string
 	Origin() string
@@ -46,14 +46,12 @@ func local(evt Event) *event {
 			ctx:            evt.Context(),
 			Name:           evt.Name(),
 			Time:           evt.Time(),
+			Identifiers:    evt.Identifiers(),
 			Data:           evt.Data(),
 			CorrelationIDs: evt.CorrelationIDs(),
 			Origin:         evt.Origin(),
 			Caller:         evt.Caller(),
 		}}
-		if ids := evt.Identifiers(); ids != nil {
-			localEvent.innerEvent.Identifiers = ids.CombinedIdentifiers()
-		}
 	}
 	return localEvent
 }
@@ -93,14 +91,14 @@ type innerEvent struct {
 	Caller         string                     `json:"caller,omitempty"` // for debugging
 }
 
-func (e event) Context() context.Context       { return e.innerEvent.ctx }
-func (e event) Name() string                   { return e.innerEvent.Name }
-func (e event) Time() time.Time                { return e.innerEvent.Time }
-func (e event) Identifiers() ttnpb.Identifiers { return e.innerEvent.Identifiers }
-func (e event) Data() interface{}              { return e.innerEvent.Data }
-func (e event) CorrelationIDs() []string       { return e.innerEvent.CorrelationIDs }
-func (e event) Origin() string                 { return e.innerEvent.Origin }
-func (e event) Caller() string                 { return e.innerEvent.Caller }
+func (e event) Context() context.Context                { return e.innerEvent.ctx }
+func (e event) Name() string                            { return e.innerEvent.Name }
+func (e event) Time() time.Time                         { return e.innerEvent.Time }
+func (e event) Identifiers() *ttnpb.CombinedIdentifiers { return e.innerEvent.Identifiers }
+func (e event) Data() interface{}                       { return e.innerEvent.Data }
+func (e event) CorrelationIDs() []string                { return e.innerEvent.CorrelationIDs }
+func (e event) Origin() string                          { return e.innerEvent.Origin }
+func (e event) Caller() string                          { return e.innerEvent.Caller }
 
 var hostname string
 
