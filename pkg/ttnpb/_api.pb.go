@@ -75,6 +75,7 @@ It has these top-level messages:
 	ClientIdentifiers
 	OrganizationIdentifiers
 	OrganizationOrUserIdentifiers
+	CombinedIdentifiers
 	PullConfigurationRequest
 	IdentityServerSettings
 	UpdateSettingsRequest

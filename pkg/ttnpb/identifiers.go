@@ -101,3 +101,44 @@ func (ids EndDeviceIdentifiers) IsZero() bool {
 		(ids.DevEUI == nil || ids.DevEUI.IsZero()) &&
 		(ids.JoinEUI == nil || ids.JoinEUI.IsZero())
 }
+
+type Identifiers interface {
+	CombinedIdentifiers() *CombinedIdentifiers
+}
+
+func (ids ApplicationIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
+	return &CombinedIdentifiers{ApplicationIDs: []*ApplicationIdentifiers{&ids}}
+}
+func (ids ClientIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
+	return &CombinedIdentifiers{ClientIDs: []*ClientIdentifiers{&ids}}
+}
+func (ids EndDeviceIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
+	return &CombinedIdentifiers{DeviceIDs: []*EndDeviceIdentifiers{&ids}}
+}
+func (ids GatewayIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
+	return &CombinedIdentifiers{GatewayIDs: []*GatewayIdentifiers{&ids}}
+}
+func (ids OrganizationIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
+	return &CombinedIdentifiers{OrganizationIDs: []*OrganizationIdentifiers{&ids}}
+}
+func (ids UserIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
+	return &CombinedIdentifiers{UserIDs: []*UserIdentifiers{&ids}}
+}
+
+func CombineIdentifiers(ids ...Identifiers) *CombinedIdentifiers {
+	combined := &CombinedIdentifiers{}
+	for _, id := range ids {
+		asCombined := id.CombinedIdentifiers()
+		combined.ApplicationIDs = append(combined.ApplicationIDs, asCombined.ApplicationIDs...)
+		combined.ClientIDs = append(combined.ClientIDs, asCombined.ClientIDs...)
+		combined.DeviceIDs = append(combined.DeviceIDs, asCombined.DeviceIDs...)
+		combined.GatewayIDs = append(combined.GatewayIDs, asCombined.GatewayIDs...)
+		combined.OrganizationIDs = append(combined.OrganizationIDs, asCombined.OrganizationIDs...)
+		combined.UserIDs = append(combined.UserIDs, asCombined.UserIDs...)
+	}
+	return combined
+}
+
+func (ids *CombinedIdentifiers) CombinedIdentifiers() *CombinedIdentifiers {
+	return ids
+}
