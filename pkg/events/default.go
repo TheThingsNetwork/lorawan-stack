@@ -14,7 +14,11 @@
 
 package events
 
-import "context"
+import (
+	"context"
+
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
 
 // DefaultPubSub is the default event pubsub.
 var DefaultPubSub = NewPubSub()
@@ -37,7 +41,7 @@ func Publish(evt Event) {
 // PublishEvent creates an event and emits it on the default event pubsub.
 // Event names are dot-separated for namespacing.
 // Event identifiers and data will in most cases be marshaled to JSON, but ideally has (embedded) proto messages.
-func PublishEvent(ctx context.Context, name string, identifiers, data interface{}) {
+func PublishEvent(ctx context.Context, name string, identifiers ttnpb.Identifiers, data interface{}) {
 	localEvent := local(New(ctx, name, identifiers, data))
 	localEvent = localEvent.withCaller()
 	Publish(localEvent)

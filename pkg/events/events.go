@@ -23,6 +23,8 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // Event interface
@@ -30,7 +32,7 @@ type Event interface {
 	Context() context.Context
 	Name() string
 	Time() time.Time
-	Identifiers() interface{}
+	Identifiers() ttnpb.Identifiers
 	Data() interface{}
 	CorrelationIDs() []string
 	Origin() string
@@ -44,12 +46,14 @@ func local(evt Event) *event {
 			ctx:            evt.Context(),
 			Name:           evt.Name(),
 			Time:           evt.Time(),
-			Identifiers:    evt.Identifiers(),
 			Data:           evt.Data(),
 			CorrelationIDs: evt.CorrelationIDs(),
 			Origin:         evt.Origin(),
 			Caller:         evt.Caller(),
 		}}
+		if ids := evt.Identifiers(); ids != nil {
+			localEvent.innerEvent.Identifiers = ids.CombinedIdentifiers()
+		}
 	}
 	return localEvent
 }
@@ -80,23 +84,23 @@ func (e *event) withCaller() *event {
 
 type innerEvent struct {
 	ctx            context.Context
-	Name           string      `json:"name"`
-	Time           time.Time   `json:"time"`
-	Identifiers    interface{} `json:"identifiers,omitempty"`
-	Data           interface{} `json:"data,omitempty"`
-	CorrelationIDs []string    `json:"correlation_ids,omitempty"`
-	Origin         string      `json:"origin,omitempty"`
-	Caller         string      `json:"caller,omitempty"` // for debugging
+	Name           string                     `json:"name"`
+	Time           time.Time                  `json:"time"`
+	Identifiers    *ttnpb.CombinedIdentifiers `json:"identifiers,omitempty"`
+	Data           interface{}                `json:"data,omitempty"`
+	CorrelationIDs []string                   `json:"correlation_ids,omitempty"`
+	Origin         string                     `json:"origin,omitempty"`
+	Caller         string                     `json:"caller,omitempty"` // for debugging
 }
 
-func (e event) Context() context.Context { return e.innerEvent.ctx }
-func (e event) Name() string             { return e.innerEvent.Name }
-func (e event) Time() time.Time          { return e.innerEvent.Time }
-func (e event) Identifiers() interface{} { return e.innerEvent.Identifiers }
-func (e event) Data() interface{}        { return e.innerEvent.Data }
-func (e event) CorrelationIDs() []string { return e.innerEvent.CorrelationIDs }
-func (e event) Origin() string           { return e.innerEvent.Origin }
-func (e event) Caller() string           { return e.innerEvent.Caller }
+func (e event) Context() context.Context       { return e.innerEvent.ctx }
+func (e event) Name() string                   { return e.innerEvent.Name }
+func (e event) Time() time.Time                { return e.innerEvent.Time }
+func (e event) Identifiers() ttnpb.Identifiers { return e.innerEvent.Identifiers }
+func (e event) Data() interface{}              { return e.innerEvent.Data }
+func (e event) CorrelationIDs() []string       { return e.innerEvent.CorrelationIDs }
+func (e event) Origin() string                 { return e.innerEvent.Origin }
+func (e event) Caller() string                 { return e.innerEvent.Caller }
 
 var hostname string
 
@@ -107,18 +111,21 @@ func init() {
 // New returns a new Event.
 // Event names are dot-separated for namespacing.
 // Event data will in most cases be marshaled to JSON, but ideally has (embedded) proto messages.
-func New(ctx context.Context, name string, identifiers, data interface{}) Event {
-	return &event{
+func New(ctx context.Context, name string, identifiers ttnpb.Identifiers, data interface{}) Event {
+	evt := &event{
 		innerEvent: innerEvent{
 			ctx:            ctx,
 			Name:           name,
 			Time:           time.Now().UTC(),
-			Identifiers:    identifiers,
 			Data:           data,
 			Origin:         hostname,
 			CorrelationIDs: CorrelationIDsFromContext(ctx),
 		},
 	}
+	if identifiers != nil {
+		evt.innerEvent.Identifiers = identifiers.CombinedIdentifiers()
+	}
+	return evt
 }
 
 // UnmarshalJSON unmarshals an event as JSON.

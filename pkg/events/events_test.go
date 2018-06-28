@@ -64,7 +64,7 @@ func TestEvents(t *testing.T) {
 	pubsub.Subscribe("test.*", handler)
 	pubsub.Subscribe("test.*", handler) // second time should not matter
 
-	evt := events.New(ctx, "test.evt1", "id", "hello")
+	evt := events.New(ctx, "test.evt1", nil, "hello")
 	a.So(evt.CorrelationIDs(), should.Contain, t.Name())
 
 	wrapped := wrappedEvent{Event: evt}
@@ -89,7 +89,7 @@ func TestEvents(t *testing.T) {
 
 func TestUnmarshalJSON(t *testing.T) {
 	a := assertions.New(t)
-	evt := events.New(context.Background(), "name", "identifiers", "data")
+	evt := events.New(context.Background(), "name", ttnpb.CombineIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "application_id"}), "data")
 	json, err := json.Marshal(evt)
 	a.So(err, should.BeNil)
 	evt2, err := events.UnmarshalJSON(json)
@@ -126,7 +126,7 @@ func Example() {
 	ctx = events.ContextWithEnsuredCorrelationID(ctx)
 
 	// Publishing an event to the events package will dispatch it on the "global" event pubsub.
-	events.Publish(adrSendEvent(ctx, dev, requests))
+	events.Publish(adrSendEvent(ctx, dev.EndDeviceIdentifiers, requests))
 
 	wg.Wait() // only for the test
 

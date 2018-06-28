@@ -26,6 +26,6 @@ import (
 func TestDefinitions(t *testing.T) {
 	a := assertions.New(t)
 	testEvent := events.Define("test", "Test Event")
-	evt := testEvent(context.Background(), "id", "err")
+	evt := testEvent(context.Background(), nil, "err")
 	a.So(evt.Name(), should.Equal, "test")
 }

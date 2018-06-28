@@ -17,10 +17,12 @@ package events
 import (
 	"context"
 	"fmt"
+
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // Definition of a registered event.
-type Definition func(ctx context.Context, identifiers, data interface{}) Event
+type Definition func(ctx context.Context, identifiers ttnpb.Identifiers, data interface{}) Event
 
 // Definitions of registered events.
 // Events that are defined in init() funcs will be collected for translation.
@@ -32,7 +34,7 @@ func Define(name, description string) Definition {
 		panic(fmt.Errorf("Event %s already defined", name))
 	}
 	Definitions[name] = description
-	return func(ctx context.Context, identifiers, data interface{}) Event {
+	return func(ctx context.Context, identifiers ttnpb.Identifiers, data interface{}) Event {
 		return New(ctx, name, identifiers, data)
 	}
 }
