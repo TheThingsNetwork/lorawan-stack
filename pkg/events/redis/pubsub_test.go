@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/events/redis"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -80,10 +81,15 @@ func TestRedisPubSub(t *testing.T) {
 
 	ctx := events.ContextWithCorrelationID(context.Background(), t.Name())
 
-	pubsub.Publish(events.New(ctx, "redis.test.evt0", nil, nil))
+	appID := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
+
+	pubsub.Publish(events.New(ctx, "redis.test.evt0", appID, nil))
 	select {
 	case e := <-eventCh:
 		a.So(e.Name(), should.Equal, "redis.test.evt0")
+		if a.So(e.Identifiers(), should.NotBeNil) {
+			a.So(e.Identifiers().ApplicationIDs, should.Resemble, []*ttnpb.ApplicationIdentifiers{appID})
+		}
 	case <-time.After(time.Second):
 		t.Error("Did not receive expected event")
 		t.FailNow()
