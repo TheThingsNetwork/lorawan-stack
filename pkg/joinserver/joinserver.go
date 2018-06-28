@@ -106,7 +106,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	logger := log.FromContext(ctx)
 	defer func() {
 		if err != nil {
-			events.Publish(evtRejectJoin(ctx, req, err))
+			events.Publish(evtRejectJoin(ctx, req.EndDeviceIdentifiers, err))
 		}
 	}()
 
