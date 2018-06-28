@@ -16,7 +16,9 @@ package test
 
 import (
 	"bytes"
+	"strings"
 	"sync"
+	"unicode"
 
 	"go.thethings.network/lorawan-stack/pkg/log"
 )
@@ -49,18 +51,18 @@ func NewTestingHandler(l Logger) *TestingHandler {
 // HandleLog implements Handler.
 func (h *TestingHandler) HandleLog(e log.Entry) error {
 	h.bufferMu.Lock()
-	defer h.bufferMu.Unlock()
-
-	defer h.buffer.Reset()
+	defer func() {
+		h.buffer.Reset()
+		h.bufferMu.Unlock()
+	}()
 	if err := h.cliHandler.HandleLog(e); err != nil {
 		return err
 	}
-
+	msg := strings.TrimRightFunc(h.buffer.String(), unicode.IsSpace)
 	if e.Level() == log.FatalLevel {
-		h.logger.Fatal(h.buffer.String())
+		h.logger.Fatal(msg)
 	} else {
-		h.logger.Log(h.buffer.String())
+		h.logger.Log(msg)
 	}
-
 	return nil
 }
