@@ -32,7 +32,10 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-const nsReceptionTimeout = 2 * time.Second
+const (
+	peerConnectionTimeout = 5 * time.Second
+	nsReceptionTimeout    = 2 * time.Second
+)
 
 type mockLink struct {
 	*test.MockServerStream
@@ -138,10 +141,16 @@ func TestLink(t *testing.T) {
 
 	gsStart := time.Now()
 	for gs.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, []string{}, nil) == nil {
-		if time.Since(gsStart) > nsReceptionTimeout {
+		if time.Since(gsStart) > peerConnectionTimeout {
 			t.Fatal("Identity Server was not initialized in time by the Gateway Server - timeout")
 		}
-		time.Sleep(2 * time.Millisecond)
+		time.Sleep(200 * time.Millisecond)
+	}
+	for gs.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, []string{}, nil) == nil {
+		if time.Since(gsStart) > peerConnectionTimeout {
+			t.Fatal("Gateway Server could not reach Network Server in time - timeout")
+		}
+		time.Sleep(200 * time.Millisecond)
 	}
 
 	wg := sync.WaitGroup{}
