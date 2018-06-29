@@ -3,4 +3,4 @@
 package version
 
 // TTN Version
-const TTN = "vv3.0.0-pre-dev"
+const TTN = "v3.0.0-pre-dev"
