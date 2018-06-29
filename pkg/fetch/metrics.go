@@ -12,28 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package fetch offers abstractions to fetch a file with the same method,
-// regardless of a location (filesystem, HTTP...).
 package fetch
 
 import (
-	"time"
-
 	"github.com/prometheus/client_golang/prometheus"
+	"go.thethings.network/lorawan-stack/pkg/metrics"
 )
 
-// Interface is an abstraction for file retrieval.
-type Interface interface {
-	File(pathElements ...string) ([]byte, error)
-}
+const subsystem = "fetch"
 
-type baseFetcher struct {
-	base    string
-	latency prometheus.Observer
-}
+var fetchLatency = metrics.NewHistogramVec(
+	prometheus.HistogramOpts{
+		Subsystem: subsystem,
+		Name:      "fetch_latency_seconds",
+		Help:      "Histogram of latency (seconds) of file fetches",
+	},
+	[]string{"backend", "base"},
+)
 
-func (f baseFetcher) observeLatency(d time.Duration) {
-	if f.latency != nil {
-		f.latency.Observe(d.Seconds())
-	}
+func init() {
+	metrics.MustRegister(fetchLatency)
 }

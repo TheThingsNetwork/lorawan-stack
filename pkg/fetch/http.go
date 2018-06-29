@@ -15,22 +15,26 @@
 package fetch
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"path"
 	"strings"
+	"time"
 
 	"github.com/gregjones/httpcache"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 type httpFetcher struct {
-	baseURL   string
+	baseFetcher
 	transport *http.Client
 }
 
 func (f httpFetcher) File(pathElements ...string) ([]byte, error) {
-	allElements := append([]string{f.baseURL}, pathElements...)
-	url := strings.Join(allElements, "/")
+	start := time.Now()
+	url := fmt.Sprintf("%s/%s", f.base, strings.TrimLeft(path.Join(pathElements...), "/"))
+
 	resp, err := f.transport.Get(url)
 	if err != nil {
 		return nil, err
@@ -42,19 +46,27 @@ func (f httpFetcher) File(pathElements ...string) ([]byte, error) {
 
 	result, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
-	return result, err
+
+	if err != nil {
+		return nil, err
+	}
+
+	f.observeLatency(time.Since(start))
+	return result, nil
 }
 
 // FromHTTP returns an object to fetch files from a webserver.
 func FromHTTP(baseURL string, cache bool) Interface {
+	baseURL = strings.TrimRight(baseURL, "/")
 	f := httpFetcher{
-		baseURL:   baseURL,
+		baseFetcher: baseFetcher{
+			base:    baseURL,
+			latency: fetchLatency.WithLabelValues("http", baseURL),
+		},
 		transport: http.DefaultClient,
 	}
-
 	if !cache {
 		f.transport = httpcache.NewMemoryCacheTransport().Client()
 	}
-
 	return f
 }

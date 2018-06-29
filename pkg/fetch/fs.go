@@ -19,23 +19,31 @@ import (
 	"os"
 	"path/filepath"
 	"syscall"
+	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 type fsFetcher struct {
-	basePath string
+	baseFetcher
 }
 
 // FromFilesystem returns an interface that fetches files from the local filesystem
 func FromFilesystem(basePath string) Interface {
-	return fsFetcher{basePath: basePath}
+	basePath = filepath.Clean(basePath)
+	return fsFetcher{
+		baseFetcher{
+			base:    basePath,
+			latency: fetchLatency.WithLabelValues("fs", basePath),
+		},
+	}
 }
 
 func (f fsFetcher) File(pathElements ...string) ([]byte, error) {
-	allElements := append([]string{f.basePath}, pathElements...)
-	content, err := ioutil.ReadFile(filepath.Join(allElements...))
+	start := time.Now()
+	content, err := ioutil.ReadFile(filepath.Join(append([]string{f.base}, pathElements...)...))
 	if err == nil {
+		f.observeLatency(time.Since(start))
 		return content, nil
 	}
 
