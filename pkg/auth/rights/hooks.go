@@ -121,15 +121,22 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 				return nil, errors.New("No Identity Server to connect to")
 			}
 
+			var (
+				rights []ttnpb.Right
+				err    error
+			)
+
 			if m, ok := req.(OrganizationIDGetter); ok {
 				orgIDs := &ttnpb.OrganizationIdentifiers{
 					OrganizationID: m.GetOrganizationID(),
 				}
 
 				if !orgIDs.IsZero() {
+					defer func() { registerRightsRequest(ctx, "organization", rights, err) }()
 					key := fmt.Sprintf("%s:%s", md.AuthValue, orgIDs.UniqueID(ctx))
 
-					rights, err := h.organizationsCache.GetOrFetch(key, func() (rights []ttnpb.Right, err error) {
+					rights, err = h.organizationsCache.GetOrFetch(key, func() (rights []ttnpb.Right, err error) {
+						defer func() { registerRightsFetch(ctx, "organization", rights, err) }()
 						md.AllowInsecure = h.config.AllowInsecure
 						resp, err := ttnpb.NewIsOrganizationClient(conn).ListOrganizationRights(ctx, orgIDs, grpc.PerRPCCredentials(md))
 						if err != nil {
@@ -152,9 +159,11 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 				}
 
 				if !appIDs.IsZero() {
+					defer func() { registerRightsRequest(ctx, "application", rights, err) }()
 					key := fmt.Sprintf("%s:%s", md.AuthValue, appIDs.UniqueID(ctx))
 
-					rights, err := h.applicationsCache.GetOrFetch(key, func() (rights []ttnpb.Right, err error) {
+					rights, err = h.applicationsCache.GetOrFetch(key, func() (rights []ttnpb.Right, err error) {
+						defer func() { registerRightsFetch(ctx, "application", rights, err) }()
 						md.AllowInsecure = h.config.AllowInsecure
 						resp, err := ttnpb.NewIsApplicationClient(conn).ListApplicationRights(ctx, appIDs, grpc.PerRPCCredentials(md))
 						if err != nil {
@@ -177,9 +186,11 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 				}
 
 				if !gtwIDs.IsZero() {
+					defer func() { registerRightsRequest(ctx, "gateway", rights, err) }()
 					key := fmt.Sprintf("%s:%s", md.AuthValue, gtwIDs.UniqueID(ctx))
 
-					rights, err := h.gatewaysCache.GetOrFetch(key, func() (rights []ttnpb.Right, err error) {
+					rights, err = h.gatewaysCache.GetOrFetch(key, func() (rights []ttnpb.Right, err error) {
+						defer func() { registerRightsFetch(ctx, "gateway", rights, err) }()
 						md.AllowInsecure = h.config.AllowInsecure
 						resp, err := ttnpb.NewIsGatewayClient(conn).ListGatewayRights(ctx, gtwIDs, grpc.PerRPCCredentials(md))
 						if err != nil {
