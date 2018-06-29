@@ -17,9 +17,9 @@ package band
 
 import (
 	"math"
+	"strings"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
@@ -199,9 +199,7 @@ func GetByID(id ID) (Band, error) {
 			return band, nil
 		}
 	}
-	return Band{}, ErrBandNotFound.New(errors.Attributes{
-		"band": id,
-	})
+	return Band{}, errBandNotFound.WithAttributes("band_id", id)
 }
 
 type swapParameters struct {
@@ -222,22 +220,24 @@ func (b Band) downgrades() []swapParameters {
 
 // Version returns the band parameters for a given version.
 func (b Band) Version(wantedVersion ttnpb.PHYVersion) (Band, error) {
+	supportedRegionalParameters := []string{}
 	for _, swapParameter := range b.downgrades() {
 		if swapParameter.downgrade == nil {
-			return b, ErrUnsupportedLoRaWANRegionalParameters.New(nil)
+			return b, errUnsupportedLoRaWANRegionalParameters.WithAttributes("supported", strings.Join(supportedRegionalParameters, ", "))
 		}
+		supportedRegionalParameters = append(supportedRegionalParameters, swapParameter.version.String())
 		b = swapParameter.downgrade(b)
 		if swapParameter.version == wantedVersion {
 			return b, nil
 		}
 	}
 
-	return b, ErrUnknownLoRaWANRegionalParameters.New(nil)
+	return b, errUnknownLoRaWANRegionalParameters
 }
 
 // Versions supported for this band.
 func (b Band) Versions() []ttnpb.PHYVersion {
-	versions := []ttnpb.PHYVersion{ttnpb.PHY_V1_1_REV_B}
+	var versions []ttnpb.PHYVersion
 	for _, swapParameter := range b.downgrades() {
 		if swapParameter.downgrade != nil {
 			versions = append(versions, swapParameter.version)

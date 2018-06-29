@@ -17,7 +17,6 @@ package band
 import (
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
@@ -109,10 +108,10 @@ func init() {
 		Rx1Channel: channelIndexModulo(8),
 		Rx1DataRate: func(idx, offset uint32, _ bool) (uint32, error) {
 			if idx > 6 {
-				return 0, ErrLoRaWANParametersInvalid.NewWithCause(nil, errors.New("Data rate index must be lower or equal to 6"))
+				return 0, errDataRateIndexTooHigh.WithAttributes("max", 6)
 			}
 			if offset > 5 {
-				return 0, ErrLoRaWANParametersInvalid.NewWithCause(nil, errors.New("Offset must be lower or equal to 5"))
+				return 0, errDataRateOffsetTooHigh.WithAttributes("max", 5)
 			}
 
 			si := int(idx + 8 - offset)
