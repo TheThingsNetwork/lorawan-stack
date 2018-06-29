@@ -19,7 +19,7 @@ import (
 	"sync"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	yaml "gopkg.in/yaml.v2"
@@ -28,32 +28,14 @@ import (
 const yamlFetchErrorCache = 1 * time.Minute
 
 var (
-	// ErrFrequencyPlanNotFound is returned when a frequency plan could not be found.
-	ErrFrequencyPlanNotFound = &errors.ErrDescriptor{
-		MessageFormat:  "Frequency plan `{frequency_plan_id}` not found",
-		Code:           1,
-		Type:           errors.NotFound,
-		SafeAttributes: []string{"frequency_plan_id"},
-	}
-	// ErrFetchFailed is returned when a frequency plan could not be fetched.
-	ErrFetchFailed = &errors.ErrDescriptor{
-		MessageFormat: "Fetching the file failed",
-		Code:          2,
-		Type:          errors.External,
-	}
-	// ErrIDNotSpecified is returned when the ID of a frequency plan to return was not specified.
-	ErrIDNotSpecified = &errors.ErrDescriptor{
-		MessageFormat: "ID of the frequency plan to return not specified",
-		Code:          3,
-		Type:          errors.InvalidArgument,
-	}
+	errFrequencyPlanNotFound         = errors.DefineNotFound("frequency_plan_not_found", "frequency plan `{id}` not found")
+	errFetchFailed                   = errors.DefineCorruption("fetch", "fetching failed")
+	errIDNotSpecified                = errors.DefineInvalidArgument("id_not_specified", "ID of the frequency plan not specified")
+	errCouldNotUnmarshalFile         = errors.DefineCorruption("unmarshal_file", "could not unmarshal file")
+	errCouldNotReadList              = errors.Define("read_list", "could not read the list of frequency plans")
+	errCouldNotReadFrequencyPlan     = errors.Define("read_frequency_plan", "could not read the frequency plan `{id}`")
+	errCouldNotReadBaseFrequencyPlan = errors.Define("read_base_frequency_plan", "could not read the base `{base_id}` of frequency plan `{id}`")
 )
-
-func init() {
-	ErrFrequencyPlanNotFound.Register()
-	ErrFetchFailed.Register()
-	ErrIDNotSpecified.Register()
-}
 
 // FrequencyPlanDescription describes a frequency plan in the YAML format.
 type FrequencyPlanDescription struct {
@@ -71,7 +53,11 @@ type FrequencyPlanDescription struct {
 }
 
 func (d FrequencyPlanDescription) content(f fetch.Interface) ([]byte, error) {
-	return f.File(d.Filename)
+	content, err := f.File(d.Filename)
+	if err != nil {
+		return nil, errFetchFailed.WithCause(err)
+	}
+	return content, nil
 }
 
 func (d FrequencyPlanDescription) proto(f fetch.Interface) (ttnpb.FrequencyPlan, error) {
@@ -83,7 +69,7 @@ func (d FrequencyPlanDescription) proto(f fetch.Interface) (ttnpb.FrequencyPlan,
 	}
 
 	if err := yaml.Unmarshal(content, &fp); err != nil {
-		return fp, err
+		return fp, errCouldNotUnmarshalFile.WithCause(err)
 	}
 
 	return fp, nil
@@ -133,12 +119,12 @@ func NewStore(fetcher fetch.Interface) *Store {
 func (s *Store) fetchDescriptions() (frequencyPlanList, error) {
 	content, err := s.Fetcher.File("frequency-plans.yml")
 	if err != nil {
-		return nil, err
+		return nil, errFetchFailed.WithCause(err)
 	}
 
 	descriptions := frequencyPlanList{}
 	if err = yaml.Unmarshal(content, &descriptions); err != nil {
-		return nil, errors.NewWithCause(err, "Failed to parse the file content as a list of frequency plans")
+		return nil, errCouldNotUnmarshalFile.WithCause(err)
 	}
 
 	return descriptions, nil
@@ -152,14 +138,14 @@ func (s *Store) descriptions() (frequencyPlanList, error) {
 	}
 
 	if time.Since(s.descriptionsFetchErrorTime) < yamlFetchErrorCache {
-		return nil, ErrFetchFailed.NewWithCause(nil, s.descriptionsFetchError)
+		return nil, s.descriptionsFetchError
 	}
 
 	descriptions, err := s.fetchDescriptions()
 	if err != nil {
 		s.descriptionsFetchError = err
 		s.descriptionsFetchErrorTime = time.Now()
-		return nil, ErrFetchFailed.NewWithCause(nil, err)
+		return nil, err
 	}
 
 	s.descriptionsFetchErrorTime = time.Time{}
@@ -172,33 +158,37 @@ func (s *Store) descriptions() (frequencyPlanList, error) {
 func (s *Store) getByID(id string) (proto ttnpb.FrequencyPlan, err error) {
 	descriptions, err := s.descriptions()
 	if err != nil {
-		return ttnpb.FrequencyPlan{}, errors.NewWithCause(err, "Could not read the list of frequency plans filenames")
+		return ttnpb.FrequencyPlan{}, errCouldNotReadList.WithCause(err)
 	}
 
 	description, ok := descriptions.get(id)
 	if !ok {
-		return ttnpb.FrequencyPlan{}, ErrFrequencyPlanNotFound.New(errors.Attributes{
-			"frequency_plan_id": id,
-		})
+		return ttnpb.FrequencyPlan{}, errFrequencyPlanNotFound.WithAttributes("id", id)
 	}
 
 	proto, err = description.proto(s.Fetcher)
 	if err != nil {
-		return
+		return proto, errCouldNotReadFrequencyPlan.WithCause(err).WithAttributes("id", id)
 	}
 
 	if description.BaseID != "" {
 		base, ok := descriptions.get(description.BaseID)
 		if !ok {
-			return ttnpb.FrequencyPlan{}, errors.NewWithCausef(ErrFrequencyPlanNotFound.New(errors.Attributes{
-				"frequency_plan_id": description.BaseID,
-			}), "Could not found the base of the frequency plan %s", id)
+			return ttnpb.FrequencyPlan{}, errCouldNotReadBaseFrequencyPlan.WithCause(
+				errFrequencyPlanNotFound.WithAttributes("id", description.BaseID),
+			).WithAttributes(
+				"id", description.ID,
+				"base_id", description.BaseID,
+			)
 		}
 
 		var baseProto ttnpb.FrequencyPlan
 		baseProto, err = base.proto(s.Fetcher)
 		if err != nil {
-			return
+			return ttnpb.FrequencyPlan{}, errCouldNotReadBaseFrequencyPlan.WithCause(err).WithAttributes(
+				"id", description.ID,
+				"base_id", description.BaseID,
+			)
 		}
 
 		proto = baseProto.Extend(proto)
@@ -210,7 +200,7 @@ func (s *Store) getByID(id string) (proto ttnpb.FrequencyPlan, err error) {
 // GetByID tries to retrieve the frequency plan that has the given ID, and returns an error otherwise.
 func (s *Store) GetByID(id string) (ttnpb.FrequencyPlan, error) {
 	if id == "" {
-		return ttnpb.FrequencyPlan{}, ErrIDNotSpecified.New(nil)
+		return ttnpb.FrequencyPlan{}, errIDNotSpecified
 	}
 
 	s.frequencyPlansMu.Lock()
@@ -232,7 +222,7 @@ func (s *Store) GetByID(id string) (ttnpb.FrequencyPlan, error) {
 func (s *Store) GetAllIDs() ([]string, error) {
 	descriptions, err := s.descriptions()
 	if err != nil {
-		return nil, err
+		return nil, errCouldNotReadList.WithCause(err)
 	}
 
 	ids := []string{}
