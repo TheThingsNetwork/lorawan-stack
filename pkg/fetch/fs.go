@@ -20,8 +20,6 @@ import (
 	"path/filepath"
 	"syscall"
 	"time"
-
-	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 type fsFetcher struct {
@@ -47,15 +45,12 @@ func (f fsFetcher) File(pathElements ...string) ([]byte, error) {
 		return content, nil
 	}
 
-	attributes := errors.Attributes{
-		"filename": filepath.Join(pathElements...),
-	}
 	switch err := err.(type) {
 	case *os.PathError:
 		if errno, ok := err.Err.(syscall.Errno); ok && errno == syscall.ENOENT {
-			return nil, ErrFileNotFound.New(attributes)
+			return nil, errFileNotFound.WithAttributes("filename", filepath.Join(pathElements...))
 		}
-		return nil, ErrFileFailedToOpen.NewWithCause(attributes, err)
+		return nil, errCouldNotReadFile.WithCause(err).WithAttributes("filename", filepath.Join(pathElements...))
 	default:
 		return nil, err
 	}

@@ -14,26 +14,10 @@
 
 package fetch
 
-import "go.thethings.network/lorawan-stack/pkg/errors"
+import errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 
 var (
-	// ErrFileFailedToOpen indicates the file could not be opened.
-	ErrFileFailedToOpen = &errors.ErrDescriptor{
-		MessageFormat:  "File `{filename}` failed to open",
-		Code:           1,
-		Type:           errors.Internal,
-		SafeAttributes: []string{"filename"},
-	}
-	// ErrFileNotFound indicates the file could not be found.
-	ErrFileNotFound = &errors.ErrDescriptor{
-		MessageFormat:  "File `{filename}` not found",
-		Code:           2,
-		Type:           errors.NotFound,
-		SafeAttributes: []string{"filename"},
-	}
+	errFileNotFound      = errors.DefineNotFound("file_not_found", "file `{filename}` not found")
+	errCouldNotFetchFile = errors.Define("fetch_file", "could not fetch file `{filename}`")
+	errCouldNotReadFile  = errors.DefineCorruption("read_file", "could not read file `{filename}`")
 )
-
-func init() {
-	ErrFileFailedToOpen.Register()
-	ErrFileNotFound.Register()
-}

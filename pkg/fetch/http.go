@@ -33,22 +33,23 @@ type httpFetcher struct {
 
 func (f httpFetcher) File(pathElements ...string) ([]byte, error) {
 	start := time.Now()
-	url := fmt.Sprintf("%s/%s", f.base, strings.TrimLeft(path.Join(pathElements...), "/"))
+	filename := strings.TrimLeft(path.Join(pathElements...), "/")
+	url := fmt.Sprintf("%s/%s", f.base, filename)
 
 	resp, err := f.transport.Get(url)
 	if err != nil {
-		return nil, err
+		return nil, errCouldNotFetchFile.WithCause(err).WithAttributes("filename", filename)
 	}
 
 	if err = errors.FromHTTP(resp); err != nil {
-		return nil, err
+		return nil, errCouldNotFetchFile.WithCause(err).WithAttributes("filename", filename)
 	}
 
 	result, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 
 	if err != nil {
-		return nil, err
+		return nil, errCouldNotReadFile.WithCause(err).WithAttributes("filename", filename)
 	}
 
 	f.observeLatency(time.Since(start))
