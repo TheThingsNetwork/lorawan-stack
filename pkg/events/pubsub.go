@@ -96,6 +96,7 @@ func (e *pubsub) Subscribe(name string, hdl Handler) error {
 		Glob:      glob,
 		Handler:   hdl,
 	})
+	subscriptions.WithLabelValues(name).Inc()
 	return nil
 }
 
@@ -105,6 +106,7 @@ func (e *pubsub) Unsubscribe(name string, hdl Handler) {
 	for i, l := range e.handlers {
 		if l.eventName == name && l.Handler == hdl {
 			e.handlers = append(e.handlers[:i], e.handlers[i+1:]...)
+			subscriptions.WithLabelValues(name).Dec()
 			return
 		}
 	}
@@ -113,5 +115,6 @@ func (e *pubsub) Unsubscribe(name string, hdl Handler) {
 func (e *pubsub) Publish(evt Event) {
 	localEvent := local(evt)
 	localEvent = localEvent.withCaller()
+	publishes.WithLabelValues(evt.Context(), evt.Name()).Inc()
 	e.events <- localEvent
 }
