@@ -53,19 +53,18 @@ func (c *ttlCache) GetOrFetch(key string, fetch func() ([]ttnpb.Right, error)) (
 
 	e, ok := c.entries[key]
 	if ok && !e.IsExpired(c.ttl) {
-		return e.value, nil
+		return e.value, e.err
 	}
 
 	// Otherwise fetch.
 	rights, err := fetch()
-	if err != nil {
-		return nil, err
-	}
 	c.entries[key] = &entry{
 		createdAt: time.Now(),
 		value:     rights,
+		err:       err,
 	}
-	return rights, nil
+
+	return rights, err
 }
 
 // garbageCollector is the method executed in a goroutine in charge of delete
@@ -94,6 +93,7 @@ func (c *ttlCache) garbageCollector() {
 type entry struct {
 	createdAt time.Time
 	value     []ttnpb.Right
+	err       error
 }
 
 func (e *entry) IsExpired(ttl time.Duration) bool {
