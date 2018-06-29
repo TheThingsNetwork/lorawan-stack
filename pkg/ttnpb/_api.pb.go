@@ -18,7 +18,7 @@ It is generated from these files:
 	go.thethings.network/lorawan-stack/api/end_device_services.proto
 	go.thethings.network/lorawan-stack/api/error.proto
 	go.thethings.network/lorawan-stack/api/gateway.proto
-	go.thethings.network/lorawan-stack/api/gateway_server.proto
+	go.thethings.network/lorawan-stack/api/gatewayserver.proto
 	go.thethings.network/lorawan-stack/api/identifiers.proto
 	go.thethings.network/lorawan-stack/api/identityserver.proto
 	go.thethings.network/lorawan-stack/api/join.proto

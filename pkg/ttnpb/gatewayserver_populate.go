@@ -32,7 +32,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
-func NewPopulatedFrequencyPlan(r randyGatewayServer, easy bool) *FrequencyPlan {
+func NewPopulatedFrequencyPlan(r randyGatewayserver, easy bool) *FrequencyPlan {
 	out := &FrequencyPlan{}
 	out.BandID = "EU_863_870"
 	out.Channels = make([]*FrequencyPlan_Channel, 16+r.Intn(42))
