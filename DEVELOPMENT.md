@@ -140,17 +140,15 @@ make go.test
 
 #### Building
 
-There's one binary to be built: the `ttn-example` binary, which holds an example component for the stack.
-
-To build it run:
+You can build the stack with the following command:
 
 ```
-make ttn-example
+make build-all
 ```
 
-This will result in two files, `release/ttn-example-darwin-amd64` (suffix can differ based on your architecture and operating system) and
-`release/ttn-example` which is a symlink to `release/ttn-example-darwin-amd64`. This symlink will always be there and will point the correct 
-binary for your architecture and operating system. This way builds on different machines will always result in one runnable binary: `./release/ttn-example`.
+This will compile the front-end in `public`, and the binaries in `release`. There is a single binary (`ttn-lw-stack`) as well as specialized binaries. The single binary contains all components and can be started independent of other binaries, while the specialized binaries together form the entire stack. This allows you to run the stack with one command in simple deployment scenarios, as well as distributing micro-services for more advanced scenarios.
+
+Note that the operating system and architecture is appended to the binary name, i.e. on macOS, you will find `release/ttn-lw-stack-darwin-amd64`.
 
 #### Development builds
 
