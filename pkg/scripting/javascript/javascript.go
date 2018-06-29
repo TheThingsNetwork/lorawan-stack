@@ -17,6 +17,7 @@ package javascript
 
 import (
 	"context"
+	"time"
 
 	"github.com/robertkrimen/otto"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -34,6 +35,16 @@ func New(options scripting.Options) scripting.Engine {
 
 // Run executes the Javascript script in the environment env and returns the output.
 func (j *js) Run(ctx context.Context, script string, env map[string]interface{}) (val interface{}, err error) {
+	start := time.Now()
+	defer func() {
+		runLatency.Observe(time.Since(start).Seconds())
+		if err != nil {
+			runs.WithLabelValues("error").Inc()
+		} else {
+			runs.WithLabelValues("ok").Inc()
+		}
+	}()
+
 	vm := otto.New()
 	vm.SetStackDepthLimit(j.options.StackDepthLimit)
 
