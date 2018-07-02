@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
@@ -29,15 +29,15 @@ import (
 	"google.golang.org/grpc"
 )
 
-type OrganizationIDGetter interface {
+type organizationIDGetter interface {
 	GetOrganizationID() string
 }
 
-type ApplicationIDGetter interface {
+type applicationIDGetter interface {
 	GetApplicationID() string
 }
 
-type GatewayIDGetter interface {
+type gatewayIDGetter interface {
 	GetGatewayID() string
 }
 
@@ -111,6 +111,21 @@ func New(ctx context.Context, connector IdentityServerConnector, config Config) 
 	return h, nil
 }
 
+var errNoIdentityServer = errors.DefineInternal(
+	"no_identity_server",
+	"no Identity Server to fetch rights from",
+)
+
+var errFetchFailed = errors.Define(
+	"rights_fetch_failed",
+	"failed to fetch rights from identity server",
+)
+
+var errEmptyIdentifiers = errors.DefineInternal(
+	"missing_rights_identifiers",
+	"missing identifiers in RPC argument",
+)
+
 // UnaryHook returns an unary handler middleware which loads in the context
 // the rights that the authorization data has to the application or gateway
 // that is being trying to be accessed to.
@@ -127,7 +142,7 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 
 			conn := h.connector.Get(ctx)
 			if conn == nil {
-				return nil, errors.New("No Identity Server to connect to")
+				return nil, errNoIdentityServer
 			}
 
 			var (
@@ -135,88 +150,103 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 				err    error
 			)
 
-			if m, ok := req.(OrganizationIDGetter); ok {
+			if m, ok := req.(organizationIDGetter); ok {
 				orgIDs := &ttnpb.OrganizationIdentifiers{
 					OrganizationID: m.GetOrganizationID(),
 				}
 
 				if !orgIDs.IsZero() {
 					defer func() { registerRightsRequest(ctx, "organization", rights, err) }()
-					key := fmt.Sprintf("%s:%s", md.AuthValue, orgIDs.UniqueID(ctx))
+
+					uid := orgIDs.UniqueID(ctx)
+					key := fmt.Sprintf("%s:%s", md.AuthValue, uid)
 
 					rights, err = h.organizationsCache.GetOrFetch(key, func() (rights []ttnpb.Right, err error) {
 						defer func() { registerRightsFetch(ctx, "organization", rights, err) }()
 						md.AllowInsecure = h.config.AllowInsecure
 						resp, err := ttnpb.NewIsOrganizationClient(conn).ListOrganizationRights(ctx, orgIDs, grpc.PerRPCCredentials(md))
-						if err != nil {
-							return nil, errors.NewWithCause(err, "Failed to fetch organization rights")
+						switch {
+						case err == nil:
+							return resp.Rights, nil
+						case errors.IsInvalidArgument(err) || errors.IsUnauthenticated(err) || errors.IsPermissionDenied(err):
+							return nil, err
+						default:
+							return nil, errFetchFailed.WithCause(err)
 						}
-
-						return resp.Rights, nil
 					})
 					if err != nil {
 						return nil, err
 					}
 
-					return next(NewContext(ctx, rights), req)
+					return next(newContext(ctx, uid, rights), req)
 				}
 			}
 
-			if m, ok := req.(ApplicationIDGetter); ok {
+			if m, ok := req.(applicationIDGetter); ok {
 				appIDs := &ttnpb.ApplicationIdentifiers{
 					ApplicationID: m.GetApplicationID(),
 				}
 
 				if !appIDs.IsZero() {
 					defer func() { registerRightsRequest(ctx, "application", rights, err) }()
-					key := fmt.Sprintf("%s:%s", md.AuthValue, appIDs.UniqueID(ctx))
+
+					uid := appIDs.UniqueID(ctx)
+					key := fmt.Sprintf("%s:%s", md.AuthValue, uid)
 
 					rights, err = h.applicationsCache.GetOrFetch(key, func() (rights []ttnpb.Right, err error) {
 						defer func() { registerRightsFetch(ctx, "application", rights, err) }()
 						md.AllowInsecure = h.config.AllowInsecure
 						resp, err := ttnpb.NewIsApplicationClient(conn).ListApplicationRights(ctx, appIDs, grpc.PerRPCCredentials(md))
-						if err != nil {
-							return nil, errors.NewWithCause(err, "Failed to fetch application rights")
+						switch {
+						case err == nil:
+							return resp.Rights, nil
+						case errors.IsInvalidArgument(err) || errors.IsUnauthenticated(err) || errors.IsPermissionDenied(err):
+							return nil, err
+						default:
+							return nil, errFetchFailed.WithCause(err)
 						}
-
-						return resp.Rights, nil
 					})
 					if err != nil {
 						return nil, err
 					}
 
-					return next(NewContext(ctx, rights), req)
+					return next(newContext(ctx, uid, rights), req)
 				}
 			}
 
-			if m, ok := req.(GatewayIDGetter); ok {
+			if m, ok := req.(gatewayIDGetter); ok {
 				gtwIDs := &ttnpb.GatewayIdentifiers{
 					GatewayID: m.GetGatewayID(),
 				}
 
 				if !gtwIDs.IsZero() {
 					defer func() { registerRightsRequest(ctx, "gateway", rights, err) }()
-					key := fmt.Sprintf("%s:%s", md.AuthValue, gtwIDs.UniqueID(ctx))
+
+					uid := gtwIDs.UniqueID(ctx)
+					key := fmt.Sprintf("%s:%s", md.AuthValue, uid)
 
 					rights, err = h.gatewaysCache.GetOrFetch(key, func() (rights []ttnpb.Right, err error) {
 						defer func() { registerRightsFetch(ctx, "gateway", rights, err) }()
 						md.AllowInsecure = h.config.AllowInsecure
 						resp, err := ttnpb.NewIsGatewayClient(conn).ListGatewayRights(ctx, gtwIDs, grpc.PerRPCCredentials(md))
-						if err != nil {
-							return nil, errors.NewWithCause(err, "Failed to fetch gateway rights")
+						switch {
+						case err == nil:
+							return resp.Rights, nil
+						case errors.IsInvalidArgument(err) || errors.IsUnauthenticated(err) || errors.IsPermissionDenied(err):
+							return nil, err
+						default:
+							return nil, errFetchFailed.WithCause(err)
 						}
-
-						return resp.Rights, nil
 					})
 					if err != nil {
 						return nil, err
 					}
 
-					return next(NewContext(ctx, rights), req)
+					return next(newContext(ctx, uid, rights), req)
 				}
 			}
 
-			return next(ctx, req)
+			return nil, errEmptyIdentifiers
 		}
 	}
 }

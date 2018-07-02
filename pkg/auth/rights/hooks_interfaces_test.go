@@ -17,8 +17,8 @@ package rights
 import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
 var (
-	_ OrganizationIDGetter = new(ttnpb.OrganizationIdentifiers)
-	_ ApplicationIDGetter  = new(ttnpb.ApplicationIdentifiers)
-	_ ApplicationIDGetter  = new(ttnpb.EndDeviceIdentifiers)
-	_ GatewayIDGetter      = new(ttnpb.GatewayIdentifiers)
+	_ organizationIDGetter = new(ttnpb.OrganizationIdentifiers)
+	_ applicationIDGetter  = new(ttnpb.ApplicationIdentifiers)
+	_ applicationIDGetter  = new(ttnpb.EndDeviceIdentifiers)
+	_ gatewayIDGetter      = new(ttnpb.GatewayIdentifiers)
 )

@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	"go.thethings.network/lorawan-stack/pkg/auth/pbkdf2"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 // hashingMethod is a method to hash a password.
@@ -58,6 +58,16 @@ func Hash(plain string) (Password, error) {
 	return Password(str), nil
 }
 
+var errInvalidHash = errors.DefineInternal(
+	"invalid_hash",
+	"invalid password hash",
+)
+
+var errUnknownHashingMethod = errors.DefineInternal(
+	"unknown_hashing_method",
+	"password hashing method `{method}` unknown",
+)
+
 // Validate checks if the password matches the plaintext password.
 // While using this over a secure channel is probably fine, consider using a
 // scheme where the hashing happens on the client side, to prevent the server
@@ -67,7 +77,7 @@ func (p Password) Validate(plain string) (bool, error) {
 	parts := strings.SplitN(str, "$", 2)
 
 	if len(parts) < 2 {
-		return false, errors.Errorf("Could not derive type from password hash: %s", str)
+		return false, errInvalidHash
 	}
 
 	typ := parts[0]
@@ -78,7 +88,7 @@ func (p Password) Validate(plain string) (bool, error) {
 		}
 	}
 
-	return false, errors.Errorf("Got unexpected hash type: %s", typ)
+	return false, errUnknownHashingMethod.WithAttributes("method", typ)
 }
 
 // Equals safely checks whether or not the other hashed password and this one

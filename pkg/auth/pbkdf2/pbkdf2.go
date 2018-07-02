@@ -22,7 +22,7 @@ import (
 	"strconv"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/random"
 	"golang.org/x/crypto/pbkdf2"
 )
@@ -63,10 +63,15 @@ func (*PBKDF2) Name() string {
 	return "PBKDF2"
 }
 
+var errZeroLengthSalt = errors.DefineInternal(
+	"zero_length_salt",
+	"password salt can not have zero length",
+)
+
 // Hash hashes a plain text password.
 func (p *PBKDF2) Hash(plain string) (string, error) {
 	if p.saltLength == 0 {
-		return "", errors.Errorf("Salts can not have zero length")
+		return "", errZeroLengthSalt
 	}
 
 	salt := random.String(p.saltLength)
@@ -76,6 +81,21 @@ func (p *PBKDF2) Hash(plain string) (string, error) {
 	return pass, nil
 }
 
+var errInvalidPBKDF2 = errors.DefineInternal( // internal because hash is in DB.
+	"invalid_pbkdf2_format",
+	"password hash has invalid PBKDF2 format",
+)
+
+var errIterations = errors.DefineInternal(
+	"pbkdf2_iterations",
+	"could not determine number of iterations from `{iter}`",
+)
+
+var errKeyLength = errors.DefineInternal(
+	"pbkdf2_key_length",
+	"could not determine key length",
+)
+
 // Validate validates a plaintext password against a hashed one.
 // The format of the hashed password should be:
 //
@@ -84,7 +104,7 @@ func (p *PBKDF2) Hash(plain string) (string, error) {
 func (*PBKDF2) Validate(hashed, plain string) (bool, error) {
 	parts := strings.Split(hashed, "$")
 	if len(parts) != 5 {
-		return false, errors.Errorf("Invalid PBKDF2 format")
+		return false, errInvalidPBKDF2
 	}
 
 	alg := parts[1]
@@ -95,7 +115,7 @@ func (*PBKDF2) Validate(hashed, plain string) (bool, error) {
 
 	iter, err := strconv.ParseInt(parts[2], 10, 32)
 	if err != nil {
-		return false, errors.Errorf("Invalid number of iterations: %s", parts[2])
+		return false, errIterations.WithAttributes("iter", parts[2])
 	}
 	salt := parts[3]
 	key := parts[4]
@@ -103,7 +123,7 @@ func (*PBKDF2) Validate(hashed, plain string) (bool, error) {
 	// Get the key length.
 	keylen, err := keyLen(key)
 	if err != nil {
-		return false, errors.Errorf("Could not get key length: %s", err)
+		return false, errKeyLength.WithCause(err)
 	}
 
 	// Hash the plaintext.

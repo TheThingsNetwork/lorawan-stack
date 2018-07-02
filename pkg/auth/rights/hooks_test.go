@@ -251,7 +251,7 @@ func TestUnaryHook(t *testing.T) {
 			appKeyStr,
 			nil,
 			[]ttnpb.Right{},
-			false,
+			true,
 		},
 		{
 			// Returns not authorized because the API key does not have rights for this application.
@@ -309,6 +309,8 @@ func TestUnaryHook(t *testing.T) {
 		},
 	} {
 		t.Run(tc.tcName, func(t *testing.T) {
+			a := assertions.New(t)
+
 			ctx := metadata.NewIncomingContext(
 				context.Background(),
 				metadata.Pairs("authorization", fmt.Sprintf("Bearer %s", tc.authValue)),
