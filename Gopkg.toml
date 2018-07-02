@@ -58,3 +58,7 @@
 [[constraint]]
   name = "github.com/TheThingsNetwork/go-cayenne-lib"
   version = "1.0.0"
+
+[[constraint]]
+  name = "go.opencensus.io"
+  version = "0.13.0"

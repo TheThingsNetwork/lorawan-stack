@@ -531,6 +531,24 @@
   version = "v3.3.2"
 
 [[projects]]
+  name = "go.opencensus.io"
+  packages = [
+    ".",
+    "internal",
+    "internal/tagencoding",
+    "plugin/ocgrpc",
+    "stats",
+    "stats/internal",
+    "stats/view",
+    "tag",
+    "trace",
+    "trace/internal",
+    "trace/propagation"
+  ]
+  revision = "6edeb78af2d9e4f169abb223feaef35da2e45d06"
+  version = "v0.13.0"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
   packages = [
@@ -680,6 +698,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b11bd1bb61dae57107348ffa45a81d95937957f32750b13f923c0402fd774d5a"
+  inputs-digest = "6b1c5714c6d0279fd6b247365610b7b8178f985ec3c5e27d78fab4c9671e2a5f"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -28,6 +28,7 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/validator"
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"go.opencensus.io/plugin/ocgrpc"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"
@@ -108,7 +109,7 @@ var ErrRPCRecovered = errors.DefineInternal("rpc_recovered", "Internal Server Er
 // New returns a new RPC server with a set of middlewares.
 // The given context is used in some of the middlewares, the given server options are passed to gRPC
 //
-// Currently the following middlewares are included: tag extraction, Prometheus metrics,
+// Currently the following middlewares are included: tag extraction, metrics,
 // logging, sending errors to Sentry, validation, errors, panic recovery
 func New(ctx context.Context, opts ...Option) *Server {
 	options := new(options)
@@ -153,6 +154,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	}
 
 	baseOptions := []grpc.ServerOption{
+		grpc.StatsHandler(new(ocgrpc.ServerHandler)),
 		grpc.MaxConcurrentStreams(math.MaxUint16),
 		grpc.KeepaliveParams(keepalive.ServerParameters{
 			MaxConnectionIdle: 6 * time.Hour,
