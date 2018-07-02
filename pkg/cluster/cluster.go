@@ -22,7 +22,7 @@ import (
 	"os"
 
 	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/rpcclient"
@@ -76,7 +76,7 @@ func New(ctx context.Context, config *config.ServiceBase, services ...rpcserver.
 	for i, key := range config.Cluster.Keys {
 		decodedKey, err := hex.DecodeString(key)
 		if err != nil {
-			return nil, errors.NewWithCause(err, "Could not decode cluster key")
+			return nil, fmt.Errorf("Could not decode cluster key: %s", err)
 		}
 		switch len(decodedKey) {
 		case 16, 24, 32:
@@ -147,6 +147,11 @@ type cluster struct {
 	keys [][]byte
 }
 
+var errPeerConnection = errors.Define(
+	"peer_connection",
+	"connection to peer `{name}` on `{address}` failed",
+)
+
 func (c *cluster) Join() (err error) {
 	options := rpcclient.DefaultDialOptions(c.ctx)
 	// TODO: Use custom WithBalancer DialOption?
@@ -169,7 +174,7 @@ func (c *cluster) Join() (err error) {
 		logger.Debug("Connecting to peer...")
 		peer.conn, err = grpc.DialContext(peer.ctx, peer.target, options...)
 		if err != nil {
-			return errors.NewWithCause(err, "Could not connect to peer")
+			return errPeerConnection.WithCause(err).WithAttributes("name", peer.name, "address", peer.target)
 		}
 	}
 	return nil
