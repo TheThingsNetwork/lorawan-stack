@@ -22,8 +22,16 @@ import (
 )
 
 func Example() {
-	var errApplicationNotFound = errors.DefineNotFound("application_not_found", "Application with ID `{id}` not found", "id")
-	var errCouldNotCreateDevice = errors.Define("could_not_create_device", "Could not create Device")
+	var errApplicationNotFound = errors.DefineNotFound(
+		"application_not_found",
+		"Application with ID `{id}` not found",
+	// Public attribute "id" is parsed from the message format.
+	)
+	var errCouldNotCreateDevice = errors.Define(
+		"could_not_create_device",
+		"Could not create Device",
+		"right_answer", // right_answer could be some extra attribute (that isn't rendered in the message format)
+	)
 
 	findApplication := func(id *ttnpb.ApplicationIdentifiers) (*ttnpb.Application, error) {
 		// try really hard, but fail
@@ -41,7 +49,7 @@ func Example() {
 	}
 
 	if err := createDevice(&ttnpb.EndDevice{}); err != nil {
-		fmt.Println(errCouldNotCreateDevice.WithCause(err))
+		fmt.Println(errCouldNotCreateDevice.WithCause(err).WithAttributes("right_answer", 42))
 	}
 
 	// Output:
