@@ -155,7 +155,7 @@ func (r *RegistryRPC) GetDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifi
 	return dev.EndDevice, nil
 }
 
-// SetDevice sets the device fields to match those of dev in underlying registry.
+// SetDevice sets the device fields to match those of req.Device in underlying registry.
 func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest) (*pbtypes.Empty, error) {
 	if err := rights.RequireApplication(ctx, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
@@ -163,7 +163,7 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 
 	var fields []string
 	if req.FieldMask != nil {
-		fields = gogoproto.GoFieldsPaths(req.FieldMask, req.GetDevice())
+		fields = gogoproto.GoFieldsPaths(req.FieldMask, req.Device)
 	}
 	if r.checks.SetDevice != nil {
 		if err := r.checks.SetDevice(ctx, &req.Device, fields...); err != nil {

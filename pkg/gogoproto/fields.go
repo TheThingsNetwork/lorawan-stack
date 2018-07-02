@@ -33,13 +33,13 @@ func init() {
 //
 // This implementation does not support separation by ",", but only paths separated by ".".
 func GoFieldsPaths(pb *pbtypes.FieldMask, v interface{}) []string {
-	newFields := []string{}
-	if pb == nil || len(pb.GetPaths()) == 0 {
+	var newFields []string
+	if pb == nil || len(pb.Paths) == 0 {
 		return newFields
 	}
 
 	goFields := goFieldsFromProtoMasks(reflect.ValueOf(v))
-	for _, field := range pb.GetPaths() {
+	for _, field := range pb.Paths {
 		goName, ok := goFields[field]
 		if ok {
 			newFields = append(newFields, goName)
@@ -52,6 +52,10 @@ func GoFieldsPaths(pb *pbtypes.FieldMask, v interface{}) []string {
 }
 
 func goFieldsFromProtoMasks(v reflect.Value) map[string]string {
+	if !v.IsValid() {
+		return nil
+	}
+
 	fields := make(map[string]string)
 	for v.Kind() == reflect.Ptr {
 		v = v.Elem()
