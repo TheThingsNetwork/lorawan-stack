@@ -16,10 +16,10 @@ package commands
 
 import (
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/assets"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/console"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 var (
@@ -31,12 +31,12 @@ var (
 				ServiceBase: config.ServiceBase,
 			})
 			if err != nil {
-				return errors.NewWithCause(err, "Failed to initialize base component")
+				return shared.ErrBaseComponentInitialize.WithCause(err)
 			}
 
 			_, err = console.New(c, assets.New(c, config.Assets), config.Console)
 			if err != nil {
-				return errors.NewWithCause(err, "Failed to initialize Console")
+				return shared.ErrConsoleInitialize.WithCause(err)
 			}
 
 			logger.Info("Starting Console...")

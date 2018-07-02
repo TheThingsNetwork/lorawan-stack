@@ -16,12 +16,12 @@ package commands
 
 import (
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
 	"go.thethings.network/lorawan-stack/pkg/assets"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/console"
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/joinserver"
@@ -37,7 +37,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
 			if err != nil {
-				return errors.NewWithCause(err, "Could not initialize base component")
+				return shared.ErrBaseComponentInitialize.WithCause(err)
 			}
 
 			nsRedis := redis.New(&redis.Config{
@@ -66,36 +66,36 @@ var (
 
 			_, err = identityserver.New(c, config.IS)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not create Identity Server")
+				return shared.ErrIdentityServerInitialize.WithCause(err)
 			}
 
 			gs, err := gatewayserver.New(c, config.GS)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not create Gateway Server")
+				return shared.ErrGatewayServerInitialize.WithCause(err)
 			}
 			_ = gs
 
 			ns, err := networkserver.New(c, &config.NS)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not create Network Server")
+				return shared.ErrNetworkServerInitialize.WithCause(err)
 			}
 			_ = ns
 
 			as, err := applicationserver.New(c, &config.AS)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not create Application Server")
+				return shared.ErrApplicationServerInitialize.WithCause(err)
 			}
 			_ = as
 
 			js, err := joinserver.New(c, &config.JS)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not create Join Server")
+				return shared.ErrJoinServerInitialize.WithCause(err)
 			}
 			_ = js
 
 			console, err := console.New(c, assets, config.Console)
 			if err != nil {
-				return errors.NewWithCause(err, "Failed to initialize console")
+				return shared.ErrConsoleInitialize.WithCause(err)
 			}
 			_ = console
 

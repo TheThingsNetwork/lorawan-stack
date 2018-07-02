@@ -16,12 +16,16 @@ package commands
 
 import (
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/assets"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	conf "go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
 )
+
+// ErrIdentityServerLoadData is returned when the data couldn't be loaded into the identity server.
+var ErrIdentityServerLoadData = errors.Define("identity_server_load_data", "could not load identity server data")
 
 var (
 	initConfigName = "ttn-lw-identity-server"
@@ -43,21 +47,21 @@ var (
 
 			c, err := component.New(logger, &component.Config{ServiceBase: initConfig.ServiceBase})
 			if err != nil {
-				return errors.NewWithCause(err, "Could not initialize base component")
+				return shared.ErrBaseComponentInitialize.WithCause(err)
 			}
 
 			initConfig.IS.OAuth.Assets = assets.New(c, initConfig.Assets)
 
 			is, err := identityserver.New(c, initConfig.IS)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not create Identity Server")
+				return shared.ErrIdentityServerInitialize.WithCause(err)
 			}
 
 			logger.Info("Initializing Identity Server...")
 
 			err = is.Init(initConfig.InitialData)
 			if err != nil {
-				return errors.NewWithCause(err, "Could not initialize Identity Server")
+				return ErrIdentityServerLoadData.WithCause(err)
 			}
 
 			logger.Info("Identity Server initialized")
