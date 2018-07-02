@@ -22,6 +22,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc/metadata"
@@ -40,8 +41,16 @@ func TestVerifySource(t *testing.T) {
 	t.Run("empty secret", func(t *testing.T) {
 		a := assertions.New(t)
 
-		validAuth := c.VerifySource(ctx)
-		a.So(validAuth, should.BeFalse)
+		a.So(errors.IsUnauthenticated(c.VerifySource(ctx)), should.BeTrue)
+	})
+
+	t.Run("invalid secret type", func(t *testing.T) {
+		a := assertions.New(t)
+
+		md := metadata.Pairs("authorization", "Basic invalid-secret")
+		ctx := metadata.NewIncomingContext(ctx, md)
+
+		a.So(errors.IsInvalidArgument(c.VerifySource(ctx)), should.BeTrue)
 	})
 
 	t.Run("valid secret", func(t *testing.T) {
@@ -50,17 +59,15 @@ func TestVerifySource(t *testing.T) {
 		md := metadata.Pairs("authorization", fmt.Sprintf("ClusterKey %s", hex.EncodeToString(key)))
 		ctx := metadata.NewIncomingContext(ctx, md)
 
-		validAuth := c.VerifySource(ctx)
-		a.So(validAuth, should.BeTrue)
+		a.So(c.VerifySource(ctx), should.BeNil)
 	})
 
-	t.Run("invalid secret", func(t *testing.T) {
+	t.Run("wrong secret", func(t *testing.T) {
 		a := assertions.New(t)
 
-		md := metadata.Pairs("authorization", "Basic invalid-secret")
+		md := metadata.Pairs("authorization", "ClusterKey 0102030405060708")
 		ctx := metadata.NewIncomingContext(ctx, md)
 
-		validAuth := c.VerifySource(ctx)
-		a.So(validAuth, should.BeFalse)
+		a.So(errors.IsPermissionDenied(c.VerifySource(ctx)), should.BeTrue)
 	})
 }

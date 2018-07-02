@@ -19,6 +19,7 @@ import (
 	"crypto/subtle"
 	"encoding/hex"
 
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"google.golang.org/grpc"
 )
@@ -30,21 +31,40 @@ var (
 	AuthType = "ClusterKey"
 )
 
-func (c *cluster) VerifySource(ctx context.Context) bool {
+var errNoClusterKey = errors.DefineUnauthenticated(
+	"no_cluster_key",
+	"missing cluster key auth",
+)
+
+var errUnsupportedAuthType = errors.DefineInvalidArgument(
+	"unsupported_auth_type",
+	"cluster auth type `{auth_type}` is not supported",
+)
+
+var errInvalidClusterKey = errors.DefinePermissionDenied(
+	"invalid_cluster_key",
+	"invalid cluster key",
+)
+
+func (c *cluster) VerifySource(ctx context.Context) error {
 	md := rpcmetadata.FromIncomingContext(ctx)
-	if md.AuthType != AuthType {
-		return false
+	switch md.AuthType {
+	case AuthType:
+	case "":
+		return errNoClusterKey
+	default:
+		return errUnsupportedAuthType.WithAttributes("auth_type", md.AuthType)
 	}
 	key, err := hex.DecodeString(md.AuthValue)
 	if err != nil {
-		return false
+		return errInvalidClusterKey
 	}
 	for _, acceptedKey := range c.keys {
 		if subtle.ConstantTimeCompare(acceptedKey, key) == 1 {
-			return true
+			return nil
 		}
 	}
-	return false
+	return errInvalidClusterKey
 }
 
 func (c *cluster) Auth() grpc.CallOption {

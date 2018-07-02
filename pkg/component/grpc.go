@@ -113,9 +113,8 @@ func (c *Component) ClusterAuth() grpc.CallOption {
 func (c *Component) UnaryHook() hooks.UnaryHandlerMiddleware {
 	return func(next grpc.UnaryHandler) grpc.UnaryHandler {
 		return func(ctx context.Context, req interface{}) (interface{}, error) {
-			validAuth := c.cluster.VerifySource(ctx)
-			if !validAuth {
-				return nil, common.ErrUnauthorized.New(nil)
+			if err := c.cluster.VerifySource(ctx); err != nil {
+				return nil, err
 			}
 			return next(ctx, req)
 		}
@@ -127,8 +126,8 @@ func (c *Component) UnaryHook() hooks.UnaryHandlerMiddleware {
 func (c *Component) StreamHook() hooks.StreamHandlerMiddleware {
 	return func(hdl grpc.StreamHandler) grpc.StreamHandler {
 		return func(srv interface{}, stream grpc.ServerStream) error {
-			if validAuth := c.cluster.VerifySource(stream.Context()); !validAuth {
-				return common.ErrUnauthorized.New(nil)
+			if err := c.cluster.VerifySource(stream.Context()); err != nil {
+				return err
 			}
 			return hdl(srv, stream)
 		}

@@ -52,7 +52,7 @@ type Cluster interface {
 	// Auth returns a gRPC CallOption that can be used to identify the component within the cluster.
 	Auth() grpc.CallOption
 	// VerifySource verifies if the caller providing this context is a component from the cluster.
-	VerifySource(context.Context) bool
+	VerifySource(context.Context) error
 }
 
 // CustomNew allows you to replace the clustering implementation. New will call CustomNew if not nil.
