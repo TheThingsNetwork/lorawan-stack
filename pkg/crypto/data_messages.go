@@ -112,7 +112,7 @@ func ComputeLegacyUplinkMIC(key types.AES128Key, addr types.DevAddr, fCnt uint32
 
 // ComputeUplinkMIC computes the Uplink Message Integrity Code
 // - The payload contains MHDR | FHDR | FPort | FRMPayload
-// - If this uplink has the ACK bit set, confFCnt must be set to the FCnt of the last downlink
+// - If this uplink has the ACK bit set, confFCnt must be set to the FCnt of the last downlink.
 func ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey types.AES128Key, confFCnt uint32, txDRIdx uint8, txChIdx uint8, addr types.DevAddr, fCnt uint32, payload []byte) (mic [4]byte, err error) {
 	m0, err := computeMIC(fNwkSIntKey, 0, addr, fCnt, payload)
 	if err != nil {
