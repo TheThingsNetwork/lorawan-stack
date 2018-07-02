@@ -121,8 +121,8 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	logger := log.FromContext(ctx).WithField("gateway_uid", uid)
 	ctx = log.NewContext(ctx, logger)
 
-	events.Publish(evtStartGatewayLink(ctx, id, nil))
-	defer events.Publish(evtEndGatewayLink(ctx, id, err))
+	registerStartGatewayLink(ctx, id)
+	defer registerEndGatewayLink(ctx, id)
 
 	logger.Info("Link with gateway opened")
 	defer logger.WithError(err).Debug("Link with gateway closed")
@@ -203,7 +203,7 @@ func (g *GatewayServer) handleUpstreamMessage(ctx context.Context, connectionInf
 	connectionInfo.addUpstreamObservations(upstreamMessage)
 
 	if upstreamMessage.GatewayStatus != nil {
-		events.Publish(evtReceiveStatus(ctx, connectionInfo.gateway().GatewayIdentifiers, nil))
+		registerReceiveStatus(ctx, connectionInfo.gateway().GatewayIdentifiers, upstreamMessage.GatewayStatus)
 		g.handleStatus(ctx, upstreamMessage.GatewayStatus)
 	}
 	for _, uplink := range upstreamMessage.UplinkMessages {
@@ -212,8 +212,7 @@ func (g *GatewayServer) handleUpstreamMessage(ctx context.Context, connectionInf
 			fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()),
 		)...)
 		uplink.CorrelationIDs = events.CorrelationIDsFromContext(msgCtx)
-		events.Publish(evtReceiveUp(msgCtx, ttnpb.CombineIdentifiers(connectionInfo.gatewayIdentifiers(), uplink.EndDeviceIdentifiers), nil))
-
+		registerReceiveUplink(msgCtx, connectionInfo.gatewayIdentifiers(), uplink)
 		g.handleUplink(msgCtx, uplink, connectionInfo)
 	}
 

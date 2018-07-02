@@ -48,7 +48,7 @@ func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downli
 	connection.addDownstreamObservations(&ttnpb.GatewayDown{DownlinkMessage: down})
 
 	msgCtx := events.ContextWithCorrelationID(ctx, down.CorrelationIDs...)
-	events.Publish(evtSendDown(msgCtx, ttnpb.CombineIdentifiers(connection.gateway().GatewayIdentifiers, down.EndDeviceIdentifiers), nil))
+	registerSendDownlink(msgCtx, connection.gateway().GatewayIdentifiers, down)
 
 	return ttnpb.Empty, nil
 }
