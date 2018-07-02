@@ -19,6 +19,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	. "go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -63,20 +64,21 @@ type message interface {
 
 func TestLoRaWANEncodingRandomized(t *testing.T) {
 	r := test.Randy
-	for _, expected := range []message{
+
+	for i, expected := range []message{
 		NewPopulatedMessageUplink(r, *types.NewPopulatedAES128Key(r), *types.NewPopulatedAES128Key(r), uint8(r.Intn(256)), uint8(r.Intn(256)), false),
 		NewPopulatedMessageUplink(r, *types.NewPopulatedAES128Key(r), *types.NewPopulatedAES128Key(r), uint8(r.Intn(256)), uint8(r.Intn(256)), true),
 		NewPopulatedMessageDownlink(r, *types.NewPopulatedAES128Key(r), false),
 		NewPopulatedMessageDownlink(r, *types.NewPopulatedAES128Key(r), true),
-		NewPopulatedMessageJoinRequest(test.Randy),
-		NewPopulatedMessageJoinAccept(test.Randy, false),
-		NewPopulatedMessageRejoinRequest(test.Randy, 0),
-		NewPopulatedMessageRejoinRequest(test.Randy, 1),
-		NewPopulatedMessageRejoinRequest(test.Randy, 2),
+		NewPopulatedMessageJoinRequest(r),
+		NewPopulatedMessageJoinAccept(r, false),
+		NewPopulatedMessageRejoinRequest(r, 0),
+		NewPopulatedMessageRejoinRequest(r, 1),
+		NewPopulatedMessageRejoinRequest(r, 2),
 
-		NewPopulatedJoinAcceptPayload(test.Randy, false),
+		NewPopulatedJoinAcceptPayload(r, false),
 	} {
-		t.Run(lorawanEncodingTestName(expected), func(t *testing.T) {
+		t.Run(fmt.Sprintf("%d/%s", i, lorawanEncodingTestName(expected)), func(t *testing.T) {
 			a := assertions.New(t)
 
 			b, err := expected.MarshalLoRaWAN()
@@ -89,13 +91,15 @@ func TestLoRaWANEncodingRandomized(t *testing.T) {
 
 			msg := reflect.New(reflect.Indirect(reflect.ValueOf(expected)).Type()).Interface().(lorawan.Unmarshaler)
 			a.So(msg.UnmarshalLoRaWAN(b), should.BeNil)
-			a.So(msg, should.Resemble, expected)
+			if !a.So(msg, should.Resemble, expected) {
+				pretty.Ldiff(t, msg, expected)
+			}
 		})
 	}
 }
 
 func TestLoRaWANEncodingRaw(t *testing.T) {
-	for _, tc := range []struct {
+	for i, tc := range []struct {
 		Message message
 		Bytes   []byte
 	}{
@@ -519,7 +523,7 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(lorawanEncodingTestName(tc.Message), func(t *testing.T) {
+		t.Run(fmt.Sprintf("%d/%s", i, lorawanEncodingTestName(tc.Message)), func(t *testing.T) {
 			a := assertions.New(t)
 
 			b, err := tc.Message.MarshalLoRaWAN()

@@ -183,8 +183,12 @@ func NewPopulatedMessageUplink(r randyLorawan, sNwkSIntKey, fNwkSIntKey types.AE
 		out.MHDR.MType = MType_UNCONFIRMED_UP
 	}
 	pld := NewPopulatedMessage_MACPayload(r)
-	pld.MACPayload.FHDR.FPending = r.Intn(2) == 0
-	pld.MACPayload.Ack = r.Intn(2) == 0
+	pld.MACPayload.FHDR.FCtrl = FCtrl{
+		ADR:       r.Intn(2) == 0,
+		ADRAckReq: r.Intn(2) == 0,
+		ClassB:    r.Intn(2) == 0,
+		Ack:       r.Intn(2) == 0,
+	}
 
 	b, err := macMICPayload(out.MHDR, pld.MACPayload.FHDR, uint8(pld.MACPayload.FPort), pld.MACPayload.FRMPayload, true)
 	if err != nil {
@@ -212,8 +216,11 @@ func NewPopulatedMessageDownlink(r randyLorawan, sNwkSIntKey types.AES128Key, co
 		out.MHDR.MType = MType_UNCONFIRMED_DOWN
 	}
 	pld := NewPopulatedMessage_MACPayload(r)
-	pld.MACPayload.FHDR.ADRAckReq = false
-	pld.MACPayload.FHDR.ClassB = false
+	pld.MACPayload.FHDR.FCtrl = FCtrl{
+		ADR:      r.Intn(2) == 0,
+		FPending: r.Intn(2) == 0,
+		Ack:      r.Intn(2) == 0,
+	}
 	b, err := macMICPayload(out.MHDR, pld.MACPayload.FHDR, uint8(pld.MACPayload.FPort), pld.MACPayload.FRMPayload, false)
 	if err != nil {
 		panic(errors.NewWithCause(err, "failed to compute payload for MIC computation"))
