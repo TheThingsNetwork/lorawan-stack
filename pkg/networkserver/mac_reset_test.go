@@ -66,11 +66,11 @@ func TestHandleResetInd(t *testing.T) {
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				ABP:               true,
-				FrequencyPlanID:   test.EUFrequencyPlanID,
-				MaxEIRP:           42,
-				MACState:          ttnpb.NewPopulatedMACState(test.Randy, false),
-				MACStateDesired:   ttnpb.NewPopulatedMACState(test.Randy, false),
+				ABP:                true,
+				FrequencyPlanID:    test.EUFrequencyPlanID,
+				MaxEIRP:            42,
+				MACState:           ttnpb.NewPopulatedMACState(test.Randy, false),
+				MACStateDesired:    ttnpb.NewPopulatedMACState(test.Randy, false),
 				QueuedMACResponses: []*ttnpb.MACCommand{},
 			},
 			Expected: func() *ttnpb.EndDevice {

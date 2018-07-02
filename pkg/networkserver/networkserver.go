@@ -1236,6 +1236,7 @@ outer:
 		Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
 			FCnt:           dev.Session.NextFCntUp - 1,
 			FPort:          pld.FPort,
+			Ack:            pld.Ack,
 			FRMPayload:     pld.FRMPayload,
 			RxMetadata:     msg.RxMetadata,
 			CorrelationIDs: msg.CorrelationIDs,

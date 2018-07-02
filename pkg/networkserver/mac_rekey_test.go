@@ -44,7 +44,7 @@ func TestHandleRekeyInd(t *testing.T) {
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				SessionFallback:   ttnpb.NewPopulatedSession(test.Randy, false),
+				SessionFallback:    ttnpb.NewPopulatedSession(test.Randy, false),
 				QueuedMACResponses: []*ttnpb.MACCommand{},
 			},
 			Expected: &ttnpb.EndDevice{

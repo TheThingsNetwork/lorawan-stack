@@ -153,9 +153,10 @@ message DownlinkMessage {
 message ApplicationUplink {
   uint32 f_port = 1;
   uint32 f_cnt = 2;
-  bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
-  repeated RxMetadata rx_metadata = 4;
-  repeated string correlation_ids = 5 [(gogoproto.customname) = "CorrelationIDs"];
+  bool ack = 3;
+  bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
+  repeated RxMetadata rx_metadata = 5;
+  repeated string correlation_ids = 6 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
 message ApplicationJoinAccept {

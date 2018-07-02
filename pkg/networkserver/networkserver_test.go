@@ -1046,6 +1046,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 								Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
 									FCnt:           tc.NextNextFCntUp - 1,
 									FPort:          tc.UplinkMessage.Payload.GetMACPayload().FPort,
+									Ack:            tc.UplinkMessage.Payload.GetMACPayload().Ack,
 									FRMPayload:     tc.UplinkMessage.Payload.GetMACPayload().FRMPayload,
 									RxMetadata:     up.GetUplinkMessage().RxMetadata,
 									CorrelationIDs: up.GetUplinkMessage().CorrelationIDs,
@@ -1191,17 +1192,21 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 
 					select {
 					case up := <-asSendCh:
-						a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+						expected := &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 							SessionKeyID:         dev.Session.SessionKeys.SessionKeyID,
 							Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
 								FCnt:           tc.NextNextFCntUp - 1,
 								FPort:          msg.Payload.GetMACPayload().FPort,
+								Ack:            msg.Payload.GetMACPayload().Ack,
 								FRMPayload:     msg.Payload.GetMACPayload().FRMPayload,
 								RxMetadata:     msg.RxMetadata,
 								CorrelationIDs: msg.CorrelationIDs,
 							}},
-						})
+						}
+						if !a.So(up, should.Resemble, expected) {
+							pretty.Ldiff(t, up, expected)
+						}
 
 					case <-time.After(Timeout):
 						t.Fatal("Timeout")
