@@ -126,9 +126,7 @@ func TestSetDeviceNoCheck(t *testing.T) {
 	}
 	pb.CreatedAt = got.GetCreatedAt()
 	pb.UpdatedAt = got.GetUpdatedAt()
-	if !a.So(got.EndDevice, should.Resemble, pb) {
-		pretty.Ldiff(t, got.EndDevice, pb)
-	}
+	a.So(pretty.Diff(got.EndDevice, pb), should.BeEmpty)
 
 	_, err = dr.Interface.Create(pb)
 	if !a.So(err, should.BeNil) {
