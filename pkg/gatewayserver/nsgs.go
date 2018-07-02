@@ -18,7 +18,6 @@ import (
 	"context"
 
 	"github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/validate"
@@ -38,11 +37,11 @@ func (g *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downli
 	g.connectionsMu.Unlock()
 
 	if !ok {
-		return nil, ErrGatewayNotConnected.New(errors.Attributes{"gateway_id": id.GetGatewayID()})
+		return nil, errGatewayNotConnected.WithAttributes("gateway_id", id.GetGatewayID())
 	}
 	err := connection.send(down)
 	if err != nil {
-		return nil, errors.NewWithCause(err, "Could not send downlink to gateway")
+		return nil, err
 	}
 
 	connection.addDownstreamObservations(&ttnpb.GatewayDown{DownlinkMessage: down})

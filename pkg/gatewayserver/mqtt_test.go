@@ -244,6 +244,7 @@ func TestMQTTConnection(t *testing.T) {
 			downlink.TxMetadata.GatewayIdentifiers = ttnpb.GatewayIdentifiers{
 				GatewayID: registeredGatewayID,
 			}
+			downlink.Settings.Frequency = 863000000
 			_, err := gs.ScheduleDownlink(ctx, downlink)
 			a.So(err, should.BeNil)
 

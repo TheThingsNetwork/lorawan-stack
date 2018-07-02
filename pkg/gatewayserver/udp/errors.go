@@ -14,60 +14,21 @@
 
 package udp
 
-import "go.thethings.network/lorawan-stack/pkg/errors"
+import "go.thethings.network/lorawan-stack/pkg/errorsv3"
 
 var (
-	// ErrTooSmallToHaveGatewayEUI is returned if a message isn't long enough
-	// to contain a Gateway EUI.
-	ErrTooSmallToHaveGatewayEUI = &errors.ErrDescriptor{
-		MessageFormat: "Packet is not long enough to contain the gateway EUI",
-		Code:          1,
-		Type:          errors.InvalidArgument,
-	}
-	// ErrUnmarshalFailed is returned if a value could not be unmarshalled.
-	ErrUnmarshalFailed = &errors.ErrDescriptor{
-		MessageFormat: "Could not unmarshal value",
-		Code:          2,
-		Type:          errors.InvalidArgument,
-	}
-	// ErrMarshalFailed is returned if a value could not be marshalled.
-	ErrMarshalFailed = &errors.ErrDescriptor{
-		MessageFormat: "Could not marshal value",
-		Code:          3,
-		Type:          errors.InvalidArgument,
-	}
-	// ErrDecodingPayloadFromBase64 is returned if the value of a base64 payload could not be decoded.
-	ErrDecodingPayloadFromBase64 = &errors.ErrDescriptor{
-		MessageFormat: "Could not decode payload from base64",
-		Code:          4,
-		Type:          errors.InvalidArgument,
-	}
-	// ErrParsingBandwidth is returned if the bandwidth could not be parsed from a message.
-	ErrParsingBandwidth = &errors.ErrDescriptor{
-		MessageFormat: "Could not parse bandwidth",
-		Code:          5,
-		Type:          errors.InvalidArgument,
-	}
-	// ErrParsingSpreadingFactor is returned if the spreading factor could not be parsed from a message.
-	ErrParsingSpreadingFactor = &errors.ErrDescriptor{
-		MessageFormat: "Could not parse spreading factor",
-		Code:          6,
-		Type:          errors.InvalidArgument,
-	}
-	// ErrUnknownModulation is returned if the modulation of a packet is unknown.
-	ErrUnknownModulation = &errors.ErrDescriptor{
-		MessageFormat: "Unknown modulation",
-		Code:          7,
-		Type:          errors.InvalidArgument,
-	}
-)
+	errGatewayNotConnected = errors.DefineNotFound("gateway_not_connected", "gateway not connected")
 
-func init() {
-	ErrTooSmallToHaveGatewayEUI.Register()
-	ErrUnmarshalFailed.Register()
-	ErrMarshalFailed.Register()
-	ErrDecodingPayloadFromBase64.Register()
-	ErrParsingBandwidth.Register()
-	ErrParsingSpreadingFactor.Register()
-	ErrUnknownModulation.Register()
-}
+	errTooSmallToHaveGatewayEUI    = errors.DefineInvalidArgument("no_gateway_eui", "packet is not long enough to contain the gateway EUI")
+	errDecodingPayloadFromBase64   = errors.DefineInvalidArgument("decoding_payload_from_b64", "could not decode payload from base64")
+	errParsingBandwidth            = errors.DefineInvalidArgument("parse_bandwidth", "could not parse bandwidth")
+	errParsingSpreadingFactor      = errors.DefineInvalidArgument("parse_spreading_factor", "could not parse spreading factor")
+	errUnmarshalPayloadFromLoRaWAN = errors.DefineInvalidArgument("unmarshal_payload_to_lorawan", "failed to unmarshal payload from LoRaWAN")
+	errUnmarshalEUI                = errors.DefineInvalidArgument("unmarshal_eui", "failed to unmarshal an EUI")
+	errUnmarshalTimestamp          = errors.DefineInvalidArgument("unmarshal_timestamp", "failed to unmarshal timestamp")
+	errMarshalPayloadToLoRaWAN     = errors.DefineInvalidArgument("marshal_payload_to_lorawan", "failed to marshalling payload to LoRaWAN format")
+	errMarshalPacketToUDP          = errors.DefineInvalidArgument("marshal_packet_to_udp_format", "failed to marshal packet to UDP format")
+	errUnknownModulation           = errors.DefineInvalidArgument("unknown_modulation", "unknown modulation `{modulation}}`")
+
+	errNoConnectionAssociated = errors.DefineCorruption("no_connection_associated", "no gateway connection associated to this packet")
+)

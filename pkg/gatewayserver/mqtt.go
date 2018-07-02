@@ -16,6 +16,7 @@ package gatewayserver
 
 import (
 	"context"
+	"io"
 
 	"github.com/TheThingsIndustries/mystique/pkg/auth"
 	mqttlog "github.com/TheThingsIndustries/mystique/pkg/log"
@@ -23,8 +24,7 @@ import (
 	"github.com/TheThingsIndustries/mystique/pkg/packet"
 	"github.com/TheThingsIndustries/mystique/pkg/session"
 	"github.com/TheThingsIndustries/mystique/pkg/topic"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/mqtt"
@@ -72,14 +72,10 @@ func (h *mqttConnectionHandler) deliveryFunc(pkt *packet.PublishPacket) (deliver
 		return nil, errors.New("v2 MQTT format not supported yet")
 	}
 	if len(pkt.TopicParts) != 3 {
-		return nil, ErrUnsupportedTopicFormat.New(errors.Attributes{
-			"topic": pkt.TopicName,
-		})
+		return nil, errUnsupportedTopicFormat.WithAttributes("topic", pkt.TopicName)
 	}
 	if version := pkt.TopicParts[0]; version != V3TopicPrefix {
-		return nil, ErrInvalidAPIVersion.New(errors.Attributes{
-			"version": version,
-		})
+		return nil, errInvalidAPIVersion.WithAttributes("version", version)
 	}
 	switch pkt.TopicParts[2] {
 	case UplinkTopicSuffix:
@@ -87,9 +83,7 @@ func (h *mqttConnectionHandler) deliveryFunc(pkt *packet.PublishPacket) (deliver
 	case StatusTopicStatus:
 		return h.deliverMQTTStatus, nil
 	default:
-		return nil, ErrUnsupportedTopicFormat.New(errors.Attributes{
-			"topic": pkt.TopicName,
-		})
+		return nil, errUnsupportedTopicFormat.WithAttributes("topic", pkt.TopicName)
 	}
 }
 
@@ -97,7 +91,7 @@ func (h *mqttConnectionHandler) deliverMQTTUplink(pkt *packet.PublishPacket, con
 	up := &ttnpb.UplinkMessage{}
 	err := up.Unmarshal(pkt.Message)
 	if err != nil {
-		return common.ErrUnmarshalPayloadFailed.NewWithCause(nil, err)
+		return errUnmarshalFromProtobuf.WithCause(err)
 	}
 
 	return h.gs.handleUplink(h.Context(), up, conn)
@@ -107,7 +101,7 @@ func (h *mqttConnectionHandler) deliverMQTTStatus(pkt *packet.PublishPacket, _ c
 	status := &ttnpb.GatewayStatus{}
 	err := status.Unmarshal(pkt.Message)
 	if err != nil {
-		return common.ErrUnmarshalPayloadFailed.NewWithCause(nil, err)
+		return errUnmarshalFromProtobuf.WithCause(err)
 	}
 
 	return h.gs.handleStatus(h.Context(), status)
@@ -144,14 +138,27 @@ func (h *mqttConnectionHandler) Connect(info *auth.Info) error {
 
 func (h *mqttConnectionHandler) Subscribe(info *auth.Info, requestedTopic string, requestedQoS byte) (acceptedTopic string, acceptedQoS byte, err error) {
 	if info.Metadata == nil {
-		err = errors.New("No metadata present")
+		err = errNoMetadata
 		return
 	}
 	rights := info.Metadata.([]ttnpb.Right)
 	// TODO: Support v2 MQTT format https://github.com/TheThingsIndustries/ttn/issues/828
 	downlinkTopic := topic.Join([]string{V3TopicPrefix, info.Username, DownlinkTopicSuffix})
-	if requestedTopic != downlinkTopic || !ttnpb.IncludesRights(rights, ttnpb.RIGHT_GATEWAY_LINK) {
-		err = common.ErrPermissionDenied.New(nil)
+	splitRequestedTopic := topic.Split(requestedTopic)
+	switch {
+	case len(splitRequestedTopic) != 3:
+		err = errUnsupportedTopicFormat.WithAttributes("topic", requestedTopic)
+	case splitRequestedTopic[0] != V3TopicPrefix:
+		err = errInvalidAPIVersion.WithAttributes("version", splitRequestedTopic[0])
+	case splitRequestedTopic[1] != info.Username || splitRequestedTopic[2] != DownlinkTopicSuffix:
+		err = errPermissionDeniedForThisTopic.WithAttributes("topic", requestedTopic)
+	case !ttnpb.IncludesRights(rights, ttnpb.RIGHT_GATEWAY_LINK):
+		err = errAPIKeyNeedsRights.WithAttributes(
+			"gateway_uid", info.Username,
+			"rights", ttnpb.RIGHT_GATEWAY_LINK.String(),
+		)
+	}
+	if err != nil {
 		return
 	}
 	identifiers, err := ttnpb.GatewayIdentifiersFromUniqueID(info.Username)
@@ -265,7 +272,7 @@ func (g *GatewayServer) handleMQTTConnection(ctx context.Context, conn net.Conn)
 		for {
 			response, err := session.ReadPacket()
 			if err != nil {
-				if !errors.ErrEOF.Describes(err) {
+				if err != io.EOF {
 					logger.WithError(err).Warn("Error when reading packet")
 				}
 				readErr <- err
@@ -295,7 +302,7 @@ func (g *GatewayServer) handleMQTTConnection(ctx context.Context, conn net.Conn)
 			err = conn.Send(pkt)
 		}
 		if err != nil {
-			if !errors.ErrEOF.Describes(err) {
+			if err != io.EOF {
 				logger.WithError(err).Error("Cannot continue to serve MQTT connection")
 			}
 			return

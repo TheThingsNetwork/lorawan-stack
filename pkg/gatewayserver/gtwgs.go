@@ -21,8 +21,6 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/cluster"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -44,18 +42,18 @@ func (e nsErrors) Error() string {
 func (g *GatewayServer) getGatewayFrequencyPlan(ctx context.Context, gatewayID *ttnpb.GatewayIdentifiers) (ttnpb.FrequencyPlan, error) {
 	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, g.config.NSTags, nil)
 	if isInfo == nil {
-		return ttnpb.FrequencyPlan{}, ErrNoIdentityServerFound.New(nil)
+		return ttnpb.FrequencyPlan{}, errNoIdentityServerFound
 	}
 
 	is := ttnpb.NewIsGatewayClient(isInfo.Conn())
 	gw, err := is.GetGateway(ctx, gatewayID)
 	if err != nil {
-		return ttnpb.FrequencyPlan{}, errors.NewWithCause(err, "Could not get gateway information from Identity Server")
+		return ttnpb.FrequencyPlan{}, errCouldNotRetrieveGatewayInformation.WithCause(err)
 	}
 
 	fp, err := g.FrequencyPlans.GetByID(gw.FrequencyPlanID)
 	if err != nil {
-		return ttnpb.FrequencyPlan{}, errors.NewWithCausef(err, "Could not retrieve frequency plan %s", gw.FrequencyPlanID)
+		return ttnpb.FrequencyPlan{}, errCouldNotRetrieveFrequencyPlanOfGateway.WithAttributes("fp_id", gw.FrequencyPlanID)
 	}
 
 	return fp, nil
@@ -129,7 +127,7 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 
 	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, g.config.NSTags, nil)
 	if isInfo == nil {
-		return ErrNoIdentityServerFound.New(nil)
+		return errNoIdentityServerFound
 	}
 	is := ttnpb.NewIsGatewayClient(isInfo.Conn())
 
@@ -142,14 +140,12 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 
 	gtw, err := is.GetGateway(ctx, &id)
 	if err != nil {
-		return errors.NewWithCause(err, "Could not get gateway information from Identity Server")
+		return errCouldNotRetrieveGatewayInformation.WithCause(err)
 	}
 
 	fp, err := g.FrequencyPlans.GetByID(gtw.GetFrequencyPlanID())
 	if err != nil {
-		return common.ErrCouldNotRetrieveFrequencyPlan.NewWithCause(errors.Attributes{
-			"frequency_plan_id": gtw.GetFrequencyPlanID(),
-		}, err)
+		return errCouldNotRetrieveFrequencyPlanOfGateway.WithAttributes("fp_id", gtw.GetFrequencyPlanID()).WithCause(err)
 	}
 
 	scheduler, err := scheduling.FrequencyPlanScheduler(ctx, fp)
@@ -258,7 +254,7 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 	switch pld.GetMType() {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		if uplink.DevAddr == nil {
-			err = errors.New("No DevAddr specified")
+			err = errNoDevAddr
 			return
 		}
 		logger = logger.WithField("devaddr", *uplink.DevAddr)
@@ -270,7 +266,7 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 		ns = g.GetPeer(ttnpb.PeerInfo_NETWORK_SERVER, g.config.NSTags, devAddrBytes)
 	case ttnpb.MType_JOIN_REQUEST, ttnpb.MType_REJOIN_REQUEST:
 		if uplink.DevEUI == nil {
-			err = errors.New("No DevEUI specified")
+			err = errNoDevEUI
 			return
 		}
 		logger = logger.WithField("deveui", uplink.DevEUI.String())
@@ -283,7 +279,7 @@ func (g *GatewayServer) handleUplink(ctx context.Context, uplink *ttnpb.UplinkMe
 	}
 
 	if ns == nil {
-		err = ErrNoNetworkServerFound.New(nil)
+		err = errNoNetworkServerFound
 		return
 	}
 
@@ -301,7 +297,7 @@ func (g *GatewayServer) handleStatus(ctx context.Context, status *ttnpb.GatewayS
 func (g *GatewayServer) GetFrequencyPlan(ctx context.Context, r *ttnpb.GetFrequencyPlanRequest) (*ttnpb.FrequencyPlan, error) {
 	fp, err := g.FrequencyPlans.GetByID(r.GetFrequencyPlanID())
 	if err != nil {
-		return nil, errors.NewWithCause(err, "Could not retrieve frequency plan from storage")
+		return nil, errCouldNotRetrieveFrequencyPlanOfGateway.WithAttributes("fp_id", r.GetFrequencyPlanID()).WithCause(err)
 	}
 
 	return &fp, nil

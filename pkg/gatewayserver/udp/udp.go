@@ -22,12 +22,8 @@ package udp
 import (
 	"net"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
-
-// ErrGatewayNotConnected is returned when trying to send a packet to a udp.Conn that has never interacted with the packet's gateway.
-var ErrGatewayNotConnected = errors.New("Not connected to the specified gateway")
 
 // Handle returns a UDP packet socket from a raw UDP socket. Requires:
 //
@@ -87,16 +83,16 @@ func (c *Conn) Read() (*Packet, error) {
 	}
 }
 
-// Write sends a packet. It returns ErrGatewayNotConnected if the gateway was never connected, and otherwise, returns the result of the marshalling and socket operation.
+// Write sends a packet. It returns errGatewayNotConnected if the gateway was never connected, and otherwise, returns the result of the marshalling and socket operation.
 func (c *Conn) Write(packet *Packet) error {
 	buf, err := packet.MarshalBinary()
 	if err != nil {
-		return ErrMarshalFailed.New(nil)
+		return errMarshalPacketToUDP.WithCause(err)
 	}
 
 	addr, hasAddr := c.addrStore.GetDownlinkAddress(*packet.GatewayEUI)
 	if !hasAddr || addr == nil {
-		return ErrGatewayNotConnected
+		return errGatewayNotConnected
 	}
 
 	_, err = c.UDPConn.WriteTo(buf, addr)
@@ -106,20 +102,17 @@ func (c *Conn) Write(packet *Packet) error {
 // Ack builds the corresponding Ack packet, using p.BuildAck(), and sends it to the gateway.
 func (p *Packet) Ack() error {
 	if p.GatewayConn == nil || p.GatewayAddr == nil {
-		return errors.New("No gateway connection associated to this packet")
+		return errNoConnectionAssociated
 	}
 
-	ackPacket, err := p.BuildAck()
-	if err != nil {
-		return errors.NewWithCause(err, "failed to build ack package")
-	}
+	ackPacket := p.BuildAck()
 	if ackPacket == nil {
 		return nil
 	}
 
 	binaryAckPacket, err := ackPacket.MarshalBinary()
 	if err != nil {
-		return ErrMarshalFailed.NewWithCause(nil, err)
+		return errMarshalPacketToUDP.WithCause(err)
 	}
 
 	_, err = p.GatewayConn.WriteToUDP(binaryAckPacket, p.GatewayAddr)

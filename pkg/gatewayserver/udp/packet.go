@@ -95,7 +95,7 @@ type Packet struct {
 }
 
 // BuildAck builds the corresponding Ack back to the gateway. If the received packet does not require an Ack, the function returns nil without an error.
-func (p Packet) BuildAck() (*Packet, error) {
+func (p Packet) BuildAck() *Packet {
 	ack := Packet{
 		ProtocolVersion: p.ProtocolVersion,
 		Token:           p.Token,
@@ -106,10 +106,10 @@ func (p Packet) BuildAck() (*Packet, error) {
 	case PullData:
 		ack.PacketType = PullAck
 	default:
-		return nil, nil
+		return nil
 	}
 
-	return &ack, nil
+	return &ack
 }
 
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler
@@ -125,13 +125,13 @@ func (p *Packet) UnmarshalBinary(b []byte) (err error) {
 
 	if p.PacketType.HasGatewayEUI() {
 		if len(b) < i+8 {
-			return ErrUnmarshalFailed.NewWithCause(nil, ErrTooSmallToHaveGatewayEUI.New(nil))
+			return errTooSmallToHaveGatewayEUI
 		}
 
 		p.GatewayEUI = new(types.EUI64)
 		err = p.GatewayEUI.UnmarshalBinary(b[i : i+8])
 		if err != nil {
-			return ErrUnmarshalFailed.NewWithCause(nil, err)
+			return errUnmarshalEUI.WithCause(err)
 		}
 		i += 8
 	}

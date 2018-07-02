@@ -52,7 +52,7 @@ func (et ExpandedTime) MarshalJSON() ([]byte, error) {
 func (et *ExpandedTime) UnmarshalJSON(data []byte) error {
 	t, err := time.Parse(`"`+ExpandedFormat+`"`, string(data))
 	if err != nil {
-		return ErrUnmarshalFailed.NewWithCause(nil, err)
+		return errUnmarshalTimestamp.WithCause(err)
 	}
 	*et = ExpandedTime(t)
 	return nil

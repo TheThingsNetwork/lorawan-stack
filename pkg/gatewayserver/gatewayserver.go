@@ -25,7 +25,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
@@ -60,7 +59,7 @@ func New(c *component.Component, conf Config) (gs *GatewayServer, err error) {
 		var conn *net.UDPConn
 		conn, err = gs.ListenUDP(conf.UDPAddress)
 		if err != nil {
-			return nil, errors.NewWithCause(err, "Could not open UDP socket")
+			return nil, errUDPSocket.WithCause(err)
 		}
 		c.Logger().WithField("address", conf.UDPAddress).Info("Listening for UDP connections")
 
@@ -145,7 +144,7 @@ func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.G
 	gs.connectionsMu.Unlock()
 
 	if !ok {
-		return nil, ErrGatewayNotConnected.New(errors.Attributes{"gateway_id": id.GatewayID})
+		return nil, errGatewayNotConnected.WithAttributes("gateway_id", id.GatewayID)
 	}
 
 	observations := connection.getObservations()
@@ -156,11 +155,11 @@ func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.G
 func (gs *GatewayServer) getIdentityServer() (ttnpb.IsGatewayClient, error) {
 	peer := gs.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, nil, nil)
 	if peer == nil {
-		return nil, ErrNoIdentityServerFound.New(nil)
+		return nil, errNoIdentityServerFound
 	}
 	isConn := peer.Conn()
 	if isConn == nil {
-		return nil, ErrNoReadyConnectionToIdentityServer.New(nil)
+		return nil, errNoReadyConnectionToIdentityServer
 	}
 
 	return ttnpb.NewIsGatewayClient(isConn), nil
@@ -178,20 +177,21 @@ func checkAuthorization(ctx context.Context, is ttnpb.IsGatewayClient, right ttn
 	md := rpcmetadata.FromIncomingContext(ctx)
 
 	if md.AuthType == "" || md.AuthValue == "" {
-		return ErrUnauthorized.New(nil)
+		return errNoCredentialsPassed
 	}
 
 	if md.AuthType != "Bearer" {
-		return errors.Errorf("Expected authentication type to be `Bearer` but got `%s` instead", md.AuthType)
+		return errUnexpectedAuthenticationType.WithAttributes("passed", md.AuthType, "expected", "Bearer")
 	}
 
-	res, err := is.ListGatewayRights(ctx, &ttnpb.GatewayIdentifiers{GatewayID: md.ID}, grpc.PerRPCCredentials(&md))
+	ids := &ttnpb.GatewayIdentifiers{GatewayID: md.ID}
+	res, err := is.ListGatewayRights(ctx, ids, grpc.PerRPCCredentials(&md))
 	if err != nil {
-		return errors.NewWithCause(err, "Could not fetch gateway rights for the credentials passed")
+		return errListGatewayRights.WithCause(err)
 	}
 
 	if !ttnpb.IncludesRights(res.Rights, right) {
-		return common.ErrPermissionDenied.New(nil)
+		return errAPIKeyNeedsRights.WithAttributes("gateway_uid", ids.UniqueID(ctx), "rights", right.String())
 	}
 
 	return nil

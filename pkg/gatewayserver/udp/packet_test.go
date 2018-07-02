@@ -89,8 +89,7 @@ func TestPacketType(t *testing.T) {
 			GatewayEUI:      eui,
 			Data:            data,
 		}
-		_, err := p.BuildAck()
-		a.So(err, should.BeNil)
+		_ = p.BuildAck()
 	}
 
 	inexistantPacketType := PacketType(math.MaxUint8)

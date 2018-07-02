@@ -14,70 +14,41 @@
 
 package gatewayserver
 
-import "go.thethings.network/lorawan-stack/pkg/errors"
+import errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 
 var (
-	// ErrNoNetworkServerFound is returned if no Network Server was found for a passed DevAddr.
-	ErrNoNetworkServerFound = &errors.ErrDescriptor{
-		MessageFormat: "No Network Server found for this message",
-		Code:          1,
-		Type:          errors.NotFound,
-	}
-	// ErrNoIdentityServerFound is returned if no Identity Server was found.
-	ErrNoIdentityServerFound = &errors.ErrDescriptor{
-		MessageFormat: "No Identity Server found",
-		Code:          2,
-		Type:          errors.NotFound,
-	}
-	// ErrUnauthorized is returned if there are no credentials passed.
-	ErrUnauthorized = &errors.ErrDescriptor{
-		MessageFormat: "No credentials passed",
-		Code:          3,
-		Type:          errors.Unauthorized,
-	}
-	// ErrGatewayNotConnected is returned when a send operation failed because a gateway is not connected.
-	ErrGatewayNotConnected = &errors.ErrDescriptor{
-		MessageFormat:  "Gateway `{gateway_id}` not connected",
-		Code:           4,
-		Type:           errors.NotFound,
-		SafeAttributes: []string{"gateway_id"},
-	}
-	// ErrNoReadyConnectionToIdentityServer is returned when the connection to the identity server is not ready yet.
-	ErrNoReadyConnectionToIdentityServer = &errors.ErrDescriptor{
-		MessageFormat: "No ready connection to the identity server",
-		Code:          5,
-		Type:          errors.Internal,
-	}
-	// ErrTranslationFromProtobuf is returned when the translation of a
-	// message between the proto format and the UDP format fails.
-	ErrTranslationFromProtobuf = &errors.ErrDescriptor{
-		MessageFormat: "Could not translate from the protobuf format to UDP",
-		Code:          6,
-		Type:          errors.Internal,
-	}
-	// ErrUnsupportedTopicFormat is returned if a topic is unsupported.
-	ErrUnsupportedTopicFormat = &errors.ErrDescriptor{
-		MessageFormat:  "Unsupported topic format `{topic}`",
-		Code:           7,
-		Type:           errors.InvalidArgument,
-		SafeAttributes: []string{"topic"},
-	}
-	// ErrInvalidAPIVersion is returned when an invalid API version is passed.
-	ErrInvalidAPIVersion = &errors.ErrDescriptor{
-		MessageFormat:  "Invalid API version tag `{version}`",
-		Code:           8,
-		Type:           errors.InvalidArgument,
-		SafeAttributes: []string{"version"},
-	}
-)
+	errUDPSocket = errors.DefineFailedPrecondition("udp_socket", "could not open UDP socket")
 
-func init() {
-	ErrNoNetworkServerFound.Register()
-	ErrNoIdentityServerFound.Register()
-	ErrUnauthorized.Register()
-	ErrGatewayNotConnected.Register()
-	ErrNoReadyConnectionToIdentityServer.Register()
-	ErrTranslationFromProtobuf.Register()
-	ErrUnsupportedTopicFormat.Register()
-	ErrInvalidAPIVersion.Register()
-}
+	errNoNetworkServerFound              = errors.DefineInternal("no_network_server_found", "no Network Server found for this message")
+	errNoIdentityServerFound             = errors.DefineInternal("no_identity_server_found", "no Identity Server found")
+	errNoReadyConnectionToIdentityServer = errors.DefineUnavailable("no_ready_connection_to_is", "no ready connection to the Identity Server")
+
+	errNoCredentialsPassed = errors.DefineUnauthenticated("no_credentials_passed", "no credentials passed")
+	errAPIKeyNeedsRights   = errors.DefinePermissionDenied(
+		"api_key_needs_rights",
+		"API key needs the following rights for the gateway `{gateway_uid}` to perform this operation: {rights}",
+	)
+	errGatewayNotConnected = errors.DefineNotFound("gateway_not_connected", "gateway `{gateway_id}` not connected")
+	errNoPULLDATAReceived  = errors.Define("no_pull_data_received", "no PULL_DATA received in the last `{delay}`")
+
+	errNoMetadata                   = errors.DefineInternal("no_metadata", "No metadata present")
+	errUnsupportedTopicFormat       = errors.DefineInvalidArgument("topic_format", "unsupported topic format `{topic}`")
+	errInvalidAPIVersion            = errors.DefineInvalidArgument("api_version", "invalid API version tag `{version}`")
+	errPermissionDeniedForThisTopic = errors.DefinePermissionDenied("topic_rights", "permission denied to subscribe to `{topic}`")
+	errUnexpectedAuthenticationType = errors.DefineInvalidArgument("authentication_type", "received `{passed}` authentication type, but expected `{expected}`")
+
+	errMarshalToProtobuf       = errors.DefineInvalidArgument("marshal_to_protobuf", "could not marshal to protobuf")
+	errUnmarshalFromProtobuf   = errors.DefineInvalidArgument("unmarshal_from_protobuf", "could not unmarshal message from protobuf")
+	errTranslationFromProtobuf = errors.DefineInternal("protocol_translation", "could not translate from the protobuf format to UDP")
+
+	errListGatewayRights = errors.Define("list_gateway_rights", "could not list gateway rights for the passed authentication method")
+
+	errCouldNotRetrieveGatewayInformation     = errors.Define("retrieve_gateway_info", "could not retrieve information about the gateway")
+	errCouldNotRetrieveFrequencyPlanOfGateway = errors.Define("retrieve_gtw_frequency_plan", "could not retrieve the frequency plan `{fp_id}` of the gateway")
+
+	errCouldNotBeScheduled          = errors.Define("schedule", "could not schedule downlink")
+	errCouldNotComputeTOAOfDownlink = errors.Define("compute_toa_of_downlink", "could not compute the time on air of a downlink")
+
+	errNoDevAddr = errors.DefineInvalidArgument("no_devaddr_specified", "no DevAddr specified")
+	errNoDevEUI  = errors.DefineInvalidArgument("no_deveui_specified", "no DevEUI specified")
+)

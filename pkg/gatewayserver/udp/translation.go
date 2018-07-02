@@ -22,7 +22,6 @@ import (
 	"strings"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/version"
 )
@@ -66,17 +65,13 @@ func TranslateUpstream(data Data, md UpstreamMetadata) (*ttnpb.GatewayUp, error)
 		}
 		convertedRx, err := convertUplink(data, rxIndex, md)
 		if err != nil {
-			continue
+			return nil, err
 		}
 		up.UplinkMessages = append(up.UplinkMessages, &convertedRx)
 	}
 
 	if data.Stat != nil {
 		up.GatewayStatus = convertStatus(*data.Stat, md)
-	}
-
-	if len(up.UplinkMessages) == 0 && up.GatewayStatus == nil {
-		return nil, errors.New("Message could not be converted to TTN format")
 	}
 
 	return up, nil
@@ -131,12 +126,12 @@ func convertUplink(data Data, rxIndex int, md UpstreamMetadata) (ttnpb.UplinkMes
 
 	rawPayload, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(rx.Data, "="))
 	if err != nil {
-		return up, ErrDecodingPayloadFromBase64.NewWithCause(nil, err)
+		return up, errDecodingPayloadFromBase64.WithCause(err)
 	}
 
 	up.RawPayload = rawPayload
 	if err := up.Payload.UnmarshalLoRaWAN(rawPayload); err != nil {
-		return up, ErrUnmarshalFailed.NewWithCause(nil, err)
+		return up, errUnmarshalPayloadFromLoRaWAN.WithCause(err)
 	}
 	if macPayload := up.Payload.GetMACPayload(); macPayload != nil {
 		up.DevAddr = &macPayload.FHDR.DevAddr
@@ -170,17 +165,17 @@ func convertUplink(data Data, rxIndex int, md UpstreamMetadata) (ttnpb.UplinkMes
 
 		sf, err := rx.DatR.SpreadingFactor()
 		if err != nil {
-			return up, ErrParsingSpreadingFactor.NewWithCause(nil, err)
+			return up, errParsingSpreadingFactor.WithCause(err)
 		}
 		up.Settings.SpreadingFactor = uint32(sf)
 		if up.Settings.Bandwidth, err = rx.DatR.Bandwidth(); err != nil {
-			return up, ErrParsingBandwidth.NewWithCause(nil, err)
+			return up, errParsingBandwidth.WithCause(err)
 		}
 	case "FSK":
 		up.Settings.Modulation = ttnpb.Modulation_FSK
 		up.Settings.BitRate = rx.DatR.FSK
 	default:
-		return up, ErrUnknownModulation.New(nil)
+		return up, errUnknownModulation.WithAttributes("modulation", rx.Modu)
 	}
 
 	return up, nil
@@ -262,7 +257,7 @@ func TranslateDownstream(downlink *ttnpb.DownlinkMessage) (TxPacket, error) {
 	if payload == nil {
 		var err error
 		if payload, err = downlink.GetPayload().MarshalLoRaWAN(); err != nil {
-			return tx, ErrMarshalFailed.NewWithCause(nil, err)
+			return tx, errMarshalPayloadToLoRaWAN.WithCause(err)
 		}
 	}
 
@@ -289,7 +284,7 @@ func TranslateDownstream(downlink *ttnpb.DownlinkMessage) (TxPacket, error) {
 		tx.Modu = "FSK"
 		tx.DatR.FSK = downlink.Settings.BitRate
 	default:
-		return tx, ErrUnknownModulation.New(nil)
+		return tx, errUnknownModulation.WithAttributes("modulation", downlink.Settings.Modulation)
 	}
 
 	return tx, nil

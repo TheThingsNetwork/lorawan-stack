@@ -21,52 +21,29 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/band"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 var (
-	// ErrDutyCycleFull is returned is the duty cycle prevents scheduling of a downlink.
-	ErrDutyCycleFull = &errors.ErrDescriptor{
-		Code:           1,
-		MessageFormat:  "Duty cycle between {min_frequency} and {max_frequency} full, exceeded quota of {quota}",
-		SafeAttributes: []string{"min_frequency", "max_frequency", "quota"},
-	}
-	// ErrOverlap is returned if there is an already existing scheduling overlapping.
-	ErrOverlap = &errors.ErrDescriptor{
-		Code:          2,
-		MessageFormat: "Window overlap",
-	}
-	// ErrTimeOffAir is returned if time-off-air constraints prevent scheduling of the new downlink.
-	ErrTimeOffAir = &errors.ErrDescriptor{
-		Code:          3,
-		MessageFormat: "Time-off-air constraints prevent scheduling",
-	}
-	// ErrNoSubBandFound is returned when an operation fails because there is no sub-band for the given frequency.
-	ErrNoSubBandFound = &errors.ErrDescriptor{
-		Code:           4,
-		MessageFormat:  "No sub-band found for frequency {frequency} Hz",
-		SafeAttributes: []string{"frequency"},
-	}
-	// ErrDwellTime is returned when an operation fails because the packet does not respect the dwell time.
-	ErrDwellTime = &errors.ErrDescriptor{
-		Code:           5,
-		MessageFormat:  "Packet time-on-air duration is greater than this band's dwell time ({packet_duration} > {dwell_time})",
-		SafeAttributes: []string{"packet_duration", "dwell_time"},
-	}
+	errDutyCycleFull = errors.DefineResourceExhausted(
+		"duty_cycle_full",
+		"duty cycle between {min_frequency} and {max_frequency} full, exceeded quota of {quota}",
+	)
+	errOverlap        = errors.DefineResourceExhausted("window_overlap", "window overlap")
+	errTimeOffAir     = errors.DefineUnavailable("time_off_air_required", "time-off-air constraints prevent scheduling")
+	errNoSubBandFound = errors.DefineNotFound("no_sub_band_found", "no sub-band found for frequency {frequency} Hz")
+	errDwellTime      = errors.DefineFailedPrecondition(
+		"dwell_time_required",
+		"packet time-on-air duration is greater than this band's dwell time ({packet_duration} > {dwell_time})",
+	)
+	errCouldNotRetrieveFPBand = errors.DefineCorruption("retrieve_fp_band", "could not retrieve the band associated with the frequency plan")
+	errNegativeDuration       = errors.DefineInternal("negative_duration", "duration cannot be negative")
 )
-
-func init() {
-	ErrDutyCycleFull.Register()
-	ErrOverlap.Register()
-	ErrTimeOffAir.Register()
-	ErrNoSubBandFound.Register()
-	ErrDwellTime.Register()
-}
 
 // Scheduler is an abstraction for an entity that manages the packet's timespans.
 type Scheduler interface {
-	// ScheduleAt adds the requested timespan to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns ErrScheduleFull. If another error prevents scheduling, it is returned.
+	// ScheduleAt adds the requested timespan to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns errScheduleFull. If another error prevents scheduling, it is returned.
 	ScheduleAt(s Span, channel uint64) error
 	// ScheduleAnytime requires a scheduling window if there is no timestamp constraint.
 	ScheduleAnytime(minimum Timestamp, d time.Duration, channel uint64) (Span, error)
@@ -84,7 +61,7 @@ func FrequencyPlanScheduler(ctx context.Context, fp ttnpb.FrequencyPlan) (Schedu
 
 	band, err := band.GetByID(fp.BandID)
 	if err != nil {
-		return nil, errors.NewWithCause(err, "Could not find band associated to that frequency plan")
+		return nil, errCouldNotRetrieveFPBand.WithCause(err)
 	}
 	if fp.DwellTime == nil && band.DwellTime > 0 {
 		scheduler.dwellTime = &band.DwellTime
@@ -118,16 +95,16 @@ func (f frequencyPlanScheduling) findSubBand(channel uint64) (*subBandScheduling
 		}
 	}
 
-	return nil, ErrNoSubBandFound.New(errors.Attributes{"frequency": channel})
+	return nil, errNoSubBandFound.WithAttributes("frequency", channel)
 }
 
 func (f frequencyPlanScheduling) ScheduleAt(s Span, channel uint64) error {
 	if s.Duration <= 0 {
-		return errors.New("Invalid span: duration cannot be negative")
+		return errNegativeDuration
 	}
 
 	if f.dwellTime != nil && s.Duration > *f.dwellTime {
-		return ErrDwellTime.New(errors.Attributes{"packet_duration": s.Duration, "dwell_time": *f.dwellTime})
+		return errDwellTime.WithAttributes("packet_duration", s.Duration, "dwell_time", *f.dwellTime)
 	}
 
 	subBand, err := f.findSubBand(channel)
@@ -140,7 +117,7 @@ func (f frequencyPlanScheduling) ScheduleAt(s Span, channel uint64) error {
 
 func (f frequencyPlanScheduling) ScheduleAnytime(minimum Timestamp, d time.Duration, channel uint64) (Span, error) {
 	if d <= 0 {
-		return Span{}, errors.New("Invalid duration: duration cannot be negative")
+		return Span{}, errNegativeDuration
 	}
 
 	subBand, err := f.findSubBand(channel)
@@ -153,7 +130,7 @@ func (f frequencyPlanScheduling) ScheduleAnytime(minimum Timestamp, d time.Durat
 
 func (f frequencyPlanScheduling) RegisterEmission(s Span, channel uint64) error {
 	if s.Duration <= 0 {
-		return errors.New("Invalid duration: duration cannot be negative")
+		return errNegativeDuration
 	}
 
 	subBand, err := f.findSubBand(channel)

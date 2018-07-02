@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/band"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -93,7 +92,7 @@ func (s *subBandScheduling) RegisterEmission(w packetWindow) {
 	s.mu.Unlock()
 }
 
-// Schedule adds the requested time window to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns ErrScheduleFull. If another error prevents scheduling, it is returned.
+// Schedule adds the requested time window to its internal schedule. If, because of its internal constraints (e.g. for duty cycles, not respecting the duty cycle), it returns errScheduleFull. If another error prevents scheduling, it is returned.
 func (s *subBandScheduling) ScheduleAt(w Span, timeOffAir *ttnpb.FrequencyPlan_TimeOffAir) error {
 	s.mu.Lock()
 	err := s.schedule(w, timeOffAir)
@@ -110,10 +109,10 @@ func (s *subBandScheduling) schedule(w Span, timeOffAir *ttnpb.FrequencyPlan_Tim
 		emissionWindows = append(emissionWindows, scheduledWindow.window)
 
 		if scheduledWindow.window.Overlaps(w) {
-			return ErrOverlap.New(errors.Attributes{})
+			return errOverlap
 		}
 		if scheduledWindow.withTimeOffAir().Overlaps(windowWithTimeOffAir.withTimeOffAir()) {
-			return ErrTimeOffAir.New(errors.Attributes{})
+			return errTimeOffAir
 		}
 	}
 
@@ -122,11 +121,11 @@ func (s *subBandScheduling) schedule(w Span, timeOffAir *ttnpb.FrequencyPlan_Tim
 
 	if prolongingWindowsAirtime > s.dutyCycle.MaxEmissionDuring(dutyCycleWindow) ||
 		precedingWindowsAirtime > s.dutyCycle.MaxEmissionDuring(dutyCycleWindow) {
-		return ErrDutyCycleFull.New(errors.Attributes{
-			"min_frequency": s.dutyCycle.MinFrequency,
-			"max_frequency": s.dutyCycle.MaxFrequency,
-			"quota":         s.dutyCycle.DutyCycle,
-		})
+		return errDutyCycleFull.WithAttributes(
+			"min_frequency", s.dutyCycle.MinFrequency,
+			"max_frequency", s.dutyCycle.MaxFrequency,
+			"quota", s.dutyCycle.DutyCycle,
+		)
 	}
 
 	s.addScheduling(windowWithTimeOffAir)

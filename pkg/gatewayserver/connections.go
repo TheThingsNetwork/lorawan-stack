@@ -23,8 +23,6 @@ import (
 	"github.com/TheThingsIndustries/mystique/pkg/packet"
 	"github.com/TheThingsIndustries/mystique/pkg/session"
 	"github.com/TheThingsIndustries/mystique/pkg/topic"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/udp"
 	"go.thethings.network/lorawan-stack/pkg/toa"
@@ -65,12 +63,12 @@ func (c *connectionData) schedule(down *ttnpb.DownlinkMessage) (err error) {
 	}
 	span.Duration, err = toa.Compute(down.RawPayload, down.Settings)
 	if err != nil {
-		return errors.NewWithCause(err, "Could not compute time-on-air of the downlink")
+		return errCouldNotComputeTOAOfDownlink.WithCause(err)
 	}
 
 	err = c.scheduler.ScheduleAt(span, down.Settings.Frequency)
 	if err != nil {
-		return errors.NewWithCause(err, "Could not schedule downlink")
+		return err
 	}
 
 	return nil
@@ -116,7 +114,7 @@ type gRPCConnection struct {
 
 func (c *gRPCConnection) send(down *ttnpb.DownlinkMessage) error {
 	if err := c.schedule(down); err != nil {
-		return err
+		return errCouldNotBeScheduled.WithCause(err)
 	}
 	return c.link.Send(&ttnpb.GatewayDown{DownlinkMessage: down})
 }
@@ -188,17 +186,15 @@ func (c *udpConnection) pullDataExpired() bool {
 func (c *udpConnection) send(down *ttnpb.DownlinkMessage) error {
 	gtw := c.gateway()
 	if c.pullDataExpired() {
-		return errors.NewWithCausef(ErrGatewayNotConnected.New(errors.Attributes{
-			"gateway_id": gtw.GetGatewayID(),
-		}), "No PULL_DATA received in the last %s", pullDataExpiration.String())
+		return errGatewayNotConnected.WithCause(errNoPULLDATAReceived.WithAttributes("delay", pullDataExpiration.String()))
 	}
 
 	tx, err := udp.TranslateDownstream(down)
 	if err != nil {
-		return ErrTranslationFromProtobuf.New(nil)
+		return errTranslationFromProtobuf
 	}
 	if err := c.schedule(down); err != nil {
-		return err
+		return errCouldNotBeScheduled.WithCause(err)
 	}
 
 	pkt := *c.lastPullData()
@@ -257,8 +253,13 @@ func (c *mqttConnection) send(down *ttnpb.DownlinkMessage) error {
 	// TODO: Support v2 MQTT format https://github.com/TheThingsIndustries/ttn/issues/828
 	data, err := down.Marshal()
 	if err != nil {
-		return common.ErrMarshalPayloadFailed.NewWithCause(nil, err)
+		return errMarshalToProtobuf.WithCause(err)
 	}
+
+	if err := c.schedule(down); err != nil {
+		return errCouldNotBeScheduled.WithCause(err)
+	}
+
 	uid := c.gateway().GatewayIdentifiers.UniqueID(c.sess.Context())
 	topicParts := []string{V3TopicPrefix, uid, DownlinkTopicSuffix}
 	pkt := &packet.PublishPacket{

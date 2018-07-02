@@ -21,6 +21,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -54,7 +55,7 @@ func TestScheduleDownlinkUnregisteredGateway(t *testing.T) {
 		},
 	})
 	a.So(err, should.NotBeNil)
-	a.So(gatewayserver.ErrGatewayNotConnected.Caused(err), should.BeTrue)
+	a.So(errors.IsNotFound(err), should.BeTrue)
 
 	defer gs.Close()
 }
