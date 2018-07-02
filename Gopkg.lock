@@ -375,7 +375,10 @@
 [[projects]]
   branch = "master"
   name = "github.com/prometheus/client_golang"
-  packages = ["prometheus"]
+  packages = [
+    "prometheus",
+    "prometheus/promhttp"
+  ]
   revision = "faf4ec335fe01ae5a6a0eaa34a5a9333bfbd1a30"
 
 [[projects]]
@@ -534,6 +537,7 @@
   name = "go.opencensus.io"
   packages = [
     ".",
+    "exporter/prometheus",
     "internal",
     "internal/tagencoding",
     "plugin/ocgrpc",
@@ -698,6 +702,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6b1c5714c6d0279fd6b247365610b7b8178f985ec3c5e27d78fab4c9671e2a5f"
+  inputs-digest = "be41e410c331800bb0120e6cf9e38fbbfdc602cc1e59288ab25cac7170e5ad81"
   solver-name = "gps-cdcl"
   solver-version = 1
