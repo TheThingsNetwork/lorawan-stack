@@ -27,7 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/log/middleware/sentry"
@@ -235,7 +235,7 @@ func (c *Component) RightsHook() (*rights.Hook, error) {
 		}
 		hook, err := rights.New(c.ctx, rightsFetchingConnector{Component: c}, config)
 		if err != nil {
-			return nil, errors.NewWithCause(err, "Could not initialize rights hook")
+			return nil, errors.New("could not initialize rights hook").WithCause(err)
 		}
 		c.rightsHook = hook
 	}
