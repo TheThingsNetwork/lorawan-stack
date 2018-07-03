@@ -18,6 +18,31 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 )
 
+func NewPopulatedEndDeviceVersion(r randyEndDevice, easy bool) *EndDeviceVersion {
+	out := &EndDeviceVersion{}
+	out.EndDeviceModel = *NewPopulatedEndDeviceModel(r, easy)
+	out.HardwareVersion = randStringEndDevice(r)
+	out.FirmwareVersion = randStringEndDevice(r)
+	if r.Intn(10) != 0 {
+		out.Photos = make([]string, r.Intn(10))
+		for i := range out.Photos {
+			out.Photos[i] = randStringEndDevice(r)
+		}
+	}
+	if r.Intn(10) != 0 {
+		out.DefaultFormatters = NewPopulatedDeviceFormatters(r, easy)
+	}
+	out.DefaultMACState = NewPopulatedMACState(r, easy)
+	out.MinFrequency = uint64(r.Uint32())
+	out.MaxFrequency = uint64(r.Uint32())
+	out.FCntResets = bool(r.Intn(2) == 0)
+	out.Supports32BitFCnt = bool(r.Intn(2) == 0)
+	out.DisableJoinNonceCheck = bool(r.Intn(2) == 0)
+	out.LoRaWANVersion = MACVersion([]int32{1, 2, 3, 4}[r.Intn(4)])
+	out.LoRaWANPHYVersion = PHYVersion([]int32{1, 2, 3, 4, 5, 6}[r.Intn(6)])
+	return out
+}
+
 func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	out := &EndDevice{}
 	out.EndDeviceIdentifiers = *NewPopulatedEndDeviceIdentifiers(r, easy)
@@ -34,38 +59,13 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	}
 	out.NextRJCount0 = r.Uint32()
 	out.NextRJCount1 = r.Uint32()
-	out.FCntResets = r.Intn(2) == 0
-	out.FCntIs16Bit = r.Intn(2) == 0
 	if r.Intn(10) != 0 {
 		out.Session = NewPopulatedSession(r, easy)
 	}
 	if r.Intn(10) != 0 {
 		out.SessionFallback = NewPopulatedSession(r, easy)
 	}
-	switch r.Intn(6) {
-	case 0:
-		out.LoRaWANVersion = MAC_V1_0
-		out.LoRaWANPHYVersion = PHY_V1_0
-	case 1:
-		out.LoRaWANVersion = MAC_V1_0_1
-		out.LoRaWANPHYVersion = PHY_V1_0_1
-	case 2:
-		out.LoRaWANVersion = MAC_V1_0_2
-		out.LoRaWANPHYVersion = PHY_V1_0_2_REV_A
-	case 3:
-		out.LoRaWANVersion = MAC_V1_0_2
-		out.LoRaWANPHYVersion = PHY_V1_0_2_REV_B
-	case 4:
-		out.LoRaWANVersion = MAC_V1_1
-		out.LoRaWANPHYVersion = PHY_V1_1_REV_A
-	case 5:
-		out.LoRaWANVersion = MAC_V1_1
-		out.LoRaWANPHYVersion = PHY_V1_1_REV_B
-	}
 	out.FrequencyPlanID = "EU_863_870"
-	out.MinFrequency = uint64(r.Uint32())
-	out.MaxFrequency = uint64(r.Uint32())
-	out.MaxEIRP = r.Float32()
 	out.MACSettings = NewPopulatedMACSettings(r, easy)
 	out.MACInfo = NewPopulatedMACInfo(r, easy)
 	out.MACState = NewPopulatedMACState(r, easy)
@@ -76,10 +76,9 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	if r.Intn(10) != 0 {
 		out.Attributes = pbtypes.NewPopulatedStruct(r, easy)
 	}
-	out.DisableJoinNonceCheck = r.Intn(2) == 0
 	out.NetworkServerAddress = randStringEndDevice(r)
 	out.ApplicationServerAddress = randStringEndDevice(r)
-	out.EndDeviceVersion = NewPopulatedEndDeviceVersion(r, easy)
+	out.EndDeviceVersion = *NewPopulatedEndDeviceVersion(r, easy)
 	if r.Intn(10) != 0 {
 		out.RecentUplinks = make([]*UplinkMessage, r.Intn(5))
 		for i := range out.RecentUplinks {
@@ -125,12 +124,11 @@ func NewPopulatedMACState(r randyEndDevice, _ bool) *MACState {
 	out.ADRAckLimit = r.Uint32()
 	out.ADRAckDelay = r.Uint32()
 	out.DutyCycle = AggregatedDutyCycle([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}[r.Intn(16)])
-	out.RxDelay = r.Uint32()
+	out.Rx1Delay = r.Uint32()
 	out.Rx1DataRateOffset = r.Uint32() % 6
 	out.Rx2DataRateIndex = r.Uint32() % 16
 	out.Rx2Frequency = 868300000
-	out.RejoinTimer = r.Uint32()
-	out.RejoinCounter = r.Uint32()
+	out.RejoinTimePeriodicity = RejoinTimePeriod([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)])
 	out.PingSlotFrequency = uint64(r.Uint32())
 	out.PingSlotDataRateIndex = r.Uint32()
 	return out

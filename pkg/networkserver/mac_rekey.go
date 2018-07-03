@@ -22,7 +22,7 @@ import (
 )
 
 func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RekeyInd) error {
-	if dev.ABP {
+	if !dev.EndDeviceVersion.SupportsJoin {
 		return nil
 	}
 

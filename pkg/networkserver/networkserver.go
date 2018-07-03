@@ -80,27 +80,23 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	}
 
 	dev.MACState = &ttnpb.MACState{
-		MaxEIRP:           band.DefaultMaxEIRP,
-		UplinkDwellTime:   false, // TODO: Use the band parameters (https://github.com/TheThingsIndustries/ttn/issues/774)
-		DownlinkDwellTime: false, // TODO: Use the band parameters (https://github.com/TheThingsIndustries/ttn/issues/774)
-		ADRNbTrans:        1,
-		ADRAckLimit:       uint32(band.ADRAckLimit),
 		ADRAckDelay:       uint32(band.ADRAckDelay),
+		ADRAckLimit:       uint32(band.ADRAckLimit),
+		ADRNbTrans:        1,
 		DutyCycle:         ttnpb.DUTY_CYCLE_1,
-		RxDelay:           uint32(band.ReceiveDelay1.Seconds()),
+		MaxEIRP:           band.DefaultMaxEIRP,
 		Rx1DataRateOffset: 0,
 		Rx2DataRateIndex:  uint32(band.DefaultRx2Parameters.DataRateIndex),
 		Rx2Frequency:      uint64(band.DefaultRx2Parameters.Frequency),
+		Rx1Delay:          uint32(band.ReceiveDelay1.Seconds()),
+		DownlinkDwellTime: band.DwellTime > 0,
+		UplinkDwellTime:   band.DwellTime > 0,
 	}
-
-	if dev.MaxEIRP > 0 && dev.MaxEIRP < band.DefaultMaxEIRP {
-		dev.MACState.MaxEIRP = dev.MaxEIRP
-	}
-
 	dev.MACStateDesired = deepcopy.Copy(dev.MACState).(*ttnpb.MACState)
 
-	// TODO: Override parameters in MACState for which a default value is defined
-	// once https://github.com/TheThingsIndustries/ttn/issues/849 is resolved.
+	if dev.EndDeviceVersion.DefaultMACState != nil {
+		dev.MACState = dev.EndDeviceVersion.DefaultMACState
+	}
 
 	dev.MACStateDesired.UplinkDwellTime = fp.UplinkDwellTime != nil
 	dev.MACStateDesired.DownlinkDwellTime = fp.DownlinkDwellTime != nil
@@ -117,6 +113,7 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 			DownlinkMargin:       dev.MACInfo.DownlinkMargin,
 		}
 	}
+	dev.MACInfo.LoRaWANVersion = dev.EndDeviceVersion.LoRaWANVersion
 
 	return nil
 }
@@ -599,7 +596,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 		if isJoinAccept {
 			rx1.Delay = band.JoinAcceptDelay1
 		} else {
-			rx1.Delay = time.Second * time.Duration(dev.MACState.RxDelay)
+			rx1.Delay = time.Second * time.Duration(dev.MACState.Rx1Delay)
 		}
 
 		if err = setDownlinkModulation(&rx1.TxSettings, band.DataRates[drIdx]); err != nil {
@@ -626,7 +623,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 	if isJoinAccept {
 		rx2.Delay = band.JoinAcceptDelay2
 	} else {
-		rx2.Delay = time.Second * time.Duration(1+dev.MACState.RxDelay)
+		rx2.Delay = time.Second * time.Duration(1+dev.MACState.Rx1Delay)
 	}
 
 	if err = setDownlinkModulation(&rx2.TxSettings, band.DataRates[dev.MACState.Rx2DataRateIndex]); err != nil {
@@ -880,6 +877,9 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, msg *ttnpb.UplinkMessa
 		},
 		0,
 		func(d *deviceregistry.Device) bool {
+			if d.MACInfo == nil {
+				return true
+			}
 			devs = append(devs, d)
 			return true
 		},
@@ -900,6 +900,9 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, msg *ttnpb.UplinkMessa
 			d.EndDeviceIdentifiers.DevAddr = &d.SessionFallback.DevAddr
 			d.Session = d.SessionFallback
 			d.SessionFallback = nil
+			if d.MACInfo == nil {
+				return true
+			}
 			devs = append(devs, d)
 			return true
 		},
@@ -922,7 +925,7 @@ outer:
 		fCnt := pld.FCnt
 
 		switch {
-		case dev.FCntIs16Bit, fCnt >= dev.Session.NextFCntUp:
+		case !dev.EndDeviceVersion.Supports32BitFCnt, fCnt >= dev.Session.NextFCntUp:
 		case fCnt > dev.Session.NextFCntUp&0xffff:
 			fCnt |= dev.Session.NextFCntUp &^ 0xffff
 		case dev.Session.NextFCntUp < 0xffff<<16:
@@ -930,14 +933,14 @@ outer:
 		}
 
 		gap := uint32(math.MaxUint32)
-		if !dev.FCntResets {
+		if !dev.EndDeviceVersion.FCntResets {
 			if dev.Session.NextFCntUp > fCnt {
 				continue outer
 			}
 
 			gap = fCnt - dev.Session.NextFCntUp
 
-			if dev.LoRaWANVersion.HasMaxFCntGap() {
+			if dev.MACInfo.LoRaWANVersion.HasMaxFCntGap() {
 				fp, err := ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)
 				if err != nil {
 					return nil, common.ErrCorruptRegistry.NewWithCause(nil, err)
@@ -959,7 +962,7 @@ outer:
 			gap:    gap,
 			fCnt:   fCnt,
 		})
-		if dev.FCntResets && fCnt != pld.FCnt {
+		if dev.EndDeviceVersion.FCntResets && fCnt != pld.FCnt {
 			matching = append(matching, device{
 				Device: dev,
 				gap:    gap,
@@ -992,7 +995,7 @@ outer:
 
 		var computedMIC [4]byte
 		var err error
-		switch dev.LoRaWANVersion {
+		switch dev.MACInfo.LoRaWANVersion {
 		case ttnpb.MAC_V1_1:
 			if dev.Session.SNwkSIntKey == nil || dev.Session.SNwkSIntKey.Key.IsZero() {
 				return nil, common.ErrCorruptRegistry.NewWithCause(nil, ErrMissingSNwkSIntKey.New(nil))
@@ -1295,11 +1298,12 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		},
 		NetID:              ns.NetID,
 		SelectedMacVersion: dev.LoRaWANVersion,
-		RxDelay:            dev.MACStateDesired.RxDelay,
+		RxDelay:            dev.MACStateDesired.Rx1Delay,
 		CFList:             frequencyplans.CFList(fp, dev.LoRaWANPHYVersion),
 		DownlinkSettings: ttnpb.DLSettings{
 			Rx1DROffset: dev.MACStateDesired.Rx1DataRateOffset,
 			Rx2DR:       dev.MACStateDesired.Rx2DataRateIndex,
+			OptNeg:      true,
 		},
 	}
 
@@ -1322,6 +1326,21 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		}
 		dev.EndDeviceIdentifiers.DevAddr = &devAddr
 
+		if err := resetMACState(ns.Component.FrequencyPlans, dev.EndDevice); err != nil {
+			return err
+		}
+		dev.MACState.Rx1Delay = req.RxDelay
+		dev.MACState.Rx1DataRateOffset = req.DownlinkSettings.Rx1DROffset
+		dev.MACState.Rx2DataRateIndex = req.DownlinkSettings.Rx2DR
+		if req.DownlinkSettings.OptNeg && dev.MACInfo.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) > 0 {
+			// The version will be further negotiated via RekeyInd/RekeyConf
+			dev.MACInfo.LoRaWANVersion = ttnpb.MAC_V1_1
+		}
+
+		dev.MACStateDesired.Rx1Delay = dev.MACState.Rx1Delay
+		dev.MACStateDesired.Rx1DataRateOffset = dev.MACState.Rx1DataRateOffset
+		dev.MACStateDesired.Rx2DataRateIndex = dev.MACState.Rx2DataRateIndex
+
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -1335,17 +1354,6 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		if len(dev.RecentUplinks) > recentUplinkCount {
 			dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
 		}
-
-		if err := resetMACState(ns.Component.FrequencyPlans, dev.EndDevice); err != nil {
-			return err
-		}
-		dev.MACState.RxDelay = req.RxDelay
-		dev.MACState.Rx1DataRateOffset = req.DownlinkSettings.Rx1DROffset
-		dev.MACState.Rx2DataRateIndex = req.DownlinkSettings.Rx2DR
-
-		dev.MACStateDesired.RxDelay = dev.MACState.RxDelay
-		dev.MACStateDesired.Rx1DataRateOffset = dev.MACState.Rx1DataRateOffset
-		dev.MACStateDesired.Rx2DataRateIndex = dev.MACState.Rx2DataRateIndex
 
 		if err := ns.scheduleDownlink(ctx, dev, msg, nil, resp.RawPayload, true); err != nil {
 			logger.WithError(err).Debug("Failed to schedule join accept")
@@ -1378,14 +1386,14 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 				return
 			}
 
-			err := cl.Send(&ttnpb.ApplicationUp{
+			if err := cl.Send(&ttnpb.ApplicationUp{
 				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 				SessionKeyID:         dev.Session.SessionKeyID,
 				Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-					AppSKey: resp.SessionKeys.AppSKey,
+					AppSKey:        resp.SessionKeys.AppSKey,
+					CorrelationIDs: msg.CorrelationIDs,
 				}},
-			})
-			if err != nil {
+			}); err != nil {
 				logger.WithField(
 					"application_id", dev.EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationID,
 				).WithError(err).Errorf("Failed to send Join Accept to AS")

@@ -477,3 +477,23 @@ enum PingSlotPeriod {
   // Every 128 seconds
   PING_EVERY_128S = 7;
 }
+
+enum RejoinTimePeriod {
+  option (gogoproto.goproto_enum_prefix) = false;
+  // Every ~17 minutes
+  REJOIN_TIME_1   = 0;
+  // Every 2 seconds
+  REJOIN_TIME_2   = 1;
+  // Every 4 seconds
+  REJOIN_TIME_4   = 2;
+  // Every 8 seconds
+  REJOIN_TIME_8   = 3;
+  // Every 16 seconds
+  REJOIN_TIME_16  = 4;
+  // Every 32 seconds
+  REJOIN_TIME_32  = 5;
+  // Every 64 seconds
+  REJOIN_TIME_64  = 6;
+  // Every 128 seconds
+  REJOIN_TIME_128 = 7;
+}

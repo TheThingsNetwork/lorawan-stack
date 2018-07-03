@@ -80,20 +80,152 @@ message EndDeviceModel {
 }
 
 message EndDeviceVersion {
+  option (gogoproto.populate) = false;
+
   // Model of the device.
   EndDeviceModel model = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
+  // LoRaWAN MAC version.
+  MACVersion lorawan_version = 2 [(gogoproto.customname) = "LoRaWANVersion"];
+
+  // LoRaWAN PHY version.
+  PHYVersion lorawan_phy_version = 3 [(gogoproto.customname) = "LoRaWANPHYVersion"];
+
   // Hardware version of this end-device.
-  string hardware_version = 2;
+  string hardware_version = 4;
 
   // Firmware version of this end-device.
-  string firmware_version = 3;
+  string firmware_version = 5;
 
   // Photos representing the devices.
-  repeated string photos = 4;
+  repeated string photos = 6;
 
+  // Time after which a rejoin request will be sent.
   // Default formatters defining the payload formats for this end device.
-  DeviceFormatters default_formatters = 5;
+  DeviceFormatters default_formatters = 7;
+
+  // DefaultMACState is the state, to which device is reset by default.(e.g. on join or ResetInd).
+  MACState default_mac_state = 8 [(gogoproto.customname) = "DefaultMACState"];
+
+  // Min frequency the device is capable of using (in Hz).
+  uint64 min_frequency = 9;
+
+  // Max frequency the device is capable of using (in Hz).
+  uint64 max_frequency = 10;
+
+  // Indicator that the device may reset the frame counters (not LoRaWAN compliant).
+  bool f_cnt_resets = 11;
+
+  // Indicator that the device uses 16-bit frame counters.
+  bool supports_32_bit_f_cnt = 12 [(gogoproto.customname) = "Supports32BitFCnt"];
+
+  // DisableJoinNonceCheck specifies whether LoRaWAN DevNonce check procedure should be disabled.
+  bool disable_join_nonce_check = 13;
+
+  // SupportsJoin specifies whether the device model supports Join flow or no.
+  bool supports_join = 14;
+}
+
+message MACSettings {
+  // Whether to disable ADR or not.
+  bool disable_adr = 1 [(gogoproto.customname) = "DisableADR"];
+
+  // The ADR margin.
+  uint32 adr_margin = 2 [(gogoproto.customname) = "ADRMargin"];
+
+  // Class B timeout.
+  google.protobuf.Timestamp class_b_timeout = 3 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+
+  // Class C timeout.
+  google.protobuf.Timestamp class_c_timeout = 4 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+}
+
+// MAC State of the device (active or desired)
+// This is used internally by the Network Server and is read only.
+message MACState {
+  reserved 14;
+
+  option (gogoproto.populate) = false;
+
+  // Currently used maximum EIRP power (in dBm).
+  float max_eirp = 1 [(gogoproto.customname) = "MaxEIRP"];
+
+  // Uplink dwell time is set (400ms).
+  bool uplink_dwell_time = 2;
+
+  // Downlink dwell time is set (400ms).
+  bool downlink_dwell_time = 3;
+
+  // ADR: data rate index to use.
+  uint32 adr_data_rate_index = 4 [(gogoproto.customname) = "ADRDataRateIndex"];
+
+  // ADR: transmission power index to use.
+  uint32 adr_tx_power_index = 5 [(gogoproto.customname) = "ADRTXPowerIndex"];
+
+  // ADR: number of retransmissions.
+  uint32 adr_nb_trans = 6 [(gogoproto.customname) = "ADRNbTrans"];
+
+  // ADR: number of messages to wait before setting ADRAckReq.
+  uint32 adr_ack_limit = 7 [(gogoproto.customname) = "ADRAckLimit"];
+
+  // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
+  uint32 adr_ack_delay = 8 [(gogoproto.customname) = "ADRAckDelay"];
+
+  // Rx1 delay in seconds (Rx2 delay is Rx1 delay + 1 second).
+  uint32 rx1_delay = 9;
+
+  // Data rate offset for Rx1.
+  uint32 rx1_data_rate_offset = 10;
+
+  // Data rate index for Rx2.
+  uint32 rx2_data_rate_index = 11;
+
+  // Frequency for Rx2.
+  uint64 rx2_frequency = 12;
+
+  // Time within which a rejoin request must be sent.
+  RejoinTimePeriod rejoin_time_periodicity = 13;
+
+  // TODO: Add RejoinCountPeriod rejoin_count_periodicity = 14;
+
+  // Frequency of the class B ping slot.
+  uint64 ping_slot_frequency = 15;
+
+  // Data rate index of the class B ping slot.
+  uint32 ping_slot_data_rate_index = 16;
+
+  // Aggregated duty cycle of the device.
+  AggregatedDutyCycle duty_cycle = 17;
+}
+
+// MAC information sent by the device
+// This message is read only.
+message MACInfo {
+  // Currently active LoRaWAN device class
+  // - Device class is A by default
+  // - If device sets ClassB bit in uplink, this will be set to B
+  // - If device sent DeviceModeInd MAC message, this will be set to that value
+  Class device_class = 1;
+
+  // LoRaWAN MAC version.
+  MACVersion lorawan_version = 2 [(gogoproto.customname) = "LoRaWANVersion"];
+
+  // Time when the last device status MAC message was received
+  google.protobuf.Timestamp last_status_received_at = 3 [(gogoproto.stdtime) = true];
+
+  // Time when a new confirmed downlink message or MAC command is ready to be scheduled for class C.
+  google.protobuf.Timestamp next_confirmed_downlink_at = 4 [(gogoproto.stdtime) = true];
+
+  // Battery percentage received in last device status message
+  float battery_percentage = 5;
+
+  // Downlink margin received in last device status message
+  int32 downlink_margin = 6;
+
+  // Periodicity of the class B ping slot
+  PingSlotPeriod ping_slot_periodicity = 7;
+
+  // TODO: Add info about failed MAC requests
 }
 
 message EndDevice {
@@ -122,87 +254,61 @@ message EndDevice {
   // Next Rejoin counter (type 1) to expect.
   uint32 next_rj_count_1 = 8 [(gogoproto.customname) = "NextRJCount1"];
 
-  // Indicator that the device may reset the frame counters (not LoRaWAN compliant).
-  bool f_cnt_resets = 9;
-
-  // Indicator that the device uses 16-bit frame counters.
-  bool f_cnt_is_16_bit = 10 [(gogoproto.customname) = "FCntIs16Bit"];
-
   // Current session.
-  Session session = 11;
+  Session session = 9;
 
-  // Fallback session (stored until RekeyInd received).
-  Session session_fallback = 12;
-
-  // LoRaWAN MAC version.
-  MACVersion lorawan_version = 13 [(gogoproto.customname) = "LoRaWANVersion"];
-
-  // LoRaWAN PHY version.
-  PHYVersion lorawan_phy_version = 14 [(gogoproto.customname) = "LoRaWANPHYVersion"];
+  // Fallback session (stored until RekeyInd is received).
+  Session session_fallback = 10;
 
   // frequency_plan_id indicates the ID of the frequency plan.
-  string frequency_plan_id = 15 [(gogoproto.customname) = "FrequencyPlanID"];
-
-  // Min frequency the device is capable of using.
-  uint64 min_frequency = 16;
-
-  // Max frequency the device is capable of using.
-  uint64 max_frequency = 17;
-
-  // Max EIRP the device is capable of using (in dBm).
-  float max_eirp = 18 [(gogoproto.customname) = "MaxEIRP"];
+  string frequency_plan_id = 11 [(gogoproto.customname) = "FrequencyPlanID"];
 
   // LoRaWAN MAC settings for the device.
-  MACSettings mac_settings = 19 [(gogoproto.customname) = "MACSettings"];
+  MACSettings mac_settings = 12 [(gogoproto.customname) = "MACSettings"];
 
   // MAC info sent by the device.
-  MACInfo mac_info = 20 [(gogoproto.customname) = "MACInfo"];
+  MACInfo mac_info = 13 [(gogoproto.customname) = "MACInfo"];
 
   // Current LoRaWAN MAC state.
-  MACState mac_state = 21 [(gogoproto.customname) = "MACState"];
+  MACState mac_state = 14 [(gogoproto.customname) = "MACState"];
 
   // Desired LoRaWAN MAC state.
-  MACState mac_state_desired = 22 [(gogoproto.customname) = "MACStateDesired"];
+  MACState mac_state_desired = 15 [(gogoproto.customname) = "MACStateDesired"];
 
   // Location of the device.
-  Location location = 23;
+  Location location = 16;
 
   // Device Attributes
   // - field names are written in snake_case
-  google.protobuf.Struct attributes = 24;
-
-  // DisableJoinNonceCheck specifies whether LoRaWAN DevNonce check procedure should be disabled.
-  bool disable_join_nonce_check = 25;
+  google.protobuf.Struct attributes = 17;
 
   // NetworkServerAddress specifies Address(host:port) of the Network Server associated with this device.
-  string network_server_address = 26 [(gogoproto.customname) = "NetworkServerAddress"];
+  string network_server_address = 18 [(gogoproto.customname) = "NetworkServerAddress"];
 
   // ApplicationServerAddress specifies Address(host:port) of the Application Server associated with this device.
-  string application_server_address = 27 [(gogoproto.customname) = "ApplicationServerAddress"];
+  string application_server_address = 19 [(gogoproto.customname) = "ApplicationServerAddress"];
 
-  EndDeviceVersion version = 28 [(gogoproto.embed) = true];
+  EndDeviceVersion version = 20 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // Recent uplink messages sorted by time.
-  repeated UplinkMessage recent_uplinks = 29;
+  repeated UplinkMessage recent_uplinks = 22;
 
   // Recent downlink messages sorted by time.
-  repeated DownlinkMessage recent_downlinks = 30;
+  repeated DownlinkMessage recent_downlinks = 23;
 
   // Queued MAC responses.
   // Regenerated on each uplink.
-  repeated MACCommand queued_mac_responses = 31 [(gogoproto.customname) = "QueuedMACResponses"];
+  repeated MACCommand queued_mac_responses = 24 [(gogoproto.customname) = "QueuedMACResponses"];
 
   // Pending MAC requests(i.e. sent requests, for which no response has been received yet).
   // Regenerated on each downlink.
-  repeated MACCommand pending_mac_requests = 32 [(gogoproto.customname) = "PendingMACRequests"];
+  repeated MACCommand pending_mac_requests = 25 [(gogoproto.customname) = "PendingMACRequests"];
 
   // Queued Application downlink messages.
-  repeated ApplicationDownlink queued_application_downlinks = 33;
+  repeated ApplicationDownlink queued_application_downlinks = 26;
 
   // Formatters defining the payload formats.
-  DeviceFormatters formatters = 34 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-
-  bool abp = 35 [(gogoproto.customname) = "ABP"];
+  DeviceFormatters formatters = 27 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   google.protobuf.Timestamp created_at = 97 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 98 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
@@ -212,74 +318,4 @@ message EndDevice {
 
 message EndDevices {
   repeated EndDevice end_devices = 1;
-}
-
-message MACSettings {
-  // Use ADR
-  bool adr = 1 [(gogoproto.customname) = "ADR"];
-  // The ADR margin
-  uint32 adr_margin = 2 [(gogoproto.customname) = "ADRMargin"];
-}
-
-// MAC State of the device (active or desired)
-// This is used internally by the Network Server and is read only
-message MACState {
-  option (gogoproto.populate) = false;
-
-  // Currently used maximum EIRP power (in dBm).
-  float max_eirp = 2 [(gogoproto.customname) = "MaxEIRP"];
-  // Uplink dwell time is set (400ms).
-  bool uplink_dwell_time = 3;
-  // Downlink dwell time is set (400ms).
-  bool downlink_dwell_time = 4;
-  // ADR: data rate index to use.
-  uint32 adr_data_rate_index = 5 [(gogoproto.customname) = "ADRDataRateIndex"];
-  // ADR: transmission power index to use.
-  uint32 adr_tx_power_index = 6 [(gogoproto.customname) = "ADRTXPowerIndex"];
-  // ADR: number of retransmissions.
-  uint32 adr_nb_trans = 7 [(gogoproto.customname) = "ADRNbTrans"];
-  // ADR: number of messages to wait before setting ADRAckReq.
-  uint32 adr_ack_limit = 8 [(gogoproto.customname) = "ADRAckLimit"];
-  // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
-  uint32 adr_ack_delay = 9 [(gogoproto.customname) = "ADRAckDelay"];
-  // Aggregated duty cycle of the device.
-  AggregatedDutyCycle duty_cycle = 10;
-  // Rx1 delay in seconds (Rx2 delay is Rx1 delay + 1 second).
-  uint32 rx_delay = 11;
-  // Data rate offset for Rx1.
-  uint32 rx1_data_rate_offset = 12;
-  // Data rate index for Rx2.
-  uint32 rx2_data_rate_index = 13;
-  // Frequency for Rx2.
-  uint64 rx2_frequency = 14;
-  // Time after which a rejoin request will be sent.
-  uint32 rejoin_timer = 18;
-  // Number of messages after which a rejoin request will be sent.
-  uint32 rejoin_counter = 19;
-  // Frequency of the class B ping slot.
-  uint64 ping_slot_frequency = 21;
-  // Data rate index of the class B ping slot.
-  uint32 ping_slot_data_rate_index = 22;
-}
-
-// MAC information sent by the device
-// This message is read only
-message MACInfo {
-  // Currently active LoRaWAN device class
-  // - Device class is A by default
-  // - If device sets ClassB bit in uplink, this will be set to B
-  // - If device sent DeviceModeInd MAC message, this will be set to that value
-  Class device_class = 1;
-  // Time when the last device status MAC message was received
-  google.protobuf.Timestamp last_status_received_at = 2 [(gogoproto.stdtime) = true];
-  // Time when a new confirmed downlink message or MAC command is ready to be scheduled for class C.
-  google.protobuf.Timestamp next_confirmed_downlink_at = 3 [(gogoproto.stdtime) = true];
-  // Battery percentage received in last device status message
-  float battery_percentage = 4;
-  // Downlink margin received in last device status message
-  int32 downlink_margin = 5;
-  // Periodicity of the class B ping slot
-  PingSlotPeriod ping_slot_periodicity = 6;
-
-  // TODO: Add info about failed MAC requests
 }

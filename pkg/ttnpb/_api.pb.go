@@ -51,11 +51,11 @@ It has these top-level messages:
 	DeviceBrand
 	EndDeviceModel
 	EndDeviceVersion
-	EndDevice
-	EndDevices
 	MACSettings
 	MACState
 	MACInfo
+	EndDevice
+	EndDevices
 	SetDeviceRequest
 	ErrorDetails
 	Gateway

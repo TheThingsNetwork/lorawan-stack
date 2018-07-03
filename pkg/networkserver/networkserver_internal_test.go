@@ -332,7 +332,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 			slots := deepcopy.Copy(slots).([]*ttnpb.DownlinkMessage)
 			slots[0].TxMetadata = ttnpb.TxMetadata{
 				GatewayIdentifiers: md.GatewayIdentifiers,
-				Timestamp:          md.Timestamp + uint64(time.Duration(dev.MACState.RxDelay)*time.Second),
+				Timestamp:          md.Timestamp + uint64(time.Duration(dev.MACState.Rx1Delay)*time.Second),
 			}
 
 			var n uint32
@@ -451,7 +451,7 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 			slots := deepcopy.Copy(slots).([]*ttnpb.DownlinkMessage)
 			slots[0].TxMetadata = ttnpb.TxMetadata{
 				GatewayIdentifiers: md.GatewayIdentifiers,
-				Timestamp:          md.Timestamp + uint64(time.Duration(dev.MACState.RxDelay)*time.Second),
+				Timestamp:          md.Timestamp + uint64(time.Duration(dev.MACState.Rx1Delay)*time.Second),
 			}
 
 			slots[1].TxMetadata = slots[0].TxMetadata

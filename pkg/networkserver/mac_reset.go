@@ -23,7 +23,7 @@ import (
 )
 
 func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_ResetInd, fps *frequencyplans.Store) error {
-	if !dev.ABP {
+	if dev.EndDeviceVersion.SupportsJoin {
 		return nil
 	}
 

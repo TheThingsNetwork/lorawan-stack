@@ -55,10 +55,14 @@ func TestHandleResetInd(t *testing.T) {
 		{
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
-				ABP: true,
+				EndDeviceVersion: ttnpb.EndDeviceVersion{
+					SupportsJoin: false,
+				},
 			},
 			Expected: &ttnpb.EndDevice{
-				ABP: true,
+				EndDeviceVersion: ttnpb.EndDeviceVersion{
+					SupportsJoin: false,
+				},
 			},
 			Payload: nil,
 			Error:   common.ErrMissingPayload.New(nil),
@@ -66,18 +70,26 @@ func TestHandleResetInd(t *testing.T) {
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				ABP:                true,
+				EndDeviceVersion: ttnpb.EndDeviceVersion{
+					DefaultMACState: &ttnpb.MACState{
+						MaxEIRP: 42,
+					},
+					SupportsJoin: false,
+				},
 				FrequencyPlanID:    test.EUFrequencyPlanID,
-				MaxEIRP:            42,
 				MACState:           ttnpb.NewPopulatedMACState(test.Randy, false),
 				MACStateDesired:    ttnpb.NewPopulatedMACState(test.Randy, false),
 				QueuedMACResponses: []*ttnpb.MACCommand{},
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
-					ABP:             true,
+					EndDeviceVersion: ttnpb.EndDeviceVersion{
+						DefaultMACState: &ttnpb.MACState{
+							MaxEIRP: 42,
+						},
+						SupportsJoin: false,
+					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
-					MaxEIRP:         42,
 					QueuedMACResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_ResetConf{
 							MinorVersion: 1,
@@ -97,9 +109,13 @@ func TestHandleResetInd(t *testing.T) {
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				ABP:             true,
+				EndDeviceVersion: ttnpb.EndDeviceVersion{
+					DefaultMACState: &ttnpb.MACState{
+						MaxEIRP: 42,
+					},
+					SupportsJoin: false,
+				},
 				FrequencyPlanID: test.EUFrequencyPlanID,
-				MaxEIRP:         42,
 				MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
 				MACStateDesired: ttnpb.NewPopulatedMACState(test.Randy, false),
 				QueuedMACResponses: []*ttnpb.MACCommand{
@@ -110,9 +126,13 @@ func TestHandleResetInd(t *testing.T) {
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
-					ABP:             true,
+					EndDeviceVersion: ttnpb.EndDeviceVersion{
+						DefaultMACState: &ttnpb.MACState{
+							MaxEIRP: 42,
+						},
+						SupportsJoin: false,
+					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
-					MaxEIRP:         42,
 					QueuedMACResponses: []*ttnpb.MACCommand{
 						{},
 						{},

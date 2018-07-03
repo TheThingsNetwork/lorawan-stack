@@ -472,7 +472,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 		test.Must(nil, ns.Start())
 
 		_, err := reg.Create(&ttnpb.EndDevice{
-			LoRaWANVersion: ttnpb.MAC_V1_1,
+			EndDeviceVersion: ttnpb.EndDeviceVersion{
+				LoRaWANVersion: ttnpb.MAC_V1_1,
+			},
 			Session: &ttnpb.Session{
 				DevAddr: DevAddr,
 				SessionKeys: ttnpb.SessionKeys{
@@ -539,7 +541,13 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.0/unconfirmed",
 				&ttnpb.EndDevice{
-					LoRaWANVersion: ttnpb.MAC_V1_0,
+					MACInfo: &ttnpb.MACInfo{
+						LoRaWANVersion: ttnpb.MAC_V1_0,
+					},
+					EndDeviceVersion: ttnpb.EndDeviceVersion{
+						LoRaWANVersion: ttnpb.MAC_V1_0,
+						FCntResets:     true,
+					},
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -577,7 +585,13 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.0/unconfirmed/FCnt resets",
 				&ttnpb.EndDevice{
-					LoRaWANVersion: ttnpb.MAC_V1_0,
+					MACInfo: &ttnpb.MACInfo{
+						LoRaWANVersion: ttnpb.MAC_V1_0,
+					},
+					EndDeviceVersion: ttnpb.EndDeviceVersion{
+						LoRaWANVersion: ttnpb.MAC_V1_0,
+						FCntResets:     true,
+					},
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -594,7 +608,6 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							},
 						},
 					},
-					FCntResets: true,
 				},
 				0x43,
 				func() *ttnpb.UplinkMessage {
@@ -616,7 +629,12 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.0/confirmed/ack",
 				&ttnpb.EndDevice{
-					LoRaWANVersion: ttnpb.MAC_V1_0,
+					MACInfo: &ttnpb.MACInfo{
+						LoRaWANVersion: ttnpb.MAC_V1_0,
+					},
+					EndDeviceVersion: ttnpb.EndDeviceVersion{
+						LoRaWANVersion: ttnpb.MAC_V1_0,
+					},
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -659,7 +677,13 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.0/confirmed/ack/FCnt resets",
 				&ttnpb.EndDevice{
-					LoRaWANVersion: ttnpb.MAC_V1_0,
+					MACInfo: &ttnpb.MACInfo{
+						LoRaWANVersion: ttnpb.MAC_V1_0,
+					},
+					EndDeviceVersion: ttnpb.EndDeviceVersion{
+						LoRaWANVersion: ttnpb.MAC_V1_0,
+						FCntResets:     true,
+					},
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -681,7 +705,6 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						ttnpb.NewPopulatedDownlinkMessage(test.Randy, false),
 						ttnpb.NewPopulatedDownlinkMessage(test.Randy, false),
 					},
-					FCntResets: true,
 				},
 				0x43,
 				func() *ttnpb.UplinkMessage {
@@ -703,7 +726,12 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.1/unconfirmed",
 				&ttnpb.EndDevice{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					MACInfo: &ttnpb.MACInfo{
+						LoRaWANVersion: ttnpb.MAC_V1_1,
+					},
+					EndDeviceVersion: ttnpb.EndDeviceVersion{
+						LoRaWANVersion: ttnpb.MAC_V1_1,
+					},
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -749,7 +777,12 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.1/confirmed/ack",
 				&ttnpb.EndDevice{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					MACInfo: &ttnpb.MACInfo{
+						LoRaWANVersion: ttnpb.MAC_V1_1,
+					},
+					EndDeviceVersion: ttnpb.EndDeviceVersion{
+						LoRaWANVersion: ttnpb.MAC_V1_1,
+					},
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -806,7 +839,13 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.1/unconfirmed/FCnt resets",
 				&ttnpb.EndDevice{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					MACInfo: &ttnpb.MACInfo{
+						LoRaWANVersion: ttnpb.MAC_V1_1,
+					},
+					EndDeviceVersion: ttnpb.EndDeviceVersion{
+						LoRaWANVersion: ttnpb.MAC_V1_1,
+						FCntResets:     true,
+					},
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -829,7 +868,6 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							},
 						},
 					},
-					FCntResets: true,
 				},
 				0x43,
 				func() *ttnpb.UplinkMessage {
@@ -853,7 +891,13 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.1/confirmed/ack/FCnt resets",
 				&ttnpb.EndDevice{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					MACInfo: &ttnpb.MACInfo{
+						LoRaWANVersion: ttnpb.MAC_V1_1,
+					},
+					EndDeviceVersion: ttnpb.EndDeviceVersion{
+						LoRaWANVersion: ttnpb.MAC_V1_1,
+						FCntResets:     true,
+					},
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -886,7 +930,6 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							return msg
 						}(),
 					},
-					FCntResets: true,
 				},
 				0x43,
 				func() *ttnpb.UplinkMessage {
@@ -1260,7 +1303,9 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.1",
 				&ttnpb.EndDevice{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					EndDeviceVersion: ttnpb.EndDeviceVersion{
+						LoRaWANVersion: ttnpb.MAC_V1_1,
+					},
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
@@ -1283,7 +1328,9 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.1",
 				&ttnpb.EndDevice{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					EndDeviceVersion: ttnpb.EndDeviceVersion{
+						LoRaWANVersion: ttnpb.MAC_V1_1,
+					},
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
@@ -1306,7 +1353,9 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.0",
 				&ttnpb.EndDevice{
-					LoRaWANVersion: ttnpb.MAC_V1_0,
+					EndDeviceVersion: ttnpb.EndDeviceVersion{
+						LoRaWANVersion: ttnpb.MAC_V1_0,
+					},
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DevEUI:                 &DevEUI,
 						JoinEUI:                &JoinEUI,
@@ -1438,11 +1487,12 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					},
 					NetID:              ns.NetID,
 					SelectedMacVersion: tc.Device.LoRaWANVersion,
-					RxDelay:            tc.Device.MACStateDesired.RxDelay,
+					RxDelay:            tc.Device.MACStateDesired.Rx1Delay,
 					CFList:             nil,
 					DownlinkSettings: ttnpb.DLSettings{
 						Rx1DROffset: tc.Device.MACStateDesired.Rx1DataRateOffset,
 						Rx2DR:       tc.Device.MACStateDesired.Rx2DataRateIndex,
+						OptNeg:      true,
 					},
 				}
 
@@ -1545,11 +1595,11 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						t.FailNow()
 					}
 
-					expected.MACState.RxDelay = tc.Device.MACStateDesired.RxDelay
+					expected.MACState.Rx1Delay = tc.Device.MACStateDesired.Rx1Delay
 					expected.MACState.Rx1DataRateOffset = tc.Device.MACStateDesired.Rx1DataRateOffset
 					expected.MACState.Rx2DataRateIndex = tc.Device.MACStateDesired.Rx2DataRateIndex
 
-					expected.MACStateDesired.RxDelay = expected.MACState.RxDelay
+					expected.MACStateDesired.Rx1Delay = expected.MACState.Rx1Delay
 					expected.MACStateDesired.Rx1DataRateOffset = expected.MACState.Rx1DataRateOffset
 					expected.MACStateDesired.Rx2DataRateIndex = expected.MACState.Rx2DataRateIndex
 
@@ -1704,7 +1754,7 @@ func TestHandleUplink(t *testing.T) {
 	msg = ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
 	msg.Payload.Major = 1
 	_, err = ns.HandleUplink(context.Background(), msg)
-	a.So(err, should.NotBeNil)
+	a.So(err, should.BeNil)
 
 	t.Run("Uplink", HandleUplinkTest(conf))
 	t.Run("Join", HandleJoinTest(conf))
