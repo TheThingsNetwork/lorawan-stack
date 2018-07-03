@@ -25,7 +25,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		return errMissingPayload
 	}
 
-	dev.PendingMACRequests, err = handleMACResponseBlock(ttnpb.CID_LINK_ADR, func(cmd *ttnpb.MACCommand) {
+	dev.MACState.PendingRequests, err = handleMACResponseBlock(ttnpb.CID_LINK_ADR, func(cmd *ttnpb.MACCommand) {
 		if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
@@ -44,6 +44,6 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		dev.MACState.ADRDataRateIndex = req.DataRateIndex
 		dev.MACState.ADRTXPowerIndex = req.TxPowerIndex
 
-	}, dev.PendingMACRequests...)
+	}, dev.MACState.PendingRequests...)
 	return
 }

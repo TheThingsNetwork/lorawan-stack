@@ -79,40 +79,34 @@ func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
 	}
 
 	dev.MACState = &ttnpb.MACState{
-		ADRAckDelay:       uint32(band.ADRAckDelay),
-		ADRAckLimit:       uint32(band.ADRAckLimit),
-		ADRNbTrans:        1,
-		DutyCycle:         ttnpb.DUTY_CYCLE_1,
-		MaxEIRP:           band.DefaultMaxEIRP,
-		Rx1DataRateOffset: 0,
-		Rx2DataRateIndex:  uint32(band.DefaultRx2Parameters.DataRateIndex),
-		Rx2Frequency:      uint64(band.DefaultRx2Parameters.Frequency),
-		Rx1Delay:          uint32(band.ReceiveDelay1.Seconds()),
-		DownlinkDwellTime: band.DwellTime > 0,
-		UplinkDwellTime:   band.DwellTime > 0,
-	}
-	dev.MACStateDesired = deepcopy.Copy(dev.MACState).(*ttnpb.MACState)
-
-	if dev.EndDeviceVersion.DefaultMACState != nil {
-		dev.MACState = dev.EndDeviceVersion.DefaultMACState
+		LoRaWANVersion: dev.EndDeviceVersion.LoRaWANVersion,
+		MACParameters: ttnpb.MACParameters{
+			ADRAckDelay:       uint32(band.ADRAckDelay),
+			ADRAckLimit:       uint32(band.ADRAckLimit),
+			ADRNbTrans:        1,
+			DutyCycle:         ttnpb.DUTY_CYCLE_1,
+			MaxEIRP:           band.DefaultMaxEIRP,
+			Rx1DataRateOffset: 0,
+			Rx2DataRateIndex:  uint32(band.DefaultRx2Parameters.DataRateIndex),
+			Rx2Frequency:      uint64(band.DefaultRx2Parameters.Frequency),
+			Rx1Delay:          uint32(band.ReceiveDelay1.Seconds()),
+			DownlinkDwellTime: band.DwellTime > 0,
+			UplinkDwellTime:   band.DwellTime > 0,
+		},
 	}
 
-	dev.MACStateDesired.UplinkDwellTime = fp.UplinkDwellTime != nil
-	dev.MACStateDesired.DownlinkDwellTime = fp.DownlinkDwellTime != nil
+	// NOTE: dev.MACState.MACParameters must not contain pointer values at this point.
+	dev.MACState.DesiredMACParameters = dev.MACState.MACParameters
 
-	// TODO: Set additional parameters in MACStateDesired from fp,
+	if dev.EndDeviceVersion.DefaultMACParameters != nil {
+		dev.MACState.MACParameters = *dev.EndDeviceVersion.DefaultMACParameters
+	}
+
+	dev.MACState.DesiredMACParameters.UplinkDwellTime = fp.UplinkDwellTime != nil
+	dev.MACState.DesiredMACParameters.DownlinkDwellTime = fp.DownlinkDwellTime != nil
+
+	// TODO: Set additional parameters in MACState.DesiredMACParameters from fp,
 	// once https://github.com/TheThingsIndustries/ttn/issues/857 is resolved.
-
-	if dev.MACInfo == nil {
-		dev.MACInfo = &ttnpb.MACInfo{}
-	} else {
-		dev.MACInfo = &ttnpb.MACInfo{
-			LastStatusReceivedAt: dev.MACInfo.LastStatusReceivedAt,
-			BatteryPercentage:    dev.MACInfo.BatteryPercentage,
-			DownlinkMargin:       dev.MACInfo.DownlinkMargin,
-		}
-	}
-	dev.MACInfo.LoRaWANVersion = dev.EndDeviceVersion.LoRaWANVersion
 
 	return nil
 }
@@ -371,11 +365,13 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 	}
 
 	dev.QueuedApplicationDownlinks = req.Downlinks
-	if err = dev.Store("QueuedApplicationDownlinks"); err != nil {
+	if err = dev.Store(
+		"QueuedApplicationDownlinks",
+	); err != nil {
 		return nil, err
 	}
 
-	if dev.MACInfo != nil && dev.MACInfo.DeviceClass == ttnpb.CLASS_C {
+	if dev.MACState != nil && dev.MACState.DeviceClass == ttnpb.CLASS_C {
 		// TODO: Schedule the next downlink (https://github.com/TheThingsIndustries/ttn/issues/728)
 	}
 	return ttnpb.Empty, nil
@@ -389,11 +385,13 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 	}
 
 	dev.QueuedApplicationDownlinks = append(dev.QueuedApplicationDownlinks, req.Downlinks...)
-	if err := dev.Store("QueuedApplicationDownlinks"); err != nil {
+	if err := dev.Store(
+		"QueuedApplicationDownlinks",
+	); err != nil {
 		return nil, err
 	}
 
-	if dev.MACInfo != nil && dev.MACInfo.DeviceClass == ttnpb.CLASS_C {
+	if dev.MACState != nil && dev.MACState.DeviceClass == ttnpb.CLASS_C {
 		// TODO: Schedule the next downlink (https://github.com/TheThingsIndustries/ttn/issues/728)
 	}
 	return ttnpb.Empty, nil
@@ -415,7 +413,9 @@ func (ns *NetworkServer) DownlinkQueueClear(ctx context.Context, devID *ttnpb.En
 		return nil, err
 	}
 	dev.QueuedApplicationDownlinks = nil
-	return ttnpb.Empty, dev.Store("QueuedApplicationDownlinks")
+	return ttnpb.Empty, dev.Store(
+		"QueuedApplicationDownlinks",
+	)
 }
 
 // StartServingGateway is called by the Gateway Server to indicate that it is serving a gateway.
@@ -689,10 +689,8 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 
 			dev.RecentDownlinks = append(dev.RecentDownlinks, msg)
 			if err = dev.Store(
-				"MACInfo",
-				"PendingMACRequests",
+				"MACState",
 				"QueuedApplicationDownlinks",
-				"QueuedMACResponses",
 				"RecentDownlinks",
 				"Session",
 			); err != nil {
@@ -719,7 +717,7 @@ func (ns *NetworkServer) generateAndScheduleDownlink(ctx context.Context, dev *d
 		"device_uid", dev.EndDeviceIdentifiers.UniqueID(ctx),
 	))
 
-	if dev.MACState == nil || dev.MACStateDesired == nil || dev.MACInfo == nil {
+	if dev.MACState == nil {
 		return errCorruptRegistry.
 			WithCause(errors.New("unknown MAC state"))
 	}
@@ -729,24 +727,24 @@ func (ns *NetworkServer) generateAndScheduleDownlink(ctx context.Context, dev *d
 		return errors.New("session is empty")
 	}
 
-	dev.PendingMACRequests = dev.PendingMACRequests[:0]
-	if *dev.MACState != *dev.MACStateDesired {
-		// TODO: Diff MACState and MACStateDesired and add commands to dev.PendingMACRequests.
+	dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
+	if dev.MACState.MACParameters != dev.MACState.DesiredMACParameters {
+		// TODO: Diff MACParameters and DesiredMACParameters and add commands to dev.MACState.PendingRequests.
 		// (https://github.com/TheThingsIndustries/ttn/issues/837)
 	}
 
-	if len(dev.PendingMACRequests) == 0 &&
-		len(dev.QueuedMACResponses) == 0 &&
+	if len(dev.MACState.PendingRequests) == 0 &&
+		len(dev.MACState.QueuedResponses) == 0 &&
 		len(dev.QueuedApplicationDownlinks) == 0 &&
 		(up == nil || up.Payload.MType != ttnpb.MType_CONFIRMED_UP) {
 		return nil
 	}
 
-	sort.SliceStable(dev.PendingMACRequests, func(i, j int) bool {
+	sort.SliceStable(dev.MACState.PendingRequests, func(i, j int) bool {
 		// NOTE: The ordering of a sequence of commands with identical CIDs shall not be changed.
 
-		ci := dev.PendingMACRequests[i].CID
-		cj := dev.PendingMACRequests[j].CID
+		ci := dev.MACState.PendingRequests[i].CID
+		cj := dev.MACState.PendingRequests[j].CID
 		switch {
 		case ci >= 0x80: // Proprietary
 			return false
@@ -771,7 +769,7 @@ func (ns *NetworkServer) generateAndScheduleDownlink(ctx context.Context, dev *d
 		return false
 	})
 
-	cmds := append(dev.QueuedMACResponses, dev.PendingMACRequests...)
+	cmds := append(dev.MACState.QueuedResponses, dev.MACState.PendingRequests...)
 
 	// TODO: Ensure cmds can be answered in one frame
 	// (https://github.com/TheThingsIndustries/ttn/issues/836)
@@ -835,23 +833,23 @@ func (ns *NetworkServer) generateAndScheduleDownlink(ctx context.Context, dev *d
 	pld.FHDR.FCtrl.FPending = len(dev.QueuedApplicationDownlinks) > 0
 
 	switch {
-	case dev.MACInfo.DeviceClass != ttnpb.CLASS_C,
-		mType != ttnpb.MType_CONFIRMED_DOWN && len(dev.PendingMACRequests) == 0:
+	case dev.MACState.DeviceClass != ttnpb.CLASS_C,
+		mType != ttnpb.MType_CONFIRMED_DOWN && len(dev.MACState.PendingRequests) == 0:
 		break
 
-	case dev.MACInfo.NextConfirmedDownlinkAt.After(time.Now()):
+	case dev.MACState.NextConfirmedDownlinkAt.After(time.Now()):
 		return errScheduleTooSoon
 
 	default:
 		t := time.Now().Add(classCTimeout).UTC()
-		dev.MACInfo.NextConfirmedDownlinkAt = &t
+		dev.MACState.NextConfirmedDownlinkAt = &t
 	}
 
 	if mType == ttnpb.MType_CONFIRMED_DOWN {
 		dev.Session.LastConfFCntDown = pld.FCnt
-		dev.MACInfo.NeedsDownlinkAck = true
+		dev.MACState.NeedsDownlinkAck = true
 	} else {
-		dev.MACInfo.NeedsDownlinkAck = false
+		dev.MACState.NeedsDownlinkAck = false
 	}
 
 	b, err := (ttnpb.Message{
@@ -905,7 +903,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, msg *ttnpb.UplinkMessa
 		},
 		0,
 		func(d *deviceregistry.Device) bool {
-			if d.MACInfo == nil {
+			if d.MACState == nil {
 				return true
 			}
 			devs = append(devs, d)
@@ -928,7 +926,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, msg *ttnpb.UplinkMessa
 			d.EndDeviceIdentifiers.DevAddr = &d.SessionFallback.DevAddr
 			d.Session = d.SessionFallback
 			d.SessionFallback = nil
-			if d.MACInfo == nil {
+			if d.MACState == nil {
 				return true
 			}
 			devs = append(devs, d)
@@ -968,7 +966,7 @@ outer:
 
 			gap = fCnt - dev.Session.NextFCntUp
 
-			if dev.MACInfo.LoRaWANVersion.HasMaxFCntGap() {
+			if dev.MACState.LoRaWANVersion.HasMaxFCntGap() {
 				fp, err := ns.Component.FrequencyPlans.GetByID(dev.FrequencyPlanID)
 				if err != nil {
 					return nil, errCorruptRegistry.
@@ -1026,7 +1024,7 @@ outer:
 
 		var computedMIC [4]byte
 		var err error
-		switch dev.MACInfo.LoRaWANVersion {
+		switch dev.MACState.LoRaWANVersion {
 		case ttnpb.MAC_V1_1:
 			if dev.Session.SNwkSIntKey == nil || dev.Session.SNwkSIntKey.Key.IsZero() {
 				return nil, errCorruptRegistry.
@@ -1140,9 +1138,9 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 			WithCause(errors.New("empty payload"))
 	}
 
-	if pld.Ack || dev.MACInfo != nil && dev.MACInfo.NeedsDownlinkAck && dev.MACInfo.DeviceClass == ttnpb.CLASS_A {
-		if dev.MACInfo != nil {
-			dev.MACInfo.NeedsDownlinkAck = false
+	if pld.Ack || dev.MACState != nil && dev.MACState.NeedsDownlinkAck && dev.MACState.DeviceClass == ttnpb.CLASS_A {
+		if dev.MACState != nil {
+			dev.MACState.NeedsDownlinkAck = false
 		}
 
 		if err := asCl.Send(&ttnpb.ApplicationUp{
@@ -1193,14 +1191,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	}
 	dev.MACState.ADRDataRateIndex = msg.Settings.DataRateIndex
 
-	if dev.MACStateDesired == nil {
-		dev.MACStateDesired = dev.MACState
-	}
-
-	if dev.MACInfo == nil {
-		dev.MACInfo = &ttnpb.MACInfo{}
-	}
-
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
@@ -1210,7 +1200,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	msg.RxMetadata = acc.Accumulated()
 	registerMergeMetadata(ctx, dev.EndDevice, msg)
 
-	dev.QueuedMACResponses = dev.QueuedMACResponses[:0]
+	dev.MACState.QueuedResponses = dev.MACState.QueuedResponses[:0]
 
 outer:
 	for _, cmd := range cmds {
@@ -1273,11 +1263,7 @@ outer:
 	dev.RecentUplinks = append(dev.RecentUplinks, msg)
 
 	if err := dev.Store(
-		"MACInfo",
 		"MACState",
-		"MACStateDesired",
-		"PendingMACRequests",
-		"QueuedMACResponses",
 		"RecentUplinks",
 		"Session",
 		"SessionFallback",
@@ -1363,11 +1349,11 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		},
 		NetID:              ns.NetID,
 		SelectedMacVersion: dev.LoRaWANVersion,
-		RxDelay:            dev.MACStateDesired.Rx1Delay,
+		RxDelay:            dev.MACState.DesiredMACParameters.Rx1Delay,
 		CFList:             frequencyplans.CFList(fp, dev.LoRaWANPHYVersion),
 		DownlinkSettings: ttnpb.DLSettings{
-			Rx1DROffset: dev.MACStateDesired.Rx1DataRateOffset,
-			Rx2DR:       dev.MACStateDesired.Rx2DataRateIndex,
+			Rx1DROffset: dev.MACState.DesiredMACParameters.Rx1DataRateOffset,
+			Rx2DR:       dev.MACState.DesiredMACParameters.Rx2DataRateIndex,
 			OptNeg:      true,
 		},
 	}
@@ -1397,14 +1383,14 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		dev.MACState.Rx1Delay = req.RxDelay
 		dev.MACState.Rx1DataRateOffset = req.DownlinkSettings.Rx1DROffset
 		dev.MACState.Rx2DataRateIndex = req.DownlinkSettings.Rx2DR
-		if req.DownlinkSettings.OptNeg && dev.MACInfo.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) > 0 {
+		if req.DownlinkSettings.OptNeg && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) > 0 {
 			// The version will be further negotiated via RekeyInd/RekeyConf
-			dev.MACInfo.LoRaWANVersion = ttnpb.MAC_V1_1
+			dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
 		}
 
-		dev.MACStateDesired.Rx1Delay = dev.MACState.Rx1Delay
-		dev.MACStateDesired.Rx1DataRateOffset = dev.MACState.Rx1DataRateOffset
-		dev.MACStateDesired.Rx2DataRateIndex = dev.MACState.Rx2DataRateIndex
+		dev.MACState.DesiredMACParameters.Rx1Delay = dev.MACState.Rx1Delay
+		dev.MACState.DesiredMACParameters.Rx1DataRateOffset = dev.MACState.Rx1DataRateOffset
+		dev.MACState.DesiredMACParameters.Rx2DataRateIndex = dev.MACState.Rx2DataRateIndex
 
 		select {
 		case <-ctx.Done():
@@ -1428,7 +1414,6 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		if err = dev.Store(
 			"EndDeviceIdentifiers.DevAddr",
 			"MACState",
-			"MACStateDesired",
 			"RecentUplinks",
 			"Session",
 			"SessionFallback",

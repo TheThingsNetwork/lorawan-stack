@@ -34,34 +34,43 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 		Error            error
 	}{
 		{
-			Name:     "nil payload",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Payload:  nil,
-			Error:    errMissingPayload,
+			Name: "nil payload",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Payload: nil,
+			Error:   errMissingPayload,
 		},
 		{
-			Name:     "no request",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Payload:  ttnpb.NewPopulatedMACCommand_BeaconFreqAns(test.Randy, false),
-			Error:    errMACRequestNotFound,
+			Name: "no request",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Payload: ttnpb.NewPopulatedMACCommand_BeaconFreqAns(test.Randy, false),
+			Error:   errMACRequestNotFound,
 		},
 		{
 			Name: "ack",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
-				PendingMACRequests: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_BeaconFreqReq{
-						Frequency: 42,
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_BeaconFreqReq{
+							Frequency: 42,
+						}).MACCommand(),
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{},
 					// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
 				},
-				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 			Payload: &ttnpb.MACCommand_BeaconFreqAns{
 				FrequencyAck: true,

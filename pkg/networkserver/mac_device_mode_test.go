@@ -34,28 +34,32 @@ func TestHandleDeviceModeInd(t *testing.T) {
 		Error            error
 	}{
 		{
-			Name:     "nil payload",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Payload:  nil,
-			Error:    errMissingPayload,
+			Name: "nil payload",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Payload: nil,
+			Error:   errMissingPayload,
 		},
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				MACInfo: &ttnpb.MACInfo{
-					DeviceClass: ttnpb.CLASS_A,
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{},
+					DeviceClass:     ttnpb.CLASS_A,
 				},
-				QueuedMACResponses: []*ttnpb.MACCommand{},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACInfo: &ttnpb.MACInfo{
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_DeviceModeConf{
+							Class: ttnpb.CLASS_C,
+						}).MACCommand(),
+					},
 					DeviceClass: ttnpb.CLASS_C,
-				},
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_DeviceModeConf{
-						Class: ttnpb.CLASS_C,
-					}).MACCommand(),
 				},
 			},
 			Payload: &ttnpb.MACCommand_DeviceModeInd{
@@ -65,26 +69,26 @@ func TestHandleDeviceModeInd(t *testing.T) {
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				MACInfo: &ttnpb.MACInfo{
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+					},
 					DeviceClass: ttnpb.CLASS_C,
-				},
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACInfo: &ttnpb.MACInfo{
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+						(&ttnpb.MACCommand_DeviceModeConf{
+							Class: ttnpb.CLASS_A,
+						}).MACCommand(),
+					},
 					DeviceClass: ttnpb.CLASS_A,
-				},
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
-					(&ttnpb.MACCommand_DeviceModeConf{
-						Class: ttnpb.CLASS_A,
-					}).MACCommand(),
 				},
 			},
 			Payload: &ttnpb.MACCommand_DeviceModeInd{

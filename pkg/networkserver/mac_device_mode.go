@@ -25,9 +25,9 @@ func handleDeviceModeInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		return errMissingPayload
 	}
 
-	dev.MACInfo.DeviceClass = pld.Class
-	dev.QueuedMACResponses = append(
-		dev.QueuedMACResponses,
+	dev.MACState.DeviceClass = pld.Class
+	dev.MACState.QueuedResponses = append(
+		dev.MACState.QueuedResponses,
 		(&ttnpb.MACCommand_DeviceModeConf{
 			Class: pld.Class,
 		}).MACCommand(),

@@ -541,7 +541,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.0/unconfirmed",
 				&ttnpb.EndDevice{
-					MACInfo: &ttnpb.MACInfo{
+					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
@@ -585,7 +585,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.0/unconfirmed/FCnt resets",
 				&ttnpb.EndDevice{
-					MACInfo: &ttnpb.MACInfo{
+					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
@@ -629,7 +629,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.0/confirmed/ack",
 				&ttnpb.EndDevice{
-					MACInfo: &ttnpb.MACInfo{
+					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
@@ -677,7 +677,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.0/confirmed/ack/FCnt resets",
 				&ttnpb.EndDevice{
-					MACInfo: &ttnpb.MACInfo{
+					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
@@ -726,7 +726,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.1/unconfirmed",
 				&ttnpb.EndDevice{
-					MACInfo: &ttnpb.MACInfo{
+					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
@@ -777,7 +777,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.1/confirmed/ack",
 				&ttnpb.EndDevice{
-					MACInfo: &ttnpb.MACInfo{
+					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
@@ -839,7 +839,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.1/unconfirmed/FCnt resets",
 				&ttnpb.EndDevice{
-					MACInfo: &ttnpb.MACInfo{
+					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
@@ -891,7 +891,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 			{
 				"1.1/confirmed/ack/FCnt resets",
 				&ttnpb.EndDevice{
-					MACInfo: &ttnpb.MACInfo{
+					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
@@ -1061,7 +1061,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				}()
 
 				if tc.UplinkMessage.Payload.GetMACPayload().Ack ||
-					dev.MACInfo != nil && dev.MACInfo.NeedsDownlinkAck && dev.MACInfo.DeviceClass == ttnpb.CLASS_A {
+					dev.MACState != nil && dev.MACState.NeedsDownlinkAck && dev.MACState.DeviceClass == ttnpb.CLASS_A {
 
 					select {
 					case up := <-asSendCh:
@@ -1111,7 +1111,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					t.Fatal("Timed out while waiting for HandleUplink to return")
 				}
 
-				t.Run("device update", func(t *testing.T) {
+				if !t.Run("device update", func(t *testing.T) {
 					a := assertions.New(t)
 
 					dev, err = dev.Load()
@@ -1140,8 +1140,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					}
 					expected.MACState.ADRDataRateIndex = msg.Settings.DataRateIndex
 
-					if expected.MACInfo == nil {
-						expected.MACInfo = &ttnpb.MACInfo{}
+					if expected.MACState == nil {
+						expected.MACState = &ttnpb.MACState{}
 					}
 
 					expected.RecentUplinks = append(expected.RecentUplinks, msg)
@@ -1164,7 +1164,9 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					expectedUp.RxMetadata = storedUp.RxMetadata
 
 					a.So(pretty.Diff(dev.EndDevice, expected), should.BeEmpty)
-				})
+				}) {
+					t.FailNow()
+				}
 
 				t.Run("after cooldown window", func(t *testing.T) {
 					a := assertions.New(t)
@@ -1190,7 +1192,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					}
 
 					if tc.UplinkMessage.Payload.GetMACPayload().Ack ||
-						dev.MACInfo != nil && dev.MACInfo.NeedsDownlinkAck && dev.MACInfo.DeviceClass == ttnpb.CLASS_A {
+						dev.MACState != nil && dev.MACState.NeedsDownlinkAck && dev.MACState.DeviceClass == ttnpb.CLASS_A {
 
 						select {
 						case up := <-asSendCh:
@@ -1311,7 +1313,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         nil,
-					MACStateDesired: ttnpb.NewPopulatedMACState(test.Randy, false),
+					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1336,7 +1338,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
-					MACStateDesired: ttnpb.NewPopulatedMACState(test.Randy, false),
+					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1361,7 +1363,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
-					MACStateDesired: ttnpb.NewPopulatedMACState(test.Randy, false),
+					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1485,11 +1487,11 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					},
 					NetID:              ns.NetID,
 					SelectedMacVersion: tc.Device.LoRaWANVersion,
-					RxDelay:            tc.Device.MACStateDesired.Rx1Delay,
+					RxDelay:            tc.Device.MACState.DesiredMACParameters.Rx1Delay,
 					CFList:             nil,
 					DownlinkSettings: ttnpb.DLSettings{
-						Rx1DROffset: tc.Device.MACStateDesired.Rx1DataRateOffset,
-						Rx2DR:       tc.Device.MACStateDesired.Rx2DataRateIndex,
+						Rx1DROffset: tc.Device.MACState.DesiredMACParameters.Rx1DataRateOffset,
+						Rx2DR:       tc.Device.MACState.DesiredMACParameters.Rx2DataRateIndex,
 						OptNeg:      true,
 					},
 				}
@@ -1596,13 +1598,13 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						t.FailNow()
 					}
 
-					expected.MACState.Rx1Delay = tc.Device.MACStateDesired.Rx1Delay
-					expected.MACState.Rx1DataRateOffset = tc.Device.MACStateDesired.Rx1DataRateOffset
-					expected.MACState.Rx2DataRateIndex = tc.Device.MACStateDesired.Rx2DataRateIndex
+					expected.MACState.Rx1Delay = tc.Device.MACState.DesiredMACParameters.Rx1Delay
+					expected.MACState.Rx1DataRateOffset = tc.Device.MACState.DesiredMACParameters.Rx1DataRateOffset
+					expected.MACState.Rx2DataRateIndex = tc.Device.MACState.DesiredMACParameters.Rx2DataRateIndex
 
-					expected.MACStateDesired.Rx1Delay = expected.MACState.Rx1Delay
-					expected.MACStateDesired.Rx1DataRateOffset = expected.MACState.Rx1DataRateOffset
-					expected.MACStateDesired.Rx2DataRateIndex = expected.MACState.Rx2DataRateIndex
+					expected.MACState.DesiredMACParameters.Rx1Delay = expected.MACState.Rx1Delay
+					expected.MACState.DesiredMACParameters.Rx1DataRateOffset = expected.MACState.Rx1DataRateOffset
+					expected.MACState.DesiredMACParameters.Rx2DataRateIndex = expected.MACState.Rx2DataRateIndex
 
 					expected.EndDeviceIdentifiers.DevAddr = dev.EndDeviceIdentifiers.DevAddr
 					expected.Session = &ttnpb.Session{

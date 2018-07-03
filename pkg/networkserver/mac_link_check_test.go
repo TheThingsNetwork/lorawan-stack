@@ -34,9 +34,13 @@ func TestHandleLinkCheckReq(t *testing.T) {
 		Error            error
 	}{
 		{
-			Name:     "SF13BW250",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
+			Name: "SF13BW250",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
 			Message: &ttnpb.UplinkMessage{
 				Settings: ttnpb.TxSettings{
 					SpreadingFactor: 13,
@@ -46,14 +50,18 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			Error: errInvalidDataRate,
 		},
 		{
-			Name:   "SF12BW250/1 gateway/empty queue",
-			Device: &ttnpb.EndDevice{},
+			Name: "SF12BW250/1 gateway/empty queue",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
 			Expected: &ttnpb.EndDevice{
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_LinkCheckAns{
-						Margin:       42, // 25-(-17)
-						GatewayCount: 1,
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_LinkCheckAns{
+							Margin:       42, // 25-(-17)
+							GatewayCount: 1,
+						}).MACCommand(),
+					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
@@ -75,21 +83,25 @@ func TestHandleLinkCheckReq(t *testing.T) {
 		{
 			Name: "SF12BW250/1 gateway/non-empty queue",
 			Device: &ttnpb.EndDevice{
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
-					(&ttnpb.MACCommand_LinkCheckAns{
-						Margin:       42, // 25-(-17)
-						GatewayCount: 1,
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+						(&ttnpb.MACCommand_LinkCheckAns{
+							Margin:       42, // 25-(-17)
+							GatewayCount: 1,
+						}).MACCommand(),
+					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
@@ -111,21 +123,25 @@ func TestHandleLinkCheckReq(t *testing.T) {
 		{
 			Name: "SF12BW250/3 gateways/non-empty queue",
 			Device: &ttnpb.EndDevice{
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
-					(&ttnpb.MACCommand_LinkCheckAns{
-						Margin:       42, // 25-(-17)
-						GatewayCount: 3,
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+						(&ttnpb.MACCommand_LinkCheckAns{
+							Margin:       42, // 25-(-17)
+							GatewayCount: 3,
+						}).MACCommand(),
+					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{

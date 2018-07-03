@@ -34,32 +34,41 @@ func TestHandleDevStatusAns(t *testing.T) {
 		Error            error
 	}{
 		{
-			Name:     "nil payload",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Payload:  nil,
-			Error:    errMissingPayload,
+			Name: "nil payload",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Payload: nil,
+			Error:   errMissingPayload,
 		},
 		{
-			Name:     "no request",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Payload:  ttnpb.NewPopulatedMACCommand_DevStatusAns(test.Randy, false),
-			Error:    errMACRequestNotFound,
+			Name: "no request",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Payload: ttnpb.NewPopulatedMACCommand_DevStatusAns(test.Randy, false),
+			Error:   errMACRequestNotFound,
 		},
 		{
 			Name: "battery 42, margin 4",
 			Device: &ttnpb.EndDevice{
-				MACInfo: &ttnpb.MACInfo{},
-				PendingMACRequests: []*ttnpb.MACCommand{
-					ttnpb.CID_DEV_STATUS.MACCommand(),
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						ttnpb.CID_DEV_STATUS.MACCommand(),
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MACInfo: &ttnpb.MACInfo{
-					// TODO: Modify status variables in MACInfo (https://github.com/TheThingsIndustries/ttn/issues/834)
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{},
+					// TODO: Modify status variables (https://github.com/TheThingsIndustries/ttn/issues/834)
 				},
-				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 			Payload: &ttnpb.MACCommand_DevStatusAns{
 				Battery: 42,

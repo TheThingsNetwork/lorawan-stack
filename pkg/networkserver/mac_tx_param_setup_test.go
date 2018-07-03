@@ -33,29 +33,36 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 		Error            error
 	}{
 		{
-			Name:     "no request",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Error:    errMACRequestNotFound,
+			Name: "no request",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Error: errMACRequestNotFound,
 		},
 		{
 			Name: "EIRP 42, dwell time both",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
-				PendingMACRequests: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_TxParamSetupReq{
-						MaxEIRPIndex:      42,
-						DownlinkDwellTime: true,
-						UplinkDwellTime:   true,
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_TxParamSetupReq{
+							MaxEIRPIndex:      42,
+							DownlinkDwellTime: true,
+							UplinkDwellTime:   true,
+						}).MACCommand(),
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					DownlinkDwellTime: true,
-					UplinkDwellTime:   true,
+					MACParameters: ttnpb.MACParameters{
+						DownlinkDwellTime: true,
+						UplinkDwellTime:   true,
+					},
+					PendingRequests: []*ttnpb.MACCommand{},
 				},
-				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 		},
 	} {

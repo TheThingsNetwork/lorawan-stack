@@ -34,35 +34,44 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 		Error            error
 	}{
 		{
-			Name:     "nil payload",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Payload:  nil,
-			Error:    errMissingPayload,
+			Name: "nil payload",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Payload: nil,
+			Error:   errMissingPayload,
 		},
 		{
-			Name:     "no request",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Payload:  ttnpb.NewPopulatedMACCommand_RejoinParamSetupAns(test.Randy, false),
-			Error:    errMACRequestNotFound,
+			Name: "no request",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Payload: ttnpb.NewPopulatedMACCommand_RejoinParamSetupAns(test.Randy, false),
+			Error:   errMACRequestNotFound,
 		},
 		{
 			Name: "all ack",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
-				PendingMACRequests: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_RejoinParamSetupReq{
-						MaxCountExponent: 42,
-						MaxTimeExponent:  43,
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_RejoinParamSetupReq{
+							MaxCountExponent: 42,
+							MaxTimeExponent:  43,
+						}).MACCommand(),
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{},
 					// TODO: Handle (https://github.com/TheThingsIndustries/ttn/issues/834)
 				},
-				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 			Payload: &ttnpb.MACCommand_RejoinParamSetupAns{
 				MaxTimeExponentAck: true,

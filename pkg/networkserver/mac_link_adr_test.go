@@ -34,36 +34,47 @@ func TestHandleLinkADRAns(t *testing.T) {
 		Error            error
 	}{
 		{
-			Name:     "nil payload",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Payload:  nil,
-			Error:    errMissingPayload,
+			Name: "nil payload",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Payload: nil,
+			Error:   errMissingPayload,
 		},
 		{
-			Name:     "no request",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Payload:  ttnpb.NewPopulatedMACCommand_LinkADRAns(test.Randy, false),
-			Error:    errMACRequestNotFound,
+			Name: "no request",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Payload: ttnpb.NewPopulatedMACCommand_LinkADRAns(test.Randy, false),
+			Error:   errMACRequestNotFound,
 		},
 		{
 			Name: "1 request/all ack",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
-				PendingMACRequests: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_LinkADRReq{
-						DataRateIndex: 4,
-						TxPowerIndex:  42,
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_LinkADRReq{
+							DataRateIndex: 4,
+							TxPowerIndex:  42,
+						}).MACCommand(),
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					ADRDataRateIndex: 4,
-					ADRTXPowerIndex:  42,
+					MACParameters: ttnpb.MACParameters{
+						ADRDataRateIndex: 4,
+						ADRTXPowerIndex:  42,
+					},
+					PendingRequests: []*ttnpb.MACCommand{},
 				},
-				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 			Payload: &ttnpb.MACCommand_LinkADRAns{
 				ChannelMaskAck:   true,
@@ -74,24 +85,27 @@ func TestHandleLinkADRAns(t *testing.T) {
 		{
 			Name: "2 requests/all ack",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
-				PendingMACRequests: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_LinkADRReq{
-						DataRateIndex: 4,
-						TxPowerIndex:  42,
-					}).MACCommand(),
-					(&ttnpb.MACCommand_LinkADRReq{
-						DataRateIndex: 5,
-						TxPowerIndex:  43,
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_LinkADRReq{
+							DataRateIndex: 4,
+							TxPowerIndex:  42,
+						}).MACCommand(),
+						(&ttnpb.MACCommand_LinkADRReq{
+							DataRateIndex: 5,
+							TxPowerIndex:  43,
+						}).MACCommand(),
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					ADRDataRateIndex: 5,
-					ADRTXPowerIndex:  43,
+					MACParameters: ttnpb.MACParameters{
+						ADRDataRateIndex: 5,
+						ADRTXPowerIndex:  43,
+					},
+					PendingRequests: []*ttnpb.MACCommand{},
 				},
-				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 			Payload: &ttnpb.MACCommand_LinkADRAns{
 				ChannelMaskAck:   true,

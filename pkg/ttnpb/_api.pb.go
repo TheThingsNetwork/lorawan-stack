@@ -52,8 +52,8 @@ It has these top-level messages:
 	EndDeviceModel
 	EndDeviceVersion
 	MACSettings
+	MACParameters
 	MACState
-	MACInfo
 	EndDevice
 	EndDevices
 	SetDeviceRequest

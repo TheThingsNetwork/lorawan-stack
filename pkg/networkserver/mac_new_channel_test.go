@@ -34,37 +34,46 @@ func TestHandleNewChannelAns(t *testing.T) {
 		Error            error
 	}{
 		{
-			Name:     "nil payload",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Payload:  nil,
-			Error:    errMissingPayload,
+			Name: "nil payload",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Payload: nil,
+			Error:   errMissingPayload,
 		},
 		{
-			Name:     "no request",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Payload:  ttnpb.NewPopulatedMACCommand_NewChannelAns(test.Randy, false),
-			Error:    errMACRequestNotFound,
+			Name: "no request",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Payload: ttnpb.NewPopulatedMACCommand_NewChannelAns(test.Randy, false),
+			Error:   errMACRequestNotFound,
 		},
 		{
 			Name: "both ack",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
-				PendingMACRequests: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_NewChannelReq{
-						ChannelIndex:     4,
-						Frequency:        42,
-						MinDataRateIndex: 2,
-						MaxDataRateIndex: 3,
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex:     4,
+							Frequency:        42,
+							MinDataRateIndex: 2,
+							MaxDataRateIndex: 3,
+						}).MACCommand(),
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					// TODO: Handle (https://github.com/TheThingsIndustries/ttn/issues/292)
+					PendingRequests: []*ttnpb.MACCommand{},
 				},
-				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 			Payload: &ttnpb.MACCommand_NewChannelAns{
 				FrequencyAck: true,

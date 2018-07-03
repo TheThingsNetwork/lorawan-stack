@@ -32,7 +32,7 @@ func NewPopulatedEndDeviceVersion(r randyEndDevice, easy bool) *EndDeviceVersion
 	if r.Intn(10) != 0 {
 		out.DefaultFormatters = NewPopulatedDeviceFormatters(r, easy)
 	}
-	out.DefaultMACState = NewPopulatedMACState(r, easy)
+	out.DefaultMACParameters = NewPopulatedMACParameters(r, easy)
 	out.MinFrequency = uint64(r.Uint32())
 	out.MaxFrequency = uint64(r.Uint32())
 	out.FCntResets = bool(r.Intn(2) == 0)
@@ -40,6 +40,34 @@ func NewPopulatedEndDeviceVersion(r randyEndDevice, easy bool) *EndDeviceVersion
 	out.DisableJoinNonceCheck = bool(r.Intn(2) == 0)
 	out.LoRaWANVersion = MACVersion([]int32{1, 2, 3, 4}[r.Intn(4)])
 	out.LoRaWANPHYVersion = PHYVersion([]int32{1, 2, 3, 4, 5, 6}[r.Intn(6)])
+	return out
+}
+
+func NewPopulatedMACState(r randyEndDevice, easy bool) *MACState {
+	out := &MACState{}
+	out.DeviceClass = Class([]int32{0, 1, 2}[r.Intn(3)])
+	out.LoRaWANVersion = MACVersion([]int32{1, 2, 3, 4}[r.Intn(4)])
+	out.LastStatusReceivedAt = pbtypes.NewPopulatedStdTime(r, easy)
+	out.NextConfirmedDownlinkAt = pbtypes.NewPopulatedStdTime(r, easy)
+	out.DownlinkMargin = r.Int31()
+	if r.Intn(2) == 0 {
+		out.DownlinkMargin *= -1
+	}
+	out.PingSlotPeriodicity = PingSlotPeriod([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)])
+	if r.Intn(10) != 0 {
+		out.QueuedResponses = make([]*MACCommand, r.Intn(5))
+		for i := range out.QueuedResponses {
+			out.QueuedResponses[i] = NewPopulatedMACCommand(r, easy)
+		}
+	}
+	if r.Intn(10) != 0 {
+		out.PendingRequests = make([]*MACCommand, r.Intn(5))
+		for i := range out.PendingRequests {
+			out.PendingRequests[i] = NewPopulatedMACCommand(r, easy)
+		}
+	}
+	out.MACParameters = *NewPopulatedMACParameters(r, easy)
+	out.DesiredMACParameters = *NewPopulatedMACParameters(r, easy)
 	return out
 }
 
@@ -65,11 +93,11 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	if r.Intn(10) != 0 {
 		out.SessionFallback = NewPopulatedSession(r, easy)
 	}
+	out.BatteryPercentage = r.Float32()
 	out.FrequencyPlanID = "EU_863_870"
 	out.MACSettings = NewPopulatedMACSettings(r, easy)
-	out.MACInfo = NewPopulatedMACInfo(r, easy)
 	out.MACState = NewPopulatedMACState(r, easy)
-	out.MACStateDesired = NewPopulatedMACState(r, easy)
+	out.MACState = NewPopulatedMACState(r, easy)
 	if r.Intn(10) != 0 {
 		out.Location = NewPopulatedLocation(r, easy)
 	}
@@ -92,18 +120,6 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 		}
 	}
 	if r.Intn(10) != 0 {
-		out.QueuedMACResponses = make([]*MACCommand, r.Intn(5))
-		for i := range out.QueuedMACResponses {
-			out.QueuedMACResponses[i] = NewPopulatedMACCommand(r, easy)
-		}
-	}
-	if r.Intn(10) != 0 {
-		out.PendingMACRequests = make([]*MACCommand, r.Intn(5))
-		for i := range out.PendingMACRequests {
-			out.PendingMACRequests[i] = NewPopulatedMACCommand(r, easy)
-		}
-	}
-	if r.Intn(10) != 0 {
 		out.QueuedApplicationDownlinks = make([]*ApplicationDownlink, r.Intn(5))
 		for i := range out.QueuedApplicationDownlinks {
 			out.QueuedApplicationDownlinks[i] = NewPopulatedApplicationDownlink(r, easy)
@@ -113,8 +129,8 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	return out
 }
 
-func NewPopulatedMACState(r randyEndDevice, _ bool) *MACState {
-	out := &MACState{}
+func NewPopulatedMACParameters(r randyEndDevice, _ bool) *MACParameters {
+	out := &MACParameters{}
 	out.MaxEIRP = r.Float32()
 	out.UplinkDwellTime = r.Intn(2) == 0
 	out.DownlinkDwellTime = r.Intn(2) == 0

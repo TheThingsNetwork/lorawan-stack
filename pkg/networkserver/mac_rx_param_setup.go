@@ -25,7 +25,7 @@ func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 		return errMissingPayload
 	}
 
-	dev.PendingMACRequests, err = handleMACResponse(ttnpb.CID_RX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
+	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_RX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
 		if !pld.Rx1DataRateOffsetAck || !pld.Rx2DataRateIndexAck || !pld.Rx2FrequencyAck {
 			// TODO: Handle NACK, modify desired state
 			// (https://github.com/TheThingsIndustries/ttn/issues/834)
@@ -38,6 +38,6 @@ func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 		dev.MACState.Rx2DataRateIndex = req.Rx2DataRateIndex
 		dev.MACState.Rx2Frequency = req.Rx2Frequency
 
-	}, dev.PendingMACRequests...)
+	}, dev.MACState.PendingRequests...)
 	return
 }

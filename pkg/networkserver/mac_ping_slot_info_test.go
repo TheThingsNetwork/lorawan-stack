@@ -34,20 +34,28 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 		Error            error
 	}{
 		{
-			Name:     "nil payload",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Payload:  nil,
-			Error:    errMissingPayload,
+			Name: "nil payload",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Payload: nil,
+			Error:   errMissingPayload,
 		},
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				QueuedMACResponses: []*ttnpb.MACCommand{},
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{},
+				},
 			},
 			Expected: &ttnpb.EndDevice{
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
+					},
 				},
 			},
 			Payload: &ttnpb.MACCommand_PingSlotInfoReq{
@@ -57,18 +65,22 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
-					// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+						// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
+					},
 				},
 			},
 			Payload: &ttnpb.MACCommand_PingSlotInfoReq{

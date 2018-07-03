@@ -33,26 +33,33 @@ func TestHandleDutyCycleAns(t *testing.T) {
 		Error            error
 	}{
 		{
-			Name:     "no request",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Error:    errMACRequestNotFound,
+			Name: "no request",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Error: errMACRequestNotFound,
 		},
 		{
 			Name: "2048",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
-				PendingMACRequests: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_DutyCycleReq{
-						MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_DutyCycleReq{
+							MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,
+						}).MACCommand(),
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					DutyCycle: ttnpb.DUTY_CYCLE_2048,
+					PendingRequests: []*ttnpb.MACCommand{},
+					MACParameters: ttnpb.MACParameters{
+						DutyCycle: ttnpb.DUTY_CYCLE_2048,
+					},
 				},
-				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 		},
 	} {

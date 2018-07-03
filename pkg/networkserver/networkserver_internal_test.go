@@ -178,11 +178,12 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		test.Must(nil, ns.Start())
 
 		ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-		for ed.Session == nil || len(ed.RecentUplinks) == 0 {
+		for ed.MACState == nil || ed.Session == nil || len(ed.RecentUplinks) == 0 {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
 		ed.QueuedApplicationDownlinks = nil
-		ed.QueuedMACResponses = nil
+		ed.MACState.QueuedResponses = nil
+		ed.MACState.MACParameters = ed.MACState.DesiredMACParameters
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
 		err := ns.generateAndScheduleDownlink(context.Background(), dev, nil, nil)
@@ -205,10 +206,11 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		test.Must(nil, ns.Start())
 
 		ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-		for ed.Session == nil || len(ed.QueuedApplicationDownlinks) == 0 {
+		for ed.MACState == nil || ed.Session == nil || len(ed.QueuedApplicationDownlinks) == 0 {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
-		ed.QueuedMACResponses = nil
+		ed.MACState.QueuedResponses = nil
+		ed.MACState.MACParameters = ed.MACState.DesiredMACParameters
 		ed.RecentUplinks = nil
 		dev := test.Must(reg.Create(ed)).(*deviceregistry.Device)
 
@@ -238,10 +240,11 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		test.Must(nil, ns.Start())
 
 		ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-		for ed.Session == nil || len(ed.RecentUplinks) == 0 {
+		for ed.MACState == nil || ed.Session == nil || len(ed.RecentUplinks) == 0 {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
-		ed.QueuedMACResponses = nil
+		ed.MACState.QueuedResponses = nil
+		ed.MACState.MACParameters = ed.MACState.DesiredMACParameters
 		ed.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
 			ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
 		}
@@ -293,10 +296,11 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		down := ttnpb.NewPopulatedApplicationDownlink(test.Randy, false)
 
 		ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-		for ed.Session == nil {
+		for ed.MACState == nil || ed.Session == nil {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
-		ed.QueuedMACResponses = nil
+		ed.MACState.QueuedResponses = nil
+		ed.MACState.MACParameters = ed.MACState.DesiredMACParameters
 		ed.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
 			down,
 		}
@@ -407,10 +411,11 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 		down := ttnpb.NewPopulatedApplicationDownlink(test.Randy, false)
 
 		ed := ttnpb.NewPopulatedEndDevice(test.Randy, false)
-		for ed.Session == nil {
+		for ed.MACState == nil || ed.Session == nil {
 			ed = ttnpb.NewPopulatedEndDevice(test.Randy, false)
 		}
-		ed.QueuedMACResponses = nil
+		ed.MACState.QueuedResponses = nil
+		ed.MACState.MACParameters = ed.MACState.DesiredMACParameters
 		ed.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
 			down,
 		}

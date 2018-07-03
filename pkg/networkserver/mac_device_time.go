@@ -39,8 +39,8 @@ func handleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.U
 		t = time.Unix(0, (ts[i].UnixNano()+ts[i+1].UnixNano())/2)
 	}
 
-	dev.QueuedMACResponses = append(
-		dev.QueuedMACResponses,
+	dev.MACState.QueuedResponses = append(
+		dev.MACState.QueuedResponses,
 		(&ttnpb.MACCommand_DeviceTimeAns{
 			Time: t,
 		}).MACCommand(),

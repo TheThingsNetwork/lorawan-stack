@@ -25,7 +25,7 @@ func handleRejoinParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *t
 		return errMissingPayload
 	}
 
-	dev.PendingMACRequests, err = handleMACResponse(ttnpb.CID_REJOIN_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
+	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_REJOIN_PARAM_SETUP, func(cmd *ttnpb.MACCommand) {
 		req := cmd.GetRejoinParamSetupReq()
 
 		// TODO: Handle (https://github.com/TheThingsIndustries/ttn/issues/834)
@@ -34,6 +34,6 @@ func handleRejoinParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *t
 			_ = req.MaxTimeExponent
 		}
 
-	}, dev.PendingMACRequests...)
+	}, dev.MACState.PendingRequests...)
 	return
 }

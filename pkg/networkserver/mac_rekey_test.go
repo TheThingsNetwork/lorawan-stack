@@ -54,18 +54,22 @@ func TestHandleRekeyInd(t *testing.T) {
 				EndDeviceVersion: ttnpb.EndDeviceVersion{
 					SupportsJoin: true,
 				},
-				SessionFallback:    ttnpb.NewPopulatedSession(test.Randy, false),
-				QueuedMACResponses: []*ttnpb.MACCommand{},
+				SessionFallback: ttnpb.NewPopulatedSession(test.Randy, false),
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{},
+				},
 			},
 			Expected: &ttnpb.EndDevice{
 				EndDeviceVersion: ttnpb.EndDeviceVersion{
 					SupportsJoin: true,
 				},
 				SessionFallback: nil,
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_RekeyConf{
-						MinorVersion: 1,
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_RekeyConf{
+							MinorVersion: 1,
+						}).MACCommand(),
+					},
 				},
 			},
 			Payload: &ttnpb.MACCommand_RekeyInd{
@@ -79,10 +83,12 @@ func TestHandleRekeyInd(t *testing.T) {
 					SupportsJoin: true,
 				},
 				SessionFallback: ttnpb.NewPopulatedSession(test.Randy, false),
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
@@ -90,13 +96,15 @@ func TestHandleRekeyInd(t *testing.T) {
 					SupportsJoin: true,
 				},
 				SessionFallback: nil,
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
-					(&ttnpb.MACCommand_RekeyConf{
-						MinorVersion: 1,
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+						(&ttnpb.MACCommand_RekeyConf{
+							MinorVersion: 1,
+						}).MACCommand(),
+					},
 				},
 			},
 			Payload: &ttnpb.MACCommand_RekeyInd{

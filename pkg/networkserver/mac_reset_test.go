@@ -57,11 +57,13 @@ func TestHandleResetInd(t *testing.T) {
 				EndDeviceVersion: ttnpb.EndDeviceVersion{
 					SupportsJoin: false,
 				},
+				MACState: &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
 				EndDeviceVersion: ttnpb.EndDeviceVersion{
 					SupportsJoin: false,
 				},
+				MACState: &ttnpb.MACState{},
 			},
 			Payload: nil,
 			Error:   errMissingPayload,
@@ -70,33 +72,36 @@ func TestHandleResetInd(t *testing.T) {
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
 				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					DefaultMACState: &ttnpb.MACState{
+					DefaultMACParameters: &ttnpb.MACParameters{
 						MaxEIRP: 42,
 					},
 					SupportsJoin: false,
 				},
-				FrequencyPlanID:    test.EUFrequencyPlanID,
-				MACState:           ttnpb.NewPopulatedMACState(test.Randy, false),
-				MACStateDesired:    ttnpb.NewPopulatedMACState(test.Randy, false),
-				QueuedMACResponses: []*ttnpb.MACCommand{},
+				FrequencyPlanID: test.EUFrequencyPlanID,
+				MACState: &ttnpb.MACState{
+					MACParameters:        *ttnpb.NewPopulatedMACParameters(test.Randy, false),
+					DesiredMACParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
+					QueuedResponses:      []*ttnpb.MACCommand{},
+				},
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						DefaultMACState: &ttnpb.MACState{
+						DefaultMACParameters: &ttnpb.MACParameters{
 							MaxEIRP: 42,
 						},
 						SupportsJoin: false,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
-					QueuedMACResponses: []*ttnpb.MACCommand{
-						(&ttnpb.MACCommand_ResetConf{
-							MinorVersion: 1,
-						}).MACCommand(),
-					},
 				}
 				if err := ResetMACState(frequencyPlansStore, dev); err != nil {
 					panic(errors.NewWithCause(err, "failed to reset MACState"))
+				}
+
+				dev.MACState.QueuedResponses = []*ttnpb.MACCommand{
+					(&ttnpb.MACCommand_ResetConf{
+						MinorVersion: 1,
+					}).MACCommand(),
 				}
 				return dev
 			}(),
@@ -109,40 +114,40 @@ func TestHandleResetInd(t *testing.T) {
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
 				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					DefaultMACState: &ttnpb.MACState{
+					DefaultMACParameters: &ttnpb.MACParameters{
 						MaxEIRP: 42,
 					},
 					SupportsJoin: false,
 				},
 				FrequencyPlanID: test.EUFrequencyPlanID,
-				MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
-				MACStateDesired: ttnpb.NewPopulatedMACState(test.Randy, false),
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
+				MACState: &ttnpb.MACState{
+					MACParameters:        *ttnpb.NewPopulatedMACParameters(test.Randy, false),
+					DesiredMACParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+					},
 				},
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
-						DefaultMACState: &ttnpb.MACState{
+						DefaultMACParameters: &ttnpb.MACParameters{
 							MaxEIRP: 42,
 						},
 						SupportsJoin: false,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
-					QueuedMACResponses: []*ttnpb.MACCommand{
-						{},
-						{},
-						{},
-						(&ttnpb.MACCommand_ResetConf{
-							MinorVersion: 1,
-						}).MACCommand(),
-					},
 				}
 				if err := ResetMACState(frequencyPlansStore, dev); err != nil {
 					panic(errors.NewWithCause(err, "failed to reset MACState"))
+				}
+
+				dev.MACState.QueuedResponses = []*ttnpb.MACCommand{
+					(&ttnpb.MACCommand_ResetConf{
+						MinorVersion: 1,
+					}).MACCommand(),
 				}
 				return dev
 			}(),

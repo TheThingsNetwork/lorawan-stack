@@ -35,13 +35,17 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 		Error            error
 	}{
 		{
-			Name:   "empty queue",
-			Device: &ttnpb.EndDevice{},
+			Name: "empty queue",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
 			Expected: &ttnpb.EndDevice{
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_DeviceTimeAns{
-						Time: time.Unix(42, 42),
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_DeviceTimeAns{
+							Time: time.Unix(42, 42),
+						}).MACCommand(),
+					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
@@ -56,20 +60,24 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 		{
 			Name: "non-empty queue/odd",
 			Device: &ttnpb.EndDevice{
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
-					(&ttnpb.MACCommand_DeviceTimeAns{
-						Time: time.Unix(42, 42),
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+						(&ttnpb.MACCommand_DeviceTimeAns{
+							Time: time.Unix(42, 42),
+						}).MACCommand(),
+					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
@@ -90,20 +98,24 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 		{
 			Name: "non-empty queue/even",
 			Device: &ttnpb.EndDevice{
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				QueuedMACResponses: []*ttnpb.MACCommand{
-					{},
-					{},
-					{},
-					(&ttnpb.MACCommand_DeviceTimeAns{
-						Time: time.Unix(42, 45),
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					QueuedResponses: []*ttnpb.MACCommand{
+						{},
+						{},
+						{},
+						(&ttnpb.MACCommand_DeviceTimeAns{
+							Time: time.Unix(42, 45),
+						}).MACCommand(),
+					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{

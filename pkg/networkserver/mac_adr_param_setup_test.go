@@ -33,23 +33,31 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 		Error            error
 	}{
 		{
-			Name:     "no request",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Error:    errMACRequestNotFound,
+			Name: "no request",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Error: errMACRequestNotFound,
 		},
 		{
 			Name: "limit 42, delay 24",
 			Device: &ttnpb.EndDevice{
-				PendingMACRequests: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_ADRParamSetupReq{
-						ADRAckLimitExponent: 42,
-						ADRAckDelayExponent: 24,
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_ADRParamSetupReq{
+							ADRAckLimitExponent: 42,
+							ADRAckDelayExponent: 24,
+						}).MACCommand(),
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				PendingMACRequests: []*ttnpb.MACCommand{},
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{},
+				},
 			},
 		},
 	} {

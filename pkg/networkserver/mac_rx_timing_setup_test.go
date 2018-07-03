@@ -33,26 +33,33 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 		Error            error
 	}{
 		{
-			Name:     "no request",
-			Device:   &ttnpb.EndDevice{},
-			Expected: &ttnpb.EndDevice{},
-			Error:    errMACRequestNotFound,
+			Name: "no request",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Error: errMACRequestNotFound,
 		},
 		{
 			Name: "42",
 			Device: &ttnpb.EndDevice{
-				MACState: &ttnpb.MACState{},
-				PendingMACRequests: []*ttnpb.MACCommand{
-					(&ttnpb.MACCommand_RxTimingSetupReq{
-						Delay: 42,
-					}).MACCommand(),
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_RxTimingSetupReq{
+							Delay: 42,
+						}).MACCommand(),
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
-					Rx1Delay: 42,
+					MACParameters: ttnpb.MACParameters{
+						Rx1Delay: 42,
+					},
+					PendingRequests: []*ttnpb.MACCommand{},
 				},
-				PendingMACRequests: []*ttnpb.MACCommand{},
 			},
 		},
 	} {
