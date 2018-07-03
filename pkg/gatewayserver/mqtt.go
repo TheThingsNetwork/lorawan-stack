@@ -116,7 +116,7 @@ func (h *mqttConnectionHandler) Connect(info *auth.Info) error {
 		ID:            identifiers.GetGatewayID(),
 		AuthType:      "Bearer",
 		AuthValue:     string(info.Password),
-		AllowInsecure: true,
+		AllowInsecure: h.gs.Component.AllowInsecureForCredentials(),
 	}
 
 	is, err := h.gs.getIdentityServer()

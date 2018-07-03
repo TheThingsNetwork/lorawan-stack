@@ -130,7 +130,7 @@ func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
 
 // GetGatewayObservations returns gateway information as observed by the Gateway Server.
 func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
-	if !gs.config.DisableAuth && !ttnpb.IncludesRights(rights.FromContext(ctx), ttnpb.RIGHT_GATEWAY_STATUS_READ) {
+	if !ttnpb.IncludesRights(rights.FromContext(ctx), ttnpb.RIGHT_GATEWAY_STATUS_READ) {
 		return nil, common.ErrPermissionDenied.New(nil)
 	}
 
@@ -173,8 +173,9 @@ func (gs *GatewayServer) getGateway(ctx context.Context, id *ttnpb.GatewayIdenti
 	return is.GetGateway(ctx, id)
 }
 
-func checkAuthorization(ctx context.Context, is ttnpb.IsGatewayClient, right ttnpb.Right) error {
+func (gs *GatewayServer) checkAuthorization(ctx context.Context, right ttnpb.Right) error {
 	md := rpcmetadata.FromIncomingContext(ctx)
+	md.AllowInsecure = gs.Component.AllowInsecureRPCs()
 
 	if md.AuthType == "" || md.AuthValue == "" {
 		return errNoCredentialsPassed
@@ -182,6 +183,11 @@ func checkAuthorization(ctx context.Context, is ttnpb.IsGatewayClient, right ttn
 
 	if md.AuthType != "Bearer" {
 		return errUnexpectedAuthenticationType.WithAttributes("passed", md.AuthType, "expected", "Bearer")
+	}
+
+	is, err := gs.getIdentityServer()
+	if err != nil {
+		return err
 	}
 
 	ids := &ttnpb.GatewayIdentifiers{GatewayID: md.ID}

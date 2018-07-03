@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
@@ -81,12 +82,13 @@ func TestLink(t *testing.T) {
 	defer store.Destroy()
 
 	registeredGatewayID := "registered-gateway"
-	_, isAddr := StartMockIsGatewayServer(ctx, []ttnpb.Gateway{
+	is, isAddr := StartMockIsGatewayServer(ctx, []ttnpb.Gateway{
 		{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayID},
 			FrequencyPlanID:    "EU_863_870",
 		},
 	})
+	is.rights = []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_LINK} // result of ListGatewayRights
 	ns, nsAddr := StartMockGsNsServer(ctx)
 
 	c := component.MustNew(logger, &component.Config{
@@ -99,11 +101,12 @@ func TestLink(t *testing.T) {
 			FrequencyPlans: config.FrequencyPlans{
 				StoreDirectory: store.Directory(),
 			},
+			Rights: rights.Config{
+				AllowInsecure: true,
+			},
 		},
 	})
-	gs, err := gatewayserver.New(c, gatewayserver.Config{
-		DisableAuth: true,
-	})
+	gs, err := gatewayserver.New(c, gatewayserver.Config{})
 	if !a.So(err, should.BeNil) {
 		t.Fatal("Gateway Server could not be initialized:", err)
 	}
@@ -135,7 +138,8 @@ func TestLink(t *testing.T) {
 	}
 	link.ContextFunc = func() context.Context {
 		return metadata.NewIncomingContext(ctx, metadata.MD{
-			"id": []string{registeredGatewayID},
+			"id":            []string{registeredGatewayID},
+			"authorization": []string{"Bearer dummy-token"},
 		})
 	}
 

@@ -77,6 +77,9 @@ func TestMQTTConnection(t *testing.T) {
 			FrequencyPlans: config.FrequencyPlans{
 				StoreDirectory: store.Directory(),
 			},
+			GRPC: config.GRPC{
+				AllowInsecureForCredentials: true,
+			},
 		},
 	})
 	gs, err := gatewayserver.New(c, gatewayserver.Config{

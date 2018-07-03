@@ -238,3 +238,8 @@ func (c *Component) RightsHook() (*rights.Hook, error) {
 
 	return c.rightsHook, nil
 }
+
+// AllowInsecureRPCs returns `true` if the component was configured to allow connection over insecure protocols.
+func (c *Component) AllowInsecureRPCs() bool {
+	return c.config.Rights.AllowInsecure
+}
