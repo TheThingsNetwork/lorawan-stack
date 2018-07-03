@@ -27,10 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
-const (
-	gatewayInMemory = time.Hour
-	ttnGSIndex      = "ttn-gateway-server"
-)
+const gatewayInMemory = time.Hour
 
 func (g *GatewayServer) runUDPBridge(ctx context.Context, udpConn *net.UDPConn) {
 	gwStore := udp.NewGatewayStore(gatewayInMemory)
