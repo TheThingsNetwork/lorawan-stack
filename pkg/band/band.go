@@ -172,7 +172,7 @@ type Band struct {
 	DwellTime time.Duration
 }
 
-// DutyCycle for the [MinFrequency;MaxFrequency[ sub-band
+// DutyCycle for the [MinFrequency;MaxFrequency] sub-band
 type DutyCycle struct {
 	MinFrequency uint64
 	MaxFrequency uint64
