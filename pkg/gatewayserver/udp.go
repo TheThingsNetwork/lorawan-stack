@@ -29,7 +29,7 @@ import (
 
 const gatewayInMemory = time.Hour
 
-func (g *GatewayServer) runUDPBridge(ctx context.Context, udpConn *net.UDPConn) {
+func (g *GatewayServer) runUDPEndpoint(ctx context.Context, udpConn *net.UDPConn) {
 	gwStore := udp.NewGatewayStore(gatewayInMemory)
 
 	conn := udp.Handle(udpConn, gwStore, gwStore)

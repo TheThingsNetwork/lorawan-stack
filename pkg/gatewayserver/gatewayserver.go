@@ -65,7 +65,7 @@ func New(c *component.Component, conf Config) (gs *GatewayServer, err error) {
 		c.Logger().WithField("address", conf.UDPAddress).Info("Listening for UDP connections")
 
 		ctx, cancel := context.WithCancel(c.Context())
-		go gs.runUDPBridge(ctx, conn)
+		go gs.runUDPEndpoint(ctx, conn)
 		defer func() {
 			if err != nil {
 				cancel()
