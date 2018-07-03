@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package rights implements a gRPC unary hook that preloads rights in the context.
 package rights
 
 import (
@@ -53,7 +54,7 @@ type IdentityServerConnector interface {
 // Config is the type that configures the rights hook.
 type Config struct {
 	// TTL is the duration that entries will remain in the cache before being
-	// garbage collected. If the value is not set (i.e. 0) caching will be disabled.
+	// garbage collected.
 	TTL time.Duration `name:"ttl" description:"Validity of Identity Server responses"`
 
 	// AllowInsecure makes the hook not to use a transport security to send
@@ -64,6 +65,15 @@ type Config struct {
 // Hook implements a gRPC unary hook that preloads in the context the rights
 // based on the authorization value in the request metadata with the resource
 // that is being trying to be accessed to.
+//
+// On an incoming RPC:
+//
+// 1. The hook looks up whether the request message identifies one of the entity Getter interface,
+// defined in the package.
+//
+// 2. Using the IdentityServerConnector, the hook retrieves the rights associated to the authorization value of the request.
+//
+// 3. The resulting rights are put in the context using NewContext, and can be retrieved using FromContext.
 type Hook struct {
 	ctx                context.Context
 	logger             log.Interface
@@ -74,8 +84,9 @@ type Hook struct {
 	gatewaysCache      cache
 }
 
-// New returns a new hook instance. ctx is a cancelable context
-// used to stop the garbage collector of the TTL cache if it has been set.
+// New returns a new instance of a hook that preloads rights in the context.
+//
+// If a TTL cache is set in the config, a garbage collector runs until ctx is cancelled.
 func New(ctx context.Context, connector IdentityServerConnector, config Config) (*Hook, error) {
 	if connector == nil {
 		return nil, errors.New("An Identity Server connection provider must be given")
