@@ -35,6 +35,12 @@ border-input($side = '')
     $prefix = ''
   border{$prefix + $side}: 1px solid $c-input-border
 
+border-subtle($side = '')
+  $prefix = '-'
+  if $side == ''
+    $prefix = ''
+  border{$prefix + $side}: 1px solid $c-divider-subtle
+
 
 
 // COLORS
@@ -48,8 +54,10 @@ lighter($color, $step = 1)
 
 
 
-// NUDGES
+// POSITIONING
 // ======
+
+// Nudges push the element in the specified direction by the specified amount.
 
 nudge($direction, $amount = 1px)
   position: relative
@@ -62,6 +70,14 @@ nudge($direction, $amount = 1px)
     right: $amount
   if $direction == 'right'
     left: $amount
+
+// Center absolute uses absolute positioning to put the element in the
+// center of its container.
+center-absolute()
+  top: 50%
+  left: 50%
+  position: absolute
+  transform: translate(-50%, -50%)
 
 
 // TYPOGRAPHY
@@ -79,5 +95,16 @@ one-liner($display = inline-block)
 // again by subtracting the gap that results from line-heights higher than 1.
 // Currently this only works for the standard line-height.
 
-to-bb($size)
+to-bb($size = 0)
   return $x-height-subtractor + $size
+
+
+// LAYOUT
+// ======
+
+// Horizontalize is a shorthand to make elements in a container horizonatally
+// distributed.
+
+horizontalize()
+  display: flex
+  justify-content: space-between
