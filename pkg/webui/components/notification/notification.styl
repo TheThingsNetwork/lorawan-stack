@@ -1,0 +1,47 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+left-border($color)
+  background: linear-gradient(left, $color, 5px $color, 5px white)
+
+.notification
+  left-border($c-divider-dark)
+  border-top: 1px solid $c-divider
+  border-right: 1px solid $c-divider
+  border-color: $c-divider-subtle
+  border-radius: $br.m
+  display: flex
+  padding: $cs.xl $cs.l
+  margin-bottom: $ls.xxs
+  box-shadow: 0 1px 1px 0 $c-divider-dark
+
+  &.small
+    padding: $cs.s
+    border-left-width: 4px
+
+  &.error
+    left-border($c-error)
+    color: $c-error
+
+  &.warning
+    left-border($c-warning)
+    color: darker($c-warning, 2)
+
+  &.info
+    left-border($c-active-blue)
+    color: $c-active-blue
+
+  span:last-child
+    margin-left: $cs.xs
+    nudge('up')
