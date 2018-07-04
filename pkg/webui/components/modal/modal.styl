@@ -1,0 +1,115 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.modal
+  border-dark()
+  center-absolute()
+  z-index: 10
+  background: white
+  border-radius: $br.m
+  width: 60%
+  max-height: 80vh
+  display: flex
+  flex-direction: column
+
+  +media-query-min($bp.s)
+    min-width: 500px
+    max-width: 780px
+
+  +media-query($bp.s)
+    full-screen()
+    border: 0
+    border-radius: 0
+    justify-content: space-between
+
+.title-section
+  horizontalize()
+  padding: $ls.m $ls.l
+  align-items: center
+
+  +media-query($bp.s)
+    flex-wrap: wrap-reverse
+
+  & > div:first-child
+    flex-shrink: 1
+    margin-right: $cs.m
+
+    span
+      display: block
+      text-margin-bottom()
+
+  h1
+    line-height: $lh.xxl
+    text-margin-top()
+
+    &:last-child
+      text-margin-bottom()
+
+    &:not(:last-child)
+      text-margin-bottom($cs.s)
+
+.line
+  height: 1px
+  width: 18%
+  background-color: $c-divider-dark
+  margin-left: $cs.xxl
+  flex-shrink: 0
+  margin-bottom: -4px // compensate for own visual height
+
+.body
+  padding: $ls.m $ls.l
+  overflow-x: auto
+  flex-grow: 1
+
+  +media-query-min($bp.s)
+    horizontalize()
+
+.message
+  eat-text-margins()
+
+.control-bar
+  horizontalize()
+  border-dark('top')
+  padding: $cs.l
+  flex-shrink: 0
+  flex-grow: 0
+  align-items: center
+
+  & > div:first-child
+    align-items: center
+    display: flex
+
+    span
+      nudge('up')
+      color: $tc-subtle-gray
+      margin-right: $cs.m
+
+  & > div:last-child
+    display: flex
+    align-items: center
+
+.logo
+  width: 170px
+  flex-shrink: 0
+
+  +media-query($bp.s)
+    margin-bottom: $ls.s
+
+.shadow
+  position: fixed
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  background: rgba(0, 0, 0, .05)
