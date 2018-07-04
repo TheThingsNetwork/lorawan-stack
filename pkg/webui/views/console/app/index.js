@@ -21,7 +21,7 @@ import Login from '../login'
 import Landing from '../landing'
 import store from '../../../store'
 
-export default class Console extends React.PureComponent {
+export default class ConsoleApp extends React.PureComponent {
   render () {
     return (
       <Provider store={store}>

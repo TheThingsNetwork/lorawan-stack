@@ -21,7 +21,7 @@ const mapStateToProps = state => ({
 })
 
 @connect(mapStateToProps)
-export default class Console extends React.PureComponent {
+export default class Landing extends React.PureComponent {
   render () {
     const { user } = this.props
 

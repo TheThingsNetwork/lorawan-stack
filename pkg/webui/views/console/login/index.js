@@ -20,14 +20,24 @@ import Button from '../../../components/button'
 
 @withRouter
 @bind
-export default class Console extends React.PureComponent {
+export default class Login extends React.PureComponent {
   redirectToLogin () {
-    window.location = '/console/api/auth/login'
+    window.location = `/console/api/auth/login?path=${window.location.pathname}`
+  }
+
+  logout () {
+    fetch('/oauth/api/auth/logout', {
+      method: 'POST',
+      credentials: 'same-origin',
+    })
   }
 
   render () {
     return (
-      <div>Login <Button message="Login" onClick={this.redirectToLogin} /></div>
+      <div>
+        <Button message="Login" onClick={this.redirectToLogin} />
+        <Button message="Logout" onClick={this.logout} />
+      </div>
     )
   }
 }
