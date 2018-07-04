@@ -21,9 +21,9 @@ import (
 
 // DefaultConsoleConfig is the default configuration for the Console.
 var DefaultConsoleConfig = console.Config{
-	DefaultLanguage:   "en",
-	IdentityServerURL: shared.DefaultOAuthPublicURL,
-	PublicURL:         shared.DefaultConsolePublicURL,
+	DefaultLanguage: "en",
+	OAuthURL:        shared.DefaultOAuthPublicURL,
+	PublicURL:       shared.DefaultConsolePublicURL,
 	OAuth: console.OAuth{
 		ID:     "console",
 		Secret: "console",

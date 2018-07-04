@@ -161,8 +161,8 @@ func (s *Server) RegisterRoutes(server *web.Server) {
 	group := server.Group(s.config.mount)
 	group.Use(s.config.Assets.Errors("error.html", env))
 
-	group.POST("/oauth/token", s.token)
-	group.Any("/oauth/authorize", s.authorize(index), s.RedirectToLogin)
+	group.POST("/token", s.token)
+	group.Any("/authorize", s.authorize(index), s.RedirectToLogin)
 
 	group.POST("/api/auth/login", s.login)
 	group.GET("/api/me", s.me, s.RequireLogin)

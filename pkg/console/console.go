@@ -39,8 +39,8 @@ type Config struct {
 	// DefaultLanguage is the default language of the Console.
 	DefaultLanguage string `name:"language" description:"Default language of the Console"`
 
-	// IdentityServerURL is the location of the Identity Server.
-	IdentityServerURL string `name:"identity-server-url" description:"URL of the Identity Server"`
+	// OAuthURL is the location of the OAuth provider.
+	OAuthURL string `name:"oauth-url" description:"URL of the OAuth provider"`
 
 	// OAuth is the OAuth config for the Console.
 	OAuth OAuth `name:"oauth"`
@@ -93,8 +93,8 @@ func New(c *component.Component, assets *assets.Assets, config Config) (*Console
 		ClientSecret: console.config.OAuth.Secret,
 		RedirectURL:  fmt.Sprintf("%s/oauth/callback", strings.TrimSuffix(console.config.PublicURL, "/")),
 		Endpoint: oauth2.Endpoint{
-			TokenURL: fmt.Sprintf("%s/oauth/token", strings.TrimSuffix(console.config.IdentityServerURL, "/")),
-			AuthURL:  fmt.Sprintf("%s/oauth/authorize", strings.TrimSuffix(console.config.IdentityServerURL, "/")),
+			TokenURL: fmt.Sprintf("%s/token", strings.TrimSuffix(console.config.OAuthURL, "/")),
+			AuthURL:  fmt.Sprintf("%s/authorize", strings.TrimSuffix(console.config.OAuthURL, "/")),
 		},
 	}
 

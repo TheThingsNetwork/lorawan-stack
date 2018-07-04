@@ -57,7 +57,7 @@ func TestAuthorizationFlow(t *testing.T) {
 
 	// Authorize client.
 	{
-		uri := fmt.Sprintf("/oauth/authorize?client_id=%s&redirect_uri=%s&response_type=code&state=%s&scope=%s", client.ClientID, client.RedirectURI, state, url.QueryEscape(Scope(rights)))
+		uri := fmt.Sprintf("/authorize?client_id=%s&redirect_uri=%s&response_type=code&state=%s&scope=%s", client.ClientID, client.RedirectURI, state, url.QueryEscape(Scope(rights)))
 
 		req := httptest.NewRequest("POST", uri, strings.NewReader(`authorize=true`))
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -80,7 +80,7 @@ func TestAuthorizationFlow(t *testing.T) {
 
 	// Exchange authorization code per an access token.
 	{
-		req := httptest.NewRequest("POST", "/oauth/token", strings.NewReader(fmt.Sprintf(`{"code":"%s", "grant_type": "authorization_code", "redirect_uri": "%s"}`, code, client.RedirectURI)))
+		req := httptest.NewRequest("POST", "/token", strings.NewReader(fmt.Sprintf(`{"code":"%s", "grant_type": "authorization_code", "redirect_uri": "%s"}`, code, client.RedirectURI)))
 		req.Header.Set("Content-Type", "application/json")
 		req.AddCookie(resp.Cookies()[0])
 
