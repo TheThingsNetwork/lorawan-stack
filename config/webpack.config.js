@@ -121,7 +121,8 @@ export default {
             loader: 'stylus-loader',
             options: {
               'import': [
-                path.resolve(context, 'pkg/webui/include.styl'),
+                path.resolve(context, 'pkg/webui/styles/include.styl'),
+
               ],
               use: [ nib() ],
             },

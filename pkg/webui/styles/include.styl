@@ -12,20 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import 'nib'
+@require 'nib'
 
-@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700')
-@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Mono')
+@require './variables.styl'
+@require './mixins.styl'
 
-global-reset()
-
-html, body
-  font-size: $font-size-base
-
-body
-  font-family: $font-family
-  line-height: $line-height
-  color: $tc-deep-gray
-  -webkit-font-smoothing: antialiased
-  -moz-osx-font-smoothing: grayscale
-  background: white

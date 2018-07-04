@@ -1,0 +1,43 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700')
+@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Mono')
+
+@font-face
+  font-family: 'Material Icons'
+  font-style: normal
+  font-weight: 400
+  src: url('https://fonts.gstatic.com/s/materialicons/v32/2fcrYFNaTjcS6g4U3t-Y5UEw0lE80llgEseQY3FEmqw.woff2') format('woff2')
+
+
+global-reset()
+
+html, body
+  font-size: $font-size-base
+  height: 100%
+
+body
+  font-family: $font-family
+  line-height: $line-height
+  color: $tc-deep-gray
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+  background: white
+
+  & > div
+    height: 100%
+
+h1
+  font-size: $fs.xxl

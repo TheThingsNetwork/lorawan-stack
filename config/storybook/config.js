@@ -20,7 +20,7 @@ import { Provider } from 'react-redux'
 import { ConnectedRouter } from 'react-router-redux'
 import createHistory from 'history/createMemoryHistory'
 
-import '../../pkg/webui/main.styl'
+import '../../pkg/webui/styles/main.styl'
 import Store from '../../pkg/webui/store'
 
 import Center from './center'

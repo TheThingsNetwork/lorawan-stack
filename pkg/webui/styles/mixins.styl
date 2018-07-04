@@ -1,0 +1,83 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// BORDERS
+// =======
+
+// ## General
+
+border-normal($side = '')
+  $prefix = '-'
+  if $side == ''
+    $prefix = ''
+  border{$prefix + $side}: 1px solid $c-divider
+
+border-dark($side = '')
+  $prefix = '-'
+  if $side == ''
+    $prefix = ''
+  border{$prefix + $side}: 1px solid $c-divider-dark
+
+border-input($side = '')
+  $prefix = '-'
+  if $side == ''
+    $prefix = ''
+  border{$prefix + $side}: 1px solid $c-input-border
+
+
+
+// COLORS
+// ======
+
+darker($color, $step = 1)
+  darken($color, 5 * $step * $step)
+
+lighter($color, $step = 1)
+  lighten($color, 5 * $step * $step)
+
+
+
+// NUDGES
+// ======
+
+nudge($direction, $amount = 1px)
+  position: relative
+
+  if $direction == 'up'
+    bottom: $amount
+  if $direction == 'down'
+    top: $amount
+  if $direction == 'left'
+    right: $amount
+  if $direction == 'right'
+    left: $amount
+
+
+// TYPOGRAPHY
+// ==========
+
+// One liner, sets line-height to 1, makes components spacing a lot easier.
+// Only suitable for texts that will not wrap at all. Otherwise use to-bb()
+
+one-liner($display = inline-block)
+  line-height: 1
+  display: $display
+  white-space: nowrap
+
+// To bounding box will make text elements spacing relative to bounding box
+// again by subtracting the gap that results from line-heights higher than 1.
+// Currently this only works for the standard line-height.
+
+to-bb($size)
+  return $x-height-subtractor + $size
