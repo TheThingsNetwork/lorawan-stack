@@ -21,7 +21,7 @@ import { ConnectedRouter } from 'react-router-redux'
 import createHistory from 'history/createMemoryHistory'
 
 import '../../pkg/webui/styles/main.styl'
-import Store from '../../pkg/webui/store'
+import store from '../../pkg/webui/store'
 
 import Center from './center'
 
@@ -29,7 +29,6 @@ const req = require.context('../../pkg/webui/', true, /story\.js$/)
 const load = () => req.keys().forEach(req)
 
 const history = createHistory()
-const store = Store(history)
 
 addDecorator(function (story) {
   return (

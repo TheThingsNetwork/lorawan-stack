@@ -137,7 +137,6 @@ export default {
             options: {
               'import': [
                 path.resolve(context, 'pkg/webui/styles/include.styl'),
-
               ],
               use: [ nib() ],
             },
@@ -216,6 +215,7 @@ export default {
   serve: {
     content: 'public',
     devMiddleware: { stats: 'minimal' },
+    hotClient: { allEntries: true },
     add (app, middleware, options) {
       // Add new api routes here, to proxy them
       app.use(convert(proxy([ '/api', '/console/api', '/oauth/api' ],
