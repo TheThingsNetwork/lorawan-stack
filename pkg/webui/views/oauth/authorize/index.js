@@ -80,18 +80,20 @@ export default class Authorize extends PureComponent {
         approval
         logo
       >
-        <div className={style.left}>
-          <ul>
-            { client.rights.map(right => (
-              <li key={right}><Icon icon="check" className={style.icon} /><Message m={rights[right]} /></li>
-            )
-            )}
-          </ul>
-        </div>
-        <div className={style.right}>
-          <h3>{client_id}</h3>
-          <p>{client.description}</p>
-        </div>
+        <Fragment>
+          <div className={style.left}>
+            <ul>
+              { client.rights.map(right => (
+                <li key={right}><Icon icon="check" className={style.icon} /><Message content={right} /></li>
+              )
+              )}
+            </ul>
+          </div>
+          <div className={style.right}>
+            <h3>{capitalize(client_id)}</h3>
+            <p>{client.description}</p>
+          </div>
+        </Fragment>
       </Modal>
     )
   }
