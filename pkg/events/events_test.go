@@ -98,12 +98,14 @@ func TestUnmarshalJSON(t *testing.T) {
 }
 
 func Example() {
-	// This is only for the test
+	// The WaitGroup is only for synchronizing the unit test
 	var wg sync.WaitGroup
 	wg.Add(1)
+
 	events.Subscribe("ns.**", events.HandlerFunc(func(e events.Event) {
 		fmt.Printf("Received event %s\n", e.Name())
-		wg.Done()
+
+		wg.Done() // only for synchronizing the unit test
 	}))
 
 	// You can send any arbitrary event; you don't have to pass any identifiers or data.
@@ -128,7 +130,7 @@ func Example() {
 	// Publishing an event to the events package will dispatch it on the "global" event pubsub.
 	events.Publish(adrSendEvent(ctx, dev.EndDeviceIdentifiers, requests))
 
-	wg.Wait() // only for the test
+	wg.Wait() // only for synchronizing the unit test
 
 	// Output:
 	// Received event ns.mac.adr.send_req
