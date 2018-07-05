@@ -23,7 +23,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -65,7 +64,7 @@ func TestHandleResetInd(t *testing.T) {
 				},
 			},
 			Payload: nil,
-			Error:   common.ErrMissingPayload.New(nil),
+			Error:   errMissingPayload,
 		},
 		{
 			Name: "empty queue",

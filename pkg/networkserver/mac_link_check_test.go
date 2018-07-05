@@ -43,7 +43,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					Bandwidth:       250,
 				},
 			},
-			Error: ErrInvalidDataRate.New(nil),
+			Error: errInvalidDataRate,
 		},
 		{
 			Name:   "SF12BW250/1 gateway/empty queue",

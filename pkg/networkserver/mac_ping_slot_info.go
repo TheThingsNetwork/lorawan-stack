@@ -17,13 +17,12 @@ package networkserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 func handlePingSlotInfoReq(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_PingSlotInfoReq) error {
 	if pld == nil {
-		return common.ErrMissingPayload.New(nil)
+		return errMissingPayload
 	}
 	// TODO: Support Class B (https://github.com/TheThingsIndustries/ttn/issues/833)
 	_ = pld.Period

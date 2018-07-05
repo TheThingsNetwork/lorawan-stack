@@ -17,13 +17,12 @@ package networkserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 func handleDeviceModeInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DeviceModeInd) error {
 	if pld == nil {
-		return common.ErrMissingPayload.New(nil)
+		return errMissingPayload
 	}
 
 	dev.MACInfo.DeviceClass = pld.Class

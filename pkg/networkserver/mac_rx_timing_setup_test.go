@@ -36,7 +36,7 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 			Name:     "no request",
 			Device:   &ttnpb.EndDevice{},
 			Expected: &ttnpb.EndDevice{},
-			Error:    ErrMACRequestNotFound.New(nil),
+			Error:    errMACRequestNotFound,
 		},
 		{
 			Name: "42",

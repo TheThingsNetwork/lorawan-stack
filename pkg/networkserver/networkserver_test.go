@@ -1533,6 +1533,8 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 
 				select {
 				case up := <-asSendCh:
+					a.So(up.GetJoinAccept().CorrelationIDs, should.NotBeEmpty)
+
 					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 						SessionKeyID: test.Must(dev.Load()).(*deviceregistry.Device).Session.SessionKeys.SessionKeyID,
 						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1543,7 +1545,8 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 							ApplicationIdentifiers: tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers,
 						},
 						Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-							AppSKey: resp.SessionKeys.AppSKey,
+							AppSKey:        resp.SessionKeys.AppSKey,
+							CorrelationIDs: up.GetJoinAccept().CorrelationIDs,
 						}},
 					})
 
@@ -1673,6 +1676,8 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 
 					select {
 					case up := <-asSendCh:
+						a.So(up.GetJoinAccept().CorrelationIDs, should.NotBeEmpty)
+
 						a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 							SessionKeyID: test.Must(dev.Load()).(*deviceregistry.Device).Session.SessionKeys.SessionKeyID,
 							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1683,7 +1688,8 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 								ApplicationIdentifiers: tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers,
 							},
 							Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-								AppSKey: resp.SessionKeys.AppSKey,
+								AppSKey:        resp.SessionKeys.AppSKey,
+								CorrelationIDs: up.GetJoinAccept().CorrelationIDs,
 							}},
 						})
 
@@ -1754,7 +1760,7 @@ func TestHandleUplink(t *testing.T) {
 	msg = ttnpb.NewPopulatedUplinkMessage(test.Randy, false)
 	msg.Payload.Major = 1
 	_, err = ns.HandleUplink(context.Background(), msg)
-	a.So(err, should.BeNil)
+	a.So(err, should.NotBeNil)
 
 	t.Run("Uplink", HandleUplinkTest(conf))
 	t.Run("Join", HandleJoinTest(conf))

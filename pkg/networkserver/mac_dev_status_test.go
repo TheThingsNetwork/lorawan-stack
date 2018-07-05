@@ -21,7 +21,6 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -39,14 +38,14 @@ func TestHandleDevStatusAns(t *testing.T) {
 			Device:   &ttnpb.EndDevice{},
 			Expected: &ttnpb.EndDevice{},
 			Payload:  nil,
-			Error:    common.ErrMissingPayload.New(nil),
+			Error:    errMissingPayload,
 		},
 		{
 			Name:     "no request",
 			Device:   &ttnpb.EndDevice{},
 			Expected: &ttnpb.EndDevice{},
 			Payload:  ttnpb.NewPopulatedMACCommand_DevStatusAns(test.Randy, false),
-			Error:    ErrMACRequestNotFound.New(nil),
+			Error:    errMACRequestNotFound,
 		},
 		{
 			Name: "battery 42, margin 4",

@@ -17,7 +17,6 @@ package networkserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -28,7 +27,7 @@ func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	}
 
 	if pld == nil {
-		return common.ErrMissingPayload.New(nil)
+		return errMissingPayload
 	}
 
 	if err := resetMACState(fps, dev); err != nil {

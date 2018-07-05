@@ -23,7 +23,7 @@ import (
 func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) error {
 	floor, ok := demodulationFloor[msg.Settings.SpreadingFactor][msg.Settings.Bandwidth]
 	if !ok {
-		return ErrInvalidDataRate.New(nil)
+		return errInvalidDataRate
 	}
 
 	gtws := make(map[string]struct{}, len(msg.RxMetadata))

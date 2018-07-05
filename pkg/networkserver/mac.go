@@ -24,7 +24,7 @@ func handleMACResponse(cid ttnpb.MACCommandIdentifier, f func(*ttnpb.MACCommand)
 		f(cmd)
 		return append(cmds[:i], cmds[i+1:]...), nil
 	}
-	return cmds, ErrMACRequestNotFound.New(nil)
+	return cmds, errMACRequestNotFound
 }
 
 func handleMACResponseBlock(cid ttnpb.MACCommandIdentifier, f func(*ttnpb.MACCommand), cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, error) {
@@ -47,7 +47,7 @@ outer:
 	}
 
 	if first < 0 {
-		return cmds, ErrMACRequestNotFound.New(nil)
+		return cmds, errMACRequestNotFound
 	}
 	return append(cmds[:first], cmds[last+1:]...), nil
 }

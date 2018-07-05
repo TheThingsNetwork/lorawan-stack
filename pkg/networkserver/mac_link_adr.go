@@ -17,13 +17,12 @@ package networkserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns) (err error) {
 	if pld == nil {
-		return common.ErrMissingPayload.New(nil)
+		return errMissingPayload
 	}
 
 	dev.PendingMACRequests, err = handleMACResponseBlock(ttnpb.CID_LINK_ADR, func(cmd *ttnpb.MACCommand) {

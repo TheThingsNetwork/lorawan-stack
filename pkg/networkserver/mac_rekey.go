@@ -17,7 +17,6 @@ package networkserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -27,7 +26,7 @@ func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	}
 
 	if pld == nil {
-		return common.ErrMissingPayload.New(nil)
+		return errMissingPayload
 	}
 
 	dev.SessionFallback = nil
