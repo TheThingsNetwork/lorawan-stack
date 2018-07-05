@@ -23,10 +23,10 @@ var (
 		Code:          1,
 		Type:          errors.InvalidArgument,
 	}
-	// ErrCheckFailed is returned if the arguments didn't pass a specifically-defined
-	// argument check.
-	ErrCheckFailed = &errors.ErrDescriptor{
-		MessageFormat: "Arguments check failed",
+	// ErrProcessorFailed is returned if the arguments didn't pass a specifically-defined
+	// argument processor.
+	ErrProcessorFailed = &errors.ErrDescriptor{
+		MessageFormat: "Failed to process arguments",
 		Code:          2,
 		Type:          errors.InvalidArgument,
 	}
@@ -64,7 +64,7 @@ var (
 
 func init() {
 	ErrInvalidArgument.Register()
-	ErrCheckFailed.Register()
+	ErrProcessorFailed.Register()
 	ErrUnmarshalPayloadFailed.Register()
 	ErrMarshalPayloadFailed.Register()
 	ErrCorruptRegistry.Register()

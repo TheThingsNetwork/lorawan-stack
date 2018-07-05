@@ -33,35 +33,18 @@ type RegistryRPC struct {
 	Interface
 	*component.Component
 
-	checks struct {
-		GetApplication    func(ctx context.Context, id *ttnpb.ApplicationIdentifiers) error
-		SetApplication    func(ctx context.Context, app *ttnpb.Application, fields ...string) error
-		DeleteApplication func(ctx context.Context, id *ttnpb.ApplicationIdentifiers) error
-	}
+	setApplicationProcessor func(ctx context.Context, create bool, app *ttnpb.Application, fields ...string) (*ttnpb.Application, []string, error)
 }
 
 // RPCOption represents RegistryRPC option
 type RPCOption func(*RegistryRPC)
 
-// WithGetApplicationCheck sets a check to GetApplication method of RegistryRPC instance.
-// GetApplication first executes fn and if error is returned by it,
-// returns error, otherwise execution advances as usual.
-func WithGetApplicationCheck(fn func(context.Context, *ttnpb.ApplicationIdentifiers) error) RPCOption {
-	return func(r *RegistryRPC) { r.checks.GetApplication = fn }
-}
-
-// WithSetApplicationCheck sets a check to SetApplication method of RegistryRPC instance.
-// SetApplication first executes fn and if error is returned by it,
-// returns error, otherwise execution advances as usual.
-func WithSetApplicationCheck(fn func(context.Context, *ttnpb.Application, ...string) error) RPCOption {
-	return func(r *RegistryRPC) { r.checks.SetApplication = fn }
-}
-
-// WithDeleteApplicationCheck sets a check to DeleteApplication method of RegistryRPC instance.
-// DeleteApplication first executes fn and if error is returned by it,
-// returns error, otherwise execution advances as usual.
-func WithDeleteApplicationCheck(fn func(context.Context, *ttnpb.ApplicationIdentifiers) error) RPCOption {
-	return func(r *RegistryRPC) { r.checks.DeleteApplication = fn }
+// WithSetApplicationProcessor sets a function, which checks and processes the application and fields,
+// which are about to be passed to SetApplication method of RegistryRPC instance.
+// After a successful search, SetApplication executes fn on the found value before creating or updating the application in the registry.
+// If fn returns error, SetApplication returns it without modifying the registry.
+func WithSetApplicationProcessor(fn func(context.Context, bool, *ttnpb.Application, ...string) (*ttnpb.Application, []string, error)) RPCOption {
+	return func(r *RegistryRPC) { r.setApplicationProcessor = fn }
 }
 
 // NewRPC returns a new instance of RegistryRPC
@@ -90,15 +73,6 @@ func (r *RegistryRPC) GetApplication(ctx context.Context, id *ttnpb.ApplicationI
 		return nil, err
 	}
 
-	if r.checks.GetApplication != nil {
-		if err := r.checks.GetApplication(ctx, id); err != nil {
-			if errors.GetType(err) != errors.Unknown {
-				return nil, err
-			}
-			return nil, common.ErrCheckFailed.NewWithCause(nil, err)
-		}
-	}
-
 	app, err := FindByIdentifiers(r.Interface, id)
 	if err != nil {
 		return nil, err
@@ -107,7 +81,7 @@ func (r *RegistryRPC) GetApplication(ctx context.Context, id *ttnpb.ApplicationI
 }
 
 // SetApplication sets the application fields to match those of app in underlying registry.
-func (r *RegistryRPC) SetApplication(ctx context.Context, req *ttnpb.SetApplicationRequest) (*pbtypes.Empty, error) {
+func (r *RegistryRPC) SetApplication(ctx context.Context, req *ttnpb.SetApplicationRequest) (*ttnpb.Application, error) {
 	if err := rights.RequireApplication(ctx, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
@@ -116,14 +90,6 @@ func (r *RegistryRPC) SetApplication(ctx context.Context, req *ttnpb.SetApplicat
 	if req.FieldMask != nil {
 		fields = gogoproto.GoFieldsPaths(req.FieldMask, req.GetApplication())
 	}
-	if r.checks.SetApplication != nil {
-		if err := r.checks.SetApplication(ctx, &req.Application, fields...); err != nil {
-			if errors.GetType(err) != errors.Unknown {
-				return nil, err
-			}
-			return nil, common.ErrCheckFailed.NewWithCause(nil, err)
-		}
-	}
 
 	app, err := FindByIdentifiers(r.Interface, &req.Application.ApplicationIdentifiers)
 	notFound := errors.Descriptor(err) == ErrApplicationNotFound
@@ -131,35 +97,36 @@ func (r *RegistryRPC) SetApplication(ctx context.Context, req *ttnpb.SetApplicat
 		return nil, err
 	}
 
-	if notFound {
-		_, err := r.Interface.Create(&req.Application, fields...)
-		if err == nil {
-			events.Publish(evtCreateApplication(ctx, req.Application.ApplicationIdentifiers, nil))
+	setApp := &req.Application
+	if r.setApplicationProcessor != nil {
+		setApp, fields, err = r.setApplicationProcessor(ctx, notFound, setApp, fields...)
+		if err != nil && errors.GetType(err) != errors.Unknown {
+			return nil, err
+		} else if err != nil {
+			return nil, common.ErrProcessorFailed.NewWithCause(nil, err)
 		}
-		return ttnpb.Empty, err
 	}
-	app.Application = &req.Application
+
+	if notFound {
+		_, err := r.Interface.Create(setApp, fields...)
+		if err == nil {
+			events.Publish(evtCreateApplication(ctx, setApp.ApplicationIdentifiers, nil))
+		}
+		return setApp, err
+	}
+	app.Application = setApp
 
 	if err = app.Store(fields...); err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateApplication(ctx, req.Application.ApplicationIdentifiers, req.FieldMask))
-	return ttnpb.Empty, nil
+	events.Publish(evtUpdateApplication(ctx, setApp.ApplicationIdentifiers, req.FieldMask))
+	return setApp, nil
 }
 
 // DeleteApplication deletes the application associated with id from underlying registry.
 func (r *RegistryRPC) DeleteApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireApplication(ctx, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
-	}
-
-	if r.checks.DeleteApplication != nil {
-		if err := r.checks.DeleteApplication(ctx, id); err != nil {
-			if errors.GetType(err) != errors.Unknown {
-				return nil, err
-			}
-			return nil, common.ErrCheckFailed.NewWithCause(nil, err)
-		}
 	}
 
 	app, err := FindByIdentifiers(r.Interface, id)

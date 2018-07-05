@@ -46,14 +46,19 @@ func TestRegistryRPC(t *testing.T) {
 		ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 	})
 
-	_, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *pb})
+	dev, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
+	a.So(dev, should.BeNil)
 
-	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
+	dev, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
+	pb.CreatedAt = dev.GetCreatedAt()
+	pb.UpdatedAt = dev.GetUpdatedAt()
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	a.So(v, should.Equal, ttnpb.Empty)
+	if !a.So(dev, should.Resemble, pb) {
+		pretty.Ldiff(t, dev, pb)
+	}
 
 	devs, err := dr.ListDevices(context.Background(), &pb.EndDeviceIdentifiers)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -68,7 +73,7 @@ func TestRegistryRPC(t *testing.T) {
 	_, err = dr.DeleteDevice(context.Background(), &pb.EndDeviceIdentifiers)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
-	v, err = dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
+	v, err := dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -82,7 +87,7 @@ func TestRegistryRPC(t *testing.T) {
 	a.So(devs.EndDevices, should.BeEmpty)
 }
 
-func TestSetDeviceNoCheck(t *testing.T) {
+func TestSetDeviceNoProcessor(t *testing.T) {
 	a := assertions.New(t)
 	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
@@ -95,9 +100,13 @@ func TestSetDeviceNoCheck(t *testing.T) {
 	_, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
-	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
+	dev, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(err, should.BeNil)
-	a.So(v, should.Equal, ttnpb.Empty)
+	pb.CreatedAt = dev.GetCreatedAt()
+	pb.UpdatedAt = dev.GetUpdatedAt()
+	if !a.So(dev, should.Resemble, pb) {
+		pretty.Ldiff(t, dev, pb)
+	}
 
 	old := deepcopy.Copy(pb).(*ttnpb.EndDevice)
 
@@ -105,14 +114,18 @@ func TestSetDeviceNoCheck(t *testing.T) {
 		pb.Location = ttnpb.NewPopulatedLocation(test.Randy, false)
 	}
 
-	v, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{
+	dev, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{
 		Device: *pb,
 		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{"location.latitude"},
 		},
 	})
 	a.So(err, should.BeNil)
-	a.So(v, should.Equal, ttnpb.Empty)
+	pb.CreatedAt = dev.GetCreatedAt()
+	pb.UpdatedAt = dev.GetUpdatedAt()
+	if !a.So(dev, should.Resemble, pb) {
+		pretty.Ldiff(t, dev, pb)
+	}
 
 	if old.Location == nil {
 		old.Location = &ttnpb.Location{}
@@ -133,12 +146,12 @@ func TestSetDeviceNoCheck(t *testing.T) {
 		t.FailNow()
 	}
 
-	v, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
+	dev, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(err, should.DescribeError, ErrTooManyDevices)
-	a.So(v, should.BeNil)
+	a.So(dev, should.BeNil)
 }
 
-func TestListDevicesNoCheck(t *testing.T) {
+func TestListDevices(t *testing.T) {
 	a := assertions.New(t)
 	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
@@ -171,7 +184,7 @@ func TestListDevicesNoCheck(t *testing.T) {
 	}
 }
 
-func TestGetDeviceNoCheck(t *testing.T) {
+func TestGetDevice(t *testing.T) {
 	a := assertions.New(t)
 	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
@@ -206,7 +219,7 @@ func TestGetDeviceNoCheck(t *testing.T) {
 	a.So(v, should.BeNil)
 }
 
-func TestDeleteDeviceNoCheck(t *testing.T) {
+func TestDeleteDevice(t *testing.T) {
 	a := assertions.New(t)
 	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
@@ -248,7 +261,7 @@ func TestDeleteDeviceNoCheck(t *testing.T) {
 	a.So(v, should.BeNil)
 }
 
-func TestCheck(t *testing.T) {
+func TesSetDeviceProcessor(t *testing.T) {
 	errTest := &removetheseerrors.ErrDescriptor{
 		MessageFormat: "Test",
 		Type:          removetheseerrors.Internal,
@@ -256,13 +269,15 @@ func TestCheck(t *testing.T) {
 	}
 	errTest.Register()
 
-	var checkErr error
+	var procErr error
 
 	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())),
-		WithListDevicesCheck(func(context.Context, *ttnpb.EndDeviceIdentifiers) error { return checkErr }),
-		WithGetDeviceCheck(func(context.Context, *ttnpb.EndDeviceIdentifiers) error { return checkErr }),
-		WithSetDeviceCheck(func(context.Context, *ttnpb.EndDevice, ...string) error { return checkErr }),
-		WithDeleteDeviceCheck(func(context.Context, *ttnpb.EndDeviceIdentifiers) error { return checkErr }),
+		WithSetDeviceProcessor(func(_ context.Context, _ bool, dev *ttnpb.EndDevice, fields ...string) (*ttnpb.EndDevice, []string, error) {
+			if procErr != nil {
+				return nil, nil, procErr
+			}
+			return dev, fields, nil
+		}),
 	)).(*RegistryRPC)
 
 	ctx := rights.NewContext(context.Background(), []ttnpb.Right{
@@ -271,92 +286,22 @@ func TestCheck(t *testing.T) {
 
 	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
-	t.Run("SetDevice", func(t *testing.T) {
-		a := assertions.New(t)
+	a := assertions.New(t)
 
-		checkErr = removetheseerrors.New("err")
-		v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
-		a.So(err, should.DescribeError, common.ErrCheckFailed)
-		a.So(v, should.BeNil)
+	procErr = removetheseerrors.New("err")
+	dev, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
+	a.So(err, should.DescribeError, common.ErrProcessorFailed)
+	a.So(dev, should.BeNil)
 
-		checkErr = errTest.New(nil)
-		v, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
-		a.So(err, should.Equal, checkErr)
-		a.So(v, should.BeNil)
+	procErr = errTest.New(nil)
+	dev, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
+	a.So(err, should.Equal, procErr)
+	a.So(dev, should.BeNil)
 
-		checkErr = nil
-		v, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
-		a.So(err, should.BeNil)
-		a.So(v, should.NotBeNil)
-	})
-
-	if !t.Run("GetDevice", func(t *testing.T) {
-		a := assertions.New(t)
-
-		checkErr = removetheseerrors.New("err")
-		ret, err := dr.GetDevice(ctx, &pb.EndDeviceIdentifiers)
-		a.So(err, should.DescribeError, common.ErrCheckFailed)
-		a.So(ret, should.BeNil)
-
-		checkErr = errTest.New(nil)
-		ret, err = dr.GetDevice(ctx, &pb.EndDeviceIdentifiers)
-		a.So(err, should.Equal, checkErr)
-		a.So(ret, should.BeNil)
-
-		checkErr = nil
-		ret, err = dr.GetDevice(ctx, &pb.EndDeviceIdentifiers)
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
-		}
-		ret.CreatedAt = pb.GetCreatedAt()
-		ret.UpdatedAt = pb.GetUpdatedAt()
-		a.So(pretty.Diff(ret, pb), should.BeEmpty)
-	}) {
-		t.FailNow()
-	}
-
-	t.Run("ListDevices", func(t *testing.T) {
-		a := assertions.New(t)
-
-		checkErr = removetheseerrors.New("err")
-		devs, err := dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
-		a.So(err, should.DescribeError, common.ErrCheckFailed)
-		a.So(devs, should.BeNil)
-
-		checkErr = errTest.New(nil)
-		devs, err = dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
-		a.So(err, should.Equal, checkErr)
-		a.So(devs, should.BeNil)
-
-		checkErr = nil
-		devs, err = dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
-		a.So(err, should.BeNil)
-		if a.So(devs, should.NotBeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
-			devs.EndDevices[0].CreatedAt = pb.GetCreatedAt()
-			devs.EndDevices[0].UpdatedAt = pb.GetUpdatedAt()
-			a.So(pretty.Diff(devs.EndDevices[0], pb), should.BeEmpty)
-		}
-	})
-
-	t.Run("DeleteDevice", func(t *testing.T) {
-		a := assertions.New(t)
-
-		checkErr = removetheseerrors.New("err")
-		_, err := dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
-		a.So(err, should.DescribeError, common.ErrCheckFailed)
-
-		checkErr = errTest.New(nil)
-		_, err = dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
-		a.So(err, should.Equal, checkErr)
-
-		checkErr = nil
-		_, err = dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
-		a.So(err, should.BeNil)
-
-		devs, err := dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
-		a.So(err, should.BeNil)
-		if a.So(devs, should.NotBeNil) {
-			a.So(devs.EndDevices, should.BeEmpty)
-		}
-	})
+	procErr = nil
+	dev, err = dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
+	a.So(err, should.BeNil)
+	pb.CreatedAt = dev.GetCreatedAt()
+	pb.UpdatedAt = dev.GetUpdatedAt()
+	a.So(dev, should.Resemble, pb)
 }

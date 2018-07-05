@@ -36,12 +36,7 @@ type RegistryRPC struct {
 	Interface
 	*component.Component
 
-	checks struct {
-		ListDevices  func(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) error
-		GetDevice    func(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) error
-		SetDevice    func(ctx context.Context, dev *ttnpb.EndDevice, fields ...string) error
-		DeleteDevice func(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) error
-	}
+	setDeviceProcessor func(ctx context.Context, create bool, dev *ttnpb.EndDevice, fields ...string) (*ttnpb.EndDevice, []string, error)
 
 	servedComponents []ttnpb.PeerInfo_Role
 }
@@ -49,37 +44,17 @@ type RegistryRPC struct {
 // RPCOption represents RegistryRPC option
 type RPCOption func(*RegistryRPC)
 
-// WithListDevicesCheck sets a check to ListDevices method of RegistryRPC instance.
-// ListDevices first executes fn and if error is returned by it,
-// returns error, otherwise execution advances as usual.
-func WithListDevicesCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) RPCOption {
-	return func(r *RegistryRPC) { r.checks.ListDevices = fn }
-}
-
-// WithGetDeviceCheck sets a check to GetDevice method of RegistryRPC instance.
-// GetDevice first executes fn and if error is returned by it,
-// returns error, otherwise execution advances as usual.
-func WithGetDeviceCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) RPCOption {
-	return func(r *RegistryRPC) { r.checks.GetDevice = fn }
-}
-
-// WithSetDeviceCheck sets a check to SetDevice method of RegistryRPC instance.
-// SetDevice first executes fn and if error is returned by it,
-// returns error, otherwise execution advances as usual.
-func WithSetDeviceCheck(fn func(context.Context, *ttnpb.EndDevice, ...string) error) RPCOption {
-	return func(r *RegistryRPC) { r.checks.SetDevice = fn }
-}
-
-// WithDeleteDeviceCheck sets a check to DeleteDevice method of RegistryRPC instance.
-// DeleteDevice first executes fn and if error is returned by it,
-// returns error, otherwise execution advances as usual.
-func WithDeleteDeviceCheck(fn func(context.Context, *ttnpb.EndDeviceIdentifiers) error) RPCOption {
-	return func(r *RegistryRPC) { r.checks.DeleteDevice = fn }
-}
-
 // ForComponents takes in parameter the components that this device registry RPC will serve for.
 func ForComponents(components ...ttnpb.PeerInfo_Role) RPCOption {
 	return func(r *RegistryRPC) { r.servedComponents = append(r.servedComponents, components...) }
+}
+
+// WithSetDeviceProcessor sets a function, which checks and processes the device and fields,
+// which are about to be passed to SetDevice method of RegistryRPC instance.
+// After a successful search, SetDevice executes fn on the found value before creating or updating the device in the registry.
+// If fn returns error, SetDevice returns it without modifying the registry.
+func WithSetDeviceProcessor(fn func(context.Context, bool, *ttnpb.EndDevice, ...string) (*ttnpb.EndDevice, []string, error)) RPCOption {
+	return func(r *RegistryRPC) { r.setDeviceProcessor = fn }
 }
 
 // NewRPC returns a new instance of RegistryRPC
@@ -114,15 +89,6 @@ func (r *RegistryRPC) ListDevices(ctx context.Context, filter *ttnpb.EndDeviceId
 		return nil, err
 	}
 
-	if r.checks.ListDevices != nil {
-		if err := r.checks.ListDevices(ctx, filter); err != nil {
-			if errors.GetType(err) != errors.Unknown {
-				return nil, err
-			}
-			return nil, common.ErrCheckFailed.NewWithCause(nil, err)
-		}
-	}
-
 	eds := make([]*ttnpb.EndDevice, 0, defaultListCount)
 	if err := RangeByIdentifiers(r.Interface, filter, defaultListCount, func(dev *Device) bool {
 		eds = append(eds, dev.EndDevice)
@@ -139,15 +105,6 @@ func (r *RegistryRPC) GetDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifi
 		return nil, err
 	}
 
-	if r.checks.GetDevice != nil {
-		if err := r.checks.GetDevice(ctx, id); err != nil {
-			if errors.GetType(err) != errors.Unknown {
-				return nil, err
-			}
-			return nil, common.ErrCheckFailed.NewWithCause(nil, err)
-		}
-	}
-
 	dev, err := FindByIdentifiers(r.Interface, id)
 	if err != nil {
 		return nil, err
@@ -156,7 +113,7 @@ func (r *RegistryRPC) GetDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifi
 }
 
 // SetDevice sets the device fields to match those of req.Device in underlying registry.
-func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest) (*pbtypes.Empty, error) {
+func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest) (*ttnpb.EndDevice, error) {
 	if err := rights.RequireApplication(ctx, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
@@ -165,14 +122,6 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 	if req.FieldMask != nil {
 		fields = gogoproto.GoFieldsPaths(req.FieldMask, req.Device)
 	}
-	if r.checks.SetDevice != nil {
-		if err := r.checks.SetDevice(ctx, &req.Device, fields...); err != nil {
-			if errors.GetType(err) != errors.Unknown {
-				return nil, err
-			}
-			return nil, common.ErrCheckFailed.NewWithCause(nil, err)
-		}
-	}
 
 	dev, err := FindByIdentifiers(r.Interface, &req.Device.EndDeviceIdentifiers)
 	notFound := errors.Descriptor(err) == ErrDeviceNotFound
@@ -180,20 +129,31 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 		return nil, err
 	}
 
-	if notFound {
-		_, err := r.Interface.Create(&req.Device, fields...)
-		if err == nil {
-			events.Publish(evtCreateDevice(ctx, req.Device.EndDeviceIdentifiers, nil))
+	setDev := &req.Device
+	if r.setDeviceProcessor != nil {
+		setDev, fields, err = r.setDeviceProcessor(ctx, notFound, setDev, fields...)
+		if err != nil && errors.GetType(err) != errors.Unknown {
+			return nil, err
+		} else if err != nil {
+			return nil, common.ErrProcessorFailed.NewWithCause(nil, err)
 		}
-		return ttnpb.Empty, err
 	}
-	dev.EndDevice = &req.Device
 
+	if notFound {
+		dev, err := r.Interface.Create(setDev, fields...)
+		if err != nil {
+			return nil, err
+		}
+		events.Publish(evtCreateDevice(ctx, setDev.EndDeviceIdentifiers, nil))
+		return dev.EndDevice, nil
+	}
+
+	dev.EndDevice = setDev
 	if err = dev.Store(fields...); err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateDevice(ctx, req.Device.EndDeviceIdentifiers, req.FieldMask))
-	return ttnpb.Empty, nil
+	events.Publish(evtUpdateDevice(ctx, setDev.EndDeviceIdentifiers, fields))
+	return dev.EndDevice, nil
 }
 
 // DeleteDevice deletes the device associated with id from underlying registry.
@@ -202,19 +162,11 @@ func (r *RegistryRPC) DeleteDevice(ctx context.Context, id *ttnpb.EndDeviceIdent
 		return nil, err
 	}
 
-	if r.checks.DeleteDevice != nil {
-		if err := r.checks.DeleteDevice(ctx, id); err != nil {
-			if errors.GetType(err) != errors.Unknown {
-				return nil, err
-			}
-			return nil, common.ErrCheckFailed.NewWithCause(nil, err)
-		}
-	}
-
 	dev, err := FindByIdentifiers(r.Interface, id)
 	if err != nil {
 		return nil, err
 	}
+
 	if err = dev.Delete(); err != nil {
 		return nil, err
 	}

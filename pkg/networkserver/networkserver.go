@@ -271,7 +271,46 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		opt(ns)
 	}
 
-	registryRPC, err := deviceregistry.NewRPC(c, conf.Registry, deviceregistry.ForComponents(ttnpb.PeerInfo_NETWORK_SERVER)) // TODO: Add checks https://github.com/TheThingsIndustries/ttn/issues/558
+	registryRPC, err := deviceregistry.NewRPC(
+		c,
+		conf.Registry,
+		deviceregistry.ForComponents(ttnpb.PeerInfo_NETWORK_SERVER),
+		deviceregistry.WithSetDeviceProcessor(func(_ context.Context, create bool, dev *ttnpb.EndDevice, fields ...string) (*ttnpb.EndDevice, []string, error) {
+			if !create {
+				// TODO
+				return dev, fields, nil
+			}
+
+			// TODO: Add checks https://github.com/TheThingsIndustries/ttn/issues/558
+			if len(dev.RecentDownlinks) > 0 || len(dev.RecentUplinks) > 0 {
+				return nil, errors.New("trying to override internal field")
+			}
+
+			if err := resetMACState(ns.Component.FrequencyPlans); err != nil {
+				return nil, nil, err
+			}
+
+			if dev.MACSettings == nil {
+				dev.MACSettings = &ttnpb.MACSettings{
+					ADR: true,
+				}
+			}
+
+			if dev.ABP {
+				dev.Session = &ttnpb.Session{}
+			}
+
+			if len(fields) == nil {
+				return dev, nil
+			}
+			return dev, append(fields,
+				"MACInfo",
+				"MACSettings",
+				"MACState",
+				"MACStateDesired",
+			)
+		}),
+	)
 	if err != nil {
 		return nil, errDeviceRegistryInitialize.WithCause(err)
 	}
