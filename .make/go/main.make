@@ -129,12 +129,12 @@ go.min-version:
 		exit 1; \
 	fi
 
-DEP_FLAGS ?= $(if $(CI),-vendor-only,)
+DEP_FLAGS ?= -v
 
 # install dependencies
 go.deps:
 	@$(log) "Installing go dependencies"
-	@dep ensure -v $(DEP_FLAGS)
+	@dep ensure $(DEP_FLAGS)
 
 # clean build files
 go.clean:
