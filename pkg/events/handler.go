@@ -29,3 +29,17 @@ func (f handlerFunc) Notify(evt Event) { f.handler(evt) }
 func HandlerFunc(handler func(Event)) Handler {
 	return &handlerFunc{handler}
 }
+
+// Channel is a channel of Events that can be used as an event handler.
+// The channel should be buffered, events will be dropped if the channel blocks.
+// It is typically not safe to close this channel until you're absolutely sure
+// that it is no longer registered as an event handler.
+type Channel chan Event
+
+// Notify implements the Handler interface.
+func (ch Channel) Notify(evt Event) {
+	select {
+	case ch <- evt:
+	default:
+	}
+}

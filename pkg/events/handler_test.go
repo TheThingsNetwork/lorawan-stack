@@ -33,3 +33,22 @@ func ExampleHandlerFunc() {
 
 	// Note that in-transit events may still be delivered after Unsubscribe returns.
 }
+
+func ExampleChannel() {
+	eventChan := make(events.Channel, 16)
+
+	go func() {
+		for e := range eventChan {
+			fmt.Printf("Received event %v\n", e)
+		}
+	}()
+
+	events.Subscribe("example", eventChan)
+
+	// From this moment on, "example" events will be delivered to the channel.
+
+	events.Unsubscribe("example", eventChan)
+
+	// Note that in-transit events may still be delivered after Unsubscribe returns.
+	// This means that you can't immediately close the channel after unsubscribing.
+}
