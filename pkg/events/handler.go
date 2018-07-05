@@ -14,6 +14,8 @@
 
 package events
 
+import "context"
+
 // Handler interface for event listeners.
 type Handler interface {
 	Notify(Event)
@@ -41,5 +43,21 @@ func (ch Channel) Notify(evt Event) {
 	select {
 	case ch <- evt:
 	default:
+	}
+}
+
+// ContextHandler delivers events to the Handler as long as ctx.Err() is non-nil.
+func ContextHandler(ctx context.Context, handler Handler) Handler {
+	return &contextHandler{Context: ctx, Handler: handler}
+}
+
+type contextHandler struct {
+	context.Context
+	Handler
+}
+
+func (hdl contextHandler) Notify(evt Event) {
+	if hdl.Err() == nil {
+		hdl.Handler.Notify(evt)
 	}
 }

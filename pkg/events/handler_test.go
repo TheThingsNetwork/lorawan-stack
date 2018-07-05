@@ -15,6 +15,7 @@
 package events_test
 
 import (
+	"context"
 	"fmt"
 
 	"go.thethings.network/lorawan-stack/pkg/events"
@@ -35,7 +36,13 @@ func ExampleHandlerFunc() {
 }
 
 func ExampleChannel() {
-	eventChan := make(events.Channel, 16)
+	eventChan := make(events.Channel, 2)
+
+	events.Subscribe("example", eventChan)
+
+	// From this moment on, "example" events will be delivered to the channel.
+	// As soon as the channel is full, events will be dropped, so it's probably a
+	// good idea to start handling the channel before subscribing.
 
 	go func() {
 		for e := range eventChan {
@@ -43,12 +50,41 @@ func ExampleChannel() {
 		}
 	}()
 
-	events.Subscribe("example", eventChan)
-
-	// From this moment on, "example" events will be delivered to the channel.
-
+	// Later:
 	events.Unsubscribe("example", eventChan)
 
 	// Note that in-transit events may still be delivered after Unsubscribe returns.
 	// This means that you can't immediately close the channel after unsubscribing.
+}
+
+func ExampleContextHandler() {
+	// Usually the context comes from somewhere else (e.g. a streaming RPC):
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	eventChan := make(events.Channel, 2)
+	handler := events.ContextHandler(ctx, eventChan)
+
+	events.Subscribe("example", handler)
+
+	// From this moment on, "example" events will be delivered to the channel.
+	// As soon as the channel is full, events will be dropped, so it's probably a
+	// good idea to start handling the channel before subscribing.
+
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				// Don't forget to unsubscribe:
+				events.Unsubscribe("example", handler)
+
+				// The ContextHandler will make sure that no events are delivered after
+				// the context is canceled, so it is now safe to close the channel:
+				close(eventChan)
+				return
+			case e := <-eventChan:
+				fmt.Printf("Received event %v\n", e)
+			}
+		}
+	}()
 }
