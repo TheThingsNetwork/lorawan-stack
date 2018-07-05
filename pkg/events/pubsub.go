@@ -39,6 +39,8 @@ type Subscriber interface {
 	// The handler must be non-blocking.
 	Subscribe(name string, hdl Handler) error
 	// Unsubscribe removes an event handler from the default event pubsub.
+	// Queued or in-transit events may still be delivered to the handler
+	// even after Unsubscribe returns.
 	Unsubscribe(name string, hdl Handler)
 }
 
