@@ -150,7 +150,9 @@ func (m MessageDescriptorMap) Define(id, message string) *MessageDescriptor {
 
 // Define a message in the global registry.
 func Define(id, message string) *MessageDescriptor {
-	return Global.Define(id, message)
+	d := Global.Define(id, message)
+	d.SetSource(2)
+	return d
 }
 
 // Merge messages from the given descriptor map into the current registry.
