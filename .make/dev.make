@@ -21,7 +21,7 @@ DEV_REDIS_DATA_PATH ?= $(DEV_DB_DATA_PATH)/redis
 # Path to the Docker binary to be used
 DOCKER_BINARY ?= docker
 
-DEV_COCKROACH_IMAGE = cockroachdb/cockroach:v2.0.1
+DEV_COCKROACH_IMAGE = cockroachdb/cockroach:v2.0.3
 DEV_REDIS_IMAGE = redis:4.0-alpine
 
 db_docker_prefix = ttn-lw-devdb
