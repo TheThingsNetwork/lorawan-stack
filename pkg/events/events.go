@@ -68,7 +68,7 @@ var IncludeCaller bool
 func (e *event) withCaller() *event {
 	if IncludeCaller && e.innerEvent.Caller == "" {
 		if _, file, line, ok := runtime.Caller(2); ok {
-			split := strings.SplitAfter(file, "ttn/")
+			split := strings.SplitAfter(file, "lorawan-stack/")
 			if len(split) > 1 {
 				file = split[1]
 			}
