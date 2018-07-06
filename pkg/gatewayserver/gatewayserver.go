@@ -175,7 +175,7 @@ func (gs *GatewayServer) getGateway(ctx context.Context, id *ttnpb.GatewayIdenti
 
 func (gs *GatewayServer) checkAuthorization(ctx context.Context, right ttnpb.Right) error {
 	md := rpcmetadata.FromIncomingContext(ctx)
-	md.AllowInsecure = gs.Component.AllowInsecureRPCs()
+	md.AllowInsecure = gs.Component.AllowInsecureForCredentials()
 
 	if md.AuthType == "" || md.AuthValue == "" {
 		return errNoCredentialsPassed

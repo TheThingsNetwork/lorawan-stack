@@ -21,7 +21,6 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
@@ -101,8 +100,8 @@ func TestLink(t *testing.T) {
 			FrequencyPlans: config.FrequencyPlans{
 				StoreDirectory: store.Directory(),
 			},
-			Rights: rights.Config{
-				AllowInsecure: true,
+			GRPC: config.GRPC{
+				AllowInsecureForCredentials: true,
 			},
 		},
 	})

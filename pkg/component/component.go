@@ -229,7 +229,11 @@ func (c *Component) Close() {
 // RightsHook returns the hook that preload rights in the context based an authorization value.
 func (c *Component) RightsHook() (*rights.Hook, error) {
 	if c.rightsHook == nil {
-		hook, err := rights.New(c.ctx, rightsFetchingConnector{Component: c}, c.config.Rights)
+		config := rights.Config{
+			AllowInsecure: c.config.GRPC.AllowInsecureForCredentials,
+			Rights:        c.config.Rights,
+		}
+		hook, err := rights.New(c.ctx, rightsFetchingConnector{Component: c}, config)
 		if err != nil {
 			return nil, errors.NewWithCause(err, "Could not initialize rights hook")
 		}
@@ -239,7 +243,8 @@ func (c *Component) RightsHook() (*rights.Hook, error) {
 	return c.rightsHook, nil
 }
 
-// AllowInsecureRPCs returns `true` if the component was configured to allow connection over insecure protocols.
-func (c *Component) AllowInsecureRPCs() bool {
-	return c.config.Rights.AllowInsecure
+// AllowCredentialsOverInsecureRPCs returns `true` if the component was configured to allow transmission of credentials
+// over insecure protocols.
+func (c *Component) AllowInsecureForCredentials() bool {
+	return c.config.GRPC.AllowInsecureForCredentials
 }

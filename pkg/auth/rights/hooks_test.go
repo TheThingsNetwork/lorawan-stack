@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	. "go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store/sql"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
@@ -175,8 +176,8 @@ func TestUnaryHook(t *testing.T) {
 			conn: conn,
 		},
 		Config{
-			TTL:           0,
 			AllowInsecure: true,
+			Rights:        config.Rights{TTL: 0},
 		},
 	)
 	if !a.So(err, should.BeNil) {

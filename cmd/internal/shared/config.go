@@ -18,7 +18,6 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/assets"
-	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/log"
 )
@@ -95,7 +94,7 @@ var DefaultFrequencyPlansConfig = config.FrequencyPlans{
 }
 
 // DefaultISRightsConfig is the default config to fetch rights from the Identity Server.
-var DefaultISRightsConfig = rights.Config{
+var DefaultISRightsConfig = config.Rights{
 	TTL: 2 * time.Minute,
 }
 

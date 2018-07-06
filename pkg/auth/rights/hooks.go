@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -53,13 +54,10 @@ type IdentityServerConnector interface {
 
 // Config is the type that configures the rights hook.
 type Config struct {
-	// TTL is the duration that entries will remain in the cache before being
-	// garbage collected.
-	TTL time.Duration `name:"ttl" description:"Validity of Identity Server responses"`
+	config.Rights
 
-	// AllowInsecure makes the hook not to use a transport security to send
-	// the credentials in gRPC calls to the Identity Server.
-	AllowInsecure bool `name:"allow-insecure" description:"Allow rights fetching over insecure transport"`
+	// AllowInsecure enables transmission of credentials over insecure connections.
+	AllowInsecure bool
 }
 
 // Hook implements a gRPC unary hook that preloads in the context the rights

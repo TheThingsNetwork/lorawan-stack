@@ -15,7 +15,8 @@
 package config
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"time"
+
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
@@ -60,6 +61,8 @@ type Cluster struct {
 
 // GRPC represents gRPC listener configuration.
 type GRPC struct {
+	AllowInsecureForCredentials bool `name:"allow-insecure-for-credentials" description:"Allow transmission of credentials over insecure transport"`
+
 	Listen    string `name:"listen" description:"Address for the TCP gRPC server to listen on"`
 	ListenTLS string `name:"listen-tls" description:"Address for the TLS gRPC server to listen on"`
 }
@@ -110,6 +113,13 @@ type Events struct {
 	Redis   Redis  `name:"redis"`
 }
 
+// Rights represents the configuration to apply when fetching entity rights.
+type Rights struct {
+	// TTL is the duration that entries will remain in the cache before being
+	// garbage collected.
+	TTL time.Duration `name:"ttl" description:"Validity of Identity Server responses"`
+}
+
 // ServiceBase represents base service configuration.
 type ServiceBase struct {
 	Base           `name:",squash"`
@@ -121,7 +131,7 @@ type ServiceBase struct {
 	TLS            TLS            `name:"tls"`
 	Sentry         Sentry         `name:"sentry"`
 	FrequencyPlans FrequencyPlans `name:"frequency-plans"`
-	Rights         rights.Config  `name:"rights"`
+	Rights         Rights         `name:"rights"`
 }
 
 // FrequencyPlans represents frequency plans fetching configuration.
