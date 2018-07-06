@@ -27,20 +27,20 @@ import (
 )
 
 func logFieldsForError(err error) (fieldsKV []interface{}) {
-	if err, ok := errors.From(err); ok {
-		fieldsKV = append(fieldsKV, "grpc_code", codes.Code(err.Code()))
-		if ns := err.Namespace(); ns != "" {
+	if ttnErr, ok := errors.From(err); ok {
+		fieldsKV = append(fieldsKV, "grpc_code", codes.Code(ttnErr.Code()))
+		if ns := ttnErr.Namespace(); ns != "" {
 			fieldsKV = append(fieldsKV, "error_namespace", ns)
 		}
-		if name := err.Name(); name != "" {
+		if name := ttnErr.Name(); name != "" {
 			fieldsKV = append(fieldsKV, "error_name", name)
 		}
-		if cid := err.CorrelationID(); cid != "" {
+		if cid := ttnErr.CorrelationID(); cid != "" {
 			fieldsKV = append(fieldsKV, "error_correlation_id", cid)
 		}
-	} else if err, ok := status.FromError(err); ok {
+	} else if status, ok := status.FromError(err); ok {
 		fieldsKV = append(fieldsKV,
-			"grpc_code", err.Code(),
+			"grpc_code", status.Code(),
 		)
 	}
 	return

@@ -159,8 +159,8 @@ func registerDropUplink(ctx context.Context, msg *ttnpb.UplinkMessage, err error
 	case ttnpb.MType_REJOIN_REQUEST:
 		events.Publish(evtDropRejoin(ctx, msg.EndDeviceIdentifiers, err))
 	}
-	if err, ok := errors.From(err); ok {
-		nsMetrics.uplinkDropped.WithLabelValues(ctx, mType(msg), err.String()).Inc()
+	if ttnErr, ok := errors.From(err); ok {
+		nsMetrics.uplinkDropped.WithLabelValues(ctx, mType(msg), ttnErr.String()).Inc()
 	} else {
 		nsMetrics.uplinkDropped.WithLabelValues(ctx, mType(msg), unknown).Inc()
 	}
