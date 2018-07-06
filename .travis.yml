@@ -25,6 +25,7 @@ script:
 - make go.fmt
 - if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make go.lint-travis || true; fi # only on pull requests
 - make headers.check
+- if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make messages; fi # only on pull requests
 - make dev.git-diff
 - GOARCH=amd64 TEST_SLOWDOWN=16 make test
 - if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then GOARCH=386 TEST_SLOWDOWN=16 make test; fi # only on pull requests
