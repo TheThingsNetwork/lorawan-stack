@@ -32,7 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/web"
 )
 
-var testErr = errors.DefineInternal("test", "Test error")
+var errTest = errors.DefineInternal("test", "test error")
 
 func TestErrors(t *testing.T) {
 	a := assertions.New(t)
@@ -52,7 +52,7 @@ func TestErrors(t *testing.T) {
 		middleware := as.Errors("error.html", nil)
 		group := s.Group("/error")
 		group.GET("", func(c echo.Context) error {
-			return testErr
+			return errTest
 		}, middleware)
 	}))
 
@@ -75,13 +75,13 @@ func TestErrors(t *testing.T) {
 				var returnErr errors.Error
 				err := returnErr.UnmarshalJSON(buf)
 				a.So(err, should.BeNil)
-				a.So(returnErr, should.HaveSameErrorDefinitionAs, testErr)
+				a.So(returnErr, should.HaveSameErrorDefinitionAs, errTest)
 			},
 		},
 		{
 			Accept: "text/plain",
 			Test: func(a *assertions.Assertion, buf []byte) {
-				a.So(string(buf), should.Equal, testErr.String())
+				a.So(string(buf), should.Equal, errTest.String())
 			},
 		},
 	} {

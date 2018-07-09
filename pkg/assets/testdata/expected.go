@@ -50,7 +50,7 @@ const ExpectedErrorTemplated = `<!doctype html>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1">
 	</head>
 	<body>
-		error:pkg/assets_test:test (Test error)
+		error:pkg/assets_test:test (test error)
 	</body>
 </html>
 `

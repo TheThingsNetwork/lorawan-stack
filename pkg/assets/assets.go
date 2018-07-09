@@ -72,7 +72,7 @@ func New(c *component.Component, config Config) (*Assets, error) {
 	}
 	if assets.fs == nil {
 		if config.CDN == "" {
-			return nil, ErrInvalidConfiguration
+			return nil, errInvalidConfiguration
 		}
 		logger = logger.WithField("cdn", config.CDN)
 	}
@@ -118,7 +118,7 @@ func (a *Assets) AppHandler(name string, env interface{}) echo.HandlerFunc {
 		t = templates.App
 		appData, ok := a.config.Apps[name]
 		if !ok {
-			err = ErrTemplateNotFound
+			err = errTemplateNotFound
 		} else {
 			data.Data = appData
 			data.Root = a.config.CDN
@@ -138,7 +138,7 @@ func (a *Assets) loadTemplate(name string) (*template.Template, error) {
 	f, err := a.fs.Open(name)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, ErrTemplateNotFound.WithCause(err)
+			return nil, errTemplateNotFound.WithCause(err)
 		}
 		return nil, err
 	}

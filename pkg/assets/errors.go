@@ -25,13 +25,9 @@ import (
 )
 
 var (
-	// ErrInvalidConfiguration is returned when the configuration is invalid.
-	ErrInvalidConfiguration = errors.DefineInvalidArgument("invalid_configuration", "invalid configuration")
-
-	// ErrTemplateNotFound is returned when the specified template could not be found.
-	ErrTemplateNotFound = errors.DefineNotFound("not_found", "template `{name}` not found", "name")
-
-	errHTTP = errors.Define("http_error", "HTTP error: {message}")
+	errInvalidConfiguration = errors.DefineInvalidArgument("invalid_configuration", "invalid configuration")
+	errTemplateNotFound     = errors.DefineNotFound("not_found", "template `{name}` not found", "name")
+	errHTTP                 = errors.Define("http_error", "HTTP error: {message}")
 )
 
 // Errors renders an error according to a negotiated content type.
