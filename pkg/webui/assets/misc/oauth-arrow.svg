@@ -1,1 +1,17 @@
-<svg width="14" height="667" xmlns="http://www.w3.org/2000/svg"><path d="M1.125 779.867V43.52l11.779-11.78L1.426 20.264V.583" stroke="#979797" fill="none" fill-rule="evenodd" opacity=".279"/></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="550px" viewBox="0 0 14 550" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>Path 2</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="11.9077141%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#979797" offset="0%"></stop>
+            <stop stop-color="#FFFFFF" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="TopTab-Nav" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.279241071">
+        <g id="Authorize" transform="translate(-1083.000000, -413.000000)" stroke="url(#linearGradient-1)">
+            <polyline id="Path-2" points="1084.125 962.132812 1084.125 456.519531 1095.90367 444.740862 1084.42606 433.263252 1084.42606 413.582546"></polyline>
+        </g>
+    </g>
+</svg>
