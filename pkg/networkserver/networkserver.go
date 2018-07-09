@@ -824,7 +824,8 @@ func (ns *NetworkServer) generateAndScheduleDownlink(ctx context.Context, dev *d
 		return ErrScheduleTooSoon.New(nil)
 
 	default:
-		dev.MACInfo.NextConfirmedDownlinkAt = time.Now().Add(classCTimeout).UTC()
+		t := time.Now().Add(classCTimeout).UTC()
+		dev.MACInfo.NextConfirmedDownlinkAt = &t
 	}
 
 	if mType == ttnpb.MType_CONFIRMED_DOWN {
