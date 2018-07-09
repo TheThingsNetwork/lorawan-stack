@@ -15,11 +15,13 @@
 package component
 
 import (
+	"crypto/subtle"
 	"net/http"
 	"net/http/pprof"
 	"strings"
 
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/metrics"
@@ -67,7 +69,11 @@ func (c *Component) listenWeb() (err error) {
 	}
 
 	if c.config.HTTP.PProf {
-		g := c.web.RootGroup("/debug/pprof") // TODO(#565): Add auth to pprof endpoints.
+		var middleware []echo.MiddlewareFunc
+		if c.config.HTTP.PProfPassword != "" {
+			middleware = append(middleware, c.basicAuth("pprof", c.config.HTTP.PProfPassword))
+		}
+		g := c.web.RootGroup("/debug/pprof", middleware...)
 		g.GET("", func(c echo.Context) error { return c.Redirect(http.StatusFound, c.Path()+"/") })
 		g.GET("/*", echo.WrapHandler(http.HandlerFunc(pprof.Index)))
 		g.GET("/profile", echo.WrapHandler(http.HandlerFunc(pprof.Profile)))
@@ -75,12 +81,33 @@ func (c *Component) listenWeb() (err error) {
 	}
 
 	if c.config.HTTP.Metrics {
-		g := c.web.RootGroup("/metrics") // TODO(#565): Add auth to metrics endpoints.
+		var middleware []echo.MiddlewareFunc
+		if c.config.HTTP.MetricsPassword != "" {
+			middleware = append(middleware, c.basicAuth("metrics", c.config.HTTP.MetricsPassword))
+		}
+		g := c.web.RootGroup("/metrics", middleware...)
 		g.GET("/", func(c echo.Context) error { return c.Redirect(http.StatusFound, strings.TrimSuffix(c.Path(), "/")) })
 		g.GET("", echo.WrapHandler(metrics.Exporter))
 	}
 
 	return nil
+}
+
+func (c *Component) basicAuth(username, password string) echo.MiddlewareFunc {
+	usernameBytes, passwordBytes := []byte(username), []byte(password)
+	return middleware.BasicAuth(func(username string, password string, ctx echo.Context) (bool, error) {
+		usernameCompare := subtle.ConstantTimeCompare([]byte(username), usernameBytes)
+		passwordCompare := subtle.ConstantTimeCompare([]byte(password), passwordBytes)
+		if usernameCompare != 1 || passwordCompare != 1 {
+			c.Logger().WithFields(log.Fields(
+				"namespace", "web",
+				"url", ctx.Path(),
+				"remote_addr", ctx.RealIP(),
+			)).Warn("Basic auth failed")
+			return false, nil
+		}
+		return true, nil
+	})
 }
 
 func (c *Component) ServeHTTP(w http.ResponseWriter, r *http.Request) {

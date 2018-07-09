@@ -75,11 +75,13 @@ type Cookie struct {
 
 // HTTP represents the HTTP and HTTPS server configuration.
 type HTTP struct {
-	Listen    string `name:"listen" description:"Address for the HTTP server to listen on"`
-	ListenTLS string `name:"listen-tls" description:"Address for the HTTPS server to listen on"`
-	Cookie    Cookie `name:"cookie"`
-	PProf     bool   `name:"pprof" description:"Expose pprof over HTTP"`
-	Metrics   bool   `name:"metrics" description:"Expose metrics over HTTP"`
+	Listen          string `name:"listen" description:"Address for the HTTP server to listen on"`
+	ListenTLS       string `name:"listen-tls" description:"Address for the HTTPS server to listen on"`
+	Cookie          Cookie `name:"cookie"`
+	PProf           bool   `name:"pprof" description:"Expose pprof over HTTP"`
+	PProfPassword   string `name:"pprof-password" description:"Password to protect pprof endpoint (username is pprof)"`
+	Metrics         bool   `name:"metrics" description:"Expose metrics over HTTP"`
+	MetricsPassword string `name:"metrics-password" description:"Password to protect metrics endpoint (username is metrics)"`
 }
 
 // Redis represents Redis configuration.

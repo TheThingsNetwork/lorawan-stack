@@ -65,6 +65,12 @@
   revision = "59c0560478b705bf9bd12f9252224a0fad7c87df"
 
 [[projects]]
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
+
+[[projects]]
   name = "github.com/eclipse/paho.mqtt.golang"
   packages = [
     ".",
@@ -190,10 +196,10 @@
   revision = "e9c5d9645c437ab1b204cff969a2c0fb16cd4276"
 
 [[projects]]
+  branch = "master"
   name = "github.com/grpc-ecosystem/go-grpc-prometheus"
   packages = ["."]
   revision = "c225b8c3b01faf2899099b768856a9e916e5087b"
-  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
@@ -266,15 +272,20 @@
 
 [[projects]]
   name = "github.com/labstack/echo"
-  packages = ["."]
+  packages = [
+    ".",
+    "middleware"
+  ]
   revision = "6d227dfea4d2e52cb76856120b3c17f758139b4e"
   version = "3.3.5"
 
 [[projects]]
   name = "github.com/labstack/gommon"
   packages = [
+    "bytes",
     "color",
-    "log"
+    "log",
+    "random"
   ]
   revision = "d6898124de917583f5ff5592ef931d1dfe0ddc05"
   version = "0.2.6"
@@ -697,6 +708,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "5ef6053970269da2e2d7c190c7be247c1e4e5ddb60132dc7e87e83793dcebe0e"
+  inputs-digest = "97380684d102f26b6dea883595ddeb24f95dead3797a63d25ec344fdca138ffa"
   solver-name = "gps-cdcl"
   solver-version = 1
