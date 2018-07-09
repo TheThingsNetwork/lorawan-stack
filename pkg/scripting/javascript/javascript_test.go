@@ -19,7 +19,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/scripting"
 	. "go.thethings.network/lorawan-stack/pkg/scripting/javascript"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -59,7 +59,6 @@ func TestRunError(t *testing.T) {
 	e := New(scripting.DefaultOptions)
 	_, err := e.Run(ctx, script, nil)
 	a.So(err, should.NotBeNil)
-	a.So(errors.GetType(err), should.Equal, errors.External)
 }
 
 func TestRunStackOverflow(t *testing.T) {
@@ -95,6 +94,5 @@ func TestRunTimeout(t *testing.T) {
 	e := New(scripting.DefaultOptions)
 	_, err := e.Run(ctx, script, nil)
 	a.So(err, should.NotBeNil)
-	a.So(errors.GetCode(err), should.Equal, scripting.ErrRuntime.Code)
-	a.So(errors.GetType(errors.Cause(err)), should.Equal, errors.Timeout)
+	a.So(errors.IsDeadlineExceeded(errors.Cause(err)), should.BeTrue)
 }
