@@ -307,21 +307,16 @@ type UplinkHandler interface {
 	HandleUplink(context.Context, *ttnpb.UplinkMessage) (*pbtypes.Empty, error)
 }
 
-func sendUplinkDuplicates(t *testing.T, h UplinkHandler, windowEndCh chan windowEnd, ctx context.Context, msg *ttnpb.UplinkMessage, n int, waitForFirst bool) ([]*ttnpb.RxMetadata, <-chan error) {
+func sendUplinkDuplicates(t *testing.T, h UplinkHandler, windowEndCh chan windowEnd, ctx context.Context, msg *ttnpb.UplinkMessage, n int) []*ttnpb.RxMetadata {
 	t.Helper()
 
 	a := assertions.New(t)
-	msg = deepcopy.Copy(msg).(*ttnpb.UplinkMessage)
-
-	errch := make(chan error, 1)
-	go func(msg *ttnpb.UplinkMessage) {
-		_, err := h.HandleUplink(ctx, msg)
-		errch <- err
-	}(deepcopy.Copy(msg).(*ttnpb.UplinkMessage))
 
 	var weCh chan<- time.Time
 	select {
 	case we := <-windowEndCh:
+		msg := deepcopy.Copy(msg).(*ttnpb.UplinkMessage)
+
 		a.So(we.msg.ReceivedAt, should.HappenBefore, time.Now())
 		msg.ReceivedAt = we.msg.ReceivedAt
 
@@ -330,69 +325,62 @@ func sendUplinkDuplicates(t *testing.T, h UplinkHandler, windowEndCh chan window
 
 		a.So(we.msg, should.Resemble, msg)
 		a.So(we.ctx, ttnshould.HaveParentContext, ctx)
+
 		weCh = we.ch
 
 	case <-time.After(Timeout):
-		select {
-		case err := <-errch:
-			t.Fatalf("Error processing first message: %s", err)
+		t.Fatal("Timed out while waiting for window end request to arrive")
+		return nil
+	}
 
-		default:
-			t.Fatal("Timed out while waiting for first message to arrive")
+	mdCh := make(chan *ttnpb.RxMetadata, n)
+	if !t.Run("duplicates", func(t *testing.T) {
+		a := assertions.New(t)
+
+		wg := &sync.WaitGroup{}
+		wg.Add(n)
+
+		for i := 0; i < n; i++ {
+			go func() {
+				defer wg.Done()
+
+				msg := deepcopy.Copy(msg).(*ttnpb.UplinkMessage)
+
+				msg.RxMetadata = nil
+				n := rand.Intn(10)
+				for i := 0; i < n; i++ {
+					md := ttnpb.NewPopulatedRxMetadata(test.Randy, false)
+					msg.RxMetadata = append(msg.RxMetadata, md)
+					mdCh <- md
+				}
+
+				_, err := h.HandleUplink(ctx, msg)
+				a.So(err, should.BeNil)
+			}()
 		}
-	}
 
-	mdCh := make(chan *ttnpb.RxMetadata)
-
-	wg := &sync.WaitGroup{}
-	wg.Add(n)
-
-	for i := 0; i < n; i++ {
 		go func() {
-			defer wg.Done()
+			wg.Wait()
 
-			msg := deepcopy.Copy(msg).(*ttnpb.UplinkMessage)
-
-			msg.RxMetadata = nil
-			n := rand.Intn(10)
-			for i := 0; i < n; i++ {
-				md := ttnpb.NewPopulatedRxMetadata(test.Randy, false)
-				msg.RxMetadata = append(msg.RxMetadata, md)
-				mdCh <- md
-			}
-
-			_, err := h.HandleUplink(ctx, msg)
-			a.So(err, should.BeNil)
-		}()
-	}
-
-	go func() {
-		wg.Wait()
-
-		if waitForFirst {
 			select {
-			case errch <- <-errch:
+			case weCh <- time.Now():
 
 			case <-time.After(Timeout):
-				t.Fatal("Timed out while waiting for first call to HandleUplink to return ")
+				t.Fatal("Timed out while waiting for metadata collection to stop")
 			}
-		}
 
-		select {
-		case weCh <- time.Now():
-
-		case <-time.After(Timeout):
-			t.Fatal("Timed out while waiting for metadata collection to stop")
-		}
-
-		close(mdCh)
-	}()
+			close(mdCh)
+		}()
+	}) {
+		t.Fatal("Failed to send duplicates")
+		return nil
+	}
 
 	mds := append([]*ttnpb.RxMetadata{}, msg.RxMetadata...)
 	for md := range mdCh {
 		mds = append(mds, md)
 	}
-	return mds, errch
+	return mds
 }
 
 type MockAsNsLinkApplicationStream struct {
@@ -1014,8 +1002,6 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					t.Errorf("LinkApplication should not return, returned with error: %s", err)
 				}()
 
-				time.Sleep(test.Delay)
-
 				dev, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
@@ -1024,200 +1010,193 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				ctx := context.WithValue(context.Background(), "answer", 42)
 
 				start := time.Now()
-				if !t.Run("deduplication window", func(t *testing.T) {
-					var md []*ttnpb.RxMetadata
 
-					t.Run("message send", func(t *testing.T) {
-						a := assertions.New(t)
+				errch := make(chan error, 1)
+				go func() {
+					_, err := ns.HandleUplink(ctx, deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
+					errch <- err
+				}()
 
-						var errch <-chan error
-						md, errch = sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount, false)
-
-						select {
-						case up := <-asSendCh:
-							if !a.So(md, should.HaveSameElementsDeep, up.GetUplinkMessage().RxMetadata) {
-								metadataLdiff(t, up.GetUplinkMessage().RxMetadata, md)
-							}
-							a.So(up.GetUplinkMessage().CorrelationIDs, should.NotBeEmpty)
-
-							expected := &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-								SessionKeyID:         dev.Session.SessionKeys.SessionKeyID,
-								Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-									FCnt:           tc.NextNextFCntUp - 1,
-									FPort:          tc.UplinkMessage.Payload.GetMACPayload().FPort,
-									Ack:            tc.UplinkMessage.Payload.GetMACPayload().Ack,
-									FRMPayload:     tc.UplinkMessage.Payload.GetMACPayload().FRMPayload,
-									RxMetadata:     up.GetUplinkMessage().RxMetadata,
-									CorrelationIDs: up.GetUplinkMessage().CorrelationIDs,
-								}},
-							}
-							if !a.So(up, should.Resemble, expected) {
-								pretty.Ldiff(t, up, expected)
-							}
-
-						case err := <-errch:
-							a.So(err, should.BeNil)
-							t.Fatal("Uplink not sent to AS")
-
-						case <-time.After(Timeout):
-							t.Fatal("Timeout")
-						}
-
-						select {
-						case err := <-errch:
-							a.So(err, should.BeNil)
-
-						case <-time.After(Timeout):
-							t.Fatal("Timeout")
-						}
-					})
-
-					t.Run("device update", func(t *testing.T) {
-						a := assertions.New(t)
-
-						dev, err = dev.Load()
-						if !a.So(err, should.BeNil) ||
-							!a.So(dev.EndDevice, should.NotBeNil) {
-							t.FailNow()
-						}
-
-						if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
-							t.FailNow()
-						}
-
-						msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
-						msg.RxMetadata = md
-
-						expected := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-						expected.Session.NextFCntUp = tc.NextNextFCntUp
-						expected.SessionFallback = nil
-						expected.CreatedAt = dev.CreatedAt
-						expected.UpdatedAt = dev.UpdatedAt
-						if expected.MACState == nil {
-							err := ResetMACState(ns.Component.FrequencyPlans, expected)
-							if !a.So(err, should.BeNil) {
-								t.FailNow()
-							}
-						}
-						expected.MACState.ADRDataRateIndex = msg.Settings.DataRateIndex
-
-						if expected.MACInfo == nil {
-							expected.MACInfo = &ttnpb.MACInfo{}
-						}
-
-						expected.RecentUplinks = append(expected.RecentUplinks, msg)
-						if len(expected.RecentUplinks) > RecentUplinkCount {
-							expected.RecentUplinks = expected.RecentUplinks[len(expected.RecentUplinks)-RecentUplinkCount:]
-						}
-
-						storedUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
-						expectedUp := expected.RecentUplinks[len(expected.RecentUplinks)-1]
-
-						a.So(storedUp.ReceivedAt, should.HappenBetween, start, time.Now())
-						expectedUp.ReceivedAt = storedUp.ReceivedAt
-
-						a.So(storedUp.CorrelationIDs, should.NotBeEmpty)
-						expectedUp.CorrelationIDs = storedUp.CorrelationIDs
-
-						if !a.So(storedUp.RxMetadata, should.HaveSameElementsDiff, expectedUp.RxMetadata) {
-							metadataLdiff(t, storedUp.RxMetadata, expectedUp.RxMetadata)
-						}
-						expectedUp.RxMetadata = storedUp.RxMetadata
-
-						a.So(pretty.Diff(dev.EndDevice, expected), should.BeEmpty)
-					})
-				}) {
-					t.FailNow()
-				}
-
-				t.Run("cooldown window", func(t *testing.T) {
-					a := assertions.New(t)
-
-					_, errch := sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount, true)
+				if tc.UplinkMessage.Payload.GetMACPayload().Ack ||
+					dev.MACInfo != nil && dev.MACInfo.NeedsDownlinkAck && dev.MACInfo.DeviceClass == ttnpb.CLASS_A {
 
 					select {
-					case err := <-errch:
-						a.So(err, should.BeNil)
+					case up := <-asSendCh:
+						a.So(up.GetDownlinkAck(), should.Resemble, tc.UplinkMessage.Payload.GetMACPayload().Ack)
 
 					case <-time.After(Timeout):
-						t.Fatal("Timeout")
+						t.Fatal("Timed out while waiting for (n)ack to be sent to AS")
 					}
-				})
+				}
 
-				time.Sleep(test.Delay) // Ensure the message hash is removed from deduplication table
+				md := sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+
+				select {
+				case up := <-asSendCh:
+					if !a.So(md, should.HaveSameElementsDeep, up.GetUplinkMessage().RxMetadata) {
+						metadataLdiff(t, up.GetUplinkMessage().RxMetadata, md)
+					}
+					a.So(up.GetUplinkMessage().CorrelationIDs, should.NotBeEmpty)
+
+					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+						SessionKeyID:         dev.Session.SessionKeys.SessionKeyID,
+						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+						Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
+							FCnt:           tc.NextNextFCntUp - 1,
+							FPort:          tc.UplinkMessage.Payload.GetMACPayload().FPort,
+							Ack:            tc.UplinkMessage.Payload.GetMACPayload().Ack,
+							FRMPayload:     tc.UplinkMessage.Payload.GetMACPayload().FRMPayload,
+							RxMetadata:     up.GetUplinkMessage().RxMetadata,
+							CorrelationIDs: up.GetUplinkMessage().CorrelationIDs,
+						}},
+					})
+
+				case err := <-errch:
+					a.So(err, should.BeNil)
+					t.Fatal("Uplink not sent to AS")
+
+				case <-time.After(Timeout):
+					t.Fatal("Timed out while waiting for uplink to be sent to AS")
+				}
+
+				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+
+				select {
+				case err := <-errch:
+					a.So(err, should.BeNil)
+
+				case <-time.After(Timeout):
+					t.Fatal("Timed out while waiting for HandleUplink to return")
+				}
+
+				t.Run("device update", func(t *testing.T) {
+					a := assertions.New(t)
+
+					dev, err = dev.Load()
+					if !a.So(err, should.BeNil) ||
+						!a.So(dev.EndDevice, should.NotBeNil) {
+						t.FailNow()
+					}
+
+					if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
+						t.FailNow()
+					}
+
+					msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
+					msg.RxMetadata = md
+
+					expected := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+					expected.Session.NextFCntUp = tc.NextNextFCntUp
+					expected.SessionFallback = nil
+					expected.CreatedAt = dev.CreatedAt
+					expected.UpdatedAt = dev.UpdatedAt
+					if expected.MACState == nil {
+						err := ResetMACState(ns.Component.FrequencyPlans, expected)
+						if !a.So(err, should.BeNil) {
+							t.FailNow()
+						}
+					}
+					expected.MACState.ADRDataRateIndex = msg.Settings.DataRateIndex
+
+					if expected.MACInfo == nil {
+						expected.MACInfo = &ttnpb.MACInfo{}
+					}
+
+					expected.RecentUplinks = append(expected.RecentUplinks, msg)
+					if len(expected.RecentUplinks) > RecentUplinkCount {
+						expected.RecentUplinks = expected.RecentUplinks[len(expected.RecentUplinks)-RecentUplinkCount:]
+					}
+
+					storedUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
+					expectedUp := expected.RecentUplinks[len(expected.RecentUplinks)-1]
+
+					a.So(storedUp.ReceivedAt, should.HappenBetween, start, time.Now())
+					expectedUp.ReceivedAt = storedUp.ReceivedAt
+
+					a.So(storedUp.CorrelationIDs, should.NotBeEmpty)
+					expectedUp.CorrelationIDs = storedUp.CorrelationIDs
+
+					if !a.So(storedUp.RxMetadata, should.HaveSameElementsDiff, expectedUp.RxMetadata) {
+						metadataLdiff(t, storedUp.RxMetadata, expectedUp.RxMetadata)
+					}
+					expectedUp.RxMetadata = storedUp.RxMetadata
+
+					a.So(pretty.Diff(dev.EndDevice, expected), should.BeEmpty)
+				})
 
 				t.Run("after cooldown window", func(t *testing.T) {
 					a := assertions.New(t)
 
-					msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
-					if len(msg.RxMetadata) > 1 {
-						// Deduplication may change the order of metadata in the slice
-						msg.RxMetadata = []*ttnpb.RxMetadata{msg.RxMetadata[0]}
-					}
-
 					errch := make(chan error, 1)
-					go func(ctx context.Context, msg *ttnpb.UplinkMessage) {
-						_, err = ns.HandleUplink(ctx, msg)
+					go func() {
+						_, err = ns.HandleUplink(ctx, deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
 						errch <- err
-					}(ctx, deepcopy.Copy(msg).(*ttnpb.UplinkMessage))
+					}()
 
-					select {
-					case err := <-errch:
-						if !dev.FCntResets {
+					if !dev.FCntResets {
+						_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+
+						select {
+						case err := <-errch:
 							a.So(err, should.BeError)
-							return
+
+						case <-time.After(Timeout):
+							t.Fatal("Timed out while waiting for HandleUplink to return")
 						}
 
-						a.So(err, should.BeNil)
-						t.Fatal("Uplink not sent to AS")
-
-					case de := <-deduplicationDoneCh:
-						a.So(de.msg.ReceivedAt, should.HappenBetween, start, time.Now())
-						msg.ReceivedAt = de.msg.ReceivedAt
-
-						a.So(de.msg.CorrelationIDs, should.NotBeEmpty)
-						msg.CorrelationIDs = de.msg.CorrelationIDs
-
-						if !a.So(de.msg, should.Resemble, msg) {
-							pretty.Ldiff(t, de.msg, msg)
-						}
-						a.So(de.ctx, ttnshould.HaveParentContext, ctx)
-
-						de.ch <- time.Now()
-
-					case <-time.After(Timeout):
-						t.Fatal("Timeout")
+						return
 					}
+
+					if tc.UplinkMessage.Payload.GetMACPayload().Ack ||
+						dev.MACInfo != nil && dev.MACInfo.NeedsDownlinkAck && dev.MACInfo.DeviceClass == ttnpb.CLASS_A {
+
+						select {
+						case up := <-asSendCh:
+							a.So(up.GetDownlinkAck(), should.Resemble, tc.UplinkMessage.Payload.GetMACPayload().Ack)
+
+						case <-time.After(Timeout):
+							t.Fatal("Timed out while waiting for (n)ack to be sent to AS")
+						}
+					}
+
+					md := sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
 
 					select {
 					case up := <-asSendCh:
-						expected := &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+						if !a.So(md, should.HaveSameElementsDeep, up.GetUplinkMessage().RxMetadata) {
+							metadataLdiff(t, up.GetUplinkMessage().RxMetadata, md)
+						}
+						a.So(up.GetUplinkMessage().CorrelationIDs, should.NotBeEmpty)
+
+						a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 							SessionKeyID:         dev.Session.SessionKeys.SessionKeyID,
+							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 							Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
 								FCnt:           tc.NextNextFCntUp - 1,
-								FPort:          msg.Payload.GetMACPayload().FPort,
-								Ack:            msg.Payload.GetMACPayload().Ack,
-								FRMPayload:     msg.Payload.GetMACPayload().FRMPayload,
-								RxMetadata:     msg.RxMetadata,
-								CorrelationIDs: msg.CorrelationIDs,
+								FPort:          tc.UplinkMessage.Payload.GetMACPayload().FPort,
+								Ack:            tc.UplinkMessage.Payload.GetMACPayload().Ack,
+								FRMPayload:     tc.UplinkMessage.Payload.GetMACPayload().FRMPayload,
+								RxMetadata:     up.GetUplinkMessage().RxMetadata,
+								CorrelationIDs: up.GetUplinkMessage().CorrelationIDs,
 							}},
-						}
-						if !a.So(up, should.Resemble, expected) {
-							pretty.Ldiff(t, up, expected)
-						}
+						})
+
+					case err := <-errch:
+						a.So(err, should.BeNil)
+						t.Fatal("Uplink not sent to AS")
 
 					case <-time.After(Timeout):
-						t.Fatal("Timeout")
+						t.Fatal("Timed out while waiting for uplink to be sent to AS")
 					}
+
+					_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
 
 					select {
 					case err := <-errch:
 						a.So(err, should.BeNil)
 
 					case <-time.After(Timeout):
-						t.Fatal("Timeout")
+						t.Fatal("Timed out while waiting for HandleUplink to return")
 					}
 				})
 			})
@@ -1445,8 +1424,6 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					t.Errorf("LinkApplication should not return, returned with error: %s", err)
 				}()
 
-				time.Sleep(test.Delay)
-
 				dev, err := reg.Create(deepcopy.Copy(tc.Device).(*ttnpb.EndDevice))
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
@@ -1472,230 +1449,207 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				ctx := context.WithValue(context.Background(), "answer", 42)
 
 				start := time.Now()
-				if !t.Run("deduplication window", func(t *testing.T) {
-					var md []*ttnpb.RxMetadata
 
-					resp := ttnpb.NewPopulatedJoinResponse(test.Randy, false)
-					resp.SessionKeys = *keys
+				resp := ttnpb.NewPopulatedJoinResponse(test.Randy, false)
+				resp.SessionKeys = *keys
 
-					t.Run("message send", func(t *testing.T) {
-						a := assertions.New(t)
+				errch := make(chan error, 1)
+				go func() {
+					_, err := ns.HandleUplink(ctx, deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
+					errch <- err
+				}()
 
-						wg := &sync.WaitGroup{}
-						wg.Add(1)
-						go func() {
-							defer wg.Done()
+				select {
+				case req := <-handleJoinCh:
+					if ses := tc.Device.Session; ses != nil {
+						a.So(req.req.EndDeviceIdentifiers.DevAddr, should.NotResemble, ses.DevAddr)
+					}
 
-							select {
-							case req := <-handleJoinCh:
-								if ses := tc.Device.Session; ses != nil {
-									a.So(req.req.EndDeviceIdentifiers.DevAddr, should.NotResemble, ses.DevAddr)
-								}
+					expectedRequest.EndDeviceIdentifiers.DevAddr = req.req.EndDeviceIdentifiers.DevAddr
+					a.So(req.req, should.Resemble, expectedRequest)
 
-								expectedRequest.EndDeviceIdentifiers.DevAddr = req.req.EndDeviceIdentifiers.DevAddr
-								a.So(req.req, should.Resemble, expectedRequest)
+					req.ch <- resp
+					req.errch <- nil
 
-								req.ch <- resp
-								req.errch <- nil
+				case err := <-errch:
+					a.So(err, should.BeNil)
+					t.Fatal("Join not sent to JS")
 
-							case <-time.After(Timeout):
-								t.Fatal("Timeout")
-							}
-						}()
-
-						var errch <-chan error
-						md, errch = sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount, false)
-
-						select {
-						case err := <-errch:
-							a.So(err, should.BeNil)
-
-						case <-time.After(Timeout):
-							t.Fatal("Timeout")
-						}
-
-						select {
-						case up := <-asSendCh:
-							expected := &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-									DevAddr:                expectedRequest.EndDeviceIdentifiers.DevAddr,
-									DevEUI:                 tc.Device.EndDeviceIdentifiers.DevEUI,
-									DeviceID:               tc.Device.EndDeviceIdentifiers.DeviceID,
-									JoinEUI:                tc.Device.EndDeviceIdentifiers.JoinEUI,
-									ApplicationIdentifiers: tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers,
-								},
-								SessionKeyID: test.Must(dev.Load()).(*deviceregistry.Device).Session.SessionKeys.SessionKeyID,
-								Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-									AppSKey: resp.SessionKeys.AppSKey,
-								}},
-							}
-							expected.DevAddr = expectedRequest.EndDeviceIdentifiers.DevAddr
-							a.So(up, should.Resemble, expected)
-
-						case <-time.After(Timeout):
-							t.Fatal("Timeout")
-						}
-
-						wg.Wait()
-					})
-
-					t.Run("device update", func(t *testing.T) {
-						a := assertions.New(t)
-
-						dev, err = dev.Load()
-						if !a.So(err, should.BeNil) ||
-							!a.So(dev.EndDevice, should.NotBeNil) {
-							t.FailNow()
-						}
-						if a.So(dev.Session, should.NotBeNil) {
-							ses := dev.Session
-							a.So(ses.StartedAt, should.HappenBetween, start, time.Now())
-							a.So(dev.EndDeviceIdentifiers.DevAddr, should.Resemble, &ses.DevAddr)
-							if tc.Device.Session != nil {
-								a.So(ses.DevAddr, should.NotResemble, tc.Device.Session.DevAddr)
-							}
-						}
-
-						if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
-							t.FailNow()
-						}
-
-						if !a.So(dev.RecentDownlinks, should.NotBeEmpty) {
-							t.FailNow()
-						}
-
-						a.So(pretty.Diff(dev.RecentDownlinks[len(dev.RecentDownlinks)-1].RawPayload, resp.RawPayload), should.BeEmpty)
-
-						msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
-						msg.RxMetadata = md
-
-						expected := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
-
-						err := ResetMACState(ns.Component.FrequencyPlans, expected)
-						if !a.So(err, should.BeNil) {
-							t.FailNow()
-						}
-
-						expected.MACState.RxDelay = tc.Device.MACStateDesired.RxDelay
-						expected.MACState.Rx1DataRateOffset = tc.Device.MACStateDesired.Rx1DataRateOffset
-						expected.MACState.Rx2DataRateIndex = tc.Device.MACStateDesired.Rx2DataRateIndex
-
-						expected.MACStateDesired.RxDelay = expected.MACState.RxDelay
-						expected.MACStateDesired.Rx1DataRateOffset = expected.MACState.Rx1DataRateOffset
-						expected.MACStateDesired.Rx2DataRateIndex = expected.MACState.Rx2DataRateIndex
-
-						expected.EndDeviceIdentifiers.DevAddr = dev.EndDeviceIdentifiers.DevAddr
-						expected.Session = &ttnpb.Session{
-							SessionKeys: *keys,
-							StartedAt:   dev.Session.StartedAt,
-							DevAddr:     *dev.EndDeviceIdentifiers.DevAddr,
-						}
-						expected.SessionFallback = tc.Device.Session
-						expected.CreatedAt = dev.CreatedAt
-						expected.UpdatedAt = dev.UpdatedAt
-						expected.RecentDownlinks = dev.RecentDownlinks
-
-						expected.RecentUplinks = append(expected.RecentUplinks, msg)
-						if len(expected.RecentUplinks) > RecentUplinkCount {
-							expected.RecentUplinks = expected.RecentUplinks[len(expected.RecentUplinks)-RecentUplinkCount:]
-						}
-
-						storedUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
-						expectedUp := expected.RecentUplinks[len(expected.RecentUplinks)-1]
-
-						a.So(storedUp.ReceivedAt, should.HappenBetween, start, time.Now())
-						expectedUp.ReceivedAt = storedUp.ReceivedAt
-
-						a.So(storedUp.CorrelationIDs, should.NotBeEmpty)
-						expectedUp.CorrelationIDs = storedUp.CorrelationIDs
-
-						if !a.So(storedUp.RxMetadata, should.HaveSameElementsDiff, expectedUp.RxMetadata) {
-							metadataLdiff(t, storedUp.RxMetadata, expectedUp.RxMetadata)
-						}
-						expectedUp.RxMetadata = storedUp.RxMetadata
-
-						a.So(pretty.Diff(dev.EndDevice, expected), should.BeEmpty)
-					})
-				}) {
-					t.FailNow()
+				case <-time.After(Timeout):
+					t.Fatal("Timed out while waiting for join to be sent to JS")
 				}
 
-				t.Run("cooldown window", func(t *testing.T) {
+				md := sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+
+				select {
+				case up := <-asSendCh:
+					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+						SessionKeyID: test.Must(dev.Load()).(*deviceregistry.Device).Session.SessionKeys.SessionKeyID,
+						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+							DevAddr:                expectedRequest.EndDeviceIdentifiers.DevAddr,
+							DevEUI:                 tc.Device.EndDeviceIdentifiers.DevEUI,
+							DeviceID:               tc.Device.EndDeviceIdentifiers.DeviceID,
+							JoinEUI:                tc.Device.EndDeviceIdentifiers.JoinEUI,
+							ApplicationIdentifiers: tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers,
+						},
+						Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
+							AppSKey: resp.SessionKeys.AppSKey,
+						}},
+					})
+
+				case <-time.After(Timeout):
+					t.Fatal("Timed out while waiting for join to be sent to AS")
+				}
+
+				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+
+				select {
+				case err := <-errch:
+					a.So(err, should.BeNil)
+
+				case <-time.After(Timeout):
+					t.Fatal("Timed out while waiting for HandleUplink to return")
+				}
+
+				t.Run("device update", func(t *testing.T) {
 					a := assertions.New(t)
 
-					_, errch := sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount, true)
-
-					select {
-					case err := <-errch:
-						a.So(err, should.BeNil)
-
-					case <-time.After(Timeout):
-						t.Fatal("Timeout")
+					dev, err = dev.Load()
+					if !a.So(err, should.BeNil) ||
+						!a.So(dev.EndDevice, should.NotBeNil) {
+						t.FailNow()
 					}
-				})
+					if a.So(dev.Session, should.NotBeNil) {
+						ses := dev.Session
+						a.So(ses.StartedAt, should.HappenBetween, start, time.Now())
+						a.So(dev.EndDeviceIdentifiers.DevAddr, should.Resemble, &ses.DevAddr)
+						if tc.Device.Session != nil {
+							a.So(ses.DevAddr, should.NotResemble, tc.Device.Session.DevAddr)
+						}
+					}
 
-				time.Sleep(test.Delay) // Ensure the message hash is removed from deduplication table
+					if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
+						t.FailNow()
+					}
+
+					if !a.So(dev.RecentDownlinks, should.NotBeEmpty) {
+						t.FailNow()
+					}
+
+					a.So(pretty.Diff(dev.RecentDownlinks[len(dev.RecentDownlinks)-1].RawPayload, resp.RawPayload), should.BeEmpty)
+
+					expected := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+
+					err := ResetMACState(ns.Component.FrequencyPlans, expected)
+					if !a.So(err, should.BeNil) {
+						t.FailNow()
+					}
+
+					expected.MACState.RxDelay = tc.Device.MACStateDesired.RxDelay
+					expected.MACState.Rx1DataRateOffset = tc.Device.MACStateDesired.Rx1DataRateOffset
+					expected.MACState.Rx2DataRateIndex = tc.Device.MACStateDesired.Rx2DataRateIndex
+
+					expected.MACStateDesired.RxDelay = expected.MACState.RxDelay
+					expected.MACStateDesired.Rx1DataRateOffset = expected.MACState.Rx1DataRateOffset
+					expected.MACStateDesired.Rx2DataRateIndex = expected.MACState.Rx2DataRateIndex
+
+					expected.EndDeviceIdentifiers.DevAddr = dev.EndDeviceIdentifiers.DevAddr
+					expected.Session = &ttnpb.Session{
+						SessionKeys: *keys,
+						StartedAt:   dev.Session.StartedAt,
+						DevAddr:     *dev.EndDeviceIdentifiers.DevAddr,
+					}
+					expected.SessionFallback = tc.Device.Session
+					expected.CreatedAt = dev.CreatedAt
+					expected.UpdatedAt = dev.UpdatedAt
+					expected.RecentDownlinks = dev.RecentDownlinks
+
+					msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
+					msg.RxMetadata = md
+
+					expected.RecentUplinks = append(expected.RecentUplinks, msg)
+					if len(expected.RecentUplinks) > RecentUplinkCount {
+						expected.RecentUplinks = expected.RecentUplinks[len(expected.RecentUplinks)-RecentUplinkCount:]
+					}
+
+					storedUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
+					expectedUp := expected.RecentUplinks[len(expected.RecentUplinks)-1]
+
+					a.So(storedUp.ReceivedAt, should.HappenBetween, start, time.Now())
+					expectedUp.ReceivedAt = storedUp.ReceivedAt
+
+					a.So(storedUp.CorrelationIDs, should.NotBeEmpty)
+					expectedUp.CorrelationIDs = storedUp.CorrelationIDs
+
+					if !a.So(storedUp.RxMetadata, should.HaveSameElementsDiff, expectedUp.RxMetadata) {
+						metadataLdiff(t, storedUp.RxMetadata, expectedUp.RxMetadata)
+					}
+					expectedUp.RxMetadata = storedUp.RxMetadata
+
+					a.So(pretty.Diff(dev.EndDevice, expected), should.BeEmpty)
+				})
 
 				t.Run("after cooldown window", func(t *testing.T) {
 					a := assertions.New(t)
 
-					wg := &sync.WaitGroup{}
-					wg.Add(1)
-					go func() {
-						defer wg.Done()
-
-						select {
-						case req := <-handleJoinCh:
-							a.So(req.req.EndDeviceIdentifiers.DevAddr, should.NotResemble, dev.Session.DevAddr)
-
-							expectedRequest.EndDeviceIdentifiers.DevAddr = req.req.EndDeviceIdentifiers.DevAddr
-							a.So(req.req, should.Resemble, expectedRequest)
-
-							resp := ttnpb.NewPopulatedJoinResponse(test.Randy, false)
-							resp.SessionKeys = *keys
-
-							req.ch <- resp
-							req.errch <- nil
-
-						case <-time.After(Timeout):
-							t.Error("Timeout")
-						}
-					}()
-
-					msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
-
 					errch := make(chan error, 1)
 					go func() {
-						_, err = ns.HandleUplink(ctx, deepcopy.Copy(msg).(*ttnpb.UplinkMessage))
+						_, err = ns.HandleUplink(ctx, deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage))
 						errch <- err
 					}()
 
 					select {
-					case de := <-deduplicationDoneCh:
-						a.So(de.msg.ReceivedAt, should.HappenBetween, start, time.Now())
-						msg.ReceivedAt = de.msg.ReceivedAt
+					case req := <-handleJoinCh:
+						a.So(req.req.EndDeviceIdentifiers.DevAddr, should.NotResemble, dev.Session.DevAddr)
 
-						a.So(de.msg.CorrelationIDs, should.NotBeEmpty)
-						msg.CorrelationIDs = de.msg.CorrelationIDs
+						expectedRequest.EndDeviceIdentifiers.DevAddr = req.req.EndDeviceIdentifiers.DevAddr
+						a.So(req.req, should.Resemble, expectedRequest)
 
-						a.So(de.msg, should.Resemble, msg)
-						a.So(de.ctx, ttnshould.HaveParentContext, ctx)
+						resp := ttnpb.NewPopulatedJoinResponse(test.Randy, false)
+						resp.SessionKeys = *keys
 
-						de.ch <- time.Now()
+						req.ch <- resp
+						req.errch <- nil
+
+					case err := <-errch:
+						a.So(err, should.BeNil)
+						t.Fatal("Join not sent to JS")
 
 					case <-time.After(Timeout):
-						t.Fatal("Timeout")
+						t.Fatal("Timed out while waiting for join to be sent to JS")
 					}
+
+					_ = sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+
+					select {
+					case up := <-asSendCh:
+						a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+							SessionKeyID: test.Must(dev.Load()).(*deviceregistry.Device).Session.SessionKeys.SessionKeyID,
+							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+								DevAddr:                expectedRequest.EndDeviceIdentifiers.DevAddr,
+								DevEUI:                 tc.Device.EndDeviceIdentifiers.DevEUI,
+								DeviceID:               tc.Device.EndDeviceIdentifiers.DeviceID,
+								JoinEUI:                tc.Device.EndDeviceIdentifiers.JoinEUI,
+								ApplicationIdentifiers: tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers,
+							},
+							Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
+								AppSKey: resp.SessionKeys.AppSKey,
+							}},
+						})
+
+					case <-time.After(Timeout):
+						t.Fatal("Timed out while waiting for join to be sent to AS")
+					}
+
+					_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
 
 					select {
 					case err := <-errch:
 						a.So(err, should.BeNil)
 
 					case <-time.After(Timeout):
-						t.Fatal("Timeout")
+						t.Fatal("Timed out while waiting for HandleUplink to return")
 					}
-
-					wg.Wait()
 				})
 			})
 		}

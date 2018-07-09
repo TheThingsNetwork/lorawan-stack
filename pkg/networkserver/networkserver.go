@@ -484,7 +484,7 @@ func (a *metadataAccumulator) Add(mds ...*ttnpb.RxMetadata) {
 	}
 }
 
-func (ns *NetworkServer) deduplicateUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*metadataAccumulator, bool) {
+func (ns *NetworkServer) deduplicateUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*metadataAccumulator, func(), bool) {
 	h := ns.hashPool.Get().(hash.Hash64)
 	_, _ = h.Write(msg.RawPayload)
 
@@ -499,14 +499,9 @@ func (ns *NetworkServer) deduplicateUplink(ctx context.Context, msg *ttnpb.Uplin
 
 	if isDup {
 		ns.metadataAccumulatorPool.Put(a)
-		return nil, true
+		return nil, nil, true
 	}
-
-	go func(msg *ttnpb.UplinkMessage) {
-		<-ns.collectionDone(ctx, msg)
-		ns.metadataAccumulators.Delete(k)
-	}(deepcopy.Copy(msg).(*ttnpb.UplinkMessage))
-	return a, false
+	return a, func() { ns.metadataAccumulators.Delete(k) }, false
 }
 
 func setDownlinkModulation(s *ttnpb.TxSettings, dr band.DataRate) (err error) {
@@ -1439,7 +1434,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		})
 	}
 
-	acc, ok := ns.deduplicateUplink(ctx, msg)
+	acc, stopDedup, ok := ns.deduplicateUplink(ctx, msg)
 	if ok {
 		logger.Debug("Dropping duplicate uplink")
 		registerReceiveUplinkDuplicate(ctx, msg)
@@ -1447,6 +1442,12 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	}
 	registerReceiveUplink(ctx, msg)
 
+	defer func(msg *ttnpb.UplinkMessage) {
+		<-ns.collectionDone(ctx, msg)
+		stopDedup()
+	}(msg)
+
+	msg = deepcopy.Copy(msg).(*ttnpb.UplinkMessage)
 	switch msg.Payload.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		return ttnpb.Empty, ns.handleUplink(ctx, msg, acc)
