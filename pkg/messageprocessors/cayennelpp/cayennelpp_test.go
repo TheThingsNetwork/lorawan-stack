@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cayennelpp_test
+package cayennelpp
 
 import (
 	"context"
@@ -22,7 +22,6 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
-	"go.thethings.network/lorawan-stack/pkg/messageprocessors/cayennelpp"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -31,7 +30,7 @@ func TestEncode(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := context.Background()
-	host := cayennelpp.New()
+	host := New()
 
 	model := &ttnpb.EndDeviceVersion{
 		EndDeviceModel: ttnpb.EndDeviceModel{
@@ -121,7 +120,7 @@ func TestDecode(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := context.Background()
-	host := cayennelpp.New()
+	host := New()
 
 	model := &ttnpb.EndDeviceVersion{
 		EndDeviceModel: ttnpb.EndDeviceModel{

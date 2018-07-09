@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package javascript_test
+package javascript
 
 import (
 	"context"
@@ -21,8 +21,6 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
-	"go.thethings.network/lorawan-stack/pkg/messageprocessors"
-	"go.thethings.network/lorawan-stack/pkg/messageprocessors/javascript"
 	"go.thethings.network/lorawan-stack/pkg/scripting"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -32,7 +30,7 @@ func TestEncode(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := context.Background()
-	host := javascript.New()
+	host := New()
 
 	model := &ttnpb.EndDeviceVersion{
 		EndDeviceModel: ttnpb.EndDeviceModel{
@@ -122,7 +120,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, model, script)
-		a.So(err, should.DescribeError, messageprocessors.ErrInvalidOutputRange)
+		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidOutputRange)
 	}
 
 	// Return invalid type.
@@ -133,7 +131,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, model, script)
-		a.So(err, should.DescribeError, messageprocessors.ErrInvalidOutput)
+		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidOutputType)
 	}
 
 	// Return nothing.
@@ -144,7 +142,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, model, script)
-		a.So(err, should.DescribeError, messageprocessors.ErrInvalidOutputType)
+		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidOutputType)
 	}
 
 	// Return an object.
@@ -157,7 +155,7 @@ func TestEncode(t *testing.T) {
 		}
 		`
 		_, err := host.Encode(ctx, message, model, script)
-		a.So(err, should.DescribeError, messageprocessors.ErrInvalidOutputType)
+		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidOutputType)
 	}
 }
 
@@ -165,7 +163,7 @@ func TestDecode(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := context.Background()
-	host := javascript.New()
+	host := New()
 
 	model := &ttnpb.EndDeviceVersion{
 		EndDeviceModel: ttnpb.EndDeviceModel{

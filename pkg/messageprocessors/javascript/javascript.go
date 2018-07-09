@@ -20,8 +20,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/pkg/scripting"
@@ -49,11 +48,19 @@ func (h *host) createEnvironment(model *ttnpb.EndDeviceVersion) map[string]inter
 	return env
 }
 
+var (
+	errInvalidInput       = errors.DefineInvalidArgument("input", "invalid input")
+	errInvalidOutput      = errors.Define("output", "invalid output")
+	errInvalidOutputType  = errors.Define("output_type", "invalid output of type `{type}`")
+	errInvalidOutputRange = errors.Define("output_range", "output value `{value}` does not fall between `{low}` and `{high}`")
+	errMissingPayload     = errors.DefineInvalidArgument("missing_payload", "missing message payload")
+)
+
 // Encode encodes the message's MAC payload DecodedPayload to FRMPayload using script.
 func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *ttnpb.EndDeviceVersion, script string) (*ttnpb.DownlinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
-		return nil, common.ErrMissingPayload.New(nil)
+		return nil, errMissingPayload
 	}
 
 	decoded := payload.DecodedPayload
@@ -63,7 +70,7 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 
 	m, err := gogoproto.Map(decoded)
 	if err != nil {
-		return nil, messageprocessors.ErrInvalidInput.NewWithCause(nil, err)
+		return nil, errInvalidInput.WithCause(err)
 	}
 
 	env := h.createEnvironment(model)
@@ -85,7 +92,7 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 	}
 
 	if value == nil || reflect.TypeOf(value).Kind() != reflect.Slice {
-		return nil, messageprocessors.ErrInvalidOutputType.New(nil)
+		return nil, errInvalidOutputType
 	}
 
 	slice := reflect.ValueOf(value)
@@ -114,14 +121,14 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 		case uint64:
 			b = int64(i)
 		default:
-			return nil, messageprocessors.ErrInvalidOutput.New(nil)
+			return nil, errInvalidOutputType.WithAttributes("type", fmt.Sprintf("%T", i))
 		}
 		if b < 0x00 || b > 0xFF {
-			return nil, messageprocessors.ErrInvalidOutputRange.New(errors.Attributes{
-				"value": b,
-				"low":   0x00,
-				"high":  0xFF,
-			})
+			return nil, errInvalidOutputRange.WithAttributes(
+				"value", b,
+				"low", 0x00,
+				"high", 0xFF,
+			)
 		}
 		payload.FRMPayload[i] = byte(b)
 	}
@@ -133,7 +140,7 @@ func (h *host) Encode(ctx context.Context, msg *ttnpb.DownlinkMessage, model *tt
 func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, model *ttnpb.EndDeviceVersion, script string) (*ttnpb.UplinkMessage, error) {
 	payload := msg.Payload.GetMACPayload()
 	if payload == nil {
-		return nil, common.ErrMissingPayload.New(nil)
+		return nil, errMissingPayload
 	}
 
 	env := h.createEnvironment(model)
@@ -156,12 +163,12 @@ func (h *host) Decode(ctx context.Context, msg *ttnpb.UplinkMessage, model *ttnp
 
 	m, ok := value.(map[string]interface{})
 	if !ok {
-		return nil, messageprocessors.ErrInvalidOutput.New(nil)
+		return nil, errInvalidOutput
 	}
 
 	s, err := gogoproto.Struct(m)
 	if err != nil {
-		return nil, messageprocessors.ErrInvalidOutput.NewWithCause(nil, err)
+		return nil, errInvalidOutput.WithCause(err)
 	}
 
 	payload.DecodedPayload = s
