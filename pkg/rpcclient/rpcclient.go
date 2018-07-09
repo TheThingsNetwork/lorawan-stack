@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/metrics"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/pkg/version"
 	"google.golang.org/grpc"
 )
@@ -39,12 +40,14 @@ func DefaultDialOptions(ctx context.Context) []grpc.DialOption {
 		errors.StreamClientInterceptor(),
 		metrics.StreamClientInterceptor,
 		rpclog.StreamClientInterceptor(ctx), // Gets logger from global context
+		warning.StreamClientInterceptor,
 	}
 
 	unaryInterceptors := []grpc.UnaryClientInterceptor{
 		errors.UnaryClientInterceptor(),
 		metrics.UnaryClientInterceptor,
 		rpclog.UnaryClientInterceptor(ctx), // Gets logger from global context
+		warning.UnaryClientInterceptor,
 	}
 
 	ttnVersion := strings.TrimPrefix(version.TTN, "v")
