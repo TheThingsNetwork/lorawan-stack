@@ -14,23 +14,22 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Redirect } from 'react-router'
+
+import WithAuth from '../../../components/with-auth'
 
 const mapStateToProps = state => ({
-  user: state.user,
+  user: state.user.user,
 })
 
 @connect(mapStateToProps)
 export default class Landing extends React.PureComponent {
   render () {
-    const { user } = this.props
-
-    if (!user.user_id) {
-      return <Redirect to="/console/login" />
-    }
+    const { user = {}} = this.props
 
     return (
-      <div>Landing</div>
+      <WithAuth>
+        <div>Welcome, {user.name}</div>
+      </WithAuth>
     )
   }
 }
