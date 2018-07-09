@@ -24,15 +24,16 @@ const consoleLogic = createLogic({
   async process ({ getState, action }, dispatch, done) {
     try {
       try {
-        const result = await api.v3.is.users.me()
-        console.log(result)
+        const result = window.ENV.console
+          ? await api.v3.is.users.me()
+          : await api.oauth.me()
         dispatch(user.getUserMeSuccess(result.data))
       } catch (error) {
         dispatch(user.getUserMeFailure())
         accessToken.clear()
       }
       dispatch(_console.initializeSuccess())
-      console.log('Console has initialized!')
+      console.log('Initialization successful!')
     } catch (error) {
       console.log(error)
       dispatch(_console.initializeFailure())

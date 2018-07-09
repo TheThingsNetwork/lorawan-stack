@@ -23,6 +23,7 @@ import Landing from '../landing'
 import Login from '../login'
 import Authorize from '../authorize'
 import store from '../../../store'
+import Init from '../../../components/init'
 
 const env = window.ENV || {}
 

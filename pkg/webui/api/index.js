@@ -51,5 +51,11 @@ export default {
     login (credentials) {
       return axios.post('/oauth/api/auth/login', credentials)
     },
+    logout () {
+      return axios.post('/oauth/api/auth/logout')
+    },
+    me () {
+      return axios.get('/oauth/api/me')
+    },
   },
 }

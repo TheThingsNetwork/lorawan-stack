@@ -12,12 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import client from './client'
-import user from './user'
-import init from './init' // Conflicting name with window.console
+import React from 'react'
+import { connect } from 'react-redux'
 
-export default [
-  client,
-  ...user,
-  init,
-]
+import Spinner from '../spinner'
+
+@connect(state => (
+  {
+    initialized: state.console.initialized,
+  }
+))
+export default class Init extends React.PureComponent {
+  componentWillMount () {
+    this.props.dispatch({ type: 'INITIALIZE' })
+  }
+
+  render () {
+    const { initialized } = this.props
+
+    if (!initialized) {
+      return (<Spinner center>Please wait…</Spinner>)
+    }
+
+    return this.props.children
+  }
+}

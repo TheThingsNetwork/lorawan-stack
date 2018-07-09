@@ -17,6 +17,7 @@ import { Switch, Route, BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
 import Header from '../../../components/header'
+import Init from '../../../components/init'
 import Login from '../login'
 import Landing from '../landing'
 import store from '../../../store'
@@ -25,15 +26,17 @@ export default class ConsoleApp extends React.PureComponent {
   render () {
     return (
       <Provider store={store}>
-        <div>
-          <Header />
-          <BrowserRouter>
-            <Switch>
-              <Route exact path="/console" component={Landing} />
-              <Route path="/console/login" component={Login} />
-            </Switch>
-          </BrowserRouter>
-        </div>
+        <Init>
+          <div>
+            <Header />
+            <BrowserRouter>
+              <Switch>
+                <Route exact path="/console" component={Landing} />
+                <Route path="/console/login" component={Login} />
+              </Switch>
+            </BrowserRouter>
+          </div>
+        </Init>
       </Provider>
     )
   }
