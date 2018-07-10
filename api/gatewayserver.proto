@@ -127,6 +127,6 @@ service NsGs {
 
 // Service Gs allows clients to retrieve the status of their gateways
 service Gs {
-  // GetGatewayObservations for a gateway.
+  // Get observations for a gateway.
   rpc GetGatewayObservations(GatewayIdentifiers) returns (GatewayObservations);
 }

@@ -1123,7 +1123,7 @@ var _NsGs_serviceDesc = grpc.ServiceDesc{
 // Client API for Gs service
 
 type GsClient interface {
-	// GetGatewayObservations for a gateway.
+	// Get observations for a gateway.
 	GetGatewayObservations(ctx context.Context, in *GatewayIdentifiers, opts ...grpc.CallOption) (*GatewayObservations, error)
 }
 
@@ -1147,7 +1147,7 @@ func (c *gsClient) GetGatewayObservations(ctx context.Context, in *GatewayIdenti
 // Server API for Gs service
 
 type GsServer interface {
-	// GetGatewayObservations for a gateway.
+	// Get observations for a gateway.
 	GetGatewayObservations(context.Context, *GatewayIdentifiers) (*GatewayObservations, error)
 }
 
