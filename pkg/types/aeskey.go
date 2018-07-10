@@ -83,7 +83,7 @@ func (key AES128Key) Value() (driver.Value, error) {
 func (key *AES128Key) Scan(src interface{}) error {
 	data, ok := src.([]byte)
 	if !ok {
-		return ErrTypeAssertion
+		return errScanArgumentType
 	}
 	return key.UnmarshalText(data)
 }

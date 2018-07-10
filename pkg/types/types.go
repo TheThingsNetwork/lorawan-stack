@@ -16,7 +16,7 @@
 package types
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 
 	"bytes"
 	"database/sql/driver"
@@ -42,23 +42,20 @@ type Interface interface {
 	Scan(src interface{}) error
 }
 
-// ErrInvalidLength can be returned when unmarshaling a slice of invalid length.
-var ErrInvalidLength = errors.New("invalid length")
-
-// ErrTypeAssertion can be returned when trying to assert one variable.
-var ErrTypeAssertion = errors.New("invalid type assertion")
-
-// ErrInvalidJSONString is returned when an invalid JSON string is passed as an argument.
-var ErrInvalidJSONString = &errors.ErrDescriptor{
-	MessageFormat:  "Invalid JSON string: `{json_string}`",
-	Code:           1,
-	Type:           errors.InvalidArgument,
-	SafeAttributes: []string{"json_string"},
-}
-
-func init() {
-	ErrInvalidJSONString.Register()
-}
+var (
+	errScanArgumentType = errors.DefineInternal( // Internal because it's a problem with the db table.
+		"src_type",
+		"invalid type for src",
+	)
+	errInvalidJSON = errors.DefineInvalidArgument(
+		"invalid_json",
+		"invalid JSON: `{json}`",
+	)
+	errInvalidLength = errors.DefineInvalidArgument(
+		"invalid_length",
+		"invalid slice length",
+	)
+)
 
 func marshalJSONHexBytes(data []byte) ([]byte, error) {
 	hexData, err := marshalTextBytes(data)
@@ -76,9 +73,7 @@ func unmarshalJSONHexBytes(dst, data []byte) error {
 	}
 
 	if len(data) < 2 || data[0] != '"' || data[len(data)-1] != '"' {
-		return ErrInvalidJSONString.New(errors.Attributes{
-			"json_string": string(data),
-		})
+		return errInvalidJSON.WithAttributes("json", string(data))
 	}
 	return unmarshalTextBytes(dst, data[1:len(data)-1])
 }
@@ -100,7 +95,7 @@ func unmarshalTextBytes(dst, data []byte) error {
 		return err
 	}
 	if n != len(dst) || copy(dst, b) != len(dst) {
-		return ErrInvalidLength
+		return errInvalidLength
 	}
 	return nil
 }
@@ -113,7 +108,7 @@ func marshalBinaryBytes(data []byte) ([]byte, error) {
 
 func marshalBinaryBytesTo(dst, src []byte) (int, error) {
 	if len(dst) < len(src) {
-		return 0, ErrInvalidLength
+		return 0, errInvalidLength
 	}
 	return copy(dst, src), nil
 }
@@ -123,7 +118,7 @@ func unmarshalBinaryBytes(dst, data []byte) error {
 		return nil
 	}
 	if len(data) != len(dst) || copy(dst[:], data) != len(dst) {
-		return ErrInvalidLength
+		return errInvalidLength
 	}
 	return nil
 }

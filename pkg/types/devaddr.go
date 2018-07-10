@@ -15,7 +15,7 @@
 package types
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 
 	"database/sql/driver"
 	"encoding/binary"
@@ -95,7 +95,7 @@ func (addr DevAddr) Value() (driver.Value, error) {
 func (addr *DevAddr) Scan(src interface{}) error {
 	data, ok := src.([]byte)
 	if !ok {
-		return ErrTypeAssertion
+		return errScanArgumentType
 	}
 	return addr.UnmarshalText(data)
 }
@@ -149,7 +149,7 @@ func (addr DevAddr) NetIDType() byte {
 			return byte(7 - i)
 		}
 	}
-	panic(errors.New("Unmatched NetID type"))
+	panic(unmatchedNetID)
 }
 
 // NwkAddr returns NwkAddr of the DevAddr.
@@ -172,7 +172,7 @@ func (addr DevAddr) NwkAddr() []byte {
 	case 7:
 		return []byte{addr[3] & 0x7f}
 	}
-	panic(fmt.Errorf("Unmatched NetID type: %d", addr.NetIDType()))
+	panic(unmatchedNetID)
 }
 
 // NwkID returns NwkID of the DevAddr.
@@ -195,7 +195,7 @@ func (addr DevAddr) NwkID() []byte {
 	case 7:
 		return []byte{addr[1] >> 7, (addr[1] << 1) | (addr[2] >> 7), (addr[2] << 1) | (addr[3] >> 7)}
 	}
-	panic(fmt.Errorf("Unmatched NetID type: %d", addr.NetIDType()))
+	panic(unmatchedNetID)
 }
 
 // NwkAddrBits returns the length of NwkAddr field of netID in bits.
@@ -218,7 +218,7 @@ func NwkAddrBits(netID NetID) uint {
 	case 7:
 		return 7
 	}
-	panic(fmt.Errorf("Unmatched NetID type: %d", netID.Type()))
+	panic(unmatchedNetID)
 }
 
 // NwkAddrLength returns the length of NwkAddr field of netID in bytes.
@@ -226,13 +226,15 @@ func NwkAddrLength(netID NetID) int {
 	return int((NwkAddrBits(netID) + 7) / 8)
 }
 
+var errNwkAddrLength = errors.DefineInternal("nwk_addr_bits", "too many bits set in NwkAddr")
+
 // NewDevAddr returns new DevAddr.
 func NewDevAddr(netID NetID, nwkAddr []byte) (addr DevAddr, err error) {
 	if len(nwkAddr) < 4 {
 		nwkAddr = append(make([]byte, 4-len(nwkAddr)), nwkAddr...)
 	}
 	if nwkAddr[0]&(0xfe<<((NwkAddrBits(netID)-1)%8)) > 0 {
-		return DevAddr{}, errors.New("Too many bits set in nwkAddr")
+		return DevAddr{}, errNwkAddrLength
 	}
 	copy(addr[:], nwkAddr)
 
@@ -274,9 +276,6 @@ func NewDevAddr(netID NetID, nwkAddr []byte) (addr DevAddr, err error) {
 	addr[0] |= 0xfe << (7 - t)
 	return addr, nil
 }
-
-// ErrInvalidDevAddrPrefix can be returned when unmarshaling an invalid slice into a prefix.
-var ErrInvalidDevAddrPrefix = errors.New("invalid device address prefix")
 
 // DevAddrPrefix is a DevAddr with a prefix length.
 type DevAddrPrefix struct {
@@ -350,6 +349,11 @@ func (prefix DevAddrPrefix) MarshalJSON() ([]byte, error) {
 	return append(str, '"'), nil
 }
 
+var errInvalidDevAddrPrefix = errors.DefineInvalidArgument(
+	"dev_addr_prefix",
+	"invalid DevAddr prefix",
+)
+
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (prefix *DevAddrPrefix) UnmarshalJSON(data []byte) error {
 	if string(data) == `""` {
@@ -357,15 +361,13 @@ func (prefix *DevAddrPrefix) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 	if len(data) != 12 && len(data) != 13 {
-		return ErrInvalidLength
+		return errInvalidDevAddrPrefix
 	}
 	if data[0] != '"' || data[len(data)-1] != '"' {
-		return ErrInvalidJSONString.New(errors.Attributes{
-			"json_string": string(data),
-		})
+		return errInvalidJSON.WithAttributes("json", string(data))
 	}
 	if data[9] != '/' {
-		return ErrInvalidDevAddrPrefix
+		return errInvalidDevAddrPrefix
 	}
 	b := make([]byte, hex.DecodedLen(8))
 	n, err := hex.Decode(b, data[1:9])
@@ -373,7 +375,7 @@ func (prefix *DevAddrPrefix) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	if n != 4 || copy(prefix.DevAddr[:], b) != 4 {
-		return ErrInvalidDevAddrPrefix
+		return errInvalidDevAddrPrefix
 	}
 	length, err := strconv.Atoi(string(data[10 : len(data)-1]))
 	if err != nil {
@@ -395,7 +397,7 @@ func (prefix *DevAddrPrefix) UnmarshalBinary(data []byte) error {
 		return nil
 	}
 	if len(data) != 5 {
-		return ErrInvalidLength
+		return errInvalidDevAddrPrefix
 	}
 	if err := prefix.DevAddr.Unmarshal(data[:4]); err != nil {
 		return err
@@ -420,10 +422,10 @@ func (prefix *DevAddrPrefix) UnmarshalText(data []byte) error {
 		return nil
 	}
 	if len(data) != 10 && len(data) != 11 {
-		return ErrInvalidLength
+		return errInvalidDevAddrPrefix
 	}
 	if data[8] != '/' {
-		return ErrInvalidDevAddrPrefix
+		return errInvalidDevAddrPrefix
 	}
 	if err := prefix.DevAddr.UnmarshalText(data[:8]); err != nil {
 		return err
@@ -446,7 +448,7 @@ func (prefix DevAddrPrefix) Value() (driver.Value, error) {
 func (prefix *DevAddrPrefix) Scan(src interface{}) error {
 	data, ok := src.([]byte)
 	if !ok {
-		return ErrTypeAssertion
+		return errScanArgumentType
 	}
 	return prefix.UnmarshalText(data)
 }

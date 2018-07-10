@@ -17,10 +17,12 @@ package types
 import (
 	"database/sql/driver"
 	"encoding/hex"
-	"errors"
-	"fmt"
 	"strings"
+
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
+
+const unmatchedNetID = "unmatched NetID type"
 
 // NetID is issued by the LoRa Alliance.
 type NetID [3]byte
@@ -85,7 +87,7 @@ func (id NetID) Value() (driver.Value, error) {
 func (id *NetID) Scan(src interface{}) error {
 	data, ok := src.([]byte)
 	if !ok {
-		return ErrTypeAssertion
+		return errScanArgumentType
 	}
 	return id.UnmarshalText(data)
 }
@@ -108,7 +110,7 @@ func (id NetID) ID() []byte {
 		// 21 LSB
 		return []byte{id[0] & 0x1f, id[1], id[2]}
 	default:
-		panic(fmt.Errorf("Unmatched NetID type: %d", id.Type()))
+		panic(unmatchedNetID)
 	}
 }
 
@@ -122,20 +124,30 @@ func (id NetID) IDBits() uint {
 	case 3, 4, 5, 6, 7:
 		return 21
 	}
-	panic(fmt.Errorf("Unmatched NetID type: %d", id.Type()))
+	panic(unmatchedNetID)
 }
+
+var errNetIDType = errors.DefineInvalidArgument(
+	"net_id_type",
+	"NetID type must be lower or equal to 7",
+)
+
+var errNetIDBits = errors.DefineInvalidArgument(
+	"net_id_bits",
+	"too many bits set in NetID",
+)
 
 // NewNetID returns new NetID.
 func NewNetID(typ byte, id []byte) (netID NetID, err error) {
 	if typ > 7 {
-		return NetID{}, fmt.Errorf("NetID type must be lower or equal to 7, got: %d", typ)
+		return NetID{}, errNetIDType
 	}
 
 	if len(id) < 3 {
 		id = append(make([]byte, 3-len(id)), id...)
 	}
 	if id[0]&0xe0 > 0 {
-		return NetID{}, errors.New("Too many bits set in id")
+		return NetID{}, errNetIDBits
 	}
 	copy(netID[:], id)
 	netID[0] = netID[0]&0x1f | typ<<5

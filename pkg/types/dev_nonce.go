@@ -83,7 +83,7 @@ func (dn DevNonce) Value() (driver.Value, error) {
 func (dn *DevNonce) Scan(src interface{}) error {
 	data, ok := src.([]byte)
 	if !ok {
-		return ErrTypeAssertion
+		return errScanArgumentType
 	}
 	return dn.UnmarshalText(data)
 }

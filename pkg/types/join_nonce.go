@@ -83,7 +83,7 @@ func (jn JoinNonce) Value() (driver.Value, error) {
 func (jn *JoinNonce) Scan(src interface{}) error {
 	data, ok := src.([]byte)
 	if !ok {
-		return ErrTypeAssertion
+		return errScanArgumentType
 	}
 	return jn.UnmarshalText(data)
 }

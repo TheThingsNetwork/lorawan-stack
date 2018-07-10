@@ -14,9 +14,7 @@
 
 package types
 
-import (
-	"encoding/binary"
-)
+import "encoding/binary"
 
 type randy interface {
 	Int63() int64

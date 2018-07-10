@@ -15,8 +15,6 @@
 package types
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/errors"
-
 	"database/sql/driver"
 	"encoding/binary"
 	"encoding/hex"
@@ -24,6 +22,8 @@ import (
 	"math"
 	"strconv"
 	"strings"
+
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 // EUI64 is a 64-bit Extended Unique Identifier.
@@ -89,7 +89,7 @@ func (eui EUI64) Value() (driver.Value, error) {
 func (eui *EUI64) Scan(src interface{}) error {
 	data, ok := src.([]byte)
 	if !ok {
-		return ErrTypeAssertion
+		return errScanArgumentType
 	}
 	return eui.UnmarshalText(data)
 }
@@ -130,9 +130,6 @@ func (eui EUI64) BeforeOrEqual(a EUI64) bool {
 func (eui EUI64) AfterOrEqual(a EUI64) bool {
 	return eui == a || eui.After(a)
 }
-
-// ErrInvalidEUI64Prefix can be returned when unmarshaling an invalid slice into a prefix.
-var ErrInvalidEUI64Prefix = errors.New("invalid EUI prefix")
 
 // EUI64Prefix is an EUI64 with a prefix length.
 type EUI64Prefix struct {
@@ -207,6 +204,11 @@ func (prefix EUI64Prefix) MarshalJSON() ([]byte, error) {
 	return append(result, '"'), nil
 }
 
+var errInvalidEUIPrefix = errors.DefineInvalidArgument(
+	"eui_prefix",
+	"invalid EUI prefix",
+)
+
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (prefix *EUI64Prefix) UnmarshalJSON(data []byte) error {
 	if string(data) == `""` {
@@ -214,15 +216,13 @@ func (prefix *EUI64Prefix) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 	if len(data) != 20 && len(data) != 21 {
-		return ErrInvalidLength
+		return errInvalidEUIPrefix
 	}
 	if data[0] != '"' || data[len(data)-1] != '"' {
-		return ErrInvalidJSONString.New(errors.Attributes{
-			"json_string": string(data),
-		})
+		return errInvalidJSON.WithAttributes("json", string(data))
 	}
 	if data[17] != '/' {
-		return ErrInvalidEUI64Prefix
+		return errInvalidEUIPrefix
 	}
 	b := make([]byte, hex.DecodedLen(16))
 	n, err := hex.Decode(b, data[1:17])
@@ -230,7 +230,7 @@ func (prefix *EUI64Prefix) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	if n != 8 || copy(prefix.EUI64[:], b) != 8 {
-		return ErrInvalidEUI64Prefix
+		return errInvalidEUIPrefix
 	}
 	length, err := strconv.Atoi(string(data[18 : len(data)-1]))
 	if err != nil {
@@ -252,7 +252,7 @@ func (prefix *EUI64Prefix) UnmarshalBinary(data []byte) error {
 		return nil
 	}
 	if len(data) != 9 {
-		return ErrInvalidLength
+		return errInvalidEUIPrefix
 	}
 	if err := prefix.EUI64.Unmarshal(data[:8]); err != nil {
 		return err
@@ -278,10 +278,10 @@ func (prefix *EUI64Prefix) UnmarshalText(data []byte) error {
 		return nil
 	}
 	if len(data) != 18 && len(data) != 19 {
-		return ErrInvalidLength
+		return errInvalidEUIPrefix
 	}
 	if data[16] != '/' {
-		return ErrInvalidEUI64Prefix
+		return errInvalidEUIPrefix
 	}
 	if err := prefix.EUI64.UnmarshalText(data[:16]); err != nil {
 		return err
@@ -304,7 +304,7 @@ func (prefix EUI64Prefix) Value() (driver.Value, error) {
 func (prefix *EUI64Prefix) Scan(src interface{}) error {
 	data, ok := src.([]byte)
 	if !ok {
-		return ErrTypeAssertion
+		return errScanArgumentType
 	}
 	return prefix.UnmarshalText(data)
 }

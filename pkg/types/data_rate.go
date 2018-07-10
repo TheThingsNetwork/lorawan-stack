@@ -18,8 +18,10 @@ import (
 	"regexp"
 	"strconv"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
+
+var invalidDataRate = errors.DefineInvalidArgument("data_rate", "invalid data rate")
 
 // DataRate encodes a LoRa data rate as a string or an FSK bit rate as an uint
 type DataRate struct {
@@ -27,32 +29,32 @@ type DataRate struct {
 	FSK  uint32
 }
 
+var sfRegexp = regexp.MustCompile("^SF(6|7|8|9|10|11|12)")
+
 // SpreadingFactor returns the spreading factor of this data rate, if it is a LoRa data rate. It returns an error otherwise.
 func (dr DataRate) SpreadingFactor() (uint8, error) {
-	re := regexp.MustCompile("SF(7|8|9|10|11|12)")
-	matches := re.FindStringSubmatch(dr.LoRa)
+	matches := sfRegexp.FindStringSubmatch(dr.LoRa)
 	if len(matches) != 2 {
-		return 0, errors.New("Spreading factor not found")
+		return 0, invalidDataRate
 	}
-
 	sf, err := strconv.ParseUint(matches[1], 10, 64)
 	if err != nil {
-		return 0, errors.NewWithCause(err, "Failed to parse spreading factor")
+		return 0, invalidDataRate
 	}
 	return uint8(sf), err
 }
 
+var drRegexp = regexp.MustCompile("BW(125|250|500)$")
+
 // Bandwidth returns the bandwidth of this data rate in Hz, if it is a LoRa data rate. It returns an error otherwise.
 func (dr DataRate) Bandwidth() (uint32, error) {
-	re := regexp.MustCompile("BW(125|250|500)")
-	matches := re.FindStringSubmatch(dr.LoRa)
+	matches := drRegexp.FindStringSubmatch(dr.LoRa)
 	if len(matches) != 2 {
-		return 0, errors.New("Bandwidth not found")
+		return 0, invalidDataRate
 	}
-
 	bw, err := strconv.ParseUint(matches[1], 10, 64)
 	if err != nil {
-		return 0, errors.NewWithCause(err, "Failed to parse bandwidth")
+		return 0, invalidDataRate
 	}
 	return uint32(bw) * 1000, err
 }

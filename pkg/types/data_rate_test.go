@@ -26,6 +26,7 @@ func TestValidSpreadingFactors(t *testing.T) {
 	a := assertions.New(t)
 
 	dataRates := map[types.DataRate]uint8{
+		{LoRa: "SF6BW125"}:  6,
 		{LoRa: "SF7BW125"}:  7,
 		{LoRa: "SF8BW125"}:  8,
 		{LoRa: "SF9BW125"}:  9,
