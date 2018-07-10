@@ -225,6 +225,10 @@ message MACInfo {
   // Periodicity of the class B ping slot
   PingSlotPeriod ping_slot_periodicity = 7;
 
+  // NeedsDownlinkAck reports whether a confirmed downlink had been recently scheduled for the device
+  // and an acknowledgment is expected to arrive.
+  bool needs_downlink_ack = 8;
+
   // TODO: Add info about failed MAC requests
 }
 

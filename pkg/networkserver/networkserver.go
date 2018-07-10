@@ -62,9 +62,9 @@ const (
 	// device should acknowledge the downlink or answer MAC command.
 	classCTimeout = 5 * time.Minute
 
-	// appQueueUpdateTime represents the time interval, within which AS
+	// appQueueUpdateTimeout represents the time interval, within which AS
 	// shall update the application queue after receiving the uplink.
-	appQueueUpdateTime = 200 * time.Millisecond
+	appQueueUpdateTimeout = 200 * time.Millisecond
 )
 
 func resetMACState(fps *frequencyplans.Store, dev *ttnpb.EndDevice) error {
@@ -849,6 +849,9 @@ func (ns *NetworkServer) generateAndScheduleDownlink(ctx context.Context, dev *d
 
 	if mType == ttnpb.MType_CONFIRMED_DOWN {
 		dev.Session.LastConfFCntDown = pld.FCnt
+		dev.MACInfo.NeedsDownlinkAck = true
+	} else {
+		dev.MACInfo.NeedsDownlinkAck = false
 	}
 
 	b, err := (ttnpb.Message{
@@ -1091,6 +1094,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 			WithCause(err)
 	}
 	if dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		// LoRaWAN1.1+ device will send a RekeyInd.
 		dev.SessionFallback = nil
 	}
 
@@ -1099,7 +1103,23 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		"device_uid", dev.EndDeviceIdentifiers.UniqueID(ctx),
 	))
 
-	defer time.AfterFunc(appQueueUpdateTime, func() {
+	updateTimeout := appQueueUpdateTimeout
+
+	uid := dev.EndDeviceIdentifiers.ApplicationIdentifiers.UniqueID(ctx)
+	if uid == "" {
+		return errCorruptRegistry.
+			WithCause(errMissingApplicationID)
+	}
+
+	ns.applicationServersMu.RLock()
+	asCl, asOk := ns.applicationServers[uid]
+	ns.applicationServersMu.RUnlock()
+
+	if !asOk {
+		updateTimeout = 0
+	}
+
+	defer time.AfterFunc(updateTimeout, func() {
 		// TODO: Decouple Class A downlink from uplink.
 		// https://github.com/TheThingsIndustries/lorawan-stack/issues/905
 
@@ -1118,6 +1138,21 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 	if pld == nil {
 		return errInvalidArgument.
 			WithCause(errors.New("empty payload"))
+	}
+
+	if pld.Ack || dev.MACInfo != nil && dev.MACInfo.NeedsDownlinkAck && dev.MACInfo.DeviceClass == ttnpb.CLASS_A {
+		if dev.MACInfo != nil {
+			dev.MACInfo.NeedsDownlinkAck = false
+		}
+
+		if err := asCl.Send(&ttnpb.ApplicationUp{
+			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+			Up: &ttnpb.ApplicationUp_DownlinkAck{
+				DownlinkAck: pld.Ack,
+			},
+		}); err != nil {
+			return err
+		}
 	}
 
 	mac := pld.FOpts
@@ -1251,30 +1286,20 @@ outer:
 		return err
 	}
 
-	uid := dev.EndDeviceIdentifiers.ApplicationIdentifiers.UniqueID(ctx)
-	if uid == "" {
-		return errCorruptRegistry.WithCause(errMissingApplicationID)
-	}
-
-	ns.applicationServersMu.RLock()
-	cl, ok := ns.applicationServers[uid]
-	ns.applicationServersMu.RUnlock()
-
-	if !ok {
+	if !asOk {
 		return nil
 	}
 
 	registerForwardUplink(ctx, dev.EndDevice, msg)
-	return cl.Send(&ttnpb.ApplicationUp{
+	return asCl.Send(&ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-		SessionKeyID:         dev.Session.SessionKeyID,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
+			CorrelationIDs: msg.CorrelationIDs,
 			FCnt:           dev.Session.NextFCntUp - 1,
 			FPort:          pld.FPort,
-			Ack:            pld.Ack,
 			FRMPayload:     pld.FRMPayload,
 			RxMetadata:     msg.RxMetadata,
-			CorrelationIDs: msg.CorrelationIDs,
+			SessionKeyID:   dev.Session.SessionKeyID,
 		}},
 	})
 }
@@ -1429,10 +1454,10 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 
 			if err := cl.Send(&ttnpb.ApplicationUp{
 				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-				SessionKeyID:         dev.Session.SessionKeyID,
 				Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 					AppSKey:        resp.SessionKeys.AppSKey,
 					CorrelationIDs: msg.CorrelationIDs,
+					SessionKeyID:   dev.Session.SessionKeyID,
 				}},
 			}); err != nil {
 				logger.WithField(

@@ -1082,15 +1082,14 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					a.So(up.GetUplinkMessage().CorrelationIDs, should.NotBeEmpty)
 
 					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-						SessionKeyID:         dev.Session.SessionKeys.SessionKeyID,
 						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 						Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
+							CorrelationIDs: up.GetUplinkMessage().CorrelationIDs,
 							FCnt:           tc.NextNextFCntUp - 1,
 							FPort:          tc.UplinkMessage.Payload.GetMACPayload().FPort,
-							Ack:            tc.UplinkMessage.Payload.GetMACPayload().Ack,
 							FRMPayload:     tc.UplinkMessage.Payload.GetMACPayload().FRMPayload,
 							RxMetadata:     up.GetUplinkMessage().RxMetadata,
-							CorrelationIDs: up.GetUplinkMessage().CorrelationIDs,
+							SessionKeyID:   dev.Session.SessionKeys.SessionKeyID,
 						}},
 					})
 
@@ -1212,15 +1211,14 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						a.So(up.GetUplinkMessage().CorrelationIDs, should.NotBeEmpty)
 
 						a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-							SessionKeyID:         dev.Session.SessionKeys.SessionKeyID,
 							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 							Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
+								CorrelationIDs: up.GetUplinkMessage().CorrelationIDs,
 								FCnt:           tc.NextNextFCntUp - 1,
 								FPort:          tc.UplinkMessage.Payload.GetMACPayload().FPort,
-								Ack:            tc.UplinkMessage.Payload.GetMACPayload().Ack,
 								FRMPayload:     tc.UplinkMessage.Payload.GetMACPayload().FRMPayload,
 								RxMetadata:     up.GetUplinkMessage().RxMetadata,
-								CorrelationIDs: up.GetUplinkMessage().CorrelationIDs,
+								SessionKeyID:   dev.Session.SessionKeys.SessionKeyID,
 							}},
 						})
 
@@ -1536,7 +1534,6 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 					a.So(up.GetJoinAccept().CorrelationIDs, should.NotBeEmpty)
 
 					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-						SessionKeyID: test.Must(dev.Load()).(*deviceregistry.Device).Session.SessionKeys.SessionKeyID,
 						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 							DevAddr:                expectedRequest.EndDeviceIdentifiers.DevAddr,
 							DevEUI:                 tc.Device.EndDeviceIdentifiers.DevEUI,
@@ -1547,6 +1544,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 							AppSKey:        resp.SessionKeys.AppSKey,
 							CorrelationIDs: up.GetJoinAccept().CorrelationIDs,
+							SessionKeyID:   test.Must(dev.Load()).(*deviceregistry.Device).Session.SessionKeys.SessionKeyID,
 						}},
 					})
 
@@ -1679,7 +1677,6 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 						a.So(up.GetJoinAccept().CorrelationIDs, should.NotBeEmpty)
 
 						a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-							SessionKeyID: test.Must(dev.Load()).(*deviceregistry.Device).Session.SessionKeys.SessionKeyID,
 							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 								DevAddr:                expectedRequest.EndDeviceIdentifiers.DevAddr,
 								DevEUI:                 tc.Device.EndDeviceIdentifiers.DevEUI,
@@ -1690,6 +1687,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 							Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 								AppSKey:        resp.SessionKeys.AppSKey,
 								CorrelationIDs: up.GetJoinAccept().CorrelationIDs,
+								SessionKeyID:   test.Must(dev.Load()).(*deviceregistry.Device).Session.SessionKeys.SessionKeyID,
 							}},
 						})
 

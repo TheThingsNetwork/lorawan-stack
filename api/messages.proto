@@ -151,18 +151,21 @@ message DownlinkMessage {
 }
 
 message ApplicationUplink {
-  uint32 f_port = 1;
-  uint32 f_cnt = 2;
-  bool ack = 3;
+  // Join Server issued identifier for the session keys.
+  string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
+  uint32 f_port = 2;
+  uint32 f_cnt = 3;
   bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
   repeated RxMetadata rx_metadata = 5;
   repeated string correlation_ids = 6 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
 message ApplicationJoinAccept {
+  // Join Server issued identifier for the session keys.
+  string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
   // The (encrypted) Application Session Key.
-  KeyEnvelope app_s_key = 1;
-  repeated string correlation_ids = 2 [(gogoproto.customname) = "CorrelationIDs"];
+  KeyEnvelope app_s_key = 2;
+  repeated string correlation_ids = 3 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
 message ApplicationDownlink {

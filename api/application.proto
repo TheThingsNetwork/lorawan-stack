@@ -58,16 +58,12 @@ message Applications {
 message ApplicationUp {
   EndDeviceIdentifiers end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
-  // Join Server issued identifier for the session keys.
-  string session_key_id = 2 [(gogoproto.customname) = "SessionKeyID"];
-
   oneof up {
-    ApplicationUplink uplink_message = 3;
-    ApplicationJoinAccept join_accept = 4;
-    // Downlink queued
-    // Downlink sent
-    // Downlink acked
-    // Downlink not acked
+    ApplicationUplink uplink_message = 2;
+    ApplicationJoinAccept join_accept = 3;
+    bool downlink_ack = 4;
+    google.protobuf.Empty downlink_sent = 5;
+    google.protobuf.Empty downlink_queued = 6;
     // Downlink queue invalidated (LoRaWAN 1.0)
   }
 }
