@@ -12,11 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable no-console */
 
 import dev from './dev'
 
-export default function (...args) {
+export function warn (...args) {
   if (dev) {
     console.warn(...args)
+  }
+}
+
+export function error (...args) {
+  if (dev) {
+    console.warn(...args)
+  }
+}
+
+export default function log (...args) {
+  if (dev) {
+    console.log(...args)
   }
 }
