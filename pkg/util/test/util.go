@@ -15,6 +15,7 @@
 package test
 
 import (
+	"fmt"
 	"os"
 	"reflect"
 	"strconv"
@@ -22,7 +23,6 @@ import (
 	"time"
 
 	"github.com/kr/pretty"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // Delay is the value, which can be used to slowdown the execution of time-dependent tests.
@@ -42,14 +42,10 @@ var Delay = time.Millisecond * func() time.Duration {
 	return time.Duration(v)
 }()
 
-func mustErr(err error) error {
-	return errors.Errorf("Error: %s", err)
-}
-
 // Must returns v if err is nil and panics otherwise.
 func Must(v interface{}, err error) interface{} {
 	if err != nil {
-		panic(mustErr(err))
+		panic(err)
 	}
 	return v
 }
@@ -60,16 +56,16 @@ func Must(v interface{}, err error) interface{} {
 func MustMultiple(vs ...interface{}) []interface{} {
 	n := len(vs)
 	if n == 0 {
-		panic(errors.Errorf("MustMultiple requires at least 1 argument"))
+		panic("MustMultiple requires at least 1 argument")
 	}
 
 	err, ok := vs[n-1].(error)
 	if !ok && vs[n-1] != nil {
-		panic(errors.Errorf("MustMultiple expected last argument to be an error, got %T", vs[n-1]))
+		panic(fmt.Sprintf("MustMultiple expected last argument to be an error, got %T", vs[n-1]))
 	}
 
 	if err != nil {
-		panic(mustErr(err))
+		panic(err)
 	}
 	return vs[:n-1]
 }
@@ -87,17 +83,17 @@ func DiffEqual(x, y interface{}) bool {
 func SameElements(eq interface{}, xs, ys interface{}) bool {
 	ev := reflect.ValueOf(eq)
 	if ev.Kind() != reflect.Func {
-		panic(errors.Errorf("Expected kind of eq to be a function, got: %s", ev.Kind()))
+		panic(fmt.Sprintf("Expected kind of eq to be a function, got: %s", ev.Kind()))
 	}
 
 	xv := reflect.ValueOf(xs)
 	if xv.Kind() != reflect.Slice {
-		panic(errors.Errorf("Expected kind of xs to be a slice, got: %s", xv.Kind()))
+		panic(fmt.Sprintf("Expected kind of xs to be a slice, got: %s", xv.Kind()))
 	}
 
 	yv := reflect.ValueOf(ys)
 	if yv.Kind() != reflect.Slice {
-		panic(errors.Errorf("Expected kind of ys to be a slice, got: %s", yv.Kind()))
+		panic(fmt.Sprintf("Expected kind of ys to be a slice, got: %s", yv.Kind()))
 	}
 
 	n := xv.Len()

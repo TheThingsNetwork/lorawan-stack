@@ -15,12 +15,12 @@
 package test
 
 import (
+	"errors"
 	"strconv"
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 func TestSameElements(t *testing.T) {

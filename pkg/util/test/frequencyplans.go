@@ -19,7 +19,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 const (
@@ -79,7 +79,7 @@ func NewFrequencyPlansStore() (FrequencyPlansStore, error) {
 
 	dir, err := ioutil.TempDir("", "frequencyplans")
 	if err != nil {
-		return store, errors.NewWithCause(err, "Failed to create a new temporary directory for frequency plans")
+		return store, errors.New("Failed to create a new temporary directory for frequency plans").WithCause(err)
 	}
 	store = FrequencyPlansStore(dir)
 
