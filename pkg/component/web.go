@@ -68,10 +68,10 @@ func (c *Component) listenWeb() (err error) {
 		}()
 	}
 
-	if c.config.HTTP.PProf {
+	if c.config.HTTP.PProf.Enable {
 		var middleware []echo.MiddlewareFunc
-		if c.config.HTTP.PProfPassword != "" {
-			middleware = append(middleware, c.basicAuth("pprof", c.config.HTTP.PProfPassword))
+		if c.config.HTTP.PProf.Password != "" {
+			middleware = append(middleware, c.basicAuth("pprof", c.config.HTTP.PProf.Password))
 		}
 		g := c.web.RootGroup("/debug/pprof", middleware...)
 		g.GET("", func(c echo.Context) error { return c.Redirect(http.StatusFound, c.Path()+"/") })
@@ -80,10 +80,10 @@ func (c *Component) listenWeb() (err error) {
 		g.GET("/trace", echo.WrapHandler(http.HandlerFunc(pprof.Trace)))
 	}
 
-	if c.config.HTTP.Metrics {
+	if c.config.HTTP.Metrics.Enable {
 		var middleware []echo.MiddlewareFunc
-		if c.config.HTTP.MetricsPassword != "" {
-			middleware = append(middleware, c.basicAuth("metrics", c.config.HTTP.MetricsPassword))
+		if c.config.HTTP.Metrics.Password != "" {
+			middleware = append(middleware, c.basicAuth("metrics", c.config.HTTP.Metrics.Password))
 		}
 		g := c.web.RootGroup("/metrics", middleware...)
 		g.GET("/", func(c echo.Context) error { return c.Redirect(http.StatusFound, strings.TrimSuffix(c.Path(), "/")) })

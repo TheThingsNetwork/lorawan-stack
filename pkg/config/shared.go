@@ -73,15 +73,25 @@ type Cookie struct {
 	BlockKey []byte `name:"block-key" description:"Key for cookie contents encryption (16, 24 or 32 bytes)"`
 }
 
+// PProf represents the pprof endpoint configuration.
+type PProf struct {
+	Enable   bool   `name:"enable" description:"Enable pprof endpoint on HTTP server"`
+	Password string `name:"password" description:"Password to protect pprof endpoint (username is pprof)"`
+}
+
+// Metrics represents the metrics endpoint configuration.
+type Metrics struct {
+	Enable   bool   `name:"enable" description:"Enable metrics endpoint on HTTP server"`
+	Password string `name:"password" description:"Password to protect metrics endpoint (username is metrics)"`
+}
+
 // HTTP represents the HTTP and HTTPS server configuration.
 type HTTP struct {
-	Listen          string `name:"listen" description:"Address for the HTTP server to listen on"`
-	ListenTLS       string `name:"listen-tls" description:"Address for the HTTPS server to listen on"`
-	Cookie          Cookie `name:"cookie"`
-	PProf           bool   `name:"pprof" description:"Expose pprof over HTTP"`
-	PProfPassword   string `name:"pprof-password" description:"Password to protect pprof endpoint (username is pprof)"`
-	Metrics         bool   `name:"metrics" description:"Expose metrics over HTTP"`
-	MetricsPassword string `name:"metrics-password" description:"Password to protect metrics endpoint (username is metrics)"`
+	Listen    string  `name:"listen" description:"Address for the HTTP server to listen on"`
+	ListenTLS string  `name:"listen-tls" description:"Address for the HTTPS server to listen on"`
+	Cookie    Cookie  `name:"cookie"`
+	PProf     PProf   `name:"pprof"`
+	Metrics   Metrics `name:"metrics"`
 }
 
 // Redis represents Redis configuration.

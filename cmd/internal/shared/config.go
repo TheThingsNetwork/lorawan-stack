@@ -46,8 +46,12 @@ var DefaultClusterConfig = config.Cluster{}
 var DefaultHTTPConfig = config.HTTP{
 	Listen:    ":1885",
 	ListenTLS: ":8885",
-	PProf:     true,
-	Metrics:   true,
+	PProf: config.PProf{
+		Enable: true,
+	},
+	Metrics: config.Metrics{
+		Enable: true,
+	},
 }
 
 // DefaultGRPCConfig is the default config for GRPC.

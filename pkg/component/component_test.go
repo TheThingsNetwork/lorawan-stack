@@ -82,9 +82,7 @@ func TestHTTP(t *testing.T) {
 	a := assertions.New(t)
 
 	httpAddress, httpsAddress := "0.0.0.0:9185", "0.0.0.0:9186"
-	baseConfig := component.Config{
-		ServiceBase: config.ServiceBase{HTTP: config.HTTP{PProf: true}},
-	}
+	baseConfig := component.Config{}
 
 	workingRoutePath := "/ok"
 	workingRoute := registererFunc(func(s *web.Server) {
