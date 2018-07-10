@@ -16,15 +16,10 @@ package log
 
 import (
 	"fmt"
-
-	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // Fielder interface check.
 var _ Fielder = &F{}
-
-// ErrInvalidPairs occurs when not passing an even amount of arguments to a function that expects a list of key-value pairs.
-var ErrInvalidPairs = errors.New("Uneven number of key-value pairs passed")
 
 // Fielder is the interface for anything that can have fields.
 type Fielder interface {
@@ -33,13 +28,8 @@ type Fielder interface {
 
 // Fields returns a new immutable fields structure.
 func Fields(pairs ...interface{}) *F {
-	nodes, err := pairsToMap(pairs...)
-	if err != nil {
-		panic(err)
-	}
-
 	return &F{
-		nodes: nodes,
+		nodes: pairsToMap(pairs...),
 	}
 }
 
@@ -65,14 +55,12 @@ func (f *F) Get(key string) (interface{}, bool) {
 	return nil, false
 }
 
-func pairsToMap(pairs ...interface{}) (map[string]interface{}, error) {
+func pairsToMap(pairs ...interface{}) map[string]interface{} {
+	if len(pairs)%2 != 0 {
+		panic("Uneven number of key-value pairs passed")
+	}
 	nodes := make(map[string]interface{})
 	var key string
-
-	if len(pairs)%2 != 0 {
-		return nil, ErrInvalidPairs
-	}
-
 	for i, node := range pairs {
 		if i%2 == 0 {
 			key = fmt.Sprintf("%v", node)
@@ -80,8 +68,7 @@ func pairsToMap(pairs ...interface{}) (map[string]interface{}, error) {
 			nodes[key] = node
 		}
 	}
-
-	return nodes, nil
+	return nodes
 }
 
 // Fields implements Fielder. Returns all fields in O(n), where n is the number of entries in the map.

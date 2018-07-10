@@ -25,26 +25,22 @@ func TestPairs(t *testing.T) {
 	a := assertions.New(t)
 
 	{
-		n, err := pairsToMap("a", 10, "b", true)
-		a.So(err, should.BeNil)
+		n := pairsToMap("a", 10, "b", true)
 		a.So(n["a"], should.Equal, 10)
 		a.So(n["b"], should.Equal, true)
 	}
 
 	{
-		n, err := pairsToMap()
-		a.So(err, should.BeNil)
+		n := pairsToMap()
 		a.So(n, should.BeEmpty)
 	}
 
 	{
-		_, err := pairsToMap("a")
-		a.So(err, should.NotBeNil)
+		a.So(func() { pairsToMap("a") }, should.Panic)
 	}
 
 	{
-		n, err := pairsToMap(10, 20, true, "OK")
-		a.So(err, should.BeNil)
+		n := pairsToMap(10, 20, true, "OK")
 		a.So(n["10"], should.Equal, 20)
 		a.So(n["true"], should.Equal, "OK")
 	}
