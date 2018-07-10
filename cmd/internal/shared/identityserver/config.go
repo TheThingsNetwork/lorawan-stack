@@ -23,7 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/oauth"
 )
 
-// DefaultIdentityServerConfig is the default configuration for the IdentityServer.
+// DefaultIdentityServerConfig is the default configuration for the Identity Server.
 var DefaultIdentityServerConfig = identityserver.Config{
 	DatabaseURI:      "postgres://root@localhost:26257/is_development?sslmode=disable",
 	PublicURL:        "http://localhost:1885",
@@ -35,7 +35,7 @@ var DefaultIdentityServerConfig = identityserver.Config{
 	},
 }
 
-// DefaultIdentityServerInitialData is the default initial data when running the `init` command.
+// DefaultIdentityServerInitialData is the default initial data.
 var DefaultIdentityServerInitialData = identityserver.InitialData{
 	Settings: identityserver.DefaultSettings,
 	Admin: identityserver.InitialAdminData{
