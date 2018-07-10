@@ -146,11 +146,15 @@ func TestUnaryHook(t *testing.T) {
 		a.So(err, should.BeNil)
 		go func() {
 			as.up <- &ttnpb.ApplicationUp{
-				SessionKeyID: "key",
+				Up: &ttnpb.ApplicationUp_UplinkMessage{
+					UplinkMessage: &ttnpb.ApplicationUplink{
+						SessionKeyID: "key",
+					},
+				},
 			}
 		}()
 		up, err := sub.Recv()
 		a.So(err, should.BeNil)
-		a.So(up.SessionKeyID, should.Equal, "key")
+		a.So(up.GetUplinkMessage().SessionKeyID, should.Equal, "key")
 	}
 }

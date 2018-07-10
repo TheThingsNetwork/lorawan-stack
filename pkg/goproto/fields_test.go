@@ -104,8 +104,8 @@ func TestGoFieldsPathsEndDevice(t *testing.T) {
 		fields, expected []string
 	}{
 		{
-			fields:   []string{"mac_state_desired", "lorawan_version"},
-			expected: []string{"MACStateDesired", "LoRaWANVersion"},
+			fields:   []string{"mac_state", "recent_uplinks", "frequency_plan_id"},
+			expected: []string{"MACState", "RecentUplinks", "FrequencyPlanID"},
 		},
 		{
 			fields:   []string{"location.latitude"},
