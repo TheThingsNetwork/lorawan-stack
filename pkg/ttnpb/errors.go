@@ -19,8 +19,8 @@ import (
 	"math"
 
 	proto "github.com/golang/protobuf/proto"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	errorsv3 "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	removetheseerrors "go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 )
 
@@ -43,7 +43,7 @@ func (e errorDetails) PublicAttributes() map[string]interface{} {
 func (e errorDetails) CorrelationID() string { return e.GetCorrelationID() }
 
 func init() {
-	errorsv3.ErrorDetailsToProto = func(e errorsv3.ErrorDetails) proto.Message {
+	errors.ErrorDetailsToProto = func(e errors.ErrorDetails) proto.Message {
 		attributes, err := gogoproto.Struct(e.PublicAttributes())
 		if err != nil {
 			panic(fmt.Sprintf("Failed to encode error attributes: %s", err)) // Likely a bug in ttn (invalid attribute type).
@@ -56,7 +56,7 @@ func init() {
 			CorrelationID: e.CorrelationID(),
 		}
 	}
-	errorsv3.ErrorDetailsFromProto = func(msg ...proto.Message) (details errorsv3.ErrorDetails, rest []proto.Message) {
+	errors.ErrorDetailsFromProto = func(msg ...proto.Message) (details errors.ErrorDetails, rest []proto.Message) {
 		var detailsMsg *ErrorDetails
 		for _, msg := range msg {
 			switch msg := msg.(type) {
@@ -73,60 +73,60 @@ func init() {
 
 var (
 	// ErrEmptyUpdateMask is returned when the update mask is specified but empty.
-	ErrEmptyUpdateMask = &errors.ErrDescriptor{
+	ErrEmptyUpdateMask = &removetheseerrors.ErrDescriptor{
 		MessageFormat: "update_mask must be non-empty",
 		Code:          1,
-		Type:          errors.InvalidArgument,
+		Type:          removetheseerrors.InvalidArgument,
 	}
 
 	// ErrInvalidPathUpdateMask is returned when the update mask includes a wrong field path.
-	ErrInvalidPathUpdateMask = &errors.ErrDescriptor{
+	ErrInvalidPathUpdateMask = &removetheseerrors.ErrDescriptor{
 		MessageFormat: "Invalid update_mask: `{path}` is not a valid path",
 		Code:          2,
-		Type:          errors.InvalidArgument,
+		Type:          removetheseerrors.InvalidArgument,
 	}
 
 	// ErrMissingRawPayload represents error ocurring when raw message payload is missing.
-	ErrMissingRawPayload = &errors.ErrDescriptor{
+	ErrMissingRawPayload = &removetheseerrors.ErrDescriptor{
 		MessageFormat: "Raw Message payload is missing",
-		Type:          errors.InvalidArgument,
+		Type:          removetheseerrors.InvalidArgument,
 		Code:          3,
 	}
 
 	// ErrWrongPayloadType represents error ocurring when wrong payload type is received.
-	ErrWrongPayloadType = &errors.ErrDescriptor{
+	ErrWrongPayloadType = &removetheseerrors.ErrDescriptor{
 		MessageFormat:  "Wrong payload type: `{type}`",
-		Type:           errors.InvalidArgument,
+		Type:           removetheseerrors.InvalidArgument,
 		Code:           4,
 		SafeAttributes: []string{"type"},
 	}
 
 	// ErrFPortTooHigh represents error ocurring when FPort provided is too high.
-	ErrFPortTooHigh = &errors.ErrDescriptor{
+	ErrFPortTooHigh = &removetheseerrors.ErrDescriptor{
 		MessageFormat: fmt.Sprintf("FPort must be lower or equal to %d", math.MaxUint8),
-		Type:          errors.InvalidArgument,
+		Type:          removetheseerrors.InvalidArgument,
 		Code:          5,
 	}
 
 	// ErrTxChIdxTooHigh represents error ocurring when TxChIdx provided is too high.
-	ErrTxChIdxTooHigh = &errors.ErrDescriptor{
+	ErrTxChIdxTooHigh = &removetheseerrors.ErrDescriptor{
 		MessageFormat: fmt.Sprintf("TxChIdx must be lower or equal to %d", math.MaxUint8),
-		Type:          errors.InvalidArgument,
+		Type:          removetheseerrors.InvalidArgument,
 		Code:          6,
 	}
 
 	// ErrTxDRIdxTooHigh represents error ocurring when TxDRIdx provided is too high.
-	ErrTxDRIdxTooHigh = &errors.ErrDescriptor{
+	ErrTxDRIdxTooHigh = &removetheseerrors.ErrDescriptor{
 		MessageFormat: fmt.Sprintf("TxDRIdx must be lower or equal to %d", math.MaxUint8),
-		Type:          errors.InvalidArgument,
+		Type:          removetheseerrors.InvalidArgument,
 		Code:          7,
 	}
 
 	// ErrEmptyIdentifiers is returned when the XXXIdentifiers are empty.
-	ErrEmptyIdentifiers = &errors.ErrDescriptor{
+	ErrEmptyIdentifiers = &removetheseerrors.ErrDescriptor{
 		MessageFormat: "Identifiers must not be empty",
 		Code:          8,
-		Type:          errors.InvalidArgument,
+		Type:          removetheseerrors.InvalidArgument,
 	}
 )
 
