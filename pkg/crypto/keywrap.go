@@ -18,7 +18,7 @@ import (
 	"crypto/aes"
 	"encoding/binary"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 var iv = [8]byte{0xA6, 0xA6, 0xA6, 0xA6, 0xA6, 0xA6, 0xA6, 0xA6}
@@ -37,18 +37,18 @@ func xor(b [8]byte, t uint64) (c [8]byte) {
 func msb(b [16]byte) (c [8]byte) { copy(c[:], b[:8]); return }
 func lsb(b [16]byte) (c [8]byte) { copy(c[:], b[8:]); return }
 
+var errInvalidKeyLength = errInvalidSize("key_length", "key length", "16, 24 or 32")
+
 // WrapKey implements the RFC 3394 Wrap algorithm
 func WrapKey(plaintext, kek []byte) (ciphertext []byte, err error) {
 	length := len(plaintext)
 	if length%8 != 0 {
-		return nil, ErrInvalidPlaintextLength.New(errors.Attributes{
-			"size": length,
-		})
+		return nil, errInvalidKeyLength.WithAttributes("size", length)
 	}
 
 	var n = length / 8
 	if n < 2 {
-		return nil, ErrNoKeyPresent.New(nil)
+		return nil, errInvalidKeyLength.WithAttributes("size", length)
 	}
 
 	cipher, err := aes.NewCipher(kek)
@@ -85,18 +85,18 @@ func WrapKey(plaintext, kek []byte) (ciphertext []byte, err error) {
 	return ciphertext, nil
 }
 
+var errCorruptKey = errors.DefineCorruption("corrupt_key", "corrupt key data")
+
 // UnwrapKey implements the RFC 3394 Unwrap algorithm
 func UnwrapKey(ciphertext, kek []byte) (plaintext []byte, err error) {
 	length := len(ciphertext)
 	if length%8 != 0 {
-		return nil, ErrInvalidCiphertextLength.New(errors.Attributes{
-			"size": length,
-		})
+		return nil, errInvalidKeyLength.WithAttributes("size", length)
 	}
 
 	var n = (length / 8) - 1
 	if n < 2 {
-		return nil, ErrNoKeyPresent.New(nil)
+		return nil, errInvalidKeyLength.WithAttributes("size", length)
 	}
 
 	cipher, err := aes.NewCipher(kek)
@@ -126,7 +126,7 @@ func UnwrapKey(ciphertext, kek []byte) (plaintext []byte, err error) {
 
 	// Check for corruption
 	if a != iv {
-		return nil, ErrCorruptKeyData.New(nil)
+		return nil, errCorruptKey
 	}
 
 	// Build the result

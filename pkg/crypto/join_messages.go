@@ -18,9 +18,10 @@ import (
 	"crypto/aes"
 
 	"github.com/jacobsa/crypto/cmac"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
+
+var errInvalidJoinAcceptMessageSize = errInvalidSize("join_accept_message", "Join-accept message", "16 or 32")
 
 // EncryptJoinAccept uses AES Decrypt to encrypt a JoinAccept message
 // - The payload contains JoinNonce/AppNonce | NetID | DevAddr | DLSettings | RxDelay | (CFList | CFListType) | MIC
@@ -29,9 +30,7 @@ import (
 // - In LoRaWAN 1.1, the JSEncKey is used in reply to a RejoinRequest (type 0,1,2)
 func EncryptJoinAccept(key types.AES128Key, payload []byte) (encrypted []byte, err error) {
 	if len(payload) != 16 && len(payload) != 32 {
-		return nil, ErrInvalidJoinAcceptPayloadForEncryption.New(errors.Attributes{
-			"size": len(payload),
-		})
+		return nil, errInvalidJoinAcceptMessageSize.WithAttributes("size", len(payload))
 	}
 	cipher, err := aes.NewCipher(key[:])
 	if err != nil {
@@ -50,9 +49,7 @@ func EncryptJoinAccept(key types.AES128Key, payload []byte) (encrypted []byte, e
 // - In LoRaWAN 1.1, the NwkKey or JSEncKey is used
 func DecryptJoinAccept(key types.AES128Key, encrypted []byte) (payload []byte, err error) {
 	if len(encrypted) != 16 && len(encrypted) != 32 {
-		return nil, ErrInvalidJoinAcceptPayloadForDecryption.New(errors.Attributes{
-			"size": len(payload),
-		})
+		return nil, errInvalidJoinAcceptMessageSize.WithAttributes("size", len(payload))
 	}
 	cipher, err := aes.NewCipher(key[:])
 	if err != nil {
@@ -65,15 +62,15 @@ func DecryptJoinAccept(key types.AES128Key, encrypted []byte) (payload []byte, e
 	return
 }
 
+var errInvalidJoinRequestPayloadSize = errInvalidSize("join_request_payload", "Join-request payload", "19")
+
 // ComputeJoinRequestMIC computes the Message Integrity Code for a JoinRequest message
 // - The payload contains MHDR | JoinEUI/AppEUI | DevEUI | DevNonce
 // - In LoRaWAN 1.0, the AppKey is used
 // - In LoRaWAN 1.1, the NwkKey is used
 func ComputeJoinRequestMIC(key types.AES128Key, payload []byte) (mic [4]byte, err error) {
 	if len(payload) != 19 {
-		return mic, ErrInvalidJoinRequestPayloadForMIC.New(errors.Attributes{
-			"size": len(payload),
-		})
+		return mic, errInvalidJoinRequestPayloadSize.WithAttributes("size", len(payload))
 	}
 	hash, err := cmac.New(key[:])
 	if err != nil {
@@ -86,6 +83,12 @@ func ComputeJoinRequestMIC(key types.AES128Key, payload []byte) (mic [4]byte, er
 	copy(mic[:], hash.Sum([]byte{}))
 	return
 }
+
+var (
+	errrInvalidRejoinRequestSize    = errInvalidSize("rejoin_request", "Rejoin-request", "15 or 20")
+	errrInvalidRejoinRequestType0_2 = errInvalidSize("rejoin_request_0_2", "Rejoin-request type 0 or 2", "15")
+	errrInvalidRejoinRequestType1   = errInvalidSize("rejoin_request_1", "Rejoin-request type 1", "20")
+)
 
 // ComputeRejoinRequestMIC computes the Message Integrity Code for a RejoinRequest message
 // - For a type 0 or 2 RejoinRequest, the payload contains MHDR | RejoinType | NetID | DevEUI | RJcount0
@@ -93,24 +96,18 @@ func ComputeJoinRequestMIC(key types.AES128Key, payload []byte) (mic [4]byte, er
 // - For a type 1 RejoinRequest, the payload contains MHDR | RejoinType | JoinEUI | DevEUI | RJcount1
 // - For a type 1 RejoinRequest, the JSIntKey is used
 func ComputeRejoinRequestMIC(key types.AES128Key, payload []byte) (mic [4]byte, err error) {
-	if len(payload) < 2 {
-		return mic, ErrInvalidRejoinRequestSizeForMIC.New(errors.Attributes{
-			"size": len(payload),
-		})
+	if len(payload) != 15 && len(payload) != 20 {
+		return mic, errrInvalidRejoinRequestSize.WithAttributes("size", len(payload))
 	}
 	rejoinType := payload[1]
 	switch rejoinType {
 	case 0, 2:
 		if len(payload) != 15 {
-			return mic, ErrInvalidRejoinRequestType0_2ForMIC.New(errors.Attributes{
-				"size": len(payload),
-			})
+			return mic, errrInvalidRejoinRequestType0_2.WithAttributes("size", len(payload))
 		}
 	case 1:
 		if len(payload) != 20 {
-			return mic, ErrInvalidRejoinRequestType1ForMIC.New(errors.Attributes{
-				"size": len(payload),
-			})
+			return mic, errrInvalidRejoinRequestType1.WithAttributes("size", len(payload))
 		}
 	}
 	hash, err := cmac.New(key[:])
@@ -122,8 +119,10 @@ func ComputeRejoinRequestMIC(key types.AES128Key, payload []byte) (mic [4]byte, 
 		return mic, err
 	}
 	copy(mic[:], hash.Sum([]byte{}))
-	return
+	return mic, nil
 }
+
+var errInvalidJoinAcceptPayloadSize = errInvalidSize("join_accept_payload", "JoinAccept payload", "13 or 29")
 
 // ComputeLegacyJoinAcceptMIC computes the Message Integrity Code for a JoinAccept message
 // - The payload contains MHDR | JoinNonce/AppNonce | NetID | DevAddr | DLSettings | RxDelay | (CFList | CFListType)
@@ -131,9 +130,7 @@ func ComputeRejoinRequestMIC(key types.AES128Key, payload []byte) (mic [4]byte, 
 // - In LoRaWAN 1.1 with OptNeg=0, the NwkKey is used
 func ComputeLegacyJoinAcceptMIC(key types.AES128Key, payload []byte) (mic [4]byte, err error) {
 	if n := len(payload); n != 13 && n != 29 {
-		return mic, ErrInvalidJoinAcceptPayloadForMIC.New(errors.Attributes{
-			"size": len(payload),
-		})
+		return mic, errInvalidJoinAcceptPayloadSize.WithAttributes("size", len(payload))
 	}
 	hash, err := cmac.New(key[:])
 	if err != nil {
@@ -152,9 +149,7 @@ func ComputeLegacyJoinAcceptMIC(key types.AES128Key, payload []byte) (mic [4]byt
 // - the joinReqType is 0xFF in reply to a JoinRequest or the rejoin type in reply to a RejoinRequest
 func ComputeJoinAcceptMIC(jsIntKey types.AES128Key, joinReqType byte, joinEUI types.EUI64, dn types.DevNonce, payload []byte) (mic [4]byte, err error) {
 	if n := len(payload); n != 13 && n != 29 {
-		return mic, ErrInvalidJoinAcceptPayloadForMIC.New(errors.Attributes{
-			"size": len(payload),
-		})
+		return mic, errInvalidJoinAcceptPayloadSize.WithAttributes("size", len(payload))
 	}
 	hash, err := cmac.New(jsIntKey[:])
 	if err != nil {

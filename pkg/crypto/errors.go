@@ -17,72 +17,12 @@ package crypto
 import (
 	"fmt"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
-var (
-	errInvalidSize = func(typeName, expectedSize string, code errors.Code) *errors.ErrDescriptor {
-		return &errors.ErrDescriptor{
-			MessageFormat:  fmt.Sprintf("Expected %s to be %s, got {size}", typeName, expectedSize),
-			SafeAttributes: []string{"size"},
-			Code:           code,
-			Type:           errors.InvalidArgument,
-		}
-	}
-
-	// ErrInvalidJoinAcceptPayloadForEncryption is returned if encryption couldn't be completed due to
-	// an invalid join-accept payload size.
-	ErrInvalidJoinAcceptPayloadForEncryption = errInvalidSize("Join-accept payload", "16 or 32 bytes", 1)
-	// ErrInvalidJoinAcceptPayloadForDecryption is returned if decryption couldn't be completed due to
-	// an invalid encrypted join-accept payload size.
-	ErrInvalidJoinAcceptPayloadForDecryption = errInvalidSize("Encrypted join-accept payload", "16 or 32 bytes", 2)
-	// ErrInvalidJoinRequestPayloadForMIC is returned if MIC computing couldn't be completed due to
-	// an invalid join-request payload size.
-	ErrInvalidJoinRequestPayloadForMIC = errInvalidSize("Join-request payload", "19 bytes", 3)
-	// ErrInvalidJoinAcceptPayloadForMIC is returned if MIC computing couldn't be completed due to
-	// an invalid join-accept payload size.
-	ErrInvalidJoinAcceptPayloadForMIC = errInvalidSize("Join-accept payload", "13 or 29 bytes", 4)
-
-	// ErrInvalidRejoinRequestSizeForMIC is returned if MIC computing couldn't be completed due to
-	// an invalid rejoin-request payload size.
-	ErrInvalidRejoinRequestSizeForMIC = errInvalidSize("Rejoin-request payload", "at least 3 bytes", 5)
-	// ErrInvalidRejoinRequestType0_2ForMIC is returned if MIC computing couldn't be completed due to
-	// an invalid type 0 or 2 rejoin-request payload size.
-	ErrInvalidRejoinRequestType0_2ForMIC = errInvalidSize("Rejoin-request type 0 or 2 payload", "15 bytes", 6)
-	// ErrInvalidRejoinRequestType1ForMIC is returned if MIC computing couldn't be completed due to
-	// an invalid type 1 rejoin-request payload size.
-	ErrInvalidRejoinRequestType1ForMIC = errInvalidSize("Rejoin-request type 1 payload", "20 bytes", 7)
-
-	// ErrNoKeyPresent is returned if no key could be read during a WrapKey operation.
-	ErrNoKeyPresent = &errors.ErrDescriptor{
-		MessageFormat: "No key present",
-		Code:          8,
-		Type:          errors.InvalidArgument,
-	}
-	// ErrInvalidPlaintextLength is returned when the plain text message doesn't have
-	// the expected length.
-	ErrInvalidPlaintextLength = errInvalidSize("Plaintext length", "a multiple of 8 bytes", 9)
-	// ErrInvalidCiphertextLength is returned when the cipher text message doesn't have
-	// the expected length.
-	ErrInvalidCiphertextLength = errInvalidSize("Ciphertext length", "a multiple of 8 bytes", 10)
-	// ErrCorruptKeyData is returned if the key data is corrupt.
-	ErrCorruptKeyData = &errors.ErrDescriptor{
-		MessageFormat: "Corrupt key data",
-		Code:          11,
-		Type:          errors.InvalidArgument,
-	}
-)
-
-func init() {
-	ErrInvalidJoinAcceptPayloadForEncryption.Register()
-	ErrInvalidJoinAcceptPayloadForDecryption.Register()
-	ErrInvalidJoinRequestPayloadForMIC.Register()
-	ErrInvalidJoinAcceptPayloadForMIC.Register()
-	ErrInvalidRejoinRequestSizeForMIC.Register()
-	ErrInvalidRejoinRequestType0_2ForMIC.Register()
-	ErrInvalidRejoinRequestType1ForMIC.Register()
-	ErrNoKeyPresent.Register()
-	ErrInvalidPlaintextLength.Register()
-	ErrInvalidCiphertextLength.Register()
-	ErrCorruptKeyData.Register()
+func errInvalidSize(typeName, typeDescription, expectedSize string) errors.Definition {
+	return errors.DefineInvalidArgument(
+		fmt.Sprintf("%s_size", typeName),
+		fmt.Sprintf("invalid %s size of {size} bytes, expected %s bytes", typeDescription, expectedSize),
+	)
 }
