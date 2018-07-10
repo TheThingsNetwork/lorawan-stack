@@ -245,6 +245,9 @@ func TestMQTTConnection(t *testing.T) {
 				GatewayID: registeredGatewayID,
 			}
 			downlink.Settings.Frequency = 863000000
+			downlink.Settings.SpreadingFactor = 7
+			downlink.Settings.Bandwidth = 125000
+			downlink.Settings.CodingRate = "4/5"
 			_, err := gs.ScheduleDownlink(ctx, downlink)
 			a.So(err, should.BeNil)
 

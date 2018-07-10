@@ -128,6 +128,9 @@ func testDownlink(registeredGatewayID string, gs *gatewayserver.GatewayServer, c
 	downlink.TxMetadata.GatewayIdentifiers = ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayID}
 	downlink.TxMetadata.Timestamp = 3003503000
 	downlink.Settings.Frequency = 868300000
+	downlink.Settings.SpreadingFactor = 7
+	downlink.Settings.Bandwidth = 125000
+	downlink.Settings.CodingRate = "4/5"
 
 	base64payloadRegexp := regexp.MustCompile(regexp.QuoteMeta(base64.StdEncoding.EncodeToString(downlink.RawPayload)))
 
