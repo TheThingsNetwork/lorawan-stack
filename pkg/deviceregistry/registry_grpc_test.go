@@ -28,6 +28,7 @@ import (
 	. "go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	errorsv3 "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/store"
 	"go.thethings.network/lorawan-stack/pkg/store/mapstore"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -46,7 +47,7 @@ func TestRegistryRPC(t *testing.T) {
 	})
 
 	_, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *pb})
-	a.So(err, should.DescribeError, common.ErrPermissionDenied)
+	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
 
 	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	if !a.So(err, should.BeNil) {
@@ -55,7 +56,7 @@ func TestRegistryRPC(t *testing.T) {
 	a.So(v, should.Equal, ttnpb.Empty)
 
 	devs, err := dr.ListDevices(context.Background(), &pb.EndDeviceIdentifiers)
-	a.So(err, should.DescribeError, common.ErrPermissionDenied)
+	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
 
 	devs, err = dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
 	if a.So(err, should.BeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
@@ -65,7 +66,7 @@ func TestRegistryRPC(t *testing.T) {
 	}
 
 	_, err = dr.DeleteDevice(context.Background(), &pb.EndDeviceIdentifiers)
-	a.So(err, should.DescribeError, common.ErrPermissionDenied)
+	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
 
 	v, err = dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
 	if !a.So(err, should.BeNil) {
@@ -74,7 +75,7 @@ func TestRegistryRPC(t *testing.T) {
 	a.So(v, should.Equal, ttnpb.Empty)
 
 	_, err = dr.ListDevices(context.Background(), &pb.EndDeviceIdentifiers)
-	a.So(err, should.DescribeError, common.ErrPermissionDenied)
+	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
 
 	devs, err = dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
@@ -92,7 +93,7 @@ func TestSetDeviceNoCheck(t *testing.T) {
 	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
 	_, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *pb})
-	a.So(err, should.DescribeError, common.ErrPermissionDenied)
+	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
 
 	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(err, should.BeNil)
@@ -147,10 +148,6 @@ func TestListDevicesNoCheck(t *testing.T) {
 		ttnpb.RIGHT_APPLICATION_DEVICES_READ, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 	})
 
-	devs, err := dr.ListDevices(ctx, &ttnpb.EndDeviceIdentifiers{})
-	a.So(err, should.DescribeError, rights.ErrInvalidApplicationID)
-	a.So(devs, should.BeNil)
-
 	dev1, err := dr.Interface.Create(ttnpb.NewPopulatedEndDevice(test.Randy, false))
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -161,7 +158,7 @@ func TestListDevicesNoCheck(t *testing.T) {
 		t.FailNow()
 	}
 
-	devs, err = dr.ListDevices(ctx, &dev1.EndDeviceIdentifiers)
+	devs, err := dr.ListDevices(ctx, &dev1.EndDeviceIdentifiers)
 	if a.So(err, should.BeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
 		devs.EndDevices[0].CreatedAt = dev1.EndDevice.GetCreatedAt()
 		devs.EndDevices[0].UpdatedAt = dev1.EndDevice.GetUpdatedAt()

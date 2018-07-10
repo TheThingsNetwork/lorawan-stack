@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	errorsv3 "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/store"
 	"go.thethings.network/lorawan-stack/pkg/store/mapstore"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -47,7 +48,7 @@ func TestRegistryRPC(t *testing.T) {
 	})
 
 	_, err := dr.SetApplication(context.Background(), &ttnpb.SetApplicationRequest{Application: *pb})
-	a.So(err, should.DescribeError, common.ErrPermissionDenied)
+	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
 
 	v, err := dr.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
 	if !a.So(err, should.BeNil) {
@@ -56,7 +57,7 @@ func TestRegistryRPC(t *testing.T) {
 	a.So(v, should.Equal, ttnpb.Empty)
 
 	app, err := dr.GetApplication(context.Background(), &pb.ApplicationIdentifiers)
-	a.So(err, should.DescribeError, common.ErrPermissionDenied)
+	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
 
 	app, err = dr.GetApplication(ctx, &pb.ApplicationIdentifiers)
 	if a.So(err, should.BeNil) {
@@ -66,7 +67,7 @@ func TestRegistryRPC(t *testing.T) {
 	}
 
 	_, err = dr.DeleteApplication(context.Background(), &pb.ApplicationIdentifiers)
-	a.So(err, should.DescribeError, common.ErrPermissionDenied)
+	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
 
 	v, err = dr.DeleteApplication(ctx, &pb.ApplicationIdentifiers)
 	if !a.So(err, should.BeNil) {
@@ -75,7 +76,7 @@ func TestRegistryRPC(t *testing.T) {
 	a.So(v, should.Equal, ttnpb.Empty)
 
 	_, err = dr.GetApplication(context.Background(), &pb.ApplicationIdentifiers)
-	a.So(err, should.DescribeError, common.ErrPermissionDenied)
+	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
 
 	_, err = dr.GetApplication(ctx, &pb.ApplicationIdentifiers)
 	a.So(err, should.DescribeError, ErrApplicationNotFound)
@@ -93,7 +94,7 @@ func TestSetApplicationNoCheck(t *testing.T) {
 	a.So(validate.ID(pb.GetApplicationID()), should.BeNil)
 
 	_, err := dr.SetApplication(context.Background(), &ttnpb.SetApplicationRequest{Application: *pb})
-	a.So(err, should.DescribeError, common.ErrPermissionDenied)
+	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
 
 	v, err := dr.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(err, should.BeNil)
@@ -213,11 +214,11 @@ func TestCheck(t *testing.T) {
 
 		checkErr = errors.New("err")
 		v, err := dr.SetApplication(context.Background(), &ttnpb.SetApplicationRequest{Application: *pb})
-		a.So(err, should.DescribeError, common.ErrPermissionDenied)
+		a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
 		a.So(v, should.BeNil)
 
 		v, err = dr.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: ttnpb.Application{}})
-		a.So(err, should.DescribeError, rights.ErrInvalidApplicationID)
+		a.So(errorsv3.IsInvalidArgument(err), should.BeTrue)
 		a.So(v, should.BeNil)
 
 		checkErr = errTest.New(nil)
