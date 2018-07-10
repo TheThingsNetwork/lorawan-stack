@@ -170,7 +170,6 @@ message ApplicationDownlink {
   uint32 f_port = 1;
   uint32 f_cnt = 2;
   bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
-  // TODO: Add "hints" for NS
-  repeated string correlation_ids = 4 [(gogoproto.customname) = "CorrelationIDs"];
+  bool confirmed = 4;
+  repeated string correlation_ids = 5 [(gogoproto.customname) = "CorrelationIDs"];
 }
-
