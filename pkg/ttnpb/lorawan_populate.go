@@ -183,8 +183,8 @@ func NewPopulatedMessageUplink(r randyLorawan, sNwkSIntKey, fNwkSIntKey types.AE
 		out.MHDR.MType = MType_UNCONFIRMED_UP
 	}
 	pld := NewPopulatedMessage_MACPayload(r)
-	pld.MACPayload.FHDR.FPending = false
-	pld.MACPayload.Ack = confirmed
+	pld.MACPayload.FHDR.FPending = r.Intn(2) == 0
+	pld.MACPayload.Ack = r.Intn(2) == 0
 
 	b, err := macMICPayload(out.MHDR, pld.MACPayload.FHDR, uint8(pld.MACPayload.FPort), pld.MACPayload.FRMPayload, true)
 	if err != nil {

@@ -93,9 +93,15 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 		}
 	}
 	if r.Intn(10) != 0 {
-		out.QueuedMACCommands = make([]*MACCommand, r.Intn(5))
-		for i := range out.QueuedMACCommands {
-			out.QueuedMACCommands[i] = NewPopulatedMACCommand(r, easy)
+		out.QueuedMACResponses = make([]*MACCommand, r.Intn(5))
+		for i := range out.QueuedMACResponses {
+			out.QueuedMACResponses[i] = NewPopulatedMACCommand(r, easy)
+		}
+	}
+	if r.Intn(10) != 0 {
+		out.PendingMACRequests = make([]*MACCommand, r.Intn(5))
+		for i := range out.PendingMACRequests {
+			out.PendingMACRequests[i] = NewPopulatedMACCommand(r, easy)
 		}
 	}
 	if r.Intn(10) != 0 {
