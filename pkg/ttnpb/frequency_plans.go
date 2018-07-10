@@ -14,25 +14,9 @@
 
 package ttnpb
 
-import "time"
-
 // Extend a frequency plan from a frequency plan blueprint
 func (f FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
-	extended := f
-
-	extended.copyChannels(ext.Channels, ext.FSKChannel, ext.LoraStandardChannel)
-	extended.copyDwellTime(ext.UplinkDwellTime, ext.DownlinkDwellTime)
-	extended.copyLBT(ext.LBT)
-	extended.copyTimeOffAir(ext.TimeOffAir)
-	extended.copyPingSlot(ext.PingSlot)
-	extended.copyRX2(ext.RX2)
-	extended.copyMaxEIRP(ext.MaxEIRP)
-
-	return extended
-}
-
-func (f *FrequencyPlan) copyChannels(channels []*FrequencyPlan_Channel, fskChannel *FrequencyPlan_Channel, stdChannel *FrequencyPlan_Channel) {
-	if channels != nil {
+	if channels := ext.Channels; channels != nil {
 		f.Channels = make([]*FrequencyPlan_Channel, 0)
 		for _, channel := range channels {
 			f.Channels = append(f.Channels, &FrequencyPlan_Channel{
@@ -41,66 +25,48 @@ func (f *FrequencyPlan) copyChannels(channels []*FrequencyPlan_Channel, fskChann
 			})
 		}
 	}
-
-	if fskChannel != nil {
-		f.FSKChannel = &FrequencyPlan_Channel{Frequency: fskChannel.Frequency, DataRate: fskChannel.DataRate}
+	if ext.FSKChannel != nil {
+		f.FSKChannel = &FrequencyPlan_Channel{Frequency: ext.FSKChannel.Frequency, DataRate: ext.FSKChannel.DataRate}
 	}
-
-	if stdChannel != nil {
-		f.LoraStandardChannel = &FrequencyPlan_Channel{Frequency: stdChannel.Frequency, DataRate: stdChannel.DataRate}
+	if ext.LoraStandardChannel != nil {
+		f.LoraStandardChannel = &FrequencyPlan_Channel{Frequency: ext.LoraStandardChannel.Frequency, DataRate: ext.LoraStandardChannel.DataRate}
 	}
-}
-
-func (f *FrequencyPlan) copyDwellTime(uplink, downlink *time.Duration) {
-	if uplink != nil {
-		duration := *uplink
+	if ext.UplinkDwellTime != nil {
+		duration := *ext.UplinkDwellTime
 		f.UplinkDwellTime = &duration
 	}
-	if downlink != nil {
-		duration := *downlink
+	if ext.DownlinkDwellTime != nil {
+		duration := *ext.DownlinkDwellTime
 		f.DownlinkDwellTime = &duration
 	}
-}
-
-func (f *FrequencyPlan) copyTimeOffAir(timeoff *FrequencyPlan_TimeOffAir) {
-	if timeoff != nil {
-		f.TimeOffAir = &FrequencyPlan_TimeOffAir{
-			Duration: timeoff.Duration,
-			Fraction: timeoff.Fraction,
-		}
-	}
-}
-
-func (f *FrequencyPlan) copyLBT(lbt *FrequencyPlan_LBTConfiguration) {
-	if lbt != nil {
+	if ext.LBT != nil {
 		f.LBT = &FrequencyPlan_LBTConfiguration{
-			RSSIOffset: lbt.RSSIOffset,
-			RSSITarget: lbt.RSSITarget,
-			ScanTime:   lbt.ScanTime,
+			RSSIOffset: ext.LBT.RSSIOffset,
+			RSSITarget: ext.LBT.RSSITarget,
+			ScanTime:   ext.LBT.ScanTime,
 		}
 	}
-}
-
-func (f *FrequencyPlan) copyPingSlot(pingSlot *FrequencyPlan_Channel) {
-	if pingSlot != nil {
+	if ext.TimeOffAir != nil {
+		f.TimeOffAir = &FrequencyPlan_TimeOffAir{
+			Duration: ext.TimeOffAir.Duration,
+			Fraction: ext.TimeOffAir.Fraction,
+		}
+	}
+	if ext.PingSlot != nil {
 		f.PingSlot = &FrequencyPlan_Channel{
-			Frequency: pingSlot.Frequency,
-			DataRate:  pingSlot.DataRate,
+			Frequency: ext.PingSlot.Frequency,
+			DataRate:  ext.PingSlot.DataRate,
 		}
 	}
-}
-
-func (f *FrequencyPlan) copyRX2(rx2 *FrequencyPlan_Channel) {
-	if rx2 != nil {
+	if ext.RX2 != nil {
 		f.RX2 = &FrequencyPlan_Channel{
-			Frequency: rx2.Frequency,
-			DataRate:  rx2.DataRate,
+			Frequency: ext.RX2.Frequency,
+			DataRate:  ext.RX2.DataRate,
 		}
 	}
-}
-
-func (f *FrequencyPlan) copyMaxEIRP(maxEIRP float32) {
-	if maxEIRP != 0.0 {
-		f.MaxEIRP = maxEIRP
+	if ext.MaxEIRP != 0.0 {
+		f.MaxEIRP = ext.MaxEIRP
 	}
+
+	return f
 }
