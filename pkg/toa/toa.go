@@ -19,80 +19,46 @@ import (
 	"math"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/validate"
 )
-
-var (
-	// ErrInvalidCodingRate is returned if the passed coding rate is invalid
-	ErrInvalidCodingRate = &errors.ErrDescriptor{
-		MessageFormat: "Invalid coding rate: cannot be different from 4/[5..8]",
-		Code:          1,
-		Type:          errors.InvalidArgument,
-	}
-	// ErrInvalidBandwidth is returned if the passed bandwidth is invalid
-	ErrInvalidBandwidth = &errors.ErrDescriptor{
-		MessageFormat:  "Invalid bandwidth: cannot be {bandwidth}",
-		Code:           2,
-		Type:           errors.InvalidArgument,
-		SafeAttributes: []string{"bandwidth"},
-	}
-	// ErrInvalidSpreadingFactor is returned if the passed spready factor is invalid
-	ErrInvalidSpreadingFactor = &errors.ErrDescriptor{
-		MessageFormat:  "Invalid spreading factor: cannot be {spreading_factor}",
-		Code:           3,
-		Type:           errors.InvalidArgument,
-		SafeAttributes: []string{"spreading_factor"},
-	}
-)
-
-func init() {
-	ErrInvalidCodingRate.Register()
-	ErrInvalidBandwidth.Register()
-	ErrInvalidSpreadingFactor.Register()
-}
 
 // Compute the time-on-air from the payload and RF parameters. This function only takes into account the PHY payload.
 //
 // See http://www.semtech.com/images/datasheet/LoraDesignGuide_STD.pdf, page 7
-func Compute(rawPayload []byte, settings ttnpb.TxSettings) (time.Duration, error) {
+func Compute(rawPayload []byte, settings ttnpb.TxSettings) (d time.Duration, err error) {
 	switch settings.Modulation {
 	case ttnpb.Modulation_LORA:
-		d, err := computeLoRa(rawPayload, settings)
-		return d, err
+		return computeLoRa(rawPayload, settings)
 	case ttnpb.Modulation_FSK:
 		return computeFSK(rawPayload, settings), nil
 	default:
-		return 0, common.ErrInvalidModulation.New(nil)
+		panic("invalid modulation")
 	}
 }
 
+var codingRate = map[string]float64{
+	"4/5": 1,
+	"4/6": 2,
+	"4/7": 3,
+	"4/8": 4,
+}
+
 func computeLoRa(rawPayload []byte, settings ttnpb.TxSettings) (time.Duration, error) {
-	var cr float64
-	switch settings.CodingRate {
-	case "4/5":
-		cr = 1
-	case "4/6":
-		cr = 2
-	case "4/7":
-		cr = 3
-	case "4/8":
-		cr = 4
-	default:
-		return 0, ErrInvalidCodingRate.New(nil)
+	err := validate.All(
+		validate.LoRaBandwidth(int(settings.Bandwidth/1000)),
+		validate.LoRaSpreadingFactor(int(settings.SpreadingFactor)),
+		validate.LoRaCodingRateString(settings.CodingRate),
+	)
+	if err != nil {
+		return 0, err
 	}
 
+	cr := codingRate[settings.CodingRate]
 	bandwidth := settings.Bandwidth / 1000 // Bandwidth in KHz
 	spreadingFactor := settings.SpreadingFactor
 
 	var de float64
-	if bandwidth == 0 {
-		return 0, ErrInvalidBandwidth.New(errors.Attributes{"bandwidth": 0})
-	}
-	if spreadingFactor < 7 || spreadingFactor > 12 {
-		return 0, ErrInvalidSpreadingFactor.New(errors.Attributes{"spreading_factor": spreadingFactor})
-	}
 	if bandwidth == 125 && (spreadingFactor == 11 || spreadingFactor == 12) {
 		de = 1.0
 	}

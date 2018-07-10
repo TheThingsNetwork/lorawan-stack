@@ -63,8 +63,9 @@ func TestInvalidModulation(t *testing.T) {
 		},
 	}
 
-	_, err := Compute(dl.RawPayload, dl.Settings)
-	a.So(err, should.NotBeNil)
+	a.So(func() {
+		Compute(dl.RawPayload, dl.Settings)
+	}, should.Panic)
 }
 
 func TestInvalidLoRa(t *testing.T) {
