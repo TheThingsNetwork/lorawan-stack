@@ -21,9 +21,14 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/assets"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"golang.org/x/oauth2"
+)
+
+var (
+	errOAuthNotConfigured = errors.DefineInvalidArgument("oauth_not_configured", "no OAuth client ID and/or secret configured for the Console")
+	errExtractPath        = errors.DefineInvalidArgument("extract_path_from_public_url", "could not extract from public URL `{url}`")
 )
 
 // Config is the configuration for the Console.
@@ -68,7 +73,7 @@ type Console struct {
 // New returns a new Console.
 func New(c *component.Component, assets *assets.Assets, config Config) (*Console, error) {
 	if config.OAuth.isZero() {
-		return nil, errors.New("No OAuth client ID and/or secret configured for the Console")
+		return nil, errOAuthNotConfigured
 	}
 
 	console := &Console{
@@ -79,7 +84,7 @@ func New(c *component.Component, assets *assets.Assets, config Config) (*Console
 
 	mount, err := path(console.config.PublicURL)
 	if err != nil {
-		return nil, errors.NewWithCausef(err, "Could not extract path from public URL `%s`", console.config.PublicURL)
+		return nil, errExtractPath.WithAttributes("url", console.config.PublicURL).WithCause(err)
 	}
 	console.config.mount = mount
 
