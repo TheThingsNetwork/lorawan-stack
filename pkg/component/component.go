@@ -243,8 +243,8 @@ func (c *Component) RightsHook() (*rights.Hook, error) {
 	return c.rightsHook, nil
 }
 
-// AllowCredentialsOverInsecureRPCs returns `true` if the component was configured to allow transmission of credentials
-// over insecure protocols.
+// AllowInsecureForCredentials returns `true` if the component was configured to allow transmission of credentials
+// over insecure transports.
 func (c *Component) AllowInsecureForCredentials() bool {
 	return c.config.GRPC.AllowInsecureForCredentials
 }
