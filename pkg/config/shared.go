@@ -17,7 +17,7 @@ package config
 import (
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -143,7 +143,7 @@ type FrequencyPlans struct {
 type unconfiguredFetcher struct{}
 
 func (u unconfiguredFetcher) File(path ...string) ([]byte, error) {
-	return nil, errors.New("Fetcher not configured")
+	return nil, errors.New("frequency plans fetcher not configured")
 }
 
 // Store returns the abstraction to retrieve frequency plans from the given configuration.
