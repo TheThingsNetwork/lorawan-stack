@@ -14,11 +14,15 @@
 
 import React from 'react'
 import { withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 
 import Button from '../../../components/button'
 
 @withRouter
+@connect(state => ({
+  user: state.user.user,
+}))
 @bind
 export default class Login extends React.PureComponent {
   redirectToLogin () {
@@ -26,17 +30,15 @@ export default class Login extends React.PureComponent {
   }
 
   logout () {
-    fetch('/oauth/api/auth/logout', {
-      method: 'POST',
-      credentials: 'same-origin',
-    })
+    this.props.dispatch({ type: 'LOGOUT' })
   }
 
   render () {
     return (
       <div>
-        <Button message="Login" onClick={this.redirectToLogin} />
-        <Button message="Logout" onClick={this.logout} />
+        {!this.props.user
+          ? <Button message="Login via TTN Account" onClick={this.redirectToLogin} />
+          : <Button message="Logout" onClick={this.logout} />}
       </div>
     )
   }
