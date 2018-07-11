@@ -849,12 +849,22 @@ func (ns *NetworkServer) generateAndScheduleDownlink(ctx context.Context, dev *d
 	}
 	// NOTE: It is assumed, that b does not contain MIC.
 
-	if dev.Session.SNwkSIntKey == nil || dev.Session.SNwkSIntKey.Key.IsZero() {
-		return errMissingSNwkSIntKey
+	var key types.AES128Key
+	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		if dev.Session.FNwkSIntKey == nil || dev.Session.FNwkSIntKey.Key.IsZero() {
+			return errMissingFNwkSIntKey
+		}
+		key = *dev.Session.FNwkSIntKey.Key
+
+	} else {
+		if dev.Session.SNwkSIntKey == nil || dev.Session.SNwkSIntKey.Key.IsZero() {
+			return errMissingSNwkSIntKey
+		}
+		key = *dev.Session.SNwkSIntKey.Key
 	}
 
 	mic, err := crypto.ComputeDownlinkMIC(
-		*dev.Session.SNwkSIntKey.Key,
+		key,
 		*dev.EndDeviceIdentifiers.DevAddr,
 		pld.FCnt,
 		b,
@@ -1001,8 +1011,15 @@ outer:
 
 		var computedMIC [4]byte
 		var err error
-		switch dev.MACState.LoRaWANVersion {
-		case ttnpb.MAC_V1_1:
+		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+			computedMIC, err = crypto.ComputeLegacyUplinkMIC(
+				*dev.Session.FNwkSIntKey.Key,
+				pld.DevAddr,
+				dev.fCnt,
+				b,
+			)
+
+		} else {
 			if dev.Session.SNwkSIntKey == nil || dev.Session.SNwkSIntKey.Key.IsZero() {
 				return nil, errMissingSNwkSIntKey
 			}
@@ -1021,19 +1038,6 @@ outer:
 				pld.DevAddr,
 				dev.fCnt,
 				b,
-			)
-
-		case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-			computedMIC, err = crypto.ComputeLegacyUplinkMIC(
-				*dev.Session.FNwkSIntKey.Key,
-				pld.DevAddr,
-				dev.fCnt,
-				b,
-			)
-
-		default:
-			return nil, errUnsupportedLoRaWANVersion.WithAttributes(
-				"version", dev.MACState.LoRaWANVersion,
 			)
 		}
 		if err != nil {

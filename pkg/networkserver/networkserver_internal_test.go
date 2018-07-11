@@ -138,8 +138,13 @@ func TestGenerateAndScheduleDownlink(t *testing.T) {
 			}).MarshalLoRaWAN()).([]byte),
 		}
 
+		key := *dev.Session.SNwkSIntKey.Key
+		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+			key = *dev.Session.FNwkSIntKey.Key
+		}
+
 		mic := test.Must(crypto.ComputeDownlinkMIC(
-			*dev.Session.SessionKeys.SNwkSIntKey.Key,
+			key,
 			*dev.EndDeviceIdentifiers.DevAddr,
 			down.FCnt,
 			msg.RawPayload,
