@@ -54,16 +54,12 @@ func TestHandleResetInd(t *testing.T) {
 		{
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					SupportsJoin: false,
-				},
-				MACState: &ttnpb.MACState{},
+				SupportsJoin: false,
+				MACState:     &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					SupportsJoin: false,
-				},
-				MACState: &ttnpb.MACState{},
+				SupportsJoin: false,
+				MACState:     &ttnpb.MACState{},
 			},
 			Payload: nil,
 			Error:   errMissingPayload,
@@ -75,8 +71,8 @@ func TestHandleResetInd(t *testing.T) {
 					DefaultMACParameters: &ttnpb.MACParameters{
 						MaxEIRP: 42,
 					},
-					SupportsJoin: false,
 				},
+				SupportsJoin:    false,
 				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
 					MACParameters:        *ttnpb.NewPopulatedMACParameters(test.Randy, false),
@@ -90,8 +86,8 @@ func TestHandleResetInd(t *testing.T) {
 						DefaultMACParameters: &ttnpb.MACParameters{
 							MaxEIRP: 42,
 						},
-						SupportsJoin: false,
 					},
+					SupportsJoin:    false,
 					FrequencyPlanID: test.EUFrequencyPlanID,
 				}
 				if err := ResetMACState(frequencyPlansStore, dev); err != nil {
@@ -117,8 +113,8 @@ func TestHandleResetInd(t *testing.T) {
 					DefaultMACParameters: &ttnpb.MACParameters{
 						MaxEIRP: 42,
 					},
-					SupportsJoin: false,
 				},
+				SupportsJoin:    false,
 				FrequencyPlanID: test.EUFrequencyPlanID,
 				MACState: &ttnpb.MACState{
 					MACParameters:        *ttnpb.NewPopulatedMACParameters(test.Randy, false),
@@ -136,8 +132,8 @@ func TestHandleResetInd(t *testing.T) {
 						DefaultMACParameters: &ttnpb.MACParameters{
 							MaxEIRP: 42,
 						},
-						SupportsJoin: false,
 					},
+					SupportsJoin:    false,
 					FrequencyPlanID: test.EUFrequencyPlanID,
 				}
 				if err := ResetMACState(frequencyPlansStore, dev); err != nil {

@@ -126,6 +126,7 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 		}
 	}
 	out.DeviceFormatters = *NewPopulatedDeviceFormatters(r, easy)
+	out.SupportsJoin = r.Intn(2) == 0
 	return out
 }
 

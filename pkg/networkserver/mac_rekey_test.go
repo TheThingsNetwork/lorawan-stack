@@ -36,14 +36,10 @@ func TestHandleRekeyInd(t *testing.T) {
 		{
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					SupportsJoin: true,
-				},
+				SupportsJoin: true,
 			},
 			Expected: &ttnpb.EndDevice{
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					SupportsJoin: true,
-				},
+				SupportsJoin: true,
 			},
 			Payload: nil,
 			Error:   errMissingPayload,
@@ -51,18 +47,14 @@ func TestHandleRekeyInd(t *testing.T) {
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					SupportsJoin: true,
-				},
+				SupportsJoin:    true,
 				SessionFallback: ttnpb.NewPopulatedSession(test.Randy, false),
 				MACState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					SupportsJoin: true,
-				},
+				SupportsJoin:    true,
 				SessionFallback: nil,
 				MACState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
@@ -79,9 +71,7 @@ func TestHandleRekeyInd(t *testing.T) {
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					SupportsJoin: true,
-				},
+				SupportsJoin:    true,
 				SessionFallback: ttnpb.NewPopulatedSession(test.Randy, false),
 				MACState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
@@ -92,9 +82,7 @@ func TestHandleRekeyInd(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				EndDeviceVersion: ttnpb.EndDeviceVersion{
-					SupportsJoin: true,
-				},
+				SupportsJoin:    true,
 				SessionFallback: nil,
 				MACState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{

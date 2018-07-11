@@ -121,9 +121,6 @@ message EndDeviceVersion {
 
   // DisableJoinNonceCheck specifies whether LoRaWAN DevNonce check procedure should be disabled.
   bool disable_join_nonce_check = 13;
-
-  // SupportsJoin specifies whether the device model supports Join flow or no.
-  bool supports_join = 14;
 }
 
 message MACSettings {
@@ -316,6 +313,9 @@ message EndDevice {
 
   // Formatters defining the payload formats.
   DeviceFormatters formatters = 24 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+
+  // SupportsJoin specifies whether the device supports Join flow or no.
+  bool supports_join = 25;
 
   google.protobuf.Timestamp created_at = 97 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 98 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
