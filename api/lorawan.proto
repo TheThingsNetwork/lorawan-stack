@@ -479,21 +479,39 @@ enum PingSlotPeriod {
 }
 
 enum RejoinTimePeriod {
+  // For calculations see https://github.com/TheThingsIndustries/lorawan-stack/pull/865#discussion_r201625341
+
   option (gogoproto.goproto_enum_prefix) = false;
-  // Every ~17 minutes
-  REJOIN_TIME_1   = 0;
-  // Every 2 seconds
-  REJOIN_TIME_2   = 1;
-  // Every 4 seconds
-  REJOIN_TIME_4   = 2;
-  // Every 8 seconds
-  REJOIN_TIME_8   = 3;
-  // Every 16 seconds
-  REJOIN_TIME_16  = 4;
-  // Every 32 seconds
-  REJOIN_TIME_32  = 5;
-  // Every 64 seconds
-  REJOIN_TIME_64  = 6;
-  // Every 128 seconds
-  REJOIN_TIME_128 = 7;
+  // Every ~17.1 minutes
+  REJOIN_TIME_0   = 0;
+  // Every ~34.1 minutes
+  REJOIN_TIME_1   = 1;
+  // Every ~1.1 hours
+  REJOIN_TIME_2   = 2;
+  // Every ~2.3 hours
+  REJOIN_TIME_3   = 3;
+  // Every ~4.6 hours
+  REJOIN_TIME_4  = 4;
+  // Every ~9.1 hours
+  REJOIN_TIME_5  = 5;
+  // Every ~18.2 hours
+  REJOIN_TIME_6  = 6;
+  // Every ~1.5 days
+  REJOIN_TIME_7 = 7;
+  // Every ~3.0 days
+  REJOIN_TIME_8 = 8;
+  // Every ~6.1 days
+  REJOIN_TIME_9 = 9;
+  // Every ~12.1 days
+  REJOIN_TIME_10 = 10;
+  // Every ~3.5 weeks
+  REJOIN_TIME_11 = 11;
+  // Every ~1.6 months
+  REJOIN_TIME_12 = 12;
+  // Every ~3.2 months
+  REJOIN_TIME_13 = 13;
+  // Every ~6.4 months
+  REJOIN_TIME_14 = 14;
+  // Every ~1.1 year
+  REJOIN_TIME_15 = 15;
 }

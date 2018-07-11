@@ -24,17 +24,11 @@ func NewPopulatedEndDeviceVersion(r randyEndDevice, easy bool) *EndDeviceVersion
 	out.HardwareVersion = randStringEndDevice(r)
 	out.FirmwareVersion = randStringEndDevice(r)
 	if r.Intn(10) != 0 {
-		out.Photos = make([]string, r.Intn(10))
-		for i := range out.Photos {
-			out.Photos[i] = randStringEndDevice(r)
-		}
-	}
-	if r.Intn(10) != 0 {
 		out.DefaultFormatters = NewPopulatedDeviceFormatters(r, easy)
 	}
 	out.DefaultMACParameters = NewPopulatedMACParameters(r, easy)
-	out.MinFrequency = uint64(r.Uint32())
 	out.MaxFrequency = uint64(r.Uint32())
+	out.MinFrequency = uint64(r.Uint32()) % out.MaxFrequency
 	out.FCntResets = bool(r.Intn(2) == 0)
 	out.Supports32BitFCnt = bool(r.Intn(2) == 0)
 	out.DisableJoinNonceCheck = bool(r.Intn(2) == 0)
@@ -47,13 +41,8 @@ func NewPopulatedMACState(r randyEndDevice, easy bool) *MACState {
 	out := &MACState{}
 	out.DeviceClass = Class([]int32{0, 1, 2}[r.Intn(3)])
 	out.LoRaWANVersion = MACVersion([]int32{1, 2, 3, 4}[r.Intn(4)])
-	out.LastStatusReceivedAt = pbtypes.NewPopulatedStdTime(r, easy)
-	out.NextConfirmedDownlinkAt = pbtypes.NewPopulatedStdTime(r, easy)
-	out.DownlinkMargin = r.Int31()
-	if r.Intn(2) == 0 {
-		out.DownlinkMargin *= -1
-	}
 	out.PingSlotPeriodicity = PingSlotPeriod([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)])
+	out.NextConfirmedDownlinkAt = pbtypes.NewPopulatedStdTime(r, easy)
 	if r.Intn(10) != 0 {
 		out.QueuedResponses = make([]*MACCommand, r.Intn(5))
 		for i := range out.QueuedResponses {
@@ -97,7 +86,6 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	out.FrequencyPlanID = "EU_863_870"
 	out.MACSettings = NewPopulatedMACSettings(r, easy)
 	out.MACState = NewPopulatedMACState(r, easy)
-	out.MACState = NewPopulatedMACState(r, easy)
 	if r.Intn(10) != 0 {
 		out.Location = NewPopulatedLocation(r, easy)
 	}
@@ -124,6 +112,12 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 		for i := range out.QueuedApplicationDownlinks {
 			out.QueuedApplicationDownlinks[i] = NewPopulatedApplicationDownlink(r, easy)
 		}
+	}
+	out.StatusUpdatedAt = pbtypes.NewPopulatedStdTime(r, easy)
+	out.BatteryPercentage = r.Float32()
+	out.DownlinkMargin = r.Int31()
+	if r.Intn(2) == 0 {
+		out.DownlinkMargin *= -1
 	}
 	out.DeviceFormatters = *NewPopulatedDeviceFormatters(r, easy)
 	out.SupportsJoin = r.Intn(2) == 0
