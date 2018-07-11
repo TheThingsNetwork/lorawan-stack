@@ -28,7 +28,7 @@ import (
 
 var (
 	errOAuthNotConfigured = errors.DefineInvalidArgument("oauth_not_configured", "no OAuth client ID and/or secret configured for the Console")
-	errExtractPath        = errors.DefineInvalidArgument("extract_path_from_public_url", "could not extract from public URL `{url}`")
+	errExtractPath        = errors.DefineInvalidArgument("extract_path_from_public_url", "could not extract path from public URL `{url}`")
 )
 
 // Config is the configuration for the Console.
