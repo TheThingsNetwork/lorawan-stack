@@ -692,7 +692,8 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 	for i, err := range errs {
 		logger = logger.WithField(fmt.Sprintf("error_%d", i), err)
 	}
-	return errors.New("failed to schedule downlink")
+	logger.Warn("all gateway servers failed to schedule the downlink")
+	return errors.New("all gateway servers failed to schedule the downlink")
 }
 
 // generateAndScheduleDownlink loads dev, tries to generate a downlink and schedule it.
