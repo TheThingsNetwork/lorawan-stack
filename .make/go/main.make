@@ -114,7 +114,7 @@ TEST_PACKAGES = $(GO_FILES) | $(no_vendor) | $(only_test) | $(to_packages)
 # get tools required for development
 go.dev-deps:
 	@$(log) "Installing go dev dependencies"
-	@$(log) "Getting dep" && $(GO) get -u github.com/golang/dep/cmd/dep
+	@$(log) "Getting dep" && curl -sL https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 	@if [[ ! -z "$(CI)" ]]; then $(log) "Getting goveralls" && $(GO) get -u github.com/mattn/goveralls; fi
 	@$(log) "Getting gometalinter" && $(GO) get -u github.com/alecthomas/gometalinter
 	@$(log) "Getting gometalinter linters" && $(GO_METALINTER) -i
