@@ -49,6 +49,10 @@ var (
 	ResetMACState = resetMACState
 )
 
+func SetAppQueueUpdateTimeout(d time.Duration) {
+	appQueueUpdateTimeout = d
+}
+
 func TestAccumulator(t *testing.T) {
 	a := assertions.New(t)
 

@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/store"
 	"go.thethings.network/lorawan-stack/pkg/store/mapstore"
@@ -59,6 +60,10 @@ var (
 
 	Keys = []string{"AEAEAEAEAEAEAEAEAEAEAEAEAEAEAEAE"}
 )
+
+func init() {
+	SetAppQueueUpdateTimeout(0)
+}
 
 func contextWithKey() context.Context {
 	return metadata.NewIncomingContext(context.Background(), metadata.MD{
@@ -630,7 +635,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				"1.0/confirmed/ack",
 				&ttnpb.EndDevice{
 					MACState: &ttnpb.MACState{
-						LoRaWANVersion: ttnpb.MAC_V1_0,
+						LoRaWANVersion:   ttnpb.MAC_V1_0,
+						NeedsDownlinkAck: true,
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
@@ -678,7 +684,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				"1.0/confirmed/ack/FCnt resets",
 				&ttnpb.EndDevice{
 					MACState: &ttnpb.MACState{
-						LoRaWANVersion: ttnpb.MAC_V1_0,
+						LoRaWANVersion:   ttnpb.MAC_V1_0,
+						NeedsDownlinkAck: true,
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
@@ -778,7 +785,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				"1.1/confirmed/ack",
 				&ttnpb.EndDevice{
 					MACState: &ttnpb.MACState{
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						LoRaWANVersion:   ttnpb.MAC_V1_1,
+						NeedsDownlinkAck: true,
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
@@ -892,7 +900,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				"1.1/confirmed/ack/FCnt resets",
 				&ttnpb.EndDevice{
 					MACState: &ttnpb.MACState{
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						LoRaWANVersion:   ttnpb.MAC_V1_1,
+						NeedsDownlinkAck: true,
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
@@ -1051,6 +1060,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				}
 
 				ctx := context.WithValue(context.Background(), "answer", 42)
+				ctx = log.NewContext(ctx, test.GetLogger(t))
 
 				start := time.Now()
 
@@ -1138,11 +1148,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							t.FailNow()
 						}
 					}
+					expected.MACState.NeedsDownlinkAck = false
 					expected.MACState.ADRDataRateIndex = msg.Settings.DataRateIndex
-
-					if expected.MACState == nil {
-						expected.MACState = &ttnpb.MACState{}
-					}
 
 					expected.RecentUplinks = append(expected.RecentUplinks, msg)
 					if len(expected.RecentUplinks) > RecentUplinkCount {
@@ -1166,6 +1173,39 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					a.So(pretty.Diff(dev.EndDevice, expected), should.BeEmpty)
 				}) {
 					t.FailNow()
+				}
+
+				if len(dev.QueuedApplicationDownlinks) > 0 ||
+					len(dev.MACState.QueuedResponses) > 0 ||
+					tc.UplinkMessage.Payload.MType == ttnpb.MType_CONFIRMED_UP {
+					t.Run("downlink", func(t *testing.T) {
+						a := assertions.New(t)
+
+						select {
+						case we := <-deduplicationDoneCh:
+							if !a.So(we.msg.RxMetadata, should.HaveSameElementsDeep, md) {
+								metadataLdiff(t, md, we.msg.RxMetadata)
+							}
+
+							msg := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
+
+							msg.RxMetadata = we.msg.RxMetadata
+
+							a.So(we.msg.ReceivedAt, should.HappenBefore, time.Now())
+							msg.ReceivedAt = we.msg.ReceivedAt
+
+							a.So(we.msg.CorrelationIDs, should.NotBeEmpty)
+							msg.CorrelationIDs = we.msg.CorrelationIDs
+
+							a.So(we.msg, should.Resemble, msg)
+							a.So(we.ctx, ttnshould.HaveParentContext, ctx)
+
+							we.ch <- time.Now()
+
+						case <-time.After(Timeout):
+							t.Fatal("Timed out while waiting for deduplication window end request during downlink scheduling")
+						}
+					})
 				}
 
 				t.Run("after cooldown window", func(t *testing.T) {
@@ -1497,6 +1537,7 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 				}
 
 				ctx := context.WithValue(context.Background(), "answer", 42)
+				ctx = log.NewContext(ctx, test.GetLogger(t))
 
 				start := time.Now()
 
