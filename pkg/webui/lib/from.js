@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * from returns an array that contains the values of the keys of a which have a trueish value in b.
  * If only is passed, it is used as a whitelist for keys that should be used.
