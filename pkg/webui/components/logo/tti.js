@@ -16,7 +16,7 @@
 import React from 'react'
 
 import gradient from './gradient'
-import style from './style.styl'
+import style from './logo.styl'
 
 export default (
   <svg viewBox="0 0 5870 1130">

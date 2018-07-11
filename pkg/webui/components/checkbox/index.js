@@ -16,7 +16,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import style from './style.styl'
+import style from './checkbox.styl'
 
 const Checkbox = function ({ value, onChange, type, error, warning, ...rest }) {
   return (

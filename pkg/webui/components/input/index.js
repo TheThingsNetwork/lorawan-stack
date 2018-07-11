@@ -19,7 +19,7 @@ import classnames from 'classnames'
 import bind from 'autobind-decorator'
 import ByteInput from './byte'
 
-import style from './style.styl'
+import style from './input.styl'
 
 const ok = [
   'name',

@@ -14,7 +14,7 @@
 
 
 import React from 'react'
-import style from './style.styl'
+import style from './logo.styl'
 
 export default (
   <defs>

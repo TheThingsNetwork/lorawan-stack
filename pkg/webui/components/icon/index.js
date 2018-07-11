@@ -16,7 +16,7 @@
 import React from 'react'
 import classnames from 'classnames'
 
-import style from './style.styl'
+import style from './icon.styl'
 
 // A map of hardcoded names to their corresponding icons.
 const hardcoded = {

@@ -17,7 +17,7 @@ import React from 'react'
 import classnames from 'classnames'
 
 import TTN from './ttn'
-import style from './style.styl'
+import style from './logo.styl'
 
 const Logo = function (props) {
   const {

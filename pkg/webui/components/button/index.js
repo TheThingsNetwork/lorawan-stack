@@ -21,7 +21,7 @@ import Spinner from '../spinner'
 import Message from '../message'
 import Icon from '../icon'
 
-import style from './style.styl'
+import style from './button.styl'
 
 const Button = function ({
   message,
