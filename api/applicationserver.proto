@@ -40,7 +40,7 @@ service AsApplicationRegistry {
   };
 
   // SetApplication creates or updates the application
-  rpc SetApplication(SetApplicationRequest) returns (google.protobuf.Empty) {
+  rpc SetApplication(SetApplicationRequest) returns (Application) {
     option (google.api.http) = {
       post: "/as/applications/{application.ids.application_id}"
       body: "*"
