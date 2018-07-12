@@ -1,0 +1,81 @@
+// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.pagination
+  white-space: nowrap
+
+  .item
+    margin: 0
+
+.item
+  display: inline-block
+  color: $c-active-blue
+  font-weight: 600
+  user-select: none
+
+  .link:hover,
+  .link:focus
+    background-color: $c-backdrop
+
+  .link:active
+    background-color: darker($c-backdrop, .8)
+
+  &-navigation-next
+    .link
+      border-radius: 0 $br.s $br.s 0
+      border-dark()
+
+  &-navigation-prev
+    .link
+      border-radius: $br.s 0 0 $br.s
+
+  &-disabled
+    .link
+      opacity: .4
+      cursor: not-allowed
+
+  &-active
+    .link
+      background-color: $c-active-blue
+      border: 1px solid $c-active-blue
+      color: white
+
+    & + .item
+      a
+        border-left: 0
+
+    & + .item-break
+      border-left: 0
+
+    .link:hover,
+    .link:focus
+      background-color: lighter($c-active-blue, 1)
+
+    .link:active
+      background-color: lighter($c-active-blue, .7)
+
+  &-break
+    color: $c-active-blue
+    padding: $cs.xs $cs.m
+    border-dark()
+    border-right: 0
+
+.link
+  padding: $cs.xs $cs.m
+  text-align: center
+  text-decoration: none
+  cursor: pointer
+  display: inline-block
+  border-dark()
+  border-right: 0
