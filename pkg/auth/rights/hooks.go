@@ -168,7 +168,7 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 						switch {
 						case err == nil:
 							return resp.Rights, nil
-						case errors.IsInvalidArgument(err) || errors.IsUnauthenticated(err) || errors.IsPermissionDenied(err):
+						case errors.IsInvalidArgument(err), errors.IsUnauthenticated(err), errors.IsPermissionDenied(err):
 							return nil, err
 						default:
 							return nil, errFetchFailed.WithCause(err)
@@ -200,7 +200,7 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 						switch {
 						case err == nil:
 							return resp.Rights, nil
-						case errors.IsInvalidArgument(err) || errors.IsUnauthenticated(err) || errors.IsPermissionDenied(err):
+						case errors.IsInvalidArgument(err), errors.IsUnauthenticated(err), errors.IsPermissionDenied(err):
 							return nil, err
 						default:
 							return nil, errFetchFailed.WithCause(err)
@@ -232,7 +232,7 @@ func (h *Hook) UnaryHook() hooks.UnaryHandlerMiddleware {
 						switch {
 						case err == nil:
 							return resp.Rights, nil
-						case errors.IsInvalidArgument(err) || errors.IsUnauthenticated(err) || errors.IsPermissionDenied(err):
+						case errors.IsInvalidArgument(err), errors.IsUnauthenticated(err), errors.IsPermissionDenied(err):
 							return nil, err
 						default:
 							return nil, errFetchFailed.WithCause(err)
