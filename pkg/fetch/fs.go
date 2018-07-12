@@ -18,7 +18,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"syscall"
 	"time"
 )
 
@@ -45,13 +44,8 @@ func (f fsFetcher) File(pathElements ...string) ([]byte, error) {
 		return content, nil
 	}
 
-	switch err := err.(type) {
-	case *os.PathError:
-		if errno, ok := err.Err.(syscall.Errno); ok && errno == syscall.ENOENT {
-			return nil, errFileNotFound.WithAttributes("filename", filepath.Join(pathElements...))
-		}
-		return nil, errCouldNotReadFile.WithCause(err).WithAttributes("filename", filepath.Join(pathElements...))
-	default:
-		return nil, err
+	if os.IsNotExist(err) {
+		return nil, errFileNotFound.WithAttributes("filename", filepath.Join(pathElements...))
 	}
+	return nil, errCouldNotReadFile.WithCause(err).WithAttributes("filename", filepath.Join(pathElements...))
 }
