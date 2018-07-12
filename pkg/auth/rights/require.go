@@ -23,7 +23,7 @@ import (
 
 var errMissingOrganizationRights = errors.DefinePermissionDenied(
 	"missing_organization_rights",
-	"Missing rights for organization `{uid}`",
+	"missing rights for organization `{uid}`",
 )
 
 // RequireOrganization checks that context contains the specified rights for the organization.
@@ -38,7 +38,7 @@ func RequireOrganization(ctx context.Context, rights ...ttnpb.Right) error {
 
 var errMissingApplicationRights = errors.DefinePermissionDenied(
 	"missing_application_rights",
-	"Missing rights for application `{uid}`",
+	"missing rights for application `{uid}`",
 )
 
 // RequireApplication checks that context contains the specified rights for the application.
@@ -53,7 +53,7 @@ func RequireApplication(ctx context.Context, rights ...ttnpb.Right) error {
 
 var errMissingGatewayRights = errors.DefinePermissionDenied(
 	"missing_gateway_rights",
-	"Missing rights for gateway `{uid}`",
+	"missing rights for gateway `{uid}`",
 )
 
 // RequireGateway checks that context contains the specified rights for the gateway.
