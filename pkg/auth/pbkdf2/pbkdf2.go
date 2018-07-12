@@ -88,7 +88,7 @@ var errInvalidPBKDF2 = errors.DefineInternal( // internal because hash is in DB.
 
 var errIterations = errors.DefineInternal(
 	"pbkdf2_iterations",
-	"could not determine number of iterations from `{iter}`",
+	"could not determine number of iterations from `{iterations}`",
 )
 
 var errKeyLength = errors.DefineInternal(
@@ -115,7 +115,7 @@ func (*PBKDF2) Validate(hashed, plain string) (bool, error) {
 
 	iter, err := strconv.ParseInt(parts[2], 10, 32)
 	if err != nil {
-		return false, errIterations.WithAttributes("iter", parts[2])
+		return false, errIterations.WithAttributes("iterations", parts[2])
 	}
 	salt := parts[3]
 	key := parts[4]
