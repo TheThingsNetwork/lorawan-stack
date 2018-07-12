@@ -157,7 +157,6 @@ message ApplicationUplink {
   uint32 f_cnt = 3;
   bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
   repeated RxMetadata rx_metadata = 5;
-  repeated string correlation_ids = 6 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
 message ApplicationJoinAccept {
@@ -165,7 +164,6 @@ message ApplicationJoinAccept {
   string session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
   // The (encrypted) Application Session Key.
   KeyEnvelope app_s_key = 2;
-  repeated string correlation_ids = 3 [(gogoproto.customname) = "CorrelationIDs"];
 }
 
 message ApplicationDownlink {

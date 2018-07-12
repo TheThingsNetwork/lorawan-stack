@@ -635,8 +635,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				"1.0/confirmed/ack",
 				&ttnpb.EndDevice{
 					MACState: &ttnpb.MACState{
-						LoRaWANVersion:   ttnpb.MAC_V1_0,
-						NeedsDownlinkAck: true,
+						LoRaWANVersion:             ttnpb.MAC_V1_0,
+						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
@@ -684,8 +684,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				"1.0/confirmed/ack/FCnt resets",
 				&ttnpb.EndDevice{
 					MACState: &ttnpb.MACState{
-						LoRaWANVersion:   ttnpb.MAC_V1_0,
-						NeedsDownlinkAck: true,
+						LoRaWANVersion:             ttnpb.MAC_V1_0,
+						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
@@ -785,8 +785,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				"1.1/confirmed/ack",
 				&ttnpb.EndDevice{
 					MACState: &ttnpb.MACState{
-						LoRaWANVersion:   ttnpb.MAC_V1_1,
-						NeedsDownlinkAck: true,
+						LoRaWANVersion:             ttnpb.MAC_V1_1,
+						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
@@ -900,8 +900,8 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 				"1.1/confirmed/ack/FCnt resets",
 				&ttnpb.EndDevice{
 					MACState: &ttnpb.MACState{
-						LoRaWANVersion:   ttnpb.MAC_V1_1,
-						NeedsDownlinkAck: true,
+						LoRaWANVersion:             ttnpb.MAC_V1_1,
+						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
 					},
 					EndDeviceVersion: ttnpb.EndDeviceVersion{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
@@ -1070,12 +1070,14 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					errch <- err
 				}()
 
-				if tc.UplinkMessage.Payload.GetMACPayload().Ack ||
-					dev.MACState != nil && dev.MACState.NeedsDownlinkAck && dev.MACState.DeviceClass == ttnpb.CLASS_A {
-
+				if dev.MACState != nil && dev.MACState.PendingApplicationDownlink != nil {
 					select {
 					case up := <-asSendCh:
-						a.So(up.GetDownlinkAck(), should.Resemble, tc.UplinkMessage.Payload.GetMACPayload().Ack)
+						if tc.UplinkMessage.Payload.GetMACPayload().Ack {
+							a.So(up.GetDownlinkAck(), should.Resemble, dev.MACState.PendingApplicationDownlink)
+						} else {
+							a.So(up.GetDownlinkNack(), should.Resemble, dev.MACState.PendingApplicationDownlink)
+						}
 
 					case <-time.After(Timeout):
 						t.Fatal("Timed out while waiting for (n)ack to be sent to AS")
@@ -1089,17 +1091,17 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 					if !a.So(md, should.HaveSameElementsDeep, up.GetUplinkMessage().RxMetadata) {
 						metadataLdiff(t, up.GetUplinkMessage().RxMetadata, md)
 					}
-					a.So(up.GetUplinkMessage().CorrelationIDs, should.NotBeEmpty)
+					a.So(up.CorrelationIDs, should.NotBeEmpty)
 
 					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+						CorrelationIDs:       up.CorrelationIDs,
 						Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-							CorrelationIDs: up.GetUplinkMessage().CorrelationIDs,
-							FCnt:           tc.NextNextFCntUp - 1,
-							FPort:          tc.UplinkMessage.Payload.GetMACPayload().FPort,
-							FRMPayload:     tc.UplinkMessage.Payload.GetMACPayload().FRMPayload,
-							RxMetadata:     up.GetUplinkMessage().RxMetadata,
-							SessionKeyID:   dev.Session.SessionKeys.SessionKeyID,
+							FCnt:         tc.NextNextFCntUp - 1,
+							FPort:        tc.UplinkMessage.Payload.GetMACPayload().FPort,
+							FRMPayload:   tc.UplinkMessage.Payload.GetMACPayload().FRMPayload,
+							RxMetadata:   up.GetUplinkMessage().RxMetadata,
+							SessionKeyID: dev.Session.SessionKeys.SessionKeyID,
 						}},
 					})
 
@@ -1148,7 +1150,7 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 							t.FailNow()
 						}
 					}
-					expected.MACState.NeedsDownlinkAck = false
+					expected.MACState.PendingApplicationDownlink = nil
 					expected.MACState.ADRDataRateIndex = msg.Settings.DataRateIndex
 
 					expected.RecentUplinks = append(expected.RecentUplinks, msg)
@@ -1231,12 +1233,14 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						return
 					}
 
-					if tc.UplinkMessage.Payload.GetMACPayload().Ack ||
-						dev.MACState != nil && dev.MACState.NeedsDownlinkAck && dev.MACState.DeviceClass == ttnpb.CLASS_A {
-
+					if dev.MACState != nil && dev.MACState.PendingApplicationDownlink != nil {
 						select {
 						case up := <-asSendCh:
-							a.So(up.GetDownlinkAck(), should.Resemble, tc.UplinkMessage.Payload.GetMACPayload().Ack)
+							if tc.UplinkMessage.Payload.GetMACPayload().Ack {
+								a.So(up.GetDownlinkAck(), should.Resemble, dev.MACState.PendingApplicationDownlink)
+							} else {
+								a.So(up.GetDownlinkNack(), should.Resemble, dev.MACState.PendingApplicationDownlink)
+							}
 
 						case <-time.After(Timeout):
 							t.Fatal("Timed out while waiting for (n)ack to be sent to AS")
@@ -1250,17 +1254,17 @@ func HandleUplinkTest(conf *component.Config) func(t *testing.T) {
 						if !a.So(md, should.HaveSameElementsDeep, up.GetUplinkMessage().RxMetadata) {
 							metadataLdiff(t, up.GetUplinkMessage().RxMetadata, md)
 						}
-						a.So(up.GetUplinkMessage().CorrelationIDs, should.NotBeEmpty)
+						a.So(up.CorrelationIDs, should.NotBeEmpty)
 
 						a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+							CorrelationIDs:       up.CorrelationIDs,
 							Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-								CorrelationIDs: up.GetUplinkMessage().CorrelationIDs,
-								FCnt:           tc.NextNextFCntUp - 1,
-								FPort:          tc.UplinkMessage.Payload.GetMACPayload().FPort,
-								FRMPayload:     tc.UplinkMessage.Payload.GetMACPayload().FRMPayload,
-								RxMetadata:     up.GetUplinkMessage().RxMetadata,
-								SessionKeyID:   dev.Session.SessionKeys.SessionKeyID,
+								FCnt:         tc.NextNextFCntUp - 1,
+								FPort:        tc.UplinkMessage.Payload.GetMACPayload().FPort,
+								FRMPayload:   tc.UplinkMessage.Payload.GetMACPayload().FRMPayload,
+								RxMetadata:   up.GetUplinkMessage().RxMetadata,
+								SessionKeyID: dev.Session.SessionKeys.SessionKeyID,
 							}},
 						})
 
@@ -1574,9 +1578,10 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 
 				select {
 				case up := <-asSendCh:
-					a.So(up.GetJoinAccept().CorrelationIDs, should.NotBeEmpty)
+					a.So(up.CorrelationIDs, should.NotBeEmpty)
 
 					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+						CorrelationIDs: up.CorrelationIDs,
 						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 							DevAddr:                expectedRequest.EndDeviceIdentifiers.DevAddr,
 							DevEUI:                 tc.Device.EndDeviceIdentifiers.DevEUI,
@@ -1585,9 +1590,8 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 							ApplicationIdentifiers: tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers,
 						},
 						Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-							AppSKey:        resp.SessionKeys.AppSKey,
-							CorrelationIDs: up.GetJoinAccept().CorrelationIDs,
-							SessionKeyID:   test.Must(dev.Load()).(*deviceregistry.Device).Session.SessionKeys.SessionKeyID,
+							AppSKey:      resp.SessionKeys.AppSKey,
+							SessionKeyID: test.Must(dev.Load()).(*deviceregistry.Device).Session.SessionKeys.SessionKeyID,
 						}},
 					})
 
@@ -1717,9 +1721,10 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 
 					select {
 					case up := <-asSendCh:
-						a.So(up.GetJoinAccept().CorrelationIDs, should.NotBeEmpty)
+						a.So(up.CorrelationIDs, should.NotBeEmpty)
 
 						a.So(up, should.Resemble, &ttnpb.ApplicationUp{
+							CorrelationIDs: up.CorrelationIDs,
 							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 								DevAddr:                expectedRequest.EndDeviceIdentifiers.DevAddr,
 								DevEUI:                 tc.Device.EndDeviceIdentifiers.DevEUI,
@@ -1728,9 +1733,8 @@ func HandleJoinTest(conf *component.Config) func(t *testing.T) {
 								ApplicationIdentifiers: tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers,
 							},
 							Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-								AppSKey:        resp.SessionKeys.AppSKey,
-								CorrelationIDs: up.GetJoinAccept().CorrelationIDs,
-								SessionKeyID:   test.Must(dev.Load()).(*deviceregistry.Device).Session.SessionKeys.SessionKeyID,
+								AppSKey:      resp.SessionKeys.AppSKey,
+								SessionKeyID: test.Must(dev.Load()).(*deviceregistry.Device).Session.SessionKeys.SessionKeyID,
 							}},
 						})
 

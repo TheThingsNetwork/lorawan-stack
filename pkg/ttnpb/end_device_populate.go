@@ -57,6 +57,9 @@ func NewPopulatedMACState(r randyEndDevice, easy bool) *MACState {
 	}
 	out.MACParameters = *NewPopulatedMACParameters(r, easy)
 	out.DesiredMACParameters = *NewPopulatedMACParameters(r, easy)
+	if r.Intn(10) != 0 {
+		out.PendingApplicationDownlink = NewPopulatedApplicationDownlink(r, easy)
+	}
 	return out
 }
 

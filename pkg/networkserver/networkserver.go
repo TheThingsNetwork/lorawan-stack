@@ -789,6 +789,9 @@ func (ns *NetworkServer) generateAndScheduleDownlink(ctx context.Context, dev *d
 		pld.FPort = down.FPort
 		pld.FRMPayload = down.FRMPayload
 		if down.Confirmed {
+			dev.MACState.PendingApplicationDownlink = down
+			dev.Session.LastConfFCntDown = pld.FCnt
+
 			mType = ttnpb.MType_CONFIRMED_DOWN
 		}
 	}
@@ -826,13 +829,6 @@ func (ns *NetworkServer) generateAndScheduleDownlink(ctx context.Context, dev *d
 	default:
 		t := time.Now().Add(classCTimeout).UTC()
 		dev.MACState.NextConfirmedDownlinkAt = &t
-	}
-
-	if mType == ttnpb.MType_CONFIRMED_DOWN {
-		dev.Session.LastConfFCntDown = pld.FCnt
-		dev.MACState.NeedsDownlinkAck = true
-	} else {
-		dev.MACState.NeedsDownlinkAck = false
 	}
 
 	b, err := (ttnpb.Message{
@@ -1114,19 +1110,27 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 		return errMissingPayload
 	}
 
-	if pld.Ack || dev.MACState != nil && dev.MACState.NeedsDownlinkAck && dev.MACState.DeviceClass == ttnpb.CLASS_A {
-		if dev.MACState != nil {
-			dev.MACState.NeedsDownlinkAck = false
+	if dev.MACState != nil && dev.MACState.PendingApplicationDownlink != nil {
+		asUp := &ttnpb.ApplicationUp{
+			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+			CorrelationIDs:       dev.MACState.PendingApplicationDownlink.CorrelationIDs,
 		}
 
-		if err := asCl.Send(&ttnpb.ApplicationUp{
-			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-			Up: &ttnpb.ApplicationUp_DownlinkAck{
-				DownlinkAck: pld.Ack,
-			},
-		}); err != nil {
+		if pld.Ack {
+			asUp.Up = &ttnpb.ApplicationUp_DownlinkAck{
+				DownlinkAck: dev.MACState.PendingApplicationDownlink,
+			}
+			asUp.CorrelationIDs = append(asUp.CorrelationIDs, msg.CorrelationIDs...)
+		} else {
+			asUp.Up = &ttnpb.ApplicationUp_DownlinkNack{
+				DownlinkNack: dev.MACState.PendingApplicationDownlink,
+			}
+		}
+
+		if err := asCl.Send(asUp); err != nil {
 			return err
 		}
+		dev.MACState.PendingApplicationDownlink = nil
 	}
 
 	mac := pld.FOpts
@@ -1253,13 +1257,13 @@ outer:
 	registerForwardUplink(ctx, dev.EndDevice, msg)
 	return asCl.Send(&ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+		CorrelationIDs:       msg.CorrelationIDs,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-			CorrelationIDs: msg.CorrelationIDs,
-			FCnt:           dev.Session.NextFCntUp - 1,
-			FPort:          pld.FPort,
-			FRMPayload:     pld.FRMPayload,
-			RxMetadata:     msg.RxMetadata,
-			SessionKeyID:   dev.Session.SessionKeyID,
+			FCnt:         dev.Session.NextFCntUp - 1,
+			FPort:        pld.FPort,
+			FRMPayload:   pld.FRMPayload,
+			RxMetadata:   msg.RxMetadata,
+			SessionKeyID: dev.Session.SessionKeyID,
 		}},
 	})
 }
@@ -1408,10 +1412,10 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 
 			if err := cl.Send(&ttnpb.ApplicationUp{
 				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+				CorrelationIDs:       msg.CorrelationIDs,
 				Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-					AppSKey:        resp.SessionKeys.AppSKey,
-					CorrelationIDs: msg.CorrelationIDs,
-					SessionKeyID:   dev.Session.SessionKeyID,
+					AppSKey:      resp.SessionKeys.AppSKey,
+					SessionKeyID: dev.Session.SessionKeyID,
 				}},
 			}); err != nil {
 				logger.WithField(

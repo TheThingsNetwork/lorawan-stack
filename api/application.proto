@@ -57,13 +57,15 @@ message Applications {
 // ApplicationUp wraps multiple application-layer uplink types
 message ApplicationUp {
   EndDeviceIdentifiers end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  repeated string correlation_ids = 2 [(gogoproto.customname) = "CorrelationIDs"];
 
   oneof up {
-    ApplicationUplink uplink_message = 2;
-    ApplicationJoinAccept join_accept = 3;
-    bool downlink_ack = 4;
-    google.protobuf.Empty downlink_sent = 5;
-    google.protobuf.Empty downlink_queued = 6;
+    ApplicationUplink uplink_message = 3;
+    ApplicationJoinAccept join_accept = 4;
+    ApplicationDownlink downlink_ack = 5;
+    ApplicationDownlink downlink_nack = 6;
+    ApplicationDownlink downlink_sent = 7;
+    ApplicationDownlink downlink_queued = 8;
     // Downlink queue invalidated (LoRaWAN 1.0)
   }
 }
