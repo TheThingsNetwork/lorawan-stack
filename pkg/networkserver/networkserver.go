@@ -275,41 +275,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		c,
 		conf.Registry,
 		deviceregistry.ForComponents(ttnpb.PeerInfo_NETWORK_SERVER),
-		deviceregistry.WithSetDeviceProcessor(func(_ context.Context, create bool, dev *ttnpb.EndDevice, fields ...string) (*ttnpb.EndDevice, []string, error) {
-			if !create {
-				// TODO
-				return dev, fields, nil
-			}
-
-			// TODO: Add checks https://github.com/TheThingsIndustries/ttn/issues/558
-			if len(dev.RecentDownlinks) > 0 || len(dev.RecentUplinks) > 0 {
-				return nil, errors.New("trying to override internal field")
-			}
-
-			if err := resetMACState(ns.Component.FrequencyPlans); err != nil {
-				return nil, nil, err
-			}
-
-			if dev.MACSettings == nil {
-				dev.MACSettings = &ttnpb.MACSettings{
-					ADR: true,
-				}
-			}
-
-			if dev.ABP {
-				dev.Session = &ttnpb.Session{}
-			}
-
-			if len(fields) == nil {
-				return dev, nil
-			}
-			return dev, append(fields,
-				"MACInfo",
-				"MACSettings",
-				"MACState",
-				"MACStateDesired",
-			)
-		}),
+		deviceregistry.WithSetDeviceProcessor(ns.setDeviceProcessor),
 	)
 	if err != nil {
 		return nil, errDeviceRegistryInitialize.WithCause(err)
@@ -343,6 +309,39 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 
 	c.RegisterGRPC(ns)
 	return ns, nil
+}
+
+func (ns *NetworkServer) setDeviceProcessor(_ context.Context, create bool, dev *ttnpb.EndDevice, fields ...string) (*ttnpb.EndDevice, []string, error) {
+	switch {
+	case len(dev.RecentDownlinks) > 0,
+		len(dev.RecentUplinks) > 0,
+		dev.MACState != nil,
+		dev.QueuedApplicationDownlinks != nil:
+		return nil, nil, errors.New("trying to override internal field")
+	}
+
+	if !create {
+		return dev, fields, nil
+	}
+
+	if err := resetMACState(ns.Component.FrequencyPlans, dev); err != nil {
+		return nil, nil, err
+	}
+
+	if !dev.SupportsJoin {
+		dev.Session = &ttnpb.Session{
+			// TODO: Populate session for ABP.
+			// (https://github.com/TheThingsIndustries/lorawan-stack/issues/291)
+		}
+	}
+
+	if len(fields) == 0 {
+		return dev, nil, nil
+	}
+	return dev, append(fields,
+		"MACState",
+		"Session",
+	), nil
 }
 
 type applicationUpStream struct {
