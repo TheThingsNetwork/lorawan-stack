@@ -24,9 +24,9 @@ import (
 	. "go.thethings.network/lorawan-stack/pkg/applicationregistry"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	removetheseerrors "go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
-	errorsv3 "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/store"
 	"go.thethings.network/lorawan-stack/pkg/store/mapstore"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -48,7 +48,7 @@ func TestRegistryRPC(t *testing.T) {
 	})
 
 	_, err := dr.SetApplication(context.Background(), &ttnpb.SetApplicationRequest{Application: *pb})
-	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
+	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 	v, err := dr.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
 	if !a.So(err, should.BeNil) {
@@ -57,7 +57,7 @@ func TestRegistryRPC(t *testing.T) {
 	a.So(v, should.Equal, ttnpb.Empty)
 
 	app, err := dr.GetApplication(context.Background(), &pb.ApplicationIdentifiers)
-	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
+	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 	app, err = dr.GetApplication(ctx, &pb.ApplicationIdentifiers)
 	if a.So(err, should.BeNil) {
@@ -67,7 +67,7 @@ func TestRegistryRPC(t *testing.T) {
 	}
 
 	_, err = dr.DeleteApplication(context.Background(), &pb.ApplicationIdentifiers)
-	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
+	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 	v, err = dr.DeleteApplication(ctx, &pb.ApplicationIdentifiers)
 	if !a.So(err, should.BeNil) {
@@ -76,7 +76,7 @@ func TestRegistryRPC(t *testing.T) {
 	a.So(v, should.Equal, ttnpb.Empty)
 
 	_, err = dr.GetApplication(context.Background(), &pb.ApplicationIdentifiers)
-	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
+	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 	_, err = dr.GetApplication(ctx, &pb.ApplicationIdentifiers)
 	a.So(err, should.DescribeError, ErrApplicationNotFound)
@@ -94,7 +94,7 @@ func TestSetApplicationNoCheck(t *testing.T) {
 	a.So(validate.ID(pb.GetApplicationID()), should.BeNil)
 
 	_, err := dr.SetApplication(context.Background(), &ttnpb.SetApplicationRequest{Application: *pb})
-	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
+	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 	v, err := dr.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(err, should.BeNil)
@@ -188,9 +188,9 @@ func TestDeleteApplicationNoCheck(t *testing.T) {
 }
 
 func TestCheck(t *testing.T) {
-	errTest := &errors.ErrDescriptor{
+	errTest := &removetheseerrors.ErrDescriptor{
 		MessageFormat: "Test",
-		Type:          errors.Internal,
+		Type:          removetheseerrors.Internal,
 		Code:          1,
 	}
 	errTest.Register()
@@ -212,13 +212,13 @@ func TestCheck(t *testing.T) {
 	t.Run("SetApplication", func(t *testing.T) {
 		a := assertions.New(t)
 
-		checkErr = errors.New("err")
+		checkErr = removetheseerrors.New("err")
 		v, err := dr.SetApplication(context.Background(), &ttnpb.SetApplicationRequest{Application: *pb})
-		a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		a.So(v, should.BeNil)
 
 		v, err = dr.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: ttnpb.Application{}})
-		a.So(errorsv3.IsInvalidArgument(err), should.BeTrue)
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
 		a.So(v, should.BeNil)
 
 		checkErr = errTest.New(nil)
@@ -235,7 +235,7 @@ func TestCheck(t *testing.T) {
 	if !t.Run("GetApplication", func(t *testing.T) {
 		a := assertions.New(t)
 
-		checkErr = errors.New("err")
+		checkErr = removetheseerrors.New("err")
 		ret, err := dr.GetApplication(ctx, &pb.ApplicationIdentifiers)
 		a.So(err, should.DescribeError, common.ErrCheckFailed)
 		a.So(ret, should.BeNil)
@@ -260,7 +260,7 @@ func TestCheck(t *testing.T) {
 	t.Run("DeleteApplication", func(t *testing.T) {
 		a := assertions.New(t)
 
-		checkErr = errors.New("err")
+		checkErr = removetheseerrors.New("err")
 		_, err := dr.DeleteApplication(ctx, &pb.ApplicationIdentifiers)
 		a.So(err, should.DescribeError, common.ErrCheckFailed)
 

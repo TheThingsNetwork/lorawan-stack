@@ -26,9 +26,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	. "go.thethings.network/lorawan-stack/pkg/deviceregistry"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	removetheseerrors "go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/errors/common"
-	errorsv3 "go.thethings.network/lorawan-stack/pkg/errorsv3"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/store"
 	"go.thethings.network/lorawan-stack/pkg/store/mapstore"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -47,7 +47,7 @@ func TestRegistryRPC(t *testing.T) {
 	})
 
 	_, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *pb})
-	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
+	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	if !a.So(err, should.BeNil) {
@@ -56,7 +56,7 @@ func TestRegistryRPC(t *testing.T) {
 	a.So(v, should.Equal, ttnpb.Empty)
 
 	devs, err := dr.ListDevices(context.Background(), &pb.EndDeviceIdentifiers)
-	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
+	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 	devs, err = dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
 	if a.So(err, should.BeNil) && a.So(devs.EndDevices, should.HaveLength, 1) {
@@ -66,7 +66,7 @@ func TestRegistryRPC(t *testing.T) {
 	}
 
 	_, err = dr.DeleteDevice(context.Background(), &pb.EndDeviceIdentifiers)
-	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
+	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 	v, err = dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
 	if !a.So(err, should.BeNil) {
@@ -75,7 +75,7 @@ func TestRegistryRPC(t *testing.T) {
 	a.So(v, should.Equal, ttnpb.Empty)
 
 	_, err = dr.ListDevices(context.Background(), &pb.EndDeviceIdentifiers)
-	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
+	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 	devs, err = dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
 	a.So(err, should.BeNil)
@@ -93,7 +93,7 @@ func TestSetDeviceNoCheck(t *testing.T) {
 	pb := ttnpb.NewPopulatedEndDevice(test.Randy, false)
 
 	_, err := dr.SetDevice(context.Background(), &ttnpb.SetDeviceRequest{Device: *pb})
-	a.So(errorsv3.IsPermissionDenied(err), should.BeTrue)
+	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 	v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 	a.So(err, should.BeNil)
@@ -251,9 +251,9 @@ func TestDeleteDeviceNoCheck(t *testing.T) {
 }
 
 func TestCheck(t *testing.T) {
-	errTest := &errors.ErrDescriptor{
+	errTest := &removetheseerrors.ErrDescriptor{
 		MessageFormat: "Test",
-		Type:          errors.Internal,
+		Type:          removetheseerrors.Internal,
 		Code:          1,
 	}
 	errTest.Register()
@@ -276,7 +276,7 @@ func TestCheck(t *testing.T) {
 	t.Run("SetDevice", func(t *testing.T) {
 		a := assertions.New(t)
 
-		checkErr = errors.New("err")
+		checkErr = removetheseerrors.New("err")
 		v, err := dr.SetDevice(ctx, &ttnpb.SetDeviceRequest{Device: *pb})
 		a.So(err, should.DescribeError, common.ErrCheckFailed)
 		a.So(v, should.BeNil)
@@ -295,7 +295,7 @@ func TestCheck(t *testing.T) {
 	if !t.Run("GetDevice", func(t *testing.T) {
 		a := assertions.New(t)
 
-		checkErr = errors.New("err")
+		checkErr = removetheseerrors.New("err")
 		ret, err := dr.GetDevice(ctx, &pb.EndDeviceIdentifiers)
 		a.So(err, should.DescribeError, common.ErrCheckFailed)
 		a.So(ret, should.BeNil)
@@ -320,7 +320,7 @@ func TestCheck(t *testing.T) {
 	t.Run("ListDevices", func(t *testing.T) {
 		a := assertions.New(t)
 
-		checkErr = errors.New("err")
+		checkErr = removetheseerrors.New("err")
 		devs, err := dr.ListDevices(ctx, &pb.EndDeviceIdentifiers)
 		a.So(err, should.DescribeError, common.ErrCheckFailed)
 		a.So(devs, should.BeNil)
@@ -343,7 +343,7 @@ func TestCheck(t *testing.T) {
 	t.Run("DeleteDevice", func(t *testing.T) {
 		a := assertions.New(t)
 
-		checkErr = errors.New("err")
+		checkErr = removetheseerrors.New("err")
 		_, err := dr.DeleteDevice(ctx, &pb.EndDeviceIdentifiers)
 		a.So(err, should.DescribeError, common.ErrCheckFailed)
 
