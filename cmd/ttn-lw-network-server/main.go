@@ -18,13 +18,17 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-network-server/commands"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 func main() {
 	if err := commands.Root.Execute(); err != nil {
-		fmt.Println(err)
+		for i, err := range errors.Stack(err) {
+			fmt.Println(strings.Repeat("  ", i), err)
+		}
 		os.Exit(-1)
 	}
 }
