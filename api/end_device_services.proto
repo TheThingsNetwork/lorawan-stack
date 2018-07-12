@@ -52,7 +52,7 @@ service NsDeviceRegistry {
   };
 
   // SetDevice creates or updates the device
-  rpc SetDevice(SetDeviceRequest) returns (google.protobuf.Empty) {
+  rpc SetDevice(SetDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
       post: "/ns/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}"
       body: "*"
@@ -90,7 +90,7 @@ service AsDeviceRegistry {
   };
 
   // SetDevice creates or updates the device
-  rpc SetDevice(SetDeviceRequest) returns (google.protobuf.Empty) {
+  rpc SetDevice(SetDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
       post: "/as/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}"
       body: "*"
@@ -128,7 +128,7 @@ service JsDeviceRegistry {
   };
 
   // SetDevice creates or updates the device
-  rpc SetDevice(SetDeviceRequest) returns (google.protobuf.Empty) {
+  rpc SetDevice(SetDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
       post: "/js/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}"
       body: "*"
