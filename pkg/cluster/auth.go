@@ -37,12 +37,12 @@ var errNoClusterKey = errors.DefineUnauthenticated(
 )
 
 var errUnsupportedAuthType = errors.DefineInvalidArgument(
-	"unsupported_auth_type",
+	"auth_type",
 	"cluster auth type `{auth_type}` is not supported",
 )
 
 var errInvalidClusterKey = errors.DefinePermissionDenied(
-	"invalid_cluster_key",
+	"cluster_key",
 	"invalid cluster key",
 )
 
@@ -57,7 +57,7 @@ func (c *cluster) VerifySource(ctx context.Context) error {
 	}
 	key, err := hex.DecodeString(md.AuthValue)
 	if err != nil {
-		return errInvalidClusterKey
+		return errInvalidClusterKey.WithCause(err)
 	}
 	for _, acceptedKey := range c.keys {
 		if subtle.ConstantTimeCompare(acceptedKey, key) == 1 {
