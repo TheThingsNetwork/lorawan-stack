@@ -40,9 +40,11 @@ type RPCOption func(*RegistryRPC)
 
 // WithSetApplicationProcessor sets a function, which checks and processes the application and fields,
 // which are about to be passed to SetApplication method of RegistryRPC instance.
-// After a successful search, SetApplication executes fn on the found value before creating or updating the application in the registry.
-// If fn returns error, SetApplication returns it without modifying the registry.
-func WithSetApplicationProcessor(fn func(context.Context, bool, *ttnpb.Application, ...string) (*ttnpb.Application, []string, error)) RPCOption {
+// After a successful search, SetApplication passes request context, bool, indicating whether the request will trigger a 'Create' or an 'Update',
+// application, which is about to be passed to the underlying registry and converted field paths(if such are specified in the request).
+// If nil error is returned by fn, SetApplication passes the application and fields returned to the underlying registry,
+// otherwise SetApplication returns the error without modifying the registry.
+func WithSetApplicationProcessor(fn func(ctx context.Context, create bool, app *ttnpb.Application, fields ...string) (*ttnpb.Application, []string, error)) RPCOption {
 	return func(r *RegistryRPC) { r.setApplicationProcessor = fn }
 }
 

@@ -50,9 +50,11 @@ func ForComponents(components ...ttnpb.PeerInfo_Role) RPCOption {
 
 // WithSetDeviceProcessor sets a function, which checks and processes the device and fields,
 // which are about to be passed to SetDevice method of RegistryRPC instance.
-// After a successful search, SetDevice executes fn on the found value before creating or updating the device in the registry.
-// If fn returns error, SetDevice returns it without modifying the registry.
-func WithSetDeviceProcessor(fn func(context.Context, bool, *ttnpb.EndDevice, ...string) (*ttnpb.EndDevice, []string, error)) RPCOption {
+// After a successful search, SetDevice passes request context, bool, indicating whether the request will trigger a 'Create' or an 'Update',
+// device, which is about to be passed to the underlying registry and converted field paths(if such are specified in the request).
+// If nil error is returned by fn, SetDevice passes the device and fields returned to the underlying registry,
+// otherwise SetDevice returns the error without modifying the registry.
+func WithSetDeviceProcessor(fn func(ctx context.Context, create bool, dev *ttnpb.EndDevice, fields ...string) (*ttnpb.EndDevice, []string, error)) RPCOption {
 	return func(r *RegistryRPC) { r.setDeviceProcessor = fn }
 }
 
