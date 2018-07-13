@@ -22,19 +22,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var formatters = map[string]ttnpb.PayloadFormatter{
-	"cayennelpp": ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
-	"grpc":       ttnpb.PayloadFormatter_FORMATTER_GRPC_SERVICE,
-	"javascript": ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
-}
-
 // Client allows retrieval of device data.
 type Client struct {
 	Fetcher fetch.Interface
 }
 
-// Brand returns the general information related to a brand.
-type Brand struct {
+type brand struct {
 	id string
 
 	Name  string   `yaml:"name,omitempty"`
@@ -42,205 +35,155 @@ type Brand struct {
 	Logos []string `yaml:"logos,omitempty"`
 }
 
-// Proto of the brand.
-func (b Brand) Proto() *ttnpb.DeviceBrand {
-	return &ttnpb.DeviceBrand{
-		ID:    b.id,
-		Name:  b.Name,
-		URL:   b.URL,
-		Logos: b.Logos,
-	}
-}
-
 var (
-	errFetchFailed = errors.DefineUnavailable("fetch_failed", "fetch failed of file `{filename}`")
-	errParseFailed = errors.DefineInvalidArgument("parse_failed", "parse failed")
+	errFetchFailed = errors.Define("fetch", "failed to fetch file `{filename}`")
+	errParseFailed = errors.DefineInvalidArgument("parse", "parse failed")
+)
+
+const (
+	brandsFile   = "brands.yml"
+	devicesFile  = "devices.yml"
+	versionsFile = "versions.yml"
 )
 
 // Brands fetches and parses the list of brands.
-func (c Client) Brands() (map[string]Brand, error) {
-	filename := "brands.yml"
-	content, err := c.Fetcher.File(filename)
+func (c Client) Brands() (map[string]ttnpb.EndDeviceBrand, error) {
+	content, err := c.Fetcher.File(brandsFile)
 	if err != nil {
-		return nil, errFetchFailed.WithCause(err).WithAttributes("filename", filename)
+		return nil, errFetchFailed.WithCause(err).WithAttributes("filename", brandsFile)
 	}
 
 	l := &struct {
 		Version string           `yaml:"version"`
-		Brands  map[string]Brand `yaml:"brands,omitempty"`
+		Brands  map[string]brand `yaml:"brands,omitempty"`
 	}{}
 	if err = yaml.Unmarshal(content, l); err != nil {
 		return nil, errParseFailed.WithCause(err)
 	}
 
-	brands := make(map[string]Brand)
+	brands := make(map[string]ttnpb.EndDeviceBrand)
 	for id, brand := range l.Brands {
-		brand.id = id
-		brands[id] = brand
+		brands[id] = ttnpb.EndDeviceBrand{
+			ID:    id,
+			Name:  brand.Name,
+			URL:   brand.URL,
+			Logos: brand.Logos,
+		}
 	}
 	return brands, nil
 }
 
-var (
-	errMissingFileExtension = errors.DefineInvalidArgument("missing_file_extension", "missing file extension in `{filename}`")
-	errUnknownFileType      = errors.DefineInvalidArgument("unknown_file_type", "unknown file type `{filename}`")
-)
-
-// Device contains the general information related to a device.
-type Device struct {
-	brand string
-	id    string
-
+type endDeviceModel struct {
 	Name string `yaml:"name,omitempty"`
 }
 
-// Proto returns the device in the protobuf format.
-func (d Device) Proto() *ttnpb.EndDeviceModel {
-	return &ttnpb.EndDeviceModel{BrandID: d.brand, ModelID: d.id, ModelName: d.Name}
-}
-
-// Devices returns the list of devices related to this brand, indexed by device ID.
-func (c Client) Devices(brandID string) (map[string]Device, error) {
-	filename := "devices.yml"
-	content, err := c.Fetcher.File(brandID, filename)
+// DeviceModels fetches and parses the list of device models.
+func (c Client) DeviceModels(brandID string) (map[string]ttnpb.EndDeviceModel, error) {
+	content, err := c.Fetcher.File(brandID, devicesFile)
 	if err != nil {
-		return nil, errFetchFailed.WithCause(err).WithAttributes("filename", filename)
+		return nil, errFetchFailed.WithCause(err).WithAttributes("filename", devicesFile)
 	}
 
 	l := &struct {
-		Version string            `yaml:"version"`
-		Devices map[string]Device `yaml:"devices,omitempty"`
+		Version string                    `yaml:"version"`
+		Devices map[string]endDeviceModel `yaml:"devices,omitempty"`
 	}{}
 	if err = yaml.Unmarshal(content, l); err != nil {
 		return nil, errParseFailed.WithCause(err)
 	}
 
-	devices := make(map[string]Device)
-	for deviceID, device := range l.Devices {
-		device.id = deviceID
-		device.brand = brandID
-		devices[deviceID] = device
+	devices := make(map[string]ttnpb.EndDeviceModel)
+	for id, device := range l.Devices {
+		devices[id] = ttnpb.EndDeviceModel{
+			ID:      id,
+			BrandID: brandID,
+			Name:    device.Name,
+		}
 	}
-
 	return devices, nil
 }
 
-// DeviceVersions returns the versions of this device, along with this version's characteristics.
-func (c Client) DeviceVersions(brandID, modelID string) (map[string]DeviceHardwareVersion, error) {
-	filename := "versions.yml"
-	content, err := c.Fetcher.File(brandID, modelID, filename)
+type payloadFormat struct {
+	Type      string `yaml:"type"`
+	Parameter string `yaml:"parameter,omitempty"`
+}
+
+type payloadFormats struct {
+	Up   *payloadFormat `yaml:"up,omitempty"`
+	Down *payloadFormat `yaml:"down,omitempty"`
+}
+
+type endDeviceVersion struct {
+	FirmwareVersion string         `yaml:"firmware_version"`
+	Photos          []string       `yaml:"photos,omitempty"`
+	PayloadFormats  payloadFormats `yaml:"payload_format,omitempty"`
+}
+
+var errInvalidPayloadFormatter = errors.DefineInvalidArgument("invalid_payload_formatter", "invalid payload formatter `{formatter}`")
+
+// DeviceVersions fetches and parses the list of device versions.
+func (c Client) DeviceVersions(brandID, modelID string) ([]ttnpb.EndDeviceVersion, error) {
+	content, err := c.Fetcher.File(brandID, modelID, versionsFile)
 	if err != nil {
-		return nil, errFetchFailed.WithCause(err).WithAttributes("filename", filename)
+		return nil, errFetchFailed.WithCause(err).WithAttributes("filename", versionsFile)
 	}
 
 	l := &struct {
-		Version          string                           `yaml:"version"`
-		HardwareVersions map[string]DeviceHardwareVersion `yaml:"hardware_versions,omitempty"`
+		Version          string                        `yaml:"version"`
+		HardwareVersions map[string][]endDeviceVersion `yaml:"hardware_versions,omitempty"`
 	}{}
 	if err = yaml.Unmarshal(content, l); err != nil {
 		return nil, errParseFailed.WithCause(err)
 	}
 
-	hardwareVersions := make(map[string]DeviceHardwareVersion)
-	for version, versionDetails := range l.HardwareVersions {
-		payloadFormats := []*PayloadFormat{
-			versionDetails.PayloadFormats.Up,
-			versionDetails.PayloadFormats.Down,
-		}
-		for _, payloadFormat := range payloadFormats {
-			if payloadFormat == nil || payloadFormat.Type != "javascript" {
-				continue
+	var versions []ttnpb.EndDeviceVersion
+	for hwVersion, fwVersions := range l.HardwareVersions {
+		for _, version := range fwVersions {
+			parseFormatter := func(pf payloadFormat) (ttnpb.PayloadFormatter, string, error) {
+				switch pf.Type {
+				case "cayennelpp":
+					return ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP, "", nil
+				case "grpc":
+					return ttnpb.PayloadFormatter_FORMATTER_GRPC_SERVICE, pf.Parameter, nil
+				case "javascript":
+					content, err = c.Fetcher.File(brandID, modelID, hwVersion, pf.Parameter)
+					if err != nil {
+						return 0, "", errFetchFailed.WithCause(err).WithAttributes("filename", pf.Parameter)
+					}
+					return ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT, string(content), nil
+				default:
+					return 0, "", errInvalidPayloadFormatter.WithAttributes("formatter", pf.Type)
+				}
 			}
 
-			content, err = c.Fetcher.File(brandID, modelID, version, payloadFormat.Parameter)
-			if err != nil {
-				return nil, errFetchFailed.WithCause(err).WithAttributes("filename", payloadFormat.Parameter)
+			formatters := ttnpb.EndDeviceFormatters{}
+			if version.PayloadFormats.Up != nil {
+				formatters.UpFormatter, formatters.UpFormatterParameter, err = parseFormatter(*version.PayloadFormats.Up)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				formatters.UpFormatter = ttnpb.PayloadFormatter_FORMATTER_NONE
+			}
+			if version.PayloadFormats.Down != nil {
+				formatters.DownFormatter, formatters.DownFormatterParameter, err = parseFormatter(*version.PayloadFormats.Down)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				formatters.DownFormatter = ttnpb.PayloadFormatter_FORMATTER_NONE
 			}
 
-			payloadFormat.Parameter = string(content)
-		}
-
-		versionDetails.brand = brandID
-		versionDetails.device = modelID
-		versionDetails.version = version
-		hardwareVersions[version] = versionDetails
-	}
-
-	return hardwareVersions, nil
-}
-
-// PayloadFormat of a device.
-type PayloadFormat struct {
-	Type      string `yaml:"type"`
-	Parameter string `yaml:"param,omitempty"`
-}
-
-// DevicePayloadFormats for a specific device hardware version.
-type DevicePayloadFormats struct {
-	Up   *PayloadFormat `yaml:"up,omitempty"`
-	Down *PayloadFormat `yaml:"down,omitempty"`
-}
-
-// DeviceHardwareVersion with the characteristics of the specific version.
-type DeviceHardwareVersion struct {
-	brand, device, version string
-
-	FirmwareVersions []string `yaml:"firmware_versions,omitempty"`
-	Photos           []string `yaml:"photos,omitempty"`
-
-	PayloadFormats DevicePayloadFormats `yaml:"payload_format,omitempty"`
-}
-
-// Protos returns the device's firmware versions for that specific hardware version.
-func (d DeviceHardwareVersion) Protos() []*ttnpb.EndDeviceVersion {
-	proto := ttnpb.EndDeviceVersion{
-		EndDeviceModel: ttnpb.EndDeviceModel{
-			ModelID: d.device,
-			BrandID: d.brand,
-		},
-		HardwareVersion: d.version,
-
-		DefaultFormatters: &ttnpb.DeviceFormatters{},
-	}
-
-	if d.PayloadFormats.Up != nil {
-		if formatter, ok := formatters[d.PayloadFormats.Up.Type]; ok {
-			proto.DefaultFormatters.UpFormatter = formatter
-			proto.DefaultFormatters.UpFormatterParameter = d.PayloadFormats.Up.Parameter
-		} else {
-			proto.DefaultFormatters.UpFormatter = ttnpb.PayloadFormatter_FORMATTER_NONE
-			proto.DefaultFormatters.UpFormatterParameter = ""
+			versions = append(versions, ttnpb.EndDeviceVersion{
+				BrandID:           brandID,
+				ModelID:           modelID,
+				HardwareVersion:   hwVersion,
+				FirmwareVersion:   version.FirmwareVersion,
+				Photos:            version.Photos,
+				DefaultFormatters: formatters,
+			})
 		}
 	}
 
-	if d.PayloadFormats.Down != nil {
-		if formatter, ok := formatters[d.PayloadFormats.Down.Type]; ok {
-			proto.DefaultFormatters.DownFormatter = formatter
-			proto.DefaultFormatters.DownFormatterParameter = d.PayloadFormats.Down.Parameter
-		} else {
-			proto.DefaultFormatters.DownFormatter = ttnpb.PayloadFormatter_FORMATTER_NONE
-			proto.DefaultFormatters.DownFormatterParameter = ""
-		}
-	}
-
-	protos := []*ttnpb.EndDeviceVersion{}
-	switch len(d.FirmwareVersions) {
-	case 0:
-		protos = append(protos, &proto)
-	case 1:
-		proto.FirmwareVersion = d.FirmwareVersions[0]
-		protos = append(protos, &proto)
-	default:
-		for _, firmwareVersion := range d.FirmwareVersions {
-			firmwareProto := proto
-			if proto.DefaultFormatters != nil {
-				defaultFormatters := *proto.DefaultFormatters
-				firmwareProto.DefaultFormatters = &defaultFormatters
-			}
-			firmwareProto.FirmwareVersion = firmwareVersion
-			protos = append(protos, &firmwareProto)
-		}
-	}
-
-	return protos
+	return versions, nil
 }

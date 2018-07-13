@@ -15,255 +15,228 @@
 package devicerepository_test
 
 import (
-	"errors"
-	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/devicerepository"
+	. "go.thethings.network/lorawan-stack/pkg/devicerepository"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 type testFetcher map[string][]byte
 
+var errNotFound = errors.DefineNotFound("not_found", "not found")
+
 func (t testFetcher) File(name ...string) ([]byte, error) {
 	if content, ok := t[strings.Join(name, "/")]; ok {
 		return content, nil
 	}
-
-	return nil, errors.New("Not found")
+	return nil, errNotFound
 }
 
 var (
-	validFetcher, invalidFetcher, emptyFetcher testFetcher
-
-	standardUnoEncoder = "function Encoder() { return { led: 1 }}"
-)
-
-func init() {
-	// Valid fetcher.
-	{
-		validFetcher = map[string][]byte{}
-		validFetcher["brands.yml"] = []byte(`version: '3'
+	validFetcher = testFetcher(map[string][]byte{
+		"brands.yml": []byte(`version: '3'
 brands:
   thethingsproducts:
     name: The Things Products
     url: https://www.thethingsnetwork.org
     logos:
-    - logo.png`)
-		validFetcher["thethingsproducts/logo.png"] = []byte("image")
-		validFetcher["thethingsproducts/devices.yml"] = []byte(`version: '3'
+    - logo.png`),
+		"thethingsproducts/devices.yml": []byte(`version: '3'
 devices:
   thethingsuno:
-    name: The Things Uno`)
-		validFetcher["thethingsproducts/thethingsuno/versions.yml"] = []byte(`version: '3'
+    name: The Things Uno`),
+		"thethingsproducts/thethingsuno/versions.yml": []byte(`version: '3'
 hardware_versions:
-  standard:
-    firmware_versions: [v1.0]
-    photos: [standard.png]
-    payload_format:
-      up:
-        type: grpc
-        param: hosted-service:1234
-      down:
-        type: javascript
-        param: encoder.js`)
-		validFetcher["thethingsproducts/thethingsuno/standard/standard.png"] = []byte("standard-image")
-		validFetcher["thethingsproducts/thethingsuno/standard/encoder.js"] = []byte(standardUnoEncoder)
-	}
+  '1.0':
+    - firmware_version: 1.1
+      photos: [front.jpg, back.jpg]
+      payload_format:
+        up:
+          type: grpc
+          parameter: hosted-service:1234
+        down:
+          type: javascript
+          parameter: encoder.js`),
+		"thethingsproducts/thethingsuno/1.0/encoder.js": []byte(`function Encoder() { return { led: 1 } }`)})
 
-	// Invalid fetcher.
-	{
-		invalidFetcher = map[string][]byte{}
-		invalidFetcher["brands.yml"] = []byte(`version: '3'
-brands:
-  thethingsproducts:
-  - name: The Things Products
-  - url: https://www.thethingsnetwork.org`)
-		invalidFetcher["thethingsproducts/devices.yml"] = []byte(`version: '3'
-devices:
-  thethingsuno:
-		name: The Things Uno`)
-		invalidFetcher["thethingsproducts/thethingsuno/versions.yml"] = []byte(`version: '3'
-hardware_versions:
-standard:
- 		   firmware_versions: [v1.0]
-    photos: [standard.png]
-    payload_format:
-      up:
-        type: grpc
-        param: hosted-service:1234
-      down:
-        type: javascript
-        param: encoder.js`)
-		invalidFetcher["thethingsproducts/thethingsnode/versions.yml"] = []byte(`version: '3'
-hardware_versions:
-  standard:
-    firmware_versions: [v1.0]
-    payload_format:
-      up:
-        type: grpc
-        param: hosted-service:1234
-      down:
-        type: javascript
-        param: encoder.js`)
-	}
+	invalidFetcher = testFetcher(map[string][]byte{
+		"brands.yml":                                  []byte(`invalid yaml`),
+		"thethingsproducts/devices.yml":               []byte(`invalid yaml`),
+		"thethingsproducts/thethingsuno/versions.yml": []byte(`invalid yaml`)})
 
-	// Empty fetcher.
-	{
-		emptyFetcher = map[string][]byte{}
-	}
-}
+	emptyFetcher = testFetcher(map[string][]byte{})
+)
 
 func TestBrand(t *testing.T) {
-	a := assertions.New(t)
+	for _, tc := range []struct {
+		Name          string
+		Fetcher       fetch.Interface
+		ExpectedErr   func(err error) bool
+		ExpectedValue interface{}
+	}{
+		{
+			Name:        "Normal",
+			Fetcher:     validFetcher,
+			ExpectedErr: func(err error) bool { return err == nil },
+			ExpectedValue: map[string]ttnpb.EndDeviceBrand{
+				"thethingsproducts": {
+					ID:    "thethingsproducts",
+					Name:  "The Things Products",
+					URL:   "https://www.thethingsnetwork.org",
+					Logos: []string{"logo.png"},
+				},
+			},
+		},
+		{
+			Name:        "Invalid",
+			Fetcher:     invalidFetcher,
+			ExpectedErr: errors.IsInvalidArgument,
+		},
+		{
+			Name:        "Empty",
+			Fetcher:     emptyFetcher,
+			ExpectedErr: errors.IsNotFound,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
 
-	// Valid fetcher.
-	{
-		c := devicerepository.Client{Fetcher: validFetcher}
-		brands, err := c.Brands()
-		a.So(err, should.BeNil)
-
-		ttp, ok := brands["thethingsproducts"]
-		a.So(ok, should.BeTrue)
-		a.So(ttp.Name, should.Equal, "The Things Products")
-		a.So(ttp.URL, should.Equal, "https://www.thethingsnetwork.org")
-		a.So(ttp.Logos, should.HaveLength, 1)
-	}
-
-	// Invalid fetcher.
-	{
-		c := devicerepository.Client{Fetcher: invalidFetcher}
-		_, err := c.Brands()
-		a.So(err, should.NotBeNil)
-	}
-
-	// Invalid fetcher.
-	{
-		c := devicerepository.Client{Fetcher: emptyFetcher}
-		_, err := c.Brands()
-		a.So(err, should.NotBeNil)
-	}
-}
-
-func TestDevice(t *testing.T) {
-	a := assertions.New(t)
-
-	// Valid fetcher.
-	{
-		c := devicerepository.Client{Fetcher: validFetcher}
-		devices, err := c.Devices("thethingsproducts")
-		a.So(err, should.BeNil)
-
-		unoInfo, ok := devices["thethingsuno"]
-		a.So(ok, should.BeTrue)
-		a.So(unoInfo.Name, should.Equal, "The Things Uno")
-
-		versions, err := c.DeviceVersions("thethingsproducts", "thethingsuno")
-		a.So(err, should.BeNil)
-
-		standard, ok := versions["standard"]
-		a.So(ok, should.BeTrue)
-		a.So(standard.FirmwareVersions[0], should.Equal, "v1.0")
-		a.So(standard.Photos[0], should.Equal, "standard.png")
-		a.So(standard.PayloadFormats.Up.Parameter, should.Equal, "hosted-service:1234")
-		a.So(standard.PayloadFormats.Down.Parameter, should.Equal, standardUnoEncoder)
-		a.So(standard.PayloadFormats.Up.Type, should.Equal, "grpc")
-		a.So(standard.PayloadFormats.Down.Type, should.Equal, "javascript")
-	}
-
-	// Invalid fetcher.
-	{
-		c := devicerepository.Client{Fetcher: invalidFetcher}
-		_, err := c.Devices("thethingsproducts")
-		a.So(err, should.NotBeNil)
-
-		_, err = c.DeviceVersions("thethingsproducts", "thethingsuno")
-		a.So(err, should.NotBeNil)
-
-		_, err = c.DeviceVersions("thethingsproducts", "thethingsnode")
-		a.So(err, should.NotBeNil)
-	}
-
-	// Empty fetcher.
-	{
-		c := devicerepository.Client{Fetcher: emptyFetcher}
-		_, err := c.Devices("thethingsproducts")
-		a.So(err, should.NotBeNil)
-
-		_, err = c.DeviceVersions("thethingsproducts", "thethingsuno")
-		a.So(err, should.NotBeNil)
+			repo := Client{Fetcher: tc.Fetcher}
+			brands, err := repo.Brands()
+			if a.So(tc.ExpectedErr(err), should.BeTrue) && err == nil {
+				a.So(brands, should.Resemble, tc.ExpectedValue)
+			}
+		})
 	}
 }
 
-func TestProtos(t *testing.T) {
-	a := assertions.New(t)
+func TestDeviceModels(t *testing.T) {
+	for _, tc := range []struct {
+		Name          string
+		BrandID       string
+		Fetcher       fetch.Interface
+		ExpectedErr   func(err error) bool
+		ExpectedValue interface{}
+	}{
+		{
+			Name:        "Normal",
+			BrandID:     "thethingsproducts",
+			Fetcher:     validFetcher,
+			ExpectedErr: func(err error) bool { return err == nil },
+			ExpectedValue: map[string]ttnpb.EndDeviceModel{
+				"thethingsuno": {
+					BrandID: "thethingsproducts",
+					ID:      "thethingsuno",
+					Name:    "The Things Uno",
+				},
+			},
+		},
+		{
+			Name:          "UnknownBrand",
+			BrandID:       "unknown-brand",
+			Fetcher:       validFetcher,
+			ExpectedErr:   errors.IsNotFound,
+			ExpectedValue: nil,
+		},
+		{
+			Name:        "Invalid",
+			BrandID:     "thethingsproducts",
+			Fetcher:     invalidFetcher,
+			ExpectedErr: errors.IsInvalidArgument,
+		},
+		{
+			Name:        "Empty",
+			BrandID:     "thethingsproducts",
+			Fetcher:     emptyFetcher,
+			ExpectedErr: errors.IsNotFound,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
 
-	c := devicerepository.Client{Fetcher: validFetcher}
-
-	// Brand.
-	{
-		brands, err := c.Brands()
-		a.So(err, should.BeNil)
-
-		ttp, ok := brands["thethingsproducts"]
-		a.So(ok, should.BeTrue)
-
-		proto := ttp.Proto()
-		a.So(proto.ID, should.Equal, "thethingsproducts")
-		a.So(proto.Name, should.Equal, ttp.Name)
-	}
-
-	// Model.
-	{
-		devices, err := c.Devices("thethingsproducts")
-		a.So(err, should.BeNil)
-
-		uno, ok := devices["thethingsuno"]
-		a.So(ok, should.BeTrue)
-
-		proto := uno.Proto()
-		a.So(proto.BrandID, should.Equal, "thethingsproducts")
-		a.So(proto.ModelID, should.Equal, "thethingsuno")
-	}
-
-	// Version.
-	{
-		versions, err := c.DeviceVersions("thethingsproducts", "thethingsuno")
-		a.So(err, should.BeNil)
-
-		std, ok := versions["standard"]
-		a.So(ok, should.BeTrue)
-
-		protos := std.Protos()
-		a.So(protos, should.HaveLength, 1)
-		proto := protos[0]
-		a.So(proto.ModelID, should.Equal, "thethingsuno")
-		a.So(proto.FirmwareVersion, should.Equal, "v1.0")
+			repo := Client{Fetcher: tc.Fetcher}
+			models, err := repo.DeviceModels(tc.BrandID)
+			if a.So(tc.ExpectedErr(err), should.BeTrue) && err == nil {
+				a.So(models, should.Resemble, tc.ExpectedValue)
+			}
+		})
 	}
 }
+func TestDeviceVersions(t *testing.T) {
+	for _, tc := range []struct {
+		Name          string
+		BrandID       string
+		ModelID       string
+		Fetcher       fetch.Interface
+		ExpectedErr   func(err error) bool
+		ExpectedValue interface{}
+	}{
+		{
+			Name:        "Normal",
+			BrandID:     "thethingsproducts",
+			ModelID:     "thethingsuno",
+			Fetcher:     validFetcher,
+			ExpectedErr: func(err error) bool { return err == nil },
+			ExpectedValue: []ttnpb.EndDeviceVersion{
+				{
+					BrandID:         "thethingsproducts",
+					ModelID:         "thethingsuno",
+					HardwareVersion: "1.0",
+					FirmwareVersion: "1.1",
+					Photos:          []string{"front.jpg", "back.jpg"},
+					DefaultFormatters: ttnpb.EndDeviceFormatters{
+						UpFormatter:            ttnpb.PayloadFormatter_FORMATTER_GRPC_SERVICE,
+						UpFormatterParameter:   "hosted-service:1234",
+						DownFormatter:          ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
+						DownFormatterParameter: "function Encoder() { return { led: 1 } }",
+					},
+				},
+			},
+		},
+		{
+			Name:          "UnknownBrand",
+			BrandID:       "unknown-brand",
+			ModelID:       "unknown-model",
+			Fetcher:       validFetcher,
+			ExpectedErr:   errors.IsNotFound,
+			ExpectedValue: nil,
+		},
+		{
+			Name:          "UnknownModel",
+			BrandID:       "thethingsproducts",
+			ModelID:       "unknown-model",
+			Fetcher:       validFetcher,
+			ExpectedErr:   errors.IsNotFound,
+			ExpectedValue: nil,
+		},
+		{
+			Name:        "Invalid",
+			BrandID:     "thethingsproducts",
+			ModelID:     "thethingsuno",
+			Fetcher:     invalidFetcher,
+			ExpectedErr: errors.IsInvalidArgument,
+		},
+		{
+			Name:        "Empty",
+			BrandID:     "thethingsproducts",
+			ModelID:     "thethingsuno",
+			Fetcher:     emptyFetcher,
+			ExpectedErr: errors.IsNotFound,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
 
-func Example() {
-	repository := devicerepository.Client{
-		Fetcher: fetch.FromHTTP("https://raw.githubusercontent.com/TheThingsNetwork/devices/master", true),
-	}
-
-	brands, err := repository.Brands()
-	if err != nil {
-		panic(err)
-	}
-
-	for brandID, brand := range brands {
-		fmt.Println("Brand:", brand.Name)
-		devices, err := repository.Devices(brandID)
-		if err != nil {
-			panic(err)
-		}
-
-		for _, device := range devices {
-			fmt.Println("\tDevice:", device.Name)
-		}
+			repo := Client{Fetcher: tc.Fetcher}
+			models, err := repo.DeviceVersions(tc.BrandID, tc.ModelID)
+			if a.So(tc.ExpectedErr(err), should.BeTrue) && err == nil {
+				a.So(models, should.Resemble, tc.ExpectedValue)
+			}
+		})
 	}
 }
