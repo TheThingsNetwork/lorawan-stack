@@ -21,8 +21,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
@@ -55,6 +54,12 @@ func ForComponents(components ...ttnpb.PeerInfo_Role) RPCOption {
 // If fn returns error, SetDevice returns it without modifying the registry.
 func WithSetDeviceProcessor(fn func(context.Context, bool, *ttnpb.EndDevice, ...string) (*ttnpb.EndDevice, []string, error)) RPCOption {
 	return func(r *RegistryRPC) { r.setDeviceProcessor = fn }
+}
+
+var componentsDiminutives = map[ttnpb.PeerInfo_Role]string{
+	ttnpb.PeerInfo_APPLICATION_SERVER: "As",
+	ttnpb.PeerInfo_NETWORK_SERVER:     "Ns",
+	ttnpb.PeerInfo_JOIN_SERVER:        "Js",
 }
 
 // NewRPC returns a new instance of RegistryRPC
@@ -124,7 +129,7 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 	}
 
 	dev, err := FindByIdentifiers(r.Interface, &req.Device.EndDeviceIdentifiers)
-	notFound := errors.Descriptor(err) == ErrDeviceNotFound
+	notFound := errors.IsNotFound(err)
 	if err != nil && !notFound {
 		return nil, err
 	}
@@ -132,10 +137,10 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 	setDev := &req.Device
 	if r.setDeviceProcessor != nil {
 		setDev, fields, err = r.setDeviceProcessor(ctx, notFound, setDev, fields...)
-		if err != nil && errors.GetType(err) != errors.Unknown {
+		if err != nil && !errors.IsUnknown(err) {
 			return nil, err
 		} else if err != nil {
-			return nil, common.ErrProcessorFailed.NewWithCause(nil, err)
+			return nil, errProcessorFailed.WithCause(err)
 		}
 	}
 

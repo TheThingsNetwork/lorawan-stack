@@ -143,10 +143,10 @@ func FindByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers) (*Applicat
 	}
 	switch i {
 	case 0:
-		return nil, ErrApplicationNotFound.New(nil)
+		return nil, errApplicationNotFound
 	case 1:
 		return app, nil
 	default:
-		return nil, ErrTooManyApplications.New(nil)
+		return nil, errTooManyApplications
 	}
 }

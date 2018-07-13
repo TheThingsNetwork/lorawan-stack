@@ -158,10 +158,10 @@ func FindByIdentifiers(r Interface, id *ttnpb.EndDeviceIdentifiers) (*Device, er
 	}
 	switch i {
 	case 0:
-		return nil, ErrDeviceNotFound.New(nil)
+		return nil, errDeviceNotFound
 	case 1:
 		return dev, nil
 	default:
-		return nil, ErrTooManyDevices.New(nil)
+		return nil, errTooManyDevices
 	}
 }

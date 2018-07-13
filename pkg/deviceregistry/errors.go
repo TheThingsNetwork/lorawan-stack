@@ -15,35 +15,11 @@
 package deviceregistry
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 )
 
 var (
-	// ErrDeviceNotFound represents the ErrDescriptor of the error returned
-	// when the device is not found.
-	ErrDeviceNotFound = &errors.ErrDescriptor{
-		MessageFormat: "Device not found",
-		Type:          errors.NotFound,
-		Code:          1,
-	}
-
-	// ErrTooManyDevices represents the ErrDescriptor of the error returned
-	// when there are too many devices associated with the identifiers specified.
-	ErrTooManyDevices = &errors.ErrDescriptor{
-		MessageFormat: "Too many devices found",
-		Type:          errors.Conflict,
-		Code:          2,
-	}
+	errDeviceNotFound  = errors.DefineNotFound("device_not_found", "device not found")
+	errTooManyDevices  = errors.Define("too_many_devices", "too many devices found")
+	errProcessorFailed = errors.Define("processor_failed", "failed to process arguments")
 )
-
-var componentsDiminutives = map[ttnpb.PeerInfo_Role]string{
-	ttnpb.PeerInfo_APPLICATION_SERVER: "As",
-	ttnpb.PeerInfo_NETWORK_SERVER:     "Ns",
-	ttnpb.PeerInfo_JOIN_SERVER:        "Js",
-}
-
-func init() {
-	ErrDeviceNotFound.Register()
-	ErrTooManyDevices.Register()
-}

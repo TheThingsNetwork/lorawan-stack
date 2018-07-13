@@ -12,14 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package applicationregistry
-
-import (
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
-)
+package deviceregistry
 
 var (
-	errApplicationNotFound = errors.DefineNotFound("application_not_found", "application not found")
-	errTooManyApplications = errors.Define("too_many_applications", "too many applications found")
-	errProcessorFailed     = errors.Define("processor_failed", "failed to process arguments")
+	ErrDeviceNotFound  = errDeviceNotFound
+	ErrTooManyDevices  = errTooManyDevices
+	ErrProcessorFailed = errProcessorFailed
 )

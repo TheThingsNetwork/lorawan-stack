@@ -20,8 +20,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
@@ -88,11 +87,11 @@ func (r *RegistryRPC) SetApplication(ctx context.Context, req *ttnpb.SetApplicat
 
 	var fields []string
 	if req.FieldMask != nil {
-		fields = gogoproto.GoFieldsPaths(req.FieldMask, req.GetApplication())
+		fields = gogoproto.GoFieldsPaths(req.FieldMask, req.Application)
 	}
 
 	app, err := FindByIdentifiers(r.Interface, &req.Application.ApplicationIdentifiers)
-	notFound := errors.Descriptor(err) == ErrApplicationNotFound
+	notFound := errors.IsNotFound(err)
 	if err != nil && !notFound {
 		return nil, err
 	}
@@ -100,27 +99,28 @@ func (r *RegistryRPC) SetApplication(ctx context.Context, req *ttnpb.SetApplicat
 	setApp := &req.Application
 	if r.setApplicationProcessor != nil {
 		setApp, fields, err = r.setApplicationProcessor(ctx, notFound, setApp, fields...)
-		if err != nil && errors.GetType(err) != errors.Unknown {
+		if err != nil && !errors.IsUnknown(err) {
 			return nil, err
 		} else if err != nil {
-			return nil, common.ErrProcessorFailed.NewWithCause(nil, err)
+			return nil, errProcessorFailed.WithCause(err)
 		}
 	}
 
 	if notFound {
-		_, err := r.Interface.Create(setApp, fields...)
-		if err == nil {
-			events.Publish(evtCreateApplication(ctx, setApp.ApplicationIdentifiers, nil))
+		app, err := r.Interface.Create(setApp, fields...)
+		if err != nil {
+			return nil, err
 		}
-		return setApp, err
+		events.Publish(evtCreateApplication(ctx, setApp.ApplicationIdentifiers, nil))
+		return app.Application, nil
 	}
-	app.Application = setApp
 
+	app.Application = setApp
 	if err = app.Store(fields...); err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateApplication(ctx, setApp.ApplicationIdentifiers, req.FieldMask))
-	return setApp, nil
+	events.Publish(evtUpdateApplication(ctx, setApp.ApplicationIdentifiers, fields))
+	return app.Application, nil
 }
 
 // DeleteApplication deletes the application associated with id from underlying registry.
@@ -133,6 +133,7 @@ func (r *RegistryRPC) DeleteApplication(ctx context.Context, id *ttnpb.Applicati
 	if err != nil {
 		return nil, err
 	}
+
 	if err = app.Delete(); err != nil {
 		return nil, err
 	}

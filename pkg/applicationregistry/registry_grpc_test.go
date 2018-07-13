@@ -24,7 +24,6 @@ import (
 	. "go.thethings.network/lorawan-stack/pkg/applicationregistry"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	removetheseerrors "go.thethings.network/lorawan-stack/pkg/errors"
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/store"
 	"go.thethings.network/lorawan-stack/pkg/store/mapstore"
@@ -38,19 +37,19 @@ var _ ttnpb.AsApplicationRegistryServer = &RegistryRPC{}
 
 func TestRegistryRPC(t *testing.T) {
 	a := assertions.New(t)
-	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
+	ar := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
 	pb := ttnpb.NewPopulatedApplication(test.Randy, false)
 
-	ctx := rights.NewContext(context.Background(), []ttnpb.Right{
+	ctx := rights.NewContext(test.Context(), []ttnpb.Right{
 		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
 	})
 
-	app, err := dr.SetApplication(context.Background(), &ttnpb.SetApplicationRequest{Application: *pb})
+	app, err := ar.SetApplication(test.Context(), &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	a.So(app, should.BeNil)
 
-	app, err = dr.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
+	app, err = ar.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
 	pb.CreatedAt = app.GetCreatedAt()
 	pb.UpdatedAt = app.GetUpdatedAt()
 	if !a.So(err, should.BeNil) {
@@ -60,183 +59,178 @@ func TestRegistryRPC(t *testing.T) {
 		pretty.Ldiff(t, app, pb)
 	}
 
-	app, err = dr.GetApplication(context.Background(), &pb.ApplicationIdentifiers)
+	app, err = ar.GetApplication(test.Context(), &pb.ApplicationIdentifiers)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	a.So(app, should.BeNil)
 
-	app, err = dr.GetApplication(ctx, &pb.ApplicationIdentifiers)
+	app, err = ar.GetApplication(ctx, &pb.ApplicationIdentifiers)
 	a.So(err, should.BeNil)
 	if !a.So(app, should.Resemble, pb) {
 		pretty.Ldiff(t, app, pb)
 	}
 
-	v, err := dr.DeleteApplication(context.Background(), &pb.ApplicationIdentifiers)
+	v, err := ar.DeleteApplication(test.Context(), &pb.ApplicationIdentifiers)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	a.So(v, should.BeNil)
 
-	v, err = dr.DeleteApplication(ctx, &pb.ApplicationIdentifiers)
+	v, err = ar.DeleteApplication(ctx, &pb.ApplicationIdentifiers)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	a.So(v, should.Equal, ttnpb.Empty)
 
-	app, err = dr.GetApplication(context.Background(), &pb.ApplicationIdentifiers)
+	app, err = ar.GetApplication(test.Context(), &pb.ApplicationIdentifiers)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	a.So(app, should.BeNil)
 
-	app, err = dr.GetApplication(ctx, &pb.ApplicationIdentifiers)
-	a.So(err, should.DescribeError, ErrApplicationNotFound)
+	app, err = ar.GetApplication(ctx, &pb.ApplicationIdentifiers)
+	a.So(err, should.EqualErrorOrDefinition, ErrApplicationNotFound)
 	a.So(app, should.BeNil)
 }
 
 func TestSetApplicationNoProcessor(t *testing.T) {
 	a := assertions.New(t)
-	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
+	ar := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
-	ctx := rights.NewContext(context.Background(), []ttnpb.Right{
+	ctx := rights.NewContext(test.Context(), []ttnpb.Right{
 		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
 	})
 
 	pb := ttnpb.NewPopulatedApplication(test.Randy, false)
 	a.So(validate.ID(pb.GetApplicationID()), should.BeNil)
 
-	_, err := dr.SetApplication(context.Background(), &ttnpb.SetApplicationRequest{Application: *pb})
+	_, err := ar.SetApplication(test.Context(), &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
-	v, err := dr.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
+	v, err := ar.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 
-	_, err = dr.Interface.Create(pb)
+	_, err = ar.Interface.Create(pb)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	v, err = dr.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
-	a.So(err, should.DescribeError, ErrTooManyApplications)
+	v, err = ar.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
+	a.So(err, should.EqualErrorOrDefinition, ErrTooManyApplications)
 	a.So(v, should.BeNil)
 }
 
 func TestGetApplication(t *testing.T) {
 	a := assertions.New(t)
-	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
+	ar := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
-	ctx := rights.NewContext(context.Background(), []ttnpb.Right{
+	ctx := rights.NewContext(test.Context(), []ttnpb.Right{
 		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
 	})
 
 	pb := ttnpb.NewPopulatedApplication(test.Randy, false)
 
-	v, err := dr.GetApplication(ctx, &pb.ApplicationIdentifiers)
-	a.So(err, should.DescribeError, ErrApplicationNotFound)
+	v, err := ar.GetApplication(ctx, &pb.ApplicationIdentifiers)
+	a.So(err, should.EqualErrorOrDefinition, ErrApplicationNotFound)
 	a.So(v, should.BeNil)
 
-	_, err = dr.Interface.Create(pb)
+	_, err = ar.Interface.Create(pb)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	v, err = dr.GetApplication(ctx, &pb.ApplicationIdentifiers)
+	v, err = ar.GetApplication(ctx, &pb.ApplicationIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 
 	pb.CreatedAt = time.Time{}
 	pb.UpdatedAt = time.Time{}
-	_, err = dr.Interface.Create(pb)
+	_, err = ar.Interface.Create(pb)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	v, err = dr.GetApplication(ctx, &pb.ApplicationIdentifiers)
-	a.So(err, should.DescribeError, ErrTooManyApplications)
+	v, err = ar.GetApplication(ctx, &pb.ApplicationIdentifiers)
+	a.So(err, should.EqualErrorOrDefinition, ErrTooManyApplications)
 	a.So(v, should.BeNil)
 }
 
 func TestDeleteApplication(t *testing.T) {
 	a := assertions.New(t)
-	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
+	ar := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())))).(*RegistryRPC)
 
-	ctx := rights.NewContext(context.Background(), []ttnpb.Right{
+	ctx := rights.NewContext(test.Context(), []ttnpb.Right{
 		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
 	})
 
 	pb := ttnpb.NewPopulatedApplication(test.Randy, false)
 
-	v, err := dr.DeleteApplication(ctx, &pb.ApplicationIdentifiers)
-	a.So(err, should.DescribeError, ErrApplicationNotFound)
+	v, err := ar.DeleteApplication(ctx, &pb.ApplicationIdentifiers)
+	a.So(err, should.EqualErrorOrDefinition, ErrApplicationNotFound)
 	a.So(v, should.BeNil)
 
-	_, err = dr.Interface.Create(pb)
+	_, err = ar.Interface.Create(pb)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	v, err = dr.DeleteApplication(ctx, &pb.ApplicationIdentifiers)
+	v, err = ar.DeleteApplication(ctx, &pb.ApplicationIdentifiers)
 	a.So(err, should.BeNil)
 	a.So(v, should.NotBeNil)
 
 	pb.CreatedAt = time.Time{}
 	pb.UpdatedAt = time.Time{}
-	_, err = dr.Interface.Create(pb)
+	_, err = ar.Interface.Create(pb)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
 	pb.CreatedAt = time.Time{}
 	pb.UpdatedAt = time.Time{}
-	_, err = dr.Interface.Create(pb)
+	_, err = ar.Interface.Create(pb)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	v, err = dr.DeleteApplication(ctx, &pb.ApplicationIdentifiers)
-	a.So(err, should.DescribeError, ErrTooManyApplications)
+	v, err = ar.DeleteApplication(ctx, &pb.ApplicationIdentifiers)
+	a.So(err, should.EqualErrorOrDefinition, ErrTooManyApplications)
 	a.So(v, should.BeNil)
 }
 
 func TestSetApplicationProcessor(t *testing.T) {
-	errTest := &removetheseerrors.ErrDescriptor{
-		MessageFormat: "Test",
-		Type:          removetheseerrors.Internal,
-		Code:          1,
-	}
-	errTest.Register()
+	errTest := errors.DefineInternal("test", "test")
 
 	var procErr error
 
-	dr := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())),
-		WithSetApplicationProcessor(func(_ context.Context, _ bool, dev *ttnpb.Application, fields ...string) (*ttnpb.Application, []string, error) {
+	ar := test.Must(NewRPC(component.MustNew(test.GetLogger(t), &component.Config{}), New(store.NewTypedMapStoreClient(mapstore.New())),
+		WithSetApplicationProcessor(func(_ context.Context, _ bool, app *ttnpb.Application, fields ...string) (*ttnpb.Application, []string, error) {
 			if procErr != nil {
 				return nil, nil, procErr
 			}
-			return dev, fields, nil
+			return app, fields, nil
 		}),
 	)).(*RegistryRPC)
-
-	ctx := rights.NewContext(context.Background(), []ttnpb.Right{
-		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-	})
 
 	pb := ttnpb.NewPopulatedApplication(test.Randy, false)
 
 	a := assertions.New(t)
 
-	procErr = removetheseerrors.New("err")
-	app, err := dr.SetApplication(context.Background(), &ttnpb.SetApplicationRequest{Application: *pb})
+	app, err := ar.SetApplication(test.Context(), &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	a.So(app, should.BeNil)
 
-	app, err = dr.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: ttnpb.Application{}})
-	a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	ctx := rights.NewContext(test.Context(), []ttnpb.Right{
+		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
+	})
+
+	procErr = errors.New("err")
+	app, err = ar.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
+	a.So(err, should.HaveSameErrorDefinitionAs, ErrProcessorFailed)
 	a.So(app, should.BeNil)
 
-	procErr = errTest.New(nil)
-	app, err = dr.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
-	a.So(err, should.Equal, procErr)
+	procErr = errTest.WithAttributes("foo", "bar")
+	app, err = ar.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
+	a.So(err, should.Resemble, procErr)
 	a.So(app, should.BeNil)
 
 	procErr = nil
-	app, err = dr.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
+	app, err = ar.SetApplication(ctx, &ttnpb.SetApplicationRequest{Application: *pb})
 	a.So(err, should.BeNil)
 	pb.CreatedAt = app.GetCreatedAt()
 	pb.UpdatedAt = app.GetUpdatedAt()
