@@ -132,10 +132,10 @@ dev.git-diff:
 # Binaries
 
 dev.ttn-lw-stack.start: ttn-lw-stack
-	./release/ttn-lw-stack-$(GOOS)-$(GOARCH) start --log.level=debug --assets.dir=public
+	./release/ttn-lw-stack-$(GOOS)-$(GOARCH) start --log.level=debug
 
 dev.ttn-lw-identity-server.start: ttn-lw-identity-server
-	./release/ttn-lw-identity-server-$(GOOS)-$(GOARCH) start --log.level=debug --assets.dir=public
+	./release/ttn-lw-identity-server-$(GOOS)-$(GOARCH) start --log.level=debug
 
 dev.ttn-lw-gateway-server.start: ttn-lw-gateway-server
 	./release/ttn-lw-gateway-server-$(GOOS)-$(GOARCH) start --log.level=debug
@@ -150,6 +150,6 @@ dev.ttn-lw-join-server.start: ttn-lw-join-server
 	./release/ttn-lw-join-server-$(GOOS)-$(GOARCH) start --log.level=debug
 
 dev.ttn-lw-console.start: ttn-lw-console
-	./release/ttn-lw-console-$(GOOS)-$(GOARCH) start --assets.dir=public --log.level=debug
+	./release/ttn-lw-console-$(GOOS)-$(GOARCH) start --log.level=debug
 
 # vim: ft=make
