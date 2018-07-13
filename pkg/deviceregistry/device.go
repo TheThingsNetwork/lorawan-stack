@@ -38,33 +38,45 @@ func newDevice(ed *ttnpb.EndDevice, s store.Client, k store.PrimaryKey) *Device 
 
 // Store updates devices data in the underlying store.Interface.
 // It modifies the UpdatedAt field of d.EndDevice.
-func (d *Device) Store(fields ...string) error {
-	start := time.Now()
+func (d *Device) Store(fields ...string) (err error) {
+	defer func(start time.Time) {
+		if err != nil {
+			return
+		}
+		latency.WithLabelValues("update").Observe(time.Since(start).Seconds())
+	}(time.Now())
+
 	d.EndDevice.UpdatedAt = time.Now().UTC()
 	if len(fields) != 0 {
 		fields = append(fields, "UpdatedAt")
 	}
-	err := d.store.Update(d.key, d.EndDevice, fields...)
-	latency.WithLabelValues("update").Observe(time.Since(start).Seconds())
-	return err
+	return d.store.Update(d.key, d.EndDevice, fields...)
 }
 
 // Load returns a snapshot of current device data in underlying store.Interface.
-func (d *Device) Load() (*Device, error) {
-	start := time.Now()
-	ed := &ttnpb.EndDevice{}
-	if err := d.store.Find(d.key, ed); err != nil {
+func (d *Device) Load() (dev *Device, err error) {
+	defer func(start time.Time) {
+		if err != nil {
+			return
+		}
+		latency.WithLabelValues("load").Observe(time.Since(start).Seconds())
+	}(time.Now())
+
+	pb := &ttnpb.EndDevice{}
+	if err := d.store.Find(d.key, pb); err != nil {
 		return nil, err
 	}
-	res := newDevice(ed, d.store, d.key)
-	latency.WithLabelValues("load").Observe(time.Since(start).Seconds())
-	return res, nil
+	return newDevice(pb, d.store, d.key), nil
 }
 
 // Delete removes device from the underlying store.Interface.
-func (d *Device) Delete() error {
-	start := time.Now()
-	err := d.store.Delete(d.key)
-	latency.WithLabelValues("delete").Observe(time.Since(start).Seconds())
-	return err
+func (d *Device) Delete() (err error) {
+	defer func(start time.Time) {
+		if err != nil {
+			return
+		}
+		latency.WithLabelValues("delete").Observe(time.Since(start).Seconds())
+	}(time.Now())
+
+	return d.store.Delete(d.key)
 }

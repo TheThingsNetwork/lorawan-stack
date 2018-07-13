@@ -45,13 +45,17 @@ func New(s store.Client) *Registry {
 
 // Create stores devices data in underlying store.Interface and returns a new *Device.
 // It modifies CreatedAt and UpdatedAt fields of ed and returns error if either of them is non-zero on ed.
-func (r *Registry) Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error) {
-	start := time.Now()
+func (r *Registry) Create(ed *ttnpb.EndDevice, fields ...string) (dev *Device, err error) {
+	defer func(start time.Time) {
+		if err != nil {
+			return
+		}
+		latency.WithLabelValues("create").Observe(time.Since(start).Seconds())
+	}(time.Now())
 
-	now := start.UTC()
+	now := time.Now().UTC()
 	ed.CreatedAt = now
 	ed.UpdatedAt = now
-
 	if len(fields) != 0 {
 		fields = append(fields, "CreatedAt", "UpdatedAt")
 	}
@@ -60,12 +64,7 @@ func (r *Registry) Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error
 	if err != nil {
 		return nil, err
 	}
-
-	dev := newDevice(ed, r.store, id)
-
-	latency.WithLabelValues("create").Observe(time.Since(start).Seconds())
-
-	return dev, nil
+	return newDevice(ed, r.store, id), nil
 }
 
 // Range calls f sequentially for each device stored, matching specified device fields.
@@ -79,12 +78,20 @@ func (r *Registry) Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error
 // from the underlying store in chunks of (approximately) batchSize devices.
 //
 // If len(fields) == 0, then Range uses all fields in ed to match devices.
-func (r *Registry) Range(ed *ttnpb.EndDevice, batchSize uint64, f func(*Device) bool, fields ...string) error {
+func (r *Registry) Range(ed *ttnpb.EndDevice, batchSize uint64, f func(*Device) bool, fields ...string) (err error) {
+	defer func(start time.Time) {
+		if err != nil {
+			return
+		}
+		duration := time.Since(start).Seconds()
+		latency.WithLabelValues("range").Observe(duration)
+		rangeLatency.WithLabelValues(strings.Join(fields, ",")).Observe(duration)
+	}(time.Now())
+
 	if ed == nil {
 		return errNilDevice
 	}
-	start := time.Now()
-	err := r.store.Range(
+	return r.store.Range(
 		ed,
 		func() interface{} { return &ttnpb.EndDevice{} },
 		batchSize,
@@ -93,10 +100,6 @@ func (r *Registry) Range(ed *ttnpb.EndDevice, batchSize uint64, f func(*Device) 
 		},
 		fields...,
 	)
-	duration := time.Since(start).Seconds()
-	latency.WithLabelValues("range").Observe(duration)
-	rangeLatency.WithLabelValues(strings.Join(fields, ",")).Observe(duration)
-	return err
 }
 
 // Identifiers supported in RangeByIdentifiers.

@@ -38,33 +38,45 @@ func newApplication(a *ttnpb.Application, s store.Client, k store.PrimaryKey) *A
 
 // Store updates applications data in the underlying store.Interface.
 // It modifies the UpdatedAt field of a.Application.
-func (a *Application) Store(fields ...string) error {
-	start := time.Now()
+func (a *Application) Store(fields ...string) (err error) {
+	defer func(start time.Time) {
+		if err != nil {
+			return
+		}
+		latency.WithLabelValues("update").Observe(time.Since(start).Seconds())
+	}(time.Now())
+
 	a.Application.UpdatedAt = time.Now().UTC()
 	if len(fields) != 0 {
 		fields = append(fields, "UpdatedAt")
 	}
-	err := a.store.Update(a.key, a.Application, fields...)
-	latency.WithLabelValues("update").Observe(time.Since(start).Seconds())
-	return err
+	return a.store.Update(a.key, a.Application, fields...)
 }
 
 // Load returns a snapshot of current application data in underlying store.Interface.
-func (a *Application) Load() (*Application, error) {
-	start := time.Now()
-	app := &ttnpb.Application{}
-	if err := a.store.Find(a.key, app); err != nil {
+func (a *Application) Load() (app *Application, err error) {
+	defer func(start time.Time) {
+		if err != nil {
+			return
+		}
+		latency.WithLabelValues("load").Observe(time.Since(start).Seconds())
+	}(time.Now())
+
+	pb := &ttnpb.Application{}
+	if err := a.store.Find(a.key, pb); err != nil {
 		return nil, err
 	}
-	res := newApplication(app, a.store, a.key)
-	latency.WithLabelValues("load").Observe(time.Since(start).Seconds())
-	return res, nil
+	return newApplication(pb, a.store, a.key), nil
 }
 
 // Delete removes application from the underlying store.Interface.
-func (a *Application) Delete() error {
-	start := time.Now()
-	err := a.store.Delete(a.key)
-	latency.WithLabelValues("delete").Observe(time.Since(start).Seconds())
-	return err
+func (a *Application) Delete() (err error) {
+	defer func(start time.Time) {
+		if err != nil {
+			return
+		}
+		latency.WithLabelValues("delete").Observe(time.Since(start).Seconds())
+	}(time.Now())
+
+	return a.store.Delete(a.key)
 }

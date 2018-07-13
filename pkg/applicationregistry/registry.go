@@ -45,13 +45,17 @@ func New(s store.Client) *Registry {
 
 // Create stores applications data in underlying store.Interface and returns a new *Application.
 // It modifies CreatedAt and UpdatedAt fields of a and returns error if either of them is non-zero on a.
-func (r *Registry) Create(a *ttnpb.Application, fields ...string) (*Application, error) {
-	start := time.Now()
+func (r *Registry) Create(a *ttnpb.Application, fields ...string) (app *Application, err error) {
+	defer func(start time.Time) {
+		if err != nil {
+			return
+		}
+		latency.WithLabelValues("create").Observe(time.Since(start).Seconds())
+	}(time.Now())
 
-	now := start.UTC()
+	now := time.Now().UTC()
 	a.CreatedAt = now
 	a.UpdatedAt = now
-
 	if len(fields) != 0 {
 		fields = append(fields, "CreatedAt", "UpdatedAt")
 	}
@@ -60,12 +64,7 @@ func (r *Registry) Create(a *ttnpb.Application, fields ...string) (*Application,
 	if err != nil {
 		return nil, err
 	}
-
-	app := newApplication(a, r.store, id)
-
-	latency.WithLabelValues("create").Observe(time.Since(start).Seconds())
-
-	return app, nil
+	return newApplication(a, r.store, id), nil
 }
 
 // Range calls f sequentially for each application stored, matching specified application fields.
@@ -79,12 +78,20 @@ func (r *Registry) Create(a *ttnpb.Application, fields ...string) (*Application,
 // from the underlying store in chunks of (approximately) batchSize applications.
 //
 // If len(fields) == 0, then Range uses all fields in a to match applications.
-func (r *Registry) Range(a *ttnpb.Application, batchSize uint64, f func(*Application) bool, fields ...string) error {
+func (r *Registry) Range(a *ttnpb.Application, batchSize uint64, f func(*Application) bool, fields ...string) (err error) {
+	defer func(start time.Time) {
+		if err != nil {
+			return
+		}
+		duration := time.Since(start).Seconds()
+		latency.WithLabelValues("range").Observe(duration)
+		rangeLatency.WithLabelValues(strings.Join(fields, ",")).Observe(duration)
+	}(time.Now())
+
 	if a == nil {
 		return errNilApplication
 	}
-	start := time.Now()
-	err := r.store.Range(
+	return r.store.Range(
 		a,
 		func() interface{} { return &ttnpb.Application{} },
 		batchSize,
@@ -93,10 +100,6 @@ func (r *Registry) Range(a *ttnpb.Application, batchSize uint64, f func(*Applica
 		},
 		fields...,
 	)
-	duration := time.Since(start).Seconds()
-	latency.WithLabelValues("range").Observe(duration)
-	rangeLatency.WithLabelValues(strings.Join(fields, ",")).Observe(duration)
-	return err
 }
 
 // Identifiers supported in RangeByIdentifiers.
