@@ -25,6 +25,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+var (
+	ErrAddressMismatch      = errAddressMismatch
+	ErrDevNonceReused       = errDevNonceReused
+	ErrDevNonceTooSmall     = errDevNonceTooSmall
+	ErrSessionKeyIDMismatch = errSessionKeyIDMismatch
+	ErrNoSession            = errNoSession
+)
+
 func KeyPointer(key types.AES128Key) *types.AES128Key { return keyPointer(key) }
 
 func TestMICCheck(t *testing.T) {

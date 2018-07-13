@@ -37,8 +37,6 @@ import (
 	"golang.org/x/net/context"
 )
 
-const appID = "test"
-
 var (
 	joinEUIPrefixes = []types.EUI64Prefix{
 		{EUI64: types.EUI64{0xff, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}, Length: 42},
@@ -410,7 +408,7 @@ func TestHandleJoin(t *testing.T) {
 				CFList:  nil,
 			},
 			nil,
-			ErrDevNonceTooSmall.New(nil),
+			ErrDevNonceTooSmall,
 		},
 		{
 			"1.1 address mismatch",
@@ -469,9 +467,9 @@ func TestHandleJoin(t *testing.T) {
 				CFList:  nil,
 			},
 			nil,
-			ErrAddressMismatch.New(errors.Attributes{
-				"component": "Network Server",
-			}),
+			ErrAddressMismatch.WithAttributes(
+				"component", "Network Server",
+			),
 		},
 		{
 			"1.0.2 new device",
@@ -903,7 +901,7 @@ func TestHandleJoin(t *testing.T) {
 				CFList:  nil,
 			},
 			nil,
-			ErrDevNonceReused.New(nil),
+			ErrDevNonceReused,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -1084,7 +1082,7 @@ func TestGetAppSKey(t *testing.T) {
 				SessionKeyID: "test",
 			},
 			nil,
-			ErrNoSession.New(nil),
+			ErrNoSession,
 		},
 		{
 			"ID mismatch",
@@ -1109,7 +1107,7 @@ func TestGetAppSKey(t *testing.T) {
 				SessionKeyID: "test",
 			},
 			nil,
-			ErrSessionKeyIDMismatch.New(nil),
+			ErrSessionKeyIDMismatch,
 		},
 		{
 			"ID mismatch no fallback",
@@ -1129,7 +1127,7 @@ func TestGetAppSKey(t *testing.T) {
 				SessionKeyID: "test",
 			},
 			nil,
-			ErrSessionKeyIDMismatch.New(nil),
+			ErrSessionKeyIDMismatch,
 		},
 		{
 			"Address mismatch",
@@ -1144,9 +1142,9 @@ func TestGetAppSKey(t *testing.T) {
 				SessionKeyID: "test",
 			},
 			nil,
-			ErrAddressMismatch.New(errors.Attributes{
-				"component": "Application Server",
-			}),
+			ErrAddressMismatch.WithAttributes(
+				"component", "Application Server",
+			),
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -1328,7 +1326,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				SessionKeyID: "test",
 			},
 			nil,
-			ErrNoSession.New(nil),
+			ErrNoSession,
 		},
 		{
 			"ID mismatch",
@@ -1353,7 +1351,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				SessionKeyID: "test",
 			},
 			nil,
-			ErrSessionKeyIDMismatch.New(nil),
+			ErrSessionKeyIDMismatch,
 		},
 		{
 			"ID mismatch no fallback",
@@ -1373,7 +1371,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				SessionKeyID: "test",
 			},
 			nil,
-			ErrSessionKeyIDMismatch.New(nil),
+			ErrSessionKeyIDMismatch,
 		},
 		{
 			"Address mismatch",
@@ -1388,9 +1386,9 @@ func TestGetNwkSKeys(t *testing.T) {
 				SessionKeyID: "test",
 			},
 			nil,
-			ErrAddressMismatch.New(errors.Attributes{
-				"component": "Network Server",
-			}),
+			ErrAddressMismatch.WithAttributes(
+				"component", "Network Server",
+			),
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {

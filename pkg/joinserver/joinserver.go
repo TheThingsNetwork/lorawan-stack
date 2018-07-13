@@ -25,8 +25,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/deviceregistry"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
@@ -86,15 +84,15 @@ func keyPointer(key types.AES128Key) *types.AES128Key {
 
 func checkMIC(key types.AES128Key, rawPayload []byte) error {
 	if n := len(rawPayload); n != 23 {
-		return errors.Errorf("Expected length of raw payload to be equal to 23, got %d", n)
+		return errPayloadLengthMismatch.WithAttributes("length", n)
 	}
 	computed, err := crypto.ComputeJoinRequestMIC(key, rawPayload[:19])
 	if err != nil {
-		return ErrMICComputeFailed.New(nil)
+		return errMICComputeFailed
 	}
 	for i := 0; i < 4; i++ {
 		if computed[i] != rawPayload[19+i] {
-			return ErrMICMismatch.New(nil)
+			return errMICMismatch
 		}
 	}
 	return nil
@@ -117,52 +115,46 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		}
 	}
 	if !supported {
-		return nil, common.ErrUnsupportedLoRaWANMACVersion.New(errors.Attributes{
-			"version": req.SelectedMacVersion,
-		})
+		return nil, errUnsupportedLoRaWANVersion.WithAttributes("version", req.SelectedMacVersion)
 	}
 
 	if req.EndDeviceIdentifiers.DevAddr == nil {
-		return nil, common.ErrMissingDevAddr.New(nil)
+		return nil, errMissingDevAddr
 	}
 
 	if req.Payload.Payload == nil {
 		if req.RawPayload == nil {
-			return nil, common.ErrMissingPayload.New(nil)
+			return nil, errMissingPayload
 		}
 		if err = req.Payload.UnmarshalLoRaWAN(req.RawPayload); err != nil {
-			return nil, common.ErrUnmarshalPayloadFailed.NewWithCause(nil, err)
+			return nil, errUnmarshalPayloadFailed.WithCause(err)
 		}
 	}
 
 	if req.Payload.Major != ttnpb.Major_LORAWAN_R1 {
-		return nil, common.ErrUnsupportedLoRaWANVersion.New(errors.Attributes{
-			"version": req.Payload.Major,
-		})
+		return nil, errUnsupportedLoRaWANVersion.WithAttributes("version", req.Payload.Major)
 	}
 	if req.Payload.MType != ttnpb.MType_JOIN_REQUEST {
-		return nil, ErrWrongPayloadType.New(errors.Attributes{
-			"type": req.Payload.MType,
-		})
+		return nil, errWrongPayloadType.WithAttributes("type", req.Payload.MType)
 	}
 
 	pld := req.Payload.GetJoinRequestPayload()
 	if pld == nil {
-		return nil, ErrMissingJoinRequest.New(nil)
+		return nil, errMissingJoinRequest
 	}
 
 	if pld.DevEUI.IsZero() {
-		return nil, common.ErrMissingDevEUI.New(nil)
+		return nil, errMissingDevEUI
 	}
 	if pld.JoinEUI.IsZero() {
-		return nil, common.ErrMissingJoinEUI.New(nil)
+		return nil, errMissingJoinEUI
 	}
 
 	rawPayload := req.RawPayload
 	if rawPayload == nil {
 		rawPayload, err = req.Payload.MarshalLoRaWAN()
 		if err != nil {
-			panic(errors.NewWithCause(err, "Failed to marshal join request payload"))
+			return nil, errMarshalPayloadFailed.WithCause(err)
 		}
 	}
 
@@ -175,9 +167,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 
 	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.NetworkServerAddress {
-		return nil, ErrAddressMismatch.New(errors.Attributes{
-			"component": "Network Server",
-		})
+		return nil, errAddressMismatch.WithAttributes("component", "Network Server")
 	}
 
 	match := false
@@ -189,19 +179,16 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 	switch {
 	case !match && dev.LoRaWANVersion == ttnpb.MAC_V1_0:
-		return nil, ErrUnknownAppEUI.New(nil)
+		return nil, errUnknownAppEUI
 	case !match:
 		// TODO determine the cluster containing the device
 		// https://github.com/TheThingsIndustries/ttn/issues/244
-		return nil, ErrForwardJoinRequest.NewWithCause(nil, deviceregistry.ErrDeviceNotFound.New(nil))
+		return nil, errForwardJoinRequest
 	}
 
 	// Registered version is lower than selected.
 	if dev.LoRaWANVersion.Compare(req.SelectedMacVersion) == -1 {
-		return nil, ErrMACVersionMismatch.New(errors.Attributes{
-			"registered": dev.LoRaWANVersion,
-			"selected":   req.SelectedMacVersion,
-		})
+		return nil, errMACVersionMismatch.WithAttributes("registered", dev.LoRaWANVersion, "selected", req.SelectedMacVersion)
 	}
 
 	var b []byte
@@ -216,7 +203,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		Major: req.Payload.Major,
 	}).AppendLoRaWAN(b)
 	if err != nil {
-		panic(errors.NewWithCause(err, "Failed to encode join accept MHDR"))
+		return nil, errMarshalPayloadFailed.WithCause(err)
 	}
 
 	var jn types.JoinNonce
@@ -233,7 +220,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		RxDelay:    req.RxDelay,
 	}).AppendLoRaWAN(b)
 	if err != nil {
-		panic(errors.NewWithCause(err, "Failed to encode join accept MAC payload"))
+		return nil, errMarshalPayloadFailed.WithCause(err)
 	}
 
 	dn := binary.LittleEndian.Uint16(pld.DevNonce[:])
@@ -241,16 +228,16 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		switch req.SelectedMacVersion {
 		case ttnpb.MAC_V1_1:
 			if uint32(dn) < dev.NextDevNonce {
-				return nil, ErrDevNonceTooSmall.New(nil)
+				return nil, errDevNonceTooSmall
 			}
 			if dev.NextDevNonce == math.MaxUint32 {
-				return nil, ErrDevNonceTooHigh.New(nil)
+				return nil, errDevNonceTooHigh
 			}
 			dev.NextDevNonce = uint32(dn + 1)
 		case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
 			for _, used := range dev.UsedDevNonces {
 				if dn == uint16(used) {
-					return nil, ErrDevNonceReused.New(nil)
+					return nil, errDevNonceReused
 				}
 			}
 		default:
@@ -258,55 +245,47 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		}
 	}
 
-	if dev.RootKeys.AppKey == nil {
-		return nil, common.ErrCorruptRegistry.NewWithCause(nil, ErrAppKeyEnvelopeNotFound.New(nil))
+	if dev.RootKeys.AppKey == nil || dev.RootKeys.AppKey.Key.IsZero() {
+		return nil, errMissingAppKey
 	}
-	if dev.RootKeys.AppKey.Key == nil || dev.RootKeys.AppKey.Key.IsZero() {
-		return nil, common.ErrCorruptRegistry.NewWithCause(nil, ErrAppKeyNotFound.New(nil))
-	}
-	appKey := *dev.RootKeys.AppKey.Key
 
 	switch req.SelectedMacVersion {
 	case ttnpb.MAC_V1_1:
-		if dev.RootKeys.NwkKey == nil {
-			return nil, common.ErrCorruptRegistry.NewWithCause(nil, ErrNwkKeyEnvelopeNotFound.New(nil))
-		}
-		if dev.RootKeys.NwkKey.Key == nil || dev.RootKeys.NwkKey.Key.IsZero() {
-			return nil, common.ErrCorruptRegistry.NewWithCause(nil, ErrNwkKeyNotFound.New(nil))
-		}
-		nwkKey := *dev.RootKeys.NwkKey.Key
-
-		if err := checkMIC(nwkKey, rawPayload); err != nil {
-			return nil, ErrMICCheckFailed.NewWithCause(nil, err)
+		if dev.RootKeys.NwkKey == nil || dev.RootKeys.NwkKey.Key.IsZero() {
+			return nil, errMissingNwkKey
 		}
 
-		mic, err := crypto.ComputeJoinAcceptMIC(crypto.DeriveJSIntKey(nwkKey, pld.DevEUI), 0xff, pld.JoinEUI, pld.DevNonce, b)
+		if err := checkMIC(*dev.RootKeys.NwkKey.Key, rawPayload); err != nil {
+			return nil, errMICCheckFailed.WithCause(err)
+		}
+
+		mic, err := crypto.ComputeJoinAcceptMIC(crypto.DeriveJSIntKey(*dev.RootKeys.NwkKey.Key, pld.DevEUI), 0xff, pld.JoinEUI, pld.DevNonce, b)
 		if err != nil {
-			return nil, common.ErrComputeMIC.NewWithCause(nil, err)
+			return nil, errMICComputeFailed.WithCause(err)
 		}
 
-		enc, err := crypto.EncryptJoinAccept(nwkKey, append(b[1:], mic[:]...))
+		enc, err := crypto.EncryptJoinAccept(*dev.RootKeys.NwkKey.Key, append(b[1:], mic[:]...))
 		if err != nil {
-			return nil, ErrEncryptPayloadFailed.NewWithCause(nil, err)
+			return nil, errEncryptPayloadFailed.WithCause(err)
 		}
 		resp = &ttnpb.JoinResponse{
 			RawPayload: append(b[:1], enc...),
 			SessionKeys: ttnpb.SessionKeys{
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key:      keyPointer(crypto.DeriveFNwkSIntKey(nwkKey, jn, pld.JoinEUI, pld.DevNonce)),
+					Key:      keyPointer(crypto.DeriveFNwkSIntKey(*dev.RootKeys.NwkKey.Key, jn, pld.JoinEUI, pld.DevNonce)),
 					KEKLabel: "",
 				},
 				SNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key:      keyPointer(crypto.DeriveSNwkSIntKey(nwkKey, jn, pld.JoinEUI, pld.DevNonce)),
+					Key:      keyPointer(crypto.DeriveSNwkSIntKey(*dev.RootKeys.NwkKey.Key, jn, pld.JoinEUI, pld.DevNonce)),
 					KEKLabel: "",
 				},
 				NwkSEncKey: &ttnpb.KeyEnvelope{
-					Key:      keyPointer(crypto.DeriveNwkSEncKey(nwkKey, jn, pld.JoinEUI, pld.DevNonce)),
+					Key:      keyPointer(crypto.DeriveNwkSEncKey(*dev.RootKeys.NwkKey.Key, jn, pld.JoinEUI, pld.DevNonce)),
 					KEKLabel: "",
 				},
 				// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key:      keyPointer(crypto.DeriveAppSKey(appKey, jn, pld.JoinEUI, pld.DevNonce)),
+					Key:      keyPointer(crypto.DeriveAppSKey(*dev.RootKeys.AppKey.Key, jn, pld.JoinEUI, pld.DevNonce)),
 					KEKLabel: "",
 				},
 			},
@@ -314,28 +293,28 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		}
 
 	case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-		if err := checkMIC(appKey, rawPayload); err != nil {
-			return nil, ErrMICCheckFailed.NewWithCause(nil, err)
+		if err := checkMIC(*dev.RootKeys.AppKey.Key, rawPayload); err != nil {
+			return nil, errMICCheckFailed.WithCause(err)
 		}
 
-		mic, err := crypto.ComputeLegacyJoinAcceptMIC(appKey, b)
+		mic, err := crypto.ComputeLegacyJoinAcceptMIC(*dev.RootKeys.AppKey.Key, b)
 		if err != nil {
-			return nil, common.ErrComputeMIC.NewWithCause(nil, err)
+			return nil, errMICComputeFailed.WithCause(err)
 		}
 
-		enc, err := crypto.EncryptJoinAccept(appKey, append(b[1:], mic[:]...))
+		enc, err := crypto.EncryptJoinAccept(*dev.RootKeys.AppKey.Key, append(b[1:], mic[:]...))
 		if err != nil {
-			return nil, ErrEncryptPayloadFailed.NewWithCause(nil, err)
+			return nil, errEncryptPayloadFailed.WithCause(err)
 		}
 		resp = &ttnpb.JoinResponse{
 			RawPayload: append(b[:1], enc...),
 			SessionKeys: ttnpb.SessionKeys{
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
-					Key:      keyPointer(crypto.DeriveLegacyNwkSKey(appKey, jn, req.NetID, pld.DevNonce)),
+					Key:      keyPointer(crypto.DeriveLegacyNwkSKey(*dev.RootKeys.AppKey.Key, jn, req.NetID, pld.DevNonce)),
 					KEKLabel: "",
 				},
 				AppSKey: &ttnpb.KeyEnvelope{
-					Key:      keyPointer(crypto.DeriveLegacyAppSKey(appKey, jn, req.NetID, pld.DevNonce)),
+					Key:      keyPointer(crypto.DeriveLegacyAppSKey(*dev.RootKeys.AppKey.Key, jn, req.NetID, pld.DevNonce)),
 					KEKLabel: "",
 				},
 			},
@@ -368,10 +347,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 // GetAppSKey returns the AppSKey associated with device specified by the supplied request.
 func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
 	if req.DevEUI.IsZero() {
-		return nil, common.ErrMissingDevEUI.New(nil)
+		return nil, errMissingDevEUI
 	}
 	if req.SessionKeyID == "" {
-		return nil, ErrMissingSessionKeyID.New(nil)
+		return nil, errMissingSessionKeyID
 	}
 
 	dev, err := deviceregistry.FindByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
@@ -382,23 +361,21 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 	}
 
 	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.ApplicationServerAddress {
-		return nil, ErrAddressMismatch.New(errors.Attributes{
-			"component": "Application Server",
-		})
+		return nil, errAddressMismatch.WithAttributes("component", "Application Server")
 	}
 
 	if dev.Session == nil {
-		return nil, ErrNoSession.New(nil)
+		return nil, errNoSession
 	}
 	if dev.Session.SessionKeyID != req.SessionKeyID {
 		dev.Session = dev.SessionFallback
 		if dev.Session == nil || dev.Session.SessionKeyID != req.SessionKeyID {
-			return nil, ErrSessionKeyIDMismatch.New(nil)
+			return nil, errSessionKeyIDMismatch
 		}
 	}
 
 	if dev.Session.AppSKey == nil {
-		return nil, ErrAppSKeyEnvelopeNotFound.New(nil)
+		return nil, errMissingAppSKey
 	}
 	// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
 	return &ttnpb.AppSKeyResponse{
@@ -409,10 +386,10 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 // GetNwkSKeys returns the NwkSKeys associated with device specified by the supplied request.
 func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
 	if req.DevEUI.IsZero() {
-		return nil, common.ErrMissingDevEUI.New(nil)
+		return nil, errMissingDevEUI
 	}
 	if req.SessionKeyID == "" {
-		return nil, ErrMissingSessionKeyID.New(nil)
+		return nil, errMissingSessionKeyID
 	}
 
 	dev, err := deviceregistry.FindByIdentifiers(js.registry, &ttnpb.EndDeviceIdentifiers{
@@ -423,29 +400,27 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 	}
 
 	if rpcmetadata.FromIncomingContext(ctx).NetAddress != dev.NetworkServerAddress {
-		return nil, ErrAddressMismatch.New(errors.Attributes{
-			"component": "Network Server",
-		})
+		return nil, errAddressMismatch.WithAttributes("component", "Network Server")
 	}
 
 	if dev.Session == nil {
-		return nil, ErrNoSession.New(nil)
+		return nil, errNoSession
 	}
 	if dev.Session.SessionKeyID != req.SessionKeyID {
 		dev.Session = dev.SessionFallback
 		if dev.Session == nil || dev.Session.SessionKeyID != req.SessionKeyID {
-			return nil, ErrSessionKeyIDMismatch.New(nil)
+			return nil, errSessionKeyIDMismatch
 		}
 	}
 
 	if dev.Session.NwkSEncKey == nil {
-		return nil, ErrNwkSEncKeyEnvelopeNotFound.New(nil)
+		return nil, errMissingNwkSEncKey
 	}
 	if dev.Session.FNwkSIntKey == nil {
-		return nil, ErrFNwkSIntKeyEnvelopeNotFound.New(nil)
+		return nil, errMissingFNwkSIntKey
 	}
 	if dev.Session.SNwkSIntKey == nil {
-		return nil, ErrSNwkSIntKeyEnvelopeNotFound.New(nil)
+		return nil, errMissingSNwkSIntKey
 	}
 	// TODO: Encrypt key with AS KEK https://github.com/TheThingsIndustries/ttn/issues/271
 	return &ttnpb.NwkSKeysResponse{
