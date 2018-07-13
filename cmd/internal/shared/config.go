@@ -73,7 +73,8 @@ var DefaultEventsConfig = config.Events{
 
 // DefaultAssetsConfig is the default config for the assets server.
 var DefaultAssetsConfig = assets.Config{
-	Mount: "/assets",
+	Mount:      "/assets",
+	SearchPath: []string{"public"},
 }
 
 // DefaultServiceBase is the default base config for a service.

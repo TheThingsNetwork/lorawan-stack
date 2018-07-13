@@ -36,7 +36,7 @@ var (
 			if err != nil {
 				return shared.ErrIdentityServerInitialize.WithCause(err)
 			}
-			initConfig.IS.OAuth.Assets = assets
+			config.IS.OAuth.Assets = assets
 
 			is, err := identityserver.New(c, config.IS)
 			if err != nil {
