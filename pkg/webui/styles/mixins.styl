@@ -83,6 +83,21 @@ center-absolute()
 // TYPOGRAPHY
 // ==========
 
+// Heading size definitions
+
+h1()
+  font-size: $fs.xxl
+  line-height: $lh.xxl
+
+h2()
+  font-size: $fs.xl
+  line-height: $lh.xl
+
+h3()
+  font-size: $fs.l
+  line-height: $lh.l
+
+
 // One liner, sets line-height to 1, makes components spacing a lot easier.
 // Only suitable for texts that will not wrap at all. Otherwise use to-bb()
 
@@ -91,12 +106,46 @@ one-liner($display = inline-block)
   display: $display
   white-space: nowrap
 
+
 // To bounding box will make text elements spacing relative to bounding box
 // again by subtracting the gap that results from line-heights higher than 1.
 // Currently this only works for the standard line-height.
 
-to-bb($size = 0)
-  return $x-height-subtractor + $size
+to-bb($size = 0, $line-height = $line-height-base)
+  $subtractor = $line-height * $line-height-margin-factor
+  return 'calc(%s - %s)' % ($size $subtractor)
+
+
+// Text margin will return a margin value that compensates for the elements
+// line height, in order to make it relative to the elements visual bounding
+// box again. It can be used to space text elements that cannot have a
+// line height of 1
+
+text-margin-top($val = 0rem, $line-height = @line-height)
+  if not $line-height
+    $line-height = $line-height-base
+  $subtractor = $line-height * ($line-height-margin-factor - .04rem)
+  margin-top: 'calc(%s - %s)' % ($val $subtractor)
+
+text-margin-bottom($val = 0rem, $line-height = @line-height)
+  if not $line-height
+    $line-height = $line-height-base
+  $subtractor = $line-height * ($line-height-margin-factor + .04rem)
+  margin-bottom: 'calc(%s - %s)' % ($val $subtractor)
+
+text-margin($up = 0rem, $down = false, $line-height = @line-height)
+  text-margin-top($up, $line-height)
+  if $down
+    text-margin-bottom($down, $line-height)
+  else
+    text-margin-bottom($up, $line-height)
+
+
+// Eat text margin is a shorthand mixin to strip of a text elements margins
+// relative to its visual bounding box
+
+eat-text-margins($line-height = @line-height)
+  text-margin(0rem, false, $line-height)
 
 
 // LAYOUT

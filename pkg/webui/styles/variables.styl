@@ -88,9 +88,9 @@ $font-family-mono = 'IBM Plex Mono', monospace
 
 // ## Size and spacing
 
-$font-size-base = 14px
-$line-height = 1.785 // = 25px
-$x-height-subtractor = -.35rem
+$font-size-base = 14px // will be set on root element, so 1rem = 14px
+$line-height-base = 1.785 // = 25px
+$line-height-margin-factor = .3rem // Used for margin calculations on text elements
 
 
 // ## Font Scale
@@ -101,6 +101,15 @@ $fs = {
   'l': 1.286rem, // ~18p
   'xl': 1.57rem, // ~22px
   'xxl': 1.857rem // ~26px
+}
+
+// Corresponding default line heights
+$lh = {
+  's': $line-height-base
+  'm': $line-height-base
+  'l': 1.6
+  'xl': 1.4
+  'xxl': 1.2
 }
 
 
