@@ -23,7 +23,7 @@ const ExpectedAppLocal = `<!doctype html>
 	</head>
 	<body>
 		<div id="app"></div>
-		<script type="text/javascript" src="test/test.123.js"></script>
+		<script type="text/javascript" src="/test/test.123.js"></script>
 	</body>
 </html>
 `

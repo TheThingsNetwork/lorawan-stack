@@ -43,7 +43,7 @@ func TestErrors(t *testing.T) {
 	})
 
 	as, err := New(c, Config{
-		Mount:      "test",
+		Mount:      "/test",
 		SearchPath: []string{"testdata"},
 	})
 	a.So(err, should.BeNil)

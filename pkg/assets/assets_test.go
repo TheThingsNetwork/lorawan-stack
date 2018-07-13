@@ -48,7 +48,7 @@ func TestAppHandler(t *testing.T) {
 			Port: 9185,
 			Name: "Local",
 			Config: Config{
-				Mount:      "test",
+				Mount:      "/test",
 				SearchPath: []string{"testdata"},
 			},
 			Expected: testdata.ExpectedAppLocal,
@@ -57,7 +57,7 @@ func TestAppHandler(t *testing.T) {
 			Port: 9186,
 			Name: "CDN",
 			Config: Config{
-				Mount: "test",
+				Mount: "/test",
 				CDN:   "https://cdn.thethings.network",
 				Apps: map[string]templates.AppData{
 					"app.html": {
