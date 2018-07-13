@@ -124,15 +124,15 @@ func BenchmarkSessionProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestDeviceFormattersProto(t *testing.T) {
+func TestEndDeviceFormattersProto(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedDeviceFormatters(popr, false)
+	p := NewPopulatedEndDeviceFormatters(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &DeviceFormatters{}
+	msg := &EndDeviceFormatters{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -158,10 +158,10 @@ func TestDeviceFormattersProto(t *testing.T) {
 	}
 }
 
-func TestDeviceFormattersMarshalTo(t *testing.T) {
+func TestEndDeviceFormattersMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedDeviceFormatters(popr, false)
+	p := NewPopulatedEndDeviceFormatters(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
 	for i := range dAtA {
@@ -171,7 +171,7 @@ func TestDeviceFormattersMarshalTo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &DeviceFormatters{}
+	msg := &EndDeviceFormatters{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -186,12 +186,12 @@ func TestDeviceFormattersMarshalTo(t *testing.T) {
 	}
 }
 
-func BenchmarkDeviceFormattersProtoMarshal(b *testing.B) {
+func BenchmarkEndDeviceFormattersProtoMarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*DeviceFormatters, 10000)
+	pops := make([]*EndDeviceFormatters, 10000)
 	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedDeviceFormatters(popr, false)
+		pops[i] = NewPopulatedEndDeviceFormatters(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -204,18 +204,18 @@ func BenchmarkDeviceFormattersProtoMarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func BenchmarkDeviceFormattersProtoUnmarshal(b *testing.B) {
+func BenchmarkEndDeviceFormattersProtoUnmarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := proto.Marshal(NewPopulatedDeviceFormatters(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedEndDeviceFormatters(popr, false))
 		if err != nil {
 			panic(err)
 		}
 		datas[i] = dAtA
 	}
-	msg := &DeviceFormatters{}
+	msg := &EndDeviceFormatters{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
@@ -226,15 +226,15 @@ func BenchmarkDeviceFormattersProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestDeviceBrandProto(t *testing.T) {
+func TestEndDeviceBrandProto(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedDeviceBrand(popr, false)
+	p := NewPopulatedEndDeviceBrand(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &DeviceBrand{}
+	msg := &EndDeviceBrand{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -260,10 +260,10 @@ func TestDeviceBrandProto(t *testing.T) {
 	}
 }
 
-func TestDeviceBrandMarshalTo(t *testing.T) {
+func TestEndDeviceBrandMarshalTo(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedDeviceBrand(popr, false)
+	p := NewPopulatedEndDeviceBrand(popr, false)
 	size := p.Size()
 	dAtA := make([]byte, size)
 	for i := range dAtA {
@@ -273,7 +273,7 @@ func TestDeviceBrandMarshalTo(t *testing.T) {
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &DeviceBrand{}
+	msg := &EndDeviceBrand{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -288,12 +288,12 @@ func TestDeviceBrandMarshalTo(t *testing.T) {
 	}
 }
 
-func BenchmarkDeviceBrandProtoMarshal(b *testing.B) {
+func BenchmarkEndDeviceBrandProtoMarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*DeviceBrand, 10000)
+	pops := make([]*EndDeviceBrand, 10000)
 	for i := 0; i < 10000; i++ {
-		pops[i] = NewPopulatedDeviceBrand(popr, false)
+		pops[i] = NewPopulatedEndDeviceBrand(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -306,18 +306,18 @@ func BenchmarkDeviceBrandProtoMarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func BenchmarkDeviceBrandProtoUnmarshal(b *testing.B) {
+func BenchmarkEndDeviceBrandProtoUnmarshal(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
 	datas := make([][]byte, 10000)
 	for i := 0; i < 10000; i++ {
-		dAtA, err := proto.Marshal(NewPopulatedDeviceBrand(popr, false))
+		dAtA, err := proto.Marshal(NewPopulatedEndDeviceBrand(popr, false))
 		if err != nil {
 			panic(err)
 		}
 		datas[i] = dAtA
 	}
-	msg := &DeviceBrand{}
+	msg := &EndDeviceBrand{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		total += len(datas[i%10000])
@@ -1063,16 +1063,16 @@ func TestSessionJSON(t *testing.T) {
 		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
 	}
 }
-func TestDeviceFormattersJSON(t *testing.T) {
+func TestEndDeviceFormattersJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedDeviceFormatters(popr, true)
+	p := NewPopulatedEndDeviceFormatters(popr, true)
 	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &DeviceFormatters{}
+	msg := &EndDeviceFormatters{}
 	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
@@ -1084,16 +1084,16 @@ func TestDeviceFormattersJSON(t *testing.T) {
 		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
 	}
 }
-func TestDeviceBrandJSON(t *testing.T) {
+func TestEndDeviceBrandJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedDeviceBrand(popr, true)
+	p := NewPopulatedEndDeviceBrand(popr, true)
 	marshaler := jsonpb.Marshaler{}
 	jsondata, err := marshaler.MarshalToString(p)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
-	msg := &DeviceBrand{}
+	msg := &EndDeviceBrand{}
 	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
@@ -1286,12 +1286,12 @@ func TestSessionProtoCompactText(t *testing.T) {
 	}
 }
 
-func TestDeviceFormattersProtoText(t *testing.T) {
+func TestEndDeviceFormattersProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedDeviceFormatters(popr, true)
+	p := NewPopulatedEndDeviceFormatters(popr, true)
 	dAtA := proto.MarshalTextString(p)
-	msg := &DeviceFormatters{}
+	msg := &EndDeviceFormatters{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1303,12 +1303,12 @@ func TestDeviceFormattersProtoText(t *testing.T) {
 	}
 }
 
-func TestDeviceFormattersProtoCompactText(t *testing.T) {
+func TestEndDeviceFormattersProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedDeviceFormatters(popr, true)
+	p := NewPopulatedEndDeviceFormatters(popr, true)
 	dAtA := proto.CompactTextString(p)
-	msg := &DeviceFormatters{}
+	msg := &EndDeviceFormatters{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1320,12 +1320,12 @@ func TestDeviceFormattersProtoCompactText(t *testing.T) {
 	}
 }
 
-func TestDeviceBrandProtoText(t *testing.T) {
+func TestEndDeviceBrandProtoText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedDeviceBrand(popr, true)
+	p := NewPopulatedEndDeviceBrand(popr, true)
 	dAtA := proto.MarshalTextString(p)
-	msg := &DeviceBrand{}
+	msg := &EndDeviceBrand{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1337,12 +1337,12 @@ func TestDeviceBrandProtoText(t *testing.T) {
 	}
 }
 
-func TestDeviceBrandProtoCompactText(t *testing.T) {
+func TestEndDeviceBrandProtoCompactText(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedDeviceBrand(popr, true)
+	p := NewPopulatedEndDeviceBrand(popr, true)
 	dAtA := proto.CompactTextString(p)
-	msg := &DeviceBrand{}
+	msg := &EndDeviceBrand{}
 	if err := proto.UnmarshalText(dAtA, msg); err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
@@ -1607,14 +1607,14 @@ func TestSessionVerboseEqual(t *testing.T) {
 		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
 	}
 }
-func TestDeviceFormattersVerboseEqual(t *testing.T) {
+func TestEndDeviceFormattersVerboseEqual(t *testing.T) {
 	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedDeviceFormatters(popr, false)
+	p := NewPopulatedEndDeviceFormatters(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
-	msg := &DeviceFormatters{}
+	msg := &EndDeviceFormatters{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
@@ -1622,14 +1622,14 @@ func TestDeviceFormattersVerboseEqual(t *testing.T) {
 		t.Fatalf("%#v !VerboseEqual %#v, since %v", msg, p, err)
 	}
 }
-func TestDeviceBrandVerboseEqual(t *testing.T) {
+func TestEndDeviceBrandVerboseEqual(t *testing.T) {
 	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
-	p := NewPopulatedDeviceBrand(popr, false)
+	p := NewPopulatedEndDeviceBrand(popr, false)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
 		panic(err)
 	}
-	msg := &DeviceBrand{}
+	msg := &EndDeviceBrand{}
 	if err := proto.Unmarshal(dAtA, msg); err != nil {
 		panic(err)
 	}
@@ -1778,10 +1778,10 @@ func BenchmarkSessionSize(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestDeviceFormattersSize(t *testing.T) {
+func TestEndDeviceFormattersSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedDeviceFormatters(popr, true)
+	p := NewPopulatedEndDeviceFormatters(popr, true)
 	size2 := proto.Size(p)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
@@ -1800,12 +1800,12 @@ func TestDeviceFormattersSize(t *testing.T) {
 	}
 }
 
-func BenchmarkDeviceFormattersSize(b *testing.B) {
+func BenchmarkEndDeviceFormattersSize(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*DeviceFormatters, 1000)
+	pops := make([]*EndDeviceFormatters, 1000)
 	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedDeviceFormatters(popr, false)
+		pops[i] = NewPopulatedEndDeviceFormatters(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -1814,10 +1814,10 @@ func BenchmarkDeviceFormattersSize(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
-func TestDeviceBrandSize(t *testing.T) {
+func TestEndDeviceBrandSize(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
-	p := NewPopulatedDeviceBrand(popr, true)
+	p := NewPopulatedEndDeviceBrand(popr, true)
 	size2 := proto.Size(p)
 	dAtA, err := proto.Marshal(p)
 	if err != nil {
@@ -1836,12 +1836,12 @@ func TestDeviceBrandSize(t *testing.T) {
 	}
 }
 
-func BenchmarkDeviceBrandSize(b *testing.B) {
+func BenchmarkEndDeviceBrandSize(b *testing.B) {
 	popr := rand.New(rand.NewSource(616))
 	total := 0
-	pops := make([]*DeviceBrand, 1000)
+	pops := make([]*EndDeviceBrand, 1000)
 	for i := 0; i < 1000; i++ {
-		pops[i] = NewPopulatedDeviceBrand(popr, false)
+		pops[i] = NewPopulatedEndDeviceBrand(popr, false)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

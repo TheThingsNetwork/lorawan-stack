@@ -20,11 +20,12 @@ import (
 
 func NewPopulatedEndDeviceVersion(r randyEndDevice, easy bool) *EndDeviceVersion {
 	out := &EndDeviceVersion{}
-	out.EndDeviceModel = *NewPopulatedEndDeviceModel(r, easy)
+	out.BrandID = randStringEndDevice(r)
+	out.ModelID = randStringEndDevice(r)
 	out.HardwareVersion = randStringEndDevice(r)
 	out.FirmwareVersion = randStringEndDevice(r)
 	if r.Intn(10) != 0 {
-		out.DefaultFormatters = NewPopulatedDeviceFormatters(r, easy)
+		out.DefaultFormatters = *NewPopulatedEndDeviceFormatters(r, easy)
 	}
 	out.DefaultMACParameters = NewPopulatedMACParameters(r, easy)
 	out.MaxFrequency = uint64(r.Uint32())
@@ -122,7 +123,7 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	if r.Intn(2) == 0 {
 		out.DownlinkMargin *= -1
 	}
-	out.DeviceFormatters = *NewPopulatedDeviceFormatters(r, easy)
+	out.EndDeviceFormatters = *NewPopulatedEndDeviceFormatters(r, easy)
 	out.SupportsJoin = r.Intn(2) == 0
 	return out
 }

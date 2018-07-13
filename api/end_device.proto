@@ -40,7 +40,7 @@ message Session {
   google.protobuf.Timestamp started_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }
 
-message DeviceFormatters {
+message EndDeviceFormatters {
   // Type of formatter used to process uplink messages.
   PayloadFormatter up_formatter = 1;
 
@@ -54,14 +54,14 @@ message DeviceFormatters {
   string down_formatter_parameter = 4;
 }
 
-message DeviceBrand {
+message EndDeviceBrand {
   // ID of the device brand.
   string id = 1 [(gogoproto.customname) = "ID"];
 
   // Name of the brand.
   string name = 2;
 
-  // URL for this brand.
+  // URL for the brand.
   string url = 3 [(gogoproto.customname) = "URL"];
 
   // Logos of the brand.
@@ -69,57 +69,59 @@ message DeviceBrand {
 }
 
 message EndDeviceModel {
-  // ID of the model.
-  string model_id = 1 [(gogoproto.customname) = "ModelID"];
+  // Brand ID of the model.
+  string brand_id = 1 [(gogoproto.customname) = "BrandID"];
 
-  // ID of the brand of this device.
-  string brand_id = 2 [(gogoproto.customname) = "BrandID"];
+  // ID of the model.
+  string id = 2 [(gogoproto.customname) = "ID"];
 
   // Name of the device model.
-  string model_name = 3;
+  string name = 3;
 }
 
 message EndDeviceVersion {
   option (gogoproto.populate) = false;
 
+  // Brand of the device.
+  string brand_id = 1 [(gogoproto.customname) = "BrandID"];
+
   // Model of the device.
-  EndDeviceModel model = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  string model_id = 2 [(gogoproto.customname) = "ModelID"];
 
   // LoRaWAN MAC version.
-  MACVersion lorawan_version = 2 [(gogoproto.customname) = "LoRaWANVersion"];
+  MACVersion lorawan_version = 3 [(gogoproto.customname) = "LoRaWANVersion"];
 
   // LoRaWAN PHY version.
-  PHYVersion lorawan_phy_version = 3 [(gogoproto.customname) = "LoRaWANPHYVersion"];
+  PHYVersion lorawan_phy_version = 4 [(gogoproto.customname) = "LoRaWANPHYVersion"];
 
   // Hardware version of this end-device.
-  string hardware_version = 4;
+  string hardware_version = 5;
 
   // Firmware version of this end-device.
-  string firmware_version = 5;
+  string firmware_version = 6;
 
-  reserved 6; // RFU: repeated Image photos = 6;
+  reserved 7; // RFU: repeated Image photos = 7;
 
-  // Time after which a rejoin request will be sent.
   // Default formatters defining the payload formats for this end device.
-  DeviceFormatters default_formatters = 7;
+  EndDeviceFormatters default_formatters = 8 [(gogoproto.nullable) = false];
 
   // DefaultMACParameters are the default MAC layer parameters, to which device is reset by default.(e.g. on join or ResetInd).
-  MACParameters default_mac_parameters = 8 [(gogoproto.customname) = "DefaultMACParameters"];
+  MACParameters default_mac_parameters = 9 [(gogoproto.customname) = "DefaultMACParameters"];
 
   // Min frequency the device is capable of using (in Hz).
-  uint64 min_frequency = 9;
+  uint64 min_frequency = 10;
 
   // Max frequency the device is capable of using (in Hz).
-  uint64 max_frequency = 10;
+  uint64 max_frequency = 11;
 
   // Indicator that the device may reset the frame counters (not LoRaWAN compliant).
-  bool f_cnt_resets = 11;
+  bool f_cnt_resets = 12;
 
   // Indicator that the device uses 16-bit frame counters.
-  bool supports_32_bit_f_cnt = 12 [(gogoproto.customname) = "Supports32BitFCnt"];
+  bool supports_32_bit_f_cnt = 13 [(gogoproto.customname) = "Supports32BitFCnt"];
 
   // DisableJoinNonceCheck specifies whether LoRaWAN DevNonce check procedure should be disabled.
-  bool disable_join_nonce_check = 13;
+  bool disable_join_nonce_check = 14;
 }
 
 message MACSettings {
@@ -304,7 +306,7 @@ message EndDevice {
   repeated ApplicationDownlink queued_application_downlinks = 23;
 
   // Formatters defining the payload formats.
-  DeviceFormatters formatters = 24 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  EndDeviceFormatters formatters = 24 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
 
   // Device Attributes
   // - field names are written in snake_case

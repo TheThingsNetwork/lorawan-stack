@@ -47,8 +47,8 @@ It has these top-level messages:
 	ApplicationCollaborator
 	GatewayCollaborator
 	Session
-	DeviceFormatters
-	DeviceBrand
+	EndDeviceFormatters
+	EndDeviceBrand
 	EndDeviceModel
 	EndDeviceVersion
 	MACSettings
