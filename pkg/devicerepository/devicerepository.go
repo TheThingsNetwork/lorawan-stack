@@ -20,45 +20,16 @@ import (
 	"path/filepath"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"gopkg.in/yaml.v2"
-)
-
-var (
-	// ErrParsingFailed is returned if parsing the files failed.
-	ErrParsingFailed = &errors.ErrDescriptor{
-		Code:          1,
-		MessageFormat: "Parsing failed",
-		Type:          errors.External,
-	}
-	// ErrNoExtension is returned if the filename has no extension.
-	ErrNoExtension = &errors.ErrDescriptor{
-		Code:           2,
-		MessageFormat:  "The filename `{filename}` does not have an extension",
-		Type:           errors.InvalidArgument,
-		SafeAttributes: []string{"filename"},
-	}
-	// ErrUnknownType is returned if the type of a file could not be deduced.
-	ErrUnknownType = &errors.ErrDescriptor{
-		Code:           3,
-		MessageFormat:  "Could not deduce the type of `{filename}`",
-		Type:           errors.Unknown,
-		SafeAttributes: []string{"filename"},
-	}
 )
 
 var formatters = map[string]ttnpb.PayloadFormatter{
 	"cayennelpp": ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
 	"grpc":       ttnpb.PayloadFormatter_FORMATTER_GRPC_SERVICE,
 	"javascript": ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT,
-}
-
-func init() {
-	ErrParsingFailed.Register()
-	ErrNoExtension.Register()
-	ErrUnknownType.Register()
 }
 
 // Client allows retrieval of device data.
@@ -85,11 +56,17 @@ func (b Brand) Proto() *ttnpb.DeviceBrand {
 	}
 }
 
-// Brands returns the list of device brands available, indexed by brand ID.
+var (
+	errFetchFailed = errors.DefineUnavailable("fetch_failed", "fetch failed of file `{filename}`")
+	errParseFailed = errors.DefineInvalidArgument("parse_failed", "parse failed")
+)
+
+// Brands fetches and parses the list of brands.
 func (c Client) Brands() (map[string]Brand, error) {
-	content, err := c.Fetcher.File("brands.yml")
+	filename := "brands.yml"
+	content, err := c.Fetcher.File(filename)
 	if err != nil {
-		return nil, errors.NewWithCause(err, "Could not read the brands file")
+		return nil, errFetchFailed.WithCause(err).WithAttributes("filename", filename)
 	}
 
 	l := &struct {
@@ -97,17 +74,21 @@ func (c Client) Brands() (map[string]Brand, error) {
 		Brands  map[string]Brand `yaml:"brands,omitempty"`
 	}{}
 	if err = yaml.Unmarshal(content, l); err != nil {
-		return nil, ErrParsingFailed.NewWithCause(nil, err)
+		return nil, errParseFailed.WithCause(err)
 	}
 
 	brands := make(map[string]Brand)
-	for brandID, brand := range l.Brands {
-		brand.id = brandID
-		brands[brandID] = brand
+	for id, brand := range l.Brands {
+		brand.id = id
+		brands[id] = brand
 	}
-
 	return brands, nil
 }
+
+var (
+	errMissingFileExtension = errors.DefineInvalidArgument("missing_file_extension", "missing file extension in `{filename}`")
+	errUnknownFileType      = errors.DefineInvalidArgument("unknown_file_type", "unknown file type `{filename}`")
+)
 
 // Image contains the raw content of an image.
 type Image struct {
@@ -119,18 +100,14 @@ func (c Client) getImage(filePath ...string) (Image, error) {
 	image := Image{}
 	nbElements := len(filePath)
 	if nbElements == 0 || !strings.ContainsRune(filePath[nbElements-1], '.') {
-		return image, ErrNoExtension.New(errors.Attributes{
-			"filename": strings.Join(filePath, "/"),
-		})
+		return image, errMissingFileExtension.WithAttributes("filename", strings.Join(filePath, "/"))
 	}
 
 	lastElement := filePath[nbElements-1]
 	periodSplit := strings.Split(lastElement, ".")
 	image.MIMEType = fmt.Sprintf(".%s", periodSplit[len(periodSplit)-1])
 	if image.MIMEType == "" {
-		return image, ErrUnknownType.New(errors.Attributes{
-			"filename": lastElement,
-		})
+		return image, errUnknownFileType.WithAttributes("filename", lastElement)
 	}
 
 	var err error
@@ -158,9 +135,10 @@ func (d Device) Proto() *ttnpb.EndDeviceModel {
 
 // Devices returns the list of devices related to this brand, indexed by device ID.
 func (c Client) Devices(brandID string) (map[string]Device, error) {
-	content, err := c.Fetcher.File(brandID, "devices.yml")
+	filename := "devices.yml"
+	content, err := c.Fetcher.File(brandID, filename)
 	if err != nil {
-		return nil, errors.NewWithCause(err, "Could not read the device info file")
+		return nil, errFetchFailed.WithCause(err).WithAttributes("filename", filename)
 	}
 
 	l := &struct {
@@ -168,7 +146,7 @@ func (c Client) Devices(brandID string) (map[string]Device, error) {
 		Devices map[string]Device `yaml:"devices,omitempty"`
 	}{}
 	if err = yaml.Unmarshal(content, l); err != nil {
-		return nil, ErrParsingFailed.NewWithCause(nil, err)
+		return nil, errParseFailed.WithCause(err)
 	}
 
 	devices := make(map[string]Device)
@@ -183,9 +161,10 @@ func (c Client) Devices(brandID string) (map[string]Device, error) {
 
 // DeviceVersions returns the versions of this device, along with this version's characteristics.
 func (c Client) DeviceVersions(brandID, modelID string) (map[string]DeviceHardwareVersion, error) {
-	content, err := c.Fetcher.File(brandID, modelID, "versions.yml")
+	filename := "versions.yml"
+	content, err := c.Fetcher.File(brandID, modelID, filename)
 	if err != nil {
-		return nil, errors.NewWithCause(err, "Could not read the device versions file")
+		return nil, errFetchFailed.WithCause(err).WithAttributes("filename", filename)
 	}
 
 	l := &struct {
@@ -193,7 +172,7 @@ func (c Client) DeviceVersions(brandID, modelID string) (map[string]DeviceHardwa
 		HardwareVersions map[string]DeviceHardwareVersion `yaml:"hardware_versions,omitempty"`
 	}{}
 	if err = yaml.Unmarshal(content, l); err != nil {
-		return nil, ErrParsingFailed.NewWithCause(nil, err)
+		return nil, errParseFailed.WithCause(err)
 	}
 
 	hardwareVersions := make(map[string]DeviceHardwareVersion)
@@ -209,7 +188,7 @@ func (c Client) DeviceVersions(brandID, modelID string) (map[string]DeviceHardwa
 
 			content, err = c.Fetcher.File(brandID, modelID, version, payloadFormat.Parameter)
 			if err != nil {
-				return nil, errors.NewWithCausef(err, "Could not read the %s payload format JavaScript file", payloadFormat.Parameter)
+				return nil, errFetchFailed.WithCause(err).WithAttributes("filename", payloadFormat.Parameter)
 			}
 
 			payloadFormat.Parameter = string(content)
