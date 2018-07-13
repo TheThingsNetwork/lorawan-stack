@@ -16,10 +16,6 @@
 package devicerepository
 
 import (
-	"fmt"
-	"path/filepath"
-	"strings"
-
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -90,37 +86,7 @@ var (
 	errUnknownFileType      = errors.DefineInvalidArgument("unknown_file_type", "unknown file type `{filename}`")
 )
 
-// Image contains the raw content of an image.
-type Image struct {
-	Content  []byte
-	MIMEType string
-}
-
-func (c Client) getImage(filePath ...string) (Image, error) {
-	image := Image{}
-	nbElements := len(filePath)
-	if nbElements == 0 || !strings.ContainsRune(filePath[nbElements-1], '.') {
-		return image, errMissingFileExtension.WithAttributes("filename", strings.Join(filePath, "/"))
-	}
-
-	lastElement := filePath[nbElements-1]
-	periodSplit := strings.Split(lastElement, ".")
-	image.MIMEType = fmt.Sprintf(".%s", periodSplit[len(periodSplit)-1])
-	if image.MIMEType == "" {
-		return image, errUnknownFileType.WithAttributes("filename", lastElement)
-	}
-
-	var err error
-	image.Content, err = c.Fetcher.File(filePath...)
-	return image, err
-}
-
-// BrandLogo returns the raw image of a brand's logo.
-func (c Client) BrandLogo(brandID, file string) (Image, error) {
-	return c.getImage(filepath.Join(brandID, file))
-}
-
-// Device returns the general information related to a device.
+// Device contains the general information related to a device.
 type Device struct {
 	brand string
 	id    string
@@ -201,11 +167,6 @@ func (c Client) DeviceVersions(brandID, modelID string) (map[string]DeviceHardwa
 	}
 
 	return hardwareVersions, nil
-}
-
-// DeviceVersionPhoto returns the photo of the specified version of a device.
-func (c Client) DeviceVersionPhoto(brandID, modelID, version, file string) (Image, error) {
-	return c.getImage(filepath.Join(brandID, modelID, version, file))
 }
 
 // PayloadFormat of a device.

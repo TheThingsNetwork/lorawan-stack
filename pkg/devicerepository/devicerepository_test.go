@@ -131,10 +131,6 @@ func TestBrand(t *testing.T) {
 		a.So(ttp.Name, should.Equal, "The Things Products")
 		a.So(ttp.URL, should.Equal, "https://www.thethingsnetwork.org")
 		a.So(ttp.Logos, should.HaveLength, 1)
-
-		content, err := c.BrandLogo("thethingsproducts", ttp.Logos[0])
-		a.So(err, should.BeNil)
-		a.So(string(content.Content), should.Equal, "image")
 	}
 
 	// Invalid fetcher.
@@ -176,10 +172,6 @@ func TestDevice(t *testing.T) {
 		a.So(standard.PayloadFormats.Down.Parameter, should.Equal, standardUnoEncoder)
 		a.So(standard.PayloadFormats.Up.Type, should.Equal, "grpc")
 		a.So(standard.PayloadFormats.Down.Type, should.Equal, "javascript")
-
-		image, err := c.DeviceVersionPhoto("thethingsproducts", "thethingsuno", "standard", "standard.png")
-		a.So(err, should.BeNil)
-		a.So(string(image.Content), should.Equal, "standard-image")
 	}
 
 	// Invalid fetcher.
