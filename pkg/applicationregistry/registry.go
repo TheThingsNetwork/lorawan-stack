@@ -19,7 +19,6 @@ import (
 	"strings"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -82,7 +81,7 @@ func (r *Registry) Create(a *ttnpb.Application, fields ...string) (*Application,
 // If len(fields) == 0, then Range uses all fields in a to match applications.
 func (r *Registry) Range(a *ttnpb.Application, batchSize uint64, f func(*Application) bool, fields ...string) error {
 	if a == nil {
-		return errors.New("Application specified is nil")
+		return errNilApplication
 	}
 	start := time.Now()
 	err := r.store.Range(
@@ -116,7 +115,7 @@ var Identifiers = []string{
 // from the underlying store in chunks of (approximately) batchSize applications.
 func RangeByIdentifiers(r Interface, id *ttnpb.ApplicationIdentifiers, batchSize uint64, f func(*Application) bool) error {
 	if id == nil {
-		return errors.New("Identifiers specified are nil")
+		return errNilIdentifiers
 	}
 
 	fields := make([]string, 0, 1)

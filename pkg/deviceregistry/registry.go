@@ -19,7 +19,6 @@ import (
 	"strings"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -82,7 +81,7 @@ func (r *Registry) Create(ed *ttnpb.EndDevice, fields ...string) (*Device, error
 // If len(fields) == 0, then Range uses all fields in ed to match devices.
 func (r *Registry) Range(ed *ttnpb.EndDevice, batchSize uint64, f func(*Device) bool, fields ...string) error {
 	if ed == nil {
-		return errors.New("Device specified is nil")
+		return errNilDevice
 	}
 	start := time.Now()
 	err := r.store.Range(
@@ -120,7 +119,7 @@ var Identifiers = []string{
 // from the underlying store in chunks of (approximately) batchSize devices.
 func RangeByIdentifiers(r Interface, id *ttnpb.EndDeviceIdentifiers, batchSize uint64, f func(*Device) bool) error {
 	if id == nil {
-		return errors.New("Identifiers specified are nil")
+		return errNilIdentifiers
 	}
 	fields := make([]string, 0, 5)
 	if id.DeviceID != "" {

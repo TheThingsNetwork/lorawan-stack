@@ -22,4 +22,6 @@ var (
 	errApplicationNotFound = errors.DefineNotFound("application_not_found", "application not found")
 	errTooManyApplications = errors.Define("too_many_applications", "too many applications found")
 	errProcessorFailed     = errors.Define("processor_failed", "failed to process arguments")
+	errNilApplication      = errors.DefineInvalidArgument("nil_application", "application specified is nil")
+	errNilIdentifiers      = errors.DefineInvalidArgument("nil_identifiers", "identifiers specified are nil")
 )
