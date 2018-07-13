@@ -17,7 +17,6 @@ package identityserver
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"testing"
 	"time"
 
@@ -68,7 +67,7 @@ func TestBuildauthorizationData(t *testing.T) {
 		AccessToken: token3,
 		UserID:      alice.UserID,
 		ClientID:    client.ClientID,
-		CreatedAt:   time.Now().UTC().Truncate(time.Duration(time.Hour * 999)),
+		CreatedAt:   time.Date(2018, 1, 1, 0, 0, 0, 0, time.UTC),
 		ExpiresIn:   time.Duration(time.Minute * 10),
 		Scope:       oauth.Scope([]ttnpb.Right{ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS}),
 		RedirectURI: "http://localhost/auth/callback",
@@ -103,6 +102,7 @@ func TestBuildauthorizationData(t *testing.T) {
 		},
 	}
 	err = is.store.Applications.Create(app)
+	a.So(err, should.BeNil)
 	defer func() {
 		is.store.Applications.Delete(app.ApplicationIdentifiers)
 	}()
@@ -130,6 +130,7 @@ func TestBuildauthorizationData(t *testing.T) {
 		},
 	}
 	err = is.store.Gateways.Create(gtw)
+	a.So(err, should.BeNil)
 	defer func() {
 		is.store.Gateways.Delete(gtw.GatewayIdentifiers)
 	}()
@@ -178,7 +179,8 @@ func TestBuildauthorizationData(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	// Actual test cases section.
-	for i, tc := range []struct {
+	for _, tc := range []struct {
+		name      string
 		authType  string
 		authValue string
 		res       *authorizationData
@@ -186,6 +188,7 @@ func TestBuildauthorizationData(t *testing.T) {
 	}{
 		{
 			// Returns empty authorization data as no authorization credentials were found.
+			"Empty",
 			"",
 			"",
 			new(authorizationData),
@@ -193,6 +196,7 @@ func TestBuildauthorizationData(t *testing.T) {
 		},
 		{
 			// Returns error as only valid AuthType is `Bearer`.
+			"InvalidAuthType",
 			"Key",
 			"",
 			nil,
@@ -200,6 +204,7 @@ func TestBuildauthorizationData(t *testing.T) {
 		},
 		{
 			// Returns error as the token can not be decoded using `auth.DecodeTokenOrKey(string)`.
+			"InvalidAuthValue",
 			"Bearer",
 			"fake",
 			nil,
@@ -207,6 +212,7 @@ func TestBuildauthorizationData(t *testing.T) {
 		},
 		{
 			// Returns error because the token does not exist in the database.
+			"NotExistingToken",
 			"Bearer",
 			token2,
 			nil,
@@ -214,12 +220,14 @@ func TestBuildauthorizationData(t *testing.T) {
 		},
 		{
 			// Returns error because the token is expired.
+			"ExpiredToken",
 			"Bearer",
 			token3,
 			nil,
 			false,
 		},
 		{
+			"NormalWithUserToken",
 			"Bearer",
 			token,
 			&authorizationData{
@@ -233,12 +241,14 @@ func TestBuildauthorizationData(t *testing.T) {
 		},
 		{
 			// Returns error because the user API does not exist.
+			"NotExistingApplicationAPIKey",
 			"Bearer",
 			ukey2,
 			nil,
 			false,
 		},
 		{
+			"NormalWithUserAPIKey",
 			"Bearer",
 			ukey,
 			&authorizationData{
@@ -250,12 +260,14 @@ func TestBuildauthorizationData(t *testing.T) {
 		},
 		{
 			// Returns error because the application API does not exist.
+			"NotExistingUserAPIKey",
 			"Bearer",
 			akey2,
 			nil,
 			false,
 		},
 		{
+			"NormalWithApplicationAPIKey",
 			"Bearer",
 			akey,
 			&authorizationData{
@@ -267,12 +279,14 @@ func TestBuildauthorizationData(t *testing.T) {
 		},
 		{
 			// Returns error because the gateway API does not exist.
+			"NotExistingGatewayAPIKey",
 			"Bearer",
 			gkey2,
 			nil,
 			false,
 		},
 		{
+			"NormalWithGatewayAPIKey",
 			"Bearer",
 			gkey,
 			&authorizationData{
@@ -284,12 +298,14 @@ func TestBuildauthorizationData(t *testing.T) {
 		},
 		{
 			// Returns error because the organization API does not exist.
+			"NotExistingOrganizationAPIKey",
 			"Bearer",
 			okey2,
 			nil,
 			false,
 		},
 		{
+			"NormalWithOrganizationAPIKey",
 			"Bearer",
 			okey,
 			&authorizationData{
@@ -300,7 +316,7 @@ func TestBuildauthorizationData(t *testing.T) {
 			true,
 		},
 	} {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
+		t.Run(tc.name, func(t *testing.T) {
 			a := assertions.New(t)
 
 			ctx := metadata.NewIncomingContext(
