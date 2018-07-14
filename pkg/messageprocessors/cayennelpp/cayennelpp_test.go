@@ -33,11 +33,8 @@ func TestEncode(t *testing.T) {
 	host := New()
 
 	model := &ttnpb.EndDeviceVersion{
-		EndDeviceModel: ttnpb.EndDeviceModel{
-			BrandID: "The Things Products",
-			ModelID: "The Things Uno",
-		},
-
+		BrandID:         "The Things Products",
+		ModelID:         "The Things Uno",
 		HardwareVersion: "1.0",
 		FirmwareVersion: "1.0.0",
 	}
@@ -123,10 +120,8 @@ func TestDecode(t *testing.T) {
 	host := New()
 
 	model := &ttnpb.EndDeviceVersion{
-		EndDeviceModel: ttnpb.EndDeviceModel{
-			BrandID: "The Things Products",
-			ModelID: "The Things Uno",
-		},
+		BrandID:         "The Things Products",
+		ModelID:         "The Things Uno",
 		HardwareVersion: "1.0",
 		FirmwareVersion: "1.0.0",
 	}
