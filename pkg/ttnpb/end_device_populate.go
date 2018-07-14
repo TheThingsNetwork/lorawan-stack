@@ -24,6 +24,7 @@ func NewPopulatedEndDeviceVersion(r randyEndDevice, easy bool) *EndDeviceVersion
 	out.ModelID = randStringEndDevice(r)
 	out.HardwareVersion = randStringEndDevice(r)
 	out.FirmwareVersion = randStringEndDevice(r)
+	out.Photos = []string{randStringEndDevice(r) + ".jpg", randStringEndDevice(r) + ".jpg"}
 	if r.Intn(10) != 0 {
 		out.DefaultFormatters = *NewPopulatedEndDeviceFormatters(r, easy)
 	}

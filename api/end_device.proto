@@ -94,13 +94,14 @@ message EndDeviceVersion {
   // LoRaWAN PHY version.
   PHYVersion lorawan_phy_version = 4 [(gogoproto.customname) = "LoRaWANPHYVersion"];
 
-  // Hardware version of this end-device.
+  // Hardware version of this device.
   string hardware_version = 5;
 
-  // Firmware version of this end-device.
+  // Firmware version of this device.
   string firmware_version = 6;
 
-  reserved 7; // RFU: repeated Image photos = 7;
+  // Photos contains file names of photos.
+  repeated string photos = 7;
 
   // Default formatters defining the payload formats for this end device.
   EndDeviceFormatters default_formatters = 8 [(gogoproto.nullable) = false];
