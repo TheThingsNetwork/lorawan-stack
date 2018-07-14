@@ -31,11 +31,9 @@ func TestEncode(t *testing.T) {
 	ctx := context.Background()
 	host := New()
 
-	model := &ttnpb.EndDeviceVersion{
-		EndDeviceModel: ttnpb.EndDeviceModel{
-			BrandID: "The Things Products",
-			ModelID: "The Things Uno",
-		},
+	version := &ttnpb.EndDeviceVersion{
+		BrandID:         "The Things Products",
+		ModelID:         "The Things Uno",
 		HardwareVersion: "1.0",
 		FirmwareVersion: "1.0.0",
 	}
@@ -65,7 +63,7 @@ func TestEncode(t *testing.T) {
 			return [1, 2, 3]
 		}
 		`
-		output, err := host.Encode(ctx, message, model, script)
+		output, err := host.Encode(ctx, message, version, script)
 		a.So(err, should.BeNil)
 		a.So(output.Payload.GetMACPayload().FRMPayload, should.Resemble, []byte{1, 2, 3})
 	}
@@ -81,7 +79,7 @@ func TestEncode(t *testing.T) {
 			]
 		}
 		`
-		output, err := host.Encode(ctx, message, model, script)
+		output, err := host.Encode(ctx, message, version, script)
 		a.So(err, should.BeNil)
 		a.So(output.Payload.GetMACPayload().FRMPayload, should.Resemble, []byte{247, 174})
 	}
@@ -98,16 +96,16 @@ func TestEncode(t *testing.T) {
 					val & 0xff
 				]
 			default:
-				throw Error('unknown model')
+				throw Error('unknown version')
 			}
 		}
 		`
-		output, err := host.Encode(ctx, message, model, script)
+		output, err := host.Encode(ctx, message, version, script)
 		a.So(err, should.BeNil)
 		a.So(output.Payload.GetMACPayload().FRMPayload, should.Resemble, []byte{247, 174})
 
-		model.EndDeviceModel.ModelID = "L-Tek FF1705"
-		_, err = host.Encode(ctx, message, model, script)
+		version.ModelID = "L-Tek FF1705"
+		_, err = host.Encode(ctx, message, version, script)
 		a.So(err, should.NotBeNil)
 	}
 
@@ -118,7 +116,7 @@ func TestEncode(t *testing.T) {
 			return [300, 0, 1]
 		}
 		`
-		_, err := host.Encode(ctx, message, model, script)
+		_, err := host.Encode(ctx, message, version, script)
 		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidOutputRange)
 	}
 
@@ -129,7 +127,7 @@ func TestEncode(t *testing.T) {
 			return ['test']
 		}
 		`
-		_, err := host.Encode(ctx, message, model, script)
+		_, err := host.Encode(ctx, message, version, script)
 		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidOutputType)
 	}
 
@@ -140,7 +138,7 @@ func TestEncode(t *testing.T) {
 			return null
 		}
 		`
-		_, err := host.Encode(ctx, message, model, script)
+		_, err := host.Encode(ctx, message, version, script)
 		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidOutputType)
 	}
 
@@ -153,7 +151,7 @@ func TestEncode(t *testing.T) {
 			}
 		}
 		`
-		_, err := host.Encode(ctx, message, model, script)
+		_, err := host.Encode(ctx, message, version, script)
 		a.So(err, should.HaveSameErrorDefinitionAs, errInvalidOutputType)
 	}
 }
@@ -164,11 +162,9 @@ func TestDecode(t *testing.T) {
 	ctx := context.Background()
 	host := New()
 
-	model := &ttnpb.EndDeviceVersion{
-		EndDeviceModel: ttnpb.EndDeviceModel{
-			BrandID: "The Things Products",
-			ModelID: "The Things Uno",
-		},
+	version := &ttnpb.EndDeviceVersion{
+		BrandID:         "The Things Products",
+		ModelID:         "The Things Uno",
 		HardwareVersion: "1.0",
 		FirmwareVersion: "1.0.0",
 	}
@@ -192,7 +188,7 @@ func TestDecode(t *testing.T) {
 			}
 		}
 		`
-		output, err := host.Decode(ctx, message, model, script)
+		output, err := host.Decode(ctx, message, version, script)
 		a.So(err, should.BeNil)
 		m, err := gogoproto.Map(output.Payload.GetMACPayload().DecodedPayload)
 		a.So(err, should.BeNil)
@@ -201,7 +197,7 @@ func TestDecode(t *testing.T) {
 		})
 	}
 
-	// Parse and take brand and model into account.
+	// Parse and take brand and version into account.
 	{
 		script := `
 		function Decoder(payload, f_port) {
@@ -212,7 +208,7 @@ func TestDecode(t *testing.T) {
 			}
 		}
 		`
-		output, err := host.Decode(ctx, message, model, script)
+		output, err := host.Decode(ctx, message, version, script)
 		a.So(err, should.BeNil)
 		m, err := gogoproto.Map(output.Payload.GetMACPayload().DecodedPayload)
 		a.So(err, should.BeNil)
@@ -230,7 +226,7 @@ func TestDecode(t *testing.T) {
 			return 42
 		}
 		`
-		_, err := host.Decode(ctx, message, model, script)
+		_, err := host.Decode(ctx, message, version, script)
 		a.So(err, should.NotBeNil)
 	}
 
@@ -241,7 +237,7 @@ func TestDecode(t *testing.T) {
 			throw Error('unknown error')
 		}
 		`
-		_, err := host.Decode(ctx, message, model, script)
+		_, err := host.Decode(ctx, message, version, script)
 		a.So(err, should.NotBeNil)
 	}
 }
