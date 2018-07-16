@@ -127,14 +127,9 @@ func (id NetID) IDBits() uint {
 	panic(unmatchedNetID)
 }
 
-var errNetIDType = errors.DefineInvalidArgument(
-	"net_id_type",
-	"NetID type must be lower or equal to 7",
-)
-
-var errNetIDBits = errors.DefineInvalidArgument(
-	"net_id_bits",
-	"too many bits set in NetID",
+var (
+	errNetIDType = errors.DefineInvalidArgument("net_id_type", "NetID type must be lower or equal to 7")
+	errNetIDBits = errors.DefineInvalidArgument("net_id_bits", "too many bits set in NetID")
 )
 
 // NewNetID returns new NetID.

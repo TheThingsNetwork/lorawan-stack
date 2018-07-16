@@ -43,18 +43,9 @@ type Interface interface {
 }
 
 var (
-	errScanArgumentType = errors.DefineInternal( // Internal because it's a problem with the db table.
-		"src_type",
-		"invalid type for src",
-	)
-	errInvalidJSON = errors.DefineInvalidArgument(
-		"invalid_json",
-		"invalid JSON: `{json}`",
-	)
-	errInvalidLength = errors.DefineInvalidArgument(
-		"invalid_length",
-		"invalid slice length",
-	)
+	errScanArgumentType = errors.DefineInternal("src_type", "invalid type for src") // DB schema problem.
+	errInvalidJSON      = errors.DefineInvalidArgument("invalid_json", "invalid JSON: `{json}`")
+	errInvalidLength    = errors.DefineInvalidArgument("invalid_length", "invalid slice length")
 )
 
 func marshalJSONHexBytes(data []byte) ([]byte, error) {

@@ -204,10 +204,7 @@ func (prefix EUI64Prefix) MarshalJSON() ([]byte, error) {
 	return append(result, '"'), nil
 }
 
-var errInvalidEUIPrefix = errors.DefineInvalidArgument(
-	"eui_prefix",
-	"invalid EUI prefix",
-)
+var errInvalidEUIPrefix = errors.DefineInvalidArgument("eui_prefix", "invalid EUI prefix")
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (prefix *EUI64Prefix) UnmarshalJSON(data []byte) error {

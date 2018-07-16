@@ -349,10 +349,7 @@ func (prefix DevAddrPrefix) MarshalJSON() ([]byte, error) {
 	return append(str, '"'), nil
 }
 
-var errInvalidDevAddrPrefix = errors.DefineInvalidArgument(
-	"dev_addr_prefix",
-	"invalid DevAddr prefix",
-)
+var errInvalidDevAddrPrefix = errors.DefineInvalidArgument("dev_addr_prefix", "invalid DevAddr prefix")
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (prefix *DevAddrPrefix) UnmarshalJSON(data []byte) error {
