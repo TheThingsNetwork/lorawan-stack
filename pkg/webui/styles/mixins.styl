@@ -80,6 +80,18 @@ center-absolute()
   transform: translate(-50%, -50%)
 
 
+// Fullscreen forces an element to be full screen using position absolute
+full-screen()
+  position: absolute
+  top: 0
+  left: 0
+  width: 100vw
+  height: 100vh
+  transform: translate(0, 0)
+  max-width: initial
+  max-height: initial
+
+
 // TYPOGRAPHY
 // ==========
 
@@ -157,3 +169,20 @@ eat-text-margins($line-height = @line-height)
 horizontalize()
   display: flex
   justify-content: space-between
+
+
+// RESPONSIVENESS
+// ==============
+
+media-query($max)
+  @media screen and (max-width: $max)
+    {block}
+
+media-query-min($min)
+  @media screen and (min-width: $min + 1)
+    {block} // @stylint ignore
+
+media-query-between($min, $max)
+  @media screen and (min-width: $min + 1) and (max-width: $max)
+    {block} // @stylint ignore
+
