@@ -21,7 +21,6 @@ import (
 	"github.com/kr/pretty"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -144,7 +143,7 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 
 			err := handleDeviceTimeReq(test.Context(), dev, tc.Message)
 			if tc.Error != nil {
-				a.So(err, should.DescribeError, errors.Descriptor(tc.Error))
+				a.So(err, should.EqualErrorOrDefinition, tc.Error)
 			} else {
 				a.So(err, should.BeNil)
 			}

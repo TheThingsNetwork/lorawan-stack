@@ -231,13 +231,18 @@ func WithNsGsClientFunc(fn NsGsClientFunc) Option {
 // the CID is out of range.
 func WithMACHandler(cid ttnpb.MACCommandIdentifier, fn MACHandler) Option {
 	if cid < 0x80 || cid > 0xFF {
-		panic(errors.New(fmt.Sprintf("CID must be in range from 0x80 to 0xFF, got 0x%X", int32(cid))))
+		panic(errCIDOutOfRange.WithAttributes(
+			"min", fmt.Sprintf("0x%X", 0x80),
+			"max", fmt.Sprintf("0x%X", 0xFF),
+		))
 	}
 
 	return func(ns *NetworkServer) {
 		_, ok := ns.macHandlers.LoadOrStore(cid, fn)
 		if ok {
-			panic(errors.New(fmt.Sprintf("A handler for CID 0x%X is already registered", int32(cid))))
+			panic(errDuplicateCIDHandler.WithAttributes(
+				"cid", fmt.Sprintf("0x%X", int32(cid)),
+			))
 		}
 	}
 }
@@ -268,7 +273,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 
 	registryRPC, err := deviceregistry.NewRPC(c, conf.Registry, deviceregistry.ForComponents(ttnpb.PeerInfo_NETWORK_SERVER)) // TODO: Add checks https://github.com/TheThingsIndustries/ttn/issues/558
 	if err != nil {
-		return nil, errors.New("could not initialize the Network Server's device registry RPC").WithCause(err)
+		return nil, errDeviceRegistryInitialize.WithCause(err)
 	}
 	ns.RegistryRPC = registryRPC
 
@@ -506,7 +511,7 @@ func (ns *NetworkServer) deduplicateUplink(ctx context.Context, msg *ttnpb.Uplin
 
 func setDownlinkModulation(s *ttnpb.TxSettings, dr band.DataRate) (err error) {
 	if dr.Rate.LoRa != "" && dr.Rate.FSK > 0 {
-		return errors.New("Both LoRa and FSK present - inconsistent data rate")
+		return errLoRaAndFSK
 	}
 
 	if dr.Rate.LoRa == "" {
@@ -611,7 +616,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 	}
 
 	if uint(dev.MACState.Rx2DataRateIndex) > uint(len(band.DataRates)) {
-		return errors.New(fmt.Sprintf("RX2 data rate index must be lower or equal to %d", len(band.DataRates)-1))
+		return errInvalidRX2DataRateIndex
 	}
 
 	rx2 := tx{
@@ -683,7 +688,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 				"RecentDownlinks",
 				"Session",
 			); err != nil {
-				return errors.New("failed to store device").WithCause(err)
+				return errDeviceStoreFailed.WithCause(err)
 			}
 			return nil
 		}
@@ -693,7 +698,7 @@ func (ns *NetworkServer) scheduleDownlink(ctx context.Context, dev *deviceregist
 		logger = logger.WithField(fmt.Sprintf("error_%d", i), err)
 	}
 	logger.Warn("all gateway servers failed to schedule the downlink")
-	return errors.New("all gateway servers failed to schedule the downlink")
+	return errScheduleFailed
 }
 
 // generateAndScheduleDownlink loads dev, tries to generate a downlink and schedule it.
@@ -711,7 +716,7 @@ func (ns *NetworkServer) generateAndScheduleDownlink(ctx context.Context, dev *d
 
 	if dev.Session == nil {
 		logger.Debug("No active session found for device")
-		return errors.New("session is empty")
+		return errEmptySession
 	}
 
 	dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
@@ -766,7 +771,7 @@ func (ns *NetworkServer) generateAndScheduleDownlink(ctx context.Context, dev *d
 	for _, cmd := range cmds {
 		cmdBuf, err = cmd.AppendLoRaWAN(cmdBuf)
 		if err != nil {
-			return errors.New(fmt.Sprintf("failed to encode MAC command with CID 0x%X", cmd.CID)).WithCause(err)
+			return errMACEncodeFailed.WithCause(err)
 		}
 	}
 
@@ -803,7 +808,7 @@ func (ns *NetworkServer) generateAndScheduleDownlink(ctx context.Context, dev *d
 
 		cmdBuf, err = crypto.EncryptDownlink(*dev.Session.NwkSEncKey.Key, *dev.EndDeviceIdentifiers.DevAddr, pld.FHDR.FCnt, cmdBuf)
 		if err != nil {
-			return errors.New("failed to encrypt MAC commands").WithCause(err)
+			return errMACEncryptFailed.WithCause(err)
 		}
 	}
 
@@ -988,7 +993,7 @@ outer:
 	})
 
 	if len(msg.RawPayload) < 4 {
-		return nil, errors.New("Length of RawPayload must not be less than 4")
+		return nil, errRawPayloadTooLong
 	}
 	b := msg.RawPayload[:len(msg.RawPayload)-4]
 
@@ -1063,7 +1068,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, msg *ttnpb.UplinkMess
 
 	dev, err := ns.matchDevice(ctx, msg)
 	if err != nil {
-		return errors.New("failed to match device").WithCause(err)
+		return errDeviceNotFound.WithCause(err)
 	}
 	if dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 		// LoRaWAN1.1+ device will send a RekeyInd.
@@ -1430,7 +1435,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, msg *ttnpb.UplinkMessag
 		logger = logger.WithField(fmt.Sprintf("error_%d", i), err)
 	}
 	logger.Warn("Join failed")
-	return errors.New("failed to perform join procedure").WithCause(errors.New("no Join Server could handle join request"))
+	return errJoinFailed
 }
 
 func (ns *NetworkServer) handleRejoin(ctx context.Context, msg *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {

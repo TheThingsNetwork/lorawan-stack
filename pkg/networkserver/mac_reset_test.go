@@ -22,7 +22,7 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -91,7 +91,7 @@ func TestHandleResetInd(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 				}
 				if err := ResetMACState(frequencyPlansStore, dev); err != nil {
-					panic(errors.NewWithCause(err, "failed to reset MACState"))
+					panic(errors.New("failed to reset MACState").WithCause(err))
 				}
 
 				dev.MACState.QueuedResponses = []*ttnpb.MACCommand{
@@ -137,7 +137,7 @@ func TestHandleResetInd(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 				}
 				if err := ResetMACState(frequencyPlansStore, dev); err != nil {
-					panic(errors.NewWithCause(err, "failed to reset MACState"))
+					panic(errors.New("failed to reset MACState").WithCause(err))
 				}
 
 				dev.MACState.QueuedResponses = []*ttnpb.MACCommand{
@@ -160,7 +160,7 @@ func TestHandleResetInd(t *testing.T) {
 
 			err := handleResetInd(test.Context(), dev, tc.Payload, frequencyPlansStore)
 			if tc.Error != nil {
-				a.So(err, should.DescribeError, errors.Descriptor(tc.Error))
+				a.So(err, should.EqualErrorOrDefinition, tc.Error)
 			} else {
 				a.So(err, should.BeNil)
 			}
