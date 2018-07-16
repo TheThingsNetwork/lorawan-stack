@@ -67,6 +67,7 @@ func FromGRPCStatus(status *status.Status) Error {
 		}
 		if messageFormat := details.MessageFormat(); messageFormat != "" {
 			err.messageFormat = messageFormat
+			err.parsedMessageFormat, _ = formatter.Parse(messageFormat)
 		}
 		if attributes := details.PublicAttributes(); len(attributes) != 0 {
 			err.attributes = attributes

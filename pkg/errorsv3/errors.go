@@ -17,6 +17,7 @@
 package errors
 
 import (
+	"fmt"
 	"sync/atomic"
 
 	"google.golang.org/grpc/codes"
@@ -41,6 +42,10 @@ type Error struct {
 	details       []interface{}
 	attributes    map[string]interface{}
 	grpcStatus    *atomic.Value
+}
+
+func (e Error) String() string {
+	return fmt.Sprintf("error:%s (%s)", e.FullName(), e.FormatMessage(e.PublicAttributes()))
 }
 
 // Interface is the interface of an error.
