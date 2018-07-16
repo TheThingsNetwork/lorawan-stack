@@ -28,7 +28,7 @@ var (
 	errUnmarshalTimestamp          = errors.DefineInvalidArgument("unmarshal_timestamp", "failed to unmarshal timestamp")
 	errMarshalPayloadToLoRaWAN     = errors.DefineInvalidArgument("marshal_payload_to_lorawan", "failed to marshalling payload to LoRaWAN format")
 	errMarshalPacketToUDP          = errors.DefineInvalidArgument("marshal_packet_to_udp_format", "failed to marshal packet to UDP format")
-	errUnknownModulation           = errors.DefineInvalidArgument("unknown_modulation", "unknown modulation `{modulation}}`")
+	errUnknownModulation           = errors.DefineInvalidArgument("unknown_modulation", "unknown modulation `{modulation}`")
 
 	errNoConnectionAssociated = errors.DefineCorruption("no_connection_associated", "no gateway connection associated to this packet")
 )
