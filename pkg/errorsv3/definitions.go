@@ -39,6 +39,7 @@ type DefinitionInterface interface {
 	fmt.Stringer
 	Namespace() string
 	Name() string
+	FullName() string
 	MessageFormat() string
 	Code() uint32
 }
@@ -49,6 +50,19 @@ func (d Definition) Namespace() string { return d.namespace }
 // Name of the error.
 func (d Definition) Name() string { return d.name }
 
+// FullName returns the full name (namespace:name) of the error.
+func (d Definition) FullName() string {
+	namespace := d.namespace
+	if namespace == "" {
+		namespace = "unknown"
+	}
+	name := d.name
+	if name == "" {
+		name = "unknown"
+	}
+	return fmt.Sprintf("%s:%s", namespace, name)
+}
+
 // MessageFormat of the error.
 func (d Definition) MessageFormat() string { return d.messageFormat }
 
@@ -57,10 +71,7 @@ func (d Definition) MessageFormat() string { return d.messageFormat }
 func (d Definition) Code() uint32 { return d.code }
 
 func (d Definition) String() string {
-	if d.namespace == "" || d.name == "" {
-		return d.messageFormat
-	}
-	return fmt.Sprintf("error:%s:%s (%s)", d.namespace, d.name, d.messageFormat)
+	return fmt.Sprintf("error:%s (%s)", d.FullName(), d.messageFormat)
 }
 
 // Error implements the error interface.
@@ -87,13 +98,8 @@ func messageFormatArguments(messageFormat string) (args []string) {
 
 func define(code uint32, name, messageFormat string, publicAttributes ...string) Definition {
 	ns := namespace(3)
-	fullName := fmt.Sprintf("%s:%s", ns, name)
 	if code == 0 {
 		code = uint32(codes.Unknown)
-	}
-
-	if Definitions[fullName] != nil {
-		panic(fmt.Errorf("Error %s already defined", fullName))
 	}
 
 	def := Definition{
@@ -103,6 +109,11 @@ func define(code uint32, name, messageFormat string, publicAttributes ...string)
 		messageFormatArguments: messageFormatArguments(messageFormat),
 		publicAttributes:       publicAttributes,
 		code:                   code,
+	}
+
+	fullName := def.FullName()
+	if Definitions[fullName] != nil {
+		panic(fmt.Errorf("Error %s already defined", fullName))
 	}
 
 	// All message format arguments must be public:
