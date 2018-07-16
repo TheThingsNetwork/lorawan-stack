@@ -48,6 +48,9 @@ func (e Error) String() string {
 	return fmt.Sprintf("error:%s (%s)", e.FullName(), e.FormatMessage(e.PublicAttributes()))
 }
 
+// Error implements the error interface.
+func (e Error) Error() string { return e.String() }
+
 // Interface is the interface of an error.
 type Interface interface {
 	DefinitionInterface
