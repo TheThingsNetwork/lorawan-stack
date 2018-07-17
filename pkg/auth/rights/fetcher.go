@@ -35,17 +35,23 @@ type FetcherFunc func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right
 
 // ApplicationRights implements the Fetcher interface.
 func (f FetcherFunc) ApplicationRights(ctx context.Context, ids ttnpb.ApplicationIdentifiers) ([]ttnpb.Right, error) {
-	return f(ctx, ids)
+	rights, err := f(ctx, ids)
+	registerRightsFetch(ctx, "application", rights, err)
+	return rights, err
 }
 
 // GatewayRights implements the Fetcher interface.
 func (f FetcherFunc) GatewayRights(ctx context.Context, ids ttnpb.GatewayIdentifiers) ([]ttnpb.Right, error) {
-	return f(ctx, ids)
+	rights, err := f(ctx, ids)
+	registerRightsFetch(ctx, "gateway", rights, err)
+	return rights, err
 }
 
 // OrganizationRights implements the Fetcher interface.
 func (f FetcherFunc) OrganizationRights(ctx context.Context, ids ttnpb.OrganizationIdentifiers) ([]ttnpb.Right, error) {
-	return f(ctx, ids)
+	rights, err := f(ctx, ids)
+	registerRightsFetch(ctx, "organization", rights, err)
+	return rights, err
 }
 
 type fetcherKeyType struct{}
@@ -98,6 +104,7 @@ func (f identityServerFetcher) ApplicationRights(ctx context.Context, appID ttnp
 		return nil, err
 	}
 	rights, err := ttnpb.NewIsApplicationClient(cc).ListApplicationRights(ctx, &appID, grpc.PerRPCCredentials(md))
+	registerRightsFetch(ctx, "application", rights.GetRights(), err)
 	if err != nil {
 		return nil, err
 	}
@@ -114,6 +121,7 @@ func (f identityServerFetcher) GatewayRights(ctx context.Context, gtwID ttnpb.Ga
 		return nil, err
 	}
 	rights, err := ttnpb.NewIsGatewayClient(cc).ListGatewayRights(ctx, &gtwID, grpc.PerRPCCredentials(md))
+	registerRightsFetch(ctx, "gateway", rights.GetRights(), err)
 	if err != nil {
 		return nil, err
 	}
@@ -130,6 +138,7 @@ func (f identityServerFetcher) OrganizationRights(ctx context.Context, orgID ttn
 		return nil, err
 	}
 	rights, err := ttnpb.NewIsOrganizationClient(cc).ListOrganizationRights(ctx, &orgID, grpc.PerRPCCredentials(md))
+	registerRightsFetch(ctx, "organization", rights.GetRights(), err)
 	if err != nil {
 		return nil, err
 	}

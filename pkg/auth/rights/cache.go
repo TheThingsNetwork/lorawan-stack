@@ -129,7 +129,8 @@ func (f *inMemoryCache) maybeCleanup() {
 	f.lastCleanup = now()
 }
 
-func (f *inMemoryCache) ApplicationRights(ctx context.Context, appID ttnpb.ApplicationIdentifiers) ([]ttnpb.Right, error) {
+func (f *inMemoryCache) ApplicationRights(ctx context.Context, appID ttnpb.ApplicationIdentifiers) (rights []ttnpb.Right, err error) {
+	defer func() { registerRightsRequest(ctx, "application", rights, err) }()
 	req := newReq(ctx, appID)
 	f.mu.Lock()
 	res := f.applicationRights[req]
@@ -144,7 +145,8 @@ func (f *inMemoryCache) ApplicationRights(ctx context.Context, appID ttnpb.Appli
 	return res.rights, res.err
 }
 
-func (f *inMemoryCache) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayIdentifiers) ([]ttnpb.Right, error) {
+func (f *inMemoryCache) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayIdentifiers) (rights []ttnpb.Right, err error) {
+	defer func() { registerRightsRequest(ctx, "gateway", rights, err) }()
 	req := newReq(ctx, gtwID)
 	f.mu.Lock()
 	res := f.gatewayRights[req]
@@ -159,7 +161,8 @@ func (f *inMemoryCache) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayId
 	return res.rights, res.err
 }
 
-func (f *inMemoryCache) OrganizationRights(ctx context.Context, orgID ttnpb.OrganizationIdentifiers) ([]ttnpb.Right, error) {
+func (f *inMemoryCache) OrganizationRights(ctx context.Context, orgID ttnpb.OrganizationIdentifiers) (rights []ttnpb.Right, err error) {
+	defer func() { registerRightsRequest(ctx, "organization", rights, err) }()
 	req := newReq(ctx, orgID)
 	f.mu.Lock()
 	res := f.organizationRights[req]
