@@ -30,6 +30,24 @@ type Fetcher interface {
 	OrganizationRights(context.Context, ttnpb.OrganizationIdentifiers) ([]ttnpb.Right, error)
 }
 
+// FetcherFunc is a function that implements the Fetcher interface.
+type FetcherFunc func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error)
+
+// ApplicationRights implements the Fetcher interface.
+func (f FetcherFunc) ApplicationRights(ctx context.Context, ids ttnpb.ApplicationIdentifiers) ([]ttnpb.Right, error) {
+	return f(ctx, ids)
+}
+
+// GatewayRights implements the Fetcher interface.
+func (f FetcherFunc) GatewayRights(ctx context.Context, ids ttnpb.GatewayIdentifiers) ([]ttnpb.Right, error) {
+	return f(ctx, ids)
+}
+
+// OrganizationRights implements the Fetcher interface.
+func (f FetcherFunc) OrganizationRights(ctx context.Context, ids ttnpb.OrganizationIdentifiers) ([]ttnpb.Right, error) {
+	return f(ctx, ids)
+}
+
 type fetcherKeyType struct{}
 
 var fetcherKey fetcherKeyType

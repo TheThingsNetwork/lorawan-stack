@@ -92,6 +92,39 @@ func (is *mockIdentityServer) ListOrganizationRights(ctx context.Context, ids *t
 	}
 	return &ttnpb.ListOrganizationRightsResponse{Rights: is.organizationRights}, nil
 }
+
+func TestFetcherFunc(t *testing.T) {
+	a := assertions.New(t)
+
+	var fetcher struct {
+		mu     sync.Mutex
+		ctx    []context.Context
+		ids    []ttnpb.Identifiers
+		rights []ttnpb.Right
+		err    error
+	}
+	fetcher.err = errors.New("test err")
+	f := FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) ([]ttnpb.Right, error) {
+		fetcher.mu.Lock()
+		defer fetcher.mu.Unlock()
+		fetcher.ctx = append(fetcher.ctx, ctx)
+		fetcher.ids = append(fetcher.ids, ids)
+		return fetcher.rights, fetcher.err
+	})
+
+	res := fetchRights(context.Background(), "foo", f)
+	a.So(res.AppErr, should.Resemble, fetcher.err)
+	a.So(res.GtwErr, should.Resemble, fetcher.err)
+	a.So(res.OrgErr, should.Resemble, fetcher.err)
+
+	a.So(fetcher.ids, should.HaveLength, 3)
+	a.So(ttnpb.CombineIdentifiers(fetcher.ids...), should.Resemble, &ttnpb.CombinedIdentifiers{
+		ApplicationIDs:  []*ttnpb.ApplicationIdentifiers{{ApplicationID: "foo"}},
+		GatewayIDs:      []*ttnpb.GatewayIdentifiers{{GatewayID: "foo"}},
+		OrganizationIDs: []*ttnpb.OrganizationIdentifiers{{OrganizationID: "foo"}},
+	})
+}
+
 func TestIdentityServerFetcher(t *testing.T) {
 	a := assertions.New(t)
 
