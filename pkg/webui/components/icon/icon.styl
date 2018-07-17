@@ -18,13 +18,12 @@
   font-style: normal
   font-size: 1.3rem
   line-height: 1
-  display: inline-flex
-  text-transform: none
   letter-spacing: normal
-  word-wrap: normal
+  text-transform: none
+  display: inline-block
   white-space: nowrap
+  word-wrap: normal
   direction: ltr
-  align-items: center
   vertical-align: middle
   font-feature-settings: 'liga'
 
@@ -34,8 +33,10 @@
   &.large
     font-size: 2rem
 
-  &.nudgeTop
-    bottom: 2px
+  &.nudgeUp
+    position: relative
+    top: -1px
 
-  &.nudgeBottom
-    bottom: 0
+  &.nudgeDown
+    position: relative
+    top: 1px

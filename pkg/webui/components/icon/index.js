@@ -31,16 +31,16 @@ const hardcoded = {
 export default function ({
   icon = '',
   className,
-  nudgeTop,
-  nudgeBottom,
+  nudgeUp,
+  nudgeDown,
   small,
   large,
   ...rest
 }) {
 
   const classname = classnames(style.icon, className, {
-    [style.nudgeTop]: nudgeTop,
-    [style.nudgeBottom]: nudgeBottom,
+    [style.nudgeUp]: nudgeUp,
+    [style.nudgeDown]: nudgeDown,
     [style.large]: large,
     [style.small]: small,
   })

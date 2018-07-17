@@ -64,7 +64,7 @@ const Button = function ({
       {...rest}
     >
       <div className={style.content}>
-        {icon ? <Icon className={classnameIcon} nudgeTop icon={icon} /> : null}
+        {icon ? <Icon className={classnameIcon} nudgeUp icon={icon} /> : null}
         {busy ? <Spinner className={style.spinner} small after={200} /> : null}
         {message ? <Message content={message} /> : null}
       </div>

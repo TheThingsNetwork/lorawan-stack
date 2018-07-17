@@ -22,6 +22,10 @@ $button($color)
   color: white
   white-space: nowrap
 
+  &:not(.busy) span:last-child
+    vertical-align: middle
+    nudge('up')
+
   &:not(:last-child)
     margin-right: $cs.s
 
@@ -106,6 +110,7 @@ $button($color)
 
 .content
   position: relative
+  vertical-align: middle
 
 .spinner
   position: absolute
