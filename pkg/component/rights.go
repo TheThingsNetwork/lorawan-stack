@@ -17,21 +17,23 @@ package component
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
 
-// Implements pkg/auth/rights.IdentityServerConnector,
-// and is used by the rights fetcher hook.
-type rightsFetchingConnector struct {
-	*Component
-}
+func (c *Component) initRights() {
+	fetcher := rights.NewIdentityServerFetcher(func(ctx context.Context) *grpc.ClientConn {
+		peer := c.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, nil, nil)
+		if peer == nil {
+			return nil
+		}
+		return peer.Conn()
+	}, c.config.GRPC.AllowInsecureForCredentials)
 
-func (c rightsFetchingConnector) Get(context.Context) *grpc.ClientConn {
-	peer := c.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, nil, nil)
-	if peer == nil {
-		return nil
+	if c.config.Rights.TTL > 0 {
+		fetcher = rights.NewInMemoryCache(fetcher, c.config.Rights.TTL, c.config.Rights.TTL)
 	}
 
-	return peer.Conn()
+	c.rightsFetcher = fetcher
 }

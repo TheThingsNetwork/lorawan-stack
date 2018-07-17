@@ -20,6 +20,7 @@ import (
 	"strings"
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
@@ -112,6 +113,11 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	id := ttnpb.GatewayIdentifiers{
 		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
+
+	if err := rights.RequireGateway(ctx, id, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
+		return err
+	}
+
 	if err := validate.ID(id.GetGatewayID()); err != nil {
 		return err
 	}
@@ -128,11 +134,6 @@ func (g *GatewayServer) Link(link ttnpb.GtwGs_LinkServer) (err error) {
 	isInfo := g.GetPeer(ttnpb.PeerInfo_IDENTITY_SERVER, g.config.NSTags, nil)
 	if isInfo == nil {
 		return errNoIdentityServerFound
-	}
-
-	// TODO: Add rights caching: https://github.com/TheThingsIndustries/ttn/issues/594
-	if err = g.checkAuthorization(ctx, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
-		return err
 	}
 
 	gtw, err := g.getGateway(ctx, &id)

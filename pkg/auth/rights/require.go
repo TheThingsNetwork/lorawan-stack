@@ -21,47 +21,89 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-var errMissingOrganizationRights = errors.DefinePermissionDenied(
-	"missing_organization_rights",
-	"missing rights for organization `{uid}`",
-)
-
-// RequireOrganization checks that context contains the specified rights for the organization.
-// This only works if the Rights hook previously added the rights on the context,
-// using the auth data in the metadata, and the request data of the RPC.
-func RequireOrganization(ctx context.Context, rights ...ttnpb.Right) error {
-	if ad := fromContext(ctx); !ttnpb.IncludesRights(ad.rights, rights...) {
-		return errMissingOrganizationRights.WithAttributes("uid", ad.uid)
-	}
-	return nil
-}
-
 var errMissingApplicationRights = errors.DefinePermissionDenied(
 	"missing_application_rights",
 	"missing rights for application `{uid}`",
 )
-
-// RequireApplication checks that context contains the specified rights for the application.
-// This only works if the Rights hook previously added the rights on the context,
-// using the auth data in the metadata, and the request data of the RPC.
-func RequireApplication(ctx context.Context, rights ...ttnpb.Right) error {
-	if ad := fromContext(ctx); !ttnpb.IncludesRights(ad.rights, rights...) {
-		return errMissingApplicationRights.WithAttributes("uid", ad.uid)
-	}
-	return nil
-}
 
 var errMissingGatewayRights = errors.DefinePermissionDenied(
 	"missing_gateway_rights",
 	"missing rights for gateway `{uid}`",
 )
 
-// RequireGateway checks that context contains the specified rights for the gateway.
-// This only works if the Rights hook previously added the rights on the context,
-// using the auth data in the metadata, and the request data of the RPC.
-func RequireGateway(ctx context.Context, rights ...ttnpb.Right) error {
-	if ad := fromContext(ctx); !ttnpb.IncludesRights(ad.rights, rights...) {
-		return errMissingGatewayRights.WithAttributes("uid", ad.uid)
+var errMissingOrganizationRights = errors.DefinePermissionDenied(
+	"missing_organization_rights",
+	"missing rights for organization `{uid}`",
+)
+
+// RequireApplication checks that context contains the required rights for the
+// given Application ID.
+func RequireApplication(ctx context.Context, appID ttnpb.ApplicationIdentifiers, required ...ttnpb.Right) error {
+	rights, ok := FromContext(ctx)
+	if !ok {
+		fetcher, ok := fetcherFromContext(ctx)
+		if !ok {
+			panic(errNoFetcher)
+		}
+		appRights, err := fetcher.ApplicationRights(ctx, appID)
+		switch {
+		case err == nil, errors.IsPermissionDenied(err):
+			break
+		default:
+			return err
+		}
+		rights.ApplicationRights = map[ttnpb.ApplicationIdentifiers][]ttnpb.Right{appID: appRights}
+	}
+	if !rights.IncludesApplicationRights(appID, required...) {
+		return errMissingApplicationRights.WithAttributes("uid", appID.UniqueID(ctx))
+	}
+	return nil
+}
+
+// RequireGateway checks that context contains the required rights for the
+// given Gateway ID.
+func RequireGateway(ctx context.Context, gtwID ttnpb.GatewayIdentifiers, required ...ttnpb.Right) error {
+	rights, ok := FromContext(ctx)
+	if !ok {
+		fetcher, ok := fetcherFromContext(ctx)
+		if !ok {
+			panic(errNoFetcher)
+		}
+		gtwRights, err := fetcher.GatewayRights(ctx, gtwID)
+		switch {
+		case err == nil, errors.IsPermissionDenied(err):
+			break
+		default:
+			return err
+		}
+		rights.GatewayRights = map[ttnpb.GatewayIdentifiers][]ttnpb.Right{gtwID: gtwRights}
+	}
+	if !rights.IncludesGatewayRights(gtwID, required...) {
+		return errMissingGatewayRights.WithAttributes("uid", gtwID.UniqueID(ctx))
+	}
+	return nil
+}
+
+// RequireOrganization checks that context contains the required rights for the
+// given organization ID.
+func RequireOrganization(ctx context.Context, orgID ttnpb.OrganizationIdentifiers, required ...ttnpb.Right) error {
+	rights, ok := FromContext(ctx)
+	if !ok {
+		fetcher, ok := fetcherFromContext(ctx)
+		if !ok {
+			panic(errNoFetcher)
+		}
+		orgRights, err := fetcher.OrganizationRights(ctx, orgID)
+		switch {
+		case err == nil, errors.IsPermissionDenied(err):
+			break
+		default:
+			return err
+		}
+		rights.OrganizationRights = map[ttnpb.OrganizationIdentifiers][]ttnpb.Right{orgID: orgRights}
+	}
+	if !rights.IncludesOrganizationRights(orgID, required...) {
+		return errMissingOrganizationRights.WithAttributes("uid", orgID.UniqueID(ctx))
 	}
 	return nil
 }

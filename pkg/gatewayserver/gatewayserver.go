@@ -23,11 +23,7 @@ import (
 	mqttnet "github.com/TheThingsIndustries/mystique/pkg/net"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/errors/common"
-	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
-	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/validate"
 	"google.golang.org/grpc"
@@ -102,13 +98,6 @@ func New(c *component.Component, conf Config) (gs *GatewayServer, err error) {
 		go gs.runMQTTEndpoint(mqttLis)
 	}
 
-	rightsHook, err := c.RightsHook()
-	if err != nil {
-		return nil, err
-	}
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Gs/GetGatewayObservations", rights.HookName, rightsHook.UnaryHook())
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.UnaryHook())
-
 	c.RegisterGRPC(gs)
 	return gs, nil
 }
@@ -130,8 +119,8 @@ func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
 
 // GetGatewayObservations returns gateway information as observed by the Gateway Server.
 func (gs *GatewayServer) GetGatewayObservations(ctx context.Context, id *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayObservations, error) {
-	if !ttnpb.IncludesRights(rights.FromContext(ctx), ttnpb.RIGHT_GATEWAY_STATUS_READ) {
-		return nil, common.ErrPermissionDenied.New(nil)
+	if err := rights.RequireGateway(ctx, *id, ttnpb.RIGHT_GATEWAY_STATUS_READ); err != nil {
+		return nil, err
 	}
 
 	gtwID := id.GetGatewayID()
@@ -171,34 +160,4 @@ func (gs *GatewayServer) getGateway(ctx context.Context, id *ttnpb.GatewayIdenti
 		return nil, err
 	}
 	return is.GetGateway(ctx, id)
-}
-
-func (gs *GatewayServer) checkAuthorization(ctx context.Context, right ttnpb.Right) error {
-	md := rpcmetadata.FromIncomingContext(ctx)
-	md.AllowInsecure = gs.Component.AllowInsecureForCredentials()
-
-	if md.AuthType == "" || md.AuthValue == "" {
-		return errNoCredentialsPassed
-	}
-
-	if md.AuthType != "Bearer" {
-		return errUnexpectedAuthenticationType.WithAttributes("passed", md.AuthType, "expected", "Bearer")
-	}
-
-	is, err := gs.getIdentityServer()
-	if err != nil {
-		return err
-	}
-
-	ids := &ttnpb.GatewayIdentifiers{GatewayID: md.ID}
-	res, err := is.ListGatewayRights(ctx, ids, grpc.PerRPCCredentials(&md))
-	if err != nil {
-		return errListGatewayRights.WithCause(err)
-	}
-
-	if !ttnpb.IncludesRights(res.Rights, right) {
-		return errAPIKeyNeedsRights.WithAttributes("gateway_uid", ids.UniqueID(ctx), "rights", right.String())
-	}
-
-	return nil
 }

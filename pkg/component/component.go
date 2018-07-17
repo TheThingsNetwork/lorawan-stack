@@ -27,7 +27,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/config"
-	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/log/middleware/sentry"
@@ -64,7 +63,7 @@ type Component struct {
 
 	FrequencyPlans *frequencyplans.Store
 
-	rightsHook *rights.Hook
+	rightsFetcher rights.Fetcher
 }
 
 // MustNew calls New and returns a new component or panics on an error.
@@ -122,6 +121,8 @@ func (c *Component) Context() context.Context {
 
 // Start starts the component
 func (c *Component) Start() (err error) {
+	c.initRights()
+
 	c.initGRPC()
 
 	if c.grpc != nil {
@@ -224,23 +225,6 @@ func (c *Component) Close() {
 		c.grpc.Stop()
 		c.logger.Debug("Stopped gRPC server")
 	}
-}
-
-// RightsHook returns the hook that preload rights in the context based an authorization value.
-func (c *Component) RightsHook() (*rights.Hook, error) {
-	if c.rightsHook == nil {
-		config := rights.Config{
-			AllowInsecure: c.config.GRPC.AllowInsecureForCredentials,
-			Rights:        c.config.Rights,
-		}
-		hook, err := rights.New(c.ctx, rightsFetchingConnector{Component: c}, config)
-		if err != nil {
-			return nil, errors.New("could not initialize rights hook").WithCause(err)
-		}
-		c.rightsHook = hook
-	}
-
-	return c.rightsHook, nil
 }
 
 // AllowInsecureForCredentials returns `true` if the component was configured to allow transmission of credentials

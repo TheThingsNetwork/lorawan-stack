@@ -16,7 +16,6 @@ package deviceregistry
 
 import (
 	"context"
-	"fmt"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
@@ -24,7 +23,6 @@ import (
 	errors "go.thethings.network/lorawan-stack/pkg/errorsv3"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
-	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -75,24 +73,12 @@ func NewRPC(c *component.Component, r Interface, opts ...RPCOption) (*RegistryRP
 		opt(rpc)
 	}
 
-	hook, err := c.RightsHook()
-	if err != nil {
-		return nil, err
-	}
-	for _, servedComponent := range rpc.servedComponents {
-		diminutive, ok := componentsDiminutives[servedComponent]
-		if ok {
-			rpcPrefix := fmt.Sprintf("/ttn.lorawan.v3.%sDeviceRegistry", diminutive)
-			hooks.RegisterUnaryHook(rpcPrefix, rights.HookName, hook.UnaryHook())
-		}
-	}
-
 	return rpc, nil
 }
 
 // ListDevices lists devices matching filter in underlying registry.
 func (r *RegistryRPC) ListDevices(ctx context.Context, filter *ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevices, error) {
-	if err := rights.RequireApplication(ctx, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
+	if err := rights.RequireApplication(ctx, filter.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
 
@@ -108,7 +94,7 @@ func (r *RegistryRPC) ListDevices(ctx context.Context, filter *ttnpb.EndDeviceId
 
 // GetDevice returns the device associated with id in underlying registry, if found.
 func (r *RegistryRPC) GetDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevice, error) {
-	if err := rights.RequireApplication(ctx, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
+	if err := rights.RequireApplication(ctx, id.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
 
@@ -121,7 +107,7 @@ func (r *RegistryRPC) GetDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifi
 
 // SetDevice sets the device fields to match those of req.Device in underlying registry.
 func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest) (*ttnpb.EndDevice, error) {
-	if err := rights.RequireApplication(ctx, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 
@@ -165,7 +151,7 @@ func (r *RegistryRPC) SetDevice(ctx context.Context, req *ttnpb.SetDeviceRequest
 
 // DeleteDevice deletes the device associated with id from underlying registry.
 func (r *RegistryRPC) DeleteDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err := rights.RequireApplication(ctx, id.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 
